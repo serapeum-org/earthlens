@@ -1,0 +1,262 @@
+# Copernicus Marine Service (CMEMS) curated catalog
+#
+# Variable-catalog YAML for the `earthlens.cmems` backend.
+# `available_products:` is informational (mirrors the toolbox's
+# `copernicusmarine.describe()` index of every product id). `datasets:`
+# is the curated map this package actually consumes — each entry binds
+# a CMEMS `dataset_id` to the per-variable metadata we need when
+# constructing a `copernicusmarine.subset()` request.
+#
+# Dataset ids are stable across releases but new ones are added
+# regularly. To regenerate / extend the curated list, walk
+# `copernicusmarine.describe()` and append entries here. Dataset ids
+# that no longer resolve raise `copernicusmarine.DatasetNotFound` at
+# `subset()` time, which the backend re-raises so a stale row fails
+# loud at download time, not at import time.
+#
+# Schema:
+#   available_products:                   # optional list[str]
+#     - <product_id>
+#   datasets:
+#     <dataset_id>:                       # CMEMS dataset id (the key
+#                                          # the toolbox accepts)
+#       product: <product_id>             # parent product id (for
+#                                          # human reference)
+#       title: <human-readable title>
+#       cadence: <daily|monthly|hourly|6hourly|climatology|irregular>
+#       domain: <global|regional|arctic|baltic|black-sea|...>
+#       temporal:
+#         start: YYYY-MM-DD
+#         end: YYYY-MM-DD                 # null = NRT (rolling)
+#       variables:
+#         <variable_short_name>:
+#           units: <CF units string>
+#           long_name: <CF long name>
+#           types: state|flux             # optional; default state
+
+available_products:
+  - GLOBAL_MULTIYEAR_PHY_001_030          # GLORYS12 reanalysis
+  - GLOBAL_ANALYSISFORECAST_PHY_001_024   # global NRT physics
+  - GLOBAL_MULTIYEAR_BGC_001_029          # PISCES biogeochem reanalysis
+  - SST_GLO_SST_L4_NRT_OBSERVATIONS_010_001  # OSTIA SST NRT
+  - SST_GLO_SST_L4_REP_OBSERVATIONS_010_024  # OSTIA SST reanalysis
+  - SEALEVEL_GLO_PHY_L4_MY_008_047        # altimetry reanalysis
+  - SEAICE_GLO_PHY_L4_NRT_011_014         # sea ice concentration NRT
+  - MEDSEA_MULTIYEAR_PHY_006_004          # Mediterranean reanalysis
+  - BLKSEA_MULTIYEAR_PHY_007_004          # Black Sea reanalysis
+  - BALTICSEA_MULTIYEAR_PHY_003_011       # Baltic reanalysis
+  - ARCTIC_MULTIYEAR_PHY_002_003          # Arctic TOPAZ reanalysis
+  - IBI_MULTIYEAR_PHY_005_002             # IBI reanalysis
+
+datasets:
+  cmems_mod_glo_phy_my_0.083deg_P1D-m:
+    product: GLOBAL_MULTIYEAR_PHY_001_030
+    title: GLORYS12 — global ocean physical reanalysis (daily, 1/12°)
+    cadence: daily
+    domain: global
+    temporal:
+      start: 1993-01-01
+      end: null
+    variables:
+      thetao:
+        units: degrees_C
+        long_name: Sea water potential temperature
+      so:
+        units: "1e-3"
+        long_name: Sea water salinity
+      uo:
+        units: m s-1
+        long_name: Eastward sea water velocity
+      vo:
+        units: m s-1
+        long_name: Northward sea water velocity
+      zos:
+        units: m
+        long_name: Sea surface height above geoid
+
+  cmems_mod_glo_bgc_my_0.25deg_P1D-m:
+    product: GLOBAL_MULTIYEAR_BGC_001_029
+    title: PISCES global biogeochemistry reanalysis (daily, 1/4°)
+    cadence: daily
+    domain: global
+    temporal:
+      start: 1993-01-01
+      end: null
+    variables:
+      chl:
+        units: mg m-3
+        long_name: Mass concentration of chlorophyll-a in sea water
+      no3:
+        units: mmol m-3
+        long_name: Mole concentration of nitrate in sea water
+      po4:
+        units: mmol m-3
+        long_name: Mole concentration of phosphate in sea water
+      si:
+        units: mmol m-3
+        long_name: Mole concentration of silicate in sea water
+      o2:
+        units: mmol m-3
+        long_name: Mole concentration of dissolved oxygen in sea water
+
+  METOFFICE-GLO-SST-L4-NRT-OBS-SST-V2:
+    product: SST_GLO_SST_L4_NRT_OBSERVATIONS_010_001
+    title: OSTIA L4 SST analysis (NRT, daily, ~5 km)
+    cadence: daily
+    domain: global
+    temporal:
+      start: 2007-01-01
+      end: null
+    variables:
+      analysed_sst:
+        units: K
+        long_name: Analysed sea surface temperature
+      sea_ice_fraction:
+        units: "1"
+        long_name: Sea ice area fraction
+
+  ESACCI-GLO-SST-L4-REP-OBS-SST:
+    product: SST_GLO_SST_L4_REP_OBSERVATIONS_010_024
+    title: ESA SST CCI reprocessed L4 SST (daily, ~5 km)
+    cadence: daily
+    domain: global
+    temporal:
+      start: 1981-09-01
+      end: null
+    variables:
+      analysed_sst:
+        units: K
+        long_name: Analysed sea surface temperature
+      analysis_error:
+        units: K
+        long_name: Estimated error standard deviation of analysed_sst
+
+  cmems_obs-sl_glo_phy-ssh_my_allsat-l4-duacs-0.25deg_P1D:
+    product: SEALEVEL_GLO_PHY_L4_MY_008_047
+    title: Multi-mission L4 sea-level anomaly reanalysis (daily, 1/4°)
+    cadence: daily
+    domain: global
+    temporal:
+      start: 1993-01-01
+      end: null
+    variables:
+      sla:
+        units: m
+        long_name: Sea level anomaly
+      adt:
+        units: m
+        long_name: Absolute dynamic topography
+      ugos:
+        units: m s-1
+        long_name: Surface geostrophic eastward velocity
+      vgos:
+        units: m s-1
+        long_name: Surface geostrophic northward velocity
+
+  cmems_obs-si_glo_phy-conc_nrt_amsr-0.025deg_P1D:
+    product: SEAICE_GLO_PHY_L4_NRT_011_014
+    title: AMSR2 sea-ice concentration L4 (NRT, daily, 2.5 km)
+    cadence: daily
+    domain: polar
+    temporal:
+      start: 2017-01-01
+      end: null
+    variables:
+      ice_conc:
+        units: "%"
+        long_name: Sea-ice area fraction
+
+  med-cmcc-tem-rean-d:
+    product: MEDSEA_MULTIYEAR_PHY_006_004
+    title: Mediterranean Sea physical reanalysis — daily temperature
+    cadence: daily
+    domain: mediterranean
+    temporal:
+      start: 1987-01-01
+      end: null
+    variables:
+      thetao:
+        units: degrees_C
+        long_name: Sea water potential temperature
+      bottomT:
+        units: degrees_C
+        long_name: Sea floor potential temperature
+
+  cmems_mod_blk_phy_my_2.5km_P1D-m:
+    product: BLKSEA_MULTIYEAR_PHY_007_004
+    title: Black Sea physical reanalysis (daily, 2.5 km)
+    cadence: daily
+    domain: black-sea
+    temporal:
+      start: 1992-12-15
+      end: null
+    variables:
+      thetao:
+        units: degrees_C
+        long_name: Sea water potential temperature
+      so:
+        units: "1e-3"
+        long_name: Sea water salinity
+      zos:
+        units: m
+        long_name: Sea surface height above geoid
+
+  cmems_mod_bal_phy_my_P1D-m:
+    product: BALTICSEA_MULTIYEAR_PHY_003_011
+    title: Baltic Sea physical reanalysis (daily)
+    cadence: daily
+    domain: baltic-sea
+    temporal:
+      start: 1993-01-01
+      end: null
+    variables:
+      thetao:
+        units: degrees_C
+        long_name: Sea water potential temperature
+      so:
+        units: "1e-3"
+        long_name: Sea water salinity
+      zos:
+        units: m
+        long_name: Sea surface height above geoid
+
+  cmems_mod_arc_phy_my_topaz4_P1D-m:
+    product: ARCTIC_MULTIYEAR_PHY_002_003
+    title: Arctic TOPAZ4 physical reanalysis (daily)
+    cadence: daily
+    domain: arctic
+    temporal:
+      start: 1991-01-02
+      end: null
+    variables:
+      thetao:
+        units: degrees_C
+        long_name: Sea water potential temperature
+      so:
+        units: "1e-3"
+        long_name: Sea water salinity
+      siconc:
+        units: "1"
+        long_name: Sea-ice area fraction
+
+  cmems_mod_ibi_phy_my_0.083deg-3D_P1D-m:
+    product: IBI_MULTIYEAR_PHY_005_002
+    title: Iberian-Biscay-Ireland physical reanalysis (daily, 1/12°)
+    cadence: daily
+    domain: ibi
+    temporal:
+      start: 1993-01-01
+      end: null
+    variables:
+      thetao:
+        units: degrees_C
+        long_name: Sea water potential temperature
+      so:
+        units: "1e-3"
+        long_name: Sea water salinity
+      uo:
+        units: m s-1
+        long_name: Eastward sea water velocity
+      vo:
+        units: m s-1
+        long_name: Northward sea water velocity

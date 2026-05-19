@@ -102,7 +102,7 @@ class EarthLens:
             ```python
             >>> from earthlens.earthlens import EarthLens
             >>> sorted(EarthLens.DataSources)
-            ['amazon-s3', 'chc', 'chirps', 'ecmwf', 'gee', 'google-earth-engine']
+            ['amazon-s3', 'chc', 'chirps', 'cmems', 'ecmwf', 'gee', 'google-earth-engine']
 
             ```
         - Asking for an unknown backend raises `ValueError`:
@@ -119,6 +119,8 @@ class EarthLens:
     See Also:
         :class:`earthlens.chc.CHIRPS`: CHIRPS rainfall over FTP.
         :class:`earthlens.s3.S3`: ERA5 on AWS public S3 bucket.
+        :class:`earthlens.cmems.CMEMS`: Copernicus Marine ocean
+            datasets via `copernicusmarine`.
         :class:`earthlens.ecmwf.ECMWF`: ERA5 via the Copernicus
             Climate Data Store (cdsapi).
         :class:`earthlens.gee.GEE`: imagery from Google Earth Engine
@@ -134,6 +136,7 @@ class EarthLens:
             # key is kept for callers that still use it.
             "chirps": ("earthlens.chc", "CHIRPS", ""),
             "amazon-s3": ("earthlens.s3", "S3", "s3"),
+            "cmems": ("earthlens.cmems", "CMEMS", "cmems"),
             "ecmwf": ("earthlens.ecmwf", "ECMWF", "ecmwf"),
             "gee": ("earthlens.gee", "GEE", "gee"),
             "google-earth-engine": ("earthlens.gee", "GEE", "gee"),
@@ -161,9 +164,9 @@ class EarthLens:
 
         Args:
             data_source: Backend key — one of `"chc"` (alias
-                `"chirps"`), `"amazon-s3"`, `"ecmwf"`, or `"gee"`
-                (alias `"google-earth-engine"`). Defaults to
-                `"chc"`.
+                `"chirps"`), `"amazon-s3"`, `"cmems"`, `"ecmwf"`,
+                or `"gee"` (alias `"google-earth-engine"`).
+                Defaults to `"chc"`.
             temporal_resolution: `"daily"` or `"monthly"` for most
                 backends; the GEE backend also accepts `"raw"` and
                 `"yearly"`. The concrete backend may accept a narrower
