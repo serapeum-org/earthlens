@@ -69,6 +69,26 @@ def cadence_for_dataset_id(dataset_id: str) -> str:
     Returns:
         One of `"hourly"`, `"6hourly"`, `"daily"`, `"weekly"`,
             `"monthly"`, `"annual"`, `"climatology"`, or `"irregular"`.
+
+    Examples:
+        - GLORYS daily mean -> `"daily"`:
+            ```python
+            >>> cadence_for_dataset_id("cmems_mod_glo_phy_my_0.083deg_P1D-m")
+            'daily'
+
+            ```
+        - A `-climatology_P1M-m` suffix wins over the bare `_P1M-m`:
+            ```python
+            >>> cadence_for_dataset_id("cmems_mod_glo_phy_my_0.083deg-climatology_P1M-m")
+            'climatology'
+
+            ```
+        - An id with no recognised suffix falls back to `"irregular"`:
+            ```python
+            >>> cadence_for_dataset_id("some_static_dataset_no_suffix")
+            'irregular'
+
+            ```
     """
     for suffix, cadence in _CADENCE_SUFFIXES:
         if suffix in dataset_id:
@@ -127,6 +147,26 @@ def domain_for_product_id(product_id: str) -> str:
             `"baltic-sea"`, `"arctic"`, `"ibi"`, `"nw-shelf"`,
             `"polar"`, or `"indicator"`. Unknown prefixes fall back to
             `"global"`.
+
+    Examples:
+        - A global physics product routes to `"global"`:
+            ```python
+            >>> domain_for_product_id("GLOBAL_MULTIYEAR_PHY_001_030")
+            'global'
+
+            ```
+        - A composite prefix like `SST_GLO_` resolves to its region segment:
+            ```python
+            >>> domain_for_product_id("SST_GLO_SST_L4_NRT_OBSERVATIONS_010_001")
+            'global'
+
+            ```
+        - An unrecognised prefix falls back to `"global"`:
+            ```python
+            >>> domain_for_product_id("UNKNOWN_PREFIX_X")
+            'global'
+
+            ```
     """
     sorted_prefixes = sorted(_DOMAIN_PREFIXES, key=lambda kv: -len(kv[0]))
     for prefix, domain in sorted_prefixes:
@@ -152,6 +192,28 @@ def humanize_standard_name(standard_name: str | None) -> str:
     Returns:
         The capitalised, space-separated form, or `""` if input is
             falsy.
+
+    Examples:
+        - CF standard_name -> humanised long_name:
+            ```python
+            >>> humanize_standard_name("sea_water_potential_temperature")
+            'Sea water potential temperature'
+
+            ```
+        - Single-word names are simply capitalised:
+            ```python
+            >>> humanize_standard_name("chlorophyll")
+            'Chlorophyll'
+
+            ```
+        - Falsy input maps to an empty string (does not raise):
+            ```python
+            >>> humanize_standard_name(None)
+            ''
+            >>> humanize_standard_name("")
+            ''
+
+            ```
     """
     if not standard_name:
         return ""
@@ -285,6 +347,30 @@ def render_available_products_block(product_ids: Iterable[str]) -> str:
     Returns:
         The block as a string, ready to splice via
             :func:`splice_available_products`.
+
+    Examples:
+        - Render and inspect the block:
+            ```python
+            >>> block = render_available_products_block(["GLOBAL_X", "ARCTIC_Y"])
+            >>> print(block, end="")
+            available_products:
+              - ARCTIC_Y
+              - GLOBAL_X
+
+            ```
+        - Duplicate inputs are collapsed:
+            ```python
+            >>> block = render_available_products_block(["A", "A", "B"])
+            >>> block.count("- A")
+            1
+
+            ```
+        - Empty input yields just the header line:
+            ```python
+            >>> render_available_products_block([])
+            'available_products:\\n'
+
+            ```
     """
     sorted_ids = sorted(set(product_ids))
     lines = ["available_products:"]
@@ -401,6 +487,30 @@ def compact_text(raw_text: str) -> str:
 
     Returns:
         Cleaned text ending in a single newline.
+
+    Examples:
+        - Scratch markers and blank-run collapse:
+            ```python
+            >>> raw = "# ---- paste under `datasets:` ----\\n  ds-a:\\n\\n\\n\\n  ds-b:\\n"
+            >>> out = compact_text(raw)
+            >>> "# ---- paste" in out
+            False
+            >>> "ds-a" in out and "ds-b" in out
+            True
+
+            ```
+        - CRLF line endings normalise to LF:
+            ```python
+            >>> "\\r" in compact_text("  ds-x:\\r\\n    product: P\\r\\n")
+            False
+
+            ```
+        - Empty input still ends with a single newline:
+            ```python
+            >>> compact_text("")
+            '\\n'
+
+            ```
     """
     raw_text = raw_text.replace("\r\n", "\n").replace("\r", "\n")
     kept: list[str] = []
