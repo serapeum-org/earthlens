@@ -114,6 +114,11 @@ nav:
       - Catalog & Tooling: reference/chc/catalog.md
       - Reference: reference/chc/chc.md
     - Amazon S3: reference/s3.md
+    - CMEMS (Copernicus Marine):
+      - Introduction: reference/cmems/introduction.md
+      - Usage: reference/cmems/usage.md
+      - Authentication: reference/cmems/authentication.md
+      - Reference: reference/cmems/cmems.md
     - ECMWF:
       - Reference: reference/ecmwf.md
       - Catalog & Probes: reference/ecmwf/catalog.md
@@ -140,6 +145,11 @@ nav:
       - Heat waves — public health: examples/ecmwf/heat_waves_public_health.ipynb
       - Climate change — temperature anomalies: examples/ecmwf/climate_change_anomalies.ipynb
       - Drought — SPI from precipitation: examples/ecmwf/drought_precipitation_deficit.ipynb
+    - Copernicus Marine:
+      - Quickstart — OSTIA SST: examples/cmems/quickstart.ipynb
+      - GLORYS — thermocline time-series: examples/cmems/glorys_thermocline_timeseries.ipynb
+      - PISCES — chlorophyll seasonal cycle: examples/cmems/pisces_chlorophyll_seasonal_cycle.ipynb
+      - Altimetry — coastal sea-level anomaly: examples/cmems/altimetry_sla_coastal_signal.ipynb
     - Google Earth Engine:
       - Quickstart — EarthLens facade: examples/gee/quickstart.ipynb
       - Atmosphere & chemistry — TROPOMI NO2: examples/gee/atmosphere-chemistry.ipynb
