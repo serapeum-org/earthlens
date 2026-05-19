@@ -3,7 +3,7 @@
 # Variable-catalog YAML for the `earthlens.cmems` backend.
 # `available_products:` is informational (mirrors the toolbox's
 # `copernicusmarine.describe()` index of every product id). `datasets:`
-# is the curated map this package actually consumes — each entry binds
+# is the curated map this package actually consumes - each entry binds
 # a CMEMS `dataset_id` to the per-variable metadata we need when
 # constructing a `copernicusmarine.subset()` request.
 #
@@ -14,17 +14,23 @@
 # `subset()` time, which the backend re-raises so a stale row fails
 # loud at download time, not at import time.
 #
+# Maintainer tools:
+#   tools/cmems/refresh_cmems_catalog.py refresh            # rewrite available_products: from cm.describe()
+#   tools/cmems/refresh_cmems_catalog.py refresh \
+#       --with-datasets <product_id>                        # emit datasets: stanzas for a product
+#   tools/cmems/refresh_cmems_catalog.py add-ids <ds_id>    # fetch + compact + append one stanza
+#   tools/cmems/audit_cmems_datasets.py [--strict]          # classify curated rows vs the live catalogue
+#   tools/cmems/probe_cmems_netcdf.py --all-curated         # JSON sidecar of on-disk long_name/units (needs creds)
+#
 # Schema:
-#   available_products:                   # optional list[str]
+#   available_products:                   # list[str] - informational
 #     - <product_id>
 #   datasets:
-#     <dataset_id>:                       # CMEMS dataset id (the key
-#                                          # the toolbox accepts)
-#       product: <product_id>             # parent product id (for
-#                                          # human reference)
+#     <dataset_id>:                       # CMEMS dataset id (the key the toolbox accepts)
+#       product: <product_id>
 #       title: <human-readable title>
 #       cadence: <daily|monthly|hourly|6hourly|climatology|irregular>
-#       domain: <global|regional|arctic|baltic|black-sea|...>
+#       domain: <global|regional|arctic|baltic|black-sea|mediterranean|ibi|polar|nw-shelf|indicator>
 #       temporal:
 #         start: YYYY-MM-DD
 #         end: YYYY-MM-DD                 # null = NRT (rolling)
@@ -35,23 +41,320 @@
 #           types: state|flux             # optional; default state
 
 available_products:
-  - GLOBAL_MULTIYEAR_PHY_001_030          # GLORYS12 reanalysis
-  - GLOBAL_ANALYSISFORECAST_PHY_001_024   # global NRT physics
-  - GLOBAL_MULTIYEAR_BGC_001_029          # PISCES biogeochem reanalysis
-  - SST_GLO_SST_L4_NRT_OBSERVATIONS_010_001  # OSTIA SST NRT
-  - SST_GLO_SST_L4_REP_OBSERVATIONS_010_024  # OSTIA SST reanalysis
-  - SEALEVEL_GLO_PHY_L4_MY_008_047        # altimetry reanalysis
-  - SEAICE_GLO_PHY_L4_NRT_011_014         # sea ice concentration NRT
-  - MEDSEA_MULTIYEAR_PHY_006_004          # Mediterranean reanalysis
-  - BLKSEA_MULTIYEAR_PHY_007_004          # Black Sea reanalysis
-  - BALTICSEA_MULTIYEAR_PHY_003_011       # Baltic reanalysis
-  - ARCTIC_MULTIYEAR_PHY_002_003          # Arctic TOPAZ reanalysis
-  - IBI_MULTIYEAR_PHY_005_002             # IBI reanalysis
+  - ANTARCTIC_OMI_SI_extent
+  - ANTARCTIC_OMI_SI_extent_obs
+  - ARCTIC_ANALYSISFORECAST_BGC_002_004
+  - ARCTIC_ANALYSISFORECAST_PHY_002_001
+  - ARCTIC_ANALYSISFORECAST_PHY_ICE_002_011
+  - ARCTIC_ANALYSISFORECAST_PHY_TIDE_002_015
+  - ARCTIC_ANALYSIS_FORECAST_WAV_002_014
+  - ARCTIC_MULTIYEAR_BGC_002_005
+  - ARCTIC_MULTIYEAR_PHY_002_003
+  - ARCTIC_MULTIYEAR_PHY_ICE_002_016
+  - ARCTIC_MULTIYEAR_WAV_002_013
+  - ARCTIC_OMI_SI_extent
+  - ARCTIC_OMI_SI_extent_obs
+  - ARCTIC_OMI_TEMPSAL_FWC
+  - BALTICSEA_ANALYSISFORECAST_BGC_003_007
+  - BALTICSEA_ANALYSISFORECAST_PHY_003_006
+  - BALTICSEA_ANALYSISFORECAST_WAV_003_010
+  - BALTICSEA_MULTIYEAR_BGC_003_012
+  - BALTICSEA_MULTIYEAR_PHY_003_011
+  - BALTICSEA_MULTIYEAR_WAV_003_015
+  - BATHYMETRY_GLO_PHY_COASTAL_L4_MY_016_001
+  - BLKSEA_ANALYSISFORECAST_BGC_007_010
+  - BLKSEA_ANALYSISFORECAST_PHY_007_001
+  - BLKSEA_ANALYSISFORECAST_WAV_007_003
+  - BLKSEA_MULTIYEAR_BGC_007_005
+  - BLKSEA_MULTIYEAR_PHY_007_004
+  - BLKSEA_MULTIYEAR_WAV_007_006
+  - BLKSEA_OMI_HEALTH_oxygen_trend
+  - BLKSEA_OMI_SEASTATE_extreme_var_swh_mean_and_anomaly
+  - BLKSEA_OMI_TEMPSAL_extreme_var_temp_mean_and_anomaly
+  - BLKSEA_OMI_TEMPSAL_sst_area_averaged_anomalies
+  - BLKSEA_OMI_TEMPSAL_sst_trend
+  - GLOBAL_ANALYSISFORECAST_BGC_001_028
+  - GLOBAL_ANALYSISFORECAST_PHY_001_024
+  - GLOBAL_ANALYSISFORECAST_WAV_001_027
+  - GLOBAL_MULTIYEAR_BGC_001_029
+  - GLOBAL_MULTIYEAR_BGC_001_033
+  - GLOBAL_MULTIYEAR_PHY_001_030
+  - GLOBAL_MULTIYEAR_PHY_ENS_001_031
+  - GLOBAL_MULTIYEAR_WAV_001_032
+  - GLOBAL_OMI_CLIMVAR_enso_Tzt_anomaly
+  - GLOBAL_OMI_CLIMVAR_enso_sst_area_averaged_anomalies
+  - GLOBAL_OMI_HEALTH_carbon_co2_flux_integrated
+  - GLOBAL_OMI_HEALTH_carbon_ph_area_averaged
+  - GLOBAL_OMI_HEALTH_carbon_ph_trend
+  - GLOBAL_OMI_NATLANTIC_amoc_26N_profile
+  - GLOBAL_OMI_NATLANTIC_amoc_max26N_timeseries
+  - GLOBAL_OMI_TEMPSAL_sst_area_averaged_anomalies
+  - GLOBAL_OMI_TEMPSAL_sst_trend
+  - GLOBAL_OMI_WMHE_heattrp
+  - GLOBAL_OMI_WMHE_northward_mht
+  - GLOBAL_OMI_WMHE_voltrp
+  - IBI_ANALYSISFORECAST_BGC_005_004
+  - IBI_ANALYSISFORECAST_PHY_005_001
+  - IBI_ANALYSISFORECAST_WAV_005_005
+  - IBI_MULTIYEAR_BGC_005_003
+  - IBI_MULTIYEAR_PHY_005_002
+  - IBI_MULTIYEAR_WAV_005_006
+  - IBI_OMI_CURRENTS_cui
+  - IBI_OMI_SEASTATE_extreme_var_swh_mean_and_anomaly
+  - IBI_OMI_SEASTATE_swi
+  - IBI_OMI_WMHE_mow
+  - INSITU_ARC_PHYBGCWAV_DISCRETE_MYNRT_013_031
+  - INSITU_BAL_PHYBGCWAV_DISCRETE_MYNRT_013_032
+  - INSITU_BLK_PHYBGCWAV_DISCRETE_MYNRT_013_034
+  - INSITU_GLO_BGC_CARBON_DISCRETE_MY_013_050
+  - INSITU_GLO_BGC_DISCRETE_MY_013_046
+  - INSITU_GLO_PHYBGCWAV_DISCRETE_MYNRT_013_030
+  - INSITU_GLO_PHY_SSH_DISCRETE_MY_013_053
+  - INSITU_GLO_PHY_TS_DISCRETE_MY_013_001
+  - INSITU_GLO_PHY_TS_OA_MY_013_052
+  - INSITU_GLO_PHY_TS_OA_NRT_013_002
+  - INSITU_GLO_PHY_UV_DISCRETE_MY_013_044
+  - INSITU_GLO_PHY_UV_DISCRETE_NRT_013_048
+  - INSITU_GLO_WAV_DISCRETE_MY_013_045
+  - INSITU_IBI_PHYBGCWAV_DISCRETE_MYNRT_013_033
+  - INSITU_MED_PHYBGCWAV_DISCRETE_MYNRT_013_035
+  - INSITU_NWS_PHYBGCWAV_DISCRETE_MYNRT_013_036
+  - MEDSEA_ANALYSISFORECAST_BGC_006_014
+  - MEDSEA_ANALYSISFORECAST_PHY_006_013
+  - MEDSEA_ANALYSISFORECAST_WAV_006_017
+  - MEDSEA_MULTIYEAR_BGC_006_008
+  - MEDSEA_MULTIYEAR_PHY_006_004
+  - MEDSEA_MULTIYEAR_WAV_006_012
+  - MEDSEA_OMI_SEASTATE_extreme_var_swh_mean_and_anomaly
+  - MEDSEA_OMI_TEMPSAL_extreme_var_temp_mean_and_anomaly
+  - MEDSEA_OMI_TEMPSAL_sst_area_averaged_anomalies
+  - MEDSEA_OMI_TEMPSAL_sst_trend
+  - MULTIOBS_GLO_BGC_CARBON_SURFACE_MYNRT_015_008
+  - MULTIOBS_GLO_BGC_NUTRIENTS_CARBON_PROFILES_MYNRT_015_009
+  - MULTIOBS_GLO_BGC_SURFACE_NRT_015_016
+  - MULTIOBS_GLO_BIO_BGC_3D_REP_015_010
+  - MULTIOBS_GLO_PHY_MYNRT_015_003
+  - MULTIOBS_GLO_PHY_SSS_L3_MYNRT_015_014
+  - MULTIOBS_GLO_PHY_SSS_L4_MY_015_015
+  - MULTIOBS_GLO_PHY_S_SURFACE_MYNRT_015_013
+  - MULTIOBS_GLO_PHY_TSUV_3D_MYNRT_015_012
+  - MULTIOBS_GLO_PHY_UVW_3D_MYNRT_015_007
+  - NORTHWESTSHELF_OMI_TEMPSAL_extreme_var_temp_mean_and_anomaly
+  - NWSHELF_ANALYSISFORECAST_BGC_004_002
+  - NWSHELF_ANALYSISFORECAST_PHY_004_013
+  - NWSHELF_ANALYSISFORECAST_PHY_LR_004_001
+  - NWSHELF_ANALYSISFORECAST_WAV_004_014
+  - NWSHELF_MULTIYEAR_BGC_004_011
+  - NWSHELF_MULTIYEAR_PHY_004_009
+  - NWSHELF_REANALYSIS_WAV_004_015
+  - OCEANCOLOUR_ARC_BGC_HR_L3_NRT_009_201
+  - OCEANCOLOUR_ARC_BGC_HR_L4_NRT_009_207
+  - OCEANCOLOUR_ARC_BGC_L3_MY_009_123
+  - OCEANCOLOUR_ARC_BGC_L3_NRT_009_121
+  - OCEANCOLOUR_ARC_BGC_L4_MY_009_124
+  - OCEANCOLOUR_ARC_BGC_L4_NRT_009_122
+  - OCEANCOLOUR_ATL_BGC_L3_MY_009_113
+  - OCEANCOLOUR_ATL_BGC_L3_NRT_009_111
+  - OCEANCOLOUR_ATL_BGC_L4_MY_009_118
+  - OCEANCOLOUR_ATL_BGC_L4_NRT_009_116
+  - OCEANCOLOUR_BAL_BGC_HR_L3_NRT_009_202
+  - OCEANCOLOUR_BAL_BGC_HR_L4_NRT_009_208
+  - OCEANCOLOUR_BAL_BGC_L3_MY_009_133
+  - OCEANCOLOUR_BAL_BGC_L3_NRT_009_131
+  - OCEANCOLOUR_BAL_BGC_L4_MY_009_134
+  - OCEANCOLOUR_BAL_BGC_L4_NRT_009_132
+  - OCEANCOLOUR_BLK_BGC_HR_L3_NRT_009_206
+  - OCEANCOLOUR_BLK_BGC_HR_L4_NRT_009_212
+  - OCEANCOLOUR_BLK_BGC_L3_MY_009_153
+  - OCEANCOLOUR_BLK_BGC_L3_NRT_009_151
+  - OCEANCOLOUR_BLK_BGC_L4_MY_009_154
+  - OCEANCOLOUR_BLK_BGC_L4_NRT_009_152
+  - OCEANCOLOUR_GLO_BGC_L3_MY_009_103
+  - OCEANCOLOUR_GLO_BGC_L3_MY_009_107
+  - OCEANCOLOUR_GLO_BGC_L3_NRT_009_101
+  - OCEANCOLOUR_GLO_BGC_L4_MY_009_104
+  - OCEANCOLOUR_GLO_BGC_L4_MY_009_108
+  - OCEANCOLOUR_GLO_BGC_L4_NRT_009_102
+  - OCEANCOLOUR_IBI_BGC_HR_L3_NRT_009_204
+  - OCEANCOLOUR_IBI_BGC_HR_L4_NRT_009_210
+  - OCEANCOLOUR_MED_BGC_HR_L3_NRT_009_205
+  - OCEANCOLOUR_MED_BGC_HR_L4_NRT_009_211
+  - OCEANCOLOUR_MED_BGC_L3_MY_009_143
+  - OCEANCOLOUR_MED_BGC_L3_NRT_009_141
+  - OCEANCOLOUR_MED_BGC_L4_MY_009_144
+  - OCEANCOLOUR_MED_BGC_L4_NRT_009_142
+  - OCEANCOLOUR_NWS_BGC_HR_L3_NRT_009_203
+  - OCEANCOLOUR_NWS_BGC_HR_L4_NRT_009_209
+  - OMI_CIRCULATION_BOUNDARY_ATLANTIC_gulf_stream_destabilization_point
+  - OMI_CIRCULATION_BOUNDARY_BLKSEA_rim_current_index
+  - OMI_CIRCULATION_BOUNDARY_PACIFIC_kuroshio_phase_area_averaged
+  - OMI_CIRCULATION_MOC_BLKSEA_area_averaged_mean
+  - OMI_CIRCULATION_MOC_MEDSEA_area_averaged_mean
+  - OMI_CIRCULATION_VOLTRANS_ARCTIC_averaged
+  - OMI_CIRCULATION_VOLTRANS_IBI_section_integrated_anomalies
+  - OMI_CLIMATE_OFC_BALTIC_area_averaged_anomalies
+  - OMI_CLIMATE_OHC_BALTIC_area_averaged_anomalies
+  - OMI_CLIMATE_OHC_BLKSEA_area_averaged_anomalies
+  - OMI_CLIMATE_OHC_GLOBAL_area_averaged_anomalies_0_2000
+  - OMI_CLIMATE_OHC_GLOBAL_area_averaged_anomalies_0_300
+  - OMI_CLIMATE_OHC_GLOBAL_area_averaged_anomalies_0_700
+  - OMI_CLIMATE_OHC_GLOBAL_trend
+  - OMI_CLIMATE_OHC_IBI_area_averaged_anomalies
+  - OMI_CLIMATE_OHC_MEDSEA_area_averaged_anomalies
+  - OMI_CLIMATE_OSC_MEDSEA_volume_mean
+  - OMI_CLIMATE_SI_ARCTIC_transport
+  - OMI_CLIMATE_SI_BALTIC_extent
+  - OMI_CLIMATE_SI_BALTIC_volume
+  - OMI_CLIMATE_SL_BALTIC_area_averaged_anomalies
+  - OMI_CLIMATE_SL_BLKSEA_area_averaged_anomalies
+  - OMI_CLIMATE_SL_EUROPE_area_averaged_anomalies
+  - OMI_CLIMATE_SL_GLOBAL_area_averaged_anomalies
+  - OMI_CLIMATE_SL_GLOBAL_regional_trends
+  - OMI_CLIMATE_SL_IBI_area_averaged_anomalies
+  - OMI_CLIMATE_SL_MEDSEA_area_averaged_anomalies
+  - OMI_CLIMATE_SL_NORTHWESTSHELF_area_averaged_anomalies
+  - OMI_CLIMATE_SST_BAL_area_averaged_anomalies
+  - OMI_CLIMATE_SST_BAL_trend
+  - OMI_CLIMATE_SST_IBI_area_averaged_anomalies
+  - OMI_CLIMATE_SST_IBI_trend
+  - OMI_CLIMATE_SST_IST_ARCTIC_anomaly
+  - OMI_CLIMATE_SST_IST_ARCTIC_area_averaged_anomalies
+  - OMI_CLIMATE_SST_IST_ARCTIC_trend
+  - OMI_CLIMATE_SST_NORTHWESTSHELF_area_averaged_anomalies
+  - OMI_CLIMATE_SST_NORTHWESTSHELF_trend
+  - OMI_CLIMATE_TEMPSAL_BALTIC_Stz_trend
+  - OMI_CLIMATE_TEMPSAL_BALTIC_Ttz_trend
+  - OMI_CLIMATE_TEMPSAL_IBI_extreme_var_mean_and_anomaly
+  - OMI_CLIMATE_THSL_GLOBAL_area_averaged_anomalies_0_2000
+  - OMI_CLIMATE_THSL_GLOBAL_area_averaged_anomalies_0_700
+  - OMI_CLIMATE_THSL_GLOBAL_trend
+  - OMI_EXTREME_CLIMVAR_PACIFIC_npgo_sla_eof_mode_projection
+  - OMI_EXTREME_MHW_ARCTIC_area_averaged_anomalies
+  - OMI_EXTREME_SL_BALTIC_slev_mean_and_anomaly_obs
+  - OMI_EXTREME_SL_IBI_slev_mean_and_anomaly_obs
+  - OMI_EXTREME_SL_MEDSEA_slev_mean_and_anomaly_obs
+  - OMI_EXTREME_SL_NORTHWESTSHELF_slev_mean_and_anomaly_obs
+  - OMI_EXTREME_SST_BALTIC_sst_mean_and_anomaly_obs
+  - OMI_EXTREME_SST_IBI_sst_mean_and_anomaly_obs
+  - OMI_EXTREME_SST_MEDSEA_sst_mean_and_anomaly_obs
+  - OMI_EXTREME_SST_NORTHWESTSHELF_sst_mean_and_anomaly_obs
+  - OMI_EXTREME_STATE_GLOBAL_trend
+  - OMI_EXTREME_WAVE_BALTIC_swh_mean_and_anomaly_obs
+  - OMI_EXTREME_WAVE_BLKSEA_recent_changes
+  - OMI_EXTREME_WAVE_BLKSEA_wave_power
+  - OMI_EXTREME_WAVE_IBI_swh_mean_and_anomaly_obs
+  - OMI_EXTREME_WAVE_MEDSEA_swh_mean_and_anomaly_obs
+  - OMI_EXTREME_WAVE_NORTHWESTSHELF_swh_mean_and_anomaly_obs
+  - OMI_EXTREME_WMF_MEDSEA_area_averaged_mean
+  - OMI_HEALTH_BLOOM_BALTIC_spatiotemporal_coverage
+  - OMI_HEALTH_CHL_ARCTIC_OCEANCOLOUR_area_averaged_mean
+  - OMI_HEALTH_CHL_ATLANTIC_OCEANCOLOUR_area_averaged_mean
+  - OMI_HEALTH_CHL_ATLANTIC_OCEANCOLOUR_eutrophication
+  - OMI_HEALTH_CHL_BALTIC_OCEANCOLOUR_area_averaged_mean
+  - OMI_HEALTH_CHL_BALTIC_OCEANCOLOUR_trend
+  - OMI_HEALTH_CHL_BLKSEA_OCEANCOLOUR_area_averaged_mean
+  - OMI_HEALTH_CHL_BLKSEA_OCEANCOLOUR_trend
+  - OMI_HEALTH_CHL_GLOBAL_OCEANCOLOUR_oligo_nag_area_mean
+  - OMI_HEALTH_CHL_GLOBAL_OCEANCOLOUR_oligo_npg_area_mean
+  - OMI_HEALTH_CHL_GLOBAL_OCEANCOLOUR_oligo_sag_area_mean
+  - OMI_HEALTH_CHL_GLOBAL_OCEANCOLOUR_oligo_spg_area_mean
+  - OMI_HEALTH_CHL_GLOBAL_OCEANCOLOUR_trend
+  - OMI_HEALTH_CHL_MEDSEA_OCEANCOLOUR_area_averaged_mean
+  - OMI_HEALTH_CHL_MEDSEA_OCEANCOLOUR_trend
+  - OMI_HEALTH_TEMPSALOXY_BALTIC_cod_volume
+  - OMI_HEALTH_TEMPSALOXY_BALTIC_mbi_bottom_salinity_arkona_bornholm
+  - OMI_HEALTH_TEMPSALOXY_BALTIC_mbi_sto2tz_gotland
+  - SEAICE_ANT_PHY_AUTO_L3_NRT_011_012
+  - SEAICE_ANT_PHY_L3_MY_011_018
+  - SEAICE_ARC_PHY_AUTO_L3_MYNRT_011_023
+  - SEAICE_ARC_PHY_AUTO_L4_MYNRT_011_024
+  - SEAICE_ARC_PHY_AUTO_L4_MY_011_025
+  - SEAICE_ARC_PHY_CLIMATE_L3_MY_011_021
+  - SEAICE_ARC_PHY_CLIMATE_L4_MY_011_016
+  - SEAICE_ARC_PHY_SST-IST_L3S_NRT_011_022
+  - SEAICE_ARC_SEAICE_L3_REP_OBSERVATIONS_011_010
+  - SEAICE_ARC_SEAICE_L4_NRT_OBSERVATIONS_011_002
+  - SEAICE_ARC_SEAICE_L4_NRT_OBSERVATIONS_011_007
+  - SEAICE_ARC_SEAICE_L4_NRT_OBSERVATIONS_011_008
+  - SEAICE_BAL_PHY_L4_MY_011_019
+  - SEAICE_BAL_SEAICE_L4_NRT_OBSERVATIONS_011_004
+  - SEAICE_BAL_SEAICE_L4_NRT_OBSERVATIONS_011_011
+  - SEAICE_GLO_PHY_CLIMATE_L3_MY_011_013
+  - SEAICE_GLO_PHY_L4_MY_011_020
+  - SEAICE_GLO_PHY_L4_NRT_011_014
+  - SEAICE_GLO_SEAICE_L4_NRT_OBSERVATIONS_011_001
+  - SEAICE_GLO_SEAICE_L4_NRT_OBSERVATIONS_011_006
+  - SEAICE_GLO_SEAICE_L4_REP_OBSERVATIONS_011_009
+  - SEALEVEL_BLK_PHY_MDT_L4_STATIC_008_067
+  - SEALEVEL_EUR_PHY_L3_MY_008_061
+  - SEALEVEL_EUR_PHY_L3_NRT_008_059
+  - SEALEVEL_EUR_PHY_L4_MY_008_068
+  - SEALEVEL_EUR_PHY_L4_NRT_008_060
+  - SEALEVEL_EUR_PHY_MDT_L4_STATIC_008_070
+  - SEALEVEL_GLO_PHY_CLIMATE_L4_MY_008_057
+  - SEALEVEL_GLO_PHY_L3_MY_008_062
+  - SEALEVEL_GLO_PHY_L3_NRT_008_044
+  - SEALEVEL_GLO_PHY_L4_MY_008_047
+  - SEALEVEL_GLO_PHY_L4_NRT_008_046
+  - SEALEVEL_GLO_PHY_MDT_008_063
+  - SEALEVEL_GLO_PHY_NOISE_L4_STATIC_008_033
+  - SEALEVEL_MED_PHY_MDT_L4_STATIC_008_066
+  - SST_ATL_PHY_L3S_MY_010_038
+  - SST_ATL_PHY_L3S_NRT_010_037
+  - SST_ATL_SST_L4_NRT_OBSERVATIONS_010_025
+  - SST_ATL_SST_L4_REP_OBSERVATIONS_010_026
+  - SST_BAL_PHY_L3S_MY_010_040
+  - SST_BAL_PHY_SUBSKIN_L4_NRT_010_034
+  - SST_BAL_SST_L3S_NRT_OBSERVATIONS_010_032
+  - SST_BAL_SST_L4_NRT_OBSERVATIONS_010_007_b
+  - SST_BAL_SST_L4_REP_OBSERVATIONS_010_016
+  - SST_BS_PHY_L3S_MY_010_041
+  - SST_BS_PHY_SUBSKIN_L4_NRT_010_035
+  - SST_BS_SST_L3S_NRT_OBSERVATIONS_010_013
+  - SST_BS_SST_L4_NRT_OBSERVATIONS_010_006
+  - SST_BS_SST_L4_REP_OBSERVATIONS_010_022
+  - SST_GLO_PHY_L3S_MY_010_039
+  - SST_GLO_PHY_L4_NRT_010_005
+  - SST_GLO_SST_L3S_NRT_OBSERVATIONS_010_010
+  - SST_GLO_SST_L4_NRT_OBSERVATIONS_010_001
+  - SST_GLO_SST_L4_REP_OBSERVATIONS_010_011
+  - SST_GLO_SST_L4_REP_OBSERVATIONS_010_024
+  - SST_MED_PHY_L3S_MY_010_042
+  - SST_MED_PHY_SUBSKIN_L4_NRT_010_036
+  - SST_MED_SST_L3S_NRT_OBSERVATIONS_010_012
+  - SST_MED_SST_L4_NRT_OBSERVATIONS_010_004
+  - SST_MED_SST_L4_REP_OBSERVATIONS_010_021
+  - WAVE_GLO_PHY_SPC-FWK_L3_NRT_014_002
+  - WAVE_GLO_PHY_SPC-FWK_L4_NRT_014_004
+  - WAVE_GLO_PHY_SPC_L3_MY_014_006
+  - WAVE_GLO_PHY_SPC_L3_NRT_014_009
+  - WAVE_GLO_PHY_SWH_L3_MY_014_005
+  - WAVE_GLO_PHY_SWH_L3_NRT_014_001
+  - WAVE_GLO_PHY_SWH_L4_MY_014_007
+  - WAVE_GLO_PHY_SWH_L4_NRT_014_003
+  - WIND_ARC_PHY_HR_L3_MY_012_105
+  - WIND_ARC_PHY_HR_L3_NRT_012_100
+  - WIND_ATL_PHY_HR_L3_MY_012_106
+  - WIND_ATL_PHY_HR_L3_NRT_012_101
+  - WIND_BAL_PHY_HR_L3_MY_012_107
+  - WIND_BAL_PHY_HR_L3_NRT_012_102
+  - WIND_BLK_PHY_HR_L3_MY_012_108
+  - WIND_BLK_PHY_HR_L3_NRT_012_103
+  - WIND_GLO_PHY_CLIMATE_L4_MY_012_003
+  - WIND_GLO_PHY_L3_MY_012_005
+  - WIND_GLO_PHY_L3_NRT_012_002
+  - WIND_GLO_PHY_L4_MY_012_006
+  - WIND_GLO_PHY_L4_NRT_012_004
+  - WIND_MED_PHY_HR_L3_MY_012_109
+  - WIND_MED_PHY_HR_L3_NRT_012_104
 
 datasets:
+
+  # ===================== Global ocean physics =====================
+
   cmems_mod_glo_phy_my_0.083deg_P1D-m:
     product: GLOBAL_MULTIYEAR_PHY_001_030
-    title: GLORYS12 — global ocean physical reanalysis (daily, 1/12°)
+    title: GLORYS12 - global ocean physical reanalysis (daily, 1/12 deg)
     cadence: daily
     domain: global
     temporal:
@@ -74,9 +377,64 @@ datasets:
         units: m
         long_name: Sea surface height above geoid
 
+  cmems_mod_glo_phy_my_0.083deg_P1M-m:
+    product: GLOBAL_MULTIYEAR_PHY_001_030
+    title: GLORYS12 - global ocean physical reanalysis (monthly, 1/12 deg)
+    cadence: monthly
+    domain: global
+    temporal:
+      start: 1993-01-01
+      end: null
+    variables:
+      thetao:
+        units: degrees_C
+        long_name: Sea water potential temperature
+      so:
+        units: "1e-3"
+        long_name: Sea water salinity
+      uo:
+        units: m s-1
+        long_name: Eastward sea water velocity
+      vo:
+        units: m s-1
+        long_name: Northward sea water velocity
+      zos:
+        units: m
+        long_name: Sea surface height above geoid
+
+  cmems_mod_glo_phy_anfc_0.083deg_P1D-m:
+    product: GLOBAL_ANALYSISFORECAST_PHY_001_024
+    title: Global ocean physics analysis-forecast (daily NRT, 1/12 deg)
+    cadence: daily
+    domain: global
+    temporal:
+      start: 2020-01-01
+      end: null
+    variables:
+      mlotst:
+        units: m
+        long_name: Ocean mixed layer thickness defined by sigma theta
+      siconc:
+        units: "1"
+        long_name: Sea ice area fraction
+      sithick:
+        units: m
+        long_name: Sea ice thickness
+      sob:
+        units: "1e-3"
+        long_name: Sea water salinity at sea floor
+      tob:
+        units: degrees_C
+        long_name: Sea water potential temperature at sea floor
+      zos:
+        units: m
+        long_name: Sea surface height above geoid
+
+  # ===================== Global biogeochemistry =====================
+
   cmems_mod_glo_bgc_my_0.25deg_P1D-m:
     product: GLOBAL_MULTIYEAR_BGC_001_029
-    title: PISCES global biogeochemistry reanalysis (daily, 1/4°)
+    title: PISCES global biogeochemistry reanalysis (daily, 1/4 deg)
     cadence: daily
     domain: global
     temporal:
@@ -98,6 +456,74 @@ datasets:
       o2:
         units: mmol m-3
         long_name: Mole concentration of dissolved oxygen in sea water
+
+  cmems_mod_glo_bgc_my_0.25deg_P1M-m:
+    product: GLOBAL_MULTIYEAR_BGC_001_029
+    title: PISCES global biogeochemistry reanalysis (monthly, 1/4 deg)
+    cadence: monthly
+    domain: global
+    temporal:
+      start: 1993-01-01
+      end: null
+    variables:
+      chl:
+        units: mg m-3
+        long_name: Mass concentration of chlorophyll-a in sea water
+      no3:
+        units: mmol m-3
+        long_name: Mole concentration of nitrate in sea water
+      po4:
+        units: mmol m-3
+        long_name: Mole concentration of phosphate in sea water
+      si:
+        units: mmol m-3
+        long_name: Mole concentration of silicate in sea water
+      o2:
+        units: mmol m-3
+        long_name: Mole concentration of dissolved oxygen in sea water
+      ph:
+        units: "1"
+        long_name: Sea water ph reported on total scale
+      phyc:
+        units: mmol m-3
+        long_name: Mole concentration of phytoplankton expressed as carbon in sea water
+      nppv:
+        units: mg m-3 day-1
+        long_name: Net primary production of biomass expressed as carbon per unit volume in sea water
+
+  cmems_mod_glo_bgc-bio_anfc_0.25deg_P1D-m:
+    product: GLOBAL_ANALYSISFORECAST_BGC_001_028
+    title: Global biogeochemistry analysis-forecast - biology (daily NRT, 1/4 deg)
+    cadence: daily
+    domain: global
+    temporal:
+      start: 2020-01-01
+      end: null
+    variables:
+      nppv:
+        units: mg m-3 day-1
+        long_name: Net primary production of biomass expressed as carbon per unit volume in sea water
+      o2:
+        units: mmol m-3
+        long_name: Mole concentration of dissolved oxygen in sea water
+
+  cmems_mod_glo_bgc-pft_anfc_0.25deg_P1D-m:
+    product: GLOBAL_ANALYSISFORECAST_BGC_001_028
+    title: Global biogeochemistry analysis-forecast - PFT (daily NRT, 1/4 deg)
+    cadence: daily
+    domain: global
+    temporal:
+      start: 2020-01-01
+      end: null
+    variables:
+      chl:
+        units: mg m-3
+        long_name: Mass concentration of chlorophyll-a in sea water
+      phyc:
+        units: mmol m-3
+        long_name: Mole concentration of phytoplankton expressed as carbon in sea water
+
+  # ===================== SST analyses =====================
 
   METOFFICE-GLO-SST-L4-NRT-OBS-SST-V2:
     product: SST_GLO_SST_L4_NRT_OBSERVATIONS_010_001
@@ -127,13 +553,18 @@ datasets:
       analysed_sst:
         units: K
         long_name: Analysed sea surface temperature
-      analysis_error:
+      analysed_sst_uncertainty:
         units: K
-        long_name: Estimated error standard deviation of analysed_sst
+        long_name: Sea surface temperature standard error
+      sea_ice_fraction:
+        units: "1"
+        long_name: Sea ice area fraction
 
-  cmems_obs-sl_glo_phy-ssh_my_allsat-l4-duacs-0.25deg_P1D:
+  # ===================== Sea level / altimetry =====================
+
+  cmems_obs-sl_glo_phy-ssh_my_allsat-l4-duacs-0.125deg_P1D:
     product: SEALEVEL_GLO_PHY_L4_MY_008_047
-    title: Multi-mission L4 sea-level anomaly reanalysis (daily, 1/4°)
+    title: Multi-mission L4 sea-level anomaly reanalysis (daily, 1/8 deg)
     cadence: daily
     domain: global
     temporal:
@@ -147,28 +578,57 @@ datasets:
         units: m
         long_name: Absolute dynamic topography
       ugos:
-        units: m s-1
+        units: m/s
         long_name: Surface geostrophic eastward velocity
       vgos:
-        units: m s-1
+        units: m/s
         long_name: Surface geostrophic northward velocity
 
-  cmems_obs-si_glo_phy-conc_nrt_amsr-0.025deg_P1D:
+  # ===================== Sea ice =====================
+
+  esa_obs-si_arc_phy-sit_nrt_l4-multi_P1D-m:
     product: SEAICE_GLO_PHY_L4_NRT_011_014
-    title: AMSR2 sea-ice concentration L4 (NRT, daily, 2.5 km)
+    title: Arctic sea-ice thickness L4 NRT (multi-sensor merge)
+    cadence: daily
+    domain: arctic
+    temporal:
+      start: 2010-11-15
+      end: null
+    variables:
+      sea_ice_concentration:
+        units: "%"
+        long_name: Sea ice area fraction
+      sea_ice_thickness:
+        units: m
+        long_name: Sea ice thickness
+      sea_ice_thickness_uncertainty:
+        units: m
+        long_name: Sea ice thickness standard error
+
+  esa_obs-si_ant_phy-sit_nrt_l4-multi_P1D-m:
+    product: SEAICE_GLO_PHY_L4_NRT_011_014
+    title: Antarctic sea-ice thickness L4 NRT (multi-sensor merge)
     cadence: daily
     domain: polar
     temporal:
-      start: 2017-01-01
+      start: 2010-11-15
       end: null
     variables:
-      ice_conc:
+      sea_ice_concentration:
         units: "%"
-        long_name: Sea-ice area fraction
+        long_name: Sea ice area fraction
+      sea_ice_thickness:
+        units: m
+        long_name: Sea ice thickness
+      sea_ice_thickness_uncertainty:
+        units: m
+        long_name: Sea ice thickness standard error
 
-  med-cmcc-tem-rean-d:
+  # ===================== Mediterranean =====================
+
+  cmems_mod_med_phy-temp_my_4.2km_P1D-m:
     product: MEDSEA_MULTIYEAR_PHY_006_004
-    title: Mediterranean Sea physical reanalysis — daily temperature
+    title: Mediterranean Sea physical reanalysis - daily temperature
     cadence: daily
     domain: mediterranean
     temporal:
@@ -182,9 +642,40 @@ datasets:
         units: degrees_C
         long_name: Sea floor potential temperature
 
-  cmems_mod_blk_phy_my_2.5km_P1D-m:
+  cmems_mod_med_phy-sal_my_4.2km_P1D-m:
+    product: MEDSEA_MULTIYEAR_PHY_006_004
+    title: Mediterranean Sea physical reanalysis - daily salinity
+    cadence: daily
+    domain: mediterranean
+    temporal:
+      start: 1987-01-01
+      end: null
+    variables:
+      so:
+        units: "0.001"
+        long_name: Sea water salinity
+
+  cmems_mod_med_phy-cur_my_4.2km_P1D-m:
+    product: MEDSEA_MULTIYEAR_PHY_006_004
+    title: Mediterranean Sea physical reanalysis - daily currents
+    cadence: daily
+    domain: mediterranean
+    temporal:
+      start: 1987-01-01
+      end: null
+    variables:
+      uo:
+        units: m s-1
+        long_name: Eastward sea water velocity
+      vo:
+        units: m s-1
+        long_name: Northward sea water velocity
+
+  # ===================== Black Sea =====================
+
+  cmems_mod_blk_phy-temp_my_2.5km_P1D-m:
     product: BLKSEA_MULTIYEAR_PHY_007_004
-    title: Black Sea physical reanalysis (daily, 2.5 km)
+    title: Black Sea physical reanalysis - daily temperature (2.5 km)
     cadence: daily
     domain: black-sea
     temporal:
@@ -194,12 +685,69 @@ datasets:
       thetao:
         units: degrees_C
         long_name: Sea water potential temperature
+      bottomT:
+        units: degrees_C
+        long_name: Sea water potential temperature at sea floor
+
+  cmems_mod_blk_phy-sal_my_2.5km_P1D-m:
+    product: BLKSEA_MULTIYEAR_PHY_007_004
+    title: Black Sea physical reanalysis - daily salinity (2.5 km)
+    cadence: daily
+    domain: black-sea
+    temporal:
+      start: 1992-12-15
+      end: null
+    variables:
       so:
         units: "1e-3"
         long_name: Sea water salinity
+
+  cmems_mod_blk_phy-ssh_my_2.5km_P1D-m:
+    product: BLKSEA_MULTIYEAR_PHY_007_004
+    title: Black Sea physical reanalysis - daily SSH (2.5 km)
+    cadence: daily
+    domain: black-sea
+    temporal:
+      start: 1992-12-15
+      end: null
+    variables:
       zos:
         units: m
         long_name: Sea surface height above geoid
+
+  cmems_mod_blk_phy-cur_my_2.5km_P1D-m:
+    product: BLKSEA_MULTIYEAR_PHY_007_004
+    title: Black Sea physical reanalysis - daily currents (2.5 km)
+    cadence: daily
+    domain: black-sea
+    temporal:
+      start: 1992-12-15
+      end: null
+    variables:
+      uo:
+        units: m/s
+        long_name: Eastward sea water velocity
+      vo:
+        units: m/s
+        long_name: Northward sea water velocity
+
+  cmems_mod_blk_phy-temp_my_2.5km_P1M-m:
+    product: BLKSEA_MULTIYEAR_PHY_007_004
+    title: Black Sea physical reanalysis - monthly temperature (2.5 km)
+    cadence: monthly
+    domain: black-sea
+    temporal:
+      start: 1992-12-15
+      end: null
+    variables:
+      thetao:
+        units: degrees_C
+        long_name: Sea water potential temperature
+      bottomT:
+        units: degrees_C
+        long_name: Sea water potential temperature at sea floor
+
+  # ===================== Baltic =====================
 
   cmems_mod_bal_phy_my_P1D-m:
     product: BALTICSEA_MULTIYEAR_PHY_003_011
@@ -214,11 +762,38 @@ datasets:
         units: degrees_C
         long_name: Sea water potential temperature
       so:
-        units: "1e-3"
+        units: "0.001"
         long_name: Sea water salinity
-      zos:
+      sla:
         units: m
-        long_name: Sea surface height above geoid
+        long_name: Sea surface height above sea level
+
+  cmems_mod_bal_phy_my_P1M-m:
+    product: BALTICSEA_MULTIYEAR_PHY_003_011
+    title: Baltic Sea physical reanalysis (monthly)
+    cadence: monthly
+    domain: baltic-sea
+    temporal:
+      start: 1993-01-01
+      end: null
+    variables:
+      thetao:
+        units: degrees_C
+        long_name: Sea water potential temperature
+      so:
+        units: "0.001"
+        long_name: Sea water salinity
+      sla:
+        units: m
+        long_name: Sea surface height above sea level
+      uo:
+        units: m s-1
+        long_name: Eastward sea water velocity
+      vo:
+        units: m s-1
+        long_name: Northward sea water velocity
+
+  # ===================== Arctic =====================
 
   cmems_mod_arc_phy_my_topaz4_P1D-m:
     product: ARCTIC_MULTIYEAR_PHY_002_003
@@ -239,9 +814,36 @@ datasets:
         units: "1"
         long_name: Sea-ice area fraction
 
-  cmems_mod_ibi_phy_my_0.083deg-3D_P1D-m:
+  cmems_mod_arc_phy_my_topaz4_P1M:
+    product: ARCTIC_MULTIYEAR_PHY_002_003
+    title: Arctic TOPAZ4 physical reanalysis (monthly, 12.5 km)
+    cadence: monthly
+    domain: arctic
+    temporal:
+      start: 1991-01-02
+      end: null
+    variables:
+      thetao:
+        units: degrees_C
+        long_name: Sea water potential temperature
+      so:
+        units: "1e-3"
+        long_name: Sea water salinity
+      siconc:
+        units: "1"
+        long_name: Sea ice area fraction
+      sithick:
+        units: m
+        long_name: Sea ice thickness
+      zos:
+        units: m
+        long_name: Sea surface height above geoid
+
+  # ===================== Iberian-Biscay-Ireland (IBI) =====================
+
+  cmems_mod_ibi_phy-temp_my_0.027deg_P1D-m:
     product: IBI_MULTIYEAR_PHY_005_002
-    title: Iberian-Biscay-Ireland physical reanalysis (daily, 1/12°)
+    title: IBI physical reanalysis - daily temperature (3 km)
     cadence: daily
     domain: ibi
     temporal:
@@ -251,12 +853,139 @@ datasets:
       thetao:
         units: degrees_C
         long_name: Sea water potential temperature
+      bottomT:
+        units: degrees_C
+        long_name: Sea water potential temperature at sea floor
+
+  cmems_mod_ibi_phy-sal_my_0.027deg_P1D-m:
+    product: IBI_MULTIYEAR_PHY_005_002
+    title: IBI physical reanalysis - daily salinity (3 km)
+    cadence: daily
+    domain: ibi
+    temporal:
+      start: 1993-01-01
+      end: null
+    variables:
       so:
         units: "1e-3"
         long_name: Sea water salinity
+
+  cmems_mod_ibi_phy-cur_my_0.027deg_P1D-m:
+    product: IBI_MULTIYEAR_PHY_005_002
+    title: IBI physical reanalysis - daily currents (3 km)
+    cadence: daily
+    domain: ibi
+    temporal:
+      start: 1993-01-01
+      end: null
+    variables:
       uo:
         units: m s-1
         long_name: Eastward sea water velocity
       vo:
         units: m s-1
         long_name: Northward sea water velocity
+
+  cmems_mod_ibi_phy-temp_my_0.027deg_P1M-m:
+    product: IBI_MULTIYEAR_PHY_005_002
+    title: IBI physical reanalysis - monthly temperature (3 km)
+    cadence: monthly
+    domain: ibi
+    temporal:
+      start: 1993-01-01
+      end: null
+    variables:
+      thetao:
+        units: degrees_C
+        long_name: Sea water potential temperature
+      bottomT:
+        units: degrees_C
+        long_name: Sea water potential temperature at sea floor
+
+  # ===================== Global waves =====================
+
+  cmems_mod_glo_wav_my_0.2deg_PT3H-i:
+    product: GLOBAL_MULTIYEAR_WAV_001_032
+    title: Global wave reanalysis (MFWAM, 3-hourly, 0.2 deg)
+    cadence: irregular
+    domain: global
+    temporal:
+      start: 1980-01-01
+      end: null
+    variables:
+      VHM0:
+        units: m
+        long_name: Sea surface wave significant height
+      VTPK:
+        units: s
+        long_name: Sea surface wave period at variance spectral density maximum
+      VMDR:
+        units: degree
+        long_name: Sea surface wave from direction
+
+  cmems_mod_glo_wav_anfc_0.083deg_PT3H-i:
+    product: GLOBAL_ANALYSISFORECAST_WAV_001_027
+    title: Global wave analysis-forecast (MFWAM, 3-hourly NRT, 1/12 deg)
+    cadence: irregular
+    domain: global
+    temporal:
+      start: 2020-01-01
+      end: null
+    variables:
+      VHM0:
+        units: m
+        long_name: Sea surface wave significant height
+      VTPK:
+        units: s
+        long_name: Sea surface wave period at variance spectral density maximum
+      VMDR:
+        units: degree
+        long_name: Sea surface wave from direction
+      VCMX:
+        units: m
+        long_name: Sea surface wave maximum height
+
+  # ===================== Ocean colour =====================
+
+  cmems_obs-oc_glo_bgc-plankton_my_l4-multi-4km_P1M:
+    product: OCEANCOLOUR_GLO_BGC_L4_MY_009_104
+    title: GlobColour L4 ocean colour - phytoplankton (monthly, 4 km)
+    cadence: monthly
+    domain: global
+    temporal:
+      start: 1997-09-01
+      end: null
+    variables:
+      CHL:
+        units: mg m-3
+        long_name: Mass concentration of chlorophyll-a in sea water
+      MICRO:
+        units: mg m-3
+        long_name: Mass concentration of microphytoplankton expressed as chlorophyll
+      NANO:
+        units: mg m-3
+        long_name: Mass concentration of nanophytoplankton expressed as chlorophyll
+      PICO:
+        units: mg m-3
+        long_name: Mass concentration of picophytoplankton expressed as chlorophyll
+
+  # ===================== Multi-obs surface salinity =====================
+
+  cmems_obs-mob_glo_phy-sss_my_multi_P1M:
+    product: MULTIOBS_GLO_PHY_S_SURFACE_MYNRT_015_013
+    title: Global sea surface salinity multi-observation analysis (monthly)
+    cadence: monthly
+    domain: global
+    temporal:
+      start: 2010-01-01
+      end: null
+    variables:
+      sos:
+        units: "0.001"
+        long_name: Sea surface salinity
+      dos:
+        units: kg m-3
+        long_name: Sea surface density
+      sea_ice_fraction:
+        units: "%"
+        long_name: Sea ice area fraction
