@@ -344,7 +344,7 @@ class Catalog(AbstractCatalog):
             >>> from earthlens.cmems import Catalog
             >>> cat = Catalog()
             >>> sorted(cat.datasets)[:3]
-            ['ESACCI-GLO-SST-L4-REP-OBS-SST', 'METOFFICE-GLO-SST-L4-NRT-OBS-SST-V2', 'cmems_mod_arc_phy_my_topaz4_P1D-m']
+            ['C3S-GLO-SST-L4-REP-OBS-SST', 'CERSAT-GLO-SEAICE_30DAYS_DRIFT_ASCAT_SSMI_MERGED_RAN-OBS_FULL_TIME_SERIE', 'CERSAT-GLO-SEAICE_30DAYS_DRIFT_QUICKSCAT_SSMI_MERGED_RAN-OBS_FULL_TIME_SERIE']
 
             ```
     """
