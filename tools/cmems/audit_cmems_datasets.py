@@ -207,7 +207,38 @@ def emit_markdown(rows: list[dict[str, Any]]) -> str:
 
 
 def emit_json(rows: list[dict[str, Any]]) -> str:
-    """Render `rows` as JSON (sorted by status then dataset_id)."""
+    """Render `rows` as JSON, sorted by `(status, dataset_id)`.
+
+    Same row-shape as :func:`emit_markdown` but written for machine
+    consumption: a 2-space-indented JSON array, sorted so `covered`
+    rows precede `partial` / `renamed` / `missing` ones for stable
+    diffs across audit runs. Each entry preserves all six row fields
+    (`dataset_id`, `status`, `live_id`, `missing_variables`,
+    `error`).
+
+    Args:
+        rows: Output of :func:`classify` — one dict per curated
+            dataset.
+
+    Returns:
+        A JSON string ending in a single newline.
+
+    Examples:
+        - Round-trip via `json.loads`:
+            ```python
+            >>> import json
+            >>> rows = [
+            ...     {"dataset_id": "z", "status": "covered", "live_id": "z",
+            ...      "missing_variables": [], "error": None},
+            ...     {"dataset_id": "a", "status": "missing", "live_id": None,
+            ...      "missing_variables": [], "error": "DatasetNotFound: x"},
+            ... ]
+            >>> parsed = json.loads(emit_json(rows))
+            >>> [r["status"] for r in parsed]
+            ['covered', 'missing']
+
+            ```
+    """
     order = {name: i for i, name in enumerate(_STATUS_ORDER)}
     sorted_rows = sorted(
         rows, key=lambda r: (order.get(r["status"], 99), r["dataset_id"])
@@ -216,7 +247,38 @@ def emit_json(rows: list[dict[str, Any]]) -> str:
 
 
 def main(argv: list[str] | None = None) -> int:
-    """CLI entry — return 0 on full coverage, 1 on drift (with `--strict`)."""
+    """CLI entry -- classify every curated row and emit a coverage report.
+
+    Builds the argparse tree (`--strict`, `--format=markdown|json`,
+    `--catalog`), loads the curated catalog via `Catalog.load()`,
+    runs :func:`classify` against the live toolbox, and writes the
+    report (default Markdown) to stdout. Designed to run anonymously
+    -- `cm.describe()` does not require credentials -- so this is
+    safe to wire into CI as a drift gate.
+
+    Args:
+        argv: Argument vector to parse, in the form
+            `argparse.ArgumentParser.parse_args` accepts. `None`
+            falls back to `sys.argv[1:]`.
+
+    Returns:
+        `0` on full coverage. `1` when `--strict` is set and any
+            curated row is `partial` / `renamed` / `missing` /
+            `error`, or when the catalog itself fails to load.
+
+    Examples:
+        - Default coverage table to stdout:
+
+            `pixi run -e dev python tools/cmems/audit_cmems_datasets.py`
+
+        - Strict mode (exits 1 on any drift, suitable for CI):
+
+            `... audit_cmems_datasets.py --strict`
+
+        - Machine-readable output:
+
+            `... audit_cmems_datasets.py --format=json > audit.json`
+    """
     parser = argparse.ArgumentParser(
         description=__doc__,
         formatter_class=argparse.RawDescriptionHelpFormatter,

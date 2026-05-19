@@ -48,7 +48,41 @@ from _helpers import (  # noqa: E402
 
 
 def _cmd_refresh(args: argparse.Namespace) -> int:
-    """Walk `cm.describe()`, rewrite `available_products:`, optionally emit stanzas."""
+    """Walk `cm.describe()`, rewrite `available_products:`, optionally emit stanzas.
+
+    Implements the `refresh` subcommand. Calls
+    `copernicusmarine.describe(disable_progress_bar=True)` to get the
+    full live product index, replaces the YAML's
+    `available_products:` block in place, and (when
+    `args.with_datasets` is non-empty) writes one ready-to-paste
+    `datasets:` stanza per dataset under each listed product to
+    stdout.
+
+    Args:
+        args: Parsed argparse namespace. Honours `args.catalog`
+            (`Path` to `cmems_data_catalog.yaml`), `args.dry_run`
+            (`bool` — when `True` the new block is printed instead
+            of written), and `args.with_datasets`
+            (`list[str] | None` of product ids).
+
+    Returns:
+        `0` on success, `1` on any toolbox- or splice-level failure.
+        Per-product errors when emitting stanzas are logged to stderr
+        and skipped without changing the return code.
+
+    Examples:
+        - Typical invocation as a subcommand:
+
+            `pixi run -e dev python tools/cmems/refresh_cmems_catalog.py refresh`
+
+          rewrites `available_products:` in place.
+
+        - Dry-run with stanza emission:
+
+            `... refresh --dry-run --with-datasets GLOBAL_MULTIYEAR_PHY_001_030`
+
+          prints the block + the per-dataset stanzas to stdout.
+    """
     import copernicusmarine as cm
 
     try:
@@ -95,7 +129,39 @@ def _cmd_refresh(args: argparse.Namespace) -> int:
 
 
 def _cmd_add_ids(args: argparse.Namespace) -> int:
-    """Append one stanza per dataset_id to the YAML, then re-parse to verify."""
+    """Append one stanza per dataset_id to the YAML, then re-parse to verify.
+
+    Implements the `add-ids` subcommand. For each id in
+    `args.dataset_ids` that is not already curated, calls
+    `copernicusmarine.describe(dataset_id=...)`, emits the canonical
+    stanza, runs it through :func:`compact_text`, appends to the
+    YAML's `datasets:` block, then reloads via `Catalog.load()` so
+    any malformed stanza fails loud rather than silently corrupting
+    the file.
+
+    Args:
+        args: Parsed argparse namespace. Honours `args.catalog`
+            (`Path` to `cmems_data_catalog.yaml`) and
+            `args.dataset_ids` (`list[str]` of dataset ids to add).
+
+    Returns:
+        `0` on a clean append (or when every id is already curated),
+        `1` when every requested id failed `describe()`.
+
+    Examples:
+        - Add one new dataset:
+
+            `... add-ids cmems_mod_glo_phy_anfc_0.083deg_P1D-m`
+
+          appends a freshly-emitted stanza for the global NRT
+          analysis-forecast under `datasets:` and re-parses.
+        - Add several at once:
+
+            `... add-ids ds_a ds_b ds_c`
+
+          fetches and appends each in turn; already-curated ids are
+          skipped with a note on stderr.
+    """
     import copernicusmarine as cm
 
     sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "src"))
@@ -151,13 +217,57 @@ def _cmd_add_ids(args: argparse.Namespace) -> int:
 
 
 def _cmd_compact(args: argparse.Namespace) -> int:
-    """stdin → stdout normalisation pass over raw `refresh --with-datasets` output."""
+    """stdin -> stdout normalisation pass over raw `refresh --with-datasets` output.
+
+    Implements the `compact` subcommand. Reads the entire stdin
+    buffer, runs it through :func:`compact_text` (CRLF -> LF, blank-
+    run collapse, scratch-marker strip, trailing-whitespace trim),
+    and writes the result to stdout. Acts as a Unix-style filter:
+
+        ... refresh --with-datasets X | ... compact > stanzas.yaml
+
+    Args:
+        args: Parsed argparse namespace (unused; reserved for future
+            options).
+
+    Returns:
+        `0` always — the pass is purely textual and cannot fail.
+    """
     sys.stdout.write(compact_text(sys.stdin.read()))
     return 0
 
 
 def main(argv: list[str] | None = None) -> int:
-    """CLI dispatch — return 0 on success, non-zero on any error."""
+    """CLI dispatch -- route to refresh / add-ids / compact handlers.
+
+    Builds the `argparse` tree, parses `argv`, and delegates to the
+    selected subcommand handler (`_cmd_refresh`, `_cmd_add_ids`, or
+    `_cmd_compact`). Mirrors the entry-point shape used by every
+    other `tools/{backend}/refresh_*.py` script in the repo, so a
+    maintainer who knows the GEE or ECMWF tooling sees the same CLI.
+
+    Args:
+        argv: Argument vector to parse, in the form
+            `argparse.ArgumentParser.parse_args` accepts. `None`
+            falls back to `sys.argv[1:]`.
+
+    Returns:
+        Exit code from the selected subcommand: `0` on success,
+            `1` on any toolbox / parse / I/O error.
+
+    Examples:
+        - From a script entry point:
+
+            ```python
+            raise SystemExit(main())
+            ```
+
+        - Programmatic dispatch in tests:
+
+            ```python
+            assert main(["refresh", "--dry-run", "--catalog", "path/to/yaml"]) == 0
+            ```
+    """
     parser = argparse.ArgumentParser(
         description=__doc__,
         formatter_class=argparse.RawDescriptionHelpFormatter,

@@ -284,6 +284,47 @@ def _curated_dataset_variables() -> dict[str, list[str]]:
 
 
 def _parse_bbox(text: str) -> tuple[float, float, float, float]:
+    """Parse a `--bbox` CLI argument into a 4-tuple of floats.
+
+    Custom `argparse` `type=` callable. Splits on commas, coerces to
+    float, and validates that exactly four values were supplied
+    (matching the toolbox's `(west, east, south, north)` parameter
+    convention).
+
+    Args:
+        text: Raw CLI string, e.g. `"0,1,0,1"` for the default 1deg
+            x 1deg probe window at the equator / prime meridian.
+
+    Returns:
+        A `(west, east, south, north)` tuple of floats.
+
+    Raises:
+        argparse.ArgumentTypeError: If `text` has fewer or more than
+            four comma-separated tokens, or if any token does not
+            parse as a float.
+
+    Examples:
+        - Parse the default probe window:
+            ```python
+            >>> _parse_bbox("0,1,0,1")
+            (0.0, 1.0, 0.0, 1.0)
+
+            ```
+        - Negative bounds parse without quoting:
+            ```python
+            >>> _parse_bbox("-10,-4,30,36")
+            (-10.0, -4.0, 30.0, 36.0)
+
+            ```
+        - Wrong arity raises an argparse-shaped error:
+            ```python
+            >>> _parse_bbox("0,1,2")  # doctest: +ELLIPSIS
+            Traceback (most recent call last):
+                ...
+            argparse.ArgumentTypeError: --bbox must be 'west,east,south,north' (4 floats); got '0,1,2'
+
+            ```
+    """
     parts = [float(p.strip()) for p in text.split(",")]
     if len(parts) != 4:
         raise argparse.ArgumentTypeError(
@@ -293,6 +334,50 @@ def _parse_bbox(text: str) -> tuple[float, float, float, float]:
 
 
 def _parse_depth(text: str) -> tuple[float, float] | None:
+    """Parse a `--depth` CLI argument into `(min, max)` or `None`.
+
+    Custom `argparse` `type=` callable. Accepts either two
+    comma-separated metres values (`"0,5"` for surface 0-5 m) or one
+    of the sentinel tokens `"none"`, `"null"`, `"skip"` (case-
+    insensitive) — the latter group resolves to `None`, which the
+    probe interprets as "omit the depth axis kwargs entirely" for
+    surface-only datasets like OSTIA SST or altimetry.
+
+    Args:
+        text: Raw CLI string.
+
+    Returns:
+        A `(minimum_depth, maximum_depth)` tuple in metres, or
+            `None` for any of the sentinel tokens.
+
+    Raises:
+        argparse.ArgumentTypeError: If `text` is neither a sentinel
+            token nor exactly two comma-separated floats.
+
+    Examples:
+        - Parse the default 0-5 m surface clip:
+            ```python
+            >>> _parse_depth("0,5")
+            (0.0, 5.0)
+
+            ```
+        - Sentinel tokens map to None (case-insensitive):
+            ```python
+            >>> _parse_depth("none") is None
+            True
+            >>> _parse_depth("SKIP") is None
+            True
+
+            ```
+        - Wrong arity raises:
+            ```python
+            >>> _parse_depth("0")  # doctest: +ELLIPSIS
+            Traceback (most recent call last):
+                ...
+            argparse.ArgumentTypeError: --depth must be 'min,max' or 'none'; got '0'
+
+            ```
+    """
     if text.lower() in {"none", "null", "skip"}:
         return None
     parts = [float(p.strip()) for p in text.split(",")]
@@ -304,7 +389,34 @@ def _parse_depth(text: str) -> tuple[float, float] | None:
 
 
 def main(argv: list[str] | None = None) -> int:
-    """CLI entry: return 0 on full success, 1 if any probe failed."""
+    """CLI entry -- dispatch single-dataset or `--all-curated` batch probing.
+
+    Builds the argparse tree (mutually exclusive `--dataset` /
+    `--all-curated` modes, plus shared `--cache-dir`, `--probe-date`,
+    `--bbox`, `--depth`, `--credentials-file` options), parses
+    `argv`, and runs the probe. Writes JSON sidecars to disk and
+    exits non-zero when any probe failed.
+
+    Args:
+        argv: Argument vector to parse, in the form
+            `argparse.ArgumentParser.parse_args` accepts. `None`
+            falls back to `sys.argv[1:]`.
+
+    Returns:
+        `0` when every requested probe succeeded; `1` when any probe
+            recorded an `__error__` sidecar or when required flag
+            combinations are missing.
+
+    Examples:
+        - Probe one dataset and write a single sidecar:
+
+            `... probe_cmems_netcdf.py --dataset cmems_mod_glo_phy_my_0.083deg_P1D-m \\
+                --variables thetao,so,zos --out C:/tmp/probe/glo_phy.json`
+
+        - Probe every curated dataset, one sidecar per:
+
+            `... probe_cmems_netcdf.py --all-curated --out-dir C:/tmp/probe/`
+    """
     parser = argparse.ArgumentParser(
         description=__doc__,
         formatter_class=argparse.RawDescriptionHelpFormatter,
