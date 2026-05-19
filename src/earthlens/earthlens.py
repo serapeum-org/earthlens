@@ -316,12 +316,16 @@ class EarthLens:
             progress_bar: Whether the backend should print a per-date
                 progress bar during the loop. Defaults to `True`.
             aggregate: Optional :class:`earthlens.aggregate.AggregationConfig`.
-                Forwarded to backends that support it (currently
-                ECMWF). CHIRPS / S3 accept `**kwargs` and ignore an
-                unused `aggregate` payload, so passing it there is a
-                no-op; the GEE backend explicitly rejects a non-`None`
-                `aggregate` with `NotImplementedError` (planned — see
-                the GEE plan task M3).
+                Forwarded to backends whose `OUTPUT_KIND` is
+                `"raster"`, `"xarray"`, or `"mixed"` — the three
+                shapes for which a gridded reduction is well-defined.
+                Backends declaring `"vector"` or `"tabular"` reject a
+                non-`None` `aggregate` with `NotImplementedError`
+                before the backend's `download` is called (the
+                aggregator has no meaningful semantics on
+                `GeoDataFrame` / `DataFrame` rows). A backend
+                without an explicit `OUTPUT_KIND` attribute is
+                treated as `"raster"` for back-compatibility.
             *args: Forwarded positionally to `backend.download`.
             **kwargs: Forwarded as keywords to `backend.download`.
 
@@ -338,6 +342,12 @@ class EarthLens:
                 :class:`earthlens.ecmwf.AuthenticationError`.
             KeyError: When any backend receives an unknown variable
                 code that the catalog cannot resolve.
+            NotImplementedError: When `aggregate=` is not `None` and
+                the bound backend's `OUTPUT_KIND` is `"vector"` or
+                `"tabular"`. The aggregator only handles raster /
+                xarray outputs; vector / tabular backends emit
+                `GeoDataFrame` / `DataFrame` rows that have no
+                meaningful gridded reduction.
 
         Examples:
             - End-to-end CHIRPS download. Marked `# doctest: +SKIP`
@@ -392,5 +402,15 @@ class EarthLens:
                 synchronous cap).
         """
         if aggregate is not None:
+            output_kind = getattr(self.datasource, "OUTPUT_KIND", "raster")
+            if output_kind not in {"raster", "xarray", "mixed"}:
+                raise NotImplementedError(
+                    f"aggregate= is not supported for "
+                    f"{type(self.datasource).__name__} backends "
+                    f"(OUTPUT_KIND={output_kind!r}). The aggregator only "
+                    f"handles raster / xarray outputs; vector / tabular "
+                    f"backends emit GeoDataFrames or DataFrames that do "
+                    f"not have a meaningful gridded reduction."
+                )
             kwargs["aggregate"] = aggregate
         return self.datasource.download(*args, progress_bar=progress_bar, **kwargs)

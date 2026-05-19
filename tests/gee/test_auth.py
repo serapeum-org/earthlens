@@ -180,3 +180,64 @@ def test_module_exposes_expected_symbols():
     """The auth module exposes the documented public symbols."""
     assert hasattr(auth_module, "EarthEngineAuth")
     assert hasattr(auth_module, "AuthenticationError")
+    # C2 retrofit — the credentials value object is also public.
+    assert hasattr(auth_module, "EarthEngineCredentials")
+
+
+@pytest.mark.unit
+class TestEarthEngineAuthC2Retrofit:
+    """C2 retrofit — `EarthEngineAuth` inherits the cross-backend ABC."""
+
+    def test_inherits_abstract_auth(self):
+        """`EarthEngineAuth` subclasses `earthlens.base.AbstractAuth`."""
+        from earthlens.base import AbstractAuth
+
+        assert issubclass(EarthEngineAuth, AbstractAuth)
+
+    def test_gee_authentication_error_is_base_subclass(self):
+        """`gee.AuthenticationError` is a subclass of `base.AuthenticationError`."""
+        from earthlens.base import AuthenticationError as BaseAuthError
+
+        assert issubclass(AuthenticationError, BaseAuthError), (
+            "gee.AuthenticationError must inherit base.AuthenticationError "
+            "so callers can catch every backend's auth failure uniformly."
+        )
+
+    def test_constructor_eagerly_configures(self, key_file, stub_ee):
+        """Construction still runs `ee.Initialize` (back-compat)."""
+        _, init = stub_ee
+        auth = EarthEngineAuth("sa@x.iam", key_file)
+        init.assert_called_once()
+        assert auth.is_authenticated() is True
+        assert auth.project == "demo-project"
+
+    def test_configure_is_idempotent(self, key_file, stub_ee):
+        """A second `configure()` does not re-invoke `ee.Initialize`."""
+        _, init = stub_ee
+        auth = EarthEngineAuth("sa@x.iam", key_file)
+        init.reset_mock()
+        auth.configure()
+        init.assert_not_called()
+
+    def test_is_authenticated_false_until_configured(self, key_file, stub_ee):
+        """A bypass-construct instance is not authenticated until `configure()` runs."""
+        from earthlens.gee.auth import EarthEngineCredentials
+
+        creds = EarthEngineCredentials(
+            service_account="sa@x.iam",
+            service_key=key_file,
+        )
+        # Bypass __init__ so we can observe the pre-configure state.
+        auth = EarthEngineAuth.__new__(EarthEngineAuth)
+        auth._creds = creds
+        auth.service_account = "sa@x.iam"
+        auth.project = None
+        assert auth.is_authenticated() is False
+        auth.configure()
+        assert auth.is_authenticated() is True
+        assert auth.project == "demo-project"
+
+    def test_context_manager_round_trip(self, key_file, stub_ee):
+        """`with EarthEngineAuth(...) as auth` exposes the same instance."""
+        with EarthEngineAuth("sa@x.iam", key_file) as auth:
+            assert auth.is_authenticated() is True

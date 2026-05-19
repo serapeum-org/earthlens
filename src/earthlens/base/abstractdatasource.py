@@ -3,10 +3,126 @@ from __future__ import annotations
 import difflib
 import os
 from abc import ABC, abstractmethod
+from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any
+from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
+
+OutputKind = Literal["raster", "vector", "tabular", "xarray", "mixed"]
+"""The five output shapes an `AbstractDataSource` subclass can emit.
+
+`EarthLens` reads `datasource.OUTPUT_KIND` at `download()` time to
+decide whether a non-`None` `aggregate=` argument is meaningful for
+the bound backend. The semantics per value:
+
+* `"raster"` — gridded raster output (GeoTIFF, COG). The aggregator
+  is forwarded; this is what every backend shipped before C1
+  declares.
+* `"vector"` — `GeoDataFrame` / vector features (events, footprints,
+  admin boundaries). The aggregator is rejected with
+  `NotImplementedError` — no meaningful gridded reduction.
+* `"tabular"` — `DataFrame` per-row records (station observations,
+  climate indices, biodiversity occurrences). Also rejects
+  `aggregate=`.
+* `"xarray"` — lazy `xarray.Dataset` (CMEMS, NWM Zarr, ECMWF GRIB
+  decoded). The aggregator is forwarded; gridded reductions are
+  well-defined on xarray.
+* `"mixed"` — escape hatch for backends like HDX whose per-resource
+  format is only known at download time. The facade forwards the
+  aggregator unchanged and trusts the backend to honour it.
+
+Examples:
+    - Inspect the literal arguments without importing anything else:
+        ```python
+        >>> from typing import get_args
+        >>> from earthlens.base import OutputKind
+        >>> get_args(OutputKind)
+        ('raster', 'vector', 'tabular', 'xarray', 'mixed')
+
+        ```
+
+See Also:
+    AbstractDataSource.OUTPUT_KIND: The per-class declaration each
+        backend uses to opt into one of these shapes.
+"""
+
+
+@dataclass(frozen=True)
+class RemoteProduct:
+    """A single discoverable item returned by `AbstractDataSource._search`.
+
+    Carries enough metadata for `AbstractDataSource._fetch` to pull
+    the underlying bytes without re-querying the catalog, plus a
+    free-form `metadata` dict for backend-specific payloads (CMR
+    `umm`, STAC item JSON, EUMETSAT `eumdac.product.id`, CDS
+    request-shape dict). Designed so a dry-run "what would I
+    download?" query is cheap — call `_search` and inspect the
+    returned list without consuming any network bandwidth for the
+    actual data.
+
+    The dataclass is frozen and value-equal: two `RemoteProduct`s
+    with the same `id` / `href` / `metadata` compare equal and can
+    be used as dedupe keys (after dict-ification of `metadata`).
+
+    Attributes:
+        id: Stable provider-side identifier of the product. Format
+            depends on the backend: a CMR concept-id
+            (`G1234-PROVIDER`), a CDS request hash, an Earth Engine
+            asset id, a STAC item id, etc. Used for logging,
+            caching keys, and dedupe.
+        href: Optional URL the bytes live at. `None` is valid for
+            backends whose `_fetch` needs more than a URL — CDS
+            jobs queue a request and discover the URL at completion
+            time; CHIRPS FTP composes the path from the catalog row
+            + date.
+        metadata: Backend-specific extra fields the fetch step
+            needs. Kept untyped (a plain dict) on purpose: every
+            backend's metadata shape is different, and pinning a
+            schema here would force every backend to inherit a
+            wrapper class for its CMR JSON or its STAC asset map.
+
+    Examples:
+        - Minimal product — only the id is required:
+            ```python
+            >>> from earthlens.base import RemoteProduct
+            >>> rp = RemoteProduct(id="G1234-EARTHDATA")
+            >>> rp.id
+            'G1234-EARTHDATA'
+            >>> rp.href is None
+            True
+            >>> rp.metadata
+            {}
+
+            ```
+        - Carry an asset URL plus arbitrary upstream metadata:
+            ```python
+            >>> from earthlens.base import RemoteProduct
+            >>> rp = RemoteProduct(
+            ...     id="S2A_MSIL2A_20240115T112109_N0510_R037_T29SNB_20240115T143018",
+            ...     href="s3://sentinel-s2-l2a-cogs/29/S/NB/2024/1/15/0/B04.tif",
+            ...     metadata={"cloud_cover": 12.5, "platform": "Sentinel-2A"},
+            ... )
+            >>> rp.metadata["platform"]
+            'Sentinel-2A'
+            >>> rp.href.endswith(".tif")
+            True
+
+            ```
+        - Two products with the same fields compare equal:
+            ```python
+            >>> from earthlens.base import RemoteProduct
+            >>> a = RemoteProduct(id="x", href="h", metadata={"k": 1})
+            >>> b = RemoteProduct(id="x", href="h", metadata={"k": 1})
+            >>> a == b
+            True
+
+            ```
+    """
+
+    id: str
+    href: str | None = None
+    metadata: dict[str, Any] = field(default_factory=dict)
 
 
 class TemporalExtent(BaseModel):
@@ -206,7 +322,30 @@ class SpatialExtent(BaseModel):
 
 
 class AbstractDataSource(ABC):
-    """Bluebrint for all class for different datasources."""
+    """Blueprint for every concrete data-source backend.
+
+    Subclasses encapsulate the request shape, authentication, and
+    download orchestration for a single provider (CHIRPS, ERA5 on AWS
+    S3, ECMWF CDS, Google Earth Engine). The base class wires the
+    abstract hooks (:meth:`_initialize`, :meth:`_create_grid`,
+    :meth:`_check_input_dates`) into a uniform `__init__` shape and
+    exposes a single :meth:`download` entry point.
+
+    Attributes:
+        OUTPUT_KIND: Class-level declaration of the natural output
+            shape this backend emits. Read by
+            :class:`earthlens.earthlens.EarthLens` at facade
+            `download()` time to gate the `aggregate=` argument:
+            `"raster"` and `"xarray"` accept it (the existing
+            `aggregate_netcdf` flow); `"vector"` and `"tabular"`
+            reject it with :class:`NotImplementedError`; `"mixed"`
+            forwards it unchanged. Subclasses override the class
+            attribute; the default is `"raster"` so the four
+            backends shipped before C1 (CHIRPS, S3, ECMWF, GEE) all
+            keep their existing behaviour with no source change.
+    """
+
+    OUTPUT_KIND: OutputKind = "raster"
 
     def __init__(
         self,
@@ -325,8 +464,115 @@ class AbstractDataSource(ABC):
         Called by :meth:`download` (or :meth:`_download_dataset`) once
         per `(dataset, variable)` pair. The signature is
         backend-specific.
+
+        New backends (C3 onward) should implement :meth:`_search` and
+        :meth:`_fetch` instead and let the default
+        :meth:`_api_via_search_fetch` compose them; existing backends
+        (CHIRPS, S3, ECMWF, GEE) continue to override `_api` directly.
         """
         pass
+
+    # ------------------------------------------------------------------
+    # C3 — optional search/fetch decomposition.
+    #
+    # The existing four backends (CHIRPS, S3, ECMWF, GEE) keep their
+    # `_api` overrides unchanged: nothing below is abstract, so they do
+    # not have to implement `_search` / `_fetch` to stay green.
+    #
+    # New backends (earthlens.stac, earthlens.earthdata, earthlens.fdsn,
+    # earthlens.openaq, …) should override `_search` and `_fetch`
+    # instead — `_search` returns a list of `RemoteProduct`s and
+    # `_fetch` consumes them. The :meth:`_api_via_search_fetch` helper
+    # is the canonical composition; backends can opt into it by
+    # overriding `_api` as `return self._api_via_search_fetch()`.
+    # ------------------------------------------------------------------
+
+    def _search(self) -> list[RemoteProduct]:
+        """List the remote products that satisfy this download request.
+
+        Default raises `NotImplementedError` so backends that do not
+        opt into the search/fetch split (the four shipped before C3)
+        keep their `_api`-only flow unchanged. Backends that opt in
+        override this to return one `RemoteProduct` per item the
+        server's catalog says they should download.
+
+        The split exists to make dry-run inspection cheap (`_search`
+        does not hit the bulk-download endpoint) and to make
+        per-product parallelism explicit (`_fetch` is the
+        parallelisable half).
+
+        Returns:
+            list[RemoteProduct]: One item per product to download.
+                The empty list is a legal result (the catalog matched
+                nothing) and short-circuits `_api_via_search_fetch`
+                without ever calling `_fetch`.
+
+        Raises:
+            NotImplementedError: When the subclass keeps the legacy
+                `_api`-only flow. The message names the subclass
+                class so the user can find the offending backend.
+        """
+        raise NotImplementedError(
+            f"{type(self).__name__} does not implement _search; "
+            f"either override _api directly (legacy) or override both "
+            f"_search and _fetch (post-C3)."
+        )
+
+    def _fetch(self, products: list[RemoteProduct]) -> list[Path]:
+        """Download the bytes of every product `_search` returned.
+
+        Default raises `NotImplementedError` (see `_search`).
+        Backends that opt into the search/fetch split override this
+        to iterate over `products` — either sequentially or via
+        `joblib.Parallel` / `concurrent.futures` — and write each
+        one to disk.
+
+        Args:
+            products: The list returned by `_search` (or a
+                user-filtered subset). The empty list is allowed and
+                returns an empty list.
+
+        Returns:
+            list[Path]: The local file paths written, in the same
+                order as `products`. Empty list when `products` is
+                empty (no-op fetch is legal).
+
+        Raises:
+            NotImplementedError: When the subclass keeps the legacy
+                `_api`-only flow.
+        """
+        raise NotImplementedError(
+            f"{type(self).__name__} does not implement _fetch; "
+            f"either override _api directly (legacy) or override both "
+            f"_search and _fetch (post-C3)."
+        )
+
+    def _api_via_search_fetch(self) -> list[Path]:
+        """Canonical `_api` body for backends using the C3 split.
+
+        Backends that override `_search` and `_fetch` usually want
+        `_api` to just compose them; this helper is that
+        composition, factored once so each new backend's `_api`
+        body becomes a single line:
+
+        ```python
+        def _api(self):
+            return self._api_via_search_fetch()
+        ```
+
+        The helper short-circuits on an empty search result so
+        `_fetch` is only called when there is something to fetch —
+        a tiny but meaningful win when many backends are queried in
+        parallel and most return nothing.
+
+        Returns:
+            list[Path]: Whatever `_fetch` returned. An empty list
+                when `_search` returned no products.
+        """
+        products = self._search()
+        if not products:
+            return []
+        return self._fetch(products)
 
 
 class AbstractCatalog(BaseModel):

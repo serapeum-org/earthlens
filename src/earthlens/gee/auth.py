@@ -28,6 +28,10 @@ from pathlib import Path
 from typing import Any
 
 import ee
+from pydantic import BaseModel, ConfigDict
+
+from earthlens.base.auth import AbstractAuth
+from earthlens.base.auth import AuthenticationError as _BaseAuthenticationError
 
 _REGISTER_URL = "https://code.earthengine.google.com/register"
 _SERVICE_ACCOUNT_DOCS = (
@@ -35,14 +39,74 @@ _SERVICE_ACCOUNT_DOCS = (
 )
 
 
-class AuthenticationError(Exception):
+class AuthenticationError(_BaseAuthenticationError):
     """Raised when the Earth Engine connection cannot be established.
 
     Wraps the underlying `ee` / Google credential errors with an
     actionable message — most commonly a missing or malformed service
     key, an unregistered Cloud project, or a service account that lacks
     an Earth Engine IAM role on the target project.
+
+    A subclass of the cross-backend
+    :class:`earthlens.base.AuthenticationError` so callers can catch
+    every backend's auth failure with one `except` clause; backward
+    compatible with existing `except earthlens.gee.AuthenticationError`
+    consumers.
     """
+
+
+class EarthEngineCredentials(BaseModel):
+    """Frozen value object holding the Earth Engine service-account creds.
+
+    Used internally by `EarthEngineAuth` to satisfy the
+    `earthlens.base.AbstractAuth` generic-type bound. The public
+    `EarthEngineAuth` constructor still accepts the three positional
+    kwargs (`service_account`, `service_key`, `project`) for
+    backward compatibility — the credentials object is built
+    internally and stored on `self._creds`.
+
+    Attributes:
+        service_account: Service-account email, e.g.
+            `my-sa@my-project.iam.gserviceaccount.com`.
+        service_key: Path to the JSON key file, or the JSON content
+            as a string. `EarthEngineAuth.initialize` distinguishes
+            the two by leading character.
+        project: Cloud project id; if `None`, falls back to the key
+            file's `project_id` field at `configure()` time.
+
+    Examples:
+        - Build a credentials object from a file path:
+            ```python
+            >>> from earthlens.gee.auth import EarthEngineCredentials
+            >>> creds = EarthEngineCredentials(
+            ...     service_account="sa@my-project.iam.gserviceaccount.com",
+            ...     service_key="/path/to/key.json",
+            ...     project="my-project",
+            ... )
+            >>> creds.service_account
+            'sa@my-project.iam.gserviceaccount.com'
+            >>> creds.project
+            'my-project'
+
+            ```
+        - `project` is optional — `None` defers resolution to `configure()`:
+            ```python
+            >>> from earthlens.gee.auth import EarthEngineCredentials
+            >>> creds = EarthEngineCredentials(
+            ...     service_account="sa@p.iam",
+            ...     service_key='{"type": "service_account"}',
+            ... )
+            >>> creds.project is None
+            True
+
+            ```
+    """
+
+    model_config = ConfigDict(frozen=True, arbitrary_types_allowed=True)
+
+    service_account: str
+    service_key: str
+    project: str | None = None
 
 
 def _load_key_dict(service_key: str) -> dict[str, Any] | None:
@@ -78,13 +142,20 @@ def _load_key_dict(service_key: str) -> dict[str, Any] | None:
         return None
 
 
-class EarthEngineAuth:
+class EarthEngineAuth(AbstractAuth[EarthEngineCredentials]):
     """Authenticate and initialise a connection to Google Earth Engine.
 
     Construct this with a service-account email and key (file path or
     raw JSON); construction performs the one-time `ee.Initialize`. The
     Cloud project is read from the `project` argument or, failing that,
     from the key file's `project_id`.
+
+    Conforms to the cross-backend
+    :class:`earthlens.base.AbstractAuth` contract (C2): construction
+    still authenticates eagerly for backward compatibility, but the
+    underlying work lives in :meth:`configure` and is idempotent —
+    the second call after :meth:`is_authenticated` returns `True`
+    short-circuits.
 
     Args:
         service_account: The service-account email, e.g.
@@ -128,8 +199,83 @@ class EarthEngineAuth:
         Raises:
             AuthenticationError: As described on :class:`EarthEngineAuth`.
         """
+        creds = EarthEngineCredentials(
+            service_account=service_account,
+            service_key=service_key,
+            project=project,
+        )
+        super().__init__(creds)
+        # Backward-compat surface: existing callers reach for
+        # `auth.service_account` and `auth.project` as plain attrs.
         self.service_account = service_account
-        self.project = self.initialize(service_account, service_key, project)
+        self.project: str | None = None
+        self.configure()
+
+    def configure(self) -> None:
+        """Authenticate against Earth Engine; idempotent.
+
+        Calls `initialize` on first invocation and caches the
+        resolved Cloud project id on `self.project`. Subsequent
+        calls short-circuit when `is_authenticated` returns `True`,
+        so it is safe to call repeatedly from long-lived workers.
+
+        Raises:
+            AuthenticationError: As described on `EarthEngineAuth`
+                — missing/invalid key, unresolved project,
+                unregistered Earth Engine project, or insufficient
+                IAM permissions on the service account.
+
+        Examples:
+            - Calling `configure` twice does the network work once
+              (the second call short-circuits via
+              `is_authenticated`):
+
+                ```python
+                >>> auth = EarthEngineAuth(  # doctest: +SKIP
+                ...     "my-sa@my-project.iam.gserviceaccount.com",
+                ...     "/path/to/key.json",
+                ... )
+                >>> auth.is_authenticated()  # doctest: +SKIP
+                True
+                >>> auth.configure()  # no-op  # doctest: +SKIP
+
+                ```
+        """
+        if self.is_authenticated():
+            return
+        self.project = self.initialize(
+            self._creds.service_account,
+            self._creds.service_key,
+            self._creds.project,
+        )
+
+    def is_authenticated(self) -> bool:
+        """`True` once `ee.Initialize` has succeeded for this instance.
+
+        Cheap predicate — does not call into the `ee` library or
+        the network. Returns `True` exactly when `self.project` is
+        set to a non-empty string (the success signal from
+        `initialize`).
+
+        Returns:
+            bool: `True` after a successful `configure()` /
+                construction, `False` otherwise.
+
+        Examples:
+            - A fresh, configured instance is authenticated:
+                ```python
+                >>> auth = EarthEngineAuth(  # doctest: +SKIP
+                ...     "my-sa@my-project.iam.gserviceaccount.com",
+                ...     "/path/to/key.json",
+                ... )
+                >>> auth.is_authenticated()  # doctest: +SKIP
+                True
+                >>> auth.project  # doctest: +SKIP
+                'my-project'
+
+                ```
+        """
+        return bool(self.project)
 
     @staticmethod
     def initialize(

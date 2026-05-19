@@ -10,19 +10,26 @@ from __future__ import annotations
 from earthlens.base.abstractdatasource import (
     AbstractCatalog,
     AbstractDataSource,
+    OutputKind,
+    RemoteProduct,
     SpatialExtent,
     TemporalExtent,
 )
+from earthlens.base.auth import AbstractAuth, AuthenticationError
 from earthlens.base.leaves import FluxableLeaf
 from earthlens.base.providers import Provider, clear_providers_cache, load_providers
 from earthlens.base.spatial import METRES_PER_DEGREE, estimate_pixel_dims
 
 __all__ = [
+    "AbstractAuth",
     "AbstractCatalog",
     "AbstractDataSource",
+    "AuthenticationError",
     "FluxableLeaf",
     "METRES_PER_DEGREE",
+    "OutputKind",
     "Provider",
+    "RemoteProduct",
     "SpatialExtent",
     "TemporalExtent",
     "clear_providers_cache",
