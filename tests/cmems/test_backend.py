@@ -86,10 +86,11 @@ def cmems_instance(fake_cmems: _FakeCmems, tmp_path: Path) -> CMEMS:
 class TestCMEMSConstruction:
     """`__init__` wires `space` / `time` / OUTPUT_KIND correctly."""
 
-    def test_output_kind_is_xarray(self):
-        """CMEMS declares the xarray output kind so aggregate is allowed."""
-        assert CMEMS.OUTPUT_KIND == "xarray", (
-            f"CMEMS.OUTPUT_KIND must be 'xarray', got {CMEMS.OUTPUT_KIND!r}"
+    def test_output_kind_is_raster(self):
+        """CMEMS declares raster output (gridded NetCDF/Zarr)."""
+        assert CMEMS.OUTPUT_KIND == "raster", (
+            f"CMEMS.OUTPUT_KIND must be 'raster' (the on-disk artefact is "
+            f"a gridded NetCDF/Zarr), got {CMEMS.OUTPUT_KIND!r}"
         )
 
     def test_init_captures_space(self, cmems_instance: CMEMS):

@@ -9,25 +9,27 @@ from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
-OutputKind = Literal["raster", "vector", "tabular", "xarray", "mixed"]
-"""The five output shapes an `AbstractDataSource` subclass can emit.
+OutputKind = Literal["raster", "vector", "tabular", "mixed"]
+"""The four output shapes an `AbstractDataSource` subclass can emit.
 
 `EarthLens` reads `datasource.OUTPUT_KIND` at `download()` time to
 decide whether a non-`None` `aggregate=` argument is meaningful for
 the bound backend. The semantics per value:
 
-* `"raster"` — gridded raster output (GeoTIFF, COG). The aggregator
-  is forwarded; this is what every backend shipped before C1
-  declares.
+* `"raster"` — gridded raster output. Covers both 2-D rasters
+  (GeoTIFF, COG, BIL) and per-variable NetCDF / Zarr — the
+  classifier is "is the on-disk artefact a gridded array?". The
+  aggregator is forwarded; the time-window reducer (in
+  `earthlens.aggregate`, backed by `pyramids.netcdf.NetCDF`) reads
+  the file directly. This is what every backend shipped before C1
+  declares, and every gridded backend added after C1 should
+  declare.
 * `"vector"` — `GeoDataFrame` / vector features (events, footprints,
   admin boundaries). The aggregator is rejected with
   `NotImplementedError` — no meaningful gridded reduction.
 * `"tabular"` — `DataFrame` per-row records (station observations,
   climate indices, biodiversity occurrences). Also rejects
   `aggregate=`.
-* `"xarray"` — lazy `xarray.Dataset` (CMEMS, NWM Zarr, ECMWF GRIB
-  decoded). The aggregator is forwarded; gridded reductions are
-  well-defined on xarray.
 * `"mixed"` — escape hatch for backends like HDX whose per-resource
   format is only known at download time. The facade forwards the
   aggregator unchanged and trusts the backend to honour it.
@@ -38,7 +40,7 @@ Examples:
         >>> from typing import get_args
         >>> from earthlens.base import OutputKind
         >>> get_args(OutputKind)
-        ('raster', 'vector', 'tabular', 'xarray', 'mixed')
+        ('raster', 'vector', 'tabular', 'mixed')
 
         ```
 
@@ -336,7 +338,7 @@ class AbstractDataSource(ABC):
             shape this backend emits. Read by
             :class:`earthlens.earthlens.EarthLens` at facade
             `download()` time to gate the `aggregate=` argument:
-            `"raster"` and `"xarray"` accept it (the existing
+            `"raster"` accepts it (the existing pyramids-backed
             `aggregate_netcdf` flow); `"vector"` and `"tabular"`
             reject it with :class:`NotImplementedError`; `"mixed"`
             forwards it unchanged. Subclasses override the class

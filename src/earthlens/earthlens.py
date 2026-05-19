@@ -320,9 +320,9 @@ class EarthLens:
                 progress bar during the loop. Defaults to `True`.
             aggregate: Optional :class:`earthlens.aggregate.AggregationConfig`.
                 Forwarded to backends whose `OUTPUT_KIND` is
-                `"raster"`, `"xarray"`, or `"mixed"` — the three
-                shapes for which a gridded reduction is well-defined.
-                Backends declaring `"vector"` or `"tabular"` reject a
+                `"raster"` or `"mixed"` — the two shapes for which
+                a gridded reduction is well-defined. Backends
+                declaring `"vector"` or `"tabular"` reject a
                 non-`None` `aggregate` with `NotImplementedError`
                 before the backend's `download` is called (the
                 aggregator has no meaningful semantics on
@@ -347,8 +347,8 @@ class EarthLens:
                 code that the catalog cannot resolve.
             NotImplementedError: When `aggregate=` is not `None` and
                 the bound backend's `OUTPUT_KIND` is `"vector"` or
-                `"tabular"`. The aggregator only handles raster /
-                xarray outputs; vector / tabular backends emit
+                `"tabular"`. The aggregator only handles gridded
+                raster outputs; vector / tabular backends emit
                 `GeoDataFrame` / `DataFrame` rows that have no
                 meaningful gridded reduction.
 
@@ -406,12 +406,12 @@ class EarthLens:
         """
         if aggregate is not None:
             output_kind = getattr(self.datasource, "OUTPUT_KIND", "raster")
-            if output_kind not in {"raster", "xarray", "mixed"}:
+            if output_kind not in {"raster", "mixed"}:
                 raise NotImplementedError(
                     f"aggregate= is not supported for "
                     f"{type(self.datasource).__name__} backends "
                     f"(OUTPUT_KIND={output_kind!r}). The aggregator only "
-                    f"handles raster / xarray outputs; vector / tabular "
+                    f"handles gridded raster outputs; vector / tabular "
                     f"backends emit GeoDataFrames or DataFrames that do "
                     f"not have a meaningful gridded reduction."
                 )
