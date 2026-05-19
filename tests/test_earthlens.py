@@ -300,7 +300,7 @@ class TestEarthLensDownloadAggregate:
         # aggregate-guard in EarthLens.download should accept
         # `aggregate=` and forward it. Without this, MagicMock would
         # synthesise a child mock for `.OUTPUT_KIND` and the guard
-        # would (correctly) reject it as not in {raster, xarray, mixed}.
+        # would (correctly) reject it as not in {raster, mixed}.
         stub.OUTPUT_KIND = "raster"
         earthlens.datasource = stub
         return earthlens

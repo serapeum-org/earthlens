@@ -81,7 +81,7 @@ class TestEarthLensCmemsRouting:
         assert isinstance(el.datasource, CMEMS), (
             f"el.datasource must be a CMEMS instance, got {type(el.datasource).__name__}"
         )
-        assert el.datasource.OUTPUT_KIND == "xarray"
+        assert el.datasource.OUTPUT_KIND == "raster"
 
 
 @pytest.mark.cmems
@@ -92,13 +92,14 @@ class TestEarthLensCmemsAggregateGuard:
     def test_facade_allows_aggregate_through_to_backend(
         self, fake_cmems: _FakeCmems, tmp_path: Path
     ):
-        """For OUTPUT_KIND='xarray', the facade forwards aggregate.
+        """For OUTPUT_KIND='raster', the facade forwards aggregate.
 
         The CMEMS backend then raises NotImplementedError because
-        the xarray aggregate path is staged. This proves the C1
-        guard is *not* the one rejecting xarray backends — the
-        rejection is backend-internal and goes away once CMEMS
-        implements xarray.resample-based aggregation.
+        the aggregate path is staged — earthlens.aggregate.aggregate_netcdf
+        (pyramids-backed) is hardcoded to the ECMWF Variable shape and
+        a time × lat × lon layout. This proves the C1 guard is *not*
+        the one rejecting CMEMS; the rejection is backend-internal and
+        goes away once the pyramids time-window reducer is generalised.
         """
         el = EarthLens(
             data_source="cmems",
@@ -124,7 +125,7 @@ class TestEarthLensCmemsAggregateGuard:
 
         Patches the instance-level OUTPUT_KIND to "vector" and confirms the
         facade — not the backend — raises the NotImplementedError. Proves the
-        guard distinguishes by OUTPUT_KIND and that CMEMS' "xarray" declaration
+        guard distinguishes by OUTPUT_KIND and that CMEMS' "raster" declaration
         is what unlocks the kwarg in the previous test.
         """
         el = EarthLens(

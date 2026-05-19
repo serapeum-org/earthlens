@@ -10,17 +10,22 @@ toolbox cuts the requested space/time window out of the source
 dataset on the server and streams a single NetCDF (or Zarr) back to
 the user's `path`.
 
-The output shape is xarray-friendly NetCDF/Zarr, so
-`OUTPUT_KIND = "xarray"` — the
-:class:`earthlens.earthlens.EarthLens` facade therefore forwards
-`aggregate=AggregationConfig(...)` to this backend's `download()`
-without rejecting it. The aggregator hand-off itself is staged:
-`CMEMS.download(aggregate=...)` accepts the argument and raises
-`NotImplementedError` with a forward-pointing message until the
-xarray-resample integration lands as a follow-up. The facade-level
-guard still works (the `xarray` OUTPUT_KIND is one of the kinds
-that accepts the kwarg), which keeps the contract tested by C1
-intact.
+The on-disk artefact is a gridded NetCDF/Zarr, so
+`OUTPUT_KIND = "raster"` — structurally identical to ECMWF's
+per-variable NetCDF output. The :class:`earthlens.earthlens.EarthLens`
+facade therefore forwards `aggregate=AggregationConfig(...)` to this
+backend's `download()` without rejecting it. The aggregator hand-off
+itself is staged: the existing
+:func:`earthlens.aggregate.aggregate_netcdf` (pyramids-backed via
+:class:`pyramids.netcdf.NetCDF`) is hardcoded to consume the ECMWF
+`Variable` row shape and a `time × lat × lon` layout. CMEMS NetCDFs
+add a depth (or elevation) axis on physics / biogeochem variables,
+and CMEMS catalog rows are a different pydantic type. Both gaps
+are pyramids-side concerns and will be lifted by generalising the
+pyramids time-window reducer to (a) accept any `Variable` exposing
+`(nc_variable, output_label, is_flux)` and (b) handle the optional
+depth axis (collapse via mean, pick a single level, or preserve
+through the per-window write).
 """
 
 from __future__ import annotations
@@ -53,14 +58,15 @@ FileFormat = Literal["netcdf", "zarr"]
 
 
 class CMEMS(AbstractDataSource):
-    """Copernicus Marine Service backend (xarray output).
+    """Copernicus Marine Service backend (gridded NetCDF/Zarr output).
 
     Wraps :func:`copernicusmarine.subset` so a user can request a
     space/time window of one or more CMEMS datasets through the
     same `download()` shape every other earthlens backend uses.
     Each `(dataset_id, [variables])` pair becomes one server-side
     subset call; the toolbox returns a single NetCDF (or Zarr) per
-    request that the user can immediately `xarray.open_dataset()`.
+    request, ready to be opened by any NetCDF reader — within this
+    package, that reader is :class:`pyramids.netcdf.NetCDF`.
 
     Authentication is one-time: the first :meth:`_initialize` call
     delegates to :class:`CmemsAuth`, which validates the credentials
@@ -70,12 +76,17 @@ class CMEMS(AbstractDataSource):
     authenticated automatically.
 
     Attributes:
-        OUTPUT_KIND: `"xarray"` — second earthlens backend (after
-            ECMWF) whose output composes with the
-            :class:`earthlens.aggregate.AggregationConfig` flow.
+        OUTPUT_KIND: `"raster"` — the on-disk artefact is a gridded
+            NetCDF/Zarr, structurally identical to ECMWF's per-
+            variable NetCDF output. Composes with the existing
+            pyramids-backed
+            :class:`earthlens.aggregate.AggregationConfig` flow once
+            the pyramids time-window reducer is generalised to
+            accept the CMEMS catalog row shape and the optional
+            depth axis.
     """
 
-    OUTPUT_KIND: OutputKind = "xarray"
+    OUTPUT_KIND: OutputKind = "raster"
 
     def __init__(
         self,
@@ -271,12 +282,16 @@ class CMEMS(AbstractDataSource):
                 progress bar is suppressed. Defaults to `True`.
             aggregate: Optional
                 :class:`earthlens.aggregate.AggregationConfig`.
-                Accepted because :data:`OUTPUT_KIND` is `"xarray"`,
+                Accepted because :data:`OUTPUT_KIND` is `"raster"`,
                 so the facade allows the kwarg through. Currently
-                staged — the call raises
-                `NotImplementedError` with a forward-pointing
-                message; xarray-resample integration is the
-                first follow-up after the initial CMEMS landing.
+                staged — the call raises `NotImplementedError`
+                because the existing pyramids-backed
+                :func:`earthlens.aggregate.aggregate_netcdf` is
+                hardcoded to the ECMWF `Variable` shape and a
+                `time × lat × lon` layout, neither of which fits
+                CMEMS rows (different pydantic type, optional
+                depth axis). The fix is a pyramids-side
+                generalisation of the time-window reducer.
 
         Returns:
             list[Path]: Absolute paths of every output the
@@ -285,19 +300,24 @@ class CMEMS(AbstractDataSource):
 
         Raises:
             NotImplementedError: When `aggregate` is not `None`.
-                Will be removed when the xarray-resample
-                integration lands.
+                Will be removed once the pyramids time-window
+                reducer accepts CMEMS catalog rows and a depth
+                axis.
         """
         if aggregate is not None:
             raise NotImplementedError(
                 "CMEMS.download(aggregate=...) is staged but not "
                 "yet implemented. The facade-level OUTPUT_KIND "
-                "guard allows aggregate=ConfigT for xarray "
-                "backends; an xarray.resample-based path is the "
-                "next CMEMS-side follow-up. For now, call "
-                "download() without aggregate= and run "
-                "xarray.open_dataset(path).resample(time=freq) on "
-                "the returned NetCDF."
+                "guard allows aggregate= for raster backends; the "
+                "blocker is that earthlens.aggregate.aggregate_netcdf "
+                "(backed by pyramids.netcdf.NetCDF) is hardcoded to "
+                "the ECMWF Variable shape and a time x lat x lon "
+                "layout. CMEMS uses a different catalog row type and "
+                "adds an optional depth axis. The fix is a pyramids-"
+                "side generalisation of the time-window reducer. "
+                "For now, call download() without aggregate= and "
+                "post-process the returned NetCDF directly via "
+                "pyramids.netcdf.NetCDF."
             )
 
         out_paths = self._api_via_search_fetch_with_progress(progress_bar)
