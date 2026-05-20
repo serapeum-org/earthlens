@@ -1,0 +1,1682 @@
+# CMEMS curated catalog - baltic-sea slice.
+#
+# One slice of the per-domain split of the Copernicus Marine catalog.
+# The loader (earthlens.cmems.catalog.Catalog) merges every *.yaml in
+# this directory into one Catalog at construction time; dataset ids
+# must be unique across files. Stanzas are emitted by
+# tools/cmems/refresh_cmems_catalog.py from copernicusmarine.describe();
+# `cadence` is inferred from the dataset_id suffix and `domain` from
+# the product_id prefix. The `global` basin is sub-split by theme
+# (global-physics / global-biogeochem / global-sst / ...) to keep file
+# sizes balanced; the `domain:` field on every row below is still the
+# plain basin label. Where the toolbox exposes no standard_name for a
+# variable, the row carries `long_name: ''` with a TODO marker.
+#
+# Schema (per dataset):
+#   <dataset_id>:
+#     product: <product_id>
+#     title: <human-readable title>
+#     cadence: <daily|monthly|hourly|6hourly|climatology|irregular>
+#     domain: <global|mediterranean|arctic|...>
+#     temporal: { start: YYYY-MM-DD, end: YYYY-MM-DD }   # end null = NRT
+#     variables:
+#       <short_name>: { units: <CF units>, long_name: <CF long name> }
+
+datasets:
+
+  DMI-BALTIC-SST-L3S-NRT-OBS_FULL_TIME_SERIE:
+    product: SST_BAL_SST_L3S_NRT_OBSERVATIONS_010_032
+    title: DMI North Sea/Baltic Sea SST, L3S, (SST_BAL_SST_L3S_NRT_OBSERVATIONS_010_032)
+    cadence: irregular
+    domain: baltic-sea
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      mask:
+        units: ''
+        long_name: ''            # TODO: standard_name missing on describe()
+      or_number_of_sst_pixels:
+        units: ''
+        long_name: ''            # TODO: standard_name missing on describe()
+      quality_level:
+        units: ''
+        long_name: ''            # TODO: standard_name missing on describe()
+      sea_ice_fraction:
+        units: '1'
+        long_name: Sea ice area fraction
+      sea_surface_temperature:
+        units: kelvin
+        long_name: Sea surface temperature
+      source_of_sst:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      sses_bias:
+        units: kelvin
+        long_name: ''            # TODO: standard_name missing on describe()
+      sses_standard_deviation:
+        units: kelvin
+        long_name: ''            # TODO: standard_name missing on describe()
+      sst_dtime:
+        units: seconds
+        long_name: ''            # TODO: standard_name missing on describe()
+      sum_square_sst:
+        units: Celsius2
+        long_name: ''            # TODO: standard_name missing on describe()
+      sum_sst:
+        units: Celsius
+        long_name: ''            # TODO: standard_name missing on describe()
+
+  DMI-BALTIC-SST-L4-NRT-OBS_FULL_TIME_SERIE:
+    product: SST_BAL_SST_L4_NRT_OBSERVATIONS_010_007_b
+    title: DMI Sea Surface Temperature analysis
+    cadence: irregular
+    domain: baltic-sea
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      analysed_sst:
+        units: kelvin
+        long_name: Sea surface foundation temperature
+      analysis_error:
+        units: kelvin
+        long_name: Sea suface temperature error
+      mask:
+        units: ''
+        long_name: ''            # TODO: standard_name missing on describe()
+      sea_ice_fraction:
+        units: '1'
+        long_name: Sea ice area fraction
+
+  cmems_mod_bal_bgc-pp_anfc_P1D-i:
+    product: BALTICSEA_ANALYSISFORECAST_BGC_003_007
+    title: CMEMS ERGOM accumulated daily NPP
+    cadence: daily
+    domain: baltic-sea
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      nppv:
+        units: mg m-3 day-1
+        long_name: Net primary production of biomass expressed as carbon per unit volume in sea water
+
+  cmems_mod_bal_bgc_anfc_P1D-m:
+    product: BALTICSEA_ANALYSISFORECAST_BGC_003_007
+    title: CMEMS ERGOM daily integrated model fields
+    cadence: daily
+    domain: baltic-sea
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      cdom:
+        units: mmol m-3
+        long_name: Mole concentration of colored dissolved organic matter expressed as carbon in sea
+      chl:
+        units: mg m-3
+        long_name: Mass concentration of chlorophyll a in sea water
+      dissic:
+        units: mol m-3
+        long_name: Mole concentration of dissolved inorganic carbon in sea water
+      fe:
+        units: mmol m-3
+        long_name: Mole concentration of dissolved iron in sea water
+      h2s:
+        units: mmol m-3
+        long_name: Mole concentration of hydrogen sulfide in sea water
+      kd:
+        units: 1/m
+        long_name: Volume attenuation coefficient of downwelling radiative flux in sea water
+      nh4:
+        units: mmol m-3
+        long_name: Mole concentration of ammonium in sea water
+      no3:
+        units: mmol m-3
+        long_name: Mole concentration of nitrate in sea water
+      o2:
+        units: mmol m-3
+        long_name: Mole concentration of dissolved molecular oxygen in sea water
+      o2b:
+        units: mmol m-3
+        long_name: Mole concentration of dissolved molecular oxygen in sea water
+      pH:
+        units: '1'
+        long_name: Sea water ph reported on total scale
+      phyc:
+        units: mmol m-3
+        long_name: Mole concentration of phytoplankton expressed as carbon in sea water
+      po4:
+        units: mmol m-3
+        long_name: Mole concentration of phosphate in sea water
+      si:
+        units: mmol m-3
+        long_name: Mole concentration of silicate in sea water
+      spCO2:
+        units: Pa
+        long_name: Surface partial pressure of carbon dioxide in sea water
+      zooc:
+        units: mmol m-3
+        long_name: Mole concentration of zooplankton expressed as carbon in sea water
+      zsd:
+        units: m
+        long_name: Secchi depth of sea water
+
+  cmems_mod_bal_bgc_anfc_P1M-m:
+    product: BALTICSEA_ANALYSISFORECAST_BGC_003_007
+    title: CMEMS ERGOM monthly integrated model fields
+    cadence: monthly
+    domain: baltic-sea
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      cdom:
+        units: mmol m-3
+        long_name: Mole concentration of colored dissolved organic matter expressed as carbon in sea
+      chl:
+        units: mg m-3
+        long_name: Mass concentration of chlorophyll a in sea water
+      dissic:
+        units: mol m-3
+        long_name: Mole concentration of dissolved inorganic carbon in sea water
+      fe:
+        units: mmol m-3
+        long_name: Mole concentration of dissolved iron in sea water
+      h2s:
+        units: mmol m-3
+        long_name: Mole concentration of hydrogen sulfide in sea water
+      kd:
+        units: 1/m
+        long_name: Volume attenuation coefficient of downwelling radiative flux in sea water
+      nh4:
+        units: mmol m-3
+        long_name: Mole concentration of ammonium in sea water
+      no3:
+        units: mmol m-3
+        long_name: Mole concentration of nitrate in sea water
+      o2:
+        units: mmol m-3
+        long_name: Mole concentration of dissolved molecular oxygen in sea water
+      o2b:
+        units: mmol m-3
+        long_name: Mole concentration of dissolved molecular oxygen in sea water
+      pH:
+        units: '1'
+        long_name: Sea water ph reported on total scale
+      phyc:
+        units: mmol m-3
+        long_name: Mole concentration of phytoplankton expressed as carbon in sea water
+      po4:
+        units: mmol m-3
+        long_name: Mole concentration of phosphate in sea water
+      si:
+        units: mmol m-3
+        long_name: Mole concentration of silicate in sea water
+      spCO2:
+        units: Pa
+        long_name: Surface partial pressure of carbon dioxide in sea water
+      zooc:
+        units: mmol m-3
+        long_name: Mole concentration of zooplankton expressed as carbon in sea water
+
+  cmems_mod_bal_bgc_anfc_static:
+    product: BALTICSEA_ANALYSISFORECAST_BGC_003_007
+    title: cmems_mod_bal_bgc_anfc_static
+    cadence: irregular
+    domain: baltic-sea
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      deptho:
+        units: m
+        long_name: Sea floor depth below geoid
+      deptho_lev:
+        units: '1'
+        long_name: Model level number at sea floor
+      mask:
+        units: '1'
+        long_name: Sea binary mask
+
+  cmems_mod_bal_bgc_my_P1D-m:
+    product: BALTICSEA_MULTIYEAR_BGC_003_012
+    title: CMEMS ERGOM daily integrated model fields
+    cadence: daily
+    domain: baltic-sea
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      chl:
+        units: mg m-3
+        long_name: Mass concentration of chlorophyll a in sea water
+      nh4:
+        units: mmol m-3
+        long_name: Mole concentration of ammonium in sea water
+      no3:
+        units: mmol m-3
+        long_name: Mole concentration of nitrate in sea water
+      nppv:
+        units: mg m-3 day-1
+        long_name: Net primary production of biomass expressed as carbon per unit volume in sea water
+      o2:
+        units: mmol m-3
+        long_name: Mole concentration of dissolved molecular oxygen in sea water
+      o2b:
+        units: mmol m-3
+        long_name: Mole concentration of dissolved molecular oxygen in sea water
+      ph:
+        units: '1'
+        long_name: Sea water ph reported on total scale
+      po4:
+        units: mmol m-3
+        long_name: Mole concentration of phosphate in sea water
+      spco2:
+        units: Pa
+        long_name: Surface partial pressure of carbon dioxide in sea water
+      zsd:
+        units: m
+        long_name: Secchi depth of sea water
+
+  cmems_mod_bal_bgc_my_P1M-m:
+    product: BALTICSEA_MULTIYEAR_BGC_003_012
+    title: CMEMS ERGOM monthly integrated model fields
+    cadence: monthly
+    domain: baltic-sea
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      chl:
+        units: mg m-3
+        long_name: Mass concentration of chlorophyll a in sea water
+      nh4:
+        units: mmol m-3
+        long_name: Mole concentration of ammonium in sea water
+      no3:
+        units: mmol m-3
+        long_name: Mole concentration of nitrate in sea water
+      nppv:
+        units: mg m-3 day-1
+        long_name: Net primary production of biomass expressed as carbon per unit volume in sea water
+      o2:
+        units: mmol m-3
+        long_name: Mole concentration of dissolved molecular oxygen in sea water
+      o2b:
+        units: mmol m-3
+        long_name: Mole concentration of dissolved molecular oxygen in sea water
+      ph:
+        units: '1'
+        long_name: Sea water ph reported on total scale
+      po4:
+        units: mmol m-3
+        long_name: Mole concentration of phosphate in sea water
+      spco2:
+        units: Pa
+        long_name: Surface partial pressure of carbon dioxide in sea water
+      zsd:
+        units: m
+        long_name: Secchi depth of sea water
+
+  cmems_mod_bal_bgc_my_P1Y-m:
+    product: BALTICSEA_MULTIYEAR_BGC_003_012
+    title: CMEMS ERGOM annual integrated model fields
+    cadence: annual
+    domain: baltic-sea
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      chl:
+        units: mg m-3
+        long_name: Mass concentration of chlorophyll a in sea water
+      nh4:
+        units: mmol m-3
+        long_name: Mole concentration of ammonium in sea water
+      no3:
+        units: mmol m-3
+        long_name: Mole concentration of nitrate in sea water
+      nppv:
+        units: mg m-3 day-1
+        long_name: Net primary production of biomass expressed as carbon per unit volume in sea water
+      o2:
+        units: mmol m-3
+        long_name: Mole concentration of dissolved molecular oxygen in sea water
+      o2b:
+        units: mmol m-3
+        long_name: Mole concentration of dissolved molecular oxygen in sea water
+      ph:
+        units: '1'
+        long_name: Sea water ph reported on total scale
+      po4:
+        units: mmol m-3
+        long_name: Mole concentration of phosphate in sea water
+      spco2:
+        units: Pa
+        long_name: Surface partial pressure of carbon dioxide in sea water
+      zsd:
+        units: m
+        long_name: Secchi depth of sea water
+
+  cmems_mod_bal_bgc_my_static:
+    product: BALTICSEA_MULTIYEAR_BGC_003_012
+    title: cmems_mod_bal_bgc_my_static
+    cadence: irregular
+    domain: baltic-sea
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      deptho:
+        units: m
+        long_name: Sea floor depth below geoid
+      deptho_lev:
+        units: '1'
+        long_name: Model level number at sea floor
+      mask:
+        units: '1'
+        long_name: Sea binary mask
+
+  cmems_mod_bal_phy-cur_anfc_detided_P1D-m:
+    product: BALTICSEA_ANALYSISFORECAST_PHY_003_006
+    title: CMEMS NEMO surface currents detided daily means
+    cadence: daily
+    domain: baltic-sea
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      uos_detided:
+        units: m s-1
+        long_name: Eastward sea water velocity assuming no tide
+      vos_detided:
+        units: m s-1
+        long_name: Northward sea water velocity assuming no tide
+
+  cmems_mod_bal_phy-ssh_anfc_detided_P1D-m:
+    product: BALTICSEA_ANALYSISFORECAST_PHY_003_006
+    title: CMEMS NEMO SSH detided daily means
+    cadence: daily
+    domain: baltic-sea
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      zos_detided:
+        units: m
+        long_name: Sea surface height above geoid assuming no tide
+
+  cmems_mod_bal_phy_anfc_P1D-m:
+    product: BALTICSEA_ANALYSISFORECAST_PHY_003_006
+    title: CMEMS NEMO daily integrated model fields
+    cadence: daily
+    domain: baltic-sea
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      bottomT:
+        units: degrees_C
+        long_name: Sea water potential temperature at sea floor
+      mlotst:
+        units: m
+        long_name: Ocean mixed layer thickness defined by sigma theta
+      siconc:
+        units: '1'
+        long_name: Sea ice area fraction
+      sithick:
+        units: m
+        long_name: Sea ice thickness
+      so:
+        units: 1e-3
+        long_name: Sea water salinity
+      sob:
+        units: '0.001'
+        long_name: Sea water salinity at sea floor
+      thetao:
+        units: degree_Celsius
+        long_name: Sea water potential temperature
+      uo:
+        units: m s-1
+        long_name: Eastward sea water velocity
+      vo:
+        units: m s-1
+        long_name: Northward sea water velocity
+      wo:
+        units: m s-1
+        long_name: Upward sea water velocity
+
+  cmems_mod_bal_phy_anfc_P1M-m:
+    product: BALTICSEA_ANALYSISFORECAST_PHY_003_006
+    title: CMEMS NEMO monthly integrated model fields
+    cadence: monthly
+    domain: baltic-sea
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      bottomT:
+        units: degrees_C
+        long_name: Sea water potential temperature at sea floor
+      mlotst:
+        units: m
+        long_name: Ocean mixed layer thickness defined by sigma theta
+      siconc:
+        units: '1'
+        long_name: Sea ice area fraction
+      sithick:
+        units: m
+        long_name: Sea ice thickness
+      sla:
+        units: m
+        long_name: Sea surface height above sea level
+      so:
+        units: 1e-3
+        long_name: Sea water salinity
+      sob:
+        units: '0.001'
+        long_name: Sea water salinity at sea floor
+      thetao:
+        units: degree_Celsius
+        long_name: Sea water potential temperature
+      uo:
+        units: m s-1
+        long_name: Eastward sea water velocity
+      vo:
+        units: m s-1
+        long_name: Northward sea water velocity
+      wo:
+        units: m s-1
+        long_name: Upward sea water velocity
+
+  cmems_mod_bal_phy_anfc_PT15M-i:
+    product: BALTICSEA_ANALYSISFORECAST_PHY_003_006
+    title: CMEMS NEMO 15 minutes surface model fields
+    cadence: irregular
+    domain: baltic-sea
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      sla:
+        units: m
+        long_name: Sea surface height above sea level
+      uo:
+        units: m s-1
+        long_name: Eastward sea water velocity
+      vo:
+        units: m s-1
+        long_name: Northward sea water velocity
+
+  cmems_mod_bal_phy_anfc_PT1H-i:
+    product: BALTICSEA_ANALYSISFORECAST_PHY_003_006
+    title: CMEMS NEMO hourly model fields
+    cadence: hourly
+    domain: baltic-sea
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      bottomT:
+        units: degrees_C
+        long_name: Sea water potential temperature at sea floor
+      mlotst:
+        units: m
+        long_name: Ocean mixed layer thickness defined by sigma theta
+      siconc:
+        units: '1'
+        long_name: Sea ice area fraction
+      sithick:
+        units: m
+        long_name: Sea ice thickness
+      sla:
+        units: m
+        long_name: Sea surface height above sea level
+      so:
+        units: 1e-3
+        long_name: Sea water salinity
+      sob:
+        units: '0.001'
+        long_name: Sea water salinity at sea floor
+      thetao:
+        units: degree_Celsius
+        long_name: Sea water potential temperature
+      uo:
+        units: m s-1
+        long_name: Eastward sea water velocity
+      vo:
+        units: m s-1
+        long_name: Northward sea water velocity
+      wo:
+        units: m s-1
+        long_name: Upward sea water velocity
+
+  cmems_mod_bal_phy_anfc_static:
+    product: BALTICSEA_ANALYSISFORECAST_PHY_003_006
+    title: cmems_mod_bal_phy_anfc_static
+    cadence: irregular
+    domain: baltic-sea
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      deptho:
+        units: m
+        long_name: Sea floor depth below geoid
+      deptho_lev:
+        units: '1'
+        long_name: Model level number at sea floor
+      mask:
+        units: '1'
+        long_name: Sea binary mask
+
+  cmems_mod_bal_phy_my_P1D-m:
+    product: BALTICSEA_MULTIYEAR_PHY_003_011
+    title: CMEMS NEMO daily integrated model fields
+    cadence: daily
+    domain: baltic-sea
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      bottomT:
+        units: degrees_C
+        long_name: Sea water potential temperature at sea floor
+      mlotst:
+        units: m
+        long_name: Ocean mixed layer thickness defined by sigma theta
+      siconc:
+        units: '1'
+        long_name: Sea ice area fraction
+      sithick:
+        units: m
+        long_name: Sea ice thickness
+      sla:
+        units: m
+        long_name: Sea surface height above sea level
+      so:
+        units: '0.001'
+        long_name: Sea water salinity
+      sob:
+        units: '0.001'
+        long_name: Sea water salinity at sea floor
+      thetao:
+        units: degrees_C
+        long_name: Sea water potential temperature
+      uo:
+        units: m s-1
+        long_name: Eastward sea water velocity
+      vo:
+        units: m s-1
+        long_name: Northward sea water velocity
+
+  cmems_mod_bal_phy_my_P1M-m:
+    product: BALTICSEA_MULTIYEAR_PHY_003_011
+    title: CMEMS NEMO monthly integrated model fields
+    cadence: monthly
+    domain: baltic-sea
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      bottomT:
+        units: degrees_C
+        long_name: Sea water potential temperature at sea floor
+      mlotst:
+        units: m
+        long_name: Ocean mixed layer thickness defined by sigma theta
+      siconc:
+        units: '1'
+        long_name: Sea ice area fraction
+      sithick:
+        units: m
+        long_name: Sea ice thickness
+      sla:
+        units: m
+        long_name: Sea surface height above sea level
+      so:
+        units: '0.001'
+        long_name: Sea water salinity
+      sob:
+        units: '0.001'
+        long_name: Sea water salinity at sea floor
+      thetao:
+        units: degrees_C
+        long_name: Sea water potential temperature
+      uo:
+        units: m s-1
+        long_name: Eastward sea water velocity
+      vo:
+        units: m s-1
+        long_name: Northward sea water velocity
+
+  cmems_mod_bal_phy_my_P1Y-m:
+    product: BALTICSEA_MULTIYEAR_PHY_003_011
+    title: CMEMS NEMO annual integrated model fields
+    cadence: annual
+    domain: baltic-sea
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      bottomT:
+        units: degrees_C
+        long_name: Sea water potential temperature at sea floor
+      mlotst:
+        units: m
+        long_name: Ocean mixed layer thickness defined by sigma theta
+      siconc:
+        units: '1'
+        long_name: Sea ice area fraction
+      sithick:
+        units: m
+        long_name: Sea ice thickness
+      sla:
+        units: m
+        long_name: Sea surface height above sea level
+      so:
+        units: '0.001'
+        long_name: Sea water salinity
+      sob:
+        units: '0.001'
+        long_name: Sea water salinity at sea floor
+      thetao:
+        units: degrees_C
+        long_name: Sea water potential temperature
+      uo:
+        units: m s-1
+        long_name: Eastward sea water velocity
+      vo:
+        units: m s-1
+        long_name: Northward sea water velocity
+
+  cmems_mod_bal_phy_my_static:
+    product: BALTICSEA_MULTIYEAR_PHY_003_011
+    title: cmems_mod_bal_phy_my_static
+    cadence: irregular
+    domain: baltic-sea
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      deptho:
+        units: m
+        long_name: Sea floor depth below geoid
+      deptho_lev:
+        units: '1'
+        long_name: Model level number at sea floor
+      mask:
+        units: '1'
+        long_name: Sea binary mask
+
+  cmems_mod_bal_wav_anfc_PT1H-i:
+    product: BALTICSEA_ANALYSISFORECAST_WAV_003_010
+    title: CMEMS WAM model fields (hourly)
+    cadence: hourly
+    domain: baltic-sea
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      VCMX:
+        units: m
+        long_name: Sea surface wave maximum height
+      VHM0:
+        units: m
+        long_name: Sea surface wave significant height
+      VHM0_SW1:
+        units: m
+        long_name: Sea surface primary swell wave significant height
+      VHM0_SW2:
+        units: m
+        long_name: Sea surface secondary swell wave significant height
+      VHM0_WW:
+        units: m
+        long_name: Sea surface wind wave significant height
+      VMDR:
+        units: degree
+        long_name: Sea surface wave from direction
+      VMDR_SW1:
+        units: degree
+        long_name: Sea surface primary swell wave from direction
+      VMDR_SW2:
+        units: degree
+        long_name: Sea surface secondary swell wave from direction
+      VMDR_WW:
+        units: degree
+        long_name: Sea surface wind wave from direction
+      VMXL:
+        units: m
+        long_name: Sea surface wave maximum crest height
+      VPED:
+        units: degree
+        long_name: Sea surface wave from direction at variance spectral density maximum
+      VSDX:
+        units: m s-1
+        long_name: Sea surface wave stokes drift x velocity
+      VSDY:
+        units: m s-1
+        long_name: Sea surface wave stokes drift y velocity
+      VTM01_SW1:
+        units: s
+        long_name: Sea surface primary swell wave mean period
+      VTM01_SW2:
+        units: s
+        long_name: Sea surface secondary swell wave mean period
+      VTM01_WW:
+        units: s
+        long_name: Sea surface wind wave mean period
+      VTM02:
+        units: s
+        long_name: Sea surface wave mean period from variance spectral density second frequency moment
+      VTM10:
+        units: s
+        long_name: Sea surface wave mean period from variance spectral density inverse frequency moment
+      VTPK:
+        units: s
+        long_name: Sea surface wave period at variance spectral density maximum
+
+  cmems_mod_bal_wav_anfc_static:
+    product: BALTICSEA_ANALYSISFORECAST_WAV_003_010
+    title: cmems_mod_bal_wav_anfc_static
+    cadence: irregular
+    domain: baltic-sea
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      deptho:
+        units: m
+        long_name: Sea floor depth below geoid
+      mask:
+        units: '1'
+        long_name: Sea binary mask
+
+  cmems_mod_bal_wav_my_2km-climatology_P1M-m:
+    product: BALTICSEA_MULTIYEAR_WAV_003_015
+    title: Monthly climatology reference period 1980-2023
+    cadence: climatology
+    domain: baltic-sea
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      VHM0:
+        units: m
+        long_name: Sea surface wave significant height
+      VTM02:
+        units: s
+        long_name: Sea surface wave mean period from variance spectral density second frequency moment
+      climatology_bounds:
+        units: seconds since 1970-01-01
+        long_name: ''            # TODO: standard_name missing on describe()
+
+  cmems_mod_bal_wav_my_PT1H-i:
+    product: BALTICSEA_MULTIYEAR_WAV_003_015
+    title: 2D - Hourly Instantaneous
+    cadence: hourly
+    domain: baltic-sea
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      VCMX:
+        units: m
+        long_name: Sea surface wave maximum height
+      VHM0:
+        units: m
+        long_name: Sea surface wave significant height
+      VHM0_SW1:
+        units: m
+        long_name: Sea surface primary swell wave significant height
+      VHM0_SW2:
+        units: m
+        long_name: Sea surface secondary swell wave significant height
+      VHM0_WW:
+        units: m
+        long_name: Sea surface wind wave significant height
+      VMDR:
+        units: degree
+        long_name: Sea surface wave from direction
+      VMDR_SW1:
+        units: degree
+        long_name: Sea surface primary swell wave from direction
+      VMDR_SW2:
+        units: degree
+        long_name: Sea surface secondary swell wave from direction
+      VMDR_WW:
+        units: degree
+        long_name: Sea surface wind wave from direction
+      VMXL:
+        units: m
+        long_name: Sea surface wave maximum crest height
+      VPED:
+        units: degree
+        long_name: Sea surface wave from direction at variance spectral density maximum
+      VSDX:
+        units: m s-1
+        long_name: Sea surface wave stokes drift x velocity
+      VSDY:
+        units: m s-1
+        long_name: Sea surface wave stokes drift y velocity
+      VTM01_SW1:
+        units: s
+        long_name: Sea surface primary swell wave mean period
+      VTM01_SW2:
+        units: s
+        long_name: Sea surface secondary swell wave mean period
+      VTM01_WW:
+        units: s
+        long_name: Sea surface wind wave mean period
+      VTM02:
+        units: s
+        long_name: Sea surface wave mean period from variance spectral density second frequency moment
+      VTM10:
+        units: s
+        long_name: Sea surface wave mean period from variance spectral density inverse frequency moment
+      VTPK:
+        units: s
+        long_name: Sea surface wave period at variance spectral density maximum
+
+  cmems_mod_bal_wav_my_aflux_PT1H-i:
+    product: BALTICSEA_MULTIYEAR_WAV_003_015
+    title: 2D - Hourly Instantaneous air-sea fluxes
+    cadence: hourly
+    domain: baltic-sea
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      chnk:
+        units: ''
+        long_name: Charnock coefficient for surface roughness length for momentum in air
+      mflx:
+        units: W m-2
+        long_name: Wave momentum flux into sea water
+      sdes:
+        units: Pa
+        long_name: Surface downward eastward stress due to ocean viscous dissipation
+      sdnes:
+        units: Pa
+        long_name: Surface downward northward stress due to ocean viscous dissipation
+      z0:
+        units: m
+        long_name: Surface roughness length
+
+  cmems_mod_bal_wav_my_static:
+    product: BALTICSEA_MULTIYEAR_WAV_003_015
+    title: cmems_mod_bal_wav_my_static
+    cadence: irregular
+    domain: baltic-sea
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      deptho:
+        units: m
+        long_name: Sea floor depth below geoid
+      mask:
+        units: '1'
+        long_name: Sea binary mask
+
+  cmems_obs-oc_bal_bgc-optics_my_l3-olci-300m_P1D:
+    product: OCEANCOLOUR_BAL_BGC_L3_MY_009_133
+    title: cmems_obs-oc_bal_bgc-optics_my_l3-olci-300m_P1D
+    cadence: daily
+    domain: baltic-sea
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      ADG443:
+        units: m^-1
+        long_name: Volume absorption coefficient of radiative flux in sea water due to dissolved organic
+      APH443:
+        units: m^-1
+        long_name: Volume absorption coefficient of radiative flux in sea water due to phytoplankton
+      BBP443:
+        units: m^-1
+        long_name: Volume backwards scattering coefficient of radiative flux in sea water due to particles
+      SENSORMASK:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+
+  cmems_obs-oc_bal_bgc-optics_nrt_l3-hr-mosaic_P1D-m:
+    product: OCEANCOLOUR_BAL_BGC_HR_L3_NRT_009_202
+    title: CMEMS HR-OC Baltic Sea optical (rrs, bbp) daily observations mosaic
+    cadence: daily
+    domain: baltic-sea
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      BBP443:
+        units: m-1
+        long_name: Volume backwards scattering coefficient of radiative flux in sea water
+      BBP492:
+        units: m-1
+        long_name: Volume backwards scattering coefficient of radiative flux in sea water
+      BBP560:
+        units: m-1
+        long_name: Volume backwards scattering coefficient of radiative flux in sea water
+      BBP665:
+        units: m-1
+        long_name: Volume backwards scattering coefficient of radiative flux in sea water
+      BBP704:
+        units: m-1
+        long_name: Volume backwards scattering coefficient of radiative flux in sea water
+      BBP740:
+        units: m-1
+        long_name: Volume backwards scattering coefficient of radiative flux in sea water
+      BBP783:
+        units: m-1
+        long_name: Volume backwards scattering coefficient of radiative flux in sea water
+      BBP865:
+        units: m-1
+        long_name: Volume backwards scattering coefficient of radiative flux in sea water
+      RRS443:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS443_UNC:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS492:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS492_UNC:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS560:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS560_UNC:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS665:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS665_UNC:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS704:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS704_UNC:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS740:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS740_UNC:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS783:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS783_UNC:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS865:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS865_UNC:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+
+  cmems_obs-oc_bal_bgc-optics_nrt_l3-olci-300m_P1D:
+    product: OCEANCOLOUR_BAL_BGC_L3_NRT_009_131
+    title: cmems_obs-oc_bal_bgc-optics_nrt_l3-olci-300m_P1D
+    cadence: daily
+    domain: baltic-sea
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      ADG443:
+        units: m^-1
+        long_name: Volume absorption coefficient of radiative flux in sea water due to dissolved organic
+      APH443:
+        units: m^-1
+        long_name: Volume absorption coefficient of radiative flux in sea water due to phytoplankton
+      BBP443:
+        units: m^-1
+        long_name: Volume backwards scattering coefficient of radiative flux in sea water due to particles
+      SENSORMASK:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+
+  cmems_obs-oc_bal_bgc-optics_nrt_l4-hr-mosaic_P1D-m:
+    product: OCEANCOLOUR_BAL_BGC_HR_L4_NRT_009_208
+    title: CMEMS HR-OC Baltic Sea optical (rrs, bbp) daily interpolated observations mosaic
+    cadence: daily
+    domain: baltic-sea
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      BBP443:
+        units: m-1
+        long_name: Volume backwards scattering coefficient of radiative flux in sea water
+
+  cmems_obs-oc_bal_bgc-optics_nrt_l4-hr-mosaic_P1M-m:
+    product: OCEANCOLOUR_BAL_BGC_HR_L4_NRT_009_208
+    title: CMEMS HR-OC Baltic Sea optical (rrs, bbp) monthly averaged observations mosaic
+    cadence: monthly
+    domain: baltic-sea
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      BBP443:
+        units: m-1
+        long_name: Volume backwards scattering coefficient of radiative flux in sea water
+      BBP443_count:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      BBP443_error:
+        units: m-1
+        long_name: Volume backwards scattering coefficient of radiative flux in sea water standard error
+
+  cmems_obs-oc_bal_bgc-plankton_my_l3-multi-1km_P1D:
+    product: OCEANCOLOUR_BAL_BGC_L3_MY_009_133
+    title: cmems_obs-oc_bal_bgc-plankton_my_l3-multi-1km_P1D
+    cadence: daily
+    domain: baltic-sea
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      CHL:
+        units: milligram m^-3
+        long_name: Mass concentration of chlorophyll a in sea water
+      CRYPTO:
+        units: milligram m^-3
+        long_name: Mass concentration of cryptophytes expressed as chlorophyll in sea water
+      CYANOBLOOM:
+        units: ''
+        long_name: ''            # TODO: standard_name missing on describe()
+      DIATO:
+        units: milligram m^-3
+        long_name: Mass concentration of diatoms expressed as chlorophyll in sea water
+      DINO:
+        units: milligram m^-3
+        long_name: Mass concentration of dinophytes expressed as chlorophyll in sea water
+      GREEN:
+        units: milligram m^-3
+        long_name: Mass concentration of greenalgae and prochlorophytes expressed as chlorophyll in sea
+      MICRO:
+        units: milligram m^-3
+        long_name: Mass concentration of microphytoplankton expressed as chlorophyll in sea water
+      NANO:
+        units: milligram m^-3
+        long_name: Mass concentration of nanophytoplankton expressed as chlorophyll in sea water
+      PICO:
+        units: milligram m^-3
+        long_name: Mass concentration of picophytoplankton expressed as chlorophyll in sea water
+      PROKAR:
+        units: milligram m^-3
+        long_name: Mass concentration of prokaryotes expressed as chlorophyll in sea water
+
+  cmems_obs-oc_bal_bgc-plankton_my_l3-olci-300m_P1D-m:
+    product: OCEANCOLOUR_BAL_BGC_L3_MY_009_133
+    title: cmems_obs-oc_bal_bgc-plankton_my_l3-olci-300m_P1D
+    cadence: daily
+    domain: baltic-sea
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      CHL:
+        units: milligram m^-3
+        long_name: Mass concentration of chlorophyll a in sea water
+      CRYPTO:
+        units: milligram m^-3
+        long_name: Mass concentration of cryptophytes expressed as chlorophyll in sea water
+      CYANOBLOOM:
+        units: ''
+        long_name: ''            # TODO: standard_name missing on describe()
+      DIATO:
+        units: milligram m^-3
+        long_name: Mass concentration of diatoms expressed as chlorophyll in sea water
+      DINO:
+        units: milligram m^-3
+        long_name: Mass concentration of dinophytes expressed as chlorophyll in sea water
+      GREEN:
+        units: milligram m^-3
+        long_name: Mass concentration of greenalgae and prochlorophytes expressed as chlorophyll in sea
+      MICRO:
+        units: milligram m^-3
+        long_name: Mass concentration of microphytoplankton expressed as chlorophyll in sea water
+      NANO:
+        units: milligram m^-3
+        long_name: Mass concentration of nanophytoplankton expressed as chlorophyll in sea water
+      PICO:
+        units: milligram m^-3
+        long_name: Mass concentration of picophytoplankton expressed as chlorophyll in sea water
+      PROKAR:
+        units: milligram m^-3
+        long_name: Mass concentration of prokaryotes expressed as chlorophyll in sea water
+      QI_CHL:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      SENSORMASK:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+
+  cmems_obs-oc_bal_bgc-plankton_my_l4-multi-1km_P1M:
+    product: OCEANCOLOUR_BAL_BGC_L4_MY_009_134
+    title: cmems_obs-oc_bal_bgc-plankton_my_l4-multi-1km_P1M
+    cadence: monthly
+    domain: baltic-sea
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      CHL:
+        units: milligram m^-3
+        long_name: Mass concentration of chlorophyll a in sea water
+      CHL_count:
+        units: '1'
+        long_name: Mass concentration of chlorophyll a in sea water number of observations
+      CHL_error:
+        units: milligram m^-3
+        long_name: Mass concentration of chlorophyll a in sea water standard error
+
+  cmems_obs-oc_bal_bgc-plankton_my_l4-olci-300m_P1M-m:
+    product: OCEANCOLOUR_BAL_BGC_L4_MY_009_134
+    title: cmems_obs-oc_bal_bgc-plankton_my_l4-olci-300m_P1M
+    cadence: monthly
+    domain: baltic-sea
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      CHL:
+        units: milligram m^-3
+        long_name: Mass concentration of chlorophyll a in sea water
+      CHL_count:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      CHL_error:
+        units: milligram m^-3
+        long_name: ''            # TODO: standard_name missing on describe()
+
+  cmems_obs-oc_bal_bgc-plankton_nrt_l3-olci-300m_P1D:
+    product: OCEANCOLOUR_BAL_BGC_L3_NRT_009_131
+    title: cmems_obs-oc_bal_bgc-plankton_nrt_l3-olci-300m_P1D
+    cadence: daily
+    domain: baltic-sea
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      CHL:
+        units: milligram m^-3
+        long_name: Mass concentration of chlorophyll a in sea water
+      CRYPTO:
+        units: milligram m^-3
+        long_name: Mass concentration of cryptophytes expressed as chlorophyll in sea water
+      CYANOBLOOM:
+        units: ''
+        long_name: ''            # TODO: standard_name missing on describe()
+      DIATO:
+        units: milligram m^-3
+        long_name: Mass concentration of diatoms expressed as chlorophyll in sea water
+      DINO:
+        units: milligram m^-3
+        long_name: Mass concentration of dinophytes expressed as chlorophyll in sea water
+      GREEN:
+        units: milligram m^-3
+        long_name: Mass concentration of greenalgae and prochlorophytes expressed as chlorophyll in sea
+      MICRO:
+        units: milligram m^-3
+        long_name: Mass concentration of microphytoplankton expressed as chlorophyll in sea water
+      NANO:
+        units: milligram m^-3
+        long_name: Mass concentration of nanophytoplankton expressed as chlorophyll in sea water
+      PICO:
+        units: milligram m^-3
+        long_name: Mass concentration of picophytoplankton expressed as chlorophyll in sea water
+      PROKAR:
+        units: milligram m^-3
+        long_name: Mass concentration of prokaryotes expressed as chlorophyll in sea water
+      QI_CHL:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      SENSORMASK:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+
+  cmems_obs-oc_bal_bgc-plankton_nrt_l4-olci-300m_P1M:
+    product: OCEANCOLOUR_BAL_BGC_L4_NRT_009_132
+    title: cmems_obs-oc_bal_bgc-plankton_nrt_l4-olci-300m_P1M
+    cadence: monthly
+    domain: baltic-sea
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      CHL:
+        units: milligram m^-3
+        long_name: Mass concentration of chlorophyll a in sea water
+      CHL_count:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      CHL_error:
+        units: milligram m^-3
+        long_name: ''            # TODO: standard_name missing on describe()
+
+  cmems_obs-oc_bal_bgc-pp_my_l4-multi-4km_P1D:
+    product: OCEANCOLOUR_BAL_BGC_L4_MY_009_134
+    title: cmems_obs-oc_bal_bgc-pp_my_l4-multi-4km_P1D
+    cadence: daily
+    domain: baltic-sea
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      PP:
+        units: g m^-2 d^-1
+        long_name: Primary productivity of biomass expressed as carbon
+
+  cmems_obs-oc_bal_bgc-pp_my_l4-multi-4km_P1M:
+    product: OCEANCOLOUR_BAL_BGC_L4_MY_009_134
+    title: cmems_obs-oc_bal_bgc-pp_my_l4-multi-4km_P1M
+    cadence: monthly
+    domain: baltic-sea
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      PP:
+        units: g m^-2 d^-1
+        long_name: Primary productivity of biomass expressed as carbon
+      PP_count:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      PP_error:
+        units: g m^-2 d^-1
+        long_name: ''            # TODO: standard_name missing on describe()
+
+  cmems_obs-oc_bal_bgc-reflectance_my_l3-multi-1km_P1D:
+    product: OCEANCOLOUR_BAL_BGC_L3_MY_009_133
+    title: cmems_obs-oc_bal_bgc-reflectance_my_l3-multi-1km_P1D
+    cadence: daily
+    domain: baltic-sea
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      RRS412:
+        units: sr^-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS443:
+        units: sr^-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS490:
+        units: sr^-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS510:
+        units: sr^-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS560:
+        units: sr^-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS665:
+        units: sr^-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+
+  cmems_obs-oc_bal_bgc-reflectance_my_l3-olci-300m_P1D:
+    product: OCEANCOLOUR_BAL_BGC_L3_MY_009_133
+    title: cmems_obs-oc_bal_bgc-reflectance_my_l3-olci-300m_P1D
+    cadence: daily
+    domain: baltic-sea
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      QI_RRS412_5:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      QI_RRS442_5:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      QI_RRS490:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      QI_RRS510:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      QI_RRS560:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      QI_RRS673_75:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS400:
+        units: sr^-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS412_5:
+        units: sr^-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS442_5:
+        units: sr^-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS490:
+        units: sr^-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS510:
+        units: sr^-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS560:
+        units: sr^-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS620:
+        units: sr^-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS665:
+        units: sr^-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS673_75:
+        units: sr^-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS681_25:
+        units: sr^-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS708_75:
+        units: sr^-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS778_75:
+        units: sr^-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS865:
+        units: sr^-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      SENSORMASK:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+
+  cmems_obs-oc_bal_bgc-reflectance_nrt_l3-olci-300m_P1D:
+    product: OCEANCOLOUR_BAL_BGC_L3_NRT_009_131
+    title: cmems_obs-oc_bal_bgc-reflectance_nrt_l3-olci-300m_P1D
+    cadence: daily
+    domain: baltic-sea
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      QI_RRS412_5:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      QI_RRS442_5:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      QI_RRS490:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      QI_RRS510:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      QI_RRS560:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      QI_RRS673_75:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS400:
+        units: sr^-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS412_5:
+        units: sr^-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS442_5:
+        units: sr^-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS490:
+        units: sr^-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS510:
+        units: sr^-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS560:
+        units: sr^-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS620:
+        units: sr^-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS665:
+        units: sr^-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS673_75:
+        units: sr^-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS681_25:
+        units: sr^-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS708_75:
+        units: sr^-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS778_75:
+        units: sr^-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS865:
+        units: sr^-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      SENSORMASK:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+
+  cmems_obs-oc_bal_bgc-transp_my_l3-multi-1km_P1D:
+    product: OCEANCOLOUR_BAL_BGC_L3_MY_009_133
+    title: cmems_obs-oc_bal_bgc-transp_my_l3-multi-1km_P1D
+    cadence: daily
+    domain: baltic-sea
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      KD490:
+        units: m^-1
+        long_name: Volume attenuation coefficient of downwelling radiative flux in sea water
+
+  cmems_obs-oc_bal_bgc-transp_my_l3-olci-300m_P1D:
+    product: OCEANCOLOUR_BAL_BGC_L3_MY_009_133
+    title: cmems_obs-oc_bal_bgc-transp_my_l3-olci-300m_P1D
+    cadence: daily
+    domain: baltic-sea
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      KD490:
+        units: m^-1
+        long_name: Volume attenuation coefficient of downwelling radiative flux in sea water
+      QI_KD490:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      SENSORMASK:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+
+  cmems_obs-oc_bal_bgc-transp_nrt_l3-olci-300m_P1D:
+    product: OCEANCOLOUR_BAL_BGC_L3_NRT_009_131
+    title: cmems_obs-oc_bal_bgc-transp_nrt_l3-olci-300m_P1D
+    cadence: daily
+    domain: baltic-sea
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      KD490:
+        units: m^-1
+        long_name: Volume attenuation coefficient of downwelling radiative flux in sea water
+      QI_KD490:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      SENSORMASK:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+
+  cmems_obs-oc_bal_bgc-tur-spm-chl_nrt_l4-hr-mosaic_P1M-m:
+    product: OCEANCOLOUR_BAL_BGC_HR_L4_NRT_009_208
+    title: CMEMS HR-OC Baltic Sea transparency (spm, tur) and geophysical (chl) monthly averaged
+    cadence: monthly
+    domain: baltic-sea
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      CHL:
+        units: mg m-3
+        long_name: Mass concentration of chlorophyll a in sea water
+      CHL_count:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      CHL_error:
+        units: mg m-3
+        long_name: Mass concentration of chlorophyll a in sea water standard error
+      SPM:
+        units: g m-3
+        long_name: Mass concentration of suspended matter in sea water
+      SPM_count:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      SPM_error:
+        units: g m-3
+        long_name: Mass concentration of suspended matter in sea water standard error
+      TUR:
+        units: FNU
+        long_name: Sea water turbidity
+      TUR_count:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      TUR_error:
+        units: FNU
+        long_name: Sea water turbidity standard error
+
+  cmems_obs-sst_bal_phy-subskin_nrt_l4_PT1H-m:
+    product: SST_BAL_PHY_SUBSKIN_L4_NRT_010_034
+    title: North Sea/Baltic Sea SST L4 Diurnal Sub-skin Sea Surface Temperature Analysis (SST_BAL_PHY_SUBSKIN_L4_NRT_010_034,
+    cadence: hourly
+    domain: baltic-sea
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      analysed_sst:
+        units: kelvin
+        long_name: Sea surface subskin temperature
+      analysis_error:
+        units: kelvin
+        long_name: ''            # TODO: standard_name missing on describe()
+      mask:
+        units: ''
+        long_name: ''            # TODO: standard_name missing on describe()
+      sea_ice_fraction:
+        units: '1'
+        long_name: Sea ice area fraction
+
+  cmems_obs-sst_bal_phy-temp_my_l4_P1D-m:
+    product: SST_BAL_SST_L4_REP_OBSERVATIONS_010_016
+    title: Baltic Sea/North Sea SST analysis, daily reprocessed level 4 analysis (SST_BAL_SST_L4_REP_OBSERVATIONS_010_016)
+    cadence: daily
+    domain: baltic-sea
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      analysed_sst:
+        units: kelvin
+        long_name: Sea surface foundation temperature
+      analysis_error:
+        units: kelvin
+        long_name: Sea surface temperature error
+      mask:
+        units: ''
+        long_name: ''            # TODO: standard_name missing on describe()
+      sea_ice_fraction:
+        units: '1'
+        long_name: Sea ice area fraction
+
+  cmems_obs-sst_bal_phy_my_l3s_P1D-m:
+    product: SST_BAL_PHY_L3S_MY_010_040
+    title: North Sea/Baltic Sea SST, L3S, (SST_BAL_PHY_L3S_MY_010_040)
+    cadence: daily
+    domain: baltic-sea
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      mask:
+        units: ''
+        long_name: ''            # TODO: standard_name missing on describe()
+      or_number_of_sst_pixels:
+        units: ''
+        long_name: ''            # TODO: standard_name missing on describe()
+      quality_level:
+        units: ''
+        long_name: ''            # TODO: standard_name missing on describe()
+      sea_ice_fraction:
+        units: '1'
+        long_name: Sea ice area fraction
+      sea_surface_temperature:
+        units: kelvin
+        long_name: Sea surface temperature
+      source_of_sst:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      sses_bias:
+        units: kelvin
+        long_name: ''            # TODO: standard_name missing on describe()
+      sses_standard_deviation:
+        units: kelvin
+        long_name: ''            # TODO: standard_name missing on describe()
+      sst_dtime:
+        units: seconds
+        long_name: ''            # TODO: standard_name missing on describe()
+      sum_square_sst:
+        units: Celsius2
+        long_name: ''            # TODO: standard_name missing on describe()
+      sum_sst:
+        units: Celsius
+        long_name: ''            # TODO: standard_name missing on describe()
+
+  cmems_obs_oc_bal_bgc_tur-spm-chl_nrt_l3-hr-mosaic_P1D-m:
+    product: OCEANCOLOUR_BAL_BGC_HR_L3_NRT_009_202
+    title: CMEMS HR-OC Baltic Sea transparency (spm, tur) and geophysical (chl) daily observations
+    cadence: daily
+    domain: baltic-sea
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      CHL:
+        units: mg m-3
+        long_name: Mass concentration of chlorophyll a in sea water
+      SPM:
+        units: g m-3
+        long_name: Mass concentration of suspended matter in sea water
+      TUR:
+        units: FNU
+        long_name: Sea water turbidity
+
+  cmems_obs_oc_bal_bgc_tur-spm-chl_nrt_l4-hr-mosaic_P1D-m:
+    product: OCEANCOLOUR_BAL_BGC_HR_L4_NRT_009_208
+    title: CMEMS HR-OC Baltic Sea transparency (spm, tur) and geophysical (chl) daily interpolated
+    cadence: daily
+    domain: baltic-sea
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      CHL:
+        units: mg m-3
+        long_name: Mass concentration of chlorophyll a in sea water
+      SPM:
+        units: g m-3
+        long_name: Mass concentration of suspended matter in sea water
+      TUR:
+        units: FNU
+        long_name: Sea water turbidity

@@ -1,7 +1,7 @@
 """Audit the bundled CMEMS catalog against the live toolbox catalogue.
 
-For every dataset id under `datasets:` in
-`src/earthlens/cmems/cmems_data_catalog.yaml`, call
+For every dataset id under `datasets:` in the bundled catalog
+directory `src/earthlens/cmems/catalog/`, call
 `copernicusmarine.describe(dataset_id=...)` and classify the result:
 
 * `covered` — id resolves; every curated variable is present in the
@@ -298,7 +298,7 @@ def main(argv: list[str] | None = None) -> int:
         "--catalog",
         type=Path,
         default=None,
-        help="path to cmems_data_catalog.yaml (default: bundled)",
+        help="path to the catalog/ directory or a single YAML (default: bundled)",
     )
     args = parser.parse_args(argv)
 

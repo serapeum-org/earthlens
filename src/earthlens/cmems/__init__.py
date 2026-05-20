@@ -12,8 +12,8 @@ Public surface (re-exported from this package):
   a bbox, and a `{dataset_id: [variable, ...]}` mapping, then call
   :meth:`CMEMS.download` to subset every dataset/variable group.
 * :class:`Catalog` — pydantic-backed loader for
-  `cmems_data_catalog.yaml`. Exposes the YAML's structure as typed
-  pydantic fields (`available_products`, `datasets`).
+  the bundled `catalog/` directory. Exposes the merged structure as
+  typed pydantic fields (`available_datasets`, `datasets`).
 * :class:`Dataset` — one CMEMS dataset's section inside the catalog
   (variables map plus cadence + temporal-coverage metadata).
 * :class:`Variable` — one variable's metadata (units, long-name,
@@ -25,11 +25,13 @@ Public surface (re-exported from this package):
 * :class:`AuthenticationError` — raised when `copernicusmarine.login`
   cannot authenticate; subclass of
   :class:`earthlens.base.AuthenticationError`.
-* :data:`CATALOG_PATH` — absolute path to the bundled YAML catalog;
-  monkey-patchable to redirect the loader at a temporary file.
+* :data:`CATALOG_PATH` — absolute path to the bundled `catalog/`
+  directory; monkey-patchable to redirect the loader at a temporary
+  directory or single file.
 
-The catalog YAML ships with this package as data, loaded by
-:class:`Catalog` from `Path(__file__).parent`.
+The catalog ships with this package as data — a directory of
+per-domain `*.yaml` files plus an `_index.yaml`, loaded and merged by
+:class:`Catalog` from `Path(__file__).parent / "catalog"`.
 
 Examples:
     - List curated datasets and look up a variable:

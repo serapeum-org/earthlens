@@ -49,7 +49,7 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
-from _helpers import CATALOG_PATH  # noqa: E402
+from _helpers import CATALOG_DIR  # noqa: E402
 
 DEFAULT_CACHE_DIR = Path("C:/tmp/cmems_probe")
 DEFAULT_PROBE_DATE = "2020-01-01"
@@ -263,24 +263,34 @@ def probe_one_dataset(
 
 
 def _curated_dataset_variables() -> dict[str, list[str]]:
-    """Return `{dataset_id: [variable_short_name, ...]}` from the bundled YAML.
+    """Return `{dataset_id: [variable_short_name, ...]}` from the bundled catalog.
 
     Mirrors `Catalog().datasets` without round-tripping through the
-    pydantic models — this script is read-only against the YAML and
-    needs only the variable short names per dataset.
+    pydantic models — this script is read-only against the catalog and
+    needs only the variable short names per dataset. Reads every
+    per-domain `*.yaml` under :data:`CATALOG_DIR` (skipping
+    `_index.yaml`, which carries only `available_datasets:`) and
+    unions their `datasets:` blocks.
 
     Returns:
-        Mapping from every curated dataset id to its list of variable
-            short names.
+        Mapping from every curated dataset id to its sorted list of
+            variable short names.
     """
     import yaml
 
-    raw = yaml.safe_load(CATALOG_PATH.read_text(encoding="utf-8")) or {}
-    datasets = raw.get("datasets") or {}
-    return {
-        ds_id: sorted((ds_body or {}).get("variables", {}).keys())
-        for ds_id, ds_body in datasets.items()
-    }
+    files = (
+        sorted(CATALOG_DIR.glob("*.yaml"))
+        if CATALOG_DIR.is_dir()
+        else [CATALOG_DIR]
+    )
+    out: dict[str, list[str]] = {}
+    for file_path in files:
+        if file_path.name == "_index.yaml":
+            continue
+        raw = yaml.safe_load(file_path.read_text(encoding="utf-8")) or {}
+        for ds_id, ds_body in (raw.get("datasets") or {}).items():
+            out[ds_id] = sorted((ds_body or {}).get("variables", {}).keys())
+    return out
 
 
 def _parse_bbox(text: str) -> tuple[float, float, float, float]:

@@ -25,23 +25,35 @@ def _clear_cache_around_each_test():
 
 @pytest.mark.cmems
 class TestCatalogBundledYaml:
-    """The bundled `cmems_data_catalog.yaml` parses and is non-empty."""
+    """The bundled `catalog/` directory parses and is non-empty."""
 
     def test_bundled_catalog_path_exists(self):
-        """`CATALOG_PATH` points at a real shipped file."""
-        assert CATALOG_PATH.is_file(), f"bundled catalog missing: {CATALOG_PATH}"
+        """`CATALOG_PATH` points at the real shipped catalog directory."""
+        assert CATALOG_PATH.is_dir(), f"bundled catalog dir missing: {CATALOG_PATH}"
+        assert (CATALOG_PATH / "_index.yaml").is_file(), "missing _index.yaml"
 
     def test_default_construction_loads_yaml(self):
-        """`Catalog()` with no args loads the bundled YAML."""
+        """`Catalog()` with no args loads the bundled catalog directory."""
         cat = Catalog()
         assert len(cat.datasets) > 0, "bundled catalog should have at least one dataset"
 
-    def test_available_products_populated(self):
-        """The informational `available_products` block round-trips."""
+    def test_available_datasets_populated(self):
+        """The informational `available_datasets` index round-trips."""
         cat = Catalog()
-        assert isinstance(cat.available_products, list)
-        assert any("PHY" in p or "SST" in p for p in cat.available_products), (
-            f"expected at least one physics or SST product id, got {cat.available_products!r}"
+        assert isinstance(cat.available_datasets, list)
+        assert any(
+            "phy" in d or "sst" in d.lower() for d in cat.available_datasets
+        ), (
+            "expected at least one physics or SST dataset id, got "
+            f"{cat.available_datasets[:5]!r}"
+        )
+
+    def test_curated_is_subset_of_available(self):
+        """Every curated dataset id is a member of `available_datasets`."""
+        cat = Catalog()
+        missing = set(cat.datasets) - set(cat.available_datasets)
+        assert not missing, (
+            f"curated datasets absent from available_datasets: {sorted(missing)[:5]}"
         )
 
     def test_curated_glorys_present(self):

@@ -109,7 +109,7 @@ include = ["earthlens", "earthlens.*"]
 
 [tool.setuptools.package-data]
 "earthlens.chc" = ["*.yaml", "catalog/*.yaml"]
-"earthlens.cmems" = ["*.yaml"]
+"earthlens.cmems" = ["*.yaml", "catalog/*.yaml"]
 "earthlens.ecmwf" = ["*.yaml"]
 "earthlens.gee" = ["*.yaml", "catalog/*.yaml"]
 

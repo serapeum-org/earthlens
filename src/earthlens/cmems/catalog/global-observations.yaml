@@ -1,0 +1,1959 @@
+# CMEMS curated catalog - global-observations slice.
+#
+# One slice of the per-domain split of the Copernicus Marine catalog.
+# The loader (earthlens.cmems.catalog.Catalog) merges every *.yaml in
+# this directory into one Catalog at construction time; dataset ids
+# must be unique across files. Stanzas are emitted by
+# tools/cmems/refresh_cmems_catalog.py from copernicusmarine.describe();
+# `cadence` is inferred from the dataset_id suffix and `domain` from
+# the product_id prefix. The `global` basin is sub-split by theme
+# (global-physics / global-biogeochem / global-sst / ...) to keep file
+# sizes balanced; the `domain:` field on every row below is still the
+# plain basin label. Where the toolbox exposes no standard_name for a
+# variable, the row carries `long_name: ''` with a TODO marker.
+#
+# Schema (per dataset):
+#   <dataset_id>:
+#     product: <product_id>
+#     title: <human-readable title>
+#     cadence: <daily|monthly|hourly|6hourly|climatology|irregular>
+#     domain: <global|mediterranean|arctic|...>
+#     temporal: { start: YYYY-MM-DD, end: YYYY-MM-DD }   # end null = NRT
+#     variables:
+#       <short_name>: { units: <CF units>, long_name: <CF long name> }
+
+datasets:
+
+  cmems_obs-ins_arc_phybgcwav_mynrt_na_irr:
+    product: INSITU_ARC_PHYBGCWAV_DISCRETE_MYNRT_013_031
+    title: cmems_obs-ins_arc_phybgcwav_mynrt_na_irr
+    cadence: irregular
+    domain: global
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      ATMP:
+        units: hPa
+        long_name: Air pressure
+      ATMS:
+        units: hPa
+        long_name: Air pressure at sea level
+      ATPT:
+        units: hPa h-1
+        long_name: Tendency of air pressure
+      CDOM:
+        units: 1e-9
+        long_name: Concentration of colored dissolved organic matter in sea water expressed as equivalent
+      CNDC:
+        units: S m-1
+        long_name: Sea water electrical conductivity
+      CPHL:
+        units: mg m-3
+        long_name: Mass concentration of chlorophyll a in sea water
+      DENS:
+        units: kg m-3
+        long_name: Sea water sigma theta
+      DEWT:
+        units: degrees_C
+        long_name: Dew point temperature
+      DOX1:
+        units: ml l-1
+        long_name: Volume fraction of oxygen in sea water
+      DOX2:
+        units: µmol kg-1
+        long_name: Moles of oxygen per unit mass in sea water
+      DRYT:
+        units: degrees_C
+        long_name: Air temperature
+      EWCT:
+        units: m s-1
+        long_name: Eastward sea water velocity
+      FLU2:
+        units: mg m-3
+        long_name: Mass concentration of chlorophyll a fluorescence in sea water
+      GSPD:
+        units: m s-1
+        long_name: Wind speed of gust
+      HCDT:
+        units: degree
+        long_name: Direction of sea water velocity
+      HCSP:
+        units: m s-1
+        long_name: Sea water speed
+      LGHT:
+        units: µmol m-2 s-1
+        long_name: Downwelling photosynthetic photon flux in sea water
+      NSCT:
+        units: m s-1
+        long_name: Northward sea water velocity
+      NTAW:
+        units: µmol kg-1
+        long_name: Moles of nitrate per unit mass in sea water
+      PHPH:
+        units: '1'
+        long_name: Sea water ph reported on total scale
+      PSAL:
+        units: '0.001'
+        long_name: Sea water practical salinity
+      RVFL:
+        units: m3 s-1
+        long_name: Water volume transport into sea water from rivers
+      SLEV:
+        units: m
+        long_name: Water surface height above reference datum
+      SVEL:
+        units: m s-1
+        long_name: Speed of sound in sea water
+      TEMP:
+        units: degrees_C
+        long_name: Sea water temperature
+      VAVH:
+        units: m
+        long_name: Sea surface wave significant height
+      VDIR:
+        units: degree
+        long_name: Sea surface wave from direction
+      VGHS:
+        units: m
+        long_name: Sea surface wave significant height
+      VGTA:
+        units: s
+        long_name: Sea surface wave mean period
+      VHM0:
+        units: m
+        long_name: Sea surface wave significant height
+      VTPK:
+        units: s
+        long_name: Sea surface wave period at variance spectral density maximum
+      VTZA:
+        units: s
+        long_name: Sea surface wave mean period
+      VTZM:
+        units: s
+        long_name: Sea surface wave period of highest wave
+      VZMX:
+        units: m
+        long_name: Sea surface wave maximum height
+      WDIR:
+        units: degree
+        long_name: Wind from direction
+      WSPD:
+        units: m s-1
+        long_name: Wind speed
+
+  cmems_obs-ins_bal_phybgcwav_mynrt_na_irr:
+    product: INSITU_BAL_PHYBGCWAV_DISCRETE_MYNRT_013_032
+    title: cmems_obs-ins_bal_phybgcwav_mynrt_na_irr
+    cadence: irregular
+    domain: global
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      ATMP:
+        units: hPa
+        long_name: Air pressure
+      CDOM:
+        units: 1e-9
+        long_name: Concentration of colored dissolved organic matter in sea water expressed as equivalent
+      CHLT:
+        units: mg m-3
+        long_name: Mass concentration of chlorophyll in sea water
+      CNDC:
+        units: S m-1
+        long_name: Sea water electrical conductivity
+      CPHL:
+        units: mg m-3
+        long_name: Mass concentration of chlorophyll a in sea water
+      DOX1:
+        units: ml l-1
+        long_name: Volume fraction of oxygen in sea water
+      DOX2:
+        units: µmol kg-1
+        long_name: Moles of oxygen per unit mass in sea water
+      DRYT:
+        units: degrees_C
+        long_name: Air temperature
+      EWCT:
+        units: m s-1
+        long_name: Eastward sea water velocity
+      FLU2:
+        units: mg m-3
+        long_name: Mass concentration of chlorophyll a fluorescence in sea water
+      HCDT:
+        units: degree
+        long_name: Direction of sea water velocity
+      HCSP:
+        units: m s-1
+        long_name: Sea water speed
+      LGHT:
+        units: µmol m-2 s-1
+        long_name: Downwelling photosynthetic photon flux in sea water
+      NSCT:
+        units: m s-1
+        long_name: Northward sea water velocity
+      OSAT:
+        units: '%'
+        long_name: Fractional saturation of oxygen in sea water
+      PHPH:
+        units: '1'
+        long_name: Sea water ph reported on total scale
+      PSAL:
+        units: '0.001'
+        long_name: Sea water practical salinity
+      RELH:
+        units: '%'
+        long_name: Relative humidity
+      RVFL:
+        units: m3 s-1
+        long_name: Water volume transport into sea water from rivers
+      SINC:
+        units: W m-2
+        long_name: Surface downwelling shortwave flux in air
+      SLEV:
+        units: m
+        long_name: Water surface height above reference datum
+      SVEL:
+        units: m s-1
+        long_name: Speed of sound in sea water
+      TEMP:
+        units: degrees_C
+        long_name: Sea water temperature
+      TUR4:
+        units: '1'
+        long_name: Sea water turbidity
+      VAVH:
+        units: m
+        long_name: Sea surface wave significant height
+      VAVT:
+        units: s
+        long_name: Sea surface wave significant period
+      VDIR:
+        units: degree
+        long_name: Sea surface wave from direction
+      VEMH:
+        units: m
+        long_name: Sea surface wave maximum height
+      VH110:
+        units: m
+        long_name: Sea surface wave mean height of highest tenth
+      VHM0:
+        units: m
+        long_name: Sea surface wave significant height
+      VMDR:
+        units: degree
+        long_name: Sea surface wave from direction
+      VPED:
+        units: degree
+        long_name: Sea surface wave from direction at variance spectral density maximum
+      VPSP:
+        units: degree
+        long_name: Sea surface wave directional spread at variance spectral density maximum
+      VTM02:
+        units: s
+        long_name: Sea surface wave mean period from variance spectral density second frequency moment
+      VTPK:
+        units: s
+        long_name: Sea surface wave period at variance spectral density maximum
+      VTZA:
+        units: s
+        long_name: Sea surface wave mean period
+      VTZM:
+        units: s
+        long_name: Sea surface wave period of highest wave
+      VZMX:
+        units: m
+        long_name: Sea surface wave maximum height
+      WDIR:
+        units: degree
+        long_name: Wind from direction
+      WSPD:
+        units: m s-1
+        long_name: Wind speed
+
+  cmems_obs-ins_blk_phybgcwav_mynrt_na_irr:
+    product: INSITU_BLK_PHYBGCWAV_DISCRETE_MYNRT_013_034
+    title: cmems_obs-ins_blk_phybgcwav_mynrt_na_irr
+    cadence: irregular
+    domain: global
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      ATMS:
+        units: hPa
+        long_name: Air pressure at sea level
+      CDOM:
+        units: 1e-9
+        long_name: Concentration of colored dissolved organic matter in sea water expressed as equivalent
+      CNDC:
+        units: S m-1
+        long_name: Sea water electrical conductivity
+      CPHL:
+        units: mg m-3
+        long_name: Mass concentration of chlorophyll a in sea water
+      DEWT:
+        units: degrees_C
+        long_name: Dew point temperature
+      DOX1:
+        units: ml l-1
+        long_name: Volume fraction of oxygen in sea water
+      DOX2:
+        units: µmol kg-1
+        long_name: Moles of oxygen per unit mass in sea water
+      DRYT:
+        units: degrees_C
+        long_name: Air temperature
+      EWCT:
+        units: m s-1
+        long_name: Eastward sea water velocity
+      LGHT:
+        units: µmol m-2 s-1
+        long_name: Downwelling photosynthetic photon flux in sea water
+      NSCT:
+        units: m s-1
+        long_name: Northward sea water velocity
+      NTAW:
+        units: µmol kg-1
+        long_name: Moles of nitrate per unit mass in sea water
+      OSAT:
+        units: '%'
+        long_name: Fractional saturation of oxygen in sea water
+      PSAL:
+        units: '0.001'
+        long_name: Sea water practical salinity
+      RELH:
+        units: '%'
+        long_name: Relative humidity
+      RVFL:
+        units: m3 s-1
+        long_name: Water volume transport into sea water from rivers
+      SLEV:
+        units: m
+        long_name: Water surface height above reference datum
+      TEMP:
+        units: degrees_C
+        long_name: Sea water temperature
+      VEPK:
+        units: m2 s
+        long_name: Sea surface wave energy at variance spectral density maximum
+      VGHS:
+        units: m
+        long_name: Sea surface wave significant height
+      VGTA:
+        units: s
+        long_name: Sea surface wave mean period
+      VHM0:
+        units: m
+        long_name: Sea surface wave significant height
+      VMDR:
+        units: degree
+        long_name: Sea surface wave from direction
+      VPED:
+        units: degree
+        long_name: Sea surface wave from direction at variance spectral density maximum
+      VPSP:
+        units: degree
+        long_name: Sea surface wave directional spread at variance spectral density maximum
+      VTM02:
+        units: s
+        long_name: Sea surface wave mean period from variance spectral density second frequency moment
+      VTPK:
+        units: s
+        long_name: Sea surface wave period at variance spectral density maximum
+      VZMX:
+        units: m
+        long_name: Sea surface wave maximum height
+      WDIR:
+        units: degree
+        long_name: Wind from direction
+      WSPD:
+        units: m s-1
+        long_name: Wind speed
+
+  cmems_obs-ins_eur_phy-ssh_my_tide-surge_PT1H-m:
+    product: INSITU_GLO_PHY_SSH_DISCRETE_MY_013_053
+    title: cmems_obs-ins_eur_phy-ssh_my_tide-surge_PT1H-m
+    cadence: hourly
+    domain: global
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      SLEV:
+        units: m
+        long_name: Water surface height above reference datum
+
+  cmems_obs-ins_glo_phy-cur_my_adcp_irr:
+    product: INSITU_GLO_PHY_UV_DISCRETE_MY_013_044
+    title: cmems_obs-ins_glo_phy-cur_my_adcp_irr
+    cadence: irregular
+    domain: global
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      EWCT:
+        units: m s-1
+        long_name: Eastward sea water velocity
+      HCDT:
+        units: degree
+        long_name: Direction of sea water velocity
+      HCSP:
+        units: m s-1
+        long_name: Sea water speed
+      NSCT:
+        units: m s-1
+        long_name: Northward sea water velocity
+      TEMP:
+        units: degrees_C
+        long_name: Sea water temperature
+      VCSP:
+        units: m s-1
+        long_name: Upward sea water velocity
+
+  cmems_obs-ins_glo_phy-cur_my_argo_irr:
+    product: INSITU_GLO_PHY_UV_DISCRETE_MY_013_044
+    title: cmems_obs-ins_glo_phy-cur_my_argo_irr
+    cadence: irregular
+    domain: global
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      EWCT:
+        units: m s-1
+        long_name: Eastward sea water velocity
+      NSCT:
+        units: m s-1
+        long_name: Northward sea water velocity
+
+  cmems_obs-ins_glo_phy-cur_my_drifter_PT1H:
+    product: INSITU_GLO_PHY_UV_DISCRETE_MY_013_044
+    title: cmems_obs-ins_glo_phy-cur_my_drifter_PT1H
+    cadence: hourly
+    domain: global
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      EWCT:
+        units: m s-1
+        long_name: Eastward sea water velocity
+      NSCT:
+        units: m s-1
+        long_name: Northward sea water velocity
+
+  cmems_obs-ins_glo_phy-cur_my_glider_irr:
+    product: INSITU_GLO_PHY_UV_DISCRETE_MY_013_044
+    title: cmems_obs-ins_glo_phy-cur_my_glider_irr
+    cadence: irregular
+    domain: global
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      EWCT:
+        units: m s-1
+        long_name: Eastward sea water velocity
+      NSCT:
+        units: m s-1
+        long_name: Northward sea water velocity
+
+  cmems_obs-ins_glo_phy-cur_nrt_argo_irr:
+    product: INSITU_GLO_PHY_UV_DISCRETE_NRT_013_048
+    title: cmems_obs-ins_glo_phy-cur_nrt_argo_irr
+    cadence: irregular
+    domain: global
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      EWCT:
+        units: m s-1
+        long_name: Eastward sea water velocity
+      NSCT:
+        units: m s-1
+        long_name: Northward sea water velocity
+
+  cmems_obs-ins_glo_phy-cur_nrt_drifter_irr:
+    product: INSITU_GLO_PHY_UV_DISCRETE_NRT_013_048
+    title: cmems_obs-ins_glo_phy-cur_nrt_drifter_irr
+    cadence: irregular
+    domain: global
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      EWCT:
+        units: m s-1
+        long_name: Eastward sea water velocity
+      NSCT:
+        units: m s-1
+        long_name: Northward sea water velocity
+      TEMP:
+        units: degrees_C
+        long_name: Sea water temperature
+
+  cmems_obs-ins_glo_phy-ssh_my_na_PT1H:
+    product: INSITU_GLO_PHY_SSH_DISCRETE_MY_013_053
+    title: cmems_obs-ins_glo_phy-ssh_my_na_PT1H
+    cadence: hourly
+    domain: global
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      SLEV:
+        units: m
+        long_name: Water surface height above reference datum
+
+  cmems_obs-ins_glo_phy-ssh_my_na_irr:
+    product: INSITU_GLO_PHY_SSH_DISCRETE_MY_013_053
+    title: cmems_obs-ins_glo_phy-ssh_my_na_irr
+    cadence: irregular
+    domain: global
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      SLEV:
+        units: m
+        long_name: Water surface height above reference datum
+
+  cmems_obs-ins_glo_phy-temp-sal_my_cora-oa_P1M:
+    product: INSITU_GLO_PHY_TS_OA_MY_013_052
+    title: 'Global Ocean - Coriolis Observation Re-Analysis CORA5.2 '
+    cadence: monthly
+    domain: global
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      TEMP:
+        units: degree_Celsius
+        long_name: Sea water temperature
+      TEMP_ERR:
+        units: degree_Celsius
+        long_name: ''            # TODO: standard_name missing on describe()
+      TEMP_PCTVAR:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+
+  cmems_obs-ins_glo_phy-temp-sal_nrt_oa_P1M:
+    product: INSITU_GLO_PHY_TS_OA_NRT_013_002
+    title: Global Ocean - Coriolis Analysis - Near Real Time
+    cadence: monthly
+    domain: global
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      TEMP:
+        units: degree_Celsius
+        long_name: Sea water temperature
+      TEMP_ERR:
+        units: degree_Celsius
+        long_name: ''            # TODO: standard_name missing on describe()
+      TEMP_PCTVAR:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+
+  cmems_obs-ins_glo_phybgcwav_mynrt_na_irr:
+    product: INSITU_GLO_PHYBGCWAV_DISCRETE_MYNRT_013_030
+    title: cmems_obs-ins_glo_phybgcwav_mynrt_na_irr
+    cadence: irregular
+    domain: global
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      ATMP:
+        units: hPa
+        long_name: Air pressure
+      ATMS:
+        units: hPa
+        long_name: Air pressure at sea level
+      ATPT:
+        units: hPa h-1
+        long_name: Tendency of air pressure
+      CDOM:
+        units: 1e-9
+        long_name: Concentration of colored dissolved organic matter in sea water expressed as equivalent
+      CHLT:
+        units: mg m-3
+        long_name: Mass concentration of chlorophyll in sea water
+      CNDC:
+        units: S m-1
+        long_name: Sea water electrical conductivity
+      CPHL:
+        units: mg m-3
+        long_name: Mass concentration of chlorophyll a in sea water
+      DENS:
+        units: kg m-3
+        long_name: Sea water sigma theta
+      DEWT:
+        units: degrees_C
+        long_name: Dew point temperature
+      DOX1:
+        units: ml l-1
+        long_name: Volume fraction of oxygen in sea water
+      DOX2:
+        units: µmol kg-1
+        long_name: Moles of oxygen per unit mass in sea water
+      DOXY:
+        units: mmol m-3
+        long_name: Mole concentration of dissolved molecular oxygen in sea water
+      DRYT:
+        units: degrees_C
+        long_name: Air temperature
+      EWCT:
+        units: m s-1
+        long_name: Eastward sea water velocity
+      FLU2:
+        units: mg m-3
+        long_name: Mass concentration of chlorophyll a fluorescence in sea water
+      GDIR:
+        units: degree
+        long_name: Wind gust from direction
+      GSPD:
+        units: m s-1
+        long_name: Wind speed of gust
+      HCDT:
+        units: degree
+        long_name: Direction of sea water velocity
+      HCSP:
+        units: m s-1
+        long_name: Sea water speed
+      LGH4:
+        units: µmol m-2 s-1
+        long_name: Surface downwelling photosynthetic photon flux in air
+      LGHT:
+        units: µmol m-2 s-1
+        long_name: Downwelling photosynthetic photon flux in sea water
+      LINC:
+        units: W m-2
+        long_name: Surface downwelling longwave flux in air
+      NSCT:
+        units: m s-1
+        long_name: Northward sea water velocity
+      NTAW:
+        units: µmol kg-1
+        long_name: Moles of nitrate per unit mass in sea water
+      NTRA:
+        units: mmol m-3
+        long_name: Mole concentration of nitrate in sea water
+      NTRI:
+        units: mmol m-3
+        long_name: Mole concentration of nitrite in sea water
+      OSAT:
+        units: '%'
+        long_name: Fractional saturation of oxygen in sea water
+      PHOS:
+        units: mmol m-3
+        long_name: Mole concentration of phosphate in sea water
+      PHPH:
+        units: '1'
+        long_name: Sea water ph reported on total scale
+      PRRT:
+        units: mm h-1
+        long_name: Lwe precipitation rate
+      PSAL:
+        units: '0.001'
+        long_name: Sea water practical salinity
+      RELH:
+        units: '%'
+        long_name: Relative humidity
+      RVFL:
+        units: m3 s-1
+        long_name: Water volume transport into sea water from rivers
+      SINC:
+        units: W m-2
+        long_name: Surface downwelling shortwave flux in air
+      SLEV:
+        units: m
+        long_name: Water surface height above reference datum
+      SVEL:
+        units: m s-1
+        long_name: Speed of sound in sea water
+      TEMP:
+        units: degrees_C
+        long_name: Sea water temperature
+      TUR4:
+        units: '1'
+        long_name: Sea water turbidity
+      VAVH:
+        units: m
+        long_name: Sea surface wave significant height
+      VAVT:
+        units: s
+        long_name: Sea surface wave significant period
+      VCMX:
+        units: m
+        long_name: Sea surface wave maximum height
+      VCSP:
+        units: m s-1
+        long_name: Upward sea water velocity
+      VDIR:
+        units: degree
+        long_name: Sea surface wave from direction
+      VEMH:
+        units: m
+        long_name: Sea surface wave maximum height
+      VEPK:
+        units: m2 s
+        long_name: Sea surface wave energy at variance spectral density maximum
+      VGHS:
+        units: m
+        long_name: Sea surface wave significant height
+      VGTA:
+        units: s
+        long_name: Sea surface wave mean period
+      VH110:
+        units: m
+        long_name: Sea surface wave mean height of highest tenth
+      VHM0:
+        units: m
+        long_name: Sea surface wave significant height
+      VHZA:
+        units: m
+        long_name: Sea surface wave mean height
+      VMDR:
+        units: degree
+        long_name: Sea surface wave from direction
+      VPED:
+        units: degree
+        long_name: Sea surface wave from direction at variance spectral density maximum
+      VPSP:
+        units: degree
+        long_name: Sea surface wave directional spread at variance spectral density maximum
+      VT110:
+        units: s
+        long_name: Sea surface wave mean period of highest tenth
+      VTM02:
+        units: s
+        long_name: Sea surface wave mean period from variance spectral density second frequency moment
+      VTM10:
+        units: s
+        long_name: Sea surface wave mean period from variance spectral density inverse frequency moment
+      VTMX:
+        units: s
+        long_name: Sea surface wave maximum period
+      VTPK:
+        units: s
+        long_name: Sea surface wave period at variance spectral density maximum
+      VTZA:
+        units: s
+        long_name: Sea surface wave mean period
+      VTZM:
+        units: s
+        long_name: Sea surface wave period of highest wave
+      VZMX:
+        units: m
+        long_name: Sea surface wave maximum height
+      WDIR:
+        units: degree
+        long_name: Wind from direction
+      WSPD:
+        units: m s-1
+        long_name: Wind speed
+      WSPE:
+        units: m s-1
+        long_name: Eastward wind
+      WSPN:
+        units: m s-1
+        long_name: Northward wind
+
+  cmems_obs-ins_ibi_phybgcwav_mynrt_na_irr:
+    product: INSITU_IBI_PHYBGCWAV_DISCRETE_MYNRT_013_033
+    title: cmems_obs-ins_ibi_phybgcwav_mynrt_na_irr
+    cadence: irregular
+    domain: global
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      ATMP:
+        units: hPa
+        long_name: Air pressure
+      ATMS:
+        units: hPa
+        long_name: Air pressure at sea level
+      ATPT:
+        units: hPa h-1
+        long_name: Tendency of air pressure
+      CDOM:
+        units: 1e-9
+        long_name: Concentration of colored dissolved organic matter in sea water expressed as equivalent
+      CHLT:
+        units: mg m-3
+        long_name: Mass concentration of chlorophyll in sea water
+      CNDC:
+        units: S m-1
+        long_name: Sea water electrical conductivity
+      CPHL:
+        units: mg m-3
+        long_name: Mass concentration of chlorophyll a in sea water
+      DENS:
+        units: kg m-3
+        long_name: Sea water sigma theta
+      DEWT:
+        units: degrees_C
+        long_name: Dew point temperature
+      DOX1:
+        units: ml l-1
+        long_name: Volume fraction of oxygen in sea water
+      DOX2:
+        units: µmol kg-1
+        long_name: Moles of oxygen per unit mass in sea water
+      DOXY:
+        units: mmol m-3
+        long_name: Mole concentration of dissolved molecular oxygen in sea water
+      DRYT:
+        units: degrees_C
+        long_name: Air temperature
+      EWCT:
+        units: m s-1
+        long_name: Eastward sea water velocity
+      FLU2:
+        units: mg m-3
+        long_name: Mass concentration of chlorophyll a fluorescence in sea water
+      GDIR:
+        units: degree
+        long_name: Wind gust from direction
+      GSPD:
+        units: m s-1
+        long_name: Wind speed of gust
+      HCDT:
+        units: degree
+        long_name: Direction of sea water velocity
+      HCSP:
+        units: m s-1
+        long_name: Sea water speed
+      LGH4:
+        units: µmol m-2 s-1
+        long_name: Surface downwelling photosynthetic photon flux in air
+      LGHT:
+        units: µmol m-2 s-1
+        long_name: Downwelling photosynthetic photon flux in sea water
+      NSCT:
+        units: m s-1
+        long_name: Northward sea water velocity
+      NTAW:
+        units: µmol kg-1
+        long_name: Moles of nitrate per unit mass in sea water
+      NTRA:
+        units: mmol m-3
+        long_name: Mole concentration of nitrate in sea water
+      NTRI:
+        units: mmol m-3
+        long_name: Mole concentration of nitrite in sea water
+      OSAT:
+        units: '%'
+        long_name: Fractional saturation of oxygen in sea water
+      PHOS:
+        units: mmol m-3
+        long_name: Mole concentration of phosphate in sea water
+      PHPH:
+        units: '1'
+        long_name: Sea water ph reported on total scale
+      PRRT:
+        units: mm h-1
+        long_name: Lwe precipitation rate
+      PSAL:
+        units: '0.001'
+        long_name: Sea water practical salinity
+      RELH:
+        units: '%'
+        long_name: Relative humidity
+      RVFL:
+        units: m3 s-1
+        long_name: Water volume transport into sea water from rivers
+      SINC:
+        units: W m-2
+        long_name: Surface downwelling shortwave flux in air
+      SLEV:
+        units: m
+        long_name: Water surface height above reference datum
+      SVEL:
+        units: m s-1
+        long_name: Speed of sound in sea water
+      TEMP:
+        units: degrees_C
+        long_name: Sea water temperature
+      TUR4:
+        units: '1'
+        long_name: Sea water turbidity
+      VAVH:
+        units: m
+        long_name: Sea surface wave significant height
+      VAVT:
+        units: s
+        long_name: Sea surface wave significant period
+      VDIR:
+        units: degree
+        long_name: Sea surface wave from direction
+      VEPK:
+        units: m2 s
+        long_name: Sea surface wave energy at variance spectral density maximum
+      VGHS:
+        units: m
+        long_name: Sea surface wave significant height
+      VGTA:
+        units: s
+        long_name: Sea surface wave mean period
+      VH110:
+        units: m
+        long_name: Sea surface wave mean height of highest tenth
+      VHM0:
+        units: m
+        long_name: Sea surface wave significant height
+      VHZA:
+        units: m
+        long_name: Sea surface wave mean height
+      VMDR:
+        units: degree
+        long_name: Sea surface wave from direction
+      VPED:
+        units: degree
+        long_name: Sea surface wave from direction at variance spectral density maximum
+      VPSP:
+        units: degree
+        long_name: Sea surface wave directional spread at variance spectral density maximum
+      VT110:
+        units: s
+        long_name: Sea surface wave mean period of highest tenth
+      VTM02:
+        units: s
+        long_name: Sea surface wave mean period from variance spectral density second frequency moment
+      VTM10:
+        units: s
+        long_name: Sea surface wave mean period from variance spectral density inverse frequency moment
+      VTMX:
+        units: s
+        long_name: Sea surface wave maximum period
+      VTPK:
+        units: s
+        long_name: Sea surface wave period at variance spectral density maximum
+      VTZA:
+        units: s
+        long_name: Sea surface wave mean period
+      VTZM:
+        units: s
+        long_name: Sea surface wave period of highest wave
+      VZMX:
+        units: m
+        long_name: Sea surface wave maximum height
+      WDIR:
+        units: degree
+        long_name: Wind from direction
+      WSPD:
+        units: m s-1
+        long_name: Wind speed
+      WSPE:
+        units: m s-1
+        long_name: Eastward wind
+      WSPN:
+        units: m s-1
+        long_name: Northward wind
+
+  cmems_obs-ins_med_phybgcwav_mynrt_na_irr:
+    product: INSITU_MED_PHYBGCWAV_DISCRETE_MYNRT_013_035
+    title: cmems_obs-ins_med_phybgcwav_mynrt_na_irr
+    cadence: irregular
+    domain: global
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      ATMP:
+        units: hPa
+        long_name: Air pressure
+      ATMS:
+        units: hPa
+        long_name: Air pressure at sea level
+      ATPT:
+        units: hPa h-1
+        long_name: Tendency of air pressure
+      CDOM:
+        units: 1e-9
+        long_name: Concentration of colored dissolved organic matter in sea water expressed as equivalent
+      CNDC:
+        units: S m-1
+        long_name: Sea water electrical conductivity
+      CPHL:
+        units: mg m-3
+        long_name: Mass concentration of chlorophyll a in sea water
+      DOX1:
+        units: ml l-1
+        long_name: Volume fraction of oxygen in sea water
+      DOX2:
+        units: µmol kg-1
+        long_name: Moles of oxygen per unit mass in sea water
+      DRYT:
+        units: degrees_C
+        long_name: Air temperature
+      EWCT:
+        units: m s-1
+        long_name: Eastward sea water velocity
+      FLU2:
+        units: mg m-3
+        long_name: Mass concentration of chlorophyll a fluorescence in sea water
+      GDIR:
+        units: degree
+        long_name: Wind gust from direction
+      GSPD:
+        units: m s-1
+        long_name: Wind speed of gust
+      HCDT:
+        units: degree
+        long_name: Direction of sea water velocity
+      HCSP:
+        units: m s-1
+        long_name: Sea water speed
+      LGH4:
+        units: µmol m-2 s-1
+        long_name: Surface downwelling photosynthetic photon flux in air
+      LGHT:
+        units: µmol m-2 s-1
+        long_name: Downwelling photosynthetic photon flux in sea water
+      NSCT:
+        units: m s-1
+        long_name: Northward sea water velocity
+      NTAW:
+        units: µmol kg-1
+        long_name: Moles of nitrate per unit mass in sea water
+      OSAT:
+        units: '%'
+        long_name: Fractional saturation of oxygen in sea water
+      PHPH:
+        units: '1'
+        long_name: Sea water ph reported on total scale
+      PRRT:
+        units: mm h-1
+        long_name: Lwe precipitation rate
+      PSAL:
+        units: '0.001'
+        long_name: Sea water practical salinity
+      RELH:
+        units: '%'
+        long_name: Relative humidity
+      SLEV:
+        units: m
+        long_name: Water surface height above reference datum
+      SVEL:
+        units: m s-1
+        long_name: Speed of sound in sea water
+      TEMP:
+        units: degrees_C
+        long_name: Sea water temperature
+      TUR4:
+        units: '1'
+        long_name: Sea water turbidity
+      VAVH:
+        units: m
+        long_name: Sea surface wave significant height
+      VAVT:
+        units: s
+        long_name: Sea surface wave significant period
+      VDIR:
+        units: degree
+        long_name: Sea surface wave from direction
+      VEPK:
+        units: m2 s
+        long_name: Sea surface wave energy at variance spectral density maximum
+      VGHS:
+        units: m
+        long_name: Sea surface wave significant height
+      VGTA:
+        units: s
+        long_name: Sea surface wave mean period
+      VH110:
+        units: m
+        long_name: Sea surface wave mean height of highest tenth
+      VHM0:
+        units: m
+        long_name: Sea surface wave significant height
+      VHZA:
+        units: m
+        long_name: Sea surface wave mean height
+      VMDR:
+        units: degree
+        long_name: Sea surface wave from direction
+      VPED:
+        units: degree
+        long_name: Sea surface wave from direction at variance spectral density maximum
+      VPSP:
+        units: degree
+        long_name: Sea surface wave directional spread at variance spectral density maximum
+      VT110:
+        units: s
+        long_name: Sea surface wave mean period of highest tenth
+      VTM02:
+        units: s
+        long_name: Sea surface wave mean period from variance spectral density second frequency moment
+      VTMX:
+        units: s
+        long_name: Sea surface wave maximum period
+      VTPK:
+        units: s
+        long_name: Sea surface wave period at variance spectral density maximum
+      VTZA:
+        units: s
+        long_name: Sea surface wave mean period
+      VZMX:
+        units: m
+        long_name: Sea surface wave maximum height
+      WDIR:
+        units: degree
+        long_name: Wind from direction
+      WSPD:
+        units: m s-1
+        long_name: Wind speed
+
+  cmems_obs-ins_nws_phybgcwav_mynrt_na_irr:
+    product: INSITU_NWS_PHYBGCWAV_DISCRETE_MYNRT_013_036
+    title: cmems_obs-ins_nws_phybgcwav_mynrt_na_irr
+    cadence: irregular
+    domain: global
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      ATMP:
+        units: hPa
+        long_name: Air pressure
+      ATMS:
+        units: hPa
+        long_name: Air pressure at sea level
+      ATPT:
+        units: hPa h-1
+        long_name: Tendency of air pressure
+      CDOM:
+        units: 1e-9
+        long_name: Concentration of colored dissolved organic matter in sea water expressed as equivalent
+      CHLT:
+        units: mg m-3
+        long_name: Mass concentration of chlorophyll in sea water
+      CNDC:
+        units: S m-1
+        long_name: Sea water electrical conductivity
+      CPHL:
+        units: mg m-3
+        long_name: Mass concentration of chlorophyll a in sea water
+      DEWT:
+        units: degrees_C
+        long_name: Dew point temperature
+      DOX1:
+        units: ml l-1
+        long_name: Volume fraction of oxygen in sea water
+      DOX2:
+        units: µmol kg-1
+        long_name: Moles of oxygen per unit mass in sea water
+      DRYT:
+        units: degrees_C
+        long_name: Air temperature
+      EWCT:
+        units: m s-1
+        long_name: Eastward sea water velocity
+      FLU2:
+        units: mg m-3
+        long_name: Mass concentration of chlorophyll a fluorescence in sea water
+      GDIR:
+        units: degree
+        long_name: Wind gust from direction
+      GSPD:
+        units: m s-1
+        long_name: Wind speed of gust
+      HCDT:
+        units: degree
+        long_name: Direction of sea water velocity
+      HCSP:
+        units: m s-1
+        long_name: Sea water speed
+      LGH4:
+        units: µmol m-2 s-1
+        long_name: Surface downwelling photosynthetic photon flux in air
+      LGHT:
+        units: µmol m-2 s-1
+        long_name: Downwelling photosynthetic photon flux in sea water
+      NSCT:
+        units: m s-1
+        long_name: Northward sea water velocity
+      NTAW:
+        units: µmol kg-1
+        long_name: Moles of nitrate per unit mass in sea water
+      NTRA:
+        units: mmol m-3
+        long_name: Mole concentration of nitrate in sea water
+      NTRI:
+        units: mmol m-3
+        long_name: Mole concentration of nitrite in sea water
+      OSAT:
+        units: '%'
+        long_name: Fractional saturation of oxygen in sea water
+      PHOS:
+        units: mmol m-3
+        long_name: Mole concentration of phosphate in sea water
+      PHPH:
+        units: '1'
+        long_name: Sea water ph reported on total scale
+      PSAL:
+        units: '0.001'
+        long_name: Sea water practical salinity
+      RELH:
+        units: '%'
+        long_name: Relative humidity
+      RVFL:
+        units: m3 s-1
+        long_name: Water volume transport into sea water from rivers
+      SINC:
+        units: W m-2
+        long_name: Surface downwelling shortwave flux in air
+      SLEV:
+        units: m
+        long_name: Water surface height above reference datum
+      SVEL:
+        units: m s-1
+        long_name: Speed of sound in sea water
+      TEMP:
+        units: degrees_C
+        long_name: Sea water temperature
+      TUR4:
+        units: '1'
+        long_name: Sea water turbidity
+      VAVH:
+        units: m
+        long_name: Sea surface wave significant height
+      VAVT:
+        units: s
+        long_name: Sea surface wave significant period
+      VDIR:
+        units: degree
+        long_name: Sea surface wave from direction
+      VEMH:
+        units: m
+        long_name: Sea surface wave maximum height
+      VEPK:
+        units: m2 s
+        long_name: Sea surface wave energy at variance spectral density maximum
+      VGHS:
+        units: m
+        long_name: Sea surface wave significant height
+      VGTA:
+        units: s
+        long_name: Sea surface wave mean period
+      VH110:
+        units: m
+        long_name: Sea surface wave mean height of highest tenth
+      VHM0:
+        units: m
+        long_name: Sea surface wave significant height
+      VMDR:
+        units: degree
+        long_name: Sea surface wave from direction
+      VPED:
+        units: degree
+        long_name: Sea surface wave from direction at variance spectral density maximum
+      VPSP:
+        units: degree
+        long_name: Sea surface wave directional spread at variance spectral density maximum
+      VTM02:
+        units: s
+        long_name: Sea surface wave mean period from variance spectral density second frequency moment
+      VTM10:
+        units: s
+        long_name: Sea surface wave mean period from variance spectral density inverse frequency moment
+      VTPK:
+        units: s
+        long_name: Sea surface wave period at variance spectral density maximum
+      VTZA:
+        units: s
+        long_name: Sea surface wave mean period
+      VTZM:
+        units: s
+        long_name: Sea surface wave period of highest wave
+      VZMX:
+        units: m
+        long_name: Sea surface wave maximum height
+      WDIR:
+        units: degree
+        long_name: Wind from direction
+      WSPD:
+        units: m s-1
+        long_name: Wind speed
+
+  cmems_obs-mob_glo_phy-cur_my_0.25deg_P1D-m:
+    product: MULTIOBS_GLO_PHY_MYNRT_015_003
+    title: Daily mean total surface and 15m velocities
+    cadence: daily
+    domain: global
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      err_ue:
+        units: m/s
+        long_name: Eastward sea water velocity due to ekman drift standard error
+      err_ugos:
+        units: m/s
+        long_name: Surface geostophic eastward sea water velocity standard error
+      err_uo:
+        units: m/s
+        long_name: Eastward sea water velocity standard error
+      err_utide:
+        units: m/s
+        long_name: Sea water x velocity due to tide standard error
+      err_ve:
+        units: m/s
+        long_name: Northward sea water velocity due to ekman drift standard error
+      err_vgos:
+        units: m/s
+        long_name: Surface geostophic northward sea water velocity standard error
+      err_vo:
+        units: m/s
+        long_name: Northward sea water velocity standard error
+      err_vtide:
+        units: m/s
+        long_name: Sea water y velocity due to tide velocity standard error
+      ue:
+        units: m/s
+        long_name: Eastward sea water velocity due to ekman drift
+      ugos:
+        units: m/s
+        long_name: Surface geostrophic eastward sea water velocity
+      uo:
+        units: m/s
+        long_name: Eastward sea water velocity
+      utide:
+        units: m/s
+        long_name: Sea water x velocity due to tide
+      ve:
+        units: m/s
+        long_name: Northward sea water velocity due to ekman drift
+      vgos:
+        units: m/s
+        long_name: Surface geostrophic northward sea water velocity
+      vo:
+        units: m/s
+        long_name: Northward sea water velocity
+      vtide:
+        units: m/s
+        long_name: Sea water y velocity due to tide
+
+  cmems_obs-mob_glo_phy-cur_my_0.25deg_P1M-m:
+    product: MULTIOBS_GLO_PHY_MYNRT_015_003
+    title: Monthly mean total surface and 15m velocities
+    cadence: monthly
+    domain: global
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      err_ue:
+        units: m/s
+        long_name: Eastward sea water velocity due to ekman drift standard error
+      err_ugos:
+        units: m/s
+        long_name: Surface geostophic eastward sea water velocity standard error
+      err_uo:
+        units: m/s
+        long_name: Eastward sea water velocity standard error
+      err_utide:
+        units: m/s
+        long_name: Sea water x velocity due to tide standard error
+      err_ve:
+        units: m/s
+        long_name: Northward sea water velocity due to ekman drift standard error
+      err_vgos:
+        units: m/s
+        long_name: Surface geostophic northward sea water velocity standard error
+      err_vo:
+        units: m/s
+        long_name: Northward sea water velocity standard error
+      err_vtide:
+        units: m/s
+        long_name: Sea water y velocity due to tide velocity standard error
+      ue:
+        units: m/s
+        long_name: Eastward sea water velocity due to ekman drift
+      ugos:
+        units: m/s
+        long_name: Surface geostrophic eastward sea water velocity
+      uo:
+        units: m/s
+        long_name: Eastward sea water velocity
+      utide:
+        units: m/s
+        long_name: Sea water x velocity due to tide
+      ve:
+        units: m/s
+        long_name: Northward sea water velocity due to ekman drift
+      vgos:
+        units: m/s
+        long_name: Surface geostrophic northward sea water velocity
+      vo:
+        units: m/s
+        long_name: Northward sea water velocity
+      vtide:
+        units: m/s
+        long_name: Sea water y velocity due to tide
+
+  cmems_obs-mob_glo_phy-cur_my_0.25deg_PT1H-i:
+    product: MULTIOBS_GLO_PHY_MYNRT_015_003
+    title: Total surface and 15m velocities
+    cadence: hourly
+    domain: global
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      ue:
+        units: m/s
+        long_name: Eastward sea water velocity due to ekman drift
+      uo:
+        units: m/s
+        long_name: Eastward sea water velocity
+      utide:
+        units: m/s
+        long_name: Sea water x velocity due to tide
+      ve:
+        units: m/s
+        long_name: Northward sea water velocity due to ekman drift
+      vo:
+        units: m/s
+        long_name: Northward sea water velocity
+      vtide:
+        units: m/s
+        long_name: Sea water y velocity due to tide
+
+  cmems_obs-mob_glo_phy-cur_nrt_0.25deg_P1D-m:
+    product: MULTIOBS_GLO_PHY_MYNRT_015_003
+    title: Daily mean total surface and 15m velocities
+    cadence: daily
+    domain: global
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      err_ue:
+        units: m/s
+        long_name: Eastward sea water velocity due to ekman drift standard error
+      err_ugos:
+        units: m/s
+        long_name: Surface geostophic eastward sea water velocity standard error
+      err_uo:
+        units: m/s
+        long_name: Eastward sea water velocity standard error
+      err_utide:
+        units: m/s
+        long_name: Sea water x velocity due to tide standard error
+      err_ve:
+        units: m/s
+        long_name: Northward sea water velocity due to ekman drift standard error
+      err_vgos:
+        units: m/s
+        long_name: Surface geostophic northward sea water velocity standard error
+      err_vo:
+        units: m/s
+        long_name: Northward sea water velocity standard error
+      err_vtide:
+        units: m/s
+        long_name: Sea water y velocity due to tide velocity standard error
+      ue:
+        units: m/s
+        long_name: Eastward sea water velocity due to ekman drift
+      ugos:
+        units: m/s
+        long_name: Surface geostrophic eastward sea water velocity
+      uo:
+        units: m/s
+        long_name: Eastward sea water velocity
+      utide:
+        units: m/s
+        long_name: Sea water x velocity due to tide
+      ve:
+        units: m/s
+        long_name: Northward sea water velocity due to ekman drift
+      vgos:
+        units: m/s
+        long_name: Surface geostrophic northward sea water velocity
+      vo:
+        units: m/s
+        long_name: Northward sea water velocity
+      vtide:
+        units: m/s
+        long_name: Sea water y velocity due to tide
+
+  cmems_obs-mob_glo_phy-cur_nrt_0.25deg_P1M-m:
+    product: MULTIOBS_GLO_PHY_MYNRT_015_003
+    title: Monthly mean total surface and 15m velocities
+    cadence: monthly
+    domain: global
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      err_ue:
+        units: m/s
+        long_name: Eastward sea water velocity due to ekman drift standard error
+      err_ugos:
+        units: m/s
+        long_name: Surface geostophic eastward sea water velocity standard error
+      err_uo:
+        units: m/s
+        long_name: Eastward sea water velocity standard error
+      err_utide:
+        units: m/s
+        long_name: Sea water x velocity due to tide standard error
+      err_ve:
+        units: m/s
+        long_name: Northward sea water velocity due to ekman drift standard error
+      err_vgos:
+        units: m/s
+        long_name: Surface geostophic northward sea water velocity standard error
+      err_vo:
+        units: m/s
+        long_name: Northward sea water velocity standard error
+      err_vtide:
+        units: m/s
+        long_name: Sea water y velocity due to tide velocity standard error
+      ue:
+        units: m/s
+        long_name: Eastward sea water velocity due to ekman drift
+      ugos:
+        units: m/s
+        long_name: Surface geostrophic eastward sea water velocity
+      uo:
+        units: m/s
+        long_name: Eastward sea water velocity
+      utide:
+        units: m/s
+        long_name: Sea water x velocity due to tide
+      ve:
+        units: m/s
+        long_name: Northward sea water velocity due to ekman drift
+      vgos:
+        units: m/s
+        long_name: Surface geostrophic northward sea water velocity
+      vo:
+        units: m/s
+        long_name: Northward sea water velocity
+      vtide:
+        units: m/s
+        long_name: Sea water y velocity due to tide
+
+  cmems_obs-mob_glo_phy-cur_nrt_0.25deg_PT1H-i:
+    product: MULTIOBS_GLO_PHY_MYNRT_015_003
+    title: Total surface and 15m velocities
+    cadence: hourly
+    domain: global
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      ue:
+        units: m/s
+        long_name: Eastward sea water velocity due to ekman drift
+      uo:
+        units: m/s
+        long_name: Eastward sea water velocity
+      utide:
+        units: m/s
+        long_name: Sea water x velocity due to tide
+      ve:
+        units: m/s
+        long_name: Northward sea water velocity due to ekman drift
+      vo:
+        units: m/s
+        long_name: Northward sea water velocity
+      vtide:
+        units: m/s
+        long_name: Sea water y velocity due to tide
+
+  cmems_obs-mob_glo_phy-sss_my_multi-oi_P1W:
+    product: MULTIOBS_GLO_PHY_SSS_L4_MY_015_015
+    title: SSS SMOS/SMAP L4 OI - LOPS-v2024
+    cadence: irregular
+    domain: global
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      CT:
+        units: Celsius
+        long_name: Sea water conservative temperature
+      SA:
+        units: g/kg
+        long_name: Sea surface salinity
+      alpha:
+        units: 1/K
+        long_name: ''            # TODO: standard_name missing on describe()
+      beta:
+        units: '1000'
+        long_name: ''            # TODO: standard_name missing on describe()
+      ice_mask:
+        units: ''
+        long_name: ''            # TODO: standard_name missing on describe()
+      rho:
+        units: kg/m^3
+        long_name: Sea surface density
+      spiciness0:
+        units: kg/m^3
+        long_name: ''            # TODO: standard_name missing on describe()
+      sss:
+        units: '0.001'
+        long_name: Sea surface salinity
+      sss_corr_smap:
+        units: '0.001'
+        long_name: ''            # TODO: standard_name missing on describe()
+      sss_corr_smos:
+        units: '0.001'
+        long_name: ''            # TODO: standard_name missing on describe()
+      sss_isas:
+        units: '0.001'
+        long_name: Sea surface salinity
+      sst:
+        units: Celsius
+        long_name: Sea surface temperature
+
+  cmems_obs-mob_glo_phy-sss_my_multi_P1D:
+    product: MULTIOBS_GLO_PHY_S_SURFACE_MYNRT_015_013
+    title: Global Analysed Sea Surface Salinity and Density
+    cadence: daily
+    domain: global
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      dos:
+        units: kg/m3
+        long_name: Sea surface density
+      dos_error:
+        units: kg/m3
+        long_name: Sea surface density error
+      sea_ice_fraction:
+        units: percent
+        long_name: Sea ice area fraction
+      sos:
+        units: '.001'
+        long_name: Sea surface salinity
+      sos_error:
+        units: '0.001'
+        long_name: Sea surface salinity error
+
+  cmems_obs-mob_glo_phy-sss_my_multi_P1M:
+    product: MULTIOBS_GLO_PHY_S_SURFACE_MYNRT_015_013
+    title: Global analysed sea surface salinity and density monthly average
+    cadence: monthly
+    domain: global
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      dos:
+        units: kg/m3
+        long_name: Sea surface density
+      dos_error:
+        units: kg/m3
+        long_name: Sea surface density error
+      sea_ice_fraction:
+        units: percent
+        long_name: Sea ice area fraction
+      sos:
+        units: '.001'
+        long_name: Sea surface salinity
+      sos_error:
+        units: '0.001'
+        long_name: Sea surface salinity error
+
+  cmems_obs-mob_glo_phy-sss_mynrt_smos-asc_P1D:
+    product: MULTIOBS_GLO_PHY_SSS_L3_MYNRT_015_014
+    title: SMOS CATDS Qualified (L2Q) Sea Surface Salinity product
+    cadence: daily
+    domain: global
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      Mean_Acq_Time:
+        units: days since 2000-01-01T00:00:00Z
+        long_name: ''            # TODO: standard_name missing on describe()
+      Sea_Surface_Salinity:
+        units: '0.001'
+        long_name: Sea surface salinity
+      Sea_Surface_Salinity_Error:
+        units: '0.001'
+        long_name: Sea surface salinity standard error
+      Sea_Surface_Salinity_QC:
+        units: ''
+        long_name: Status flag
+      Sea_Surface_Salinity_Rain_Corrected:
+        units: '0.001'
+        long_name: Sea surface salinity
+      Sea_Surface_Salinity_Rain_Corrected_Error:
+        units: '0.001'
+        long_name: Sea surface salinity standard error
+      X_Swath:
+        units: km
+        long_name: ''            # TODO: standard_name missing on describe()
+
+  cmems_obs-mob_glo_phy-sss_mynrt_smos-des_P1D:
+    product: MULTIOBS_GLO_PHY_SSS_L3_MYNRT_015_014
+    title: SMOS CATDS Qualified (L2Q) Sea Surface Salinity product
+    cadence: daily
+    domain: global
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      Mean_Acq_Time:
+        units: days since 2000-01-01T00:00:00Z
+        long_name: ''            # TODO: standard_name missing on describe()
+      Sea_Surface_Salinity:
+        units: '0.001'
+        long_name: Sea surface salinity
+      Sea_Surface_Salinity_Error:
+        units: '0.001'
+        long_name: Sea surface salinity standard error
+      Sea_Surface_Salinity_QC:
+        units: ''
+        long_name: Status flag
+      Sea_Surface_Salinity_Rain_Corrected:
+        units: '0.001'
+        long_name: Sea surface salinity
+      Sea_Surface_Salinity_Rain_Corrected_Error:
+        units: '0.001'
+        long_name: Sea surface salinity standard error
+      X_Swath:
+        units: km
+        long_name: ''            # TODO: standard_name missing on describe()
+
+  cmems_obs-mob_glo_phy-sss_nrt_multi_P1D:
+    product: MULTIOBS_GLO_PHY_S_SURFACE_MYNRT_015_013
+    title: Global Analysed Sea Surface Salinity and Density
+    cadence: daily
+    domain: global
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      dos:
+        units: kg/m3
+        long_name: Sea surface density
+      dos_error:
+        units: kg/m3
+        long_name: Sea surface density error
+      sea_ice_fraction:
+        units: percent
+        long_name: Sea ice area fraction
+      sos:
+        units: '.001'
+        long_name: Sea surface salinity
+      sos_error:
+        units: '0.001'
+        long_name: Sea surface salinity error
+
+  cmems_obs-mob_glo_phy-sss_nrt_multi_P1M:
+    product: MULTIOBS_GLO_PHY_S_SURFACE_MYNRT_015_013
+    title: Global analysed sea surface salinity and density monthly average
+    cadence: monthly
+    domain: global
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      dos:
+        units: kg/m3
+        long_name: Sea surface density
+      dos_error:
+        units: kg/m3
+        long_name: Sea surface density error
+      sea_ice_fraction:
+        units: percent
+        long_name: Sea ice area fraction
+      sos:
+        units: '.001'
+        long_name: Sea surface salinity
+      sos_error:
+        units: '0.001'
+        long_name: Sea surface salinity error
+
+  cmems_obs-mob_glo_phy-uvw_my_0.25deg_P7D-i:
+    product: MULTIOBS_GLO_PHY_UVW_3D_MYNRT_015_007
+    title: Global Observed Ocean Physics 3D Quasi-Geostrophic Currents (OMEGA3D)
+    cadence: weekly
+    domain: global
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      uago:
+        units: m/s
+        long_name: Eastward sea water velocity
+      uo:
+        units: m/s
+        long_name: Eastward sea water velocity
+      vago:
+        units: m/s
+        long_name: Northward sea water velocity
+      vo:
+        units: m/s
+        long_name: Northward sea water velocity
+      wo:
+        units: m/day
+        long_name: Upward sea water velocity
+
+  cmems_obs-mob_glo_phy-uvw_nrt_0.25deg_P7D-i:
+    product: MULTIOBS_GLO_PHY_UVW_3D_MYNRT_015_007
+    title: Global Observed Ocean Physics 3D Quasi-Geostrophic Currents (OMEGA3D)
+    cadence: weekly
+    domain: global
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      uago:
+        units: m/s
+        long_name: Eastward sea water velocity
+      uo:
+        units: m/s
+        long_name: Eastward sea water velocity
+      vago:
+        units: m/s
+        long_name: Northward sea water velocity
+      vo:
+        units: m/s
+        long_name: Northward sea water velocity
+      wo:
+        units: m/day
+        long_name: Upward sea water velocity
+
+  cmems_obs-mob_glo_phy_my_0.125deg_P1D-m:
+    product: MULTIOBS_GLO_PHY_TSUV_3D_MYNRT_015_012
+    title: ARMOR3D REP - TSHUVMld Global Ocean Observation-based Product
+    cadence: daily
+    domain: global
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      mlotst:
+        units: m
+        long_name: Ocean mixed layer thickness
+      so:
+        units: '0.001'
+        long_name: Sea water salinity
+      to:
+        units: degrees_C
+        long_name: Sea water temperature
+      ugo:
+        units: m s-1
+        long_name: Geostrophic eastward sea water velocity
+      vgo:
+        units: m s-1
+        long_name: Geostrophic northward sea water velocity
+      zo:
+        units: m
+        long_name: Geopotential height
+
+  cmems_obs-mob_glo_phy_my_0.125deg_P1M-m:
+    product: MULTIOBS_GLO_PHY_TSUV_3D_MYNRT_015_012
+    title: ARMOR3D REP - TSHUVMld Global Ocean Observation-based Product monthly average
+    cadence: monthly
+    domain: global
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      mlotst:
+        units: m
+        long_name: Ocean mixed layer thickness
+      so:
+        units: '0.001'
+        long_name: Sea water salinity
+      to:
+        units: degrees_C
+        long_name: Sea water temperature
+      ugo:
+        units: m s-1
+        long_name: Geostrophic eastward sea water velocity
+      vgo:
+        units: m s-1
+        long_name: Geostrophic northward sea water velocity
+      zo:
+        units: m
+        long_name: Geopotential height
+
+  cmems_obs-mob_glo_phy_mynrt_0.125deg-climatology-uncertainty_P1M-m:
+    product: MULTIOBS_GLO_PHY_TSUV_3D_MYNRT_015_012
+    title: ARMOR3D - TS Global Ocean Observation-based Product Uncertainties
+    cadence: climatology
+    domain: global
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      so_uncertainty:
+        units: practical salinity unit
+        long_name: Sea water salinity uncertainty
+      to_uncertainty:
+        units: degree Celsius
+        long_name: Sea water temperature uncertainty
+
+  cmems_obs-mob_glo_phy_nrt_0.125deg_P1D-m:
+    product: MULTIOBS_GLO_PHY_TSUV_3D_MYNRT_015_012
+    title: ARMOR3D NRT - TSHUVMld Global Ocean Observation-based Product
+    cadence: daily
+    domain: global
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      mlotst:
+        units: m
+        long_name: Ocean mixed layer thickness
+      so:
+        units: '0.001'
+        long_name: Sea water salinity
+      to:
+        units: degrees_C
+        long_name: Sea water temperature
+      ugo:
+        units: m s-1
+        long_name: Geostrophic eastward sea water velocity
+      vgo:
+        units: m s-1
+        long_name: Geostrophic northward sea water velocity
+      zo:
+        units: m
+        long_name: Geopotential height
+
+  cmems_obs-mob_glo_phy_nrt_0.125deg_P1M-m:
+    product: MULTIOBS_GLO_PHY_TSUV_3D_MYNRT_015_012
+    title: ARMOR3D NRT - TSHUVMld Global Ocean Observation-based Product monthly average
+    cadence: monthly
+    domain: global
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      mlotst:
+        units: m
+        long_name: Ocean mixed layer thickness
+      so:
+        units: '0.001'
+        long_name: Sea water salinity
+      to:
+        units: degrees_C
+        long_name: Sea water temperature
+      ugo:
+        units: m s-1
+        long_name: Geostrophic eastward sea water velocity
+      vgo:
+        units: m s-1
+        long_name: Geostrophic northward sea water velocity
+      zo:
+        units: m
+        long_name: Geopotential height

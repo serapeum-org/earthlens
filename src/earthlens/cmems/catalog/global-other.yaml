@@ -1,0 +1,472 @@
+# CMEMS curated catalog - global-other slice.
+#
+# One slice of the per-domain split of the Copernicus Marine catalog.
+# The loader (earthlens.cmems.catalog.Catalog) merges every *.yaml in
+# this directory into one Catalog at construction time; dataset ids
+# must be unique across files. Stanzas are emitted by
+# tools/cmems/refresh_cmems_catalog.py from copernicusmarine.describe();
+# `cadence` is inferred from the dataset_id suffix and `domain` from
+# the product_id prefix. The `global` basin is sub-split by theme
+# (global-physics / global-biogeochem / global-sst / ...) to keep file
+# sizes balanced; the `domain:` field on every row below is still the
+# plain basin label. Where the toolbox exposes no standard_name for a
+# variable, the row carries `long_name: ''` with a TODO marker.
+#
+# Schema (per dataset):
+#   <dataset_id>:
+#     product: <product_id>
+#     title: <human-readable title>
+#     cadence: <daily|monthly|hourly|6hourly|climatology|irregular>
+#     domain: <global|mediterranean|arctic|...>
+#     temporal: { start: YYYY-MM-DD, end: YYYY-MM-DD }   # end null = NRT
+#     variables:
+#       <short_name>: { units: <CF units>, long_name: <CF long name> }
+
+datasets:
+
+  antarctic_omi_si_extent:
+    product: ANTARCTIC_OMI_SI_extent
+    title: Sea Ice Extent for Southern Hemisphere
+    cadence: irregular
+    domain: global
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      siextents_cglo:
+        units: km2
+        long_name: Sea ice extent
+      siextents_glor:
+        units: km2
+        long_name: Sea ice extent
+      siextents_mean:
+        units: km2
+        long_name: Sea ice extent
+      siextents_oras:
+        units: km2
+        long_name: Sea ice extent
+      siextents_std:
+        units: km2
+        long_name: Sea ice extent
+
+  antarctic_omi_si_extent_obs:
+    product: ANTARCTIC_OMI_SI_extent_obs
+    title: Southern Hemisphere Monthly Averaged Sea Ice Extent
+    cadence: irregular
+    domain: global
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      monthlyclimsiextent_mean:
+        units: km^2
+        long_name: Sea ice extent
+      monthlyclimsiextent_std:
+        units: km^2
+        long_name: ''            # TODO: standard_name missing on describe()
+      siextent:
+        units: km^2
+        long_name: Sea ice extent
+
+  global_omi_climate-variability_nino34_sst_anom:
+    product: GLOBAL_OMI_CLIMVAR_enso_sst_area_averaged_anomalies
+    title: NINO3.4 index
+    cadence: irregular
+    domain: global
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      sst_cglo:
+        units: degree_C
+        long_name: Sea surface temperature
+      sst_glor:
+        units: degree_C
+        long_name: Sea surface temperature
+      sst_mean:
+        units: degree_C
+        long_name: Sea surface temperature
+      sst_oras:
+        units: degree_C
+        long_name: Sea surface temperature
+      sst_std:
+        units: degree_C
+        long_name: Sea surface temperature
+
+  global_omi_climate-variability_nino34_tzt_anom:
+    product: GLOBAL_OMI_CLIMVAR_enso_Tzt_anomaly
+    title: NINO3.4 Tzt Anomaly
+    cadence: irregular
+    domain: global
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      sigma_theta_cglo:
+        units: kg m-3
+        long_name: Sea water sigma theta
+      sigma_theta_glor:
+        units: kg m-3
+        long_name: Sea water sigma theta
+      sigma_theta_mean:
+        units: kg m-3
+        long_name: Sea water sigma theta
+      sigma_theta_oras:
+        units: kg m-3
+        long_name: Sea water sigma theta
+      sigma_theta_std:
+        units: kg m-3
+        long_name: Sea water sigma theta
+      thetao_cglo:
+        units: degree_C
+        long_name: Sea water temperature
+      thetao_glor:
+        units: degree_C
+        long_name: Sea water temperature
+      thetao_mean:
+        units: degree_C
+        long_name: Sea water temperature
+      thetao_oras:
+        units: degree_C
+        long_name: Sea water temperature
+      thetao_std:
+        units: degree_C
+        long_name: Sea water temperature
+
+  global_omi_health_carbon_co2_flux_integrated:
+    product: GLOBAL_OMI_HEALTH_carbon_co2_flux_integrated
+    title: Area Integrated Yearly Surface Downward Flux of total CO2
+    cadence: irregular
+    domain: global
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      fgco2:
+        units: Pg yr-1
+        long_name: Global integrated co2 flux expressed as carbon
+      fgco2_uncertainty:
+        units: Pg yr-1
+        long_name: Global integrated co2 flux expressed as carbon
+
+  global_omi_health_carbon_ph_area_averaged:
+    product: GLOBAL_OMI_HEALTH_carbon_ph_area_averaged
+    title: Area Averaged Yearly Mean Surface Sea Water pH reported on total scale
+    cadence: irregular
+    domain: global
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      ph:
+        units: '1'
+        long_name: Sea water ph reported on total scale
+      ph_uncertainty:
+        units: '1'
+        long_name: Sea water ph reported on total scale
+
+  global_omi_health_carbon_ph_trend:
+    product: GLOBAL_OMI_HEALTH_carbon_ph_trend
+    title: Global surface ocean pH trends
+    cadence: irregular
+    domain: global
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      ph_trend:
+        units: yr-1
+        long_name: Trend of surface ocean ph reported on total scale
+      ph_trend_uncertainty:
+        units: yr-1
+        long_name: Uncertainty of trend of surface ocean ph reported on total scale
+
+  global_omi_natlantic_amoc_26N_profile:
+    product: GLOBAL_OMI_NATLANTIC_amoc_26N_profile
+    title: global_omi_natlantic_amoc_26N_profile_202411
+    cadence: irregular
+    domain: global
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      amoc_cglo:
+        units: m3 s-1
+        long_name: Ocean meridional overturning streamfunction
+      amoc_glor:
+        units: m3 s-1
+        long_name: Ocean meridional overturning streamfunction
+      amoc_mean:
+        units: m3 s-1
+        long_name: Ocean meridional overturning streamfunction
+      amoc_oras:
+        units: m3 s-1
+        long_name: Ocean meridional overturning streamfunction
+      amoc_std:
+        units: m3 s-1
+        long_name: Ocean meridional overturning streamfunction
+
+  global_omi_natlantic_amoc_max26N_timeseries:
+    product: GLOBAL_OMI_NATLANTIC_amoc_max26N_timeseries
+    title: global_omi_natlantic_amoc_max26N_timeseries_202411
+    cadence: irregular
+    domain: global
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      amoc_cglo:
+        units: m3 s-1
+        long_name: Ocean meridional overturning streamfunction
+      amoc_glor:
+        units: m3 s-1
+        long_name: Ocean meridional overturning streamfunction
+      amoc_mean:
+        units: m3 s-1
+        long_name: Ocean meridional overturning streamfunction
+      amoc_oras:
+        units: m3 s-1
+        long_name: Ocean meridional overturning streamfunction
+      amoc_std:
+        units: m3 s-1
+        long_name: Ocean meridional overturning streamfunction
+
+  global_omi_tempsal_sst_area_averaged_anomalies:
+    product: GLOBAL_OMI_TEMPSAL_sst_area_averaged_anomalies
+    title: Area Averaged Sea Surface Temperature Anomaly
+    cadence: irregular
+    domain: global
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      sst_anomaly:
+        units: K
+        long_name: Sea surface temperature
+      sst_anomaly_filtered:
+        units: K
+        long_name: Sea surface temperature
+
+  global_omi_tempsal_sst_trend:
+    product: GLOBAL_OMI_TEMPSAL_sst_trend
+    title: Sea Surface Temperature trends 1982-2024
+    cadence: irregular
+    domain: global
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      sst_trends:
+        units: kelvin/year
+        long_name: Sea surface temperature
+
+  global_omi_wmhe_heattrp:
+    product: GLOBAL_OMI_WMHE_heattrp
+    title: Ocean heat transport across lines
+    cadence: irregular
+    domain: global
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      heattrp_1993-2014_cglo:
+        units: PW
+        long_name: Ocean heat transport across line
+      heattrp_1993-2014_foam:
+        units: PW
+        long_name: Ocean heat transport across line
+      heattrp_1993-2014_glor:
+        units: PW
+        long_name: Ocean heat transport across line
+      heattrp_1993-2014_mean:
+        units: PW
+        long_name: Ocean heat transport across line
+      heattrp_1993-2014_oras:
+        units: PW
+        long_name: Ocean heat transport across line
+      heattrp_1993-2014_std:
+        units: PW
+        long_name: Ocean heat transport across line
+      heattrp_2017_cglo:
+        units: PW
+        long_name: Ocean heat transport across line
+      heattrp_2017_foam:
+        units: PW
+        long_name: Ocean heat transport across line
+      heattrp_2017_glor:
+        units: PW
+        long_name: Ocean heat transport across line
+      heattrp_2017_mean:
+        units: PW
+        long_name: Ocean heat transport across line
+      heattrp_2017_oras:
+        units: PW
+        long_name: Ocean heat transport across line
+
+  global_omi_wmhe_northward_mht:
+    product: GLOBAL_OMI_WMHE_northward_mht
+    title: Northward ocean heat transport
+    cadence: irregular
+    domain: global
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      northward_heat_transport_atl_1993-2014_cglo:
+        units: PW
+        long_name: Northward ocean heat transport
+      northward_heat_transport_atl_1993-2014_foam:
+        units: PW
+        long_name: Northward ocean heat transport
+      northward_heat_transport_atl_1993-2014_glor:
+        units: PW
+        long_name: Northward ocean heat transport
+      northward_heat_transport_atl_1993-2014_mean:
+        units: PW
+        long_name: Northward ocean heat transport
+      northward_heat_transport_atl_1993-2014_oras:
+        units: PW
+        long_name: Northward ocean heat transport
+      northward_heat_transport_atl_1993-2014_std:
+        units: PW
+        long_name: Northward ocean heat transport
+      northward_heat_transport_atl_2017_cglo:
+        units: PW
+        long_name: Northward ocean heat transport
+      northward_heat_transport_atl_2017_foam:
+        units: PW
+        long_name: Northward ocean heat transport
+      northward_heat_transport_atl_2017_glor:
+        units: PW
+        long_name: Northward ocean heat transport
+      northward_heat_transport_atl_2017_mean:
+        units: PW
+        long_name: Northward ocean heat transport
+      northward_heat_transport_atl_2017_oras:
+        units: PW
+        long_name: Northward ocean heat transport
+      northward_heat_transport_glo_1993-2014_cglo:
+        units: PW
+        long_name: Northward ocean heat transport
+      northward_heat_transport_glo_1993-2014_foam:
+        units: PW
+        long_name: Northward ocean heat transport
+      northward_heat_transport_glo_1993-2014_glor:
+        units: PW
+        long_name: Northward ocean heat transport
+      northward_heat_transport_glo_1993-2014_mean:
+        units: PW
+        long_name: Northward ocean heat transport
+      northward_heat_transport_glo_1993-2014_oras:
+        units: PW
+        long_name: Northward ocean heat transport
+      northward_heat_transport_glo_1993-2014_std:
+        units: PW
+        long_name: Northward ocean heat transport
+      northward_heat_transport_glo_2017_cglo:
+        units: PW
+        long_name: Northward ocean heat transport
+      northward_heat_transport_glo_2017_foam:
+        units: PW
+        long_name: Northward ocean heat transport
+      northward_heat_transport_glo_2017_glor:
+        units: PW
+        long_name: Northward ocean heat transport
+      northward_heat_transport_glo_2017_mean:
+        units: PW
+        long_name: Northward ocean heat transport
+      northward_heat_transport_glo_2017_oras:
+        units: PW
+        long_name: Northward ocean heat transport
+      northward_heat_transport_inp0_1993-2014_cglo:
+        units: PW
+        long_name: Northward ocean heat transport
+      northward_heat_transport_inp0_1993-2014_foam:
+        units: PW
+        long_name: Northward ocean heat transport
+      northward_heat_transport_inp0_1993-2014_glor:
+        units: PW
+        long_name: Northward ocean heat transport
+      northward_heat_transport_inp0_1993-2014_mean:
+        units: PW
+        long_name: Northward ocean heat transport
+      northward_heat_transport_inp0_1993-2014_oras:
+        units: PW
+        long_name: Northward ocean heat transport
+      northward_heat_transport_inp0_1993-2014_std:
+        units: PW
+        long_name: Northward ocean heat transport
+      northward_heat_transport_inp0_2017_cglo:
+        units: PW
+        long_name: Northward ocean heat transport
+      northward_heat_transport_inp0_2017_foam:
+        units: PW
+        long_name: Northward ocean heat transport
+      northward_heat_transport_inp0_2017_glor:
+        units: PW
+        long_name: Northward ocean heat transport
+      northward_heat_transport_inp0_2017_mean:
+        units: PW
+        long_name: Northward ocean heat transport
+      northward_heat_transport_inp0_2017_oras:
+        units: PW
+        long_name: Northward ocean heat transport
+
+  global_omi_wmhe_voltrp:
+    product: GLOBAL_OMI_WMHE_voltrp
+    title: Ocean volume transport across lines
+    cadence: irregular
+    domain: global
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      voltrp_1993-2014_cglo:
+        units: m3/s
+        long_name: Ocean volume transport across line
+      voltrp_1993-2014_foam:
+        units: m3/s
+        long_name: Ocean volume transport across line
+      voltrp_1993-2014_glor:
+        units: m3/s
+        long_name: Ocean volume transport across line
+      voltrp_1993-2014_mean:
+        units: m3/s
+        long_name: Ocean volume transport across line
+      voltrp_1993-2014_oras:
+        units: m3/s
+        long_name: Ocean volume transport across line
+      voltrp_1993-2014_std:
+        units: m3/s
+        long_name: Ocean volume transport across line
+      voltrp_2017_cglo:
+        units: m3/s
+        long_name: Ocean volume transport across line
+      voltrp_2017_foam:
+        units: m3/s
+        long_name: Ocean volume transport across line
+      voltrp_2017_glor:
+        units: m3/s
+        long_name: Ocean volume transport across line
+      voltrp_2017_mean:
+        units: m3/s
+        long_name: Ocean volume transport across line
+      voltrp_2017_oras:
+        units: m3/s
+        long_name: Ocean volume transport across line
+
+  northwestshelf_omi_tempsal_extreme_var_temp_mean_and_anomaly:
+    product: NORTHWESTSHELF_OMI_TEMPSAL_extreme_var_temp_mean_and_anomaly
+    title: Extremes variability in European Seas
+    cadence: irregular
+    domain: global
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      temp_percentile99_anom:
+        units: degree_C
+        long_name: Sea water temperature
+      temp_percentile99_mean:
+        units: degree_C
+        long_name: Sea water temperature

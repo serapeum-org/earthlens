@@ -1,0 +1,1875 @@
+# CMEMS curated catalog - indicator slice.
+#
+# One slice of the per-domain split of the Copernicus Marine catalog.
+# The loader (earthlens.cmems.catalog.Catalog) merges every *.yaml in
+# this directory into one Catalog at construction time; dataset ids
+# must be unique across files. Stanzas are emitted by
+# tools/cmems/refresh_cmems_catalog.py from copernicusmarine.describe();
+# `cadence` is inferred from the dataset_id suffix and `domain` from
+# the product_id prefix. The `global` basin is sub-split by theme
+# (global-physics / global-biogeochem / global-sst / ...) to keep file
+# sizes balanced; the `domain:` field on every row below is still the
+# plain basin label. Where the toolbox exposes no standard_name for a
+# variable, the row carries `long_name: ''` with a TODO marker.
+#
+# Schema (per dataset):
+#   <dataset_id>:
+#     product: <product_id>
+#     title: <human-readable title>
+#     cadence: <daily|monthly|hourly|6hourly|climatology|irregular>
+#     domain: <global|mediterranean|arctic|...>
+#     temporal: { start: YYYY-MM-DD, end: YYYY-MM-DD }   # end null = NRT
+#     variables:
+#       <short_name>: { units: <CF units>, long_name: <CF long name> }
+
+datasets:
+
+  OMI_CIRCULATION_VOLTRANS_IBI_section_integrated_anomalies_AC:
+    product: OMI_CIRCULATION_VOLTRANS_IBI_section_integrated_anomalies
+    title: Volume transport anomaly across monitoring section AC
+    cadence: irregular
+    domain: indicator
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      cur_armor:
+        units: Sverdrup [10^6m^3/sec]
+        long_name: Volume transport anomaly across monitoring section
+      cur_glo_myp:
+        units: Sverdrup [10^6m^3/sec]
+        long_name: Volume transport anomaly across monitoring section
+      cur_ibi_int:
+        units: Sverdrup [10^6m^3/sec]
+        long_name: Volume transport anomaly across monitoring section
+      cur_ibi_myp:
+        units: Sverdrup [10^6m^3/sec]
+        long_name: Volume transport anomaly across monitoring section
+      cur_mean:
+        units: Sverdrup [10^6m^3/sec]
+        long_name: Volume transport anomaly across monitoring section
+      cur_std:
+        units: Sverdrup [10^6m^3/sec]
+        long_name: Volume transport anomaly across monitoring section
+
+  OMI_CIRCULATION_VOLTRANS_IBI_section_integrated_anomalies_ALC:
+    product: OMI_CIRCULATION_VOLTRANS_IBI_section_integrated_anomalies
+    title: Volume transport anomaly across monitoring section ALC
+    cadence: irregular
+    domain: indicator
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      cur_armor:
+        units: Sverdrup [10^6m^3/sec]
+        long_name: Volume transport anomaly across monitoring section
+      cur_glo_myp:
+        units: Sverdrup [10^6m^3/sec]
+        long_name: Volume transport anomaly across monitoring section
+      cur_ibi_int:
+        units: Sverdrup [10^6m^3/sec]
+        long_name: Volume transport anomaly across monitoring section
+      cur_ibi_myp:
+        units: Sverdrup [10^6m^3/sec]
+        long_name: Volume transport anomaly across monitoring section
+      cur_mean:
+        units: Sverdrup [10^6m^3/sec]
+        long_name: Volume transport anomaly across monitoring section
+      cur_med_myp:
+        units: Sverdrup [10^6m^3/sec]
+        long_name: Volume transport anomaly across monitoring section
+      cur_std:
+        units: Sverdrup [10^6m^3/sec]
+        long_name: Volume transport anomaly across monitoring section
+
+  OMI_CIRCULATION_VOLTRANS_IBI_section_integrated_anomalies_CC:
+    product: OMI_CIRCULATION_VOLTRANS_IBI_section_integrated_anomalies
+    title: Volume transport anomaly across monitoring section CC
+    cadence: irregular
+    domain: indicator
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      cur_armor:
+        units: Sverdrup [10^6m^3/sec]
+        long_name: Volume transport anomaly across monitoring section
+      cur_glo_myp:
+        units: Sverdrup [10^6m^3/sec]
+        long_name: Volume transport anomaly across monitoring section
+      cur_ibi_int:
+        units: Sverdrup [10^6m^3/sec]
+        long_name: Volume transport anomaly across monitoring section
+      cur_ibi_myp:
+        units: Sverdrup [10^6m^3/sec]
+        long_name: Volume transport anomaly across monitoring section
+      cur_mean:
+        units: Sverdrup [10^6m^3/sec]
+        long_name: Volume transport anomaly across monitoring section
+      cur_std:
+        units: Sverdrup [10^6m^3/sec]
+        long_name: Volume transport anomaly across monitoring section
+
+  OMI_CIRCULATION_VOLTRANS_IBI_section_integrated_anomalies_N48:
+    product: OMI_CIRCULATION_VOLTRANS_IBI_section_integrated_anomalies
+    title: Volume transport anomaly across monitoring section N48
+    cadence: irregular
+    domain: indicator
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      cur_armor:
+        units: Sverdrup [10^6m^3/sec]
+        long_name: Volume transport anomaly across monitoring section
+      cur_glo_myp:
+        units: Sverdrup [10^6m^3/sec]
+        long_name: Volume transport anomaly across monitoring section
+      cur_ibi_int:
+        units: Sverdrup [10^6m^3/sec]
+        long_name: Volume transport anomaly across monitoring section
+      cur_ibi_myp:
+        units: Sverdrup [10^6m^3/sec]
+        long_name: Volume transport anomaly across monitoring section
+      cur_mean:
+        units: Sverdrup [10^6m^3/sec]
+        long_name: Volume transport anomaly across monitoring section
+      cur_nws_myp:
+        units: Sverdrup [10^6m^3/sec]
+        long_name: Volume transport anomaly across monitoring section
+      cur_std:
+        units: Sverdrup [10^6m^3/sec]
+        long_name: Volume transport anomaly across monitoring section
+
+  OMI_CIRCULATION_VOLTRANS_IBI_section_integrated_anomalies_RTE:
+    product: OMI_CIRCULATION_VOLTRANS_IBI_section_integrated_anomalies
+    title: Volume transport anomaly across monitoring section RTE
+    cadence: irregular
+    domain: indicator
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      cur_armor:
+        units: Sverdrup [10^6m^3/sec]
+        long_name: Volume transport anomaly across monitoring section
+      cur_glo_myp:
+        units: Sverdrup [10^6m^3/sec]
+        long_name: Volume transport anomaly across monitoring section
+      cur_ibi_int:
+        units: Sverdrup [10^6m^3/sec]
+        long_name: Volume transport anomaly across monitoring section
+      cur_ibi_myp:
+        units: Sverdrup [10^6m^3/sec]
+        long_name: Volume transport anomaly across monitoring section
+      cur_mean:
+        units: Sverdrup [10^6m^3/sec]
+        long_name: Volume transport anomaly across monitoring section
+      cur_nws_myp:
+        units: Sverdrup [10^6m^3/sec]
+        long_name: Volume transport anomaly across monitoring section
+      cur_std:
+        units: Sverdrup [10^6m^3/sec]
+        long_name: Volume transport anomaly across monitoring section
+
+  cmems_mod_arc_phy_temp_my_mhw_barentssea_P1D-m:
+    product: OMI_EXTREME_MHW_ARCTIC_area_averaged_anomalies
+    title: Marine Heat Waves
+    cadence: daily
+    domain: indicator
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      MHW_index_bottom:
+        units: ''
+        long_name: Mhwbottom
+      MHW_index_surface:
+        units: ''
+        long_name: Mhwsurface
+
+  omi_circulation_boundary_atlantic_gulf_stream_destabilization_point:
+    product: OMI_CIRCULATION_BOUNDARY_ATLANTIC_gulf_stream_destabilization_point
+    title: GS Distabilization point
+    cadence: irregular
+    domain: indicator
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      ci_latitude:
+        units: ''
+        long_name: Confidence interval latitude of the destabilization point
+      ci_longitude:
+        units: ''
+        long_name: Confidence interval longitude of the destabilization point
+
+  omi_circulation_boundary_blksea_rim_current_index:
+    product: OMI_CIRCULATION_BOUNDARY_BLKSEA_rim_current_index
+    title: Black Sea Rim Current Index
+    cadence: irregular
+    domain: indicator
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      BSRCI:
+        units: '1'
+        long_name: Rim current intensity index
+      BSRCIn:
+        units: '1'
+        long_name: Rim current intensity index
+      BSRCIs:
+        units: '1'
+        long_name: Rim current intensity index
+
+  omi_circulation_boundary_pacific_kuroshio_phase_area_averaged:
+    product: OMI_CIRCULATION_BOUNDARY_PACIFIC_kuroshio_phase_area_averaged
+    title: Kuroshio extension phase variations index
+    cadence: irregular
+    domain: indicator
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      kuroshio:
+        units: '1'
+        long_name: Filtered specific turbulent kinetic energy of sea water index
+
+  omi_circulation_moc_blksea_area_averaged_mean:
+    product: OMI_CIRCULATION_MOC_BLKSEA_area_averaged_mean
+    title: Black Sea Meridional Overturning Current
+    cadence: irregular
+    domain: indicator
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      vol_sigma_tr:
+        units: m^3/s
+        long_name: Ocean meridional overturning streamfunction
+
+  omi_circulation_moc_medsea_area_averaged_mean:
+    product: OMI_CIRCULATION_MOC_MEDSEA_area_averaged_mean
+    title: Mediterranean meridional overturning circulation strength
+    cadence: irregular
+    domain: indicator
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      EMOC:
+        units: '[Sv = $10^6 m^3 s^{-1}$]'
+        long_name: Ocean meridional overturning streamfunction
+      WMOC:
+        units: '[Sv = $10^6 m^3 s^{-1}$]'
+        long_name: Ocean meridional overturning streamfunction
+
+  omi_circulation_voltrans_arctic_averaged:
+    product: OMI_CIRCULATION_VOLTRANS_ARCTIC_averaged
+    title: Volume transport through the Nordic Seas
+    cadence: irregular
+    domain: indicator
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      vol_BSOAW_Reanalysis:
+        units: 10E6 meter3 second-1
+        long_name: Ocean volume transport across line
+      vol_DSOW_Reanalysis:
+        units: 10E6 meter3 second-1
+        long_name: Ocean volume transport across line
+      vol_FSAW_Reanalysis:
+        units: 10E6 meter3 second-1
+        long_name: Ocean volume transport across line
+      vol_FSCAW_Reanalysis:
+        units: 10E6 meter3 second-1
+        long_name: Ocean volume transport across line
+      vol_FSCOW_Reanalysis:
+        units: 10E6 meter3 second-1
+        long_name: Ocean volume transport across line
+
+  omi_climate_ofc_baltic_area_averaged_anomalies:
+    product: OMI_CLIMATE_OFC_BALTIC_area_averaged_anomalies
+    title: Baltic Sea Ocean Freshwater Content Anomaly (0-300m) from Reanalysis
+    cadence: irregular
+    domain: indicator
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      ofc_balrean:
+        units: km3
+        long_name: Sea water volume
+      ofc_balrean_lower_rmsd:
+        units: km3
+        long_name: Sea water volume
+      ofc_balrean_upper_rmsd:
+        units: km3
+        long_name: Sea water volume
+
+  omi_climate_ohc_baltic_area_averaged_anomalies:
+    product: OMI_CLIMATE_OHC_BALTIC_area_averaged_anomalies
+    title: Baltic Sea Ocean Heat Content Anomaly (0-300m) from Reanalysis
+    cadence: irregular
+    domain: indicator
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      ohc_balrean:
+        units: J m-2
+        long_name: Integral wrt depth of sea water potential temperature expressed as heat content
+      ohc_balrean_lower_rmsd:
+        units: J m-2
+        long_name: Integral wrt depth of sea water potential temperature expressed as heat content
+      ohc_balrean_upper_rmsd:
+        units: J m-2
+        long_name: Integral wrt depth of sea water potential temperature expressed as heat content
+
+  omi_climate_ohc_blksea_area_averaged_anomalies:
+    product: OMI_CLIMATE_OHC_BLKSEA_area_averaged_anomalies
+    title: Area Averaged Ocean Heat Content Anomaly
+    cadence: irregular
+    domain: indicator
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      ohc_armor:
+        units: J m-2
+        long_name: Integral wrt depth of sea water temperature expressed as heat content
+      ohc_bs:
+        units: J m-2
+        long_name: Integral wrt depth of sea water potential temperature expressed as heat content
+      ohc_cora:
+        units: J m-2
+        long_name: Integral wrt depth of sea water temperature expressed as heat content
+      ohc_glor:
+        units: J m-2
+        long_name: Integral wrt depth of sea water potential temperature expressed as heat content
+      ohc_mean:
+        units: J m-2
+        long_name: Integral wrt depth of sea water temperature expressed as heat content
+      ohc_std:
+        units: J m-2
+        long_name: Integral wrt depth of sea water temperature expressed as heat content
+
+  omi_climate_ohc_global_area_averaged_anomalies_0_2000:
+    product: OMI_CLIMATE_OHC_GLOBAL_area_averaged_anomalies_0_2000
+    title: Area Averaged Ocean Heat Content Anomaly
+    cadence: irregular
+    domain: indicator
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      ARMOR-3D:
+        units: J m-2
+        long_name: Integral wrt depth of sea water potential temperature expressed as heat content
+      C-GLORS:
+        units: J m-2
+        long_name: Integral wrt depth of sea water potential temperature expressed as heat content
+      CORA5.2:
+        units: J m-2
+        long_name: Integral wrt depth of sea water potential temperature expressed as heat content
+      GLORYS2V4:
+        units: J m-2
+        long_name: Integral wrt depth of sea water potential temperature expressed as heat content
+      ORAS5:
+        units: J m-2
+        long_name: Integral wrt depth of sea water potential temperature expressed as heat content
+      ohc_bretherton:
+        units: J m-2
+        long_name: Integral wrt depth of sea water potential temperature expressed as heat content
+      ohc_bretherton_error:
+        units: J m-2
+        long_name: Integral wrt depth of sea water potential temperature expressed as heat content
+      ohc_mean_observations:
+        units: J m-2
+        long_name: Integral wrt depth of sea water potential temperature expressed as heat content
+      ohc_mean_reanalyses:
+        units: J m-2
+        long_name: Integral wrt depth of sea water potential temperature expressed as heat content
+      ohc_std_observations:
+        units: J m-2
+        long_name: Integral wrt depth of sea water potential temperature expressed as heat content
+      ohc_std_reanalyses:
+        units: J m-2
+        long_name: Integral wrt depth of sea water potential temperature expressed as heat content
+
+  omi_climate_ohc_global_area_averaged_anomalies_0_300:
+    product: OMI_CLIMATE_OHC_GLOBAL_area_averaged_anomalies_0_300
+    title: Area Averaged Ocean Heat Content Anomaly
+    cadence: irregular
+    domain: indicator
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      ARMOR-3D:
+        units: J m-2
+        long_name: Integral wrt depth of sea water potential temperature expressed as heat content
+      C-GLORS:
+        units: J m-2
+        long_name: Integral wrt depth of sea water potential temperature expressed as heat content
+      CORA5.2:
+        units: J m-2
+        long_name: Integral wrt depth of sea water potential temperature expressed as heat content
+      GLORYS2V4:
+        units: J m-2
+        long_name: Integral wrt depth of sea water potential temperature expressed as heat content
+      ORAS5:
+        units: J m-2
+        long_name: Integral wrt depth of sea water potential temperature expressed as heat content
+      ohc_bretherton:
+        units: J m-2
+        long_name: Integral wrt depth of sea water potential temperature expressed as heat content
+      ohc_bretherton_error:
+        units: J m-2
+        long_name: Integral wrt depth of sea water potential temperature expressed as heat content
+      ohc_mean_observations:
+        units: J m-2
+        long_name: Integral wrt depth of sea water potential temperature expressed as heat content
+      ohc_mean_reanalyses:
+        units: J m-2
+        long_name: Integral wrt depth of sea water potential temperature expressed as heat content
+      ohc_std_observations:
+        units: J m-2
+        long_name: Integral wrt depth of sea water potential temperature expressed as heat content
+      ohc_std_reanalyses:
+        units: J m-2
+        long_name: Integral wrt depth of sea water potential temperature expressed as heat content
+
+  omi_climate_ohc_global_area_averaged_anomalies_0_700:
+    product: OMI_CLIMATE_OHC_GLOBAL_area_averaged_anomalies_0_700
+    title: Area Averaged Ocean Heat Content Anomaly
+    cadence: irregular
+    domain: indicator
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      ARMOR-3D:
+        units: J m-2
+        long_name: Integral wrt depth of sea water potential temperature expressed as heat content
+      C-GLORS:
+        units: J m-2
+        long_name: Integral wrt depth of sea water potential temperature expressed as heat content
+      CORA5.2:
+        units: J m-2
+        long_name: Integral wrt depth of sea water potential temperature expressed as heat content
+      GLORYS2V4:
+        units: J m-2
+        long_name: Integral wrt depth of sea water potential temperature expressed as heat content
+      ORAS5:
+        units: J m-2
+        long_name: Integral wrt depth of sea water potential temperature expressed as heat content
+      ohc_bretherton:
+        units: J m-2
+        long_name: Integral wrt depth of sea water potential temperature expressed as heat content
+      ohc_bretherton_error:
+        units: J m-2
+        long_name: Integral wrt depth of sea water potential temperature expressed as heat content
+      ohc_mean_observations:
+        units: J m-2
+        long_name: Integral wrt depth of sea water potential temperature expressed as heat content
+      ohc_mean_reanalyses:
+        units: J m-2
+        long_name: Integral wrt depth of sea water potential temperature expressed as heat content
+      ohc_std_observations:
+        units: J m-2
+        long_name: Integral wrt depth of sea water potential temperature expressed as heat content
+      ohc_std_reanalyses:
+        units: J m-2
+        long_name: Integral wrt depth of sea water potential temperature expressed as heat content
+
+  omi_climate_ohc_global_trend:
+    product: OMI_CLIMATE_OHC_GLOBAL_trend
+    title: Ocean Heat Content Trend (0-2000m)
+    cadence: irregular
+    domain: indicator
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      opottemptend_armor:
+        units: W m-2
+        long_name: Tendency of sea water potential expressed as heat content
+      opottemptend_cglo:
+        units: W m-2
+        long_name: Tendency of sea water potential temperature expressed as heat content
+      opottemptend_cora:
+        units: W m-2
+        long_name: Tendency of sea water potential expressed as heat content
+      opottemptend_glor:
+        units: W m-2
+        long_name: Tendency of sea water potential temperature expressed as heat content
+      opottemptend_mean:
+        units: W m-2
+        long_name: Tendency of sea water potential expressed as heat content
+      opottemptend_oras:
+        units: W m-2
+        long_name: Tendency of sea water potential temperature expressed as heat content
+      opottemptend_std:
+        units: W m-2
+        long_name: Tendency of sea water potential expressed as heat content
+
+  omi_climate_ohc_ibi_area_averaged_anomalies:
+    product: OMI_CLIMATE_OHC_IBI_area_averaged_anomalies
+    title: Iberia Biscay Ireland Ocean Heat Content Anomaly (0-2000m) time series and trend from
+    cadence: irregular
+    domain: indicator
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      ohc_armor_myp:
+        units: Jm-2
+        long_name: Integral wrt depth of sea water temperature expressed as heat content
+      ohc_cora_myp:
+        units: Jm-2
+        long_name: Integral wrt depth of sea water temperature expressed as heat content
+      ohc_glo_myp:
+        units: Jm-2
+        long_name: Integral wrt depth of sea water temperature expressed as heat content
+      ohc_ibi_int:
+        units: Jm-2
+        long_name: Integral wrt depth of sea water temperature expressed as heat content
+      ohc_ibi_myp:
+        units: Jm-2
+        long_name: Integral wrt depth of sea water temperature expressed as heat content
+      ohc_mean:
+        units: Jm-2
+        long_name: Integral wrt depth of sea water temperature expressed as heat content
+      ohc_std:
+        units: Jm-2
+        long_name: Integral wrt depth of sea water temperature expressed as heat content
+
+  omi_climate_ohc_medsea_area_averaged_anomalies:
+    product: OMI_CLIMATE_OHC_MEDSEA_area_averaged_anomalies
+    title: Area Averaged Ocean Heat Content Anomaly (0-700m)
+    cadence: irregular
+    domain: indicator
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      ohc_armor:
+        units: J m-2
+        long_name: Integral wrt depth of sea water temperature expressed as heat content
+      ohc_cglo:
+        units: J m-2
+        long_name: Integral wrt depth of sea water potential temperature expressed as heat content
+      ohc_cora:
+        units: J m-2
+        long_name: Integral wrt depth of sea water temperature expressed as heat content
+      ohc_glor:
+        units: J m-2
+        long_name: Integral wrt depth of sea water potential temperature expressed as heat content
+      ohc_mean:
+        units: J m-2
+        long_name: Integral wrt depth of sea water potential temperature expressed as heat content
+      ohc_med:
+        units: J m-2
+        long_name: Integral wrt depth of sea water potential temperature expressed as heat content
+      ohc_oras:
+        units: J m-2
+        long_name: Integral wrt depth of sea water potential temperature expressed as heat content
+      ohc_std:
+        units: J m-2
+        long_name: Integral wrt depth of sea water potential temperature expressed as heat content
+
+  omi_climate_osc_medsea_volume_mean:
+    product: OMI_CLIMATE_OSC_MEDSEA_volume_mean
+    title: Volume Mean Salt Content (0-300m)
+    cadence: irregular
+    domain: indicator
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      osc_armor:
+        units: PSU
+        long_name: Integral wrt depth of sea water salinity expressed as salt content
+      osc_cglo:
+        units: PSU
+        long_name: Integral wrt depth of sea water salinity expressed as salt content
+      osc_cora:
+        units: PSU
+        long_name: Integral wrt depth of sea water salinity expressed as salt content
+      osc_glor:
+        units: PSU
+        long_name: Integral wrt depth of sea water salinity expressed as salt content
+      osc_mean:
+        units: PSU
+        long_name: Integral wrt depth of sea water salinity expressed as salt content
+      osc_med:
+        units: PSU
+        long_name: Integral wrt depth of sea water salinity expressed as salt content
+      osc_oras:
+        units: PSU
+        long_name: Integral wrt depth of sea water salinity expressed as salt content
+      osc_std:
+        units: PSU
+        long_name: Integral wrt depth of sea water salinity expressed as salt content
+
+  omi_climate_si_arctic_transport:
+    product: OMI_CLIMATE_SI_ARCTIC_transport
+    title: Sea Ice area/volume transport in the Nordic Seas
+    cadence: irregular
+    domain: indicator
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      SI_AT_BSE_Reanalysis:
+        units: km2
+        long_name: Sea ice transport across line
+      SI_AT_BSN_Reanalysis:
+        units: km2
+        long_name: Sea ice transport across line
+      SI_AT_FS_Reanalysis:
+        units: km2
+        long_name: Sea ice transport across line
+      SI_VT_BSE_Reanalysis:
+        units: km3
+        long_name: Sea ice transport across line
+      SI_VT_BSN_Reanalysis:
+        units: km3
+        long_name: Sea ice transport across line
+      SI_VT_FS_Reanalysis:
+        units: km3
+        long_name: Sea ice transport across line
+
+  omi_climate_si_baltic_extent:
+    product: OMI_CLIMATE_SI_BALTIC_extent
+    title: Baltic Sea Sea Ice Extent
+    cadence: irregular
+    domain: indicator
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      siextentn:
+        units: 10³ km²
+        long_name: Sea ice extent
+
+  omi_climate_si_baltic_extent_yday:
+    product: OMI_CLIMATE_SI_BALTIC_extent
+    title: Baltic Sea Ice Extent from Observations Reprocessing
+    cadence: irregular
+    domain: indicator
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      siextentn_yday_2024:
+        units: 10³ km²
+        long_name: Sea ice extent
+      siextentn_yday_mean:
+        units: 10³ km²
+        long_name: Sea ice extent
+      siextentn_yday_std:
+        units: 10³ km²
+        long_name: Sea ice extent
+
+  omi_climate_si_baltic_volume:
+    product: OMI_CLIMATE_SI_BALTIC_volume
+    title: Baltic Sea Sea Ice Volume
+    cadence: irregular
+    domain: indicator
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      sivoln:
+        units: km³
+        long_name: Sea ice volume
+
+  omi_climate_si_baltic_volume_yday:
+    product: OMI_CLIMATE_SI_BALTIC_volume
+    title: Baltic Sea Ice Volume from Observations Reprocessing
+    cadence: irregular
+    domain: indicator
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      sivoln_yday_2024:
+        units: km³
+        long_name: Sea ice volume
+      sivoln_yday_mean:
+        units: km³
+        long_name: Sea ice volume
+      sivoln_yday_std:
+        units: km³
+        long_name: Sea ice volume
+
+  omi_climate_sl_baltic_area_averaged_anomalies:
+    product: OMI_CLIMATE_SL_BALTIC_area_averaged_anomalies
+    title: Baltic Sea area Averaged Mean Sea Level from DUACS DT2024
+    cadence: irregular
+    domain: indicator
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      MSL_filtered_GIA_corrected_adjusted:
+        units: cm
+        long_name: Sea surface height above sea level
+      trend_MSL_filtered_GIA_corrected_adjusted:
+        units: ''
+        long_name: Sea surface height above sea level
+
+  omi_climate_sl_blksea_area_averaged_anomalies:
+    product: OMI_CLIMATE_SL_BLKSEA_area_averaged_anomalies
+    title: Black Sea area Averaged Mean Sea Level from DUACS DT2024
+    cadence: irregular
+    domain: indicator
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      MSL_filtered_GIA_corrected_adjusted:
+        units: cm
+        long_name: Sea surface height above sea level
+      trend_MSL_filtered_GIA_corrected_adjusted:
+        units: ''
+        long_name: Sea surface height above sea level
+
+  omi_climate_sl_europe_area_averaged_anomalies:
+    product: OMI_CLIMATE_SL_EUROPE_area_averaged_anomalies
+    title: Northeast Atlantic Ocean and adjacent seas area Averaged Mean Sea Level from DUACS
+    cadence: irregular
+    domain: indicator
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      MSL_filtered_GIA_corrected_adjusted:
+        units: cm
+        long_name: Sea surface height above sea level
+      trend_MSL_filtered_GIA_corrected_adjusted:
+        units: ''
+        long_name: Sea surface height above sea level
+
+  omi_climate_sl_global_area_averaged_anomalies:
+    product: OMI_CLIMATE_SL_GLOBAL_area_averaged_anomalies
+    title: Global Ocean area Averaged Mean Sea Level from DUACS DT2024
+    cadence: irregular
+    domain: indicator
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      MSL_filtered_GIA_corrected_adjusted:
+        units: cm
+        long_name: Sea surface height above sea level
+      trend_MSL_filtered_GIA_corrected_adjusted:
+        units: ''
+        long_name: Sea surface height above sea level
+      uncertainty_envelop:
+        units: cm
+        long_name: Sea surface height above sea level standard error
+
+  omi_climate_sl_global_regional_trends:
+    product: OMI_CLIMATE_SL_GLOBAL_regional_trends
+    title: Map of Sea Level Trends from DUACS DT2024
+    cadence: irregular
+    domain: indicator
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      acceleration:
+        units: mm/year2
+        long_name: Acceleration of sea surface height above sea level
+      trend_GIA_corrected:
+        units: mm/year
+        long_name: Tendency of sea surface height above sea level
+
+  omi_climate_sl_ibi_area_averaged_anomalies:
+    product: OMI_CLIMATE_SL_IBI_area_averaged_anomalies
+    title: Ireland Biscay Iberia area Averaged Mean Sea Level from DUACS DT2024
+    cadence: irregular
+    domain: indicator
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      MSL_filtered_GIA_corrected_adjusted:
+        units: cm
+        long_name: Sea surface height above sea level
+      trend_MSL_filtered_GIA_corrected_adjusted:
+        units: ''
+        long_name: Sea surface height above sea level
+
+  omi_climate_sl_medsea_area_averaged_anomalies:
+    product: OMI_CLIMATE_SL_MEDSEA_area_averaged_anomalies
+    title: Mediterranean Sea area Averaged Mean Sea Level from DUACS DT2024
+    cadence: irregular
+    domain: indicator
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      MSL_filtered_GIA_corrected_adjusted:
+        units: cm
+        long_name: Sea surface height above sea level
+      trend_MSL_filtered_GIA_corrected_adjusted:
+        units: ''
+        long_name: Sea surface height above sea level
+
+  omi_climate_sl_northwestshelf_area_averaged_anomalies:
+    product: OMI_CLIMATE_SL_NORTHWESTSHELF_area_averaged_anomalies
+    title: North West Shelf area Averaged Mean Sea Level from DUACS DT2024
+    cadence: irregular
+    domain: indicator
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      MSL_filtered_GIA_corrected_adjusted:
+        units: cm
+        long_name: Sea surface height above sea level
+      trend_MSL_filtered_GIA_corrected_adjusted:
+        units: ''
+        long_name: Sea surface height above sea level
+
+  omi_climate_sst_bal_area_averaged_anomalies:
+    product: OMI_CLIMATE_SST_BAL_area_averaged_anomalies
+    title: Area Averaged Sea Surface Temperature Anomalies
+    cadence: irregular
+    domain: indicator
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      sst_anomaly:
+        units: K
+        long_name: Sea surface foundation temperature
+
+  omi_climate_sst_bal_trend:
+    product: OMI_CLIMATE_SST_BAL_trend
+    title: Cumulative Sea Surface Temperature Anomaly Trend for Baltic Sea
+    cadence: irregular
+    domain: indicator
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      sst_trend:
+        units: K
+        long_name: Change over time in sea water temperature
+
+  omi_climate_sst_ibi_area_averaged_anomalies:
+    product: OMI_CLIMATE_SST_IBI_area_averaged_anomalies
+    title: OMI monthly mean SST anomaly for Iberia Biscay Irish areas - SST Analysis
+    cadence: irregular
+    domain: indicator
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      sst_anomaly:
+        units: kelvin
+        long_name: Sea surface foundation temperature
+      sst_anomaly_filtered:
+        units: kelvin
+        long_name: Sea surface foundation temperature
+      sst_error:
+        units: kelvin
+        long_name: Sea surface temperature error
+
+  omi_climate_sst_ibi_trend:
+    product: OMI_CLIMATE_SST_IBI_trend
+    title: OMI  SST trends for Iberia Biscay Irish Seas - SST Analysis
+    cadence: irregular
+    domain: indicator
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      sst_trend:
+        units: kelvin/year
+        long_name: Change over time in sea surface temperature
+
+  omi_climate_sst_ist_arctic_anomaly:
+    product: OMI_CLIMATE_SST_IST_ARCTIC_anomaly
+    title: Cumulative Surface Temperature Anomaly for Arctic Sea
+    cadence: irregular
+    domain: indicator
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      st_anomaly:
+        units: K
+        long_name: Change over time in surface temperature
+
+  omi_climate_sst_ist_arctic_area_averaged_anomalies:
+    product: OMI_CLIMATE_SST_IST_ARCTIC_area_averaged_anomalies
+    title: Area Averaged Sea Surface Temperature Anomalies
+    cadence: irregular
+    domain: indicator
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      sst_anomaly:
+        units: K
+        long_name: Sea surface foundation temperature
+
+  omi_climate_sst_ist_arctic_trend:
+    product: OMI_CLIMATE_SST_IST_ARCTIC_trend
+    title: Cumulative Surface Temperature Anomaly Trend for Arctic Sea
+    cadence: irregular
+    domain: indicator
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      st_trend:
+        units: K
+        long_name: Change over time in surface temperature
+
+  omi_climate_sst_northwestshelf_area_averaged_anomalies:
+    product: OMI_CLIMATE_SST_NORTHWESTSHELF_area_averaged_anomalies
+    title: OMI monthly mean SST anomaly for European North West Shelf  - SST Analysis
+    cadence: irregular
+    domain: indicator
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      sst_anomaly:
+        units: kelvin
+        long_name: Sea surface foundation temperature
+      sst_anomaly_filtered:
+        units: kelvin
+        long_name: Sea surface foundation temperature
+      sst_error:
+        units: kelvin
+        long_name: Sea surface temperature error
+
+  omi_climate_sst_northwestshelf_trend:
+    product: OMI_CLIMATE_SST_NORTHWESTSHELF_trend
+    title: OMI  SST trends for European North West Shelf areas - SST Analysis
+    cadence: irregular
+    domain: indicator
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      sst_trend:
+        units: kelvin/year
+        long_name: Change over time in sea surface temperature
+
+  omi_climate_tempsal_baltic_stz_trend:
+    product: OMI_CLIMATE_TEMPSAL_BALTIC_Stz_trend
+    title: Baltic Sea Subsurface salinity trend
+    cadence: irregular
+    domain: indicator
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      so_trend:
+        units: 1e-3 year-1
+        long_name: Tendency of sea water salinity
+      so_trend_lower95p:
+        units: 1e-3 year-1
+        long_name: Tendency of sea water salinity
+      so_trend_upper95p:
+        units: 1e-3 year-1
+        long_name: Tendency of sea water salinity
+
+  omi_climate_tempsal_baltic_ttz_trend:
+    product: OMI_CLIMATE_TEMPSAL_BALTIC_Ttz_trend
+    title: Baltic Sea Subsurface temperature trend
+    cadence: irregular
+    domain: indicator
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      thetao_trend:
+        units: degree_C year-1
+        long_name: Tendency of sea water potential temperature
+      thetao_trend_lower95p:
+        units: degree_C year-1
+        long_name: Tendency of sea water potential temperature
+      thetao_trend_upper95p:
+        units: degree_C year-1
+        long_name: Tendency of sea water potential temperature
+
+  omi_climate_tempsal_ibi_extreme_var_mean_and_anomaly:
+    product: OMI_CLIMATE_TEMPSAL_IBI_extreme_var_mean_and_anomaly
+    title: Extremes variability in European Seas
+    cadence: irregular
+    domain: indicator
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      temp_percentile99_anom:
+        units: degree_C
+        long_name: Sea water temperature
+      temp_percentile99_mean:
+        units: degree_C
+        long_name: Sea water temperature
+
+  omi_climate_thsl_global_area_averaged_anomalies_0_2000:
+    product: OMI_CLIMATE_THSL_GLOBAL_area_averaged_anomalies_0_2000
+    title: Area Averaged Ocean Thermosteric Component
+    cadence: irregular
+    domain: indicator
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      thsl_armor:
+        units: m
+        long_name: Thermosteric change in mean sea level
+      thsl_bretherton:
+        units: m
+        long_name: Thermosteric change in mean sea level
+      thsl_bretherton_error:
+        units: ''
+        long_name: ''            # TODO: standard_name missing on describe()
+      thsl_cglo:
+        units: m
+        long_name: Thermosteric change in mean sea level
+      thsl_cora:
+        units: m
+        long_name: Thermosteric change in mean sea level
+      thsl_glor:
+        units: m
+        long_name: Thermosteric change in mean sea level
+      thsl_mean_observations:
+        units: m
+        long_name: Thermosteric change in mean sea level
+      thsl_mean_reanalysis:
+        units: m
+        long_name: Thermosteric change in mean sea level
+      thsl_oras:
+        units: m
+        long_name: Thermosteric change in mean sea level
+      thsl_std_observations:
+        units: m
+        long_name: Thermosteric change in mean sea level
+      thsl_std_reanalysis:
+        units: m
+        long_name: Thermosteric change in mean sea level
+
+  omi_climate_thsl_global_area_averaged_anomalies_0_700:
+    product: OMI_CLIMATE_THSL_GLOBAL_area_averaged_anomalies_0_700
+    title: Area Averaged Ocean Thermosteric Component
+    cadence: irregular
+    domain: indicator
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      thsl_armor:
+        units: m
+        long_name: Thermosteric change in mean sea level
+      thsl_bretherton:
+        units: m
+        long_name: Thermosteric change in mean sea level
+      thsl_bretherton_error:
+        units: ''
+        long_name: ''            # TODO: standard_name missing on describe()
+      thsl_cglo:
+        units: m
+        long_name: Thermosteric change in mean sea level
+      thsl_cora:
+        units: m
+        long_name: Thermosteric change in mean sea level
+      thsl_glor:
+        units: m
+        long_name: Thermosteric change in mean sea level
+      thsl_mean_observations:
+        units: m
+        long_name: Thermosteric change in mean sea level
+      thsl_mean_reanalysis:
+        units: m
+        long_name: Thermosteric change in mean sea level
+      thsl_oras:
+        units: m
+        long_name: Thermosteric change in mean sea level
+      thsl_std_observations:
+        units: m
+        long_name: Thermosteric change in mean sea level
+      thsl_std_reanalysis:
+        units: m
+        long_name: Thermosteric change in mean sea level
+
+  omi_climate_thsl_global_trend:
+    product: OMI_CLIMATE_THSL_GLOBAL_trend
+    title: Thermosteric Sea Level Trend (0-2000m)
+    cadence: irregular
+    domain: indicator
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      thsl_armor:
+        units: mm/year
+        long_name: Tendency of thermosteric change in mean sea level
+      thsl_cglo:
+        units: mm/year
+        long_name: Tendency of thermosteric change in mean sea level
+      thsl_cora:
+        units: mm/year
+        long_name: Tendency of thermosteric change in mean sea level
+      thsl_glor:
+        units: mm/year
+        long_name: Tendency of thermosteric change in mean sea level
+      thsl_mean:
+        units: mm/year
+        long_name: Tendency of thermosteric change in mean sea level
+      thsl_oras:
+        units: mm/year
+        long_name: Tendency of thermosteric change in mean sea level
+      thsl_std:
+        units: mm/year
+        long_name: Tendency of thermosteric change in mean sea level
+
+  omi_extreme_climvar_pacific_npgo_sla_eof_mode_projection:
+    product: OMI_EXTREME_CLIMVAR_PACIFIC_npgo_sla_eof_mode_projection
+    title: North Pacific Gyre Oscillation index
+    cadence: irregular
+    domain: indicator
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      npgo:
+        units: ''
+        long_name: Tendency of sea surface height above mean sea level
+
+  omi_extreme_sl_baltic_slev_mean_and_anomaly_obs:
+    product: OMI_EXTREME_SL_BALTIC_slev_mean_and_anomaly_obs
+    title: Baltic Sea sea level extreme variability mean and anomaly (observations)
+    cadence: irregular
+    domain: indicator
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      slev_percentile1_2023:
+        units: m
+        long_name: Water surface height above reference datum
+      slev_percentile1_anomaly:
+        units: m
+        long_name: Water surface height above reference datum
+      slev_percentile1_mean:
+        units: m
+        long_name: Water surface height above reference datum
+      slev_percentile1_std:
+        units: m
+        long_name: Water surface height above reference datum
+      slev_percentile99_2023:
+        units: m
+        long_name: Water surface height above reference datum
+      slev_percentile99_anomaly:
+        units: m
+        long_name: Water surface height above reference datum
+      slev_percentile99_mean:
+        units: m
+        long_name: Water surface height above reference datum
+      slev_percentile99_std:
+        units: m
+        long_name: Water surface height above reference datum
+
+  omi_extreme_sl_ibi_slev_mean_and_anomaly_obs:
+    product: OMI_EXTREME_SL_IBI_slev_mean_and_anomaly_obs
+    title: Iberia Biscay Ireland sea level extreme variability mean and anomaly (observations)
+    cadence: irregular
+    domain: indicator
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      slev_percentile1_2023:
+        units: m
+        long_name: Water surface height above reference datum
+      slev_percentile1_anomaly:
+        units: m
+        long_name: Water surface height above reference datum
+      slev_percentile1_mean:
+        units: m
+        long_name: Water surface height above reference datum
+      slev_percentile1_std:
+        units: m
+        long_name: Water surface height above reference datum
+      slev_percentile99_2023:
+        units: m
+        long_name: Water surface height above reference datum
+      slev_percentile99_anomaly:
+        units: m
+        long_name: Water surface height above reference datum
+      slev_percentile99_mean:
+        units: m
+        long_name: Water surface height above reference datum
+      slev_percentile99_std:
+        units: m
+        long_name: Water surface height above reference datum
+
+  omi_extreme_sl_medsea_slev_mean_and_anomaly_obs:
+    product: OMI_EXTREME_SL_MEDSEA_slev_mean_and_anomaly_obs
+    title: Mediterranean Sea sea level extreme variability mean and anomaly (observations)
+    cadence: irregular
+    domain: indicator
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      slev_percentile1_2023:
+        units: m
+        long_name: Water surface height above reference datum
+      slev_percentile1_anomaly:
+        units: m
+        long_name: Water surface height above reference datum
+      slev_percentile1_mean:
+        units: m
+        long_name: Water surface height above reference datum
+      slev_percentile1_std:
+        units: m
+        long_name: Water surface height above reference datum
+      slev_percentile99_2023:
+        units: m
+        long_name: Water surface height above reference datum
+      slev_percentile99_anomaly:
+        units: m
+        long_name: Water surface height above reference datum
+      slev_percentile99_mean:
+        units: m
+        long_name: Water surface height above reference datum
+      slev_percentile99_std:
+        units: m
+        long_name: Water surface height above reference datum
+
+  omi_extreme_sl_northwestshelf_slev_mean_and_anomaly_obs:
+    product: OMI_EXTREME_SL_NORTHWESTSHELF_slev_mean_and_anomaly_obs
+    title: North West Shelf sea level extreme variability mean and anomaly (observations)
+    cadence: irregular
+    domain: indicator
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      slev_percentile1_2023:
+        units: m
+        long_name: Water surface height above reference datum
+      slev_percentile1_anomaly:
+        units: m
+        long_name: Water surface height above reference datum
+      slev_percentile1_mean:
+        units: m
+        long_name: Water surface height above reference datum
+      slev_percentile1_std:
+        units: m
+        long_name: Water surface height above reference datum
+      slev_percentile99_2023:
+        units: m
+        long_name: Water surface height above reference datum
+      slev_percentile99_anomaly:
+        units: m
+        long_name: Water surface height above reference datum
+      slev_percentile99_mean:
+        units: m
+        long_name: Water surface height above reference datum
+      slev_percentile99_std:
+        units: m
+        long_name: Water surface height above reference datum
+
+  omi_extreme_sst_baltic_sst_mean_and_anomaly_obs:
+    product: OMI_EXTREME_SST_BALTIC_sst_mean_and_anomaly_obs
+    title: Baltic Sea sea surface temperature extreme variability mean and anomaly (observations)
+    cadence: irregular
+    domain: indicator
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      sst_percentile1_2023:
+        units: degree_C
+        long_name: Sea surface temperature
+      sst_percentile1_anomaly:
+        units: degree_C
+        long_name: Sea surface temperature
+      sst_percentile1_mean:
+        units: degree_C
+        long_name: Sea surface temperature
+      sst_percentile1_std:
+        units: degree_C
+        long_name: Sea surface temperature
+      sst_percentile99_2023:
+        units: degree_C
+        long_name: Sea surface temperature
+      sst_percentile99_anomaly:
+        units: degree_C
+        long_name: Sea surface temperature
+      sst_percentile99_mean:
+        units: degree_C
+        long_name: Sea surface temperature
+      sst_percentile99_std:
+        units: degree_C
+        long_name: Sea surface temperature
+
+  omi_extreme_sst_ibi_sst_mean_and_anomaly_obs:
+    product: OMI_EXTREME_SST_IBI_sst_mean_and_anomaly_obs
+    title: Iberia Biscay Ireland sea surface temperature extreme variability mean and anomaly
+    cadence: irregular
+    domain: indicator
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      sst_percentile1_2023:
+        units: degree_C
+        long_name: Sea surface temperature
+      sst_percentile1_anomaly:
+        units: degree_C
+        long_name: Sea surface temperature
+      sst_percentile1_mean:
+        units: degree_C
+        long_name: Sea surface temperature
+      sst_percentile1_std:
+        units: degree_C
+        long_name: Sea surface temperature
+      sst_percentile99_2023:
+        units: degree_C
+        long_name: Sea surface temperature
+      sst_percentile99_anomaly:
+        units: degree_C
+        long_name: Sea surface temperature
+      sst_percentile99_mean:
+        units: degree_C
+        long_name: Sea surface temperature
+      sst_percentile99_std:
+        units: degree_C
+        long_name: Sea surface temperature
+
+  omi_extreme_sst_medsea_sst_mean_and_anomaly_obs:
+    product: OMI_EXTREME_SST_MEDSEA_sst_mean_and_anomaly_obs
+    title: Mediterranean Sea sea surface temperature extreme variability mean and anomaly (observations)
+    cadence: irregular
+    domain: indicator
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      sst_percentile1_2023:
+        units: degree_C
+        long_name: Sea surface temperature
+      sst_percentile1_anomaly:
+        units: degree_C
+        long_name: Sea surface temperature
+      sst_percentile1_mean:
+        units: degree_C
+        long_name: Sea surface temperature
+      sst_percentile1_std:
+        units: degree_C
+        long_name: Sea surface temperature
+      sst_percentile99_2023:
+        units: degree_C
+        long_name: Sea surface temperature
+      sst_percentile99_anomaly:
+        units: degree_C
+        long_name: Sea surface temperature
+      sst_percentile99_mean:
+        units: degree_C
+        long_name: Sea surface temperature
+      sst_percentile99_std:
+        units: degree_C
+        long_name: Sea surface temperature
+
+  omi_extreme_sst_northwestshelf_sst_mean_and_anomaly_obs:
+    product: OMI_EXTREME_SST_NORTHWESTSHELF_sst_mean_and_anomaly_obs
+    title: North West Shelf sea surface temperature extreme variability mean and anomaly (observations)
+    cadence: irregular
+    domain: indicator
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      sst_percentile1_2023:
+        units: degree_C
+        long_name: Sea surface temperature
+      sst_percentile1_anomaly:
+        units: degree_C
+        long_name: Sea surface temperature
+      sst_percentile1_mean:
+        units: degree_C
+        long_name: Sea surface temperature
+      sst_percentile1_std:
+        units: degree_C
+        long_name: Sea surface temperature
+      sst_percentile99_2023:
+        units: degree_C
+        long_name: Sea surface temperature
+      sst_percentile99_anomaly:
+        units: degree_C
+        long_name: Sea surface temperature
+      sst_percentile99_mean:
+        units: degree_C
+        long_name: Sea surface temperature
+      sst_percentile99_std:
+        units: degree_C
+        long_name: Sea surface temperature
+
+  omi_extreme_state_global_trend_area_averaged_mean_and_extreme:
+    product: OMI_EXTREME_STATE_GLOBAL_trend
+    title: Global Ocean, extreme and mean significant wave height trends from satellite observations
+    cadence: irregular
+    domain: indicator
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      vavh_seasonal_mean:
+        units: m
+        long_name: Sea surface wave significant height seasonal mean
+      vavh_seasonal_mean_uncertainty_max:
+        units: m
+        long_name: Sea surface significant wave height mean uncertainty maximal bound
+      vavh_seasonal_mean_uncertainty_min:
+        units: m
+        long_name: Sea surface significant wave height mean uncertainty minimal bound
+      vavh_seasonal_nbr:
+        units: '-'
+        long_name: Sea surface significant height seasonal number of observations
+      vavh_seasonal_q95:
+        units: m
+        long_name: Sea surface wave significant height seasonal 95percentile
+      vavh_seasonal_q95_uncertainty_max:
+        units: m
+        long_name: Sea surface significant wave height 95percentile uncertainty maximal bound
+      vavh_seasonal_q95_uncertainty_min:
+        units: m
+        long_name: Sea surface significant wave height 95percentile uncertainty minimal bound
+      vavh_trend_mean:
+        units: cm/y
+        long_name: Sea surface wave significant height mean trend
+      vavh_trend_mean_uncertainty:
+        units: cm/y
+        long_name: Sea surface significant height trend uncertainty mean
+      vavh_trend_q95:
+        units: cm/y
+        long_name: Sea surface wave significant height 95percentile trend
+      vavh_trend_q95_uncertainty:
+        units: cm/y
+        long_name: Sea surface significant height trend uncertainty 95percentile
+
+  omi_extreme_state_global_trend_mean_and_extreme:
+    product: OMI_EXTREME_STATE_GLOBAL_trend
+    title: Global Ocean, extreme and mean significant wave height trends from satellite observations
+    cadence: irregular
+    domain: indicator
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      vavh_trend_seasonal_mean_global:
+        units: cm/y
+        long_name: Sea surface significant wave height seasonal mean trend
+      vavh_trend_seasonal_q95_global:
+        units: cm/y
+        long_name: Sea surface significant wave height seasonal 95percentile trend
+      vavh_trend_seasonal_uncertainty_mean_global:
+        units: '-'
+        long_name: Sea surface significant wave height seasonal mean trend pvalue
+      vavh_trend_seasonal_uncertainty_q95_global:
+        units: '-'
+        long_name: Sea surface significant wave height seasonal 95percentile trend pvalue
+
+  omi_extreme_wave_baltic_swh_mean_and_anomaly_obs:
+    product: OMI_EXTREME_WAVE_BALTIC_swh_mean_and_anomaly_obs
+    title: Baltic Sea significant wave height extreme variability mean and anomaly (observations)
+    cadence: irregular
+    domain: indicator
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      swh_percentile1_2023:
+        units: m
+        long_name: Sea surface wave significant height
+      swh_percentile1_anomaly:
+        units: m
+        long_name: Sea surface wave significant height
+      swh_percentile1_mean:
+        units: m
+        long_name: Sea surface wave significant height
+      swh_percentile1_std:
+        units: m
+        long_name: Sea surface wave significant height
+      swh_percentile99_2023:
+        units: m
+        long_name: Sea surface wave significant height
+      swh_percentile99_anomaly:
+        units: m
+        long_name: Sea surface wave significant height
+      swh_percentile99_mean:
+        units: m
+        long_name: Sea surface wave significant height
+      swh_percentile99_std:
+        units: m
+        long_name: Sea surface wave significant height
+
+  omi_extreme_wave_blksea_recent_changes:
+    product: OMI_EXTREME_WAVE_BLKSEA_recent_changes
+    title: Recent Changes of the Black Sea Extreme Wave Events
+    cadence: irregular
+    domain: indicator
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      NR_anom_2023:
+        units: N
+        long_name: 2023 anomaly of yearly mean number of wave storm events
+      NR_y_avg:
+        units: N
+        long_name: Yearly mean number of wave storm events
+      NR_y_trend:
+        units: N y^-1
+        long_name: Yearly trend of mean number of wave storm events
+
+  omi_extreme_wave_blksea_wave_power:
+    product: OMI_EXTREME_WAVE_BLKSEA_wave_power
+    title: Recent Changes of the Black Sea Wave Power
+    cadence: irregular
+    domain: indicator
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      P_anom_2023:
+        units: kW m^-1
+        long_name: 2023 anomaly of yearly average of 99th percentile of wave power
+      P_y_avg:
+        units: kW m^-1
+        long_name: Yearly average of 99th percentile of wave power
+      P_y_trend:
+        units: W m^-1 y^-1
+        long_name: Yearly trend of 99th percentile of wave power
+
+  omi_extreme_wave_ibi_swh_mean_and_anomaly_obs:
+    product: OMI_EXTREME_WAVE_IBI_swh_mean_and_anomaly_obs
+    title: Iberia Biscay Ireland significant wave height extreme variability mean and anomaly
+    cadence: irregular
+    domain: indicator
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      swh_percentile1_2023:
+        units: m
+        long_name: Sea surface wave significant height
+      swh_percentile1_anomaly:
+        units: m
+        long_name: Sea surface wave significant height
+      swh_percentile1_mean:
+        units: m
+        long_name: Sea surface wave significant height
+      swh_percentile1_std:
+        units: m
+        long_name: Sea surface wave significant height
+      swh_percentile99_2023:
+        units: m
+        long_name: Sea surface wave significant height
+      swh_percentile99_anomaly:
+        units: m
+        long_name: Sea surface wave significant height
+      swh_percentile99_mean:
+        units: m
+        long_name: Sea surface wave significant height
+      swh_percentile99_std:
+        units: m
+        long_name: Sea surface wave significant height
+
+  omi_extreme_wave_medsea_swh_mean_and_anomaly_obs:
+    product: OMI_EXTREME_WAVE_MEDSEA_swh_mean_and_anomaly_obs
+    title: Mediterranean Sea significant wave height extreme variability mean and anomaly (observations)
+    cadence: irregular
+    domain: indicator
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      swh_percentile1_2023:
+        units: m
+        long_name: Sea surface wave significant height
+      swh_percentile1_anomaly:
+        units: m
+        long_name: Sea surface wave significant height
+      swh_percentile1_mean:
+        units: m
+        long_name: Sea surface wave significant height
+      swh_percentile1_std:
+        units: m
+        long_name: Sea surface wave significant height
+      swh_percentile99_2023:
+        units: m
+        long_name: Sea surface wave significant height
+      swh_percentile99_anomaly:
+        units: m
+        long_name: Sea surface wave significant height
+      swh_percentile99_mean:
+        units: m
+        long_name: Sea surface wave significant height
+      swh_percentile99_std:
+        units: m
+        long_name: Sea surface wave significant height
+
+  omi_extreme_wave_northwestshelf_swh_mean_and_anomaly_obs:
+    product: OMI_EXTREME_WAVE_NORTHWESTSHELF_swh_mean_and_anomaly_obs
+    title: North West Shelf significant wave height extreme variability mean and anomaly (observations)
+    cadence: irregular
+    domain: indicator
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      swh_percentile1_2023:
+        units: m
+        long_name: Sea surface wave significant height
+      swh_percentile1_anomaly:
+        units: m
+        long_name: Sea surface wave significant height
+      swh_percentile1_mean:
+        units: m
+        long_name: Sea surface wave significant height
+      swh_percentile1_std:
+        units: m
+        long_name: Sea surface wave significant height
+      swh_percentile99_2023:
+        units: m
+        long_name: Sea surface wave significant height
+      swh_percentile99_anomaly:
+        units: m
+        long_name: Sea surface wave significant height
+      swh_percentile99_mean:
+        units: m
+        long_name: Sea surface wave significant height
+      swh_percentile99_std:
+        units: m
+        long_name: Sea surface wave significant height
+
+  omi_extreme_wmf_medsea_area_averaged_mean:
+    product: OMI_EXTREME_WMF_MEDSEA_area_averaged_mean
+    title: Mediterranean water mass formation rates
+    cadence: irregular
+    domain: indicator
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      CDW:
+        units: Sv (10^6 m3 s-1)
+        long_name: Water mass formation rate
+      CIW:
+        units: Sv (10^6 m3 s-1)
+        long_name: Water mass formation rate
+      EMDW:
+        units: Sv (10^6 m3 s-1)
+        long_name: Water mass formation rate
+      LDW:
+        units: Sv (10^6 m3 s-1)
+        long_name: Water mass formation rate
+      LIW:
+        units: Sv (10^6 m3 s-1)
+        long_name: Water mass formation rate
+      WMDW:
+        units: Sv (10^6 m3 s-1)
+        long_name: Water mass formation rate
+
+  omi_health_bloom_baltic_spatiotemporal_coverage:
+    product: OMI_HEALTH_BLOOM_BALTIC_spatiotemporal_coverage
+    title: Baltic Sea summer bloom coverage (1998-2024)
+    cadence: irregular
+    domain: indicator
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      CONCURRENT_CYANOBLOOM:
+        units: day·km2·10e6
+        long_name: ''            # TODO: standard_name missing on describe()
+      SUBSURFACE_CYANOBLOOM:
+        units: day·km2·10e6
+        long_name: ''            # TODO: standard_name missing on describe()
+      SURFACE_CYANOBLOOM:
+        units: day·km2·10e6
+        long_name: ''            # TODO: standard_name missing on describe()
+
+  omi_health_chl_atlantic_oceancolour_euIndex:
+    product: OMI_HEALTH_CHL_ATLANTIC_OCEANCOLOUR_eutrophication
+    title: Eutrophication indicator compared to the reference period
+    cadence: irregular
+    domain: indicator
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      eutrophication_indicator:
+        units: ''
+        long_name: Eutrophication indicator in period
+      oligotrophication_indicator:
+        units: ''
+        long_name: Oligotrophication indicator in period
+
+  omi_health_chl_baltic_oceancolour_area_averaged_mean:
+    product: OMI_HEALTH_CHL_BALTIC_OCEANCOLOUR_area_averaged_mean
+    title: Baltic Sea Chlorophyll-a time series
+    cadence: irregular
+    domain: indicator
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      chlor_a:
+        units: mg m^-3
+        long_name: Mass concentration of chlorophyll in sea water
+      chlor_deseasonalized:
+        units: mg m^-3
+        long_name: Mass concentration of chlorophyll in sea water
+
+  omi_health_chl_baltic_oceancolour_trend:
+    product: OMI_HEALTH_CHL_BALTIC_OCEANCOLOUR_trend
+    title: Baltic Sea Chlorophyll-a trend
+    cadence: irregular
+    domain: indicator
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      trend:
+        units: '% yr^-1'
+        long_name: Change in mass concentration of chlorophyll in seawater over time
+
+  omi_health_chl_blksea_oceancolour_area_averaged_mean:
+    product: OMI_HEALTH_CHL_BLKSEA_OCEANCOLOUR_area_averaged_mean
+    title: Black Sea Chlorophyll-a time series
+    cadence: irregular
+    domain: indicator
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      chlor_a:
+        units: mg m^-3
+        long_name: Mass concentration of chlorophyll in sea water
+      chlor_deseasonalized:
+        units: mg m^-3
+        long_name: Mass concentration of chlorophyll in sea water
+
+  omi_health_chl_blksea_oceancolour_trend:
+    product: OMI_HEALTH_CHL_BLKSEA_OCEANCOLOUR_trend
+    title: Black Sea Chlorophyll-a trend
+    cadence: irregular
+    domain: indicator
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      trend:
+        units: '% yr^-1'
+        long_name: Change in mass concentration of chlorophyll in seawater over time
+
+  omi_health_chl_global_oceancolour_trend:
+    product: OMI_HEALTH_CHL_GLOBAL_OCEANCOLOUR_trend
+    title: Global Ocean Chlorophyll-a trend
+    cadence: irregular
+    domain: indicator
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      trend:
+        units: '% yr^-1'
+        long_name: Change in mass concentration of chlorophyll in seawater over time
+
+  omi_health_chl_medsea_oceancolour_area_averaged_mean:
+    product: OMI_HEALTH_CHL_MEDSEA_OCEANCOLOUR_area_averaged_mean
+    title: Mediterranean Sea Chlorophyll-a time series
+    cadence: irregular
+    domain: indicator
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      chlor_a:
+        units: mg m^-3
+        long_name: Mass concentration of chlorophyll in sea water
+      chlor_deseasonalized:
+        units: mg m^-3
+        long_name: Mass concentration of chlorophyll in sea water
+
+  omi_health_chl_medsea_oceancolour_trend:
+    product: OMI_HEALTH_CHL_MEDSEA_OCEANCOLOUR_trend
+    title: Mediterranean Sea Chlorophyll-a trend
+    cadence: irregular
+    domain: indicator
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      trend:
+        units: '% yr^-1'
+        long_name: Change in mass concentration of chlorophyll in seawater over time
+
+  omi_health_tempsaloxy_baltic_cod_volume:
+    product: OMI_HEALTH_TEMPSALOXY_BALTIC_cod_volume
+    title: Baltic Sea Cod Reproductive Volume
+    cadence: irregular
+    domain: indicator
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      crv:
+        units: km3
+        long_name: Sea water volume
+
+  omi_health_tempsaloxy_baltic_mbi_bottom_salinity_arkona_bornholm:
+    product: OMI_HEALTH_TEMPSALOXY_BALTIC_mbi_bottom_salinity_arkona_bornholm
+    title: 'Baltic Sea Major Baltic Inflow: bottom salinity from Reanalysis'
+    cadence: irregular
+    domain: indicator
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      sob_ark:
+        units: '0.001'
+        long_name: Sea water salinity at sea floor
+      sob_bor:
+        units: '0.001'
+        long_name: Sea water salinity at sea floor
+
+  omi_health_tempsaloxy_baltic_mbi_sto2tz_gotland:
+    product: OMI_HEALTH_TEMPSALOXY_BALTIC_mbi_sto2tz_gotland
+    title: 'Baltic Sea Major Baltic Inflow: time/depth evolution S,T,O2 from Observations Reprocessing'
+    cadence: irregular
+    domain: indicator
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      oxy:
+        units: '0.001'
+        long_name: Volume fraction of oxygen in sea water
+      so:
+        units: '0.001'
+        long_name: Sea water salinity
+      to:
+        units: degree_C
+        long_name: Sea water temperature

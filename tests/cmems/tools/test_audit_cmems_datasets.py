@@ -22,8 +22,11 @@ def temp_catalog(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
     """Bundle a minimal 2-row catalog and point Catalog.load at it."""
     path = tmp_path / "cmems_data_catalog.yaml"
     path.write_text(
-        "available_products:\n"
-        "  - PROD_A\n"
+        "available_datasets:\n"
+        "  - ds-covered\n"
+        "  - ds-partial\n"
+        "  - ds-missing\n"
+        "  - ds-renamed-old\n"
         "datasets:\n"
         "  ds-covered:\n"
         "    product: PROD_A\n"

@@ -1,27 +1,33 @@
 """Variable-catalog loader for the Copernicus Marine backend.
 
-Hosts :class:`Catalog`, the pydantic-backed reader for
-`cmems_data_catalog.yaml`. Mirrors the shape of
-:mod:`earthlens.ecmwf.catalog` so the two backends feel identical to
-callers — a `(dataset_id, variable_short_name)` pair resolves to a
+Hosts :class:`Catalog`, the pydantic-backed reader for the bundled
+CMEMS catalog. Mirrors the shape of :mod:`earthlens.gee.catalog`: the
+catalog ships as a directory of per-domain YAML files at
+`src/earthlens/cmems/catalog/` (`global.yaml`, `mediterranean.yaml`,
+`black-sea.yaml`, `arctic.yaml`, …) plus a single `_index.yaml`
+carrying the merged `available_datasets:` list. Each per-domain file
+contributes its `datasets:` block; the loader unions them into one
+:class:`Catalog` at construction time, the same way
+:mod:`earthlens.gee.catalog` merges its per-category files.
+
+A `(dataset_id, variable_short_name)` pair resolves to a
 :class:`Variable` via :meth:`Catalog.get_variable`, and the full
 :class:`Dataset` shape (cadence, temporal coverage, domain) is
 available via :meth:`AbstractCatalog.get_dataset` /
 ``Catalog()["..."]``.
 
-The catalog is intentionally **curated, not exhaustive**: CMEMS
-hosts ~600 datasets across ~50 products and that index moves
-weekly. The bundled YAML covers the highest-leverage marine
-datasets (global physics + biogeochem, OSTIA SST, sea-level
-altimetry, sea ice, four regional reanalyses). Users who need a
-dataset outside the curated list can still call
-:meth:`CMEMS.download` with the dataset id directly — the catalog
-lookup is a metadata convenience, not a gate; the toolbox itself
-is the source of truth.
+`available_datasets:` is the informational index of every dataset id
+the toolbox publishes (~1,251 today, the full
+`copernicusmarine.describe()` walk); the curated `datasets:` map is a
+subset of it (those that carry downloadable variables). Every curated
+dataset id must appear in `available_datasets:` — the loader enforces
+this. Users who need a dataset outside the curated list can still
+call :meth:`CMEMS.download` with the id directly; the catalog lookup
+is a metadata convenience, not a gate.
 
-The path to the bundled YAML lives at :data:`CATALOG_PATH`; tests
-can monkey-patch that module attribute to redirect the loader at a
-temporary file.
+The path to the bundled catalog directory lives at
+:data:`CATALOG_PATH`; tests can monkey-patch that module attribute to
+redirect the loader at a temporary directory or single YAML file.
 """
 
 from __future__ import annotations
@@ -35,12 +41,13 @@ from pydantic import BaseModel, ConfigDict, Field, ValidationError, field_valida
 from earthlens.base import AbstractCatalog
 from earthlens.base.yaml_loader import load_yaml_strict
 
-CATALOG_PATH: Path = Path(__file__).parent / "cmems_data_catalog.yaml"
+CATALOG_PATH: Path = Path(__file__).parent / "catalog"
 
-# Module-level cache of parsed catalog data, keyed on
-# `(resolved_path, mtime_ns)` so any real file mutation invalidates
-# the entry naturally. Mirrors the ECMWF / GEE pattern.
-_CATALOG_CACHE: dict[tuple[str, int], tuple[list[str], dict[str, "Dataset"]]] = {}
+# Module-level cache of parsed catalog data, keyed on the resolved
+# path plus a tuple of `(file, mtime_ns)` for every YAML the load
+# touched, so editing any per-domain file invalidates the entry
+# without inspecting every row. Mirrors the GEE multi-file pattern.
+_CATALOG_CACHE: dict[Any, tuple[list[str], dict[str, "Dataset"]]] = {}
 
 CadenceLiteral = Literal[
     "hourly",
@@ -59,51 +66,106 @@ def clear_catalog_cache() -> None:
 
     Useful in tests that rewrite the catalog on disk and want to
     force a re-parse. Production callers do not need this — the
-    cache keys include `st_mtime_ns`, so any real file mutation
-    invalidates the entry on its own.
+    cache keys include every contributing file's `st_mtime_ns`, so
+    any real file mutation invalidates the entry on its own.
     """
     _CATALOG_CACHE.clear()
+
+
+def _yaml_files_for(path: Path) -> list[Path]:
+    """Return the sorted list of YAML files that contribute to a load.
+
+    `path` may point at either:
+
+    * a directory of per-domain `*.yaml` files (the default layout —
+      `src/earthlens/cmems/catalog/`, e.g. `global.yaml`,
+      `mediterranean.yaml`, plus `_index.yaml`); or
+    * a single `*.yaml` file (back-compat for tests that monkey-patch
+      `CATALOG_PATH` to a temp file, and for any caller still using a
+      monolithic `cmems_data_catalog.yaml`).
+
+    Args:
+        path: Catalog directory or single YAML file.
+
+    Returns:
+        Sorted list of YAML paths. For a directory, every `*.yaml`
+            sibling (including `_index.yaml`); for a file, just that
+            file.
+    """
+    if path.is_dir():
+        return sorted(path.glob("*.yaml"))
+    return [path]
 
 
 def _load_catalog_data(path: Path) -> tuple[list[str], dict[str, "Dataset"]]:
     """Parse, validate, and cache the CMEMS catalog at `path`.
 
-    Returns a `(available_products, datasets)` tuple of the same
-    shape :class:`Catalog` exposes. Cached on
-    `(resolved-path, mtime_ns)` so a second `Catalog()` on an
-    unchanged file skips both YAML parsing and pydantic validation.
+    Returns a `(available_datasets, datasets)` tuple of the same
+    shape :class:`Catalog` exposes. When `path` is a directory, every
+    `*.yaml` file is merged: `available_datasets:` lists are
+    concatenated and `datasets:` maps are unioned (a dataset id
+    declared in two files is an error). Cached on the resolved path
+    plus every contributing file's `mtime_ns`, so a second
+    `Catalog()` on an unchanged tree skips both YAML parsing and
+    pydantic validation.
+
+    Args:
+        path: Catalog directory (default
+            `src/earthlens/cmems/catalog/`) or a single `*.yaml`
+            file.
+
+    Returns:
+        Tuple of `(list[str], dict[str, Dataset])` — the merged
+            `available_datasets:` index and the curated `datasets:`
+            map.
 
     Raises:
-        ValueError: If the YAML is missing, has no `datasets:` block,
-            has no variables under any dataset, or declares the same
-            key twice anywhere.
+        ValueError: If no file has a `datasets:` block, a dataset is
+            declared in two files, a dataset has no `variables:`, a
+            variable fails validation, or a curated dataset id is
+            absent from `available_datasets:`.
     """
     resolved = str(path.resolve())
+    files = _yaml_files_for(path)
     try:
-        mtime_ns = path.stat().st_mtime_ns
+        mtime_tuple = tuple((str(f), f.stat().st_mtime_ns) for f in files)
     except FileNotFoundError:
-        mtime_ns = 0
-    key = (resolved, mtime_ns)
+        mtime_tuple = ((resolved, 0),)
+    key = (resolved, mtime_tuple)
     cached = _CATALOG_CACHE.get(key)
     if cached is not None:
         return cached
 
-    data = load_yaml_strict(path) or {}
-    datasets_yaml = data.get("datasets")
-    if not datasets_yaml:
+    merged_available: list[str] = []
+    merged_datasets_yaml: dict[str, Any] = {}
+    origin: dict[str, Path] = {}
+    for file_path in files:
+        data = load_yaml_strict(file_path) or {}
+        merged_available.extend(data.get("available_datasets") or [])
+        for ds_id, ds_body in (data.get("datasets") or {}).items():
+            if ds_id in merged_datasets_yaml:
+                raise ValueError(
+                    f"dataset {ds_id!r} declared in two catalog files: "
+                    f"{origin[ds_id]} and {file_path}"
+                )
+            merged_datasets_yaml[ds_id] = ds_body
+            origin[ds_id] = file_path
+
+    if not merged_datasets_yaml:
         raise ValueError(
             f"{path} is missing or has an empty 'datasets:' block. "
             "The catalog must contain at least one dataset with one "
-            "variable. See the schema header at the top of the file."
+            "variable."
         )
 
+    available = set(merged_available)
     structural: dict[str, Dataset] = {}
     total_vars = 0
-    for ds_id, ds_body in datasets_yaml.items():
+    for ds_id, ds_body in merged_datasets_yaml.items():
         variables_yaml = (ds_body or {}).get("variables") or {}
         if not variables_yaml:
             raise ValueError(
-                f"{path} dataset {ds_id!r} has no `variables:`. "
+                f"{origin[ds_id]} dataset {ds_id!r} has no `variables:`. "
                 "Every curated dataset must list at least one variable."
             )
         ds_vars: dict[str, Variable] = {}
@@ -113,8 +175,8 @@ def _load_catalog_data(path: Path) -> tuple[list[str], dict[str, "Dataset"]]:
                 ds_vars[var_name] = Variable(**payload)
             except ValidationError as exc:
                 raise ValueError(
-                    f"{path} dataset {ds_id!r} variable {var_name!r} "
-                    f"failed validation:\n{exc}"
+                    f"{origin[ds_id]} dataset {ds_id!r} variable "
+                    f"{var_name!r} failed validation:\n{exc}"
                 ) from exc
             total_vars += 1
         temporal_body = ds_body.get("temporal") or {}
@@ -132,8 +194,14 @@ def _load_catalog_data(path: Path) -> tuple[list[str], dict[str, "Dataset"]]:
             )
         except ValidationError as exc:
             raise ValueError(
-                f"{path} dataset {ds_id!r} failed validation:\n{exc}"
+                f"{origin[ds_id]} dataset {ds_id!r} failed validation:\n{exc}"
             ) from exc
+        if available and ds_id not in available:
+            raise ValueError(
+                f"dataset {ds_id!r} is in 'datasets:' but missing from "
+                f"'available_datasets:' ({origin[ds_id]}); add it to "
+                "_index.yaml too."
+            )
 
     if total_vars == 0:
         raise ValueError(
@@ -141,8 +209,7 @@ def _load_catalog_data(path: Path) -> tuple[list[str], dict[str, "Dataset"]]:
             "The catalog must contain at least one variable."
         )
 
-    available = list(data.get("available_products") or [])
-    _CATALOG_CACHE[key] = (available, structural)
+    _CATALOG_CACHE[key] = (merged_available, structural)
     return _CATALOG_CACHE[key]
 
 
@@ -254,9 +321,10 @@ class TemporalCoverage(BaseModel):
 class Dataset(BaseModel):
     """One curated CMEMS dataset row.
 
-    Mirrors a single `datasets.<dataset_id>:` block in
-    `cmems_data_catalog.yaml`. The dataset id itself is the parent
-    key in :attr:`Catalog.datasets` and is not stored on the row.
+    Mirrors a single `datasets.<dataset_id>:` block in one of the
+    per-domain `catalog/*.yaml` files. The dataset id itself is the
+    parent key in :attr:`Catalog.datasets` and is not stored on the
+    row.
 
     Attributes:
         product: Parent CMEMS product id (e.g.
@@ -306,8 +374,8 @@ class Dataset(BaseModel):
 class Catalog(AbstractCatalog):
     """Variable catalog for the Copernicus Marine backend.
 
-    Reads `cmems_data_catalog.yaml` (shipped as package data) and
-    exposes its consumed top-level sections as typed pydantic
+    Reads the bundled `catalog/` directory (shipped as package data)
+    and exposes its consumed top-level sections as typed pydantic
     fields. Instantiate with no arguments (`Catalog()`) —
     :func:`model_post_init` parses the YAML and populates every
     field in one pass.
@@ -318,10 +386,13 @@ class Catalog(AbstractCatalog):
     dataset id is part of the identity.
 
     Attributes:
-        available_products: Informational list of every CMEMS
-            product id worth knowing about. Mirrors the
-            `available_products:` block in the YAML; runtime code
-            does not consume it.
+        available_datasets: Informational list of every CMEMS dataset
+            id the toolbox publishes (the full
+            `copernicusmarine.describe()` index, including ids that
+            carry no downloadable variables). Mirrors the
+            `available_datasets:` block in `catalog/_index.yaml`;
+            every curated `datasets:` key is a member of this list.
+            Runtime code does not consume it.
         datasets: Structural map keyed by CMEMS dataset id. Each
             value is a :class:`Dataset` carrying that dataset's
             cadence / domain / temporal coverage / variables map.
@@ -351,16 +422,17 @@ class Catalog(AbstractCatalog):
 
     _catalog_kind: str = "CMEMS catalog"
 
-    available_products: list[str] = Field(default_factory=list)
+    available_datasets: list[str] = Field(default_factory=list)
     datasets: dict[str, Dataset] = Field(default_factory=dict)
 
     def model_post_init(self, __context: Any) -> None:
-        """Auto-load `cmems_data_catalog.yaml` when no datasets were supplied.
+        """Auto-load the bundled catalog when no datasets were supplied.
 
         `Catalog()` with no args is sugar for `Catalog.load()` — it
-        reads the bundled YAML through the `(path, mtime_ns)`-keyed
-        cache so repeated construction is ~1 ms. If the caller
-        passed `datasets=...`, the disk read is skipped.
+        reads the bundled `catalog/` directory through the
+        `(path, mtime)`-keyed cache so repeated construction is fast.
+        If the caller passed `datasets=...`, the disk read is
+        skipped.
 
         Raises:
             ValueError: When auto-loading, propagates the same
@@ -369,7 +441,7 @@ class Catalog(AbstractCatalog):
         if self.datasets:
             return
         loaded = Catalog.load()
-        self.available_products = loaded.available_products
+        self.available_datasets = loaded.available_datasets
         self.datasets = loaded.datasets
 
     @classmethod
@@ -377,8 +449,9 @@ class Catalog(AbstractCatalog):
         """Read the CMEMS catalog from disk (cached).
 
         Args:
-            catalog_path: Path to a `cmems_data_catalog.yaml`-shaped
-                file. Defaults to module-level :data:`CATALOG_PATH`.
+            catalog_path: Path to the `catalog/` directory or a
+                single `*.yaml` file. Defaults to module-level
+                :data:`CATALOG_PATH`.
 
         Returns:
             A fully-populated :class:`Catalog`.
@@ -387,9 +460,9 @@ class Catalog(AbstractCatalog):
             ValueError: Propagated from :func:`_load_catalog_data`.
         """
         catalog_path = catalog_path if catalog_path is not None else CATALOG_PATH
-        available_products, datasets = _load_catalog_data(catalog_path)
+        available_datasets, datasets = _load_catalog_data(catalog_path)
         return cls(
-            available_products=list(available_products),
+            available_datasets=list(available_datasets),
             datasets=dict(datasets),
         )
 

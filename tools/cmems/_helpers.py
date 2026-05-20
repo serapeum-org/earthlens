@@ -20,13 +20,21 @@ from typing import Any, Iterable
 
 import yaml
 
-CATALOG_PATH: Path = (
+CATALOG_DIR: Path = (
     Path(__file__).resolve().parents[2]
     / "src"
     / "earthlens"
     / "cmems"
-    / "cmems_data_catalog.yaml"
+    / "catalog"
 )
+
+# The merged-index file inside CATALOG_DIR (mirrors GEE's _index.yaml).
+INDEX_PATH: Path = CATALOG_DIR / "_index.yaml"
+
+# Back-compat alias: callers that imported CATALOG_PATH (the old
+# single-file constant) now get the catalog directory, which is what
+# earthlens.cmems.catalog.CATALOG_PATH also points at.
+CATALOG_PATH: Path = CATALOG_DIR
 
 
 _CADENCE_SUFFIXES: tuple[tuple[str, str], ...] = (
@@ -175,6 +183,74 @@ def domain_for_product_id(product_id: str) -> str:
     return "global"
 
 
+# Thematic sub-buckets for the oversized `global` domain. The global
+# basin alone holds ~424 datasets — too many for one balanced file —
+# so it is split by the thematic token in the product_id. Checked in
+# order; first substring match wins. Anything unmatched lands in
+# `global-other`.
+_GLOBAL_THEMES: tuple[tuple[str, str], ...] = (
+    ("_BGC", "global-biogeochem"),
+    ("OCEANCOLOUR", "global-biogeochem"),
+    ("_WAV", "global-wave"),
+    ("WIND_", "global-wind"),
+    ("SST_", "global-sst"),
+    ("SEALEVEL", "global-sealevel"),
+    ("INSITU_", "global-observations"),
+    ("MULTIOBS", "global-observations"),
+    ("_PHY", "global-physics"),
+)
+
+
+def catalog_file_for(product_id: str) -> str:
+    """Return the per-file stem that owns a dataset from `product_id`.
+
+    Routes a dataset to its catalog file under
+    `src/earthlens/cmems/catalog/`. Most domains map 1:1 onto a single
+    file (the domain label from :func:`domain_for_product_id`); the
+    `global` domain is sub-split by theme because it alone carries
+    ~424 datasets, which would otherwise dwarf every other file (the
+    same balance the GEE catalog keeps via its per-category split).
+
+    Args:
+        product_id: The CMEMS product_id, e.g.
+            `"GLOBAL_MULTIYEAR_PHY_001_030"`.
+
+    Returns:
+        A filename stem (no `.yaml`): one of the regional domains
+            (`"mediterranean"`, `"arctic"`, …) or a global theme
+            (`"global-physics"`, `"global-biogeochem"`, `"global-sst"`,
+            `"global-sealevel"`, `"global-wave"`, `"global-wind"`,
+            `"global-observations"`, `"global-other"`).
+
+    Examples:
+        - Global physics routes to its theme file:
+            ```python
+            >>> catalog_file_for("GLOBAL_MULTIYEAR_PHY_001_030")
+            'global-physics'
+
+            ```
+        - Global SST routes to the SST theme:
+            ```python
+            >>> catalog_file_for("SST_GLO_SST_L4_NRT_OBSERVATIONS_010_001")
+            'global-sst'
+
+            ```
+        - A regional product keeps its plain domain file:
+            ```python
+            >>> catalog_file_for("MEDSEA_MULTIYEAR_PHY_006_004")
+            'mediterranean'
+
+            ```
+    """
+    domain = domain_for_product_id(product_id)
+    if domain != "global":
+        return domain
+    for token, theme in _GLOBAL_THEMES:
+        if token in product_id:
+            return theme
+    return "global-other"
+
+
 def humanize_standard_name(standard_name: str | None) -> str:
     """Convert a CF standard_name to a human-readable long_name.
 
@@ -272,8 +348,8 @@ def emit_dataset_stanza(product: Any, dataset: Any) -> str:
     """Emit a ready-to-paste `datasets.<dataset_id>:` YAML stanza.
 
     Maps one `(product, dataset)` pair from
-    `copernicusmarine.describe()` onto the catalog schema in
-    `cmems_data_catalog.yaml`. `cadence` is inferred from the
+    `copernicusmarine.describe()` onto the per-domain catalog schema
+    (`catalog/<domain>.yaml`). `cadence` is inferred from the
     dataset_id suffix; `domain` from the product_id prefix. Temporal
     bounds are emitted as `null` with a TODO comment because the
     toolbox's `released_date` is the release timestamp of the dataset's
@@ -325,84 +401,82 @@ def emit_dataset_stanza(product: Any, dataset: Any) -> str:
     return "\n".join(lines) + "\n"
 
 
-_AVAILABLE_PRODUCTS_RE = re.compile(
-    r"^available_products:\n(?:[ \t]+.*(?:\n|$)|\n)+",
+_AVAILABLE_DATASETS_RE = re.compile(
+    r"^available_datasets:\n(?:[ \t]+.*(?:\n|$)|\n)+",
     re.MULTILINE,
 )
 
 
-def render_available_products_block(product_ids: Iterable[str]) -> str:
-    """Render the `available_products:` YAML block.
+def render_available_datasets_block(dataset_ids: Iterable[str]) -> str:
+    """Render the `available_datasets:` YAML block for `_index.yaml`.
 
-    The block is a flat alphabetised list of product ids — no grouping
-    headers because the CMEMS thematic prefixes are themselves the
-    grouping (`GLOBAL_*`, `MEDSEA_*`, …) and re-sorting under explicit
-    `# ----- <header> -----` comments would only duplicate that
-    structure. Ends with a single trailing newline.
+    The block is a flat alphabetised list of dataset ids — the full
+    `copernicusmarine.describe()` index, of which the curated
+    `datasets:` map across the per-domain files is a subset. Ends with
+    a single trailing newline.
 
     Args:
-        product_ids: Any iterable of product_id strings; sorted before
-            rendering so the output is deterministic.
+        dataset_ids: Any iterable of dataset_id strings; sorted +
+            de-duplicated before rendering so the output is
+            deterministic.
 
     Returns:
         The block as a string, ready to splice via
-            :func:`splice_available_products`.
+            :func:`splice_available_datasets`.
 
     Examples:
         - Render and inspect the block:
             ```python
-            >>> block = render_available_products_block(["GLOBAL_X", "ARCTIC_Y"])
+            >>> block = render_available_datasets_block(["ds_b", "ds_a"])
             >>> print(block, end="")
-            available_products:
-              - ARCTIC_Y
-              - GLOBAL_X
+            available_datasets:
+              - ds_a
+              - ds_b
 
             ```
         - Duplicate inputs are collapsed:
             ```python
-            >>> block = render_available_products_block(["A", "A", "B"])
-            >>> block.count("- A")
+            >>> render_available_datasets_block(["x", "x", "y"]).count("- x")
             1
 
             ```
         - Empty input yields just the header line:
             ```python
-            >>> render_available_products_block([])
-            'available_products:\\n'
+            >>> render_available_datasets_block([])
+            'available_datasets:\\n'
 
             ```
     """
-    sorted_ids = sorted(set(product_ids))
-    lines = ["available_products:"]
-    lines.extend(f"  - {pid}" for pid in sorted_ids)
+    sorted_ids = sorted(set(dataset_ids))
+    lines = ["available_datasets:"]
+    lines.extend(f"  - {ds_id}" for ds_id in sorted_ids)
     return "\n".join(lines) + "\n"
 
 
-def splice_available_products(text: str, new_block: str) -> str:
-    """Replace the `available_products:` block in `text` with `new_block`.
+def splice_available_datasets(text: str, new_block: str) -> str:
+    """Replace the `available_datasets:` block in `_index.yaml` text.
 
-    Preserves everything outside the block — leading comments, the
-    `datasets:` block below, schema-header lines. Raises if the YAML
-    has no `available_products:` key (a structural assertion: the
-    bundled catalog must always have one, even if empty).
+    Preserves everything outside the block — the leading comment
+    header in `_index.yaml`. Raises if the text has no
+    `available_datasets:` key (a structural assertion: `_index.yaml`
+    must always have one, even if empty).
 
     Args:
-        text: Full current contents of `cmems_data_catalog.yaml`.
-        new_block: Output of :func:`render_available_products_block`.
+        text: Full current contents of `catalog/_index.yaml`.
+        new_block: Output of :func:`render_available_datasets_block`.
 
     Returns:
-        The updated YAML text.
+        The updated text.
 
     Raises:
-        ValueError: If `text` has no top-level `available_products:`
+        ValueError: If `text` has no top-level `available_datasets:`
             block.
     """
-    m = _AVAILABLE_PRODUCTS_RE.search(text)
+    m = _AVAILABLE_DATASETS_RE.search(text)
     if not m:
         raise ValueError(
-            "could not find an `available_products:` block in the YAML — "
-            "expected a list-of-strings entry between the schema header "
-            "and the `datasets:` map"
+            "could not find an `available_datasets:` block in _index.yaml — "
+            "expected a list-of-strings entry after the comment header"
         )
     return text[: m.start()] + new_block + text[m.end() :]
 
