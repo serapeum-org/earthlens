@@ -35,15 +35,36 @@ class TestCatalogLoad:
         """The shipped catalog YAML is present as package data."""
         assert CATALOG_PATH.is_file(), f"missing bundled catalog at {CATALOG_PATH}"
 
-    def test_four_known_providers(self):
-        """The bundled catalog lists the four FDSN networks."""
-        assert sorted(Catalog().providers) == ["EARTHSCOPE", "EMSC", "INGV", "USGS"]
+    def test_known_providers(self):
+        """The bundled catalog lists all six curated FDSN networks."""
+        assert sorted(Catalog().providers) == [
+            "EARTHSCOPE",
+            "EMSC",
+            "GEONET",
+            "INGV",
+            "ISC",
+            "USGS",
+        ]
 
     def test_usgs_row_fields(self):
         """The USGS row resolves to the obspy URL_MAPPINGS key."""
         usgs = Catalog().get_provider("USGS")
         assert usgs.fdsn_id == "USGS"
         assert usgs.needs_token is False
+
+    @pytest.mark.parametrize(
+        "name, fdsn_id, min_mag",
+        [
+            ("ISC", "ISC", 4.5),
+            ("GEONET", "GEONET", 3.0),
+        ],
+    )
+    def test_added_provider_rows(self, name: str, fdsn_id: str, min_mag: float):
+        """The ISC and GeoNet rows resolve with their expected fields."""
+        provider = Catalog().get_provider(name)
+        assert provider.fdsn_id == fdsn_id
+        assert provider.needs_token is False
+        assert provider.default_min_magnitude == min_mag
 
     def test_get_catalog_returns_providers(self):
         """`get_catalog` returns the same provider map."""

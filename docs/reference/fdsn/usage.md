@@ -54,8 +54,8 @@ EarthLens(variables=["USGS"], data_source="fdsn", ...)
 EarthLens(variables=["USGS", "EMSC", "INGV"], data_source="fdsn", ...)
 ```
 
-Valid keys are `USGS`, `EMSC`, `INGV`, `EARTHSCOPE`. An unknown key
-raises with a did-you-mean hint
+Valid keys are `USGS`, `EMSC`, `INGV`, `EARTHSCOPE`, `ISC`, `GEONET`.
+An unknown key raises with a did-you-mean hint
 (`Catalog().get_provider("USG")` → *Did you mean 'USGS'?*).
 
 ## Filtering the query

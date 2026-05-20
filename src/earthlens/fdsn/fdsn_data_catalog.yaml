@@ -31,3 +31,15 @@ providers:
     needs_token: false
     default_min_magnitude: 4.5
     docs_url: https://service.earthscope.org/fdsnws/event/1/
+  ISC:
+    fdsn_id: ISC
+    title: "ISC — International Seismological Centre; global reviewed bulletin"
+    needs_token: false
+    default_min_magnitude: 4.5
+    docs_url: https://www.isc.ac.uk/fdsnws/event/1/
+  GEONET:
+    fdsn_id: GEONET
+    title: "GeoNet — New Zealand seismic network"
+    needs_token: false
+    default_min_magnitude: 3.0
+    docs_url: https://www.geonet.org.nz/data/tools/FDSN

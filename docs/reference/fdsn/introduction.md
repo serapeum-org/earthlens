@@ -4,8 +4,8 @@ The [FDSN](https://www.fdsn.org/) (International Federation of Digital
 Seismograph Networks) **event web service** is the common standard that
 seismological data centres expose for querying earthquake (and other
 seismic-event) catalogs. earthlens ships a single `fdsn` backend that
-speaks this standard to four networks through one
-[`obspy`](https://docs.obspy.org/) client — because all four answer the
+speaks this standard to six networks through one
+[`obspy`](https://docs.obspy.org/) client — because they all answer the
 identical FDSN-event protocol, one code path covers them all.
 
 This page orients the backend. For the hands-on download walkthrough
@@ -36,7 +36,7 @@ imagery). FDSN is different in two ways that shape the backend:
   tooling and no growth task — adding a network later (ISC, ORFEUS,
   GEONET, …) is a hand-edit of one YAML row.
 
-## The four networks
+## The networks
 
 | Key (`variables=[...]`) | Network | Best for |
 |---|---|---|
@@ -44,6 +44,8 @@ imagery). FDSN is different in two ways that shape the backend:
 | `EMSC` | EMSC seismicportal | **European-Mediterranean** events; fast preliminary solutions |
 | `INGV` | Istituto Nazionale di Geofisica e Vulcanologia | **Italy** + volcano monitoring; reports much smaller magnitudes |
 | `EARTHSCOPE` | EarthScope (ex-IRIS DMC) | the global archive; `IRIS` is the legacy alias and still resolves |
+| `ISC` | International Seismological Centre | the global **reviewed** bulletin (definitive, but lags real time) |
+| `GEONET` | GeoNet | **New Zealand** seismic network |
 
 Each is selected by passing its key in `variables` — for this backend
 `variables` is the list of seismic **networks**, not data-variable

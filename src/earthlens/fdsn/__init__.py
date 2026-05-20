@@ -40,7 +40,7 @@ Examples:
         ```python
         >>> from earthlens.fdsn import Catalog
         >>> sorted(Catalog().providers)
-        ['EARTHSCOPE', 'EMSC', 'INGV', 'USGS']
+        ['EARTHSCOPE', 'EMSC', 'GEONET', 'INGV', 'ISC', 'USGS']
 
         ```
 """

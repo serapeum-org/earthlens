@@ -92,7 +92,7 @@ class Catalog(AbstractCatalog):
             >>> from earthlens.fdsn import Catalog
             >>> cat = Catalog()
             >>> sorted(cat.providers)
-            ['EARTHSCOPE', 'EMSC', 'INGV', 'USGS']
+            ['EARTHSCOPE', 'EMSC', 'GEONET', 'INGV', 'ISC', 'USGS']
             >>> cat.get_provider("USGS").fdsn_id
             'USGS'
 
@@ -103,7 +103,7 @@ class Catalog(AbstractCatalog):
             >>> Catalog().get_provider("USG")
             Traceback (most recent call last):
                 ...
-            ValueError: 'USG' is not a registered provider. Known providers: ['EARTHSCOPE', 'EMSC', 'INGV', 'USGS']. Did you mean 'USGS'?
+            ValueError: 'USG' is not a registered provider. Known providers: ['EARTHSCOPE', 'EMSC', 'GEONET', 'INGV', 'ISC', 'USGS']. Did you mean 'USGS'?
 
             ```
     """
