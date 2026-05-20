@@ -297,13 +297,23 @@ class CMEMS(AbstractDataSource):
         Returns:
             list[Path]: Absolute paths of every output the
                 toolbox successfully wrote. Order matches the
-                iteration order of `self.vars`.
+                iteration order of `self.vars`. On a partial
+                failure (some pairs succeed, some fail) only the
+                successes are returned and the failures are logged;
+                an empty list is returned only for an empty request
+                (`self.vars == {}`).
 
         Raises:
             NotImplementedError: When `aggregate` is not `None`.
                 Will be removed once the pyramids time-window
                 reducer accepts CMEMS catalog rows and a depth
                 axis.
+            RuntimeError: When **every** `(dataset_id, variables)`
+                pair fails its subset (total failure). Raised rather
+                than returning `[]` so a caller cannot silently
+                process nothing; the message aggregates the failed
+                dataset ids and exception types, and the per-product
+                toolbox exceptions are logged at ERROR.
         """
         if aggregate is not None:
             raise NotImplementedError(
@@ -329,7 +339,12 @@ class CMEMS(AbstractDataSource):
                 f"written to {self.root_dir}"
             )
         else:
-            logger.warning("CMEMS download summary: no files written")
+            # Reached only for an empty request — total failure raises
+            # inside _fetch_with_progress before we get here.
+            logger.warning(
+                "CMEMS download summary: no datasets requested, "
+                "nothing written"
+            )
         return out_paths
 
     def _api(self) -> list[Path]:
@@ -427,6 +442,17 @@ class CMEMS(AbstractDataSource):
             logger.warning(
                 f"{len(failed)} CMEMS subset(s) failed: {failed_summary}"
             )
+            # Partial failure (some products wrote) returns the successes
+            # so a multi-dataset request is not all-or-nothing. Total
+            # failure raises rather than returning an empty list, so a
+            # caller doing `paths = download(); use(paths)` cannot
+            # silently process nothing.
+            if not out_paths:
+                raise RuntimeError(
+                    f"all {len(failed)} CMEMS subset(s) failed: "
+                    f"{failed_summary}. See the per-product ERROR logs "
+                    "above for the underlying toolbox exceptions."
+                )
         return out_paths
 
     def _subset_one(

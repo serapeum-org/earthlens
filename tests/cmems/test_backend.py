@@ -32,6 +32,9 @@ class _FakeCmems(types.ModuleType):
         self.subset_calls: list[dict[str, Any]] = []
         self.subset_response: _FakeResponse | None = None
         self.subset_raises: BaseException | None = None
+        # Per-dataset failures keyed by dataset_id, for partial-failure
+        # tests. Checked before the blanket `subset_raises`.
+        self.subset_raises_for: dict[str, BaseException] = {}
         self.login_result: bool | BaseException = True
         self.InvalidUsernameOrPassword = type(
             "InvalidUsernameOrPassword", (Exception,), {}
@@ -51,6 +54,9 @@ class _FakeCmems(types.ModuleType):
 
     def subset(self, **kwargs: Any) -> _FakeResponse:
         self.subset_calls.append(dict(kwargs))
+        per_ds = self.subset_raises_for.get(kwargs.get("dataset_id"))
+        if per_ds is not None:
+            raise per_ds
         if self.subset_raises is not None:
             raise self.subset_raises
         assert self.subset_response is not None, (
@@ -216,13 +222,42 @@ class TestCMEMSFetch:
                 f"unsafe character {bad!r} leaked into output_filename: {filename!r}"
             )
 
-    def test_subset_failure_logged_and_dropped(
+    def test_total_failure_raises(
         self, fake_cmems: _FakeCmems, cmems_instance: CMEMS
     ):
-        """A single bad subset is dropped from the result, not raised."""
+        """When every subset fails, _fetch raises rather than returning []."""
         fake_cmems.subset_raises = RuntimeError("server upset")
-        paths = cmems_instance._fetch(cmems_instance._search())
-        assert paths == [], f"failing subset should drop the path; got {paths!r}"
+        with pytest.raises(RuntimeError, match="all 1 CMEMS subset"):
+            cmems_instance._fetch(cmems_instance._search())
+
+    def test_partial_failure_returns_successes(
+        self, fake_cmems: _FakeCmems, tmp_path: Path
+    ):
+        """One failing dataset is dropped; the surviving dataset's path is returned."""
+        good = tmp_path / "good.nc"
+        good.write_bytes(b"")
+        fake_cmems.subset_response = _FakeResponse(good)
+        fake_cmems.subset_raises_for = {
+            "bad_ds": RuntimeError("server upset")
+        }
+        cm = CMEMS(
+            start="2024-01-01",
+            end="2024-01-02",
+            variables={
+                "bad_ds": ["x"],
+                "cmems_mod_glo_phy_my_0.083deg_P1D-m": ["thetao"],
+            },
+            lat_lim=[40.0, 42.0],
+            lon_lim=[-10.0, -8.0],
+            temporal_resolution="daily",
+            path=str(tmp_path),
+            service_username="alice",
+            service_password="secret",
+        )
+        paths = cm._fetch(cm._search())
+        assert paths == [good], (
+            f"partial failure should return only the survivor; got {paths!r}"
+        )
 
     def test_subset_missing_file_path_raises(
         self, fake_cmems: _FakeCmems, cmems_instance: CMEMS
