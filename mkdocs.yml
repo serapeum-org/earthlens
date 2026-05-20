@@ -146,10 +146,14 @@ nav:
       - Climate change — temperature anomalies: examples/ecmwf/climate_change_anomalies.ipynb
       - Drought — SPI from precipitation: examples/ecmwf/drought_precipitation_deficit.ipynb
     - Copernicus Marine:
+      - Catalog explorer (no network): examples/cmems/catalog_explorer.ipynb
       - Quickstart — OSTIA SST: examples/cmems/quickstart.ipynb
       - GLORYS — thermocline time-series: examples/cmems/glorys_thermocline_timeseries.ipynb
       - PISCES — chlorophyll seasonal cycle: examples/cmems/pisces_chlorophyll_seasonal_cycle.ipynb
       - Altimetry — coastal sea-level anomaly: examples/cmems/altimetry_sla_coastal_signal.ipynb
+      - Sea ice — Arctic thickness map: examples/cmems/seaice_arctic_thickness.ipynb
+      - Waves — significant wave height: examples/cmems/global_wave_significant_height.ipynb
+      - Mediterranean — surface temperature map: examples/cmems/mediterranean_sst_map.ipynb
     - Google Earth Engine:
       - Quickstart — EarthLens facade: examples/gee/quickstart.ipynb
       - Atmosphere & chemistry — TROPOMI NO2: examples/gee/atmosphere-chemistry.ipynb

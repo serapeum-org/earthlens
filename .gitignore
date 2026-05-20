@@ -168,3 +168,4 @@ tools/chc/_discovered_paths.json
 # notebooks against live services. They must NOT enter git.
 docs/examples/ecmwf/data/
 docs/examples/gee/out/
+docs/examples/cmems/data/
