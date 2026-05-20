@@ -5,12 +5,12 @@
 # this directory into one Catalog at construction time; dataset ids
 # must be unique across files. Stanzas are emitted by
 # tools/cmems/refresh_cmems_catalog.py from copernicusmarine.describe();
-# `cadence` is inferred from the dataset_id suffix and `domain` from
-# the product_id prefix. The `global` basin is sub-split by theme
-# (global-physics / global-biogeochem / global-sst / ...) to keep file
-# sizes balanced; the `domain:` field on every row below is still the
-# plain basin label. Where the toolbox exposes no standard_name for a
-# variable, the row carries `long_name: ''` with a TODO marker.
+# `cadence` is inferred from the dataset_id suffix, `domain` from the
+# product_id prefix, and `temporal.start` is read from the dataset's
+# arco time-coordinate bounds. `end` is left null (the arco max is
+# "latest available today" and would go stale for rolling products).
+# Where the toolbox exposes no standard_name for a variable, the row
+# carries `long_name: ''` with a TODO marker.
 #
 # Schema (per dataset):
 #   <dataset_id>:
@@ -30,8 +30,8 @@ datasets:
     cadence: irregular
     domain: mediterranean
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 2008-01-01
+      end: null              # null = NRT / rolling
     variables:
       sst_anomaly:
         units: Celsius
@@ -43,8 +43,8 @@ datasets:
     cadence: irregular
     domain: mediterranean
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 2008-01-01
+      end: null              # null = NRT / rolling
     variables:
       sst_anomaly:
         units: Celsius
@@ -56,8 +56,8 @@ datasets:
     cadence: irregular
     domain: mediterranean
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 2008-01-01
+      end: null              # null = NRT / rolling
     variables:
       adjusted_sea_surface_temperature:
         units: kelvin
@@ -117,8 +117,8 @@ datasets:
     cadence: irregular
     domain: mediterranean
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 2008-01-01
+      end: null              # null = NRT / rolling
     variables:
       adjusted_sea_surface_temperature:
         units: kelvin
@@ -178,8 +178,8 @@ datasets:
     cadence: irregular
     domain: mediterranean
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 2008-01-01
+      end: null              # null = NRT / rolling
     variables:
       analysed_sst:
         units: kelvin
@@ -200,8 +200,8 @@ datasets:
     cadence: irregular
     domain: mediterranean
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 2008-01-01
+      end: null              # null = NRT / rolling
     variables:
       analysed_sst:
         units: kelvin
@@ -222,8 +222,8 @@ datasets:
     cadence: irregular
     domain: mediterranean
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 1982-01-01
+      end: null              # null = NRT / rolling
     variables:
       analysed_sst:
         units: kelvin
@@ -244,8 +244,8 @@ datasets:
     cadence: daily
     domain: mediterranean
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 2024-02-26
+      end: null              # null = NRT / rolling
     variables:
       nppv:
         units: mg m-3 day-1
@@ -260,8 +260,8 @@ datasets:
     cadence: monthly
     domain: mediterranean
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       nppv:
         units: mg m-3 day-1
@@ -276,8 +276,8 @@ datasets:
     cadence: daily
     domain: mediterranean
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 1999-01-01
+      end: null              # null = NRT / rolling
     variables:
       nppv:
         units: mg m-3 day-1
@@ -292,8 +292,8 @@ datasets:
     cadence: monthly
     domain: mediterranean
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       nppv:
         units: mg m-3 day-1
@@ -308,8 +308,8 @@ datasets:
     cadence: annual
     domain: mediterranean
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       nppv:
         units: mg m-3 day-1
@@ -324,8 +324,8 @@ datasets:
     cadence: daily
     domain: mediterranean
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 2024-02-26
+      end: null              # null = NRT / rolling
     variables:
       dissic:
         units: mol m-3
@@ -343,8 +343,8 @@ datasets:
     cadence: monthly
     domain: mediterranean
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       dissic:
         units: mol m-3
@@ -362,8 +362,8 @@ datasets:
     cadence: daily
     domain: mediterranean
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 1999-01-01
+      end: null              # null = NRT / rolling
     variables:
       dissic:
         units: mol m-3
@@ -381,8 +381,8 @@ datasets:
     cadence: monthly
     domain: mediterranean
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       dissic:
         units: mol m-3
@@ -400,8 +400,8 @@ datasets:
     cadence: annual
     domain: mediterranean
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       dissic:
         units: mol m-3
@@ -419,8 +419,8 @@ datasets:
     cadence: daily
     domain: mediterranean
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 2024-02-26
+      end: null              # null = NRT / rolling
     variables:
       fgco2:
         units: kg m-2 s-1
@@ -435,8 +435,8 @@ datasets:
     cadence: monthly
     domain: mediterranean
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       fgco2:
         units: kg m-2 s-1
@@ -451,8 +451,8 @@ datasets:
     cadence: daily
     domain: mediterranean
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 1999-01-01
+      end: null              # null = NRT / rolling
     variables:
       fpco2:
         units: kg m-2 s-1
@@ -467,8 +467,8 @@ datasets:
     cadence: monthly
     domain: mediterranean
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       fpco2:
         units: kg m-2 s-1
@@ -483,8 +483,8 @@ datasets:
     cadence: annual
     domain: mediterranean
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       fpco2:
         units: kg m-2 s-1
@@ -499,8 +499,8 @@ datasets:
     cadence: daily
     domain: mediterranean
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 2024-02-26
+      end: null              # null = NRT / rolling
     variables:
       nh4:
         units: mmol m-3
@@ -521,8 +521,8 @@ datasets:
     cadence: monthly
     domain: mediterranean
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       nh4:
         units: mmol m-3
@@ -543,8 +543,8 @@ datasets:
     cadence: daily
     domain: mediterranean
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 1999-01-01
+      end: null              # null = NRT / rolling
     variables:
       nh4:
         units: mmol m-3
@@ -562,8 +562,8 @@ datasets:
     cadence: monthly
     domain: mediterranean
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       nh4:
         units: mmol m-3
@@ -581,8 +581,8 @@ datasets:
     cadence: annual
     domain: mediterranean
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       nh4:
         units: mmol m-3
@@ -600,8 +600,8 @@ datasets:
     cadence: daily
     domain: mediterranean
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 2024-02-26
+      end: null              # null = NRT / rolling
     variables:
       kd490:
         units: m-1
@@ -613,8 +613,8 @@ datasets:
     cadence: monthly
     domain: mediterranean
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       kd490:
         units: m-1
@@ -626,8 +626,8 @@ datasets:
     cadence: daily
     domain: mediterranean
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 2024-02-26
+      end: null              # null = NRT / rolling
     variables:
       chl:
         units: mg m-3
@@ -669,8 +669,8 @@ datasets:
     cadence: monthly
     domain: mediterranean
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       chl:
         units: mg m-3
@@ -712,8 +712,8 @@ datasets:
     cadence: daily
     domain: mediterranean
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 1999-01-01
+      end: null              # null = NRT / rolling
     variables:
       chl:
         units: mg m-3
@@ -728,8 +728,8 @@ datasets:
     cadence: monthly
     domain: mediterranean
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       chl:
         units: mg m-3
@@ -744,8 +744,8 @@ datasets:
     cadence: annual
     domain: mediterranean
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       chl:
         units: mg m-3
@@ -760,8 +760,8 @@ datasets:
     cadence: irregular
     domain: mediterranean
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       deptho:
         units: m
@@ -779,8 +779,8 @@ datasets:
     cadence: climatology
     domain: mediterranean
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       chl_avg:
         units: mg m-3
@@ -864,8 +864,8 @@ datasets:
     cadence: irregular
     domain: mediterranean
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       deptho:
         units: m
@@ -883,8 +883,8 @@ datasets:
     cadence: hourly
     domain: mediterranean
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 2024-03-29
+      end: null              # null = NRT / rolling
     variables:
       uo:
         units: m s-1
@@ -899,8 +899,8 @@ datasets:
     cadence: hourly
     domain: mediterranean
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 2025-10-06
+      end: null              # null = NRT / rolling
     variables:
       uo:
         units: m s-1
@@ -915,8 +915,8 @@ datasets:
     cadence: daily
     domain: mediterranean
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 2024-03-30
+      end: null              # null = NRT / rolling
     variables:
       uo:
         units: m s-1
@@ -931,8 +931,8 @@ datasets:
     cadence: monthly
     domain: mediterranean
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       uo:
         units: m s-1
@@ -947,8 +947,8 @@ datasets:
     cadence: irregular
     domain: mediterranean
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 2024-03-28
+      end: null              # null = NRT / rolling
     variables:
       uo:
         units: m s-1
@@ -963,8 +963,8 @@ datasets:
     cadence: daily
     domain: mediterranean
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 2024-03-30
+      end: null              # null = NRT / rolling
     variables:
       uo_detided:
         units: m s-1
@@ -979,8 +979,8 @@ datasets:
     cadence: daily
     domain: mediterranean
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 1987-01-01
+      end: null              # null = NRT / rolling
     variables:
       uo:
         units: m s-1
@@ -995,8 +995,8 @@ datasets:
     cadence: monthly
     domain: mediterranean
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       uo:
         units: m s-1
@@ -1011,8 +1011,8 @@ datasets:
     cadence: annual
     domain: mediterranean
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       uo:
         units: m s-1
@@ -1027,8 +1027,8 @@ datasets:
     cadence: hourly
     domain: mediterranean
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 1987-01-01
+      end: null              # null = NRT / rolling
     variables:
       uo:
         units: m s-1
@@ -1043,8 +1043,8 @@ datasets:
     cadence: daily
     domain: mediterranean
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 1987-01-01
+      end: null              # null = NRT / rolling
     variables:
       hfds:
         units: W m-2
@@ -1068,8 +1068,8 @@ datasets:
     cadence: monthly
     domain: mediterranean
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       hfds:
         units: W m-2
@@ -1093,8 +1093,8 @@ datasets:
     cadence: daily
     domain: mediterranean
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 1987-01-01
+      end: null              # null = NRT / rolling
     variables:
       tauuo:
         units: N m-2
@@ -1109,8 +1109,8 @@ datasets:
     cadence: monthly
     domain: mediterranean
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       tauuo:
         units: N m-2
@@ -1125,8 +1125,8 @@ datasets:
     cadence: hourly
     domain: mediterranean
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 2024-03-29
+      end: null              # null = NRT / rolling
     variables:
       mlotst:
         units: m
@@ -1138,8 +1138,8 @@ datasets:
     cadence: daily
     domain: mediterranean
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 2024-03-30
+      end: null              # null = NRT / rolling
     variables:
       mlotst:
         units: m
@@ -1151,8 +1151,8 @@ datasets:
     cadence: monthly
     domain: mediterranean
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       mlotst:
         units: m
@@ -1164,8 +1164,8 @@ datasets:
     cadence: daily
     domain: mediterranean
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 1987-01-01
+      end: null              # null = NRT / rolling
     variables:
       mlotst:
         units: m
@@ -1177,8 +1177,8 @@ datasets:
     cadence: monthly
     domain: mediterranean
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       mlotst:
         units: m
@@ -1190,8 +1190,8 @@ datasets:
     cadence: annual
     domain: mediterranean
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       mlotst:
         units: m
@@ -1203,8 +1203,8 @@ datasets:
     cadence: hourly
     domain: mediterranean
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 2024-03-29
+      end: null              # null = NRT / rolling
     variables:
       so:
         units: '0.001'
@@ -1216,8 +1216,8 @@ datasets:
     cadence: hourly
     domain: mediterranean
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 2025-10-06
+      end: null              # null = NRT / rolling
     variables:
       so:
         units: '0.001'
@@ -1229,8 +1229,8 @@ datasets:
     cadence: daily
     domain: mediterranean
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 2024-03-30
+      end: null              # null = NRT / rolling
     variables:
       so:
         units: '0.001'
@@ -1242,8 +1242,8 @@ datasets:
     cadence: monthly
     domain: mediterranean
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       so:
         units: '0.001'
@@ -1255,8 +1255,8 @@ datasets:
     cadence: daily
     domain: mediterranean
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 1987-01-01
+      end: null              # null = NRT / rolling
     variables:
       so:
         units: '0.001'
@@ -1268,8 +1268,8 @@ datasets:
     cadence: monthly
     domain: mediterranean
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       so:
         units: '0.001'
@@ -1281,8 +1281,8 @@ datasets:
     cadence: annual
     domain: mediterranean
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       so:
         units: '0.001'
@@ -1294,8 +1294,8 @@ datasets:
     cadence: hourly
     domain: mediterranean
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 2024-03-29
+      end: null              # null = NRT / rolling
     variables:
       zos:
         units: m
@@ -1307,8 +1307,8 @@ datasets:
     cadence: daily
     domain: mediterranean
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 2024-03-30
+      end: null              # null = NRT / rolling
     variables:
       zos:
         units: m
@@ -1320,8 +1320,8 @@ datasets:
     cadence: monthly
     domain: mediterranean
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       zos:
         units: m
@@ -1333,8 +1333,8 @@ datasets:
     cadence: irregular
     domain: mediterranean
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 2024-03-28
+      end: null              # null = NRT / rolling
     variables:
       zos:
         units: m
@@ -1346,8 +1346,8 @@ datasets:
     cadence: daily
     domain: mediterranean
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 2024-03-30
+      end: null              # null = NRT / rolling
     variables:
       zos_detided:
         units: m
@@ -1359,8 +1359,8 @@ datasets:
     cadence: daily
     domain: mediterranean
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 1987-01-01
+      end: null              # null = NRT / rolling
     variables:
       zos:
         units: m
@@ -1372,8 +1372,8 @@ datasets:
     cadence: monthly
     domain: mediterranean
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       zos:
         units: m
@@ -1385,8 +1385,8 @@ datasets:
     cadence: annual
     domain: mediterranean
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       zos:
         units: m
@@ -1398,8 +1398,8 @@ datasets:
     cadence: hourly
     domain: mediterranean
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 1987-01-01
+      end: null              # null = NRT / rolling
     variables:
       zos:
         units: m
@@ -1411,8 +1411,8 @@ datasets:
     cadence: hourly
     domain: mediterranean
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 2024-03-29
+      end: null              # null = NRT / rolling
     variables:
       thetao:
         units: degrees_C
@@ -1424,8 +1424,8 @@ datasets:
     cadence: hourly
     domain: mediterranean
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 2025-10-06
+      end: null              # null = NRT / rolling
     variables:
       bottomT:
         units: degrees_C
@@ -1440,8 +1440,8 @@ datasets:
     cadence: daily
     domain: mediterranean
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 2024-03-30
+      end: null              # null = NRT / rolling
     variables:
       bottomT:
         units: degrees_C
@@ -1456,8 +1456,8 @@ datasets:
     cadence: monthly
     domain: mediterranean
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       bottomT:
         units: degrees_C
@@ -1472,8 +1472,8 @@ datasets:
     cadence: annual
     domain: mediterranean
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       bottomT:
         units: degrees_C
@@ -1488,8 +1488,8 @@ datasets:
     cadence: daily
     domain: mediterranean
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 1987-01-01
+      end: null              # null = NRT / rolling
     variables:
       bottomT:
         units: degrees_C
@@ -1504,8 +1504,8 @@ datasets:
     cadence: monthly
     domain: mediterranean
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       bottomT:
         units: degrees_C
@@ -1520,8 +1520,8 @@ datasets:
     cadence: daily
     domain: mediterranean
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 2024-03-30
+      end: null              # null = NRT / rolling
     variables:
       wo:
         units: m s-1
@@ -1533,8 +1533,8 @@ datasets:
     cadence: monthly
     domain: mediterranean
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       wo:
         units: m s-1
@@ -1546,8 +1546,8 @@ datasets:
     cadence: daily
     domain: mediterranean
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 1987-01-01
+      end: null              # null = NRT / rolling
     variables:
       evs:
         units: kg m-2 s-1
@@ -1565,8 +1565,8 @@ datasets:
     cadence: monthly
     domain: mediterranean
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       evs:
         units: kg m-2 s-1
@@ -1584,8 +1584,8 @@ datasets:
     cadence: irregular
     domain: mediterranean
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       deptho:
         units: m
@@ -1603,8 +1603,8 @@ datasets:
     cadence: climatology
     domain: mediterranean
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       bottomT_avg:
         units: degrees_C
@@ -1658,8 +1658,8 @@ datasets:
     cadence: irregular
     domain: mediterranean
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       deptho:
         units: m
@@ -1677,8 +1677,8 @@ datasets:
     cadence: hourly
     domain: mediterranean
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 2021-11-30
+      end: null              # null = NRT / rolling
     variables:
       VCMX:
         units: m
@@ -1744,8 +1744,8 @@ datasets:
     cadence: irregular
     domain: mediterranean
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       deptho:
         units: m
@@ -1760,8 +1760,8 @@ datasets:
     cadence: climatology
     domain: mediterranean
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       VHM0:
         units: m
@@ -1779,8 +1779,8 @@ datasets:
     cadence: hourly
     domain: mediterranean
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 1985-01-01
+      end: null              # null = NRT / rolling
     variables:
       VHM0:
         units: m
@@ -1840,8 +1840,8 @@ datasets:
     cadence: irregular
     domain: mediterranean
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       deptho:
         units: m
@@ -1856,8 +1856,8 @@ datasets:
     cadence: daily
     domain: mediterranean
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 1997-09-16
+      end: null              # null = NRT / rolling
     variables:
       ADG443:
         units: m^-1
@@ -1887,8 +1887,8 @@ datasets:
     cadence: daily
     domain: mediterranean
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 2025-11-01
+      end: null              # null = NRT / rolling
     variables:
       BBP443:
         units: m-1
@@ -1969,8 +1969,8 @@ datasets:
     cadence: daily
     domain: mediterranean
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 2026-05-10
+      end: null              # null = NRT / rolling
     variables:
       ADG443:
         units: m^-1
@@ -2000,8 +2000,8 @@ datasets:
     cadence: daily
     domain: mediterranean
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 2025-11-01
+      end: null              # null = NRT / rolling
     variables:
       BBP443:
         units: m-1
@@ -2013,8 +2013,8 @@ datasets:
     cadence: monthly
     domain: mediterranean
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       BBP443:
         units: m-1
@@ -2032,8 +2032,8 @@ datasets:
     cadence: daily
     domain: mediterranean
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 1997-09-16
+      end: null              # null = NRT / rolling
     variables:
       CHL:
         units: milligram m^-3
@@ -2081,8 +2081,8 @@ datasets:
     cadence: daily
     domain: mediterranean
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 2016-04-26
+      end: null              # null = NRT / rolling
     variables:
       CHL:
         units: milligram m^-3
@@ -2100,8 +2100,8 @@ datasets:
     cadence: daily
     domain: mediterranean
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 1997-09-16
+      end: null              # null = NRT / rolling
     variables:
       CHL:
         units: milligram m^-3
@@ -2113,8 +2113,8 @@ datasets:
     cadence: monthly
     domain: mediterranean
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       CHL:
         units: milligram m^-3
@@ -2132,8 +2132,8 @@ datasets:
     cadence: climatology
     domain: mediterranean
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 2000-01-01
+      end: null              # null = NRT / rolling
     variables:
       CHL_count:
         units: '1'
@@ -2154,8 +2154,8 @@ datasets:
     cadence: monthly
     domain: mediterranean
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       CHL:
         units: milligram m^-3
@@ -2173,8 +2173,8 @@ datasets:
     cadence: daily
     domain: mediterranean
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 2026-05-10
+      end: null              # null = NRT / rolling
     variables:
       CHL:
         units: milligram m^-3
@@ -2222,8 +2222,8 @@ datasets:
     cadence: daily
     domain: mediterranean
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 2026-05-10
+      end: null              # null = NRT / rolling
     variables:
       CHL:
         units: milligram m^-3
@@ -2241,8 +2241,8 @@ datasets:
     cadence: daily
     domain: mediterranean
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 2026-04-22
+      end: null              # null = NRT / rolling
     variables:
       CHL:
         units: milligram m^-3
@@ -2254,8 +2254,8 @@ datasets:
     cadence: monthly
     domain: mediterranean
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       CHL:
         units: milligram m^-3
@@ -2273,8 +2273,8 @@ datasets:
     cadence: monthly
     domain: mediterranean
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       CHL:
         units: milligram m^-3
@@ -2292,8 +2292,8 @@ datasets:
     cadence: daily
     domain: mediterranean
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 1997-09-16
+      end: null              # null = NRT / rolling
     variables:
       PP:
         units: g m^-2 d^-1
@@ -2305,8 +2305,8 @@ datasets:
     cadence: monthly
     domain: mediterranean
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       PP:
         units: g m^-2 d^-1
@@ -2324,8 +2324,8 @@ datasets:
     cadence: daily
     domain: mediterranean
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 2026-05-08
+      end: null              # null = NRT / rolling
     variables:
       PP:
         units: g m^-2 d^-1
@@ -2337,8 +2337,8 @@ datasets:
     cadence: monthly
     domain: mediterranean
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       PP:
         units: g m^-2 d^-1
@@ -2356,8 +2356,8 @@ datasets:
     cadence: daily
     domain: mediterranean
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 1997-09-16
+      end: null              # null = NRT / rolling
     variables:
       QI_RRS412:
         units: '1'
@@ -2405,8 +2405,8 @@ datasets:
     cadence: daily
     domain: mediterranean
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 2016-04-26
+      end: null              # null = NRT / rolling
     variables:
       QI_RRS412_5:
         units: '1'
@@ -2475,8 +2475,8 @@ datasets:
     cadence: daily
     domain: mediterranean
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 2026-05-10
+      end: null              # null = NRT / rolling
     variables:
       QI_RRS412:
         units: '1'
@@ -2524,8 +2524,8 @@ datasets:
     cadence: daily
     domain: mediterranean
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 2026-05-10
+      end: null              # null = NRT / rolling
     variables:
       QI_RRS412_5:
         units: '1'
@@ -2594,8 +2594,8 @@ datasets:
     cadence: daily
     domain: mediterranean
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 1997-09-16
+      end: null              # null = NRT / rolling
     variables:
       KD490:
         units: m^-1
@@ -2613,8 +2613,8 @@ datasets:
     cadence: daily
     domain: mediterranean
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 2016-04-26
+      end: null              # null = NRT / rolling
     variables:
       KD490:
         units: m^-1
@@ -2632,8 +2632,8 @@ datasets:
     cadence: daily
     domain: mediterranean
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 2026-05-10
+      end: null              # null = NRT / rolling
     variables:
       KD490:
         units: m^-1
@@ -2651,8 +2651,8 @@ datasets:
     cadence: daily
     domain: mediterranean
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 2026-05-10
+      end: null              # null = NRT / rolling
     variables:
       KD490:
         units: m^-1
@@ -2670,8 +2670,8 @@ datasets:
     cadence: monthly
     domain: mediterranean
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       KD490:
         units: m^-1
@@ -2689,8 +2689,8 @@ datasets:
     cadence: monthly
     domain: mediterranean
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       KD490:
         units: m^-1
@@ -2708,8 +2708,8 @@ datasets:
     cadence: monthly
     domain: mediterranean
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       CHL:
         units: mg m-3
@@ -2745,8 +2745,8 @@ datasets:
     cadence: hourly
     domain: mediterranean
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 2019-01-01
+      end: null              # null = NRT / rolling
     variables:
       analysed_sst:
         units: kelvin
@@ -2767,8 +2767,8 @@ datasets:
     cadence: daily
     domain: mediterranean
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 1982-01-01
+      end: null              # null = NRT / rolling
     variables:
       adjusted_sea_surface_temperature:
         units: kelvin
@@ -2780,8 +2780,8 @@ datasets:
     cadence: daily
     domain: mediterranean
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 2020-01-01
+      end: null              # null = NRT / rolling
     variables:
       CHL:
         units: mg m-3
@@ -2799,8 +2799,8 @@ datasets:
     cadence: daily
     domain: mediterranean
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 2020-01-01
+      end: null              # null = NRT / rolling
     variables:
       CHL:
         units: mg m-3
@@ -2818,8 +2818,8 @@ datasets:
     cadence: irregular
     domain: mediterranean
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       swh_percentile99_anom:
         units: m
@@ -2834,8 +2834,8 @@ datasets:
     cadence: irregular
     domain: mediterranean
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       temp_percentile99_anom:
         units: degree_C
@@ -2850,8 +2850,8 @@ datasets:
     cadence: irregular
     domain: mediterranean
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       sst_anomaly:
         units: degrees C
@@ -2866,8 +2866,8 @@ datasets:
     cadence: irregular
     domain: mediterranean
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       sst_trend:
         units: C/year
