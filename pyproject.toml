@@ -42,11 +42,11 @@ dependencies = [
 s3 = ["boto3 >=1.43.0"]
 ecmwf = ["cdsapi >=0.7.7"]
 gee = ["earthengine-api >=1.7.26", "Rtree >=1.0.0"]
-cmems = ["copernicusmarine >=2.0.0"]
+cmems = ["copernicusmarine >=2.0.0,<3"]
 all = [
     "boto3 >=1.43.0",
     "cdsapi >=0.7.7",
-    "copernicusmarine >=2.0.0",
+    "copernicusmarine >=2.0.0,<3",
     "earthengine-api >=1.7.26",
     "Rtree >=1.0.0",
 ]
