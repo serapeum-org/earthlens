@@ -31,6 +31,7 @@ through the per-window write).
 from __future__ import annotations
 
 import datetime as dt
+from collections import Counter
 from pathlib import Path
 from typing import TYPE_CHECKING, Literal
 
@@ -350,12 +351,17 @@ class CMEMS(AbstractDataSource):
                 `self.vars`; metadata carries `{"variables":
                 [...]}`.
         """
+        ext = "nc" if self._file_format == "netcdf" else "zarr"
+        filenames = _unique_output_names(list(self.vars), ext)
         products: list[RemoteProduct] = []
         for dataset_id, var_codes in self.vars.items():
             products.append(
                 RemoteProduct(
                     id=dataset_id,
-                    metadata={"variables": list(var_codes)},
+                    metadata={
+                        "variables": list(var_codes),
+                        "output_filename": filenames[dataset_id],
+                    },
                 )
             )
         return products
@@ -453,7 +459,9 @@ class CMEMS(AbstractDataSource):
         dataset_id = product.id
         variables = product.metadata.get("variables") or []
         ext = "nc" if self._file_format == "netcdf" else "zarr"
-        output_filename = f"{_safe_filename(dataset_id)}.{ext}"
+        output_filename = product.metadata.get("output_filename") or (
+            f"{_safe_filename(dataset_id)}.{ext}"
+        )
 
         logger.info(
             f"Requesting CMEMS subset for {dataset_id!r} "
@@ -519,3 +527,36 @@ def _safe_filename(dataset_id: str) -> str:
     for bad in ("/", "\\", ":", "*", "?", '"', "<", ">", "|"):
         safe = safe.replace(bad, "_")
     return safe
+
+
+def _unique_output_names(dataset_ids: list[str], ext: str) -> dict[str, str]:
+    """Map each dataset id to a collision-free `<stem>.<ext>` filename.
+
+    :func:`_safe_filename` is many-to-one — two distinct dataset ids
+    can normalise to the same stem (e.g. an id with a `.` and one with
+    a `_` in the same position). Writing both to the same output
+    directory in one `download()` would silently overwrite. This
+    builds the per-request filename map up front and, only for stems
+    shared by more than one id, disambiguates by appending a short
+    deterministic hash of the full dataset id. Non-colliding ids keep
+    their clean stem.
+
+    Args:
+        dataset_ids: The dataset ids in one `download()` request.
+        ext: File extension without the dot (`"nc"` or `"zarr"`).
+
+    Returns:
+        Mapping from each dataset id to its output filename. Values
+            are unique across the input.
+    """
+    import hashlib
+
+    stems: dict[str, str] = {ds_id: _safe_filename(ds_id) for ds_id in dataset_ids}
+    counts = Counter(stems.values())
+    names: dict[str, str] = {}
+    for ds_id, stem in stems.items():
+        if counts[stem] > 1:
+            digest = hashlib.blake2b(ds_id.encode("utf-8"), digest_size=4).hexdigest()
+            stem = f"{stem}_{digest}"
+        names[ds_id] = f"{stem}.{ext}"
+    return names
