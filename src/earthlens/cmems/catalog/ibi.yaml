@@ -5,12 +5,12 @@
 # this directory into one Catalog at construction time; dataset ids
 # must be unique across files. Stanzas are emitted by
 # tools/cmems/refresh_cmems_catalog.py from copernicusmarine.describe();
-# `cadence` is inferred from the dataset_id suffix and `domain` from
-# the product_id prefix. The `global` basin is sub-split by theme
-# (global-physics / global-biogeochem / global-sst / ...) to keep file
-# sizes balanced; the `domain:` field on every row below is still the
-# plain basin label. Where the toolbox exposes no standard_name for a
-# variable, the row carries `long_name: ''` with a TODO marker.
+# `cadence` is inferred from the dataset_id suffix, `domain` from the
+# product_id prefix, and `temporal.start` is read from the dataset's
+# arco time-coordinate bounds. `end` is left null (the arco max is
+# "latest available today" and would go stale for rolling products).
+# Where the toolbox exposes no standard_name for a variable, the row
+# carries `long_name: ''` with a TODO marker.
 #
 # Schema (per dataset):
 #   <dataset_id>:
@@ -30,8 +30,8 @@ datasets:
     cadence: daily
     domain: ibi
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 1993-01-01
+      end: null              # null = NRT / rolling
     variables:
       dissic:
         units: mol.m-3
@@ -49,8 +49,8 @@ datasets:
     cadence: monthly
     domain: ibi
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       dissic:
         units: mol.m-3
@@ -68,8 +68,8 @@ datasets:
     cadence: annual
     domain: ibi
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       dissic:
         units: mol.m-3
@@ -87,8 +87,8 @@ datasets:
     cadence: daily
     domain: ibi
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 1993-01-01
+      end: null              # null = NRT / rolling
     variables:
       fe:
         units: mmol.m-3
@@ -112,8 +112,8 @@ datasets:
     cadence: monthly
     domain: ibi
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       fe:
         units: mmol.m-3
@@ -137,8 +137,8 @@ datasets:
     cadence: annual
     domain: ibi
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       fe:
         units: mmol.m-3
@@ -162,8 +162,8 @@ datasets:
     cadence: daily
     domain: ibi
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 1993-01-01
+      end: null              # null = NRT / rolling
     variables:
       o2:
         units: mmol.m-3
@@ -175,8 +175,8 @@ datasets:
     cadence: monthly
     domain: ibi
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       o2:
         units: mmol.m-3
@@ -188,8 +188,8 @@ datasets:
     cadence: annual
     domain: ibi
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       o2:
         units: mmol.m-3
@@ -201,8 +201,8 @@ datasets:
     cadence: daily
     domain: ibi
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 2023-11-15
+      end: null              # null = NRT / rolling
     variables:
       kd:
         units: m-1
@@ -214,8 +214,8 @@ datasets:
     cadence: monthly
     domain: ibi
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       kd:
         units: m-1
@@ -227,8 +227,8 @@ datasets:
     cadence: daily
     domain: ibi
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 1993-01-01
+      end: null              # null = NRT / rolling
     variables:
       kd:
         units: m-1
@@ -243,8 +243,8 @@ datasets:
     cadence: monthly
     domain: ibi
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       kd:
         units: m-1
@@ -259,8 +259,8 @@ datasets:
     cadence: annual
     domain: ibi
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       kd:
         units: m-1
@@ -275,8 +275,8 @@ datasets:
     cadence: daily
     domain: ibi
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 1993-01-01
+      end: null              # null = NRT / rolling
     variables:
       chl:
         units: mg.m-3
@@ -297,8 +297,8 @@ datasets:
     cadence: monthly
     domain: ibi
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       chl:
         units: mg.m-3
@@ -319,8 +319,8 @@ datasets:
     cadence: annual
     domain: ibi
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       chl:
         units: mg.m-3
@@ -341,8 +341,8 @@ datasets:
     cadence: daily
     domain: ibi
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 2022-11-23
+      end: null              # null = NRT / rolling
     variables:
       chl:
         units: mg.m-3
@@ -393,8 +393,8 @@ datasets:
     cadence: monthly
     domain: ibi
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       chl:
         units: mg.m-3
@@ -445,8 +445,8 @@ datasets:
     cadence: irregular
     domain: ibi
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       deptho:
         units: m
@@ -464,8 +464,8 @@ datasets:
     cadence: irregular
     domain: ibi
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       deptho:
         units: m
@@ -483,8 +483,8 @@ datasets:
     cadence: climatology
     domain: ibi
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       chl_mean:
         units: mg.m-3
@@ -586,8 +586,8 @@ datasets:
     cadence: daily
     domain: ibi
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 2022-11-22
+      end: null              # null = NRT / rolling
     variables:
       uo_detided:
         units: m s-1
@@ -602,8 +602,8 @@ datasets:
     cadence: monthly
     domain: ibi
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       uo_detided:
         units: m s-1
@@ -618,8 +618,8 @@ datasets:
     cadence: daily
     domain: ibi
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 1993-01-01
+      end: null              # null = NRT / rolling
     variables:
       uo:
         units: m s-1
@@ -634,8 +634,8 @@ datasets:
     cadence: monthly
     domain: ibi
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       uo:
         units: m s-1
@@ -650,8 +650,8 @@ datasets:
     cadence: annual
     domain: ibi
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       uo:
         units: m s-1
@@ -666,8 +666,8 @@ datasets:
     cadence: hourly
     domain: ibi
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 1993-01-01
+      end: null              # null = NRT / rolling
     variables:
       ubar:
         units: m s-1
@@ -688,8 +688,8 @@ datasets:
     cadence: daily
     domain: ibi
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 1993-01-01
+      end: null              # null = NRT / rolling
     variables:
       uo_detided:
         units: m s-1
@@ -704,8 +704,8 @@ datasets:
     cadence: monthly
     domain: ibi
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       uo_detided:
         units: m s-1
@@ -720,8 +720,8 @@ datasets:
     cadence: annual
     domain: ibi
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       uo_detided:
         units: m s-1
@@ -736,8 +736,8 @@ datasets:
     cadence: daily
     domain: ibi
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 1993-01-01
+      end: null              # null = NRT / rolling
     variables:
       hfds:
         units: W m-2
@@ -761,8 +761,8 @@ datasets:
     cadence: monthly
     domain: ibi
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       hfds:
         units: W m-2
@@ -786,8 +786,8 @@ datasets:
     cadence: annual
     domain: ibi
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       hfds:
         units: W m-2
@@ -811,8 +811,8 @@ datasets:
     cadence: daily
     domain: ibi
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 1993-01-01
+      end: null              # null = NRT / rolling
     variables:
       taum:
         units: N m-2
@@ -824,8 +824,8 @@ datasets:
     cadence: monthly
     domain: ibi
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       taum:
         units: N m-2
@@ -837,8 +837,8 @@ datasets:
     cadence: annual
     domain: ibi
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       taum:
         units: N m-2
@@ -850,8 +850,8 @@ datasets:
     cadence: daily
     domain: ibi
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 1993-01-01
+      end: null              # null = NRT / rolling
     variables:
       mlotst:
         units: m
@@ -863,8 +863,8 @@ datasets:
     cadence: monthly
     domain: ibi
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       mlotst:
         units: m
@@ -876,8 +876,8 @@ datasets:
     cadence: annual
     domain: ibi
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       mlotst:
         units: m
@@ -889,8 +889,8 @@ datasets:
     cadence: hourly
     domain: ibi
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 1993-01-01
+      end: null              # null = NRT / rolling
     variables:
       mlotst:
         units: m
@@ -902,8 +902,8 @@ datasets:
     cadence: daily
     domain: ibi
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 1993-01-01
+      end: null              # null = NRT / rolling
     variables:
       so:
         units: 1e-3
@@ -915,8 +915,8 @@ datasets:
     cadence: monthly
     domain: ibi
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       so:
         units: 1e-3
@@ -928,8 +928,8 @@ datasets:
     cadence: annual
     domain: ibi
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       so:
         units: 1e-3
@@ -941,8 +941,8 @@ datasets:
     cadence: daily
     domain: ibi
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 2022-11-22
+      end: null              # null = NRT / rolling
     variables:
       zos_detided:
         units: m
@@ -954,8 +954,8 @@ datasets:
     cadence: monthly
     domain: ibi
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       zos_detided:
         units: m
@@ -967,8 +967,8 @@ datasets:
     cadence: daily
     domain: ibi
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 1993-01-01
+      end: null              # null = NRT / rolling
     variables:
       zos:
         units: m
@@ -980,8 +980,8 @@ datasets:
     cadence: monthly
     domain: ibi
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       zos:
         units: m
@@ -993,8 +993,8 @@ datasets:
     cadence: annual
     domain: ibi
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       zos:
         units: m
@@ -1006,8 +1006,8 @@ datasets:
     cadence: hourly
     domain: ibi
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 1993-01-01
+      end: null              # null = NRT / rolling
     variables:
       zos:
         units: m
@@ -1019,8 +1019,8 @@ datasets:
     cadence: daily
     domain: ibi
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 1993-01-01
+      end: null              # null = NRT / rolling
     variables:
       zos_detided:
         units: m
@@ -1032,8 +1032,8 @@ datasets:
     cadence: monthly
     domain: ibi
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       zos_detided:
         units: m
@@ -1045,8 +1045,8 @@ datasets:
     cadence: annual
     domain: ibi
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       zos_detided:
         units: m
@@ -1058,8 +1058,8 @@ datasets:
     cadence: daily
     domain: ibi
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 1993-01-01
+      end: null              # null = NRT / rolling
     variables:
       bottomT:
         units: degrees_C
@@ -1074,8 +1074,8 @@ datasets:
     cadence: monthly
     domain: ibi
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       bottomT:
         units: degrees_C
@@ -1090,8 +1090,8 @@ datasets:
     cadence: annual
     domain: ibi
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       bottomT:
         units: degrees_C
@@ -1106,8 +1106,8 @@ datasets:
     cadence: hourly
     domain: ibi
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 1993-01-01
+      end: null              # null = NRT / rolling
     variables:
       thetao:
         units: degrees_C
@@ -1119,8 +1119,8 @@ datasets:
     cadence: daily
     domain: ibi
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 2023-11-22
+      end: null              # null = NRT / rolling
     variables:
       wo:
         units: m s-1
@@ -1132,8 +1132,8 @@ datasets:
     cadence: monthly
     domain: ibi
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       wo:
         units: m s-1
@@ -1145,8 +1145,8 @@ datasets:
     cadence: daily
     domain: ibi
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 1993-01-01
+      end: null              # null = NRT / rolling
     variables:
       wo:
         units: m s-1
@@ -1158,8 +1158,8 @@ datasets:
     cadence: monthly
     domain: ibi
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       wo:
         units: m s-1
@@ -1171,8 +1171,8 @@ datasets:
     cadence: annual
     domain: ibi
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       wo:
         units: m s-1
@@ -1184,8 +1184,8 @@ datasets:
     cadence: daily
     domain: ibi
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 1993-01-01
+      end: null              # null = NRT / rolling
     variables:
       pr:
         units: kg m-2 s-1
@@ -1200,8 +1200,8 @@ datasets:
     cadence: monthly
     domain: ibi
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       pr:
         units: kg m-2 s-1
@@ -1216,8 +1216,8 @@ datasets:
     cadence: annual
     domain: ibi
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       pr:
         units: kg m-2 s-1
@@ -1232,8 +1232,8 @@ datasets:
     cadence: irregular
     domain: ibi
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 2022-11-23
+      end: null              # null = NRT / rolling
     variables:
       uo:
         units: m s-1
@@ -1251,8 +1251,8 @@ datasets:
     cadence: hourly
     domain: ibi
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 2022-11-23
+      end: null              # null = NRT / rolling
     variables:
       mlotst:
         units: m
@@ -1282,8 +1282,8 @@ datasets:
     cadence: daily
     domain: ibi
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 2022-11-23
+      end: null              # null = NRT / rolling
     variables:
       bottomT:
         units: degrees_C
@@ -1313,8 +1313,8 @@ datasets:
     cadence: monthly
     domain: ibi
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       bottomT:
         units: degrees_C
@@ -1344,8 +1344,8 @@ datasets:
     cadence: hourly
     domain: ibi
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 2024-11-10
+      end: null              # null = NRT / rolling
     variables:
       so:
         units: 1e-3
@@ -1366,8 +1366,8 @@ datasets:
     cadence: irregular
     domain: ibi
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       deptho:
         units: m
@@ -1385,8 +1385,8 @@ datasets:
     cadence: irregular
     domain: ibi
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       deptho:
         units: m
@@ -1404,8 +1404,8 @@ datasets:
     cadence: climatology
     domain: ibi
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       bottomT_mean:
         units: degrees_C
@@ -1531,8 +1531,8 @@ datasets:
     cadence: hourly
     domain: ibi
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 2022-11-26
+      end: null              # null = NRT / rolling
     variables:
       VCMX:
         units: m
@@ -1598,8 +1598,8 @@ datasets:
     cadence: irregular
     domain: ibi
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       deptho:
         units: m
@@ -1614,8 +1614,8 @@ datasets:
     cadence: irregular
     domain: ibi
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 1980-01-01
+      end: null              # null = NRT / rolling
     variables:
       TAUX:
         units: Pa
@@ -1633,8 +1633,8 @@ datasets:
     cadence: climatology
     domain: ibi
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       VHM0_mean:
         units: m
@@ -1652,8 +1652,8 @@ datasets:
     cadence: hourly
     domain: ibi
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 1980-01-01
+      end: null              # null = NRT / rolling
     variables:
       VCMX:
         units: m
@@ -1719,8 +1719,8 @@ datasets:
     cadence: irregular
     domain: ibi
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       deptho:
         units: m
@@ -1735,8 +1735,8 @@ datasets:
     cadence: daily
     domain: ibi
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 2025-11-01
+      end: null              # null = NRT / rolling
     variables:
       BBP443:
         units: m-1
@@ -1817,8 +1817,8 @@ datasets:
     cadence: daily
     domain: ibi
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 2025-11-01
+      end: null              # null = NRT / rolling
     variables:
       BBP443:
         units: m-1
@@ -1830,8 +1830,8 @@ datasets:
     cadence: monthly
     domain: ibi
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       BBP443:
         units: m-1
@@ -1849,8 +1849,8 @@ datasets:
     cadence: monthly
     domain: ibi
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       CHL:
         units: mg m-3
@@ -1886,8 +1886,8 @@ datasets:
     cadence: irregular
     domain: ibi
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       err_mdt:
         units: m
@@ -1917,8 +1917,8 @@ datasets:
     cadence: irregular
     domain: ibi
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       dac:
         units: m
@@ -1948,8 +1948,8 @@ datasets:
     cadence: irregular
     domain: ibi
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       dac:
         units: m
@@ -1979,8 +1979,8 @@ datasets:
     cadence: daily
     domain: ibi
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 1993-01-01
+      end: null              # null = NRT / rolling
     variables:
       adt:
         units: m
@@ -2022,8 +2022,8 @@ datasets:
     cadence: daily
     domain: ibi
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 1993-01-01
+      end: null              # null = NRT / rolling
     variables:
       adt:
         units: m
@@ -2065,8 +2065,8 @@ datasets:
     cadence: monthly
     domain: ibi
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       sla:
         units: m
@@ -2078,8 +2078,8 @@ datasets:
     cadence: irregular
     domain: ibi
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       dac:
         units: m
@@ -2109,8 +2109,8 @@ datasets:
     cadence: irregular
     domain: ibi
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       dac:
         units: m
@@ -2140,8 +2140,8 @@ datasets:
     cadence: irregular
     domain: ibi
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       dac:
         units: m
@@ -2171,8 +2171,8 @@ datasets:
     cadence: irregular
     domain: ibi
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       dac:
         units: m
@@ -2202,8 +2202,8 @@ datasets:
     cadence: irregular
     domain: ibi
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       dac:
         units: m
@@ -2233,8 +2233,8 @@ datasets:
     cadence: irregular
     domain: ibi
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       dac:
         units: m
@@ -2264,8 +2264,8 @@ datasets:
     cadence: irregular
     domain: ibi
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       dac:
         units: m
@@ -2295,8 +2295,8 @@ datasets:
     cadence: irregular
     domain: ibi
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       dac:
         units: m
@@ -2326,8 +2326,8 @@ datasets:
     cadence: irregular
     domain: ibi
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       dac:
         units: m
@@ -2357,8 +2357,8 @@ datasets:
     cadence: irregular
     domain: ibi
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       dac:
         units: m
@@ -2388,8 +2388,8 @@ datasets:
     cadence: irregular
     domain: ibi
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       dac:
         units: m
@@ -2419,8 +2419,8 @@ datasets:
     cadence: irregular
     domain: ibi
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       dac:
         units: m
@@ -2450,8 +2450,8 @@ datasets:
     cadence: irregular
     domain: ibi
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       dac:
         units: m
@@ -2481,8 +2481,8 @@ datasets:
     cadence: irregular
     domain: ibi
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       dac:
         units: m
@@ -2512,8 +2512,8 @@ datasets:
     cadence: irregular
     domain: ibi
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       dac:
         units: m
@@ -2543,8 +2543,8 @@ datasets:
     cadence: irregular
     domain: ibi
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       dac:
         units: m
@@ -2574,8 +2574,8 @@ datasets:
     cadence: irregular
     domain: ibi
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       dac:
         units: m
@@ -2605,8 +2605,8 @@ datasets:
     cadence: irregular
     domain: ibi
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       dac:
         units: m
@@ -2636,8 +2636,8 @@ datasets:
     cadence: irregular
     domain: ibi
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       dac:
         units: m
@@ -2667,8 +2667,8 @@ datasets:
     cadence: irregular
     domain: ibi
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       dac:
         units: m
@@ -2698,8 +2698,8 @@ datasets:
     cadence: irregular
     domain: ibi
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       dac:
         units: m
@@ -2729,8 +2729,8 @@ datasets:
     cadence: irregular
     domain: ibi
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       dac:
         units: m
@@ -2760,8 +2760,8 @@ datasets:
     cadence: irregular
     domain: ibi
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       dac:
         units: m
@@ -2791,8 +2791,8 @@ datasets:
     cadence: irregular
     domain: ibi
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       dac:
         units: m
@@ -2822,8 +2822,8 @@ datasets:
     cadence: irregular
     domain: ibi
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       dac:
         units: m
@@ -2853,8 +2853,8 @@ datasets:
     cadence: irregular
     domain: ibi
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       dac:
         units: m
@@ -2884,8 +2884,8 @@ datasets:
     cadence: irregular
     domain: ibi
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       dac:
         units: m
@@ -2915,8 +2915,8 @@ datasets:
     cadence: irregular
     domain: ibi
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       dac:
         units: m
@@ -2946,8 +2946,8 @@ datasets:
     cadence: daily
     domain: ibi
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 2024-07-01
+      end: null              # null = NRT / rolling
     variables:
       adt:
         units: m
@@ -2986,8 +2986,8 @@ datasets:
     cadence: daily
     domain: ibi
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 2022-10-04
+      end: null              # null = NRT / rolling
     variables:
       adt:
         units: m
@@ -3026,8 +3026,8 @@ datasets:
     cadence: irregular
     domain: ibi
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       dac:
         units: m
@@ -3057,8 +3057,8 @@ datasets:
     cadence: daily
     domain: ibi
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 2025-10-28
+      end: null              # null = NRT / rolling
     variables:
       adt:
         units: m
@@ -3097,8 +3097,8 @@ datasets:
     cadence: irregular
     domain: ibi
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       dac:
         units: m
@@ -3140,8 +3140,8 @@ datasets:
     cadence: irregular
     domain: ibi
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       dac:
         units: m
@@ -3171,8 +3171,8 @@ datasets:
     cadence: irregular
     domain: ibi
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       dac:
         units: m
@@ -3214,8 +3214,8 @@ datasets:
     cadence: irregular
     domain: ibi
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       dac:
         units: m
@@ -3245,8 +3245,8 @@ datasets:
     cadence: irregular
     domain: ibi
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       dac:
         units: m
@@ -3288,8 +3288,8 @@ datasets:
     cadence: irregular
     domain: ibi
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       dac:
         units: m
@@ -3319,8 +3319,8 @@ datasets:
     cadence: irregular
     domain: ibi
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       dac:
         units: m
@@ -3362,8 +3362,8 @@ datasets:
     cadence: irregular
     domain: ibi
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       dac:
         units: m
@@ -3393,8 +3393,8 @@ datasets:
     cadence: irregular
     domain: ibi
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       dac:
         units: m
@@ -3436,8 +3436,8 @@ datasets:
     cadence: irregular
     domain: ibi
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       dac:
         units: m
@@ -3467,8 +3467,8 @@ datasets:
     cadence: irregular
     domain: ibi
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       dac:
         units: m
@@ -3510,8 +3510,8 @@ datasets:
     cadence: irregular
     domain: ibi
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       dac:
         units: m
@@ -3541,8 +3541,8 @@ datasets:
     cadence: irregular
     domain: ibi
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       dac:
         units: m
@@ -3584,8 +3584,8 @@ datasets:
     cadence: irregular
     domain: ibi
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       dac:
         units: m
@@ -3615,8 +3615,8 @@ datasets:
     cadence: daily
     domain: ibi
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 2020-01-01
+      end: null              # null = NRT / rolling
     variables:
       CHL:
         units: mg m-3
@@ -3634,8 +3634,8 @@ datasets:
     cadence: daily
     domain: ibi
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 2020-01-01
+      end: null              # null = NRT / rolling
     variables:
       CHL:
         units: mg m-3
@@ -3653,8 +3653,8 @@ datasets:
     cadence: irregular
     domain: ibi
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       cui_ibi-phy-myp:
         units: degrees_C
@@ -3669,8 +3669,8 @@ datasets:
     cadence: irregular
     domain: ibi
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       cui_ibi-phy-myp_trend:
         units: degrees_C Yr-1
@@ -3688,8 +3688,8 @@ datasets:
     cadence: irregular
     domain: ibi
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       swh_percentile99_anom:
         units: m
@@ -3704,8 +3704,8 @@ datasets:
     cadence: irregular
     domain: ibi
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       swi_myp_wav1:
         units: percentage
@@ -3738,8 +3738,8 @@ datasets:
     cadence: irregular
     domain: ibi
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       swh_percentile90_myp:
         units: metres
@@ -3751,8 +3751,8 @@ datasets:
     cadence: irregular
     domain: ibi
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       mow_armor:
         units: 1e-3
@@ -3782,8 +3782,8 @@ datasets:
     cadence: irregular
     domain: ibi
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       mow_armor:
         units: 1e-3
@@ -3813,8 +3813,8 @@ datasets:
     cadence: irregular
     domain: ibi
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       mow_armor:
         units: 1e-3
@@ -3844,8 +3844,8 @@ datasets:
     cadence: irregular
     domain: ibi
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       mow_armor:
         units: 1e-3

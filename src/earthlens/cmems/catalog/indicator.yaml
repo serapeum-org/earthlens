@@ -5,12 +5,12 @@
 # this directory into one Catalog at construction time; dataset ids
 # must be unique across files. Stanzas are emitted by
 # tools/cmems/refresh_cmems_catalog.py from copernicusmarine.describe();
-# `cadence` is inferred from the dataset_id suffix and `domain` from
-# the product_id prefix. The `global` basin is sub-split by theme
-# (global-physics / global-biogeochem / global-sst / ...) to keep file
-# sizes balanced; the `domain:` field on every row below is still the
-# plain basin label. Where the toolbox exposes no standard_name for a
-# variable, the row carries `long_name: ''` with a TODO marker.
+# `cadence` is inferred from the dataset_id suffix, `domain` from the
+# product_id prefix, and `temporal.start` is read from the dataset's
+# arco time-coordinate bounds. `end` is left null (the arco max is
+# "latest available today" and would go stale for rolling products).
+# Where the toolbox exposes no standard_name for a variable, the row
+# carries `long_name: ''` with a TODO marker.
 #
 # Schema (per dataset):
 #   <dataset_id>:
@@ -30,8 +30,8 @@ datasets:
     cadence: irregular
     domain: indicator
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       cur_armor:
         units: Sverdrup [10^6m^3/sec]
@@ -58,8 +58,8 @@ datasets:
     cadence: irregular
     domain: indicator
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       cur_armor:
         units: Sverdrup [10^6m^3/sec]
@@ -89,8 +89,8 @@ datasets:
     cadence: irregular
     domain: indicator
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       cur_armor:
         units: Sverdrup [10^6m^3/sec]
@@ -117,8 +117,8 @@ datasets:
     cadence: irregular
     domain: indicator
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       cur_armor:
         units: Sverdrup [10^6m^3/sec]
@@ -148,8 +148,8 @@ datasets:
     cadence: irregular
     domain: indicator
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       cur_armor:
         units: Sverdrup [10^6m^3/sec]
@@ -179,8 +179,8 @@ datasets:
     cadence: daily
     domain: indicator
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 1991-01-01
+      end: null              # null = NRT / rolling
     variables:
       MHW_index_bottom:
         units: ''
@@ -195,8 +195,8 @@ datasets:
     cadence: irregular
     domain: indicator
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       ci_latitude:
         units: ''
@@ -211,8 +211,8 @@ datasets:
     cadence: irregular
     domain: indicator
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       BSRCI:
         units: '1'
@@ -230,8 +230,8 @@ datasets:
     cadence: irregular
     domain: indicator
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       kuroshio:
         units: '1'
@@ -243,8 +243,8 @@ datasets:
     cadence: irregular
     domain: indicator
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       vol_sigma_tr:
         units: m^3/s
@@ -256,8 +256,8 @@ datasets:
     cadence: irregular
     domain: indicator
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       EMOC:
         units: '[Sv = $10^6 m^3 s^{-1}$]'
@@ -272,8 +272,8 @@ datasets:
     cadence: irregular
     domain: indicator
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       vol_BSOAW_Reanalysis:
         units: 10E6 meter3 second-1
@@ -297,8 +297,8 @@ datasets:
     cadence: irregular
     domain: indicator
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       ofc_balrean:
         units: km3
@@ -316,8 +316,8 @@ datasets:
     cadence: irregular
     domain: indicator
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       ohc_balrean:
         units: J m-2
@@ -335,8 +335,8 @@ datasets:
     cadence: irregular
     domain: indicator
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       ohc_armor:
         units: J m-2
@@ -363,8 +363,8 @@ datasets:
     cadence: irregular
     domain: indicator
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       ARMOR-3D:
         units: J m-2
@@ -406,8 +406,8 @@ datasets:
     cadence: irregular
     domain: indicator
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       ARMOR-3D:
         units: J m-2
@@ -449,8 +449,8 @@ datasets:
     cadence: irregular
     domain: indicator
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       ARMOR-3D:
         units: J m-2
@@ -492,8 +492,8 @@ datasets:
     cadence: irregular
     domain: indicator
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       opottemptend_armor:
         units: W m-2
@@ -523,8 +523,8 @@ datasets:
     cadence: irregular
     domain: indicator
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       ohc_armor_myp:
         units: Jm-2
@@ -554,8 +554,8 @@ datasets:
     cadence: irregular
     domain: indicator
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       ohc_armor:
         units: J m-2
@@ -588,8 +588,8 @@ datasets:
     cadence: irregular
     domain: indicator
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       osc_armor:
         units: PSU
@@ -622,8 +622,8 @@ datasets:
     cadence: irregular
     domain: indicator
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       SI_AT_BSE_Reanalysis:
         units: km2
@@ -650,8 +650,8 @@ datasets:
     cadence: irregular
     domain: indicator
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 1993-01-01
+      end: null              # null = NRT / rolling
     variables:
       siextentn:
         units: 10³ km²
@@ -663,8 +663,8 @@ datasets:
     cadence: irregular
     domain: indicator
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 2023-10-01
+      end: null              # null = NRT / rolling
     variables:
       siextentn_yday_2024:
         units: 10³ km²
@@ -682,8 +682,8 @@ datasets:
     cadence: irregular
     domain: indicator
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 1993-01-01
+      end: null              # null = NRT / rolling
     variables:
       sivoln:
         units: km³
@@ -695,8 +695,8 @@ datasets:
     cadence: irregular
     domain: indicator
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 2023-10-01
+      end: null              # null = NRT / rolling
     variables:
       sivoln_yday_2024:
         units: km³
@@ -714,8 +714,8 @@ datasets:
     cadence: irregular
     domain: indicator
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 1999-02-20
+      end: null              # null = NRT / rolling
     variables:
       MSL_filtered_GIA_corrected_adjusted:
         units: cm
@@ -730,8 +730,8 @@ datasets:
     cadence: irregular
     domain: indicator
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 1999-02-20
+      end: null              # null = NRT / rolling
     variables:
       MSL_filtered_GIA_corrected_adjusted:
         units: cm
@@ -746,8 +746,8 @@ datasets:
     cadence: irregular
     domain: indicator
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 1999-02-20
+      end: null              # null = NRT / rolling
     variables:
       MSL_filtered_GIA_corrected_adjusted:
         units: cm
@@ -762,8 +762,8 @@ datasets:
     cadence: irregular
     domain: indicator
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 1999-02-20
+      end: null              # null = NRT / rolling
     variables:
       MSL_filtered_GIA_corrected_adjusted:
         units: cm
@@ -781,8 +781,8 @@ datasets:
     cadence: irregular
     domain: indicator
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       acceleration:
         units: mm/year2
@@ -797,8 +797,8 @@ datasets:
     cadence: irregular
     domain: indicator
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 1999-02-20
+      end: null              # null = NRT / rolling
     variables:
       MSL_filtered_GIA_corrected_adjusted:
         units: cm
@@ -813,8 +813,8 @@ datasets:
     cadence: irregular
     domain: indicator
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 1999-02-20
+      end: null              # null = NRT / rolling
     variables:
       MSL_filtered_GIA_corrected_adjusted:
         units: cm
@@ -829,8 +829,8 @@ datasets:
     cadence: irregular
     domain: indicator
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 1999-02-20
+      end: null              # null = NRT / rolling
     variables:
       MSL_filtered_GIA_corrected_adjusted:
         units: cm
@@ -845,8 +845,8 @@ datasets:
     cadence: irregular
     domain: indicator
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       sst_anomaly:
         units: K
@@ -858,8 +858,8 @@ datasets:
     cadence: irregular
     domain: indicator
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       sst_trend:
         units: K
@@ -871,8 +871,8 @@ datasets:
     cadence: irregular
     domain: indicator
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       sst_anomaly:
         units: kelvin
@@ -890,8 +890,8 @@ datasets:
     cadence: irregular
     domain: indicator
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       sst_trend:
         units: kelvin/year
@@ -903,8 +903,8 @@ datasets:
     cadence: irregular
     domain: indicator
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       st_anomaly:
         units: K
@@ -916,8 +916,8 @@ datasets:
     cadence: irregular
     domain: indicator
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       sst_anomaly:
         units: K
@@ -929,8 +929,8 @@ datasets:
     cadence: irregular
     domain: indicator
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       st_trend:
         units: K
@@ -942,8 +942,8 @@ datasets:
     cadence: irregular
     domain: indicator
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       sst_anomaly:
         units: kelvin
@@ -961,8 +961,8 @@ datasets:
     cadence: irregular
     domain: indicator
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       sst_trend:
         units: kelvin/year
@@ -974,8 +974,8 @@ datasets:
     cadence: irregular
     domain: indicator
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       so_trend:
         units: 1e-3 year-1
@@ -993,8 +993,8 @@ datasets:
     cadence: irregular
     domain: indicator
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       thetao_trend:
         units: degree_C year-1
@@ -1012,8 +1012,8 @@ datasets:
     cadence: irregular
     domain: indicator
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       temp_percentile99_anom:
         units: degree_C
@@ -1028,8 +1028,8 @@ datasets:
     cadence: irregular
     domain: indicator
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       thsl_armor:
         units: m
@@ -1071,8 +1071,8 @@ datasets:
     cadence: irregular
     domain: indicator
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       thsl_armor:
         units: m
@@ -1114,8 +1114,8 @@ datasets:
     cadence: irregular
     domain: indicator
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       thsl_armor:
         units: mm/year
@@ -1145,8 +1145,8 @@ datasets:
     cadence: irregular
     domain: indicator
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       npgo:
         units: ''
@@ -1158,8 +1158,8 @@ datasets:
     cadence: irregular
     domain: indicator
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       slev_percentile1_2023:
         units: m
@@ -1192,8 +1192,8 @@ datasets:
     cadence: irregular
     domain: indicator
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       slev_percentile1_2023:
         units: m
@@ -1226,8 +1226,8 @@ datasets:
     cadence: irregular
     domain: indicator
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       slev_percentile1_2023:
         units: m
@@ -1260,8 +1260,8 @@ datasets:
     cadence: irregular
     domain: indicator
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       slev_percentile1_2023:
         units: m
@@ -1294,8 +1294,8 @@ datasets:
     cadence: irregular
     domain: indicator
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       sst_percentile1_2023:
         units: degree_C
@@ -1328,8 +1328,8 @@ datasets:
     cadence: irregular
     domain: indicator
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       sst_percentile1_2023:
         units: degree_C
@@ -1362,8 +1362,8 @@ datasets:
     cadence: irregular
     domain: indicator
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       sst_percentile1_2023:
         units: degree_C
@@ -1396,8 +1396,8 @@ datasets:
     cadence: irregular
     domain: indicator
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       sst_percentile1_2023:
         units: degree_C
@@ -1430,8 +1430,8 @@ datasets:
     cadence: irregular
     domain: indicator
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       vavh_seasonal_mean:
         units: m
@@ -1473,8 +1473,8 @@ datasets:
     cadence: irregular
     domain: indicator
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       vavh_trend_seasonal_mean_global:
         units: cm/y
@@ -1495,8 +1495,8 @@ datasets:
     cadence: irregular
     domain: indicator
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       swh_percentile1_2023:
         units: m
@@ -1529,8 +1529,8 @@ datasets:
     cadence: irregular
     domain: indicator
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       NR_anom_2023:
         units: N
@@ -1548,8 +1548,8 @@ datasets:
     cadence: irregular
     domain: indicator
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       P_anom_2023:
         units: kW m^-1
@@ -1567,8 +1567,8 @@ datasets:
     cadence: irregular
     domain: indicator
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       swh_percentile1_2023:
         units: m
@@ -1601,8 +1601,8 @@ datasets:
     cadence: irregular
     domain: indicator
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       swh_percentile1_2023:
         units: m
@@ -1635,8 +1635,8 @@ datasets:
     cadence: irregular
     domain: indicator
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       swh_percentile1_2023:
         units: m
@@ -1669,8 +1669,8 @@ datasets:
     cadence: irregular
     domain: indicator
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       CDW:
         units: Sv (10^6 m3 s-1)
@@ -1697,8 +1697,8 @@ datasets:
     cadence: irregular
     domain: indicator
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       CONCURRENT_CYANOBLOOM:
         units: day·km2·10e6
@@ -1716,8 +1716,8 @@ datasets:
     cadence: irregular
     domain: indicator
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       eutrophication_indicator:
         units: ''
@@ -1732,8 +1732,8 @@ datasets:
     cadence: irregular
     domain: indicator
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       chlor_a:
         units: mg m^-3
@@ -1748,8 +1748,8 @@ datasets:
     cadence: irregular
     domain: indicator
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       trend:
         units: '% yr^-1'
@@ -1761,8 +1761,8 @@ datasets:
     cadence: irregular
     domain: indicator
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       chlor_a:
         units: mg m^-3
@@ -1777,8 +1777,8 @@ datasets:
     cadence: irregular
     domain: indicator
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       trend:
         units: '% yr^-1'
@@ -1790,8 +1790,8 @@ datasets:
     cadence: irregular
     domain: indicator
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       trend:
         units: '% yr^-1'
@@ -1803,8 +1803,8 @@ datasets:
     cadence: irregular
     domain: indicator
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       chlor_a:
         units: mg m^-3
@@ -1819,8 +1819,8 @@ datasets:
     cadence: irregular
     domain: indicator
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       trend:
         units: '% yr^-1'
@@ -1832,8 +1832,8 @@ datasets:
     cadence: irregular
     domain: indicator
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 1993-01-01
+      end: null              # null = NRT / rolling
     variables:
       crv:
         units: km3
@@ -1845,8 +1845,8 @@ datasets:
     cadence: irregular
     domain: indicator
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 1993-01-01
+      end: null              # null = NRT / rolling
     variables:
       sob_ark:
         units: '0.001'
@@ -1861,8 +1861,8 @@ datasets:
     cadence: irregular
     domain: indicator
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       oxy:
         units: '0.001'

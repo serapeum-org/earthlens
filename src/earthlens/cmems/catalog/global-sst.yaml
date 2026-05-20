@@ -5,12 +5,12 @@
 # this directory into one Catalog at construction time; dataset ids
 # must be unique across files. Stanzas are emitted by
 # tools/cmems/refresh_cmems_catalog.py from copernicusmarine.describe();
-# `cadence` is inferred from the dataset_id suffix and `domain` from
-# the product_id prefix. The `global` basin is sub-split by theme
-# (global-physics / global-biogeochem / global-sst / ...) to keep file
-# sizes balanced; the `domain:` field on every row below is still the
-# plain basin label. Where the toolbox exposes no standard_name for a
-# variable, the row carries `long_name: ''` with a TODO marker.
+# `cadence` is inferred from the dataset_id suffix, `domain` from the
+# product_id prefix, and `temporal.start` is read from the dataset's
+# arco time-coordinate bounds. `end` is left null (the arco max is
+# "latest available today" and would go stale for rolling products).
+# Where the toolbox exposes no standard_name for a variable, the row
+# carries `long_name: ''` with a TODO marker.
 #
 # Schema (per dataset):
 #   <dataset_id>:
@@ -30,8 +30,8 @@ datasets:
     cadence: irregular
     domain: global
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 1982-01-01
+      end: null              # null = NRT / rolling
     variables:
       analysed_sst:
         units: kelvin
@@ -61,8 +61,8 @@ datasets:
     cadence: irregular
     domain: global
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 1980-01-01
+      end: null              # null = NRT / rolling
     variables:
       analysed_sst:
         units: kelvin
@@ -83,8 +83,8 @@ datasets:
     cadence: irregular
     domain: global
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 2018-01-01
+      end: null              # null = NRT / rolling
     variables:
       analysed_sst:
         units: kelvin
@@ -105,8 +105,8 @@ datasets:
     cadence: irregular
     domain: global
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 2021-01-01
+      end: null              # null = NRT / rolling
     variables:
       adjusted_sea_surface_temperature:
         units: kelvin
@@ -157,8 +157,8 @@ datasets:
     cadence: irregular
     domain: global
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 2024-01-17
+      end: null              # null = NRT / rolling
     variables:
       analysed_sst:
         units: kelvin
@@ -179,8 +179,8 @@ datasets:
     cadence: irregular
     domain: global
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 1981-10-01
+      end: null              # null = NRT / rolling
     variables:
       analysed_sst:
         units: kelvin
@@ -201,8 +201,8 @@ datasets:
     cadence: irregular
     domain: global
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 1982-01-01
+      end: null              # null = NRT / rolling
     variables:
       analysed_sst:
         units: kelvin
@@ -217,8 +217,8 @@ datasets:
     cadence: daily
     domain: global
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 2020-12-20
+      end: null              # null = NRT / rolling
     variables:
       adjusted_sea_surface_temperature:
         units: K
@@ -269,8 +269,8 @@ datasets:
     cadence: daily
     domain: global
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 2020-12-20
+      end: null              # null = NRT / rolling
     variables:
       adjusted_sea_surface_temperature:
         units: K
@@ -321,8 +321,8 @@ datasets:
     cadence: daily
     domain: global
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 2020-12-20
+      end: null              # null = NRT / rolling
     variables:
       adjusted_sea_surface_temperature:
         units: K
@@ -370,8 +370,8 @@ datasets:
     cadence: daily
     domain: global
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 1982-01-01
+      end: null              # null = NRT / rolling
     variables:
       adjusted_sea_surface_temperature:
         units: kelvin
@@ -404,8 +404,8 @@ datasets:
     cadence: daily
     domain: global
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 2021-01-01
+      end: null              # null = NRT / rolling
     variables:
       adjusted_sea_surface_temperature:
         units: kelvin
@@ -456,8 +456,8 @@ datasets:
     cadence: daily
     domain: global
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 2026-01-01
+      end: null              # null = NRT / rolling
     variables:
       analysed_sst:
         units: kelvin
@@ -484,8 +484,8 @@ datasets:
     cadence: daily
     domain: global
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 2020-12-20
+      end: null              # null = NRT / rolling
     variables:
       adjusted_sea_surface_temperature:
         units: K
@@ -536,8 +536,8 @@ datasets:
     cadence: daily
     domain: global
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 2020-12-20
+      end: null              # null = NRT / rolling
     variables:
       adjusted_sea_surface_temperature:
         units: K
@@ -588,8 +588,8 @@ datasets:
     cadence: daily
     domain: global
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 2020-12-20
+      end: null              # null = NRT / rolling
     variables:
       adjusted_sea_surface_temperature:
         units: K
@@ -637,8 +637,8 @@ datasets:
     cadence: daily
     domain: global
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 1982-01-01
+      end: null              # null = NRT / rolling
     variables:
       adjusted_sea_surface_temperature:
         units: kelvin

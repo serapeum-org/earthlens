@@ -14,6 +14,7 @@ Not part of the installed package — `sys.path.insert` against
 
 from __future__ import annotations
 
+import datetime as _dt
 import re
 from pathlib import Path
 from typing import Any, Iterable
@@ -344,6 +345,108 @@ def walk_variables(dataset: Any) -> list[Any]:
     return []
 
 
+# Multipliers from a CF time-unit word to seconds.
+_TIME_UNIT_SECONDS: dict[str, float] = {
+    "milliseconds": 1e-3,
+    "millisecond": 1e-3,
+    "ms": 1e-3,
+    "seconds": 1.0,
+    "second": 1.0,
+    "secs": 1.0,
+    "sec": 1.0,
+    "s": 1.0,
+    "minutes": 60.0,
+    "minute": 60.0,
+    "min": 60.0,
+    "hours": 3600.0,
+    "hour": 3600.0,
+    "hr": 3600.0,
+    "h": 3600.0,
+    "days": 86400.0,
+    "day": 86400.0,
+    "d": 86400.0,
+}
+
+_TIME_UNIT_RE = re.compile(r"\s*(\w+)\s+since\s+(\d{4}-\d{2}-\d{2})")
+
+
+def _parse_time_unit(unit: str | None) -> tuple[float, _dt.datetime] | None:
+    """Parse a CF `"<unit> since <date>"` string into `(seconds, epoch)`.
+
+    Args:
+        unit: A CF time-coordinate unit string, e.g.
+            `"milliseconds since 1970-01-01 00:00:00Z"` or
+            `"hours since 1950-01-01"`.
+
+    Returns:
+        `(seconds_per_unit, epoch_datetime)` when the string matches,
+            else `None`.
+    """
+    if not unit:
+        return None
+    m = _TIME_UNIT_RE.match(unit)
+    if not m:
+        return None
+    scale = _TIME_UNIT_SECONDS.get(m.group(1).lower())
+    if scale is None:
+        return None
+    epoch = _dt.datetime.strptime(m.group(2), "%Y-%m-%d").replace(
+        tzinfo=_dt.timezone.utc
+    )
+    return scale, epoch
+
+
+def temporal_bounds(dataset: Any) -> tuple[str | None, str | None]:
+    """Read a dataset's time-coverage bounds from `describe()`.
+
+    The `original-files` / `wmts` services carry no coordinate
+    metadata, but the arco services (`arco-geo-series` /
+    `arco-time-series`) expose each variable's `coordinates` with a
+    `time` entry carrying `minimum_value` / `maximum_value` plus a CF
+    `coordinate_unit`. This walks to the first such `time` coordinate
+    and converts the numeric min/max to `YYYY-MM-DD` strings, so the
+    catalog's `temporal.start` can be pinned without a live
+    `subset()` probe.
+
+    Args:
+        dataset: A `CopernicusMarineDataset` from
+            `copernicusmarine.describe()`.
+
+    Returns:
+        `(start_iso, end_iso)`. `start_iso` is the earliest date the
+            dataset covers; `end_iso` is the latest. Either is `None`
+            when no `time` coordinate is found or its unit can't be
+            parsed (static fields, malformed metadata).
+    """
+    for version in dataset.versions:
+        for part in version.parts:
+            for service in part.services:
+                for var in service.variables:
+                    for coord in getattr(var, "coordinates", None) or []:
+                        if getattr(coord, "coordinate_id", None) != "time":
+                            continue
+                        parsed = _parse_time_unit(
+                            getattr(coord, "coordinate_unit", None)
+                        )
+                        mn = getattr(coord, "minimum_value", None)
+                        mx = getattr(coord, "maximum_value", None)
+                        if parsed is None or mn is None:
+                            continue
+                        scale, epoch = parsed
+                        start = (
+                            epoch + _dt.timedelta(seconds=mn * scale)
+                        ).date().isoformat()
+                        end = (
+                            (epoch + _dt.timedelta(seconds=mx * scale))
+                            .date()
+                            .isoformat()
+                            if mx is not None
+                            else None
+                        )
+                        return start, end
+    return None, None
+
+
 def emit_dataset_stanza(product: Any, dataset: Any) -> str:
     """Emit a ready-to-paste `datasets.<dataset_id>:` YAML stanza.
 
@@ -372,6 +475,7 @@ def emit_dataset_stanza(product: Any, dataset: Any) -> str:
     cadence = cadence_for_dataset_id(ds_id)
     domain = domain_for_product_id(product.product_id)
     variables = walk_variables(dataset)
+    start, _end = temporal_bounds(dataset)
 
     lines: list[str] = [
         f"  {ds_id}:",
@@ -380,9 +484,16 @@ def emit_dataset_stanza(product: Any, dataset: Any) -> str:
         f"    cadence: {cadence}",
         f"    domain: {domain}",
         "    temporal:",
-        "      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py",
-        "      end: null              # null = NRT (rolling)",
     ]
+    if start:
+        lines.append(f"      start: {start}")
+    else:
+        lines.append(
+            "      start: null            # TODO: no time coord in describe()"
+        )
+    # `end` stays null: the arco max is "latest available today" and
+    # would go stale for rolling/NRT products. null = NRT / rolling.
+    lines.append("      end: null              # null = NRT / rolling")
     if variables:
         lines.append("    variables:")
         for var in variables:

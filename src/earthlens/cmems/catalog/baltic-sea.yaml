@@ -5,12 +5,12 @@
 # this directory into one Catalog at construction time; dataset ids
 # must be unique across files. Stanzas are emitted by
 # tools/cmems/refresh_cmems_catalog.py from copernicusmarine.describe();
-# `cadence` is inferred from the dataset_id suffix and `domain` from
-# the product_id prefix. The `global` basin is sub-split by theme
-# (global-physics / global-biogeochem / global-sst / ...) to keep file
-# sizes balanced; the `domain:` field on every row below is still the
-# plain basin label. Where the toolbox exposes no standard_name for a
-# variable, the row carries `long_name: ''` with a TODO marker.
+# `cadence` is inferred from the dataset_id suffix, `domain` from the
+# product_id prefix, and `temporal.start` is read from the dataset's
+# arco time-coordinate bounds. `end` is left null (the arco max is
+# "latest available today" and would go stale for rolling products).
+# Where the toolbox exposes no standard_name for a variable, the row
+# carries `long_name: ''` with a TODO marker.
 #
 # Schema (per dataset):
 #   <dataset_id>:
@@ -30,8 +30,8 @@ datasets:
     cadence: irregular
     domain: baltic-sea
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 2019-03-11
+      end: null              # null = NRT / rolling
     variables:
       mask:
         units: ''
@@ -73,8 +73,8 @@ datasets:
     cadence: irregular
     domain: baltic-sea
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 2023-01-30
+      end: null              # null = NRT / rolling
     variables:
       analysed_sst:
         units: kelvin
@@ -95,8 +95,8 @@ datasets:
     cadence: daily
     domain: baltic-sea
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 2022-11-01
+      end: null              # null = NRT / rolling
     variables:
       nppv:
         units: mg m-3 day-1
@@ -108,8 +108,8 @@ datasets:
     cadence: daily
     domain: baltic-sea
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 2022-11-01
+      end: null              # null = NRT / rolling
     variables:
       cdom:
         units: mmol m-3
@@ -169,8 +169,8 @@ datasets:
     cadence: monthly
     domain: baltic-sea
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       cdom:
         units: mmol m-3
@@ -227,8 +227,8 @@ datasets:
     cadence: irregular
     domain: baltic-sea
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       deptho:
         units: m
@@ -246,8 +246,8 @@ datasets:
     cadence: daily
     domain: baltic-sea
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 1993-01-01
+      end: null              # null = NRT / rolling
     variables:
       chl:
         units: mg m-3
@@ -286,8 +286,8 @@ datasets:
     cadence: monthly
     domain: baltic-sea
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       chl:
         units: mg m-3
@@ -326,8 +326,8 @@ datasets:
     cadence: annual
     domain: baltic-sea
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       chl:
         units: mg m-3
@@ -366,8 +366,8 @@ datasets:
     cadence: irregular
     domain: baltic-sea
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       deptho:
         units: m
@@ -385,8 +385,8 @@ datasets:
     cadence: daily
     domain: baltic-sea
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 2022-12-02
+      end: null              # null = NRT / rolling
     variables:
       uos_detided:
         units: m s-1
@@ -401,8 +401,8 @@ datasets:
     cadence: daily
     domain: baltic-sea
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 2022-12-02
+      end: null              # null = NRT / rolling
     variables:
       zos_detided:
         units: m
@@ -414,8 +414,8 @@ datasets:
     cadence: daily
     domain: baltic-sea
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 2022-12-02
+      end: null              # null = NRT / rolling
     variables:
       bottomT:
         units: degrees_C
@@ -454,8 +454,8 @@ datasets:
     cadence: monthly
     domain: baltic-sea
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       bottomT:
         units: degrees_C
@@ -497,8 +497,8 @@ datasets:
     cadence: irregular
     domain: baltic-sea
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 2022-12-02
+      end: null              # null = NRT / rolling
     variables:
       sla:
         units: m
@@ -516,8 +516,8 @@ datasets:
     cadence: hourly
     domain: baltic-sea
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 2022-12-02
+      end: null              # null = NRT / rolling
     variables:
       bottomT:
         units: degrees_C
@@ -559,8 +559,8 @@ datasets:
     cadence: irregular
     domain: baltic-sea
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       deptho:
         units: m
@@ -578,8 +578,8 @@ datasets:
     cadence: daily
     domain: baltic-sea
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 1993-01-01
+      end: null              # null = NRT / rolling
     variables:
       bottomT:
         units: degrees_C
@@ -618,8 +618,8 @@ datasets:
     cadence: monthly
     domain: baltic-sea
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       bottomT:
         units: degrees_C
@@ -658,8 +658,8 @@ datasets:
     cadence: annual
     domain: baltic-sea
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       bottomT:
         units: degrees_C
@@ -698,8 +698,8 @@ datasets:
     cadence: irregular
     domain: baltic-sea
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       deptho:
         units: m
@@ -717,8 +717,8 @@ datasets:
     cadence: hourly
     domain: baltic-sea
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 2021-10-01
+      end: null              # null = NRT / rolling
     variables:
       VCMX:
         units: m
@@ -784,8 +784,8 @@ datasets:
     cadence: irregular
     domain: baltic-sea
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       deptho:
         units: m
@@ -800,8 +800,8 @@ datasets:
     cadence: climatology
     domain: baltic-sea
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       VHM0:
         units: m
@@ -819,8 +819,8 @@ datasets:
     cadence: hourly
     domain: baltic-sea
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 1980-01-01
+      end: null              # null = NRT / rolling
     variables:
       VCMX:
         units: m
@@ -886,8 +886,8 @@ datasets:
     cadence: hourly
     domain: baltic-sea
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 1980-01-01
+      end: null              # null = NRT / rolling
     variables:
       chnk:
         units: ''
@@ -911,8 +911,8 @@ datasets:
     cadence: irregular
     domain: baltic-sea
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       deptho:
         units: m
@@ -927,8 +927,8 @@ datasets:
     cadence: daily
     domain: baltic-sea
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 2016-04-26
+      end: null              # null = NRT / rolling
     variables:
       ADG443:
         units: m^-1
@@ -949,8 +949,8 @@ datasets:
     cadence: daily
     domain: baltic-sea
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 2025-10-01
+      end: null              # null = NRT / rolling
     variables:
       BBP443:
         units: m-1
@@ -1031,8 +1031,8 @@ datasets:
     cadence: daily
     domain: baltic-sea
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 2026-04-24
+      end: null              # null = NRT / rolling
     variables:
       ADG443:
         units: m^-1
@@ -1053,8 +1053,8 @@ datasets:
     cadence: daily
     domain: baltic-sea
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 2025-11-01
+      end: null              # null = NRT / rolling
     variables:
       BBP443:
         units: m-1
@@ -1066,8 +1066,8 @@ datasets:
     cadence: monthly
     domain: baltic-sea
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       BBP443:
         units: m-1
@@ -1085,8 +1085,8 @@ datasets:
     cadence: daily
     domain: baltic-sea
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 1997-09-04
+      end: null              # null = NRT / rolling
     variables:
       CHL:
         units: milligram m^-3
@@ -1125,8 +1125,8 @@ datasets:
     cadence: daily
     domain: baltic-sea
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 2016-04-26
+      end: null              # null = NRT / rolling
     variables:
       CHL:
         units: milligram m^-3
@@ -1171,8 +1171,8 @@ datasets:
     cadence: monthly
     domain: baltic-sea
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       CHL:
         units: milligram m^-3
@@ -1190,8 +1190,8 @@ datasets:
     cadence: monthly
     domain: baltic-sea
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       CHL:
         units: milligram m^-3
@@ -1209,8 +1209,8 @@ datasets:
     cadence: daily
     domain: baltic-sea
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 2026-05-07
+      end: null              # null = NRT / rolling
     variables:
       CHL:
         units: milligram m^-3
@@ -1255,8 +1255,8 @@ datasets:
     cadence: monthly
     domain: baltic-sea
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       CHL:
         units: milligram m^-3
@@ -1274,8 +1274,8 @@ datasets:
     cadence: daily
     domain: baltic-sea
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 1997-09-04
+      end: null              # null = NRT / rolling
     variables:
       PP:
         units: g m^-2 d^-1
@@ -1287,8 +1287,8 @@ datasets:
     cadence: monthly
     domain: baltic-sea
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       PP:
         units: g m^-2 d^-1
@@ -1306,8 +1306,8 @@ datasets:
     cadence: daily
     domain: baltic-sea
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 1997-09-04
+      end: null              # null = NRT / rolling
     variables:
       RRS412:
         units: sr^-1
@@ -1334,8 +1334,8 @@ datasets:
     cadence: daily
     domain: baltic-sea
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 2016-04-26
+      end: null              # null = NRT / rolling
     variables:
       QI_RRS412_5:
         units: '1'
@@ -1404,8 +1404,8 @@ datasets:
     cadence: daily
     domain: baltic-sea
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 2026-04-24
+      end: null              # null = NRT / rolling
     variables:
       QI_RRS412_5:
         units: '1'
@@ -1474,8 +1474,8 @@ datasets:
     cadence: daily
     domain: baltic-sea
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 1997-09-04
+      end: null              # null = NRT / rolling
     variables:
       KD490:
         units: m^-1
@@ -1487,8 +1487,8 @@ datasets:
     cadence: daily
     domain: baltic-sea
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 2016-04-26
+      end: null              # null = NRT / rolling
     variables:
       KD490:
         units: m^-1
@@ -1506,8 +1506,8 @@ datasets:
     cadence: daily
     domain: baltic-sea
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 2026-04-24
+      end: null              # null = NRT / rolling
     variables:
       KD490:
         units: m^-1
@@ -1525,8 +1525,8 @@ datasets:
     cadence: monthly
     domain: baltic-sea
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
     variables:
       CHL:
         units: mg m-3
@@ -1562,8 +1562,8 @@ datasets:
     cadence: hourly
     domain: baltic-sea
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 2022-05-01
+      end: null              # null = NRT / rolling
     variables:
       analysed_sst:
         units: kelvin
@@ -1584,8 +1584,8 @@ datasets:
     cadence: daily
     domain: baltic-sea
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 1982-01-01
+      end: null              # null = NRT / rolling
     variables:
       analysed_sst:
         units: kelvin
@@ -1606,8 +1606,8 @@ datasets:
     cadence: daily
     domain: baltic-sea
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 1982-01-01
+      end: null              # null = NRT / rolling
     variables:
       mask:
         units: ''
@@ -1649,8 +1649,8 @@ datasets:
     cadence: daily
     domain: baltic-sea
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 2020-01-01
+      end: null              # null = NRT / rolling
     variables:
       CHL:
         units: mg m-3
@@ -1668,8 +1668,8 @@ datasets:
     cadence: daily
     domain: baltic-sea
     temporal:
-      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
-      end: null              # null = NRT (rolling)
+      start: 2020-01-08
+      end: null              # null = NRT / rolling
     variables:
       CHL:
         units: mg m-3
