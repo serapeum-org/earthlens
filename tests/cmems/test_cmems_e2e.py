@@ -15,6 +15,7 @@ Run with:
 
 from __future__ import annotations
 
+import datetime as dt
 import os
 from pathlib import Path
 
@@ -27,6 +28,15 @@ _HAVE_CREDS = bool(
     os.environ.get("COPERNICUSMARINE_SERVICE_USERNAME")
     and os.environ.get("COPERNICUSMARINE_SERVICE_PASSWORD")
 )
+
+# OSTIA NRT is a rolling near-real-time product: its coverage window
+# slides forward and old days fall off the back, so a hardcoded date
+# eventually leaves the dataset bounds (`CoordinatesOutOfDatasetBounds`).
+# Probe ~30 days back from today, comfortably inside the NRT window and
+# after the ~1-day publication latency.
+_NRT_PROBE_DATE = (
+    dt.datetime.now(dt.timezone.utc) - dt.timedelta(days=30)
+).strftime("%Y-%m-%d")
 
 
 @pytest.mark.e2e
@@ -45,8 +55,8 @@ class TestCmemsLiveSubset:
         """OSTIA L4 SST — 1° box × 1 day → one NetCDF written."""
         el = EarthLens(
             data_source="cmems",
-            start="2024-01-15",
-            end="2024-01-15",
+            start=_NRT_PROBE_DATE,
+            end=_NRT_PROBE_DATE,
             variables={"METOFFICE-GLO-SST-L4-NRT-OBS-SST-V2": ["analysed_sst"]},
             lat_lim=[40.0, 41.0],
             lon_lim=[-10.0, -9.0],
