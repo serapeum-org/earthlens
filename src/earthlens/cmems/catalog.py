@@ -38,7 +38,7 @@ from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, ValidationError, field_validator
 
-from earthlens.base import AbstractCatalog
+from earthlens.base import AbstractCatalog, FluxableLeaf
 from earthlens.base.yaml_loader import load_yaml_strict
 
 CATALOG_PATH: Path = Path(__file__).parent / "catalog"
@@ -258,7 +258,7 @@ def _load_catalog_data(path: Path) -> tuple[list[str], dict[str, "Dataset"]]:
     return _CATALOG_CACHE[key]
 
 
-class Variable(BaseModel):
+class Variable(FluxableLeaf):
     """One CMEMS variable's metadata row.
 
     Carries the minimum fields the backend needs to label the
@@ -266,7 +266,9 @@ class Variable(BaseModel):
     when `op="auto"`. Source-of-truth for units / long-names lives
     in the toolbox's `describe()` output; the curated rows here
     mirror what `describe()` would report for the same
-    `(dataset_id, variable)` pair.
+    `(dataset_id, variable)` pair. Inherits `types` + `is_flux`
+    from :class:`earthlens.base.FluxableLeaf`, the same shared base
+    CHIRPS and ECMWF variable rows use.
 
     Attributes:
         units: CF-style unit string (e.g. `"degrees_C"`, `"m s-1"`,
@@ -276,14 +278,14 @@ class Variable(BaseModel):
         long_name: CF long-name of the variable (e.g. `"Sea water
             potential temperature"`). Mainly for human-readable
             logging.
-        types: Optional `"flux"` or `"state"` marker. Currently
-            advisory only — CMEMS variables are overwhelmingly
-            state (instantaneous fields); the marker is provided so
-            future flux-style aggregation can route to `"sum"`
-            instead of `"mean"` when `op="auto"`.
+        types: Optional `"flux"` or `"state"` marker (inherited).
+            Currently advisory only — CMEMS variables are
+            overwhelmingly state (instantaneous fields); the marker
+            is provided so future flux-style aggregation can route
+            to `"sum"` instead of `"mean"` when `op="auto"`.
 
     Examples:
-        - Build a row directly:
+        - Build a row and read its labels:
 
             ```python
             >>> from earthlens.cmems import Variable
@@ -292,20 +294,23 @@ class Variable(BaseModel):
             'degrees_C'
             >>> v.long_name
             'Sea water potential temperature'
+            >>> v.is_flux
+            False
+
+            ```
+        - Mark a variable as a flux quantity:
+
+            ```python
+            >>> from earthlens.cmems import Variable
+            >>> v = Variable(units="kg m-2 s-1", types="flux")
+            >>> v.is_flux
+            True
 
             ```
     """
 
-    model_config = ConfigDict(frozen=True, extra="forbid")
-
     units: str
     long_name: str = ""
-    types: Literal["state", "flux"] | None = None
-
-    @property
-    def is_flux(self) -> bool:
-        """Return `True` when `types == "flux"`."""
-        return self.types == "flux"
 
 
 class TemporalCoverage(BaseModel):
