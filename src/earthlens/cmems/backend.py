@@ -14,18 +14,17 @@ The on-disk artefact is a gridded NetCDF/Zarr, so
 `OUTPUT_KIND = "raster"` — structurally identical to ECMWF's
 per-variable NetCDF output. The :class:`earthlens.earthlens.EarthLens`
 facade therefore forwards `aggregate=AggregationConfig(...)` to this
-backend's `download()` without rejecting it. The aggregator hand-off
-itself is staged: the existing
-:func:`earthlens.aggregate.aggregate_netcdf` (pyramids-backed via
-:class:`pyramids.netcdf.NetCDF`) is hardcoded to consume the ECMWF
-`Variable` row shape and a `time × lat × lon` layout. CMEMS NetCDFs
-add a depth (or elevation) axis on physics / biogeochem variables,
-and CMEMS catalog rows are a different pydantic type. Both gaps
-are pyramids-side concerns and will be lifted by generalising the
-pyramids time-window reducer to (a) accept any `Variable` exposing
-`(nc_variable, output_label, is_flux)` and (b) handle the optional
-depth axis (collapse via mean, pick a single level, or preserve
-through the per-window write).
+backend's `download()`. The aggregation runs through
+:meth:`pyramids.netcdf.NetCDF.reduce` (the generalised time-window
+reducer shipped in pyramids): the optional `depth` axis is collapsed
+to a column mean (or pinned with `AggregationConfig.level`), the
+`time` axis is windowed by `AggregationConfig.freq`, and one GeoTIFF
+per `(variable, window)` is written — the same output shape the ECMWF
+backend produces via :func:`earthlens.aggregate.aggregate_netcdf`.
+The window labels are computed from the file's own decoded time axis
+because pyramids' native `get_time_variable` does not decode the CMEMS
+time coordinate; see :meth:`CMEMS._window_labels`. A pyramids build
+without `NetCDF.reduce` raises a clear `NotImplementedError`.
 """
 
 from __future__ import annotations
@@ -79,12 +78,11 @@ class CMEMS(AbstractDataSource):
     Attributes:
         OUTPUT_KIND: `"raster"` — the on-disk artefact is a gridded
             NetCDF/Zarr, structurally identical to ECMWF's per-
-            variable NetCDF output. Composes with the existing
-            pyramids-backed
-            :class:`earthlens.aggregate.AggregationConfig` flow once
-            the pyramids time-window reducer is generalised to
-            accept the CMEMS catalog row shape and the optional
-            depth axis.
+            variable NetCDF output. Composes with the
+            :class:`earthlens.aggregate.AggregationConfig` flow:
+            `download(aggregate=...)` reduces each subset via
+            :meth:`pyramids.netcdf.NetCDF.reduce` (depth collapse +
+            time windowing) into per-`(variable, window)` GeoTIFFs.
     """
 
     OUTPUT_KIND: OutputKind = "raster"
@@ -284,30 +282,28 @@ class CMEMS(AbstractDataSource):
             aggregate: Optional
                 :class:`earthlens.aggregate.AggregationConfig`.
                 Accepted because :data:`OUTPUT_KIND` is `"raster"`,
-                so the facade allows the kwarg through. Currently
-                staged — the call raises `NotImplementedError`
-                because the existing pyramids-backed
-                :func:`earthlens.aggregate.aggregate_netcdf` is
-                hardcoded to the ECMWF `Variable` shape and a
-                `time × lat × lon` layout, neither of which fits
-                CMEMS rows (different pydantic type, optional
-                depth axis). The fix is a pyramids-side
-                generalisation of the time-window reducer.
+                so the facade allows the kwarg through. When set,
+                every subset NetCDF is reduced via
+                :meth:`pyramids.netcdf.NetCDF.reduce`: any `depth`
+                axis is collapsed first (mean) or pinned
+                (`config.level`), then the `time` axis is windowed by
+                `config.freq` with the `config.op` operator, and one
+                GeoTIFF per `(variable, window)` is written (shaped
+                like the ECMWF aggregate output). Requires a pyramids
+                build that ships `NetCDF.reduce`
+                (see :meth:`_aggregate_outputs`).
 
         Returns:
-            list[Path]: Absolute paths of every output the
-                toolbox successfully wrote. Order matches the
-                iteration order of `self.vars`. On a partial
-                failure (some pairs succeed, some fail) only the
-                successes are returned and the failures are logged;
-                an empty list is returned only for an empty request
-                (`self.vars == {}`).
+            list[Path]: When `aggregate` is `None`, the absolute
+                paths of every subset the toolbox wrote (iteration
+                order of `self.vars`; partial failure returns the
+                successes; an empty list only for an empty request).
+                When `aggregate` is set, the per-`(variable, window)`
+                GeoTIFF paths instead.
 
         Raises:
-            NotImplementedError: When `aggregate` is not `None`.
-                Will be removed once the pyramids time-window
-                reducer accepts CMEMS catalog rows and a depth
-                axis.
+            NotImplementedError: When `aggregate` is set but the
+                installed pyramids has no `NetCDF.reduce`.
             RuntimeError: When **every** `(dataset_id, variables)`
                 pair fails its subset (total failure). Raised rather
                 than returning `[]` so a caller cannot silently
@@ -315,23 +311,10 @@ class CMEMS(AbstractDataSource):
                 dataset ids and exception types, and the per-product
                 toolbox exceptions are logged at ERROR.
         """
-        if aggregate is not None:
-            raise NotImplementedError(
-                "CMEMS.download(aggregate=...) is staged but not "
-                "yet implemented. The facade-level OUTPUT_KIND "
-                "guard allows aggregate= for raster backends; the "
-                "blocker is that earthlens.aggregate.aggregate_netcdf "
-                "(backed by pyramids.netcdf.NetCDF) is hardcoded to "
-                "the ECMWF Variable shape and a time x lat x lon "
-                "layout. CMEMS uses a different catalog row type and "
-                "adds an optional depth axis. The fix is a pyramids-"
-                "side generalisation of the time-window reducer. "
-                "For now, call download() without aggregate= and "
-                "post-process the returned NetCDF directly via "
-                "pyramids.netcdf.NetCDF."
-            )
-
         out_paths = self._api_via_search_fetch_with_progress(progress_bar)
+
+        if aggregate is not None:
+            return self._aggregate_outputs(out_paths, aggregate)
 
         if out_paths:
             logger.info(
@@ -346,6 +329,183 @@ class CMEMS(AbstractDataSource):
                 "nothing written"
             )
         return out_paths
+
+    def _aggregate_outputs(
+        self, nc_paths: list[Path], config: AggregationConfig
+    ) -> list[Path]:
+        """Reduce each subset NetCDF via `pyramids.netcdf.NetCDF.reduce`.
+
+        Maps the :class:`earthlens.aggregate.AggregationConfig` request
+        onto the pyramids time-window reducer (shipped as
+        `NetCDF.reduce(dim, how, *, groupby, skipna)`): for every path
+        in `nc_paths` the depth axis is resolved first (pinned to
+        `config.level`, or collapsed by mean when present and no level
+        is given), then the `time` axis is windowed by `config.freq`
+        with the `config.op` reducer, and the result is written next to
+        the source as `<stem>_<freq>_agg.nc`.
+
+        Args:
+            nc_paths: The raw subset NetCDFs from `download`.
+            config: The aggregation request.
+
+        Returns:
+            list[Path]: The per-`(variable, window)` GeoTIFF paths
+                across every input NetCDF (skipping non-NetCDF inputs
+                such as Zarr stores, which the reducer does not
+                handle).
+
+        Raises:
+            NotImplementedError: When the installed pyramids exposes no
+                `NetCDF.reduce` (the feature ships in a later pyramids
+                release; until then call `download()` without
+                `aggregate=` and post-process manually).
+        """
+        from pyramids.netcdf import NetCDF
+
+        if not hasattr(NetCDF, "reduce"):
+            raise NotImplementedError(
+                "CMEMS.download(aggregate=...) needs pyramids' "
+                "NetCDF.reduce(dim, how, groupby=...), which the "
+                "installed pyramids build does not provide. Upgrade "
+                "pyramids to a release that ships NetCDF.reduce, or "
+                "call download() without aggregate= and post-process "
+                "the returned NetCDF directly."
+            )
+
+        how = "mean" if config.op == "auto" else config.op
+        out_paths: list[Path] = []
+        for nc_path in nc_paths:
+            if nc_path.suffix.lower() != ".nc":
+                logger.warning(
+                    f"skipping aggregate for non-NetCDF output {nc_path.name!r} "
+                    "(the reducer only handles NetCDF)"
+                )
+                continue
+            out_paths.extend(self._aggregate_one(nc_path, config, how))
+        return out_paths
+
+    def _aggregate_one(
+        self, nc_path: Path, config: AggregationConfig, how: str
+    ) -> list[Path]:
+        """Reduce one subset NetCDF into per-`(variable, window)` GeoTIFFs.
+
+        Resolves the depth axis (pinned via `config.level` or collapsed
+        by mean), windows the `time` axis by `config.freq` using
+        :meth:`pyramids.netcdf.NetCDF.reduce`, then writes one GeoTIFF
+        per variable per window via
+        :meth:`pyramids.dataset.Dataset.create_from_array` — the same
+        proven raster-write path :func:`earthlens.aggregate.aggregate_netcdf`
+        uses for the ECMWF backend, so CMEMS aggregate output is shaped
+        like ECMWF's (per-window GeoTIFFs, not a multidimensional
+        NetCDF, which the GDAL netCDF driver cannot write back).
+
+        The window labels are computed here from the file's own decoded
+        time axis (see :meth:`_window_labels`) and handed to `reduce` as
+        an explicit per-timestep label sequence — `reduce`'s
+        frequency-string grouping relies on its native
+        `get_time_variable`, which does not decode the CMEMS time
+        coordinate, so the label form is used instead.
+
+        Args:
+            nc_path: The NetCDF to reduce.
+            config: The aggregation request (provides `freq`, `level`,
+                `out_dir`, `skipna`).
+            how: The already-resolved reducer (`config.op` with
+                `"auto"` mapped to `"mean"`).
+
+        Returns:
+            list[Path]: One GeoTIFF path per `(variable, window)`,
+                written under `config.out_dir` (or next to `nc_path`
+                when `out_dir` is `None`).
+
+        Raises:
+            ValueError: When the file has no `time` dimension to window.
+        """
+        from pyramids.dataset import Dataset
+        from pyramids.netcdf import NetCDF
+
+        nc = NetCDF.read_file(str(nc_path))
+        dims = tuple(nc.dimension_names or ())
+        if "time" not in dims:
+            raise ValueError(
+                f"{nc_path.name} has no `time` dimension to aggregate "
+                f"(dims={dims})."
+            )
+
+        depth_collapsed = False
+        if "depth" in dims:
+            if config.level is not None:
+                nc = nc.sel(depth=config.level)
+            else:
+                nc = nc.reduce("depth", how="mean", skipna=config.skipna)
+                depth_collapsed = True
+
+        labels = self._window_labels(nc_path, config.freq)
+        windows = list(dict.fromkeys(labels))
+        reduced = nc.reduce(
+            "time", how=how, groupby=labels, skipna=config.skipna
+        )
+
+        out_dir = Path(config.out_dir) if config.out_dir is not None else nc_path.parent
+        out_dir.mkdir(parents=True, exist_ok=True)
+
+        written: list[Path] = []
+        for var_name in reduced.variable_names:
+            var = reduced.get_variable(var_name)
+            arr = var.read_array()
+            if arr.ndim == 2:
+                arr = arr[None, :, :]
+            for i, window in enumerate(windows):
+                target = out_dir / (
+                    f"{nc_path.stem}_{var_name}_{config.freq}_{window}.tif"
+                )
+                Dataset.create_from_array(
+                    arr=arr[i], geo=var.geotransform, epsg=var.epsg
+                ).to_file(str(target))
+                written.append(target)
+
+        logger.info(
+            f"CMEMS aggregate: {nc_path.name} -> {len(written)} GeoTIFF(s) "
+            f"({len(windows)} windows x {len(reduced.variable_names)} vars, "
+            f"time/{config.freq} {how}"
+            f"{', depth collapsed' if depth_collapsed else ''})"
+        )
+        return written
+
+    @staticmethod
+    def _window_labels(nc_path: Path, freq: str) -> list[str]:
+        """Return one window label per timestep, bucketing time by `freq`.
+
+        Decodes the NetCDF's CF time axis (via the pyramids
+        `to_xarray()` bridge + `xarray.decode_cf`, the same path the
+        CMEMS example notebooks use) into a `pandas.DatetimeIndex`, then
+        assigns each timestep the start-of-window timestamp of its
+        `freq` bucket. Timesteps in the same window share a label, so
+        :meth:`pyramids.netcdf.NetCDF.reduce` coarsens `time` to one
+        slice per distinct window.
+
+        Args:
+            nc_path: The NetCDF whose time axis to bucket.
+            freq: A pandas offset alias (`"1MS"`, `"7D"`, `"YS"`, …).
+
+        Returns:
+            list[str]: One `YYYYMMDD` window label per timestep, in
+                file order (length = the time dimension size).
+        """
+        import xarray as xr
+        from pyramids.netcdf import NetCDF
+
+        ds = xr.decode_cf(NetCDF.read_file(str(nc_path)).to_xarray())
+        time_index = pd.DatetimeIndex(ds["time"].values)
+        positions = pd.Series(range(len(time_index)), index=time_index)
+        label_for: dict[int, str] = {}
+        for window_start, group in positions.groupby(pd.Grouper(freq=freq)):
+            if group.empty:
+                continue
+            label = window_start.strftime("%Y%m%d")
+            for pos in group.tolist():
+                label_for[int(pos)] = label
+        return [label_for[i] for i in range(len(time_index))]
 
     def _api(self) -> list[Path]:
         """Compose `_search` and `_fetch` into the canonical C3 shape."""

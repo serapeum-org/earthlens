@@ -7,6 +7,8 @@ import types
 from pathlib import Path
 from typing import Any
 
+import numpy as np
+import pandas as pd
 import pytest
 
 from earthlens.aggregate import AggregationConfig
@@ -70,6 +72,92 @@ def fake_cmems(monkeypatch: pytest.MonkeyPatch) -> _FakeCmems:
     fake = _FakeCmems()
     monkeypatch.setitem(sys.modules, "copernicusmarine", fake)
     return fake
+
+
+# Records (dim, how[, groupby_distinct]) for each NetCDF.reduce call so the
+# aggregate wiring test can assert depth-then-time reduction.
+_FAKE_REDUCE_CALLS: list[dict[str, Any]] = []
+
+
+class _FakeVar:
+    """Stand-in for a reduced pyramids variable subset."""
+
+    def __init__(self, n_windows: int):
+        self._n = n_windows
+        self.geotransform = (0.0, 1.0, 0.0, 0.0, 0.0, -1.0)
+        self.epsg = 4326
+
+    def read_array(self) -> np.ndarray:
+        return np.zeros((self._n, 2, 2), dtype="float64")
+
+
+class _FakeReducedNetCDF:
+    """Stand-in for the multi-window NetCDF that `reduce("time", ...)` returns."""
+
+    def __init__(self, n_windows: int):
+        self.variable_names = ["thetao"]
+        self._n = n_windows
+
+    def get_variable(self, name: str) -> _FakeVar:
+        return _FakeVar(self._n)
+
+
+class _FakeNetCDF:
+    """Minimal pyramids `NetCDF` stub exercising the aggregate path."""
+
+    dimension_names = ("depth", "latitude", "longitude", "time")
+
+    @classmethod
+    def read_file(cls, path: str) -> "_FakeNetCDF":
+        return cls()
+
+    def to_xarray(self):  # consumed by xr.decode_cf in _window_labels
+        return self
+
+    def reduce(self, dim, how="mean", *, groupby=None, skipna=True):
+        call: dict[str, Any] = {"dim": dim, "how": how}
+        if groupby is not None:
+            call["groupby_distinct"] = len(set(groupby))
+        _FAKE_REDUCE_CALLS.append(call)
+        if dim == "depth":
+            return self  # collapsed container, still reducible by time
+        return _FakeReducedNetCDF(len(set(groupby)) if groupby else 1)
+
+    def sel(self, **kwargs):
+        return self
+
+
+class _FakeDatasetWriter:
+    def __init__(self, target_seen: list):
+        self._seen = target_seen
+
+    def to_file(self, path: str) -> None:
+        Path(path).write_bytes(b"GTIFF")
+
+
+class _FakeDataset:
+    @staticmethod
+    def create_from_array(arr, geo, epsg) -> _FakeDatasetWriter:
+        return _FakeDatasetWriter([])
+
+
+def _install_fake_pyramids_reduce(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Wire fake pyramids `NetCDF`/`Dataset` + xarray time decode for aggregate tests."""
+    _FAKE_REDUCE_CALLS.clear()
+
+    netcdf_mod = types.ModuleType("pyramids.netcdf")
+    netcdf_mod.NetCDF = _FakeNetCDF
+    monkeypatch.setitem(sys.modules, "pyramids.netcdf", netcdf_mod)
+
+    dataset_mod = types.ModuleType("pyramids.dataset")
+    dataset_mod.Dataset = _FakeDataset
+    monkeypatch.setitem(sys.modules, "pyramids.dataset", dataset_mod)
+
+    # 40 daily steps -> Jan (31) + Feb (9) 2020 -> two monthly windows.
+    time_index = pd.date_range("2020-01-01", periods=40, freq="D")
+    xr_mod = types.ModuleType("xarray")
+    xr_mod.decode_cf = lambda ds: {"time": types.SimpleNamespace(values=time_index)}
+    monkeypatch.setitem(sys.modules, "xarray", xr_mod)
 
 
 @pytest.fixture
@@ -299,13 +387,51 @@ class TestCMEMSDownload:
         paths = cmems_instance.download(progress_bar=False)
         assert paths == [target], f"download() should return [{target}], got {paths!r}"
 
-    def test_download_rejects_aggregate(self, cmems_instance: CMEMS):
-        """`aggregate=` is staged — raises NotImplementedError with hint."""
-        with pytest.raises(NotImplementedError, match="staged"):
+    def test_download_aggregate_guarded_without_reduce(
+        self, fake_cmems: _FakeCmems, cmems_instance: CMEMS, tmp_path: Path,
+        monkeypatch: pytest.MonkeyPatch,
+    ):
+        """`aggregate=` raises NotImplementedError when pyramids lacks `reduce`."""
+        target = tmp_path / "cmems_mod_glo_phy_my_0.083deg_P1D-m.nc"
+        target.write_bytes(b"")
+        fake_cmems.subset_response = _FakeResponse(target)
+
+        fake_netcdf_mod = types.ModuleType("pyramids.netcdf")
+        fake_netcdf_mod.NetCDF = type("NetCDF", (), {})  # no `reduce` attr
+        monkeypatch.setitem(sys.modules, "pyramids.netcdf", fake_netcdf_mod)
+
+        with pytest.raises(NotImplementedError, match="NetCDF.reduce"):
             cmems_instance.download(
                 progress_bar=False,
                 aggregate=AggregationConfig(freq="1MS", op="mean"),
             )
+
+    def test_download_aggregate_via_reduce(
+        self, fake_cmems: _FakeCmems, cmems_instance: CMEMS, tmp_path: Path,
+        monkeypatch: pytest.MonkeyPatch,
+    ):
+        """`aggregate=` reduces each subset into per-(variable, window) GeoTIFFs."""
+        subset = tmp_path / "cmems_mod_glo_phy_my_0.083deg_P1D-m.nc"
+        subset.write_bytes(b"")
+        fake_cmems.subset_response = _FakeResponse(subset)
+        _install_fake_pyramids_reduce(monkeypatch)
+
+        paths = cmems_instance.download(
+            progress_bar=False,
+            aggregate=AggregationConfig(freq="1MS", op="mean"),
+        )
+        # 40 daily steps span Jan + Feb 2020 -> 2 monthly windows, one var.
+        names = sorted(p.name for p in paths)
+        assert names == [
+            "cmems_mod_glo_phy_my_0.083deg_P1D-m_thetao_1MS_20200101.tif",
+            "cmems_mod_glo_phy_my_0.083deg_P1D-m_thetao_1MS_20200201.tif",
+        ], f"unexpected aggregate outputs: {names}"
+        assert all(p.exists() for p in paths), "GeoTIFFs should be written"
+        # depth collapsed (no level) + time windowed -> two reduce calls.
+        assert _FAKE_REDUCE_CALLS == [
+            {"dim": "depth", "how": "mean"},
+            {"dim": "time", "how": "mean", "groupby_distinct": 2},
+        ], f"unexpected reduce calls: {_FAKE_REDUCE_CALLS}"
 
     def test_download_disable_progress_forwards(
         self, fake_cmems: _FakeCmems, cmems_instance: CMEMS, tmp_path: Path

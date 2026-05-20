@@ -176,13 +176,33 @@ arr = nc.read_array("thetao")         # numpy ndarray (time, depth, lat, lon)
 nc.close()
 ```
 
-(The earthlens aggregator — `earthlens.aggregate.aggregate_netcdf`,
-backed by `pyramids.netcdf.NetCDF` — currently accepts only the ECMWF
-catalog row shape and a `time x lat x lon` layout. CMEMS rows and the
-depth axis are gated by a pyramids-side generalisation tracked under
-`planning/providers/tasks-pyramids.md`. Until that lands,
-`CMEMS.download(aggregate=...)` raises `NotImplementedError` and
-post-processing happens through `pyramids.netcdf.NetCDF` as above.)
+### Aggregating in one call
+
+`CMEMS.download(aggregate=AggregationConfig(...))` reduces every subset
+through `pyramids.netcdf.NetCDF.reduce`: any `depth` axis is collapsed
+to a column mean (or pinned with `level=`), the `time` axis is then
+windowed by the config's `freq`, and one GeoTIFF per
+`(variable, window)` is written — the same output shape the ECMWF
+backend produces.
+
+```python
+from earthlens import AggregationConfig
+
+cmems = CMEMS(
+    start="2020-01-01", end="2020-12-31",
+    temporal_resolution="daily",
+    variables={"cmems_mod_glo_phy_my_0.083deg_P1D-m": ["thetao"]},
+    lat_lim=[30.0, 36.0], lon_lim=[-10.0, -4.0],
+    path="data/cmems", minimum_depth=0.0, maximum_depth=200.0,
+)
+tifs = cmems.download(aggregate=AggregationConfig(freq="1MS", op="mean"))
+# -> one monthly-mean GeoTIFF per (variable, month)
+```
+
+This requires a `pyramids` build that ships `NetCDF.reduce` (pyramids
+PR #339 / the release carrying it); on older pyramids the call raises
+`NotImplementedError` naming `NetCDF.reduce`, and you post-process the
+returned NetCDF through `pyramids.netcdf.NetCDF` as shown above.
 
 ## 7. Curated catalog versus uncurated ids
 

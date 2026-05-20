@@ -87,20 +87,27 @@ class TestEarthLensCmemsRouting:
 @pytest.mark.cmems
 @pytest.mark.integration
 class TestEarthLensCmemsAggregateGuard:
-    """Facade still raises (via CMEMS itself) when aggregate is staged."""
+    """The facade forwards aggregate to CMEMS, which reduces via pyramids."""
 
-    def test_facade_allows_aggregate_through_to_backend(
+    def test_facade_forwards_aggregate_to_reduce_path(
         self, fake_cmems: _FakeCmems, tmp_path: Path
     ):
         """For OUTPUT_KIND='raster', the facade forwards aggregate.
 
-        The CMEMS backend then raises NotImplementedError because
-        the aggregate path is staged — earthlens.aggregate.aggregate_netcdf
-        (pyramids-backed) is hardcoded to the ECMWF Variable shape and
-        a time × lat × lon layout. This proves the C1 guard is *not*
-        the one rejecting CMEMS; the rejection is backend-internal and
-        goes away once the pyramids time-window reducer is generalised.
+        The CMEMS backend downloads the subset, then routes into the
+        `pyramids.netcdf.NetCDF.reduce`-backed aggregate path. When the
+        installed pyramids has no `NetCDF.reduce` (a release that
+        predates pyramids PR #339), the backend raises a clear
+        NotImplementedError naming `NetCDF.reduce` — proving the facade
+        guard is *not* the one stopping CMEMS (CMEMS is `"raster"`, so
+        the kwarg is forwarded) and that the requirement is the pyramids
+        reducer, not a staged earthlens shim.
         """
+        subset = tmp_path / "cmems_mod_glo_phy_my_0.083deg_P1D-m.nc"
+        subset.write_bytes(b"")
+        fake_cmems.subset_response = types.SimpleNamespace(
+            file_path=str(subset), status="ok"
+        )
         el = EarthLens(
             data_source="cmems",
             start="2024-01-01",
@@ -112,7 +119,7 @@ class TestEarthLensCmemsAggregateGuard:
             service_username="u",
             service_password="p",
         )
-        with pytest.raises(NotImplementedError, match="staged"):
+        with pytest.raises(NotImplementedError, match="NetCDF.reduce"):
             el.download(
                 progress_bar=False,
                 aggregate=AggregationConfig(freq="1MS", op="mean"),
