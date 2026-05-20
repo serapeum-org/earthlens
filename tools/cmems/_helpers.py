@@ -381,6 +381,34 @@ def _parse_time_unit(unit: str | None) -> tuple[float, _dt.datetime] | None:
     Returns:
         `(seconds_per_unit, epoch_datetime)` when the string matches,
             else `None`.
+
+    Examples:
+        - An hours-since-1950 unit gives the scale + epoch:
+            ```python
+            >>> scale, epoch = _parse_time_unit("hours since 1950-01-01")
+            >>> scale
+            3600.0
+            >>> epoch.year, epoch.month, epoch.day
+            (1950, 1, 1)
+
+            ```
+        - Milliseconds and a trailing timezone marker still parse:
+            ```python
+            >>> scale, epoch = _parse_time_unit("milliseconds since 1970-01-01 00:00:00Z")
+            >>> scale
+            0.001
+            >>> epoch.year
+            1970
+
+            ```
+        - Empty or unrecognised-unit strings return None:
+            ```python
+            >>> _parse_time_unit("") is None
+            True
+            >>> _parse_time_unit("parsecs since 1970-01-01") is None
+            True
+
+            ```
     """
     if not unit:
         return None
@@ -417,6 +445,31 @@ def temporal_bounds(dataset: Any) -> tuple[str | None, str | None]:
             dataset covers; `end_iso` is the latest. Either is `None`
             when no `time` coordinate is found or its unit can't be
             parsed (static fields, malformed metadata).
+
+    Examples:
+        - Read the coverage start of a curated dataset from the live
+          toolbox (needs the network + `copernicusmarine`, so skipped
+          under doctest):
+            ```python
+            >>> import copernicusmarine as cm  # doctest: +SKIP
+            >>> resp = cm.describe(  # doctest: +SKIP
+            ...     dataset_id="cmems_mod_glo_phy_my_0.083deg_P1D-m",
+            ...     disable_progress_bar=True,
+            ... )
+            >>> dataset = resp.products[0].datasets[0]  # doctest: +SKIP
+            >>> start, end = temporal_bounds(dataset)  # doctest: +SKIP
+            >>> start  # doctest: +SKIP
+            '1993-01-01'
+
+            ```
+
+        The conversion logic is unit-tested against lightweight
+        coordinate stand-ins in
+        `tests/cmems/tools/test_helpers.py::TestTemporalBounds` (no
+        network); a `time` coordinate of `"hours since 1950-01-01"`
+        with `minimum_value=0`, `maximum_value=24` yields
+        `("1950-01-01", "1950-01-02")`, and a dataset whose variables
+        carry no `time` coordinate yields `(None, None)`.
     """
     for version in dataset.versions:
         for part in version.parts:

@@ -574,6 +574,37 @@ def _unique_output_names(dataset_ids: list[str], ext: str) -> dict[str, str]:
     Returns:
         Mapping from each dataset id to its output filename. Values
             are unique across the input.
+
+    Examples:
+        - Distinct ids that don't normalise-collide keep clean stems:
+            ```python
+            >>> from earthlens.cmems.backend import _unique_output_names
+            >>> _unique_output_names(
+            ...     ["cmems_mod_glo_phy_my_0.083deg_P1D-m", "med-cmcc-tem-rean-d"],
+            ...     "nc",
+            ... )
+            {'cmems_mod_glo_phy_my_0.083deg_P1D-m': 'cmems_mod_glo_phy_my_0.083deg_P1D-m.nc', 'med-cmcc-tem-rean-d': 'med-cmcc-tem-rean-d.nc'}
+
+            ```
+        - Two ids that normalise to the same stem get distinct names:
+            ```python
+            >>> from earthlens.cmems.backend import _unique_output_names
+            >>> names = _unique_output_names(["a/b", "a_b"], "nc")
+            >>> len(set(names.values()))
+            2
+            >>> all(v.startswith("a_b_") and v.endswith(".nc") for v in names.values())
+            True
+
+            ```
+        - The extension is applied and empty input maps to `{}`:
+            ```python
+            >>> from earthlens.cmems.backend import _unique_output_names
+            >>> _unique_output_names(["ds-1"], "zarr")
+            {'ds-1': 'ds-1.zarr'}
+            >>> _unique_output_names([], "nc")
+            {}
+
+            ```
     """
     import hashlib
 

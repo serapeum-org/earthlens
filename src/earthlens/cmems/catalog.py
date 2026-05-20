@@ -96,6 +96,41 @@ def _yaml_files_for(path: Path) -> list[Path]:
         ValueError: If `path` is neither an existing directory nor an
             existing file (so the loader fails with a clear message
             instead of trying to read a missing file).
+
+    Examples:
+        - A directory yields its `*.yaml` siblings, sorted, and skips
+          non-YAML files:
+            ```python
+            >>> import tempfile
+            >>> from pathlib import Path
+            >>> d = Path(tempfile.mkdtemp())
+            >>> _ = (d / "b.yaml").write_text("datasets: {}\\n")
+            >>> _ = (d / "a.yaml").write_text("datasets: {}\\n")
+            >>> _ = (d / "notes.txt").write_text("ignore\\n")
+            >>> [p.name for p in _yaml_files_for(d)]
+            ['a.yaml', 'b.yaml']
+
+            ```
+        - A single existing file returns just that file:
+            ```python
+            >>> import tempfile
+            >>> from pathlib import Path
+            >>> f = Path(tempfile.mkdtemp()) / "one.yaml"
+            >>> _ = f.write_text("datasets: {}\\n")
+            >>> _yaml_files_for(f) == [f]
+            True
+
+            ```
+        - A path that does not exist fails loud:
+            ```python
+            >>> from pathlib import Path
+            >>> try:
+            ...     _yaml_files_for(Path("no-such-catalog-path"))
+            ... except ValueError as exc:
+            ...     print("does not exist" in str(exc))
+            True
+
+            ```
     """
     if path.is_dir():
         return sorted(path.glob("*.yaml"))
