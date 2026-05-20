@@ -209,10 +209,10 @@ class TestCmemsAuthCredentialResolution:
     ):
         """Explicit username + password are forwarded verbatim to login()."""
         fake = _install_fake_cmems(monkeypatch, login_result=True)
-        auth = CmemsAuth(CmemsCredentials(username="alice", password="pw"))
+        auth = CmemsAuth(CmemsCredentials(username="u", password="pw"))
         auth.configure()
         call = fake.login_calls[0]
-        assert call["username"] == "alice", f"username not forwarded; got {call!r}"
+        assert call["username"] == "u", f"username not forwarded; got {call!r}"
         assert call["password"] == "pw", f"password not forwarded; got {call!r}"
         assert call.get("check_credentials_valid") is True, (
             "check_credentials_valid must be True so login() actually validates"
