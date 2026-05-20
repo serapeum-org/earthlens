@@ -8,9 +8,13 @@ import pytest
 
 import _helpers  # noqa: E402 (sys.path injection happens in conftest.py)
 from tests.cmems.tools.conftest import (
+    FakeCoordinate,
     FakeDataset,
+    FakePart,
     FakeProduct,
+    FakeService,
     FakeVariable,
+    FakeVersion,
     make_dataset,
 )
 
@@ -436,3 +440,86 @@ class TestCompactText:
         raw = "  ds:\n    product: P   \n"
         out = _helpers.compact_text(raw)
         assert "    product: P\n" in out
+
+
+class TestParseTimeUnit:
+    """`_parse_time_unit` parses CF `<unit> since <date>` strings."""
+
+    @pytest.mark.parametrize(
+        "unit, expected_scale, expected_epoch_year",
+        [
+            ("milliseconds since 1970-01-01 00:00:00Z (no leap seconds)", 1e-3, 1970),
+            ("hours since 1950-01-01", 3600.0, 1950),
+            ("seconds since 2000-01-01", 1.0, 2000),
+            ("days since 1900-01-01", 86400.0, 1900),
+        ],
+    )
+    def test_known_units(self, unit, expected_scale, expected_epoch_year):
+        """Each supported unit word + epoch parses to (seconds, epoch)."""
+        parsed = _helpers._parse_time_unit(unit)
+        assert parsed is not None, f"{unit!r} should parse"
+        scale, epoch = parsed
+        assert scale == expected_scale, f"scale for {unit!r}: expected {expected_scale}, got {scale}"
+        assert epoch.year == expected_epoch_year, (
+            f"epoch year for {unit!r}: expected {expected_epoch_year}, got {epoch.year}"
+        )
+
+    @pytest.mark.parametrize("unit", [None, "", "not a time unit", "parsecs since 1970-01-01"])
+    def test_unparseable_returns_none(self, unit):
+        """Empty, malformed, or unknown-unit strings return None."""
+        assert _helpers._parse_time_unit(unit) is None, f"{unit!r} should not parse"
+
+
+def _dataset_with_time_coord(coord: FakeCoordinate | None) -> FakeDataset:
+    """Build a dataset whose arco service variable carries `coord` (or none)."""
+    var = FakeVariable("thetao", "degrees_C", "sea_water_potential_temperature",
+                       coordinates=[coord] if coord else [])
+    return FakeDataset("ds-x", [FakeVersion([FakePart([FakeService([var])])])])
+
+
+class TestTemporalBounds:
+    """`temporal_bounds` reads start/end from the arco time coordinate."""
+
+    def test_milliseconds_since_1970(self):
+        """A ms-since-1970 time coord converts min/max to ISO dates."""
+        # 1993-01-01 = 725846400000 ms; 2020-01-01 = 1577836800000 ms.
+        coord = FakeCoordinate(
+            "time",
+            "milliseconds since 1970-01-01 00:00:00Z",
+            minimum_value=725846400000.0,
+            maximum_value=1577836800000.0,
+        )
+        start, end = _helpers.temporal_bounds(_dataset_with_time_coord(coord))
+        assert start == "1993-01-01", f"start: expected 1993-01-01, got {start}"
+        assert end == "2020-01-01", f"end: expected 2020-01-01, got {end}"
+
+    def test_hours_since_1950(self):
+        """An hours-since-1950 time coord converts correctly."""
+        # 1950-01-01 + 0 h = 1950-01-01; + 24 h = 1950-01-02.
+        coord = FakeCoordinate("time", "hours since 1950-01-01",
+                               minimum_value=0.0, maximum_value=24.0)
+        start, end = _helpers.temporal_bounds(_dataset_with_time_coord(coord))
+        assert (start, end) == ("1950-01-01", "1950-01-02"), f"got {(start, end)}"
+
+    def test_no_time_coordinate_returns_none(self):
+        """A dataset whose variables carry no time coord yields (None, None)."""
+        start, end = _helpers.temporal_bounds(_dataset_with_time_coord(None))
+        assert (start, end) == (None, None), f"expected (None, None), got {(start, end)}"
+
+    def test_unparseable_unit_returns_none(self):
+        """A time coord with an unparseable unit yields (None, None)."""
+        coord = FakeCoordinate("time", "garbage unit", minimum_value=1.0, maximum_value=2.0)
+        assert _helpers.temporal_bounds(_dataset_with_time_coord(coord)) == (None, None)
+
+    def test_missing_min_returns_none(self):
+        """A time coord without a minimum_value yields (None, None)."""
+        coord = FakeCoordinate("time", "hours since 1950-01-01",
+                               minimum_value=None, maximum_value=24.0)
+        assert _helpers.temporal_bounds(_dataset_with_time_coord(coord)) == (None, None)
+
+    def test_max_none_gives_start_only(self):
+        """A time coord with min but no max yields a start and a None end."""
+        coord = FakeCoordinate("time", "hours since 1950-01-01",
+                               minimum_value=0.0, maximum_value=None)
+        start, end = _helpers.temporal_bounds(_dataset_with_time_coord(coord))
+        assert start == "1950-01-01" and end is None, f"got {(start, end)}"

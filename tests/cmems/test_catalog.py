@@ -11,6 +11,7 @@ from earthlens.cmems.catalog import (
     CATALOG_PATH,
     TemporalCoverage,
     _load_catalog_data,
+    _yaml_files_for,
     clear_catalog_cache,
 )
 
@@ -109,6 +110,38 @@ class TestTemporalCoverageDateCoercion:
 
 
 @pytest.mark.cmems
+class TestYamlFilesFor:
+    """`_yaml_files_for` resolves a catalog path to its contributing files."""
+
+    def test_directory_globs_yaml_sorted(self, tmp_path: Path):
+        """A directory returns its `*.yaml` siblings, sorted."""
+        (tmp_path / "b.yaml").write_text("datasets: {}\n")
+        (tmp_path / "a.yaml").write_text("datasets: {}\n")
+        (tmp_path / "notes.txt").write_text("ignore me\n")
+        files = _yaml_files_for(tmp_path)
+        assert [f.name for f in files] == ["a.yaml", "b.yaml"], (
+            f"expected sorted *.yaml only, got {[f.name for f in files]}"
+        )
+
+    def test_single_file_returns_itself(self, tmp_path: Path):
+        """An existing single file returns just that file."""
+        target = tmp_path / "one.yaml"
+        target.write_text("datasets: {}\n")
+        assert _yaml_files_for(target) == [target], (
+            f"single file should return [itself], got {_yaml_files_for(target)!r}"
+        )
+
+    def test_missing_path_raises_valueerror(self, tmp_path: Path):
+        """A path that is neither a dir nor an existing file fails loud."""
+        missing = tmp_path / "nope" / "missing.yaml"
+        with pytest.raises(ValueError, match="does not exist") as exc:
+            _yaml_files_for(missing)
+        assert "missing.yaml" in str(exc.value), (
+            f"error should name the bad path, got {exc.value}"
+        )
+
+
+@pytest.mark.cmems
 class TestCatalogLoaderEdgeCases:
     """Loader validates YAML structure before yielding."""
 
@@ -118,6 +151,11 @@ class TestCatalogLoaderEdgeCases:
         bad.write_text("available_products: []\n")
         with pytest.raises(ValueError, match="datasets"):
             _load_catalog_data(bad)
+
+    def test_missing_catalog_path_raises(self, tmp_path: Path):
+        """`_load_catalog_data` on a nonexistent path raises a clear error."""
+        with pytest.raises(ValueError, match="does not exist"):
+            _load_catalog_data(tmp_path / "absent-dir")
 
     def test_dataset_without_variables(self, tmp_path: Path):
         """A dataset entry without any `variables:` fails loud."""
