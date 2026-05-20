@@ -89,6 +89,22 @@ class TestCatalogToFc:
         fc = catalog_to_fc(Catalog(events=[make_event(with_magnitude=False)]), "USGS")
         assert fc["magnitude"].isna().iloc[0], "no-magnitude event should be NA"
 
+    def test_origin_less_event_has_null_geometry(
+        self, make_event: Callable[..., Event]
+    ):
+        """An event with no usable origin yields a null geometry, not POINT(nan nan)."""
+        event = Event(magnitudes=[], origins=[], event_type="earthquake")
+        fc = catalog_to_fc(Catalog(events=[event]), "USGS")
+        assert len(fc) == 1, "the row is still emitted"
+        assert fc.geometry.iloc[0] is None, "missing-origin geometry must be null"
+
+    def test_mixed_origin_presence(self, make_event: Callable[..., Event]):
+        """A normal event keeps its Point while an origin-less one is null."""
+        normal = make_event(lon=12.5, lat=42.0)
+        missing = Event(magnitudes=[], origins=[], event_type="earthquake")
+        fc = catalog_to_fc(Catalog(events=[normal, missing]), "USGS")
+        assert fc.geometry.iloc[0] is not None and fc.geometry.iloc[1] is None
+
     def test_empty_catalog_returns_empty_fc(self):
         """An empty catalog maps to an empty FeatureCollection with the schema."""
         fc = catalog_to_fc(Catalog(events=[]), "USGS")

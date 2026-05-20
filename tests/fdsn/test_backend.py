@@ -8,10 +8,9 @@ from typing import Callable
 import pytest
 from geopandas import GeoDataFrame
 from obspy.clients.fdsn.header import FDSNNoDataException
-from obspy.core.event import Catalog
 
 from earthlens.base import RemoteProduct, SpatialExtent, TemporalExtent
-from earthlens.fdsn import FDSN
+from earthlens.fdsn import FDSN, Catalog, Provider
 
 from .conftest import _FakeFdsn
 
@@ -82,6 +81,11 @@ class TestFDSNSearch:
         product = _make_backend(tmp_path, variables=["USGS"])._search()[0]
         assert product.metadata["fdsn_id"] == "USGS"
 
+    def test_product_carries_default_min_magnitude(self, tmp_path: Path):
+        """The provider's catalog magnitude floor rides on product metadata."""
+        product = _make_backend(tmp_path, variables=["INGV"])._search()[0]
+        assert product.metadata["default_min_magnitude"] == 2.0
+
     def test_unknown_provider_raises(self, tmp_path: Path):
         """A network key absent from the catalog raises with a hint."""
         backend = _make_backend(tmp_path, variables=["USG"])
@@ -133,6 +137,53 @@ class TestFDSNFetch:
         assert (
             "eida_token" not in ctor_kwargs
         ), "public USGS network must not receive a token"
+
+    def test_token_passed_when_provider_needs_it(
+        self, tmp_path: Path, fake_fdsn: _FakeFdsn
+    ):
+        """A needs_token provider with a token receives eida_token on the client."""
+        backend = _make_backend(tmp_path, earthscope_token="tok")
+        backend._catalog = Catalog(
+            providers={"USGS": Provider(fdsn_id="USGS", needs_token=True)}
+        )
+        backend._fetch(backend._search())
+        _, ctor_kwargs = fake_fdsn.constructions[0]
+        assert (
+            ctor_kwargs.get("eida_token") == "tok"
+        ), "token-gated network should receive the resolved token"
+
+    def test_versioned_user_agent(self, tmp_path: Path, fake_fdsn: _FakeFdsn):
+        """The obspy client is built with a versioned earthlens user-agent."""
+        backend = _make_backend(tmp_path)
+        backend._fetch(backend._search())
+        _, ctor_kwargs = fake_fdsn.constructions[0]
+        assert ctor_kwargs["user_agent"].startswith(
+            "earthlens/"
+        ), f"user_agent should be versioned, got {ctor_kwargs.get('user_agent')!r}"
+
+    @pytest.mark.parametrize(
+        "provider, expected_floor",
+        [("USGS", 4.5), ("INGV", 2.0), ("GEONET", 3.0)],
+    )
+    def test_min_magnitude_falls_back_per_provider(
+        self, tmp_path: Path, fake_fdsn: _FakeFdsn, provider: str, expected_floor: float
+    ):
+        """With min_magnitude=None, each network uses its catalog floor."""
+        backend = _make_backend(tmp_path, variables=[provider], min_magnitude=None)
+        backend._fetch(backend._search())
+        _, query_kwargs = fake_fdsn.calls[0]
+        assert (
+            query_kwargs["minmagnitude"] == expected_floor
+        ), f"{provider} should fall back to {expected_floor}, got {query_kwargs['minmagnitude']}"
+
+    def test_explicit_min_magnitude_overrides_floor(
+        self, tmp_path: Path, fake_fdsn: _FakeFdsn
+    ):
+        """An explicit min_magnitude overrides the per-provider floor."""
+        backend = _make_backend(tmp_path, variables=["INGV"], min_magnitude=6.0)
+        backend._fetch(backend._search())
+        _, query_kwargs = fake_fdsn.calls[0]
+        assert query_kwargs["minmagnitude"] == 6.0
 
 
 @pytest.mark.fdsn

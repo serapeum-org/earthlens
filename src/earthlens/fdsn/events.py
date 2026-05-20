@@ -29,6 +29,7 @@ from typing import TYPE_CHECKING
 import geopandas as gpd
 import pandas as pd
 from pyramids.feature.collection import FeatureCollection
+from shapely.geometry import Point
 
 if TYPE_CHECKING:
     from obspy.core.event import Catalog, Event
@@ -59,9 +60,13 @@ def catalog_to_fc(catalog: Catalog, provider: str) -> FeatureCollection:
 
     One row per event, columns per :data:`ATTRIBUTE_COLUMNS` plus a
     `geometry` column of `shapely.Point(longitude, latitude)` in
-    `EPSG:4326`. An empty catalog returns an empty FeatureCollection
-    with the same columns/dtypes (see :func:`empty_fc`) so the result
-    type is identical whether or not the query matched anything.
+    `EPSG:4326`. An event with no usable origin (no preferred origin
+    and an empty `origins` list) still contributes a row, but its
+    `geometry` is `None` rather than an invalid `POINT (nan nan)` that
+    would corrupt a written GeoPackage/GeoJSON. An empty catalog
+    returns an empty FeatureCollection with the same columns/dtypes
+    (see :func:`empty_fc`) so the result type is identical whether or
+    not the query matched anything.
 
     Args:
         catalog: An `obspy.core.event.Catalog` (iterable over
@@ -71,7 +76,9 @@ def catalog_to_fc(catalog: Catalog, provider: str) -> FeatureCollection:
             …) recorded in the `provider` column of every row.
 
     Returns:
-        FeatureCollection: One feature per event, CRS `EPSG:4326`.
+        FeatureCollection: One feature per event, CRS `EPSG:4326`;
+            rows whose event lacked a usable origin carry a null
+            geometry.
 
     Examples:
         - Map a one-event catalog and read back a field:
@@ -112,8 +119,16 @@ def catalog_to_fc(catalog: Catalog, provider: str) -> FeatureCollection:
             continue
         frame[column] = frame[column].astype(dtype)
 
-    geometry = gpd.points_from_xy(frame["longitude"], frame["latitude"], crs=EVENT_CRS)
-    gdf = gpd.GeoDataFrame(frame, geometry=geometry, crs=EVENT_CRS)
+    # Build the Point per row so an event with no usable origin (NaN
+    # longitude/latitude) gets a null geometry rather than an invalid
+    # POINT (nan nan) that would corrupt a written GeoPackage/GeoJSON.
+    points = [
+        Point(lon, lat) if pd.notna(lon) and pd.notna(lat) else None
+        for lon, lat in zip(frame["longitude"], frame["latitude"])
+    ]
+    gdf = gpd.GeoDataFrame(
+        frame, geometry=gpd.GeoSeries(points, crs=EVENT_CRS), crs=EVENT_CRS
+    )
     return FeatureCollection(gdf)
 
 

@@ -99,7 +99,7 @@ class FDSN(AbstractDataSource):
         temporal_resolution: str = "all",
         path: Path | str = "",
         fmt: str = "%Y-%m-%d",
-        min_magnitude: float | None = 4.5,
+        min_magnitude: float | None = None,
         max_magnitude: float | None = None,
         min_depth: float | None = None,
         max_depth: float | None = None,
@@ -131,8 +131,13 @@ class FDSN(AbstractDataSource):
             path: Output directory for the per-network vector files.
                 Created by the parent class if absent.
             fmt: `strptime` format for `start` / `end`.
-            min_magnitude: Lower magnitude bound. Defaults to `4.5`;
-                `None` means no lower bound.
+            min_magnitude: Lower magnitude bound. `None` (the default)
+                falls back per network to that provider's
+                `default_min_magnitude` catalog value (USGS / EMSC /
+                EarthScope / ISC = 4.5, INGV = 2.0, GeoNet = 3.0), so
+                each regional network keeps a sensible floor. Pass an
+                explicit number to override every network with one
+                bound.
             max_magnitude: Upper magnitude bound, or `None`.
             min_depth: Lower depth bound in kilometres, or `None`.
             max_depth: Upper depth bound in kilometres, or `None`.
@@ -270,6 +275,7 @@ class FDSN(AbstractDataSource):
                     metadata={
                         "fdsn_id": provider.fdsn_id,
                         "needs_token": provider.needs_token,
+                        "default_min_magnitude": provider.default_min_magnitude,
                     },
                 )
             )
@@ -311,19 +317,34 @@ class FDSN(AbstractDataSource):
         from obspy.clients.fdsn import Client
         from obspy.clients.fdsn.header import FDSNNoDataException
 
+        from earthlens import __version__
+
         provider_key = product.id
         fdsn_id = product.metadata["fdsn_id"]
         needs_token = product.metadata.get("needs_token", False)
 
-        client_kwargs: dict[str, object] = {"user_agent": "earthlens"}
+        # An explicit min_magnitude overrides every network; otherwise fall
+        # back to this provider's catalog default so regional networks (INGV,
+        # GeoNet) keep their lower floor instead of the global 4.5.
+        min_magnitude = (
+            self._min_magnitude
+            if self._min_magnitude is not None
+            else product.metadata.get("default_min_magnitude")
+        )
+
+        client_kwargs: dict[str, object] = {"user_agent": f"earthlens/{__version__}"}
         if needs_token and self._earthscope_token:
+            # obspy's only token slot is `eida_token`. The bundled networks are
+            # all public (needs_token=False), so this branch is opt-in: a
+            # maintainer who adds a token-gated network must confirm that
+            # network accepts an EIDA-style token before relying on it.
             client_kwargs["eida_token"] = self._earthscope_token
         client = Client(fdsn_id, **client_kwargs)
 
         logger.info(
             f"Querying FDSN provider {provider_key!r} ({fdsn_id}) for events "
             f"{self.time.start_date}..{self.time.end_date} "
-            f"min_magnitude={self._min_magnitude}"
+            f"min_magnitude={min_magnitude}"
         )
         try:
             catalog = client.get_events(
@@ -333,7 +354,7 @@ class FDSN(AbstractDataSource):
                 maxlatitude=self.space.north,
                 minlongitude=self.space.west,
                 maxlongitude=self.space.east,
-                minmagnitude=self._min_magnitude,
+                minmagnitude=min_magnitude,
                 maxmagnitude=self._max_magnitude,
                 mindepth=self._min_depth,
                 maxdepth=self._max_depth,
