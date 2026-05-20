@@ -1,11 +1,12 @@
 """FDSN seismic-event backend.
 
 Thin wrapper over `obspy.clients.fdsn` that queries the IRIS
-FDSN-event web service across four seismological networks — USGS
-(ComCat), EMSC (seismicportal), INGV (Italian seismic + volcano), and
-EarthScope (ex-IRIS DMC) — and returns the matched events as a
-pyramids :class:`~pyramids.feature.collection.FeatureCollection` of
-point features (CRS `EPSG:4326`).
+FDSN-event web service across six seismological networks — USGS
+(ComCat), EMSC (seismicportal), INGV (Italian seismic + volcano),
+EarthScope (ex-IRIS DMC), ISC (global reviewed bulletin), and GeoNet
+(New Zealand) — and returns the matched events as a pyramids
+:class:`~pyramids.feature.collection.FeatureCollection` of point
+features (CRS `EPSG:4326`).
 
 This is the package's first `vector` backend: the result is a table of
 events, not a gridded array, so :data:`FDSN.OUTPUT_KIND` is

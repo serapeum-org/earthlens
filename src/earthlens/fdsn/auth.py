@@ -1,8 +1,8 @@
 """Optional EarthScope token resolution for the FDSN backend.
 
-The four FDSN-event networks earthlens ships with (USGS, EMSC, INGV,
-EarthScope) all expose **public** event web services, so the common
-path needs no credentials at all. This module is intentionally thin:
+The six FDSN-event networks earthlens ships with (USGS, EMSC, INGV,
+EarthScope, ISC, GeoNet) all expose **public** event web services, so
+the common path needs no credentials at all. This module is intentionally thin:
 it only resolves an optional EarthScope access token from, in
 priority order, an explicit argument, the `EARTHSCOPE_TOKEN`
 environment variable, or a `~/.earthscope_token` file. The backend

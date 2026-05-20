@@ -124,8 +124,8 @@ class EarthLens:
         :class:`earthlens.ecmwf.ECMWF`: ERA5 via the Copernicus
             Climate Data Store (cdsapi).
         :class:`earthlens.fdsn.FDSN`: seismic events from the FDSN
-            networks (USGS / EMSC / INGV / EarthScope) via `obspy`;
-            the first `vector`-output backend.
+            networks (USGS / EMSC / INGV / EarthScope / ISC / GeoNet)
+            via `obspy`; the first `vector`-output backend.
         :class:`earthlens.gee.GEE`: imagery from Google Earth Engine
             (`earthengine-api`); keys `"gee"` / `"google-earth-engine"`.
     """

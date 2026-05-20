@@ -31,10 +31,10 @@ imagery). FDSN is different in two ways that shape the backend:
 
 - **There is no dataset catalog to curate.** FDSN is a *fixed query
   protocol*, not a 600-dataset archive. The entire "catalog" is a
-  four-row provider-dispatch table mapping a user-facing network name
+  six-row provider-dispatch table mapping a user-facing network name
   to an `obspy` URL mapping. There is no `refresh` / `probe` / `audit`
-  tooling and no growth task — adding a network later (ISC, ORFEUS,
-  GEONET, …) is a hand-edit of one YAML row.
+  tooling and no growth task — adding another network later (ORFEUS,
+  GFZ, …) is a hand-edit of one YAML row.
 
 ## The networks
 
@@ -53,7 +53,7 @@ names (an intentional, documented overload; see [Usage](usage.md)).
 
 ## Authentication
 
-**None for the common path.** All four networks expose *public* FDSN
+**None for the common path.** All six networks expose *public* FDSN
 event services, so a default query needs no credentials at all. The
 single exception is EarthScope, whose restricted endpoints can take an
 optional access token; earthlens resolves it from an explicit

@@ -1,10 +1,11 @@
 """Backend that queries FDSN-event seismological networks via obspy.
 
 `FDSN(AbstractDataSource)` fetches earthquake / seismic-event catalogs
-from the four IRIS-FDSN-event networks earthlens ships with — USGS
-(ComCat), EMSC (seismicportal), INGV (Italian seismic + volcano), and
-EarthScope (ex-IRIS DMC) — through one `obspy.clients.fdsn.Client` per
-network, because all four speak the identical FDSN-event web-service
+from the six IRIS-FDSN-event networks earthlens ships with — USGS
+(ComCat), EMSC (seismicportal), INGV (Italian seismic + volcano),
+EarthScope (ex-IRIS DMC), ISC (global reviewed bulletin), and GeoNet
+(New Zealand) — through one `obspy.clients.fdsn.Client` per network,
+because they all speak the identical FDSN-event web-service
 standard. Each provider key in `variables` becomes one server-side
 `get_events` call; the per-network `obspy.core.event.Catalog` is mapped
 to a pyramids :class:`~pyramids.feature.collection.FeatureCollection`
@@ -93,7 +94,7 @@ class FDSN(AbstractDataSource):
         self,
         start: str,
         end: str,
-        variables: list[str] | dict[str, list[str]],
+        variables: list[str],
         lat_lim: list[float],
         lon_lim: list[float],
         temporal_resolution: str = "all",
@@ -170,6 +171,13 @@ class FDSN(AbstractDataSource):
                 f"{file_format!r}."
             )
         self._file_format: FileFormat = file_format
+        if isinstance(variables, dict):
+            raise TypeError(
+                "FDSN `variables` must be a list of network keys (e.g. "
+                "['USGS', 'EMSC']), not a mapping. For this backend "
+                "`variables` selects seismic networks, not data variables; "
+                "query filters are explicit FDSN(...) keyword arguments."
+            )
         self._catalog = Catalog()
         super().__init__(
             start=start,

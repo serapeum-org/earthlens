@@ -1,9 +1,9 @@
 """Live end-to-end tests for the FDSN seismic-event backend.
 
-Hits the real FDSN event web services. USGS is public (no
-credentials), so its tests are gated only behind the `e2e` pytest
-marker plus network availability; a default `pytest` invocation skips
-them. The EarthScope test is gated additionally on `EARTHSCOPE_TOKEN`.
+Hits the real FDSN event web services. All bundled networks expose
+public event services, so these tests are gated only behind the `e2e`
+pytest marker plus network availability; a default `pytest` invocation
+skips them.
 
 Run with:
 
@@ -12,7 +12,6 @@ Run with:
 
 from __future__ import annotations
 
-import os
 from pathlib import Path
 
 import pytest
@@ -76,12 +75,8 @@ class TestUsgsLiveQuery:
 
 @pytest.mark.e2e
 @pytest.mark.fdsn
-@pytest.mark.skipif(
-    not os.environ.get("EARTHSCOPE_TOKEN"),
-    reason="set EARTHSCOPE_TOKEN to run the live EarthScope e2e test",
-)
 class TestEarthscopeLiveQuery:
-    """Live EarthScope query, gated on an EarthScope token."""
+    """Live EarthScope query (public event service — no token needed)."""
 
     def test_active_window_returns_events(self, tmp_path: Path):
         """EarthScope returns plausible events for the active window."""
@@ -93,7 +88,6 @@ class TestEarthscopeLiveQuery:
             lon_lim=_JAPAN_LON,
             path=str(tmp_path),
             min_magnitude=5.0,
-            earthscope_token=os.environ.get("EARTHSCOPE_TOKEN"),
         ).download()
 
         assert len(fc) > 0, "expected at least one M5+ event from EarthScope"

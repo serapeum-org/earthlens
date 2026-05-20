@@ -65,13 +65,19 @@ by the facade's `**backend_kwargs`):
 
 | Keyword | Meaning | Default |
 |---|---|---|
-| `min_magnitude` / `max_magnitude` | magnitude bounds | `4.5` / `None` |
+| `min_magnitude` / `max_magnitude` | magnitude bounds | `None` / `None` |
 | `min_depth` / `max_depth` | depth bounds, **kilometres** | `None` |
 | `magnitude_type` | restrict to e.g. `"Mw"` | `None` (any) |
 | `event_type` | restrict to e.g. `"earthquake"` | `None` (any) |
 | `orderby` | `"time"`, `"time-asc"`, `"magnitude"`, `"magnitude-asc"` | `"time"` |
 | `limit` | max events per network | `None` |
 | `file_format` | `"gpkg"` or `"geojson"` | `"gpkg"` |
+
+`min_magnitude=None` (the default) falls back **per network** to that
+provider's catalog floor — USGS / EMSC / EarthScope / ISC use `4.5`,
+INGV uses `2.0`, GeoNet uses `3.0` — so each regional network keeps a
+sensible default. Pass an explicit number to override every network
+with one bound.
 
 The spatial window comes from `lat_lim` / `lon_lim` and the temporal
 window from `start` / `end`. FDSN issues one query spanning the whole

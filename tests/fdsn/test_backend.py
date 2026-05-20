@@ -64,6 +64,11 @@ class TestFDSNConstruction:
         with pytest.raises(ValueError, match="file_format must be one of"):
             _make_backend(tmp_path, file_format="shp")
 
+    def test_mapping_variables_rejected(self, tmp_path: Path):
+        """A dict `variables` (backend-style mapping) raises a clear TypeError."""
+        with pytest.raises(TypeError, match="must be a list of network keys"):
+            _make_backend(tmp_path, variables={"USGS": ["events"]})
+
 
 @pytest.mark.fdsn
 class TestFDSNSearch:

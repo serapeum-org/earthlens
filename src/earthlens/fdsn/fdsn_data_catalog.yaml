@@ -5,7 +5,7 @@
 # "catalog": one row per seismic network, keyed by the user-facing name
 # passed in `variables=[...]`. Each `fdsn_id` is an obspy
 # `URL_MAPPINGS` key (verified against obspy 1.5.0); a future maintainer
-# adds a network (ISC, ORFEUS, GEONET, …) by hand-adding a row here.
+# adds another network (ORFEUS, GFZ, RESIF, …) by hand-adding a row here.
 providers:
   USGS:
     fdsn_id: USGS

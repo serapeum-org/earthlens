@@ -1,12 +1,12 @@
 """Provider dispatch table for the FDSN seismic-event backend.
 
 FDSN is a fixed query protocol, not a curated dataset catalogue, so
-this "catalog" is deliberately tiny: a four-row map from a user-facing
-network name (`"USGS"`, `"EMSC"`, `"INGV"`, `"EARTHSCOPE"`) to the
-obspy `URL_MAPPINGS` key plus a little metadata. There is no
-`refresh` / `probe` / `audit` tooling and no `tools/fdsn/` directory —
-adding a network later (ISC, ORFEUS, GEONET, …) is a hand-edit of one
-YAML row.
+this "catalog" is deliberately tiny: a six-row map from a user-facing
+network name (`"USGS"`, `"EMSC"`, `"INGV"`, `"EARTHSCOPE"`, `"ISC"`,
+`"GEONET"`) to the obspy `URL_MAPPINGS` key plus a little metadata.
+There is no `refresh` / `probe` / `audit` tooling and no
+`tools/fdsn/` directory — adding another network later (ORFEUS,
+GFZ, …) is a hand-edit of one YAML row.
 
 :class:`Catalog` is a thin :class:`earthlens.base.AbstractCatalog`
 subclass that loads the bundled `fdsn_data_catalog.yaml` and exposes
