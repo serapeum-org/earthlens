@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -1020,6 +1020,23 @@
       
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="6. Post-process the returned NetCDF with pyramids">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#aggregating-in-one-call" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Aggregating in one call
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -2936,6 +2953,23 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="6. Post-process the returned NetCDF with pyramids">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#aggregating-in-one-call" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Aggregating in one call
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -3142,13 +3176,29 @@ open the returned NetCDF rather than reaching for <code>xarray</code> directly:<
 <a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a><span class="n">arr</span> <span class="o">=</span> <span class="n">nc</span><span class="o">.</span><span class="n">read_array</span><span class="p">(</span><span class="s2">&quot;thetao&quot;</span><span class="p">)</span>         <span class="c1"># numpy ndarray (time, depth, lat, lon)</span>
 <a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a><span class="n">nc</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 </code></pre></div>
-<p>(The earthlens aggregator — <code>earthlens.aggregate.aggregate_netcdf</code>,
-backed by <code>pyramids.netcdf.NetCDF</code> — currently accepts only the ECMWF
-catalog row shape and a <code>time x lat x lon</code> layout. CMEMS rows and the
-depth axis are gated by a pyramids-side generalisation tracked under
-<code>planning/providers/tasks-pyramids.md</code>. Until that lands,
-<code>CMEMS.download(aggregate=...)</code> raises <code>NotImplementedError</code> and
-post-processing happens through <code>pyramids.netcdf.NetCDF</code> as above.)</p>
+<h3 id="aggregating-in-one-call"><a class="toclink" href="#aggregating-in-one-call">Aggregating in one call</a><a class="headerlink" href="#aggregating-in-one-call" title="Permanent link">#</a></h3>
+<p><code>CMEMS.download(aggregate=AggregationConfig(...))</code> reduces every subset
+through <code>pyramids.netcdf.NetCDF.reduce</code>: any <code>depth</code> axis is collapsed
+to a column mean (or pinned with <code>level=</code>), the <code>time</code> axis is then
+windowed by the config's <code>freq</code>, and one GeoTIFF per
+<code>(variable, window)</code> is written — the same output shape the ECMWF
+backend produces.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens</span><span class="w"> </span><span class="kn">import</span> <span class="n">AggregationConfig</span>
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="n">cmems</span> <span class="o">=</span> <span class="n">CMEMS</span><span class="p">(</span>
+<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>    <span class="n">start</span><span class="o">=</span><span class="s2">&quot;2020-01-01&quot;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">&quot;2020-12-31&quot;</span><span class="p">,</span>
+<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>    <span class="n">temporal_resolution</span><span class="o">=</span><span class="s2">&quot;daily&quot;</span><span class="p">,</span>
+<a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>    <span class="n">variables</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;cmems_mod_glo_phy_my_0.083deg_P1D-m&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;thetao&quot;</span><span class="p">]},</span>
+<a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a>    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">30.0</span><span class="p">,</span> <span class="mf">36.0</span><span class="p">],</span> <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">10.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">4.0</span><span class="p">],</span>
+<a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a>    <span class="n">path</span><span class="o">=</span><span class="s2">&quot;data/cmems&quot;</span><span class="p">,</span> <span class="n">minimum_depth</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">maximum_depth</span><span class="o">=</span><span class="mf">200.0</span><span class="p">,</span>
+<a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a><span class="p">)</span>
+<a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a><span class="n">tifs</span> <span class="o">=</span> <span class="n">cmems</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">aggregate</span><span class="o">=</span><span class="n">AggregationConfig</span><span class="p">(</span><span class="n">freq</span><span class="o">=</span><span class="s2">&quot;1MS&quot;</span><span class="p">,</span> <span class="n">op</span><span class="o">=</span><span class="s2">&quot;mean&quot;</span><span class="p">))</span>
+<a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a><span class="c1"># -&gt; one monthly-mean GeoTIFF per (variable, month)</span>
+</code></pre></div>
+<p>This requires a <code>pyramids</code> build that ships <code>NetCDF.reduce</code> (pyramids
+PR #339 / the release carrying it); on older pyramids the call raises
+<code>NotImplementedError</code> naming <code>NetCDF.reduce</code>, and you post-process the
+returned NetCDF through <code>pyramids.netcdf.NetCDF</code> as shown above.</p>
 <h2 id="7-curated-catalog-versus-uncurated-ids"><a class="toclink" href="#7-curated-catalog-versus-uncurated-ids">7. Curated catalog versus uncurated ids</a><a class="headerlink" href="#7-curated-catalog-versus-uncurated-ids" title="Permanent link">#</a></h2>
 <p>The curated catalog targets the highest-leverage marine datasets;
 ~600 toolbox-addressable ids are not curated. The two paths:</p>
@@ -3163,8 +3213,8 @@ post-processing happens through <code>pyramids.netcdf.NetCDF</code> as above.)</
 </ul>
 <p>To promote an uncurated id into the bundled catalog without
 hand-writing the stanza, run:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>pixi<span class="w"> </span>run<span class="w"> </span>-e<span class="w"> </span>dev<span class="w"> </span>python<span class="w"> </span>tools/cmems/refresh_cmems_catalog.py<span class="w"> </span>add-ids<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="w">    </span>&lt;new_dataset_id&gt;
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>pixi<span class="w"> </span>run<span class="w"> </span>-e<span class="w"> </span>dev<span class="w"> </span>python<span class="w"> </span>tools/cmems/refresh_cmems_catalog.py<span class="w"> </span>add-ids<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="w">    </span>&lt;new_dataset_id&gt;
 </code></pre></div>
 <p>which fetches <code>describe()</code>, emits the YAML stanza, appends it to the
 routed per-domain file under <code>catalog/</code> (and adds the id to
