@@ -12,7 +12,7 @@ import pytest
 from earthlens.aggregate import AggregationConfig
 from earthlens.base import RemoteProduct, SpatialExtent, TemporalExtent
 from earthlens.cmems import CMEMS, AuthenticationError, CmemsAuth, CmemsCredentials
-from earthlens.cmems.backend import _safe_filename
+from earthlens.cmems.backend import _safe_filename, _unique_output_names
 
 
 class _FakeResponse:
@@ -335,3 +335,45 @@ class TestSafeFilename:
         assert _safe_filename(raw) == expected, (
             f"_safe_filename({raw!r}) should be {expected!r}, got {_safe_filename(raw)!r}"
         )
+
+
+@pytest.mark.cmems
+class TestUniqueOutputNames:
+    """`_unique_output_names` maps dataset ids to collision-free filenames."""
+
+    def test_no_collision_keeps_clean_stems(self):
+        """Distinct ids that don't normalise-collide keep their plain stems."""
+        names = _unique_output_names(
+            ["cmems_mod_glo_phy_my_0.083deg_P1D-m", "med-cmcc-tem-rean-d"], "nc"
+        )
+        assert names == {
+            "cmems_mod_glo_phy_my_0.083deg_P1D-m": "cmems_mod_glo_phy_my_0.083deg_P1D-m.nc",
+            "med-cmcc-tem-rean-d": "med-cmcc-tem-rean-d.nc",
+        }, f"clean stems should be untouched, got {names!r}"
+
+    def test_collision_is_disambiguated_and_unique(self):
+        """Two ids normalising to the same stem get distinct hash-suffixed names."""
+        names = _unique_output_names(["a/b", "a_b"], "nc")
+        assert len(set(names.values())) == 2, (
+            f"colliding ids must get unique filenames, got {names!r}"
+        )
+        for value in names.values():
+            assert value.startswith("a_b_") and value.endswith(".nc"), (
+                f"disambiguated name should keep the stem + suffix, got {value!r}"
+            )
+
+    def test_disambiguation_is_deterministic(self):
+        """The hash suffix is stable across calls (same id -> same name)."""
+        first = _unique_output_names(["a/b", "a_b"], "nc")
+        second = _unique_output_names(["a/b", "a_b"], "nc")
+        assert first == second, f"output names must be deterministic: {first} != {second}"
+
+    @pytest.mark.parametrize("ext", ["nc", "zarr"])
+    def test_extension_applied(self, ext: str):
+        """The supplied extension is appended to every filename."""
+        names = _unique_output_names(["ds-1"], ext)
+        assert names["ds-1"] == f"ds-1.{ext}", f"expected ds-1.{ext}, got {names['ds-1']!r}"
+
+    def test_empty_input(self):
+        """No dataset ids yields an empty map."""
+        assert _unique_output_names([], "nc") == {}, "empty input should map to {}"

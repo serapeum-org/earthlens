@@ -30,10 +30,28 @@ class FakeVariable:
         short_name: str,
         units: str = "",
         standard_name: str | None = None,
+        coordinates: list["FakeCoordinate"] | None = None,
     ) -> None:
         self.short_name = short_name
         self.units = units
         self.standard_name = standard_name
+        self.coordinates = coordinates or []
+
+
+class FakeCoordinate:
+    """Minimal stand-in for `CopernicusMarineCoordinate`."""
+
+    def __init__(
+        self,
+        coordinate_id: str,
+        coordinate_unit: str | None = None,
+        minimum_value: float | None = None,
+        maximum_value: float | None = None,
+    ) -> None:
+        self.coordinate_id = coordinate_id
+        self.coordinate_unit = coordinate_unit
+        self.minimum_value = minimum_value
+        self.maximum_value = maximum_value
 
 
 class FakeService:
