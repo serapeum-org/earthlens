@@ -1,0 +1,1264 @@
+# CMEMS curated catalog - arctic slice.
+#
+# One slice of the per-domain split of the Copernicus Marine catalog.
+# The loader (earthlens.cmems.catalog.Catalog) merges every *.yaml in
+# this directory into one Catalog at construction time; dataset ids
+# must be unique across files. Stanzas are emitted by
+# tools/cmems/refresh_cmems_catalog.py from copernicusmarine.describe();
+# `cadence` is inferred from the dataset_id suffix and `domain` from
+# the product_id prefix. The `global` basin is sub-split by theme
+# (global-physics / global-biogeochem / global-sst / ...) to keep file
+# sizes balanced; the `domain:` field on every row below is still the
+# plain basin label. Where the toolbox exposes no standard_name for a
+# variable, the row carries `long_name: ''` with a TODO marker.
+#
+# Schema (per dataset):
+#   <dataset_id>:
+#     product: <product_id>
+#     title: <human-readable title>
+#     cadence: <daily|monthly|hourly|6hourly|climatology|irregular>
+#     domain: <global|mediterranean|arctic|...>
+#     temporal: { start: YYYY-MM-DD, end: YYYY-MM-DD }   # end null = NRT
+#     variables:
+#       <short_name>: { units: <CF units>, long_name: <CF long name> }
+
+datasets:
+
+  arctic_omi_si_extent:
+    product: ARCTIC_OMI_SI_extent
+    title: Monthly Sea Ice Extent for Northern Hemisphere
+    cadence: irregular
+    domain: arctic
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      siextentn_cglo:
+        units: km2
+        long_name: Sea ice extent
+      siextentn_glor:
+        units: km2
+        long_name: Sea ice extent
+      siextentn_mean:
+        units: km2
+        long_name: Sea ice extent
+      siextentn_oras:
+        units: km2
+        long_name: Sea ice extent
+      siextentn_std:
+        units: km2
+        long_name: Sea ice extent
+
+  arctic_omi_si_extent_obs:
+    product: ARCTIC_OMI_SI_extent_obs
+    title: Northern Hemisphere Monthly Averaged Sea Ice Extent
+    cadence: irregular
+    domain: arctic
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      monthlyclimsiextent_mean:
+        units: km^2
+        long_name: Sea ice extent
+      monthlyclimsiextent_std:
+        units: km^2
+        long_name: ''            # TODO: standard_name missing on describe()
+      siextent:
+        units: km^2
+        long_name: Sea ice extent
+
+  arctic_omi_tempsal_fwc:
+    product: ARCTIC_OMI_TEMPSAL_FWC
+    title: Monthly Freshwater Content for Arctic
+    cadence: irregular
+    domain: arctic
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      fwc_cglo:
+        units: km3
+        long_name: Integral wrt depth of sea water volume defined by reference salinity expressed as
+      fwc_glor:
+        units: km3
+        long_name: Integral wrt depth of sea water volume defined by reference salinity expressed as
+      fwc_mean:
+        units: km3
+        long_name: Integral wrt depth of sea water volume defined by reference salinity expressed as
+      fwc_oras:
+        units: km3
+        long_name: Integral wrt depth of sea water volume defined by reference salinity expressed as
+      fwc_std:
+        units: km3
+        long_name: Integral wrt depth of sea water volume defined by reference salinity expressed as
+
+  cmems_mod_arc_bgc_anfc_ecosmo_P1D-m:
+    product: ARCTIC_ANALYSISFORECAST_BGC_002_004
+    title: Arctic Ocean Biogeochemistry Analysis and Forecast, 6.25 km daily mean
+    cadence: daily
+    domain: arctic
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      chl:
+        units: mg m-3
+        long_name: Mass concentration of chlorophyll a in sea water
+      dissic:
+        units: mole m-3
+        long_name: Mole concentration of dissolved inorganic carbon in sea water
+      expc:
+        units: mol m-2 d-1
+        long_name: Sinking mole flux of particulate organic matter expressed as carbon in sea water
+      kd:
+        units: m-1
+        long_name: Volume attenuation coefficient of downwelling radiative flux in sea water
+      model_depth:
+        units: meter
+        long_name: Sea floor depth below sea level
+      no3:
+        units: mmol m-3
+        long_name: Mole concentration of nitrate in sea water
+      nppv:
+        units: mg m-3 day-1
+        long_name: Net primary production of biomass expressed as carbon per unit volume in sea water
+      o2:
+        units: mmol m-3
+        long_name: Mole concentration of dissolved molecular oxygen in sea water
+      ph:
+        units: '1'
+        long_name: Sea water ph reported on total scale
+      phyc:
+        units: mmol m-3
+        long_name: Mole concentration of phytoplankton expressed as carbon in sea water
+      po4:
+        units: mmol m-3
+        long_name: Mole concentration of phosphate in sea water
+      si:
+        units: mmol m-3
+        long_name: Mole concentration of silicate in sea water
+      spco2:
+        units: Pa
+        long_name: Surface partial pressure of carbon dioxide in sea water
+      zooc:
+        units: mmol m-3
+        long_name: Mole concentration of zooplankton expressed as carbon in sea water
+
+  cmems_mod_arc_bgc_anfc_ecosmo_P1M-m:
+    product: ARCTIC_ANALYSISFORECAST_BGC_002_004
+    title: Arctic Ocean Biogeochemistry Analysis and Forecast, 6.25 km monthly mean
+    cadence: monthly
+    domain: arctic
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      chl:
+        units: mg m-3
+        long_name: Mass concentration of chlorophyll a in sea water
+      dissic:
+        units: mole m-3
+        long_name: Mole concentration of dissolved inorganic carbon in sea water
+      expc:
+        units: mol m-2 d-1
+        long_name: Sinking mole flux of particulate organic matter expressed as carbon in sea water
+      kd:
+        units: m-1
+        long_name: Volume attenuation coefficient of downwelling radiative flux in sea water
+      model_depth:
+        units: meter
+        long_name: Sea floor depth below sea level
+      no3:
+        units: mmol m-3
+        long_name: Mole concentration of nitrate in sea water
+      nppv:
+        units: mg m-3 day-1
+        long_name: Net primary production of biomass expressed as carbon per unit volume in sea water
+      o2:
+        units: mmol m-3
+        long_name: Mole concentration of dissolved molecular oxygen in sea water
+      ph:
+        units: '1'
+        long_name: Sea water ph reported on total scale
+      phyc:
+        units: mmol m-3
+        long_name: Mole concentration of phytoplankton expressed as carbon in sea water
+      po4:
+        units: mmol m-3
+        long_name: Mole concentration of phosphate in sea water
+      si:
+        units: mmol m-3
+        long_name: Mole concentration of silicate in sea water
+      spco2:
+        units: Pa
+        long_name: Surface partial pressure of carbon dioxide in sea water
+      zooc:
+        units: mmol m-3
+        long_name: Mole concentration of zooplankton expressed as carbon in sea water
+
+  cmems_mod_arc_bgc_my_ecosmo_P1D-m:
+    product: ARCTIC_MULTIYEAR_BGC_002_005
+    title: Arctic Ocean Biogeochemistry Reanalysis, 25km surface daily mean
+    cadence: daily
+    domain: arctic
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      chl:
+        units: mg m-3
+        long_name: Mass concentration of chlorophyll a in sea water
+      kd:
+        units: m-1
+        long_name: Volume attenuation coefficient of downwelling radiative flux in sea water
+      model_depth:
+        units: meter
+        long_name: Sea floor depth below sea level
+      no3:
+        units: mmol m-3
+        long_name: Mole concentration of nitrate in sea water
+      nppv:
+        units: mg m-3 day-1
+        long_name: Net primary production of biomass expressed as carbon per unit volume in sea water
+      o2:
+        units: mmol m-3
+        long_name: Mole concentration of dissolved molecular oxygen in sea water
+      phyc:
+        units: mmol m-3
+        long_name: Mole concentration of phytoplankton expressed as carbon in sea water
+      po4:
+        units: mmol m-3
+        long_name: Mole concentration of phosphate in sea water
+      si:
+        units: mmol m-3
+        long_name: Mole concentration of silicate in sea water
+      zooc:
+        units: mmol m-3
+        long_name: Mole concentration of zooplankton expressed as carbon in sea water
+
+  cmems_mod_arc_bgc_my_ecosmo_P1M:
+    product: ARCTIC_MULTIYEAR_BGC_002_005
+    title: Arctic Ocean Biogeochemistry Reanalysis, 25km monthly mean
+    cadence: monthly
+    domain: arctic
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      chl:
+        units: mg m-3
+        long_name: Mass concentration of chlorophyll a in sea water
+      kd:
+        units: m-1
+        long_name: Volume attenuation coefficient of downwelling radiative flux in sea water
+      model_depth:
+        units: meter
+        long_name: Sea floor depth below sea level
+      no3:
+        units: mmol m-3
+        long_name: Mole concentration of nitrate in sea water
+      nppv:
+        units: mg m-3 day-1
+        long_name: Net primary production of biomass expressed as carbon per unit volume in sea water
+      o2:
+        units: mmol m-3
+        long_name: Mole concentration of dissolved molecular oxygen in sea water
+      phyc:
+        units: mmol m-3
+        long_name: Mole concentration of phytoplankton expressed as carbon in sea water
+      po4:
+        units: mmol m-3
+        long_name: Mole concentration of phosphate in sea water
+      si:
+        units: mmol m-3
+        long_name: Mole concentration of silicate in sea water
+      zooc:
+        units: mmol m-3
+        long_name: Mole concentration of zooplankton expressed as carbon in sea water
+
+  cmems_mod_arc_bgc_my_ecosmo_P1Y:
+    product: ARCTIC_MULTIYEAR_BGC_002_005
+    title: Arctic Ocean Biogeochemistry Reanalysis, 25km yearly mean
+    cadence: annual
+    domain: arctic
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      chl:
+        units: mg m-3
+        long_name: Mass concentration of chlorophyll a in sea water
+      kd:
+        units: m-1
+        long_name: Volume attenuation coefficient of downwelling radiative flux in sea water
+      model_depth:
+        units: meter
+        long_name: Sea floor depth below sea level
+      no3:
+        units: mmol m-3
+        long_name: Mole concentration of nitrate in sea water
+      nppv:
+        units: mg m-3 day-1
+        long_name: Net primary production of biomass expressed as carbon per unit volume in sea water
+      o2:
+        units: mmol m-3
+        long_name: Mole concentration of dissolved molecular oxygen in sea water
+      phyc:
+        units: mmol m-3
+        long_name: Mole concentration of phytoplankton expressed as carbon in sea water
+      po4:
+        units: mmol m-3
+        long_name: Mole concentration of phosphate in sea water
+      si:
+        units: mmol m-3
+        long_name: Mole concentration of silicate in sea water
+      zooc:
+        units: mmol m-3
+        long_name: Mole concentration of zooplankton expressed as carbon in sea water
+
+  cmems_mod_arc_phy_anfc_6km_detided_P1D-m:
+    product: ARCTIC_ANALYSISFORECAST_PHY_002_001
+    title: Arctic Ocean Physics Analysis and Forecast, 6.25 km daily mean
+    cadence: daily
+    domain: arctic
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      bottomT:
+        units: degrees_C
+        long_name: Sea water potential temperature at sea floor
+      mlotst:
+        units: m
+        long_name: Ocean mixed layer thickness defined by sigma theta
+      model_depth:
+        units: meter
+        long_name: Sea floor depth below sea level
+      siage:
+        units: day
+        long_name: Age of sea ice
+      sialb:
+        units: '1'
+        long_name: Sea ice albedo
+      siconc:
+        units: '1'
+        long_name: Sea ice area fraction
+      siconc_fy:
+        units: '1'
+        long_name: Sea ice classification
+      sisnthick:
+        units: m
+        long_name: Surface snow thickness
+      sithick:
+        units: m
+        long_name: Sea ice thickness
+      so:
+        units: 1e-3
+        long_name: Sea water salinity
+      stfbaro:
+        units: m3 s-1
+        long_name: Ocean barotropic streamfunction
+      thetao:
+        units: degrees_C
+        long_name: Sea water potential temperature
+      vxo:
+        units: m s-1
+        long_name: Eastward sea water velocity
+      vxsi:
+        units: m s-1
+        long_name: Eastward sea ice velocity
+      vyo:
+        units: m s-1
+        long_name: Northward sea water velocity
+      vysi:
+        units: m s-1
+        long_name: Northward sea ice velocity
+      wo:
+        units: m s-1
+        long_name: Upward sea water velocity
+      zos:
+        units: m
+        long_name: Sea surface height above geoid
+
+  cmems_mod_arc_phy_anfc_6km_detided_P1M-m:
+    product: ARCTIC_ANALYSISFORECAST_PHY_002_001
+    title: Arctic Ocean Physics Analysis, 6.25km monthly mean
+    cadence: monthly
+    domain: arctic
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      bottomT:
+        units: degrees_C
+        long_name: Sea water potential temperature at sea floor
+      mlotst:
+        units: m
+        long_name: Ocean mixed layer thickness defined by sigma theta
+      model_depth:
+        units: meter
+        long_name: Sea floor depth below sea level
+      siage:
+        units: day
+        long_name: Age of sea ice
+      sialb:
+        units: '1'
+        long_name: Sea ice albedo
+      siconc:
+        units: '1'
+        long_name: Sea ice area fraction
+      siconc_fy:
+        units: '1'
+        long_name: Sea ice classification
+      sisnthick:
+        units: m
+        long_name: Surface snow thickness
+      sithick:
+        units: m
+        long_name: Sea ice thickness
+      so:
+        units: 1e-3
+        long_name: Sea water salinity
+      stfbaro:
+        units: m3 s-1
+        long_name: Ocean barotropic streamfunction
+      thetao:
+        units: degrees_C
+        long_name: Sea water potential temperature
+      vxo:
+        units: m s-1
+        long_name: Eastward sea water velocity
+      vxsi:
+        units: m s-1
+        long_name: Eastward sea ice velocity
+      vyo:
+        units: m s-1
+        long_name: Northward sea water velocity
+      vysi:
+        units: m s-1
+        long_name: Northward sea ice velocity
+      wo:
+        units: m s-1
+        long_name: Upward sea water velocity
+      zos:
+        units: m
+        long_name: Sea surface height above geoid
+
+  cmems_mod_arc_phy_anfc_6km_detided_PT1H-i:
+    product: ARCTIC_ANALYSISFORECAST_PHY_002_001
+    title: Arctic Ocean Physics Analysis and Forecast, 6.25 km hourly instantaneous
+    cadence: hourly
+    domain: arctic
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      model_depth:
+        units: meter
+        long_name: Sea floor depth below sea level
+      siconc:
+        units: '1'
+        long_name: Sea ice area fraction
+      sisnthick:
+        units: m
+        long_name: Surface snow thickness
+      sithick:
+        units: m
+        long_name: Sea ice thickness
+      so:
+        units: 1e-3
+        long_name: Sea water salinity
+      thetao:
+        units: degrees_C
+        long_name: Sea water potential temperature
+      vxo:
+        units: m s-1
+        long_name: Eastward sea water velocity
+      vxsi:
+        units: m s-1
+        long_name: Eastward sea ice velocity
+      vyo:
+        units: m s-1
+        long_name: Northward sea water velocity
+      vysi:
+        units: m s-1
+        long_name: Northward sea ice velocity
+      zos:
+        units: m
+        long_name: Sea surface height above geoid
+
+  cmems_mod_arc_phy_anfc_6km_detided_PT6H-m:
+    product: ARCTIC_ANALYSISFORECAST_PHY_002_001
+    title: Arctic Ocean Physics Analysis and Forecast, 6.25 km 6-hourly mean
+    cadence: 6hourly
+    domain: arctic
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      bottomT:
+        units: degrees_C
+        long_name: Sea water potential temperature at sea floor
+      mlotst:
+        units: m
+        long_name: Ocean mixed layer thickness defined by sigma theta
+      model_depth:
+        units: meter
+        long_name: Sea floor depth below sea level
+      siage:
+        units: day
+        long_name: Age of sea ice
+      sialb:
+        units: '1'
+        long_name: Sea ice albedo
+      siconc:
+        units: '1'
+        long_name: Sea ice area fraction
+      siconc_fy:
+        units: '1'
+        long_name: Sea ice classification
+      sisnthick:
+        units: m
+        long_name: Surface snow thickness
+      sithick:
+        units: m
+        long_name: Sea ice thickness
+      so:
+        units: 1e-3
+        long_name: Sea water salinity
+      stfbaro:
+        units: m3 s-1
+        long_name: Ocean barotropic streamfunction
+      thetao:
+        units: degrees_C
+        long_name: Sea water potential temperature
+      vxo:
+        units: m s-1
+        long_name: Eastward sea water velocity
+      vxsi:
+        units: m s-1
+        long_name: Eastward sea ice velocity
+      vyo:
+        units: m s-1
+        long_name: Northward sea water velocity
+      vysi:
+        units: m s-1
+        long_name: Northward sea ice velocity
+      wo:
+        units: m s-1
+        long_name: Upward sea water velocity
+      zos:
+        units: m
+        long_name: Sea surface height above geoid
+
+  cmems_mod_arc_phy_anfc_nextsim_P1M-m:
+    product: ARCTIC_ANALYSISFORECAST_PHY_ICE_002_011
+    title: neXtSIM-F sea ice forecast, 3 km monthly averaged fields (cmems_mod_arc_phy_anfc_nextsim_P1M-m)
+    cadence: monthly
+    domain: arctic
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      si_ridge_ratio:
+        units: '1'
+        long_name: Sea ice volume fraction of ridged ice
+      siage:
+        units: years
+        long_name: Age of sea ice
+      sialb:
+        units: '1'
+        long_name: Sea ice albedo
+      siconc:
+        units: '1'
+        long_name: Sea ice area fraction
+      siconc_my:
+        units: '1'
+        long_name: Sea ice classification
+      siconc_young:
+        units: '1'
+        long_name: Sea ice classification
+      sisnthick:
+        units: m
+        long_name: Surface snow thickness
+      sithick:
+        units: m
+        long_name: Sea ice thickness
+      vxsi:
+        units: m s-1
+        long_name: Eastward sea ice velocity
+      vysi:
+        units: m s-1
+        long_name: Northward sea ice velocity
+
+  cmems_mod_arc_phy_anfc_nextsim_hm:
+    product: ARCTIC_ANALYSISFORECAST_PHY_ICE_002_011
+    title: cmems_mod_arc_phy_anfc_nextsim_hm_202311
+    cadence: irregular
+    domain: arctic
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      si_ridge_ratio:
+        units: '1'
+        long_name: Sea ice volume fraction of ridged ice
+      siage:
+        units: years
+        long_name: Age of sea ice
+      sialb:
+        units: '1'
+        long_name: Sea ice albedo
+      siconc:
+        units: '1'
+        long_name: Sea ice area fraction
+      siconc_my:
+        units: '1'
+        long_name: Sea ice classification
+      siconc_young:
+        units: '1'
+        long_name: Sea ice classification
+      sisnthick:
+        units: m
+        long_name: Surface snow thickness
+      sithick:
+        units: m
+        long_name: Sea ice thickness
+      vxsi:
+        units: m s-1
+        long_name: Eastward sea ice velocity
+      vysi:
+        units: m s-1
+        long_name: Northward sea ice velocity
+
+  cmems_mod_arc_phy_my_3km-climatology_P1M-m:
+    product: ARCTIC_MULTIYEAR_PHY_ICE_002_016
+    title: Arctic sea ice reanalysis
+    cadence: climatology
+    domain: arctic
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      climatology_bounds:
+        units: days since 1900-01-01 00:00:00
+        long_name: ''            # TODO: standard_name missing on describe()
+      si_ridge_ratio:
+        units: '1'
+        long_name: Sea ice volume fraction of ridged ice
+      siage:
+        units: years
+        long_name: Age of sea ice
+      sialb:
+        units: '1'
+        long_name: Sea ice albedo
+      siconc:
+        units: '1'
+        long_name: Sea ice area fraction
+      siconc_my:
+        units: '1'
+        long_name: Sea ice classification
+      siconc_young:
+        units: '1'
+        long_name: Sea ice classification
+      sisnthick:
+        units: m
+        long_name: Surface snow thickness
+      sithick:
+        units: m
+        long_name: Sea ice thickness
+      vxsi:
+        units: m s-1
+        long_name: Eastward sea ice velocity
+      vysi:
+        units: m s-1
+        long_name: Northward sea ice velocity
+
+  cmems_mod_arc_phy_my_hflux_P1D-m:
+    product: ARCTIC_MULTIYEAR_PHY_002_003
+    title: Arctic Ocean Physics Reanalysis, 12.5km daily mean
+    cadence: daily
+    domain: arctic
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      hfds:
+        units: W m-2
+        long_name: Surface downward heat flux in sea water
+      rsntds:
+        units: W m-2
+        long_name: Net downward shortwave flux at sea water surface
+
+  cmems_mod_arc_phy_my_hflux_P1M-m:
+    product: ARCTIC_MULTIYEAR_PHY_002_003
+    title: Arctic Ocean Physics Reanalysis, 12.5km monthly mean
+    cadence: monthly
+    domain: arctic
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      hfds:
+        units: W m-2
+        long_name: Surface downward heat flux in sea water
+      rsntds:
+        units: W m-2
+        long_name: Net downward shortwave flux at sea water surface
+
+  cmems_mod_arc_phy_my_mflux_P1D-m:
+    product: ARCTIC_MULTIYEAR_PHY_002_003
+    title: Arctic Ocean Physics Reanalysis, 12.5km daily mean
+    cadence: daily
+    domain: arctic
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      tauuo:
+        units: N m-2
+        long_name: Surface downward x stress
+      tauvo:
+        units: N m-2
+        long_name: Surface downward y stress
+
+  cmems_mod_arc_phy_my_mflux_P1M-m:
+    product: ARCTIC_MULTIYEAR_PHY_002_003
+    title: Arctic Ocean Physics Reanalysis, 12.5km monthly mean
+    cadence: monthly
+    domain: arctic
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      tauuo:
+        units: N m-2
+        long_name: Surface downward x stress
+      tauvo:
+        units: N m-2
+        long_name: Surface downward y stress
+
+  cmems_mod_arc_phy_my_nextsim_P1D-m:
+    product: ARCTIC_MULTIYEAR_PHY_ICE_002_016
+    title: Arctic sea ice reanalysis
+    cadence: daily
+    domain: arctic
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      si_ridge_ratio:
+        units: '1'
+        long_name: Sea ice volume fraction of ridged ice
+      siage:
+        units: years
+        long_name: Age of sea ice
+      sialb:
+        units: '1'
+        long_name: Sea ice albedo
+      siconc:
+        units: '1'
+        long_name: Sea ice area fraction
+      siconc_my:
+        units: '1'
+        long_name: Sea ice classification
+      siconc_young:
+        units: '1'
+        long_name: Sea ice classification
+      sisnthick:
+        units: m
+        long_name: Surface snow thickness
+      sithick:
+        units: m
+        long_name: Sea ice thickness
+      vxsi:
+        units: m s-1
+        long_name: Eastward sea ice velocity
+      vysi:
+        units: m s-1
+        long_name: Northward sea ice velocity
+
+  cmems_mod_arc_phy_my_nextsim_P1M-m:
+    product: ARCTIC_MULTIYEAR_PHY_ICE_002_016
+    title: Arctic sea ice reanalysis
+    cadence: monthly
+    domain: arctic
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      si_ridge_ratio:
+        units: '1'
+        long_name: Sea ice volume fraction of ridged ice
+      siage:
+        units: years
+        long_name: Age of sea ice
+      sialb:
+        units: '1'
+        long_name: Sea ice albedo
+      siconc:
+        units: '1'
+        long_name: Sea ice area fraction
+      siconc_my:
+        units: '1'
+        long_name: Sea ice classification
+      siconc_young:
+        units: '1'
+        long_name: Sea ice classification
+      sisnthick:
+        units: m
+        long_name: Surface snow thickness
+      sithick:
+        units: m
+        long_name: Sea ice thickness
+      vxsi:
+        units: m s-1
+        long_name: Eastward sea ice velocity
+      vysi:
+        units: m s-1
+        long_name: Northward sea ice velocity
+
+  cmems_mod_arc_phy_my_topaz4_P1D-m:
+    product: ARCTIC_MULTIYEAR_PHY_002_003
+    title: Arctic Ocean Physics Reanalysis, 12.5km daily mean
+    cadence: daily
+    domain: arctic
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      bottomT:
+        units: degrees_C
+        long_name: Sea water potential temperature at sea floor
+      mlotst:
+        units: m
+        long_name: Ocean mixed layer thickness defined by sigma theta
+      model_depth:
+        units: meter
+        long_name: Sea floor depth below sea level
+      siconc:
+        units: '1'
+        long_name: Sea ice area fraction
+      sisnthick:
+        units: m
+        long_name: Surface snow thickness
+      sithick:
+        units: m
+        long_name: Sea ice thickness
+      sithick_corr:
+        units: m
+        long_name: Sea ice thickness
+      so:
+        units: 1e-3
+        long_name: Sea water salinity
+      stfbaro:
+        units: m3 s-1
+        long_name: Ocean barotropic streamfunction
+      thetao:
+        units: degrees_C
+        long_name: Sea water potential temperature
+      vxo:
+        units: m s-1
+        long_name: Eastward sea water velocity
+      vxsi:
+        units: m s-1
+        long_name: Eastward sea ice velocity
+      vyo:
+        units: m s-1
+        long_name: Northward sea water velocity
+      vysi:
+        units: m s-1
+        long_name: Northward sea ice velocity
+      zos:
+        units: m
+        long_name: Sea surface height above geoid
+
+  cmems_mod_arc_phy_my_topaz4_P1M:
+    product: ARCTIC_MULTIYEAR_PHY_002_003
+    title: Arctic Ocean Physics Reanalysis, 12.5km monthly mean
+    cadence: monthly
+    domain: arctic
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      bottomT:
+        units: degrees_C
+        long_name: Sea water potential temperature at sea floor
+      mlotst:
+        units: m
+        long_name: Ocean mixed layer thickness defined by sigma theta
+      model_depth:
+        units: meter
+        long_name: Sea floor depth below sea level
+      siconc:
+        units: '1'
+        long_name: Sea ice area fraction
+      sisnthick:
+        units: m
+        long_name: Surface snow thickness
+      sithick:
+        units: m
+        long_name: Sea ice thickness
+      sithick_corr:
+        units: m
+        long_name: Sea ice thickness
+      so:
+        units: 1e-3
+        long_name: Sea water salinity
+      stfbaro:
+        units: m3 s-1
+        long_name: Ocean barotropic streamfunction
+      thetao:
+        units: degrees_C
+        long_name: Sea water potential temperature
+      vxo:
+        units: m s-1
+        long_name: Eastward sea water velocity
+      vxsi:
+        units: m s-1
+        long_name: Eastward sea ice velocity
+      vyo:
+        units: m s-1
+        long_name: Northward sea water velocity
+      vysi:
+        units: m s-1
+        long_name: Northward sea ice velocity
+      zos:
+        units: m
+        long_name: Sea surface height above geoid
+
+  cmems_mod_arc_phy_my_topaz4_P1Y:
+    product: ARCTIC_MULTIYEAR_PHY_002_003
+    title: Arctic Ocean Physics Reanalysis, 12.5km yearly mean
+    cadence: annual
+    domain: arctic
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      bottomT:
+        units: degrees_C
+        long_name: Sea water potential temperature at sea floor
+      mlotst:
+        units: m
+        long_name: Ocean mixed layer thickness defined by sigma theta
+      model_depth:
+        units: meter
+        long_name: Sea floor depth below sea level
+      siconc:
+        units: '1'
+        long_name: Sea ice area fraction
+      sisnthick:
+        units: m
+        long_name: Surface snow thickness
+      sithick:
+        units: m
+        long_name: Sea ice thickness
+      sithick_corr:
+        units: m
+        long_name: Sea ice thickness
+      so:
+        units: 1e-3
+        long_name: Sea water salinity
+      stfbaro:
+        units: m3 s-1
+        long_name: Ocean barotropic streamfunction
+      thetao:
+        units: degrees_C
+        long_name: Sea water potential temperature
+      vxo:
+        units: m s-1
+        long_name: Eastward sea water velocity
+      vxsi:
+        units: m s-1
+        long_name: Eastward sea ice velocity
+      vyo:
+        units: m s-1
+        long_name: Northward sea water velocity
+      vysi:
+        units: m s-1
+        long_name: Northward sea ice velocity
+      zos:
+        units: m
+        long_name: Sea surface height above geoid
+
+  cmems_obs-oc_arc_bgc-plankton_my_l3-multi-4km_P1D:
+    product: OCEANCOLOUR_ARC_BGC_L3_MY_009_123
+    title: cmems_obs-oc_arc_bgc-plankton_my_l3-multi-4km_P1D
+    cadence: daily
+    domain: arctic
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      CHL:
+        units: milligram m^-3
+        long_name: Mass concentration of chlorophyll a in sea water
+      QI_CHL:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+
+  cmems_obs-oc_arc_bgc-plankton_my_l3-olci-300m_P1D:
+    product: OCEANCOLOUR_ARC_BGC_L3_MY_009_123
+    title: cmems_obs-oc_arc_bgc-plankton_my_l3-olci-300m_P1D_202303
+    cadence: daily
+    domain: arctic
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      CHL:
+        units: milligram m^-3
+        long_name: Mass concentration of chlorophyll a in sea water
+      SENSORMASK:
+        units: ''
+        long_name: ''            # TODO: standard_name missing on describe()
+
+  cmems_obs-oc_arc_bgc-plankton_my_l4-multi-4km_P1M:
+    product: OCEANCOLOUR_ARC_BGC_L4_MY_009_124
+    title: cmems_obs-oc_arc_bgc-plankton_my_l4-multi-4km_P1M
+    cadence: monthly
+    domain: arctic
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      CHL:
+        units: milligram m^-3
+        long_name: Mass concentration of chlorophyll a in sea water
+      CHL_count:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      CHL_error:
+        units: milligram m^-3
+        long_name: ''            # TODO: standard_name missing on describe()
+
+  cmems_obs-oc_arc_bgc-reflectance_my_l3-multi-4km_P1D:
+    product: OCEANCOLOUR_ARC_BGC_L3_MY_009_123
+    title: cmems_obs-oc_arc_bgc-reflectance_my_l3-multi-4km_P1D
+    cadence: daily
+    domain: arctic
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      QI_RRS412:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      QI_RRS443:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      QI_RRS490:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      QI_RRS510:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      QI_RRS560:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      QI_RRS665:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS412:
+        units: sr^-1
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS443:
+        units: sr^-1
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS490:
+        units: sr^-1
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS510:
+        units: sr^-1
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS560:
+        units: sr^-1
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS665:
+        units: sr^-1
+        long_name: ''            # TODO: standard_name missing on describe()
+
+  cmems_obs-oc_arc_bgc-reflectance_my_l3-olci-300m_P1D:
+    product: OCEANCOLOUR_ARC_BGC_L3_MY_009_123
+    title: cmems_obs-oc_arc_bgc-reflectance_my_l3-olci-300m_P1D_202303
+    cadence: daily
+    domain: arctic
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      RRS400:
+        units: sr^-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS412_5:
+        units: sr^-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS442_5:
+        units: sr^-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS490:
+        units: sr^-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS510:
+        units: sr^-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS560:
+        units: sr^-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS620:
+        units: sr^-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS665:
+        units: sr^-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS673_75:
+        units: sr^-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS681_25:
+        units: sr^-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS708_75:
+        units: sr^-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      SENSORMASK:
+        units: ''
+        long_name: ''            # TODO: standard_name missing on describe()
+
+  cmems_obs-oc_arc_bgc-transp_my_l3-multi-4km_P1D:
+    product: OCEANCOLOUR_ARC_BGC_L3_MY_009_123
+    title: cmems_obs-oc_arc_bgc-transp_my_l3-multi-4km_P1D
+    cadence: daily
+    domain: arctic
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      KD490:
+        units: m^-1
+        long_name: Volume attenuation coefficient of downwelling radiative flux in sea water
+      QI_KD490:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+
+  cmems_obs-oc_arc_bgc-transp_my_l3-olci-300m_P1D:
+    product: OCEANCOLOUR_ARC_BGC_L3_MY_009_123
+    title: cmems_obs-oc_arc_bgc-transp_my_l3-olci-300m_P1D_202303
+    cadence: daily
+    domain: arctic
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      KD490:
+        units: m^-1
+        long_name: Volume attenuation coefficient of downwelling radiative flux in sea water
+      SENSORMASK:
+        units: ''
+        long_name: ''            # TODO: standard_name missing on describe()
+
+  dataset-topaz6-arc-15min-3km-be:
+    product: ARCTIC_ANALYSISFORECAST_PHY_TIDE_002_015
+    title: dataset-topaz6-arc-15min-3km-be_202003
+    cadence: irregular
+    domain: arctic
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      model_depth:
+        units: meter
+        long_name: Sea floor depth below sea level
+      vxo:
+        units: m s-1
+        long_name: Eastward sea water velocity
+      vyo:
+        units: m s-1
+        long_name: Northward sea water velocity
+      zos:
+        units: m
+        long_name: Sea surface height above geoid
+
+  dataset-wam-arctic-1hr3km-be:
+    product: ARCTIC_ANALYSIS_FORECAST_WAV_002_014
+    title: dataset-wam-arctic-1hr3km-be_202411
+    cadence: irregular
+    domain: arctic
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      Current:
+        units: m/s
+        long_name: Sea water speed
+      Currentdir:
+        units: degree
+        long_name: Sea water to direction
+      SIC:
+        units: '1'
+        long_name: Sea ice area fraction
+      SIT:
+        units: m
+        long_name: Sea ice thickness
+      VCMX:
+        units: m
+        long_name: Sea surface wave maximum height
+      VHM0:
+        units: m
+        long_name: Sea surface wave significant height
+      VHM0_SW1:
+        units: m
+        long_name: Sea surface primary swell wave significant height
+      VHM0_SW2:
+        units: m
+        long_name: Sea surface secondary swell wave significant height
+      VHM0_WW:
+        units: m
+        long_name: Sea surface wind wave significant height
+      VMDR:
+        units: degree
+        long_name: Sea surface wave from direction
+      VMDR_SW1:
+        units: degree
+        long_name: Sea surface primary swell wave from direction
+      VMDR_SW2:
+        units: degree
+        long_name: Sea surface secondary swell wave from direction
+      VMDR_WW:
+        units: degree
+        long_name: Sea surface wind wave from direction
+      VMXL:
+        units: m
+        long_name: Sea surface wave maximum crest height
+      VPED:
+        units: degree
+        long_name: Sea surface wave from direction at variance spectral density maximum
+      VSDX:
+        units: m/s
+        long_name: Sea surface wave stokes drift x velocity
+      VSDY:
+        units: m/s
+        long_name: Sea surface wave stokes drift y velocity
+      VTM01_SW1:
+        units: s
+        long_name: Sea surface primary swell wave mean period
+      VTM01_SW2:
+        units: s
+        long_name: Sea surface secondary swell wave mean period
+      VTM01_WW:
+        units: s
+        long_name: Sea surface wind wave mean period from variance spectral density first frequency moment
+      VTM02:
+        units: s
+        long_name: Sea surface wave mean period from variance spectral density second frequency moment
+      VTM10:
+        units: s
+        long_name: Sea surface wave mean period from variance spectral density inverse frequency moment
+      VTPK:
+        units: s
+        long_name: Sea surface wave period at variance spectral density maximum
+      depth:
+        units: m
+        long_name: Sea floor depth below sea level

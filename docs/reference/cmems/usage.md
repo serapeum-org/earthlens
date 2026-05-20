@@ -32,13 +32,13 @@ cat.get_variable("cmems_mod_glo_phy_my_0.083deg_P1D-m", "thetao").units
 # 'degrees_C'
 ```
 
-`available_products:` is the live informational index of every CMEMS
-product id the toolbox publishes (regenerate with
-`tools/cmems/refresh_cmems_catalog.py refresh`); `datasets:` is the
-curated subset earthlens models in detail. **Uncurated dataset ids
-still work** — the catalog lookup is a metadata convenience, not a
-gate. Pass any id the toolbox's `copernicusmarine.describe()`
-recognises and the backend issues the request unchanged.
+`Catalog().available_datasets` is the live informational index of
+every CMEMS dataset id the toolbox publishes (regenerate with
+`tools/cmems/refresh_cmems_catalog.py refresh`); `Catalog().datasets`
+is the curated map, a subset of it. **Uncurated dataset ids still
+work** — the catalog lookup is a metadata convenience, not a gate.
+Pass any id the toolbox's `copernicusmarine.describe()` recognises and
+the backend issues the request unchanged.
 
 ## 2. Download
 
@@ -205,9 +205,9 @@ pixi run -e dev python tools/cmems/refresh_cmems_catalog.py add-ids \
     <new_dataset_id>
 ```
 
-which fetches `describe()`, emits the YAML stanza, appends it to
-`cmems_data_catalog.yaml`'s `datasets:` block, and re-parses to fail
-loud on malformed YAML.
+which fetches `describe()`, emits the YAML stanza, appends it to the
+routed per-domain file under `catalog/` (and adds the id to
+`_index.yaml`), then re-parses to fail loud on malformed YAML.
 
 ## 8. Common error modes
 

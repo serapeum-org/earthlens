@@ -1,0 +1,3870 @@
+# CMEMS curated catalog - ibi slice.
+#
+# One slice of the per-domain split of the Copernicus Marine catalog.
+# The loader (earthlens.cmems.catalog.Catalog) merges every *.yaml in
+# this directory into one Catalog at construction time; dataset ids
+# must be unique across files. Stanzas are emitted by
+# tools/cmems/refresh_cmems_catalog.py from copernicusmarine.describe();
+# `cadence` is inferred from the dataset_id suffix and `domain` from
+# the product_id prefix. The `global` basin is sub-split by theme
+# (global-physics / global-biogeochem / global-sst / ...) to keep file
+# sizes balanced; the `domain:` field on every row below is still the
+# plain basin label. Where the toolbox exposes no standard_name for a
+# variable, the row carries `long_name: ''` with a TODO marker.
+#
+# Schema (per dataset):
+#   <dataset_id>:
+#     product: <product_id>
+#     title: <human-readable title>
+#     cadence: <daily|monthly|hourly|6hourly|climatology|irregular>
+#     domain: <global|mediterranean|arctic|...>
+#     temporal: { start: YYYY-MM-DD, end: YYYY-MM-DD }   # end null = NRT
+#     variables:
+#       <short_name>: { units: <CF units>, long_name: <CF long name> }
+
+datasets:
+
+  cmems_mod_ibi_bgc-car_my_0.027deg_P1D-m:
+    product: IBI_MULTIYEAR_BGC_005_003
+    title: Biogeochemical 3D daily mean fields for the Iberia-Biscay-Ireland (IBI) region
+    cadence: daily
+    domain: ibi
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      dissic:
+        units: mol.m-3
+        long_name: Mole concentration of dissolved inorganic carbon in sea water
+      ph:
+        units: '1'
+        long_name: Sea water ph reported on total scale
+      spco2:
+        units: Pa
+        long_name: Surface partial pressure of carbon dioxide in sea water
+
+  cmems_mod_ibi_bgc-car_my_0.027deg_P1M-m:
+    product: IBI_MULTIYEAR_BGC_005_003
+    title: Ocean monthly mean fields for the Iberia-Biscay-Ireland (IBI) region
+    cadence: monthly
+    domain: ibi
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      dissic:
+        units: mol.m-3
+        long_name: Mole concentration of dissolved inorganic carbon in sea water
+      ph:
+        units: '1'
+        long_name: Sea water ph reported on total scale
+      spco2:
+        units: Pa
+        long_name: Surface partial pressure of carbon dioxide in sea water
+
+  cmems_mod_ibi_bgc-car_my_0.027deg_P1Y-m:
+    product: IBI_MULTIYEAR_BGC_005_003
+    title: Ocean yearly mean fields for the Iberia-Biscay-Ireland (IBI) region
+    cadence: annual
+    domain: ibi
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      dissic:
+        units: mol.m-3
+        long_name: Mole concentration of dissolved inorganic carbon in sea water
+      ph:
+        units: '1'
+        long_name: Sea water ph reported on total scale
+      spco2:
+        units: Pa
+        long_name: Surface partial pressure of carbon dioxide in sea water
+
+  cmems_mod_ibi_bgc-nut_my_0.027deg_P1D-m:
+    product: IBI_MULTIYEAR_BGC_005_003
+    title: Biogeochemical 3D daily mean fields for the Iberia-Biscay-Ireland (IBI) region
+    cadence: daily
+    domain: ibi
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      fe:
+        units: mmol.m-3
+        long_name: Mole concentration of dissolved iron in sea water
+      nh4:
+        units: mmol.m-3
+        long_name: Mole concentration of ammonium in sea water
+      no3:
+        units: mmol.m-3
+        long_name: Mole concentration of nitrate in sea water
+      po4:
+        units: mmol.m-3
+        long_name: Mole concentration of phosphate in sea water
+      si:
+        units: mmol.m-3
+        long_name: Mole concentration of silicate in sea water
+
+  cmems_mod_ibi_bgc-nut_my_0.027deg_P1M-m:
+    product: IBI_MULTIYEAR_BGC_005_003
+    title: Ocean monthly mean fields for the Iberia-Biscay-Ireland (IBI) region
+    cadence: monthly
+    domain: ibi
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      fe:
+        units: mmol.m-3
+        long_name: Mole concentration of dissolved iron in sea water
+      nh4:
+        units: mmol.m-3
+        long_name: Mole concentration of ammonium in sea water
+      no3:
+        units: mmol.m-3
+        long_name: Mole concentration of nitrate in sea water
+      po4:
+        units: mmol.m-3
+        long_name: Mole concentration of phosphate in sea water
+      si:
+        units: mmol.m-3
+        long_name: Mole concentration of silicate in sea water
+
+  cmems_mod_ibi_bgc-nut_my_0.027deg_P1Y-m:
+    product: IBI_MULTIYEAR_BGC_005_003
+    title: Ocean yearly mean fields for the Iberia-Biscay-Ireland (IBI) region
+    cadence: annual
+    domain: ibi
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      fe:
+        units: mmol.m-3
+        long_name: Mole concentration of dissolved iron in sea water
+      nh4:
+        units: mmol.m-3
+        long_name: Mole concentration of ammonium in sea water
+      no3:
+        units: mmol.m-3
+        long_name: Mole concentration of nitrate in sea water
+      po4:
+        units: mmol.m-3
+        long_name: Mole concentration of phosphate in sea water
+      si:
+        units: mmol.m-3
+        long_name: Mole concentration of silicate in sea water
+
+  cmems_mod_ibi_bgc-o2_my_0.027deg_P1D-m:
+    product: IBI_MULTIYEAR_BGC_005_003
+    title: Biogeochemical 3D daily mean fields for the Iberia-Biscay-Ireland (IBI) region
+    cadence: daily
+    domain: ibi
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      o2:
+        units: mmol.m-3
+        long_name: Mole concentration of dissolved molecular oxygen in sea water
+
+  cmems_mod_ibi_bgc-o2_my_0.027deg_P1M-m:
+    product: IBI_MULTIYEAR_BGC_005_003
+    title: Ocean monthly mean fields for the Iberia-Biscay-Ireland (IBI) region
+    cadence: monthly
+    domain: ibi
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      o2:
+        units: mmol.m-3
+        long_name: Mole concentration of dissolved molecular oxygen in sea water
+
+  cmems_mod_ibi_bgc-o2_my_0.027deg_P1Y-m:
+    product: IBI_MULTIYEAR_BGC_005_003
+    title: Ocean yearly mean fields for the Iberia-Biscay-Ireland (IBI) region
+    cadence: annual
+    domain: ibi
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      o2:
+        units: mmol.m-3
+        long_name: Mole concentration of dissolved molecular oxygen in sea water
+
+  cmems_mod_ibi_bgc-optics_anfc_0.027deg_P1D-m:
+    product: IBI_ANALYSISFORECAST_BGC_005_004
+    title: Biogeochemical 3D daily mean fields for the Iberia-Biscay-Ireland (IBI) region
+    cadence: daily
+    domain: ibi
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      kd:
+        units: m-1
+        long_name: Volume attenuation coefficient of downwelling radiative flux in sea water
+
+  cmems_mod_ibi_bgc-optics_anfc_0.027deg_P1M-m:
+    product: IBI_ANALYSISFORECAST_BGC_005_004
+    title: Biogeochemical 3D monthly mean fields for the Iberia-Biscay-Ireland (IBI) region
+    cadence: monthly
+    domain: ibi
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      kd:
+        units: m-1
+        long_name: Volume attenuation coefficient of downwelling radiative flux in sea water
+
+  cmems_mod_ibi_bgc-optics_my_0.027deg_P1D-m:
+    product: IBI_MULTIYEAR_BGC_005_003
+    title: Biogeochemical 3D daily mean fields for the Iberia-Biscay-Ireland (IBI) region
+    cadence: daily
+    domain: ibi
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      kd:
+        units: m-1
+        long_name: Volume attenuation coefficient of downwelling radiative flux in sea water
+      zeu:
+        units: m
+        long_name: Euphotic zone depth
+
+  cmems_mod_ibi_bgc-optics_my_0.027deg_P1M-m:
+    product: IBI_MULTIYEAR_BGC_005_003
+    title: Ocean monthly mean fields for the Iberia-Biscay-Ireland (IBI) region
+    cadence: monthly
+    domain: ibi
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      kd:
+        units: m-1
+        long_name: Volume attenuation coefficient of downwelling radiative flux in sea water
+      zeu:
+        units: m
+        long_name: Euphotic zone depth
+
+  cmems_mod_ibi_bgc-optics_my_0.027deg_P1Y-m:
+    product: IBI_MULTIYEAR_BGC_005_003
+    title: Ocean yearly mean fields for the Iberia-Biscay-Ireland (IBI) region
+    cadence: annual
+    domain: ibi
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      kd:
+        units: m-1
+        long_name: Volume attenuation coefficient of downwelling radiative flux in sea water
+      zeu:
+        units: m
+        long_name: Euphotic zone depth
+
+  cmems_mod_ibi_bgc-plankton_my_0.027deg_P1D-m:
+    product: IBI_MULTIYEAR_BGC_005_003
+    title: Biogeochemical 3D daily mean fields for the Iberia-Biscay-Ireland (IBI) region
+    cadence: daily
+    domain: ibi
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      chl:
+        units: mg.m-3
+        long_name: Mass concentration of chlorophyll a in sea water
+      nppv:
+        units: mg.m-3.day-1
+        long_name: Net primary production of biomass expressed as carbon per unit volume in sea water
+      phyc:
+        units: mmol.m-3
+        long_name: Mole concentration of phytoplankton expressed as carbon in sea water
+      zooc:
+        units: mmol.m-3
+        long_name: Mole concentration of zooplankton expressed as carbon in sea water
+
+  cmems_mod_ibi_bgc-plankton_my_0.027deg_P1M-m:
+    product: IBI_MULTIYEAR_BGC_005_003
+    title: Ocean monthly mean fields for the Iberia-Biscay-Ireland (IBI) region
+    cadence: monthly
+    domain: ibi
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      chl:
+        units: mg.m-3
+        long_name: Mass concentration of chlorophyll a in sea water
+      nppv:
+        units: mg.m-3.day-1
+        long_name: Net primary production of biomass expressed as carbon per unit volume in sea water
+      phyc:
+        units: mmol.m-3
+        long_name: Mole concentration of phytoplankton expressed as carbon in sea water
+      zooc:
+        units: mmol.m-3
+        long_name: Mole concentration of zooplankton expressed as carbon in sea water
+
+  cmems_mod_ibi_bgc-plankton_my_0.027deg_P1Y-m:
+    product: IBI_MULTIYEAR_BGC_005_003
+    title: Ocean yearly mean fields for the Iberia-Biscay-Ireland (IBI) region
+    cadence: annual
+    domain: ibi
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      chl:
+        units: mg.m-3
+        long_name: Mass concentration of chlorophyll a in sea water
+      nppv:
+        units: mg.m-3.day-1
+        long_name: Net primary production of biomass expressed as carbon per unit volume in sea water
+      phyc:
+        units: mmol.m-3
+        long_name: Mole concentration of phytoplankton expressed as carbon in sea water
+      zooc:
+        units: mmol.m-3
+        long_name: Mole concentration of zooplankton expressed as carbon in sea water
+
+  cmems_mod_ibi_bgc_anfc_0.027deg-3D_P1D-m:
+    product: IBI_ANALYSISFORECAST_BGC_005_004
+    title: Biogeochemical 3D daily mean fields for the Iberia-Biscay-Ireland (IBI) region
+    cadence: daily
+    domain: ibi
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      chl:
+        units: mg.m-3
+        long_name: Mass concentration of chlorophyll a in sea water
+      dissic:
+        units: mol.m-3
+        long_name: Mole concentration of dissolved inorganic carbon in sea water
+      fe:
+        units: mmol.m-3
+        long_name: Mole concentration of dissolved iron in sea water
+      nh4:
+        units: mmol.m-3
+        long_name: Mole concentration of ammonium in sea water
+      no3:
+        units: mmol.m-3
+        long_name: Mole concentration of nitrate in sea water
+      nppv:
+        units: mg.m-3.day-1
+        long_name: Net primary production of biomass expressed as carbon per unit volume in sea water
+      o2:
+        units: mmol.m-3
+        long_name: Mole concentration of dissolved molecular oxygen in sea water
+      ph:
+        units: '1'
+        long_name: Sea water ph reported on total scale
+      phyc:
+        units: mmol.m-3
+        long_name: Mole concentration of phytoplankton expressed as carbon in sea water
+      po4:
+        units: mmol.m-3
+        long_name: Mole concentration of phosphate in sea water
+      si:
+        units: mmol.m-3
+        long_name: Mole concentration of silicate in sea water
+      spco2:
+        units: Pa
+        long_name: Surface partial pressure of carbon dioxide in sea water
+      zeu:
+        units: m
+        long_name: Euphotic zone depth
+      zooc:
+        units: mmol.m-3
+        long_name: Mole concentration of zooplankton expressed as carbon in sea water
+
+  cmems_mod_ibi_bgc_anfc_0.027deg-3D_P1M-m:
+    product: IBI_ANALYSISFORECAST_BGC_005_004
+    title: Biogeochemical 3D monthly mean fields for the Iberia-Biscay-Ireland (IBI) region
+    cadence: monthly
+    domain: ibi
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      chl:
+        units: mg.m-3
+        long_name: Mass concentration of chlorophyll a in sea water
+      dissic:
+        units: mol.m-3
+        long_name: Mole concentration of dissolved inorganic carbon in sea water
+      fe:
+        units: mmol.m-3
+        long_name: Mole concentration of dissolved iron in sea water
+      nh4:
+        units: mmol.m-3
+        long_name: Mole concentration of ammonium in sea water
+      no3:
+        units: mmol.m-3
+        long_name: Mole concentration of nitrate in sea water
+      nppv:
+        units: mg.m-3.day-1
+        long_name: Net primary production of biomass expressed as carbon per unit volume in sea water
+      o2:
+        units: mmol.m-3
+        long_name: Mole concentration of dissolved molecular oxygen in sea water
+      ph:
+        units: '1'
+        long_name: Sea water ph reported on total scale
+      phyc:
+        units: mmol.m-3
+        long_name: Mole concentration of phytoplankton expressed as carbon in sea water
+      po4:
+        units: mmol.m-3
+        long_name: Mole concentration of phosphate in sea water
+      si:
+        units: mmol.m-3
+        long_name: Mole concentration of silicate in sea water
+      spco2:
+        units: Pa
+        long_name: Surface partial pressure of carbon dioxide in sea water
+      zeu:
+        units: m
+        long_name: Euphotic zone depth
+      zooc:
+        units: mmol.m-3
+        long_name: Mole concentration of zooplankton expressed as carbon in sea water
+
+  cmems_mod_ibi_bgc_anfc_0.027deg-3D_static:
+    product: IBI_ANALYSISFORECAST_BGC_005_004
+    title: cmems_mod_ibi_bgc_anfc_0.027deg-3D_static
+    cadence: irregular
+    domain: ibi
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      deptho:
+        units: m
+        long_name: Sea floor depth below geoid
+      deptho_lev:
+        units: '1'
+        long_name: Model level number at sea floor
+      mask:
+        units: '1'
+        long_name: Sea binary mask
+
+  cmems_mod_ibi_bgc_my_0.027deg-3D_static:
+    product: IBI_MULTIYEAR_BGC_005_003
+    title: cmems_mod_ibi_bgc_my_0.027deg-3D_static
+    cadence: irregular
+    domain: ibi
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      deptho:
+        units: m
+        long_name: Sea floor depth below geoid
+      deptho_lev:
+        units: '1'
+        long_name: Model level number at sea floor
+      mask:
+        units: '1'
+        long_name: Sea binary mask
+
+  cmems_mod_ibi_bgc_my_0.027deg-climatology_P1M-m:
+    product: IBI_MULTIYEAR_BGC_005_003
+    title: Ocean monthly mean fields for the Iberia-Biscay-Ireland (IBI) region
+    cadence: climatology
+    domain: ibi
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      chl_mean:
+        units: mg.m-3
+        long_name: Mass concentration of chlorophyll a in sea water
+      chl_std:
+        units: mg.m-3
+        long_name: Mass concentration of chlorophyll a in sea water
+      climatology_bounds:
+        units: ''
+        long_name: ''            # TODO: standard_name missing on describe()
+      dissic_mean:
+        units: mol.m-3
+        long_name: Mole concentration of dissolved inorganic carbon in sea water
+      dissic_std:
+        units: mol.m-3
+        long_name: Mole concentration of dissolved inorganic carbon in sea water
+      fe_mean:
+        units: mmol.m-3
+        long_name: Mole concentration of dissolved iron in sea water
+      fe_std:
+        units: mmol.m-3
+        long_name: Mole concentration of dissolved iron in sea water
+      kd_mean:
+        units: m-1
+        long_name: Volume attenuation coefficient of downwelling radiative flux in sea water
+      kd_std:
+        units: m-1
+        long_name: Volume attenuation coefficient of downwelling radiative flux in sea water
+      nh4_mean:
+        units: mmol.m-3
+        long_name: Mole concentration of ammonium in sea water
+      nh4_std:
+        units: mmol.m-3
+        long_name: Mole concentration of ammonium in sea water
+      no3_mean:
+        units: mmol.m-3
+        long_name: Mole concentration of nitrate in sea water
+      no3_std:
+        units: mmol.m-3
+        long_name: Mole concentration of nitrate in sea water
+      nppv_mean:
+        units: mg.m-3.day-1
+        long_name: Net primary production of biomass expressed as carbon per unit volume in sea water
+      nppv_std:
+        units: mg.m-3.day-1
+        long_name: Net primary production of biomass expressed as carbon per unit volume in sea water
+      o2_mean:
+        units: mmol.m-3
+        long_name: Mole concentration of dissolved molecular oxygen in sea water
+      o2_std:
+        units: mmol.m-3
+        long_name: Mole concentration of dissolved molecular oxygen in sea water
+      ph_mean:
+        units: '1'
+        long_name: Sea water ph reported on total scale
+      ph_std:
+        units: '1'
+        long_name: Sea water ph reported on total scale
+      phyc_mean:
+        units: mmol.m-3
+        long_name: Mole concentration of phytoplankton expressed as carbon in sea water
+      phyc_std:
+        units: mmol.m-3
+        long_name: Mole concentration of phytoplankton expressed as carbon in sea water
+      po4_mean:
+        units: mmol.m-3
+        long_name: Mole concentration of phosphate in sea water
+      po4_std:
+        units: mmol.m-3
+        long_name: Mole concentration of phosphate in sea water
+      si_mean:
+        units: mmol.m-3
+        long_name: Mole concentration of silicate in sea water
+      si_std:
+        units: mmol.m-3
+        long_name: Mole concentration of silicate in sea water
+      spco2_mean:
+        units: Pa
+        long_name: Surface partial pressure of carbon dioxide in sea water
+      spco2_std:
+        units: Pa
+        long_name: Surface partial pressure of carbon dioxide in sea water
+      zeu_mean:
+        units: m
+        long_name: Euphotic zone depth
+      zeu_std:
+        units: m
+        long_name: Euphotic zone depth
+      zooc_mean:
+        units: mmol.m-3
+        long_name: Mole concentration of zooplankton expressed as carbon in sea water
+      zooc_std:
+        units: mmol.m-3
+        long_name: Mole concentration of zooplankton expressed as carbon in sea water
+
+  cmems_mod_ibi_phy-cur_anfc_detided-0.027deg_P1D-m:
+    product: IBI_ANALYSISFORECAST_PHY_005_001
+    title: Ocean 3D daily mean fields for the Iberia-Biscay-Ireland (IBI) region
+    cadence: daily
+    domain: ibi
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      uo_detided:
+        units: m s-1
+        long_name: Northward sea water velocity assuming no tide
+      vo_detided:
+        units: m s-1
+        long_name: Eastward sea water velocity assuming no tide
+
+  cmems_mod_ibi_phy-cur_anfc_detided-0.027deg_P1M-m:
+    product: IBI_ANALYSISFORECAST_PHY_005_001
+    title: Ocean 3D monthly mean fields for the Iberia-Biscay-Ireland (IBI) region
+    cadence: monthly
+    domain: ibi
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      uo_detided:
+        units: m s-1
+        long_name: Northward sea water velocity assuming no tide
+      vo_detided:
+        units: m s-1
+        long_name: Eastward sea water velocity assuming no tide
+
+  cmems_mod_ibi_phy-cur_my_0.027deg_P1D-m:
+    product: IBI_MULTIYEAR_PHY_005_002
+    title: Ocean 3D daily mean fields for the Iberia-Biscay-Ireland (IBI) region
+    cadence: daily
+    domain: ibi
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      uo:
+        units: m s-1
+        long_name: Eastward sea water velocity
+      vo:
+        units: m s-1
+        long_name: Northward sea water velocity
+
+  cmems_mod_ibi_phy-cur_my_0.027deg_P1M-m:
+    product: IBI_MULTIYEAR_PHY_005_002
+    title: Ocean monthly mean fields for the Iberia-Biscay-Ireland (IBI) region
+    cadence: monthly
+    domain: ibi
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      uo:
+        units: m s-1
+        long_name: Eastward sea water velocity
+      vo:
+        units: m s-1
+        long_name: Northward sea water velocity
+
+  cmems_mod_ibi_phy-cur_my_0.027deg_P1Y-m:
+    product: IBI_MULTIYEAR_PHY_005_002
+    title: Ocean yearly mean fields for the Iberia-Biscay-Ireland (IBI) region
+    cadence: annual
+    domain: ibi
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      uo:
+        units: m s-1
+        long_name: Eastward sea water velocity
+      vo:
+        units: m s-1
+        long_name: Northward sea water velocity
+
+  cmems_mod_ibi_phy-cur_my_0.027deg_PT1H-m:
+    product: IBI_MULTIYEAR_PHY_005_002
+    title: Ocean surface hourly mean fields for the Iberia-Biscay-Ireland (IBI) region
+    cadence: hourly
+    domain: ibi
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      ubar:
+        units: m s-1
+        long_name: Barotropic eastward sea water velocity
+      uo:
+        units: m s-1
+        long_name: Eastward sea water velocity
+      vbar:
+        units: m s-1
+        long_name: Barotropic northward sea water velocity
+      vo:
+        units: m s-1
+        long_name: Northward sea water velocity
+
+  cmems_mod_ibi_phy-cur_my_detided-0.027deg_P1D-m:
+    product: IBI_MULTIYEAR_PHY_005_002
+    title: Ocean 3D daily mean fields for the Iberia-Biscay-Ireland (IBI) region
+    cadence: daily
+    domain: ibi
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      uo_detided:
+        units: m s-1
+        long_name: Northward sea water velocity assuming no tide
+      vo_detided:
+        units: m s-1
+        long_name: Eastward sea water velocity assuming no tide
+
+  cmems_mod_ibi_phy-cur_my_detided-0.027deg_P1M-m:
+    product: IBI_MULTIYEAR_PHY_005_002
+    title: Ocean monthly mean fields for the Iberia-Biscay-Ireland (IBI) region
+    cadence: monthly
+    domain: ibi
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      uo_detided:
+        units: m s-1
+        long_name: Northward sea water velocity assuming no tide
+      vo_detided:
+        units: m s-1
+        long_name: Eastward sea water velocity assuming no tide
+
+  cmems_mod_ibi_phy-cur_my_detided-0.027deg_P1Y-m:
+    product: IBI_MULTIYEAR_PHY_005_002
+    title: Ocean yearly mean fields for the Iberia-Biscay-Ireland (IBI) region
+    cadence: annual
+    domain: ibi
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      uo_detided:
+        units: m s-1
+        long_name: Northward sea water velocity assuming no tide
+      vo_detided:
+        units: m s-1
+        long_name: Eastward sea water velocity assuming no tide
+
+  cmems_mod_ibi_phy-hflux_my_0.027deg_P1D-m:
+    product: IBI_MULTIYEAR_PHY_005_002
+    title: Ocean 3D daily mean fields for the Iberia-Biscay-Ireland (IBI) region
+    cadence: daily
+    domain: ibi
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      hfds:
+        units: W m-2
+        long_name: Surface downward heat flux in sea water
+      hfls:
+        units: W m-2
+        long_name: 'Surface downward latent heat flux '
+      hfss:
+        units: W m-2
+        long_name: Surface downward sensible heat flux
+      rlds:
+        units: W m-2
+        long_name: Surface net downward longwave flux
+      rsntds:
+        units: W m-2
+        long_name: Net downward shortwave flux at sea water surface
+
+  cmems_mod_ibi_phy-hflux_my_0.027deg_P1M-m:
+    product: IBI_MULTIYEAR_PHY_005_002
+    title: Ocean monthly mean fields for the Iberia-Biscay-Ireland (IBI) region
+    cadence: monthly
+    domain: ibi
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      hfds:
+        units: W m-2
+        long_name: Surface downward heat flux in sea water
+      hfls:
+        units: W m-2
+        long_name: 'Surface downward latent heat flux '
+      hfss:
+        units: W m-2
+        long_name: Surface downward sensible heat flux
+      rlds:
+        units: W m-2
+        long_name: Surface net downward longwave flux
+      rsntds:
+        units: W m-2
+        long_name: Net downward shortwave flux at sea water surface
+
+  cmems_mod_ibi_phy-hflux_my_0.027deg_P1Y-m:
+    product: IBI_MULTIYEAR_PHY_005_002
+    title: Ocean yearly mean fields for the Iberia-Biscay-Ireland (IBI) region
+    cadence: annual
+    domain: ibi
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      hfds:
+        units: W m-2
+        long_name: Surface downward heat flux in sea water
+      hfls:
+        units: W m-2
+        long_name: 'Surface downward latent heat flux '
+      hfss:
+        units: W m-2
+        long_name: Surface downward sensible heat flux
+      rlds:
+        units: W m-2
+        long_name: Surface net downward longwave flux
+      rsntds:
+        units: W m-2
+        long_name: Net downward shortwave flux at sea water surface
+
+  cmems_mod_ibi_phy-mflux_my_0.027deg_P1D-m:
+    product: IBI_MULTIYEAR_PHY_005_002
+    title: Ocean 3D daily mean fields for the Iberia-Biscay-Ireland (IBI) region
+    cadence: daily
+    domain: ibi
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      taum:
+        units: N m-2
+        long_name: Magnitude of surface downward stress
+
+  cmems_mod_ibi_phy-mflux_my_0.027deg_P1M-m:
+    product: IBI_MULTIYEAR_PHY_005_002
+    title: Ocean monthly mean fields for the Iberia-Biscay-Ireland (IBI) region
+    cadence: monthly
+    domain: ibi
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      taum:
+        units: N m-2
+        long_name: Magnitude of surface downward stress
+
+  cmems_mod_ibi_phy-mflux_my_0.027deg_P1Y-m:
+    product: IBI_MULTIYEAR_PHY_005_002
+    title: Ocean yearly mean fields for the Iberia-Biscay-Ireland (IBI) region
+    cadence: annual
+    domain: ibi
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      taum:
+        units: N m-2
+        long_name: Magnitude of surface downward stress
+
+  cmems_mod_ibi_phy-mld_my_0.027deg_P1D-m:
+    product: IBI_MULTIYEAR_PHY_005_002
+    title: Ocean 3D daily mean fields for the Iberia-Biscay-Ireland (IBI) region
+    cadence: daily
+    domain: ibi
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      mlotst:
+        units: m
+        long_name: Ocean mixed layer thickness defined by sigma theta
+
+  cmems_mod_ibi_phy-mld_my_0.027deg_P1M-m:
+    product: IBI_MULTIYEAR_PHY_005_002
+    title: Ocean monthly mean fields for the Iberia-Biscay-Ireland (IBI) region
+    cadence: monthly
+    domain: ibi
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      mlotst:
+        units: m
+        long_name: Ocean mixed layer thickness defined by sigma theta
+
+  cmems_mod_ibi_phy-mld_my_0.027deg_P1Y-m:
+    product: IBI_MULTIYEAR_PHY_005_002
+    title: Ocean yearly mean fields for the Iberia-Biscay-Ireland (IBI) region
+    cadence: annual
+    domain: ibi
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      mlotst:
+        units: m
+        long_name: Ocean mixed layer thickness defined by sigma theta
+
+  cmems_mod_ibi_phy-mld_my_0.027deg_PT1H-m:
+    product: IBI_MULTIYEAR_PHY_005_002
+    title: Ocean surface hourly mean fields for the Iberia-Biscay-Ireland (IBI) region
+    cadence: hourly
+    domain: ibi
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      mlotst:
+        units: m
+        long_name: Ocean mixed layer thickness defined by sigma theta
+
+  cmems_mod_ibi_phy-sal_my_0.027deg_P1D-m:
+    product: IBI_MULTIYEAR_PHY_005_002
+    title: Ocean 3D daily mean fields for the Iberia-Biscay-Ireland (IBI) region
+    cadence: daily
+    domain: ibi
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      so:
+        units: 1e-3
+        long_name: Sea water salinity
+
+  cmems_mod_ibi_phy-sal_my_0.027deg_P1M-m:
+    product: IBI_MULTIYEAR_PHY_005_002
+    title: Ocean monthly mean fields for the Iberia-Biscay-Ireland (IBI) region
+    cadence: monthly
+    domain: ibi
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      so:
+        units: 1e-3
+        long_name: Sea water salinity
+
+  cmems_mod_ibi_phy-sal_my_0.027deg_P1Y-m:
+    product: IBI_MULTIYEAR_PHY_005_002
+    title: Ocean yearly mean fields for the Iberia-Biscay-Ireland (IBI) region
+    cadence: annual
+    domain: ibi
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      so:
+        units: 1e-3
+        long_name: Sea water salinity
+
+  cmems_mod_ibi_phy-ssh_anfc_detided-0.027deg_P1D-m:
+    product: IBI_ANALYSISFORECAST_PHY_005_001
+    title: Ocean 3D daily mean fields for the Iberia-Biscay-Ireland (IBI) region
+    cadence: daily
+    domain: ibi
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      zos_detided:
+        units: m
+        long_name: Sea surface height above geoid assuming no tide
+
+  cmems_mod_ibi_phy-ssh_anfc_detided-0.027deg_P1M-m:
+    product: IBI_ANALYSISFORECAST_PHY_005_001
+    title: Ocean 3D monthly mean fields for the Iberia-Biscay-Ireland (IBI) region
+    cadence: monthly
+    domain: ibi
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      zos_detided:
+        units: m
+        long_name: Sea surface height above geoid assuming no tide
+
+  cmems_mod_ibi_phy-ssh_my_0.027deg_P1D-m:
+    product: IBI_MULTIYEAR_PHY_005_002
+    title: Ocean 3D daily mean fields for the Iberia-Biscay-Ireland (IBI) region
+    cadence: daily
+    domain: ibi
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      zos:
+        units: m
+        long_name: Sea surface height above geoid
+
+  cmems_mod_ibi_phy-ssh_my_0.027deg_P1M-m:
+    product: IBI_MULTIYEAR_PHY_005_002
+    title: Ocean monthly mean fields for the Iberia-Biscay-Ireland (IBI) region
+    cadence: monthly
+    domain: ibi
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      zos:
+        units: m
+        long_name: Sea surface height above geoid
+
+  cmems_mod_ibi_phy-ssh_my_0.027deg_P1Y-m:
+    product: IBI_MULTIYEAR_PHY_005_002
+    title: Ocean yearly mean fields for the Iberia-Biscay-Ireland (IBI) region
+    cadence: annual
+    domain: ibi
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      zos:
+        units: m
+        long_name: Sea surface height above geoid
+
+  cmems_mod_ibi_phy-ssh_my_0.027deg_PT1H-m:
+    product: IBI_MULTIYEAR_PHY_005_002
+    title: Ocean surface hourly mean fields for the Iberia-Biscay-Ireland (IBI) region
+    cadence: hourly
+    domain: ibi
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      zos:
+        units: m
+        long_name: Sea surface height above geoid
+
+  cmems_mod_ibi_phy-ssh_my_detided-0.027deg_P1D-m:
+    product: IBI_MULTIYEAR_PHY_005_002
+    title: Ocean 3D daily mean fields for the Iberia-Biscay-Ireland (IBI) region
+    cadence: daily
+    domain: ibi
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      zos_detided:
+        units: m
+        long_name: Sea surface height above geoid assuming no tide
+
+  cmems_mod_ibi_phy-ssh_my_detided-0.027deg_P1M-m:
+    product: IBI_MULTIYEAR_PHY_005_002
+    title: Ocean monthly mean fields for the Iberia-Biscay-Ireland (IBI) region
+    cadence: monthly
+    domain: ibi
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      zos_detided:
+        units: m
+        long_name: Sea surface height above geoid assuming no tide
+
+  cmems_mod_ibi_phy-ssh_my_detided-0.027deg_P1Y-m:
+    product: IBI_MULTIYEAR_PHY_005_002
+    title: Ocean yearly mean fields for the Iberia-Biscay-Ireland (IBI) region
+    cadence: annual
+    domain: ibi
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      zos_detided:
+        units: m
+        long_name: Sea surface height above geoid assuming no tide
+
+  cmems_mod_ibi_phy-temp_my_0.027deg_P1D-m:
+    product: IBI_MULTIYEAR_PHY_005_002
+    title: Ocean 3D daily mean fields for the Iberia-Biscay-Ireland (IBI) region
+    cadence: daily
+    domain: ibi
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      bottomT:
+        units: degrees_C
+        long_name: Sea water potential temperature at sea floor
+      thetao:
+        units: degrees_C
+        long_name: Sea water potential temperature
+
+  cmems_mod_ibi_phy-temp_my_0.027deg_P1M-m:
+    product: IBI_MULTIYEAR_PHY_005_002
+    title: Ocean monthly mean fields for the Iberia-Biscay-Ireland (IBI) region
+    cadence: monthly
+    domain: ibi
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      bottomT:
+        units: degrees_C
+        long_name: Sea water potential temperature at sea floor
+      thetao:
+        units: degrees_C
+        long_name: Sea water potential temperature
+
+  cmems_mod_ibi_phy-temp_my_0.027deg_P1Y-m:
+    product: IBI_MULTIYEAR_PHY_005_002
+    title: Ocean yearly mean fields for the Iberia-Biscay-Ireland (IBI) region
+    cadence: annual
+    domain: ibi
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      bottomT:
+        units: degrees_C
+        long_name: Sea water potential temperature at sea floor
+      thetao:
+        units: degrees_C
+        long_name: Sea water potential temperature
+
+  cmems_mod_ibi_phy-temp_my_0.027deg_PT1H-m:
+    product: IBI_MULTIYEAR_PHY_005_002
+    title: Ocean surface hourly mean fields for the Iberia-Biscay-Ireland (IBI) region
+    cadence: hourly
+    domain: ibi
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      thetao:
+        units: degrees_C
+        long_name: Sea water potential temperature
+
+  cmems_mod_ibi_phy-wcur_anfc_0.027deg_P1D-m:
+    product: IBI_ANALYSISFORECAST_PHY_005_001
+    title: Ocean 3D daily mean fields for the Iberia-Biscay-Ireland (IBI) region
+    cadence: daily
+    domain: ibi
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      wo:
+        units: m s-1
+        long_name: Upward sea water velocity
+
+  cmems_mod_ibi_phy-wcur_anfc_0.027deg_P1M-m:
+    product: IBI_ANALYSISFORECAST_PHY_005_001
+    title: Ocean 3D monthly mean fields for the Iberia-Biscay-Ireland (IBI) region
+    cadence: monthly
+    domain: ibi
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      wo:
+        units: m s-1
+        long_name: Upward sea water velocity
+
+  cmems_mod_ibi_phy-wcur_my_0.027deg_P1D-m:
+    product: IBI_MULTIYEAR_PHY_005_002
+    title: Ocean 3D daily mean fields for the Iberia-Biscay-Ireland (IBI) region
+    cadence: daily
+    domain: ibi
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      wo:
+        units: m s-1
+        long_name: Upward sea water velocity
+
+  cmems_mod_ibi_phy-wcur_my_0.027deg_P1M-m:
+    product: IBI_MULTIYEAR_PHY_005_002
+    title: Ocean monthly mean fields for the Iberia-Biscay-Ireland (IBI) region
+    cadence: monthly
+    domain: ibi
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      wo:
+        units: m s-1
+        long_name: Upward sea water velocity
+
+  cmems_mod_ibi_phy-wcur_my_0.027deg_P1Y-m:
+    product: IBI_MULTIYEAR_PHY_005_002
+    title: Ocean yearly mean fields for the Iberia-Biscay-Ireland (IBI) region
+    cadence: annual
+    domain: ibi
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      wo:
+        units: m s-1
+        long_name: Upward sea water velocity
+
+  cmems_mod_ibi_phy-wflux_my_0.027deg_P1D-m:
+    product: IBI_MULTIYEAR_PHY_005_002
+    title: Ocean 3D daily mean fields for the Iberia-Biscay-Ireland (IBI) region
+    cadence: daily
+    domain: ibi
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      pr:
+        units: kg m-2 s-1
+        long_name: Precipitation flux
+      wfo:
+        units: kg m-2 s-1
+        long_name: Water flux into sea water
+
+  cmems_mod_ibi_phy-wflux_my_0.027deg_P1M-m:
+    product: IBI_MULTIYEAR_PHY_005_002
+    title: Ocean monthly mean fields for the Iberia-Biscay-Ireland (IBI) region
+    cadence: monthly
+    domain: ibi
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      pr:
+        units: kg m-2 s-1
+        long_name: Precipitation flux
+      wfo:
+        units: kg m-2 s-1
+        long_name: Water flux into sea water
+
+  cmems_mod_ibi_phy-wflux_my_0.027deg_P1Y-m:
+    product: IBI_MULTIYEAR_PHY_005_002
+    title: Ocean yearly mean fields for the Iberia-Biscay-Ireland (IBI) region
+    cadence: annual
+    domain: ibi
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      pr:
+        units: kg m-2 s-1
+        long_name: Precipitation flux
+      wfo:
+        units: kg m-2 s-1
+        long_name: Water flux into sea water
+
+  cmems_mod_ibi_phy_anfc_0.027deg-2D_PT15M-i:
+    product: IBI_ANALYSISFORECAST_PHY_005_001
+    title: Ocean surface 15-minutes instantaneous fields for the Iberia-Biscay-Ireland (IBI)
+    cadence: irregular
+    domain: ibi
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      uo:
+        units: m s-1
+        long_name: Eastward sea water velocity
+      vo:
+        units: m s-1
+        long_name: Northward sea water velocity
+      zos:
+        units: m
+        long_name: Sea surface height above geoid
+
+  cmems_mod_ibi_phy_anfc_0.027deg-2D_PT1H-m:
+    product: IBI_ANALYSISFORECAST_PHY_005_001
+    title: Ocean surface hourly mean fields for the Iberia-Biscay-Ireland (IBI) region
+    cadence: hourly
+    domain: ibi
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      mlotst:
+        units: m
+        long_name: Ocean mixed layer thickness defined by sigma theta
+      thetao:
+        units: degrees_C
+        long_name: Sea water potential temperature
+      ubar:
+        units: m s-1
+        long_name: Barotropic eastward sea water velocity
+      uo:
+        units: m s-1
+        long_name: Eastward sea water velocity
+      vbar:
+        units: m s-1
+        long_name: Barotropic northward sea water velocity
+      vo:
+        units: m s-1
+        long_name: Northward sea water velocity
+      zos:
+        units: m
+        long_name: Sea surface height above geoid
+
+  cmems_mod_ibi_phy_anfc_0.027deg-3D_P1D-m:
+    product: IBI_ANALYSISFORECAST_PHY_005_001
+    title: Ocean 3D daily mean fields for the Iberia-Biscay-Ireland (IBI) region
+    cadence: daily
+    domain: ibi
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      bottomT:
+        units: degrees_C
+        long_name: Sea water potential temperature at sea floor
+      mlotst:
+        units: m
+        long_name: Ocean mixed layer thickness defined by sigma theta
+      so:
+        units: 1e-3
+        long_name: Sea water salinity
+      thetao:
+        units: degrees_C
+        long_name: Sea water potential temperature
+      uo:
+        units: m s-1
+        long_name: Eastward sea water velocity
+      vo:
+        units: m s-1
+        long_name: Northward sea water velocity
+      zos:
+        units: m
+        long_name: Sea surface height above geoid
+
+  cmems_mod_ibi_phy_anfc_0.027deg-3D_P1M-m:
+    product: IBI_ANALYSISFORECAST_PHY_005_001
+    title: Ocean 3D monthly mean fields for the Iberia-Biscay-Ireland (IBI) region
+    cadence: monthly
+    domain: ibi
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      bottomT:
+        units: degrees_C
+        long_name: Sea water potential temperature at sea floor
+      mlotst:
+        units: m
+        long_name: Ocean mixed layer thickness defined by sigma theta
+      so:
+        units: 1e-3
+        long_name: Sea water salinity
+      thetao:
+        units: degrees_C
+        long_name: Sea water potential temperature
+      uo:
+        units: m s-1
+        long_name: Eastward sea water velocity
+      vo:
+        units: m s-1
+        long_name: Northward sea water velocity
+      zos:
+        units: m
+        long_name: Sea surface height above geoid
+
+  cmems_mod_ibi_phy_anfc_0.027deg-3D_PT1H-m:
+    product: IBI_ANALYSISFORECAST_PHY_005_001
+    title: Ocean 3D hourly mean fields for the Iberia-Biscay-Ireland (IBI) region
+    cadence: hourly
+    domain: ibi
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      so:
+        units: 1e-3
+        long_name: Sea water salinity
+      thetao:
+        units: degrees_C
+        long_name: Sea water potential temperature
+      uo:
+        units: m s-1
+        long_name: Eastward sea water velocity
+      vo:
+        units: m s-1
+        long_name: Northward sea water velocity
+
+  cmems_mod_ibi_phy_anfc_0.027deg-3D_static:
+    product: IBI_ANALYSISFORECAST_PHY_005_001
+    title: cmems_mod_ibi_phy_anfc_0.027deg-3D_static
+    cadence: irregular
+    domain: ibi
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      deptho:
+        units: m
+        long_name: Sea floor depth below geoid
+      deptho_lev:
+        units: '1'
+        long_name: Model level number at sea floor
+      mask:
+        units: '1'
+        long_name: Sea binary mask
+
+  cmems_mod_ibi_phy_my_0.027deg-3D_static:
+    product: IBI_MULTIYEAR_PHY_005_002
+    title: cmems_mod_ibi_phy_my_0.027deg-3D_static
+    cadence: irregular
+    domain: ibi
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      deptho:
+        units: m
+        long_name: Sea floor depth below geoid
+      deptho_lev:
+        units: '1'
+        long_name: Model level number at sea floor
+      mask:
+        units: '1'
+        long_name: Sea binary mask
+
+  cmems_mod_ibi_phy_my_0.027deg-climatology_P1M-m:
+    product: IBI_MULTIYEAR_PHY_005_002
+    title: Ocean monthly mean fields for the Iberia-Biscay-Ireland (IBI) region
+    cadence: climatology
+    domain: ibi
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      bottomT_mean:
+        units: degrees_C
+        long_name: Sea water potential temperature at sea floor
+      bottomT_std:
+        units: degrees_C
+        long_name: Sea water potential temperature at sea floor
+      climatology_bounds:
+        units: ''
+        long_name: ''            # TODO: standard_name missing on describe()
+      hfds_mean:
+        units: W m-2
+        long_name: Surface downward heat flux in sea water
+      hfds_std:
+        units: W m-2
+        long_name: Surface downward heat flux in sea water
+      hfls_mean:
+        units: W m-2
+        long_name: 'Surface downward latent heat flux '
+      hfls_std:
+        units: W m-2
+        long_name: 'Surface downward latent heat flux '
+      hfss_mean:
+        units: W m-2
+        long_name: Surface downward sensible heat flux
+      hfss_std:
+        units: W m-2
+        long_name: Surface downward sensible heat flux
+      mlotst_mean:
+        units: m
+        long_name: Ocean mixed layer thickness defined by sigma theta
+      mlotst_std:
+        units: m
+        long_name: Ocean mixed layer thickness defined by sigma theta
+      pr_mean:
+        units: kg m-2 s-1
+        long_name: Precipitation flux
+      pr_std:
+        units: kg m-2 s-1
+        long_name: Precipitation flux
+      rlds_mean:
+        units: W m-2
+        long_name: Surface net downward longwave flux
+      rlds_std:
+        units: W m-2
+        long_name: Surface net downward longwave flux
+      rsntds_mean:
+        units: W m-2
+        long_name: Net downward shortwave flux at sea water surface
+      rsntds_std:
+        units: W m-2
+        long_name: Net downward shortwave flux at sea water surface
+      so_mean:
+        units: 1e-3
+        long_name: Sea water salinity
+      so_std:
+        units: 1e-3
+        long_name: Sea water salinity
+      taum_mean:
+        units: N m-2
+        long_name: Magnitude of surface downward stress
+      taum_std:
+        units: N m-2
+        long_name: Magnitude of surface downward stress
+      thetao_mean:
+        units: degrees_C
+        long_name: Sea water potential temperature
+      thetao_std:
+        units: degrees_C
+        long_name: Sea water potential temperature
+      uo_detided_mean:
+        units: m s-1
+        long_name: Northward sea water velocity assuming no tide
+      uo_detided_std:
+        units: m s-1
+        long_name: Northward sea water velocity assuming no tide
+      uo_mean:
+        units: m s-1
+        long_name: Eastward sea water velocity
+      uo_std:
+        units: m s-1
+        long_name: Eastward sea water velocity
+      vo_detided_mean:
+        units: m s-1
+        long_name: Eastward sea water velocity assuming no tide
+      vo_detided_std:
+        units: m s-1
+        long_name: Eastward sea water velocity assuming no tide
+      vo_mean:
+        units: m s-1
+        long_name: Northward sea water velocity
+      vo_std:
+        units: m s-1
+        long_name: Northward sea water velocity
+      wfo_mean:
+        units: kg m-2 s-1
+        long_name: Water flux into sea water
+      wfo_std:
+        units: kg m-2 s-1
+        long_name: Water flux into sea water
+      wo_mean:
+        units: m s-1
+        long_name: Upward sea water velocity
+      wo_std:
+        units: m s-1
+        long_name: Upward sea water velocity
+      zos_detided_mean:
+        units: m
+        long_name: Sea surface height above geoid assuming no tide
+      zos_detided_std:
+        units: m
+        long_name: Sea surface height above geoid assuming no tide
+      zos_mean:
+        units: m
+        long_name: Sea surface height above geoid
+      zos_std:
+        units: m
+        long_name: Sea surface height above geoid
+
+  cmems_mod_ibi_wav_anfc_0.027deg_PT1H-i:
+    product: IBI_ANALYSISFORECAST_WAV_005_005
+    title: Wave hourly instantaneous fields for the Iberia-Biscay-Ireland (IBI) region
+    cadence: hourly
+    domain: ibi
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      VCMX:
+        units: m
+        long_name: Sea surface wave maximum height
+      VHM0:
+        units: m
+        long_name: Sea surface wave significant height
+      VHM0_SW1:
+        units: m
+        long_name: Sea surface primary swell wave significant height
+      VHM0_SW2:
+        units: m
+        long_name: Sea surface secondary swell wave significant height
+      VHM0_WW:
+        units: m
+        long_name: Sea surface wind wave significant height
+      VMDR:
+        units: degree
+        long_name: Sea surface wave from direction
+      VMDR_SW1:
+        units: degree
+        long_name: Sea surface primary swell wave from direction
+      VMDR_SW2:
+        units: degree
+        long_name: Sea surface secondary swell wave from direction
+      VMDR_WW:
+        units: degree
+        long_name: Sea surface wind wave from direction
+      VMXL:
+        units: m
+        long_name: Sea surface wave maximum crest height
+      VPED:
+        units: degree
+        long_name: Sea surface wave from direction at variance spectral density maximum
+      VSDX:
+        units: m s-1
+        long_name: Sea surface wave stokes drift x velocity
+      VSDY:
+        units: m s-1
+        long_name: Sea surface wave stokes drift y velocity
+      VTM01_SW1:
+        units: s
+        long_name: Sea surface primary swell wave mean period
+      VTM01_SW2:
+        units: s
+        long_name: Sea surface secondary swell wave mean period
+      VTM01_WW:
+        units: s
+        long_name: Sea surface wind wave mean period
+      VTM02:
+        units: s
+        long_name: Sea surface wave mean period from variance spectral density second frequency moment
+      VTM10:
+        units: s
+        long_name: Sea surface wave mean period from variance spectral density inverse frequency moment
+      VTPK:
+        units: s
+        long_name: Sea surface wave period at variance spectral density maximum
+
+  cmems_mod_ibi_wav_anfc_0.027deg_static:
+    product: IBI_ANALYSISFORECAST_WAV_005_005
+    title: cmems_mod_ibi_wav_anfc_0.027deg_static
+    cadence: irregular
+    domain: ibi
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      deptho:
+        units: m
+        long_name: Sea floor depth below geoid
+      mask:
+        units: '1'
+        long_name: Sea binary mask
+
+  cmems_mod_ibi_wav_my-aflux_0.027deg_P1H-i:
+    product: IBI_MULTIYEAR_WAV_005_006
+    title: 'CMEMS IBI MULTI-YEAR REANALYSIS: HOURLY WAVE PRODUCTS'
+    cadence: irregular
+    domain: ibi
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      TAUX:
+        units: Pa
+        long_name: Surface downward eastward stress due to ocean viscous dissipation
+      TAUY:
+        units: Pa
+        long_name: Surface downward northward stress due to ocean viscous dissipation
+      TLA:
+        units: W m-2
+        long_name: Wave mixing energy flux into sea water
+
+  cmems_mod_ibi_wav_my_0.027deg-climatology_P1M-m:
+    product: IBI_MULTIYEAR_WAV_005_006
+    title: Monthly climatology reference period 1993-2016
+    cadence: climatology
+    domain: ibi
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      VHM0_mean:
+        units: m
+        long_name: Sea surface wave significant height
+      VTM02_mean:
+        units: s
+        long_name: Sea surface wave mean period from variance spectral density second frequency moment
+      climatology_bounds:
+        units: ''
+        long_name: ''            # TODO: standard_name missing on describe()
+
+  cmems_mod_ibi_wav_my_0.027deg_PT1H-i:
+    product: IBI_MULTIYEAR_WAV_005_006
+    title: 'CMEMS IBI MULTI-YEAR REANALYSIS: HOURLY WAVE PRODUCTS'
+    cadence: hourly
+    domain: ibi
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      VCMX:
+        units: m
+        long_name: Sea surface wave maximum height
+      VHM0:
+        units: m
+        long_name: Sea surface wave significant height
+      VHM0_SW1:
+        units: m
+        long_name: Sea surface primary swell wave significant height
+      VHM0_SW2:
+        units: m
+        long_name: Sea surface secondary swell wave significant height
+      VHM0_WW:
+        units: m
+        long_name: Sea surface wind wave significant height
+      VMDR:
+        units: degree
+        long_name: Sea surface wave from direction
+      VMDR_SW1:
+        units: degree
+        long_name: Sea surface primary swell wave from direction
+      VMDR_SW2:
+        units: degree
+        long_name: Sea surface secondary swell wave from direction
+      VMDR_WW:
+        units: degree
+        long_name: Sea surface wind wave from direction
+      VMXL:
+        units: m
+        long_name: Sea surface wave maximum crest height
+      VPED:
+        units: degree
+        long_name: Sea surface wave from direction at variance spectral density maximum
+      VSDX:
+        units: m s-1
+        long_name: Sea surface wave stokes drift x velocity
+      VSDY:
+        units: m s-1
+        long_name: Sea surface wave stokes drift y velocity
+      VTM01_SW1:
+        units: s
+        long_name: Sea surface primary swell wave mean period
+      VTM01_SW2:
+        units: s
+        long_name: Sea surface secondary swell wave mean period
+      VTM01_WW:
+        units: s
+        long_name: Sea surface wind wave mean period
+      VTM02:
+        units: s
+        long_name: Sea surface wave mean period from variance spectral density second frequency moment
+      VTM10:
+        units: s
+        long_name: Sea surface wave mean period from variance spectral density inverse frequency moment
+      VTPK:
+        units: s
+        long_name: Sea surface wave period at variance spectral density maximum
+
+  cmems_mod_ibi_wav_my_0.027deg_static:
+    product: IBI_MULTIYEAR_WAV_005_006
+    title: cmems_mod_ibi_wav_my_0.027deg_static
+    cadence: irregular
+    domain: ibi
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      deptho:
+        units: m
+        long_name: Sea floor depth below geoid
+      mask:
+        units: '1'
+        long_name: Sea binary mask
+
+  cmems_obs-oc_ibi_bgc-optics_nrt_l3-hr-mosaic_P1D-m:
+    product: OCEANCOLOUR_IBI_BGC_HR_L3_NRT_009_204
+    title: CMEMS HR-OC Iberian Sea optical (rrs, bbp) daily observations mosaic
+    cadence: daily
+    domain: ibi
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      BBP443:
+        units: m-1
+        long_name: Volume backwards scattering coefficient of radiative flux in sea water
+      BBP492:
+        units: m-1
+        long_name: Volume backwards scattering coefficient of radiative flux in sea water
+      BBP560:
+        units: m-1
+        long_name: Volume backwards scattering coefficient of radiative flux in sea water
+      BBP665:
+        units: m-1
+        long_name: Volume backwards scattering coefficient of radiative flux in sea water
+      BBP704:
+        units: m-1
+        long_name: Volume backwards scattering coefficient of radiative flux in sea water
+      BBP740:
+        units: m-1
+        long_name: Volume backwards scattering coefficient of radiative flux in sea water
+      BBP783:
+        units: m-1
+        long_name: Volume backwards scattering coefficient of radiative flux in sea water
+      BBP865:
+        units: m-1
+        long_name: Volume backwards scattering coefficient of radiative flux in sea water
+      RRS443:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS443_UNC:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS492:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS492_UNC:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS560:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS560_UNC:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS665:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS665_UNC:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS704:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS704_UNC:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS740:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS740_UNC:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS783:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS783_UNC:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS865:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS865_UNC:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+
+  cmems_obs-oc_ibi_bgc-optics_nrt_l4-hr-mosaic_P1D-m:
+    product: OCEANCOLOUR_IBI_BGC_HR_L4_NRT_009_210
+    title: CMEMS HR-OC Iberian Sea optical (rrs, bbp) daily interpolated observations mosaic
+    cadence: daily
+    domain: ibi
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      BBP443:
+        units: m-1
+        long_name: Volume backwards scattering coefficient of radiative flux in sea water
+
+  cmems_obs-oc_ibi_bgc-optics_nrt_l4-hr-mosaic_P1M-m:
+    product: OCEANCOLOUR_IBI_BGC_HR_L4_NRT_009_210
+    title: CMEMS HR-OC Iberian Sea optical (rrs, bbp) monthly averaged observations mosaic
+    cadence: monthly
+    domain: ibi
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      BBP443:
+        units: m-1
+        long_name: Volume backwards scattering coefficient of radiative flux in sea water
+      BBP443_count:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      BBP443_error:
+        units: m-1
+        long_name: Volume backwards scattering coefficient of radiative flux in sea water standard error
+
+  cmems_obs-oc_ibi_bgc-tur-spm-chl_nrt_l4-hr-mosaic_P1M-m:
+    product: OCEANCOLOUR_IBI_BGC_HR_L4_NRT_009_210
+    title: CMEMS HR-OC Iberian Sea transparency (spm, tur) and geophysical (chl) monthly averaged
+    cadence: monthly
+    domain: ibi
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      CHL:
+        units: mg m-3
+        long_name: Mass concentration of chlorophyll a in sea water
+      CHL_count:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      CHL_error:
+        units: mg m-3
+        long_name: Mass concentration of chlorophyll a in sea water standard error
+      SPM:
+        units: g m-3
+        long_name: Mass concentration of suspended matter in sea water
+      SPM_count:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      SPM_error:
+        units: g m-3
+        long_name: Mass concentration of suspended matter in sea water standard error
+      TUR:
+        units: FNU
+        long_name: Sea water turbidity
+      TUR_count:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      TUR_error:
+        units: FNU
+        long_name: Sea water turbidity standard error
+
+  cmems_obs-sl_eur_phy-mdt_my_l4-0.0625deg_P20Y:
+    product: SEALEVEL_EUR_PHY_MDT_L4_STATIC_008_070
+    title: cmems_obs-sl_eur_phy-mdt_my_l4-0.0625deg_P20Y
+    cadence: irregular
+    domain: ibi
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      err_mdt:
+        units: m
+        long_name: Mean dynamic topography error
+      err_u:
+        units: m
+        long_name: Mean zonal geostrophic velocity error
+      err_v:
+        units: m
+        long_name: Mean meridional geostrophic velocity error
+      land_water_mask:
+        units: ''
+        long_name: Land water mask
+      mdt:
+        units: m
+        long_name: Mean dynamic topography
+      u:
+        units: m/s
+        long_name: Mean zonal geostrophic velocity
+      v:
+        units: m/s
+        long_name: Mean meridional geostrophic velocity
+
+  cmems_obs-sl_eur_phy-ssh_my_al-l3-duacs_PT1S:
+    product: SEALEVEL_EUR_PHY_L3_MY_008_061
+    title: cmems_obs-sl_eur_phy-ssh_my_al-l3-duacs_PT1S_202411
+    cadence: irregular
+    domain: ibi
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      dac:
+        units: m
+        long_name: Dac
+      internal_tide:
+        units: m
+        long_name: Internal tide
+      lwe:
+        units: m
+        long_name: Lwe
+      mdt:
+        units: m
+        long_name: Sea surface height above geoid
+      ocean_tide:
+        units: m
+        long_name: Ocean tide
+      sla_filtered:
+        units: m
+        long_name: Sea surface height above sea level
+      sla_unfiltered:
+        units: m
+        long_name: Sea surface height above sea level
+
+  cmems_obs-sl_eur_phy-ssh_my_alg-l3-duacs_PT1S:
+    product: SEALEVEL_EUR_PHY_L3_MY_008_061
+    title: cmems_obs-sl_eur_phy-ssh_my_alg-l3-duacs_PT1S_202411
+    cadence: irregular
+    domain: ibi
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      dac:
+        units: m
+        long_name: Dac
+      internal_tide:
+        units: m
+        long_name: Internal tide
+      lwe:
+        units: m
+        long_name: Lwe
+      mdt:
+        units: m
+        long_name: Sea surface height above geoid
+      ocean_tide:
+        units: m
+        long_name: Ocean tide
+      sla_filtered:
+        units: m
+        long_name: Sea surface height above sea level
+      sla_unfiltered:
+        units: m
+        long_name: Sea surface height above sea level
+
+  cmems_obs-sl_eur_phy-ssh_my_allsat-demo-l4-duacs-0.0625deg_P1D-i:
+    product: SEALEVEL_EUR_PHY_L4_MY_008_068
+    title: DT merged all satellites European Seas Gridded DUACS Sea Surface Height L4 product
+    cadence: daily
+    domain: ibi
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      adt:
+        units: m
+        long_name: Sea surface height above geoid
+      err_sla:
+        units: m
+        long_name: Sea surface height above sea level standard error
+      err_ugosa:
+        units: m/s
+        long_name: Surface geostrophic eastward sea water velocity assuming sea level for geoid standard
+      err_vgosa:
+        units: m/s
+        long_name: Surface geostrophic northward sea water velocity assuming sea level for geoid standard
+      flag_ice:
+        units: ''
+        long_name: Status flag
+      sla:
+        units: m
+        long_name: Sea surface height above sea level
+      tpa_correction:
+        units: m
+        long_name: Sea surface height above sea level
+      ugos:
+        units: m/s
+        long_name: Surface geostrophic eastward sea water velocity
+      ugosa:
+        units: m/s
+        long_name: Surface geostrophic eastward sea water velocity assuming sea level for geoid
+      vgos:
+        units: m/s
+        long_name: Surface geostrophic northward sea water velocity
+      vgosa:
+        units: m/s
+        long_name: Surface geostrophic northward sea water velocity assuming sea level for geoid
+
+  cmems_obs-sl_eur_phy-ssh_my_allsat-l4-duacs-0.0625deg_P1D:
+    product: SEALEVEL_EUR_PHY_L4_MY_008_068
+    title: DT merged all satellites European Seas Gridded SSALTO/DUACS Sea Surface Height L4
+    cadence: daily
+    domain: ibi
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      adt:
+        units: m
+        long_name: Sea surface height above geoid
+      err_sla:
+        units: m
+        long_name: Sea surface height above sea level standard error
+      err_ugosa:
+        units: m/s
+        long_name: Surface geostrophic eastward sea water velocity assuming sea level for geoid standard
+      err_vgosa:
+        units: m/s
+        long_name: Surface geostrophic northward sea water velocity assuming sea level for geoid standard
+      flag_ice:
+        units: ''
+        long_name: Status flag
+      sla:
+        units: m
+        long_name: Sea surface height above sea level
+      tpa_correction:
+        units: m
+        long_name: Sea surface height above sea level
+      ugos:
+        units: m/s
+        long_name: Surface geostrophic eastward sea water velocity
+      ugosa:
+        units: m/s
+        long_name: Surface geostrophic eastward sea water velocity assuming sea level for geoid
+      vgos:
+        units: m/s
+        long_name: Surface geostrophic northward sea water velocity
+      vgosa:
+        units: m/s
+        long_name: Surface geostrophic northward sea water velocity assuming sea level for geoid
+
+  cmems_obs-sl_eur_phy-ssh_my_allsat-l4-duacs-0.0625deg_P1M-m:
+    product: SEALEVEL_EUR_PHY_L4_MY_008_068
+    title: DT merged all satellites European Seas Gridded Monthly Mean of Sea Level Anomalies
+    cadence: monthly
+    domain: ibi
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      sla:
+        units: m
+        long_name: Sea surface height above sea level
+
+  cmems_obs-sl_eur_phy-ssh_my_c2-l3-duacs_PT1S:
+    product: SEALEVEL_EUR_PHY_L3_MY_008_061
+    title: cmems_obs-sl_eur_phy-ssh_my_c2-l3-duacs_PT1S_202411
+    cadence: irregular
+    domain: ibi
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      dac:
+        units: m
+        long_name: Dac
+      internal_tide:
+        units: m
+        long_name: Internal tide
+      lwe:
+        units: m
+        long_name: Lwe
+      mdt:
+        units: m
+        long_name: Sea surface height above geoid
+      ocean_tide:
+        units: m
+        long_name: Ocean tide
+      sla_filtered:
+        units: m
+        long_name: Sea surface height above sea level
+      sla_unfiltered:
+        units: m
+        long_name: Sea surface height above sea level
+
+  cmems_obs-sl_eur_phy-ssh_my_c2n-l3-duacs_PT1S:
+    product: SEALEVEL_EUR_PHY_L3_MY_008_061
+    title: cmems_obs-sl_eur_phy-ssh_my_c2n-l3-duacs_PT1S_202411
+    cadence: irregular
+    domain: ibi
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      dac:
+        units: m
+        long_name: Dac
+      internal_tide:
+        units: m
+        long_name: Internal tide
+      lwe:
+        units: m
+        long_name: Lwe
+      mdt:
+        units: m
+        long_name: Sea surface height above geoid
+      ocean_tide:
+        units: m
+        long_name: Ocean tide
+      sla_filtered:
+        units: m
+        long_name: Sea surface height above sea level
+      sla_unfiltered:
+        units: m
+        long_name: Sea surface height above sea level
+
+  cmems_obs-sl_eur_phy-ssh_my_e1-l3-duacs_PT1S:
+    product: SEALEVEL_EUR_PHY_L3_MY_008_061
+    title: cmems_obs-sl_eur_phy-ssh_my_e1-l3-duacs_PT1S_202411
+    cadence: irregular
+    domain: ibi
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      dac:
+        units: m
+        long_name: Dac
+      internal_tide:
+        units: m
+        long_name: Internal tide
+      lwe:
+        units: m
+        long_name: Lwe
+      mdt:
+        units: m
+        long_name: Sea surface height above geoid
+      ocean_tide:
+        units: m
+        long_name: Ocean tide
+      sla_filtered:
+        units: m
+        long_name: Sea surface height above sea level
+      sla_unfiltered:
+        units: m
+        long_name: Sea surface height above sea level
+
+  cmems_obs-sl_eur_phy-ssh_my_e1g-l3-duacs_PT1S:
+    product: SEALEVEL_EUR_PHY_L3_MY_008_061
+    title: cmems_obs-sl_eur_phy-ssh_my_e1g-l3-duacs_PT1S_202411
+    cadence: irregular
+    domain: ibi
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      dac:
+        units: m
+        long_name: Dac
+      internal_tide:
+        units: m
+        long_name: Internal tide
+      lwe:
+        units: m
+        long_name: Lwe
+      mdt:
+        units: m
+        long_name: Sea surface height above geoid
+      ocean_tide:
+        units: m
+        long_name: Ocean tide
+      sla_filtered:
+        units: m
+        long_name: Sea surface height above sea level
+      sla_unfiltered:
+        units: m
+        long_name: Sea surface height above sea level
+
+  cmems_obs-sl_eur_phy-ssh_my_e2-l3-duacs_PT1S:
+    product: SEALEVEL_EUR_PHY_L3_MY_008_061
+    title: cmems_obs-sl_eur_phy-ssh_my_e2-l3-duacs_PT1S_202411
+    cadence: irregular
+    domain: ibi
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      dac:
+        units: m
+        long_name: Dac
+      internal_tide:
+        units: m
+        long_name: Internal tide
+      lwe:
+        units: m
+        long_name: Lwe
+      mdt:
+        units: m
+        long_name: Sea surface height above geoid
+      ocean_tide:
+        units: m
+        long_name: Ocean tide
+      sla_filtered:
+        units: m
+        long_name: Sea surface height above sea level
+      sla_unfiltered:
+        units: m
+        long_name: Sea surface height above sea level
+
+  cmems_obs-sl_eur_phy-ssh_my_en-l3-duacs_PT1S:
+    product: SEALEVEL_EUR_PHY_L3_MY_008_061
+    title: cmems_obs-sl_eur_phy-ssh_my_en-l3-duacs_PT1S_202411
+    cadence: irregular
+    domain: ibi
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      dac:
+        units: m
+        long_name: Dac
+      internal_tide:
+        units: m
+        long_name: Internal tide
+      lwe:
+        units: m
+        long_name: Lwe
+      mdt:
+        units: m
+        long_name: Sea surface height above geoid
+      ocean_tide:
+        units: m
+        long_name: Ocean tide
+      sla_filtered:
+        units: m
+        long_name: Sea surface height above sea level
+      sla_unfiltered:
+        units: m
+        long_name: Sea surface height above sea level
+
+  cmems_obs-sl_eur_phy-ssh_my_enn-l3-duacs_PT1S:
+    product: SEALEVEL_EUR_PHY_L3_MY_008_061
+    title: cmems_obs-sl_eur_phy-ssh_my_enn-l3-duacs_PT1S_202411
+    cadence: irregular
+    domain: ibi
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      dac:
+        units: m
+        long_name: Dac
+      internal_tide:
+        units: m
+        long_name: Internal tide
+      lwe:
+        units: m
+        long_name: Lwe
+      mdt:
+        units: m
+        long_name: Sea surface height above geoid
+      ocean_tide:
+        units: m
+        long_name: Ocean tide
+      sla_filtered:
+        units: m
+        long_name: Sea surface height above sea level
+      sla_unfiltered:
+        units: m
+        long_name: Sea surface height above sea level
+
+  cmems_obs-sl_eur_phy-ssh_my_g2-l3-duacs_PT1S:
+    product: SEALEVEL_EUR_PHY_L3_MY_008_061
+    title: cmems_obs-sl_eur_phy-ssh_my_g2-l3-duacs_PT1S_202411
+    cadence: irregular
+    domain: ibi
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      dac:
+        units: m
+        long_name: Dac
+      internal_tide:
+        units: m
+        long_name: Internal tide
+      lwe:
+        units: m
+        long_name: Lwe
+      mdt:
+        units: m
+        long_name: Sea surface height above geoid
+      ocean_tide:
+        units: m
+        long_name: Ocean tide
+      sla_filtered:
+        units: m
+        long_name: Sea surface height above sea level
+      sla_unfiltered:
+        units: m
+        long_name: Sea surface height above sea level
+
+  cmems_obs-sl_eur_phy-ssh_my_h2a-l3-duacs_PT1S:
+    product: SEALEVEL_EUR_PHY_L3_MY_008_061
+    title: cmems_obs-sl_eur_phy-ssh_my_h2a-l3-duacs_PT1S_202411
+    cadence: irregular
+    domain: ibi
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      dac:
+        units: m
+        long_name: Dac
+      internal_tide:
+        units: m
+        long_name: Internal tide
+      lwe:
+        units: m
+        long_name: Lwe
+      mdt:
+        units: m
+        long_name: Sea surface height above geoid
+      ocean_tide:
+        units: m
+        long_name: Ocean tide
+      sla_filtered:
+        units: m
+        long_name: Sea surface height above sea level
+      sla_unfiltered:
+        units: m
+        long_name: Sea surface height above sea level
+
+  cmems_obs-sl_eur_phy-ssh_my_h2ag-l3-duacs_PT1S:
+    product: SEALEVEL_EUR_PHY_L3_MY_008_061
+    title: cmems_obs-sl_eur_phy-ssh_my_h2ag-l3-duacs_PT1S_202411
+    cadence: irregular
+    domain: ibi
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      dac:
+        units: m
+        long_name: Dac
+      internal_tide:
+        units: m
+        long_name: Internal tide
+      lwe:
+        units: m
+        long_name: Lwe
+      mdt:
+        units: m
+        long_name: Sea surface height above geoid
+      ocean_tide:
+        units: m
+        long_name: Ocean tide
+      sla_filtered:
+        units: m
+        long_name: Sea surface height above sea level
+      sla_unfiltered:
+        units: m
+        long_name: Sea surface height above sea level
+
+  cmems_obs-sl_eur_phy-ssh_my_h2b-l3-duacs_PT1S:
+    product: SEALEVEL_EUR_PHY_L3_MY_008_061
+    title: cmems_obs-sl_eur_phy-ssh_my_h2b-l3-duacs_PT1S_202411
+    cadence: irregular
+    domain: ibi
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      dac:
+        units: m
+        long_name: Dac
+      internal_tide:
+        units: m
+        long_name: Internal tide
+      lwe:
+        units: m
+        long_name: Lwe
+      mdt:
+        units: m
+        long_name: Sea surface height above geoid
+      ocean_tide:
+        units: m
+        long_name: Ocean tide
+      sla_filtered:
+        units: m
+        long_name: Sea surface height above sea level
+      sla_unfiltered:
+        units: m
+        long_name: Sea surface height above sea level
+
+  cmems_obs-sl_eur_phy-ssh_my_j1-l3-duacs_PT1S:
+    product: SEALEVEL_EUR_PHY_L3_MY_008_061
+    title: cmems_obs-sl_eur_phy-ssh_my_j1-l3-duacs_PT1S_202411
+    cadence: irregular
+    domain: ibi
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      dac:
+        units: m
+        long_name: Dac
+      internal_tide:
+        units: m
+        long_name: Internal tide
+      lwe:
+        units: m
+        long_name: Lwe
+      mdt:
+        units: m
+        long_name: Sea surface height above geoid
+      ocean_tide:
+        units: m
+        long_name: Ocean tide
+      sla_filtered:
+        units: m
+        long_name: Sea surface height above sea level
+      sla_unfiltered:
+        units: m
+        long_name: Sea surface height above sea level
+
+  cmems_obs-sl_eur_phy-ssh_my_j1g-l3-duacs_PT1S:
+    product: SEALEVEL_EUR_PHY_L3_MY_008_061
+    title: cmems_obs-sl_eur_phy-ssh_my_j1g-l3-duacs_PT1S_202411
+    cadence: irregular
+    domain: ibi
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      dac:
+        units: m
+        long_name: Dac
+      internal_tide:
+        units: m
+        long_name: Internal tide
+      lwe:
+        units: m
+        long_name: Lwe
+      mdt:
+        units: m
+        long_name: Sea surface height above geoid
+      ocean_tide:
+        units: m
+        long_name: Ocean tide
+      sla_filtered:
+        units: m
+        long_name: Sea surface height above sea level
+      sla_unfiltered:
+        units: m
+        long_name: Sea surface height above sea level
+
+  cmems_obs-sl_eur_phy-ssh_my_j1n-l3-duacs_PT1S:
+    product: SEALEVEL_EUR_PHY_L3_MY_008_061
+    title: cmems_obs-sl_eur_phy-ssh_my_j1n-l3-duacs_PT1S_202411
+    cadence: irregular
+    domain: ibi
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      dac:
+        units: m
+        long_name: Dac
+      internal_tide:
+        units: m
+        long_name: Internal tide
+      lwe:
+        units: m
+        long_name: Lwe
+      mdt:
+        units: m
+        long_name: Sea surface height above geoid
+      ocean_tide:
+        units: m
+        long_name: Ocean tide
+      sla_filtered:
+        units: m
+        long_name: Sea surface height above sea level
+      sla_unfiltered:
+        units: m
+        long_name: Sea surface height above sea level
+
+  cmems_obs-sl_eur_phy-ssh_my_j2-l3-duacs_PT1S:
+    product: SEALEVEL_EUR_PHY_L3_MY_008_061
+    title: cmems_obs-sl_eur_phy-ssh_my_j2-l3-duacs_PT1S_202411
+    cadence: irregular
+    domain: ibi
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      dac:
+        units: m
+        long_name: Dac
+      internal_tide:
+        units: m
+        long_name: Internal tide
+      lwe:
+        units: m
+        long_name: Lwe
+      mdt:
+        units: m
+        long_name: Sea surface height above geoid
+      ocean_tide:
+        units: m
+        long_name: Ocean tide
+      sla_filtered:
+        units: m
+        long_name: Sea surface height above sea level
+      sla_unfiltered:
+        units: m
+        long_name: Sea surface height above sea level
+
+  cmems_obs-sl_eur_phy-ssh_my_j2g-l3-duacs_PT1S:
+    product: SEALEVEL_EUR_PHY_L3_MY_008_061
+    title: cmems_obs-sl_eur_phy-ssh_my_j2g-l3-duacs_PT1S_202411
+    cadence: irregular
+    domain: ibi
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      dac:
+        units: m
+        long_name: Dac
+      internal_tide:
+        units: m
+        long_name: Internal tide
+      lwe:
+        units: m
+        long_name: Lwe
+      mdt:
+        units: m
+        long_name: Sea surface height above geoid
+      ocean_tide:
+        units: m
+        long_name: Ocean tide
+      sla_filtered:
+        units: m
+        long_name: Sea surface height above sea level
+      sla_unfiltered:
+        units: m
+        long_name: Sea surface height above sea level
+
+  cmems_obs-sl_eur_phy-ssh_my_j2n-l3-duacs_PT1S:
+    product: SEALEVEL_EUR_PHY_L3_MY_008_061
+    title: cmems_obs-sl_eur_phy-ssh_my_j2n-l3-duacs_PT1S_202411
+    cadence: irregular
+    domain: ibi
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      dac:
+        units: m
+        long_name: Dac
+      internal_tide:
+        units: m
+        long_name: Internal tide
+      lwe:
+        units: m
+        long_name: Lwe
+      mdt:
+        units: m
+        long_name: Sea surface height above geoid
+      ocean_tide:
+        units: m
+        long_name: Ocean tide
+      sla_filtered:
+        units: m
+        long_name: Sea surface height above sea level
+      sla_unfiltered:
+        units: m
+        long_name: Sea surface height above sea level
+
+  cmems_obs-sl_eur_phy-ssh_my_j3-l3-duacs_PT1S:
+    product: SEALEVEL_EUR_PHY_L3_MY_008_061
+    title: cmems_obs-sl_eur_phy-ssh_my_j3-l3-duacs_PT1S_202411
+    cadence: irregular
+    domain: ibi
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      dac:
+        units: m
+        long_name: Dac
+      internal_tide:
+        units: m
+        long_name: Internal tide
+      lwe:
+        units: m
+        long_name: Lwe
+      mdt:
+        units: m
+        long_name: Sea surface height above geoid
+      ocean_tide:
+        units: m
+        long_name: Ocean tide
+      sla_filtered:
+        units: m
+        long_name: Sea surface height above sea level
+      sla_unfiltered:
+        units: m
+        long_name: Sea surface height above sea level
+
+  cmems_obs-sl_eur_phy-ssh_my_j3g-l3-duacs_PT1S-i:
+    product: SEALEVEL_EUR_PHY_L3_MY_008_061
+    title: cmems_obs-sl_eur_phy-ssh_my_j3g-l3-duacs_PT1S-i_202506
+    cadence: irregular
+    domain: ibi
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      dac:
+        units: m
+        long_name: Dac
+      internal_tide:
+        units: m
+        long_name: Internal tide
+      lwe:
+        units: m
+        long_name: Lwe
+      mdt:
+        units: m
+        long_name: Sea surface height above geoid
+      ocean_tide:
+        units: m
+        long_name: Ocean tide
+      sla_filtered:
+        units: m
+        long_name: Sea surface height above sea level
+      sla_unfiltered:
+        units: m
+        long_name: Sea surface height above sea level
+
+  cmems_obs-sl_eur_phy-ssh_my_j3n-l3-duacs_PT1S:
+    product: SEALEVEL_EUR_PHY_L3_MY_008_061
+    title: cmems_obs-sl_eur_phy-ssh_my_j3n-l3-duacs_PT1S_202411
+    cadence: irregular
+    domain: ibi
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      dac:
+        units: m
+        long_name: Dac
+      internal_tide:
+        units: m
+        long_name: Internal tide
+      lwe:
+        units: m
+        long_name: Lwe
+      mdt:
+        units: m
+        long_name: Sea surface height above geoid
+      ocean_tide:
+        units: m
+        long_name: Ocean tide
+      sla_filtered:
+        units: m
+        long_name: Sea surface height above sea level
+      sla_unfiltered:
+        units: m
+        long_name: Sea surface height above sea level
+
+  cmems_obs-sl_eur_phy-ssh_my_s3a-l3-duacs_PT1S:
+    product: SEALEVEL_EUR_PHY_L3_MY_008_061
+    title: cmems_obs-sl_eur_phy-ssh_my_s3a-l3-duacs_PT1S_202411
+    cadence: irregular
+    domain: ibi
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      dac:
+        units: m
+        long_name: Dac
+      internal_tide:
+        units: m
+        long_name: Internal tide
+      lwe:
+        units: m
+        long_name: Lwe
+      mdt:
+        units: m
+        long_name: Sea surface height above geoid
+      ocean_tide:
+        units: m
+        long_name: Ocean tide
+      sla_filtered:
+        units: m
+        long_name: Sea surface height above sea level
+      sla_unfiltered:
+        units: m
+        long_name: Sea surface height above sea level
+
+  cmems_obs-sl_eur_phy-ssh_my_s3b-l3-duacs_PT1S:
+    product: SEALEVEL_EUR_PHY_L3_MY_008_061
+    title: cmems_obs-sl_eur_phy-ssh_my_s3b-l3-duacs_PT1S_202411
+    cadence: irregular
+    domain: ibi
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      dac:
+        units: m
+        long_name: Dac
+      internal_tide:
+        units: m
+        long_name: Internal tide
+      lwe:
+        units: m
+        long_name: Lwe
+      mdt:
+        units: m
+        long_name: Sea surface height above geoid
+      ocean_tide:
+        units: m
+        long_name: Ocean tide
+      sla_filtered:
+        units: m
+        long_name: Sea surface height above sea level
+      sla_unfiltered:
+        units: m
+        long_name: Sea surface height above sea level
+
+  cmems_obs-sl_eur_phy-ssh_my_s6a-lr-l3-duacs_PT1S:
+    product: SEALEVEL_EUR_PHY_L3_MY_008_061
+    title: cmems_obs-sl_eur_phy-ssh_my_s6a-lr-l3-duacs_PT1S_202411
+    cadence: irregular
+    domain: ibi
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      dac:
+        units: m
+        long_name: Dac
+      internal_tide:
+        units: m
+        long_name: Internal tide
+      lwe:
+        units: m
+        long_name: Lwe
+      mdt:
+        units: m
+        long_name: Sea surface height above geoid
+      ocean_tide:
+        units: m
+        long_name: Ocean tide
+      sla_filtered:
+        units: m
+        long_name: Sea surface height above sea level
+      sla_unfiltered:
+        units: m
+        long_name: Sea surface height above sea level
+
+  cmems_obs-sl_eur_phy-ssh_my_swon-l3-duacs_PT1S:
+    product: SEALEVEL_EUR_PHY_L3_MY_008_061
+    title: cmems_obs-sl_eur_phy-ssh_my_swon-l3-duacs_PT1S_202411
+    cadence: irregular
+    domain: ibi
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      dac:
+        units: m
+        long_name: Dac
+      internal_tide:
+        units: m
+        long_name: Internal tide
+      lwe:
+        units: m
+        long_name: Lwe
+      mdt:
+        units: m
+        long_name: Sea surface height above geoid
+      ocean_tide:
+        units: m
+        long_name: Ocean tide
+      sla_filtered:
+        units: m
+        long_name: Sea surface height above sea level
+      sla_unfiltered:
+        units: m
+        long_name: Sea surface height above sea level
+
+  cmems_obs-sl_eur_phy-ssh_my_swonc-l3-duacs_PT1S:
+    product: SEALEVEL_EUR_PHY_L3_MY_008_061
+    title: cmems_obs-sl_eur_phy-ssh_my_swonc-l3-duacs_PT1S_202411
+    cadence: irregular
+    domain: ibi
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      dac:
+        units: m
+        long_name: Dac
+      internal_tide:
+        units: m
+        long_name: Internal tide
+      lwe:
+        units: m
+        long_name: Lwe
+      mdt:
+        units: m
+        long_name: Sea surface height above geoid
+      ocean_tide:
+        units: m
+        long_name: Ocean tide
+      sla_filtered:
+        units: m
+        long_name: Sea surface height above sea level
+      sla_unfiltered:
+        units: m
+        long_name: Sea surface height above sea level
+
+  cmems_obs-sl_eur_phy-ssh_my_tp-l3-duacs_PT1S:
+    product: SEALEVEL_EUR_PHY_L3_MY_008_061
+    title: cmems_obs-sl_eur_phy-ssh_my_tp-l3-duacs_PT1S_202411
+    cadence: irregular
+    domain: ibi
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      dac:
+        units: m
+        long_name: Dac
+      internal_tide:
+        units: m
+        long_name: Internal tide
+      lwe:
+        units: m
+        long_name: Lwe
+      mdt:
+        units: m
+        long_name: Sea surface height above geoid
+      ocean_tide:
+        units: m
+        long_name: Ocean tide
+      sla_filtered:
+        units: m
+        long_name: Sea surface height above sea level
+      sla_unfiltered:
+        units: m
+        long_name: Sea surface height above sea level
+
+  cmems_obs-sl_eur_phy-ssh_my_tpn-l3-duacs_PT1S:
+    product: SEALEVEL_EUR_PHY_L3_MY_008_061
+    title: cmems_obs-sl_eur_phy-ssh_my_tpn-l3-duacs_PT1S_202411
+    cadence: irregular
+    domain: ibi
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      dac:
+        units: m
+        long_name: Dac
+      internal_tide:
+        units: m
+        long_name: Internal tide
+      lwe:
+        units: m
+        long_name: Lwe
+      mdt:
+        units: m
+        long_name: Sea surface height above geoid
+      ocean_tide:
+        units: m
+        long_name: Ocean tide
+      sla_filtered:
+        units: m
+        long_name: Sea surface height above sea level
+      sla_unfiltered:
+        units: m
+        long_name: Sea surface height above sea level
+
+  cmems_obs-sl_eur_phy-ssh_nrt_al-l3-duacs_PT1S:
+    product: SEALEVEL_EUR_PHY_L3_NRT_008_059
+    title: cmems_obs-sl_eur_phy-ssh_nrt_al-l3-duacs_PT1S_202311
+    cadence: irregular
+    domain: ibi
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      dac:
+        units: m
+        long_name: Dac
+      internal_tide:
+        units: m
+        long_name: Internal tide
+      lwe:
+        units: m
+        long_name: Lwe
+      mdt:
+        units: m
+        long_name: Sea surface height above geoid
+      ocean_tide:
+        units: m
+        long_name: Ocean tide
+      sla_filtered:
+        units: m
+        long_name: Sea surface height above sea level
+      sla_unfiltered:
+        units: m
+        long_name: Sea surface height above sea level
+
+  cmems_obs-sl_eur_phy-ssh_nrt_allsat-l4-duacs-0.0625deg_P1D:
+    product: SEALEVEL_EUR_PHY_L4_NRT_008_060
+    title: NRT merged all satellites European Seas Gridded SSALTO/DUACS Sea Surface Height L4
+    cadence: daily
+    domain: ibi
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      adt:
+        units: m
+        long_name: Sea surface height above geoid
+      err_sla:
+        units: m
+        long_name: Sea surface height above sea level standard error
+      err_ugosa:
+        units: m/s
+        long_name: Surface geostrophic eastward sea water velocity assuming sea level for geoid standard
+      err_vgosa:
+        units: m/s
+        long_name: Surface geostrophic northward sea water velocity assuming sea level for geoid standard
+      flag_ice:
+        units: ''
+        long_name: Status flag
+      sla:
+        units: m
+        long_name: Sea surface height above sea level
+      ugos:
+        units: m/s
+        long_name: Surface geostrophic eastward sea water velocity
+      ugosa:
+        units: m/s
+        long_name: Surface geostrophic eastward sea water velocity assuming sea level for geoid
+      vgos:
+        units: m/s
+        long_name: Surface geostrophic northward sea water velocity
+      vgosa:
+        units: m/s
+        long_name: Surface geostrophic northward sea water velocity assuming sea level for geoid
+
+  cmems_obs-sl_eur_phy-ssh_nrt_allsat-l4-duacs-0.125deg_P1D:
+    product: SEALEVEL_EUR_PHY_L4_NRT_008_060
+    title: NRT merged all satellites European Seas Gridded SSALTO/DUACS Sea Surface Height L4
+    cadence: daily
+    domain: ibi
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      adt:
+        units: m
+        long_name: Sea surface height above geoid
+      err_sla:
+        units: m
+        long_name: Sea surface height above sea level standard error
+      err_ugosa:
+        units: m/s
+        long_name: Surface geostrophic eastward sea water velocity assuming sea level for geoid standard
+      err_vgosa:
+        units: m/s
+        long_name: Surface geostrophic northward sea water velocity assuming sea level for geoid standard
+      flag_ice:
+        units: ''
+        long_name: Status flag
+      sla:
+        units: m
+        long_name: Sea surface height above sea level
+      ugos:
+        units: m/s
+        long_name: Surface geostrophic eastward sea water velocity
+      ugosa:
+        units: m/s
+        long_name: Surface geostrophic eastward sea water velocity assuming sea level for geoid
+      vgos:
+        units: m/s
+        long_name: Surface geostrophic northward sea water velocity
+      vgosa:
+        units: m/s
+        long_name: Surface geostrophic northward sea water velocity assuming sea level for geoid
+
+  cmems_obs-sl_eur_phy-ssh_nrt_c2n-l3-duacs_PT1S:
+    product: SEALEVEL_EUR_PHY_L3_NRT_008_059
+    title: cmems_obs-sl_eur_phy-ssh_nrt_c2n-l3-duacs_PT1S_202311
+    cadence: irregular
+    domain: ibi
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      dac:
+        units: m
+        long_name: Dac
+      internal_tide:
+        units: m
+        long_name: Internal tide
+      lwe:
+        units: m
+        long_name: Lwe
+      mdt:
+        units: m
+        long_name: Sea surface height above geoid
+      ocean_tide:
+        units: m
+        long_name: Ocean tide
+      sla_filtered:
+        units: m
+        long_name: Sea surface height above sea level
+      sla_unfiltered:
+        units: m
+        long_name: Sea surface height above sea level
+
+  cmems_obs-sl_eur_phy-ssh_nrt_demo-allsat-swos-l4-duacs-0.0625deg_P1D-i:
+    product: SEALEVEL_EUR_PHY_L4_NRT_008_060
+    title: NRT merged all Nadir satellites and SWOT Karin European Seas Gridded SSALTO/DUACS
+    cadence: daily
+    domain: ibi
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      adt:
+        units: m
+        long_name: Sea surface height above geoid
+      err_sla:
+        units: m
+        long_name: Sea surface height above sea level standard error
+      err_ugosa:
+        units: m/s
+        long_name: Surface geostrophic eastward sea water velocity assuming sea level for geoid standard
+      err_vgosa:
+        units: m/s
+        long_name: Surface geostrophic northward sea water velocity assuming sea level for geoid standard
+      flag_ice:
+        units: ''
+        long_name: Status flag
+      sla:
+        units: m
+        long_name: Sea surface height above sea level
+      ugos:
+        units: m/s
+        long_name: Surface geostrophic eastward sea water velocity
+      ugosa:
+        units: m/s
+        long_name: Surface geostrophic eastward sea water velocity assuming sea level for geoid
+      vgos:
+        units: m/s
+        long_name: Surface geostrophic northward sea water velocity
+      vgosa:
+        units: m/s
+        long_name: Surface geostrophic northward sea water velocity assuming sea level for geoid
+
+  cmems_obs-sl_eur_phy-ssh_nrt_h2b-l3-duacs_PT0.2S:
+    product: SEALEVEL_EUR_PHY_L3_NRT_008_059
+    title: cmems_obs-sl_eur_phy-ssh_nrt_h2b-l3-duacs_PT0.2S_202311
+    cadence: irregular
+    domain: ibi
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      dac:
+        units: m
+        long_name: Dac
+      ib_lf:
+        units: m
+        long_name: Sea surface height correction due to air pressure at low frequency
+      internal_tide:
+        units: m
+        long_name: Internal tide
+      lwe:
+        units: m
+        long_name: Lwe
+      mdt:
+        units: m
+        long_name: Sea surface height above geoid
+      ocean_tide:
+        units: m
+        long_name: Sea surface height amplitude due to geocentric ocean tide
+      sla_filtered:
+        units: m
+        long_name: Sea surface height above sea level
+      sla_unfiltered:
+        units: m
+        long_name: Sea surface height above sea level
+      xtdir:
+        units: degrees
+        long_name: Sea water velocity to direction
+      xtgosa:
+        units: m s-1
+        long_name: Xtgosa
+      xtgosm:
+        units: m s-1
+        long_name: Xtgosm
+
+  cmems_obs-sl_eur_phy-ssh_nrt_h2b-l3-duacs_PT1S:
+    product: SEALEVEL_EUR_PHY_L3_NRT_008_059
+    title: cmems_obs-sl_eur_phy-ssh_nrt_h2b-l3-duacs_PT1S_202311
+    cadence: irregular
+    domain: ibi
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      dac:
+        units: m
+        long_name: Dac
+      internal_tide:
+        units: m
+        long_name: Internal tide
+      lwe:
+        units: m
+        long_name: Lwe
+      mdt:
+        units: m
+        long_name: Sea surface height above geoid
+      ocean_tide:
+        units: m
+        long_name: Ocean tide
+      sla_filtered:
+        units: m
+        long_name: Sea surface height above sea level
+      sla_unfiltered:
+        units: m
+        long_name: Sea surface height above sea level
+
+  cmems_obs-sl_eur_phy-ssh_nrt_j3g-l3-duacs_PT0.2S-i:
+    product: SEALEVEL_EUR_PHY_L3_NRT_008_059
+    title: cmems_obs-sl_eur_phy-ssh_nrt_j3g-l3-duacs_PT0.2S-i_202506
+    cadence: irregular
+    domain: ibi
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      dac:
+        units: m
+        long_name: Dac
+      ib_lf:
+        units: m
+        long_name: Sea surface height correction due to air pressure at low frequency
+      internal_tide:
+        units: m
+        long_name: Internal tide
+      lwe:
+        units: m
+        long_name: Lwe
+      mdt:
+        units: m
+        long_name: Sea surface height above geoid
+      ocean_tide:
+        units: m
+        long_name: Sea surface height amplitude due to geocentric ocean tide
+      sla_filtered:
+        units: m
+        long_name: Sea surface height above sea level
+      sla_unfiltered:
+        units: m
+        long_name: Sea surface height above sea level
+      xtdir:
+        units: degrees
+        long_name: Sea water velocity to direction
+      xtgosa:
+        units: m s-1
+        long_name: Xtgosa
+      xtgosm:
+        units: m s-1
+        long_name: Xtgosm
+
+  cmems_obs-sl_eur_phy-ssh_nrt_j3g-l3-duacs_PT1S-i:
+    product: SEALEVEL_EUR_PHY_L3_NRT_008_059
+    title: cmems_obs-sl_eur_phy-ssh_nrt_j3g-l3-duacs_PT1S-i_202506
+    cadence: irregular
+    domain: ibi
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      dac:
+        units: m
+        long_name: Dac
+      internal_tide:
+        units: m
+        long_name: Internal tide
+      lwe:
+        units: m
+        long_name: Lwe
+      mdt:
+        units: m
+        long_name: Sea surface height above geoid
+      ocean_tide:
+        units: m
+        long_name: Sea surface height amplitude due to geocentric ocean tide
+      sla_filtered:
+        units: m
+        long_name: Sea surface height above sea level
+      sla_unfiltered:
+        units: m
+        long_name: Sea surface height above sea level
+
+  cmems_obs-sl_eur_phy-ssh_nrt_j3n-l3-duacs_PT0.2S:
+    product: SEALEVEL_EUR_PHY_L3_NRT_008_059
+    title: cmems_obs-sl_eur_phy-ssh_nrt_j3n-l3-duacs_PT0.2S_202311
+    cadence: irregular
+    domain: ibi
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      dac:
+        units: m
+        long_name: Dac
+      ib_lf:
+        units: m
+        long_name: Sea surface height correction due to air pressure at low frequency
+      internal_tide:
+        units: m
+        long_name: Internal tide
+      lwe:
+        units: m
+        long_name: Lwe
+      mdt:
+        units: m
+        long_name: Sea surface height above geoid
+      ocean_tide:
+        units: m
+        long_name: Sea surface height amplitude due to geocentric ocean tide
+      sla_filtered:
+        units: m
+        long_name: Sea surface height above sea level
+      sla_unfiltered:
+        units: m
+        long_name: Sea surface height above sea level
+      xtdir:
+        units: degrees
+        long_name: Sea water velocity to direction
+      xtgosa:
+        units: m s-1
+        long_name: Xtgosa
+      xtgosm:
+        units: m s-1
+        long_name: Xtgosm
+
+  cmems_obs-sl_eur_phy-ssh_nrt_j3n-l3-duacs_PT1S:
+    product: SEALEVEL_EUR_PHY_L3_NRT_008_059
+    title: cmems_obs-sl_eur_phy-ssh_nrt_j3n-l3-duacs_PT1S_202311
+    cadence: irregular
+    domain: ibi
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      dac:
+        units: m
+        long_name: Dac
+      internal_tide:
+        units: m
+        long_name: Internal tide
+      lwe:
+        units: m
+        long_name: Lwe
+      mdt:
+        units: m
+        long_name: Sea surface height above geoid
+      ocean_tide:
+        units: m
+        long_name: Ocean tide
+      sla_filtered:
+        units: m
+        long_name: Sea surface height above sea level
+      sla_unfiltered:
+        units: m
+        long_name: Sea surface height above sea level
+
+  cmems_obs-sl_eur_phy-ssh_nrt_s3a-l3-duacs_PT0.2S:
+    product: SEALEVEL_EUR_PHY_L3_NRT_008_059
+    title: cmems_obs-sl_eur_phy-ssh_nrt_s3a-l3-duacs_PT0.2S_202311
+    cadence: irregular
+    domain: ibi
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      dac:
+        units: m
+        long_name: Dac
+      ib_lf:
+        units: m
+        long_name: Sea surface height correction due to air pressure at low frequency
+      internal_tide:
+        units: m
+        long_name: Internal tide
+      lwe:
+        units: m
+        long_name: Lwe
+      mdt:
+        units: m
+        long_name: Sea surface height above geoid
+      ocean_tide:
+        units: m
+        long_name: Sea surface height amplitude due to geocentric ocean tide
+      sla_filtered:
+        units: m
+        long_name: Sea surface height above sea level
+      sla_unfiltered:
+        units: m
+        long_name: Sea surface height above sea level
+      xtdir:
+        units: degrees
+        long_name: Sea water velocity to direction
+      xtgosa:
+        units: m s-1
+        long_name: Xtgosa
+      xtgosm:
+        units: m s-1
+        long_name: Xtgosm
+
+  cmems_obs-sl_eur_phy-ssh_nrt_s3a-l3-duacs_PT1S:
+    product: SEALEVEL_EUR_PHY_L3_NRT_008_059
+    title: cmems_obs-sl_eur_phy-ssh_nrt_s3a-l3-duacs_PT1S_202311
+    cadence: irregular
+    domain: ibi
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      dac:
+        units: m
+        long_name: Dac
+      internal_tide:
+        units: m
+        long_name: Internal tide
+      lwe:
+        units: m
+        long_name: Lwe
+      mdt:
+        units: m
+        long_name: Sea surface height above geoid
+      ocean_tide:
+        units: m
+        long_name: Ocean tide
+      sla_filtered:
+        units: m
+        long_name: Sea surface height above sea level
+      sla_unfiltered:
+        units: m
+        long_name: Sea surface height above sea level
+
+  cmems_obs-sl_eur_phy-ssh_nrt_s3b-l3-duacs_PT0.2S:
+    product: SEALEVEL_EUR_PHY_L3_NRT_008_059
+    title: cmems_obs-sl_eur_phy-ssh_nrt_s3b-l3-duacs_PT0.2S_202311
+    cadence: irregular
+    domain: ibi
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      dac:
+        units: m
+        long_name: Dac
+      ib_lf:
+        units: m
+        long_name: Sea surface height correction due to air pressure at low frequency
+      internal_tide:
+        units: m
+        long_name: Internal tide
+      lwe:
+        units: m
+        long_name: Lwe
+      mdt:
+        units: m
+        long_name: Sea surface height above geoid
+      ocean_tide:
+        units: m
+        long_name: Sea surface height amplitude due to geocentric ocean tide
+      sla_filtered:
+        units: m
+        long_name: Sea surface height above sea level
+      sla_unfiltered:
+        units: m
+        long_name: Sea surface height above sea level
+      xtdir:
+        units: degrees
+        long_name: Sea water velocity to direction
+      xtgosa:
+        units: m s-1
+        long_name: Xtgosa
+      xtgosm:
+        units: m s-1
+        long_name: Xtgosm
+
+  cmems_obs-sl_eur_phy-ssh_nrt_s3b-l3-duacs_PT1S:
+    product: SEALEVEL_EUR_PHY_L3_NRT_008_059
+    title: cmems_obs-sl_eur_phy-ssh_nrt_s3b-l3-duacs_PT1S_202311
+    cadence: irregular
+    domain: ibi
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      dac:
+        units: m
+        long_name: Dac
+      internal_tide:
+        units: m
+        long_name: Internal tide
+      lwe:
+        units: m
+        long_name: Lwe
+      mdt:
+        units: m
+        long_name: Sea surface height above geoid
+      ocean_tide:
+        units: m
+        long_name: Ocean tide
+      sla_filtered:
+        units: m
+        long_name: Sea surface height above sea level
+      sla_unfiltered:
+        units: m
+        long_name: Sea surface height above sea level
+
+  cmems_obs-sl_eur_phy-ssh_nrt_s6a-hr-l3-duacs_PT0.2S:
+    product: SEALEVEL_EUR_PHY_L3_NRT_008_059
+    title: cmems_obs-sl_eur_phy-ssh_nrt_s6a-hr-l3-duacs_PT0.2S_202311
+    cadence: irregular
+    domain: ibi
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      dac:
+        units: m
+        long_name: Dac
+      ib_lf:
+        units: m
+        long_name: Sea surface height correction due to air pressure at low frequency
+      internal_tide:
+        units: m
+        long_name: Internal tide
+      lwe:
+        units: m
+        long_name: Lwe
+      mdt:
+        units: m
+        long_name: Sea surface height above geoid
+      ocean_tide:
+        units: m
+        long_name: Sea surface height amplitude due to geocentric ocean tide
+      sla_filtered:
+        units: m
+        long_name: Sea surface height above sea level
+      sla_unfiltered:
+        units: m
+        long_name: Sea surface height above sea level
+      xtdir:
+        units: degrees
+        long_name: Sea water velocity to direction
+      xtgosa:
+        units: m s-1
+        long_name: Xtgosa
+      xtgosm:
+        units: m s-1
+        long_name: Xtgosm
+
+  cmems_obs-sl_eur_phy-ssh_nrt_s6a-hr-l3-duacs_PT1S:
+    product: SEALEVEL_EUR_PHY_L3_NRT_008_059
+    title: cmems_obs-sl_eur_phy-ssh_nrt_s6a-hr-l3-duacs_PT1S_202311
+    cadence: irregular
+    domain: ibi
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      dac:
+        units: m
+        long_name: Dac
+      internal_tide:
+        units: m
+        long_name: Internal tide
+      lwe:
+        units: m
+        long_name: Lwe
+      mdt:
+        units: m
+        long_name: Sea surface height above geoid
+      ocean_tide:
+        units: m
+        long_name: Ocean tide
+      sla_filtered:
+        units: m
+        long_name: Sea surface height above sea level
+      sla_unfiltered:
+        units: m
+        long_name: Sea surface height above sea level
+
+  cmems_obs-sl_eur_phy-ssh_nrt_swon-l3-duacs_PT0.2S:
+    product: SEALEVEL_EUR_PHY_L3_NRT_008_059
+    title: cmems_obs-sl_eur_phy-ssh_nrt_swon-l3-duacs_PT0.2S_202311
+    cadence: irregular
+    domain: ibi
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      dac:
+        units: m
+        long_name: Dac
+      ib_lf:
+        units: m
+        long_name: Sea surface height correction due to air pressure at low frequency
+      internal_tide:
+        units: m
+        long_name: Internal tide
+      lwe:
+        units: m
+        long_name: Lwe
+      mdt:
+        units: m
+        long_name: Sea surface height above geoid
+      ocean_tide:
+        units: m
+        long_name: Sea surface height amplitude due to geocentric ocean tide
+      sla_filtered:
+        units: m
+        long_name: Sea surface height above sea level
+      sla_unfiltered:
+        units: m
+        long_name: Sea surface height above sea level
+      xtdir:
+        units: degrees
+        long_name: Sea water velocity to direction
+      xtgosa:
+        units: m s-1
+        long_name: Xtgosa
+      xtgosm:
+        units: m s-1
+        long_name: Xtgosm
+
+  cmems_obs-sl_eur_phy-ssh_nrt_swon-l3-duacs_PT1S:
+    product: SEALEVEL_EUR_PHY_L3_NRT_008_059
+    title: cmems_obs-sl_eur_phy-ssh_nrt_swon-l3-duacs_PT1S_202311
+    cadence: irregular
+    domain: ibi
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      dac:
+        units: m
+        long_name: Dac
+      internal_tide:
+        units: m
+        long_name: Internal tide
+      lwe:
+        units: m
+        long_name: Lwe
+      mdt:
+        units: m
+        long_name: Sea surface height above geoid
+      ocean_tide:
+        units: m
+        long_name: Sea surface height amplitude due to geocentric ocean tide
+      sla_filtered:
+        units: m
+        long_name: Sea surface height above sea level
+      sla_unfiltered:
+        units: m
+        long_name: Sea surface height above sea level
+
+  cmems_obs_oc_ibi_bgc_tur-spm-chl_nrt_l3-hr-mosaic_P1D-m:
+    product: OCEANCOLOUR_IBI_BGC_HR_L3_NRT_009_204
+    title: CMEMS HR-OC Iberian Sea transparency (spm, tur) and geophysical (chl) daily observations
+    cadence: daily
+    domain: ibi
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      CHL:
+        units: mg m-3
+        long_name: Mass concentration of chlorophyll a in sea water
+      SPM:
+        units: g m-3
+        long_name: Mass concentration of suspended matter in sea water
+      TUR:
+        units: FNU
+        long_name: Sea water turbidity
+
+  cmems_obs_oc_ibi_bgc_tur-spm-chl_nrt_l4-hr-mosaic_P1D-m:
+    product: OCEANCOLOUR_IBI_BGC_HR_L4_NRT_009_210
+    title: CMEMS HR-OC Iberian Sea transparency (spm, tur) and geophysical (chl) daily interpolated
+    cadence: daily
+    domain: ibi
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      CHL:
+        units: mg m-3
+        long_name: Mass concentration of chlorophyll a in sea water
+      SPM:
+        units: g m-3
+        long_name: Mass concentration of suspended matter in sea water
+      TUR:
+        units: FNU
+        long_name: Sea water turbidity
+
+  ibi_omi_currents_cui_index:
+    product: IBI_OMI_CURRENTS_cui
+    title: IBI Coastal Upwelling Index (CUI)
+    cadence: irregular
+    domain: ibi
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      cui_ibi-phy-myp:
+        units: degrees_C
+        long_name: Sea water potential temperature difference
+      cui_ibi-phy-nrt:
+        units: degrees_C
+        long_name: Sea water potential temperature difference
+
+  ibi_omi_currents_cui_trend:
+    product: IBI_OMI_CURRENTS_cui
+    title: IBI Coastal Upwelling Index (CUI) Trend
+    cadence: irregular
+    domain: ibi
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      cui_ibi-phy-myp_trend:
+        units: degrees_C Yr-1
+        long_name: Tendency of sea water potential temperature difference
+      cui_ibi-phy-myp_trend_max_int:
+        units: degrees_C Yr-1
+        long_name: Tendency of sea water potential temperature difference
+      cui_ibi-phy-myp_trend_min_int:
+        units: degrees_C Yr-1
+        long_name: Tendency of sea water potential temperature difference
+
+  ibi_omi_seastate_extreme_var_swh_mean_and_anomaly:
+    product: IBI_OMI_SEASTATE_extreme_var_swh_mean_and_anomaly
+    title: Extremes variability in European Seas
+    cadence: irregular
+    domain: ibi
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      swh_percentile99_anom:
+        units: m
+        long_name: Sea surface wave significant height
+      swh_percentile99_mean:
+        units: m
+        long_name: Sea surface wave significant height
+
+  ibi_omi_seastate_swi_anomaly:
+    product: IBI_OMI_SEASTATE_swi
+    title: IBI Strong Wave Incidence (SWI) index
+    cadence: irregular
+    domain: ibi
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      swi_myp_wav1:
+        units: percentage
+        long_name: Wave significant height anomaly
+      swi_myp_wav2:
+        units: percentage
+        long_name: Wave significant height anomaly
+      swi_myp_wav3:
+        units: percentage
+        long_name: Wave significant height anomaly
+      swi_myp_wav4:
+        units: percentage
+        long_name: Wave significant height anomaly
+      swi_nrt_wav1:
+        units: percentage
+        long_name: Wave significant height anomaly
+      swi_nrt_wav2:
+        units: percentage
+        long_name: Wave significant height anomaly
+      swi_nrt_wav3:
+        units: percentage
+        long_name: Wave significant height anomaly
+      swi_nrt_wav4:
+        units: percentage
+        long_name: Wave significant height anomaly
+
+  ibi_omi_seastate_swi_mean_percentile:
+    product: IBI_OMI_SEASTATE_swi
+    title: IBI Strong Wave Incidence (SWI) index
+    cadence: irregular
+    domain: ibi
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      swh_percentile90_myp:
+        units: metres
+        long_name: Sea surface wave significant height
+
+  ibi_omi_wmhe_mow_anomalies_north:
+    product: IBI_OMI_WMHE_mow
+    title: IBI Mediterranean Outflow Water Index (MOW)
+    cadence: irregular
+    domain: ibi
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      mow_armor:
+        units: 1e-3
+        long_name: Sea water salinity
+      mow_cora:
+        units: 1e-3
+        long_name: Sea water salinity
+      mow_glo_myp:
+        units: 1e-3
+        long_name: Sea water salinity
+      mow_ibi_myp:
+        units: 1e-3
+        long_name: Sea water salinity
+      mow_ibi_nrt:
+        units: 1e-3
+        long_name: Sea water salinity
+      mow_mean:
+        units: 1e-3
+        long_name: Sea water salinity
+      mow_std:
+        units: 1e-3
+        long_name: Sea water salinity
+
+  ibi_omi_wmhe_mow_anomalies_reservoir:
+    product: IBI_OMI_WMHE_mow
+    title: IBI Mediterranean Outflow Water Index (MOW)
+    cadence: irregular
+    domain: ibi
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      mow_armor:
+        units: 1e-3
+        long_name: Sea water salinity
+      mow_cora:
+        units: 1e-3
+        long_name: Sea water salinity
+      mow_glo_myp:
+        units: 1e-3
+        long_name: Sea water salinity
+      mow_ibi_myp:
+        units: 1e-3
+        long_name: Sea water salinity
+      mow_ibi_nrt:
+        units: 1e-3
+        long_name: Sea water salinity
+      mow_mean:
+        units: 1e-3
+        long_name: Sea water salinity
+      mow_std:
+        units: 1e-3
+        long_name: Sea water salinity
+
+  ibi_omi_wmhe_mow_anomalies_south:
+    product: IBI_OMI_WMHE_mow
+    title: IBI Mediterranean Outflow Water Index (MOW)
+    cadence: irregular
+    domain: ibi
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      mow_armor:
+        units: 1e-3
+        long_name: Sea water salinity
+      mow_cora:
+        units: 1e-3
+        long_name: Sea water salinity
+      mow_glo_myp:
+        units: 1e-3
+        long_name: Sea water salinity
+      mow_ibi_myp:
+        units: 1e-3
+        long_name: Sea water salinity
+      mow_ibi_nrt:
+        units: 1e-3
+        long_name: Sea water salinity
+      mow_mean:
+        units: 1e-3
+        long_name: Sea water salinity
+      mow_std:
+        units: 1e-3
+        long_name: Sea water salinity
+
+  ibi_omi_wmhe_mow_anomalies_west:
+    product: IBI_OMI_WMHE_mow
+    title: IBI Mediterranean Outflow Water Index (MOW)
+    cadence: irregular
+    domain: ibi
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      mow_armor:
+        units: 1e-3
+        long_name: Sea water salinity
+      mow_cora:
+        units: 1e-3
+        long_name: Sea water salinity
+      mow_glo_myp:
+        units: 1e-3
+        long_name: Sea water salinity
+      mow_ibi_myp:
+        units: 1e-3
+        long_name: Sea water salinity
+      mow_ibi_nrt:
+        units: 1e-3
+        long_name: Sea water salinity
+      mow_mean:
+        units: 1e-3
+        long_name: Sea water salinity
+      mow_std:
+        units: 1e-3
+        long_name: Sea water salinity

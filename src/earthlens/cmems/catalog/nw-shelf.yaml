@@ -1,0 +1,1557 @@
+# CMEMS curated catalog - nw-shelf slice.
+#
+# One slice of the per-domain split of the Copernicus Marine catalog.
+# The loader (earthlens.cmems.catalog.Catalog) merges every *.yaml in
+# this directory into one Catalog at construction time; dataset ids
+# must be unique across files. Stanzas are emitted by
+# tools/cmems/refresh_cmems_catalog.py from copernicusmarine.describe();
+# `cadence` is inferred from the dataset_id suffix and `domain` from
+# the product_id prefix. The `global` basin is sub-split by theme
+# (global-physics / global-biogeochem / global-sst / ...) to keep file
+# sizes balanced; the `domain:` field on every row below is still the
+# plain basin label. Where the toolbox exposes no standard_name for a
+# variable, the row carries `long_name: ''` with a TODO marker.
+#
+# Schema (per dataset):
+#   <dataset_id>:
+#     product: <product_id>
+#     title: <human-readable title>
+#     cadence: <daily|monthly|hourly|6hourly|climatology|irregular>
+#     domain: <global|mediterranean|arctic|...>
+#     temporal: { start: YYYY-MM-DD, end: YYYY-MM-DD }   # end null = NRT
+#     variables:
+#       <short_name>: { units: <CF units>, long_name: <CF long name> }
+
+datasets:
+
+  MetO-NWS-WAV-RAN:
+    product: NWSHELF_REANALYSIS_WAV_004_015
+    title: 3-hourly-instantaneous wave
+    cadence: irregular
+    domain: nw-shelf
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      VHM0:
+        units: m
+        long_name: Sea surface wave significant height
+      VHM0_SW1:
+        units: m
+        long_name: Sea surface primary swell wave significant height
+      VHM0_SW2:
+        units: m
+        long_name: Sea surface secondary swell wave significant height
+      VHM0_WW:
+        units: m
+        long_name: Sea surface wind wave significant height
+      VMDR:
+        units: degree
+        long_name: Sea surface wave from direction
+      VMDR_SW1:
+        units: degree
+        long_name: Sea surface primary swell wave from direction
+      VMDR_SW2:
+        units: degree
+        long_name: Sea surface secondary swell wave from direction
+      VMDR_WW:
+        units: degree
+        long_name: Sea surface wind wave from direction
+      VPED:
+        units: degree
+        long_name: Sea surface wave from direction at variance spectral density maximum
+      VSDX:
+        units: m s-1
+        long_name: Sea surface wave stokes drift x velocity
+      VSDY:
+        units: m s-1
+        long_name: Sea surface wave stokes drift y velocity
+      VTM01_SW1:
+        units: s
+        long_name: Sea surface primary swell wave mean period
+      VTM01_SW2:
+        units: s
+        long_name: Sea surface secondary swell wave mean period
+      VTM01_WW:
+        units: s
+        long_name: Sea surface wind wave mean period
+      VTM02:
+        units: s
+        long_name: Sea surface wave mean period from variance spectral density second frequency moment
+      VTM10:
+        units: s
+        long_name: Sea surface wave mean period from variance spectral density inverse frequency moment
+      VTPK:
+        units: s
+        long_name: Sea surface wave period at variance spectral density maximum
+
+  cmems_mod_nws_bgc-chl_anfc_7km-3D_P1D-m:
+    product: NWSHELF_ANALYSISFORECAST_BGC_004_002
+    title: daily-mean chlorophyll concentration (3D)
+    cadence: daily
+    domain: nw-shelf
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      chl:
+        units: mg m-3
+        long_name: Mass concentration of chlorophyll a in sea water
+
+  cmems_mod_nws_bgc-chl_my_7km-3D_P1D-m:
+    product: NWSHELF_MULTIYEAR_BGC_004_011
+    title: daily-mean chlorophyll concentration (3D)
+    cadence: daily
+    domain: nw-shelf
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      chl:
+        units: mg m-3
+        long_name: Mass concentration of chlorophyll a in sea water
+
+  cmems_mod_nws_bgc-chl_my_7km-3D_P1M-m:
+    product: NWSHELF_MULTIYEAR_BGC_004_011
+    title: monthly-mean chlorophyll concentration (3D)
+    cadence: monthly
+    domain: nw-shelf
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      chl:
+        units: mg m-3
+        long_name: Mass concentration of chlorophyll a in sea water
+
+  cmems_mod_nws_bgc-dissic_anfc_7km-3D_P1D-m:
+    product: NWSHELF_ANALYSISFORECAST_BGC_004_002
+    title: daily-mean dissolved inorganic carbon (3D)
+    cadence: daily
+    domain: nw-shelf
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      dissic:
+        units: mmol m-3
+        long_name: Mole concentration of dissolved inorganic carbon in sea water
+
+  cmems_mod_nws_bgc-kd_anfc_7km-3D_P1D-m:
+    product: NWSHELF_ANALYSISFORECAST_BGC_004_002
+    title: daily-mean attenuation coefficient (3D)
+    cadence: daily
+    domain: nw-shelf
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      attn:
+        units: m^-1
+        long_name: Volume beam attenuation coefficient of radiative flux in sea water
+
+  cmems_mod_nws_bgc-kd_my_7km-3D_P1D-m:
+    product: NWSHELF_MULTIYEAR_BGC_004_011
+    title: daily-mean attenuation coefficient (3D)
+    cadence: daily
+    domain: nw-shelf
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      attn:
+        units: m-1
+        long_name: Volume beam attenuation coefficient of radiative flux in sea water
+
+  cmems_mod_nws_bgc-kd_my_7km-3D_P1M-m:
+    product: NWSHELF_MULTIYEAR_BGC_004_011
+    title: monthly-mean attenuation coefficient (3D)
+    cadence: monthly
+    domain: nw-shelf
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      attn:
+        units: m-1
+        long_name: Volume beam attenuation coefficient of radiative flux in sea water
+
+  cmems_mod_nws_bgc-nh4_anfc_7km-3D_P1D-m:
+    product: NWSHELF_ANALYSISFORECAST_BGC_004_002
+    title: daily-mean total ammonium (3D)
+    cadence: daily
+    domain: nw-shelf
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      nh4:
+        units: mmol m-3
+        long_name: Mole concentration of ammonium in sea water
+
+  cmems_mod_nws_bgc-no3_anfc_7km-3D_P1D-m:
+    product: NWSHELF_ANALYSISFORECAST_BGC_004_002
+    title: daily-mean nitrate (3D)
+    cadence: daily
+    domain: nw-shelf
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      no3:
+        units: mmol m-3
+        long_name: Mole concentration of nitrate in sea water
+
+  cmems_mod_nws_bgc-no3_my_7km-3D_P1D-m:
+    product: NWSHELF_MULTIYEAR_BGC_004_011
+    title: daily-mean nitrate (3D)
+    cadence: daily
+    domain: nw-shelf
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      no3:
+        units: mmol m-3
+        long_name: Mole concentration of nitrate in sea water
+
+  cmems_mod_nws_bgc-no3_my_7km-3D_P1M-m:
+    product: NWSHELF_MULTIYEAR_BGC_004_011
+    title: monthly-mean nitrate (3D)
+    cadence: monthly
+    domain: nw-shelf
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      no3:
+        units: mmol m-3
+        long_name: Mole concentration of nitrate in sea water
+
+  cmems_mod_nws_bgc-o2_anfc_7km-3D_P1D-m:
+    product: NWSHELF_ANALYSISFORECAST_BGC_004_002
+    title: daily-mean dissolved oxygen (3D)
+    cadence: daily
+    domain: nw-shelf
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      o2:
+        units: mmol m-3
+        long_name: Mole concentration of dissolved molecular oxygen in sea water
+
+  cmems_mod_nws_bgc-o2_my_7km-3D_P1D-m:
+    product: NWSHELF_MULTIYEAR_BGC_004_011
+    title: daily-mean dissolved oxygen (3D)
+    cadence: daily
+    domain: nw-shelf
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      o2:
+        units: mmol m-3
+        long_name: Mole concentration of dissolved molecular oxygen in sea water
+
+  cmems_mod_nws_bgc-o2_my_7km-3D_P1M-m:
+    product: NWSHELF_MULTIYEAR_BGC_004_011
+    title: monthly-mean dissolved oxygen (3D)
+    cadence: monthly
+    domain: nw-shelf
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      o2:
+        units: mmol m-3
+        long_name: Mole concentration of dissolved molecular oxygen in sea water
+
+  cmems_mod_nws_bgc-pft_my_7km-3D-diato_P1D-m:
+    product: NWSHELF_MULTIYEAR_BGC_004_011
+    title: daily-mean chlorophyll concentration in diatoms (3D)
+    cadence: daily
+    domain: nw-shelf
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      diato:
+        units: mg m-3
+        long_name: Mass concentration of diatoms expressed as chlorophyll in sea water
+
+  cmems_mod_nws_bgc-pft_my_7km-3D-diato_P1M-m:
+    product: NWSHELF_MULTIYEAR_BGC_004_011
+    title: monthly-mean chlorophyll concentration in diatoms (3D)
+    cadence: monthly
+    domain: nw-shelf
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      diato:
+        units: mg m-3
+        long_name: Mass concentration of diatoms expressed as chlorophyll in sea water
+
+  cmems_mod_nws_bgc-pft_my_7km-3D-dino_P1D-m:
+    product: NWSHELF_MULTIYEAR_BGC_004_011
+    title: daily-mean chlorophyll concentration in dinoflagellates (3D)
+    cadence: daily
+    domain: nw-shelf
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      dino:
+        units: mg m-3
+        long_name: Mass concentration of dinoflagellates expressed as chlorophyll in sea water
+
+  cmems_mod_nws_bgc-pft_my_7km-3D-dino_P1M-m:
+    product: NWSHELF_MULTIYEAR_BGC_004_011
+    title: monthly-mean chlorophyll concentration in dinoflagellates (3D)
+    cadence: monthly
+    domain: nw-shelf
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      dino:
+        units: mg m-3
+        long_name: Mass concentration of dinoflagellates expressed as chlorophyll in sea water
+
+  cmems_mod_nws_bgc-pft_my_7km-3D-nano_P1D-m:
+    product: NWSHELF_MULTIYEAR_BGC_004_011
+    title: daily-mean chlorophyll concentration in nanophytoplankton (3D)
+    cadence: daily
+    domain: nw-shelf
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      nano:
+        units: mg m-3
+        long_name: Mass concentration of nanophytoplankton expressed as chlorophyll in sea water
+
+  cmems_mod_nws_bgc-pft_my_7km-3D-nano_P1M-m:
+    product: NWSHELF_MULTIYEAR_BGC_004_011
+    title: monthly-mean chlorophyll concentration in nanophytoplankton (3D)
+    cadence: monthly
+    domain: nw-shelf
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      nano:
+        units: mg m-3
+        long_name: Mass concentration of nanophytoplankton expressed as chlorophyll in sea water
+
+  cmems_mod_nws_bgc-pft_my_7km-3D-pico_P1D-m:
+    product: NWSHELF_MULTIYEAR_BGC_004_011
+    title: daily-mean chlorophyll concentration in picophytoplankton (3D)
+    cadence: daily
+    domain: nw-shelf
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      pico:
+        units: mg m-3
+        long_name: Mass concentration of picophytoplankton expressed as chlorophyll in sea water
+
+  cmems_mod_nws_bgc-pft_my_7km-3D-pico_P1M-m:
+    product: NWSHELF_MULTIYEAR_BGC_004_011
+    title: monthly-mean chlorophyll concentration in picophytoplankton (3D)
+    cadence: monthly
+    domain: nw-shelf
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      pico:
+        units: mg m-3
+        long_name: Mass concentration of picophytoplankton expressed as chlorophyll in sea water
+
+  cmems_mod_nws_bgc-ph_anfc_7km-3D_P1D-m:
+    product: NWSHELF_ANALYSISFORECAST_BGC_004_002
+    title: daily-mean pH (3D)
+    cadence: daily
+    domain: nw-shelf
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      ph:
+        units: '1'
+        long_name: Sea water ph reported on total scale
+
+  cmems_mod_nws_bgc-ph_my_7km-3D_P1D-m:
+    product: NWSHELF_MULTIYEAR_BGC_004_011
+    title: daily-mean pH (3D)
+    cadence: daily
+    domain: nw-shelf
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      ph:
+        units: '1'
+        long_name: Sea water ph reported on total scale
+
+  cmems_mod_nws_bgc-ph_my_7km-3D_P1M-m:
+    product: NWSHELF_MULTIYEAR_BGC_004_011
+    title: monthly-mean pH (3D)
+    cadence: monthly
+    domain: nw-shelf
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      ph:
+        units: '1'
+        long_name: Sea water ph reported on total scale
+
+  cmems_mod_nws_bgc-phyc_anfc_7km-3D_P1D-m:
+    product: NWSHELF_ANALYSISFORECAST_BGC_004_002
+    title: daily-mean phytoplankton (3D)
+    cadence: daily
+    domain: nw-shelf
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      phyc:
+        units: mmol m-3
+        long_name: Mole concentration of phytoplankton expressed as carbon in sea water
+
+  cmems_mod_nws_bgc-phyc_my_7km-3D_P1D-m:
+    product: NWSHELF_MULTIYEAR_BGC_004_011
+    title: daily-mean phytoplankton (3D)
+    cadence: daily
+    domain: nw-shelf
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      phyc:
+        units: mmol m-3
+        long_name: Mole concentration of phytoplankton expressed as carbon in sea water
+
+  cmems_mod_nws_bgc-phyc_my_7km-3D_P1M-m:
+    product: NWSHELF_MULTIYEAR_BGC_004_011
+    title: monthly-mean phytoplankton (3D)
+    cadence: monthly
+    domain: nw-shelf
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      phyc:
+        units: mmol m-3
+        long_name: Mole concentration of phytoplankton expressed as carbon in sea water
+
+  cmems_mod_nws_bgc-po4_anfc_7km-3D_P1D-m:
+    product: NWSHELF_ANALYSISFORECAST_BGC_004_002
+    title: daily-mean phosphate (3D)
+    cadence: daily
+    domain: nw-shelf
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      po4:
+        units: mmol m-3
+        long_name: Mole concentration of phosphate in sea water
+
+  cmems_mod_nws_bgc-po4_my_7km-3D_P1D-m:
+    product: NWSHELF_MULTIYEAR_BGC_004_011
+    title: daily-mean phosphate (3D)
+    cadence: daily
+    domain: nw-shelf
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      po4:
+        units: mmol m-3
+        long_name: Mole concentration of phosphate in sea water
+
+  cmems_mod_nws_bgc-po4_my_7km-3D_P1M-m:
+    product: NWSHELF_MULTIYEAR_BGC_004_011
+    title: monthly-mean phosphate (3D)
+    cadence: monthly
+    domain: nw-shelf
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      po4:
+        units: mmol m-3
+        long_name: Mole concentration of phosphate in sea water
+
+  cmems_mod_nws_bgc-pp_anfc_7km-3D_P1D-m:
+    product: NWSHELF_ANALYSISFORECAST_BGC_004_002
+    title: daily-mean primary productivity (3D)
+    cadence: daily
+    domain: nw-shelf
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      nppv:
+        units: mg m-3 day-1
+        long_name: Net primary production of biomass expressed as carbon per unit volume in sea water
+
+  cmems_mod_nws_bgc-pp_my_7km-3D_P1D-m:
+    product: NWSHELF_MULTIYEAR_BGC_004_011
+    title: daily-mean net primary production (3D)
+    cadence: daily
+    domain: nw-shelf
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      nppv:
+        units: mg m-3 day-1
+        long_name: Net primary production of biomass expressed as carbon per unit volume in sea water
+
+  cmems_mod_nws_bgc-pp_my_7km-3D_P1M-m:
+    product: NWSHELF_MULTIYEAR_BGC_004_011
+    title: monthly-mean net primary production (3D)
+    cadence: monthly
+    domain: nw-shelf
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      nppv:
+        units: mg m-3 day-1
+        long_name: Net primary production of biomass expressed as carbon per unit volume in sea water
+
+  cmems_mod_nws_bgc-si_anfc_7km-3D_P1D-m:
+    product: NWSHELF_ANALYSISFORECAST_BGC_004_002
+    title: daily-mean total silicate (3D)
+    cadence: daily
+    domain: nw-shelf
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      si:
+        units: mmol m-3
+        long_name: Mole concentration of silicate in sea water
+
+  cmems_mod_nws_bgc-spco2_anfc_7km-2D_P1D-m:
+    product: NWSHELF_ANALYSISFORECAST_BGC_004_002
+    title: daily-mean spCO2 (2D)
+    cadence: daily
+    domain: nw-shelf
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      spco2:
+        units: Pa
+        long_name: Surface partial pressure of carbon dioxide in sea water
+
+  cmems_mod_nws_bgc-spco2_my_7km-2D_P1D-m:
+    product: NWSHELF_MULTIYEAR_BGC_004_011
+    title: daily-mean spCO2 (2D)
+    cadence: daily
+    domain: nw-shelf
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      spco2:
+        units: Pa
+        long_name: Surface partial pressure of carbon dioxide in sea water
+
+  cmems_mod_nws_bgc-spco2_my_7km-2D_P1M-m:
+    product: NWSHELF_MULTIYEAR_BGC_004_011
+    title: monthly-mean spCO2 (2D)
+    cadence: monthly
+    domain: nw-shelf
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      spco2:
+        units: Pa
+        long_name: Surface partial pressure of carbon dioxide in sea water
+
+  cmems_mod_nws_bgc-talk_anfc_7km-3D_P1D-m:
+    product: NWSHELF_ANALYSISFORECAST_BGC_004_002
+    title: daily-mean total alkalinity (3D)
+    cadence: daily
+    domain: nw-shelf
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      talk:
+        units: mmol m-3
+        long_name: Sea water alkalinity expressed as mole equivalent
+
+  cmems_mod_nws_bgc-zeu_anfc_7km-2D_P1D-m:
+    product: NWSHELF_ANALYSISFORECAST_BGC_004_002
+    title: daily-mean euphotic zone depth (2D)
+    cadence: daily
+    domain: nw-shelf
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      zeu:
+        units: m
+        long_name: Euphotic zone depth
+
+  cmems_mod_nws_bgc_anfc_7km-3D_static:
+    product: NWSHELF_ANALYSISFORECAST_BGC_004_002
+    title: cmems_mod_nws_bgc_anfc_7km-3D_static
+    cadence: irregular
+    domain: nw-shelf
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      deptho:
+        units: m
+        long_name: Sea floor depth below geoid
+      deptho_lev:
+        units: '1'
+        long_name: Model level number at sea floor
+      mask:
+        units: ''
+        long_name: Sea binary mask
+
+  cmems_mod_nws_bgc_my_7km-3D_static:
+    product: NWSHELF_MULTIYEAR_BGC_004_011
+    title: cmems_mod_nws_bgc_my_7km-3D_static
+    cadence: irregular
+    domain: nw-shelf
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      deptho:
+        units: m
+        long_name: Sea floor depth below geoid
+      deptho_lev_interp:
+        units: '1'
+        long_name: Model level number at sea floor
+      mask:
+        units: '1'
+        long_name: Sea binary mask
+
+  cmems_mod_nws_phy-bottomt_anfc_1.5km-2D_P1D-m:
+    product: NWSHELF_ANALYSISFORECAST_PHY_004_013
+    title: daily-mean seabed temperature (2D)
+    cadence: daily
+    domain: nw-shelf
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      bottomT:
+        units: degrees_C
+        long_name: Sea water potential temperature at sea floor
+
+  cmems_mod_nws_phy-bottomt_anfc_1.5km-2D_PT1H-i:
+    product: NWSHELF_ANALYSISFORECAST_PHY_004_013
+    title: hourly-instantaneous seabed temperature (2D)
+    cadence: hourly
+    domain: nw-shelf
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      bottomT:
+        units: degrees_C
+        long_name: Sea water potential temperature at sea floor
+
+  cmems_mod_nws_phy-bottomt_anfc_7km-2D_P1D-m:
+    product: NWSHELF_ANALYSISFORECAST_PHY_LR_004_001
+    title: daily-mean seabed temperature (2D)
+    cadence: daily
+    domain: nw-shelf
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      bottomT:
+        units: degrees_C
+        long_name: Sea water potential temperature at sea floor
+
+  cmems_mod_nws_phy-bottomt_my_7km-2D_P1D-m:
+    product: NWSHELF_MULTIYEAR_PHY_004_009
+    title: daily-mean seabed temperature (2D)
+    cadence: daily
+    domain: nw-shelf
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      bottomT:
+        units: degrees_C
+        long_name: Sea water potential temperature at sea floor
+
+  cmems_mod_nws_phy-bottomt_my_7km-2D_P1M-m:
+    product: NWSHELF_MULTIYEAR_PHY_004_009
+    title: monthly-mean seabed temperature (2D)
+    cadence: monthly
+    domain: nw-shelf
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      bottomT:
+        units: degrees_C
+        long_name: Sea water potential temperature at sea floor
+
+  cmems_mod_nws_phy-bottomt_my_7km-2D_PT1H-i:
+    product: NWSHELF_MULTIYEAR_PHY_004_009
+    title: hourly-instantaneous seabed temperature (2D)
+    cadence: hourly
+    domain: nw-shelf
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      bottomT:
+        units: degrees_C
+        long_name: Sea water potential temperature at sea floor
+
+  cmems_mod_nws_phy-cur_anfc_1.5km-2D_PT15M-i:
+    product: NWSHELF_ANALYSISFORECAST_PHY_004_013
+    title: 15minute-instantaneous horizontal velocity (2D)
+    cadence: irregular
+    domain: nw-shelf
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      uo:
+        units: m s-1
+        long_name: Eastward sea water velocity
+      vo:
+        units: m s-1
+        long_name: Northward sea water velocity
+
+  cmems_mod_nws_phy-cur_anfc_1.5km-2D_PT1H-i:
+    product: NWSHELF_ANALYSISFORECAST_PHY_004_013
+    title: hourly-instantaneous horizontal velocity (2D)
+    cadence: hourly
+    domain: nw-shelf
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      uo:
+        units: m s-1
+        long_name: Eastward sea water velocity
+      vo:
+        units: m s-1
+        long_name: Northward sea water velocity
+
+  cmems_mod_nws_phy-cur_anfc_1.5km-3D_P1D-m:
+    product: NWSHELF_ANALYSISFORECAST_PHY_004_013
+    title: daily-mean velocity (3D)
+    cadence: daily
+    domain: nw-shelf
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      ubar:
+        units: m s-1
+        long_name: Barotropic eastward sea water velocity
+      uo:
+        units: m s-1
+        long_name: Eastward sea water velocity
+      vbar:
+        units: m s-1
+        long_name: Barotropic northward sea water velocity
+      vo:
+        units: m s-1
+        long_name: Northward sea water velocity
+      wo:
+        units: m s-1
+        long_name: Upward sea water velocity
+
+  cmems_mod_nws_phy-cur_anfc_1.5km-3D_PT1H-i:
+    product: NWSHELF_ANALYSISFORECAST_PHY_004_013
+    title: hourly-instantaneous velocity (3D)
+    cadence: hourly
+    domain: nw-shelf
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      ubar:
+        units: m s-1
+        long_name: Barotropic eastward sea water velocity
+      uo:
+        units: m s-1
+        long_name: Eastward sea water velocity
+      vbar:
+        units: m s-1
+        long_name: Barotropic northward sea water velocity
+      vo:
+        units: m s-1
+        long_name: Northward sea water velocity
+      wo:
+        units: m s-1
+        long_name: Upward sea water velocity
+
+  cmems_mod_nws_phy-mld_anfc_1.5km-2D_P1D-m:
+    product: NWSHELF_ANALYSISFORECAST_PHY_004_013
+    title: daily-mean mixed layer depth (2D)
+    cadence: daily
+    domain: nw-shelf
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      mlotst:
+        units: m
+        long_name: Ocean mixed layer thickness defined by sigma theta
+
+  cmems_mod_nws_phy-mld_anfc_1.5km-2D_PT1H-i:
+    product: NWSHELF_ANALYSISFORECAST_PHY_004_013
+    title: hourly-instantaneous mixed layer depth (2D)
+    cadence: hourly
+    domain: nw-shelf
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      mlotst:
+        units: m
+        long_name: Ocean mixed layer thickness defined by sigma theta
+
+  cmems_mod_nws_phy-mld_anfc_7km-2D_P1D-m:
+    product: NWSHELF_ANALYSISFORECAST_PHY_LR_004_001
+    title: daily-mean mixed layer depth (2D)
+    cadence: daily
+    domain: nw-shelf
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      mlotst:
+        units: m
+        long_name: Ocean mixed layer thickness defined by sigma theta
+
+  cmems_mod_nws_phy-mld_my_7km-2D_P1D-m:
+    product: NWSHELF_MULTIYEAR_PHY_004_009
+    title: daily-mean mixed layer depth (2D)
+    cadence: daily
+    domain: nw-shelf
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      mlotst:
+        units: m
+        long_name: Ocean mixed layer thickness defined by sigma theta
+
+  cmems_mod_nws_phy-mld_my_7km-2D_P1M-m:
+    product: NWSHELF_MULTIYEAR_PHY_004_009
+    title: monthly-mean mixed layer depth (2D)
+    cadence: monthly
+    domain: nw-shelf
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      mlotst:
+        units: m
+        long_name: Ocean mixed layer thickness defined by sigma theta
+
+  cmems_mod_nws_phy-mld_my_7km-2D_PT1H-i:
+    product: NWSHELF_MULTIYEAR_PHY_004_009
+    title: hourly-instantaneous mixed layer depth (2D)
+    cadence: hourly
+    domain: nw-shelf
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      mlotst:
+        units: m
+        long_name: Ocean mixed layer thickness defined by sigma theta
+
+  cmems_mod_nws_phy-s_my_7km-3D_P1D-m:
+    product: NWSHELF_MULTIYEAR_PHY_004_009
+    title: daily-mean salinity (3D)
+    cadence: daily
+    domain: nw-shelf
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      so:
+        units: 1e-3
+        long_name: Sea water salinity
+
+  cmems_mod_nws_phy-s_my_7km-3D_P1M-m:
+    product: NWSHELF_MULTIYEAR_PHY_004_009
+    title: monthly-mean salinity (3D)
+    cadence: monthly
+    domain: nw-shelf
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      so:
+        units: 1e-3
+        long_name: Sea water salinity
+
+  cmems_mod_nws_phy-sal_anfc_1.5km-3D_P1D-m:
+    product: NWSHELF_ANALYSISFORECAST_PHY_004_013
+    title: daily-mean salinity (3D)
+    cadence: daily
+    domain: nw-shelf
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      so:
+        units: 1e-3
+        long_name: Sea water salinity
+
+  cmems_mod_nws_phy-sal_anfc_1.5km-3D_PT1H-i:
+    product: NWSHELF_ANALYSISFORECAST_PHY_004_013
+    title: hourly-instantaneous salinity (3D)
+    cadence: hourly
+    domain: nw-shelf
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      so:
+        units: 1e-3
+        long_name: Sea water salinity
+
+  cmems_mod_nws_phy-sal_anfc_7km-3D_P1D-m:
+    product: NWSHELF_ANALYSISFORECAST_PHY_LR_004_001
+    title: daily-mean salinity (3D)
+    cadence: daily
+    domain: nw-shelf
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      so:
+        units: 1e-3
+        long_name: Sea water salinity
+
+  cmems_mod_nws_phy-ssh_anfc_1.5km-2D_PT15M-i:
+    product: NWSHELF_ANALYSISFORECAST_PHY_004_013
+    title: 15minute-instantaneous SSH (2D)
+    cadence: irregular
+    domain: nw-shelf
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      zos:
+        units: m
+        long_name: Sea surface height above geoid
+
+  cmems_mod_nws_phy-ssh_anfc_1.5km-2D_PT1H-i:
+    product: NWSHELF_ANALYSISFORECAST_PHY_004_013
+    title: hourly-instantaneous SSH (2D)
+    cadence: hourly
+    domain: nw-shelf
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      zos:
+        units: m
+        long_name: Sea surface height above geoid
+
+  cmems_mod_nws_phy-ssh_anfc_7km-2D_P1D-m:
+    product: NWSHELF_ANALYSISFORECAST_PHY_LR_004_001
+    title: daily-mean SSH (2D)
+    cadence: daily
+    domain: nw-shelf
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      zos:
+        units: m
+        long_name: Sea surface height above geoid
+
+  cmems_mod_nws_phy-ssh_my_7km-2D_P1D-m:
+    product: NWSHELF_MULTIYEAR_PHY_004_009
+    title: daily-mean SSH (2D)
+    cadence: daily
+    domain: nw-shelf
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      zos:
+        units: m
+        long_name: Sea surface height above geoid
+
+  cmems_mod_nws_phy-ssh_my_7km-2D_P1M-m:
+    product: NWSHELF_MULTIYEAR_PHY_004_009
+    title: monthly-mean SSH (2D)
+    cadence: monthly
+    domain: nw-shelf
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      zos:
+        units: m
+        long_name: Sea surface height above geoid
+
+  cmems_mod_nws_phy-ssh_my_7km-2D_PT1H-i:
+    product: NWSHELF_MULTIYEAR_PHY_004_009
+    title: hourly-instantaneous SSH (2D)
+    cadence: hourly
+    domain: nw-shelf
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      zos:
+        units: m
+        long_name: Sea surface height above geoid
+
+  cmems_mod_nws_phy-sss_anfc_1.5km-2D_PT1H-i:
+    product: NWSHELF_ANALYSISFORECAST_PHY_004_013
+    title: hourly-instantaneous surface salinity (2D)
+    cadence: hourly
+    domain: nw-shelf
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      so:
+        units: 1e-3
+        long_name: Sea water salinity
+
+  cmems_mod_nws_phy-sss_my_7km-2D_PT1H-i:
+    product: NWSHELF_MULTIYEAR_PHY_004_009
+    title: hourly-instantaneous surface salinity (2D)
+    cadence: hourly
+    domain: nw-shelf
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      so:
+        units: 1e-3
+        long_name: Sea water salinity
+
+  cmems_mod_nws_phy-sst_anfc_1.5km-2D_PT1H-i:
+    product: NWSHELF_ANALYSISFORECAST_PHY_004_013
+    title: hourly-instantaneous surface temperature (2D)
+    cadence: hourly
+    domain: nw-shelf
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      thetao:
+        units: degrees_C
+        long_name: Sea water potential temperature
+
+  cmems_mod_nws_phy-sst_my_7km-2D_PT1H-i:
+    product: NWSHELF_MULTIYEAR_PHY_004_009
+    title: hourly-instantaneous surface temperature (2D)
+    cadence: hourly
+    domain: nw-shelf
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      thetao:
+        units: degrees_C
+        long_name: Sea water potential temperature
+
+  cmems_mod_nws_phy-t_my_7km-3D_P1D-m:
+    product: NWSHELF_MULTIYEAR_PHY_004_009
+    title: daily-mean potential temperature (3D)
+    cadence: daily
+    domain: nw-shelf
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      thetao:
+        units: degrees_C
+        long_name: Sea water potential temperature
+
+  cmems_mod_nws_phy-t_my_7km-3D_P1M-m:
+    product: NWSHELF_MULTIYEAR_PHY_004_009
+    title: monthly-mean potential temperature (3D)
+    cadence: monthly
+    domain: nw-shelf
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      thetao:
+        units: degrees_C
+        long_name: Sea water potential temperature
+
+  cmems_mod_nws_phy-tem_anfc_1.5km-3D_P1D-m:
+    product: NWSHELF_ANALYSISFORECAST_PHY_004_013
+    title: daily-mean potential temperature (3D)
+    cadence: daily
+    domain: nw-shelf
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      thetao:
+        units: degrees_C
+        long_name: Sea water potential temperature
+
+  cmems_mod_nws_phy-tem_anfc_1.5km-3D_PT1H-i:
+    product: NWSHELF_ANALYSISFORECAST_PHY_004_013
+    title: hourly-instantaneous potential temperature (3D)
+    cadence: hourly
+    domain: nw-shelf
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      thetao:
+        units: degrees_C
+        long_name: Sea water potential temperature
+
+  cmems_mod_nws_phy-tem_anfc_7km-3D_P1D-m:
+    product: NWSHELF_ANALYSISFORECAST_PHY_LR_004_001
+    title: daily-mean potential temperature (3D)
+    cadence: daily
+    domain: nw-shelf
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      thetao:
+        units: degrees_C
+        long_name: Sea water potential temperature
+
+  cmems_mod_nws_phy-uv_anfc_7km-3D_P1D-m:
+    product: NWSHELF_ANALYSISFORECAST_PHY_LR_004_001
+    title: daily-mean horizontal velocity (3D)
+    cadence: daily
+    domain: nw-shelf
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      uo:
+        units: m s-1
+        long_name: Eastward sea water velocity
+      vo:
+        units: m s-1
+        long_name: Northward sea water velocity
+
+  cmems_mod_nws_phy-uv_my_7km-2D_PT1H-i:
+    product: NWSHELF_MULTIYEAR_PHY_004_009
+    title: hourly-instantaneous horizontal velocity (2D)
+    cadence: hourly
+    domain: nw-shelf
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      uo:
+        units: m s-1
+        long_name: Eastward sea water velocity
+      vo:
+        units: m s-1
+        long_name: Northward sea water velocity
+
+  cmems_mod_nws_phy-uv_my_7km-3D_P1D-m:
+    product: NWSHELF_MULTIYEAR_PHY_004_009
+    title: daily-mean horizontal velocity (3D)
+    cadence: daily
+    domain: nw-shelf
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      uo:
+        units: m s-1
+        long_name: Eastward sea water velocity
+      vo:
+        units: m s-1
+        long_name: Northward sea water velocity
+
+  cmems_mod_nws_phy-uv_my_7km-3D_P1M-m:
+    product: NWSHELF_MULTIYEAR_PHY_004_009
+    title: monthly-mean horizontal velocity (3D)
+    cadence: monthly
+    domain: nw-shelf
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      uo:
+        units: m s-1
+        long_name: Eastward sea water velocity
+      vo:
+        units: m s-1
+        long_name: Northward sea water velocity
+
+  cmems_mod_nws_phy_anfc_1.5km_static:
+    product: NWSHELF_ANALYSISFORECAST_PHY_004_013
+    title: cmems_mod_nws_phy_anfc_1.5km_static
+    cadence: irregular
+    domain: nw-shelf
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      deptho:
+        units: ''
+        long_name: Sea floor depth below geoid
+      deptho_lev:
+        units: '1'
+        long_name: Model level number at sea floor
+      mask:
+        units: ''
+        long_name: Sea binary mask
+
+  cmems_mod_nws_phy_anfc_7km-3D_static:
+    product: NWSHELF_ANALYSISFORECAST_PHY_LR_004_001
+    title: cmems_mod_nws_phy_anfc_7km-3D_static
+    cadence: irregular
+    domain: nw-shelf
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      deptho:
+        units: m
+        long_name: Sea floor depth below geoid
+      deptho_lev:
+        units: '1'
+        long_name: Model level number at sea floor
+      mask:
+        units: ''
+        long_name: Sea binary mask
+
+  cmems_mod_nws_phy_my_7km-3D_static:
+    product: NWSHELF_MULTIYEAR_PHY_004_009
+    title: cmems_mod_nws_phy_my_7km-3D_static
+    cadence: irregular
+    domain: nw-shelf
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      deptho:
+        units: m
+        long_name: Sea floor depth below geoid
+      deptho_lev_interp:
+        units: '1'
+        long_name: Model level number at sea floor
+      mask:
+        units: '1'
+        long_name: Sea binary mask
+
+  cmems_mod_nws_wav_anfc_1.5km_PT1H-i:
+    product: NWSHELF_ANALYSISFORECAST_WAV_004_014
+    title: hourly-instantaneous wave
+    cadence: hourly
+    domain: nw-shelf
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      VCMX:
+        units: m
+        long_name: Sea surface wave maximum height
+      VHM0:
+        units: m
+        long_name: Sea surface wave significant height
+      VHM0_SW1:
+        units: m
+        long_name: Sea surface primary swell wave significant height
+      VHM0_SW2:
+        units: m
+        long_name: Sea surface secondary swell wave significant height
+      VHM0_WW:
+        units: m
+        long_name: Sea surface wind wave significant height
+      VMDR:
+        units: degree
+        long_name: Sea surface wave from direction
+      VMDR_SW1:
+        units: degree
+        long_name: Sea surface primary swell wave from direction
+      VMDR_SW2:
+        units: degree
+        long_name: Sea surface secondary swell wave from direction
+      VMDR_WW:
+        units: degree
+        long_name: Sea surface wind wave from direction
+      VMXL:
+        units: m
+        long_name: Sea surface wave maximum crest height
+      VPED:
+        units: degree
+        long_name: Sea surface wave from direction at variance spectral density maximum
+      VSDX:
+        units: m s-1
+        long_name: Sea surface wave stokes drift x velocity
+      VSDY:
+        units: m s-1
+        long_name: Sea surface wave stokes drift y velocity
+      VTM01_SW1:
+        units: s
+        long_name: Sea surface primary swell wave mean period
+      VTM01_SW2:
+        units: s
+        long_name: Sea surface secondary swell wave mean period
+      VTM01_WW:
+        units: s
+        long_name: Sea surface wind wave mean period
+      VTM02:
+        units: s
+        long_name: Sea surface wave mean period from variance spectral density second frequency moment
+      VTM10:
+        units: s
+        long_name: Sea surface wave mean period from variance spectral density inverse frequency moment
+      VTPK:
+        units: s
+        long_name: Sea surface wave period at variance spectral density maximum
+      forecast_period:
+        units: s
+        long_name: Forecast period
+
+  cmems_mod_nws_wav_anfc_1.5km_static:
+    product: NWSHELF_ANALYSISFORECAST_WAV_004_014
+    title: cmems_mod_nws_wav_anfc_1.5km_static
+    cadence: irregular
+    domain: nw-shelf
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      deptho:
+        units: ''
+        long_name: Sea floor depth below geoid
+      deptho_lev:
+        units: '1'
+        long_name: Model level number at sea floor
+      mask:
+        units: ''
+        long_name: Sea binary mask
+
+  cmems_mod_nws_wav_my_1.5km-3D_static:
+    product: NWSHELF_REANALYSIS_WAV_004_015
+    title: cmems_mod_nws_wav_my_1.5km-3D_static
+    cadence: irregular
+    domain: nw-shelf
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      deptho:
+        units: m
+        long_name: Sea floor depth below geoid
+      mask:
+        units: '1'
+        long_name: Sea binary mask
+
+  cmems_obs-oc_nws_bgc-optics_nrt_l3-hr-mosaic_P1D-m:
+    product: OCEANCOLOUR_NWS_BGC_HR_L3_NRT_009_203
+    title: CMEMS HR-OC North West Shelf Region optical (rrs, bbp) daily observations mosaic
+    cadence: daily
+    domain: nw-shelf
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      BBP443:
+        units: m-1
+        long_name: Volume backwards scattering coefficient of radiative flux in sea water
+      BBP492:
+        units: m-1
+        long_name: Volume backwards scattering coefficient of radiative flux in sea water
+      BBP560:
+        units: m-1
+        long_name: Volume backwards scattering coefficient of radiative flux in sea water
+      BBP665:
+        units: m-1
+        long_name: Volume backwards scattering coefficient of radiative flux in sea water
+      BBP704:
+        units: m-1
+        long_name: Volume backwards scattering coefficient of radiative flux in sea water
+      BBP740:
+        units: m-1
+        long_name: Volume backwards scattering coefficient of radiative flux in sea water
+      BBP783:
+        units: m-1
+        long_name: Volume backwards scattering coefficient of radiative flux in sea water
+      BBP865:
+        units: m-1
+        long_name: Volume backwards scattering coefficient of radiative flux in sea water
+      RRS443:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS443_UNC:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS492:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS492_UNC:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS560:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS560_UNC:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS665:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS665_UNC:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS704:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS704_UNC:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS740:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS740_UNC:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS783:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS783_UNC:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS865:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS865_UNC:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+
+  cmems_obs-oc_nws_bgc-optics_nrt_l4-hr-mosaic_P1D-m:
+    product: OCEANCOLOUR_NWS_BGC_HR_L4_NRT_009_209
+    title: CMEMS HR-OC North West Shelf Region optical (rrs, bbp) daily interpolated observations
+    cadence: daily
+    domain: nw-shelf
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      BBP443:
+        units: m-1
+        long_name: Volume backwards scattering coefficient of radiative flux in sea water
+
+  cmems_obs-oc_nws_bgc-optics_nrt_l4-hr-mosaic_P1M-m:
+    product: OCEANCOLOUR_NWS_BGC_HR_L4_NRT_009_209
+    title: CMEMS HR-OC North West Shelf Region optical (rrs, bbp) monthly averaged observations
+    cadence: monthly
+    domain: nw-shelf
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      BBP443:
+        units: m-1
+        long_name: Volume backwards scattering coefficient of radiative flux in sea water
+      BBP443_count:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      BBP443_error:
+        units: m-1
+        long_name: Volume backwards scattering coefficient of radiative flux in sea water standard error
+
+  cmems_obs-oc_nws_bgc-tur-spm-chl_nrt_l4-hr-mosaic_P1M-m:
+    product: OCEANCOLOUR_NWS_BGC_HR_L4_NRT_009_209
+    title: CMEMS HR-OC North West Shelf Region transparency (spm, tur) and geophysical (chl)
+    cadence: monthly
+    domain: nw-shelf
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      CHL:
+        units: mg m-3
+        long_name: Mass concentration of chlorophyll a in sea water
+      CHL_count:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      CHL_error:
+        units: mg m-3
+        long_name: Mass concentration of chlorophyll a in sea water standard error
+      SPM:
+        units: g m-3
+        long_name: Mass concentration of suspended matter in sea water
+      SPM_count:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      SPM_error:
+        units: g m-3
+        long_name: Mass concentration of suspended matter in sea water standard error
+      TUR:
+        units: FNU
+        long_name: Sea water turbidity
+      TUR_count:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      TUR_error:
+        units: FNU
+        long_name: Sea water turbidity standard error
+
+  cmems_obs_oc_nws_bgc_tur-spm-chl_nrt_l3-hr-mosaic_P1D-m:
+    product: OCEANCOLOUR_NWS_BGC_HR_L3_NRT_009_203
+    title: CMEMS HR-OC North West Shelf Region transparency (spm, tur) and geophysical (chl)
+    cadence: daily
+    domain: nw-shelf
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      CHL:
+        units: mg m-3
+        long_name: Mass concentration of chlorophyll a in sea water
+      SPM:
+        units: g m-3
+        long_name: Mass concentration of suspended matter in sea water
+      TUR:
+        units: FNU
+        long_name: Sea water turbidity
+
+  cmems_obs_oc_nws_bgc_tur-spm-chl_nrt_l4-hr-mosaic_P1D-m:
+    product: OCEANCOLOUR_NWS_BGC_HR_L4_NRT_009_209
+    title: CMEMS HR-OC North West Shelf Region transparency (spm, tur) and geophysical (chl)
+    cadence: daily
+    domain: nw-shelf
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      CHL:
+        units: mg m-3
+        long_name: Mass concentration of chlorophyll a in sea water
+      SPM:
+        units: g m-3
+        long_name: Mass concentration of suspended matter in sea water
+      TUR:
+        units: FNU
+        long_name: Sea water turbidity

@@ -271,56 +271,77 @@ class TestEmitDatasetStanza:
         assert "title: My Product Title" in stanza
 
 
-class TestRenderAvailableProductsBlock:
-    """`available_products:` block formatter."""
+class TestCatalogFileFor:
+    """Per-file routing of a dataset by its product_id."""
+
+    @pytest.mark.parametrize(
+        "product_id, expected",
+        [
+            ("GLOBAL_MULTIYEAR_PHY_001_030", "global-physics"),
+            ("GLOBAL_MULTIYEAR_BGC_001_029", "global-biogeochem"),
+            ("OCEANCOLOUR_GLO_BGC_L4_MY_009_104", "global-biogeochem"),
+            ("GLOBAL_ANALYSISFORECAST_WAV_001_027", "global-wave"),
+            ("WIND_GLO_PHY_L4_NRT_012_004", "global-wind"),
+            ("SST_GLO_SST_L4_NRT_OBSERVATIONS_010_001", "global-sst"),
+            ("SEALEVEL_GLO_PHY_L4_MY_008_047", "global-sealevel"),
+            ("INSITU_GLO_PHY_TS_OBS_013_001", "global-observations"),
+            ("MULTIOBS_GLO_PHY_S_SURFACE_MYNRT_015_013", "global-observations"),
+            ("MEDSEA_MULTIYEAR_PHY_006_004", "mediterranean"),
+            ("ARCTIC_MULTIYEAR_PHY_002_003", "arctic"),
+            ("SEAICE_GLO_PHY_L4_NRT_011_014", "polar"),
+        ],
+    )
+    def test_routing(self, product_id: str, expected: str) -> None:
+        """Global datasets route to a theme file; regional ones to their domain."""
+        assert _helpers.catalog_file_for(product_id) == expected
+
+    def test_unrecognised_global_falls_to_other(self) -> None:
+        """A GLOBAL_ product with no theme token lands in global-other."""
+        assert _helpers.catalog_file_for("GLOBAL_MYSTERY_DATASET_000") == "global-other"
+
+
+class TestRenderAvailableDatasetsBlock:
+    """`available_datasets:` block formatter."""
 
     def test_basic_block(self) -> None:
         """Three ids render as a sorted bullet list with a header."""
-        block = _helpers.render_available_products_block(
-            ["GLOBAL_X", "ARCTIC_Y", "MEDSEA_Z"]
-        )
-        assert block.startswith("available_products:\n")
+        block = _helpers.render_available_datasets_block(["ds_x", "ds_a", "ds_m"])
+        assert block.startswith("available_datasets:\n")
         assert block.endswith("\n")
         body = block.splitlines()[1:]
-        assert body == ["  - ARCTIC_Y", "  - GLOBAL_X", "  - MEDSEA_Z"]
+        assert body == ["  - ds_a", "  - ds_m", "  - ds_x"]
 
     def test_deduplicates(self) -> None:
         """Duplicate ids are collapsed."""
-        block = _helpers.render_available_products_block(
-            ["A", "A", "B", "A"]
-        )
-        assert block.splitlines()[1:] == ["  - A", "  - B"]
+        block = _helpers.render_available_datasets_block(["a", "a", "b", "a"])
+        assert block.splitlines()[1:] == ["  - a", "  - b"]
 
     def test_empty_input(self) -> None:
-        """No products -> header line only."""
-        assert _helpers.render_available_products_block([]) == "available_products:\n"
+        """No datasets -> header line only."""
+        assert _helpers.render_available_datasets_block([]) == "available_datasets:\n"
 
 
-class TestSpliceAvailableProducts:
-    """In-place rewrite of the `available_products:` block."""
+class TestSpliceAvailableDatasets:
+    """In-place rewrite of the `available_datasets:` block in _index.yaml."""
 
     def test_replaces_existing_block(self) -> None:
         """The old block is removed and the new one substituted in."""
         original = (
-            "# header\n"
-            "available_products:\n"
+            "# header comment\n"
+            "available_datasets:\n"
             "  - OLD_A\n"
             "  - OLD_B\n"
-            "\n"
-            "datasets:\n"
-            "  ds-1:\n"
-            "    product: P\n"
         )
-        new_block = "available_products:\n  - NEW_A\n  - NEW_B\n"
-        rewritten = _helpers.splice_available_products(original, new_block)
+        new_block = "available_datasets:\n  - NEW_A\n  - NEW_B\n"
+        rewritten = _helpers.splice_available_datasets(original, new_block)
         assert "OLD_A" not in rewritten
         assert "NEW_A" in rewritten
-        assert "datasets:\n  ds-1:\n    product: P\n" in rewritten
+        assert "# header comment" in rewritten
 
     def test_missing_block_raises(self) -> None:
-        """A YAML without an available_products header errors clearly."""
-        with pytest.raises(ValueError, match="available_products"):
-            _helpers.splice_available_products("datasets:\n  ds-1: {}\n", "")
+        """Text without an available_datasets header errors clearly."""
+        with pytest.raises(ValueError, match="available_datasets"):
+            _helpers.splice_available_datasets("# just a comment\n", "")
 
 
 class TestFindDatasetStanzaSpan:
@@ -377,7 +398,7 @@ class TestAppendStanzasToDatasetsBlock:
         """No `datasets:` -> ValueError, not silent append."""
         with pytest.raises(ValueError, match="datasets:"):
             _helpers.append_stanzas_to_datasets_block(
-                "available_products: []\n", "  new: {}\n"
+                "available_datasets: []\n", "  new: {}\n"
             )
 
 

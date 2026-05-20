@@ -1,0 +1,374 @@
+# CMEMS curated catalog - global-wave slice.
+#
+# One slice of the per-domain split of the Copernicus Marine catalog.
+# The loader (earthlens.cmems.catalog.Catalog) merges every *.yaml in
+# this directory into one Catalog at construction time; dataset ids
+# must be unique across files. Stanzas are emitted by
+# tools/cmems/refresh_cmems_catalog.py from copernicusmarine.describe();
+# `cadence` is inferred from the dataset_id suffix and `domain` from
+# the product_id prefix. The `global` basin is sub-split by theme
+# (global-physics / global-biogeochem / global-sst / ...) to keep file
+# sizes balanced; the `domain:` field on every row below is still the
+# plain basin label. Where the toolbox exposes no standard_name for a
+# variable, the row carries `long_name: ''` with a TODO marker.
+#
+# Schema (per dataset):
+#   <dataset_id>:
+#     product: <product_id>
+#     title: <human-readable title>
+#     cadence: <daily|monthly|hourly|6hourly|climatology|irregular>
+#     domain: <global|mediterranean|arctic|...>
+#     temporal: { start: YYYY-MM-DD, end: YYYY-MM-DD }   # end null = NRT
+#     variables:
+#       <short_name>: { units: <CF units>, long_name: <CF long name> }
+
+datasets:
+
+  cmems_mod_glo_wav_anfc_0.083deg_PT3H-i:
+    product: GLOBAL_ANALYSISFORECAST_WAV_001_027
+    title: cmems_mod_glo_wav_anfc_0.083deg_PT3H-i_202411
+    cadence: irregular
+    domain: global
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      VCMX:
+        units: m
+        long_name: Sea surface wave maximum height
+      VHM0:
+        units: m
+        long_name: Sea surface wave significant height
+      VHM0_SW1:
+        units: m
+        long_name: Sea surface primary swell wave significant height
+      VHM0_SW2:
+        units: m
+        long_name: Sea surface secondary swell wave significant height
+      VHM0_WW:
+        units: m
+        long_name: Sea surface wind wave significant height
+      VMDR:
+        units: degree
+        long_name: Sea surface wave from direction
+      VMDR_SW1:
+        units: degree
+        long_name: Sea surface primary swell wave from direction
+      VMDR_SW2:
+        units: degree
+        long_name: Sea surface secondary swell wave from direction
+      VMDR_WW:
+        units: degree
+        long_name: Sea surface wind wave from direction
+      VMXL:
+        units: m
+        long_name: Sea surface wave maximum crest height
+      VPED:
+        units: degree
+        long_name: Sea surface wave from direction at variance spectral density maximum
+      VSDX:
+        units: m s-1
+        long_name: Sea surface wave stokes drift x velocity
+      VSDY:
+        units: m s-1
+        long_name: Sea surface wave stokes drift y velocity
+      VTM01_SW1:
+        units: s
+        long_name: Sea surface primary swell wave mean period
+      VTM01_SW2:
+        units: s
+        long_name: Sea surface secondary swell wave mean period
+      VTM01_WW:
+        units: s
+        long_name: Sea surface wind wave mean period
+      VTM02:
+        units: s
+        long_name: Sea surface wave mean period from variance spectral density second frequency moment
+      VTM10:
+        units: s
+        long_name: Sea surface wave mean period from variance spectral density inverse frequency moment
+      VTPK:
+        units: s
+        long_name: Sea surface wave period at variance spectral density maximum
+
+  cmems_mod_glo_wav_my_0.2deg-climatology_P1M-m:
+    product: GLOBAL_MULTIYEAR_WAV_001_032
+    title: Monthly climatology reference period 1993-2020
+    cadence: climatology
+    domain: global
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      VHM0:
+        units: m
+        long_name: Sea surface wave significant height
+      VTM02:
+        units: s
+        long_name: Sea surface wave mean period from variance spectral density second frequency moment
+      climatology_bounds:
+        units: hours since 1950-1-1
+        long_name: ''            # TODO: standard_name missing on describe()
+
+  cmems_mod_glo_wav_my_0.2deg_PT3H-i:
+    product: GLOBAL_MULTIYEAR_WAV_001_032
+    title: Mean fields from global wave model MFWAM of Meteo-France with ECMWF forcing
+    cadence: irregular
+    domain: global
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      VHM0:
+        units: m
+        long_name: Sea surface wave significant height
+      VHM0_SW1:
+        units: m
+        long_name: Sea surface primary swell wave significant height
+      VHM0_SW2:
+        units: m
+        long_name: Sea surface secondary swell wave significant height
+      VHM0_WW:
+        units: m
+        long_name: Sea surface wind wave significant height
+      VMDR:
+        units: degree
+        long_name: Sea surface wave from direction
+      VMDR_SW1:
+        units: degree
+        long_name: Sea surface primary swell wave from direction
+      VMDR_SW2:
+        units: degree
+        long_name: Sea surface secondary swell wave from direction
+      VMDR_WW:
+        units: degree
+        long_name: Sea surface wind wave from direction
+      VPED:
+        units: degree
+        long_name: Sea surface wave from direction at variance spectral density maximum
+      VSDX:
+        units: m s-1
+        long_name: Sea surface wave stokes drift x velocity
+      VSDY:
+        units: m s-1
+        long_name: Sea surface wave stokes drift y velocity
+      VTM01_SW1:
+        units: s
+        long_name: Sea surface primary swell wave mean period
+      VTM01_SW2:
+        units: s
+        long_name: Sea surface secondary swell wave mean period
+      VTM01_WW:
+        units: s
+        long_name: Sea surface wind wave mean period
+      VTM02:
+        units: s
+        long_name: Sea surface wave mean period from variance spectral density second frequency moment
+      VTM10:
+        units: s
+        long_name: Sea surface wave mean period from variance spectral density inverse frequency moment
+      VTPK:
+        units: s
+        long_name: Sea surface wave period at variance spectral density maximum
+
+  cmems_mod_glo_wav_my_0.2deg_static:
+    product: GLOBAL_MULTIYEAR_WAV_001_032
+    title: cmems_mod_glo_wav_my_0.2deg_static
+    cadence: irregular
+    domain: global
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      deptho:
+        units: m
+        long_name: Sea floor depth below geoid
+
+  cmems_mod_wav_anfc_0.083deg_static:
+    product: GLOBAL_ANALYSISFORECAST_WAV_001_027
+    title: cmems_mod_wav_anfc_0.083deg_static
+    cadence: irregular
+    domain: global
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      deptho:
+        units: m
+        long_name: Sea floor depth below geoid
+
+  cmems_obs-ins_glo_wav_my_na_PT1H:
+    product: INSITU_GLO_WAV_DISCRETE_MY_013_045
+    title: cmems_obs-ins_glo_wav_my_na_PT1H
+    cadence: hourly
+    domain: global
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      VAVH:
+        units: m
+        long_name: Sea surface wave significant height
+      VAVT:
+        units: s
+        long_name: Sea surface wave significant period
+      VCMX:
+        units: m
+        long_name: Sea surface wave maximum height
+      VDIR:
+        units: degree
+        long_name: Sea surface wave from direction
+      VEMH:
+        units: m
+        long_name: Sea surface wave maximum height
+      VEPK:
+        units: m2 s
+        long_name: Sea surface wave energy at variance spectral density maximum
+      VGHS:
+        units: m
+        long_name: Sea surface wave significant height
+      VGTA:
+        units: s
+        long_name: Sea surface wave mean period
+      VH110:
+        units: m
+        long_name: Sea surface wave mean height of highest tenth
+      VHM0:
+        units: m
+        long_name: Sea surface wave significant height
+      VHZA:
+        units: m
+        long_name: Sea surface wave mean height
+      VMDR:
+        units: degree
+        long_name: Sea surface wave from direction
+      VPED:
+        units: degree
+        long_name: Sea surface wave from direction at variance spectral density maximum
+      VPSP:
+        units: degree
+        long_name: Sea surface wave directional spread at variance spectral density maximum
+      VST1:
+        units: '1'
+        long_name: Sea surface wave maximum steepness
+      VT110:
+        units: s
+        long_name: Sea surface wave mean period of highest tenth
+      VTM02:
+        units: s
+        long_name: Sea surface wave mean period from variance spectral density second frequency moment
+      VTM10:
+        units: s
+        long_name: Sea surface wave mean period from variance spectral density inverse frequency moment
+      VTMX:
+        units: s
+        long_name: Sea surface wave maximum period
+      VTPK:
+        units: s
+        long_name: Sea surface wave period at variance spectral density maximum
+      VTZA:
+        units: s
+        long_name: Sea surface wave mean period
+      VTZM:
+        units: s
+        long_name: Sea surface wave period of highest wave
+      VZMX:
+        units: m
+        long_name: Sea surface wave maximum height
+
+  cmems_obs-ins_glo_wav_my_na_irr:
+    product: INSITU_GLO_WAV_DISCRETE_MY_013_045
+    title: cmems_obs-ins_glo_wav_my_na_irr
+    cadence: irregular
+    domain: global
+    temporal:
+      start: null            # TODO: pin from CMEMS portal / probe_cmems_netcdf.py
+      end: null              # null = NRT (rolling)
+    variables:
+      GDIR:
+        units: degree
+        long_name: Wind gust from direction
+      GSPD:
+        units: m s-1
+        long_name: Wind speed of gust
+      VAVH:
+        units: m
+        long_name: Sea surface wave significant height
+      VAVT:
+        units: s
+        long_name: Sea surface wave significant period
+      VCMX:
+        units: m
+        long_name: Sea surface wave maximum height
+      VDIR:
+        units: degree
+        long_name: Sea surface wave from direction
+      VEMH:
+        units: m
+        long_name: Sea surface wave maximum height
+      VEPK:
+        units: m2 s
+        long_name: Sea surface wave energy at variance spectral density maximum
+      VGHS:
+        units: m
+        long_name: Sea surface wave significant height
+      VGTA:
+        units: s
+        long_name: Sea surface wave mean period
+      VH110:
+        units: m
+        long_name: Sea surface wave mean height of highest tenth
+      VHM0:
+        units: m
+        long_name: Sea surface wave significant height
+      VHZA:
+        units: m
+        long_name: Sea surface wave mean height
+      VMDR:
+        units: degree
+        long_name: Sea surface wave from direction
+      VPED:
+        units: degree
+        long_name: Sea surface wave from direction at variance spectral density maximum
+      VPSP:
+        units: degree
+        long_name: Sea surface wave directional spread at variance spectral density maximum
+      VST1:
+        units: '1'
+        long_name: Sea surface wave maximum steepness
+      VT110:
+        units: s
+        long_name: Sea surface wave mean period of highest tenth
+      VTM02:
+        units: s
+        long_name: Sea surface wave mean period from variance spectral density second frequency moment
+      VTM10:
+        units: s
+        long_name: Sea surface wave mean period from variance spectral density inverse frequency moment
+      VTMX:
+        units: s
+        long_name: Sea surface wave maximum period
+      VTPK:
+        units: s
+        long_name: Sea surface wave period at variance spectral density maximum
+      VTZA:
+        units: s
+        long_name: Sea surface wave mean period
+      VTZM:
+        units: s
+        long_name: Sea surface wave period of highest wave
+      VZMX:
+        units: m
+        long_name: Sea surface wave maximum height
+      WDIR:
+        units: degree
+        long_name: Wind from direction
+      WSPD:
+        units: m s-1
+        long_name: Wind speed
+      WSPE:
+        units: m s-1
+        long_name: Eastward wind
+      WSPN:
+        units: m s-1
+        long_name: Northward wind

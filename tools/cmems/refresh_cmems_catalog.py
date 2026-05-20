@@ -32,35 +32,38 @@ Not part of the installed package.
 from __future__ import annotations
 
 import argparse
-import io
 import sys
 from pathlib import Path
 
+import yaml
+
 sys.path.insert(0, str(Path(__file__).parent))
 from _helpers import (  # noqa: E402
-    CATALOG_PATH,
+    CATALOG_DIR,
+    INDEX_PATH,
     append_stanzas_to_datasets_block,
+    catalog_file_for,
     compact_text,
     emit_dataset_stanza,
-    render_available_products_block,
-    splice_available_products,
+    render_available_datasets_block,
+    splice_available_datasets,
 )
 
 
 def _cmd_refresh(args: argparse.Namespace) -> int:
-    """Walk `cm.describe()`, rewrite `available_products:`, optionally emit stanzas.
+    """Walk `cm.describe()`, rewrite `available_datasets:`, optionally emit stanzas.
 
     Implements the `refresh` subcommand. Calls
     `copernicusmarine.describe(disable_progress_bar=True)` to get the
-    full live product index, replaces the YAML's
-    `available_products:` block in place, and (when
-    `args.with_datasets` is non-empty) writes one ready-to-paste
-    `datasets:` stanza per dataset under each listed product to
-    stdout.
+    full live catalogue, collects every dataset id across every
+    product, and replaces the `available_datasets:` block in
+    `catalog/_index.yaml` in place. When `args.with_datasets` is
+    non-empty, also writes one ready-to-paste `datasets:` stanza per
+    dataset under each listed product to stdout.
 
     Args:
-        args: Parsed argparse namespace. Honours `args.catalog`
-            (`Path` to `cmems_data_catalog.yaml`), `args.dry_run`
+        args: Parsed argparse namespace. Honours `args.index`
+            (`Path` to `catalog/_index.yaml`), `args.dry_run`
             (`bool` — when `True` the new block is printed instead
             of written), and `args.with_datasets`
             (`list[str] | None` of product ids).
@@ -75,7 +78,7 @@ def _cmd_refresh(args: argparse.Namespace) -> int:
 
             `pixi run -e dev python tools/cmems/refresh_cmems_catalog.py refresh`
 
-          rewrites `available_products:` in place.
+          rewrites `available_datasets:` in `_index.yaml` in place.
 
         - Dry-run with stanza emission:
 
@@ -91,24 +94,26 @@ def _cmd_refresh(args: argparse.Namespace) -> int:
         print(f"error fetching CMEMS catalogue: {exc}", file=sys.stderr)
         return 1
 
-    product_ids = sorted({p.product_id for p in catalogue.products})
-    print(f"collected {len(product_ids)} product ids from describe()")
+    dataset_ids = sorted(
+        {d.dataset_id for p in catalogue.products for d in p.datasets}
+    )
+    print(f"collected {len(dataset_ids)} dataset ids from describe()")
 
-    block = render_available_products_block(product_ids)
+    block = render_available_datasets_block(dataset_ids)
     if args.dry_run:
         sys.stdout.write(block)
     else:
-        text = args.catalog.read_text(encoding="utf-8")
+        text = args.index.read_text(encoding="utf-8")
         try:
-            new_text = splice_available_products(text, block)
+            new_text = splice_available_datasets(text, block)
         except ValueError as exc:
-            print(f"error rewriting {args.catalog}: {exc}", file=sys.stderr)
+            print(f"error rewriting {args.index}: {exc}", file=sys.stderr)
             return 1
         if new_text == text:
-            print(f"No changes — {args.catalog} already up to date.")
+            print(f"No changes — {args.index} already up to date.")
         else:
-            args.catalog.write_text(new_text, encoding="utf-8")
-            print(f"updated {args.catalog}")
+            args.index.write_text(new_text, encoding="utf-8")
+            print(f"updated {args.index}")
 
     if args.with_datasets:
         for pid in args.with_datasets:
@@ -134,14 +139,17 @@ def _cmd_add_ids(args: argparse.Namespace) -> int:
     Implements the `add-ids` subcommand. For each id in
     `args.dataset_ids` that is not already curated, calls
     `copernicusmarine.describe(dataset_id=...)`, emits the canonical
-    stanza, runs it through :func:`compact_text`, appends to the
-    YAML's `datasets:` block, then reloads via `Catalog.load()` so
-    any malformed stanza fails loud rather than silently corrupting
-    the file.
+    stanza, runs it through :func:`compact_text`, and appends it to
+    the per-domain catalog file chosen by :func:`catalog_file_for`
+    (creating the file with a `datasets:` header if it does not yet
+    exist). The dataset id is also added to `_index.yaml`'s
+    `available_datasets:` so the `curated ⊆ index` invariant holds.
+    Finally reloads via `Catalog.load()` so any malformed stanza
+    fails loud rather than silently corrupting the catalog.
 
     Args:
-        args: Parsed argparse namespace. Honours `args.catalog`
-            (`Path` to `cmems_data_catalog.yaml`) and
+        args: Parsed argparse namespace. Honours `args.catalog_dir`
+            (`Path` to the `catalog/` directory) and
             `args.dataset_ids` (`list[str]` of dataset ids to add).
 
     Returns:
@@ -153,14 +161,14 @@ def _cmd_add_ids(args: argparse.Namespace) -> int:
 
             `... add-ids cmems_mod_glo_phy_anfc_0.083deg_P1D-m`
 
-          appends a freshly-emitted stanza for the global NRT
-          analysis-forecast under `datasets:` and re-parses.
+          appends a freshly-emitted stanza to `catalog/global-physics.yaml`,
+          adds the id to `_index.yaml`, and re-parses.
         - Add several at once:
 
             `... add-ids ds_a ds_b ds_c`
 
-          fetches and appends each in turn; already-curated ids are
-          skipped with a note on stderr.
+          fetches and appends each to its per-domain file; already-
+          curated ids are skipped with a note on stderr.
     """
     import copernicusmarine as cm
 
@@ -168,7 +176,7 @@ def _cmd_add_ids(args: argparse.Namespace) -> int:
     from earthlens.cmems import Catalog
     from earthlens.cmems.catalog import clear_catalog_cache
 
-    cat = Catalog()
+    cat = Catalog.load(args.catalog_dir)
     existing = set(cat.datasets)
     fresh = [d for d in args.dataset_ids if d not in existing]
     skipped = sorted(set(args.dataset_ids) - set(fresh))
@@ -178,8 +186,8 @@ def _cmd_add_ids(args: argparse.Namespace) -> int:
         print("nothing to add — all ids already curated")
         return 0
 
-    raw = io.StringIO()
-    raw.write("\n# ---- paste under `datasets:` ----\n")
+    # Group emitted stanzas by their target per-domain file.
+    per_file: dict[str, list[str]] = {}
     appended = 0
     for ds_id in fresh:
         try:
@@ -198,20 +206,42 @@ def _cmd_add_ids(args: argparse.Namespace) -> int:
         if target is None:
             print(f"  ! {ds_id}: not in describe() response", file=sys.stderr)
             continue
-        raw.write(emit_dataset_stanza(product, target))
+        stem = catalog_file_for(product.product_id)
+        per_file.setdefault(stem, []).append(emit_dataset_stanza(product, target))
         appended += 1
 
     if appended == 0:
         print("nothing to append — every id failed describe()")
         return 1
 
-    cleaned = compact_text(raw.getvalue())
-    text = args.catalog.read_text(encoding="utf-8")
-    new_text = append_stanzas_to_datasets_block(text, cleaned)
-    args.catalog.write_text(new_text, encoding="utf-8")
+    # Add the fresh ids to _index.yaml FIRST, so the curated-subset
+    # invariant the loader enforces still holds when we re-parse below.
+    index_path = args.catalog_dir / "_index.yaml"
+    if index_path.exists():
+        index_text = index_path.read_text(encoding="utf-8")
+        current_index = set(yaml.safe_load(index_text).get("available_datasets") or [])
+        merged_ids = sorted(current_index | set(fresh))
+        index_path.write_text(
+            splice_available_datasets(
+                index_text, render_available_datasets_block(merged_ids)
+            ),
+            encoding="utf-8",
+        )
+
+    for stem, stanzas in per_file.items():
+        target_file = args.catalog_dir / f"{stem}.yaml"
+        cleaned = compact_text("".join(stanzas))
+        if target_file.exists():
+            new_text = append_stanzas_to_datasets_block(
+                target_file.read_text(encoding="utf-8"), cleaned
+            )
+        else:
+            new_text = f"datasets:\n\n{cleaned.rstrip(chr(10))}\n"
+        target_file.write_text(new_text, encoding="utf-8")
+        print(f"  appended {len(stanzas)} -> {target_file.name}")
 
     clear_catalog_cache()
-    cat2 = Catalog.load(args.catalog)
+    cat2 = Catalog.load(args.catalog_dir)
     print(f"appended {appended} stanzas — total curated: {len(cat2.datasets)}")
     return 0
 
@@ -265,7 +295,7 @@ def main(argv: list[str] | None = None) -> int:
         - Programmatic dispatch in tests:
 
             ```python
-            assert main(["refresh", "--dry-run", "--catalog", "path/to/yaml"]) == 0
+            assert main(["refresh", "--dry-run", "--index", "path/to/_index.yaml"]) == 0
             ```
     """
     parser = argparse.ArgumentParser(
@@ -276,18 +306,18 @@ def main(argv: list[str] | None = None) -> int:
 
     p_refresh = sub.add_parser(
         "refresh",
-        help="walk describe() + rewrite available_products: (+ optional --with-datasets stanzas)",
+        help="walk describe() + rewrite available_datasets: (+ optional --with-datasets stanzas)",
     )
     p_refresh.add_argument(
-        "--catalog",
+        "--index",
         type=Path,
-        default=CATALOG_PATH,
-        help="path to cmems_data_catalog.yaml",
+        default=INDEX_PATH,
+        help="path to catalog/_index.yaml",
     )
     p_refresh.add_argument(
         "--dry-run",
         action="store_true",
-        help="print the new available_products: block instead of writing",
+        help="print the new available_datasets: block instead of writing",
     )
     p_refresh.add_argument(
         "--with-datasets",
@@ -307,10 +337,10 @@ def main(argv: list[str] | None = None) -> int:
         metavar="DATASET_ID",
     )
     p_add.add_argument(
-        "--catalog",
+        "--catalog-dir",
         type=Path,
-        default=CATALOG_PATH,
-        help="path to cmems_data_catalog.yaml",
+        default=CATALOG_DIR,
+        help="path to the catalog/ directory",
     )
     p_add.set_defaults(func=_cmd_add_ids)
 
