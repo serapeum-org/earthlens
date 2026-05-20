@@ -1,0 +1,33 @@
+# FDSN-event provider dispatch table.
+#
+# Unlike the other earthlens backends, FDSN has no per-dataset catalog
+# to curate — it is a fixed query protocol. This file is the entire
+# "catalog": one row per seismic network, keyed by the user-facing name
+# passed in `variables=[...]`. Each `fdsn_id` is an obspy
+# `URL_MAPPINGS` key (verified against obspy 1.5.0); a future maintainer
+# adds a network (ISC, ORFEUS, GEONET, …) by hand-adding a row here.
+providers:
+  USGS:
+    fdsn_id: USGS
+    title: "USGS ComCat — global earthquake catalog (the canonical EQ source)"
+    needs_token: false
+    default_min_magnitude: 4.5
+    docs_url: https://earthquake.usgs.gov/fdsnws/event/1/
+  EMSC:
+    fdsn_id: EMSC
+    title: "EMSC seismicportal — European-Mediterranean, fast preliminary solutions"
+    needs_token: false
+    default_min_magnitude: 4.5
+    docs_url: https://www.seismicportal.eu/fdsnws/event/1/
+  INGV:
+    fdsn_id: INGV
+    title: "INGV — Italian seismic network and volcano monitoring"
+    needs_token: false
+    default_min_magnitude: 2.0
+    docs_url: https://webservices.ingv.it/fdsnws/event/1/
+  EARTHSCOPE:
+    fdsn_id: EARTHSCOPE
+    title: "EarthScope (ex-IRIS DMC) — global archive; 'IRIS' is the legacy alias"
+    needs_token: false
+    default_min_magnitude: 4.5
+    docs_url: https://service.earthscope.org/fdsnws/event/1/

@@ -1,0 +1,175 @@
+"""Unit + integration tests for `earthlens.fdsn.backend`."""
+
+from __future__ import annotations
+
+from pathlib import Path
+from typing import Callable
+
+import pytest
+from geopandas import GeoDataFrame
+from obspy.clients.fdsn.header import FDSNNoDataException
+from obspy.core.event import Catalog
+
+from earthlens.base import RemoteProduct, SpatialExtent, TemporalExtent
+from earthlens.fdsn import FDSN
+
+from .conftest import _FakeFdsn
+
+
+def _make_backend(tmp_path: Path, **overrides) -> FDSN:
+    """Construct an FDSN backend with sensible defaults for tests."""
+    params: dict[str, object] = dict(
+        start="2024-01-01",
+        end="2024-01-31",
+        variables=["USGS"],
+        lat_lim=[30.0, 45.0],
+        lon_lim=[130.0, 145.0],
+        path=str(tmp_path),
+    )
+    params.update(overrides)
+    return FDSN(**params)
+
+
+@pytest.mark.fdsn
+class TestFDSNConstruction:
+    """`__init__` wiring: OUTPUT_KIND, space, time, defaults."""
+
+    def test_output_kind_is_vector(self):
+        """FDSN declares vector output (point features, not gridded)."""
+        assert (
+            FDSN.OUTPUT_KIND == "vector"
+        ), f"FDSN.OUTPUT_KIND must be 'vector', got {FDSN.OUTPUT_KIND!r}"
+
+    def test_space_captured(self, tmp_path: Path):
+        """The bbox lands on `self.space` as a SpatialExtent."""
+        backend = _make_backend(tmp_path)
+        assert isinstance(backend.space, SpatialExtent)
+        assert backend.space.south == 30.0
+        assert backend.space.east == 145.0
+
+    def test_time_resolution_sentinel(self, tmp_path: Path):
+        """The temporal resolution is the FDSN 'all' sentinel."""
+        backend = _make_backend(tmp_path)
+        assert isinstance(backend.time, TemporalExtent)
+        assert (
+            backend.time.resolution == "all"
+        ), f"expected 'all' sentinel, got {backend.time.resolution!r}"
+
+    def test_empty_variables_defaults_to_usgs(self, tmp_path: Path):
+        """An empty `variables` list defaults to ['USGS']."""
+        backend = _make_backend(tmp_path, variables=[])
+        assert backend.vars == ["USGS"], f"expected ['USGS'], got {backend.vars}"
+
+    def test_invalid_file_format_rejected(self, tmp_path: Path):
+        """An unsupported file_format raises at construction."""
+        with pytest.raises(ValueError, match="file_format must be one of"):
+            _make_backend(tmp_path, file_format="shp")
+
+
+@pytest.mark.fdsn
+class TestFDSNSearch:
+    """`_search` builds one product per requested network."""
+
+    def test_one_product_per_provider(self, tmp_path: Path):
+        """Two networks yield two products, in request order."""
+        backend = _make_backend(tmp_path, variables=["USGS", "EMSC"])
+        products = backend._search()
+        assert [p.id for p in products] == ["USGS", "EMSC"]
+        assert all(isinstance(p, RemoteProduct) for p in products)
+
+    def test_product_carries_fdsn_id(self, tmp_path: Path):
+        """The resolved obspy URL_MAPPINGS key rides on product metadata."""
+        product = _make_backend(tmp_path, variables=["USGS"])._search()[0]
+        assert product.metadata["fdsn_id"] == "USGS"
+
+    def test_unknown_provider_raises(self, tmp_path: Path):
+        """A network key absent from the catalog raises with a hint."""
+        backend = _make_backend(tmp_path, variables=["USG"])
+        with pytest.raises(ValueError, match="Did you mean 'USGS'"):
+            backend._search()
+
+
+@pytest.mark.fdsn
+class TestFDSNFetch:
+    """`_fetch` queries each network and maps results to FeatureCollections."""
+
+    def test_returns_feature_collections(self, tmp_path: Path, fake_fdsn: _FakeFdsn):
+        """`_fetch` returns one FeatureCollection per product."""
+        backend = _make_backend(tmp_path)
+        results = backend._fetch(backend._search())
+        assert len(results) == 1
+        assert isinstance(results[0], GeoDataFrame)
+
+    def test_forwards_bbox_dates_magnitude(self, tmp_path: Path, fake_fdsn: _FakeFdsn):
+        """bbox, time window, and min_magnitude reach `get_events`."""
+        backend = _make_backend(tmp_path, min_magnitude=5.0)
+        backend._fetch(backend._search())
+        _, kwargs = fake_fdsn.calls[0]
+        assert kwargs["minlatitude"] == 30.0
+        assert kwargs["maxlongitude"] == 145.0
+        assert kwargs["minmagnitude"] == 5.0
+        assert str(kwargs["starttime"]).startswith("2024-01-01")
+        assert str(kwargs["endtime"]).startswith("2024-01-31")
+
+    def test_nodata_yields_empty_not_error(self, tmp_path: Path, fake_fdsn: _FakeFdsn):
+        """FDSNNoDataException maps to an empty FeatureCollection."""
+        fake_fdsn.set_result("USGS", FDSNNoDataException("204"))
+        backend = _make_backend(tmp_path)
+        results = backend._fetch(backend._search())
+        assert len(results[0]) == 0, "no-data network should yield an empty FC"
+
+    def test_other_fdsn_error_propagates(self, tmp_path: Path, fake_fdsn: _FakeFdsn):
+        """A non-no-data failure propagates rather than being swallowed."""
+        fake_fdsn.set_result("USGS", RuntimeError("boom"))
+        backend = _make_backend(tmp_path)
+        with pytest.raises(RuntimeError, match="boom"):
+            backend._fetch(backend._search())
+
+    def test_token_passed_only_when_needed(self, tmp_path: Path, fake_fdsn: _FakeFdsn):
+        """No eida_token is sent for a network that does not require one."""
+        backend = _make_backend(tmp_path, earthscope_token="tok")
+        backend._fetch(backend._search())
+        _, ctor_kwargs = fake_fdsn.constructions[0]
+        assert (
+            "eida_token" not in ctor_kwargs
+        ), "public USGS network must not receive a token"
+
+
+@pytest.mark.fdsn
+class TestFDSNDownload:
+    """`download` writes per-network files and returns the union FC."""
+
+    def test_returns_union_and_writes_files(self, tmp_path: Path, fake_fdsn: _FakeFdsn):
+        """Two networks write two files and return a 2-row union."""
+        backend = _make_backend(tmp_path, variables=["USGS", "EMSC"])
+        fc = backend.download()
+        assert len(fc) == 2, f"expected 2 events, got {len(fc)}"
+        written = sorted(p.name for p in tmp_path.glob("*.gpkg"))
+        assert written == ["emsc.gpkg", "usgs.gpkg"], f"unexpected files {written}"
+
+    def test_geojson_format(self, tmp_path: Path, fake_fdsn: _FakeFdsn):
+        """`file_format='geojson'` writes a .geojson file."""
+        backend = _make_backend(tmp_path, file_format="geojson")
+        backend.download()
+        assert (tmp_path / "usgs.geojson").is_file()
+
+    def test_all_empty_writes_nothing(self, tmp_path: Path, fake_fdsn: _FakeFdsn):
+        """An all-empty result returns an empty FC and writes no files."""
+        fake_fdsn.set_result("USGS", FDSNNoDataException("204"))
+        backend = _make_backend(tmp_path)
+        fc = backend.download()
+        assert len(fc) == 0
+        assert list(tmp_path.glob("*.gpkg")) == [], "nothing should be written"
+
+    def test_aggregate_rejected(self, tmp_path: Path, fake_fdsn: _FakeFdsn):
+        """A non-None aggregate is rejected (vector output)."""
+        backend = _make_backend(tmp_path)
+        with pytest.raises(NotImplementedError, match="vector"):
+            backend.download(aggregate=object())
+
+    def test_api_via_search_fetch(self, tmp_path: Path, fake_fdsn: _FakeFdsn):
+        """`_api` composes search+fetch and returns FeatureCollections."""
+        backend = _make_backend(tmp_path)
+        results = backend._api()
+        assert len(results) == 1
+        assert isinstance(results[0], GeoDataFrame)
