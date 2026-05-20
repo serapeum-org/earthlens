@@ -91,10 +91,20 @@ def _yaml_files_for(path: Path) -> list[Path]:
         Sorted list of YAML paths. For a directory, every `*.yaml`
             sibling (including `_index.yaml`); for a file, just that
             file.
+
+    Raises:
+        ValueError: If `path` is neither an existing directory nor an
+            existing file (so the loader fails with a clear message
+            instead of trying to read a missing file).
     """
     if path.is_dir():
         return sorted(path.glob("*.yaml"))
-    return [path]
+    if path.is_file():
+        return [path]
+    raise ValueError(
+        f"CMEMS catalog path {path} does not exist (expected a "
+        "directory of per-domain *.yaml files, or a single YAML file)."
+    )
 
 
 def _load_catalog_data(path: Path) -> tuple[list[str], dict[str, "Dataset"]]:
