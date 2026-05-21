@@ -159,6 +159,9 @@ nav:
       - Tracking batch exports (end-to-end demo): examples/gee/track-batch-exports.ipynb
     - Disaster alerts (GDACS):
       - Quickstart — recent alerts: examples/gdacs/quickstart.ipynb
+      - Global hazard dashboard: examples/gdacs/global_hazard_dashboard.ipynb
+      - Earthquakes + cyclones overlay: examples/gdacs/eq_tc_overlay.ipynb
+      - Country hazard profile: examples/gdacs/country_hazard_profile.ipynb
   - API Reference:
     - EarthLens Facade: reference/earthlens.md
     - AbstractDataSource: reference/abstract-datasource.md
