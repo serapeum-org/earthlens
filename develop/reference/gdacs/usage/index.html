@@ -1339,6 +1339,23 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Filtering the query">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#result-size-limit-100-events" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Result size limit (100 events)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -2802,6 +2819,23 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Filtering the query">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#result-size-limit-100-events" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Result size limit (100 events)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -3005,6 +3039,19 @@ window from <code>start</code> / <code>end</code>. GDACS issues one query spanni
 <code>"all"</code>). GDACS has no server-side bounding-box filter, so the backend
 fetches the window's alerts and <strong>clips them to your
 <code>lat_lim</code> / <code>lon_lim</code> client-side</strong>.</p>
+<h3 id="result-size-limit-100-events"><a class="toclink" href="#result-size-limit-100-events">Result size limit (100 events)</a><a class="headerlink" href="#result-size-limit-100-events" title="Permanent link">#</a></h3>
+<p>The GDACS SEARCH endpoint <strong>caps every response at the 100 most-recent
+events</strong> and offers no pagination, <code>limit</code>, or <code>offset</code> parameter. A
+window busier than that is silently truncated upstream — so the backend
+logs a warning whenever a response comes back at the cap:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>GDACS SEARCH returned 100 events - its hard cap. The result is the 100
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>most-recent matching alerts and is almost certainly truncated ... Narrow
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>the date window (or query fewer hazard types) to retrieve the rest.
+</code></pre></div>
+<p>To retrieve everything in a busy period, <strong>narrow the date window</strong>
+(e.g. query month by month) or request fewer hazard types per call, then
+concatenate the results — the backend issues exactly one request per
+<code>download()</code>, so paging is in your hands.</p>
 <h2 id="the-returned-featurecollection"><a class="toclink" href="#the-returned-featurecollection">The returned FeatureCollection</a><a class="headerlink" href="#the-returned-featurecollection" title="Permanent link">#</a></h2>
 <p>CRS <code>EPSG:4326</code>, one row per alert. Columns: <code>event_id</code>, <code>episode_id</code>,
 <code>hazard_type</code>, <code>name</code>, <code>alert_level</code>, <code>alert_score</code>, <code>from_date</code> (UTC),
@@ -3015,23 +3062,23 @@ FeatureCollection with exactly these columns — not an error — so
 downstream <code>concat</code> / <code>to_file</code> never breaks. A renamed or missing field
 in the upstream feed degrades to a null cell rather than raising.</p>
 <h3 id="plotting"><a class="toclink" href="#plotting">Plotting</a><a class="headerlink" href="#plotting" title="Permanent link">#</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
-<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>
-<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="n">colours</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;Green&quot;</span><span class="p">:</span> <span class="s2">&quot;green&quot;</span><span class="p">,</span> <span class="s2">&quot;Orange&quot;</span><span class="p">:</span> <span class="s2">&quot;orange&quot;</span><span class="p">,</span> <span class="s2">&quot;Red&quot;</span><span class="p">:</span> <span class="s2">&quot;red&quot;</span><span class="p">}</span>
-<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="n">alerts</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span><span class="n">variables</span><span class="o">=</span><span class="p">[],</span> <span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;gdacs&quot;</span><span class="p">,</span>
-<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>                   <span class="n">start</span><span class="o">=</span><span class="s2">&quot;2024-01-01&quot;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">&quot;2024-03-31&quot;</span><span class="p">,</span>
-<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>                   <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">90</span><span class="p">,</span> <span class="mi">90</span><span class="p">],</span> <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">180</span><span class="p">,</span> <span class="mi">180</span><span class="p">],</span>
-<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a>                   <span class="n">path</span><span class="o">=</span><span class="s2">&quot;./out&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
-<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a>
-<a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="n">ax</span> <span class="o">=</span> <span class="n">alerts</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="n">alerts</span><span class="p">[</span><span class="s2">&quot;alert_level&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">colours</span><span class="p">),</span> <span class="n">markersize</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.6</span><span class="p">)</span>
-<a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a><span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;GDACS alerts, Q1 2024 (coloured by alert level)&quot;</span><span class="p">)</span>
-<a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a><span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="n">colours</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;Green&quot;</span><span class="p">:</span> <span class="s2">&quot;green&quot;</span><span class="p">,</span> <span class="s2">&quot;Orange&quot;</span><span class="p">:</span> <span class="s2">&quot;orange&quot;</span><span class="p">,</span> <span class="s2">&quot;Red&quot;</span><span class="p">:</span> <span class="s2">&quot;red&quot;</span><span class="p">}</span>
+<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="n">alerts</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span><span class="n">variables</span><span class="o">=</span><span class="p">[],</span> <span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;gdacs&quot;</span><span class="p">,</span>
+<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>                   <span class="n">start</span><span class="o">=</span><span class="s2">&quot;2024-01-01&quot;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">&quot;2024-03-31&quot;</span><span class="p">,</span>
+<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>                   <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">90</span><span class="p">,</span> <span class="mi">90</span><span class="p">],</span> <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">180</span><span class="p">,</span> <span class="mi">180</span><span class="p">],</span>
+<a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a>                   <span class="n">path</span><span class="o">=</span><span class="s2">&quot;./out&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
+<a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a>
+<a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a><span class="n">ax</span> <span class="o">=</span> <span class="n">alerts</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="n">alerts</span><span class="p">[</span><span class="s2">&quot;alert_level&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">colours</span><span class="p">),</span> <span class="n">markersize</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.6</span><span class="p">)</span>
+<a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a><span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;GDACS alerts, Q1 2024 (coloured by alert level)&quot;</span><span class="p">)</span>
+<a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a><span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </code></pre></div>
 <h3 id="writing-to-disk"><a class="toclink" href="#writing-to-disk">Writing to disk</a><a class="headerlink" href="#writing-to-disk" title="Permanent link">#</a></h3>
 <p><code>download()</code> writes <code>gdacs_alerts.gpkg</code> (or <code>.geojson</code>) automatically.
 To write the collection yourself:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="n">alerts</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="s2">&quot;alerts.gpkg&quot;</span><span class="p">,</span> <span class="n">driver</span><span class="o">=</span><span class="s2">&quot;GPKG&quot;</span><span class="p">)</span>       <span class="c1"># GeoPackage</span>
-<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="n">alerts</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="s2">&quot;alerts.geojson&quot;</span><span class="p">,</span> <span class="n">driver</span><span class="o">=</span><span class="s2">&quot;GeoJSON&quot;</span><span class="p">)</span>  <span class="c1"># GeoJSON</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="n">alerts</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="s2">&quot;alerts.gpkg&quot;</span><span class="p">,</span> <span class="n">driver</span><span class="o">=</span><span class="s2">&quot;GPKG&quot;</span><span class="p">)</span>       <span class="c1"># GeoPackage</span>
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="n">alerts</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="s2">&quot;alerts.geojson&quot;</span><span class="p">,</span> <span class="n">driver</span><span class="o">=</span><span class="s2">&quot;GeoJSON&quot;</span><span class="p">)</span>  <span class="c1"># GeoJSON</span>
 </code></pre></div>
 <h3 id="cross-referencing-with-glide"><a class="toclink" href="#cross-referencing-with-glide">Cross-referencing with GLIDE</a><a class="headerlink" href="#cross-referencing-with-glide" title="Permanent link">#</a></h3>
 <p>The <code>glide</code> column carries the GLIDE disaster identifier where GDACS has
@@ -3039,12 +3086,12 @@ assigned one — a stable key shared with
 <a href="https://reliefweb.int/">ReliefWeb</a> and
 <a href="https://emergency.copernicus.eu/">Copernicus EMS</a>. Filter to alerts
 that carry one to join against those sources:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="n">with_glide</span> <span class="o">=</span> <span class="n">alerts</span><span class="p">[</span><span class="n">alerts</span><span class="p">[</span><span class="s2">&quot;glide&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">notna</span><span class="p">()</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">alerts</span><span class="p">[</span><span class="s2">&quot;glide&quot;</span><span class="p">]</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span><span class="p">)]</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="n">with_glide</span> <span class="o">=</span> <span class="n">alerts</span><span class="p">[</span><span class="n">alerts</span><span class="p">[</span><span class="s2">&quot;glide&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">notna</span><span class="p">()</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">alerts</span><span class="p">[</span><span class="s2">&quot;glide&quot;</span><span class="p">]</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span><span class="p">)]</span>
 </code></pre></div>
 <h2 id="aggregation-is-not-supported"><a class="toclink" href="#aggregation-is-not-supported">Aggregation is not supported</a><a class="headerlink" href="#aggregation-is-not-supported" title="Permanent link">#</a></h2>
 <p>GDACS output is vector, so the <code>aggregate=</code> argument is rejected:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="n">EarthLens</span><span class="p">(</span><span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;EQ&quot;</span><span class="p">],</span> <span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;gdacs&quot;</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">aggregate</span><span class="o">=</span><span class="n">cfg</span><span class="p">)</span>
-<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="c1"># NotImplementedError: aggregate= is not supported ... (OUTPUT_KIND=&#39;vector&#39;)</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="n">EarthLens</span><span class="p">(</span><span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;EQ&quot;</span><span class="p">],</span> <span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;gdacs&quot;</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">aggregate</span><span class="o">=</span><span class="n">cfg</span><span class="p">)</span>
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="c1"># NotImplementedError: aggregate= is not supported ... (OUTPUT_KIND=&#39;vector&#39;)</span>
 </code></pre></div>
 <p>The aggregator only reduces gridded raster outputs. Post-process the
 returned FeatureCollection directly instead (it is a GeoDataFrame).</p>

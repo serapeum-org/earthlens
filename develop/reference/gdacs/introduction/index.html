@@ -3009,6 +3009,14 @@ the same disaster in <a href="https://reliefweb.int/">ReliefWeb</a> and
 country-level datasets. As a side effect, <code>download()</code> also writes the
 collection to one vector file in the output directory (GeoPackage by
 default, or GeoJSON).</p>
+<div class="admonition note">
+<p class="admonition-title">100-event cap</p>
+<p>The SEARCH endpoint returns at most the <strong>100 most-recent events</strong>
+per request and offers no pagination. A busier window is truncated
+upstream; the backend logs a warning when a response hits the cap.
+To get everything, narrow the date window or query fewer hazard
+types — see <a href="../usage/#result-size-limit-100-events">Usage</a>.</p>
+</div>
 <h2 id="alerts-not-an-authoritative-catalog"><a class="toclink" href="#alerts-not-an-authoritative-catalog">Alerts, not an authoritative catalog</a><a class="headerlink" href="#alerts-not-an-authoritative-catalog" title="Permanent link">#</a></h2>
 <p>GDACS is an <strong>impact-alert</strong> feed: it answers "what disasters are
 happening and how bad are they?", optimised for speed and coordination,
