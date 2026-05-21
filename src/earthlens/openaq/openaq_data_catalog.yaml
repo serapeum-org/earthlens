@@ -9,9 +9,22 @@
 # ids are stable but verify when adding a row). A future maintainer
 # adds another parameter by hand-adding a row here.
 parameters:
+  # Criteria pollutants + particulates (the six core rows; ids per the
+  # OpenAQ v3 /parameters endpoint).
   pm25: { id: 2, name: pm25, units: "µg/m³", display_name: "PM2.5", group: particulate }
   pm10: { id: 1, name: pm10, units: "µg/m³", display_name: "PM10", group: particulate }
   no2: { id: 5, name: no2, units: "µg/m³", display_name: "Nitrogen dioxide", group: criteria }
   o3: { id: 7, name: o3, units: "µg/m³", display_name: "Ozone", group: criteria }
   so2: { id: 6, name: so2, units: "µg/m³", display_name: "Sulphur dioxide", group: criteria }
   co: { id: 8, name: co, units: "ppm", display_name: "Carbon monoxide", group: criteria }
+  # Additional pollutants + meteorological parameters. The integer ids
+  # below are provisional — reconfirm each against the live
+  # `/v3/parameters` endpoint before relying on them (the pre-v1 API has
+  # renamed/renumbered parameters between releases). Name->id resolution
+  # and the schema are stable regardless of the exact id values.
+  bc: { id: 91, name: bc, units: "µg/m³", display_name: "Black carbon", group: particulate }
+  # `no` is quoted because YAML 1.1 parses the bare token as boolean false.
+  "no": { id: 35, name: "no", units: "µg/m³", display_name: "Nitrogen monoxide", group: other }
+  temperature: { id: 100, name: temperature, units: "c", display_name: "Temperature", group: meteorological }
+  relativehumidity: { id: 98, name: relativehumidity, units: "%", display_name: "Relative humidity", group: meteorological }
+  pressure: { id: 96, name: pressure, units: "hpa", display_name: "Atmospheric pressure", group: meteorological }
