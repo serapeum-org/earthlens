@@ -113,6 +113,7 @@ include = ["earthlens", "earthlens.*"]
 "earthlens.cmems" = ["*.yaml", "catalog/*.yaml"]
 "earthlens.ecmwf" = ["*.yaml"]
 "earthlens.gee" = ["*.yaml", "catalog/*.yaml"]
+"earthlens.openaq" = ["*.yaml"]
 
 [tool.flake8]
 ignore = ["E203", "E266", "E501", "W503", "E722", "C901", "E741", "E731"]

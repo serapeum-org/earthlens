@@ -1,0 +1,17 @@
+# OpenAQ v3 pollutant-parameter dispatch table.
+#
+# Unlike the raster backends, OpenAQ has no per-dataset catalog to
+# curate — it is a fixed query protocol over a small, stable set of
+# measured parameters. This file is the entire "catalog": one row per
+# parameter, keyed by the user-facing name passed in `variables=[...]`.
+# `id` is the OpenAQ numeric `parameters_id` the v3 API filters on
+# (cross-check against the live `/v3/parameters` endpoint; the integer
+# ids are stable but verify when adding a row). A future maintainer
+# adds another parameter by hand-adding a row here.
+parameters:
+  pm25: { id: 2, name: pm25, units: "µg/m³", display_name: "PM2.5", group: particulate }
+  pm10: { id: 1, name: pm10, units: "µg/m³", display_name: "PM10", group: particulate }
+  no2: { id: 5, name: no2, units: "µg/m³", display_name: "Nitrogen dioxide", group: criteria }
+  o3: { id: 7, name: o3, units: "µg/m³", display_name: "Ozone", group: criteria }
+  so2: { id: 6, name: so2, units: "µg/m³", display_name: "Sulphur dioxide", group: criteria }
+  co: { id: 8, name: co, units: "ppm", display_name: "Carbon monoxide", group: criteria }
