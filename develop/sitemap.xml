@@ -73,6 +73,10 @@
          <lastmod>2026-05-21</lastmod>
     </url>
     <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/examples/gdacs/quickstart/</loc>
+         <lastmod>2026-05-21</lastmod>
+    </url>
+    <url>
          <loc>https://serapeum-org.github.io/earthlens/develop/examples/gee/atmosphere-chemistry/</loc>
          <lastmod>2026-05-21</lastmod>
     </url>
@@ -162,6 +166,18 @@
     </url>
     <url>
          <loc>https://serapeum-org.github.io/earthlens/develop/reference/ecmwf/catalog/</loc>
+         <lastmod>2026-05-21</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/gdacs/gdacs/</loc>
+         <lastmod>2026-05-21</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/gdacs/introduction/</loc>
+         <lastmod>2026-05-21</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/gdacs/usage/</loc>
          <lastmod>2026-05-21</lastmod>
     </url>
     <url>
