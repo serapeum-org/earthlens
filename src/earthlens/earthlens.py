@@ -102,7 +102,7 @@ class EarthLens:
             ```python
             >>> from earthlens.earthlens import EarthLens
             >>> sorted(EarthLens.DataSources)
-            ['amazon-s3', 'chc', 'chirps', 'cmems', 'ecmwf', 'gee', 'google-earth-engine']
+            ['amazon-s3', 'chc', 'chirps', 'cmems', 'ecmwf', 'gee', 'google-earth-engine', 'openaq']
 
             ```
         - Asking for an unknown backend raises `ValueError`:
@@ -125,6 +125,8 @@ class EarthLens:
             Climate Data Store (cdsapi).
         :class:`earthlens.gee.GEE`: imagery from Google Earth Engine
             (`earthengine-api`); keys `"gee"` / `"google-earth-engine"`.
+        :class:`earthlens.openaq.OpenAQ`: ground-station air-quality
+            measurements from OpenAQ v3 (tabular `DataFrame`).
     """
 
     DataSources = _LazyRegistry(
@@ -140,6 +142,7 @@ class EarthLens:
             "ecmwf": ("earthlens.ecmwf", "ECMWF", "ecmwf"),
             "gee": ("earthlens.gee", "GEE", "gee"),
             "google-earth-engine": ("earthlens.gee", "GEE", "gee"),
+            "openaq": ("earthlens.openaq", "OpenAQ", "openaq"),
         }
     )
 
@@ -165,8 +168,8 @@ class EarthLens:
         Args:
             data_source: Backend key — one of `"chc"` (alias
                 `"chirps"`), `"amazon-s3"`, `"cmems"`, `"ecmwf"`,
-                or `"gee"` (alias `"google-earth-engine"`).
-                Defaults to `"chc"`.
+                `"gee"` (alias `"google-earth-engine"`), or
+                `"openaq"`. Defaults to `"chc"`.
             temporal_resolution: `"daily"` or `"monthly"` for most
                 backends; the GEE backend also accepts `"raw"` and
                 `"yearly"`. The concrete backend may accept a narrower
