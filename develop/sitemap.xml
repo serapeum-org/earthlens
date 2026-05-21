@@ -153,18 +153,6 @@
          <lastmod>2026-05-21</lastmod>
     </url>
     <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/examples/openaq/multistation_comparison/</loc>
-         <lastmod>2026-05-21</lastmod>
-    </url>
-    <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/examples/openaq/pm25_city_timeseries/</loc>
-         <lastmod>2026-05-21</lastmod>
-    </url>
-    <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/examples/openaq/quickstart/</loc>
-         <lastmod>2026-05-21</lastmod>
-    </url>
-    <url>
          <loc>https://serapeum-org.github.io/earthlens/develop/overview/architecture/</loc>
          <lastmod>2026-05-21</lastmod>
     </url>
@@ -242,22 +230,6 @@
     </url>
     <url>
          <loc>https://serapeum-org.github.io/earthlens/develop/reference/gee/usage/</loc>
-         <lastmod>2026-05-21</lastmod>
-    </url>
-    <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/reference/openaq/authentication/</loc>
-         <lastmod>2026-05-21</lastmod>
-    </url>
-    <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/reference/openaq/introduction/</loc>
-         <lastmod>2026-05-21</lastmod>
-    </url>
-    <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/reference/openaq/openaq/</loc>
-         <lastmod>2026-05-21</lastmod>
-    </url>
-    <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/reference/openaq/usage/</loc>
          <lastmod>2026-05-21</lastmod>
     </url>
 </urlset>
