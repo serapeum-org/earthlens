@@ -90,24 +90,32 @@ class TestEarthLensCmemsAggregateGuard:
     """The facade forwards aggregate to CMEMS, which reduces via pyramids."""
 
     def test_facade_forwards_aggregate_to_reduce_path(
-        self, fake_cmems: _FakeCmems, tmp_path: Path
+        self,
+        fake_cmems: _FakeCmems,
+        tmp_path: Path,
+        monkeypatch: pytest.MonkeyPatch,
     ):
         """For OUTPUT_KIND='raster', the facade forwards aggregate.
 
         The CMEMS backend downloads the subset, then routes into the
-        `pyramids.netcdf.NetCDF.reduce`-backed aggregate path. When the
-        installed pyramids has no `NetCDF.reduce` (a release that
-        predates pyramids PR #339), the backend raises a clear
+        `pyramids.netcdf.NetCDF.reduce`-backed aggregate path. With
+        pyramids' `NetCDF` stubbed to lack `reduce` (the shape of any
+        release predating pyramids PR #339), the backend raises a clear
         NotImplementedError naming `NetCDF.reduce` — proving the facade
         guard is *not* the one stopping CMEMS (CMEMS is `"raster"`, so
         the kwarg is forwarded) and that the requirement is the pyramids
-        reducer, not a staged earthlens shim.
+        reducer, not a staged earthlens shim. Stubbing `reduce` away
+        keeps the test deterministic regardless of the installed
+        pyramids version.
         """
         subset = tmp_path / "cmems_mod_glo_phy_my_0.083deg_P1D-m.nc"
         subset.write_bytes(b"")
         fake_cmems.subset_response = types.SimpleNamespace(
             file_path=str(subset), status="ok"
         )
+        fake_netcdf_mod = types.ModuleType("pyramids.netcdf")
+        fake_netcdf_mod.NetCDF = type("NetCDF", (), {})  # no `reduce` attr
+        monkeypatch.setitem(sys.modules, "pyramids.netcdf", fake_netcdf_mod)
         el = EarthLens(
             data_source="cmems",
             start="2024-01-01",
