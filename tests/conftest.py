@@ -1,5 +1,5 @@
 from __future__ import annotations
-
+from pyramids import __version__
 import os
 from pathlib import Path
 
