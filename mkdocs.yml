@@ -124,6 +124,10 @@ nav:
       - Service account setup: reference/gee/service-account-setup.md
       - Usage: reference/gee/usage.md
       - Reference: reference/gee/gee.md
+    - GDACS (disaster alerts):
+      - Introduction: reference/gdacs/introduction.md
+      - Usage: reference/gdacs/usage.md
+      - Reference: reference/gdacs/gdacs.md
   - Examples:
     - Authentication: examples/authentication.md
     - Data Sources: examples/data-sources.md
@@ -153,6 +157,8 @@ nav:
       - Precipitation — CHIRPS daily: examples/gee/precipitation.ipynb
       - SAR / radar — Sentinel-1 GRD VV: examples/gee/sar-radar.ipynb
       - Tracking batch exports (end-to-end demo): examples/gee/track-batch-exports.ipynb
+    - Disaster alerts (GDACS):
+      - Quickstart — recent alerts: examples/gdacs/quickstart.ipynb
   - API Reference:
     - EarthLens Facade: reference/earthlens.md
     - AbstractDataSource: reference/abstract-datasource.md
