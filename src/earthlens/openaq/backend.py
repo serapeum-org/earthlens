@@ -32,18 +32,22 @@ from __future__ import annotations
 
 import datetime as dt
 from pathlib import Path
-from typing import TYPE_CHECKING, Literal
+from typing import TYPE_CHECKING, Any, Literal
 
 import pandas as pd
+from loguru import logger
+from tqdm import tqdm
 
 from earthlens.base import (
     AbstractDataSource,
     OutputKind,
+    RemoteProduct,
     SpatialExtent,
     TemporalExtent,
 )
 from earthlens.openaq.auth import OpenaqAuth, OpenaqCredentials
 from earthlens.openaq.catalog import Catalog
+from earthlens.openaq.client import OpenaqClient
 
 if TYPE_CHECKING:
     from earthlens.aggregate import AggregationConfig
@@ -174,6 +178,7 @@ class OpenAQ(AbstractDataSource):
         self._page_limit = limit
         self._file_format: FileFormat = file_format
         self._auth: OpenaqAuth | None = None
+        self._client_obj: OpenaqClient | None = None
         self._catalog = Catalog()
         super().__init__(
             start=start,
@@ -270,35 +275,282 @@ class OpenAQ(AbstractDataSource):
         """
         return _ROLLUP_BY_RESOLUTION[self.time.resolution]
 
-    def _api(self):
-        """Compose `_search` and `_fetch` into the canonical C3 shape.
+    def _client(self) -> OpenaqClient:
+        """Build (once) and return the rate-limit-aware HTTP client.
 
-        The search/fetch bodies land in C2; this wires the standard
-        composition so the abstract contract is satisfied from C1.
+        The client is created lazily — after :meth:`_initialize` has
+        resolved the API key — and cached on the instance, so a
+        multi-sensor `_fetch` reuses one `requests.Session`.
+
+        Returns:
+            OpenaqClient: The cached client bound to the resolved key.
+
+        Raises:
+            AuthenticationError: When the auth was never configured
+                (reading :attr:`OpenaqAuth.api_key` before
+                `configure()`).
         """
-        return self._api_via_search_fetch()
+        if self._client_obj is None:
+            assert self._auth is not None  # set in _initialize, before download
+            self._client_obj = OpenaqClient(
+                self._auth.api_key, max_retries=5, backoff_factor=1.0
+            )
+        return self._client_obj
+
+    def _bbox(self) -> str:
+        """Return the request bbox as OpenAQ's `"west,south,east,north"`."""
+        return (
+            f"{self.space.west},{self.space.south},"
+            f"{self.space.east},{self.space.north}"
+        )
+
+    def _search(self) -> list[RemoteProduct]:
+        """Enumerate one :class:`RemoteProduct` per matching sensor.
+
+        Lists monitoring locations in the bbox filtered by the
+        requested parameter ids (cheap — locations + sensor
+        enumeration, no measurement bytes), then emits one product per
+        sensor whose parameter was requested, honouring
+        `max_locations` and `max_sensors_per_location`. A truncating
+        cap logs a loud warning so the caller knows the frame is
+        partial.
+
+        Returns:
+            list[RemoteProduct]: One product per sensor; `id` is the
+                sensor id and `metadata` carries `station_id` /
+                `parameter` / `units` / `lat` / `lon` / `provider`.
+        """
+        wanted_ids = set(self._catalog.ids_for(self.vars))
+        locations = self._client().list_locations(
+            bbox=self._bbox(),
+            parameters_id=sorted(wanted_ids),
+            limit=self._page_limit,
+            max_locations=self._max_locations,
+        )
+        if self._max_locations is not None and len(locations) >= self._max_locations:
+            logger.warning(
+                f"OpenAQ search hit the max_locations={self._max_locations} cap; "
+                "the result may be partial. Raise max_locations= or shrink the "
+                "bbox / date window to capture every station."
+            )
+
+        products: list[RemoteProduct] = []
+        for location in locations:
+            coords = location.get("coordinates") or {}
+            provider = (location.get("provider") or {}).get("name") or "openaq"
+            sensors = location.get("sensors") or []
+            if self._max_sensors_per_location is not None:
+                sensors = sensors[: self._max_sensors_per_location]
+            for sensor in sensors:
+                parameter = sensor.get("parameter") or {}
+                if parameter.get("id") not in wanted_ids:
+                    continue
+                products.append(
+                    RemoteProduct(
+                        id=str(sensor.get("id")),
+                        metadata={
+                            "station_id": location.get("id"),
+                            "parameter": parameter.get("name"),
+                            "units": parameter.get("units"),
+                            "lat": coords.get("latitude"),
+                            "lon": coords.get("longitude"),
+                            "provider": provider,
+                        },
+                    )
+                )
+        return products
+
+    def _fetch(self, products: list[RemoteProduct]) -> list[pd.DataFrame]:
+        """Pull each sensor's measurements into a per-product DataFrame.
+
+        Widens the inherited `-> list[Path]` contract: a tabular
+        backend returns in-memory long-format
+        :class:`pandas.DataFrame`s, not file paths (the `R4` finding —
+        the composition is sound because `_api_via_search_fetch` only
+        short-circuits on the empty product list and otherwise returns
+        this list verbatim). Each sensor's measurements are fetched
+        with `429`/`Retry-After` back-off via :class:`OpenaqClient`.
+
+        Args:
+            products: The list returned by :meth:`_search`.
+
+        Returns:
+            list[pd.DataFrame]: One schema-shaped frame per product, in
+                the same order; an empty (schema-only) frame for a
+                sensor with no measurements in the window.
+        """
+        return [self._fetch_one(product) for product in products]
+
+    def _fetch_one(self, product: RemoteProduct) -> pd.DataFrame:
+        """Fetch one sensor's measurements and shape them to the schema.
+
+        Args:
+            product: One :class:`RemoteProduct` from :meth:`_search`.
+
+        Returns:
+            pd.DataFrame: The sensor's rows in the long-format schema
+                (empty, schema-only, when the sensor returned nothing).
+        """
+        measurements = self._client().list_measurements(
+            sensor_id=product.id,
+            datetime_from=self.time.start_date.isoformat(),
+            datetime_to=self.time.end_date.isoformat(),
+            rollup=self._rollup,
+            limit=self._page_limit,
+        )
+        rows = [_measurement_row(product, m) for m in measurements]
+        if not rows:
+            return _empty_frame()
+        return pd.DataFrame(rows).astype(_SCHEMA)
 
     def download(
         self,
         progress_bar: bool = True,
         aggregate: AggregationConfig | None = None,
     ) -> pd.DataFrame:
-        """Fetch measurements and return the long-format DataFrame.
+        """Fetch measurements, write them to `path`, and return the frame.
 
-        Implemented in C2. The C1 scaffold only wires authentication
-        and the request extents.
+        Runs the cheap :meth:`_search` (locations + sensors) then the
+        rate-limited :meth:`_fetch` (per-sensor measurements), wrapping
+        the per-sensor loop in a `tqdm` progress bar. The per-product
+        frames are concatenated into one long-format DataFrame, written
+        to `path` as CSV (or Parquet), and returned. An empty result
+        returns — and writes — a schema-only DataFrame so callers
+        always get the same shape.
 
         Args:
-            progress_bar: Whether to show a per-sensor progress bar.
-            aggregate: Must be `None` — OpenAQ output is tabular, so
-                the facade rejects a non-`None` `aggregate=`.
+            progress_bar: Show a per-sensor progress bar. Defaults to
+                `True`.
+            aggregate: Must be `None`. OpenAQ output is tabular, so
+                there is no meaningful gridded reduction; the facade
+                already rejects a non-`None` `aggregate=` for a
+                `tabular` backend, and this is the belt-and-suspenders
+                guard for direct backend callers. Use the server-side
+                `temporal_resolution` rollup instead.
+
+        Returns:
+            pd.DataFrame: The long-format union of every sensor's
+                measurements (schema columns, `datetime_utc` tz-aware
+                UTC). Empty (schema-only) when nothing matched.
 
         Raises:
-            NotImplementedError: Always, until C2 lands the
-                search/fetch implementation.
+            NotImplementedError: If `aggregate` is not `None`.
         """
-        raise NotImplementedError(
-            "OpenAQ.download is implemented in task C2 (search/fetch + "
-            "rate-limit back-off); the C1 scaffold only wires auth and "
-            "the request extents."
+        if aggregate is not None:
+            raise NotImplementedError(
+                "OpenAQ.download(aggregate=...) is not supported: pollutant "
+                "measurements are tabular per-row station observations, not "
+                "gridded rasters, so there is no meaningful gridded "
+                "reduction. Use the server-side temporal_resolution rollup "
+                "(hourly/daily/monthly/yearly) instead."
+            )
+
+        products = self._search()
+        iterator = tqdm(
+            products,
+            disable=not progress_bar,
+            desc="OpenAQ sensors",
+            unit="sensor",
         )
+        frames = [self._fetch_one(product) for product in iterator]
+        non_empty = [frame for frame in frames if not frame.empty]
+        df = pd.concat(non_empty, ignore_index=True) if non_empty else _empty_frame()
+
+        out_path = self._output_path()
+        if self._file_format == "parquet":
+            df.to_parquet(out_path, index=False)
+        else:
+            df.to_csv(out_path, index=False)
+
+        if len(df):
+            logger.info(
+                f"OpenAQ download summary: {len(df)} measurement(s) across "
+                f"{len(non_empty)} sensor(s) written to {out_path}"
+            )
+        else:
+            logger.warning(
+                "OpenAQ download summary: no measurements matched the request; "
+                f"wrote an empty (schema-only) frame to {out_path}"
+            )
+        return df
+
+    def _output_path(self) -> Path:
+        """Compose the per-request output file path under `root_dir`."""
+        ext = "parquet" if self._file_format == "parquet" else "csv"
+        params = "-".join(self.vars)
+        start = self.time.start_date.strftime("%Y%m%d")
+        end = self.time.end_date.strftime("%Y%m%d")
+        return self.root_dir / f"openaq_{params}_{start}_{end}.{ext}"
+
+    def _api(self):
+        """Compose `_search` and `_fetch` into the canonical C3 shape."""
+        return self._api_via_search_fetch()
+
+
+def _empty_frame() -> pd.DataFrame:
+    """Return an empty DataFrame with the exact long-format schema.
+
+    Used for a no-data sensor and for a download that matched nothing,
+    so every caller sees the same columns and dtypes regardless of
+    whether any measurements came back.
+
+    Returns:
+        pd.DataFrame: Zero rows, :data:`_SCHEMA` columns and dtypes.
+    """
+    return pd.DataFrame({column: [] for column in _SCHEMA}).astype(_SCHEMA)
+
+
+def _measurement_datetime(measurement: dict[str, Any]) -> Any:
+    """Extract the UTC timestamp from one v3 measurement object.
+
+    The v3 shape nests the timestamp under `period.datetimeFrom.utc`;
+    older / rollup shapes use a flat `datetime.utc` or `date.utc`. This
+    tries each in turn so the backend tolerates the pre-v1 surface
+    drift the plan flags.
+
+    Args:
+        measurement: One measurement result object.
+
+    Returns:
+        The UTC timestamp string, or `None` if no known field is
+            present.
+    """
+    period = measurement.get("period") or {}
+    datetime_from = period.get("datetimeFrom") or {}
+    if isinstance(datetime_from, dict) and datetime_from.get("utc"):
+        return datetime_from["utc"]
+    for key in ("datetime", "date"):
+        value = measurement.get(key) or {}
+        if isinstance(value, dict) and value.get("utc"):
+            return value["utc"]
+    return None
+
+
+def _measurement_row(
+    product: RemoteProduct, measurement: dict[str, Any]
+) -> dict[str, Any]:
+    """Build one schema row from a product's metadata + a measurement.
+
+    The station-level fields (`station_id` / `parameter` / `units` /
+    `lat` / `lon` / `provider`) come from the product metadata captured
+    in :meth:`OpenAQ._search`; only `value` and `datetime_utc` come
+    from the measurement object.
+
+    Args:
+        product: The sensor's :class:`RemoteProduct`.
+        measurement: One measurement result object for that sensor.
+
+    Returns:
+        dict[str, Any]: A row keyed by the :data:`_SCHEMA` columns.
+    """
+    meta = product.metadata
+    return {
+        "station_id": meta.get("station_id"),
+        "parameter": meta.get("parameter"),
+        "datetime_utc": pd.to_datetime(_measurement_datetime(measurement), utc=True),
+        "value": measurement.get("value"),
+        "units": meta.get("units"),
+        "lat": meta.get("lat"),
+        "lon": meta.get("lon"),
+        "provider": meta.get("provider"),
+    }
