@@ -58,7 +58,7 @@ FileFormat = Literal["csv", "parquet"]
 _DEFAULT_PARAMETERS = ["pm25"]
 
 #: Map a `temporal_resolution` label to the OpenAQ v3 server-side rollup
-#: endpoint segment. The sentinel ``"all"`` / ``"raw"`` selects raw
+#: endpoint segment. The sentinel `"all"` / `"raw"` selects raw
 #: measurements (no rollup). Mapping cuts request volume sharply for
 #: long windows — a year of daily rollups is ~365 rows per sensor, not
 #: tens of thousands of raw readings.
