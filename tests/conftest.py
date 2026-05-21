@@ -1,5 +1,11 @@
+
 from __future__ import annotations
-from pyramids import __version__
+
+# `import pyramids` first: importing it wires its bundled GDAL onto the
+# `osgeo` namespace, so it must run before pytest imports anything that
+# does `from osgeo import gdal` (directly or via an earthlens backend).
+import pyramids  # noqa: F401  # isort: skip
+
 import os
 from pathlib import Path
 
