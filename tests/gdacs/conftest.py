@@ -8,6 +8,7 @@ the SEARCH call returns a canned response and records its query params.
 
 from __future__ import annotations
 
+from collections.abc import Iterator
 from typing import Any, Callable
 
 import pytest
@@ -135,3 +136,16 @@ def fake_gdacs(monkeypatch: pytest.MonkeyPatch) -> _FakeGdacs:
     state = _FakeGdacs()
     monkeypatch.setattr("earthlens.gdacs.backend.requests.get", state)
     return state
+
+
+@pytest.fixture
+def warnings_log() -> Iterator[list[str]]:
+    """Capture WARNING-level loguru messages into a list for the test's duration."""
+    from loguru import logger
+
+    messages: list[str] = []
+    sink_id = logger.add(messages.append, level="WARNING", format="{message}")
+    try:
+        yield messages
+    finally:
+        logger.remove(sink_id)

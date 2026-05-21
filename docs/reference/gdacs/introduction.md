@@ -88,6 +88,13 @@ country-level datasets. As a side effect, `download()` also writes the
 collection to one vector file in the output directory (GeoPackage by
 default, or GeoJSON).
 
+!!! note "100-event cap"
+    The SEARCH endpoint returns at most the **100 most-recent events**
+    per request and offers no pagination. A busier window is truncated
+    upstream; the backend logs a warning when a response hits the cap.
+    To get everything, narrow the date window or query fewer hazard
+    types — see [Usage](usage.md#result-size-limit-100-events).
+
 ## Alerts, not an authoritative catalog
 
 GDACS is an **impact-alert** feed: it answers "what disasters are

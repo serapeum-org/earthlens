@@ -162,6 +162,48 @@ class TestGDACSFetch:
         with pytest.raises(requests.HTTPError, match="500"):
             backend._fetch(backend._search())
 
+    def test_cap_logs_truncation_warning(
+        self,
+        tmp_path: Path,
+        fake_gdacs: _FakeGdacs,
+        make_feature,
+        make_payload,
+        warnings_log,
+    ):
+        """A response at the 100-event cap logs a truncation warning."""
+        from earthlens.gdacs.backend import MAX_EVENTS_PER_RESPONSE
+
+        fake_gdacs.set_payload(
+            make_payload(
+                features=[
+                    make_feature(eventid=i) for i in range(MAX_EVENTS_PER_RESPONSE)
+                ]
+            )
+        )
+        backend = _make_backend(tmp_path)
+        backend._fetch(backend._search())
+        assert any(
+            "truncated" in msg for msg in warnings_log
+        ), f"expected a truncation warning, got {warnings_log}"
+
+    def test_below_cap_no_warning(
+        self,
+        tmp_path: Path,
+        fake_gdacs: _FakeGdacs,
+        make_feature,
+        make_payload,
+        warnings_log,
+    ):
+        """A response below the cap logs no truncation warning."""
+        fake_gdacs.set_payload(
+            make_payload(features=[make_feature(eventid=i) for i in range(5)])
+        )
+        backend = _make_backend(tmp_path)
+        backend._fetch(backend._search())
+        assert not any(
+            "truncated" in msg for msg in warnings_log
+        ), f"unexpected truncation warning, got {warnings_log}"
+
     def test_bbox_post_filter(
         self, tmp_path: Path, fake_gdacs: _FakeGdacs, make_feature, make_payload
     ):

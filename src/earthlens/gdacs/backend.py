@@ -57,6 +57,17 @@ if TYPE_CHECKING:
 #: one GeoJSON response (verified against the live service).
 SEARCH_URL = "https://www.gdacs.org/gdacsapi/api/events/geteventlist/SEARCH"
 
+#: GDACS SEARCH caps every response at the 100 most-recent events and
+#: honours no pagination / `limit` / `offset` parameter (verified
+#: against the live service: a one-year all-hazard query returns exactly
+#: 100, and `page=2` / `offset=100` return the same first 100). A
+#: response at this size is therefore assumed truncated, and `_fetch`
+#: warns so the truncation is never silent. The remedy is to narrow the
+#: date window (or query fewer hazard types) — there is no way to page
+#: past it, and chunking would mean per-window fan-out this single-request
+#: backend deliberately avoids.
+MAX_EVENTS_PER_RESPONSE = 100
+
 #: The complete GDACS hazard-type universe; `variables=[]` defaults here.
 _ALL_TYPES = ["EQ", "TC", "FL", "VO", "WF", "DR"]
 
@@ -269,6 +280,12 @@ class GDACS(AbstractDataSource):
         Because GDACS SEARCH has no documented bbox filter, the mapped
         alerts are clipped to `self.space` client-side.
 
+        When the response hits the endpoint's
+        :data:`MAX_EVENTS_PER_RESPONSE` cap (100), the result is almost
+        certainly truncated to the most-recent matches; a warning is
+        logged so the truncation is never silent (the endpoint offers no
+        pagination — narrow the window to retrieve more).
+
         Args:
             products: The single-element list returned by
                 :meth:`_search`.
@@ -295,7 +312,17 @@ class GDACS(AbstractDataSource):
         )
         response = requests.get(SEARCH_URL, params=params, timeout=self._timeout)
         response.raise_for_status()
-        collection = events.geojson_to_fc(response.json())
+        payload = response.json()
+        feature_count = len(payload.get("features") or [])
+        if feature_count >= MAX_EVENTS_PER_RESPONSE:
+            logger.warning(
+                f"GDACS SEARCH returned {feature_count} events - its hard cap. "
+                "The result is the 100 most-recent matching alerts and is "
+                "almost certainly truncated; the endpoint offers no pagination. "
+                "Narrow the date window (or query fewer hazard types) to "
+                "retrieve the rest."
+            )
+        collection = events.geojson_to_fc(payload)
         clipped = events.clip_to_bbox(
             collection,
             [self.space.south, self.space.north],

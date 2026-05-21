@@ -95,6 +95,24 @@ window from `start` / `end`. GDACS issues one query spanning the whole
 fetches the window's alerts and **clips them to your
 `lat_lim` / `lon_lim` client-side**.
 
+### Result size limit (100 events)
+
+The GDACS SEARCH endpoint **caps every response at the 100 most-recent
+events** and offers no pagination, `limit`, or `offset` parameter. A
+window busier than that is silently truncated upstream — so the backend
+logs a warning whenever a response comes back at the cap:
+
+```text
+GDACS SEARCH returned 100 events - its hard cap. The result is the 100
+most-recent matching alerts and is almost certainly truncated ... Narrow
+the date window (or query fewer hazard types) to retrieve the rest.
+```
+
+To retrieve everything in a busy period, **narrow the date window**
+(e.g. query month by month) or request fewer hazard types per call, then
+concatenate the results — the backend issues exactly one request per
+`download()`, so paging is in your hands.
+
 ## The returned FeatureCollection
 
 CRS `EPSG:4326`, one row per alert. Columns: `event_id`, `episode_id`,
