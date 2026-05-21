@@ -1,0 +1,137 @@
+"""Shared fixtures for the GDACS backend tests.
+
+Builds hand-made GDACS GeoJSON payloads (no network) and a fake
+`requests.get` so the backend can be exercised end-to-end offline. The
+`fake_gdacs` fixture patches `requests.get` at the backend module so
+the SEARCH call returns a canned response and records its query params.
+"""
+
+from __future__ import annotations
+
+from typing import Any, Callable
+
+import pytest
+
+
+def _make_feature(
+    *,
+    lon: float = 12.5,
+    lat: float = 42.0,
+    eventtype: str = "EQ",
+    eventid: int | None = 1541788,
+    episodeid: int | None = 1707034,
+    name: str = "Earthquake in Italy",
+    alertlevel: str = "Green",
+    alertscore: float = 1.0,
+    fromdate: str = "2026-05-10T00:00:00",
+    todate: str = "2026-05-10T01:00:00",
+    country: str = "Italy",
+    iso3: str = "ITA",
+    glide: str = "",
+    severity: float | None = 4.7,
+    severityunit: str | None = "M",
+    severitytext: str | None = "Magnitude 4.7M",
+    geometry: dict[str, Any] | None = None,
+    drop_properties: tuple[str, ...] = (),
+    drop_severity: bool = False,
+) -> dict[str, Any]:
+    """Build one GDACS GeoJSON feature with controllable fields.
+
+    `drop_properties` removes named keys to exercise the defensive
+    `.get`; `drop_severity` omits the whole `severitydata` sub-dict;
+    `geometry` overrides the default Point (pass an explicit dict or
+    `None` to drop geometry entirely via `drop_properties`).
+    """
+    properties: dict[str, Any] = {
+        "eventtype": eventtype,
+        "eventid": eventid,
+        "episodeid": episodeid,
+        "name": name,
+        "alertlevel": alertlevel,
+        "alertscore": alertscore,
+        "fromdate": fromdate,
+        "todate": todate,
+        "country": country,
+        "iso3": iso3,
+        "glide": glide,
+    }
+    if not drop_severity:
+        properties["severitydata"] = {
+            "severity": severity,
+            "severitytext": severitytext,
+            "severityunit": severityunit,
+        }
+    for key in drop_properties:
+        properties.pop(key, None)
+    feature_geometry = (
+        geometry
+        if geometry is not None
+        else {"type": "Point", "coordinates": [lon, lat]}
+    )
+    return {"type": "Feature", "geometry": feature_geometry, "properties": properties}
+
+
+def _make_payload(features: list[dict[str, Any]] | None = None) -> dict[str, Any]:
+    """Wrap features in a GDACS GeoJSON FeatureCollection envelope."""
+    return {
+        "type": "FeatureCollection",
+        "features": features if features is not None else [_make_feature()],
+    }
+
+
+class _FakeResponse:
+    """Stand-in for a `requests.Response` returning a canned payload."""
+
+    def __init__(self, payload: dict[str, Any], status_error: Exception | None):
+        self._payload = payload
+        self._status_error = status_error
+
+    def raise_for_status(self) -> None:
+        if self._status_error is not None:
+            raise self._status_error
+
+    def json(self) -> dict[str, Any]:
+        return self._payload
+
+
+class _FakeGdacs:
+    """Callable `requests.get` stand-in that records the query params."""
+
+    def __init__(self) -> None:
+        self.calls: list[dict[str, Any]] = []
+        self.payload: dict[str, Any] = _make_payload()
+        self.status_error: Exception | None = None
+
+    def __call__(
+        self, url: str, params: dict[str, Any], timeout: float
+    ) -> _FakeResponse:
+        self.calls.append({"url": url, "params": params, "timeout": timeout})
+        return _FakeResponse(self.payload, self.status_error)
+
+    def set_payload(self, payload: dict[str, Any]) -> None:
+        """Pin the payload the next SEARCH call returns."""
+        self.payload = payload
+
+    def set_status_error(self, error: Exception) -> None:
+        """Make `raise_for_status` raise the given error (HTTP failure)."""
+        self.status_error = error
+
+
+@pytest.fixture
+def make_feature() -> Callable[..., dict[str, Any]]:
+    """Factory for one GDACS GeoJSON feature (see `_make_feature` kwargs)."""
+    return _make_feature
+
+
+@pytest.fixture
+def make_payload() -> Callable[..., dict[str, Any]]:
+    """Factory for a GDACS GeoJSON FeatureCollection payload."""
+    return _make_payload
+
+
+@pytest.fixture
+def fake_gdacs(monkeypatch: pytest.MonkeyPatch) -> _FakeGdacs:
+    """Patch `requests.get` in the backend with the recording fake."""
+    state = _FakeGdacs()
+    monkeypatch.setattr("earthlens.gdacs.backend.requests.get", state)
+    return state
