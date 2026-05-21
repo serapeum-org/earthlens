@@ -445,14 +445,7 @@ class OpenAQ(AbstractDataSource):
                 "(hourly/daily/monthly/yearly) instead."
             )
 
-        products = self._search()
-        iterator = tqdm(
-            products,
-            disable=not progress_bar,
-            desc="OpenAQ sensors",
-            unit="sensor",
-        )
-        frames = [self._fetch_one(product) for product in iterator]
+        frames = self._api_via_search_fetch_with_progress(progress_bar)
         non_empty = [frame for frame in frames if not frame.empty]
         df = pd.concat(non_empty, ignore_index=True) if non_empty else _empty_frame()
 
@@ -485,6 +478,35 @@ class OpenAQ(AbstractDataSource):
     def _api(self):
         """Compose `_search` and `_fetch` into the canonical C3 shape."""
         return self._api_via_search_fetch()
+
+    def _api_via_search_fetch_with_progress(
+        self, progress_bar: bool
+    ) -> list[pd.DataFrame]:
+        """C3 composition with an explicit per-sensor progress bar.
+
+        Mirrors the CMEMS backend's progress-aware composition: run the
+        cheap :meth:`_search`, then map :meth:`_fetch_one` over the
+        products wrapped in a `tqdm` bar (disabled when `progress_bar`
+        is `False`). Short-circuits on an empty search so `_fetch_one`
+        is never called when there is nothing to fetch.
+
+        Args:
+            progress_bar: Show the per-sensor `tqdm` bar when `True`.
+
+        Returns:
+            list[pd.DataFrame]: One frame per product (same order as
+                `_search`), or `[]` when nothing matched.
+        """
+        products = self._search()
+        if not products:
+            return []
+        iterator = tqdm(
+            products,
+            disable=not progress_bar,
+            desc="OpenAQ sensors",
+            unit="sensor",
+        )
+        return [self._fetch_one(product) for product in iterator]
 
 
 def _empty_frame() -> pd.DataFrame:
