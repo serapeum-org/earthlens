@@ -1,0 +1,1879 @@
+# CMEMS curated catalog - global-sealevel slice.
+#
+# One slice of the per-domain split of the Copernicus Marine catalog.
+# The loader (earthlens.cmems.catalog.Catalog) merges every *.yaml in
+# this directory into one Catalog at construction time; dataset ids
+# must be unique across files. Stanzas are emitted by
+# tools/cmems/refresh_cmems_catalog.py from copernicusmarine.describe();
+# `cadence` is inferred from the dataset_id suffix, `domain` from the
+# product_id prefix, and `temporal.start` is read from the dataset's
+# arco time-coordinate bounds. `end` is left null (the arco max is
+# "latest available today" and would go stale for rolling products).
+# Where the toolbox exposes no standard_name for a variable, the row
+# carries `long_name: ''` with a TODO marker.
+#
+# Schema (per dataset):
+#   <dataset_id>:
+#     product: <product_id>
+#     title: <human-readable title>
+#     cadence: <daily|monthly|hourly|6hourly|climatology|irregular>
+#     domain: <global|mediterranean|arctic|...>
+#     temporal: { start: YYYY-MM-DD, end: YYYY-MM-DD }   # end null = NRT
+#     variables:
+#       <short_name>: { units: <CF units>, long_name: <CF long name> }
+
+datasets:
+
+  c3s_obs-sl_glo_phy-ssh_my_twosat-l4-duacs-0.25deg_P1D:
+    product: SEALEVEL_GLO_PHY_CLIMATE_L4_MY_008_057
+    title: DT merged two satellites Global Ocean Gridded SSALTO/DUACS Sea Surface Height L4 product
+    cadence: daily
+    domain: global
+    temporal:
+      start: 1993-01-01
+      end: null              # null = NRT / rolling
+    variables:
+      adt:
+        units: m
+        long_name: Sea surface height above geoid
+      err_sla:
+        units: m
+        long_name: Sea surface height above sea level standard error
+      err_ugosa:
+        units: m/s
+        long_name: Surface geostrophic eastward sea water velocity assuming sea level for geoid standard
+      err_vgosa:
+        units: m/s
+        long_name: Surface geostrophic northward sea water velocity assuming sea level for geoid standard
+      flag_ice:
+        units: ''
+        long_name: Status flag
+      sla:
+        units: m
+        long_name: Sea surface height above sea level
+      tpa_correction:
+        units: m
+        long_name: Sea surface height above sea level
+      ugos:
+        units: m/s
+        long_name: Surface geostrophic eastward sea water velocity
+      ugosa:
+        units: m/s
+        long_name: Surface geostrophic eastward sea water velocity assuming sea level for geoid
+      vgos:
+        units: m/s
+        long_name: Surface geostrophic northward sea water velocity
+      vgosa:
+        units: m/s
+        long_name: Surface geostrophic northward sea water velocity assuming sea level for geoid
+
+  c3s_obs-sl_glo_phy-ssh_my_twosat-l4-duacs-0.25deg_P1M-m:
+    product: SEALEVEL_GLO_PHY_CLIMATE_L4_MY_008_057
+    title: DT merged two-satellite Global Ocean L4 Monthly Means of Sea Level Anomalies and Derived
+    cadence: monthly
+    domain: global
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      eke:
+        units: cm2/s2
+        long_name: Specific kinetic energy of sea water
+      sla:
+        units: m
+        long_name: Sea surface height above sea level
+
+  cmems_obs-sl_blk_phy-mdt_my_l4-0.0625deg_P20Y:
+    product: SEALEVEL_BLK_PHY_MDT_L4_STATIC_008_067
+    title: cmems_obs-sl_blk_phy-mdt_my_l4-0.0625deg_P20Y
+    cadence: irregular
+    domain: global
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      err_mdt:
+        units: m
+        long_name: Sea surface height above geoid standard error
+      err_u:
+        units: m/s
+        long_name: Surface geostrophic eastward sea water velocity standard error
+      err_v:
+        units: m/s
+        long_name: Surface geostrophic northward sea water velocity standard error
+      mdt:
+        units: m
+        long_name: Sea surface height above geoid
+      u:
+        units: m/s
+        long_name: Surface geostrophic eastward sea water velocity
+      v:
+        units: m/s
+        long_name: Surface geostrophic northward sea water velocity
+
+  cmems_obs-sl_glo_phy-noise_mynrt_multi-L4-duacs-0.25deg_P1Y:
+    product: SEALEVEL_GLO_PHY_NOISE_L4_STATIC_008_033
+    title: cmems_obs-sl_glo_phy-noise_mynrt_multi-L4-duacs-0.25deg_P1Y
+    cadence: annual
+    domain: global
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      noise:
+        units: m
+        long_name: Sea surface height above sea level
+
+  cmems_obs-sl_glo_phy-ssh_my_al-l3-duacs_PT1S:
+    product: SEALEVEL_GLO_PHY_L3_MY_008_062
+    title: cmems_obs-sl_glo_phy-ssh_my_al-l3-duacs_PT1S_202411
+    cadence: irregular
+    domain: global
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      dac:
+        units: m
+        long_name: Dac
+      internal_tide:
+        units: m
+        long_name: Internal tide
+      lwe:
+        units: m
+        long_name: Lwe
+      mdt:
+        units: m
+        long_name: Sea surface height above geoid
+      ocean_tide:
+        units: m
+        long_name: Ocean tide
+      sla_filtered:
+        units: m
+        long_name: Sea surface height above sea level
+      sla_unfiltered:
+        units: m
+        long_name: Sea surface height above sea level
+
+  cmems_obs-sl_glo_phy-ssh_my_alg-l3-duacs_PT1S:
+    product: SEALEVEL_GLO_PHY_L3_MY_008_062
+    title: cmems_obs-sl_glo_phy-ssh_my_alg-l3-duacs_PT1S_202411
+    cadence: irregular
+    domain: global
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      dac:
+        units: m
+        long_name: Dac
+      internal_tide:
+        units: m
+        long_name: Internal tide
+      lwe:
+        units: m
+        long_name: Lwe
+      mdt:
+        units: m
+        long_name: Sea surface height above geoid
+      ocean_tide:
+        units: m
+        long_name: Ocean tide
+      sla_filtered:
+        units: m
+        long_name: Sea surface height above sea level
+      sla_unfiltered:
+        units: m
+        long_name: Sea surface height above sea level
+
+  cmems_obs-sl_glo_phy-ssh_my_allsat-demo-l4-duacs-0.125deg_P1D-i:
+    product: SEALEVEL_GLO_PHY_L4_MY_008_047
+    title: DT merged all satellites Global Ocean Gridded DUACS Sea Surface Height L4 product
+    cadence: daily
+    domain: global
+    temporal:
+      start: 1993-01-01
+      end: null              # null = NRT / rolling
+    variables:
+      adt:
+        units: m
+        long_name: Sea surface height above geoid
+      err_sla:
+        units: m
+        long_name: Sea surface height above sea level standard error
+      err_ugosa:
+        units: m/s
+        long_name: Surface geostrophic eastward sea water velocity assuming sea level for geoid standard
+      err_vgosa:
+        units: m/s
+        long_name: Surface geostrophic northward sea water velocity assuming sea level for geoid standard
+      flag_ice:
+        units: ''
+        long_name: Status flag
+      sla:
+        units: m
+        long_name: Sea surface height above sea level
+      tpa_correction:
+        units: m
+        long_name: Sea surface height above sea level
+      ugos:
+        units: m/s
+        long_name: Surface geostrophic eastward sea water velocity
+      ugosa:
+        units: m/s
+        long_name: Surface geostrophic eastward sea water velocity assuming sea level for geoid
+      vgos:
+        units: m/s
+        long_name: Surface geostrophic northward sea water velocity
+      vgosa:
+        units: m/s
+        long_name: Surface geostrophic northward sea water velocity assuming sea level for geoid
+
+  cmems_obs-sl_glo_phy-ssh_my_allsat-l4-duacs-0.125deg_P1D:
+    product: SEALEVEL_GLO_PHY_L4_MY_008_047
+    title: DT merged all satellites Global Ocean Gridded SSALTO/DUACS Sea Surface Height L4 product
+    cadence: daily
+    domain: global
+    temporal:
+      start: 1993-01-01
+      end: null              # null = NRT / rolling
+    variables:
+      adt:
+        units: m
+        long_name: Sea surface height above geoid
+      err_sla:
+        units: m
+        long_name: Sea surface height above sea level standard error
+      err_ugosa:
+        units: m/s
+        long_name: Surface geostrophic eastward sea water velocity assuming sea level for geoid standard
+      err_vgosa:
+        units: m/s
+        long_name: Surface geostrophic northward sea water velocity assuming sea level for geoid standard
+      flag_ice:
+        units: ''
+        long_name: Status flag
+      sla:
+        units: m
+        long_name: Sea surface height above sea level
+      tpa_correction:
+        units: m
+        long_name: Sea surface height above sea level
+      ugos:
+        units: m/s
+        long_name: Surface geostrophic eastward sea water velocity
+      ugosa:
+        units: m/s
+        long_name: Surface geostrophic eastward sea water velocity assuming sea level for geoid
+      vgos:
+        units: m/s
+        long_name: Surface geostrophic northward sea water velocity
+      vgosa:
+        units: m/s
+        long_name: Surface geostrophic northward sea water velocity assuming sea level for geoid
+
+  cmems_obs-sl_glo_phy-ssh_my_allsat-l4-duacs-0.125deg_P1M-m:
+    product: SEALEVEL_GLO_PHY_L4_MY_008_047
+    title: DT merged all satellites Global Ocean Ocean Gridded Monthly Mean of Sea Level Anomalies
+    cadence: monthly
+    domain: global
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      sla:
+        units: m
+        long_name: Sea surface height above sea level
+
+  cmems_obs-sl_glo_phy-ssh_my_c2-l3-duacs_PT1S:
+    product: SEALEVEL_GLO_PHY_L3_MY_008_062
+    title: cmems_obs-sl_glo_phy-ssh_my_c2-l3-duacs_PT1S_202411
+    cadence: irregular
+    domain: global
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      dac:
+        units: m
+        long_name: Dac
+      internal_tide:
+        units: m
+        long_name: Internal tide
+      lwe:
+        units: m
+        long_name: Lwe
+      mdt:
+        units: m
+        long_name: Sea surface height above geoid
+      ocean_tide:
+        units: m
+        long_name: Ocean tide
+      sla_filtered:
+        units: m
+        long_name: Sea surface height above sea level
+      sla_unfiltered:
+        units: m
+        long_name: Sea surface height above sea level
+
+  cmems_obs-sl_glo_phy-ssh_my_c2n-l3-duacs_PT1S:
+    product: SEALEVEL_GLO_PHY_L3_MY_008_062
+    title: cmems_obs-sl_glo_phy-ssh_my_c2n-l3-duacs_PT1S_202411
+    cadence: irregular
+    domain: global
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      dac:
+        units: m
+        long_name: Dac
+      internal_tide:
+        units: m
+        long_name: Internal tide
+      lwe:
+        units: m
+        long_name: Lwe
+      mdt:
+        units: m
+        long_name: Sea surface height above geoid
+      ocean_tide:
+        units: m
+        long_name: Ocean tide
+      sla_filtered:
+        units: m
+        long_name: Sea surface height above sea level
+      sla_unfiltered:
+        units: m
+        long_name: Sea surface height above sea level
+
+  cmems_obs-sl_glo_phy-ssh_my_e1-l3-duacs_PT1S:
+    product: SEALEVEL_GLO_PHY_L3_MY_008_062
+    title: cmems_obs-sl_glo_phy-ssh_my_e1-l3-duacs_PT1S_202411
+    cadence: irregular
+    domain: global
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      dac:
+        units: m
+        long_name: Dac
+      internal_tide:
+        units: m
+        long_name: Internal tide
+      lwe:
+        units: m
+        long_name: Lwe
+      mdt:
+        units: m
+        long_name: Sea surface height above geoid
+      ocean_tide:
+        units: m
+        long_name: Ocean tide
+      sla_filtered:
+        units: m
+        long_name: Sea surface height above sea level
+      sla_unfiltered:
+        units: m
+        long_name: Sea surface height above sea level
+
+  cmems_obs-sl_glo_phy-ssh_my_e1g-l3-duacs_PT1S:
+    product: SEALEVEL_GLO_PHY_L3_MY_008_062
+    title: cmems_obs-sl_glo_phy-ssh_my_e1g-l3-duacs_PT1S_202411
+    cadence: irregular
+    domain: global
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      dac:
+        units: m
+        long_name: Dac
+      internal_tide:
+        units: m
+        long_name: Internal tide
+      lwe:
+        units: m
+        long_name: Lwe
+      mdt:
+        units: m
+        long_name: Sea surface height above geoid
+      ocean_tide:
+        units: m
+        long_name: Ocean tide
+      sla_filtered:
+        units: m
+        long_name: Sea surface height above sea level
+      sla_unfiltered:
+        units: m
+        long_name: Sea surface height above sea level
+
+  cmems_obs-sl_glo_phy-ssh_my_e2-l3-duacs_PT1S:
+    product: SEALEVEL_GLO_PHY_L3_MY_008_062
+    title: cmems_obs-sl_glo_phy-ssh_my_e2-l3-duacs_PT1S_202411
+    cadence: irregular
+    domain: global
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      dac:
+        units: m
+        long_name: Dac
+      internal_tide:
+        units: m
+        long_name: Internal tide
+      lwe:
+        units: m
+        long_name: Lwe
+      mdt:
+        units: m
+        long_name: Sea surface height above geoid
+      ocean_tide:
+        units: m
+        long_name: Ocean tide
+      sla_filtered:
+        units: m
+        long_name: Sea surface height above sea level
+      sla_unfiltered:
+        units: m
+        long_name: Sea surface height above sea level
+
+  cmems_obs-sl_glo_phy-ssh_my_en-l3-duacs_PT1S:
+    product: SEALEVEL_GLO_PHY_L3_MY_008_062
+    title: cmems_obs-sl_glo_phy-ssh_my_en-l3-duacs_PT1S_202411
+    cadence: irregular
+    domain: global
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      dac:
+        units: m
+        long_name: Dac
+      internal_tide:
+        units: m
+        long_name: Internal tide
+      lwe:
+        units: m
+        long_name: Lwe
+      mdt:
+        units: m
+        long_name: Sea surface height above geoid
+      ocean_tide:
+        units: m
+        long_name: Ocean tide
+      sla_filtered:
+        units: m
+        long_name: Sea surface height above sea level
+      sla_unfiltered:
+        units: m
+        long_name: Sea surface height above sea level
+
+  cmems_obs-sl_glo_phy-ssh_my_enn-l3-duacs_PT1S:
+    product: SEALEVEL_GLO_PHY_L3_MY_008_062
+    title: cmems_obs-sl_glo_phy-ssh_my_enn-l3-duacs_PT1S_202411
+    cadence: irregular
+    domain: global
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      dac:
+        units: m
+        long_name: Dac
+      internal_tide:
+        units: m
+        long_name: Internal tide
+      lwe:
+        units: m
+        long_name: Lwe
+      mdt:
+        units: m
+        long_name: Sea surface height above geoid
+      ocean_tide:
+        units: m
+        long_name: Ocean tide
+      sla_filtered:
+        units: m
+        long_name: Sea surface height above sea level
+      sla_unfiltered:
+        units: m
+        long_name: Sea surface height above sea level
+
+  cmems_obs-sl_glo_phy-ssh_my_g2-l3-duacs_PT1S:
+    product: SEALEVEL_GLO_PHY_L3_MY_008_062
+    title: cmems_obs-sl_glo_phy-ssh_my_g2-l3-duacs_PT1S_202411
+    cadence: irregular
+    domain: global
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      dac:
+        units: m
+        long_name: Dac
+      internal_tide:
+        units: m
+        long_name: Internal tide
+      lwe:
+        units: m
+        long_name: Lwe
+      mdt:
+        units: m
+        long_name: Sea surface height above geoid
+      ocean_tide:
+        units: m
+        long_name: Ocean tide
+      sla_filtered:
+        units: m
+        long_name: Sea surface height above sea level
+      sla_unfiltered:
+        units: m
+        long_name: Sea surface height above sea level
+
+  cmems_obs-sl_glo_phy-ssh_my_h2a-l3-duacs_PT1S:
+    product: SEALEVEL_GLO_PHY_L3_MY_008_062
+    title: cmems_obs-sl_glo_phy-ssh_my_h2a-l3-duacs_PT1S_202411
+    cadence: irregular
+    domain: global
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      dac:
+        units: m
+        long_name: Dac
+      internal_tide:
+        units: m
+        long_name: Internal tide
+      lwe:
+        units: m
+        long_name: Lwe
+      mdt:
+        units: m
+        long_name: Sea surface height above geoid
+      ocean_tide:
+        units: m
+        long_name: Ocean tide
+      sla_filtered:
+        units: m
+        long_name: Sea surface height above sea level
+      sla_unfiltered:
+        units: m
+        long_name: Sea surface height above sea level
+
+  cmems_obs-sl_glo_phy-ssh_my_h2ag-l3-duacs_PT1S:
+    product: SEALEVEL_GLO_PHY_L3_MY_008_062
+    title: cmems_obs-sl_glo_phy-ssh_my_h2ag-l3-duacs_PT1S_202411
+    cadence: irregular
+    domain: global
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      dac:
+        units: m
+        long_name: Dac
+      internal_tide:
+        units: m
+        long_name: Internal tide
+      lwe:
+        units: m
+        long_name: Lwe
+      mdt:
+        units: m
+        long_name: Sea surface height above geoid
+      ocean_tide:
+        units: m
+        long_name: Ocean tide
+      sla_filtered:
+        units: m
+        long_name: Sea surface height above sea level
+      sla_unfiltered:
+        units: m
+        long_name: Sea surface height above sea level
+
+  cmems_obs-sl_glo_phy-ssh_my_h2b-l3-duacs_PT1S:
+    product: SEALEVEL_GLO_PHY_L3_MY_008_062
+    title: cmems_obs-sl_glo_phy-ssh_my_h2b-l3-duacs_PT1S_202411
+    cadence: irregular
+    domain: global
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      dac:
+        units: m
+        long_name: Dac
+      internal_tide:
+        units: m
+        long_name: Internal tide
+      lwe:
+        units: m
+        long_name: Lwe
+      mdt:
+        units: m
+        long_name: Sea surface height above geoid
+      ocean_tide:
+        units: m
+        long_name: Ocean tide
+      sla_filtered:
+        units: m
+        long_name: Sea surface height above sea level
+      sla_unfiltered:
+        units: m
+        long_name: Sea surface height above sea level
+
+  cmems_obs-sl_glo_phy-ssh_my_j1-l3-duacs_PT1S:
+    product: SEALEVEL_GLO_PHY_L3_MY_008_062
+    title: cmems_obs-sl_glo_phy-ssh_my_j1-l3-duacs_PT1S_202411
+    cadence: irregular
+    domain: global
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      dac:
+        units: m
+        long_name: Dac
+      internal_tide:
+        units: m
+        long_name: Internal tide
+      lwe:
+        units: m
+        long_name: Lwe
+      mdt:
+        units: m
+        long_name: Sea surface height above geoid
+      ocean_tide:
+        units: m
+        long_name: Ocean tide
+      sla_filtered:
+        units: m
+        long_name: Sea surface height above sea level
+      sla_unfiltered:
+        units: m
+        long_name: Sea surface height above sea level
+
+  cmems_obs-sl_glo_phy-ssh_my_j1g-l3-duacs_PT1S:
+    product: SEALEVEL_GLO_PHY_L3_MY_008_062
+    title: cmems_obs-sl_glo_phy-ssh_my_j1g-l3-duacs_PT1S_202411
+    cadence: irregular
+    domain: global
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      dac:
+        units: m
+        long_name: Dac
+      internal_tide:
+        units: m
+        long_name: Internal tide
+      lwe:
+        units: m
+        long_name: Lwe
+      mdt:
+        units: m
+        long_name: Sea surface height above geoid
+      ocean_tide:
+        units: m
+        long_name: Ocean tide
+      sla_filtered:
+        units: m
+        long_name: Sea surface height above sea level
+      sla_unfiltered:
+        units: m
+        long_name: Sea surface height above sea level
+
+  cmems_obs-sl_glo_phy-ssh_my_j1n-l3-duacs_PT1S:
+    product: SEALEVEL_GLO_PHY_L3_MY_008_062
+    title: cmems_obs-sl_glo_phy-ssh_my_j1n-l3-duacs_PT1S_202411
+    cadence: irregular
+    domain: global
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      dac:
+        units: m
+        long_name: Dac
+      internal_tide:
+        units: m
+        long_name: Internal tide
+      lwe:
+        units: m
+        long_name: Lwe
+      mdt:
+        units: m
+        long_name: Sea surface height above geoid
+      ocean_tide:
+        units: m
+        long_name: Ocean tide
+      sla_filtered:
+        units: m
+        long_name: Sea surface height above sea level
+      sla_unfiltered:
+        units: m
+        long_name: Sea surface height above sea level
+
+  cmems_obs-sl_glo_phy-ssh_my_j2-l3-duacs_PT1S:
+    product: SEALEVEL_GLO_PHY_L3_MY_008_062
+    title: cmems_obs-sl_glo_phy-ssh_my_j2-l3-duacs_PT1S_202411
+    cadence: irregular
+    domain: global
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      dac:
+        units: m
+        long_name: Dac
+      internal_tide:
+        units: m
+        long_name: Internal tide
+      lwe:
+        units: m
+        long_name: Lwe
+      mdt:
+        units: m
+        long_name: Sea surface height above geoid
+      ocean_tide:
+        units: m
+        long_name: Ocean tide
+      sla_filtered:
+        units: m
+        long_name: Sea surface height above sea level
+      sla_unfiltered:
+        units: m
+        long_name: Sea surface height above sea level
+
+  cmems_obs-sl_glo_phy-ssh_my_j2g-l3-duacs_PT1S:
+    product: SEALEVEL_GLO_PHY_L3_MY_008_062
+    title: cmems_obs-sl_glo_phy-ssh_my_j2g-l3-duacs_PT1S_202411
+    cadence: irregular
+    domain: global
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      dac:
+        units: m
+        long_name: Dac
+      internal_tide:
+        units: m
+        long_name: Internal tide
+      lwe:
+        units: m
+        long_name: Lwe
+      mdt:
+        units: m
+        long_name: Sea surface height above geoid
+      ocean_tide:
+        units: m
+        long_name: Ocean tide
+      sla_filtered:
+        units: m
+        long_name: Sea surface height above sea level
+      sla_unfiltered:
+        units: m
+        long_name: Sea surface height above sea level
+
+  cmems_obs-sl_glo_phy-ssh_my_j2n-l3-duacs_PT1S:
+    product: SEALEVEL_GLO_PHY_L3_MY_008_062
+    title: cmems_obs-sl_glo_phy-ssh_my_j2n-l3-duacs_PT1S_202411
+    cadence: irregular
+    domain: global
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      dac:
+        units: m
+        long_name: Dac
+      internal_tide:
+        units: m
+        long_name: Internal tide
+      lwe:
+        units: m
+        long_name: Lwe
+      mdt:
+        units: m
+        long_name: Sea surface height above geoid
+      ocean_tide:
+        units: m
+        long_name: Ocean tide
+      sla_filtered:
+        units: m
+        long_name: Sea surface height above sea level
+      sla_unfiltered:
+        units: m
+        long_name: Sea surface height above sea level
+
+  cmems_obs-sl_glo_phy-ssh_my_j3-l3-duacs_PT1S:
+    product: SEALEVEL_GLO_PHY_L3_MY_008_062
+    title: cmems_obs-sl_glo_phy-ssh_my_j3-l3-duacs_PT1S_202411
+    cadence: irregular
+    domain: global
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      dac:
+        units: m
+        long_name: Dac
+      internal_tide:
+        units: m
+        long_name: Internal tide
+      lwe:
+        units: m
+        long_name: Lwe
+      mdt:
+        units: m
+        long_name: Sea surface height above geoid
+      ocean_tide:
+        units: m
+        long_name: Ocean tide
+      sla_filtered:
+        units: m
+        long_name: Sea surface height above sea level
+      sla_unfiltered:
+        units: m
+        long_name: Sea surface height above sea level
+
+  cmems_obs-sl_glo_phy-ssh_my_j3g-l3-duacs_PT1S-i:
+    product: SEALEVEL_GLO_PHY_L3_MY_008_062
+    title: cmems_obs-sl_glo_phy-ssh_my_j3g-l3-duacs_PT1S-i_202506
+    cadence: irregular
+    domain: global
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      dac:
+        units: m
+        long_name: Dac
+      internal_tide:
+        units: m
+        long_name: Internal tide
+      lwe:
+        units: m
+        long_name: Lwe
+      mdt:
+        units: m
+        long_name: Sea surface height above geoid
+      ocean_tide:
+        units: m
+        long_name: Ocean tide
+      sla_filtered:
+        units: m
+        long_name: Sea surface height above sea level
+      sla_unfiltered:
+        units: m
+        long_name: Sea surface height above sea level
+
+  cmems_obs-sl_glo_phy-ssh_my_j3n-l3-duacs_PT1S:
+    product: SEALEVEL_GLO_PHY_L3_MY_008_062
+    title: cmems_obs-sl_glo_phy-ssh_my_j3n-l3-duacs_PT1S_202411
+    cadence: irregular
+    domain: global
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      dac:
+        units: m
+        long_name: Dac
+      internal_tide:
+        units: m
+        long_name: Internal tide
+      lwe:
+        units: m
+        long_name: Lwe
+      mdt:
+        units: m
+        long_name: Sea surface height above geoid
+      ocean_tide:
+        units: m
+        long_name: Ocean tide
+      sla_filtered:
+        units: m
+        long_name: Sea surface height above sea level
+      sla_unfiltered:
+        units: m
+        long_name: Sea surface height above sea level
+
+  cmems_obs-sl_glo_phy-ssh_my_s3a-l3-duacs_PT1S:
+    product: SEALEVEL_GLO_PHY_L3_MY_008_062
+    title: cmems_obs-sl_glo_phy-ssh_my_s3a-l3-duacs_PT1S_202411
+    cadence: irregular
+    domain: global
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      dac:
+        units: m
+        long_name: Dac
+      internal_tide:
+        units: m
+        long_name: Internal tide
+      lwe:
+        units: m
+        long_name: Lwe
+      mdt:
+        units: m
+        long_name: Sea surface height above geoid
+      ocean_tide:
+        units: m
+        long_name: Ocean tide
+      sla_filtered:
+        units: m
+        long_name: Sea surface height above sea level
+      sla_unfiltered:
+        units: m
+        long_name: Sea surface height above sea level
+
+  cmems_obs-sl_glo_phy-ssh_my_s3b-l3-duacs_PT1S:
+    product: SEALEVEL_GLO_PHY_L3_MY_008_062
+    title: cmems_obs-sl_glo_phy-ssh_my_s3b-l3-duacs_PT1S_202411
+    cadence: irregular
+    domain: global
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      dac:
+        units: m
+        long_name: Dac
+      internal_tide:
+        units: m
+        long_name: Internal tide
+      lwe:
+        units: m
+        long_name: Lwe
+      mdt:
+        units: m
+        long_name: Sea surface height above geoid
+      ocean_tide:
+        units: m
+        long_name: Ocean tide
+      sla_filtered:
+        units: m
+        long_name: Sea surface height above sea level
+      sla_unfiltered:
+        units: m
+        long_name: Sea surface height above sea level
+
+  cmems_obs-sl_glo_phy-ssh_my_s6a-lr-l3-duacs_PT1S:
+    product: SEALEVEL_GLO_PHY_L3_MY_008_062
+    title: cmems_obs-sl_glo_phy-ssh_my_s6a-lr-l3-duacs_PT1S_202411
+    cadence: irregular
+    domain: global
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      dac:
+        units: m
+        long_name: Dac
+      internal_tide:
+        units: m
+        long_name: Internal tide
+      lwe:
+        units: m
+        long_name: Lwe
+      mdt:
+        units: m
+        long_name: Sea surface height above geoid
+      ocean_tide:
+        units: m
+        long_name: Ocean tide
+      sla_filtered:
+        units: m
+        long_name: Sea surface height above sea level
+      sla_unfiltered:
+        units: m
+        long_name: Sea surface height above sea level
+
+  cmems_obs-sl_glo_phy-ssh_my_swon-l3-duacs_PT1S:
+    product: SEALEVEL_GLO_PHY_L3_MY_008_062
+    title: cmems_obs-sl_glo_phy-ssh_my_swon-l3-duacs_PT1S_202411
+    cadence: irregular
+    domain: global
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      dac:
+        units: m
+        long_name: Dac
+      internal_tide:
+        units: m
+        long_name: Internal tide
+      lwe:
+        units: m
+        long_name: Lwe
+      mdt:
+        units: m
+        long_name: Sea surface height above geoid
+      ocean_tide:
+        units: m
+        long_name: Ocean tide
+      sla_filtered:
+        units: m
+        long_name: Sea surface height above sea level
+      sla_unfiltered:
+        units: m
+        long_name: Sea surface height above sea level
+
+  cmems_obs-sl_glo_phy-ssh_my_swonc-l3-duacs_PT1S:
+    product: SEALEVEL_GLO_PHY_L3_MY_008_062
+    title: cmems_obs-sl_glo_phy-ssh_my_swonc-l3-duacs_PT1S_202411
+    cadence: irregular
+    domain: global
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      dac:
+        units: m
+        long_name: Dac
+      internal_tide:
+        units: m
+        long_name: Internal tide
+      lwe:
+        units: m
+        long_name: Lwe
+      mdt:
+        units: m
+        long_name: Sea surface height above geoid
+      ocean_tide:
+        units: m
+        long_name: Ocean tide
+      sla_filtered:
+        units: m
+        long_name: Sea surface height above sea level
+      sla_unfiltered:
+        units: m
+        long_name: Sea surface height above sea level
+
+  cmems_obs-sl_glo_phy-ssh_my_tp-l3-duacs_PT1S:
+    product: SEALEVEL_GLO_PHY_L3_MY_008_062
+    title: cmems_obs-sl_glo_phy-ssh_my_tp-l3-duacs_PT1S_202411
+    cadence: irregular
+    domain: global
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      dac:
+        units: m
+        long_name: Dac
+      internal_tide:
+        units: m
+        long_name: Internal tide
+      lwe:
+        units: m
+        long_name: Lwe
+      mdt:
+        units: m
+        long_name: Sea surface height above geoid
+      ocean_tide:
+        units: m
+        long_name: Ocean tide
+      sla_filtered:
+        units: m
+        long_name: Sea surface height above sea level
+      sla_unfiltered:
+        units: m
+        long_name: Sea surface height above sea level
+
+  cmems_obs-sl_glo_phy-ssh_my_tpn-l3-duacs_PT1S:
+    product: SEALEVEL_GLO_PHY_L3_MY_008_062
+    title: cmems_obs-sl_glo_phy-ssh_my_tpn-l3-duacs_PT1S_202411
+    cadence: irregular
+    domain: global
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      dac:
+        units: m
+        long_name: Dac
+      internal_tide:
+        units: m
+        long_name: Internal tide
+      lwe:
+        units: m
+        long_name: Lwe
+      mdt:
+        units: m
+        long_name: Sea surface height above geoid
+      ocean_tide:
+        units: m
+        long_name: Ocean tide
+      sla_filtered:
+        units: m
+        long_name: Sea surface height above sea level
+      sla_unfiltered:
+        units: m
+        long_name: Sea surface height above sea level
+
+  cmems_obs-sl_glo_phy-ssh_nrt_al-l3-duacs_PT1S:
+    product: SEALEVEL_GLO_PHY_L3_NRT_008_044
+    title: cmems_obs-sl_glo_phy-ssh_nrt_al-l3-duacs_PT1S_202311
+    cadence: irregular
+    domain: global
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      dac:
+        units: m
+        long_name: Dac
+      internal_tide:
+        units: m
+        long_name: Internal tide
+      lwe:
+        units: m
+        long_name: Lwe
+      mdt:
+        units: m
+        long_name: Sea surface height above geoid
+      ocean_tide:
+        units: m
+        long_name: Ocean tide
+      sla_filtered:
+        units: m
+        long_name: Sea surface height above sea level
+      sla_unfiltered:
+        units: m
+        long_name: Sea surface height above sea level
+
+  cmems_obs-sl_glo_phy-ssh_nrt_allsat-l4-duacs-0.125deg_P1D:
+    product: SEALEVEL_GLO_PHY_L4_NRT_008_046
+    title: NRT merged all satellites Global Ocean Gridded SSALTO/DUACS Sea Surface Height L4
+    cadence: daily
+    domain: global
+    temporal:
+      start: 2024-07-01
+      end: null              # null = NRT / rolling
+    variables:
+      adt:
+        units: m
+        long_name: Sea surface height above geoid
+      err_sla:
+        units: m
+        long_name: Sea surface height above sea level standard error
+      err_ugosa:
+        units: m/s
+        long_name: Surface geostrophic eastward sea water velocity assuming sea level for geoid standard
+      err_vgosa:
+        units: m/s
+        long_name: Surface geostrophic northward sea water velocity assuming sea level for geoid standard
+      flag_ice:
+        units: ''
+        long_name: Status flag
+      sla:
+        units: m
+        long_name: Sea surface height above sea level
+      ugos:
+        units: m/s
+        long_name: Surface geostrophic eastward sea water velocity
+      ugosa:
+        units: m/s
+        long_name: Surface geostrophic eastward sea water velocity assuming sea level for geoid
+      vgos:
+        units: m/s
+        long_name: Surface geostrophic northward sea water velocity
+      vgosa:
+        units: m/s
+        long_name: Surface geostrophic northward sea water velocity assuming sea level for geoid
+
+  cmems_obs-sl_glo_phy-ssh_nrt_allsat-l4-duacs-0.25deg_P1D:
+    product: SEALEVEL_GLO_PHY_L4_NRT_008_046
+    title: NRT merged all satellites Global Ocean Gridded SSALTO/DUACS Sea Surface Height L4
+    cadence: daily
+    domain: global
+    temporal:
+      start: 2022-10-04
+      end: null              # null = NRT / rolling
+    variables:
+      adt:
+        units: m
+        long_name: Sea surface height above geoid
+      err_sla:
+        units: m
+        long_name: Sea surface height above sea level standard error
+      err_ugosa:
+        units: m/s
+        long_name: Surface geostrophic eastward sea water velocity assuming sea level for geoid standard
+      err_vgosa:
+        units: m/s
+        long_name: Surface geostrophic northward sea water velocity assuming sea level for geoid standard
+      flag_ice:
+        units: ''
+        long_name: Status flag
+      sla:
+        units: m
+        long_name: Sea surface height above sea level
+      ugos:
+        units: m/s
+        long_name: Surface geostrophic eastward sea water velocity
+      ugosa:
+        units: m/s
+        long_name: Surface geostrophic eastward sea water velocity assuming sea level for geoid
+      vgos:
+        units: m/s
+        long_name: Surface geostrophic northward sea water velocity
+      vgosa:
+        units: m/s
+        long_name: Surface geostrophic northward sea water velocity assuming sea level for geoid
+
+  cmems_obs-sl_glo_phy-ssh_nrt_c2n-l3-duacs_PT1S:
+    product: SEALEVEL_GLO_PHY_L3_NRT_008_044
+    title: cmems_obs-sl_glo_phy-ssh_nrt_c2n-l3-duacs_PT1S_202311
+    cadence: irregular
+    domain: global
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      dac:
+        units: m
+        long_name: Dac
+      internal_tide:
+        units: m
+        long_name: Internal tide
+      lwe:
+        units: m
+        long_name: Lwe
+      mdt:
+        units: m
+        long_name: Sea surface height above geoid
+      ocean_tide:
+        units: m
+        long_name: Ocean tide
+      sla_filtered:
+        units: m
+        long_name: Sea surface height above sea level
+      sla_unfiltered:
+        units: m
+        long_name: Sea surface height above sea level
+
+  cmems_obs-sl_glo_phy-ssh_nrt_demo-allsat-swos-l4-duacs-0.125deg_P1D-i:
+    product: SEALEVEL_GLO_PHY_L4_NRT_008_046
+    title: NRT merged all Nadir satellites and SWOT Karin Global Ocean Gridded SSALTO/DUACS Sea
+    cadence: daily
+    domain: global
+    temporal:
+      start: 2025-10-28
+      end: null              # null = NRT / rolling
+    variables:
+      adt:
+        units: m
+        long_name: Sea surface height above geoid
+      err_sla:
+        units: m
+        long_name: Sea surface height above sea level standard error
+      err_ugosa:
+        units: m/s
+        long_name: Surface geostrophic eastward sea water velocity assuming sea level for geoid standard
+      err_vgosa:
+        units: m/s
+        long_name: Surface geostrophic northward sea water velocity assuming sea level for geoid standard
+      flag_ice:
+        units: ''
+        long_name: Status flag
+      sla:
+        units: m
+        long_name: Sea surface height above sea level
+      ugos:
+        units: m/s
+        long_name: Surface geostrophic eastward sea water velocity
+      ugosa:
+        units: m/s
+        long_name: Surface geostrophic eastward sea water velocity assuming sea level for geoid
+      vgos:
+        units: m/s
+        long_name: Surface geostrophic northward sea water velocity
+      vgosa:
+        units: m/s
+        long_name: Surface geostrophic northward sea water velocity assuming sea level for geoid
+
+  cmems_obs-sl_glo_phy-ssh_nrt_h2b-l3-duacs_PT0.2S:
+    product: SEALEVEL_GLO_PHY_L3_NRT_008_044
+    title: cmems_obs-sl_glo_phy-ssh_nrt_h2b-l3-duacs_PT0.2S_202311
+    cadence: irregular
+    domain: global
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      dac:
+        units: m
+        long_name: Dac
+      ib_lf:
+        units: m
+        long_name: Sea surface height correction due to air pressure at low frequency
+      internal_tide:
+        units: m
+        long_name: Internal tide
+      lwe:
+        units: m
+        long_name: Lwe
+      mdt:
+        units: m
+        long_name: Sea surface height above geoid
+      ocean_tide:
+        units: m
+        long_name: Sea surface height amplitude due to geocentric ocean tide
+      sla_filtered:
+        units: m
+        long_name: Sea surface height above sea level
+      sla_unfiltered:
+        units: m
+        long_name: Sea surface height above sea level
+      xtdir:
+        units: degrees
+        long_name: Sea water velocity to direction
+      xtgosa:
+        units: m s-1
+        long_name: Xtgosa
+      xtgosm:
+        units: m s-1
+        long_name: Xtgosm
+
+  cmems_obs-sl_glo_phy-ssh_nrt_h2b-l3-duacs_PT1S:
+    product: SEALEVEL_GLO_PHY_L3_NRT_008_044
+    title: cmems_obs-sl_glo_phy-ssh_nrt_h2b-l3-duacs_PT1S_202311
+    cadence: irregular
+    domain: global
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      dac:
+        units: m
+        long_name: Dac
+      internal_tide:
+        units: m
+        long_name: Internal tide
+      lwe:
+        units: m
+        long_name: Lwe
+      mdt:
+        units: m
+        long_name: Sea surface height above geoid
+      ocean_tide:
+        units: m
+        long_name: Ocean tide
+      sla_filtered:
+        units: m
+        long_name: Sea surface height above sea level
+      sla_unfiltered:
+        units: m
+        long_name: Sea surface height above sea level
+
+  cmems_obs-sl_glo_phy-ssh_nrt_j3g-l3-duacs_PT0.2S-i:
+    product: SEALEVEL_GLO_PHY_L3_NRT_008_044
+    title: cmems_obs-sl_glo_phy-ssh_nrt_j3g-l3-duacs_PT0.2S-i_202506
+    cadence: irregular
+    domain: global
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      dac:
+        units: m
+        long_name: Dac
+      ib_lf:
+        units: m
+        long_name: Sea surface height correction due to air pressure at low frequency
+      internal_tide:
+        units: m
+        long_name: Internal tide
+      lwe:
+        units: m
+        long_name: Lwe
+      mdt:
+        units: m
+        long_name: Sea surface height above geoid
+      ocean_tide:
+        units: m
+        long_name: Sea surface height amplitude due to geocentric ocean tide
+      sla_filtered:
+        units: m
+        long_name: Sea surface height above sea level
+      sla_unfiltered:
+        units: m
+        long_name: Sea surface height above sea level
+      xtdir:
+        units: degrees
+        long_name: Sea water velocity to direction
+      xtgosa:
+        units: m s-1
+        long_name: Xtgosa
+      xtgosm:
+        units: m s-1
+        long_name: Xtgosm
+
+  cmems_obs-sl_glo_phy-ssh_nrt_j3g-l3-duacs_PT1S-i:
+    product: SEALEVEL_GLO_PHY_L3_NRT_008_044
+    title: cmems_obs-sl_glo_phy-ssh_nrt_j3g-l3-duacs_PT1S-i_202506
+    cadence: irregular
+    domain: global
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      dac:
+        units: m
+        long_name: Dac
+      internal_tide:
+        units: m
+        long_name: Internal tide
+      lwe:
+        units: m
+        long_name: Lwe
+      mdt:
+        units: m
+        long_name: Sea surface height above geoid
+      ocean_tide:
+        units: m
+        long_name: Sea surface height amplitude due to geocentric ocean tide
+      sla_filtered:
+        units: m
+        long_name: Sea surface height above sea level
+      sla_unfiltered:
+        units: m
+        long_name: Sea surface height above sea level
+
+  cmems_obs-sl_glo_phy-ssh_nrt_j3n-l3-duacs_PT0.2S:
+    product: SEALEVEL_GLO_PHY_L3_NRT_008_044
+    title: cmems_obs-sl_glo_phy-ssh_nrt_j3n-l3-duacs_PT0.2S_202311
+    cadence: irregular
+    domain: global
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      dac:
+        units: m
+        long_name: Dac
+      ib_lf:
+        units: m
+        long_name: Sea surface height correction due to air pressure at low frequency
+      internal_tide:
+        units: m
+        long_name: Internal tide
+      lwe:
+        units: m
+        long_name: Lwe
+      mdt:
+        units: m
+        long_name: Sea surface height above geoid
+      ocean_tide:
+        units: m
+        long_name: Sea surface height amplitude due to geocentric ocean tide
+      sla_filtered:
+        units: m
+        long_name: Sea surface height above sea level
+      sla_unfiltered:
+        units: m
+        long_name: Sea surface height above sea level
+      xtdir:
+        units: degrees
+        long_name: Sea water velocity to direction
+      xtgosa:
+        units: m s-1
+        long_name: Xtgosa
+      xtgosm:
+        units: m s-1
+        long_name: Xtgosm
+
+  cmems_obs-sl_glo_phy-ssh_nrt_j3n-l3-duacs_PT1S:
+    product: SEALEVEL_GLO_PHY_L3_NRT_008_044
+    title: cmems_obs-sl_glo_phy-ssh_nrt_j3n-l3-duacs_PT1S_202311
+    cadence: irregular
+    domain: global
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      dac:
+        units: m
+        long_name: Dac
+      internal_tide:
+        units: m
+        long_name: Internal tide
+      lwe:
+        units: m
+        long_name: Lwe
+      mdt:
+        units: m
+        long_name: Sea surface height above geoid
+      ocean_tide:
+        units: m
+        long_name: Ocean tide
+      sla_filtered:
+        units: m
+        long_name: Sea surface height above sea level
+      sla_unfiltered:
+        units: m
+        long_name: Sea surface height above sea level
+
+  cmems_obs-sl_glo_phy-ssh_nrt_s3a-l3-duacs_PT0.2S:
+    product: SEALEVEL_GLO_PHY_L3_NRT_008_044
+    title: cmems_obs-sl_glo_phy-ssh_nrt_s3a-l3-duacs_PT0.2S_202311
+    cadence: irregular
+    domain: global
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      dac:
+        units: m
+        long_name: Dac
+      ib_lf:
+        units: m
+        long_name: Sea surface height correction due to air pressure at low frequency
+      internal_tide:
+        units: m
+        long_name: Internal tide
+      lwe:
+        units: m
+        long_name: Lwe
+      mdt:
+        units: m
+        long_name: Sea surface height above geoid
+      ocean_tide:
+        units: m
+        long_name: Sea surface height amplitude due to geocentric ocean tide
+      sla_filtered:
+        units: m
+        long_name: Sea surface height above sea level
+      sla_unfiltered:
+        units: m
+        long_name: Sea surface height above sea level
+      xtdir:
+        units: degrees
+        long_name: Sea water velocity to direction
+      xtgosa:
+        units: m s-1
+        long_name: Xtgosa
+      xtgosm:
+        units: m s-1
+        long_name: Xtgosm
+
+  cmems_obs-sl_glo_phy-ssh_nrt_s3a-l3-duacs_PT1S:
+    product: SEALEVEL_GLO_PHY_L3_NRT_008_044
+    title: cmems_obs-sl_glo_phy-ssh_nrt_s3a-l3-duacs_PT1S_202311
+    cadence: irregular
+    domain: global
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      dac:
+        units: m
+        long_name: Dac
+      internal_tide:
+        units: m
+        long_name: Internal tide
+      lwe:
+        units: m
+        long_name: Lwe
+      mdt:
+        units: m
+        long_name: Sea surface height above geoid
+      ocean_tide:
+        units: m
+        long_name: Ocean tide
+      sla_filtered:
+        units: m
+        long_name: Sea surface height above sea level
+      sla_unfiltered:
+        units: m
+        long_name: Sea surface height above sea level
+
+  cmems_obs-sl_glo_phy-ssh_nrt_s3b-l3-duacs_PT0.2S:
+    product: SEALEVEL_GLO_PHY_L3_NRT_008_044
+    title: cmems_obs-sl_glo_phy-ssh_nrt_s3b-l3-duacs_PT0.2S_202311
+    cadence: irregular
+    domain: global
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      dac:
+        units: m
+        long_name: Dac
+      ib_lf:
+        units: m
+        long_name: Sea surface height correction due to air pressure at low frequency
+      internal_tide:
+        units: m
+        long_name: Internal tide
+      lwe:
+        units: m
+        long_name: Lwe
+      mdt:
+        units: m
+        long_name: Sea surface height above geoid
+      ocean_tide:
+        units: m
+        long_name: Sea surface height amplitude due to geocentric ocean tide
+      sla_filtered:
+        units: m
+        long_name: Sea surface height above sea level
+      sla_unfiltered:
+        units: m
+        long_name: Sea surface height above sea level
+      xtdir:
+        units: degrees
+        long_name: Sea water velocity to direction
+      xtgosa:
+        units: m s-1
+        long_name: Xtgosa
+      xtgosm:
+        units: m s-1
+        long_name: Xtgosm
+
+  cmems_obs-sl_glo_phy-ssh_nrt_s3b-l3-duacs_PT1S:
+    product: SEALEVEL_GLO_PHY_L3_NRT_008_044
+    title: cmems_obs-sl_glo_phy-ssh_nrt_s3b-l3-duacs_PT1S_202311
+    cadence: irregular
+    domain: global
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      dac:
+        units: m
+        long_name: Dac
+      internal_tide:
+        units: m
+        long_name: Internal tide
+      lwe:
+        units: m
+        long_name: Lwe
+      mdt:
+        units: m
+        long_name: Sea surface height above geoid
+      ocean_tide:
+        units: m
+        long_name: Ocean tide
+      sla_filtered:
+        units: m
+        long_name: Sea surface height above sea level
+      sla_unfiltered:
+        units: m
+        long_name: Sea surface height above sea level
+
+  cmems_obs-sl_glo_phy-ssh_nrt_s6a-hr-l3-duacs_PT0.2S:
+    product: SEALEVEL_GLO_PHY_L3_NRT_008_044
+    title: cmems_obs-sl_glo_phy-ssh_nrt_s6a-hr-l3-duacs_PT0.2S_202311
+    cadence: irregular
+    domain: global
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      dac:
+        units: m
+        long_name: Dac
+      ib_lf:
+        units: m
+        long_name: Sea surface height correction due to air pressure at low frequency
+      internal_tide:
+        units: m
+        long_name: Internal tide
+      lwe:
+        units: m
+        long_name: Lwe
+      mdt:
+        units: m
+        long_name: Sea surface height above geoid
+      ocean_tide:
+        units: m
+        long_name: Sea surface height amplitude due to geocentric ocean tide
+      sla_filtered:
+        units: m
+        long_name: Sea surface height above sea level
+      sla_unfiltered:
+        units: m
+        long_name: Sea surface height above sea level
+      xtdir:
+        units: degrees
+        long_name: Sea water velocity to direction
+      xtgosa:
+        units: m s-1
+        long_name: Xtgosa
+      xtgosm:
+        units: m s-1
+        long_name: Xtgosm
+
+  cmems_obs-sl_glo_phy-ssh_nrt_s6a-hr-l3-duacs_PT1S:
+    product: SEALEVEL_GLO_PHY_L3_NRT_008_044
+    title: cmems_obs-sl_glo_phy-ssh_nrt_s6a-hr-l3-duacs_PT1S_202311
+    cadence: irregular
+    domain: global
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      dac:
+        units: m
+        long_name: Dac
+      internal_tide:
+        units: m
+        long_name: Internal tide
+      lwe:
+        units: m
+        long_name: Lwe
+      mdt:
+        units: m
+        long_name: Sea surface height above geoid
+      ocean_tide:
+        units: m
+        long_name: Ocean tide
+      sla_filtered:
+        units: m
+        long_name: Sea surface height above sea level
+      sla_unfiltered:
+        units: m
+        long_name: Sea surface height above sea level
+
+  cmems_obs-sl_glo_phy-ssh_nrt_swon-l3-duacs_PT0.2S:
+    product: SEALEVEL_GLO_PHY_L3_NRT_008_044
+    title: cmems_obs-sl_glo_phy-ssh_nrt_swon-l3-duacs_PT0.2S_202311
+    cadence: irregular
+    domain: global
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      dac:
+        units: m
+        long_name: Dac
+      ib_lf:
+        units: m
+        long_name: Sea surface height correction due to air pressure at low frequency
+      internal_tide:
+        units: m
+        long_name: Internal tide
+      lwe:
+        units: m
+        long_name: Lwe
+      mdt:
+        units: m
+        long_name: Sea surface height above geoid
+      ocean_tide:
+        units: m
+        long_name: Sea surface height amplitude due to geocentric ocean tide
+      sla_filtered:
+        units: m
+        long_name: Sea surface height above sea level
+      sla_unfiltered:
+        units: m
+        long_name: Sea surface height above sea level
+      xtdir:
+        units: degrees
+        long_name: Sea water velocity to direction
+      xtgosa:
+        units: m s-1
+        long_name: Xtgosa
+      xtgosm:
+        units: m s-1
+        long_name: Xtgosm
+
+  cmems_obs-sl_glo_phy-ssh_nrt_swon-l3-duacs_PT1S:
+    product: SEALEVEL_GLO_PHY_L3_NRT_008_044
+    title: cmems_obs-sl_glo_phy-ssh_nrt_swon-l3-duacs_PT1S_202311
+    cadence: irregular
+    domain: global
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      dac:
+        units: m
+        long_name: Dac
+      internal_tide:
+        units: m
+        long_name: Internal tide
+      lwe:
+        units: m
+        long_name: Lwe
+      mdt:
+        units: m
+        long_name: Sea surface height above geoid
+      ocean_tide:
+        units: m
+        long_name: Sea surface height amplitude due to geocentric ocean tide
+      sla_filtered:
+        units: m
+        long_name: Sea surface height above sea level
+      sla_unfiltered:
+        units: m
+        long_name: Sea surface height above sea level
+
+  cmems_obs-sl_med_phy-mdt_my_l4-0.0417deg_P20Y:
+    product: SEALEVEL_MED_PHY_MDT_L4_STATIC_008_066
+    title: cmems_obs-sl_med_phy-mdt_my_l4-0.0417deg_P20Y
+    cadence: irregular
+    domain: global
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      err_mdt:
+        units: m
+        long_name: Sea surface height above geoid standard error
+      err_u:
+        units: m/s
+        long_name: Surface geostrophic eastward sea water velocity standard error
+      err_v:
+        units: m/s
+        long_name: Surface geostrophic northward sea water velocity standard error
+      mdt:
+        units: m
+        long_name: Sea surface height above geoid
+      u:
+        units: m/s
+        long_name: Surface geostrophic eastward sea water velocity
+      v:
+        units: m/s
+        long_name: Surface geostrophic northward sea water velocity
+
+  cnes_obs-sl_glo_phy-mdt_my_0.125deg_P20Y:
+    product: SEALEVEL_GLO_PHY_MDT_008_063
+    title: cnes_obs-sl_glo_phy-mdt_my_0.125deg_P20Y
+    cadence: irregular
+    domain: global
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      err_mdt:
+        units: m
+        long_name: Mean dynamic topography error
+      err_u:
+        units: m
+        long_name: Mean zonal geostrophic velocity error
+      err_v:
+        units: m
+        long_name: Mean meridional geostrophic velocity error
+      mdt:
+        units: m
+        long_name: Mean dynamic topography
+      u:
+        units: m/s
+        long_name: Mean zonal geostrophic velocity
+      v:
+        units: m/s
+        long_name: Mean meridional geostrophic velocity

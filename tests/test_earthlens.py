@@ -295,7 +295,14 @@ class TestEarthLensDownloadAggregate:
             lon_lim=[-75.0, -74.0],
             path=str(tmp_path),
         )
-        earthlens.datasource = MagicMock(name="stub_backend")
+        stub = MagicMock(name="stub_backend")
+        # Match the C1 contract: ECMWF is a raster backend, so the
+        # aggregate-guard in EarthLens.download should accept
+        # `aggregate=` and forward it. Without this, MagicMock would
+        # synthesise a child mock for `.OUTPUT_KIND` and the guard
+        # would (correctly) reject it as not in {raster, mixed}.
+        stub.OUTPUT_KIND = "raster"
+        earthlens.datasource = stub
         return earthlens
 
     def test_aggregate_none_does_not_reach_backend(self, stub_facade):

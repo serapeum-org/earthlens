@@ -29,6 +29,14 @@ def fake_gee(monkeypatch):
         to `EarthLens.datasource`.
     """
     fake = MagicMock(name="GEE", __name__="GEE")
+    # The real GEE backend declares OUTPUT_KIND = "raster" (C1). The
+    # facade's aggregate-guard inspects `instance.OUTPUT_KIND` to
+    # decide whether `aggregate=` is meaningful; without an explicit
+    # value on the mock, MagicMock would auto-fabricate a child mock
+    # and trip the guard. Pin both the class and instance attrs to
+    # the real backend's value so the mock keeps the same contract.
+    fake.OUTPUT_KIND = "raster"
+    fake.return_value.OUTPUT_KIND = "raster"
     monkeypatch.setattr(earthlens.gee, "GEE", fake)
     return fake
 
@@ -58,7 +66,7 @@ class TestRegistry:
         assert "gee" in EarthLens.DataSources
         assert "google-earth-engine" in EarthLens.DataSources
         assert sorted(EarthLens.DataSources) == [
-            "amazon-s3", "chc", "chirps", "ecmwf", "gee", "google-earth-engine",
+            "amazon-s3", "chc", "chirps", "cmems", "ecmwf", "gee", "google-earth-engine",
         ]
 
     def test_keys_resolve_to_gee_class(self):

@@ -1,0 +1,1791 @@
+# CMEMS curated catalog - polar slice.
+#
+# One slice of the per-domain split of the Copernicus Marine catalog.
+# The loader (earthlens.cmems.catalog.Catalog) merges every *.yaml in
+# this directory into one Catalog at construction time; dataset ids
+# must be unique across files. Stanzas are emitted by
+# tools/cmems/refresh_cmems_catalog.py from copernicusmarine.describe();
+# `cadence` is inferred from the dataset_id suffix, `domain` from the
+# product_id prefix, and `temporal.start` is read from the dataset's
+# arco time-coordinate bounds. `end` is left null (the arco max is
+# "latest available today" and would go stale for rolling products).
+# Where the toolbox exposes no standard_name for a variable, the row
+# carries `long_name: ''` with a TODO marker.
+#
+# Schema (per dataset):
+#   <dataset_id>:
+#     product: <product_id>
+#     title: <human-readable title>
+#     cadence: <daily|monthly|hourly|6hourly|climatology|irregular>
+#     domain: <global|mediterranean|arctic|...>
+#     temporal: { start: YYYY-MM-DD, end: YYYY-MM-DD }   # end null = NRT
+#     variables:
+#       <short_name>: { units: <CF units>, long_name: <CF long name> }
+
+datasets:
+
+  CERSAT-GLO-SEAICE_30DAYS_DRIFT_ASCAT_SSMI_MERGED_RAN-OBS_FULL_TIME_SERIE:
+    product: SEAICE_ARC_SEAICE_L3_REP_OBSERVATIONS_011_010
+    title: Arctic Ocean - Sea Ice - 30 days Drift, ASCAT/SSMI
+    cadence: irregular
+    domain: polar
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      eastward_sea_ice_velocity:
+        units: m/s
+        long_name: Eastward sea ice velocity
+      northward_sea_ice_velocity:
+        units: m/s
+        long_name: Northward sea ice velocity
+
+  CERSAT-GLO-SEAICE_30DAYS_DRIFT_QUICKSCAT_SSMI_MERGED_RAN-OBS_FULL_TIME_SERIE:
+    product: SEAICE_ARC_SEAICE_L3_REP_OBSERVATIONS_011_010
+    title: Polar Sea Ice Drift - QuikSCAT, SSM/I - L4 product
+    cadence: irregular
+    domain: polar
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      eastward_sea_ice_velocity:
+        units: m/s
+        long_name: Eastward sea ice velocity
+      northward_sea_ice_velocity:
+        units: m/s
+        long_name: Northward sea ice velocity
+
+  CERSAT-GLO-SEAICE_3DAYS_DRIFT_ASCAT_RAN-OBS_FULL_TIME_SERIE:
+    product: SEAICE_ARC_SEAICE_L3_REP_OBSERVATIONS_011_010
+    title: Arctic Ocean - Sea Ice - 3 days Drift, ASCAT
+    cadence: irregular
+    domain: polar
+    temporal:
+      start: 2007-01-31
+      end: null              # null = NRT / rolling
+    variables:
+      eastward_sea_ice_velocity:
+        units: m/s
+        long_name: Eastward sea ice velocity
+      northward_sea_ice_velocity:
+        units: m/s
+        long_name: Northward sea ice velocity
+
+  CERSAT-GLO-SEAICE_3DAYS_DRIFT_ASCAT_SSMI_MERGED_RAN-OBS_FULL_TIME_SERIE:
+    product: SEAICE_ARC_SEAICE_L3_REP_OBSERVATIONS_011_010
+    title: Arctic Ocean - Sea Ice - 3 days Drift, ASCAT/SSMI
+    cadence: irregular
+    domain: polar
+    temporal:
+      start: 2007-01-31
+      end: null              # null = NRT / rolling
+    variables:
+      eastward_sea_ice_velocity:
+        units: m/s
+        long_name: Eastward sea ice velocity
+      northward_sea_ice_velocity:
+        units: m/s
+        long_name: Northward sea ice velocity
+
+  CERSAT-GLO-SEAICE_3DAYS_DRIFT_QUICKSCAT_RAN-OBS_FULL_TIME_SERIE:
+    product: SEAICE_ARC_SEAICE_L3_REP_OBSERVATIONS_011_010
+    title: Polar Sea Ice Drift - QuikSCAT - L4 product
+    cadence: irregular
+    domain: polar
+    temporal:
+      start: 1999-09-28
+      end: null              # null = NRT / rolling
+    variables:
+      eastward_sea_ice_velocity:
+        units: m/s
+        long_name: Eastward sea ice velocity
+      northward_sea_ice_velocity:
+        units: m/s
+        long_name: Northward sea ice velocity
+
+  CERSAT-GLO-SEAICE_3DAYS_DRIFT_QUICKSCAT_SSMI_MERGED_RAN-OBS_FULL_TIME_SERIE:
+    product: SEAICE_ARC_SEAICE_L3_REP_OBSERVATIONS_011_010
+    title: Polar Sea Ice Drift - QuikSCAT, SSM/I - L4 product
+    cadence: irregular
+    domain: polar
+    temporal:
+      start: 1999-10-01
+      end: null              # null = NRT / rolling
+    variables:
+      eastward_sea_ice_velocity:
+        units: m/s
+        long_name: Eastward sea ice velocity
+      northward_sea_ice_velocity:
+        units: m/s
+        long_name: Northward sea ice velocity
+
+  CERSAT-GLO-SEAICE_6DAYS_DRIFT_ASCAT_RAN-OBS_FULL_TIME_SERIE:
+    product: SEAICE_ARC_SEAICE_L3_REP_OBSERVATIONS_011_010
+    title: Arctic Ocean - Sea Ice - 6 days Drift, ASCAT
+    cadence: irregular
+    domain: polar
+    temporal:
+      start: 2007-01-31
+      end: null              # null = NRT / rolling
+    variables:
+      eastward_sea_ice_velocity:
+        units: m/s
+        long_name: Eastward sea ice velocity
+      northward_sea_ice_velocity:
+        units: m/s
+        long_name: Northward sea ice velocity
+
+  CERSAT-GLO-SEAICE_6DAYS_DRIFT_QUICKSCAT_RAN-OBS_FULL_TIME_SERIE:
+    product: SEAICE_ARC_SEAICE_L3_REP_OBSERVATIONS_011_010
+    title: Polar Sea Ice Drift - QuikSCAT - L4 product
+    cadence: irregular
+    domain: polar
+    temporal:
+      start: 1999-09-25
+      end: null              # null = NRT / rolling
+    variables:
+      eastward_sea_ice_velocity:
+        units: m/s
+        long_name: Eastward sea ice velocity
+      northward_sea_ice_velocity:
+        units: m/s
+        long_name: Northward sea ice velocity
+
+  DMI-ARC-SEAICE_BERG-L4-NRT-OBS:
+    product: SEAICE_ARC_SEAICE_L4_NRT_OBSERVATIONS_011_007
+    title: Arctic Iceberg Density, L3, 10km daily  (DMI-ARC-SEAICE_BERG-L4-NRT-OBS)
+    cadence: irregular
+    domain: polar
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      extrem_lev:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      ibc:
+        units: 1e-2 km-2
+        long_name: Number of icebergs per unit area
+      stat_perc:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+
+  DMI-ARC-SEAICE_BERG_IW-L4-NRT-OBS:
+    product: SEAICE_ARC_SEAICE_L4_NRT_OBSERVATIONS_011_007
+    title: Arctic Iceberg Density, L3, 10km daily  (DMI-ARC-SEAICE_BERG_IW-L4-NRT-OBS)
+    cadence: irregular
+    domain: polar
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      extrem_lev:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      ibc:
+        units: 1e-2 km-2
+        long_name: Number of icebergs per unit area
+      stat_perc:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+
+  DMI-ARC-SEAICE_BERG_MOSAIC-L4-NRT-OBS:
+    product: SEAICE_ARC_SEAICE_L4_NRT_OBSERVATIONS_011_007
+    title: Arctic Iceberg Concentration Mosaic, L3, 10km daily  (DMI-ARC-SEAICE_BERG_MOSAIC-L4-NRT-OBS)
+    cadence: irregular
+    domain: polar
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      acq_time:
+        units: s
+        long_name: ''            # TODO: standard_name missing on describe()
+      extrem_lev:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      ibc:
+        units: 1e-2 km-2
+        long_name: Number of icebergs per unit area
+      stat_perc:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+
+  DMI-ARC-SEAICE_BERG_MOSAIC_IW-L4-NRT-OBS:
+    product: SEAICE_ARC_SEAICE_L4_NRT_OBSERVATIONS_011_007
+    title: Arctic Iceberg Concentration Mosaic, L3, 10km daily  (DMI-ARC-SEAICE_BERG_MOSAIC_IW-L4-NRT-OBS)
+    cadence: irregular
+    domain: polar
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      acq_time:
+        units: s
+        long_name: ''            # TODO: standard_name missing on describe()
+      extrem_lev:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      ibc:
+        units: 1e-2 km-2
+        long_name: Number of icebergs per unit area
+      stat_perc:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+
+  DMI-ARC-SEAICE_TEMP-L4-NRT-OBS:
+    product: SEAICE_ARC_SEAICE_L4_NRT_OBSERVATIONS_011_008
+    title: Arctic Sea and Ice Surface Temperature, L4, 5km daily  (DMI-ARC-SEAICE_TEMP-L4-NRT-OBS)
+    cadence: irregular
+    domain: polar
+    temporal:
+      start: 2018-01-01
+      end: null              # null = NRT / rolling
+    variables:
+      analysed_st:
+        units: kelvin
+        long_name: Surface temperature
+      analysis_error:
+        units: kelvin
+        long_name: ''            # TODO: standard_name missing on describe()
+      mask:
+        units: ''
+        long_name: ''            # TODO: standard_name missing on describe()
+      observation_max:
+        units: kelvin
+        long_name: ''            # TODO: standard_name missing on describe()
+      observation_min:
+        units: kelvin
+        long_name: ''            # TODO: standard_name missing on describe()
+      observation_num:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      observation_std:
+        units: kelvin
+        long_name: ''            # TODO: standard_name missing on describe()
+      sea_ice_fraction:
+        units: '1'
+        long_name: Sea ice area fraction
+
+  FMI-BAL-SEAICE_CONC-L4-NRT-OBS:
+    product: SEAICE_BAL_SEAICE_L4_NRT_OBSERVATIONS_011_004
+    title: Baltic Ice Concentration, L4, 1km daily (FMI-BAL-SEAICE_CONC-L4-NRT-OBS)
+    cadence: irregular
+    domain: polar
+    temporal:
+      start: 2018-01-01
+      end: null              # null = NRT / rolling
+    variables:
+      concentration_range:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      ice_concentration:
+        units: '%'
+        long_name: Sea ice area fraction
+      product_quality:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+
+  FMI-BAL-SEAICE_THICK-L4-NRT-OBS:
+    product: SEAICE_BAL_SEAICE_L4_NRT_OBSERVATIONS_011_004
+    title: Baltic Ice Thickness, L4, 1km daily (FMI-BAL-SEAICE_THICK-L4-NRT-OBS)
+    cadence: irregular
+    domain: polar
+    temporal:
+      start: 2018-01-01
+      end: null              # null = NRT / rolling
+    variables:
+      ice_thickness:
+        units: cm
+        long_name: Sea ice thickness
+      product_quality:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      thickness_range:
+        units: cm
+        long_name: ''            # TODO: standard_name missing on describe()
+
+  OSISAF-GLO-SEAICE_CONC_CONT_TIMESERIES-NH-LA-OBS:
+    product: SEAICE_GLO_SEAICE_L4_REP_OBSERVATIONS_011_009
+    title: Interim Sea Ice Concentration Climate Data Record Version 3 from the EUMETSAT OSI
+    cadence: irregular
+    domain: polar
+    temporal:
+      start: 2021-01-01
+      end: null              # null = NRT / rolling
+    variables:
+      algorithm_standard_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      ice_conc:
+        units: '%'
+        long_name: Sea ice area fraction
+      raw_ice_conc_values:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      smearing_standard_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      status_flag:
+        units: ''
+        long_name: Sea ice area fraction status flag
+      total_standard_uncertainty:
+        units: '%'
+        long_name: Sea ice area fraction standard error
+
+  OSISAF-GLO-SEAICE_CONC_CONT_TIMESERIES-SH-LA-OBS:
+    product: SEAICE_GLO_SEAICE_L4_REP_OBSERVATIONS_011_009
+    title: Interim Sea Ice Concentration Climate Data Record Version 3 from the EUMETSAT OSI
+    cadence: irregular
+    domain: polar
+    temporal:
+      start: 2021-01-01
+      end: null              # null = NRT / rolling
+    variables:
+      algorithm_standard_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      ice_conc:
+        units: '%'
+        long_name: Sea ice area fraction
+      raw_ice_conc_values:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      smearing_standard_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      status_flag:
+        units: ''
+        long_name: Sea ice area fraction status flag
+      total_standard_uncertainty:
+        units: '%'
+        long_name: Sea ice area fraction standard error
+
+  OSISAF-GLO-SEAICE_CONC_TIMESERIES-NH-LA-OBS:
+    product: SEAICE_GLO_SEAICE_L4_REP_OBSERVATIONS_011_009
+    title: Sea Ice Concentration Climate Data Record Version 3 (SMMR, SSM/I, and SSMIS) from
+    cadence: irregular
+    domain: polar
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      algorithm_standard_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      ice_conc:
+        units: '%'
+        long_name: Sea ice area fraction
+      raw_ice_conc_values:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      smearing_standard_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      status_flag:
+        units: ''
+        long_name: Sea ice area fraction status flag
+      total_standard_uncertainty:
+        units: '%'
+        long_name: Sea ice area fraction standard error
+
+  OSISAF-GLO-SEAICE_CONC_TIMESERIES-SH-LA-OBS:
+    product: SEAICE_GLO_SEAICE_L4_REP_OBSERVATIONS_011_009
+    title: Sea Ice Concentration Climate Data Record Version 3 (SMMR, SSM/I, and SSMIS) from
+    cadence: irregular
+    domain: polar
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      algorithm_standard_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      ice_conc:
+        units: '%'
+        long_name: Sea ice area fraction
+      raw_ice_conc_values:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      smearing_standard_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      status_flag:
+        units: ''
+        long_name: Sea ice area fraction status flag
+      total_standard_uncertainty:
+        units: '%'
+        long_name: Sea ice area fraction standard error
+
+  c3s_obs-si_glo_phy_my_nh-l3_P1M:
+    product: SEAICE_GLO_PHY_CLIMATE_L3_MY_011_013
+    title: Sea Ice Thickness
+    cadence: monthly
+    domain: polar
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      quality_flag:
+        units: '1'
+        long_name: Quality flag
+      sea_ice_thickness:
+        units: m
+        long_name: Sea ice thickness
+      status_flag:
+        units: '1'
+        long_name: Status flag
+      uncertainty:
+        units: m
+        long_name: Sea ice thickness standard error
+
+  cmems_obs-si_ant_phy_my_drift-cfosat-ssmi-merged_P30D:
+    product: SEAICE_ANT_PHY_L3_MY_011_018
+    title: Antarctic Ocean - Sea Ice - 3 days Drift, CFOSAT/SSMI interpolated
+    cadence: irregular
+    domain: polar
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      eastward_sea_ice_velocity:
+        units: m/s
+        long_name: Eastward sea ice velocity
+      northward_sea_ice_velocity:
+        units: m/s
+        long_name: Northward sea ice velocity
+
+  cmems_obs-si_ant_phy_my_drift-cfosat-ssmi-merged_P3D:
+    product: SEAICE_ANT_PHY_L3_MY_011_018
+    title: Antarctic Ocean - Sea Ice - 3 days Drift, CFOSAT/SSMI interpolated
+    cadence: irregular
+    domain: polar
+    temporal:
+      start: 2020-05-29
+      end: null              # null = NRT / rolling
+    variables:
+      eastward_sea_ice_velocity:
+        units: m/s
+        long_name: Eastward sea ice velocity
+      northward_sea_ice_velocity:
+        units: m/s
+        long_name: Northward sea ice velocity
+
+  cmems_obs-si_ant_phy_my_drift-cfosat_P2D:
+    product: SEAICE_ANT_PHY_L3_MY_011_018
+    title: Antarctic Ocean - Sea Ice - 2 days Drift, CFOSAT
+    cadence: irregular
+    domain: polar
+    temporal:
+      start: 2020-05-28
+      end: null              # null = NRT / rolling
+    variables:
+      eastward_sea_ice_velocity:
+        units: m/s
+        long_name: Eastward sea ice velocity
+      northward_sea_ice_velocity:
+        units: m/s
+        long_name: Northward sea ice velocity
+
+  cmems_obs-si_ant_phy_my_drift-cfosat_P3D:
+    product: SEAICE_ANT_PHY_L3_MY_011_018
+    title: Antarctic Ocean - Sea Ice - 3 days Drift, CFOSAT
+    cadence: irregular
+    domain: polar
+    temporal:
+      start: 2020-05-28
+      end: null              # null = NRT / rolling
+    variables:
+      eastward_sea_ice_velocity:
+        units: m/s
+        long_name: Eastward sea ice velocity
+      northward_sea_ice_velocity:
+        units: m/s
+        long_name: Northward sea ice velocity
+
+  cmems_obs-si_ant_phy_nrt_l3-1km_P1D:
+    product: SEAICE_ANT_PHY_AUTO_L3_NRT_011_012
+    title: cmems_obs-si_ant_phy_nrt_l3-1km_P1D_202303
+    cadence: daily
+    domain: polar
+    temporal:
+      start: 2023-02-02
+      end: null              # null = NRT / rolling
+    variables:
+      acq_time:
+        units: s
+        long_name: ''            # TODO: standard_name missing on describe()
+      confidence:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      ice_concentration:
+        units: '%'
+        long_name: Sea ice area fraction
+
+  cmems_obs-si_ant_physic_my_drift-amsr_P2D:
+    product: SEAICE_ANT_PHY_L3_MY_011_018
+    title: Antarctic Ocean - Sea Ice - 2 days Drift, AMSR
+    cadence: irregular
+    domain: polar
+    temporal:
+      start: 2003-04-01
+      end: null              # null = NRT / rolling
+    variables:
+      eastward_sea_ice_velocity:
+        units: m/s
+        long_name: Eastward sea ice velocity
+      northward_sea_ice_velocity:
+        units: m/s
+        long_name: Northward sea ice velocity
+
+  cmems_obs-si_ant_physic_my_drift-amsr_P3D:
+    product: SEAICE_ANT_PHY_L3_MY_011_018
+    title: Antarctic Ocean - Sea Ice - 3 days Drift, AMSR
+    cadence: irregular
+    domain: polar
+    temporal:
+      start: 2003-04-01
+      end: null              # null = NRT / rolling
+    variables:
+      eastward_sea_ice_velocity:
+        units: m/s
+        long_name: Eastward sea ice velocity
+      northward_sea_ice_velocity:
+        units: m/s
+        long_name: Northward sea ice velocity
+
+  cmems_obs-si_arc_phy-drift_my_l3-ssmi_P30D:
+    product: SEAICE_ARC_SEAICE_L3_REP_OBSERVATIONS_011_010
+    title: Arctic Ocean - Sea Ice - Monthly Drift, SSMI
+    cadence: irregular
+    domain: polar
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      eastward_sea_ice_velocity:
+        units: m/s
+        long_name: Eastward sea ice velocity
+      northward_sea_ice_velocity:
+        units: m/s
+        long_name: Northward sea ice velocity
+
+  cmems_obs-si_arc_phy-drift_my_l3-ssmi_P3D:
+    product: SEAICE_ARC_SEAICE_L3_REP_OBSERVATIONS_011_010
+    title: Arctic Ocean - Sea Ice - 3 days Drift, SSMI
+    cadence: irregular
+    domain: polar
+    temporal:
+      start: 1991-12-03
+      end: null              # null = NRT / rolling
+    variables:
+      eastward_sea_ice_velocity:
+        units: m/s
+        long_name: Eastward sea ice velocity
+      northward_sea_ice_velocity:
+        units: m/s
+        long_name: Northward sea ice velocity
+
+  cmems_obs-si_arc_phy-siage_my_P1D-m:
+    product: SEAICE_ARC_PHY_AUTO_L4_MY_011_025
+    title: Arctic Sea Ice Age Climate Data Record v2.1
+    cadence: daily
+    domain: polar
+    temporal:
+      start: 1995-09-15
+      end: null              # null = NRT / rolling
+    variables:
+      conc_1yi:
+        units: '1'
+        long_name: Sea ice area fraction
+      conc_2yi:
+        units: '1'
+        long_name: Sea ice area fraction
+      conc_3yi:
+        units: '1'
+        long_name: Sea ice area fraction
+      conc_4yi:
+        units: '1'
+        long_name: Sea ice area fraction
+      conc_5yi:
+        units: '1'
+        long_name: Sea ice area fraction
+      conc_6yi:
+        units: '1'
+        long_name: Sea ice area fraction
+      siage:
+        units: years
+        long_name: Age of sea ice
+      status_flag:
+        units: ''
+        long_name: Age of sea ice status flag
+
+  cmems_obs-si_arc_phy-temp_nrt_l3s_P1D-m:
+    product: SEAICE_ARC_PHY_SST-IST_L3S_NRT_011_022
+    title: Arctic Sea and Ice Surface Temperature, L3S, 5km daily  (DMI-ARC-SEAICE_TEMP-L3S-NRT-OBS)
+    cadence: daily
+    domain: polar
+    temporal:
+      start: 2025-11-01
+      end: null              # null = NRT / rolling
+    variables:
+      analysed_st:
+        units: kelvin
+        long_name: Surface temperature
+      mask:
+        units: ''
+        long_name: ''            # TODO: standard_name missing on describe()
+      observation_max:
+        units: kelvin
+        long_name: ''            # TODO: standard_name missing on describe()
+      observation_min:
+        units: kelvin
+        long_name: ''            # TODO: standard_name missing on describe()
+      observation_std:
+        units: kelvin
+        long_name: ''            # TODO: standard_name missing on describe()
+      or_number_of_sst_pixels:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      quality_level:
+        units: ''
+        long_name: ''            # TODO: standard_name missing on describe()
+      sea_ice_fraction:
+        units: '1'
+        long_name: Sea ice area fraction
+      source_of_st:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      sses_bias:
+        units: kelvin
+        long_name: ''            # TODO: standard_name missing on describe()
+      sses_standard_deviation:
+        units: kelvin
+        long_name: ''            # TODO: standard_name missing on describe()
+      sst_dtime:
+        units: seconds
+        long_name: ''            # TODO: standard_name missing on describe()
+      sum_square_sst:
+        units: Celsius2
+        long_name: ''            # TODO: standard_name missing on describe()
+      sum_st:
+        units: Celsius
+        long_name: ''            # TODO: standard_name missing on describe()
+
+  cmems_obs-si_arc_phy_berg-mos-rcmln_nrt_l3-10km_P1D_irr:
+    product: SEAICE_ARC_SEAICE_L4_NRT_OBSERVATIONS_011_007
+    title: Arctic Iceberg Concentration Mosaic, L3, 10km daily (cmems_obs-si_arc_phy_berg-mos-rcmln_nrt_l3-10km_P1D_irr)
+    cadence: daily
+    domain: polar
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      acq_time:
+        units: s
+        long_name: ''            # TODO: standard_name missing on describe()
+      extrem_lev:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      ibc:
+        units: 1e-2 km-2
+        long_name: Number of icebergs per unit area
+      stat_perc:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+
+  cmems_obs-si_arc_phy_berg-rcmln_nrt_l3-10km_irr:
+    product: SEAICE_ARC_SEAICE_L4_NRT_OBSERVATIONS_011_007
+    title: Arctic Iceberg Density, L3, 10km daily  (cmems_obs-si_arc_phy_berg-rcmln_nrt_l3-10km_irr)
+    cadence: irregular
+    domain: polar
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      extrem_lev:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      ibc:
+        units: 1e-2 km-2
+        long_name: Number of icebergs per unit area
+      stat_perc:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+
+  cmems_obs-si_arc_phy_my_L3S-DMIOI_P1D-m:
+    product: SEAICE_ARC_PHY_CLIMATE_L3_MY_011_021
+    title: DMI Arctic SST/IST, L3S , (SEAICE_ARC_PHY_CLIMATE_L3_MY_011_021)
+    cadence: daily
+    domain: polar
+    temporal:
+      start: 1982-01-01
+      end: null              # null = NRT / rolling
+    variables:
+      analysed_st:
+        units: kelvin
+        long_name: Surface temperature
+      mask:
+        units: ''
+        long_name: ''            # TODO: standard_name missing on describe()
+      or_number_of_st_pixels:
+        units: ''
+        long_name: ''            # TODO: standard_name missing on describe()
+      quality_level:
+        units: ''
+        long_name: ''            # TODO: standard_name missing on describe()
+      sea_ice_fraction:
+        units: '1'
+        long_name: Sea ice area fraction
+      source_of_st:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      sses_bias:
+        units: kelvin
+        long_name: ''            # TODO: standard_name missing on describe()
+      sses_standard_deviation:
+        units: kelvin
+        long_name: ''            # TODO: standard_name missing on describe()
+      st_dtime:
+        units: seconds
+        long_name: ''            # TODO: standard_name missing on describe()
+      sum_square_st:
+        units: Celsius2
+        long_name: ''            # TODO: standard_name missing on describe()
+      sum_st:
+        units: Celsius
+        long_name: ''            # TODO: standard_name missing on describe()
+
+  cmems_obs-si_arc_phy_my_drift-cfosat-ssmi-merged_P30D:
+    product: SEAICE_ARC_SEAICE_L3_REP_OBSERVATIONS_011_010
+    title: Arctic Ocean - Sea Ice - 30 days Drift, ASCAT/SSMI
+    cadence: irregular
+    domain: polar
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      eastward_sea_ice_velocity:
+        units: m/s
+        long_name: Eastward sea ice velocity
+      northward_sea_ice_velocity:
+        units: m/s
+        long_name: Northward sea ice velocity
+
+  cmems_obs-si_arc_phy_my_drift-cfosat-ssmi-merged_P3D:
+    product: SEAICE_ARC_SEAICE_L3_REP_OBSERVATIONS_011_010
+    title: Arctic Ocean - Sea Ice - 3 days Drift, ASCAT/SSMI
+    cadence: irregular
+    domain: polar
+    temporal:
+      start: 2020-09-09
+      end: null              # null = NRT / rolling
+    variables:
+      eastward_sea_ice_velocity:
+        units: m/s
+        long_name: Eastward sea ice velocity
+      northward_sea_ice_velocity:
+        units: m/s
+        long_name: Northward sea ice velocity
+
+  cmems_obs-si_arc_phy_my_drift-cfosat_P3D:
+    product: SEAICE_ARC_SEAICE_L3_REP_OBSERVATIONS_011_010
+    title: Arctic Ocean - Sea Ice - 3 days Drift, ASCAT
+    cadence: irregular
+    domain: polar
+    temporal:
+      start: 2020-09-08
+      end: null              # null = NRT / rolling
+    variables:
+      eastward_sea_ice_velocity:
+        units: m/s
+        long_name: Eastward sea ice velocity
+      northward_sea_ice_velocity:
+        units: m/s
+        long_name: Northward sea ice velocity
+
+  cmems_obs-si_arc_phy_my_drift-cfosat_P6D:
+    product: SEAICE_ARC_SEAICE_L3_REP_OBSERVATIONS_011_010
+    title: Arctic Ocean - Sea Ice - 6 days Drift, ASCAT
+    cadence: irregular
+    domain: polar
+    temporal:
+      start: 2020-09-08
+      end: null              # null = NRT / rolling
+    variables:
+      eastward_sea_ice_velocity:
+        units: m/s
+        long_name: Eastward sea ice velocity
+      northward_sea_ice_velocity:
+        units: m/s
+        long_name: Northward sea ice velocity
+
+  cmems_obs-si_arc_phy_my_l3_P1D:
+    product: SEAICE_ARC_PHY_AUTO_L3_MYNRT_011_023
+    title: cmems_obs-si_arc_phy_my_l3_P1D_202411
+    cadence: daily
+    domain: polar
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      acq_time:
+        units: s
+        long_name: ''            # TODO: standard_name missing on describe()
+      confidence_flz:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      confidence_sod:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      flz:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      sic:
+        units: '%'
+        long_name: Sea ice area fraction
+      sod:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      standard_deviation_sic:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      status_flag:
+        units: '1'
+        long_name: Status flag
+
+  cmems_obs-si_arc_phy_my_l4_P1D:
+    product: SEAICE_ARC_PHY_AUTO_L4_MYNRT_011_024
+    title: cmems_obs-si_arc_phy_my_l4_P1D_202411
+    cadence: daily
+    domain: polar
+    temporal:
+      start: 2014-10-03
+      end: null              # null = NRT / rolling
+    variables:
+      sic:
+        units: '%'
+        long_name: Sea ice area fraction
+      status_flag:
+        units: '1'
+        long_name: Status flag
+      uncertainty_sic:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+
+  cmems_obs-si_arc_phy_nrt_1km-svb_P1D-irr:
+    product: SEAICE_ARC_SEAICE_L4_NRT_OBSERVATIONS_011_002
+    title: Arctic Sea Ice Concentration From Norwegian Meteorological Institute
+    cadence: daily
+    domain: polar
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      ice_concentration:
+        units: '%'
+        long_name: Sea ice area fraction
+      satellite_availability:
+        units: ''
+        long_name: Quality flag
+
+  cmems_obs-si_arc_phy_nrt_l3_P1D:
+    product: SEAICE_ARC_PHY_AUTO_L3_MYNRT_011_023
+    title: Near-real-time
+    cadence: daily
+    domain: polar
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      acq_time:
+        units: s
+        long_name: ''            # TODO: standard_name missing on describe()
+      confidence_flz:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      confidence_sod:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      flz:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      sic:
+        units: '%'
+        long_name: Sea ice area fraction
+      sod:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      standard_deviation_sic:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      status_flag:
+        units: '1'
+        long_name: Status flag
+
+  cmems_obs-si_arc_phy_nrt_l4_P1D:
+    product: SEAICE_ARC_PHY_AUTO_L4_MYNRT_011_024
+    title: cmems_obs-si_arc_phy_nrt_l4_P1D_202411
+    cadence: daily
+    domain: polar
+    temporal:
+      start: 2024-10-03
+      end: null              # null = NRT / rolling
+    variables:
+      sic:
+        units: '%'
+        long_name: Sea ice area fraction
+      status_flag:
+        units: '1'
+        long_name: Status flag
+      uncertainty_sic:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+
+  cmems_obs-si_arc_physic_nrt_1km-grl_P1D-irr:
+    product: SEAICE_ARC_SEAICE_L4_NRT_OBSERVATIONS_011_002
+    title: Arctic Sea Ice Greenland
+    cadence: daily
+    domain: polar
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      concentration_range:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      ice_concentration:
+        units: '%'
+        long_name: Sea ice area fraction
+
+  cmems_obs-si_arc_physic_nrt_1km-grl_P1WT3D-m:
+    product: SEAICE_ARC_SEAICE_L4_NRT_OBSERVATIONS_011_002
+    title: Arctic Sea Ice Greenland Overview
+    cadence: irregular
+    domain: polar
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      concentration_range:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      ice_concentration:
+        units: '%'
+        long_name: Sea ice area fraction
+
+  cmems_obs-si_bal_phy-sit_my_l4-1km_P1D-m:
+    product: SEAICE_BAL_PHY_L4_MY_011_019
+    title: Baltic Ice Thickness, L4, 1km daily
+    cadence: daily
+    domain: polar
+    temporal:
+      start: 1980-11-03
+      end: null              # null = NRT / rolling
+    variables:
+      ice_thickness:
+        units: cm
+        long_name: Sea ice thickness
+      product_quality:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      thickness_range:
+        units: cm
+        long_name: ''            # TODO: standard_name missing on describe()
+
+  cmems_obs-si_bal_seaice-conc_my_1km:
+    product: SEAICE_BAL_PHY_L4_MY_011_019
+    title: Baltic Ice Concentration and classification, L4, 1km daily
+    cadence: irregular
+    domain: polar
+    temporal:
+      start: 1980-11-03
+      end: null              # null = NRT / rolling
+    variables:
+      concentration_range:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      ice_concentration:
+        units: '%'
+        long_name: Sea ice area fraction
+      sea_ice_classification:
+        units: ''
+        long_name: Sea ice classification
+      sea_ice_extent:
+        units: 1e6km2
+        long_name: Sea ice extent
+
+  cmems_obs-si_glo_phy-drift-north_my_l4_P1D-m:
+    product: SEAICE_GLO_PHY_L4_MY_011_020
+    title: Reprocessed Arctic Sea Ice Drift, L4 SAR, 10km daily mosaic
+    cadence: daily
+    domain: polar
+    temporal:
+      start: 2014-10-06
+      end: null              # null = NRT / rolling
+    variables:
+      dXY_count:
+        units: count
+        long_name: ''            # TODO: standard_name missing on describe()
+      dX_mean:
+        units: km
+        long_name: Sea ice x displacement
+      dX_std:
+        units: km
+        long_name: ''            # TODO: standard_name missing on describe()
+      dY_mean:
+        units: km
+        long_name: Sea ice y displacement
+      dY_std:
+        units: km
+        long_name: ''            # TODO: standard_name missing on describe()
+      divergence:
+        units: 1/s
+        long_name: ''            # TODO: standard_name missing on describe()
+      qos_bnds_from_time:
+        units: seconds since 2000-01-01 00:00:00 UTC
+        long_name: ''            # TODO: standard_name missing on describe()
+      qos_bnds_to_time:
+        units: seconds since 2000-01-01 00:00:00 UTC
+        long_name: ''            # TODO: standard_name missing on describe()
+      qos_mean_dX:
+        units: meter
+        long_name: ''            # TODO: standard_name missing on describe()
+      qos_mean_dY:
+        units: meter
+        long_name: ''            # TODO: standard_name missing on describe()
+      qos_sample_count:
+        units: count
+        long_name: ''            # TODO: standard_name missing on describe()
+      qos_stddev_dX:
+        units: meter
+        long_name: ''            # TODO: standard_name missing on describe()
+      qos_stddev_dY:
+        units: meter
+        long_name: ''            # TODO: standard_name missing on describe()
+      shear:
+        units: 1/s
+        long_name: ''            # TODO: standard_name missing on describe()
+      status_flag:
+        units: ''
+        long_name: ''            # TODO: standard_name missing on describe()
+      time_first:
+        units: seconds since 2000-01-01 00:00:00 UTC
+        long_name: ''            # TODO: standard_name missing on describe()
+      time_last:
+        units: seconds since 2000-01-01 00:00:00 UTC
+        long_name: ''            # TODO: standard_name missing on describe()
+      time_period_end:
+        units: seconds since 2000-01-01 00:00:00 UTC
+        long_name: ''            # TODO: standard_name missing on describe()
+      time_period_start:
+        units: seconds since 2000-01-01 00:00:00 UTC
+        long_name: ''            # TODO: standard_name missing on describe()
+      vorticity:
+        units: 1/s
+        long_name: ''            # TODO: standard_name missing on describe()
+
+  cmems_obs-si_glo_phy-drift-south_my_l4_P1D-m:
+    product: SEAICE_GLO_PHY_L4_MY_011_020
+    title: Reprocessed Antarctic Sea Ice Drift, L4 SAR, 10km daily mosaic
+    cadence: daily
+    domain: polar
+    temporal:
+      start: 2014-10-06
+      end: null              # null = NRT / rolling
+    variables:
+      dXY_count:
+        units: count
+        long_name: ''            # TODO: standard_name missing on describe()
+      dX_mean:
+        units: km
+        long_name: Sea ice x displacement
+      dX_std:
+        units: km
+        long_name: ''            # TODO: standard_name missing on describe()
+      dY_mean:
+        units: km
+        long_name: Sea ice y displacement
+      dY_std:
+        units: km
+        long_name: ''            # TODO: standard_name missing on describe()
+      divergence:
+        units: 1/s
+        long_name: ''            # TODO: standard_name missing on describe()
+      qos_bnds_from_time:
+        units: seconds since 2000-01-01 00:00:00 UTC
+        long_name: ''            # TODO: standard_name missing on describe()
+      qos_bnds_to_time:
+        units: seconds since 2000-01-01 00:00:00 UTC
+        long_name: ''            # TODO: standard_name missing on describe()
+      qos_mean_dX:
+        units: meter
+        long_name: ''            # TODO: standard_name missing on describe()
+      qos_mean_dY:
+        units: meter
+        long_name: ''            # TODO: standard_name missing on describe()
+      qos_sample_count:
+        units: count
+        long_name: ''            # TODO: standard_name missing on describe()
+      qos_stddev_dX:
+        units: meter
+        long_name: ''            # TODO: standard_name missing on describe()
+      qos_stddev_dY:
+        units: meter
+        long_name: ''            # TODO: standard_name missing on describe()
+      shear:
+        units: 1/s
+        long_name: ''            # TODO: standard_name missing on describe()
+      status_flag:
+        units: ''
+        long_name: ''            # TODO: standard_name missing on describe()
+      time_first:
+        units: seconds since 2000-01-01 00:00:00 UTC
+        long_name: ''            # TODO: standard_name missing on describe()
+      time_last:
+        units: seconds since 2000-01-01 00:00:00 UTC
+        long_name: ''            # TODO: standard_name missing on describe()
+      time_period_end:
+        units: seconds since 2000-01-01 00:00:00 UTC
+        long_name: ''            # TODO: standard_name missing on describe()
+      time_period_start:
+        units: seconds since 2000-01-01 00:00:00 UTC
+        long_name: ''            # TODO: standard_name missing on describe()
+      vorticity:
+        units: 1/s
+        long_name: ''            # TODO: standard_name missing on describe()
+
+  cmems_obs_si_arc_phy_my_L4-DMIOI_P1D-m:
+    product: SEAICE_ARC_PHY_CLIMATE_L4_MY_011_016
+    title: Arctic Sea and Ice Surface Temperature, L4, 5km daily reprocessed SST and IST
+    cadence: daily
+    domain: polar
+    temporal:
+      start: 1982-01-01
+      end: null              # null = NRT / rolling
+    variables:
+      analysed_st:
+        units: kelvin
+        long_name: Surface temperature
+      analysis_error:
+        units: kelvin
+        long_name: ''            # TODO: standard_name missing on describe()
+      mask:
+        units: ''
+        long_name: ''            # TODO: standard_name missing on describe()
+      observation_max:
+        units: kelvin
+        long_name: ''            # TODO: standard_name missing on describe()
+      observation_min:
+        units: kelvin
+        long_name: ''            # TODO: standard_name missing on describe()
+      observation_num:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      observation_std:
+        units: kelvin
+        long_name: ''            # TODO: standard_name missing on describe()
+      sea_ice_fraction:
+        units: '1'
+        long_name: Sea ice area fraction
+
+  cmems_sat-si_glo_drift_nrt_north_d:
+    product: SEAICE_GLO_SEAICE_L4_NRT_OBSERVATIONS_011_006
+    title: Arctic Sea Ice Drift, L4 SAR, 10km daily
+    cadence: irregular
+    domain: polar
+    temporal:
+      start: 2022-01-02
+      end: null              # null = NRT / rolling
+    variables:
+      dXY_count:
+        units: count
+        long_name: ''            # TODO: standard_name missing on describe()
+      dX_mean:
+        units: km
+        long_name: Sea ice x displacement
+      dX_std:
+        units: km
+        long_name: ''            # TODO: standard_name missing on describe()
+      dY_mean:
+        units: km
+        long_name: Sea ice y displacement
+      dY_std:
+        units: km
+        long_name: ''            # TODO: standard_name missing on describe()
+      divergence:
+        units: 1/s
+        long_name: ''            # TODO: standard_name missing on describe()
+      qos_mean_dX:
+        units: meter
+        long_name: ''            # TODO: standard_name missing on describe()
+      qos_mean_dY:
+        units: meter
+        long_name: ''            # TODO: standard_name missing on describe()
+      qos_sample_count:
+        units: count
+        long_name: ''            # TODO: standard_name missing on describe()
+      qos_stddev_dX:
+        units: meter
+        long_name: ''            # TODO: standard_name missing on describe()
+      qos_stddev_dY:
+        units: meter
+        long_name: ''            # TODO: standard_name missing on describe()
+      shear:
+        units: 1/s
+        long_name: ''            # TODO: standard_name missing on describe()
+      status_flag:
+        units: ''
+        long_name: ''            # TODO: standard_name missing on describe()
+      time_first:
+        units: seconds since 2000-01-01 00:00:00 UTC
+        long_name: ''            # TODO: standard_name missing on describe()
+      time_last:
+        units: seconds since 2000-01-01 00:00:00 UTC
+        long_name: ''            # TODO: standard_name missing on describe()
+      time_period_end:
+        units: seconds since 2000-01-01 00:00:00 UTC
+        long_name: ''            # TODO: standard_name missing on describe()
+      time_period_start:
+        units: seconds since 2000-01-01 00:00:00 UTC
+        long_name: ''            # TODO: standard_name missing on describe()
+      vorticity:
+        units: 1/s
+        long_name: ''            # TODO: standard_name missing on describe()
+
+  cmems_sat-si_glo_drift_nrt_south_d:
+    product: SEAICE_GLO_SEAICE_L4_NRT_OBSERVATIONS_011_006
+    title: Antarctic Sea Ice Drift, L4 SAR, 10km daily
+    cadence: irregular
+    domain: polar
+    temporal:
+      start: 2022-01-02
+      end: null              # null = NRT / rolling
+    variables:
+      dXY_count:
+        units: count
+        long_name: ''            # TODO: standard_name missing on describe()
+      dX_mean:
+        units: km
+        long_name: Sea ice x displacement
+      dX_std:
+        units: km
+        long_name: ''            # TODO: standard_name missing on describe()
+      dY_mean:
+        units: km
+        long_name: Sea ice y displacement
+      dY_std:
+        units: km
+        long_name: ''            # TODO: standard_name missing on describe()
+      divergence:
+        units: 1/s
+        long_name: ''            # TODO: standard_name missing on describe()
+      qos_mean_dX:
+        units: meter
+        long_name: ''            # TODO: standard_name missing on describe()
+      qos_mean_dY:
+        units: meter
+        long_name: ''            # TODO: standard_name missing on describe()
+      qos_sample_count:
+        units: count
+        long_name: ''            # TODO: standard_name missing on describe()
+      qos_stddev_dX:
+        units: meter
+        long_name: ''            # TODO: standard_name missing on describe()
+      qos_stddev_dY:
+        units: meter
+        long_name: ''            # TODO: standard_name missing on describe()
+      shear:
+        units: 1/s
+        long_name: ''            # TODO: standard_name missing on describe()
+      status_flag:
+        units: ''
+        long_name: ''            # TODO: standard_name missing on describe()
+      time_first:
+        units: seconds since 2000-01-01 00:00:00 UTC
+        long_name: ''            # TODO: standard_name missing on describe()
+      time_last:
+        units: seconds since 2000-01-01 00:00:00 UTC
+        long_name: ''            # TODO: standard_name missing on describe()
+      time_period_end:
+        units: seconds since 2000-01-01 00:00:00 UTC
+        long_name: ''            # TODO: standard_name missing on describe()
+      time_period_start:
+        units: seconds since 2000-01-01 00:00:00 UTC
+        long_name: ''            # TODO: standard_name missing on describe()
+      vorticity:
+        units: 1/s
+        long_name: ''            # TODO: standard_name missing on describe()
+
+  esa_obs-si_ant_phy-sit_nrt_l4-multi_P1D-m:
+    product: SEAICE_GLO_PHY_L4_NRT_011_014
+    title: Sea Ice Thickness derived from merging CryoSat-2, Sentinel-3A, Sentinel-3B and SMOS
+    cadence: daily
+    domain: polar
+    temporal:
+      start: 2025-04-18
+      end: null              # null = NRT / rolling
+    variables:
+      density_of_ocean:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      quality_flag:
+        units: '1'
+        long_name: Quality flag
+      sea_ice_concentration:
+        units: percent
+        long_name: Sea ice area fraction
+      sea_ice_thickness:
+        units: m
+        long_name: Sea ice thickness
+      sea_ice_thickness_uncertainty:
+        units: m
+        long_name: Sea ice thickness standard error
+      status_flag:
+        units: '1'
+        long_name: Status flag
+
+  esa_obs-si_arc_phy-sit_nrt_l4-multi_P1D-m:
+    product: SEAICE_GLO_PHY_L4_NRT_011_014
+    title: Sea Ice Thickness derived from merging CryoSat-2, Sentinel-3A, Sentinel-3B and SMOS
+    cadence: daily
+    domain: polar
+    temporal:
+      start: 2023-10-18
+      end: null              # null = NRT / rolling
+    variables:
+      density_of_ocean:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      quality_flag:
+        units: '1'
+        long_name: Quality flag
+      sea_ice_concentration:
+        units: percent
+        long_name: Sea ice area fraction
+      sea_ice_thickness:
+        units: m
+        long_name: Sea ice thickness
+      sea_ice_thickness_uncertainty:
+        units: m
+        long_name: Sea ice thickness standard error
+      status_flag:
+        units: '1'
+        long_name: Status flag
+
+  osisaf_obs-si_glo_phy-sic-north_nrt_amsr2_l4_P1D-m:
+    product: SEAICE_GLO_SEAICE_L4_NRT_OBSERVATIONS_011_001
+    title: Level-3 Sea Ice Concentration Analysis (AMSR2) from OSI SAF EUMETSAT
+    cadence: daily
+    domain: polar
+    temporal:
+      start: 2023-03-23
+      end: null              # null = NRT / rolling
+    variables:
+      algorithm_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      ice_conc:
+        units: '%'
+        long_name: Sea ice area fraction
+      raw_ice_conc_values:
+        units: '%'
+        long_name: Sea ice area fraction
+      smearing_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      status_flag:
+        units: '1'
+        long_name: Sea ice area fraction status flag
+      total_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+
+  osisaf_obs-si_glo_phy-sic-north_nrt_ssmis_l4_P1D-m:
+    product: SEAICE_GLO_SEAICE_L4_NRT_OBSERVATIONS_011_001
+    title: Level-3 Sea Ice Concentration Analysis (SSMIS) from OSI SAF EUMETSAT
+    cadence: daily
+    domain: polar
+    temporal:
+      start: 2023-03-23
+      end: null              # null = NRT / rolling
+    variables:
+      algorithm_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      ice_conc:
+        units: '%'
+        long_name: Sea ice area fraction
+      raw_ice_conc_values:
+        units: '%'
+        long_name: Sea ice area fraction
+      smearing_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      status_flag:
+        units: '1'
+        long_name: Sea ice area fraction status flag
+      total_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+
+  osisaf_obs-si_glo_phy-sic-south_nrt_amsr2_l4_P1D-m:
+    product: SEAICE_GLO_SEAICE_L4_NRT_OBSERVATIONS_011_001
+    title: Level-3 Sea Ice Concentration Analysis (AMSR2) from OSI SAF EUMETSAT
+    cadence: daily
+    domain: polar
+    temporal:
+      start: 2023-03-23
+      end: null              # null = NRT / rolling
+    variables:
+      algorithm_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      ice_conc:
+        units: '%'
+        long_name: Sea ice area fraction
+      raw_ice_conc_values:
+        units: '%'
+        long_name: Sea ice area fraction
+      smearing_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      status_flag:
+        units: '1'
+        long_name: Sea ice area fraction status flag
+      total_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+
+  osisaf_obs-si_glo_phy-sic-south_nrt_ssmis_l4_P1D-m:
+    product: SEAICE_GLO_SEAICE_L4_NRT_OBSERVATIONS_011_001
+    title: Level-3 Sea Ice Concentration Analysis (SSMIS) from OSI SAF EUMETSAT
+    cadence: daily
+    domain: polar
+    temporal:
+      start: 2023-03-23
+      end: null              # null = NRT / rolling
+    variables:
+      algorithm_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      ice_conc:
+        units: '%'
+        long_name: Sea ice area fraction
+      raw_ice_conc_values:
+        units: '%'
+        long_name: Sea ice area fraction
+      smearing_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      status_flag:
+        units: '1'
+        long_name: Sea ice area fraction status flag
+      total_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+
+  osisaf_obs-si_glo_phy-sidrift_nrt_nh_P1D-m:
+    product: SEAICE_GLO_SEAICE_L4_NRT_OBSERVATIONS_011_001
+    title: Global Low Resolution Sea Ice Drift
+    cadence: daily
+    domain: polar
+    temporal:
+      start: 2024-10-14
+      end: null              # null = NRT / rolling
+    variables:
+      dX:
+        units: km
+        long_name: Sea ice x displacement
+      dY:
+        units: km
+        long_name: Sea ice y displacement
+      dt0:
+        units: seconds
+        long_name: ''            # TODO: standard_name missing on describe()
+      dt1:
+        units: seconds
+        long_name: ''            # TODO: standard_name missing on describe()
+      lat1:
+        units: degrees_north
+        long_name: ''            # TODO: standard_name missing on describe()
+      lon1:
+        units: degrees_east
+        long_name: ''            # TODO: standard_name missing on describe()
+      status_flag:
+        units: ''
+        long_name: Sea ice x displacement status flag
+      uncert_dX_and_dY:
+        units: km
+        long_name: Sea ice x displacement standard error
+
+  osisaf_obs-si_glo_phy-sidrift_nrt_sh_P1D-m:
+    product: SEAICE_GLO_SEAICE_L4_NRT_OBSERVATIONS_011_001
+    title: Global Low Resolution Sea Ice Drift
+    cadence: daily
+    domain: polar
+    temporal:
+      start: 2024-10-14
+      end: null              # null = NRT / rolling
+    variables:
+      dX:
+        units: km
+        long_name: Sea ice x displacement
+      dY:
+        units: km
+        long_name: Sea ice y displacement
+      dt0:
+        units: seconds
+        long_name: ''            # TODO: standard_name missing on describe()
+      dt1:
+        units: seconds
+        long_name: ''            # TODO: standard_name missing on describe()
+      lat1:
+        units: degrees_north
+        long_name: ''            # TODO: standard_name missing on describe()
+      lon1:
+        units: degrees_east
+        long_name: ''            # TODO: standard_name missing on describe()
+      status_flag:
+        units: ''
+        long_name: Sea ice x displacement status flag
+      uncert_dX_and_dY:
+        units: km
+        long_name: Sea ice x displacement standard error
+
+  osisaf_obs-si_glo_phy-siedge_nrt_nh-P1D:
+    product: SEAICE_GLO_SEAICE_L4_NRT_OBSERVATIONS_011_001
+    title: Daily Sea Ice Edge Analysis from OSI SAF EUMETSAT
+    cadence: irregular
+    domain: polar
+    temporal:
+      start: 2022-01-01
+      end: null              # null = NRT / rolling
+    variables:
+      ice_edge:
+        units: ''
+        long_name: Sea ice classification
+      orbit_num_amsr:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      orbit_num_ascat:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      orbit_num_ssmis:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      param_used:
+        units: ''
+        long_name: ''            # TODO: standard_name missing on describe()
+      status_flag:
+        units: ''
+        long_name: Status flag
+      uncertainty:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+
+  osisaf_obs-si_glo_phy-siedge_nrt_sh-P1D:
+    product: SEAICE_GLO_SEAICE_L4_NRT_OBSERVATIONS_011_001
+    title: Daily Sea Ice Edge Analysis from OSI SAF EUMETSAT
+    cadence: irregular
+    domain: polar
+    temporal:
+      start: 2022-01-01
+      end: null              # null = NRT / rolling
+    variables:
+      ice_edge:
+        units: ''
+        long_name: Sea ice classification
+      orbit_num_amsr:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      orbit_num_ascat:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      orbit_num_ssmis:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      param_used:
+        units: ''
+        long_name: ''            # TODO: standard_name missing on describe()
+      status_flag:
+        units: ''
+        long_name: Status flag
+      uncertainty:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+
+  osisaf_obs-si_glo_phy-sitype_nrt_nh-P1D:
+    product: SEAICE_GLO_SEAICE_L4_NRT_OBSERVATIONS_011_001
+    title: Daily Sea Ice Type Analysis from OSI SAF EUMETSAT
+    cadence: irregular
+    domain: polar
+    temporal:
+      start: 2022-01-01
+      end: null              # null = NRT / rolling
+    variables:
+      ice_type:
+        units: ''
+        long_name: Sea ice classification
+      orbit_num_amsr:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      orbit_num_ascat:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      orbit_num_ssmis:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      param_used:
+        units: ''
+        long_name: ''            # TODO: standard_name missing on describe()
+      status_flag:
+        units: ''
+        long_name: Status flag
+      uncertainty:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+
+  osisaf_obs-si_glo_phy-sitype_nrt_sh-P1D:
+    product: SEAICE_GLO_SEAICE_L4_NRT_OBSERVATIONS_011_001
+    title: Daily Sea Ice Type Analysis from OSI SAF EUMETSAT
+    cadence: irregular
+    domain: polar
+    temporal:
+      start: 2022-01-01
+      end: null              # null = NRT / rolling
+    variables:
+      ice_type:
+        units: ''
+        long_name: Sea ice classification
+      orbit_num_amsr:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      orbit_num_ascat:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      orbit_num_ssmis:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      param_used:
+        units: ''
+        long_name: ''            # TODO: standard_name missing on describe()
+      status_flag:
+        units: ''
+        long_name: Status flag
+      uncertainty:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+
+  osisaf_obs-si_glo_phy_sic-north_my_amsr_cdr_P1D-m:
+    product: SEAICE_GLO_SEAICE_L4_REP_OBSERVATIONS_011_009
+    title: Sea Ice Concentration Climate Data Record Version 3 (AMSR-E and AMSR2) from the EUMETSAT
+    cadence: daily
+    domain: polar
+    temporal:
+      start: 2002-06-01
+      end: null              # null = NRT / rolling
+    variables:
+      algorithm_standard_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      ice_conc:
+        units: '%'
+        long_name: Sea ice area fraction
+      raw_ice_conc_values:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      smearing_standard_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      status_flag:
+        units: ''
+        long_name: Sea ice area fraction status flag
+      total_standard_uncertainty:
+        units: '%'
+        long_name: Sea ice area fraction standard error
+
+  osisaf_obs-si_glo_phy_sic-north_my_amsr_icdr_P1D-m:
+    product: SEAICE_GLO_SEAICE_L4_REP_OBSERVATIONS_011_009
+    title: Interim Sea Ice Concentration Climate Data Record Version 3 (AMSR series) from the
+    cadence: daily
+    domain: polar
+    temporal:
+      start: 2021-01-01
+      end: null              # null = NRT / rolling
+    variables:
+      algorithm_standard_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      ice_conc:
+        units: '%'
+        long_name: Sea ice area fraction
+      raw_ice_conc_values:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      smearing_standard_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      status_flag:
+        units: ''
+        long_name: Sea ice area fraction status flag
+      total_standard_uncertainty:
+        units: '%'
+        long_name: Sea ice area fraction standard error
+
+  osisaf_obs-si_glo_phy_sic-south_my_amsr_cdr_P1D-m:
+    product: SEAICE_GLO_SEAICE_L4_REP_OBSERVATIONS_011_009
+    title: Sea Ice Concentration Climate Data Record Version 3 (AMSR-E and AMSR2) from the EUMETSAT
+    cadence: daily
+    domain: polar
+    temporal:
+      start: 2002-06-01
+      end: null              # null = NRT / rolling
+    variables:
+      algorithm_standard_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      ice_conc:
+        units: '%'
+        long_name: Sea ice area fraction
+      raw_ice_conc_values:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      smearing_standard_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      status_flag:
+        units: ''
+        long_name: Sea ice area fraction status flag
+      total_standard_uncertainty:
+        units: '%'
+        long_name: Sea ice area fraction standard error
+
+  osisaf_obs-si_glo_phy_sic-south_my_amsr_icdr_P1D-m:
+    product: SEAICE_GLO_SEAICE_L4_REP_OBSERVATIONS_011_009
+    title: Interim Sea Ice Concentration Climate Data Record Version 3 (AMSR series) from the
+    cadence: daily
+    domain: polar
+    temporal:
+      start: 2021-01-01
+      end: null              # null = NRT / rolling
+    variables:
+      algorithm_standard_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      ice_conc:
+        units: '%'
+        long_name: Sea ice area fraction
+      raw_ice_conc_values:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      smearing_standard_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      status_flag:
+        units: ''
+        long_name: Sea ice area fraction status flag
+      total_standard_uncertainty:
+        units: '%'
+        long_name: Sea ice area fraction standard error

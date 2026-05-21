@@ -1,0 +1,5160 @@
+# CMEMS curated catalog - global-biogeochem slice.
+#
+# One slice of the per-domain split of the Copernicus Marine catalog.
+# The loader (earthlens.cmems.catalog.Catalog) merges every *.yaml in
+# this directory into one Catalog at construction time; dataset ids
+# must be unique across files. Stanzas are emitted by
+# tools/cmems/refresh_cmems_catalog.py from copernicusmarine.describe();
+# `cadence` is inferred from the dataset_id suffix, `domain` from the
+# product_id prefix, and `temporal.start` is read from the dataset's
+# arco time-coordinate bounds. `end` is left null (the arco max is
+# "latest available today" and would go stale for rolling products).
+# Where the toolbox exposes no standard_name for a variable, the row
+# carries `long_name: ''` with a TODO marker.
+#
+# Schema (per dataset):
+#   <dataset_id>:
+#     product: <product_id>
+#     title: <human-readable title>
+#     cadence: <daily|monthly|hourly|6hourly|climatology|irregular>
+#     domain: <global|mediterranean|arctic|...>
+#     temporal: { start: YYYY-MM-DD, end: YYYY-MM-DD }   # end null = NRT
+#     variables:
+#       <short_name>: { units: <CF units>, long_name: <CF long name> }
+
+datasets:
+
+  c3s_obs-oc_glo_bgc-plankton_my_l3-multi-4km_P1D:
+    product: OCEANCOLOUR_GLO_BGC_L3_MY_009_107
+    title: c3s_obs-oc_glo_bgc-plankton_my_l3-multi-4km_P1M
+    cadence: daily
+    domain: global
+    temporal:
+      start: 1997-09-04
+      end: null              # null = NRT / rolling
+    variables:
+      CHL:
+        units: milligram m-3
+        long_name: Mass concentration of chlorophyll a in sea water
+      MICRO:
+        units: milligram m-3
+        long_name: Mass concentration of microphytoplankton expressed as chlorophyll in sea water
+      MICRO_BIAS:
+        units: milligram m-3
+        long_name: ''            # TODO: standard_name missing on describe()
+      MICRO_RMSE:
+        units: milligram m-3
+        long_name: ''            # TODO: standard_name missing on describe()
+      NANO:
+        units: milligram m-3
+        long_name: Mass concentration of nanophytoplankton expressed as chlorophyll in sea water
+      NANO_BIAS:
+        units: milligram m-3
+        long_name: ''            # TODO: standard_name missing on describe()
+      NANO_RMSE:
+        units: milligram m-3
+        long_name: ''            # TODO: standard_name missing on describe()
+      PICO:
+        units: milligram m-3
+        long_name: Mass concentration of picophytoplankton expressed as chlorophyll in sea water
+      PICO_BIAS:
+        units: milligram m-3
+        long_name: ''            # TODO: standard_name missing on describe()
+      PICO_RMSE:
+        units: milligram m-3
+        long_name: ''            # TODO: standard_name missing on describe()
+
+  c3s_obs-oc_glo_bgc-plankton_my_l4-multi-4km_P1M:
+    product: OCEANCOLOUR_GLO_BGC_L4_MY_009_108
+    title: c3s_obs-oc_glo_bgc-plankton_my_l4-multi-4km_P1M
+    cadence: monthly
+    domain: global
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      CHL:
+        units: milligram m-3
+        long_name: Mass concentration of chlorophyll a in sea water
+      CHL_count:
+        units: count
+        long_name: ''            # TODO: standard_name missing on describe()
+      CHL_error:
+        units: milligram m-3
+        long_name: Standard deviation of mass concentration of chlorophyll a in sea water
+
+  c3s_obs-oc_glo_bgc-reflectance_my_l3-multi-4km_P1D:
+    product: OCEANCOLOUR_GLO_BGC_L3_MY_009_107
+    title: c3s_obs-oc_glo_bgc-reflectance_my_l3-multi-4km_P1M
+    cadence: daily
+    domain: global
+    temporal:
+      start: 1997-09-04
+      end: null              # null = NRT / rolling
+    variables:
+      RRS412:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS443:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS490:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS510:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS560:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS665:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+
+  cmems_mod_glo_bgc-bio_anfc_0.25deg_P1D-m:
+    product: GLOBAL_ANALYSISFORECAST_BGC_001_028
+    title: daily mean fields from Global Ocean Biogeochemistry Analysis and Forecast
+    cadence: daily
+    domain: global
+    temporal:
+      start: 2021-11-01
+      end: null              # null = NRT / rolling
+    variables:
+      nppv:
+        units: mg m-3 day-1
+        long_name: Net primary production of biomass expressed as carbon per unit volume in sea water
+      o2:
+        units: mmol m-3
+        long_name: Mole concentration of dissolved molecular oxygen in sea water
+
+  cmems_mod_glo_bgc-bio_anfc_0.25deg_P1M-m:
+    product: GLOBAL_ANALYSISFORECAST_BGC_001_028
+    title: Monthly mean fields for product GLOBAL_ANALYSIS_FORECAST_BIO_001_028
+    cadence: monthly
+    domain: global
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      nppv:
+        units: mg m-3 day-1
+        long_name: Net primary production of biomass expressed as carbon per unit volume in sea water
+      o2:
+        units: mmol m-3
+        long_name: Mole concentration of dissolved molecular oxygen in sea water
+
+  cmems_mod_glo_bgc-car_anfc_0.25deg_P1D-m:
+    product: GLOBAL_ANALYSISFORECAST_BGC_001_028
+    title: daily mean fields from Global Ocean Biogeochemistry Analysis and Forecast
+    cadence: daily
+    domain: global
+    temporal:
+      start: 2021-11-01
+      end: null              # null = NRT / rolling
+    variables:
+      dissic:
+        units: mol m-3
+        long_name: Mole concentration of dissolved inorganic carbon in sea water
+      ph:
+        units: '1'
+        long_name: Sea water ph reported on total scale
+      talk:
+        units: mol m-3
+        long_name: Sea water alkalinity expressed as mole equivalent
+
+  cmems_mod_glo_bgc-car_anfc_0.25deg_P1M-m:
+    product: GLOBAL_ANALYSISFORECAST_BGC_001_028
+    title: Monthly mean fields for product GLOBAL_ANALYSIS_FORECAST_BIO_001_028
+    cadence: monthly
+    domain: global
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      dissic:
+        units: mol m-3
+        long_name: Mole concentration of dissolved inorganic carbon in sea water
+      ph:
+        units: '1'
+        long_name: Sea water ph reported on total scale
+      talk:
+        units: mol m-3
+        long_name: Sea water alkalinity expressed as mole equivalent
+
+  cmems_mod_glo_bgc-co2_anfc_0.25deg_P1D-m:
+    product: GLOBAL_ANALYSISFORECAST_BGC_001_028
+    title: daily mean fields from Global Ocean Biogeochemistry Analysis and Forecast
+    cadence: daily
+    domain: global
+    temporal:
+      start: 2021-11-01
+      end: null              # null = NRT / rolling
+    variables:
+      spco2:
+        units: Pa
+        long_name: Surface partial pressure of carbon dioxide in sea water
+
+  cmems_mod_glo_bgc-co2_anfc_0.25deg_P1M-m:
+    product: GLOBAL_ANALYSISFORECAST_BGC_001_028
+    title: Monthly mean fields for product GLOBAL_ANALYSIS_FORECAST_BIO_001_028
+    cadence: monthly
+    domain: global
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      spco2:
+        units: Pa
+        long_name: Surface partial pressure of carbon dioxide in sea water
+
+  cmems_mod_glo_bgc-nut_anfc_0.25deg_P1D-m:
+    product: GLOBAL_ANALYSISFORECAST_BGC_001_028
+    title: daily mean fields from Global Ocean Biogeochemistry Analysis and Forecast
+    cadence: daily
+    domain: global
+    temporal:
+      start: 2021-11-01
+      end: null              # null = NRT / rolling
+    variables:
+      fe:
+        units: mmol m-3
+        long_name: Mole concentration of dissolved iron in sea water
+      no3:
+        units: mmol m-3
+        long_name: Mole concentration of nitrate in sea water
+      po4:
+        units: mmol m-3
+        long_name: Mole concentration of phosphate in sea water
+      si:
+        units: mmol m-3
+        long_name: Mole concentration of silicate in sea water
+
+  cmems_mod_glo_bgc-nut_anfc_0.25deg_P1M-m:
+    product: GLOBAL_ANALYSISFORECAST_BGC_001_028
+    title: Monthly mean fields for product GLOBAL_ANALYSIS_FORECAST_BIO_001_028
+    cadence: monthly
+    domain: global
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      fe:
+        units: mmol m-3
+        long_name: Mole concentration of dissolved iron in sea water
+      no3:
+        units: mmol m-3
+        long_name: Mole concentration of nitrate in sea water
+      po4:
+        units: mmol m-3
+        long_name: Mole concentration of phosphate in sea water
+      si:
+        units: mmol m-3
+        long_name: Mole concentration of silicate in sea water
+
+  cmems_mod_glo_bgc-optics_anfc_0.25deg_P1D-m:
+    product: GLOBAL_ANALYSISFORECAST_BGC_001_028
+    title: daily mean fields from Global Ocean Biogeochemistry Analysis and Forecast
+    cadence: daily
+    domain: global
+    temporal:
+      start: 2023-11-15
+      end: null              # null = NRT / rolling
+    variables:
+      kd:
+        units: m-1
+        long_name: Volume attenuation coefficient of downwelling radiative flux in sea water
+
+  cmems_mod_glo_bgc-optics_anfc_0.25deg_P1M-m:
+    product: GLOBAL_ANALYSISFORECAST_BGC_001_028
+    title: Monthly mean fields for product GLOBAL_ANALYSISFORECAST_BGC_001_028
+    cadence: monthly
+    domain: global
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      kd:
+        units: m-1
+        long_name: Volume attenuation coefficient of downwelling radiative flux in sea water
+
+  cmems_mod_glo_bgc-pft_anfc_0.25deg_P1D-m:
+    product: GLOBAL_ANALYSISFORECAST_BGC_001_028
+    title: daily mean fields from Global Ocean Biogeochemistry Analysis and Forecast
+    cadence: daily
+    domain: global
+    temporal:
+      start: 2021-11-01
+      end: null              # null = NRT / rolling
+    variables:
+      chl:
+        units: mg m-3
+        long_name: Mass concentration of chlorophyll a in sea water
+      phyc:
+        units: mmol m-3
+        long_name: Mole concentration of phytoplankton expressed as carbon in sea water
+
+  cmems_mod_glo_bgc-pft_anfc_0.25deg_P1M-m:
+    product: GLOBAL_ANALYSISFORECAST_BGC_001_028
+    title: Monthly mean fields for product GLOBAL_ANALYSIS_FORECAST_BIO_001_028
+    cadence: monthly
+    domain: global
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      chl:
+        units: mg m-3
+        long_name: Mass concentration of chlorophyll a in sea water
+      phyc:
+        units: mmol m-3
+        long_name: Mole concentration of phytoplankton expressed as carbon in sea water
+
+  cmems_mod_glo_bgc-plankton_anfc_0.25deg_P1D-m:
+    product: GLOBAL_ANALYSISFORECAST_BGC_001_028
+    title: daily mean fields from Global Ocean Biogeochemistry Analysis and Forecast
+    cadence: daily
+    domain: global
+    temporal:
+      start: 2024-04-23
+      end: null              # null = NRT / rolling
+    variables:
+      zooc:
+        units: mmol m-3
+        long_name: Mole concentration of zooplankton expressed as carbon in sea water
+
+  cmems_mod_glo_bgc-plankton_anfc_0.25deg_P1M-m:
+    product: GLOBAL_ANALYSISFORECAST_BGC_001_028
+    title: Monthly mean fields for product GLOBAL_ANALYSISFORECAST_BGC_001_028
+    cadence: monthly
+    domain: global
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      zooc:
+        units: mmol m-3
+        long_name: Mole concentration of zooplankton expressed as carbon in sea water
+
+  cmems_mod_glo_bgc_anfc_0.25deg_static:
+    product: GLOBAL_ANALYSISFORECAST_BGC_001_028
+    title: cmems_mod_glo_bgc_anfc_0.25deg_static
+    cadence: irregular
+    domain: global
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      e1t:
+        units: m
+        long_name: ''            # TODO: standard_name missing on describe()
+      e2t:
+        units: m
+        long_name: ''            # TODO: standard_name missing on describe()
+      e3t:
+        units: m
+        long_name: Cell thickness
+
+  cmems_mod_glo_bgc_my_0.083deg-lmtl-Fphy_P1D-i:
+    product: GLOBAL_MULTIYEAR_BGC_001_033
+    title: Physical forcings of global ocean low and mid trophic levels biomass content hindcast
+    cadence: daily
+    domain: global
+    temporal:
+      start: 1998-01-01
+      end: null              # null = NRT / rolling
+    variables:
+      T:
+        units: Celsius degree
+        long_name: Sea water potential temperature vertical mean over pelagic layer
+      U:
+        units: m/s
+        long_name: Eastward sea water velocity vertical mean over pelagic layer
+      V:
+        units: m/s
+        long_name: Northward sea water velocity vertical mean over pelagic layer
+      pelagic_layer_depth:
+        units: m
+        long_name: Sea water pelagic layer bottom depth
+
+  cmems_mod_glo_bgc_my_0.083deg-lmtl_P1D-i:
+    product: GLOBAL_MULTIYEAR_BGC_001_033
+    title: Global ocean low and mid trophic levels biomass content hindcast
+    cadence: daily
+    domain: global
+    temporal:
+      start: 1998-01-01
+      end: null              # null = NRT / rolling
+    variables:
+      mnkc_epi:
+        units: g m-2
+        long_name: Ocean wet mass content of epipelagic micronekton
+      mnkc_hmlmeso:
+        units: g m-2
+        long_name: Ocean wet mass content of highly migrant lower mesopelagic micronekton
+      mnkc_lmeso:
+        units: g m-2
+        long_name: Ocean wet mass content of lower mesopelagic micronekton
+      mnkc_mlmeso:
+        units: g m-2
+        long_name: Ocean wet mass content of migrant lower mesopelagic micronekton
+      mnkc_mumeso:
+        units: g m-2
+        long_name: Ocean wet mass content of migrant upper mesopelagic micronekton
+      mnkc_umeso:
+        units: g m-2
+        long_name: Ocean wet mass content of upper mesopelagic micronekton
+      npp:
+        units: mg m-2 day-1
+        long_name: Net primary productivity of biomass expressed as carbon in sea water
+      zeu:
+        units: m
+        long_name: Euphotic zone depth
+      zooc:
+        units: g m-2
+        long_name: Mass content of zooplankton expressed as carbon in sea water
+
+  cmems_mod_glo_bgc_my_0.25deg_P1D-m:
+    product: GLOBAL_MULTIYEAR_BGC_001_029
+    title: Daily mean fields for product GLOBAL_REANALYSIS_BIO_001_029
+    cadence: daily
+    domain: global
+    temporal:
+      start: 1993-01-01
+      end: null              # null = NRT / rolling
+    variables:
+      chl:
+        units: mg m-3
+        long_name: Mass concentration of chlorophyll a in sea water
+      no3:
+        units: mmol m-3
+        long_name: Mole concentration of nitrate in sea water
+      nppv:
+        units: mg m-3 day-1
+        long_name: Net primary production of biomass expressed as carbon per unit volume in sea water
+      o2:
+        units: mmol m-3
+        long_name: Mole concentration of dissolved molecular oxygen in sea water
+      po4:
+        units: mmol m-3
+        long_name: Mole concentration of phosphate in sea water
+      si:
+        units: mmol m-3
+        long_name: Mole concentration of silicate in sea water
+
+  cmems_mod_glo_bgc_my_0.25deg_P1M-m:
+    product: GLOBAL_MULTIYEAR_BGC_001_029
+    title: Monthly mean fields for product GLOBAL_REANALYSIS_BIO_001_029
+    cadence: monthly
+    domain: global
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      chl:
+        units: mg m-3
+        long_name: Mass concentration of chlorophyll a in sea water
+      fe:
+        units: mmol m-3
+        long_name: Mole concentration of dissolved iron in sea water
+      no3:
+        units: mmol m-3
+        long_name: Mole concentration of nitrate in sea water
+      nppv:
+        units: mg m-3 day-1
+        long_name: Net primary production of biomass expressed as carbon per unit volume in sea water
+      o2:
+        units: mmol m-3
+        long_name: Mole concentration of dissolved molecular oxygen in sea water
+      ph:
+        units: '1'
+        long_name: Sea water ph reported on total scale
+      phyc:
+        units: mmol m-3
+        long_name: Mole concentration of phytoplankton expressed as carbon in sea water
+      po4:
+        units: mmol m-3
+        long_name: Mole concentration of phosphate in sea water
+      si:
+        units: mmol m-3
+        long_name: Mole concentration of silicate in sea water
+      spco2:
+        units: Pa
+        long_name: Surface partial pressure of carbon dioxide in sea water
+
+  cmems_mod_glo_bgc_my_0.25deg_static:
+    product: GLOBAL_MULTIYEAR_BGC_001_029
+    title: cmems_mod_glo_bgc_my_0.25deg_static
+    cadence: irregular
+    domain: global
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      e1t:
+        units: m
+        long_name: ''            # TODO: standard_name missing on describe()
+      e2t:
+        units: m
+        long_name: ''            # TODO: standard_name missing on describe()
+      e3t:
+        units: m
+        long_name: Cell thickness
+
+  cmems_obs-ins_glo_bgc-car_my_glodap-gridded_irr:
+    product: INSITU_GLO_BGC_CARBON_DISCRETE_MY_013_050
+    title: Global Ocean - In Situ reprocessed carbon observations gridded - GLODAPv2
+    cadence: irregular
+    domain: global
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      NO3:
+        units: umol kg-1
+        long_name: ''            # TODO: standard_name missing on describe()
+      NO3_error:
+        units: umol kg-1
+        long_name: ''            # TODO: standard_name missing on describe()
+      NO3_input_N:
+        units: ''
+        long_name: ''            # TODO: standard_name missing on describe()
+      NO3_input_mean:
+        units: umol kg-1
+        long_name: ''            # TODO: standard_name missing on describe()
+      NO3_input_std:
+        units: umol kg-1
+        long_name: ''            # TODO: standard_name missing on describe()
+      NO3_relerr:
+        units: ''
+        long_name: ''            # TODO: standard_name missing on describe()
+      PO4:
+        units: umol kg-1
+        long_name: ''            # TODO: standard_name missing on describe()
+      PO4_error:
+        units: umol kg-1
+        long_name: ''            # TODO: standard_name missing on describe()
+      PO4_input_N:
+        units: ''
+        long_name: ''            # TODO: standard_name missing on describe()
+      PO4_input_mean:
+        units: umol kg-1
+        long_name: ''            # TODO: standard_name missing on describe()
+      PO4_input_std:
+        units: umol kg-1
+        long_name: ''            # TODO: standard_name missing on describe()
+      PO4_relerr:
+        units: ''
+        long_name: ''            # TODO: standard_name missing on describe()
+      TAlk:
+        units: umol kg-1
+        long_name: ''            # TODO: standard_name missing on describe()
+      TAlk_error:
+        units: umol kg-1
+        long_name: ''            # TODO: standard_name missing on describe()
+      TAlk_relerr:
+        units: ''
+        long_name: ''            # TODO: standard_name missing on describe()
+      TCO2:
+        units: umol kg-1
+        long_name: ''            # TODO: standard_name missing on describe()
+      TCO2_error:
+        units: umol kg-1
+        long_name: ''            # TODO: standard_name missing on describe()
+      TCO2_input_N:
+        units: ''
+        long_name: ''            # TODO: standard_name missing on describe()
+      TCO2_input_mean:
+        units: umol kg-1
+        long_name: ''            # TODO: standard_name missing on describe()
+      TCO2_input_std:
+        units: umol kg-1
+        long_name: ''            # TODO: standard_name missing on describe()
+      TCO2_relerr:
+        units: ''
+        long_name: ''            # TODO: standard_name missing on describe()
+      Talk_input_N:
+        units: ''
+        long_name: ''            # TODO: standard_name missing on describe()
+      Talk_input_mean:
+        units: umol kg-1
+        long_name: ''            # TODO: standard_name missing on describe()
+      Talk_input_std:
+        units: umol kg-1
+        long_name: ''            # TODO: standard_name missing on describe()
+      oxygen:
+        units: umol kg-1
+        long_name: ''            # TODO: standard_name missing on describe()
+      oxygen_error:
+        units: umol kg-1
+        long_name: ''            # TODO: standard_name missing on describe()
+      oxygen_input_N:
+        units: ''
+        long_name: ''            # TODO: standard_name missing on describe()
+      oxygen_input_mean:
+        units: umol kg-1
+        long_name: ''            # TODO: standard_name missing on describe()
+      oxygen_input_std:
+        units: umol kg-1
+        long_name: ''            # TODO: standard_name missing on describe()
+      oxygen_relerr:
+        units: ''
+        long_name: ''            # TODO: standard_name missing on describe()
+      pHts25p0:
+        units: ''
+        long_name: ''            # TODO: standard_name missing on describe()
+      pHts25p0_error:
+        units: ''
+        long_name: ''            # TODO: standard_name missing on describe()
+      pHts25p0_input_N:
+        units: ''
+        long_name: ''            # TODO: standard_name missing on describe()
+      pHts25p0_input_mean:
+        units: umol kg-1
+        long_name: ''            # TODO: standard_name missing on describe()
+      pHts25p0_input_std:
+        units: umol kg-1
+        long_name: ''            # TODO: standard_name missing on describe()
+      pHts25p0_relerr:
+        units: ''
+        long_name: ''            # TODO: standard_name missing on describe()
+      pHtsinsitutp:
+        units: ''
+        long_name: ''            # TODO: standard_name missing on describe()
+      pHtsinsitutp_error:
+        units: ''
+        long_name: ''            # TODO: standard_name missing on describe()
+      pHtsinsitutp_input_N:
+        units: ''
+        long_name: ''            # TODO: standard_name missing on describe()
+      pHtsinsitutp_input_mean:
+        units: umol kg-1
+        long_name: ''            # TODO: standard_name missing on describe()
+      pHtsinsitutp_input_std:
+        units: umol kg-1
+        long_name: ''            # TODO: standard_name missing on describe()
+      pHtsinsitutp_relerr:
+        units: ''
+        long_name: ''            # TODO: standard_name missing on describe()
+      salinity:
+        units: ''
+        long_name: ''            # TODO: standard_name missing on describe()
+      salinity_error:
+        units: ''
+        long_name: ''            # TODO: standard_name missing on describe()
+      salinity_input_N:
+        units: ''
+        long_name: ''            # TODO: standard_name missing on describe()
+      salinity_input_mean:
+        units: umol kg-1
+        long_name: ''            # TODO: standard_name missing on describe()
+      salinity_input_std:
+        units: umol kg-1
+        long_name: ''            # TODO: standard_name missing on describe()
+      salinity_relerr:
+        units: ''
+        long_name: ''            # TODO: standard_name missing on describe()
+      silicate:
+        units: umol kg-1
+        long_name: ''            # TODO: standard_name missing on describe()
+      silicate_error:
+        units: umol kg-1
+        long_name: ''            # TODO: standard_name missing on describe()
+      silicate_input_N:
+        units: ''
+        long_name: ''            # TODO: standard_name missing on describe()
+      silicate_input_mean:
+        units: umol kg-1
+        long_name: ''            # TODO: standard_name missing on describe()
+      silicate_input_std:
+        units: umol kg-1
+        long_name: ''            # TODO: standard_name missing on describe()
+      silicate_relerr:
+        units: ''
+        long_name: ''            # TODO: standard_name missing on describe()
+      temperature:
+        units: degree_C
+        long_name: ''            # TODO: standard_name missing on describe()
+      temperature_error:
+        units: degree_C
+        long_name: ''            # TODO: standard_name missing on describe()
+      temperature_input_N:
+        units: ''
+        long_name: ''            # TODO: standard_name missing on describe()
+      temperature_input_mean:
+        units: umol kg-1
+        long_name: ''            # TODO: standard_name missing on describe()
+      temperature_input_std:
+        units: umol kg-1
+        long_name: ''            # TODO: standard_name missing on describe()
+      temperature_relerr:
+        units: ''
+        long_name: ''            # TODO: standard_name missing on describe()
+
+  cmems_obs-ins_glo_bgc-car_my_glodap-obs_irr:
+    product: INSITU_GLO_BGC_CARBON_DISCRETE_MY_013_050
+    title: cmems_obs-ins_glo_bgc-car_my_glodap-obs_irr_202211
+    cadence: irregular
+    domain: global
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      ALKW:
+        units: µmol kg-1
+        long_name: Sea water alkalinity per unit mass
+      CPHL:
+        units: mg m-3
+        long_name: Mass concentration of chlorophyll a in sea water
+      DOX2:
+        units: µmol kg-1
+        long_name: Moles of oxygen per unit mass in sea water
+      NODW:
+        units: µmol kg-1
+        long_name: ' '
+      NTAW:
+        units: µmol kg-1
+        long_name: Moles of nitrate per unit mass in sea water
+      NTIW:
+        units: µmol kg-1
+        long_name: Moles of nitrite per unit mass in sea water
+      PH25:
+        units: '1'
+        long_name: ' '
+      PHOW:
+        units: µmol kg-1
+        long_name: Moles of phosphate per unit mass in sea water
+      PHPH:
+        units: '1'
+        long_name: Sea water ph reported on total scale
+      PSAL:
+        units: '0.001'
+        long_name: Sea water practical salinity
+      SLCW:
+        units: µmol kg-1
+        long_name: Moles of silicate per unit mass in sea water
+      TEMP:
+        units: degrees_C
+        long_name: Sea water temperature
+      TICW:
+        units: µmol kg-1
+        long_name: ' '
+
+  cmems_obs-ins_glo_bgc-car_my_na_irr:
+    product: INSITU_GLO_BGC_DISCRETE_MY_013_046
+    title: cmems_obs-ins_glo_bgc-car_my_na_irr
+    cadence: irregular
+    domain: global
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      ALKW:
+        units: µmol kg-1
+        long_name: Sea water alkalinity per unit mass
+      ALKY:
+        units: mmol m-3
+        long_name: Sea water alkalinity expressed as mole equivalent
+      AMON:
+        units: mmol m-3
+        long_name: Mole concentration of ammonium in sea water
+      CPHL:
+        units: mg m-3
+        long_name: Mass concentration of chlorophyll a in sea water
+      DOX1:
+        units: ml l-1
+        long_name: Volume fraction of oxygen in sea water
+      DOX2:
+        units: µmol kg-1
+        long_name: Moles of oxygen per unit mass in sea water
+      DOXY:
+        units: mmol m-3
+        long_name: Mole concentration of dissolved molecular oxygen in sea water
+      FCO2:
+        units: µatm
+        long_name: Fugacity of carbon dioxide in sea water
+      FLU2:
+        units: mg m-3
+        long_name: Mass concentration of chlorophyll a fluorescence in sea water
+      NTAW:
+        units: µmol kg-1
+        long_name: Moles of nitrate per unit mass in sea water
+      NTIW:
+        units: µmol kg-1
+        long_name: Moles of nitrite per unit mass in sea water
+      NTRA:
+        units: mmol m-3
+        long_name: Mole concentration of nitrate in sea water
+      NTRI:
+        units: mmol m-3
+        long_name: Mole concentration of nitrite in sea water
+      NTRZ:
+        units: mmol m-3
+        long_name: Mole concentration of nitrate and nitrite in sea water
+      PCO2:
+        units: µatm
+        long_name: Surface partial pressure of carbon dioxide in sea water
+      PHOS:
+        units: mmol m-3
+        long_name: Mole concentration of phosphate in sea water
+      PHOW:
+        units: µmol kg-1
+        long_name: Moles of phosphate per unit mass in sea water
+      PHPH:
+        units: '1'
+        long_name: Sea water ph reported on total scale
+      PSAL:
+        units: '0.001'
+        long_name: Sea water practical salinity
+      SLCA:
+        units: mmol m-3
+        long_name: Mole concentration of silicate in sea water
+      SLCW:
+        units: µmol kg-1
+        long_name: Moles of silicate per unit mass in sea water
+      TEMP:
+        units: degrees_C
+        long_name: Sea water temperature
+      TICW:
+        units: µmol kg-1
+        long_name: Moles of dissolved inorganic carbon per unit mass in sea water
+      TSMP:
+        units: g m-3
+        long_name: Mass concentration of suspended matter in sea water
+
+  cmems_obs-ins_glo_bgc-car_my_socat-gridded_irr:
+    product: INSITU_GLO_BGC_CARBON_DISCRETE_MY_013_050
+    title: cmems_obs-ins_glo_bgc-car_my_socat-gridded_irr
+    cadence: irregular
+    domain: global
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      count_ncruise_decade:
+        units: count
+        long_name: ''            # TODO: standard_name missing on describe()
+      fco2_ave_unwtd_decade:
+        units: uatm
+        long_name: ''            # TODO: standard_name missing on describe()
+      fco2_ave_weighted_decade:
+        units: uatm
+        long_name: ''            # TODO: standard_name missing on describe()
+      fco2_count_nobs_decade:
+        units: count
+        long_name: ''            # TODO: standard_name missing on describe()
+      fco2_max_unwtd_decade:
+        units: uatm
+        long_name: ''            # TODO: standard_name missing on describe()
+      fco2_min_unwtd_decade:
+        units: uatm
+        long_name: ''            # TODO: standard_name missing on describe()
+      salinity_ave_unwtd_decade:
+        units: PSU
+        long_name: ''            # TODO: standard_name missing on describe()
+      salinity_ave_weighted_decade:
+        units: PSU
+        long_name: ''            # TODO: standard_name missing on describe()
+      salinity_count_nobs_decade:
+        units: count
+        long_name: ''            # TODO: standard_name missing on describe()
+      salinity_max_unwtd_decade:
+        units: PSU
+        long_name: ''            # TODO: standard_name missing on describe()
+      salinity_min_unwtd_decade:
+        units: PSU
+        long_name: ''            # TODO: standard_name missing on describe()
+      sst_ave_unwtd_decade:
+        units: degrees C
+        long_name: ''            # TODO: standard_name missing on describe()
+      sst_ave_weighted_decade:
+        units: degrees C
+        long_name: ''            # TODO: standard_name missing on describe()
+      sst_count_nobs_decade:
+        units: count
+        long_name: ''            # TODO: standard_name missing on describe()
+      sst_max_unwtd_decade:
+        units: degrees C
+        long_name: ''            # TODO: standard_name missing on describe()
+      sst_min_unwtd_decade:
+        units: degrees C
+        long_name: ''            # TODO: standard_name missing on describe()
+
+  cmems_obs-ins_glo_bgc-car_my_socat-obs_irr:
+    product: INSITU_GLO_BGC_CARBON_DISCRETE_MY_013_050
+    title: cmems_obs-ins_glo_bgc-car_my_socat-obs_irr_202211
+    cadence: irregular
+    domain: global
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      FCO2:
+        units: µatm
+        long_name: Fugacity of carbon dioxide in sea water
+      PSAL:
+        units: '0.001'
+        long_name: Sea water practical salinity
+      TEMP:
+        units: degrees_C
+        long_name: Sea water temperature
+
+  cmems_obs-ins_glo_bgc-chl_my_na_irr:
+    product: INSITU_GLO_BGC_DISCRETE_MY_013_046
+    title: cmems_obs-ins_glo_bgc-chl_my_na_irr
+    cadence: irregular
+    domain: global
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      ALKW:
+        units: µmol kg-1
+        long_name: Sea water alkalinity per unit mass
+      ALKY:
+        units: mmol m-3
+        long_name: Sea water alkalinity expressed as mole equivalent
+      AMON:
+        units: mmol m-3
+        long_name: Mole concentration of ammonium in sea water
+      ATMP:
+        units: hPa
+        long_name: Air pressure
+      ATMS:
+        units: hPa
+        long_name: Air pressure at sea level
+      CDOM:
+        units: 1e-9
+        long_name: Concentration of colored dissolved organic matter in sea water expressed as equivalent
+      CHLT:
+        units: mg m-3
+        long_name: Mass concentration of chlorophyll in sea water
+      CNDC:
+        units: S m-1
+        long_name: Sea water electrical conductivity
+      CPHL:
+        units: mg m-3
+        long_name: Mass concentration of chlorophyll a in sea water
+      DENS:
+        units: kg m-3
+        long_name: Sea water sigma theta
+      DEWT:
+        units: degrees_C
+        long_name: Dew point temperature
+      DOX1:
+        units: ml l-1
+        long_name: Volume fraction of oxygen in sea water
+      DOX2:
+        units: µmol kg-1
+        long_name: Moles of oxygen per unit mass in sea water
+      DOXY:
+        units: mmol m-3
+        long_name: Mole concentration of dissolved molecular oxygen in sea water
+      DRYT:
+        units: degrees_C
+        long_name: Air temperature
+      EWCT:
+        units: m s-1
+        long_name: Eastward sea water velocity
+      FCO2:
+        units: µatm
+        long_name: Fugacity of carbon dioxide in sea water
+      FLU2:
+        units: mg m-3
+        long_name: Mass concentration of chlorophyll a fluorescence in sea water
+      GDIR:
+        units: degree
+        long_name: Wind gust from direction
+      GSPD:
+        units: m s-1
+        long_name: Wind speed of gust
+      HCDT:
+        units: degree
+        long_name: Direction of sea water velocity
+      HCSP:
+        units: m s-1
+        long_name: Sea water speed
+      LGH4:
+        units: µmol m-2 s-1
+        long_name: Surface downwelling photosynthetic photon flux in air
+      LGHT:
+        units: µmol m-2 s-1
+        long_name: Downwelling photosynthetic photon flux in sea water
+      LINC:
+        units: W m-2
+        long_name: Surface downwelling longwave flux in air
+      NRAD:
+        units: W m-2
+        long_name: Surface net downward radiative flux
+      NSCT:
+        units: m s-1
+        long_name: Northward sea water velocity
+      NTAW:
+        units: µmol kg-1
+        long_name: Moles of nitrate per unit mass in sea water
+      NTIW:
+        units: µmol kg-1
+        long_name: Moles of nitrite per unit mass in sea water
+      NTRA:
+        units: mmol m-3
+        long_name: Mole concentration of nitrate in sea water
+      NTRI:
+        units: mmol m-3
+        long_name: Mole concentration of nitrite in sea water
+      NTRZ:
+        units: mmol m-3
+        long_name: Mole concentration of nitrate and nitrite in sea water
+      OSAT:
+        units: '%'
+        long_name: Fractional saturation of oxygen in sea water
+      PCO2:
+        units: µatm
+        long_name: Surface partial pressure of carbon dioxide in sea water
+      PHOS:
+        units: mmol m-3
+        long_name: Mole concentration of phosphate in sea water
+      PHOW:
+        units: µmol kg-1
+        long_name: Moles of phosphate per unit mass in sea water
+      PHPH:
+        units: '1'
+        long_name: Sea water ph reported on total scale
+      PRRD:
+        units: mm d-1
+        long_name: Lwe precipitation rate
+      PRRT:
+        units: mm h-1
+        long_name: Lwe precipitation rate
+      PSAL:
+        units: '0.001'
+        long_name: Sea water practical salinity
+      RDIN:
+        units: W m-2
+        long_name: Surface downwelling radiative flux in sea water
+      RELH:
+        units: '%'
+        long_name: Relative humidity
+      SINC:
+        units: W m-2
+        long_name: Surface downwelling shortwave flux in air
+      SLCA:
+        units: mmol m-3
+        long_name: Mole concentration of silicate in sea water
+      SLCW:
+        units: µmol kg-1
+        long_name: Moles of silicate per unit mass in sea water
+      SVEL:
+        units: m s-1
+        long_name: Speed of sound in sea water
+      TEMP:
+        units: degrees_C
+        long_name: Sea water temperature
+      TICW:
+        units: µmol kg-1
+        long_name: Moles of dissolved inorganic carbon per unit mass in sea water
+      TSMP:
+        units: g m-3
+        long_name: Mass concentration of suspended matter in sea water
+      TUR4:
+        units: '1'
+        long_name: Sea water turbidity
+      VAVH:
+        units: m
+        long_name: Sea surface wave significant height
+      VAVT:
+        units: s
+        long_name: Sea surface wave significant period
+      VCMX:
+        units: m
+        long_name: Sea surface wave maximum height
+      VCSP:
+        units: m s-1
+        long_name: Upward sea water velocity
+      VDIR:
+        units: degree
+        long_name: Sea surface wave from direction
+      VEMH:
+        units: m
+        long_name: Sea surface wave maximum height
+      VGHS:
+        units: m
+        long_name: Sea surface wave significant height
+      VGTA:
+        units: s
+        long_name: Sea surface wave mean period
+      VH110:
+        units: m
+        long_name: Sea surface wave mean height of highest tenth
+      VHM0:
+        units: m
+        long_name: Sea surface wave significant height
+      VHZA:
+        units: m
+        long_name: Sea surface wave mean height
+      VMDR:
+        units: degree
+        long_name: Sea surface wave from direction
+      VPED:
+        units: degree
+        long_name: Sea surface wave from direction at variance spectral density maximum
+      VT110:
+        units: s
+        long_name: Sea surface wave mean period of highest tenth
+      VTM02:
+        units: s
+        long_name: Sea surface wave mean period from variance spectral density second frequency moment
+      VTPK:
+        units: s
+        long_name: Sea surface wave period at variance spectral density maximum
+      VTZA:
+        units: s
+        long_name: Sea surface wave mean period
+      VZMX:
+        units: m
+        long_name: Sea surface wave maximum height
+      WDIR:
+        units: degree
+        long_name: Wind from direction
+      WSPD:
+        units: m s-1
+        long_name: Wind speed
+      WSPE:
+        units: m s-1
+        long_name: Eastward wind
+      WSPN:
+        units: m s-1
+        long_name: Northward wind
+
+  cmems_obs-ins_glo_bgc-nut_my_na_irr:
+    product: INSITU_GLO_BGC_DISCRETE_MY_013_046
+    title: cmems_obs-ins_glo_bgc-nut_my_na_irr
+    cadence: irregular
+    domain: global
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      ALKW:
+        units: µmol kg-1
+        long_name: Sea water alkalinity per unit mass
+      ALKY:
+        units: mmol m-3
+        long_name: Sea water alkalinity expressed as mole equivalent
+      AMON:
+        units: mmol m-3
+        long_name: Mole concentration of ammonium in sea water
+      ATMP:
+        units: hPa
+        long_name: Air pressure
+      ATMS:
+        units: hPa
+        long_name: Air pressure at sea level
+      CDOM:
+        units: 1e-9
+        long_name: Concentration of colored dissolved organic matter in sea water expressed as equivalent
+      CHLT:
+        units: mg m-3
+        long_name: Mass concentration of chlorophyll in sea water
+      CNDC:
+        units: S m-1
+        long_name: Sea water electrical conductivity
+      CPHL:
+        units: mg m-3
+        long_name: Mass concentration of chlorophyll a in sea water
+      DENS:
+        units: kg m-3
+        long_name: Sea water sigma theta
+      DOX1:
+        units: ml l-1
+        long_name: Volume fraction of oxygen in sea water
+      DOX2:
+        units: µmol kg-1
+        long_name: Moles of oxygen per unit mass in sea water
+      DOXY:
+        units: mmol m-3
+        long_name: Mole concentration of dissolved molecular oxygen in sea water
+      DRYT:
+        units: degrees_C
+        long_name: Air temperature
+      EWCT:
+        units: m s-1
+        long_name: Eastward sea water velocity
+      FCO2:
+        units: µatm
+        long_name: Fugacity of carbon dioxide in sea water
+      FLU2:
+        units: mg m-3
+        long_name: Mass concentration of chlorophyll a fluorescence in sea water
+      GDIR:
+        units: degree
+        long_name: Wind gust from direction
+      GSPD:
+        units: m s-1
+        long_name: Wind speed of gust
+      HCDT:
+        units: degree
+        long_name: Direction of sea water velocity
+      HCSP:
+        units: m s-1
+        long_name: Sea water speed
+      LGH4:
+        units: µmol m-2 s-1
+        long_name: Surface downwelling photosynthetic photon flux in air
+      LGHT:
+        units: µmol m-2 s-1
+        long_name: Downwelling photosynthetic photon flux in sea water
+      LINC:
+        units: W m-2
+        long_name: Surface downwelling longwave flux in air
+      NSCT:
+        units: m s-1
+        long_name: Northward sea water velocity
+      NTAW:
+        units: µmol kg-1
+        long_name: Moles of nitrate per unit mass in sea water
+      NTIW:
+        units: µmol kg-1
+        long_name: Moles of nitrite per unit mass in sea water
+      NTRA:
+        units: mmol m-3
+        long_name: Mole concentration of nitrate in sea water
+      NTRI:
+        units: mmol m-3
+        long_name: Mole concentration of nitrite in sea water
+      NTRZ:
+        units: mmol m-3
+        long_name: Mole concentration of nitrate and nitrite in sea water
+      OSAT:
+        units: '%'
+        long_name: Fractional saturation of oxygen in sea water
+      PCO2:
+        units: µatm
+        long_name: Surface partial pressure of carbon dioxide in sea water
+      PHOS:
+        units: mmol m-3
+        long_name: Mole concentration of phosphate in sea water
+      PHOW:
+        units: µmol kg-1
+        long_name: Moles of phosphate per unit mass in sea water
+      PHPH:
+        units: '1'
+        long_name: Sea water ph reported on total scale
+      PRRT:
+        units: mm h-1
+        long_name: Lwe precipitation rate
+      PSAL:
+        units: '0.001'
+        long_name: Sea water practical salinity
+      RELH:
+        units: '%'
+        long_name: Relative humidity
+      SINC:
+        units: W m-2
+        long_name: Surface downwelling shortwave flux in air
+      SLCA:
+        units: mmol m-3
+        long_name: Mole concentration of silicate in sea water
+      SLCW:
+        units: µmol kg-1
+        long_name: Moles of silicate per unit mass in sea water
+      SVEL:
+        units: m s-1
+        long_name: Speed of sound in sea water
+      TEMP:
+        units: degrees_C
+        long_name: Sea water temperature
+      TICW:
+        units: µmol kg-1
+        long_name: Moles of dissolved inorganic carbon per unit mass in sea water
+      TSMP:
+        units: g m-3
+        long_name: Mass concentration of suspended matter in sea water
+      TUR4:
+        units: '1'
+        long_name: Sea water turbidity
+      VAVH:
+        units: m
+        long_name: Sea surface wave significant height
+      VAVT:
+        units: s
+        long_name: Sea surface wave significant period
+      VCMX:
+        units: m
+        long_name: Sea surface wave maximum height
+      VCSP:
+        units: m s-1
+        long_name: Upward sea water velocity
+      VGTA:
+        units: s
+        long_name: Sea surface wave mean period
+      VHZA:
+        units: m
+        long_name: Sea surface wave mean height
+      VPED:
+        units: degree
+        long_name: Sea surface wave from direction at variance spectral density maximum
+      WDIR:
+        units: degree
+        long_name: Wind from direction
+      WSPD:
+        units: m s-1
+        long_name: Wind speed
+      WSPE:
+        units: m s-1
+        long_name: Eastward wind
+      WSPN:
+        units: m s-1
+        long_name: Northward wind
+
+  cmems_obs-ins_glo_bgc-ox_my_na_irr:
+    product: INSITU_GLO_BGC_DISCRETE_MY_013_046
+    title: cmems_obs-ins_glo_bgc-ox_my_na_irr
+    cadence: irregular
+    domain: global
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      ALKW:
+        units: µmol kg-1
+        long_name: Sea water alkalinity per unit mass
+      ALKY:
+        units: mmol m-3
+        long_name: Sea water alkalinity expressed as mole equivalent
+      AMON:
+        units: mmol m-3
+        long_name: Mole concentration of ammonium in sea water
+      ATMP:
+        units: hPa
+        long_name: Air pressure
+      ATMS:
+        units: hPa
+        long_name: Air pressure at sea level
+      CDOM:
+        units: 1e-9
+        long_name: Concentration of colored dissolved organic matter in sea water expressed as equivalent
+      CHLT:
+        units: mg m-3
+        long_name: Mass concentration of chlorophyll in sea water
+      CNDC:
+        units: S m-1
+        long_name: Sea water electrical conductivity
+      CPHL:
+        units: mg m-3
+        long_name: Mass concentration of chlorophyll a in sea water
+      DENS:
+        units: kg m-3
+        long_name: Sea water sigma theta
+      DEWT:
+        units: degrees_C
+        long_name: Dew point temperature
+      DOX1:
+        units: ml l-1
+        long_name: Volume fraction of oxygen in sea water
+      DOX2:
+        units: µmol kg-1
+        long_name: Moles of oxygen per unit mass in sea water
+      DOXY:
+        units: mmol m-3
+        long_name: Mole concentration of dissolved molecular oxygen in sea water
+      DRYT:
+        units: degrees_C
+        long_name: Air temperature
+      EWCT:
+        units: m s-1
+        long_name: Eastward sea water velocity
+      FCO2:
+        units: µatm
+        long_name: Fugacity of carbon dioxide in sea water
+      FLU2:
+        units: mg m-3
+        long_name: Mass concentration of chlorophyll a fluorescence in sea water
+      GDIR:
+        units: degree
+        long_name: Wind gust from direction
+      GSPD:
+        units: m s-1
+        long_name: Wind speed of gust
+      HCDT:
+        units: degree
+        long_name: Direction of sea water velocity
+      HCSP:
+        units: m s-1
+        long_name: Sea water speed
+      LGH4:
+        units: µmol m-2 s-1
+        long_name: Surface downwelling photosynthetic photon flux in air
+      LGHT:
+        units: µmol m-2 s-1
+        long_name: Downwelling photosynthetic photon flux in sea water
+      LINC:
+        units: W m-2
+        long_name: Surface downwelling longwave flux in air
+      NRAD:
+        units: W m-2
+        long_name: Surface net downward radiative flux
+      NSCT:
+        units: m s-1
+        long_name: Northward sea water velocity
+      NTAW:
+        units: µmol kg-1
+        long_name: Moles of nitrate per unit mass in sea water
+      NTIW:
+        units: µmol kg-1
+        long_name: Moles of nitrite per unit mass in sea water
+      NTRA:
+        units: mmol m-3
+        long_name: Mole concentration of nitrate in sea water
+      NTRI:
+        units: mmol m-3
+        long_name: Mole concentration of nitrite in sea water
+      NTRZ:
+        units: mmol m-3
+        long_name: Mole concentration of nitrate and nitrite in sea water
+      OSAT:
+        units: '%'
+        long_name: Fractional saturation of oxygen in sea water
+      PCO2:
+        units: µatm
+        long_name: Surface partial pressure of carbon dioxide in sea water
+      PHOS:
+        units: mmol m-3
+        long_name: Mole concentration of phosphate in sea water
+      PHOW:
+        units: µmol kg-1
+        long_name: Moles of phosphate per unit mass in sea water
+      PHPH:
+        units: '1'
+        long_name: Sea water ph reported on total scale
+      PRRD:
+        units: mm d-1
+        long_name: Lwe precipitation rate
+      PRRT:
+        units: mm h-1
+        long_name: Lwe precipitation rate
+      PSAL:
+        units: '0.001'
+        long_name: Sea water practical salinity
+      RDIN:
+        units: W m-2
+        long_name: Surface downwelling radiative flux in sea water
+      RELH:
+        units: '%'
+        long_name: Relative humidity
+      SINC:
+        units: W m-2
+        long_name: Surface downwelling shortwave flux in air
+      SLCA:
+        units: mmol m-3
+        long_name: Mole concentration of silicate in sea water
+      SLCW:
+        units: µmol kg-1
+        long_name: Moles of silicate per unit mass in sea water
+      SVEL:
+        units: m s-1
+        long_name: Speed of sound in sea water
+      TEMP:
+        units: degrees_C
+        long_name: Sea water temperature
+      TICW:
+        units: µmol kg-1
+        long_name: Moles of dissolved inorganic carbon per unit mass in sea water
+      TSMP:
+        units: g m-3
+        long_name: Mass concentration of suspended matter in sea water
+      TUR4:
+        units: '1'
+        long_name: Sea water turbidity
+      VAVH:
+        units: m
+        long_name: Sea surface wave significant height
+      VAVT:
+        units: s
+        long_name: Sea surface wave significant period
+      VCMX:
+        units: m
+        long_name: Sea surface wave maximum height
+      VCSP:
+        units: m s-1
+        long_name: Upward sea water velocity
+      VDIR:
+        units: degree
+        long_name: Sea surface wave from direction
+      VEMH:
+        units: m
+        long_name: Sea surface wave maximum height
+      VGHS:
+        units: m
+        long_name: Sea surface wave significant height
+      VGTA:
+        units: s
+        long_name: Sea surface wave mean period
+      VH110:
+        units: m
+        long_name: Sea surface wave mean height of highest tenth
+      VHM0:
+        units: m
+        long_name: Sea surface wave significant height
+      VHZA:
+        units: m
+        long_name: Sea surface wave mean height
+      VMDR:
+        units: degree
+        long_name: Sea surface wave from direction
+      VPED:
+        units: degree
+        long_name: Sea surface wave from direction at variance spectral density maximum
+      VT110:
+        units: s
+        long_name: Sea surface wave mean period of highest tenth
+      VTM02:
+        units: s
+        long_name: Sea surface wave mean period from variance spectral density second frequency moment
+      VTPK:
+        units: s
+        long_name: Sea surface wave period at variance spectral density maximum
+      VTZA:
+        units: s
+        long_name: Sea surface wave mean period
+      VTZM:
+        units: s
+        long_name: Sea surface wave period of highest wave
+      VZMX:
+        units: m
+        long_name: Sea surface wave maximum height
+      WDIR:
+        units: degree
+        long_name: Wind from direction
+      WSPD:
+        units: m s-1
+        long_name: Wind speed
+      WSPE:
+        units: m s-1
+        long_name: Eastward wind
+      WSPN:
+        units: m s-1
+        long_name: Northward wind
+
+  cmems_obs-mob_glo_bgc-car_my_irr-i:
+    product: MULTIOBS_GLO_BGC_CARBON_SURFACE_MYNRT_015_008
+    title: Surface ocean carbon fields
+    cadence: irregular
+    domain: global
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      fgco2:
+        units: molC m-2 yr-1
+        long_name: Surface downward mass flux of carbon dioxide expressed as carbon
+      fgco2_uncertainty:
+        units: molC m-2 yr-1
+        long_name: Uncertainty surface downward mass flux of carbon dioxide expressed as carbon
+      omega_ar:
+        units: '-'
+        long_name: Aragonite saturation state in sea water
+      omega_ar_uncertainty:
+        units: '-'
+        long_name: Uncertainty aragonite saturation state in sea wate
+      omega_ca:
+        units: '-'
+        long_name: Calcite saturation state in sea water
+      omega_ca_uncertainty:
+        units: '-'
+        long_name: Uncertainty calcite saturation state in sea water
+      ph:
+        units: '1'
+        long_name: Sea water ph reported on total scale
+      ph_uncertainty:
+        units: '1'
+        long_name: Uncertainty sea water ph reported on total scale
+      spco2:
+        units: micro atm
+        long_name: Surface partial pressure of carbon dioxide in sea water
+      spco2_uncertainty:
+        units: micro atm
+        long_name: Uncertainty surface partial pressure of carbon dioxide in sea water
+      talk:
+        units: micro mol kg-1
+        long_name: Total alkalinity in sea water
+      talk_uncertainty:
+        units: micro mol kg-1
+        long_name: Uncertainty total alkalinity in sea water
+      tco2:
+        units: micro mol kg-1
+        long_name: Dissolved inorganic carbon in sea water
+      tco2_uncertainty:
+        units: micro mol kg-1
+        long_name: Uncertainty dissolved inorganic carbon in sea water
+
+  cmems_obs-mob_glo_bgc-car_nrt_irr-i:
+    product: MULTIOBS_GLO_BGC_CARBON_SURFACE_MYNRT_015_008
+    title: Surface ocean carbon fields
+    cadence: irregular
+    domain: global
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      fgco2:
+        units: molC m-2 yr-1
+        long_name: Surface downward mass flux of carbon dioxide expressed as carbon
+      fgco2_uncertainty:
+        units: molC m-2 yr-1
+        long_name: Uncertainty surface downward mass flux of carbon dioxide expressed as carbon
+      omega_ar:
+        units: '-'
+        long_name: Aragonite saturation state in sea water
+      omega_ar_uncertainty:
+        units: '-'
+        long_name: Uncertainty aragonite saturation state in sea wate
+      omega_ca:
+        units: '-'
+        long_name: Calcite saturation state in sea water
+      omega_ca_uncertainty:
+        units: '-'
+        long_name: Uncertainty calcite saturation state in sea water
+      ph:
+        units: '1'
+        long_name: Sea water ph reported on total scale
+      ph_uncertainty:
+        units: '1'
+        long_name: Uncertainty sea water ph reported on total scale
+      spco2:
+        units: micro atm
+        long_name: Surface partial pressure of carbon dioxide in sea water
+      spco2_uncertainty:
+        units: micro atm
+        long_name: Uncertainty surface partial pressure of carbon dioxide in sea water
+      talk:
+        units: micro mol kg-1
+        long_name: Total alkalinity in sea water
+      talk_uncertainty:
+        units: micro mol kg-1
+        long_name: Uncertainty total alkalinity in sea water
+      tco2:
+        units: micro mol kg-1
+        long_name: Dissolved inorganic carbon in sea water
+      tco2_uncertainty:
+        units: micro mol kg-1
+        long_name: Uncertainty dissolved inorganic carbon in sea water
+
+  cmems_obs-mob_glo_bgc-chl-poc_my_0.25deg-climatology_P1M-m:
+    product: MULTIOBS_GLO_BIO_BGC_3D_REP_015_010
+    title: Monthly climatology reference period 1998-2023
+    cadence: climatology
+    domain: global
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      ED380:
+        units: W m-2 nm-1
+        long_name: ''            # TODO: standard_name missing on describe()
+      ED380_error:
+        units: W m-2 nm-1
+        long_name: ''            # TODO: standard_name missing on describe()
+      ED412:
+        units: W m-2 nm-1
+        long_name: ''            # TODO: standard_name missing on describe()
+      ED412_error:
+        units: W m-2 nm-1
+        long_name: ''            # TODO: standard_name missing on describe()
+      ED490:
+        units: W m-2 nm-1
+        long_name: ''            # TODO: standard_name missing on describe()
+      ED490_error:
+        units: W m-2 nm-1
+        long_name: ''            # TODO: standard_name missing on describe()
+      PAR:
+        units: μmol quanta m−2 s−1
+        long_name: Downwelling photosynthetic photon flux in sea water
+      PAR_error:
+        units: μmol quanta m−2 s−1
+        long_name: Downwelling photosynthetic photon flux in sea water
+      bbp:
+        units: m-1
+        long_name: Volume backwards scattering coefficient of radiative flux in sea water due to particles
+      bbp_error:
+        units: m-1
+        long_name: Volume backwards scattering coefficient of radiative flux in sea water due to particles
+      chl:
+        units: mg m-3
+        long_name: Mass concentration of chlorophyll a in sea water
+      chl_error:
+        units: mg m-3
+        long_name: Mass concentration of chlorophyll a in sea water
+      poc:
+        units: mg m-3
+        long_name: Mass concentration of particulate organic matter expressed as carbon in sea water
+      poc_error:
+        units: mg m-3
+        long_name: Mass concentration of particulate organic matter expressed as carbon in sea water
+
+  cmems_obs-mob_glo_bgc-chl-poc_my_0.25deg_P7D-m:
+    product: MULTIOBS_GLO_BIO_BGC_3D_REP_015_010
+    title: Global Ocean 3D Chlorophyll-a concentration, Particulate Backscattering coefficient,
+    cadence: weekly
+    domain: global
+    temporal:
+      start: 1998-01-07
+      end: null              # null = NRT / rolling
+    variables:
+      ED380:
+        units: W m-2 nm-1
+        long_name: ''            # TODO: standard_name missing on describe()
+      ED380_error:
+        units: W m-2 nm-1
+        long_name: ''            # TODO: standard_name missing on describe()
+      ED412:
+        units: W m-2 nm-1
+        long_name: ''            # TODO: standard_name missing on describe()
+      ED412_error:
+        units: W m-2 nm-1
+        long_name: ''            # TODO: standard_name missing on describe()
+      ED490:
+        units: W m-2 nm-1
+        long_name: ''            # TODO: standard_name missing on describe()
+      ED490_error:
+        units: W m-2 nm-1
+        long_name: ''            # TODO: standard_name missing on describe()
+      PAR:
+        units: μmol quanta m−2 s−1
+        long_name: Downwelling photosynthetic photon flux in sea water
+      PAR_error:
+        units: μmol quanta m−2 s−1
+        long_name: Downwelling photosynthetic photon flux in sea water
+      bbp:
+        units: m-1
+        long_name: Volume backwards scattering coefficient of radiative flux in sea water due to particles
+      bbp_error:
+        units: m-1
+        long_name: Volume backwards scattering coefficient of radiative flux in sea water due to particles
+      chl:
+        units: mg m-3
+        long_name: Mass concentration of chlorophyll a in sea water
+      chl_error:
+        units: mg m-3
+        long_name: Mass concentration of chlorophyll a in sea water
+      poc:
+        units: mg m-3
+        long_name: Mass concentration of particulate organic matter expressed as carbon in sea water
+      poc_error:
+        units: mg m-3
+        long_name: Mass concentration of particulate organic matter expressed as carbon in sea water
+
+  cmems_obs-mob_glo_bgc_nrt_mr_abi_P1D-i:
+    product: MULTIOBS_GLO_BGC_SURFACE_NRT_015_016
+    title: 10-minutes instantaneous sargassum index derived from GOES-East ABI observations
+    cadence: daily
+    domain: global
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      faia:
+        units: '1'
+        long_name: Floating algae index
+      flag_faia:
+        units: ''
+        long_name: Status flag
+
+  cmems_obs-mob_glo_bgc_nrt_mr_modis_P1D-i:
+    product: MULTIOBS_GLO_BGC_SURFACE_NRT_015_016
+    title: Daily sargassum index derived from MODIS Aqua observations
+    cadence: daily
+    domain: global
+    temporal:
+      start: 2023-11-01
+      end: null              # null = NRT / rolling
+    variables:
+      flag_nfai:
+        units: '1'
+        long_name: Status flag
+      nfai:
+        units: '1'
+        long_name: Normalized floating algae index
+
+  cmems_obs-mob_glo_bgc_nrt_mr_multi_P7D-m:
+    product: MULTIOBS_GLO_BGC_SURFACE_NRT_015_016
+    title: Weekly mean sargassum index derived from Sentinel-3 OLCI and MODIS Aqua observations
+    cadence: weekly
+    domain: global
+    temporal:
+      start: 2023-11-01
+      end: null              # null = NRT / rolling
+    variables:
+      flag_nfai:
+        units: '1'
+        long_name: Status flag
+      nfai:
+        units: '1'
+        long_name: Floating algae index
+
+  cmems_obs-mob_glo_bgc_nrt_mr_olci_P1D-i:
+    product: MULTIOBS_GLO_BGC_SURFACE_NRT_015_016
+    title: Daily sargassum indices derived from Sentinel-3 OLCI observations
+    cadence: daily
+    domain: global
+    temporal:
+      start: 2023-11-01
+      end: null              # null = NRT / rolling
+    variables:
+      flag_mci:
+        units: '1'
+        long_name: Status flag
+      flag_nfai:
+        units: '1'
+        long_name: Status flag
+      mci:
+        units: '1'
+        long_name: Maximum chlorophyll index
+      nfai:
+        units: '1'
+        long_name: Normalized floating algae index
+
+  cmems_obs-oc_atl_bgc-optics_my_l3-multi-1km_P1D:
+    product: OCEANCOLOUR_ATL_BGC_L3_MY_009_113
+    title: cmems_obs-oc_atl_bgc-optics_my_l3-multi-1km_P1D
+    cadence: daily
+    domain: global
+    temporal:
+      start: 1997-09-04
+      end: null              # null = NRT / rolling
+    variables:
+      BBP:
+        units: m-1
+        long_name: Volume backwards scattering coefficient of radiative flux in sea water due to particles
+      BBP_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      CDM:
+        units: m-1
+        long_name: Volume absorption coefficient of radiative flux in sea water due to dissolved organic
+      CDM_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      flags:
+        units: ''
+        long_name: Status flag
+
+  cmems_obs-oc_atl_bgc-optics_nrt_l3-multi-1km_P1D:
+    product: OCEANCOLOUR_ATL_BGC_L3_NRT_009_111
+    title: cmems_obs-oc_atl_bgc-optics_nrt_l3-multi-1km_P1D
+    cadence: daily
+    domain: global
+    temporal:
+      start: 2026-05-03
+      end: null              # null = NRT / rolling
+    variables:
+      BBP:
+        units: m-1
+        long_name: Volume backwards scattering coefficient of radiative flux in sea water due to particles
+      BBP_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      CDM:
+        units: m-1
+        long_name: Volume absorption coefficient of radiative flux in sea water due to dissolved organic
+      CDM_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      flags:
+        units: ''
+        long_name: Status flag
+
+  cmems_obs-oc_atl_bgc-plankton_my_l3-multi-1km_P1D:
+    product: OCEANCOLOUR_ATL_BGC_L3_MY_009_113
+    title: cmems_obs-oc_atl_bgc-plankton_my_l3-multi-1km_P1D
+    cadence: daily
+    domain: global
+    temporal:
+      start: 1997-09-04
+      end: null              # null = NRT / rolling
+    variables:
+      CHL:
+        units: milligram m-3
+        long_name: Mass concentration of chlorophyll a in sea water
+      CHL_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      DIATO:
+        units: milligram m^-3
+        long_name: Mass concentration of diatoms expressed as chlorophyll in sea water
+      DIATO_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      DINO:
+        units: milligram m^-3
+        long_name: Mass concentration of dinophytes expressed as chlorophyll in sea water
+      DINO_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      GREEN:
+        units: milligram m^-3
+        long_name: Mass concentration of greenalgae expressed as chlorophyll in sea water
+      GREEN_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      HAPTO:
+        units: milligram m^-3
+        long_name: Mass concentration of haptophytes expressed as chlorophyll in sea water
+      HAPTO_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      MICRO:
+        units: milligram m^-3
+        long_name: Mass concentration of microphytoplankton expressed as chlorophyll in sea water
+      MICRO_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      NANO:
+        units: milligram m^-3
+        long_name: Mass concentration of nanophytoplankton expressed as chlorophyll in sea water
+      NANO_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      PICO:
+        units: milligram m^-3
+        long_name: Mass concentration of picophytoplankton expressed as chlorophyll in sea water
+      PICO_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      PROCHLO:
+        units: milligram m^-3
+        long_name: Mass concentration of prochlorophytes expressed as chlorophyll in sea water
+      PROCHLO_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      PROKAR:
+        units: milligram m^-3
+        long_name: Mass concentration of prokaryotes expressed as chlorophyll in sea water
+      PROKAR_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      flags:
+        units: ''
+        long_name: Status flag
+
+  cmems_obs-oc_atl_bgc-plankton_my_l3-olci-1km_P1D:
+    product: OCEANCOLOUR_ATL_BGC_L3_MY_009_113
+    title: cmems_obs-oc_atl_bgc-plankton_my_l3-olci-1km_P1D
+    cadence: daily
+    domain: global
+    temporal:
+      start: 2016-04-25
+      end: null              # null = NRT / rolling
+    variables:
+      CHL:
+        units: milligram m-3
+        long_name: Mass concentration of chlorophyll a in sea water
+      CHL_gradient:
+        units: milligram m-3 km-1
+        long_name: Magnitude of horizontal gradient of mass concentration of chlorophyll a in sea water
+      CHL_gradient_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      CHL_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      flags:
+        units: ''
+        long_name: Status flag
+
+  cmems_obs-oc_atl_bgc-plankton_my_l3-olci-300m_P1D:
+    product: OCEANCOLOUR_ATL_BGC_L3_MY_009_113
+    title: cmems_obs-oc_atl_bgc-plankton_my_l3-olci-300m_P1D
+    cadence: daily
+    domain: global
+    temporal:
+      start: 2016-04-25
+      end: null              # null = NRT / rolling
+    variables:
+      CHL:
+        units: milligram m-3
+        long_name: Mass concentration of chlorophyll a in sea water
+      CHL_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      flags:
+        units: ''
+        long_name: Status flag
+
+  cmems_obs-oc_atl_bgc-plankton_my_l4-gapfree-multi-1km_P1D:
+    product: OCEANCOLOUR_ATL_BGC_L4_MY_009_118
+    title: cmems_obs-oc_atl_bgc-plankton_my_l4-gapfree-multi-1km_P1D
+    cadence: daily
+    domain: global
+    temporal:
+      start: 1997-10-01
+      end: null              # null = NRT / rolling
+    variables:
+      CHL:
+        units: milligram m-3
+        long_name: Mass concentration of chlorophyll a in sea water
+      CHL_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      flags:
+        units: ''
+        long_name: Status flag
+
+  cmems_obs-oc_atl_bgc-plankton_my_l4-multi-1km_P1M:
+    product: OCEANCOLOUR_ATL_BGC_L4_MY_009_118
+    title: cmems_obs-oc_atl_bgc-plankton_my_l4-multi-1km_P1M
+    cadence: monthly
+    domain: global
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      CHL:
+        units: milligram m-3
+        long_name: Mass concentration of chlorophyll a in sea water
+      CHL_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      DIATO:
+        units: milligram m^-3
+        long_name: Mass concentration of diatoms expressed as chlorophyll in sea water
+      DIATO_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      DINO:
+        units: milligram m^-3
+        long_name: Mass concentration of dinophytes expressed as chlorophyll in sea water
+      DINO_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      GREEN:
+        units: milligram m^-3
+        long_name: Mass concentration of greenalgae expressed as chlorophyll in sea water
+      GREEN_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      HAPTO:
+        units: milligram m^-3
+        long_name: Mass concentration of haptophytes expressed as chlorophyll in sea water
+      HAPTO_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      MICRO:
+        units: milligram m^-3
+        long_name: Mass concentration of microphytoplankton expressed as chlorophyll in sea water
+      MICRO_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      NANO:
+        units: milligram m^-3
+        long_name: Mass concentration of nanophytoplankton expressed as chlorophyll in sea water
+      NANO_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      PICO:
+        units: milligram m^-3
+        long_name: Mass concentration of picophytoplankton expressed as chlorophyll in sea water
+      PICO_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      PROCHLO:
+        units: milligram m^-3
+        long_name: Mass concentration of prochlorophytes expressed as chlorophyll in sea water
+      PROCHLO_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      PROKAR:
+        units: milligram m^-3
+        long_name: Mass concentration of prokaryotes expressed as chlorophyll in sea water
+      PROKAR_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      flags:
+        units: ''
+        long_name: Status flag
+
+  cmems_obs-oc_atl_bgc-plankton_nrt_l3-multi-1km_P1D:
+    product: OCEANCOLOUR_ATL_BGC_L3_NRT_009_111
+    title: cmems_obs-oc_atl_bgc-plankton_nrt_l3-multi-1km_P1D
+    cadence: daily
+    domain: global
+    temporal:
+      start: 2026-05-02
+      end: null              # null = NRT / rolling
+    variables:
+      CHL:
+        units: milligram m-3
+        long_name: Mass concentration of chlorophyll a in sea water
+      CHL_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      DIATO:
+        units: milligram m^-3
+        long_name: Mass concentration of diatoms expressed as chlorophyll in sea water
+      DIATO_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      DINO:
+        units: milligram m^-3
+        long_name: Mass concentration of dinophytes expressed as chlorophyll in sea water
+      DINO_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      GREEN:
+        units: milligram m^-3
+        long_name: Mass concentration of greenalgae expressed as chlorophyll in sea water
+      GREEN_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      HAPTO:
+        units: milligram m^-3
+        long_name: Mass concentration of haptophytes expressed as chlorophyll in sea water
+      HAPTO_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      MICRO:
+        units: milligram m^-3
+        long_name: Mass concentration of microphytoplankton expressed as chlorophyll in sea water
+      MICRO_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      NANO:
+        units: milligram m^-3
+        long_name: Mass concentration of nanophytoplankton expressed as chlorophyll in sea water
+      NANO_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      PICO:
+        units: milligram m^-3
+        long_name: Mass concentration of picophytoplankton expressed as chlorophyll in sea water
+      PICO_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      PROCHLO:
+        units: milligram m^-3
+        long_name: Mass concentration of prochlorophytes expressed as chlorophyll in sea water
+      PROCHLO_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      PROKAR:
+        units: milligram m^-3
+        long_name: Mass concentration of prokaryotes expressed as chlorophyll in sea water
+      PROKAR_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      flags:
+        units: ''
+        long_name: Status flag
+
+  cmems_obs-oc_atl_bgc-plankton_nrt_l3-olci-1km_P1D:
+    product: OCEANCOLOUR_ATL_BGC_L3_NRT_009_111
+    title: cmems_obs-oc_atl_bgc-plankton_nrt_l3-olci-1km_P1D
+    cadence: daily
+    domain: global
+    temporal:
+      start: 2026-05-02
+      end: null              # null = NRT / rolling
+    variables:
+      CHL:
+        units: milligram m-3
+        long_name: Mass concentration of chlorophyll a in sea water
+      CHL_gradient:
+        units: milligram m-3 km-1
+        long_name: Magnitude of horizontal gradient of mass concentration of chlorophyll a in sea water
+      CHL_gradient_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      CHL_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      flags:
+        units: ''
+        long_name: Status flag
+
+  cmems_obs-oc_atl_bgc-plankton_nrt_l3-olci-300m_P1D:
+    product: OCEANCOLOUR_ATL_BGC_L3_NRT_009_111
+    title: cmems_obs-oc_atl_bgc-plankton_nrt_l3-olci-300m_P1D
+    cadence: daily
+    domain: global
+    temporal:
+      start: 2026-05-10
+      end: null              # null = NRT / rolling
+    variables:
+      CHL:
+        units: milligram m-3
+        long_name: Mass concentration of chlorophyll a in sea water
+      CHL_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      flags:
+        units: ''
+        long_name: Status flag
+
+  cmems_obs-oc_atl_bgc-plankton_nrt_l4-gapfree-multi-1km_P1D:
+    product: OCEANCOLOUR_ATL_BGC_L4_NRT_009_116
+    title: cmems_obs-oc_atl_bgc-plankton_nrt_l4-gapfree-multi-1km_P1D
+    cadence: daily
+    domain: global
+    temporal:
+      start: 2026-05-02
+      end: null              # null = NRT / rolling
+    variables:
+      CHL:
+        units: milligram m-3
+        long_name: Mass concentration of chlorophyll a in sea water
+      CHL_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      flags:
+        units: ''
+        long_name: Status flag
+
+  cmems_obs-oc_atl_bgc-plankton_nrt_l4-multi-1km_P1M:
+    product: OCEANCOLOUR_ATL_BGC_L4_NRT_009_116
+    title: cmems_obs-oc_atl_bgc-plankton_nrt_l4-multi-1km_P1M
+    cadence: monthly
+    domain: global
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      CHL:
+        units: milligram m-3
+        long_name: Mass concentration of chlorophyll a in sea water
+      CHL_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      DIATO:
+        units: milligram m^-3
+        long_name: Mass concentration of diatoms expressed as chlorophyll in sea water
+      DIATO_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      DINO:
+        units: milligram m^-3
+        long_name: Mass concentration of dinophytes expressed as chlorophyll in sea water
+      DINO_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      GREEN:
+        units: milligram m^-3
+        long_name: Mass concentration of greenalgae expressed as chlorophyll in sea water
+      GREEN_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      HAPTO:
+        units: milligram m^-3
+        long_name: Mass concentration of haptophytes expressed as chlorophyll in sea water
+      HAPTO_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      MICRO:
+        units: milligram m^-3
+        long_name: Mass concentration of microphytoplankton expressed as chlorophyll in sea water
+      MICRO_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      NANO:
+        units: milligram m^-3
+        long_name: Mass concentration of nanophytoplankton expressed as chlorophyll in sea water
+      NANO_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      PICO:
+        units: milligram m^-3
+        long_name: Mass concentration of picophytoplankton expressed as chlorophyll in sea water
+      PICO_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      PROCHLO:
+        units: milligram m^-3
+        long_name: Mass concentration of prochlorophytes expressed as chlorophyll in sea water
+      PROCHLO_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      PROKAR:
+        units: milligram m^-3
+        long_name: Mass concentration of prokaryotes expressed as chlorophyll in sea water
+      PROKAR_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      flags:
+        units: ''
+        long_name: Status flag
+
+  cmems_obs-oc_atl_bgc-pp_my_l4-multi-1km_P1M:
+    product: OCEANCOLOUR_ATL_BGC_L4_MY_009_118
+    title: cmems_obs-oc_atl_bgc-pp_my_l4-multi-1km_P1M
+    cadence: monthly
+    domain: global
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      PP:
+        units: mg m-2 day-1
+        long_name: Primary productivity of biomass expressed as carbon
+      PP_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      flags:
+        units: ''
+        long_name: Status flag
+
+  cmems_obs-oc_atl_bgc-pp_nrt_l4-multi-1km_P1M:
+    product: OCEANCOLOUR_ATL_BGC_L4_NRT_009_116
+    title: cmems_obs-oc_atl_bgc-pp_nrt_l4-multi-1km_P1M
+    cadence: monthly
+    domain: global
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      PP:
+        units: mg m-2 day-1
+        long_name: Primary productivity of biomass expressed as carbon
+      PP_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      flags:
+        units: ''
+        long_name: Status flag
+
+  cmems_obs-oc_atl_bgc-reflectance_my_l3-multi-1km_P1D:
+    product: OCEANCOLOUR_ATL_BGC_L3_MY_009_113
+    title: cmems_obs-oc_atl_bgc-reflectance_my_l3-multi-1km_P1D
+    cadence: daily
+    domain: global
+    temporal:
+      start: 1997-09-04
+      end: null              # null = NRT / rolling
+    variables:
+      RRS412:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS412_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS443:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS443_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS490:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS490_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS555:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS555_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS670:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS670_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      flags:
+        units: ''
+        long_name: Status flag
+
+  cmems_obs-oc_atl_bgc-reflectance_my_l3-olci-300m_P1D:
+    product: OCEANCOLOUR_ATL_BGC_L3_MY_009_113
+    title: cmems_obs-oc_atl_bgc-reflectance_my_l3-olci-300m_P1D
+    cadence: daily
+    domain: global
+    temporal:
+      start: 2016-04-25
+      end: null              # null = NRT / rolling
+    variables:
+      RRS400:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS400_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS412:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS412_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS443:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS443_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS490:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS490_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS510:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS510_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS560:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS560_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS620:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS620_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS665:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS665_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS674:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS674_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS681:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS681_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS709:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS709_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      flags:
+        units: ''
+        long_name: Status flag
+
+  cmems_obs-oc_atl_bgc-reflectance_nrt_l3-multi-1km_P1D:
+    product: OCEANCOLOUR_ATL_BGC_L3_NRT_009_111
+    title: cmems_obs-oc_atl_bgc-reflectance_nrt_l3-multi-1km_P1D
+    cadence: daily
+    domain: global
+    temporal:
+      start: 2026-05-03
+      end: null              # null = NRT / rolling
+    variables:
+      RRS412:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS412_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS443:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS443_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS490:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS490_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS555:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS555_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS670:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS670_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      flags:
+        units: ''
+        long_name: Status flag
+
+  cmems_obs-oc_atl_bgc-reflectance_nrt_l3-olci-300m_P1D:
+    product: OCEANCOLOUR_ATL_BGC_L3_NRT_009_111
+    title: cmems_obs-oc_atl_bgc-reflectance_nrt_l3-olci-300m_P1D
+    cadence: daily
+    domain: global
+    temporal:
+      start: 2026-05-09
+      end: null              # null = NRT / rolling
+    variables:
+      RRS400:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS400_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS412:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS412_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS443:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS443_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS490:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS490_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS510:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS510_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS560:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS560_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS620:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS620_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS665:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS665_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS674:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS674_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS681:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS681_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS709:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS709_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      flags:
+        units: ''
+        long_name: Status flag
+
+  cmems_obs-oc_atl_bgc-transp_my_l3-multi-1km_P1D:
+    product: OCEANCOLOUR_ATL_BGC_L3_MY_009_113
+    title: cmems_obs-oc_atl_bgc-transp_my_l3-multi-1km_P1D
+    cadence: daily
+    domain: global
+    temporal:
+      start: 1997-09-04
+      end: null              # null = NRT / rolling
+    variables:
+      KD490:
+        units: m-1
+        long_name: Volume attenuation coefficient of downwelling radiative flux in sea water
+      KD490_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      SPM:
+        units: g/m3
+        long_name: Mass concentration of suspended matter in sea water
+      SPM_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      ZSD:
+        units: m
+        long_name: Secchi depth of sea water
+      ZSD_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      flags:
+        units: ''
+        long_name: Status flag
+
+  cmems_obs-oc_atl_bgc-transp_nrt_l3-multi-1km_P1D:
+    product: OCEANCOLOUR_ATL_BGC_L3_NRT_009_111
+    title: cmems_obs-oc_atl_bgc-transp_nrt_l3-multi-1km_P1D
+    cadence: daily
+    domain: global
+    temporal:
+      start: 2026-05-03
+      end: null              # null = NRT / rolling
+    variables:
+      KD490:
+        units: m-1
+        long_name: Volume attenuation coefficient of downwelling radiative flux in sea water
+      KD490_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      SPM:
+        units: g/m3
+        long_name: Mass concentration of suspended matter in sea water
+      SPM_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      ZSD:
+        units: m
+        long_name: Secchi depth of sea water
+      ZSD_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      flags:
+        units: ''
+        long_name: Status flag
+
+  cmems_obs-oc_blk_bgc-optics_my_l3-multi-1km_P1D:
+    product: OCEANCOLOUR_BLK_BGC_L3_MY_009_153
+    title: cmems_obs-oc_blk_bgc-optics_my_l3-multi-1km_P1D
+    cadence: daily
+    domain: global
+    temporal:
+      start: 1997-09-16
+      end: null              # null = NRT / rolling
+    variables:
+      ADG443:
+        units: m^-1
+        long_name: Volume absorption coefficient of radiative flux in sea water due to dissolved organic
+      APH443:
+        units: m^-1
+        long_name: Volume absorption coefficient of radiative flux in sea water due to phytoplankton
+      BBP443:
+        units: m^-1
+        long_name: Volume backwards scattering coefficient of radiative flux in sea water due to particles
+      QI_ADG443:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      QI_APH443:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      QI_BBP443:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      SENSORMASK:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+
+  cmems_obs-oc_blk_bgc-optics_nrt_l3-hr-mosaic_P1D-m:
+    product: OCEANCOLOUR_BLK_BGC_HR_L3_NRT_009_206
+    title: CMEMS HR-OC Black Sea optical (rrs, bbp) daily observations mosaic
+    cadence: daily
+    domain: global
+    temporal:
+      start: 2025-10-01
+      end: null              # null = NRT / rolling
+    variables:
+      BBP443:
+        units: m-1
+        long_name: Volume backwards scattering coefficient of radiative flux in sea water
+      BBP492:
+        units: m-1
+        long_name: Volume backwards scattering coefficient of radiative flux in sea water
+      BBP560:
+        units: m-1
+        long_name: Volume backwards scattering coefficient of radiative flux in sea water
+      BBP665:
+        units: m-1
+        long_name: Volume backwards scattering coefficient of radiative flux in sea water
+      BBP704:
+        units: m-1
+        long_name: Volume backwards scattering coefficient of radiative flux in sea water
+      BBP740:
+        units: m-1
+        long_name: Volume backwards scattering coefficient of radiative flux in sea water
+      BBP783:
+        units: m-1
+        long_name: Volume backwards scattering coefficient of radiative flux in sea water
+      BBP865:
+        units: m-1
+        long_name: Volume backwards scattering coefficient of radiative flux in sea water
+      RRS443:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS443_UNC:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS492:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS492_UNC:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS560:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS560_UNC:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS665:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS665_UNC:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS704:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS704_UNC:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS740:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS740_UNC:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS783:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS783_UNC:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS865:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS865_UNC:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+
+  cmems_obs-oc_blk_bgc-optics_nrt_l3-multi-1km_P1D:
+    product: OCEANCOLOUR_BLK_BGC_L3_NRT_009_151
+    title: cmems_obs-oc_blk_bgc-optics_nrt_l3-multi-1km_P1D
+    cadence: daily
+    domain: global
+    temporal:
+      start: 2026-05-07
+      end: null              # null = NRT / rolling
+    variables:
+      ADG443:
+        units: m^-1
+        long_name: Volume absorption coefficient of radiative flux in sea water due to dissolved organic
+      APH443:
+        units: m^-1
+        long_name: Volume absorption coefficient of radiative flux in sea water due to phytoplankton
+      BBP443:
+        units: m^-1
+        long_name: Volume backwards scattering coefficient of radiative flux in sea water due to particles
+      QI_ADG443:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      QI_APH443:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      QI_BBP443:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      SENSORMASK:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+
+  cmems_obs-oc_blk_bgc-optics_nrt_l4-hr-mosaic_P1D-m:
+    product: OCEANCOLOUR_BLK_BGC_HR_L4_NRT_009_212
+    title: CMEMS HR-OC Black Sea optical (rrs, bbp) daily interpolated observations mosaic
+    cadence: daily
+    domain: global
+    temporal:
+      start: 2025-11-01
+      end: null              # null = NRT / rolling
+    variables:
+      BBP443:
+        units: m-1
+        long_name: Volume backwards scattering coefficient of radiative flux in sea water
+
+  cmems_obs-oc_blk_bgc-optics_nrt_l4-hr-mosaic_P1M-m:
+    product: OCEANCOLOUR_BLK_BGC_HR_L4_NRT_009_212
+    title: CMEMS HR-OC Black Sea optical (rrs, bbp) monthly averaged observations mosaic
+    cadence: monthly
+    domain: global
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      BBP443:
+        units: m-1
+        long_name: Volume backwards scattering coefficient of radiative flux in sea water
+      BBP443_count:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      BBP443_error:
+        units: m-1
+        long_name: Volume backwards scattering coefficient of radiative flux in sea water standard error
+
+  cmems_obs-oc_blk_bgc-plankton_my_l3-multi-1km_P1D:
+    product: OCEANCOLOUR_BLK_BGC_L3_MY_009_153
+    title: cmems_obs-oc_blk_bgc-plankton_my_l3-multi-1km_P1D
+    cadence: daily
+    domain: global
+    temporal:
+      start: 1997-09-16
+      end: null              # null = NRT / rolling
+    variables:
+      CHL:
+        units: milligram m^-3
+        long_name: Mass concentration of chlorophyll a in sea water
+      MICRO:
+        units: milligram m^-3
+        long_name: Mass concentration of microphytoplankton expressed as chlorophyll in sea water
+      NANO:
+        units: milligram m^-3
+        long_name: Mass concentration of nanophytoplankton expressed as chlorophyll in sea water
+      PICO:
+        units: milligram m^-3
+        long_name: Mass concentration of picophytoplankton expressed as chlorophyll in sea water
+      QI_CHL:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      SENSORMASK:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+
+  cmems_obs-oc_blk_bgc-plankton_my_l3-olci-300m_P1D:
+    product: OCEANCOLOUR_BLK_BGC_L3_MY_009_153
+    title: cmems_obs-oc_blk_bgc-plankton_my_l3-olci-300m_P1D
+    cadence: daily
+    domain: global
+    temporal:
+      start: 2016-04-26
+      end: null              # null = NRT / rolling
+    variables:
+      CHL:
+        units: milligram m^-3
+        long_name: Mass concentration of chlorophyll a in sea water
+      QI_CHL:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      SENSORMASK:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+
+  cmems_obs-oc_blk_bgc-plankton_my_l4-gapfree-multi-1km_P1D:
+    product: OCEANCOLOUR_BLK_BGC_L4_MY_009_154
+    title: cmems_obs-oc_blk_bgc-plankton_my_l4-gapfree-multi-1km_P1D
+    cadence: daily
+    domain: global
+    temporal:
+      start: 1997-09-16
+      end: null              # null = NRT / rolling
+    variables:
+      CHL:
+        units: milligram m^-3
+        long_name: Mass concentration of chlorophyll a in sea water
+
+  cmems_obs-oc_blk_bgc-plankton_my_l4-multi-1km_P1M:
+    product: OCEANCOLOUR_BLK_BGC_L4_MY_009_154
+    title: cmems_obs-oc_blk_bgc-plankton_my_l4-multi-1km_P1M
+    cadence: monthly
+    domain: global
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      CHL:
+        units: milligram m^-3
+        long_name: Mass concentration of chlorophyll a in sea water
+      CHL_count:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      CHL_error:
+        units: milligram m^-3
+        long_name: ''            # TODO: standard_name missing on describe()
+
+  cmems_obs-oc_blk_bgc-plankton_my_l4-multi-climatology-1km_P1D:
+    product: OCEANCOLOUR_BLK_BGC_L4_MY_009_154
+    title: cmems_obs-oc_blk_bgc-plankton_my_l4-multi-climatology-1km_P1D
+    cadence: climatology
+    domain: global
+    temporal:
+      start: 2000-01-01
+      end: null              # null = NRT / rolling
+    variables:
+      CHL_count:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      CHL_median:
+        units: mg/m3
+        long_name: Mass concentration of chlorophyll a in sea water
+      CHL_standard_deviation:
+        units: mg/m3
+        long_name: Mass concentration of chlorophyll a in sea water
+      climatology_bounds:
+        units: seconds since 1981-01-01
+        long_name: Time
+
+  cmems_obs-oc_blk_bgc-plankton_my_l4-olci-300m_P1M:
+    product: OCEANCOLOUR_BLK_BGC_L4_MY_009_154
+    title: cmems_obs-oc_blk_bgc-plankton_my_l4-olci-300m_P1M
+    cadence: monthly
+    domain: global
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      CHL:
+        units: milligram m^-3
+        long_name: Mass concentration of chlorophyll a in sea water
+      CHL_count:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      CHL_error:
+        units: milligram m^-3
+        long_name: ''            # TODO: standard_name missing on describe()
+
+  cmems_obs-oc_blk_bgc-plankton_nrt_l3-multi-1km_P1D:
+    product: OCEANCOLOUR_BLK_BGC_L3_NRT_009_151
+    title: cmems_obs-oc_blk_bgc-plankton_nrt_l3-multi-1km_P1D
+    cadence: daily
+    domain: global
+    temporal:
+      start: 2026-05-07
+      end: null              # null = NRT / rolling
+    variables:
+      CHL:
+        units: milligram m^-3
+        long_name: Mass concentration of chlorophyll a in sea water
+      MICRO:
+        units: milligram m^-3
+        long_name: Mass concentration of microphytoplankton expressed as chlorophyll in sea water
+      NANO:
+        units: milligram m^-3
+        long_name: Mass concentration of nanophytoplankton expressed as chlorophyll in sea water
+      PICO:
+        units: milligram m^-3
+        long_name: Mass concentration of picophytoplankton expressed as chlorophyll in sea water
+      QI_CHL:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      SENSORMASK:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+
+  cmems_obs-oc_blk_bgc-plankton_nrt_l3-olci-300m_P1D:
+    product: OCEANCOLOUR_BLK_BGC_L3_NRT_009_151
+    title: cmems_obs-oc_blk_bgc-plankton_nrt_l3-olci-300m_P1D
+    cadence: daily
+    domain: global
+    temporal:
+      start: 2026-05-04
+      end: null              # null = NRT / rolling
+    variables:
+      CHL:
+        units: milligram m^-3
+        long_name: Mass concentration of chlorophyll a in sea water
+      QI_CHL:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      SENSORMASK:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+
+  cmems_obs-oc_blk_bgc-plankton_nrt_l4-gapfree-multi-1km_P1D:
+    product: OCEANCOLOUR_BLK_BGC_L4_NRT_009_152
+    title: cmems_obs-oc_blk_bgc-plankton_nrt_l4-gapfree-multi-1km_P1D
+    cadence: daily
+    domain: global
+    temporal:
+      start: 2026-04-22
+      end: null              # null = NRT / rolling
+    variables:
+      CHL:
+        units: milligram m^-3
+        long_name: Mass concentration of chlorophyll a in sea water
+
+  cmems_obs-oc_blk_bgc-plankton_nrt_l4-multi-1km_P1M:
+    product: OCEANCOLOUR_BLK_BGC_L4_NRT_009_152
+    title: cmems_obs-oc_blk_bgc-plankton_nrt_l4-multi-1km_P1M
+    cadence: monthly
+    domain: global
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      CHL:
+        units: milligram m^-3
+        long_name: Mass concentration of chlorophyll a in sea water
+      CHL_count:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      CHL_error:
+        units: milligram m^-3
+        long_name: ''            # TODO: standard_name missing on describe()
+
+  cmems_obs-oc_blk_bgc-plankton_nrt_l4-olci-300m_P1M:
+    product: OCEANCOLOUR_BLK_BGC_L4_NRT_009_152
+    title: cmems_obs-oc_blk_bgc-plankton_nrt_l4-olci-300m_P1M
+    cadence: monthly
+    domain: global
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      CHL:
+        units: milligram m^-3
+        long_name: Mass concentration of chlorophyll a in sea water
+      CHL_count:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      CHL_error:
+        units: milligram m^-3
+        long_name: ''            # TODO: standard_name missing on describe()
+
+  cmems_obs-oc_blk_bgc-pp_my_l4-multi-4km_P1D:
+    product: OCEANCOLOUR_BLK_BGC_L4_MY_009_154
+    title: cmems_obs-oc_blk_bgc-pp_my_l4-multi-4km_P1D
+    cadence: daily
+    domain: global
+    temporal:
+      start: 1997-09-16
+      end: null              # null = NRT / rolling
+    variables:
+      PP:
+        units: g m^-2 d^-1
+        long_name: Primary productivity of biomass expressed as carbon
+
+  cmems_obs-oc_blk_bgc-pp_my_l4-multi-4km_P1M:
+    product: OCEANCOLOUR_BLK_BGC_L4_MY_009_154
+    title: cmems_obs-oc_blk_bgc-pp_my_l4-multi-4km_P1M
+    cadence: monthly
+    domain: global
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      PP:
+        units: g m^-2 d^-1
+        long_name: Primary productivity of biomass expressed as carbon
+      PP_count:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      PP_error:
+        units: g m^-2 d^-1
+        long_name: ''            # TODO: standard_name missing on describe()
+
+  cmems_obs-oc_blk_bgc-pp_nrt_l4-multi-4km_P1D:
+    product: OCEANCOLOUR_BLK_BGC_L4_NRT_009_152
+    title: cmems_obs-oc_blk_bgc-pp_nrt_l4-multi-4km_P1D
+    cadence: daily
+    domain: global
+    temporal:
+      start: 2026-04-30
+      end: null              # null = NRT / rolling
+    variables:
+      PP:
+        units: g m^-2 d^-1
+        long_name: Primary productivity of biomass expressed as carbon
+
+  cmems_obs-oc_blk_bgc-pp_nrt_l4-multi-4km_P1M:
+    product: OCEANCOLOUR_BLK_BGC_L4_NRT_009_152
+    title: cmems_obs-oc_blk_bgc-pp_nrt_l4-multi-4km_P1M
+    cadence: monthly
+    domain: global
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      PP:
+        units: g m^-2 d^-1
+        long_name: Primary productivity of biomass expressed as carbon
+      PP_count:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      PP_error:
+        units: g m^-2 d^-1
+        long_name: ''            # TODO: standard_name missing on describe()
+
+  cmems_obs-oc_blk_bgc-reflectance_my_l3-multi-1km_P1D:
+    product: OCEANCOLOUR_BLK_BGC_L3_MY_009_153
+    title: cmems_obs-oc_blk_bgc-reflectance_my_l3-multi-1km_P1D
+    cadence: daily
+    domain: global
+    temporal:
+      start: 1997-09-16
+      end: null              # null = NRT / rolling
+    variables:
+      QI_RRS412:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      QI_RRS443:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      QI_RRS490:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      QI_RRS510:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      QI_RRS555:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      QI_RRS670:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS412:
+        units: sr^-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS443:
+        units: sr^-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS490:
+        units: sr^-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS510:
+        units: sr^-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS555:
+        units: sr^-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS670:
+        units: sr^-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      SENSORMASK:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+
+  cmems_obs-oc_blk_bgc-reflectance_my_l3-olci-300m_P1D:
+    product: OCEANCOLOUR_BLK_BGC_L3_MY_009_153
+    title: cmems_obs-oc_blk_bgc-reflectance_my_l3-olci-300m_P1D
+    cadence: daily
+    domain: global
+    temporal:
+      start: 2016-04-26
+      end: null              # null = NRT / rolling
+    variables:
+      QI_RRS412_5:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      QI_RRS442_5:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      QI_RRS490:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      QI_RRS510:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      QI_RRS560:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      QI_RRS673_75:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS400:
+        units: sr^-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS412_5:
+        units: sr^-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS442_5:
+        units: sr^-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS490:
+        units: sr^-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS510:
+        units: sr^-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS560:
+        units: sr^-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS620:
+        units: sr^-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS665:
+        units: sr^-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS673_75:
+        units: sr^-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS681_25:
+        units: sr^-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS708_75:
+        units: sr^-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS778_75:
+        units: sr^-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS865:
+        units: sr^-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      SENSORMASK:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+
+  cmems_obs-oc_blk_bgc-reflectance_nrt_l3-multi-1km_P1D:
+    product: OCEANCOLOUR_BLK_BGC_L3_NRT_009_151
+    title: cmems_obs-oc_blk_bgc-reflectance_nrt_l3-multi-1km_P1D
+    cadence: daily
+    domain: global
+    temporal:
+      start: 2026-05-07
+      end: null              # null = NRT / rolling
+    variables:
+      QI_RRS412:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      QI_RRS443:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      QI_RRS490:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      QI_RRS510:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      QI_RRS555:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      QI_RRS670:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS412:
+        units: sr^-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS443:
+        units: sr^-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS490:
+        units: sr^-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS510:
+        units: sr^-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS555:
+        units: sr^-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS670:
+        units: sr^-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      SENSORMASK:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+
+  cmems_obs-oc_blk_bgc-reflectance_nrt_l3-olci-300m_P1D:
+    product: OCEANCOLOUR_BLK_BGC_L3_NRT_009_151
+    title: cmems_obs-oc_blk_bgc-reflectance_nrt_l3-olci-300m_P1D
+    cadence: daily
+    domain: global
+    temporal:
+      start: 2026-05-07
+      end: null              # null = NRT / rolling
+    variables:
+      QI_RRS412_5:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      QI_RRS442_5:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      QI_RRS490:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      QI_RRS510:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      QI_RRS560:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      QI_RRS673_75:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS400:
+        units: sr^-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS412_5:
+        units: sr^-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS442_5:
+        units: sr^-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS490:
+        units: sr^-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS510:
+        units: sr^-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS560:
+        units: sr^-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS620:
+        units: sr^-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS665:
+        units: sr^-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS673_75:
+        units: sr^-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS681_25:
+        units: sr^-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS708_75:
+        units: sr^-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS778_75:
+        units: sr^-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS865:
+        units: sr^-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      SENSORMASK:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+
+  cmems_obs-oc_blk_bgc-transp_my_l3-multi-1km_P1D:
+    product: OCEANCOLOUR_BLK_BGC_L3_MY_009_153
+    title: cmems_obs-oc_blk_bgc-transp_my_l3-multi-1km_P1D
+    cadence: daily
+    domain: global
+    temporal:
+      start: 1997-09-16
+      end: null              # null = NRT / rolling
+    variables:
+      KD490:
+        units: m^-1
+        long_name: Volume attenuation coefficient of downwelling radiative flux in sea water
+      QI_KD490:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      SENSORMASK:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+
+  cmems_obs-oc_blk_bgc-transp_my_l3-olci-300m_P1D:
+    product: OCEANCOLOUR_BLK_BGC_L3_MY_009_153
+    title: cmems_obs-oc_blk_bgc-transp_my_l3-olci-300m_P1D
+    cadence: daily
+    domain: global
+    temporal:
+      start: 2016-04-26
+      end: null              # null = NRT / rolling
+    variables:
+      KD490:
+        units: m^-1
+        long_name: Volume attenuation coefficient of downwelling radiative flux in sea water
+      QI_KD490:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      SENSORMASK:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+
+  cmems_obs-oc_blk_bgc-transp_nrt_l3-multi-1km_P1D:
+    product: OCEANCOLOUR_BLK_BGC_L3_NRT_009_151
+    title: cmems_obs-oc_blk_bgc-transp_nrt_l3-multi-1km_P1D
+    cadence: daily
+    domain: global
+    temporal:
+      start: 2026-05-07
+      end: null              # null = NRT / rolling
+    variables:
+      KD490:
+        units: m^-1
+        long_name: Volume attenuation coefficient of downwelling radiative flux in sea water
+      QI_KD490:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      SENSORMASK:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+
+  cmems_obs-oc_blk_bgc-transp_nrt_l3-olci-300m_P1D:
+    product: OCEANCOLOUR_BLK_BGC_L3_NRT_009_151
+    title: cmems_obs-oc_blk_bgc-transp_nrt_l3-olci-300m_P1D
+    cadence: daily
+    domain: global
+    temporal:
+      start: 2026-05-07
+      end: null              # null = NRT / rolling
+    variables:
+      KD490:
+        units: m^-1
+        long_name: Volume attenuation coefficient of downwelling radiative flux in sea water
+      QI_KD490:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      SENSORMASK:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+
+  cmems_obs-oc_blk_bgc-transp_nrt_l4-multi-1km_P1M:
+    product: OCEANCOLOUR_BLK_BGC_L4_NRT_009_152
+    title: cmems_obs-oc_blk_bgc-transp_nrt_l4-multi-1km_P1M
+    cadence: monthly
+    domain: global
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      KD490:
+        units: m^-1
+        long_name: Volume attenuation coefficient of downwelling radiative flux in sea water
+      KD490_count:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      KD490_error:
+        units: m^-1
+        long_name: ''            # TODO: standard_name missing on describe()
+
+  cmems_obs-oc_blk_bgc-transp_nrt_l4-olci-300m_P1M:
+    product: OCEANCOLOUR_BLK_BGC_L4_NRT_009_152
+    title: cmems_obs-oc_blk_bgc-transp_nrt_l4-olci-300m_P1M
+    cadence: monthly
+    domain: global
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      KD490:
+        units: m^-1
+        long_name: Volume attenuation coefficient of downwelling radiative flux in sea water
+      KD490_count:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      KD490_error:
+        units: m^-1
+        long_name: ''            # TODO: standard_name missing on describe()
+
+  cmems_obs-oc_blk_bgc-tur-spm-chl_nrt_l4-hr-mosaic_P1M-m:
+    product: OCEANCOLOUR_BLK_BGC_HR_L4_NRT_009_212
+    title: CMEMS HR-OC Black Sea transparency (spm, tur) and geophysical (chl) monthly averaged
+    cadence: monthly
+    domain: global
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      CHL:
+        units: mg m-3
+        long_name: Mass concentration of chlorophyll a in sea water
+      CHL_count:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      CHL_error:
+        units: mg m-3
+        long_name: Mass concentration of chlorophyll a in sea water standard error
+      SPM:
+        units: g m-3
+        long_name: Mass concentration of suspended matter in sea water
+      SPM_count:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      SPM_error:
+        units: g m-3
+        long_name: Mass concentration of suspended matter in sea water standard error
+      TUR:
+        units: FNU
+        long_name: Sea water turbidity
+      TUR_count:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      TUR_error:
+        units: FNU
+        long_name: Sea water turbidity standard error
+
+  cmems_obs-oc_glo_bgc-optics_my_l3-multi-4km_P1D:
+    product: OCEANCOLOUR_GLO_BGC_L3_MY_009_103
+    title: cmems_obs-oc_glo_bgc-optics_my_l3-multi-4km_P1D
+    cadence: daily
+    domain: global
+    temporal:
+      start: 1997-09-04
+      end: null              # null = NRT / rolling
+    variables:
+      BBP:
+        units: m-1
+        long_name: Volume backwards scattering coefficient of radiative flux in sea water due to particles
+      BBP_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      CDM:
+        units: m-1
+        long_name: Volume absorption coefficient of radiative flux in sea water due to dissolved organic
+      CDM_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      flags:
+        units: ''
+        long_name: Status flag
+
+  cmems_obs-oc_glo_bgc-optics_my_l4-multi-4km_P1M:
+    product: OCEANCOLOUR_GLO_BGC_L4_MY_009_104
+    title: cmems_obs-oc_glo_bgc-optics_my_l4-multi-4km_P1M
+    cadence: monthly
+    domain: global
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      BBP:
+        units: m-1
+        long_name: Volume backwards scattering coefficient of radiative flux in sea water due to particles
+      BBP_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      CDM:
+        units: m-1
+        long_name: Volume absorption coefficient of radiative flux in sea water due to dissolved organic
+      CDM_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      flags:
+        units: ''
+        long_name: Status flag
+
+  cmems_obs-oc_glo_bgc-optics_nrt_l3-multi-4km_P1D:
+    product: OCEANCOLOUR_GLO_BGC_L3_NRT_009_101
+    title: cmems_obs-oc_glo_bgc-optics_nrt_l3-multi-4km_P1D
+    cadence: daily
+    domain: global
+    temporal:
+      start: 2026-05-03
+      end: null              # null = NRT / rolling
+    variables:
+      BBP:
+        units: m-1
+        long_name: Volume backwards scattering coefficient of radiative flux in sea water due to particles
+      BBP_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      CDM:
+        units: m-1
+        long_name: Volume absorption coefficient of radiative flux in sea water due to dissolved organic
+      CDM_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      flags:
+        units: ''
+        long_name: Status flag
+
+  cmems_obs-oc_glo_bgc-optics_nrt_l4-multi-4km_P1M:
+    product: OCEANCOLOUR_GLO_BGC_L4_NRT_009_102
+    title: cmems_obs-oc_glo_bgc-optics_nrt_l4-multi-4km_P1M
+    cadence: monthly
+    domain: global
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      BBP:
+        units: m-1
+        long_name: Volume backwards scattering coefficient of radiative flux in sea water due to particles
+      BBP_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      CDM:
+        units: m-1
+        long_name: Volume absorption coefficient of radiative flux in sea water due to dissolved organic
+      CDM_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      flags:
+        units: ''
+        long_name: Status flag
+
+  cmems_obs-oc_glo_bgc-plankton_my_l3-multi-4km_P1D:
+    product: OCEANCOLOUR_GLO_BGC_L3_MY_009_103
+    title: cmems_obs-oc_glo_bgc-plankton_my_l3-multi-4km_P1D
+    cadence: daily
+    domain: global
+    temporal:
+      start: 1997-09-04
+      end: null              # null = NRT / rolling
+    variables:
+      CHL:
+        units: milligram m-3
+        long_name: Mass concentration of chlorophyll a in sea water
+      CHL_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      DIATO:
+        units: milligram m^-3
+        long_name: Mass concentration of diatoms expressed as chlorophyll in sea water
+      DIATO_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      DINO:
+        units: milligram m^-3
+        long_name: Mass concentration of dinophytes expressed as chlorophyll in sea water
+      DINO_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      GREEN:
+        units: milligram m^-3
+        long_name: Mass concentration of greenalgae expressed as chlorophyll in sea water
+      GREEN_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      HAPTO:
+        units: milligram m^-3
+        long_name: Mass concentration of haptophytes expressed as chlorophyll in sea water
+      HAPTO_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      MICRO:
+        units: milligram m^-3
+        long_name: Mass concentration of microphytoplankton expressed as chlorophyll in sea water
+      MICRO_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      NANO:
+        units: milligram m^-3
+        long_name: Mass concentration of nanophytoplankton expressed as chlorophyll in sea water
+      NANO_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      PICO:
+        units: milligram m^-3
+        long_name: Mass concentration of picophytoplankton expressed as chlorophyll in sea water
+      PICO_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      PROCHLO:
+        units: milligram m^-3
+        long_name: Mass concentration of prochlorophytes expressed as chlorophyll in sea water
+      PROCHLO_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      PROKAR:
+        units: milligram m^-3
+        long_name: Mass concentration of prokaryotes expressed as chlorophyll in sea water
+      PROKAR_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      flags:
+        units: ''
+        long_name: Status flag
+
+  cmems_obs-oc_glo_bgc-plankton_my_l3-olci-300m_P1D:
+    product: OCEANCOLOUR_GLO_BGC_L3_MY_009_103
+    title: cmems_obs-oc_glo_bgc-plankton_my_l3-olci-300m_P1D
+    cadence: daily
+    domain: global
+    temporal:
+      start: 2016-04-25
+      end: null              # null = NRT / rolling
+    variables:
+      CHL:
+        units: milligram m-3
+        long_name: Mass concentration of chlorophyll a in sea water
+      CHL_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      flags:
+        units: ''
+        long_name: Status flag
+
+  cmems_obs-oc_glo_bgc-plankton_my_l3-olci-4km_P1D:
+    product: OCEANCOLOUR_GLO_BGC_L3_MY_009_103
+    title: cmems_obs-oc_glo_bgc-plankton_my_l3-olci-4km_P1D
+    cadence: daily
+    domain: global
+    temporal:
+      start: 2016-04-25
+      end: null              # null = NRT / rolling
+    variables:
+      CHL:
+        units: milligram m-3
+        long_name: Mass concentration of chlorophyll a in sea water
+      CHL_gradient:
+        units: milligram m-3 km-1
+        long_name: Magnitude of horizontal gradient of mass concentration of chlorophyll a in sea water
+      CHL_gradient_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      CHL_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      flags:
+        units: ''
+        long_name: Status flag
+
+  cmems_obs-oc_glo_bgc-plankton_my_l4-gapfree-multi-4km_P1D:
+    product: OCEANCOLOUR_GLO_BGC_L4_MY_009_104
+    title: cmems_obs-oc_glo_bgc-plankton_my_l4-gapfree-multi-4km_P1D
+    cadence: daily
+    domain: global
+    temporal:
+      start: 1997-09-04
+      end: null              # null = NRT / rolling
+    variables:
+      CHL:
+        units: milligram m-3
+        long_name: Mass concentration of chlorophyll a in sea water
+      CHL_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      flags:
+        units: ''
+        long_name: Status flag
+
+  cmems_obs-oc_glo_bgc-plankton_my_l4-multi-4km_P1M:
+    product: OCEANCOLOUR_GLO_BGC_L4_MY_009_104
+    title: cmems_obs-oc_glo_bgc-plankton_my_l4-multi-4km_P1M
+    cadence: monthly
+    domain: global
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      CHL:
+        units: milligram m-3
+        long_name: Mass concentration of chlorophyll a in sea water
+      CHL_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      DIATO:
+        units: milligram m^-3
+        long_name: Mass concentration of diatoms expressed as chlorophyll in sea water
+      DIATO_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      DINO:
+        units: milligram m^-3
+        long_name: Mass concentration of dinophytes expressed as chlorophyll in sea water
+      DINO_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      GREEN:
+        units: milligram m^-3
+        long_name: Mass concentration of greenalgae expressed as chlorophyll in sea water
+      GREEN_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      HAPTO:
+        units: milligram m^-3
+        long_name: Mass concentration of haptophytes expressed as chlorophyll in sea water
+      HAPTO_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      MICRO:
+        units: milligram m^-3
+        long_name: Mass concentration of microphytoplankton expressed as chlorophyll in sea water
+      MICRO_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      NANO:
+        units: milligram m^-3
+        long_name: Mass concentration of nanophytoplankton expressed as chlorophyll in sea water
+      NANO_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      PICO:
+        units: milligram m^-3
+        long_name: Mass concentration of picophytoplankton expressed as chlorophyll in sea water
+      PICO_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      PROCHLO:
+        units: milligram m^-3
+        long_name: Mass concentration of prochlorophytes expressed as chlorophyll in sea water
+      PROCHLO_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      PROKAR:
+        units: milligram m^-3
+        long_name: Mass concentration of prokaryotes expressed as chlorophyll in sea water
+      PROKAR_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      flags:
+        units: ''
+        long_name: Status flag
+
+  cmems_obs-oc_glo_bgc-plankton_my_l4-multi-climatology-4km_P1D:
+    product: OCEANCOLOUR_GLO_BGC_L4_MY_009_104
+    title: cmems_obs-oc_glo_bgc-plankton_my_l4-multi-climatology-4km_P1D
+    cadence: climatology
+    domain: global
+    temporal:
+      start: 2008-01-01
+      end: null              # null = NRT / rolling
+    variables:
+      CHL_count:
+        units: ''
+        long_name: Number of observations
+      CHL_maximum:
+        units: milligram m-3
+        long_name: Mass concentration of chlorophyll a in sea water
+      CHL_mean:
+        units: milligram m-3
+        long_name: Mass concentration of chlorophyll a in sea water
+      CHL_median:
+        units: milligram m-3
+        long_name: Mass concentration of chlorophyll a in sea water
+      CHL_minimum:
+        units: milligram m-3
+        long_name: Mass concentration of chlorophyll a in sea water
+      CHL_percentile_3:
+        units: milligram m-3
+        long_name: Mass concentration of chlorophyll a in sea water
+      CHL_percentile_97:
+        units: milligram m-3
+        long_name: Mass concentration of chlorophyll a in sea water
+      CHL_percentile_standard_deviation:
+        units: milligram m-3
+        long_name: Mass concentration of chlorophyll a in sea water
+      CHL_standard_deviation:
+        units: milligram m-3
+        long_name: Mass concentration of chlorophyll a in sea water
+      climatology_bounds:
+        units: days since 1900-01-01
+        long_name: Time
+      flags:
+        units: ''
+        long_name: Status flag
+
+  cmems_obs-oc_glo_bgc-plankton_my_l4-olci-300m_P1M:
+    product: OCEANCOLOUR_GLO_BGC_L4_MY_009_104
+    title: cmems_obs-oc_glo_bgc-plankton_my_l4-olci-300m_P1M
+    cadence: monthly
+    domain: global
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      CHL:
+        units: milligram m-3
+        long_name: Mass concentration of chlorophyll a in sea water
+      CHL_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      flags:
+        units: ''
+        long_name: Status flag
+
+  cmems_obs-oc_glo_bgc-plankton_my_l4-olci-4km_P1M:
+    product: OCEANCOLOUR_GLO_BGC_L4_MY_009_104
+    title: cmems_obs-oc_glo_bgc-plankton_my_l4-olci-4km_P1M
+    cadence: monthly
+    domain: global
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      CHL:
+        units: milligram m-3
+        long_name: Mass concentration of chlorophyll a in sea water
+      CHL_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      flags:
+        units: ''
+        long_name: Status flag
+
+  cmems_obs-oc_glo_bgc-plankton_nrt_l3-multi-4km_P1D:
+    product: OCEANCOLOUR_GLO_BGC_L3_NRT_009_101
+    title: cmems_obs-oc_glo_bgc-plankton_nrt_l3-multi-4km_P1D
+    cadence: daily
+    domain: global
+    temporal:
+      start: 2026-05-03
+      end: null              # null = NRT / rolling
+    variables:
+      CHL:
+        units: milligram m-3
+        long_name: Mass concentration of chlorophyll a in sea water
+      CHL_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      DIATO:
+        units: milligram m^-3
+        long_name: Mass concentration of diatoms expressed as chlorophyll in sea water
+      DIATO_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      DINO:
+        units: milligram m^-3
+        long_name: Mass concentration of dinophytes expressed as chlorophyll in sea water
+      DINO_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      GREEN:
+        units: milligram m^-3
+        long_name: Mass concentration of greenalgae expressed as chlorophyll in sea water
+      GREEN_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      HAPTO:
+        units: milligram m^-3
+        long_name: Mass concentration of haptophytes expressed as chlorophyll in sea water
+      HAPTO_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      MICRO:
+        units: milligram m^-3
+        long_name: Mass concentration of microphytoplankton expressed as chlorophyll in sea water
+      MICRO_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      NANO:
+        units: milligram m^-3
+        long_name: Mass concentration of nanophytoplankton expressed as chlorophyll in sea water
+      NANO_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      PICO:
+        units: milligram m^-3
+        long_name: Mass concentration of picophytoplankton expressed as chlorophyll in sea water
+      PICO_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      PROCHLO:
+        units: milligram m^-3
+        long_name: Mass concentration of prochlorophytes expressed as chlorophyll in sea water
+      PROCHLO_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      PROKAR:
+        units: milligram m^-3
+        long_name: Mass concentration of prokaryotes expressed as chlorophyll in sea water
+      PROKAR_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      flags:
+        units: ''
+        long_name: Status flag
+
+  cmems_obs-oc_glo_bgc-plankton_nrt_l3-olci-300m_P1D:
+    product: OCEANCOLOUR_GLO_BGC_L3_NRT_009_101
+    title: cmems_obs-oc_glo_bgc-plankton_nrt_l3-olci-300m_P1D
+    cadence: daily
+    domain: global
+    temporal:
+      start: 2026-05-03
+      end: null              # null = NRT / rolling
+    variables:
+      CHL:
+        units: milligram m-3
+        long_name: Mass concentration of chlorophyll a in sea water
+      CHL_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      flags:
+        units: ''
+        long_name: Status flag
+
+  cmems_obs-oc_glo_bgc-plankton_nrt_l3-olci-4km_P1D:
+    product: OCEANCOLOUR_GLO_BGC_L3_NRT_009_101
+    title: cmems_obs-oc_glo_bgc-plankton_nrt_l3-olci-4km_P1D
+    cadence: daily
+    domain: global
+    temporal:
+      start: 2026-04-28
+      end: null              # null = NRT / rolling
+    variables:
+      CHL:
+        units: milligram m-3
+        long_name: Mass concentration of chlorophyll a in sea water
+      CHL_gradient:
+        units: milligram m-3 km-1
+        long_name: Magnitude of horizontal gradient of mass concentration of chlorophyll a in sea water
+      CHL_gradient_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      CHL_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      flags:
+        units: ''
+        long_name: Status flag
+
+  cmems_obs-oc_glo_bgc-plankton_nrt_l4-gapfree-multi-4km_P1D:
+    product: OCEANCOLOUR_GLO_BGC_L4_NRT_009_102
+    title: cmems_obs-oc_glo_bgc-plankton_nrt_l4-gapfree-multi-4km_P1D
+    cadence: daily
+    domain: global
+    temporal:
+      start: 2026-05-03
+      end: null              # null = NRT / rolling
+    variables:
+      CHL:
+        units: milligram m-3
+        long_name: Mass concentration of chlorophyll a in sea water
+      CHL_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      flags:
+        units: ''
+        long_name: Status flag
+
+  cmems_obs-oc_glo_bgc-plankton_nrt_l4-multi-4km_P1M:
+    product: OCEANCOLOUR_GLO_BGC_L4_NRT_009_102
+    title: cmems_obs-oc_glo_bgc-plankton_nrt_l4-multi-4km_P1M
+    cadence: monthly
+    domain: global
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      CHL:
+        units: milligram m-3
+        long_name: Mass concentration of chlorophyll a in sea water
+      CHL_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      DIATO:
+        units: milligram m^-3
+        long_name: Mass concentration of diatoms expressed as chlorophyll in sea water
+      DIATO_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      DINO:
+        units: milligram m^-3
+        long_name: Mass concentration of dinophytes expressed as chlorophyll in sea water
+      DINO_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      GREEN:
+        units: milligram m^-3
+        long_name: Mass concentration of greenalgae expressed as chlorophyll in sea water
+      GREEN_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      HAPTO:
+        units: milligram m^-3
+        long_name: Mass concentration of haptophytes expressed as chlorophyll in sea water
+      HAPTO_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      MICRO:
+        units: milligram m^-3
+        long_name: Mass concentration of microphytoplankton expressed as chlorophyll in sea water
+      MICRO_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      NANO:
+        units: milligram m^-3
+        long_name: Mass concentration of nanophytoplankton expressed as chlorophyll in sea water
+      NANO_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      PICO:
+        units: milligram m^-3
+        long_name: Mass concentration of picophytoplankton expressed as chlorophyll in sea water
+      PICO_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      PROCHLO:
+        units: milligram m^-3
+        long_name: Mass concentration of prochlorophytes expressed as chlorophyll in sea water
+      PROCHLO_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      PROKAR:
+        units: milligram m^-3
+        long_name: Mass concentration of prokaryotes expressed as chlorophyll in sea water
+      PROKAR_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      flags:
+        units: ''
+        long_name: Status flag
+
+  cmems_obs-oc_glo_bgc-plankton_nrt_l4-olci-300m_P1M:
+    product: OCEANCOLOUR_GLO_BGC_L4_NRT_009_102
+    title: cmems_obs-oc_glo_bgc-plankton_nrt_l4-olci-300m_P1M
+    cadence: monthly
+    domain: global
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      CHL:
+        units: milligram m-3
+        long_name: Mass concentration of chlorophyll a in sea water
+      CHL_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      flags:
+        units: ''
+        long_name: Status flag
+
+  cmems_obs-oc_glo_bgc-plankton_nrt_l4-olci-4km_P1M:
+    product: OCEANCOLOUR_GLO_BGC_L4_NRT_009_102
+    title: cmems_obs-oc_glo_bgc-plankton_nrt_l4-olci-4km_P1M
+    cadence: monthly
+    domain: global
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      CHL:
+        units: milligram m-3
+        long_name: Mass concentration of chlorophyll a in sea water
+      CHL_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      flags:
+        units: ''
+        long_name: Status flag
+
+  cmems_obs-oc_glo_bgc-pp_my_l4-multi-4km_P1M:
+    product: OCEANCOLOUR_GLO_BGC_L4_MY_009_104
+    title: cmems_obs-oc_glo_bgc-pp_my_l4-multi-4km_P1M
+    cadence: monthly
+    domain: global
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      PP:
+        units: mg m-2 day-1
+        long_name: Primary productivity of biomass expressed as carbon
+      PP_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      flags:
+        units: ''
+        long_name: Status flag
+
+  cmems_obs-oc_glo_bgc-pp_nrt_l4-multi-4km_P1M:
+    product: OCEANCOLOUR_GLO_BGC_L4_NRT_009_102
+    title: cmems_obs-oc_glo_bgc-pp_nrt_l4-multi-4km_P1M
+    cadence: monthly
+    domain: global
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      PP:
+        units: mg m-2 day-1
+        long_name: Primary productivity of biomass expressed as carbon
+      PP_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      flags:
+        units: ''
+        long_name: Status flag
+
+  cmems_obs-oc_glo_bgc-reflectance_my_l3-multi-4km_P1D:
+    product: OCEANCOLOUR_GLO_BGC_L3_MY_009_103
+    title: cmems_obs-oc_glo_bgc-reflectance_my_l3-multi-4km_P1D
+    cadence: daily
+    domain: global
+    temporal:
+      start: 1997-09-04
+      end: null              # null = NRT / rolling
+    variables:
+      RRS412:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS412_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS443:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS443_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS490:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS490_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS555:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS555_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS670:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS670_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      flags:
+        units: ''
+        long_name: Status flag
+
+  cmems_obs-oc_glo_bgc-reflectance_my_l3-olci-4km_P1D:
+    product: OCEANCOLOUR_GLO_BGC_L3_MY_009_103
+    title: cmems_obs-oc_glo_bgc-reflectance_my_l3-olci-4km_P1D
+    cadence: daily
+    domain: global
+    temporal:
+      start: 2016-04-25
+      end: null              # null = NRT / rolling
+    variables:
+      RRS400:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS400_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS412:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS412_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS443:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS443_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS490:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS490_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS510:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS510_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS560:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS560_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS620:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS620_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS665:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS665_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS674:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS674_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS681:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS681_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS709:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS709_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      flags:
+        units: ''
+        long_name: Status flag
+
+  cmems_obs-oc_glo_bgc-reflectance_my_l4-multi-4km_P1M:
+    product: OCEANCOLOUR_GLO_BGC_L4_MY_009_104
+    title: cmems_obs-oc_glo_bgc-reflectance_my_l4-multi-4km_P1M
+    cadence: monthly
+    domain: global
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      RRS412:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS412_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS443:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS443_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS490:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS490_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS555:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS555_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS670:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS670_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      flags:
+        units: ''
+        long_name: Status flag
+
+  cmems_obs-oc_glo_bgc-reflectance_my_l4-olci-300m_P1M:
+    product: OCEANCOLOUR_GLO_BGC_L4_MY_009_104
+    title: cmems_obs-oc_glo_bgc-reflectance_my_l4-olci-300m_P1M
+    cadence: monthly
+    domain: global
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      RRS400:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS400_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS412:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS412_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS443:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS443_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS490:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS490_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS510:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS510_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS560:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS560_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS620:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS620_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS665:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS665_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS674:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS674_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS681:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS681_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS709:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS709_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      flags:
+        units: ''
+        long_name: Status flag
+
+  cmems_obs-oc_glo_bgc-reflectance_my_l4-olci-4km_P1M:
+    product: OCEANCOLOUR_GLO_BGC_L4_MY_009_104
+    title: cmems_obs-oc_glo_bgc-reflectance_my_l4-olci-4km_P1M
+    cadence: monthly
+    domain: global
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      RRS400:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS400_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS412:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS412_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS443:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS443_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS490:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS490_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS510:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS510_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS560:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS560_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS620:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS620_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS665:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS665_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS674:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS674_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS681:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS681_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS709:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS709_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      flags:
+        units: ''
+        long_name: Status flag
+
+  cmems_obs-oc_glo_bgc-reflectance_nrt_l3-multi-4km_P1D:
+    product: OCEANCOLOUR_GLO_BGC_L3_NRT_009_101
+    title: cmems_obs-oc_glo_bgc-reflectance_nrt_l3-multi-4km_P1D
+    cadence: daily
+    domain: global
+    temporal:
+      start: 2026-05-03
+      end: null              # null = NRT / rolling
+    variables:
+      RRS412:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS412_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS443:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS443_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS490:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS490_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS555:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS555_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS670:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS670_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      flags:
+        units: ''
+        long_name: Status flag
+
+  cmems_obs-oc_glo_bgc-reflectance_nrt_l3-olci-300m_P1D:
+    product: OCEANCOLOUR_GLO_BGC_L3_NRT_009_101
+    title: cmems_obs-oc_glo_bgc-reflectance_nrt_l3-olci-300m_P1D
+    cadence: daily
+    domain: global
+    temporal:
+      start: 2026-05-09
+      end: null              # null = NRT / rolling
+    variables:
+      RRS400:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS400_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS412:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS412_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS443:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS443_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS490:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS490_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS510:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS510_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS560:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS560_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS620:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS620_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS665:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS665_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS674:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS674_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS681:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS681_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS709:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS709_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      flags:
+        units: ''
+        long_name: Status flag
+
+  cmems_obs-oc_glo_bgc-reflectance_nrt_l3-olci-4km_P1D:
+    product: OCEANCOLOUR_GLO_BGC_L3_NRT_009_101
+    title: cmems_obs-oc_glo_bgc-reflectance_nrt_l3-olci-4km_P1D
+    cadence: daily
+    domain: global
+    temporal:
+      start: 2026-05-07
+      end: null              # null = NRT / rolling
+    variables:
+      RRS400:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS400_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS412:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS412_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS443:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS443_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS490:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS490_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS510:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS510_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS560:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS560_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS620:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS620_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS665:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS665_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS674:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS674_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS681:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS681_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS709:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS709_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      flags:
+        units: ''
+        long_name: Status flag
+
+  cmems_obs-oc_glo_bgc-reflectance_nrt_l4-multi-4km_P1M:
+    product: OCEANCOLOUR_GLO_BGC_L4_NRT_009_102
+    title: cmems_obs-oc_glo_bgc-reflectance_nrt_l4-multi-4km_P1M
+    cadence: monthly
+    domain: global
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      RRS412:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS412_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS443:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS443_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS490:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS490_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS555:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS555_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS670:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS670_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      flags:
+        units: ''
+        long_name: Status flag
+
+  cmems_obs-oc_glo_bgc-reflectance_nrt_l4-olci-300m_P1M:
+    product: OCEANCOLOUR_GLO_BGC_L4_NRT_009_102
+    title: cmems_obs-oc_glo_bgc-reflectance_nrt_l4-olci-300m_P1M
+    cadence: monthly
+    domain: global
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      RRS400:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS400_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS412:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS412_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS443:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS443_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS490:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS490_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS510:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS510_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS560:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS560_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS620:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS620_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS665:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS665_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS674:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS674_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS681:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS681_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS709:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS709_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      flags:
+        units: ''
+        long_name: Status flag
+
+  cmems_obs-oc_glo_bgc-reflectance_nrt_l4-olci-4km_P1M:
+    product: OCEANCOLOUR_GLO_BGC_L4_NRT_009_102
+    title: cmems_obs-oc_glo_bgc-reflectance_nrt_l4-olci-4km_P1M
+    cadence: monthly
+    domain: global
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      RRS400:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS400_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS412:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS412_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS443:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS443_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS490:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS490_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS510:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS510_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS560:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS560_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS620:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS620_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS665:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS665_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS674:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS674_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS681:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS681_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS709:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS709_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      flags:
+        units: ''
+        long_name: Status flag
+
+  cmems_obs-oc_glo_bgc-transp_my_l3-multi-4km_P1D:
+    product: OCEANCOLOUR_GLO_BGC_L3_MY_009_103
+    title: cmems_obs-oc_glo_bgc-transp_my_l3-multi-4km_P1D
+    cadence: daily
+    domain: global
+    temporal:
+      start: 1997-09-04
+      end: null              # null = NRT / rolling
+    variables:
+      KD490:
+        units: m-1
+        long_name: Volume attenuation coefficient of downwelling radiative flux in sea water
+      KD490_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      SPM:
+        units: g/m3
+        long_name: Mass concentration of suspended matter in sea water
+      SPM_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      ZSD:
+        units: m
+        long_name: Secchi depth of sea water
+      ZSD_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      flags:
+        units: ''
+        long_name: Status flag
+
+  cmems_obs-oc_glo_bgc-transp_my_l3-olci-4km_P1D:
+    product: OCEANCOLOUR_GLO_BGC_L3_MY_009_103
+    title: cmems_obs-oc_glo_bgc-transp_my_l3-olci-4km_P1D
+    cadence: daily
+    domain: global
+    temporal:
+      start: 2016-04-25
+      end: null              # null = NRT / rolling
+    variables:
+      KD490:
+        units: m-1
+        long_name: Volume attenuation coefficient of downwelling radiative flux in sea water
+      KD490_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      flags:
+        units: ''
+        long_name: Status flag
+
+  cmems_obs-oc_glo_bgc-transp_my_l4-gapfree-multi-4km_P1D:
+    product: OCEANCOLOUR_GLO_BGC_L4_MY_009_104
+    title: cmems_obs-oc_glo_bgc-transp_my_l4-gapfree-multi-4km_P1D
+    cadence: daily
+    domain: global
+    temporal:
+      start: 1997-09-04
+      end: null              # null = NRT / rolling
+    variables:
+      KD490:
+        units: m-1
+        long_name: Volume attenuation coefficient of downwelling radiative flux in sea water
+      KD490_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      ZSD:
+        units: m
+        long_name: Secchi depth of sea water
+      ZSD_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      flags:
+        units: ''
+        long_name: Status flag
+
+  cmems_obs-oc_glo_bgc-transp_my_l4-multi-4km_P1M:
+    product: OCEANCOLOUR_GLO_BGC_L4_MY_009_104
+    title: cmems_obs-oc_glo_bgc-transp_my_l4-multi-4km_P1M
+    cadence: monthly
+    domain: global
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      KD490:
+        units: m-1
+        long_name: Volume attenuation coefficient of downwelling radiative flux in sea water
+      KD490_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      SPM:
+        units: g/m3
+        long_name: Mass concentration of suspended matter in sea water
+      SPM_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      ZSD:
+        units: m
+        long_name: Secchi depth of sea water
+      ZSD_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      flags:
+        units: ''
+        long_name: Status flag
+
+  cmems_obs-oc_glo_bgc-transp_my_l4-olci-4km_P1M:
+    product: OCEANCOLOUR_GLO_BGC_L4_MY_009_104
+    title: cmems_obs-oc_glo_bgc-transp_my_l4-olci-4km_P1M
+    cadence: monthly
+    domain: global
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      KD490:
+        units: m-1
+        long_name: Volume attenuation coefficient of downwelling radiative flux in sea water
+      KD490_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      flags:
+        units: ''
+        long_name: Status flag
+
+  cmems_obs-oc_glo_bgc-transp_nrt_l3-multi-4km_P1D:
+    product: OCEANCOLOUR_GLO_BGC_L3_NRT_009_101
+    title: cmems_obs-oc_glo_bgc-transp_nrt_l3-multi-4km_P1D
+    cadence: daily
+    domain: global
+    temporal:
+      start: 2026-05-03
+      end: null              # null = NRT / rolling
+    variables:
+      KD490:
+        units: m-1
+        long_name: Volume attenuation coefficient of downwelling radiative flux in sea water
+      KD490_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      SPM:
+        units: g/m3
+        long_name: Mass concentration of suspended matter in sea water
+      SPM_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      ZSD:
+        units: m
+        long_name: Secchi depth of sea water
+      ZSD_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      flags:
+        units: ''
+        long_name: Status flag
+
+  cmems_obs-oc_glo_bgc-transp_nrt_l3-olci-4km_P1D:
+    product: OCEANCOLOUR_GLO_BGC_L3_NRT_009_101
+    title: cmems_obs-oc_glo_bgc-transp_nrt_l3-olci-4km_P1D
+    cadence: daily
+    domain: global
+    temporal:
+      start: 2026-05-07
+      end: null              # null = NRT / rolling
+    variables:
+      KD490:
+        units: m-1
+        long_name: Volume attenuation coefficient of downwelling radiative flux in sea water
+      KD490_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      flags:
+        units: ''
+        long_name: Status flag
+
+  cmems_obs-oc_glo_bgc-transp_nrt_l4-gapfree-multi-4km_P1D:
+    product: OCEANCOLOUR_GLO_BGC_L4_NRT_009_102
+    title: cmems_obs-oc_glo_bgc-transp_nrt_l4-gapfree-multi-4km_P1D
+    cadence: daily
+    domain: global
+    temporal:
+      start: 2026-05-04
+      end: null              # null = NRT / rolling
+    variables:
+      KD490:
+        units: m-1
+        long_name: Volume attenuation coefficient of downwelling radiative flux in sea water
+      KD490_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      ZSD:
+        units: m
+        long_name: Secchi depth of sea water
+      ZSD_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      flags:
+        units: ''
+        long_name: Status flag
+
+  cmems_obs-oc_glo_bgc-transp_nrt_l4-multi-4km_P1M:
+    product: OCEANCOLOUR_GLO_BGC_L4_NRT_009_102
+    title: cmems_obs-oc_glo_bgc-transp_nrt_l4-multi-4km_P1M
+    cadence: monthly
+    domain: global
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      KD490:
+        units: m-1
+        long_name: Volume attenuation coefficient of downwelling radiative flux in sea water
+      KD490_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      SPM:
+        units: g/m3
+        long_name: Mass concentration of suspended matter in sea water
+      SPM_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      ZSD:
+        units: m
+        long_name: Secchi depth of sea water
+      ZSD_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      flags:
+        units: ''
+        long_name: Status flag
+
+  cmems_obs-oc_glo_bgc-transp_nrt_l4-olci-4km_P1M:
+    product: OCEANCOLOUR_GLO_BGC_L4_NRT_009_102
+    title: cmems_obs-oc_glo_bgc-transp_nrt_l4-olci-4km_P1M
+    cadence: monthly
+    domain: global
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      KD490:
+        units: m-1
+        long_name: Volume attenuation coefficient of downwelling radiative flux in sea water
+      KD490_uncertainty:
+        units: '%'
+        long_name: ''            # TODO: standard_name missing on describe()
+      flags:
+        units: ''
+        long_name: Status flag
+
+  cmems_obs_oc_blk_bgc_tur-spm-chl_nrt_l3-hr-mosaic_P1D-m:
+    product: OCEANCOLOUR_BLK_BGC_HR_L3_NRT_009_206
+    title: CMEMS HR-OC Black Sea transparency (spm, tur) and geophysical (chl) daily observations
+    cadence: daily
+    domain: global
+    temporal:
+      start: 2020-01-01
+      end: null              # null = NRT / rolling
+    variables:
+      CHL:
+        units: mg m-3
+        long_name: Mass concentration of chlorophyll a in sea water
+      SPM:
+        units: g m-3
+        long_name: Mass concentration of suspended matter in sea water
+      TUR:
+        units: FNU
+        long_name: Sea water turbidity
+
+  cmems_obs_oc_blk_bgc_tur-spm-chl_nrt_l4-hr-mosaic_P1D-m:
+    product: OCEANCOLOUR_BLK_BGC_HR_L4_NRT_009_212
+    title: CMEMS HR-OC Black Sea transparency (spm, tur) and geophysical (chl) daily interpolated
+    cadence: daily
+    domain: global
+    temporal:
+      start: 2020-01-02
+      end: null              # null = NRT / rolling
+    variables:
+      CHL:
+        units: mg m-3
+        long_name: Mass concentration of chlorophyll a in sea water
+      SPM:
+        units: g m-3
+        long_name: Mass concentration of suspended matter in sea water
+      TUR:
+        units: FNU
+        long_name: Sea water turbidity
