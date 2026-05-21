@@ -182,6 +182,13 @@ markers = [
 channels = ["conda-forge"]
 platforms = ["win-64", "linux-64", "osx-arm64"]
 
+# pyramids-gis ships Linux wheels tagged manylinux_2_39 (glibc >=2.39),
+# which bundle GDAL. Without this, pixi's lower default glibc floor judges
+# them incompatible and falls back to the sdist (no bundled GDAL -> no
+# osgeo). ubuntu-latest (24.04) provides glibc 2.39.
+[tool.pixi.system-requirements]
+libc = "2.39"
+
 [tool.pixi.pypi-dependencies]
 # Dev/test env pulls every backend's SDK so the full suite runs.
 # Production users do `pip install earthlens[ecmwf]` (or whichever
