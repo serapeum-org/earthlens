@@ -114,6 +114,18 @@ class TestGeojsonToFc:
         assert len(fc) == 1, "the row must survive a bad severity"
         assert pd.isna(fc["severity"].iloc[0]), "bad severity should be NaN"
 
+    def test_non_dict_severitydata_degrades_to_na(self):
+        """A non-dict severitydata (e.g. a list) yields null severity, not an error."""
+        feature = {
+            "type": "Feature",
+            "geometry": {"type": "Point", "coordinates": [12.5, 42.0]},
+            "properties": {"eventtype": "EQ", "eventid": 1, "severitydata": []},
+        }
+        fc = geojson_to_fc({"features": [feature]})
+        assert len(fc) == 1, "the row must survive a non-dict severitydata"
+        assert pd.isna(fc["severity"].iloc[0])
+        assert pd.isna(fc["severity_unit"].iloc[0])
+
     def test_geometryless_feature_has_null_geometry(
         self, make_feature: Callable[..., dict[str, Any]]
     ):

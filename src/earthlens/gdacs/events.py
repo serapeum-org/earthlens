@@ -240,7 +240,9 @@ def _feature_to_row(feature: dict[str, Any]) -> tuple[dict[str, object], object]
     Reads every property defensively (`.get`) so a renamed or missing
     field becomes `None` (rendered as `<NA>` / `NaN` once typed). The
     flat `severitydata` sub-dict is unpacked into the `severity` /
-    `severity_unit` / `severity_text` columns.
+    `severity_unit` / `severity_text` columns; a `severitydata` that is
+    absent or not a mapping (a list / scalar) is treated as empty, so
+    those columns become null rather than raising.
 
     Args:
         feature: One GeoJSON feature mapping (`geometry` + `properties`).
@@ -251,7 +253,11 @@ def _feature_to_row(feature: dict[str, Any]) -> tuple[dict[str, object], object]
         shapely geometry or `None`.
     """
     properties = feature.get("properties") or {}
-    severity = properties.get("severitydata") or {}
+    severity = properties.get("severitydata")
+    # GDACS normally nests a dict here, but guard against a non-dict
+    # (e.g. a list or a scalar) so `.get` below never raises — keep the
+    # "a bad field degrades to null, not an error" contract.
+    severity = severity if isinstance(severity, dict) else {}
     event_id = properties.get("eventid")
     episode_id = properties.get("episodeid")
     row = {
