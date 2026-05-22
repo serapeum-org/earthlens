@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from pathlib import Path
+from typing import Any, Callable
 
 import pytest
 import requests
@@ -152,7 +153,10 @@ class TestGDACSFetch:
         assert fake_gdacs.calls[0]["timeout"] == 12.0
 
     def test_empty_feed_yields_empty_fc(
-        self, tmp_path: Path, fake_gdacs: _FakeGdacs, make_payload
+        self,
+        tmp_path: Path,
+        fake_gdacs: _FakeGdacs,
+        make_payload: Callable[..., dict[str, Any]],
     ):
         """An empty feed maps to an empty FeatureCollection, not an error."""
         fake_gdacs.set_payload(make_payload(features=[]))
@@ -171,9 +175,9 @@ class TestGDACSFetch:
         self,
         tmp_path: Path,
         fake_gdacs: _FakeGdacs,
-        make_feature,
-        make_payload,
-        warnings_log,
+        make_feature: Callable[..., dict[str, Any]],
+        make_payload: Callable[..., dict[str, Any]],
+        warnings_log: list[str],
     ):
         """A response at the 100-event cap logs a truncation warning."""
         from earthlens.gdacs.backend import MAX_EVENTS_PER_RESPONSE
@@ -195,9 +199,9 @@ class TestGDACSFetch:
         self,
         tmp_path: Path,
         fake_gdacs: _FakeGdacs,
-        make_feature,
-        make_payload,
-        warnings_log,
+        make_feature: Callable[..., dict[str, Any]],
+        make_payload: Callable[..., dict[str, Any]],
+        warnings_log: list[str],
     ):
         """A response below the cap logs no truncation warning."""
         fake_gdacs.set_payload(
@@ -210,7 +214,11 @@ class TestGDACSFetch:
         ), f"unexpected truncation warning, got {warnings_log}"
 
     def test_bbox_post_filter(
-        self, tmp_path: Path, fake_gdacs: _FakeGdacs, make_feature, make_payload
+        self,
+        tmp_path: Path,
+        fake_gdacs: _FakeGdacs,
+        make_feature: Callable[..., dict[str, Any]],
+        make_payload: Callable[..., dict[str, Any]],
     ):
         """Alerts outside lat_lim/lon_lim are dropped client-side."""
         fake_gdacs.set_payload(
@@ -265,7 +273,10 @@ class TestGDACSDownload:
         assert len(list(tmp_path.glob("gdacs_alerts_*.gpkg"))) == 2
 
     def test_empty_writes_nothing(
-        self, tmp_path: Path, fake_gdacs: _FakeGdacs, make_payload
+        self,
+        tmp_path: Path,
+        fake_gdacs: _FakeGdacs,
+        make_payload: Callable[..., dict[str, Any]],
     ):
         """An empty result returns an empty FC and writes no file."""
         fake_gdacs.set_payload(make_payload(features=[]))
