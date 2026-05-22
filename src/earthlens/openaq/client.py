@@ -32,6 +32,13 @@ from loguru import logger
 #: OpenAQ v3 API base URL. All endpoint paths are joined onto this.
 BASE_URL = "https://api.openaq.org/v3"
 
+#: Maximum page size the v3 list endpoints accept. A `limit` above this
+#: is rejected with HTTP 422 (verified live 2026-05-23), so the client
+#: clamps to it — both to avoid the 422 and so that "a page shorter than
+#: the requested limit is the last page" is a reliable end-of-pages
+#: signal (the server never returns more than we ask for).
+_MAX_PAGE_SIZE = 1000
+
 #: Rollup endpoints that filter on a calendar `date_from`/`date_to`
 #: (date granularity) rather than `datetime_from`/`datetime_to`. The raw
 #: `/measurements` and the `/hours` rollup take datetime filters; `/days`,
@@ -180,13 +187,18 @@ class OpenaqClient:
     ) -> Iterator[dict[str, Any]]:
         """Yield every result across pages of a v3 list endpoint.
 
-        Walks `page=1, 2, ...` until a short page signals the end (or
-        `max_items` is reached), yielding each element of the
-        `results` array. The page size is taken from `params["limit"]`.
+        Walks `page=1, 2, ...` until the endpoint is exhausted (or
+        `max_items` is reached), yielding each element of the `results`
+        array. The requested `limit` is clamped to
+        :data:`_MAX_PAGE_SIZE` (the v3 maximum), so the server never
+        returns more rows than asked and a page shorter than that limit
+        reliably marks the last page — no silent truncation, no extra
+        empty round-trip.
 
         Args:
             path: List-endpoint path relative to :data:`BASE_URL`.
-            params: Query parameters; `limit` sets the page size.
+            params: Query parameters; `limit` requests the page size
+                (clamped to :data:`_MAX_PAGE_SIZE`).
             max_items: Stop after yielding this many results. `None`
                 (default) means no cap — exhaust the endpoint.
 
@@ -196,7 +208,8 @@ class OpenaqClient:
         page = 1
         yielded = 0
         page_params = dict(params)
-        limit = int(page_params.get("limit", 100))
+        limit = min(int(page_params.get("limit", _MAX_PAGE_SIZE)), _MAX_PAGE_SIZE)
+        page_params["limit"] = limit
         while True:
             page_params["page"] = page
             payload = self._request(path, page_params)
@@ -218,11 +231,20 @@ class OpenaqClient:
         limit: int = 1000,
         max_locations: int | None = None,
     ) -> list[dict[str, Any]]:
-        """List monitoring locations in `bbox`, filtered by parameter.
+        """List monitoring locations in `bbox`, narrowed by parameter.
+
+        `parameters_id` is a **best-effort server-side narrowing hint**,
+        not the source of truth: live probing showed `/locations`
+        returning the same locations regardless of the `parameters_id`
+        value, and a returned location carries *all* its sensors (not
+        just the requested ones). The caller (`OpenAQ._search`) is
+        responsible for the authoritative per-sensor filter, which it
+        does by parameter **name**.
 
         Args:
             bbox: Comma-joined `"west,south,east,north"` WGS84 box.
-            parameters_id: OpenAQ numeric parameter ids to filter on.
+            parameters_id: OpenAQ numeric parameter ids to narrow by
+                (best-effort; see above).
             limit: Page size.
             max_locations: Cap on the number of locations returned.
 

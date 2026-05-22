@@ -15,16 +15,22 @@ class TestParameter:
     """The Parameter row model and its defaults."""
 
     def test_minimal_construction(self):
-        """A parameter needs id/name/units; display_name and group default."""
-        p = Parameter(id=2, name="pm25", units="µg/m³")
-        assert p.id == 2
+        """A parameter needs name/ids; units, display_name, group default."""
+        p = Parameter(name="pm25", ids=[2])
+        assert p.ids == [2]
+        assert p.units == []
         assert p.display_name == ""
         assert p.group == "other"
+
+    def test_empty_ids_rejected(self):
+        """A parameter must carry at least one id."""
+        with pytest.raises(Exception):
+            Parameter(name="pm25", ids=[])
 
     def test_extra_fields_forbidden(self):
         """Unknown fields are rejected (extra='forbid')."""
         with pytest.raises(Exception):
-            Parameter(id=2, name="pm25", units="µg/m³", bogus="x")
+            Parameter(name="pm25", ids=[2], bogus="x")
 
 
 @pytest.mark.openaq
@@ -45,13 +51,21 @@ class TestCatalogLoad:
             "wind_direction", "wind_speed",
         ]
 
-    def test_pm25_id(self):
-        """pm25 resolves to OpenAQ parameters_id 2."""
-        assert Catalog().get_parameter("pm25").id == 2
+    def test_pm25_ids(self):
+        """pm25 resolves to its single id [2]."""
+        assert Catalog().get_parameter("pm25").ids == [2]
 
-    def test_ids_for_preserves_order(self):
-        """ids_for returns ids in the requested name order."""
-        assert Catalog().ids_for(["pm25", "no2"]) == [2, 15]
+    def test_no2_has_all_unit_variant_ids(self):
+        """no2 carries every unit-variant id, not just one."""
+        assert Catalog().get_parameter("no2").ids == [5, 7, 15]
+
+    def test_ids_for_unions_all_variants_in_order(self):
+        """ids_for returns the de-duplicated union across names, order-stable."""
+        assert Catalog().ids_for(["pm25", "no2"]) == [2, 5, 7, 15]
+
+    def test_ids_for_dedupes_repeated_name(self):
+        """A name repeated across the request contributes its ids only once."""
+        assert Catalog().ids_for(["no2", "no2"]) == [5, 7, 15]
 
     def test_get_catalog_returns_parameters(self):
         """get_catalog returns the same parameter map."""
@@ -88,11 +102,11 @@ class TestCatalogLoadErrors:
     def test_invalid_row(self, tmp_path: Path):
         """A row missing required fields raises ValueError."""
         bad = tmp_path / "bad.yaml"
-        bad.write_text("parameters:\n  x:\n    id: 1\n", encoding="utf-8")
+        bad.write_text("parameters:\n  x:\n    name: x\n", encoding="utf-8")
         with pytest.raises(ValueError, match="failed validation"):
             Catalog.load(bad)
 
     def test_explicit_parameters_skip_disk(self):
         """Passing parameters= skips the disk read (no auto-load)."""
-        cat = Catalog(parameters={"x": Parameter(id=1, name="x", units="u")})
+        cat = Catalog(parameters={"x": Parameter(name="x", ids=[1])})
         assert sorted(cat.parameters) == ["x"]

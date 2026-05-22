@@ -114,6 +114,21 @@ class TestSearch:
         products = _backend(tmp_path)._search()
         assert [p.id for p in products] == ["10"]
 
+    def test_matches_by_name_not_id(self, tmp_path: Path, fake_openaq: _FakeOpenaq):
+        """A sensor with a non-catalogued unit-variant id but matching name is kept.
+
+        Regression for C1: OpenAQ assigns a separate id per unit, so the
+        filter must key off the parameter name, not a single catalog id.
+        """
+        fake_openaq.locations = {
+            "results": [
+                _location(sensors=[_sensor(sensor_id=10, param_id=7, name="no2")])
+            ]
+        }
+        products = _backend(tmp_path, variables=["no2"])._search()
+        assert [p.id for p in products] == ["10"]
+        assert products[0].metadata["parameter"] == "no2"
+
     def test_product_metadata(self, tmp_path: Path, fake_openaq: _FakeOpenaq):
         """A product carries station/parameter/units/lat/lon/provider."""
         product = _backend(tmp_path)._search()[0]
@@ -137,9 +152,9 @@ class TestSearch:
     def test_parameters_id_forwarded(
         self, tmp_path: Path, fake_openaq: _FakeOpenaq
     ):
-        """variables=['pm25','no2'] forwards parameters_id=[2,15] to locations."""
+        """variables=['pm25','no2'] forwards the full id union to locations."""
         _backend(tmp_path, variables=["pm25", "no2"])._search()
-        assert fake_openaq.location_calls()[0]["parameters_id"] == [2, 15]
+        assert fake_openaq.location_calls()[0]["parameters_id"] == [2, 5, 7, 15]
 
     def test_max_sensors_per_location_caps(
         self, tmp_path: Path, fake_openaq: _FakeOpenaq
@@ -158,13 +173,27 @@ class TestSearch:
         products = _backend(tmp_path, max_sensors_per_location=1)._search()
         assert [p.id for p in products] == ["10"]
 
-    def test_truncation_warns(
+    def test_truncation_warns_when_more_than_cap(
         self, tmp_path: Path, fake_openaq: _FakeOpenaq, log_messages: list[str]
     ):
-        """Hitting max_locations logs a partial-result warning."""
-        fake_openaq.locations = {"results": [_location(station_id=1), _location(station_id=2)]}
-        _backend(tmp_path, max_locations=2)._search()
+        """More locations than max_locations logs a partial-result warning and trims."""
+        fake_openaq.locations = {
+            "results": [_location(station_id=i) for i in range(1, 4)]  # 3 > cap 2
+        }
+        products = _backend(tmp_path, max_locations=2)._search()
         assert any("max_locations" in message for message in log_messages)
+        # Trimmed to the cap: 2 locations x 1 pm25 sensor each.
+        assert len(products) == 2
+
+    def test_no_truncation_warning_when_exactly_cap(
+        self, tmp_path: Path, fake_openaq: _FakeOpenaq, log_messages: list[str]
+    ):
+        """Exactly max_locations locations does not warn (nothing truncated)."""
+        fake_openaq.locations = {
+            "results": [_location(station_id=i) for i in range(1, 3)]  # 2 == cap 2
+        }
+        _backend(tmp_path, max_locations=2)._search()
+        assert not any("max_locations" in message for message in log_messages)
 
 
 @pytest.mark.openaq
@@ -202,6 +231,18 @@ class TestFetch:
         backend._fetch_one(backend._search()[0])
         url, _params = fake_openaq.measurement_calls()[0]
         assert url.endswith("/sensors/10/days")
+
+    def test_max_measurements_per_sensor_warns(
+        self, tmp_path: Path, fake_openaq: _FakeOpenaq, log_messages: list[str]
+    ):
+        """Hitting max_measurements_per_sensor truncates and warns."""
+        fake_openaq.measurements = {
+            "results": [_measurement(value=v) for v in (1.0, 2.0, 3.0)]
+        }
+        backend = _backend(tmp_path, max_measurements_per_sensor=2)
+        frame = backend._fetch_one(backend._search()[0])
+        assert len(frame) == 2
+        assert any("max_measurements_per_sensor" in m for m in log_messages)
 
     def test_empty_sensor_returns_schema_frame(
         self, tmp_path: Path, fake_openaq: _FakeOpenaq

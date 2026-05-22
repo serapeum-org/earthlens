@@ -60,7 +60,7 @@ sorted(Catalog().parameters)
 #  'pm10', 'pm25', 'pm4', 'pressure', 'relativehumidity', 'so2',
 #  'temperature', 'ufp', 'um003', 'um010', 'um025', 'um100',
 #  'wind_direction', 'wind_speed']
-Catalog().ids_for(["pm25", "no2"])      # [2, 15]
+Catalog().ids_for(["pm25", "no2"])      # [2, 5, 7, 15]  (all unit-variant ids)
 ```
 
 An unknown name raises with a did-you-mean hint

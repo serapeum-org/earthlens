@@ -28,8 +28,8 @@ Public surface (re-exported from this package):
   :meth:`OpenAQ.download`.
 * :class:`Catalog` — pydantic-backed loader for the bundled
   `openaq_data_catalog.yaml` parameter dispatch table.
-* :class:`Parameter` — one pollutant's dispatch row (`id`, `name`,
-  `units`, `display_name`, `group`).
+* :class:`Parameter` — one pollutant's dispatch row (`name`, `ids`
+  — one per reporting unit, `units`, `display_name`, `group`).
 * :class:`OpenaqAuth` — `AbstractAuth` implementation resolving the
   single `X-API-Key`.
 * :class:`OpenaqCredentials` — frozen pydantic value object the auth

@@ -41,12 +41,20 @@ class Parameter(BaseModel):
     :attr:`Catalog.parameters` and is also stored on the row as
     :attr:`name` so a resolved :class:`Parameter` is self-describing.
 
+    OpenAQ assigns a **separate** `parameters_id` per reporting unit, so
+    one pollutant name maps to several ids (`no2` is 5=µg/m³, 7=ppm,
+    15=ppb). :attr:`ids` holds them all; the backend matches sensors by
+    name (stable across units) and uses the id list only as a
+    server-side narrowing hint.
+
     Attributes:
-        id: OpenAQ numeric `parameters_id` — the value the v3
-            `locations` / `measurements` endpoints filter on.
         name: Short machine name (`"pm25"`, `"no2"`); matches the
             catalog key.
-        units: Reporting units (`"µg/m³"`, `"ppm"`).
+        ids: All OpenAQ numeric `parameters_id`s that share this name —
+            one per reporting unit. At least one.
+        units: The reporting units across :attr:`ids` (`["ppb", "ppm",
+            "µg/m³"]`). Informational — the backend reads the real
+            per-sensor unit at fetch time.
         display_name: Human-readable label for docs / plots
             (`"PM2.5"`, `"Nitrogen dioxide"`).
         group: Coarse classification — `"criteria"` (criteria
@@ -57,18 +65,20 @@ class Parameter(BaseModel):
         - Build a row directly:
             ```python
             >>> from earthlens.openaq import Parameter
-            >>> p = Parameter(id=2, name="pm25", units="µg/m³")
-            >>> p.id, p.group
-            (2, 'other')
+            >>> p = Parameter(name="no2", ids=[5, 7, 15], units=["µg/m³", "ppm", "ppb"])
+            >>> p.ids
+            [5, 7, 15]
+            >>> p.group
+            'other'
 
             ```
     """
 
     model_config = ConfigDict(frozen=True, extra="forbid")
 
-    id: int
     name: str
-    units: str
+    ids: list[int] = Field(min_length=1)
+    units: list[str] = Field(default_factory=list)
     display_name: str = ""
     group: ParameterGroup = "other"
 
@@ -88,14 +98,14 @@ class Catalog(AbstractCatalog):
             :class:`Parameter` dispatch row.
 
     Examples:
-        - List parameters and resolve one to its OpenAQ id:
+        - List parameters and resolve names to OpenAQ ids:
             ```python
             >>> from earthlens.openaq import Catalog
             >>> cat = Catalog()
-            >>> cat.get_parameter("pm25").id
-            2
+            >>> cat.get_parameter("pm25").ids
+            [2]
             >>> cat.ids_for(["pm25", "no2"])
-            [2, 15]
+            [2, 5, 7, 15]
 
             ```
         - An unknown but close name raises with a did-you-mean hint:
@@ -194,17 +204,28 @@ class Catalog(AbstractCatalog):
             ) from None
 
     def ids_for(self, names: list[str]) -> list[int]:
-        """Resolve a list of parameter names to their OpenAQ ids, in order.
+        """Resolve names to the union of their OpenAQ ids (all unit variants).
+
+        Each name contributes every id in its :attr:`Parameter.ids`
+        (one per reporting unit), so a request for `"no2"` yields all of
+        `no2`'s ids regardless of the unit a station reports in. Order
+        follows `names` then each parameter's own id order; duplicates
+        across names are dropped (first occurrence wins).
 
         Args:
             names: User-facing parameter names to resolve.
 
         Returns:
-            list[int]: The OpenAQ `parameters_id` for each name, in the
-                same order as `names`.
+            list[int]: The union of OpenAQ `parameters_id`s across
+                `names`, de-duplicated, order-stable.
 
         Raises:
             ValueError: If any name is unknown (via
                 :meth:`get_parameter`).
         """
-        return [self.get_parameter(name).id for name in names]
+        ids: list[int] = []
+        for name in names:
+            for pid in self.get_parameter(name).ids:
+                if pid not in ids:
+                    ids.append(pid)
+        return ids

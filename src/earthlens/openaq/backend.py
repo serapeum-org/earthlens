@@ -45,7 +45,7 @@ from earthlens.base import (
     SpatialExtent,
     TemporalExtent,
 )
-from earthlens.openaq.auth import OpenaqAuth, OpenaqCredentials
+from earthlens.openaq.auth import AuthenticationError, OpenaqAuth, OpenaqCredentials
 from earthlens.openaq.catalog import Catalog
 from earthlens.openaq.client import OpenaqClient
 
@@ -123,6 +123,7 @@ class OpenAQ(AbstractDataSource):
         api_key: str | None = None,
         max_locations: int | None = 500,
         max_sensors_per_location: int | None = None,
+        max_measurements_per_sensor: int | None = None,
         limit: int = 1000,
         file_format: FileFormat = "csv",
     ):
@@ -159,6 +160,12 @@ class OpenAQ(AbstractDataSource):
                 fan-out. `None` means no cap. Defaults to `500`.
             max_sensors_per_location: Optional cap on sensors taken
                 from each location. `None` (default) means no cap.
+            max_measurements_per_sensor: Optional cap on measurement
+                rows pulled per sensor, to bound a raw
+                (`temporal_resolution="all"`) query where a busy station
+                can have tens of thousands of readings. `None` (default)
+                means no cap. When a cap truncates a sensor, a warning is
+                logged.
             limit: Page size for the paginated OpenAQ list endpoints.
                 Defaults to `1000`.
             file_format: Output format — `"csv"` (default) or
@@ -175,6 +182,7 @@ class OpenAQ(AbstractDataSource):
         self._api_key = api_key
         self._max_locations = max_locations
         self._max_sensors_per_location = max_sensors_per_location
+        self._max_measurements_per_sensor = max_measurements_per_sensor
         self._page_limit = limit
         self._file_format: FileFormat = file_format
         self._auth: OpenaqAuth | None = None
@@ -291,7 +299,11 @@ class OpenAQ(AbstractDataSource):
                 `configure()`).
         """
         if self._client_obj is None:
-            assert self._auth is not None  # set in _initialize, before download
+            if self._auth is None:  # pragma: no cover - _initialize always runs first
+                raise AuthenticationError(
+                    "OpenAQ auth was not initialised; construct the backend "
+                    "through its normal __init__ before calling download()."
+                )
             self._client_obj = OpenaqClient(
                 self._auth.api_key, max_retries=5, backoff_factor=1.0
             )
@@ -320,19 +332,28 @@ class OpenAQ(AbstractDataSource):
                 sensor id and `metadata` carries `station_id` /
                 `parameter` / `units` / `lat` / `lon` / `provider`.
         """
-        wanted_ids = set(self._catalog.ids_for(self.vars))
+        # Match sensors by NAME (stable across reporting units), not by id:
+        # OpenAQ assigns a separate parameters_id per unit, so a single id
+        # would silently drop sensors reporting the same pollutant in a
+        # different unit. The id union is passed only as a server-side
+        # narrowing hint for the locations query.
+        wanted_names = set(self.vars)
+        wanted_ids = self._catalog.ids_for(self.vars)
+        cap = self._max_locations
         locations = self._client().list_locations(
             bbox=self._bbox(),
-            parameters_id=sorted(wanted_ids),
+            parameters_id=wanted_ids,
             limit=self._page_limit,
-            max_locations=self._max_locations,
+            # Fetch one past the cap so a genuine truncation can be detected.
+            max_locations=(cap + 1) if cap is not None else None,
         )
-        if self._max_locations is not None and len(locations) >= self._max_locations:
+        if cap is not None and len(locations) > cap:
             logger.warning(
-                f"OpenAQ search hit the max_locations={self._max_locations} cap; "
-                "the result may be partial. Raise max_locations= or shrink the "
-                "bbox / date window to capture every station."
+                f"OpenAQ search hit the max_locations={cap} cap; the result "
+                "may be partial. Raise max_locations= or shrink the bbox / "
+                "date window to capture every station."
             )
+            locations = locations[:cap]
 
         products: list[RemoteProduct] = []
         for location in locations:
@@ -343,7 +364,7 @@ class OpenAQ(AbstractDataSource):
                 sensors = sensors[: self._max_sensors_per_location]
             for sensor in sensors:
                 parameter = sensor.get("parameter") or {}
-                if parameter.get("id") not in wanted_ids:
+                if parameter.get("name") not in wanted_names:
                     continue
                 products.append(
                     RemoteProduct(
@@ -391,13 +412,21 @@ class OpenAQ(AbstractDataSource):
             pd.DataFrame: The sensor's rows in the long-format schema
                 (empty, schema-only, when the sensor returned nothing).
         """
+        cap = self._max_measurements_per_sensor
         measurements = self._client().list_measurements(
             sensor_id=product.id,
             datetime_from=self.time.start_date.isoformat(),
             datetime_to=self.time.end_date.isoformat(),
             rollup=self._rollup,
             limit=self._page_limit,
+            max_items=cap,
         )
+        if cap is not None and len(measurements) >= cap:
+            logger.warning(
+                f"OpenAQ sensor {product.id} hit the "
+                f"max_measurements_per_sensor={cap} cap; its series may be "
+                "truncated. Raise the cap or narrow the date window."
+            )
         rows = [_measurement_row(product, m) for m in measurements]
         if not rows:
             return _empty_frame()

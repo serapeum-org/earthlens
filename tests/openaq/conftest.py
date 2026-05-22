@@ -97,12 +97,18 @@ class _FakeOpenaq:
 
     def respond(self, url: str, params: dict[str, Any]) -> _FakeResponse:
         self.calls.append((url, params))
+        # The real v3 list endpoints paginate: page 1 returns the rows,
+        # later pages return an empty `results` to signal the end. Model
+        # that so the client's pagination loop terminates.
+        page = int(params.get("page", 1))
         if "/locations" in url:
-            return _FakeResponse(self.locations)
+            body = self.locations if page == 1 else {"results": []}
+            return _FakeResponse(body)
         if self.n_429 > 0:
             self.n_429 -= 1
             return _FakeResponse({}, status_code=429, headers={"Retry-After": "0"})
-        return _FakeResponse(self.measurements)
+        body = self.measurements if page == 1 else {"results": []}
+        return _FakeResponse(body)
 
     def location_calls(self) -> list[dict[str, Any]]:
         """Return the params of every locations request made."""
