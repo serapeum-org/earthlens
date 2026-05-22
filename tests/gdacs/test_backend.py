@@ -232,13 +232,32 @@ class TestGDACSDownload:
         fc = backend.download(progress_bar=False)
         assert isinstance(fc, GeoDataFrame)
         assert len(fc) == 1, f"expected 1 alert, got {len(fc)}"
-        assert (tmp_path / "gdacs_alerts.gpkg").is_file()
+        written = list(tmp_path.glob("gdacs_alerts_*.gpkg"))
+        assert len(written) == 1, f"expected one date-stamped file, got {written}"
 
     def test_geojson_format(self, tmp_path: Path, fake_gdacs: _FakeGdacs):
         """`file_format='geojson'` writes a .geojson file."""
         backend = _make_backend(tmp_path, file_format="geojson")
         backend.download(progress_bar=False)
-        assert (tmp_path / "gdacs_alerts.geojson").is_file()
+        assert len(list(tmp_path.glob("gdacs_alerts_*.geojson"))) == 1
+
+    def test_filename_embeds_date_window(self, tmp_path: Path, fake_gdacs: _FakeGdacs):
+        """The written filename carries the query's date window (no clobber)."""
+        backend = _make_backend(tmp_path, start="2024-01-01", end="2024-01-31")
+        backend.download(progress_bar=False)
+        assert (tmp_path / "gdacs_alerts_2024-01-01_2024-01-31.gpkg").is_file()
+
+    def test_distinct_windows_do_not_overwrite(
+        self, tmp_path: Path, fake_gdacs: _FakeGdacs
+    ):
+        """Two different windows into one path produce two files."""
+        _make_backend(tmp_path, start="2024-01-01", end="2024-01-31").download(
+            progress_bar=False
+        )
+        _make_backend(tmp_path, start="2024-02-01", end="2024-02-28").download(
+            progress_bar=False
+        )
+        assert len(list(tmp_path.glob("gdacs_alerts_*.gpkg"))) == 2
 
     def test_empty_writes_nothing(
         self, tmp_path: Path, fake_gdacs: _FakeGdacs, make_payload

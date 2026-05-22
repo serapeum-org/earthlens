@@ -50,7 +50,7 @@ class TestGdacsLiveQuery:
         assert fc.crs.to_epsg() == 4326
         if len(fc):
             assert fc["hazard_type"].isin(["EQ"]).all(), "only EQ alerts requested"
-            assert (tmp_path / "gdacs_alerts.gpkg").is_file(), "GeoPackage written"
+            assert list(tmp_path.glob("gdacs_alerts_*.gpkg")), "GeoPackage written"
 
     def test_single_request(self, tmp_path: Path):
         """A multi-hazard download issues exactly one HTTP request (no fan-out)."""

@@ -391,6 +391,13 @@ class GDACS(AbstractDataSource):
     def _write(self, collection: FeatureCollection) -> Path:
         """Write the alerts to one vector file under `root_dir`.
 
+        The filename embeds the query's date window
+        (`gdacs_alerts_<from>_<to>.<ext>`), so downloading successive
+        windows into the same `path` — the recommended way to page past
+        the 100-event cap — yields distinct files instead of silently
+        overwriting one another. Two downloads of the *same* window do
+        overwrite, which is the intended idempotent behaviour.
+
         Args:
             collection: The alerts to write.
 
@@ -398,6 +405,10 @@ class GDACS(AbstractDataSource):
             Path: Absolute path of the file written.
         """
         driver, ext = _DRIVERS[self._file_format]
-        out_path = self.root_dir / f"gdacs_alerts.{ext}"
+        stem = (
+            f"gdacs_alerts_{self.time.start_date:%Y-%m-%d}"
+            f"_{self.time.end_date:%Y-%m-%d}"
+        )
+        out_path = self.root_dir / f"{stem}.{ext}"
         collection.to_file(str(out_path), driver=driver)
         return out_path
