@@ -105,19 +105,15 @@
          <lastmod>2026-05-22</lastmod>
     </url>
     <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/examples/gdacs/country_hazard_profile/</loc>
+         <loc>https://serapeum-org.github.io/earthlens/develop/examples/fdsn/global_seismicity_map/</loc>
          <lastmod>2026-05-22</lastmod>
     </url>
     <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/examples/gdacs/eq_tc_overlay/</loc>
+         <loc>https://serapeum-org.github.io/earthlens/develop/examples/fdsn/quickstart/</loc>
          <lastmod>2026-05-22</lastmod>
     </url>
     <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/examples/gdacs/global_hazard_dashboard/</loc>
-         <lastmod>2026-05-22</lastmod>
-    </url>
-    <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/examples/gdacs/quickstart/</loc>
+         <loc>https://serapeum-org.github.io/earthlens/develop/examples/fdsn/regional_sequence/</loc>
          <lastmod>2026-05-22</lastmod>
     </url>
     <url>
@@ -229,15 +225,15 @@
          <lastmod>2026-05-22</lastmod>
     </url>
     <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/reference/gdacs/gdacs/</loc>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/fdsn/fdsn/</loc>
          <lastmod>2026-05-22</lastmod>
     </url>
     <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/reference/gdacs/introduction/</loc>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/fdsn/introduction/</loc>
          <lastmod>2026-05-22</lastmod>
     </url>
     <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/reference/gdacs/usage/</loc>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/fdsn/usage/</loc>
          <lastmod>2026-05-22</lastmod>
     </url>
     <url>

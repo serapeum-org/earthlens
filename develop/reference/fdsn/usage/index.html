@@ -10,13 +10,13 @@
       
       
       
-        <link rel="canonical" href="https://serapeum-org.github.io/earthlens/develop/reference/gdacs/introduction/">
+        <link rel="canonical" href="https://serapeum-org.github.io/earthlens/develop/reference/fdsn/usage/">
       
       
-        <link rel="prev" href="../../gee/gee/">
+        <link rel="prev" href="../introduction/">
       
       
-        <link rel="next" href="../usage/">
+        <link rel="next" href="../fdsn/">
       
       
         
@@ -27,7 +27,7 @@
     
     
       
-        <title>Introduction - earthlens</title>
+        <title>Usage - earthlens</title>
       
     
     
@@ -83,7 +83,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#gdacs-multi-hazard-alerts-introduction" class="md-skip">
+        <a href="#fdsn-seismic-events-usage" class="md-skip">
           Skip to content
         </a>
       
@@ -123,7 +123,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Introduction
+              Usage
             
           </span>
         </div>
@@ -1127,6 +1127,302 @@
                 
   
   
+    
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_5" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_3_5" id="__nav_3_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    FDSN (earthquakes)
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_5_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    FDSN (earthquakes)
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../introduction/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Introduction
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Usage
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Usage
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#install" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Install
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#quickstart-recent-global-m5-events" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Quickstart — recent global M5+ events
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#choosing-the-networks-variables" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Choosing the network(s) — variables
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#filtering-the-query" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Filtering the query
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-returned-featurecollection" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The returned FeatureCollection
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="The returned FeatureCollection">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#plotting" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Plotting
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#writing-to-disk" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Writing to disk
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#aggregation-is-not-supported" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Aggregation is not supported
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#earthscope-token-optional" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        EarthScope token (optional)
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../fdsn/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
   
   
     
@@ -1141,10 +1437,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_5" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_6" >
         
           
-          <label class="md-nav__link" for="__nav_3_5" id="__nav_3_5_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3_6" id="__nav_3_6_label" tabindex="0">
             
   
   
@@ -1162,8 +1458,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_5_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_5">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_6">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -1293,274 +1589,6 @@
   
     <li class="md-nav__item">
       <a href="../../gee/gee/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Reference
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-    
-  
-  
-  
-    
-    
-    
-    
-      
-      
-    
-    
-    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
-      
-        
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_6" checked>
-        
-          
-          <label class="md-nav__link" for="__nav_3_6" id="__nav_3_6_label" tabindex="0">
-            
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    GDACS (disaster alerts)
-  
-
-    
-  </span>
-  
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_6_label" aria-expanded="true">
-          <label class="md-nav__title" for="__nav_3_6">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    GDACS (disaster alerts)
-  
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-    
-  
-  
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Introduction
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Introduction
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#why-it-matters-here" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Why it matters here
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#the-hazard-types" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        The hazard types
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#authentication" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Authentication
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#what-a-query-returns" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        What a query returns
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#alerts-not-an-authoritative-catalog" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Alerts, not an authoritative catalog
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#cost" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Cost
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#references" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        References
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../usage/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Usage
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../gdacs/" class="md-nav__link">
         
   
   
@@ -2406,7 +2434,7 @@
   <span class="md-ellipsis">
     
   
-    Google Earth Engine
+    Seismic events (FDSN)
   
 
     
@@ -2419,6 +2447,148 @@
         
         <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_6_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_4_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Seismic events (FDSN)
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../examples/fdsn/quickstart/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    FDSN quickstart — recent earthquakes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../examples/fdsn/global_seismicity_map/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Global seismicity map — one year of M5+
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../examples/fdsn/regional_sequence/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Regional aftershock sequence
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_7" id="__nav_4_7_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Google Earth Engine
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_7">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -2772,176 +2942,6 @@
 
               
             
-              
-                
-  
-  
-  
-  
-    
-    
-    
-    
-      
-      
-    
-    
-    <li class="md-nav__item md-nav__item--nested">
-      
-        
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_7" >
-        
-          
-          <label class="md-nav__link" for="__nav_4_7" id="__nav_4_7_label" tabindex="0">
-            
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Disaster alerts (GDACS)
-  
-
-    
-  </span>
-  
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_7_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_7">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    Disaster alerts (GDACS)
-  
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../examples/gdacs/quickstart/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    GDACS quickstart — recent disaster alerts
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../examples/gdacs/global_hazard_dashboard/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    GDACS global hazard dashboard
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../examples/gdacs/eq_tc_overlay/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    GDACS earthquakes + tropical cyclones overlay
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../examples/gdacs/country_hazard_profile/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    GDACS country hazard profile
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
-    </li>
-  
-
-              
-            
           </ul>
         </nav>
       
@@ -3174,10 +3174,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#why-it-matters-here" class="md-nav__link">
+  <a href="#install" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Why it matters here
+        Install
       
     </span>
   </a>
@@ -3185,10 +3185,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#the-hazard-types" class="md-nav__link">
+  <a href="#quickstart-recent-global-m5-events" class="md-nav__link">
     <span class="md-ellipsis">
       
-        The hazard types
+        Quickstart — recent global M5+ events
       
     </span>
   </a>
@@ -3196,10 +3196,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#authentication" class="md-nav__link">
+  <a href="#choosing-the-networks-variables" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Authentication
+        Choosing the network(s) — variables
       
     </span>
   </a>
@@ -3207,10 +3207,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#what-a-query-returns" class="md-nav__link">
+  <a href="#filtering-the-query" class="md-nav__link">
     <span class="md-ellipsis">
       
-        What a query returns
+        Filtering the query
       
     </span>
   </a>
@@ -3218,10 +3218,49 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#alerts-not-an-authoritative-catalog" class="md-nav__link">
+  <a href="#the-returned-featurecollection" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Alerts, not an authoritative catalog
+        The returned FeatureCollection
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="The returned FeatureCollection">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#plotting" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Plotting
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#writing-to-disk" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Writing to disk
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#aggregation-is-not-supported" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Aggregation is not supported
       
     </span>
   </a>
@@ -3229,21 +3268,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#cost" class="md-nav__link">
+  <a href="#earthscope-token-optional" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Cost
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#references" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        References
+        EarthScope token (optional)
       
     </span>
   </a>
@@ -3267,7 +3295,7 @@
 
 
   
-    <a href="https://github.com/serapeum-org/earthlens/edit/master/docs/reference/gdacs/introduction.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
+    <a href="https://github.com/serapeum-org/earthlens/edit/master/docs/reference/fdsn/usage.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
     </a>
@@ -3276,217 +3304,170 @@
     
       
     
-    <a href="https://github.com/serapeum-org/earthlens/raw/master/docs/reference/gdacs/introduction.md" title="View source of this page" class="md-content__button md-icon">
+    <a href="https://github.com/serapeum-org/earthlens/raw/master/docs/reference/fdsn/usage.md" title="View source of this page" class="md-content__button md-icon">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 18c.56 0 1 .44 1 1s-.44 1-1 1-1-.44-1-1 .44-1 1-1m0-3c-2.73 0-5.06 1.66-6 4 .94 2.34 3.27 4 6 4s5.06-1.66 6-4c-.94-2.34-3.27-4-6-4m0 6.5a2.5 2.5 0 0 1-2.5-2.5 2.5 2.5 0 0 1 2.5-2.5 2.5 2.5 0 0 1 2.5 2.5 2.5 2.5 0 0 1-2.5 2.5M9.27 20H6V4h7v5h5v4.07c.7.08 1.36.25 2 .49V8l-6-6H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h4.5a8.2 8.2 0 0 1-1.23-2"/></svg>
     </a>
   
 
 
-<h1 id="gdacs-multi-hazard-alerts-introduction"><a class="toclink" href="#gdacs-multi-hazard-alerts-introduction">GDACS multi-hazard alerts — introduction</a><a class="headerlink" href="#gdacs-multi-hazard-alerts-introduction" title="Permanent link">#</a></h1>
-<p>The <a href="https://www.gdacs.org/">GDACS</a> (Global Disaster Alert and
-Coordination System) is a cooperation framework of the United Nations
-and the European Commission (run by the JRC together with UN OCHA) that
-issues near-real-time <strong>multi-hazard disaster alerts</strong> with a simple
-green / orange / red impact score. earthlens ships a single <code>gdacs</code>
-backend that reads its public GeoJSON feed over plain HTTPS — one
-request returns every alert in a date window across all six hazard
-types.</p>
-<p>This page orients the backend. For the hands-on download walkthrough
-see <a href="../usage/">Usage</a>; the rendered API is the <a href="../gdacs/">Reference</a>
-page.</p>
-<h2 id="why-it-matters-here"><a class="toclink" href="#why-it-matters-here">Why it matters here</a><a class="headerlink" href="#why-it-matters-here" title="Permanent link">#</a></h2>
-<p>Like the FDSN seismic backend, GDACS departs from the gridded backends
-(CHC rainfall, ERA5, GEE imagery) in two ways that shape it:</p>
-<ul>
-<li>
-<p><strong>The output is a vector table, not a grid.</strong> A GDACS query returns a
-  list of point features — one row per alert, each with a hazard type,
-  an alert level, an impact score, a country, dates, and a geometry
-  (usually a <code>Point</code> event centroid). So GDACS is a <strong><code>vector</code></strong> backend
-  (<code>GDACS.OUTPUT_KIND == "vector"</code>), and <code>download()</code> returns a
-  <a href="https://github.com/serapeum-org/pyramids">pyramids</a>
-  <code>FeatureCollection</code> (a <code>geopandas.GeoDataFrame</code> subclass) rather than
-  writing a raster. Because there is no meaningful gridded reduction of
-  an alert table, the <code>EarthLens</code> facade rejects an <code>aggregate=</code>
-  argument for this backend with <code>NotImplementedError</code>.</p>
-</li>
-<li>
-<p><strong>There is no dataset catalog to curate.</strong> GDACS is a <em>fixed alert
-  feed</em>, not an archive of datasets. The entire "catalog" is a six-row
-  table mapping each GDACS hazard-type code to a display name. There is
-  no <code>refresh</code> / <code>probe</code> / <code>audit</code> tooling — the six codes are the whole
-  GDACS universe.</p>
-</li>
-</ul>
-<h2 id="the-hazard-types"><a class="toclink" href="#the-hazard-types">The hazard types</a><a class="headerlink" href="#the-hazard-types" title="Permanent link">#</a></h2>
+<h1 id="fdsn-seismic-events-usage"><a class="toclink" href="#fdsn-seismic-events-usage">FDSN seismic events — usage</a><a class="headerlink" href="#fdsn-seismic-events-usage" title="Permanent link">#</a></h1>
+<p>This page walks through fetching seismic events with the <code>fdsn</code>
+backend. For background and the network list see
+<a href="../introduction/">Introduction</a>; the rendered API is the
+<a href="../fdsn/">Reference</a> page.</p>
+<h2 id="install"><a class="toclink" href="#install">Install</a><a class="headerlink" href="#install" title="Permanent link">#</a></h2>
+<p>The backend needs <a href="https://docs.obspy.org/"><code>obspy</code></a> — pulled in by the
+<code>fdsn</code> extra:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>pip<span class="w"> </span>install<span class="w"> </span>earthlens<span class="o">[</span>fdsn<span class="o">]</span>
+</code></pre></div>
+<h2 id="quickstart-recent-global-m5-events"><a class="toclink" href="#quickstart-recent-global-m5-events">Quickstart — recent global M5+ events</a><a class="headerlink" href="#quickstart-recent-global-m5-events" title="Permanent link">#</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="n">events</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;USGS&quot;</span><span class="p">],</span>          <span class="c1"># the network(s) to query — see below</span>
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>    <span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;fdsn&quot;</span><span class="p">,</span>
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>    <span class="n">start</span><span class="o">=</span><span class="s2">&quot;2024-01-01&quot;</span><span class="p">,</span>
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>    <span class="n">end</span><span class="o">=</span><span class="s2">&quot;2024-01-31&quot;</span><span class="p">,</span>
+<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">90</span><span class="p">,</span> <span class="mi">90</span><span class="p">],</span>
+<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>    <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">180</span><span class="p">,</span> <span class="mi">180</span><span class="p">],</span>
+<a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a>    <span class="n">min_magnitude</span><span class="o">=</span><span class="mf">5.0</span><span class="p">,</span>
+<a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a>    <span class="n">path</span><span class="o">=</span><span class="s2">&quot;./out&quot;</span><span class="p">,</span>
+<a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
+<a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a>
+<a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a><span class="nb">print</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">events</span><span class="p">),</span> <span class="s2">&quot;events&quot;</span><span class="p">)</span>
+<a id="__codelineno-1-15" name="__codelineno-1-15" href="#__codelineno-1-15"></a><span class="nb">print</span><span class="p">(</span><span class="n">events</span><span class="p">[[</span><span class="s2">&quot;time&quot;</span><span class="p">,</span> <span class="s2">&quot;magnitude&quot;</span><span class="p">,</span> <span class="s2">&quot;depth_km&quot;</span><span class="p">,</span> <span class="s2">&quot;geometry&quot;</span><span class="p">]]</span><span class="o">.</span><span class="n">head</span><span class="p">())</span>
+</code></pre></div>
+<p><code>download()</code> returns a pyramids <code>FeatureCollection</code> (a
+<code>geopandas.GeoDataFrame</code> subclass), so every pandas / geopandas method
+works on it directly. It also writes <code>out/usgs.gpkg</code>.</p>
+<h2 id="choosing-the-networks-variables"><a class="toclink" href="#choosing-the-networks-variables">Choosing the network(s) — <code>variables</code></a><a class="headerlink" href="#choosing-the-networks-variables" title="Permanent link">#</a></h2>
+<p>For this backend <code>variables</code> is the list of seismic <strong>networks</strong>, not
+data-variable names. This is an intentional, documented overload: the
+<code>EarthLens</code> facade makes <code>variables</code> a required argument on every call,
+so adding a separate <code>providers=</code> keyword would only force a redundant
+placeholder. Pass one or more network keys:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c1"># one network (the default if you pass an empty list is [&quot;USGS&quot;])</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="n">EarthLens</span><span class="p">(</span><span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;USGS&quot;</span><span class="p">],</span> <span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;fdsn&quot;</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="c1"># several networks — the results are unioned into one FeatureCollection</span>
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="n">EarthLens</span><span class="p">(</span><span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;USGS&quot;</span><span class="p">,</span> <span class="s2">&quot;EMSC&quot;</span><span class="p">,</span> <span class="s2">&quot;INGV&quot;</span><span class="p">],</span> <span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;fdsn&quot;</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span>
+</code></pre></div>
+<p>Valid keys are <code>USGS</code>, <code>EMSC</code>, <code>INGV</code>, <code>EARTHSCOPE</code>, <code>ISC</code>, <code>GEONET</code>.
+An unknown key raises with a did-you-mean hint
+(<code>Catalog().get_provider("USG")</code> → <em>Did you mean 'USGS'?</em>).</p>
+<h2 id="filtering-the-query"><a class="toclink" href="#filtering-the-query">Filtering the query</a><a class="headerlink" href="#filtering-the-query" title="Permanent link">#</a></h2>
+<p>Query filters arrive as explicit keyword arguments (forwarded verbatim
+by the facade's <code>**backend_kwargs</code>):</p>
 <table>
 <thead>
 <tr>
-<th>Code (<code>variables=[...]</code>)</th>
-<th>Hazard</th>
-<th>Severity reported as</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>EQ</code></td>
-<td>Earthquake</td>
-<td>moment magnitude (<code>severityunit</code> <code>"M"</code>)</td>
-</tr>
-<tr>
-<td><code>TC</code></td>
-<td>Tropical cyclone</td>
-<td>maximum sustained wind</td>
-</tr>
-<tr>
-<td><code>FL</code></td>
-<td>Flood</td>
-<td>GDACS flood magnitude score</td>
-</tr>
-<tr>
-<td><code>VO</code></td>
-<td>Volcano</td>
-<td>eruption / unrest indicator</td>
-</tr>
-<tr>
-<td><code>WF</code></td>
-<td>Wildfire</td>
-<td>burned area</td>
-</tr>
-<tr>
-<td><code>DR</code></td>
-<td>Drought</td>
-<td>drought severity score</td>
-</tr>
-</tbody>
-</table>
-<p>Each is selected by passing its code in <code>variables</code> — for this backend
-<code>variables</code> is the list of <strong>hazard types</strong>, not data-variable names (an
-intentional, documented overload; see <a href="../usage/">Usage</a>). An empty list
-defaults to all six. The alert-level filter (<code>Green</code> / <code>Orange</code> /
-<code>Red</code>) is the separate <code>alert_level=</code> keyword.</p>
-<h2 id="authentication"><a class="toclink" href="#authentication">Authentication</a><a class="headerlink" href="#authentication" title="Permanent link">#</a></h2>
-<p><strong>None.</strong> The GDACS feed is fully public — no key, no token, no login.
-GDACS is the first credential-free earthlens backend since CHC; there is
-no <code>authentication.md</code> page because there is nothing to authenticate,
-and no <code>[gdacs]</code> extra to install (the only dependency is <code>requests</code>, a
-core dependency).</p>
-<h2 id="what-a-query-returns"><a class="toclink" href="#what-a-query-returns">What a query returns</a><a class="headerlink" href="#what-a-query-returns" title="Permanent link">#</a></h2>
-<p>One <code>FeatureCollection</code> (CRS <code>EPSG:4326</code>) with these columns:</p>
-<table>
-<thead>
-<tr>
-<th>Column</th>
-<th>Type</th>
+<th>Keyword</th>
 <th>Meaning</th>
+<th>Default</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><code>event_id</code></td>
-<td>str</td>
-<td>GDACS event identifier</td>
+<td><code>min_magnitude</code> / <code>max_magnitude</code></td>
+<td>magnitude bounds</td>
+<td><code>None</code> / <code>None</code></td>
 </tr>
 <tr>
-<td><code>episode_id</code></td>
-<td>str</td>
-<td>episode identifier (an event can have several episodes)</td>
+<td><code>min_depth</code> / <code>max_depth</code></td>
+<td>depth bounds, <strong>kilometres</strong></td>
+<td><code>None</code></td>
 </tr>
 <tr>
-<td><code>hazard_type</code></td>
-<td>str</td>
-<td>one of <code>EQ</code> / <code>TC</code> / <code>FL</code> / <code>VO</code> / <code>WF</code> / <code>DR</code></td>
+<td><code>magnitude_type</code></td>
+<td>restrict to e.g. <code>"Mw"</code></td>
+<td><code>None</code> (any)</td>
 </tr>
 <tr>
-<td><code>name</code></td>
-<td>str</td>
-<td>human-readable alert name</td>
+<td><code>event_type</code></td>
+<td>restrict to e.g. <code>"earthquake"</code></td>
+<td><code>None</code> (any)</td>
 </tr>
 <tr>
-<td><code>alert_level</code></td>
-<td>str</td>
-<td><code>Green</code> / <code>Orange</code> / <code>Red</code></td>
+<td><code>orderby</code></td>
+<td><code>"time"</code>, <code>"time-asc"</code>, <code>"magnitude"</code>, <code>"magnitude-asc"</code></td>
+<td><code>"time"</code></td>
 </tr>
 <tr>
-<td><code>alert_score</code></td>
-<td>float</td>
-<td>numeric impact score</td>
+<td><code>limit</code></td>
+<td>max events per network</td>
+<td><code>None</code></td>
 </tr>
 <tr>
-<td><code>from_date</code> / <code>to_date</code></td>
-<td>datetime (UTC)</td>
-<td>alert validity window</td>
-</tr>
-<tr>
-<td><code>country</code></td>
-<td>str</td>
-<td>affected country name</td>
-</tr>
-<tr>
-<td><code>iso3</code></td>
-<td>str</td>
-<td>ISO-3166 alpha-3 country code</td>
-</tr>
-<tr>
-<td><code>glide</code></td>
-<td>str</td>
-<td>GLIDE identifier (joins to ReliefWeb / Copernicus EMS)</td>
-</tr>
-<tr>
-<td><code>severity</code></td>
-<td>float</td>
-<td>hazard-specific magnitude (may be null)</td>
-</tr>
-<tr>
-<td><code>severity_unit</code></td>
-<td>str</td>
-<td>unit of <code>severity</code> (e.g. <code>"M"</code> for an earthquake)</td>
-</tr>
-<tr>
-<td><code>severity_text</code></td>
-<td>str</td>
-<td>human-readable severity description</td>
-</tr>
-<tr>
-<td><code>geometry</code></td>
-<td>Point/Polygon</td>
-<td>event geometry (<code>shapely</code>), CRS <code>EPSG:4326</code></td>
+<td><code>file_format</code></td>
+<td><code>"gpkg"</code> or <code>"geojson"</code></td>
+<td><code>"gpkg"</code></td>
 </tr>
 </tbody>
 </table>
-<p>The <code>glide</code> and <code>iso3</code> columns are join keys: GLIDE ids cross-reference
-the same disaster in <a href="https://reliefweb.int/">ReliefWeb</a> and
-<a href="https://emergency.copernicus.eu/">Copernicus EMS</a>, and <code>iso3</code> joins to
-country-level datasets. As a side effect, <code>download()</code> also writes the
-collection to one vector file in the output directory (GeoPackage by
-default, or GeoJSON).</p>
-<div class="admonition note">
-<p class="admonition-title">100-event cap</p>
-<p>The SEARCH endpoint returns at most the <strong>100 most-recent events</strong>
-per request and offers no pagination. A busier window is truncated
-upstream; the backend logs a warning when a response hits the cap.
-To get everything, narrow the date window or query fewer hazard
-types — see <a href="../usage/#result-size-limit-100-events">Usage</a>.</p>
-</div>
-<h2 id="alerts-not-an-authoritative-catalog"><a class="toclink" href="#alerts-not-an-authoritative-catalog">Alerts, not an authoritative catalog</a><a class="headerlink" href="#alerts-not-an-authoritative-catalog" title="Permanent link">#</a></h2>
-<p>GDACS is an <strong>impact-alert</strong> feed: it answers "what disasters are
-happening and how bad are they?", optimised for speed and coordination,
-not scientific completeness. For a rigorous per-domain catalog use the
-sibling backends instead — <strong>seismic events → FDSN</strong> (the reviewed
-USGS / EMSC / ISC bulletins), not GDACS's earthquake alerts. Treat the
-GDACS <code>severity</code> as an alerting indicator, not a definitive measurement.</p>
-<h2 id="cost"><a class="toclink" href="#cost">Cost</a><a class="headerlink" href="#cost" title="Permanent link">#</a></h2>
-<p><strong>Free.</strong> The GDACS feed is public, operated by the JRC. Recommended
-attribution and terms are documented on the GDACS site.</p>
-<h2 id="references"><a class="toclink" href="#references">References</a><a class="headerlink" href="#references" title="Permanent link">#</a></h2>
-<ul>
-<li>GDACS: <a href="https://www.gdacs.org/">https://www.gdacs.org/</a></li>
-<li>GDACS about / methodology: <a href="https://www.gdacs.org/about.aspx">https://www.gdacs.org/about.aspx</a></li>
-<li>GLIDE disaster identifiers: <a href="https://glidenumber.net/">https://glidenumber.net/</a></li>
-<li>earthlens GDACS usage: <a href="../usage/">Usage</a></li>
-<li>earthlens GDACS API: <a href="../gdacs/">Reference</a></li>
-</ul>
+<p><code>min_magnitude=None</code> (the default) falls back <strong>per network</strong> to that
+provider's catalog floor — USGS / EMSC / EarthScope / ISC use <code>4.5</code>,
+INGV uses <code>2.0</code>, GeoNet uses <code>3.0</code> — so each regional network keeps a
+sensible default. Pass an explicit number to override every network
+with one bound.</p>
+<p>The spatial window comes from <code>lat_lim</code> / <code>lon_lim</code> and the temporal
+window from <code>start</code> / <code>end</code>. FDSN issues one query spanning the whole
+<code>[start, end]</code> window — it does not chunk by day or month — so
+<code>temporal_resolution</code> is irrelevant here (it carries the sentinel
+<code>"all"</code>).</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1"># shallow Italian earthquakes, smallest first</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="n">EarthLens</span><span class="p">(</span>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;INGV&quot;</span><span class="p">],</span>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>    <span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;fdsn&quot;</span><span class="p">,</span>
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>    <span class="n">start</span><span class="o">=</span><span class="s2">&quot;2023-01-01&quot;</span><span class="p">,</span>
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>    <span class="n">end</span><span class="o">=</span><span class="s2">&quot;2023-12-31&quot;</span><span class="p">,</span>
+<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mi">36</span><span class="p">,</span> <span class="mi">47</span><span class="p">],</span>
+<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>    <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="mi">6</span><span class="p">,</span> <span class="mi">19</span><span class="p">],</span>
+<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>    <span class="n">min_magnitude</span><span class="o">=</span><span class="mf">2.0</span><span class="p">,</span>
+<a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a>    <span class="n">max_depth</span><span class="o">=</span><span class="mf">30.0</span><span class="p">,</span>
+<a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a>    <span class="n">event_type</span><span class="o">=</span><span class="s2">&quot;earthquake&quot;</span><span class="p">,</span>
+<a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a>    <span class="n">orderby</span><span class="o">=</span><span class="s2">&quot;magnitude-asc&quot;</span><span class="p">,</span>
+<a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a>    <span class="n">path</span><span class="o">=</span><span class="s2">&quot;./out&quot;</span><span class="p">,</span>
+<a id="__codelineno-3-14" name="__codelineno-3-14" href="#__codelineno-3-14"></a><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
+</code></pre></div>
+<h2 id="the-returned-featurecollection"><a class="toclink" href="#the-returned-featurecollection">The returned FeatureCollection</a><a class="headerlink" href="#the-returned-featurecollection" title="Permanent link">#</a></h2>
+<p>CRS <code>EPSG:4326</code>, one row per event. Columns: <code>event_id</code>, <code>time</code>
+(UTC), <code>longitude</code>, <code>latitude</code>, <code>depth_km</code>, <code>magnitude</code>,
+<code>magnitude_type</code>, <code>event_type</code>, <code>status</code>, <code>provider</code>, <code>geometry</code>
+(<code>shapely.Point</code>). An empty result (a quiet region/time) is returned as
+an empty FeatureCollection with exactly these columns — not an error —
+so downstream <code>concat</code> / <code>to_file</code> never breaks.</p>
+<h3 id="plotting"><a class="toclink" href="#plotting">Plotting</a><a class="headerlink" href="#plotting" title="Permanent link">#</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="n">events</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span><span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;USGS&quot;</span><span class="p">],</span> <span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;fdsn&quot;</span><span class="p">,</span>
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>                   <span class="n">start</span><span class="o">=</span><span class="s2">&quot;2024-01-01&quot;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">&quot;2024-03-31&quot;</span><span class="p">,</span>
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>                   <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">90</span><span class="p">,</span> <span class="mi">90</span><span class="p">],</span> <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">180</span><span class="p">,</span> <span class="mi">180</span><span class="p">],</span>
+<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>                   <span class="n">min_magnitude</span><span class="o">=</span><span class="mf">5.5</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="s2">&quot;./out&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
+<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a>
+<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="n">ax</span> <span class="o">=</span> <span class="n">events</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">markersize</span><span class="o">=</span><span class="n">events</span><span class="p">[</span><span class="s2">&quot;magnitude&quot;</span><span class="p">]</span> <span class="o">**</span> <span class="mi">2</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+<a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;M5.5+ earthquakes, Q1 2024&quot;</span><span class="p">)</span>
+<a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a><span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</code></pre></div>
+<h3 id="writing-to-disk"><a class="toclink" href="#writing-to-disk">Writing to disk</a><a class="headerlink" href="#writing-to-disk" title="Permanent link">#</a></h3>
+<p><code>download()</code> writes one file per network automatically (named after the
+network, e.g. <code>usgs.gpkg</code>). To write the combined collection yourself:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="n">events</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="s2">&quot;all_events.gpkg&quot;</span><span class="p">,</span> <span class="n">driver</span><span class="o">=</span><span class="s2">&quot;GPKG&quot;</span><span class="p">)</span>     <span class="c1"># GeoPackage</span>
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="n">events</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="s2">&quot;all_events.geojson&quot;</span><span class="p">,</span> <span class="n">driver</span><span class="o">=</span><span class="s2">&quot;GeoJSON&quot;</span><span class="p">)</span>  <span class="c1"># GeoJSON</span>
+</code></pre></div>
+<h2 id="aggregation-is-not-supported"><a class="toclink" href="#aggregation-is-not-supported">Aggregation is not supported</a><a class="headerlink" href="#aggregation-is-not-supported" title="Permanent link">#</a></h2>
+<p>FDSN output is vector, so the <code>aggregate=</code> argument is rejected:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="n">EarthLens</span><span class="p">(</span><span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;USGS&quot;</span><span class="p">],</span> <span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;fdsn&quot;</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">aggregate</span><span class="o">=</span><span class="n">cfg</span><span class="p">)</span>
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="c1"># NotImplementedError: aggregate= is not supported ... (OUTPUT_KIND=&#39;vector&#39;)</span>
+</code></pre></div>
+<p>The aggregator only reduces gridded raster outputs. Post-process the
+returned FeatureCollection directly instead (it is a GeoDataFrame).</p>
+<h2 id="earthscope-token-optional"><a class="toclink" href="#earthscope-token-optional">EarthScope token (optional)</a><a class="headerlink" href="#earthscope-token-optional" title="Permanent link">#</a></h2>
+<p>EarthScope's restricted endpoints can take an access token; the public
+event service does not need one. If you have a token:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="n">EarthLens</span><span class="p">(</span><span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;EARTHSCOPE&quot;</span><span class="p">],</span> <span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;fdsn&quot;</span><span class="p">,</span>
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>          <span class="n">earthscope_token</span><span class="o">=</span><span class="s2">&quot;…&quot;</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span>   <span class="c1"># or set EARTHSCOPE_TOKEN / ~/.earthscope_token</span>
+</code></pre></div>
 
 
 
@@ -3522,7 +3503,7 @@ attribution and terms are documented on the GDACS site.</p>
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
           
-          <a href="../../gee/gee/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Reference">
+          <a href="../introduction/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Introduction">
             <div class="md-footer__button md-icon">
               
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
@@ -3532,20 +3513,20 @@ attribution and terms are documented on the GDACS site.</p>
                 Previous
               </span>
               <div class="md-ellipsis">
-                Reference
+                Introduction
               </div>
             </div>
           </a>
         
         
           
-          <a href="../usage/" class="md-footer__link md-footer__link--next" aria-label="Next: Usage">
+          <a href="../fdsn/" class="md-footer__link md-footer__link--next" aria-label="Next: Reference">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                Usage
+                Reference
               </div>
             </div>
             <div class="md-footer__button md-icon">
