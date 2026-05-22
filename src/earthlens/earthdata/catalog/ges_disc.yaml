@@ -1,0 +1,45 @@
+# GES DISC — Goddard Earth Sciences Data and Information Services Center.
+# CMR provider code: GES_DISC. Flagship products: GPM IMERG precipitation,
+# MERRA-2, GLDAS, OCO-2/3, AIRS, TEMPO.
+datasets:
+  GPM_3IMERGHHL_07:
+    short_name: GPM_3IMERGHHL
+    version: "07"
+    doi: 10.5067/GPM/IMERG/3B-HH-L/07
+    daac: GES_DISC
+    provider: GES_DISC
+    cadence: subhourly
+    format: hdf5
+    output_kind: raster
+    cloud_hosted: true
+    cloud_bucket: s3://gesdisc-cumulus-prod-protected
+    requires_harmony_for_subset: true
+    supports_harmony: true
+    temporal:
+      start: 2000-06-01
+      end: null
+    bands:
+      precipitation:
+        long_name: Precipitation rate (late half-hourly run)
+        units: mm/hr
+
+  GPM_3IMERGM_07:
+    short_name: GPM_3IMERGM
+    version: "07"
+    doi: 10.5067/GPM/IMERG/3B-MONTH/07
+    daac: GES_DISC
+    provider: GES_DISC
+    cadence: monthly
+    format: hdf5
+    output_kind: raster
+    cloud_hosted: true
+    cloud_bucket: s3://gesdisc-cumulus-prod-protected
+    requires_harmony_for_subset: true
+    supports_harmony: true
+    temporal:
+      start: 2000-06-01
+      end: null
+    bands:
+      precipitation:
+        long_name: Monthly mean precipitation rate
+        units: mm/hr

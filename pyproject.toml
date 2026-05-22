@@ -44,11 +44,16 @@ ecmwf = ["cdsapi >=0.7.7"]
 gee = ["earthengine-api >=1.7.26", "Rtree >=1.0.0"]
 cmems = ["copernicusmarine >=2.0.0,<3"]
 fdsn = ["obspy >=1.5.0"]
+# earthaccess >=0.18 requires Python >=3.12 (earthlens core is >=3.11); the
+# environment marker lets pip on 3.11 skip it cleanly instead of failing to
+# resolve, so `[all]` still installs on the 3.11 wheel-test matrix entry.
+earthdata = ["earthaccess >=0.18.0; python_version >= '3.12'"]
 all = [
     "boto3 >=1.43.0",
     "cdsapi >=0.7.7",
     "copernicusmarine >=2.0.0,<3",
     "earthengine-api >=1.7.26",
+    "earthaccess >=0.18.0; python_version >= '3.12'",
     "obspy >=1.5.0",
     "Rtree >=1.0.0",
 ]
@@ -113,6 +118,7 @@ include = ["earthlens", "earthlens.*"]
 "earthlens.chc" = ["*.yaml", "catalog/*.yaml"]
 "earthlens.cmems" = ["*.yaml", "catalog/*.yaml"]
 "earthlens.ecmwf" = ["*.yaml"]
+"earthlens.earthdata" = ["*.yaml", "catalog/*.yaml"]
 "earthlens.fdsn" = ["*.yaml"]
 "earthlens.gee" = ["*.yaml", "catalog/*.yaml"]
 
@@ -179,6 +185,7 @@ markers = [
     "gee: tests for the Google Earth Engine backend (requires the `gee` extra: earthengine-api).",
     "cmems: tests for the Copernicus Marine backend (requires the `cmems` extra: copernicusmarine).",
     "fdsn: tests for the FDSN seismic-event backend (requires the `fdsn` extra: obspy).",
+    "earthdata: tests for the NASA Earthdata backend (requires the `earthdata` extra: earthaccess; Python >=3.12).",
 ]
 
 [tool.pixi.workspace]
@@ -208,7 +215,8 @@ test-ecmwf = { cmd = "pytest -vvv -m 'ecmwf and not e2e' --cov=src/earthlens --c
 test-gee = { cmd = "pytest -vvv -m 'gee and not e2e' --cov=src/earthlens --cov-report=xml --cov-report=term-missing", description = "Run GEE-backend tests (requires the `gee` extra: earthengine-api)" }
 test-cmems = { cmd = "pytest -vvv -m 'cmems and not e2e' --cov=src/earthlens --cov-report=xml --cov-report=term-missing", description = "Run CMEMS-backend tests (requires the `cmems` extra: copernicusmarine)" }
 test-fdsn = { cmd = "pytest -vvv -m 'fdsn and not e2e' --cov=src/earthlens --cov-report=xml --cov-report=term-missing", description = "Run FDSN seismic-event backend tests (requires the `fdsn` extra: obspy)" }
-test-doctests = { cmd = "pytest --doctest-modules src/earthlens/gee src/earthlens/chc src/earthlens/ecmwf src/earthlens/cmems src/earthlens/fdsn src/earthlens/base", description = "Run docstring examples across the backend packages (catches drift in catalog / API docstrings)" }
+test-earthdata = { cmd = "pytest -vvv -m 'earthdata and not e2e' --cov=src/earthlens --cov-report=xml --cov-report=term-missing", description = "Run NASA Earthdata backend tests (requires the `earthdata` extra: earthaccess; Python >=3.12)" }
+test-doctests = { cmd = "pytest --doctest-modules src/earthlens/gee src/earthlens/chc src/earthlens/ecmwf src/earthlens/cmems src/earthlens/fdsn src/earthlens/earthdata src/earthlens/base", description = "Run docstring examples across the backend packages (catches drift in catalog / API docstrings)" }
 notebooks = { cmd = "pytest --nbval --nbval-lax --verbose docs/examples", description = "check notebooks" }
 jupyter = { cmd = "jupyter lab --no-browser --IdentityProvider.token='' --ServerApp.password='' --port=8889", description = "check notebooks" }
 build-dist = { cmd = "python -m build", description = "Build sdist and wheel for PyPI" }

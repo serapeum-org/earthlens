@@ -1,0 +1,24 @@
+# PO.DAAC — Physical Oceanography Distributed Active Archive Center.
+# CMR provider code: POCLOUD. Flagship products: MUR SST, SWOT, GRACE-FO,
+# Jason-3 / Sentinel-6.
+datasets:
+  MUR-JPL-L4-GLOB-v4.1:
+    short_name: MUR-JPL-L4-GLOB-v4.1
+    version: "4.1"
+    doi: 10.5067/GHGMR-4FJ04
+    daac: PO.DAAC
+    provider: POCLOUD
+    cadence: daily
+    format: netcdf4
+    output_kind: raster
+    cloud_hosted: true
+    cloud_bucket: s3://podaac-ops-cumulus-protected
+    requires_harmony_for_subset: true
+    supports_harmony: true
+    temporal:
+      start: 2002-06-01
+      end: null
+    bands:
+      analysed_sst:
+        long_name: Analysed sea surface temperature
+        units: kelvin

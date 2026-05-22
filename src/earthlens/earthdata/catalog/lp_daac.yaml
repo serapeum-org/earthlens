@@ -1,0 +1,26 @@
+# LP DAAC — Land Processes Distributed Active Archive Center.
+# CMR provider code: LPCLOUD. Flagship products: MODIS, VIIRS, ASTER,
+# ECOSTRESS, EMIT, GEDI, NASADEM. GEDI L4A is a point/footprint product —
+# its output_kind is `vector` (the first non-raster Earthdata row), which
+# the facade uses to reject `aggregate=` (G6).
+datasets:
+  GEDI04_A_002:
+    short_name: GEDI04_A
+    version: "002"
+    doi: 10.3334/ORNLDAAC/2056
+    daac: LP DAAC
+    provider: LPCLOUD
+    cadence: irregular
+    format: hdf5
+    output_kind: vector
+    cloud_hosted: true
+    cloud_bucket: s3://lp-prod-protected
+    requires_harmony_for_subset: false
+    supports_harmony: false
+    temporal:
+      start: 2019-04-18
+      end: null
+    bands:
+      agbd:
+        long_name: Aboveground biomass density (footprint)
+        units: Mg/ha
