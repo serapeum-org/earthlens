@@ -163,19 +163,45 @@ class TestListEndpoints:
         client.list_locations(bbox="1,2,3,4", parameters_id=[], limit=100)
         assert "parameters_id" not in session.calls[0]["params"]
 
-    def test_list_measurements_raw_path(self):
-        """A None rollup hits the raw measurements endpoint."""
+    def test_list_measurements_raw_path_uses_datetime_filter(self):
+        """A None rollup hits /measurements and filters on datetime_from/to."""
         client, session = _client([_Resp({"results": []})])
         client.list_measurements(
-            sensor_id="10", datetime_from="a", datetime_to="b", rollup=None
+            sensor_id="10",
+            datetime_from="2024-01-01T00:00:00",
+            datetime_to="2024-01-07T00:00:00",
+            rollup=None,
         )
+        params = session.calls[0]["params"]
         assert session.calls[0]["url"] == f"{BASE_URL}/sensors/10/measurements"
+        assert params["datetime_from"] == "2024-01-01T00:00:00"
+        assert "date_from" not in params
 
-    def test_list_measurements_rollup_path(self):
-        """A rollup segment hits the corresponding sensor sub-endpoint."""
+    def test_list_measurements_hours_uses_datetime_filter(self):
+        """The sub-daily /hours rollup also filters on datetime_from/to."""
         client, session = _client([_Resp({"results": []})])
         client.list_measurements(
-            sensor_id="10", datetime_from="a", datetime_to="b", rollup="days"
+            sensor_id="10",
+            datetime_from="2024-01-01T00:00:00",
+            datetime_to="2024-01-07T00:00:00",
+            rollup="hours",
         )
-        assert session.calls[0]["url"] == f"{BASE_URL}/sensors/10/days"
-        assert session.calls[0]["params"]["datetime_from"] == "a"
+        params = session.calls[0]["params"]
+        assert session.calls[0]["url"] == f"{BASE_URL}/sensors/10/hours"
+        assert params["datetime_from"] == "2024-01-01T00:00:00"
+
+    @pytest.mark.parametrize("rollup", ["days", "months", "years"])
+    def test_list_measurements_date_rollups_use_date_filter(self, rollup: str):
+        """The /days, /months, /years rollups filter on a calendar date_from/to."""
+        client, session = _client([_Resp({"results": []})])
+        client.list_measurements(
+            sensor_id="10",
+            datetime_from="2024-01-01T00:00:00",
+            datetime_to="2024-01-07T00:00:00",
+            rollup=rollup,
+        )
+        params = session.calls[0]["params"]
+        assert session.calls[0]["url"] == f"{BASE_URL}/sensors/10/{rollup}"
+        assert params["date_from"] == "2024-01-01", "date should be truncated to YYYY-MM-DD"
+        assert params["date_to"] == "2024-01-07"
+        assert "datetime_from" not in params

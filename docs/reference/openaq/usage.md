@@ -57,7 +57,7 @@ from earthlens.openaq import Catalog
 sorted(Catalog().parameters)
 # ['bc', 'co', 'no', 'no2', 'o3', 'pm10', 'pm25', 'pressure',
 #  'relativehumidity', 'so2', 'temperature']
-Catalog().ids_for(["pm25", "no2"])      # [2, 5]
+Catalog().ids_for(["pm25", "no2"])      # [2, 15]
 ```
 
 An unknown name raises with a did-you-mean hint

@@ -95,7 +95,7 @@ class Catalog(AbstractCatalog):
             >>> cat.get_parameter("pm25").id
             2
             >>> cat.ids_for(["pm25", "no2"])
-            [2, 5]
+            [2, 15]
 
             ```
         - An unknown but close name raises with a did-you-mean hint:

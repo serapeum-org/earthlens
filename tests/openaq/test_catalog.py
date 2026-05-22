@@ -48,7 +48,7 @@ class TestCatalogLoad:
 
     def test_ids_for_preserves_order(self):
         """ids_for returns ids in the requested name order."""
-        assert Catalog().ids_for(["pm25", "no2"]) == [2, 5]
+        assert Catalog().ids_for(["pm25", "no2"]) == [2, 15]
 
     def test_get_catalog_returns_parameters(self):
         """get_catalog returns the same parameter map."""

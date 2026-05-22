@@ -137,9 +137,9 @@ class TestSearch:
     def test_parameters_id_forwarded(
         self, tmp_path: Path, fake_openaq: _FakeOpenaq
     ):
-        """variables=['pm25','no2'] forwards parameters_id=[2,5] to locations."""
+        """variables=['pm25','no2'] forwards parameters_id=[2,15] to locations."""
         _backend(tmp_path, variables=["pm25", "no2"])._search()
-        assert fake_openaq.location_calls()[0]["parameters_id"] == [2, 5]
+        assert fake_openaq.location_calls()[0]["parameters_id"] == [2, 15]
 
     def test_max_sensors_per_location_caps(
         self, tmp_path: Path, fake_openaq: _FakeOpenaq
@@ -180,9 +180,17 @@ class TestFetch:
         assert str(frame["datetime_utc"].dtype) == "datetime64[ns, UTC]"
         assert frame["value"].iloc[0] == 12.3
 
-    def test_date_window_forwarded(self, tmp_path: Path, fake_openaq: _FakeOpenaq):
-        """The measurement query carries the ISO start/end window."""
-        backend = _backend(tmp_path)
+    def test_date_window_forwarded_daily(self, tmp_path: Path, fake_openaq: _FakeOpenaq):
+        """The default daily rollup carries a calendar date_from/date_to window."""
+        backend = _backend(tmp_path)  # temporal_resolution defaults to "daily" -> /days
+        backend._fetch_one(backend._search()[0])
+        _url, params = fake_openaq.measurement_calls()[0]
+        assert params["date_from"] == "2024-01-01"
+        assert params["date_to"] == "2024-01-07"
+
+    def test_date_window_forwarded_raw(self, tmp_path: Path, fake_openaq: _FakeOpenaq):
+        """Raw measurements carry a full datetime_from/datetime_to window."""
+        backend = _backend(tmp_path, temporal_resolution="all")
         backend._fetch_one(backend._search()[0])
         _url, params = fake_openaq.measurement_calls()[0]
         assert params["datetime_from"] == "2024-01-01T00:00:00"

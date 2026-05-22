@@ -32,6 +32,14 @@ from loguru import logger
 #: OpenAQ v3 API base URL. All endpoint paths are joined onto this.
 BASE_URL = "https://api.openaq.org/v3"
 
+#: Rollup endpoints that filter on a calendar `date_from`/`date_to`
+#: (date granularity) rather than `datetime_from`/`datetime_to`. The raw
+#: `/measurements` and the `/hours` rollup take datetime filters; `/days`,
+#: `/months`, and `/years` take date filters and *silently ignore* a
+#: `datetime_*` filter (returning the sensor's full history). Verified
+#: against the live v3 API on 2026-05-22.
+_DATE_FILTER_ROLLUPS = frozenset({"days", "months", "years"})
+
 
 def _parse_retry_after(value: str | None) -> float | None:
     """Parse a `Retry-After` header value into seconds.
@@ -239,10 +247,20 @@ class OpenaqClient:
     ) -> list[dict[str, Any]]:
         """List one sensor's measurements over a window (raw or rolled-up).
 
+        The date-window filter parameter depends on the endpoint's
+        granularity: the raw `/measurements` and `/hours` rollup take
+        `datetime_from`/`datetime_to` (full ISO datetimes), while the
+        `/days`, `/months`, and `/years` rollups take `date_from`/
+        `date_to` (calendar dates) and silently ignore a `datetime_*`
+        filter. This method routes to the correct one
+        (see :data:`_DATE_FILTER_ROLLUPS`).
+
         Args:
             sensor_id: The OpenAQ sensor id.
-            datetime_from: Inclusive ISO start (`datetime_from` filter).
-            datetime_to: Inclusive ISO end (`datetime_to` filter).
+            datetime_from: Inclusive ISO start of the window. Truncated
+                to its `YYYY-MM-DD` date for the date-granularity
+                rollups.
+            datetime_to: Inclusive ISO end of the window.
             rollup: Server-side rollup segment (`"hours"`, `"days"`,
                 `"months"`, `"years"`), or `None` for raw measurements.
             limit: Page size.
@@ -254,9 +272,11 @@ class OpenaqClient:
         """
         suffix = rollup if rollup else "measurements"
         path = f"sensors/{sensor_id}/{suffix}"
-        params: dict[str, Any] = {
-            "datetime_from": datetime_from,
-            "datetime_to": datetime_to,
-            "limit": limit,
-        }
+        params: dict[str, Any] = {"limit": limit}
+        if rollup in _DATE_FILTER_ROLLUPS:
+            params["date_from"] = datetime_from[:10]
+            params["date_to"] = datetime_to[:10]
+        else:
+            params["datetime_from"] = datetime_from
+            params["datetime_to"] = datetime_to
         return list(self.paginate(path, params, max_items=max_items))
