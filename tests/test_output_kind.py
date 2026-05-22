@@ -1,12 +1,12 @@
 """Tests for the C1 `OUTPUT_KIND` extension point + facade aggregate guard.
 
 Covers:
-- `OutputKind` type alias (the 5 allowed literal values).
+- `OutputKind` type alias (the 4 allowed literal values).
 - `AbstractDataSource.OUTPUT_KIND` class attribute (default `"raster"`).
 - Inheritance of the default by the existing 4 backends (CHIRPS, S3,
   ECMWF, GEE).
 - `EarthLens.download(aggregate=...)` rejects vector / tabular backends
-  with `NotImplementedError` and forwards to raster / xarray / mixed.
+  with `NotImplementedError` and forwards to raster / mixed.
 """
 
 from __future__ import annotations
@@ -27,13 +27,12 @@ from earthlens.s3 import S3
 class TestOutputKindLiteral:
     """The `OutputKind` literal exposes exactly the five documented values."""
 
-    def test_outputkind_args_are_the_five_documented_strings(self):
-        """`get_args(OutputKind)` yields the canonical 5-tuple."""
+    def test_outputkind_args_are_the_four_documented_strings(self):
+        """`get_args(OutputKind)` yields the canonical 4-tuple."""
         assert get_args(OutputKind) == (
             "raster",
             "vector",
             "tabular",
-            "xarray",
             "mixed",
         ), f"OutputKind args drifted: {get_args(OutputKind)!r}"
 
@@ -79,9 +78,9 @@ class TestEarthLensAggregateGuard:
         el.datasource = fake_backend
         return el
 
-    @pytest.mark.parametrize("kind", ["raster", "xarray", "mixed"])
+    @pytest.mark.parametrize("kind", ["raster", "mixed"])
     def test_aggregate_forwarded_for_allowed_kinds(self, facade, fake_backend, kind):
-        """`aggregate=cfg` is forwarded as a backend kwarg for raster/xarray/mixed."""
+        """`aggregate=cfg` is forwarded as a backend kwarg for raster/mixed."""
         fake_backend.OUTPUT_KIND = kind
         cfg = object()
         facade.download(progress_bar=False, aggregate=cfg)

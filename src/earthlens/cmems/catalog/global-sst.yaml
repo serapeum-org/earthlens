@@ -1,0 +1,666 @@
+# CMEMS curated catalog - global-sst slice.
+#
+# One slice of the per-domain split of the Copernicus Marine catalog.
+# The loader (earthlens.cmems.catalog.Catalog) merges every *.yaml in
+# this directory into one Catalog at construction time; dataset ids
+# must be unique across files. Stanzas are emitted by
+# tools/cmems/refresh_cmems_catalog.py from copernicusmarine.describe();
+# `cadence` is inferred from the dataset_id suffix, `domain` from the
+# product_id prefix, and `temporal.start` is read from the dataset's
+# arco time-coordinate bounds. `end` is left null (the arco max is
+# "latest available today" and would go stale for rolling products).
+# Where the toolbox exposes no standard_name for a variable, the row
+# carries `long_name: ''` with a TODO marker.
+#
+# Schema (per dataset):
+#   <dataset_id>:
+#     product: <product_id>
+#     title: <human-readable title>
+#     cadence: <daily|monthly|hourly|6hourly|climatology|irregular>
+#     domain: <global|mediterranean|arctic|...>
+#     temporal: { start: YYYY-MM-DD, end: YYYY-MM-DD }   # end null = NRT
+#     variables:
+#       <short_name>: { units: <CF units>, long_name: <CF long name> }
+
+datasets:
+
+  C3S-GLO-SST-L4-REP-OBS-SST:
+    product: SST_GLO_SST_L4_REP_OBSERVATIONS_010_024
+    title: Global Sea and Ice Surface Temperature, L4, 5km daily reprocessed SST and IST
+    cadence: irregular
+    domain: global
+    temporal:
+      start: 1982-01-01
+      end: null              # null = NRT / rolling
+    variables:
+      analysed_sst:
+        units: kelvin
+        long_name: Sea surface temperature
+      analysed_st:
+        units: kelvin
+        long_name: Surface temperature
+      analysis_error_sst:
+        units: kelvin
+        long_name: Estimated error standard deviation of analysed sst
+      analysis_error_st:
+        units: kelvin
+        long_name: ''            # TODO: standard_name missing on describe()
+      mask:
+        units: ''
+        long_name: ''            # TODO: standard_name missing on describe()
+      sea_ice_fraction:
+        units: '1'
+        long_name: Sea ice area fraction
+      sea_ice_fraction_flag:
+        units: ''
+        long_name: Sea ice area fraction flag
+
+  ESACCI-GLO-SST-L4-REP-OBS-SST:
+    product: SST_GLO_SST_L4_REP_OBSERVATIONS_010_024
+    title: ESA SST CCI OSTIA L4 product
+    cadence: irregular
+    domain: global
+    temporal:
+      start: 1980-01-01
+      end: null              # null = NRT / rolling
+    variables:
+      analysed_sst:
+        units: kelvin
+        long_name: Sea water temperature
+      analysed_sst_uncertainty:
+        units: kelvin
+        long_name: Sea water temperature standard error
+      mask:
+        units: ''
+        long_name: Status flag
+      sea_ice_fraction:
+        units: '1'
+        long_name: Sea ice area fraction
+
+  IFREMER-ATL-SST-L4-NRT-OBS_FULL_TIME_SERIE:
+    product: SST_ATL_SST_L4_NRT_OBSERVATIONS_010_025
+    title: ODYSSEA North-East Atlantic Sea Surface Temperature Gridded Level 4 Daily Multi-Sensor
+    cadence: irregular
+    domain: global
+    temporal:
+      start: 2018-01-01
+      end: null              # null = NRT / rolling
+    variables:
+      analysed_sst:
+        units: kelvin
+        long_name: Sea surface foundation temperature
+      analysis_error:
+        units: kelvin
+        long_name: ''            # TODO: standard_name missing on describe()
+      mask:
+        units: ''
+        long_name: ''            # TODO: standard_name missing on describe()
+      sea_ice_fraction:
+        units: '1'
+        long_name: Sea ice area fraction
+
+  IFREMER-GLOB-SST-L3-NRT-OBS_FULL_TIME_SERIE:
+    product: SST_GLO_SST_L3S_NRT_OBSERVATIONS_010_010
+    title: ODYSSEA Global Sea Surface Temperature Gridded Level 3S Daily Multi-Sensor Observations
+    cadence: irregular
+    domain: global
+    temporal:
+      start: 2021-01-01
+      end: null              # null = NRT / rolling
+    variables:
+      adjusted_sea_surface_temperature:
+        units: kelvin
+        long_name: Sea surface foundation temperature
+      bias_to_reference_sst:
+        units: kelvin
+        long_name: ''            # TODO: standard_name missing on describe()
+      or_latitude:
+        units: degrees_north
+        long_name: Latitude
+      or_longitude:
+        units: degrees_east
+        long_name: Longitude
+      or_number_of_pixels:
+        units: '1'
+        long_name: Sea surface foundation temperature number of observations
+      quality_level:
+        units: ''
+        long_name: Sea surface foundation temperature status flag
+      satellite_zenith_angle:
+        units: degrees
+        long_name: Platform zenith angle
+      sea_surface_temperature:
+        units: kelvin
+        long_name: Sea surface foundation temperature
+      sea_surface_temperature_stddev:
+        units: kelvin
+        long_name: Sea surface subskin temperature
+      solar_zenith_angle:
+        units: angular_degree
+        long_name: Solar zenith angle
+      sources_of_sst:
+        units: ''
+        long_name: ''            # TODO: standard_name missing on describe()
+      sses_bias:
+        units: kelvin
+        long_name: ''            # TODO: standard_name missing on describe()
+      sses_standard_deviation:
+        units: kelvin
+        long_name: ''            # TODO: standard_name missing on describe()
+      sst_dtime:
+        units: second
+        long_name: ''            # TODO: standard_name missing on describe()
+
+  METOFFICE-GLO-SST-L4-NRT-OBS-SST-V2:
+    product: SST_GLO_SST_L4_NRT_OBSERVATIONS_010_001
+    title: Global SST & Sea Ice Analysis, L4 OSTIA, 0.05 deg daily (METOFFICE-GLO-SST-L4-NRT-OBS-SST-V2)
+    cadence: irregular
+    domain: global
+    temporal:
+      start: 2024-01-17
+      end: null              # null = NRT / rolling
+    variables:
+      analysed_sst:
+        units: kelvin
+        long_name: Sea surface foundation temperature
+      analysis_error:
+        units: kelvin
+        long_name: Sea surface foundation temperature standard error
+      mask:
+        units: ''
+        long_name: ''            # TODO: standard_name missing on describe()
+      sea_ice_fraction:
+        units: '1'
+        long_name: Sea ice area fraction
+
+  METOFFICE-GLO-SST-L4-REP-OBS-SST:
+    product: SST_GLO_SST_L4_REP_OBSERVATIONS_010_011
+    title: Global SST & Sea Ice Analysis, L4 OSTIA, 0.05 deg daily (METOFFICE-GLO-SST-L4-REP-OBS-SST-V2)
+    cadence: irregular
+    domain: global
+    temporal:
+      start: 1981-10-01
+      end: null              # null = NRT / rolling
+    variables:
+      analysed_sst:
+        units: kelvin
+        long_name: Sea surface foundation temperature
+      analysis_error:
+        units: kelvin
+        long_name: Sea surface foundation temperature standard error
+      mask:
+        units: ''
+        long_name: ''            # TODO: standard_name missing on describe()
+      sea_ice_fraction:
+        units: '1'
+        long_name: Sea ice area fraction
+
+  cmems-IFREMER-ATL-SST-L4-REP-OBS_FULL_TIME_SERIE:
+    product: SST_ATL_SST_L4_REP_OBSERVATIONS_010_026
+    title: Merged collation of sea surface temperature from multiple satellite sources
+    cadence: irregular
+    domain: global
+    temporal:
+      start: 1982-01-01
+      end: null              # null = NRT / rolling
+    variables:
+      analysed_sst:
+        units: kelvin
+        long_name: Sea surface foundation temperature
+      analysis_error:
+        units: kelvin
+        long_name: ''            # TODO: standard_name missing on describe()
+
+  cmems_obs-sst_atl_phy_l3s_gir_P1D-m:
+    product: SST_ATL_PHY_L3S_NRT_010_037
+    title: ODYSSEA North-East Atlantic Sea Surface Temperature Gridded Level 3S Daily Geostationary
+    cadence: daily
+    domain: global
+    temporal:
+      start: 2020-12-20
+      end: null              # null = NRT / rolling
+    variables:
+      adjusted_sea_surface_temperature:
+        units: K
+        long_name: Sea surface foundation temperature
+      bias_to_reference_sst:
+        units: K
+        long_name: ''            # TODO: standard_name missing on describe()
+      or_latitude:
+        units: degree_north
+        long_name: Latitude
+      or_longitude:
+        units: degree_east
+        long_name: Longitude
+      or_number_of_pixels:
+        units: '1'
+        long_name: Sea surface foundation temperature number of observations
+      quality_level:
+        units: ''
+        long_name: Sea surface foundation temperature status flag
+      satellite_zenith_angle:
+        units: angular_degree
+        long_name: Platform zenith angle
+      sea_surface_temperature:
+        units: K
+        long_name: Sea surface foundation temperature
+      sea_surface_temperature_stddev:
+        units: kelvin
+        long_name: Sea surface subskin temperature
+      solar_zenith_angle:
+        units: angular_degree
+        long_name: Solar zenith angle
+      sources_of_sst:
+        units: ''
+        long_name: ''            # TODO: standard_name missing on describe()
+      sses_bias:
+        units: K
+        long_name: ''            # TODO: standard_name missing on describe()
+      sses_standard_deviation:
+        units: kelvin
+        long_name: ''            # TODO: standard_name missing on describe()
+      sst_dtime:
+        units: second
+        long_name: ''            # TODO: standard_name missing on describe()
+
+  cmems_obs-sst_atl_phy_l3s_pir_P1D-m:
+    product: SST_ATL_PHY_L3S_NRT_010_037
+    title: ODYSSEA North-East Atlantic Sea Surface Temperature Gridded Level 3S Daily Polar orbiting
+    cadence: daily
+    domain: global
+    temporal:
+      start: 2020-12-20
+      end: null              # null = NRT / rolling
+    variables:
+      adjusted_sea_surface_temperature:
+        units: K
+        long_name: Sea surface foundation temperature
+      bias_to_reference_sst:
+        units: K
+        long_name: ''            # TODO: standard_name missing on describe()
+      or_latitude:
+        units: degree_north
+        long_name: Latitude
+      or_longitude:
+        units: degree_east
+        long_name: Longitude
+      or_number_of_pixels:
+        units: '1'
+        long_name: Sea surface foundation temperature number of observations
+      quality_level:
+        units: ''
+        long_name: Sea surface foundation temperature status flag
+      satellite_zenith_angle:
+        units: angular_degree
+        long_name: Platform zenith angle
+      sea_surface_temperature:
+        units: K
+        long_name: Sea surface foundation temperature
+      sea_surface_temperature_stddev:
+        units: kelvin
+        long_name: Sea surface subskin temperature
+      solar_zenith_angle:
+        units: angular_degree
+        long_name: Solar zenith angle
+      sources_of_sst:
+        units: ''
+        long_name: ''            # TODO: standard_name missing on describe()
+      sses_bias:
+        units: K
+        long_name: ''            # TODO: standard_name missing on describe()
+      sses_standard_deviation:
+        units: kelvin
+        long_name: ''            # TODO: standard_name missing on describe()
+      sst_dtime:
+        units: second
+        long_name: ''            # TODO: standard_name missing on describe()
+
+  cmems_obs-sst_atl_phy_l3s_pmw_P1D-m:
+    product: SST_ATL_PHY_L3S_NRT_010_037
+    title: ODYSSEA North-East Atlantic Sea Surface Temperature Gridded Level 3S Daily Polar orbiting
+    cadence: daily
+    domain: global
+    temporal:
+      start: 2020-12-20
+      end: null              # null = NRT / rolling
+    variables:
+      adjusted_sea_surface_temperature:
+        units: K
+        long_name: Sea surface foundation temperature
+      bias_to_reference_sst:
+        units: K
+        long_name: ''            # TODO: standard_name missing on describe()
+      or_latitude:
+        units: degree_north
+        long_name: Latitude
+      or_longitude:
+        units: degree_east
+        long_name: Longitude
+      or_number_of_pixels:
+        units: '1'
+        long_name: Sea surface foundation temperature number of observations
+      quality_level:
+        units: ''
+        long_name: Sea surface foundation temperature status flag
+      sea_surface_temperature:
+        units: K
+        long_name: Sea surface foundation temperature
+      sea_surface_temperature_stddev:
+        units: K
+        long_name: Sea surface subskin temperature
+      solar_zenith_angle:
+        units: angular_degree
+        long_name: Solar zenith angle
+      sources_of_sst:
+        units: ''
+        long_name: ''            # TODO: standard_name missing on describe()
+      sses_bias:
+        units: K
+        long_name: Sses bias
+      sses_standard_deviation:
+        units: K
+        long_name: Sses standard deviation
+      sst_dtime:
+        units: second
+        long_name: ''            # TODO: standard_name missing on describe()
+
+  cmems_obs-sst_atl_phy_my_l3s_P1D-m:
+    product: SST_ATL_PHY_L3S_MY_010_038
+    title: Merged collation of sea surface temperature from multiple satellite sources
+    cadence: daily
+    domain: global
+    temporal:
+      start: 1982-01-01
+      end: null              # null = NRT / rolling
+    variables:
+      adjusted_sea_surface_temperature:
+        units: kelvin
+        long_name: Sea surface temperature
+      bias_to_reference_sst:
+        units: kelvin
+        long_name: ''            # TODO: standard_name missing on describe()
+      quality_level:
+        units: ''
+        long_name: ''            # TODO: standard_name missing on describe()
+      sea_surface_temperature:
+        units: kelvin
+        long_name: Sea surface foundation temperature
+      sources_of_sst:
+        units: ''
+        long_name: ''            # TODO: standard_name missing on describe()
+      sses_bias:
+        units: kelvin
+        long_name: ''            # TODO: standard_name missing on describe()
+      sses_standard_deviation:
+        units: kelvin
+        long_name: ''            # TODO: standard_name missing on describe()
+      sst_dtime:
+        units: seconds
+        long_name: ''            # TODO: standard_name missing on describe()
+
+  cmems_obs-sst_atl_phy_nrt_l3s_P1D-m:
+    product: SST_ATL_PHY_L3S_NRT_010_037
+    title: ODYSSEA North-East Atlantic Sea Surface Temperature Gridded Level 3S Daily Multi-Sensor
+    cadence: daily
+    domain: global
+    temporal:
+      start: 2021-01-01
+      end: null              # null = NRT / rolling
+    variables:
+      adjusted_sea_surface_temperature:
+        units: kelvin
+        long_name: Sea surface foundation temperature
+      bias_to_reference_sst:
+        units: kelvin
+        long_name: ''            # TODO: standard_name missing on describe()
+      or_latitude:
+        units: degrees_north
+        long_name: Latitude
+      or_longitude:
+        units: degrees_east
+        long_name: Longitude
+      or_number_of_pixels:
+        units: '1'
+        long_name: Sea surface foundation temperature number of observations
+      quality_level:
+        units: ''
+        long_name: Sea surface foundation temperature status flag
+      satellite_zenith_angle:
+        units: degrees
+        long_name: Platform zenith angle
+      sea_surface_temperature:
+        units: kelvin
+        long_name: Sea surface foundation temperature
+      sea_surface_temperature_stddev:
+        units: kelvin
+        long_name: Sea surface subskin temperature
+      solar_zenith_angle:
+        units: angular_degree
+        long_name: Solar zenith angle
+      sources_of_sst:
+        units: ''
+        long_name: ''            # TODO: standard_name missing on describe()
+      sses_bias:
+        units: kelvin
+        long_name: ''            # TODO: standard_name missing on describe()
+      sses_standard_deviation:
+        units: kelvin
+        long_name: ''            # TODO: standard_name missing on describe()
+      sst_dtime:
+        units: second
+        long_name: ''            # TODO: standard_name missing on describe()
+
+  cmems_obs-sst_glo_phy-temp_nrt_P1D-m:
+    product: SST_GLO_PHY_L4_NRT_010_005
+    title: Global SST Ensemble, L4 GMPE, 0.25deg daily (METOFFICE-GLO-SST-L4-NRT-OBS-GMPE-V3)
+    cadence: daily
+    domain: global
+    temporal:
+      start: 2026-01-01
+      end: null              # null = NRT / rolling
+    variables:
+      analysed_sst:
+        units: kelvin
+        long_name: Sea surface foundation temperature
+      analysis_number:
+        units: ''
+        long_name: ''            # TODO: standard_name missing on describe()
+      anomaly_fields:
+        units: kelvin
+        long_name: ''            # TODO: standard_name missing on describe()
+      gradient_fields:
+        units: kelvin m-1
+        long_name: ''            # TODO: standard_name missing on describe()
+      median_type:
+        units: ''
+        long_name: ''            # TODO: standard_name missing on describe()
+      standard_deviation:
+        units: kelvin
+        long_name: ''            # TODO: standard_name missing on describe()
+
+  cmems_obs-sst_glo_phy_l3s_gir_P1D-m:
+    product: SST_GLO_SST_L3S_NRT_OBSERVATIONS_010_010
+    title: ODYSSEA Global Sea Surface Temperature Gridded Level 3S Daily Geostationary Infra
+    cadence: daily
+    domain: global
+    temporal:
+      start: 2020-12-20
+      end: null              # null = NRT / rolling
+    variables:
+      adjusted_sea_surface_temperature:
+        units: K
+        long_name: Sea surface foundation temperature
+      bias_to_reference_sst:
+        units: K
+        long_name: ''            # TODO: standard_name missing on describe()
+      or_latitude:
+        units: degree_north
+        long_name: Latitude
+      or_longitude:
+        units: degree_east
+        long_name: Longitude
+      or_number_of_pixels:
+        units: '1'
+        long_name: Sea surface foundation temperature number of observations
+      quality_level:
+        units: ''
+        long_name: Sea surface foundation temperature status flag
+      satellite_zenith_angle:
+        units: angular_degree
+        long_name: Platform zenith angle
+      sea_surface_temperature:
+        units: K
+        long_name: Sea surface foundation temperature
+      sea_surface_temperature_stddev:
+        units: kelvin
+        long_name: Sea surface subskin temperature
+      solar_zenith_angle:
+        units: angular_degree
+        long_name: Solar zenith angle
+      sources_of_sst:
+        units: ''
+        long_name: ''            # TODO: standard_name missing on describe()
+      sses_bias:
+        units: K
+        long_name: ''            # TODO: standard_name missing on describe()
+      sses_standard_deviation:
+        units: kelvin
+        long_name: ''            # TODO: standard_name missing on describe()
+      sst_dtime:
+        units: second
+        long_name: ''            # TODO: standard_name missing on describe()
+
+  cmems_obs-sst_glo_phy_l3s_pir_P1D-m:
+    product: SST_GLO_SST_L3S_NRT_OBSERVATIONS_010_010
+    title: ODYSSEA Global Sea Surface Temperature Gridded Level 3S Daily Polar orbiting Infra
+    cadence: daily
+    domain: global
+    temporal:
+      start: 2020-12-20
+      end: null              # null = NRT / rolling
+    variables:
+      adjusted_sea_surface_temperature:
+        units: K
+        long_name: Sea surface foundation temperature
+      bias_to_reference_sst:
+        units: K
+        long_name: ''            # TODO: standard_name missing on describe()
+      or_latitude:
+        units: degree_north
+        long_name: Latitude
+      or_longitude:
+        units: degree_east
+        long_name: Longitude
+      or_number_of_pixels:
+        units: '1'
+        long_name: Sea surface foundation temperature number of observations
+      quality_level:
+        units: ''
+        long_name: Sea surface foundation temperature status flag
+      satellite_zenith_angle:
+        units: angular_degree
+        long_name: Platform zenith angle
+      sea_surface_temperature:
+        units: K
+        long_name: Sea surface foundation temperature
+      sea_surface_temperature_stddev:
+        units: kelvin
+        long_name: Sea surface subskin temperature
+      solar_zenith_angle:
+        units: angular_degree
+        long_name: Solar zenith angle
+      sources_of_sst:
+        units: ''
+        long_name: ''            # TODO: standard_name missing on describe()
+      sses_bias:
+        units: K
+        long_name: ''            # TODO: standard_name missing on describe()
+      sses_standard_deviation:
+        units: kelvin
+        long_name: ''            # TODO: standard_name missing on describe()
+      sst_dtime:
+        units: second
+        long_name: ''            # TODO: standard_name missing on describe()
+
+  cmems_obs-sst_glo_phy_l3s_pmw_P1D-m:
+    product: SST_GLO_SST_L3S_NRT_OBSERVATIONS_010_010
+    title: ODYSSEA Global Sea Surface Temperature Gridded Level 3S Daily Polar orbiting MicroWave
+    cadence: daily
+    domain: global
+    temporal:
+      start: 2020-12-20
+      end: null              # null = NRT / rolling
+    variables:
+      adjusted_sea_surface_temperature:
+        units: K
+        long_name: Sea surface foundation temperature
+      bias_to_reference_sst:
+        units: K
+        long_name: ''            # TODO: standard_name missing on describe()
+      or_latitude:
+        units: degree_north
+        long_name: Latitude
+      or_longitude:
+        units: degree_east
+        long_name: Longitude
+      or_number_of_pixels:
+        units: '1'
+        long_name: Sea surface foundation temperature number of observations
+      quality_level:
+        units: ''
+        long_name: Sea surface foundation temperature status flag
+      sea_surface_temperature:
+        units: K
+        long_name: Sea surface foundation temperature
+      sea_surface_temperature_stddev:
+        units: K
+        long_name: Sea surface subskin temperature
+      solar_zenith_angle:
+        units: angular_degree
+        long_name: Solar zenith angle
+      sources_of_sst:
+        units: ''
+        long_name: ''            # TODO: standard_name missing on describe()
+      sses_bias:
+        units: K
+        long_name: Sses bias
+      sses_standard_deviation:
+        units: K
+        long_name: Sses standard deviation
+      sst_dtime:
+        units: second
+        long_name: ''            # TODO: standard_name missing on describe()
+
+  cmems_obs-sst_glo_phy_my_l3s_P1D-m:
+    product: SST_GLO_PHY_L3S_MY_010_039
+    title: Merged collation of sea surface temperature from multiple satellite sources
+    cadence: daily
+    domain: global
+    temporal:
+      start: 1982-01-01
+      end: null              # null = NRT / rolling
+    variables:
+      adjusted_sea_surface_temperature:
+        units: kelvin
+        long_name: Sea surface temperature
+      bias_to_reference_sst:
+        units: kelvin
+        long_name: ''            # TODO: standard_name missing on describe()
+      quality_level:
+        units: ''
+        long_name: ''            # TODO: standard_name missing on describe()
+      sea_surface_temperature:
+        units: kelvin
+        long_name: Sea surface foundation temperature
+      sources_of_sst:
+        units: ''
+        long_name: ''            # TODO: standard_name missing on describe()
+      sses_bias:
+        units: kelvin
+        long_name: ''            # TODO: standard_name missing on describe()
+      sses_standard_deviation:
+        units: kelvin
+        long_name: ''            # TODO: standard_name missing on describe()
+      sst_dtime:
+        units: seconds
+        long_name: ''            # TODO: standard_name missing on describe()

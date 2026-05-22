@@ -1,0 +1,1531 @@
+# CMEMS curated catalog - global-physics slice.
+#
+# One slice of the per-domain split of the Copernicus Marine catalog.
+# The loader (earthlens.cmems.catalog.Catalog) merges every *.yaml in
+# this directory into one Catalog at construction time; dataset ids
+# must be unique across files. Stanzas are emitted by
+# tools/cmems/refresh_cmems_catalog.py from copernicusmarine.describe();
+# `cadence` is inferred from the dataset_id suffix, `domain` from the
+# product_id prefix, and `temporal.start` is read from the dataset's
+# arco time-coordinate bounds. `end` is left null (the arco max is
+# "latest available today" and would go stale for rolling products).
+# Where the toolbox exposes no standard_name for a variable, the row
+# carries `long_name: ''` with a TODO marker.
+#
+# Schema (per dataset):
+#   <dataset_id>:
+#     product: <product_id>
+#     title: <human-readable title>
+#     cadence: <daily|monthly|hourly|6hourly|climatology|irregular>
+#     domain: <global|mediterranean|arctic|...>
+#     temporal: { start: YYYY-MM-DD, end: YYYY-MM-DD }   # end null = NRT
+#     variables:
+#       <short_name>: { units: <CF units>, long_name: <CF long name> }
+
+datasets:
+
+  cci_obs-wave_glo_phy-swh_my_al-l3_PT1S:
+    product: WAVE_GLO_PHY_SWH_L3_MY_014_005
+    title: cci_obs-wave_glo_phy-swh_my_al-l3_PT1S_202112
+    cadence: irregular
+    domain: global
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      VAVH:
+        units: m
+        long_name: Sea surface wave significant height
+      VAVH_UNFILTERED:
+        units: m
+        long_name: Sea surface wave significant height
+
+  cci_obs-wave_glo_phy-swh_my_c2-l3_PT1S:
+    product: WAVE_GLO_PHY_SWH_L3_MY_014_005
+    title: cci_obs-wave_glo_phy-swh_my_c2-l3_PT1S_202112
+    cadence: irregular
+    domain: global
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      VAVH:
+        units: m
+        long_name: Sea surface wave significant height
+      VAVH_UNFILTERED:
+        units: m
+        long_name: Sea surface wave significant height
+
+  cci_obs-wave_glo_phy-swh_my_en-l3_PT1S:
+    product: WAVE_GLO_PHY_SWH_L3_MY_014_005
+    title: cci_obs-wave_glo_phy-swh_my_en-l3_PT1S_202112
+    cadence: irregular
+    domain: global
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      VAVH:
+        units: m
+        long_name: Sea surface wave significant height
+      VAVH_UNFILTERED:
+        units: m
+        long_name: Sea surface wave significant height
+
+  cci_obs-wave_glo_phy-swh_my_j1-l3_PT1S:
+    product: WAVE_GLO_PHY_SWH_L3_MY_014_005
+    title: cci_obs-wave_glo_phy-swh_my_j1-l3_PT1S_202112
+    cadence: irregular
+    domain: global
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      VAVH:
+        units: m
+        long_name: Sea surface wave significant height
+      VAVH_UNFILTERED:
+        units: m
+        long_name: Sea surface wave significant height
+
+  cci_obs-wave_glo_phy-swh_my_j2-l3_PT1S:
+    product: WAVE_GLO_PHY_SWH_L3_MY_014_005
+    title: cci_obs-wave_glo_phy-swh_my_j2-l3_PT1S_202112
+    cadence: irregular
+    domain: global
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      VAVH:
+        units: m
+        long_name: Sea surface wave significant height
+      VAVH_UNFILTERED:
+        units: m
+        long_name: Sea surface wave significant height
+
+  cci_obs-wave_glo_phy-swh_my_j3-l3_PT1S:
+    product: WAVE_GLO_PHY_SWH_L3_MY_014_005
+    title: cci_obs-wave_glo_phy-swh_my_j3-l3_PT1S_202112
+    cadence: irregular
+    domain: global
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      VAVH:
+        units: m
+        long_name: Sea surface wave significant height
+      VAVH_UNFILTERED:
+        units: m
+        long_name: Sea surface wave significant height
+
+  cmems_mod_glo_phy-all_my_0.25deg_P1D-m:
+    product: GLOBAL_MULTIYEAR_PHY_ENS_001_031
+    title: Daily mean fields for product GLOBAL_MULTIYEAR_PHY_ENS_001_031
+    cadence: daily
+    domain: global
+    temporal:
+      start: 1993-01-01
+      end: null              # null = NRT / rolling
+    variables:
+      mlotst_cglo:
+        units: m
+        long_name: Ocean mixed layer thickness defined by sigma theta
+      mlotst_glor:
+        units: m
+        long_name: Ocean mixed layer thickness defined by sigma theta
+      mlotst_oras:
+        units: m
+        long_name: Ocean mixed layer thickness defined by sigma theta
+      siconc_cglo:
+        units: '1'
+        long_name: Sea ice area fraction
+      siconc_glor:
+        units: '1'
+        long_name: Sea ice area fraction
+      siconc_oras:
+        units: '1'
+        long_name: Sea ice area fraction
+      sithick_cglo:
+        units: m
+        long_name: Sea ice thickness
+      sithick_glor:
+        units: m
+        long_name: Sea ice thickness
+      sithick_oras:
+        units: m
+        long_name: Sea ice thickness
+      so_cglo:
+        units: 1e-3
+        long_name: Sea water salinity
+      so_glor:
+        units: 1e-3
+        long_name: Sea water salinity
+      so_oras:
+        units: 1e-3
+        long_name: Sea water salinity
+      thetao_cglo:
+        units: degrees_C
+        long_name: Sea water potential temperature
+      thetao_glor:
+        units: degrees_C
+        long_name: Sea water potential temperature
+      thetao_oras:
+        units: degrees_C
+        long_name: Sea water potential temperature
+      uo_cglo:
+        units: m s-1
+        long_name: Eastward sea water velocity
+      uo_glor:
+        units: m s-1
+        long_name: Eastward sea water velocity
+      uo_oras:
+        units: m s-1
+        long_name: Eastward sea water velocity
+      vo_cglo:
+        units: m s-1
+        long_name: Northward sea water velocity
+      vo_glor:
+        units: m s-1
+        long_name: Northward sea water velocity
+      vo_oras:
+        units: m s-1
+        long_name: Northward sea water velocity
+      zos_cglo:
+        units: m
+        long_name: Sea surface height above geoid
+      zos_glor:
+        units: m
+        long_name: Sea surface height above geoid
+      zos_oras:
+        units: m
+        long_name: Sea surface height above geoid
+
+  cmems_mod_glo_phy-all_my_0.25deg_P1M-m:
+    product: GLOBAL_MULTIYEAR_PHY_ENS_001_031
+    title: Monthly mean fields for product GLOBAL_MULTIYEAR_PHY_ENS_001_031
+    cadence: monthly
+    domain: global
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      mlotst_cglo:
+        units: m
+        long_name: Ocean mixed layer thickness defined by sigma theta
+      mlotst_glor:
+        units: m
+        long_name: Ocean mixed layer thickness defined by sigma theta
+      mlotst_oras:
+        units: m
+        long_name: Ocean mixed layer thickness defined by sigma theta
+      siconc_cglo:
+        units: '1'
+        long_name: Sea ice area fraction
+      siconc_glor:
+        units: '1'
+        long_name: Sea ice area fraction
+      siconc_oras:
+        units: '1'
+        long_name: Sea ice area fraction
+      sithick_cglo:
+        units: m
+        long_name: Sea ice thickness
+      sithick_glor:
+        units: m
+        long_name: Sea ice thickness
+      sithick_oras:
+        units: m
+        long_name: Sea ice thickness
+      so_cglo:
+        units: 1e-3
+        long_name: Sea water salinity
+      so_glor:
+        units: 1e-3
+        long_name: Sea water salinity
+      so_oras:
+        units: 1e-3
+        long_name: Sea water salinity
+      thetao_cglo:
+        units: degrees_C
+        long_name: Sea water potential temperature
+      thetao_glor:
+        units: degrees_C
+        long_name: Sea water potential temperature
+      thetao_oras:
+        units: degrees_C
+        long_name: Sea water potential temperature
+      uo_cglo:
+        units: m s-1
+        long_name: Eastward sea water velocity
+      uo_glor:
+        units: m s-1
+        long_name: Eastward sea water velocity
+      uo_oras:
+        units: m s-1
+        long_name: Eastward sea water velocity
+      vo_cglo:
+        units: m s-1
+        long_name: Northward sea water velocity
+      vo_glor:
+        units: m s-1
+        long_name: Northward sea water velocity
+      vo_oras:
+        units: m s-1
+        long_name: Northward sea water velocity
+      zos_cglo:
+        units: m
+        long_name: Sea surface height above geoid
+      zos_glor:
+        units: m
+        long_name: Sea surface height above geoid
+      zos_oras:
+        units: m
+        long_name: Sea surface height above geoid
+
+  cmems_mod_glo_phy-cur_anfc_0.083deg_P1D-m:
+    product: GLOBAL_ANALYSISFORECAST_PHY_001_024
+    title: daily mean fields from Global Ocean Physics Analysis and Forecast updated Daily
+    cadence: daily
+    domain: global
+    temporal:
+      start: 2022-06-01
+      end: null              # null = NRT / rolling
+    variables:
+      uo:
+        units: m s-1
+        long_name: Eastward sea water velocity
+      vo:
+        units: m s-1
+        long_name: Northward sea water velocity
+
+  cmems_mod_glo_phy-cur_anfc_0.083deg_P1M-m:
+    product: GLOBAL_ANALYSISFORECAST_PHY_001_024
+    title: Monthly mean fields for product GLOBAL_ANALYSISFORECAST_PHY_001_024
+    cadence: monthly
+    domain: global
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      uo:
+        units: m s-1
+        long_name: Eastward sea water velocity
+      vo:
+        units: m s-1
+        long_name: Northward sea water velocity
+
+  cmems_mod_glo_phy-cur_anfc_0.083deg_PT6H-i:
+    product: GLOBAL_ANALYSISFORECAST_PHY_001_024
+    title: Instantaneous fields for product GLOBAL_ANALYSISFORECAST_PHY_001_024
+    cadence: 6hourly
+    domain: global
+    temporal:
+      start: 2022-06-01
+      end: null              # null = NRT / rolling
+    variables:
+      uo:
+        units: m s-1
+        long_name: Eastward sea water velocity
+      vo:
+        units: m s-1
+        long_name: Northward sea water velocity
+
+  cmems_mod_glo_phy-mnstd_my_0.25deg_P1D-m:
+    product: GLOBAL_MULTIYEAR_PHY_ENS_001_031
+    title: Daily mean fields for product GLOBAL_MULTIYEAR_PHY_ENS_001_031
+    cadence: daily
+    domain: global
+    temporal:
+      start: 1993-01-01
+      end: null              # null = NRT / rolling
+    variables:
+      mlotst_mean:
+        units: m
+        long_name: Ocean mixed layer thickness defined by sigma theta
+      mlotst_std:
+        units: m
+        long_name: Ocean mixed layer thickness defined by sigma theta
+      siconc_mean:
+        units: '1'
+        long_name: Sea ice area fraction
+      siconc_std:
+        units: '1'
+        long_name: Sea ice area fraction
+      sithick_mean:
+        units: m
+        long_name: Sea ice thickness
+      sithick_std:
+        units: m
+        long_name: Sea ice thickness
+      so_mean:
+        units: 1e-3
+        long_name: Sea water salinity
+      so_std:
+        units: 1e-3
+        long_name: Sea water salinity
+      thetao_mean:
+        units: degrees_C
+        long_name: Sea water potential temperature
+      thetao_std:
+        units: degrees_C
+        long_name: Sea water potential temperature
+      uo_mean:
+        units: m s-1
+        long_name: Eastward sea water velocity
+      uo_std:
+        units: m s-1
+        long_name: Eastward sea water velocity
+      vo_mean:
+        units: m s-1
+        long_name: Northward sea water velocity
+      vo_std:
+        units: m s-1
+        long_name: Northward sea water velocity
+      zos_mean:
+        units: m
+        long_name: Sea surface height above geoid
+      zos_std:
+        units: m
+        long_name: Sea surface height above geoid
+
+  cmems_mod_glo_phy-mnstd_my_0.25deg_P1M-m:
+    product: GLOBAL_MULTIYEAR_PHY_ENS_001_031
+    title: Monthly mean fields for product GLOBAL_MULTIYEAR_PHY_ENS_001_031
+    cadence: monthly
+    domain: global
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      mlotst_mean:
+        units: m
+        long_name: Ocean mixed layer thickness defined by sigma theta
+      mlotst_std:
+        units: m
+        long_name: Ocean mixed layer thickness defined by sigma theta
+      siconc_mean:
+        units: '1'
+        long_name: Sea ice area fraction
+      siconc_std:
+        units: '1'
+        long_name: Sea ice area fraction
+      sithick_mean:
+        units: m
+        long_name: Sea ice thickness
+      sithick_std:
+        units: m
+        long_name: Sea ice thickness
+      so_mean:
+        units: 1e-3
+        long_name: Sea water salinity
+      so_std:
+        units: 1e-3
+        long_name: Sea water salinity
+      thetao_mean:
+        units: degrees_C
+        long_name: Sea water potential temperature
+      thetao_std:
+        units: degrees_C
+        long_name: Sea water potential temperature
+      uo_mean:
+        units: m s-1
+        long_name: Eastward sea water velocity
+      uo_std:
+        units: m s-1
+        long_name: Eastward sea water velocity
+      vo_mean:
+        units: m s-1
+        long_name: Northward sea water velocity
+      vo_std:
+        units: m s-1
+        long_name: Northward sea water velocity
+      zos_mean:
+        units: m
+        long_name: Sea surface height above geoid
+      zos_std:
+        units: m
+        long_name: Sea surface height above geoid
+
+  cmems_mod_glo_phy-so_anfc_0.083deg_P1D-m:
+    product: GLOBAL_ANALYSISFORECAST_PHY_001_024
+    title: daily mean fields from Global Ocean Physics Analysis and Forecast updated Daily
+    cadence: daily
+    domain: global
+    temporal:
+      start: 2022-06-01
+      end: null              # null = NRT / rolling
+    variables:
+      so:
+        units: 1e-3
+        long_name: Sea water salinity
+
+  cmems_mod_glo_phy-so_anfc_0.083deg_P1M-m:
+    product: GLOBAL_ANALYSISFORECAST_PHY_001_024
+    title: Monthly mean fields for product GLOBAL_ANALYSISFORECAST_PHY_001_024
+    cadence: monthly
+    domain: global
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      so:
+        units: 1e-3
+        long_name: Sea water salinity
+
+  cmems_mod_glo_phy-so_anfc_0.083deg_PT6H-i:
+    product: GLOBAL_ANALYSISFORECAST_PHY_001_024
+    title: Instantaneous fields for product GLOBAL_ANALYSISFORECAST_PHY_001_024
+    cadence: 6hourly
+    domain: global
+    temporal:
+      start: 2022-06-01
+      end: null              # null = NRT / rolling
+    variables:
+      so:
+        units: 1e-3
+        long_name: Sea water salinity
+
+  cmems_mod_glo_phy-thetao_anfc_0.083deg_P1D-m:
+    product: GLOBAL_ANALYSISFORECAST_PHY_001_024
+    title: daily mean fields from Global Ocean Physics Analysis and Forecast updated Daily
+    cadence: daily
+    domain: global
+    temporal:
+      start: 2022-06-01
+      end: null              # null = NRT / rolling
+    variables:
+      thetao:
+        units: degrees_C
+        long_name: Sea water potential temperature
+
+  cmems_mod_glo_phy-thetao_anfc_0.083deg_P1M-m:
+    product: GLOBAL_ANALYSISFORECAST_PHY_001_024
+    title: Monthly mean fields for product GLOBAL_ANALYSISFORECAST_PHY_001_024
+    cadence: monthly
+    domain: global
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      thetao:
+        units: degrees_C
+        long_name: Sea water potential temperature
+
+  cmems_mod_glo_phy-thetao_anfc_0.083deg_PT6H-i:
+    product: GLOBAL_ANALYSISFORECAST_PHY_001_024
+    title: Instantaneous fields for product GLOBAL_ANALYSISFORECAST_PHY_001_024
+    cadence: 6hourly
+    domain: global
+    temporal:
+      start: 2022-06-01
+      end: null              # null = NRT / rolling
+    variables:
+      thetao:
+        units: degrees_C
+        long_name: Sea water potential temperature
+
+  cmems_mod_glo_phy-wcur_anfc_0.083deg_P1D-m:
+    product: GLOBAL_ANALYSISFORECAST_PHY_001_024
+    title: daily mean fields from Global Ocean Physics Analysis and Forecast updated Daily
+    cadence: daily
+    domain: global
+    temporal:
+      start: 2022-06-01
+      end: null              # null = NRT / rolling
+    variables:
+      wo:
+        units: m s-1
+        long_name: Upward sea water velocity
+
+  cmems_mod_glo_phy-wcur_anfc_0.083deg_P1M-m:
+    product: GLOBAL_ANALYSISFORECAST_PHY_001_024
+    title: Monthly mean fields for product GLOBAL_ANALYSISFORECAST_PHY_001_024
+    cadence: monthly
+    domain: global
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      wo:
+        units: m s-1
+        long_name: Upward sea water velocity
+
+  cmems_mod_glo_phy_anfc_0.083deg-climatology-uncertainty_P1M-m:
+    product: GLOBAL_ANALYSISFORECAST_PHY_001_024
+    title: Monthly mean climatological fields SST uncertainty from the period 2017-2022 for Global
+    cadence: climatology
+    domain: global
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      sea_surface_temperature_md_uncertainty:
+        units: °C
+        long_name: Md uncertainty
+      sea_surface_temperature_number_of_observations:
+        units: '1'
+        long_name: Number of observations
+      sea_surface_temperature_rmsd_uncertainty:
+        units: °C
+        long_name: Rmsd uncertainty
+
+  cmems_mod_glo_phy_anfc_0.083deg-sst-anomaly_P1D-m:
+    product: GLOBAL_ANALYSISFORECAST_PHY_001_024
+    title: Sea Surface Temperature Anomaly (2D) - Daily Mean
+    cadence: daily
+    domain: global
+    temporal:
+      start: 2022-11-01
+      end: null              # null = NRT / rolling
+    variables:
+      sea_surface_temperature_anomaly:
+        units: degrees_C
+        long_name: Sea surface temperature anomaly
+
+  cmems_mod_glo_phy_anfc_0.083deg-sst-anomaly_P1M-m:
+    product: GLOBAL_ANALYSISFORECAST_PHY_001_024
+    title: Sea Surface Temperature Anomaly (2D) - Monthly Mean
+    cadence: monthly
+    domain: global
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      sea_surface_temperature_anomaly:
+        units: degrees_C
+        long_name: Sea surface temperature anomaly
+
+  cmems_mod_glo_phy_anfc_0.083deg_P1D-m:
+    product: GLOBAL_ANALYSISFORECAST_PHY_001_024
+    title: daily mean fields from Global Ocean Physics Analysis and Forecast updated Daily
+    cadence: daily
+    domain: global
+    temporal:
+      start: 2022-06-01
+      end: null              # null = NRT / rolling
+    variables:
+      ist:
+        units: degrees_C
+        long_name: Sea ice surface temperature
+      mlotst:
+        units: m
+        long_name: Ocean mixed layer thickness defined by sigma theta
+      pbo:
+        units: dbar
+        long_name: Sea water pressure at sea floor
+      siage:
+        units: years
+        long_name: Age of sea ice
+      sialb:
+        units: '%'
+        long_name: Sea ice albedo
+      siconc:
+        units: '1'
+        long_name: Sea ice area fraction
+      sisnthick:
+        units: m
+        long_name: Surface snow thickness
+      sithick:
+        units: m
+        long_name: Sea ice thickness
+      sivelo:
+        units: m s-1
+        long_name: Sea ice speed
+      sob:
+        units: 1e-3
+        long_name: Sea water salinity at sea floor
+      tob:
+        units: degrees_C
+        long_name: Sea water potential temperature at sea floor
+      usi:
+        units: m s-1
+        long_name: Eastward sea ice velocity
+      vsi:
+        units: m s-1
+        long_name: Northward sea ice velocity
+      zos:
+        units: m
+        long_name: Sea surface height above geoid
+
+  cmems_mod_glo_phy_anfc_0.083deg_P1M-m:
+    product: GLOBAL_ANALYSISFORECAST_PHY_001_024
+    title: Monthly mean fields for product GLOBAL_ANALYSISFORECAST_PHY_001_024
+    cadence: monthly
+    domain: global
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      ist:
+        units: degrees_C
+        long_name: Sea ice surface temperature
+      mlotst:
+        units: m
+        long_name: Ocean mixed layer thickness defined by sigma theta
+      pbo:
+        units: dbar
+        long_name: Sea water pressure at sea floor
+      siage:
+        units: years
+        long_name: Age of sea ice
+      sialb:
+        units: '%'
+        long_name: Sea ice albedo
+      siconc:
+        units: '1'
+        long_name: Sea ice area fraction
+      sisnthick:
+        units: m
+        long_name: Surface snow thickness
+      sithick:
+        units: m
+        long_name: Sea ice thickness
+      sivelo:
+        units: m s-1
+        long_name: Sea ice speed
+      sob:
+        units: 1e-3
+        long_name: Sea water salinity at sea floor
+      tob:
+        units: degrees_C
+        long_name: Sea water potential temperature at sea floor
+      usi:
+        units: m s-1
+        long_name: Eastward sea ice velocity
+      vsi:
+        units: m s-1
+        long_name: Northward sea ice velocity
+      zos:
+        units: m
+        long_name: Sea surface height above geoid
+
+  cmems_mod_glo_phy_anfc_0.083deg_PT1H-m:
+    product: GLOBAL_ANALYSISFORECAST_PHY_001_024
+    title: hourly mean fields from Global Ocean Physics Analysis and Forecast updated Daily
+    cadence: hourly
+    domain: global
+    temporal:
+      start: 2022-06-01
+      end: null              # null = NRT / rolling
+    variables:
+      so:
+        units: 1e-3
+        long_name: Sea water salinity
+      thetao:
+        units: degrees_C
+        long_name: Sea water potential temperature
+      uo:
+        units: m s-1
+        long_name: Eastward sea water velocity
+      vo:
+        units: m s-1
+        long_name: Northward sea water velocity
+      zos:
+        units: m
+        long_name: Sea surface height above geoid
+
+  cmems_mod_glo_phy_anfc_0.083deg_static:
+    product: GLOBAL_ANALYSISFORECAST_PHY_001_024
+    title: cmems_mod_glo_phy_anfc_0.083deg_static
+    cadence: irregular
+    domain: global
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      deptho:
+        units: m
+        long_name: Sea floor depth below geoid
+      deptho_lev:
+        units: '1'
+        long_name: Model level number at sea floor
+      mask:
+        units: '1'
+        long_name: Sea binary mask
+
+  cmems_mod_glo_phy_anfc_merged-sl_PT1H-i:
+    product: GLOBAL_ANALYSISFORECAST_PHY_001_024
+    title: hourly mean merged sea levels
+    cadence: hourly
+    domain: global
+    temporal:
+      start: 2022-09-01
+      end: null              # null = NRT / rolling
+    variables:
+      global_mean_mass_volume_variation:
+        units: m
+        long_name: Global average sea level change due to water mass budget
+      global_mean_steric_variation:
+        units: m
+        long_name: Global average steric sea level change
+      invert_barometer:
+        units: m
+        long_name: Change in sea surface height due to change in air pressure
+      ocean_tide:
+        units: m
+        long_name: Sea surface height above geoid due to ocean tide
+      sea_surface_height:
+        units: m
+        long_name: Ocean dynamic sea level
+      tide_loading:
+        units: m
+        long_name: Change in sea floor height above reference ellipsoid due to ocean tide loading
+      total_sea_level:
+        units: m
+        long_name: Sea surface height above geoid
+
+  cmems_mod_glo_phy_anfc_merged-uv_PT1H-i:
+    product: GLOBAL_ANALYSISFORECAST_PHY_001_024
+    title: hourly mean merged surface currents from oceanic circulation, tides and waves
+    cadence: hourly
+    domain: global
+    temporal:
+      start: 2020-11-01
+      end: null              # null = NRT / rolling
+    variables:
+      uo:
+        units: m s-1
+        long_name: Eastward sea water velocity
+      utide:
+        units: m s-1
+        long_name: Surface sea water x velocity due to tide
+      utotal:
+        units: m s-1
+        long_name: Surface sea water x velocity
+      vo:
+        units: m s-1
+        long_name: Northward sea water velocity
+      vsdx:
+        units: m s-1
+        long_name: Sea surface wave stokes drift x velocity
+      vsdy:
+        units: m s-1
+        long_name: Sea surface wave stokes drift y velocity
+      vtide:
+        units: m s-1
+        long_name: Surface sea water y velocity due to tide
+      vtotal:
+        units: m s-1
+        long_name: Surface sea water y velocity
+
+  cmems_mod_glo_phy_my_0.083deg-climatology_P1M-m:
+    product: GLOBAL_MULTIYEAR_PHY_001_030
+    title: Monthly climatology fields for product GLOBAL_REANALYSIS_PHY_001_030
+    cadence: climatology
+    domain: global
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      bottomT:
+        units: degrees_C
+        long_name: Sea water potential temperature at sea floor
+      climatology_bounds:
+        units: hours since 1950-01-01
+        long_name: ''            # TODO: standard_name missing on describe()
+      mlotst:
+        units: m
+        long_name: Ocean mixed layer thickness defined by sigma theta
+      siconc:
+        units: '1'
+        long_name: Sea ice area fraction
+      sithick:
+        units: m
+        long_name: Sea ice thickness
+      so:
+        units: 1e-3
+        long_name: Sea water salinity
+      thetao:
+        units: degrees_C
+        long_name: Sea water potential temperature
+      uo:
+        units: m s-1
+        long_name: Eastward sea water velocity
+      usi:
+        units: m s-1
+        long_name: Eastward sea ice velocity
+      vo:
+        units: m s-1
+        long_name: Northward sea water velocity
+      vsi:
+        units: m s-1
+        long_name: Northward sea ice velocity
+      zos:
+        units: m
+        long_name: Sea surface height above geoid
+
+  cmems_mod_glo_phy_my_0.083deg_P1D-m:
+    product: GLOBAL_MULTIYEAR_PHY_001_030
+    title: daily mean fields from Global Ocean Physics Analysis and Forecast updated Daily
+    cadence: daily
+    domain: global
+    temporal:
+      start: 1993-01-01
+      end: null              # null = NRT / rolling
+    variables:
+      bottomT:
+        units: degrees_C
+        long_name: Sea water potential temperature at sea floor
+      mlotst:
+        units: m
+        long_name: Ocean mixed layer thickness defined by sigma theta
+      siconc:
+        units: '1'
+        long_name: Sea ice area fraction
+      sithick:
+        units: m
+        long_name: Sea ice thickness
+      so:
+        units: 1e-3
+        long_name: Sea water salinity
+      thetao:
+        units: degrees_C
+        long_name: Sea water potential temperature
+      uo:
+        units: m s-1
+        long_name: Eastward sea water velocity
+      usi:
+        units: m s-1
+        long_name: Eastward sea ice velocity
+      vo:
+        units: m s-1
+        long_name: Northward sea water velocity
+      vsi:
+        units: m s-1
+        long_name: Northward sea ice velocity
+      zos:
+        units: m
+        long_name: Sea surface height above geoid
+
+  cmems_mod_glo_phy_my_0.083deg_P1M-m:
+    product: GLOBAL_MULTIYEAR_PHY_001_030
+    title: Monthly mean fields for product GLOBAL_REANALYSIS_PHY_001_030
+    cadence: monthly
+    domain: global
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      bottomT:
+        units: degrees_C
+        long_name: Sea water potential temperature at sea floor
+      mlotst:
+        units: m
+        long_name: Ocean mixed layer thickness defined by sigma theta
+      siconc:
+        units: '1'
+        long_name: Sea ice area fraction
+      sithick:
+        units: m
+        long_name: Sea ice thickness
+      so:
+        units: 1e-3
+        long_name: Sea water salinity
+      thetao:
+        units: degrees_C
+        long_name: Sea water potential temperature
+      uo:
+        units: m s-1
+        long_name: Eastward sea water velocity
+      usi:
+        units: m s-1
+        long_name: Eastward sea ice velocity
+      vo:
+        units: m s-1
+        long_name: Northward sea water velocity
+      vsi:
+        units: m s-1
+        long_name: Northward sea ice velocity
+      zos:
+        units: m
+        long_name: Sea surface height above geoid
+
+  cmems_mod_glo_phy_my_0.083deg_static:
+    product: GLOBAL_MULTIYEAR_PHY_001_030
+    title: cmems_mod_glo_phy_my_0.083deg_static
+    cadence: irregular
+    domain: global
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      deptho:
+        units: m
+        long_name: Sea floor depth below geoid
+      deptho_lev:
+        units: '1'
+        long_name: Model level number at sea floor
+      mask:
+        units: '1'
+        long_name: Sea binary mask
+
+  cmems_obs-sdb_glo_phy_comp_my_100m-l4-s2_static:
+    product: BATHYMETRY_GLO_PHY_COASTAL_L4_MY_016_001
+    title: Provision of global coastal bathymetry derived from Sentinel 2 observations
+    cadence: irregular
+    domain: global
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      Quality_indicator:
+        units: ''
+        long_name: Quality flag
+      SDB_type:
+        units: ''
+        long_name: Sdb methodology
+      height:
+        units: m
+        long_name: Height
+
+  cmems_obs-sdb_glo_phy_irte_my_100m-l4-s2_static:
+    product: BATHYMETRY_GLO_PHY_COASTAL_L4_MY_016_001
+    title: Provision of global coastal bathymetry derived from Sentinel 2 observations
+    cadence: irregular
+    domain: global
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      Quality_indicator:
+        units: ''
+        long_name: Quality flag
+      SDB_type:
+        units: ''
+        long_name: Sdb methodology
+      height:
+        units: m
+        long_name: Height
+
+  cmems_obs-sdb_glo_phy_it_my_100m-l4-s2_static:
+    product: BATHYMETRY_GLO_PHY_COASTAL_L4_MY_016_001
+    title: Provision of global coastal bathymetry derived from Sentinel 2 observations
+    cadence: irregular
+    domain: global
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      Quality_indicator:
+        units: ''
+        long_name: Quality flag
+      SDB_type:
+        units: ''
+        long_name: Sdb methodology
+      height:
+        units: m
+        long_name: Height
+
+  cmems_obs-sdb_glo_phy_wk_my_100m-l4-s2_static:
+    product: BATHYMETRY_GLO_PHY_COASTAL_L4_MY_016_001
+    title: Provision of global coastal bathymetry derived from Sentinel 2 observations
+    cadence: irregular
+    domain: global
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      Quality_indicator:
+        units: ''
+        long_name: Quality flag
+      SDB_type:
+        units: ''
+        long_name: Sdb methodology
+      height:
+        units: m
+        long_name: Height
+
+  cmems_obs-wave_glo_phy-spc-fwk_nrt_multi-l4-1deg_PT3H-i:
+    product: WAVE_GLO_PHY_SPC-FWK_L4_NRT_014_004
+    title: NRT merged Global Ocean Gridded spectral parameters L4 product and derived variables
+    cadence: irregular
+    domain: global
+    temporal:
+      start: 2024-03-26
+      end: null              # null = NRT / rolling
+    variables:
+      VAVH_NBR_SW0:
+        units: '1'
+        long_name: Sea surface primary swell wave significant height number of observations
+      VAVH_NBR_SW1:
+        units: '1'
+        long_name: Sea surface secondary swell wave significant height number of observations
+      VAVH_NBR_SW2:
+        units: '1'
+        long_name: Sea surface tertiary swell wave significant height number of observations
+      VAVH_NBR_SW3:
+        units: '1'
+        long_name: Sea surface quaternary swell wave significant height number of observations
+      VAVH_NBR_SW4:
+        units: '1'
+        long_name: Sea surface quinary swell wave significant height number of observations
+      VAVH_SW0:
+        units: m
+        long_name: Sea surface primary swell wave significant height
+      VAVH_SW1:
+        units: m
+        long_name: Sea surface secondary swell wave significant height
+      VAVH_SW2:
+        units: m
+        long_name: Sea surface tertiary swell wave significant height
+      VAVH_SW3:
+        units: m
+        long_name: Sea surface quaternary swell wave significant height
+      VAVH_SW4:
+        units: m
+        long_name: Sea surface quinary swell wave significant height
+      VPED_NBR_SW0:
+        units: '1'
+        long_name: Sea surface primary swell wave from direction at variance spectral density maximum
+      VPED_NBR_SW1:
+        units: '1'
+        long_name: Sea surface secondary swell wave from direction at variance spectral density maximum
+      VPED_NBR_SW2:
+        units: '1'
+        long_name: Sea surface tertiary swell wave from direction at variance spectral density maximum
+      VPED_NBR_SW3:
+        units: '1'
+        long_name: Sea surface quaternary swell wave from direction at variance spectral density maximum
+      VPED_NBR_SW4:
+        units: '1'
+        long_name: Sea surface quinary swell wave from direction at variance spectral density maximum
+      VPED_SW0:
+        units: degree
+        long_name: Sea surface primary swell wave from direction at variance spectral density maximum
+      VPED_SW1:
+        units: degree
+        long_name: Sea surface secondary swell wave from direction at variance spectral density maximum
+      VPED_SW2:
+        units: degree
+        long_name: Sea surface tertiary swell wave from direction at variance spectral density maximum
+      VPED_SW3:
+        units: degree
+        long_name: Sea surface quaternary swell wave from direction at variance spectral density maximum
+      VPED_SW4:
+        units: degree
+        long_name: Sea surface quinary swell wave from direction at variance spectral density maximum
+      VTPK_NBR_SW0:
+        units: '1'
+        long_name: Sea surface primary swell wave period at variance spectral density maximum number
+      VTPK_NBR_SW1:
+        units: '1'
+        long_name: Sea surface secondary swell wave period at variance spectral density maximum number
+      VTPK_NBR_SW2:
+        units: '1'
+        long_name: Sea surface tertiary swell wave period at variance spectral density maximum number
+      VTPK_NBR_SW3:
+        units: '1'
+        long_name: Sea surface quaternary swell wave period at variance spectral density maximum number
+      VTPK_NBR_SW4:
+        units: '1'
+        long_name: Sea surface quinary swell wave period at variance spectral density maximum number
+      VTPK_SW0:
+        units: s
+        long_name: Sea surface primary swell wave period at variance spectral density maximum
+      VTPK_SW1:
+        units: s
+        long_name: Sea surface secondary swell wave period at variance spectral density maximum
+      VTPK_SW2:
+        units: s
+        long_name: Sea surface tertiary swell wave period at variance spectral density maximum
+      VTPK_SW3:
+        units: s
+        long_name: Sea surface quaternary swell wave period at variance spectral density maximum
+      VTPK_SW4:
+        units: s
+        long_name: Sea surface quinary swell wave period at variance spectral density maximum
+      storm_number_SW0:
+        units: '1'
+        long_name: Corresponding storm name index
+      storm_number_SW1:
+        units: '1'
+        long_name: Corresponding storm name index
+      storm_number_SW2:
+        units: '1'
+        long_name: Corresponding storm name index
+      storm_number_SW3:
+        units: '1'
+        long_name: Corresponding storm name index
+      storm_number_SW4:
+        units: '1'
+        long_name: Corresponding storm name index
+
+  cmems_obs-wave_glo_phy-swh_my_cfo-l3_PT1S:
+    product: WAVE_GLO_PHY_SWH_L3_MY_014_005
+    title: cmems_obs-wave_glo_phy-swh_my_cfo-l3_PT1S_202112
+    cadence: irregular
+    domain: global
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      VAVH:
+        units: m
+        long_name: Sea surface wave significant height
+      VAVH_UNFILTERED:
+        units: m
+        long_name: Sea surface wave significant height
+
+  cmems_obs-wave_glo_phy-swh_my_multi-l4-0.5deg_P1D-i:
+    product: WAVE_GLO_PHY_SWH_L4_MY_014_007
+    title: Multi-Year merged all satellites Global Ocean Gridded Significant Wave Height L4 product
+    cadence: daily
+    domain: global
+    temporal:
+      start: 2002-01-15
+      end: null              # null = NRT / rolling
+    variables:
+      VAVH_INST:
+        units: m
+        long_name: Sea surface wave significant height
+      VAVH_INST_FLAG:
+        units: '-'
+        long_name: Sea surface wave significant height flag
+
+  cmems_obs-wave_glo_phy-swh_my_multi-l4-2deg_P1D-m:
+    product: WAVE_GLO_PHY_SWH_L4_MY_014_007
+    title: Multi-Year merged all satellites Global Ocean Gridded Significant Wave Height L4 product
+    cadence: daily
+    domain: global
+    temporal:
+      start: 2002-01-15
+      end: null              # null = NRT / rolling
+    variables:
+      VAVH_DAILY_MAX:
+        units: m
+        long_name: Sea surface wave significant height
+      VAVH_DAILY_MEAN:
+        units: m
+        long_name: Sea surface wave significant height
+      VAVH_DAILY_NBR:
+        units: '1'
+        long_name: Sea surface wave significant height number of observations
+      VAVH_DAILY_STD:
+        units: m
+        long_name: Sea surface wave significant height
+
+  cmems_obs-wave_glo_phy-swh_nrt_al-l3-1km_PT0.2S-i:
+    product: WAVE_GLO_PHY_SWH_L3_NRT_014_001
+    title: cmems_obs-wave_glo_phy-swh_nrt_al-l3-1km_PT0.2S-i_202603
+    cadence: irregular
+    domain: global
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      VAVH:
+        units: m
+        long_name: Sea surface wave significant height
+      VAVH_UNFILTERED:
+        units: m
+        long_name: Sea surface wave significant height
+
+  cmems_obs-wave_glo_phy-swh_nrt_al-l3_PT1S:
+    product: WAVE_GLO_PHY_SWH_L3_NRT_014_001
+    title: cmems_obs-wave_glo_phy-swh_nrt_al-l3_PT1S_202211
+    cadence: irregular
+    domain: global
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      VAVH:
+        units: m
+        long_name: Sea surface wave significant height
+      VAVH_UNFILTERED:
+        units: m
+        long_name: Sea surface wave significant height
+      WIND_SPEED:
+        units: m s-1
+        long_name: Wind speed
+
+  cmems_obs-wave_glo_phy-swh_nrt_c2-l3-1km_PT0.2S-i:
+    product: WAVE_GLO_PHY_SWH_L3_NRT_014_001
+    title: cmems_obs-wave_glo_phy-swh_nrt_c2-l3-1km_PT0.2S-i_202603
+    cadence: irregular
+    domain: global
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      VAVH:
+        units: m
+        long_name: Sea surface wave significant height
+      VAVH_UNFILTERED:
+        units: m
+        long_name: Sea surface wave significant height
+
+  cmems_obs-wave_glo_phy-swh_nrt_c2-l3_PT1S:
+    product: WAVE_GLO_PHY_SWH_L3_NRT_014_001
+    title: cmems_obs-wave_glo_phy-swh_nrt_c2-l3_PT1S_202211
+    cadence: irregular
+    domain: global
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      VAVH:
+        units: m
+        long_name: Sea surface wave significant height
+      VAVH_UNFILTERED:
+        units: m
+        long_name: Sea surface wave significant height
+      WIND_SPEED:
+        units: m s-1
+        long_name: Wind speed
+
+  cmems_obs-wave_glo_phy-swh_nrt_cfo-l3_PT1S:
+    product: WAVE_GLO_PHY_SWH_L3_NRT_014_001
+    title: cmems_obs-wave_glo_phy-swh_nrt_cfo-l3_PT1S_202211
+    cadence: irregular
+    domain: global
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      VAVH:
+        units: m
+        long_name: Sea surface wave significant height
+      VAVH_UNFILTERED:
+        units: m
+        long_name: Sea surface wave significant height
+      WIND_SPEED:
+        units: m s-1
+        long_name: Wind speed
+
+  cmems_obs-wave_glo_phy-swh_nrt_h2b-l3_PT1S:
+    product: WAVE_GLO_PHY_SWH_L3_NRT_014_001
+    title: cmems_obs-wave_glo_phy-swh_nrt_h2b-l3_PT1S_202211
+    cadence: irregular
+    domain: global
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      VAVH:
+        units: m
+        long_name: Sea surface wave significant height
+      VAVH_UNFILTERED:
+        units: m
+        long_name: Sea surface wave significant height
+      WIND_SPEED:
+        units: m s-1
+        long_name: Wind speed
+
+  cmems_obs-wave_glo_phy-swh_nrt_h2c-l3_PT1S:
+    product: WAVE_GLO_PHY_SWH_L3_NRT_014_001
+    title: cmems_obs-wave_glo_phy-swh_nrt_h2c-l3_PT1S_202211
+    cadence: irregular
+    domain: global
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      VAVH:
+        units: m
+        long_name: Sea surface wave significant height
+      VAVH_UNFILTERED:
+        units: m
+        long_name: Sea surface wave significant height
+      WIND_SPEED:
+        units: m s-1
+        long_name: Wind speed
+
+  cmems_obs-wave_glo_phy-swh_nrt_j3-l3-1km_PT0.2S-i:
+    product: WAVE_GLO_PHY_SWH_L3_NRT_014_001
+    title: cmems_obs-wave_glo_phy-swh_nrt_j3-l3-1km_PT0.2S-i_202603
+    cadence: irregular
+    domain: global
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      VAVH:
+        units: m
+        long_name: Sea surface wave significant height
+      VAVH_UNFILTERED:
+        units: m
+        long_name: Sea surface wave significant height
+
+  cmems_obs-wave_glo_phy-swh_nrt_j3-l3_PT1S:
+    product: WAVE_GLO_PHY_SWH_L3_NRT_014_001
+    title: cmems_obs-wave_glo_phy-swh_nrt_j3-l3_PT1S_202211
+    cadence: irregular
+    domain: global
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      VAVH:
+        units: m
+        long_name: Sea surface wave significant height
+      VAVH_UNFILTERED:
+        units: m
+        long_name: Sea surface wave significant height
+      WIND_SPEED:
+        units: m s-1
+        long_name: Wind speed
+
+  cmems_obs-wave_glo_phy-swh_nrt_multi-l4-2deg_P1D-i:
+    product: WAVE_GLO_PHY_SWH_L4_NRT_014_003
+    title: Near-Real Time merged all satellites Global Ocean Gridded Significant Wave Height
+    cadence: daily
+    domain: global
+    temporal:
+      start: 2021-01-01
+      end: null              # null = NRT / rolling
+    variables:
+      VAVH_INST:
+        units: m
+        long_name: Sea surface wave significant height
+      VAVH_INST_FLAG:
+        units: '-'
+        long_name: Sea surface wave significant height flag
+
+  cmems_obs-wave_glo_phy-swh_nrt_multi-l4-2deg_P1D-m:
+    product: WAVE_GLO_PHY_SWH_L4_NRT_014_003
+    title: Near-Real Time merged all satellites Global Ocean Gridded Significant Wave Height
+    cadence: daily
+    domain: global
+    temporal:
+      start: 2021-01-01
+      end: null              # null = NRT / rolling
+    variables:
+      VAVH_DAILY_MAX:
+        units: m
+        long_name: Sea surface wave significant height
+      VAVH_DAILY_MEAN:
+        units: m
+        long_name: Sea surface wave significant height
+      VAVH_DAILY_NBR:
+        units: '1'
+        long_name: Sea surface wave significant height number of observations
+      VAVH_DAILY_STD:
+        units: m
+        long_name: Sea surface wave significant height
+
+  cmems_obs-wave_glo_phy-swh_nrt_s3a-l3-1km_PT0.2S-i:
+    product: WAVE_GLO_PHY_SWH_L3_NRT_014_001
+    title: cmems_obs-wave_glo_phy-swh_nrt_s3a-l3-1km_PT0.2S-i_202603
+    cadence: irregular
+    domain: global
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      VAVH:
+        units: m
+        long_name: Sea surface wave significant height
+      VAVH_UNFILTERED:
+        units: m
+        long_name: Sea surface wave significant height
+
+  cmems_obs-wave_glo_phy-swh_nrt_s3a-l3_PT1S:
+    product: WAVE_GLO_PHY_SWH_L3_NRT_014_001
+    title: cmems_obs-wave_glo_phy-swh_nrt_s3a-l3_PT1S_202211
+    cadence: irregular
+    domain: global
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      VAVH:
+        units: m
+        long_name: Sea surface wave significant height
+      VAVH_UNFILTERED:
+        units: m
+        long_name: Sea surface wave significant height
+      WIND_SPEED:
+        units: m s-1
+        long_name: Wind speed
+
+  cmems_obs-wave_glo_phy-swh_nrt_s3b-l3-1km_PT0.2S-i:
+    product: WAVE_GLO_PHY_SWH_L3_NRT_014_001
+    title: cmems_obs-wave_glo_phy-swh_nrt_s3b-l3-1km_PT0.2S-i_202603
+    cadence: irregular
+    domain: global
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      VAVH:
+        units: m
+        long_name: Sea surface wave significant height
+      VAVH_UNFILTERED:
+        units: m
+        long_name: Sea surface wave significant height
+
+  cmems_obs-wave_glo_phy-swh_nrt_s3b-l3_PT1S:
+    product: WAVE_GLO_PHY_SWH_L3_NRT_014_001
+    title: cmems_obs-wave_glo_phy-swh_nrt_s3b-l3_PT1S_202211
+    cadence: irregular
+    domain: global
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      VAVH:
+        units: m
+        long_name: Sea surface wave significant height
+      VAVH_UNFILTERED:
+        units: m
+        long_name: Sea surface wave significant height
+      WIND_SPEED:
+        units: m s-1
+        long_name: Wind speed
+
+  cmems_obs-wave_glo_phy-swh_nrt_s6a-l3-1km_PT0.2S-i:
+    product: WAVE_GLO_PHY_SWH_L3_NRT_014_001
+    title: cmems_obs-wave_glo_phy-swh_nrt_s6a-l3-1km_PT0.2S-i_202603
+    cadence: irregular
+    domain: global
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      VAVH:
+        units: m
+        long_name: Sea surface wave significant height
+      VAVH_UNFILTERED:
+        units: m
+        long_name: Sea surface wave significant height
+
+  cmems_obs-wave_glo_phy-swh_nrt_s6a-l3_PT1S:
+    product: WAVE_GLO_PHY_SWH_L3_NRT_014_001
+    title: cmems_obs-wave_glo_phy-swh_nrt_s6a-l3_PT1S_202211
+    cadence: irregular
+    domain: global
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      VAVH:
+        units: m
+        long_name: Sea surface wave significant height
+      VAVH_UNFILTERED:
+        units: m
+        long_name: Sea surface wave significant height
+      WIND_SPEED:
+        units: m s-1
+        long_name: Wind speed
+
+  cmems_obs-wave_glo_phy-swh_nrt_swon-l3_PT1S:
+    product: WAVE_GLO_PHY_SWH_L3_NRT_014_001
+    title: cmems_obs-wave_glo_phy-swh_nrt_swon-l3_PT1S_202311
+    cadence: irregular
+    domain: global
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      VAVH:
+        units: m
+        long_name: Sea surface wave significant height
+      VAVH_UNFILTERED:
+        units: m
+        long_name: Sea surface wave significant height
+      WIND_SPEED:
+        units: m s-1
+        long_name: Wind speed

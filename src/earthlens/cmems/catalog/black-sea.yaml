@@ -1,0 +1,2111 @@
+# CMEMS curated catalog - black-sea slice.
+#
+# One slice of the per-domain split of the Copernicus Marine catalog.
+# The loader (earthlens.cmems.catalog.Catalog) merges every *.yaml in
+# this directory into one Catalog at construction time; dataset ids
+# must be unique across files. Stanzas are emitted by
+# tools/cmems/refresh_cmems_catalog.py from copernicusmarine.describe();
+# `cadence` is inferred from the dataset_id suffix, `domain` from the
+# product_id prefix, and `temporal.start` is read from the dataset's
+# arco time-coordinate bounds. `end` is left null (the arco max is
+# "latest available today" and would go stale for rolling products).
+# Where the toolbox exposes no standard_name for a variable, the row
+# carries `long_name: ''` with a TODO marker.
+#
+# Schema (per dataset):
+#   <dataset_id>:
+#     product: <product_id>
+#     title: <human-readable title>
+#     cadence: <daily|monthly|hourly|6hourly|climatology|irregular>
+#     domain: <global|mediterranean|arctic|...>
+#     temporal: { start: YYYY-MM-DD, end: YYYY-MM-DD }   # end null = NRT
+#     variables:
+#       <short_name>: { units: <CF units>, long_name: <CF long name> }
+
+datasets:
+
+  SST_BS_SSTA_L4_NRT_OBSERVATIONS_010_006_b:
+    product: SST_BS_SST_L4_NRT_OBSERVATIONS_010_006
+    title: Black Sea SST Anomaly, L4, 1/16deg daily (SST_BS_SSTA_L4_NRT_OBSERVATIONS_010_006_b)
+    cadence: irregular
+    domain: black-sea
+    temporal:
+      start: 2022-05-15
+      end: null              # null = NRT / rolling
+    variables:
+      sst_anomaly:
+        units: Celsius
+        long_name: Sea surface temperature anomaly
+
+  SST_BS_SSTA_L4_NRT_OBSERVATIONS_010_006_d:
+    product: SST_BS_SST_L4_NRT_OBSERVATIONS_010_006
+    title: Black Sea SST Anomaly, L4, 1km daily (SST_BS_SSTA_L4_NRT_OBSERVATIONS_010_006_d)
+    cadence: irregular
+    domain: black-sea
+    temporal:
+      start: 2022-04-05
+      end: null              # null = NRT / rolling
+    variables:
+      sst_anomaly:
+        units: Celsius
+        long_name: Sea surface temperature anomaly
+
+  SST_BS_SST_L3S_NRT_OBSERVATIONS_010_013_a:
+    product: SST_BS_SST_L3S_NRT_OBSERVATIONS_010_013
+    title: Black Sea SST, L3S, 1/16deg daily (SST_BS_SST_L3S_NRT_OBSERVATIONS_010_013_a)
+    cadence: irregular
+    domain: black-sea
+    temporal:
+      start: 2008-01-01
+      end: null              # null = NRT / rolling
+    variables:
+      adjusted_sea_surface_temperature:
+        units: kelvin
+        long_name: Sea surface foundation temperature
+      adjusted_standard_deviation_error:
+        units: kelvin
+        long_name: ''            # TODO: standard_name missing on describe()
+      bias_to_reference_sst:
+        units: kelvin
+        long_name: ''            # TODO: standard_name missing on describe()
+      l2p_flags:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      or_latitude:
+        units: degrees_north
+        long_name: Latitude
+      or_longitude:
+        units: degree_east
+        long_name: Longitude
+      or_number_of_pixels:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      quality_level:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      sea_surface_temperature:
+        units: kelvin
+        long_name: Sea surface foundation temperature
+      sources_of_sst:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      sses_bias:
+        units: kelvin
+        long_name: ''            # TODO: standard_name missing on describe()
+      sses_standard_deviation:
+        units: kelvin
+        long_name: ''            # TODO: standard_name missing on describe()
+      sst_dtime:
+        units: seconds
+        long_name: ''            # TODO: standard_name missing on describe()
+      standard_deviation_to_reference_sst:
+        units: kelvin
+        long_name: ''            # TODO: standard_name missing on describe()
+      sum_square_sst:
+        units: kelvin^2
+        long_name: ''            # TODO: standard_name missing on describe()
+      sum_sst:
+        units: kelvin
+        long_name: ''            # TODO: standard_name missing on describe()
+      wind_speed:
+        units: m s-1
+        long_name: Wind speed
+
+  SST_BS_SST_L3S_NRT_OBSERVATIONS_010_013_b:
+    product: SST_BS_SST_L3S_NRT_OBSERVATIONS_010_013
+    title: Black Sea SST, L3S, 1km daily (SST_BS_SST_L3S_NRT_OBSERVATIONS_010_013_b)
+    cadence: irregular
+    domain: black-sea
+    temporal:
+      start: 2008-01-01
+      end: null              # null = NRT / rolling
+    variables:
+      adjusted_sea_surface_temperature:
+        units: kelvin
+        long_name: Sea surface foundation temperature
+      adjusted_standard_deviation_error:
+        units: kelvin
+        long_name: ''            # TODO: standard_name missing on describe()
+      bias_to_reference_sst:
+        units: kelvin
+        long_name: ''            # TODO: standard_name missing on describe()
+      l2p_flags:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      or_latitude:
+        units: degrees_north
+        long_name: Latitude
+      or_longitude:
+        units: degree_east
+        long_name: Longitude
+      or_number_of_pixels:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      quality_level:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      sea_surface_temperature:
+        units: kelvin
+        long_name: Sea surface foundation temperature
+      sources_of_sst:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      sses_bias:
+        units: kelvin
+        long_name: ''            # TODO: standard_name missing on describe()
+      sses_standard_deviation:
+        units: kelvin
+        long_name: ''            # TODO: standard_name missing on describe()
+      sst_dtime:
+        units: seconds
+        long_name: ''            # TODO: standard_name missing on describe()
+      standard_deviation_to_reference_sst:
+        units: kelvin
+        long_name: ''            # TODO: standard_name missing on describe()
+      sum_square_sst:
+        units: kelvin^2
+        long_name: ''            # TODO: standard_name missing on describe()
+      sum_sst:
+        units: kelvin
+        long_name: ''            # TODO: standard_name missing on describe()
+      wind_speed:
+        units: m s-1
+        long_name: Wind speed
+
+  SST_BS_SST_L4_NRT_OBSERVATIONS_010_006_a_V2:
+    product: SST_BS_SST_L4_NRT_OBSERVATIONS_010_006
+    title: Black Sea SST Analysis, L4, 1/16deg daily
+    cadence: irregular
+    domain: black-sea
+    temporal:
+      start: 2008-01-01
+      end: null              # null = NRT / rolling
+    variables:
+      analysed_sst:
+        units: kelvin
+        long_name: Sea surface foundation temperature
+      analysis_error:
+        units: kelvin
+        long_name: ''            # TODO: standard_name missing on describe()
+      mask:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      sea_ice_fraction:
+        units: '1'
+        long_name: Sea ice area fraction
+
+  SST_BS_SST_L4_NRT_OBSERVATIONS_010_006_c_V2:
+    product: SST_BS_SST_L4_NRT_OBSERVATIONS_010_006
+    title: Black Sea SST Analysis, L4, 1km daily (SST_BS_SST_L4_NRT_OBSERVATIONS_010_006_c_V2)
+    cadence: irregular
+    domain: black-sea
+    temporal:
+      start: 2008-01-01
+      end: null              # null = NRT / rolling
+    variables:
+      analysed_sst:
+        units: kelvin
+        long_name: Sea surface foundation temperature
+      analysis_error:
+        units: kelvin
+        long_name: ''            # TODO: standard_name missing on describe()
+      mask:
+        units: ''
+        long_name: ''            # TODO: standard_name missing on describe()
+      sea_ice_fraction:
+        units: '1'
+        long_name: Sea ice area fraction
+
+  blksea_omi_health_oxygen_trend_annual:
+    product: BLKSEA_OMI_HEALTH_oxygen_trend
+    title: Black Sea Oxygen Trend from Observations Reprocessing
+    cadence: irregular
+    domain: black-sea
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      oxygen_inventory_mean:
+        units: mol/m2
+        long_name: Ocean mole content of dissolved molecular oxygen
+      oxygen_inventory_std:
+        units: mol/m2
+        long_name: Ocean mole content of dissolved molecular oxygen
+      oxygen_penetration_density_mean:
+        units: kg/m3
+        long_name: Sea water sigma theta defined by mole concentration of dissolved molecular oxygen
+      oxygen_penetration_density_std:
+        units: kg/m3
+        long_name: Sea water sigma theta defined by mole concentration of dissolved molecular oxygen
+      oxygen_penetration_depth_mean:
+        units: m
+        long_name: Ocean layer thickness defined by mole concentration of dissolved molecular oxygen
+      oxygen_penetration_depth_std:
+        units: m
+        long_name: Ocean layer thickness defined by mole concentration of dissolved molecular oxygen
+
+  blksea_omi_seastate_extreme_var_swh_mean_and_anomaly:
+    product: BLKSEA_OMI_SEASTATE_extreme_var_swh_mean_and_anomaly
+    title: Extremes variability in European Seas
+    cadence: irregular
+    domain: black-sea
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      swh_percentile99_anom:
+        units: m
+        long_name: Sea surface wave significant height
+      swh_percentile99_mean:
+        units: m
+        long_name: Sea surface wave significant height
+
+  blksea_omi_tempsal_extreme_var_temp_mean_and_anomaly:
+    product: BLKSEA_OMI_TEMPSAL_extreme_var_temp_mean_and_anomaly
+    title: Extremes variability in European Seas
+    cadence: irregular
+    domain: black-sea
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      temp_percentile99_anom:
+        units: degree_C
+        long_name: Sea water temperature
+      temp_percentile99_mean:
+        units: degree_C
+        long_name: Sea water temperature
+
+  blksea_omi_tempsal_sst_area_averaged_anomalies:
+    product: BLKSEA_OMI_TEMPSAL_sst_area_averaged_anomalies
+    title: Area Averaged Sea Surface Temperature Anomaly
+    cadence: irregular
+    domain: black-sea
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      sst_anomaly:
+        units: degrees C
+        long_name: Sea surface temperature
+      sst_anomaly_filtered:
+        units: degrees C
+        long_name: Sea surface temperature
+
+  blksea_omi_tempsal_sst_trend:
+    product: BLKSEA_OMI_TEMPSAL_sst_trend
+    title: Cumulative Sea Surface Temperature Trend
+    cadence: irregular
+    domain: black-sea
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      sst_trend:
+        units: C/year
+        long_name: Change over time in sea surface temperature
+      sst_trend_significance:
+        units: Boolean
+        long_name: Sea surface temperature trend significance
+
+  cmems_SST_BS_SST_L4_REP_OBSERVATIONS_010_022:
+    product: SST_BS_SST_L4_REP_OBSERVATIONS_010_022
+    title: Black Sea SST Analysis L4, Reprocessed using ESA CCI SST v.3.0 and PFV53 data, 0.05
+    cadence: irregular
+    domain: black-sea
+    temporal:
+      start: 1982-01-01
+      end: null              # null = NRT / rolling
+    variables:
+      analysed_sst:
+        units: kelvin
+        long_name: Sea surface temperature
+      analysis_error:
+        units: kelvin
+        long_name: ''            # TODO: standard_name missing on describe()
+      mask:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      sea_ice_fraction:
+        units: '1'
+        long_name: Sea ice area fraction
+
+  cmems_mod_blk_bgc-bio_my_2.5km_P1D-m:
+    product: BLKSEA_MULTIYEAR_BGC_007_005
+    title: Net Primary Production, Dissolved Oxygen (3D), Bottom Dissolved Oxygen (2D) - Daily
+    cadence: daily
+    domain: black-sea
+    temporal:
+      start: 1992-01-02
+      end: null              # null = NRT / rolling
+    variables:
+      nppv:
+        units: mg m-3 day-1
+        long_name: Net primary production of biomass expressed as carbon per unit volume in sea water
+      o2:
+        units: mmol m-3
+        long_name: Mole concentration of dissolved molecular oxygen in sea water
+      o2b:
+        units: mmol m-3
+        long_name: Mole concentration of dissolved molecular oxygen in sea water
+
+  cmems_mod_blk_bgc-bio_my_2.5km_P1M-m:
+    product: BLKSEA_MULTIYEAR_BGC_007_005
+    title: Net Primary Production, Dissolved Oxygen (3D), Bottom Dissolved Oxygen (2D) - Monthly
+    cadence: monthly
+    domain: black-sea
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      nppv:
+        units: mg m-3 day-1
+        long_name: Net primary production of biomass expressed as carbon per unit volume in sea water
+      o2:
+        units: mmol m-3
+        long_name: Mole concentration of dissolved molecular oxygen in sea water
+      o2b:
+        units: mmol m-3
+        long_name: Mole concentration of dissolved molecular oxygen in sea water
+
+  cmems_mod_blk_bgc-bio_my_2.5km_P1Y-m:
+    product: BLKSEA_MULTIYEAR_BGC_007_005
+    title: Net Primary Production, Dissolved Oxygen (3D), Bottom Dissolved Oxygen (2D) - Yearly
+    cadence: annual
+    domain: black-sea
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      nppv:
+        units: mg m-3 day-1
+        long_name: Net primary production of biomass expressed as carbon per unit volume in sea water
+      o2:
+        units: mmol m-3
+        long_name: Mole concentration of dissolved molecular oxygen in sea water
+      o2b:
+        units: mmol m-3
+        long_name: Mole concentration of dissolved molecular oxygen in sea water
+
+  cmems_mod_blk_bgc-bio_my_2.5km_climatology_P1M-m:
+    product: BLKSEA_MULTIYEAR_BGC_007_005
+    title: Net Primary Production, Dissolved Oxygen (3D), Bottom Dissolved Oxygen (2D) - Climatology
+    cadence: monthly
+    domain: black-sea
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      climatology_bounds:
+        units: seconds since 1900-01-01
+        long_name: ''            # TODO: standard_name missing on describe()
+      nppv:
+        units: mg m-3 day-1
+        long_name: Net primary production of biomass expressed as carbon per unit volume in sea water
+      o2:
+        units: mmol m-3
+        long_name: Mole concentration of dissolved molecular oxygen in sea water
+      o2b:
+        units: mmol m-3
+        long_name: Mole concentration of dissolved molecular oxygen in sea water
+
+  cmems_mod_blk_bgc-car_anfc_2.5km_P1D-m:
+    product: BLKSEA_ANALYSISFORECAST_BGC_007_010
+    title: Dissolved Inorganic Carbon, Alkalinity, pH (3D) - Daily Mean
+    cadence: daily
+    domain: black-sea
+    temporal:
+      start: 2024-04-02
+      end: null              # null = NRT / rolling
+    variables:
+      dissic:
+        units: mol m-3
+        long_name: Mole concentration of dissolved inorganic carbon in sea water
+      ph:
+        units: '1'
+        long_name: Sea water ph reported on total scale
+      talk:
+        units: mol m-3
+        long_name: Sea water alkalinity expressed as mole equivalent
+
+  cmems_mod_blk_bgc-car_anfc_2.5km_P1M-m:
+    product: BLKSEA_ANALYSISFORECAST_BGC_007_010
+    title: Dissolved Inorganic Carbon, Alkalinity, pH (3D) - Monthly Mean
+    cadence: monthly
+    domain: black-sea
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      dissic:
+        units: mol m-3
+        long_name: Mole concentration of dissolved inorganic carbon in sea water
+      ph:
+        units: '1'
+        long_name: Sea water ph reported on total scale
+      talk:
+        units: mol m-3
+        long_name: Sea water alkalinity expressed as mole equivalent
+
+  cmems_mod_blk_bgc-car_my_2.5km_P1D-m:
+    product: BLKSEA_MULTIYEAR_BGC_007_005
+    title: Dissolved Inorganic Carbon, Alkalinity, pH (3D) - Daily Mean
+    cadence: daily
+    domain: black-sea
+    temporal:
+      start: 1992-01-02
+      end: null              # null = NRT / rolling
+    variables:
+      dissic:
+        units: mol m-3
+        long_name: Mole concentration of dissolved inorganic carbon in sea water
+      ph:
+        units: '1'
+        long_name: Sea water ph reported on total scale
+      talk:
+        units: mol m-3
+        long_name: Sea water alkalinity expressed as mole equivalent
+
+  cmems_mod_blk_bgc-car_my_2.5km_P1M-m:
+    product: BLKSEA_MULTIYEAR_BGC_007_005
+    title: Dissolved Inorganic Carbon, Alkalinity, pH (3D) - Monthly Mean
+    cadence: monthly
+    domain: black-sea
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      dissic:
+        units: mol m-3
+        long_name: Mole concentration of dissolved inorganic carbon in sea water
+      ph:
+        units: '1'
+        long_name: Sea water ph reported on total scale
+      talk:
+        units: mol m-3
+        long_name: Sea water alkalinity expressed as mole equivalent
+
+  cmems_mod_blk_bgc-car_my_2.5km_P1Y-m:
+    product: BLKSEA_MULTIYEAR_BGC_007_005
+    title: Dissolved Inorganic Carbon, Alkalinity, pH (3D) - Yearly Mean
+    cadence: annual
+    domain: black-sea
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      dissic:
+        units: mol m-3
+        long_name: Mole concentration of dissolved inorganic carbon in sea water
+      ph:
+        units: '1'
+        long_name: Sea water ph reported on total scale
+      talk:
+        units: mol m-3
+        long_name: Sea water alkalinity expressed as mole equivalent
+
+  cmems_mod_blk_bgc-car_my_2.5km_climatology_P1M-m:
+    product: BLKSEA_MULTIYEAR_BGC_007_005
+    title: Dissolved Inorganic Carbon, Alkalinity, pH (3D) - Climatology Mean
+    cadence: monthly
+    domain: black-sea
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      climatology_bounds:
+        units: seconds since 1900-01-01
+        long_name: ''            # TODO: standard_name missing on describe()
+      dissic:
+        units: mol m-3
+        long_name: Mole concentration of dissolved inorganic carbon in sea water
+      ph:
+        units: '1'
+        long_name: Sea water ph reported on total scale
+      talk:
+        units: mol m-3
+        long_name: Sea water alkalinity expressed as mole equivalent
+
+  cmems_mod_blk_bgc-co2_anfc_2.5km_P1D-m:
+    product: BLKSEA_ANALYSISFORECAST_BGC_007_010
+    title: Surface partial pressure of CO2 and Surface CO2 flux (2D) - Daily Mean
+    cadence: daily
+    domain: black-sea
+    temporal:
+      start: 2024-04-10
+      end: null              # null = NRT / rolling
+    variables:
+      fpco2:
+        units: kg m-2 s-1
+        long_name: Surface downward mass flux of carbon dioxide expressed as carbon
+      spco2:
+        units: Pa
+        long_name: Surface partial pressure of carbon dioxide in sea water
+
+  cmems_mod_blk_bgc-co2_anfc_2.5km_P1M-m:
+    product: BLKSEA_ANALYSISFORECAST_BGC_007_010
+    title: Surface partial pressure of CO2 and Surface CO2 flux (2D) - Monthly Mean
+    cadence: monthly
+    domain: black-sea
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      fpco2:
+        units: kg m-2 s-1
+        long_name: Surface downward mass flux of carbon dioxide expressed as carbon
+      spco2:
+        units: Pa
+        long_name: Surface partial pressure of carbon dioxide in sea water
+
+  cmems_mod_blk_bgc-co2_anfc_2.5km_PT1H-m:
+    product: BLKSEA_ANALYSISFORECAST_BGC_007_010
+    title: Surface partial pressure of CO2 and Surface CO2 flux (2D) - Hourly Mean
+    cadence: hourly
+    domain: black-sea
+    temporal:
+      start: 2024-03-31
+      end: null              # null = NRT / rolling
+    variables:
+      fpco2:
+        units: kg m-2 s-1
+        long_name: Surface downward mass flux of carbon dioxide expressed as carbon
+      spco2:
+        units: Pa
+        long_name: Surface partial pressure of carbon dioxide in sea water
+
+  cmems_mod_blk_bgc-co2_my_2.5km_P1D-m:
+    product: BLKSEA_MULTIYEAR_BGC_007_005
+    title: Surface partial pressure of CO2 and Surface CO2 flux (2D) - Daily Mean
+    cadence: daily
+    domain: black-sea
+    temporal:
+      start: 1992-01-02
+      end: null              # null = NRT / rolling
+    variables:
+      fpco2:
+        units: kg m-2 s-1
+        long_name: Surface downward mass flux of carbon dioxide expressed as carbon
+      spco2:
+        units: Pa
+        long_name: Surface partial pressure of carbon dioxide in sea water
+
+  cmems_mod_blk_bgc-co2_my_2.5km_P1M-m:
+    product: BLKSEA_MULTIYEAR_BGC_007_005
+    title: Surface partial pressure of CO2 and Surface CO2 flux (2D) - Monthly Mean
+    cadence: monthly
+    domain: black-sea
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      fpco2:
+        units: kg m-2 s-1
+        long_name: Surface downward mass flux of carbon dioxide expressed as carbon
+      spco2:
+        units: Pa
+        long_name: Surface partial pressure of carbon dioxide in sea water
+
+  cmems_mod_blk_bgc-co2_my_2.5km_P1Y-m:
+    product: BLKSEA_MULTIYEAR_BGC_007_005
+    title: Surface partial pressure of CO2 and Surface CO2 flux (2D) - Yearly Mean
+    cadence: annual
+    domain: black-sea
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      fpco2:
+        units: kg m-2 s-1
+        long_name: Surface downward mass flux of carbon dioxide expressed as carbon
+      spco2:
+        units: Pa
+        long_name: Surface partial pressure of carbon dioxide in sea water
+
+  cmems_mod_blk_bgc-co2_my_2.5km_climatology_P1M-m:
+    product: BLKSEA_MULTIYEAR_BGC_007_005
+    title: Surface partial pressure of CO2 and Surface CO2 flux (2D) - Climatology Mean
+    cadence: monthly
+    domain: black-sea
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      climatology_bounds:
+        units: seconds since 1900-01-01
+        long_name: ''            # TODO: standard_name missing on describe()
+      fpco2:
+        units: kg m-2 s-1
+        long_name: Surface downward mass flux of carbon dioxide expressed as carbon
+      spco2:
+        units: Pa
+        long_name: Surface partial pressure of carbon dioxide in sea water
+
+  cmems_mod_blk_bgc-nut_anfc_2.5km_P1D-m:
+    product: BLKSEA_ANALYSISFORECAST_BGC_007_010
+    title: Nitrate and Phosphate (3D) - Daily Mean
+    cadence: daily
+    domain: black-sea
+    temporal:
+      start: 2024-04-02
+      end: null              # null = NRT / rolling
+    variables:
+      no3:
+        units: mmol m-3
+        long_name: Mole concentration of nitrate in sea water
+      odu:
+        units: mmol m-3
+        long_name: Mole concentration of oxygen demand units in sea water
+      po4:
+        units: mmol m-3
+        long_name: Mole concentration of phosphate in sea water
+
+  cmems_mod_blk_bgc-nut_anfc_2.5km_P1M-m:
+    product: BLKSEA_ANALYSISFORECAST_BGC_007_010
+    title: Nitrate and Phosphate (3D) - Monthly Mean
+    cadence: monthly
+    domain: black-sea
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      no3:
+        units: mmol m-3
+        long_name: Mole concentration of nitrate in sea water
+      odu:
+        units: mmol m-3
+        long_name: Mole concentration of oxygen demand units in sea water
+      po4:
+        units: mmol m-3
+        long_name: Mole concentration of phosphate in sea water
+
+  cmems_mod_blk_bgc-nut_my_2.5km_P1D-m:
+    product: BLKSEA_MULTIYEAR_BGC_007_005
+    title: Nitrate and Phosphate (3D) - Daily Mean
+    cadence: daily
+    domain: black-sea
+    temporal:
+      start: 1992-01-02
+      end: null              # null = NRT / rolling
+    variables:
+      no3:
+        units: mmol m-3
+        long_name: Mole concentration of nitrate in sea water
+      po4:
+        units: mmol m-3
+        long_name: Mole concentration of phosphate in sea water
+
+  cmems_mod_blk_bgc-nut_my_2.5km_P1M-m:
+    product: BLKSEA_MULTIYEAR_BGC_007_005
+    title: Nitrate and Phosphate (3D) - Monthly Mean
+    cadence: monthly
+    domain: black-sea
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      no3:
+        units: mmol m-3
+        long_name: Mole concentration of nitrate in sea water
+      po4:
+        units: mmol m-3
+        long_name: Mole concentration of phosphate in sea water
+
+  cmems_mod_blk_bgc-nut_my_2.5km_P1Y-m:
+    product: BLKSEA_MULTIYEAR_BGC_007_005
+    title: Nitrate and Phosphate (3D) - Yearly Mean
+    cadence: annual
+    domain: black-sea
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      no3:
+        units: mmol m-3
+        long_name: Mole concentration of nitrate in sea water
+      po4:
+        units: mmol m-3
+        long_name: Mole concentration of phosphate in sea water
+
+  cmems_mod_blk_bgc-nut_my_2.5km_climatology_P1M-m:
+    product: BLKSEA_MULTIYEAR_BGC_007_005
+    title: Nitrate and Phosphate (3D) - Climatology Mean
+    cadence: monthly
+    domain: black-sea
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      climatology_bounds:
+        units: seconds since 1900-01-01
+        long_name: ''            # TODO: standard_name missing on describe()
+      no3:
+        units: mmol m-3
+        long_name: Mole concentration of nitrate in sea water
+      po4:
+        units: mmol m-3
+        long_name: Mole concentration of phosphate in sea water
+
+  cmems_mod_blk_bgc-optics_anfc_2.5km_P1D-m:
+    product: BLKSEA_ANALYSISFORECAST_BGC_007_010
+    title: Photosynthetical-Active Radiation and Attenuation coefficient (3D) - Daily Mean
+    cadence: daily
+    domain: black-sea
+    temporal:
+      start: 2024-04-02
+      end: null              # null = NRT / rolling
+    variables:
+      kd:
+        units: m-1
+        long_name: Volume attenuation coefficient of downwelling radiative flux in sea water
+      lght:
+        units: W m-2
+        long_name: Downwelling photosynthetic photon flux in sea water
+
+  cmems_mod_blk_bgc-optics_anfc_2.5km_P1M-m:
+    product: BLKSEA_ANALYSISFORECAST_BGC_007_010
+    title: Photosynthetical-Active Radiation and Attenuation coefficient (3D) - Monthly Mean
+    cadence: monthly
+    domain: black-sea
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      kd:
+        units: m-1
+        long_name: Volume attenuation coefficient of downwelling radiative flux in sea water
+      lght:
+        units: W m-2
+        long_name: Downwelling photosynthetic photon flux in sea water
+
+  cmems_mod_blk_bgc-pft_anfc_2.5km_P1D-m:
+    product: BLKSEA_ANALYSISFORECAST_BGC_007_010
+    title: Phytoplankton Carbon Biomass and Chlorophyll (3D) - Daily Mean
+    cadence: daily
+    domain: black-sea
+    temporal:
+      start: 2024-04-02
+      end: null              # null = NRT / rolling
+    variables:
+      chl:
+        units: mg m-3
+        long_name: Mass concentration of chlorophyll a in sea water
+      phyc:
+        units: mmol m-3
+        long_name: Mole concentration of phytoplankton expressed as carbon in sea water
+      zooc:
+        units: mmol m-3
+        long_name: Mole concentration of zooplankton expressed as carbon in sea water
+
+  cmems_mod_blk_bgc-pft_anfc_2.5km_P1M-m:
+    product: BLKSEA_ANALYSISFORECAST_BGC_007_010
+    title: Phytoplankton Carbon Biomass and Chlorophyll (3D) - Monthly Mean
+    cadence: monthly
+    domain: black-sea
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      chl:
+        units: mg m-3
+        long_name: Mass concentration of chlorophyll a in sea water
+      phyc:
+        units: mmol m-3
+        long_name: Mole concentration of phytoplankton expressed as carbon in sea water
+      zooc:
+        units: mmol m-3
+        long_name: Mole concentration of zooplankton expressed as carbon in sea water
+
+  cmems_mod_blk_bgc-plankton_my_2.5km_P1D-m:
+    product: BLKSEA_MULTIYEAR_BGC_007_005
+    title: Phytoplankton Carbon Biomass and Chlorophyll (3D) - Daily Mean
+    cadence: daily
+    domain: black-sea
+    temporal:
+      start: 1992-01-02
+      end: null              # null = NRT / rolling
+    variables:
+      chl:
+        units: mg m-3
+        long_name: Mass concentration of chlorophyll a in sea water
+      phyc:
+        units: mmol m-3
+        long_name: Mole concentration of phytoplankton expressed as carbon in sea water
+
+  cmems_mod_blk_bgc-plankton_my_2.5km_P1M-m:
+    product: BLKSEA_MULTIYEAR_BGC_007_005
+    title: Phytoplankton Carbon Biomass and Chlorophyll (3D) - Monthly Mean
+    cadence: monthly
+    domain: black-sea
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      chl:
+        units: mg m-3
+        long_name: Mass concentration of chlorophyll a in sea water
+      phyc:
+        units: mmol m-3
+        long_name: Mole concentration of phytoplankton expressed as carbon in sea water
+
+  cmems_mod_blk_bgc-plankton_my_2.5km_P1Y-m:
+    product: BLKSEA_MULTIYEAR_BGC_007_005
+    title: Phytoplankton Carbon Biomass and Chlorophyll (3D) - Yearly Mean
+    cadence: annual
+    domain: black-sea
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      chl:
+        units: mg m-3
+        long_name: Mass concentration of chlorophyll a in sea water
+      phyc:
+        units: mmol m-3
+        long_name: Mole concentration of phytoplankton expressed as carbon in sea water
+
+  cmems_mod_blk_bgc-plankton_my_2.5km_climatology_P1M-m:
+    product: BLKSEA_MULTIYEAR_BGC_007_005
+    title: Phytoplankton Carbon Biomass and Chlorophyll (3D) - Climatology Mean
+    cadence: monthly
+    domain: black-sea
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      chl:
+        units: mg m-3
+        long_name: Mass concentration of chlorophyll a in sea water
+      climatology_bounds:
+        units: seconds since 1900-01-01
+        long_name: ''            # TODO: standard_name missing on describe()
+      phyc:
+        units: mmol m-3
+        long_name: Mole concentration of phytoplankton expressed as carbon in sea water
+
+  cmems_mod_blk_bgc-pp-o2_anfc_2.5km_P1D-m:
+    product: BLKSEA_ANALYSISFORECAST_BGC_007_010
+    title: Net Primary Production, Dissolved Oxygen (3D), Bottom Dissolved Oxygen (2D) - Daily
+    cadence: daily
+    domain: black-sea
+    temporal:
+      start: 2024-04-02
+      end: null              # null = NRT / rolling
+    variables:
+      nppv:
+        units: mg m-3 day-1
+        long_name: Net primary production of biomass expressed as carbon per unit volume in sea water
+      o2:
+        units: mmol m-3
+        long_name: Mole concentration of dissolved molecular oxygen in sea water
+      o2b:
+        units: mmol m-3
+        long_name: Mole concentration of dissolved molecular oxygen in sea water
+
+  cmems_mod_blk_bgc-pp-o2_anfc_2.5km_P1M-m:
+    product: BLKSEA_ANALYSISFORECAST_BGC_007_010
+    title: Net Primary Production, Dissolved Oxygen (3D), Bottom Dissolved Oxygen (2D) - Monthly
+    cadence: monthly
+    domain: black-sea
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      nppv:
+        units: mg m-3 day-1
+        long_name: Net primary production of biomass expressed as carbon per unit volume in sea water
+      o2:
+        units: mmol m-3
+        long_name: Mole concentration of dissolved molecular oxygen in sea water
+      o2b:
+        units: mmol m-3
+        long_name: Mole concentration of dissolved molecular oxygen in sea water
+
+  cmems_mod_blk_bgc_anfc_2.5km_static:
+    product: BLKSEA_ANALYSISFORECAST_BGC_007_010
+    title: cmems_mod_blk_bgc_anfc_2.5km_static
+    cadence: irregular
+    domain: black-sea
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      deptho:
+        units: m
+        long_name: Sea floor depth below geoid
+      deptho_lev:
+        units: '1'
+        long_name: Model level number at sea floor
+      mask:
+        units: 0/1
+        long_name: Sea binary mask
+
+  cmems_mod_blk_bgc_my_2.5km_static:
+    product: BLKSEA_MULTIYEAR_BGC_007_005
+    title: cmems_mod_blk_bgc_my_2.5km_static
+    cadence: irregular
+    domain: black-sea
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      deptho:
+        units: m
+        long_name: Sea floor depth below geoid
+      deptho_lev:
+        units: '1'
+        long_name: Model level number at sea floor
+      mask:
+        units: 0/1
+        long_name: Sea binary mask
+
+  cmems_mod_blk_phy-cur_anfc_2.5km_P1D-m:
+    product: BLKSEA_ANALYSISFORECAST_PHY_007_001
+    title: Horizontal and Vertical Velocity (3D) - Daily Mean
+    cadence: daily
+    domain: black-sea
+    temporal:
+      start: 2024-04-25
+      end: null              # null = NRT / rolling
+    variables:
+      uo:
+        units: m/s
+        long_name: Eastward sea water velocity
+      vo:
+        units: m/s
+        long_name: Northward sea water velocity
+      wo:
+        units: m/s
+        long_name: Upward sea water velocity
+
+  cmems_mod_blk_phy-cur_anfc_2.5km_P1M-m:
+    product: BLKSEA_ANALYSISFORECAST_PHY_007_001
+    title: Horizontal and Vertical Velocity (3D) - Monthly Mean
+    cadence: monthly
+    domain: black-sea
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      uo:
+        units: m/s
+        long_name: Eastward sea water velocity
+      vo:
+        units: m/s
+        long_name: Northward sea water velocity
+      wo:
+        units: m/s
+        long_name: Upward sea water velocity
+
+  cmems_mod_blk_phy-cur_anfc_2.5km_PT15M-i:
+    product: BLKSEA_ANALYSISFORECAST_PHY_007_001
+    title: Horizontal Surface Velocity (2D) - 15 Minutes Instantaneous
+    cadence: irregular
+    domain: black-sea
+    temporal:
+      start: 2024-04-21
+      end: null              # null = NRT / rolling
+    variables:
+      uo:
+        units: m/s
+        long_name: Eastward sea water velocity
+      vo:
+        units: m/s
+        long_name: Northward sea water velocity
+
+  cmems_mod_blk_phy-cur_anfc_2.5km_PT1H-m:
+    product: BLKSEA_ANALYSISFORECAST_PHY_007_001
+    title: Horizontal and Vertical Velocity (3D) - Hourly Mean
+    cadence: hourly
+    domain: black-sea
+    temporal:
+      start: 2024-04-21
+      end: null              # null = NRT / rolling
+    variables:
+      uo:
+        units: m/s
+        long_name: Eastward sea water velocity
+      vo:
+        units: m/s
+        long_name: Northward sea water velocity
+
+  cmems_mod_blk_phy-cur_anfc_detided-2.5km_P1D-m:
+    product: BLKSEA_ANALYSISFORECAST_PHY_007_001
+    title: Horizontal Velocity (2D) - Daily Mean
+    cadence: daily
+    domain: black-sea
+    temporal:
+      start: 2024-05-11
+      end: null              # null = NRT / rolling
+    variables:
+      uo:
+        units: m/s
+        long_name: Eastward sea water velocity
+      vo:
+        units: m/s
+        long_name: Northward sea water velocity
+
+  cmems_mod_blk_phy-cur_anfc_mrm-500m_P1D-m:
+    product: BLKSEA_ANALYSISFORECAST_PHY_007_001
+    title: Horizontal Velocity (3D) - Daily Mean
+    cadence: daily
+    domain: black-sea
+    temporal:
+      start: 2021-11-01
+      end: null              # null = NRT / rolling
+    variables:
+      uo:
+        units: m/s
+        long_name: Eastward sea water velocity
+      vo:
+        units: m/s
+        long_name: Northward sea water velocity
+
+  cmems_mod_blk_phy-cur_anfc_mrm-500m_PT1H-i:
+    product: BLKSEA_ANALYSISFORECAST_PHY_007_001
+    title: Horizontal Velocity (3D) - Hourly Mean
+    cadence: hourly
+    domain: black-sea
+    temporal:
+      start: 2022-09-12
+      end: null              # null = NRT / rolling
+    variables:
+      uo:
+        units: m/s
+        long_name: Eastward sea water velocity
+      vo:
+        units: m/s
+        long_name: Northward sea water velocity
+
+  cmems_mod_blk_phy-cur_my_2.5km-climatology_P1M-m:
+    product: BLKSEA_MULTIYEAR_PHY_007_004
+    title: Horizontal Velocity (3D) - Monthly Climatology and Standard Deviation
+    cadence: climatology
+    domain: black-sea
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      climatology_bounds:
+        units: ''
+        long_name: ''            # TODO: standard_name missing on describe()
+      uo_mean:
+        units: m/s
+        long_name: Eastward sea water velocity
+      uo_std:
+        units: m/s
+        long_name: Eastward sea water velocity
+      vo_mean:
+        units: m/s
+        long_name: Northward sea water velocity
+      vo_std:
+        units: m/s
+        long_name: Northward sea water velocity
+
+  cmems_mod_blk_phy-cur_my_2.5km_P1D-m:
+    product: BLKSEA_MULTIYEAR_PHY_007_004
+    title: Horizontal Velocity (3D) - Daily Mean
+    cadence: daily
+    domain: black-sea
+    temporal:
+      start: 1993-01-01
+      end: null              # null = NRT / rolling
+    variables:
+      uo:
+        units: m/s
+        long_name: Eastward sea water velocity
+      vo:
+        units: m/s
+        long_name: Northward sea water velocity
+
+  cmems_mod_blk_phy-cur_my_2.5km_P1M-m:
+    product: BLKSEA_MULTIYEAR_PHY_007_004
+    title: Horizontal Velocity (3D) - Monthly Mean
+    cadence: monthly
+    domain: black-sea
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      uo:
+        units: m/s
+        long_name: Eastward sea water velocity
+      vo:
+        units: m/s
+        long_name: Northward sea water velocity
+
+  cmems_mod_blk_phy-cur_my_2.5km_P1Y-m:
+    product: BLKSEA_MULTIYEAR_PHY_007_004
+    title: Horizontal Velocity (3D) - Yearly Mean
+    cadence: annual
+    domain: black-sea
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      uo:
+        units: m/s
+        long_name: Eastward sea water velocity
+      vo:
+        units: m/s
+        long_name: Northward sea water velocity
+
+  cmems_mod_blk_phy-hflux_my_2.5km_P1D-m:
+    product: BLKSEA_MULTIYEAR_PHY_007_004
+    title: Heat flux (2D) - Daily Mean
+    cadence: daily
+    domain: black-sea
+    temporal:
+      start: 1993-01-01
+      end: null              # null = NRT / rolling
+    variables:
+      hfds:
+        units: W m-2
+        long_name: Surface downward heat flux in sea water
+      hfls:
+        units: W m-2
+        long_name: Surface downward latent heat flux
+      hfss:
+        units: W m-2
+        long_name: Surface downward sensible heat flux
+      rlds:
+        units: W m-2
+        long_name: Surface net downward longwave flux
+      rsntds:
+        units: W m-2
+        long_name: Net downward shortwave flux at sea water surface
+
+  cmems_mod_blk_phy-hflux_my_2.5km_P1M-m:
+    product: BLKSEA_MULTIYEAR_PHY_007_004
+    title: Heat flux (2D) - Monthly Mean
+    cadence: monthly
+    domain: black-sea
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      hfds:
+        units: W m-2
+        long_name: Surface downward heat flux in sea water
+      hfls:
+        units: W m-2
+        long_name: Surface downward latent heat flux
+      hfss:
+        units: W m-2
+        long_name: Surface downward sensible heat flux
+      rlds:
+        units: W m-2
+        long_name: Surface net downward longwave flux
+      rsntds:
+        units: W m-2
+        long_name: Net downward shortwave flux at sea water surface
+
+  cmems_mod_blk_phy-ice_anfc_2.5km_P1D-m:
+    product: BLKSEA_ANALYSISFORECAST_PHY_007_001
+    title: Sea-ice (2D) - Daily Mean
+    cadence: daily
+    domain: black-sea
+    temporal:
+      start: 2024-02-21
+      end: null              # null = NRT / rolling
+    variables:
+      siconc:
+        units: ''
+        long_name: Sea ice area fraction
+      sithick:
+        units: m
+        long_name: Sea ice thickness
+
+  cmems_mod_blk_phy-mflux_my_2.5km_P1D-m:
+    product: BLKSEA_MULTIYEAR_PHY_007_004
+    title: Momentum flux (2D) - Daily Mean
+    cadence: daily
+    domain: black-sea
+    temporal:
+      start: 1993-01-01
+      end: null              # null = NRT / rolling
+    variables:
+      tauuo:
+        units: N m-2
+        long_name: Surface downward x stress
+      tauvo:
+        units: N m-2
+        long_name: Surface downward y stress
+
+  cmems_mod_blk_phy-mflux_my_2.5km_P1M-m:
+    product: BLKSEA_MULTIYEAR_PHY_007_004
+    title: Momentum flux (2D) - Monthly Mean
+    cadence: monthly
+    domain: black-sea
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      tauuo:
+        units: N m-2
+        long_name: Surface downward x stress
+      tauvo:
+        units: N m-2
+        long_name: Surface downward y stress
+
+  cmems_mod_blk_phy-mld_anfc_2.5km_P1D-m:
+    product: BLKSEA_ANALYSISFORECAST_PHY_007_001
+    title: Mixed Layer Depth (2D) - Daily Mean
+    cadence: daily
+    domain: black-sea
+    temporal:
+      start: 2024-05-11
+      end: null              # null = NRT / rolling
+    variables:
+      mlotst:
+        units: m
+        long_name: Ocean mixed layer thickness defined by sigma theta
+
+  cmems_mod_blk_phy-mld_anfc_2.5km_P1M-m:
+    product: BLKSEA_ANALYSISFORECAST_PHY_007_001
+    title: Mixed Layer Depth (2D) - Monthly Mean
+    cadence: monthly
+    domain: black-sea
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      mlotst:
+        units: m
+        long_name: Ocean mixed layer thickness defined by sigma theta
+
+  cmems_mod_blk_phy-mld_anfc_2.5km_PT1H-m:
+    product: BLKSEA_ANALYSISFORECAST_PHY_007_001
+    title: Mixed Layer Depth (2D) - Hourly Mean
+    cadence: hourly
+    domain: black-sea
+    temporal:
+      start: 2024-04-21
+      end: null              # null = NRT / rolling
+    variables:
+      mlotst:
+        units: m
+        long_name: Ocean mixed layer thickness defined by sigma theta
+
+  cmems_mod_blk_phy-mld_my_2.5km-climatology_P1M-m:
+    product: BLKSEA_MULTIYEAR_PHY_007_004
+    title: Mixed Layer Depth (2D) - Monthly Climatology and Standard Deviation
+    cadence: climatology
+    domain: black-sea
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      climatology_bounds:
+        units: ''
+        long_name: ''            # TODO: standard_name missing on describe()
+      mlotst_mean:
+        units: m
+        long_name: Ocean mixed layer thickness defined by sigma theta
+      mlotst_std:
+        units: m
+        long_name: Ocean mixed layer thickness defined by sigma theta
+
+  cmems_mod_blk_phy-mld_my_2.5km_P1D-m:
+    product: BLKSEA_MULTIYEAR_PHY_007_004
+    title: Mixed Layer Depth (2D) - Daily Mean
+    cadence: daily
+    domain: black-sea
+    temporal:
+      start: 1993-01-01
+      end: null              # null = NRT / rolling
+    variables:
+      mlotst:
+        units: m
+        long_name: Ocean mixed layer thickness defined by sigma theta
+
+  cmems_mod_blk_phy-mld_my_2.5km_P1M-m:
+    product: BLKSEA_MULTIYEAR_PHY_007_004
+    title: Mixed Layer Depth (2D) - Monthly Mean
+    cadence: monthly
+    domain: black-sea
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      mlotst:
+        units: m
+        long_name: Ocean mixed layer thickness defined by sigma theta
+
+  cmems_mod_blk_phy-mld_my_2.5km_P1Y-m:
+    product: BLKSEA_MULTIYEAR_PHY_007_004
+    title: Mixed Layer Depth (2D) - Yearly Mean
+    cadence: annual
+    domain: black-sea
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      mlotst:
+        units: m
+        long_name: Ocean mixed layer thickness defined by sigma theta
+
+  cmems_mod_blk_phy-sal_anfc_2.5km_P1D-m:
+    product: BLKSEA_ANALYSISFORECAST_PHY_007_001
+    title: Salinity (3D) - Daily Mean
+    cadence: daily
+    domain: black-sea
+    temporal:
+      start: 2024-04-25
+      end: null              # null = NRT / rolling
+    variables:
+      so:
+        units: 1e-3
+        long_name: Sea water salinity
+
+  cmems_mod_blk_phy-sal_anfc_2.5km_P1M-m:
+    product: BLKSEA_ANALYSISFORECAST_PHY_007_001
+    title: Salinity (3D) - Monthly Mean
+    cadence: monthly
+    domain: black-sea
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      so:
+        units: 1e-3
+        long_name: Sea water salinity
+
+  cmems_mod_blk_phy-sal_anfc_2.5km_PT1H-m:
+    product: BLKSEA_ANALYSISFORECAST_PHY_007_001
+    title: Salinity (3D) - Hourly Mean
+    cadence: hourly
+    domain: black-sea
+    temporal:
+      start: 2024-04-21
+      end: null              # null = NRT / rolling
+    variables:
+      so:
+        units: 1e-3
+        long_name: Sea water salinity
+
+  cmems_mod_blk_phy-sal_anfc_mrm-500m_P1D-m:
+    product: BLKSEA_ANALYSISFORECAST_PHY_007_001
+    title: Salinity (3D) - Daily Mean
+    cadence: daily
+    domain: black-sea
+    temporal:
+      start: 2021-11-01
+      end: null              # null = NRT / rolling
+    variables:
+      so:
+        units: 1e-3
+        long_name: Sea water salinity
+
+  cmems_mod_blk_phy-sal_anfc_mrm-500m_PT1H-i:
+    product: BLKSEA_ANALYSISFORECAST_PHY_007_001
+    title: Salinity (3D) - Hourly Mean
+    cadence: hourly
+    domain: black-sea
+    temporal:
+      start: 2022-09-12
+      end: null              # null = NRT / rolling
+    variables:
+      so:
+        units: 1e-3
+        long_name: Sea water salinity
+
+  cmems_mod_blk_phy-sal_my_2.5km-climatology_P1M-m:
+    product: BLKSEA_MULTIYEAR_PHY_007_004
+    title: Salinity (3D) - Monthly Climatology and Standard Deviation
+    cadence: climatology
+    domain: black-sea
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      climatology_bounds:
+        units: ''
+        long_name: ''            # TODO: standard_name missing on describe()
+      so_mean:
+        units: 1e-3
+        long_name: Sea water salinity
+      so_std:
+        units: 1e-3
+        long_name: Sea water salinity
+
+  cmems_mod_blk_phy-sal_my_2.5km_P1D-m:
+    product: BLKSEA_MULTIYEAR_PHY_007_004
+    title: Salinity (3D) - Daily Mean
+    cadence: daily
+    domain: black-sea
+    temporal:
+      start: 1993-01-01
+      end: null              # null = NRT / rolling
+    variables:
+      so:
+        units: 1e-3
+        long_name: Sea water salinity
+
+  cmems_mod_blk_phy-sal_my_2.5km_P1M-m:
+    product: BLKSEA_MULTIYEAR_PHY_007_004
+    title: Salinity (3D) - Monthly Mean
+    cadence: monthly
+    domain: black-sea
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      so:
+        units: 1e-3
+        long_name: Sea water salinity
+
+  cmems_mod_blk_phy-sal_my_2.5km_P1Y-m:
+    product: BLKSEA_MULTIYEAR_PHY_007_004
+    title: Salinity (3D) - Yearly Mean
+    cadence: annual
+    domain: black-sea
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      so:
+        units: 1e-3
+        long_name: Sea water salinity
+
+  cmems_mod_blk_phy-ssh_anfc_2.5km_P1D-m:
+    product: BLKSEA_ANALYSISFORECAST_PHY_007_001
+    title: Sea Surface Height (2D) - Daily Mean
+    cadence: daily
+    domain: black-sea
+    temporal:
+      start: 2024-05-11
+      end: null              # null = NRT / rolling
+    variables:
+      zos:
+        units: m
+        long_name: Sea surface height above geoid
+
+  cmems_mod_blk_phy-ssh_anfc_2.5km_P1M-m:
+    product: BLKSEA_ANALYSISFORECAST_PHY_007_001
+    title: Sea Surface Height (2D) - Monthly Mean
+    cadence: monthly
+    domain: black-sea
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      zos:
+        units: m
+        long_name: Sea surface height above geoid
+
+  cmems_mod_blk_phy-ssh_anfc_2.5km_PT15M-i:
+    product: BLKSEA_ANALYSISFORECAST_PHY_007_001
+    title: Sea Surface Height (2D) - 15 Minutes Instantaneous
+    cadence: irregular
+    domain: black-sea
+    temporal:
+      start: 2024-04-21
+      end: null              # null = NRT / rolling
+    variables:
+      zos:
+        units: m
+        long_name: Sea surface height above geoid
+
+  cmems_mod_blk_phy-ssh_anfc_2.5km_PT1H-m:
+    product: BLKSEA_ANALYSISFORECAST_PHY_007_001
+    title: Sea Surface Height (2D) - Hourly Mean
+    cadence: hourly
+    domain: black-sea
+    temporal:
+      start: 2024-04-21
+      end: null              # null = NRT / rolling
+    variables:
+      zos:
+        units: m
+        long_name: Sea surface height above geoid
+
+  cmems_mod_blk_phy-ssh_anfc_detided-2.5km_P1D-m:
+    product: BLKSEA_ANALYSISFORECAST_PHY_007_001
+    title: Sea Surface Height (2D) - Daily Mean
+    cadence: daily
+    domain: black-sea
+    temporal:
+      start: 2024-05-11
+      end: null              # null = NRT / rolling
+    variables:
+      zos:
+        units: m
+        long_name: Sea surface height above geoid
+
+  cmems_mod_blk_phy-ssh_anfc_mrm-500m_P1D-m:
+    product: BLKSEA_ANALYSISFORECAST_PHY_007_001
+    title: Sea Surface Height (2D) - Daily Mean
+    cadence: daily
+    domain: black-sea
+    temporal:
+      start: 2021-11-01
+      end: null              # null = NRT / rolling
+    variables:
+      zos:
+        units: m
+        long_name: Sea surface height above geoid
+
+  cmems_mod_blk_phy-ssh_anfc_mrm-500m_PT1H-i:
+    product: BLKSEA_ANALYSISFORECAST_PHY_007_001
+    title: Sea Surface Height (2D) - Hourly Mean
+    cadence: hourly
+    domain: black-sea
+    temporal:
+      start: 2022-09-12
+      end: null              # null = NRT / rolling
+    variables:
+      zos:
+        units: m
+        long_name: Sea surface height above geoid
+
+  cmems_mod_blk_phy-ssh_my_2.5km-climatology_P1M-m:
+    product: BLKSEA_MULTIYEAR_PHY_007_004
+    title: Sea Surface Height (2D) - Monthly Climatology and Standard Deviation
+    cadence: climatology
+    domain: black-sea
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      climatology_bounds:
+        units: ''
+        long_name: ''            # TODO: standard_name missing on describe()
+      zos_mean:
+        units: m
+        long_name: Sea surface height above geoid
+      zos_std:
+        units: m
+        long_name: Sea surface height above geoid
+
+  cmems_mod_blk_phy-ssh_my_2.5km_P1D-m:
+    product: BLKSEA_MULTIYEAR_PHY_007_004
+    title: Sea Surface Height (2D) - Daily Mean
+    cadence: daily
+    domain: black-sea
+    temporal:
+      start: 1993-01-01
+      end: null              # null = NRT / rolling
+    variables:
+      zos:
+        units: m
+        long_name: Sea surface height above geoid
+
+  cmems_mod_blk_phy-ssh_my_2.5km_P1M-m:
+    product: BLKSEA_MULTIYEAR_PHY_007_004
+    title: Sea Surface Height (2D) - Monthly Mean
+    cadence: monthly
+    domain: black-sea
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      zos:
+        units: m
+        long_name: Sea surface height above geoid
+
+  cmems_mod_blk_phy-ssh_my_2.5km_P1Y-m:
+    product: BLKSEA_MULTIYEAR_PHY_007_004
+    title: Sea Surface Height (2D) - Yearly Mean
+    cadence: annual
+    domain: black-sea
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      zos:
+        units: m
+        long_name: Sea surface height above geoid
+
+  cmems_mod_blk_phy-tem_anfc_mrm-500m_P1D-m:
+    product: BLKSEA_ANALYSISFORECAST_PHY_007_001
+    title: Potential Temperature (3D) - Daily Mean
+    cadence: daily
+    domain: black-sea
+    temporal:
+      start: 2021-11-01
+      end: null              # null = NRT / rolling
+    variables:
+      thetao:
+        units: degrees_C
+        long_name: Sea water potential temperature
+
+  cmems_mod_blk_phy-tem_anfc_mrm-500m_PT1H-i:
+    product: BLKSEA_ANALYSISFORECAST_PHY_007_001
+    title: Potential Temperature (3D) - Hourly Mean
+    cadence: hourly
+    domain: black-sea
+    temporal:
+      start: 2022-09-12
+      end: null              # null = NRT / rolling
+    variables:
+      thetao:
+        units: degrees_C
+        long_name: Sea water potential temperature
+
+  cmems_mod_blk_phy-temp_anfc_2.5km_P1D-m:
+    product: BLKSEA_ANALYSISFORECAST_PHY_007_001
+    title: Potential Temperature (3D), Bottom Temperature (2D) - Daily Mean
+    cadence: daily
+    domain: black-sea
+    temporal:
+      start: 2024-04-25
+      end: null              # null = NRT / rolling
+    variables:
+      bottomT:
+        units: degrees_C
+        long_name: Sea water potential temperature at sea floor
+      thetao:
+        units: degrees_C
+        long_name: Sea water potential temperature
+
+  cmems_mod_blk_phy-temp_anfc_2.5km_P1M-m:
+    product: BLKSEA_ANALYSISFORECAST_PHY_007_001
+    title: Potential Temperature (3D), Bottom Temperature (2D) - Monthly Mean
+    cadence: monthly
+    domain: black-sea
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      bottomT:
+        units: degrees_C
+        long_name: Sea water potential temperature at sea floor
+      thetao:
+        units: degrees_C
+        long_name: Sea water potential temperature
+
+  cmems_mod_blk_phy-temp_anfc_2.5km_PT1H-m:
+    product: BLKSEA_ANALYSISFORECAST_PHY_007_001
+    title: Potential Temperature (3D), Bottom Temperature (2D) - Hourly Mean
+    cadence: hourly
+    domain: black-sea
+    temporal:
+      start: 2024-04-21
+      end: null              # null = NRT / rolling
+    variables:
+      bottomT:
+        units: degrees_C
+        long_name: Sea water potential temperature at sea floor
+      thetao:
+        units: degrees_C
+        long_name: Sea water potential temperature
+
+  cmems_mod_blk_phy-temp_my_2.5km-climatology_P1M-m:
+    product: BLKSEA_MULTIYEAR_PHY_007_004
+    title: Potential Temperature (3D), Bottom Temperature (2D) - Monthly Climatology and Standard
+    cadence: climatology
+    domain: black-sea
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      bottomT_mean:
+        units: degrees_C
+        long_name: Sea water potential temperature at sea floor
+      bottomT_std:
+        units: degrees_C
+        long_name: Sea water potential temperature at sea floor
+      climatology_bounds:
+        units: ''
+        long_name: ''            # TODO: standard_name missing on describe()
+      thetao_mean:
+        units: degrees_C
+        long_name: Sea water potential temperature
+      thetao_std:
+        units: degrees_C
+        long_name: Sea water potential temperature
+
+  cmems_mod_blk_phy-temp_my_2.5km_P1D-m:
+    product: BLKSEA_MULTIYEAR_PHY_007_004
+    title: Potential Temperature (3D), Bottom Temperature (2D) - Daily Mean
+    cadence: daily
+    domain: black-sea
+    temporal:
+      start: 1993-01-01
+      end: null              # null = NRT / rolling
+    variables:
+      bottomT:
+        units: degrees_C
+        long_name: Sea water potential temperature at sea floor
+      thetao:
+        units: degrees_C
+        long_name: Sea water potential temperature
+
+  cmems_mod_blk_phy-temp_my_2.5km_P1M-m:
+    product: BLKSEA_MULTIYEAR_PHY_007_004
+    title: Potential Temperature (3D), Bottom Temperature (2D) - Monthly Mean
+    cadence: monthly
+    domain: black-sea
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      bottomT:
+        units: degrees_C
+        long_name: Sea water potential temperature at sea floor
+      thetao:
+        units: degrees_C
+        long_name: Sea water potential temperature
+
+  cmems_mod_blk_phy-temp_my_2.5km_P1Y-m:
+    product: BLKSEA_MULTIYEAR_PHY_007_004
+    title: Potential Temperature (3D), Bottom Temperature (2D) - Yearly Mean
+    cadence: annual
+    domain: black-sea
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      bottomT:
+        units: degrees_C
+        long_name: Sea water potential temperature at sea floor
+      thetao:
+        units: degrees_C
+        long_name: Sea water potential temperature
+
+  cmems_mod_blk_phy-wflux_my_2.5km_P1D-m:
+    product: BLKSEA_MULTIYEAR_PHY_007_004
+    title: Water flux (2D) - Daily Mean
+    cadence: daily
+    domain: black-sea
+    temporal:
+      start: 1993-01-01
+      end: null              # null = NRT / rolling
+    variables:
+      evs:
+        units: kg m-2 s-1
+        long_name: Surface water evaporation flux
+      friver:
+        units: kg m-2 s-1
+        long_name: Water flux into sea water from rivers
+      pr:
+        units: kg m-2 s-1
+        long_name: Precipitation flux
+
+  cmems_mod_blk_phy-wflux_my_2.5km_P1M-m:
+    product: BLKSEA_MULTIYEAR_PHY_007_004
+    title: Water flux (2D) - Monthly Mean
+    cadence: monthly
+    domain: black-sea
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      evs:
+        units: kg m-2 s-1
+        long_name: Surface water evaporation flux
+      friver:
+        units: kg m-2 s-1
+        long_name: Water flux into sea water from rivers
+      pr:
+        units: kg m-2 s-1
+        long_name: Precipitation flux
+
+  cmems_mod_blk_phy_anfc_2.5km_static:
+    product: BLKSEA_ANALYSISFORECAST_PHY_007_001
+    title: cmems_mod_blk_phy_anfc_2.5km_static
+    cadence: irregular
+    domain: black-sea
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      deptho:
+        units: m
+        long_name: Sea floor depth below geoid
+      deptho_lev:
+        units: '1'
+        long_name: Model level number at sea floor
+      mask:
+        units: 0/1
+        long_name: Sea binary mask
+
+  cmems_mod_blk_phy_anfc_mrm-500m_static:
+    product: BLKSEA_ANALYSISFORECAST_PHY_007_001
+    title: cmems_mod_blk_phy_anfc_mrm-500m_static
+    cadence: irregular
+    domain: black-sea
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      deptho:
+        units: m
+        long_name: ''            # TODO: standard_name missing on describe()
+      mask:
+        units: 0/1
+        long_name: ''            # TODO: standard_name missing on describe()
+
+  cmems_mod_blk_phy_my_2.5km_static:
+    product: BLKSEA_MULTIYEAR_PHY_007_004
+    title: cmems_mod_blk_phy_my_2.5km_static
+    cadence: irregular
+    domain: black-sea
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      deptho:
+        units: m
+        long_name: Sea floor depth below geoid
+      deptho_lev:
+        units: '1'
+        long_name: Model level number at sea floor
+      mask:
+        units: 0/1
+        long_name: Sea binary mask
+
+  cmems_mod_blk_wav-aflux_my_2.5km_PT1H-i:
+    product: BLKSEA_MULTIYEAR_WAV_007_006
+    title: Wave Products (2D) - Instantaneous Field
+    cadence: hourly
+    domain: black-sea
+    temporal:
+      start: 1950-01-08
+      end: null              # null = NRT / rolling
+    variables:
+      CHNK:
+        units: ''
+        long_name: Charnock coefficient for surface roughness length for momentum in air
+      EFLX:
+        units: kg/s/s/s
+        long_name: Wave mixing energy flux into sea water
+      FRICV:
+        units: m/s
+        long_name: Friction velocity at sea water surface
+      MFLXU:
+        units: kg/m/s/s
+        long_name: Eastward wave momentum flux into sea water
+      MFLXV:
+        units: kg/m/s/s
+        long_name: Northward wave momentum flux into sea water
+      WDIR:
+        units: degree
+        long_name: Wind from direction
+      WSPD:
+        units: m/s
+        long_name: Wind speed
+      Z0:
+        units: m
+        long_name: Surface roughness length
+
+  cmems_mod_blk_wav_anfc_2.5km_PT1H-i:
+    product: BLKSEA_ANALYSISFORECAST_WAV_007_003
+    title: Wave Products (2D) - Instantaneous Field
+    cadence: hourly
+    domain: black-sea
+    temporal:
+      start: 2022-12-18
+      end: null              # null = NRT / rolling
+    variables:
+      VCMX:
+        units: m
+        long_name: Sea surface wave maximum height
+      VHM0:
+        units: m
+        long_name: Sea surface wave significant height
+      VHM0_SW1:
+        units: m
+        long_name: Sea surface primary swell wave significant height
+      VHM0_SW2:
+        units: m
+        long_name: Sea surface secondary swell wave significant height
+      VHM0_WW:
+        units: m
+        long_name: Sea surface wind wave significant height
+      VMDR:
+        units: degree
+        long_name: Sea surface wave from direction
+      VMDR_SW1:
+        units: degree
+        long_name: Sea surface primary swell wave from direction
+      VMDR_SW2:
+        units: degree
+        long_name: Sea surface secondary swell wave from direction
+      VMDR_WW:
+        units: degree
+        long_name: Sea surface wind wave from direction
+      VMXL:
+        units: m
+        long_name: Sea surface wave maximum crest height
+      VPED:
+        units: degree
+        long_name: Sea surface wave from direction at variance spectral density maximum
+      VSDX:
+        units: m/s
+        long_name: Sea surface wave stokes drift x velocity
+      VSDY:
+        units: m/s
+        long_name: Sea surface wave stokes drift y velocity
+      VTM01_SW1:
+        units: s
+        long_name: Sea surface primary swell wave mean period
+      VTM01_SW2:
+        units: s
+        long_name: Sea surface secondary swell wave mean period
+      VTM01_WW:
+        units: s
+        long_name: Sea surface wind wave mean period
+      VTM02:
+        units: s
+        long_name: Sea surface wave mean period from variance spectral density second frequency moment
+      VTM10:
+        units: s
+        long_name: Sea surface wave mean period from variance spectral density inverse frequency moment
+      VTPK:
+        units: s
+        long_name: Sea surface wave period at variance spectral density maximum
+
+  cmems_mod_blk_wav_anfc_2.5km_static:
+    product: BLKSEA_ANALYSISFORECAST_WAV_007_003
+    title: cmems_mod_blk_wav_anfc_2.5km_static
+    cadence: irregular
+    domain: black-sea
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      deptho:
+        units: m
+        long_name: Sea floor depth below geoid
+      mask:
+        units: '1'
+        long_name: Sea binary mask
+
+  cmems_mod_blk_wav_my_2.5km-climatology_PT1M-m:
+    product: BLKSEA_MULTIYEAR_WAV_007_006
+    title: Monthly climatology reference period 1950-2023
+    cadence: climatology
+    domain: black-sea
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      VHM0:
+        units: m
+        long_name: Sea surface wave significant height
+      VTM02:
+        units: s
+        long_name: Sea surface wave mean period from variance spectral density second frequency moment
+      climatology_bounds:
+        units: seconds since 1950-01-01 00:00:00
+        long_name: ''            # TODO: standard_name missing on describe()
+
+  cmems_mod_blk_wav_my_2.5km_PT1H-i:
+    product: BLKSEA_MULTIYEAR_WAV_007_006
+    title: Wave Products (2D) - Instantaneous Field
+    cadence: hourly
+    domain: black-sea
+    temporal:
+      start: 1950-01-08
+      end: null              # null = NRT / rolling
+    variables:
+      VCMX:
+        units: m
+        long_name: Sea surface wave maximum height
+      VHM0:
+        units: m
+        long_name: Sea surface wave significant height
+      VHM0_SW1:
+        units: m
+        long_name: Sea surface primary swell wave significant height
+      VHM0_SW2:
+        units: m
+        long_name: Sea surface secondary swell wave significant height
+      VHM0_WW:
+        units: m
+        long_name: Sea surface wind wave significant height
+      VMDR:
+        units: degree
+        long_name: Sea surface wave from direction
+      VMDR_SW1:
+        units: degree
+        long_name: Sea surface primary swell wave from direction
+      VMDR_SW2:
+        units: degree
+        long_name: Sea surface secondary swell wave from direction
+      VMDR_WW:
+        units: degree
+        long_name: Sea surface wind wave from direction
+      VMXL:
+        units: m
+        long_name: Sea surface wave maximum crest height
+      VPED:
+        units: degree
+        long_name: Sea surface wave from direction at variance spectral density maximum
+      VSDX:
+        units: m/s
+        long_name: Sea surface wave stokes drift x velocity
+      VSDY:
+        units: m/s
+        long_name: Sea surface wave stokes drift y velocity
+      VTM01_SW1:
+        units: s
+        long_name: Sea surface primary swell wave mean period
+      VTM01_SW2:
+        units: s
+        long_name: Sea surface secondary swell wave mean period
+      VTM01_WW:
+        units: s
+        long_name: Sea surface wind wave mean period
+      VTM02:
+        units: s
+        long_name: Sea surface wave mean period from variance spectral density second frequency moment
+      VTM10:
+        units: s
+        long_name: Sea surface wave mean period from variance spectral density inverse frequency moment
+      VTPK:
+        units: s
+        long_name: Sea surface wave period at variance spectral density maximum
+
+  cmems_mod_blk_wav_my_2.5km_static:
+    product: BLKSEA_MULTIYEAR_WAV_007_006
+    title: cmems_mod_blk_wav_my_2.5km_static
+    cadence: irregular
+    domain: black-sea
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      deptho:
+        units: m
+        long_name: Sea floor depth below geoid
+      mask:
+        units: '1'
+        long_name: Sea binary mask
+
+  cmems_obs-sst_blk_phy-sst_nrt_diurnal-oi-0.0625deg_PT1H-m:
+    product: SST_BS_PHY_SUBSKIN_L4_NRT_010_035
+    title: Black Sea Diurnal Subskin SST Analysis, L4, 1/16deg hourly
+    cadence: hourly
+    domain: black-sea
+    temporal:
+      start: 2020-01-01
+      end: null              # null = NRT / rolling
+    variables:
+      analysed_sst:
+        units: kelvin
+        long_name: Sea surface subskin temperature
+      analysis_error:
+        units: percentage
+        long_name: ''            # TODO: standard_name missing on describe()
+      mask:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      sea_ice_fraction:
+        units: '1'
+        long_name: Sea ice area fraction
+
+  cmems_obs-sst_bs_phy_my_l3s_P1D-m:
+    product: SST_BS_PHY_L3S_MY_010_041
+    title: Black Sea SST, L3S, Reprocessed using ESA CCI SST v.3.0 and PFV53 data, 0.05 deg.
+    cadence: daily
+    domain: black-sea
+    temporal:
+      start: 1982-01-01
+      end: null              # null = NRT / rolling
+    variables:
+      adjusted_sea_surface_temperature:
+        units: kelvin
+        long_name: Sea surface foundation temperature

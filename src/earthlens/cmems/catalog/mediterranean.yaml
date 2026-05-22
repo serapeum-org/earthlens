@@ -1,0 +1,2877 @@
+# CMEMS curated catalog - mediterranean slice.
+#
+# One slice of the per-domain split of the Copernicus Marine catalog.
+# The loader (earthlens.cmems.catalog.Catalog) merges every *.yaml in
+# this directory into one Catalog at construction time; dataset ids
+# must be unique across files. Stanzas are emitted by
+# tools/cmems/refresh_cmems_catalog.py from copernicusmarine.describe();
+# `cadence` is inferred from the dataset_id suffix, `domain` from the
+# product_id prefix, and `temporal.start` is read from the dataset's
+# arco time-coordinate bounds. `end` is left null (the arco max is
+# "latest available today" and would go stale for rolling products).
+# Where the toolbox exposes no standard_name for a variable, the row
+# carries `long_name: ''` with a TODO marker.
+#
+# Schema (per dataset):
+#   <dataset_id>:
+#     product: <product_id>
+#     title: <human-readable title>
+#     cadence: <daily|monthly|hourly|6hourly|climatology|irregular>
+#     domain: <global|mediterranean|arctic|...>
+#     temporal: { start: YYYY-MM-DD, end: YYYY-MM-DD }   # end null = NRT
+#     variables:
+#       <short_name>: { units: <CF units>, long_name: <CF long name> }
+
+datasets:
+
+  SST_MED_SSTA_L4_NRT_OBSERVATIONS_010_004_b:
+    product: SST_MED_SST_L4_NRT_OBSERVATIONS_010_004
+    title: Mediterranean SST Anomaly, L4, 1/16deg daily (SST_MED_SSTA_L4_NRT_OBSERVATIONS_010_004_b)
+    cadence: irregular
+    domain: mediterranean
+    temporal:
+      start: 2008-01-01
+      end: null              # null = NRT / rolling
+    variables:
+      sst_anomaly:
+        units: Celsius
+        long_name: Sea surface temperature anomaly
+
+  SST_MED_SSTA_L4_NRT_OBSERVATIONS_010_004_d:
+    product: SST_MED_SST_L4_NRT_OBSERVATIONS_010_004
+    title: Mediterranean SST Anomaly, L4, 1km daily (SST_MED_SSTA_L4_NRT_OBSERVATIONS_010_004_d)
+    cadence: irregular
+    domain: mediterranean
+    temporal:
+      start: 2008-01-01
+      end: null              # null = NRT / rolling
+    variables:
+      sst_anomaly:
+        units: Celsius
+        long_name: Sea surface temperature anomaly
+
+  SST_MED_SST_L3S_NRT_OBSERVATIONS_010_012_a:
+    product: SST_MED_SST_L3S_NRT_OBSERVATIONS_010_012
+    title: Mediterranean SST, L3S, 1/16deg daily (SST_MED_SST_L3S_NRT_OBSERVATIONS_010_012_a)
+    cadence: irregular
+    domain: mediterranean
+    temporal:
+      start: 2008-01-01
+      end: null              # null = NRT / rolling
+    variables:
+      adjusted_sea_surface_temperature:
+        units: kelvin
+        long_name: Sea surface foundation temperature
+      adjusted_standard_deviation_error:
+        units: kelvin
+        long_name: ''            # TODO: standard_name missing on describe()
+      bias_to_reference_sst:
+        units: kelvin
+        long_name: ''            # TODO: standard_name missing on describe()
+      l2p_flags:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      or_latitude:
+        units: degrees_north
+        long_name: Latitude
+      or_longitude:
+        units: degree_east
+        long_name: Longitude
+      or_number_of_pixels:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      quality_level:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      sea_surface_temperature:
+        units: kelvin
+        long_name: Sea surface foundation temperature
+      sources_of_sst:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      sses_bias:
+        units: kelvin
+        long_name: ''            # TODO: standard_name missing on describe()
+      sses_standard_deviation:
+        units: kelvin
+        long_name: ''            # TODO: standard_name missing on describe()
+      sst_dtime:
+        units: seconds
+        long_name: ''            # TODO: standard_name missing on describe()
+      standard_deviation_to_reference_sst:
+        units: kelvin
+        long_name: ''            # TODO: standard_name missing on describe()
+      sum_square_sst:
+        units: kelvin^2
+        long_name: ''            # TODO: standard_name missing on describe()
+      sum_sst:
+        units: kelvin
+        long_name: ''            # TODO: standard_name missing on describe()
+      wind_speed:
+        units: m s-1
+        long_name: Wind speed
+
+  SST_MED_SST_L3S_NRT_OBSERVATIONS_010_012_b:
+    product: SST_MED_SST_L3S_NRT_OBSERVATIONS_010_012
+    title: Mediterranean SST, L3S, 1km daily (SST_MED_SST_L3S_NRT_OBSERVATIONS_010_012_b)
+    cadence: irregular
+    domain: mediterranean
+    temporal:
+      start: 2008-01-01
+      end: null              # null = NRT / rolling
+    variables:
+      adjusted_sea_surface_temperature:
+        units: kelvin
+        long_name: Sea surface foundation temperature
+      adjusted_standard_deviation_error:
+        units: kelvin
+        long_name: ''            # TODO: standard_name missing on describe()
+      bias_to_reference_sst:
+        units: kelvin
+        long_name: ''            # TODO: standard_name missing on describe()
+      l2p_flags:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      or_latitude:
+        units: degrees_north
+        long_name: Latitude
+      or_longitude:
+        units: degree_east
+        long_name: Longitude
+      or_number_of_pixels:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      quality_level:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      sea_surface_temperature:
+        units: kelvin
+        long_name: Sea surface foundation temperature
+      sources_of_sst:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      sses_bias:
+        units: kelvin
+        long_name: ''            # TODO: standard_name missing on describe()
+      sses_standard_deviation:
+        units: kelvin
+        long_name: ''            # TODO: standard_name missing on describe()
+      sst_dtime:
+        units: seconds
+        long_name: ''            # TODO: standard_name missing on describe()
+      standard_deviation_to_reference_sst:
+        units: kelvin
+        long_name: ''            # TODO: standard_name missing on describe()
+      sum_square_sst:
+        units: kelvin^2
+        long_name: ''            # TODO: standard_name missing on describe()
+      sum_sst:
+        units: kelvin
+        long_name: ''            # TODO: standard_name missing on describe()
+      wind_speed:
+        units: m s-1
+        long_name: Wind speed
+
+  SST_MED_SST_L4_NRT_OBSERVATIONS_010_004_a_V2:
+    product: SST_MED_SST_L4_NRT_OBSERVATIONS_010_004
+    title: Mediterranean SST Analysis, L4, 1/16deg daily (SST_MED_SST_L4_NRT_OBSERVATIONS_010_004_a_V2)
+    cadence: irregular
+    domain: mediterranean
+    temporal:
+      start: 2008-01-01
+      end: null              # null = NRT / rolling
+    variables:
+      analysed_sst:
+        units: kelvin
+        long_name: Sea surface foundation temperature
+      analysis_error:
+        units: kelvin
+        long_name: ''            # TODO: standard_name missing on describe()
+      mask:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      sea_ice_fraction:
+        units: '1'
+        long_name: Sea ice area fraction
+
+  SST_MED_SST_L4_NRT_OBSERVATIONS_010_004_c_V2:
+    product: SST_MED_SST_L4_NRT_OBSERVATIONS_010_004
+    title: Mediterranean SST Analysis, L4, 1km daily (SST_MED_SST_L4_NRT_OBSERVATIONS_010_004_c_V2)
+    cadence: irregular
+    domain: mediterranean
+    temporal:
+      start: 2008-01-01
+      end: null              # null = NRT / rolling
+    variables:
+      analysed_sst:
+        units: kelvin
+        long_name: Sea surface foundation temperature
+      analysis_error:
+        units: kelvin
+        long_name: ''            # TODO: standard_name missing on describe()
+      mask:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      sea_ice_fraction:
+        units: '1'
+        long_name: Sea ice area fraction
+
+  cmems_SST_MED_SST_L4_REP_OBSERVATIONS_010_021:
+    product: SST_MED_SST_L4_REP_OBSERVATIONS_010_021
+    title: Mediterranean Sea SST Analysis L4, Reprocessed using ESA CCI SST v.3.0 and PFV53 data,
+    cadence: irregular
+    domain: mediterranean
+    temporal:
+      start: 1982-01-01
+      end: null              # null = NRT / rolling
+    variables:
+      analysed_sst:
+        units: kelvin
+        long_name: Sea surface temperature
+      analysis_error:
+        units: kelvin
+        long_name: ''            # TODO: standard_name missing on describe()
+      mask:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      sea_ice_fraction:
+        units: '1'
+        long_name: Sea ice area fraction
+
+  cmems_mod_med_bgc-bio_anfc_4.2km_P1D-m:
+    product: MEDSEA_ANALYSISFORECAST_BGC_006_014
+    title: Primary Production and Oxygen (3D) - Daily Mean
+    cadence: daily
+    domain: mediterranean
+    temporal:
+      start: 2024-02-26
+      end: null              # null = NRT / rolling
+    variables:
+      nppv:
+        units: mg m-3 day-1
+        long_name: Net primary production of biomass expressed as carbon per unit volume in sea water
+      o2:
+        units: mmol m-3
+        long_name: Mole concentration of dissolved molecular oxygen in sea water
+
+  cmems_mod_med_bgc-bio_anfc_4.2km_P1M-m:
+    product: MEDSEA_ANALYSISFORECAST_BGC_006_014
+    title: Primary Production and Oxygen (3D) - Monthly Mean
+    cadence: monthly
+    domain: mediterranean
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      nppv:
+        units: mg m-3 day-1
+        long_name: Net primary production of biomass expressed as carbon per unit volume in sea water
+      o2:
+        units: mmol m-3
+        long_name: Mole concentration of dissolved molecular oxygen in sea water
+
+  cmems_mod_med_bgc-bio_my_4.2km_P1D-m:
+    product: MEDSEA_MULTIYEAR_BGC_006_008
+    title: Primary Production and Oxygen (3D) - Daily Mean
+    cadence: daily
+    domain: mediterranean
+    temporal:
+      start: 1999-01-01
+      end: null              # null = NRT / rolling
+    variables:
+      nppv:
+        units: mg m-3 day-1
+        long_name: Net primary production of biomass expressed as carbon per unit volume in sea water
+      o2:
+        units: mmol m-3
+        long_name: Mole concentration of dissolved molecular oxygen in sea water
+
+  cmems_mod_med_bgc-bio_my_4.2km_P1M-m:
+    product: MEDSEA_MULTIYEAR_BGC_006_008
+    title: Primary Production and Oxygen (3D) - Monthly Mean
+    cadence: monthly
+    domain: mediterranean
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      nppv:
+        units: mg m-3 day-1
+        long_name: Net primary production of biomass expressed as carbon per unit volume in sea water
+      o2:
+        units: mmol m-3
+        long_name: Mole concentration of dissolved molecular oxygen in sea water
+
+  cmems_mod_med_bgc-bio_my_4.2km_P1Y-m:
+    product: MEDSEA_MULTIYEAR_BGC_006_008
+    title: Primary Production and Oxygen (3D) - Yearly Mean
+    cadence: annual
+    domain: mediterranean
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      nppv:
+        units: mg m-3 day-1
+        long_name: Net primary production of biomass expressed as carbon per unit volume in sea water
+      o2:
+        units: mmol m-3
+        long_name: Mole concentration of dissolved molecular oxygen in sea water
+
+  cmems_mod_med_bgc-car_anfc_4.2km_P1D-m:
+    product: MEDSEA_ANALYSISFORECAST_BGC_006_014
+    title: Dissolved Inorganic Carbon, pH and Alkalinity (3D) - Daily Mean
+    cadence: daily
+    domain: mediterranean
+    temporal:
+      start: 2024-02-26
+      end: null              # null = NRT / rolling
+    variables:
+      dissic:
+        units: mol m-3
+        long_name: Mole concentration of dissolved inorganic carbon in sea water
+      ph:
+        units: '1'
+        long_name: Sea water ph reported on total scale
+      talk:
+        units: mol m-3
+        long_name: Sea water alkalinity expressed as mole equivalent
+
+  cmems_mod_med_bgc-car_anfc_4.2km_P1M-m:
+    product: MEDSEA_ANALYSISFORECAST_BGC_006_014
+    title: Dissolved Inorganic Carbon, pH and Alkalinity (3D) - Monthly Mean
+    cadence: monthly
+    domain: mediterranean
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      dissic:
+        units: mol m-3
+        long_name: Mole concentration of dissolved inorganic carbon in sea water
+      ph:
+        units: '1'
+        long_name: Sea water ph reported on total scale
+      talk:
+        units: mol m-3
+        long_name: Sea water alkalinity expressed as mole equivalent
+
+  cmems_mod_med_bgc-car_my_4.2km_P1D-m:
+    product: MEDSEA_MULTIYEAR_BGC_006_008
+    title: Dissolved Inorganic Carbon, pH and Alkalinity (3D) - Daily Mean
+    cadence: daily
+    domain: mediterranean
+    temporal:
+      start: 1999-01-01
+      end: null              # null = NRT / rolling
+    variables:
+      dissic:
+        units: mol m-3
+        long_name: Mole concentration of dissolved inorganic carbon in sea water
+      ph:
+        units: '1'
+        long_name: Sea water ph reported on total scale
+      talk:
+        units: mol m-3
+        long_name: Sea water alkalinity expressed as mole equivalent
+
+  cmems_mod_med_bgc-car_my_4.2km_P1M-m:
+    product: MEDSEA_MULTIYEAR_BGC_006_008
+    title: Dissolved Inorganic Carbon, pH and Alkalinity (3D) - Monthly Mean
+    cadence: monthly
+    domain: mediterranean
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      dissic:
+        units: mol m-3
+        long_name: Mole concentration of dissolved inorganic carbon in sea water
+      ph:
+        units: '1'
+        long_name: Sea water ph reported on total scale
+      talk:
+        units: mol m-3
+        long_name: Sea water alkalinity expressed as mole equivalent
+
+  cmems_mod_med_bgc-car_my_4.2km_P1Y-m:
+    product: MEDSEA_MULTIYEAR_BGC_006_008
+    title: Dissolved Inorganic Carbon, pH and Alkalinity (3D) - Yearly Mean
+    cadence: annual
+    domain: mediterranean
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      dissic:
+        units: mol m-3
+        long_name: Mole concentration of dissolved inorganic carbon in sea water
+      ph:
+        units: '1'
+        long_name: Sea water ph reported on total scale
+      talk:
+        units: mol m-3
+        long_name: Sea water alkalinity expressed as mole equivalent
+
+  cmems_mod_med_bgc-co2_anfc_4.2km_P1D-m:
+    product: MEDSEA_ANALYSISFORECAST_BGC_006_014
+    title: Surface partial pressure of CO2 and Surface CO2 flux (2D) - Daily Mean
+    cadence: daily
+    domain: mediterranean
+    temporal:
+      start: 2024-02-26
+      end: null              # null = NRT / rolling
+    variables:
+      fgco2:
+        units: kg m-2 s-1
+        long_name: Surface downward mass flux of carbon dioxide expressed as carbon
+      spco2:
+        units: Pa
+        long_name: Surface partial pressure of carbon dioxide in sea water
+
+  cmems_mod_med_bgc-co2_anfc_4.2km_P1M-m:
+    product: MEDSEA_ANALYSISFORECAST_BGC_006_014
+    title: Surface partial pressure of CO2 and Surface CO2 flux (2D) - Monthly Mean
+    cadence: monthly
+    domain: mediterranean
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      fgco2:
+        units: kg m-2 s-1
+        long_name: Surface downward mass flux of carbon dioxide expressed as carbon
+      spco2:
+        units: Pa
+        long_name: Surface partial pressure of carbon dioxide in sea water
+
+  cmems_mod_med_bgc-co2_my_4.2km_P1D-m:
+    product: MEDSEA_MULTIYEAR_BGC_006_008
+    title: Surface partial pressure of CO2 and Surface CO2 flux (2D) - Daily Mean
+    cadence: daily
+    domain: mediterranean
+    temporal:
+      start: 1999-01-01
+      end: null              # null = NRT / rolling
+    variables:
+      fpco2:
+        units: kg m-2 s-1
+        long_name: Surface downward mass flux of carbon dioxide expressed as carbon
+      spco2:
+        units: Pa
+        long_name: Surface partial pressure of carbon dioxide in sea water
+
+  cmems_mod_med_bgc-co2_my_4.2km_P1M-m:
+    product: MEDSEA_MULTIYEAR_BGC_006_008
+    title: Surface partial pressure of CO2 and Surface CO2 flux (2D) - Monthly Mean
+    cadence: monthly
+    domain: mediterranean
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      fpco2:
+        units: kg m-2 s-1
+        long_name: Surface downward mass flux of carbon dioxide expressed as carbon
+      spco2:
+        units: Pa
+        long_name: Surface partial pressure of carbon dioxide in sea water
+
+  cmems_mod_med_bgc-co2_my_4.2km_P1Y-m:
+    product: MEDSEA_MULTIYEAR_BGC_006_008
+    title: Surface partial pressure of CO2 and Surface CO2 flux (2D) - Yearly Mean
+    cadence: annual
+    domain: mediterranean
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      fpco2:
+        units: kg m-2 s-1
+        long_name: Surface downward mass flux of carbon dioxide expressed as carbon
+      spco2:
+        units: Pa
+        long_name: Surface partial pressure of carbon dioxide in sea water
+
+  cmems_mod_med_bgc-nut_anfc_4.2km_P1D-m:
+    product: MEDSEA_ANALYSISFORECAST_BGC_006_014
+    title: Nitrate, Phosphate, Ammonium and Silicate (3D) - Daily Mean
+    cadence: daily
+    domain: mediterranean
+    temporal:
+      start: 2024-02-26
+      end: null              # null = NRT / rolling
+    variables:
+      nh4:
+        units: mmol m-3
+        long_name: Mole concentration of ammonium in sea water
+      no3:
+        units: mmol m-3
+        long_name: Mole concentration of nitrate in sea water
+      po4:
+        units: mmol m-3
+        long_name: Mole concentration of phosphate in sea water
+      si:
+        units: mmol m-3
+        long_name: Mole concentration of silicate in sea water
+
+  cmems_mod_med_bgc-nut_anfc_4.2km_P1M-m:
+    product: MEDSEA_ANALYSISFORECAST_BGC_006_014
+    title: Nitrate, Phosphate, Ammonium and Silicate (3D) - Monthly Mean
+    cadence: monthly
+    domain: mediterranean
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      nh4:
+        units: mmol m-3
+        long_name: Mole concentration of ammonium in sea water
+      no3:
+        units: mmol m-3
+        long_name: Mole concentration of nitrate in sea water
+      po4:
+        units: mmol m-3
+        long_name: Mole concentration of phosphate in sea water
+      si:
+        units: mmol m-3
+        long_name: Mole concentration of silicate in sea water
+
+  cmems_mod_med_bgc-nut_my_4.2km_P1D-m:
+    product: MEDSEA_MULTIYEAR_BGC_006_008
+    title: Nitrate, Phosphate and Ammonium (3D) - Daily Mean
+    cadence: daily
+    domain: mediterranean
+    temporal:
+      start: 1999-01-01
+      end: null              # null = NRT / rolling
+    variables:
+      nh4:
+        units: mmol m-3
+        long_name: Mole concentration of ammonium in sea water
+      no3:
+        units: mmol m-3
+        long_name: Mole concentration of nitrate in sea water
+      po4:
+        units: mmol m-3
+        long_name: Mole concentration of phosphate in sea water
+
+  cmems_mod_med_bgc-nut_my_4.2km_P1M-m:
+    product: MEDSEA_MULTIYEAR_BGC_006_008
+    title: Nitrate, Phosphate and Ammonium (3D) - Monthly Mean
+    cadence: monthly
+    domain: mediterranean
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      nh4:
+        units: mmol m-3
+        long_name: Mole concentration of ammonium in sea water
+      no3:
+        units: mmol m-3
+        long_name: Mole concentration of nitrate in sea water
+      po4:
+        units: mmol m-3
+        long_name: Mole concentration of phosphate in sea water
+
+  cmems_mod_med_bgc-nut_my_4.2km_P1Y-m:
+    product: MEDSEA_MULTIYEAR_BGC_006_008
+    title: Nitrate, Phosphate and Ammonium (3D) - Yearly Mean
+    cadence: annual
+    domain: mediterranean
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      nh4:
+        units: mmol m-3
+        long_name: Mole concentration of ammonium in sea water
+      no3:
+        units: mmol m-3
+        long_name: Mole concentration of nitrate in sea water
+      po4:
+        units: mmol m-3
+        long_name: Mole concentration of phosphate in sea water
+
+  cmems_mod_med_bgc-optics_anfc_4.2km_P1D-m:
+    product: MEDSEA_ANALYSISFORECAST_BGC_006_014
+    title: Attenuation coefficient of downwelling radiative flux (2D) - Daily Mean
+    cadence: daily
+    domain: mediterranean
+    temporal:
+      start: 2024-02-26
+      end: null              # null = NRT / rolling
+    variables:
+      kd490:
+        units: m-1
+        long_name: Volume attenuation coefficient of downwelling radiative flux in sea water 490
+
+  cmems_mod_med_bgc-optics_anfc_4.2km_P1M-m:
+    product: MEDSEA_ANALYSISFORECAST_BGC_006_014
+    title: Attenuation coefficient of downwelling radiative flux (2D) - Monthly Mean
+    cadence: monthly
+    domain: mediterranean
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      kd490:
+        units: m-1
+        long_name: Volume attenuation coefficient of downwelling radiative flux in sea water 490
+
+  cmems_mod_med_bgc-pft_anfc_4.2km_P1D-m:
+    product: MEDSEA_ANALYSISFORECAST_BGC_006_014
+    title: Phytoplankton Carbon Biomass, Zooplankton Carbon Biomass, Chlorophyll and PFTs (3D)
+    cadence: daily
+    domain: mediterranean
+    temporal:
+      start: 2024-02-26
+      end: null              # null = NRT / rolling
+    variables:
+      chl:
+        units: mg m-3
+        long_name: Mass concentration of chlorophyll a in sea water
+      diatoC:
+        units: mmol m-3
+        long_name: Mole concentration of diatoms expressed as carbon in sea water
+      diatoChla:
+        units: mg m-3
+        long_name: Mass concentration of diatoms expressed as chlorophyll in sea water
+      dinoC:
+        units: mmol m-3
+        long_name: Mole concentration of dinoflagellates expressed as carbon in sea water
+      dinoChla:
+        units: mg m-3
+        long_name: Mass concentration of dinoflagellates expressed as chlorophyll in sea water
+      nanoC:
+        units: mmol m-3
+        long_name: Mole concentration of nanophytoplankton expressed as carbon in sea water
+      nanoChla:
+        units: mg m-3
+        long_name: Mass concentration of nanophytoplankton expressed as chlorophyll in sea water
+      phyc:
+        units: mmol m-3
+        long_name: Mole concentration of phytoplankton expressed as carbon in sea water
+      picoC:
+        units: mmol m-3
+        long_name: Mole concentration of picophytoplankton expressed as carbon in sea water
+      picoChla:
+        units: mg m-3
+        long_name: Mass concentration of picophytoplankton expressed as chlorophyll in sea water
+      zooc:
+        units: mmol m-3
+        long_name: Mole concentration of zooplankton expressed as carbon in sea water
+
+  cmems_mod_med_bgc-pft_anfc_4.2km_P1M-m:
+    product: MEDSEA_ANALYSISFORECAST_BGC_006_014
+    title: Phytoplankton Carbon Biomass, Zooplankton Carbon Biomass, Chlorophyll and PFTs (3D)
+    cadence: monthly
+    domain: mediterranean
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      chl:
+        units: mg m-3
+        long_name: Mass concentration of chlorophyll a in sea water
+      diatoC:
+        units: mmol m-3
+        long_name: Mole concentration of diatoms expressed as carbon in sea water
+      diatoChla:
+        units: mg m-3
+        long_name: Mass concentration of diatoms expressed as chlorophyll in sea water
+      dinoC:
+        units: mmol m-3
+        long_name: Mole concentration of dinoflagellates expressed as carbon in sea water
+      dinoChla:
+        units: mg m-3
+        long_name: Mass concentration of dinoflagellates expressed as chlorophyll in sea water
+      nanoC:
+        units: mmol m-3
+        long_name: Mole concentration of nanophytoplankton expressed as carbon in sea water
+      nanoChla:
+        units: mg m-3
+        long_name: Mass concentration of nanophytoplankton expressed as chlorophyll in sea water
+      phyc:
+        units: mmol m-3
+        long_name: Mole concentration of phytoplankton expressed as carbon in sea water
+      picoC:
+        units: mmol m-3
+        long_name: Mole concentration of picophytoplankton expressed as carbon in sea water
+      picoChla:
+        units: mg m-3
+        long_name: Mass concentration of picophytoplankton expressed as chlorophyll in sea water
+      zooc:
+        units: mmol m-3
+        long_name: Mole concentration of zooplankton expressed as carbon in sea water
+
+  cmems_mod_med_bgc-plankton_my_4.2km_P1D-m:
+    product: MEDSEA_MULTIYEAR_BGC_006_008
+    title: Phytoplankton Carbon Biomass and Chlorophyll (3D) - Daily Mean
+    cadence: daily
+    domain: mediterranean
+    temporal:
+      start: 1999-01-01
+      end: null              # null = NRT / rolling
+    variables:
+      chl:
+        units: mg m-3
+        long_name: Mass concentration of chlorophyll a in sea water
+      phyc:
+        units: mmol m-3
+        long_name: Mole concentration of phytoplankton expressed as carbon in sea water
+
+  cmems_mod_med_bgc-plankton_my_4.2km_P1M-m:
+    product: MEDSEA_MULTIYEAR_BGC_006_008
+    title: Phytoplankton Carbon Biomass and Chlorophyll (3D) - Monthly Mean
+    cadence: monthly
+    domain: mediterranean
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      chl:
+        units: mg m-3
+        long_name: Mass concentration of chlorophyll a in sea water
+      phyc:
+        units: mmol m-3
+        long_name: Mole concentration of phytoplankton expressed as carbon in sea water
+
+  cmems_mod_med_bgc-plankton_my_4.2km_P1Y-m:
+    product: MEDSEA_MULTIYEAR_BGC_006_008
+    title: Phytoplankton Carbon Biomass and Chlorophyll (3D) - Yearly Mean
+    cadence: annual
+    domain: mediterranean
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      chl:
+        units: mg m-3
+        long_name: Mass concentration of chlorophyll a in sea water
+      phyc:
+        units: mmol m-3
+        long_name: Mole concentration of phytoplankton expressed as carbon in sea water
+
+  cmems_mod_med_bgc_anfc_4.2km_static:
+    product: MEDSEA_ANALYSISFORECAST_BGC_006_014
+    title: cmems_mod_med_bgc_anfc_4.2km_static
+    cadence: irregular
+    domain: mediterranean
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      deptho:
+        units: m
+        long_name: Sea floor depth below geoid
+      deptho_lev:
+        units: '1'
+        long_name: Model level number at sea floor
+      mask:
+        units: '1'
+        long_name: Sea binary mask
+
+  cmems_mod_med_bgc_my_4.2km-climatology_P1M-m:
+    product: MEDSEA_MULTIYEAR_BGC_006_008
+    title: Monthly climatology reference period 1999-2019
+    cadence: climatology
+    domain: mediterranean
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      chl_avg:
+        units: mg m-3
+        long_name: Mass concentration of chlorophyll a in sea water
+      chl_std:
+        units: mg m-3
+        long_name: Mass concentration of chlorophyll a in sea water
+      climatology_bounds:
+        units: days since 1970-01-01 00:00:00
+        long_name: Time
+      dissic_avg:
+        units: mol m-3
+        long_name: Mole concentration of dissolved inorganic carbon in sea water
+      dissic_std:
+        units: mol m-3
+        long_name: Mole concentration of dissolved inorganic carbon in sea water
+      fgco2_avg:
+        units: kg m-2 s-1
+        long_name: Surface downward mass flux of carbon dioxide expressed as carbon
+      fgco2_std:
+        units: kg m-2 s-1
+        long_name: Surface downward mass flux of carbon dioxide expressed as carbon
+      nh4_avg:
+        units: mmol m-3
+        long_name: Mole concentration of ammonium in sea water
+      nh4_std:
+        units: mmol m-3
+        long_name: Mole concentration of ammonium in sea water
+      no3_avg:
+        units: mmol m-3
+        long_name: Mole concentration of nitrate in sea water
+      no3_std:
+        units: mmol m-3
+        long_name: Mole concentration of nitrate in sea water
+      nppv_avg:
+        units: mg m-3 day-1
+        long_name: Net primary production of biomass expressed as carbon per unit volume in sea water
+      nppv_std:
+        units: mg m-3 day-1
+        long_name: Net primary production of biomass expressed as carbon per unit volume in sea water
+      o2_avg:
+        units: mmol m-3
+        long_name: Mole concentration of dissolved molecular oxygen in sea water
+      o2_std:
+        units: mmol m-3
+        long_name: Mole concentration of dissolved molecular oxygen in sea water
+      ph_avg:
+        units: '1'
+        long_name: Sea water ph reported on total scale
+      ph_std:
+        units: '1'
+        long_name: Sea water ph reported on total scale
+      phyc_avg:
+        units: mmol m-3
+        long_name: Mole concentration of phytoplankton expressed as carbon in sea water
+      phyc_std:
+        units: mmol m-3
+        long_name: Mole concentration of phytoplankton expressed as carbon in sea water
+      po4_avg:
+        units: mmol m-3
+        long_name: Mole concentration of phosphate in sea water
+      po4_std:
+        units: mmol m-3
+        long_name: Mole concentration of phosphate in sea water
+      spco2_avg:
+        units: Pa
+        long_name: Surface partial pressure of carbon dioxide in sea water
+      spco2_std:
+        units: Pa
+        long_name: Surface partial pressure of carbon dioxide in sea water
+      talk_avg:
+        units: mol m-3
+        long_name: Sea water alkalinity expressed as mole equivalent
+      talk_std:
+        units: mol m-3
+        long_name: Sea water alkalinity expressed as mole equivalent
+
+  cmems_mod_med_bgc_my_4.2km_static:
+    product: MEDSEA_MULTIYEAR_BGC_006_008
+    title: cmems_mod_med_bgc_my_4.2km_static
+    cadence: irregular
+    domain: mediterranean
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      deptho:
+        units: m
+        long_name: Sea floor depth below geoid
+      deptho_lev:
+        units: '1'
+        long_name: Model level number at sea floor
+      mask:
+        units: '1'
+        long_name: Sea binary mask
+
+  cmems_mod_med_phy-cur_anfc_4.2km-2D_PT1H-m:
+    product: MEDSEA_ANALYSISFORECAST_PHY_006_013
+    title: Sea Surface Horizontal Velocity (2D) - Hourly Mean
+    cadence: hourly
+    domain: mediterranean
+    temporal:
+      start: 2024-03-29
+      end: null              # null = NRT / rolling
+    variables:
+      uo:
+        units: m s-1
+        long_name: Eastward sea water velocity
+      vo:
+        units: m s-1
+        long_name: Northward sea water velocity
+
+  cmems_mod_med_phy-cur_anfc_4.2km-3D_PT1H-m:
+    product: MEDSEA_ANALYSISFORECAST_PHY_006_013
+    title: Horizontal Velocity (3D) - Hourly Mean
+    cadence: hourly
+    domain: mediterranean
+    temporal:
+      start: 2025-10-06
+      end: null              # null = NRT / rolling
+    variables:
+      uo:
+        units: m s-1
+        long_name: Eastward sea water velocity
+      vo:
+        units: m s-1
+        long_name: Northward sea water velocity
+
+  cmems_mod_med_phy-cur_anfc_4.2km_P1D-m:
+    product: MEDSEA_ANALYSISFORECAST_PHY_006_013
+    title: Horizontal Velocity (3D) - Daily Mean
+    cadence: daily
+    domain: mediterranean
+    temporal:
+      start: 2024-03-30
+      end: null              # null = NRT / rolling
+    variables:
+      uo:
+        units: m s-1
+        long_name: Eastward sea water velocity
+      vo:
+        units: m s-1
+        long_name: Northward sea water velocity
+
+  cmems_mod_med_phy-cur_anfc_4.2km_P1M-m:
+    product: MEDSEA_ANALYSISFORECAST_PHY_006_013
+    title: Horizontal Velocity (3D) - Monthly Mean
+    cadence: monthly
+    domain: mediterranean
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      uo:
+        units: m s-1
+        long_name: Eastward sea water velocity
+      vo:
+        units: m s-1
+        long_name: Northward sea water velocity
+
+  cmems_mod_med_phy-cur_anfc_4.2km_PT15M-i:
+    product: MEDSEA_ANALYSISFORECAST_PHY_006_013
+    title: Horizontal Surface Velocity (2D) - 15 Minutes Instantaneous
+    cadence: irregular
+    domain: mediterranean
+    temporal:
+      start: 2024-03-28
+      end: null              # null = NRT / rolling
+    variables:
+      uo:
+        units: m s-1
+        long_name: Eastward sea water velocity
+      vo:
+        units: m s-1
+        long_name: Northward sea water velocity
+
+  cmems_mod_med_phy-cur_anfc_detided-4.2km_P1D-m:
+    product: MEDSEA_ANALYSISFORECAST_PHY_006_013
+    title: Sea Surface Horizontal Velocity Assuming No Tide (2D) - Daily Mean
+    cadence: daily
+    domain: mediterranean
+    temporal:
+      start: 2024-03-30
+      end: null              # null = NRT / rolling
+    variables:
+      uo_detided:
+        units: m s-1
+        long_name: Eastward sea water velocity assuming no tide
+      vo_detided:
+        units: m s-1
+        long_name: Northward sea water velocity assuming no tide
+
+  cmems_mod_med_phy-cur_my_4.2km_P1D-m:
+    product: MEDSEA_MULTIYEAR_PHY_006_004
+    title: Horizontal Velocity (3D) - Daily Mean
+    cadence: daily
+    domain: mediterranean
+    temporal:
+      start: 1987-01-01
+      end: null              # null = NRT / rolling
+    variables:
+      uo:
+        units: m s-1
+        long_name: Eastward sea water velocity
+      vo:
+        units: m s-1
+        long_name: Northward sea water velocity
+
+  cmems_mod_med_phy-cur_my_4.2km_P1M-m:
+    product: MEDSEA_MULTIYEAR_PHY_006_004
+    title: Horizontal Velocity (3D) - Monthly Mean
+    cadence: monthly
+    domain: mediterranean
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      uo:
+        units: m s-1
+        long_name: Eastward sea water velocity
+      vo:
+        units: m s-1
+        long_name: Northward sea water velocity
+
+  cmems_mod_med_phy-cur_my_4.2km_P1Y-m:
+    product: MEDSEA_MULTIYEAR_PHY_006_004
+    title: Horizontal Velocity (3D) - Yearly Mean
+    cadence: annual
+    domain: mediterranean
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      uo:
+        units: m s-1
+        long_name: Eastward sea water velocity
+      vo:
+        units: m s-1
+        long_name: Northward sea water velocity
+
+  cmems_mod_med_phy-cur_my_4.2km_PT1H-m:
+    product: MEDSEA_MULTIYEAR_PHY_006_004
+    title: Horizontal Surface Velocity (2D) - Hourly Mean
+    cadence: hourly
+    domain: mediterranean
+    temporal:
+      start: 1987-01-01
+      end: null              # null = NRT / rolling
+    variables:
+      uo:
+        units: m s-1
+        long_name: Eastward sea water velocity
+      vo:
+        units: m s-1
+        long_name: Northward sea water velocity
+
+  cmems_mod_med_phy-hflux_my_4.2km_P1D-m:
+    product: MEDSEA_MULTIYEAR_PHY_006_004
+    title: Heat flux (2D) - Daily Mean
+    cadence: daily
+    domain: mediterranean
+    temporal:
+      start: 1987-01-01
+      end: null              # null = NRT / rolling
+    variables:
+      hfds:
+        units: W m-2
+        long_name: Surface downward heat flux in sea water
+      hfls:
+        units: W m-2
+        long_name: Surface downward latent heat flux
+      hfss:
+        units: W m-2
+        long_name: Surface downward sensible heat flux
+      rlds:
+        units: W m-2
+        long_name: Surface net downward longwave flux
+      rsntds:
+        units: W m-2
+        long_name: Net downward shortwave flux at sea water surface
+
+  cmems_mod_med_phy-hflux_my_4.2km_P1M-m:
+    product: MEDSEA_MULTIYEAR_PHY_006_004
+    title: Heat flux (2D) - Monthly Mean
+    cadence: monthly
+    domain: mediterranean
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      hfds:
+        units: W m-2
+        long_name: Surface downward heat flux in sea water
+      hfls:
+        units: W m-2
+        long_name: Surface downward latent heat flux
+      hfss:
+        units: W m-2
+        long_name: Surface downward sensible heat flux
+      rlds:
+        units: W m-2
+        long_name: Surface net downward longwave flux
+      rsntds:
+        units: W m-2
+        long_name: Net downward shortwave flux at sea water surface
+
+  cmems_mod_med_phy-mflux_my_4.2km_P1D-m:
+    product: MEDSEA_MULTIYEAR_PHY_006_004
+    title: Momentum flux (2D) - Daily Mean
+    cadence: daily
+    domain: mediterranean
+    temporal:
+      start: 1987-01-01
+      end: null              # null = NRT / rolling
+    variables:
+      tauuo:
+        units: N m-2
+        long_name: Surface downward x stress
+      tauvo:
+        units: N m-2
+        long_name: Surface downward y stress
+
+  cmems_mod_med_phy-mflux_my_4.2km_P1M-m:
+    product: MEDSEA_MULTIYEAR_PHY_006_004
+    title: Momentum flux (2D) - Monthly Mean
+    cadence: monthly
+    domain: mediterranean
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      tauuo:
+        units: N m-2
+        long_name: Surface downward x stress
+      tauvo:
+        units: N m-2
+        long_name: Surface downward y stress
+
+  cmems_mod_med_phy-mld_anfc_4.2km-2D_PT1H-m:
+    product: MEDSEA_ANALYSISFORECAST_PHY_006_013
+    title: Mixed Layer Depth (2D) - Hourly Mean
+    cadence: hourly
+    domain: mediterranean
+    temporal:
+      start: 2024-03-29
+      end: null              # null = NRT / rolling
+    variables:
+      mlotst:
+        units: m
+        long_name: Ocean mixed layer thickness defined by sigma theta
+
+  cmems_mod_med_phy-mld_anfc_4.2km_P1D-m:
+    product: MEDSEA_ANALYSISFORECAST_PHY_006_013
+    title: Mixed Layer Depth (2D) - Daily Mean
+    cadence: daily
+    domain: mediterranean
+    temporal:
+      start: 2024-03-30
+      end: null              # null = NRT / rolling
+    variables:
+      mlotst:
+        units: m
+        long_name: Ocean mixed layer thickness defined by sigma theta
+
+  cmems_mod_med_phy-mld_anfc_4.2km_P1M-m:
+    product: MEDSEA_ANALYSISFORECAST_PHY_006_013
+    title: Mixed Layer Depth (2D) - Monthly Mean
+    cadence: monthly
+    domain: mediterranean
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      mlotst:
+        units: m
+        long_name: Ocean mixed layer thickness defined by sigma theta
+
+  cmems_mod_med_phy-mld_my_4.2km_P1D-m:
+    product: MEDSEA_MULTIYEAR_PHY_006_004
+    title: Mixed Layer Depth (2D) - Daily Mean
+    cadence: daily
+    domain: mediterranean
+    temporal:
+      start: 1987-01-01
+      end: null              # null = NRT / rolling
+    variables:
+      mlotst:
+        units: m
+        long_name: Ocean mixed layer thickness defined by sigma theta
+
+  cmems_mod_med_phy-mld_my_4.2km_P1M-m:
+    product: MEDSEA_MULTIYEAR_PHY_006_004
+    title: Mixed Layer Depth (2D) - Monthly Mean
+    cadence: monthly
+    domain: mediterranean
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      mlotst:
+        units: m
+        long_name: Ocean mixed layer thickness defined by sigma theta
+
+  cmems_mod_med_phy-mld_my_4.2km_P1Y-m:
+    product: MEDSEA_MULTIYEAR_PHY_006_004
+    title: Mixed Layer Depth (2D) - Yearly Mean
+    cadence: annual
+    domain: mediterranean
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      mlotst:
+        units: m
+        long_name: Ocean mixed layer thickness defined by sigma theta
+
+  cmems_mod_med_phy-sal_anfc_4.2km-2D_PT1H-m:
+    product: MEDSEA_ANALYSISFORECAST_PHY_006_013
+    title: Sea Surface Salinity (2D) - Hourly Mean
+    cadence: hourly
+    domain: mediterranean
+    temporal:
+      start: 2024-03-29
+      end: null              # null = NRT / rolling
+    variables:
+      so:
+        units: '0.001'
+        long_name: Sea water salinity
+
+  cmems_mod_med_phy-sal_anfc_4.2km-3D_PT1H-m:
+    product: MEDSEA_ANALYSISFORECAST_PHY_006_013
+    title: Salinity (3D) - Hourly Mean
+    cadence: hourly
+    domain: mediterranean
+    temporal:
+      start: 2025-10-06
+      end: null              # null = NRT / rolling
+    variables:
+      so:
+        units: '0.001'
+        long_name: Sea water salinity
+
+  cmems_mod_med_phy-sal_anfc_4.2km_P1D-m:
+    product: MEDSEA_ANALYSISFORECAST_PHY_006_013
+    title: Salinity (3D) - Daily Mean
+    cadence: daily
+    domain: mediterranean
+    temporal:
+      start: 2024-03-30
+      end: null              # null = NRT / rolling
+    variables:
+      so:
+        units: '0.001'
+        long_name: Sea water salinity
+
+  cmems_mod_med_phy-sal_anfc_4.2km_P1M-m:
+    product: MEDSEA_ANALYSISFORECAST_PHY_006_013
+    title: Salinity (3D) - Monthly Mean
+    cadence: monthly
+    domain: mediterranean
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      so:
+        units: '0.001'
+        long_name: Sea water salinity
+
+  cmems_mod_med_phy-sal_my_4.2km_P1D-m:
+    product: MEDSEA_MULTIYEAR_PHY_006_004
+    title: Salinity (3D) - Daily Mean
+    cadence: daily
+    domain: mediterranean
+    temporal:
+      start: 1987-01-01
+      end: null              # null = NRT / rolling
+    variables:
+      so:
+        units: '0.001'
+        long_name: Sea water salinity
+
+  cmems_mod_med_phy-sal_my_4.2km_P1M-m:
+    product: MEDSEA_MULTIYEAR_PHY_006_004
+    title: Salinity (3D) - Monthly Mean
+    cadence: monthly
+    domain: mediterranean
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      so:
+        units: '0.001'
+        long_name: Sea water salinity
+
+  cmems_mod_med_phy-sal_my_4.2km_P1Y-m:
+    product: MEDSEA_MULTIYEAR_PHY_006_004
+    title: Salinity (3D) - Yearly
+    cadence: annual
+    domain: mediterranean
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      so:
+        units: '0.001'
+        long_name: Sea water salinity
+
+  cmems_mod_med_phy-ssh_anfc_4.2km-2D_PT1H-m:
+    product: MEDSEA_ANALYSISFORECAST_PHY_006_013
+    title: Sea Surface Height (2D) - Hourly Mean
+    cadence: hourly
+    domain: mediterranean
+    temporal:
+      start: 2024-03-29
+      end: null              # null = NRT / rolling
+    variables:
+      zos:
+        units: m
+        long_name: Sea surface height above geoid
+
+  cmems_mod_med_phy-ssh_anfc_4.2km_P1D-m:
+    product: MEDSEA_ANALYSISFORECAST_PHY_006_013
+    title: Sea Surface Height (2D) - Daily Mean
+    cadence: daily
+    domain: mediterranean
+    temporal:
+      start: 2024-03-30
+      end: null              # null = NRT / rolling
+    variables:
+      zos:
+        units: m
+        long_name: Sea surface height above geoid
+
+  cmems_mod_med_phy-ssh_anfc_4.2km_P1M-m:
+    product: MEDSEA_ANALYSISFORECAST_PHY_006_013
+    title: Sea Surface Height (2D) - Monthly Mean
+    cadence: monthly
+    domain: mediterranean
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      zos:
+        units: m
+        long_name: Sea surface height above geoid
+
+  cmems_mod_med_phy-ssh_anfc_4.2km_PT15M-i:
+    product: MEDSEA_ANALYSISFORECAST_PHY_006_013
+    title: Sea Surface Height (2D) - 15 Minutes Instantaneous
+    cadence: irregular
+    domain: mediterranean
+    temporal:
+      start: 2024-03-28
+      end: null              # null = NRT / rolling
+    variables:
+      zos:
+        units: m
+        long_name: Sea surface height above geoid
+
+  cmems_mod_med_phy-ssh_anfc_detided-4.2km_P1D-m:
+    product: MEDSEA_ANALYSISFORECAST_PHY_006_013
+    title: Sea Surface Height Assuming No Tide (2D) - Daily Mean
+    cadence: daily
+    domain: mediterranean
+    temporal:
+      start: 2024-03-30
+      end: null              # null = NRT / rolling
+    variables:
+      zos_detided:
+        units: m
+        long_name: Sea surface height above geoid assuming no tide
+
+  cmems_mod_med_phy-ssh_my_4.2km_P1D-m:
+    product: MEDSEA_MULTIYEAR_PHY_006_004
+    title: Sea Surface Height (2D) - Daily Mean
+    cadence: daily
+    domain: mediterranean
+    temporal:
+      start: 1987-01-01
+      end: null              # null = NRT / rolling
+    variables:
+      zos:
+        units: m
+        long_name: Sea surface height above geoid
+
+  cmems_mod_med_phy-ssh_my_4.2km_P1M-m:
+    product: MEDSEA_MULTIYEAR_PHY_006_004
+    title: Sea Surface Height (2D) - Monthly Mean
+    cadence: monthly
+    domain: mediterranean
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      zos:
+        units: m
+        long_name: Sea surface height above geoid
+
+  cmems_mod_med_phy-ssh_my_4.2km_P1Y-m:
+    product: MEDSEA_MULTIYEAR_PHY_006_004
+    title: Sea Surface Height (2D) - Yearly Mean
+    cadence: annual
+    domain: mediterranean
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      zos:
+        units: m
+        long_name: Sea surface height above geoid
+
+  cmems_mod_med_phy-ssh_my_4.2km_PT1H-m:
+    product: MEDSEA_MULTIYEAR_PHY_006_004
+    title: Sea Surface Height (2D) - Hourly Mean
+    cadence: hourly
+    domain: mediterranean
+    temporal:
+      start: 1987-01-01
+      end: null              # null = NRT / rolling
+    variables:
+      zos:
+        units: m
+        long_name: Sea surface height above geoid
+
+  cmems_mod_med_phy-tem_anfc_4.2km-2D_PT1H-m:
+    product: MEDSEA_ANALYSISFORECAST_PHY_006_013
+    title: Sea Surface Temperature (2D) - Hourly Mean
+    cadence: hourly
+    domain: mediterranean
+    temporal:
+      start: 2024-03-29
+      end: null              # null = NRT / rolling
+    variables:
+      thetao:
+        units: degrees_C
+        long_name: Sea water potential temperature
+
+  cmems_mod_med_phy-tem_anfc_4.2km-3D_PT1H-m:
+    product: MEDSEA_ANALYSISFORECAST_PHY_006_013
+    title: Sea Temperature (3D) - Hourly Mean
+    cadence: hourly
+    domain: mediterranean
+    temporal:
+      start: 2025-10-06
+      end: null              # null = NRT / rolling
+    variables:
+      bottomT:
+        units: degrees_C
+        long_name: Sea water potential temperature at sea floor
+      thetao:
+        units: degrees_C
+        long_name: Sea water potential temperature
+
+  cmems_mod_med_phy-tem_anfc_4.2km_P1D-m:
+    product: MEDSEA_ANALYSISFORECAST_PHY_006_013
+    title: Sea Temperature (3D) - Daily Mean
+    cadence: daily
+    domain: mediterranean
+    temporal:
+      start: 2024-03-30
+      end: null              # null = NRT / rolling
+    variables:
+      bottomT:
+        units: degrees_C
+        long_name: Sea water potential temperature at sea floor
+      thetao:
+        units: degrees_C
+        long_name: Sea water potential temperature
+
+  cmems_mod_med_phy-tem_anfc_4.2km_P1M-m:
+    product: MEDSEA_ANALYSISFORECAST_PHY_006_013
+    title: Sea Temperature (3D) - Monthly Mean
+    cadence: monthly
+    domain: mediterranean
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      bottomT:
+        units: degrees_C
+        long_name: Sea water potential temperature at sea floor
+      thetao:
+        units: degrees_C
+        long_name: Sea water potential temperature
+
+  cmems_mod_med_phy-tem_my_4.2km_P1Y-m:
+    product: MEDSEA_MULTIYEAR_PHY_006_004
+    title: Potential Temperature (3D) - Yearly Mean
+    cadence: annual
+    domain: mediterranean
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      bottomT:
+        units: degrees_C
+        long_name: Sea water potential temperature at sea floor
+      thetao:
+        units: degrees_C
+        long_name: Sea water potential temperature
+
+  cmems_mod_med_phy-temp_my_4.2km_P1D-m:
+    product: MEDSEA_MULTIYEAR_PHY_006_004
+    title: Potential Temperature (3D) - Daily Mean
+    cadence: daily
+    domain: mediterranean
+    temporal:
+      start: 1987-01-01
+      end: null              # null = NRT / rolling
+    variables:
+      bottomT:
+        units: degrees_C
+        long_name: Sea water potential temperature at sea floor
+      thetao:
+        units: degrees_C
+        long_name: Sea water potential temperature
+
+  cmems_mod_med_phy-temp_my_4.2km_P1M-m:
+    product: MEDSEA_MULTIYEAR_PHY_006_004
+    title: Potential Temperature (3D) - Monthly Mean
+    cadence: monthly
+    domain: mediterranean
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      bottomT:
+        units: degrees_C
+        long_name: Sea water potential temperature at sea floor
+      thetao:
+        units: degrees_C
+        long_name: Sea water potential temperature
+
+  cmems_mod_med_phy-wcur_anfc_4.2km_P1D-m:
+    product: MEDSEA_ANALYSISFORECAST_PHY_006_013
+    title: Vertical Velocity (3D) - Daily Mean
+    cadence: daily
+    domain: mediterranean
+    temporal:
+      start: 2024-03-30
+      end: null              # null = NRT / rolling
+    variables:
+      wo:
+        units: m s-1
+        long_name: Upward sea water velocity
+
+  cmems_mod_med_phy-wcur_anfc_4.2km_P1M-m:
+    product: MEDSEA_ANALYSISFORECAST_PHY_006_013
+    title: Vertical Velocity (3D) - Monthly Mean
+    cadence: monthly
+    domain: mediterranean
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      wo:
+        units: m s-1
+        long_name: Upward sea water velocity
+
+  cmems_mod_med_phy-wflux_my_4.2km_P1D-m:
+    product: MEDSEA_MULTIYEAR_PHY_006_004
+    title: Water flux (2D) - Daily Mean
+    cadence: daily
+    domain: mediterranean
+    temporal:
+      start: 1987-01-01
+      end: null              # null = NRT / rolling
+    variables:
+      evs:
+        units: kg m-2 s-1
+        long_name: Surface water evaporation flux
+      friver:
+        units: kg m-2 s-1
+        long_name: Water flux into sea water from rivers
+      pr:
+        units: kg m-2 s-1
+        long_name: Precipitation flux
+
+  cmems_mod_med_phy-wflux_my_4.2km_P1M-m:
+    product: MEDSEA_MULTIYEAR_PHY_006_004
+    title: Water flux (2D) - Monthly Mean
+    cadence: monthly
+    domain: mediterranean
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      evs:
+        units: kg m-2 s-1
+        long_name: Surface water evaporation flux
+      friver:
+        units: kg m-2 s-1
+        long_name: Water flux into sea water from rivers
+      pr:
+        units: kg m-2 s-1
+        long_name: Precipitation flux
+
+  cmems_mod_med_phy_anfc_4.2km_static:
+    product: MEDSEA_ANALYSISFORECAST_PHY_006_013
+    title: cmems_mod_med_phy_anfc_4.2km_static
+    cadence: irregular
+    domain: mediterranean
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      deptho:
+        units: m
+        long_name: Sea floor depth below geoid
+      deptho_lev:
+        units: '1'
+        long_name: Model level number at sea floor
+      mask:
+        units: '1'
+        long_name: Sea binary mask
+
+  cmems_mod_med_phy_my_4.2km-climatology_P1M-m:
+    product: MEDSEA_MULTIYEAR_PHY_006_004
+    title: Monthly climatology reference period 1993-2016
+    cadence: climatology
+    domain: mediterranean
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      bottomT_avg:
+        units: degrees_C
+        long_name: Sea water potential temperature at sea floor
+      bottomT_std:
+        units: degrees_C
+        long_name: Sea water potential temperature at sea floor
+      climatology_bnds:
+        units: minutes since 1900-01-01 00:00:00
+        long_name: ''            # TODO: standard_name missing on describe()
+      mlotst_avg:
+        units: m
+        long_name: Ocean mixed layer thickness defined by sigma theta
+      mlotst_std:
+        units: m
+        long_name: Ocean mixed layer thickness defined by sigma theta
+      so_avg:
+        units: '0.001'
+        long_name: Sea water salinity
+      so_std:
+        units: '0.001'
+        long_name: Sea water salinity
+      thetao_avg:
+        units: degrees_C
+        long_name: Sea water potential temperature
+      thetao_std:
+        units: degrees_C
+        long_name: Sea water potential temperature
+      uo_avg:
+        units: m s-1
+        long_name: Eastward sea water velocity
+      uo_std:
+        units: m s-1
+        long_name: Eastward sea water velocity
+      vo_avg:
+        units: m s-1
+        long_name: Northward sea water velocity
+      vo_std:
+        units: m s-1
+        long_name: Northward sea water velocity
+      zos_avg:
+        units: m
+        long_name: Sea surface height above geoid
+      zos_std:
+        units: m
+        long_name: Sea surface height above geoid
+
+  cmems_mod_med_phy_my_4.2km_static:
+    product: MEDSEA_MULTIYEAR_PHY_006_004
+    title: cmems_mod_med_phy_my_4.2km_static
+    cadence: irregular
+    domain: mediterranean
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      deptho:
+        units: m
+        long_name: Sea floor depth below geoid
+      deptho_lev:
+        units: '1'
+        long_name: Model level number at sea floor
+      mask:
+        units: '1'
+        long_name: Sea binary mask
+
+  cmems_mod_med_wav_anfc_4.2km_PT1H-i:
+    product: MEDSEA_ANALYSISFORECAST_WAV_006_017
+    title: Wave fields (2D) - Hourly Instantaneous
+    cadence: hourly
+    domain: mediterranean
+    temporal:
+      start: 2021-11-30
+      end: null              # null = NRT / rolling
+    variables:
+      VCMX:
+        units: m
+        long_name: Sea surface wave maximum height
+      VHM0:
+        units: m
+        long_name: Sea surface wave significant height
+      VHM0_SW1:
+        units: m
+        long_name: Sea surface primary swell wave significant height
+      VHM0_SW2:
+        units: m
+        long_name: Sea surface secondary swell wave significant height
+      VHM0_WW:
+        units: m
+        long_name: Sea surface wind wave significant height
+      VMDR:
+        units: degree
+        long_name: Sea surface wave from direction
+      VMDR_SW1:
+        units: degree
+        long_name: Sea surface primary swell wave from direction
+      VMDR_SW2:
+        units: degree
+        long_name: Sea surface secondary swell wave from direction
+      VMDR_WW:
+        units: degree
+        long_name: Sea surface wind wave from direction
+      VMXL:
+        units: m
+        long_name: Sea surface wave maximum crest height
+      VPED:
+        units: degree
+        long_name: Sea surface wave from direction at variance spectral density maximum
+      VSDX:
+        units: m/s
+        long_name: Sea surface wave stokes drift x velocity
+      VSDY:
+        units: m/s
+        long_name: Sea surface wave stokes drift y velocity
+      VTM01_SW1:
+        units: s
+        long_name: Sea surface primary swell wave mean period
+      VTM01_SW2:
+        units: s
+        long_name: Sea surface secondary swell wave mean period
+      VTM01_WW:
+        units: s
+        long_name: Sea surface wind wave mean period
+      VTM02:
+        units: s
+        long_name: Sea surface wave mean period from variance spectral density second frequency moment
+      VTM10:
+        units: s
+        long_name: Sea surface wave mean period from variance spectral density inverse frequency moment
+      VTPK:
+        units: s
+        long_name: Sea surface wave period at variance spectral density maximum
+
+  cmems_mod_med_wav_anfc_4.2km_static:
+    product: MEDSEA_ANALYSISFORECAST_WAV_006_017
+    title: cmems_mod_med_wav_anfc_4.2km_static
+    cadence: irregular
+    domain: mediterranean
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      deptho:
+        units: m
+        long_name: Sea floor depth below geoid
+      mask:
+        units: '1'
+        long_name: Sea binary mask
+
+  cmems_mod_med_wav_my_4.2km-climatology_P1M-m:
+    product: MEDSEA_MULTIYEAR_WAV_006_012
+    title: monthly climatology reference period 1993-2016
+    cadence: climatology
+    domain: mediterranean
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      VHM0:
+        units: m
+        long_name: Sea surface wave significant height
+      VTM02:
+        units: s
+        long_name: Sea surface wave mean period from variance spectral density second frequency moment
+      climatology_bounds:
+        units: days since 1970-01-01 00:00:00
+        long_name: Time
+
+  cmems_mod_med_wav_my_4.2km_PT1H-i:
+    product: MEDSEA_MULTIYEAR_WAV_006_012
+    title: Wave fields (2D) - Hourly Instantaneous
+    cadence: hourly
+    domain: mediterranean
+    temporal:
+      start: 1985-01-01
+      end: null              # null = NRT / rolling
+    variables:
+      VHM0:
+        units: m
+        long_name: Sea surface wave significant height
+      VHM0_SW1:
+        units: m
+        long_name: Sea surface primary swell wave significant height
+      VHM0_SW2:
+        units: m
+        long_name: Sea surface secondary swell wave significant height
+      VHM0_WW:
+        units: m
+        long_name: Sea surface wind wave significant height
+      VMDR:
+        units: degree
+        long_name: Sea surface wave from direction
+      VMDR_SW1:
+        units: degree
+        long_name: Sea surface primary swell wave from direction
+      VMDR_SW2:
+        units: degree
+        long_name: Sea surface secondary swell wave from direction
+      VMDR_WW:
+        units: degree
+        long_name: Sea surface wind wave from direction
+      VPED:
+        units: degree
+        long_name: Sea surface wave from direction at variance spectral density maximum
+      VSDX:
+        units: m/s
+        long_name: Sea surface wave stokes drift x velocity
+      VSDY:
+        units: m/s
+        long_name: Sea surface wave stokes drift y velocity
+      VTM01_SW1:
+        units: s
+        long_name: Sea surface primary swell wave mean period
+      VTM01_SW2:
+        units: s
+        long_name: Sea surface secondary swell wave mean period
+      VTM01_WW:
+        units: s
+        long_name: Sea surface wind wave mean period
+      VTM02:
+        units: s
+        long_name: Sea surface wave mean period from variance spectral density second frequency moment
+      VTM10:
+        units: s
+        long_name: Sea surface wave mean period from variance spectral density inverse frequency moment
+      VTPK:
+        units: s
+        long_name: Sea surface wave period at variance spectral density maximum
+
+  cmems_mod_med_wav_my_4.2km_static:
+    product: MEDSEA_MULTIYEAR_WAV_006_012
+    title: cmems_mod_med_wav_my_4.2km_static
+    cadence: irregular
+    domain: mediterranean
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      deptho:
+        units: m
+        long_name: Sea floor depth below geoid
+      mask:
+        units: '1'
+        long_name: Sea binary mask
+
+  cmems_obs-oc_med_bgc-optics_my_l3-multi-1km_P1D:
+    product: OCEANCOLOUR_MED_BGC_L3_MY_009_143
+    title: cmems_obs-oc_med_bgc-optics_my_l3-multi-1km_P1D
+    cadence: daily
+    domain: mediterranean
+    temporal:
+      start: 1997-09-16
+      end: null              # null = NRT / rolling
+    variables:
+      ADG443:
+        units: m^-1
+        long_name: Volume absorption coefficient of radiative flux in sea water due to dissolved organic
+      APH443:
+        units: m^-1
+        long_name: Volume absorption coefficient of radiative flux in sea water due to phytoplankton
+      BBP443:
+        units: m^-1
+        long_name: Volume backwards scattering coefficient of radiative flux in sea water due to particles
+      QI_ADG443:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      QI_APH443:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      QI_BBP443:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      SENSORMASK:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+
+  cmems_obs-oc_med_bgc-optics_nrt_l3-hr-mosaic_P1D-m:
+    product: OCEANCOLOUR_MED_BGC_HR_L3_NRT_009_205
+    title: CMEMS HR-OC Mediterranean Sea optical (rrs, bbp) daily observations mosaic
+    cadence: daily
+    domain: mediterranean
+    temporal:
+      start: 2025-11-01
+      end: null              # null = NRT / rolling
+    variables:
+      BBP443:
+        units: m-1
+        long_name: Volume backwards scattering coefficient of radiative flux in sea water
+      BBP492:
+        units: m-1
+        long_name: Volume backwards scattering coefficient of radiative flux in sea water
+      BBP560:
+        units: m-1
+        long_name: Volume backwards scattering coefficient of radiative flux in sea water
+      BBP665:
+        units: m-1
+        long_name: Volume backwards scattering coefficient of radiative flux in sea water
+      BBP704:
+        units: m-1
+        long_name: Volume backwards scattering coefficient of radiative flux in sea water
+      BBP740:
+        units: m-1
+        long_name: Volume backwards scattering coefficient of radiative flux in sea water
+      BBP783:
+        units: m-1
+        long_name: Volume backwards scattering coefficient of radiative flux in sea water
+      BBP865:
+        units: m-1
+        long_name: Volume backwards scattering coefficient of radiative flux in sea water
+      RRS443:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS443_UNC:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS492:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS492_UNC:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS560:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS560_UNC:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS665:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS665_UNC:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS704:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS704_UNC:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS740:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS740_UNC:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS783:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS783_UNC:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS865:
+        units: sr-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS865_UNC:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+
+  cmems_obs-oc_med_bgc-optics_nrt_l3-multi-1km_P1D:
+    product: OCEANCOLOUR_MED_BGC_L3_NRT_009_141
+    title: cmems_obs-oc_med_bgc-optics_nrt_l3-multi-1km_P1D
+    cadence: daily
+    domain: mediterranean
+    temporal:
+      start: 2026-05-10
+      end: null              # null = NRT / rolling
+    variables:
+      ADG443:
+        units: m^-1
+        long_name: Volume absorption coefficient of radiative flux in sea water due to dissolved organic
+      APH443:
+        units: m^-1
+        long_name: Volume absorption coefficient of radiative flux in sea water due to phytoplankton
+      BBP443:
+        units: m^-1
+        long_name: Volume backwards scattering coefficient of radiative flux in sea water due to particles
+      QI_ADG443:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      QI_APH443:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      QI_BBP443:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      SENSORMASK:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+
+  cmems_obs-oc_med_bgc-optics_nrt_l4-hr-mosaic_P1D-m:
+    product: OCEANCOLOUR_MED_BGC_HR_L4_NRT_009_211
+    title: CMEMS HR-OC Mediterranean Sea optical (rrs, bbp) daily interpolated observations mosaic
+    cadence: daily
+    domain: mediterranean
+    temporal:
+      start: 2025-11-01
+      end: null              # null = NRT / rolling
+    variables:
+      BBP443:
+        units: m-1
+        long_name: Volume backwards scattering coefficient of radiative flux in sea water
+
+  cmems_obs-oc_med_bgc-optics_nrt_l4-hr-mosaic_P1M-m:
+    product: OCEANCOLOUR_MED_BGC_HR_L4_NRT_009_211
+    title: CMEMS HR-OC Mediterranean Sea optical (rrs, bbp) monthly averaged observations mosaic
+    cadence: monthly
+    domain: mediterranean
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      BBP443:
+        units: m-1
+        long_name: Volume backwards scattering coefficient of radiative flux in sea water
+      BBP443_count:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      BBP443_error:
+        units: m-1
+        long_name: Volume backwards scattering coefficient of radiative flux in sea water standard error
+
+  cmems_obs-oc_med_bgc-plankton_my_l3-multi-1km_P1D:
+    product: OCEANCOLOUR_MED_BGC_L3_MY_009_143
+    title: cmems_obs-oc_med_bgc-plankton_my_l3-multi-1km_P1D
+    cadence: daily
+    domain: mediterranean
+    temporal:
+      start: 1997-09-16
+      end: null              # null = NRT / rolling
+    variables:
+      CHL:
+        units: milligram m^-3
+        long_name: Mass concentration of chlorophyll a in sea water
+      CRYPTO:
+        units: milligram m^-3
+        long_name: Mass concentration of cryptophytes expressed as chlorophyll in sea water
+      DIATO:
+        units: milligram m^-3
+        long_name: Mass concentration of diatoms expressed as chlorophyll in sea water
+      DINO:
+        units: milligram m^-3
+        long_name: Mass concentration of dinophytes expressed as chlorophyll in sea water
+      GREEN:
+        units: milligram m^-3
+        long_name: Mass concentration of greenalgae and prochlorophytes expressed as chlorophyll in sea
+      HAPTO:
+        units: milligram m^-3
+        long_name: Mass concentration of haptophytes expressed as chlorophyll in sea water
+      MICRO:
+        units: milligram m^-3
+        long_name: Mass concentration of microphytoplankton expressed as chlorophyll in sea water
+      NANO:
+        units: milligram m^-3
+        long_name: Mass concentration of nanophytoplankton expressed as chlorophyll in sea water
+      PICO:
+        units: milligram m^-3
+        long_name: Mass concentration of picophytoplankton expressed as chlorophyll in sea water
+      PROKAR:
+        units: milligram m^-3
+        long_name: Mass concentration of prokaryotes expressed as chlorophyll in sea water
+      QI_CHL:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      SENSORMASK:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      WTM:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+
+  cmems_obs-oc_med_bgc-plankton_my_l3-olci-300m_P1D:
+    product: OCEANCOLOUR_MED_BGC_L3_MY_009_143
+    title: cmems_obs-oc_med_bgc-plankton_my_l3-olci-300m_P1D
+    cadence: daily
+    domain: mediterranean
+    temporal:
+      start: 2016-04-26
+      end: null              # null = NRT / rolling
+    variables:
+      CHL:
+        units: milligram m^-3
+        long_name: Mass concentration of chlorophyll a in sea water
+      QI_CHL:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      SENSORMASK:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+
+  cmems_obs-oc_med_bgc-plankton_my_l4-gapfree-multi-1km_P1D:
+    product: OCEANCOLOUR_MED_BGC_L4_MY_009_144
+    title: cmems_obs-oc_med_bgc-plankton_my_l4-gapfree-multi-1km_P1D
+    cadence: daily
+    domain: mediterranean
+    temporal:
+      start: 1997-09-16
+      end: null              # null = NRT / rolling
+    variables:
+      CHL:
+        units: milligram m^-3
+        long_name: Mass concentration of chlorophyll a in sea water
+
+  cmems_obs-oc_med_bgc-plankton_my_l4-multi-1km_P1M:
+    product: OCEANCOLOUR_MED_BGC_L4_MY_009_144
+    title: cmems_obs-oc_med_bgc-plankton_my_l4-multi-1km_P1M
+    cadence: monthly
+    domain: mediterranean
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      CHL:
+        units: milligram m^-3
+        long_name: Mass concentration of chlorophyll a in sea water
+      CHL_count:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      CHL_error:
+        units: milligram m^-3
+        long_name: ''            # TODO: standard_name missing on describe()
+
+  cmems_obs-oc_med_bgc-plankton_my_l4-multi-climatology-1km_P1D:
+    product: OCEANCOLOUR_MED_BGC_L4_MY_009_144
+    title: cmems_obs-oc_med_bgc-plankton_my_l4-multi-climatology-1km_P1D
+    cadence: climatology
+    domain: mediterranean
+    temporal:
+      start: 2000-01-01
+      end: null              # null = NRT / rolling
+    variables:
+      CHL_count:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      CHL_median:
+        units: mg/m3
+        long_name: Mass concentration of chlorophyll a in sea water
+      CHL_standard_deviation:
+        units: mg/m3
+        long_name: Mass concentration of chlorophyll a in sea water
+      climatology_bounds:
+        units: seconds since 1981-01-01
+        long_name: Time
+
+  cmems_obs-oc_med_bgc-plankton_my_l4-olci-300m_P1M:
+    product: OCEANCOLOUR_MED_BGC_L4_MY_009_144
+    title: cmems_obs-oc_med_bgc-plankton_my_l4-olci-300m_P1M
+    cadence: monthly
+    domain: mediterranean
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      CHL:
+        units: milligram m^-3
+        long_name: Mass concentration of chlorophyll a in sea water
+      CHL_count:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      CHL_error:
+        units: milligram m^-3
+        long_name: ''            # TODO: standard_name missing on describe()
+
+  cmems_obs-oc_med_bgc-plankton_nrt_l3-multi-1km_P1D:
+    product: OCEANCOLOUR_MED_BGC_L3_NRT_009_141
+    title: cmems_obs-oc_med_bgc-plankton_nrt_l3-multi-1km_P1D
+    cadence: daily
+    domain: mediterranean
+    temporal:
+      start: 2026-05-10
+      end: null              # null = NRT / rolling
+    variables:
+      CHL:
+        units: milligram m^-3
+        long_name: Mass concentration of chlorophyll a in sea water
+      CRYPTO:
+        units: milligram m^-3
+        long_name: Mass concentration of cryptophytes expressed as chlorophyll in sea water
+      DIATO:
+        units: milligram m^-3
+        long_name: Mass concentration of diatoms expressed as chlorophyll in sea water
+      DINO:
+        units: milligram m^-3
+        long_name: Mass concentration of dinophytes expressed as chlorophyll in sea water
+      GREEN:
+        units: milligram m^-3
+        long_name: Mass concentration of greenalgae and prochlorophytes expressed as chlorophyll in sea
+      HAPTO:
+        units: milligram m^-3
+        long_name: Mass concentration of haptophytes expressed as chlorophyll in sea water
+      MICRO:
+        units: milligram m^-3
+        long_name: Mass concentration of microphytoplankton expressed as chlorophyll in sea water
+      NANO:
+        units: milligram m^-3
+        long_name: Mass concentration of nanophytoplankton expressed as chlorophyll in sea water
+      PICO:
+        units: milligram m^-3
+        long_name: Mass concentration of picophytoplankton expressed as chlorophyll in sea water
+      PROKAR:
+        units: milligram m^-3
+        long_name: Mass concentration of prokaryotes expressed as chlorophyll in sea water
+      QI_CHL:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      SENSORMASK:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      WTM:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+
+  cmems_obs-oc_med_bgc-plankton_nrt_l3-olci-300m_P1D:
+    product: OCEANCOLOUR_MED_BGC_L3_NRT_009_141
+    title: cmems_obs-oc_med_bgc-plankton_nrt_l3-olci-300m_P1D
+    cadence: daily
+    domain: mediterranean
+    temporal:
+      start: 2026-05-10
+      end: null              # null = NRT / rolling
+    variables:
+      CHL:
+        units: milligram m^-3
+        long_name: Mass concentration of chlorophyll a in sea water
+      QI_CHL:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      SENSORMASK:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+
+  cmems_obs-oc_med_bgc-plankton_nrt_l4-gapfree-multi-1km_P1D:
+    product: OCEANCOLOUR_MED_BGC_L4_NRT_009_142
+    title: cmems_obs-oc_med_bgc-plankton_nrt_l4-gapfree-multi-1km_P1D
+    cadence: daily
+    domain: mediterranean
+    temporal:
+      start: 2026-04-22
+      end: null              # null = NRT / rolling
+    variables:
+      CHL:
+        units: milligram m^-3
+        long_name: Mass concentration of chlorophyll a in sea water
+
+  cmems_obs-oc_med_bgc-plankton_nrt_l4-multi-1km_P1M:
+    product: OCEANCOLOUR_MED_BGC_L4_NRT_009_142
+    title: cmems_obs-oc_med_bgc-plankton_nrt_l4-multi-1km_P1M
+    cadence: monthly
+    domain: mediterranean
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      CHL:
+        units: milligram m^-3
+        long_name: Mass concentration of chlorophyll a in sea water
+      CHL_count:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      CHL_error:
+        units: milligram m^-3
+        long_name: ''            # TODO: standard_name missing on describe()
+
+  cmems_obs-oc_med_bgc-plankton_nrt_l4-olci-300m_P1M:
+    product: OCEANCOLOUR_MED_BGC_L4_NRT_009_142
+    title: cmems_obs-oc_med_bgc-plankton_nrt_l4-olci-300m_P1M
+    cadence: monthly
+    domain: mediterranean
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      CHL:
+        units: milligram m^-3
+        long_name: Mass concentration of chlorophyll a in sea water
+      CHL_count:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      CHL_error:
+        units: milligram m^-3
+        long_name: ''            # TODO: standard_name missing on describe()
+
+  cmems_obs-oc_med_bgc-pp_my_l4-multi-4km_P1D:
+    product: OCEANCOLOUR_MED_BGC_L4_MY_009_144
+    title: cmems_obs-oc_med_bgc-pp_my_l4-multi-4km_P1D
+    cadence: daily
+    domain: mediterranean
+    temporal:
+      start: 1997-09-16
+      end: null              # null = NRT / rolling
+    variables:
+      PP:
+        units: g m^-2 d^-1
+        long_name: Primary productivity of biomass expressed as carbon
+
+  cmems_obs-oc_med_bgc-pp_my_l4-multi-4km_P1M:
+    product: OCEANCOLOUR_MED_BGC_L4_MY_009_144
+    title: cmems_obs-oc_med_bgc-pp_my_l4-multi-4km_P1M
+    cadence: monthly
+    domain: mediterranean
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      PP:
+        units: g m^-2 d^-1
+        long_name: Primary productivity of biomass expressed as carbon
+      PP_count:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      PP_error:
+        units: g m^-2 d^-1
+        long_name: ''            # TODO: standard_name missing on describe()
+
+  cmems_obs-oc_med_bgc-pp_nrt_l4-multi-4km_P1D:
+    product: OCEANCOLOUR_MED_BGC_L4_NRT_009_142
+    title: cmems_obs-oc_med_bgc-pp_nrt_l4-multi-4km_P1D
+    cadence: daily
+    domain: mediterranean
+    temporal:
+      start: 2026-05-08
+      end: null              # null = NRT / rolling
+    variables:
+      PP:
+        units: g m^-2 d^-1
+        long_name: Primary productivity of biomass expressed as carbon
+
+  cmems_obs-oc_med_bgc-pp_nrt_l4-multi-4km_P1M:
+    product: OCEANCOLOUR_MED_BGC_L4_NRT_009_142
+    title: cmems_obs-oc_med_bgc-pp_nrt_l4-multi-4km_P1M
+    cadence: monthly
+    domain: mediterranean
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      PP:
+        units: g m^-2 d^-1
+        long_name: Primary productivity of biomass expressed as carbon
+      PP_count:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      PP_error:
+        units: g m^-2 d^-1
+        long_name: ''            # TODO: standard_name missing on describe()
+
+  cmems_obs-oc_med_bgc-reflectance_my_l3-multi-1km_P1D:
+    product: OCEANCOLOUR_MED_BGC_L3_MY_009_143
+    title: cmems_obs-oc_med_bgc-reflectance_my_l3-multi-1km_P1D
+    cadence: daily
+    domain: mediterranean
+    temporal:
+      start: 1997-09-16
+      end: null              # null = NRT / rolling
+    variables:
+      QI_RRS412:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      QI_RRS443:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      QI_RRS490:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      QI_RRS510:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      QI_RRS555:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      QI_RRS670:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS412:
+        units: sr^-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS443:
+        units: sr^-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS490:
+        units: sr^-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS510:
+        units: sr^-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS555:
+        units: sr^-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS670:
+        units: sr^-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      SENSORMASK:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+
+  cmems_obs-oc_med_bgc-reflectance_my_l3-olci-300m_P1D:
+    product: OCEANCOLOUR_MED_BGC_L3_MY_009_143
+    title: cmems_obs-oc_med_bgc-reflectance_my_l3-olci-300m_P1D
+    cadence: daily
+    domain: mediterranean
+    temporal:
+      start: 2016-04-26
+      end: null              # null = NRT / rolling
+    variables:
+      QI_RRS412_5:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      QI_RRS442_5:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      QI_RRS490:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      QI_RRS510:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      QI_RRS560:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      QI_RRS673_75:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS400:
+        units: sr^-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS412_5:
+        units: sr^-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS442_5:
+        units: sr^-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS490:
+        units: sr^-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS510:
+        units: sr^-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS560:
+        units: sr^-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS620:
+        units: sr^-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS665:
+        units: sr^-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS673_75:
+        units: sr^-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS681_25:
+        units: sr^-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS708_75:
+        units: sr^-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS778_75:
+        units: sr^-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS865:
+        units: sr^-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      SENSORMASK:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+
+  cmems_obs-oc_med_bgc-reflectance_nrt_l3-multi-1km_P1D:
+    product: OCEANCOLOUR_MED_BGC_L3_NRT_009_141
+    title: cmems_obs-oc_med_bgc-reflectance_nrt_l3-multi-1km_P1D
+    cadence: daily
+    domain: mediterranean
+    temporal:
+      start: 2026-05-10
+      end: null              # null = NRT / rolling
+    variables:
+      QI_RRS412:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      QI_RRS443:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      QI_RRS490:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      QI_RRS510:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      QI_RRS555:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      QI_RRS670:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS412:
+        units: sr^-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS443:
+        units: sr^-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS490:
+        units: sr^-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS510:
+        units: sr^-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS555:
+        units: sr^-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS670:
+        units: sr^-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      SENSORMASK:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+
+  cmems_obs-oc_med_bgc-reflectance_nrt_l3-olci-300m_P1D:
+    product: OCEANCOLOUR_MED_BGC_L3_NRT_009_141
+    title: cmems_obs-oc_med_bgc-reflectance_nrt_l3-olci-300m_P1D
+    cadence: daily
+    domain: mediterranean
+    temporal:
+      start: 2026-05-10
+      end: null              # null = NRT / rolling
+    variables:
+      QI_RRS412_5:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      QI_RRS442_5:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      QI_RRS490:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      QI_RRS510:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      QI_RRS560:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      QI_RRS673_75:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      RRS400:
+        units: sr^-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS412_5:
+        units: sr^-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS442_5:
+        units: sr^-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS490:
+        units: sr^-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS510:
+        units: sr^-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS560:
+        units: sr^-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS620:
+        units: sr^-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS665:
+        units: sr^-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS673_75:
+        units: sr^-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS681_25:
+        units: sr^-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS708_75:
+        units: sr^-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS778_75:
+        units: sr^-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      RRS865:
+        units: sr^-1
+        long_name: Surface ratio of upwelling radiance emerging from sea water to downwelling radiative
+      SENSORMASK:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+
+  cmems_obs-oc_med_bgc-transp_my_l3-multi-1km_P1D:
+    product: OCEANCOLOUR_MED_BGC_L3_MY_009_143
+    title: cmems_obs-oc_med_bgc-transp_my_l3-multi-1km_P1D
+    cadence: daily
+    domain: mediterranean
+    temporal:
+      start: 1997-09-16
+      end: null              # null = NRT / rolling
+    variables:
+      KD490:
+        units: m^-1
+        long_name: Volume attenuation coefficient of downwelling radiative flux in sea water
+      QI_KD490:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      SENSORMASK:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+
+  cmems_obs-oc_med_bgc-transp_my_l3-olci-300m_P1D:
+    product: OCEANCOLOUR_MED_BGC_L3_MY_009_143
+    title: cmems_obs-oc_med_bgc-transp_my_l3-olci-300m_P1D
+    cadence: daily
+    domain: mediterranean
+    temporal:
+      start: 2016-04-26
+      end: null              # null = NRT / rolling
+    variables:
+      KD490:
+        units: m^-1
+        long_name: Volume attenuation coefficient of downwelling radiative flux in sea water
+      QI_KD490:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      SENSORMASK:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+
+  cmems_obs-oc_med_bgc-transp_nrt_l3-multi-1km_P1D:
+    product: OCEANCOLOUR_MED_BGC_L3_NRT_009_141
+    title: cmems_obs-oc_med_bgc-transp_nrt_l3-multi-1km_P1D
+    cadence: daily
+    domain: mediterranean
+    temporal:
+      start: 2026-05-10
+      end: null              # null = NRT / rolling
+    variables:
+      KD490:
+        units: m^-1
+        long_name: Volume attenuation coefficient of downwelling radiative flux in sea water
+      QI_KD490:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      SENSORMASK:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+
+  cmems_obs-oc_med_bgc-transp_nrt_l3-olci-300m_P1D:
+    product: OCEANCOLOUR_MED_BGC_L3_NRT_009_141
+    title: cmems_obs-oc_med_bgc-transp_nrt_l3-olci-300m_P1D
+    cadence: daily
+    domain: mediterranean
+    temporal:
+      start: 2026-05-10
+      end: null              # null = NRT / rolling
+    variables:
+      KD490:
+        units: m^-1
+        long_name: Volume attenuation coefficient of downwelling radiative flux in sea water
+      QI_KD490:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      SENSORMASK:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+
+  cmems_obs-oc_med_bgc-transp_nrt_l4-multi-1km_P1M:
+    product: OCEANCOLOUR_MED_BGC_L4_NRT_009_142
+    title: cmems_obs-oc_med_bgc-transp_nrt_l4-multi-1km_P1M
+    cadence: monthly
+    domain: mediterranean
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      KD490:
+        units: m^-1
+        long_name: Volume attenuation coefficient of downwelling radiative flux in sea water
+      KD490_count:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      KD490_error:
+        units: m^-1
+        long_name: ''            # TODO: standard_name missing on describe()
+
+  cmems_obs-oc_med_bgc-transp_nrt_l4-olci-300m_P1M:
+    product: OCEANCOLOUR_MED_BGC_L4_NRT_009_142
+    title: cmems_obs-oc_med_bgc-transp_nrt_l4-olci-300m_P1M
+    cadence: monthly
+    domain: mediterranean
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      KD490:
+        units: m^-1
+        long_name: Volume attenuation coefficient of downwelling radiative flux in sea water
+      KD490_count:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      KD490_error:
+        units: m^-1
+        long_name: ''            # TODO: standard_name missing on describe()
+
+  cmems_obs-oc_med_bgc-tur-spm-chl_nrt_l4-hr-mosaic_P1M-m:
+    product: OCEANCOLOUR_MED_BGC_HR_L4_NRT_009_211
+    title: CMEMS HR-OC Mediterranean Sea transparency (spm, tur) and geophysical (chl) monthly
+    cadence: monthly
+    domain: mediterranean
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      CHL:
+        units: mg m-3
+        long_name: Mass concentration of chlorophyll a in sea water
+      CHL_count:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      CHL_error:
+        units: mg m-3
+        long_name: Mass concentration of chlorophyll a in sea water standard error
+      SPM:
+        units: g m-3
+        long_name: Mass concentration of suspended matter in sea water
+      SPM_count:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      SPM_error:
+        units: g m-3
+        long_name: Mass concentration of suspended matter in sea water standard error
+      TUR:
+        units: FNU
+        long_name: Sea water turbidity
+      TUR_count:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      TUR_error:
+        units: FNU
+        long_name: Sea water turbidity standard error
+
+  cmems_obs-sst_med_phy-sst_nrt_diurnal-oi-0.0625deg_PT1H-m:
+    product: SST_MED_PHY_SUBSKIN_L4_NRT_010_036
+    title: Mediterranean Sea Diurnal Subskin SST Analysis, L4, 1/16deg hourly
+    cadence: hourly
+    domain: mediterranean
+    temporal:
+      start: 2019-01-01
+      end: null              # null = NRT / rolling
+    variables:
+      analysed_sst:
+        units: kelvin
+        long_name: Sea surface subskin temperature
+      analysis_error:
+        units: percentage
+        long_name: ''            # TODO: standard_name missing on describe()
+      mask:
+        units: '1'
+        long_name: ''            # TODO: standard_name missing on describe()
+      sea_ice_fraction:
+        units: '1'
+        long_name: Sea ice area fraction
+
+  cmems_obs-sst_med_phy_my_l3s_P1D-m:
+    product: SST_MED_PHY_L3S_MY_010_042
+    title: Mediterranean Sea SST, L3S, Reprocessed using ESA CCI SST v.3.0 and PFV53 data, 0.05
+    cadence: daily
+    domain: mediterranean
+    temporal:
+      start: 1982-01-01
+      end: null              # null = NRT / rolling
+    variables:
+      adjusted_sea_surface_temperature:
+        units: kelvin
+        long_name: Sea surface foundation temperature
+
+  cmems_obs_oc_med_bgc_tur-spm-chl_nrt_l3-hr-mosaic_P1D-m:
+    product: OCEANCOLOUR_MED_BGC_HR_L3_NRT_009_205
+    title: CMEMS HR-OC Mediterranean Sea transparency (spm, tur) and geophysical (chl) daily
+    cadence: daily
+    domain: mediterranean
+    temporal:
+      start: 2020-01-01
+      end: null              # null = NRT / rolling
+    variables:
+      CHL:
+        units: mg m-3
+        long_name: Mass concentration of chlorophyll a in sea water
+      SPM:
+        units: g m-3
+        long_name: Mass concentration of suspended matter in sea water
+      TUR:
+        units: FNU
+        long_name: Sea water turbidity
+
+  cmems_obs_oc_med_bgc_tur-spm-chl_nrt_l4-hr-mosaic_P1D-m:
+    product: OCEANCOLOUR_MED_BGC_HR_L4_NRT_009_211
+    title: CMEMS HR-OC Mediterranean Sea transparency (spm, tur) and geophysical (chl) daily
+    cadence: daily
+    domain: mediterranean
+    temporal:
+      start: 2020-01-01
+      end: null              # null = NRT / rolling
+    variables:
+      CHL:
+        units: mg m-3
+        long_name: Mass concentration of chlorophyll a in sea water
+      SPM:
+        units: g m-3
+        long_name: Mass concentration of suspended matter in sea water
+      TUR:
+        units: FNU
+        long_name: Sea water turbidity
+
+  medsea_omi_seastate_extreme_var_swh_mean_and_anomaly:
+    product: MEDSEA_OMI_SEASTATE_extreme_var_swh_mean_and_anomaly
+    title: Extremes variability in European Seas
+    cadence: irregular
+    domain: mediterranean
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      swh_percentile99_anom:
+        units: m
+        long_name: Sea surface wave significant height
+      swh_percentile99_mean:
+        units: m
+        long_name: Sea surface wave significant height
+
+  medsea_omi_tempsal_extreme_var_temp_mean_and_anomaly:
+    product: MEDSEA_OMI_TEMPSAL_extreme_var_temp_mean_and_anomaly
+    title: Extremes variability in European Seas
+    cadence: irregular
+    domain: mediterranean
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      temp_percentile99_anom:
+        units: degree_C
+        long_name: Sea water temperature
+      temp_percentile99_mean:
+        units: degree_C
+        long_name: Sea water temperature
+
+  medsea_omi_tempsal_sst_area_averaged_anomalies:
+    product: MEDSEA_OMI_TEMPSAL_sst_area_averaged_anomalies
+    title: Area Averaged Sea Surface Temperature Anomaly
+    cadence: irregular
+    domain: mediterranean
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      sst_anomaly:
+        units: degrees C
+        long_name: Sea surface temperature
+      sst_anomaly_filtered:
+        units: degrees C
+        long_name: Sea surface temperature
+
+  medsea_omi_tempsal_sst_trend:
+    product: MEDSEA_OMI_TEMPSAL_sst_trend
+    title: Sea Surface Temperature Trend
+    cadence: irregular
+    domain: mediterranean
+    temporal:
+      start: null            # TODO: no time coord in describe()
+      end: null              # null = NRT / rolling
+    variables:
+      sst_trend:
+        units: C/year
+        long_name: Change over time in sea surface temperature
+      sst_trend_significance:
+        units: Boolean
+        long_name: Sea surface temperature trend significance
