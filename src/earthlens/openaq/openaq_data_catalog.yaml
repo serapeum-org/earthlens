@@ -33,3 +33,20 @@ parameters:
   pressure: { id: 132, name: pressure, units: "mb", display_name: "Atmospheric pressure", group: meteorological }
   wind_speed: { id: 34, name: wind_speed, units: "m/s", display_name: "Wind speed", group: meteorological }
   wind_direction: { id: 22, name: wind_direction, units: "deg", display_name: "Wind direction", group: meteorological }
+  humidity: { id: 134, name: humidity, units: "%", display_name: "Humidity", group: meteorological }
+  # Additional PM size fractions.
+  pm1: { id: 19, name: pm1, units: "µg/m³", display_name: "PM1", group: particulate }
+  pm4: { id: 19844, name: pm4, units: "µg/m³", display_name: "PM4.0", group: particulate }
+  # Particle-count metrics (counts per cm³) from optical particle counters.
+  ufp: { id: 33, name: ufp, units: "particles/cm³", display_name: "Ultrafine particle count", group: particulate }
+  um003: { id: 125, name: um003, units: "particles/cm³", display_name: "PM0.3 count", group: particulate }
+  um010: { id: 126, name: um010, units: "particles/cm³", display_name: "PM1 count", group: particulate }
+  um025: { id: 130, name: um025, units: "particles/cm³", display_name: "PM2.5 count", group: particulate }
+  um100: { id: 135, name: um100, units: "particles/cm³", display_name: "PM10 count", group: particulate }
+  # Wavelength-resolved black carbon (aethalometer channels).
+  bc_370: { id: 19866, name: bc_370, units: "ng/m³", display_name: "BC 370nm", group: particulate }
+  bc_375: { id: 19861, name: bc_375, units: "ng/m³", display_name: "BC 375nm", group: particulate }
+  bc_470: { id: 19862, name: bc_470, units: "ng/m³", display_name: "BC 470nm", group: particulate }
+  bc_528: { id: 19863, name: bc_528, units: "ng/m³", display_name: "BC 528nm", group: particulate }
+  bc_625: { id: 19864, name: bc_625, units: "ng/m³", display_name: "BC 625nm", group: particulate }
+  bc_880: { id: 19865, name: bc_880, units: "ng/m³", display_name: "BC 880nm", group: particulate }
