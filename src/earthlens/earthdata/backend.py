@@ -35,7 +35,7 @@ from __future__ import annotations
 import datetime as dt
 import os
 from pathlib import Path
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 import pandas as pd
 
@@ -292,29 +292,140 @@ class EarthData(AbstractDataSource):
         return self._api_via_search_fetch()
 
     def _search(self) -> list[RemoteProduct]:
-        """List the CMR granules for the requested datasets (C3).
+        """Query CMR for the granules of every requested dataset.
 
-        Implemented in C3. The scaffold raises so the search/fetch
-        surface is explicit before the CMR wiring lands.
+        One `earthaccess.search_data` call per resolved dataset row,
+        scoped to the request bbox and time window. The bounding box is
+        passed as the `(west, south, east, north)` tuple CMR expects
+        (lon/lat order). Each returned granule becomes one
+        :class:`RemoteProduct` whose `metadata` carries the raw granule
+        handle and its dataset row, so :meth:`_fetch` can group and
+        fetch without re-querying.
 
-        Raises:
-            NotImplementedError: Always, until C3.
+        Returns:
+            list[RemoteProduct]: One product per matching CMR granule,
+                across every requested dataset. An empty list (no
+                granules in the window) short-circuits the fetch.
         """
-        raise NotImplementedError(
-            "EarthData._search (CMR query) lands in C3."
+        try:
+            import earthaccess
+        except ImportError as exc:
+            raise ImportError(
+                "the NASA Earthdata backend needs `earthaccess`; install "
+                "`pip install earthlens[earthdata]` (Python >=3.12)."
+            ) from exc
+
+        if self._auth is not None:
+            self._auth.configure()
+
+        bbox = (
+            self.space.west,
+            self.space.south,
+            self.space.east,
+            self.space.north,
         )
+        temporal = (
+            self.time.start_date.isoformat(),
+            self.time.end_date.isoformat(),
+        )
+        products: list[RemoteProduct] = []
+        for ds in self._datasets:
+            granules = earthaccess.search_data(
+                short_name=ds.short_name,
+                version=ds.version or None,
+                provider=ds.provider or None,
+                bounding_box=bbox,
+                temporal=temporal,
+                count=-1,
+            )
+            for granule in granules:
+                products.append(
+                    RemoteProduct(
+                        id=str(granule["meta"]["concept-id"]),
+                        metadata={"granule": granule, "dataset": ds},
+                    )
+                )
+        return products
 
     def _fetch(self, products: list[RemoteProduct]) -> list[Path]:
-        """Fetch the granules `_search` returned (C3).
+        """Fetch every granule `_search` returned to local paths.
 
-        Implemented in C3 (download / in-region open).
+        Groups the products by dataset (each dataset's granules share
+        one fetch strategy) and, per group, either streams in-region
+        from S3 (`earthaccess.open`) or downloads over HTTPS
+        (`earthaccess.download`). The choice follows `direct_s3`
+        (`G4`): `"always"` forces S3, `"never"` forces HTTPS, and
+        `"auto"` (default) uses S3 only when the dataset is
+        cloud-hosted and the caller runs in the DAAC's region.
 
-        Raises:
-            NotImplementedError: Always, until C3.
+        Args:
+            products: The products from :meth:`_search`.
+
+        Returns:
+            list[Path]: Local paths of every fetched granule, in
+                dataset/group order.
         """
-        raise NotImplementedError(
-            "EarthData._fetch (download/open) lands in C3."
-        )
+        import earthaccess
+
+        out_paths: list[Path] = []
+        for ds, granules in self._group_by_dataset(products):
+            if self._use_s3(ds):
+                files = earthaccess.open(granules)
+                out_paths.extend(Path(getattr(f, "path", str(f))) for f in files)
+            else:
+                downloaded = earthaccess.download(granules, str(self.root_dir))
+                out_paths.extend(Path(p) for p in downloaded)
+        return out_paths
+
+    @staticmethod
+    def _group_by_dataset(
+        products: list[RemoteProduct],
+    ) -> list[tuple[EarthdataDataset, list[Any]]]:
+        """Group granule handles by their dataset row, preserving order.
+
+        Returns `(dataset, granules)` pairs rather than a dict because
+        :class:`EarthdataDataset` is not hashable (it carries a `bands`
+        mapping), and grouping is by object identity.
+
+        Args:
+            products: The products from :meth:`_search`.
+
+        Returns:
+            list[tuple[EarthdataDataset, list]]: One pair per dataset,
+                in first-seen order, each holding that dataset's raw
+                granule handles.
+        """
+        groups: list[tuple[EarthdataDataset, list[Any]]] = []
+        for product in products:
+            ds = product.metadata["dataset"]
+            for existing_ds, granules in groups:
+                if existing_ds is ds:
+                    granules.append(product.metadata["granule"])
+                    break
+            else:
+                groups.append((ds, [product.metadata["granule"]]))
+        return groups
+
+    def _use_s3(self, dataset: EarthdataDataset) -> bool:
+        """Decide whether to stream a dataset from S3 instead of HTTPS (`G4`).
+
+        Args:
+            dataset: The dataset row being fetched.
+
+        Returns:
+            bool: `True` to use `earthaccess.open` (in-region S3),
+                `False` to use `earthaccess.download` (HTTPS).
+        """
+        if self._direct_s3 == "always":
+            return True
+        if self._direct_s3 == "never":
+            return False
+        region = "us-west-2"
+        try:
+            region = self._catalog.get_daac(dataset.provider).cloud_region
+        except KeyError:
+            pass
+        return dataset.cloud_hosted and self._in_region(region)
 
     def _in_region(self, region: str) -> bool:
         """Return whether the caller appears to run in `region`.
@@ -344,21 +455,132 @@ class EarthData(AbstractDataSource):
         progress_bar: bool = True,
         aggregate: AggregationConfig | None = None,
     ) -> list[Path]:
-        """Search CMR, fetch the granules, return their local paths (C3).
+        """Search CMR, fetch the granules, return their local paths.
 
-        Implemented in C3. The `aggregate=` routing (raster →
-        `NetCDF.reduce` / `DatasetCollection.groupby`) lands there too;
-        the facade only forwards `aggregate=` for a `"raster"`
-        instance (`G6`).
+        Composes :meth:`_search` and :meth:`_fetch` to pull every
+        granule matching the request bbox + window to `self.root_dir`
+        (or in-region S3 handles). When `aggregate` is given, the
+        fetched granules are reduced per-window via the existing
+        pyramids reducer (`G6`) — the facade only forwards `aggregate=`
+        for a `"raster"` instance, having rejected it for `"vector"` /
+        `"tabular"`.
 
         Args:
-            progress_bar: Forwarded to the fetch progress bar.
-            aggregate: Optional aggregation request (raster only).
+            progress_bar: Reserved for parity with the other backends'
+                `download(progress_bar=...)` signature; the
+                `earthaccess` fetch shows its own progress.
+            aggregate: Optional
+                :class:`earthlens.aggregate.AggregationConfig`. Only
+                reached for a `"raster"` instance.
+
+        Returns:
+            list[Path]: The fetched granule paths, or — when
+                `aggregate` is set — the per-window reduced raster
+                paths.
 
         Raises:
-            NotImplementedError: Always, until C3.
+            NotImplementedError: When `aggregate` is set but the
+                installed pyramids exposes no `NetCDF.reduce` /
+                `DatasetCollection.groupby` for the fetched format.
         """
-        raise NotImplementedError(
-            "EarthData.download (search → fetch → optional aggregate) "
-            "lands in C3."
-        )
+        paths = self._api_via_search_fetch()
+        if aggregate is not None:
+            return self._aggregate(paths, aggregate)
+        return paths
+
+    def _aggregate(
+        self, paths: list[Path], config: AggregationConfig
+    ) -> list[Path]:
+        """Reduce fetched raster granules per-window via pyramids (`G6`).
+
+        Routes by on-disk format using the existing pyramids reducers —
+        no new pyramids feature: NetCDF / HDF granules go through
+        :meth:`pyramids.netcdf.NetCDF.reduce` (the CMEMS path) and a
+        COG stack through
+        :meth:`pyramids.dataset.DatasetCollection.groupby` (the STAC
+        path).
+
+        Args:
+            paths: The fetched granule paths.
+            config: The aggregation request.
+
+        Returns:
+            list[Path]: The reduced raster paths.
+
+        Raises:
+            NotImplementedError: When the installed pyramids lacks the
+                reducer the fetched format needs.
+        """
+        netcdf_like = {".nc", ".nc4", ".h5", ".hdf", ".hdf5", ".he5"}
+        cog_like = {".tif", ".tiff", ".cog"}
+        nc_paths = [p for p in paths if p.suffix.lower() in netcdf_like]
+        tif_paths = [p for p in paths if p.suffix.lower() in cog_like]
+
+        out: list[Path] = []
+        if nc_paths:
+            out.extend(self._reduce_netcdf(nc_paths, config))
+        if tif_paths:
+            out.extend(self._reduce_cog_stack(tif_paths, config))
+        return out
+
+    def _reduce_netcdf(
+        self, paths: list[Path], config: AggregationConfig
+    ) -> list[Path]:
+        """Reduce NetCDF / HDF granules over time via `NetCDF.reduce`.
+
+        Args:
+            paths: NetCDF / HDF granule paths.
+            config: The aggregation request (provides `freq` / `op`).
+
+        Returns:
+            list[Path]: One reduced NetCDF per input, written beside it.
+
+        Raises:
+            NotImplementedError: When the installed pyramids has no
+                `NetCDF.reduce`.
+        """
+        from pyramids.netcdf import NetCDF
+
+        if not hasattr(NetCDF, "reduce"):
+            raise NotImplementedError(
+                "EarthData.download(aggregate=...) needs pyramids' "
+                "NetCDF.reduce, which the installed pyramids build does "
+                "not provide. Upgrade pyramids, or call download() without "
+                "aggregate= and post-process the granules directly."
+            )
+        how = "mean" if config.op == "auto" else config.op
+        out: list[Path] = []
+        for path in paths:
+            reduced = NetCDF.read_file(str(path)).reduce("time", how=how)
+            target = path.with_name(f"{path.stem}_{config.freq}_agg.nc")
+            reduced.to_file(str(target))
+            out.append(target)
+        return out
+
+    def _reduce_cog_stack(
+        self, paths: list[Path], config: AggregationConfig
+    ) -> list[Path]:
+        """Reduce a COG stack per-window via `DatasetCollection.groupby`.
+
+        Args:
+            paths: COG / GeoTIFF granule paths.
+            config: The aggregation request (provides `freq`).
+
+        Returns:
+            list[Path]: The per-window reduced raster paths.
+
+        Raises:
+            NotImplementedError: When the installed pyramids has no
+                `DatasetCollection.groupby`.
+        """
+        from pyramids.dataset import DatasetCollection
+
+        if not hasattr(DatasetCollection, "groupby"):
+            raise NotImplementedError(
+                "EarthData.download(aggregate=...) for a COG stack needs "
+                "pyramids' DatasetCollection.groupby, which the installed "
+                "pyramids build does not provide."
+            )
+        collection = DatasetCollection.read_file([str(p) for p in paths])
+        grouped = collection.groupby(config.freq)
+        return [Path(p) for p in grouped.to_file(str(self.root_dir))]
