@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -6909,8 +6909,8 @@ one (the normal case for the public event services).</p>
     <ul>
 <li>An explicit token wins and is returned unchanged:
     <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="o">&gt;&gt;&gt;</span> <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.fdsn.auth</span><span class="w"> </span><span class="kn">import</span> <span class="n">resolve_earthscope_token</span>
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="o">&gt;&gt;&gt;</span> <span class="n">resolve_earthscope_token</span><span class="p">(</span><span class="s2">&quot;abc123&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="s1">&#39;abc123&#39;</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="o">&gt;&gt;&gt;</span> <span class="n">resolve_earthscope_token</span><span class="p">(</span><span class="s2">&quot;example-token&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="s1">&#39;example-token&#39;</span>
 </code></pre></div></li>
 <li>With no argument, env var, or file, the result is <code>None</code>:
     <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="o">&gt;&gt;&gt;</span> <span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
@@ -6986,8 +6986,8 @@ one (the normal case for the public event services).</p>
 <a id="__codelineno-0-43" name="__codelineno-0-43"></a><span class="sd">        - An explicit token wins and is returned unchanged:</span>
 <a id="__codelineno-0-44" name="__codelineno-0-44"></a><span class="sd">            ```python</span>
 <a id="__codelineno-0-45" name="__codelineno-0-45"></a><span class="sd">            &gt;&gt;&gt; from earthlens.fdsn.auth import resolve_earthscope_token</span>
-<a id="__codelineno-0-46" name="__codelineno-0-46"></a><span class="sd">            &gt;&gt;&gt; resolve_earthscope_token(&quot;abc123&quot;)</span>
-<a id="__codelineno-0-47" name="__codelineno-0-47"></a><span class="sd">            &#39;abc123&#39;</span>
+<a id="__codelineno-0-46" name="__codelineno-0-46"></a><span class="sd">            &gt;&gt;&gt; resolve_earthscope_token(&quot;example-token&quot;)</span>
+<a id="__codelineno-0-47" name="__codelineno-0-47"></a><span class="sd">            &#39;example-token&#39;</span>
 <a id="__codelineno-0-48" name="__codelineno-0-48"></a>
 <a id="__codelineno-0-49" name="__codelineno-0-49"></a><span class="sd">            ```</span>
 <a id="__codelineno-0-50" name="__codelineno-0-50"></a><span class="sd">        - With no argument, env var, or file, the result is `None`:</span>
@@ -10369,8 +10369,8 @@ one (the normal case for the public event services).</p>
     <ul>
 <li>An explicit token wins and is returned unchanged:
     <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="o">&gt;&gt;&gt;</span> <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.fdsn.auth</span><span class="w"> </span><span class="kn">import</span> <span class="n">resolve_earthscope_token</span>
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="o">&gt;&gt;&gt;</span> <span class="n">resolve_earthscope_token</span><span class="p">(</span><span class="s2">&quot;abc123&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="s1">&#39;abc123&#39;</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="o">&gt;&gt;&gt;</span> <span class="n">resolve_earthscope_token</span><span class="p">(</span><span class="s2">&quot;example-token&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="s1">&#39;example-token&#39;</span>
 </code></pre></div></li>
 <li>With no argument, env var, or file, the result is <code>None</code>:
     <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="o">&gt;&gt;&gt;</span> <span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
@@ -10446,8 +10446,8 @@ one (the normal case for the public event services).</p>
 <a id="__codelineno-0-43" name="__codelineno-0-43"></a><span class="sd">        - An explicit token wins and is returned unchanged:</span>
 <a id="__codelineno-0-44" name="__codelineno-0-44"></a><span class="sd">            ```python</span>
 <a id="__codelineno-0-45" name="__codelineno-0-45"></a><span class="sd">            &gt;&gt;&gt; from earthlens.fdsn.auth import resolve_earthscope_token</span>
-<a id="__codelineno-0-46" name="__codelineno-0-46"></a><span class="sd">            &gt;&gt;&gt; resolve_earthscope_token(&quot;abc123&quot;)</span>
-<a id="__codelineno-0-47" name="__codelineno-0-47"></a><span class="sd">            &#39;abc123&#39;</span>
+<a id="__codelineno-0-46" name="__codelineno-0-46"></a><span class="sd">            &gt;&gt;&gt; resolve_earthscope_token(&quot;example-token&quot;)</span>
+<a id="__codelineno-0-47" name="__codelineno-0-47"></a><span class="sd">            &#39;example-token&#39;</span>
 <a id="__codelineno-0-48" name="__codelineno-0-48"></a>
 <a id="__codelineno-0-49" name="__codelineno-0-49"></a><span class="sd">            ```</span>
 <a id="__codelineno-0-50" name="__codelineno-0-50"></a><span class="sd">        - With no argument, env var, or file, the result is `None`:</span>
