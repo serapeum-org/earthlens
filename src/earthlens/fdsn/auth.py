@@ -43,8 +43,8 @@ def resolve_earthscope_token(token: str | None = None) -> str | None:
         - An explicit token wins and is returned unchanged:
             ```python
             >>> from earthlens.fdsn.auth import resolve_earthscope_token
-            >>> resolve_earthscope_token("abc123")
-            'abc123'
+            >>> resolve_earthscope_token("example-token")
+            'example-token'
 
             ```
         - With no argument, env var, or file, the result is `None`:
