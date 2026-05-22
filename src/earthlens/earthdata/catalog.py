@@ -38,12 +38,15 @@ from earthlens.base import AbstractCatalog
 from earthlens.base.yaml_loader import load_yaml_strict
 
 CATALOG_PATH: Path = Path(__file__).parent / "catalog"
+PROVIDERS_PATH: Path = Path(__file__).parent / "providers.yaml"
 
 # Module-level cache of parsed catalog data, keyed on the resolved
 # path plus a tuple of `(file, mtime_ns)` for every YAML the load
 # touched, so editing any per-DAAC file invalidates the entry without
 # inspecting every row. Mirrors the CMEMS / GEE multi-file pattern.
 _CATALOG_CACHE: dict[Any, tuple[list[str], dict[str, "EarthdataDataset"]]] = {}
+# Same `(path, mtime_ns)` cache for the DAAC provider registry.
+_PROVIDERS_CACHE: dict[Any, dict[str, "EarthdataDAAC"]] = {}
 
 OutputKindLiteral = Literal["raster", "vector", "tabular"]
 
@@ -72,6 +75,7 @@ def clear_catalog_cache() -> None:
     mutation invalidates the entry on its own.
     """
     _CATALOG_CACHE.clear()
+    _PROVIDERS_CACHE.clear()
 
 
 def _yaml_files_for(path: Path) -> list[Path]:
@@ -101,6 +105,45 @@ def _yaml_files_for(path: Path) -> list[Path]:
         f"Earthdata catalog path {path} does not exist (expected a "
         "directory of per-DAAC *.yaml files, or a single YAML file)."
     )
+
+
+def _load_providers(path: Path) -> dict[str, "EarthdataDAAC"]:
+    """Parse, validate, and cache the DAAC provider registry.
+
+    Args:
+        path: Path to `providers.yaml`.
+
+    Returns:
+        dict[str, EarthdataDAAC]: Map keyed by CMR provider code.
+
+    Raises:
+        ValueError: If the file has no `daacs:` block or a DAAC entry
+            fails validation.
+    """
+    resolved = str(path.resolve())
+    try:
+        mtime = path.stat().st_mtime_ns
+    except FileNotFoundError:
+        mtime = 0
+    key = (resolved, mtime)
+    cached = _PROVIDERS_CACHE.get(key)
+    if cached is not None:
+        return cached
+
+    data = load_yaml_strict(path) or {}
+    daacs_yaml = data.get("daacs") or {}
+    if not daacs_yaml:
+        raise ValueError(f"{path} is missing or has an empty 'daacs:' block.")
+    daacs: dict[str, EarthdataDAAC] = {}
+    for code, body in daacs_yaml.items():
+        try:
+            daacs[code] = EarthdataDAAC(cmr_provider=code, **(body or {}))
+        except ValidationError as exc:
+            raise ValueError(
+                f"{path} provider {code!r} failed validation:\n{exc}"
+            ) from exc
+    _PROVIDERS_CACHE[key] = daacs
+    return daacs
 
 
 def _load_catalog_data(
@@ -183,6 +226,46 @@ def _load_catalog_data(
 
     _CATALOG_CACHE[key] = (merged_available, structural)
     return _CATALOG_CACHE[key]
+
+
+class EarthdataDAAC(BaseModel):
+    """One DAAC's entry in the CMR provider registry (`providers.yaml`).
+
+    Maps a CMR provider code (the `provider:` field on a dataset row,
+    passed straight to `earthaccess.search_data`) to its DAAC name,
+    landing page, and — for cloud-hosted collections — the us-west-2
+    region and the S3 credentials endpoint `earthaccess` uses to mint
+    rotating keys (`G4`).
+
+    Attributes:
+        cmr_provider: The CMR provider code (also the registry key),
+            e.g. `"GES_DISC"`, `"POCLOUD"`, `"LPCLOUD"`.
+        daac: Short DAAC id (e.g. `"GES DISC"`, `"PO.DAAC"`).
+        display_name: Full human-readable DAAC name.
+        landing_page: DAAC home page URL.
+        cloud_region: AWS region the DAAC's cloud holdings live in
+            (`"us-west-2"` for every current DAAC).
+        s3_credentials_endpoint: URL that vends rotating S3 credentials
+            for in-region streaming.
+
+    Examples:
+        - Look up a DAAC by provider code:
+            ```python
+            >>> from earthlens.earthdata import Catalog
+            >>> Catalog().get_daac("GES_DISC").daac
+            'GES DISC'
+
+            ```
+    """
+
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    cmr_provider: str
+    daac: str = ""
+    display_name: str = ""
+    landing_page: str = ""
+    cloud_region: str = "us-west-2"
+    s3_credentials_endpoint: str = ""
 
 
 class Band(BaseModel):
@@ -354,14 +437,16 @@ class Catalog(AbstractCatalog):
 
     available_datasets: list[str] = Field(default_factory=list)
     datasets: dict[str, EarthdataDataset] = Field(default_factory=dict)
+    daacs: dict[str, EarthdataDAAC] = Field(default_factory=dict)
 
     def model_post_init(self, __context: Any) -> None:
         """Auto-load the bundled catalog when no datasets were supplied.
 
         `Catalog()` with no args is sugar for `Catalog.load()` — it
-        reads the bundled `catalog/` directory through the
-        `(path, mtime)`-keyed cache so repeated construction is fast.
-        If the caller passed `datasets=...`, the disk read is skipped.
+        reads the bundled `catalog/` directory and `providers.yaml`
+        through the `(path, mtime)`-keyed caches so repeated
+        construction is fast. If the caller passed `datasets=...`, the
+        disk read is skipped.
 
         Raises:
             ValueError: When auto-loading, propagates the same errors
@@ -372,28 +457,79 @@ class Catalog(AbstractCatalog):
         loaded = Catalog.load()
         self.available_datasets = loaded.available_datasets
         self.datasets = loaded.datasets
+        self.daacs = loaded.daacs
 
     @classmethod
-    def load(cls, catalog_path: Path | None = None) -> Catalog:
-        """Read the Earthdata catalog from disk (cached).
+    def load(
+        cls,
+        catalog_path: Path | None = None,
+        providers_path: Path | None = None,
+    ) -> Catalog:
+        """Read the Earthdata catalog + provider registry from disk (cached).
 
         Args:
             catalog_path: Path to the `catalog/` directory or a single
                 `*.yaml` file. Defaults to module-level
                 :data:`CATALOG_PATH`.
+            providers_path: Path to `providers.yaml`. Defaults to
+                module-level :data:`PROVIDERS_PATH`.
 
         Returns:
             A fully-populated :class:`Catalog`.
 
         Raises:
-            ValueError: Propagated from :func:`_load_catalog_data`.
+            ValueError: Propagated from :func:`_load_providers` /
+                :func:`_load_catalog_data`, including when a dataset
+                row names a `provider:` absent from `providers.yaml`.
         """
         catalog_path = catalog_path if catalog_path is not None else CATALOG_PATH
+        providers_path = (
+            providers_path if providers_path is not None else PROVIDERS_PATH
+        )
+        daacs = _load_providers(providers_path)
         available_datasets, datasets = _load_catalog_data(catalog_path)
+        unknown = {
+            ds.provider
+            for ds in datasets.values()
+            if ds.provider and ds.provider not in daacs
+        }
+        if unknown:
+            raise ValueError(
+                f"dataset rows reference provider code(s) not in "
+                f"{providers_path.name}: {sorted(unknown)}. Known codes: "
+                f"{sorted(daacs)}."
+            )
         return cls(
             available_datasets=list(available_datasets),
             datasets=dict(datasets),
+            daacs=dict(daacs),
         )
+
+    def get_daac(self, provider_code: str) -> EarthdataDAAC:
+        """Return the :class:`EarthdataDAAC` for a CMR provider code.
+
+        Args:
+            provider_code: A CMR provider code registered in
+                `providers.yaml` (e.g. `"GES_DISC"`, `"POCLOUD"`).
+
+        Returns:
+            EarthdataDAAC: The matching DAAC entry.
+
+        Raises:
+            KeyError: If `provider_code` is not registered (with a
+                did-you-mean hint).
+        """
+        try:
+            return self.daacs[provider_code]
+        except KeyError:
+            import difflib
+
+            close = difflib.get_close_matches(provider_code, self.daacs, n=1)
+            hint = f" Did you mean {close[0]!r}?" if close else ""
+            raise KeyError(
+                f"{provider_code!r} is not a registered CMR provider. "
+                f"Known: {sorted(self.daacs)}.{hint}"
+            ) from None
 
     def get_catalog(self) -> dict[str, EarthdataDataset]:
         """Return the structural per-dataset map.

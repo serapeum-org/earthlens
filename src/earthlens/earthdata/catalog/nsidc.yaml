@@ -1,0 +1,45 @@
+# NSIDC DAAC — National Snow and Ice Data Center.
+# CMR provider code: NSIDC_CPRD. Flagship: ICESat-2 (point/vector),
+# SMAP, sea-ice CDR, MEaSUREs BedMachine.
+datasets:
+  ATL08_006:
+    short_name: ATL08
+    version: "006"
+    doi: 10.5067/ATLAS/ATL08.006
+    daac: NSIDC
+    provider: NSIDC_CPRD
+    cadence: irregular
+    format: hdf5
+    output_kind: vector
+    cloud_hosted: true
+    cloud_bucket: s3://nsidc-cumulus-prod-protected
+    requires_harmony_for_subset: false
+    supports_harmony: true
+    temporal:
+      start: 2018-10-14
+      end: null
+    bands:
+      h_canopy:
+        long_name: Canopy height above ground (ATL08 land/vegetation)
+        units: m
+
+  SPL3SMP_E_006:
+    short_name: SPL3SMP_E
+    version: "006"
+    doi: 10.5067/4DQ54OUIJ9DL
+    daac: NSIDC
+    provider: NSIDC_CPRD
+    cadence: daily
+    format: hdf5
+    output_kind: raster
+    cloud_hosted: true
+    cloud_bucket: s3://nsidc-cumulus-prod-protected
+    requires_harmony_for_subset: true
+    supports_harmony: true
+    temporal:
+      start: 2015-03-31
+      end: null
+    bands:
+      soil_moisture:
+        long_name: Enhanced L3 radiometer soil moisture
+        units: cm3/cm3

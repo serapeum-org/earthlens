@@ -1,0 +1,23 @@
+# ORNL DAAC — Oak Ridge National Laboratory. CMR provider code: ORNL_CLOUD.
+# Flagship: Daymet (raster), GEDI L4B, field-campaign CSV (tabular).
+datasets:
+  Daymet_V4R1_2129:
+    short_name: Daymet_Daily_V4R1
+    version: "1"
+    doi: 10.3334/ORNLDAAC/2129
+    daac: ORNL DAAC
+    provider: ORNL_CLOUD
+    cadence: daily
+    format: netcdf4
+    output_kind: raster
+    cloud_hosted: true
+    cloud_bucket: s3://ornl-cumulus-prod-protected
+    requires_harmony_for_subset: false
+    supports_harmony: false
+    temporal:
+      start: 1980-01-01
+      end: null
+    bands:
+      prcp:
+        long_name: Daily total precipitation
+        units: mm/day

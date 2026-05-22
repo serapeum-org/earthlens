@@ -24,3 +24,45 @@ datasets:
       agbd:
         long_name: Aboveground biomass density (footprint)
         units: Mg/ha
+
+  EMITL2ARFL_001:
+    short_name: EMITL2ARFL
+    version: "001"
+    doi: 10.5067/EMIT/EMITL2ARFL.001
+    daac: LP DAAC
+    provider: LPCLOUD
+    cadence: irregular
+    format: netcdf4
+    output_kind: raster
+    cloud_hosted: true
+    cloud_bucket: s3://lp-prod-protected
+    requires_harmony_for_subset: false
+    supports_harmony: false
+    temporal:
+      start: 2022-08-10
+      end: null
+    bands:
+      reflectance:
+        long_name: Surface reflectance (imaging spectroscopy, 285 bands)
+        units: "1"
+
+  MCD12Q1_061:
+    short_name: MCD12Q1
+    version: "061"
+    doi: 10.5067/MODIS/MCD12Q1.061
+    daac: LP DAAC
+    provider: LPCLOUD
+    cadence: annual
+    format: hdf-eos2
+    output_kind: raster
+    cloud_hosted: true
+    cloud_bucket: s3://lp-prod-protected
+    requires_harmony_for_subset: false
+    supports_harmony: false
+    temporal:
+      start: 2001-01-01
+      end: null
+    bands:
+      LC_Type1:
+        long_name: Land cover type 1 (IGBP classification)
+        units: class

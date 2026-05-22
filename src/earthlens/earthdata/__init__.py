@@ -46,8 +46,10 @@ from earthlens.earthdata.auth import (
 from earthlens.earthdata.backend import EarthData
 from earthlens.earthdata.catalog import (
     CATALOG_PATH,
+    PROVIDERS_PATH,
     Band,
     Catalog,
+    EarthdataDAAC,
     EarthdataDataset,
 )
 
@@ -55,9 +57,11 @@ __all__ = [
     "AuthenticationError",
     "Band",
     "CATALOG_PATH",
+    "PROVIDERS_PATH",
     "Catalog",
     "EarthData",
     "EarthdataAuth",
     "EarthdataCredentials",
+    "EarthdataDAAC",
     "EarthdataDataset",
 ]

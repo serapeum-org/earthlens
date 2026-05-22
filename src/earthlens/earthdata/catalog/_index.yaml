@@ -7,3 +7,12 @@ available_datasets:
   - GPM_3IMERGM_07
   - MUR-JPL-L4-GLOB-v4.1
   - GEDI04_A_002
+  - EMITL2ARFL_001
+  - MCD12Q1_061
+  - ATL08_006
+  - SPL3SMP_E_006
+  - PACE_OCI_L2_AOP
+  - VNP46A2_001
+  - OPERA_L2_RTC-S1_V1
+  - Daymet_V4R1_2129
+  - CER_SSF_Terra-FM1-MODIS_Edition4A
