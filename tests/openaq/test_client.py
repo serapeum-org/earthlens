@@ -144,6 +144,12 @@ class TestPaginate:
         client, _ = _client([_Resp({"results": []})])
         assert list(client.paginate("locations", {"limit": 10})) == []
 
+    def test_limit_clamped_to_max_page_size(self):
+        """A limit above the v3 maximum is clamped to 1000 in the request."""
+        client, session = _client([_Resp({"results": []})])
+        list(client.paginate("locations", {"limit": 5000}))
+        assert session.calls[0]["params"]["limit"] == 1000
+
 
 @pytest.mark.openaq
 class TestListEndpoints:

@@ -59,6 +59,10 @@ class TestCatalogLoad:
         """no2 carries every unit-variant id, not just one."""
         assert Catalog().get_parameter("no2").ids == [5, 7, 15]
 
+    def test_no2_units_list_all_variants(self):
+        """no2 records the reporting unit of each variant id."""
+        assert Catalog().get_parameter("no2").units == ["ppb", "ppm", "µg/m³"]
+
     def test_ids_for_unions_all_variants_in_order(self):
         """ids_for returns the de-duplicated union across names, order-stable."""
         assert Catalog().ids_for(["pm25", "no2"]) == [2, 5, 7, 15]
