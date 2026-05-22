@@ -66,7 +66,14 @@ class TestRegistry:
         assert "gee" in EarthLens.DataSources
         assert "google-earth-engine" in EarthLens.DataSources
         assert sorted(EarthLens.DataSources) == [
-            "amazon-s3", "chc", "chirps", "cmems", "ecmwf", "gdacs", "gee",
+            "amazon-s3",
+            "chc",
+            "chirps",
+            "cmems",
+            "ecmwf",
+            "fdsn",
+            "gdacs",
+            "gee",
             "google-earth-engine",
         ]
 
@@ -95,14 +102,23 @@ class TestFacadeConstruction:
     def test_forwards_backend_kwargs(self, fake_gee):
         """GEE-specific keyword arguments are forwarded verbatim to `GEE(...)`."""
         extra = dict(
-            service_account="sa@x.iam", service_key="key.json", project="p",
-            scale=90, crs="EPSG:3857", reducer="median", export_via="drive",
-            drive_folder="ee_out", gcs_bucket="b", region="a-geodataframe-sentinel",
+            service_account="sa@x.iam",
+            service_key="key.json",
+            project="p",
+            scale=90,
+            crs="EPSG:3857",
+            reducer="median",
+            export_via="drive",
+            drive_folder="ee_out",
+            gcs_bucket="b",
+            region="a-geodataframe-sentinel",
         )
         EarthLens(**_gee_kwargs(**extra))
         kwargs = fake_gee.call_args.kwargs
         for name, value in extra.items():
-            assert kwargs.get(name) == value, f"{name} not forwarded: {kwargs.get(name)!r}"
+            assert (
+                kwargs.get(name) == value
+            ), f"{name} not forwarded: {kwargs.get(name)!r}"
 
     def test_alias_builds_same_backend(self, fake_gee):
         """`data_source="google-earth-engine"` constructs the `GEE` backend too."""
@@ -156,5 +172,7 @@ class TestMissingExtra:
             return real_import(name, *args, **kwargs)
 
         monkeypatch.setattr("earthlens.earthlens.importlib.import_module", fake_import)
-        with pytest.raises(ImportError, match=r"Backend 'gee' is unavailable.*earthlens\[gee\]"):
+        with pytest.raises(
+            ImportError, match=r"Backend 'gee' is unavailable.*earthlens\[gee\]"
+        ):
             EarthLens(variables={"USGS/SRTMGL1_003": ["elevation"]}, data_source="gee")
