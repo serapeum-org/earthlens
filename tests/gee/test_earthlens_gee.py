@@ -72,6 +72,7 @@ class TestRegistry:
             "cmems",
             "ecmwf",
             "fdsn",
+            "gdacs",
             "gee",
             "google-earth-engine",
         ]
