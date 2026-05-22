@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from typing import Any, Callable
 
+import pandas as pd
 import pytest
 from geopandas import GeoDataFrame
 
@@ -96,6 +97,22 @@ class TestGeojsonToFc:
         fc = geojson_to_fc({"features": [make_feature(drop_severity=True)]})
         assert fc["severity"].isna().iloc[0]
         assert fc["severity_unit"].isna().iloc[0]
+
+    def test_non_numeric_alert_score_coerces_to_nan(
+        self, make_feature: Callable[..., dict[str, Any]]
+    ):
+        """A non-numeric alertscore (GDACS emits "") degrades to NaN, not an error."""
+        fc = geojson_to_fc({"features": [make_feature(alertscore="")]})
+        assert len(fc) == 1, "the row must survive a bad alert_score"
+        assert pd.isna(fc["alert_score"].iloc[0]), "bad alert_score should be NaN"
+
+    def test_non_numeric_severity_coerces_to_nan(
+        self, make_feature: Callable[..., dict[str, Any]]
+    ):
+        """A non-numeric severity value degrades to NaN rather than raising."""
+        fc = geojson_to_fc({"features": [make_feature(severity="n/a")]})
+        assert len(fc) == 1, "the row must survive a bad severity"
+        assert pd.isna(fc["severity"].iloc[0]), "bad severity should be NaN"
 
     def test_geometryless_feature_has_null_geometry(
         self, make_feature: Callable[..., dict[str, Any]]

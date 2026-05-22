@@ -23,6 +23,10 @@ so a single `severity` / `severity_unit` / `severity_text` trio covers
 all six hazards. Properties are read defensively with `.get(...)` so a
 renamed or absent field degrades to a null cell rather than raising —
 the GDACS API is informally documented and has drifted historically.
+The numeric columns (`alert_score`, `severity`) are coerced with
+`pandas.to_numeric(errors="coerce")` rather than a hard cast, so a
+non-numeric token (GDACS emits `""` for some absent fields) becomes
+`NaN` instead of aborting the whole mapping.
 """
 
 from __future__ import annotations
@@ -73,7 +77,9 @@ def geojson_to_fc(payload: dict[str, Any]) -> FeatureCollection:
     `None` rather than an invalid value that would corrupt a written
     GeoPackage/GeoJSON. An empty (or geometry-less) payload returns an
     empty FeatureCollection with the same columns/dtypes (see
-    :func:`empty_fc`).
+    :func:`empty_fc`). The numeric columns (`alert_score`, `severity`)
+    are coerced with `pandas.to_numeric(errors="coerce")`, so a
+    non-numeric value degrades to `NaN` rather than raising.
 
     Args:
         payload: The decoded GDACS SEARCH response — a GeoJSON
@@ -137,6 +143,14 @@ def geojson_to_fc(payload: dict[str, Any]) -> FeatureCollection:
             frame[column] = pd.to_datetime(
                 frame[column], utc=True, errors="coerce"
             ).astype(dtype)
+        elif dtype == "float64":
+            # Coerce rather than hard-cast: GDACS emits "" (or other
+            # non-numeric tokens) for absent numeric fields, and a bare
+            # astype("float64") would raise on those and abort the whole
+            # download. Coercion degrades a bad value to NaN, honouring
+            # the module's "a renamed/absent field becomes null, not an
+            # error" contract.
+            frame[column] = pd.to_numeric(frame[column], errors="coerce")
         else:
             frame[column] = frame[column].astype(dtype)
 
