@@ -55,6 +55,11 @@ all = [
 [dependency-groups]
 dev = [
     "nbval >=0.11.0",
+    # Example notebooks (docs/examples/**) plot with matplotlib; it is
+    # not pulled by earthlens' runtime deps (pyramids-gis only ships it
+    # under its optional `viz` extra), so declare it for the env that
+    # runs `pixi run notebooks` (nbval).
+    "matplotlib >=3.5",
     "pre-commit >=3.7.1",
     "pre-commit-hooks >=4.6.0",
     "pytest >=8.2.2",
@@ -82,6 +87,9 @@ docs = [
     "mkdocs-panzoom-plugin",
     "jupyter-contrib-nbextensions  >=0.7.0",
     "notebook<7.0",
+    # mkdocs-jupyter executes the example notebooks at build time; their
+    # plot cells need matplotlib (not a runtime dep — see the `dev` group).
+    "matplotlib >=3.5",
 ]
 
 notebook = [
