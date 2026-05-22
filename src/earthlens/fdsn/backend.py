@@ -296,18 +296,60 @@ class FDSN(AbstractDataSource):
         returns in-memory :class:`FeatureCollection`s, not file paths.
         A network whose query matches nothing
         (`FDSNNoDataException`, HTTP 204) yields an empty
-        FeatureCollection rather than raising — an empty result is a
-        legitimate answer for a quiet region/time. Other
-        `FDSNException` failures propagate.
+        FeatureCollection — an empty result is a legitimate answer for a
+        quiet region/time.
+
+        A network whose query *errors* (timeout, HTTP 5xx, service
+        unavailable) is logged and skipped rather than aborting the
+        whole request — one flaky network does not lose the events
+        already fetched from healthy ones (mirrors the ECMWF/CMEMS
+        "one bad item does not kill the batch" policy). The skipped
+        network contributes an empty FeatureCollection so the returned
+        list stays positionally aligned with `products`. Only a
+        **total** failure (every network errored) raises.
 
         Args:
             products: The list returned by :meth:`_search`.
 
         Returns:
             list[FeatureCollection]: One collection per product, in the
-                same order; empty collections for no-data networks.
+                same order; empty collections for no-data or failed
+                networks.
+
+        Raises:
+            RuntimeError: When **every** network's query failed, so a
+                caller cannot silently process nothing. The message
+                aggregates the failed networks and their exception
+                types; the per-network errors are logged at ERROR.
         """
-        return [self._query_one(product) for product in products]
+        collections: list[FeatureCollection] = []
+        failed: list[tuple[str, BaseException]] = []
+        for product in products:
+            try:
+                collections.append(self._query_one(product))
+            except Exception as exc:  # noqa: BLE001 - log the failure and continue
+                logger.error(
+                    f"FDSN query for provider {product.id!r} failed: "
+                    f"{type(exc).__name__}: {exc}"
+                )
+                failed.append((product.id, exc))
+                collections.append(events.empty_fc())
+
+        if failed and len(failed) == len(products):
+            summary = ", ".join(
+                f"{pid} ({type(exc).__name__}: {exc})" for pid, exc in failed
+            )
+            raise RuntimeError(
+                f"all {len(failed)} FDSN provider query(ies) failed: "
+                f"{summary}. See the per-provider ERROR logs above."
+            )
+        if failed:
+            summary = ", ".join(f"{pid} ({type(exc).__name__})" for pid, exc in failed)
+            logger.warning(
+                f"{len(failed)} of {len(products)} FDSN provider query(ies) "
+                f"failed and were skipped: {summary}"
+            )
+        return collections
 
     def _query_one(self, product: RemoteProduct) -> FeatureCollection:
         """Run one network's `get_events` and map it to a FeatureCollection.
@@ -393,9 +435,12 @@ class FDSN(AbstractDataSource):
         Each network in `self.vars` is queried once; its events are
         written to one vector file under `path` (named after the
         network), and the per-network results are concatenated into the
-        single :class:`FeatureCollection` returned. An all-empty result
-        returns a schema-correct empty FeatureCollection and writes
-        nothing.
+        single :class:`FeatureCollection` returned. A network that
+        errors is logged and skipped (its events are simply absent from
+        the union) rather than aborting the whole request; only a total
+        failure — every network errored — raises. An all-empty result
+        (every network matched nothing) returns a schema-correct empty
+        FeatureCollection and writes nothing.
 
         Args:
             progress_bar: Accepted for signature parity with the other
@@ -414,6 +459,9 @@ class FDSN(AbstractDataSource):
 
         Raises:
             NotImplementedError: If `aggregate` is not `None`.
+            RuntimeError: If **every** requested network's query failed
+                (propagated from :meth:`_fetch`). A partial failure does
+                not raise — the healthy networks' events are returned.
         """
         if aggregate is not None:
             raise NotImplementedError(

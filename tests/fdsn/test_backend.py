@@ -127,12 +127,23 @@ class TestFDSNFetch:
         results = backend._fetch(backend._search())
         assert len(results[0]) == 0, "no-data network should yield an empty FC"
 
-    def test_other_fdsn_error_propagates(self, tmp_path: Path, fake_fdsn: _FakeFdsn):
-        """A non-no-data failure propagates rather than being swallowed."""
+    def test_total_failure_raises(self, tmp_path: Path, fake_fdsn: _FakeFdsn):
+        """When every network errors, `_fetch` raises RuntimeError naming the cause."""
         fake_fdsn.set_result("USGS", RuntimeError("boom"))
         backend = _make_backend(tmp_path)
         with pytest.raises(RuntimeError, match="boom"):
             backend._fetch(backend._search())
+
+    def test_partial_failure_skips_and_continues(
+        self, tmp_path: Path, fake_fdsn: _FakeFdsn
+    ):
+        """One failing network is skipped; the healthy network's events survive."""
+        fake_fdsn.set_result("EMSC", RuntimeError("emsc down"))
+        backend = _make_backend(tmp_path, variables=["USGS", "EMSC"])
+        results = backend._fetch(backend._search())
+        assert len(results) == 2, "result list stays aligned with products"
+        assert len(results[0]) == 1, "healthy USGS network returns its event"
+        assert len(results[1]) == 0, "failed EMSC network contributes an empty FC"
 
     def test_token_passed_only_when_needed(self, tmp_path: Path, fake_fdsn: _FakeFdsn):
         """No eida_token is sent for a network that does not require one."""
@@ -216,6 +227,19 @@ class TestFDSNDownload:
         fc = backend.download()
         assert len(fc) == 0
         assert list(tmp_path.glob("*.gpkg")) == [], "nothing should be written"
+
+    def test_partial_failure_returns_healthy_network(
+        self, tmp_path: Path, fake_fdsn: _FakeFdsn
+    ):
+        """A multi-network download survives one network failing."""
+        fake_fdsn.set_result("EMSC", RuntimeError("emsc down"))
+        backend = _make_backend(tmp_path, variables=["USGS", "EMSC"])
+        fc = backend.download()
+        assert len(fc) == 1, "the healthy USGS network's event is returned"
+        written = sorted(p.name for p in tmp_path.glob("*.gpkg"))
+        assert written == [
+            "usgs.gpkg"
+        ], f"only the healthy network is written: {written}"
 
     def test_aggregate_rejected(self, tmp_path: Path, fake_fdsn: _FakeFdsn):
         """A non-None aggregate is rejected (vector output)."""

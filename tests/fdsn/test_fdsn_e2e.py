@@ -80,15 +80,18 @@ class TestEarthscopeLiveQuery:
 
     def test_active_window_returns_events(self, tmp_path: Path):
         """EarthScope returns plausible events for the active window."""
-        fc = FDSN(
-            start=_ACTIVE_START,
-            end=_ACTIVE_END,
-            variables=["EARTHSCOPE"],
-            lat_lim=_JAPAN_LAT,
-            lon_lim=_JAPAN_LON,
-            path=str(tmp_path),
-            min_magnitude=5.0,
-        ).download()
+        try:
+            fc = FDSN(
+                start=_ACTIVE_START,
+                end=_ACTIVE_END,
+                variables=["EARTHSCOPE"],
+                lat_lim=_JAPAN_LAT,
+                lon_lim=_JAPAN_LON,
+                path=str(tmp_path),
+                min_magnitude=5.0,
+            ).download()
+        except RuntimeError as exc:
+            pytest.skip(f"EarthScope service unavailable: {exc}")
 
         assert len(fc) > 0, "expected at least one M5+ event from EarthScope"
         assert fc.crs.to_epsg() == 4326
