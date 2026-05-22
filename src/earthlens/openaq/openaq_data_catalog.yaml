@@ -25,6 +25,11 @@ parameters:
   bc: { id: 11, name: bc, units: "µg/m³", display_name: "Black carbon", group: particulate }
   # `no` is quoted because YAML 1.1 parses the bare token as boolean false.
   "no": { id: 19843, name: "no", units: "µg/m³", display_name: "Nitrogen monoxide", group: other }
+  nox: { id: 19840, name: nox, units: "ppm", display_name: "NOx", group: other }
+  co2: { id: 21, name: co2, units: "ppm", display_name: "Carbon dioxide", group: other }
+  ch4: { id: 28, name: ch4, units: "ppm", display_name: "Methane", group: other }
   temperature: { id: 128, name: temperature, units: "f", display_name: "Temperature", group: meteorological }
   relativehumidity: { id: 98, name: relativehumidity, units: "%", display_name: "Relative humidity", group: meteorological }
   pressure: { id: 132, name: pressure, units: "mb", display_name: "Atmospheric pressure", group: meteorological }
+  wind_speed: { id: 34, name: wind_speed, units: "m/s", display_name: "Wind speed", group: meteorological }
+  wind_direction: { id: 22, name: wind_direction, units: "deg", display_name: "Wind direction", group: meteorological }

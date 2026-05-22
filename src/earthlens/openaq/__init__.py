@@ -45,8 +45,9 @@ Examples:
         ```python
         >>> from earthlens.openaq import Catalog
         >>> sorted(Catalog().parameters)  # doctest: +NORMALIZE_WHITESPACE
-        ['bc', 'co', 'no', 'no2', 'o3', 'pm10', 'pm25', 'pressure',
-         'relativehumidity', 'so2', 'temperature']
+        ['bc', 'ch4', 'co', 'co2', 'no', 'no2', 'nox', 'o3', 'pm10', 'pm25',
+         'pressure', 'relativehumidity', 'so2', 'temperature',
+         'wind_direction', 'wind_speed']
 
         ```
 """

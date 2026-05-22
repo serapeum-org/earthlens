@@ -55,8 +55,9 @@ few meteorological parameters:
 from earthlens.openaq import Catalog
 
 sorted(Catalog().parameters)
-# ['bc', 'co', 'no', 'no2', 'o3', 'pm10', 'pm25', 'pressure',
-#  'relativehumidity', 'so2', 'temperature']
+# ['bc', 'ch4', 'co', 'co2', 'no', 'no2', 'nox', 'o3', 'pm10', 'pm25',
+#  'pressure', 'relativehumidity', 'so2', 'temperature',
+#  'wind_direction', 'wind_speed']
 Catalog().ids_for(["pm25", "no2"])      # [2, 15]
 ```
 

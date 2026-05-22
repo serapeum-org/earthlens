@@ -38,8 +38,9 @@ class TestCatalogLoad:
     def test_known_parameters(self):
         """The bundled catalog lists the curated parameter set."""
         assert sorted(Catalog().parameters) == [
-            "bc", "co", "no", "no2", "o3", "pm10",
+            "bc", "ch4", "co", "co2", "no", "no2", "nox", "o3", "pm10",
             "pm25", "pressure", "relativehumidity", "so2", "temperature",
+            "wind_direction", "wind_speed",
         ]
 
     def test_pm25_id(self):
