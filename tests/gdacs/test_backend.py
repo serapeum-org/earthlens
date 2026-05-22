@@ -74,6 +74,11 @@ class TestGDACSConstruction:
         with pytest.raises(ValueError, match="file_format must be one of"):
             _make_backend(tmp_path, file_format="shp")
 
+    def test_inverted_dates_rejected(self, tmp_path: Path):
+        """A start later than end raises ValueError (per _check_input_dates)."""
+        with pytest.raises(ValueError, match="inverted bounds"):
+            _make_backend(tmp_path, start="2024-02-01", end="2024-01-01")
+
     def test_mapping_variables_rejected(self, tmp_path: Path):
         """A dict `variables` (backend-style mapping) raises a clear TypeError."""
         with pytest.raises(TypeError, match="must be a list of hazard-type codes"):
