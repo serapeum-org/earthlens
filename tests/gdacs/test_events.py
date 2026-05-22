@@ -205,6 +205,18 @@ class TestClipToBbox:
         """Clipping an already-empty collection is a no-op empty FC."""
         assert len(clip_to_bbox(empty_fc(), [0.0, 1.0], [0.0, 1.0])) == 0
 
+    def test_straddling_polygon_is_kept(
+        self, make_feature: Callable[..., dict[str, Any]]
+    ):
+        """A polygon partly outside the box is kept whole (intersection semantics)."""
+        polygon = {
+            "type": "Polygon",
+            "coordinates": [[[15, 15], [25, 15], [25, 25], [15, 25], [15, 15]]],
+        }
+        fc = geojson_to_fc({"features": [make_feature(geometry=polygon)]})
+        clipped = clip_to_bbox(fc, [0.0, 20.0], [0.0, 20.0])
+        assert len(clipped) == 1, "a polygon overlapping the box must be retained"
+
     def test_unordered_limits_handled(
         self, make_feature: Callable[..., dict[str, Any]]
     ):

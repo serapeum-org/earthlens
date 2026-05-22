@@ -206,12 +206,16 @@ def clip_to_bbox(
     lat_lim: list[float],
     lon_lim: list[float],
 ) -> FeatureCollection:
-    """Drop alerts whose geometry falls outside the WGS84 bbox.
+    """Keep only alerts whose geometry intersects the WGS84 bbox.
 
     GDACS SEARCH has no documented server-side bbox filter, so spatial
-    selection is done client-side here. Rows with a null geometry are
-    dropped (they cannot be placed in the box). An empty result returns
-    a schema-correct empty FeatureCollection.
+    selection is done client-side here via `GeoDataFrame.cx`, which
+    selects by **bounding-box intersection**: a `Point` is kept when it
+    lies in the box, and a polygon/line (a flood or cyclone track) is
+    kept when any part of it overlaps the box — a partially-overlapping
+    polygon is retained whole, not clipped. Rows with a null geometry
+    are dropped (they cannot be placed in the box). An empty result
+    returns a schema-correct empty FeatureCollection.
 
     Args:
         collection: The mapped alerts to filter.
