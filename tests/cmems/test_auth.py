@@ -56,11 +56,11 @@ class TestCmemsCredentials:
 
     def test_password_is_secret(self):
         """SecretStr hides the password from repr."""
-        creds = CmemsCredentials(username="u", password="hunter2-do-not-leak")
-        assert "hunter2-do-not-leak" not in repr(creds), (
+        creds = CmemsCredentials(username="u", password="pw")
+        assert "pw" not in repr(creds), (
             f"password leaked into repr: {repr(creds)}"
         )
-        assert creds.password.get_secret_value() == "hunter2-do-not-leak", (
+        assert creds.password.get_secret_value() == "pw", (
             "SecretStr.get_secret_value() must round-trip the plaintext"
         )
 
@@ -209,11 +209,11 @@ class TestCmemsAuthCredentialResolution:
     ):
         """Explicit username + password are forwarded verbatim to login()."""
         fake = _install_fake_cmems(monkeypatch, login_result=True)
-        auth = CmemsAuth(CmemsCredentials(username="alice", password="s3cret"))
+        auth = CmemsAuth(CmemsCredentials(username="u", password="pw"))
         auth.configure()
         call = fake.login_calls[0]
-        assert call["username"] == "alice", f"username not forwarded; got {call!r}"
-        assert call["password"] == "s3cret", f"password not forwarded; got {call!r}"
+        assert call["username"] == "u", f"username not forwarded; got {call!r}"
+        assert call["password"] == "pw", f"password not forwarded; got {call!r}"
         assert call.get("check_credentials_valid") is True, (
             "check_credentials_valid must be True so login() actually validates"
         )
@@ -223,13 +223,13 @@ class TestCmemsAuthCredentialResolution:
     ):
         """When credentials are empty, env vars supply them."""
         monkeypatch.setenv("COPERNICUSMARINE_SERVICE_USERNAME", "env-user")
-        monkeypatch.setenv("COPERNICUSMARINE_SERVICE_PASSWORD", "env-pass")
+        monkeypatch.setenv("COPERNICUSMARINE_SERVICE_PASSWORD", "envpw")
         fake = _install_fake_cmems(monkeypatch, login_result=True)
         auth = CmemsAuth(CmemsCredentials())
         auth.configure()
         call = fake.login_calls[0]
         assert call["username"] == "env-user", f"env username not picked up; got {call!r}"
-        assert call["password"] == "env-pass", f"env password not picked up; got {call!r}"
+        assert call["password"] == "envpw", f"env password not picked up; got {call!r}"
 
     def test_credentials_file_forwarded(
         self, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
