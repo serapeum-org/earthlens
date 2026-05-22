@@ -102,7 +102,7 @@ class EarthLens:
             ```python
             >>> from earthlens.earthlens import EarthLens
             >>> sorted(EarthLens.DataSources)
-            ['amazon-s3', 'chc', 'chirps', 'cmems', 'ecmwf', 'gee', 'google-earth-engine']
+            ['amazon-s3', 'chc', 'chirps', 'cmems', 'ecmwf', 'fdsn', 'gee', 'google-earth-engine']
 
             ```
         - Asking for an unknown backend raises `ValueError`:
@@ -123,6 +123,9 @@ class EarthLens:
             datasets via `copernicusmarine`.
         :class:`earthlens.ecmwf.ECMWF`: ERA5 via the Copernicus
             Climate Data Store (cdsapi).
+        :class:`earthlens.fdsn.FDSN`: seismic events from the FDSN
+            networks (USGS / EMSC / INGV / EarthScope / ISC / GeoNet)
+            via `obspy`; the first `vector`-output backend.
         :class:`earthlens.gee.GEE`: imagery from Google Earth Engine
             (`earthengine-api`); keys `"gee"` / `"google-earth-engine"`.
     """
@@ -138,6 +141,7 @@ class EarthLens:
             "amazon-s3": ("earthlens.s3", "S3", "s3"),
             "cmems": ("earthlens.cmems", "CMEMS", "cmems"),
             "ecmwf": ("earthlens.ecmwf", "ECMWF", "ecmwf"),
+            "fdsn": ("earthlens.fdsn", "FDSN", "fdsn"),
             "gee": ("earthlens.gee", "GEE", "gee"),
             "google-earth-engine": ("earthlens.gee", "GEE", "gee"),
         }

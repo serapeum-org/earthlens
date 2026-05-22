@@ -123,6 +123,10 @@ nav:
       - Reference: reference/ecmwf.md
       - Catalog & Probes: reference/ecmwf/catalog.md
       - Aggregation: reference/aggregation.md
+    - FDSN (earthquakes):
+      - Introduction: reference/fdsn/introduction.md
+      - Usage: reference/fdsn/usage.md
+      - Reference: reference/fdsn/fdsn.md
     - GEE:
       - Introduction: reference/gee/introduction.md
       - Registering a project: reference/gee/registering-a-project.md
@@ -154,6 +158,10 @@ nav:
       - Sea ice — Arctic thickness map: examples/cmems/seaice_arctic_thickness.ipynb
       - Waves — significant wave height: examples/cmems/global_wave_significant_height.ipynb
       - Mediterranean — surface temperature map: examples/cmems/mediterranean_sst_map.ipynb
+    - Seismic events (FDSN):
+      - Quickstart — recent earthquakes: examples/fdsn/quickstart.ipynb
+      - Global seismicity map: examples/fdsn/global_seismicity_map.ipynb
+      - Regional aftershock sequence: examples/fdsn/regional_sequence.ipynb
     - Google Earth Engine:
       - Quickstart — EarthLens facade: examples/gee/quickstart.ipynb
       - Atmosphere & chemistry — TROPOMI NO2: examples/gee/atmosphere-chemistry.ipynb
