@@ -9,11 +9,18 @@ There is no `refresh` / `probe` / `audit` tooling and no
 GFZ, …) is a hand-edit of one YAML row.
 
 :class:`Catalog` is a thin :class:`earthlens.base.AbstractCatalog`
-subclass that loads the bundled `fdsn_data_catalog.yaml` and exposes
-each row as a :class:`Provider`. Look a provider up with
-:meth:`AbstractCatalog.get_provider`, which raises with a
-did-you-mean hint on an unknown name. :data:`CATALOG_PATH` is the
-path to the bundled YAML and is monkey-patchable in tests.
+subclass. To stay consistent with the other backends (GEE / ECMWF /
+CMEMS), the network rows are stored in the framework's
+:attr:`~earthlens.base.AbstractCatalog.datasets` field — so the
+inherited dict-like surface works (`len(cat)`, `name in cat`,
+`cat[name]`, `iter(cat)`, `str(cat)`, :meth:`get_dataset`). Because
+the FDSN domain term for a row is a *network* / *provider*, the same
+map is mirrored onto :attr:`~earthlens.base.AbstractCatalog.providers`
+and :meth:`get_provider` works too — they are aliases of the same
+rows. Parsing is cached on `(path, mtime)` exactly like the other
+backends (see :data:`_CATALOG_CACHE` / :func:`clear_catalog_cache`).
+:data:`CATALOG_PATH` is the path to the bundled YAML and is
+monkey-patchable in tests.
 """
 
 from __future__ import annotations
@@ -28,12 +35,73 @@ from earthlens.base.yaml_loader import load_yaml_strict
 
 CATALOG_PATH: Path = Path(__file__).parent / "fdsn_data_catalog.yaml"
 
+# Module-level cache of parsed catalog rows, keyed on the resolved path
+# plus the YAML's `st_mtime_ns`, so editing the file invalidates the
+# entry without re-parsing on every `Catalog()`. Mirrors the
+# `_CATALOG_CACHE` pattern in the GEE / ECMWF / CMEMS catalog loaders.
+_CATALOG_CACHE: dict[tuple[str, int], dict[str, Provider]] = {}
+
+
+def clear_catalog_cache() -> None:
+    """Empty the module-level catalog parse cache.
+
+    Useful in tests that rewrite the catalog on disk and want to force
+    a re-parse. Production callers do not need this — the cache key
+    includes the file's `st_mtime_ns`, so any real edit invalidates the
+    entry on its own.
+    """
+    _CATALOG_CACHE.clear()
+
+
+def _load_catalog_data(path: Path) -> dict[str, Provider]:
+    """Parse, validate, and cache the FDSN provider catalog at `path`.
+
+    Args:
+        path: Path to the catalog YAML (default :data:`CATALOG_PATH`).
+
+    Returns:
+        Mapping from network name to its :class:`Provider` row.
+
+    Raises:
+        ValueError: If the file has no `providers:` block, or a row
+            fails :class:`Provider` validation.
+    """
+    resolved = str(path.resolve())
+    try:
+        mtime = path.stat().st_mtime_ns
+    except FileNotFoundError:
+        mtime = 0
+    key = (resolved, mtime)
+    cached = _CATALOG_CACHE.get(key)
+    if cached is not None:
+        return cached
+
+    data = load_yaml_strict(path) or {}
+    providers_yaml = data.get("providers") or {}
+    if not providers_yaml:
+        raise ValueError(
+            f"{path} is missing or has an empty 'providers:' block. "
+            "The FDSN catalog must list at least one provider."
+        )
+    rows: dict[str, Provider] = {}
+    for name, body in providers_yaml.items():
+        try:
+            rows[name] = Provider(**dict(body or {}))
+        except ValidationError as exc:
+            raise ValueError(
+                f"{path} provider {name!r} failed validation:\n{exc}"
+            ) from exc
+
+    _CATALOG_CACHE[key] = rows
+    return rows
+
 
 class Provider(BaseModel):
     """One FDSN-event network's dispatch row.
 
     The user-facing name is the parent key in
-    :attr:`Catalog.providers` and is not stored on the row.
+    :attr:`Catalog.providers` (and :attr:`Catalog.datasets`) and is not
+    stored on the row.
 
     Attributes:
         fdsn_id: obspy `URL_MAPPINGS` key (e.g. `"USGS"`) or an
@@ -78,23 +146,46 @@ class Catalog(AbstractCatalog):
     Reads the bundled `fdsn_data_catalog.yaml` (shipped as package
     data) and exposes its `providers:` block as a map of
     :class:`Provider` rows. Instantiate with no arguments
-    (`Catalog()`); :func:`model_post_init` loads and validates the
-    YAML in one pass. Resolve a provider with
-    :meth:`AbstractCatalog.get_provider`.
+    (`Catalog()`); :func:`model_post_init` loads and validates the YAML
+    (cached) in one pass.
+
+    The rows live in the framework's :attr:`datasets` field so the
+    inherited dict-like surface behaves like every other backend's
+    catalog — `len(cat)`, `name in cat`, `cat[name]`, `iter(cat)` and
+    :meth:`get_dataset` all work. The same rows are mirrored onto
+    :attr:`providers`, so the domain-friendly :meth:`get_provider` and
+    `cat.providers` work too; the two are aliases of one another.
 
     Attributes:
-        providers: Map from the user-facing network name to its
-            :class:`Provider` dispatch row.
+        datasets: Map from the user-facing network name to its
+            :class:`Provider` dispatch row (the framework field).
+        providers: Alias of :attr:`datasets` — same rows, kept for the
+            FDSN "network / provider" vocabulary.
 
     Examples:
-        - List networks and resolve one:
+        - The dict-like surface works like the other backends:
             ```python
             >>> from earthlens.fdsn import Catalog
             >>> cat = Catalog()
-            >>> sorted(cat.providers)
-            ['EARTHSCOPE', 'EMSC', 'GEONET', 'INGV', 'ISC', 'USGS']
+            >>> len(cat)
+            6
+            >>> "USGS" in cat
+            True
+            >>> cat["USGS"].fdsn_id
+            'USGS'
+
+            ```
+        - `datasets` and `providers` are the same rows; resolve via
+          either accessor:
+            ```python
+            >>> from earthlens.fdsn import Catalog
+            >>> cat = Catalog()
+            >>> sorted(cat.providers) == sorted(cat.datasets)
+            True
             >>> cat.get_provider("USGS").fdsn_id
             'USGS'
+            >>> cat.get_dataset("EMSC").fdsn_id
+            'EMSC'
 
             ```
         - An unknown network raises with a did-you-mean hint:
@@ -110,26 +201,34 @@ class Catalog(AbstractCatalog):
 
     _catalog_kind: str = "FDSN catalog"
 
+    datasets: dict[str, Provider] = Field(default_factory=dict)
     providers: dict[str, Provider] = Field(default_factory=dict)
 
     def model_post_init(self, __context: Any) -> None:
-        """Auto-load the bundled catalog when no providers were supplied.
+        """Auto-load the bundled catalog and keep `datasets`/`providers` in sync.
 
-        `Catalog()` with no args reads :data:`CATALOG_PATH`; passing
-        `providers=...` skips the disk read (used in tests).
+        `Catalog()` with no args reads :data:`CATALOG_PATH` (cached).
+        Passing either `datasets=...` or `providers=...` skips the disk
+        read (used in tests); whichever was supplied is mirrored onto
+        the other so both accessors stay consistent.
 
         Raises:
-            ValueError: Propagated from :meth:`load` when the YAML is
-                missing, empty, or has a malformed provider row.
+            ValueError: Propagated from :func:`_load_catalog_data` when
+                the YAML is missing, empty, or has a malformed row.
         """
-        if self.providers:
+        if self.datasets or self.providers:
+            if not self.datasets:
+                self.datasets = self.providers
+            if not self.providers:
+                self.providers = self.datasets
             return
-        loaded = Catalog.load()
-        self.providers = loaded.providers
+        rows = _load_catalog_data(CATALOG_PATH)
+        self.datasets = dict(rows)
+        self.providers = self.datasets
 
     @classmethod
     def load(cls, catalog_path: Path | None = None) -> Catalog:
-        """Read the FDSN provider catalog from disk.
+        """Read the FDSN provider catalog from disk (cached).
 
         Args:
             catalog_path: Path to the catalog YAML. Defaults to the
@@ -139,31 +238,17 @@ class Catalog(AbstractCatalog):
             A fully-populated :class:`Catalog`.
 
         Raises:
-            ValueError: If the file has no `providers:` block, or a
-                row fails :class:`Provider` validation.
+            ValueError: If the file has no `providers:` block, or a row
+                fails :class:`Provider` validation.
         """
         catalog_path = catalog_path if catalog_path is not None else CATALOG_PATH
-        data = load_yaml_strict(catalog_path) or {}
-        providers_yaml = data.get("providers") or {}
-        if not providers_yaml:
-            raise ValueError(
-                f"{catalog_path} is missing or has an empty 'providers:' "
-                "block. The FDSN catalog must list at least one provider."
-            )
-        providers: dict[str, Provider] = {}
-        for name, body in providers_yaml.items():
-            try:
-                providers[name] = Provider(**dict(body or {}))
-            except ValidationError as exc:
-                raise ValueError(
-                    f"{catalog_path} provider {name!r} failed validation:\n{exc}"
-                ) from exc
-        return cls(providers=providers)
+        rows = _load_catalog_data(catalog_path)
+        return cls(datasets=dict(rows))
 
     def get_catalog(self) -> dict[str, Provider]:
-        """Return the provider map (satisfies the abstract contract).
+        """Return the network map (satisfies the abstract contract).
 
         Returns:
-            dict[str, Provider]: Same object as :attr:`providers`.
+            dict[str, Provider]: Same object as :attr:`datasets`.
         """
-        return self.providers
+        return self.datasets

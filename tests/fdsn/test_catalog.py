@@ -66,10 +66,28 @@ class TestCatalogLoad:
         assert provider.needs_token is False
         assert provider.default_min_magnitude == min_mag
 
-    def test_get_catalog_returns_providers(self):
-        """`get_catalog` returns the same provider map."""
+    def test_get_catalog_returns_datasets(self):
+        """`get_catalog` returns the framework `datasets` map."""
         cat = Catalog()
-        assert cat.get_catalog() is cat.providers
+        assert cat.get_catalog() is cat.datasets
+
+    def test_providers_aliases_datasets(self):
+        """`providers` and `datasets` expose the same network rows."""
+        cat = Catalog()
+        assert sorted(cat.providers) == sorted(cat.datasets)
+        assert cat.providers == cat.datasets
+
+    def test_dict_surface_like_other_backends(self):
+        """The inherited len/contains/getitem/iter surface works (not empty)."""
+        cat = Catalog()
+        assert len(cat) == 6, f"expected 6 networks, got {len(cat)}"
+        assert "USGS" in cat
+        assert cat["USGS"].fdsn_id == "USGS"
+        assert set(iter(cat)) == {"EARTHSCOPE", "EMSC", "GEONET", "INGV", "ISC", "USGS"}
+
+    def test_get_dataset_alias(self):
+        """`get_dataset` resolves a network too (alias of get_provider)."""
+        assert Catalog().get_dataset("EMSC").fdsn_id == "EMSC"
 
     def test_get_provider_unknown_raises_with_hint(self):
         """An unknown but close name raises with a did-you-mean hint."""
