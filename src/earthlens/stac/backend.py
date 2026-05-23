@@ -134,8 +134,10 @@ class STAC(AbstractDataSource):
         client is stored on `self._client`.
 
         Raises:
-            ValueError: When `variables` is empty or names an endpoint /
-                collection the catalog does not know.
+            ValueError: When `variables` is empty, names an endpoint /
+                collection the catalog does not know, or mixes collections that
+                are not all served by the chosen endpoint (one endpoint per
+                request).
         """
         from earthlens.stac.catalog import Catalog
         from earthlens.stac.signers import build_signer
@@ -359,9 +361,13 @@ class STAC(AbstractDataSource):
             progress_bar: Reserved for parity with the other backends.
             aggregate: Optional aggregation request. Accepted (not rejected)
                 because `OUTPUT_KIND` is `"raster"`, so the facade forwards it.
+                When set, the per-date COGs are reduced per time window into
+                per-window COGs (see :meth:`_aggregate_cogs`) and the per-date
+                intermediates are removed.
 
         Returns:
-            The written COG paths.
+            The written COG paths: one per `(collection, date)` when `aggregate`
+            is `None`, or one per `(collection, window)` when `aggregate` is set.
 
         """
         paths = self._api_via_search_fetch()
@@ -471,6 +477,22 @@ def _item_epsg(item: Any) -> int | None:
 
     Returns:
         The integer EPSG code declared by the item, or `None` when absent.
+
+    Examples:
+        - Read the CRS from a raw STAC item dict:
+            ```python
+            >>> from earthlens.stac.backend import _item_epsg
+            >>> _item_epsg({"properties": {"proj:epsg": 32631}})
+            32631
+
+            ```
+        - An item without `proj:epsg` yields `None`:
+            ```python
+            >>> from earthlens.stac.backend import _item_epsg
+            >>> _item_epsg({"properties": {}}) is None
+            True
+
+            ```
     """
     props = getattr(item, "properties", None)
     if props is None and isinstance(item, dict):
