@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import sys
+
 import geopandas as gpd
 import pandas as pd
 import pytest
@@ -237,8 +239,15 @@ class TestAggregateBasins:
 class TestMissingExtra:
     """Tests for the friendly missing-[tropycal]-extra error."""
 
-    def test_download_without_extra_raises_importerror(self, tmp_path):
-        """With no tropycal installed, download() raises a friendly ImportError."""
+    def test_download_without_extra_raises_importerror(self, tmp_path, monkeypatch):
+        """A failing tropycal import surfaces as a friendly ImportError.
+
+        Forces `import tropycal.tracks` to fail (via sys.modules) so the test
+        holds whether or not the [tropycal] extra is installed in the env — the
+        dev / wheel-test envs install [all], which includes tropycal.
+        """
+        monkeypatch.setitem(sys.modules, "tropycal", None)
+        monkeypatch.setitem(sys.modules, "tropycal.tracks", None)
         backend = _backend(tmp_path)
         with pytest.raises(ImportError, match=r"earthlens\[tropycal\]"):
             backend.download()
