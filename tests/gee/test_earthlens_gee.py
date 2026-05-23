@@ -73,8 +73,10 @@ class TestRegistry:
             "earthdata",
             "ecmwf",
             "fdsn",
+            "gdacs",
             "gee",
             "google-earth-engine",
+            "openaq",
         ]
 
     def test_keys_resolve_to_gee_class(self):
