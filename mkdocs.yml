@@ -138,6 +138,15 @@ nav:
       - Usage: reference/stac/usage.md
       - Authentication: reference/stac/authentication.md
       - Reference: reference/stac/stac.md
+    - GDACS (disaster alerts):
+      - Introduction: reference/gdacs/introduction.md
+      - Usage: reference/gdacs/usage.md
+      - Reference: reference/gdacs/gdacs.md
+    - OpenAQ (air quality):
+      - Introduction: reference/openaq/introduction.md
+      - Usage: reference/openaq/usage.md
+      - Authentication: reference/openaq/authentication.md
+      - Reference: reference/openaq/openaq.md
   - Examples:
     - Authentication: examples/authentication.md
     - Data Sources: examples/data-sources.md
@@ -184,6 +193,15 @@ nav:
       - Quickstart — Sentinel-2 COGs: examples/stac/quickstart.ipynb
       - NDVI time-series — monthly Sentinel-2: examples/stac/sentinel2_ndvi_timeseries.ipynb
       - Same AOI across MPC Landsat + CDSE Sentinel: examples/stac/mpc_landsat_cdse_sentinel_same_aoi.ipynb
+    - Disaster alerts (GDACS):
+      - Quickstart — recent alerts: examples/gdacs/quickstart.ipynb
+      - Global hazard dashboard: examples/gdacs/global_hazard_dashboard.ipynb
+      - Earthquakes + cyclones overlay: examples/gdacs/eq_tc_overlay.ipynb
+      - Country hazard profile: examples/gdacs/country_hazard_profile.ipynb
+    - Air quality (OpenAQ):
+      - Quickstart — PM2.5 over a city: examples/openaq/quickstart.ipynb
+      - PM2.5 city time-series (WHO guideline): examples/openaq/pm25_city_timeseries.ipynb
+      - Multi-station NO2 diurnal comparison: examples/openaq/multistation_comparison.ipynb
   - API Reference:
     - EarthLens Facade: reference/earthlens.md
     - AbstractDataSource: reference/abstract-datasource.md

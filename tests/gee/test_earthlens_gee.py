@@ -74,8 +74,10 @@ class TestRegistry:
             "earth-search",
             "ecmwf",
             "fdsn",
+            "gdacs",
             "gee",
             "google-earth-engine",
+            "openaq",
             "planetary-computer",
             "stac",
         ]
