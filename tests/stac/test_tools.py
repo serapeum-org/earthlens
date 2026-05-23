@@ -11,6 +11,7 @@ import yaml
 _TOOLS_DIR = Path(__file__).resolve().parents[2] / "tools" / "stac"
 sys.path.insert(0, str(_TOOLS_DIR))
 
+import audit_stac_catalog as audit  # noqa: E402
 import probe_stac_assets as probe  # noqa: E402
 import refresh_stac_catalog as refresh  # noqa: E402
 
@@ -96,3 +97,29 @@ class TestProbeAssetSchema:
         fields = probe._asset_fields(asset)
         assert fields["type"] == "image/tiff"
         assert fields["raster:bands"][0]["data_type"] == "int16"
+
+
+@pytest.mark.stac
+class TestAuditDiff:
+    """`_diff_collections` / `_curated_resolved` flag catalog-vs-live drift."""
+
+    def test_diff_reports_missing_and_untracked(self):
+        """Curated-not-live is 'missing'; live-not-curated is 'untracked'."""
+        curated = {"e": {"a", "b"}}
+        live = {"e": {"b", "c"}}
+        report = audit._diff_collections(curated, live)
+        assert report["e"]["missing"] == ["a"]
+        assert report["e"]["untracked"] == ["c"]
+
+    def test_diff_empty_when_in_sync(self):
+        """No drift yields an empty report."""
+        assert audit._diff_collections({"e": {"a"}}, {"e": {"a"}}) == {}
+
+    def test_curated_resolved_applies_aliases(self):
+        """Each endpoint maps to its curated collections' resolved ids."""
+        from earthlens.stac.catalog import Catalog
+
+        resolved = audit._curated_resolved(Catalog())
+        assert "sentinel-2-c1-l2a" in resolved["earth-search"]
+        assert "sentinel-2-l2a" in resolved["planetary-computer"]
+        assert "sentinel-1-grd" in resolved["cdse"]
