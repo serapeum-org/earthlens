@@ -68,16 +68,18 @@ class TestAliasEndpointBinding:
 class TestAggregateForwarded:
     """For OUTPUT_KIND='raster' the facade forwards aggregate to the backend."""
 
-    def test_aggregate_is_forwarded_not_rejected_at_guard(self, fake_pyramids, tmp_path):
-        """download(aggregate=...) passes the facade guard and reaches the STAC backend.
+    def test_aggregate_is_forwarded_and_reduced(self, fake_pyramids, tmp_path):
+        """download(aggregate=...) passes the facade guard and runs the COG reducer.
 
         The facade rejects aggregate only for vector/tabular backends; STAC is
-        raster, so the kwarg is forwarded. The backend then raises its own
-        NotImplementedError naming COG reduction (D6) — a different message
-        from the facade guard — proving the guard did not stop it.
+        raster, so the kwarg is forwarded and the backend reduces the per-date
+        COGs into per-window COGs. With no matching items there are no windows,
+        so the call returns an empty list (proving it was forwarded + executed,
+        not rejected at the guard).
         """
+        from earthlens.aggregate import AggregationConfig
+
         fake_pyramids.items_by_collection["sentinel-2-l2a"] = []
         el = _facade(fake_pyramids, tmp_path, "planetary-computer")
-        with pytest.raises(NotImplementedError, match="COG") as exc:
-            el.download(aggregate=object())
-        assert "vector / tabular" not in str(exc.value)
+        result = el.download(aggregate=AggregationConfig(freq="1MS"))
+        assert result == [], f"no items should reduce to no windows, got {result}"

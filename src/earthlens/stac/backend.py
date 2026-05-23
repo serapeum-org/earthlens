@@ -110,6 +110,8 @@ class STAC(AbstractDataSource):
         # Non-crossing AOI sub-bboxes; populated by _create_grid (one box, or
         # two when the request crosses the antimeridian).
         self._aoi_bboxes: list[tuple[float, float, float, float]] = []
+        # Filled by _fetch: (collection_key, date, half index, path) per COG.
+        self._written: list[tuple[str, str, int, Path]] = []
         self._catalog: Catalog | None = None
         self._endpoint_obj: Endpoint | None = None
         self._signer: Any = None
@@ -275,6 +277,9 @@ class STAC(AbstractDataSource):
         from pyramids.dataset.merge import merge_rasters, stack_bands
 
         out: list[Path] = []
+        # (collection_key, date, half index, path) for each written COG, so
+        # download(aggregate=) can group + window them without re-parsing names.
+        self._written = []
         multi = len(self._aoi_bboxes) > 1
         with CloudConfig(extra=self._signer.gdal_env()):
             for (collection_key, date, bbox_key), group in _group_products(products):
@@ -302,6 +307,7 @@ class STAC(AbstractDataSource):
                 target = Path(self.root_dir) / f"{collection_key}_{date}{part}.tif"
                 write_cog(stacked.crop(list(bbox_key)), str(target))
                 out.append(target)
+                self._written.append((collection_key, date, idx, target))
                 _cleanup(band_paths)
         logger.info(f"STAC download: {len(out)} COG(s) written to {self.root_dir}")
         return out
@@ -355,21 +361,101 @@ class STAC(AbstractDataSource):
         Returns:
             The written COG paths.
 
-        Raises:
-            NotImplementedError: When `aggregate` is set — composing the
-                aggregator over a COG stack is not yet wired (the existing
-                reducer path targets NetCDF; see `planning/stac/` `D6`). Call
-                `download()` without `aggregate=` and post-process the COGs.
         """
         paths = self._api_via_search_fetch()
         if aggregate is not None:
-            raise NotImplementedError(
-                "STAC.download(aggregate=...) is accepted (OUTPUT_KIND='raster') "
-                "but composing the time-window aggregator over a COG stack is "
-                "not yet wired; the existing reducer targets NetCDF. Call "
-                "download() without aggregate= and reduce the returned COGs."
-            )
+            return self._aggregate_cogs(aggregate)
         return paths
+
+    def _aggregate_cogs(self, config: AggregationConfig) -> list[Path]:
+        """Reduce the per-date COGs into per-`(window)` COGs via pyramids.
+
+        Groups the COGs `_fetch` wrote by `(collection, antimeridian half)` —
+        each group shares a grid — builds a `pyramids.dataset.DatasetCollection`
+        over the group (time axis = acquisition date), labels each timestep with
+        its `config.freq` window, and reduces with `config.op` via
+        `DatasetCollection.groupby(labels).<op>()` (the COG analog of the
+        NetCDF reducer CMEMS uses). One COG is written per `(group, window)`.
+
+        Args:
+            config: The aggregation request (`freq` window, `op` reducer,
+                `out_dir`, `skipna`).
+
+        Returns:
+            The per-window COG paths.
+        """
+        from pyramids.dataset import Dataset, DatasetCollection
+        from pyramids.dataset.cog import write_cog
+
+        op = "mean" if config.op == "auto" else config.op
+        out_dir = Path(config.out_dir) if config.out_dir is not None else Path(self.root_dir)
+        out_dir.mkdir(parents=True, exist_ok=True)
+
+        groups: dict[tuple[str, int], list[tuple[str, Path]]] = {}
+        for collection_key, date, idx, path in self._written:
+            groups.setdefault((collection_key, idx), []).append((date, path))
+
+        written: list[Path] = []
+        multi = len(self._aoi_bboxes) > 1
+        for (collection_key, idx), dated in groups.items():
+            dated.sort()
+            dates = [d for d, _ in dated]
+            files = [str(p) for _, p in dated]
+            labels = _window_labels(dates, config.freq)
+            collection = DatasetCollection.from_files(files)
+            reduced = getattr(collection.groupby(labels), op)(skipna=config.skipna)
+            geo, epsg = _geo_of(Dataset, files[0])
+            part = f"_part{idx}" if multi else ""
+            for label, array in reduced.items():
+                target = out_dir / f"{collection_key}_{op}_{config.freq}_{label}{part}.tif"
+                write_cog(Dataset.create_from_array(arr=array, geo=geo, epsg=epsg), str(target))
+                written.append(target)
+        logger.info(
+            f"STAC aggregate: {len(self._written)} COG(s) -> {len(written)} "
+            f"window COG(s) (time/{config.freq} {op}) in {out_dir}"
+        )
+        return written
+
+
+def _window_labels(dates: list[str], freq: str) -> list[str]:
+    """Return one window-start label (`YYYYMMDD`) per date, bucketed by `freq`.
+
+    Dates sharing a `config.freq` window get the same label, so
+    `DatasetCollection.groupby` coarsens the time axis to one slice per window.
+
+    Args:
+        dates: Acquisition dates as `YYYY-MM-DD` strings, in file order.
+        freq: A pandas offset alias (`"1MS"`, `"7D"`, `"YS"`, …).
+
+    Returns:
+        One label per input date (length == `len(dates)`).
+    """
+    import pandas as pd
+
+    index = pd.DatetimeIndex(pd.to_datetime(list(dates)))
+    positions = pd.Series(range(len(index)), index=index)
+    label_for: dict[int, str] = {}
+    for window_start, group in positions.groupby(pd.Grouper(freq=freq)):
+        if group.empty:
+            continue
+        label = window_start.strftime("%Y%m%d")
+        for pos in group.tolist():
+            label_for[int(pos)] = label
+    return [label_for[i] for i in range(len(index))]
+
+
+def _geo_of(dataset_cls: Any, path: str) -> tuple[Any, Any]:
+    """Return `(geotransform, epsg)` read from a written COG.
+
+    Args:
+        dataset_cls: The pyramids `Dataset` class.
+        path: A COG path in the group (all share a grid).
+
+    Returns:
+        The geotransform and EPSG to stamp on the per-window outputs.
+    """
+    ds = dataset_cls.read_file(path)
+    return ds.geotransform, ds.epsg
 
 
 def _acq_date(item: Any) -> str:

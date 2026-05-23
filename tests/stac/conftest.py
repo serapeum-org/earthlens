@@ -73,6 +73,7 @@ class _FakeDataset:
     def __init__(self, href: str = "", epsg: int | None = 32630) -> None:
         self.href = href
         self.epsg = epsg
+        self.geotransform = (0.0, 1.0, 0.0, 0.0, 0.0, -1.0)
         self.cropped_bbox: list[float] | None = None
         self.reprojected_to: int | None = None
 
@@ -107,6 +108,38 @@ class _FakeCloudConfig:
 
     def __exit__(self, *exc: object) -> None:
         return None
+
+
+class _FakeGrouped:
+    """A pyramids _GroupedCollection stand-in returning one array per label."""
+
+    def __init__(self, labels: list[str]) -> None:
+        self._labels = list(dict.fromkeys(labels))
+
+    def _reduce(self, **kwargs):
+        import numpy as np
+
+        return {label: np.zeros((1, 1)) for label in self._labels}
+
+    mean = sum = min = max = std = var = _reduce
+
+
+class _FakeDatasetCollection:
+    """A pyramids DatasetCollection stand-in (from_files + groupby)."""
+
+    def __init__(self) -> None:
+        self.files: list[str] = []
+
+    @classmethod
+    def from_files(cls, files, **kwargs) -> _FakeDatasetCollection:
+        """Build a collection from file paths."""
+        inst = cls()
+        inst.files = list(files)
+        return inst
+
+    def groupby(self, labels) -> _FakeGrouped:
+        """Return a grouped view keyed by the per-timestep labels."""
+        return _FakeGrouped(labels)
 
 
 class FakePyramids:
@@ -219,9 +252,18 @@ def fake_pyramids(monkeypatch: pytest.MonkeyPatch) -> FakePyramids:
     def _read_file(href, **kwargs):
         return _FakeDataset(href, fp.dataset_epsgs.get(href, 32630))
 
+    def _create_from_array(arr=None, geo=None, epsg=None, **kwargs):
+        return _FakeDataset()
+
     dataset_mod.Dataset = type(
-        "Dataset", (), {"read_file": staticmethod(_read_file)}
+        "Dataset",
+        (),
+        {
+            "read_file": staticmethod(_read_file),
+            "create_from_array": staticmethod(_create_from_array),
+        },
     )
+    dataset_mod.DatasetCollection = _FakeDatasetCollection
     monkeypatch.setitem(sys.modules, "pyramids.dataset", dataset_mod)
 
     bbox_mod = types.ModuleType("pyramids.feature.bbox")

@@ -246,12 +246,18 @@ class TestDownload:
         stac = _build_stac(tmp_path, endpoint="earth-search")
         assert len(stac.download()) == 1
 
-    def test_download_aggregate_raises_not_implemented(self, fake_pyramids, tmp_path):
-        """aggregate= is accepted (raster) but COG reduction is not yet wired (D6)."""
-        fake_pyramids.items_by_collection["sentinel-2-c1-l2a"] = []
-        stac = _build_stac(tmp_path, endpoint="earth-search")
-        with pytest.raises(NotImplementedError, match="COG"):
-            stac.download(aggregate=object())
+    def test_download_aggregate_reduces_to_window_cogs(self, fake_pyramids, tmp_path):
+        """aggregate= reduces the per-date COGs into one COG per time window."""
+        from earthlens.aggregate import AggregationConfig
+
+        fake_pyramids.items_by_collection["sentinel-2-c1-l2a"] = [
+            make_item("a", "2024-01-05", {"B04": "https://h/a.tif"}),
+            make_item("b", "2024-01-20", {"B04": "https://h/b.tif"}),
+        ]
+        stac = _build_stac(tmp_path, endpoint="earth-search", variables={"sentinel-2-l2a": ["B04"]})
+        out = stac.download(aggregate=AggregationConfig(freq="1MS", out_dir=tmp_path / "agg"))
+        assert len(out) == 1, f"two Jan dates should reduce to one monthly COG, got {out}"
+        assert out[0].name == "sentinel-2-l2a_mean_1MS_20240101.tif"
 
 
 @pytest.mark.stac
