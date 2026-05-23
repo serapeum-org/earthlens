@@ -4199,6 +4199,11 @@ fixes (the drawn track is clipped to the time window).</p>
 <a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a><span class="p">)</span>
 <a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a><span class="n">majors</span> <span class="o">=</span> <span class="n">el</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
 </code></pre></div>
+<p><code>min_category</code> / <code>storm_type</code> filter at the <strong>fix</strong> level. In
+<code>geometry="track"</code> mode that means the filter is applied <em>before</em> the
+<code>LineString</code> is built, so a storm that only briefly meets the threshold yields
+a track drawn from just its qualifying fixes — a clipped, possibly shortened
+path rather than the storm's whole track.</p>
 <h2 id="multiple-basins"><a class="toclink" href="#multiple-basins">Multiple basins</a><a class="headerlink" href="#multiple-basins" title="Permanent link">#</a></h2>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">el</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
 <a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>    <span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;tropycal&quot;</span><span class="p">,</span>
