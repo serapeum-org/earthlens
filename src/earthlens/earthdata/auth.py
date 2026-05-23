@@ -68,11 +68,11 @@ class EarthdataCredentials(BaseModel):
     """Frozen value object holding the Earthdata Login credentials.
 
     The auth wrapper accepts every EDL-credential source `earthaccess`
-    knows about: explicit username/password, a pre-existing token, a
-    path to a `.netrc` file, or no fields at all (and rely on env
-    vars / the default `~/.netrc` / an interactive prompt). Validation
-    is intentionally permissive — the real "do these creds work?" gate
-    is :meth:`EarthdataAuth.configure`, which talks to EDL.
+    knows about: explicit username/password, a path to a `.netrc` file,
+    or no fields at all (and rely on env vars / the default `~/.netrc` /
+    an interactive prompt). Validation is intentionally permissive — the
+    real "do these creds work?" gate is :meth:`EarthdataAuth.configure`,
+    which talks to EDL.
 
     Attributes:
         username: EDL account username. `None` means "look at the
@@ -81,11 +81,6 @@ class EarthdataCredentials(BaseModel):
             :class:`pydantic.SecretStr` so it is never echoed by
             `repr(creds)` or in logs. `None` means same as
             `username`.
-        token: Optional pre-minted EDL bearer token, stored as
-            :class:`pydantic.SecretStr`. Currently informational —
-            `earthaccess.login` resolves tokens itself from the
-            chosen strategy; the field is carried so a future
-            token-first strategy can use it.
         netrc_path: Optional path to a `.netrc` file holding a
             `machine urs.earthdata.nasa.gov` entry. `None` falls back
             to `~/.netrc`.
@@ -113,7 +108,6 @@ class EarthdataCredentials(BaseModel):
 
     username: str | None = None
     password: SecretStr | None = None
-    token: SecretStr | None = None
     netrc_path: Path | None = None
 
 

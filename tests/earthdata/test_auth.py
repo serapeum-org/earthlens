@@ -34,7 +34,7 @@ class TestEarthdataCredentials:
         """Every field defaults to None."""
         creds = EarthdataCredentials()
         assert creds.username is None and creds.password is None
-        assert creds.token is None and creds.netrc_path is None
+        assert creds.netrc_path is None
 
     def test_password_is_secret(self):
         """The password is not echoed in repr."""
