@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import builtins
+import os
 import sys
 from pathlib import Path
 
@@ -73,6 +74,25 @@ class TestEarthdataAuth:
         monkeypatch.delenv("EARTHDATA_PASSWORD", raising=False)
         auth = EarthdataAuth(EarthdataCredentials(netrc_path=Path("/no/such/netrc")))
         assert auth._resolve_strategy() == "interactive"
+
+    def test_explicit_credentials_authenticate(self, fake_earthaccess, monkeypatch):
+        """Explicit username/password authenticate even without env vars or netrc."""
+        monkeypatch.delenv("EARTHDATA_USERNAME", raising=False)
+        monkeypatch.delenv("EARTHDATA_PASSWORD", raising=False)
+        auth = EarthdataAuth(
+            EarthdataCredentials(
+                username="explicit-user",
+                password="explicit-pass",
+                netrc_path=Path("/no/such/netrc"),
+            )
+        )
+        auth.configure()
+        assert auth.is_authenticated() is True
+        assert fake_earthaccess.login_calls == [
+            {"strategy": "environment", "persist": True}
+        ]
+        assert os.environ["EARTHDATA_USERNAME"] == "explicit-user"
+        assert os.environ["EARTHDATA_PASSWORD"] == "explicit-pass"
 
     def test_configure_logs_in(self, fake_earthaccess, edl_env):
         """configure() logs in via earthaccess and marks authenticated."""

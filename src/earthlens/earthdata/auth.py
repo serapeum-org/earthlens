@@ -169,16 +169,25 @@ class EarthdataAuth(AbstractAuth[EarthdataCredentials]):
         self._auth = None
         self._configured = False
 
+    def _has_explicit_credentials(self) -> bool:
+        """Return whether both an explicit username and password were given."""
+        return self._creds.username is not None and self._creds.password is not None
+
     def _resolve_strategy(self) -> str:
-        """Pick the `earthaccess.login` strategy from the environment.
+        """Pick the `earthaccess.login` strategy.
 
         Returns the first viable source in the documented order:
-        environment variables, then a `.netrc` holding an EDL entry,
-        then an interactive prompt as the last resort.
+        explicit `username` + `password` passed to the constructor
+        (fed to `earthaccess` via the environment strategy), then the
+        `EARTHDATA_USERNAME` / `EARTHDATA_PASSWORD` environment
+        variables, then a `.netrc` holding an EDL entry, then an
+        interactive prompt as the last resort.
 
         Returns:
             str: One of `"environment"`, `"netrc"`, `"interactive"`.
         """
+        if self._has_explicit_credentials():
+            return "environment"
         if os.getenv("EARTHDATA_USERNAME") and os.getenv("EARTHDATA_PASSWORD"):
             return "environment"
         netrc_path = self._creds.netrc_path or (Path.home() / ".netrc")
@@ -191,9 +200,13 @@ class EarthdataAuth(AbstractAuth[EarthdataCredentials]):
 
         Idempotent — short-circuits when :meth:`is_authenticated`
         already returns `True`. On the first call, resolves the login
-        strategy (env → netrc → interactive), logs in with
-        `persist=True`, and keeps the returned `earthaccess.Auth`
-        handle on :attr:`_auth`.
+        strategy (explicit creds → env → netrc → interactive). When an
+        explicit `username` / `password` was passed to the constructor,
+        it is exported to `EARTHDATA_USERNAME` / `EARTHDATA_PASSWORD` so
+        the `earthaccess` environment strategy picks it up (the SDK has
+        no direct username/password login argument). Then logs in with
+        `persist=True` and keeps the returned `earthaccess.Auth` handle
+        on :attr:`_auth`.
 
         Raises:
             AuthenticationError: When `earthaccess.login` returns an
@@ -214,6 +227,12 @@ class EarthdataAuth(AbstractAuth[EarthdataCredentials]):
             ) from exc
 
         strategy = self._resolve_strategy()
+        if strategy == "environment" and self._has_explicit_credentials():
+            # earthaccess has no direct username/password argument; the
+            # environment strategy reads these two variables. Export the
+            # explicit creds so they actually reach the login.
+            os.environ["EARTHDATA_USERNAME"] = self._creds.username
+            os.environ["EARTHDATA_PASSWORD"] = self._creds.password.get_secret_value()
         try:
             auth = earthaccess.login(strategy=strategy, persist=True)
         except Exception as exc:  # noqa: BLE001 - re-raised as AuthenticationError
