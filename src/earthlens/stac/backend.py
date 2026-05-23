@@ -150,6 +150,17 @@ class STAC(AbstractDataSource):
         if self._endpoint is None:
             self._endpoint = self._catalog.get_collection(first_collection_key).endpoint
         self._endpoint_obj = self._catalog.get_endpoint(self._endpoint)
+        # All requested collections must be served by the chosen endpoint —
+        # otherwise a later collection would silently search the wrong API.
+        for col_key in self._variables:
+            collection = self._catalog.get_collection(col_key)
+            if self._endpoint != collection.endpoint and self._endpoint not in collection.aliases:
+                raise ValueError(
+                    f"collection {col_key!r} is not served by endpoint "
+                    f"{self._endpoint!r} (home {collection.endpoint!r}, aliases "
+                    f"{sorted(collection.aliases)}). Use one endpoint per request, "
+                    "or pass endpoint= explicitly."
+                )
         self._signer = build_signer(
             self._endpoint_obj.signer,
             region=self._region or self._endpoint_obj.region,
@@ -401,6 +412,9 @@ class STAC(AbstractDataSource):
                 target = out_dir / f"{collection_key}_{op}_{config.freq}_{label}{part}.tif"
                 write_cog(Dataset.create_from_array(arr=array, geo=geo, epsg=epsg), str(target))
                 written.append(target)
+        # The per-date COGs are intermediates of the aggregation; drop them so
+        # the caller is left with only the per-window outputs.
+        _cleanup([path for _, _, _, path in self._written])
         logger.info(
             f"STAC aggregate: {len(self._written)} COG(s) -> {len(written)} "
             f"window COG(s) (time/{config.freq} {op}) in {out_dir}"

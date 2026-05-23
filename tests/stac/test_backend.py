@@ -69,6 +69,15 @@ class TestInitialize:
         )
         assert stac._endpoint == "planetary-computer"
 
+    def test_mixed_endpoint_collections_raise(self, fake_pyramids, fake_pc, tmp_path):
+        """A collection not served by the chosen endpoint is rejected, not mis-queried."""
+        with pytest.raises(ValueError, match="not served by endpoint"):
+            STAC(
+                start="2024-01-01", end="2024-01-02",
+                variables={"landsat-c2-l2": ["red"], "sentinel-1-grd": ["vv"]},
+                lat_lim=[0.0, 1.0], lon_lim=[0.0, 1.0], path=str(tmp_path),
+            )
+
     def test_empty_variables_raises(self, fake_pyramids, tmp_path):
         """An empty variables mapping is rejected."""
         with pytest.raises(ValueError, match="at least one collection"):
@@ -277,6 +286,9 @@ class TestDownload:
         out = stac.download(aggregate=AggregationConfig(freq="1MS", out_dir=tmp_path / "agg"))
         assert len(out) == 1, f"two Jan dates should reduce to one monthly COG, got {out}"
         assert out[0].name == "sentinel-2-l2a_mean_1MS_20240101.tif"
+        # the intermediate per-date COGs are cleaned up (M3)
+        assert not (tmp_path / "sentinel-2-l2a_2024-01-05.tif").exists()
+        assert not (tmp_path / "sentinel-2-l2a_2024-01-20.tif").exists()
 
 
 @pytest.mark.stac
