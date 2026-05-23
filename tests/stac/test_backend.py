@@ -249,6 +249,25 @@ class TestFetch:
         merge_kwargs = fake_pyramids.merge_calls[0][2]
         assert merge_kwargs["dst_crs"] == 32630  # lowest of the differing EPSGs
 
+    def test_explicit_epsg_sets_merge_dst_crs(self, fake_pyramids, tmp_path):
+        """An explicit epsg= overrides item metadata as the merge dst_crs."""
+        fake_pyramids.items_by_collection["sentinel-2-c1-l2a"] = [
+            make_item("a", "2024-01-05", {"B04": "https://h/a.tif"}, proj_epsg=32630)
+        ]
+        stac = _build_stac(
+            tmp_path, endpoint="earth-search", variables={"sentinel-2-l2a": ["B04"]}, epsg=3857
+        )
+        stac._fetch(stac._search())
+        assert fake_pyramids.merge_calls[0][2]["dst_crs"] == 3857
+
+    def test_api_composes_search_and_fetch(self, fake_pyramids, tmp_path):
+        """_api() runs the search/fetch pipeline and returns the COG paths."""
+        fake_pyramids.items_by_collection["sentinel-2-c1-l2a"] = [
+            make_item("a", "2024-01-05", {"B04": "https://h/a.tif"})
+        ]
+        stac = _build_stac(tmp_path, endpoint="earth-search", variables={"sentinel-2-l2a": ["B04"]})
+        assert len(stac._api()) == 1
+
     def test_same_crs_tiles_leave_dst_crs_none(self, fake_pyramids, tmp_path):
         """Tiles sharing proj:epsg keep their native CRS (dst_crs=None)."""
         fake_pyramids.items_by_collection["sentinel-2-c1-l2a"] = [
@@ -342,6 +361,13 @@ class TestModuleHelpers:
 
         assert _item_epsg(make_item("a", "2024-01-05", {}, proj_epsg=32631)) == 32631
         assert _item_epsg(make_item("a", "2024-01-05", {})) is None
+
+    def test_item_epsg_reads_dict_item(self):
+        """_item_epsg reads proj:epsg from a raw STAC item dict."""
+        from earthlens.stac.backend import _item_epsg
+
+        assert _item_epsg({"properties": {"proj:epsg": 32633}}) == 32633
+        assert _item_epsg({"properties": {}}) is None
 
     def test_group_products_buckets_by_collection_date_bbox(self):
         """Products are grouped by (collection_key, date, source bbox)."""

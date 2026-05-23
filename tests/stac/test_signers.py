@@ -76,6 +76,10 @@ class TestCdseS3Signer:
         out = CdseS3Signer("ak", "sk").sign_href("https://example.com/a.tif")
         assert out == "https://example.com/a.tif"
 
+    def test_sign_href_non_http_scheme_passthrough(self):
+        """A non-s3, non-http href is returned unchanged."""
+        assert CdseS3Signer("ak", "sk").sign_href("/vsicurl/local.tif") == "/vsicurl/local.tif"
+
     def test_gdal_env_carries_s3_credentials_no_authorization(self):
         """gdal_env supplies the S3 endpoint + keys and never an Authorization header."""
         env = CdseS3Signer("ak", "sk", endpoint="eodata.example").gdal_env()
