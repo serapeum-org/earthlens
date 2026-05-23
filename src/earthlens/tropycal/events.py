@@ -325,7 +325,15 @@ def _prepare_frame(frame: pd.DataFrame) -> pd.DataFrame:
         A copy of `frame` with `_time` / `_lat` / `_lon` helper columns.
     """
     prepared = frame.copy()
-    time_col = "time" if "time" in prepared.columns else "date"
+    if "time" in prepared.columns:
+        time_col = "time"
+    elif "date" in prepared.columns:
+        time_col = "date"
+    else:
+        raise KeyError(
+            "storm frame has no 'time' or 'date' column; cannot place fixes in "
+            f"time (columns: {list(prepared.columns)})."
+        )
     # Parse as UTC first, then strip the tz to get naive timestamps. tropycal's
     # best-track `time` column is tz-naive UTC; parsing with `utc=True` makes
     # the value tz-aware regardless of the input, so `tz_localize(None)` works

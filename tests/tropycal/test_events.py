@@ -242,6 +242,26 @@ class TestFirstHelper:
         assert events._first(pd.Series([1, 2, 3])) == 1
 
 
+class TestPrepareFrame:
+    """Tests for the _prepare_frame normalization helper."""
+
+    def test_missing_time_column_raises(self):
+        """A frame with neither 'time' nor 'date' raises a clear KeyError."""
+        bad = pd.DataFrame({"lat": [1.0], "lon": [2.0]})
+        with pytest.raises(KeyError, match="no 'time' or 'date' column"):
+            events.frame_to_fc(
+                [bad], geometry="point", window=_WINDOW, bbox=_BBOX, source="hurdat"
+            )
+
+    def test_date_column_accepted(self):
+        """A frame using a 'date' column instead of 'time' is accepted."""
+        frame = _frame().rename(columns={"time": "date"})
+        fc = events.frame_to_fc(
+            [frame], geometry="point", window=_WINDOW, bbox=_BBOX, source="hurdat"
+        )
+        assert len(fc) == 3
+
+
 class TestColumnHelper:
     """Tests for the _column accessor."""
 
