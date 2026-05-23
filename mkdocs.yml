@@ -137,6 +137,10 @@ nav:
       - Introduction: reference/gdacs/introduction.md
       - Usage: reference/gdacs/usage.md
       - Reference: reference/gdacs/gdacs.md
+    - Tropycal (cyclone tracks):
+      - Introduction: reference/tropycal/introduction.md
+      - Usage: reference/tropycal/usage.md
+      - Reference: reference/tropycal/tropycal.md
   - Examples:
     - Authentication: examples/authentication.md
     - Data Sources: examples/data-sources.md
@@ -184,6 +188,10 @@ nav:
       - Global hazard dashboard: examples/gdacs/global_hazard_dashboard.ipynb
       - Earthquakes + cyclones overlay: examples/gdacs/eq_tc_overlay.ipynb
       - Country hazard profile: examples/gdacs/country_hazard_profile.ipynb
+    - Tropical cyclones (Tropycal):
+      - Quickstart — Atlantic season: examples/tropycal/quickstart.ipynb
+      - Season track map: examples/tropycal/season_track_map.ipynb
+      - Multi-decade landfall density: examples/tropycal/landfall_density.ipynb
   - API Reference:
     - EarthLens Facade: reference/earthlens.md
     - AbstractDataSource: reference/abstract-datasource.md
