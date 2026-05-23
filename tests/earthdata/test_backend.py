@@ -141,6 +141,20 @@ class TestConstruction:
         with pytest.raises(ValueError, match="non-empty"):
             _make(tmp_path, {})
 
+    def test_daac_with_multiple_datasets_rejected(self, fake_earthaccess, edl_env, tmp_path):
+        """daac= combined with several datasets is rejected up front."""
+        with pytest.raises(ValueError, match="daac= only applies to a single-dataset"):
+            _make(
+                tmp_path,
+                {"GPM_3IMERGHHL_07": ["precipitation"], "GPM_3IMERGM_07": ["precipitation"]},
+                daac="GES_DISC",
+            )
+
+    def test_daac_with_single_dataset_ok(self, fake_earthaccess, edl_env, tmp_path):
+        """daac= with one dataset resolves normally."""
+        obj = _make(tmp_path, {"GPM_3IMERGHHL_07": ["precipitation"]}, daac="GES_DISC")
+        assert obj._datasets[0].provider == "GES_DISC"
+
     def test_unknown_key_rejected(self, fake_earthaccess, edl_env, tmp_path):
         """An unknown dataset key is rejected with did-you-mean."""
         with pytest.raises(ValueError, match="Did you mean"):

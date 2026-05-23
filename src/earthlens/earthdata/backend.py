@@ -169,13 +169,25 @@ class EarthData(AbstractDataSource):
             list[EarthdataDataset]: One row per key, in request order.
 
         Raises:
-            ValueError: When `variables` is empty or a key is unknown
-                (the catalog's did-you-mean is surfaced in the message).
+            ValueError: When `variables` is empty, a key is unknown
+                (the catalog's did-you-mean is surfaced in the message),
+                or `daac=` is combined with a multi-dataset request.
         """
         if not variables:
             raise ValueError(
                 "EarthData requires a non-empty `variables` mapping of "
                 "{dataset_key: [band, ...]}."
+            )
+        # `daac=` disambiguates a single short_name served by more than one
+        # provider, so it only makes sense for a single-dataset request. With
+        # several datasets it would be applied to every key and wrongly reject
+        # any whose DAAC differs — reject that combination up front.
+        if self._daac is not None and len(variables) > 1:
+            raise ValueError(
+                "daac= only applies to a single-dataset request; it cannot be "
+                f"combined with {len(variables)} datasets (it would be applied "
+                "to every key). Drop daac= and rely on the dataset keys, or "
+                "issue one request per dataset."
             )
         resolved: list[EarthdataDataset] = []
         for key in variables:

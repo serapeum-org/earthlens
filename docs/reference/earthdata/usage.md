@@ -75,6 +75,12 @@ pick the curated row you mean:
 EarthLens(data_source="earthdata", daac="GES_DISC", ...)
 ```
 
+`daac=` only applies to a **single-dataset** request — it disambiguates
+one colliding `short_name`. Combining it with a multi-dataset
+`variables` mapping is rejected at construction (it would be applied to
+every key and wrongly drop any whose DAAC differs); issue one request
+per dataset instead.
+
 ## Aggregation
 
 Because `OUTPUT_KIND` is per-instance, the facade forwards an
