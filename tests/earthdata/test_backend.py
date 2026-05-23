@@ -91,6 +91,10 @@ class _FakeDatasetCollection:
         return _FakeCollection(paths)
 
 
+class _DatasetCollectionNoGroupby:
+    """Fake pyramids DatasetCollection lacking the groupby method."""
+
+
 class TestConstruction:
     """Catalog resolution + per-instance OUTPUT_KIND."""
 
@@ -189,39 +193,61 @@ class TestFetch:
 
 
 class TestAggregate:
-    """download(aggregate=) routing per format (G6)."""
+    """download(aggregate=) routing — axis-driven, not format-driven (G6)."""
 
-    def test_netcdf_routes_to_reduce(self, fake_earthaccess, edl_env, tmp_path, monkeypatch):
-        """A NetCDF fetch reduces via NetCDF.reduce."""
+    def test_granule_stack_routes_to_groupby(self, fake_earthaccess, edl_env, tmp_path, monkeypatch):
+        """A multi-granule fetch (the common case) windows the stack via groupby."""
+        import pyramids.dataset as dsmod
+        from earthlens.aggregate import AggregationConfig
+
+        monkeypatch.setattr(dsmod, "DatasetCollection", _FakeDatasetCollection)
+        obj = _make(tmp_path, {"GPM_3IMERGHHL_07": ["precipitation"]})
+        out = obj.download(aggregate=AggregationConfig(freq="1MS"))
+        assert [p.name for p in out] == ["window_2020.tif"]
+
+    def test_single_netcdf_reduces_internal_axis(self, fake_earthaccess, edl_env, tmp_path, monkeypatch):
+        """A single NetCDF cube collapses its internal time axis via NetCDF.reduce."""
         import pyramids.netcdf as ncmod
         from earthlens.aggregate import AggregationConfig
 
+        fake_earthaccess.granules = [{"meta": {"concept-id": "G1"}}]
         _FakeReduced.written = []
         monkeypatch.setattr(ncmod, "NetCDF", _FakeNetCDF)
         obj = _make(tmp_path, {"GPM_3IMERGHHL_07": ["precipitation"]})
         out = obj.download(aggregate=AggregationConfig(freq="1MS"))
-        assert out and all(str(p).endswith("_1MS_agg.nc") for p in out)
-        assert len(_FakeReduced.written) == len(out)
+        assert [str(p).endswith("_1MS_agg.nc") for p in out] == [True]
+        assert len(_FakeReduced.written) == 1
 
-    def test_missing_reducer_raises(self, fake_earthaccess, edl_env, tmp_path, monkeypatch):
-        """A pyramids build without NetCDF.reduce raises NotImplementedError."""
+    def test_single_cog_uses_stack_path(self, fake_earthaccess, edl_env, tmp_path, monkeypatch):
+        """A lone COG (no internal axis) falls through to the stack path."""
+        import pyramids.dataset as dsmod
+        from earthlens.aggregate import AggregationConfig
+
+        monkeypatch.setattr(dsmod, "DatasetCollection", _FakeDatasetCollection)
+        obj = _make(tmp_path, {"OPERA_L2_RTC-S1_V1": ["VV"]}, direct_s3="never")
+        out = obj._aggregate([Path("only.tif")], AggregationConfig(freq="YS"))
+        assert [p.name for p in out] == ["window_2020.tif"]
+
+    def test_missing_reduce_raises(self, fake_earthaccess, edl_env, tmp_path, monkeypatch):
+        """A single NetCDF without NetCDF.reduce raises NotImplementedError."""
         import pyramids.netcdf as ncmod
         from earthlens.aggregate import AggregationConfig
 
+        fake_earthaccess.granules = [{"meta": {"concept-id": "G1"}}]
         monkeypatch.setattr(ncmod, "NetCDF", _NetCDFNoReduce)
         obj = _make(tmp_path, {"GPM_3IMERGHHL_07": ["precipitation"]})
         with pytest.raises(NotImplementedError, match="NetCDF.reduce"):
             obj.download(aggregate=AggregationConfig(freq="1MS"))
 
-    def test_cog_stack_routes_to_groupby(self, fake_earthaccess, edl_env, tmp_path, monkeypatch):
-        """A COG stack reduces via DatasetCollection.groupby."""
+    def test_missing_groupby_raises(self, fake_earthaccess, edl_env, tmp_path, monkeypatch):
+        """A stack without DatasetCollection.groupby raises NotImplementedError."""
         import pyramids.dataset as dsmod
         from earthlens.aggregate import AggregationConfig
 
-        monkeypatch.setattr(dsmod, "DatasetCollection", _FakeDatasetCollection)
+        monkeypatch.setattr(dsmod, "DatasetCollection", _DatasetCollectionNoGroupby)
         obj = _make(tmp_path, {"OPERA_L2_RTC-S1_V1": ["VV"]})
-        out = obj._aggregate([Path("a.tif"), Path("b.tif")], AggregationConfig(freq="YS"))
-        assert [p.name for p in out] == ["window_2020.tif"]
+        with pytest.raises(NotImplementedError, match="groupby"):
+            obj._aggregate([Path("a.tif"), Path("b.tif")], AggregationConfig(freq="YS"))
 
     def test_search_missing_earthaccess_raises(self, fake_earthaccess, edl_env, tmp_path, monkeypatch):
         """_search surfaces a friendly ImportError when earthaccess is gone."""

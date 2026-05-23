@@ -46,12 +46,11 @@ class TestPerInstanceAggregateGuard:
     """The facade gates aggregate= on the per-instance OUTPUT_KIND (G1/G6)."""
 
     def test_raster_forwards_aggregate(self, fake_earthaccess, edl_env, tmp_path, monkeypatch):
-        """A raster instance forwards aggregate= into the backend."""
-        import pyramids.netcdf as ncmod
-        from tests.earthdata.test_backend import _FakeNetCDF, _FakeReduced
+        """A raster instance forwards aggregate= into the backend (stack path)."""
+        import pyramids.dataset as dsmod
+        from tests.earthdata.test_backend import _FakeDatasetCollection
 
-        _FakeReduced.written = []
-        monkeypatch.setattr(ncmod, "NetCDF", _FakeNetCDF)
+        monkeypatch.setattr(dsmod, "DatasetCollection", _FakeDatasetCollection)
         fac = _facade(tmp_path, {"GPM_3IMERGHHL_07": ["precipitation"]})
         out = fac.download(aggregate=AggregationConfig(freq="1MS"))
         assert out, "raster aggregate should produce reduced paths"

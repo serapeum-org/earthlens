@@ -493,12 +493,21 @@ class EarthData(AbstractDataSource):
     ) -> list[Path]:
         """Reduce fetched raster granules per-window via pyramids (`G6`).
 
-        Routes by on-disk format using the existing pyramids reducers —
-        no new pyramids feature: NetCDF / HDF granules go through
-        :meth:`pyramids.netcdf.NetCDF.reduce` (the CMEMS path) and a
-        COG stack through
-        :meth:`pyramids.dataset.DatasetCollection.groupby` (the STAC
-        path).
+        The routing is **axis-driven, not format-driven** — it depends
+        on where the time axis lives, not on the file extension:
+
+        * The common Earthdata case is a **stack of single-timestep
+          granules** (one file per overpass / half-hour / day, NetCDF
+          *or* COG). That whole stack is windowed by
+          :meth:`pyramids.dataset.DatasetCollection.groupby` (the STAC
+          path) — one reduced raster per `config.freq` window.
+        * The rarer case is a **single granule that already carries a
+          multi-timestep time axis inside it** (one NetCDF cube). Its
+          internal `time` axis is collapsed by
+          :meth:`pyramids.netcdf.NetCDF.reduce` (the CMEMS path).
+
+        A single COG (one timestep, no internal axis) falls through to
+        the stack path as a one-element stack (a single window).
 
         Args:
             paths: The fetched granule paths.
@@ -509,31 +518,40 @@ class EarthData(AbstractDataSource):
 
         Raises:
             NotImplementedError: When the installed pyramids lacks the
-                reducer the fetched format needs.
+                reducer the chosen path needs.
         """
-        netcdf_like = {".nc", ".nc4", ".h5", ".hdf", ".hdf5", ".he5"}
-        cog_like = {".tif", ".tiff", ".cog"}
-        nc_paths = [p for p in paths if p.suffix.lower() in netcdf_like]
-        tif_paths = [p for p in paths if p.suffix.lower() in cog_like]
+        if not paths:
+            return []
+        if len(paths) == 1 and self._is_netcdf_like(paths[0]):
+            return self._reduce_internal_axis(paths[0], config)
+        return self._reduce_stack(paths, config)
 
-        out: list[Path] = []
-        if nc_paths:
-            out.extend(self._reduce_netcdf(nc_paths, config))
-        if tif_paths:
-            out.extend(self._reduce_cog_stack(tif_paths, config))
-        return out
-
-    def _reduce_netcdf(
-        self, paths: list[Path], config: AggregationConfig
-    ) -> list[Path]:
-        """Reduce NetCDF / HDF granules over time via `NetCDF.reduce`.
+    @staticmethod
+    def _is_netcdf_like(path: Path) -> bool:
+        """Return whether a path is a NetCDF / HDF granule (has an internal axis).
 
         Args:
-            paths: NetCDF / HDF granule paths.
+            path: A fetched granule path.
+
+        Returns:
+            bool: `True` for NetCDF / HDF suffixes (which can carry an
+                internal multi-timestep time axis), `False` otherwise
+                (e.g. a single-timestep COG).
+        """
+        return path.suffix.lower() in {".nc", ".nc4", ".h5", ".hdf", ".hdf5", ".he5"}
+
+    def _reduce_internal_axis(
+        self, path: Path, config: AggregationConfig
+    ) -> list[Path]:
+        """Collapse one NetCDF cube's internal time axis via `NetCDF.reduce`.
+
+        Args:
+            path: A single NetCDF / HDF granule carrying a multi-timestep
+                `time` axis.
             config: The aggregation request (provides `freq` / `op`).
 
         Returns:
-            list[Path]: One reduced NetCDF per input, written beside it.
+            list[Path]: One reduced NetCDF, written beside the source.
 
         Raises:
             NotImplementedError: When the installed pyramids has no
@@ -549,21 +567,23 @@ class EarthData(AbstractDataSource):
                 "aggregate= and post-process the granules directly."
             )
         how = "mean" if config.op == "auto" else config.op
-        out: list[Path] = []
-        for path in paths:
-            reduced = NetCDF.read_file(str(path)).reduce("time", how=how)
-            target = path.with_name(f"{path.stem}_{config.freq}_agg.nc")
-            reduced.to_file(str(target))
-            out.append(target)
-        return out
+        reduced = NetCDF.read_file(str(path)).reduce("time", how=how)
+        target = path.with_name(f"{path.stem}_{config.freq}_agg.nc")
+        reduced.to_file(str(target))
+        return [target]
 
-    def _reduce_cog_stack(
+    def _reduce_stack(
         self, paths: list[Path], config: AggregationConfig
     ) -> list[Path]:
-        """Reduce a COG stack per-window via `DatasetCollection.groupby`.
+        """Window a stack of single-timestep granules via `groupby`.
+
+        The common Earthdata aggregation case: many granules, each one
+        timestep, windowed by `config.freq` into one reduced raster per
+        window. Handles a NetCDF stack and a COG stack alike (the choice
+        is the granule layout, not the format).
 
         Args:
-            paths: COG / GeoTIFF granule paths.
+            paths: The fetched granule paths (a temporal stack).
             config: The aggregation request (provides `freq`).
 
         Returns:
@@ -577,7 +597,7 @@ class EarthData(AbstractDataSource):
 
         if not hasattr(DatasetCollection, "groupby"):
             raise NotImplementedError(
-                "EarthData.download(aggregate=...) for a COG stack needs "
+                "EarthData.download(aggregate=...) for a granule stack needs "
                 "pyramids' DatasetCollection.groupby, which the installed "
                 "pyramids build does not provide."
             )
