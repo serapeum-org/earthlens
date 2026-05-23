@@ -176,6 +176,17 @@ class TestFetch:
         stac._fetch(stac._search())
         assert len(fake_pyramids.merge_calls) == 2
 
+    def test_crop_uses_wgs84_bbox_and_epsg(self, fake_pyramids, tmp_path):
+        """The mosaic is cropped with the WGS84 AOI bbox declared as EPSG:4326."""
+        fake_pyramids.items_by_collection["sentinel-2-c1-l2a"] = [
+            make_item("a", "2024-01-05", {"B04": "https://h/a.tif"})
+        ]
+        stac = _build_stac(tmp_path, endpoint="earth-search", variables={"sentinel-2-l2a": ["B04"]})
+        stac._fetch(stac._search())
+        cropped = fake_pyramids.write_data[-1]
+        assert cropped.cropped_epsg == 4326, "crop bbox must be declared in WGS84 (EPSG:4326)"
+        assert cropped.cropped_bbox == [-4.0, 40.0, -3.0, 41.0]
+
     def test_fetch_wraps_in_cloudconfig_with_gdal_env(self, fake_pyramids, tmp_path):
         """The merge/stack reads run inside CloudConfig(extra=signer.gdal_env())."""
         fake_pyramids.items_by_collection["sentinel-1-grd"] = [

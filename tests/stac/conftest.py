@@ -75,6 +75,7 @@ class _FakeDataset:
         self.epsg = epsg
         self.geotransform = (0.0, 1.0, 0.0, 0.0, 0.0, -1.0)
         self.cropped_bbox: list[float] | None = None
+        self.cropped_epsg: int | None = None
         self.reprojected_to: int | None = None
 
     def to_crs(self, epsg: int) -> _FakeDataset:
@@ -83,10 +84,11 @@ class _FakeDataset:
         out.reprojected_to = epsg
         return out
 
-    def crop(self, bbox: list[float]) -> _FakeDataset:
-        """Return a copy cropped to `bbox` (records the bbox)."""
+    def crop(self, mask=None, touch: bool = True, *, bbox=None, epsg=None) -> _FakeDataset:
+        """Mirror pyramids' keyword-only crop, recording the bbox + its CRS."""
         out = _FakeDataset(self.href, self.epsg)
-        out.cropped_bbox = list(bbox)
+        out.cropped_bbox = list(bbox) if bbox is not None else None
+        out.cropped_epsg = epsg
         return out
 
     def to_file(self, path: str) -> None:
@@ -152,6 +154,7 @@ class FakePyramids:
         self.merge_calls: list[tuple[list[str], str]] = []
         self.stack_calls: list[dict[str, Any]] = []
         self.write_calls: list[str] = []
+        self.write_data: list = []
         self.split_antimeridian_calls: list[tuple] = []
         self.dataset_epsgs: dict[str, int] = {}
 
@@ -237,6 +240,7 @@ def fake_pyramids(monkeypatch: pytest.MonkeyPatch) -> FakePyramids:
 
     def _write_cog(data, output, **kwargs):
         fp.write_calls.append(str(output))
+        fp.write_data.append(data)
         Path(output).write_bytes(b"")
         return Path(output), None
 

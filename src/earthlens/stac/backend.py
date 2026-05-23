@@ -305,7 +305,9 @@ class STAC(AbstractDataSource):
                 # half, suffixed _part0 (eastern) / _part1 (western).
                 part = f"_part{idx}" if multi else ""
                 target = Path(self.root_dir) / f"{collection_key}_{date}{part}.tif"
-                write_cog(stacked.crop(list(bbox_key)), str(target))
+                # crop wants the bbox as a keyword in an explicit CRS; the AOI
+                # is WGS84 while the mosaic is in the tiles' native CRS.
+                write_cog(stacked.crop(bbox=list(bbox_key), epsg=4326), str(target))
                 out.append(target)
                 self._written.append((collection_key, date, idx, target))
                 _cleanup(band_paths)
