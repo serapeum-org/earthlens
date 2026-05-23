@@ -141,8 +141,23 @@ class TestSearch:
         assert call["version"] == "07"
         assert call["provider"] == "GES_DISC"
         assert call["bounding_box"] == (30.0, 10.0, 40.0, 20.0)
-        assert call["temporal"] == ("2020-06-01T00:00:00", "2020-06-02T00:00:00")
+        assert call["temporal"] == ("2020-06-01T00:00:00", "2020-06-02T23:59:59.999999")
         assert call["count"] == -1
+
+    def test_temporal_spans_full_end_day(self, fake_earthaccess, edl_env, tmp_path):
+        """A single-day request covers the whole day, not a midnight instant."""
+        obj = EarthData(
+            start="2020-06-01",
+            end="2020-06-01",
+            variables={"GPM_3IMERGHHL_07": ["precipitation"]},
+            lat_lim=[10.0, 20.0],
+            lon_lim=[30.0, 40.0],
+            path=tmp_path,
+        )
+        obj._search()
+        start, end = fake_earthaccess.search_calls[-1]["temporal"]
+        assert start == "2020-06-01T00:00:00"
+        assert end == "2020-06-01T23:59:59.999999"
 
     def test_search_one_product_per_granule(self, fake_earthaccess, edl_env, tmp_path):
         """Each returned granule becomes one RemoteProduct."""

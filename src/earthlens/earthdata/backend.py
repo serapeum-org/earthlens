@@ -324,9 +324,16 @@ class EarthData(AbstractDataSource):
             self.space.east,
             self.space.north,
         )
+        # The end date is inclusive of its whole calendar day. `start`/`end`
+        # parse to midnight, so passing them verbatim would make a same-day
+        # request a zero-width instant at 00:00 and match few or no granules;
+        # extend the end bound to the end of `end_date`'s day.
+        end_of_day = self.time.end_date.replace(
+            hour=23, minute=59, second=59, microsecond=999999
+        )
         temporal = (
             self.time.start_date.isoformat(),
-            self.time.end_date.isoformat(),
+            end_of_day.isoformat(),
         )
         products: list[RemoteProduct] = []
         for ds in self._datasets:
