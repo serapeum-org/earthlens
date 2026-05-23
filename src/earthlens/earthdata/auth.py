@@ -286,6 +286,13 @@ class EarthdataAuth(AbstractAuth[EarthdataCredentials]):
         credentials rotate roughly hourly; callers that hit an
         `AccessDenied` mid-stream should re-call this to refresh.
 
+        Note:
+            The backend's in-region fetch path uses `earthaccess.open`,
+            which mints and refreshes S3 credentials internally, so it
+            does not call this method. It is provided as forward-facing
+            API for callers that want to read in-region S3 directly
+            (e.g. with `s3fs`).
+
         Args:
             provider: The CMR provider code whose in-region bucket the
                 caller wants to read (e.g. `"GES_DISC"`, `"POCLOUD"`).
