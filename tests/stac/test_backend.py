@@ -260,6 +260,22 @@ class TestFetch:
         stac._fetch(stac._search())
         assert fake_pyramids.merge_calls[0][2]["dst_crs"] == 3857
 
+    def test_stack_uses_catalog_nodata_not_default(self, fake_pyramids, tmp_path):
+        """stack_bands/merge get the catalog nodata (0 for S2 uint16), not -9999."""
+        fake_pyramids.items_by_collection["sentinel-2-c1-l2a"] = [
+            make_item("a", "2024-01-05", {"B04": "https://h/a.tif"})
+        ]
+        stac = _build_stac(tmp_path, endpoint="earth-search", variables={"sentinel-2-l2a": ["B04"]})
+        stac._fetch(stac._search())
+        assert fake_pyramids.stack_calls[0]["no_data_value"] == 0
+        assert fake_pyramids.merge_calls[0][2]["no_data_value"] == 0
+
+    def test_nodata_for_reads_catalog_else_zero(self, fake_pyramids, tmp_path):
+        """_nodata_for returns the catalog asset nodata, else 0 (dtype-safe)."""
+        stac = _build_stac(tmp_path, endpoint="earth-search", variables={"sentinel-2-l2a": ["B04"]})
+        assert stac._nodata_for("sentinel-2-l2a", ["B04"]) == 0
+        assert stac._nodata_for("no-such-collection", ["x"]) == 0
+
     def test_api_composes_search_and_fetch(self, fake_pyramids, tmp_path):
         """_api() runs the search/fetch pipeline and returns the COG paths."""
         fake_pyramids.items_by_collection["sentinel-2-c1-l2a"] = [

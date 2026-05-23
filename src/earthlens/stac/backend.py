@@ -300,6 +300,7 @@ class STAC(AbstractDataSource):
                 assets = group[0].metadata["assets"]
                 band_paths: list[Path] = []
                 target_crs = self._target_crs(group)
+                nodata = self._nodata_for(collection_key, assets)
                 for band in assets:
                     hrefs = [
                         self._signer.sign_href(_asset_href(p.metadata["item"], band))
@@ -311,11 +312,18 @@ class STAC(AbstractDataSource):
                     # pass (multi-UTM Sentinel-2). A single tile is handled too.
                     merge_rasters(
                         [str(h) for h in hrefs], str(tmp), method="last",
-                        dst_crs=target_crs,
+                        dst_crs=target_crs, no_data_value=nodata,
                     )
                     band_paths.append(tmp)
+                # align=False uses the BuildVRT band-by-band path (same-grid,
+                # uniform-dtype bands — the common case); align=True hits a
+                # pyramids bug where the grid template defaults no-data to -9999
+                # and overflows unsigned dtypes (Sentinel-2 uint16). Mixed-
+                # resolution bands raise AlignmentError until that is fixed
+                # upstream.
                 stacked = stack_bands(
-                    [str(p) for p in band_paths], band_names=list(assets), align=True
+                    [str(p) for p in band_paths], band_names=list(assets), align=False,
+                    no_data_value=nodata,
                 )
                 # One COG per (collection, date); a crossing AOI yields one per
                 # half, suffixed _part0 (eastern) / _part1 (western).
@@ -349,6 +357,31 @@ class STAC(AbstractDataSource):
             return self._epsg
         epsgs = {e for e in (_item_epsg(p.metadata["item"]) for p in group) if e}
         return sorted(epsgs)[0] if len(epsgs) > 1 else None
+
+    def _nodata_for(self, collection_key: str, assets: list[str]) -> float | int:
+        """Pick a dtype-safe no-data value for the mosaic/stack of a collection.
+
+        Uses the catalog asset's `nodata` for the first requested asset that
+        declares one, else `0`. pyramids' default no-data (`-9999`) overflows
+        unsigned dtypes such as Sentinel-2's `uint16`, so a catalog-driven
+        (or `0`) value is passed to `merge_rasters` / `stack_bands` instead.
+
+        Args:
+            collection_key: The logical collection key.
+            assets: The requested asset keys, in priority order.
+
+        Returns:
+            The no-data value to write (catalog `nodata`, or `0`).
+        """
+        try:
+            collection = self._catalog.get_collection(collection_key)
+        except ValueError:
+            return 0
+        for band in assets:
+            asset = collection.assets.get(band)
+            if asset is not None and asset.nodata is not None:
+                return asset.nodata
+        return 0
 
     def download(
         self,
