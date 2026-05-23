@@ -77,6 +77,27 @@ def _rewrite_available_collections(text: str, available: dict[str, list[str]]) -
 
     Returns:
         The updated YAML text (newline-terminated).
+
+    Examples:
+        - The endpoints block survives; the index block is replaced:
+            ```python
+            >>> import yaml
+            >>> text = "endpoints:\\n  e:\\n    url: u\\navailable_collections:\\n  e:\\n    - old\\n"
+            >>> out = _rewrite_available_collections(text, {"e": ["a", "b"]})
+            >>> yaml.safe_load(out)["available_collections"]
+            {'e': ['a', 'b']}
+            >>> yaml.safe_load(out)["endpoints"]["e"]["url"]
+            'u'
+
+            ```
+        - A source with no index block gets one appended:
+            ```python
+            >>> import yaml
+            >>> out = _rewrite_available_collections("endpoints:\\n  e:\\n    url: u\\n", {"e": ["x"]})
+            >>> yaml.safe_load(out)["available_collections"]
+            {'e': ['x']}
+
+            ```
     """
     block = yaml.safe_dump(
         {"available_collections": available},

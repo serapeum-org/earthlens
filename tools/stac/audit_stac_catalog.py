@@ -35,6 +35,20 @@ def _diff_collections(
         `{endpoint: {"missing": [...], "untracked": [...]}}`, only for endpoints
         with drift. `missing` = curated ids the endpoint no longer serves;
         `untracked` = live ids not in the curated set (informational).
+
+    Examples:
+        - Curated-but-not-live shows as `missing`, live-but-not-curated as `untracked`:
+            ```python
+            >>> _diff_collections({"e": {"a", "b"}}, {"e": {"b", "c"}})
+            {'e': {'missing': ['a'], 'untracked': ['c']}}
+
+            ```
+        - An endpoint fully in sync produces no entry:
+            ```python
+            >>> _diff_collections({"e": {"a"}}, {"e": {"a"}})
+            {}
+
+            ```
     """
     report: dict[str, dict[str, list[str]]] = {}
     for endpoint, curated_ids in curated.items():

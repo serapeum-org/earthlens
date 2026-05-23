@@ -32,6 +32,22 @@ def _asset_fields(asset: Any) -> dict[str, Any]:
 
     Returns:
         A dict exposing `type`, `eo:bands`, `raster:bands` (missing keys absent).
+
+    Examples:
+        - A raw STAC asset dict is returned as-is:
+            ```python
+            >>> _asset_fields({"href": "x.tif", "type": "image/tiff"})["type"]
+            'image/tiff'
+
+            ```
+        - A pystac-like asset is normalised to a field dict:
+            ```python
+            >>> from types import SimpleNamespace
+            >>> asset = SimpleNamespace(media_type="image/tiff", extra_fields={"raster:bands": [{"data_type": "int16"}]})
+            >>> _asset_fields(asset)["raster:bands"][0]["data_type"]
+            'int16'
+
+            ```
     """
     if isinstance(asset, dict):
         return asset
@@ -55,6 +71,25 @@ def _asset_schema(item: Any) -> dict[str, dict[str, Any]]:
     Returns:
         Mapping of asset key → `{media_type, common_name, dtype, nodata}` (with
         `None` for fields the item does not carry).
+
+    Examples:
+        - Recover the band schema from a STAC item's assets:
+            ```python
+            >>> item = {"assets": {"B04": {"type": "image/tiff",
+            ...     "eo:bands": [{"common_name": "red"}],
+            ...     "raster:bands": [{"data_type": "uint16", "nodata": 0}]}}}
+            >>> _asset_schema(item)["B04"]["common_name"]
+            'red'
+            >>> _asset_schema(item)["B04"]["dtype"]
+            'uint16'
+
+            ```
+        - An asset without band extensions yields None fields:
+            ```python
+            >>> _asset_schema({"assets": {"data": {"type": "image/tiff"}}})["data"]["dtype"] is None
+            True
+
+            ```
     """
     assets = getattr(item, "assets", None)
     if assets is None and isinstance(item, dict):
