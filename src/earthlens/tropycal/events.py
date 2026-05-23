@@ -49,6 +49,9 @@ EVENT_CRS = "EPSG:4326"
 
 #: Per-fix point-mode schema (attribute columns + dtypes). The `geometry`
 #: column (a `shapely.Point` per row) is added separately and not listed.
+#: `vmax_kt` / `mslp_hpa` are `float64` (not `int`) even though tropycal emits
+#: integer winds/pressures, so a missing value degrades to `NaN` rather than
+#: forcing a lossy/again-failing integer cast.
 POINT_COLUMNS: dict[str, str] = {
     "storm_id": "string",
     "name": "string",
