@@ -44,13 +44,19 @@ ecmwf = ["cdsapi >=0.7.7"]
 gee = ["earthengine-api >=1.7.26", "Rtree >=1.0.0"]
 cmems = ["copernicusmarine >=2.0.0,<3"]
 fdsn = ["obspy >=1.5.0"]
+# tropycal hard-imports cartopy + shapely at module load but does not
+# declare them, and its version shim needs setuptools<81 (pkg_resources).
+tropycal = ["tropycal >=1.4", "cartopy >=0.22", "shapely >=2.0"]
 all = [
     "boto3 >=1.43.0",
+    "cartopy >=0.22",
     "cdsapi >=0.7.7",
     "copernicusmarine >=2.0.0,<3",
     "earthengine-api >=1.7.26",
     "obspy >=1.5.0",
     "Rtree >=1.0.0",
+    "shapely >=2.0",
+    "tropycal >=1.4",
 ]
 
 [dependency-groups]
@@ -124,6 +130,7 @@ include = ["earthlens", "earthlens.*"]
 "earthlens.fdsn" = ["*.yaml"]
 "earthlens.gee" = ["*.yaml", "catalog/*.yaml"]
 "earthlens.gdacs" = ["*.yaml"]
+"earthlens.tropycal" = ["*.yaml"]
 
 [tool.flake8]
 ignore = ["E203", "E266", "E501", "W503", "E722", "C901", "E741", "E731"]
@@ -189,6 +196,7 @@ markers = [
     "cmems: tests for the Copernicus Marine backend (requires the `cmems` extra: copernicusmarine).",
     "fdsn: tests for the FDSN seismic-event backend (requires the `fdsn` extra: obspy).",
     "gdacs: tests for the GDACS multi-hazard alert backend (public feed, no extra SDK).",
+    "tropycal: tests for the Tropycal cyclone-track backend (requires the `tropycal` extra: tropycal, cartopy).",
 ]
 
 [tool.pixi.workspace]
@@ -219,7 +227,8 @@ test-gee = { cmd = "pytest -vvv -m 'gee and not e2e' --cov=src/earthlens --cov-r
 test-cmems = { cmd = "pytest -vvv -m 'cmems and not e2e' --cov=src/earthlens --cov-report=xml --cov-report=term-missing", description = "Run CMEMS-backend tests (requires the `cmems` extra: copernicusmarine)" }
 test-fdsn = { cmd = "pytest -vvv -m 'fdsn and not e2e' --cov=src/earthlens --cov-report=xml --cov-report=term-missing", description = "Run FDSN seismic-event backend tests (requires the `fdsn` extra: obspy)" }
 test-gdacs = { cmd = "pytest -vvv -m 'gdacs and not e2e' --cov=src/earthlens --cov-report=xml --cov-report=term-missing", description = "Run GDACS-backend tests (public feed, no extra SDK)" }
-test-doctests = { cmd = "pytest --doctest-modules src/earthlens/gee src/earthlens/chc src/earthlens/ecmwf src/earthlens/cmems src/earthlens/fdsn src/earthlens/base src/earthlens/gdacs", description = "Run docstring examples across the backend packages (catches drift in catalog / API docstrings)" }
+test-tropycal = { cmd = "pytest -vvv -m 'tropycal and not e2e' --cov=src/earthlens --cov-report=xml --cov-report=term-missing", description = "Run Tropycal cyclone-track backend tests (requires the `tropycal` extra: tropycal, cartopy)" }
+test-doctests = { cmd = "pytest --doctest-modules src/earthlens/gee src/earthlens/chc src/earthlens/ecmwf src/earthlens/cmems src/earthlens/fdsn src/earthlens/base src/earthlens/gdacs src/earthlens/tropycal", description = "Run docstring examples across the backend packages (catches drift in catalog / API docstrings)" }
 notebooks = { cmd = "pytest --nbval --nbval-lax --verbose docs/examples", description = "check notebooks" }
 jupyter = { cmd = "jupyter lab --no-browser --IdentityProvider.token='' --ServerApp.password='' --port=8889", description = "check notebooks" }
 build-dist = { cmd = "python -m build", description = "Build sdist and wheel for PyPI" }

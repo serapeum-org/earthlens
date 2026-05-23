@@ -75,6 +75,7 @@ class TestRegistry:
             "gdacs",
             "gee",
             "google-earth-engine",
+            "tropycal",
         ]
 
     def test_keys_resolve_to_gee_class(self):

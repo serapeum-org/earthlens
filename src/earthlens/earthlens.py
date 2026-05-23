@@ -131,6 +131,9 @@ class EarthLens:
             (`earthengine-api`); keys `"gee"` / `"google-earth-engine"`.
         :class:`earthlens.gdacs.GDACS`: GDACS multi-hazard disaster
             alerts (public feed, no credentials); key `"gdacs"`.
+        :class:`earthlens.tropycal.TropicalCyclone`: tropical-cyclone
+            best tracks via `tropycal` (`vector` output); key
+            `"tropycal"`.
     """
 
     DataSources = _LazyRegistry(
@@ -149,6 +152,7 @@ class EarthLens:
             "google-earth-engine": ("earthlens.gee", "GEE", "gee"),
             # GDACS is a public feed (requests only), so no extra to hint.
             "gdacs": ("earthlens.gdacs", "GDACS", ""),
+            "tropycal": ("earthlens.tropycal", "TropicalCyclone", "tropycal"),
         }
     )
 
