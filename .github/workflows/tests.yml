@@ -36,5 +36,20 @@ jobs:
       - name: Run GEE tests
         run: pixi run -e ${{ matrix.environment }} test-gee
 
+      - name: Run CMEMS tests
+        run: pixi run -e ${{ matrix.environment }} test-cmems
+
+      - name: Run FDSN tests
+        run: pixi run -e ${{ matrix.environment }} test-fdsn
+
+      - name: Run STAC tests
+        run: pixi run -e ${{ matrix.environment }} test-stac
+
+      - name: Run GDACS tests
+        run: pixi run -e ${{ matrix.environment }} test-gdacs
+
+      - name: Run OpenAQ tests
+        run: pixi run -e ${{ matrix.environment }} test-openaq
+
       - name: Upload coverage reports to Codecov with GitHub Action
         uses: codecov/codecov-action@v5
