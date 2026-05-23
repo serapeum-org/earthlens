@@ -11,7 +11,7 @@ them into one :class:`Catalog` at construction time.
 
 A dataset key (e.g. `"GPM_3IMERGHHL_07"`) resolves to an
 :class:`EarthdataDataset` via :meth:`Catalog.get_dataset` /
-``Catalog()["..."]`` / :meth:`Catalog.resolve`. The row carries the
+`Catalog()["..."]` / :meth:`Catalog.resolve`. The row carries the
 fields the backend needs to shape a CMR search and a fetch:
 `short_name` / `version` / `provider` (the CMR provider code), the
 per-instance `output_kind` (`G1`), the on-disk `format`, the
@@ -518,6 +518,24 @@ class Catalog(AbstractCatalog):
         Raises:
             KeyError: If `provider_code` is not registered (with a
                 did-you-mean hint).
+
+        Examples:
+            - Look up a DAAC's region by provider code:
+                ```python
+                >>> from earthlens.earthdata import Catalog
+                >>> Catalog().get_daac("POCLOUD").cloud_region
+                'us-west-2'
+
+                ```
+            - An unknown code surfaces a did-you-mean hint:
+                ```python
+                >>> from earthlens.earthdata import Catalog
+                >>> Catalog().get_daac("POCLOD")
+                Traceback (most recent call last):
+                    ...
+                KeyError: "'POCLOD' is not a registered CMR provider. Known: ['ASF', 'GES_DISC', 'LAADS', 'LARC_CLOUD', 'LPCLOUD', 'NSIDC_CPRD', 'OB_CLOUD', 'ORNL_CLOUD', 'POCLOUD']. Did you mean 'POCLOUD'?"
+
+                ```
         """
         try:
             return self.daacs[provider_code]
@@ -563,6 +581,24 @@ class Catalog(AbstractCatalog):
         Raises:
             KeyError: When `key` is unknown (with a did-you-mean hint)
                 or when `daac=` is given but does not match the row.
+
+        Examples:
+            - Resolve a key and read its provider:
+                ```python
+                >>> from earthlens.earthdata import Catalog
+                >>> Catalog().resolve("GPM_3IMERGHHL_07").provider
+                'GES_DISC'
+
+                ```
+            - A wrong `daac=` filter is rejected:
+                ```python
+                >>> from earthlens.earthdata import Catalog
+                >>> Catalog().resolve("GEDI04_A_002", daac="GES DISC")
+                Traceback (most recent call last):
+                    ...
+                KeyError: "dataset 'GEDI04_A_002' resolves to DAAC 'LP DAAC', not the requested daac='GES DISC'."
+
+                ```
         """
         dataset = self.get_dataset(key)
         if daac is not None and dataset.daac != daac:
