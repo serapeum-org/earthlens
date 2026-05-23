@@ -103,7 +103,7 @@ class EarthLens:
             >>> from earthlens.earthlens import EarthLens
             >>> sorted(EarthLens.DataSources)  # doctest: +NORMALIZE_WHITESPACE
             ['amazon-s3', 'chc', 'chirps', 'cmems', 'ecmwf', 'fdsn', 'gdacs', 'gee',
-             'google-earth-engine']
+             'google-earth-engine', 'openaq']
 
             ```
         - Asking for an unknown backend raises `ValueError`:
@@ -131,6 +131,8 @@ class EarthLens:
             (`earthengine-api`); keys `"gee"` / `"google-earth-engine"`.
         :class:`earthlens.gdacs.GDACS`: GDACS multi-hazard disaster
             alerts (public feed, no credentials); key `"gdacs"`.
+        :class:`earthlens.openaq.OpenAQ`: ground-station air-quality
+            measurements from OpenAQ v3 (tabular `DataFrame`).
     """
 
     DataSources = _LazyRegistry(
@@ -149,6 +151,7 @@ class EarthLens:
             "google-earth-engine": ("earthlens.gee", "GEE", "gee"),
             # GDACS is a public feed (requests only), so no extra to hint.
             "gdacs": ("earthlens.gdacs", "GDACS", ""),
+            "openaq": ("earthlens.openaq", "OpenAQ", "openaq"),
         }
     )
 
@@ -174,8 +177,9 @@ class EarthLens:
         Args:
             data_source: Backend key — one of `"chc"` (alias
                 `"chirps"`), `"amazon-s3"`, `"cmems"`, `"ecmwf"`,
-                or `"gee"` (alias `"google-earth-engine"`).
-                Defaults to `"chc"`.
+                `"fdsn"`, `"gdacs"`, `"gee"` (alias
+                `"google-earth-engine"`), or `"openaq"`. Defaults to
+                `"chc"`.
             temporal_resolution: `"daily"` or `"monthly"` for most
                 backends; the GEE backend also accepts `"raw"` and
                 `"yearly"`. The concrete backend may accept a narrower
