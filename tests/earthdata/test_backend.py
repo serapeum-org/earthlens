@@ -36,11 +36,23 @@ class _FakeReduced:
 
 
 class _FakeNetCDFHandle:
-    """NetCDF handle stand-in whose reduce() returns a _FakeReduced."""
+    """NetCDF handle stand-in (with a time axis) whose reduce() returns a _FakeReduced."""
+
+    dimension_names = ("time", "lat", "lon")
 
     def reduce(self, dim, how="mean"):
         """Return a fake reduced handle."""
         return _FakeReduced()
+
+
+class _NoTimeNetCDFHandle:
+    """NetCDF handle stand-in lacking a time dimension."""
+
+    dimension_names = ("lat", "lon")
+
+    def reduce(self, dim, how="mean"):
+        """Should never be called when there is no time axis."""
+        raise AssertionError("reduce() called on a granule with no time axis")
 
 
 class _FakeNetCDF:
@@ -50,8 +62,19 @@ class _FakeNetCDF:
 
     @staticmethod
     def read_file(path):
-        """Return a fake handle ignoring the path."""
+        """Return a fake handle (with a time axis) ignoring the path."""
         return _FakeNetCDFHandle()
+
+
+class _NoTimeNetCDF:
+    """Fake pyramids NetCDF whose granule has no time dimension."""
+
+    reduce = True
+
+    @staticmethod
+    def read_file(path):
+        """Return a fake handle without a time axis."""
+        return _NoTimeNetCDFHandle()
 
 
 class _NetCDFNoReduce:
@@ -232,6 +255,21 @@ class TestAggregate:
         out = obj.download(aggregate=AggregationConfig(freq="1MS"))
         assert [str(p).endswith("_1MS_agg.nc") for p in out] == [True]
         assert len(_FakeReduced.written) == 1
+
+    def test_single_netcdf_without_time_falls_back_to_stack(
+        self, fake_earthaccess, edl_env, tmp_path, monkeypatch
+    ):
+        """A single NetCDF with no time axis falls back to the stack/groupby path."""
+        import pyramids.dataset as dsmod
+        import pyramids.netcdf as ncmod
+        from earthlens.aggregate import AggregationConfig
+
+        fake_earthaccess.granules = [{"meta": {"concept-id": "G1"}}]
+        monkeypatch.setattr(ncmod, "NetCDF", _NoTimeNetCDF)
+        monkeypatch.setattr(dsmod, "DatasetCollection", _FakeDatasetCollection)
+        obj = _make(tmp_path, {"GPM_3IMERGHHL_07": ["precipitation"]})
+        out = obj.download(aggregate=AggregationConfig(freq="1MS"))
+        assert [p.name for p in out] == ["window_2020.tif"]
 
     def test_single_cog_uses_stack_path(self, fake_earthaccess, edl_env, tmp_path, monkeypatch):
         """A lone COG (no internal axis) falls through to the stack path."""

@@ -573,8 +573,15 @@ class EarthData(AbstractDataSource):
                 "not provide. Upgrade pyramids, or call download() without "
                 "aggregate= and post-process the granules directly."
             )
+        nc = NetCDF.read_file(str(path))
+        if "time" not in tuple(nc.dimension_names or ()):
+            # No internal time axis to collapse — e.g. a single-timestep
+            # granule, or an HDF-EOS file whose time is not a decodable CF
+            # dimension. Treat it as a one-element stack so `groupby` windows
+            # it instead of `reduce` raising on a missing dimension.
+            return self._reduce_stack([path], config)
         how = "mean" if config.op == "auto" else config.op
-        reduced = NetCDF.read_file(str(path)).reduce("time", how=how)
+        reduced = nc.reduce("time", how=how)
         target = path.with_name(f"{path.stem}_{config.freq}_agg.nc")
         reduced.to_file(str(target))
         return [target]
