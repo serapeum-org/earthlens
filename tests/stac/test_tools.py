@@ -11,6 +11,7 @@ import yaml
 _TOOLS_DIR = Path(__file__).resolve().parents[2] / "tools" / "stac"
 sys.path.insert(0, str(_TOOLS_DIR))
 
+import probe_stac_assets as probe  # noqa: E402
 import refresh_stac_catalog as refresh  # noqa: E402
 
 
@@ -50,3 +51,48 @@ class TestRewriteAvailableCollections:
         parsed = yaml.safe_load(out)
         assert parsed["available_collections"]["planetary-computer"] == ["sentinel-2-l2a"]
         assert "endpoints" in parsed
+
+
+@pytest.mark.stac
+class TestProbeAssetSchema:
+    """`_asset_schema` recovers per-asset band metadata from a STAC item."""
+
+    def test_extracts_eo_and_raster_band_fields(self):
+        """common_name comes from eo:bands, dtype/nodata from raster:bands."""
+        item = {
+            "assets": {
+                "B04": {
+                    "type": "image/tiff; application=geotiff; profile=cloud-optimized",
+                    "eo:bands": [{"common_name": "red"}],
+                    "raster:bands": [{"data_type": "uint16", "nodata": 0}],
+                }
+            }
+        }
+        schema = probe._asset_schema(item)
+        assert schema["B04"] == {
+            "media_type": "image/tiff; application=geotiff; profile=cloud-optimized",
+            "common_name": "red",
+            "dtype": "uint16",
+            "nodata": 0,
+        }
+
+    def test_missing_band_extensions_yield_none(self):
+        """An asset without band extensions yields None fields, not an error."""
+        schema = probe._asset_schema({"assets": {"data": {"type": "image/tiff"}}})
+        assert schema["data"] == {
+            "media_type": "image/tiff",
+            "common_name": None,
+            "dtype": None,
+            "nodata": None,
+        }
+
+    def test_asset_fields_reads_pystac_like_object(self):
+        """A pystac-like Asset (media_type + extra_fields) is normalised to a dict."""
+        from types import SimpleNamespace
+
+        asset = SimpleNamespace(
+            media_type="image/tiff", extra_fields={"raster:bands": [{"data_type": "int16"}]}
+        )
+        fields = probe._asset_fields(asset)
+        assert fields["type"] == "image/tiff"
+        assert fields["raster:bands"][0]["data_type"] == "int16"
