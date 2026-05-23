@@ -323,8 +323,13 @@ def _prepare_frame(frame: pd.DataFrame) -> pd.DataFrame:
     """
     prepared = frame.copy()
     time_col = "time" if "time" in prepared.columns else "date"
+    # Parse as UTC first, then strip the tz to get naive timestamps. tropycal's
+    # best-track `time` column is tz-naive UTC; parsing with `utc=True` makes
+    # the value tz-aware regardless of the input, so `tz_localize(None)` works
+    # on every supported pandas (on pandas < 3.0 `tz_localize(None)` raises on
+    # already-naive input, so the naive-in/naive-out shortcut is not portable).
     prepared["_time"] = pd.to_datetime(
-        prepared.get(time_col), errors="coerce"
+        prepared.get(time_col), errors="coerce", utc=True
     ).dt.tz_localize(None)
     prepared["_lat"] = pd.to_numeric(prepared.get("lat"), errors="coerce")
     prepared["_lon"] = pd.to_numeric(prepared.get("lon"), errors="coerce")
