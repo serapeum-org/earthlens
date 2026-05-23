@@ -402,7 +402,12 @@ class TropicalCyclone(AbstractDataSource):
             season = track_dataset.get_season(year)
             ids = season.summary().get("id") or []
             return list(ids)
-        except Exception as exc:  # noqa: BLE001 - skip an unservable season
+        except Exception as exc:  # noqa: BLE001
+            # Intentionally broad (matches the FDSN/CMEMS "one bad item does
+            # not kill the batch" policy): a single unservable season is
+            # logged with its exception type and skipped so a multi-year
+            # request still returns the seasons that loaded. The type+message
+            # are logged so a genuine bug is visible rather than silent.
             logger.warning(f"tropycal season {year} skipped: {type(exc).__name__}: {exc}")
             return []
 
@@ -421,7 +426,10 @@ class TropicalCyclone(AbstractDataSource):
         try:
             storm = track_dataset.get_storm(storm_id)
             return storm.to_dataframe(attrs_as_columns=True)
-        except Exception as exc:  # noqa: BLE001 - skip an unreadable storm
+        except Exception as exc:  # noqa: BLE001
+            # Intentionally broad (batch resilience, as above): one unreadable
+            # storm is logged with its exception type and skipped rather than
+            # aborting the whole basin.
             logger.warning(
                 f"tropycal storm {storm_id!r} skipped: {type(exc).__name__}: {exc}"
             )
