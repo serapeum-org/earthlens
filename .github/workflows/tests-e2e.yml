@@ -70,3 +70,30 @@ jobs:
           GEE_SERVICE_KEY: ${{ secrets.GEE_SERVICE_KEY }}
         run: |
           pixi run -e py312 pytest -m "e2e and gee" -v
+
+  e2e-earthdata:
+    runs-on: ubuntu-latest
+    if: github.repository == 'serapeum-org/earthlens'
+
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: serapeum-org/github-actions/actions/python-setup/pixi@pixi/v1
+        with:
+          # earthaccess >=0.18 requires Python >=3.12, so the Earthdata
+          # extra is exercised under the py312 environment.
+          environments: py312
+          activate-environment: py312
+          cache: true
+
+      - name: Run live NASA Earthdata e2e tests
+        # The Earthdata e2e test skips itself when these are unset, so
+        # this job is harmless if the secrets are not configured yet.
+        env:
+          EARTHDATA_USERNAME: ${{ secrets.EARTHDATA_USERNAME }}
+          EARTHDATA_PASSWORD: ${{ secrets.EARTHDATA_PASSWORD }}
+        run: |
+          pixi run -e py312 pytest -m "e2e and earthdata" -v
