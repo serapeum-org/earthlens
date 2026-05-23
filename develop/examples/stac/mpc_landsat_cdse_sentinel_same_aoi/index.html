@@ -27,7 +27,7 @@
     
     
       
-        <title>Same AOI across providers: MPC Landsat + CDSE Sentinel - earthlens</title>
+        <title>Same AOI across providers: MPC + CDSE - earthlens</title>
       
     
     
@@ -83,7 +83,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#same-aoi-across-providers-mpc-landsat-cdse-sentinel" class="md-skip">
+        <a href="#same-aoi-across-providers-mpc-cdse" class="md-skip">
           Skip to content
         </a>
       
@@ -123,7 +123,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Same AOI across providers: MPC Landsat + CDSE Sentinel
+              Same AOI across providers: MPC + CDSE
             
           </span>
         </div>
@@ -3399,7 +3399,7 @@
   <span class="md-ellipsis">
     
   
-    Same AOI across providers: MPC Landsat + CDSE Sentinel
+    Same AOI across providers: MPC + CDSE
   
 
     
@@ -3417,7 +3417,7 @@
   <span class="md-ellipsis">
     
   
-    Same AOI across providers: MPC Landsat + CDSE Sentinel
+    Same AOI across providers: MPC + CDSE
   
 
     
@@ -3443,10 +3443,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#mpc-landsat-no-account-sas-signing" class="md-nav__link">
+  <a href="#planetary-computer-sentinel-2-sas-signing-no-account-live" class="md-nav__link">
     <span class="md-ellipsis">
       
-        MPC Landsat (no account — SAS signing)
+        Planetary Computer — Sentinel-2 (SAS signing, no account, live)
       
     </span>
   </a>
@@ -3454,10 +3454,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#cdse-sentinel-s3-keys" class="md-nav__link">
+  <a href="#cdse-sentinel-2-s3-keys-recipe" class="md-nav__link">
     <span class="md-ellipsis">
       
-        CDSE Sentinel (S3 keys)
+        CDSE — Sentinel-2 (S3 keys; recipe)
       
     </span>
   </a>
@@ -4025,10 +4025,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#mpc-landsat-no-account-sas-signing" class="md-nav__link">
+  <a href="#planetary-computer-sentinel-2-sas-signing-no-account-live" class="md-nav__link">
     <span class="md-ellipsis">
       
-        MPC Landsat (no account — SAS signing)
+        Planetary Computer — Sentinel-2 (SAS signing, no account, live)
       
     </span>
   </a>
@@ -4036,10 +4036,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#cdse-sentinel-s3-keys" class="md-nav__link">
+  <a href="#cdse-sentinel-2-s3-keys-recipe" class="md-nav__link">
     <span class="md-ellipsis">
       
-        CDSE Sentinel (S3 keys)
+        CDSE — Sentinel-2 (S3 keys; recipe)
       
     </span>
   </a>
@@ -4800,18 +4800,18 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </style>
 <!-- End of mermaid configuration --><div class="jupyter-wrapper">
 <div class="jp-Notebook" data-jp-theme-light="true" data-jp-theme-name="JupyterLab Light">
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=e2e375b7">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=61ad41f4">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h1 id="same-aoi-across-providers-mpc-landsat-cdse-sentinel">Same AOI across providers: MPC Landsat + CDSE Sentinel<a class="anchor-link" href="#same-aoi-across-providers-mpc-landsat-cdse-sentinel">¶</a></h1><p>Demonstrates the endpoint/signer abstraction: the <strong>same</strong> request shape pulls Landsat from Microsoft Planetary Computer (SAS URL signing) and Sentinel from Copernicus Data Space (S3 credentials) over one AOI. Only <code>data_source</code> (and CDSE keys) change. Offline cells show how the catalog resolves each; the pulls are recipes.</p>
+<h1 id="same-aoi-across-providers-mpc-cdse">Same AOI across providers: MPC + CDSE<a class="anchor-link" href="#same-aoi-across-providers-mpc-cdse">¶</a></h1><p>Demonstrates the endpoint/signer abstraction: the <strong>same</strong> request shape pulls from Microsoft Planetary Computer (Azure SAS URL signing) and Copernicus Data Space (S3 credentials) over one AOI. Only <code>data_source</code> (and CDSE keys) change. The MPC pull runs live; the CDSE pull is a recipe (needs S3 keys).</p>
 </div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=2671d4be">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=c795cd22">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -4832,42 +4832,92 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.stac</span><span class="w"> </span><span class="kn">import</span> <span class="n">Catalog</span>
 
 <span class="n">cat</span> <span class="o">=</span> <span class="n">Catalog</span><span class="p">()</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">"MPC Landsat id:"</span><span class="p">,</span> <span class="n">cat</span><span class="o">.</span><span class="n">resolve</span><span class="p">(</span><span class="s2">"planetary-computer"</span><span class="p">,</span> <span class="s2">"landsat-c2-l2"</span><span class="p">))</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">"MPC signer:"</span><span class="p">,</span> <span class="n">cat</span><span class="o">.</span><span class="n">get_endpoint</span><span class="p">(</span><span class="s2">"planetary-computer"</span><span class="p">)</span><span class="o">.</span><span class="n">signer</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">"CDSE signer:"</span><span class="p">,</span> <span class="n">cat</span><span class="o">.</span><span class="n">get_endpoint</span><span class="p">(</span><span class="s2">"cdse"</span><span class="p">)</span><span class="o">.</span><span class="n">signer</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"MPC S2 id:"</span><span class="p">,</span> <span class="n">cat</span><span class="o">.</span><span class="n">resolve</span><span class="p">(</span><span class="s2">"planetary-computer"</span><span class="p">,</span> <span class="s2">"sentinel-2-l2a"</span><span class="p">))</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-1">from earthlens.stac import Catalog
 
 cat = Catalog()
-print("MPC Landsat id:", cat.resolve("planetary-computer", "landsat-c2-l2"))
 print("MPC signer:", cat.get_endpoint("planetary-computer").signer)
-print("CDSE signer:", cat.get_endpoint("cdse").signer)</div>
+print("CDSE signer:", cat.get_endpoint("cdse").signer)
+print("MPC S2 id:", cat.resolve("planetary-computer", "sentinel-2-l2a"))</div>
 </div>
 </div>
 </div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=41e79c27">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=337771fd">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="mpc-landsat-no-account-sas-signing">MPC Landsat (no account — SAS signing)<a class="anchor-link" href="#mpc-landsat-no-account-sas-signing">¶</a></h2><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.earthlens</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
+<h2 id="planetary-computer-sentinel-2-sas-signing-no-account-live">Planetary Computer — Sentinel-2 (SAS signing, no account, live)<a class="anchor-link" href="#planetary-computer-sentinel-2-sas-signing-no-account-live">¶</a></h2><p>MPC serves Sentinel-2 L2A bands as <code>B04</code>/<code>B03</code>/<code>B02</code>; assets are signed with an Azure SAS token via the <code>planetary-computer</code> SDK.</p>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=26da04fd">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="CodeMirror cm-s-jupyter">
+<div class="zeroclipboard-container">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-2">
+<div>
+<span class="notice" hidden="">Copied!</span>
+<svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
+<path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+<path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+</svg>
+</div>
+</clipboard-copy>
+</div>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">tempfile</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.earthlens</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
 
-<span class="n">aoi</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">40.40</span><span class="p">,</span> <span class="mf">40.45</span><span class="p">],</span> <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">3.72</span><span class="p">,</span> <span class="o">-</span><span class="mf">3.67</span><span class="p">],</span>
-           <span class="n">start</span><span class="o">=</span><span class="s2">"2024-06-01"</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">"2024-06-30"</span><span class="p">)</span>
-<span class="n">landsat</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span><span class="n">data_source</span><span class="o">=</span><span class="s2">"planetary-computer"</span><span class="p">,</span>
-                    <span class="n">variables</span><span class="o">=</span><span class="p">{</span><span class="s2">"landsat-c2-l2"</span><span class="p">:</span> <span class="p">[</span><span class="s2">"red"</span><span class="p">,</span> <span class="s2">"green"</span><span class="p">,</span> <span class="s2">"blue"</span><span class="p">]},</span>
-                    <span class="n">path</span><span class="o">=</span><span class="s2">"out/aoi/landsat"</span><span class="p">,</span> <span class="n">max_items</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="o">**</span><span class="n">aoi</span><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
+<span class="n">aoi</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">40.40</span><span class="p">,</span> <span class="mf">40.45</span><span class="p">],</span> <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">3.72</span><span class="p">,</span> <span class="o">-</span><span class="mf">3.67</span><span class="p">],</span> <span class="n">start</span><span class="o">=</span><span class="s2">"2024-06-01"</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">"2024-06-20"</span><span class="p">)</span>
+<span class="n">mpc</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
+    <span class="n">data_source</span><span class="o">=</span><span class="s2">"planetary-computer"</span><span class="p">,</span>
+    <span class="n">variables</span><span class="o">=</span><span class="p">{</span><span class="s2">"sentinel-2-l2a"</span><span class="p">:</span> <span class="p">[</span><span class="s2">"B04"</span><span class="p">,</span> <span class="s2">"B03"</span><span class="p">,</span> <span class="s2">"B02"</span><span class="p">]},</span>
+    <span class="n">path</span><span class="o">=</span><span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">(),</span> <span class="n">max_items</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="o">**</span><span class="n">aoi</span><span class="p">,</span>
+<span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
+<span class="p">[</span><span class="n">p</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">mpc</span><span class="p">]</span>
 </pre></div>
-<h2 id="cdse-sentinel-s3-keys">CDSE Sentinel (S3 keys)<a class="anchor-link" href="#cdse-sentinel-s3-keys">¶</a></h2><div class="highlight"><pre><span></span><span class="c1"># export CDSE_S3_ACCESS_KEY / CDSE_S3_SECRET_KEY first (see Authentication)</span>
-<span class="n">sentinel</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span><span class="n">data_source</span><span class="o">=</span><span class="s2">"cdse"</span><span class="p">,</span>
-                     <span class="n">variables</span><span class="o">=</span><span class="p">{</span><span class="s2">"sentinel-2-l2a"</span><span class="p">:</span> <span class="p">[</span><span class="s2">"B04"</span><span class="p">,</span> <span class="s2">"B03"</span><span class="p">,</span> <span class="s2">"B02"</span><span class="p">]},</span>
-                     <span class="n">path</span><span class="o">=</span><span class="s2">"out/aoi/sentinel"</span><span class="p">,</span> <span class="n">max_items</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="o">**</span><span class="n">aoi</span><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
+<div class="clipboard-copy-txt" id="cell-2">import tempfile
+from earthlens.earthlens import EarthLens
+
+aoi = dict(lat_lim=[40.40, 40.45], lon_lim=[-3.72, -3.67], start="2024-06-01", end="2024-06-20")
+mpc = EarthLens(
+    data_source="planetary-computer",
+    variables={"sentinel-2-l2a": ["B04", "B03", "B02"]},
+    path=tempfile.mkdtemp(), max_items=1, **aoi,
+).download()
+[p.name for p in mpc]</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=b0f456b6">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h2 id="cdse-sentinel-2-s3-keys-recipe">CDSE — Sentinel-2 (S3 keys; recipe)<a class="anchor-link" href="#cdse-sentinel-2-s3-keys-recipe">¶</a></h2><p>Set <code>CDSE_S3_ACCESS_KEY</code> / <code>CDSE_S3_SECRET_KEY</code> first (see Authentication), then the identical shape pulls from CDSE — the backend picks <code>CdseS3Signer</code> from the catalog instead of <code>MpcSasSigner</code>:</p>
+<div class="highlight"><pre><span></span><span class="n">cdse</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
+    <span class="n">data_source</span><span class="o">=</span><span class="s2">"cdse"</span><span class="p">,</span>
+    <span class="n">variables</span><span class="o">=</span><span class="p">{</span><span class="s2">"sentinel-2-l2a"</span><span class="p">:</span> <span class="p">[</span><span class="s2">"B04"</span><span class="p">,</span> <span class="s2">"B03"</span><span class="p">,</span> <span class="s2">"B02"</span><span class="p">]},</span>
+    <span class="n">path</span><span class="o">=</span><span class="s2">"out/cdse"</span><span class="p">,</span> <span class="n">max_items</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="o">**</span><span class="n">aoi</span><span class="p">,</span>
+<span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
 </pre></div>
-<p>Both write COGs over the identical AOI; the backend picked <code>MpcSasSigner</code> vs <code>CdseS3Signer</code> from the catalog. Reproject/stack them with pyramids to compare Landsat and Sentinel over the same scene.</p>
+<p>Both write COGs over the identical AOI; reproject/stack them with pyramids to compare providers over the same scene.</p>
 </div>
 </div>
 </div>

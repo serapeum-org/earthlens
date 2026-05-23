@@ -3364,24 +3364,6 @@
         
       
       
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Sentinel-2 monthly NDVI time-series (Earth Search)
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
       <a href="./" class="md-nav__link md-nav__link--active">
         
   
@@ -3398,47 +3380,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#pull-aggregate-live" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Pull + aggregate (live)
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#ndvi-per-window" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        NDVI per window
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
       
     </li>
   
@@ -3459,7 +3400,7 @@
   <span class="md-ellipsis">
     
   
-    Same AOI across providers: MPC Landsat + CDSE Sentinel
+    Same AOI across providers: MPC + CDSE
   
 
     
@@ -4017,36 +3958,6 @@
   
     
   
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#pull-aggregate-live" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Pull + aggregate (live)
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#ndvi-per-window" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        NDVI per window
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
   
 </nav>
                   </div>
@@ -4800,18 +4711,18 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </style>
 <!-- End of mermaid configuration --><div class="jupyter-wrapper">
 <div class="jp-Notebook" data-jp-theme-light="true" data-jp-theme-name="JupyterLab Light">
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=c2a03c65">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=fbdc1935">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h1 id="sentinel-2-monthly-ndvi-time-series-earth-search">Sentinel-2 monthly NDVI time-series (Earth Search)<a class="anchor-link" href="#sentinel-2-monthly-ndvi-time-series-earth-search">¶</a></h1><p>Shows the <strong>raster <code>aggregate=</code></strong> path: pull Sentinel-2 red + NIR over a farm for a season, reduce per month into per-window COGs, then compute NDVI per month. Offline cells below build the aggregation request; the live pull is a recipe.</p>
+<h1 id="sentinel-2-monthly-ndvi-time-series-earth-search">Sentinel-2 monthly NDVI time-series (Earth Search)<a class="anchor-link" href="#sentinel-2-monthly-ndvi-time-series-earth-search">¶</a></h1><p>Shows the <strong>raster <code>aggregate=</code></strong> path: pull Sentinel-2 red + NIR over a small AOI for a couple of months, reduce per month into per-window COGs, then compute mean NDVI per month. Runs live against Earth Search (anonymous).</p>
 </div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=2894de92">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=8b424565">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -4829,54 +4740,89 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.aggregate</span><span class="w"> </span><span class="kn">import</span> <span class="n">AggregationConfig</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">tempfile</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.earthlens</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.aggregate</span><span class="w"> </span><span class="kn">import</span> <span class="n">AggregationConfig</span>
 
-<span class="c1"># Monthly mean windows; one COG per (collection, month) is written.</span>
-<span class="n">agg</span> <span class="o">=</span> <span class="n">AggregationConfig</span><span class="p">(</span><span class="n">freq</span><span class="o">=</span><span class="s2">"1MS"</span><span class="p">,</span> <span class="n">op</span><span class="o">=</span><span class="s2">"mean"</span><span class="p">,</span> <span class="n">out_dir</span><span class="o">=</span><span class="s2">"out/farm/monthly"</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">agg</span><span class="o">.</span><span class="n">freq</span><span class="p">,</span> <span class="n">agg</span><span class="o">.</span><span class="n">op</span><span class="p">)</span>
+<span class="n">out</span> <span class="o">=</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">()</span>
+<span class="n">el</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
+    <span class="n">data_source</span><span class="o">=</span><span class="s2">"earth-search"</span><span class="p">,</span>
+    <span class="n">start</span><span class="o">=</span><span class="s2">"2024-06-01"</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">"2024-07-31"</span><span class="p">,</span>
+    <span class="n">variables</span><span class="o">=</span><span class="p">{</span><span class="s2">"sentinel-2-l2a"</span><span class="p">:</span> <span class="p">[</span><span class="s2">"red"</span><span class="p">,</span> <span class="s2">"nir"</span><span class="p">]},</span>
+    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">40.40</span><span class="p">,</span> <span class="mf">40.45</span><span class="p">],</span> <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">3.72</span><span class="p">,</span> <span class="o">-</span><span class="mf">3.67</span><span class="p">],</span>
+    <span class="n">path</span><span class="o">=</span><span class="n">out</span><span class="p">,</span> <span class="n">max_items</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">monthly</span> <span class="o">=</span> <span class="n">el</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">aggregate</span><span class="o">=</span><span class="n">AggregationConfig</span><span class="p">(</span><span class="n">freq</span><span class="o">=</span><span class="s2">"1MS"</span><span class="p">,</span> <span class="n">op</span><span class="o">=</span><span class="s2">"mean"</span><span class="p">,</span> <span class="n">out_dir</span><span class="o">=</span><span class="n">out</span> <span class="o">+</span> <span class="s2">"/monthly"</span><span class="p">))</span>
+<span class="p">[</span><span class="n">p</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">monthly</span><span class="p">]</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-1">from earthlens.aggregate import AggregationConfig
+<div class="clipboard-copy-txt" id="cell-1">import tempfile
+from earthlens.earthlens import EarthLens
+from earthlens.aggregate import AggregationConfig
 
-# Monthly mean windows; one COG per (collection, month) is written.
-agg = AggregationConfig(freq="1MS", op="mean", out_dir="out/farm/monthly")
-print(agg.freq, agg.op)</div>
+out = tempfile.mkdtemp()
+el = EarthLens(
+    data_source="earth-search",
+    start="2024-06-01", end="2024-07-31",
+    variables={"sentinel-2-l2a": ["red", "nir"]},
+    lat_lim=[40.40, 40.45], lon_lim=[-3.72, -3.67],
+    path=out, max_items=2,
+)
+monthly = el.download(aggregate=AggregationConfig(freq="1MS", op="mean", out_dir=out + "/monthly"))
+[p.name for p in monthly]</div>
 </div>
 </div>
 </div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=e5be94d4">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=792aca2e">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="pull-aggregate-live">Pull + aggregate (live)<a class="anchor-link" href="#pull-aggregate-live">¶</a></h2><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.earthlens</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.aggregate</span><span class="w"> </span><span class="kn">import</span> <span class="n">AggregationConfig</span>
-
-<span class="n">el</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
-    <span class="n">data_source</span><span class="o">=</span><span class="s2">"earth-search"</span><span class="p">,</span>
-    <span class="n">start</span><span class="o">=</span><span class="s2">"2024-04-01"</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">"2024-09-30"</span><span class="p">,</span>
-    <span class="n">variables</span><span class="o">=</span><span class="p">{</span><span class="s2">"sentinel-2-l2a"</span><span class="p">:</span> <span class="p">[</span><span class="s2">"red"</span><span class="p">,</span> <span class="s2">"nir"</span><span class="p">]},</span>
-    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">40.40</span><span class="p">,</span> <span class="mf">40.45</span><span class="p">],</span> <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">3.72</span><span class="p">,</span> <span class="o">-</span><span class="mf">3.67</span><span class="p">],</span>
-    <span class="n">path</span><span class="o">=</span><span class="s2">"out/farm"</span><span class="p">,</span>
-<span class="p">)</span>
-<span class="n">monthly</span> <span class="o">=</span> <span class="n">el</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">aggregate</span><span class="o">=</span><span class="n">AggregationConfig</span><span class="p">(</span><span class="n">freq</span><span class="o">=</span><span class="s2">"1MS"</span><span class="p">,</span> <span class="n">op</span><span class="o">=</span><span class="s2">"mean"</span><span class="p">,</span>
-                                                  <span class="n">out_dir</span><span class="o">=</span><span class="s2">"out/farm/monthly"</span><span class="p">))</span>
-<span class="c1"># `monthly` is one COG per month, named sentinel-2-l2a_mean_1MS_&lt;YYYYMMDD&gt;.tif</span>
-</pre></div>
-<h2 id="ndvi-per-window">NDVI per window<a class="anchor-link" href="#ndvi-per-window">¶</a></h2><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<p>Each path is one COG per month, named <code>sentinel-2-l2a_mean_1MS_&lt;YYYYMMDD&gt;.tif</code>. Compute the mean NDVI per window:</p>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=87bf02cf">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="CodeMirror cm-s-jupyter">
+<div class="zeroclipboard-container">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-2">
+<div>
+<span class="notice" hidden="">Copied!</span>
+<svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
+<path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+<path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+</svg>
+</div>
+</clipboard-copy>
+</div>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span>
 
 <span class="k">for</span> <span class="n">cog</span> <span class="ow">in</span> <span class="n">monthly</span><span class="p">:</span>
-    <span class="n">ds</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">cog</span><span class="p">))</span>
-    <span class="n">arr</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">read_array</span><span class="p">()</span>              <span class="c1"># (band, y, x): band 0 = red, 1 = nir</span>
-    <span class="n">red</span><span class="p">,</span> <span class="n">nir</span> <span class="o">=</span> <span class="n">arr</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">),</span> <span class="n">arr</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
+    <span class="n">arr</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">cog</span><span class="p">))</span><span class="o">.</span><span class="n">read_array</span><span class="p">()</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
+    <span class="n">red</span><span class="p">,</span> <span class="n">nir</span> <span class="o">=</span> <span class="n">arr</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">arr</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
     <span class="n">ndvi</span> <span class="o">=</span> <span class="p">(</span><span class="n">nir</span> <span class="o">-</span> <span class="n">red</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">nir</span> <span class="o">+</span> <span class="n">red</span> <span class="o">+</span> <span class="mf">1e-9</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">cog</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nanmean</span><span class="p">(</span><span class="n">ndvi</span><span class="p">)))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">cog</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s2">"mean NDVI:"</span><span class="p">,</span> <span class="nb">round</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nanmean</span><span class="p">(</span><span class="n">ndvi</span><span class="p">)),</span> <span class="mi">3</span><span class="p">))</span>
 </pre></div>
-<p>Plotting the per-month NDVI mean gives the seasonal greening curve.</p>
+<div class="clipboard-copy-txt" id="cell-2">import numpy as np
+from pyramids.dataset import Dataset
+
+for cog in monthly:
+    arr = Dataset.read_file(str(cog)).read_array().astype(float)
+    red, nir = arr[0], arr[1]
+    ndvi = (nir - red) / (nir + red + 1e-9)
+    print(cog.name, "mean NDVI:", round(float(np.nanmean(ndvi)), 3))</div>
+</div>
+</div>
 </div>
 </div>
 </div>
@@ -4940,13 +4886,13 @@ print(agg.freq, agg.op)</div>
         
         
           
-          <a href="../mpc_landsat_cdse_sentinel_same_aoi/" class="md-footer__link md-footer__link--next" aria-label="Next: Same AOI across providers: MPC Landsat + CDSE Sentinel">
+          <a href="../mpc_landsat_cdse_sentinel_same_aoi/" class="md-footer__link md-footer__link--next" aria-label="Next: Same AOI across providers: MPC + CDSE">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                Same AOI across providers: MPC Landsat + CDSE Sentinel
+                Same AOI across providers: MPC + CDSE
               </div>
             </div>
             <div class="md-footer__button md-icon">
