@@ -29,17 +29,23 @@ class _FakeAsset:
 class _FakeItem:
     """A STAC item stand-in with id, datetime, and an assets map."""
 
-    def __init__(self, item_id: str, date: str, asset_hrefs: dict[str, str]) -> None:
+    def __init__(
+        self, item_id: str, date: str, asset_hrefs: dict[str, str],
+        proj_epsg: int | None = None,
+    ) -> None:
         import datetime as dt
 
         self.id = item_id
         self.datetime = dt.datetime.strptime(date, "%Y-%m-%d")
         self.assets = {k: _FakeAsset(v) for k, v in asset_hrefs.items()}
+        self.properties = {"proj:epsg": proj_epsg} if proj_epsg is not None else {}
 
 
-def make_item(item_id: str, date: str, asset_hrefs: dict[str, str]) -> _FakeItem:
-    """Build a fake STAC item for a search result."""
-    return _FakeItem(item_id, date, asset_hrefs)
+def make_item(
+    item_id: str, date: str, asset_hrefs: dict[str, str], proj_epsg: int | None = None
+) -> _FakeItem:
+    """Build a fake STAC item for a search result (optional `proj:epsg`)."""
+    return _FakeItem(item_id, date, asset_hrefs, proj_epsg)
 
 
 class _FakeSearch:
@@ -225,7 +231,7 @@ def fake_pyramids(monkeypatch: pytest.MonkeyPatch) -> FakePyramids:
     merge_mod = types.ModuleType("pyramids.dataset.merge")
 
     def _merge_rasters(src, dst, **kwargs):
-        fp.merge_calls.append((list(src), str(dst)))
+        fp.merge_calls.append((list(src), str(dst), dict(kwargs)))
         Path(dst).write_bytes(b"")
 
     def _stack_bands(files, **kwargs):

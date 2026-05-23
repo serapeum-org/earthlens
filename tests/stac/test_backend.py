@@ -154,14 +154,14 @@ class TestSearch:
 class TestFetch:
     """_fetch mosaics per (collection, date) and writes one COG per group."""
 
-    def test_single_tile_skips_merge_and_writes_one_cog(self, fake_pyramids, tmp_path):
-        """One tile per date stacks + writes a COG without calling merge_rasters."""
+    def test_single_tile_merges_each_band_and_writes_one_cog(self, fake_pyramids, tmp_path):
+        """One tile per date mosaics each band, stacks, and writes one COG."""
         fake_pyramids.items_by_collection["sentinel-2-c1-l2a"] = [
             make_item("a", "2024-01-05", {"B04": "https://h/a_b04.tif", "B08": "https://h/a_b08.tif"})
         ]
         stac = _build_stac(tmp_path, endpoint="earth-search")
         paths = stac._fetch(stac._search())
-        assert fake_pyramids.merge_calls == []
+        assert len(fake_pyramids.merge_calls) == 2  # one mosaic per band
         assert len(fake_pyramids.stack_calls) == 1
         assert len(fake_pyramids.write_calls) == 1
         assert len(paths) == 1 and paths[0].name == "sentinel-2-l2a_2024-01-05.tif"
@@ -227,22 +227,30 @@ class TestFetch:
         names = sorted(p.name for p in stac._fetch(stac._search()))
         assert names == ["sentinel-2-l2a_2024-01-05_part0.tif", "sentinel-2-l2a_2024-01-05_part1.tif"]
 
-    def test_cross_crs_tiles_reprojected_before_merge(self, fake_pyramids, tmp_path):
-        """Tiles in different CRSs are reprojected to a common CRS before merging."""
+    def test_cross_crs_tiles_set_merge_dst_crs(self, fake_pyramids, tmp_path):
+        """Tiles with differing proj:epsg make merge_rasters reproject via dst_crs."""
         fake_pyramids.items_by_collection["sentinel-2-c1-l2a"] = [
-            make_item("a", "2024-01-05", {"B04": "https://h/a_b04.tif"}),
-            make_item("b", "2024-01-05", {"B04": "https://h/b_b04.tif"}),
+            make_item("a", "2024-01-05", {"B04": "https://h/a_b04.tif"}, proj_epsg=32630),
+            make_item("b", "2024-01-05", {"B04": "https://h/b_b04.tif"}, proj_epsg=32631),
         ]
-        fake_pyramids.dataset_epsgs = {
-            "https://h/a_b04.tif": 32630,
-            "https://h/b_b04.tif": 32631,
-        }
         stac = _build_stac(
             tmp_path, endpoint="earth-search", variables={"sentinel-2-l2a": ["B04"]}
         )
         stac._fetch(stac._search())
-        merged_src = fake_pyramids.merge_calls[0][0]
-        assert any("reproj" in s for s in merged_src)
+        merge_kwargs = fake_pyramids.merge_calls[0][2]
+        assert merge_kwargs["dst_crs"] == 32630  # lowest of the differing EPSGs
+
+    def test_same_crs_tiles_leave_dst_crs_none(self, fake_pyramids, tmp_path):
+        """Tiles sharing proj:epsg keep their native CRS (dst_crs=None)."""
+        fake_pyramids.items_by_collection["sentinel-2-c1-l2a"] = [
+            make_item("a", "2024-01-05", {"B04": "https://h/a_b04.tif"}, proj_epsg=32630),
+            make_item("b", "2024-01-05", {"B04": "https://h/b_b04.tif"}, proj_epsg=32630),
+        ]
+        stac = _build_stac(
+            tmp_path, endpoint="earth-search", variables={"sentinel-2-l2a": ["B04"]}
+        )
+        stac._fetch(stac._search())
+        assert fake_pyramids.merge_calls[0][2]["dst_crs"] is None
 
 
 @pytest.mark.stac
@@ -310,31 +318,18 @@ class TestModuleHelpers:
         with pytest.raises(KeyError, match="no 'href'"):
             _asset_href(item, "B04")
 
-    def test_copy_single_writes_file(self, fake_pyramids, tmp_path):
-        """_copy_single materialises a single tile href to a local GeoTIFF."""
-        from earthlens.stac.backend import _copy_single
-
-        target = tmp_path / "one.tif"
-        _copy_single("https://h/a.tif", target)
-        assert target.is_file()
-
     def test_cleanup_ignores_missing(self, tmp_path):
         """_cleanup tolerates absent paths."""
         from earthlens.stac.backend import _cleanup
 
         _cleanup([tmp_path / "absent.tif"])
 
-    def test_to_common_crs_single_href_passthrough(self, fake_pyramids, tmp_path):
-        """A single tile needs no reprojection and is returned unchanged."""
-        stac = _build_stac(tmp_path, endpoint="earth-search")
-        assert stac._to_common_crs(["https://h/a.tif"]) == ["https://h/a.tif"]
+    def test_item_epsg_reads_proj_metadata(self):
+        """_item_epsg reads proj:epsg from item properties (None when absent)."""
+        from earthlens.stac.backend import _item_epsg
 
-    def test_to_common_crs_same_epsg_passthrough(self, fake_pyramids, tmp_path):
-        """Tiles sharing a CRS are returned unchanged (no reprojection)."""
-        fake_pyramids.dataset_epsgs = {"https://h/a.tif": 32630, "https://h/b.tif": 32630}
-        stac = _build_stac(tmp_path, endpoint="earth-search")
-        out = stac._to_common_crs(["https://h/a.tif", "https://h/b.tif"])
-        assert out == ["https://h/a.tif", "https://h/b.tif"]
+        assert _item_epsg(make_item("a", "2024-01-05", {}, proj_epsg=32631)) == 32631
+        assert _item_epsg(make_item("a", "2024-01-05", {})) is None
 
     def test_group_products_buckets_by_collection_date_bbox(self):
         """Products are grouped by (collection_key, date, source bbox)."""

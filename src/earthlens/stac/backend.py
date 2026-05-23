@@ -286,17 +286,20 @@ class STAC(AbstractDataSource):
                 idx = self._aoi_bboxes.index(bbox_key) if multi else 0
                 assets = group[0].metadata["assets"]
                 band_paths: list[Path] = []
+                target_crs = self._target_crs(group)
                 for band in assets:
                     hrefs = [
                         self._signer.sign_href(_asset_href(p.metadata["item"], band))
                         for p in group
                     ]
-                    hrefs = self._to_common_crs(hrefs)
                     tmp = Path(self.root_dir) / f".{collection_key}_{band}_{date}_{idx}.tif"
-                    if len(hrefs) > 1:
-                        merge_rasters([str(h) for h in hrefs], str(tmp), method="last")
-                    else:
-                        _copy_single(hrefs[0], tmp)
+                    # merge_rasters mosaics the tiles and, when dst_crs is given,
+                    # reprojects mismatched-CRS tiles onto one grid in a single
+                    # pass (multi-UTM Sentinel-2). A single tile is handled too.
+                    merge_rasters(
+                        [str(h) for h in hrefs], str(tmp), method="last",
+                        dst_crs=target_crs,
+                    )
                     band_paths.append(tmp)
                 stacked = stack_bands(
                     [str(p) for p in band_paths], band_names=list(assets), align=True
@@ -314,39 +317,25 @@ class STAC(AbstractDataSource):
         logger.info(f"STAC download: {len(out)} COG(s) written to {self.root_dir}")
         return out
 
-    def _to_common_crs(self, hrefs: list[str]) -> list[str]:
-        """Reproject mismatched-CRS tiles onto a shared CRS before mosaicking.
+    def _target_crs(self, group: list[RemoteProduct]) -> int | None:
+        """Pick the mosaic target CRS for a date group, without opening rasters.
 
-        `merge_rasters` aligns onto a union grid assuming a shared CRS, so a
-        multi-UTM-zone bbox (common for Sentinel-2) needs each tile reprojected
-        first. When all tiles already share a CRS (the common single-tile or
-        single-zone case), the hrefs are returned unchanged.
+        Returns the user's `epsg` when set; otherwise, if the group's tiles
+        report differing `proj:epsg` in their STAC metadata, the lowest of those
+        (so `merge_rasters` reprojects them onto one grid); otherwise `None`
+        (tiles share a CRS — `merge_rasters` keeps it). Reading the CRS from item
+        metadata avoids opening every remote tile just to compare CRSs.
 
         Args:
-            hrefs: Signed tile hrefs for one band of one date group.
+            group: The products for one `(collection, date, half)`.
 
         Returns:
-            Hrefs/paths ready for `merge_rasters` (reprojected copies where the
-            CRS differed; the originals otherwise).
+            An EPSG code to reproject to, or `None` to keep the native CRS.
         """
-        if len(hrefs) <= 1:
-            return hrefs
-        from pyramids.dataset import Dataset
-
-        datasets = [Dataset.read_file(h) for h in hrefs]
-        epsgs = {getattr(ds, "epsg", None) for ds in datasets}
-        if len(epsgs) <= 1:
-            return hrefs
-        target_epsg = self._epsg or next(iter(sorted(e for e in epsgs if e)))
-        reprojected: list[str] = []
-        for href, ds in zip(hrefs, datasets):
-            if getattr(ds, "epsg", None) == target_epsg:
-                reprojected.append(href)
-                continue
-            tmp = Path(self.root_dir) / f".reproj_{abs(hash(href))}.tif"
-            ds.to_crs(target_epsg).to_file(str(tmp))
-            reprojected.append(str(tmp))
-        return reprojected
+        if self._epsg:
+            return self._epsg
+        epsgs = {e for e in (_item_epsg(p.metadata["item"]) for p in group) if e}
+        return sorted(epsgs)[0] if len(epsgs) > 1 else None
 
     def download(
         self,
@@ -460,6 +449,23 @@ def _geo_of(dataset_cls: Any, path: str) -> tuple[Any, Any]:
     return ds.geotransform, ds.epsg
 
 
+def _item_epsg(item: Any) -> int | None:
+    """Return a STAC item's `proj:epsg` from its properties, or `None`.
+
+    Args:
+        item: A pystac `Item` or a raw STAC item dict.
+
+    Returns:
+        The integer EPSG code declared by the item, or `None` when absent.
+    """
+    props = getattr(item, "properties", None)
+    if props is None and isinstance(item, dict):
+        props = item.get("properties")
+    if isinstance(props, dict) and isinstance(props.get("proj:epsg"), int):
+        return props["proj:epsg"]
+    return None
+
+
 def _acq_date(item: Any) -> str:
     """Return a STAC item's acquisition date as `YYYY-MM-DD`.
 
@@ -537,22 +543,6 @@ def _group_products(
         )
         groups.setdefault(key, []).append(product)
     return list(groups.items())
-
-
-def _copy_single(href: str, target: Path) -> None:
-    """Materialise a single signed tile href to `target` as a GeoTIFF.
-
-    Used when a date group has exactly one tile for a band, so no mosaic is
-    needed. Reads via pyramids (honouring the active `CloudConfig`) and writes
-    a local copy.
-
-    Args:
-        href: The single signed tile href.
-        target: Local output path.
-    """
-    from pyramids.dataset import Dataset
-
-    Dataset.read_file(href).to_file(str(target))
 
 
 def _cleanup(paths: list[Path]) -> None:
