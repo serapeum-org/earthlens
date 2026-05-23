@@ -564,17 +564,25 @@ class EarthData(AbstractDataSource):
     ) -> list[Path]:
         """Collapse one NetCDF cube's internal time axis via `NetCDF.reduce`.
 
+        If the granule has no `time` dimension (a single-timestep file, or
+        an HDF-EOS file whose time is not a decodable CF dimension), there
+        is nothing to collapse — it is treated as a one-element stack and
+        windowed via :meth:`_reduce_stack` instead of raising.
+
         Args:
-            path: A single NetCDF / HDF granule carrying a multi-timestep
-                `time` axis.
+            path: A single NetCDF / HDF granule, ideally carrying a
+                multi-timestep `time` axis.
             config: The aggregation request (provides `freq` / `op`).
 
         Returns:
-            list[Path]: One reduced NetCDF, written beside the source.
+            list[Path]: One reduced NetCDF (written beside the source) when
+                a `time` axis is present, otherwise the per-window raster
+                paths from the stack fallback.
 
         Raises:
             NotImplementedError: When the installed pyramids has no
-                `NetCDF.reduce`.
+                `NetCDF.reduce` (or, on the fallback, no
+                `DatasetCollection.groupby`).
         """
         from pyramids.netcdf import NetCDF
 
