@@ -138,10 +138,16 @@ class TropicalCyclone(AbstractDataSource):
                 per 6-hourly fix) or `"track"` (one `LineString` per
                 storm with summary attributes).
             min_category: Optional Saffir-Simpson floor; fixes below this
-                category are dropped. `None` keeps every fix.
+                category are dropped. `None` keeps every fix. In
+                `geometry="track"` mode the filter applies at the fix
+                level *before* the LineString is built, so a storm that
+                only briefly reaches the floor yields a track drawn from
+                just its qualifying fixes (a clipped / shortened path),
+                not its whole track.
             storm_type: Optional tropycal storm-type filter (`"HU"`,
                 `"TS"`, …); keeps only fixes of that type. `None` keeps
-                every type.
+                every type. Same fix-level, track-clipping behaviour as
+                `min_category` in `geometry="track"` mode.
             file_format: Output vector format — `"gpkg"` (default,
                 GeoPackage) or `"geojson"`.
 

@@ -70,6 +70,12 @@ el = EarthLens(
 majors = el.download()
 ```
 
+`min_category` / `storm_type` filter at the **fix** level. In
+`geometry="track"` mode that means the filter is applied *before* the
+`LineString` is built, so a storm that only briefly meets the threshold yields
+a track drawn from just its qualifying fixes — a clipped, possibly shortened
+path rather than the storm's whole track.
+
 ## Multiple basins
 
 ```python
