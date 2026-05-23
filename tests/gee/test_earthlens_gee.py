@@ -70,6 +70,7 @@ class TestRegistry:
             "chc",
             "chirps",
             "cmems",
+            "earthdata",
             "ecmwf",
             "fdsn",
             "gee",
