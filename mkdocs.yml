@@ -164,6 +164,9 @@ nav:
       - Sea ice — Arctic thickness map: examples/cmems/seaice_arctic_thickness.ipynb
       - Waves — significant wave height: examples/cmems/global_wave_significant_height.ipynb
       - Mediterranean — surface temperature map: examples/cmems/mediterranean_sst_map.ipynb
+    - NASA Earthdata:
+      - Catalog explorer (no network): examples/earthdata/catalog_explorer.ipynb
+      - Per-dataset output kind: examples/earthdata/output_kinds.ipynb
     - Seismic events (FDSN):
       - Quickstart — recent earthquakes: examples/fdsn/quickstart.ipynb
       - Global seismicity map: examples/fdsn/global_seismicity_map.ipynb
