@@ -189,13 +189,9 @@ class EarthData(AbstractDataSource):
                 "to every key). Drop daac= and rely on the dataset keys, or "
                 "issue one request per dataset."
             )
-        resolved: list[EarthdataDataset] = []
-        for key in variables:
-            try:
-                resolved.append(self._catalog.resolve(key, daac=self._daac))
-            except KeyError as exc:
-                raise ValueError(str(exc)) from exc
-        return resolved
+        # Catalog.resolve raises ValueError (with a did-you-mean hint) for an
+        # unknown key or a daac mismatch, so it propagates as-is.
+        return [self._catalog.resolve(key, daac=self._daac) for key in variables]
 
     @staticmethod
     def _unify_output_kind(datasets: list[EarthdataDataset]) -> OutputKind:

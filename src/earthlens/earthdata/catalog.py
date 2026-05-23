@@ -579,8 +579,10 @@ class Catalog(AbstractCatalog):
             EarthdataDataset: The resolved row.
 
         Raises:
-            KeyError: When `key` is unknown (with a did-you-mean hint)
+            ValueError: When `key` is unknown (with a did-you-mean hint)
                 or when `daac=` is given but does not match the row.
+                Both not-found conditions raise `ValueError`, matching
+                :meth:`get_dataset`.
 
         Examples:
             - Resolve a key and read its provider:
@@ -596,13 +598,13 @@ class Catalog(AbstractCatalog):
                 >>> Catalog().resolve("GEDI04_A_002", daac="GES DISC")
                 Traceback (most recent call last):
                     ...
-                KeyError: "dataset 'GEDI04_A_002' resolves to DAAC 'LP DAAC', not the requested daac='GES DISC'."
+                ValueError: dataset 'GEDI04_A_002' resolves to DAAC 'LP DAAC', not the requested daac='GES DISC'.
 
                 ```
         """
         dataset = self.get_dataset(key)
         if daac is not None and dataset.daac != daac:
-            raise KeyError(
+            raise ValueError(
                 f"dataset {key!r} resolves to DAAC {dataset.daac!r}, "
                 f"not the requested daac={daac!r}."
             )

@@ -156,8 +156,8 @@ class TestCatalogLookup:
         assert ds.short_name == "GPM_3IMERGHHL"
 
     def test_resolve_with_wrong_daac_rejected(self):
-        """resolve() with a non-matching daac raises KeyError."""
-        with pytest.raises(KeyError, match="not the requested"):
+        """resolve() with a non-matching daac raises ValueError (like get_dataset)."""
+        with pytest.raises(ValueError, match="not the requested"):
             Catalog().resolve("GEDI04_A_002", daac="GES DISC")
 
     def test_get_daac(self):
