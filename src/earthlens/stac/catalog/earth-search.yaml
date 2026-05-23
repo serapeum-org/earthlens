@@ -1,0 +1,19 @@
+# Curated collections whose home endpoint is Earth Search (Element 84 / AWS).
+#
+# Sentinel-2 L2A and Copernicus DEM are served here too, but their home
+# definitions live in planetary-computer.yaml with an `earth-search:` alias
+# (Earth Search calls Sentinel-2 L2A `sentinel-2-c1-l2a`). Earth-Search-native
+# collections (e.g. NAIP, Sentinel-2 pre-COG) are added here by
+# tools/stac/refresh_stac_catalog.py / add-collection.
+
+collections:
+  naip:
+    endpoint: earth-search
+    collection_id: naip
+    default_assets: [image]
+    resolution: 1.0
+    extent:
+      start_date: "2010-01-01"
+      bbox: [-125.0, 24.0, -66.0, 50.0]
+    assets:
+      image: {common_name: rgbn, dtype: uint8, title: NAIP RGBN imagery}

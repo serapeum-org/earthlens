@@ -1,0 +1,50 @@
+# Curated collections whose home endpoint is Microsoft Planetary Computer.
+# Cross-endpoint availability is expressed via per-collection `aliases:`
+# (e.g. Earth Search serves Sentinel-2 L2A under `sentinel-2-c1-l2a`).
+
+collections:
+  sentinel-2-l2a:
+    endpoint: planetary-computer
+    collection_id: sentinel-2-l2a
+    aliases:
+      earth-search: sentinel-2-c1-l2a
+      cdse: sentinel-2-l2a
+    default_assets: [B02, B03, B04, B08]
+    cadence: 5-day
+    resolution: 10.0
+    extent:
+      start_date: "2015-06-27"
+      bbox: [-180.0, -90.0, 180.0, 90.0]
+    assets:
+      B02: {common_name: blue, dtype: uint16, nodata: 0, title: Blue (490 nm)}
+      B03: {common_name: green, dtype: uint16, nodata: 0, title: Green (560 nm)}
+      B04: {common_name: red, dtype: uint16, nodata: 0, title: Red (665 nm)}
+      B08: {common_name: nir, dtype: uint16, nodata: 0, title: NIR (842 nm)}
+
+  landsat-c2-l2:
+    endpoint: planetary-computer
+    collection_id: landsat-c2-l2
+    default_assets: [red, green, blue, nir08]
+    cadence: 16-day
+    resolution: 30.0
+    extent:
+      start_date: "1982-08-22"
+      bbox: [-180.0, -90.0, 180.0, 90.0]
+    assets:
+      red: {common_name: red, dtype: uint16, nodata: 0}
+      green: {common_name: green, dtype: uint16, nodata: 0}
+      blue: {common_name: blue, dtype: uint16, nodata: 0}
+      nir08: {common_name: nir08, dtype: uint16, nodata: 0}
+
+  cop-dem-glo-30:
+    endpoint: planetary-computer
+    collection_id: cop-dem-glo-30
+    aliases:
+      earth-search: cop-dem-glo-30
+    default_assets: [data]
+    resolution: 30.0
+    extent:
+      start_date: "2021-04-22"
+      bbox: [-180.0, -90.0, 180.0, 90.0]
+    assets:
+      data: {common_name: elevation, dtype: float32, title: Copernicus DEM GLO-30 elevation}

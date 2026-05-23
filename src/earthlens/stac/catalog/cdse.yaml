@@ -1,0 +1,15 @@
+# Curated collections whose home endpoint is the Copernicus Data Space (CDSE).
+
+collections:
+  sentinel-1-grd:
+    endpoint: cdse
+    collection_id: sentinel-1-grd
+    default_assets: [vv, vh]
+    cadence: 6-day
+    resolution: 10.0
+    extent:
+      start_date: "2014-10-03"
+      bbox: [-180.0, -90.0, 180.0, 90.0]
+    assets:
+      vv: {common_name: vv, dtype: float32, title: VV backscatter}
+      vh: {common_name: vh, dtype: float32, title: VH backscatter}

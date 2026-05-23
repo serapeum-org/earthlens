@@ -27,7 +27,7 @@ classifiers = [
 requires-python = ">= 3.11, <4"
 
 dependencies = [
-    "pyramids-gis >=0.21.0",
+    "pyramids-gis @ git+https://github.com/serapeum-org/pyramids.git@feat/stac-enhancments",
     "joblib >=1.5.0",
     "loguru >=0.7.3",
     "numpy >=2.0.0",
@@ -44,12 +44,18 @@ ecmwf = ["cdsapi >=0.7.7"]
 gee = ["earthengine-api >=1.7.26", "Rtree >=1.0.0"]
 cmems = ["copernicusmarine >=2.0.0,<3"]
 fdsn = ["obspy >=1.5.0"]
+# pyramids' own STAC client (pystac-client) is pulled by `pyramids-gis[stac]`,
+# but earthlens pins pyramids by direct URL above, so list pystac-client here
+# directly; planetary-computer is the MPC SAS-signing SDK (earthlens-side).
+stac = ["pystac-client >=0.8.0", "planetary-computer >=1.0"]
 all = [
     "boto3 >=1.43.0",
     "cdsapi >=0.7.7",
     "copernicusmarine >=2.0.0,<3",
     "earthengine-api >=1.7.26",
     "obspy >=1.5.0",
+    "planetary-computer >=1.0",
+    "pystac-client >=0.8.0",
     "Rtree >=1.0.0",
 ]
 
@@ -115,6 +121,7 @@ include = ["earthlens", "earthlens.*"]
 "earthlens.ecmwf" = ["*.yaml"]
 "earthlens.fdsn" = ["*.yaml"]
 "earthlens.gee" = ["*.yaml", "catalog/*.yaml"]
+"earthlens.stac" = ["*.yaml", "catalog/*.yaml"]
 
 [tool.flake8]
 ignore = ["E203", "E266", "E501", "W503", "E722", "C901", "E741", "E731"]
@@ -179,6 +186,7 @@ markers = [
     "gee: tests for the Google Earth Engine backend (requires the `gee` extra: earthengine-api).",
     "cmems: tests for the Copernicus Marine backend (requires the `cmems` extra: copernicusmarine).",
     "fdsn: tests for the FDSN seismic-event backend (requires the `fdsn` extra: obspy).",
+    "stac: tests for the STAC backend (requires the `stac` extra: pystac-client / planetary-computer).",
 ]
 
 [tool.pixi.workspace]
@@ -208,7 +216,8 @@ test-ecmwf = { cmd = "pytest -vvv -m 'ecmwf and not e2e' --cov=src/earthlens --c
 test-gee = { cmd = "pytest -vvv -m 'gee and not e2e' --cov=src/earthlens --cov-report=xml --cov-report=term-missing", description = "Run GEE-backend tests (requires the `gee` extra: earthengine-api)" }
 test-cmems = { cmd = "pytest -vvv -m 'cmems and not e2e' --cov=src/earthlens --cov-report=xml --cov-report=term-missing", description = "Run CMEMS-backend tests (requires the `cmems` extra: copernicusmarine)" }
 test-fdsn = { cmd = "pytest -vvv -m 'fdsn and not e2e' --cov=src/earthlens --cov-report=xml --cov-report=term-missing", description = "Run FDSN seismic-event backend tests (requires the `fdsn` extra: obspy)" }
-test-doctests = { cmd = "pytest --doctest-modules src/earthlens/gee src/earthlens/chc src/earthlens/ecmwf src/earthlens/cmems src/earthlens/fdsn src/earthlens/base", description = "Run docstring examples across the backend packages (catches drift in catalog / API docstrings)" }
+test-stac = { cmd = "pytest -vvv -m 'stac and not e2e' --cov=src/earthlens --cov-report=xml --cov-report=term-missing", description = "Run STAC-backend tests (requires the `stac` extra: pystac-client / planetary-computer)" }
+test-doctests = { cmd = "pytest --doctest-modules src/earthlens/gee src/earthlens/chc src/earthlens/ecmwf src/earthlens/cmems src/earthlens/fdsn src/earthlens/stac src/earthlens/base", description = "Run docstring examples across the backend packages (catches drift in catalog / API docstrings)" }
 notebooks = { cmd = "pytest --nbval --nbval-lax --verbose docs/examples", description = "check notebooks" }
 jupyter = { cmd = "jupyter lab --no-browser --IdentityProvider.token='' --ServerApp.password='' --port=8889", description = "check notebooks" }
 build-dist = { cmd = "python -m build", description = "Build sdist and wheel for PyPI" }
