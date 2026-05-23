@@ -123,12 +123,20 @@ nav:
       - Reference: reference/ecmwf.md
       - Catalog & Probes: reference/ecmwf/catalog.md
       - Aggregation: reference/aggregation.md
+    - FDSN (earthquakes):
+      - Introduction: reference/fdsn/introduction.md
+      - Usage: reference/fdsn/usage.md
+      - Reference: reference/fdsn/fdsn.md
     - GEE:
       - Introduction: reference/gee/introduction.md
       - Registering a project: reference/gee/registering-a-project.md
       - Service account setup: reference/gee/service-account-setup.md
       - Usage: reference/gee/usage.md
       - Reference: reference/gee/gee.md
+    - GDACS (disaster alerts):
+      - Introduction: reference/gdacs/introduction.md
+      - Usage: reference/gdacs/usage.md
+      - Reference: reference/gdacs/gdacs.md
     - OpenAQ (air quality):
       - Introduction: reference/openaq/introduction.md
       - Usage: reference/openaq/usage.md
@@ -159,6 +167,10 @@ nav:
       - Sea ice — Arctic thickness map: examples/cmems/seaice_arctic_thickness.ipynb
       - Waves — significant wave height: examples/cmems/global_wave_significant_height.ipynb
       - Mediterranean — surface temperature map: examples/cmems/mediterranean_sst_map.ipynb
+    - Seismic events (FDSN):
+      - Quickstart — recent earthquakes: examples/fdsn/quickstart.ipynb
+      - Global seismicity map: examples/fdsn/global_seismicity_map.ipynb
+      - Regional aftershock sequence: examples/fdsn/regional_sequence.ipynb
     - Google Earth Engine:
       - Quickstart — EarthLens facade: examples/gee/quickstart.ipynb
       - Atmosphere & chemistry — TROPOMI NO2: examples/gee/atmosphere-chemistry.ipynb
@@ -172,6 +184,11 @@ nav:
       - Precipitation — CHIRPS daily: examples/gee/precipitation.ipynb
       - SAR / radar — Sentinel-1 GRD VV: examples/gee/sar-radar.ipynb
       - Tracking batch exports (end-to-end demo): examples/gee/track-batch-exports.ipynb
+    - Disaster alerts (GDACS):
+      - Quickstart — recent alerts: examples/gdacs/quickstart.ipynb
+      - Global hazard dashboard: examples/gdacs/global_hazard_dashboard.ipynb
+      - Earthquakes + cyclones overlay: examples/gdacs/eq_tc_overlay.ipynb
+      - Country hazard profile: examples/gdacs/country_hazard_profile.ipynb
     - Air quality (OpenAQ):
       - Quickstart — PM2.5 over a city: examples/openaq/quickstart.ipynb
       - PM2.5 city time-series (WHO guideline): examples/openaq/pm25_city_timeseries.ipynb

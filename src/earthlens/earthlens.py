@@ -101,8 +101,9 @@ class EarthLens:
 
             ```python
             >>> from earthlens.earthlens import EarthLens
-            >>> sorted(EarthLens.DataSources)
-            ['amazon-s3', 'chc', 'chirps', 'cmems', 'ecmwf', 'gee', 'google-earth-engine', 'openaq']
+            >>> sorted(EarthLens.DataSources)  # doctest: +NORMALIZE_WHITESPACE
+            ['amazon-s3', 'chc', 'chirps', 'cmems', 'ecmwf', 'fdsn', 'gdacs', 'gee',
+             'google-earth-engine', 'openaq']
 
             ```
         - Asking for an unknown backend raises `ValueError`:
@@ -123,8 +124,13 @@ class EarthLens:
             datasets via `copernicusmarine`.
         :class:`earthlens.ecmwf.ECMWF`: ERA5 via the Copernicus
             Climate Data Store (cdsapi).
+        :class:`earthlens.fdsn.FDSN`: seismic events from the FDSN
+            networks (USGS / EMSC / INGV / EarthScope / ISC / GeoNet)
+            via `obspy`; the first `vector`-output backend.
         :class:`earthlens.gee.GEE`: imagery from Google Earth Engine
             (`earthengine-api`); keys `"gee"` / `"google-earth-engine"`.
+        :class:`earthlens.gdacs.GDACS`: GDACS multi-hazard disaster
+            alerts (public feed, no credentials); key `"gdacs"`.
         :class:`earthlens.openaq.OpenAQ`: ground-station air-quality
             measurements from OpenAQ v3 (tabular `DataFrame`).
     """
@@ -140,8 +146,11 @@ class EarthLens:
             "amazon-s3": ("earthlens.s3", "S3", "s3"),
             "cmems": ("earthlens.cmems", "CMEMS", "cmems"),
             "ecmwf": ("earthlens.ecmwf", "ECMWF", "ecmwf"),
+            "fdsn": ("earthlens.fdsn", "FDSN", "fdsn"),
             "gee": ("earthlens.gee", "GEE", "gee"),
             "google-earth-engine": ("earthlens.gee", "GEE", "gee"),
+            # GDACS is a public feed (requests only), so no extra to hint.
+            "gdacs": ("earthlens.gdacs", "GDACS", ""),
             "openaq": ("earthlens.openaq", "OpenAQ", "openaq"),
         }
     )
@@ -168,8 +177,9 @@ class EarthLens:
         Args:
             data_source: Backend key — one of `"chc"` (alias
                 `"chirps"`), `"amazon-s3"`, `"cmems"`, `"ecmwf"`,
-                `"gee"` (alias `"google-earth-engine"`), or
-                `"openaq"`. Defaults to `"chc"`.
+                `"fdsn"`, `"gdacs"`, `"gee"` (alias
+                `"google-earth-engine"`), or `"openaq"`. Defaults to
+                `"chc"`.
             temporal_resolution: `"daily"` or `"monthly"` for most
                 backends; the GEE backend also accepts `"raw"` and
                 `"yearly"`. The concrete backend may accept a narrower
