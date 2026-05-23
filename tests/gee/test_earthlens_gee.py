@@ -75,6 +75,7 @@ class TestRegistry:
             "gdacs",
             "gee",
             "google-earth-engine",
+            "openaq",
             "tropycal",
         ]
 

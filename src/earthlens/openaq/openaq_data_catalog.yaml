@@ -1,0 +1,57 @@
+# OpenAQ v3 pollutant-parameter dispatch table.
+#
+# Unlike the raster backends, OpenAQ has no per-dataset catalog to
+# curate — it is a fixed query protocol over a small, stable set of
+# measured parameters. This file is the entire "catalog": one row per
+# pollutant NAME, keyed by the user-facing name passed in
+# `variables=[...]`.
+#
+# `ids` is the list of OpenAQ numeric `parameters_id`s that share this
+# name — OpenAQ assigns a SEPARATE id per reporting unit (e.g. `no2` is
+# 5=µg/m³, 7=ppm, 15=ppb), and different networks report the same
+# pollutant in different units. The backend therefore matches sensors by
+# NAME (stable across units) and uses the full id list only as a
+# server-side narrowing hint for the `/locations` query. `units` is the
+# set of reporting units across those ids (informational — the backend
+# reads the real per-sensor unit at fetch time).
+#
+# All ids + units below were verified against the live `/v3/parameters`
+# endpoint on 2026-05-23. Re-verify when adding a row.
+parameters:
+  # Criteria pollutants + particulates.
+  pm25: { name: pm25, ids: [2], units: ["µg/m³"], display_name: "PM2.5", group: particulate }
+  pm10: { name: pm10, ids: [1], units: ["µg/m³"], display_name: "PM10", group: particulate }
+  no2: { name: no2, ids: [5, 7, 15], units: ["ppb", "ppm", "µg/m³"], display_name: "Nitrogen dioxide", group: criteria }
+  o3: { name: o3, ids: [3, 10, 32], units: ["ppb", "ppm", "µg/m³"], display_name: "Ozone", group: criteria }
+  so2: { name: so2, ids: [6, 9, 101], units: ["ppb", "ppm", "µg/m³"], display_name: "Sulphur dioxide", group: criteria }
+  co: { name: co, ids: [4, 8, 102], units: ["ppb", "ppm", "µg/m³"], display_name: "Carbon monoxide", group: criteria }
+  # Additional pollutants + greenhouse gases.
+  bc: { name: bc, ids: [11], units: ["µg/m³"], display_name: "Black carbon", group: particulate }
+  # `no` is quoted because YAML 1.1 parses the bare token as boolean false.
+  "no": { name: "no", ids: [24, 35, 19843], units: ["ppb", "ppm", "µg/m³"], display_name: "Nitrogen monoxide", group: other }
+  nox: { name: nox, ids: [23, 27, 19840], units: ["ppb", "ppm", "µg/m³"], display_name: "NOx", group: other }
+  co2: { name: co2, ids: [21], units: ["ppm"], display_name: "Carbon dioxide", group: other }
+  ch4: { name: ch4, ids: [28], units: ["ppm"], display_name: "Methane", group: other }
+  # Meteorological parameters.
+  temperature: { name: temperature, ids: [100, 128], units: ["c", "f"], display_name: "Temperature", group: meteorological }
+  relativehumidity: { name: relativehumidity, ids: [98], units: ["%"], display_name: "Relative humidity", group: meteorological }
+  pressure: { name: pressure, ids: [95, 132], units: ["hpa", "mb"], display_name: "Atmospheric pressure", group: meteorological }
+  wind_speed: { name: wind_speed, ids: [34], units: ["m/s"], display_name: "Wind speed", group: meteorological }
+  wind_direction: { name: wind_direction, ids: [22], units: ["deg"], display_name: "Wind direction", group: meteorological }
+  humidity: { name: humidity, ids: [134], units: ["%"], display_name: "Humidity", group: meteorological }
+  # Additional PM size fractions.
+  pm1: { name: pm1, ids: [19], units: ["µg/m³"], display_name: "PM1", group: particulate }
+  pm4: { name: pm4, ids: [19844], units: ["µg/m³"], display_name: "PM4.0", group: particulate }
+  # Particle-count metrics (counts per cm³) from optical particle counters.
+  ufp: { name: ufp, ids: [33], units: ["particles/cm³"], display_name: "Ultrafine particle count", group: particulate }
+  um003: { name: um003, ids: [125], units: ["particles/cm³"], display_name: "PM0.3 count", group: particulate }
+  um010: { name: um010, ids: [126], units: ["particles/cm³"], display_name: "PM1 count", group: particulate }
+  um025: { name: um025, ids: [130], units: ["particles/cm³"], display_name: "PM2.5 count", group: particulate }
+  um100: { name: um100, ids: [135], units: ["particles/cm³"], display_name: "PM10 count", group: particulate }
+  # Wavelength-resolved black carbon (aethalometer channels).
+  bc_370: { name: bc_370, ids: [19866], units: ["ng/m³"], display_name: "BC 370nm", group: particulate }
+  bc_375: { name: bc_375, ids: [19861], units: ["ng/m³"], display_name: "BC 375nm", group: particulate }
+  bc_470: { name: bc_470, ids: [19862], units: ["ng/m³"], display_name: "BC 470nm", group: particulate }
+  bc_528: { name: bc_528, ids: [19863], units: ["ng/m³"], display_name: "BC 528nm", group: particulate }
+  bc_625: { name: bc_625, ids: [19864], units: ["ng/m³"], display_name: "BC 625nm", group: particulate }
+  bc_880: { name: bc_880, ids: [19865], units: ["ng/m³"], display_name: "BC 880nm", group: particulate }
