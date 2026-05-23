@@ -204,6 +204,36 @@ class TestErrorSkips:
         assert any("AL122005" in m for m in warnings_log)
 
 
+class TestAggregateBasins:
+    """Tests for the `both` / `all` aggregate basin codes."""
+
+    def test_all_basin_ibtracs(self, tmp_path, fake_tropycal):
+        """variables=['all'] with ibtracs resolves, loads, and maps storms."""
+        backend = _backend(tmp_path, variables=["all"], source="ibtracs")
+        result = backend.download()
+        assert len(result) == 3
+        assert fake_tropycal.constructions == [("all", "ibtracs")]
+
+    def test_both_basin_hurdat(self, tmp_path, fake_tropycal):
+        """variables=['both'] with hurdat resolves and loads the aggregate basin."""
+        backend = _backend(tmp_path, variables=["both"], source="hurdat")
+        result = backend.download()
+        assert len(result) == 3
+        assert fake_tropycal.constructions == [("both", "hurdat")]
+
+    def test_all_rejects_hurdat(self, tmp_path):
+        """`all` is ibtracs-only, so source='hurdat' is rejected."""
+        backend = _backend(tmp_path, variables=["all"], source="hurdat")
+        with pytest.raises(ValueError, match="does not serve basin"):
+            backend._search()
+
+    def test_both_rejects_ibtracs(self, tmp_path):
+        """`both` is hurdat-only, so source='ibtracs' is rejected."""
+        backend = _backend(tmp_path, variables=["both"], source="ibtracs")
+        with pytest.raises(ValueError, match="does not serve basin"):
+            backend._search()
+
+
 class TestMissingExtra:
     """Tests for the friendly missing-[tropycal]-extra error."""
 
