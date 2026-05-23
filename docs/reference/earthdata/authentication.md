@@ -1,0 +1,62 @@
+# NASA Earthdata — authentication
+
+The Earthdata backend authenticates once per process against **Earthdata
+Login (EDL)** and reuses that session across every DAAC.
+
+## Installation
+
+The backend needs the `earthdata` extra:
+
+```bash
+pip install earthlens[earthdata]
+```
+
+This pulls [`earthaccess`](https://earthaccess.readthedocs.io) `>=0.18`,
+which **requires Python ≥ 3.12**. On Python 3.11 the dependency will not
+resolve — the rest of earthlens still works, but the Earthdata backend
+is unavailable until you move to 3.12+. The `earthaccess` import is
+lazy, so `import earthlens.earthdata` succeeds without the extra; the
+friendly `ImportError` (naming `earthlens[earthdata]`) is only raised
+when you actually log in.
+
+## Get an account
+
+Register a free account at
+[urs.earthdata.nasa.gov](https://urs.earthdata.nasa.gov). Some
+collections additionally require you to **authorize the DAAC application**
+once from your EDL profile.
+
+## Credential sources (in priority order)
+
+`EarthData(...)` resolves a login strategy automatically:
+
+1. **Environment variables** — set `EARTHDATA_USERNAME` and
+   `EARTHDATA_PASSWORD`. Used in CI and the e2e tests.
+2. **`~/.netrc`** — add a machine entry:
+
+   ```text
+   machine urs.earthdata.nasa.gov
+       login YOUR_USERNAME
+       password YOUR_PASSWORD
+   ```
+
+   Pass a non-default path with `EarthData(..., netrc_path=...)`.
+3. **Interactive prompt** — the last resort when neither of the above
+   resolves; `earthaccess` prompts and persists a token.
+
+You can also pass `EarthData(..., username=..., password=...)`
+explicitly. After a successful login, `earthaccess` persists the token
+so later processes reuse it.
+
+## In-region S3 access
+
+For cloud-hosted collections, the authenticated session also mints
+**rotating, per-provider S3 credentials** (valid roughly one hour). The
+backend uses them automatically when streaming in-region — see
+[Usage → cloud streaming](usage.md#cloud-streaming-vs-https-download).
+
+## CI secrets
+
+The live e2e suite (`-m "e2e and earthdata"`) reads the
+`EARTHDATA_USERNAME` / `EARTHDATA_PASSWORD` repository secrets and skips
+cleanly when they are absent.

@@ -119,6 +119,12 @@ nav:
       - Usage: reference/cmems/usage.md
       - Authentication: reference/cmems/authentication.md
       - Reference: reference/cmems/cmems.md
+    - Earthdata (NASA EOSDIS):
+      - Introduction: reference/earthdata/introduction.md
+      - Usage: reference/earthdata/usage.md
+      - Authentication: reference/earthdata/authentication.md
+      - Catalog & Tooling: reference/earthdata/catalog.md
+      - Reference: reference/earthdata/earthdata.md
     - ECMWF:
       - Reference: reference/ecmwf.md
       - Catalog & Probes: reference/ecmwf/catalog.md
