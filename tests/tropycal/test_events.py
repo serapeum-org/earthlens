@@ -242,6 +242,21 @@ class TestFirstHelper:
         assert events._first(pd.Series([1, 2, 3])) == 1
 
 
+class TestColumnHelper:
+    """Tests for the _column accessor."""
+
+    def test_present_column(self):
+        """_column returns the column when present."""
+        out = events._column(pd.DataFrame({"vmax": [1, 2]}), "vmax")
+        assert list(out) == [1, 2]
+
+    def test_missing_column_all_null(self):
+        """_column returns an all-null Series of the right length when absent."""
+        out = events._column(pd.DataFrame({"a": [1, 2, 3]}), "id")
+        assert len(out) == 3
+        assert out.isna().all()
+
+
 class TestConcatFcs:
     """Tests for concat_fcs."""
 

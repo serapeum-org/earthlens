@@ -37,7 +37,7 @@ from typing import TYPE_CHECKING, Iterable, Literal
 import geopandas as gpd
 import pandas as pd
 from pyramids.feature.collection import FeatureCollection
-from shapely.geometry import LineString, Point
+from shapely.geometry import LineString
 
 if TYPE_CHECKING:
     import datetime as dt
@@ -202,8 +202,9 @@ def frame_to_fc(
     """
     south, north, west, east = bbox
     start, end = window
-    rows: list[dict[str, object]] = []
-    geoms: list[object] = []
+    track_rows: list[dict[str, object]] = []
+    track_geoms: list[object] = []
+    point_frames: list[pd.DataFrame] = []
 
     for frame in storm_frames:
         if frame is None or len(frame) == 0:
@@ -227,17 +228,19 @@ def frame_to_fc(
         if geometry == "track":
             track_row = _track_row(in_window, source)
             if track_row is not None:
-                rows.append(track_row[0])
-                geoms.append(track_row[1])
+                track_rows.append(track_row[0])
+                track_geoms.append(track_row[1])
         else:
-            for point_row, point in _point_rows(in_box, source):
-                rows.append(point_row)
-                geoms.append(point)
+            point_frames.append(in_box)
 
-    columns = POINT_COLUMNS if geometry == "point" else TRACK_COLUMNS
-    if not rows:
-        return empty_fc(geometry)
-    return _build_fc(rows, geoms, columns)
+    if geometry == "track":
+        if not track_rows:
+            return empty_fc("track")
+        return _build_fc(track_rows, track_geoms, TRACK_COLUMNS)
+
+    if not point_frames:
+        return empty_fc("point")
+    return _points_to_fc(pd.concat(point_frames, ignore_index=True), source)
 
 
 def empty_fc(geometry: Geometry = "point") -> FeatureCollection:
@@ -336,37 +339,76 @@ def _prepare_frame(frame: pd.DataFrame) -> pd.DataFrame:
     return prepared
 
 
-def _point_rows(
-    in_box: pd.DataFrame, source: str
-) -> list[tuple[dict[str, object], object]]:
-    """Build per-fix point rows from a storm's in-window/in-box fixes.
+def _points_to_fc(fixes: pd.DataFrame, source: str) -> FeatureCollection:
+    """Build the point-mode FeatureCollection from concatenated in-box fixes.
+
+    Vectorised: every in-window/in-box fix across all storms is typed and
+    mapped in one pass — no per-fix Python loop — so multi-decade,
+    many-thousand-fix queries stay fast. The fixes have already been filtered
+    to finite lat/lon by the bbox mask (NaN positions compare False and are
+    dropped), so the `Point` geometry is always valid.
 
     Args:
-        in_box: The storm's fixes already filtered to window + bbox.
-        source: The requested data source, stamped on each row.
+        fixes: All in-window/in-box fixes, concatenated across storms (a
+            `to_dataframe(attrs_as_columns=True)`-shaped frame with the
+            `_time` / `_lat` / `_lon` helper columns).
+        source: The requested data source, stamped on every row.
 
     Returns:
-        A list of `(row, Point)` pairs, one per fix.
+        FeatureCollection: Point-mode collection, CRS `EPSG:4326`.
     """
-    out: list[tuple[dict[str, object], object]] = []
-    for _, fix in in_box.iterrows():
-        vmax = _num(fix.get("vmax"))
-        lon, lat = float(fix["_lon"]), float(fix["_lat"])
-        row = {
-            "storm_id": _str(fix.get("id")),
-            "name": _str(fix.get("name")),
-            "time": fix["_time"],
-            "lat": lat,
-            "lon": lon,
-            "vmax_kt": vmax,
-            "mslp_hpa": _num(fix.get("mslp")),
-            "storm_type": _str(fix.get("type")),
-            "category": saffir_simpson_category(vmax),
-            "basin": _str(fix.get("wmo_basin")),
+    vmax = pd.to_numeric(_column(fixes, "vmax"), errors="coerce")
+    frame = pd.DataFrame(
+        {
+            "storm_id": _column(fixes, "id").to_numpy(),
+            "name": _column(fixes, "name").to_numpy(),
+            "time": fixes["_time"].to_numpy(),
+            "lat": fixes["_lat"].to_numpy(),
+            "lon": fixes["_lon"].to_numpy(),
+            "vmax_kt": vmax.to_numpy(),
+            "mslp_hpa": pd.to_numeric(_column(fixes, "mslp"), errors="coerce").to_numpy(),
+            "storm_type": _column(fixes, "type").to_numpy(),
+            "category": _categories(vmax).to_numpy(),
+            "basin": _column(fixes, "wmo_basin").to_numpy(),
             "source": source,
         }
-        out.append((row, Point(lon, lat)))
-    return out
+    )
+    geoms = gpd.points_from_xy(frame["lon"], frame["lat"])
+    return _frame_to_typed_fc(frame, geoms, POINT_COLUMNS)
+
+
+def _categories(vmax: pd.Series) -> pd.Series:
+    """Vectorised Saffir-Simpson category for a wind Series (knots).
+
+    Same bins as :func:`saffir_simpson_category` (single source of truth via
+    :data:`_SSHWS_UPPER_KT`); missing winds map to `0`.
+
+    Args:
+        vmax: Maximum-sustained-wind values in knots.
+
+    Returns:
+        An `int64` Series of categories in `0..5`.
+    """
+    bins = [float("-inf"), *_SSHWS_UPPER_KT, float("inf")]
+    labels = list(range(len(_SSHWS_UPPER_KT) + 1))
+    cats = pd.cut(vmax, bins=bins, labels=labels, right=True)
+    return cats.astype("float64").fillna(0).astype("int64")
+
+
+def _column(fixes: pd.DataFrame, name: str) -> pd.Series:
+    """Return a frame column, or an all-null Series when the column is absent.
+
+    Args:
+        fixes: The (concatenated) fix frame.
+        name: Column name to read.
+
+    Returns:
+        The column as a default-indexed Series, or an all-`None` Series of the
+        same length when `name` is missing.
+    """
+    if name in fixes.columns:
+        return fixes[name].reset_index(drop=True)
+    return pd.Series([None] * len(fixes))
 
 
 def _track_row(
@@ -418,7 +460,8 @@ def _build_fc(
     """Assemble typed rows + geometries into a `FeatureCollection`.
 
     Args:
-        rows: Attribute rows keyed by `columns`.
+        rows: Attribute rows keyed by `columns` (used by track mode, whose
+            row count is the storm count — small).
         geoms: One shapely geometry per row (parallel to `rows`).
         columns: The mode schema (column -> pandas dtype).
 
@@ -426,6 +469,25 @@ def _build_fc(
         FeatureCollection: Typed collection, CRS `EPSG:4326`.
     """
     frame = pd.DataFrame(rows, columns=list(columns))
+    return _frame_to_typed_fc(frame, geoms, columns)
+
+
+def _frame_to_typed_fc(
+    frame: pd.DataFrame,
+    geoms: object,
+    columns: dict[str, str],
+) -> FeatureCollection:
+    """Cast a frame to the mode schema and wrap it as a `FeatureCollection`.
+
+    Args:
+        frame: A DataFrame whose columns match `columns` (untyped).
+        geoms: A geometry sequence (one per row), e.g. a
+            `geopandas.array.GeometryArray` or list of shapely geometries.
+        columns: The mode schema (column -> pandas dtype).
+
+    Returns:
+        FeatureCollection: Typed collection, CRS `EPSG:4326`.
+    """
     for column, dtype in columns.items():
         if dtype.startswith("datetime64"):
             frame[column] = pd.to_datetime(frame[column], utc=True).astype(dtype)
