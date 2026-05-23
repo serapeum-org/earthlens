@@ -57,10 +57,24 @@ class TestCdseS3Signer:
         out = CdseS3Signer("ak", "sk").sign_href("s3://eodata/foo/bar.tif")
         assert out == "/vsis3/eodata/foo/bar.tif"
 
-    def test_sign_href_passes_other_schemes_through(self):
-        """A non-s3 href is returned unchanged."""
-        out = CdseS3Signer("ak", "sk").sign_href("https://host/a.tif")
-        assert out == "https://host/a.tif"
+    def test_sign_href_rewrites_https_eodata_host(self):
+        """An https href on the CDSE host is rewritten to the /vsis3/eodata path."""
+        out = CdseS3Signer("ak", "sk").sign_href(
+            "https://eodata.dataspace.copernicus.eu/Sentinel-2/foo/B04.jp2"
+        )
+        assert out == "/vsis3/eodata/Sentinel-2/foo/B04.jp2"
+
+    def test_sign_href_https_path_already_eodata(self):
+        """An https path already prefixed with eodata/ is not double-prefixed."""
+        out = CdseS3Signer("ak", "sk").sign_href(
+            "https://eodata.dataspace.copernicus.eu/eodata/foo/B04.jp2"
+        )
+        assert out == "/vsis3/eodata/foo/B04.jp2"
+
+    def test_sign_href_passes_foreign_host_through(self):
+        """An https href on an unrelated host is returned unchanged."""
+        out = CdseS3Signer("ak", "sk").sign_href("https://example.com/a.tif")
+        assert out == "https://example.com/a.tif"
 
     def test_gdal_env_carries_s3_credentials_no_authorization(self):
         """gdal_env supplies the S3 endpoint + keys and never an Authorization header."""

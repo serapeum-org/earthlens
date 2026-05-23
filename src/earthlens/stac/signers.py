@@ -114,6 +114,14 @@ class CdseS3Signer:
             '/vsis3/eodata/foo/B04.tif'
 
             ```
+        - An `https://` href on the CDSE host is rewritten the same way:
+            ```python
+            >>> from earthlens.stac import CdseS3Signer
+            >>> CdseS3Signer("ak", "sk").sign_href(
+            ...     "https://eodata.dataspace.copernicus.eu/foo/B04.tif")
+            '/vsis3/eodata/foo/B04.tif'
+
+            ```
         - The credentials surface through the GDAL S3 environment:
             ```python
             >>> from earthlens.stac import CdseS3Signer
@@ -154,17 +162,35 @@ class CdseS3Signer:
         return None
 
     def sign_href(self, href: str) -> str:
-        """Rewrite an `s3://eodata/<key>` href to the `/vsis3/eodata/<key>` GDAL path.
+        """Rewrite a CDSE asset href to the `/vsis3/eodata/<key>` GDAL path.
+
+        CDSE items expose assets both as `s3://eodata/<key>` and as
+        `https://<eodata-host>/<key>` (the latter is the common default href,
+        with the `s3://` form often only an `alternate`). Either is rewritten to
+        the S3 VSI path so the credentials in `gdal_env()` apply; any other host
+        is returned unchanged.
 
         Args:
-            href: An asset href. An `s3://` href is rewritten to `/vsis3/`;
-                any other scheme is returned unchanged.
+            href: An asset href (`s3://eodata/...`, an `https://` URL on the
+                CDSE endpoint host, or something else).
 
         Returns:
-            The GDAL-readable href.
+            The GDAL-readable `/vsis3/...` path, or `href` unchanged when it is
+            not a CDSE asset.
         """
         if href.startswith("s3://"):
             return "/vsis3/" + href[len("s3://"):]
+        if href.startswith(("https://", "http://")):
+            from urllib.parse import urlsplit
+
+            parts = urlsplit(href)
+            if parts.netloc == self._endpoint or parts.netloc.endswith(
+                "dataspace.copernicus.eu"
+            ):
+                key = parts.path.lstrip("/")
+                if key.startswith("eodata/"):
+                    return f"/vsis3/{key}"
+                return f"/vsis3/eodata/{key}"
         return href
 
     def gdal_env(self) -> dict[str, str]:
