@@ -386,13 +386,16 @@ class EarthData(AbstractDataSource):
         """
         import earthaccess
 
+        show_progress = getattr(self, "_show_progress", True)
         out_paths: list[Path] = []
         for ds, granules in self._group_by_dataset(products):
             if self._use_s3(ds):
-                files = earthaccess.open(granules)
+                files = earthaccess.open(granules, show_progress=show_progress)
                 out_paths.extend(Path(getattr(f, "path", str(f))) for f in files)
             else:
-                downloaded = earthaccess.download(granules, str(self.root_dir))
+                downloaded = earthaccess.download(
+                    granules, str(self.root_dir), show_progress=show_progress
+                )
                 out_paths.extend(Path(p) for p in downloaded)
         return out_paths
 
@@ -485,9 +488,9 @@ class EarthData(AbstractDataSource):
         `"tabular"`.
 
         Args:
-            progress_bar: Reserved for parity with the other backends'
-                `download(progress_bar=...)` signature; the
-                `earthaccess` fetch shows its own progress.
+            progress_bar: Forwarded to `earthaccess` as `show_progress`
+                on the download / open call, so `False` suppresses the
+                per-granule progress bar.
             aggregate: Optional
                 :class:`earthlens.aggregate.AggregationConfig`. Only
                 reached for a `"raster"` instance.
@@ -502,6 +505,7 @@ class EarthData(AbstractDataSource):
                 installed pyramids exposes no `NetCDF.reduce` /
                 `DatasetCollection.groupby` for the fetched format.
         """
+        self._show_progress = progress_bar
         paths = self._api_via_search_fetch()
         if aggregate is not None:
             return self._aggregate(paths, aggregate)

@@ -67,12 +67,20 @@ class _FakeEarthaccess(types.ModuleType):
 
     def download(self, granules, local_path=None, **kwargs: Any):
         """Record the download and return one fabricated path per granule."""
-        self.download_calls.append({"n": len(granules), "local_path": local_path})
+        self.download_calls.append(
+            {
+                "n": len(granules),
+                "local_path": local_path,
+                "show_progress": kwargs.get("show_progress"),
+            }
+        )
         return [str(Path(local_path) / f"g{i}.nc4") for i, _ in enumerate(granules)]
 
     def open(self, granules, **kwargs: Any):
         """Record the open and return one fake S3 file handle per granule."""
-        self.open_calls.append(list(granules))
+        self.open_calls.append(
+            {"granules": list(granules), "show_progress": kwargs.get("show_progress")}
+        )
         return [_FakeFile(f"/vsis3/bucket/g{i}.nc4") for i, _ in enumerate(granules)]
 
 

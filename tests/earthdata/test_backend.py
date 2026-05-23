@@ -243,6 +243,18 @@ class TestFetch:
         obj = _make(tmp_path, {"GPM_3IMERGHHL_07": ["precipitation"]})
         assert obj._in_region("us-west-2") is True
 
+    def test_progress_bar_forwarded_to_download(self, fake_earthaccess, edl_env, tmp_path):
+        """progress_bar=False is forwarded to earthaccess as show_progress."""
+        obj = _make(tmp_path, {"GPM_3IMERGHHL_07": ["precipitation"]})
+        obj.download(progress_bar=False)
+        assert fake_earthaccess.download_calls[-1]["show_progress"] is False
+
+    def test_progress_bar_forwarded_to_open(self, fake_earthaccess, edl_env, tmp_path):
+        """progress_bar is forwarded to earthaccess.open on the S3 path."""
+        obj = _make(tmp_path, {"GPM_3IMERGHHL_07": ["precipitation"]}, direct_s3="always")
+        obj.download(progress_bar=False)
+        assert fake_earthaccess.open_calls[-1]["show_progress"] is False
+
 
 class TestAggregate:
     """download(aggregate=) routing — axis-driven, not format-driven (G6)."""
