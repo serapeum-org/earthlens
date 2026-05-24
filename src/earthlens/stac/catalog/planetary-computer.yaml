@@ -131,14 +131,16 @@ collections:
     endpoint: planetary-computer
   planetary-computer/3dep-seamless:
     assets:
-      data: {}
+      data:
+        title: USGS 1/3 arc-second n34w116 1 x 1 degree
     collection_id: 3dep-seamless
     default_assets:
     - data
     endpoint: planetary-computer
   planetary-computer/alos-dem:
     assets:
-      data: {}
+      data:
+        title: S084W180
     collection_id: alos-dem
     default_assets:
     - data
@@ -248,13 +250,14 @@ collections:
     collection_id: chloris-biomass
     default_assets:
     - biomass
-    - biomass_wm
     - biomass_change
     - biomass_change_wm
+    - biomass_wm
     endpoint: planetary-computer
   planetary-computer/cop-dem-glo-90:
     assets:
-      data: {}
+      data:
+        title: S90_00_W180_00
     collection_id: cop-dem-glo-90
     default_assets:
     - data
@@ -290,9 +293,9 @@ collections:
         title: Land Cover Map Processed Area Flag
     collection_id: esa-cci-lc
     default_assets:
-    - lccs_class
     - change_count
-    - processed_flag
+    - current_pixel_state
+    - lccs_class
     - observation_count
     endpoint: planetary-computer
   planetary-computer/esa-worldcover:
@@ -307,8 +310,8 @@ collections:
         title: Land Cover Classes
     collection_id: esa-worldcover
     default_assets:
-    - map
     - input_quality
+    - map
     endpoint: planetary-computer
   planetary-computer/gap:
     assets:
@@ -321,120 +324,236 @@ collections:
   planetary-computer/gnatsgo-rasters:
     assets:
       aws0_100:
+        dtype: float32
+        nodata: 2147483647.0
         title: aws0_100
       aws0_150:
+        dtype: float32
+        nodata: 2147483647.0
         title: aws0_150
       aws0_20:
+        dtype: float32
+        nodata: 2147483647.0
         title: aws0_20
       aws0_30:
+        dtype: float32
+        nodata: 2147483647.0
         title: aws0_30
       aws0_5:
+        dtype: float32
+        nodata: 2147483647.0
         title: aws0_5
       aws0_999:
+        dtype: float32
+        nodata: 2147483647.0
         title: aws0_999
       aws100_150:
+        dtype: float32
+        nodata: 2147483647.0
         title: aws100_150
       aws150_999:
+        dtype: float32
+        nodata: 2147483647.0
         title: aws150_999
       aws20_50:
+        dtype: float32
+        nodata: 2147483647.0
         title: aws20_50
       aws50_100:
+        dtype: float32
+        nodata: 2147483647.0
         title: aws50_100
       aws5_20:
+        dtype: float32
+        nodata: 2147483647.0
         title: aws5_20
       droughty:
+        dtype: int16
+        nodata: -9999.0
         title: droughty
       mukey:
+        dtype: int32
+        nodata: 2147483647.0
         title: mukey
       musumcpct:
+        dtype: int16
+        nodata: -9999.0
         title: musumcpct
       musumcpcta:
+        dtype: int16
+        nodata: -9999.0
         title: musumcpcta
       musumcpcts:
+        dtype: int16
+        nodata: -9999.0
         title: musumcpcts
       nccpi3all:
+        dtype: float32
+        nodata: -9999.0
         title: nccpi3all
       nccpi3corn:
+        dtype: float32
+        nodata: -9999.0
         title: nccpi3corn
       nccpi3cot:
+        dtype: float32
+        nodata: -9999.0
         title: nccpi3cot
       nccpi3sg:
+        dtype: float32
+        nodata: -9999.0
         title: nccpi3sg
       nccpi3soy:
+        dtype: float32
+        nodata: -9999.0
         title: nccpi3soy
       pctearthmc:
+        dtype: int16
+        nodata: -9999.0
         title: pctearthmc
       pwsl1pomu:
+        dtype: int16
+        nodata: -9999.0
         title: pwsl1pomu
       rootznaws:
+        dtype: int16
+        nodata: -9999.0
         title: rootznaws
       rootznemc:
+        dtype: int16
+        nodata: -9999.0
         title: rootznemc
       soc0_100:
+        dtype: float32
+        nodata: -9999.0
         title: soc0_100
       soc0_150:
+        dtype: float32
+        nodata: -9999.0
         title: soc0_150
       soc0_20:
+        dtype: float32
+        nodata: -9999.0
         title: soc0_20
       soc0_30:
+        dtype: float32
+        nodata: -9999.0
         title: soc0_30
       soc0_5:
+        dtype: float32
+        nodata: -9999.0
         title: soc0_5
       soc0_999:
+        dtype: float32
+        nodata: -9999.0
         title: soc0_999
       soc100_150:
+        dtype: float32
+        nodata: -9999.0
         title: soc100_150
       soc150_999:
+        dtype: float32
+        nodata: -9999.0
         title: soc150_999
       soc20_50:
+        dtype: float32
+        nodata: -9999.0
         title: soc20_50
       soc50_100:
+        dtype: float32
+        nodata: -9999.0
         title: soc50_100
       soc5_20:
+        dtype: float32
+        nodata: -9999.0
         title: soc5_20
       tk0_100a:
+        dtype: float32
+        nodata: 2147483647.0
         title: tk0_100a
       tk0_100s:
+        dtype: float32
+        nodata: -9999.0
         title: tk0_100s
       tk0_150a:
+        dtype: float32
+        nodata: 2147483647.0
         title: tk0_150a
       tk0_150s:
+        dtype: float32
+        nodata: -9999.0
         title: tk0_150s
       tk0_20a:
+        dtype: float32
+        nodata: 2147483647.0
         title: tk0_20a
       tk0_20s:
+        dtype: float32
+        nodata: -9999.0
         title: tk0_20s
       tk0_30a:
+        dtype: float32
+        nodata: 2147483647.0
         title: tk0_30a
       tk0_30s:
+        dtype: float32
+        nodata: -9999.0
         title: tk0_30s
       tk0_5a:
+        dtype: float32
+        nodata: 2147483647.0
         title: tk0_5a
       tk0_5s:
+        dtype: float32
+        nodata: -9999.0
         title: tk0_5s
       tk0_999a:
+        dtype: float32
+        nodata: 2147483647.0
         title: tk0_999a
       tk0_999s:
+        dtype: float32
+        nodata: -9999.0
         title: tk0_999s
       tk100_150a:
+        dtype: float32
+        nodata: 2147483647.0
         title: tk100_150a
       tk100_150s:
+        dtype: float32
+        nodata: -9999.0
         title: tk100_150s
       tk150_999a:
+        dtype: float32
+        nodata: 2147483647.0
         title: tk150_999a
       tk150_999s:
+        dtype: float32
+        nodata: -9999.0
         title: tk150_999s
       tk20_50a:
+        dtype: float32
+        nodata: 2147483647.0
         title: tk20_50a
       tk20_50s:
+        dtype: float32
+        nodata: -9999.0
         title: tk20_50s
       tk50_100a:
+        dtype: float32
+        nodata: 2147483647.0
         title: tk50_100a
       tk50_100s:
+        dtype: float32
+        nodata: -9999.0
         title: tk50_100s
       tk5_20a:
+        dtype: float32
+        nodata: 2147483647.0
         title: tk5_20a
       tk5_20s:
+        dtype: float32
+        nodata: -9999.0
         title: tk5_20s
     collection_id: gnatsgo-rasters
     default_assets:
@@ -558,8 +677,8 @@ collections:
     default_assets:
     - C01_1km
     - C01_2km
-    - C02_2km
-    - C03_1km
+    - C01_2km_wm
+    - C01_DQF_1km
     endpoint: planetary-computer
   planetary-computer/hgb:
     assets:
@@ -575,8 +694,6 @@ collections:
     default_assets:
     - aboveground
     - belowground
-    - aboveground_uncertainty
-    - belowground_uncertainty
     endpoint: planetary-computer
   planetary-computer/hls2-l30:
     assets:
@@ -625,6 +742,7 @@ collections:
     - B04
     - B03
     - B02
+    - B05
     endpoint: planetary-computer
   planetary-computer/hls2-s30:
     assets:
@@ -677,6 +795,7 @@ collections:
     - B04
     - B03
     - B02
+    - B08
     endpoint: planetary-computer
   planetary-computer/hrea:
     assets:
@@ -707,7 +826,7 @@ collections:
   planetary-computer/io-lulc:
     assets:
       data:
-        title: Global land cover data
+        nodata: 0
     collection_id: io-lulc
     default_assets:
     - data
@@ -715,7 +834,7 @@ collections:
   planetary-computer/io-lulc-9-class:
     assets:
       data:
-        title: Global land cover data
+        nodata: 0
     collection_id: io-lulc-9-class
     default_assets:
     - data
@@ -723,7 +842,7 @@ collections:
   planetary-computer/io-lulc-annual-v02:
     assets:
       data:
-        title: Global land cover data
+        nodata: 0
     collection_id: io-lulc-annual-v02
     default_assets:
     - data
@@ -731,17 +850,17 @@ collections:
   planetary-computer/jrc-gsw:
     assets:
       change:
-        title: Occurrence Change Intensity
+        title: Water Occurrence Change
       extent:
         title: Maximum Water Extent
       occurrence:
-        title: Occurrence
+        title: Water Occurrence
       recurrence:
-        title: Recurrence
+        title: Water Recurrence
       seasonality:
-        title: Seasonality
+        title: Water Seasonality
       transitions:
-        title: Transitions
+        title: Water Transitions
     collection_id: jrc-gsw
     default_assets:
     - change
@@ -783,40 +902,39 @@ collections:
     - red
     - green
     - nir08
-    - nir09
     endpoint: planetary-computer
   planetary-computer/mobi:
     assets:
       PWRSR_GAP12_SUM_All:
-        title: Protection-weighted range-size rarity for all species
+        title: PWRSR_GAP12_SUM_All
       PWRSR_GAP12_SUM_AquaticInverts:
-        title: Protection-weighted range-size rarity for aquatic invertebrates
+        title: PWRSR_GAP12_SUM_AquaticInverts
       PWRSR_GAP12_SUM_Plants:
-        title: Protection-weighted range-size rarity for vascular plants
+        title: PWRSR_GAP12_SUM_Plants
       PWRSR_GAP12_SUM_PollinatorInverts:
-        title: Protection-weighted range-size rarity for pollinators
+        title: PWRSR_GAP12_SUM_PollinatorInverts
       PWRSR_GAP12_SUM_Vertebrates:
-        title: Protection-weighted range-size rarity for vertebrates
+        title: PWRSR_GAP12_SUM_Vertebrates
       RSR_All:
-        title: Range-size rarity for all species
+        title: RSR_All
       RSR_AquaticInverts:
-        title: Range-size rarity for aquatic invertebrates
+        title: RSR_AquaticInverts
       RSR_Plants:
-        title: Range-size rarity for vascular plants
+        title: RSR_Plants
       RSR_PollinatorInverts:
-        title: Range-size rarity for pollinators
+        title: RSR_PollinatorInverts
       RSR_Vertebrates:
-        title: Range-size rarity for vertebrates
+        title: RSR_Vertebrates
       SpeciesRichness_All:
-        title: Species richness for all species
+        title: SpeciesRichness_All
       SpeciesRichness_AquaticInverts:
-        title: Species richness for aquatic invertebrates
+        title: SpeciesRichness_AquaticInverts
       SpeciesRichness_Plants:
-        title: Species richness for vascular plants
+        title: SpeciesRichness_Plants
       SpeciesRichness_PollinatorInverts:
-        title: Species richness for pollinators
+        title: SpeciesRichness_PollinatorInverts
       SpeciesRichness_Vertebrates:
-        title: Species richness for vertebrates
+        title: SpeciesRichness_Vertebrates
     collection_id: mobi
     default_assets:
     - RSR_All
@@ -927,9 +1045,8 @@ collections:
     collection_id: modis-10A1-061
     default_assets:
     - NDSI
-    - orbit_pnt
     - granule_pnt
-    - NDSI_Snow_Cover
+    - orbit_pnt
     endpoint: planetary-computer
   planetary-computer/modis-10A2-061:
     assets:
@@ -942,8 +1059,8 @@ collections:
         title: Maximum snow extent over the 8-day period.
     collection_id: modis-10A2-061
     default_assets:
-    - Maximum_Snow_Extent
     - Eight_Day_Snow_Cover
+    - Maximum_Snow_Extent
     endpoint: planetary-computer
   planetary-computer/modis-11A1-061:
     assets:
@@ -985,10 +1102,10 @@ collections:
         title: Quality control for nighttime LST and emissivity
     collection_id: modis-11A1-061
     default_assets:
-    - QC_Day
-    - Emis_31
-    - Emis_32
-    - QC_Night
+    - Clear_day_cov
+    - Clear_night_cov
+    - Day_view_angl
+    - Day_view_time
     endpoint: planetary-computer
   planetary-computer/modis-11A2-061:
     assets:
@@ -1030,10 +1147,10 @@ collections:
         title: Quality control for nighttime LST and emissivity
     collection_id: modis-11A2-061
     default_assets:
-    - QC_Day
-    - Emis_31
-    - Emis_32
-    - QC_Night
+    - Clear_sky_days
+    - Clear_sky_nights
+    - Day_view_angl
+    - Day_view_time
     endpoint: planetary-computer
   planetary-computer/modis-13A1-061:
     assets:
@@ -1076,9 +1193,9 @@ collections:
     collection_id: modis-13A1-061
     default_assets:
     - 500m_16_days_EVI
-    - 500m_16_days_NDVI
-    - 500m_16_days_VI_Quality
     - 500m_16_days_MIR_reflectance
+    - 500m_16_days_NDVI
+    - 500m_16_days_NIR_reflectance
     endpoint: planetary-computer
   planetary-computer/modis-13Q1-061:
     assets:
@@ -1121,9 +1238,9 @@ collections:
     collection_id: modis-13Q1-061
     default_assets:
     - 250m_16_days_EVI
-    - 250m_16_days_NDVI
-    - 250m_16_days_VI_Quality
     - 250m_16_days_MIR_reflectance
+    - 250m_16_days_NDVI
+    - 250m_16_days_NIR_reflectance
     endpoint: planetary-computer
   planetary-computer/modis-14A1-061:
     assets:
@@ -1141,10 +1258,8 @@ collections:
         title: Position of fire pixel within scan
     collection_id: modis-14A1-061
     default_assets:
-    - QA
     - MaxFRP
     - sample
-    - FireMask
     endpoint: planetary-computer
   planetary-computer/modis-14A2-061:
     assets:
@@ -1156,8 +1271,8 @@ collections:
         title: Pixel quality indicators
     collection_id: modis-14A2-061
     default_assets:
-    - QA
     - FireMask
+    - QA
     endpoint: planetary-computer
   planetary-computer/modis-15A2H-061:
     assets:
@@ -1181,10 +1296,10 @@ collections:
         title: Leaf Area Index
     collection_id: modis-15A2H-061
     default_assets:
-    - Lai_500m
-    - Fpar_500m
-    - FparLai_QC
     - FparExtra_QC
+    - FparLai_QC
+    - FparStdDev_500m
+    - Fpar_500m
     endpoint: planetary-computer
   planetary-computer/modis-15A3H-061:
     assets:
@@ -1208,10 +1323,10 @@ collections:
         title: Leaf Area Index
     collection_id: modis-15A3H-061
     default_assets:
-    - Lai_500m
-    - Fpar_500m
-    - FparLai_QC
     - FparExtra_QC
+    - FparLai_QC
+    - FparStdDev_500m
+    - Fpar_500m
     endpoint: planetary-computer
   planetary-computer/modis-16A3GF-061:
     assets:
@@ -1233,9 +1348,9 @@ collections:
     collection_id: modis-16A3GF-061
     default_assets:
     - ET_500m
+    - ET_QC_500m
     - LE_500m
     - PET_500m
-    - PLE_500m
     endpoint: planetary-computer
   planetary-computer/modis-17A2H-061:
     assets:
@@ -1325,10 +1440,10 @@ collections:
         title: Night Time of Observation
     collection_id: modis-21A2-061
     default_assets:
+    - LST_Day_1KM
+    - LST_Night_1KM
     - QC_Day
-    - Emis_29
-    - Emis_31
-    - Emis_32
+    - QC_Night
     endpoint: planetary-computer
   planetary-computer/modis-43A4-061:
     assets:
@@ -1406,10 +1521,8 @@ collections:
         title: Quality Assurance Indicators
     collection_id: modis-64A1-061
     default_assets:
-    - QA
-    - Last_Day
-    - Burn_Date
     - First_Day
+    - Last_Day
     endpoint: planetary-computer
   planetary-computer/mtbs:
     assets:
@@ -1473,9 +1586,9 @@ collections:
     collection_id: noaa-cdr-ocean-heat-content
     default_assets:
     - heat_content
+    - mean_halosteric_sea_level
     - mean_salinity
     - mean_temperature
-    - mean_halosteric_sea_level
     endpoint: planetary-computer
   planetary-computer/noaa-cdr-sea-surface-temperature-optimum-interpolation:
     assets:
@@ -1493,10 +1606,10 @@ collections:
         nodata: -999
     collection_id: noaa-cdr-sea-surface-temperature-optimum-interpolation
     default_assets:
+    - anom
     - err
     - ice
     - sst
-    - anom
     endpoint: planetary-computer
   planetary-computer/noaa-cdr-sea-surface-temperature-whoi:
     assets:
@@ -1581,10 +1694,10 @@ collections:
         nodata: nan
     collection_id: noaa-climate-normals-gridded
     default_assets:
+    - m2dprcp_norm
+    - prcp_flag
     - prcp_max
     - prcp_min
-    - prcp_std
-    - tavg_max
     endpoint: planetary-computer
   planetary-computer/noaa-mrms-qpe-1h-pass1:
     assets:
@@ -1651,7 +1764,8 @@ collections:
   planetary-computer/planet-nicfi-analytic:
     assets:
       data:
-        title: Data
+        common_name: blue
+        dtype: uint16
     collection_id: planet-nicfi-analytic
     default_assets:
     - data
@@ -1659,7 +1773,8 @@ collections:
   planetary-computer/planet-nicfi-visual:
     assets:
       data:
-        title: Data
+        common_name: red
+        dtype: uint8
     collection_id: planet-nicfi-visual
     default_assets:
     - data
@@ -1670,16 +1785,10 @@ collections:
         title: 'HH: horizontal transmit, horizontal receive'
       hv:
         title: 'HV: horizontal transmit, vertical receive'
-      vh:
-        title: 'VH: vertical transmit, horizontal receive'
-      vv:
-        title: 'VV: vertical transmit, vertical receive'
     collection_id: sentinel-1-grd
     default_assets:
     - hh
     - hv
-    - vh
-    - vv
     endpoint: planetary-computer
   planetary-computer/sentinel-1-rtc:
     assets:
@@ -1701,10 +1810,10 @@ collections:
         title: 'VV: vertical transmit, vertical receive'
     collection_id: sentinel-1-rtc
     default_assets:
+    - vv
+    - vh
     - hh
     - hv
-    - vh
-    - vv
     endpoint: planetary-computer
   planetary-computer/usda-cdl:
     assets:
@@ -1731,8 +1840,8 @@ collections:
         nodata: 255
     collection_id: usda-cdl
     default_assets:
+    - confidence
     - corn
-    - wheat
     - cotton
     - cropland
     endpoint: planetary-computer
@@ -1779,10 +1888,10 @@ collections:
         title: Time of Spectral Change
     collection_id: usgs-lcmap-conus-v13
     default_assets:
+    - browse
+    - lcachg
+    - lcpconf
     - lcpri
-    - lcsec
-    - scmag
-    - scmqa
     endpoint: planetary-computer
   planetary-computer/usgs-lcmap-hawaii-v10:
     assets:
@@ -1827,10 +1936,10 @@ collections:
         title: Time of Spectral Change
     collection_id: usgs-lcmap-hawaii-v10
     default_assets:
+    - browse
+    - lcachg
+    - lcpconf
     - lcpri
-    - lcsec
-    - scmag
-    - scmqa
     endpoint: planetary-computer
   sentinel-2-l2a:
     aliases:

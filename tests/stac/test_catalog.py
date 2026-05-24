@@ -73,6 +73,18 @@ class TestBundledCatalog:
         for key in namespaced[:20]:
             assert key.split("/", 1)[0] == cat.get_collection(key).endpoint
 
+    def test_default_assets_prefer_imagery_not_qa(self):
+        """default_assets pick spectral bands, not QA/quality/uncertainty assets."""
+        cat = Catalog()
+        # Landsat: RGB+NIR, not the qa_pixel/qa_radsat the alphabetical pick chose.
+        assert cat.get_collection("earth-search/landsat-c2-l2").default_assets == [
+            "red", "green", "blue", "nir08",
+        ]
+        # CDSE NDVI: the data band, not the uncertainty/quality/count bands.
+        assert cat.get_collection("cdse/clms_ndvi_global_1km_10daily_v3_cog").default_assets == [
+            "ndvi_ndvi",
+        ]
+
 
 @pytest.mark.stac
 class TestResolve:

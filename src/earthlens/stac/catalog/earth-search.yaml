@@ -100,10 +100,10 @@ collections:
         title: Upwelled Radiance Band
     collection_id: landsat-c2-l2
     default_assets:
-    - qa_pixel
-    - qa_radsat
-    - coastal
+    - red
+    - green
     - blue
+    - nir08
     endpoint: earth-search
   earth-search/sentinel-1-grd:
     assets:
@@ -125,10 +125,10 @@ collections:
         title: VV Data
     collection_id: sentinel-1-grd
     default_assets:
+    - vv
+    - vh
     - hh
     - hv
-    - vh
-    - vv
     endpoint: earth-search
   earth-search/sentinel-2-l2a:
     assets:
@@ -209,9 +209,10 @@ collections:
         title: Water vapour (WVP)
     collection_id: sentinel-2-l2a
     default_assets:
-    - visual
+    - red
     - green
     - blue
+    - nir
     endpoint: earth-search
   earth-search/sentinel-2-pre-c1-l2a:
     assets:
@@ -308,6 +309,7 @@ collections:
     - preview
     - green
     - blue
+    - nir
     endpoint: earth-search
   naip:
     assets:

@@ -60,7 +60,6 @@ collections:
     collection_id: clms_dmp_global_1km_10daily_v2_cog
     default_assets:
     - dmp_dmp
-    - dmp_qflag
     endpoint: cdse
   cdse/clms_dmp_global_300m_10daily_v1_cog:
     assets:
@@ -71,7 +70,6 @@ collections:
     collection_id: clms_dmp_global_300m_10daily_v1_cog
     default_assets:
     - dmp300_dmp
-    - dmp300_qflag
     endpoint: cdse
   cdse/clms_dmp_global_300m_10daily_v2_cog:
     assets:
@@ -82,7 +80,6 @@ collections:
     collection_id: clms_dmp_global_300m_10daily_v2_cog
     default_assets:
     - dmp300_dmp
-    - dmp300_qflag
     endpoint: cdse
   cdse/clms_eta_global_300m_10daily_v1_cog:
     assets:
@@ -118,10 +115,10 @@ collections:
         title: Dekadal actual transpiration (from canopy) TSEB-PT
     collection_id: clms_eta_global_300m_10daily_v1_cog
     default_assets:
-    - gfd
-    - flag
-    - nobs
+    - e_ensemble
+    - e_etlook
     - e_std
+    - e_tsebpt
     endpoint: cdse
   cdse/clms_fapar_global_1km_10daily_v2_cog:
     assets:
@@ -142,10 +139,10 @@ collections:
           Radiation
     collection_id: clms_fapar_global_1km_10daily_v2_cog
     default_assets:
-    - fapar_nobs
-    - fapar_rmse
     - fapar_fapar
-    - fapar_qflag
+    - fapar_lafter
+    - fapar_lbefore
+    - fapar_rmse
     endpoint: cdse
   cdse/clms_fapar_global_300m_10daily_v1_cog:
     assets:
@@ -166,10 +163,10 @@ collections:
           Radiation
     collection_id: clms_fapar_global_300m_10daily_v1_cog
     default_assets:
-    - fapar300_nobs
-    - fapar300_rmse
     - fapar300_fapar
-    - fapar300_qflag
+    - fapar300_lafter
+    - fapar300_lbefore
+    - fapar300_rmse
     endpoint: cdse
   cdse/clms_fapar_global_300m_10daily_v2_cog:
     assets:
@@ -190,10 +187,10 @@ collections:
           Radiation
     collection_id: clms_fapar_global_300m_10daily_v2_cog
     default_assets:
-    - fapar300_nobs
-    - fapar300_rmse
     - fapar300_fapar
-    - fapar300_qflag
+    - fapar300_lafter
+    - fapar300_lbefore
+    - fapar300_rmse
     endpoint: cdse
   cdse/clms_fcover_global_1km_10daily_v2_cog:
     assets:
@@ -213,10 +210,10 @@ collections:
         title: Root Mean Square Error on Fraction of green Vegetation Cover
     collection_id: clms_fcover_global_1km_10daily_v2_cog
     default_assets:
-    - fcover_nobs
-    - fcover_rmse
-    - fcover_qflag
     - fcover_fcover
+    - fcover_lafter
+    - fcover_lbefore
+    - fcover_rmse
     endpoint: cdse
   cdse/clms_fcover_global_300m_10daily_v1_cog:
     assets:
@@ -236,10 +233,10 @@ collections:
         title: Root Mean Square Error on Fraction of green Vegetation Cover
     collection_id: clms_fcover_global_300m_10daily_v1_cog
     default_assets:
-    - fcover300_nobs
-    - fcover300_rmse
-    - fcover300_qflag
     - fcover300_fcover
+    - fcover300_lafter
+    - fcover300_lbefore
+    - fcover300_rmse
     endpoint: cdse
   cdse/clms_fcover_global_300m_10daily_v2_cog:
     assets:
@@ -259,10 +256,10 @@ collections:
         title: Root Mean Square Error on Fraction of green Vegetation Cover
     collection_id: clms_fcover_global_300m_10daily_v2_cog
     default_assets:
-    - fcover300_nobs
-    - fcover300_rmse
-    - fcover300_qflag
     - fcover300_fcover
+    - fcover300_lafter
+    - fcover300_lbefore
+    - fcover300_rmse
     endpoint: cdse
   cdse/clms_gdmp_global_1km_10daily_v2_cog:
     assets:
@@ -273,7 +270,6 @@ collections:
     collection_id: clms_gdmp_global_1km_10daily_v2_cog
     default_assets:
     - gdmp_gdmp
-    - gdmp_qflag
     endpoint: cdse
   cdse/clms_gdmp_global_300m_10daily_v1_cog:
     assets:
@@ -284,7 +280,6 @@ collections:
     collection_id: clms_gdmp_global_300m_10daily_v1_cog
     default_assets:
     - gdmp300_gdmp
-    - gdmp300_qflag
     endpoint: cdse
   cdse/clms_gdmp_global_300m_10daily_v2_cog:
     assets:
@@ -295,7 +290,6 @@ collections:
     collection_id: clms_gdmp_global_300m_10daily_v2_cog
     default_assets:
     - gdmp300_gdmp
-    - gdmp300_qflag
     endpoint: cdse
   cdse/clms_gpp_global_300m_10daily_v1_cog:
     assets:
@@ -306,7 +300,6 @@ collections:
     collection_id: clms_gpp_global_300m_10daily_v1_cog
     default_assets:
     - gpp300_gpp
-    - gpp300_qflag
     endpoint: cdse
   cdse/clms_gpp_global_300m_10daily_v2_cog:
     assets:
@@ -317,7 +310,6 @@ collections:
     collection_id: clms_gpp_global_300m_10daily_v2_cog
     default_assets:
     - gpp300_gpp
-    - gpp300_qflag
     endpoint: cdse
   cdse/clms_hf_global_300m_daily_v1_cog:
     assets:
@@ -329,9 +321,9 @@ collections:
         title: Overpass Time (UTC)
     collection_id: clms_hf_global_300m_daily_v1_cog
     default_assets:
-    - ot
     - h_tsebpt
     - le_tsebpt
+    - ot
     endpoint: cdse
   cdse/clms_lai_global_1km_10daily_v2_cog:
     assets:
@@ -349,10 +341,10 @@ collections:
         title: Root Mean Square Error on Leaf Area Index
     collection_id: clms_lai_global_1km_10daily_v2_cog
     default_assets:
+    - lai_lafter
     - lai_lai
-    - lai_nobs
+    - lai_lbefore
     - lai_rmse
-    - lai_qflag
     endpoint: cdse
   cdse/clms_lai_global_300m_10daily_v1_cog:
     assets:
@@ -370,10 +362,10 @@ collections:
         title: Root Mean Square Error on Leaf Area Index
     collection_id: clms_lai_global_300m_10daily_v1_cog
     default_assets:
+    - lai300_lafter
     - lai300_lai
-    - lai300_nobs
+    - lai300_lbefore
     - lai300_rmse
-    - lai300_qflag
     endpoint: cdse
   cdse/clms_lai_global_300m_10daily_v2_cog:
     assets:
@@ -391,10 +383,10 @@ collections:
         title: Root Mean Square Error on Leaf Area Index
     collection_id: clms_lai_global_300m_10daily_v2_cog
     default_assets:
+    - lai300_lafter
     - lai300_lai
-    - lai300_nobs
+    - lai300_lbefore
     - lai300_rmse
-    - lai300_qflag
     endpoint: cdse
   cdse/clms_lc_global_100m_yearly_v3_cog:
     assets:
@@ -433,10 +425,10 @@ collections:
         title: Percent Vegetation Cover (PVC) for forest land cover class
     collection_id: clms_lc_global_100m_yearly_v3_cog
     default_assets:
-    - forest_type_layer
-    - datadensityindicator
-    - change_confidence_layer
     - bare_coverfraction_layer
+    - builtup_coverfraction_layer
+    - change_confidence_layer
+    - crops_coverfraction_layer
     endpoint: cdse
   cdse/clms_lcm_global_10m_yearly_v1_cog:
     assets:
@@ -471,8 +463,8 @@ collections:
           Ice Extent
     collection_id: clms_lie_global_500m_daily_v2_cog
     default_assets:
-    - lie500_p
     - lie500_lie
+    - lie500_p
     endpoint: cdse
   cdse/clms_lie_northernhemisphere_500m_daily_v1_cog:
     assets:
@@ -483,8 +475,8 @@ collections:
           Ice Extent
     collection_id: clms_lie_northernhemisphere_500m_daily_v1_cog
     default_assets:
-    - lie_nh_p
     - lie_nh_lie
+    - lie_nh_p
     endpoint: cdse
   cdse/clms_lsp_global_300m_yearly_v1_cog:
     assets:
@@ -546,10 +538,10 @@ collections:
         title: Total productivity season 2
     collection_id: clms_lsp_global_300m_yearly_v1_cog
     default_assets:
-    - lsp300_qa_s1
-    - lsp300_qa_s2
     - lsp300_ampl_s1
     - lsp300_ampl_s2
+    - lsp300_eosd_s1
+    - lsp300_eosd_s2
     endpoint: cdse
   cdse/clms_lsp_global_300m_yearly_v2_cog:
     assets:
@@ -611,10 +603,10 @@ collections:
         title: Total productivity season 2
     collection_id: clms_lsp_global_300m_yearly_v2_cog
     default_assets:
-    - lsp300_qa_s1
-    - lsp300_qa_s2
     - lsp300_ampl_s1
     - lsp300_ampl_s2
+    - lsp300_eosd_s1
+    - lsp300_eosd_s2
     endpoint: cdse
   cdse/clms_lst-daily-cycle_global_3km_10daily_v3_cog:
     assets:
@@ -636,10 +628,10 @@ collections:
         title: Minimum at 12-23 hr on Land Surface Temperature
     collection_id: clms_lst-daily-cycle_global_3km_10daily_v3_cog
     default_assets:
+    - lst10_dc_fobs_00_11
+    - lst10_dc_fobs_12_23
     - lst10_dc_max_00_11
     - lst10_dc_max_12_23
-    - lst10_dc_min_00_11
-    - lst10_dc_min_12_23
     endpoint: cdse
   cdse/clms_lst-daily-cycle_global_5km_10daily_v1_cog:
     assets:
@@ -661,10 +653,10 @@ collections:
         title: Minimum at 12-23 hr on Land Surface Temperature
     collection_id: clms_lst-daily-cycle_global_5km_10daily_v1_cog
     default_assets:
+    - lst10_dc_fobs_00_11
+    - lst10_dc_fobs_12_23
     - lst10_dc_max_00_11
     - lst10_dc_max_12_23
-    - lst10_dc_min_00_11
-    - lst10_dc_min_12_23
     endpoint: cdse
   cdse/clms_lst-daily-cycle_global_5km_10daily_v2_cog:
     assets:
@@ -686,10 +678,10 @@ collections:
         title: Minimum at 12-23 hr on Land Surface Temperature
     collection_id: clms_lst-daily-cycle_global_5km_10daily_v2_cog
     default_assets:
+    - lst10_dc_fobs_00_11
+    - lst10_dc_fobs_12_23
     - lst10_dc_max_00_11
     - lst10_dc_max_12_23
-    - lst10_dc_min_00_11
-    - lst10_dc_min_12_23
     endpoint: cdse
   cdse/clms_lst-tci_global_3km_10daily_v3_cog:
     assets:
@@ -705,10 +697,10 @@ collections:
         title: Thermal Conditions Index
     collection_id: clms_lst-tci_global_3km_10daily_v3_cog
     default_assets:
-    - lst10_tci_max
-    - lst10_tci_min
-    - lst10_tci_tci
     - lst10_tci_fobs
+    - lst10_tci_max
+    - lst10_tci_median
+    - lst10_tci_min
     endpoint: cdse
   cdse/clms_lst-tci_global_5km_10daily_v1_cog:
     assets:
@@ -724,10 +716,10 @@ collections:
         title: Thermal Conditions Index
     collection_id: clms_lst-tci_global_5km_10daily_v1_cog
     default_assets:
-    - lst10_tci_max
-    - lst10_tci_min
-    - lst10_tci_tci
     - lst10_tci_fobs
+    - lst10_tci_max
+    - lst10_tci_median
+    - lst10_tci_min
     endpoint: cdse
   cdse/clms_lst-tci_global_5km_10daily_v2_cog:
     assets:
@@ -743,10 +735,10 @@ collections:
         title: Thermal Conditions Index
     collection_id: clms_lst-tci_global_5km_10daily_v2_cog
     default_assets:
-    - lst10_tci_max
-    - lst10_tci_min
-    - lst10_tci_tci
     - lst10_tci_fobs
+    - lst10_tci_max
+    - lst10_tci_median
+    - lst10_tci_min
     endpoint: cdse
   cdse/clms_lst_global_3km_hourly_v3_cog:
     assets:
@@ -760,10 +752,9 @@ collections:
         title: Time delta between observation and reference time on Land Surface Temperature
     collection_id: clms_lst_global_3km_hourly_v3_cog
     default_assets:
-    - lst_lst
-    - lst_qflag
-    - lst_tdelta
     - lst_errorbar
+    - lst_lst
+    - lst_tdelta
     endpoint: cdse
   cdse/clms_lst_global_5km_hourly_v1_cog:
     assets:
@@ -779,9 +770,9 @@ collections:
         title: Time delta between observation and reference time on Land Surface Temperature
     collection_id: clms_lst_global_5km_hourly_v1_cog
     default_assets:
+    - lst_errorbar
     - lst_lst
     - lst_ppp
-    - lst_qflag
     - lst_tdelta
     endpoint: cdse
   cdse/clms_lst_global_5km_hourly_v2_cog:
@@ -798,9 +789,9 @@ collections:
         title: Time delta between observation and reference time on Land Surface Temperature
     collection_id: clms_lst_global_5km_hourly_v2_cog
     default_assets:
+    - lst_errorbar
     - lst_lst
     - lst_ppp
-    - lst_qflag
     - lst_tdelta
     endpoint: cdse
   cdse/clms_lswt-nrt_global_1km_10daily_v1_cog:
@@ -821,9 +812,9 @@ collections:
         title: Uncertainty on Lake Surface Water Temperature
     collection_id: clms_lswt-nrt_global_1km_10daily_v1_cog
     default_assets:
-    - lswt_unc
     - lswt_lswt
-    - lswt_nobs
+    - lswt_qlevel
+    - lswt_stdev
     - lswt_tobs
     endpoint: cdse
   cdse/clms_lswt-offline_global_1km_10daily_v1_cog:
@@ -842,9 +833,9 @@ collections:
         title: Uncertainty on Lake Surface Water Temperature
     collection_id: clms_lswt-offline_global_1km_10daily_v1_cog
     default_assets:
-    - lswt_unc
     - lswt_lswt
-    - lswt_nobs
+    - lswt_qlevel
+    - lswt_stdev
     - lswt_tobs
     endpoint: cdse
   cdse/clms_lwq-nrt_global_100m_10daily_v1_cog:
@@ -889,10 +880,10 @@ collections:
         title: Trophic state index
     collection_id: clms_lwq-nrt_global_100m_10daily_v1_cog
     default_assets:
-    - lwq100_tsi
     - lwq100_fobs
     - lwq100_lobs
-    - lwq100_nobs
+    - lwq100_rw1375
+    - lwq100_rw1610
     endpoint: cdse
   cdse/clms_lwq-nrt_global_100m_10daily_v2_cog:
     assets:
@@ -944,10 +935,10 @@ collections:
         title: Mean concentration of total suspended matter
     collection_id: clms_lwq-nrt_global_100m_10daily_v2_cog
     default_assets:
-    - lwq100_tsi
+    - lwq100_chlamean
+    - lwq100_fcbprob
     - lwq100_fobs
     - lwq100_lobs
-    - lwq100_nobs
     endpoint: cdse
   cdse/clms_lwq-nrt_global_300m_10daily_v1_cog:
     assets:
@@ -1016,10 +1007,10 @@ collections:
         title: Standar deviation of turbidity in water body
     collection_id: clms_lwq-nrt_global_300m_10daily_v1_cog
     default_assets:
-    - lwq300_tsi
     - lwq300_fobs
     - lwq300_lobs
-    - lwq300_nobs
+    - lwq300_rw1020
+    - lwq300_rw400
     endpoint: cdse
   cdse/clms_lwq-nrt_global_300m_10daily_v2_cog:
     assets:
@@ -1087,10 +1078,10 @@ collections:
           at peak reflectance
     collection_id: clms_lwq-nrt_global_300m_10daily_v2_cog
     default_assets:
-    - lwq300_tsi
-    - lwq300_unc
+    - lwq300_chlamean
+    - lwq300_chlaunc
+    - lwq300_fcbprob
     - lwq300_fobs
-    - lwq300_lobs
     endpoint: cdse
   cdse/clms_lwq-reproc_global_300m_10daily_v1_cog:
     assets:
@@ -1147,10 +1138,10 @@ collections:
         title: Standar deviation of turbidity in water body
     collection_id: clms_lwq-reproc_global_300m_10daily_v1_cog
     default_assets:
-    - lwq300_tsi
     - lwq300_fobs
     - lwq300_lobs
-    - lwq300_nobs
+    - lwq300_rw412
+    - lwq300_rw443
     endpoint: cdse
   cdse/clms_ndvi-lts_global_1km_10daily_v2_cog:
     assets:
@@ -1170,9 +1161,9 @@ collections:
     collection_id: clms_ndvi-lts_global_1km_10daily_v2_cog
     default_assets:
     - ndvi_max_lts
-    - ndvi_min_lts
     - ndvi_mean_lts
-    - ndvi_nobs_lts
+    - ndvi_median_lts
+    - ndvi_min_lts
     endpoint: cdse
   cdse/clms_ndvi-lts_global_1km_10daily_v3_cog:
     assets:
@@ -1192,9 +1183,9 @@ collections:
     collection_id: clms_ndvi-lts_global_1km_10daily_v3_cog
     default_assets:
     - ndvi_max_lts
-    - ndvi_min_lts
     - ndvi_mean_lts
-    - ndvi_nobs_lts
+    - ndvi_median_lts
+    - ndvi_min_lts
     endpoint: cdse
   cdse/clms_ndvi_global_1km_10daily_v2_cog:
     assets:
@@ -1205,7 +1196,6 @@ collections:
     collection_id: clms_ndvi_global_1km_10daily_v2_cog
     default_assets:
     - ndvi_ndvi
-    - ndvi_timegrid
     endpoint: cdse
   cdse/clms_ndvi_global_1km_10daily_v3_cog:
     assets:
@@ -1221,10 +1211,7 @@ collections:
         title: Uncertainty on Normalized Difference Vegetation Index
     collection_id: clms_ndvi_global_1km_10daily_v3_cog
     default_assets:
-    - ndvi_unc
     - ndvi_ndvi
-    - ndvi_nobs
-    - ndvi_qflag
     endpoint: cdse
   cdse/clms_ndvi_global_300m_10daily_v1_cog:
     assets:
@@ -1246,10 +1233,7 @@ collections:
         title: Uncertainty on Normalized Difference Vegetation Index
     collection_id: clms_ndvi_global_300m_10daily_v2_cog
     default_assets:
-    - ndvi300_unc
     - ndvi300_ndvi
-    - ndvi300_nobs
-    - ndvi300_qflag
     endpoint: cdse
   cdse/clms_ndvi_global_300m_10daily_v3_cog:
     assets:
@@ -1263,10 +1247,7 @@ collections:
         title: Uncertainty on Normalized Difference Vegetation Index
     collection_id: clms_ndvi_global_300m_10daily_v3_cog
     default_assets:
-    - ndvi300_unc
     - ndvi300_ndvi
-    - ndvi300_nobs
-    - ndvi300_qflag
     endpoint: cdse
   cdse/clms_npp_global_300m_10daily_v1_cog:
     assets:
@@ -1277,7 +1258,6 @@ collections:
     collection_id: clms_npp_global_300m_10daily_v1_cog
     default_assets:
     - npp300_npp
-    - npp300_qflag
     endpoint: cdse
   cdse/clms_npp_global_300m_10daily_v2_cog:
     assets:
@@ -1288,7 +1268,6 @@ collections:
     collection_id: clms_npp_global_300m_10daily_v2_cog
     default_assets:
     - npp300_npp
-    - npp300_qflag
     endpoint: cdse
   cdse/clms_sce_europe_500m_daily_v1_cog:
     assets:
@@ -1307,7 +1286,6 @@ collections:
     collection_id: clms_sce_global_1km_daily_v1_cog
     default_assets:
     - sce_sce
-    - sce_unc
     endpoint: cdse
   cdse/clms_sce_northernhemisphere_1km_daily_v1_cog:
     assets:
@@ -1325,8 +1303,8 @@ collections:
         title: Surface Soil Moisture
     collection_id: clms_ssm_europe_1km_daily_v1_cog
     default_assets:
-    - ssm1km_ssm
     - ssm1km_noise
+    - ssm1km_ssm
     endpoint: cdse
   cdse/clms_swe_northernhemisphere_5km_daily_v1_cog:
     assets:
@@ -2038,8 +2016,8 @@ collections:
         title: Water Bodies
     collection_id: clms_wb_global_100m_monthly_v1_cog
     default_assets:
-    - wb100_wb
     - wb100_qual
+    - wb100_wb
     endpoint: cdse
   cdse/clms_wb_global_1km_10daily_v2_cog:
     assets:
@@ -2049,8 +2027,8 @@ collections:
         title: Water Bodies
     collection_id: clms_wb_global_1km_10daily_v2_cog
     default_assets:
-    - wb_wb
     - wb_qual
+    - wb_wb
     endpoint: cdse
   cdse/clms_wb_global_300m_10daily_v1_cog:
     assets:
@@ -2060,8 +2038,8 @@ collections:
         title: Water Bodies
     collection_id: clms_wb_global_300m_10daily_v1_cog
     default_assets:
-    - wb300_wb
     - wb300_qual
+    - wb300_wb
     endpoint: cdse
   cdse/clms_wb_global_300m_monthly_v2_cog:
     assets:
@@ -2071,8 +2049,8 @@ collections:
         title: Water Bodies
     collection_id: clms_wb_global_300m_monthly_v2_cog
     default_assets:
-    - wb300_wb
     - wb300_qual
+    - wb300_wb
     endpoint: cdse
   cdse/cop-dem-eea-10-laea-tif:
     assets:
@@ -2176,9 +2154,9 @@ collections:
     collection_id: landsat-c2-l1-oli-tirs
     default_assets:
     - B1
+    - B10
+    - B11
     - B2
-    - B3
-    - B4
     endpoint: cdse
   cdse/landsat-c2-l1-tirs:
     assets:
@@ -2194,8 +2172,6 @@ collections:
     default_assets:
     - B10
     - B11
-    - qa_pixel
-    - qa_radsat
     endpoint: cdse
   cdse/opengeohub-landsat-bimonthly-mosaic-v1.0.1:
     assets:
@@ -2355,10 +2331,10 @@ collections:
         title: 'VV: Vertical transmit, vertical receive'
     collection_id: sentinel-1-slc
     default_assets:
-    - s1-hh
-    - s1-hv
-    - s1-vh
-    - s1-vv
+    - ew1-hh
+    - ew1-hv
+    - ew1-vh
+    - ew1-vv
     endpoint: cdse
   cdse/sentinel-1-slc-wv:
     assets:
