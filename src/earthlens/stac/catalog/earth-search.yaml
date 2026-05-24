@@ -1,19 +1,329 @@
-# Curated collections whose home endpoint is Earth Search (Element 84 / AWS).
-#
-# Sentinel-2 L2A and Copernicus DEM are served here too, but their home
-# definitions live in planetary-computer.yaml with an `earth-search:` alias
-# (Earth Search calls Sentinel-2 L2A `sentinel-2-c1-l2a`). Earth-Search-native
-# collections (e.g. NAIP, Sentinel-2 pre-COG) are added here by
-# tools/stac/refresh_stac_catalog.py / add-collection.
+# Curated collections served by Earth Search (Element 84 / AWS).
 
 collections:
-  naip:
-    endpoint: earth-search
-    collection_id: naip
-    default_assets: [image]
-    resolution: 1.0
-    extent:
-      start_date: "2010-01-01"
-      bbox: [-125.0, 24.0, -66.0, 50.0]
+  earth-search/cop-dem-glo-90:
     assets:
-      image: {common_name: rgbn, dtype: uint8, title: NAIP RGBN imagery}
+      data:
+        dtype: float32
+        title: Data
+    collection_id: cop-dem-glo-90
+    default_assets:
+    - data
+    endpoint: earth-search
+  earth-search/landsat-c2-l2:
+    assets:
+      atmos_opacity:
+        dtype: int16
+        nodata: -9999
+        title: Atmospheric Opacity Band
+      atran:
+        dtype: int16
+        nodata: -9999
+        title: Atmospheric Transmittance Band
+      blue:
+        dtype: uint16
+        nodata: 0
+        title: Blue Band
+      cdist:
+        dtype: int16
+        nodata: -9999
+        title: Cloud Distance Band
+      cloud_qa:
+        dtype: uint8
+        title: Cloud Quality Assessment Band
+      coastal:
+        dtype: uint16
+        nodata: 0
+        title: Coastal/Aerosol Band
+      drad:
+        dtype: int16
+        nodata: -9999
+        title: Downwelled Radiance Band
+      emis:
+        dtype: int16
+        nodata: -9999
+        title: Emissivity Band
+      emsd:
+        dtype: int16
+        nodata: -9999
+        title: Emissivity Standard Deviation Band
+      green:
+        dtype: uint16
+        nodata: 0
+        title: Green Band
+      lwir:
+        dtype: uint16
+        nodata: 0
+        title: Surface Temperature Band
+      lwir11:
+        dtype: uint16
+        nodata: 0
+        title: Surface Temperature Band
+      nir08:
+        dtype: uint16
+        nodata: 0
+        title: Near Infrared Band 0.8
+      qa:
+        dtype: int16
+        nodata: -9999
+        title: Surface Temperature Quality Assessment Band
+      qa_aerosol:
+        dtype: uint8
+        nodata: 1
+        title: Aerosol Quality Assessment Band
+      qa_pixel:
+        dtype: uint16
+        nodata: 1
+        title: Pixel Quality Assessment Band
+      qa_radsat:
+        dtype: uint16
+        title: Radiometric Saturation Quality Assessment Band
+      red:
+        dtype: uint16
+        nodata: 0
+        title: Red Band
+      swir16:
+        dtype: uint16
+        nodata: 0
+        title: Short-wave Infrared Band 1.6
+      swir22:
+        dtype: uint16
+        nodata: 0
+        title: Short-wave Infrared Band 2.2
+      trad:
+        dtype: int16
+        nodata: -9999
+        title: Thermal Radiance Band
+      urad:
+        dtype: int16
+        nodata: -9999
+        title: Upwelled Radiance Band
+    collection_id: landsat-c2-l2
+    default_assets:
+    - qa_pixel
+    - qa_radsat
+    - coastal
+    - blue
+    endpoint: earth-search
+  earth-search/sentinel-1-grd:
+    assets:
+      hh:
+        dtype: uint16
+        nodata: 0
+        title: HH Data
+      hv:
+        dtype: uint16
+        nodata: 0
+        title: HV Data
+      vh:
+        dtype: uint16
+        nodata: 0
+        title: VH Data
+      vv:
+        dtype: uint16
+        nodata: 0
+        title: VV Data
+    collection_id: sentinel-1-grd
+    default_assets:
+    - hh
+    - hv
+    - vh
+    - vv
+    endpoint: earth-search
+  earth-search/sentinel-2-l2a:
+    assets:
+      aot:
+        dtype: uint16
+        nodata: 0
+        title: Aerosol optical thickness (AOT)
+      blue:
+        common_name: blue
+        dtype: uint16
+        nodata: 0
+        title: Blue (band 2) - 10m
+      coastal:
+        common_name: coastal
+        dtype: uint16
+        nodata: 0
+        title: Coastal aerosol (band 1) - 60m
+      green:
+        common_name: green
+        dtype: uint16
+        nodata: 0
+        title: Green (band 3) - 10m
+      nir:
+        common_name: nir
+        dtype: uint16
+        nodata: 0
+        title: NIR 1 (band 8) - 10m
+      nir08:
+        common_name: nir08
+        dtype: uint16
+        nodata: 0
+        title: NIR 2 (band 8A) - 20m
+      nir09:
+        common_name: nir09
+        dtype: uint16
+        nodata: 0
+        title: NIR 3 (band 9) - 60m
+      red:
+        common_name: red
+        dtype: uint16
+        nodata: 0
+        title: Red (band 4) - 10m
+      rededge1:
+        common_name: rededge
+        dtype: uint16
+        nodata: 0
+        title: Red edge 1 (band 5) - 20m
+      rededge2:
+        common_name: rededge
+        dtype: uint16
+        nodata: 0
+        title: Red edge 2 (band 6) - 20m
+      rededge3:
+        common_name: rededge
+        dtype: uint16
+        nodata: 0
+        title: Red edge 3 (band 7) - 20m
+      scl:
+        dtype: uint8
+        nodata: 0
+        title: Scene classification map (SCL)
+      swir16:
+        common_name: swir16
+        dtype: uint16
+        nodata: 0
+        title: SWIR 1 (band 11) - 20m
+      swir22:
+        common_name: swir22
+        dtype: uint16
+        nodata: 0
+        title: SWIR 2 (band 12) - 20m
+      visual:
+        common_name: red
+        title: True color image
+      wvp:
+        dtype: uint16
+        nodata: 0
+        title: Water vapour (WVP)
+    collection_id: sentinel-2-l2a
+    default_assets:
+    - visual
+    - green
+    - blue
+    endpoint: earth-search
+  earth-search/sentinel-2-pre-c1-l2a:
+    assets:
+      aot:
+        dtype: uint16
+        nodata: 0
+        title: Aerosol optical thickness (AOT)
+      blue:
+        common_name: blue
+        dtype: uint16
+        nodata: 0
+        title: Blue - 10m
+      cloud:
+        dtype: uint8
+        nodata: 0
+        title: Cloud Probabilities
+      coastal:
+        common_name: coastal
+        dtype: uint16
+        nodata: 0
+        title: Coastal - 60m
+      green:
+        common_name: green
+        dtype: uint16
+        nodata: 0
+        title: Green - 10m
+      nir:
+        common_name: nir
+        dtype: uint16
+        nodata: 0
+        title: NIR 1 - 10m
+      nir08:
+        common_name: nir08
+        dtype: uint16
+        nodata: 0
+        title: NIR 2 - 20m
+      nir09:
+        common_name: nir09
+        dtype: uint16
+        nodata: 0
+        title: NIR 3 - 60m
+      preview:
+        common_name: red
+        title: True color preview
+      red:
+        common_name: red
+        dtype: uint16
+        nodata: 0
+        title: Red - 10m
+      rededge1:
+        common_name: rededge
+        dtype: uint16
+        nodata: 0
+        title: Red Edge 1 - 20m
+      rededge2:
+        common_name: rededge
+        dtype: uint16
+        nodata: 0
+        title: Red Edge 2 - 20m
+      rededge3:
+        common_name: rededge
+        dtype: uint16
+        nodata: 0
+        title: Red Edge 3 - 20m
+      scl:
+        dtype: uint8
+        nodata: 0
+        title: Scene classification map (SCL)
+      snow:
+        dtype: uint8
+        nodata: 0
+        title: Snow Probabilities
+      swir16:
+        common_name: swir16
+        dtype: uint16
+        nodata: 0
+        title: SWIR 1.6μm - 20m
+      swir22:
+        common_name: swir22
+        dtype: uint16
+        nodata: 0
+        title: SWIR 2.2μm - 20m
+      visual:
+        common_name: red
+        dtype: uint8
+        nodata: 0
+        title: True color image
+      wvp:
+        dtype: uint16
+        nodata: 0
+        title: Water Vapour (WVP)
+    collection_id: sentinel-2-pre-c1-l2a
+    default_assets:
+    - preview
+    - green
+    - blue
+    endpoint: earth-search
+  naip:
+    assets:
+      image:
+        common_name: rgbn
+        dtype: uint8
+        title: NAIP RGBN imagery
+    collection_id: naip
+    default_assets:
+    - image
+    endpoint: earth-search
+    extent:
+      bbox:
+      - -125.0
+      - 24.0
+      - -66.0
+      - 50.0
+      start_date: '2010-01-01'
+    resolution: 1.0

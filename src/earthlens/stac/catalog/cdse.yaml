@@ -1,15 +1,2422 @@
-# Curated collections whose home endpoint is the Copernicus Data Space (CDSE).
+# Curated collections served by the Copernicus Data Space (CDSE).
 
 collections:
-  sentinel-1-grd:
-    endpoint: cdse
-    collection_id: sentinel-1-grd
-    default_assets: [vv, vh]
-    cadence: 6-day
-    resolution: 10.0
-    extent:
-      start_date: "2014-10-03"
-      bbox: [-180.0, -90.0, 180.0, 90.0]
+  cdse/clms_ba_global_300m_daily_v3_cog:
     assets:
-      vv: {common_name: vv, dtype: float32, title: VV backscatter}
-      vh: {common_name: vh, dtype: float32, title: VH backscatter}
+      ba300_dob_nrt:
+        title: Day Of Burn
+    collection_id: clms_ba_global_300m_daily_v3_cog
+    default_assets:
+    - ba300_dob_nrt
+    endpoint: cdse
+  cdse/clms_ba_global_300m_daily_v4_cog:
+    assets:
+      ba300_bf_nrt:
+        title: Fraction of pixel surface affected by fire at the day of the burn detection
+      ba300_cp_nrt:
+        title: Probability that the burn detection corresponds to an actual burn
+      ba300_dob_nrt:
+        title: Day of burn in year (1-366), no burn (0) or flag (<0)
+      ba300_lfp_nrt:
+        title: Probability that the fractional burned area is above 0.1
+    collection_id: clms_ba_global_300m_daily_v4_cog
+    default_assets:
+    - ba300_bf_nrt
+    - ba300_cp_nrt
+    - ba300_dob_nrt
+    - ba300_lfp_nrt
+    endpoint: cdse
+  cdse/clms_ba_global_300m_monthly_v3_cog:
+    assets:
+      ba300_dob_ntc:
+        title: Day Of Burn
+    collection_id: clms_ba_global_300m_monthly_v3_cog
+    default_assets:
+    - ba300_dob_ntc
+    endpoint: cdse
+  cdse/clms_ba_global_300m_monthly_v4_cog:
+    assets:
+      ba300_bf_ntc:
+        title: Fraction of pixel surface affected by fire at the day of the burn detection
+      ba300_cp_ntc:
+        title: Probability that the burn detection corresponds to an actual burn
+      ba300_dob_ntc:
+        title: Day of burn in year (1-366), no burn (0) or flag (<0)
+      ba300_lfp_ntc:
+        title: Probability that the fractional burned area is above 0.1
+    collection_id: clms_ba_global_300m_monthly_v4_cog
+    default_assets:
+    - ba300_bf_ntc
+    - ba300_cp_ntc
+    - ba300_dob_ntc
+    - ba300_lfp_ntc
+    endpoint: cdse
+  cdse/clms_dmp_global_1km_10daily_v2_cog:
+    assets:
+      dmp_dmp:
+        title: Dry Matter Productivity
+      dmp_qflag:
+        title: Quality Flag on Dry Matter Productivity
+    collection_id: clms_dmp_global_1km_10daily_v2_cog
+    default_assets:
+    - dmp_dmp
+    - dmp_qflag
+    endpoint: cdse
+  cdse/clms_dmp_global_300m_10daily_v1_cog:
+    assets:
+      dmp300_dmp:
+        title: Dry Matter Productivity
+      dmp300_qflag:
+        title: Quality Flag on Dry Matter Productivity
+    collection_id: clms_dmp_global_300m_10daily_v1_cog
+    default_assets:
+    - dmp300_dmp
+    - dmp300_qflag
+    endpoint: cdse
+  cdse/clms_dmp_global_300m_10daily_v2_cog:
+    assets:
+      dmp300_dmp:
+        title: Dry Matter Productivity
+      dmp300_qflag:
+        title: Quality Flag on Dry Matter Productivity
+    collection_id: clms_dmp_global_300m_10daily_v2_cog
+    default_assets:
+    - dmp300_dmp
+    - dmp300_qflag
+    endpoint: cdse
+  cdse/clms_eta_global_300m_10daily_v1_cog:
+    assets:
+      e_ensemble:
+        title: Dekadal actual evaporation (from soil) Ensemble (average)
+      e_etlook:
+        title: Dekadal actual evaporation (from soil) ETLook
+      e_std:
+        title: Dekadal actual evaporation (from soil) Standard Deviation (Ensemble)
+      e_tsebpt:
+        title: Dekadal actual evaporation (from soil) TSEB-PT
+      et_ensemble:
+        title: Dekadal actual evapotranspiration Ensemble (average)
+      et_etlook:
+        title: Dekadal actual evapotranspiration ETLook
+      et_std:
+        title: Dekadal actual evapotranspiration Standard Deviation (Ensemble)
+      et_tsebpt:
+        title: Dekadal actual evapotranspiration TSEB-PT
+      flag:
+        title: Annotation flags
+      gfd:
+        title: Gap-filling distance
+      nobs:
+        title: Number of cloud free observations in a given dekade
+      t_ensemble:
+        title: Dekadal actual transpiration (from canopy) Ensemble (average)
+      t_etlook:
+        title: Dekadal actual transpiration (from canopy) ETLook
+      t_std:
+        title: Dekadal actual transpiration (from canopy) Standard Deviation (Ensemble)
+      t_tsebpt:
+        title: Dekadal actual transpiration (from canopy) TSEB-PT
+    collection_id: clms_eta_global_300m_10daily_v1_cog
+    default_assets:
+    - gfd
+    - flag
+    - nobs
+    - e_std
+    endpoint: cdse
+  cdse/clms_fapar_global_1km_10daily_v2_cog:
+    assets:
+      fapar_fapar:
+        title: Fraction of Absorbed Photosynthetically Active Radiation
+      fapar_lafter:
+        title: Length of semi-period after product date on Fraction of Absorbed Photosynthetically
+          Active Radiation
+      fapar_lbefore:
+        title: Length of semi-period before product date on Fraction of Absorbed Photosynthetically
+          Active Radiation
+      fapar_nobs:
+        title: Number of observation
+      fapar_qflag:
+        title: Quality Flag on Fraction of Absorbed Photosynthetically Active Radiation
+      fapar_rmse:
+        title: Root Mean Square Error on Fraction of Absorbed Photosynthetically Active
+          Radiation
+    collection_id: clms_fapar_global_1km_10daily_v2_cog
+    default_assets:
+    - fapar_nobs
+    - fapar_rmse
+    - fapar_fapar
+    - fapar_qflag
+    endpoint: cdse
+  cdse/clms_fapar_global_300m_10daily_v1_cog:
+    assets:
+      fapar300_fapar:
+        title: Fraction of Absorbed Photosynthetically Active Radiation
+      fapar300_lafter:
+        title: Length of semi-period after product date on Fraction of Absorbed Photosynthetically
+          Active Radiation
+      fapar300_lbefore:
+        title: Length of semi-period before product date on Fraction of Absorbed Photosynthetically
+          Active Radiation
+      fapar300_nobs:
+        title: Number of observation
+      fapar300_qflag:
+        title: Quality Flag on Fraction of Absorbed Photosynthetically Active Radiation
+      fapar300_rmse:
+        title: Root Mean Square Error on Fraction of Absorbed Photosynthetically Active
+          Radiation
+    collection_id: clms_fapar_global_300m_10daily_v1_cog
+    default_assets:
+    - fapar300_nobs
+    - fapar300_rmse
+    - fapar300_fapar
+    - fapar300_qflag
+    endpoint: cdse
+  cdse/clms_fapar_global_300m_10daily_v2_cog:
+    assets:
+      fapar300_fapar:
+        title: Fraction of Absorbed Photosynthetically Active Radiation
+      fapar300_lafter:
+        title: Length of semi-period after product date on Fraction of Absorbed Photosynthetically
+          Active Radiation
+      fapar300_lbefore:
+        title: Length of semi-period before product date on Fraction of Absorbed Photosynthetically
+          Active Radiation
+      fapar300_nobs:
+        title: Number of observation
+      fapar300_qflag:
+        title: Quality Flag on Fraction of Absorbed Photosynthetically Active Radiation
+      fapar300_rmse:
+        title: Root Mean Square Error on Fraction of Absorbed Photosynthetically Active
+          Radiation
+    collection_id: clms_fapar_global_300m_10daily_v2_cog
+    default_assets:
+    - fapar300_nobs
+    - fapar300_rmse
+    - fapar300_fapar
+    - fapar300_qflag
+    endpoint: cdse
+  cdse/clms_fcover_global_1km_10daily_v2_cog:
+    assets:
+      fcover_fcover:
+        title: Fraction of green Vegetation Cover
+      fcover_lafter:
+        title: Length of semi-period after product date on Fraction of green Vegetation
+          Cover
+      fcover_lbefore:
+        title: Length of semi-period before product date on Fraction of green Vegetation
+          Cover
+      fcover_nobs:
+        title: Number of observation
+      fcover_qflag:
+        title: Quality Flag on Fraction of green Vegetation Cover
+      fcover_rmse:
+        title: Root Mean Square Error on Fraction of green Vegetation Cover
+    collection_id: clms_fcover_global_1km_10daily_v2_cog
+    default_assets:
+    - fcover_nobs
+    - fcover_rmse
+    - fcover_qflag
+    - fcover_fcover
+    endpoint: cdse
+  cdse/clms_fcover_global_300m_10daily_v1_cog:
+    assets:
+      fcover300_fcover:
+        title: Fraction of green Vegetation Cover
+      fcover300_lafter:
+        title: Length of semi-period after product date on Fraction of green Vegetation
+          Cover
+      fcover300_lbefore:
+        title: Length of semi-period before product date on Fraction of green Vegetation
+          Cover
+      fcover300_nobs:
+        title: Number of observation
+      fcover300_qflag:
+        title: Quality Flag on Fraction of green Vegetation Cover
+      fcover300_rmse:
+        title: Root Mean Square Error on Fraction of green Vegetation Cover
+    collection_id: clms_fcover_global_300m_10daily_v1_cog
+    default_assets:
+    - fcover300_nobs
+    - fcover300_rmse
+    - fcover300_qflag
+    - fcover300_fcover
+    endpoint: cdse
+  cdse/clms_fcover_global_300m_10daily_v2_cog:
+    assets:
+      fcover300_fcover:
+        title: Fraction of green Vegetation Cover
+      fcover300_lafter:
+        title: Length of semi-period after product date on Fraction of green Vegetation
+          Cover
+      fcover300_lbefore:
+        title: Length of semi-period before product date on Fraction of green Vegetation
+          Cover
+      fcover300_nobs:
+        title: Number of observation
+      fcover300_qflag:
+        title: Quality Flag on Fraction of green Vegetation Cover
+      fcover300_rmse:
+        title: Root Mean Square Error on Fraction of green Vegetation Cover
+    collection_id: clms_fcover_global_300m_10daily_v2_cog
+    default_assets:
+    - fcover300_nobs
+    - fcover300_rmse
+    - fcover300_qflag
+    - fcover300_fcover
+    endpoint: cdse
+  cdse/clms_gdmp_global_1km_10daily_v2_cog:
+    assets:
+      gdmp_gdmp:
+        title: Gross Dry Matter Productivity
+      gdmp_qflag:
+        title: Quality Flag on Gross Dry Matter Productivity
+    collection_id: clms_gdmp_global_1km_10daily_v2_cog
+    default_assets:
+    - gdmp_gdmp
+    - gdmp_qflag
+    endpoint: cdse
+  cdse/clms_gdmp_global_300m_10daily_v1_cog:
+    assets:
+      gdmp300_gdmp:
+        title: Gross Dry Matter Productivity
+      gdmp300_qflag:
+        title: Quality Flag on Gross Dry Matter Productivity
+    collection_id: clms_gdmp_global_300m_10daily_v1_cog
+    default_assets:
+    - gdmp300_gdmp
+    - gdmp300_qflag
+    endpoint: cdse
+  cdse/clms_gdmp_global_300m_10daily_v2_cog:
+    assets:
+      gdmp300_gdmp:
+        title: Gross Dry Matter Productivity
+      gdmp300_qflag:
+        title: Quality Flag on Gross Dry Matter Productivity
+    collection_id: clms_gdmp_global_300m_10daily_v2_cog
+    default_assets:
+    - gdmp300_gdmp
+    - gdmp300_qflag
+    endpoint: cdse
+  cdse/clms_gpp_global_300m_10daily_v1_cog:
+    assets:
+      gpp300_gpp:
+        title: Gross Primary Production
+      gpp300_qflag:
+        title: Quality Flag on Gross Primary Production
+    collection_id: clms_gpp_global_300m_10daily_v1_cog
+    default_assets:
+    - gpp300_gpp
+    - gpp300_qflag
+    endpoint: cdse
+  cdse/clms_gpp_global_300m_10daily_v2_cog:
+    assets:
+      gpp300_gpp:
+        title: Gross Primary Production
+      gpp300_qflag:
+        title: Quality Flag on Gross Primary Production
+    collection_id: clms_gpp_global_300m_10daily_v2_cog
+    default_assets:
+    - gpp300_gpp
+    - gpp300_qflag
+    endpoint: cdse
+  cdse/clms_hf_global_300m_daily_v1_cog:
+    assets:
+      h_tsebpt:
+        title: Sensible Heat Flux modelled by TSEB-PT (instantaneous)
+      le_tsebpt:
+        title: Latent Heat Flux modelled by TSEB-PT (instantaneous)
+      ot:
+        title: Overpass Time (UTC)
+    collection_id: clms_hf_global_300m_daily_v1_cog
+    default_assets:
+    - ot
+    - h_tsebpt
+    - le_tsebpt
+    endpoint: cdse
+  cdse/clms_lai_global_1km_10daily_v2_cog:
+    assets:
+      lai_lafter:
+        title: Length of semi-period after product date on Leaf Area Index
+      lai_lai:
+        title: Leaf Area Index
+      lai_lbefore:
+        title: Length of semi-period before product date on Leaf Area Index
+      lai_nobs:
+        title: Number of observation
+      lai_qflag:
+        title: Quality Flag on Leaf Area Index
+      lai_rmse:
+        title: Root Mean Square Error on Leaf Area Index
+    collection_id: clms_lai_global_1km_10daily_v2_cog
+    default_assets:
+    - lai_lai
+    - lai_nobs
+    - lai_rmse
+    - lai_qflag
+    endpoint: cdse
+  cdse/clms_lai_global_300m_10daily_v1_cog:
+    assets:
+      lai300_lafter:
+        title: Length of semi-period after product date on Leaf Area Index
+      lai300_lai:
+        title: Leaf Area Index
+      lai300_lbefore:
+        title: Length of semi-period before product date on Leaf Area Index
+      lai300_nobs:
+        title: Number of observation
+      lai300_qflag:
+        title: Quality Flag on Leaf Area Index
+      lai300_rmse:
+        title: Root Mean Square Error on Leaf Area Index
+    collection_id: clms_lai_global_300m_10daily_v1_cog
+    default_assets:
+    - lai300_lai
+    - lai300_nobs
+    - lai300_rmse
+    - lai300_qflag
+    endpoint: cdse
+  cdse/clms_lai_global_300m_10daily_v2_cog:
+    assets:
+      lai300_lafter:
+        title: Length of semi-period after product date on Leaf Area Index
+      lai300_lai:
+        title: Leaf Area Index
+      lai300_lbefore:
+        title: Length of semi-period before product date on Leaf Area Index
+      lai300_nobs:
+        title: Number of observation
+      lai300_qflag:
+        title: Quality Flag on Leaf Area Index
+      lai300_rmse:
+        title: Root Mean Square Error on Leaf Area Index
+    collection_id: clms_lai_global_300m_10daily_v2_cog
+    default_assets:
+    - lai300_lai
+    - lai300_nobs
+    - lai300_rmse
+    - lai300_qflag
+    endpoint: cdse
+  cdse/clms_lc_global_100m_yearly_v3_cog:
+    assets:
+      bare_coverfraction_layer:
+        title: Percent Vegetation Cover (PVC) for bare-sparse-vegetation land cover
+          class
+      builtup_coverfraction_layer:
+        title: Percent Ground Cover for built-up land cover class
+      change_confidence_layer:
+        title: Change Confidence for detected land cover changes compared to previous
+          year
+      crops_coverfraction_layer:
+        title: Percent Vegetation Cover (PVC) for cropland land cover class
+      datadensityindicator:
+        title: Data Density Indicator for Algorithm input data
+      discrete_classification_map:
+        title: Land Cover Classification
+      discrete_classification_proba:
+        title: quality indicator (classification probability) of the discrete classification
+      forest_type_layer:
+        title: Forest Type for all pixels with tree PVC bigger than 1%
+      grass_coverfraction_layer:
+        title: Percent Vegetation Cover (PVC) for herbaceous vegetation land cover
+          class
+      mosslichen_coverfraction_layer:
+        title: Percent Vegetation Cover (PVC) for moss&lichen land cover class
+      permanentwater_coverfraction_layer:
+        title: Percent Ground Cover for permanent water land cover class
+      seasonalwater_coverfraction_layer:
+        title: Percent Ground Cover for seasonal water land cover class
+      shrub_coverfraction_layer:
+        title: Percent Vegetation Cover (PVC) for shrubland land cover class
+      snow_coverfraction_layer:
+        title: Percent Ground Cover for snow&ice land cover class
+      tree_coverfraction_layer:
+        title: Percent Vegetation Cover (PVC) for forest land cover class
+    collection_id: clms_lc_global_100m_yearly_v3_cog
+    default_assets:
+    - forest_type_layer
+    - datadensityindicator
+    - change_confidence_layer
+    - bare_coverfraction_layer
+    endpoint: cdse
+  cdse/clms_lcm_global_10m_yearly_v1_cog:
+    assets:
+      map:
+        title: LCM-10 Map
+    collection_id: clms_lcm_global_10m_yearly_v1_cog
+    default_assets:
+    - map
+    endpoint: cdse
+  cdse/clms_lie_baltic_250m_daily_v1_cog:
+    assets:
+      lie250_lie:
+        title: Lake Ice Extent
+    collection_id: clms_lie_baltic_250m_daily_v1_cog
+    default_assets:
+    - lie250_lie
+    endpoint: cdse
+  cdse/clms_lie_europe_250m_daily_v2_cog:
+    assets:
+      lie250_lie:
+        title: Lake Ice Extent
+    collection_id: clms_lie_europe_250m_daily_v2_cog
+    default_assets:
+    - lie250_lie
+    endpoint: cdse
+  cdse/clms_lie_global_500m_daily_v2_cog:
+    assets:
+      lie500_lie:
+        title: Lake Ice Extent
+      lie500_p:
+        title: GMM predicted posterior probability of the most likely class for Lake
+          Ice Extent
+    collection_id: clms_lie_global_500m_daily_v2_cog
+    default_assets:
+    - lie500_p
+    - lie500_lie
+    endpoint: cdse
+  cdse/clms_lie_northernhemisphere_500m_daily_v1_cog:
+    assets:
+      lie_nh_lie:
+        title: Lake Ice Extent
+      lie_nh_p:
+        title: GMM predicted posterior probability of the most likely class for Lake
+          Ice Extent
+    collection_id: clms_lie_northernhemisphere_500m_daily_v1_cog
+    default_assets:
+    - lie_nh_p
+    - lie_nh_lie
+    endpoint: cdse
+  cdse/clms_lsp_global_300m_yearly_v1_cog:
+    assets:
+      lsp300_ampl_s1:
+        title: Season amplitude season 1
+      lsp300_ampl_s2:
+        title: Season amplitude season 2
+      lsp300_eosd_s1:
+        title: End-Of-Season Day season 1
+      lsp300_eosd_s2:
+        title: End-Of-Season Day season 2
+      lsp300_eosv_s1:
+        title: End-Of-Season Value season 1
+      lsp300_eosv_s2:
+        title: End-Of-Season Value season 2
+      lsp300_length_s1:
+        title: Length of Season season 1
+      lsp300_length_s2:
+        title: Length of Season season 2
+      lsp300_lslope_s1:
+        title: Slope of green-up period season 1
+      lsp300_lslope_s2:
+        title: Slope of green-up period season 2
+      lsp300_maxd_s1:
+        title: Maximum-Of-Season Day season 1
+      lsp300_maxd_s2:
+        title: Maximum-Of-Season Day season 2
+      lsp300_maxv_s1:
+        title: Maximum-Of-Season Value season 1
+      lsp300_maxv_s2:
+        title: Maximum-Of-Season Value season 2
+      lsp300_minv_s1:
+        title: Minimum-Of-Season Value season 1
+      lsp300_minv_s2:
+        title: Minimum-Of-Season Value season 2
+      lsp300_qa_s1:
+        title: Quality Flag season 1
+      lsp300_qa_s2:
+        title: Quality Flag season 2
+      lsp300_rslope_s1:
+        title: Slope of green-down period season 1
+      lsp300_rslope_s2:
+        title: Slope of green-down period season 2
+      lsp300_sosd_s1:
+        title: Start-Of-Season Day season 1
+      lsp300_sosd_s2:
+        title: Start-Of-Season Day season 2
+      lsp300_sosv_s1:
+        title: Start-Of-Season Value season 1
+      lsp300_sosv_s2:
+        title: Start-Of-Season Value season 2
+      lsp300_sprod_s1:
+        title: Seasonal productivity season 1
+      lsp300_sprod_s2:
+        title: Seasonal productivity season 2
+      lsp300_tprod_s1:
+        title: Total productivity season 1
+      lsp300_tprod_s2:
+        title: Total productivity season 2
+    collection_id: clms_lsp_global_300m_yearly_v1_cog
+    default_assets:
+    - lsp300_qa_s1
+    - lsp300_qa_s2
+    - lsp300_ampl_s1
+    - lsp300_ampl_s2
+    endpoint: cdse
+  cdse/clms_lsp_global_300m_yearly_v2_cog:
+    assets:
+      lsp300_ampl_s1:
+        title: Season amplitude season 1
+      lsp300_ampl_s2:
+        title: Season amplitude season 2
+      lsp300_eosd_s1:
+        title: End-Of-Season Day season 1
+      lsp300_eosd_s2:
+        title: End-Of-Season Day season 2
+      lsp300_eosv_s1:
+        title: End-Of-Season Value season 1
+      lsp300_eosv_s2:
+        title: End-Of-Season Value season 2
+      lsp300_length_s1:
+        title: Length of Season season 1
+      lsp300_length_s2:
+        title: Length of Season season 2
+      lsp300_lslope_s1:
+        title: Slope of green-up period season 1
+      lsp300_lslope_s2:
+        title: Slope of green-up period season 2
+      lsp300_maxd_s1:
+        title: Maximum-Of-Season Day season 1
+      lsp300_maxd_s2:
+        title: Maximum-Of-Season Day season 2
+      lsp300_maxv_s1:
+        title: Maximum-Of-Season Value season 1
+      lsp300_maxv_s2:
+        title: Maximum-Of-Season Value season 2
+      lsp300_minv_s1:
+        title: Minimum-Of-Season Value season 1
+      lsp300_minv_s2:
+        title: Minimum-Of-Season Value season 2
+      lsp300_qa_s1:
+        title: Quality Flag season 1
+      lsp300_qa_s2:
+        title: Quality Flag season 2
+      lsp300_rslope_s1:
+        title: Slope of green-down period season 1
+      lsp300_rslope_s2:
+        title: Slope of green-down period season 2
+      lsp300_sosd_s1:
+        title: Start-Of-Season Day season 1
+      lsp300_sosd_s2:
+        title: Start-Of-Season Day season 2
+      lsp300_sosv_s1:
+        title: Start-Of-Season Value season 1
+      lsp300_sosv_s2:
+        title: Start-Of-Season Value season 2
+      lsp300_sprod_s1:
+        title: Seasonal productivity season 1
+      lsp300_sprod_s2:
+        title: Seasonal productivity season 2
+      lsp300_tprod_s1:
+        title: Total productivity season 1
+      lsp300_tprod_s2:
+        title: Total productivity season 2
+    collection_id: clms_lsp_global_300m_yearly_v2_cog
+    default_assets:
+    - lsp300_qa_s1
+    - lsp300_qa_s2
+    - lsp300_ampl_s1
+    - lsp300_ampl_s2
+    endpoint: cdse
+  cdse/clms_lst-daily-cycle_global_3km_10daily_v3_cog:
+    assets:
+      lst10_dc_fobs_00_11:
+        title: Fraction of valid observations at 00-11 hr on Land Surface Temperature
+      lst10_dc_fobs_12_23:
+        title: Fraction of valid observations at 12-23 hr on Land Surface Temperature
+      lst10_dc_max_00_11:
+        title: Maximum at 00-11 hr on Land Surface Temperature
+      lst10_dc_max_12_23:
+        title: Maximum at 12-23 hr on Land Surface Temperature
+      lst10_dc_median_00_11:
+        title: Median at 00-11 hr on Land Surface Temperature
+      lst10_dc_median_12_23:
+        title: Median at 12-23 hr on Land Surface Temperature
+      lst10_dc_min_00_11:
+        title: Minimum at 00-11 hr on Land Surface Temperature
+      lst10_dc_min_12_23:
+        title: Minimum at 12-23 hr on Land Surface Temperature
+    collection_id: clms_lst-daily-cycle_global_3km_10daily_v3_cog
+    default_assets:
+    - lst10_dc_max_00_11
+    - lst10_dc_max_12_23
+    - lst10_dc_min_00_11
+    - lst10_dc_min_12_23
+    endpoint: cdse
+  cdse/clms_lst-daily-cycle_global_5km_10daily_v1_cog:
+    assets:
+      lst10_dc_fobs_00_11:
+        title: Fraction of valid observations at 00-11 hr on Land Surface Temperature
+      lst10_dc_fobs_12_23:
+        title: Fraction of valid observations at 12-23 hr on Land Surface Temperature
+      lst10_dc_max_00_11:
+        title: Maximum at 00-11 hr on Land Surface Temperature
+      lst10_dc_max_12_23:
+        title: Maximum at 12-23 hr on Land Surface Temperature
+      lst10_dc_median_00_11:
+        title: Median at 00-11 hr on Land Surface Temperature
+      lst10_dc_median_12_23:
+        title: Median at 12-23 hr on Land Surface Temperature
+      lst10_dc_min_00_11:
+        title: Minimum at 00-11 hr on Land Surface Temperature
+      lst10_dc_min_12_23:
+        title: Minimum at 12-23 hr on Land Surface Temperature
+    collection_id: clms_lst-daily-cycle_global_5km_10daily_v1_cog
+    default_assets:
+    - lst10_dc_max_00_11
+    - lst10_dc_max_12_23
+    - lst10_dc_min_00_11
+    - lst10_dc_min_12_23
+    endpoint: cdse
+  cdse/clms_lst-daily-cycle_global_5km_10daily_v2_cog:
+    assets:
+      lst10_dc_fobs_00_11:
+        title: Fraction of valid observations at 00-11 hr on Land Surface Temperature
+      lst10_dc_fobs_12_23:
+        title: Fraction of valid observations at 12-23 hr on Land Surface Temperature
+      lst10_dc_max_00_11:
+        title: Maximum at 00-11 hr on Land Surface Temperature
+      lst10_dc_max_12_23:
+        title: Maximum at 12-23 hr on Land Surface Temperature
+      lst10_dc_median_00_11:
+        title: Median at 00-11 hr on Land Surface Temperature
+      lst10_dc_median_12_23:
+        title: Median at 12-23 hr on Land Surface Temperature
+      lst10_dc_min_00_11:
+        title: Minimum at 00-11 hr on Land Surface Temperature
+      lst10_dc_min_12_23:
+        title: Minimum at 12-23 hr on Land Surface Temperature
+    collection_id: clms_lst-daily-cycle_global_5km_10daily_v2_cog
+    default_assets:
+    - lst10_dc_max_00_11
+    - lst10_dc_max_12_23
+    - lst10_dc_min_00_11
+    - lst10_dc_min_12_23
+    endpoint: cdse
+  cdse/clms_lst-tci_global_3km_10daily_v3_cog:
+    assets:
+      lst10_tci_fobs:
+        title: Fraction of valid observations
+      lst10_tci_max:
+        title: Maximum on Land Surface Temperature
+      lst10_tci_median:
+        title: Median on Land Surface Temperature
+      lst10_tci_min:
+        title: Minimum on Land Surface Temperature
+      lst10_tci_tci:
+        title: Thermal Conditions Index
+    collection_id: clms_lst-tci_global_3km_10daily_v3_cog
+    default_assets:
+    - lst10_tci_max
+    - lst10_tci_min
+    - lst10_tci_tci
+    - lst10_tci_fobs
+    endpoint: cdse
+  cdse/clms_lst-tci_global_5km_10daily_v1_cog:
+    assets:
+      lst10_tci_fobs:
+        title: Fraction of valid observations
+      lst10_tci_max:
+        title: Maximum on Land Surface Temperature
+      lst10_tci_median:
+        title: Median on Land Surface Temperature
+      lst10_tci_min:
+        title: Minimum on Land Surface Temperature
+      lst10_tci_tci:
+        title: Thermal Conditions Index
+    collection_id: clms_lst-tci_global_5km_10daily_v1_cog
+    default_assets:
+    - lst10_tci_max
+    - lst10_tci_min
+    - lst10_tci_tci
+    - lst10_tci_fobs
+    endpoint: cdse
+  cdse/clms_lst-tci_global_5km_10daily_v2_cog:
+    assets:
+      lst10_tci_fobs:
+        title: Fraction of valid observations
+      lst10_tci_max:
+        title: Maximum on Land Surface Temperature
+      lst10_tci_median:
+        title: Median on Land Surface Temperature
+      lst10_tci_min:
+        title: Minimum on Land Surface Temperature
+      lst10_tci_tci:
+        title: Thermal Conditions Index
+    collection_id: clms_lst-tci_global_5km_10daily_v2_cog
+    default_assets:
+    - lst10_tci_max
+    - lst10_tci_min
+    - lst10_tci_tci
+    - lst10_tci_fobs
+    endpoint: cdse
+  cdse/clms_lst_global_3km_hourly_v3_cog:
+    assets:
+      lst_errorbar:
+        title: Standard error on Land Surface Temperature
+      lst_lst:
+        title: Land Surface Temperature
+      lst_qflag:
+        title: Quality Flag on Land Surface Temperature
+      lst_tdelta:
+        title: Time delta between observation and reference time on Land Surface Temperature
+    collection_id: clms_lst_global_3km_hourly_v3_cog
+    default_assets:
+    - lst_lst
+    - lst_qflag
+    - lst_tdelta
+    - lst_errorbar
+    endpoint: cdse
+  cdse/clms_lst_global_5km_hourly_v1_cog:
+    assets:
+      lst_errorbar:
+        title: Standard error on Land Surface Temperature
+      lst_lst:
+        title: Land Surface Temperature
+      lst_ppp:
+        title: Percentage of processed pixels on Land Surface Temperature
+      lst_qflag:
+        title: Quality Flag on Land Surface Temperature
+      lst_tdelta:
+        title: Time delta between observation and reference time on Land Surface Temperature
+    collection_id: clms_lst_global_5km_hourly_v1_cog
+    default_assets:
+    - lst_lst
+    - lst_ppp
+    - lst_qflag
+    - lst_tdelta
+    endpoint: cdse
+  cdse/clms_lst_global_5km_hourly_v2_cog:
+    assets:
+      lst_errorbar:
+        title: Standard error on Land Surface Temperature
+      lst_lst:
+        title: Land Surface Temperature
+      lst_ppp:
+        title: Percentage of processed pixels on Land Surface Temperature
+      lst_qflag:
+        title: Quality Flag on Land Surface Temperature
+      lst_tdelta:
+        title: Time delta between observation and reference time on Land Surface Temperature
+    collection_id: clms_lst_global_5km_hourly_v2_cog
+    default_assets:
+    - lst_lst
+    - lst_ppp
+    - lst_qflag
+    - lst_tdelta
+    endpoint: cdse
+  cdse/clms_lswt-nrt_global_1km_10daily_v1_cog:
+    assets:
+      lswt_lswt:
+        title: Lake Surface Water Temperature
+      lswt_nobs:
+        title: Number of observation
+      lswt_nobsb:
+        title: Number of observation from SLSTRB
+      lswt_qlevel:
+        title: Quality Level of Lake Surface Water Temperature
+      lswt_stdev:
+        title: Standar deviation Lake Surface Water Temperature
+      lswt_tobs:
+        title: Observation day within 10-daily period of Lake Surface Water Temperature
+      lswt_unc:
+        title: Uncertainty on Lake Surface Water Temperature
+    collection_id: clms_lswt-nrt_global_1km_10daily_v1_cog
+    default_assets:
+    - lswt_unc
+    - lswt_lswt
+    - lswt_nobs
+    - lswt_tobs
+    endpoint: cdse
+  cdse/clms_lswt-offline_global_1km_10daily_v1_cog:
+    assets:
+      lswt_lswt:
+        title: Lake Surface Water Temperature
+      lswt_nobs:
+        title: Number of observation
+      lswt_qlevel:
+        title: Quality Level of Lake Surface Water Temperature
+      lswt_stdev:
+        title: Standar deviation Lake Surface Water Temperature
+      lswt_tobs:
+        title: Observation day within 10-daily period of Lake Surface Water Temperature
+      lswt_unc:
+        title: Uncertainty on Lake Surface Water Temperature
+    collection_id: clms_lswt-offline_global_1km_10daily_v1_cog
+    default_assets:
+    - lswt_unc
+    - lswt_lswt
+    - lswt_nobs
+    - lswt_tobs
+    endpoint: cdse
+  cdse/clms_lwq-nrt_global_100m_10daily_v1_cog:
+    assets:
+      lwq100_fobs:
+        title: First observation day within 10-daily period of Lake Water Quality
+      lwq100_lobs:
+        title: Last observation day within 10-daily period of Lake Water Quality
+      lwq100_nobs:
+        title: Number of observation
+      lwq100_rw1375:
+        title: Fully normalized water leaving reflectance at 1375 nm
+      lwq100_rw1610:
+        title: Fully normalized water leaving reflectance at 1610 nm
+      lwq100_rw2190:
+        title: Fully normalized water leaving reflectance at 2190 nm
+      lwq100_rw443:
+        title: Fully normalized water leaving reflectance at 443 nm
+      lwq100_rw490:
+        title: Fully normalized water leaving reflectance at 490 nm
+      lwq100_rw560:
+        title: Fully normalized water leaving reflectance at 560 nm
+      lwq100_rw665:
+        title: Fully normalized water leaving reflectance at 665 nm
+      lwq100_rw705:
+        title: Fully normalized water leaving reflectance at 705 nm
+      lwq100_rw740:
+        title: Fully normalized water leaving reflectance at 740 nm
+      lwq100_rw783:
+        title: Fully normalized water leaving reflectance at 783 nm
+      lwq100_rw842:
+        title: Fully normalized water leaving reflectance at 842 nm
+      lwq100_rw865:
+        title: Fully normalized water leaving reflectance at 865 nm
+      lwq100_rw945:
+        title: Fully normalized water leaving reflectance at 945 nm
+      lwq100_tmean:
+        title: Mean of turbidity in water body
+      lwq100_tobs:
+        title: Observation day within 10-daily period of Lake Water Quality
+      lwq100_tsi:
+        title: Trophic state index
+    collection_id: clms_lwq-nrt_global_100m_10daily_v1_cog
+    default_assets:
+    - lwq100_tsi
+    - lwq100_fobs
+    - lwq100_lobs
+    - lwq100_nobs
+    endpoint: cdse
+  cdse/clms_lwq-nrt_global_100m_10daily_v2_cog:
+    assets:
+      lwq100_chlamean:
+        title: Mean concentration of chlorophyll-a
+      lwq100_fcbprob:
+        title: Probability of Floating Cyanobacteria
+      lwq100_fobs:
+        title: First observation day within 10-daily period of Lake Water Quality
+      lwq100_lobs:
+        title: Last observation day within 10-daily period of Lake Water Quality
+      lwq100_nobs:
+        title: Number of observation
+      lwq100_qflag:
+        title: Quality Flag on Lake Water Quality
+      lwq100_rw1375:
+        title: Fully normalized water leaving reflectance at 1375 nm
+      lwq100_rw1610:
+        title: Fully normalized water leaving reflectance at 1610 nm
+      lwq100_rw2190:
+        title: Fully normalized water leaving reflectance at 2190 nm
+      lwq100_rw443:
+        title: Fully normalized water leaving reflectance at 443 nm
+      lwq100_rw490:
+        title: Fully normalized water leaving reflectance at 490 nm
+      lwq100_rw560:
+        title: Fully normalized water leaving reflectance at 560 nm
+      lwq100_rw665:
+        title: Fully normalized water leaving reflectance at 665 nm
+      lwq100_rw705:
+        title: Fully normalized water leaving reflectance at 705 nm
+      lwq100_rw740:
+        title: Fully normalized water leaving reflectance at 740 nm
+      lwq100_rw783:
+        title: Fully normalized water leaving reflectance at 783 nm
+      lwq100_rw842:
+        title: Fully normalized water leaving reflectance at 842 nm
+      lwq100_rw865:
+        title: Fully normalized water leaving reflectance at 865 nm
+      lwq100_rw945:
+        title: Fully normalized water leaving reflectance at 945 nm
+      lwq100_tmean:
+        title: Mean of turbidity in water body
+      lwq100_tobs:
+        title: Observation day within 10-daily period of Lake Water Quality
+      lwq100_tsi:
+        title: Trophic state index
+      lwq100_tsmmean:
+        title: Mean concentration of total suspended matter
+    collection_id: clms_lwq-nrt_global_100m_10daily_v2_cog
+    default_assets:
+    - lwq100_tsi
+    - lwq100_fobs
+    - lwq100_lobs
+    - lwq100_nobs
+    endpoint: cdse
+  cdse/clms_lwq-nrt_global_300m_10daily_v1_cog:
+    assets:
+      lwq300_fobs:
+        title: First observation day within 10-daily period of Lake Water Quality
+      lwq300_lobs:
+        title: Last observation day within 10-daily period of Lake Water Quality
+      lwq300_nobs:
+        title: Number of observation
+      lwq300_nobsqrs:
+        title: Number of observation potentially affected by suboptimal observation
+          conditions
+      lwq300_rw1020:
+        title: Fully normalized water leaving reflectance at 1020 nm
+      lwq300_rw400:
+        title: Fully normalized water leaving reflectance at 400 nm
+      lwq300_rw412:
+        title: Fully normalized water leaving reflectance at 412 nm
+      lwq300_rw443:
+        title: Fully normalized water leaving reflectance at 443 nm
+      lwq300_rw490:
+        title: Fully normalized water leaving reflectance at 490 nm
+      lwq300_rw510:
+        title: Fully normalized water leaving reflectance at 510 nm
+      lwq300_rw560:
+        title: Fully normalized water leaving reflectance at 560 nm
+      lwq300_rw620:
+        title: Fully normalized water leaving reflectance at 620 nm
+      lwq300_rw665:
+        title: Fully normalized water leaving reflectance at 665 nm
+      lwq300_rw674:
+        title: Fully normalized water leaving reflectance at 674 nm
+      lwq300_rw681:
+        title: Fully normalized water leaving reflectance at 681 nm
+      lwq300_rw709:
+        title: Fully normalized water leaving reflectance at 709 nm
+      lwq300_rw754:
+        title: Fully normalized water leaving reflectance at 754 nm
+      lwq300_rw760:
+        title: Fully normalized water leaving reflectance at 760 nm
+      lwq300_rw764:
+        title: Fully normalized water leaving reflectance at 764 nm
+      lwq300_rw767:
+        title: Fully normalized water leaving reflectance at 767 nm
+      lwq300_rw779:
+        title: Fully normalized water leaving reflectance at 779 nm
+      lwq300_rw865:
+        title: Fully normalized water leaving reflectance at 865 nm
+      lwq300_rw885:
+        title: Fully normalized water leaving reflectance at 885 nm
+      lwq300_rw900:
+        title: Fully normalized water leaving reflectance at 900 nm
+      lwq300_rw940:
+        title: Fully normalized water leaving reflectance at 940 nm
+      lwq300_tmean:
+        title: Mean of turbidity in water body
+      lwq300_tnobs:
+        title: Number of observation for turbidity in water body
+      lwq300_tobs:
+        title: Observation day within 10-daily period of Lake Water Quality
+      lwq300_tsi:
+        title: Trophic state index
+      lwq300_tsinobs:
+        title: Number of observation for trophic state index
+      lwq300_tstdev:
+        title: Standar deviation of turbidity in water body
+    collection_id: clms_lwq-nrt_global_300m_10daily_v1_cog
+    default_assets:
+    - lwq300_tsi
+    - lwq300_fobs
+    - lwq300_lobs
+    - lwq300_nobs
+    endpoint: cdse
+  cdse/clms_lwq-nrt_global_300m_10daily_v2_cog:
+    assets:
+      lwq300_chlamean:
+        title: Mean concentration of chlorophyll-a
+      lwq300_chlaunc:
+        title: Relative uncertainty in concentration of chlorophyll-a
+      lwq300_fcbprob:
+        title: Probability of Floating Cyanobacteria
+      lwq300_fobs:
+        title: First observation day within 10-daily period of Lake Water Quality
+      lwq300_lobs:
+        title: Last observation day within 10-daily period of Lake Water Quality
+      lwq300_nobs:
+        title: Number of observation
+      lwq300_qflag:
+        title: Quality Flag on Lake Water Quality
+      lwq300_rw1020:
+        title: Fully normalized water leaving reflectance at 1020 nm
+      lwq300_rw400:
+        title: Fully normalized water leaving reflectance at 400 nm
+      lwq300_rw412:
+        title: Fully normalized water leaving reflectance at 412 nm
+      lwq300_rw443:
+        title: Fully normalized water leaving reflectance at 443 nm
+      lwq300_rw490:
+        title: Fully normalized water leaving reflectance at 490 nm
+      lwq300_rw510:
+        title: Fully normalized water leaving reflectance at 510 nm
+      lwq300_rw560:
+        title: Fully normalized water leaving reflectance at 560 nm
+      lwq300_rw620:
+        title: Fully normalized water leaving reflectance at 620 nm
+      lwq300_rw665:
+        title: Fully normalized water leaving reflectance at 665 nm
+      lwq300_rw674:
+        title: Fully normalized water leaving reflectance at 674 nm
+      lwq300_rw681:
+        title: Fully normalized water leaving reflectance at 681 nm
+      lwq300_rw709:
+        title: Fully normalized water leaving reflectance at 709 nm
+      lwq300_rw754:
+        title: Fully normalized water leaving reflectance at 754 nm
+      lwq300_rw779:
+        title: Fully normalized water leaving reflectance at 779 nm
+      lwq300_rw885:
+        title: Fully normalized water leaving reflectance at 885 nm
+      lwq300_rw900:
+        title: Fully normalized water leaving reflectance at 900 nm
+      lwq300_tmean:
+        title: Mean of turbidity in water body
+      lwq300_tobs:
+        title: Observation day within 10-daily period of Lake Water Quality
+      lwq300_tsi:
+        title: Trophic state index
+      lwq300_tsmmean:
+        title: Mean concentration of total suspended matter
+      lwq300_tsmunc:
+        title: Relative uncertainty in concentration of total suspended matter
+      lwq300_unc:
+        title: Relative uncertainty in fully normalized water-leaving reflectance
+          at peak reflectance
+      lwq300_uncub:
+        title: Relative unbiased uncertainty in fully normalized water-leaving reflectance
+          at peak reflectance
+    collection_id: clms_lwq-nrt_global_300m_10daily_v2_cog
+    default_assets:
+    - lwq300_tsi
+    - lwq300_unc
+    - lwq300_fobs
+    - lwq300_lobs
+    endpoint: cdse
+  cdse/clms_lwq-reproc_global_300m_10daily_v1_cog:
+    assets:
+      lwq300_fobs:
+        title: First observation day within 10-daily period of Lake Water Quality
+      lwq300_lobs:
+        title: Last observation day within 10-daily period of Lake Water Quality
+      lwq300_nobs:
+        title: Number of observation
+      lwq300_nobsqrs:
+        title: Number of observation potentially affected by suboptimal observation
+          conditions
+      lwq300_rw412:
+        title: Fully normalized water leaving reflectance at 412 nm
+      lwq300_rw443:
+        title: Fully normalized water leaving reflectance at 443 nm
+      lwq300_rw490:
+        title: Fully normalized water leaving reflectance at 490 nm
+      lwq300_rw510:
+        title: Fully normalized water leaving reflectance at 510 nm
+      lwq300_rw560:
+        title: Fully normalized water leaving reflectance at 560 nm
+      lwq300_rw620:
+        title: Fully normalized water leaving reflectance at 620 nm
+      lwq300_rw665:
+        title: Fully normalized water leaving reflectance at 665 nm
+      lwq300_rw681:
+        title: Fully normalized water leaving reflectance at 681 nm
+      lwq300_rw709:
+        title: Fully normalized water leaving reflectance at 709 nm
+      lwq300_rw754:
+        title: Fully normalized water leaving reflectance at 754 nm
+      lwq300_rw760:
+        title: Fully normalized water leaving reflectance at 760 nm
+      lwq300_rw779:
+        title: Fully normalized water leaving reflectance at 779 nm
+      lwq300_rw865:
+        title: Fully normalized water leaving reflectance at 865 nm
+      lwq300_rw885:
+        title: Fully normalized water leaving reflectance at 885 nm
+      lwq300_rw900:
+        title: Fully normalized water leaving reflectance at 900 nm
+      lwq300_tmean:
+        title: Mean of turbidity in water body
+      lwq300_tnobs:
+        title: Number of observation for turbidity in water body
+      lwq300_tobs:
+        title: Observation day within 10-daily period of Lake Water Quality
+      lwq300_tsi:
+        title: Trophic state index
+      lwq300_tsinobs:
+        title: Number of observation for trophic state index
+      lwq300_tstdev:
+        title: Standar deviation of turbidity in water body
+    collection_id: clms_lwq-reproc_global_300m_10daily_v1_cog
+    default_assets:
+    - lwq300_tsi
+    - lwq300_fobs
+    - lwq300_lobs
+    - lwq300_nobs
+    endpoint: cdse
+  cdse/clms_ndvi-lts_global_1km_10daily_v2_cog:
+    assets:
+      ndvi_max_lts:
+        title: Maximum Normalized Difference Vegetation Index over time period
+      ndvi_mean_lts:
+        title: Mean Normalized Difference Vegetation Index over time period
+      ndvi_median_lts:
+        title: Median Normalized Difference Vegetation Index over time period
+      ndvi_min_lts:
+        title: Minimum Normalized Difference Vegetation Index over time period
+      ndvi_nobs_lts:
+        title: Number of observation
+      ndvi_stdev_lts:
+        title: Standard deviation Normalized Difference Vegetation Index over time
+          period
+    collection_id: clms_ndvi-lts_global_1km_10daily_v2_cog
+    default_assets:
+    - ndvi_max_lts
+    - ndvi_min_lts
+    - ndvi_mean_lts
+    - ndvi_nobs_lts
+    endpoint: cdse
+  cdse/clms_ndvi-lts_global_1km_10daily_v3_cog:
+    assets:
+      ndvi_max_lts:
+        title: Maximum Normalized Difference Vegetation Index over time period
+      ndvi_mean_lts:
+        title: Mean Normalized Difference Vegetation Index over time period
+      ndvi_median_lts:
+        title: Median Normalized Difference Vegetation Index over time period
+      ndvi_min_lts:
+        title: Minimum Normalized Difference Vegetation Index over time period
+      ndvi_nobs_lts:
+        title: Number of observation
+      ndvi_stdev_lts:
+        title: Standard deviation Normalized Difference Vegetation Index over time
+          period
+    collection_id: clms_ndvi-lts_global_1km_10daily_v3_cog
+    default_assets:
+    - ndvi_max_lts
+    - ndvi_min_lts
+    - ndvi_mean_lts
+    - ndvi_nobs_lts
+    endpoint: cdse
+  cdse/clms_ndvi_global_1km_10daily_v2_cog:
+    assets:
+      ndvi_ndvi:
+        title: Normalized Difference Vegetation Index
+      ndvi_timegrid:
+        title: Time Grid
+    collection_id: clms_ndvi_global_1km_10daily_v2_cog
+    default_assets:
+    - ndvi_ndvi
+    - ndvi_timegrid
+    endpoint: cdse
+  cdse/clms_ndvi_global_1km_10daily_v3_cog:
+    assets:
+      ndvi_ndvi:
+        title: Normalized Difference Vegetation Index
+      ndvi_nobs:
+        title: Number of observation
+      ndvi_qflag:
+        title: Quality Flag on Normalized Difference Vegetation Index
+      ndvi_timegrid:
+        title: Time Grid
+      ndvi_unc:
+        title: Uncertainty on Normalized Difference Vegetation Index
+    collection_id: clms_ndvi_global_1km_10daily_v3_cog
+    default_assets:
+    - ndvi_unc
+    - ndvi_ndvi
+    - ndvi_nobs
+    - ndvi_qflag
+    endpoint: cdse
+  cdse/clms_ndvi_global_300m_10daily_v1_cog:
+    assets:
+      ndvi300_ndvi:
+        title: Normalized Difference Vegetation Index
+    collection_id: clms_ndvi_global_300m_10daily_v1_cog
+    default_assets:
+    - ndvi300_ndvi
+    endpoint: cdse
+  cdse/clms_ndvi_global_300m_10daily_v2_cog:
+    assets:
+      ndvi300_ndvi:
+        title: Normalized Difference Vegetation Index
+      ndvi300_nobs:
+        title: Number of observation
+      ndvi300_qflag:
+        title: Quality Flag on Normalized Difference Vegetation Index
+      ndvi300_unc:
+        title: Uncertainty on Normalized Difference Vegetation Index
+    collection_id: clms_ndvi_global_300m_10daily_v2_cog
+    default_assets:
+    - ndvi300_unc
+    - ndvi300_ndvi
+    - ndvi300_nobs
+    - ndvi300_qflag
+    endpoint: cdse
+  cdse/clms_ndvi_global_300m_10daily_v3_cog:
+    assets:
+      ndvi300_ndvi:
+        title: Normalized Difference Vegetation Index
+      ndvi300_nobs:
+        title: Number of observation
+      ndvi300_qflag:
+        title: Quality Flag on Normalized Difference Vegetation Index
+      ndvi300_unc:
+        title: Uncertainty on Normalized Difference Vegetation Index
+    collection_id: clms_ndvi_global_300m_10daily_v3_cog
+    default_assets:
+    - ndvi300_unc
+    - ndvi300_ndvi
+    - ndvi300_nobs
+    - ndvi300_qflag
+    endpoint: cdse
+  cdse/clms_npp_global_300m_10daily_v1_cog:
+    assets:
+      npp300_npp:
+        title: Net Primary Production
+      npp300_qflag:
+        title: Quality Flag on Net Primary Production
+    collection_id: clms_npp_global_300m_10daily_v1_cog
+    default_assets:
+    - npp300_npp
+    - npp300_qflag
+    endpoint: cdse
+  cdse/clms_npp_global_300m_10daily_v2_cog:
+    assets:
+      npp300_npp:
+        title: Net Primary Production
+      npp300_qflag:
+        title: Quality Flag on Net Primary Production
+    collection_id: clms_npp_global_300m_10daily_v2_cog
+    default_assets:
+    - npp300_npp
+    - npp300_qflag
+    endpoint: cdse
+  cdse/clms_sce_europe_500m_daily_v1_cog:
+    assets:
+      sce500:
+        title: Surface snow area fraction
+    collection_id: clms_sce_europe_500m_daily_v1_cog
+    default_assets:
+    - sce500
+    endpoint: cdse
+  cdse/clms_sce_global_1km_daily_v1_cog:
+    assets:
+      sce_sce:
+        title: Surface snow area fraction
+      sce_unc:
+        title: Unbiased Root Mean Square Error for Snow Cover Extent
+    collection_id: clms_sce_global_1km_daily_v1_cog
+    default_assets:
+    - sce_sce
+    - sce_unc
+    endpoint: cdse
+  cdse/clms_sce_northernhemisphere_1km_daily_v1_cog:
+    assets:
+      sce:
+        title: Surface snow area fraction
+    collection_id: clms_sce_northernhemisphere_1km_daily_v1_cog
+    default_assets:
+    - sce
+    endpoint: cdse
+  cdse/clms_ssm_europe_1km_daily_v1_cog:
+    assets:
+      ssm1km_noise:
+        title: Noise on Surface Soil Moisture
+      ssm1km_ssm:
+        title: Surface Soil Moisture
+    collection_id: clms_ssm_europe_1km_daily_v1_cog
+    default_assets:
+    - ssm1km_ssm
+    - ssm1km_noise
+    endpoint: cdse
+  cdse/clms_swe_northernhemisphere_5km_daily_v1_cog:
+    assets:
+      swe5k_swe:
+        title: Snow Water Equivalent
+      swe5k_var:
+        title: Variance of Snow Water Equivalent
+    collection_id: clms_swe_northernhemisphere_5km_daily_v1_cog
+    default_assets:
+    - swe5k_swe
+    - swe5k_var
+    endpoint: cdse
+  cdse/clms_swe_northernhemisphere_5km_daily_v2_cog:
+    assets:
+      swe5k_swe:
+        title: Snow Water Equivalent
+      swe5k_var:
+        title: Variance of Snow Water Equivalent
+    collection_id: clms_swe_northernhemisphere_5km_daily_v2_cog
+    default_assets:
+    - swe5k_swe
+    - swe5k_var
+    endpoint: cdse
+  cdse/clms_swi-static_global_12.5km_daily_v3_cog:
+    assets:
+      swi_static_ci:
+        title: Pearson Correlation between SWI and GLDAS NOAH version 1 average layer
+          1 soil moisture
+      swi_static_fm:
+        title: Tropical Forest Mask
+      swi_static_tc:
+        title: Topographic Complexity
+      swi_static_wf:
+        title: Wetland Fraction
+    collection_id: clms_swi-static_global_12.5km_daily_v3_cog
+    default_assets:
+    - swi_static_ci
+    - swi_static_fm
+    - swi_static_tc
+    - swi_static_wf
+    endpoint: cdse
+  cdse/clms_swi_europe_1km_daily_v1_cog:
+    assets:
+      swi1km_qflag002:
+        title: Quality Flag on Soil Water Index with T=2
+      swi1km_qflag005:
+        title: Quality Flag on Soil Water Index with T=5
+      swi1km_qflag010:
+        title: Quality Flag on Soil Water Index with T=10
+      swi1km_qflag015:
+        title: Quality Flag on Soil Water Index with T=15
+      swi1km_qflag020:
+        title: Quality Flag on Soil Water Index with T=20
+      swi1km_qflag040:
+        title: Quality Flag on Soil Water Index with T=40
+      swi1km_qflag060:
+        title: Quality Flag on Soil Water Index with T=60
+      swi1km_qflag100:
+        title: Quality Flag on Soil Water Index with T=100
+      swi1km_ssf:
+        title: Surface State Flag
+      swi1km_swi002:
+        title: Soil Water Index with T=2
+      swi1km_swi005:
+        title: Soil Water Index with T=5
+      swi1km_swi010:
+        title: Soil Water Index with T=10
+      swi1km_swi015:
+        title: Soil Water Index with T=15
+      swi1km_swi020:
+        title: Soil Water Index with T=20
+      swi1km_swi040:
+        title: Soil Water Index with T=40
+      swi1km_swi060:
+        title: Soil Water Index with T=60
+      swi1km_swi100:
+        title: Soil Water Index with T=100
+    collection_id: clms_swi_europe_1km_daily_v1_cog
+    default_assets:
+    - swi1km_ssf
+    - swi1km_swi002
+    - swi1km_swi005
+    - swi1km_swi010
+    endpoint: cdse
+  cdse/clms_swi_europe_1km_daily_v2_cog:
+    assets:
+      swi1km_qflag002:
+        title: Quality Flag on Soil Water Index with T=2
+      swi1km_qflag005:
+        title: Quality Flag on Soil Water Index with T=5
+      swi1km_qflag010:
+        title: Quality Flag on Soil Water Index with T=10
+      swi1km_qflag015:
+        title: Quality Flag on Soil Water Index with T=15
+      swi1km_qflag020:
+        title: Quality Flag on Soil Water Index with T=20
+      swi1km_qflag040:
+        title: Quality Flag on Soil Water Index with T=40
+      swi1km_qflag060:
+        title: Quality Flag on Soil Water Index with T=60
+      swi1km_qflag100:
+        title: Quality Flag on Soil Water Index with T=100
+      swi1km_ssf:
+        title: Surface State Flag
+      swi1km_swi002:
+        title: Soil Water Index with T=2
+      swi1km_swi005:
+        title: Soil Water Index with T=5
+      swi1km_swi010:
+        title: Soil Water Index with T=10
+      swi1km_swi015:
+        title: Soil Water Index with T=15
+      swi1km_swi020:
+        title: Soil Water Index with T=20
+      swi1km_swi040:
+        title: Soil Water Index with T=40
+      swi1km_swi060:
+        title: Soil Water Index with T=60
+      swi1km_swi100:
+        title: Soil Water Index with T=100
+    collection_id: clms_swi_europe_1km_daily_v2_cog
+    default_assets:
+    - swi1km_ssf
+    - swi1km_swi002
+    - swi1km_swi005
+    - swi1km_swi010
+    endpoint: cdse
+  cdse/clms_swi_global_12.5km_10daily_v3_cog:
+    assets:
+      swi10_qflag001:
+        title: Quality Flag on Soil Water Index with T=1
+      swi10_qflag005:
+        title: Quality Flag on Soil Water Index with T=5
+      swi10_qflag010:
+        title: Quality Flag on Soil Water Index with T=10
+      swi10_qflag015:
+        title: Quality Flag on Soil Water Index with T=15
+      swi10_qflag020:
+        title: Quality Flag on Soil Water Index with T=20
+      swi10_qflag040:
+        title: Quality Flag on Soil Water Index with T=40
+      swi10_qflag060:
+        title: Quality Flag on Soil Water Index with T=60
+      swi10_qflag100:
+        title: Quality Flag on Soil Water Index with T=100
+      swi10_swi001:
+        title: Soil Water Index with T=1
+      swi10_swi005:
+        title: Soil Water Index with T=5
+      swi10_swi010:
+        title: Soil Water Index with T=10
+      swi10_swi015:
+        title: Soil Water Index with T=15
+      swi10_swi020:
+        title: Soil Water Index with T=20
+      swi10_swi040:
+        title: Soil Water Index with T=40
+      swi10_swi060:
+        title: Soil Water Index with T=60
+      swi10_swi100:
+        title: Soil Water Index with T=100
+      swi10_vobs001:
+        title: Percent Valid Observations on Soil Water Index with T=1
+      swi10_vobs005:
+        title: Percent Valid Observations on Soil Water Index with T=5
+      swi10_vobs010:
+        title: Percent Valid Observations on Soil Water Index with T=10
+      swi10_vobs015:
+        title: Percent Valid Observations on Soil Water Index with T=15
+      swi10_vobs020:
+        title: Percent Valid Observations on Soil Water Index with T=20
+      swi10_vobs040:
+        title: Percent Valid Observations on Soil Water Index with T=40
+      swi10_vobs060:
+        title: Percent Valid Observations on Soil Water Index with T=60
+      swi10_vobs100:
+        title: Percent Valid Observations on Soil Water Index with T=100
+    collection_id: clms_swi_global_12.5km_10daily_v3_cog
+    default_assets:
+    - swi10_swi001
+    - swi10_swi005
+    - swi10_swi010
+    - swi10_swi015
+    endpoint: cdse
+  cdse/clms_swi_global_12.5km_10daily_v4_cog:
+    assets:
+      swi10_qflag001:
+        title: Quality Flag on Soil Water Index with T=1
+      swi10_qflag005:
+        title: Quality Flag on Soil Water Index with T=5
+      swi10_qflag010:
+        title: Quality Flag on Soil Water Index with T=10
+      swi10_qflag015:
+        title: Quality Flag on Soil Water Index with T=15
+      swi10_qflag020:
+        title: Quality Flag on Soil Water Index with T=20
+      swi10_qflag040:
+        title: Quality Flag on Soil Water Index with T=40
+      swi10_qflag060:
+        title: Quality Flag on Soil Water Index with T=60
+      swi10_qflag100:
+        title: Quality Flag on Soil Water Index with T=100
+      swi10_swi001:
+        title: Soil Water Index with T=1
+      swi10_swi005:
+        title: Soil Water Index with T=5
+      swi10_swi010:
+        title: Soil Water Index with T=10
+      swi10_swi015:
+        title: Soil Water Index with T=15
+      swi10_swi020:
+        title: Soil Water Index with T=20
+      swi10_swi040:
+        title: Soil Water Index with T=40
+      swi10_swi060:
+        title: Soil Water Index with T=60
+      swi10_swi100:
+        title: Soil Water Index with T=100
+      swi10_vobs001:
+        title: Percent Valid Observations on Soil Water Index with T=1
+      swi10_vobs005:
+        title: Percent Valid Observations on Soil Water Index with T=5
+      swi10_vobs010:
+        title: Percent Valid Observations on Soil Water Index with T=10
+      swi10_vobs015:
+        title: Percent Valid Observations on Soil Water Index with T=15
+      swi10_vobs020:
+        title: Percent Valid Observations on Soil Water Index with T=20
+      swi10_vobs040:
+        title: Percent Valid Observations on Soil Water Index with T=40
+      swi10_vobs060:
+        title: Percent Valid Observations on Soil Water Index with T=60
+      swi10_vobs100:
+        title: Percent Valid Observations on Soil Water Index with T=100
+    collection_id: clms_swi_global_12.5km_10daily_v4_cog
+    default_assets:
+    - swi10_swi001
+    - swi10_swi005
+    - swi10_swi010
+    - swi10_swi015
+    endpoint: cdse
+  cdse/clms_swi_global_12.5km_daily_v3_cog:
+    assets:
+      swi_qflag001:
+        title: Quality Flag on Soil Water Index with T=1
+      swi_qflag005:
+        title: Quality Flag on Soil Water Index with T=5
+      swi_qflag010:
+        title: Quality Flag on Soil Water Index with T=10
+      swi_qflag015:
+        title: Quality Flag on Soil Water Index with T=15
+      swi_qflag020:
+        title: Quality Flag on Soil Water Index with T=20
+      swi_qflag040:
+        title: Quality Flag on Soil Water Index with T=40
+      swi_qflag060:
+        title: Quality Flag on Soil Water Index with T=60
+      swi_qflag100:
+        title: Quality Flag on Soil Water Index with T=100
+      swi_ssf:
+        title: Surface State Flag
+      swi_swi001:
+        title: Soil Water Index with T=1
+      swi_swi005:
+        title: Soil Water Index with T=5
+      swi_swi010:
+        title: Soil Water Index with T=10
+      swi_swi015:
+        title: Soil Water Index with T=15
+      swi_swi020:
+        title: Soil Water Index with T=20
+      swi_swi040:
+        title: Soil Water Index with T=40
+      swi_swi060:
+        title: Soil Water Index with T=60
+      swi_swi100:
+        title: Soil Water Index with T=100
+    collection_id: clms_swi_global_12.5km_daily_v3_cog
+    default_assets:
+    - swi_ssf
+    - swi_swi001
+    - swi_swi005
+    - swi_swi010
+    endpoint: cdse
+  cdse/clms_swi_global_12.5km_daily_v4_cog:
+    assets:
+      swi_qflag001:
+        title: Quality Flag on Soil Water Index with T=1
+      swi_qflag005:
+        title: Quality Flag on Soil Water Index with T=5
+      swi_qflag010:
+        title: Quality Flag on Soil Water Index with T=10
+      swi_qflag015:
+        title: Quality Flag on Soil Water Index with T=15
+      swi_qflag020:
+        title: Quality Flag on Soil Water Index with T=20
+      swi_qflag040:
+        title: Quality Flag on Soil Water Index with T=40
+      swi_qflag060:
+        title: Quality Flag on Soil Water Index with T=60
+      swi_qflag100:
+        title: Quality Flag on Soil Water Index with T=100
+      swi_ssf:
+        title: Surface State Flag
+      swi_swi001:
+        title: Soil Water Index with T=1
+      swi_swi005:
+        title: Soil Water Index with T=5
+      swi_swi010:
+        title: Soil Water Index with T=10
+      swi_swi015:
+        title: Soil Water Index with T=15
+      swi_swi020:
+        title: Soil Water Index with T=20
+      swi_swi040:
+        title: Soil Water Index with T=40
+      swi_swi060:
+        title: Soil Water Index with T=60
+      swi_swi100:
+        title: Soil Water Index with T=100
+    collection_id: clms_swi_global_12.5km_daily_v4_cog
+    default_assets:
+    - swi_ssf
+    - swi_swi001
+    - swi_swi005
+    - swi_swi010
+    endpoint: cdse
+  cdse/clms_tcd_pantropical_10m_yearly_v1_cog:
+    assets:
+      map:
+        title: TCD-10 Map
+    collection_id: clms_tcd_pantropical_10m_yearly_v1_cog
+    default_assets:
+    - map
+    endpoint: cdse
+  cdse/clms_ua_building-height_europe_10m_3yearly_v1:
+    assets:
+      data:
+        title: Urban Atlas Building Height Raster (10m)
+    collection_id: clms_ua_building-height_europe_10m_3yearly_v1
+    default_assets:
+    - data
+    endpoint: cdse
+  cdse/clms_vlcc_bare-soil-after-confidence-layer_europe_10m_yearly_v1:
+    assets:
+      data:
+        title: Bare Soil After Confidence Layer Raster (10m)
+    collection_id: clms_vlcc_bare-soil-after-confidence-layer_europe_10m_yearly_v1
+    default_assets:
+    - data
+    endpoint: cdse
+  cdse/clms_vlcc_bare-soil-after_europe_10m_yearly_v1:
+    assets:
+      data:
+        title: Bare Soil After Raster (10m)
+    collection_id: clms_vlcc_bare-soil-after_europe_10m_yearly_v1
+    default_assets:
+    - data
+    endpoint: cdse
+  cdse/clms_vlcc_bare-soil-before-confidence-layer_europe_10m_yearly_v1:
+    assets:
+      data:
+        title: Bare Soil Before Confidence Layer Raster (10m)
+    collection_id: clms_vlcc_bare-soil-before-confidence-layer_europe_10m_yearly_v1
+    default_assets:
+    - data
+    endpoint: cdse
+  cdse/clms_vlcc_bare-soil-before_europe_10m_yearly_v1:
+    assets:
+      data:
+        title: Bare Soil Before Raster (10m)
+    collection_id: clms_vlcc_bare-soil-before_europe_10m_yearly_v1
+    default_assets:
+    - data
+    endpoint: cdse
+  cdse/clms_vlcc_broadleaved-cover-density_europe_100m_yearly_v1:
+    assets:
+      data:
+        title: Broadleaved Cover Density Raster (100m)
+    collection_id: clms_vlcc_broadleaved-cover-density_europe_100m_yearly_v1
+    default_assets:
+    - data
+    endpoint: cdse
+  cdse/clms_vlcc_coniferous-cover-density_europe_100m_yearly_v1:
+    assets:
+      data:
+        title: Coniferous Cover Density Raster (100m)
+    collection_id: clms_vlcc_coniferous-cover-density_europe_100m_yearly_v1
+    default_assets:
+    - data
+    endpoint: cdse
+  cdse/clms_vlcc_crop-types-confidence-layer_europe_10m_yearly_v1:
+    assets:
+      data:
+        title: Crop Types Confidence Layer Raster (10m)
+    collection_id: clms_vlcc_crop-types-confidence-layer_europe_10m_yearly_v1
+    default_assets:
+    - data
+    endpoint: cdse
+  cdse/clms_vlcc_crop-types_europe_10m_yearly_v1:
+    assets:
+      data:
+        title: Crop Types Raster (10m)
+    collection_id: clms_vlcc_crop-types_europe_10m_yearly_v1
+    default_assets:
+    - data
+    endpoint: cdse
+  cdse/clms_vlcc_cropping-seasons-types_europe_10m_yearly_v1:
+    assets:
+      data:
+        title: Cropping Seasons Types Raster (10m)
+    collection_id: clms_vlcc_cropping-seasons-types_europe_10m_yearly_v1
+    default_assets:
+    - data
+    endpoint: cdse
+  cdse/clms_vlcc_cropping-seasons_europe_10m_yearly_v1:
+    assets:
+      data:
+        title: Cropping Seasons Yearly Raster (10m)
+    collection_id: clms_vlcc_cropping-seasons_europe_10m_yearly_v1
+    default_assets:
+    - data
+    endpoint: cdse
+  cdse/clms_vlcc_dominant-leaf-type-change_europe_20m_3yearly_v1:
+    assets:
+      data:
+        title: Dominant Leaf Type Change Raster (20m)
+    collection_id: clms_vlcc_dominant-leaf-type-change_europe_20m_3yearly_v1
+    default_assets:
+    - data
+    endpoint: cdse
+  cdse/clms_vlcc_dominant-leaf-type-confidence-layer_europe_10m_yearly_v1:
+    assets:
+      data:
+        title: Dominant Leaf Type Confidence Layer Raster (10m)
+    collection_id: clms_vlcc_dominant-leaf-type-confidence-layer_europe_10m_yearly_v1
+    default_assets:
+    - data
+    endpoint: cdse
+  cdse/clms_vlcc_dominant-leaf-type_europe_10m_yearly_v1:
+    assets:
+      data:
+        title: Dominant Leaf Type Raster (10m)
+    collection_id: clms_vlcc_dominant-leaf-type_europe_10m_yearly_v1
+    default_assets:
+    - data
+    endpoint: cdse
+  cdse/clms_vlcc_fallow-land-duration-confidence-layer_europe_10m_yearly_v1:
+    assets:
+      data:
+        title: Fallow Land Duration Confidence Layer Raster (10m)
+    collection_id: clms_vlcc_fallow-land-duration-confidence-layer_europe_10m_yearly_v1
+    default_assets:
+    - data
+    endpoint: cdse
+  cdse/clms_vlcc_fallow-land-duration_europe_10m_yearly_v1:
+    assets:
+      data:
+        title: Fallow Land Duration Raster (10m)
+    collection_id: clms_vlcc_fallow-land-duration_europe_10m_yearly_v1
+    default_assets:
+    - data
+    endpoint: cdse
+  cdse/clms_vlcc_fallow-land-presence-confidence-layer_europe_10m_yearly_v1:
+    assets:
+      data:
+        title: Fallow Land Presence Confidence Layer Raster (10m)
+    collection_id: clms_vlcc_fallow-land-presence-confidence-layer_europe_10m_yearly_v1
+    default_assets:
+    - data
+    endpoint: cdse
+  cdse/clms_vlcc_fallow-land-presence_europe_10m_yearly_v1:
+    assets:
+      data:
+        title: Fallow Land Presence Raster (10m)
+    collection_id: clms_vlcc_fallow-land-presence_europe_10m_yearly_v1
+    default_assets:
+    - data
+    endpoint: cdse
+  cdse/clms_vlcc_forest-additional-support-layer_europe_10m_3yearly_v1:
+    assets:
+      data:
+        title: Forest Additional Support Layer Raster (10m)
+    collection_id: clms_vlcc_forest-additional-support-layer_europe_10m_3yearly_v1
+    default_assets:
+    - data
+    endpoint: cdse
+  cdse/clms_vlcc_forest-type_europe_100m_3yearly_v1:
+    assets:
+      data:
+        title: Forest Type Raster (100m)
+    collection_id: clms_vlcc_forest-type_europe_100m_3yearly_v1
+    default_assets:
+    - data
+    endpoint: cdse
+  cdse/clms_vlcc_forest-type_europe_10m_3yearly_v1:
+    assets:
+      data:
+        title: Forest Type Raster (10m)
+    collection_id: clms_vlcc_forest-type_europe_10m_3yearly_v1
+    default_assets:
+    - data
+    endpoint: cdse
+  cdse/clms_vlcc_grassland-change-confidence-layer_europe_20m_3yearly_v1:
+    assets:
+      data:
+        title: Grassland Change Confidence Layer Raster (20m)
+    collection_id: clms_vlcc_grassland-change-confidence-layer_europe_20m_3yearly_v1
+    default_assets:
+    - data
+    endpoint: cdse
+  cdse/clms_vlcc_grassland-change_europe_20m_3yearly_v1:
+    assets:
+      data:
+        title: Grassland Change Raster (20m)
+    collection_id: clms_vlcc_grassland-change_europe_20m_3yearly_v1
+    default_assets:
+    - data
+    endpoint: cdse
+  cdse/clms_vlcc_grassland-confidence-layer_europe_10m_yearly_v1:
+    assets:
+      data:
+        title: Grassland Confidence Layer Raster (10m)
+    collection_id: clms_vlcc_grassland-confidence-layer_europe_10m_yearly_v1
+    default_assets:
+    - data
+    endpoint: cdse
+  cdse/clms_vlcc_grassland-mowing-dates_europe_10m_yearly_v1:
+    assets:
+      data:
+        title: Grassland Mowing Dates Raster (10m)
+    collection_id: clms_vlcc_grassland-mowing-dates_europe_10m_yearly_v1
+    default_assets:
+    - data
+    endpoint: cdse
+  cdse/clms_vlcc_grassland-mowing-events-confidence-layer_europe_10m_yearly_v1:
+    assets:
+      data:
+        title: Grassland Mowing Events Confidence Layer Raster (10m)
+    collection_id: clms_vlcc_grassland-mowing-events-confidence-layer_europe_10m_yearly_v1
+    default_assets:
+    - data
+    endpoint: cdse
+  cdse/clms_vlcc_grassland-mowing-events_europe_10m_yearly_v1:
+    assets:
+      data:
+        title: Grassland Mowing Events Raster (10m)
+    collection_id: clms_vlcc_grassland-mowing-events_europe_10m_yearly_v1
+    default_assets:
+    - data
+    endpoint: cdse
+  cdse/clms_vlcc_grassland_europe_100m_yearly_v1:
+    assets:
+      data:
+        title: Grassland Raster (100m)
+    collection_id: clms_vlcc_grassland_europe_100m_yearly_v1
+    default_assets:
+    - data
+    endpoint: cdse
+  cdse/clms_vlcc_grassland_europe_10m_yearly_v1:
+    assets:
+      data:
+        title: Grassland Raster (10m)
+    collection_id: clms_vlcc_grassland_europe_10m_yearly_v1
+    default_assets:
+    - data
+    endpoint: cdse
+  cdse/clms_vlcc_herbaceous-cover_europe_10m_yearly_v1:
+    assets:
+      data:
+        title: Herbaceous Cover Raster (10m)
+    collection_id: clms_vlcc_herbaceous-cover_europe_10m_yearly_v1
+    default_assets:
+    - data
+    endpoint: cdse
+  cdse/clms_vlcc_main-crop-duration-confidence-layer_europe_10m_yearly_v1:
+    assets:
+      data:
+        title: Main Crop Duration Confidence Layer Raster (10m)
+    collection_id: clms_vlcc_main-crop-duration-confidence-layer_europe_10m_yearly_v1
+    default_assets:
+    - data
+    endpoint: cdse
+  cdse/clms_vlcc_main-crop-duration_europe_10m_yearly_v1:
+    assets:
+      data:
+        title: Main Crop Duration Raster (10m)
+    collection_id: clms_vlcc_main-crop-duration_europe_10m_yearly_v1
+    default_assets:
+    - data
+    endpoint: cdse
+  cdse/clms_vlcc_main-crop-emergence-confidence-layer_europe_10m_yearly_v1:
+    assets:
+      data:
+        title: Main Crop Emergence Confidence Layer Raster (10m)
+    collection_id: clms_vlcc_main-crop-emergence-confidence-layer_europe_10m_yearly_v1
+    default_assets:
+    - data
+    endpoint: cdse
+  cdse/clms_vlcc_main-crop-emergence_europe_10m_yearly_v1:
+    assets:
+      data:
+        title: Main Crop Emergence Raster (10m)
+    collection_id: clms_vlcc_main-crop-emergence_europe_10m_yearly_v1
+    default_assets:
+    - data
+    endpoint: cdse
+  cdse/clms_vlcc_main-crop-harvest-confidence-layer_europe_10m_yearly_v1:
+    assets:
+      data:
+        title: Main Crop Harvest Confidence Layer Raster (10m)
+    collection_id: clms_vlcc_main-crop-harvest-confidence-layer_europe_10m_yearly_v1
+    default_assets:
+    - data
+    endpoint: cdse
+  cdse/clms_vlcc_main-crop-harvest_europe_10m_yearly_v1:
+    assets:
+      data:
+        title: Main Crop Harvest Raster (10m)
+    collection_id: clms_vlcc_main-crop-harvest_europe_10m_yearly_v1
+    default_assets:
+    - data
+    endpoint: cdse
+  cdse/clms_vlcc_ploughing-indicator_europe_10m_yearly_v1:
+    assets:
+      data:
+        title: Ploughing Indicator Raster (10m)
+    collection_id: clms_vlcc_ploughing-indicator_europe_10m_yearly_v1
+    default_assets:
+    - data
+    endpoint: cdse
+  cdse/clms_vlcc_secondary-crop-duration-confidence-layer_europe_10m_yearly_v1:
+    assets:
+      data:
+        title: Secondary Crop Duration Confidence Layer Raster (10m)
+    collection_id: clms_vlcc_secondary-crop-duration-confidence-layer_europe_10m_yearly_v1
+    default_assets:
+    - data
+    endpoint: cdse
+  cdse/clms_vlcc_secondary-crop-duration_europe_10m_yearly_v1:
+    assets:
+      data:
+        title: Secondary Crop Duration Raster (10m)
+    collection_id: clms_vlcc_secondary-crop-duration_europe_10m_yearly_v1
+    default_assets:
+    - data
+    endpoint: cdse
+  cdse/clms_vlcc_secondary-crop-emergence_europe_10m_yearly_v1:
+    assets:
+      data:
+        title: Secondary Crop Emergence Raster (10m)
+    collection_id: clms_vlcc_secondary-crop-emergence_europe_10m_yearly_v1
+    default_assets:
+    - data
+    endpoint: cdse
+  cdse/clms_vlcc_secondary-crop-types_europe_10m_yearly_v1:
+    assets:
+      data:
+        title: Secondary Crop Types Raster (10m)
+    collection_id: clms_vlcc_secondary-crop-types_europe_10m_yearly_v1
+    default_assets:
+    - data
+    endpoint: cdse
+  cdse/clms_vlcc_tree-cover-density-confidence-layer_europe_10m_yearly_v1:
+    assets:
+      data:
+        title: Tree Cover Density Confidence Layer Raster (10m)
+    collection_id: clms_vlcc_tree-cover-density-confidence-layer_europe_10m_yearly_v1
+    default_assets:
+    - data
+    endpoint: cdse
+  cdse/clms_vlcc_tree-cover-density_europe_100m_yearly_v1:
+    assets:
+      data:
+        title: Tree Cover Density Raster (100m)
+    collection_id: clms_vlcc_tree-cover-density_europe_100m_yearly_v1
+    default_assets:
+    - data
+    endpoint: cdse
+  cdse/clms_vlcc_tree-cover-density_europe_10m_yearly_v1:
+    assets:
+      data:
+        title: Tree Cover Density Raster (10m)
+    collection_id: clms_vlcc_tree-cover-density_europe_10m_yearly_v1
+    default_assets:
+    - data
+    endpoint: cdse
+  cdse/clms_vlcc_tree-cover-presence-change-confidence-layer_europe_20m_3yearly_v1:
+    assets:
+      data:
+        title: Tree Cover Presence Change Confidence Layer Raster (20m)
+    collection_id: clms_vlcc_tree-cover-presence-change-confidence-layer_europe_20m_3yearly_v1
+    default_assets:
+    - data
+    endpoint: cdse
+  cdse/clms_vlcc_tree-cover-presence-change_europe_20m_3yearly_v1:
+    assets:
+      data:
+        title: Tree Cover Presence Change Raster (20m)
+    collection_id: clms_vlcc_tree-cover-presence-change_europe_20m_3yearly_v1
+    default_assets:
+    - data
+    endpoint: cdse
+  cdse/clms_wb_global_100m_monthly_v1_cog:
+    assets:
+      wb100_qual:
+        title: Quality Flag on Water Bodies
+      wb100_wb:
+        title: Water Bodies
+    collection_id: clms_wb_global_100m_monthly_v1_cog
+    default_assets:
+    - wb100_wb
+    - wb100_qual
+    endpoint: cdse
+  cdse/clms_wb_global_1km_10daily_v2_cog:
+    assets:
+      wb_qual:
+        title: Quality Flag on Water Bodies
+      wb_wb:
+        title: Water Bodies
+    collection_id: clms_wb_global_1km_10daily_v2_cog
+    default_assets:
+    - wb_wb
+    - wb_qual
+    endpoint: cdse
+  cdse/clms_wb_global_300m_10daily_v1_cog:
+    assets:
+      wb300_qual:
+        title: Quality Flag on Water Bodies
+      wb300_wb:
+        title: Water Bodies
+    collection_id: clms_wb_global_300m_10daily_v1_cog
+    default_assets:
+    - wb300_wb
+    - wb300_qual
+    endpoint: cdse
+  cdse/clms_wb_global_300m_monthly_v2_cog:
+    assets:
+      wb300_qual:
+        title: Quality Flag on Water Bodies
+      wb300_wb:
+        title: Water Bodies
+    collection_id: clms_wb_global_300m_monthly_v2_cog
+    default_assets:
+    - wb300_wb
+    - wb300_qual
+    endpoint: cdse
+  cdse/cop-dem-eea-10-laea-tif:
+    assets:
+      data:
+        title: GeoTIFF
+    collection_id: cop-dem-eea-10-laea-tif
+    default_assets:
+    - data
+    endpoint: cdse
+  cdse/cop-dem-glo-30-dged-cog:
+    assets:
+      data:
+        title: GeoTIFF
+    collection_id: cop-dem-glo-30-dged-cog
+    default_assets:
+    - data
+    endpoint: cdse
+  cdse/cop-dem-glo-90-dged-cog:
+    assets:
+      data:
+        title: GeoTIFF
+    collection_id: cop-dem-glo-90-dged-cog
+    default_assets:
+    - data
+    endpoint: cdse
+  cdse/landsat-c2-l1-oli:
+    assets:
+      B1:
+        title: Coastal aerosol (band 1) - 30m
+      B2:
+        title: Blue (band 2) - 30m
+      B3:
+        title: Green (band 3) - 30m
+      B4:
+        title: Red (band 4) - 30m
+      B5:
+        title: Near Infrared (band 5) - 30m
+      B6:
+        title: Short-wave Infrared 1.6 (band 6) - 30m
+      B7:
+        title: Short-wave Infrared 2.2 (band 7) - 30m
+      B8:
+        title: Panchromatic (band 8) - 15m
+      B9:
+        title: Cirrus (band 9) - 30m
+      SAA:
+        title: Solar Azimuth Angle Band
+      SZA:
+        title: Solar Zenith Angle Band
+      VAA:
+        title: Sensor Azimuth Angle Band
+      VZA:
+        title: Sensor Zenith Angle Band
+      qa_pixel:
+        title: Quality Assessment Band
+      qa_radsat:
+        title: Radiometric Saturation Quality Assessment Band
+    collection_id: landsat-c2-l1-oli
+    default_assets:
+    - B1
+    - B2
+    - B3
+    - B4
+    endpoint: cdse
+  cdse/landsat-c2-l1-oli-tirs:
+    assets:
+      B1:
+        title: Coastal aerosol (band 1) - 30m
+      B10:
+        title: Thermal Infrared 10.9 (band 10) - 100m
+      B11:
+        title: Thermal Infrared 12.0 (band 11) - 100m
+      B2:
+        title: Blue (band 2) - 30m
+      B3:
+        title: Green (band 3) - 30m
+      B4:
+        title: Red (band 4) - 30m
+      B5:
+        title: Near Infrared (band 5) - 30m
+      B6:
+        title: Short-wave Infrared 1.6 (band 6) - 30m
+      B7:
+        title: Short-wave Infrared 2.2 (band 7) - 30m
+      B8:
+        title: Panchromatic (band 8) - 15m
+      B9:
+        title: Cirrus (band 9) - 30m
+      SAA:
+        title: Solar Azimuth Angle Band
+      SZA:
+        title: Solar Zenith Angle Band
+      VAA:
+        title: Sensor Azimuth Angle Band
+      VZA:
+        title: Sensor Zenith Angle Band
+      qa_pixel:
+        title: Quality Assessment Band
+      qa_radsat:
+        title: Radiometric Saturation Quality Assessment Band
+    collection_id: landsat-c2-l1-oli-tirs
+    default_assets:
+    - B1
+    - B2
+    - B3
+    - B4
+    endpoint: cdse
+  cdse/landsat-c2-l1-tirs:
+    assets:
+      B10:
+        title: Thermal Infrared 10.9 (band 10) - 100m
+      B11:
+        title: Thermal Infrared 12.0 (band 11) - 100m
+      qa_pixel:
+        title: Quality Assessment Band
+      qa_radsat:
+        title: Radiometric Saturation Quality Assessment Band
+    collection_id: landsat-c2-l1-tirs
+    default_assets:
+    - B10
+    - B11
+    - qa_pixel
+    - qa_radsat
+    endpoint: cdse
+  cdse/opengeohub-landsat-bimonthly-mosaic-v1.0.1:
+    assets:
+      B01:
+        title: Band 1
+      B02:
+        title: Band 2
+      B03:
+        title: Band 3
+      B04:
+        title: Band 4
+      B05:
+        title: Band 5
+      B06:
+        title: Band 6
+      B07:
+        title: Band 7
+      clear_sky_mask:
+        title: Clear sky mask
+    collection_id: opengeohub-landsat-bimonthly-mosaic-v1.0.1
+    default_assets:
+    - B01
+    - B02
+    - B03
+    - B04
+    endpoint: cdse
+  cdse/sentinel-1-global-mosaics:
+    assets:
+      HH:
+        title: 'HH: Horizontal transmit, horizontal receive'
+      HV:
+        title: 'HV: Horizontal transmit, horizontal receive'
+      VH:
+        title: 'VH: Vertical transmit, horizontal receive'
+      VV:
+        title: 'VV: Vertical transmit, vertical receive'
+    collection_id: sentinel-1-global-mosaics
+    default_assets:
+    - HH
+    - HV
+    - VH
+    - VV
+    endpoint: cdse
+  cdse/sentinel-1-slc:
+    assets:
+      ew1-hh:
+        title: 'HH: Horizontal transmit, horizontal receive'
+      ew1-hv:
+        title: 'HV: Horizontal transmit, vertical receive'
+      ew1-vh:
+        title: 'VH: Vertical transmit, horizontal receive'
+      ew1-vv:
+        title: 'VV: Vertical transmit, vertical receive'
+      ew2-hh:
+        title: 'HH: Horizontal transmit, horizontal receive'
+      ew2-hv:
+        title: 'HV: Horizontal transmit, vertical receive'
+      ew2-vh:
+        title: 'VH: Vertical transmit, horizontal receive'
+      ew2-vv:
+        title: 'VV: Vertical transmit, vertical receive'
+      ew3-hh:
+        title: 'HH: Horizontal transmit, horizontal receive'
+      ew3-hv:
+        title: 'HV: Horizontal transmit, vertical receive'
+      ew3-vh:
+        title: 'VH: Vertical transmit, horizontal receive'
+      ew3-vv:
+        title: 'VV: Vertical transmit, vertical receive'
+      ew4-hh:
+        title: 'HH: Horizontal transmit, horizontal receive'
+      ew4-hv:
+        title: 'HV: Horizontal transmit, vertical receive'
+      ew4-vh:
+        title: 'VH: Vertical transmit, horizontal receive'
+      ew4-vv:
+        title: 'VV: Vertical transmit, vertical receive'
+      ew5-hh:
+        title: 'HH: Horizontal transmit, horizontal receive'
+      ew5-hv:
+        title: 'HV: Horizontal transmit, vertical receive'
+      ew5-vh:
+        title: 'VH: Vertical transmit, horizontal receive'
+      ew5-vv:
+        title: 'VV: Vertical transmit, vertical receive'
+      iw1-hh:
+        title: 'HH: Horizontal transmit, horizontal receive'
+      iw1-hv:
+        title: 'HV: Horizontal transmit, vertical receive'
+      iw1-vh:
+        title: 'VH: Vertical transmit, horizontal receive'
+      iw1-vv:
+        title: 'VV: Vertical transmit, vertical receive'
+      iw2-hh:
+        title: 'HH: Horizontal transmit, horizontal receive'
+      iw2-hv:
+        title: 'HV: Horizontal transmit, vertical receive'
+      iw2-vh:
+        title: 'VH: Vertical transmit, horizontal receive'
+      iw2-vv:
+        title: 'VV: Vertical transmit, vertical receive'
+      iw3-hh:
+        title: 'HH: Horizontal transmit, horizontal receive'
+      iw3-hv:
+        title: 'HV: Horizontal transmit, vertical receive'
+      iw3-vh:
+        title: 'VH: Vertical transmit, horizontal receive'
+      iw3-vv:
+        title: 'VV: Vertical transmit, vertical receive'
+      s1-hh:
+        title: 'HH: Horizontal transmit, horizontal receive'
+      s1-hv:
+        title: 'HV: Horizontal transmit, vertical receive'
+      s1-vh:
+        title: 'VH: Vertical transmit, horizontal receive'
+      s1-vv:
+        title: 'VV: Vertical transmit, vertical receive'
+      s2-hh:
+        title: 'HH: Horizontal transmit, horizontal receive'
+      s2-hv:
+        title: 'HV: Horizontal transmit, vertical receive'
+      s2-vh:
+        title: 'VH: Vertical transmit, horizontal receive'
+      s2-vv:
+        title: 'VV: Vertical transmit, vertical receive'
+      s3-hh:
+        title: 'HH: Horizontal transmit, horizontal receive'
+      s3-hv:
+        title: 'HV: Horizontal transmit, vertical receive'
+      s3-vh:
+        title: 'VH: Vertical transmit, horizontal receive'
+      s3-vv:
+        title: 'VV: Vertical transmit, vertical receive'
+      s4-hh:
+        title: 'HH: Horizontal transmit, horizontal receive'
+      s4-hv:
+        title: 'HV: Horizontal transmit, vertical receive'
+      s4-vh:
+        title: 'VH: Vertical transmit, horizontal receive'
+      s4-vv:
+        title: 'VV: Vertical transmit, vertical receive'
+      s5-hh:
+        title: 'HH: Horizontal transmit, horizontal receive'
+      s5-hv:
+        title: 'HV: Horizontal transmit, vertical receive'
+      s5-vh:
+        title: 'VH: Vertical transmit, horizontal receive'
+      s5-vv:
+        title: 'VV: Vertical transmit, vertical receive'
+      s6-hh:
+        title: 'HH: Horizontal transmit, horizontal receive'
+      s6-hv:
+        title: 'HV: Horizontal transmit, vertical receive'
+      s6-vh:
+        title: 'VH: Vertical transmit, horizontal receive'
+      s6-vv:
+        title: 'VV: Vertical transmit, vertical receive'
+    collection_id: sentinel-1-slc
+    default_assets:
+    - s1-hh
+    - s1-hv
+    - s1-vh
+    - s1-vv
+    endpoint: cdse
+  cdse/sentinel-1-slc-wv:
+    assets:
+      wv1-hh:
+        title: 'HH: Horizontal transmit, horizontal receive'
+      wv1-vv:
+        title: 'VV: Vertical transmit, vertical receive'
+      wv2-hh:
+        title: 'HH: Horizontal transmit, horizontal receive'
+      wv2-vv:
+        title: 'VV: Vertical transmit, vertical receive'
+    collection_id: sentinel-1-slc-wv
+    default_assets:
+    - wv1-hh
+    - wv1-vv
+    - wv2-hh
+    - wv2-vv
+    endpoint: cdse
+  cdse/sentinel-2-global-mosaics:
+    assets:
+      B02:
+        title: Blue (band 2)
+      B03:
+        title: Green (band 3)
+      B04:
+        title: Red (band 4)
+      B08:
+        title: NIR 1 (band 8)
+      observations:
+        title: Observations
+    collection_id: sentinel-2-global-mosaics
+    default_assets:
+    - B02
+    - B03
+    - B04
+    - B08
+    endpoint: cdse
+  sentinel-1-grd:
+    assets:
+      vh:
+        common_name: vh
+        dtype: float32
+        title: VH backscatter
+      vv:
+        common_name: vv
+        dtype: float32
+        title: VV backscatter
+    cadence: 6-day
+    collection_id: sentinel-1-grd
+    default_assets:
+    - vv
+    - vh
+    endpoint: cdse
+    extent:
+      bbox:
+      - -180.0
+      - -90.0
+      - 180.0
+      - 90.0
+      start_date: '2014-10-03'
+    resolution: 10.0

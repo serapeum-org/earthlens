@@ -63,6 +63,16 @@ class TestBundledCatalog:
         """get_collection returns a Collection model."""
         assert isinstance(Catalog().get_collection("sentinel-2-l2a"), Collection)
 
+    def test_bulk_cog_collections_curated(self):
+        """The bulk COG-imagery curation populated many endpoint-namespaced entries."""
+        cat = Catalog()
+        assert len(cat.datasets) > 100, f"expected the bulk COG curation, got {len(cat.datasets)}"
+        namespaced = [k for k in cat.datasets if "/" in k]
+        assert namespaced, "expected endpoint-namespaced <endpoint>/<id> bulk entries"
+        # every namespaced key's endpoint prefix matches its collection's endpoint
+        for key in namespaced[:20]:
+            assert key.split("/", 1)[0] == cat.get_collection(key).endpoint
+
 
 @pytest.mark.stac
 class TestResolve:
