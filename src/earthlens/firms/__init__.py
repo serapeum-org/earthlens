@@ -63,6 +63,7 @@ from earthlens.firms.catalog import (
     Sensor,
     SensorColumn,
 )
+from earthlens.firms.events import csv_to_fc, empty_fc
 
 __all__ = [
     "CATALOG_PATH",
@@ -73,4 +74,6 @@ __all__ = [
     "FirmsCredentials",
     "Sensor",
     "SensorColumn",
+    "csv_to_fc",
+    "empty_fc",
 ]

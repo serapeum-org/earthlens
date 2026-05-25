@@ -30,10 +30,15 @@ per-request cap), so `temporal_resolution` carries the sentinel `"all"`.
 from __future__ import annotations
 
 import datetime as dt
+import time
+from io import StringIO
 from pathlib import Path
 from typing import TYPE_CHECKING, Literal
 
 import pandas as pd
+import requests
+from loguru import logger
+from tqdm import tqdm
 
 from earthlens.base import (
     AbstractDataSource,
@@ -42,7 +47,9 @@ from earthlens.base import (
     SpatialExtent,
     TemporalExtent,
 )
-from earthlens.firms.auth import FirmsAuth, FirmsCredentials
+from earthlens.firms import events
+from earthlens.firms._helpers import chunk_windows, classify_body, firms_get
+from earthlens.firms.auth import AuthenticationError, FirmsAuth, FirmsCredentials
 from earthlens.firms.catalog import Catalog
 
 if TYPE_CHECKING:
@@ -50,13 +57,21 @@ if TYPE_CHECKING:
 
     from earthlens.aggregate import AggregationConfig
 
+#: FIRMS area-CSV endpoint. Filled with the MAP_KEY, sensor, bbox
+#: (W,S,E,N), day_range, and start_date path segments.
+AREA_URL_TEMPLATE = (
+    "https://firms.modaps.eosdis.nasa.gov/api/area/csv/"
+    "{map_key}/{sensor}/{bbox}/{day_range}/{start_date}"
+)
+
 #: Default sensor when `variables=[]` — the highest-resolution current
 #: NRT sensor.
 _DEFAULT_SENSORS = ["VIIRS_SNPP_NRT"]
 
-#: FIRMS caps `day_range` at 10 days per area request (windows longer
-#: than this are chunked in :meth:`FIRMS._search`).
-MAX_DAY_RANGE = 10
+#: Approximate NRT retention: `*_NRT` sensors only hold roughly the last
+#: two months, so a request older than this against an NRT sensor warns
+#: (and names the `*_SP` archive variant).
+NRT_RETENTION_DAYS = 60
 
 FileFormat = Literal["gpkg", "geojson"]
 
@@ -161,6 +176,11 @@ class FIRMS(AbstractDataSource):
         self._file_format: FileFormat = file_format
         self._timeout = timeout
         self._catalog = Catalog()
+        # Reactive back-off knobs (G2); the sleep is an instance attr so
+        # it can be swapped for a no-op in tests.
+        self._sleep = time.sleep
+        self._max_retries = 5
+        self._backoff_factor = 1.0
         super().__init__(
             start=start,
             end=end,
@@ -239,27 +259,300 @@ class FIRMS(AbstractDataSource):
         )
 
     def _search(self) -> list[RemoteProduct]:
-        """List one product per `(sensor, ≤10-day chunk)` (wired in C2)."""
-        raise NotImplementedError(
-            "FIRMS._search is implemented in the search/fetch task (C2)."
+        """List one :class:`RemoteProduct` per `(sensor, ≤10-day chunk)`.
+
+        Validates each code in `self.vars` against the bundled catalog
+        (raising with a did-you-mean hint on an unknown sensor), warns
+        when the requested window falls outside an `*_NRT` sensor's
+        coverage (naming the `*_SP` archive variant — it does *not*
+        auto-swap), and walks the `[start, end]` window in ≤10-day
+        chunks. No network call is made here.
+
+        Returns:
+            list[RemoteProduct]: One product per `(sensor, chunk)`, whose
+                `metadata` carries `sensor`, `family`, `start_date`, and
+                `day_range`. The product `id` is `f"{sensor}:{start}"`.
+
+        Raises:
+            ValueError: If a code in `self.vars` is not a registered
+                FIRMS sensor.
+        """
+        start_date = self.time.start_date.date()
+        end_date = self.time.end_date.date()
+        windows = chunk_windows(start_date, end_date)
+        logger.info(
+            f"FIRMS request: {len(self.vars)} sensor(s) x {len(windows)} chunk(s) "
+            f"= {len(self.vars) * len(windows)} CSV GET(s)"
         )
+        products: list[RemoteProduct] = []
+        for code in self.vars:
+            sensor = self._catalog.get_sensor(code)
+            self._warn_if_out_of_coverage(sensor, start_date, end_date)
+            for chunk_start, day_range in windows:
+                products.append(
+                    RemoteProduct(
+                        id=f"{code}:{chunk_start.isoformat()}",
+                        metadata={
+                            "sensor": code,
+                            "family": sensor.family,
+                            "start_date": chunk_start,
+                            "day_range": day_range,
+                        },
+                    )
+                )
+        return products
+
+    def _warn_if_out_of_coverage(
+        self, sensor, start_date: dt.date, end_date: dt.date
+    ) -> None:
+        """Warn (do not auto-swap) when the window is outside coverage.
+
+        An `*_NRT` sensor holds only roughly the last
+        :data:`NRT_RETENTION_DAYS` days; a request for older data returns
+        a silently empty CSV rather than an error. This logs a loud
+        warning naming the `*_SP` archive variant when that variant
+        exists. A request that predates the sensor's mission start is
+        warned the same way.
+
+        Args:
+            sensor: The resolved :class:`~earthlens.firms.Sensor`.
+            start_date: Requested inclusive start.
+            end_date: Requested inclusive end.
+        """
+        mission_start = sensor.temporal.start
+        if isinstance(mission_start, dt.datetime):
+            mission_start = mission_start.date()
+        if mission_start is not None and start_date < mission_start:
+            logger.warning(
+                f"{sensor.code} coverage begins {mission_start}; the requested "
+                f"window starts {start_date} and may return no detections."
+            )
+        if sensor.temporal.quality != "NRT":
+            return
+        cutoff = dt.date.today() - dt.timedelta(days=NRT_RETENTION_DAYS)
+        if end_date < cutoff:
+            sp_variant = sensor.code.replace("_NRT", "_SP")
+            hint = (
+                f" for archive data use {sp_variant}"
+                if sp_variant in self._catalog
+                else ""
+            )
+            logger.warning(
+                f"{sensor.code} is near-real-time and covers only the last "
+                f"~{NRT_RETENTION_DAYS} days; the requested window ending "
+                f"{end_date} is older and will likely be empty{hint}."
+            )
 
     def _fetch(self, products: list[RemoteProduct]) -> list[FeatureCollection]:
-        """Fetch each product's CSV into a FeatureCollection (wired in C2)."""
-        raise NotImplementedError(
-            "FIRMS._fetch is implemented in the search/fetch task (C2)."
+        """Fetch each product's CSV and map it to a FeatureCollection.
+
+        Widens the inherited `-> list[Path]` contract: a vector backend
+        returns in-memory :class:`FeatureCollection`s, not file paths.
+        Each product is one CSV GET issued through the quota back-off
+        (`G2`); the response body is classified before parsing (`G6`) so
+        a FIRMS error-as-HTTP-200 text body never reaches
+        `pandas.read_csv`.
+
+        Args:
+            products: The list returned by :meth:`_search`.
+
+        Returns:
+            list[FeatureCollection]: One collection per product, in the
+                same order.
+        """
+        return [self._fetch_one(product) for product in products]
+
+    def _fetch_one(self, product: RemoteProduct) -> FeatureCollection:
+        """Fetch and map one `(sensor, chunk)` product.
+
+        Args:
+            product: One :class:`RemoteProduct` from :meth:`_search`.
+
+        Returns:
+            FeatureCollection: The chunk's detections (schema-only empty
+                when the CSV had no rows).
+
+        Raises:
+            AuthenticationError: If the body is a bad-key message (`G6`).
+            RuntimeError: If the body is a non-CSV error, or a quota body
+                survives the back-off retries.
+            requests.HTTPError: On a non-quota HTTP error status.
+        """
+        url = self._build_url(product)
+        response = firms_get(
+            url,
+            timeout=self._timeout,
+            get=requests.get,
+            sleep=self._sleep,
+            max_retries=self._max_retries,
+            backoff_factor=self._backoff_factor,
+        )
+        if getattr(response, "status_code", 200) >= 400:
+            response.raise_for_status()
+        text = response.text
+        kind = classify_body(text)
+        if kind == "auth":
+            raise AuthenticationError(
+                f"FIRMS rejected the MAP_KEY: {_truncate(text)}"
+            )
+        if kind == "quota":
+            raise RuntimeError(
+                "FIRMS transaction quota exhausted after back-off retries: "
+                f"{_truncate(text)}"
+            )
+        if kind == "error":
+            raise RuntimeError(f"FIRMS returned a non-CSV error body: {_truncate(text)}")
+        frame = pd.read_csv(StringIO(text))
+        return events.csv_to_fc(
+            frame,
+            sensor=product.metadata["sensor"],
+            family=product.metadata["family"],
+            min_confidence=self._min_confidence,
+            day_night=self._day_night,
+        )
+
+    def _build_url(self, product: RemoteProduct) -> str:
+        """Compose the FIRMS area-CSV URL for one product.
+
+        The bbox path segment is `W,S,E,N` (FIRMS area order). The
+        `MAP_KEY` is read from the configured :class:`FirmsAuth`.
+
+        Args:
+            product: One :class:`RemoteProduct` from :meth:`_search`.
+
+        Returns:
+            str: The fully-formed request URL.
+        """
+        bbox = f"{self.space.west},{self.space.south},{self.space.east},{self.space.north}"
+        return AREA_URL_TEMPLATE.format(
+            map_key=self.client.map_key,
+            sensor=product.metadata["sensor"],
+            bbox=bbox,
+            day_range=product.metadata["day_range"],
+            start_date=product.metadata["start_date"].isoformat(),
         )
 
     def _api(self) -> list[FeatureCollection]:
         """Compose `_search` and `_fetch` into the canonical C3 shape."""
         return self._api_via_search_fetch()
 
+    def _api_via_search_fetch_with_progress(
+        self, progress_bar: bool
+    ) -> list[FeatureCollection]:
+        """C3 composition with a per-chunk progress bar.
+
+        Mirrors the CMEMS / OpenAQ progress-aware composition: run the
+        cheap :meth:`_search`, then map :meth:`_fetch_one` over the
+        products wrapped in a `tqdm` bar (disabled when `progress_bar`
+        is `False`). Short-circuits on an empty search.
+
+        Args:
+            progress_bar: Show the per-chunk `tqdm` bar when `True`.
+
+        Returns:
+            list[FeatureCollection]: One collection per product, or `[]`
+                when nothing matched.
+        """
+        products = self._search()
+        if not products:
+            return []
+        iterator = tqdm(
+            products,
+            disable=not progress_bar,
+            desc="FIRMS chunks",
+            unit="chunk",
+        )
+        return [self._fetch_one(product) for product in iterator]
+
     def download(
         self,
         progress_bar: bool = True,
         aggregate: AggregationConfig | None = None,
     ) -> FeatureCollection:
-        """Query FIRMS and return the matched detections (wired in C2)."""
-        raise NotImplementedError(
-            "FIRMS.download is implemented in the search/fetch task (C2)."
+        """Query FIRMS and return the matched detections.
+
+        Runs the cheap :meth:`_search` (sensor validation + chunk
+        planning) then the throttled :meth:`_fetch` (one CSV GET per
+        chunk), concatenates the per-chunk collections into one
+        FeatureCollection, writes it to one vector file under `path`, and
+        returns it. An empty result returns — and writes nothing for — a
+        schema-correct empty FeatureCollection.
+
+        Args:
+            progress_bar: Show a per-chunk progress bar. Defaults to
+                `True`.
+            aggregate: Must be `None`. Detections are vector, not
+                gridded, so there is no meaningful aggregation. The
+                facade already rejects a non-`None` `aggregate=` for a
+                `vector` backend; this is the belt-and-suspenders guard
+                for direct backend callers.
+
+        Returns:
+            FeatureCollection: The matched detections, CRS `EPSG:4326`.
+                Empty (schema-only) when nothing matched.
+
+        Raises:
+            NotImplementedError: If `aggregate` is not `None`.
+        """
+        if aggregate is not None:
+            raise NotImplementedError(
+                "FIRMS.download(aggregate=...) is not supported: fire "
+                "detections are vector point features, not gridded rasters, so "
+                "there is no meaningful gridded reduction. Call download() "
+                "without aggregate= and post-process the returned "
+                "FeatureCollection (a GeoDataFrame) directly."
+            )
+
+        collections = self._api_via_search_fetch_with_progress(progress_bar)
+        collection = events.concat(collections)
+
+        if len(collection):
+            out_path = self._write(collection)
+            logger.info(
+                f"FIRMS download summary: {len(collection)} detection(s) "
+                f"written to {out_path}"
+            )
+        else:
+            logger.warning(
+                "FIRMS download summary: no detections matched the request, "
+                "nothing written"
+            )
+        return collection
+
+    def _write(self, collection: FeatureCollection) -> Path:
+        """Write the detections to one vector file under `root_dir`.
+
+        The filename embeds the sensor list and the query's date window
+        so successive downloads into the same `path` yield distinct
+        files. Two downloads of the same request overwrite, the intended
+        idempotent behaviour.
+
+        Args:
+            collection: The detections to write.
+
+        Returns:
+            Path: Absolute path of the file written.
+        """
+        driver, ext = _DRIVERS[self._file_format]
+        sensors = "-".join(self.vars)
+        stem = (
+            f"firms_{sensors}_{self.time.start_date:%Y%m%d}"
+            f"_{self.time.end_date:%Y%m%d}"
         )
+        out_path = self.root_dir / f"{stem}.{ext}"
+        collection.to_file(str(out_path), driver=driver)
+        return out_path
+
+
+def _truncate(text: str, limit: int = 200) -> str:
+    """Return a single-line, length-capped slice of an error body.
+
+    Args:
+        text: The raw response body.
+        limit: Maximum characters to keep.
+
+    Returns:
+        str: The body collapsed to one line and truncated for logging.
+    """
+    flattened = " ".join(text.split())
+    return flattened[:limit]
