@@ -27,6 +27,7 @@ Backends with no extra (CHC, GDACS, OpenAQ) need only the core install — they 
 | OpenAQ air quality | `openaq` | tabular | API key (`X-API-Key`) | — | [OpenAQ](openaq/introduction.md) |
 | Tropycal tropical-cyclone tracks | `tropycal` | vector (tabular for SHIPS) | none | `tropycal` | [Tropycal](tropycal/introduction.md) |
 | STAC — Planetary Computer / CDSE / Earth Search | `stac`, `cdse` | raster | per-endpoint (anonymous / MPC SAS / CDSE S3) | `stac` | [STAC](stac/introduction.md) |
+| NASA Earthdata (9 EOSDIS DAACs via `earthaccess`) | `earthdata` | per-dataset (raster / vector / tabular) | EDL login or bearer token | `earthdata` | [Earthdata](earthdata/introduction.md) |
 
 `Output` is the backend's `OUTPUT_KIND` — `raster` writes GeoTIFF/COG/NetCDF, `vector` writes geometry tables
 (GeoJSON / GeoPackage), and `tabular` writes plain tables (CSV / Parquet). It also governs `aggregate=`: the
@@ -38,7 +39,6 @@ These have a completion plan but no code yet — they are **not** available from
 
 | Provider | Planned key | Notes |
 |---|---|---|
-| NASA Earthdata (9 EOSDIS DAACs via `earthaccess`) | `earthdata` | One EDL login → PO.DAAC, NSIDC, LP DAAC, GES DISC, ASF, … per-dataset output kind |
 | NASA FIRMS active fire detections | `firms` | `MAP_KEY` auth |
 
 For the full roadmap of providers beyond these, see the project's planning notes.

@@ -1,0 +1,75 @@
+# ASDC — Atmospheric Science Data Center. CMR provider code: LARC_CLOUD.
+# CERES radiative-flux products.
+datasets:
+  CER_SSF_Terra-FM1-MODIS_Edition4A:
+    short_name: CER_SSF_Terra-FM1-MODIS
+    version: Edition4A
+    daac: ASDC
+    provider: LARC_CLOUD
+    cadence: irregular
+    format: hdf4
+    output_kind: raster
+    cloud_hosted: true
+    requires_harmony_for_subset: false
+    supports_harmony: false
+    temporal:
+      start: '2000-02-24'
+      end: null
+    bands:
+      CERES_SW_TOA_flux:
+        long_name: CERES shortwave TOA flux
+        units: W/m2
+  CER_SSF1deg-Day_Terra-MODIS_Edition4A:
+    short_name: CER_SSF1deg-Day_Terra-MODIS
+    version: Edition4A
+    daac: ASDC
+    provider: LARC_CLOUD
+    cadence: daily
+    format: netcdf4
+    output_kind: raster
+    cloud_hosted: true
+    requires_harmony_for_subset: false
+    supports_harmony: false
+    temporal:
+      start: '2000-03-01'
+      end: null
+    bands:
+      toa_sw_all_daily:
+        long_name: TOA shortwave flux, all-sky daily mean
+        units: W/m2
+  CER_SYN1deg-Day_Terra-Aqua-MODIS_Edition4A:
+    short_name: CER_SYN1deg-Day_Terra-Aqua-MODIS
+    version: Edition4A
+    daac: ASDC
+    provider: LARC_CLOUD
+    cadence: daily
+    format: netcdf4
+    output_kind: raster
+    cloud_hosted: true
+    requires_harmony_for_subset: false
+    supports_harmony: false
+    temporal:
+      start: '2000-03-01'
+      end: null
+    bands:
+      toa_sw_all_daily:
+        long_name: TOA shortwave flux, all-sky daily (synoptic)
+        units: W/m2
+  TEMPO_NO2_L3_V04:
+    short_name: TEMPO_NO2_L3
+    version: V04
+    daac: ASDC
+    provider: LARC_CLOUD
+    cadence: hourly
+    format: netcdf4
+    output_kind: raster
+    cloud_hosted: true
+    requires_harmony_for_subset: false
+    supports_harmony: false
+    temporal:
+      start: '2023-08-01'
+      end: null
+    bands:
+      vertical_column_troposphere:
+        long_name: Tropospheric NO2 vertical column (geostationary)
+        units: molec/cm2

@@ -1,0 +1,184 @@
+# LP DAAC — Land Processes DAAC. CMR provider code: LPCLOUD.
+# MODIS, ECOSTRESS, EMIT, GEDI L1-L2, NASADEM. GEDI02_A is a footprint
+# (vector) product; the L4A/L4B biomass products live at ORNL, not here.
+datasets:
+  EMITL2ARFL_001:
+    short_name: EMITL2ARFL
+    version: '001'
+    daac: LP DAAC
+    provider: LPCLOUD
+    cadence: irregular
+    format: netcdf4
+    output_kind: raster
+    cloud_hosted: true
+    requires_harmony_for_subset: false
+    supports_harmony: false
+    temporal:
+      start: '2022-08-10'
+      end: null
+    bands:
+      reflectance:
+        long_name: Surface reflectance (imaging spectroscopy, 285 bands)
+        units: '1'
+  MCD12Q1_061:
+    short_name: MCD12Q1
+    version: '061'
+    daac: LP DAAC
+    provider: LPCLOUD
+    cadence: annual
+    format: hdf-eos2
+    output_kind: raster
+    cloud_hosted: true
+    requires_harmony_for_subset: false
+    supports_harmony: false
+    temporal:
+      start: '2001-01-01'
+      end: null
+    bands:
+      LC_Type1:
+        long_name: Land cover type 1 (IGBP classification)
+        units: class
+  MOD11A1_061:
+    short_name: MOD11A1
+    version: '061'
+    daac: LP DAAC
+    provider: LPCLOUD
+    cadence: daily
+    format: hdf-eos2
+    output_kind: raster
+    cloud_hosted: true
+    requires_harmony_for_subset: false
+    supports_harmony: false
+    temporal:
+      start: '2000-02-24'
+      end: null
+    bands:
+      LST_Day_1km:
+        long_name: Daytime land surface temperature
+        units: K
+  MOD13Q1_061:
+    short_name: MOD13Q1
+    version: '061'
+    daac: LP DAAC
+    provider: LPCLOUD
+    cadence: 16day
+    format: hdf-eos2
+    output_kind: raster
+    cloud_hosted: true
+    requires_harmony_for_subset: false
+    supports_harmony: false
+    temporal:
+      start: '2000-02-18'
+      end: null
+    bands:
+      NDVI:
+        long_name: Normalized difference vegetation index
+        units: '1'
+  ECO_L2T_LSTE_002:
+    short_name: ECO_L2T_LSTE
+    version: '002'
+    daac: LP DAAC
+    provider: LPCLOUD
+    cadence: irregular
+    format: cog
+    output_kind: raster
+    cloud_hosted: true
+    requires_harmony_for_subset: false
+    supports_harmony: false
+    temporal:
+      start: '2018-07-09'
+      end: null
+    bands:
+      LST:
+        long_name: Land surface temperature (ECOSTRESS tiled)
+        units: K
+  GEDI02_A_002:
+    short_name: GEDI02_A
+    version: '002'
+    daac: LP DAAC
+    provider: LPCLOUD
+    cadence: irregular
+    format: hdf5
+    output_kind: vector
+    cloud_hosted: true
+    requires_harmony_for_subset: false
+    supports_harmony: false
+    temporal:
+      start: '2019-04-18'
+      end: null
+    bands:
+      rh100:
+        long_name: Relative height at 100% energy (canopy top)
+        units: m
+  NASADEM_HGT_001:
+    short_name: NASADEM_HGT
+    version: '001'
+    daac: LP DAAC
+    provider: LPCLOUD
+    cadence: static
+    format: zip
+    output_kind: raster
+    cloud_hosted: true
+    requires_harmony_for_subset: false
+    supports_harmony: false
+    temporal:
+      start: '2000-02-11'
+      end: null
+    bands:
+      elevation:
+        long_name: NASADEM merged DEM elevation
+        units: m
+  HLSS30_20:
+    short_name: HLSS30
+    version: '2.0'
+    daac: LP DAAC
+    provider: LPCLOUD
+    cadence: irregular
+    format: cog
+    output_kind: raster
+    cloud_hosted: true
+    requires_harmony_for_subset: false
+    supports_harmony: false
+    temporal:
+      start: '2015-11-28'
+      end: null
+    bands:
+      B04:
+        long_name: Harmonized Sentinel-2 red surface reflectance
+        units: '1'
+  ASTGTM_003:
+    short_name: ASTGTM
+    version: '003'
+    daac: LP DAAC
+    provider: LPCLOUD
+    cadence: static
+    format: geotiff
+    output_kind: raster
+    cloud_hosted: true
+    requires_harmony_for_subset: false
+    supports_harmony: false
+    temporal:
+      start: '2000-03-01'
+      end: null
+    bands:
+      ASTER_GDEM_DEM:
+        long_name: ASTER Global DEM elevation
+        units: m
+  MOD09GA_061:
+    short_name: MOD09GA
+    version: '061'
+    daac: LP DAAC
+    provider: LPCLOUD
+    cadence: daily
+    format: hdf-eos2
+    output_kind: raster
+    cloud_hosted: true
+    requires_harmony_for_subset: false
+    supports_harmony: false
+    temporal:
+      start: '2000-02-24'
+      end: null
+    bands:
+      sur_refl_b01:
+        long_name: Surface reflectance band 1 (red)
+        units: '1'

@@ -120,6 +120,12 @@ nav:
       - Usage: reference/cmems/usage.md
       - Authentication: reference/cmems/authentication.md
       - Reference: reference/cmems/cmems.md
+    - Earthdata (NASA EOSDIS):
+      - Introduction: reference/earthdata/introduction.md
+      - Usage: reference/earthdata/usage.md
+      - Authentication: reference/earthdata/authentication.md
+      - Catalog & Tooling: reference/earthdata/catalog.md
+      - Reference: reference/earthdata/earthdata.md
     - ECMWF:
       - Reference: reference/ecmwf.md
       - Catalog & Probes: reference/ecmwf/catalog.md
@@ -177,6 +183,14 @@ nav:
       - Sea ice — Arctic thickness map: examples/cmems/seaice_arctic_thickness.ipynb
       - Waves — significant wave height: examples/cmems/global_wave_significant_height.ipynb
       - Mediterranean — surface temperature map: examples/cmems/mediterranean_sst_map.ipynb
+    - NASA Earthdata:
+      - Catalog explorer (no network): examples/earthdata/catalog_explorer.ipynb
+      - Per-dataset output kind: examples/earthdata/output_kinds.ipynb
+      - GPM IMERG monthly precipitation (live): examples/earthdata/imerg_precipitation.ipynb
+      - GEDI L4A biomass footprints (live): examples/earthdata/gedi_l4a_footprints.ipynb
+      - PACE ocean-colour chlorophyll (live): examples/earthdata/pace_ocean_colour.ipynb
+      - SMAP soil moisture (live): examples/earthdata/smap_soil_moisture.ipynb
+      - OPERA Sentinel-1 SAR backscatter (live): examples/earthdata/opera_s1_backscatter.ipynb
     - Seismic events (FDSN):
       - Quickstart — recent earthquakes: examples/fdsn/quickstart.ipynb
       - Global seismicity map: examples/fdsn/global_seismicity_map.ipynb
