@@ -193,6 +193,18 @@
          <lastmod>2026-05-25</lastmod>
     </url>
     <url>
+         <loc>https://serapeum-org.github.io/earthlens/main/examples/stac/mpc_landsat_cdse_sentinel_same_aoi/</loc>
+         <lastmod>2026-05-25</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/main/examples/stac/quickstart/</loc>
+         <lastmod>2026-05-25</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/main/examples/stac/sentinel2_ndvi_timeseries/</loc>
+         <lastmod>2026-05-25</lastmod>
+    </url>
+    <url>
          <loc>https://serapeum-org.github.io/earthlens/main/examples/tropycal/katrina_intensity_timeline/</loc>
          <lastmod>2026-05-25</lastmod>
     </url>
@@ -342,6 +354,22 @@
     </url>
     <url>
          <loc>https://serapeum-org.github.io/earthlens/main/reference/openaq/usage/</loc>
+         <lastmod>2026-05-25</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/main/reference/stac/authentication/</loc>
+         <lastmod>2026-05-25</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/main/reference/stac/introduction/</loc>
+         <lastmod>2026-05-25</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/main/reference/stac/stac/</loc>
+         <lastmod>2026-05-25</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/main/reference/stac/usage/</loc>
          <lastmod>2026-05-25</lastmod>
     </url>
     <url>
