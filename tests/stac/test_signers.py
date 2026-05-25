@@ -6,36 +6,7 @@ import pytest
 
 from earthlens.base import AuthenticationError
 from earthlens.stac import auth_cdse
-from earthlens.stac.signers import CdseS3Signer, MpcSasSigner, build_signer
-
-
-@pytest.mark.stac
-class TestMpcSasSigner:
-    """The MPC signer signs hrefs/items via the planetary-computer SDK."""
-
-    def test_name(self):
-        """The signer reports its catalog label."""
-        assert MpcSasSigner().name == "mpc-sas"
-
-    def test_sign_request_is_noop(self):
-        """Search is anonymous, so sign_request returns None."""
-        assert MpcSasSigner().sign_request(object()) is None
-
-    def test_sign_href_calls_pc_sign(self, fake_pc):
-        """sign_href delegates to planetary_computer.sign."""
-        out = MpcSasSigner().sign_href("https://host/a.tif")
-        assert out == "https://host/a.tif?sas=token"
-        assert fake_pc.sign_calls == ["https://host/a.tif"]
-
-    def test_sign_item_returns_none_and_calls_sign_inplace(self, fake_pc):
-        """sign_item mutates in place via sign_inplace and returns None."""
-        item = object()
-        assert MpcSasSigner().sign_item(item) is None
-        assert fake_pc.sign_inplace_calls == [item]
-
-    def test_gdal_env_is_empty(self):
-        """The SAS credential lives in the URL, so the GDAL env is empty."""
-        assert MpcSasSigner().gdal_env() == {}
+from earthlens.stac.signers import CdseS3Signer, build_signer
 
 
 @pytest.mark.stac
@@ -104,9 +75,9 @@ class TestBuildSigner:
         assert signer.name == "aws-requester-pays"
         assert signer.region == "us-west-2"
 
-    def test_mpc_sas(self):
-        """The mpc-sas name resolves to MpcSasSigner."""
-        assert isinstance(build_signer("mpc-sas"), MpcSasSigner)
+    def test_mpc_sas(self, fake_pyramids):
+        """The mpc-sas name resolves to pyramids' native PlanetaryComputerSigner."""
+        assert build_signer("mpc-sas").name == "planetary-computer"
 
     def test_cdse_s3_from_kwargs(self):
         """The cdse-s3 name resolves to CdseS3Signer using the supplied keys."""

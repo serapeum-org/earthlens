@@ -9,7 +9,6 @@ import pytest
 from earthlens.stac.backend import (
     STAC,
     _acq_date,
-    _asset_href,
     _group_products,
 )
 
@@ -48,7 +47,7 @@ class TestInitialize:
         _build_stac(tmp_path, endpoint="earth-search")
         assert fake_pyramids.open_client_calls[0]["url"].startswith("https://earth-search")
 
-    def test_signer_selected_per_endpoint(self, fake_pyramids, fake_pc, tmp_path):
+    def test_signer_selected_per_endpoint(self, fake_pyramids, tmp_path):
         """Each endpoint binds the signer its catalog row names."""
         s_es = _build_stac(tmp_path, endpoint="earth-search")
         s_pc = _build_stac(tmp_path, endpoint="planetary-computer")
@@ -57,10 +56,10 @@ class TestInitialize:
             access_key="ak", secret_key="sk",
         )
         assert s_es._signer.name == "anonymous"
-        assert s_pc._signer.name == "mpc-sas"
+        assert s_pc._signer.name == "planetary-computer"
         assert s_cdse._signer.name == "cdse-s3"
 
-    def test_endpoint_inferred_from_first_collection(self, fake_pyramids, fake_pc, tmp_path):
+    def test_endpoint_inferred_from_first_collection(self, fake_pyramids, tmp_path):
         """With no endpoint kwarg the home endpoint of the first collection is used."""
         stac = STAC(
             start="2024-01-01", end="2024-01-02",
@@ -69,7 +68,7 @@ class TestInitialize:
         )
         assert stac._endpoint == "planetary-computer"
 
-    def test_mixed_endpoint_collections_raise(self, fake_pyramids, fake_pc, tmp_path):
+    def test_mixed_endpoint_collections_raise(self, fake_pyramids, tmp_path):
         """A collection not served by the chosen endpoint is rejected, not mis-queried."""
         with pytest.raises(ValueError, match="not served by endpoint"):
             STAC(
@@ -185,8 +184,8 @@ class TestFetch:
         stac._fetch(stac._search())
         assert len(fake_pyramids.merge_calls) == 2
 
-    def test_mixed_resolution_bands_align_and_assemble(self, fake_pyramids, tmp_path):
-        """Mixed-resolution bands are aligned + assembled via create_from_array (H1)."""
+    def test_mixed_resolution_bands_use_aligned_stack_bands(self, fake_pyramids, tmp_path):
+        """Mixed-resolution bands stack via stack_bands(align=True) with a dtype-safe nodata."""
         fake_pyramids.items_by_collection["sentinel-2-c1-l2a"] = [
             make_item("a", "2024-01-05", {"B04": "https://h/a_b04.tif", "B08": "https://h/a_b08.tif"})
         ]
@@ -195,18 +194,20 @@ class TestFetch:
         stac = _build_stac(tmp_path, endpoint="earth-search", variables={"sentinel-2-l2a": ["B04", "B08"]})
         paths = stac._fetch(stac._search())
         assert len(paths) == 1
-        assert fake_pyramids.create_calls, "mixed-resolution should assemble via create_from_array"
-        assert fake_pyramids.create_calls[-1]["no_data_value"] == 0
-        assert not fake_pyramids.stack_calls, "mixed-resolution must not use stack_bands(align=False)"
+        assert len(fake_pyramids.stack_calls) == 1
+        assert fake_pyramids.stack_calls[-1]["align"] is True
+        assert fake_pyramids.stack_calls[-1]["no_data_value"] == 0
+        assert not fake_pyramids.create_calls
 
     def test_same_resolution_bands_use_stack_bands(self, fake_pyramids, tmp_path):
-        """Same-grid bands keep the stack_bands path (band names preserved)."""
+        """Same-grid bands also stack via stack_bands(align=True), preserving band names."""
         fake_pyramids.items_by_collection["sentinel-2-c1-l2a"] = [
             make_item("a", "2024-01-05", {"B04": "https://h/a_b04.tif", "B08": "https://h/a_b08.tif"})
         ]
         stac = _build_stac(tmp_path, endpoint="earth-search")
         stac._fetch(stac._search())
         assert len(fake_pyramids.stack_calls) == 1
+        assert fake_pyramids.stack_calls[-1]["align"] is True
         assert not fake_pyramids.create_calls
 
     def test_crop_uses_wgs84_bbox_and_epsg(self, fake_pyramids, tmp_path):
@@ -232,7 +233,7 @@ class TestFetch:
         stac._fetch(stac._search())
         assert _FakeCloudConfig.active_extras[-1]["AWS_S3_ENDPOINT"]
 
-    def test_signed_hrefs_reach_merge(self, fake_pyramids, fake_pc, tmp_path):
+    def test_signed_hrefs_reach_merge(self, fake_pyramids, tmp_path):
         """MPC signs each tile href before it is handed to the mosaic step."""
         fake_pyramids.items_by_collection["sentinel-2-l2a"] = [
             make_item("a", "2024-01-05", {"B04": "https://h/a_b04.tif"}),
@@ -388,32 +389,10 @@ class TestModuleHelpers:
         """A datetime-less item yields the 'unknown' bucket."""
         assert _acq_date(object()) == "unknown"
 
-    def test_asset_href_resolves_key(self):
-        """_asset_href returns the href of the named asset."""
-        item = make_item("a", "2024-01-01", {"B04": "https://h/a.tif"})
-        assert _asset_href(item, "B04") == "https://h/a.tif"
-
-    def test_asset_href_missing_raises(self):
-        """A missing asset key raises KeyError."""
-        item = make_item("a", "2024-01-01", {"B04": "https://h/a.tif"})
-        with pytest.raises(KeyError):
-            _asset_href(item, "B99")
-
     def test_acq_date_from_dict_properties(self):
         """_acq_date reads properties['datetime'] on a raw STAC dict."""
         item = {"properties": {"datetime": "2024-02-03T10:00:00Z"}}
         assert _acq_date(item) == "2024-02-03"
-
-    def test_asset_href_from_dict_item(self):
-        """_asset_href resolves a raw dict item + dict asset."""
-        item = {"assets": {"B04": {"href": "https://h/a.tif"}}}
-        assert _asset_href(item, "B04") == "https://h/a.tif"
-
-    def test_asset_href_dict_asset_without_href_raises(self):
-        """A dict asset lacking an href raises KeyError."""
-        item = {"assets": {"B04": {}}}
-        with pytest.raises(KeyError, match="no 'href'"):
-            _asset_href(item, "B04")
 
     def test_cleanup_ignores_missing(self, tmp_path):
         """_cleanup tolerates absent paths."""
@@ -429,19 +408,19 @@ class TestModuleHelpers:
         assert _to_vsi("https://h/a.tif") == "https://h/a.tif"
         assert _to_vsi("/vsis3/eodata/a.tif") == "/vsis3/eodata/a.tif"
 
-    def test_item_epsg_reads_proj_metadata(self):
-        """_item_epsg reads proj:epsg from item properties (None when absent)."""
+    def test_item_epsg_reads_proj_metadata(self, fake_pyramids):
+        """_item_epsg reads proj:epsg via pyramids' extension reader (None when absent)."""
         from earthlens.stac.backend import _item_epsg
 
         assert _item_epsg(make_item("a", "2024-01-05", {}, proj_epsg=32631)) == 32631
         assert _item_epsg(make_item("a", "2024-01-05", {})) is None
 
-    def test_item_epsg_reads_dict_item(self):
+    def test_item_epsg_reads_dict_item(self, fake_pyramids):
         """_item_epsg reads proj:epsg from a raw STAC item dict."""
         from earthlens.stac.backend import _item_epsg
 
-        assert _item_epsg({"properties": {"proj:epsg": 32633}}) == 32633
-        assert _item_epsg({"properties": {}}) is None
+        assert _item_epsg({"properties": {"proj:epsg": 32633}, "assets": {}}) == 32633
+        assert _item_epsg({"properties": {}, "assets": {}}) is None
 
     def test_group_products_buckets_by_collection_date_bbox(self):
         """Products are grouped by (collection_key, date, source bbox)."""

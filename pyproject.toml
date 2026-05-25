@@ -45,16 +45,16 @@ gee = ["earthengine-api >=1.7.26", "Rtree >=1.0.0"]
 cmems = ["copernicusmarine >=2.0.0,<3"]
 fdsn = ["obspy >=1.5.0"]
 # pyramids' own STAC client (pystac-client) is pulled by `pyramids-gis[stac]`,
-# but earthlens pins pyramids by direct URL above, so list pystac-client here
-# directly; planetary-computer is the MPC SAS-signing SDK (earthlens-side).
-stac = ["pystac-client >=0.8.0", "planetary-computer >=1.0"]
+# but earthlens overrides pyramids by git pin (see [tool.pixi.pypi-dependencies]),
+# so list pystac-client here directly. MPC SAS signing is native in pyramids'
+# PlanetaryComputerSigner now, so no `planetary-computer` SDK is needed.
+stac = ["pystac-client >=0.8.0"]
 all = [
     "boto3 >=1.43.0",
     "cdsapi >=0.7.7",
     "copernicusmarine >=2.0.0,<3",
     "earthengine-api >=1.7.26",
     "obspy >=1.5.0",
-    "planetary-computer >=1.0",
     "pystac-client >=0.8.0",
     "Rtree >=1.0.0",
 ]
@@ -217,6 +217,13 @@ libc = "2.39"
 # Production users do `pip install earthlens[ecmwf]` (or whichever
 # subset they need) per the [project.optional-dependencies] above.
 earthlens = { path = ".", editable = true, extras = ["all"] }
+# The STAC backend consumes pyramids' new STAC surface (typed search,
+# read_extension_metadata, resolved_href, native PlanetaryComputerSigner,
+# multi-asset/aligned from_band_files) which ships on the pyramids branch
+# below but is not yet on a PyPI release. Override the transitive
+# `pyramids-gis >=0.22.0` (kept in [project.dependencies] for PyPI users)
+# with the branch until it is released.
+pyramids-gis = { git = "https://github.com/Serapieum-of-alex/pyramids.git", branch = "feat/stac-fix-new-features" }
 
 [tool.pixi.tasks]
 test-all = { cmd = "pytest -vvv --cov=src/earthlens -sv --cov-report=xml --cov-report=term-missing", description = "Run all testsuite" }

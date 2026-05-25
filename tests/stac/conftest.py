@@ -3,10 +3,10 @@
 The STAC backend imports pyramids and the STAC SDKs lazily inside its methods,
 so these fixtures inject fakes into `sys.modules` (the same pattern
 `tests/cmems/` uses for `copernicusmarine`). That keeps the unit tests free of
-network, GDAL, and the optional `[stac]` SDKs: `pyramids.stac.open_client`,
+network, GDAL, and the optional `[stac]` SDK: `pyramids.stac.open_client`,
 `pyramids.dataset.merge`, `pyramids.dataset.cog`, `pyramids.base.remote`,
-`pyramids.dataset`, `pyramids.feature.bbox`, and `planetary_computer` are all
-replaced with recording stubs.
+`pyramids.dataset`, and `pyramids.feature.bbox` are all replaced with recording
+stubs.
 """
 
 from __future__ import annotations
@@ -229,6 +229,44 @@ class _AWSRequesterPaysSigner(_AnonymousSigner):
         return {"AWS_REQUEST_PAYER": "requester"}
 
 
+class _PlanetaryComputerSigner(_AnonymousSigner):
+    """Stand-in for pyramids' native PlanetaryComputerSigner (SAS URL signing)."""
+
+    name = "planetary-computer"
+
+    def sign_href(self, href: str) -> str:
+        return href + "?sas=token"
+
+
+def _resolved_href(item_or_asset: Any, asset_key: Any = None, *, signer: Any = None) -> str:
+    """Stand-in for pyramids.stac.resolved_href: resolve href + apply sign_href."""
+    if asset_key is None:
+        asset = item_or_asset
+    else:
+        assets = getattr(item_or_asset, "assets", None)
+        if assets is None and isinstance(item_or_asset, dict):
+            assets = item_or_asset.get("assets")
+        if not assets or asset_key not in assets:
+            raise KeyError(f"asset {asset_key!r} not found; available {sorted(assets or [])}")
+        asset = assets[asset_key]
+    href = getattr(asset, "href", None)
+    if href is None and isinstance(asset, dict):
+        href = asset.get("href")
+    if href is None:
+        raise KeyError(f"asset {asset_key!r} has no 'href'")
+    href = str(href)
+    return signer.sign_href(href) if signer is not None else href
+
+
+def _read_extension_metadata(item: Any, asset_key: Any = None) -> dict[str, Any]:
+    """Stand-in for pyramids.stac.read_extension_metadata (proj:epsg only here)."""
+    props = getattr(item, "properties", None)
+    if props is None and isinstance(item, dict):
+        props = item.get("properties")
+    epsg = props.get("proj:epsg") if isinstance(props, dict) else None
+    return {"epsg": epsg if isinstance(epsg, int) else None}
+
+
 @pytest.fixture
 def fake_pyramids(monkeypatch: pytest.MonkeyPatch) -> FakePyramids:
     """Inject fake pyramids submodules into `sys.modules` and return the recorder."""
@@ -237,6 +275,9 @@ def fake_pyramids(monkeypatch: pytest.MonkeyPatch) -> FakePyramids:
     stac_mod = types.ModuleType("pyramids.stac")
     stac_mod.AnonymousSigner = _AnonymousSigner
     stac_mod.AWSRequesterPaysSigner = _AWSRequesterPaysSigner
+    stac_mod.PlanetaryComputerSigner = _PlanetaryComputerSigner
+    stac_mod.resolved_href = _resolved_href
+    stac_mod.read_extension_metadata = _read_extension_metadata
 
     def _open_client(url: str, *, signer: Any = None, **kwargs: Any):
         fp.open_client_calls.append({"url": url, "signer": signer})

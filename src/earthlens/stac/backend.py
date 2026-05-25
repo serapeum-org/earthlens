@@ -9,11 +9,12 @@ matched items to the bbox per acquisition date, and writes one Cloud-Optimized
 GeoTIFF per `(collection, date)` to `path`.
 
 The GIS heavy lifting lives in pyramids (per the pyramids/earthlens split):
-`pyramids.stac.open_client` / `load_asset`, `pyramids.dataset.merge`'s
-`merge_rasters` / `stack_bands`, `Dataset.crop` / `Dataset.to_crs`, and
-`pyramids.dataset.cog.write_cog`. earthlens owns only the provider signers
-(`earthlens.stac.signers`), the endpoint × collection × asset catalog, and the
-search→load→write orchestration. There is no `odc-stac` / `stackstac`
+`pyramids.stac.open_client` / `resolved_href` / `read_extension_metadata`,
+`pyramids.dataset.merge`'s `merge_rasters` / `stack_bands(align=True)`,
+`Dataset.crop`, and `pyramids.dataset.cog.write_cog`. earthlens owns only the
+CDSE S3 signer (`earthlens.stac.signers`; the generic + Planetary Computer
+signers come from `pyramids.stac`), the endpoint × collection × asset catalog,
+and the search→load→write orchestration. There is no `odc-stac` / `stackstac`
 dependency.
 
 `OUTPUT_KIND = "raster"`, so the `EarthLens` facade forwards
@@ -290,6 +291,7 @@ class STAC(AbstractDataSource):
         from pyramids.base.remote import CloudConfig
         from pyramids.dataset.cog import write_cog
         from pyramids.dataset.merge import merge_rasters
+        from pyramids.stac import resolved_href
 
         out: list[Path] = []
         # (collection_key, date, half index, path) for each written COG, so
@@ -310,8 +312,12 @@ class STAC(AbstractDataSource):
                 # they don't create phantom subdirectories.
                 safe_key = collection_key.replace("/", "_")
                 for band in assets:
+                    # resolved_href resolves the asset href and applies the
+                    # signer's sign_href (SAS graft / CDSE /vsis3 rewrite /
+                    # no-op for requester-pays); _to_vsi then normalises a
+                    # left-over s3:// to the GDAL /vsis3/ path.
                     hrefs = [
-                        _to_vsi(signer.sign_href(_asset_href(p.metadata["item"], band)))
+                        _to_vsi(resolved_href(p.metadata["item"], band, signer=signer))
                         for p in group
                     ]
                     tmp = Path(self.root_dir) / f".{safe_key}_{band}_{date}_{idx}.tif"
@@ -414,42 +420,29 @@ class STAC(AbstractDataSource):
     def _stack_bands(self, band_paths: list[Path], assets: list[str], nodata: float | int) -> Any:
         """Stack per-band mosaics into one multiband `Dataset`.
 
-        Same-resolution bands (the common case) go through pyramids'
-        `stack_bands(align=False)`, which preserves band names. Mixed-resolution
-        bands are resampled onto the finest band's grid with `Dataset.align` and
-        assembled via `create_from_array(no_data_value=…)` — this avoids
-        `stack_bands(align=True)`, whose grid template defaults no-data to -9999
-        and overflows unsigned dtypes such as Sentinel-2 `uint16` (a pyramids
-        `from_band_files` bug, filed upstream).
+        Delegates to pyramids' `stack_bands(align=True, no_data_value=…)`: same
+        -resolution bands stack directly, and mixed-resolution bands (e.g.
+        Sentinel-2 `red` 10 m + `swir16` 20 m) are resampled onto the **first**
+        requested band's grid. `no_data_value` is threaded through so the grid
+        template adopts a dtype-safe fill — pyramids' earlier `from_band_files`
+        default of -9999 overflowed unsigned dtypes such as `uint16`; that is
+        fixed upstream, so the previous `Dataset.align` + `create_from_array`
+        workaround is no longer needed.
 
         Args:
             band_paths: One single-band mosaic per requested asset, in order.
-            assets: The requested asset keys (used as band names when same-grid).
+            assets: The requested asset keys (used as band names); the first
+                also defines the output grid for mixed-resolution stacks.
             nodata: The no-data value to stamp on the output.
 
         Returns:
             A pyramids `Dataset` with one band per `band_paths` entry.
         """
-        from pyramids.dataset import Dataset
         from pyramids.dataset.merge import stack_bands
 
-        datasets = [Dataset.read_file(str(p)) for p in band_paths]
-        grids = {(d.shape[-2], d.shape[-1]) for d in datasets}
-        if len(grids) == 1:
-            return stack_bands(
-                [str(p) for p in band_paths], band_names=list(assets),
-                align=False, no_data_value=nodata,
-            )
-        import numpy as np
-
-        reference = max(datasets, key=lambda d: d.shape[-1] * d.shape[-2])
-        arrays = [
-            (d if d is reference else d.align(reference)).read_array(band=0)
-            for d in datasets
-        ]
-        return Dataset.create_from_array(
-            arr=np.stack(arrays), geo=reference.geotransform,
-            epsg=reference.epsg, no_data_value=nodata,
+        return stack_bands(
+            [str(p) for p in band_paths], band_names=list(assets),
+            align=True, no_data_value=nodata,
         )
 
     def download(
@@ -574,6 +567,11 @@ def _geo_of(dataset_cls: Any, path: str) -> tuple[Any, Any]:
 def _item_epsg(item: Any) -> int | None:
     """Return a STAC item's `proj:epsg` from its properties, or `None`.
 
+    Delegates to `pyramids.stac.read_extension_metadata`, which reads the
+    item's `proj` extension (resolving `proj:code` / `proj:epsg`) the same way
+    for a pystac `Item` or a raw STAC dict — so earthlens does not re-parse the
+    projection extension itself.
+
     Args:
         item: A pystac `Item` or a raw STAC item dict.
 
@@ -584,24 +582,21 @@ def _item_epsg(item: Any) -> int | None:
         - Read the CRS from a raw STAC item dict:
             ```python
             >>> from earthlens.stac.backend import _item_epsg
-            >>> _item_epsg({"properties": {"proj:epsg": 32631}})
+            >>> _item_epsg({"properties": {"proj:epsg": 32631}, "assets": {}})
             32631
 
             ```
         - An item without `proj:epsg` yields `None`:
             ```python
             >>> from earthlens.stac.backend import _item_epsg
-            >>> _item_epsg({"properties": {}}) is None
+            >>> _item_epsg({"properties": {}, "assets": {}}) is None
             True
 
             ```
     """
-    props = getattr(item, "properties", None)
-    if props is None and isinstance(item, dict):
-        props = item.get("properties")
-    if isinstance(props, dict) and isinstance(props.get("proj:epsg"), int):
-        return props["proj:epsg"]
-    return None
+    from pyramids.stac import read_extension_metadata
+
+    return read_extension_metadata(item, None).get("epsg")
 
 
 def _acq_date(item: Any) -> str:
@@ -625,36 +620,6 @@ def _acq_date(item: Any) -> str:
     if isinstance(value, str) and len(value) >= 10:
         return value[:10]
     return "unknown"
-
-
-def _asset_href(item: Any, asset_key: str) -> str:
-    """Return the href of `asset_key` on a STAC item (pystac or raw dict).
-
-    Args:
-        item: A pystac `Item` or a raw STAC dict with an `assets` mapping.
-        asset_key: The asset name to resolve.
-
-    Returns:
-        The asset href.
-
-    Raises:
-        KeyError: If the asset is missing or has no href.
-    """
-    assets = getattr(item, "assets", None)
-    if assets is None and isinstance(item, dict):
-        assets = item.get("assets")
-    if not assets or asset_key not in assets:
-        raise KeyError(
-            f"asset {asset_key!r} not found on STAC item; "
-            f"available: {sorted(assets or [])}"
-        )
-    asset = assets[asset_key]
-    href = getattr(asset, "href", None)
-    if href is None and isinstance(asset, dict):
-        href = asset.get("href")
-    if href is None:
-        raise KeyError(f"STAC asset {asset_key!r} has no 'href'")
-    return str(href)
 
 
 def _to_vsi(href: str) -> str:

@@ -16,14 +16,14 @@ Public surface (re-exported from this package):
   `get_collection` / `get_endpoint` / `resolve`.
 * :class:`Endpoint` / :class:`Collection` / :class:`Asset` / :class:`Extent`
   — the frozen value objects the catalog is built from.
-* :class:`MpcSasSigner` / :class:`CdseS3Signer` / :func:`build_signer` — the
-  earthlens-side provider signers and the factory that selects one (the
-  generic signers come from `pyramids.stac`).
+* :class:`CdseS3Signer` / :func:`build_signer` — the earthlens-side CDSE S3
+  signer and the factory that selects one (the generic + Planetary Computer
+  signers come from `pyramids.stac`).
 * :data:`CATALOG_PATH` — absolute path to the bundled catalog directory;
   monkey-patchable to redirect the loader at a temporary directory.
 
-The STAC SDKs (`pystac-client`, `planetary-computer` — the `[stac]` extra) are
-imported lazily, so the `EarthLens` facade still imports without them.
+The STAC SDK (`pystac-client` — the `[stac]` extra) is imported lazily, so the
+`EarthLens` facade still imports without it.
 """
 
 from __future__ import annotations
@@ -38,7 +38,7 @@ from earthlens.stac.catalog import (
     Endpoint,
     Extent,
 )
-from earthlens.stac.signers import CdseS3Signer, MpcSasSigner, build_signer
+from earthlens.stac.signers import CdseS3Signer, build_signer
 
 __all__ = [
     "STAC",
@@ -50,6 +50,5 @@ __all__ = [
     "Collection",
     "Endpoint",
     "Extent",
-    "MpcSasSigner",
     "build_signer",
 ]
