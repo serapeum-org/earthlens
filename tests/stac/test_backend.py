@@ -364,6 +364,14 @@ class TestSignerOverride:
         # a collection without an override keeps the endpoint (anonymous) signer
         assert stac._signer_for("sentinel-2-l2a").name == "anonymous"
 
+    def test_override_signer_cached_by_type(self, fake_pyramids, tmp_path):
+        """A repeated override lookup returns the same cached signer instance."""
+        stac = _build_stac(
+            tmp_path, endpoint="earth-search", variables={"earth-search/landsat-c2-l2": ["red"]}
+        )
+        first = stac._signer_for("earth-search/landsat-c2-l2")
+        assert stac._signer_for("earth-search/landsat-c2-l2") is first
+
     def test_fetch_applies_requester_pays_env_and_vsis3(self, fake_pyramids, tmp_path):
         """The override's GDAL env is active and s3:// hrefs become /vsis3/ for the read."""
         fake_pyramids.items_by_collection["landsat-c2-l2"] = [
@@ -394,11 +402,29 @@ class TestModuleHelpers:
         item = {"properties": {"datetime": "2024-02-03T10:00:00Z"}}
         assert _acq_date(item) == "2024-02-03"
 
+    def test_window_labels_skips_empty_buckets(self):
+        """A monthly grouping over dates with a gap skips the empty window."""
+        from earthlens.stac.backend import _window_labels
+
+        # Jan + Mar dates: the February bucket is empty and is skipped.
+        labels = _window_labels(["2024-01-10", "2024-03-20"], "MS")
+        assert labels == ["20240101", "20240301"]
+
     def test_cleanup_ignores_missing(self, tmp_path):
         """_cleanup tolerates absent paths."""
         from earthlens.stac.backend import _cleanup
 
         _cleanup([tmp_path / "absent.tif"])
+
+    def test_cleanup_swallows_oserror(self, tmp_path, monkeypatch):
+        """_cleanup swallows an OSError raised while unlinking."""
+        from earthlens.stac.backend import _cleanup
+
+        def _raise(self, missing_ok=False):
+            raise OSError("locked")
+
+        monkeypatch.setattr(Path, "unlink", _raise)
+        _cleanup([tmp_path / "x.tif"])  # must not raise
 
     def test_to_vsi_rewrites_s3(self):
         """_to_vsi turns s3:// into the GDAL /vsis3/ path; leaves others alone."""

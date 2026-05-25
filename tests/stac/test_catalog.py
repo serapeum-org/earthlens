@@ -135,6 +135,37 @@ class TestLoaderRules:
         _write(tmp_path / "a.yaml", "collections: {}\n")
         assert [p.name for p in _yaml_files_for(tmp_path)] == ["a.yaml", "b.yaml"]
 
+    def test_yaml_files_for_single_file(self, tmp_path):
+        """A single YAML file path yields just that file."""
+        single = _write(tmp_path / "one.yaml", "collections: {}\n")
+        assert _yaml_files_for(single) == [single]
+
+    def test_duplicate_endpoint_across_files_raises(self, tmp_path):
+        """The same endpoint key in two files is a load error."""
+        _write(
+            tmp_path / "a.yaml",
+            "endpoints:\n  e:\n    url: u\n    signer: anonymous\n"
+            "collections:\n  c:\n    endpoint: e\n",
+        )
+        _write(tmp_path / "b.yaml", "endpoints:\n  e:\n    url: u2\n    signer: anonymous\n")
+        with pytest.raises(ValueError, match="declared in two catalog files"):
+            _load_catalog_data(tmp_path)
+
+    def test_invalid_collection_body_raises(self, tmp_path):
+        """A collection with an unknown field is rejected with an 'invalid collection' error."""
+        _write(
+            tmp_path / "a.yaml",
+            "endpoints:\n  e:\n    url: u\n    signer: anonymous\n"
+            "collections:\n  c:\n    endpoint: e\n    bogus_field: 1\n",
+        )
+        with pytest.raises(ValueError, match="invalid collection"):
+            _load_catalog_data(tmp_path)
+
+    def test_get_catalog_returns_datasets(self):
+        """get_catalog returns the same curated collection map as datasets."""
+        cat = Catalog()
+        assert cat.get_catalog() is cat.datasets
+
     def test_missing_path_raises(self, tmp_path):
         """A non-existent path fails loud."""
         with pytest.raises(ValueError, match="does not exist"):
