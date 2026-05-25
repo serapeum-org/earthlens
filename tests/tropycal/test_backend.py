@@ -306,6 +306,19 @@ class TestReconProduct:
         result = _recon_backend(tmp_path, recon_product="dropsondes").download()
         assert set(result["recon_product"]) == {"dropsondes"}
 
+    def test_multi_storm_recon_concat(self, tmp_path, fake_recon):
+        """A multi-storm recon request unions each storm's obs (per-storm id)."""
+        fake_recon.storms["AL132005"] = fake_recon.storms["AL122005"]
+        result = _recon_backend(tmp_path, variables=["AL122005", "AL132005"]).download()
+        assert len(result) == 6
+        assert set(result["storm_id"]) == {"AL122005", "AL132005"}
+
+    def test_recon_ignores_geometry_track(self, tmp_path, fake_recon):
+        """recon always yields obs points, even when geometry='track' is passed."""
+        result = _recon_backend(tmp_path, geometry="track").download()
+        assert set(RECON_COLUMNS).issubset(result.columns)
+        assert result.geometry.iloc[0].geom_type == "Point"
+
     def test_no_recon_data_empty(self, tmp_path, fake_recon):
         """A storm with no recon data yields an empty recon FC, no file."""
         fake_recon.recon_frame = None
@@ -371,6 +384,18 @@ class TestShipsProduct:
         """product='ships' without ships_time is rejected."""
         with pytest.raises(ValueError, match="ships_time"):
             _ships_backend(tmp_path, ships_time=None)
+
+    def test_ships_empty_variables_rejected(self, tmp_path):
+        """product='ships' is storm-keyed: empty variables is rejected."""
+        with pytest.raises(ValueError, match="storm-keyed"):
+            _ships_backend(tmp_path, variables=[])
+
+    def test_multi_storm_ships_concat(self, tmp_path, fake_ships):
+        """A multi-storm ships request stacks each storm's guidance table."""
+        fake_ships.storms["AL102022"] = fake_ships.storms["AL092022"]
+        result = _ships_backend(tmp_path, variables=["AL092022", "AL102022"]).download()
+        assert len(result) == 6
+        assert set(result["storm_id"]) == {"AL092022", "AL102022"}
 
     def test_download_returns_dataframe(self, tmp_path, fake_ships):
         """ships download returns a DataFrame with storm_id/forecast_init + fhr."""

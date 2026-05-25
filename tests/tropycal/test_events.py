@@ -324,6 +324,27 @@ class TestReconToFc:
         )
         assert len(fc) == 0
 
+    def test_nan_met_field_kept_as_nan(self):
+        """An obs with a missing met field is kept; the column is NaN."""
+        frame = _recon_frame()
+        frame.loc[0, "wspd"] = float("nan")
+        fc = events.recon_to_fc(
+            frame, storm_id="X", recon_product="hdobs",
+            window=_WINDOW, bbox=_BBOX, source="hurdat",
+        )
+        assert len(fc) == 2
+        assert pd.isna(fc["wspd_kt"].iloc[0])
+
+    def test_nan_position_obs_dropped(self):
+        """An obs with a NaN lat/lon is dropped by the bbox filter."""
+        frame = _recon_frame()
+        frame.loc[0, "lat"] = float("nan")
+        fc = events.recon_to_fc(
+            frame, storm_id="X", recon_product="hdobs",
+            window=_WINDOW, bbox=_BBOX, source="hurdat",
+        )
+        assert len(fc) == 1
+
     def test_concat_recon_fcs(self):
         """concat_recon_fcs unions per-storm recon collections; empty fallback."""
         a = events.recon_to_fc(
