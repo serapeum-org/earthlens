@@ -28,10 +28,6 @@ requires-python = ">= 3.11, <4"
 
 dependencies = [
     "pyramids-gis >=0.23.0",
-    # geopandas / pyproj / shapely are imported directly by earthlens core
-    # (spatial.py, utm.py) and by no-extra backends (gdacs, fdsn), so they are
-    # declared here even though pyramids-gis already pulls them — earthlens
-    # declares what it imports. Floors match pyramids-gis 0.23.0.
     "geopandas >=1.0.0",
     "joblib >=1.5.0",
     "loguru >=0.7.3",
@@ -46,13 +42,8 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-# botocore is imported directly in s3/s3.py (UNSIGNED Config) — declared
-# alongside boto3 even though boto3 always pulls it.
 s3 = ["boto3 >=1.43.0", "botocore >=1.34.0"]
 ecmwf = ["cdsapi >=0.7.7"]
-# google-api-python-client (googleapiclient), google-cloud-storage
-# (google.cloud.storage) and urllib3 are imported directly by the gee backend
-# (io.py / jobs.py); declared here even though earthengine-api pulls them.
 gee = [
     "earthengine-api >=1.7.26",
     "google-api-python-client >=2.0",
@@ -62,17 +53,10 @@ gee = [
 ]
 cmems = ["copernicusmarine >=2.0.0,<3"]
 fdsn = ["obspy >=1.5.0"]
-# earthaccess >=0.18 requires Python >=3.12 (earthlens core is >=3.11); the
-# environment marker lets pip on 3.11 skip it cleanly instead of failing to
-# resolve, so `[all]` still installs on the 3.11 wheel-test matrix entry.
+# earthaccess needs Python >=3.12; the marker lets 3.11 skip it so `[all]` still resolves.
 earthdata = ["earthaccess >=0.18.0; python_version >= '3.12'"]
-# pyramids' own STAC client (pystac-client) is pulled by `pyramids-gis[stac]`,
-# but list it here directly so the earthlens `[stac]` extra is self-contained.
-# MPC SAS signing is native in pyramids' PlanetaryComputerSigner (>=0.23.0),
-# so no `planetary-computer` SDK is needed.
-stac = ["pystac-client >=0.8.0"]
-# tropycal hard-imports cartopy at module load but does not declare it; its
-# version shim needs setuptools<81 (pkg_resources). (shapely is a core dep.)
+stac = ["pyramids-gis[stac]"]
+# cartopy: tropycal hard-imports it at load but doesn't declare it (needs setuptools<81).
 tropycal = ["tropycal >=1.4", "cartopy >=0.22"]
 all = [
     "boto3 >=1.43.0",
@@ -85,7 +69,7 @@ all = [
     "google-api-python-client >=2.0",
     "google-cloud-storage >=2.0",
     "obspy >=1.5.0",
-    "pystac-client >=0.8.0",
+    "pyramids-gis[stac]",
     "Rtree >=1.0.0",
     "tropycal >=1.4",
     "urllib3 >=1.26",
@@ -94,10 +78,7 @@ all = [
 [dependency-groups]
 dev = [
     "nbval >=0.11.0",
-    # Example notebooks (docs/examples/**) plot with matplotlib; it is
-    # not pulled by earthlens' runtime deps (pyramids-gis only ships it
-    # under its optional `viz` extra), so declare it for the env that
-    # runs `pixi run notebooks` (nbval).
+    # matplotlib: example notebooks plot with it; not a runtime dep.
     "matplotlib >=3.5",
     "pre-commit >=3.7.1",
     "pre-commit-hooks >=4.6.0",
@@ -126,8 +107,7 @@ docs = [
     "mkdocs-panzoom-plugin",
     "jupyter-contrib-nbextensions  >=0.7.0",
     "notebook<7.0",
-    # mkdocs-jupyter executes the example notebooks at build time; their
-    # plot cells need matplotlib (not a runtime dep — see the `dev` group).
+    # matplotlib: mkdocs-jupyter runs the notebooks at build time.
     "matplotlib >=3.5",
 ]
 
@@ -231,7 +211,7 @@ markers = [
     "cmems: tests for the Copernicus Marine backend (requires the `cmems` extra: copernicusmarine).",
     "fdsn: tests for the FDSN seismic-event backend (requires the `fdsn` extra: obspy).",
     "earthdata: tests for the NASA Earthdata backend (requires the `earthdata` extra: earthaccess; Python >=3.12).",
-    "stac: tests for the STAC backend (requires the `stac` extra: pystac-client / planetary-computer).",
+    "stac: tests for the STAC backend (requires the `stac` extra: pyramids-gis[stac] → pystac-client + stac-asset).",
     "gdacs: tests for the GDACS multi-hazard alert backend (public feed, no extra SDK).",
     "openaq: tests for the OpenAQ v3 air-quality backend (no extra SDK; uses the core `requests` dependency).",
     "tropycal: tests for the Tropycal cyclone-track backend (requires the `tropycal` extra: tropycal, cartopy).",
@@ -241,17 +221,13 @@ markers = [
 channels = ["conda-forge"]
 platforms = ["win-64", "linux-64", "osx-arm64"]
 
-# pyramids-gis ships Linux wheels tagged manylinux_2_39 (glibc >=2.39),
-# which bundle GDAL. Without this, pixi's lower default glibc floor judges
-# them incompatible and falls back to the sdist (no bundled GDAL -> no
-# osgeo). ubuntu-latest (24.04) provides glibc 2.39.
+# pyramids-gis Linux wheels (GDAL bundled) are manylinux_2_39; without this floor
+# pixi falls back to the GDAL-less sdist. ubuntu-latest (24.04) provides glibc 2.39.
 [tool.pixi.system-requirements]
 libc = "2.39"
 
 [tool.pixi.pypi-dependencies]
-# Dev/test env pulls every backend's SDK so the full suite runs.
-# Production users do `pip install earthlens[ecmwf]` (or whichever
-# subset they need) per the [project.optional-dependencies] above.
+# Dev/test env pulls every backend's SDK (`[all]`) so the full suite runs.
 earthlens = { path = ".", editable = true, extras = ["all"] }
 
 [tool.pixi.tasks]
@@ -265,7 +241,7 @@ test-gee = { cmd = "pytest -vvv -m 'gee and not e2e' --cov=src/earthlens --cov-r
 test-cmems = { cmd = "pytest -vvv -m 'cmems and not e2e' --cov=src/earthlens --cov-report=xml --cov-report=term-missing", description = "Run CMEMS-backend tests (requires the `cmems` extra: copernicusmarine)" }
 test-fdsn = { cmd = "pytest -vvv -m 'fdsn and not e2e' --cov=src/earthlens --cov-report=xml --cov-report=term-missing", description = "Run FDSN seismic-event backend tests (requires the `fdsn` extra: obspy)" }
 test-earthdata = { cmd = "pytest -vvv -m 'earthdata and not e2e' --cov=src/earthlens --cov-report=xml --cov-report=term-missing", description = "Run NASA Earthdata backend tests (requires the `earthdata` extra: earthaccess; Python >=3.12)" }
-test-stac = { cmd = "pytest -vvv -m 'stac and not e2e' --cov=src/earthlens --cov-report=xml --cov-report=term-missing", description = "Run STAC-backend tests (requires the `stac` extra: pystac-client / planetary-computer)" }
+test-stac = { cmd = "pytest -vvv -m 'stac and not e2e' --cov=src/earthlens --cov-report=xml --cov-report=term-missing", description = "Run STAC-backend tests (requires the `stac` extra: pyramids-gis[stac])" }
 test-gdacs = { cmd = "pytest -vvv -m 'gdacs and not e2e' --cov=src/earthlens --cov-report=xml --cov-report=term-missing", description = "Run GDACS-backend tests (public feed, no extra SDK)" }
 test-openaq = { cmd = "pytest -vvv -m 'openaq and not e2e' --cov=src/earthlens --cov-report=xml --cov-report=term-missing", description = "Run OpenAQ-backend tests (no extra SDK; uses the core requests dependency)" }
 test-tropycal = { cmd = "pytest -vvv -m 'tropycal and not e2e' --cov=src/earthlens --cov-report=xml --cov-report=term-missing", description = "Run Tropycal cyclone-track backend tests (requires the `tropycal` extra: tropycal, cartopy)" }
