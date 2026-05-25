@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -3084,6 +3084,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../examples/earthdata/opera_s1_backscatter/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    OPERA Sentinel-1 RTC backscatter (NASA Earthdata)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -4290,13 +4318,35 @@ backend.</p>
 <p>Two one-time, dataset-specific steps you may hit:</p>
 <ul>
 <li><strong>Authorize the DAAC application.</strong> Some DAACs require you to approve
-  their application once. After logging in at
-  <a href="https://urs.earthdata.nasa.gov">urs.earthdata.nasa.gov</a>, go to
-  <strong>Applications → Authorized Apps</strong> and approve as prompted (or you
-  will simply be asked the first time you reach that DAAC).</li>
-<li><strong>Accept a EULA.</strong> A few collections (e.g. GPM IMERG at GES DISC) ask
-  you to accept a licence agreement on first download.</li>
+  their application once, or downloads return <strong>HTTP 401</strong> even with a
+  valid token. <strong>ASF (Sentinel-1 / OPERA) is the common case.</strong> To
+  authorize it:<ol>
+<li>Log in at <a href="https://urs.earthdata.nasa.gov">urs.earthdata.nasa.gov</a>.</li>
+<li>Top-right menu → <strong>Applications → Authorized Apps</strong>.</li>
+<li>Click <strong>Approve More Applications</strong>, find <strong>“Alaska Satellite
+   Facility Data Access”</strong>, and authorize it. If it is not listed,
+   go to <strong>EULAs → Accept New EULAs</strong> and accept the ASF one (ASF
+   gates its datapool behind a EULA).</li>
+<li>Alternatively, open any ASF granule once via
+   <a href="https://search.asf.alaska.edu">ASF Vertex</a> while logged in and
+   approve when prompted.
+  The same flow applies to any DAAC whose download 401s — approve its
+  application from <strong>Authorized Apps</strong>.</li>
+</ol>
+</li>
 </ul>
+<p>!!! warning "ASF needs username/password, not a bearer token"
+      Authorizing the ASF app is necessary but <strong>not sufficient</strong> for a
+      token. ASF's datapool redirects through an EDL OAuth flow
+      (<code>datapool.asf.alaska.edu</code> → <code>cumulus.asf.alaska.edu</code> →
+      <code>urs.earthdata.nasa.gov</code>), and a bearer token is dropped across
+      that cross-host redirect → <strong>HTTP 401</strong>. For ASF (Sentinel-1 /
+      OPERA) downloads, authenticate with <strong>username/password</strong> (or a
+      <code>~/.netrc</code> entry) so <code>earthaccess</code> can hold the OAuth session, or
+      stream in-region from S3. A bare <code>EARTHDATA_TOKEN</code> works for the
+      other DAACs (GES DISC, ORNL, OB.DAAC, NSIDC, …) but not ASF HTTPS.
+- <strong>Accept a EULA.</strong> A few collections (e.g. GPM IMERG at GES DISC) ask
+  you to accept a licence agreement on first download.</p>
 <h2 id="credential-sources-in-priority-order"><a class="toclink" href="#credential-sources-in-priority-order">Credential sources (in priority order)</a><a class="headerlink" href="#credential-sources-in-priority-order" title="Permanent link">#</a></h2>
 <p><code>EarthData(...)</code> resolves a login strategy automatically, in this
 priority order:</p>
