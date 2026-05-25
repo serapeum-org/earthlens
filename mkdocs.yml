@@ -201,6 +201,8 @@ nav:
       - Quickstart — Atlantic season: examples/tropycal/quickstart.ipynb
       - Season track map: examples/tropycal/season_track_map.ipynb
       - Multi-decade landfall density: examples/tropycal/landfall_density.ipynb
+      - Recon observations — Katrina: examples/tropycal/recon_katrina.ipynb
+      - SHIPS intensity forecast — Ian: examples/tropycal/ships_intensity_forecast.ipynb
       - Hurricane Katrina — intensity timeline: examples/tropycal/katrina_intensity_timeline.ipynb
       - HURDAT2 vs IBTrACS — source comparison: examples/tropycal/source_comparison.ipynb
       - Multi-basin season — ACE by basin: examples/tropycal/multibasin_ace.ipynb
