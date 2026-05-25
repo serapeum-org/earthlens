@@ -128,3 +128,57 @@ datasets:
       elevation:
         long_name: NASADEM merged DEM elevation
         units: m
+  HLSS30_20:
+    short_name: HLSS30
+    version: '2.0'
+    daac: LP DAAC
+    provider: LPCLOUD
+    cadence: irregular
+    format: cog
+    output_kind: raster
+    cloud_hosted: true
+    requires_harmony_for_subset: false
+    supports_harmony: false
+    temporal:
+      start: '2015-11-28'
+      end: null
+    bands:
+      B04:
+        long_name: Harmonized Sentinel-2 red surface reflectance
+        units: '1'
+  ASTGTM_003:
+    short_name: ASTGTM
+    version: '003'
+    daac: LP DAAC
+    provider: LPCLOUD
+    cadence: static
+    format: geotiff
+    output_kind: raster
+    cloud_hosted: true
+    requires_harmony_for_subset: false
+    supports_harmony: false
+    temporal:
+      start: '2000-03-01'
+      end: null
+    bands:
+      ASTER_GDEM_DEM:
+        long_name: ASTER Global DEM elevation
+        units: m
+  MOD09GA_061:
+    short_name: MOD09GA
+    version: '061'
+    daac: LP DAAC
+    provider: LPCLOUD
+    cadence: daily
+    format: hdf-eos2
+    output_kind: raster
+    cloud_hosted: true
+    requires_harmony_for_subset: false
+    supports_harmony: false
+    temporal:
+      start: '2000-02-24'
+      end: null
+    bands:
+      sur_refl_b01:
+        long_name: Surface reflectance band 1 (red)
+        units: '1'

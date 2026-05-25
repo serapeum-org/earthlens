@@ -19,3 +19,21 @@ datasets:
       VV:
         long_name: Radiometric terrain-corrected backscatter (VV)
         units: '1'
+  OPERA_L2_CSLC-S1_V1:
+    short_name: OPERA_L2_CSLC-S1_V1
+    version: '1'
+    daac: ASF
+    provider: ASF
+    cadence: irregular
+    format: hdf5
+    output_kind: raster
+    cloud_hosted: true
+    requires_harmony_for_subset: false
+    supports_harmony: false
+    temporal:
+      start: '2014-04-25'
+      end: null
+    bands:
+      VV:
+        long_name: Co-registered single-look complex backscatter (VV)
+        units: '1'

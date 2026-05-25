@@ -37,3 +37,39 @@ datasets:
       EV_1KM_RefSB:
         long_name: Calibrated Earth-view 1 km reflective-band radiance
         units: W/m2/um/sr
+  VNP46A1_2:
+    short_name: VNP46A1
+    version: '2'
+    daac: LAADS
+    provider: LAADS
+    cadence: daily
+    format: hdf-eos5
+    output_kind: raster
+    cloud_hosted: true
+    requires_harmony_for_subset: false
+    supports_harmony: false
+    temporal:
+      start: '2012-01-19'
+      end: null
+    bands:
+      DNB_At_Sensor_Radiance_500m:
+        long_name: At-sensor day/night band radiance
+        units: nW/cm2/sr
+  MOD04_L2_61:
+    short_name: MOD04_L2
+    version: '6.1'
+    daac: LAADS
+    provider: LAADS
+    cadence: irregular
+    format: hdf-eos2
+    output_kind: raster
+    cloud_hosted: true
+    requires_harmony_for_subset: false
+    supports_harmony: false
+    temporal:
+      start: '2000-02-24'
+      end: null
+    bands:
+      Optical_Depth_Land_And_Ocean:
+        long_name: Aerosol optical depth (land + ocean)
+        units: '1'

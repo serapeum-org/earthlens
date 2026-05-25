@@ -91,3 +91,39 @@ datasets:
       ICECON:
         long_name: Sea ice concentration (CDR)
         units: '1'
+  MOD10A1_61:
+    short_name: MOD10A1
+    version: '61'
+    daac: NSIDC
+    provider: NSIDC_CPRD
+    cadence: daily
+    format: hdf-eos2
+    output_kind: raster
+    cloud_hosted: true
+    requires_harmony_for_subset: true
+    supports_harmony: true
+    temporal:
+      start: '2000-02-24'
+      end: null
+    bands:
+      NDSI_Snow_Cover:
+        long_name: Normalized-difference snow cover
+        units: '%'
+  ATL10_007:
+    short_name: ATL10
+    version: '007'
+    daac: NSIDC
+    provider: NSIDC_CPRD
+    cadence: irregular
+    format: hdf5
+    output_kind: vector
+    cloud_hosted: true
+    requires_harmony_for_subset: false
+    supports_harmony: false
+    temporal:
+      start: '2018-10-14'
+      end: null
+    bands:
+      freeboard:
+        long_name: Sea-ice freeboard (along-track segments)
+        units: m

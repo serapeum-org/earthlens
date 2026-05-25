@@ -109,3 +109,57 @@ datasets:
       xco2:
         long_name: Column-averaged dry-air CO2 mole fraction
         units: ppm
+  GPM_3IMERGDF_07:
+    short_name: GPM_3IMERGDF
+    version: '07'
+    daac: GES DISC
+    provider: GES_DISC
+    cadence: daily
+    format: hdf5
+    output_kind: raster
+    cloud_hosted: true
+    requires_harmony_for_subset: true
+    supports_harmony: true
+    temporal:
+      start: '2000-06-01'
+      end: null
+    bands:
+      precipitation:
+        long_name: Daily accumulated precipitation
+        units: mm/day
+  OMNO2d_004:
+    short_name: OMNO2d
+    version: '004'
+    daac: GES DISC
+    provider: GES_DISC
+    cadence: daily
+    format: hdf-eos5
+    output_kind: raster
+    cloud_hosted: true
+    requires_harmony_for_subset: true
+    supports_harmony: true
+    temporal:
+      start: '2004-10-01'
+      end: null
+    bands:
+      ColumnAmountNO2:
+        long_name: Total column NO2 (OMI daily L3)
+        units: molec/cm2
+  M2TMNXSLV_5124:
+    short_name: M2TMNXSLV
+    version: 5.12.4
+    daac: GES DISC
+    provider: GES_DISC
+    cadence: monthly
+    format: netcdf4
+    output_kind: raster
+    cloud_hosted: true
+    requires_harmony_for_subset: true
+    supports_harmony: true
+    temporal:
+      start: '1980-01-01'
+      end: null
+    bands:
+      T2M:
+        long_name: 2-metre air temperature (monthly mean)
+        units: K

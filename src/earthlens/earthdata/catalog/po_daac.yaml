@@ -55,3 +55,21 @@ datasets:
       sss_smap:
         long_name: Sea surface salinity
         units: psu
+  OISSS_L4_multimission_monthly_v2:
+    short_name: OISSS_L4_multimission_monthly_v2
+    version: '2.0'
+    daac: PO.DAAC
+    provider: POCLOUD
+    cadence: monthly
+    format: netcdf4
+    output_kind: raster
+    cloud_hosted: true
+    requires_harmony_for_subset: true
+    supports_harmony: true
+    temporal:
+      start: '2011-08-01'
+      end: null
+    bands:
+      sss:
+        long_name: Multi-mission optimally interpolated sea-surface salinity
+        units: psu

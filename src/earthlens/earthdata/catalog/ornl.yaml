@@ -55,3 +55,21 @@ datasets:
       MU:
         long_name: Mean aboveground biomass density (1 km grid)
         units: Mg/ha
+  FLUXNET_Canada_1335:
+    short_name: FLUXNET_Canada_1335
+    version: '1'
+    daac: ORNL DAAC
+    provider: ORNL_CLOUD
+    cadence: irregular
+    format: csv
+    output_kind: tabular
+    cloud_hosted: true
+    requires_harmony_for_subset: false
+    supports_harmony: false
+    temporal:
+      start: '2003-01-01'
+      end: null
+    bands:
+      FC:
+        long_name: Net CO2 flux (eddy covariance tower)
+        units: umol/m2/s
