@@ -1,45 +1,93 @@
-# NSIDC DAAC — National Snow and Ice Data Center.
-# CMR provider code: NSIDC_CPRD. Flagship: ICESat-2 (point/vector),
-# SMAP, sea-ice CDR, MEaSUREs BedMachine.
+# NSIDC DAAC — National Snow and Ice Data Center. CMR provider: NSIDC_CPRD.
+# ICESat-2 (ATL06/08, vector), SMAP, sea-ice concentration CDR.
 datasets:
   ATL08_006:
     short_name: ATL08
-    version: "006"
-    doi: 10.5067/ATLAS/ATL08.006
+    version: '006'
     daac: NSIDC
     provider: NSIDC_CPRD
     cadence: irregular
     format: hdf5
     output_kind: vector
     cloud_hosted: true
-    cloud_bucket: s3://nsidc-cumulus-prod-protected
-    requires_harmony_for_subset: false
+    requires_harmony_for_subset: true
     supports_harmony: true
     temporal:
-      start: 2018-10-14
+      start: '2018-10-14'
       end: null
     bands:
       h_canopy:
         long_name: Canopy height above ground (ATL08 land/vegetation)
         units: m
-
+  ATL06_006:
+    short_name: ATL06
+    version: '006'
+    daac: NSIDC
+    provider: NSIDC_CPRD
+    cadence: irregular
+    format: hdf5
+    output_kind: vector
+    cloud_hosted: true
+    requires_harmony_for_subset: true
+    supports_harmony: true
+    temporal:
+      start: '2018-10-14'
+      end: null
+    bands:
+      h_li:
+        long_name: Land-ice surface height
+        units: m
   SPL3SMP_E_006:
     short_name: SPL3SMP_E
-    version: "006"
-    doi: 10.5067/4DQ54OUIJ9DL
+    version: '006'
     daac: NSIDC
     provider: NSIDC_CPRD
     cadence: daily
     format: hdf5
     output_kind: raster
     cloud_hosted: true
-    cloud_bucket: s3://nsidc-cumulus-prod-protected
     requires_harmony_for_subset: true
     supports_harmony: true
     temporal:
-      start: 2015-03-31
+      start: '2015-03-31'
       end: null
     bands:
       soil_moisture:
         long_name: Enhanced L3 radiometer soil moisture
         units: cm3/cm3
+  SPL4SMGP_008:
+    short_name: SPL4SMGP
+    version: 008
+    daac: NSIDC
+    provider: NSIDC_CPRD
+    cadence: 3hourly
+    format: hdf5
+    output_kind: raster
+    cloud_hosted: true
+    requires_harmony_for_subset: true
+    supports_harmony: true
+    temporal:
+      start: '2015-03-31'
+      end: null
+    bands:
+      sm_surface:
+        long_name: Surface soil moisture (L4 9 km)
+        units: m3/m3
+  NSIDC-0051_2:
+    short_name: NSIDC-0051
+    version: '2'
+    daac: NSIDC
+    provider: NSIDC_CPRD
+    cadence: daily
+    format: netcdf4
+    output_kind: raster
+    cloud_hosted: true
+    requires_harmony_for_subset: true
+    supports_harmony: true
+    temporal:
+      start: '1978-10-25'
+      end: null
+    bands:
+      ICECON:
+        long_name: Sea ice concentration (CDR)
+        units: '1'

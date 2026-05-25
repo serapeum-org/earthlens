@@ -128,13 +128,13 @@ class TestConstruction:
 
     def test_vector_output_kind(self, fake_earthaccess, edl_env, tmp_path):
         """A vector dataset sets OUTPUT_KIND='vector'."""
-        obj = _make(tmp_path, {"GEDI04_A_002": ["agbd"]})
+        obj = _make(tmp_path, {"ATL08_006": ["h_canopy"]})
         assert obj.OUTPUT_KIND == "vector"
 
     def test_mixed_kind_rejected(self, fake_earthaccess, edl_env, tmp_path):
         """Mixing raster and vector datasets is rejected."""
         with pytest.raises(ValueError, match="mixed kinds"):
-            _make(tmp_path, {"GPM_3IMERGHHL_07": ["precipitation"], "GEDI04_A_002": ["agbd"]})
+            _make(tmp_path, {"GPM_3IMERGHHL_07": ["precipitation"], "ATL08_006": ["h_canopy"]})
 
     def test_empty_variables_rejected(self, fake_earthaccess, edl_env, tmp_path):
         """An empty variables mapping is rejected."""
@@ -152,7 +152,7 @@ class TestConstruction:
 
     def test_daac_with_single_dataset_ok(self, fake_earthaccess, edl_env, tmp_path):
         """daac= with one dataset resolves normally."""
-        obj = _make(tmp_path, {"GPM_3IMERGHHL_07": ["precipitation"]}, daac="GES_DISC")
+        obj = _make(tmp_path, {"GPM_3IMERGHHL_07": ["precipitation"]}, daac="GES DISC")
         assert obj._datasets[0].provider == "GES_DISC"
 
     def test_unknown_key_rejected(self, fake_earthaccess, edl_env, tmp_path):

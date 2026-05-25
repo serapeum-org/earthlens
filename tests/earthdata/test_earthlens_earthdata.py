@@ -57,12 +57,12 @@ class TestPerInstanceAggregateGuard:
 
     def test_vector_rejects_aggregate(self, fake_earthaccess, edl_env, tmp_path):
         """A vector instance rejects aggregate= at the facade."""
-        fac = _facade(tmp_path, {"GEDI04_A_002": ["agbd"]})
+        fac = _facade(tmp_path, {"ATL08_006": ["h_canopy"]})
         with pytest.raises(NotImplementedError, match="vector"):
             fac.download(aggregate=AggregationConfig(freq="1MS"))
 
     def test_vector_download_without_aggregate_ok(self, fake_earthaccess, edl_env, tmp_path):
         """A vector instance downloads fine without aggregate=."""
-        fac = _facade(tmp_path, {"GEDI04_A_002": ["agbd"]})
+        fac = _facade(tmp_path, {"ATL08_006": ["h_canopy"]})
         paths = fac.download()
         assert isinstance(paths, list)

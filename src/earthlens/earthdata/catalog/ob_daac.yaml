@@ -1,23 +1,39 @@
 # OB.DAAC — Ocean Biology DAAC. CMR provider code: OB_CLOUD.
-# Flagship: PACE OCI, ocean colour (MODIS-Aqua, VIIRS).
+# PACE OCI ocean colour (L2 AOP + L3 chlorophyll).
 datasets:
-  PACE_OCI_L2_AOP:
+  PACE_OCI_L2_AOP_32:
     short_name: PACE_OCI_L2_AOP
-    version: "3.0"
-    doi: 10.5067/PACE/OCI/L2/AOP/3.0
+    version: '3.2'
     daac: OB.DAAC
     provider: OB_CLOUD
     cadence: irregular
     format: netcdf4
     output_kind: raster
     cloud_hosted: true
-    cloud_bucket: s3://ob-cumulus-prod-public
     requires_harmony_for_subset: false
     supports_harmony: false
     temporal:
-      start: 2024-03-04
+      start: '2024-03-04'
       end: null
     bands:
       Rrs:
         long_name: Remote sensing reflectance (hyperspectral)
         units: sr-1
+  PACE_OCI_L3M_CHL_31:
+    short_name: PACE_OCI_L3M_CHL
+    version: '3.1'
+    daac: OB.DAAC
+    provider: OB_CLOUD
+    cadence: daily
+    format: netcdf4
+    output_kind: raster
+    cloud_hosted: true
+    requires_harmony_for_subset: false
+    supports_harmony: false
+    temporal:
+      start: '2024-03-04'
+      end: null
+    bands:
+      chlor_a:
+        long_name: Chlorophyll-a concentration
+        units: mg m-3

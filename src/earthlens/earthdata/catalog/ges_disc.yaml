@@ -1,45 +1,111 @@
 # GES DISC — Goddard Earth Sciences Data and Information Services Center.
-# CMR provider code: GES_DISC. Flagship products: GPM IMERG precipitation,
-# MERRA-2, GLDAS, OCO-2/3, AIRS, TEMPO.
+# CMR provider code: GES_DISC. GPM IMERG, MERRA-2, GLDAS, AIRS, OCO-2.
 datasets:
   GPM_3IMERGHHL_07:
     short_name: GPM_3IMERGHHL
-    version: "07"
-    doi: 10.5067/GPM/IMERG/3B-HH-L/07
-    daac: GES_DISC
+    version: '07'
+    daac: GES DISC
     provider: GES_DISC
     cadence: subhourly
     format: hdf5
     output_kind: raster
     cloud_hosted: true
-    cloud_bucket: s3://gesdisc-cumulus-prod-protected
     requires_harmony_for_subset: true
     supports_harmony: true
     temporal:
-      start: 2000-06-01
+      start: '2000-06-01'
       end: null
     bands:
       precipitation:
         long_name: Precipitation rate (late half-hourly run)
         units: mm/hr
-
   GPM_3IMERGM_07:
     short_name: GPM_3IMERGM
-    version: "07"
-    doi: 10.5067/GPM/IMERG/3B-MONTH/07
-    daac: GES_DISC
+    version: '07'
+    daac: GES DISC
     provider: GES_DISC
     cadence: monthly
     format: hdf5
     output_kind: raster
     cloud_hosted: true
-    cloud_bucket: s3://gesdisc-cumulus-prod-protected
     requires_harmony_for_subset: true
     supports_harmony: true
     temporal:
-      start: 2000-06-01
+      start: '2000-06-01'
       end: null
     bands:
       precipitation:
         long_name: Monthly mean precipitation rate
         units: mm/hr
+  M2T1NXSLV_5124:
+    short_name: M2T1NXSLV
+    version: 5.12.4
+    daac: GES DISC
+    provider: GES_DISC
+    cadence: hourly
+    format: netcdf4
+    output_kind: raster
+    cloud_hosted: true
+    requires_harmony_for_subset: true
+    supports_harmony: true
+    temporal:
+      start: '1980-01-01'
+      end: null
+    bands:
+      T2M:
+        long_name: 2-metre air temperature
+        units: K
+  GLDAS_NOAH025_3H_21:
+    short_name: GLDAS_NOAH025_3H
+    version: '2.1'
+    daac: GES DISC
+    provider: GES_DISC
+    cadence: 3hourly
+    format: netcdf4
+    output_kind: raster
+    cloud_hosted: true
+    requires_harmony_for_subset: true
+    supports_harmony: true
+    temporal:
+      start: '2000-01-01'
+      end: null
+    bands:
+      Rainf_tavg:
+        long_name: Rainfall flux
+        units: kg m-2 s-1
+  AIRX3STD_7:
+    short_name: AIRX3STD
+    version: '7.0'
+    daac: GES DISC
+    provider: GES_DISC
+    cadence: daily
+    format: hdf-eos2
+    output_kind: raster
+    cloud_hosted: true
+    requires_harmony_for_subset: true
+    supports_harmony: true
+    temporal:
+      start: '2002-08-30'
+      end: null
+    bands:
+      Temperature_A:
+        long_name: Air temperature (ascending)
+        units: K
+  OCO2_L2_Lite_FP_112r:
+    short_name: OCO2_L2_Lite_FP
+    version: 11.2r
+    daac: GES DISC
+    provider: GES_DISC
+    cadence: daily
+    format: netcdf4
+    output_kind: vector
+    cloud_hosted: true
+    requires_harmony_for_subset: false
+    supports_harmony: false
+    temporal:
+      start: '2014-09-06'
+      end: null
+    bands:
+      xco2:
+        long_name: Column-averaged dry-air CO2 mole fraction
+        units: ppm

@@ -48,7 +48,7 @@ Split such a request into one call per kind.
 
 ```python
 el = EarthLens(data_source="earthdata",
-               variables={"GEDI04_A_002": ["agbd"]}, ...)
+               variables={"ATL08_006": ["h_canopy"]}, ...)
 el.datasource.OUTPUT_KIND   # 'vector'
 ```
 
@@ -72,7 +72,7 @@ If a `short_name` is served by more than one provider, pass `daac=` to
 pick the curated row you mean:
 
 ```python
-EarthLens(data_source="earthdata", daac="GES_DISC", ...)
+EarthLens(data_source="earthdata", daac="GES DISC", ...)
 ```
 
 `daac=` only applies to a **single-dataset** request — it disambiguates

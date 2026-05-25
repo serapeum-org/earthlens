@@ -1,23 +1,39 @@
 # LAADS DAAC — Level-1 and Atmosphere Archive and Distribution System.
-# CMR provider code: LAADS. Flagship: VIIRS Black Marble, MODIS L1.
+# CMR provider code: LAADS. VIIRS Black Marble, MODIS L1B.
 datasets:
-  VNP46A2_001:
+  VNP46A2_2:
     short_name: VNP46A2
-    version: "001"
-    doi: 10.5067/VIIRS/VNP46A2.001
+    version: '2'
     daac: LAADS
     provider: LAADS
     cadence: daily
     format: hdf-eos5
     output_kind: raster
     cloud_hosted: true
-    cloud_bucket: s3://prod-lads
     requires_harmony_for_subset: false
     supports_harmony: false
     temporal:
-      start: 2012-01-19
+      start: '2012-01-19'
       end: null
     bands:
       Gap_Filled_DNB_BRDF-Corrected_NTL:
         long_name: Gap-filled BRDF-corrected nighttime lights (Black Marble)
         units: nW/cm2/sr
+  MOD021KM_61:
+    short_name: MOD021KM
+    version: '6.1'
+    daac: LAADS
+    provider: LAADS
+    cadence: irregular
+    format: hdf-eos2
+    output_kind: raster
+    cloud_hosted: true
+    requires_harmony_for_subset: false
+    supports_harmony: false
+    temporal:
+      start: '2000-02-24'
+      end: null
+    bands:
+      EV_1KM_RefSB:
+        long_name: Calibrated Earth-view 1 km reflective-band radiance
+        units: W/m2/um/sr

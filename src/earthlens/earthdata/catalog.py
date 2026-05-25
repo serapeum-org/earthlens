@@ -595,10 +595,10 @@ class Catalog(AbstractCatalog):
             - A wrong `daac=` filter is rejected:
                 ```python
                 >>> from earthlens.earthdata import Catalog
-                >>> Catalog().resolve("GEDI04_A_002", daac="GES DISC")
+                >>> Catalog().resolve("ATL08_006", daac="GES DISC")
                 Traceback (most recent call last):
                     ...
-                ValueError: dataset 'GEDI04_A_002' resolves to DAAC 'LP DAAC', not the requested daac='GES DISC'.
+                ValueError: dataset 'ATL08_006' resolves to DAAC 'NSIDC', not the requested daac='GES DISC'.
 
                 ```
         """

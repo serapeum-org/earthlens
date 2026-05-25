@@ -1,23 +1,39 @@
 # ASDC — Atmospheric Science Data Center. CMR provider code: LARC_CLOUD.
-# Flagship: CERES, MISR, CALIPSO.
+# CERES radiative-flux products.
 datasets:
   CER_SSF_Terra-FM1-MODIS_Edition4A:
-    short_name: CER_SSF_Terra-FM1-MODIS_Edition4A
-    version: "4A"
-    doi: 10.5067/TERRA/CERES/SSF-FM1_L2.004A
+    short_name: CER_SSF_Terra-FM1-MODIS
+    version: Edition4A
     daac: ASDC
     provider: LARC_CLOUD
     cadence: irregular
     format: hdf4
     output_kind: raster
-    cloud_hosted: false
-    cloud_bucket: null
+    cloud_hosted: true
     requires_harmony_for_subset: false
     supports_harmony: false
     temporal:
-      start: 2000-02-24
+      start: '2000-02-24'
       end: null
     bands:
       CERES_SW_TOA_flux:
         long_name: CERES shortwave TOA flux
+        units: W/m2
+  CER_SSF1deg-Day_Terra-MODIS_Edition4A:
+    short_name: CER_SSF1deg-Day_Terra-MODIS
+    version: Edition4A
+    daac: ASDC
+    provider: LARC_CLOUD
+    cadence: daily
+    format: netcdf4
+    output_kind: raster
+    cloud_hosted: true
+    requires_harmony_for_subset: false
+    supports_harmony: false
+    temporal:
+      start: '2000-03-01'
+      end: null
+    bands:
+      toa_sw_all_daily:
+        long_name: TOA shortwave flux, all-sky daily mean
         units: W/m2

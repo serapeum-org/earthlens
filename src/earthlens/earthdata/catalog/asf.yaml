@@ -1,24 +1,21 @@
 # ASF DAAC — Alaska Satellite Facility. CMR provider code: ASF.
-# Flagship: Sentinel-1, OPERA, ALOS, NISAR. Reached via earthaccess +
-# daac="ASF"; the richer asf_search stack search is deferred (G5).
+# Sentinel-1, OPERA. Reached via earthaccess + daac="ASF".
 datasets:
   OPERA_L2_RTC-S1_V1:
     short_name: OPERA_L2_RTC-S1_V1
-    version: "1"
-    doi: 10.5067/SNWG/OPERA_L2_RTC-S1_V1
+    version: '1'
     daac: ASF
     provider: ASF
     cadence: irregular
     format: cog
     output_kind: raster
     cloud_hosted: true
-    cloud_bucket: s3://asf-cumulus-prod-opera-products
     requires_harmony_for_subset: false
     supports_harmony: false
     temporal:
-      start: 2014-04-25
+      start: '2014-04-25'
       end: null
     bands:
       VV:
         long_name: Radiometric terrain-corrected backscatter (VV)
-        units: "1"
+        units: '1'

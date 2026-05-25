@@ -1,23 +1,57 @@
-# ORNL DAAC — Oak Ridge National Laboratory. CMR provider code: ORNL_CLOUD.
-# Flagship: Daymet (raster), GEDI L4B, field-campaign CSV (tabular).
+# ORNL DAAC — Oak Ridge National Laboratory. CMR provider: ORNL_CLOUD.
+# Daymet (raster), GEDI L4A footprints (vector), GEDI L4B gridded biomass.
 datasets:
-  Daymet_V4R1_2129:
-    short_name: Daymet_Daily_V4R1
-    version: "1"
-    doi: 10.3334/ORNLDAAC/2129
+  Daymet_Daily_V4R1_2129:
+    short_name: Daymet_Daily_V4R1_2129
+    version: '4.1'
     daac: ORNL DAAC
     provider: ORNL_CLOUD
     cadence: daily
     format: netcdf4
     output_kind: raster
     cloud_hosted: true
-    cloud_bucket: s3://ornl-cumulus-prod-protected
     requires_harmony_for_subset: false
     supports_harmony: false
     temporal:
-      start: 1980-01-01
+      start: '1980-01-01'
       end: null
     bands:
       prcp:
         long_name: Daily total precipitation
         units: mm/day
+  GEDI_L4A_AGB_Density_V2_1_2056:
+    short_name: GEDI_L4A_AGB_Density_V2_1_2056
+    version: '2.1'
+    daac: ORNL DAAC
+    provider: ORNL_CLOUD
+    cadence: irregular
+    format: hdf5
+    output_kind: vector
+    cloud_hosted: true
+    requires_harmony_for_subset: false
+    supports_harmony: false
+    temporal:
+      start: '2019-04-18'
+      end: null
+    bands:
+      agbd:
+        long_name: Aboveground biomass density (footprint)
+        units: Mg/ha
+  GEDI_L4B_Gridded_Biomass_V2_1_2299:
+    short_name: GEDI_L4B_Gridded_Biomass_V2_1_2299
+    version: '2.1'
+    daac: ORNL DAAC
+    provider: ORNL_CLOUD
+    cadence: static
+    format: geotiff
+    output_kind: raster
+    cloud_hosted: true
+    requires_harmony_for_subset: false
+    supports_harmony: false
+    temporal:
+      start: '2019-04-18'
+      end: null
+    bands:
+      MU:
+        long_name: Mean aboveground biomass density (1 km grid)
+        units: Mg/ha

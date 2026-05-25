@@ -152,13 +152,13 @@ class TestCatalogLookup:
 
     def test_resolve_with_matching_daac(self):
         """resolve() with a matching daac returns the row."""
-        ds = Catalog().resolve("GPM_3IMERGHHL_07", daac="GES_DISC")
+        ds = Catalog().resolve("GPM_3IMERGHHL_07", daac="GES DISC")
         assert ds.short_name == "GPM_3IMERGHHL"
 
     def test_resolve_with_wrong_daac_rejected(self):
         """resolve() with a non-matching daac raises ValueError (like get_dataset)."""
         with pytest.raises(ValueError, match="not the requested"):
-            Catalog().resolve("GEDI04_A_002", daac="GES DISC")
+            Catalog().resolve("ATL08_006", daac="GES DISC")
 
     def test_get_daac(self):
         """get_daac returns the registry entry for a provider code."""
