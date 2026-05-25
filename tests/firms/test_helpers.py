@@ -12,6 +12,8 @@ from earthlens.firms._helpers import (
     firms_get,
 )
 
+pytestmark = pytest.mark.firms
+
 
 class _Resp:
     """Minimal fake response exposing status_code and text."""
@@ -50,6 +52,12 @@ def test_end_before_start_raises():
     """A reversed window is rejected."""
     with pytest.raises(ValueError, match="before start"):
         chunk_windows(dt.date(2024, 1, 10), dt.date(2024, 1, 1))
+
+
+def test_zero_max_days_raises():
+    """A non-positive chunk cap is rejected."""
+    with pytest.raises(ValueError, match="max_days must be"):
+        chunk_windows(dt.date(2024, 1, 1), dt.date(2024, 1, 5), max_days=0)
 
 
 def test_classify_csv_header():

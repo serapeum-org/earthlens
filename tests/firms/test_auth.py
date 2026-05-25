@@ -11,6 +11,8 @@ from earthlens.firms import (
     FirmsCredentials,
 )
 
+pytestmark = pytest.mark.firms
+
 
 def test_secretstr_hides_key():
     """The MAP_KEY never appears in the credentials repr."""

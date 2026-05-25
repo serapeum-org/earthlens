@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import geopandas as gpd
 import pandas as pd
+import pytest
 
 from earthlens.firms.events import (
     ATTRIBUTE_COLUMNS,
@@ -11,6 +12,8 @@ from earthlens.firms.events import (
     csv_to_fc,
     empty_fc,
 )
+
+pytestmark = pytest.mark.firms
 
 
 def _viirs_frame() -> pd.DataFrame:
@@ -125,3 +128,17 @@ def test_concat_all_empty_is_empty():
     merged = concat([empty_fc(), empty_fc()])
     assert len(merged) == 0
     assert set(ATTRIBUTE_COLUMNS).issubset(merged.columns)
+
+
+def test_missing_confidence_column_degrades_to_nan():
+    """A frame without a confidence column yields NaN confidence_pct."""
+    frame = _modis_frame().drop(columns=["confidence"])
+    fc = csv_to_fc(frame, "MODIS_NRT", "MODIS")
+    assert pd.isna(fc["confidence_pct"].iloc[0])
+
+
+def test_missing_satellite_column_degrades_to_na():
+    """A frame without a satellite column yields a null satellite."""
+    frame = _viirs_frame().drop(columns=["satellite"])
+    fc = csv_to_fc(frame, "VIIRS_SNPP_NRT", "VIIRS")
+    assert pd.isna(fc["satellite"].iloc[0])

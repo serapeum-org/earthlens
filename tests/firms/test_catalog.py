@@ -10,6 +10,8 @@ import pytest
 from earthlens.firms import Catalog, Sensor, SensorColumn
 from earthlens.firms.catalog import Temporal
 
+pytestmark = pytest.mark.firms
+
 
 def test_bundled_catalog_loads():
     """The default Catalog() loads the bundled YAML with all six sensors."""
@@ -92,6 +94,12 @@ def test_missing_sensors_block_raises(tmp_path: Path):
     empty.write_text("other: {}\n")
     with pytest.raises(ValueError, match="missing or has an empty 'sensors:'"):
         Catalog.load(empty)
+
+
+def test_get_catalog_returns_datasets():
+    """get_catalog() returns the same map as datasets (abstract contract)."""
+    cat = Catalog()
+    assert cat.get_catalog() is cat.datasets
 
 
 def test_sensor_built_from_models():
