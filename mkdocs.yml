@@ -176,6 +176,8 @@ nav:
     - NASA Earthdata:
       - Catalog explorer (no network): examples/earthdata/catalog_explorer.ipynb
       - Per-dataset output kind: examples/earthdata/output_kinds.ipynb
+      - GPM IMERG monthly precipitation (live): examples/earthdata/imerg_precipitation.ipynb
+      - GEDI L4A biomass footprints (live): examples/earthdata/gedi_l4a_footprints.ipynb
     - Seismic events (FDSN):
       - Quickstart — recent earthquakes: examples/fdsn/quickstart.ipynb
       - Global seismicity map: examples/fdsn/global_seismicity_map.ipynb

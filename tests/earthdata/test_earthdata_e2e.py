@@ -12,7 +12,9 @@ Run with:
 
 from __future__ import annotations
 
+import contextlib
 import datetime as dt
+import io
 import os
 from pathlib import Path
 
@@ -20,9 +22,43 @@ import pytest
 
 from earthlens.earthlens import EarthLens
 
+# A non-interactive matplotlib backend so the notebooks' plot cells run headless.
+os.environ.setdefault("MPLBACKEND", "Agg")
+
 _HAVE_CREDS = bool(
     os.environ.get("EARTHDATA_USERNAME") and os.environ.get("EARTHDATA_PASSWORD")
 )
+
+_REPO_ROOT = Path(__file__).resolve().parents[2]
+_EXAMPLES = _REPO_ROOT / "docs" / "examples" / "earthdata"
+# The real-life (live-download) notebooks — distinct from the offline
+# catalog_explorer / output_kinds demos, which need no credentials.
+_LIVE_NOTEBOOKS = ["imerg_precipitation.ipynb", "gedi_l4a_footprints.ipynb"]
+
+
+def _run_notebook_cells(path: Path, workdir: Path) -> str:
+    """Exec a notebook's code cells in one namespace; return captured stdout.
+
+    Runs with `workdir` as the working directory (the notebooks write under a
+    relative `earthdata_output/`). Any cell exception propagates so the test
+    fails. A full kernel run is avoided deliberately: it keeps the e2e robust
+    without depending on a registered Jupyter kernelspec in the CI env.
+    """
+    import nbformat
+
+    nb = nbformat.read(str(path), as_version=4)
+    namespace: dict = {}
+    buffer = io.StringIO()
+    prev = Path.cwd()
+    os.chdir(workdir)
+    try:
+        with contextlib.redirect_stdout(buffer):
+            for cell in nb.cells:
+                if cell.cell_type == "code":
+                    exec(compile(cell.source, f"{path.name}#cell", "exec"), namespace)
+    finally:
+        os.chdir(prev)
+    return buffer.getvalue()
 
 # GPM IMERG late half-hourly has a publication latency of roughly half a
 # day; probe ~10 days back so the requested window is comfortably
@@ -59,3 +95,22 @@ class TestEarthdataLiveFetch:
         assert all(Path(p).exists() for p in paths), (
             f"download() returned non-existent paths: {paths!r}"
         )
+
+
+@pytest.mark.e2e
+@pytest.mark.earthdata
+@pytest.mark.skipif(
+    not _HAVE_CREDS,
+    reason="set EARTHDATA_USERNAME / EARTHDATA_PASSWORD to run live Earthdata e2e tests",
+)
+class TestEarthdataExampleNotebooks:
+    """Execute the real-life example notebooks against live EDL."""
+
+    @pytest.mark.parametrize("notebook", _LIVE_NOTEBOOKS)
+    def test_live_notebook_runs(self, notebook: str, tmp_path: Path):
+        """The notebook's cells run end-to-end and its live query is not skipped."""
+        out = _run_notebook_cells(_EXAMPLES / notebook, tmp_path)
+        assert "skipped live query" not in out, (
+            f"{notebook} fell into the offline skip branch — the live query failed:\n{out}"
+        )
+        assert "granule(s)" in out, f"{notebook} did not report a fetch:\n{out}"
