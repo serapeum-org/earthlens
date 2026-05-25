@@ -56,6 +56,18 @@ exposed to GDAL via the asset-read environment (`AWS_S3_ENDPOINT`,
 `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, …), never as an `Authorization`
 header.
 
+## Requester-pays collections — AWS credentials
+
+A few collections store their assets on a **requester-pays** S3 bucket even
+though their endpoint is otherwise anonymous — e.g. Earth Search's
+`landsat-c2-l2` resolves to `s3://usgs-landsat`. The catalog marks these with a
+per-collection `signer: aws-requester-pays`, so the backend reads them with the
+requester-pays signer (sets `AWS_REQUEST_PAYER=requester` and rewrites the
+`s3://` href to GDAL's `/vsis3/` path). **You must have valid AWS credentials**
+in the environment (`AWS_ACCESS_KEY_ID` / `AWS_SECRET_ACCESS_KEY`, or an
+instance role) — the requester (you) pays the egress. Without them the read
+fails with an S3 `403`.
+
 ## CI secret pattern
 
 Set the CDSE keys as repository secrets and export them in the job environment

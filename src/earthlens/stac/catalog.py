@@ -141,6 +141,12 @@ class Collection(BaseModel):
         resolution: Native ground sample distance in metres, or `None`.
         extent: Spatial/temporal coverage.
         assets: Asset key → :class:`Asset` metadata.
+        signer: Optional per-collection signer override. When set, the backend
+            reads this collection's assets with this signer instead of the
+            endpoint's default — e.g. `"aws-requester-pays"` for a collection
+            whose assets sit on a requester-pays S3 bucket (Earth Search's
+            `landsat-c2-l2` → `s3://usgs-landsat`). `None` uses the endpoint
+            signer.
     """
 
     model_config = ConfigDict(frozen=True, extra="forbid")
@@ -153,6 +159,7 @@ class Collection(BaseModel):
     resolution: float | None = None
     extent: Extent | None = None
     assets: dict[str, Asset] = Field(default_factory=dict)
+    signer: SignerType | None = None
 
 
 def _load_catalog_data(

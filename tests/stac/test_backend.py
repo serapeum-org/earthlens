@@ -351,6 +351,32 @@ class TestDownload:
 
 
 @pytest.mark.stac
+class TestSignerOverride:
+    """A collection can override its endpoint's signer (M3 — requester-pays)."""
+
+    def test_override_resolves_to_requester_pays(self, fake_pyramids, tmp_path):
+        """earth-search/landsat-c2-l2 reads with aws-requester-pays, not anonymous."""
+        stac = _build_stac(
+            tmp_path, endpoint="earth-search", variables={"earth-search/landsat-c2-l2": ["red"]}
+        )
+        assert stac._signer_for("earth-search/landsat-c2-l2").name == "aws-requester-pays"
+        # a collection without an override keeps the endpoint (anonymous) signer
+        assert stac._signer_for("sentinel-2-l2a").name == "anonymous"
+
+    def test_fetch_applies_requester_pays_env_and_vsis3(self, fake_pyramids, tmp_path):
+        """The override's GDAL env is active and s3:// hrefs become /vsis3/ for the read."""
+        fake_pyramids.items_by_collection["landsat-c2-l2"] = [
+            make_item("a", "2024-01-05", {"red": "s3://usgs-landsat/x/red.tif"})
+        ]
+        stac = _build_stac(
+            tmp_path, endpoint="earth-search", variables={"earth-search/landsat-c2-l2": ["red"]}
+        )
+        stac._fetch(stac._search())
+        assert _FakeCloudConfig.active_extras[-1].get("AWS_REQUEST_PAYER") == "requester"
+        assert fake_pyramids.merge_calls[0][0][0].startswith("/vsis3/usgs-landsat/")
+
+
+@pytest.mark.stac
 class TestModuleHelpers:
     """The module-level helpers behave on pystac-shaped and dict-shaped items."""
 
@@ -394,6 +420,14 @@ class TestModuleHelpers:
         from earthlens.stac.backend import _cleanup
 
         _cleanup([tmp_path / "absent.tif"])
+
+    def test_to_vsi_rewrites_s3(self):
+        """_to_vsi turns s3:// into the GDAL /vsis3/ path; leaves others alone."""
+        from earthlens.stac.backend import _to_vsi
+
+        assert _to_vsi("s3://usgs-landsat/x/B4.TIF") == "/vsis3/usgs-landsat/x/B4.TIF"
+        assert _to_vsi("https://h/a.tif") == "https://h/a.tif"
+        assert _to_vsi("/vsis3/eodata/a.tif") == "/vsis3/eodata/a.tif"
 
     def test_item_epsg_reads_proj_metadata(self):
         """_item_epsg reads proj:epsg from item properties (None when absent)."""

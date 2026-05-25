@@ -115,6 +115,8 @@ class STAC(AbstractDataSource):
         self._catalog: Catalog | None = None
         self._endpoint_obj: Endpoint | None = None
         self._signer: Any = None
+        # Per-collection signer overrides, built on demand and cached by type.
+        self._signer_cache: dict[str, Any] = {}
         self._client: Any = None
         super().__init__(
             start=start,
@@ -294,19 +296,25 @@ class STAC(AbstractDataSource):
         # download(aggregate=) can group + window them without re-parsing names.
         self._written = []
         multi = len(self._aoi_bboxes) > 1
-        with CloudConfig(extra=self._signer.gdal_env()):
-            for (collection_key, date, bbox_key), group in _group_products(products):
+        for (collection_key, date, bbox_key), group in _group_products(products):
+            # Per-collection signer (e.g. requester-pays for usgs-landsat) — its
+            # GDAL env must be active for the remote reads inside merge_rasters.
+            signer = self._signer_for(collection_key)
+            with CloudConfig(extra=signer.gdal_env()):
                 idx = self._aoi_bboxes.index(bbox_key) if multi else 0
                 assets = group[0].metadata["assets"]
                 band_paths: list[Path] = []
                 target_crs = self._target_crs(group)
                 nodata = self._nodata_for(collection_key, assets)
+                # Endpoint-namespaced keys contain "/"; flatten for filenames so
+                # they don't create phantom subdirectories.
+                safe_key = collection_key.replace("/", "_")
                 for band in assets:
                     hrefs = [
-                        self._signer.sign_href(_asset_href(p.metadata["item"], band))
+                        _to_vsi(signer.sign_href(_asset_href(p.metadata["item"], band)))
                         for p in group
                     ]
-                    tmp = Path(self.root_dir) / f".{collection_key}_{band}_{date}_{idx}.tif"
+                    tmp = Path(self.root_dir) / f".{safe_key}_{band}_{date}_{idx}.tif"
                     # merge_rasters mosaics the tiles and, when dst_crs is given,
                     # reprojects mismatched-CRS tiles onto one grid in a single
                     # pass (multi-UTM Sentinel-2). A single tile is handled too.
@@ -319,15 +327,44 @@ class STAC(AbstractDataSource):
                 # One COG per (collection, date); a crossing AOI yields one per
                 # half, suffixed _part0 (eastern) / _part1 (western).
                 part = f"_part{idx}" if multi else ""
-                target = Path(self.root_dir) / f"{collection_key}_{date}{part}.tif"
+                target = Path(self.root_dir) / f"{safe_key}_{date}{part}.tif"
                 # crop wants the bbox as a keyword in an explicit CRS; the AOI
                 # is WGS84 while the mosaic is in the tiles' native CRS.
                 write_cog(stacked.crop(bbox=list(bbox_key), epsg=4326), str(target))
-                out.append(target)
-                self._written.append((collection_key, date, idx, target))
-                _cleanup(band_paths)
+            out.append(target)
+            self._written.append((collection_key, date, idx, target))
+            _cleanup(band_paths)
         logger.info(f"STAC download: {len(out)} COG(s) written to {self.root_dir}")
         return out
+
+    def _signer_for(self, collection_key: str) -> Any:
+        """Return the signer to read `collection_key`'s assets with.
+
+        A collection may override its endpoint's signer (catalog `signer:`
+        field) — e.g. a requester-pays bucket on an otherwise-anonymous
+        endpoint. Built signers are cached by type.
+
+        Args:
+            collection_key: The logical collection key.
+
+        Returns:
+            The endpoint signer, or the collection's override signer.
+        """
+        override = self._catalog.get_collection(collection_key).signer
+        if not override or override == self._endpoint_obj.signer:
+            return self._signer
+        cached = self._signer_cache.get(override)
+        if cached is None:
+            from earthlens.stac.signers import build_signer
+
+            cached = build_signer(
+                override,
+                region=self._region or self._endpoint_obj.region,
+                access_key=self._access_key,
+                secret_key=self._secret_key,
+            )
+            self._signer_cache[override] = cached
+        return cached
 
     def _target_crs(self, group: list[RemoteProduct]) -> int | None:
         """Pick the mosaic target CRS for a date group, without opening rasters.
@@ -618,6 +655,25 @@ def _asset_href(item: Any, asset_key: str) -> str:
     if href is None:
         raise KeyError(f"STAC asset {asset_key!r} has no 'href'")
     return str(href)
+
+
+def _to_vsi(href: str) -> str:
+    """Rewrite an `s3://bucket/key` href to the GDAL `/vsis3/bucket/key` path.
+
+    GDAL cannot open an `s3://` URL directly. Signers that only set the GDAL env
+    (e.g. the requester-pays signer) leave the href as `s3://`, so normalise it
+    here so the asset is actually readable. Non-`s3://` hrefs are returned
+    unchanged (an already-`/vsis3/`-rewritten CDSE href is left as-is).
+
+    Args:
+        href: A (possibly already signed) asset href.
+
+    Returns:
+        The GDAL-readable href.
+    """
+    if href.startswith("s3://"):
+        return "/vsis3/" + href[len("s3://"):]
+    return href
 
 
 def _group_products(

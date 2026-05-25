@@ -11,6 +11,7 @@ collections:
     - data
     endpoint: earth-search
   earth-search/landsat-c2-l2:
+    signer: aws-requester-pays
     assets:
       atmos_opacity:
         dtype: int16
