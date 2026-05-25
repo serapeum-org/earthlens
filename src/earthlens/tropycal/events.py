@@ -360,6 +360,29 @@ def recon_to_fc(
 
     Returns:
         FeatureCollection: Recon observation points, CRS `EPSG:4326`.
+
+    Examples:
+        - Map two in-window/in-box observations and read a met column:
+            ```python
+            >>> import datetime as dt
+            >>> import pandas as pd
+            >>> from earthlens.tropycal.events import recon_to_fc
+            >>> frame = pd.DataFrame({
+            ...     "time": pd.to_datetime(["2005-08-28 12:00", "2005-08-28 12:10"]),
+            ...     "lat": [25.0, 25.1], "lon": [-85.0, -85.1],
+            ...     "wspd": [120.0, 125.0], "p_sfc": [945.0, 942.0], "temp": [22.0, 22.5],
+            ... })
+            >>> fc = recon_to_fc(
+            ...     frame, storm_id="AL122005", recon_product="hdobs",
+            ...     window=(dt.datetime(2005, 8, 1), dt.datetime(2005, 9, 1)),
+            ...     bbox=(18.0, 31.0, -98.0, -80.0), source="hurdat",
+            ... )
+            >>> len(fc)
+            2
+            >>> list(fc["wspd_kt"])
+            [120.0, 125.0]
+
+            ```
     """
     if frame is None or len(frame) == 0:
         return empty_recon_fc()

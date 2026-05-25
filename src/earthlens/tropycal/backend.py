@@ -181,15 +181,23 @@ class TropicalCyclone(AbstractDataSource):
             recon_product: For `product="recon"`, which recon sub-product
                 to map — `"hdobs"` (default, high-density flight-level
                 observations), `"dropsondes"`, or `"vdms"`.
-            basin: For storm-keyed products (`product="recon"`), the basin
-                whose `TrackDataset` is loaded to resolve the storm
-                identifiers in `variables`. Ignored for `"besttrack"`
-                (where `variables` *are* the basins).
+            basin: For storm-keyed products (`product="recon"` / `"ships"`),
+                the basin whose `TrackDataset` is loaded to resolve the storm
+                identifiers in `variables`. Ignored for `"besttrack"` (where
+                `variables` *are* the basins) and `"realtime"`.
+            ships_time: For `product="ships"`, the SHIPS forecast-init cycle
+                as a datetime string (e.g. `"2022-09-27 00:00"`); SHIPS
+                guidance is issued per cycle, so this is required for ships
+                and ignored otherwise.
+            realtime_jtwc: For `product="realtime"`, whether to source active
+                storms from JTWC (`True`) instead of NHC (`False`, default).
+                Ignored for the other products.
 
         Raises:
-            ValueError: If `file_format`, `source`, `geometry`, `product`,
-                or `recon_product` is not a recognised value, or if a
-                storm-keyed product is given an empty `variables`.
+            ValueError: If `file_format`, `source`, `geometry`, `product`, or
+                `recon_product` is not a recognised value; if a storm-keyed
+                product is given an empty `variables`; or if `product="ships"`
+                is given no `ships_time`.
             TypeError: If `variables` is a mapping rather than a list.
         """
         if file_format not in _DRIVERS:
