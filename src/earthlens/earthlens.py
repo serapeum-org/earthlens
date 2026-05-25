@@ -44,11 +44,17 @@ class _LazyRegistry(Mapping):
     `ImportError` naming the extra to install.
 
     Attributes:
-        _mapping: Internal `key -> (module, class_name, extras_hint)`
-            table populated at construction.
+        _mapping: Internal `key -> (module, class_name, extras_hint,
+            default_kwargs)` table populated at construction. `default_kwargs`
+            is merged under the user's `**backend_kwargs` by
+            :meth:`EarthLens.__init__`, so an alias key can pre-bind a
+            constructor argument (e.g. the STAC `"cdse"` alias pre-binds
+            `endpoint="cdse"`) while a user-supplied value still wins.
     """
 
-    def __init__(self, mapping: dict[str, tuple[str, str, str]]) -> None:
+    def __init__(
+        self, mapping: dict[str, tuple[str, str, str, dict[str, object]]]
+    ) -> None:
         self._mapping = mapping
 
     def __contains__(self, key: object) -> bool:
@@ -60,8 +66,35 @@ class _LazyRegistry(Mapping):
     def __len__(self) -> int:
         return len(self._mapping)
 
+    def default_kwargs(self, key: str) -> dict[str, object]:
+        """Return a copy of the constructor kwargs pre-bound to `key`.
+
+        Args:
+            key: A registered data-source key.
+
+        Returns:
+            The per-key default kwargs (empty for keys that pre-bind nothing).
+
+        Examples:
+            - An endpoint alias pre-binds the STAC `endpoint`:
+                ```python
+                >>> from earthlens.earthlens import EarthLens
+                >>> EarthLens.DataSources.default_kwargs("cdse")
+                {'endpoint': 'cdse'}
+
+                ```
+            - A plain key pre-binds nothing:
+                ```python
+                >>> from earthlens.earthlens import EarthLens
+                >>> EarthLens.DataSources.default_kwargs("stac")
+                {}
+
+                ```
+        """
+        return dict(self._mapping[key][3])
+
     def __getitem__(self, key: str) -> type[AbstractDataSource]:
-        module_name, class_name, extras = self._mapping[key]
+        module_name, class_name, extras, _defaults = self._mapping[key]
         try:
             module = importlib.import_module(module_name)
         except ImportError as exc:
@@ -102,8 +135,9 @@ class EarthLens:
             ```python
             >>> from earthlens.earthlens import EarthLens
             >>> sorted(EarthLens.DataSources)  # doctest: +NORMALIZE_WHITESPACE
-            ['amazon-s3', 'chc', 'chirps', 'cmems', 'earthdata', 'ecmwf', 'fdsn',
-             'gdacs', 'gee', 'google-earth-engine', 'openaq']
+            ['amazon-s3', 'cdse', 'chc', 'chirps', 'cmems', 'earth-search',
+             'earthdata', 'ecmwf', 'fdsn', 'gdacs', 'gee', 'google-earth-engine',
+             'openaq', 'planetary-computer', 'stac', 'tropycal']
 
             ```
         - Asking for an unknown backend raises `ValueError`:
@@ -137,26 +171,48 @@ class EarthLens:
             alerts (public feed, no credentials); key `"gdacs"`.
         :class:`earthlens.openaq.OpenAQ`: ground-station air-quality
             measurements from OpenAQ v3 (tabular `DataFrame`).
+        :class:`earthlens.tropycal.TropicalCyclone`: tropical-cyclone
+            best tracks via `tropycal` (`vector` output); key
+            `"tropycal"`.
     """
 
     DataSources = _LazyRegistry(
         {
-            "chc": ("earthlens.chc", "CHIRPS", ""),
+            "chc": ("earthlens.chc", "CHIRPS", "", {}),
             # Back-compat alias: the package was originally named after
             # its best-known dataset (CHIRPS), then generalised to cover
             # the full Climate Hazards Center catalog. The `"chirps"`
             # key is kept for callers that still use it.
-            "chirps": ("earthlens.chc", "CHIRPS", ""),
-            "amazon-s3": ("earthlens.s3", "S3", "s3"),
-            "cmems": ("earthlens.cmems", "CMEMS", "cmems"),
-            "earthdata": ("earthlens.earthdata", "EarthData", "earthdata"),
-            "ecmwf": ("earthlens.ecmwf", "ECMWF", "ecmwf"),
-            "fdsn": ("earthlens.fdsn", "FDSN", "fdsn"),
-            "gee": ("earthlens.gee", "GEE", "gee"),
-            "google-earth-engine": ("earthlens.gee", "GEE", "gee"),
+            "chirps": ("earthlens.chc", "CHIRPS", "", {}),
+            "amazon-s3": ("earthlens.s3", "S3", "s3", {}),
+            "cmems": ("earthlens.cmems", "CMEMS", "cmems", {}),
+            "earthdata": ("earthlens.earthdata", "EarthData", "earthdata", {}),
+            "ecmwf": ("earthlens.ecmwf", "ECMWF", "ecmwf", {}),
+            "fdsn": ("earthlens.fdsn", "FDSN", "fdsn", {}),
+            "gee": ("earthlens.gee", "GEE", "gee", {}),
+            "google-earth-engine": ("earthlens.gee", "GEE", "gee", {}),
             # GDACS is a public feed (requests only), so no extra to hint.
-            "gdacs": ("earthlens.gdacs", "GDACS", ""),
-            "openaq": ("earthlens.openaq", "OpenAQ", "openaq"),
+            "gdacs": ("earthlens.gdacs", "GDACS", "", {}),
+            "openaq": ("earthlens.openaq", "OpenAQ", "openaq", {}),
+            "tropycal": ("earthlens.tropycal", "TropicalCyclone", "tropycal", {}),
+            # One unified STAC backend over several endpoints. The bare
+            # `"stac"` key leaves the endpoint to be inferred from the
+            # requested collection; the three endpoint aliases pre-bind
+            # `endpoint=` so `data_source="cdse"` needs no extra kwarg.
+            "stac": ("earthlens.stac", "STAC", "stac", {}),
+            "planetary-computer": (
+                "earthlens.stac",
+                "STAC",
+                "stac",
+                {"endpoint": "planetary-computer"},
+            ),
+            "earth-search": (
+                "earthlens.stac",
+                "STAC",
+                "stac",
+                {"endpoint": "earth-search"},
+            ),
+            "cdse": ("earthlens.stac", "STAC", "stac", {"endpoint": "cdse"}),
         }
     )
 
@@ -306,6 +362,14 @@ class EarthLens:
         if lon_lim is None:
             lon_lim = DEFAULT_LONGITUDE_LIMIT
 
+        # Per-key defaults (e.g. the STAC endpoint aliases pre-bind
+        # `endpoint=`) are merged *under* the user's kwargs, so an
+        # explicit value always wins.
+        merged_kwargs = {
+            **self.DataSources.default_kwargs(data_source),
+            **backend_kwargs,
+        }
+
         self.datasource = self.DataSources[data_source](
             start=start,
             end=end,
@@ -315,7 +379,7 @@ class EarthLens:
             temporal_resolution=temporal_resolution,
             path=path,
             fmt=fmt,
-            **backend_kwargs,
+            **merged_kwargs,
         )
 
     def download(

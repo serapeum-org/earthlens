@@ -67,9 +67,11 @@ class TestRegistry:
         assert "google-earth-engine" in EarthLens.DataSources
         assert sorted(EarthLens.DataSources) == [
             "amazon-s3",
+            "cdse",
             "chc",
             "chirps",
             "cmems",
+            "earth-search",
             "earthdata",
             "ecmwf",
             "fdsn",
@@ -77,6 +79,9 @@ class TestRegistry:
             "gee",
             "google-earth-engine",
             "openaq",
+            "planetary-computer",
+            "stac",
+            "tropycal",
         ]
 
     def test_keys_resolve_to_gee_class(self):
