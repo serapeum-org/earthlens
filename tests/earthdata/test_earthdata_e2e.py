@@ -34,6 +34,11 @@ _REPO_ROOT = Path(__file__).resolve().parents[2]
 _EXAMPLES = _REPO_ROOT / "docs" / "examples" / "earthdata"
 # The real-life (live-download) notebooks — distinct from the offline
 # catalog_explorer / output_kinds demos, which need no credentials.
+# The live notebooks exercised by the token-based e2e. opera_s1_backscatter is
+# intentionally NOT here: ASF's datapool uses an EDL OAuth redirect that drops a
+# bearer token across hosts (401), so it needs username/password (or in-region
+# S3), not the EARTHDATA_TOKEN this suite runs on. It ships as a documented
+# example only.
 _LIVE_NOTEBOOKS = [
     "imerg_precipitation.ipynb",
     "gedi_l4a_footprints.ipynb",

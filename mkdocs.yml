@@ -180,6 +180,7 @@ nav:
       - GEDI L4A biomass footprints (live): examples/earthdata/gedi_l4a_footprints.ipynb
       - PACE ocean-colour chlorophyll (live): examples/earthdata/pace_ocean_colour.ipynb
       - SMAP soil moisture (live): examples/earthdata/smap_soil_moisture.ipynb
+      - OPERA Sentinel-1 SAR backscatter (live): examples/earthdata/opera_s1_backscatter.ipynb
     - Seismic events (FDSN):
       - Quickstart — recent earthquakes: examples/fdsn/quickstart.ipynb
       - Global seismicity map: examples/fdsn/global_seismicity_map.ipynb

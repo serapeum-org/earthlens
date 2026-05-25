@@ -37,10 +37,31 @@ backend.
 Two one-time, dataset-specific steps you may hit:
 
 - **Authorize the DAAC application.** Some DAACs require you to approve
-  their application once. After logging in at
-  [urs.earthdata.nasa.gov](https://urs.earthdata.nasa.gov), go to
-  **Applications → Authorized Apps** and approve as prompted (or you
-  will simply be asked the first time you reach that DAAC).
+  their application once, or downloads return **HTTP 401** even with a
+  valid token. **ASF (Sentinel-1 / OPERA) is the common case.** To
+  authorize it:
+    1. Log in at [urs.earthdata.nasa.gov](https://urs.earthdata.nasa.gov).
+    2. Top-right menu → **Applications → Authorized Apps**.
+    3. Click **Approve More Applications**, find **“Alaska Satellite
+       Facility Data Access”**, and authorize it. If it is not listed,
+       go to **EULAs → Accept New EULAs** and accept the ASF one (ASF
+       gates its datapool behind a EULA).
+    4. Alternatively, open any ASF granule once via
+       [ASF Vertex](https://search.asf.alaska.edu) while logged in and
+       approve when prompted.
+  The same flow applies to any DAAC whose download 401s — approve its
+  application from **Authorized Apps**.
+
+  !!! warning "ASF needs username/password, not a bearer token"
+      Authorizing the ASF app is necessary but **not sufficient** for a
+      token. ASF's datapool redirects through an EDL OAuth flow
+      (`datapool.asf.alaska.edu` → `cumulus.asf.alaska.edu` →
+      `urs.earthdata.nasa.gov`), and a bearer token is dropped across
+      that cross-host redirect → **HTTP 401**. For ASF (Sentinel-1 /
+      OPERA) downloads, authenticate with **username/password** (or a
+      `~/.netrc` entry) so `earthaccess` can hold the OAuth session, or
+      stream in-region from S3. A bare `EARTHDATA_TOKEN` works for the
+      other DAACs (GES DISC, ORNL, OB.DAAC, NSIDC, …) but not ASF HTTPS.
 - **Accept a EULA.** A few collections (e.g. GPM IMERG at GES DISC) ask
   you to accept a licence agreement on first download.
 
