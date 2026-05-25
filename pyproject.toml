@@ -49,14 +49,20 @@ fdsn = ["obspy >=1.5.0"]
 # MPC SAS signing is native in pyramids' PlanetaryComputerSigner (>=0.23.0),
 # so no `planetary-computer` SDK is needed.
 stac = ["pystac-client >=0.8.0"]
+# tropycal hard-imports cartopy + shapely at module load but does not
+# declare them, and its version shim needs setuptools<81 (pkg_resources).
+tropycal = ["tropycal >=1.4", "cartopy >=0.22", "shapely >=2.0"]
 all = [
     "boto3 >=1.43.0",
+    "cartopy >=0.22",
     "cdsapi >=0.7.7",
     "copernicusmarine >=2.0.0,<3",
     "earthengine-api >=1.7.26",
     "obspy >=1.5.0",
     "pystac-client >=0.8.0",
     "Rtree >=1.0.0",
+    "shapely >=2.0",
+    "tropycal >=1.4",
 ]
 
 [dependency-groups]
@@ -132,6 +138,7 @@ include = ["earthlens", "earthlens.*"]
 "earthlens.stac" = ["*.yaml", "catalog/*.yaml"]
 "earthlens.gdacs" = ["*.yaml"]
 "earthlens.openaq" = ["*.yaml"]
+"earthlens.tropycal" = ["*.yaml"]
 
 [tool.flake8]
 ignore = ["E203", "E266", "E501", "W503", "E722", "C901", "E741", "E731"]
@@ -199,6 +206,7 @@ markers = [
     "stac: tests for the STAC backend (requires the `stac` extra: pystac-client / planetary-computer).",
     "gdacs: tests for the GDACS multi-hazard alert backend (public feed, no extra SDK).",
     "openaq: tests for the OpenAQ v3 air-quality backend (no extra SDK; uses the core `requests` dependency).",
+    "tropycal: tests for the Tropycal cyclone-track backend (requires the `tropycal` extra: tropycal, cartopy).",
 ]
 
 [tool.pixi.workspace]
@@ -231,7 +239,8 @@ test-fdsn = { cmd = "pytest -vvv -m 'fdsn and not e2e' --cov=src/earthlens --cov
 test-stac = { cmd = "pytest -vvv -m 'stac and not e2e' --cov=src/earthlens --cov-report=xml --cov-report=term-missing", description = "Run STAC-backend tests (requires the `stac` extra: pystac-client / planetary-computer)" }
 test-gdacs = { cmd = "pytest -vvv -m 'gdacs and not e2e' --cov=src/earthlens --cov-report=xml --cov-report=term-missing", description = "Run GDACS-backend tests (public feed, no extra SDK)" }
 test-openaq = { cmd = "pytest -vvv -m 'openaq and not e2e' --cov=src/earthlens --cov-report=xml --cov-report=term-missing", description = "Run OpenAQ-backend tests (no extra SDK; uses the core requests dependency)" }
-test-doctests = { cmd = "pytest --doctest-modules src/earthlens/gee src/earthlens/chc src/earthlens/ecmwf src/earthlens/cmems src/earthlens/fdsn src/earthlens/stac src/earthlens/gdacs src/earthlens/openaq src/earthlens/base", description = "Run docstring examples across the backend packages (catches drift in catalog / API docstrings)" }
+test-tropycal = { cmd = "pytest -vvv -m 'tropycal and not e2e' --cov=src/earthlens --cov-report=xml --cov-report=term-missing", description = "Run Tropycal cyclone-track backend tests (requires the `tropycal` extra: tropycal, cartopy)" }
+test-doctests = { cmd = "pytest --doctest-modules src/earthlens/gee src/earthlens/chc src/earthlens/ecmwf src/earthlens/cmems src/earthlens/fdsn src/earthlens/stac src/earthlens/gdacs src/earthlens/openaq src/earthlens/tropycal src/earthlens/base", description = "Run docstring examples across the backend packages (catches drift in catalog / API docstrings)" }
 notebooks = { cmd = "pytest --nbval --nbval-lax --verbose docs/examples", description = "check notebooks" }
 jupyter = { cmd = "jupyter lab --no-browser --IdentityProvider.token='' --ServerApp.password='' --port=8889", description = "check notebooks" }
 build-dist = { cmd = "python -m build", description = "Build sdist and wheel for PyPI" }

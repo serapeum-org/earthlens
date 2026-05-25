@@ -80,6 +80,7 @@ class TestRegistry:
             "openaq",
             "planetary-computer",
             "stac",
+            "tropycal",
         ]
 
     def test_keys_resolve_to_gee_class(self):

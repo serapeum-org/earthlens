@@ -137,7 +137,7 @@ class EarthLens:
             >>> sorted(EarthLens.DataSources)  # doctest: +NORMALIZE_WHITESPACE
             ['amazon-s3', 'cdse', 'chc', 'chirps', 'cmems', 'earth-search', 'ecmwf',
              'fdsn', 'gdacs', 'gee', 'google-earth-engine', 'openaq',
-             'planetary-computer', 'stac']
+             'planetary-computer', 'stac', 'tropycal']
 
             ```
         - Asking for an unknown backend raises `ValueError`:
@@ -167,6 +167,9 @@ class EarthLens:
             alerts (public feed, no credentials); key `"gdacs"`.
         :class:`earthlens.openaq.OpenAQ`: ground-station air-quality
             measurements from OpenAQ v3 (tabular `DataFrame`).
+        :class:`earthlens.tropycal.TropicalCyclone`: tropical-cyclone
+            best tracks via `tropycal` (`vector` output); key
+            `"tropycal"`.
     """
 
     DataSources = _LazyRegistry(
@@ -186,6 +189,7 @@ class EarthLens:
             # GDACS is a public feed (requests only), so no extra to hint.
             "gdacs": ("earthlens.gdacs", "GDACS", "", {}),
             "openaq": ("earthlens.openaq", "OpenAQ", "openaq", {}),
+            "tropycal": ("earthlens.tropycal", "TropicalCyclone", "tropycal", {}),
             # One unified STAC backend over several endpoints. The bare
             # `"stac"` key leaves the endpoint to be inferred from the
             # requested collection; the three endpoint aliases pre-bind
