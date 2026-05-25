@@ -144,6 +144,62 @@ def fake_tropycal(monkeypatch: pytest.MonkeyPatch) -> _FakeState:
     return state
 
 
+def _make_recon_obs_frame(
+    times: list[str] | None = None,
+    lats: list[float] | None = None,
+    lons: list[float] | None = None,
+) -> pd.DataFrame:
+    """Build a fake recon `hdobs.data`-shaped observation frame."""
+    times = times or ["2005-08-28 12:00", "2005-08-28 12:10", "2005-08-28 12:20"]
+    lats = lats or [25.0, 25.1, 25.2]
+    lons = lons or [-85.0, -85.1, -85.2]
+    n = len(times)
+    return pd.DataFrame(
+        {
+            "time": pd.to_datetime(times),
+            "lat": lats,
+            "lon": lons,
+            "wspd": [120.0, 125.0, 130.0][:n],
+            "p_sfc": [945.0, 942.0, 940.0][:n],
+            "temp": [22.0, 22.5, 23.0][:n],
+        }
+    )
+
+
+class _FakeReconObj:
+    """Stand-in for a tropycal recon sub-product exposing `.data`."""
+
+    def __init__(self, data: pd.DataFrame) -> None:
+        self.data = data
+
+
+@pytest.fixture
+def make_recon_obs_frame():
+    """Factory for a fake recon observation frame (see `_make_recon_obs_frame`)."""
+    return _make_recon_obs_frame
+
+
+@pytest.fixture
+def fake_recon(fake_tropycal, monkeypatch: pytest.MonkeyPatch) -> _FakeState:
+    """Inject a fake `tropycal.recon` (hdobs/dropsondes/vdms) into sys.modules.
+
+    Builds on `fake_tropycal` (so `tropycal.tracks` is faked too). The default
+    obs frame is seeded on the returned state as `.recon_frame`; set it to
+    `None` to simulate a storm with no recon data.
+    """
+    recon_module = types.ModuleType("tropycal.recon")
+    fake_tropycal.recon_frame = _make_recon_obs_frame()
+
+    def _builder(storm, data=None, update=False):
+        return _FakeReconObj(fake_tropycal.recon_frame)
+
+    recon_module.hdobs = _builder
+    recon_module.dropsondes = _builder
+    recon_module.vdms = _builder
+    monkeypatch.setitem(__import__("sys").modules, "tropycal.recon", recon_module)
+    return fake_tropycal
+
+
 @pytest.fixture
 def window() -> tuple[dt.datetime, dt.datetime]:
     """A wide August-September 2005 window covering the default storm."""

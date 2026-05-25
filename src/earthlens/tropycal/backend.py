@@ -56,6 +56,15 @@ if TYPE_CHECKING:
 
 FileFormat = Literal["gpkg", "geojson"]
 Geometry = Literal["point", "track"]
+Product = Literal["besttrack", "recon"]
+ReconProduct = Literal["hdobs", "dropsondes", "vdms"]
+
+#: Products implemented so far. `besttrack` (default) is basin+window keyed;
+#: `recon` is storm-keyed (aircraft observations for a named storm). `ships`
+#: (tabular forecast guidance) and `realtime` (live storms) are planned
+#: follow-ups and are not yet accepted.
+_PRODUCTS = ("besttrack", "recon")
+_RECON_PRODUCTS = ("hdobs", "dropsondes", "vdms")
 
 #: Map output format to the OGR driver and file extension `to_file` uses.
 _DRIVERS: dict[str, tuple[str, str]] = {
@@ -108,6 +117,9 @@ class TropicalCyclone(AbstractDataSource):
         min_category: int | None = None,
         storm_type: str | None = None,
         file_format: FileFormat = "gpkg",
+        product: Product = "besttrack",
+        recon_product: ReconProduct = "hdobs",
+        basin: str = "north_atlantic",
     ):
         """Initialise a Tropical-cyclone backend instance.
 
@@ -150,13 +162,25 @@ class TropicalCyclone(AbstractDataSource):
                 `min_category` in `geometry="track"` mode.
             file_format: Output vector format — `"gpkg"` (default,
                 GeoPackage) or `"geojson"`.
+            product: Which tropycal product to fetch. `"besttrack"`
+                (default) is basin + date-window keyed and `variables` is a
+                list of basin codes. `"recon"` is storm-keyed (aircraft
+                reconnaissance observations for named storms): `variables`
+                is then a list of storm identifiers and `basin` / `source`
+                say where to resolve them.
+            recon_product: For `product="recon"`, which recon sub-product
+                to map — `"hdobs"` (default, high-density flight-level
+                observations), `"dropsondes"`, or `"vdms"`.
+            basin: For storm-keyed products (`product="recon"`), the basin
+                whose `TrackDataset` is loaded to resolve the storm
+                identifiers in `variables`. Ignored for `"besttrack"`
+                (where `variables` *are* the basins).
 
         Raises:
-            ValueError: If `file_format` is not `"gpkg"`/`"geojson"`, if
-                `source` is not `"ibtracs"`/`"hurdat"`, or if `geometry`
-                is not `"point"`/`"track"`.
-            TypeError: If `variables` is a mapping rather than a list of
-                basin codes.
+            ValueError: If `file_format`, `source`, `geometry`, `product`,
+                or `recon_product` is not a recognised value, or if a
+                storm-keyed product is given an empty `variables`.
+            TypeError: If `variables` is a mapping rather than a list.
         """
         if file_format not in _DRIVERS:
             raise ValueError(
@@ -172,27 +196,50 @@ class TropicalCyclone(AbstractDataSource):
             raise ValueError(
                 f"geometry must be 'point' or 'track', got {geometry!r}."
             )
+        if product not in _PRODUCTS:
+            raise ValueError(
+                f"product must be one of {list(_PRODUCTS)}, got {product!r}. "
+                "(ships / realtime are planned follow-ups.)"
+            )
+        if recon_product not in _RECON_PRODUCTS:
+            raise ValueError(
+                f"recon_product must be one of {list(_RECON_PRODUCTS)}, got "
+                f"{recon_product!r}."
+            )
         if isinstance(variables, dict):
             raise TypeError(
-                "TropicalCyclone `variables` must be a list of basin codes "
-                "(e.g. ['north_atlantic', 'east_pacific']), not a mapping. "
-                "For this backend `variables` selects basins, not data "
-                "variables; source/geometry/filters are explicit keyword "
-                "arguments."
+                "TropicalCyclone `variables` must be a list (basin codes for "
+                "product='besttrack', storm identifiers for product='recon'), "
+                "not a mapping."
+            )
+        if product == "recon" and not list(variables):
+            raise ValueError(
+                "product='recon' is storm-keyed: `variables` must list at "
+                "least one storm identifier (e.g. ['AL122005'])."
             )
         self._source = source
         self._geometry: Geometry = geometry
         self._min_category = min_category
         self._storm_type = storm_type
         self._file_format: FileFormat = file_format
+        self._product: Product = product
+        self._recon_product: ReconProduct = recon_product
+        self._basin = basin
         self._catalog = Catalog()
         # Per-process memo of loaded TrackDatasets, keyed (basin, source),
         # so a multi-basin/multi-year request loads each basin once (G3).
         self._track_datasets: dict[tuple[str, str], object] = {}
+        # besttrack: empty `variables` defaults to North Atlantic. recon:
+        # `variables` are storm ids (already validated non-empty above).
+        resolved_vars = (
+            list(variables) or list(_DEFAULT_BASINS)
+            if product == "besttrack"
+            else list(variables)
+        )
         super().__init__(
             start=start,
             end=end,
-            variables=list(variables) or list(_DEFAULT_BASINS),
+            variables=resolved_vars,
             temporal_resolution=temporal_resolution,
             lat_lim=lat_lim,
             lon_lim=lon_lim,
@@ -259,22 +306,34 @@ class TropicalCyclone(AbstractDataSource):
         )
 
     def _search(self) -> list[RemoteProduct]:
-        """One :class:`RemoteProduct` per requested basin.
+        """One :class:`RemoteProduct` per requested unit.
 
-        Resolves each basin code in `self.vars` against the bundled
-        catalog (raising with a did-you-mean hint on an unknown code) and
-        validates that the requested `source` actually serves the basin
-        (`hurdat` only serves the North Atlantic / East Pacific). No
-        network call is made here.
+        For `product="besttrack"` that is one product per basin (each
+        basin/source pair validated against the catalog). For
+        `product="recon"` it is one product per storm identifier (resolved
+        against `basin`/`source` at fetch time). No network call is made
+        here.
 
         Returns:
-            list[RemoteProduct]: One product per basin, in request order;
-                `id` is the basin code and `metadata` carries `source`.
+            list[RemoteProduct]: One product per basin (besttrack) or per
+                storm id (recon), in request order.
 
         Raises:
-            ValueError: If a code in `self.vars` is not a registered
-                basin, or if the `(basin, source)` pair is invalid.
+            ValueError: If a besttrack basin is unknown or its
+                `(basin, source)` pair is invalid.
         """
+        if self._product == "recon":
+            return [
+                RemoteProduct(
+                    id=str(storm_id),
+                    metadata={
+                        "basin": self._basin,
+                        "source": self._source,
+                        "recon_product": self._recon_product,
+                    },
+                )
+                for storm_id in self.vars
+            ]
         products: list[RemoteProduct] = []
         for basin in self.vars:
             sources = self._catalog.sources_for(basin)
@@ -321,6 +380,9 @@ class TropicalCyclone(AbstractDataSource):
             FeatureCollection: The basin's matched track features (empty
                 on no match).
         """
+        if self._product == "recon":
+            return self._query_recon(product)
+
         basin = product.id
         source = product.metadata["source"]
         track_dataset = self._get_track_dataset(basin, source)
@@ -344,6 +406,85 @@ class TropicalCyclone(AbstractDataSource):
             ),
             source=source,
         )
+
+    def _query_recon(self, product: RemoteProduct) -> FeatureCollection:
+        """Fetch one storm's recon observations and map them to points.
+
+        Resolves the storm via the basin `TrackDataset`, loads the chosen
+        recon sub-product (`hdobs` / `dropsondes` / `vdms`) for it, and maps
+        the observation DataFrame to a window+bbox-filtered point
+        FeatureCollection via
+        :func:`earthlens.tropycal.events.recon_to_fc`.
+
+        Args:
+            product: A :class:`RemoteProduct` from :meth:`_search`;
+                `product.id` is the storm identifier.
+
+        Returns:
+            FeatureCollection: The storm's recon observation points (empty
+                on no match / no recon data).
+        """
+        basin = product.metadata["basin"]
+        source = product.metadata["source"]
+        recon_product = product.metadata["recon_product"]
+        track_dataset = self._get_track_dataset(basin, source)
+
+        storm = self._get_storm(track_dataset, product.id)
+        frame = self._recon_frame(storm, recon_product) if storm is not None else None
+        return events.recon_to_fc(
+            frame,
+            storm_id=product.id,
+            recon_product=recon_product,
+            window=(self.time.start_date, self.time.end_date),
+            bbox=(
+                self.space.south,
+                self.space.north,
+                self.space.west,
+                self.space.east,
+            ),
+            source=source,
+        )
+
+    @staticmethod
+    def _get_storm(track_dataset: object, storm_id: str) -> object | None:
+        """Resolve a storm by id, or `None` (logged) when it cannot be read."""
+        try:
+            return track_dataset.get_storm(storm_id)
+        except Exception as exc:  # noqa: BLE001
+            logger.warning(
+                f"tropycal storm {storm_id!r} not resolved: "
+                f"{type(exc).__name__}: {exc}"
+            )
+            return None
+
+    def _recon_frame(self, storm: object, recon_product: str):
+        """Return a storm's recon observation DataFrame, or `None` on failure.
+
+        Lazy-imports `tropycal.recon` and reads the chosen sub-product's
+        `.data` frame. A storm with no recon data (most storms) yields
+        `None`, which maps to an empty collection.
+        """
+        try:
+            import tropycal.recon as recon
+        except ImportError as exc:
+            raise ImportError(
+                "The Tropycal recon product needs the `tropycal` package. "
+                "Install it with `pip install earthlens[tropycal]`."
+            ) from exc
+        builders = {
+            "hdobs": recon.hdobs,
+            "dropsondes": recon.dropsondes,
+            "vdms": recon.vdms,
+        }
+        try:
+            obj = builders[recon_product](storm)
+            return getattr(obj, "data", None)
+        except Exception as exc:  # noqa: BLE001
+            logger.warning(
+                f"tropycal recon {recon_product} unavailable for storm: "
+                f"{type(exc).__name__}: {exc}"
+            )
+            return None
 
     def _get_track_dataset(self, basin: str, source: str) -> object:
         """Return the memoised `TrackDataset` for `(basin, source)`.
@@ -509,7 +650,10 @@ class TropicalCyclone(AbstractDataSource):
             if len(collection):
                 written.append(self._write(product.id, collection))
 
-        combined = events.concat_fcs(collections, self._geometry)
+        if self._product == "recon":
+            combined = events.concat_recon_fcs(collections)
+        else:
+            combined = events.concat_fcs(collections, self._geometry)
         if written:
             logger.info(
                 f"Tropycal download summary: {len(combined)} feature(s) across "
@@ -522,17 +666,19 @@ class TropicalCyclone(AbstractDataSource):
             )
         return combined
 
-    def _write(self, basin: str, collection: FeatureCollection) -> Path:
-        """Write one basin's features to a vector file under `root_dir`.
+    def _write(self, unit: str, collection: FeatureCollection) -> Path:
+        """Write one unit's features to a vector file under `root_dir`.
 
         Args:
-            basin: The basin code, used as the filename stem.
-            collection: The basin's track features.
+            unit: The basin code (besttrack) or storm id (recon), used as
+                the filename stem.
+            collection: The unit's features.
 
         Returns:
             Path: Absolute path of the file written.
         """
         driver, ext = _DRIVERS[self._file_format]
-        out_path = self.root_dir / f"tropycal_{basin}_{self._geometry}.{ext}"
+        label = self._recon_product if self._product == "recon" else self._geometry
+        out_path = self.root_dir / f"tropycal_{self._product}_{unit}_{label}.{ext}"
         collection.to_file(str(out_path), driver=driver)
         return out_path

@@ -9,7 +9,7 @@ import pandas as pd
 import pytest
 
 from earthlens.tropycal import TropicalCyclone
-from earthlens.tropycal.events import POINT_COLUMNS, TRACK_COLUMNS
+from earthlens.tropycal.events import POINT_COLUMNS, RECON_COLUMNS, TRACK_COLUMNS
 
 pytestmark = pytest.mark.tropycal
 
@@ -112,7 +112,7 @@ class TestDownload:
     def test_writes_file(self, tmp_path, fake_tropycal):
         """download() writes one vector file per basin under path."""
         _backend(tmp_path).download()
-        written = list(tmp_path.glob("tropycal_north_atlantic_point.gpkg"))
+        written = list(tmp_path.glob("tropycal_besttrack_north_atlantic_point.gpkg"))
         assert len(written) == 1
 
     def test_empty_result_writes_nothing(self, tmp_path, fake_tropycal):
@@ -236,6 +236,112 @@ class TestAggregateBasins:
             backend._search()
 
 
+def _recon_backend(tmp_path, **overrides):
+    """Build a recon-product TropicalCyclone over the Gulf/2005 window."""
+    kwargs = dict(
+        start="2005-08-01",
+        end="2005-09-01",
+        variables=["AL122005"],
+        lat_lim=[18, 31],
+        lon_lim=[-98, -80],
+        source="hurdat",
+        product="recon",
+        basin="north_atlantic",
+        path=str(tmp_path),
+    )
+    kwargs.update(overrides)
+    return TropicalCyclone(**kwargs)
+
+
+class TestProductValidation:
+    """Tests for the product / recon_product selectors."""
+
+    def test_unknown_product_rejected(self, tmp_path):
+        """An unimplemented/unknown product is rejected."""
+        with pytest.raises(ValueError, match="product must be one of"):
+            _backend(tmp_path, product="ships")
+
+    def test_bad_recon_product_rejected(self, tmp_path):
+        """An unknown recon_product is rejected."""
+        with pytest.raises(ValueError, match="recon_product must be one of"):
+            _recon_backend(tmp_path, recon_product="bogus")
+
+    def test_recon_requires_storm_variables(self, tmp_path):
+        """product='recon' with empty variables raises (storm-keyed)."""
+        with pytest.raises(ValueError, match="storm identifier"):
+            _recon_backend(tmp_path, variables=[])
+
+    def test_besttrack_is_default(self, tmp_path):
+        """product defaults to besttrack (basin-keyed)."""
+        assert _backend(tmp_path)._product == "besttrack"
+
+
+class TestReconProduct:
+    """Tests for product='recon' (storm-keyed aircraft observations)."""
+
+    def test_search_one_product_per_storm(self, tmp_path):
+        """recon _search emits one product per storm id with basin/source meta."""
+        products = _recon_backend(tmp_path, variables=["AL122005", "AL132005"])._search()
+        assert [p.id for p in products] == ["AL122005", "AL132005"]
+        assert products[0].metadata["basin"] == "north_atlantic"
+        assert products[0].metadata["recon_product"] == "hdobs"
+
+    def test_download_returns_recon_points(self, tmp_path, fake_recon):
+        """recon download returns a FeatureCollection of obs points."""
+        result = _recon_backend(tmp_path).download()
+        assert isinstance(result, gpd.GeoDataFrame)
+        assert set(RECON_COLUMNS).issubset(result.columns)
+        assert result.crs.to_epsg() == 4326
+        assert len(result) == 3
+        assert set(result["storm_id"]) == {"AL122005"}
+        assert set(result["recon_product"]) == {"hdobs"}
+
+    def test_download_writes_storm_named_file(self, tmp_path, fake_recon):
+        """recon download writes one file named by storm + recon_product."""
+        _recon_backend(tmp_path).download()
+        assert list(tmp_path.glob("tropycal_recon_AL122005_hdobs.gpkg"))
+
+    def test_recon_product_variant(self, tmp_path, fake_recon):
+        """recon_product='dropsondes' is stamped on the output rows."""
+        result = _recon_backend(tmp_path, recon_product="dropsondes").download()
+        assert set(result["recon_product"]) == {"dropsondes"}
+
+    def test_no_recon_data_empty(self, tmp_path, fake_recon):
+        """A storm with no recon data yields an empty recon FC, no file."""
+        fake_recon.recon_frame = None
+        result = _recon_backend(tmp_path).download()
+        assert len(result) == 0
+        assert set(RECON_COLUMNS).issubset(result.columns)
+        assert list(tmp_path.glob("*.gpkg")) == []
+
+    def test_obs_outside_window_or_bbox_dropped(self, tmp_path, fake_recon, make_recon_obs_frame):
+        """recon obs outside the window/bbox are filtered out."""
+        fake_recon.recon_frame = make_recon_obs_frame(
+            times=["2005-08-28 12:00", "2005-08-28 12:10", "2010-01-01 00:00"],
+            lons=[-85.0, -60.0, -85.0],  # 2nd east of box, 3rd out of window
+        )
+        result = _recon_backend(tmp_path).download()
+        assert len(result) == 1
+
+    def test_unresolvable_storm_empty(self, tmp_path, fake_recon):
+        """A storm id the dataset cannot resolve yields an empty recon FC."""
+        fake_recon.storms = {}  # the fake get_storm will KeyError
+        result = _recon_backend(tmp_path, variables=["NOPE"]).download()
+        assert len(result) == 0
+
+    def test_recon_builder_error_empty(self, tmp_path, fake_recon, monkeypatch):
+        """A recon sub-product that errors is logged and yields an empty FC."""
+        monkeypatch.setattr(sys.modules["tropycal.recon"], "hdobs", _boom_builder)
+        result = _recon_backend(tmp_path).download()
+        assert len(result) == 0
+
+    def test_recon_missing_extra_importerror(self, tmp_path, fake_tropycal, monkeypatch):
+        """A failing tropycal.recon import surfaces a friendly ImportError."""
+        monkeypatch.setitem(sys.modules, "tropycal.recon", None)
+        with pytest.raises(ImportError, match=r"earthlens\[tropycal\]"):
+            _recon_backend(tmp_path).download()
+
+
 class TestMissingExtra:
     """Tests for the friendly missing-[tropycal]-extra error."""
 
@@ -258,3 +364,8 @@ def _shifted(state, storm_id):
     frame = state.storms["AL122005"].copy()
     frame["id"] = storm_id
     return frame
+
+
+def _boom_builder(*args, **kwargs):
+    """A recon sub-product builder stand-in that raises (decode failure)."""
+    raise RuntimeError("recon decode failed")

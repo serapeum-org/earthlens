@@ -85,6 +85,22 @@ TRACK_COLUMNS: dict[str, str] = {
 #: above the last bound is category 5. Index = category.
 _SSHWS_UPPER_KT = (63, 82, 95, 112, 136)
 
+#: Recon-observation point schema (`product="recon"`). One row per aircraft
+#: observation; the `geometry` Point is added separately. Met fields are
+#: float64 (NaN-safe) and read defensively — `dropsondes`/`vdms` frames omit
+#: some of the `hdobs` columns.
+RECON_COLUMNS: dict[str, str] = {
+    "storm_id": "string",
+    "recon_product": "string",
+    "source": "string",
+    "time": "datetime64[ns, UTC]",
+    "lat": "float64",
+    "lon": "float64",
+    "wspd_kt": "float64",
+    "pres_hpa": "float64",
+    "temp_c": "float64",
+}
+
 
 def saffir_simpson_category(vmax_kt: float | int | None) -> int:
     """Return the Saffir-Simpson category for a max-wind value in knots.
@@ -308,6 +324,108 @@ def concat_fcs(
     non_empty = [fc for fc in collections if len(fc)]
     if not non_empty:
         return empty_fc(geometry)
+    merged = pd.concat(non_empty, ignore_index=True)
+    return FeatureCollection(
+        gpd.GeoDataFrame(merged, geometry="geometry", crs=EVENT_CRS)
+    )
+
+
+def recon_to_fc(
+    frame: pd.DataFrame | None,
+    *,
+    storm_id: str,
+    recon_product: str,
+    window: tuple[dt.datetime, dt.datetime],
+    bbox: tuple[float, float, float, float],
+    source: str,
+) -> FeatureCollection:
+    """Map one storm's recon observation frame to a point `FeatureCollection`.
+
+    `frame` is a `tropycal.recon` sub-product `.data` DataFrame (`hdobs`,
+    `dropsondes`, or `vdms`); all carry `time` / `lat` / `lon`, while the met
+    columns (`wspd`, `p_sfc`, `temp`) are read defensively since they differ
+    by sub-product. Observations are filtered to the window + bbox at the
+    point level (same loose rule as best-track fixes) and mapped to the
+    :data:`RECON_COLUMNS` schema. A `None`/empty frame (a storm with no recon
+    data — most storms) returns :func:`empty_recon_fc`.
+
+    Args:
+        frame: The recon sub-product `.data` frame, or `None`.
+        storm_id: The storm identifier, stamped on every row.
+        recon_product: `"hdobs"` / `"dropsondes"` / `"vdms"`, stamped on
+            every row.
+        window: `(start, end)` inclusive datetime bounds (tz-naive).
+        bbox: `(south, north, west, east)` degree bounds.
+        source: The data source used to resolve the storm.
+
+    Returns:
+        FeatureCollection: Recon observation points, CRS `EPSG:4326`.
+    """
+    if frame is None or len(frame) == 0:
+        return empty_recon_fc()
+    prepared = _prepare_frame(frame)
+    south, north, west, east = bbox
+    start, end = window
+    kept = prepared[
+        (prepared["_time"] >= pd.Timestamp(start))
+        & (prepared["_time"] <= pd.Timestamp(end))
+        & (prepared["_lat"] >= south)
+        & (prepared["_lat"] <= north)
+        & (prepared["_lon"] >= west)
+        & (prepared["_lon"] <= east)
+    ]
+    if kept.empty:
+        return empty_recon_fc()
+    typed = pd.DataFrame(
+        {
+            "storm_id": storm_id,
+            "recon_product": recon_product,
+            "source": source,
+            "time": kept["_time"].to_numpy(),
+            "lat": kept["_lat"].to_numpy(),
+            "lon": kept["_lon"].to_numpy(),
+            "wspd_kt": pd.to_numeric(_column(kept, "wspd"), errors="coerce").to_numpy(),
+            "pres_hpa": pd.to_numeric(_column(kept, "p_sfc"), errors="coerce").to_numpy(),
+            "temp_c": pd.to_numeric(_column(kept, "temp"), errors="coerce").to_numpy(),
+        }
+    )
+    geoms = gpd.points_from_xy(typed["lon"], typed["lat"])
+    return _frame_to_typed_fc(typed, geoms, RECON_COLUMNS)
+
+
+def empty_recon_fc() -> FeatureCollection:
+    """Return an empty recon-observation `FeatureCollection` (schema-correct).
+
+    Returns:
+        FeatureCollection: Zero rows, the :data:`RECON_COLUMNS` columns with
+            their dtypes, an empty `geometry`, CRS `EPSG:4326`.
+
+    Examples:
+        - The recon schema is present even with no rows:
+            ```python
+            >>> from earthlens.tropycal.events import empty_recon_fc, RECON_COLUMNS
+            >>> fc = empty_recon_fc()
+            >>> len(fc)
+            0
+            >>> set(RECON_COLUMNS).issubset(fc.columns)
+            True
+
+            ```
+    """
+    frame = pd.DataFrame(
+        {col: pd.Series([], dtype=dtype) for col, dtype in RECON_COLUMNS.items()}
+    )
+    gdf = gpd.GeoDataFrame(
+        frame, geometry=gpd.GeoSeries([], crs=EVENT_CRS), crs=EVENT_CRS
+    )
+    return FeatureCollection(gdf)
+
+
+def concat_recon_fcs(collections: list[FeatureCollection]) -> FeatureCollection:
+    """Row-union per-storm recon collections, falling back to `empty_recon_fc`."""
+    non_empty = [fc for fc in collections if len(fc)]
+    if not non_empty:
+        return empty_recon_fc()
     merged = pd.concat(non_empty, ignore_index=True)
     return FeatureCollection(
         gpd.GeoDataFrame(merged, geometry="geometry", crs=EVENT_CRS)
