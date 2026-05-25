@@ -5,8 +5,6 @@ environments:
     - url: https://conda.anaconda.org/conda-forge/
     indexes:
     - https://pypi.org/simple
-    options:
-      pypi-prerelease-mode: if-necessary-or-explicit
     packages:
       linux-64:
       - conda: https://conda.anaconda.org/conda-forge/linux-64/_openmp_mutex-4.5-20_gnu.conda
@@ -418,8 +416,6 @@ environments:
     - url: https://conda.anaconda.org/conda-forge/
     indexes:
     - https://pypi.org/simple
-    options:
-      pypi-prerelease-mode: if-necessary-or-explicit
     packages:
       linux-64:
       - conda: https://conda.anaconda.org/conda-forge/linux-64/_openmp_mutex-4.5-20_gnu.conda
@@ -1192,8 +1188,6 @@ environments:
     - url: https://conda.anaconda.org/conda-forge/
     indexes:
     - https://pypi.org/simple
-    options:
-      pypi-prerelease-mode: if-necessary-or-explicit
     packages:
       linux-64:
       - conda: https://conda.anaconda.org/conda-forge/linux-64/_openmp_mutex-4.5-20_gnu.conda
@@ -1924,8 +1918,6 @@ environments:
     - url: https://conda.anaconda.org/conda-forge/
     indexes:
     - https://pypi.org/simple
-    options:
-      pypi-prerelease-mode: if-necessary-or-explicit
     packages:
       linux-64:
       - conda: https://conda.anaconda.org/conda-forge/linux-64/_openmp_mutex-4.5-20_gnu.conda
@@ -2698,8 +2690,6 @@ environments:
     - url: https://conda.anaconda.org/conda-forge/
     indexes:
     - https://pypi.org/simple
-    options:
-      pypi-prerelease-mode: if-necessary-or-explicit
     packages:
       linux-64:
       - conda: https://conda.anaconda.org/conda-forge/linux-64/_openmp_mutex-4.5-20_gnu.conda
@@ -3425,8 +3415,6 @@ environments:
     - url: https://conda.anaconda.org/conda-forge/
     indexes:
     - https://pypi.org/simple
-    options:
-      pypi-prerelease-mode: if-necessary-or-explicit
     packages:
       linux-64:
       - conda: https://conda.anaconda.org/conda-forge/linux-64/_openmp_mutex-4.5-20_gnu.conda
@@ -4194,8 +4182,6 @@ environments:
     - url: https://conda.anaconda.org/conda-forge/
     indexes:
     - https://pypi.org/simple
-    options:
-      pypi-prerelease-mode: if-necessary-or-explicit
     packages:
       linux-64:
       - conda: https://conda.anaconda.org/conda-forge/linux-64/_openmp_mutex-4.5-20_gnu.conda
@@ -4966,8 +4952,6 @@ environments:
     - url: https://conda.anaconda.org/conda-forge/
     indexes:
     - https://pypi.org/simple
-    options:
-      pypi-prerelease-mode: if-necessary-or-explicit
     packages:
       linux-64:
       - conda: https://conda.anaconda.org/conda-forge/linux-64/_openmp_mutex-4.5-20_gnu.conda
@@ -7345,40 +7329,50 @@ packages:
 - pypi: ./
   name: earthlens
   version: 0.5.0
-  sha256: 9e748d5d46ea055b7eea696abffdd18f72d5a87380ac524a9d488a12393fcffd
+  sha256: ec386ec7e3a31897d783326993a492093af6fdb2adba4836faa1b11ce830a6c0
   requires_dist:
   - pyramids-gis>=0.23.0
+  - geopandas>=1.0.0
   - joblib>=1.5.0
   - loguru>=0.7.3
   - numpy>=2.0.0
   - pandas>=2.0.0
-  - pyyaml>=6.0.2
   - pydantic>=2.0
+  - pyproj>=3.7.0
+  - pyyaml>=6.0.2
   - requests>=2.28.1
+  - shapely>=2.0.0
   - tqdm>=4.66.0
   - boto3>=1.43.0 ; extra == 's3'
+  - botocore>=1.34.0 ; extra == 's3'
   - cdsapi>=0.7.7 ; extra == 'ecmwf'
   - earthengine-api>=1.7.26 ; extra == 'gee'
+  - google-api-python-client>=2.0 ; extra == 'gee'
+  - google-cloud-storage>=2.0 ; extra == 'gee'
   - rtree>=1.0.0 ; extra == 'gee'
+  - urllib3>=1.26 ; extra == 'gee'
   - copernicusmarine>=2.0.0,<3 ; extra == 'cmems'
   - obspy>=1.5.0 ; extra == 'fdsn'
   - earthaccess>=0.18.0 ; python_full_version >= '3.12' and extra == 'earthdata'
   - pystac-client>=0.8.0 ; extra == 'stac'
   - tropycal>=1.4 ; extra == 'tropycal'
   - cartopy>=0.22 ; extra == 'tropycal'
-  - shapely>=2.0 ; extra == 'tropycal'
   - boto3>=1.43.0 ; extra == 'all'
+  - botocore>=1.34.0 ; extra == 'all'
   - cartopy>=0.22 ; extra == 'all'
   - cdsapi>=0.7.7 ; extra == 'all'
   - copernicusmarine>=2.0.0,<3 ; extra == 'all'
   - earthengine-api>=1.7.26 ; extra == 'all'
   - earthaccess>=0.18.0 ; python_full_version >= '3.12' and extra == 'all'
+  - google-api-python-client>=2.0 ; extra == 'all'
+  - google-cloud-storage>=2.0 ; extra == 'all'
   - obspy>=1.5.0 ; extra == 'all'
   - pystac-client>=0.8.0 ; extra == 'all'
   - rtree>=1.0.0 ; extra == 'all'
-  - shapely>=2.0 ; extra == 'all'
   - tropycal>=1.4 ; extra == 'all'
+  - urllib3>=1.26 ; extra == 'all'
   requires_python: '>=3.11,<4'
+  editable: true
 - pypi: https://files.pythonhosted.org/packages/13/a6/27bc3c51cf862c8b70bc8fe21b812b9c1ca6f31ecee9def96c82d93f003b/ecmwf_datastores_client-0.5.1-py3-none-any.whl
   name: ecmwf-datastores-client
   version: 0.5.1

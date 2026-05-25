@@ -28,20 +28,38 @@ requires-python = ">= 3.11, <4"
 
 dependencies = [
     "pyramids-gis >=0.23.0",
+    # geopandas / pyproj / shapely are imported directly by earthlens core
+    # (spatial.py, utm.py) and by no-extra backends (gdacs, fdsn), so they are
+    # declared here even though pyramids-gis already pulls them — earthlens
+    # declares what it imports. Floors match pyramids-gis 0.23.0.
+    "geopandas >=1.0.0",
     "joblib >=1.5.0",
     "loguru >=0.7.3",
     "numpy >=2.0.0",
     "pandas >=2.0.0",
-    "PyYAML >=6.0.2",
     "pydantic >=2.0",
+    "pyproj >=3.7.0",
+    "PyYAML >=6.0.2",
     "requests >=2.28.1",
+    "shapely >=2.0.0",
     "tqdm >=4.66.0",
 ]
 
 [project.optional-dependencies]
-s3 = ["boto3 >=1.43.0"]
+# botocore is imported directly in s3/s3.py (UNSIGNED Config) — declared
+# alongside boto3 even though boto3 always pulls it.
+s3 = ["boto3 >=1.43.0", "botocore >=1.34.0"]
 ecmwf = ["cdsapi >=0.7.7"]
-gee = ["earthengine-api >=1.7.26", "Rtree >=1.0.0"]
+# google-api-python-client (googleapiclient), google-cloud-storage
+# (google.cloud.storage) and urllib3 are imported directly by the gee backend
+# (io.py / jobs.py); declared here even though earthengine-api pulls them.
+gee = [
+    "earthengine-api >=1.7.26",
+    "google-api-python-client >=2.0",
+    "google-cloud-storage >=2.0",
+    "Rtree >=1.0.0",
+    "urllib3 >=1.26",
+]
 cmems = ["copernicusmarine >=2.0.0,<3"]
 fdsn = ["obspy >=1.5.0"]
 # earthaccess >=0.18 requires Python >=3.12 (earthlens core is >=3.11); the
@@ -53,21 +71,24 @@ earthdata = ["earthaccess >=0.18.0; python_version >= '3.12'"]
 # MPC SAS signing is native in pyramids' PlanetaryComputerSigner (>=0.23.0),
 # so no `planetary-computer` SDK is needed.
 stac = ["pystac-client >=0.8.0"]
-# tropycal hard-imports cartopy + shapely at module load but does not
-# declare them, and its version shim needs setuptools<81 (pkg_resources).
-tropycal = ["tropycal >=1.4", "cartopy >=0.22", "shapely >=2.0"]
+# tropycal hard-imports cartopy at module load but does not declare it; its
+# version shim needs setuptools<81 (pkg_resources). (shapely is a core dep.)
+tropycal = ["tropycal >=1.4", "cartopy >=0.22"]
 all = [
     "boto3 >=1.43.0",
+    "botocore >=1.34.0",
     "cartopy >=0.22",
     "cdsapi >=0.7.7",
     "copernicusmarine >=2.0.0,<3",
     "earthengine-api >=1.7.26",
     "earthaccess >=0.18.0; python_version >= '3.12'",
+    "google-api-python-client >=2.0",
+    "google-cloud-storage >=2.0",
     "obspy >=1.5.0",
     "pystac-client >=0.8.0",
     "Rtree >=1.0.0",
-    "shapely >=2.0",
     "tropycal >=1.4",
+    "urllib3 >=1.26",
 ]
 
 [dependency-groups]
