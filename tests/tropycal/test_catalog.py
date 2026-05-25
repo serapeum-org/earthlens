@@ -125,3 +125,99 @@ class TestCatalog:
         """CATALOG_PATH points at the shipped basin YAML."""
         assert CATALOG_PATH.name == "tropycal_data_catalog.yaml"
         assert CATALOG_PATH.exists()
+
+    def test_describe(self):
+        """describe() returns the basin's name, sources, and sorted fields."""
+        info = Catalog().describe("north_atlantic")
+        assert info == {
+            "basin": "north_atlantic",
+            "name": "North Atlantic",
+            "sources": ["ibtracs", "hurdat"],
+            "fields": ["category", "mslp", "vmax"],
+        }
+
+    def test_describe_unknown_raises(self):
+        """describe() on an unknown basin raises the did-you-mean ValueError."""
+        with pytest.raises(ValueError, match="Tropycal basin catalog"):
+            Catalog().describe("atlantis")
+
+    def test_available_datasets_index_populated(self):
+        """available_datasets indexes the whole basin universe (gee/ecmwf parity)."""
+        assert Catalog().available_datasets == _EXPECTED_CODES
+
+    def test_health_clean_on_bundled_catalog(self):
+        """health() reports no offenders for the shipped catalog."""
+        report = Catalog().health()
+        assert report == {
+            "basin_without_sources": [],
+            "basin_without_fields": [],
+            "basin_unknown_source": [],
+        }
+
+    def test_health_flags_bad_rows(self):
+        """health() flags empty sources/fields and unknown sources."""
+        from earthlens.tropycal import Basin
+
+        cat = Catalog(
+            datasets={
+                "north_atlantic": Basin(name="NA", sources=["ibtracs"], fields={"vmax": {"units": "kt"}}),
+                "nosrc": Basin(name="NoSrc", sources=[], fields={"vmax": {"units": "kt"}}),
+                "broken": Basin(name="Broken", sources=["jtwc"], fields={}),
+            }
+        )
+        report = cat.health()
+        assert report["basin_without_sources"] == ["nosrc"]
+        assert report["basin_without_fields"] == ["broken"]
+        assert report["basin_unknown_source"] == ["broken:jtwc"]
+
+    def test_load_nonexistent_path_raises(self, tmp_path):
+        """Loading a non-existent catalog path raises FileNotFoundError."""
+        from earthlens.tropycal.catalog import clear_catalog_cache
+
+        clear_catalog_cache()
+        with pytest.raises(FileNotFoundError):
+            Catalog.load(catalog_path=tmp_path / "does_not_exist.yaml")
+
+
+class TestCatalogCache:
+    """Tests for the (path, mtime) parse cache."""
+
+    def test_repeated_construction_uses_cache(self):
+        """A second Catalog() on the unchanged file reuses the cached parse."""
+        from earthlens.tropycal.catalog import _CATALOG_CACHE, clear_catalog_cache
+
+        clear_catalog_cache()
+        Catalog()
+        assert len(_CATALOG_CACHE) == 1
+        Catalog()
+        assert len(_CATALOG_CACHE) == 1
+
+    def test_clear_cache_forces_reparse(self, tmp_path):
+        """clear_catalog_cache empties the cache so the next load re-parses."""
+        from earthlens.tropycal.catalog import _CATALOG_CACHE, clear_catalog_cache
+
+        Catalog()
+        assert _CATALOG_CACHE
+        clear_catalog_cache()
+        assert not _CATALOG_CACHE
+
+    def test_mtime_change_invalidates_cache(self, tmp_path):
+        """A rewritten file (new mtime) is re-parsed rather than served stale."""
+        from earthlens.tropycal.catalog import clear_catalog_cache
+
+        clear_catalog_cache()
+        yaml = tmp_path / "cat.yaml"
+        yaml.write_text(
+            "basins:\n  north_atlantic:\n    name: NA\n    sources: [ibtracs]\n",
+            encoding="utf-8",
+        )
+        first = Catalog.load(catalog_path=yaml)
+        assert first.codes() == ["north_atlantic"]
+        yaml.write_text(
+            "basins:\n"
+            "  north_atlantic:\n    name: NA\n    sources: [ibtracs]\n"
+            "  west_pacific:\n    name: WP\n    sources: [ibtracs]\n",
+            encoding="utf-8",
+        )
+        second = Catalog.load(catalog_path=yaml)
+        assert second.codes() == ["north_atlantic", "west_pacific"]

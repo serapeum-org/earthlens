@@ -10,16 +10,19 @@ basin codes and which `source`s serve each one.
 
 `Basin` is the "Dataset" analog (`name`, `sources`, `fields`);
 `TrackField` is the "Variable" analog (`units`, `long_name`).
-:class:`Catalog` is a thin :class:`earthlens.base.AbstractCatalog`
-subclass that loads the bundled `tropycal_data_catalog.yaml` and stores
-the basin map under the inherited `datasets` field — which gives it the
+:class:`Catalog` is an :class:`earthlens.base.AbstractCatalog` subclass
+that loads the bundled `tropycal_data_catalog.yaml` and stores the basin
+map under the inherited `datasets` field — which gives it the
 `cat["north_atlantic"]` / `"north_atlantic" in cat` / `len(cat)`
 dict-like surface and the did-you-mean error for free.
 
-There is deliberately no `available_*` index: the basins *are* the whole
-tropycal universe (a documented deviation, mirroring GDACS).
-:data:`CATALOG_PATH` is the path to the bundled YAML and is
-monkey-patchable in tests.
+It mirrors the ECMWF / GEE catalogs' shape: it exposes an
+:attr:`Catalog.available_datasets` index (every basin tropycal serves —
+here that *is* the curated set, since the basins are the whole universe),
+a :meth:`Catalog.health` hygiene report, and a `(path, mtime_ns)` parse
+cache (see :func:`clear_catalog_cache`) so repeated `Catalog()`
+construction is ~1 ms. :data:`CATALOG_PATH` is the path to the bundled
+YAML and is monkey-patchable in tests.
 """
 
 from __future__ import annotations
@@ -33,6 +36,66 @@ from earthlens.base import AbstractCatalog
 from earthlens.base.yaml_loader import load_yaml_strict
 
 CATALOG_PATH: Path = Path(__file__).parent / "tropycal_data_catalog.yaml"
+
+#: The data sources tropycal 1.4 exposes (no `jtwc`); used by
+#: :meth:`Catalog.health` to flag a basin row referencing an unknown one.
+_KNOWN_SOURCES: frozenset[str] = frozenset({"ibtracs", "hurdat"})
+
+# Module-level cache of parsed basin maps, keyed on `(resolved_path,
+# mtime_ns)` so any real file mutation invalidates the entry naturally.
+# Mirrors the ECMWF / GEE catalog cache so repeated `Catalog()`
+# construction skips the YAML parse + pydantic validation.
+_CATALOG_CACHE: dict[tuple[str, int], dict[str, "Basin"]] = {}
+
+
+def clear_catalog_cache() -> None:
+    """Empty the module-level basin parse cache.
+
+    Useful in tests that rewrite the catalog on disk and want to force a
+    re-parse. Production callers do not need this — the cache key includes
+    `st_mtime_ns`, so any real file mutation invalidates the entry on its
+    own.
+    """
+    _CATALOG_CACHE.clear()
+
+
+def _load_basins(path: Path) -> dict[str, "Basin"]:
+    """Parse, validate, and cache the basin map at `path`.
+
+    Cached on `(resolved-path, mtime_ns)` so a second `Catalog()` on an
+    unchanged file skips both YAML parsing and pydantic validation.
+
+    Raises:
+        ValueError: If the YAML has no `basins:` block or a row fails
+            :class:`Basin` validation.
+    """
+    resolved = str(path.resolve())
+    try:
+        mtime_ns = path.stat().st_mtime_ns
+    except FileNotFoundError:
+        mtime_ns = 0
+    key = (resolved, mtime_ns)
+    cached = _CATALOG_CACHE.get(key)
+    if cached is not None:
+        return cached
+
+    data = load_yaml_strict(path) or {}
+    basins_yaml = data.get("basins") or {}
+    if not basins_yaml:
+        raise ValueError(
+            f"{path} is missing or has an empty 'basins:' block. "
+            "The Tropycal catalog must list at least one basin."
+        )
+    basins: dict[str, Basin] = {}
+    for code, body in basins_yaml.items():
+        try:
+            basins[code] = Basin(**dict(body or {}))
+        except ValidationError as exc:
+            raise ValueError(
+                f"{path} basin {code!r} failed validation:\n{exc}"
+            ) from exc
+    _CATALOG_CACHE[key] = basins
+    return basins
 
 
 class TrackField(BaseModel):
@@ -143,50 +206,41 @@ class Catalog(AbstractCatalog):
     def model_post_init(self, __context: Any) -> None:
         """Auto-load the bundled catalog when no basins were supplied.
 
-        `Catalog()` with no args reads :data:`CATALOG_PATH`; passing
-        `datasets=...` skips the disk read (used in tests).
+        `Catalog()` with no args reads :data:`CATALOG_PATH` (through the
+        `(path, mtime_ns)` cache); passing `datasets=...` skips the disk
+        read (used in tests). Either way, :attr:`available_datasets` is
+        populated with the basin codes — the whole tropycal universe.
 
         Raises:
             ValueError: Propagated from :meth:`load` when the YAML is
                 missing, empty, or has a malformed basin row.
         """
-        if self.datasets:
-            return
-        loaded = Catalog.load()
-        self.datasets = loaded.datasets
+        if not self.datasets:
+            self.datasets = dict(_load_basins(CATALOG_PATH))
+        if not self.available_datasets:
+            self.available_datasets = sorted(self.datasets)
 
     @classmethod
     def load(cls, catalog_path: Path | None = None) -> Catalog:
-        """Read the Tropycal basin catalog from disk.
+        """Read the Tropycal basin catalog from disk (cached).
 
         Args:
             catalog_path: Path to the catalog YAML. Defaults to the
                 module-level :data:`CATALOG_PATH`.
 
         Returns:
-            A fully-populated :class:`Catalog`.
+            A fully-populated :class:`Catalog` with `datasets` and the
+            `available_datasets` index set.
 
         Raises:
             ValueError: If the file has no `basins:` block, or a row
                 fails :class:`Basin` validation.
         """
         catalog_path = catalog_path if catalog_path is not None else CATALOG_PATH
-        data = load_yaml_strict(catalog_path) or {}
-        basins_yaml = data.get("basins") or {}
-        if not basins_yaml:
-            raise ValueError(
-                f"{catalog_path} is missing or has an empty 'basins:' block. "
-                "The Tropycal catalog must list at least one basin."
-            )
-        basins: dict[str, Basin] = {}
-        for code, body in basins_yaml.items():
-            try:
-                basins[code] = Basin(**dict(body or {}))
-            except ValidationError as exc:
-                raise ValueError(
-                    f"{catalog_path} basin {code!r} failed validation:\n{exc}"
-                ) from exc
-        return cls(datasets=basins)
+        basins = _load_basins(catalog_path)
+        return cls(
+            datasets=dict(basins), available_datasets=sorted(basins)
+        )
 
     def get_catalog(self) -> dict[str, Basin]:
         """Return the basin map (satisfies the abstract contract).
@@ -262,3 +316,91 @@ class Catalog(AbstractCatalog):
                 (`["all", "australia", "both", ...]`).
         """
         return sorted(self.datasets)
+
+    def describe(self, code: str) -> dict[str, Any]:
+        """Return a structured introspection record for a basin.
+
+        Mirrors :meth:`earthlens.ecmwf.Catalog.describe`: a runtime "what
+        does basin X expose?" helper a CLI / notebook can dump without
+        walking the YAML.
+
+        Args:
+            code: A tropycal basin code (e.g. `"north_atlantic"`).
+
+        Returns:
+            dict[str, Any]: Keys `basin` (the code), `name`, `sources`
+            (the serving data sources), and `fields` (sorted track-field
+            codes).
+
+        Raises:
+            ValueError: If `code` is not a registered basin.
+
+        Examples:
+            - Describe the North Atlantic at a glance:
+                ```python
+                >>> from earthlens.tropycal import Catalog
+                >>> info = Catalog().describe("north_atlantic")
+                >>> info["name"]
+                'North Atlantic'
+                >>> info["sources"]
+                ['ibtracs', 'hurdat']
+                >>> info["fields"]
+                ['category', 'mslp', 'vmax']
+
+                ```
+        """
+        basin = self.get_basin(code)
+        return {
+            "basin": code,
+            "name": basin.name,
+            "sources": list(basin.sources),
+            "fields": sorted(basin.fields),
+        }
+
+    def health(self) -> dict[str, list[str]]:
+        """Report structural hygiene issues across the loaded catalog.
+
+        Mirrors :meth:`earthlens.ecmwf.Catalog.health` /
+        :meth:`earthlens.gee.Catalog.health`: returns a mapping
+        `check_name -> sorted list of offenders`. An empty list means the
+        check passes; an empty dict means the catalog is clean. Schema-level
+        invariants (duplicate keys, unknown fields) are already enforced at
+        load time — these are the residual data-quality checks the pydantic
+        schema cannot express.
+
+        Checks reported:
+
+        * `basin_without_sources` — basins whose `sources` list is empty
+          (no tropycal source could serve them).
+        * `basin_without_fields` — basins carrying zero track fields.
+        * `basin_unknown_source` — `"<basin>:<source>"` for any source not
+          in tropycal's known set (`ibtracs` / `hurdat`).
+
+        Returns:
+            dict[str, list[str]]: The per-check offender lists.
+
+        Examples:
+            - The bundled catalog is clean:
+                ```python
+                >>> from earthlens.tropycal import Catalog
+                >>> Catalog().health()
+                {'basin_without_sources': [], 'basin_without_fields': [], 'basin_unknown_source': []}
+
+                ```
+        """
+        no_sources: list[str] = []
+        no_fields: list[str] = []
+        unknown_source: list[str] = []
+        for code, basin in self.datasets.items():
+            if not basin.sources:
+                no_sources.append(code)
+            if not basin.fields:
+                no_fields.append(code)
+            for source in basin.sources:
+                if source not in _KNOWN_SOURCES:
+                    unknown_source.append(f"{code}:{source}")
+        return {
+            "basin_without_sources": sorted(no_sources),
+            "basin_without_fields": sorted(no_fields),
+            "basin_unknown_source": sorted(unknown_source),
+        }

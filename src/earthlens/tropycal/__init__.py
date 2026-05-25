@@ -56,7 +56,13 @@ Examples:
 from __future__ import annotations
 
 from earthlens.tropycal.backend import TropicalCyclone
-from earthlens.tropycal.catalog import CATALOG_PATH, Basin, Catalog, TrackField
+from earthlens.tropycal.catalog import (
+    CATALOG_PATH,
+    Basin,
+    Catalog,
+    TrackField,
+    clear_catalog_cache,
+)
 from earthlens.tropycal.events import empty_fc, frame_to_fc
 
 __all__ = [
@@ -65,6 +71,7 @@ __all__ = [
     "Catalog",
     "TrackField",
     "TropicalCyclone",
+    "clear_catalog_cache",
     "empty_fc",
     "frame_to_fc",
 ]
