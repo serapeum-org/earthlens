@@ -1671,6 +1671,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#requester-pays-collections-aws-credentials" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Requester-pays collections — AWS credentials
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#ci-secret-pattern" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -4093,6 +4104,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#requester-pays-collections-aws-credentials" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Requester-pays collections — AWS credentials
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#ci-secret-pattern" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -4186,6 +4208,16 @@ env var or kwarg:</p>
 exposed to GDAL via the asset-read environment (<code>AWS_S3_ENDPOINT</code>,
 <code>AWS_ACCESS_KEY_ID</code>, <code>AWS_SECRET_ACCESS_KEY</code>, …), never as an <code>Authorization</code>
 header.</p>
+<h2 id="requester-pays-collections-aws-credentials"><a class="toclink" href="#requester-pays-collections-aws-credentials">Requester-pays collections — AWS credentials</a><a class="headerlink" href="#requester-pays-collections-aws-credentials" title="Permanent link">#</a></h2>
+<p>A few collections store their assets on a <strong>requester-pays</strong> S3 bucket even
+though their endpoint is otherwise anonymous — e.g. Earth Search's
+<code>landsat-c2-l2</code> resolves to <code>s3://usgs-landsat</code>. The catalog marks these with a
+per-collection <code>signer: aws-requester-pays</code>, so the backend reads them with the
+requester-pays signer (sets <code>AWS_REQUEST_PAYER=requester</code> and rewrites the
+<code>s3://</code> href to GDAL's <code>/vsis3/</code> path). <strong>You must have valid AWS credentials</strong>
+in the environment (<code>AWS_ACCESS_KEY_ID</code> / <code>AWS_SECRET_ACCESS_KEY</code>, or an
+instance role) — the requester (you) pays the egress. Without them the read
+fails with an S3 <code>403</code>.</p>
 <h2 id="ci-secret-pattern"><a class="toclink" href="#ci-secret-pattern">CI secret pattern</a><a class="headerlink" href="#ci-secret-pattern" title="Permanent link">#</a></h2>
 <p>Set the CDSE keys as repository secrets and export them in the job environment
 before running the live STAC tests; the Earth Search and MPC e2e tests need no
