@@ -223,6 +223,8 @@ nav:
       - Multi-basin season — ACE by basin: examples/tropycal/multibasin_ace.ipynb
     - Active fires (FIRMS):
       - Quickstart — recent fires: examples/firms/quickstart.ipynb
+      - Fire-season time-series: examples/firms/fire_season_timeseries.ipynb
+      - MODIS vs VIIRS comparison: examples/firms/modis_vs_viirs_comparison.ipynb
   - API Reference:
     - EarthLens Facade: reference/earthlens.md
     - AbstractDataSource: reference/abstract-datasource.md
