@@ -108,6 +108,7 @@ nav:
     - Installation: installation.md
     - Architecture: overview/architecture.md
   - Data Sources:
+    - Supported providers: reference/providers.md
     - CHC (CHIRPS / CHIRTS / SPI / SPEI / …):
       - Introduction: reference/chc/introduction.md
       - Usage: reference/chc/usage.md
