@@ -7,11 +7,19 @@ string is the entire credential set.
 
 ## 1. Request a free MAP_KEY
 
-FIRMS access is free. Request a key at
-<https://firms.modaps.eosdis.nasa.gov/api/map_key/>; the portal issues a
-`MAP_KEY` immediately. Keep it secret — treat it like a password. Unlike
-a header-based key, the FIRMS `MAP_KEY` travels as a path segment in the
-request URL, so avoid logging full FIRMS URLs.
+FIRMS access is free and needs **no NASA Earthdata login**. Get a key at
+<https://firms.modaps.eosdis.nasa.gov/api/map_key/>:
+
+1. Open the page and enter your **email address**.
+2. FIRMS emails you a confirmation link — click it.
+3. The page then shows your `MAP_KEY`: a ~32-character hex string
+   (e.g. `1a2b3c4d5e6f...`), issued instantly.
+
+The same key works for the area CSV download API and for the
+`mapkey_status` / `data_availability` endpoints. Keep it secret — treat
+it like a password; you can regenerate it anytime from that same page.
+Unlike a header-based key, the FIRMS `MAP_KEY` travels as a path segment
+in the request URL, so avoid logging full FIRMS URLs.
 
 ## 2. Supply the key
 
