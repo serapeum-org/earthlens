@@ -4242,10 +4242,17 @@ backend.</p>
   you to accept a licence agreement on first download.</li>
 </ul>
 <h2 id="credential-sources-in-priority-order"><a class="toclink" href="#credential-sources-in-priority-order">Credential sources (in priority order)</a><a class="headerlink" href="#credential-sources-in-priority-order" title="Permanent link">#</a></h2>
-<p><code>EarthData(...)</code> resolves a login strategy automatically:</p>
+<p><code>EarthData(...)</code> resolves a login strategy automatically, in this
+priority order:</p>
 <ol>
-<li><strong>Environment variables</strong> — set <code>EARTHDATA_USERNAME</code> and
-   <code>EARTHDATA_PASSWORD</code>. Used in CI and the e2e tests.</li>
+<li><strong>EDL bearer token</strong> — an explicit <code>EarthData(..., token=...)</code> or the
+   <code>EARTHDATA_TOKEN</code> environment variable. A token authenticates without
+   a password (the token-equivalent of GEE's service key); generate one
+   from your EDL profile under <strong>Generate Token</strong>. Best for CI and
+   headless use — no password in plaintext.</li>
+<li><strong>Username / password</strong> — <code>EarthData(..., username=..., password=...)</code>
+   or the <code>EARTHDATA_USERNAME</code> / <code>EARTHDATA_PASSWORD</code> environment
+   variables.</li>
 <li><strong><code>~/.netrc</code></strong> — add a machine entry:</li>
 </ol>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>machine urs.earthdata.nasa.gov
@@ -4253,11 +4260,13 @@ backend.</p>
 <a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>    password YOUR_PASSWORD
 </code></pre></div>
 <p>Pass a non-default path with <code>EarthData(..., netrc_path=...)</code>.
-3. <strong>Interactive prompt</strong> — the last resort when neither of the above
+4. <strong>Interactive prompt</strong> — the last resort when none of the above
    resolves; <code>earthaccess</code> prompts and persists a token.</p>
-<p>You can also pass <code>EarthData(..., username=..., password=...)</code>
-explicitly. After a successful login, <code>earthaccess</code> persists the token
-so later processes reuse it.</p>
+<p>An explicit <code>token=</code> / <code>username=</code> / <code>password=</code> is exported to the
+matching environment variable (<code>EARTHDATA_TOKEN</code>, or <code>EARTHDATA_USERNAME</code>
+/ <code>EARTHDATA_PASSWORD</code>) that <code>earthaccess</code>'s environment strategy reads.
+After a successful login, <code>earthaccess</code> persists the token so later
+processes reuse it.</p>
 <h2 id="in-region-s3-access"><a class="toclink" href="#in-region-s3-access">In-region S3 access</a><a class="headerlink" href="#in-region-s3-access" title="Permanent link">#</a></h2>
 <p>For cloud-hosted collections, the authenticated session also mints
 <strong>rotating, per-provider S3 credentials</strong> (valid roughly one hour). The
@@ -4265,11 +4274,14 @@ backend uses them automatically when streaming in-region — see
 <a href="../usage/#cloud-streaming-vs-https-download">Usage → cloud streaming</a>.</p>
 <h2 id="ci-secrets"><a class="toclink" href="#ci-secrets">CI secrets</a><a class="headerlink" href="#ci-secrets" title="Permanent link">#</a></h2>
 <p>The live e2e suite (<code>-m "e2e and earthdata"</code>, run by the <code>e2e-earthdata</code>
-job under Python ≥ 3.12) reads the <code>EARTHDATA_USERNAME</code> /
-<code>EARTHDATA_PASSWORD</code> repository secrets and skips cleanly when they are
-absent. Configure them once with the GitHub CLI:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>gh<span class="w"> </span>secret<span class="w"> </span><span class="nb">set</span><span class="w"> </span>EARTHDATA_USERNAME<span class="w"> </span>--repo<span class="w"> </span>&lt;owner&gt;/&lt;repo&gt;<span class="w">   </span><span class="c1"># paste your EDL username</span>
-<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>gh<span class="w"> </span>secret<span class="w"> </span><span class="nb">set</span><span class="w"> </span>EARTHDATA_PASSWORD<span class="w"> </span>--repo<span class="w"> </span>&lt;owner&gt;/&lt;repo&gt;<span class="w">   </span><span class="c1"># paste your EDL password</span>
+job under Python ≥ 3.12) reads either an <code>EARTHDATA_TOKEN</code> <strong>or</strong> an
+<code>EARTHDATA_USERNAME</code> / <code>EARTHDATA_PASSWORD</code> repository secret, and skips
+cleanly when none are set. Configure with the GitHub CLI — a single
+token is the simplest:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>gh<span class="w"> </span>secret<span class="w"> </span><span class="nb">set</span><span class="w"> </span>EARTHDATA_TOKEN<span class="w"> </span>--repo<span class="w"> </span>&lt;owner&gt;/&lt;repo&gt;<span class="w">      </span><span class="c1"># paste your EDL bearer token</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="c1"># …or the username/password pair instead:</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>gh<span class="w"> </span>secret<span class="w"> </span><span class="nb">set</span><span class="w"> </span>EARTHDATA_USERNAME<span class="w"> </span>--repo<span class="w"> </span>&lt;owner&gt;/&lt;repo&gt;<span class="w">   </span><span class="c1"># paste your EDL username</span>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>gh<span class="w"> </span>secret<span class="w"> </span><span class="nb">set</span><span class="w"> </span>EARTHDATA_PASSWORD<span class="w"> </span>--repo<span class="w"> </span>&lt;owner&gt;/&lt;repo&gt;<span class="w">   </span><span class="c1"># paste your EDL password</span>
 </code></pre></div>
 <p>Until those are set, the live e2e tests (including the example-notebook
 execution) skip rather than fail.</p>
