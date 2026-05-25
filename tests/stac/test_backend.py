@@ -185,6 +185,30 @@ class TestFetch:
         stac._fetch(stac._search())
         assert len(fake_pyramids.merge_calls) == 2
 
+    def test_mixed_resolution_bands_align_and_assemble(self, fake_pyramids, tmp_path):
+        """Mixed-resolution bands are aligned + assembled via create_from_array (H1)."""
+        fake_pyramids.items_by_collection["sentinel-2-c1-l2a"] = [
+            make_item("a", "2024-01-05", {"B04": "https://h/a_b04.tif", "B08": "https://h/a_b08.tif"})
+        ]
+        # the B08 band mosaic comes back at a coarser grid than B04
+        fake_pyramids.dataset_shapes = {"_B08_": (1, 1, 1)}
+        stac = _build_stac(tmp_path, endpoint="earth-search", variables={"sentinel-2-l2a": ["B04", "B08"]})
+        paths = stac._fetch(stac._search())
+        assert len(paths) == 1
+        assert fake_pyramids.create_calls, "mixed-resolution should assemble via create_from_array"
+        assert fake_pyramids.create_calls[-1]["no_data_value"] == 0
+        assert not fake_pyramids.stack_calls, "mixed-resolution must not use stack_bands(align=False)"
+
+    def test_same_resolution_bands_use_stack_bands(self, fake_pyramids, tmp_path):
+        """Same-grid bands keep the stack_bands path (band names preserved)."""
+        fake_pyramids.items_by_collection["sentinel-2-c1-l2a"] = [
+            make_item("a", "2024-01-05", {"B04": "https://h/a_b04.tif", "B08": "https://h/a_b08.tif"})
+        ]
+        stac = _build_stac(tmp_path, endpoint="earth-search")
+        stac._fetch(stac._search())
+        assert len(fake_pyramids.stack_calls) == 1
+        assert not fake_pyramids.create_calls
+
     def test_crop_uses_wgs84_bbox_and_epsg(self, fake_pyramids, tmp_path):
         """The mosaic is cropped with the WGS84 AOI bbox declared as EPSG:4326."""
         fake_pyramids.items_by_collection["sentinel-2-c1-l2a"] = [

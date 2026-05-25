@@ -76,18 +76,33 @@ class _FakeClient:
 class _FakeDataset:
     """A pyramids Dataset stand-in for the load/mosaic/write path."""
 
-    def __init__(self, href: str = "", epsg: int | None = 32630) -> None:
+    def __init__(self, href: str = "", epsg: int | None = 32630,
+                 shape: tuple = (1, 2, 2)) -> None:
         self.href = href
         self.epsg = epsg
+        self.shape = shape
         self.geotransform = (0.0, 1.0, 0.0, 0.0, 0.0, -1.0)
         self.cropped_bbox: list[float] | None = None
         self.cropped_epsg: int | None = None
         self.reprojected_to: int | None = None
+        self.aligned_to: tuple | None = None
 
     def to_crs(self, epsg: int) -> _FakeDataset:
         """Return a copy reprojected to `epsg` (records the target)."""
         out = _FakeDataset(self.href, epsg)
         out.reprojected_to = epsg
+        return out
+
+    def read_array(self, band: int = 0):
+        """Return a zero array matching this dataset's (rows, cols)."""
+        import numpy as np
+
+        return np.zeros(self.shape[-2:], dtype="uint16")
+
+    def align(self, reference: _FakeDataset) -> _FakeDataset:
+        """Return a copy resampled onto `reference`'s grid (records the target)."""
+        out = _FakeDataset(self.href, self.epsg, reference.shape)
+        out.aligned_to = reference.shape
         return out
 
     def crop(self, mask=None, touch: bool = True, *, bbox=None, epsg=None) -> _FakeDataset:
@@ -163,6 +178,8 @@ class FakePyramids:
         self.write_data: list = []
         self.split_antimeridian_calls: list[tuple] = []
         self.dataset_epsgs: dict[str, int] = {}
+        self.dataset_shapes: dict[str, tuple] = {}
+        self.create_calls: list[dict[str, Any]] = []
 
 
 @pytest.fixture
@@ -260,10 +277,13 @@ def fake_pyramids(monkeypatch: pytest.MonkeyPatch) -> FakePyramids:
     dataset_mod = types.ModuleType("pyramids.dataset")
 
     def _read_file(href, **kwargs):
-        return _FakeDataset(href, fp.dataset_epsgs.get(href, 32630))
+        epsg = next((v for k, v in fp.dataset_epsgs.items() if k in str(href)), 32630)
+        shape = next((v for k, v in fp.dataset_shapes.items() if k in str(href)), (1, 2, 2))
+        return _FakeDataset(href, epsg, shape)
 
-    def _create_from_array(arr=None, geo=None, epsg=None, **kwargs):
-        return _FakeDataset()
+    def _create_from_array(arr=None, geo=None, epsg=None, no_data_value=None, **kwargs):
+        fp.create_calls.append({"no_data_value": no_data_value, "epsg": epsg})
+        return _FakeDataset(epsg=epsg)
 
     dataset_mod.Dataset = type(
         "Dataset",

@@ -287,7 +287,7 @@ class STAC(AbstractDataSource):
         """
         from pyramids.base.remote import CloudConfig
         from pyramids.dataset.cog import write_cog
-        from pyramids.dataset.merge import merge_rasters, stack_bands
+        from pyramids.dataset.merge import merge_rasters
 
         out: list[Path] = []
         # (collection_key, date, half index, path) for each written COG, so
@@ -315,16 +315,7 @@ class STAC(AbstractDataSource):
                         dst_crs=target_crs, no_data_value=nodata,
                     )
                     band_paths.append(tmp)
-                # align=False uses the BuildVRT band-by-band path (same-grid,
-                # uniform-dtype bands — the common case); align=True hits a
-                # pyramids bug where the grid template defaults no-data to -9999
-                # and overflows unsigned dtypes (Sentinel-2 uint16). Mixed-
-                # resolution bands raise AlignmentError until that is fixed
-                # upstream.
-                stacked = stack_bands(
-                    [str(p) for p in band_paths], band_names=list(assets), align=False,
-                    no_data_value=nodata,
-                )
+                stacked = self._stack_bands(band_paths, list(assets), nodata)
                 # One COG per (collection, date); a crossing AOI yields one per
                 # half, suffixed _part0 (eastern) / _part1 (western).
                 part = f"_part{idx}" if multi else ""
@@ -382,6 +373,47 @@ class STAC(AbstractDataSource):
             if asset is not None and asset.nodata is not None:
                 return asset.nodata
         return 0
+
+    def _stack_bands(self, band_paths: list[Path], assets: list[str], nodata: float | int) -> Any:
+        """Stack per-band mosaics into one multiband `Dataset`.
+
+        Same-resolution bands (the common case) go through pyramids'
+        `stack_bands(align=False)`, which preserves band names. Mixed-resolution
+        bands are resampled onto the finest band's grid with `Dataset.align` and
+        assembled via `create_from_array(no_data_value=…)` — this avoids
+        `stack_bands(align=True)`, whose grid template defaults no-data to -9999
+        and overflows unsigned dtypes such as Sentinel-2 `uint16` (a pyramids
+        `from_band_files` bug, filed upstream).
+
+        Args:
+            band_paths: One single-band mosaic per requested asset, in order.
+            assets: The requested asset keys (used as band names when same-grid).
+            nodata: The no-data value to stamp on the output.
+
+        Returns:
+            A pyramids `Dataset` with one band per `band_paths` entry.
+        """
+        from pyramids.dataset import Dataset
+        from pyramids.dataset.merge import stack_bands
+
+        datasets = [Dataset.read_file(str(p)) for p in band_paths]
+        grids = {(d.shape[-2], d.shape[-1]) for d in datasets}
+        if len(grids) == 1:
+            return stack_bands(
+                [str(p) for p in band_paths], band_names=list(assets),
+                align=False, no_data_value=nodata,
+            )
+        import numpy as np
+
+        reference = max(datasets, key=lambda d: d.shape[-1] * d.shape[-2])
+        arrays = [
+            (d if d is reference else d.align(reference)).read_array(band=0)
+            for d in datasets
+        ]
+        return Dataset.create_from_array(
+            arr=np.stack(arrays), geo=reference.geotransform,
+            epsg=reference.epsg, no_data_value=nodata,
+        )
 
     def download(
         self,
