@@ -1,0 +1,31 @@
+# GDACS hazard-type dispatch table.
+#
+# Like the FDSN backend, GDACS has no per-dataset catalog to curate — it
+# is a single fixed query feed. This file is the entire "catalog": one
+# row per hazard type, keyed by the GDACS event-type code passed in
+# `variables=[...]`. The six codes are the complete GDACS universe, so
+# there is no `available_*` index and no refresh/probe/audit tooling
+# (mirrors `fdsn_data_catalog.yaml`); a new hazard code, were GDACS ever
+# to add one, is a hand-edit of one row here.
+#
+# The codes and names are verified against the live GDACS SEARCH feed
+# (https://www.gdacs.org/gdacsapi/api/events/geteventlist/SEARCH).
+hazard_types:
+  EQ:
+    name: Earthquake
+    description: "Seismic events; severity is moment magnitude (severityunit 'M')."
+  TC:
+    name: Tropical cyclone
+    description: "Tropical storms and cyclones; severity is maximum sustained wind."
+  FL:
+    name: Flood
+    description: "River and flash floods; severity is the GDACS flood magnitude score."
+  VO:
+    name: Volcano
+    description: "Volcanic eruptions and unrest."
+  WF:
+    name: Wildfire
+    description: "Wildfires / forest fires; severity is burned area."
+  DR:
+    name: Drought
+    description: "Agricultural and meteorological drought episodes."

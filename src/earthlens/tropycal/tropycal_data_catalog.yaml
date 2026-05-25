@@ -1,0 +1,93 @@
+# Tropycal basin -> track-field catalog.
+#
+# Tropical-cyclone best-track data from tropycal's TrackDataset is keyed
+# on (basin, source). This catalog plays the ECMWF/GEE "dataset ->
+# variable" role: each BASIN is the dataset analog, and the per-fix
+# TRACK FIELDS (vmax / mslp / category) are the variable analog. The
+# fields are uniform across basins because tropycal's
+# Storm.to_dataframe() emits the same schema for every basin.
+#
+# `sources:` records which tropycal data sources serve each basin
+# (verified by the A3 spike against tropycal 1.4): HURDAT2 covers only
+# the North Atlantic and East Pacific (plus the `both` aggregate);
+# IBTrACS covers every basin. There is no `jtwc` source in tropycal 1.4.
+#
+# `both` (HURDAT North Atlantic + East Pacific combined) and `all`
+# (IBTrACS global) are tropycal's aggregate basin codes; they are valid
+# `variables=[...]` selections and are listed here so the catalog
+# validates them.
+#
+# There is deliberately no `available_*` index: these basins ARE the
+# whole tropycal universe (a documented deviation, like GDACS).
+
+basins:
+  north_atlantic:
+    name: North Atlantic
+    sources: [ibtracs, hurdat]
+    fields:
+      vmax: {units: kt, long_name: "Maximum sustained wind"}
+      mslp: {units: hPa, long_name: "Minimum sea-level pressure"}
+      category: {units: "1", long_name: "Saffir-Simpson hurricane category"}
+  east_pacific:
+    name: Eastern Pacific
+    sources: [ibtracs, hurdat]
+    fields:
+      vmax: {units: kt, long_name: "Maximum sustained wind"}
+      mslp: {units: hPa, long_name: "Minimum sea-level pressure"}
+      category: {units: "1", long_name: "Saffir-Simpson hurricane category"}
+  west_pacific:
+    name: Western Pacific
+    sources: [ibtracs]
+    fields:
+      vmax: {units: kt, long_name: "Maximum sustained wind"}
+      mslp: {units: hPa, long_name: "Minimum sea-level pressure"}
+      category: {units: "1", long_name: "Saffir-Simpson hurricane category"}
+  north_indian:
+    name: North Indian
+    sources: [ibtracs]
+    fields:
+      vmax: {units: kt, long_name: "Maximum sustained wind"}
+      mslp: {units: hPa, long_name: "Minimum sea-level pressure"}
+      category: {units: "1", long_name: "Saffir-Simpson hurricane category"}
+  south_indian:
+    name: South Indian
+    sources: [ibtracs]
+    fields:
+      vmax: {units: kt, long_name: "Maximum sustained wind"}
+      mslp: {units: hPa, long_name: "Minimum sea-level pressure"}
+      category: {units: "1", long_name: "Saffir-Simpson hurricane category"}
+  australia:
+    name: Australia
+    sources: [ibtracs]
+    fields:
+      vmax: {units: kt, long_name: "Maximum sustained wind"}
+      mslp: {units: hPa, long_name: "Minimum sea-level pressure"}
+      category: {units: "1", long_name: "Saffir-Simpson hurricane category"}
+  south_pacific:
+    name: South Pacific
+    sources: [ibtracs]
+    fields:
+      vmax: {units: kt, long_name: "Maximum sustained wind"}
+      mslp: {units: hPa, long_name: "Minimum sea-level pressure"}
+      category: {units: "1", long_name: "Saffir-Simpson hurricane category"}
+  south_atlantic:
+    name: South Atlantic
+    sources: [ibtracs]
+    fields:
+      vmax: {units: kt, long_name: "Maximum sustained wind"}
+      mslp: {units: hPa, long_name: "Minimum sea-level pressure"}
+      category: {units: "1", long_name: "Saffir-Simpson hurricane category"}
+  both:
+    name: North Atlantic + East Pacific (HURDAT2)
+    sources: [hurdat]
+    fields:
+      vmax: {units: kt, long_name: "Maximum sustained wind"}
+      mslp: {units: hPa, long_name: "Minimum sea-level pressure"}
+      category: {units: "1", long_name: "Saffir-Simpson hurricane category"}
+  all:
+    name: All basins (IBTrACS global)
+    sources: [ibtracs]
+    fields:
+      vmax: {units: kt, long_name: "Maximum sustained wind"}
+      mslp: {units: hPa, long_name: "Minimum sea-level pressure"}
+      category: {units: "1", long_name: "Saffir-Simpson hurricane category"}

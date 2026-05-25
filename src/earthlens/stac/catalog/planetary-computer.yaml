@@ -1,0 +1,1984 @@
+# Curated collections served by Microsoft Planetary Computer.
+# Endpoint-namespaced COG-imagery entries (<endpoint>/<id>) are bulk-curated
+# from item_assets by _curate_cog.py; the bare keys are hand-curated.
+
+collections:
+  cop-dem-glo-30:
+    aliases:
+      earth-search: cop-dem-glo-30
+    assets:
+      data:
+        common_name: elevation
+        dtype: float32
+        title: Copernicus DEM GLO-30 elevation
+    collection_id: cop-dem-glo-30
+    default_assets:
+    - data
+    endpoint: planetary-computer
+    extent:
+      bbox:
+      - -180.0
+      - -90.0
+      - 180.0
+      - 90.0
+      start_date: '2021-04-22'
+    resolution: 30.0
+  landsat-c2-l2:
+    assets:
+      blue:
+        common_name: blue
+        dtype: uint16
+        nodata: 0
+      green:
+        common_name: green
+        dtype: uint16
+        nodata: 0
+      nir08:
+        common_name: nir08
+        dtype: uint16
+        nodata: 0
+      red:
+        common_name: red
+        dtype: uint16
+        nodata: 0
+    cadence: 16-day
+    collection_id: landsat-c2-l2
+    default_assets:
+    - red
+    - green
+    - blue
+    - nir08
+    endpoint: planetary-computer
+    extent:
+      bbox:
+      - -180.0
+      - -90.0
+      - 180.0
+      - 90.0
+      start_date: '1982-08-22'
+    resolution: 30.0
+  planetary-computer/3dep-lidar-classification:
+    assets:
+      data:
+        dtype: int16
+        title: COG data
+    collection_id: 3dep-lidar-classification
+    default_assets:
+    - data
+    endpoint: planetary-computer
+  planetary-computer/3dep-lidar-dsm:
+    assets:
+      data:
+        dtype: float32
+        title: COG data
+    collection_id: 3dep-lidar-dsm
+    default_assets:
+    - data
+    endpoint: planetary-computer
+  planetary-computer/3dep-lidar-dtm:
+    assets:
+      data:
+        dtype: float32
+        title: COG data
+    collection_id: 3dep-lidar-dtm
+    default_assets:
+    - data
+    endpoint: planetary-computer
+  planetary-computer/3dep-lidar-dtm-native:
+    assets:
+      data:
+        dtype: float32
+        title: COG data
+    collection_id: 3dep-lidar-dtm-native
+    default_assets:
+    - data
+    endpoint: planetary-computer
+  planetary-computer/3dep-lidar-hag:
+    assets:
+      data:
+        dtype: float32
+        title: COG data
+    collection_id: 3dep-lidar-hag
+    default_assets:
+    - data
+    endpoint: planetary-computer
+  planetary-computer/3dep-lidar-intensity:
+    assets:
+      data:
+        dtype: uint16
+        title: COG data
+    collection_id: 3dep-lidar-intensity
+    default_assets:
+    - data
+    endpoint: planetary-computer
+  planetary-computer/3dep-lidar-pointsourceid:
+    assets:
+      data:
+        dtype: int32
+        title: COG data
+    collection_id: 3dep-lidar-pointsourceid
+    default_assets:
+    - data
+    endpoint: planetary-computer
+  planetary-computer/3dep-lidar-returns:
+    assets:
+      data:
+        dtype: int16
+        title: COG data
+    collection_id: 3dep-lidar-returns
+    default_assets:
+    - data
+    endpoint: planetary-computer
+  planetary-computer/3dep-seamless:
+    assets:
+      data:
+        title: USGS 1/3 arc-second n34w116 1 x 1 degree
+    collection_id: 3dep-seamless
+    default_assets:
+    - data
+    endpoint: planetary-computer
+  planetary-computer/alos-dem:
+    assets:
+      data:
+        title: S084W180
+    collection_id: alos-dem
+    default_assets:
+    - data
+    endpoint: planetary-computer
+  planetary-computer/alos-fnf-mosaic:
+    assets:
+      C:
+        dtype: uint8
+        nodata: 0
+        title: C
+    collection_id: alos-fnf-mosaic
+    default_assets:
+    - C
+    endpoint: planetary-computer
+  planetary-computer/alos-palsar-mosaic:
+    assets:
+      HH:
+        title: HH
+      HV:
+        title: HV
+      VH:
+        title: VH
+      VV:
+        title: VV
+      date:
+        title: date
+      linci:
+        title: linci
+      mask:
+        dtype: uint8
+        nodata: 0
+        title: mask
+    collection_id: alos-palsar-mosaic
+    default_assets:
+    - HH
+    - HV
+    - VH
+    - VV
+    endpoint: planetary-computer
+  planetary-computer/aster-l1t:
+    assets:
+      SWIR:
+        common_name: swir
+        dtype: uint8
+        nodata: 0
+        title: SWIR Swath data
+      VNIR:
+        common_name: yellow/green
+        dtype: uint8
+        nodata: 0
+        title: VNIR Swath data
+    collection_id: aster-l1t
+    default_assets:
+    - SWIR
+    - VNIR
+    endpoint: planetary-computer
+  planetary-computer/chesapeake-lc-13:
+    assets:
+      data:
+        dtype: uint8
+        nodata: 0
+        title: Land Cover Classes
+    collection_id: chesapeake-lc-13
+    default_assets:
+    - data
+    endpoint: planetary-computer
+  planetary-computer/chesapeake-lc-7:
+    assets:
+      data:
+        dtype: uint8
+        nodata: 15
+        title: Land Cover Classes
+    collection_id: chesapeake-lc-7
+    default_assets:
+    - data
+    endpoint: planetary-computer
+  planetary-computer/chesapeake-lu:
+    assets:
+      data:
+        dtype: uint8
+        nodata: 0
+        title: Land Use Classes
+    collection_id: chesapeake-lu
+    default_assets:
+    - data
+    endpoint: planetary-computer
+  planetary-computer/chloris-biomass:
+    assets:
+      biomass:
+        dtype: uint32
+        nodata: 2147483647
+        title: Annual estimates of aboveground woody biomass.
+      biomass_change:
+        dtype: int16
+        nodata: -32768
+        title: Annual estimates of changes (gains and losses) in aboveground woody
+          biomass from the previous year.
+      biomass_change_wm:
+        dtype: int16
+        nodata: -32768
+        title: Annual estimates of changes (gains and losses) in aboveground woody
+          biomass from the previous year (Web Mercator).
+      biomass_wm:
+        dtype: uint32
+        nodata: 2147483647
+        title: Annual estimates of aboveground woody biomass (Web Mercator).
+    collection_id: chloris-biomass
+    default_assets:
+    - biomass
+    - biomass_change
+    - biomass_change_wm
+    - biomass_wm
+    endpoint: planetary-computer
+  planetary-computer/cop-dem-glo-90:
+    assets:
+      data:
+        title: S90_00_W180_00
+    collection_id: cop-dem-glo-90
+    default_assets:
+    - data
+    endpoint: planetary-computer
+  planetary-computer/drcog-lulc:
+    assets:
+      data:
+        dtype: uint8
+        title: DRCOG LULC
+    collection_id: drcog-lulc
+    default_assets:
+    - data
+    endpoint: planetary-computer
+  planetary-computer/esa-cci-lc:
+    assets:
+      change_count:
+        dtype: uint8
+        title: Number of Class Changes
+      current_pixel_state:
+        dtype: uint8
+        nodata: 255
+        title: Land Cover Pixel Type Mask
+      lccs_class:
+        dtype: uint8
+        nodata: 0
+        title: Land Cover Class Defined in the Land Cover Classification System
+      observation_count:
+        dtype: uint16
+        title: Number of Valid Observations
+      processed_flag:
+        dtype: uint8
+        nodata: 255
+        title: Land Cover Map Processed Area Flag
+    collection_id: esa-cci-lc
+    default_assets:
+    - change_count
+    - current_pixel_state
+    - lccs_class
+    - observation_count
+    endpoint: planetary-computer
+  planetary-computer/esa-worldcover:
+    assets:
+      input_quality:
+        dtype: int16
+        nodata: -1
+        title: Classification Input Data Quality
+      map:
+        dtype: uint8
+        nodata: 0
+        title: Land Cover Classes
+    collection_id: esa-worldcover
+    default_assets:
+    - input_quality
+    - map
+    endpoint: planetary-computer
+  planetary-computer/gap:
+    assets:
+      data:
+        title: GeoTIFF data
+    collection_id: gap
+    default_assets:
+    - data
+    endpoint: planetary-computer
+  planetary-computer/gnatsgo-rasters:
+    assets:
+      aws0_100:
+        dtype: float32
+        nodata: 2147483647.0
+        title: aws0_100
+      aws0_150:
+        dtype: float32
+        nodata: 2147483647.0
+        title: aws0_150
+      aws0_20:
+        dtype: float32
+        nodata: 2147483647.0
+        title: aws0_20
+      aws0_30:
+        dtype: float32
+        nodata: 2147483647.0
+        title: aws0_30
+      aws0_5:
+        dtype: float32
+        nodata: 2147483647.0
+        title: aws0_5
+      aws0_999:
+        dtype: float32
+        nodata: 2147483647.0
+        title: aws0_999
+      aws100_150:
+        dtype: float32
+        nodata: 2147483647.0
+        title: aws100_150
+      aws150_999:
+        dtype: float32
+        nodata: 2147483647.0
+        title: aws150_999
+      aws20_50:
+        dtype: float32
+        nodata: 2147483647.0
+        title: aws20_50
+      aws50_100:
+        dtype: float32
+        nodata: 2147483647.0
+        title: aws50_100
+      aws5_20:
+        dtype: float32
+        nodata: 2147483647.0
+        title: aws5_20
+      droughty:
+        dtype: int16
+        nodata: -9999.0
+        title: droughty
+      mukey:
+        dtype: int32
+        nodata: 2147483647.0
+        title: mukey
+      musumcpct:
+        dtype: int16
+        nodata: -9999.0
+        title: musumcpct
+      musumcpcta:
+        dtype: int16
+        nodata: -9999.0
+        title: musumcpcta
+      musumcpcts:
+        dtype: int16
+        nodata: -9999.0
+        title: musumcpcts
+      nccpi3all:
+        dtype: float32
+        nodata: -9999.0
+        title: nccpi3all
+      nccpi3corn:
+        dtype: float32
+        nodata: -9999.0
+        title: nccpi3corn
+      nccpi3cot:
+        dtype: float32
+        nodata: -9999.0
+        title: nccpi3cot
+      nccpi3sg:
+        dtype: float32
+        nodata: -9999.0
+        title: nccpi3sg
+      nccpi3soy:
+        dtype: float32
+        nodata: -9999.0
+        title: nccpi3soy
+      pctearthmc:
+        dtype: int16
+        nodata: -9999.0
+        title: pctearthmc
+      pwsl1pomu:
+        dtype: int16
+        nodata: -9999.0
+        title: pwsl1pomu
+      rootznaws:
+        dtype: int16
+        nodata: -9999.0
+        title: rootznaws
+      rootznemc:
+        dtype: int16
+        nodata: -9999.0
+        title: rootznemc
+      soc0_100:
+        dtype: float32
+        nodata: -9999.0
+        title: soc0_100
+      soc0_150:
+        dtype: float32
+        nodata: -9999.0
+        title: soc0_150
+      soc0_20:
+        dtype: float32
+        nodata: -9999.0
+        title: soc0_20
+      soc0_30:
+        dtype: float32
+        nodata: -9999.0
+        title: soc0_30
+      soc0_5:
+        dtype: float32
+        nodata: -9999.0
+        title: soc0_5
+      soc0_999:
+        dtype: float32
+        nodata: -9999.0
+        title: soc0_999
+      soc100_150:
+        dtype: float32
+        nodata: -9999.0
+        title: soc100_150
+      soc150_999:
+        dtype: float32
+        nodata: -9999.0
+        title: soc150_999
+      soc20_50:
+        dtype: float32
+        nodata: -9999.0
+        title: soc20_50
+      soc50_100:
+        dtype: float32
+        nodata: -9999.0
+        title: soc50_100
+      soc5_20:
+        dtype: float32
+        nodata: -9999.0
+        title: soc5_20
+      tk0_100a:
+        dtype: float32
+        nodata: 2147483647.0
+        title: tk0_100a
+      tk0_100s:
+        dtype: float32
+        nodata: -9999.0
+        title: tk0_100s
+      tk0_150a:
+        dtype: float32
+        nodata: 2147483647.0
+        title: tk0_150a
+      tk0_150s:
+        dtype: float32
+        nodata: -9999.0
+        title: tk0_150s
+      tk0_20a:
+        dtype: float32
+        nodata: 2147483647.0
+        title: tk0_20a
+      tk0_20s:
+        dtype: float32
+        nodata: -9999.0
+        title: tk0_20s
+      tk0_30a:
+        dtype: float32
+        nodata: 2147483647.0
+        title: tk0_30a
+      tk0_30s:
+        dtype: float32
+        nodata: -9999.0
+        title: tk0_30s
+      tk0_5a:
+        dtype: float32
+        nodata: 2147483647.0
+        title: tk0_5a
+      tk0_5s:
+        dtype: float32
+        nodata: -9999.0
+        title: tk0_5s
+      tk0_999a:
+        dtype: float32
+        nodata: 2147483647.0
+        title: tk0_999a
+      tk0_999s:
+        dtype: float32
+        nodata: -9999.0
+        title: tk0_999s
+      tk100_150a:
+        dtype: float32
+        nodata: 2147483647.0
+        title: tk100_150a
+      tk100_150s:
+        dtype: float32
+        nodata: -9999.0
+        title: tk100_150s
+      tk150_999a:
+        dtype: float32
+        nodata: 2147483647.0
+        title: tk150_999a
+      tk150_999s:
+        dtype: float32
+        nodata: -9999.0
+        title: tk150_999s
+      tk20_50a:
+        dtype: float32
+        nodata: 2147483647.0
+        title: tk20_50a
+      tk20_50s:
+        dtype: float32
+        nodata: -9999.0
+        title: tk20_50s
+      tk50_100a:
+        dtype: float32
+        nodata: 2147483647.0
+        title: tk50_100a
+      tk50_100s:
+        dtype: float32
+        nodata: -9999.0
+        title: tk50_100s
+      tk5_20a:
+        dtype: float32
+        nodata: 2147483647.0
+        title: tk5_20a
+      tk5_20s:
+        dtype: float32
+        nodata: -9999.0
+        title: tk5_20s
+    collection_id: gnatsgo-rasters
+    default_assets:
+    - mukey
+    - aws0_5
+    - soc0_5
+    - tk0_5a
+    endpoint: planetary-computer
+  planetary-computer/goes-cmi:
+    assets:
+      C01_1km:
+        common_name: blue
+        title: Cloud and Moisture Imagery reflectance factor - Band 01 (full resolution)
+      C01_2km:
+        common_name: blue
+        title: Cloud and Moisture Imagery reflectance factor - Band 01
+      C01_2km_wm:
+        common_name: blue
+        title: Cloud and Moisture Imagery reflectance factor - Band 01, Web Mercator
+      C01_DQF_1km:
+        title: Cloud and Moisture Imagery data quality flags - Band 01 (full resolution)
+      C01_DQF_2km:
+        title: Cloud and Moisture Imagery data quality flags - Band 01
+      C02_0.5km:
+        common_name: red
+        title: Cloud and Moisture Imagery reflectance factor - Band 02 (full resolution)
+      C02_2km:
+        common_name: red
+        title: Cloud and Moisture Imagery reflectance factor - Band 02
+      C02_2km_wm:
+        common_name: red
+        title: Cloud and Moisture Imagery reflectance factor - Band 02, Web Mercator
+      C02_DQF_0.5km:
+        title: Cloud and Moisture Imagery data quality flags - Band 02 (full resolution)
+      C02_DQF_2km:
+        title: Cloud and Moisture Imagery data quality flags - Band 02
+      C03_1km:
+        common_name: nir09
+        title: Cloud and Moisture Imagery reflectance factor - Band 03 (full resolution)
+      C03_2km:
+        common_name: nir09
+        title: Cloud and Moisture Imagery reflectance factor - Band 03
+      C03_2km_wm:
+        common_name: nir09
+        title: Cloud and Moisture Imagery reflectance factor - Band 03, Web Mercator
+      C03_DQF_1km:
+        title: Cloud and Moisture Imagery data quality flags - Band 03 (full resolution)
+      C03_DQF_2km:
+        title: Cloud and Moisture Imagery data quality flags - Band 03
+      C04_2km:
+        common_name: cirrus
+        title: Cloud and Moisture Imagery reflectance factor - Band 04
+      C04_DQF_2km:
+        title: Cloud and Moisture Imagery data quality flags - Band 04
+      C05_1km:
+        common_name: swir16
+        title: Cloud and Moisture Imagery reflectance factor - Band 05 (full resolution)
+      C05_2km:
+        common_name: swir16
+        title: Cloud and Moisture Imagery reflectance factor - Band 05
+      C05_DQF_1km:
+        title: Cloud and Moisture Imagery data quality flags - Band 05 (full resolution)
+      C05_DQF_2km:
+        title: Cloud and Moisture Imagery data quality flags - Band 05
+      C06_2km:
+        common_name: swir22
+        title: Cloud and Moisture Imagery reflectance factor - Band 06
+      C06_DQF_2km:
+        title: Cloud and Moisture Imagery data quality flags - Band 06
+      C07_2km:
+        title: Cloud and Moisture Imagery brightness temperature at top of atmosphere
+          - Band 07
+      C07_DQF_2km:
+        title: Cloud and Moisture Imagery data quality flags - Band 07
+      C08_2km:
+        title: Cloud and Moisture Imagery brightness temperature at top of atmosphere
+          - Band 08
+      C08_DQF_2km:
+        title: Cloud and Moisture Imagery data quality flags - Band 08
+      C09_2km:
+        title: Cloud and Moisture Imagery brightness temperature at top of atmosphere
+          - Band 09
+      C09_DQF_2km:
+        title: Cloud and Moisture Imagery data quality flags - Band 09
+      C10_2km:
+        title: Cloud and Moisture Imagery brightness temperature at top of atmosphere
+          - Band 10
+      C10_DQF_2km:
+        title: Cloud and Moisture Imagery data quality flags - Band 10
+      C11_2km:
+        title: Cloud and Moisture Imagery brightness temperature at top of atmosphere
+          - Band 11
+      C11_DQF_2km:
+        title: Cloud and Moisture Imagery data quality flags - Band 11
+      C12_2km:
+        title: Cloud and Moisture Imagery brightness temperature at top of atmosphere
+          - Band 12
+      C12_DQF_2km:
+        title: Cloud and Moisture Imagery data quality flags - Band 12
+      C13_2km:
+        title: Cloud and Moisture Imagery brightness temperature at top of atmosphere
+          - Band 13
+      C13_DQF_2km:
+        title: Cloud and Moisture Imagery data quality flags - Band 13
+      C14_2km:
+        title: Cloud and Moisture Imagery brightness temperature at top of atmosphere
+          - Band 14
+      C14_DQF_2km:
+        title: Cloud and Moisture Imagery data quality flags - Band 14
+      C15_2km:
+        title: Cloud and Moisture Imagery brightness temperature at top of atmosphere
+          - Band 15
+      C15_DQF_2km:
+        title: Cloud and Moisture Imagery data quality flags - Band 15
+      C16_2km:
+        title: Cloud and Moisture Imagery brightness temperature at top of atmosphere
+          - Band 16
+      C16_DQF_2km:
+        title: Cloud and Moisture Imagery data quality flags - Band 16
+    collection_id: goes-cmi
+    default_assets:
+    - C01_1km
+    - C01_2km
+    - C01_2km_wm
+    - C01_DQF_1km
+    endpoint: planetary-computer
+  planetary-computer/hgb:
+    assets:
+      aboveground:
+        title: Global above-ground biomass
+      aboveground_uncertainty:
+        title: Uncertainty associated with global above-ground biomass
+      belowground:
+        title: Global below-ground biomass
+      belowground_uncertainty:
+        title: Uncertainty associated with global below-ground biomass
+    collection_id: hgb
+    default_assets:
+    - aboveground
+    - belowground
+    endpoint: planetary-computer
+  planetary-computer/hls2-l30:
+    assets:
+      B01:
+        common_name: coastal
+        title: Coastal Aerosol
+      B02:
+        common_name: blue
+        title: Blue
+      B03:
+        common_name: green
+        title: Green
+      B04:
+        common_name: red
+        title: Red
+      B05:
+        common_name: nir
+        title: NIR Narrow
+      B06:
+        common_name: swir16
+        title: SWIR 1
+      B07:
+        common_name: swir22
+        title: SWIR 2
+      B09:
+        common_name: cirrus
+        title: Cirrus
+      B10:
+        common_name: lwir11
+        title: Thermal Infrared 1
+      B11:
+        common_name: lwir12
+        title: Thermal Infrared 2
+      Fmask:
+        title: Fmask
+      SAA:
+        title: SAA
+      SZA:
+        title: SZA
+      VAA:
+        title: VAA
+      VZA:
+        title: VZA
+    collection_id: hls2-l30
+    default_assets:
+    - B04
+    - B03
+    - B02
+    - B05
+    endpoint: planetary-computer
+  planetary-computer/hls2-s30:
+    assets:
+      B01:
+        common_name: coastal
+        title: Coastal Aerosol
+      B02:
+        common_name: blue
+        title: Blue
+      B03:
+        common_name: green
+        title: Green
+      B04:
+        common_name: red
+        title: Red
+      B05:
+        title: Red-Edge 1
+      B06:
+        title: Red-Edge 2
+      B07:
+        title: Red-Edge 3
+      B08:
+        common_name: nir
+        title: NIR Broad
+      B09:
+        title: Water Vapor
+      B10:
+        common_name: cirrus
+        title: Cirrus
+      B11:
+        common_name: swir16
+        title: SWIR 1
+      B12:
+        common_name: swir22
+        title: SWIR 2
+      B8A:
+        title: NIR Narrow
+      Fmask:
+        title: Fmask
+      SAA:
+        title: SAA
+      SZA:
+        title: SZA
+      VAA:
+        title: VAA
+      VZA:
+        title: VZA
+    collection_id: hls2-s30
+    default_assets:
+    - B04
+    - B03
+    - B02
+    - B08
+    endpoint: planetary-computer
+  planetary-computer/hrea:
+    assets:
+      estimated-brightness:
+        title: Estimated brightness levels
+      light-composite:
+        title: Nighttime light annual composite
+      lightscore:
+        title: Probability of electrification
+      night-proportion:
+        title: Proportion of nights a settlement is brighter than uninhabited areas
+    collection_id: hrea
+    default_assets:
+    - lightscore
+    - light-composite
+    - night-proportion
+    - estimated-brightness
+    endpoint: planetary-computer
+  planetary-computer/io-biodiversity:
+    assets:
+      data:
+        dtype: float32
+        title: Biodiversity Intactness
+    collection_id: io-biodiversity
+    default_assets:
+    - data
+    endpoint: planetary-computer
+  planetary-computer/io-lulc:
+    assets:
+      data:
+        nodata: 0
+    collection_id: io-lulc
+    default_assets:
+    - data
+    endpoint: planetary-computer
+  planetary-computer/io-lulc-9-class:
+    assets:
+      data:
+        nodata: 0
+    collection_id: io-lulc-9-class
+    default_assets:
+    - data
+    endpoint: planetary-computer
+  planetary-computer/io-lulc-annual-v02:
+    assets:
+      data:
+        nodata: 0
+    collection_id: io-lulc-annual-v02
+    default_assets:
+    - data
+    endpoint: planetary-computer
+  planetary-computer/jrc-gsw:
+    assets:
+      change:
+        title: Water Occurrence Change
+      extent:
+        title: Maximum Water Extent
+      occurrence:
+        title: Water Occurrence
+      recurrence:
+        title: Water Recurrence
+      seasonality:
+        title: Water Seasonality
+      transitions:
+        title: Water Transitions
+    collection_id: jrc-gsw
+    default_assets:
+    - change
+    - extent
+    - occurrence
+    - recurrence
+    endpoint: planetary-computer
+  planetary-computer/landsat-c2-l1:
+    assets:
+      green:
+        common_name: green
+        dtype: uint8
+        nodata: 0
+        title: Green Band
+      nir08:
+        common_name: nir08
+        dtype: uint8
+        nodata: 0
+        title: Near Infrared Band 0.8
+      nir09:
+        common_name: nir09
+        dtype: uint8
+        nodata: 0
+        title: Near Infrared Band 0.9
+      qa_pixel:
+        dtype: uint16
+        nodata: 1
+        title: Pixel Quality Assessment Band
+      qa_radsat:
+        dtype: uint16
+        title: Radiometric Saturation and Dropped Pixel Quality Assessment Band
+      red:
+        common_name: red
+        dtype: uint8
+        nodata: 0
+        title: Red Band
+    collection_id: landsat-c2-l1
+    default_assets:
+    - red
+    - green
+    - nir08
+    endpoint: planetary-computer
+  planetary-computer/mobi:
+    assets:
+      PWRSR_GAP12_SUM_All:
+        title: PWRSR_GAP12_SUM_All
+      PWRSR_GAP12_SUM_AquaticInverts:
+        title: PWRSR_GAP12_SUM_AquaticInverts
+      PWRSR_GAP12_SUM_Plants:
+        title: PWRSR_GAP12_SUM_Plants
+      PWRSR_GAP12_SUM_PollinatorInverts:
+        title: PWRSR_GAP12_SUM_PollinatorInverts
+      PWRSR_GAP12_SUM_Vertebrates:
+        title: PWRSR_GAP12_SUM_Vertebrates
+      RSR_All:
+        title: RSR_All
+      RSR_AquaticInverts:
+        title: RSR_AquaticInverts
+      RSR_Plants:
+        title: RSR_Plants
+      RSR_PollinatorInverts:
+        title: RSR_PollinatorInverts
+      RSR_Vertebrates:
+        title: RSR_Vertebrates
+      SpeciesRichness_All:
+        title: SpeciesRichness_All
+      SpeciesRichness_AquaticInverts:
+        title: SpeciesRichness_AquaticInverts
+      SpeciesRichness_Plants:
+        title: SpeciesRichness_Plants
+      SpeciesRichness_PollinatorInverts:
+        title: SpeciesRichness_PollinatorInverts
+      SpeciesRichness_Vertebrates:
+        title: SpeciesRichness_Vertebrates
+    collection_id: mobi
+    default_assets:
+    - RSR_All
+    - RSR_Plants
+    - RSR_Vertebrates
+    - RSR_AquaticInverts
+    endpoint: planetary-computer
+  planetary-computer/modis-09A1-061:
+    assets:
+      sur_refl_b01:
+        common_name: red
+        dtype: int16
+        title: Surface Reflectance Band 1 (620-670 nm)
+      sur_refl_b02:
+        common_name: nir08
+        dtype: int16
+        title: Surface Reflectance Band 2 (841-876 nm)
+      sur_refl_b03:
+        common_name: blue
+        dtype: int16
+        title: Surface Reflectance Band 3 (459-479 nm)
+      sur_refl_b04:
+        common_name: green
+        dtype: int16
+        title: Surface Reflectance Band 4 (545-565 nm)
+      sur_refl_b05:
+        common_name: lwir12
+        dtype: int16
+        title: Surface Reflectance Band 5 (1230-1250 nm)
+      sur_refl_b06:
+        common_name: swir16
+        dtype: int16
+        title: Surface Reflectance Band 6 (1628-1652 nm)
+      sur_refl_b07:
+        common_name: swir22
+        dtype: int16
+        title: Surface Reflectance Band 7 (2105-2155 nm)
+      sur_refl_day_of_year:
+        dtype: uint16
+        title: Day of the year for the pixel
+      sur_refl_qc_500m:
+        dtype: uint32
+        title: Surface reflectance 500m band quality control flags
+      sur_refl_raz:
+        dtype: int16
+        title: MODIS relative azimuth angle
+      sur_refl_state_500m:
+        dtype: uint16
+        title: Surface reflectance 500m state flags
+      sur_refl_szen:
+        dtype: int16
+        title: MODIS solar zenith angle
+      sur_refl_vzen:
+        dtype: int16
+        title: MODIS view zenith angle
+    collection_id: modis-09A1-061
+    default_assets:
+    - sur_refl_b01
+    - sur_refl_b04
+    - sur_refl_b03
+    endpoint: planetary-computer
+  planetary-computer/modis-09Q1-061:
+    assets:
+      sur_refl_b01:
+        common_name: red
+        dtype: int16
+        title: Surface Reflectance Band 1 (620-670 nm)
+      sur_refl_b02:
+        common_name: nir08
+        dtype: int16
+        title: Surface Reflectance Band 2 (841-876 nm)
+      sur_refl_qc_250m:
+        dtype: uint16
+        title: Surface Reflectance 250m Band Quality Control flags
+      sur_refl_state_250m:
+        dtype: uint16
+        title: Surface Reflectance 250m State flags
+    collection_id: modis-09Q1-061
+    default_assets:
+    - sur_refl_b01
+    - sur_refl_b02
+    - sur_refl_qc_250m
+    - sur_refl_state_250m
+    endpoint: planetary-computer
+  planetary-computer/modis-10A1-061:
+    assets:
+      NDSI:
+        dtype: int16
+        title: Raw NDSI values (i.e. prior to screening).
+      NDSI_Snow_Cover:
+        dtype: uint8
+        title: Gridded NDSI snow cover and data flag values.
+      NDSI_Snow_Cover_Algorithm_Flags_QA:
+        dtype: uint8
+        title: Algorithm-specific bit flags set for data screens and for inland water.
+      NDSI_Snow_Cover_Basic_QA:
+        dtype: uint8
+        title: A general estimate of the quality of the algorithm result.
+      Snow_Albedo_Daily_Tile:
+        dtype: uint8
+        title: Daily snow albedo corresponding to the NDSI_Snow_Cover parameter.
+      granule_pnt:
+        dtype: uint8
+        title: Pointer for identifying the swath mapped into each grid cell.
+      orbit_pnt:
+        dtype: uint8
+        title: Pointer to the orbit of the swath mapped into each grid cell.
+    collection_id: modis-10A1-061
+    default_assets:
+    - NDSI
+    - granule_pnt
+    - orbit_pnt
+    endpoint: planetary-computer
+  planetary-computer/modis-10A2-061:
+    assets:
+      Eight_Day_Snow_Cover:
+        dtype: uint8
+        title: Snow chronology bit flags for each day in the eight-day observation
+          period.
+      Maximum_Snow_Extent:
+        dtype: uint8
+        title: Maximum snow extent over the 8-day period.
+    collection_id: modis-10A2-061
+    default_assets:
+    - Eight_Day_Snow_Cover
+    - Maximum_Snow_Extent
+    endpoint: planetary-computer
+  planetary-computer/modis-11A1-061:
+    assets:
+      Clear_day_cov:
+        dtype: uint16
+        title: Day clear-sky coverage
+      Clear_night_cov:
+        dtype: uint16
+        title: Night clear-sky coverage
+      Day_view_angl:
+        dtype: uint8
+        title: View zenith angle of daytime Landsurface Temperature
+      Day_view_time:
+        dtype: uint8
+        title: (local solar) Time of daytime Land-surface Temperature observation
+      Emis_31:
+        dtype: uint8
+        title: Band 31 emissivity
+      Emis_32:
+        dtype: uint8
+        title: Band 32 emissivity
+      LST_Day_1km:
+        dtype: uint16
+        title: Daily daytime 1km grid Land-surface Temperature
+      LST_Night_1km:
+        dtype: uint16
+        title: Daily nighttime 1km grid Land-surface Temperature
+      Night_view_angl:
+        dtype: uint8
+        title: View zenith angle of nighttime Landsurface Temperature
+      Night_view_time:
+        dtype: uint8
+        title: (local solar) Time of nighttime Landsurface Temperature observation
+      QC_Day:
+        dtype: uint8
+        title: Quality control for daytime LST and emissivity
+      QC_Night:
+        dtype: uint8
+        title: Quality control for nighttime LST and emissivity
+    collection_id: modis-11A1-061
+    default_assets:
+    - Clear_day_cov
+    - Clear_night_cov
+    - Day_view_angl
+    - Day_view_time
+    endpoint: planetary-computer
+  planetary-computer/modis-11A2-061:
+    assets:
+      Clear_sky_days:
+        dtype: uint8
+        title: the days in clear-sky conditions and with validate LSTs
+      Clear_sky_nights:
+        dtype: uint8
+        title: the nights in clear-sky conditions and with validate LSTs
+      Day_view_angl:
+        dtype: uint8
+        title: Average view zenith angle of daytime Land-surface Temperature
+      Day_view_time:
+        dtype: uint8
+        title: Average time of daytime Landsurface Temperature observation
+      Emis_31:
+        dtype: uint8
+        title: Band 31 emissivity
+      Emis_32:
+        dtype: uint8
+        title: Band 32 emissivity
+      LST_Day_1km:
+        dtype: uint16
+        title: 8-day daytime 1km grid Landsurface Temperature
+      LST_Night_1km:
+        dtype: uint16
+        title: 8-day nighttime 1km grid Landsurface Temperature
+      Night_view_angl:
+        dtype: uint8
+        title: 'View zenith angle of nighttime Land-surface Temperature '
+      Night_view_time:
+        dtype: uint8
+        title: Average view zenith angle of nighttime Land-surface Temperature
+      QC_Day:
+        dtype: uint8
+        title: Quality control for daytime LST and emissivity
+      QC_Night:
+        dtype: uint8
+        title: Quality control for nighttime LST and emissivity
+    collection_id: modis-11A2-061
+    default_assets:
+    - Clear_sky_days
+    - Clear_sky_nights
+    - Day_view_angl
+    - Day_view_time
+    endpoint: planetary-computer
+  planetary-computer/modis-13A1-061:
+    assets:
+      500m_16_days_EVI:
+        dtype: int16
+        title: 500m 16 days EVI
+      500m_16_days_MIR_reflectance:
+        dtype: int16
+        title: Surface Reflectance Band 7
+      500m_16_days_NDVI:
+        dtype: int16
+        title: 500m 16 days NDVI
+      500m_16_days_NIR_reflectance:
+        dtype: int16
+        title: Surface Reflectance Band 2
+      500m_16_days_VI_Quality:
+        dtype: uint16
+        title: VI quality indicators
+      500m_16_days_blue_reflectance:
+        dtype: int16
+        title: Surface Reflectance Band 3
+      500m_16_days_composite_day_of_the_year:
+        dtype: int16
+        title: Day of year VI pixel
+      500m_16_days_pixel_reliability:
+        dtype: int8
+        title: Quality reliability of VI pixel
+      500m_16_days_red_reflectance:
+        dtype: int16
+        title: Surface Reflectance Band 1
+      500m_16_days_relative_azimuth_angle:
+        dtype: int16
+        title: Relative azimuth angle of VI pixel
+      500m_16_days_sun_zenith_angle:
+        dtype: int16
+        title: Sun zenith angle of VI pixel
+      500m_16_days_view_zenith_angle:
+        dtype: int16
+        title: View zenith angle of VI Pixel
+    collection_id: modis-13A1-061
+    default_assets:
+    - 500m_16_days_EVI
+    - 500m_16_days_MIR_reflectance
+    - 500m_16_days_NDVI
+    - 500m_16_days_NIR_reflectance
+    endpoint: planetary-computer
+  planetary-computer/modis-13Q1-061:
+    assets:
+      250m_16_days_EVI:
+        dtype: int16
+        title: 16 day EVI
+      250m_16_days_MIR_reflectance:
+        dtype: int16
+        title: Surface Reflectance Band 7
+      250m_16_days_NDVI:
+        dtype: int16
+        title: 16 day NDVI
+      250m_16_days_NIR_reflectance:
+        dtype: int16
+        title: Surface Reflectance Band 2
+      250m_16_days_VI_Quality:
+        dtype: uint16
+        title: VI quality indicators
+      250m_16_days_blue_reflectance:
+        dtype: int16
+        title: Surface Reflectance Band 3
+      250m_16_days_composite_day_of_the_year:
+        dtype: int16
+        title: Day of year VI pixel
+      250m_16_days_pixel_reliability:
+        dtype: int8
+        title: Quality reliability of VI pixel
+      250m_16_days_red_reflectance:
+        dtype: int16
+        title: Surface Reflectance Band 1
+      250m_16_days_relative_azimuth_angle:
+        dtype: int16
+        title: Relative azimuth angle of VI pixel
+      250m_16_days_sun_zenith_angle:
+        dtype: int16
+        title: Sun zenith angle of VI pixel
+      250m_16_days_view_zenith_angle:
+        dtype: int16
+        title: View zenith angle of VI Pixel
+    collection_id: modis-13Q1-061
+    default_assets:
+    - 250m_16_days_EVI
+    - 250m_16_days_MIR_reflectance
+    - 250m_16_days_NDVI
+    - 250m_16_days_NIR_reflectance
+    endpoint: planetary-computer
+  planetary-computer/modis-14A1-061:
+    assets:
+      FireMask:
+        dtype: uint8
+        title: Confidence of fire
+      MaxFRP:
+        dtype: uint32
+        title: Maximum Fire Radiative Power
+      QA:
+        dtype: uint8
+        title: Pixel quality indicators
+      sample:
+        dtype: uint16
+        title: Position of fire pixel within scan
+    collection_id: modis-14A1-061
+    default_assets:
+    - MaxFRP
+    - sample
+    endpoint: planetary-computer
+  planetary-computer/modis-14A2-061:
+    assets:
+      FireMask:
+        dtype: uint8
+        title: Confidence of fire
+      QA:
+        dtype: uint8
+        title: Pixel quality indicators
+    collection_id: modis-14A2-061
+    default_assets:
+    - FireMask
+    - QA
+    endpoint: planetary-computer
+  planetary-computer/modis-15A2H-061:
+    assets:
+      FparExtra_QC:
+        dtype: uint8
+        title: Extra detail Quality for FPAR and LAI
+      FparLai_QC:
+        dtype: uint8
+        title: Quality for FPAR and LAI
+      FparStdDev_500m:
+        dtype: uint8
+        title: Standard deviation of FPAR
+      Fpar_500m:
+        dtype: uint8
+        title: Fraction of Photosynthetically Active Radiation
+      LaiStdDev_500m:
+        dtype: uint8
+        title: Standard deviation of LAI
+      Lai_500m:
+        dtype: uint8
+        title: Leaf Area Index
+    collection_id: modis-15A2H-061
+    default_assets:
+    - FparExtra_QC
+    - FparLai_QC
+    - FparStdDev_500m
+    - Fpar_500m
+    endpoint: planetary-computer
+  planetary-computer/modis-15A3H-061:
+    assets:
+      FparExtra_QC:
+        dtype: uint8
+        title: Extra detail Quality for FPAR and LAI
+      FparLai_QC:
+        dtype: uint8
+        title: Quality for FPAR and LAI
+      FparStdDev_500m:
+        dtype: uint8
+        title: Standard deviation of FPAR
+      Fpar_500m:
+        dtype: uint8
+        title: Fraction of Photosynthetically Active Radiation
+      LaiStdDev_500m:
+        dtype: uint8
+        title: Standard deviation of LAI
+      Lai_500m:
+        dtype: uint8
+        title: Leaf Area Index
+    collection_id: modis-15A3H-061
+    default_assets:
+    - FparExtra_QC
+    - FparLai_QC
+    - FparStdDev_500m
+    - Fpar_500m
+    endpoint: planetary-computer
+  planetary-computer/modis-16A3GF-061:
+    assets:
+      ET_500m:
+        dtype: uint16
+        title: Total of Evapotranspiration
+      ET_QC_500m:
+        dtype: uint8
+        title: Evapotranspiration Quality Assessment
+      LE_500m:
+        dtype: int16
+        title: Average of Latent Heat Flux
+      PET_500m:
+        dtype: uint16
+        title: Total Potential Evapotranspiration
+      PLE_500m:
+        dtype: int16
+        title: Average of Potential Latent Heat Flux
+    collection_id: modis-16A3GF-061
+    default_assets:
+    - ET_500m
+    - ET_QC_500m
+    - LE_500m
+    - PET_500m
+    endpoint: planetary-computer
+  planetary-computer/modis-17A2H-061:
+    assets:
+      Gpp_500m:
+        dtype: int16
+        title: Gross Primary Productivity
+      PsnNet_500m:
+        dtype: int16
+        title: Net Photosynthesis
+      Psn_QC_500m:
+        dtype: uint8
+        title: Quality control indicators
+    collection_id: modis-17A2H-061
+    default_assets:
+    - Gpp_500m
+    - PsnNet_500m
+    - Psn_QC_500m
+    endpoint: planetary-computer
+  planetary-computer/modis-17A2HGF-061:
+    assets:
+      Gpp_500m:
+        dtype: int16
+        title: Gross Primary Productivity
+      PsnNet_500m:
+        dtype: int16
+        title: Net Photosynthesis
+      Psn_QC_500m:
+        dtype: uint8
+        title: Quality control indicators
+    collection_id: modis-17A2HGF-061
+    default_assets:
+    - Gpp_500m
+    - PsnNet_500m
+    - Psn_QC_500m
+    endpoint: planetary-computer
+  planetary-computer/modis-17A3HGF-061:
+    assets:
+      Gpp_500m:
+        dtype: uint16
+        title: Gross Primary Productivity
+      Npp_500m:
+        dtype: int16
+        title: Net Primary Productivity
+      Npp_QC_500m:
+        dtype: uint8
+        title: Quality control
+    collection_id: modis-17A3HGF-061
+    default_assets:
+    - Gpp_500m
+    - Npp_500m
+    - Npp_QC_500m
+    endpoint: planetary-computer
+  planetary-computer/modis-21A2-061:
+    assets:
+      Emis_29:
+        dtype: uint8
+        title: Average Day/Night Band 29 emissivity
+      Emis_31:
+        dtype: uint8
+        title: Average Day/Night Band 31 emissivity
+      Emis_32:
+        dtype: uint8
+        title: Average Day/Night Band 32 emissivity
+      LST_Day_1KM:
+        dtype: uint16
+        title: Day Land Surface Temperature
+      LST_Night_1KM:
+        dtype: uint16
+        title: Night Land Surface Temperature
+      QC_Day:
+        dtype: uint8
+        title: Day Quality Control
+      QC_Night:
+        dtype: uint8
+        title: Night Quality Control
+      View_Angle_Day:
+        dtype: uint8
+        title: Day view zenith angle
+      View_Angle_Night:
+        dtype: uint8
+        title: Night view zenith angle
+      View_Time_Day:
+        dtype: uint8
+        title: Day Time of Observation
+      View_Time_Night:
+        dtype: uint8
+        title: Night Time of Observation
+    collection_id: modis-21A2-061
+    default_assets:
+    - LST_Day_1KM
+    - LST_Night_1KM
+    - QC_Day
+    - QC_Night
+    endpoint: planetary-computer
+  planetary-computer/modis-43A4-061:
+    assets:
+      BRDF_Albedo_Band_Mandatory_Quality_Band1:
+        dtype: uint8
+        title: BRDF Albedo Mandatory Quality for Band 1
+      BRDF_Albedo_Band_Mandatory_Quality_Band2:
+        dtype: uint8
+        title: BRDF Albedo Mandatory Quality for Band 2
+      BRDF_Albedo_Band_Mandatory_Quality_Band3:
+        dtype: uint8
+        title: BRDF Albedo Mandatory Quality for Band 3
+      BRDF_Albedo_Band_Mandatory_Quality_Band4:
+        dtype: uint8
+        title: BRDF Albedo Mandatory Quality for Band 4
+      BRDF_Albedo_Band_Mandatory_Quality_Band5:
+        dtype: uint8
+        title: BRDF Albedo Mandatory Quality for Band 5
+      BRDF_Albedo_Band_Mandatory_Quality_Band6:
+        dtype: uint8
+        title: BRDF Albedo Mandatory Quality for Band 6
+      BRDF_Albedo_Band_Mandatory_Quality_Band7:
+        dtype: uint8
+        title: BRDF Albedo Mandatory Quality for Band 7
+      Nadir_Reflectance_Band1:
+        common_name: red
+        dtype: int16
+        title: NBAR at local solar noon for Band 1
+      Nadir_Reflectance_Band2:
+        common_name: nir08
+        dtype: int16
+        title: NBAR at local solar noon for Band 2
+      Nadir_Reflectance_Band3:
+        common_name: blue
+        dtype: int16
+        title: NBAR at local solar noon for Band 3
+      Nadir_Reflectance_Band4:
+        common_name: green
+        dtype: int16
+        title: NBAR at local solar noon for Band 4
+      Nadir_Reflectance_Band5:
+        common_name: lwir12
+        dtype: int16
+        title: NBAR at local solar noon for Band 5
+      Nadir_Reflectance_Band6:
+        common_name: swir16
+        dtype: int16
+        title: NBAR at local solar noon for Band 6
+      Nadir_Reflectance_Band7:
+        common_name: swir22
+        dtype: int16
+        title: NBAR at local solar noon for Band 7
+    collection_id: modis-43A4-061
+    default_assets:
+    - Nadir_Reflectance_Band1
+    - Nadir_Reflectance_Band4
+    - Nadir_Reflectance_Band3
+    endpoint: planetary-computer
+  planetary-computer/modis-64A1-061:
+    assets:
+      Burn_Date:
+        dtype: int16
+        title: Burn day of year
+      Burn_Date_Uncertainty:
+        dtype: uint8
+        title: Estimated uncertainty in burn day
+      First_Day:
+        dtype: int16
+        title: First day of the year of reliable change detection
+      Last_Day:
+        dtype: int16
+        title: Last day of the year of reliable change detection
+      QA:
+        dtype: uint8
+        title: Quality Assurance Indicators
+    collection_id: modis-64A1-061
+    default_assets:
+    - First_Day
+    - Last_Day
+    endpoint: planetary-computer
+  planetary-computer/mtbs:
+    assets:
+      burn-severity:
+        title: Burn severity
+    collection_id: mtbs
+    default_assets:
+    - burn-severity
+    endpoint: planetary-computer
+  planetary-computer/naip:
+    assets:
+      image:
+        common_name: red
+        title: RGBIR COG tile
+    collection_id: naip
+    default_assets:
+    - image
+    endpoint: planetary-computer
+  planetary-computer/nasadem:
+    assets:
+      elevation:
+        title: Elevation
+    collection_id: nasadem
+    default_assets:
+    - elevation
+    endpoint: planetary-computer
+  planetary-computer/noaa-c-cap:
+    assets:
+      data:
+        dtype: uint8
+    collection_id: noaa-c-cap
+    default_assets:
+    - data
+    endpoint: planetary-computer
+  planetary-computer/noaa-cdr-ocean-heat-content:
+    assets:
+      heat_content:
+        dtype: float32
+        nodata: nan
+        title: Ocean Heat Content anomalies from WOA09
+      mean_halosteric_sea_level:
+        dtype: float32
+        nodata: nan
+        title: Mean halosteric sea level anomalies from WOA09
+      mean_salinity:
+        dtype: float32
+        nodata: nan
+        title: Mean salinity anomalies from WOA09
+      mean_temperature:
+        dtype: float32
+        nodata: nan
+        title: Mean temperature anomalies from WOA09
+      mean_thermosteric_sea_level:
+        dtype: float32
+        nodata: nan
+        title: Mean thermosteric sea level anomalies from WOA09
+      mean_total_steric_sea_level:
+        dtype: float32
+        nodata: nan
+        title: Mean total steric sea level anomalies from WOA09
+    collection_id: noaa-cdr-ocean-heat-content
+    default_assets:
+    - heat_content
+    - mean_halosteric_sea_level
+    - mean_salinity
+    - mean_temperature
+    endpoint: planetary-computer
+  planetary-computer/noaa-cdr-sea-surface-temperature-optimum-interpolation:
+    assets:
+      anom:
+        dtype: int16
+        nodata: -999
+      err:
+        dtype: int16
+        nodata: -999
+      ice:
+        dtype: int16
+        nodata: -999
+      sst:
+        dtype: int16
+        nodata: -999
+    collection_id: noaa-cdr-sea-surface-temperature-optimum-interpolation
+    default_assets:
+    - anom
+    - err
+    - ice
+    - sst
+    endpoint: planetary-computer
+  planetary-computer/noaa-cdr-sea-surface-temperature-whoi:
+    assets:
+      fill_missing_qc:
+        dtype: float32
+        nodata: nan
+      sea_surface_temperature:
+        dtype: float32
+        nodata: nan
+    collection_id: noaa-cdr-sea-surface-temperature-whoi
+    default_assets:
+    - fill_missing_qc
+    - sea_surface_temperature
+    endpoint: planetary-computer
+  planetary-computer/noaa-climate-normals-gridded:
+    assets:
+      m2dprcp_norm:
+        dtype: float32
+        nodata: nan
+      prcp_flag:
+        dtype: float32
+        nodata: 0
+      prcp_max:
+        dtype: float32
+        nodata: nan
+      prcp_min:
+        dtype: float32
+        nodata: nan
+      prcp_norm:
+        dtype: float32
+        nodata: nan
+      prcp_std:
+        dtype: float32
+        nodata: nan
+      tavg_flag:
+        dtype: float32
+        nodata: 0
+      tavg_max:
+        dtype: float32
+        nodata: nan
+      tavg_min:
+        dtype: float32
+        nodata: nan
+      tavg_norm:
+        dtype: float32
+        nodata: nan
+      tavg_std:
+        dtype: float32
+        nodata: nan
+      tmax_flag:
+        dtype: float32
+        nodata: 0
+      tmax_max:
+        dtype: float32
+        nodata: nan
+      tmax_min:
+        dtype: float32
+        nodata: nan
+      tmax_norm:
+        dtype: float32
+        nodata: nan
+      tmax_std:
+        dtype: float32
+        nodata: nan
+      tmin_flag:
+        dtype: float32
+        nodata: 0
+      tmin_max:
+        dtype: float32
+        nodata: nan
+      tmin_min:
+        dtype: float32
+        nodata: nan
+      tmin_norm:
+        dtype: float32
+        nodata: nan
+      tmin_std:
+        dtype: float32
+        nodata: nan
+      y2dprcp_norm:
+        dtype: float32
+        nodata: nan
+    collection_id: noaa-climate-normals-gridded
+    default_assets:
+    - m2dprcp_norm
+    - prcp_flag
+    - prcp_max
+    - prcp_min
+    endpoint: planetary-computer
+  planetary-computer/noaa-mrms-qpe-1h-pass1:
+    assets:
+      cog:
+        dtype: float64
+        title: Processed Cloud Optimized GeoTIFF file
+    collection_id: noaa-mrms-qpe-1h-pass1
+    default_assets:
+    - cog
+    endpoint: planetary-computer
+  planetary-computer/noaa-mrms-qpe-1h-pass2:
+    assets:
+      cog:
+        dtype: float64
+        title: Processed Cloud Optimized GeoTIFF file
+    collection_id: noaa-mrms-qpe-1h-pass2
+    default_assets:
+    - cog
+    endpoint: planetary-computer
+  planetary-computer/noaa-mrms-qpe-24h-pass2:
+    assets:
+      cog:
+        dtype: float64
+        title: Processed Cloud Optimized GeoTIFF file
+    collection_id: noaa-mrms-qpe-24h-pass2
+    default_assets:
+    - cog
+    endpoint: planetary-computer
+  planetary-computer/noaa-nclimgrid-monthly:
+    assets:
+      prcp:
+        dtype: float32
+        nodata: nan
+        title: Monthly Precipitation (mm)
+      tavg:
+        dtype: float32
+        nodata: nan
+        title: Monthly Average Temperature (degree Celsius)
+      tmax:
+        dtype: float32
+        nodata: nan
+        title: Monthly Maximmum Temperature (degree Celsius)
+      tmin:
+        dtype: float32
+        nodata: nan
+        title: Monthly Minimum Temperature (degree Celsius)
+    collection_id: noaa-nclimgrid-monthly
+    default_assets:
+    - prcp
+    - tavg
+    - tmax
+    - tmin
+    endpoint: planetary-computer
+  planetary-computer/nrcan-landcover:
+    assets:
+      landcover:
+        dtype: uint8
+        nodata: 0
+        title: Land cover of Canada COG
+    collection_id: nrcan-landcover
+    default_assets:
+    - landcover
+    endpoint: planetary-computer
+  planetary-computer/planet-nicfi-analytic:
+    assets:
+      data:
+        common_name: blue
+        dtype: uint16
+    collection_id: planet-nicfi-analytic
+    default_assets:
+    - data
+    endpoint: planetary-computer
+  planetary-computer/planet-nicfi-visual:
+    assets:
+      data:
+        common_name: red
+        dtype: uint8
+    collection_id: planet-nicfi-visual
+    default_assets:
+    - data
+    endpoint: planetary-computer
+  planetary-computer/sentinel-1-grd:
+    assets:
+      hh:
+        title: 'HH: horizontal transmit, horizontal receive'
+      hv:
+        title: 'HV: horizontal transmit, vertical receive'
+    collection_id: sentinel-1-grd
+    default_assets:
+    - hh
+    - hv
+    endpoint: planetary-computer
+  planetary-computer/sentinel-1-rtc:
+    assets:
+      hh:
+        dtype: float32
+        nodata: -32768
+        title: 'HH: horizontal transmit, horizontal receive'
+      hv:
+        dtype: float32
+        nodata: -32768
+        title: 'HV: horizontal transmit, vertical receive'
+      vh:
+        dtype: float32
+        nodata: -32768
+        title: 'VH: vertical transmit, horizontal receive'
+      vv:
+        dtype: float32
+        nodata: -32768
+        title: 'VV: vertical transmit, vertical receive'
+    collection_id: sentinel-1-rtc
+    default_assets:
+    - vv
+    - vh
+    - hh
+    - hv
+    endpoint: planetary-computer
+  planetary-computer/usda-cdl:
+    assets:
+      confidence:
+        dtype: uint8
+        nodata: 0
+      corn:
+        dtype: uint8
+        nodata: 255
+      cotton:
+        dtype: uint8
+        nodata: 255
+      cropland:
+        dtype: uint8
+        nodata: 0
+      cultivated:
+        dtype: uint8
+        nodata: 0
+      soybeans:
+        dtype: uint8
+        nodata: 255
+      wheat:
+        dtype: uint8
+        nodata: 255
+    collection_id: usda-cdl
+    default_assets:
+    - confidence
+    - corn
+    - cotton
+    - cropland
+    endpoint: planetary-computer
+  planetary-computer/usgs-lcmap-conus-v13:
+    assets:
+      browse:
+        dtype: uint8
+        nodata: 0
+        title: USGS Browse Image
+      lcachg:
+        dtype: uint8
+        nodata: 0
+        title: Annual Land Cover Change
+      lcpconf:
+        dtype: uint8
+        nodata: 0
+        title: Primary Land Cover Confidence
+      lcpri:
+        dtype: uint8
+        nodata: 0
+        title: Primary Land Cover
+      lcsconf:
+        dtype: uint8
+        nodata: 0
+        title: Secondary Land Cover Confidence
+      lcsec:
+        dtype: uint8
+        nodata: 0
+        title: Secondary Land Cover
+      sclast:
+        dtype: uint16
+        title: Time Since Last Change
+      scmag:
+        dtype: float32
+        title: Change Magnitude
+      scmqa:
+        dtype: uint8
+        title: Model Quality
+      scstab:
+        dtype: uint16
+        title: Spectral Stability Period
+      sctime:
+        dtype: uint16
+        title: Time of Spectral Change
+    collection_id: usgs-lcmap-conus-v13
+    default_assets:
+    - browse
+    - lcachg
+    - lcpconf
+    - lcpri
+    endpoint: planetary-computer
+  planetary-computer/usgs-lcmap-hawaii-v10:
+    assets:
+      browse:
+        dtype: uint8
+        nodata: 0
+        title: USGS Browse Image
+      lcachg:
+        dtype: uint8
+        nodata: 0
+        title: Annual Land Cover Change
+      lcpconf:
+        dtype: uint8
+        nodata: 0
+        title: Primary Land Cover Confidence
+      lcpri:
+        dtype: uint8
+        nodata: 0
+        title: Primary Land Cover
+      lcsconf:
+        dtype: uint8
+        nodata: 0
+        title: Secondary Land Cover Confidence
+      lcsec:
+        dtype: uint8
+        nodata: 0
+        title: Secondary Land Cover
+      sclast:
+        dtype: uint16
+        title: Time Since Last Change
+      scmag:
+        dtype: float32
+        title: Change Magnitude
+      scmqa:
+        dtype: uint8
+        title: Model Quality
+      scstab:
+        dtype: uint16
+        title: Spectral Stability Period
+      sctime:
+        dtype: uint16
+        title: Time of Spectral Change
+    collection_id: usgs-lcmap-hawaii-v10
+    default_assets:
+    - browse
+    - lcachg
+    - lcpconf
+    - lcpri
+    endpoint: planetary-computer
+  sentinel-2-l2a:
+    aliases:
+      cdse: sentinel-2-l2a
+      earth-search: sentinel-2-c1-l2a
+    assets:
+      B02:
+        common_name: blue
+        dtype: uint16
+        nodata: 0
+        title: Blue (490 nm)
+      B03:
+        common_name: green
+        dtype: uint16
+        nodata: 0
+        title: Green (560 nm)
+      B04:
+        common_name: red
+        dtype: uint16
+        nodata: 0
+        title: Red (665 nm)
+      B08:
+        common_name: nir
+        dtype: uint16
+        nodata: 0
+        title: NIR (842 nm)
+    cadence: 5-day
+    collection_id: sentinel-2-l2a
+    default_assets:
+    - B02
+    - B03
+    - B04
+    - B08
+    endpoint: planetary-computer
+    extent:
+      bbox:
+      - -180.0
+      - -90.0
+      - 180.0
+      - 90.0
+      start_date: '2015-06-27'
+    resolution: 10.0

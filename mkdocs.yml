@@ -134,6 +134,24 @@ nav:
       - Service account setup: reference/gee/service-account-setup.md
       - Usage: reference/gee/usage.md
       - Reference: reference/gee/gee.md
+    - STAC (Sentinel / Landsat / cloud platforms):
+      - Introduction: reference/stac/introduction.md
+      - Usage: reference/stac/usage.md
+      - Authentication: reference/stac/authentication.md
+      - Reference: reference/stac/stac.md
+    - GDACS (disaster alerts):
+      - Introduction: reference/gdacs/introduction.md
+      - Usage: reference/gdacs/usage.md
+      - Reference: reference/gdacs/gdacs.md
+    - OpenAQ (air quality):
+      - Introduction: reference/openaq/introduction.md
+      - Usage: reference/openaq/usage.md
+      - Authentication: reference/openaq/authentication.md
+      - Reference: reference/openaq/openaq.md
+    - Tropycal (cyclone tracks):
+      - Introduction: reference/tropycal/introduction.md
+      - Usage: reference/tropycal/usage.md
+      - Reference: reference/tropycal/tropycal.md
   - Examples:
     - Authentication: examples/authentication.md
     - Data Sources: examples/data-sources.md
@@ -176,6 +194,28 @@ nav:
       - Precipitation — CHIRPS daily: examples/gee/precipitation.ipynb
       - SAR / radar — Sentinel-1 GRD VV: examples/gee/sar-radar.ipynb
       - Tracking batch exports (end-to-end demo): examples/gee/track-batch-exports.ipynb
+    - Satellite imagery (STAC):
+      - Quickstart — Sentinel-2 COGs: examples/stac/quickstart.ipynb
+      - NDVI time-series — monthly Sentinel-2: examples/stac/sentinel2_ndvi_timeseries.ipynb
+      - Same AOI across MPC Landsat + CDSE Sentinel: examples/stac/mpc_landsat_cdse_sentinel_same_aoi.ipynb
+    - Disaster alerts (GDACS):
+      - Quickstart — recent alerts: examples/gdacs/quickstart.ipynb
+      - Global hazard dashboard: examples/gdacs/global_hazard_dashboard.ipynb
+      - Earthquakes + cyclones overlay: examples/gdacs/eq_tc_overlay.ipynb
+      - Country hazard profile: examples/gdacs/country_hazard_profile.ipynb
+    - Air quality (OpenAQ):
+      - Quickstart — PM2.5 over a city: examples/openaq/quickstart.ipynb
+      - PM2.5 city time-series (WHO guideline): examples/openaq/pm25_city_timeseries.ipynb
+      - Multi-station NO2 diurnal comparison: examples/openaq/multistation_comparison.ipynb
+    - Tropical cyclones (Tropycal):
+      - Quickstart — Atlantic season: examples/tropycal/quickstart.ipynb
+      - Season track map: examples/tropycal/season_track_map.ipynb
+      - Multi-decade landfall density: examples/tropycal/landfall_density.ipynb
+      - Recon observations — Katrina: examples/tropycal/recon_katrina.ipynb
+      - SHIPS intensity forecast — Ian: examples/tropycal/ships_intensity_forecast.ipynb
+      - Hurricane Katrina — intensity timeline: examples/tropycal/katrina_intensity_timeline.ipynb
+      - HURDAT2 vs IBTrACS — source comparison: examples/tropycal/source_comparison.ipynb
+      - Multi-basin season — ACE by basin: examples/tropycal/multibasin_ace.ipynb
   - API Reference:
     - EarthLens Facade: reference/earthlens.md
     - AbstractDataSource: reference/abstract-datasource.md
