@@ -53,7 +53,7 @@ class TestPlanetaryComputerE2E:
 
     def test_sentinel2_writes_cog(self, tmp_path: Path):
         """A one-item Sentinel-2 pull from MPC writes a readable COG."""
-        pytest.importorskip("planetary_computer", reason="MPC e2e needs planetary-computer")
+        pytest.importorskip("pystac_client", reason="MPC e2e needs pystac-client")
         stac = STAC(
             start=_START, end=_END, variables={"sentinel-2-l2a": ["B04"]},
             lat_lim=_LAT, lon_lim=_LON, path=str(tmp_path),

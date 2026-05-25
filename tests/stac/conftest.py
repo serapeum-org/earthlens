@@ -182,27 +182,6 @@ class FakePyramids:
         self.create_calls: list[dict[str, Any]] = []
 
 
-@pytest.fixture
-def fake_pc(monkeypatch: pytest.MonkeyPatch):
-    """Install a fake `planetary_computer` module (sign / sign_inplace)."""
-    pc = types.ModuleType("planetary_computer")
-    pc.sign_calls = []
-    pc.sign_inplace_calls = []
-
-    def _sign(href: str) -> str:
-        pc.sign_calls.append(href)
-        return href + "?sas=token"
-
-    def _sign_inplace(item: Any) -> None:
-        pc.sign_inplace_calls.append(item)
-        return None
-
-    pc.sign = _sign
-    pc.sign_inplace = _sign_inplace
-    monkeypatch.setitem(sys.modules, "planetary_computer", pc)
-    return pc
-
-
 class _AnonymousSigner:
     name = "anonymous"
 
