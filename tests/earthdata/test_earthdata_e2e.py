@@ -34,17 +34,20 @@ _REPO_ROOT = Path(__file__).resolve().parents[2]
 _EXAMPLES = _REPO_ROOT / "docs" / "examples" / "earthdata"
 # The real-life (live-download) notebooks — distinct from the offline
 # catalog_explorer / output_kinds demos, which need no credentials.
-# The live notebooks exercised by the token-based e2e. opera_s1_backscatter is
-# intentionally NOT here: ASF's datapool uses an EDL OAuth redirect that drops a
-# bearer token across hosts (401), so it needs username/password (or in-region
-# S3), not the EARTHDATA_TOKEN this suite runs on. It ships as a documented
-# example only.
+# The live notebooks the token-OR-userpass e2e exercises. opera_s1_backscatter
+# is NOT here: ASF's datapool uses an EDL OAuth redirect that drops a bearer
+# token across hosts (401), so it needs username/password — it has its own
+# gated test (TestEarthdataAsfNotebook) below.
 _LIVE_NOTEBOOKS = [
     "imerg_precipitation.ipynb",
     "gedi_l4a_footprints.ipynb",
     "pace_ocean_colour.ipynb",
     "smap_soil_moisture.ipynb",
 ]
+
+_HAVE_USERPASS = bool(
+    os.environ.get("EARTHDATA_USERNAME") and os.environ.get("EARTHDATA_PASSWORD")
+)
 
 
 def _run_notebook_cells(path: Path, workdir: Path) -> str:
@@ -125,3 +128,24 @@ class TestEarthdataExampleNotebooks:
             f"{notebook} fell into the offline skip branch — the live query failed:\n{out}"
         )
         assert "granule(s)" in out, f"{notebook} did not report a fetch:\n{out}"
+
+
+@pytest.mark.e2e
+@pytest.mark.earthdata
+@pytest.mark.skipif(
+    not _HAVE_USERPASS,
+    reason="ASF needs EARTHDATA_USERNAME / EARTHDATA_PASSWORD (a bearer token 401s on its OAuth redirect)",
+)
+class TestEarthdataAsfNotebook:
+    """The OPERA / ASF notebook — runs only on the username/password path."""
+
+    def test_opera_runs_with_userpass(self, tmp_path: Path, monkeypatch):
+        """OPERA downloads via the EDL OAuth (username/password) path, not a token."""
+        # ASF's datapool drops a bearer token across its cross-host OAuth redirect,
+        # so force the username/password path by removing any token from the env.
+        monkeypatch.delenv("EARTHDATA_TOKEN", raising=False)
+        out = _run_notebook_cells(_EXAMPLES / "opera_s1_backscatter.ipynb", tmp_path)
+        assert "skipped live query" not in out, (
+            f"opera_s1_backscatter fell into the skip branch — ASF download failed:\n{out}"
+        )
+        assert "file(s)" in out, f"opera_s1_backscatter did not report a fetch:\n{out}"
