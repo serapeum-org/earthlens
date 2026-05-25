@@ -21,10 +21,28 @@ when you actually log in.
 
 ## Get an account
 
-Register a free account at
-[urs.earthdata.nasa.gov](https://urs.earthdata.nasa.gov). Some
-collections additionally require you to **authorize the DAAC application**
-once from your EDL profile.
+Earthdata Login (EDL) is free and takes a couple of minutes. It is a
+plain username + password — no API key or token is required for this
+backend.
+
+1. Go to [urs.earthdata.nasa.gov](https://urs.earthdata.nasa.gov) and
+   click **Register**.
+2. Choose a **username** and **password** and fill in the email, name,
+   and affiliation / study-area fields NASA requests.
+3. **Verify your email** via the link NASA sends; your account is then
+   active.
+4. Your **username + password** are the credentials — wire them in via
+   the sources below.
+
+Two one-time, dataset-specific steps you may hit:
+
+- **Authorize the DAAC application.** Some DAACs require you to approve
+  their application once. After logging in at
+  [urs.earthdata.nasa.gov](https://urs.earthdata.nasa.gov), go to
+  **Applications → Authorized Apps** and approve as prompted (or you
+  will simply be asked the first time you reach that DAAC).
+- **Accept a EULA.** A few collections (e.g. GPM IMERG at GES DISC) ask
+  you to accept a licence agreement on first download.
 
 ## Credential sources (in priority order)
 
@@ -57,6 +75,15 @@ backend uses them automatically when streaming in-region — see
 
 ## CI secrets
 
-The live e2e suite (`-m "e2e and earthdata"`) reads the
-`EARTHDATA_USERNAME` / `EARTHDATA_PASSWORD` repository secrets and skips
-cleanly when they are absent.
+The live e2e suite (`-m "e2e and earthdata"`, run by the `e2e-earthdata`
+job under Python ≥ 3.12) reads the `EARTHDATA_USERNAME` /
+`EARTHDATA_PASSWORD` repository secrets and skips cleanly when they are
+absent. Configure them once with the GitHub CLI:
+
+```bash
+gh secret set EARTHDATA_USERNAME --repo <owner>/<repo>   # paste your EDL username
+gh secret set EARTHDATA_PASSWORD --repo <owner>/<repo>   # paste your EDL password
+```
+
+Until those are set, the live e2e tests (including the example-notebook
+execution) skip rather than fail.
