@@ -40,6 +40,25 @@ earthlens adds the **provider signers** (`MpcSasSigner`, `CdseS3Signer`), the
 **endpoint × collection × asset catalog**, and the **search → load → write**
 orchestration. There is no `odc-stac` / `stackstac` dependency.
 
+## The catalog is generated, not hand-written
+
+The per-endpoint catalog files (`src/earthlens/stac/catalog/*.yaml`, ~5k lines)
+are **machine-generated** from each provider's live STAC `item_assets` by
+`tools/stac/refresh_stac_catalog.py` (collection index + band stanzas) and
+`tools/stac/probe_stac_assets.py` (per-item `dtype` / `nodata` fill). This is
+**by design** — the catalog tracks hundreds of upstream collections, so it is
+regenerated rather than edited by hand. Two consequences follow from the source
+data, not from earthlens:
+
+* Collections whose `item_assets` publish no `eo:bands` / `raster:bands` (mostly
+  CDSE `clms_*_cog`) carry bare asset keys with no `dtype` / `nodata`; for those
+  `_nodata_for` falls back to `0`. Re-run the probe tool to fill any that later
+  start publishing band metadata.
+* Bulk entries omit `extent` / `cadence` / `resolution` — these are
+  informational and not required by the download path.
+
+Prefer regenerating via the refresh/probe tools over hand-editing the YAML.
+
 ## Output kind & aggregation
 
 `OUTPUT_KIND = "raster"`, so the `EarthLens` facade **forwards**
