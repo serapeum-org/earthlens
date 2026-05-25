@@ -53,10 +53,11 @@ gee = [
 ]
 cmems = ["copernicusmarine >=2.0.0,<3"]
 fdsn = ["obspy >=1.5.0"]
-# earthaccess needs Python >=3.12; the marker lets 3.11 skip it so `[all]` still resolves.
 earthdata = ["earthaccess >=0.18.0; python_version >= '3.12'"]
 stac = ["pyramids-gis[stac]"]
-# cartopy: tropycal hard-imports it at load but doesn't declare it (needs setuptools<81).
+# cartopy: not imported by earthlens, but `import tropycal.tracks` chains through
+# tropycal.utils.cartopy_utils (module-level `import cartopy`); tropycal omits it
+# from its own deps, so earthlens must supply it or the import fails.
 tropycal = ["tropycal >=1.4", "cartopy >=0.22"]
 all = [
     "boto3 >=1.43.0",
