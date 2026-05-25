@@ -152,6 +152,11 @@ nav:
       - Introduction: reference/tropycal/introduction.md
       - Usage: reference/tropycal/usage.md
       - Reference: reference/tropycal/tropycal.md
+    - FIRMS (active fires):
+      - Introduction: reference/firms/introduction.md
+      - Usage: reference/firms/usage.md
+      - Authentication: reference/firms/authentication.md
+      - Reference: reference/firms/firms.md
   - Examples:
     - Authentication: examples/authentication.md
     - Data Sources: examples/data-sources.md
