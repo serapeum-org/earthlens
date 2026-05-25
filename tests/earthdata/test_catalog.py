@@ -178,6 +178,30 @@ class TestCatalogLookup:
         assert "GPM_3IMERGHHL_07" in set(cat)
 
 
+class TestAutoDatasets:
+    """The machine-derived long-tail rows (catalog/_auto.json)."""
+
+    def test_auto_long_tail_present(self):
+        """Thousands of auto rows back the curated set."""
+        assert len(Catalog()._auto_rows()) > 1000
+
+    def test_resolve_auto_key_falls_back(self):
+        """get_dataset resolves an auto key not in the curated map."""
+        cat = Catalog()
+        key = next(iter(cat._auto_rows()))
+        ds = cat.get_dataset(key)
+        assert ds.short_name == key and key not in cat.datasets
+
+    def test_curated_short_names_excluded_from_auto(self):
+        """A curated short_name does not also appear in the auto map."""
+        assert "GPM_3IMERGHHL" not in Catalog()._auto_rows()
+
+    def test_total_resolvable_matches_index(self):
+        """Curated + auto together cover the whole available_datasets index."""
+        cat = Catalog()
+        assert len(cat.datasets) + len(cat._auto_rows()) == len(cat.available_datasets)
+
+
 class TestModels:
     """The leaf pydantic models."""
 

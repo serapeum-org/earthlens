@@ -32,13 +32,26 @@ import datetime as _dt
 from pathlib import Path
 from typing import Any, Literal
 
-from pydantic import BaseModel, ConfigDict, Field, ValidationError, field_validator
+from pydantic import (
+    BaseModel,
+    ConfigDict,
+    Field,
+    PrivateAttr,
+    ValidationError,
+    field_validator,
+)
 
 from earthlens.base import AbstractCatalog
 from earthlens.base.yaml_loader import load_yaml_strict
 
 CATALOG_PATH: Path = Path(__file__).parent / "catalog"
 PROVIDERS_PATH: Path = Path(__file__).parent / "providers.yaml"
+#: Auto-generated long-tail rows (machine-derived from a CMR walk: real
+#: short_name / version / provider + a heuristic output_kind, no bands). Kept
+#: separate from the hand-vetted `datasets:` so the two never mix — and stored
+#: as JSON (not `*.yaml`) so the ~8k rows parse in milliseconds and stay out of
+#: the curated YAML glob.
+AUTO_PATH: Path = Path(__file__).parent / "catalog" / "_auto.json"
 
 # Module-level cache of parsed catalog data, keyed on the resolved
 # path plus a tuple of `(file, mtime_ns)` for every YAML the load
@@ -47,6 +60,10 @@ PROVIDERS_PATH: Path = Path(__file__).parent / "providers.yaml"
 _CATALOG_CACHE: dict[Any, tuple[list[str], dict[str, "EarthdataDataset"]]] = {}
 # Same `(path, mtime_ns)` cache for the DAAC provider registry.
 _PROVIDERS_CACHE: dict[Any, dict[str, "EarthdataDAAC"]] = {}
+# …and for the auto-generated long-tail rows (kept as raw dicts — a model is
+# built only for the one key a caller resolves, so membership/resolution never
+# instantiates all ~8k pydantic rows).
+_AUTO_CACHE: dict[Any, dict[str, dict]] = {}
 
 OutputKindLiteral = Literal["raster", "vector", "tabular"]
 
@@ -76,6 +93,7 @@ def clear_catalog_cache() -> None:
     """
     _CATALOG_CACHE.clear()
     _PROVIDERS_CACHE.clear()
+    _AUTO_CACHE.clear()
 
 
 def _yaml_files_for(path: Path) -> list[Path]:
@@ -144,6 +162,36 @@ def _load_providers(path: Path) -> dict[str, "EarthdataDAAC"]:
             ) from exc
     _PROVIDERS_CACHE[key] = daacs
     return daacs
+
+
+def _load_auto_raw(path: Path) -> dict[str, dict]:
+    """Read and cache the auto-generated long-tail rows as raw dicts.
+
+    Reads the `auto_datasets` block of `_auto.json` (machine-derived from
+    a CMR walk) without instantiating pydantic models — a model is built
+    only for the single key a caller resolves, so membership checks and
+    resolution never pay for all ~8k rows. Returns an empty map when the
+    file is absent.
+
+    Args:
+        path: Path to `_auto.yaml`.
+
+    Returns:
+        dict[str, dict]: Raw row bodies keyed by `short_name`.
+    """
+    if not path.is_file():
+        return {}
+    resolved = str(path.resolve())
+    key = (resolved, path.stat().st_mtime_ns)
+    cached = _AUTO_CACHE.get(key)
+    if cached is not None:
+        return cached
+    import json
+
+    data = json.loads(path.read_text(encoding="utf-8")) or {}
+    rows = {k: dict(v or {}) for k, v in (data.get("auto_datasets") or {}).items()}
+    _AUTO_CACHE[key] = rows
+    return rows
 
 
 def _load_catalog_data(
@@ -438,6 +486,10 @@ class Catalog(AbstractCatalog):
     available_datasets: list[str] = Field(default_factory=list)
     datasets: dict[str, EarthdataDataset] = Field(default_factory=dict)
     daacs: dict[str, EarthdataDAAC] = Field(default_factory=dict)
+    # Machine-derived long tail (~8k rows) held as raw dicts, read lazily on
+    # first access. A pydantic row is built only for the key a caller resolves,
+    # so `Catalog()` and curated-only ops never pay for the 8k parse.
+    _auto_raw: dict[str, dict] | None = PrivateAttr(default=None)
 
     def model_post_init(self, __context: Any) -> None:
         """Auto-load the bundled catalog when no datasets were supplied.
@@ -503,6 +555,64 @@ class Catalog(AbstractCatalog):
             available_datasets=list(available_datasets),
             datasets=dict(datasets),
             daacs=dict(daacs),
+        )
+
+    def _auto_rows(self) -> dict[str, dict]:
+        """Return the raw auto-row bodies, reading `_auto.yaml` on first call."""
+        if self._auto_raw is None:
+            self._auto_raw = _load_auto_raw(AUTO_PATH)
+        return self._auto_raw
+
+    @property
+    def auto_datasets(self) -> dict[str, EarthdataDataset]:
+        """The machine-derived long-tail rows as a built map.
+
+        Builds an :class:`EarthdataDataset` for every auto row — heavy
+        (~8k rows). For membership or single-key resolution prefer
+        :meth:`get_dataset`, which builds only the one row requested.
+
+        Returns:
+            dict[str, EarthdataDataset]: Map keyed by `short_name`
+                (empty when `_auto.yaml` is absent).
+        """
+        return {k: self._build_auto(k) for k in self._auto_rows()}
+
+    def _build_auto(self, name: str) -> EarthdataDataset:
+        """Build the :class:`EarthdataDataset` for one auto row."""
+        body = {k: v for k, v in self._auto_rows()[name].items() if k != "bands"}
+        return EarthdataDataset(**body)
+
+    def get_dataset(self, name: str) -> EarthdataDataset:
+        """Resolve a dataset key against the curated then the auto map.
+
+        Curated `datasets` (hand-vetted, with bands) win; the
+        machine-derived auto long tail (read lazily from `_auto.yaml`) is
+        the fallback — only the resolved row is instantiated. An unknown
+        key raises with a did-you-mean hint drawn from both.
+
+        Args:
+            name: A curated key (e.g. `"GPM_3IMERGHHL_07"`) or an auto
+                key (a bare `short_name`, e.g. `"AA_L2A"`).
+
+        Returns:
+            EarthdataDataset: The resolved row.
+
+        Raises:
+            ValueError: When `name` is in neither map.
+        """
+        if name in self.datasets:
+            return self.datasets[name]
+        auto = self._auto_rows()
+        if name in auto:
+            return self._build_auto(name)
+        import difflib
+
+        pool = list(self.datasets) + list(auto)
+        close = difflib.get_close_matches(name, pool, n=1)
+        hint = f" Did you mean {close[0]!r}?" if close else ""
+        raise ValueError(
+            f"{name!r} is not in the {self._catalog_kind} "
+            f"({len(self.datasets)} curated + {len(auto)} auto).{hint}"
         )
 
     def get_daac(self, provider_code: str) -> EarthdataDAAC:

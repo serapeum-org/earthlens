@@ -58,3 +58,70 @@ informational `bands` map.
 | `OISSS_L4_multimission_monthly_v2` | PO.DAAC | `POCLOUD` | netcdf4 | raster | yes |
 | `SEA_SURFACE_HEIGHT_ALT_GRIDS_L4_2SATS_5DAY_6THDEG_V_JPL2205` | PO.DAAC | `POCLOUD` | netcdf4 | raster | yes |
 | `SMAP_RSS_L3_SSS_SMI_8DAY-RUNNINGMEAN_V5` | PO.DAAC | `POCLOUD` | netcdf4 | raster | yes |
+
+Inspect the curated rows programmatically:
+
+```python
+from earthlens.earthdata import Catalog
+
+cat = Catalog()
+cat.get_dataset("GPM_3IMERGHHL_07").output_kind   # 'raster'
+cat.get_daac("POCLOUD").cloud_region              # 'us-west-2'
+len(cat.datasets)                                  # 46 curated rows
+```
+
+## The auto long tail (every collection resolvable)
+
+The catalog is a **hybrid**: the ~46 rows above are hand-vetted (correct
+`output_kind`, `format`, representative `bands`, validated against live
+CMR). The **rest of the ~8,000 collections** the DAACs serve are
+machine-derived rows in `catalog/_auto.json` — real `short_name` /
+`version` / `provider` / `daac` from a CMR walk, plus a **heuristic**
+`output_kind` and **no band metadata**. They are *not* hand-vetted.
+
+`Catalog.get_dataset` resolves the curated rows first, then falls back to
+the auto map, so **all ~8,029 collections are usable** by short_name:
+
+```python
+cat.get_dataset("GPM_3IMERGHHL_07")   # curated (vetted, with bands)
+cat.get_dataset("AA_L2A")             # auto (machine-derived fallback)
+len(cat._auto_rows())                  # ~7,983 auto rows
+```
+
+The auto rows are read lazily and stored as JSON so the ~8k entries
+parse in milliseconds and stay out of the curated YAML. To promote one
+into a vetted curated row, use the `add-dataset` / `probe` tools below.
+
+A dataset key outside both maps raises with a *did-you-mean* hint.
+
+## Maintenance tooling
+
+Three scripts under `tools/earthdata/` (the CMR analogs of the GEE
+catalog tooling) keep the catalog honest. They lazy-import
+`earthaccess`, so `--help` works without the extra; the live
+subcommands need `earthlens[earthdata]` (Python ≥ 3.12).
+
+- **`refresh_earthdata_catalog.py`** — `refresh` walks CMR per provider
+  and rewrites the `available_datasets:` index; `add-dataset` emits a
+  ready-to-paste curated stanza with an inferred `output_kind` /
+  `format` (vet by hand).
+- **`audit_earthdata_datasets.py`** — diffs the curated rows against
+  live CMR (gone collections, version drift); `--strict` for CI.
+- **`probe_earthdata_granule.py`** — fetches one sample granule for a
+  collection and writes a JSON sidecar seeding `format` / `output_kind`.
+
+## Deferred features
+
+The MVP fetches **whole granules**. Two capabilities are intentionally
+**out of scope** for now and tracked by informational catalog flags:
+
+- **Harmony server-side subsetting** (`harmony-py`) — spatial / variable
+  / reprojected subsetting for the DAACs that support it. The catalog
+  rows carry `requires_harmony_for_subset` and `supports_harmony` flags
+  so a future `harmony.py` helper knows which collections qualify. Until
+  then, band names in a request are informational and you receive the
+  full granule.
+- **ASF `asf_search` stack search** — the richer InSAR / burst stack
+  semantics ASF offers. ASF collections are still reachable here through
+  `earthaccess` + `daac="ASF"` for whole-granule fetch; a dedicated
+  `earthlens.asf` spin-off is post-MVP.
