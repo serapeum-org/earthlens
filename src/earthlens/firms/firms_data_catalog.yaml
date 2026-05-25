@@ -1,0 +1,101 @@
+# NASA FIRMS sensor dispatch table.
+#
+# FIRMS exposes a small, fixed set of active-fire sensors through its
+# area CSV API; this file is the entire "catalog": one row per sensor,
+# keyed by the FIRMS source code passed in `variables=[...]`. The codes
+# are the complete FIRMS universe, so (like the GDACS / FDSN catalogs)
+# there is no `available_*` index and no `refresh` tool. A `probe` and an
+# `audit` tool (tools/firms/) verify the per-sensor `columns:` maps and
+# the temporal coverage against the live `data_availability` endpoint.
+#
+# Each sensor records:
+#   family       : MODIS | VIIRS  — drives the confidence/brightness
+#                  schema handling in earthlens.firms.events (MODIS reports
+#                  a numeric 0-100 confidence; VIIRS reports a categorical
+#                  l/n/h token, and the brightness column name differs).
+#   resolution_m : nominal nadir pixel size in metres.
+#   temporal     : {start, end, quality} — the sensor's coverage window
+#                  and quality tier. NRT (near-real-time) sensors cover
+#                  only roughly the last ~2 months; SP (standard-quality)
+#                  sensors hold the older archive. `end: null` means
+#                  "ongoing". earthlens.firms warns (it does not auto-swap)
+#                  when a request falls outside this window.
+#   columns      : the sensor-family-specific CSV columns of interest,
+#                  each with `units` and `long_name`. The common columns
+#                  (latitude/longitude/acq_date/acq_time/satellite/frp/
+#                  daynight) are handled defensively by events.py and are
+#                  not all repeated per sensor.
+#
+# Codes/coverage are verified against https://firms.modaps.eosdis.nasa.gov/api/.
+sensors:
+  VIIRS_SNPP_NRT:
+    code: VIIRS_SNPP_NRT
+    name: VIIRS S-NPP 375 m (near real-time)
+    family: VIIRS
+    resolution_m: 375
+    temporal: { start: 2012-01-20, end: null, quality: NRT }
+    columns:
+      bright_ti4: { units: K, long_name: "Brightness temperature, I-4 channel" }
+      bright_ti5: { units: K, long_name: "Brightness temperature, I-5 channel" }
+      frp: { units: MW, long_name: "Fire radiative power" }
+      confidence: { units: "1", long_name: "Detection confidence (l/n/h)" }
+
+  VIIRS_SNPP_SP:
+    code: VIIRS_SNPP_SP
+    name: VIIRS S-NPP 375 m (standard quality, archive)
+    family: VIIRS
+    resolution_m: 375
+    temporal: { start: 2012-01-20, end: null, quality: SP }
+    columns:
+      bright_ti4: { units: K, long_name: "Brightness temperature, I-4 channel" }
+      bright_ti5: { units: K, long_name: "Brightness temperature, I-5 channel" }
+      frp: { units: MW, long_name: "Fire radiative power" }
+      confidence: { units: "1", long_name: "Detection confidence (l/n/h)" }
+
+  VIIRS_NOAA20_NRT:
+    code: VIIRS_NOAA20_NRT
+    name: VIIRS NOAA-20 375 m (near real-time)
+    family: VIIRS
+    resolution_m: 375
+    temporal: { start: 2020-01-01, end: null, quality: NRT }
+    columns:
+      bright_ti4: { units: K, long_name: "Brightness temperature, I-4 channel" }
+      bright_ti5: { units: K, long_name: "Brightness temperature, I-5 channel" }
+      frp: { units: MW, long_name: "Fire radiative power" }
+      confidence: { units: "1", long_name: "Detection confidence (l/n/h)" }
+
+  VIIRS_NOAA21_NRT:
+    code: VIIRS_NOAA21_NRT
+    name: VIIRS NOAA-21 375 m (near real-time)
+    family: VIIRS
+    resolution_m: 375
+    temporal: { start: 2024-01-17, end: null, quality: NRT }
+    columns:
+      bright_ti4: { units: K, long_name: "Brightness temperature, I-4 channel" }
+      bright_ti5: { units: K, long_name: "Brightness temperature, I-5 channel" }
+      frp: { units: MW, long_name: "Fire radiative power" }
+      confidence: { units: "1", long_name: "Detection confidence (l/n/h)" }
+
+  MODIS_NRT:
+    code: MODIS_NRT
+    name: MODIS C6.1 1 km (near real-time)
+    family: MODIS
+    resolution_m: 1000
+    temporal: { start: 2000-11-01, end: null, quality: NRT }
+    columns:
+      brightness: { units: K, long_name: "Brightness temperature, channel 21/22" }
+      bright_t31: { units: K, long_name: "Brightness temperature, channel 31" }
+      frp: { units: MW, long_name: "Fire radiative power" }
+      confidence: { units: "%", long_name: "Detection confidence (0-100)" }
+
+  MODIS_SP:
+    code: MODIS_SP
+    name: MODIS C6.1 1 km (standard quality, archive)
+    family: MODIS
+    resolution_m: 1000
+    temporal: { start: 2000-11-01, end: null, quality: SP }
+    columns:
+      brightness: { units: K, long_name: "Brightness temperature, channel 21/22" }
+      bright_t31: { units: K, long_name: "Brightness temperature, channel 31" }
+      frp: { units: MW, long_name: "Fire radiative power" }
+      confidence: { units: "%", long_name: "Detection confidence (0-100)" }
