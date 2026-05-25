@@ -257,9 +257,9 @@ class TestProductValidation:
     """Tests for the product / recon_product selectors."""
 
     def test_unknown_product_rejected(self, tmp_path):
-        """An unimplemented/unknown product is rejected."""
+        """An unimplemented/unknown product is rejected (realtime not yet added)."""
         with pytest.raises(ValueError, match="product must be one of"):
-            _backend(tmp_path, product="ships")
+            _backend(tmp_path, product="realtime")
 
     def test_bad_recon_product_rejected(self, tmp_path):
         """An unknown recon_product is rejected."""
@@ -340,6 +340,64 @@ class TestReconProduct:
         monkeypatch.setitem(sys.modules, "tropycal.recon", None)
         with pytest.raises(ImportError, match=r"earthlens\[tropycal\]"):
             _recon_backend(tmp_path).download()
+
+
+def _ships_backend(tmp_path, **overrides):
+    """Build a ships-product TropicalCyclone for one storm + forecast cycle."""
+    kwargs = dict(
+        start="2022-09-20",
+        end="2022-10-01",
+        variables=["AL092022"],
+        lat_lim=[-90, 90],
+        lon_lim=[-180, 180],
+        source="hurdat",
+        product="ships",
+        basin="north_atlantic",
+        ships_time="2022-09-27 00:00",
+        path=str(tmp_path),
+    )
+    kwargs.update(overrides)
+    return TropicalCyclone(**kwargs)
+
+
+class TestShipsProduct:
+    """Tests for product='ships' (tabular SHIPS forecast guidance)."""
+
+    def test_output_kind_tabular(self, tmp_path):
+        """A ships instance declares OUTPUT_KIND='tabular'."""
+        assert _ships_backend(tmp_path).OUTPUT_KIND == "tabular"
+
+    def test_ships_requires_time(self, tmp_path):
+        """product='ships' without ships_time is rejected."""
+        with pytest.raises(ValueError, match="ships_time"):
+            _ships_backend(tmp_path, ships_time=None)
+
+    def test_download_returns_dataframe(self, tmp_path, fake_ships):
+        """ships download returns a DataFrame with storm_id/forecast_init + fhr."""
+        result = _ships_backend(tmp_path).download()
+        assert isinstance(result, pd.DataFrame)
+        assert not isinstance(result, gpd.GeoDataFrame)
+        assert {"storm_id", "forecast_init", "fhr", "vmax_noland_kt"}.issubset(result.columns)
+        assert len(result) == 3
+        assert set(result["storm_id"]) == {"AL092022"}
+
+    def test_download_writes_csv(self, tmp_path, fake_ships):
+        """ships download writes a per-storm CSV named by storm + cycle."""
+        _ships_backend(tmp_path).download()
+        assert list(tmp_path.glob("tropycal_ships_AL092022_20220927T00.csv"))
+
+    def test_no_ships_data_empty_frame(self, tmp_path, fake_ships):
+        """A cycle with no SHIPS guidance yields an empty DataFrame, no file."""
+        fake_ships.ships_frame = None
+        result = _ships_backend(tmp_path).download()
+        assert isinstance(result, pd.DataFrame)
+        assert len(result) == 0
+        assert list(tmp_path.glob("*.csv")) == []
+
+    def test_aggregate_rejected_for_tabular(self, tmp_path, fake_ships):
+        """A non-None aggregate is rejected for the tabular ships product too."""
+        with pytest.raises(NotImplementedError, match="not supported"):
+            _ships_backend(tmp_path).download(aggregate=object())
 
 
 class TestMissingExtra:

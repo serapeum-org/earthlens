@@ -59,14 +59,30 @@ def _make_storm_frame(
     return pd.DataFrame(data)
 
 
-class _FakeStorm:
-    """Stand-in for a tropycal `Storm` returning a canned DataFrame."""
+class _FakeShips:
+    """Stand-in for a tropycal `Ships` object exposing `to_dataframe`."""
 
     def __init__(self, frame: pd.DataFrame) -> None:
         self._frame = frame
 
+    def to_dataframe(self) -> pd.DataFrame:
+        return self._frame
+
+
+class _FakeStorm:
+    """Stand-in for a tropycal `Storm` returning canned DataFrames."""
+
+    def __init__(self, frame: pd.DataFrame, ships_frame: pd.DataFrame | None = None) -> None:
+        self._frame = frame
+        self._ships_frame = ships_frame
+
     def to_dataframe(self, attrs_as_columns: bool = False) -> pd.DataFrame:
         return self._frame
+
+    def get_ships(self, time) -> _FakeShips:
+        if self._ships_frame is None:
+            raise ValueError("SHIPS data is unavailable for the requested storm or time.")
+        return _FakeShips(self._ships_frame)
 
 
 class _FakeSeason:
@@ -91,6 +107,8 @@ class _FakeState:
         self.constructions: list[tuple[str, str]] = []
         self.seasons: dict[int, list[str]] = {}
         self.storms: dict[str, pd.DataFrame] = {}
+        self.ships_frame: pd.DataFrame | None = None
+        self.recon_frame: pd.DataFrame | None = None
 
     def add_storm(self, year: int, frame: pd.DataFrame, storm_id: str | None = None) -> None:
         """Register a storm DataFrame under a season year."""
@@ -115,7 +133,7 @@ def _make_trackdataset_cls(state: _FakeState) -> type:
             return _FakeSeason(state.seasons.get(year, []))
 
         def get_storm(self, storm_id: str) -> _FakeStorm:
-            return _FakeStorm(state.storms[storm_id])
+            return _FakeStorm(state.storms[storm_id], ships_frame=state.ships_frame)
 
     return _FakeTrackDataset
 
@@ -197,6 +215,28 @@ def fake_recon(fake_tropycal, monkeypatch: pytest.MonkeyPatch) -> _FakeState:
     recon_module.dropsondes = _builder
     recon_module.vdms = _builder
     monkeypatch.setitem(__import__("sys").modules, "tropycal.recon", recon_module)
+    return fake_tropycal
+
+
+@pytest.fixture
+def fake_ships(fake_tropycal) -> _FakeState:
+    """Seed a fake SHIPS forecast table on the state (no extra module needed).
+
+    SHIPS is read via `storm.get_ships(time).to_dataframe()`, so faking the
+    storm method (already on `_FakeStorm`) is enough — set `.ships_frame` to
+    `None` to simulate a cycle with no SHIPS guidance.
+    """
+    fake_tropycal.ships_frame = pd.DataFrame(
+        {
+            "fhr": [0, 6, 12],
+            "vmax_noland_kt": [80.0, 95.0, 110.0],
+            "shear_kt": [10.0, 8.0, 6.0],
+            "storm_type": ["HU", "HU", "HU"],
+        }
+    )
+    # Register the storm the ships tests query (the SHIPS table itself comes
+    # from `ships_frame`; this just lets get_storm resolve the id).
+    fake_tropycal.storms.setdefault("AL092022", _make_storm_frame(storm_id="AL092022"))
     return fake_tropycal
 
 

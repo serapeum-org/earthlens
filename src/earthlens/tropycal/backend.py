@@ -56,15 +56,18 @@ if TYPE_CHECKING:
 
 FileFormat = Literal["gpkg", "geojson"]
 Geometry = Literal["point", "track"]
-Product = Literal["besttrack", "recon"]
+Product = Literal["besttrack", "recon", "ships"]
 ReconProduct = Literal["hdobs", "dropsondes", "vdms"]
 
-#: Products implemented so far. `besttrack` (default) is basin+window keyed;
-#: `recon` is storm-keyed (aircraft observations for a named storm). `ships`
-#: (tabular forecast guidance) and `realtime` (live storms) are planned
-#: follow-ups and are not yet accepted.
-_PRODUCTS = ("besttrack", "recon")
+#: Products implemented so far. `besttrack` (default) is basin+window keyed
+#: (vector). `recon` is storm-keyed aircraft observations (vector). `ships`
+#: is storm + forecast-cycle keyed SHIPS intensity-forecast guidance
+#: (tabular). `realtime` (live storms) is a planned follow-up.
+_PRODUCTS = ("besttrack", "recon", "ships")
 _RECON_PRODUCTS = ("hdobs", "dropsondes", "vdms")
+
+#: Products that are storm-keyed (variables are storm ids, not basins).
+_STORM_KEYED = ("recon", "ships")
 
 #: Map output format to the OGR driver and file extension `to_file` uses.
 _DRIVERS: dict[str, tuple[str, str]] = {
@@ -120,6 +123,7 @@ class TropicalCyclone(AbstractDataSource):
         product: Product = "besttrack",
         recon_product: ReconProduct = "hdobs",
         basin: str = "north_atlantic",
+        ships_time: str | None = None,
     ):
         """Initialise a Tropical-cyclone backend instance.
 
@@ -212,10 +216,15 @@ class TropicalCyclone(AbstractDataSource):
                 "product='besttrack', storm identifiers for product='recon'), "
                 "not a mapping."
             )
-        if product == "recon" and not list(variables):
+        if product in _STORM_KEYED and not list(variables):
             raise ValueError(
-                "product='recon' is storm-keyed: `variables` must list at "
-                "least one storm identifier (e.g. ['AL122005'])."
+                f"product={product!r} is storm-keyed: `variables` must list "
+                "at least one storm identifier (e.g. ['AL092022'])."
+            )
+        if product == "ships" and not ships_time:
+            raise ValueError(
+                "product='ships' needs ships_time=<forecast-init datetime> "
+                "(e.g. '2022-09-27 00:00'); SHIPS guidance is per cycle."
             )
         self._source = source
         self._geometry: Geometry = geometry
@@ -225,6 +234,11 @@ class TropicalCyclone(AbstractDataSource):
         self._product: Product = product
         self._recon_product: ReconProduct = recon_product
         self._basin = basin
+        self._ships_time = ships_time
+        # ships is tabular (a forecast-guidance table); the others are
+        # vector. The facade reads this instance attribute to decide whether
+        # `aggregate=` is allowed (it is not, for either kind).
+        self.OUTPUT_KIND = "tabular" if product == "ships" else "vector"
         self._catalog = Catalog()
         # Per-process memo of loaded TrackDatasets, keyed (basin, source),
         # so a multi-basin/multi-year request loads each basin once (G3).
@@ -322,7 +336,7 @@ class TropicalCyclone(AbstractDataSource):
             ValueError: If a besttrack basin is unknown or its
                 `(basin, source)` pair is invalid.
         """
-        if self._product == "recon":
+        if self._product in _STORM_KEYED:
             return [
                 RemoteProduct(
                     id=str(storm_id),
@@ -605,7 +619,7 @@ class TropicalCyclone(AbstractDataSource):
         self,
         progress_bar: bool = True,
         aggregate: AggregationConfig | None = None,
-    ) -> FeatureCollection:
+    ) -> "FeatureCollection | pd.DataFrame":
         """Load every requested basin and return the unioned tracks.
 
         Each basin in `self.vars` is loaded once; its matched features are
@@ -636,11 +650,14 @@ class TropicalCyclone(AbstractDataSource):
         if aggregate is not None:
             raise NotImplementedError(
                 "TropicalCyclone.download(aggregate=...) is not supported: "
-                "cyclone tracks are vector features, not gridded rasters, so "
-                "there is no meaningful gridded reduction. Call download() "
-                "without aggregate= and post-process the returned "
-                "FeatureCollection (a GeoDataFrame) directly."
+                "tropycal products are vector features or tabular guidance, "
+                "not gridded rasters, so there is no meaningful gridded "
+                "reduction. Call download() without aggregate= and "
+                "post-process the returned GeoDataFrame / DataFrame directly."
             )
+
+        if self._product == "ships":
+            return self._download_ships()
 
         products = self._search()
         collections = self._fetch(products) if products else []
@@ -665,6 +682,68 @@ class TropicalCyclone(AbstractDataSource):
                 "nothing written"
             )
         return combined
+
+    def _download_ships(self) -> "pd.DataFrame":
+        """Fetch SHIPS guidance for each storm and return one tabular frame.
+
+        SHIPS is `product="ships"` — a tabular (not geographic) forecast
+        guidance table per `(storm, forecast-init cycle)`. Each requested
+        storm's `Ships.to_dataframe()` is prefixed with `storm_id` /
+        `forecast_init` columns and the per-storm tables are concatenated.
+        A storm with no SHIPS guidance for the cycle is skipped (logged).
+        Each storm's table is also written to a CSV under `path`.
+
+        Returns:
+            pd.DataFrame: The concatenated SHIPS guidance (empty with
+                `storm_id`/`forecast_init`/`fhr` columns when nothing matched).
+        """
+        init = pd.to_datetime(self._ships_time).to_pydatetime()
+        products = self._search()
+        frames: list[pd.DataFrame] = []
+        written: list[Path] = []
+        for product in products:
+            track_dataset = self._get_track_dataset(
+                product.metadata["basin"], product.metadata["source"]
+            )
+            storm = self._get_storm(track_dataset, product.id)
+            df = self._ships_frame(storm, init) if storm is not None else None
+            if df is not None and len(df):
+                df = df.copy()
+                df.insert(0, "forecast_init", pd.Timestamp(init))
+                df.insert(0, "storm_id", product.id)
+                frames.append(df)
+                written.append(self._write_table(product.id, init, df))
+        if not frames:
+            logger.warning(
+                "Tropycal ships: no SHIPS guidance matched the request, "
+                "nothing written"
+            )
+            return pd.DataFrame(columns=["storm_id", "forecast_init", "fhr"])
+        combined = pd.concat(frames, ignore_index=True)
+        logger.info(
+            f"Tropycal ships: {len(combined)} rows across {len(written)} "
+            f"file(s) written to {self.root_dir}"
+        )
+        return combined
+
+    @staticmethod
+    def _ships_frame(storm: object, init: dt.datetime) -> "pd.DataFrame | None":
+        """Return a storm's SHIPS table for `init`, or `None` (logged) if absent."""
+        try:
+            return storm.get_ships(init).to_dataframe()
+        except Exception as exc:  # noqa: BLE001
+            logger.warning(
+                f"tropycal SHIPS unavailable for the requested storm/cycle: "
+                f"{type(exc).__name__}: {exc}"
+            )
+            return None
+
+    def _write_table(self, storm_id: str, init: dt.datetime, df: "pd.DataFrame") -> Path:
+        """Write one storm's SHIPS table to a CSV under `root_dir`."""
+        stem = f"tropycal_ships_{storm_id}_{init:%Y%m%dT%H}"
+        out_path = self.root_dir / f"{stem}.csv"
+        df.to_csv(out_path, index=False)
+        return out_path
 
     def _write(self, unit: str, collection: FeatureCollection) -> Path:
         """Write one unit's features to a vector file under `root_dir`.
