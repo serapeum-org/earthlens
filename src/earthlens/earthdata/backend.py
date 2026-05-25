@@ -85,6 +85,7 @@ class EarthData(AbstractDataSource):
         direct_s3: str = "auto",
         username: str | None = None,
         password: str | None = None,
+        token: str | None = None,
         netrc_path: Path | str | None = None,
     ):
         """Initialise an Earthdata backend instance.
@@ -126,6 +127,10 @@ class EarthData(AbstractDataSource):
                 then `~/.netrc`, then an interactive prompt.
             password: EDL password. Falls back to
                 `EARTHDATA_PASSWORD`, then `~/.netrc`.
+            token: EDL bearer token (a JSON Web Token generated from the
+                EDL profile) — authenticate without a password, like
+                GEE's service key. Takes precedence over username /
+                password; falls back to the `EARTHDATA_TOKEN` env var.
             netrc_path: Optional path to a `.netrc` file holding a
                 `urs.earthdata.nasa.gov` entry.
 
@@ -139,6 +144,7 @@ class EarthData(AbstractDataSource):
         self._direct_s3 = direct_s3
         self._username = username
         self._password = password
+        self._token = token
         self._netrc_path = Path(netrc_path) if netrc_path is not None else None
         self._auth: EarthdataAuth | None = None
 
@@ -237,6 +243,7 @@ class EarthData(AbstractDataSource):
         creds = EarthdataCredentials(
             username=self._username,
             password=self._password,
+            token=self._token,
             netrc_path=self._netrc_path,
         )
         self._auth = EarthdataAuth(creds)

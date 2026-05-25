@@ -34,7 +34,7 @@ class TestEarthdataCredentials:
         """Every field defaults to None."""
         creds = EarthdataCredentials()
         assert creds.username is None and creds.password is None
-        assert creds.netrc_path is None
+        assert creds.token is None and creds.netrc_path is None
 
     def test_password_is_secret(self):
         """The password is not echoed in repr."""
@@ -63,6 +63,7 @@ class TestEarthdataAuth:
         """A present netrc with no env creds selects the netrc strategy."""
         monkeypatch.delenv("EARTHDATA_USERNAME", raising=False)
         monkeypatch.delenv("EARTHDATA_PASSWORD", raising=False)
+        monkeypatch.delenv("EARTHDATA_TOKEN", raising=False)
         netrc = tmp_path / ".netrc"
         netrc.write_text("machine urs.earthdata.nasa.gov login u password p\n")
         auth = EarthdataAuth(EarthdataCredentials(netrc_path=netrc))
@@ -72,8 +73,35 @@ class TestEarthdataAuth:
         """No env and no netrc falls back to interactive."""
         monkeypatch.delenv("EARTHDATA_USERNAME", raising=False)
         monkeypatch.delenv("EARTHDATA_PASSWORD", raising=False)
+        monkeypatch.delenv("EARTHDATA_TOKEN", raising=False)
         auth = EarthdataAuth(EarthdataCredentials(netrc_path=Path("/no/such/netrc")))
         assert auth._resolve_strategy() == "interactive"
+
+    def test_strategy_token_env(self, monkeypatch):
+        """EARTHDATA_TOKEN alone selects the environment strategy."""
+        monkeypatch.delenv("EARTHDATA_USERNAME", raising=False)
+        monkeypatch.delenv("EARTHDATA_PASSWORD", raising=False)
+        monkeypatch.setenv("EARTHDATA_TOKEN", "jwt-token")
+        auth = EarthdataAuth(EarthdataCredentials(netrc_path=Path("/no/such/netrc")))
+        assert auth._resolve_strategy() == "environment"
+
+    def test_explicit_token_authenticates(self, fake_earthaccess, monkeypatch):
+        """An explicit bearer token authenticates with no username/password."""
+        monkeypatch.delenv("EARTHDATA_USERNAME", raising=False)
+        monkeypatch.delenv("EARTHDATA_PASSWORD", raising=False)
+        monkeypatch.delenv("EARTHDATA_TOKEN", raising=False)
+        auth = EarthdataAuth(
+            EarthdataCredentials(
+                token="jwt-token", netrc_path=Path("/no/such/netrc")
+            )
+        )
+        auth.configure()
+        assert auth.is_authenticated() is True
+        assert fake_earthaccess.login_calls == [
+            {"strategy": "environment", "persist": True}
+        ]
+        assert os.environ["EARTHDATA_TOKEN"] == "jwt-token"
+        assert "jwt-token" not in repr(auth._creds)
 
     def test_explicit_credentials_authenticate(self, fake_earthaccess, monkeypatch):
         """Explicit username/password authenticate even without env vars or netrc."""

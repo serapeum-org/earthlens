@@ -94,8 +94,9 @@ def fake_earthaccess(monkeypatch: pytest.MonkeyPatch) -> _FakeEarthaccess:
 
 @pytest.fixture
 def edl_env(monkeypatch: pytest.MonkeyPatch) -> None:
-    """Set EDL env credentials and clear any AWS region hints."""
+    """Set EDL env credentials and clear any AWS region / token hints."""
     monkeypatch.setenv("EARTHDATA_USERNAME", "user")
     monkeypatch.setenv("EARTHDATA_PASSWORD", "pass")
+    monkeypatch.delenv("EARTHDATA_TOKEN", raising=False)
     monkeypatch.delenv("AWS_REGION", raising=False)
     monkeypatch.delenv("AWS_DEFAULT_REGION", raising=False)

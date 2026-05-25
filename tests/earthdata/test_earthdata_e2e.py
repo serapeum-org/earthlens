@@ -26,7 +26,8 @@ from earthlens.earthlens import EarthLens
 os.environ.setdefault("MPLBACKEND", "Agg")
 
 _HAVE_CREDS = bool(
-    os.environ.get("EARTHDATA_USERNAME") and os.environ.get("EARTHDATA_PASSWORD")
+    (os.environ.get("EARTHDATA_USERNAME") and os.environ.get("EARTHDATA_PASSWORD"))
+    or os.environ.get("EARTHDATA_TOKEN")
 )
 
 _REPO_ROOT = Path(__file__).resolve().parents[2]

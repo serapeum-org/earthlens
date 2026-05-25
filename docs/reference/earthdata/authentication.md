@@ -46,11 +46,18 @@ Two one-time, dataset-specific steps you may hit:
 
 ## Credential sources (in priority order)
 
-`EarthData(...)` resolves a login strategy automatically:
+`EarthData(...)` resolves a login strategy automatically, in this
+priority order:
 
-1. **Environment variables** — set `EARTHDATA_USERNAME` and
-   `EARTHDATA_PASSWORD`. Used in CI and the e2e tests.
-2. **`~/.netrc`** — add a machine entry:
+1. **EDL bearer token** — an explicit `EarthData(..., token=...)` or the
+   `EARTHDATA_TOKEN` environment variable. A token authenticates without
+   a password (the token-equivalent of GEE's service key); generate one
+   from your EDL profile under **Generate Token**. Best for CI and
+   headless use — no password in plaintext.
+2. **Username / password** — `EarthData(..., username=..., password=...)`
+   or the `EARTHDATA_USERNAME` / `EARTHDATA_PASSWORD` environment
+   variables.
+3. **`~/.netrc`** — add a machine entry:
 
    ```text
    machine urs.earthdata.nasa.gov
@@ -59,12 +66,14 @@ Two one-time, dataset-specific steps you may hit:
    ```
 
    Pass a non-default path with `EarthData(..., netrc_path=...)`.
-3. **Interactive prompt** — the last resort when neither of the above
+4. **Interactive prompt** — the last resort when none of the above
    resolves; `earthaccess` prompts and persists a token.
 
-You can also pass `EarthData(..., username=..., password=...)`
-explicitly. After a successful login, `earthaccess` persists the token
-so later processes reuse it.
+An explicit `token=` / `username=` / `password=` is exported to the
+matching environment variable (`EARTHDATA_TOKEN`, or `EARTHDATA_USERNAME`
+/ `EARTHDATA_PASSWORD`) that `earthaccess`'s environment strategy reads.
+After a successful login, `earthaccess` persists the token so later
+processes reuse it.
 
 ## In-region S3 access
 
@@ -76,11 +85,14 @@ backend uses them automatically when streaming in-region — see
 ## CI secrets
 
 The live e2e suite (`-m "e2e and earthdata"`, run by the `e2e-earthdata`
-job under Python ≥ 3.12) reads the `EARTHDATA_USERNAME` /
-`EARTHDATA_PASSWORD` repository secrets and skips cleanly when they are
-absent. Configure them once with the GitHub CLI:
+job under Python ≥ 3.12) reads either an `EARTHDATA_TOKEN` **or** an
+`EARTHDATA_USERNAME` / `EARTHDATA_PASSWORD` repository secret, and skips
+cleanly when none are set. Configure with the GitHub CLI — a single
+token is the simplest:
 
 ```bash
+gh secret set EARTHDATA_TOKEN --repo <owner>/<repo>      # paste your EDL bearer token
+# …or the username/password pair instead:
 gh secret set EARTHDATA_USERNAME --repo <owner>/<repo>   # paste your EDL username
 gh secret set EARTHDATA_PASSWORD --repo <owner>/<repo>   # paste your EDL password
 ```

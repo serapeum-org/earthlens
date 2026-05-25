@@ -68,11 +68,13 @@ class EarthdataCredentials(BaseModel):
     """Frozen value object holding the Earthdata Login credentials.
 
     The auth wrapper accepts every EDL-credential source `earthaccess`
-    knows about: explicit username/password, a path to a `.netrc` file,
-    or no fields at all (and rely on env vars / the default `~/.netrc` /
-    an interactive prompt). Validation is intentionally permissive — the
-    real "do these creds work?" gate is :meth:`EarthdataAuth.configure`,
-    which talks to EDL.
+    knows about: an explicit EDL **bearer token** (like GEE's key /
+    OpenAQ's API key — no password needed), an explicit
+    username/password, a path to a `.netrc` file, or no fields at all
+    (and rely on env vars / the default `~/.netrc` / an interactive
+    prompt). Validation is intentionally permissive — the real "do these
+    creds work?" gate is :meth:`EarthdataAuth.configure`, which talks to
+    EDL.
 
     Attributes:
         username: EDL account username. `None` means "look at the
@@ -81,6 +83,13 @@ class EarthdataCredentials(BaseModel):
             :class:`pydantic.SecretStr` so it is never echoed by
             `repr(creds)` or in logs. `None` means same as
             `username`.
+        token: Optional EDL **bearer token** (a long-lived JSON Web
+            Token generated from the EDL profile), stored as a
+            :class:`pydantic.SecretStr`. Lets the backend authenticate
+            without a password — the token-equivalent of GEE's service
+            key. `configure` exports it to `EARTHDATA_TOKEN`, which
+            `earthaccess`'s environment strategy consumes. `None` defers
+            to the `EARTHDATA_TOKEN` env var / username-password / netrc.
         netrc_path: Optional path to a `.netrc` file holding a
             `machine urs.earthdata.nasa.gov` entry. `None` falls back
             to `~/.netrc`.
@@ -108,6 +117,7 @@ class EarthdataCredentials(BaseModel):
 
     username: str | None = None
     password: SecretStr | None = None
+    token: SecretStr | None = None
     netrc_path: Path | None = None
 
 
@@ -167,20 +177,28 @@ class EarthdataAuth(AbstractAuth[EarthdataCredentials]):
         """Return whether both an explicit username and password were given."""
         return self._creds.username is not None and self._creds.password is not None
 
+    def _has_explicit_token(self) -> bool:
+        """Return whether an explicit EDL bearer token was given."""
+        return self._creds.token is not None
+
     def _resolve_strategy(self) -> str:
         """Pick the `earthaccess.login` strategy.
 
-        Returns the first viable source in the documented order:
-        explicit `username` + `password` passed to the constructor
-        (fed to `earthaccess` via the environment strategy), then the
-        `EARTHDATA_USERNAME` / `EARTHDATA_PASSWORD` environment
-        variables, then a `.netrc` holding an EDL entry, then an
-        interactive prompt as the last resort.
+        Returns the first viable source in this order: an explicit EDL
+        bearer `token` or `username` + `password` passed to the
+        constructor (fed to `earthaccess` via the environment strategy),
+        then the `EARTHDATA_TOKEN` or `EARTHDATA_USERNAME` /
+        `EARTHDATA_PASSWORD` environment variables, then a `.netrc`
+        holding an EDL entry, then an interactive prompt as the last
+        resort. `earthaccess`'s environment strategy accepts either a
+        token or a username/password pair.
 
         Returns:
             str: One of `"environment"`, `"netrc"`, `"interactive"`.
         """
-        if self._has_explicit_credentials():
+        if self._has_explicit_token() or self._has_explicit_credentials():
+            return "environment"
+        if os.getenv("EARTHDATA_TOKEN"):
             return "environment"
         if os.getenv("EARTHDATA_USERNAME") and os.getenv("EARTHDATA_PASSWORD"):
             return "environment"
@@ -194,13 +212,14 @@ class EarthdataAuth(AbstractAuth[EarthdataCredentials]):
 
         Idempotent — short-circuits when :meth:`is_authenticated`
         already returns `True`. On the first call, resolves the login
-        strategy (explicit creds → env → netrc → interactive). When an
-        explicit `username` / `password` was passed to the constructor,
-        it is exported to `EARTHDATA_USERNAME` / `EARTHDATA_PASSWORD` so
-        the `earthaccess` environment strategy picks it up (the SDK has
-        no direct username/password login argument). Then logs in with
-        `persist=True` and keeps the returned `earthaccess.Auth` handle
-        on :attr:`_auth`.
+        strategy (explicit token / creds → env → netrc → interactive).
+        `earthaccess` has no direct login argument for a token or a
+        username/password, so an explicit credential is exported to the
+        environment variable its `"environment"` strategy reads —
+        `EARTHDATA_TOKEN` for a bearer token, or `EARTHDATA_USERNAME` /
+        `EARTHDATA_PASSWORD` for a username/password — before login. Then
+        logs in with `persist=True` and keeps the returned
+        `earthaccess.Auth` handle on :attr:`_auth`.
 
         Raises:
             AuthenticationError: When `earthaccess.login` returns an
@@ -221,12 +240,18 @@ class EarthdataAuth(AbstractAuth[EarthdataCredentials]):
             ) from exc
 
         strategy = self._resolve_strategy()
-        if strategy == "environment" and self._has_explicit_credentials():
-            # earthaccess has no direct username/password argument; the
-            # environment strategy reads these two variables. Export the
-            # explicit creds so they actually reach the login.
-            os.environ["EARTHDATA_USERNAME"] = self._creds.username
-            os.environ["EARTHDATA_PASSWORD"] = self._creds.password.get_secret_value()
+        if strategy == "environment":
+            # earthaccess has no direct token / username-password argument;
+            # its environment strategy reads EARTHDATA_TOKEN (preferred) or
+            # EARTHDATA_USERNAME / EARTHDATA_PASSWORD. Export whichever
+            # explicit credential was supplied so it reaches the login.
+            if self._has_explicit_token():
+                os.environ["EARTHDATA_TOKEN"] = self._creds.token.get_secret_value()
+            elif self._has_explicit_credentials():
+                os.environ["EARTHDATA_USERNAME"] = self._creds.username
+                os.environ["EARTHDATA_PASSWORD"] = (
+                    self._creds.password.get_secret_value()
+                )
         try:
             auth = earthaccess.login(strategy=strategy, persist=True)
         except Exception as exc:  # noqa: BLE001 - re-raised as AuthenticationError
