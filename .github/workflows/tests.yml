@@ -54,5 +54,8 @@ jobs:
       - name: Run OpenAQ tests
         run: pixi run -e ${{ matrix.environment }} test-openaq
 
+      - name: Run Tropycal tests
+        run: pixi run -e ${{ matrix.environment }} test-tropycal
+
       - name: Upload coverage reports to Codecov with GitHub Action
         uses: codecov/codecov-action@v5
