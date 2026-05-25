@@ -17,9 +17,10 @@ Requires only the `[stac]` extra (`pip install earthlens[stac]`).
 
 ## Microsoft Planetary Computer — SAS URL signing
 
-No account needed. Install the `planetary-computer` SDK (part of the `[stac]`
-extra) and the backend signs each asset URL with a short-lived Azure **SAS
-token** in the query string (`MpcSasSigner`):
+No account needed and no extra SDK: the backend uses pyramids' native
+`PlanetaryComputerSigner`, which mints a short-lived Azure **SAS token** and
+grafts it onto each asset URL's query string (only the `[stac]` extra,
+`pystac-client`, is required):
 
 ```python
 EarthLens(data_source="planetary-computer",

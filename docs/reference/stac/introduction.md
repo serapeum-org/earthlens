@@ -36,7 +36,8 @@ the provider glue:
   and `cog.write_cog`.
 * `pyramids.feature.bbox.split_antimeridian` — antimeridian handling.
 
-earthlens adds the **provider signers** (`MpcSasSigner`, `CdseS3Signer`), the
+earthlens adds the **CDSE S3 provider signer** (`CdseS3Signer`; Planetary
+Computer signing uses pyramids' native `PlanetaryComputerSigner`), the
 **endpoint × collection × asset catalog**, and the **search → load → write**
 orchestration. There is no `odc-stac` / `stackstac` dependency.
 
