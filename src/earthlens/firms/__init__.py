@@ -51,6 +51,12 @@ Examples:
 
 from __future__ import annotations
 
+from earthlens.firms.auth import (
+    AuthenticationError,
+    FirmsAuth,
+    FirmsCredentials,
+)
+from earthlens.firms.backend import FIRMS
 from earthlens.firms.catalog import (
     CATALOG_PATH,
     Catalog,
@@ -60,7 +66,11 @@ from earthlens.firms.catalog import (
 
 __all__ = [
     "CATALOG_PATH",
+    "AuthenticationError",
     "Catalog",
+    "FIRMS",
+    "FirmsAuth",
+    "FirmsCredentials",
     "Sensor",
     "SensorColumn",
 ]
