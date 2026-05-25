@@ -142,6 +142,10 @@ nav:
       - Usage: reference/openaq/usage.md
       - Authentication: reference/openaq/authentication.md
       - Reference: reference/openaq/openaq.md
+    - Tropycal (cyclone tracks):
+      - Introduction: reference/tropycal/introduction.md
+      - Usage: reference/tropycal/usage.md
+      - Reference: reference/tropycal/tropycal.md
   - Examples:
     - Authentication: examples/authentication.md
     - Data Sources: examples/data-sources.md
@@ -193,6 +197,15 @@ nav:
       - Quickstart — PM2.5 over a city: examples/openaq/quickstart.ipynb
       - PM2.5 city time-series (WHO guideline): examples/openaq/pm25_city_timeseries.ipynb
       - Multi-station NO2 diurnal comparison: examples/openaq/multistation_comparison.ipynb
+    - Tropical cyclones (Tropycal):
+      - Quickstart — Atlantic season: examples/tropycal/quickstart.ipynb
+      - Season track map: examples/tropycal/season_track_map.ipynb
+      - Multi-decade landfall density: examples/tropycal/landfall_density.ipynb
+      - Recon observations — Katrina: examples/tropycal/recon_katrina.ipynb
+      - SHIPS intensity forecast — Ian: examples/tropycal/ships_intensity_forecast.ipynb
+      - Hurricane Katrina — intensity timeline: examples/tropycal/katrina_intensity_timeline.ipynb
+      - HURDAT2 vs IBTrACS — source comparison: examples/tropycal/source_comparison.ipynb
+      - Multi-basin season — ACE by basin: examples/tropycal/multibasin_ace.ipynb
   - API Reference:
     - EarthLens Facade: reference/earthlens.md
     - AbstractDataSource: reference/abstract-datasource.md

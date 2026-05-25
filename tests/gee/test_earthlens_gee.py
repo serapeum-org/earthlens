@@ -76,6 +76,7 @@ class TestRegistry:
             "gee",
             "google-earth-engine",
             "openaq",
+            "tropycal",
         ]
 
     def test_keys_resolve_to_gee_class(self):
