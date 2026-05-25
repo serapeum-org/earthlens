@@ -178,6 +178,8 @@ nav:
       - Per-dataset output kind: examples/earthdata/output_kinds.ipynb
       - GPM IMERG monthly precipitation (live): examples/earthdata/imerg_precipitation.ipynb
       - GEDI L4A biomass footprints (live): examples/earthdata/gedi_l4a_footprints.ipynb
+      - PACE ocean-colour chlorophyll (live): examples/earthdata/pace_ocean_colour.ipynb
+      - SMAP soil moisture (live): examples/earthdata/smap_soil_moisture.ipynb
     - Seismic events (FDSN):
       - Quickstart — recent earthquakes: examples/fdsn/quickstart.ipynb
       - Global seismicity map: examples/fdsn/global_seismicity_map.ipynb

@@ -34,7 +34,12 @@ _REPO_ROOT = Path(__file__).resolve().parents[2]
 _EXAMPLES = _REPO_ROOT / "docs" / "examples" / "earthdata"
 # The real-life (live-download) notebooks — distinct from the offline
 # catalog_explorer / output_kinds demos, which need no credentials.
-_LIVE_NOTEBOOKS = ["imerg_precipitation.ipynb", "gedi_l4a_footprints.ipynb"]
+_LIVE_NOTEBOOKS = [
+    "imerg_precipitation.ipynb",
+    "gedi_l4a_footprints.ipynb",
+    "pace_ocean_colour.ipynb",
+    "smap_soil_moisture.ipynb",
+]
 
 
 def _run_notebook_cells(path: Path, workdir: Path) -> str:
