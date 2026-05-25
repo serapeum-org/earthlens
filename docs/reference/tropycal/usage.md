@@ -114,13 +114,39 @@ el = EarthLens(
 el.download()
 ```
 
+## Other products (`product=`)
+
+Beyond best tracks, the `product=` selector fetches other tropycal families
+through the same `data_source="tropycal"` backend (see the
+[Introduction](introduction.md) products table):
+
+```python
+# recon — aircraft observations for a storm (vector points)
+EarthLens(data_source="tropycal", product="recon", variables=["AL122005"],
+          basin="north_atlantic", source="hurdat", start="2005-08-23",
+          end="2005-08-31", lat_lim=[18, 31], lon_lim=[-98, -80],
+          path="out").download()
+
+# ships — SHIPS intensity-forecast guidance (tabular DataFrame)
+EarthLens(data_source="tropycal", product="ships", variables=["AL092022"],
+          basin="north_atlantic", source="hurdat", ships_time="2022-09-27 00:00",
+          start="2022-09-20", end="2022-10-01", lat_lim=[-90, 90],
+          lon_lim=[-180, 180], path="out").download()   # -> pandas DataFrame
+
+# realtime — live active storms (vector; empty variables = all active)
+EarthLens(data_source="tropycal", product="realtime", variables=[],
+          start="2026-01-01", end="2026-12-31", lat_lim=[-90, 90],
+          lon_lim=[-180, 180], path="out").download()
+```
+
+`recon`/`ships` need a storm with aircraft data / archived SHIPS guidance;
+`realtime` returns data only while storms are active.
+
 ## Notes
 
-- **`aggregate=` is rejected.** Tropycal output is vector, so passing
-  `aggregate=` raises `NotImplementedError`. Post-process the returned
-  `GeoDataFrame` directly instead.
+- **`aggregate=` is rejected.** Tropycal output is vector or tabular, never
+  gridded, so passing `aggregate=` raises `NotImplementedError`. Post-process
+  the returned `GeoDataFrame` / `DataFrame` directly instead.
 - **First-load cost.** Expect a few seconds for HURDAT and longer for IBTrACS
   on the first query of a basin; subsequent queries in the same process reuse
   the cached `TrackDataset`.
-- **Best-track only.** Forecast / operational products are out of scope (see
-  [Introduction](introduction.md)).

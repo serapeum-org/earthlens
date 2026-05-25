@@ -34,17 +34,35 @@ library's `tracks.TrackDataset`.
   The Saffir–Simpson `category` is **derived** from `vmax` (tropycal exposes no
   category column).
 
+## Products
+
+A `product=` selector chooses which tropycal data family to fetch (one backend,
+`data_source="tropycal"`):
+
+| `product` | What | Keyed on | Output |
+|---|---|---|---|
+| `"besttrack"` (default) | historical best tracks (above) | basin + date window; `variables=[basins]` | `vector` |
+| `"recon"` | aircraft reconnaissance observations (`recon_product="hdobs"`/`"dropsondes"`/`"vdms"`) | a storm; `variables=[storm ids]`, `basin=`/`source=` resolve them | `vector` (obs points) |
+| `"ships"` | SHIPS intensity-forecast guidance | a storm + forecast cycle; `variables=[storm ids]`, `ships_time=<cycle>` | **`tabular`** (a `DataFrame`) |
+| `"realtime"` | live active storms (current tracks) | "what's active now"; `variables=[active ids]` (empty = all), `realtime_jtwc=` | `vector`; **no date window** |
+
+NHC operational advisory cones are not exposed; `realtime` returns the current
+best-track-so-far of active storms.
+
 ## Limits and scope
 
-- **Best-track only.** tropycal's realtime / operational / forecast products
-  (`tropycal.realtime`, NHC advisory cones, forecast objects) are **out of
-  scope** for this backend — it returns historical best tracks only.
-- **First-load cost.** Constructing a `TrackDataset` downloads and parses a
-  whole basin's best-track file. HURDAT loads in a few seconds; IBTrACS is
-  larger and slower. earthlens loads each `(basin, source)` once per process
-  and reuses it across years/storms, and logs an info line on the first load.
-- **No aggregation.** Because the output is vector, the `EarthLens` facade
-  rejects an `aggregate=` argument with `NotImplementedError`.
+- **First-load cost.** Constructing a `TrackDataset` (besttrack / recon /
+  ships) downloads and parses a whole basin's best-track file. HURDAT loads in
+  a few seconds; IBTrACS is larger and slower. earthlens loads each
+  `(basin, source)` once per process and reuses it, and logs an info line on
+  the first load. `recon` additionally downloads the storm's flight-level
+  files (slow); `ships` and `realtime` fetch live from NCEI / NHC.
+- **`recon`/`ships`/`realtime` availability.** recon exists only for storms
+  with aircraft missions (mostly Atlantic); SHIPS guidance is archived for
+  recent storms (not multi-decade history); realtime returns data only when
+  storms are active.
+- **No aggregation.** Whether the output is vector or tabular, the `EarthLens`
+  facade rejects an `aggregate=` argument with `NotImplementedError`.
 
 ## Installation
 
