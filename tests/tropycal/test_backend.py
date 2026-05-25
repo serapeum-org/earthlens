@@ -257,9 +257,9 @@ class TestProductValidation:
     """Tests for the product / recon_product selectors."""
 
     def test_unknown_product_rejected(self, tmp_path):
-        """An unimplemented/unknown product is rejected (realtime not yet added)."""
+        """An unknown product is rejected."""
         with pytest.raises(ValueError, match="product must be one of"):
-            _backend(tmp_path, product="realtime")
+            _backend(tmp_path, product="bogus")
 
     def test_bad_recon_product_rejected(self, tmp_path):
         """An unknown recon_product is rejected."""
@@ -398,6 +398,65 @@ class TestShipsProduct:
         """A non-None aggregate is rejected for the tabular ships product too."""
         with pytest.raises(NotImplementedError, match="not supported"):
             _ships_backend(tmp_path).download(aggregate=object())
+
+
+def _realtime_backend(tmp_path, **overrides):
+    """Build a realtime-product TropicalCyclone (whole-earth, no window)."""
+    kwargs = dict(
+        start="2026-01-01",
+        end="2026-12-31",
+        variables=[],
+        lat_lim=[-90, 90],
+        lon_lim=[-180, 180],
+        product="realtime",
+        path=str(tmp_path),
+    )
+    kwargs.update(overrides)
+    return TropicalCyclone(**kwargs)
+
+
+class TestRealtimeProduct:
+    """Tests for product='realtime' (live active storms, vector)."""
+
+    def test_output_kind_vector(self, tmp_path):
+        """A realtime instance is vector."""
+        assert _realtime_backend(tmp_path).OUTPUT_KIND == "vector"
+
+    def test_empty_variables_allowed(self, tmp_path):
+        """realtime allows empty variables (means: all active storms)."""
+        assert _realtime_backend(tmp_path).vars == []
+
+    def test_download_all_active(self, tmp_path, fake_realtime):
+        """realtime download maps every active storm's current track to points."""
+        result = _realtime_backend(tmp_path).download()
+        assert isinstance(result, gpd.GeoDataFrame)
+        assert set(POINT_COLUMNS).issubset(result.columns)
+        assert len(result) == 3
+        assert set(result["source"]) == {"realtime"}
+
+    def test_download_selects_requested_id(self, tmp_path, fake_realtime):
+        """A requested active id is selected; a non-active id yields nothing."""
+        assert len(_realtime_backend(tmp_path, variables=["AL012026"]).download()) == 3
+        assert len(_realtime_backend(tmp_path, variables=["ZZ999999"]).download()) == 0
+
+    def test_no_active_storms_empty(self, tmp_path, fake_realtime):
+        """When nothing is active (off-season), an empty FC is returned."""
+        fake_realtime.active_ids = []
+        result = _realtime_backend(tmp_path).download()
+        assert len(result) == 0
+        assert set(POINT_COLUMNS).issubset(result.columns)
+
+    def test_unreadable_active_storm_skipped(self, tmp_path, fake_realtime):
+        """An active storm that can't be read is skipped (empty, not fatal)."""
+        fake_realtime.active_ids = ["GHOST"]  # not in state.storms -> KeyError
+        result = _realtime_backend(tmp_path).download()
+        assert len(result) == 0
+
+    def test_missing_extra_importerror(self, tmp_path, fake_tropycal, monkeypatch):
+        """A failing tropycal.realtime import surfaces a friendly ImportError."""
+        monkeypatch.setitem(sys.modules, "tropycal.realtime", None)
+        with pytest.raises(ImportError, match=r"earthlens\[tropycal\]"):
+            _realtime_backend(tmp_path).download()
 
 
 class TestMissingExtra:

@@ -109,6 +109,7 @@ class _FakeState:
         self.storms: dict[str, pd.DataFrame] = {}
         self.ships_frame: pd.DataFrame | None = None
         self.recon_frame: pd.DataFrame | None = None
+        self.active_ids: list[str] = []
 
     def add_storm(self, year: int, frame: pd.DataFrame, storm_id: str | None = None) -> None:
         """Register a storm DataFrame under a season year."""
@@ -215,6 +216,36 @@ def fake_recon(fake_tropycal, monkeypatch: pytest.MonkeyPatch) -> _FakeState:
     recon_module.dropsondes = _builder
     recon_module.vdms = _builder
     monkeypatch.setitem(__import__("sys").modules, "tropycal.recon", recon_module)
+    return fake_tropycal
+
+
+class _FakeRealtime:
+    """Stand-in for `tropycal.realtime.Realtime` over the fake state."""
+
+    def __init__(self, state: _FakeState, jtwc: bool = False) -> None:
+        self._state = state
+
+    def list_active_storms(self, basin: str = "all") -> list[str]:
+        return list(self._state.active_ids)
+
+    def get_storm(self, storm_id: str) -> _FakeStorm:
+        return _FakeStorm(self._state.storms[storm_id])
+
+
+@pytest.fixture
+def fake_realtime(fake_tropycal, monkeypatch: pytest.MonkeyPatch) -> _FakeState:
+    """Inject a fake `tropycal.realtime` with one active storm.
+
+    Set `state.active_ids = []` to simulate the (common, off-season) case of
+    no active storms.
+    """
+    fake_tropycal.active_ids = ["AL012026"]
+    fake_tropycal.storms.setdefault(
+        "AL012026", _make_storm_frame(storm_id="AL012026", name="ALPHA")
+    )
+    module = types.ModuleType("tropycal.realtime")
+    module.Realtime = lambda jtwc=False, **kwargs: _FakeRealtime(fake_tropycal, jtwc)
+    monkeypatch.setitem(__import__("sys").modules, "tropycal.realtime", module)
     return fake_tropycal
 
 

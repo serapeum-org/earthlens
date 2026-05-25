@@ -56,18 +56,23 @@ if TYPE_CHECKING:
 
 FileFormat = Literal["gpkg", "geojson"]
 Geometry = Literal["point", "track"]
-Product = Literal["besttrack", "recon", "ships"]
+Product = Literal["besttrack", "recon", "ships", "realtime"]
 ReconProduct = Literal["hdobs", "dropsondes", "vdms"]
 
-#: Products implemented so far. `besttrack` (default) is basin+window keyed
-#: (vector). `recon` is storm-keyed aircraft observations (vector). `ships`
-#: is storm + forecast-cycle keyed SHIPS intensity-forecast guidance
-#: (tabular). `realtime` (live storms) is a planned follow-up.
-_PRODUCTS = ("besttrack", "recon", "ships")
+#: Products: `besttrack` (default) is basin+window keyed (vector); `recon`
+#: is storm-keyed aircraft observations (vector); `ships` is storm +
+#: forecast-cycle keyed SHIPS guidance (tabular); `realtime` is live active
+#: storms (vector, no date window).
+_PRODUCTS = ("besttrack", "recon", "ships", "realtime")
 _RECON_PRODUCTS = ("hdobs", "dropsondes", "vdms")
 
 #: Products that are storm-keyed (variables are storm ids, not basins).
+#: `realtime` is excluded: its `variables` are optional (empty = all active).
 _STORM_KEYED = ("recon", "ships")
+
+#: A window wide enough to admit every realtime fix (realtime has no
+#: `[start, end]`; only the bbox filters).
+_OPEN_WINDOW = (dt.datetime(1800, 1, 1), dt.datetime(2200, 1, 1))
 
 #: Map output format to the OGR driver and file extension `to_file` uses.
 _DRIVERS: dict[str, tuple[str, str]] = {
@@ -124,6 +129,7 @@ class TropicalCyclone(AbstractDataSource):
         recon_product: ReconProduct = "hdobs",
         basin: str = "north_atlantic",
         ships_time: str | None = None,
+        realtime_jtwc: bool = False,
     ):
         """Initialise a Tropical-cyclone backend instance.
 
@@ -202,8 +208,7 @@ class TropicalCyclone(AbstractDataSource):
             )
         if product not in _PRODUCTS:
             raise ValueError(
-                f"product must be one of {list(_PRODUCTS)}, got {product!r}. "
-                "(ships / realtime are planned follow-ups.)"
+                f"product must be one of {list(_PRODUCTS)}, got {product!r}."
             )
         if recon_product not in _RECON_PRODUCTS:
             raise ValueError(
@@ -235,6 +240,7 @@ class TropicalCyclone(AbstractDataSource):
         self._recon_product: ReconProduct = recon_product
         self._basin = basin
         self._ships_time = ships_time
+        self._realtime_jtwc = realtime_jtwc
         # ships is tabular (a forecast-guidance table); the others are
         # vector. The facade reads this instance attribute to decide whether
         # `aggregate=` is allowed (it is not, for either kind).
@@ -658,6 +664,8 @@ class TropicalCyclone(AbstractDataSource):
 
         if self._product == "ships":
             return self._download_ships()
+        if self._product == "realtime":
+            return self._download_realtime()
 
         products = self._search()
         collections = self._fetch(products) if products else []
@@ -682,6 +690,80 @@ class TropicalCyclone(AbstractDataSource):
                 "nothing written"
             )
         return combined
+
+    def _download_realtime(self) -> FeatureCollection:
+        """Fetch live active storms and map their current tracks to features.
+
+        `product="realtime"` has no date window: it pulls whatever storms are
+        active *now* from `tropycal.realtime.Realtime`. `variables` (if given)
+        selects active storm ids; empty means every active storm. Each
+        `RealtimeStorm` is `Storm`-shaped, so its `to_dataframe` maps through
+        the same point/track mapper as best tracks (with an open time window
+        — only the bbox filters). An empty result (no active storms, or none
+        in the bbox) returns a schema-correct empty FeatureCollection.
+
+        Returns:
+            FeatureCollection: Current-track features for the active storms,
+                CRS `EPSG:4326`.
+        """
+        realtime = self._get_realtime()
+        active = list(realtime.list_active_storms())
+        requested = set(self.vars)
+        ids = [s for s in active if not requested or s in requested]
+        if not ids:
+            logger.warning(
+                "Tropycal realtime: no matching active storms right now, "
+                "nothing written"
+            )
+            return events.empty_fc(self._geometry)
+
+        bbox = (self.space.south, self.space.north, self.space.west, self.space.east)
+        written: list[Path] = []
+        collections: list[FeatureCollection] = []
+        for storm_id in ids:
+            frame = self._realtime_storm_frame(realtime, storm_id)
+            fc = events.frame_to_fc(
+                [frame] if frame is not None else [],
+                geometry=self._geometry,
+                window=_OPEN_WINDOW,
+                bbox=bbox,
+                source="realtime",
+            )
+            collections.append(fc)
+            if len(fc):
+                written.append(self._write(storm_id, fc))
+
+        combined = events.concat_fcs(collections, self._geometry)
+        logger.info(
+            f"Tropycal realtime: {len(combined)} feature(s) across "
+            f"{len(written)} file(s) written to {self.root_dir}"
+        )
+        return combined
+
+    def _get_realtime(self) -> object:
+        """Build a `tropycal.realtime.Realtime` (lazy import; one live fetch)."""
+        try:
+            import tropycal.realtime as realtime
+        except ImportError as exc:
+            raise ImportError(
+                "The Tropycal realtime product needs the `tropycal` package. "
+                "Install it with `pip install earthlens[tropycal]`."
+            ) from exc
+        logger.info("Loading tropycal realtime active-storm data (live fetch).")
+        return realtime.Realtime(jtwc=self._realtime_jtwc)
+
+    @staticmethod
+    def _realtime_storm_frame(realtime: object, storm_id: str) -> pd.DataFrame | None:
+        """Return one active storm's current-track frame, or `None` on failure."""
+        try:
+            storm = realtime.get_storm(storm_id)
+            return storm.to_dataframe(attrs_as_columns=True)
+        except Exception as exc:  # noqa: BLE001
+            logger.warning(
+                f"tropycal realtime storm {storm_id!r} skipped: "
+                f"{type(exc).__name__}: {exc}"
+            )
+            return None
 
     def _download_ships(self) -> "pd.DataFrame":
         """Fetch SHIPS guidance for each storm and return one tabular frame.
