@@ -193,27 +193,15 @@
          <lastmod>2026-05-25</lastmod>
     </url>
     <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/examples/tropycal/katrina_intensity_timeline/</loc>
+         <loc>https://serapeum-org.github.io/earthlens/develop/examples/stac/mpc_landsat_cdse_sentinel_same_aoi/</loc>
          <lastmod>2026-05-25</lastmod>
     </url>
     <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/examples/tropycal/landfall_density/</loc>
+         <loc>https://serapeum-org.github.io/earthlens/develop/examples/stac/quickstart/</loc>
          <lastmod>2026-05-25</lastmod>
     </url>
     <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/examples/tropycal/multibasin_ace/</loc>
-         <lastmod>2026-05-25</lastmod>
-    </url>
-    <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/examples/tropycal/quickstart/</loc>
-         <lastmod>2026-05-25</lastmod>
-    </url>
-    <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/examples/tropycal/season_track_map/</loc>
-         <lastmod>2026-05-25</lastmod>
-    </url>
-    <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/examples/tropycal/source_comparison/</loc>
+         <loc>https://serapeum-org.github.io/earthlens/develop/examples/stac/sentinel2_ndvi_timeseries/</loc>
          <lastmod>2026-05-25</lastmod>
     </url>
     <url>
@@ -337,15 +325,19 @@
          <lastmod>2026-05-25</lastmod>
     </url>
     <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/reference/tropycal/introduction/</loc>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/stac/authentication/</loc>
          <lastmod>2026-05-25</lastmod>
     </url>
     <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/reference/tropycal/tropycal/</loc>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/stac/introduction/</loc>
          <lastmod>2026-05-25</lastmod>
     </url>
     <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/reference/tropycal/usage/</loc>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/stac/stac/</loc>
+         <lastmod>2026-05-25</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/stac/usage/</loc>
          <lastmod>2026-05-25</lastmod>
     </url>
 </urlset>

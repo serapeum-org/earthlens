@@ -10,13 +10,13 @@
       
       
       
-        <link rel="canonical" href="https://serapeum-org.github.io/earthlens/develop/reference/tropycal/introduction/">
+        <link rel="canonical" href="https://serapeum-org.github.io/earthlens/develop/reference/stac/usage/">
       
       
-        <link rel="prev" href="../../openaq/openaq/">
+        <link rel="prev" href="../introduction/">
       
       
-        <link rel="next" href="../usage/">
+        <link rel="next" href="../authentication/">
       
       
         
@@ -27,7 +27,7 @@
     
     
       
-        <title>Introduction - earthlens</title>
+        <title>Usage - earthlens</title>
       
     
     
@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -83,7 +83,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#tropycal-introduction" class="md-skip">
+        <a href="#stac-backend-usage" class="md-skip">
           Skip to content
         </a>
       
@@ -123,7 +123,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Introduction
+              Usage
             
           </span>
         </div>
@@ -1467,6 +1467,308 @@
                 
   
   
+    
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_7" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_3_7" id="__nav_3_7_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    STAC (Sentinel / Landsat / cloud platforms)
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_7_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    STAC (Sentinel / Landsat / cloud platforms)
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../introduction/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Introduction
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Usage
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Usage
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#request-shape" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Request shape
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#choosing-an-endpoint" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Choosing an endpoint
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#optional-knobs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Optional knobs
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#output" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Output
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Output">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#antimeridian" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Antimeridian
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#aggregation-aggregate" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Aggregation (aggregate=)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#see-also" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        See also
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../authentication/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Authentication
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../stac/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
   
   
     
@@ -1481,10 +1783,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_7" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_8" >
         
           
-          <label class="md-nav__link" for="__nav_3_7" id="__nav_3_7_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3_8" id="__nav_3_8_label" tabindex="0">
             
   
   
@@ -1502,8 +1804,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_7_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_7">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_8">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -1623,10 +1925,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_8" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_9" >
         
           
-          <label class="md-nav__link" for="__nav_3_8" id="__nav_3_8_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3_9" id="__nav_3_9_label" tabindex="0">
             
   
   
@@ -1644,8 +1946,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_8_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_8">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_9_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_9">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -1747,241 +2049,6 @@
   
     <li class="md-nav__item">
       <a href="../../openaq/openaq/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Reference
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-    
-  
-  
-  
-    
-    
-    
-    
-      
-      
-    
-    
-    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
-      
-        
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_9" checked>
-        
-          
-          <label class="md-nav__link" for="__nav_3_9" id="__nav_3_9_label" tabindex="0">
-            
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Tropycal (cyclone tracks)
-  
-
-    
-  </span>
-  
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_9_label" aria-expanded="true">
-          <label class="md-nav__title" for="__nav_3_9">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    Tropycal (cyclone tracks)
-  
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-    
-  
-  
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Introduction
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Introduction
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#what-it-covers" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        What it covers
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#limits-and-scope" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Limits and scope
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#installation" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Installation
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#see-also" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        See also
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../usage/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Usage
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../tropycal/" class="md-nav__link">
         
   
   
@@ -3363,7 +3430,7 @@
   <span class="md-ellipsis">
     
   
-    Disaster alerts (GDACS)
+    Satellite imagery (STAC)
   
 
     
@@ -3376,6 +3443,148 @@
         
         <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_8_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_4_8">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Satellite imagery (STAC)
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../examples/stac/quickstart/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    STAC quickstart — Sentinel-2 COGs from Earth Search
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../examples/stac/sentinel2_ndvi_timeseries/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sentinel-2 monthly NDVI time-series (Earth Search)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../examples/stac/mpc_landsat_cdse_sentinel_same_aoi/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Same AOI across providers: MPC + CDSE
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_9" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_9" id="__nav_4_9_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Disaster alerts (GDACS)
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_9_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_9">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -3523,10 +3732,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_9" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_10" >
         
           
-          <label class="md-nav__link" for="__nav_4_9" id="__nav_4_9_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_10" id="__nav_4_10_label" tabindex="0">
             
   
   
@@ -3544,8 +3753,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_9_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_9">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_10_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_10">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -3626,232 +3835,6 @@
     
   
     Multi-station NO2 — the traffic diurnal cycle
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    
-    
-    
-    
-      
-      
-    
-    
-    <li class="md-nav__item md-nav__item--nested">
-      
-        
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_10" >
-        
-          
-          <label class="md-nav__link" for="__nav_4_10" id="__nav_4_10_label" tabindex="0">
-            
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Tropical cyclones (Tropycal)
-  
-
-    
-  </span>
-  
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_10_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_10">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    Tropical cyclones (Tropycal)
-  
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../examples/tropycal/quickstart/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Tropycal quickstart — one Atlantic season
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../examples/tropycal/season_track_map/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Season track map — one basin, one season
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../examples/tropycal/landfall_density/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Multi-decade landfall density
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../examples/tropycal/katrina_intensity_timeline/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Hurricane Katrina — intensity timeline (2005)
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../examples/tropycal/source_comparison/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    HURDAT2 vs IBTrACS — source comparison
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../examples/tropycal/multibasin_ace/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Multi-basin season — ACE by basin
   
 
     
@@ -4105,10 +4088,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#what-it-covers" class="md-nav__link">
+  <a href="#request-shape" class="md-nav__link">
     <span class="md-ellipsis">
       
-        What it covers
+        Request shape
       
     </span>
   </a>
@@ -4116,10 +4099,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#limits-and-scope" class="md-nav__link">
+  <a href="#choosing-an-endpoint" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Limits and scope
+        Choosing an endpoint
       
     </span>
   </a>
@@ -4127,10 +4110,49 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#installation" class="md-nav__link">
+  <a href="#optional-knobs" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Installation
+        Optional knobs
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#output" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Output
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Output">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#antimeridian" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Antimeridian
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#aggregation-aggregate" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Aggregation (aggregate=)
       
     </span>
   </a>
@@ -4165,7 +4187,7 @@
 
 
   
-    <a href="https://github.com/serapeum-org/earthlens/edit/master/docs/reference/tropycal/introduction.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
+    <a href="https://github.com/serapeum-org/earthlens/edit/master/docs/reference/stac/usage.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
     </a>
@@ -4174,74 +4196,83 @@
     
       
     
-    <a href="https://github.com/serapeum-org/earthlens/raw/master/docs/reference/tropycal/introduction.md" title="View source of this page" class="md-content__button md-icon">
+    <a href="https://github.com/serapeum-org/earthlens/raw/master/docs/reference/stac/usage.md" title="View source of this page" class="md-content__button md-icon">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 18c.56 0 1 .44 1 1s-.44 1-1 1-1-.44-1-1 .44-1 1-1m0-3c-2.73 0-5.06 1.66-6 4 .94 2.34 3.27 4 6 4s5.06-1.66 6-4c-.94-2.34-3.27-4-6-4m0 6.5a2.5 2.5 0 0 1-2.5-2.5 2.5 2.5 0 0 1 2.5-2.5 2.5 2.5 0 0 1 2.5 2.5 2.5 2.5 0 0 1-2.5 2.5M9.27 20H6V4h7v5h5v4.07c.7.08 1.36.25 2 .49V8l-6-6H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h4.5a8.2 8.2 0 0 1-1.23-2"/></svg>
     </a>
   
 
 
-<h1 id="tropycal-introduction"><a class="toclink" href="#tropycal-introduction">Tropycal — introduction</a><a class="headerlink" href="#tropycal-introduction" title="Permanent link">#</a></h1>
-<p>The <code>tropycal</code> backend (<code>data_source="tropycal"</code>) returns <strong>tropical-cyclone
-best tracks</strong> as a vector
-<a href="https://serapeum-org.github.io/pyramids/"><code>FeatureCollection</code></a> of track
-features. It wraps the <a href="https://tropycal.github.io/tropycal/"><code>tropycal</code></a>
-library's <code>tracks.TrackDataset</code>.</p>
-<h2 id="what-it-covers"><a class="toclink" href="#what-it-covers">What it covers</a><a class="headerlink" href="#what-it-covers" title="Permanent link">#</a></h2>
-<ul>
-<li>
-<p><strong>Sources.</strong> Two best-track sources, selected with <code>source=</code>:</p>
-<ul>
-<li><code>"ibtracs"</code> (default) — IBTrACS v04r01, global coverage, every basin,
-  1848–present.</li>
-<li><code>"hurdat"</code> — HURDAT2, the NHC North Atlantic / East Pacific reanalysis.</li>
-</ul>
-<p>There is <strong>no <code>jtwc</code> source</strong> in tropycal 1.4; JTWC data is reachable only
-inside IBTrACS for some basins.
-- <strong>Basins.</strong> Selected through <code>variables=[...]</code> (this backend overloads
-  <code>variables</code> to mean <em>basin codes</em>, not data variables):
-  <code>north_atlantic</code>, <code>east_pacific</code>, <code>west_pacific</code>, <code>north_indian</code>,
-  <code>south_indian</code>, <code>australia</code>, <code>south_pacific</code>, <code>south_atlantic</code>, plus the
-  aggregates <code>both</code> (HURDAT North Atlantic + East Pacific) and <code>all</code> (IBTrACS
-  global). HURDAT serves only <code>north_atlantic</code> / <code>east_pacific</code> / <code>both</code>;
-  IBTrACS serves every basin. The catalog records the valid <code>(basin, source)</code>
-  pairs and an invalid pair is rejected with a clear error.
-- <strong>Output.</strong> <code>OUTPUT_KIND = "vector"</code>. Two geometries (<code>geometry=</code>):
-- <code>"point"</code> (default) — one feature per 6-hourly track fix, carrying
-  <code>storm_id</code>, <code>name</code>, <code>time</code>, <code>lat</code>, <code>lon</code>, <code>vmax_kt</code>, <code>mslp_hpa</code>,
-  <code>storm_type</code>, <code>category</code>, <code>basin</code>, <code>source</code>.
-- <code>"track"</code> — one <code>LineString</code> per storm with summary attributes
-  (<code>max_vmax_kt</code>, <code>min_mslp_hpa</code>, <code>max_category</code>, <code>ace</code>, <code>start_time</code>,
-  <code>end_time</code>).</p>
-</li>
-</ul>
-<p>The Saffir–Simpson <code>category</code> is <strong>derived</strong> from <code>vmax</code> (tropycal exposes no
-  category column).</p>
-<h2 id="limits-and-scope"><a class="toclink" href="#limits-and-scope">Limits and scope</a><a class="headerlink" href="#limits-and-scope" title="Permanent link">#</a></h2>
-<ul>
-<li><strong>Best-track only.</strong> tropycal's realtime / operational / forecast products
-  (<code>tropycal.realtime</code>, NHC advisory cones, forecast objects) are <strong>out of
-  scope</strong> for this backend — it returns historical best tracks only.</li>
-<li><strong>First-load cost.</strong> Constructing a <code>TrackDataset</code> downloads and parses a
-  whole basin's best-track file. HURDAT loads in a few seconds; IBTrACS is
-  larger and slower. earthlens loads each <code>(basin, source)</code> once per process
-  and reuses it across years/storms, and logs an info line on the first load.</li>
-<li><strong>No aggregation.</strong> Because the output is vector, the <code>EarthLens</code> facade
-  rejects an <code>aggregate=</code> argument with <code>NotImplementedError</code>.</li>
-</ul>
-<h2 id="installation"><a class="toclink" href="#installation">Installation</a><a class="headerlink" href="#installation" title="Permanent link">#</a></h2>
-<p>tropycal is an optional dependency:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>pip<span class="w"> </span>install<span class="w"> </span>earthlens<span class="o">[</span>tropycal<span class="o">]</span>
+<h1 id="stac-backend-usage"><a class="toclink" href="#stac-backend-usage">STAC backend — usage</a><a class="headerlink" href="#stac-backend-usage" title="Permanent link">#</a></h1>
+<h2 id="request-shape"><a class="toclink" href="#request-shape">Request shape</a><a class="headerlink" href="#request-shape" title="Permanent link">#</a></h2>
+<p>A request is a <code>variables</code> mapping of <code>{collection_key: [asset, ...]}</code> plus a
+bbox and a date window:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.earthlens</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="n">el</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;earth-search&quot;</span><span class="p">,</span>          <span class="c1"># endpoint alias (pre-binds endpoint=)</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">start</span><span class="o">=</span><span class="s2">&quot;2024-06-01&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="n">end</span><span class="o">=</span><span class="s2">&quot;2024-06-20&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    <span class="n">variables</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;sentinel-2-l2a&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;red&quot;</span><span class="p">,</span> <span class="s2">&quot;green&quot;</span><span class="p">,</span> <span class="s2">&quot;blue&quot;</span><span class="p">]},</span>
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">40.40</span><span class="p">,</span> <span class="mf">40.45</span><span class="p">],</span>
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>    <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">3.72</span><span class="p">,</span> <span class="o">-</span><span class="mf">3.67</span><span class="p">],</span>
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>    <span class="n">path</span><span class="o">=</span><span class="s2">&quot;out/madrid&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="p">)</span>
+<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="n">paths</span> <span class="o">=</span> <span class="n">el</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>                     <span class="c1"># -&gt; list of written COG paths</span>
 </code></pre></div>
-<p>This pulls <code>tropycal</code>, plus <code>cartopy</code> and <code>shapely</code> (which tropycal imports at
-load time but does not itself declare). tropycal's version shim also requires
-<code>setuptools &lt; 81</code> (it imports the now-removed <code>pkg_resources</code>). No credentials
-are needed — tropycal fetches public best-track files from NCEI / NHC over
-HTTPS.</p>
+<ul>
+<li>The <strong>collection key</strong> is logical; the catalog resolves it to the id the
+  endpoint actually serves (Earth Search calls Sentinel-2 L2A
+  <code>sentinel-2-c1-l2a</code>).</li>
+<li>The <strong>asset keys</strong> are the names that endpoint serves — these differ across
+  providers (Earth Search exposes <code>red</code>/<code>green</code>/<code>nir</code>; MPC exposes
+  <code>B04</code>/<code>B08</code>). Pass an empty list to fall back to the collection's
+  <code>default_assets</code>.</li>
+</ul>
+<h2 id="choosing-an-endpoint"><a class="toclink" href="#choosing-an-endpoint">Choosing an endpoint</a><a class="headerlink" href="#choosing-an-endpoint" title="Permanent link">#</a></h2>
+<p>Either open the facade with an <strong>endpoint alias</strong> (<code>"planetary-computer"</code>,
+<code>"earth-search"</code>, <code>"cdse"</code>), which pre-binds <code>endpoint=</code>, or use
+<code>data_source="stac"</code> and pass <code>endpoint=</code> yourself:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="n">el</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span><span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;stac&quot;</span><span class="p">,</span> <span class="n">endpoint</span><span class="o">=</span><span class="s2">&quot;planetary-computer&quot;</span><span class="p">,</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>               <span class="n">variables</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;sentinel-2-l2a&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;B04&quot;</span><span class="p">,</span> <span class="s2">&quot;B08&quot;</span><span class="p">]},</span> <span class="o">...</span><span class="p">)</span>
+</code></pre></div>
+<p>With no endpoint the backend infers it from the first collection's home
+endpoint.</p>
+<h2 id="optional-knobs"><a class="toclink" href="#optional-knobs">Optional knobs</a><a class="headerlink" href="#optional-knobs" title="Permanent link">#</a></h2>
+<p><code>resolution=</code> (output GSD, metres), <code>epsg=</code> (output CRS), and <code>max_items=</code> (cap
+the items per collection — handy for smoke pulls) are accepted as keyword
+arguments and forwarded through the facade.</p>
+<h2 id="output"><a class="toclink" href="#output">Output</a><a class="headerlink" href="#output" title="Permanent link">#</a></h2>
+<p>One COG per <code>(collection, acquisition date)</code> is written to <code>path</code>, named
+<code>&lt;collection&gt;_&lt;YYYY-MM-DD&gt;.tif</code>. Multiple tiles covering the bbox on the same
+date are mosaicked; multiple assets are stacked into the bands of one COG;
+mismatched-CRS tiles (e.g. a multi-UTM-zone Sentinel-2 AOI) are reprojected to a
+common CRS first.</p>
+<h3 id="antimeridian"><a class="toclink" href="#antimeridian">Antimeridian</a><a class="headerlink" href="#antimeridian" title="Permanent link">#</a></h3>
+<p>An AOI that crosses 180° is expressed with <code>lon_lim=[west, east]</code> where
+<code>west &gt; east</code> (e.g. <code>lon_lim=[170, -170]</code>). It is split into an eastern and a
+western half, and each date yields one COG per half
+(<code>&lt;collection&gt;_&lt;date&gt;_part0.tif</code> east, <code>_part1.tif</code> west).</p>
+<h2 id="aggregation-aggregate"><a class="toclink" href="#aggregation-aggregate">Aggregation (<code>aggregate=</code>)</a><a class="headerlink" href="#aggregation-aggregate" title="Permanent link">#</a></h2>
+<p>Because the output is raster, <code>download(aggregate=...)</code> is <strong>supported</strong>: a
+multi-date pull is reduced per time window into per-window COGs.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.aggregate</span><span class="w"> </span><span class="kn">import</span> <span class="n">AggregationConfig</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="n">el</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span><span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;earth-search&quot;</span><span class="p">,</span>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>               <span class="n">start</span><span class="o">=</span><span class="s2">&quot;2024-01-01&quot;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">&quot;2024-12-31&quot;</span><span class="p">,</span>
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>               <span class="n">variables</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;sentinel-2-l2a&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;red&quot;</span><span class="p">]},</span>
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>               <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">40.40</span><span class="p">,</span> <span class="mf">40.45</span><span class="p">],</span> <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">3.72</span><span class="p">,</span> <span class="o">-</span><span class="mf">3.67</span><span class="p">],</span> <span class="n">path</span><span class="o">=</span><span class="s2">&quot;out/ndvi&quot;</span><span class="p">)</span>
+<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="n">windows</span> <span class="o">=</span> <span class="n">el</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">aggregate</span><span class="o">=</span><span class="n">AggregationConfig</span><span class="p">(</span><span class="n">freq</span><span class="o">=</span><span class="s2">&quot;1MS&quot;</span><span class="p">,</span> <span class="n">op</span><span class="o">=</span><span class="s2">&quot;mean&quot;</span><span class="p">,</span>
+<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>                                                  <span class="n">out_dir</span><span class="o">=</span><span class="s2">&quot;out/ndvi/monthly&quot;</span><span class="p">))</span>
+</code></pre></div>
+<p>Each acquisition date is labelled with its <code>freq</code> window; the per-date COGs are
+reduced with <code>op</code> (<code>"auto"</code> → mean) via pyramids'
+<code>DatasetCollection.groupby(labels).&lt;op&gt;()</code>, writing one COG per
+<code>(collection, window)</code> named <code>&lt;collection&gt;_&lt;op&gt;_&lt;freq&gt;_&lt;YYYYMMDD&gt;.tif</code>.</p>
 <h2 id="see-also"><a class="toclink" href="#see-also">See also</a><a class="headerlink" href="#see-also" title="Permanent link">#</a></h2>
 <ul>
-<li><a href="../usage/">Usage</a> — copy-paste recipes.</li>
-<li><a href="../tropycal/">API reference</a> — the rendered <code>earthlens.tropycal</code> API.</li>
+<li><a href="../introduction/">Introduction</a> · <a href="../authentication/">Authentication</a> ·
+  <a href="../stac/">API reference</a></li>
 </ul>
 
 
@@ -4278,7 +4309,7 @@ HTTPS.</p>
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
           
-          <a href="../../openaq/openaq/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Reference">
+          <a href="../introduction/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Introduction">
             <div class="md-footer__button md-icon">
               
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
@@ -4288,20 +4319,20 @@ HTTPS.</p>
                 Previous
               </span>
               <div class="md-ellipsis">
-                Reference
+                Introduction
               </div>
             </div>
           </a>
         
         
           
-          <a href="../usage/" class="md-footer__link md-footer__link--next" aria-label="Next: Usage">
+          <a href="../authentication/" class="md-footer__link md-footer__link--next" aria-label="Next: Authentication">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                Usage
+                Authentication
               </div>
             </div>
             <div class="md-footer__button md-icon">
