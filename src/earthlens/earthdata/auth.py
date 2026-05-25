@@ -229,6 +229,16 @@ class EarthdataAuth(AbstractAuth[EarthdataCredentials]):
         if self.is_authenticated():
             return
 
+        # A CI workflow that maps an undefined secret onto an env var leaves it
+        # as an empty string (e.g. `EARTHDATA_TOKEN: ${{ secrets.EARTHDATA_TOKEN }}`
+        # when no such secret exists). `earthaccess` treats a present-but-empty
+        # EARTHDATA_TOKEN as a real token and fails with "Token does not exist",
+        # masking valid username/password env vars. Drop any empty EDL env var so
+        # the strategy resolves to the credential that is actually set.
+        for _var in ("EARTHDATA_TOKEN", "EARTHDATA_USERNAME", "EARTHDATA_PASSWORD"):
+            if os.environ.get(_var) == "":
+                os.environ.pop(_var, None)
+
         try:
             import earthaccess  # lazy — only needed when actually logging in
         except ImportError as exc:

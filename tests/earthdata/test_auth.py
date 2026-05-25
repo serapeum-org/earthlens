@@ -122,6 +122,19 @@ class TestEarthdataAuth:
         assert os.environ["EARTHDATA_USERNAME"] == "explicit-user"
         assert os.environ["EARTHDATA_PASSWORD"] == "explicit-pass"
 
+    def test_empty_token_env_is_dropped(self, fake_earthaccess, monkeypatch):
+        """An empty EARTHDATA_TOKEN (undefined CI secret) is dropped, not used."""
+        monkeypatch.setenv("EARTHDATA_TOKEN", "")
+        monkeypatch.setenv("EARTHDATA_USERNAME", "u")
+        monkeypatch.setenv("EARTHDATA_PASSWORD", "p")
+        auth = EarthdataAuth(EarthdataCredentials())
+        auth.configure()
+        assert auth.is_authenticated() is True
+        assert "EARTHDATA_TOKEN" not in os.environ
+        assert fake_earthaccess.login_calls == [
+            {"strategy": "environment", "persist": True}
+        ]
+
     def test_configure_logs_in(self, fake_earthaccess, edl_env):
         """configure() logs in via earthaccess and marks authenticated."""
         auth = EarthdataAuth(EarthdataCredentials())
