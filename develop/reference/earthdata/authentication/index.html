@@ -10,13 +10,13 @@
       
       
       
-        <link rel="canonical" href="https://serapeum-org.github.io/earthlens/develop/reference/stac/authentication/">
+        <link rel="canonical" href="https://serapeum-org.github.io/earthlens/develop/reference/earthdata/authentication/">
       
       
         <link rel="prev" href="../usage/">
       
       
-        <link rel="next" href="../stac/">
+        <link rel="next" href="../catalog/">
       
       
         
@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -83,7 +83,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#stac-backend-authentication" class="md-skip">
+        <a href="#nasa-earthdata-authentication" class="md-skip">
           Skip to content
         </a>
       
@@ -985,6 +985,308 @@
                 
   
   
+    
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_4" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_3_4" id="__nav_3_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Earthdata (NASA EOSDIS)
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_4_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Earthdata (NASA EOSDIS)
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../introduction/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Introduction
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../usage/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Usage
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Authentication
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Authentication
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#installation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Installation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#get-an-account" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Get an account
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#credential-sources-in-priority-order" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Credential sources (in priority order)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#in-region-s3-access" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        In-region S3 access
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ci-secrets" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CI secrets
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../catalog/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Catalog & Tooling
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../earthdata/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
   
   
     
@@ -999,10 +1301,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_4" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_5" >
         
           
-          <label class="md-nav__link" for="__nav_3_4" id="__nav_3_4_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3_5" id="__nav_3_5_label" tabindex="0">
             
   
   
@@ -1020,8 +1322,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_4_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_4">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_5">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -1141,10 +1443,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_5" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_6" >
         
           
-          <label class="md-nav__link" for="__nav_3_5" id="__nav_3_5_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3_6" id="__nav_3_6_label" tabindex="0">
             
   
   
@@ -1162,8 +1464,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_5_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_5">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_6">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -1283,10 +1585,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_6" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_7" >
         
           
-          <label class="md-nav__link" for="__nav_3_6" id="__nav_3_6_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3_7" id="__nav_3_7_label" tabindex="0">
             
   
   
@@ -1304,8 +1606,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_6_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_6">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_7">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -1435,291 +1737,6 @@
   
     <li class="md-nav__item">
       <a href="../../gee/gee/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Reference
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-    
-  
-  
-  
-    
-    
-    
-    
-      
-      
-    
-    
-    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
-      
-        
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_7" checked>
-        
-          
-          <label class="md-nav__link" for="__nav_3_7" id="__nav_3_7_label" tabindex="0">
-            
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    STAC (Sentinel / Landsat / cloud platforms)
-  
-
-    
-  </span>
-  
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_7_label" aria-expanded="true">
-          <label class="md-nav__title" for="__nav_3_7">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    STAC (Sentinel / Landsat / cloud platforms)
-  
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../introduction/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Introduction
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../usage/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Usage
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-    
-  
-  
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Authentication
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Authentication
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#earth-search-anonymous" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Earth Search — anonymous
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#microsoft-planetary-computer-sas-url-signing" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Microsoft Planetary Computer — SAS URL signing
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#cdse-s3-credentials" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        CDSE — S3 credentials
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#requester-pays-collections-aws-credentials" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Requester-pays collections — AWS credentials
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#ci-secret-pattern" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        CI secret pattern
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#see-also" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        See also
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../stac/" class="md-nav__link">
         
   
   
@@ -2877,7 +2894,7 @@
   <span class="md-ellipsis">
     
   
-    Seismic events (FDSN)
+    NASA Earthdata
   
 
     
@@ -2890,6 +2907,120 @@
         
         <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_6_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_4_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    NASA Earthdata
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../examples/earthdata/catalog_explorer/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Earthdata catalog explorer
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../examples/earthdata/output_kinds/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Per-dataset output kind
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_7" id="__nav_4_7_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Seismic events (FDSN)
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_7">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -3009,10 +3140,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_7" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_8" >
         
           
-          <label class="md-nav__link" for="__nav_4_7" id="__nav_4_7_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_8" id="__nav_4_8_label" tabindex="0">
             
   
   
@@ -3030,8 +3161,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_7_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_7">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_8">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -3364,148 +3495,6 @@
     
   
     Tracking asynchronous Earth Engine exports
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    
-    
-    
-    
-      
-      
-    
-    
-    <li class="md-nav__item md-nav__item--nested">
-      
-        
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_8" >
-        
-          
-          <label class="md-nav__link" for="__nav_4_8" id="__nav_4_8_label" tabindex="0">
-            
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Satellite imagery (STAC)
-  
-
-    
-  </span>
-  
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_8_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_8">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    Satellite imagery (STAC)
-  
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../examples/stac/quickstart/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    STAC quickstart — Sentinel-2 COGs from Earth Search
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../examples/stac/sentinel2_ndvi_timeseries/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Sentinel-2 monthly NDVI time-series (Earth Search)
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../examples/stac/mpc_landsat_cdse_sentinel_same_aoi/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Same AOI across providers: MPC + CDSE
   
 
     
@@ -4071,10 +4060,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#earth-search-anonymous" class="md-nav__link">
+  <a href="#installation" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Earth Search — anonymous
+        Installation
       
     </span>
   </a>
@@ -4082,10 +4071,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#microsoft-planetary-computer-sas-url-signing" class="md-nav__link">
+  <a href="#get-an-account" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Microsoft Planetary Computer — SAS URL signing
+        Get an account
       
     </span>
   </a>
@@ -4093,10 +4082,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#cdse-s3-credentials" class="md-nav__link">
+  <a href="#credential-sources-in-priority-order" class="md-nav__link">
     <span class="md-ellipsis">
       
-        CDSE — S3 credentials
+        Credential sources (in priority order)
       
     </span>
   </a>
@@ -4104,10 +4093,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#requester-pays-collections-aws-credentials" class="md-nav__link">
+  <a href="#in-region-s3-access" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Requester-pays collections — AWS credentials
+        In-region S3 access
       
     </span>
   </a>
@@ -4115,21 +4104,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#ci-secret-pattern" class="md-nav__link">
+  <a href="#ci-secrets" class="md-nav__link">
     <span class="md-ellipsis">
       
-        CI secret pattern
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#see-also" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        See also
+        CI secrets
       
     </span>
   </a>
@@ -4153,7 +4131,7 @@
 
 
   
-    <a href="https://github.com/serapeum-org/earthlens/edit/master/docs/reference/stac/authentication.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
+    <a href="https://github.com/serapeum-org/earthlens/edit/master/docs/reference/earthdata/authentication.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
     </a>
@@ -4162,71 +4140,58 @@
     
       
     
-    <a href="https://github.com/serapeum-org/earthlens/raw/master/docs/reference/stac/authentication.md" title="View source of this page" class="md-content__button md-icon">
+    <a href="https://github.com/serapeum-org/earthlens/raw/master/docs/reference/earthdata/authentication.md" title="View source of this page" class="md-content__button md-icon">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 18c.56 0 1 .44 1 1s-.44 1-1 1-1-.44-1-1 .44-1 1-1m0-3c-2.73 0-5.06 1.66-6 4 .94 2.34 3.27 4 6 4s5.06-1.66 6-4c-.94-2.34-3.27-4-6-4m0 6.5a2.5 2.5 0 0 1-2.5-2.5 2.5 2.5 0 0 1 2.5-2.5 2.5 2.5 0 0 1 2.5 2.5 2.5 2.5 0 0 1-2.5 2.5M9.27 20H6V4h7v5h5v4.07c.7.08 1.36.25 2 .49V8l-6-6H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h4.5a8.2 8.2 0 0 1-1.23-2"/></svg>
     </a>
   
 
 
-<h1 id="stac-backend-authentication"><a class="toclink" href="#stac-backend-authentication">STAC backend — authentication</a><a class="headerlink" href="#stac-backend-authentication" title="Permanent link">#</a></h1>
-<p>STAC <strong>search</strong> is anonymous on every supported endpoint; only <strong>asset reads</strong>
-may need credentials. The signer for an endpoint is chosen from the catalog, so
-you usually only supply credentials (when required) and pick the endpoint.</p>
-<h2 id="earth-search-anonymous"><a class="toclink" href="#earth-search-anonymous">Earth Search — anonymous</a><a class="headerlink" href="#earth-search-anonymous" title="Permanent link">#</a></h2>
-<p>Nothing to configure. Earth Search assets are public COGs on AWS Open Data:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">EarthLens</span><span class="p">(</span><span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;earth-search&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>          <span class="n">variables</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;sentinel-2-l2a&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;red&quot;</span><span class="p">]},</span> <span class="o">...</span><span class="p">)</span>
+<h1 id="nasa-earthdata-authentication"><a class="toclink" href="#nasa-earthdata-authentication">NASA Earthdata — authentication</a><a class="headerlink" href="#nasa-earthdata-authentication" title="Permanent link">#</a></h1>
+<p>The Earthdata backend authenticates once per process against <strong>Earthdata
+Login (EDL)</strong> and reuses that session across every DAAC.</p>
+<h2 id="installation"><a class="toclink" href="#installation">Installation</a><a class="headerlink" href="#installation" title="Permanent link">#</a></h2>
+<p>The backend needs the <code>earthdata</code> extra:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>pip<span class="w"> </span>install<span class="w"> </span>earthlens<span class="o">[</span>earthdata<span class="o">]</span>
 </code></pre></div>
-<p>Requires only the <code>[stac]</code> extra (<code>pip install earthlens[stac]</code>).</p>
-<h2 id="microsoft-planetary-computer-sas-url-signing"><a class="toclink" href="#microsoft-planetary-computer-sas-url-signing">Microsoft Planetary Computer — SAS URL signing</a><a class="headerlink" href="#microsoft-planetary-computer-sas-url-signing" title="Permanent link">#</a></h2>
-<p>No account needed. Install the <code>planetary-computer</code> SDK (part of the <code>[stac]</code>
-extra) and the backend signs each asset URL with a short-lived Azure <strong>SAS
-token</strong> in the query string (<code>MpcSasSigner</code>):</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="n">EarthLens</span><span class="p">(</span><span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;planetary-computer&quot;</span><span class="p">,</span>
-<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>          <span class="n">variables</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;sentinel-2-l2a&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;B04&quot;</span><span class="p">,</span> <span class="s2">&quot;B08&quot;</span><span class="p">]},</span> <span class="o">...</span><span class="p">)</span>
+<p>This pulls <a href="https://earthaccess.readthedocs.io"><code>earthaccess</code></a> <code>&gt;=0.18</code>,
+which <strong>requires Python ≥ 3.12</strong>. On Python 3.11 the dependency will not
+resolve — the rest of earthlens still works, but the Earthdata backend
+is unavailable until you move to 3.12+. The <code>earthaccess</code> import is
+lazy, so <code>import earthlens.earthdata</code> succeeds without the extra; the
+friendly <code>ImportError</code> (naming <code>earthlens[earthdata]</code>) is only raised
+when you actually log in.</p>
+<h2 id="get-an-account"><a class="toclink" href="#get-an-account">Get an account</a><a class="headerlink" href="#get-an-account" title="Permanent link">#</a></h2>
+<p>Register a free account at
+<a href="https://urs.earthdata.nasa.gov">urs.earthdata.nasa.gov</a>. Some
+collections additionally require you to <strong>authorize the DAAC application</strong>
+once from your EDL profile.</p>
+<h2 id="credential-sources-in-priority-order"><a class="toclink" href="#credential-sources-in-priority-order">Credential sources (in priority order)</a><a class="headerlink" href="#credential-sources-in-priority-order" title="Permanent link">#</a></h2>
+<p><code>EarthData(...)</code> resolves a login strategy automatically:</p>
+<ol>
+<li><strong>Environment variables</strong> — set <code>EARTHDATA_USERNAME</code> and
+   <code>EARTHDATA_PASSWORD</code>. Used in CI and the e2e tests.</li>
+<li><strong><code>~/.netrc</code></strong> — add a machine entry:</li>
+</ol>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>machine urs.earthdata.nasa.gov
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>    login YOUR_USERNAME
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>    password YOUR_PASSWORD
 </code></pre></div>
-<p>The token rides in the URL, not in a header — this is deliberate, because GDAL
-forwards bearer headers across the cross-host redirects MPC blob URLs use, which
-would leak a bearer token.</p>
-<h2 id="cdse-s3-credentials"><a class="toclink" href="#cdse-s3-credentials">CDSE — S3 credentials</a><a class="headerlink" href="#cdse-s3-credentials" title="Permanent link">#</a></h2>
-<p>CDSE assets live on an S3-compatible store at <code>eodata.dataspace.copernicus.eu</code>
-and need <strong>S3 access-key/secret</strong> credentials (<code>CdseS3Signer</code>). Generate keys in
-the CDSE dashboard
-(<code>https://eodata-s3keysmanager.dataspace.copernicus.eu</code>) and supply them by
-env var or kwarg:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="nb">export</span><span class="w"> </span><span class="nv">CDSE_S3_ACCESS_KEY</span><span class="o">=</span>...
-<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="nb">export</span><span class="w"> </span><span class="nv">CDSE_S3_SECRET_KEY</span><span class="o">=</span>...
-</code></pre></div>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">EarthLens</span><span class="p">(</span><span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;cdse&quot;</span><span class="p">,</span>
-<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>          <span class="n">variables</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;sentinel-1-grd&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;vv&quot;</span><span class="p">]},</span>
-<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>          <span class="n">access_key</span><span class="o">=</span><span class="s2">&quot;...&quot;</span><span class="p">,</span> <span class="n">secret_key</span><span class="o">=</span><span class="s2">&quot;...&quot;</span><span class="p">,</span>   <span class="c1"># or rely on the env vars</span>
-<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>          <span class="o">...</span><span class="p">)</span>
-</code></pre></div>
-<p>Resolution order is <strong>kwarg → env var</strong>. If neither supplies both halves, an
-<code>AuthenticationError</code> is raised naming the dashboard URL. The credentials are
-exposed to GDAL via the asset-read environment (<code>AWS_S3_ENDPOINT</code>,
-<code>AWS_ACCESS_KEY_ID</code>, <code>AWS_SECRET_ACCESS_KEY</code>, …), never as an <code>Authorization</code>
-header.</p>
-<h2 id="requester-pays-collections-aws-credentials"><a class="toclink" href="#requester-pays-collections-aws-credentials">Requester-pays collections — AWS credentials</a><a class="headerlink" href="#requester-pays-collections-aws-credentials" title="Permanent link">#</a></h2>
-<p>A few collections store their assets on a <strong>requester-pays</strong> S3 bucket even
-though their endpoint is otherwise anonymous — e.g. Earth Search's
-<code>landsat-c2-l2</code> resolves to <code>s3://usgs-landsat</code>. The catalog marks these with a
-per-collection <code>signer: aws-requester-pays</code>, so the backend reads them with the
-requester-pays signer (sets <code>AWS_REQUEST_PAYER=requester</code> and rewrites the
-<code>s3://</code> href to GDAL's <code>/vsis3/</code> path). <strong>You must have valid AWS credentials</strong>
-in the environment (<code>AWS_ACCESS_KEY_ID</code> / <code>AWS_SECRET_ACCESS_KEY</code>, or an
-instance role) — the requester (you) pays the egress. Without them the read
-fails with an S3 <code>403</code>.</p>
-<h2 id="ci-secret-pattern"><a class="toclink" href="#ci-secret-pattern">CI secret pattern</a><a class="headerlink" href="#ci-secret-pattern" title="Permanent link">#</a></h2>
-<p>Set the CDSE keys as repository secrets and export them in the job environment
-before running the live STAC tests; the Earth Search and MPC e2e tests need no
-secrets (MPC only needs the <code>planetary-computer</code> package installed).</p>
-<h2 id="see-also"><a class="toclink" href="#see-also">See also</a><a class="headerlink" href="#see-also" title="Permanent link">#</a></h2>
-<ul>
-<li><a href="../introduction/">Introduction</a> · <a href="../usage/">Usage</a> ·
-  <a href="../stac/">API reference</a></li>
-</ul>
+<p>Pass a non-default path with <code>EarthData(..., netrc_path=...)</code>.
+3. <strong>Interactive prompt</strong> — the last resort when neither of the above
+   resolves; <code>earthaccess</code> prompts and persists a token.</p>
+<p>You can also pass <code>EarthData(..., username=..., password=...)</code>
+explicitly. After a successful login, <code>earthaccess</code> persists the token
+so later processes reuse it.</p>
+<h2 id="in-region-s3-access"><a class="toclink" href="#in-region-s3-access">In-region S3 access</a><a class="headerlink" href="#in-region-s3-access" title="Permanent link">#</a></h2>
+<p>For cloud-hosted collections, the authenticated session also mints
+<strong>rotating, per-provider S3 credentials</strong> (valid roughly one hour). The
+backend uses them automatically when streaming in-region — see
+<a href="../usage/#cloud-streaming-vs-https-download">Usage → cloud streaming</a>.</p>
+<h2 id="ci-secrets"><a class="toclink" href="#ci-secrets">CI secrets</a><a class="headerlink" href="#ci-secrets" title="Permanent link">#</a></h2>
+<p>The live e2e suite (<code>-m "e2e and earthdata"</code>) reads the
+<code>EARTHDATA_USERNAME</code> / <code>EARTHDATA_PASSWORD</code> repository secrets and skips
+cleanly when they are absent.</p>
 
 
 
@@ -4279,13 +4244,13 @@ secrets (MPC only needs the <code>planetary-computer</code> package installed).<
         
         
           
-          <a href="../stac/" class="md-footer__link md-footer__link--next" aria-label="Next: Reference">
+          <a href="../catalog/" class="md-footer__link md-footer__link--next" aria-label="Next: Catalog &amp; Tooling">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                Reference
+                Catalog & Tooling
               </div>
             </div>
             <div class="md-footer__button md-icon">
