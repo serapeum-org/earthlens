@@ -221,6 +221,8 @@ nav:
       - Hurricane Katrina — intensity timeline: examples/tropycal/katrina_intensity_timeline.ipynb
       - HURDAT2 vs IBTrACS — source comparison: examples/tropycal/source_comparison.ipynb
       - Multi-basin season — ACE by basin: examples/tropycal/multibasin_ace.ipynb
+    - Active fires (FIRMS):
+      - Quickstart — recent fires: examples/firms/quickstart.ipynb
   - API Reference:
     - EarthLens Facade: reference/earthlens.md
     - AbstractDataSource: reference/abstract-datasource.md
