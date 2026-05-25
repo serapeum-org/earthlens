@@ -21,9 +21,12 @@ when you actually log in.
 
 ## Get an account
 
-Earthdata Login (EDL) is free and takes a couple of minutes. It is a
-plain username + password — no API key or token is required for this
-backend.
+Earthdata Login (EDL) is free and takes a couple of minutes. One account
+gives you **both** a username/password **and** an optional bearer
+**token** (generated from your profile) — either authenticates this
+backend, with one important exception: **ASF needs username/password**
+(see the warning below). The token is not a separate API key; it is an
+alternative credential minted from the same account.
 
 1. Go to [urs.earthdata.nasa.gov](https://urs.earthdata.nasa.gov) and
    click **Register**.
@@ -74,10 +77,14 @@ priority order:
    `EARTHDATA_TOKEN` environment variable. A token authenticates without
    a password (the token-equivalent of GEE's service key); generate one
    from your EDL profile under **Generate Token**. Best for CI and
-   headless use — no password in plaintext.
+   headless use — no password in plaintext. **Works for every DAAC
+   except ASF** — ASF's OAuth-redirecting datapool drops the bearer
+   token (see the ASF warning above), so Sentinel-1 / OPERA needs
+   username/password.
 2. **Username / password** — `EarthData(..., username=..., password=...)`
    or the `EARTHDATA_USERNAME` / `EARTHDATA_PASSWORD` environment
-   variables.
+   variables. Works for **all** DAACs, including ASF. Required for
+   ASF / OPERA.
 3. **`~/.netrc`** — add a machine entry:
 
    ```text
@@ -113,10 +120,19 @@ token is the simplest:
 
 ```bash
 gh secret set EARTHDATA_TOKEN --repo <owner>/<repo>      # paste your EDL bearer token
-# …or the username/password pair instead:
+# …and/or the username/password pair (required for the ASF / OPERA test):
 gh secret set EARTHDATA_USERNAME --repo <owner>/<repo>   # paste your EDL username
 gh secret set EARTHDATA_PASSWORD --repo <owner>/<repo>   # paste your EDL password
 ```
 
-Until those are set, the live e2e tests (including the example-notebook
-execution) skip rather than fail.
+Which secret to set depends on how much you want CI to confirm:
+
+| Secret(s) | e2e tests that run | Notes |
+|-----------|--------------------|-------|
+| `EARTHDATA_TOKEN` only | the token notebooks (IMERG, GEDI, PACE, SMAP) + the IMERG fetch | The OPERA / ASF test skips. Lower risk — a token is scoped and expires (~60 days). |
+| `EARTHDATA_TOKEN` + `EARTHDATA_USERNAME` / `EARTHDATA_PASSWORD` | **all**, including the OPERA / ASF test | ASF needs the username/password path. Note this puts your **real EDL password** in the Actions secret store. |
+
+Until the relevant secret(s) are set, the live e2e tests (including the
+example-notebook execution) **skip** rather than fail. The
+`TestEarthdataAsfNotebook` (OPERA) test is gated on
+`EARTHDATA_USERNAME` / `EARTHDATA_PASSWORD` specifically.
