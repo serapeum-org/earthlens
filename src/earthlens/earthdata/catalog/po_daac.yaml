@@ -1,0 +1,75 @@
+# PO.DAAC — Physical Oceanography DAAC. CMR provider code: POCLOUD.
+# MUR SST, gridded sea-surface height, SMAP sea-surface salinity.
+datasets:
+  MUR-JPL-L4-GLOB-v4.1:
+    short_name: MUR-JPL-L4-GLOB-v4.1
+    version: '4.1'
+    daac: PO.DAAC
+    provider: POCLOUD
+    cadence: daily
+    format: netcdf4
+    output_kind: raster
+    cloud_hosted: true
+    requires_harmony_for_subset: true
+    supports_harmony: true
+    temporal:
+      start: '2002-06-01'
+      end: null
+    bands:
+      analysed_sst:
+        long_name: Analysed sea surface temperature
+        units: kelvin
+  SEA_SURFACE_HEIGHT_ALT_GRIDS_L4_2SATS_5DAY_6THDEG_V_JPL2205:
+    short_name: SEA_SURFACE_HEIGHT_ALT_GRIDS_L4_2SATS_5DAY_6THDEG_V_JPL2205
+    version: '2205'
+    daac: PO.DAAC
+    provider: POCLOUD
+    cadence: weekly
+    format: netcdf4
+    output_kind: raster
+    cloud_hosted: true
+    requires_harmony_for_subset: true
+    supports_harmony: true
+    temporal:
+      start: '1992-10-02'
+      end: null
+    bands:
+      SLA:
+        long_name: Sea level anomaly
+        units: m
+  SMAP_RSS_L3_SSS_SMI_8DAY-RUNNINGMEAN_V5:
+    short_name: SMAP_RSS_L3_SSS_SMI_8DAY-RUNNINGMEAN_V5
+    version: '5.0'
+    daac: PO.DAAC
+    provider: POCLOUD
+    cadence: 8day
+    format: netcdf4
+    output_kind: raster
+    cloud_hosted: true
+    requires_harmony_for_subset: true
+    supports_harmony: true
+    temporal:
+      start: '2015-03-27'
+      end: null
+    bands:
+      sss_smap:
+        long_name: Sea surface salinity
+        units: psu
+  OISSS_L4_multimission_monthly_v2:
+    short_name: OISSS_L4_multimission_monthly_v2
+    version: '2.0'
+    daac: PO.DAAC
+    provider: POCLOUD
+    cadence: monthly
+    format: netcdf4
+    output_kind: raster
+    cloud_hosted: true
+    requires_harmony_for_subset: true
+    supports_harmony: true
+    temporal:
+      start: '2011-08-01'
+      end: null
+    bands:
+      sss:
+        long_name: Multi-mission optimally interpolated sea-surface salinity
+        units: psu

@@ -1,0 +1,69 @@
+# CMR provider registry for the NASA Earthdata backend.
+# Maps each CMR provider code (the `provider:` field on a dataset row,
+# passed straight to earthaccess.search_data) to its DAAC, landing page,
+# and — for cloud-hosted collections — the us-west-2 bucket region and the
+# S3 credentials endpoint earthaccess uses to mint rotating keys (G4).
+# Every dataset row's `provider:` must be a key defined here.
+daacs:
+  GES_DISC:
+    daac: GES DISC
+    display_name: Goddard Earth Sciences Data and Information Services Center
+    landing_page: https://disc.gsfc.nasa.gov
+    cloud_region: us-west-2
+    s3_credentials_endpoint: https://data.gesdisc.earthdata.nasa.gov/s3credentials
+
+  POCLOUD:
+    daac: PO.DAAC
+    display_name: Physical Oceanography Distributed Active Archive Center
+    landing_page: https://podaac.jpl.nasa.gov
+    cloud_region: us-west-2
+    s3_credentials_endpoint: https://archive.podaac.earthdata.nasa.gov/s3credentials
+
+  LPCLOUD:
+    daac: LP DAAC
+    display_name: Land Processes Distributed Active Archive Center
+    landing_page: https://lpdaac.usgs.gov
+    cloud_region: us-west-2
+    s3_credentials_endpoint: https://data.lpdaac.earthdatacloud.nasa.gov/s3credentials
+
+  NSIDC_CPRD:
+    daac: NSIDC
+    display_name: National Snow and Ice Data Center DAAC
+    landing_page: https://nsidc.org/data
+    cloud_region: us-west-2
+    s3_credentials_endpoint: https://data.nsidc.earthdatacloud.nasa.gov/s3credentials
+
+  OB_CLOUD:
+    daac: OB.DAAC
+    display_name: Ocean Biology Distributed Active Archive Center
+    landing_page: https://oceancolor.gsfc.nasa.gov
+    cloud_region: us-west-2
+    s3_credentials_endpoint: https://obdaac-tea.earthdatacloud.nasa.gov/s3credentials
+
+  LAADS:
+    daac: LAADS
+    display_name: Level-1 and Atmosphere Archive and Distribution System
+    landing_page: https://ladsweb.modaps.eosdis.nasa.gov
+    cloud_region: us-west-2
+    s3_credentials_endpoint: https://data.laadsdaac.earthdatacloud.nasa.gov/s3credentials
+
+  ASF:
+    daac: ASF
+    display_name: Alaska Satellite Facility DAAC
+    landing_page: https://asf.alaska.edu
+    cloud_region: us-west-2
+    s3_credentials_endpoint: https://cumulus.asf.alaska.edu/s3credentials
+
+  ORNL_CLOUD:
+    daac: ORNL DAAC
+    display_name: Oak Ridge National Laboratory DAAC
+    landing_page: https://daac.ornl.gov
+    cloud_region: us-west-2
+    s3_credentials_endpoint: https://data.ornldaac.earthdata.nasa.gov/s3credentials
+
+  LARC_CLOUD:
+    daac: ASDC
+    display_name: Atmospheric Science Data Center
+    landing_page: https://asdc.larc.nasa.gov
+    cloud_region: us-west-2
+    s3_credentials_endpoint: https://data.asdc.earthdata.nasa.gov/s3credentials

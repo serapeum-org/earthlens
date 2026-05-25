@@ -72,6 +72,7 @@ class TestRegistry:
             "chirps",
             "cmems",
             "earth-search",
+            "earthdata",
             "ecmwf",
             "fdsn",
             "firms",
