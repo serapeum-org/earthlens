@@ -54,17 +54,6 @@ def bundled_catalog() -> Catalog:
     return Catalog()
 
 
-def _pandas_rejects(freq: str) -> bool:
-    """Whether the installed pandas treats `freq` as an invalid offset alias."""
-    import pandas as pd
-
-    try:
-        pd.tseries.frequencies.to_offset(freq)
-        return False
-    except (ValueError, TypeError):
-        return True
-
-
 class TestPandasFreqValidation:
     """`_build_chc_dataset` validates every `pandas_freq` via pandas.to_offset."""
 
@@ -81,37 +70,16 @@ class TestPandasFreqValidation:
 
     @pytest.mark.parametrize(
         "freq",
-        ["daly", "not-a-freq", "12X"],
+        ["daly", "AS", "H", "not-a-freq", "12X"],
     )
-    def test_typos_raise(self, tmp_path: Path, freq: str):
-        """Each malformed alias is rejected during Catalog.load."""
+    def test_typos_and_deprecated_aliases_raise(self, tmp_path: Path, freq: str):
+        """Each bad alias is rejected during Catalog.load."""
         block = _dataset_block("synth", pandas_freq=freq)
         catalog_yaml = _write_catalog(tmp_path, block)
         clear_catalog_cache()
         with pytest.raises(ValueError, match=r"pandas_freq") as exc:
             Catalog.load(catalog_path=catalog_yaml)
         assert freq in str(exc.value) or "to_offset" in str(exc.value).lower() or "synth" in str(exc.value)
-
-    @pytest.mark.parametrize(
-        "freq",
-        ["AS", "H"],
-    )
-    def test_deprecated_aliases_raise_once_pandas_removes_them(
-        self, tmp_path: Path, freq: str
-    ):
-        """Deprecated aliases are rejected on pandas versions that removed them.
-
-        pandas <3 still accepts `AS` / `H` (only emitting a FutureWarning), so
-        the load does not raise there; on pandas >=3 the aliases are gone and
-        `to_offset` raises, which the catalog surfaces as a `pandas_freq` error.
-        """
-        if not _pandas_rejects(freq):
-            pytest.skip(f"installed pandas still accepts the deprecated alias {freq!r}")
-        block = _dataset_block("synth", pandas_freq=freq)
-        catalog_yaml = _write_catalog(tmp_path, block)
-        clear_catalog_cache()
-        with pytest.raises(ValueError, match=r"pandas_freq"):
-            Catalog.load(catalog_path=catalog_yaml)
 
     @pytest.mark.parametrize(
         "freq",
