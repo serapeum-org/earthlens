@@ -279,10 +279,13 @@ class EUMETSAT(AbstractDataSource):
         One `Collection.search(bbox=, dtstart=, dtend=)` per resolved
         collection row, scoped to the request bbox and time window. The
         bbox is the `eumdac` `W,S,E,N` comma-string the OpenSearch
-        endpoint expects. Each returned `eumdac` product becomes one
-        `RemoteProduct` whose `metadata` carries the raw product handle
-        and its collection row, so `_fetch` can stream without
-        re-querying.
+        endpoint expects. The `end` date is treated as **inclusive of its
+        whole calendar day**: `dtend` is widened to `23:59:59.999999` of
+        the end day so a same-day request (`start == end`) covers the
+        day's products instead of collapsing to the midnight instant.
+        Each returned `eumdac` product becomes one `RemoteProduct` whose
+        `metadata` carries the raw product handle and its collection row,
+        so `_fetch` can stream without re-querying.
 
         Returns:
             list[RemoteProduct]: One product per matching Data Store
