@@ -107,6 +107,32 @@ def _probe_ecmwf(model: NWPModel) -> str:
         return f"unreachable: {type(exc).__name__}: {exc}"
 
 
+def _probe_meteofrance_api(model: NWPModel) -> str:
+    """GetCapabilities the model's WCS service with the MF API key (no download)."""
+    opts = model.request_options
+    api_base, service = opts.get("api_base"), opts.get("coverage_service")
+    if not api_base or not service:
+        return "no api_base/coverage_service in request_options"
+    import os
+
+    import requests
+
+    key = os.environ.get("METEO_FRANCE_API_KEY") or os.environ.get("MF_API_KEY")
+    if not key:
+        return "needs METEO_FRANCE_API_KEY (https://portail-api.meteofrance.fr)"
+    url = f"{api_base}/wcs/{service}/GetCapabilities"
+    try:
+        resp = requests.get(
+            url,
+            params={"service": "WCS", "version": "2.0.1"},
+            headers={"apikey": key},
+            timeout=60,
+        )
+        return f"HTTP {resp.status_code} ({url})"
+    except Exception as exc:
+        return f"unreachable: {type(exc).__name__} ({url})"
+
+
 def _probe_herbie(model: NWPModel, cycle: dt.datetime, step: int) -> str:
     """Ask Herbie to resolve the GRIB URL for `(cycle, step)` (no download)."""
     try:
@@ -142,6 +168,7 @@ def probe(model_key: str, step: int) -> int:
         "direct-https": lambda: _probe_direct_https(model, cycle, step),
         "direct-boto3": lambda: _probe_direct_boto3(model, cycle, step),
         "ecmwf-opendata": lambda: _probe_ecmwf(model),
+        "meteofrance-api": lambda: _probe_meteofrance_api(model),
         "herbie": lambda: _probe_herbie(model, cycle, step),
     }
     print(f"{model_key} [{model.backend}] cycle={cycle:%Y-%m-%d %HZ} f{step:03d}")

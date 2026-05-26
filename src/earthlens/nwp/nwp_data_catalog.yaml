@@ -413,3 +413,50 @@ datasets:
       wind_u_10m: ":UGRD:10 m above ground:"
       wind_v_10m: ":VGRD:10 m above ground:"
       pressure_msl: ":PRMSL:mean sea level:"
+
+  # --- Météo-France via the authenticated WCS API portal (meteofrance-api).
+  # Needs METEO_FRANCE_API_KEY (https://portail-api.meteofrance.fr). The WCS
+  # coverage-id bases below are best-effort and NOT live-validated — they live
+  # here (not in code) so a fix is a catalog edit. Probe before relying. ---
+
+  arpege-world:                           # Météo-France ARPEGE global 0.25°, WCS API
+    provider: meteofrance
+    model_family: arpege
+    resolution: 0.25deg
+    cycles_utc: [0, 6, 12, 18]
+    cadence_h: 6
+    step_cadence_h: 1
+    horizon_h: 102
+    backend: meteofrance-api
+    mirrors: [meteofrance]
+    request_options:
+      api_base: "https://public-api.meteofrance.fr/public/arpege/1.0"
+      coverage_service: "MF-NWP-GLOBAL-ARPEGE-025-GLOBE-WCS"
+    bands:                                # WCS coverage-id bases (run datetime appended by the centre)
+      temperature_2m: TEMPERATURE__SPECIFIC_HEIGHT_LEVEL_ABOVE_GROUND
+      precipitation_acc: TOTAL_PRECIPITATION__GROUND_OR_WATER_SURFACE
+      dewpoint_2m: DEW_POINT_TEMPERATURE__SPECIFIC_HEIGHT_LEVEL_ABOVE_GROUND
+      wind_u_10m: U_COMPONENT_OF_WIND__SPECIFIC_HEIGHT_LEVEL_ABOVE_GROUND
+      wind_v_10m: V_COMPONENT_OF_WIND__SPECIFIC_HEIGHT_LEVEL_ABOVE_GROUND
+      pressure_msl: PRESSURE__MEAN_SEA_LEVEL
+
+  arome-france:                           # Météo-France AROME high-res France 0.025°, WCS API
+    provider: meteofrance
+    model_family: arome
+    resolution: 0.025deg
+    cycles_utc: [0, 3, 6, 9, 12, 15, 18, 21]
+    cadence_h: 3
+    step_cadence_h: 1
+    horizon_h: 51
+    backend: meteofrance-api
+    mirrors: [meteofrance]
+    request_options:
+      api_base: "https://public-api.meteofrance.fr/public/arome/1.0"
+      coverage_service: "MF-NWP-HIGHRES-AROME-0025-FRANCE-WCS"
+    bands:
+      temperature_2m: TEMPERATURE__SPECIFIC_HEIGHT_LEVEL_ABOVE_GROUND
+      precipitation_acc: TOTAL_PRECIPITATION__GROUND_OR_WATER_SURFACE
+      dewpoint_2m: DEW_POINT_TEMPERATURE__SPECIFIC_HEIGHT_LEVEL_ABOVE_GROUND
+      wind_u_10m: U_COMPONENT_OF_WIND__SPECIFIC_HEIGHT_LEVEL_ABOVE_GROUND
+      wind_v_10m: V_COMPONENT_OF_WIND__SPECIFIC_HEIGHT_LEVEL_ABOVE_GROUND
+      pressure_msl: PRESSURE__MEAN_SEA_LEVEL

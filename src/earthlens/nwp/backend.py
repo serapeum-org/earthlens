@@ -293,6 +293,14 @@ class NWP(AbstractDataSource):
         # Reflect the current download(progress_bar=) onto the centre so a
         # progress-aware SDK (Herbie) can honour it (L4).
         self._centres[backend].show_progress = getattr(self, "_show_progress", True)
+        # Give server-side-subsetting centres (the Météo-France WCS API) the
+        # request bbox; others ignore it (the backend crops their full field).
+        self._centres[backend].bbox = (
+            self.space.west,
+            self.space.south,
+            self.space.east,
+            self.space.north,
+        )
         return self._centres[backend]
 
     def _search(self) -> list[RemoteProduct]:

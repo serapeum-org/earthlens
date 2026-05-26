@@ -34,6 +34,10 @@ CENTRE_REGISTRY: dict[str, tuple[str, str]] = {
     "ecmwf-opendata": ("earthlens.nwp.centres.ecmwf", "ECMWFCentre"),
     "direct-https": ("earthlens.nwp.centres.dwd", "DWDCentre"),
     "direct-boto3": ("earthlens.nwp.centres.meteofrance", "MeteoFranceCentre"),
+    "meteofrance-api": (
+        "earthlens.nwp.centres.meteofrance_api",
+        "MeteoFranceAPICentre",
+    ),
 }
 
 
@@ -51,6 +55,10 @@ class _NWPCentre(ABC):
             progress. The backend sets it from `download(progress_bar=)`;
             only centres whose SDK exposes a progress/verbose switch
             (Herbie) honour it.
+        bbox: The request bounding box `(west, south, east, north)` in
+            degrees, set by the backend before fetch. Only centres that
+            can subset server-side (the Météo-France WCS API) use it;
+            the others download the full field and let the backend crop.
     """
 
     def __init__(self, save_dir: Path | str):
@@ -61,6 +69,7 @@ class _NWPCentre(ABC):
         """
         self.save_dir = Path(save_dir)
         self.show_progress = True
+        self.bbox: tuple[float, float, float, float] | None = None
 
     @abstractmethod
     def fetch_one(

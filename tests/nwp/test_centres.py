@@ -14,6 +14,7 @@ from earthlens.nwp.centres.base import CENTRE_REGISTRY, _NWPCentre
 from earthlens.nwp.centres.dwd import DWDCentre
 from earthlens.nwp.centres.ecmwf import ECMWFCentre, _source_for
 from earthlens.nwp.centres.meteofrance import MeteoFranceCentre
+from earthlens.nwp.centres.meteofrance_api import MeteoFranceAPICentre, resolve_api_key
 from earthlens.nwp.centres.noaa import NOAACentre, _import_herbie, _priority
 
 pytestmark = [pytest.mark.nwp, pytest.mark.unit]
@@ -44,6 +45,7 @@ class TestResolveCentre:
             "ecmwf-opendata",
             "direct-https",
             "direct-boto3",
+            "meteofrance-api",
         }
 
     @pytest.mark.parametrize(
@@ -53,6 +55,7 @@ class TestResolveCentre:
             ("ecmwf-opendata", ECMWFCentre),
             ("direct-https", DWDCentre),
             ("direct-boto3", MeteoFranceCentre),
+            ("meteofrance-api", MeteoFranceAPICentre),
         ],
     )
     def test_resolve_returns_bound_centre(self, backend, cls, tmp_path):
@@ -377,5 +380,125 @@ class TestMeteoFranceCentre:
         with pytest.raises(RuntimeError, match="s3 down"):
             MeteoFranceCentre(tmp_path).fetch_one(
                 self._mf(), dt.datetime(2024, 6, 1, 0), 0, ["temperature_2m"], "auto"
+            )
+        assert list(tmp_path.iterdir()) == [], "no partial file should remain"
+
+
+class TestMeteoFranceAPICentre:
+    """Tests for the authenticated WCS-API Météo-France centre."""
+
+    def _arpege(self, **overrides) -> NWPModel:
+        """Build an ARPEGE WCS-API row, overriding any field."""
+        base = dict(
+            provider="meteofrance",
+            model_family="arpege",
+            cycles_utc=[0, 6, 12, 18],
+            horizon_h=102,
+            backend="meteofrance-api",
+            bands={
+                "temperature_2m": "TEMPERATURE__SPECIFIC_HEIGHT_LEVEL_ABOVE_GROUND",
+                "precipitation_acc": "TOTAL_PRECIPITATION__GROUND_OR_WATER_SURFACE",
+            },
+            request_options={
+                "api_base": "https://public-api.meteofrance.fr/public/arpege/1.0",
+                "coverage_service": "MF-NWP-GLOBAL-ARPEGE-025-GLOBE-WCS",
+            },
+        )
+        base.update(overrides)
+        return NWPModel(**base)
+
+    def test_resolve_api_key_from_env(self, monkeypatch):
+        """resolve_api_key reads METEO_FRANCE_API_KEY / MF_API_KEY."""
+        monkeypatch.delenv("METEO_FRANCE_API_KEY", raising=False)
+        monkeypatch.setenv("MF_API_KEY", "secret-key")
+        assert resolve_api_key() == "secret-key"
+
+    def test_resolve_api_key_missing_raises(self, monkeypatch):
+        """A missing API key raises AuthenticationError naming the env var."""
+        from earthlens.base import AuthenticationError
+
+        monkeypatch.delenv("METEO_FRANCE_API_KEY", raising=False)
+        monkeypatch.delenv("MF_API_KEY", raising=False)
+        with pytest.raises(AuthenticationError, match="METEO_FRANCE_API_KEY"):
+            resolve_api_key()
+
+    def test_fetch_one_builds_wcs_getcoverage(self, monkeypatch, tmp_path):
+        """fetch_one issues a GetCoverage per band with apikey + bbox subset."""
+        monkeypatch.setenv("MF_API_KEY", "k")
+        calls = []
+
+        class _Resp:
+            def __init__(self, content):
+                self.content = content
+
+            def raise_for_status(self):
+                pass
+
+        def fake_get(url, params=None, headers=None, timeout=None):
+            calls.append({"url": url, "params": params, "headers": headers})
+            return _Resp(b"GRIB-" + dict(params)["coverageid"].split("__")[0].encode())
+
+        module = types.ModuleType("requests")
+        module.get = fake_get
+        monkeypatch.setitem(sys.modules, "requests", module)
+
+        centre = MeteoFranceAPICentre(tmp_path)
+        centre.bbox = (-5.0, 41.0, 10.0, 51.0)
+        out = centre.fetch_one(
+            self._arpege(), dt.datetime(2024, 6, 1, 0), 24,
+            ["temperature_2m", "precipitation_acc"], "auto",
+        )
+        assert len(calls) == 2
+        first = calls[0]
+        assert first["url"].endswith("/wcs/MF-NWP-GLOBAL-ARPEGE-025-GLOBE-WCS/GetCoverage")
+        assert first["headers"] == {"apikey": "k"}
+        qs = first["params"]
+        assert ("service", "WCS") in qs and ("version", "2.0.1") in qs
+        assert (
+            "coverageid",
+            "TEMPERATURE__SPECIFIC_HEIGHT_LEVEL_ABOVE_GROUND___2024-06-01T00.00.00Z",
+        ) in qs
+        # valid time = cycle + 24 h; bbox subsets present
+        assert ("subset", "time(2024-06-02T00:00:00Z)") in qs
+        assert ("subset", "lat(41.0,51.0)") in qs
+        assert ("subset", "long(-5.0,10.0)") in qs
+        assert out.name == "arpege_2024060100_f024.grib2"
+        assert out.read_bytes() == b"GRIB-TEMPERATUREGRIB-TOTAL_PRECIPITATION"
+
+    def test_fetch_one_without_options_raises(self, monkeypatch, tmp_path):
+        """A row lacking api_base / coverage_service is rejected."""
+        monkeypatch.setenv("MF_API_KEY", "k")
+        with pytest.raises(ValueError, match="api_base"):
+            MeteoFranceAPICentre(tmp_path).fetch_one(
+                self._arpege(request_options={}), dt.datetime(2024, 6, 1, 0), 0,
+                ["temperature_2m"], "auto",
+            )
+
+    def test_query_without_bbox_omits_spatial_subset(self, tmp_path):
+        """With no bbox set, the WCS query carries only the time subset."""
+        import datetime as dt2
+
+        centre = MeteoFranceAPICentre(tmp_path)  # bbox defaults to None
+        query = centre._coverage_query(
+            "TEMPERATURE__SPECIFIC_HEIGHT_LEVEL_ABOVE_GROUND",
+            dt2.datetime(2024, 6, 1, 0),
+            dt2.datetime(2024, 6, 1, 12),
+        )
+        subsets = [v for k, v in query if k == "subset"]
+        assert subsets == ["time(2024-06-01T12:00:00Z)"]
+
+    def test_fetch_one_failure_leaves_no_partial_file(self, monkeypatch, tmp_path):
+        """A GetCoverage failure unlinks the partial file and re-raises."""
+        monkeypatch.setenv("MF_API_KEY", "k")
+
+        def failing_get(url, params=None, headers=None, timeout=None):
+            raise RuntimeError("gateway down")
+
+        module = types.ModuleType("requests")
+        module.get = failing_get
+        monkeypatch.setitem(sys.modules, "requests", module)
+        with pytest.raises(RuntimeError, match="gateway down"):
+            MeteoFranceAPICentre(tmp_path).fetch_one(
+                self._arpege(), dt.datetime(2024, 6, 1, 0), 0, ["temperature_2m"], "auto"
             )
         assert list(tmp_path.iterdir()) == [], "no partial file should remain"
