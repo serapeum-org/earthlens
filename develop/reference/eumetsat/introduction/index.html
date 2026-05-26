@@ -10,13 +10,13 @@
       
       
       
-        <link rel="canonical" href="https://serapeum-org.github.io/earthlens/develop/reference/openeo/authentication/">
+        <link rel="canonical" href="https://serapeum-org.github.io/earthlens/develop/reference/eumetsat/introduction/">
       
       
-        <link rel="prev" href="../usage/">
+        <link rel="prev" href="../../aggregation/">
       
       
-        <link rel="next" href="../datasets/">
+        <link rel="next" href="../usage/">
       
       
         
@@ -27,7 +27,7 @@
     
     
       
-        <title>Authentication - earthlens</title>
+        <title>Introduction - earthlens</title>
       
     
     
@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -83,7 +83,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#openeo-backend-authentication" class="md-skip">
+        <a href="#eumetsat-data-store-introduction" class="md-skip">
           Skip to content
         </a>
       
@@ -123,7 +123,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Authentication
+              Introduction
             
           </span>
         </div>
@@ -1341,6 +1341,325 @@
                 
   
   
+    
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_7" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_3_7" id="__nav_3_7_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    EUMETSAT (Data Store)
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_7_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    EUMETSAT (Data Store)
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Introduction
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Introduction
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#output-kind" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Output kind
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#how-it-maps-onto-the-earthlens-facade" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How it maps onto the EarthLens facade
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#installation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Installation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#whats-in-the-mvp-and-whats-deferred" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What's in the MVP — and what's deferred
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../usage/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Usage
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../authentication/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Authentication
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../catalog/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Catalog & Tooling
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../data-tailor/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Data Tailor (deferred)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../eumetsat/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
   
   
     
@@ -1355,10 +1674,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_7" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_8" >
         
           
-          <label class="md-nav__link" for="__nav_3_7" id="__nav_3_7_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3_8" id="__nav_3_8_label" tabindex="0">
             
   
   
@@ -1376,8 +1695,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_7_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_7">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_8">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -1497,10 +1816,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_8" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_9" >
         
           
-          <label class="md-nav__link" for="__nav_3_8" id="__nav_3_8_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3_9" id="__nav_3_9_label" tabindex="0">
             
   
   
@@ -1518,8 +1837,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_8_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_8">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_9_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_9">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -1695,10 +2014,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_9" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_10" >
         
           
-          <label class="md-nav__link" for="__nav_3_9" id="__nav_3_9_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3_10" id="__nav_3_10_label" tabindex="0">
             
   
   
@@ -1716,8 +2035,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_9_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_9">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_10_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_10">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -1865,10 +2184,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_10" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_11" >
         
           
-          <label class="md-nav__link" for="__nav_3_10" id="__nav_3_10_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3_11" id="__nav_3_11_label" tabindex="0">
             
   
   
@@ -1886,8 +2205,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_10_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_10">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_11_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_11">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -2007,10 +2326,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_11" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_12" >
         
           
-          <label class="md-nav__link" for="__nav_3_11" id="__nav_3_11_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3_12" id="__nav_3_12_label" tabindex="0">
             
   
   
@@ -2028,8 +2347,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_11_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_11">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_12_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_12">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -2131,325 +2450,6 @@
   
     <li class="md-nav__item">
       <a href="../../openaq/openaq/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Reference
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-    
-  
-  
-  
-    
-    
-    
-    
-      
-      
-    
-    
-    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
-      
-        
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_12" checked>
-        
-          
-          <label class="md-nav__link" for="__nav_3_12" id="__nav_3_12_label" tabindex="0">
-            
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    openEO (server-side processing)
-  
-
-    
-  </span>
-  
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_12_label" aria-expanded="true">
-          <label class="md-nav__title" for="__nav_3_12">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    openEO (server-side processing)
-  
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../introduction/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Introduction
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../usage/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Usage
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-    
-  
-  
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Authentication
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Authentication
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#get-a-cdse-account" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Get a CDSE account
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#authentication-flows" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Authentication flows
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Authentication flows">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#interactive-first-run-on-your-laptop" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Interactive (first run on your laptop)
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#headless-ci-client-credentials" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Headless / CI (client credentials)
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#choosing-the-endpoint" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Choosing the endpoint
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#errors" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Errors
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../datasets/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Collections & recipes
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../openeo/" class="md-nav__link">
         
   
   
@@ -3861,7 +3861,7 @@
   <span class="md-ellipsis">
     
   
-    Seismic events (FDSN)
+    EUMETSAT Data Store
   
 
     
@@ -3874,6 +3874,232 @@
         
         <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_7_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_4_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    EUMETSAT Data Store
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../examples/eumetsat/catalog_explorer/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Browse the EUMETSAT catalog (no network)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../examples/eumetsat/output_kinds_and_formats/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Output kinds &amp; product formats (no network)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../examples/eumetsat/msg_hrseviri_fetch/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MSG SEVIRI L1.5 full-disk imagery
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../examples/eumetsat/sentinel3_olci_ocean_colour/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sentinel-3 OLCI L2 ocean colour
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../examples/eumetsat/sentinel5p_no2/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sentinel-5P TROPOMI NO2
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../examples/eumetsat/metop_ascat_soil_moisture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Metop ASCAT soil moisture
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_8" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_8" id="__nav_4_8_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Seismic events (FDSN)
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_8">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -3993,10 +4219,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_8" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_9" >
         
           
-          <label class="md-nav__link" for="__nav_4_8" id="__nav_4_8_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_9" id="__nav_4_9_label" tabindex="0">
             
   
   
@@ -4014,8 +4240,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_8_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_8">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_9_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_9">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -4387,10 +4613,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_9" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_10" >
         
           
-          <label class="md-nav__link" for="__nav_4_9" id="__nav_4_9_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_10" id="__nav_4_10_label" tabindex="0">
             
   
   
@@ -4408,8 +4634,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_9_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_9">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_10_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_10">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -4529,10 +4755,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_10" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_11" >
         
           
-          <label class="md-nav__link" for="__nav_4_10" id="__nav_4_10_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_11" id="__nav_4_11_label" tabindex="0">
             
   
   
@@ -4550,8 +4776,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_10_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_10">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_11_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_11">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -4699,10 +4925,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_11" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_12" >
         
           
-          <label class="md-nav__link" for="__nav_4_11" id="__nav_4_11_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_12" id="__nav_4_12_label" tabindex="0">
             
   
   
@@ -4720,8 +4946,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_11_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_11">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_12_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_12">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -4802,232 +5028,6 @@
     
   
     Multi-station NO2 — the traffic diurnal cycle
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    
-    
-    
-    
-      
-      
-    
-    
-    <li class="md-nav__item md-nav__item--nested">
-      
-        
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_12" >
-        
-          
-          <label class="md-nav__link" for="__nav_4_12" id="__nav_4_12_label" tabindex="0">
-            
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Server-side processing (openEO)
-  
-
-    
-  </span>
-  
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_12_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_12">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    Server-side processing (openEO)
-  
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../examples/openeo/catalog_explorer/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    openEO catalog explorer (no network, no auth)
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../examples/openeo/quickstart/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Quick start - Sentinel-2 NDVI monthly via openEO
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../examples/openeo/cloud_masked_composite/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Sentinel-2 cloud-masked median composite via openEO
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../examples/openeo/server_side_aggregate/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Server-side temporal aggregation with
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../examples/openeo/air_quality_no2_monthly/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Air quality - Sentinel-5P NO2 monthly mean via openEO
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../examples/openeo/ocean_chlorophyll_monthly/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Ocean colour - Sentinel-3 OLCI chlorophyll monthly via openEO
   
 
     
@@ -5705,10 +5705,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#get-a-cdse-account" class="md-nav__link">
+  <a href="#output-kind" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Get a CDSE account
+        Output kind
       
     </span>
   </a>
@@ -5716,49 +5716,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#authentication-flows" class="md-nav__link">
+  <a href="#how-it-maps-onto-the-earthlens-facade" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Authentication flows
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Authentication flows">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#interactive-first-run-on-your-laptop" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Interactive (first run on your laptop)
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#headless-ci-client-credentials" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Headless / CI (client credentials)
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#choosing-the-endpoint" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Choosing the endpoint
+        How it maps onto the EarthLens facade
       
     </span>
   </a>
@@ -5766,10 +5727,21 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#errors" class="md-nav__link">
+  <a href="#installation" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Errors
+        Installation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#whats-in-the-mvp-and-whats-deferred" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What's in the MVP — and what's deferred
       
     </span>
   </a>
@@ -5793,7 +5765,7 @@
 
 
   
-    <a href="https://github.com/serapeum-org/earthlens/edit/master/docs/reference/openeo/authentication.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
+    <a href="https://github.com/serapeum-org/earthlens/edit/master/docs/reference/eumetsat/introduction.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
     </a>
@@ -5802,114 +5774,118 @@
     
       
     
-    <a href="https://github.com/serapeum-org/earthlens/raw/master/docs/reference/openeo/authentication.md" title="View source of this page" class="md-content__button md-icon">
+    <a href="https://github.com/serapeum-org/earthlens/raw/master/docs/reference/eumetsat/introduction.md" title="View source of this page" class="md-content__button md-icon">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 18c.56 0 1 .44 1 1s-.44 1-1 1-1-.44-1-1 .44-1 1-1m0-3c-2.73 0-5.06 1.66-6 4 .94 2.34 3.27 4 6 4s5.06-1.66 6-4c-.94-2.34-3.27-4-6-4m0 6.5a2.5 2.5 0 0 1-2.5-2.5 2.5 2.5 0 0 1 2.5-2.5 2.5 2.5 0 0 1 2.5 2.5 2.5 2.5 0 0 1-2.5 2.5M9.27 20H6V4h7v5h5v4.07c.7.08 1.36.25 2 .49V8l-6-6H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h4.5a8.2 8.2 0 0 1-1.23-2"/></svg>
     </a>
   
 
 
-<h1 id="openeo-backend-authentication"><a class="toclink" href="#openeo-backend-authentication">openEO backend — authentication</a><a class="headerlink" href="#openeo-backend-authentication" title="Permanent link">#</a></h1>
-<p>openEO authenticates with <strong>OpenID Connect (OIDC)</strong>, not a static key or
-credentials file. On the default CDSE endpoint you use the <strong>same account</strong> as
-the Copernicus Data Space Ecosystem (and the STAC <code>cdse</code> endpoint), but through
-a different auth plane: OIDC bearer tokens here, S3 keys there.</p>
-<h2 id="get-a-cdse-account"><a class="toclink" href="#get-a-cdse-account">Get a CDSE account</a><a class="headerlink" href="#get-a-cdse-account" title="Permanent link">#</a></h2>
-<ol>
-<li>Register (free) at <a href="https://dataspace.copernicus.eu">https://dataspace.copernicus.eu</a>.</li>
-<li>That account is all you need for the <strong>interactive</strong> flow below. For a
-   <strong>headless / CI</strong> run you additionally register an OIDC service account and
-   create client credentials (next section).</li>
-</ol>
-<h2 id="authentication-flows"><a class="toclink" href="#authentication-flows">Authentication flows</a><a class="headerlink" href="#authentication-flows" title="Permanent link">#</a></h2>
-<p><code>earthlens.openeo.OpeneoAuth</code> selects the flow by which credentials are present,
-in this order:</p>
-<ol>
-<li><strong>client-credentials</strong> <em>(headless / CI)</em> — when a <code>client_id</code> (+
-   <code>client_secret</code>) is supplied. Non-interactive; ideal for CI and servers.</li>
-<li><strong>refresh-token</strong> — when a <code>refresh_token</code> is supplied; exchanged
-   non-interactively.</li>
-<li><strong>interactive device flow</strong> <em>(default for humans)</em> — otherwise
-   <code>authenticate_oidc()</code> is called. It <strong>reuses a refresh token cached on disk</strong>
-   (<code>~/.openeo/</code>) from an earlier login; if none is cached it prints a URL +
-   code for you to complete in a browser once. After the first login, later
-   sessions authenticate automatically from the cache.</li>
-</ol>
-<h3 id="interactive-first-run-on-your-laptop"><a class="toclink" href="#interactive-first-run-on-your-laptop">Interactive (first run on your laptop)</a><a class="headerlink" href="#interactive-first-run-on-your-laptop" title="Permanent link">#</a></h3>
-<p>No kwargs needed — the first <code>download()</code> triggers the device flow and prints a
-URL + code:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.earthlens</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="n">facade</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;openeo&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">variables</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;sentinel-2-l2a-ndvi-monthly&quot;</span><span class="p">:</span> <span class="p">[]},</span>
-<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="n">start</span><span class="o">=</span><span class="s2">&quot;2023-06-01&quot;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">&quot;2023-06-30&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">40.40</span><span class="p">,</span> <span class="mf">40.45</span><span class="p">],</span> <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">3.67</span><span class="p">,</span> <span class="mf">3.72</span><span class="p">],</span>
-<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    <span class="n">path</span><span class="o">=</span><span class="s2">&quot;out&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="p">)</span>
-<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="n">facade</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>   <span class="c1"># prints: &quot;Visit https://…/device and enter code ABCD-EFGH&quot;</span>
-</code></pre></div>
-<p>The refresh token is cached under <code>~/.openeo/</code>, so subsequent runs need no
-interaction.</p>
-<h3 id="headless-ci-client-credentials"><a class="toclink" href="#headless-ci-client-credentials">Headless / CI (client credentials)</a><a class="headerlink" href="#headless-ci-client-credentials" title="Permanent link">#</a></h3>
-<p>Register an OIDC service account on CDSE and pass its credentials — as kwargs:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="n">EarthLens</span><span class="p">(</span>
-<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>    <span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;openeo&quot;</span><span class="p">,</span>
-<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>    <span class="n">client_id</span><span class="o">=</span><span class="s2">&quot;sh-xxxxxxxx-xxxx-xxxx&quot;</span><span class="p">,</span>
-<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>    <span class="n">client_secret</span><span class="o">=</span><span class="s2">&quot;…&quot;</span><span class="p">,</span>            <span class="c1"># kept as a SecretStr internally</span>
-<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>    <span class="n">variables</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;sentinel-2-l2a-ndvi-monthly&quot;</span><span class="p">:</span> <span class="p">[]},</span>
-<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>    <span class="n">start</span><span class="o">=</span><span class="s2">&quot;2023-06-01&quot;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">&quot;2023-06-30&quot;</span><span class="p">,</span>
-<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">40.40</span><span class="p">,</span> <span class="mf">40.45</span><span class="p">],</span> <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">3.67</span><span class="p">,</span> <span class="mf">3.72</span><span class="p">],</span>
-<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>    <span class="n">path</span><span class="o">=</span><span class="s2">&quot;out&quot;</span><span class="p">,</span>
-<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
-</code></pre></div>
-<p>…or via environment variables (read by <code>OpeneoCredentials.from_env()</code> when the
-matching kwarg is not passed):</p>
+<h1 id="eumetsat-data-store-introduction"><a class="toclink" href="#eumetsat-data-store-introduction">EUMETSAT Data Store — introduction</a><a class="headerlink" href="#eumetsat-data-store-introduction" title="Permanent link">#</a></h1>
+<p><code>earthlens.eumetsat</code> is one unified backend over the <strong>EUMETSAT Data
+Store</strong>, the access point for EUMETSAT's satellite archive. A single
+OAuth2 consumer key / secret unlocks every collection the Data Store
+serves. The catalog curates the <strong>entire Data Store — all ~180
+collections</strong> — grouped into ten mission families:</p>
 <table>
 <thead>
 <tr>
-<th>Env var</th>
-<th>Meaning</th>
+<th>Group</th>
+<th>Coverage</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><code>OPENEO_CLIENT_ID</code></td>
-<td>OIDC client id (client-credentials flow)</td>
+<td><strong>MTG</strong></td>
+<td>Meteosat Third Generation — FCI imager, Lightning Imager, FCI L2 suite</td>
 </tr>
 <tr>
-<td><code>OPENEO_CLIENT_SECRET</code></td>
-<td>OIDC client secret</td>
+<td><strong>MSG</strong></td>
+<td>Meteosat Second Generation — SEVIRI L1.5, cloud products, CDRs</td>
 </tr>
 <tr>
-<td><code>OPENEO_REFRESH_TOKEN</code></td>
-<td>a pre-minted OIDC refresh token (refresh-token flow)</td>
+<td><strong>MFG</strong></td>
+<td>Meteosat First Generation — MVIRI / GSA climate data records</td>
 </tr>
 <tr>
-<td><code>OPENEO_PROVIDER_ID</code></td>
-<td>OIDC provider id, when the backend advertises several</td>
+<td><strong>Metop</strong></td>
+<td>EPS — ASCAT scatterometer, IASI sounder, AVHRR / GOME-2 / AMSU / MHS, CDR/FDR</td>
+</tr>
+<tr>
+<td><strong>Metop-SG</strong></td>
+<td>Metop Second Generation (GRAS-2, auxiliary, BUFR)</td>
+</tr>
+<tr>
+<td><strong>Sentinel-3</strong></td>
+<td>OLCI / SLSTR / SRAL marine mirror (NRT + reprocessed baselines)</td>
+</tr>
+<tr>
+<td><strong>Sentinel-5P</strong></td>
+<td>TROPOMI atmospheric composition mirror</td>
+</tr>
+<tr>
+<td><strong>Sentinel-6</strong></td>
+<td>Poseidon-4 altimetry + microwave radiometer mirror</td>
+</tr>
+<tr>
+<td><strong>OSI-SAF</strong></td>
+<td>Ocean &amp; Sea Ice — sea-ice concentration, SST</td>
+</tr>
+<tr>
+<td><strong>Other</strong></td>
+<td>Multimission / legacy climate &amp; fundamental data records (ATMS, MWHS, SSM/T, HIRS, CM SAF, SARAH, AWS, RO)</td>
 </tr>
 </tbody>
 </table>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="nb">export</span><span class="w"> </span><span class="nv">OPENEO_CLIENT_ID</span><span class="o">=</span><span class="s2">&quot;sh-xxxxxxxx-xxxx-xxxx&quot;</span>
-<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="nb">export</span><span class="w"> </span><span class="nv">OPENEO_CLIENT_SECRET</span><span class="o">=</span><span class="s2">&quot;…&quot;</span>
+<p>The backend wraps the official
+<a href="https://pypi.org/project/eumdac/"><code>eumdac</code></a> client: one
+consumer-key/secret pair mints an auto-refreshing bearer token, and every
+collection is searched by bounding box + time window and <strong>fetched as a
+whole native product to disk</strong>.</p>
+<h2 id="output-kind"><a class="toclink" href="#output-kind">Output kind</a><a class="headerlink" href="#output-kind" title="Permanent link">#</a></h2>
+<p>Like the NASA Earthdata backend, EUMETSAT's <code>OUTPUT_KIND</code> is
+<strong>per-collection, not fixed</strong>. Each catalog row carries an
+<code>output_kind</code> (<code>raster</code> / <code>vector</code> / <code>tabular</code>) that the backend copies
+onto the instance at construction. Most collections are gridded
+(<code>raster</code>); the point/vector products — Atmospheric Motion Vectors,
+ASCAT winds, and the Lightning Imager event/flash/group products — are
+tagged <code>vector</code>. A request that mixes output kinds is rejected up front.</p>
+<h2 id="how-it-maps-onto-the-earthlens-facade"><a class="toclink" href="#how-it-maps-onto-the-earthlens-facade">How it maps onto the <code>EarthLens</code> facade</a><a class="headerlink" href="#how-it-maps-onto-the-earthlens-facade" title="Permanent link">#</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.earthlens</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="n">el</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;eumetsat&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">start</span><span class="o">=</span><span class="s2">&quot;2024-06-01&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="n">end</span><span class="o">=</span><span class="s2">&quot;2024-06-01&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    <span class="n">variables</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;msg-hrseviri&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;HRSEVIRI&quot;</span><span class="p">]},</span>
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">10.0</span><span class="p">],</span>
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>    <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">10.0</span><span class="p">],</span>
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>    <span class="n">path</span><span class="o">=</span><span class="s2">&quot;eumetsat_output&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="p">)</span>
+<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="n">paths</span> <span class="o">=</span> <span class="n">el</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>   <span class="c1"># native products on disk</span>
 </code></pre></div>
-<p>The CDSE client-credentials setup is documented at
-<a href="https://documentation.dataspace.copernicus.eu/APIs/openEO/authentication/client_credentials.html">https://documentation.dataspace.copernicus.eu/APIs/openEO/authentication/client_credentials.html</a>.</p>
-<h2 id="choosing-the-endpoint"><a class="toclink" href="#choosing-the-endpoint">Choosing the endpoint</a><a class="headerlink" href="#choosing-the-endpoint" title="Permanent link">#</a></h2>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">EarthLens</span><span class="p">(</span><span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;openeo&quot;</span><span class="p">,</span> <span class="n">endpoint</span><span class="o">=</span><span class="s2">&quot;openeo-platform&quot;</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span>   <span class="c1"># NoR federation</span>
-<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="n">EarthLens</span><span class="p">(</span><span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;openeo&quot;</span><span class="p">,</span> <span class="n">endpoint</span><span class="o">=</span><span class="s2">&quot;https://my.openeo.host&quot;</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span>  <span class="c1"># custom</span>
+<p><code>variables</code> is a <code>{collection_key: [selector, ...]}</code> mapping (see
+<a href="../usage/">Usage</a>); the bbox is a <strong>search filter</strong> (which products
+intersect it), not a pixel crop.</p>
+<h2 id="installation"><a class="toclink" href="#installation">Installation</a><a class="headerlink" href="#installation" title="Permanent link">#</a></h2>
+<p>The backend's SDK is an optional extra. The package imports without it;
+the <code>eumdac</code> import is lazy and only happens when you actually
+authenticate or download.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>pip<span class="w"> </span>install<span class="w"> </span>earthlens<span class="o">[</span>eumetsat<span class="o">]</span>
 </code></pre></div>
-<p>The endpoint is resolved at construction, so an unknown alias fails fast.</p>
-<h2 id="errors"><a class="toclink" href="#errors">Errors</a><a class="headerlink" href="#errors" title="Permanent link">#</a></h2>
-<p>A missing/failed OIDC flow raises <code>earthlens.openeo.AuthenticationError</code>
-(a subclass of <code>earthlens.base.AuthenticationError</code>, so one <code>except</code> clause
-catches every backend's auth failure). The message points at the CDSE account
-URL and the headless-setup option. A missing <code>[openeo]</code> extra raises an
-<code>ImportError</code> naming <code>earthlens[openeo]</code>.</p>
-<p>Authentication is <strong>lazy</strong>: the connection is opened and the OIDC flow runs on
-the first <code>download()</code> (or first <code>OpeneoAuth.connection()</code>), not at
-construction — so building the facade never blocks on the network.</p>
+<h2 id="whats-in-the-mvp-and-whats-deferred"><a class="toclink" href="#whats-in-the-mvp-and-whats-deferred">What's in the MVP — and what's deferred</a><a class="headerlink" href="#whats-in-the-mvp-and-whats-deferred" title="Permanent link">#</a></h2>
+<p>The MVP <strong>fetches native products</strong>. Two capabilities are deferred
+follow-ons:</p>
+<ul>
+<li><strong>Data Tailor</strong> (server-side subset / reproject / format-convert) — the
+  <code>aggregate=</code> / bbox-crop path. <code>download(aggregate=...)</code> raises
+  <code>NotImplementedError</code> naming it. See <a href="../data-tailor/">Data Tailor</a>.</li>
+<li><strong>Native SEVIRI / FCI client-side reading</strong> — needs a satpy reader
+  bridge in <code>pyramids</code>. NetCDF mirror products (Sentinel-3 / -5P / -6,
+  OSI SAF) are readable with <code>pyramids</code> today.</li>
+</ul>
+<p>See <a href="../authentication/">Authentication</a>, <a href="../usage/">Usage</a>, and the
+<a href="../catalog/">Catalog &amp; tooling</a> reference for the full picture.</p>
 
 
 
@@ -5945,7 +5921,7 @@ construction — so building the facade never blocks on the network.</p>
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
           
-          <a href="../usage/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Usage">
+          <a href="../../aggregation/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Aggregation">
             <div class="md-footer__button md-icon">
               
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
@@ -5955,20 +5931,20 @@ construction — so building the facade never blocks on the network.</p>
                 Previous
               </span>
               <div class="md-ellipsis">
-                Usage
+                Aggregation
               </div>
             </div>
           </a>
         
         
           
-          <a href="../datasets/" class="md-footer__link md-footer__link--next" aria-label="Next: Collections &amp; recipes">
+          <a href="../usage/" class="md-footer__link md-footer__link--next" aria-label="Next: Usage">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                Collections & recipes
+                Usage
               </div>
             </div>
             <div class="md-footer__button md-icon">
