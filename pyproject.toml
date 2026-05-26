@@ -152,6 +152,7 @@ include = ["earthlens", "earthlens.*"]
 "earthlens.gdacs" = ["*.yaml"]
 "earthlens.openaq" = ["*.yaml"]
 "earthlens.tropycal" = ["*.yaml"]
+"earthlens.firms" = ["*.yaml"]
 
 [tool.flake8]
 ignore = ["E203", "E266", "E501", "W503", "E722", "C901", "E741", "E731"]
@@ -222,6 +223,7 @@ markers = [
     "gdacs: tests for the GDACS multi-hazard alert backend (public feed, no extra SDK).",
     "openaq: tests for the OpenAQ v3 air-quality backend (no extra SDK; uses the core `requests` dependency).",
     "tropycal: tests for the Tropycal cyclone-track backend (requires the `tropycal` extra: tropycal, cartopy).",
+    "firms: tests for the NASA FIRMS active-fire backend (free MAP_KEY, no extra SDK; uses the core `requests` + `pandas` dependencies).",
 ]
 
 [tool.pixi.workspace]
@@ -253,7 +255,8 @@ test-openeo = { cmd = "pytest -vvv -m 'openeo and not e2e' --cov=src/earthlens -
 test-gdacs = { cmd = "pytest -vvv -m 'gdacs and not e2e' --cov=src/earthlens --cov-report=xml --cov-report=term-missing", description = "Run GDACS-backend tests (public feed, no extra SDK)" }
 test-openaq = { cmd = "pytest -vvv -m 'openaq and not e2e' --cov=src/earthlens --cov-report=xml --cov-report=term-missing", description = "Run OpenAQ-backend tests (no extra SDK; uses the core requests dependency)" }
 test-tropycal = { cmd = "pytest -vvv -m 'tropycal and not e2e' --cov=src/earthlens --cov-report=xml --cov-report=term-missing", description = "Run Tropycal cyclone-track backend tests (requires the `tropycal` extra: tropycal, cartopy)" }
-test-doctests = { cmd = "pytest --doctest-modules src/earthlens/gee src/earthlens/chc src/earthlens/ecmwf src/earthlens/cmems src/earthlens/fdsn src/earthlens/earthdata src/earthlens/stac src/earthlens/openeo src/earthlens/gdacs src/earthlens/openaq src/earthlens/tropycal src/earthlens/base", description = "Run docstring examples across the backend packages (catches drift in catalog / API docstrings)" }
+test-firms = { cmd = "pytest -vvv -m 'firms and not e2e' --cov=src/earthlens --cov-report=xml --cov-report=term-missing", description = "Run NASA FIRMS active-fire backend tests (free MAP_KEY, no extra SDK)" }
+test-doctests = { cmd = "pytest --doctest-modules src/earthlens/gee src/earthlens/chc src/earthlens/ecmwf src/earthlens/cmems src/earthlens/fdsn src/earthlens/earthdata src/earthlens/stac src/earthlens/openeo src/earthlens/gdacs src/earthlens/openaq src/earthlens/tropycal src/earthlens/firms src/earthlens/base", description = "Run docstring examples across the backend packages (catches drift in catalog / API docstrings)" }
 notebooks = { cmd = "pytest --nbval --nbval-lax --verbose docs/examples", description = "check notebooks" }
 jupyter = { cmd = "jupyter lab --no-browser --IdentityProvider.token='' --ServerApp.password='' --port=8889", description = "check notebooks" }
 build-dist = { cmd = "python -m build", description = "Build sdist and wheel for PyPI" }
