@@ -334,17 +334,15 @@ class FIRMS(AbstractDataSource):
             start_date: Requested inclusive start.
             end_date: Requested inclusive end.
         """
+        # `temporal.start` / `temporal.end` are typed `datetime.date | None`
+        # on the catalog model, so no datetime-narrowing is needed here.
         mission_start = sensor.temporal.start
-        if isinstance(mission_start, dt.datetime):
-            mission_start = mission_start.date()
         if mission_start is not None and start_date < mission_start:
             logger.warning(
                 f"{sensor.code} coverage begins {mission_start}; the requested "
                 f"window starts {start_date} and may return no detections."
             )
         coverage_end = sensor.temporal.end
-        if isinstance(coverage_end, dt.datetime):
-            coverage_end = coverage_end.date()
         if coverage_end is not None and end_date > coverage_end:
             logger.warning(
                 f"{sensor.code} coverage ends {coverage_end}; the requested "

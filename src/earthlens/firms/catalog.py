@@ -27,6 +27,7 @@ is monkey-patchable in tests.
 
 from __future__ import annotations
 
+import datetime as dt
 from pathlib import Path
 from typing import Any, Literal
 
@@ -94,8 +95,8 @@ class Temporal(BaseModel):
 
     model_config = ConfigDict(frozen=True, extra="forbid")
 
-    start: Any = None
-    end: Any = None
+    start: dt.date | None = None
+    end: dt.date | None = None
     quality: Literal["NRT", "SP"] = "NRT"
 
 
