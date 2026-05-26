@@ -101,14 +101,24 @@ class ECMWFCentre(_NWPCentre):
             pathlib.Path: The local param-subset GRIB2 file.
         """
         client_cls = _import_client()
-        client = client_cls(source=_source_for(mirror, model))
-        target = self.save_dir / grib_name("ifs", cycle, step)
-        client.retrieve(
-            date=cycle.strftime("%Y-%m-%d"),
-            time=cycle.hour,
-            step=step,
-            type="fc",
-            param=[model.bands[p] for p in params],
-            target=str(target),
+        opts = model.request_options
+        # `ecmwf_model` picks the deterministic IFS (`ifs`, default) vs AIFS
+        # (`aifs-single`); `stream` / `type` select the ENS control forecast
+        # (`{"stream": "enfo", "type": "cf"}`). All are no-ops for IFS HRES.
+        client = client_cls(
+            source=_source_for(mirror, model),
+            model=opts.get("ecmwf_model", "ifs"),
         )
+        target = self.save_dir / grib_name(model.model_family or "ifs", cycle, step)
+        request: dict[str, Any] = {
+            "date": cycle.strftime("%Y-%m-%d"),
+            "time": cycle.hour,
+            "step": step,
+            "type": opts.get("type", "fc"),
+            "param": [model.bands[p] for p in params],
+            "target": str(target),
+        }
+        if opts.get("stream"):
+            request["stream"] = opts["stream"]
+        client.retrieve(**request)
         return target

@@ -33,6 +33,7 @@ CENTRE_REGISTRY: dict[str, tuple[str, str]] = {
     "herbie": ("earthlens.nwp.centres.noaa", "NOAACentre"),
     "ecmwf-opendata": ("earthlens.nwp.centres.ecmwf", "ECMWFCentre"),
     "direct-https": ("earthlens.nwp.centres.dwd", "DWDCentre"),
+    "direct-boto3": ("earthlens.nwp.centres.meteofrance", "MeteoFranceCentre"),
 }
 
 

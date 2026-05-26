@@ -45,6 +45,7 @@ class _FakeClient:
 
     def __init__(self, source: str | None = None, **kwargs: Any) -> None:
         self.source = source
+        self.kwargs = kwargs
         self.retrieve_calls: list[dict[str, Any]] = []
         _FakeClient.instances.append(self)
 

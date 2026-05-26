@@ -13,6 +13,7 @@ from earthlens.nwp.centres import resolve_centre
 from earthlens.nwp.centres.base import CENTRE_REGISTRY, _NWPCentre
 from earthlens.nwp.centres.dwd import DWDCentre
 from earthlens.nwp.centres.ecmwf import ECMWFCentre, _source_for
+from earthlens.nwp.centres.meteofrance import MeteoFranceCentre
 from earthlens.nwp.centres.noaa import NOAACentre, _import_herbie, _priority
 
 pytestmark = [pytest.mark.nwp, pytest.mark.unit]
@@ -38,11 +39,21 @@ class TestResolveCentre:
 
     def test_registry_keys(self):
         """The registry maps the SDK + direct backends to centre classes."""
-        assert set(CENTRE_REGISTRY) == {"herbie", "ecmwf-opendata", "direct-https"}
+        assert set(CENTRE_REGISTRY) == {
+            "herbie",
+            "ecmwf-opendata",
+            "direct-https",
+            "direct-boto3",
+        }
 
     @pytest.mark.parametrize(
         "backend, cls",
-        [("herbie", NOAACentre), ("ecmwf-opendata", ECMWFCentre), ("direct-https", DWDCentre)],
+        [
+            ("herbie", NOAACentre),
+            ("ecmwf-opendata", ECMWFCentre),
+            ("direct-https", DWDCentre),
+            ("direct-boto3", MeteoFranceCentre),
+        ],
     )
     def test_resolve_returns_bound_centre(self, backend, cls, tmp_path):
         """resolve_centre imports and constructs the registered centre."""
@@ -53,7 +64,7 @@ class TestResolveCentre:
     def test_unknown_backend_raises(self, tmp_path):
         """An unregistered backend raises a listing ValueError."""
         with pytest.raises(ValueError, match="no NWP centre registered"):
-            resolve_centre("direct-boto3", tmp_path)
+            resolve_centre("direct-ftp", tmp_path)
 
 
 class TestNOAACentre:
@@ -156,10 +167,44 @@ class TestECMWFCentre:
         )
         client = fake_ecmwf_client.instances[-1]
         assert client.source == "azure"
+        assert client.kwargs.get("model") == "ifs"
         call = client.retrieve_calls[-1]
         assert call["param"] == ["2t", "tp"] and call["step"] == 24 and call["time"] == 12
         assert call["date"] == "2024-06-01"
+        assert "stream" not in call
         assert out.exists() and out.name == "ifs_2024060112_f024.grib2"
+
+    def test_fetch_one_aifs_uses_model_and_family(self, fake_ecmwf_client, tmp_path):
+        """An AIFS row sets Client(model='aifs-single') and names the file by family."""
+        aifs = NWPModel(
+            provider="ecmwf-opendata",
+            model_family="aifs",
+            cycles_utc=[0],
+            horizon_h=360,
+            backend="ecmwf-opendata",
+            mirrors=["aws"],
+            bands={"temperature_2m": "2t"},
+            request_options={"ecmwf_model": "aifs-single"},
+        )
+        out = ECMWFCentre(tmp_path).fetch_one(aifs, dt.datetime(2024, 6, 1, 0), 0, ["temperature_2m"], "aws")
+        assert fake_ecmwf_client.instances[-1].kwargs.get("model") == "aifs-single"
+        assert out.name == "aifs_2024060100_f000.grib2"
+
+    def test_fetch_one_ens_passes_stream_and_type(self, fake_ecmwf_client, tmp_path):
+        """An ENS row forwards stream/type from request_options to retrieve."""
+        ens = NWPModel(
+            provider="ecmwf-opendata",
+            model_family="ens",
+            cycles_utc=[0],
+            horizon_h=360,
+            backend="ecmwf-opendata",
+            mirrors=["aws"],
+            bands={"temperature_2m": "2t"},
+            request_options={"stream": "enfo", "type": "cf"},
+        )
+        ECMWFCentre(tmp_path).fetch_one(ens, dt.datetime(2024, 6, 1, 0), 0, ["temperature_2m"], "aws")
+        call = fake_ecmwf_client.instances[-1].retrieve_calls[-1]
+        assert call["stream"] == "enfo" and call["type"] == "cf"
 
     def test_import_client_missing_raises_friendly(self, monkeypatch):
         """A missing ecmwf.opendata raises an earthlens[nwp] ImportError."""
@@ -224,3 +269,74 @@ class TestDWDCentre:
                 self._icon(), dt.datetime(2024, 6, 1, 0), 0, ["temperature_2m"], "auto"
             )
         assert list(tmp_path.iterdir()) == [], "no partial file should remain"
+
+
+class TestMeteoFranceCentre:
+    """Tests for the direct-boto3 Météo-France centre."""
+
+    def _mf(self, **overrides) -> NWPModel:
+        """Build a direct-boto3 ARPEGE row, overriding any field."""
+        base = dict(
+            provider="meteofrance",
+            model_family="arpege",
+            cycles_utc=[0, 12],
+            horizon_h=102,
+            backend="direct-boto3",
+            bands={"temperature_2m": "T2M", "precipitation_acc": "TP"},
+            request_options={
+                "bucket": "mf-nwp-models",
+                "key_template": "arpege-world/{date:%Y%m%d%H}/f{step:03d}_{var}.grib2",
+                "region": "eu-west-1",
+            },
+        )
+        base.update(overrides)
+        return NWPModel(**base)
+
+    def test_fetch_one_reads_keys_and_concatenates(self, monkeypatch, tmp_path):
+        """fetch_one builds per-variable S3 keys and concatenates their bodies."""
+        import sys
+        import types
+
+        keys = []
+
+        class _Body:
+            def __init__(self, data):
+                self._data = data
+
+            def read(self):
+                return self._data
+
+        class _Client:
+            def get_object(self, Bucket, Key):
+                keys.append((Bucket, Key))
+                return {"Body": _Body(b"<" + Key.rsplit("_", 1)[-1].encode() + b">")}
+
+        boto3_mod = types.ModuleType("boto3")
+        boto3_mod.client = lambda *a, **k: _Client()
+        botocore = types.ModuleType("botocore")
+        botocore.UNSIGNED = object()
+        client_mod = types.ModuleType("botocore.client")
+        client_mod.Config = lambda **k: None
+        botocore.client = client_mod
+        monkeypatch.setitem(sys.modules, "boto3", boto3_mod)
+        monkeypatch.setitem(sys.modules, "botocore", botocore)
+        monkeypatch.setitem(sys.modules, "botocore.client", client_mod)
+
+        out = MeteoFranceCentre(tmp_path).fetch_one(
+            self._mf(), dt.datetime(2024, 6, 1, 0), 3,
+            ["temperature_2m", "precipitation_acc"], "auto",
+        )
+        assert keys == [
+            ("mf-nwp-models", "arpege-world/2024060100/f003_T2M.grib2"),
+            ("mf-nwp-models", "arpege-world/2024060100/f003_TP.grib2"),
+        ]
+        assert out.read_bytes() == b"<T2M.grib2><TP.grib2>"
+        assert out.name == "arpege_2024060100_f003.grib2"
+
+    def test_fetch_one_without_bucket_raises(self, tmp_path):
+        """A row lacking bucket/key_template in request_options is rejected."""
+        model = self._mf(request_options={})
+        with pytest.raises(ValueError, match="bucket"):
+            MeteoFranceCentre(tmp_path).fetch_one(
+                model, dt.datetime(2024, 6, 1, 0), 0, ["temperature_2m"], "auto"
+            )
