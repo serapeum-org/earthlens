@@ -13,7 +13,7 @@ import pytest
 
 from earthlens.aggregate import AggregationConfig
 from earthlens.base import RemoteProduct, SpatialExtent, TemporalExtent
-from earthlens.cmems import CMEMS, AuthenticationError, CmemsAuth, CmemsCredentials
+from earthlens.cmems import CMEMS, AuthenticationError, CmemsAuth
 from earthlens.cmems.backend import _safe_filename, _unique_output_names
 
 
