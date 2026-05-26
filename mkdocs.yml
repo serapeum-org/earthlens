@@ -172,6 +172,10 @@ nav:
       - Introduction: reference/radar/introduction.md
       - Usage: reference/radar/usage.md
       - Reference: reference/radar/radar.md
+    - National Water Model:
+      - Introduction: reference/nwm/introduction.md
+      - Usage: reference/nwm/usage.md
+      - Reference: reference/nwm/nwm.md
   - Examples:
     - Authentication: examples/authentication.md
     - Data Sources: examples/data-sources.md
