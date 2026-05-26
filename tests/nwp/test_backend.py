@@ -296,7 +296,7 @@ class TestFetch:
         assert len(fake_pyramids["written"]) == 4
         assert paths[0].name == "gfs_2024060100_f000.tif"
         assert fake_pyramids["opened"][0].cropped == ((30.0, 10.0, 40.0, 20.0), 4326)
-        # touch=False dodges pyramids' EPSG:9122 wrap-cutline failure on real GRIB.
+        # touch=False crops to the bbox extent (touch=True masks the full grid).
         assert fake_pyramids["opened"][0].touch is False
 
     def test_download_passthrough(self, mini_catalog, tmp_path, fake_pyramids):
