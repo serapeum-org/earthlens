@@ -49,6 +49,7 @@ is an optional extra — pick the ones you actually need:
 pip install earthlens[ecmwf]    # ECMWF / Copernicus CDS (cdsapi)
 pip install earthlens[s3]       # ERA5 on AWS S3 (boto3)
 pip install earthlens[gee]      # Google Earth Engine
+pip install earthlens[openeo]   # openEO server-side processing (CDSE)
 pip install earthlens[all]      # everything
 ```
 
@@ -57,6 +58,13 @@ A bare `pip install earthlens` installs only the core dependencies
 Asking the facade for `data_source="ecmwf"` (or `"amazon-s3"`,
 or `"gee"`) without the matching extra raises a clear
 `ImportError` naming the missing extra.
+
+> **Dependency note — `pandas` / `xarray` ceiling.** The `openeo` client
+> (≤ 0.50) pins `pandas<3.0.0` and `xarray<2025.01.2`. Because `[openeo]` is
+> part of `[all]`, installing `earthlens[all]` (or `earthlens[openeo]`)
+> constrains `pandas` to the 2.x line and `xarray` to `<2025.01.2` in that
+> environment. Install `earthlens[openeo]` in its own virtualenv if you need a
+> newer `pandas`/`xarray` for unrelated work.
 
 ## From Sources
 
