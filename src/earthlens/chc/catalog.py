@@ -58,9 +58,9 @@ Examples:
 
 from __future__ import annotations
 
+import warnings
 from pathlib import Path
 from typing import Any, Literal
-
 
 #: Canonical `temporal_resolution` vocabulary for CHC datasets (M1).
 #:
@@ -438,10 +438,18 @@ def _build_chc_dataset(
     # removed in pandas 3.x; "H" deprecated for "h" in pandas 2.2).
     # Discrete-files datasets keep a placeholder pandas_freq; the check
     # still runs so even the placeholder must be a legal alias.
+    #
+    # pandas 2.2+ only *warns* (FutureWarning) on a deprecated alias rather
+    # than raising, so escalate those warnings to errors here — otherwise
+    # `"AS"` / `"H"` would slip through on pandas 2.x and only break once
+    # pandas 3.x removes them. Typos still raise ValueError directly.
     freq_value = ds_body.get("pandas_freq")
     try:
-        pd.tseries.frequencies.to_offset(freq_value)
-    except (ValueError, TypeError) as exc:
+        with warnings.catch_warnings():
+            warnings.simplefilter("error", FutureWarning)
+            warnings.simplefilter("error", DeprecationWarning)
+            pd.tseries.frequencies.to_offset(freq_value)
+    except (ValueError, TypeError, FutureWarning, DeprecationWarning) as exc:
         raise ValueError(
             f"{source_path.name} dataset {ds_key!r} has invalid "
             f"`pandas_freq` {freq_value!r}: {exc}. See "
