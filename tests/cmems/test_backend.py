@@ -88,8 +88,12 @@ class _FakeVar:
         self.epsg = 4326
 
     def read_array(self) -> np.ndarray:
+        # A single window means `reduce("time", ...)` squeezed the time axis away,
+        # so pyramids hands back a 2-D (lat, lon) array; >1 window stays 3-D
+        # (time, lat, lon). This is the only case that exercises the 2-D->3-D
+        # reshape branch in `_aggregate_one`.
         if self._n == 1:
-            return np.zeros((2, 2), dtype="float64")  # single window -> 2D (lat, lon)
+            return np.zeros((2, 2), dtype="float64")
         return np.zeros((self._n, 2, 2), dtype="float64")
 
 
@@ -108,13 +112,16 @@ class _FakeNetCDF:
     """Minimal pyramids `NetCDF` stub exercising the aggregate path."""
 
     dimension_names = ("depth", "latitude", "longitude", "time")
-    # CF-decoded time axis (pyramids `NetCDF.time_stamp`) — 40 daily steps ->
-    # Jan (31) + Feb (9) 2020 -> two monthly windows. Replaces the old xarray path.
-    time_stamp = [d.isoformat() for d in pd.date_range("2020-01-01", periods=40, freq="D")]
+    # CF-decoded time axis (pyramids `NetCDF.get_time_variable`) — 40 daily steps
+    # -> Jan (31) + Feb (9) 2020 -> two monthly windows.
+    _times = [d.isoformat() for d in pd.date_range("2020-01-01", periods=40, freq="D")]
 
     @classmethod
     def read_file(cls, path: str) -> "_FakeNetCDF":
         return cls()
+
+    def get_time_variable(self, var_name="time", time_format="%Y-%m-%d %H:%M:%S"):
+        return self._times
 
     def reduce(self, dim, how="mean", *, groupby=None, skipna=True):
         call: dict[str, Any] = {"dim": dim, "how": how}
@@ -429,16 +436,18 @@ class TestCMEMSDownload:
             {"dim": "time", "how": "mean", "groupby_distinct": 2},
         ], f"unexpected reduce calls: {_FAKE_REDUCE_CALLS}"
 
-    @pytest.mark.parametrize("bad_time_stamp", [None, []])
-    def test_window_labels_raises_when_time_axis_undecodable(self, bad_time_stamp):
-        """`_window_labels` raises a clear ValueError when `time_stamp` is empty/None."""
-        nc = types.SimpleNamespace(time_stamp=bad_time_stamp)
+    @pytest.mark.parametrize("bad_times", [None, []])
+    def test_window_labels_raises_when_time_axis_undecodable(self, bad_times):
+        """`_window_labels` raises a clear ValueError when the decoded axis is empty/None."""
+        nc = types.SimpleNamespace(get_time_variable=lambda *a, **k: bad_times)
         with pytest.raises(ValueError, match="time"):
             CMEMS._window_labels(nc, "1MS")
 
     def test_window_labels_skips_empty_buckets(self):
         """Sparse timesteps under a fine `freq` leave empty Grouper buckets unlabelled."""
-        nc = types.SimpleNamespace(time_stamp=["2020-01-01", "2020-03-01"])
+        nc = types.SimpleNamespace(
+            get_time_variable=lambda *a, **k: ["2020-01-01", "2020-03-01"]
+        )
         labels = CMEMS._window_labels(nc, "D")
         assert labels == ["20200101", "20200301"], (
             f"one label per timestep expected, empty daily buckets skipped; got {labels}"

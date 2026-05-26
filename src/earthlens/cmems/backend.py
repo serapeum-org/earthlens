@@ -402,8 +402,8 @@ class CMEMS(AbstractDataSource):
         NetCDF, which the GDAL netCDF driver cannot write back).
 
         The window labels are computed here from the file's CF-decoded
-        time axis (pyramids' `NetCDF.time_stamp`, which parses the CF
-        `units` + `calendar`; see :meth:`_window_labels`) and handed to
+        time axis (pyramids' `NetCDF.get_time_variable`, which parses the
+        CF `units` + `calendar`; see :meth:`_window_labels`) and handed to
         `reduce` as an explicit per-timestep label sequence, so each
         output slice carries a start-of-window `YYYYMMDD` label for its
         filename.
@@ -484,12 +484,17 @@ class CMEMS(AbstractDataSource):
         """Return one window label per timestep, bucketing time by `freq`.
 
         Reads the NetCDF's CF-decoded time axis from pyramids'
-        :attr:`pyramids.netcdf.NetCDF.time_stamp` (which parses the CF
-        `units` + `calendar`), builds a `pandas.DatetimeIndex`, then
-        assigns each timestep the start-of-window timestamp of its
+        :meth:`pyramids.netcdf.NetCDF.get_time_variable` (which parses
+        the CF `units` + `calendar`), builds a `pandas.DatetimeIndex`,
+        then assigns each timestep the start-of-window timestamp of its
         `freq` bucket. Timesteps in the same window share a label, so
         :meth:`pyramids.netcdf.NetCDF.reduce` coarsens `time` to one
         slice per distinct window.
+
+        The axis is requested at second resolution
+        (`time_format="%Y-%m-%d %H:%M:%S"`) rather than via the
+        date-only `time_stamp` property, so a sub-daily `freq` does not
+        collapse intra-day steps into a single bucket.
 
         Assumes a standard / proleptic-Gregorian calendar (what CMEMS
         ocean products use); the decoded timestamps are parsed with
@@ -507,7 +512,7 @@ class CMEMS(AbstractDataSource):
         Raises:
             ValueError: When the CF `time` axis cannot be decoded.
         """
-        times = nc.time_stamp
+        times = nc.get_time_variable("time", time_format="%Y-%m-%d %H:%M:%S")
         if not times:
             raise ValueError(
                 "cannot decode the NetCDF CF `time` axis for windowing "

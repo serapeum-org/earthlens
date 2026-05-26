@@ -21,6 +21,7 @@ from pathlib import Path
 
 import pytest
 
+from earthlens.aggregate import AggregationConfig
 from earthlens.earthlens import EarthLens
 
 
@@ -89,5 +90,42 @@ class TestCmemsLiveSubset:
         paths = el.download(progress_bar=False)
         assert paths, "GLORYS12 subset should write at least one file"
         assert paths[0].suffix == ".nc"
+
+    def test_glorys_monthly_aggregate_via_real_pyramids(self, tmp_path: Path):
+        """Full `aggregate=` path on a real GLORYS subset: real CF decode + reduce -> GeoTIFF.
+
+        Exercises the real pyramids contract `_aggregate_one` relies on (no stubs):
+        `get_time_variable` decodes the CF `time` axis, `_window_labels` buckets it,
+        and `reduce("time", groupby=labels)` collapses to one slice per window written
+        through `Dataset.create_from_array`. Three June 2020 days -> one monthly window.
+        """
+        el = EarthLens(
+            data_source="cmems",
+            start="2020-06-01",
+            end="2020-06-03",
+            variables={"cmems_mod_glo_phy_my_0.083deg_P1D-m": ["thetao"]},
+            lat_lim=[40.0, 40.5],
+            lon_lim=[-10.0, -9.5],
+            temporal_resolution="daily",
+            path=str(tmp_path),
+            minimum_depth=0.0,
+            maximum_depth=5.0,
+        )
+        paths = el.download(
+            progress_bar=False,
+            aggregate=AggregationConfig(freq="1MS", op="mean", out_dir=str(tmp_path)),
+        )
+        assert paths, "monthly aggregate should write at least one GeoTIFF"
+        assert all(p.suffix == ".tif" for p in paths), (
+            f"aggregate output should be GeoTIFFs, got {[p.name for p in paths]!r}"
+        )
+        names = [p.name for p in paths]
+        assert any(n.endswith("_thetao_1MS_20200601.tif") for n in names), (
+            f"expected a June-2020 monthly window GeoTIFF, got {names!r}"
+        )
+        assert all(p.exists() and p.stat().st_size > 0 for p in paths), (
+            f"aggregate GeoTIFFs should be non-empty: "
+            f"{[(p.name, p.stat().st_size) for p in paths]!r}"
+        )
 
 
