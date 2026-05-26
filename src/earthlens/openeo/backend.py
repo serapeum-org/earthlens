@@ -205,6 +205,11 @@ class OpenEO(AbstractDataSource):
 
         import pandas as pd
 
+        if start is None or end is None:
+            raise ValueError(
+                "openEO requires both start and end dates (the process graph "
+                "needs a temporal_extent); pass start=… and end=…."
+            )
         start_dt = dt.datetime.strptime(start, fmt)
         end_dt = dt.datetime.strptime(end, fmt)
         freq_map = {"daily": "D", "monthly": "MS", "hourly": "h", "yearly": "YS"}

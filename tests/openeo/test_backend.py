@@ -50,6 +50,18 @@ class TestConstruction:
         with pytest.raises(TypeError, match="mapping"):
             _make_backend(["sentinel-2-l2a"], output_dir)
 
+    def test_missing_dates_rejected(self, output_dir: Path):
+        """A request with no start/end dates is rejected with a clear message."""
+        with pytest.raises(ValueError, match="requires both start and end"):
+            OpenEO(
+                start=None,
+                end=None,
+                variables={"sentinel-2-l2a": ["B04"]},
+                lat_lim=[40.0, 41.0],
+                lon_lim=[3.0, 4.0],
+                path=output_dir,
+            )
+
     def test_bad_execute_rejected(self, output_dir: Path):
         """`execute` must be sync or batch."""
         with pytest.raises(ValueError, match="execute must be"):
