@@ -50,6 +50,25 @@ def test_groups_span_multiple_missions(catalog):
     } <= groups
 
 
+def test_mtg_and_metop_sg_fully_curated(catalog):
+    """MTG and Metop-SG are curated in bulk (the whole group, not a sample)."""
+    mtg = [c for c in catalog.collections.values() if c.group is DataStoreGroup.MTG]
+    sg = [c for c in catalog.collections.values() if c.group is DataStoreGroup.METOP_SG]
+    assert len(mtg) >= 27, f"expected the full MTG group, got {len(mtg)}"
+    assert len(sg) >= 3, f"expected the full Metop-SG group, got {len(sg)}"
+
+
+def test_mtg_carries_both_raster_and_vector_kinds(catalog):
+    """MTG mixes raster maps and vector products (AMV / LI events) per G1."""
+    kinds = {
+        c.output_kind
+        for c in catalog.collections.values()
+        if c.group is DataStoreGroup.MTG
+    }
+    assert {"raster", "vector"} <= kinds
+    assert catalog.get_collection("mtg-amv").output_kind == "vector"
+
+
 def test_get_collection_unknown_key_did_you_mean(catalog):
     """An unknown key raises ValueError with a did-you-mean hint."""
     with pytest.raises(ValueError, match="Did you mean 'msg-hrseviri'"):
