@@ -74,9 +74,11 @@ window to study fire onset, spread, and weather drivers.
 - **Confidence differs by family.** MODIS reports a numeric `0-100`
   confidence; VIIRS reports a categorical `l`/`n`/`h`; LANDSAT reports
   `l`/`m`/`h`; GOES reports a provider-defined numeric value. The backend
-  keeps the raw value and adds a uniform `confidence_pct` (the categorical
-  tokens map to 25/60/90) so you can filter across families with one
-  `min_confidence=` threshold.
+  keeps the raw value and adds a uniform `confidence_pct` (categorical
+  tokens map to 25/60/90) so one `min_confidence=` threshold works across
+  MODIS / VIIRS / LANDSAT. GOES confidence is *not* a 0-100 percent, so
+  `min_confidence` is skipped for GOES (with a warning) rather than
+  silently dropping its detections.
 - **A 5-day-per-request cap and a transaction quota.** FIRMS serves at
   most 5 days per request and one sensor per request, and allows ~5000
   transactions per rolling 10 minutes. The backend chunks longer windows

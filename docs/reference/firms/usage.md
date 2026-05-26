@@ -107,9 +107,12 @@ EarthLens(
 ```
 
 `min_confidence` filters on the **normalised** `confidence_pct` column,
-so a single threshold works across both families even though MODIS
-reports numeric confidence and VIIRS reports the categorical `l`/`n`/`h`
-(mapped to 25/60/90). `day_night` keeps only `"D"` or `"N"` rows.
+so a single threshold works across MODIS, VIIRS, and LANDSAT even though
+they report confidence differently (numeric 0-100, `l`/`n`/`h`, and
+`l`/`m`/`h` respectively, the tokens mapped to 25/60/90). **GOES** reports
+a provider-scale numeric confidence that is not a 0-100 percent, so
+`min_confidence` is skipped for GOES (with a logged warning) instead of
+dropping every GOES row. `day_night` keeps only `"D"` or `"N"` rows.
 
 ## 5. The output schema and the confidence note
 

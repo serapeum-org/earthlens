@@ -37,6 +37,7 @@ from __future__ import annotations
 import geopandas as gpd
 import numpy as np
 import pandas as pd
+from loguru import logger
 from pyramids.feature.collection import FeatureCollection
 
 #: WGS84 — the CRS every FIRMS detection FeatureCollection is tagged with.
@@ -67,6 +68,13 @@ _BRIGHTNESS_SOURCE: dict[str, str | None] = {
     "GOES": "bright_ti4",
     "LANDSAT": None,
 }
+
+#: Families whose `confidence_pct` is a genuine 0-100 percent — MODIS is
+#: numeric 0-100, VIIRS/LANDSAT map their tokens onto 0-100. GOES is
+#: excluded: its confidence is a provider-defined value (~0-1), not a
+#: percent, so a `min_confidence` threshold is meaningless on it and is
+#: skipped (with a warning) rather than silently dropping every row.
+PERCENT_CONFIDENCE_FAMILIES: frozenset[str] = frozenset({"MODIS", "VIIRS", "LANDSAT"})
 
 #: Ordered attribute columns and their pandas dtypes. The `geometry`
 #: column is added separately by :func:`csv_to_fc` / :func:`empty_fc`.
@@ -108,8 +116,11 @@ def csv_to_fc(
         family: `"MODIS"` or `"VIIRS"` — selects the confidence and
             brightness source columns.
         min_confidence: Optional 0-100 lower bound on the normalised
-            `confidence_pct`; rows below it are dropped. `None` keeps
-            all.
+            `confidence_pct`; rows below it are dropped. Applied only to
+            families whose confidence is a true 0-100 percent
+            (MODIS / VIIRS / LANDSAT); for GOES (a provider-scale numeric
+            confidence) the filter is skipped with a warning rather than
+            silently dropping every row. `None` keeps all.
         day_night: Optional `"D"` / `"N"` filter on the `daynight`
             column. `None` keeps both.
 
@@ -163,7 +174,16 @@ def csv_to_fc(
     frame["daynight"] = _as_string(df.get("daynight"))
 
     if min_confidence is not None:
-        frame = frame[frame["confidence_pct"] >= min_confidence]
+        if family in PERCENT_CONFIDENCE_FAMILIES:
+            frame = frame[frame["confidence_pct"] >= min_confidence]
+        else:
+            logger.warning(
+                f"min_confidence={min_confidence} not applied to {sensor}: "
+                f"{family} reports a provider-scale (non 0-100) confidence, so "
+                "thresholding it would silently drop every detection. Rows kept "
+                "unfiltered — filter on the raw `confidence` column yourself if "
+                "needed."
+            )
     if day_night is not None:
         frame = frame[frame["daynight"] == day_night]
 

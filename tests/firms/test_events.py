@@ -152,6 +152,31 @@ def test_goes_numeric_confidence_passthrough():
     assert float(fc["brightness_k"].iloc[0]) == 320.0  # bright_ti4 source
 
 
+def test_min_confidence_skipped_for_goes_keeps_rows(warnings_log: list[str]):
+    """min_confidence must NOT drop GOES rows (its confidence is not 0-100)."""
+    frame = _viirs_frame().assign(confidence=[0.967])
+    fc = csv_to_fc(frame, "GOES_NRT", "GOES", min_confidence=50)
+    assert len(fc) == 1, "GOES detections must survive min_confidence (scale differs)"
+    assert any("not applied to GOES_NRT" in msg for msg in warnings_log)
+
+
+def test_min_confidence_applied_for_landsat():
+    """min_confidence still filters LANDSAT (l/m/h maps onto 0-100)."""
+    frame = pd.DataFrame(
+        {
+            "latitude": [46.6],
+            "longitude": [-68.4],
+            "acq_date": ["2026-05-22"],
+            "acq_time": [1524],
+            "satellite": ["L8"],
+            "confidence": ["l"],
+            "daynight": ["D"],
+        }
+    )
+    fc = csv_to_fc(frame, "LANDSAT_NRT", "LANDSAT", min_confidence=50)
+    assert len(fc) == 0  # l -> 25 < 50
+
+
 def test_landsat_categorical_confidence_and_missing_columns():
     """LANDSAT maps l/m/h and degrades frp/brightness (no such columns) to NaN."""
     frame = pd.DataFrame(
