@@ -122,6 +122,17 @@ class TestFetch:
         with pytest.raises(requests.HTTPError):
             backend.download(progress_bar=False)
 
+    def test_http_error_does_not_leak_map_key(
+        self, tmp_path: Path, fake_firms: _FakeFirms
+    ):
+        """An HTTP error must not echo the MAP_KEY (it rides in the URL)."""
+        fake_firms.responses = [_FakeResponse("bad request", 400)]
+        backend = _make_backend(tmp_path, map_key="SUPERSECRETKEY123")
+        with pytest.raises(requests.HTTPError) as exc:
+            backend.download(progress_bar=False)
+        assert "SUPERSECRETKEY123" not in str(exc.value)
+        assert "MAP_KEY" in str(exc.value)
+
     def test_invalid_map_key_body_raises_auth(
         self, tmp_path: Path, fake_firms: _FakeFirms
     ):

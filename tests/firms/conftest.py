@@ -26,17 +26,25 @@ EMPTY_CSV = (
 
 
 class _FakeResponse:
-    """Stand-in for a `requests.Response` with a canned text body."""
+    """Stand-in for a `requests.Response` with a canned text body.
 
-    def __init__(self, text: str, status_code: int = 200):
+    `raise_for_status` mimics real `requests` by embedding the request
+    `url` in the error message, so a test can prove the backend never
+    routes a MAP_KEY-bearing URL through it.
+    """
+
+    def __init__(self, text: str, status_code: int = 200, url: str = ""):
         self.text = text
         self.status_code = status_code
+        self.url = url
 
     def raise_for_status(self) -> None:
         import requests
 
         if self.status_code >= 400:
-            raise requests.HTTPError(f"HTTP {self.status_code}")
+            raise requests.HTTPError(
+                f"{self.status_code} Client Error for url: {self.url}"
+            )
 
 
 class _FakeFirms:
@@ -56,8 +64,10 @@ class _FakeFirms:
     def __call__(self, url: str, timeout: float) -> _FakeResponse:
         self.calls.append(url)
         if self.responses is not None:
-            return self.responses.pop(0)
-        return _FakeResponse(self.text, self.status_code)
+            resp = self.responses.pop(0)
+            resp.url = url  # mirror the requested URL (carries the MAP_KEY)
+            return resp
+        return _FakeResponse(self.text, self.status_code, url=url)
 
 
 @pytest.fixture

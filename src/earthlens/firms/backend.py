@@ -387,8 +387,17 @@ class FIRMS(AbstractDataSource):
             max_retries=self._max_retries,
             backoff_factor=self._backoff_factor,
         )
-        if getattr(response, "status_code", 200) >= 400:
-            response.raise_for_status()
+        status = getattr(response, "status_code", 200)
+        if status >= 400:
+            # Do NOT call response.raise_for_status(): its message embeds
+            # the request URL, which carries the MAP_KEY as a path segment
+            # and would leak the secret into logs/tracebacks. Raise a
+            # redacted HTTPError instead.
+            raise requests.HTTPError(
+                f"FIRMS area request for sensor {product.metadata['sensor']} "
+                f"failed with HTTP {status} (URL omitted to avoid leaking the "
+                "MAP_KEY)."
+            )
         text = response.text
         kind = classify_body(text)
         if kind == "auth":
