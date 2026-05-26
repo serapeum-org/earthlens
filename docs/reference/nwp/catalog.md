@@ -55,15 +55,25 @@ doesn't carry).
 | `urma` | NOAA NODD | `herbie` | hourly | 0 h² | 2.5 km CONUS analysis (`anl`) |
 | `hiresw-arw` | NOAA NODD | `herbie` | 00/12 | 48 h | 2.5 km ARW window (`domain=conus`) |
 | `href` | NOAA NODD | `herbie` | 00/06/12/18 | 48 h | ensemble mean (`domain=conus`) |
+| `arpege-world` | Météo-France | `meteofrance-api` | 00/06/12/18 | 102 h | 0.25° global · WCS API (key)³ |
+| `arome-france` | Météo-France | `meteofrance-api` | every 3 h | 51 h | 0.025° France · WCS API (key)³ |
+
+³ **Météo-France WCS API.** Served from the authenticated portal
+(`portail-api.meteofrance.fr`), not the static-only `mf-nwp-models` S3 bucket.
+Set an application API key in `METEO_FRANCE_API_KEY` (or `MF_API_KEY`); the
+centre issues OGC WCS 2.0.1 `GetCoverage` requests with server-side bbox
+subsetting. The coverage-id strings are best-effort (not live-validated against
+a key) and live in the catalog `request_options`/`bands`, so a fix is a catalog
+edit — confirm with `probe_nwp_model.py arpege-world`.
 
 ² **Analyses** (`rtma`/`urma`) have `horizon_h=0` — they are valid *at* the cycle
 time, so only the analysis step (`f000`) is fetched.
 
-Not shipped: **Météo-France** (the `direct-boto3` centre exists, but
-`s3://mf-nwp-models` exposes only `static/` — the rolling forecasts need MF's
-authenticated API portal, a separate auth+REST effort); **CFS** (seasonal — a
-different time axis than `(cycle, step)`); **HAFS** (hurricane model — needs a
-storm id, not a generic `(cycle, step)` raster).
+Not shipped: **CFS** (seasonal — a different time axis than `(cycle, step)`) and
+**HAFS** (hurricane model — needs a storm id, not a generic `(cycle, step)`
+raster). The unsigned `direct-boto3` Météo-France centre also exists for any
+future static/unsigned MF mirror, but the live forecasts use `meteofrance-api`
+above.
 
 ¹ **HRRR per-cycle horizon.** The `horizon_h` is the *maximum*: HRRR runs to
 48 h only at the 00/06/12/18 synoptic cycles; the other (hourly) cycles run to
