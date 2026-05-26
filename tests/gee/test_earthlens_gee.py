@@ -79,6 +79,7 @@ class TestRegistry:
             "gee",
             "google-earth-engine",
             "openaq",
+            "openeo",
             "planetary-computer",
             "stac",
             "tropycal",
