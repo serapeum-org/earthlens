@@ -31,9 +31,16 @@ conda install -c conda-forge eccodes libgdal-grib
 |-----------|----------|---------|--------------|---------|-------|
 | `gfs` | NOAA NODD | `herbie` | 00/06/12/18 | 384 h | 0.25° global |
 | `gefs` | NOAA NODD | `herbie` | 00/06/12/18 | 384 h | 0.5° ensemble (`atmos.5`) |
-| `hrrr` | NOAA NODD | `herbie` | hourly | 48 h | 3 km CONUS (`wrfsfcf`) |
+| `hrrr` | NOAA NODD | `herbie` | hourly | 48 h¹ | 3 km CONUS (`wrfsfcf`) |
 | `ifs-hres` | ECMWF Open Data | `ecmwf-opendata` | 00/06/12/18 | 240 h | 0.25° global |
 | `icon-global` | DWD Open Data | `direct-https` | 00/06/12/18 | 180 h | native icosahedral grid |
+
+¹ **HRRR per-cycle horizon.** The `horizon_h` is the *maximum*: HRRR runs to
+48 h only at the 00/06/12/18 synoptic cycles; the other (hourly) cycles run to
+18 h. The catalog stores a single `horizon_h`, so a long-lead request on an
+off-synoptic cycle asks for steps that cycle doesn't carry — those are skipped
+under the default `errors="warn"` policy (see [usage](usage.md#partial-availability-errors)),
+not fetched. Per-cycle horizons are a future catalog enhancement.
 
 Each model maps the shared earthlens parameter names to its own
 selector:
