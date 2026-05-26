@@ -30,22 +30,27 @@ def test_single_day_window_is_day_range_one():
     ]
 
 
-def test_25_day_window_chunks_10_10_5():
-    """A 25-day window splits into 10/10/5 with correct starts."""
-    chunks = chunk_windows(dt.date(2024, 1, 1), dt.date(2024, 1, 25))
+def test_12_day_window_chunks_5_5_2():
+    """A 12-day window splits into 5/5/2 with correct starts (cap is 5)."""
+    chunks = chunk_windows(dt.date(2024, 1, 1), dt.date(2024, 1, 12))
     assert chunks == [
-        (dt.date(2024, 1, 1), 10),
-        (dt.date(2024, 1, 11), 10),
-        (dt.date(2024, 1, 21), 5),
+        (dt.date(2024, 1, 1), 5),
+        (dt.date(2024, 1, 6), 5),
+        (dt.date(2024, 1, 11), 2),
     ]
 
 
-def test_exact_multiple_of_ten():
-    """A 20-day window is two full 10-day chunks, no remainder."""
-    assert [dr for _, dr in chunk_windows(dt.date(2024, 1, 1), dt.date(2024, 1, 20))] == [
-        10,
-        10,
+def test_exact_multiple_of_five():
+    """A 10-day window is two full 5-day chunks, no remainder."""
+    assert [dr for _, dr in chunk_windows(dt.date(2024, 1, 1), dt.date(2024, 1, 10))] == [
+        5,
+        5,
     ]
+
+
+def test_default_cap_is_five():
+    """The default per-request cap matches the FIRMS area API limit."""
+    assert all(dr <= 5 for _, dr in chunk_windows(dt.date(2024, 1, 1), dt.date(2024, 3, 1)))
 
 
 def test_end_before_start_raises():

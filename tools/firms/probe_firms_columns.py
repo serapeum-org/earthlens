@@ -14,7 +14,7 @@ matches what the backend would parse.
 Usage::
 
     pixi run -e dev python tools/firms/probe_firms_columns.py \
-        --bbox -125,32,-114,42 --day-range 7 \
+        --bbox -125,32,-114,42 --day-range 5 \
         --out C:/tmp/firms_probe/columns.json
 
 Needs a free FIRMS MAP_KEY (``--map-key`` or the ``FIRMS_MAP_KEY`` env
@@ -59,7 +59,7 @@ def probe_sensor(
         sensor: FIRMS source code (e.g. ``"VIIRS_SNPP_NRT"``).
         map_key: The FIRMS MAP_KEY.
         bbox: Bounding box as ``W,S,E,N``.
-        day_range: Sample window length in days (≤10).
+        day_range: Sample window length in days (≤5).
         timeout: Per-request timeout in seconds.
 
     Returns:
@@ -125,7 +125,7 @@ def main(argv: list[str] | None = None) -> int:
         help="Comma-separated FIRMS sensor codes (default: every catalog sensor).",
     )
     parser.add_argument("--bbox", default=DEFAULT_BBOX, help="bbox as W,S,E,N.")
-    parser.add_argument("--day-range", type=int, default=7, help="sample days (<=10).")
+    parser.add_argument("--day-range", type=int, default=5, help="sample days (<=5).")
     parser.add_argument("--timeout", type=float, default=60.0)
     parser.add_argument("--map-key", default=os.environ.get("FIRMS_MAP_KEY"))
     parser.add_argument(

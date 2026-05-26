@@ -60,10 +60,10 @@ class TestSearchAndUrl:
         assert "/k/" in url
         assert "-119.0,33.0,-117.0,35.0" in url
 
-    def test_25_day_two_sensor_request_issues_six_gets(
+    def test_25_day_two_sensor_request_issues_ten_gets(
         self, tmp_path: Path, fake_firms: _FakeFirms
     ):
-        """3 chunks x 2 sensors == 6 CSV GETs."""
+        """ceil(25/5)=5 chunks x 2 sensors == 10 CSV GETs (5-day cap)."""
         backend = _make_backend(
             tmp_path,
             start="2024-08-01",
@@ -71,7 +71,7 @@ class TestSearchAndUrl:
             variables=["VIIRS_SNPP_NRT", "MODIS_NRT"],
         )
         backend.download(progress_bar=False)
-        assert len(fake_firms.calls) == 6
+        assert len(fake_firms.calls) == 10
 
     def test_unknown_sensor_raises_did_you_mean(self, tmp_path: Path):
         """A bad sensor code raises before any network call."""

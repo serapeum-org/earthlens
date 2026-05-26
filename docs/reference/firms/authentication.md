@@ -62,7 +62,7 @@ The live e2e test (`tests/firms/test_firms_e2e.py`) skips cleanly when
 
 A `MAP_KEY` allows roughly **5000 transactions per rolling 10-minute
 window**; each area request is one transaction. The backend chunks long
-windows into ≤10-day requests (one transaction each), so a wide
+windows into ≤5-day requests (one transaction each), so a wide
 multi-sensor, multi-month pull can approach the limit. Two safeguards:
 
 - **Automatic back-off.** A quota response — HTTP 429, or a FIRMS

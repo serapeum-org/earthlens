@@ -1,7 +1,7 @@
 # Using the FIRMS backend
 
 This page is the hands-on guide to the `earthlens` FIRMS backend —
-picking sensors, building a query, the transparent 10-day chunking, the
+picking sensors, building a query, the transparent 5-day chunking, the
 detection filters, and the output schema. For background see the
 [Introduction](introduction.md); for credentials see
 [Authentication](authentication.md); the rendered API is on the
@@ -67,14 +67,14 @@ An unknown code raises with a did-you-mean hint
 > sensor returns nothing, so the backend logs a warning naming the
 > `*_SP` variant — it never silently swaps your sensor.
 
-## 3. The bbox, date window, and 10-day chunking
+## 3. The bbox, date window, and 5-day chunking
 
 `lat_lim` / `lon_lim` are a WGS84 bounding box (`[min, max]` each);
 `start` / `end` are the inclusive detection window (parsed with `fmt`,
-default `"%Y-%m-%d"`). FIRMS caps each request at **10 days and one
-sensor**, so the backend walks the window in ≤10-day chunks and issues
+default `"%Y-%m-%d"`). FIRMS caps each request at **5 days and one
+sensor**, so the backend walks the window in ≤5-day chunks and issues
 one CSV GET per `(sensor, chunk)` — a 25-day, two-sensor request is
-`ceil(25/10) × 2 = 6` GETs. This is transparent: you pass the whole
+`ceil(25/5) × 2 = 10` GETs. This is transparent: you pass the whole
 window and get one merged `FeatureCollection` back. The bbox path
 segment is sent in FIRMS `W,S,E,N` order.
 

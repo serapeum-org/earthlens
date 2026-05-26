@@ -66,11 +66,17 @@ def fetch_live_sensors(map_key: str, timeout: float) -> dict[str, dict[str, Any]
     """
     url = DATA_AVAILABILITY_URL.format(map_key=map_key)
     response = firms_get(url, timeout=timeout, get=requests.get)
-    if classify_body(response.text) != "csv":
+    text = response.text
+    # The data_availability CSV header is `data_id,min_date,max_date` — a
+    # different shape from the area endpoint's `latitude,...` header, so
+    # `classify_body` (area-specific) is only used to label an *error*
+    # body (bad key / quota); a valid response starts with `data_id`.
+    if not text.lstrip().lower().startswith("data_id"):
         raise RuntimeError(
-            f"data_availability returned a non-CSV body: {response.text[:200]}"
+            f"data_availability returned a non-CSV body "
+            f"({classify_body(text)}): {text[:200]}"
         )
-    frame = pd.read_csv(StringIO(response.text))
+    frame = pd.read_csv(StringIO(text))
     id_col = "data_id" if "data_id" in frame.columns else frame.columns[0]
     live: dict[str, dict[str, Any]] = {}
     for _, row in frame.iterrows():
@@ -190,7 +196,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--format", choices=["markdown", "json"], default="markdown")
     parser.add_argument("--with-columns", action="store_true", help="also probe columns.")
     parser.add_argument("--bbox", default=DEFAULT_BBOX)
-    parser.add_argument("--day-range", type=int, default=7)
+    parser.add_argument("--day-range", type=int, default=5)
     parser.add_argument("--timeout", type=float, default=60.0)
     parser.add_argument(
         "--strict", action="store_true", help="exit non-zero when drift is found."

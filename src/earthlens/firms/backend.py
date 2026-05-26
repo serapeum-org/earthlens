@@ -23,7 +23,7 @@ of `variables` (see the package docstring): `variables` is a `list[str]`
 of FIRMS sensor codes (`["VIIRS_SNPP_NRT"]`,
 `["MODIS_NRT", "VIIRS_SNPP_NRT"]`); the detection filters ride as
 explicit `min_confidence=` / `day_night=` keyword arguments. The
-temporal window is chunked internally into ≤10-day requests (the FIRMS
+temporal window is chunked internally into ≤5-day requests (the FIRMS
 per-request cap), so `temporal_resolution` carries the sentinel `"all"`.
 """
 
@@ -87,8 +87,8 @@ class FIRMS(AbstractDataSource):
 
     Wraps the FIRMS area CSV API so a user can pull a space/time/sensor
     window of fire detections through the same `download()` shape every
-    other earthlens backend uses. Windows longer than the FIRMS 10-day
-    per-request cap are chunked, and each `(sensor, ≤10-day chunk)` is
+    other earthlens backend uses. Windows longer than the FIRMS 5-day
+    per-request cap are chunked, and each `(sensor, ≤5-day chunk)` is
     one CSV GET; the rows are mapped to a
     :class:`~pyramids.feature.collection.FeatureCollection`.
 
@@ -133,7 +133,7 @@ class FIRMS(AbstractDataSource):
                 degrees, both in `[-90, 90]`.
             lon_lim: `[lon_min, lon_max]` bounding-box longitudes in
                 degrees, both in `[-180, 180]`.
-            temporal_resolution: FIRMS chunks by ≤10-day windows
+            temporal_resolution: FIRMS chunks by ≤5-day windows
                 internally, not by a daily/monthly cadence, so this is
                 the sentinel `"all"`, not a pandas frequency alias.
             path: Output directory for the written vector file. Created
@@ -231,7 +231,7 @@ class FIRMS(AbstractDataSource):
     ) -> TemporalExtent:
         """Parse the `[start, end]` window into a :class:`TemporalExtent`.
 
-        FIRMS chunks the window into ≤10-day requests internally (see
+        FIRMS chunks the window into ≤5-day requests internally (see
         :meth:`_search`), so the resolution is kept as the sentinel
         `"all"` (not a real pandas frequency alias) and `dates`
         collapses to the two endpoints.
@@ -259,13 +259,13 @@ class FIRMS(AbstractDataSource):
         )
 
     def _search(self) -> list[RemoteProduct]:
-        """List one :class:`RemoteProduct` per `(sensor, ≤10-day chunk)`.
+        """List one :class:`RemoteProduct` per `(sensor, ≤5-day chunk)`.
 
         Validates each code in `self.vars` against the bundled catalog
         (raising with a did-you-mean hint on an unknown sensor), warns
         when the requested window falls outside an `*_NRT` sensor's
         coverage (naming the `*_SP` archive variant — it does *not*
-        auto-swap), and walks the `[start, end]` window in ≤10-day
+        auto-swap), and walks the `[start, end]` window in ≤5-day
         chunks. No network call is made here.
 
         Returns:

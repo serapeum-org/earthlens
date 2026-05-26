@@ -1,7 +1,7 @@
 """Pure request/parsing helpers for the FIRMS backend.
 
 Holds the FIRMS-specific logic that needs **no GIS container** so it can
-be unit-tested without importing pyramids: the ≤10-day window chunking
+be unit-tested without importing pyramids: the ≤5-day window chunking
 (`G1`), the reactive quota back-off (`G2`), and the
 error-as-HTTP-200-text-body classification (`G6`). Keeping these here
 (rather than inline in `backend.py`, which imports
@@ -11,8 +11,8 @@ directly testable.
 
 FIRMS has two engineering wrinkles these helpers absorb:
 
-* The area endpoint caps `day_range` at 10 days and serves one sensor
-  per request, so a long window is walked in ≤10-day steps
+* The area endpoint caps `day_range` at 5 days and serves one sensor
+  per request, so a long window is walked in ≤5-day steps
   (:func:`chunk_windows`).
 * FIRMS frequently returns *errors* with HTTP status 200 and a
   plain-text body (`Invalid MAP_KEY.`, a transaction-limit message, an
@@ -27,8 +27,9 @@ import datetime as dt
 import time
 from typing import Any, Callable, Literal
 
-#: A FIRMS area request covers at most this many days.
-MAX_DAY_RANGE = 10
+#: A FIRMS area request covers at most this many days (verified live
+#: against the area CSV API, which rejects >5 with "Expects [1..5]").
+MAX_DAY_RANGE = 5
 
 #: Body kinds :func:`classify_body` distinguishes.
 BodyKind = Literal["csv", "auth", "quota", "error"]
@@ -41,7 +42,7 @@ def chunk_windows(
 ) -> list[tuple[dt.date, int]]:
     """Split an inclusive `[start, end]` window into ≤`max_days` chunks.
 
-    FIRMS caps `day_range` at 10 and treats `start_date` + `day_range`
+    FIRMS caps `day_range` at 5 and treats `start_date` + `day_range`
     inclusively, so a 1-day window is `day_range=1`. Each chunk is
     `(chunk_start, day_range)` where `chunk_start = start + max_days·i`
     and `day_range` is `max_days` except for the final remainder.
@@ -49,7 +50,7 @@ def chunk_windows(
     Args:
         start: Inclusive first date of the window.
         end: Inclusive last date of the window.
-        max_days: Per-request day cap (10 for FIRMS).
+        max_days: Per-request day cap (5 for FIRMS).
 
     Returns:
         list[tuple[date, int]]: One `(chunk_start, day_range)` per
@@ -68,12 +69,12 @@ def chunk_windows(
             [(datetime.date(2024, 1, 1), 1)]
 
             ```
-        - A 25-day window chunks into 10 / 10 / 5:
+        - A 12-day window chunks into 5 / 5 / 2:
             ```python
             >>> import datetime as dt
             >>> from earthlens.firms._helpers import chunk_windows
-            >>> [dr for _, dr in chunk_windows(dt.date(2024, 1, 1), dt.date(2024, 1, 25))]
-            [10, 10, 5]
+            >>> [dr for _, dr in chunk_windows(dt.date(2024, 1, 1), dt.date(2024, 1, 12))]
+            [5, 5, 2]
 
             ```
     """

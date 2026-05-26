@@ -71,8 +71,8 @@ window to study fire onset, spread, and weather drivers.
   confidence; VIIRS reports a categorical `l`/`n`/`h`. The backend keeps
   the raw value and adds a uniform `confidence_pct` so you can filter
   across families with one `min_confidence=` threshold.
-- **A 10-day-per-request cap and a transaction quota.** FIRMS serves at
-  most 10 days per request and one sensor per request, and allows ~5000
+- **A 5-day-per-request cap and a transaction quota.** FIRMS serves at
+  most 5 days per request and one sensor per request, and allows ~5000
   transactions per rolling 10 minutes. The backend chunks longer windows
   transparently and throttles against the quota with a back-off — both
   are invisible to the caller. See [Usage](usage.md).
