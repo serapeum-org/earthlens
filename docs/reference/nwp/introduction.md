@@ -5,14 +5,17 @@ The `earthlens.nwp` backend fetches **open numerical-weather-prediction
 bbox-cropped Cloud-Optimized GeoTIFFs. It is one subpackage with sibling
 "centre" modules over the open forecast buckets:
 
-| Centre | Models (MVP) | Protocol | Cost |
-|--------|--------------|----------|------|
-| **NOAA NODD** | GFS, GEFS, HRRR | [Herbie](https://herbie.readthedocs.io) `.idx` byte-range subset (S3 / GCS / Azure, unsigned) | free |
-| **ECMWF Open Data** | IFS HRES | `ecmwf-opendata` (`s3://ecmwf-forecasts`, CC-BY-4.0) | free |
-| **DWD Open Data** | ICON-global | plain HTTPS, per-variable `.grib2.bz2` | free |
+| Centre | Models | Protocol | Cost |
+|--------|--------|----------|------|
+| **NOAA NODD** | GFS, GEFS, HRRR, RAP, NAM, NBM, RRFS | [Herbie](https://herbie.readthedocs.io) `.idx` byte-range subset (S3 / GCS / Azure, unsigned) | free |
+| **ECMWF Open Data** | IFS HRES, ENS, AIFS | `ecmwf-opendata` (`s3://ecmwf-forecasts`, CC-BY-4.0) | free |
+| **DWD Open Data** | ICON-global, ICON-EU, ICON-D2 | plain HTTPS, per-variable `.grib2.bz2` | free |
+| **ECCC MSC** | GDPS, RDPS, HRDPS | Herbie (MSC datamart) | free |
 
-Météo-France (`s3://mf-nwp-models`), ECCC (GDPS / RDPS / HRDPS), NWM,
-and MRMS are planned follow-ons.
+The 5 MVP models (GFS / GEFS / HRRR / IFS-HRES / ICON-global) are
+live-validated end to end; the rest are metadata-curated — see
+[Catalog & install](catalog.md). **Météo-France** (`s3://mf-nwp-models`,
+a `direct-boto3` centre) and **NWM / MRMS / CFS** are follow-ons.
 
 ## A forecast time axis, not an observation one
 
