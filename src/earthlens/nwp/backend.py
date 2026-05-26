@@ -37,10 +37,13 @@ from earthlens.base import (
     SpatialExtent,
     TemporalExtent,
 )
+from earthlens.nwp._helpers import cog_name, enumerate_cycles
 from earthlens.nwp.catalog import KNOWN_BACKENDS, Catalog, NWPModel
+from earthlens.nwp.centres import resolve_centre
 
 if TYPE_CHECKING:
     from earthlens.aggregate import AggregationConfig
+    from earthlens.nwp.centres.base import _NWPCentre
 
 
 class NWP(AbstractDataSource):
@@ -122,6 +125,9 @@ class NWP(AbstractDataSource):
         self._requests: list[tuple[str, NWPModel, list[str]]] = self._resolve_models(
             variables
         )
+        # Centre instances are cached per backend so a multi-cycle fetch
+        # reuses one Herbie / ecmwf-opendata adapter rather than rebuilding it.
+        self._centres: dict[str, _NWPCentre] = {}
 
         super().__init__(
             start=start,
@@ -227,32 +233,156 @@ class NWP(AbstractDataSource):
         """Compose `_search` and `_fetch` into the canonical C3 shape."""
         return self._api_via_search_fetch()
 
+    def _steps_for(self, model: NWPModel) -> list[int]:
+        """Resolve the forecast lead times to fetch for one model (`G1`).
+
+        Precedence: an explicit `steps=` list wins; otherwise `horizon=`
+        expands to every integer hour `0..horizon`; otherwise the
+        default is `[0]` (the analysis step), keeping the MVP bounded.
+        `steps=` is the recommended way to request a coarse set of lead
+        times, since not every model publishes every hourly step.
+
+        Args:
+            model: The resolved catalog row (bounds the request via
+                `horizon_h`).
+
+        Returns:
+            list[int]: Sorted, de-duplicated lead times in hours.
+
+        Raises:
+            ValueError: When a requested step exceeds the model's
+                `horizon_h`.
+        """
+        if self._steps_arg is not None:
+            steps = sorted({int(s) for s in self._steps_arg})
+        elif self._horizon_arg is not None:
+            steps = list(range(0, int(self._horizon_arg) + 1))
+        else:
+            steps = [0]
+        too_far = [s for s in steps if s > model.horizon_h]
+        if too_far:
+            raise ValueError(
+                f"step(s) {too_far} exceed the {model.horizon_h} h horizon "
+                f"of the requested model."
+            )
+        return steps
+
+    def _centre_for(self, backend: str) -> _NWPCentre:
+        """Return the cached :class:`_NWPCentre` for a catalog `backend:`.
+
+        Args:
+            backend: The model's `backend:` value (e.g. `"herbie"`).
+
+        Returns:
+            _NWPCentre: A centre bound to the output directory; one
+                instance per backend, reused across cycles.
+        """
+        if backend not in self._centres:
+            self._centres[backend] = resolve_centre(backend, self.root_dir)
+        return self._centres[backend]
+
     def _search(self) -> list[RemoteProduct]:
         """Expand the request into one product per `(model, cycle, step)`.
 
-        Implemented in `C3` (the cycle-grid walk). The scaffold raises
-        so an early caller gets a clear pointer rather than an empty
-        result.
+        Walks the cycle grid (`G1`): for each requested model, every
+        cycle in the `start`/`end` date range (per the model's
+        `cycles_utc`) crossed with every requested forecast step.
 
-        Raises:
-            NotImplementedError: Always, until `C3` lands the walk.
+        Returns:
+            list[RemoteProduct]: One product per `(model, cycle, step)`,
+                each carrying the model row, cycle, step, and requested
+                params in `metadata` so `_fetch` needs no re-query.
         """
-        raise NotImplementedError(
-            "NWP._search (the cycle-grid walk) is implemented in C3."
-        )
+        products: list[RemoteProduct] = []
+        for model_key, model, params in self._requests:
+            cycles = enumerate_cycles(
+                self.time.start_date, self.time.end_date, model.cycles_utc
+            )
+            for cycle in cycles:
+                for step in self._steps_for(model):
+                    products.append(
+                        RemoteProduct(
+                            id=f"{model_key}.{cycle:%Y%m%d%H}.f{step:03d}",
+                            metadata={
+                                "model_key": model_key,
+                                "model": model,
+                                "cycle": cycle,
+                                "step": step,
+                                "params": params,
+                            },
+                        )
+                    )
+        return products
 
     def _fetch(self, products: list[RemoteProduct]) -> list[Path]:
-        """Fetch + crop + write one COG per product.
+        """Fetch each product's GRIB2, crop to the bbox, write a COG (`G4`).
 
-        Implemented in `C3` (the `open_grib → crop → write_cog`
-        pipeline).
+        Per product: the matching centre downloads the variable-subset
+        GRIB2 (the >99 % bandwidth win — Herbie `.idx` or DWD's
+        per-variable files), then `pyramids.grib.open_grib` reads it,
+        the result is cropped to the request bbox, and written as a COG.
+        Global models on a 0–360° longitude grid are normalised to
+        −180..180 first when the bbox reaches into negative longitudes,
+        so an Americas crop lands correctly.
 
-        Raises:
-            NotImplementedError: Always, until `C3`.
+        Args:
+            products: The products from :meth:`_search`.
+
+        Returns:
+            list[Path]: One cropped COG path per product, in order.
         """
-        raise NotImplementedError(
-            "NWP._fetch (GRIB2 → cropped COG) is implemented in C3."
-        )
+        from pyramids.dataset.cog import write_cog
+        from pyramids.grib import open_grib
+
+        bbox = [
+            self.space.west,
+            self.space.south,
+            self.space.east,
+            self.space.north,
+        ]
+        out: list[Path] = []
+        for product in products:
+            meta = product.metadata
+            centre = self._centre_for(meta["model"].backend)
+            grib_path = centre.fetch_one(
+                meta["model"],
+                meta["cycle"],
+                meta["step"],
+                meta["params"],
+                self._mirror,
+            )
+            dataset = open_grib(str(grib_path))
+            dataset = self._normalise_longitude(dataset)
+            cropped = dataset.crop(bbox=bbox, epsg=4326)
+            target = self.root_dir / cog_name(
+                meta["model_key"], meta["cycle"], meta["step"]
+            )
+            write_cog(cropped, str(target))
+            out.append(target)
+        return out
+
+    def _normalise_longitude(self, dataset):
+        """Shift a 0–360° global grid to −180..180 when the bbox needs it.
+
+        `pyramids` `convert_longitude` only applies to a whole-globe
+        0–360 raster (it raises otherwise). A regional model (HRRR) or a
+        bbox entirely in the eastern hemisphere needs no shift, so this
+        is a no-op unless the request bbox reaches a negative longitude.
+
+        Args:
+            dataset: The freshly opened GRIB2 `Dataset`.
+
+        Returns:
+            The same `Dataset`, or a longitude-shifted copy.
+        """
+        if self.space.west >= 0:
+            return dataset
+        try:
+            return dataset.convert_longitude()
+        except ValueError:
+            # Not a 0–360 global raster (e.g. a regional model already in
+            # −180..180); the bbox is already in the dataset's CRS.
+            return dataset
 
     def download(
         self,
