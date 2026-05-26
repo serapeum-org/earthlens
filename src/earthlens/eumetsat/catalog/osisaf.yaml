@@ -17,7 +17,7 @@ collections:
     temporal: { start: 2015-06-01, end: null }
 
   osi-saf-metop-sst:
-    collection_id: "EO:EUM:DAT:AMETOP:GLB-SST-NC"
+    collection_id: "EO:EUM:DAT:METOP:GLB-SST-NC"
     group: OSI-SAF
     mission: metop
     output_kind: raster
