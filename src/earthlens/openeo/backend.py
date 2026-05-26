@@ -162,6 +162,10 @@ class OpenEO(AbstractDataSource):
         construction never blocks on the network.
 
         Raises:
+            TypeError: When `variables` is not a
+                `{collection_or_recipe: [band, ...]}` mapping (e.g. a bare
+                `list`), so the misuse surfaces at construction instead of as a
+                late `AttributeError` during the download.
             ValueError: When `variables` is empty or names a key the catalog
                 does not know (with a did-you-mean hint).
         """
@@ -200,7 +204,26 @@ class OpenEO(AbstractDataSource):
     def _check_input_dates(
         self, start: str, end: str, temporal_resolution: str, fmt: str
     ) -> TemporalExtent:
-        """Parse the date window into a :class:`TemporalExtent`."""
+        """Parse the date window into a :class:`TemporalExtent`.
+
+        Args:
+            start: Inclusive start date string (parsed with `fmt`).
+            end: Inclusive end date string.
+            temporal_resolution: Advisory cadence label (`"daily"`, `"monthly"`,
+                `"hourly"`, `"yearly"`) — maps to the pandas frequency stored on
+                the returned extent; the openEO window itself is `start`/`end`.
+            fmt: `strptime` format for `start` / `end`.
+
+        Returns:
+            TemporalExtent: The parsed window (with an inclusive `end_date`; the
+            backend converts it to openEO's exclusive bound at graph-build time).
+
+        Raises:
+            ValueError: When `start` or `end` is `None` — openEO needs an
+                explicit `temporal_extent`, so a missing bound is rejected with
+                an actionable message rather than a bare `TypeError` from
+                `strptime`.
+        """
         import datetime as dt
 
         import pandas as pd
@@ -265,6 +288,11 @@ class OpenEO(AbstractDataSource):
 
         Returns:
             The fully-built `DataCube` ready to download / submit.
+
+        Raises:
+            ValueError: When `max_cloud_cover` was supplied but the collection
+                does not expose `eo:cloud_cover` (non-optical collections), so
+                the filter would be silently ignored or rejected server-side.
         """
         bands = self._request_bands(key, resolved)
         load_kwargs: dict[str, Any] = {}
