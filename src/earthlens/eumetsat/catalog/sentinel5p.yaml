@@ -1,28 +1,11 @@
-# Sentinel-5P (TROPOMI) atmospheric-composition mirror collections on the
-# EUMETSAT Data Store. Delivered as NetCDF (swath) products — pyramids can
-# read them today; the MVP fetches whole products to disk (G4). Collection ids
-# verified against api.eumetsat.int/data/browse/collections on 2026-05-26.
-#
-# Timeliness note: the EUMETSAT Data Store does NOT publish offline (OFFL)
-# Sentinel-5P collections — NO2, CO and O3 are the Near-Real-Time (NRT)
-# collections (rolling retention, ~3 h latency), and CH4 is the dedicated
-# reprocessed/offline collection. The `timeliness` field below records this per
-# row; there is no OFFL id to standardise on. Use the Data Tailor / Copernicus
-# data space if you need a fuller offline archive for NO2/CO/O3.
+# Sentinel-5P (TROPOMI) atmospheric-composition mirror collections.
+# Ids, titles and start dates walked from the public browse endpoint
+# (api.eumetsat.int/data/browse/collections) on 2026-05-26. Hand-tuned rows
+# (HRSEVIRI, the S5P gases, ASCAT soil moisture, the MTG suite, ...) keep their
+# vetted metadata; the rest carry browse-derived format/output_kind/cadence
+# heuristics (advisory for the whole-product download) refined per product as
+# needed. Reconcile with tools/eumetsat/audit_eumetsat_catalog.py.
 collections:
-  s5p-l2-no2:
-    collection_id: "EO:EUM:DAT:0076"
-    group: Sentinel-5P
-    mission: sentinel-5p
-    output_kind: raster
-    format: netcdf
-    cadence: subdaily
-    timeliness: nrt
-    selectors: [L2__NO2___]
-    tailor_product_type: S5PL2NO2
-    extent: { lat: [-90, 90], lon: [-180, 180] }
-    temporal: { start: 2018-04-30, end: null }
-
   s5p-l2-ch4:
     collection_id: "EO:EUM:DAT:1101"
     group: Sentinel-5P
@@ -33,9 +16,8 @@ collections:
     timeliness: reprocessed
     selectors: [L2__CH4___]
     tailor_product_type: S5PL2CH4
-    extent: { lat: [-90, 90], lon: [-180, 180] }
+    extent: { lat: [-90.0, 90.0], lon: [-180.0, 180.0] }
     temporal: { start: 2018-04-30, end: null }
-
   s5p-l2-co:
     collection_id: "EO:EUM:DAT:0073"
     group: Sentinel-5P
@@ -46,9 +28,20 @@ collections:
     timeliness: nrt
     selectors: [L2__CO____]
     tailor_product_type: S5PL2CO
-    extent: { lat: [-90, 90], lon: [-180, 180] }
+    extent: { lat: [-90.0, 90.0], lon: [-180.0, 180.0] }
     temporal: { start: 2018-04-30, end: null }
-
+  s5p-l2-no2:
+    collection_id: "EO:EUM:DAT:0076"
+    group: Sentinel-5P
+    mission: sentinel-5p
+    output_kind: raster
+    format: netcdf
+    cadence: subdaily
+    timeliness: nrt
+    selectors: [L2__NO2___]
+    tailor_product_type: S5PL2NO2
+    extent: { lat: [-90.0, 90.0], lon: [-180.0, 180.0] }
+    temporal: { start: 2018-04-30, end: null }
   s5p-l2-o3:
     collection_id: "EO:EUM:DAT:0077"
     group: Sentinel-5P
@@ -59,5 +52,104 @@ collections:
     timeliness: nrt
     selectors: [L2__O3____]
     tailor_product_type: S5PL2O3
-    extent: { lat: [-90, 90], lon: [-180, 180] }
+    extent: { lat: [-90.0, 90.0], lon: [-180.0, 180.0] }
     temporal: { start: 2018-04-30, end: null }
+  s5p-tropomi-1b-consolidated-earth-radiances-measurements:
+    collection_id: "EO:EUM:DAT:0069"
+    group: Sentinel-5P
+    mission: sentinel-5p
+    output_kind: raster
+    format: netcdf
+    cadence: subdaily
+    selectors: []
+    tailor_product_type: null
+    extent: { lat: [-90, 90], lon: [-180, 180] }
+    temporal: { start: 2025-03-11, end: null }
+  s5p-tropomi-1b-solar-irradiance-measurements:
+    collection_id: "EO:EUM:DAT:0070"
+    group: Sentinel-5P
+    mission: sentinel-5p
+    output_kind: raster
+    format: netcdf
+    cadence: subdaily
+    selectors: []
+    tailor_product_type: null
+    extent: { lat: [-90, 90], lon: [-180, 180] }
+    temporal: { start: 2025-03-11, end: null }
+  s5p-tropomi-1b-solar-irradiance-measurements-2:
+    collection_id: "EO:EUM:DAT:0071"
+    group: Sentinel-5P
+    mission: sentinel-5p
+    output_kind: raster
+    format: netcdf
+    cadence: subdaily
+    selectors: []
+    tailor_product_type: null
+    extent: { lat: [-90, 90], lon: [-180, 180] }
+    temporal: { start: 2025-03-11, end: null }
+  s5p-tropomi-2-aerosol-index-nrt:
+    collection_id: "EO:EUM:DAT:0072"
+    group: Sentinel-5P
+    mission: sentinel-5p
+    output_kind: raster
+    format: netcdf
+    cadence: subdaily
+    selectors: []
+    tailor_product_type: null
+    extent: { lat: [-90, 90], lon: [-180, 180] }
+    temporal: { start: 2025-05-09, end: null }
+  s5p-tropomi-2-aerosol-layer-height-nrt:
+    collection_id: "EO:EUM:DAT:0103"
+    group: Sentinel-5P
+    mission: sentinel-5p
+    output_kind: raster
+    format: netcdf
+    cadence: subdaily
+    selectors: []
+    tailor_product_type: null
+    extent: { lat: [-90, 90], lon: [-180, 180] }
+    temporal: { start: 2025-05-09, end: null }
+  s5p-tropomi-2-cloud-fraction-albedo-top:
+    collection_id: "EO:EUM:DAT:0074"
+    group: Sentinel-5P
+    mission: sentinel-5p
+    output_kind: raster
+    format: netcdf
+    cadence: subdaily
+    selectors: []
+    tailor_product_type: null
+    extent: { lat: [-90, 90], lon: [-180, 180] }
+    temporal: { start: 2025-05-09, end: null }
+  s5p-tropomi-2-formaldehyde-total-column-nrt:
+    collection_id: "EO:EUM:DAT:0075"
+    group: Sentinel-5P
+    mission: sentinel-5p
+    output_kind: raster
+    format: netcdf
+    cadence: subdaily
+    selectors: []
+    tailor_product_type: null
+    extent: { lat: [-90, 90], lon: [-180, 180] }
+    temporal: { start: 2025-05-09, end: null }
+  s5p-tropomi-2-ozone-profile-nrt:
+    collection_id: "EO:EUM:DAT:0602"
+    group: Sentinel-5P
+    mission: sentinel-5p
+    output_kind: raster
+    format: netcdf
+    cadence: subdaily
+    selectors: []
+    tailor_product_type: null
+    extent: { lat: [-90, 90], lon: [-180, 180] }
+    temporal: { start: 2025-03-11, end: null }
+  s5p-tropomi-2-sulphur-dioxide-total-column:
+    collection_id: "EO:EUM:DAT:0078"
+    group: Sentinel-5P
+    mission: sentinel-5p
+    output_kind: raster
+    format: netcdf
+    cadence: subdaily
+    selectors: []
+    tailor_product_type: null
+    extent: { lat: [-90, 90], lon: [-180, 180] }
+    temporal: { start: 2025-03-12, end: null }

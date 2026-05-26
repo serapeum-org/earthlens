@@ -1,0 +1,173 @@
+# Multimission / legacy climate & fundamental data records (ATMS, MWHS, SSM/T, HIRS, CM SAF, SARAH, AWS, RO, TOOCAN, ...).
+# Ids, titles and start dates walked from the public browse endpoint
+# (api.eumetsat.int/data/browse/collections) on 2026-05-26. Hand-tuned rows
+# (HRSEVIRI, the S5P gases, ASCAT soil moisture, the MTG suite, ...) keep their
+# vetted metadata; the rest carry browse-derived format/output_kind/cadence
+# heuristics (advisory for the whole-product download) refined per product as
+# needed. Reconcile with tools/eumetsat/audit_eumetsat_catalog.py.
+collections:
+  eum-atms-1c-climate-record-release-1:
+    collection_id: "EO:EUM:DAT:0345"
+    group: Other
+    mission: multi
+    output_kind: raster
+    format: native
+    cadence: irregular
+    selectors: []
+    tailor_product_type: null
+    extent: { lat: [-90, 90], lon: [-180, 180] }
+    temporal: { start: 2011-12-10, end: 2018-12-31 }
+  eum-auxiliary-tle-aws-pfm:
+    collection_id: "EO:EUM:DAT:0908"
+    group: Other
+    mission: multi
+    output_kind: raster
+    format: other
+    cadence: irregular
+    selectors: []
+    tailor_product_type: null
+    extent: { lat: [-90, 90], lon: [-180, 180] }
+    temporal: { start: 2025-02-22, end: null }
+  eum-cm-saf-passive-microwave-upper-tropospheric:
+    collection_id: "EO:EUM:DAT:0910"
+    group: Other
+    mission: multi
+    output_kind: raster
+    format: netcdf
+    cadence: irregular
+    selectors: []
+    tailor_product_type: null
+    extent: { lat: [-90, 90], lon: [-180, 180] }
+    temporal: { start: 1994-07-05, end: 2018-12-31 }
+  eum-commercial-radio-occultation-1b:
+    collection_id: "EO:EUM:DAT:0374"
+    group: Other
+    mission: multi
+    output_kind: raster
+    format: netcdf
+    cadence: subdaily
+    selectors: []
+    tailor_product_type: null
+    extent: { lat: [-90, 90], lon: [-180, 180] }
+    temporal: { start: 2022-02-15, end: null }
+  eum-deep-convective-cloud-system-monitoring-database:
+    collection_id: "EO:EUM:DAT:0986"
+    group: Other
+    mission: multi
+    output_kind: raster
+    format: netcdf
+    cadence: subdaily
+    selectors: []
+    tailor_product_type: null
+    extent: { lat: [-90, 90], lon: [-180, 180] }
+    temporal: { start: 1981-08-01, end: 2023-12-31 }
+  eum-deep-convective-cloud-system-monitoring-database-2:
+    collection_id: "EO:EUM:DAT:0987"
+    group: Other
+    mission: multi
+    output_kind: raster
+    format: netcdf
+    cadence: subdaily
+    selectors: []
+    tailor_product_type: null
+    extent: { lat: [-90, 90], lon: [-180, 180] }
+    temporal: { start: 1981-01-01, end: 2023-12-31 }
+  eum-girafe-v1-cm-saf-global-interpolated:
+    collection_id: "EO:EUM:DAT:0921"
+    group: Other
+    mission: multi
+    output_kind: raster
+    format: netcdf
+    cadence: subdaily
+    selectors: []
+    tailor_product_type: null
+    extent: { lat: [-90, 90], lon: [-180, 180] }
+    temporal: { start: 2002-01-01, end: 2022-12-31 }
+  eum-hirs-1c-fundamental-record-release-2:
+    collection_id: "EO:EUM:DAT:0961"
+    group: Other
+    mission: multi
+    output_kind: raster
+    format: native
+    cadence: irregular
+    selectors: []
+    tailor_product_type: null
+    extent: { lat: [-90, 90], lon: [-180, 180] }
+    temporal: { start: 1978-11-03, end: 2022-12-31 }
+  eum-mwhs-1-1c-climate-record-release:
+    collection_id: "EO:EUM:DAT:0348"
+    group: Other
+    mission: multi
+    output_kind: raster
+    format: native
+    cadence: irregular
+    selectors: []
+    tailor_product_type: null
+    extent: { lat: [-90, 90], lon: [-180, 180] }
+    temporal: { start: 2008-07-01, end: 2018-12-31 }
+  eum-mwhs-2-1c-climate-record-release:
+    collection_id: "EO:EUM:DAT:0349"
+    group: Other
+    mission: multi
+    output_kind: raster
+    format: native
+    cadence: irregular
+    selectors: []
+    tailor_product_type: null
+    extent: { lat: [-90, 90], lon: [-180, 180] }
+    temporal: { start: 2013-09-30, end: 2018-12-31 }
+  eum-mwr-1b-arctic-weather-satellite-proto:
+    collection_id: "EO:EUM:DAT:0905"
+    group: Other
+    mission: multi
+    output_kind: raster
+    format: netcdf
+    cadence: subdaily
+    selectors: []
+    tailor_product_type: null
+    extent: { lat: [-90, 90], lon: [-180, 180] }
+    temporal: { start: 2000-01-01, end: null }
+  eum-si-1-fundamental-record-release-1:
+    collection_id: "EO:EUM:DAT:0963"
+    group: Other
+    mission: multi
+    output_kind: raster
+    format: netcdf
+    cadence: irregular
+    selectors: []
+    tailor_product_type: null
+    extent: { lat: [-90, 90], lon: [-180, 180] }
+    temporal: { start: 1977-07-05, end: 1979-06-30 }
+  eum-ssm-t-1c-fundamental-record-release:
+    collection_id: "EO:EUM:DAT:0964"
+    group: Other
+    mission: multi
+    output_kind: raster
+    format: native
+    cadence: irregular
+    selectors: []
+    tailor_product_type: null
+    extent: { lat: [-90, 90], lon: [-180, 180] }
+    temporal: { start: 1991-07-15, end: 2005-01-18 }
+  eum-ssm-t-2-microwave-humidity-sounder:
+    collection_id: "EO:EUM:DAT:0343"
+    group: Other
+    mission: multi
+    output_kind: raster
+    format: netcdf
+    cadence: irregular
+    selectors: []
+    tailor_product_type: null
+    extent: { lat: [-90, 90], lon: [-180, 180] }
+    temporal: { start: 1994-07-05, end: 2005-01-02 }
+  eum-surface-radiation-set:
+    collection_id: "EO:EUM:DAT:0863"
+    group: Other
+    mission: multi
+    output_kind: raster
+    format: netcdf
+    cadence: subdaily
+    selectors: []
+    tailor_product_type: null
+    extent: { lat: [-90, 90], lon: [-180, 180] }
+    temporal: { start: 1983-01-01, end: null }

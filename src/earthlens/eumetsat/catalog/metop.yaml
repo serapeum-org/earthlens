@@ -1,117 +1,22 @@
-# Metop (EPS) collections: ASCAT scatterometer, IASI sounder, and the
-# imaging / microwave instruments. EPS products are delivered as native
-# files; ASCAT soil moisture and IASI L2 soundings ship as BUFR. All are
-# treated as `raster` for the MVP (gridded / griddable files); a future
-# revision may split the swath soundings to `vector` (G1).
+# Metop (EPS) collections: ASCAT / IASI / GOME-2 / AVHRR / AMSU / MHS, NRT + CDR/FDR.
+# Ids, titles and start dates walked from the public browse endpoint
+# (api.eumetsat.int/data/browse/collections) on 2026-05-26. Hand-tuned rows
+# (HRSEVIRI, the S5P gases, ASCAT soil moisture, the MTG suite, ...) keep their
+# vetted metadata; the rest carry browse-derived format/output_kind/cadence
+# heuristics (advisory for the whole-product download) refined per product as
+# needed. Reconcile with tools/eumetsat/audit_eumetsat_catalog.py.
 collections:
-  metop-ascat-l1-szr:
-    collection_id: "EO:EUM:DAT:METOP:ASCSZR1B"
+  metop-amsu-b-microwave-humidity-sounder-climate:
+    collection_id: "EO:EUM:DAT:0303"
     group: Metop
     mission: metop
     output_kind: raster
-    format: native
-    cadence: subdaily
-    selectors: [ASCSZR1B]
-    tailor_product_type: ASCATL1SZR
+    format: netcdf
+    cadence: irregular
+    selectors: []
+    tailor_product_type: null
     extent: { lat: [-90, 90], lon: [-180, 180] }
-    temporal: { start: 2007-01-01, end: null }
-
-  metop-ascat-l1-szf:
-    collection_id: "EO:EUM:DAT:METOP:ASCSZF1B"
-    group: Metop
-    mission: metop
-    output_kind: raster
-    format: native
-    cadence: subdaily
-    selectors: [ASCSZF1B]
-    tailor_product_type: ASCATL1SZF
-    extent: { lat: [-90, 90], lon: [-180, 180] }
-    temporal: { start: 2007-01-01, end: null }
-
-  metop-ascat-soil-moisture-12km:
-    collection_id: "EO:EUM:DAT:METOP:SOMO12"
-    group: Metop
-    mission: metop
-    output_kind: raster
-    format: bufr
-    cadence: subdaily
-    selectors: [SOMO12]
-    tailor_product_type: ASCATL2SM
-    extent: { lat: [-90, 90], lon: [-180, 180] }
-    temporal: { start: 2007-01-01, end: null }
-
-  metop-ascat-soil-moisture-25km:
-    collection_id: "EO:EUM:DAT:METOP:SOMO25"
-    group: Metop
-    mission: metop
-    output_kind: raster
-    format: bufr
-    cadence: subdaily
-    selectors: [SOMO25]
-    tailor_product_type: ASCATL2SM
-    extent: { lat: [-90, 90], lon: [-180, 180] }
-    temporal: { start: 2007-01-01, end: null }
-
-  metop-iasi-l1c:
-    collection_id: "EO:EUM:DAT:METOP:IASIL1C-ALL"
-    group: Metop
-    mission: metop
-    output_kind: raster
-    format: native
-    cadence: subdaily
-    selectors: [IASIL1C]
-    tailor_product_type: IASIL1C
-    extent: { lat: [-90, 90], lon: [-180, 180] }
-    temporal: { start: 2007-05-29, end: null }
-
-  metop-iasi-l2:
-    collection_id: "EO:EUM:DAT:METOP:IASSND02"
-    group: Metop
-    mission: metop
-    output_kind: raster
-    format: bufr
-    cadence: subdaily
-    selectors: [IASSND02]
-    tailor_product_type: IASIL2
-    extent: { lat: [-90, 90], lon: [-180, 180] }
-    temporal: { start: 2008-01-01, end: null }
-
-  metop-avhrr-l1:
-    collection_id: "EO:EUM:DAT:METOP:AVHRRL1"
-    group: Metop
-    mission: metop
-    output_kind: raster
-    format: native
-    cadence: subdaily
-    selectors: [AVHRRL1]
-    tailor_product_type: AVHRRL1
-    extent: { lat: [-90, 90], lon: [-180, 180] }
-    temporal: { start: 2006-10-19, end: null }
-
-  metop-gome2-l1:
-    collection_id: "EO:EUM:DAT:METOP:GOMEL1"
-    group: Metop
-    mission: metop
-    output_kind: raster
-    format: native
-    cadence: subdaily
-    selectors: [GOMEL1]
-    tailor_product_type: GOMEL1
-    extent: { lat: [-90, 90], lon: [-180, 180] }
-    temporal: { start: 2007-01-09, end: null }
-
-  metop-mhs-l1:
-    collection_id: "EO:EUM:DAT:METOP:MHSL1"
-    group: Metop
-    mission: metop
-    output_kind: raster
-    format: native
-    cadence: subdaily
-    selectors: [MHSL1]
-    tailor_product_type: MHSL1
-    extent: { lat: [-90, 90], lon: [-180, 180] }
-    temporal: { start: 2006-10-19, end: null }
-
+    temporal: { start: 1999-01-01, end: 2014-06-05 }
   metop-amsua-l1:
     collection_id: "EO:EUM:DAT:METOP:AMSUL1"
     group: Metop
@@ -121,5 +26,423 @@ collections:
     cadence: subdaily
     selectors: [AMSUL1]
     tailor_product_type: AMSUL1
-    extent: { lat: [-90, 90], lon: [-180, 180] }
+    extent: { lat: [-90.0, 90.0], lon: [-180.0, 180.0] }
     temporal: { start: 2006-10-19, end: null }
+  metop-ascat-1-sigma0-resampled-25-km:
+    collection_id: "EO:EUM:DAT:METOP:ASCSZO1B"
+    group: Metop
+    mission: metop
+    output_kind: raster
+    format: netcdf
+    cadence: subdaily
+    selectors: []
+    tailor_product_type: null
+    extent: { lat: [-90, 90], lon: [-180, 180] }
+    temporal: { start: 2013-01-01, end: null }
+  metop-ascat-1-szf-climate-record-release:
+    collection_id: "EO:EUM:CM:METOP:ASCSZFR02"
+    group: Metop
+    mission: metop
+    output_kind: raster
+    format: netcdf
+    cadence: irregular
+    selectors: []
+    tailor_product_type: null
+    extent: { lat: [-90, 90], lon: [-180, 180] }
+    temporal: { start: 2007-01-01, end: 2014-03-31 }
+  metop-ascat-1-szo-climate-record-release:
+    collection_id: "EO:EUM:CM:METOP:ASCSZOR02"
+    group: Metop
+    mission: metop
+    output_kind: raster
+    format: netcdf
+    cadence: irregular
+    selectors: []
+    tailor_product_type: null
+    extent: { lat: [-90, 90], lon: [-180, 180] }
+    temporal: { start: 2007-01-01, end: 2014-03-31 }
+  metop-ascat-1-szr-climate-record-release:
+    collection_id: "EO:EUM:CM:METOP:ASCSZRR02"
+    group: Metop
+    mission: metop
+    output_kind: raster
+    format: netcdf
+    cadence: irregular
+    selectors: []
+    tailor_product_type: null
+    extent: { lat: [-90, 90], lon: [-180, 180] }
+    temporal: { start: 2007-01-01, end: 2014-03-31 }
+  metop-ascat-coastal-winds-12-5-km:
+    collection_id: "EO:EUM:DAT:METOP:OSI-104"
+    group: Metop
+    mission: metop
+    output_kind: vector
+    format: netcdf
+    cadence: subdaily
+    selectors: []
+    tailor_product_type: null
+    extent: { lat: [-90, 90], lon: [-180, 180] }
+    temporal: { start: 2013-06-03, end: null }
+  metop-ascat-l1-szf:
+    collection_id: "EO:EUM:DAT:METOP:ASCSZF1B"
+    group: Metop
+    mission: metop
+    output_kind: raster
+    format: native
+    cadence: subdaily
+    selectors: [ASCSZF1B]
+    tailor_product_type: ASCATL1SZF
+    extent: { lat: [-90.0, 90.0], lon: [-180.0, 180.0] }
+    temporal: { start: 2007-01-01, end: null }
+  metop-ascat-l1-szr:
+    collection_id: "EO:EUM:DAT:METOP:ASCSZR1B"
+    group: Metop
+    mission: metop
+    output_kind: raster
+    format: native
+    cadence: subdaily
+    selectors: [ASCSZR1B]
+    tailor_product_type: ASCATL1SZR
+    extent: { lat: [-90.0, 90.0], lon: [-180.0, 180.0] }
+    temporal: { start: 2007-01-01, end: null }
+  metop-ascat-l2-12-5-km-winds:
+    collection_id: "EO:EUM:DAT:METOP:OSI-150-B"
+    group: Metop
+    mission: metop
+    output_kind: vector
+    format: netcdf
+    cadence: irregular
+    selectors: []
+    tailor_product_type: null
+    extent: { lat: [-90, 90], lon: [-180, 180] }
+    temporal: { start: 2007-01-01, end: 2014-03-31 }
+  metop-ascat-l2-25-km-winds-record:
+    collection_id: "EO:EUM:DAT:METOP:OSI-150-A"
+    group: Metop
+    mission: metop
+    output_kind: vector
+    format: netcdf
+    cadence: irregular
+    selectors: []
+    tailor_product_type: null
+    extent: { lat: [-90, 90], lon: [-180, 180] }
+    temporal: { start: 2007-01-01, end: 2014-03-31 }
+  metop-ascat-soil-moisture-12km:
+    collection_id: "EO:EUM:DAT:METOP:SOMO12"
+    group: Metop
+    mission: metop
+    output_kind: raster
+    format: bufr
+    cadence: subdaily
+    selectors: [SOMO12]
+    tailor_product_type: ASCATL2SM
+    extent: { lat: [-90.0, 90.0], lon: [-180.0, 180.0] }
+    temporal: { start: 2007-01-01, end: null }
+  metop-ascat-soil-moisture-25km:
+    collection_id: "EO:EUM:DAT:METOP:SOMO25"
+    group: Metop
+    mission: metop
+    output_kind: raster
+    format: bufr
+    cadence: subdaily
+    selectors: [SOMO25]
+    tailor_product_type: ASCATL2SM
+    extent: { lat: [-90.0, 90.0], lon: [-180.0, 180.0] }
+    temporal: { start: 2007-01-01, end: null }
+  metop-ascat-winds-soil-moisture-25-km:
+    collection_id: "EO:EUM:DAT:METOP:OAS025"
+    group: Metop
+    mission: metop
+    output_kind: vector
+    format: netcdf
+    cadence: subdaily
+    selectors: []
+    tailor_product_type: null
+    extent: { lat: [-90, 90], lon: [-180, 180] }
+    temporal: { start: 2011-02-28, end: null }
+  metop-avhrr-fundamental-record:
+    collection_id: "EO:EUM:DAT:0862"
+    group: Metop
+    mission: metop
+    output_kind: raster
+    format: netcdf
+    cadence: irregular
+    selectors: []
+    tailor_product_type: null
+    extent: { lat: [-90, 90], lon: [-180, 180] }
+    temporal: { start: 1978-11-05, end: 2024-06-30 }
+  metop-avhrr-gac-atmospheric-motion-vectors-climate:
+    collection_id: "EO:EUM:DAT:0558"
+    group: Metop
+    mission: metop
+    output_kind: vector
+    format: netcdf
+    cadence: irregular
+    selectors: []
+    tailor_product_type: null
+    extent: { lat: [-90, 90], lon: [-180, 180] }
+    temporal: { start: 1979-01-01, end: 2019-08-31 }
+  metop-avhrr-global-atmospheric-motion-vectors-climate:
+    collection_id: "EO:EUM:DAT:0151"
+    group: Metop
+    mission: metop
+    output_kind: vector
+    format: netcdf
+    cadence: irregular
+    selectors: []
+    tailor_product_type: null
+    extent: { lat: [-90, 90], lon: [-180, 180] }
+    temporal: { start: 2013-04-24, end: 2017-12-31 }
+  metop-avhrr-l1:
+    collection_id: "EO:EUM:DAT:METOP:AVHRRL1"
+    group: Metop
+    mission: metop
+    output_kind: raster
+    format: native
+    cadence: subdaily
+    selectors: [AVHRRL1]
+    tailor_product_type: AVHRRL1
+    extent: { lat: [-90.0, 90.0], lon: [-180.0, 180.0] }
+    temporal: { start: 2006-10-19, end: null }
+  metop-avhrr-polar-atmospheric-motion-vectors-climate:
+    collection_id: "EO:EUM:DAT:0152"
+    group: Metop
+    mission: metop
+    output_kind: vector
+    format: netcdf
+    cadence: irregular
+    selectors: []
+    tailor_product_type: null
+    extent: { lat: [-90, 90], lon: [-180, 180] }
+    temporal: { start: 2007-03-01, end: 2017-12-31 }
+  metop-clara-a3-cm-saf-cloud-albedo:
+    collection_id: "EO:EUM:DAT:0874"
+    group: Metop
+    mission: metop
+    output_kind: raster
+    format: netcdf
+    cadence: subdaily
+    selectors: []
+    tailor_product_type: null
+    extent: { lat: [-90, 90], lon: [-180, 180] }
+    temporal: { start: 1979-01-01, end: null }
+  metop-eps-daily-land-surface-temperature:
+    collection_id: "EO:EUM:DAT:METOP:LSA-002"
+    group: Metop
+    mission: metop
+    output_kind: raster
+    format: netcdf
+    cadence: subdaily
+    selectors: []
+    tailor_product_type: null
+    extent: { lat: [-90, 90], lon: [-180, 180] }
+    temporal: { start: 2023-08-09, end: null }
+  metop-gome-2-1b-fundamental-record-release:
+    collection_id: "EO:EUM:DAT:0533"
+    group: Metop
+    mission: metop
+    output_kind: raster
+    format: netcdf
+    cadence: irregular
+    selectors: []
+    tailor_product_type: null
+    extent: { lat: [-90, 90], lon: [-180, 180] }
+    temporal: { start: 2007-04-01, end: 2020-07-31 }
+  metop-gome2-l1:
+    collection_id: "EO:EUM:DAT:METOP:GOMEL1"
+    group: Metop
+    mission: metop
+    output_kind: raster
+    format: native
+    cadence: subdaily
+    selectors: [GOMEL1]
+    tailor_product_type: GOMEL1
+    extent: { lat: [-90.0, 90.0], lon: [-180.0, 180.0] }
+    temporal: { start: 2007-01-09, end: null }
+  metop-hirs-1b:
+    collection_id: "EO:EUM:DAT:MULT:HIRSL1"
+    group: Metop
+    mission: metop
+    output_kind: raster
+    format: netcdf
+    cadence: subdaily
+    selectors: []
+    tailor_product_type: null
+    extent: { lat: [-90, 90], lon: [-180, 180] }
+    temporal: { start: 2007-03-02, end: 2025-01-21 }
+  metop-iasi-1-principal-component-scores:
+    collection_id: "EO:EUM:DAT:METOP:IASPCS01"
+    group: Metop
+    mission: metop
+    output_kind: raster
+    format: netcdf
+    cadence: subdaily
+    selectors: []
+    tailor_product_type: null
+    extent: { lat: [-90, 90], lon: [-180, 180] }
+    temporal: { start: 2019-07-01, end: null }
+  metop-iasi-1c-climate-record-release-2:
+    collection_id: "EO:EUM:DAT:0590"
+    group: Metop
+    mission: metop
+    output_kind: raster
+    format: native
+    cadence: irregular
+    selectors: []
+    tailor_product_type: null
+    extent: { lat: [-90, 90], lon: [-180, 180] }
+    temporal: { start: 2007-07-10, end: 2019-09-30 }
+  metop-iasi-all-sky-temperature-humidity-profiles:
+    collection_id: "EO:EUM:DAT:0576"
+    group: Metop
+    mission: metop
+    output_kind: raster
+    format: netcdf
+    cadence: irregular
+    selectors: []
+    tailor_product_type: null
+    extent: { lat: [-90, 90], lon: [-180, 180] }
+    temporal: { start: 2007-07-10, end: 2023-12-31 }
+  metop-iasi-carbon-monoxide-profiles-forli-co:
+    collection_id: "EO:EUM:DAT:0959"
+    group: Metop
+    mission: metop
+    output_kind: raster
+    format: netcdf
+    cadence: irregular
+    selectors: []
+    tailor_product_type: null
+    extent: { lat: [-90, 90], lon: [-180, 180] }
+    temporal: { start: 2007-07-10, end: 2023-12-31 }
+  metop-iasi-carbon-monoxide-profiles-forli-co-2:
+    collection_id: "EO:EUM:DAT:METOP:IASIL2COX"
+    group: Metop
+    mission: metop
+    output_kind: raster
+    format: netcdf
+    cadence: subdaily
+    selectors: []
+    tailor_product_type: null
+    extent: { lat: [-90, 90], lon: [-180, 180] }
+    temporal: { start: 2024-01-01, end: null }
+  metop-iasi-l1c:
+    collection_id: "EO:EUM:DAT:METOP:IASIL1C-ALL"
+    group: Metop
+    mission: metop
+    output_kind: raster
+    format: native
+    cadence: subdaily
+    selectors: [IASIL1C]
+    tailor_product_type: IASIL1C
+    extent: { lat: [-90.0, 90.0], lon: [-180.0, 180.0] }
+    temporal: { start: 2007-05-29, end: null }
+  metop-iasi-l2:
+    collection_id: "EO:EUM:DAT:METOP:IASSND02"
+    group: Metop
+    mission: metop
+    output_kind: raster
+    format: bufr
+    cadence: subdaily
+    selectors: [IASSND02]
+    tailor_product_type: IASIL2
+    extent: { lat: [-90.0, 90.0], lon: [-180.0, 180.0] }
+    temporal: { start: 2008-01-01, end: null }
+  metop-iasi-noise-covariance-matrix:
+    collection_id: "EO:EUM:DAT:1099"
+    group: Metop
+    mission: metop
+    output_kind: raster
+    format: netcdf
+    cadence: subdaily
+    selectors: []
+    tailor_product_type: null
+    extent: { lat: [-90, 90], lon: [-180, 180] }
+    temporal: { start: 2025-09-01, end: null }
+  metop-iasi-ozone-climate-record-release-1:
+    collection_id: "EO:EUM:DAT:1027"
+    group: Metop
+    mission: metop
+    output_kind: raster
+    format: netcdf
+    cadence: irregular
+    selectors: []
+    tailor_product_type: null
+    extent: { lat: [-90, 90], lon: [-180, 180] }
+    temporal: { start: 2007-07-10, end: 2023-12-31 }
+  metop-iasi-principal-components-scores-fundamental-record:
+    collection_id: "EO:EUM:DAT:0758"
+    group: Metop
+    mission: metop
+    output_kind: raster
+    format: netcdf
+    cadence: irregular
+    selectors: []
+    tailor_product_type: null
+    extent: { lat: [-90, 90], lon: [-180, 180] }
+    temporal: { start: 2007-07-10, end: 2024-12-31 }
+  metop-iasi-so2-climate-record-release-1:
+    collection_id: "EO:EUM:DAT:0960"
+    group: Metop
+    mission: metop
+    output_kind: raster
+    format: netcdf
+    cadence: irregular
+    selectors: []
+    tailor_product_type: null
+    extent: { lat: [-90, 90], lon: [-180, 180] }
+    temporal: { start: 2007-07-10, end: 2023-12-31 }
+  metop-mhs-l1:
+    collection_id: "EO:EUM:DAT:METOP:MHSL1"
+    group: Metop
+    mission: metop
+    output_kind: raster
+    format: native
+    cadence: subdaily
+    selectors: [MHSL1]
+    tailor_product_type: MHSL1
+    extent: { lat: [-90.0, 90.0], lon: [-180.0, 180.0] }
+    temporal: { start: 2006-10-19, end: null }
+  metop-mhs-microwave-humidity-sounder-climate-record:
+    collection_id: "EO:EUM:DAT:0305"
+    group: Metop
+    mission: metop
+    output_kind: raster
+    format: netcdf
+    cadence: irregular
+    selectors: []
+    tailor_product_type: null
+    extent: { lat: [-90, 90], lon: [-180, 180] }
+    temporal: { start: 2005-08-30, end: 2017-12-31 }
+  metop-mhs-microwave-humidity-sounder-climate-record-2:
+    collection_id: "EO:EUM:DAT:0344"
+    group: Metop
+    mission: metop
+    output_kind: raster
+    format: netcdf
+    cadence: irregular
+    selectors: []
+    tailor_product_type: null
+    extent: { lat: [-90, 90], lon: [-180, 180] }
+    temporal: { start: 2006-10-31, end: 2018-12-31 }
+  metop-near-real-time-total-column:
+    collection_id: "EO:EUM:DAT:METOP:NTO"
+    group: Metop
+    mission: metop
+    output_kind: raster
+    format: netcdf
+    cadence: subdaily
+    selectors: []
+    tailor_product_type: null
+    extent: { lat: [-90, 90], lon: [-180, 180] }
+    temporal: { start: 2024-07-15, end: null }
+  metop-polar-multi-sensor-aerosol-optical-properties:
+    collection_id: "EO:EUM:DAT:0579"
+    group: Metop
+    mission: metop
+    output_kind: raster
+    format: netcdf
+    cadence: irregular
+    selectors: []
+    tailor_product_type: null
+    extent: { lat: [-90, 90], lon: [-180, 180] }
+    temporal: { start: 2007-07-10, end: 2019-08-31 }

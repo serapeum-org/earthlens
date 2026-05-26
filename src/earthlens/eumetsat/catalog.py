@@ -89,12 +89,14 @@ class DataStoreGroup(str, Enum):
 
     MTG = "MTG"
     MSG = "MSG"
+    MFG = "MFG"
     METOP = "Metop"
     METOP_SG = "Metop-SG"
     SENTINEL_3 = "Sentinel-3"
     SENTINEL_5P = "Sentinel-5P"
     SENTINEL_6 = "Sentinel-6"
     OSI_SAF = "OSI-SAF"
+    OTHER = "Other"
 
 
 def clear_catalog_cache() -> None:

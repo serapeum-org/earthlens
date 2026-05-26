@@ -121,10 +121,14 @@ def test_sentinel5p_timeliness_recorded(catalog):
 
 
 def test_every_collection_id_matches_eumetsat_pattern(catalog):
-    """Every curated collection_id is a well-formed `EO:EUM:DAT:...` id."""
+    """Every curated collection_id is a well-formed `EO:EUM:DAT|CM:...` id.
+
+    `DAT` is the Data Store stream; `CM` is the CM SAF climate-monitoring
+    stream (e.g. the ASCAT Level 1 climate data records).
+    """
     import re
 
-    pattern = re.compile(r"^EO:EUM:DAT:[\w:.-]+$")
+    pattern = re.compile(r"^EO:EUM:(DAT|CM):[\w:.-]+$")
     bad = {
         key: col.collection_id
         for key, col in catalog.collections.items()
