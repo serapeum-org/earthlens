@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -5744,6 +5744,12 @@ selector:</p>
 <td><code>TD_2M</code></td>
 </tr>
 <tr>
+<td><code>relative_humidity_2m</code></td>
+<td><code>:RH:2 m above ground:</code></td>
+<td><code>2r</code></td>
+<td><code>RELHUM_2M</code></td>
+</tr>
+<tr>
 <td><code>wind_u_10m</code></td>
 <td><code>:UGRD:10 m above ground:</code></td>
 <td><code>10u</code></td>
@@ -5756,15 +5762,48 @@ selector:</p>
 <td><code>V_10M</code></td>
 </tr>
 <tr>
+<td><code>wind_gust</code></td>
+<td><code>:GUST:surface:</code></td>
+<td><code>10fg</code></td>
+<td><code>VMAX_10M</code></td>
+</tr>
+<tr>
 <td><code>pressure_msl</code></td>
 <td><code>:PRMSL:mean sea level:</code></td>
 <td><code>msl</code></td>
 <td><code>PMSL</code></td>
 </tr>
+<tr>
+<td><code>surface_pressure</code></td>
+<td><code>:PRES:surface:</code></td>
+<td><code>sp</code></td>
+<td><code>PS</code></td>
+</tr>
+<tr>
+<td><code>total_cloud_cover</code></td>
+<td><code>:TCDC:entire atmosphere:</code></td>
+<td><code>tcc</code></td>
+<td><code>CLCT</code></td>
+</tr>
+<tr>
+<td><code>cape</code></td>
+<td><code>:CAPE:surface:</code></td>
+<td><code>cape</code></td>
+<td><code>CAPE_ML</code></td>
+</tr>
+<tr>
+<td><code>downward_shortwave_radiation</code></td>
+<td><code>:DSWRF:surface:</code></td>
+<td><code>ssrd</code></td>
+<td>— (no single token)</td>
+</tr>
 </tbody>
 </table>
-<p>Not every model carries every band (e.g. analyses omit <code>precipitation_acc</code>); a
-requested band a model doesn't publish is skipped under <code>errors="warn"</code>.</p>
+<p>11–12 bands per forecast model (analyses <code>rtma</code>/<code>urma</code> carry the 9 non-flux
+fields). Not every model publishes every band — a requested band a model
+doesn't carry is skipped under <code>errors="warn"</code> (it is not a hard error). The
+DWD tokens are HEAD-validated live for <code>icon-eu</code>; the ECMWF flux tokens
+(<code>cape</code>/<code>ssrd</code>) may be outside the open-data subset for some runs and skip.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.nwp</span><span class="w"> </span><span class="kn">import</span> <span class="n">Catalog</span>
 <a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>
 <a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="n">cat</span> <span class="o">=</span> <span class="n">Catalog</span><span class="p">()</span>

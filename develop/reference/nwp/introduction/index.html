@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -5502,8 +5502,9 @@ bbox-cropped Cloud-Optimized GeoTIFFs. It is one subpackage with sibling
 </tr>
 </tbody>
 </table>
-<p><strong>22 models</strong>, each exposing 2 m temperature / dewpoint, 10 m wind (u/v),
-surface precipitation, and MSL pressure. The 5 MVP models (GFS / GEFS / HRRR /
+<p><strong>22 models</strong>, each exposing up to 12 surface fields — 2 m temperature /
+dewpoint / relative humidity, 10 m wind (u/v) + gust, precipitation, MSL +
+surface pressure, total cloud cover, CAPE, and downward shortwave radiation. The 5 MVP models (GFS / GEFS / HRRR /
 IFS-HRES / ICON-global) are live-validated end to end; the rest are
 metadata-curated (vet with <code>tools/nwp/probe_nwp_model.py</code>) — see
 <a href="../catalog/">Catalog &amp; install</a>. Météo-France needs an API key
