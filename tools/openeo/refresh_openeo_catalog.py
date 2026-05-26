@@ -81,9 +81,7 @@ def _list_ids(connection, kind: str) -> list[str]:
         raise RuntimeError(f"failed to list {kind}: {exc}") from exc
 
 
-def _render_index(
-    collections: list[str], processes: list[str], endpoint: str
-) -> str:
+def _render_index(collections: list[str], processes: list[str], endpoint: str) -> str:
     """Render the full `_index.yaml` text (header comment + both lists).
 
     Args:
@@ -209,17 +207,22 @@ def main(argv: list[str] | None = None) -> int:
         "refresh", help="list collections + processes and rewrite _index.yaml"
     )
     p_refresh.add_argument(
-        "--catalog-index", type=Path, default=CATALOG_INDEX_PATH,
+        "--catalog-index",
+        type=Path,
+        default=CATALOG_INDEX_PATH,
         help="path to catalog/_index.yaml",
     )
     p_refresh.add_argument(
         "--endpoint", default=DEFAULT_ENDPOINT, help="openEO API root URL"
     )
     p_refresh.add_argument(
-        "--dry-run", action="store_true",
+        "--dry-run",
+        action="store_true",
         help="print the regenerated index instead of writing it",
     )
-    p_refresh.add_argument("-v", "--verbose", action="store_true", help="print progress")
+    p_refresh.add_argument(
+        "-v", "--verbose", action="store_true", help="print progress"
+    )
     p_refresh.set_defaults(func=_cmd_refresh)
 
     p_validate = sub.add_parser(
@@ -229,7 +232,9 @@ def main(argv: list[str] | None = None) -> int:
     p_validate.add_argument(
         "--endpoint", default=DEFAULT_ENDPOINT, help="openEO API root URL"
     )
-    p_validate.add_argument("-v", "--verbose", action="store_true", help="print progress")
+    p_validate.add_argument(
+        "-v", "--verbose", action="store_true", help="print progress"
+    )
     p_validate.set_defaults(func=_cmd_validate_recipe)
 
     args = parser.parse_args(argv)

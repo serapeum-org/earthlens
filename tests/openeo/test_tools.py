@@ -50,10 +50,19 @@ class _FakeOpeneoModule:
 def fake_openeo(monkeypatch: pytest.MonkeyPatch):
     """Install a fake `openeo` module covering the curated recipes' needs."""
     conn = _FakeConnection(
-        collections=["SENTINEL2_L2A", "SENTINEL_5P_L2", "SENTINEL1_GRD",
-                     "SENTINEL3_OLCI_L2_WATER"],
-        processes=["mask_scl_dilation", "ndvi", "aggregate_temporal_period",
-                   "reduce_dimension", "sar_backscatter"],
+        collections=[
+            "SENTINEL2_L2A",
+            "SENTINEL_5P_L2",
+            "SENTINEL1_GRD",
+            "SENTINEL3_OLCI_L2_WATER",
+        ],
+        processes=[
+            "mask_scl_dilation",
+            "ndvi",
+            "aggregate_temporal_period",
+            "reduce_dimension",
+            "sar_backscatter",
+        ],
     )
     monkeypatch.setitem(sys.modules, "openeo", _FakeOpeneoModule(conn))
     return conn

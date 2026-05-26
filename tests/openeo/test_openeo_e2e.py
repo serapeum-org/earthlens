@@ -20,7 +20,7 @@ import pytest
 
 pytest.importorskip("openeo", reason="openEO e2e needs the [openeo] extra")
 
-from earthlens.earthlens import EarthLens
+from earthlens.earthlens import EarthLens  # noqa: E402
 
 _OPENEO_HOME = Path.home() / ".openeo"
 

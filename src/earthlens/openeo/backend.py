@@ -114,9 +114,7 @@ class OpenEO(AbstractDataSource):
                 `"sync"`/`"batch"`, or `output_format` is unknown.
         """
         if execute not in {"sync", "batch"}:
-            raise ValueError(
-                f"execute must be 'sync' or 'batch', got {execute!r}."
-            )
+            raise ValueError(f"execute must be 'sync' or 'batch', got {execute!r}.")
         if output_format not in OUTPUT_FORMATS:
             raise ValueError(
                 f"output_format must be one of {sorted(OUTPUT_FORMATS)}, "
@@ -176,8 +174,7 @@ class OpenEO(AbstractDataSource):
             )
         self._catalog = Catalog()
         self._resolved = {
-            key: self._catalog.resolve(self._process or key)
-            for key in self._variables
+            key: self._catalog.resolve(self._process or key) for key in self._variables
         }
         self._auth = OpeneoAuth(self._credentials, endpoint=self._endpoint)
         return None
@@ -334,9 +331,7 @@ class OpenEO(AbstractDataSource):
         """
         self._aggregate = aggregate
         paths = self._api_via_search_fetch()
-        logger.info(
-            f"openEO download: {len(paths)} file(s) written to {self.root_dir}"
-        )
+        logger.info(f"openEO download: {len(paths)} file(s) written to {self.root_dir}")
         return paths
 
 

@@ -100,9 +100,7 @@ class TestOpeneoAuth:
         auth.configure()
         assert sum(1 for e in conn.log if e[0] == "authenticate_oidc") == 1
 
-    def test_connection_configures_on_first_use(
-        self, monkeypatch: pytest.MonkeyPatch
-    ):
+    def test_connection_configures_on_first_use(self, monkeypatch: pytest.MonkeyPatch):
         """`connection()` configures lazily and returns the connection."""
         conn = FakeConnection()
         monkeypatch.setattr(auth_mod, "import_openeo", lambda: FakeOpeneoModule(conn))

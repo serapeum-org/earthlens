@@ -122,9 +122,7 @@ class TestLoaderFromDisk:
     def test_single_file_load(self, tmp_path: Path):
         """A single YAML file is a valid catalog source."""
         path = tmp_path / "cat.yaml"
-        path.write_text(
-            "collections:\n  k:\n    collection_id: K\n", encoding="utf-8"
-        )
+        path.write_text("collections:\n  k:\n    collection_id: K\n", encoding="utf-8")
         collections, recipes, _, _ = _load_catalog_data(path)
         assert collections["k"].collection_id == "K" and recipes == {}
 
@@ -152,7 +150,9 @@ class TestLoaderFromDisk:
 
     def test_empty_catalog_errors(self, tmp_path: Path):
         """A catalog with no collections or recipes is rejected."""
-        (tmp_path / "a.yaml").write_text("available_collections: [X]\n", encoding="utf-8")
+        (tmp_path / "a.yaml").write_text(
+            "available_collections: [X]\n", encoding="utf-8"
+        )
         with pytest.raises(ValueError, match="no 'collections:' or 'recipes:'"):
             _load_catalog_data(tmp_path)
 
