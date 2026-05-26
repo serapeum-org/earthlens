@@ -51,6 +51,8 @@ from earthlens.cmems.auth import (
 )
 
 if TYPE_CHECKING:
+    from pyramids.netcdf import NetCDF
+
     from earthlens.aggregate import AggregationConfig
 
 
@@ -432,6 +434,13 @@ class CMEMS(AbstractDataSource):
                 f"(dims={dims})."
             )
 
+        # Compute the window labels from the freshly-read container, before any
+        # depth `sel`/`reduce` — depth handling leaves the `time` axis unchanged
+        # but may not preserve its CF `units`/`calendar` attributes, and the
+        # label count still matches the (unchanged) time dimension afterwards.
+        labels = self._window_labels(nc, config.freq)
+        windows = list(dict.fromkeys(labels))
+
         depth_collapsed = False
         if "depth" in dims:
             if config.level is not None:
@@ -440,8 +449,6 @@ class CMEMS(AbstractDataSource):
                 nc = nc.reduce("depth", how="mean", skipna=config.skipna)
                 depth_collapsed = True
 
-        labels = self._window_labels(nc, config.freq)
-        windows = list(dict.fromkeys(labels))
         reduced = nc.reduce(
             "time", how=how, groupby=labels, skipna=config.skipna
         )
@@ -483,6 +490,11 @@ class CMEMS(AbstractDataSource):
         `freq` bucket. Timesteps in the same window share a label, so
         :meth:`pyramids.netcdf.NetCDF.reduce` coarsens `time` to one
         slice per distinct window.
+
+        Assumes a standard / proleptic-Gregorian calendar (what CMEMS
+        ocean products use); the decoded timestamps are parsed with
+        `pandas.to_datetime`, which does not handle exotic CF calendars
+        (`360_day`, `noleap`).
 
         Args:
             nc: The NetCDF whose time axis to bucket.

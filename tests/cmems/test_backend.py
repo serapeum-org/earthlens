@@ -427,6 +427,13 @@ class TestCMEMSDownload:
             {"dim": "time", "how": "mean", "groupby_distinct": 2},
         ], f"unexpected reduce calls: {_FAKE_REDUCE_CALLS}"
 
+    @pytest.mark.parametrize("bad_time_stamp", [None, []])
+    def test_window_labels_raises_when_time_axis_undecodable(self, bad_time_stamp):
+        """`_window_labels` raises a clear ValueError when `time_stamp` is empty/None."""
+        nc = types.SimpleNamespace(time_stamp=bad_time_stamp)
+        with pytest.raises(ValueError, match="time"):
+            CMEMS._window_labels(nc, "1MS")
+
     def test_download_disable_progress_forwards(
         self, fake_cmems: _FakeCmems, cmems_instance: CMEMS, tmp_path: Path
     ):
