@@ -137,7 +137,7 @@ class EarthLens:
             >>> sorted(EarthLens.DataSources)  # doctest: +NORMALIZE_WHITESPACE
             ['amazon-s3', 'cdse', 'chc', 'chirps', 'cmems', 'earth-search',
              'earthdata', 'ecmwf', 'fdsn', 'gdacs', 'gee', 'google-earth-engine',
-             'openaq', 'planetary-computer', 'stac', 'tropycal']
+             'nwp', 'openaq', 'planetary-computer', 'stac', 'tropycal']
 
             ```
         - Asking for an unknown backend raises `ValueError`:
@@ -174,6 +174,10 @@ class EarthLens:
         :class:`earthlens.tropycal.TropicalCyclone`: tropical-cyclone
             best tracks via `tropycal` (`vector` output); key
             `"tropycal"`.
+        :class:`earthlens.nwp.NWP`: open numerical-weather-prediction
+            forecasts (NOAA NODD / ECMWF Open Data / DWD) on a forecast
+            `(cycle, step)` axis, returned as bbox-cropped COGs; key
+            `"nwp"`.
     """
 
     DataSources = _LazyRegistry(
@@ -195,6 +199,9 @@ class EarthLens:
             "gdacs": ("earthlens.gdacs", "GDACS", "", {}),
             "openaq": ("earthlens.openaq", "OpenAQ", "openaq", {}),
             "tropycal": ("earthlens.tropycal", "TropicalCyclone", "tropycal", {}),
+            # Open NWP forecasts (NOAA NODD / ECMWF Open Data / DWD); the
+            # [nwp] extra pulls herbie-data + ecmwf-opendata.
+            "nwp": ("earthlens.nwp", "NWP", "nwp", {}),
             # One unified STAC backend over several endpoints. The bare
             # `"stac"` key leaves the endpoint to be inferred from the
             # requested collection; the three endpoint aliases pre-bind
