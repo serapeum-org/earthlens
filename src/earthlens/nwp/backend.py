@@ -78,7 +78,6 @@ class NWP(AbstractDataSource):
         path: Path | str = "",
         fmt: str = "%Y-%m-%d",
         *,
-        centre: str | None = None,
         mirror: str = "auto",
         steps: list[int] | None = None,
         horizon: int | None = None,
@@ -103,8 +102,6 @@ class NWP(AbstractDataSource):
                 `"6hourly"`.
             path: Output directory. Created by the parent class.
             fmt: `strptime` format for `start` / `end`.
-            centre: Optional explicit centre override (reserved; the
-                catalog `backend:` normally selects the centre).
             mirror: Cloud-mirror key (`"auto"` lets the centre choose).
             steps: Explicit forecast lead times in hours. Defaults to
                 `[0]` (the analysis step) when neither `steps` nor
@@ -123,7 +120,6 @@ class NWP(AbstractDataSource):
                 "NWP requires a non-empty `variables` mapping of "
                 "{model_key: [param, ...]}."
             )
-        self._centre = centre
         self._mirror = mirror
         self._steps_arg = steps
         self._horizon_arg = horizon
