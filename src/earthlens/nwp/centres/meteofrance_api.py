@@ -146,6 +146,11 @@ class MeteoFranceAPICentre(_NWPCentre):
             list[tuple[str, str]]: Query items (repeated `subset` keys are
                 a list of pairs, not a dict, so both axes are sent).
         """
+        # A pressure-level band uses the "COVERAGE@level" convention (level in
+        # hPa); it selects an isobaric coverage + a WCS pressure subset (Pa).
+        level_hpa: str | None = None
+        if "@" in coverage_base:
+            coverage_base, level_hpa = coverage_base.split("@", 1)
         coverage_id = f"{coverage_base}___{cycle:%Y-%m-%dT%H.%M.%SZ}"
         query: list[tuple[str, str]] = [
             ("service", "WCS"),
@@ -154,6 +159,8 @@ class MeteoFranceAPICentre(_NWPCentre):
             ("format", "application/wmo-grib"),
             ("subset", f"time({valid:%Y-%m-%dT%H:%M:%SZ})"),
         ]
+        if level_hpa is not None:
+            query.append(("subset", f"pressure({int(level_hpa) * 100})"))
         if self.bbox is not None:
             west, south, east, north = self.bbox
             query.append(("subset", f"lat({south},{north})"))

@@ -68,11 +68,6 @@ class DWDCentre(_NWPCentre):
                 partial file is removed first, so no truncated `.grib2`
                 is left for a later `open_grib` to misread.
         """
-        if not model.url_template:
-            raise ValueError(
-                f"model with backend {model.backend!r} has no url_template; "
-                "a direct-HTTPS centre needs one."
-            )
         import requests
 
         out = self.save_dir / grib_name(model.model_family, cycle, step)
@@ -83,14 +78,7 @@ class DWDCentre(_NWPCentre):
         try:
             with open(tmp, "wb") as handle:
                 for param in params:
-                    var = model.bands[param]
-                    url = model.url_template.format(
-                        cycle=cycle,
-                        date=cycle,
-                        step=step,
-                        var=var,
-                        var_lc=var.lower(),
-                    )
+                    url = self._band_url(model, param, cycle, step)
                     response = requests.get(url, timeout=_HTTP_TIMEOUT)
                     response.raise_for_status()
                     handle.write(bz2.decompress(response.content))
@@ -99,3 +87,48 @@ class DWDCentre(_NWPCentre):
             tmp.unlink(missing_ok=True)
             raise
         return out
+
+    @staticmethod
+    def _band_url(model: NWPModel, param: str, cycle: dt.datetime, step: int) -> str:
+        """Build the DWD URL for one band — single-level or pressure-level.
+
+        A surface band token is a bare DWD variable (`"T_2M"`) and uses the
+        model's `url_template`. A pressure-level token uses the
+        `VAR@level` convention (`"T@850"`) and the `pl_url_template` in
+        `request_options`, which additionally takes a `{level}` field.
+
+        Args:
+            model: The resolved catalog row.
+            param: The requested earthlens parameter name.
+            cycle: The forecast cycle datetime (UTC).
+            step: The forecast lead time in hours.
+
+        Returns:
+            str: The fully-formatted `.grib2.bz2` URL.
+
+        Raises:
+            ValueError: When a pressure-level band is requested but the
+                row has no `pl_url_template`, or the row has no
+                single-level `url_template` for a surface band.
+        """
+        token = model.bands[param]
+        if "@" in token:
+            var, level = token.split("@", 1)
+            template = model.request_options.get("pl_url_template")
+            if not template:
+                raise ValueError(
+                    f"model {model.model_family!r} has no 'pl_url_template' in "
+                    f"request_options for pressure-level band {param!r}."
+                )
+            return template.format(
+                cycle=cycle, date=cycle, step=step, level=level,
+                var=var, var_lc=var.lower(),
+            )
+        if not model.url_template:
+            raise ValueError(
+                f"model with backend {model.backend!r} has no url_template; "
+                "a direct-HTTPS centre needs one."
+            )
+        return model.url_template.format(
+            cycle=cycle, date=cycle, step=step, var=token, var_lc=token.lower()
+        )

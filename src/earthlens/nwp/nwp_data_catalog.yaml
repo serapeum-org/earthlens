@@ -189,6 +189,8 @@ datasets:
     backend: direct-https
     mirrors: [origin]
     url_template: "https://opendata.dwd.de/weather/nwp/icon/grib/{cycle:%H}/{var_lc}/icon_global_icosahedral_single-level_{date:%Y%m%d%H}_{step:03d}_{var}.grib2.bz2"
+    request_options:
+      pl_url_template: "https://opendata.dwd.de/weather/nwp/icon/grib/{cycle:%H}/{var_lc}/icon_global_icosahedral_pressure-level_{date:%Y%m%d%H}_{step:03d}_{level}_{var}.grib2.bz2"
     bands:
       temperature_2m: T_2M
       precipitation_acc: TOT_PREC
@@ -201,6 +203,21 @@ datasets:
       surface_pressure: PS
       total_cloud_cover: CLCT
       cape: CAPE_ML
+      # Pressure-level (3-D) via the pl_url_template — "VAR@level" (FI = geopotential).
+      geopotential_height_850hPa: "FI@850"
+      geopotential_height_500hPa: "FI@500"
+      geopotential_height_250hPa: "FI@250"
+      temperature_850hPa: "T@850"
+      temperature_500hPa: "T@500"
+      temperature_250hPa: "T@250"
+      wind_u_850hPa: "U@850"
+      wind_u_500hPa: "U@500"
+      wind_u_250hPa: "U@250"
+      wind_v_850hPa: "V@850"
+      wind_v_500hPa: "V@500"
+      wind_v_250hPa: "V@250"
+      relative_humidity_850hPa: "RELHUM@850"
+      relative_humidity_500hPa: "RELHUM@500"
 
   # ---------------------------------------------------------------------------
   # Expanded coverage (beyond the 5 MVP models). These rows are
@@ -501,6 +518,8 @@ datasets:
     backend: direct-https
     mirrors: [origin]
     url_template: "https://opendata.dwd.de/weather/nwp/icon-eu/grib/{cycle:%H}/{var_lc}/icon-eu_europe_regular-lat-lon_single-level_{date:%Y%m%d%H}_{step:03d}_{var}.grib2.bz2"
+    request_options:
+      pl_url_template: "https://opendata.dwd.de/weather/nwp/icon-eu/grib/{cycle:%H}/{var_lc}/icon-eu_europe_regular-lat-lon_pressure-level_{date:%Y%m%d%H}_{step:03d}_{level}_{var}.grib2.bz2"
     bands:
       temperature_2m: T_2M
       precipitation_acc: TOT_PREC
@@ -513,6 +532,21 @@ datasets:
       surface_pressure: PS
       total_cloud_cover: CLCT
       cape: CAPE_ML
+      # Pressure-level (3-D) via the pl_url_template — "VAR@level" (FI = geopotential).
+      geopotential_height_850hPa: "FI@850"
+      geopotential_height_500hPa: "FI@500"
+      geopotential_height_250hPa: "FI@250"
+      temperature_850hPa: "T@850"
+      temperature_500hPa: "T@500"
+      temperature_250hPa: "T@250"
+      wind_u_850hPa: "U@850"
+      wind_u_500hPa: "U@500"
+      wind_u_250hPa: "U@250"
+      wind_v_850hPa: "V@850"
+      wind_v_500hPa: "V@500"
+      wind_v_250hPa: "V@250"
+      relative_humidity_850hPa: "RELHUM@850"
+      relative_humidity_500hPa: "RELHUM@500"
 
   icon-d2:                                # DWD, ICON-D2 native icosahedral (raw fetch; not croppable), direct HTTPS
     provider: dwd-opendata
@@ -529,6 +563,8 @@ datasets:
     # ICON-D2 single-level files are icosahedral (like icon-global) and use a
     # lowercase var token in the filename — raw download works; crop does not.
     url_template: "https://opendata.dwd.de/weather/nwp/icon-d2/grib/{cycle:%H}/{var_lc}/icon-d2_germany_icosahedral_single-level_{date:%Y%m%d%H}_{step:03d}_2d_{var_lc}.grib2.bz2"
+    request_options:
+      pl_url_template: "https://opendata.dwd.de/weather/nwp/icon-d2/grib/{cycle:%H}/{var_lc}/icon-d2_germany_icosahedral_pressure-level_{date:%Y%m%d%H}_{step:03d}_{level}_{var_lc}.grib2.bz2"
     bands:
       temperature_2m: t_2m
       precipitation_acc: tot_prec
@@ -541,6 +577,21 @@ datasets:
       surface_pressure: ps
       total_cloud_cover: clct
       cape: cape_ml
+      # Pressure-level (3-D) via the pl_url_template — "var@level" (fi = geopotential).
+      geopotential_height_850hPa: "fi@850"
+      geopotential_height_500hPa: "fi@500"
+      geopotential_height_250hPa: "fi@250"
+      temperature_850hPa: "t@850"
+      temperature_500hPa: "t@500"
+      temperature_250hPa: "t@250"
+      wind_u_850hPa: "u@850"
+      wind_u_500hPa: "u@500"
+      wind_u_250hPa: "u@250"
+      wind_v_850hPa: "v@850"
+      wind_v_500hPa: "v@500"
+      wind_v_250hPa: "v@250"
+      relative_humidity_850hPa: "relhum@850"
+      relative_humidity_500hPa: "relhum@500"
 
   ens:                                    # ECMWF Open Data, IFS ENS control forecast
     provider: ecmwf-opendata
@@ -782,6 +833,21 @@ datasets:
       surface_pressure: PRESSURE__GROUND_OR_WATER_SURFACE
       total_cloud_cover: TOTAL_CLOUD_COVER__GROUND_OR_WATER_SURFACE
       cape: CONVECTIVE_AVAILABLE_POTENTIAL_ENERGY__GROUND_OR_WATER_SURFACE
+      # Pressure-level (3-D) — "COVERAGE@levelhPa" -> isobaric coverage + WCS pressure subset.
+      geopotential_height_850hPa: "GEOPOTENTIAL__ISOBARIC_SURFACE@850"
+      geopotential_height_500hPa: "GEOPOTENTIAL__ISOBARIC_SURFACE@500"
+      geopotential_height_250hPa: "GEOPOTENTIAL__ISOBARIC_SURFACE@250"
+      temperature_850hPa: "TEMPERATURE__ISOBARIC_SURFACE@850"
+      temperature_500hPa: "TEMPERATURE__ISOBARIC_SURFACE@500"
+      temperature_250hPa: "TEMPERATURE__ISOBARIC_SURFACE@250"
+      wind_u_850hPa: "U_COMPONENT_OF_WIND__ISOBARIC_SURFACE@850"
+      wind_u_500hPa: "U_COMPONENT_OF_WIND__ISOBARIC_SURFACE@500"
+      wind_u_250hPa: "U_COMPONENT_OF_WIND__ISOBARIC_SURFACE@250"
+      wind_v_850hPa: "V_COMPONENT_OF_WIND__ISOBARIC_SURFACE@850"
+      wind_v_500hPa: "V_COMPONENT_OF_WIND__ISOBARIC_SURFACE@500"
+      wind_v_250hPa: "V_COMPONENT_OF_WIND__ISOBARIC_SURFACE@250"
+      relative_humidity_850hPa: "RELATIVE_HUMIDITY__ISOBARIC_SURFACE@850"
+      relative_humidity_500hPa: "RELATIVE_HUMIDITY__ISOBARIC_SURFACE@500"
 
   arome-france:                           # Météo-France AROME high-res France 0.025°, WCS API
     provider: meteofrance
@@ -808,3 +874,18 @@ datasets:
       surface_pressure: PRESSURE__GROUND_OR_WATER_SURFACE
       total_cloud_cover: TOTAL_CLOUD_COVER__GROUND_OR_WATER_SURFACE
       cape: CONVECTIVE_AVAILABLE_POTENTIAL_ENERGY__GROUND_OR_WATER_SURFACE
+      # Pressure-level (3-D) — "COVERAGE@levelhPa" -> isobaric coverage + WCS pressure subset.
+      geopotential_height_850hPa: "GEOPOTENTIAL__ISOBARIC_SURFACE@850"
+      geopotential_height_500hPa: "GEOPOTENTIAL__ISOBARIC_SURFACE@500"
+      geopotential_height_250hPa: "GEOPOTENTIAL__ISOBARIC_SURFACE@250"
+      temperature_850hPa: "TEMPERATURE__ISOBARIC_SURFACE@850"
+      temperature_500hPa: "TEMPERATURE__ISOBARIC_SURFACE@500"
+      temperature_250hPa: "TEMPERATURE__ISOBARIC_SURFACE@250"
+      wind_u_850hPa: "U_COMPONENT_OF_WIND__ISOBARIC_SURFACE@850"
+      wind_u_500hPa: "U_COMPONENT_OF_WIND__ISOBARIC_SURFACE@500"
+      wind_u_250hPa: "U_COMPONENT_OF_WIND__ISOBARIC_SURFACE@250"
+      wind_v_850hPa: "V_COMPONENT_OF_WIND__ISOBARIC_SURFACE@850"
+      wind_v_500hPa: "V_COMPONENT_OF_WIND__ISOBARIC_SURFACE@500"
+      wind_v_250hPa: "V_COMPONENT_OF_WIND__ISOBARIC_SURFACE@250"
+      relative_humidity_850hPa: "RELATIVE_HUMIDITY__ISOBARIC_SURFACE@850"
+      relative_humidity_500hPa: "RELATIVE_HUMIDITY__ISOBARIC_SURFACE@500"

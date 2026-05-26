@@ -316,6 +316,23 @@ class TestDWDCentre:
                 model, dt.datetime(2024, 6, 1, 0), 0, ["temperature_2m"], "auto"
             )
 
+    def test_band_url_pressure_level_uses_pl_template(self, tmp_path):
+        """A VAR@level band builds the pressure-level URL with the level filled in."""
+        model = self._icon(
+            request_options={
+                "pl_url_template": "https://x/{var_lc}/pl_{date:%Y%m%d%H}_{step:03d}_{level}_{var}.bz2"
+            },
+            bands={"temperature_850hPa": "T@850"},
+        )
+        url = DWDCentre._band_url(model, "temperature_850hPa", dt.datetime(2024, 6, 1, 0), 3)
+        assert url == "https://x/t/pl_2024060100_003_850_T.bz2"
+
+    def test_band_url_pressure_level_without_pl_template_raises(self, tmp_path):
+        """A pressure-level band with no pl_url_template is rejected."""
+        model = self._icon(request_options={}, bands={"temperature_850hPa": "T@850"})
+        with pytest.raises(ValueError, match="pl_url_template"):
+            DWDCentre._band_url(model, "temperature_850hPa", dt.datetime(2024, 6, 1, 0), 0)
+
     def test_fetch_one_failure_leaves_no_partial_file(self, tmp_path, monkeypatch):
         """A failure on a later variable leaves no truncated .grib2 (L1)."""
         import sys
@@ -516,6 +533,20 @@ class TestMeteoFranceAPICentre:
         assert ("subset", "long(-5.0,10.0)") in qs
         assert out.name == "arpege_2024060100_f024.grib2"
         assert out.read_bytes() == b"GRIB-TEMPERATUREGRIB-TOTAL_PRECIPITATION"
+
+    def test_coverage_query_pressure_level(self, tmp_path):
+        """A COVERAGE@level band adds an isobaric pressure subset (hPa -> Pa)."""
+        import datetime as dt2
+
+        centre = MeteoFranceAPICentre(tmp_path)
+        centre.bbox = (-5.0, 41.0, 10.0, 51.0)
+        query = centre._coverage_query(
+            "TEMPERATURE__ISOBARIC_SURFACE@850",
+            dt2.datetime(2024, 6, 1, 0),
+            dt2.datetime(2024, 6, 1, 12),
+        )
+        assert ("coverageid", "TEMPERATURE__ISOBARIC_SURFACE___2024-06-01T00.00.00Z") in query
+        assert ("subset", "pressure(85000)") in query
 
     def test_fetch_one_without_options_raises(self, monkeypatch, tmp_path):
         """A row lacking api_base / coverage_service is rejected."""
