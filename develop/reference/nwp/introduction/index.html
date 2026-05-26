@@ -5494,15 +5494,20 @@ bbox-cropped Cloud-Optimized GeoTIFFs. It is one subpackage with sibling
 <td>Herbie (MSC datamart)</td>
 <td>free</td>
 </tr>
+<tr>
+<td><strong>Météo-France</strong></td>
+<td>ARPEGE (world), AROME (France)</td>
+<td>WCS API (<code>portail-api.meteofrance.fr</code>, API key)</td>
+<td>free w/ key</td>
+</tr>
 </tbody>
 </table>
-<p><strong>20 models</strong>, each exposing 2 m temperature / dewpoint, 10 m wind (u/v),
+<p><strong>22 models</strong>, each exposing 2 m temperature / dewpoint, 10 m wind (u/v),
 surface precipitation, and MSL pressure. The 5 MVP models (GFS / GEFS / HRRR /
 IFS-HRES / ICON-global) are live-validated end to end; the rest are
 metadata-curated (vet with <code>tools/nwp/probe_nwp_model.py</code>) — see
-<a href="../catalog/">Catalog &amp; install</a>. <strong>Météo-France</strong> needs its authenticated API
-portal (the open <code>s3://mf-nwp-models</code> bucket is static-only); <strong>NWM / MRMS /
-CFS / HAFS</strong> are follow-ons.</p>
+<a href="../catalog/">Catalog &amp; install</a>. Météo-France needs an API key
+(<code>METEO_FRANCE_API_KEY</code>); <strong>NWM / MRMS / CFS / HAFS</strong> are follow-ons.</p>
 <h2 id="a-forecast-time-axis-not-an-observation-one"><a class="toclink" href="#a-forecast-time-axis-not-an-observation-one">A forecast time axis, not an observation one</a><a class="headerlink" href="#a-forecast-time-axis-not-an-observation-one" title="Permanent link">#</a></h2>
 <p>Every other earthlens backend is indexed by a single <strong>valid time</strong>
 (when an observation was taken). NWP is different: each datum is indexed

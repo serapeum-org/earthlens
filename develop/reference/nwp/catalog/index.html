@@ -5675,15 +5675,38 @@ doesn't carry).</p>
 <td>48 h</td>
 <td>ensemble mean (<code>domain=conus</code>)</td>
 </tr>
+<tr>
+<td><code>arpege-world</code></td>
+<td>Météo-France</td>
+<td><code>meteofrance-api</code></td>
+<td>00/06/12/18</td>
+<td>102 h</td>
+<td>0.25° global · WCS API (key)³</td>
+</tr>
+<tr>
+<td><code>arome-france</code></td>
+<td>Météo-France</td>
+<td><code>meteofrance-api</code></td>
+<td>every 3 h</td>
+<td>51 h</td>
+<td>0.025° France · WCS API (key)³</td>
+</tr>
 </tbody>
 </table>
+<p>³ <strong>Météo-France WCS API.</strong> Served from the authenticated portal
+(<code>portail-api.meteofrance.fr</code>), not the static-only <code>mf-nwp-models</code> S3 bucket.
+Set an application API key in <code>METEO_FRANCE_API_KEY</code> (or <code>MF_API_KEY</code>); the
+centre issues OGC WCS 2.0.1 <code>GetCoverage</code> requests with server-side bbox
+subsetting. The coverage-id strings are best-effort (not live-validated against
+a key) and live in the catalog <code>request_options</code>/<code>bands</code>, so a fix is a catalog
+edit — confirm with <code>probe_nwp_model.py arpege-world</code>.</p>
 <p>² <strong>Analyses</strong> (<code>rtma</code>/<code>urma</code>) have <code>horizon_h=0</code> — they are valid <em>at</em> the cycle
 time, so only the analysis step (<code>f000</code>) is fetched.</p>
-<p>Not shipped: <strong>Météo-France</strong> (the <code>direct-boto3</code> centre exists, but
-<code>s3://mf-nwp-models</code> exposes only <code>static/</code> — the rolling forecasts need MF's
-authenticated API portal, a separate auth+REST effort); <strong>CFS</strong> (seasonal — a
-different time axis than <code>(cycle, step)</code>); <strong>HAFS</strong> (hurricane model — needs a
-storm id, not a generic <code>(cycle, step)</code> raster).</p>
+<p>Not shipped: <strong>CFS</strong> (seasonal — a different time axis than <code>(cycle, step)</code>) and
+<strong>HAFS</strong> (hurricane model — needs a storm id, not a generic <code>(cycle, step)</code>
+raster). The unsigned <code>direct-boto3</code> Météo-France centre also exists for any
+future static/unsigned MF mirror, but the live forecasts use <code>meteofrance-api</code>
+above.</p>
 <p>¹ <strong>HRRR per-cycle horizon.</strong> The <code>horizon_h</code> is the <em>maximum</em>: HRRR runs to
 48 h only at the 00/06/12/18 synoptic cycles; the other (hourly) cycles run to
 18 h. The catalog stores a single <code>horizon_h</code>, so a long-lead request on an
