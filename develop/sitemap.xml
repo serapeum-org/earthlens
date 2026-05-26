@@ -245,6 +245,26 @@
          <lastmod>2026-05-26</lastmod>
     </url>
     <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/examples/hdx/arbitrary_hdx_id/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/examples/hdx/catalog_explorer/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/examples/hdx/cod_admin_boundaries/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/examples/hdx/hotosm_building_export/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/examples/hdx/wfp_food_security_table/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
          <loc>https://serapeum-org.github.io/earthlens/develop/examples/openaq/multistation_comparison/</loc>
          <lastmod>2026-05-26</lastmod>
     </url>
@@ -490,6 +510,22 @@
     </url>
     <url>
          <loc>https://serapeum-org.github.io/earthlens/develop/reference/gee/usage/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/hdx/catalog/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/hdx/hdx/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/hdx/introduction/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/hdx/usage/</loc>
          <lastmod>2026-05-26</lastmod>
     </url>
     <url>
