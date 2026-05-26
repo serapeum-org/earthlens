@@ -57,6 +57,40 @@ def _import_client() -> Any:
     return Client
 
 
+def _group_params(tokens: list[str]) -> list[tuple[str | None, list[str]]]:
+    """Group band tokens into ecmwf-opendata retrieve groups by level.
+
+    A surface token is a bare param (`"2t"`); a pressure-level token uses
+    the `param@level` convention (`"t@850"`). ecmwf-opendata cannot mix
+    surface + pressure-level params (nor different pressure levels) in one
+    retrieve, so the tokens are split into: one surface group (level
+    `None`) plus one group per distinct pressure level.
+
+    Args:
+        tokens: The resolved band selector tokens for the request.
+
+    Returns:
+        list[tuple[str | None, list[str]]]: `(level, params)` groups —
+            `level=None` for the surface group, a level string (e.g.
+            `"850"`) for each pressure-level group. Surface group first,
+            then pressure levels ascending.
+    """
+    surface: list[str] = []
+    pressure: dict[str, list[str]] = {}
+    for token in tokens:
+        if "@" in token:
+            param, level = token.split("@", 1)
+            pressure.setdefault(level, []).append(param)
+        else:
+            surface.append(token)
+    groups: list[tuple[str | None, list[str]]] = []
+    if surface:
+        groups.append((None, surface))
+    for level in sorted(pressure, key=int):
+        groups.append((level, pressure[level]))
+    return groups
+
+
 def _source_for(mirror: str, model: NWPModel) -> str:
     """Resolve the `ecmwf-opendata` `source` from the `mirror=` kwarg (`G5`).
 
@@ -110,15 +144,32 @@ class ECMWFCentre(_NWPCentre):
             model=opts.get("ecmwf_model", "ifs"),
         )
         target = self.save_dir / grib_name(model.model_family or "ifs", cycle, step)
-        request: dict[str, Any] = {
+        base: dict[str, Any] = {
             "date": cycle.strftime("%Y-%m-%d"),
             "time": cycle.hour,
             "step": step,
             "type": opts.get("type", "fc"),
-            "param": [model.bands[p] for p in params],
-            "target": str(target),
         }
         if opts.get("stream"):
-            request["stream"] = opts["stream"]
-        client.retrieve(**request)
+            base["stream"] = opts["stream"]
+        # ecmwf-opendata needs one retrieve per level type / level (a single
+        # request can't mix sfc + pl, nor different pressure levels), so group
+        # the band tokens and concatenate the per-group GRIBs into one file.
+        groups = _group_params([model.bands[p] for p in params])
+        tmp = target.with_name(target.name + ".part")
+        try:
+            with open(tmp, "wb") as handle:
+                for index, (level, tokens) in enumerate(groups):
+                    part = self.save_dir / f"{target.name}.g{index}"
+                    request = {**base, "param": tokens, "target": str(part)}
+                    if level is not None:
+                        request["levtype"] = "pl"
+                        request["levelist"] = level
+                    client.retrieve(**request)
+                    handle.write(Path(part).read_bytes())
+                    part.unlink(missing_ok=True)
+            tmp.replace(target)
+        except BaseException:
+            tmp.unlink(missing_ok=True)
+            raise
         return target

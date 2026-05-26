@@ -12,7 +12,7 @@ from earthlens.nwp.catalog import NWPModel
 from earthlens.nwp.centres import resolve_centre
 from earthlens.nwp.centres.base import CENTRE_REGISTRY, _NWPCentre
 from earthlens.nwp.centres.dwd import DWDCentre
-from earthlens.nwp.centres.ecmwf import ECMWFCentre, _source_for
+from earthlens.nwp.centres.ecmwf import ECMWFCentre, _group_params, _source_for
 from earthlens.nwp.centres.meteofrance import MeteoFranceCentre
 from earthlens.nwp.centres.meteofrance_api import MeteoFranceAPICentre, resolve_api_key
 from earthlens.nwp.centres.noaa import NOAACentre, _import_herbie, _priority
@@ -157,6 +157,58 @@ class TestECMWFCentre:
             mirrors=["aws", "azure", "ecmwf"],
             bands={"temperature_2m": "2t", "precipitation_acc": "tp"},
         )
+
+    def test_group_params_splits_surface_and_pressure(self):
+        """_group_params yields the surface group first, then levels ascending."""
+        groups = _group_params(["2t", "tp", "t@850", "u@850", "gh@500"])
+        assert groups == [(None, ["2t", "tp"]), ("500", ["gh"]), ("850", ["t", "u"])]
+
+    def test_group_params_pressure_only(self):
+        """With no surface tokens, only pressure-level groups are returned."""
+        assert _group_params(["t@850", "u@850"]) == [("850", ["t", "u"])]
+
+    def test_fetch_one_failure_leaves_no_partial_file(self, monkeypatch, tmp_path):
+        """A retrieve failure unlinks the partial output and re-raises."""
+        import sys
+        import types
+
+        class _Client:
+            def __init__(self, *a, **k):
+                pass
+
+            def retrieve(self, **kwargs):
+                raise RuntimeError("retrieve failed")
+
+        pkg = types.ModuleType("ecmwf")
+        sub = types.ModuleType("ecmwf.opendata")
+        sub.Client = _Client
+        pkg.opendata = sub
+        monkeypatch.setitem(sys.modules, "ecmwf", pkg)
+        monkeypatch.setitem(sys.modules, "ecmwf.opendata", sub)
+        with pytest.raises(RuntimeError, match="retrieve failed"):
+            ECMWFCentre(tmp_path).fetch_one(
+                self._ifs(), dt.datetime(2024, 6, 1, 0), 0, ["temperature_2m"], "aws"
+            )
+        assert list(tmp_path.iterdir()) == [], "no partial file should remain"
+
+    def test_fetch_one_pressure_level_groups_into_retrieves(self, fake_ecmwf_client, tmp_path):
+        """A surface+pressure request issues one retrieve per level type/level."""
+        model = NWPModel(
+            provider="ecmwf-opendata", model_family="ifs", cycles_utc=[0], horizon_h=240,
+            backend="ecmwf-opendata", mirrors=["aws"],
+            bands={"temperature_2m": "2t", "temperature_850hPa": "t@850", "geopotential_height_500hPa": "gh@500"},
+        )
+        out = ECMWFCentre(tmp_path).fetch_one(
+            model, dt.datetime(2024, 6, 1, 0), 0,
+            ["temperature_2m", "temperature_850hPa", "geopotential_height_500hPa"], "aws",
+        )
+        calls = fake_ecmwf_client.instances[-1].retrieve_calls
+        assert len(calls) == 3
+        surface = [c for c in calls if "levtype" not in c]
+        pressure = [c for c in calls if c.get("levtype") == "pl"]
+        assert surface[0]["param"] == ["2t"]
+        assert {c["levelist"] for c in pressure} == {"500", "850"}
+        assert out.exists() and out.name == "ifs_2024060100_f000.grib2"
 
     def test_source_auto_picks_first_known_mirror(self):
         """mirror='auto' selects the first catalog mirror with a known source."""

@@ -35,6 +35,21 @@ datasets:
       total_cloud_cover: ":TCDC:entire atmosphere:"
       cape: ":CAPE:surface:"
       downward_shortwave_radiation: ":DSWRF:surface:"
+      # Pressure-level (3-D) fields — the level is encoded in the .idx regex.
+      geopotential_height_850hPa: ":HGT:850 mb:"
+      geopotential_height_500hPa: ":HGT:500 mb:"
+      geopotential_height_250hPa: ":HGT:250 mb:"
+      temperature_850hPa: ":TMP:850 mb:"
+      temperature_500hPa: ":TMP:500 mb:"
+      temperature_250hPa: ":TMP:250 mb:"
+      wind_u_850hPa: ":UGRD:850 mb:"
+      wind_u_500hPa: ":UGRD:500 mb:"
+      wind_u_250hPa: ":UGRD:250 mb:"
+      wind_v_850hPa: ":VGRD:850 mb:"
+      wind_v_500hPa: ":VGRD:500 mb:"
+      wind_v_250hPa: ":VGRD:250 mb:"
+      relative_humidity_850hPa: ":RH:850 mb:"
+      relative_humidity_500hPa: ":RH:500 mb:"
 
   gefs:                                   # NOAA NODD ensemble, via Herbie
     provider: noaa-nodd
@@ -62,6 +77,21 @@ datasets:
       total_cloud_cover: ":TCDC:entire atmosphere:"
       cape: ":CAPE:surface:"
       downward_shortwave_radiation: ":DSWRF:surface:"
+      # Pressure-level (3-D) fields — the level is encoded in the .idx regex.
+      geopotential_height_850hPa: ":HGT:850 mb:"
+      geopotential_height_500hPa: ":HGT:500 mb:"
+      geopotential_height_250hPa: ":HGT:250 mb:"
+      temperature_850hPa: ":TMP:850 mb:"
+      temperature_500hPa: ":TMP:500 mb:"
+      temperature_250hPa: ":TMP:250 mb:"
+      wind_u_850hPa: ":UGRD:850 mb:"
+      wind_u_500hPa: ":UGRD:500 mb:"
+      wind_u_250hPa: ":UGRD:250 mb:"
+      wind_v_850hPa: ":VGRD:850 mb:"
+      wind_v_500hPa: ":VGRD:500 mb:"
+      wind_v_250hPa: ":VGRD:250 mb:"
+      relative_humidity_850hPa: ":RH:850 mb:"
+      relative_humidity_500hPa: ":RH:500 mb:"
 
   hrrr:                                   # NOAA NODD, hourly cycles, via Herbie
     provider: noaa-nodd
@@ -89,6 +119,21 @@ datasets:
       total_cloud_cover: ":TCDC:entire atmosphere:"
       cape: ":CAPE:surface:"
       downward_shortwave_radiation: ":DSWRF:surface:"
+      # Pressure-level (3-D) fields — the level is encoded in the .idx regex.
+      geopotential_height_850hPa: ":HGT:850 mb:"
+      geopotential_height_500hPa: ":HGT:500 mb:"
+      geopotential_height_250hPa: ":HGT:250 mb:"
+      temperature_850hPa: ":TMP:850 mb:"
+      temperature_500hPa: ":TMP:500 mb:"
+      temperature_250hPa: ":TMP:250 mb:"
+      wind_u_850hPa: ":UGRD:850 mb:"
+      wind_u_500hPa: ":UGRD:500 mb:"
+      wind_u_250hPa: ":UGRD:250 mb:"
+      wind_v_850hPa: ":VGRD:850 mb:"
+      wind_v_500hPa: ":VGRD:500 mb:"
+      wind_v_250hPa: ":VGRD:250 mb:"
+      relative_humidity_850hPa: ":RH:850 mb:"
+      relative_humidity_500hPa: ":RH:500 mb:"
 
   ifs-hres:                               # ECMWF Open Data (IFS HRES)
     provider: ecmwf-opendata
@@ -115,6 +160,21 @@ datasets:
       total_cloud_cover: "tcc"
       cape: "cape"
       downward_shortwave_radiation: "ssrd"
+      # Pressure-level (3-D) fields — "param@level" (levtype=pl, levelist=level).
+      geopotential_height_850hPa: "gh@850"
+      geopotential_height_500hPa: "gh@500"
+      geopotential_height_250hPa: "gh@250"
+      temperature_850hPa: "t@850"
+      temperature_500hPa: "t@500"
+      temperature_250hPa: "t@250"
+      wind_u_850hPa: "u@850"
+      wind_u_500hPa: "u@500"
+      wind_u_250hPa: "u@250"
+      wind_v_850hPa: "v@850"
+      wind_v_500hPa: "v@500"
+      wind_v_250hPa: "v@250"
+      relative_humidity_850hPa: "r@850"
+      relative_humidity_500hPa: "r@500"
 
   icon-global:                            # DWD Open Data, direct HTTPS .bz2 (no .idx)
     provider: dwd-opendata
@@ -174,6 +234,21 @@ datasets:
       total_cloud_cover: ":TCDC:entire atmosphere:"
       cape: ":CAPE:surface:"
       downward_shortwave_radiation: ":DSWRF:surface:"
+      # Pressure-level (3-D) fields — the level is encoded in the .idx regex.
+      geopotential_height_850hPa: ":HGT:850 mb:"
+      geopotential_height_500hPa: ":HGT:500 mb:"
+      geopotential_height_250hPa: ":HGT:250 mb:"
+      temperature_850hPa: ":TMP:850 mb:"
+      temperature_500hPa: ":TMP:500 mb:"
+      temperature_250hPa: ":TMP:250 mb:"
+      wind_u_850hPa: ":UGRD:850 mb:"
+      wind_u_500hPa: ":UGRD:500 mb:"
+      wind_u_250hPa: ":UGRD:250 mb:"
+      wind_v_850hPa: ":VGRD:850 mb:"
+      wind_v_500hPa: ":VGRD:500 mb:"
+      wind_v_250hPa: ":VGRD:250 mb:"
+      relative_humidity_850hPa: ":RH:850 mb:"
+      relative_humidity_500hPa: ":RH:500 mb:"
 
   nam:                                    # NOAA NODD, NAM 12 km CONUS, via Herbie
     provider: noaa-nodd
@@ -199,6 +274,21 @@ datasets:
       total_cloud_cover: ":TCDC:entire atmosphere:"
       cape: ":CAPE:surface:"
       downward_shortwave_radiation: ":DSWRF:surface:"
+      # Pressure-level (3-D) fields — the level is encoded in the .idx regex.
+      geopotential_height_850hPa: ":HGT:850 mb:"
+      geopotential_height_500hPa: ":HGT:500 mb:"
+      geopotential_height_250hPa: ":HGT:250 mb:"
+      temperature_850hPa: ":TMP:850 mb:"
+      temperature_500hPa: ":TMP:500 mb:"
+      temperature_250hPa: ":TMP:250 mb:"
+      wind_u_850hPa: ":UGRD:850 mb:"
+      wind_u_500hPa: ":UGRD:500 mb:"
+      wind_u_250hPa: ":UGRD:250 mb:"
+      wind_v_850hPa: ":VGRD:850 mb:"
+      wind_v_500hPa: ":VGRD:500 mb:"
+      wind_v_250hPa: ":VGRD:250 mb:"
+      relative_humidity_850hPa: ":RH:850 mb:"
+      relative_humidity_500hPa: ":RH:500 mb:"
 
   nbm:                                    # NOAA NODD, National Blend of Models, via Herbie
     provider: noaa-nodd
@@ -224,6 +314,21 @@ datasets:
       total_cloud_cover: ":TCDC:entire atmosphere:"
       cape: ":CAPE:surface:"
       downward_shortwave_radiation: ":DSWRF:surface:"
+      # Pressure-level (3-D) fields — the level is encoded in the .idx regex.
+      geopotential_height_850hPa: ":HGT:850 mb:"
+      geopotential_height_500hPa: ":HGT:500 mb:"
+      geopotential_height_250hPa: ":HGT:250 mb:"
+      temperature_850hPa: ":TMP:850 mb:"
+      temperature_500hPa: ":TMP:500 mb:"
+      temperature_250hPa: ":TMP:250 mb:"
+      wind_u_850hPa: ":UGRD:850 mb:"
+      wind_u_500hPa: ":UGRD:500 mb:"
+      wind_u_250hPa: ":UGRD:250 mb:"
+      wind_v_850hPa: ":VGRD:850 mb:"
+      wind_v_500hPa: ":VGRD:500 mb:"
+      wind_v_250hPa: ":VGRD:250 mb:"
+      relative_humidity_850hPa: ":RH:850 mb:"
+      relative_humidity_500hPa: ":RH:500 mb:"
 
   rrfs:                                   # NOAA NODD, Rapid Refresh Forecast System, via Herbie
     provider: noaa-nodd
@@ -249,6 +354,21 @@ datasets:
       total_cloud_cover: ":TCDC:entire atmosphere:"
       cape: ":CAPE:surface:"
       downward_shortwave_radiation: ":DSWRF:surface:"
+      # Pressure-level (3-D) fields — the level is encoded in the .idx regex.
+      geopotential_height_850hPa: ":HGT:850 mb:"
+      geopotential_height_500hPa: ":HGT:500 mb:"
+      geopotential_height_250hPa: ":HGT:250 mb:"
+      temperature_850hPa: ":TMP:850 mb:"
+      temperature_500hPa: ":TMP:500 mb:"
+      temperature_250hPa: ":TMP:250 mb:"
+      wind_u_850hPa: ":UGRD:850 mb:"
+      wind_u_500hPa: ":UGRD:500 mb:"
+      wind_u_250hPa: ":UGRD:250 mb:"
+      wind_v_850hPa: ":VGRD:850 mb:"
+      wind_v_500hPa: ":VGRD:500 mb:"
+      wind_v_250hPa: ":VGRD:250 mb:"
+      relative_humidity_850hPa: ":RH:850 mb:"
+      relative_humidity_500hPa: ":RH:500 mb:"
 
   gdps:                                   # ECCC, Global Deterministic Prediction System, via Herbie
     provider: eccc-msc
@@ -273,6 +393,21 @@ datasets:
       total_cloud_cover: ":TCDC:entire atmosphere:"
       cape: ":CAPE:surface:"
       downward_shortwave_radiation: ":DSWRF:surface:"
+      # Pressure-level (3-D) fields — the level is encoded in the .idx regex.
+      geopotential_height_850hPa: ":HGT:850 mb:"
+      geopotential_height_500hPa: ":HGT:500 mb:"
+      geopotential_height_250hPa: ":HGT:250 mb:"
+      temperature_850hPa: ":TMP:850 mb:"
+      temperature_500hPa: ":TMP:500 mb:"
+      temperature_250hPa: ":TMP:250 mb:"
+      wind_u_850hPa: ":UGRD:850 mb:"
+      wind_u_500hPa: ":UGRD:500 mb:"
+      wind_u_250hPa: ":UGRD:250 mb:"
+      wind_v_850hPa: ":VGRD:850 mb:"
+      wind_v_500hPa: ":VGRD:500 mb:"
+      wind_v_250hPa: ":VGRD:250 mb:"
+      relative_humidity_850hPa: ":RH:850 mb:"
+      relative_humidity_500hPa: ":RH:500 mb:"
 
   rdps:                                   # ECCC, Regional Deterministic Prediction System, via Herbie
     provider: eccc-msc
@@ -297,6 +432,21 @@ datasets:
       total_cloud_cover: ":TCDC:entire atmosphere:"
       cape: ":CAPE:surface:"
       downward_shortwave_radiation: ":DSWRF:surface:"
+      # Pressure-level (3-D) fields — the level is encoded in the .idx regex.
+      geopotential_height_850hPa: ":HGT:850 mb:"
+      geopotential_height_500hPa: ":HGT:500 mb:"
+      geopotential_height_250hPa: ":HGT:250 mb:"
+      temperature_850hPa: ":TMP:850 mb:"
+      temperature_500hPa: ":TMP:500 mb:"
+      temperature_250hPa: ":TMP:250 mb:"
+      wind_u_850hPa: ":UGRD:850 mb:"
+      wind_u_500hPa: ":UGRD:500 mb:"
+      wind_u_250hPa: ":UGRD:250 mb:"
+      wind_v_850hPa: ":VGRD:850 mb:"
+      wind_v_500hPa: ":VGRD:500 mb:"
+      wind_v_250hPa: ":VGRD:250 mb:"
+      relative_humidity_850hPa: ":RH:850 mb:"
+      relative_humidity_500hPa: ":RH:500 mb:"
 
   hrdps:                                  # ECCC, High-Resolution Deterministic Prediction System, via Herbie
     provider: eccc-msc
@@ -322,6 +472,21 @@ datasets:
       total_cloud_cover: ":TCDC:entire atmosphere:"
       cape: ":CAPE:surface:"
       downward_shortwave_radiation: ":DSWRF:surface:"
+      # Pressure-level (3-D) fields — the level is encoded in the .idx regex.
+      geopotential_height_850hPa: ":HGT:850 mb:"
+      geopotential_height_500hPa: ":HGT:500 mb:"
+      geopotential_height_250hPa: ":HGT:250 mb:"
+      temperature_850hPa: ":TMP:850 mb:"
+      temperature_500hPa: ":TMP:500 mb:"
+      temperature_250hPa: ":TMP:250 mb:"
+      wind_u_850hPa: ":UGRD:850 mb:"
+      wind_u_500hPa: ":UGRD:500 mb:"
+      wind_u_250hPa: ":UGRD:250 mb:"
+      wind_v_850hPa: ":VGRD:850 mb:"
+      wind_v_500hPa: ":VGRD:500 mb:"
+      wind_v_250hPa: ":VGRD:250 mb:"
+      relative_humidity_850hPa: ":RH:850 mb:"
+      relative_humidity_500hPa: ":RH:500 mb:"
 
   icon-eu:                                # DWD, ICON-EU regular lat-lon (croppable), direct HTTPS
     provider: dwd-opendata
@@ -401,6 +566,21 @@ datasets:
       total_cloud_cover: "tcc"
       cape: "cape"
       downward_shortwave_radiation: "ssrd"
+      # Pressure-level (3-D) fields — "param@level" (levtype=pl, levelist=level).
+      geopotential_height_850hPa: "gh@850"
+      geopotential_height_500hPa: "gh@500"
+      geopotential_height_250hPa: "gh@250"
+      temperature_850hPa: "t@850"
+      temperature_500hPa: "t@500"
+      temperature_250hPa: "t@250"
+      wind_u_850hPa: "u@850"
+      wind_u_500hPa: "u@500"
+      wind_u_250hPa: "u@250"
+      wind_v_850hPa: "v@850"
+      wind_v_500hPa: "v@500"
+      wind_v_250hPa: "v@250"
+      relative_humidity_850hPa: "r@850"
+      relative_humidity_500hPa: "r@500"
 
   aifs:                                   # ECMWF Open Data, AIFS (data-driven), single model
     provider: ecmwf-opendata
@@ -426,6 +606,21 @@ datasets:
       total_cloud_cover: "tcc"
       cape: "cape"
       downward_shortwave_radiation: "ssrd"
+      # Pressure-level (3-D) fields — "param@level" (levtype=pl, levelist=level).
+      geopotential_height_850hPa: "gh@850"
+      geopotential_height_500hPa: "gh@500"
+      geopotential_height_250hPa: "gh@250"
+      temperature_850hPa: "t@850"
+      temperature_500hPa: "t@500"
+      temperature_250hPa: "t@250"
+      wind_u_850hPa: "u@850"
+      wind_u_500hPa: "u@500"
+      wind_u_250hPa: "u@250"
+      wind_v_850hPa: "v@850"
+      wind_v_500hPa: "v@500"
+      wind_v_250hPa: "v@250"
+      relative_humidity_850hPa: "r@850"
+      relative_humidity_500hPa: "r@500"
 
   # --- More Herbie families (analyses + windows + ensemble). hafs (hurricanes)
   # is omitted: it is storm-specific (needs a storm id), not a generic
@@ -500,6 +695,21 @@ datasets:
       total_cloud_cover: ":TCDC:entire atmosphere:"
       cape: ":CAPE:surface:"
       downward_shortwave_radiation: ":DSWRF:surface:"
+      # Pressure-level (3-D) fields — the level is encoded in the .idx regex.
+      geopotential_height_850hPa: ":HGT:850 mb:"
+      geopotential_height_500hPa: ":HGT:500 mb:"
+      geopotential_height_250hPa: ":HGT:250 mb:"
+      temperature_850hPa: ":TMP:850 mb:"
+      temperature_500hPa: ":TMP:500 mb:"
+      temperature_250hPa: ":TMP:250 mb:"
+      wind_u_850hPa: ":UGRD:850 mb:"
+      wind_u_500hPa: ":UGRD:500 mb:"
+      wind_u_250hPa: ":UGRD:250 mb:"
+      wind_v_850hPa: ":VGRD:850 mb:"
+      wind_v_500hPa: ":VGRD:500 mb:"
+      wind_v_250hPa: ":VGRD:250 mb:"
+      relative_humidity_850hPa: ":RH:850 mb:"
+      relative_humidity_500hPa: ":RH:500 mb:"
 
   href:                                   # NOAA, High Resolution Ensemble Forecast (mean), via Herbie
     provider: noaa-nodd
@@ -526,6 +736,21 @@ datasets:
       total_cloud_cover: ":TCDC:entire atmosphere:"
       cape: ":CAPE:surface:"
       downward_shortwave_radiation: ":DSWRF:surface:"
+      # Pressure-level (3-D) fields — the level is encoded in the .idx regex.
+      geopotential_height_850hPa: ":HGT:850 mb:"
+      geopotential_height_500hPa: ":HGT:500 mb:"
+      geopotential_height_250hPa: ":HGT:250 mb:"
+      temperature_850hPa: ":TMP:850 mb:"
+      temperature_500hPa: ":TMP:500 mb:"
+      temperature_250hPa: ":TMP:250 mb:"
+      wind_u_850hPa: ":UGRD:850 mb:"
+      wind_u_500hPa: ":UGRD:500 mb:"
+      wind_u_250hPa: ":UGRD:250 mb:"
+      wind_v_850hPa: ":VGRD:850 mb:"
+      wind_v_500hPa: ":VGRD:500 mb:"
+      wind_v_250hPa: ":VGRD:250 mb:"
+      relative_humidity_850hPa: ":RH:850 mb:"
+      relative_humidity_500hPa: ":RH:500 mb:"
 
   # --- Météo-France via the authenticated WCS API portal (meteofrance-api).
   # Needs METEO_FRANCE_API_KEY (https://portail-api.meteofrance.fr). The WCS
