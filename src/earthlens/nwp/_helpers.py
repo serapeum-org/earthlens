@@ -42,6 +42,27 @@ def enumerate_cycles(
     Raises:
         ValueError: If `start` is later than `end`, or a run hour is
             outside `[0, 23]`.
+
+    Examples:
+        - Enumerate the two cycles of a single day:
+            ```python
+            >>> import datetime as dt
+            >>> from earthlens.nwp._helpers import enumerate_cycles
+            >>> enumerate_cycles(dt.datetime(2024, 6, 1), dt.datetime(2024, 6, 1), [0, 12])
+            [datetime.datetime(2024, 6, 1, 0, 0), datetime.datetime(2024, 6, 1, 12, 0)]
+
+            ```
+        - Three days of 4 cycles each yields twelve datetimes:
+            ```python
+            >>> import datetime as dt
+            >>> from earthlens.nwp._helpers import enumerate_cycles
+            >>> cycles = enumerate_cycles(dt.datetime(2024, 6, 1), dt.datetime(2024, 6, 3), [0, 6, 12, 18])
+            >>> len(cycles)
+            12
+            >>> cycles[0]
+            datetime.datetime(2024, 6, 1, 0, 0)
+
+            ```
     """
     if start > end:
         raise ValueError(f"start ({start}) is after end ({end}).")
@@ -73,6 +94,16 @@ def cog_name(model_key: str, cycle: dt.datetime, step: int) -> str:
 
     Returns:
         str: The COG filename (no directory).
+
+    Examples:
+        - Name the 24 h COG of the 2024-06-01 12Z GFS run:
+            ```python
+            >>> import datetime as dt
+            >>> from earthlens.nwp._helpers import cog_name
+            >>> cog_name("gfs", dt.datetime(2024, 6, 1, 12), 24)
+            'gfs_2024060112_f024.tif'
+
+            ```
     """
     return f"{model_key}_{cycle:%Y%m%d%H}_f{step:03d}.tif"
 
@@ -87,6 +118,16 @@ def grib_name(model_key: str, cycle: dt.datetime, step: int) -> str:
 
     Returns:
         str: The GRIB2 filename (no directory).
+
+    Examples:
+        - Name the analysis-step GRIB2 of the 2024-06-01 00Z ICON run:
+            ```python
+            >>> import datetime as dt
+            >>> from earthlens.nwp._helpers import grib_name
+            >>> grib_name("icon", dt.datetime(2024, 6, 1, 0), 0)
+            'icon_2024060100_f000.grib2'
+
+            ```
     """
     return f"{model_key}_{cycle:%Y%m%d%H}_f{step:03d}.grib2"
 
@@ -100,6 +141,16 @@ def valid_time(cycle: dt.datetime, step: int) -> dt.datetime:
 
     Returns:
         datetime.datetime: The instant the forecast is valid for.
+
+    Examples:
+        - A 30 h forecast from the 2024-06-01 00Z run is valid at 06Z next day:
+            ```python
+            >>> import datetime as dt
+            >>> from earthlens.nwp._helpers import valid_time
+            >>> valid_time(dt.datetime(2024, 6, 1, 0), 30)
+            datetime.datetime(2024, 6, 2, 6, 0)
+
+            ```
     """
     return cycle + dt.timedelta(hours=step)
 

@@ -136,6 +136,31 @@ class NWPModel(BaseModel):
             selector — a Herbie `search` regex (`":TMP:2 m above
             ground:"`) for SDK models, or a provider var token
             (`"T_2M"`) for direct ones.
+
+    Examples:
+        - Build a minimal Herbie-backed row and read its selector:
+            ```python
+            >>> from earthlens.nwp import NWPModel
+            >>> row = NWPModel(
+            ...     provider="noaa-nodd",
+            ...     backend="herbie",
+            ...     cycles_utc=[0, 12],
+            ...     bands={"temperature_2m": ":TMP:2 m above ground:"},
+            ... )
+            >>> row.backend
+            'herbie'
+            >>> row.bands["temperature_2m"]
+            ':TMP:2 m above ground:'
+
+            ```
+        - Optional fields fall back to documented defaults:
+            ```python
+            >>> from earthlens.nwp import NWPModel
+            >>> row = NWPModel(provider="dwd-opendata")
+            >>> row.format, row.idx, row.cycles_utc
+            ('grib2', True, [])
+
+            ```
     """
 
     model_config = ConfigDict(frozen=True, extra="forbid")
@@ -167,6 +192,22 @@ class Catalog(AbstractCatalog):
     Attributes:
         datasets: Structural map keyed by the model key; each value is
             an :class:`NWPModel`.
+
+    Examples:
+        - Load the bundled catalog and list the MVP models:
+            ```python
+            >>> from earthlens.nwp import Catalog
+            >>> sorted(Catalog().datasets)
+            ['gefs', 'gfs', 'hrrr', 'icon-global', 'ifs-hres']
+
+            ```
+        - Resolve one model and read its download backend:
+            ```python
+            >>> from earthlens.nwp import Catalog
+            >>> Catalog().get_model("icon-global").backend
+            'direct-https'
+
+            ```
     """
 
     _catalog_kind: str = "NWP catalog"
@@ -201,6 +242,24 @@ class Catalog(AbstractCatalog):
         Raises:
             ValueError: When `model_key` is unknown (with a
                 did-you-mean hint from the base class).
+
+        Examples:
+            - Resolve a known model:
+                ```python
+                >>> from earthlens.nwp import Catalog
+                >>> Catalog().get_model("gfs").horizon_h
+                384
+
+                ```
+            - A typo raises with a did-you-mean hint:
+                ```python
+                >>> from earthlens.nwp import Catalog
+                >>> Catalog().get_model("gffs")
+                Traceback (most recent call last):
+                    ...
+                ValueError: 'gffs' is not in the NWP catalog. Known datasets: ['gefs', 'gfs', 'hrrr', 'icon-global', 'ifs-hres']. Did you mean 'gfs'?
+
+                ```
         """
         return self.get_dataset(model_key)
 
