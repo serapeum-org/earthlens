@@ -45,6 +45,11 @@ class TestConstruction:
         with pytest.raises(ValueError, match="at least one collection or recipe"):
             _make_backend({}, output_dir)
 
+    def test_list_variables_rejected(self, output_dir: Path):
+        """A list-shaped request is rejected with a clear TypeError, not a late crash."""
+        with pytest.raises(TypeError, match="mapping"):
+            _make_backend(["sentinel-2-l2a"], output_dir)
+
     def test_bad_execute_rejected(self, output_dir: Path):
         """`execute` must be sync or batch."""
         with pytest.raises(ValueError, match="execute must be"):

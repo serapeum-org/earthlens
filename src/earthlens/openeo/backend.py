@@ -167,6 +167,12 @@ class OpenEO(AbstractDataSource):
         """
         from earthlens.openeo.catalog import Catalog
 
+        if not isinstance(self._variables, dict):
+            raise TypeError(
+                "openEO requires variables as a "
+                "{collection_or_recipe: [band, ...]} mapping, got "
+                f"{type(self._variables).__name__}."
+            )
         if not self._variables:
             raise ValueError(
                 "openEO requires variables={collection_or_recipe: [band, ...]} "
