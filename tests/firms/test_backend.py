@@ -284,6 +284,26 @@ class TestCoverageWarningExtra:
         )
         assert any("coverage begins 2012-01-20" in msg for msg in warnings_log)
 
+    def test_window_past_coverage_end_warns(
+        self, tmp_path: Path, warnings_log: list[str]
+    ):
+        """A window ending after a sensor's coverage end is warned."""
+        import datetime as dt
+
+        from earthlens.firms.catalog import Sensor, Temporal
+
+        backend = _make_backend(tmp_path)
+        sensor = Sensor(
+            code="MODIS_SP",
+            family="MODIS",
+            resolution_m=1000,
+            temporal=Temporal(start=dt.date(2000, 11, 1), end=dt.date(2026, 2, 28), quality="SP"),
+        )
+        backend._warn_if_out_of_coverage(
+            sensor, dt.date(2026, 5, 1), dt.date(2026, 5, 10)
+        )
+        assert any("coverage ends 2026-02-28" in msg for msg in warnings_log)
+
     def test_sp_sensor_skips_nrt_retention_warning(
         self, tmp_path: Path, fake_firms: _FakeFirms, warnings_log: list[str]
     ):

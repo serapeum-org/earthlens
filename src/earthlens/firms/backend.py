@@ -342,6 +342,17 @@ class FIRMS(AbstractDataSource):
                 f"{sensor.code} coverage begins {mission_start}; the requested "
                 f"window starts {start_date} and may return no detections."
             )
+        coverage_end = sensor.temporal.end
+        if isinstance(coverage_end, dt.datetime):
+            coverage_end = coverage_end.date()
+        if coverage_end is not None and end_date > coverage_end:
+            logger.warning(
+                f"{sensor.code} coverage ends {coverage_end}; the requested "
+                f"window ends {end_date} and may return no detections past the "
+                "coverage end."
+            )
+        # The NRT-retention heuristic below is advisory (retention drifts
+        # per sensor); it only applies to NRT sensors.
         if sensor.temporal.quality != "NRT":
             return
         cutoff = dt.date.today() - dt.timedelta(days=NRT_RETENTION_DAYS)
