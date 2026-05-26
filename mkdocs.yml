@@ -227,6 +227,13 @@ nav:
       - Quickstart — PM2.5 over a city: examples/openaq/quickstart.ipynb
       - PM2.5 city time-series (WHO guideline): examples/openaq/pm25_city_timeseries.ipynb
       - Multi-station NO2 diurnal comparison: examples/openaq/multistation_comparison.ipynb
+    - Server-side processing (openEO):
+      - Catalog explorer (no network): examples/openeo/catalog_explorer.ipynb
+      - Quickstart — Sentinel-2 NDVI monthly: examples/openeo/quickstart.ipynb
+      - Cloud-masked median composite: examples/openeo/cloud_masked_composite.ipynb
+      - Server-side temporal aggregate: examples/openeo/server_side_aggregate.ipynb
+      - Air quality — Sentinel-5P NO2 monthly: examples/openeo/air_quality_no2_monthly.ipynb
+      - Ocean colour — Sentinel-3 chlorophyll monthly: examples/openeo/ocean_chlorophyll_monthly.ipynb
     - Tropical cyclones (Tropycal):
       - Quickstart — Atlantic season: examples/tropycal/quickstart.ipynb
       - Season track map: examples/tropycal/season_track_map.ipynb
