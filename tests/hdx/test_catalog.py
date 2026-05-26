@@ -79,7 +79,9 @@ class TestCatalog:
 
     def test_resolve_known_key(self):
         """A curated key resolves to its HDX id."""
-        assert Catalog().resolve("kontur-population").hdx_id == "kontur-population-dataset"
+        assert (
+            Catalog().resolve("kontur-population").hdx_id == "kontur-population-dataset"
+        )
 
     def test_get_dataset_unknown_did_you_mean(self):
         """An unknown key raises ValueError with a did-you-mean hint."""

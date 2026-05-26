@@ -43,9 +43,7 @@ class TestInitializeConfig:
         assert kwargs["hdx_site"] == "stage"
         assert kwargs["user_agent"] == "custom-agent"
 
-    def test_missing_extra_raises_friendly_import_error(
-        self, monkeypatch, tmp_path
-    ):
+    def test_missing_extra_raises_friendly_import_error(self, monkeypatch, tmp_path):
         """A missing `hdx` SDK surfaces a friendly ImportError naming the extra."""
         for name in (
             "hdx",

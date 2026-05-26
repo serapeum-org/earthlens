@@ -130,7 +130,9 @@ class TestSearch:
         backend = HDX(hdx_id="d", path=tmp_path)
         assert backend._search()[0].href == "http://h/a"
 
-    def test_missing_extra_in_search_raises(self, fake_hdx: FakeHdx, tmp_path, monkeypatch):
+    def test_missing_extra_in_search_raises(
+        self, fake_hdx: FakeHdx, tmp_path, monkeypatch
+    ):
         """A missing SDK at search time surfaces a friendly ImportError."""
         import sys
 

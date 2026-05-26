@@ -157,9 +157,7 @@ class HDX(AbstractDataSource):
         self._show_progress = True
 
         self._catalog = Catalog()
-        self._targets: list[Target] = self._resolve_targets(
-            variables, hdx_id, resource
-        )
+        self._targets: list[Target] = self._resolve_targets(variables, hdx_id, resource)
 
         super().__init__(
             start=start,

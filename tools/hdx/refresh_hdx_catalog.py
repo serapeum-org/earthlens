@@ -206,9 +206,8 @@ def audit(strict: bool = False) -> int:
     Returns:
         int: Process exit code (0 clean, 1 on drift under `strict`).
     """
-    from hdx.data.dataset import Dataset
-
     from earthlens.hdx import Catalog
+    from hdx.data.dataset import Dataset
 
     catalog = Catalog()
     missing: list[str] = []

@@ -73,9 +73,20 @@ class TestSearchDatasets:
             return [fake_hdx.Dataset.registry["ds-x"]]
 
         fake_hdx.Dataset.search_in_hdx = staticmethod(fake_search)
-        rows = tool.search_datasets(org="org")
+        rows = tool.search_datasets(org="org", with_formats=True)
         assert rows[0]["hdx_id"] == "ds-x"
         assert rows[0]["formats"] == ["CSV"]
+
+    def test_skips_formats_by_default(self, fake_hdx: FakeHdx):
+        """Without with_formats, the slow resource fetch is skipped."""
+        fake_hdx.add_dataset("ds-y", [FakeResource("a.csv", "CSV")])
+
+        def fake_search(query, fq=None, page_size=1000):
+            return [fake_hdx.Dataset.registry["ds-y"]]
+
+        fake_hdx.Dataset.search_in_hdx = staticmethod(fake_search)
+        rows = tool.search_datasets()
+        assert rows[0]["formats"] == [] and rows[0]["org"] == ""
 
 
 class TestDatasetStanza:

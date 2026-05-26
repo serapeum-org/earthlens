@@ -51,9 +51,7 @@ class TestFacadeConstruction:
     def test_download_through_facade(self, fake_hdx: FakeHdx, tmp_path):
         """A facade download routes to the backend and returns file paths."""
         fake_hdx.add_dataset("d", [FakeResource("a.csv", "CSV")])
-        facade = EarthLens(
-            data_source="hdx", variables={}, hdx_id="d", path=tmp_path
-        )
+        facade = EarthLens(data_source="hdx", variables={}, hdx_id="d", path=tmp_path)
         paths = facade.download()
         assert [p.name for p in paths] == ["a.csv"]
 
