@@ -5839,8 +5839,9 @@ model doesn't carry is skipped under <code>errors="warn"</code> (it is not a har
 The DWD tokens are HEAD-validated live for <code>icon-eu</code>; the ECMWF flux tokens
 (<code>cape</code>/<code>ssrd</code>) may be outside the open-data subset for some runs and skip.</p>
 <h3 id="pressure-level-3-d-fields"><a class="toclink" href="#pressure-level-3-d-fields">Pressure-level (3-D) fields</a><a class="headerlink" href="#pressure-level-3-d-fields" title="Permanent link">#</a></h3>
-<p>The Herbie (NOAA / ECCC) and ECMWF models also expose 3-D fields —
-geopotential height, temperature, u-/v-wind at <strong>925 / 850 / 700 / 500 / 300 / 250 hPa</strong> (so ~42 bands each):</p>
+<p>Every forecast model (all centres) also exposes 3-D fields —
+geopotential height, temperature, u-/v-wind, and relative humidity at
+<strong>925 / 850 / 700 / 500 / 300 / 250 / 200 / 100 hPa</strong> (so ~52 bands each):</p>
 <table>
 <thead>
 <tr>
@@ -5872,8 +5873,8 @@ geopotential height, temperature, u-/v-wind at <strong>925 / 850 / 700 / 500 / 3
 </tr>
 </tbody>
 </table>
-<p>All 22 forecast models carry these 3-D fields at six pressure levels (925/850/700/500/300/250 hPa; ~42 bands each — analyses rtma/urma stay surface-only). The per-centre
-mechanics differ:</p>
+<p>All 20 forecast models carry these at eight pressure levels (the analyses
+<code>rtma</code>/<code>urma</code> stay surface-only). The per-centre mechanics differ:</p>
 <ul>
 <li><strong>Herbie (NOAA/ECCC)</strong> — the level is in the <code>.idx</code> regex (<code>:TMP:850 mb:</code>); no
   special handling.</li>
@@ -5890,7 +5891,7 @@ mechanics differ:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.nwp</span><span class="w"> </span><span class="kn">import</span> <span class="n">Catalog</span>
 <a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>
 <a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="n">cat</span> <span class="o">=</span> <span class="n">Catalog</span><span class="p">()</span>
-<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="nb">len</span><span class="p">(</span><span class="n">cat</span><span class="o">.</span><span class="n">datasets</span><span class="p">)</span>                          <span class="c1"># 16</span>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="nb">len</span><span class="p">(</span><span class="n">cat</span><span class="o">.</span><span class="n">datasets</span><span class="p">)</span>                          <span class="c1"># 22</span>
 <a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="n">cat</span><span class="o">.</span><span class="n">get_model</span><span class="p">(</span><span class="s2">&quot;gfs&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">bands</span><span class="p">[</span><span class="s2">&quot;temperature_2m&quot;</span><span class="p">]</span>   <span class="c1"># &#39;:TMP:2 m above ground:&#39;</span>
 </code></pre></div>
 <h2 id="tooling"><a class="toclink" href="#tooling">Tooling</a><a class="headerlink" href="#tooling" title="Permanent link">#</a></h2>
