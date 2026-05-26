@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -2664,6 +2664,23 @@
       
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="Curated models">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#pressure-level-3-d-fields" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pressure-level (3-D) fields
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -5431,6 +5448,23 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Curated models">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#pressure-level-3-d-fields" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pressure-level (3-D) fields
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -5799,11 +5833,53 @@ selector:</p>
 </tr>
 </tbody>
 </table>
-<p>11–12 bands per forecast model (analyses <code>rtma</code>/<code>urma</code> carry the 9 non-flux
-fields). Not every model publishes every band — a requested band a model
-doesn't carry is skipped under <code>errors="warn"</code> (it is not a hard error). The
-DWD tokens are HEAD-validated live for <code>icon-eu</code>; the ECMWF flux tokens
+<p>11–12 surface bands per forecast model (analyses <code>rtma</code>/<code>urma</code> carry the 9
+non-flux fields). Not every model publishes every band — a requested band a
+model doesn't carry is skipped under <code>errors="warn"</code> (it is not a hard error).
+The DWD tokens are HEAD-validated live for <code>icon-eu</code>; the ECMWF flux tokens
 (<code>cape</code>/<code>ssrd</code>) may be outside the open-data subset for some runs and skip.</p>
+<h3 id="pressure-level-3-d-fields"><a class="toclink" href="#pressure-level-3-d-fields">Pressure-level (3-D) fields</a><a class="headerlink" href="#pressure-level-3-d-fields" title="Permanent link">#</a></h3>
+<p>The Herbie (NOAA / ECCC) and ECMWF models also expose 3-D fields —
+geopotential height, temperature, u-/v-wind at <strong>850 / 500 / 250 hPa</strong>, and
+relative humidity at 850 / 500 hPa (so 26 bands each):</p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>NOAA / ECCC (Herbie)</th>
+<th>ECMWF (<code>param@level</code>)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>geopotential_height_500hPa</code></td>
+<td><code>:HGT:500 mb:</code></td>
+<td><code>gh@500</code></td>
+</tr>
+<tr>
+<td><code>temperature_850hPa</code></td>
+<td><code>:TMP:850 mb:</code></td>
+<td><code>t@850</code></td>
+</tr>
+<tr>
+<td><code>wind_u_250hPa</code></td>
+<td><code>:UGRD:250 mb:</code></td>
+<td><code>u@250</code></td>
+</tr>
+<tr>
+<td><code>relative_humidity_850hPa</code></td>
+<td><code>:RH:850 mb:</code></td>
+<td><code>r@850</code></td>
+</tr>
+</tbody>
+</table>
+<p>For Herbie the level is part of the <code>.idx</code> regex (no special handling). For
+ECMWF the <code>param@level</code> token sets <code>levtype=pl</code> + <code>levelist</code>; the centre issues
+one <code>retrieve</code> per level type / level and concatenates them, since
+<code>ecmwf-opendata</code> cannot mix level types in a single request.</p>
+<p><strong>DWD ICON</strong> and <strong>Météo-France</strong> 3-D fields are a follow-on — their
+pressure-level data lives under a separate file path / WCS coverage-id structure
+than the single-level rows here.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.nwp</span><span class="w"> </span><span class="kn">import</span> <span class="n">Catalog</span>
 <a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>
 <a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="n">cat</span> <span class="o">=</span> <span class="n">Catalog</span><span class="p">()</span>
