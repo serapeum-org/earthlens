@@ -101,6 +101,17 @@ class TestCatalogResolve:
         assert model.backend == "herbie"
         assert model.bands["temperature_2m"] == ":TMP:2 m above ground:"
 
+    def test_models_expose_extended_surface_bands(self):
+        """Forecast models carry the extended surface-field set."""
+        cat = Catalog()
+        extended = {"relative_humidity_2m", "wind_gust", "surface_pressure", "total_cloud_cover", "cape"}
+        for key in ("gfs", "ifs-hres", "icon-eu", "arpege-world"):
+            assert extended <= set(cat.get_model(key).bands), key
+        # the GRIB2 gust selector is the standard surface GUST regex
+        assert cat.get_model("gfs").bands["wind_gust"] == ":GUST:surface:"
+        # DWD CAPE token validated live for icon-eu
+        assert cat.get_model("icon-eu").bands["cape"] == "CAPE_ML"
+
     def test_resolve_is_get_model(self):
         """resolve is an alias returning the same row as get_model."""
         cat = Catalog()

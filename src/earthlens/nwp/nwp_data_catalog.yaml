@@ -26,9 +26,15 @@ datasets:
       temperature_2m: ":TMP:2 m above ground:"
       precipitation_acc: ":APCP:surface:"
       dewpoint_2m: ":DPT:2 m above ground:"
+      relative_humidity_2m: ":RH:2 m above ground:"
       wind_u_10m: ":UGRD:10 m above ground:"
       wind_v_10m: ":VGRD:10 m above ground:"
+      wind_gust: ":GUST:surface:"
       pressure_msl: ":PRMSL:mean sea level:"
+      surface_pressure: ":PRES:surface:"
+      total_cloud_cover: ":TCDC:entire atmosphere:"
+      cape: ":CAPE:surface:"
+      downward_shortwave_radiation: ":DSWRF:surface:"
 
   gefs:                                   # NOAA NODD ensemble, via Herbie
     provider: noaa-nodd
@@ -47,9 +53,15 @@ datasets:
       temperature_2m: ":TMP:2 m above ground:"
       precipitation_acc: ":APCP:surface:"
       dewpoint_2m: ":DPT:2 m above ground:"
+      relative_humidity_2m: ":RH:2 m above ground:"
       wind_u_10m: ":UGRD:10 m above ground:"
       wind_v_10m: ":VGRD:10 m above ground:"
+      wind_gust: ":GUST:surface:"
       pressure_msl: ":PRMSL:mean sea level:"
+      surface_pressure: ":PRES:surface:"
+      total_cloud_cover: ":TCDC:entire atmosphere:"
+      cape: ":CAPE:surface:"
+      downward_shortwave_radiation: ":DSWRF:surface:"
 
   hrrr:                                   # NOAA NODD, hourly cycles, via Herbie
     provider: noaa-nodd
@@ -68,9 +80,15 @@ datasets:
       temperature_2m: ":TMP:2 m above ground:"
       precipitation_acc: ":APCP:surface:"
       dewpoint_2m: ":DPT:2 m above ground:"
+      relative_humidity_2m: ":RH:2 m above ground:"
       wind_u_10m: ":UGRD:10 m above ground:"
       wind_v_10m: ":VGRD:10 m above ground:"
+      wind_gust: ":GUST:surface:"
       pressure_msl: ":PRMSL:mean sea level:"
+      surface_pressure: ":PRES:surface:"
+      total_cloud_cover: ":TCDC:entire atmosphere:"
+      cape: ":CAPE:surface:"
+      downward_shortwave_radiation: ":DSWRF:surface:"
 
   ifs-hres:                               # ECMWF Open Data (IFS HRES)
     provider: ecmwf-opendata
@@ -88,9 +106,15 @@ datasets:
       temperature_2m: "2t"
       precipitation_acc: "tp"
       dewpoint_2m: "2d"
+      relative_humidity_2m: "2r"
       wind_u_10m: "10u"
       wind_v_10m: "10v"
+      wind_gust: "10fg"
       pressure_msl: "msl"
+      surface_pressure: "sp"
+      total_cloud_cover: "tcc"
+      cape: "cape"
+      downward_shortwave_radiation: "ssrd"
 
   icon-global:                            # DWD Open Data, direct HTTPS .bz2 (no .idx)
     provider: dwd-opendata
@@ -109,9 +133,14 @@ datasets:
       temperature_2m: T_2M
       precipitation_acc: TOT_PREC
       dewpoint_2m: TD_2M
+      relative_humidity_2m: RELHUM_2M
       wind_u_10m: U_10M
       wind_v_10m: V_10M
+      wind_gust: VMAX_10M
       pressure_msl: PMSL
+      surface_pressure: PS
+      total_cloud_cover: CLCT
+      cape: CAPE_ML
 
   # ---------------------------------------------------------------------------
   # Expanded coverage (beyond the 5 MVP models). These rows are
@@ -136,9 +165,15 @@ datasets:
       temperature_2m: ":TMP:2 m above ground:"
       precipitation_acc: ":APCP:surface:"
       dewpoint_2m: ":DPT:2 m above ground:"
+      relative_humidity_2m: ":RH:2 m above ground:"
       wind_u_10m: ":UGRD:10 m above ground:"
       wind_v_10m: ":VGRD:10 m above ground:"
+      wind_gust: ":GUST:surface:"
       pressure_msl: ":PRMSL:mean sea level:"
+      surface_pressure: ":PRES:surface:"
+      total_cloud_cover: ":TCDC:entire atmosphere:"
+      cape: ":CAPE:surface:"
+      downward_shortwave_radiation: ":DSWRF:surface:"
 
   nam:                                    # NOAA NODD, NAM 12 km CONUS, via Herbie
     provider: noaa-nodd
@@ -155,9 +190,15 @@ datasets:
       temperature_2m: ":TMP:2 m above ground:"
       precipitation_acc: ":APCP:surface:"
       dewpoint_2m: ":DPT:2 m above ground:"
+      relative_humidity_2m: ":RH:2 m above ground:"
       wind_u_10m: ":UGRD:10 m above ground:"
       wind_v_10m: ":VGRD:10 m above ground:"
+      wind_gust: ":GUST:surface:"
       pressure_msl: ":PRMSL:mean sea level:"
+      surface_pressure: ":PRES:surface:"
+      total_cloud_cover: ":TCDC:entire atmosphere:"
+      cape: ":CAPE:surface:"
+      downward_shortwave_radiation: ":DSWRF:surface:"
 
   nbm:                                    # NOAA NODD, National Blend of Models, via Herbie
     provider: noaa-nodd
@@ -174,9 +215,15 @@ datasets:
       temperature_2m: ":TMP:2 m above ground:"
       precipitation_acc: ":APCP:surface:"
       dewpoint_2m: ":DPT:2 m above ground:"
+      relative_humidity_2m: ":RH:2 m above ground:"
       wind_u_10m: ":UGRD:10 m above ground:"
       wind_v_10m: ":VGRD:10 m above ground:"
+      wind_gust: ":GUST:surface:"
       pressure_msl: ":PRMSL:mean sea level:"
+      surface_pressure: ":PRES:surface:"
+      total_cloud_cover: ":TCDC:entire atmosphere:"
+      cape: ":CAPE:surface:"
+      downward_shortwave_radiation: ":DSWRF:surface:"
 
   rrfs:                                   # NOAA NODD, Rapid Refresh Forecast System, via Herbie
     provider: noaa-nodd
@@ -193,9 +240,15 @@ datasets:
       temperature_2m: ":TMP:2 m above ground:"
       precipitation_acc: ":APCP:surface:"
       dewpoint_2m: ":DPT:2 m above ground:"
+      relative_humidity_2m: ":RH:2 m above ground:"
       wind_u_10m: ":UGRD:10 m above ground:"
       wind_v_10m: ":VGRD:10 m above ground:"
+      wind_gust: ":GUST:surface:"
       pressure_msl: ":PRMSL:mean sea level:"
+      surface_pressure: ":PRES:surface:"
+      total_cloud_cover: ":TCDC:entire atmosphere:"
+      cape: ":CAPE:surface:"
+      downward_shortwave_radiation: ":DSWRF:surface:"
 
   gdps:                                   # ECCC, Global Deterministic Prediction System, via Herbie
     provider: eccc-msc
@@ -211,9 +264,15 @@ datasets:
       temperature_2m: ":TMP:2 m above ground:"
       precipitation_acc: ":APCP:surface:"
       dewpoint_2m: ":DPT:2 m above ground:"
+      relative_humidity_2m: ":RH:2 m above ground:"
       wind_u_10m: ":UGRD:10 m above ground:"
       wind_v_10m: ":VGRD:10 m above ground:"
+      wind_gust: ":GUST:surface:"
       pressure_msl: ":PRMSL:mean sea level:"
+      surface_pressure: ":PRES:surface:"
+      total_cloud_cover: ":TCDC:entire atmosphere:"
+      cape: ":CAPE:surface:"
+      downward_shortwave_radiation: ":DSWRF:surface:"
 
   rdps:                                   # ECCC, Regional Deterministic Prediction System, via Herbie
     provider: eccc-msc
@@ -229,9 +288,15 @@ datasets:
       temperature_2m: ":TMP:2 m above ground:"
       precipitation_acc: ":APCP:surface:"
       dewpoint_2m: ":DPT:2 m above ground:"
+      relative_humidity_2m: ":RH:2 m above ground:"
       wind_u_10m: ":UGRD:10 m above ground:"
       wind_v_10m: ":VGRD:10 m above ground:"
+      wind_gust: ":GUST:surface:"
       pressure_msl: ":PRMSL:mean sea level:"
+      surface_pressure: ":PRES:surface:"
+      total_cloud_cover: ":TCDC:entire atmosphere:"
+      cape: ":CAPE:surface:"
+      downward_shortwave_radiation: ":DSWRF:surface:"
 
   hrdps:                                  # ECCC, High-Resolution Deterministic Prediction System, via Herbie
     provider: eccc-msc
@@ -248,9 +313,15 @@ datasets:
       temperature_2m: ":TMP:2 m above ground:"
       precipitation_acc: ":APCP:surface:"
       dewpoint_2m: ":DPT:2 m above ground:"
+      relative_humidity_2m: ":RH:2 m above ground:"
       wind_u_10m: ":UGRD:10 m above ground:"
       wind_v_10m: ":VGRD:10 m above ground:"
+      wind_gust: ":GUST:surface:"
       pressure_msl: ":PRMSL:mean sea level:"
+      surface_pressure: ":PRES:surface:"
+      total_cloud_cover: ":TCDC:entire atmosphere:"
+      cape: ":CAPE:surface:"
+      downward_shortwave_radiation: ":DSWRF:surface:"
 
   icon-eu:                                # DWD, ICON-EU regular lat-lon (croppable), direct HTTPS
     provider: dwd-opendata
@@ -269,9 +340,14 @@ datasets:
       temperature_2m: T_2M
       precipitation_acc: TOT_PREC
       dewpoint_2m: TD_2M
+      relative_humidity_2m: RELHUM_2M
       wind_u_10m: U_10M
       wind_v_10m: V_10M
+      wind_gust: VMAX_10M
       pressure_msl: PMSL
+      surface_pressure: PS
+      total_cloud_cover: CLCT
+      cape: CAPE_ML
 
   icon-d2:                                # DWD, ICON-D2 native icosahedral (raw fetch; not croppable), direct HTTPS
     provider: dwd-opendata
@@ -292,9 +368,14 @@ datasets:
       temperature_2m: t_2m
       precipitation_acc: tot_prec
       dewpoint_2m: td_2m
+      relative_humidity_2m: relhum_2m
       wind_u_10m: u_10m
       wind_v_10m: v_10m
+      wind_gust: vmax_10m
       pressure_msl: pmsl
+      surface_pressure: ps
+      total_cloud_cover: clct
+      cape: cape_ml
 
   ens:                                    # ECMWF Open Data, IFS ENS control forecast
     provider: ecmwf-opendata
@@ -311,9 +392,15 @@ datasets:
       temperature_2m: "2t"
       precipitation_acc: "tp"
       dewpoint_2m: "2d"
+      relative_humidity_2m: "2r"
       wind_u_10m: "10u"
       wind_v_10m: "10v"
+      wind_gust: "10fg"
       pressure_msl: "msl"
+      surface_pressure: "sp"
+      total_cloud_cover: "tcc"
+      cape: "cape"
+      downward_shortwave_radiation: "ssrd"
 
   aifs:                                   # ECMWF Open Data, AIFS (data-driven), single model
     provider: ecmwf-opendata
@@ -330,9 +417,15 @@ datasets:
       temperature_2m: "2t"
       precipitation_acc: "tp"
       dewpoint_2m: "2d"
+      relative_humidity_2m: "2r"
       wind_u_10m: "10u"
       wind_v_10m: "10v"
+      wind_gust: "10fg"
       pressure_msl: "msl"
+      surface_pressure: "sp"
+      total_cloud_cover: "tcc"
+      cape: "cape"
+      downward_shortwave_radiation: "ssrd"
 
   # --- More Herbie families (analyses + windows + ensemble). hafs (hurricanes)
   # is omitted: it is storm-specific (needs a storm id), not a generic
@@ -352,9 +445,13 @@ datasets:
     bands:
       temperature_2m: ":TMP:2 m above ground:"
       dewpoint_2m: ":DPT:2 m above ground:"
+      relative_humidity_2m: ":RH:2 m above ground:"
       wind_u_10m: ":UGRD:10 m above ground:"
       wind_v_10m: ":VGRD:10 m above ground:"
+      wind_gust: ":GUST:surface:"
       pressure_msl: ":PRMSL:mean sea level:"
+      surface_pressure: ":PRES:surface:"
+      total_cloud_cover: ":TCDC:entire atmosphere:"
 
   urma:                                   # NOAA, Un-Restricted Mesoscale Analysis (2.5 km CONUS), via Herbie
     provider: noaa-nodd
@@ -370,9 +467,13 @@ datasets:
     bands:
       temperature_2m: ":TMP:2 m above ground:"
       dewpoint_2m: ":DPT:2 m above ground:"
+      relative_humidity_2m: ":RH:2 m above ground:"
       wind_u_10m: ":UGRD:10 m above ground:"
       wind_v_10m: ":VGRD:10 m above ground:"
+      wind_gust: ":GUST:surface:"
       pressure_msl: ":PRMSL:mean sea level:"
+      surface_pressure: ":PRES:surface:"
+      total_cloud_cover: ":TCDC:entire atmosphere:"
 
   hiresw-arw:                             # NOAA, High-Resolution Window ARW 2.5 km CONUS, via Herbie
     provider: noaa-nodd
@@ -390,9 +491,15 @@ datasets:
       temperature_2m: ":TMP:2 m above ground:"
       precipitation_acc: ":APCP:surface:"
       dewpoint_2m: ":DPT:2 m above ground:"
+      relative_humidity_2m: ":RH:2 m above ground:"
       wind_u_10m: ":UGRD:10 m above ground:"
       wind_v_10m: ":VGRD:10 m above ground:"
+      wind_gust: ":GUST:surface:"
       pressure_msl: ":PRMSL:mean sea level:"
+      surface_pressure: ":PRES:surface:"
+      total_cloud_cover: ":TCDC:entire atmosphere:"
+      cape: ":CAPE:surface:"
+      downward_shortwave_radiation: ":DSWRF:surface:"
 
   href:                                   # NOAA, High Resolution Ensemble Forecast (mean), via Herbie
     provider: noaa-nodd
@@ -410,9 +517,15 @@ datasets:
       temperature_2m: ":TMP:2 m above ground:"
       precipitation_acc: ":APCP:surface:"
       dewpoint_2m: ":DPT:2 m above ground:"
+      relative_humidity_2m: ":RH:2 m above ground:"
       wind_u_10m: ":UGRD:10 m above ground:"
       wind_v_10m: ":VGRD:10 m above ground:"
+      wind_gust: ":GUST:surface:"
       pressure_msl: ":PRMSL:mean sea level:"
+      surface_pressure: ":PRES:surface:"
+      total_cloud_cover: ":TCDC:entire atmosphere:"
+      cape: ":CAPE:surface:"
+      downward_shortwave_radiation: ":DSWRF:surface:"
 
   # --- Météo-France via the authenticated WCS API portal (meteofrance-api).
   # Needs METEO_FRANCE_API_KEY (https://portail-api.meteofrance.fr). The WCS
@@ -436,9 +549,14 @@ datasets:
       temperature_2m: TEMPERATURE__SPECIFIC_HEIGHT_LEVEL_ABOVE_GROUND
       precipitation_acc: TOTAL_PRECIPITATION__GROUND_OR_WATER_SURFACE
       dewpoint_2m: DEW_POINT_TEMPERATURE__SPECIFIC_HEIGHT_LEVEL_ABOVE_GROUND
+      relative_humidity_2m: RELATIVE_HUMIDITY__SPECIFIC_HEIGHT_LEVEL_ABOVE_GROUND
       wind_u_10m: U_COMPONENT_OF_WIND__SPECIFIC_HEIGHT_LEVEL_ABOVE_GROUND
       wind_v_10m: V_COMPONENT_OF_WIND__SPECIFIC_HEIGHT_LEVEL_ABOVE_GROUND
+      wind_gust: WIND_SPEED_GUST__SPECIFIC_HEIGHT_LEVEL_ABOVE_GROUND
       pressure_msl: PRESSURE__MEAN_SEA_LEVEL
+      surface_pressure: PRESSURE__GROUND_OR_WATER_SURFACE
+      total_cloud_cover: TOTAL_CLOUD_COVER__GROUND_OR_WATER_SURFACE
+      cape: CONVECTIVE_AVAILABLE_POTENTIAL_ENERGY__GROUND_OR_WATER_SURFACE
 
   arome-france:                           # Météo-France AROME high-res France 0.025°, WCS API
     provider: meteofrance
@@ -457,6 +575,11 @@ datasets:
       temperature_2m: TEMPERATURE__SPECIFIC_HEIGHT_LEVEL_ABOVE_GROUND
       precipitation_acc: TOTAL_PRECIPITATION__GROUND_OR_WATER_SURFACE
       dewpoint_2m: DEW_POINT_TEMPERATURE__SPECIFIC_HEIGHT_LEVEL_ABOVE_GROUND
+      relative_humidity_2m: RELATIVE_HUMIDITY__SPECIFIC_HEIGHT_LEVEL_ABOVE_GROUND
       wind_u_10m: U_COMPONENT_OF_WIND__SPECIFIC_HEIGHT_LEVEL_ABOVE_GROUND
       wind_v_10m: V_COMPONENT_OF_WIND__SPECIFIC_HEIGHT_LEVEL_ABOVE_GROUND
+      wind_gust: WIND_SPEED_GUST__SPECIFIC_HEIGHT_LEVEL_ABOVE_GROUND
       pressure_msl: PRESSURE__MEAN_SEA_LEVEL
+      surface_pressure: PRESSURE__GROUND_OR_WATER_SURFACE
+      total_cloud_cover: TOTAL_CLOUD_COVER__GROUND_OR_WATER_SURFACE
+      cape: CONVECTIVE_AVAILABLE_POTENTIAL_ENERGY__GROUND_OR_WATER_SURFACE
