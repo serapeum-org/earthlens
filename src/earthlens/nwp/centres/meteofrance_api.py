@@ -80,8 +80,13 @@ class MeteoFranceAPICentre(_NWPCentre):
         step: int,
         params: list[str],
         mirror: str,
+        member: str | None = None,
     ) -> Path:
         """Fetch each variable via WCS GetCoverage into one `.grib2`.
+
+        `member` is accepted for interface parity but ignored (the
+        Météo-France rows here are deterministic; PEARP/PEAROME are a
+        follow-on).
 
         Args:
             model: The resolved catalog row. `request_options` must carry

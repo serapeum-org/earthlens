@@ -81,6 +81,7 @@ class NWP(AbstractDataSource):
         mirror: str = "auto",
         steps: list[int] | None = None,
         horizon: int | None = None,
+        members: list[str] | None = None,
         catalog: Catalog | None = None,
     ):
         """Initialise an NWP backend instance.
@@ -112,6 +113,11 @@ class NWP(AbstractDataSource):
                 `horizon` is given.
             horizon: Maximum forecast lead time in hours; expands to a
                 step list per model cadence (resolved in `C3`).
+            members: Ensemble member ids to fetch (e.g. GEFS `["mean",
+                "1", "2"]`, ENS `["control", "10"]`). Defaults to the
+                model's first listed member when omitted; ignored for
+                deterministic models. One COG is written per
+                `(cycle, step, member)`.
             catalog: Optional pre-built :class:`Catalog` (tests inject
                 a faked one); defaults to the bundled catalog.
 
@@ -127,6 +133,7 @@ class NWP(AbstractDataSource):
         self._mirror = mirror
         self._steps_arg = steps
         self._horizon_arg = horizon
+        self._members_arg = members
         self._catalog = catalog if catalog is not None else Catalog()
         self._requests: list[tuple[str, NWPModel, list[str]]] = self._resolve_models(
             variables
@@ -278,6 +285,38 @@ class NWP(AbstractDataSource):
             )
         return steps
 
+    def _members_for(self, model: NWPModel) -> list[str | None]:
+        """Resolve the ensemble members to fetch for one model.
+
+        A deterministic model (no `members`) has a single `[None]` axis.
+        For an ensemble model, an explicit `members=` list wins (each
+        validated against the model's members); otherwise the default is
+        the model's first listed member (e.g. the mean/control), keeping
+        a plain ensemble request bounded.
+
+        Args:
+            model: The resolved catalog row.
+
+        Returns:
+            list[str | None]: The member ids to fetch (`[None]` for a
+                deterministic model).
+
+        Raises:
+            ValueError: When a requested member is not one of the
+                model's members.
+        """
+        if not model.members:
+            return [None]
+        if self._members_arg is not None:
+            unknown = [m for m in self._members_arg if m not in model.members]
+            if unknown:
+                raise ValueError(
+                    f"members {unknown} are not in the model's members "
+                    f"{model.members}."
+                )
+            return list(self._members_arg)
+        return [model.members[0]]
+
     def _centre_for(self, backend: str) -> _NWPCentre:
         """Return the cached :class:`_NWPCentre` for a catalog `backend:`.
 
@@ -322,18 +361,21 @@ class NWP(AbstractDataSource):
             )
             for cycle in cycles:
                 for step in self._steps_for(model):
-                    products.append(
-                        RemoteProduct(
-                            id=f"{model_key}.{cycle:%Y%m%d%H}.f{step:03d}",
-                            metadata={
-                                "model_key": model_key,
-                                "model": model,
-                                "cycle": cycle,
-                                "step": step,
-                                "params": params,
-                            },
+                    for member in self._members_for(model):
+                        suffix = f".m{member}" if member is not None else ""
+                        products.append(
+                            RemoteProduct(
+                                id=f"{model_key}.{cycle:%Y%m%d%H}.f{step:03d}{suffix}",
+                                metadata={
+                                    "model_key": model_key,
+                                    "model": model,
+                                    "cycle": cycle,
+                                    "step": step,
+                                    "member": member,
+                                    "params": params,
+                                },
+                            )
                         )
-                    )
         return products
 
     def _fetch(self, products: list[RemoteProduct]) -> list[Path]:
@@ -407,6 +449,7 @@ class NWP(AbstractDataSource):
             meta["step"],
             meta["params"],
             self._mirror,
+            meta.get("member"),
         )
         dataset = open_grib(str(grib_path))
         dataset = self._normalise_longitude(dataset)
@@ -417,7 +460,7 @@ class NWP(AbstractDataSource):
         # lookup and subsets a regular NWP grid correctly.
         cropped = dataset.crop(bbox=bbox, epsg=4326, touch=False)
         target = self.root_dir / cog_name(
-            meta["model_key"], meta["cycle"], meta["step"]
+            meta["model_key"], meta["cycle"], meta["step"], meta.get("member")
         )
         write_cog(cropped, str(target))
         return target

@@ -76,8 +76,12 @@ class MeteoFranceCentre(_NWPCentre):
         step: int,
         params: list[str],
         mirror: str,
+        member: str | None = None,
     ) -> Path:
         """Download each variable's S3 object into one `.grib2`.
+
+        `member` is accepted for interface parity but ignored (the
+        Météo-France rows here are deterministic).
 
         Args:
             model: The resolved catalog row (carries `request_options`

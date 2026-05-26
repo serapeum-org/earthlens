@@ -80,17 +80,22 @@ def enumerate_cycles(
     return out
 
 
-def cog_name(model_key: str, cycle: dt.datetime, step: int) -> str:
-    """Return the output COG filename for one `(model, cycle, step)`.
+def cog_name(
+    model_key: str, cycle: dt.datetime, step: int, member: str | None = None
+) -> str:
+    """Return the output COG filename for one `(model, cycle, step[, member])`.
 
     The naming convention `{model_key}_{cycle:%Y%m%d%H}_f{step:03d}.tif`
-    is shared by every centre so the `_fetch` pipeline and the
-    `aggregate=` window-labeller can both parse it back.
+    (with an optional `_m{member}` before the suffix) is shared by every
+    centre so the `_fetch` pipeline and the `aggregate=` window-labeller
+    can both parse it back.
 
     Args:
         model_key: The catalog model key (e.g. `"gfs"`).
         cycle: The forecast cycle datetime (UTC).
         step: The forecast lead time in hours.
+        member: Ensemble member id, or `None` for a deterministic model
+            (in which case no member suffix is added).
 
     Returns:
         str: The COG filename (no directory).
@@ -104,17 +109,29 @@ def cog_name(model_key: str, cycle: dt.datetime, step: int) -> str:
             'gfs_2024060112_f024.tif'
 
             ```
+        - An ensemble member adds a `_m{member}` suffix:
+            ```python
+            >>> import datetime as dt
+            >>> from earthlens.nwp._helpers import cog_name
+            >>> cog_name("gefs", dt.datetime(2024, 6, 1, 0), 6, member="p01")
+            'gefs_2024060100_f006_mp01.tif'
+
+            ```
     """
-    return f"{model_key}_{cycle:%Y%m%d%H}_f{step:03d}.tif"
+    suffix = f"_m{member}" if member is not None else ""
+    return f"{model_key}_{cycle:%Y%m%d%H}_f{step:03d}{suffix}.tif"
 
 
-def grib_name(model_key: str, cycle: dt.datetime, step: int) -> str:
+def grib_name(
+    model_key: str, cycle: dt.datetime, step: int, member: str | None = None
+) -> str:
     """Return the intermediate GRIB2 filename for one `(model, cycle, step)`.
 
     Args:
         model_key: The catalog model key (e.g. `"icon-global"`).
         cycle: The forecast cycle datetime (UTC).
         step: The forecast lead time in hours.
+        member: Ensemble member id, or `None` (no member suffix).
 
     Returns:
         str: The GRIB2 filename (no directory).
@@ -129,7 +146,8 @@ def grib_name(model_key: str, cycle: dt.datetime, step: int) -> str:
 
             ```
     """
-    return f"{model_key}_{cycle:%Y%m%d%H}_f{step:03d}.grib2"
+    suffix = f"_m{member}" if member is not None else ""
+    return f"{model_key}_{cycle:%Y%m%d%H}_f{step:03d}{suffix}.grib2"
 
 
 def valid_time(cycle: dt.datetime, step: int) -> dt.datetime:

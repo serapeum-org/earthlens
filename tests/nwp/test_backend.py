@@ -50,10 +50,14 @@ class _CountingCentre:
         self.save_dir = save_dir
         self.calls = []
 
-    def fetch_one(self, model, cycle, step, params, mirror):
+    def fetch_one(self, model, cycle, step, params, mirror, member=None):
         """Record the call and return a fabricated GRIB path."""
-        self.calls.append((cycle, step, tuple(params), mirror))
-        return str(self.save_dir / f"{model.model_family}_{cycle:%Y%m%d%H}_f{step:03d}.grib2")
+        self.calls.append((cycle, step, tuple(params), mirror, member))
+        suffix = f"_m{member}" if member is not None else ""
+        return str(
+            self.save_dir
+            / f"{model.model_family}_{cycle:%Y%m%d%H}_f{step:03d}{suffix}.grib2"
+        )
 
 
 class _FlakyCentre(_CountingCentre):
@@ -63,11 +67,11 @@ class _FlakyCentre(_CountingCentre):
         super().__init__(save_dir)
         self.fail_step = fail_step
 
-    def fetch_one(self, model, cycle, step, params, mirror):
+    def fetch_one(self, model, cycle, step, params, mirror, member=None):
         """Raise for `fail_step`; otherwise behave like the counting centre."""
         if step == self.fail_step:
             raise RuntimeError(f"f{step:03d} not published")
-        return super().fetch_one(model, cycle, step, params, mirror)
+        return super().fetch_one(model, cycle, step, params, mirror, member)
 
 
 class TestConstruction:
@@ -167,6 +171,49 @@ class TestStepsFor:
             b._steps_for(b._requests[0][1])
 
 
+class TestMembersFor:
+    """Tests for the ensemble-member axis resolution."""
+
+    def _ens_catalog(self):
+        """A catalog with one ensemble model (members) + one deterministic."""
+        from earthlens.nwp import Catalog, NWPModel
+
+        return Catalog(
+            datasets={
+                "gefs": NWPModel(
+                    provider="noaa-nodd", model_family="gefs", cycles_utc=[0],
+                    horizon_h=240, backend="herbie",
+                    bands={"temperature_2m": ":TMP:2 m above ground:"},
+                    members=["mean", "0", "1", "2"],
+                ),
+            }
+        )
+
+    def test_deterministic_model_has_none_axis(self, mini_catalog, tmp_path):
+        """A model with no members yields a single [None] member axis."""
+        b = _make(mini_catalog, tmp_path)
+        assert b._members_for(b._requests[0][1]) == [None]
+
+    def test_default_is_first_member(self, tmp_path):
+        """An ensemble request with no members= fetches the first listed member."""
+        cat = self._ens_catalog()
+        b = _make(cat, tmp_path, variables={"gefs": ["temperature_2m"]})
+        assert b._members_for(b._requests[0][1]) == ["mean"]
+
+    def test_explicit_members(self, tmp_path):
+        """members= selects the requested members."""
+        cat = self._ens_catalog()
+        b = _make(cat, tmp_path, variables={"gefs": ["temperature_2m"]}, members=["1", "2"])
+        assert b._members_for(b._requests[0][1]) == ["1", "2"]
+
+    def test_unknown_member_raises(self, tmp_path):
+        """A member not in the model's list is rejected."""
+        cat = self._ens_catalog()
+        b = _make(cat, tmp_path, variables={"gefs": ["temperature_2m"]}, members=["99"])
+        with pytest.raises(ValueError, match="not in the model's members"):
+            b._members_for(b._requests[0][1])
+
+
 class TestSearch:
     """Tests for the cycle-grid walk."""
 
@@ -178,6 +225,27 @@ class TestSearch:
         assert products[0].id == "gfs.2024060100.f000"
         assert products[0].metadata["model_key"] == "gfs"
         assert products[0].metadata["step"] == 0
+
+    def test_expands_members(self, tmp_path):
+        """_search crosses cycle×step×member for an ensemble model."""
+        from earthlens.nwp import Catalog, NWPModel
+
+        cat = Catalog(
+            datasets={
+                "gefs": NWPModel(
+                    provider="noaa-nodd", model_family="gefs", cycles_utc=[0],
+                    horizon_h=240, backend="herbie",
+                    bands={"temperature_2m": ":TMP:2 m above ground:"},
+                    members=["mean", "1", "2"],
+                )
+            }
+        )
+        b = _make(cat, tmp_path, variables={"gefs": ["temperature_2m"]},
+                  steps=[0, 6], members=["1", "2"])
+        products = b._search()
+        assert len(products) == 1 * 2 * 2  # 1 cycle × 2 steps × 2 members
+        assert products[0].id == "gefs.2024060100.f000.m1"
+        assert products[0].metadata["member"] == "1"
 
     def test_multi_model_search(self, mini_catalog, tmp_path):
         """Each requested model contributes its own cycle×step products."""

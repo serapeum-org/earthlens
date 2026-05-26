@@ -113,6 +113,17 @@ class TestNOAACentre:
         )
         assert fake_herbie.instances[-1].kwargs["domain"] == "conus"
 
+    def test_fetch_one_member_to_herbie(self, fake_herbie, tmp_path):
+        """A numeric member becomes an int Herbie member=; 'mean' stays a string."""
+        NOAACentre(tmp_path).fetch_one(
+            _gfs(model_family="gefs"), dt.datetime(2024, 6, 1, 0), 0, ["temperature_2m"], "aws", "5"
+        )
+        assert fake_herbie.instances[-1].kwargs["member"] == 5
+        NOAACentre(tmp_path).fetch_one(
+            _gfs(model_family="gefs"), dt.datetime(2024, 6, 1, 0), 0, ["temperature_2m"], "aws", "mean"
+        )
+        assert fake_herbie.instances[-1].kwargs["member"] == "mean"
+
     def test_fetch_one_threads_show_progress_to_verbose(self, fake_herbie, tmp_path):
         """show_progress is forwarded to Herbie's verbose= (L4)."""
         centre = NOAACentre(tmp_path)
@@ -236,6 +247,29 @@ class TestECMWFCentre:
         assert call["date"] == "2024-06-01"
         assert "stream" not in call
         assert out.exists() and out.name == "ifs_2024060112_f024.grib2"
+
+    def test_fetch_one_perturbed_member_sets_pf_and_number(self, fake_ecmwf_client, tmp_path):
+        """A numeric ENS member selects type=pf + number=<member>."""
+        ens = NWPModel(
+            provider="ecmwf-opendata", model_family="ens", cycles_utc=[0], horizon_h=360,
+            backend="ecmwf-opendata", mirrors=["aws"], bands={"temperature_2m": "2t"},
+            request_options={"stream": "enfo", "type": "cf"}, members=["control", "1", "2"],
+        )
+        out = ECMWFCentre(tmp_path).fetch_one(ens, dt.datetime(2024, 6, 1, 0), 0, ["temperature_2m"], "aws", "3")
+        call = fake_ecmwf_client.instances[-1].retrieve_calls[-1]
+        assert call["type"] == "pf" and call["number"] == 3
+        assert out.name == "ens_2024060100_f000_m3.grib2"
+
+    def test_fetch_one_control_member_keeps_cf(self, fake_ecmwf_client, tmp_path):
+        """The 'control' member keeps the row's configured type (cf), no number."""
+        ens = NWPModel(
+            provider="ecmwf-opendata", model_family="ens", cycles_utc=[0], horizon_h=360,
+            backend="ecmwf-opendata", mirrors=["aws"], bands={"temperature_2m": "2t"},
+            request_options={"stream": "enfo", "type": "cf"}, members=["control", "1"],
+        )
+        ECMWFCentre(tmp_path).fetch_one(ens, dt.datetime(2024, 6, 1, 0), 0, ["temperature_2m"], "aws", "control")
+        call = fake_ecmwf_client.instances[-1].retrieve_calls[-1]
+        assert call["type"] == "cf" and "number" not in call
 
     def test_fetch_one_aifs_uses_model_and_family(self, fake_ecmwf_client, tmp_path):
         """An AIFS row sets Client(model='aifs-single') and names the file by family."""

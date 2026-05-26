@@ -102,8 +102,9 @@ class NOAACentre(_NWPCentre):
         step: int,
         params: list[str],
         mirror: str,
+        member: str | None = None,
     ) -> Path:
-        """Download the variable-subset GRIB2 for one `(cycle, step)`.
+        """Download the variable-subset GRIB2 for one `(cycle, step[, member])`.
 
         Joins the requested params' Herbie `search` regexes with `|`
         into a single `.idx` selector, runs `Herbie(...).download(...)`,
@@ -115,6 +116,9 @@ class NOAACentre(_NWPCentre):
             step: The forecast lead time in hours.
             params: The requested earthlens parameter names.
             mirror: The selected cloud-mirror key.
+            member: Ensemble member id (e.g. GEFS `"mean"` or `"5"`),
+                forwarded to Herbie's `member=` — numeric ids become an
+                `int`. `None` for a deterministic model.
 
         Returns:
             pathlib.Path: The local variable-subset GRIB2 file.
@@ -130,6 +134,8 @@ class NOAACentre(_NWPCentre):
         }
         if model.product is not None:
             kwargs["product"] = model.product
+        if member is not None:
+            kwargs["member"] = int(member) if member.isdigit() else member
         # request_options carries any extra Herbie constructor kwargs a model
         # needs — e.g. `domain` for HiResW / HREF. Splat last so the catalog
         # row can override a default if it ever needs to.

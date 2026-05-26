@@ -45,8 +45,12 @@ class DWDCentre(_NWPCentre):
         step: int,
         params: list[str],
         mirror: str,
+        member: str | None = None,
     ) -> Path:
         """Download + decompress one `.bz2` per variable into one GRIB2.
+
+        `member` is accepted for interface parity but ignored — the ICON
+        rows here are deterministic (ICON-EPS is a separate model).
 
         Args:
             model: The resolved catalog row (carries `url_template` and

@@ -79,8 +79,9 @@ class _NWPCentre(ABC):
         step: int,
         params: list[str],
         mirror: str,
+        member: str | None = None,
     ) -> Path:
-        """Download the variable-subset GRIB2 for one `(cycle, step)`.
+        """Download the variable-subset GRIB2 for one `(cycle, step[, member])`.
 
         Args:
             model: The resolved catalog row.
@@ -90,10 +91,13 @@ class _NWPCentre(ABC):
                 `model.bands`).
             mirror: The selected cloud-mirror key (`"auto"` lets the
                 centre choose).
+            member: Ensemble member id for an ensemble model, or `None`
+                for a deterministic one. Only the ensemble-capable centres
+                (NOAA GEFS, ECMWF ENS) use it; the others ignore it.
 
         Returns:
             pathlib.Path: The local GRIB2 file holding every requested
-                band for this `(cycle, step)`.
+                band for this `(cycle, step[, member])`.
         """
         raise NotImplementedError
 

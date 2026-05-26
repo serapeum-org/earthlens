@@ -145,6 +145,12 @@ class NWPModel(BaseModel):
             selector — a Herbie `search` regex (`":TMP:2 m above
             ground:"`) for SDK models, or a provider var token
             (`"T_2M"`) for direct ones.
+        members: Ensemble member ids, when the model is an ensemble
+            (empty for deterministic models). The first entry is the
+            default representative fetched when no `members=` is given
+            (e.g. `"mean"` for GEFS, `"control"` for ENS). Each centre
+            maps an id to its SDK's member selector (Herbie `member=`
+            for GEFS; `type=pf` + `number=` for ECMWF ENS).
         request_options: Free-form per-centre extras the adapter splats
             into its request. ECMWF Open Data uses `ecmwf_model` /
             `stream` / `type` (e.g. `{"ecmwf_model": "aifs-single"}` for
@@ -195,6 +201,7 @@ class NWPModel(BaseModel):
     url_template: str | None = None
     bands: dict[str, str] = Field(default_factory=dict)
     request_options: dict[str, Any] = Field(default_factory=dict)
+    members: list[str] = Field(default_factory=list)
 
 
 class Catalog(AbstractCatalog):

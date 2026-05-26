@@ -121,8 +121,9 @@ class ECMWFCentre(_NWPCentre):
         step: int,
         params: list[str],
         mirror: str,
+        member: str | None = None,
     ) -> Path:
-        """Retrieve the param-subset GRIB2 for one `(cycle, step)`.
+        """Retrieve the param-subset GRIB2 for one `(cycle, step[, member])`.
 
         Args:
             model: The resolved catalog row.
@@ -130,6 +131,9 @@ class ECMWFCentre(_NWPCentre):
             step: The forecast lead time in hours.
             params: The requested earthlens parameter names.
             mirror: The selected cloud-mirror key.
+            member: ENS member id — a numeric id selects `type=pf` +
+                `number=<id>`; `"control"` (or `None`) keeps the
+                row's configured type (`cf` for the ENS control).
 
         Returns:
             pathlib.Path: The local param-subset GRIB2 file.
@@ -143,15 +147,23 @@ class ECMWFCentre(_NWPCentre):
             source=_source_for(mirror, model),
             model=opts.get("ecmwf_model", "ifs"),
         )
-        target = self.save_dir / grib_name(model.model_family or "ifs", cycle, step)
+        target = self.save_dir / grib_name(
+            model.model_family or "ifs", cycle, step, member
+        )
+        ens_type = opts.get("type", "fc")
+        if member is not None and member.isdigit():
+            # A perturbed ENS member: type=pf + number=<member>.
+            ens_type = "pf"
         base: dict[str, Any] = {
             "date": cycle.strftime("%Y-%m-%d"),
             "time": cycle.hour,
             "step": step,
-            "type": opts.get("type", "fc"),
+            "type": ens_type,
         }
         if opts.get("stream"):
             base["stream"] = opts["stream"]
+        if member is not None and member.isdigit():
+            base["number"] = int(member)
         # ecmwf-opendata needs one retrieve per level type / level (a single
         # request can't mix sfc + pl, nor different pressure levels), so group
         # the band tokens and concatenate the per-group GRIBs into one file.
