@@ -16,6 +16,7 @@ datasets:
     resolution: 0.25deg
     cycles_utc: [0, 6, 12, 18]
     cadence_h: 6
+    step_cadence_h: 3
     horizon_h: 384
     format: grib2
     idx: true
@@ -31,6 +32,7 @@ datasets:
     resolution: 0.5deg
     cycles_utc: [0, 6, 12, 18]
     cadence_h: 6
+    step_cadence_h: 3
     horizon_h: 384
     product: atmos.5                      # 0.5-degree atmos product
     format: grib2
@@ -47,6 +49,7 @@ datasets:
     resolution: 3km
     cycles_utc: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23]
     cadence_h: 1
+    step_cadence_h: 1
     horizon_h: 48                         # 48 h at 00/06/12/18, 18 h otherwise
     product: wrfsfcf                       # surface fields
     format: grib2
@@ -63,6 +66,7 @@ datasets:
     resolution: 0.25deg
     cycles_utc: [0, 6, 12, 18]
     cadence_h: 6
+    step_cadence_h: 3
     horizon_h: 240                         # 240 h at 00/12, 90 h at 06/18
     format: grib2
     idx: true
@@ -78,6 +82,7 @@ datasets:
     resolution: 0.125deg
     cycles_utc: [0, 6, 12, 18]
     cadence_h: 6
+    step_cadence_h: 3
     horizon_h: 180
     format: grib2
     idx: false

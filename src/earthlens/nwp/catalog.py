@@ -120,6 +120,13 @@ class NWPModel(BaseModel):
             `[0, 6, 12, 18]`).
         horizon_h: Maximum forecast lead time in hours.
         cadence_h: Spacing of the run hours in `cycles_utc`, advisory.
+        step_cadence_h: Spacing between published forecast steps, in
+            hours, used to expand a `horizon=` request (e.g. `3` for a
+            model whose steps are f000/f003/f006/…). Approximate — a
+            model with a mixed grid (hourly then 3-hourly) is coarsened
+            to a single cadence; the `errors="warn"` fetch policy skips
+            any expanded step the model doesn't actually carry. Defaults
+            to `1` (hourly).
         product: Herbie product token, required for some models (e.g.
             HRRR `"wrfsfcf"`); `None` otherwise.
         format: On-disk format the fetch produces (`"grib2"`).
@@ -171,6 +178,7 @@ class NWPModel(BaseModel):
     cycles_utc: list[int] = Field(default_factory=list)
     horizon_h: int = 0
     cadence_h: int | None = None
+    step_cadence_h: int = 1
     product: str | None = None
     format: str = "grib2"
     idx: bool = True

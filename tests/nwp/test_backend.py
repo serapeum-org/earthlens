@@ -135,10 +135,30 @@ class TestStepsFor:
         b = _make(mini_catalog, tmp_path, steps=[12, 0, 12])
         assert b._steps_for(b._requests[0][1]) == [0, 12]
 
-    def test_horizon_expands_hourly(self, mini_catalog, tmp_path):
-        """horizon= expands to every integer hour up to the horizon."""
+    def test_horizon_expands_hourly_by_default(self, mini_catalog, tmp_path):
+        """horizon= expands hourly when the model has the default cadence (1)."""
         b = _make(mini_catalog, tmp_path, horizon=3)
         assert b._steps_for(b._requests[0][1]) == [0, 1, 2, 3]
+
+    def test_horizon_expands_on_step_cadence(self, tmp_path):
+        """horizon= steps on the model's step_cadence_h (M2), not hourly."""
+        from earthlens.nwp import Catalog, NWPModel
+
+        cat = Catalog(
+            datasets={
+                "gfs": NWPModel(
+                    provider="noaa-nodd",
+                    model_family="gfs",
+                    cycles_utc=[0],
+                    horizon_h=24,
+                    step_cadence_h=3,
+                    backend="herbie",
+                    bands={"temperature_2m": ":TMP:2 m above ground:"},
+                )
+            }
+        )
+        b = _make(cat, tmp_path, horizon=12)
+        assert b._steps_for(b._requests[0][1]) == [0, 3, 6, 9, 12]
 
     def test_step_beyond_horizon_raises(self, mini_catalog, tmp_path):
         """A step past the model horizon raises ValueError."""

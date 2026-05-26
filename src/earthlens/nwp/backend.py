@@ -243,14 +243,17 @@ class NWP(AbstractDataSource):
         """Resolve the forecast lead times to fetch for one model (`G1`).
 
         Precedence: an explicit `steps=` list wins; otherwise `horizon=`
-        expands to every integer hour `0..horizon`; otherwise the
-        default is `[0]` (the analysis step), keeping the MVP bounded.
-        `steps=` is the recommended way to request a coarse set of lead
-        times, since not every model publishes every hourly step.
+        expands from `0` to the horizon on the model's `step_cadence_h`
+        (e.g. every 3 h for GFS), so it does not request hourly steps a
+        coarse model never publishes (`M2`); otherwise the default is
+        `[0]` (the analysis step), keeping the MVP bounded. A step the
+        model still doesn't carry is handled by the `errors` fetch
+        policy (`M1`), not here.
 
         Args:
             model: The resolved catalog row (bounds the request via
-                `horizon_h`).
+                `horizon_h`, and sets the `horizon=` cadence via
+                `step_cadence_h`).
 
         Returns:
             list[int]: Sorted, de-duplicated lead times in hours.
@@ -262,7 +265,9 @@ class NWP(AbstractDataSource):
         if self._steps_arg is not None:
             steps = sorted({int(s) for s in self._steps_arg})
         elif self._horizon_arg is not None:
-            steps = list(range(0, int(self._horizon_arg) + 1))
+            steps = list(
+                range(0, int(self._horizon_arg) + 1, max(model.step_cadence_h, 1))
+            )
         else:
             steps = [0]
         too_far = [s for s in steps if s > model.horizon_h]

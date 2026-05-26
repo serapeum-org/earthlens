@@ -34,11 +34,25 @@ their parameter names.
 |-------|---------|
 | *(neither)* | only the **analysis step** `f000` — keeps a request small |
 | `steps=[0, 6, 24]` | exactly these lead times (recommended — explicit) |
-| `horizon=48` | every integer hour `0..48` (assumes hourly availability) |
+| `horizon=48` | `0..48` stepping on the model's `step_cadence_h` (e.g. every 3 h for GFS) |
 
-A step beyond the model's `horizon_h` raises a `ValueError`. Because not
-every model publishes every hourly step, prefer `steps=` for coarse sets
-of lead times.
+A step beyond the model's `horizon_h` raises a `ValueError`. `horizon=`
+expands on the model's published step cadence rather than blindly hourly,
+so it won't request steps a coarse model never publishes. Any step the
+model still doesn't carry on a given cycle is skipped per the
+`errors=` policy below — it does not abort the download.
+
+### Partial availability (`errors=`)
+
+A `(cycle, step)` can be legitimately missing (the latest cycle isn't
+published yet, or a model doesn't carry every step on every cycle).
+`download(errors=...)` governs that:
+
+| `errors=` | behaviour |
+|-----------|-----------|
+| `"warn"` (default) | log the miss, return the COGs that succeeded |
+| `"skip"` | drop the miss silently |
+| `"raise"` | abort the whole download on the first miss |
 
 ## Cloud mirror selection
 
