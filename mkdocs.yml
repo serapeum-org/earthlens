@@ -130,6 +130,13 @@ nav:
       - Reference: reference/ecmwf.md
       - Catalog & Probes: reference/ecmwf/catalog.md
       - Aggregation: reference/aggregation.md
+    - EUMETSAT (Data Store):
+      - Introduction: reference/eumetsat/introduction.md
+      - Usage: reference/eumetsat/usage.md
+      - Authentication: reference/eumetsat/authentication.md
+      - Catalog & Tooling: reference/eumetsat/catalog.md
+      - Data Tailor (deferred): reference/eumetsat/data-tailor.md
+      - Reference: reference/eumetsat/eumetsat.md
     - FDSN (earthquakes):
       - Introduction: reference/fdsn/introduction.md
       - Usage: reference/fdsn/usage.md
