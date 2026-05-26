@@ -1,15 +1,19 @@
-"""Shared helpers for the EUMETSAT catalog tools (refresh / audit).
+"""Shared helpers for the EUMETSAT catalog tools (refresh / audit / probe).
 
-Builds an `eumdac.DataStore` from `EUMETSAT_CONSUMER_KEY` /
-`EUMETSAT_CONSUMER_SECRET` (or `~/.eumdac/credentials`) and exposes the
-pure diff logic the audit tool runs, so that logic can be unit-tested
-without a network call. Not part of the installed package.
+The Data Store **browse** endpoint is public (no token), so the catalog
+tools walk it directly with `requests` — no credentials needed. An
+`eumdac.DataStore` (which does need credentials) is only built for
+operations that actually search/fetch products. The pure diff logic the
+audit tool runs lives here too so it can be unit-tested without a network
+call. Not part of the installed package.
 """
 
 from __future__ import annotations
 
 import sys
 from pathlib import Path
+
+import requests
 
 #: Repo `src/` so the tools can import `earthlens.eumetsat` when run from a
 #: checkout that has not `pip install`-ed the package.
@@ -19,6 +23,46 @@ if str(_SRC) not in sys.path:
 
 CATALOG_DIR = _SRC / "earthlens" / "eumetsat" / "catalog"
 INDEX_PATH = CATALOG_DIR / "_index.yaml"
+
+#: Public Data Store browse endpoints (no authentication required).
+BROWSE_URL = "https://api.eumetsat.int/data/browse/collections"
+BROWSE_DETAIL_URL = "https://api.eumetsat.int/data/browse/1.0.0/collections/{cid}"
+
+
+def browse_collection_ids(timeout: float = 30.0) -> list[str]:
+    """Return every collection id from the public browse endpoint (sorted).
+
+    Walks `api.eumetsat.int/data/browse/collections` (public, no token) and
+    extracts the `EO:EUM:DAT:…` id from each link.
+
+    Args:
+        timeout: Per-request timeout in seconds.
+
+    Returns:
+        list[str]: The collection-id strings the Data Store lists, sorted.
+    """
+    resp = requests.get(BROWSE_URL, params={"format": "json"}, timeout=timeout)
+    resp.raise_for_status()
+    links = resp.json().get("links") or []
+    return sorted({link["title"] for link in links if link.get("title")})
+
+
+def browse_collection_detail(collection_id: str, timeout: float = 30.0) -> dict:
+    """Return the public browse metadata for one collection.
+
+    Args:
+        collection_id: A Data Store `EO:EUM:DAT:…` id.
+        timeout: Per-request timeout in seconds.
+
+    Returns:
+        dict: The parsed JSON metadata document for the collection.
+    """
+    from urllib.parse import quote
+
+    url = BROWSE_DETAIL_URL.format(cid=quote(collection_id, safe=""))
+    resp = requests.get(url, params={"format": "json"}, timeout=timeout)
+    resp.raise_for_status()
+    return resp.json()
 
 
 def build_datastore():

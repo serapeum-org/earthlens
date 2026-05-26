@@ -24,7 +24,7 @@ from __future__ import annotations
 import argparse
 import sys
 
-from _store import build_datastore, diff_catalog, live_collection_ids
+from _store import browse_collection_ids, diff_catalog
 
 
 def audit(strict: bool) -> int:
@@ -35,8 +35,8 @@ def audit(strict: bool) -> int:
     curated_ids = {c.collection_id for c in catalog.collections.values()}
     available_ids = set(catalog.available_collections)
 
-    store = build_datastore()
-    live_ids = set(live_collection_ids(store))
+    # The browse endpoint is public, so the audit needs no credentials.
+    live_ids = set(browse_collection_ids())
 
     findings = diff_catalog(live_ids, curated_ids, available_ids)
     for cid in findings["gone"]:

@@ -49,11 +49,26 @@ def test_audit_strict_exit_code_via_diff():
     assert sum(len(v) for v in findings.values()) == 1
 
 
+def test_probe_resolve_passthrough_for_collection_id():
+    """probe._resolve_to_id returns a real EO:EUM:DAT id unchanged (no network)."""
+    probe = _load("probe_eumetsat_product")
+    assert probe._resolve_to_id("EO:EUM:DAT:MSG:HRSEVIRI") == "EO:EUM:DAT:MSG:HRSEVIRI"
+
+
+def test_probe_resolve_curated_key():
+    """probe._resolve_to_id maps a curated key to its collection id (no network)."""
+    probe = _load("probe_eumetsat_product")
+    assert probe._resolve_to_id("msg-hrseviri") == "EO:EUM:DAT:MSG:HRSEVIRI"
+
+
 def test_tool_clis_parse_help():
-    """Both CLIs build their argument parsers without error."""
+    """All three CLIs build their argument parsers without error."""
     refresh = _load("refresh_eumetsat_catalog")
     audit = _load("audit_eumetsat_catalog")
+    probe = _load("probe_eumetsat_product")
     with pytest.raises(SystemExit):
         refresh.main(["--help"])
+    with pytest.raises(SystemExit):
+        probe.main(["--help"])
     with pytest.raises(SystemExit):
         audit.main(["--help"])
