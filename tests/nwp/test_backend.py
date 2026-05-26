@@ -314,6 +314,22 @@ class TestAggregate:
         assert out[0].name == "gfs_mean_1D_2024060100.tif"
         assert len(fake_aggregate["written"]) == 1
 
+    def test_accumulated_field_warns(self, mini_catalog, tmp_path, fake_aggregate, monkeypatch):
+        """Aggregating an accumulated (*_acc) band logs a warning (M3)."""
+        warnings = []
+        monkeypatch.setattr(backend_mod.logger, "warning", lambda msg: warnings.append(msg))
+        b = _make(mini_catalog, tmp_path, variables={"icon-global": ["precipitation_acc"]})
+        b._aggregate([tmp_path / "icon-global_2024060100_f000.tif"], self._config())
+        assert any("accumulated" in m for m in warnings), warnings
+
+    def test_instantaneous_field_no_warn(self, mini_catalog, tmp_path, fake_aggregate, monkeypatch):
+        """A non-accumulated band aggregates without the accumulation warning."""
+        warnings = []
+        monkeypatch.setattr(backend_mod.logger, "warning", lambda msg: warnings.append(msg))
+        b = _make(mini_catalog, tmp_path, variables={"gfs": ["temperature_2m"]})
+        b._aggregate([tmp_path / "gfs_2024060100_f000.tif"], self._config())
+        assert not any("accumulated" in m for m in warnings), warnings
+
     def test_multi_model_request_rejected(self, mini_catalog, tmp_path, fake_aggregate):
         """Aggregation across models with different grids is rejected."""
         b = _make(

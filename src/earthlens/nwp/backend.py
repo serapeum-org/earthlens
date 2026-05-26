@@ -518,6 +518,19 @@ class NWP(AbstractDataSource):
         from pyramids.dataset.cog import write_cog
 
         op = "mean" if config.op == "auto" else config.op
+        # Accumulated fields (precipitation_acc / APCP / tp) carry a running
+        # total over a step-dependent window; reducing them across steps by
+        # valid time mixes accumulation intervals and can mislead. Warn rather
+        # than silently produce wrong totals (M3) — de-accumulation is a future
+        # enhancement.
+        accumulated = [p for p in self._requests[0][2] if p.endswith("_acc")]
+        if accumulated:
+            logger.warning(
+                f"NWP aggregate: {accumulated} are accumulated field(s); "
+                f"reducing them by valid time with op={op!r} mixes accumulation "
+                "windows and may give misleading totals. Prefer the per-(cycle, "
+                "step) COGs, or de-accumulate before aggregating."
+            )
         out_dir = (
             Path(config.out_dir) if config.out_dir is not None else Path(self.root_dir)
         )

@@ -103,3 +103,11 @@ paths = lens.download(
 Aggregation requires a **single model** per request — different models
 have different native grids and cannot be co-registered into one stack.
 Issue one request per model.
+
+!!! warning "Accumulated fields"
+    `precipitation_acc` (and other `*_acc` fields) are **accumulations**
+    over a step-dependent window, not instantaneous values. Reducing
+    them across forecast steps by valid time (`mean`/`sum`) mixes
+    accumulation intervals and can give misleading totals — the backend
+    logs a warning when you do. Prefer the per-`(cycle, step)` COGs, or
+    de-accumulate before aggregating.
