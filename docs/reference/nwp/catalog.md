@@ -119,14 +119,20 @@ relative humidity at 850 / 500 hPa (so 26 bands each):
 | `wind_u_250hPa` | `:UGRD:250 mb:` | `u@250` |
 | `relative_humidity_850hPa` | `:RH:850 mb:` | `r@850` |
 
-For Herbie the level is part of the `.idx` regex (no special handling). For
-ECMWF the `param@level` token sets `levtype=pl` + `levelist`; the centre issues
-one `retrieve` per level type / level and concatenates them, since
-`ecmwf-opendata` cannot mix level types in a single request.
+All 22 models carry these 3-D fields (25–26 bands each). The per-centre
+mechanics differ:
 
-**DWD ICON** and **Météo-France** 3-D fields are a follow-on — their
-pressure-level data lives under a separate file path / WCS coverage-id structure
-than the single-level rows here.
+* **Herbie (NOAA/ECCC)** — the level is in the `.idx` regex (`:TMP:850 mb:`); no
+  special handling.
+* **ECMWF** — `param@level` (`t@850`) sets `levtype=pl` + `levelist`; the centre
+  issues one `retrieve` per level type/level and concatenates (ecmwf-opendata
+  can't mix level types in one request).
+* **DWD ICON** — pressure-level data is a separate file
+  (`…/pressure-level/…_{level}_{VAR}`), so each ICON row has a
+  `request_options.pl_url_template` and `VAR@level` bands (`FI` = geopotential).
+  HEAD-validated live for `icon-eu` (`T@850` / `FI@500` / `U@250` all 200).
+* **Météo-France** — `COVERAGE@level` selects the `…__ISOBARIC_SURFACE` coverage
+  + a WCS `subset=pressure(level×100 Pa)` (best-effort, key needed to validate).
 
 ```python
 from earthlens.nwp import Catalog
