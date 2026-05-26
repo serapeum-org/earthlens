@@ -137,6 +137,29 @@ el = EarthLens(
 )
 ```
 
+## Sentinel-5P timeliness
+
+The EUMETSAT Data Store does **not** publish offline (OFFL) Sentinel-5P
+collections. The curated rows therefore mix timeliness, recorded on each
+row's `timeliness` field:
+
+| Key | Collection | Timeliness |
+|-----|------------|------------|
+| `s5p-l2-no2` | TROPOMI L2 NO2 | `nrt` |
+| `s5p-l2-co` | TROPOMI L2 CO | `nrt` |
+| `s5p-l2-o3` | TROPOMI L2 O3 | `nrt` |
+| `s5p-l2-ch4` | TROPOMI CH4 | `reprocessed` |
+
+The NRT collections have a rolling retention (~recent data only, low
+latency); CH4 is the consolidated reprocessed archive. For a deeper
+offline NO2/CO/O3 archive, use the Data Tailor or the Copernicus Data
+Space. Inspect the value with:
+
+```python
+from earthlens.eumetsat import Catalog
+print(Catalog().get_collection("s5p-l2-no2").timeliness)   # 'nrt'
+```
+
 ## Quotas, rate limits, and gotchas
 
 * **Whole-product download**: you receive entire products. Keep the bbox

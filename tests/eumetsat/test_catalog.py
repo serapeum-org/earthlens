@@ -92,6 +92,15 @@ def test_format_tags_distinguish_native_and_netcdf(catalog):
     assert catalog.get_collection("s3-olci-l2-wfr").format == "netcdf"
 
 
+def test_sentinel5p_timeliness_recorded(catalog):
+    """The S5P rows record NRT vs reprocessed timeliness; imagery leaves it None."""
+    assert catalog.get_collection("s5p-l2-no2").timeliness == "nrt"
+    assert catalog.get_collection("s5p-l2-co").timeliness == "nrt"
+    assert catalog.get_collection("s5p-l2-o3").timeliness == "nrt"
+    assert catalog.get_collection("s5p-l2-ch4").timeliness == "reprocessed"
+    assert catalog.get_collection("msg-hrseviri").timeliness is None
+
+
 def test_every_collection_id_matches_eumetsat_pattern(catalog):
     """Every curated collection_id is a well-formed `EO:EUM:DAT:...` id."""
     import re

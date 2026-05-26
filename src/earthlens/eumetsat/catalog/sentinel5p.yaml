@@ -2,6 +2,13 @@
 # EUMETSAT Data Store. Delivered as NetCDF (swath) products — pyramids can
 # read them today; the MVP fetches whole products to disk (G4). Collection ids
 # verified against api.eumetsat.int/data/browse/collections on 2026-05-26.
+#
+# Timeliness note: the EUMETSAT Data Store does NOT publish offline (OFFL)
+# Sentinel-5P collections — NO2, CO and O3 are the Near-Real-Time (NRT)
+# collections (rolling retention, ~3 h latency), and CH4 is the dedicated
+# reprocessed/offline collection. The `timeliness` field below records this per
+# row; there is no OFFL id to standardise on. Use the Data Tailor / Copernicus
+# data space if you need a fuller offline archive for NO2/CO/O3.
 collections:
   s5p-l2-no2:
     collection_id: "EO:EUM:DAT:0076"
@@ -10,6 +17,7 @@ collections:
     output_kind: raster
     format: netcdf
     cadence: subdaily
+    timeliness: nrt
     selectors: [L2__NO2___]
     tailor_product_type: S5PL2NO2
     extent: { lat: [-90, 90], lon: [-180, 180] }
@@ -22,6 +30,7 @@ collections:
     output_kind: raster
     format: netcdf
     cadence: subdaily
+    timeliness: reprocessed
     selectors: [L2__CH4___]
     tailor_product_type: S5PL2CH4
     extent: { lat: [-90, 90], lon: [-180, 180] }
@@ -34,6 +43,7 @@ collections:
     output_kind: raster
     format: netcdf
     cadence: subdaily
+    timeliness: nrt
     selectors: [L2__CO____]
     tailor_product_type: S5PL2CO
     extent: { lat: [-90, 90], lon: [-180, 180] }
@@ -46,6 +56,7 @@ collections:
     output_kind: raster
     format: netcdf
     cadence: subdaily
+    timeliness: nrt
     selectors: [L2__O3____]
     tailor_product_type: S5PL2O3
     extent: { lat: [-90, 90], lon: [-180, 180] }

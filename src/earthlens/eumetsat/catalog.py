@@ -72,6 +72,12 @@ CadenceLiteral = Literal[
     "irregular",
 ]
 
+#: Delivery timeliness of a Data Store collection. `nrt` = near-real-time
+#: (rolling retention, low latency); `reprocessed` = a consolidated reprocessed
+#: archive; `offline` = the standard offline (OFFL) stream. `None` when the
+#: distinction does not apply (e.g. geostationary L1.5 imagery).
+TimelinessLiteral = Literal["nrt", "reprocessed", "offline"]
+
 
 class DataStoreGroup(str, Enum):
     """The EUMETSAT Data Store collection groups (mission families).
@@ -304,6 +310,11 @@ class EumetsatCollection(BaseModel):
             satpy bridge (`PY-2`) to read; `"netcdf"` is pyramids-readable
             today (`G4`).
         cadence: Native temporal cadence (advisory).
+        timeliness: Delivery timeliness of the collection — `"nrt"`,
+            `"reprocessed"`, or `"offline"` — or `None` when the
+            distinction does not apply (e.g. geostationary L1.5 imagery).
+            Recorded so a caller can tell a near-real-time stream from a
+            reprocessed archive (the Sentinel-5P collections mix the two).
         selectors: Informational product-type / band selectors (`G2`).
             EUMETSAT delivers whole products, so selectors do not subset
             the download; they seed catalog metadata and the future Data
@@ -334,6 +345,7 @@ class EumetsatCollection(BaseModel):
     output_kind: OutputKindLiteral = "raster"
     format: str = ""
     cadence: CadenceLiteral = "irregular"
+    timeliness: TimelinessLiteral | None = None
     selectors: list[str] = Field(default_factory=list)
     tailor_product_type: str | None = None
     extent: Extent = Field(default_factory=Extent)
