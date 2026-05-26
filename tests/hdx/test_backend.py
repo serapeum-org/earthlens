@@ -1,0 +1,194 @@
+"""Unit + integration tests for the HDX backend (faked SDK, no network)."""
+
+from __future__ import annotations
+
+from pathlib import Path
+
+import pytest
+
+from earthlens.hdx import HDX
+from earthlens.hdx.backend import _as_filter_list
+
+from .conftest import FakeHdx, FakeResource
+
+pytestmark = pytest.mark.hdx
+
+
+class TestAsFilterList:
+    """Tests for the _as_filter_list normaliser."""
+
+    @pytest.mark.parametrize(
+        "value, expected",
+        [
+            (None, []),
+            ("", []),
+            ("*.csv", ["*.csv"]),
+            (["*.csv", "shp"], ["*.csv", "shp"]),
+            (["", "csv", ""], ["csv"]),
+        ],
+    )
+    def test_normalise(self, value, expected):
+        """A string / list / None argument normalises to a filter list."""
+        assert _as_filter_list(value) == expected
+
+
+class TestInit:
+    """Tests for HDX construction and target resolution."""
+
+    def test_resolves_catalog_key(self, fake_hdx: FakeHdx, tmp_path):
+        """A curated key resolves to its hdx_id and default resource filter."""
+        backend = HDX(variables={"kontur-population": []}, path=tmp_path)
+        assert backend._targets == [("kontur-population-dataset", ["*.gpkg.gz"])]
+
+    def test_per_call_filter_overrides_catalog_default(self, fake_hdx, tmp_path):
+        """An explicit per-key filter list overrides the catalog default."""
+        backend = HDX(variables={"kontur-population": ["*.csv"]}, path=tmp_path)
+        assert backend._targets == [("kontur-population-dataset", ["*.csv"])]
+
+    def test_default_bbox_is_global(self, fake_hdx: FakeHdx, tmp_path):
+        """Omitted bbox defaults to the whole globe (ignored by the query)."""
+        backend = HDX(variables={"kontur-population": []}, path=tmp_path)
+        assert backend.space.west == -180.0 and backend.space.east == 180.0
+
+    def test_output_kind_is_mixed(self, fake_hdx: FakeHdx, tmp_path):
+        """OUTPUT_KIND is the fixed value 'mixed'."""
+        backend = HDX(variables={"kontur-population": []}, path=tmp_path)
+        assert backend.OUTPUT_KIND == "mixed"
+
+    def test_escape_hatch_bypasses_catalog(self, fake_hdx: FakeHdx, tmp_path):
+        """hdx_id= bypasses the catalog and carries its resource filter."""
+        backend = HDX(hdx_id="arbitrary-id", resource="*.tif", path=tmp_path)
+        assert backend._targets == [("arbitrary-id", ["*.tif"])]
+
+    def test_escape_hatch_without_resource(self, fake_hdx: FakeHdx, tmp_path):
+        """hdx_id= with no resource filter targets every resource."""
+        backend = HDX(hdx_id="arbitrary-id", path=tmp_path)
+        assert backend._targets == [("arbitrary-id", [])]
+
+    def test_requires_variables_or_hdx_id(self, fake_hdx: FakeHdx, tmp_path):
+        """Neither variables nor hdx_id raises ValueError."""
+        with pytest.raises(ValueError, match="non-empty `variables`"):
+            HDX(path=tmp_path)
+
+    def test_unknown_key_raises(self, fake_hdx: FakeHdx, tmp_path):
+        """An unknown catalog key raises ValueError (did-you-mean)."""
+        with pytest.raises(ValueError, match="HDX catalog"):
+            HDX(variables={"not-a-key": []}, path=tmp_path)
+
+    def test_check_input_dates_resolution_all(self, fake_hdx: FakeHdx, tmp_path):
+        """The temporal resolution is the 'all' sentinel."""
+        backend = HDX(variables={"kontur-population": []}, path=tmp_path)
+        assert backend.time.resolution == "all"
+
+    def test_invalid_date_range_raises(self, fake_hdx: FakeHdx, tmp_path):
+        """An end-before-start window is rejected by the date parser."""
+        with pytest.raises(ValueError):
+            HDX(
+                variables={"kontur-population": []},
+                start="2024-12-31",
+                end="2024-01-01",
+                path=tmp_path,
+            )
+
+
+class TestSearch:
+    """Tests for HDX._search (resolve + filter resources)."""
+
+    def test_resolves_and_filters(self, fake_hdx: FakeHdx, tmp_path):
+        """Only resources matching the filter become products."""
+        fake_hdx.add_dataset(
+            "multi",
+            [
+                FakeResource("a.gpkg", "Geopackage"),
+                FakeResource("b.csv", "CSV"),
+            ],
+        )
+        backend = HDX(hdx_id="multi", resource="*.gpkg", path=tmp_path)
+        products = backend._search()
+        assert [p.metadata["name"] for p in products] == ["a.gpkg"]
+        assert products[0].id == "multi::a.gpkg"
+        assert products[0].metadata["format"] == "Geopackage"
+
+    def test_empty_filter_keeps_all(self, fake_hdx: FakeHdx, tmp_path):
+        """An empty filter list downloads every resource."""
+        fake_hdx.add_dataset(
+            "multi",
+            [FakeResource("a.gpkg", "Geopackage"), FakeResource("b.csv", "CSV")],
+        )
+        backend = HDX(hdx_id="multi", path=tmp_path)
+        assert len(backend._search()) == 2
+
+    def test_missing_dataset_raises(self, fake_hdx: FakeHdx, tmp_path):
+        """A dataset id absent from HDX raises a clear ValueError."""
+        backend = HDX(hdx_id="ghost", path=tmp_path)
+        with pytest.raises(ValueError, match="not found"):
+            backend._search()
+
+    def test_records_href_from_resource_url(self, fake_hdx: FakeHdx, tmp_path):
+        """Each product's href is the resource URL."""
+        fake_hdx.add_dataset("d", [FakeResource("a.csv", "CSV", url="http://h/a")])
+        backend = HDX(hdx_id="d", path=tmp_path)
+        assert backend._search()[0].href == "http://h/a"
+
+    def test_missing_extra_in_search_raises(self, fake_hdx: FakeHdx, tmp_path, monkeypatch):
+        """A missing SDK at search time surfaces a friendly ImportError."""
+        import sys
+
+        backend = HDX(hdx_id="d", path=tmp_path)
+        for name in ("hdx", "hdx.data", "hdx.data.dataset"):
+            monkeypatch.setitem(sys.modules, name, None)
+        with pytest.raises(ImportError, match=r"earthlens\[hdx\]"):
+            backend._search()
+
+
+class TestFetch:
+    """Tests for HDX._fetch (download resources to disk)."""
+
+    def test_downloads_to_root_dir(self, fake_hdx: FakeHdx, tmp_path):
+        """Resources are downloaded into root_dir and their paths returned."""
+        fake_hdx.add_dataset("d", [FakeResource("a.csv", "CSV")])
+        backend = HDX(hdx_id="d", path=tmp_path)
+        paths = backend._fetch(backend._search())
+        assert paths == [Path(tmp_path) / "a.csv"]
+        assert paths[0].exists()
+
+    def test_empty_products_returns_empty(self, fake_hdx: FakeHdx, tmp_path):
+        """Fetching no products returns an empty list."""
+        backend = HDX(hdx_id="d", path=tmp_path)
+        assert backend._fetch([]) == []
+
+
+class TestDownload:
+    """Tests for HDX.download (the facade-facing entry point)."""
+
+    def test_download_composes_search_fetch(self, fake_hdx: FakeHdx, tmp_path):
+        """download resolves, filters, and downloads end-to-end."""
+        fake_hdx.add_dataset("d", [FakeResource("a.csv", "CSV")])
+        backend = HDX(hdx_id="d", path=tmp_path)
+        paths = backend.download()
+        assert [p.name for p in paths] == ["a.csv"]
+
+    def test_download_rejects_aggregate(self, fake_hdx: FakeHdx, tmp_path):
+        """A non-None aggregate= is rejected despite the mixed-forwarding facade."""
+        backend = HDX(variables={"kontur-population": []}, path=tmp_path)
+        with pytest.raises(NotImplementedError, match="aggregate="):
+            backend.download(aggregate=object())
+
+    def test_download_empty_search_short_circuits(self, fake_hdx: FakeHdx, tmp_path):
+        """A dataset with no matching resource downloads nothing."""
+        fake_hdx.add_dataset("d", [FakeResource("a.csv", "CSV")])
+        backend = HDX(hdx_id="d", resource="*.gpkg", path=tmp_path)
+        assert backend.download() == []
+
+    def test_progress_bar_flag_stored(self, fake_hdx: FakeHdx, tmp_path):
+        """The progress_bar flag is recorded on the instance."""
+        fake_hdx.add_dataset("d", [FakeResource("a.csv", "CSV")])
+        backend = HDX(hdx_id="d", path=tmp_path)
+        backend.download(progress_bar=False)
+        assert backend._show_progress is False
+
+    def test_api_via_search_fetch(self, fake_hdx: FakeHdx, tmp_path):
+        """_api composes the search/fetch split."""
+        fake_hdx.add_dataset("d", [FakeResource("a.csv", "CSV")])
+        backend = HDX(hdx_id="d", path=tmp_path)
+        assert [p.name for p in backend._api()] == ["a.csv"]

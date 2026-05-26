@@ -88,8 +88,8 @@ class HDX(AbstractDataSource):
     def __init__(
         self,
         variables: dict[str, list[str]] | None = None,
-        start: str = "1970-01-01",
-        end: str = "2100-01-01",
+        start: str | None = "1970-01-01",
+        end: str | None = "2100-01-01",
         lat_lim: list[float] | None = None,
         lon_lim: list[float] | None = None,
         temporal_resolution: str = "all",
@@ -145,6 +145,11 @@ class HDX(AbstractDataSource):
                 or a dataset key is unknown (the catalog's did-you-mean
                 hint is surfaced).
         """
+        # bbox / time are ignored for the query (`G2`); the facade may pass
+        # `start=None` / `end=None`, so fall back to wide sentinels.
+        start = start if start is not None else "1970-01-01"
+        end = end if end is not None else "2100-01-01"
+
         self._hdx_site = hdx_site
         self._user_agent = user_agent
         self._hdx_id = hdx_id
