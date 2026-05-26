@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -5643,12 +5643,47 @@ doesn't carry).</p>
 <td>360 h</td>
 <td>data-driven (<code>aifs-single</code>) ✓ probed</td>
 </tr>
+<tr>
+<td><code>rtma</code></td>
+<td>NOAA NODD</td>
+<td><code>herbie</code></td>
+<td>hourly</td>
+<td>0 h²</td>
+<td>2.5 km CONUS analysis (<code>anl</code>)</td>
+</tr>
+<tr>
+<td><code>urma</code></td>
+<td>NOAA NODD</td>
+<td><code>herbie</code></td>
+<td>hourly</td>
+<td>0 h²</td>
+<td>2.5 km CONUS analysis (<code>anl</code>)</td>
+</tr>
+<tr>
+<td><code>hiresw-arw</code></td>
+<td>NOAA NODD</td>
+<td><code>herbie</code></td>
+<td>00/12</td>
+<td>48 h</td>
+<td>2.5 km ARW window (<code>domain=conus</code>)</td>
+</tr>
+<tr>
+<td><code>href</code></td>
+<td>NOAA NODD</td>
+<td><code>herbie</code></td>
+<td>00/06/12/18</td>
+<td>48 h</td>
+<td>ensemble mean (<code>domain=conus</code>)</td>
+</tr>
 </tbody>
 </table>
-<p>Not yet shipped: <strong>Météo-France</strong> (the <code>direct-boto3</code> centre exists, but the
-<code>mf-nwp-models</code> bucket doesn't expose rolling forecasts in a resolvable
-unsigned layout) and <strong>CFS</strong> (seasonal — a different time axis than
-<code>(cycle, step)</code>).</p>
+<p>² <strong>Analyses</strong> (<code>rtma</code>/<code>urma</code>) have <code>horizon_h=0</code> — they are valid <em>at</em> the cycle
+time, so only the analysis step (<code>f000</code>) is fetched.</p>
+<p>Not shipped: <strong>Météo-France</strong> (the <code>direct-boto3</code> centre exists, but
+<code>s3://mf-nwp-models</code> exposes only <code>static/</code> — the rolling forecasts need MF's
+authenticated API portal, a separate auth+REST effort); <strong>CFS</strong> (seasonal — a
+different time axis than <code>(cycle, step)</code>); <strong>HAFS</strong> (hurricane model — needs a
+storm id, not a generic <code>(cycle, step)</code> raster).</p>
 <p>¹ <strong>HRRR per-cycle horizon.</strong> The <code>horizon_h</code> is the <em>maximum</em>: HRRR runs to
 48 h only at the 00/06/12/18 synoptic cycles; the other (hourly) cycles run to
 18 h. The catalog stores a single <code>horizon_h</code>, so a long-lead request on an
@@ -5661,9 +5696,9 @@ selector:</p>
 <thead>
 <tr>
 <th>Parameter</th>
-<th>GFS / GEFS / HRRR (Herbie regex)</th>
-<th>IFS (ecmwf token)</th>
-<th>ICON (DWD token)</th>
+<th>NOAA / ECCC (Herbie regex)</th>
+<th>ECMWF (token)</th>
+<th>DWD (token, lc for D2)</th>
 </tr>
 </thead>
 <tbody>
@@ -5679,8 +5714,34 @@ selector:</p>
 <td><code>tp</code></td>
 <td><code>TOT_PREC</code></td>
 </tr>
+<tr>
+<td><code>dewpoint_2m</code></td>
+<td><code>:DPT:2 m above ground:</code></td>
+<td><code>2d</code></td>
+<td><code>TD_2M</code></td>
+</tr>
+<tr>
+<td><code>wind_u_10m</code></td>
+<td><code>:UGRD:10 m above ground:</code></td>
+<td><code>10u</code></td>
+<td><code>U_10M</code></td>
+</tr>
+<tr>
+<td><code>wind_v_10m</code></td>
+<td><code>:VGRD:10 m above ground:</code></td>
+<td><code>10v</code></td>
+<td><code>V_10M</code></td>
+</tr>
+<tr>
+<td><code>pressure_msl</code></td>
+<td><code>:PRMSL:mean sea level:</code></td>
+<td><code>msl</code></td>
+<td><code>PMSL</code></td>
+</tr>
 </tbody>
 </table>
+<p>Not every model carries every band (e.g. analyses omit <code>precipitation_acc</code>); a
+requested band a model doesn't publish is skipped under <code>errors="warn"</code>.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.nwp</span><span class="w"> </span><span class="kn">import</span> <span class="n">Catalog</span>
 <a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>
 <a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="n">cat</span> <span class="o">=</span> <span class="n">Catalog</span><span class="p">()</span>

@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -12440,7 +12440,11 @@ missing-dependency import into a friendly <code>earthlens[nwp]</code> hint.</p>
 <span class="normal"><a href="#__codelineno-0-131">131</a></span>
 <span class="normal"><a href="#__codelineno-0-132">132</a></span>
 <span class="normal"><a href="#__codelineno-0-133">133</a></span>
-<span class="normal"><a href="#__codelineno-0-134">134</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-95" name="__codelineno-0-95"></a><span class="k">class</span><span class="w"> </span><span class="nc">NOAACentre</span><span class="p">(</span><span class="n">_NWPCentre</span><span class="p">):</span>
+<span class="normal"><a href="#__codelineno-0-134">134</a></span>
+<span class="normal"><a href="#__codelineno-0-135">135</a></span>
+<span class="normal"><a href="#__codelineno-0-136">136</a></span>
+<span class="normal"><a href="#__codelineno-0-137">137</a></span>
+<span class="normal"><a href="#__codelineno-0-138">138</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-95" name="__codelineno-0-95"></a><span class="k">class</span><span class="w"> </span><span class="nc">NOAACentre</span><span class="p">(</span><span class="n">_NWPCentre</span><span class="p">):</span>
 <a id="__codelineno-0-96" name="__codelineno-0-96"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Herbie-backed fetcher for the NOAA NODD models.&quot;&quot;&quot;</span>
 <a id="__codelineno-0-97" name="__codelineno-0-97"></a>
 <a id="__codelineno-0-98" name="__codelineno-0-98"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">fetch_one</span><span class="p">(</span>
@@ -12478,8 +12482,12 @@ missing-dependency import into a friendly <code>earthlens[nwp]</code> hint.</p>
 <a id="__codelineno-0-130" name="__codelineno-0-130"></a>        <span class="p">}</span>
 <a id="__codelineno-0-131" name="__codelineno-0-131"></a>        <span class="k">if</span> <span class="n">model</span><span class="o">.</span><span class="n">product</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
 <a id="__codelineno-0-132" name="__codelineno-0-132"></a>            <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;product&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">product</span>
-<a id="__codelineno-0-133" name="__codelineno-0-133"></a>        <span class="n">handle</span> <span class="o">=</span> <span class="n">herbie_cls</span><span class="p">(</span><span class="n">cycle</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-<a id="__codelineno-0-134" name="__codelineno-0-134"></a>        <span class="k">return</span> <span class="n">Path</span><span class="p">(</span><span class="n">handle</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">search</span><span class="p">))</span>
+<a id="__codelineno-0-133" name="__codelineno-0-133"></a>        <span class="c1"># request_options carries any extra Herbie constructor kwargs a model</span>
+<a id="__codelineno-0-134" name="__codelineno-0-134"></a>        <span class="c1"># needs — e.g. `domain` for HiResW / HREF. Splat last so the catalog</span>
+<a id="__codelineno-0-135" name="__codelineno-0-135"></a>        <span class="c1"># row can override a default if it ever needs to.</span>
+<a id="__codelineno-0-136" name="__codelineno-0-136"></a>        <span class="n">kwargs</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">request_options</span><span class="p">)</span>
+<a id="__codelineno-0-137" name="__codelineno-0-137"></a>        <span class="n">handle</span> <span class="o">=</span> <span class="n">herbie_cls</span><span class="p">(</span><span class="n">cycle</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+<a id="__codelineno-0-138" name="__codelineno-0-138"></a>        <span class="k">return</span> <span class="n">Path</span><span class="p">(</span><span class="n">handle</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">search</span><span class="p">))</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -12669,7 +12677,11 @@ and returns the path Herbie wrote.</p>
 <span class="normal"><a href="#__codelineno-0-131">131</a></span>
 <span class="normal"><a href="#__codelineno-0-132">132</a></span>
 <span class="normal"><a href="#__codelineno-0-133">133</a></span>
-<span class="normal"><a href="#__codelineno-0-134">134</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-98" name="__codelineno-0-98"></a><span class="k">def</span><span class="w"> </span><span class="nf">fetch_one</span><span class="p">(</span>
+<span class="normal"><a href="#__codelineno-0-134">134</a></span>
+<span class="normal"><a href="#__codelineno-0-135">135</a></span>
+<span class="normal"><a href="#__codelineno-0-136">136</a></span>
+<span class="normal"><a href="#__codelineno-0-137">137</a></span>
+<span class="normal"><a href="#__codelineno-0-138">138</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-98" name="__codelineno-0-98"></a><span class="k">def</span><span class="w"> </span><span class="nf">fetch_one</span><span class="p">(</span>
 <a id="__codelineno-0-99" name="__codelineno-0-99"></a>    <span class="bp">self</span><span class="p">,</span>
 <a id="__codelineno-0-100" name="__codelineno-0-100"></a>    <span class="n">model</span><span class="p">:</span> <span class="n">NWPModel</span><span class="p">,</span>
 <a id="__codelineno-0-101" name="__codelineno-0-101"></a>    <span class="n">cycle</span><span class="p">:</span> <span class="n">dt</span><span class="o">.</span><span class="n">datetime</span><span class="p">,</span>
@@ -12704,8 +12716,12 @@ and returns the path Herbie wrote.</p>
 <a id="__codelineno-0-130" name="__codelineno-0-130"></a>    <span class="p">}</span>
 <a id="__codelineno-0-131" name="__codelineno-0-131"></a>    <span class="k">if</span> <span class="n">model</span><span class="o">.</span><span class="n">product</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
 <a id="__codelineno-0-132" name="__codelineno-0-132"></a>        <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;product&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">product</span>
-<a id="__codelineno-0-133" name="__codelineno-0-133"></a>    <span class="n">handle</span> <span class="o">=</span> <span class="n">herbie_cls</span><span class="p">(</span><span class="n">cycle</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-<a id="__codelineno-0-134" name="__codelineno-0-134"></a>    <span class="k">return</span> <span class="n">Path</span><span class="p">(</span><span class="n">handle</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">search</span><span class="p">))</span>
+<a id="__codelineno-0-133" name="__codelineno-0-133"></a>    <span class="c1"># request_options carries any extra Herbie constructor kwargs a model</span>
+<a id="__codelineno-0-134" name="__codelineno-0-134"></a>    <span class="c1"># needs — e.g. `domain` for HiResW / HREF. Splat last so the catalog</span>
+<a id="__codelineno-0-135" name="__codelineno-0-135"></a>    <span class="c1"># row can override a default if it ever needs to.</span>
+<a id="__codelineno-0-136" name="__codelineno-0-136"></a>    <span class="n">kwargs</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">request_options</span><span class="p">)</span>
+<a id="__codelineno-0-137" name="__codelineno-0-137"></a>    <span class="n">handle</span> <span class="o">=</span> <span class="n">herbie_cls</span><span class="p">(</span><span class="n">cycle</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+<a id="__codelineno-0-138" name="__codelineno-0-138"></a>    <span class="k">return</span> <span class="n">Path</span><span class="p">(</span><span class="n">handle</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">search</span><span class="p">))</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
