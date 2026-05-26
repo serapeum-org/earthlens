@@ -136,7 +136,7 @@ class EarthLens:
             >>> from earthlens.earthlens import EarthLens
             >>> sorted(EarthLens.DataSources)  # doctest: +NORMALIZE_WHITESPACE
             ['amazon-s3', 'cdse', 'chc', 'chirps', 'cmems', 'earth-search',
-             'earthdata', 'ecmwf', 'fdsn', 'firms', 'gdacs', 'gee',
+             'earthdata', 'ecmwf', 'eumetsat', 'fdsn', 'firms', 'gdacs', 'gee',
              'google-earth-engine', 'national-water-model', 'nexrad', 'nwm',
              'nwp', 'openaq', 'planetary-computer', 'radar', 'stac', 'tropycal']
 
@@ -163,6 +163,9 @@ class EarthLens:
             tabular), not fixed.
         :class:`earthlens.ecmwf.ECMWF`: ERA5 via the Copernicus
             Climate Data Store (cdsapi).
+        :class:`earthlens.eumetsat.EUMETSAT`: EUMETSAT Data Store
+            products (MTG / MSG / Metop / Sentinel-3/-5P/-6 mirrors)
+            via `eumdac`; per-collection `OUTPUT_KIND`; key `"eumetsat"`.
         :class:`earthlens.fdsn.FDSN`: seismic events from the FDSN
             networks (USGS / EMSC / INGV / EarthScope / ISC / GeoNet)
             via `obspy`; the first `vector`-output backend.
@@ -203,6 +206,7 @@ class EarthLens:
             "cmems": ("earthlens.cmems", "CMEMS", "cmems", {}),
             "earthdata": ("earthlens.earthdata", "EarthData", "earthdata", {}),
             "ecmwf": ("earthlens.ecmwf", "ECMWF", "ecmwf", {}),
+            "eumetsat": ("earthlens.eumetsat", "EUMETSAT", "eumetsat", {}),
             "fdsn": ("earthlens.fdsn", "FDSN", "fdsn", {}),
             "gee": ("earthlens.gee", "GEE", "gee", {}),
             "google-earth-engine": ("earthlens.gee", "GEE", "gee", {}),

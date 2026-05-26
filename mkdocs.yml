@@ -130,6 +130,13 @@ nav:
       - Reference: reference/ecmwf.md
       - Catalog & Probes: reference/ecmwf/catalog.md
       - Aggregation: reference/aggregation.md
+    - EUMETSAT (Data Store):
+      - Introduction: reference/eumetsat/introduction.md
+      - Usage: reference/eumetsat/usage.md
+      - Authentication: reference/eumetsat/authentication.md
+      - Catalog & Tooling: reference/eumetsat/catalog.md
+      - Data Tailor (deferred): reference/eumetsat/data-tailor.md
+      - Reference: reference/eumetsat/eumetsat.md
     - FDSN (earthquakes):
       - Introduction: reference/fdsn/introduction.md
       - Usage: reference/fdsn/usage.md
@@ -209,6 +216,13 @@ nav:
       - PACE ocean-colour chlorophyll (live): examples/earthdata/pace_ocean_colour.ipynb
       - SMAP soil moisture (live): examples/earthdata/smap_soil_moisture.ipynb
       - OPERA Sentinel-1 SAR backscatter (live): examples/earthdata/opera_s1_backscatter.ipynb
+    - EUMETSAT Data Store:
+      - Catalog explorer (no network): examples/eumetsat/catalog_explorer.ipynb
+      - Output kinds & formats (no network): examples/eumetsat/output_kinds_and_formats.ipynb
+      - MSG SEVIRI L1.5 imagery (live): examples/eumetsat/msg_hrseviri_fetch.ipynb
+      - Sentinel-3 OLCI L2 ocean colour (live): examples/eumetsat/sentinel3_olci_ocean_colour.ipynb
+      - Sentinel-5P TROPOMI NO2 (live): examples/eumetsat/sentinel5p_no2.ipynb
+      - Metop ASCAT soil moisture (live): examples/eumetsat/metop_ascat_soil_moisture.ipynb
     - Seismic events (FDSN):
       - Quickstart — recent earthquakes: examples/fdsn/quickstart.ipynb
       - Global seismicity map: examples/fdsn/global_seismicity_map.ipynb
