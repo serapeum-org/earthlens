@@ -163,6 +163,11 @@ nav:
       - Usage: reference/firms/usage.md
       - Authentication: reference/firms/authentication.md
       - Reference: reference/firms/firms.md
+    - HDX (humanitarian data):
+      - Introduction: reference/hdx/introduction.md
+      - Usage: reference/hdx/usage.md
+      - Catalog & Tooling: reference/hdx/catalog.md
+      - Reference: reference/hdx/hdx.md
   - Examples:
     - Authentication: examples/authentication.md
     - Data Sources: examples/data-sources.md
