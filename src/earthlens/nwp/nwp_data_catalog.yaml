@@ -92,3 +92,180 @@ datasets:
     bands:
       temperature_2m: T_2M
       precipitation_acc: TOT_PREC
+
+  # ---------------------------------------------------------------------------
+  # Expanded coverage (beyond the 5 MVP models). These rows are
+  # metadata-curated from Herbie's model templates + provider docs and are NOT
+  # all live-validated; cycles_utc / horizon_h / product can drift. Vet a row
+  # with `python tools/nwp/probe_nwp_model.py <key>` before relying on it. The
+  # M1 errors="warn" fetch policy skips any (cycle, step) a model doesn't carry.
+  # ---------------------------------------------------------------------------
+
+  rap:                                    # NOAA NODD, hourly RAP, via Herbie
+    provider: noaa-nodd
+    model_family: rap
+    resolution: 13km
+    cycles_utc: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23]
+    cadence_h: 1
+    step_cadence_h: 1
+    horizon_h: 51
+    product: awp130pgrb
+    backend: herbie
+    mirrors: [aws, google, azure]
+    bands:
+      temperature_2m: ":TMP:2 m above ground:"
+      precipitation_acc: ":APCP:surface:"
+
+  nam:                                    # NOAA NODD, NAM 12 km CONUS, via Herbie
+    provider: noaa-nodd
+    model_family: nam
+    resolution: 12km
+    cycles_utc: [0, 6, 12, 18]
+    cadence_h: 6
+    step_cadence_h: 3
+    horizon_h: 84
+    product: awphys
+    backend: herbie
+    mirrors: [aws, google, azure]
+    bands:
+      temperature_2m: ":TMP:2 m above ground:"
+      precipitation_acc: ":APCP:surface:"
+
+  nbm:                                    # NOAA NODD, National Blend of Models, via Herbie
+    provider: noaa-nodd
+    model_family: nbm
+    resolution: 13km
+    cycles_utc: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23]
+    cadence_h: 1
+    step_cadence_h: 1
+    horizon_h: 264
+    product: co
+    backend: herbie
+    mirrors: [aws, google, azure]
+    bands:
+      temperature_2m: ":TMP:2 m above ground:"
+      precipitation_acc: ":APCP:surface:"
+
+  rrfs:                                   # NOAA NODD, Rapid Refresh Forecast System, via Herbie
+    provider: noaa-nodd
+    model_family: rrfs
+    resolution: 3km
+    cycles_utc: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23]
+    cadence_h: 1
+    step_cadence_h: 1
+    horizon_h: 60
+    product: prslev
+    backend: herbie
+    mirrors: [aws]
+    bands:
+      temperature_2m: ":TMP:2 m above ground:"
+      precipitation_acc: ":APCP:surface:"
+
+  gdps:                                   # ECCC, Global Deterministic Prediction System, via Herbie
+    provider: eccc-msc
+    model_family: gdps
+    resolution: 15km
+    cycles_utc: [0, 12]
+    cadence_h: 12
+    step_cadence_h: 3
+    horizon_h: 240
+    backend: herbie
+    mirrors: [msc]
+    bands:
+      temperature_2m: ":TMP:2 m above ground:"
+      precipitation_acc: ":APCP:surface:"
+
+  rdps:                                   # ECCC, Regional Deterministic Prediction System, via Herbie
+    provider: eccc-msc
+    model_family: rdps
+    resolution: 10km
+    cycles_utc: [0, 6, 12, 18]
+    cadence_h: 6
+    step_cadence_h: 1
+    horizon_h: 84
+    backend: herbie
+    mirrors: [msc]
+    bands:
+      temperature_2m: ":TMP:2 m above ground:"
+      precipitation_acc: ":APCP:surface:"
+
+  hrdps:                                  # ECCC, High-Resolution Deterministic Prediction System, via Herbie
+    provider: eccc-msc
+    model_family: hrdps
+    resolution: 2.5km
+    cycles_utc: [0, 6, 12, 18]
+    cadence_h: 6
+    step_cadence_h: 1
+    horizon_h: 48
+    product: continental
+    backend: herbie
+    mirrors: [msc]
+    bands:
+      temperature_2m: ":TMP:2 m above ground:"
+      precipitation_acc: ":APCP:surface:"
+
+  icon-eu:                                # DWD, ICON-EU regular lat-lon (croppable), direct HTTPS
+    provider: dwd-opendata
+    model_family: icon-eu
+    resolution: 0.0625deg
+    cycles_utc: [0, 6, 12, 18]
+    cadence_h: 6
+    step_cadence_h: 1
+    horizon_h: 120
+    format: grib2
+    idx: false
+    backend: direct-https
+    mirrors: [origin]
+    url_template: "https://opendata.dwd.de/weather/nwp/icon-eu/grib/{cycle:%H}/{var_lc}/icon-eu_europe_regular-lat-lon_single-level_{date:%Y%m%d%H}_{step:03d}_{var}.grib2.bz2"
+    bands:
+      temperature_2m: T_2M
+      precipitation_acc: TOT_PREC
+
+  icon-d2:                                # DWD, ICON-D2 native icosahedral (raw fetch; not croppable), direct HTTPS
+    provider: dwd-opendata
+    model_family: icon-d2
+    resolution: 2.2km
+    cycles_utc: [0, 3, 6, 9, 12, 15, 18, 21]
+    cadence_h: 3
+    step_cadence_h: 1
+    horizon_h: 48
+    format: grib2
+    idx: false
+    backend: direct-https
+    mirrors: [origin]
+    # ICON-D2 single-level files are icosahedral (like icon-global) and use a
+    # lowercase var token in the filename — raw download works; crop does not.
+    url_template: "https://opendata.dwd.de/weather/nwp/icon-d2/grib/{cycle:%H}/{var_lc}/icon-d2_germany_icosahedral_single-level_{date:%Y%m%d%H}_{step:03d}_2d_{var_lc}.grib2.bz2"
+    bands:
+      temperature_2m: t_2m
+      precipitation_acc: tot_prec
+
+  ens:                                    # ECMWF Open Data, IFS ENS control forecast
+    provider: ecmwf-opendata
+    model_family: ens
+    resolution: 0.25deg
+    cycles_utc: [0, 6, 12, 18]
+    cadence_h: 6
+    step_cadence_h: 3
+    horizon_h: 360
+    backend: ecmwf-opendata
+    mirrors: [aws, azure, ecmwf]
+    request_options: {stream: enfo, type: cf}
+    bands:
+      temperature_2m: "2t"
+      precipitation_acc: "tp"
+
+  aifs:                                   # ECMWF Open Data, AIFS (data-driven), single model
+    provider: ecmwf-opendata
+    model_family: aifs
+    resolution: 0.25deg
+    cycles_utc: [0, 6, 12, 18]
+    cadence_h: 6
+    step_cadence_h: 6
+    horizon_h: 360
+    backend: ecmwf-opendata
+    mirrors: [aws, azure, ecmwf]
+    request_options: {ecmwf_model: aifs-single}
+    bands:
+      temperature_2m: "2t"
+      precipitation_acc: "tp"

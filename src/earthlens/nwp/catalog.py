@@ -209,11 +209,12 @@ class Catalog(AbstractCatalog):
             an :class:`NWPModel`.
 
     Examples:
-        - Load the bundled catalog and list the MVP models:
+        - Load the bundled catalog and check which models are present:
             ```python
             >>> from earthlens.nwp import Catalog
-            >>> sorted(Catalog().datasets)
-            ['gefs', 'gfs', 'hrrr', 'icon-global', 'ifs-hres']
+            >>> cat = Catalog()
+            >>> "gfs" in cat and "icon-eu" in cat and "aifs" in cat
+            True
 
             ```
         - Resolve one model and read its download backend:
@@ -269,10 +270,10 @@ class Catalog(AbstractCatalog):
             - A typo raises with a did-you-mean hint:
                 ```python
                 >>> from earthlens.nwp import Catalog
-                >>> Catalog().get_model("gffs")
+                >>> Catalog().get_model("gffs")  # doctest: +ELLIPSIS
                 Traceback (most recent call last):
                     ...
-                ValueError: 'gffs' is not in the NWP catalog. Known datasets: ['gefs', 'gfs', 'hrrr', 'icon-global', 'ifs-hres']. Did you mean 'gfs'?
+                ValueError: 'gffs' is not in the NWP catalog. Known datasets: [...]. Did you mean 'gfs'?
 
                 ```
         """

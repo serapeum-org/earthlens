@@ -50,10 +50,12 @@ def _clear_cache():
 class TestCatalogLoad:
     """Tests for Catalog construction and the bundled / on-disk load."""
 
-    def test_bundled_catalog_has_five_models(self):
-        """The shipped catalog resolves the five MVP models."""
-        models = sorted(Catalog().datasets)
-        assert models == ["gefs", "gfs", "hrrr", "icon-global", "ifs-hres"], models
+    def test_bundled_catalog_has_the_mvp_and_expanded_models(self):
+        """The shipped catalog resolves the MVP models plus the expanded set."""
+        models = set(Catalog().datasets)
+        mvp = {"gfs", "gefs", "hrrr", "ifs-hres", "icon-global"}
+        expanded = {"rap", "nam", "nbm", "rrfs", "gdps", "rdps", "hrdps", "icon-eu", "icon-d2", "ens", "aifs"}
+        assert mvp <= models and expanded <= models, sorted(models)
 
     def test_load_from_disk(self, tmp_path, monkeypatch):
         """A monkey-patched CATALOG_PATH is parsed into typed rows."""
@@ -70,7 +72,7 @@ class TestCatalogLoad:
         """A second construction reuses the cached parse for the same file."""
         first = sorted(Catalog().datasets)
         second = sorted(Catalog().datasets)
-        assert first == second == ["gefs", "gfs", "hrrr", "icon-global", "ifs-hres"]
+        assert first == second and "gfs" in first and "aifs" in first
 
     def test_empty_datasets_block_raises(self, tmp_path, monkeypatch):
         """A YAML with no datasets: block raises ValueError."""
