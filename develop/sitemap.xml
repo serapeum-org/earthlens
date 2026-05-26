@@ -133,6 +133,30 @@
          <lastmod>2026-05-26</lastmod>
     </url>
     <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/examples/eumetsat/catalog_explorer/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/examples/eumetsat/metop_ascat_soil_moisture/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/examples/eumetsat/msg_hrseviri_fetch/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/examples/eumetsat/output_kinds_and_formats/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/examples/eumetsat/sentinel3_olci_ocean_colour/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/examples/eumetsat/sentinel5p_no2/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
          <loc>https://serapeum-org.github.io/earthlens/develop/examples/fdsn/global_seismicity_map/</loc>
          <lastmod>2026-05-26</lastmod>
     </url>
@@ -221,6 +245,14 @@
          <lastmod>2026-05-26</lastmod>
     </url>
     <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/examples/nwp/gfs_temperature/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/examples/nwp/icon_precipitation/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
          <loc>https://serapeum-org.github.io/earthlens/develop/examples/openaq/multistation_comparison/</loc>
          <lastmod>2026-05-26</lastmod>
     </url>
@@ -230,30 +262,6 @@
     </url>
     <url>
          <loc>https://serapeum-org.github.io/earthlens/develop/examples/openaq/quickstart/</loc>
-         <lastmod>2026-05-26</lastmod>
-    </url>
-    <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/examples/openeo/air_quality_no2_monthly/</loc>
-         <lastmod>2026-05-26</lastmod>
-    </url>
-    <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/examples/openeo/catalog_explorer/</loc>
-         <lastmod>2026-05-26</lastmod>
-    </url>
-    <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/examples/openeo/cloud_masked_composite/</loc>
-         <lastmod>2026-05-26</lastmod>
-    </url>
-    <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/examples/openeo/ocean_chlorophyll_monthly/</loc>
-         <lastmod>2026-05-26</lastmod>
-    </url>
-    <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/examples/openeo/quickstart/</loc>
-         <lastmod>2026-05-26</lastmod>
-    </url>
-    <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/examples/openeo/server_side_aggregate/</loc>
          <lastmod>2026-05-26</lastmod>
     </url>
     <url>
@@ -385,6 +393,30 @@
          <lastmod>2026-05-26</lastmod>
     </url>
     <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/eumetsat/authentication/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/eumetsat/catalog/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/eumetsat/data-tailor/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/eumetsat/eumetsat/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/eumetsat/introduction/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/eumetsat/usage/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
          <loc>https://serapeum-org.github.io/earthlens/develop/reference/fdsn/fdsn/</loc>
          <lastmod>2026-05-26</lastmod>
     </url>
@@ -445,6 +477,34 @@
          <lastmod>2026-05-26</lastmod>
     </url>
     <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/nwm/introduction/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/nwm/nwm/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/nwm/usage/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/nwp/catalog/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/nwp/introduction/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/nwp/nwp/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/nwp/usage/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
          <loc>https://serapeum-org.github.io/earthlens/develop/reference/openaq/authentication/</loc>
          <lastmod>2026-05-26</lastmod>
     </url>
@@ -461,23 +521,15 @@
          <lastmod>2026-05-26</lastmod>
     </url>
     <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/reference/openeo/authentication/</loc>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/radar/introduction/</loc>
          <lastmod>2026-05-26</lastmod>
     </url>
     <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/reference/openeo/datasets/</loc>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/radar/radar/</loc>
          <lastmod>2026-05-26</lastmod>
     </url>
     <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/reference/openeo/introduction/</loc>
-         <lastmod>2026-05-26</lastmod>
-    </url>
-    <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/reference/openeo/openeo/</loc>
-         <lastmod>2026-05-26</lastmod>
-    </url>
-    <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/reference/openeo/usage/</loc>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/radar/usage/</loc>
          <lastmod>2026-05-26</lastmod>
     </url>
     <url>
