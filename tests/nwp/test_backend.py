@@ -218,12 +218,46 @@ class TestNormaliseLongitude:
         assert b._normalise_longitude(ds) is ds
 
 
-class TestAggregateStub:
-    """Tests for the aggregate stub (implemented in C6)."""
+class TestAggregate:
+    """Tests for the (cycle, step) COG-stack reducer."""
 
-    def test_aggregate_not_yet_implemented(self, mini_catalog, tmp_path, fake_pyramids):
-        """download(aggregate=...) raises until C6 lands the reducer."""
+    def _config(self, **kwargs):
+        """Build an AggregationConfig with test-friendly defaults."""
+        from earthlens.aggregate import AggregationConfig
+
+        params = dict(freq="1D", op="auto")
+        params.update(kwargs)
+        return AggregationConfig(**params)
+
+    def test_empty_paths_returns_empty(self, mini_catalog, tmp_path):
+        """Aggregating an empty stack is a no-op."""
+        assert _make(mini_catalog, tmp_path)._aggregate([], self._config()) == []
+
+    def test_reduces_stack_to_per_window_cogs(self, mini_catalog, tmp_path, fake_aggregate):
+        """Two cycles in one daily window collapse to a single window COG."""
+        b = _make(mini_catalog, tmp_path)
+        paths = [
+            tmp_path / "gfs_2024060100_f000.tif",
+            tmp_path / "gfs_2024060112_f000.tif",
+        ]
+        out = b._aggregate(paths, self._config(freq="1D", op="mean"))
+        assert len(out) == 1
+        assert out[0].name == "gfs_mean_1D_2024060100.tif"
+        assert len(fake_aggregate["written"]) == 1
+
+    def test_multi_model_request_rejected(self, mini_catalog, tmp_path, fake_aggregate):
+        """Aggregation across models with different grids is rejected."""
+        b = _make(
+            mini_catalog,
+            tmp_path,
+            variables={"gfs": ["temperature_2m"], "icon-global": ["temperature_2m"]},
+        )
+        with pytest.raises(ValueError, match="single model"):
+            b._aggregate([tmp_path / "gfs_2024060100_f000.tif"], self._config())
+
+    def test_download_with_aggregate(self, mini_catalog, tmp_path, fake_pyramids, fake_aggregate):
+        """download(aggregate=...) fetches then reduces the stack end to end."""
         b = _make(mini_catalog, tmp_path)
         b._centres["herbie"] = _CountingCentre(tmp_path)
-        with pytest.raises(NotImplementedError, match="C6"):
-            b.download(aggregate=object())
+        out = b.download(progress_bar=False, aggregate=self._config(freq="1D", op="mean"))
+        assert len(out) == 1 and out[0].name.startswith("gfs_mean_1D_")

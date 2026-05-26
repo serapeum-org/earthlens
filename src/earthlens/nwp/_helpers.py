@@ -155,6 +155,64 @@ def valid_time(cycle: dt.datetime, step: int) -> dt.datetime:
     return cycle + dt.timedelta(hours=step)
 
 
+def parse_cog_valid_time(path: Path | str) -> dt.datetime:
+    """Recover a forecast's valid time from a `cog_name` filename.
+
+    Inverts :func:`cog_name`: the trailing `_{cycle}_f{step}` of the stem
+    gives the cycle datetime and lead time, whose sum is the valid time.
+    Model keys may contain hyphens but never underscores, so the last two
+    underscore-separated tokens are always the cycle stamp and the step.
+
+    Args:
+        path: A COG path or filename produced by :func:`cog_name`.
+
+    Returns:
+        datetime.datetime: The instant the forecast is valid for.
+
+    Examples:
+        - Recover the valid time of a 24 h forecast COG:
+            ```python
+            >>> from earthlens.nwp._helpers import parse_cog_valid_time
+            >>> parse_cog_valid_time("gfs_2024060112_f024.tif")
+            datetime.datetime(2024, 6, 2, 12, 0)
+
+            ```
+    """
+    stem = Path(path).stem
+    _, cycle_str, step_str = stem.rsplit("_", 2)
+    cycle = dt.datetime.strptime(cycle_str, "%Y%m%d%H")
+    return valid_time(cycle, int(step_str.lstrip("f")))
+
+
+def window_labels(times: list[dt.datetime], freq: str) -> list[str]:
+    """Return one `YYYYMMDDHH` window-start label per time, bucketed by `freq`.
+
+    Times sharing a `freq` window get the same label, so
+    `DatasetCollection.groupby` coarsens the forecast time axis to one
+    slice per window. The hour is kept in the label so sub-daily windows
+    (e.g. `"6h"`) on the same day stay distinct.
+
+    Args:
+        times: Valid (or cycle) times, in file order.
+        freq: A pandas offset alias (`"6h"`, `"1D"`, `"1MS"`, …).
+
+    Returns:
+        list[str]: One label per input time (same length as `times`).
+    """
+    import pandas as pd
+
+    index = pd.DatetimeIndex(pd.to_datetime(list(times)))
+    positions = pd.Series(range(len(index)), index=index)
+    label_for: dict[int, str] = {}
+    for window_start, group in positions.groupby(pd.Grouper(freq=freq)):
+        if group.empty:
+            continue
+        label = window_start.strftime("%Y%m%d%H")
+        for pos in group.tolist():
+            label_for[int(pos)] = label
+    return [label_for[i] for i in range(len(index))]
+
+
 def ensure_dir(path: Path | str) -> Path:
     """Create `path` if absent and return it as an absolute `Path`.
 

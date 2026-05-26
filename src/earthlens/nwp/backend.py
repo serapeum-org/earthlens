@@ -37,7 +37,12 @@ from earthlens.base import (
     SpatialExtent,
     TemporalExtent,
 )
-from earthlens.nwp._helpers import cog_name, enumerate_cycles
+from earthlens.nwp._helpers import (
+    cog_name,
+    enumerate_cycles,
+    parse_cog_valid_time,
+    window_labels,
+)
 from earthlens.nwp.catalog import KNOWN_BACKENDS, Catalog, NWPModel
 from earthlens.nwp.centres import resolve_centre
 
@@ -410,13 +415,63 @@ class NWP(AbstractDataSource):
     def _aggregate(
         self, paths: list[Path], config: AggregationConfig
     ) -> list[Path]:
-        """Reduce the `(cycle, step)` COG stack per window (`C6`).
+        """Reduce the `(cycle, step)` COG stack into per-window COGs (`C6`).
 
-        Implemented in `C6`.
+        Labels each COG by the window its **valid time** (`cycle + step`)
+        falls in, then reduces the co-registered stack with `config.op`
+        via `DatasetCollection.groupby(labels).<op>()` — the COG analog
+        of the NetCDF reducer the observation-time backends use. One COG
+        is written per window.
+
+        Aggregation requires a **single model**: different models have
+        different native grids and cannot be co-registered into one
+        stack, so a multi-model request is rejected here rather than
+        silently mixing grids.
+
+        Args:
+            paths: The per-`(cycle, step)` COGs from :meth:`_fetch`.
+            config: The aggregation request (`freq` window, `op`
+                reducer, `out_dir`, `skipna`).
+
+        Returns:
+            list[Path]: The per-window reduced COG paths.
 
         Raises:
-            NotImplementedError: Always, until `C6`.
+            ValueError: When the request names more than one model.
         """
-        raise NotImplementedError(
-            "NWP.download(aggregate=...) is implemented in C6."
+        if not paths:
+            return []
+        model_keys = {key for key, _, _ in self._requests}
+        if len(model_keys) > 1:
+            raise ValueError(
+                "aggregate= over an NWP request needs a single model; "
+                f"got {sorted(model_keys)}. Different models have different "
+                "native grids and cannot be co-registered into one stack — "
+                "issue one request per model."
+            )
+        from pyramids.dataset import Dataset, DatasetCollection
+        from pyramids.dataset.cog import write_cog
+
+        op = "mean" if config.op == "auto" else config.op
+        out_dir = (
+            Path(config.out_dir) if config.out_dir is not None else Path(self.root_dir)
         )
+        out_dir.mkdir(parents=True, exist_ok=True)
+
+        dated = sorted((parse_cog_valid_time(p), str(p)) for p in paths)
+        times = [t for t, _ in dated]
+        files = [f for _, f in dated]
+        labels = window_labels(times, config.freq)
+        collection = DatasetCollection.from_files(files)
+        reduced = getattr(collection.groupby(labels), op)(skipna=config.skipna)
+        reference = Dataset.read_file(files[0])
+        geo, epsg = reference.geotransform, reference.epsg
+        model_key = model_keys.pop()
+        written: list[Path] = []
+        for label, array in reduced.items():
+            target = out_dir / f"{model_key}_{op}_{config.freq}_{label}.tif"
+            write_cog(
+                Dataset.create_from_array(arr=array, geo=geo, epsg=epsg), str(target)
+            )
+            written.append(target)
+        return written

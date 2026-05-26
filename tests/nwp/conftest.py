@@ -154,6 +154,72 @@ def fake_pyramids(monkeypatch: pytest.MonkeyPatch) -> dict[str, Any]:
     return state
 
 
+class _FakeGrouped:
+    """Stand-in for the result of `DatasetCollection.groupby(labels)`."""
+
+    def __init__(self, labels: list[str]) -> None:
+        self.labels = labels
+
+    def mean(self, skipna: bool = True) -> dict[str, str]:
+        """Return one fabricated array per unique window label, in order."""
+        return {label: f"array-{label}" for label in dict.fromkeys(self.labels)}
+
+
+class _FakeCollection:
+    """Stand-in for `pyramids.dataset.DatasetCollection`."""
+
+    last_files: list[str] = []
+
+    @classmethod
+    def from_files(cls, files: list[str]) -> _FakeCollection:
+        """Record the input files and return a collection."""
+        cls.last_files = list(files)
+        return cls()
+
+    def groupby(self, labels: list[str]) -> _FakeGrouped:
+        """Return a grouped stand-in carrying the per-file labels."""
+        return _FakeGrouped(labels)
+
+
+class _FakeRef:
+    """Stand-in reference Dataset exposing a geotransform + EPSG."""
+
+    geotransform = (0.0, 1.0, 0.0, 0.0, 0.0, -1.0)
+    epsg = 4326
+
+
+class _FakeAggDataset:
+    """Stand-in for `pyramids.dataset.Dataset` used by _aggregate."""
+
+    @classmethod
+    def read_file(cls, path: str) -> _FakeRef:
+        """Return a reference grid for the first stacked COG."""
+        return _FakeRef()
+
+    @classmethod
+    def create_from_array(cls, arr: Any = None, geo: Any = None, epsg: Any = None) -> tuple:
+        """Return a sentinel 'dataset' carrying the reduced array."""
+        return ("dataset", arr, geo, epsg)
+
+
+@pytest.fixture
+def fake_aggregate(monkeypatch: pytest.MonkeyPatch) -> dict[str, Any]:
+    """Replace the pyramids aggregate surface (DatasetCollection / Dataset / write_cog)."""
+    import pyramids.dataset as ds_mod
+    import pyramids.dataset.cog as cog_mod
+
+    state: dict[str, Any] = {"written": []}
+
+    def fake_write_cog(data: Any, output: str, **kwargs: Any):
+        state["written"].append(str(output))
+        return (Path(output), None)
+
+    monkeypatch.setattr(ds_mod, "DatasetCollection", _FakeCollection)
+    monkeypatch.setattr(ds_mod, "Dataset", _FakeAggDataset)
+    monkeypatch.setattr(cog_mod, "write_cog", fake_write_cog)
+    return state
+
+
 @pytest.fixture
 def mini_catalog() -> Catalog:
     """A two-model catalog (Herbie gfs + direct-HTTPS icon) built in-memory."""
