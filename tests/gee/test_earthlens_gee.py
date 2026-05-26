@@ -79,6 +79,7 @@ class TestRegistry:
             "gdacs",
             "gee",
             "google-earth-engine",
+            "hdx",
             "openaq",
             "planetary-computer",
             "stac",

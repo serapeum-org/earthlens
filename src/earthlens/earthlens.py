@@ -137,8 +137,8 @@ class EarthLens:
             >>> sorted(EarthLens.DataSources)  # doctest: +NORMALIZE_WHITESPACE
             ['amazon-s3', 'cdse', 'chc', 'chirps', 'cmems', 'earth-search',
              'earthdata', 'ecmwf', 'fdsn', 'firms', 'gdacs', 'gee',
-             'google-earth-engine', 'openaq', 'planetary-computer', 'stac',
-             'tropycal']
+             'google-earth-engine', 'hdx', 'openaq', 'planetary-computer',
+             'stac', 'tropycal']
 
             ```
         - Asking for an unknown backend raises `ValueError`:
@@ -178,6 +178,10 @@ class EarthLens:
         :class:`earthlens.firms.FIRMS`: NASA FIRMS active-fire
             detections (MODIS / VIIRS) as a `vector` FeatureCollection;
             free `MAP_KEY`, no extra; key `"firms"`.
+        :class:`earthlens.hdx.HDX`: Humanitarian Data Exchange resources
+            via CKAN (`hdx-python-api`); the first `mixed`-output
+            backend (downloads CSV / GeoTIFF / GeoPackage / … files
+            as-is); public, no credentials; key `"hdx"`.
     """
 
     DataSources = _LazyRegistry(
@@ -197,6 +201,7 @@ class EarthLens:
             "google-earth-engine": ("earthlens.gee", "GEE", "gee", {}),
             # GDACS is a public feed (requests only), so no extra to hint.
             "gdacs": ("earthlens.gdacs", "GDACS", "", {}),
+            "hdx": ("earthlens.hdx", "HDX", "hdx", {}),
             "openaq": ("earthlens.openaq", "OpenAQ", "openaq", {}),
             "tropycal": ("earthlens.tropycal", "TropicalCyclone", "tropycal", {}),
             # FIRMS needs a free MAP_KEY but no SDK (requests + pandas
@@ -246,8 +251,8 @@ class EarthLens:
             data_source: Backend key — one of `"chc"` (alias
                 `"chirps"`), `"amazon-s3"`, `"cmems"`, `"ecmwf"`,
                 `"fdsn"`, `"gdacs"`, `"gee"` (alias
-                `"google-earth-engine"`), or `"openaq"`. Defaults to
-                `"chc"`.
+                `"google-earth-engine"`), `"hdx"`, or `"openaq"`.
+                Defaults to `"chc"`.
             temporal_resolution: `"daily"` or `"monthly"` for most
                 backends; the GEE backend also accepts `"raw"` and
                 `"yearly"`. The concrete backend may accept a narrower
