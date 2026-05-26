@@ -10,13 +10,13 @@
       
       
       
-        <link rel="canonical" href="https://serapeum-org.github.io/earthlens/develop/reference/nwp/catalog/">
+        <link rel="canonical" href="https://serapeum-org.github.io/earthlens/develop/reference/openeo/usage/">
       
       
-        <link rel="prev" href="../usage/">
+        <link rel="prev" href="../introduction/">
       
       
-        <link rel="next" href="../nwp/">
+        <link rel="next" href="../authentication/">
       
       
         
@@ -27,7 +27,7 @@
     
     
       
-        <title>Catalog & install - earthlens</title>
+        <title>Usage - earthlens</title>
       
     
     
@@ -83,7 +83,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#nwp-forecasts-catalog-install" class="md-skip">
+        <a href="#openeo-backend-usage" class="md-skip">
           Skip to content
         </a>
       
@@ -123,7 +123,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Catalog & install
+              Usage
             
           </span>
         </div>
@@ -2163,6 +2163,336 @@
                 
   
   
+    
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_12" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_3_12" id="__nav_3_12_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    openEO (server-side processing)
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_12_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3_12">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    openEO (server-side processing)
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../introduction/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Introduction
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Usage
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Usage
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#request-shape" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Request shape
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Request shape">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#kwargs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Kwargs
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#server-side-aggregation-aggregate" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Server-side aggregation (aggregate=)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#execution-sync-vs-batch" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Execution: sync vs batch
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#return-value" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Return value
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#catalog-tooling" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Catalog tooling
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#gotchas-limits" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Gotchas &amp; limits
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../authentication/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Authentication
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../datasets/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Collections & recipes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../openeo/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
   
   
     
@@ -2177,10 +2507,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_12" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_13" >
         
           
-          <label class="md-nav__link" for="__nav_3_12" id="__nav_3_12_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3_13" id="__nav_3_13_label" tabindex="0">
             
   
   
@@ -2198,8 +2528,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_12_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_12">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_13_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_13">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -2319,10 +2649,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_13" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_14" >
         
           
-          <label class="md-nav__link" for="__nav_3_13" id="__nav_3_13_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3_14" id="__nav_3_14_label" tabindex="0">
             
   
   
@@ -2340,8 +2670,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_13_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_13">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_14_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_14">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -2443,275 +2773,6 @@
   
     <li class="md-nav__item">
       <a href="../../firms/firms/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Reference
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-    
-  
-  
-  
-    
-    
-    
-    
-      
-      
-    
-    
-    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
-      
-        
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_14" checked>
-        
-          
-          <label class="md-nav__link" for="__nav_3_14" id="__nav_3_14_label" tabindex="0">
-            
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    NWP (weather forecasts)
-  
-
-    
-  </span>
-  
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_14_label" aria-expanded="true">
-          <label class="md-nav__title" for="__nav_3_14">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    NWP (weather forecasts)
-  
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../introduction/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Introduction
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../usage/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Usage
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-    
-  
-  
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Catalog & install
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Catalog & install
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#installation" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Installation
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#curated-models" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Curated models
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Curated models">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#pressure-level-3-d-fields" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Pressure-level (3-D) fields
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#tooling" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Tooling
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../nwp/" class="md-nav__link">
         
   
   
@@ -4801,7 +4862,7 @@
   <span class="md-ellipsis">
     
   
-    Tropical cyclones (Tropycal)
+    Server-side processing (openEO)
   
 
     
@@ -4814,6 +4875,232 @@
         
         <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_12_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_4_12">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Server-side processing (openEO)
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../examples/openeo/catalog_explorer/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    openEO catalog explorer (no network, no auth)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../examples/openeo/quickstart/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Quick start - Sentinel-2 NDVI monthly via openEO
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../examples/openeo/cloud_masked_composite/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sentinel-2 cloud-masked median composite via openEO
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../examples/openeo/server_side_aggregate/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Server-side temporal aggregation with
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../examples/openeo/air_quality_no2_monthly/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Air quality - Sentinel-5P NO2 monthly mean via openEO
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../examples/openeo/ocean_chlorophyll_monthly/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Ocean colour - Sentinel-3 OLCI chlorophyll monthly via openEO
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_13" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_13" id="__nav_4_13_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tropical cyclones (Tropycal)
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_13_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_13">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -5073,10 +5360,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_13" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_14" >
         
           
-          <label class="md-nav__link" for="__nav_4_13" id="__nav_4_13_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_14" id="__nav_4_14_label" tabindex="0">
             
   
   
@@ -5094,8 +5381,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_13_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_13">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_14_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_14">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -5429,33 +5716,22 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#installation" class="md-nav__link">
+  <a href="#request-shape" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Installation
+        Request shape
       
     </span>
   </a>
   
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#curated-models" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Curated models
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Curated models">
+    <nav class="md-nav" aria-label="Request shape">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#pressure-level-3-d-fields" class="md-nav__link">
+  <a href="#kwargs" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Pressure-level (3-D) fields
+        Kwargs
       
     </span>
   </a>
@@ -5468,10 +5744,54 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#tooling" class="md-nav__link">
+  <a href="#server-side-aggregation-aggregate" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Tooling
+        Server-side aggregation (aggregate=)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#execution-sync-vs-batch" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Execution: sync vs batch
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#return-value" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Return value
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#catalog-tooling" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Catalog tooling
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#gotchas-limits" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Gotchas &amp; limits
       
     </span>
   </a>
@@ -5495,7 +5815,7 @@
 
 
   
-    <a href="https://github.com/serapeum-org/earthlens/edit/master/docs/reference/nwp/catalog.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
+    <a href="https://github.com/serapeum-org/earthlens/edit/master/docs/reference/openeo/usage.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
     </a>
@@ -5504,411 +5824,217 @@
     
       
     
-    <a href="https://github.com/serapeum-org/earthlens/raw/master/docs/reference/nwp/catalog.md" title="View source of this page" class="md-content__button md-icon">
+    <a href="https://github.com/serapeum-org/earthlens/raw/master/docs/reference/openeo/usage.md" title="View source of this page" class="md-content__button md-icon">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 18c.56 0 1 .44 1 1s-.44 1-1 1-1-.44-1-1 .44-1 1-1m0-3c-2.73 0-5.06 1.66-6 4 .94 2.34 3.27 4 6 4s5.06-1.66 6-4c-.94-2.34-3.27-4-6-4m0 6.5a2.5 2.5 0 0 1-2.5-2.5 2.5 2.5 0 0 1 2.5-2.5 2.5 2.5 0 0 1 2.5 2.5 2.5 2.5 0 0 1-2.5 2.5M9.27 20H6V4h7v5h5v4.07c.7.08 1.36.25 2 .49V8l-6-6H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h4.5a8.2 8.2 0 0 1-1.23-2"/></svg>
     </a>
   
 
 
-<h1 id="nwp-forecasts-catalog-install"><a class="toclink" href="#nwp-forecasts-catalog-install">NWP forecasts — catalog &amp; install</a><a class="headerlink" href="#nwp-forecasts-catalog-install" title="Permanent link">#</a></h1>
-<h2 id="installation"><a class="toclink" href="#installation">Installation</a><a class="headerlink" href="#installation" title="Permanent link">#</a></h2>
-<p>The NWP backend's SDKs are an optional extra:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>pip<span class="w"> </span>install<span class="w"> </span>earthlens<span class="o">[</span>nwp<span class="o">]</span><span class="w">      </span><span class="c1"># herbie-data + ecmwf-opendata</span>
+<h1 id="openeo-backend-usage"><a class="toclink" href="#openeo-backend-usage">openEO backend — usage</a><a class="headerlink" href="#openeo-backend-usage" title="Permanent link">#</a></h1>
+<h2 id="request-shape"><a class="toclink" href="#request-shape">Request shape</a><a class="headerlink" href="#request-shape" title="Permanent link">#</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">EarthLens</span><span class="p">(</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;openeo&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">variables</span><span class="o">=</span><span class="p">{</span><span class="n">collection_or_recipe_key</span><span class="p">:</span> <span class="p">[</span><span class="n">band</span><span class="p">,</span> <span class="o">...</span><span class="p">]},</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">start</span><span class="o">=</span><span class="s2">&quot;YYYY-MM-DD&quot;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">&quot;YYYY-MM-DD&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="n">lat_min</span><span class="p">,</span> <span class="n">lat_max</span><span class="p">],</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="n">lon_min</span><span class="p">,</span> <span class="n">lon_max</span><span class="p">],</span>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    <span class="n">path</span><span class="o">=</span><span class="s2">&quot;out&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    <span class="c1"># optional openEO kwargs:</span>
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>    <span class="n">endpoint</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>            <span class="c1"># &quot;cdse&quot; (default) / &quot;cdse-federation&quot; / &quot;openeo-platform&quot; / URL</span>
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>    <span class="n">process</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>             <span class="c1"># explicit recipe key, overriding the one inferred from the request key</span>
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>    <span class="n">execute</span><span class="o">=</span><span class="s2">&quot;sync&quot;</span><span class="p">,</span>           <span class="c1"># &quot;sync&quot; (default) or &quot;batch&quot;</span>
+<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>    <span class="n">output_format</span><span class="o">=</span><span class="s2">&quot;GTiff&quot;</span><span class="p">,</span>    <span class="c1"># &quot;GTiff&quot; (default) or &quot;netCDF&quot;</span>
+<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>    <span class="n">max_cloud_cover</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>     <span class="c1"># server-side property filter on load_collection (Sentinel-2)</span>
+<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>    <span class="c1"># OIDC credential kwargs (see Authentication): client_id / client_secret / refresh_token / provider_id</span>
+<a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a><span class="p">)</span>
 </code></pre></div>
-<p>Two binary libraries are <strong>environment requirements</strong> (not on PyPI in a
-usable form on every platform), so install them via conda-forge if they
-are missing:</p>
+<p><code>variables</code> maps each key to a band list. A key is <strong>either</strong>:</p>
 <ul>
-<li><strong><code>libgdal-grib</code></strong> — the GDAL GRIB driver that
-  <code>pyramids.grib.open_grib</code> calls. Bundled in the <code>pyramids-gis</code> wheels;
-  raises <code>DriverNotExistError</code> if absent.</li>
-<li><strong><code>eccodes</code></strong> — the C library that <code>cfgrib</code>/<code>eccodes</code> need. Herbie's
-  import chain pulls <code>cfgrib</code>, so <code>import herbie</code> fails with
-  <code>RuntimeError: Cannot find the ecCodes library</code> if the binary is
-  missing (notably the pip <code>eccodes</code> wheel on Windows). earthlens itself
-  imports neither <code>cfgrib</code> nor <code>eccodes</code> directly.</li>
+<li>a <strong>collection</strong> (e.g. <code>"sentinel-2-l2a"</code>) → the default graph
+  <code>load_collection → clip → save</code>, loading the bands you list (or the
+  collection's <code>default_bands</code> when the list is empty); or</li>
+<li>a <strong>recipe</strong> (e.g. <code>"sentinel-2-l2a-ndvi-monthly"</code>) → the recipe's fixed
+  graph. An empty band list uses the recipe's own bands; a non-empty list
+  overrides them.</li>
 </ul>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>conda<span class="w"> </span>install<span class="w"> </span>-c<span class="w"> </span>conda-forge<span class="w"> </span>eccodes<span class="w"> </span>libgdal-grib
-</code></pre></div>
-<h2 id="curated-models"><a class="toclink" href="#curated-models">Curated models</a><a class="headerlink" href="#curated-models" title="Permanent link">#</a></h2>
-<p>The <strong>MVP 5</strong> are live-validated end to end; the <strong>expanded set</strong> is
-metadata-curated from Herbie's templates + provider docs and should be
-vetted with <code>tools/nwp/probe_nwp_model.py &lt;key&gt;</code> before relying on it
-(the <code>errors="warn"</code> fetch policy skips any <code>(cycle, step)</code> a model
-doesn't carry).</p>
+<p>Multiple keys per call are allowed — one output file is written per key.</p>
+<h3 id="kwargs"><a class="toclink" href="#kwargs">Kwargs</a><a class="headerlink" href="#kwargs" title="Permanent link">#</a></h3>
 <table>
 <thead>
 <tr>
-<th>Model key</th>
-<th>Provider</th>
-<th>Backend</th>
-<th>Cycles (UTC)</th>
-<th>Horizon</th>
-<th>Notes</th>
+<th>Kwarg</th>
+<th>Default</th>
+<th>Meaning</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><code>gfs</code></td>
-<td>NOAA NODD</td>
-<td><code>herbie</code></td>
-<td>00/06/12/18</td>
-<td>384 h</td>
-<td>0.25° global · MVP</td>
+<td><code>endpoint</code></td>
+<td><code>"cdse"</code></td>
+<td>which openEO backend to target (<a href="../introduction/">Introduction</a>)</td>
 </tr>
 <tr>
-<td><code>gefs</code></td>
-<td>NOAA NODD</td>
-<td><code>herbie</code></td>
-<td>00/06/12/18</td>
-<td>384 h</td>
-<td>0.5° ensemble (<code>atmos.5</code>) · MVP</td>
+<td><code>process</code></td>
+<td><code>None</code></td>
+<td>apply this recipe to <strong>every</strong> request key, overriding the inferred recipe/collection</td>
 </tr>
 <tr>
-<td><code>hrrr</code></td>
-<td>NOAA NODD</td>
-<td><code>herbie</code></td>
-<td>hourly</td>
-<td>48 h¹</td>
-<td>3 km CONUS (<code>wrfsfcf</code>) · MVP</td>
+<td><code>execute</code></td>
+<td><code>"sync"</code></td>
+<td><code>"sync"</code> = <code>DataCube.download</code> (size-capped); <code>"batch"</code> = a polled batch job</td>
 </tr>
 <tr>
-<td><code>ifs-hres</code></td>
-<td>ECMWF Open Data</td>
-<td><code>ecmwf-opendata</code></td>
-<td>00/06/12/18</td>
-<td>240 h</td>
-<td>0.25° global · MVP</td>
+<td><code>output_format</code></td>
+<td><code>"GTiff"</code></td>
+<td>openEO output format; a recipe's own <code>output_format</code> wins when set</td>
 </tr>
 <tr>
-<td><code>icon-global</code></td>
-<td>DWD Open Data</td>
-<td><code>direct-https</code></td>
-<td>00/06/12/18</td>
-<td>180 h</td>
-<td>icosahedral (raw fetch) · MVP</td>
-</tr>
-<tr>
-<td><code>rap</code></td>
-<td>NOAA NODD</td>
-<td><code>herbie</code></td>
-<td>hourly</td>
-<td>51 h</td>
-<td>13 km CONUS (<code>awp130pgrb</code>)</td>
-</tr>
-<tr>
-<td><code>nam</code></td>
-<td>NOAA NODD</td>
-<td><code>herbie</code></td>
-<td>00/06/12/18</td>
-<td>84 h</td>
-<td>12 km CONUS (<code>awphys</code>)</td>
-</tr>
-<tr>
-<td><code>nbm</code></td>
-<td>NOAA NODD</td>
-<td><code>herbie</code></td>
-<td>hourly</td>
-<td>264 h</td>
-<td>National Blend (<code>co</code>)</td>
-</tr>
-<tr>
-<td><code>rrfs</code></td>
-<td>NOAA NODD</td>
-<td><code>herbie</code></td>
-<td>hourly</td>
-<td>60 h</td>
-<td>3 km (<code>prslev</code>)</td>
-</tr>
-<tr>
-<td><code>gdps</code></td>
-<td>ECCC MSC</td>
-<td><code>herbie</code></td>
-<td>00/12</td>
-<td>240 h</td>
-<td>15 km global</td>
-</tr>
-<tr>
-<td><code>rdps</code></td>
-<td>ECCC MSC</td>
-<td><code>herbie</code></td>
-<td>00/06/12/18</td>
-<td>84 h</td>
-<td>10 km regional</td>
-</tr>
-<tr>
-<td><code>hrdps</code></td>
-<td>ECCC MSC</td>
-<td><code>herbie</code></td>
-<td>00/06/12/18</td>
-<td>48 h</td>
-<td>2.5 km (<code>continental</code>)</td>
-</tr>
-<tr>
-<td><code>icon-eu</code></td>
-<td>DWD Open Data</td>
-<td><code>direct-https</code></td>
-<td>00/06/12/18</td>
-<td>120 h</td>
-<td><strong>regular lat-lon (croppable)</strong> ✓ probed</td>
-</tr>
-<tr>
-<td><code>icon-d2</code></td>
-<td>DWD Open Data</td>
-<td><code>direct-https</code></td>
-<td>every 3 h</td>
-<td>48 h</td>
-<td>icosahedral (raw fetch) ✓ probed</td>
-</tr>
-<tr>
-<td><code>ens</code></td>
-<td>ECMWF Open Data</td>
-<td><code>ecmwf-opendata</code></td>
-<td>00/06/12/18</td>
-<td>360 h</td>
-<td>IFS ENS control (<code>enfo</code>/<code>cf</code>) ✓ probed</td>
-</tr>
-<tr>
-<td><code>aifs</code></td>
-<td>ECMWF Open Data</td>
-<td><code>ecmwf-opendata</code></td>
-<td>00/06/12/18</td>
-<td>360 h</td>
-<td>data-driven (<code>aifs-single</code>) ✓ probed</td>
-</tr>
-<tr>
-<td><code>rtma</code></td>
-<td>NOAA NODD</td>
-<td><code>herbie</code></td>
-<td>hourly</td>
-<td>0 h²</td>
-<td>2.5 km CONUS analysis (<code>anl</code>)</td>
-</tr>
-<tr>
-<td><code>urma</code></td>
-<td>NOAA NODD</td>
-<td><code>herbie</code></td>
-<td>hourly</td>
-<td>0 h²</td>
-<td>2.5 km CONUS analysis (<code>anl</code>)</td>
-</tr>
-<tr>
-<td><code>hiresw-arw</code></td>
-<td>NOAA NODD</td>
-<td><code>herbie</code></td>
-<td>00/12</td>
-<td>48 h</td>
-<td>2.5 km ARW window (<code>domain=conus</code>)</td>
-</tr>
-<tr>
-<td><code>href</code></td>
-<td>NOAA NODD</td>
-<td><code>herbie</code></td>
-<td>00/06/12/18</td>
-<td>48 h</td>
-<td>ensemble mean (<code>domain=conus</code>)</td>
-</tr>
-<tr>
-<td><code>arpege-world</code></td>
-<td>Météo-France</td>
-<td><code>meteofrance-api</code></td>
-<td>00/06/12/18</td>
-<td>102 h</td>
-<td>0.25° global · WCS API (key)³</td>
-</tr>
-<tr>
-<td><code>arome-france</code></td>
-<td>Météo-France</td>
-<td><code>meteofrance-api</code></td>
-<td>every 3 h</td>
-<td>51 h</td>
-<td>0.025° France · WCS API (key)³</td>
+<td><code>max_cloud_cover</code></td>
+<td><code>None</code></td>
+<td>forwarded to <code>load_collection(max_cloud_cover=…)</code>; only for optical collections that expose <code>eo:cloud_cover</code> (Sentinel-2). Passing it to a non-optical collection (SAR, atmosphere, DEM) raises <code>ValueError</code>.</td>
 </tr>
 </tbody>
 </table>
-<p>³ <strong>Météo-France WCS API.</strong> Served from the authenticated portal
-(<code>portail-api.meteofrance.fr</code>), not the static-only <code>mf-nwp-models</code> S3 bucket.
-Set an application API key in <code>METEO_FRANCE_API_KEY</code> (or <code>MF_API_KEY</code>); the
-centre issues OGC WCS 2.0.1 <code>GetCoverage</code> requests with server-side bbox
-subsetting. The coverage-id strings are best-effort (not live-validated against
-a key) and live in the catalog <code>request_options</code>/<code>bands</code>, so a fix is a catalog
-edit — confirm with <code>probe_nwp_model.py arpege-world</code>.</p>
-<p>² <strong>Analyses</strong> (<code>rtma</code>/<code>urma</code>) have <code>horizon_h=0</code> — they are valid <em>at</em> the cycle
-time, so only the analysis step (<code>f000</code>) is fetched.</p>
-<p>Not shipped: <strong>CFS</strong> (seasonal — a different time axis than <code>(cycle, step)</code>) and
-<strong>HAFS</strong> (hurricane model — needs a storm id, not a generic <code>(cycle, step)</code>
-raster). The unsigned <code>direct-boto3</code> Météo-France centre also exists for any
-future static/unsigned MF mirror, but the live forecasts use <code>meteofrance-api</code>
-above.</p>
-<p>¹ <strong>HRRR per-cycle horizon.</strong> The <code>horizon_h</code> is the <em>maximum</em>: HRRR runs to
-48 h only at the 00/06/12/18 synoptic cycles; the other (hourly) cycles run to
-18 h. The catalog stores a single <code>horizon_h</code>, so a long-lead request on an
-off-synoptic cycle asks for steps that cycle doesn't carry — those are skipped
-under the default <code>errors="warn"</code> policy (see <a href="../usage/#partial-availability-errors">usage</a>),
-not fetched. Per-cycle horizons are a future catalog enhancement.</p>
-<p>Each model maps the shared earthlens parameter names to its own
-selector:</p>
+<blockquote>
+<p><code>output_format</code> is named distinctly from <code>fmt</code> (the date-string format
+inherited from the facade) on purpose — the two never collide.</p>
+</blockquote>
+<h2 id="server-side-aggregation-aggregate"><a class="toclink" href="#server-side-aggregation-aggregate">Server-side aggregation (<code>aggregate=</code>)</a><a class="headerlink" href="#server-side-aggregation-aggregate" title="Permanent link">#</a></h2>
+<p>Because openEO reduces <strong>server-side</strong>, an <code>aggregate=AggregationConfig(...)</code>
+becomes a native <code>aggregate_temporal_period</code> node in the graph (before
+<code>save_result</code>) — the only backend where <code>aggregate=</code> costs <strong>no</strong> client compute
+and no pyramids reducer.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.aggregate</span><span class="w"> </span><span class="kn">import</span> <span class="n">AggregationConfig</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="n">EarthLens</span><span class="p">(</span>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>    <span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;openeo&quot;</span><span class="p">,</span>
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>    <span class="n">variables</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;sentinel-2-l2a&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;B04&quot;</span><span class="p">,</span> <span class="s2">&quot;B08&quot;</span><span class="p">]},</span>
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>    <span class="n">start</span><span class="o">=</span><span class="s2">&quot;2023-01-01&quot;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">&quot;2023-12-31&quot;</span><span class="p">,</span>
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">40.40</span><span class="p">,</span> <span class="mf">40.45</span><span class="p">],</span> <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">3.67</span><span class="p">,</span> <span class="mf">3.72</span><span class="p">],</span>
+<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>    <span class="n">path</span><span class="o">=</span><span class="s2">&quot;out&quot;</span><span class="p">,</span>
+<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">aggregate</span><span class="o">=</span><span class="n">AggregationConfig</span><span class="p">(</span><span class="n">freq</span><span class="o">=</span><span class="s2">&quot;1MS&quot;</span><span class="p">,</span> <span class="n">op</span><span class="o">=</span><span class="s2">&quot;mean&quot;</span><span class="p">))</span>
+</code></pre></div>
+<p>The aggregator's pandas <code>freq</code> is mapped to an openEO <strong>calendar period</strong>, and
+its <code>op</code> to an openEO <strong>reducer</strong>:</p>
 <table>
 <thead>
 <tr>
-<th>Parameter</th>
-<th>NOAA / ECCC (Herbie regex)</th>
-<th>ECMWF (token)</th>
-<th>DWD (token, lc for D2)</th>
+<th><code>AggregationConfig.freq</code></th>
+<th>openEO <code>period</code></th>
+<th></th>
+<th><code>AggregationConfig.op</code></th>
+<th>openEO <code>reducer</code></th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><code>temperature_2m</code></td>
-<td><code>:TMP:2 m above ground:</code></td>
-<td><code>2t</code></td>
-<td><code>T_2M</code></td>
+<td><code>D</code> / <code>7D</code></td>
+<td><code>day</code></td>
+<td></td>
+<td><code>auto</code></td>
+<td><code>mean</code></td>
 </tr>
 <tr>
-<td><code>precipitation_acc</code></td>
-<td><code>:APCP:surface:</code></td>
-<td><code>tp</code></td>
-<td><code>TOT_PREC</code></td>
+<td><code>W</code></td>
+<td><code>week</code></td>
+<td></td>
+<td><code>mean</code></td>
+<td><code>mean</code></td>
 </tr>
 <tr>
-<td><code>dewpoint_2m</code></td>
-<td><code>:DPT:2 m above ground:</code></td>
-<td><code>2d</code></td>
-<td><code>TD_2M</code></td>
+<td><code>10D</code></td>
+<td><code>dekad</code> (10-day)</td>
+<td></td>
+<td><code>sum</code></td>
+<td><code>sum</code></td>
 </tr>
 <tr>
-<td><code>relative_humidity_2m</code></td>
-<td><code>:RH:2 m above ground:</code></td>
-<td><code>2r</code></td>
-<td><code>RELHUM_2M</code></td>
+<td><code>MS</code> / <code>M</code></td>
+<td><code>month</code></td>
+<td></td>
+<td><code>min</code> / <code>max</code></td>
+<td><code>min</code> / <code>max</code></td>
 </tr>
 <tr>
-<td><code>wind_u_10m</code></td>
-<td><code>:UGRD:10 m above ground:</code></td>
-<td><code>10u</code></td>
-<td><code>U_10M</code></td>
+<td><code>QS</code> / <code>Q</code></td>
+<td><code>season</code></td>
+<td></td>
+<td><code>std</code></td>
+<td><code>sd</code></td>
 </tr>
 <tr>
-<td><code>wind_v_10m</code></td>
-<td><code>:VGRD:10 m above ground:</code></td>
-<td><code>10v</code></td>
-<td><code>V_10M</code></td>
-</tr>
-<tr>
-<td><code>wind_gust</code></td>
-<td><code>:GUST:surface:</code></td>
-<td><code>10fg</code></td>
-<td><code>VMAX_10M</code></td>
-</tr>
-<tr>
-<td><code>pressure_msl</code></td>
-<td><code>:PRMSL:mean sea level:</code></td>
-<td><code>msl</code></td>
-<td><code>PMSL</code></td>
-</tr>
-<tr>
-<td><code>surface_pressure</code></td>
-<td><code>:PRES:surface:</code></td>
-<td><code>sp</code></td>
-<td><code>PS</code></td>
-</tr>
-<tr>
-<td><code>total_cloud_cover</code></td>
-<td><code>:TCDC:entire atmosphere:</code></td>
-<td><code>tcc</code></td>
-<td><code>CLCT</code></td>
-</tr>
-<tr>
-<td><code>cape</code></td>
-<td><code>:CAPE:surface:</code></td>
-<td><code>cape</code></td>
-<td><code>CAPE_ML</code></td>
-</tr>
-<tr>
-<td><code>downward_shortwave_radiation</code></td>
-<td><code>:DSWRF:surface:</code></td>
-<td><code>ssrd</code></td>
-<td>— (no single token)</td>
+<td><code>YS</code> / <code>Y</code></td>
+<td><code>year</code></td>
+<td></td>
+<td></td>
+<td></td>
 </tr>
 </tbody>
 </table>
-<p>11–12 surface bands per forecast model (analyses <code>rtma</code>/<code>urma</code> carry the 9
-non-flux fields). Not every model publishes every band — a requested band a
-model doesn't carry is skipped under <code>errors="warn"</code> (it is not a hard error).
-The DWD tokens are HEAD-validated live for <code>icon-eu</code>; the ECMWF flux tokens
-(<code>cape</code>/<code>ssrd</code>) may be outside the open-data subset for some runs and skip.</p>
-<h3 id="pressure-level-3-d-fields"><a class="toclink" href="#pressure-level-3-d-fields">Pressure-level (3-D) fields</a><a class="headerlink" href="#pressure-level-3-d-fields" title="Permanent link">#</a></h3>
-<p>Every forecast model (all centres) also exposes 3-D fields —
-geopotential height, temperature, u-/v-wind, and relative humidity at
-<strong>925 / 850 / 700 / 500 / 300 / 250 / 200 / 100 hPa</strong> (so ~52 bands each):</p>
-<table>
-<thead>
-<tr>
-<th>Parameter</th>
-<th>NOAA / ECCC (Herbie)</th>
-<th>ECMWF (<code>param@level</code>)</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>geopotential_height_500hPa</code></td>
-<td><code>:HGT:500 mb:</code></td>
-<td><code>gh@500</code></td>
-</tr>
-<tr>
-<td><code>temperature_850hPa</code></td>
-<td><code>:TMP:850 mb:</code></td>
-<td><code>t@850</code></td>
-</tr>
-<tr>
-<td><code>wind_u_250hPa</code></td>
-<td><code>:UGRD:250 mb:</code></td>
-<td><code>u@250</code></td>
-</tr>
-<tr>
-<td><code>relative_humidity_850hPa</code></td>
-<td><code>:RH:850 mb:</code></td>
-<td><code>r@850</code></td>
-</tr>
-</tbody>
-</table>
-<p>All 20 forecast models carry these at eight pressure levels (the analyses
-<code>rtma</code>/<code>urma</code> stay surface-only). The per-centre mechanics differ:</p>
+<p>A <code>freq</code> with no calendar equivalent raises <code>NotImplementedError</code> naming the
+supported periods.</p>
+<h2 id="execution-sync-vs-batch"><a class="toclink" href="#execution-sync-vs-batch">Execution: sync vs batch</a><a class="headerlink" href="#execution-sync-vs-batch" title="Permanent link">#</a></h2>
 <ul>
-<li><strong>Herbie (NOAA/ECCC)</strong> — the level is in the <code>.idx</code> regex (<code>:TMP:850 mb:</code>); no
-  special handling.</li>
-<li><strong>ECMWF</strong> — <code>param@level</code> (<code>t@850</code>) sets <code>levtype=pl</code> + <code>levelist</code>; the centre
-  issues one <code>retrieve</code> per level type/level and concatenates (ecmwf-opendata
-  can't mix level types in one request).</li>
-<li><strong>DWD ICON</strong> — pressure-level data is a separate file
-  (<code>…/pressure-level/…_{level}_{VAR}</code>), so each ICON row has a
-  <code>request_options.pl_url_template</code> and <code>VAR@level</code> bands (<code>FI</code> = geopotential).
-  HEAD-validated live for <code>icon-eu</code> (<code>T@850</code> / <code>FI@500</code> / <code>U@250</code> all 200).</li>
-<li><strong>Météo-France</strong> — <code>COVERAGE@level</code> selects the <code>…__ISOBARIC_SURFACE</code> coverage</li>
-<li>a WCS <code>subset=pressure(level×100 Pa)</code> (best-effort, key needed to validate).</li>
+<li><strong><code>execute="sync"</code></strong> (default) — <code>DataCube.download(path, format=…)</code>. Fast, but
+  the openEO sync endpoint has <strong>size/time caps</strong>; use it for small AOIs and
+  short windows.</li>
+<li><strong><code>execute="batch"</code></strong> — <code>cube.create_job().start_and_wait().get_results()
+  .download_file(path)</code>. The backend submits a batch job and <strong>polls to
+  completion</strong>, like GEE's async export. Use it for large AOIs / long windows.</li>
 </ul>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.nwp</span><span class="w"> </span><span class="kn">import</span> <span class="n">Catalog</span>
-<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>
-<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="n">cat</span> <span class="o">=</span> <span class="n">Catalog</span><span class="p">()</span>
-<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="nb">len</span><span class="p">(</span><span class="n">cat</span><span class="o">.</span><span class="n">datasets</span><span class="p">)</span>                          <span class="c1"># 22</span>
-<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="n">cat</span><span class="o">.</span><span class="n">get_model</span><span class="p">(</span><span class="s2">&quot;gfs&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">bands</span><span class="p">[</span><span class="s2">&quot;temperature_2m&quot;</span><span class="p">]</span>   <span class="c1"># &#39;:TMP:2 m above ground:&#39;</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">EarthLens</span><span class="p">(</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>    <span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;openeo&quot;</span><span class="p">,</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>    <span class="n">variables</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;sentinel-2-l2a-cloud-masked-composite&quot;</span><span class="p">:</span> <span class="p">[]},</span>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>    <span class="n">start</span><span class="o">=</span><span class="s2">&quot;2023-06-01&quot;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">&quot;2023-08-31&quot;</span><span class="p">,</span>
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">40.0</span><span class="p">,</span> <span class="mf">41.0</span><span class="p">],</span> <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">3.0</span><span class="p">,</span> <span class="mf">4.0</span><span class="p">],</span>
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>    <span class="n">path</span><span class="o">=</span><span class="s2">&quot;out&quot;</span><span class="p">,</span>
+<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>    <span class="n">execute</span><span class="o">=</span><span class="s2">&quot;batch&quot;</span><span class="p">,</span>
+<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
 </code></pre></div>
-<h2 id="tooling"><a class="toclink" href="#tooling">Tooling</a><a class="headerlink" href="#tooling" title="Permanent link">#</a></h2>
-<p>Three maintenance scripts live under <code>tools/nwp/</code>:</p>
+<h2 id="return-value"><a class="toclink" href="#return-value">Return value</a><a class="headerlink" href="#return-value" title="Permanent link">#</a></h2>
+<p><code>download()</code> returns a <code>list[pathlib.Path]</code> — one written file per request key.
+The suffix follows the format (<code>.tif</code> for <code>GTiff</code>, <code>.nc</code> for <code>netCDF</code>); a
+recipe's <code>output_format</code> overrides the backend default.</p>
+<h2 id="catalog-tooling"><a class="toclink" href="#catalog-tooling">Catalog tooling</a><a class="headerlink" href="#catalog-tooling" title="Permanent link">#</a></h2>
+<p>Three scripts under <code>tools/openeo/</code> (the same <code>refresh</code> / <code>probe</code> / <code>audit</code> set
+the other backends ship). Listing and describing are <strong>anonymous</strong> — no OIDC
+login is needed for any of them.</p>
+<p><strong><code>refresh_openeo_catalog.py</code></strong> — keep the informational index current and
+validate a recipe:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1"># Rebuild available_collections / available_processes in _index.yaml:</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>python<span class="w"> </span>tools/openeo/refresh_openeo_catalog.py<span class="w"> </span>refresh
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="c1"># Print the regenerated index without writing it:</span>
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>python<span class="w"> </span>tools/openeo/refresh_openeo_catalog.py<span class="w"> </span>refresh<span class="w"> </span>--dry-run
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>
+<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="c1"># Check a recipe&#39;s base collection + process names exist on the backend:</span>
+<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>python<span class="w"> </span>tools/openeo/refresh_openeo_catalog.py<span class="w"> </span>validate-recipe<span class="w"> </span>sentinel-2-l2a-ndvi-monthly
+</code></pre></div>
+<p><strong><code>audit_openeo_datasets.py</code></strong> — diff the curated catalog against the live
+backend (curated collections no longer served, recipe processes no longer
+advertised, untracked live collections):</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>python<span class="w"> </span>tools/openeo/audit_openeo_datasets.py<span class="w"> </span>audit
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>python<span class="w"> </span>tools/openeo/audit_openeo_datasets.py<span class="w"> </span>audit<span class="w"> </span>--strict<span class="w">   </span><span class="c1"># exit 1 on any drift</span>
+</code></pre></div>
+<p><strong><code>probe_openeo_collection.py</code></strong> — inspect one collection's live metadata when
+curating a new row (bands, extent, gsd); <code>--yaml</code> emits a paste-ready stanza:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>python<span class="w"> </span>tools/openeo/probe_openeo_collection.py<span class="w"> </span>SENTINEL2_L2A
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>python<span class="w"> </span>tools/openeo/probe_openeo_collection.py<span class="w"> </span>ESA_WORLDCOVER_10M_2021_V2<span class="w"> </span>--yaml
+</code></pre></div>
+<p><code>validate-recipe</code> and <code>audit --strict</code> exit non-zero on any drift (a base
+collection or a process the backend no longer advertises).</p>
+<h2 id="gotchas-limits"><a class="toclink" href="#gotchas-limits">Gotchas &amp; limits</a><a class="headerlink" href="#gotchas-limits" title="Permanent link">#</a></h2>
 <ul>
-<li><code>refresh_nwp_catalog.py</code> — print a model summary; <code>--live</code> HEAD-probes
-  each <code>direct-https</code> model's latest cycle.</li>
-<li><code>audit_nwp_catalog.py</code> — static consistency lint (backend vs
-  <code>url_template</code> / <code>model_family</code>, empty bands, cycle-hour range).</li>
-<li><code>probe_nwp_model.py &lt;key&gt;</code> — live availability check for one model,
-  dispatching on backend (HTTP HEAD / unsigned S3 <code>head_object</code> /
-  <code>Client.latest()</code> / Herbie URL resolution). Use it to vet a catalog
-  row before relying on it.</li>
+<li><strong>Sync size cap</strong> — large requests fail the sync endpoint; switch to
+  <code>execute="batch"</code>.</li>
+<li><strong>OIDC in CI</strong> — the interactive flow needs a browser once; CI must use
+  client-credentials or a cached refresh token (see <a href="../authentication/">Authentication</a>).</li>
+<li><strong>Recipe bands</strong> — overriding a recipe's bands can break its graph (e.g. the
+  NDVI recipe needs <code>B04</code>/<code>B08</code>/<code>SCL</code>); prefer leaving the band list empty.</li>
+<li><strong>MVP scope</strong> — arbitrary user-supplied process graphs / UDFs are a follow-on;
+  the MVP ships the curated recipe library plus plain-collection loads.</li>
 </ul>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>pixi<span class="w"> </span>run<span class="w"> </span>-e<span class="w"> </span>dev<span class="w"> </span>python<span class="w"> </span>tools/nwp/refresh_nwp_catalog.py<span class="w"> </span>--live
-<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>pixi<span class="w"> </span>run<span class="w"> </span>-e<span class="w"> </span>dev<span class="w"> </span>python<span class="w"> </span>tools/nwp/audit_nwp_catalog.py
-</code></pre></div>
 
 
 
@@ -5944,7 +6070,7 @@ geopotential height, temperature, u-/v-wind, and relative humidity at
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
           
-          <a href="../usage/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Usage">
+          <a href="../introduction/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Introduction">
             <div class="md-footer__button md-icon">
               
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
@@ -5954,20 +6080,20 @@ geopotential height, temperature, u-/v-wind, and relative humidity at
                 Previous
               </span>
               <div class="md-ellipsis">
-                Usage
+                Introduction
               </div>
             </div>
           </a>
         
         
           
-          <a href="../nwp/" class="md-footer__link md-footer__link--next" aria-label="Next: Reference">
+          <a href="../authentication/" class="md-footer__link md-footer__link--next" aria-label="Next: Authentication">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                Reference
+                Authentication
               </div>
             </div>
             <div class="md-footer__button md-icon">
