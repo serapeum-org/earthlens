@@ -1,47 +1,56 @@
 # openEO backend — collections & recipes
 
 The openEO catalog has two layers: **curated collections** (CDSE collections you
-can load directly) and **curated recipes** (named process graphs). Below are
-both, in full, plus the complete `available_collections` index. Install with
-`pip install earthlens[openeo]`.
+can load directly) and **curated recipes** (named process graphs). All **19**
+CDSE openEO collections are curated below, plus the 5 recipes and the full
+`available_processes` index. Install with `pip install earthlens[openeo]`.
 
 ## Curated collections
 
 A collection key is loaded with `variables={key: [band, ...]}`; an empty band
 list uses the **default bands**. Every `collection_id` is the UPPERCASE openEO
-id verified against the live CDSE backend.
+id verified against the live CDSE backend (the curated set equals the full
+`available_collections` index — all 19).
 
-| Key | `collection_id` | Default bands | Cadence | Resolution | Coverage start |
-|---|---|---|---|---|---|
-| `sentinel-2-l2a` | `SENTINEL2_L2A` | `B02, B03, B04, B08` | 5-day | 10 m | 2015-06-27 |
-| `sentinel-2-l1c` | `SENTINEL2_L1C` | `B02, B03, B04, B08` | 5-day | 10 m | 2015-06-27 |
-| `sentinel-1-grd` | `SENTINEL1_GRD` | `VV, VH` | 6-day | 10 m | 2014-10-03 |
-| `sentinel-3-olci-l2-water` | `SENTINEL3_OLCI_L2_WATER` | `CHL_NN, TSM_NN` | ~2-day | 300 m | 2016-04-25 |
-| `sentinel-3-olci-l2-land` | `SENTINEL3_OLCI_L2_LAND` | `OTCI, GIFAPAR` | ~2-day | 300 m | 2016-04-25 |
-| `sentinel-5p-l2` | `SENTINEL_5P_L2` | `NO2` | daily | 5.5 km | 2018-04-30 |
-| `copernicus-dem-30` | `COPERNICUS_30` | `DEM` | static | 30 m | 2010-12-12 |
+| Key | `collection_id` | Default bands | Cadence | Resolution |
+|---|---|---|---|---|
+| `sentinel-2-l2a` | `SENTINEL2_L2A` | `B02, B03, B04, B08` | 5-day | 10 m |
+| `sentinel-2-l1c` | `SENTINEL2_L1C` | `B02, B03, B04, B08` | 5-day | 10 m |
+| `sentinel-1-grd` | `SENTINEL1_GRD` | `VV, VH` | 6-day | 10 m |
+| `sentinel-1-global-mosaics` | `SENTINEL1_GLOBAL_MOSAICS` | `VV, VH` | monthly | 20 m |
+| `sentinel-3-olci-l1b` | `SENTINEL3_OLCI_L1B` | `B08, B06, B04` | ~2-day | 300 m |
+| `sentinel-3-olci-l2-water` | `SENTINEL3_OLCI_L2_WATER` | `CHL_NN, TSM_NN` | ~2-day | 300 m |
+| `sentinel-3-olci-l2-land` | `SENTINEL3_OLCI_L2_LAND` | `OTCI, GIFAPAR` | ~2-day | 300 m |
+| `sentinel-3-slstr` | `SENTINEL3_SLSTR` | `S7, S8, S9` | ~1-day | 1 km |
+| `sentinel-3-slstr-l2-lst` | `SENTINEL3_SLSTR_L2_LST` | `LST` | daily | 1 km |
+| `sentinel-3-syn-l2-aod` | `SENTINEL3_SYN_L2_AOD` | `AOD_550` | daily | — |
+| `sentinel-3-syn-l2-syn` | `SENTINEL3_SYN_L2_SYN` | `Syn_Oa08/06/03_reflectance` | daily | 300 m |
+| `sentinel-5p-l2` | `SENTINEL_5P_L2` | `NO2` | daily | 5.5 km |
+| `landsat-bimonthly-mosaic` | `LANDSAT_BIMONTHLY_MOSAIC` | `B04, B03, B02` | bimonthly | 30 m |
+| `esa-worldcover-2020` | `ESA_WORLDCOVER_10M_2020_V1` | `MAP` | annual | 10 m |
+| `esa-worldcover-2021` | `ESA_WORLDCOVER_10M_2021_V2` | `MAP` | annual | 10 m |
+| `copernicus-plant-phenology-index` | `COPERNICUS_PLANT_PHENOLOGY_INDEX` | `PPI` | 10-daily | 10 m |
+| `copernicus-vegetation-phenology-productivity-season1` | `COPERNICUS_VEGETATION_PHENOLOGY_PRODUCTIVITY_10M_SEASON1` | `SOSD, EOSD, LENGTH` | yearly | 10 m |
+| `copernicus-vegetation-phenology-productivity-season2` | `COPERNICUS_VEGETATION_PHENOLOGY_PRODUCTIVITY_10M_SEASON2` | `SOSD, EOSD, LENGTH` | yearly | 10 m |
+| `copernicus-dem-30` | `COPERNICUS_30` | `DEM` | static | 30 m |
 
-### Full band lists
+Each collection's **full** band list, spatial/temporal extent, and description
+live in `src/earthlens/openeo/catalog/collections.yaml` (and are queryable via
+`Catalog().get_collection(key)`). A few highlights:
 
-* **`sentinel-2-l2a`** — `B01, B02, B03, B04, B05, B06, B07, B08, B8A, B09, B11,
-  B12, WVP, AOT, SCL, sunAzimuthAngles, sunZenithAngles, viewAzimuthMean,
-  viewZenithMean, CLD, SNW`
-* **`sentinel-2-l1c`** — `B01, B02, B03, B04, B05, B06, B07, B08, B8A, B09, B10,
-  B11, B12`
-* **`sentinel-1-grd`** — `HH, HV, VH, VV` (polarisations; availability depends on
-  acquisition mode)
-* **`sentinel-3-olci-l2-water`** — `FLAGS, IWV, CHL_OC4ME, TSM_NN, PAR,
-  KD490_M07, A865, T865, CHL_NN, ADG443_NN, B01…B12, B16, B17, B18, B21`
-* **`sentinel-3-olci-l2-land`** — `GIFAPAR, IWV, OTCI, RC681, RC865, LQSF`
-* **`sentinel-5p-l2`** — `CO, HCHO, NO2, O3, SO2, CH4, AER_AI_340_380,
-  AER_AI_354_388, CLOUD_BASE_PRESSURE, CLOUD_TOP_PRESSURE, CLOUD_BASE_HEIGHT,
-  CLOUD_TOP_HEIGHT, CLOUD_OPTICAL_THICKNESS, CLOUD_FRACTION, dataMask`
-* **`copernicus-dem-30`** — `DEM`
+* **`sentinel-2-l2a`** — `B01…B12, B8A, WVP, AOT, SCL, CLD, SNW`, sun/view
+  angles (the `SCL` scene-classification band drives `mask_scl_dilation`).
+* **`sentinel-5p-l2`** — `CO, HCHO, NO2, O3, SO2, CH4`, aerosol indices, cloud
+  bands, `dataMask`.
+* **`sentinel-3-olci-l2-water`** — `CHL_OC4ME, CHL_NN, TSM_NN, KD490_M07, PAR`,
+  plus the 16 OLCI reflectance bands.
+* **`sentinel-3-syn-l2-aod`** — multi-wavelength `AOD_440…AOD_2250`, single-
+  scattering albedo, Angstrom exponent.
 
 ## Curated recipes
 
-A recipe key runs a fixed process graph server-side. The graph steps below are
-applied after `load_collection`; each step name is a verified CDSE process.
+A recipe key runs a fixed process graph server-side. Each step name is a process
+verified present on the CDSE backend.
 
 | Recipe | Base collection | Bands | Graph steps | Output |
 |---|---|---|---|---|
@@ -56,27 +65,13 @@ A step whose process is a `DataCube` method (`ndvi`, `aggregate_temporal_period`
 (`mask_scl_dilation`, `sar_backscatter`) is applied through `DataCube.process`
 with the cube bound as `data`.
 
-## Available collections (full index)
+## Available index
 
-The backend serves more collections than are curated above. The full
-`available_collections` index — regenerated by
-`tools/openeo/refresh_openeo_catalog.py refresh` — currently lists all **19**
-CDSE openEO collections:
-
-`COPERNICUS_30`, `COPERNICUS_PLANT_PHENOLOGY_INDEX`,
-`COPERNICUS_VEGETATION_PHENOLOGY_PRODUCTIVITY_10M_SEASON1`,
-`COPERNICUS_VEGETATION_PHENOLOGY_PRODUCTIVITY_10M_SEASON2`,
-`ESA_WORLDCOVER_10M_2020_V1`, `ESA_WORLDCOVER_10M_2021_V2`,
-`LANDSAT_BIMONTHLY_MOSAIC`, `SENTINEL1_GLOBAL_MOSAICS`, `SENTINEL1_GRD`,
-`SENTINEL2_L1C`, `SENTINEL2_L2A`, `SENTINEL3_OLCI_L1B`,
-`SENTINEL3_OLCI_L2_LAND`, `SENTINEL3_OLCI_L2_WATER`, `SENTINEL3_SLSTR`,
-`SENTINEL3_SLSTR_L2_LST`, `SENTINEL3_SYN_L2_AOD`, `SENTINEL3_SYN_L2_SYN`,
-`SENTINEL_5P_L2`.
-
-To use an un-curated collection, add a row to
-`src/earthlens/openeo/catalog/collections.yaml` (or load it by adding a curated
-collection entry). The `available_processes` index (143 processes) is also
-rebuilt by the refresh tool and lives in `_index.yaml`.
+`_index.yaml` carries the informational `available_collections` (all 19 ids,
+matching the curated set) and `available_processes` (143 process ids) — both
+regenerated by `tools/openeo/refresh_openeo_catalog.py refresh`. The audit tool
+(`audit_openeo_datasets.py`) confirms the curated catalog matches the live
+backend with no drift.
 
 ## Programmatic access
 
@@ -84,10 +79,11 @@ rebuilt by the refresh tool and lives in `_index.yaml`.
 from earthlens.openeo import Catalog
 
 cat = Catalog()
-sorted(cat.datasets)                 # curated collection keys
+sorted(cat.datasets)                 # all 19 curated collection keys
 sorted(cat.recipes)                  # curated recipe keys
 cat.is_recipe("sentinel-2-l2a-ndvi-monthly")          # True
-cat.get_collection("sentinel-2-l2a").collection_id    # "SENTINEL2_L2A"
+cat.get_collection("sentinel-2-l2a").bands            # the full band list
 cat.resolve("sentinel-2-l2a-ndvi-monthly").graph      # the ordered steps
 cat.available_collections                              # the full 19-id index
+cat.available_processes                                # the 143-process index
 ```

@@ -10,6 +10,8 @@ import pytest
 _TOOLS_DIR = Path(__file__).resolve().parents[2] / "tools" / "openeo"
 sys.path.insert(0, str(_TOOLS_DIR))
 
+import audit_openeo_datasets as audit  # noqa: E402
+import probe_openeo_collection as probe  # noqa: E402
 import refresh_openeo_catalog as refresh  # noqa: E402
 
 
@@ -18,11 +20,17 @@ class _FakeListing(list):
 
 
 class _FakeConnection:
-    """An openEO connection stand-in exposing the listing calls."""
+    """An openEO connection stand-in exposing the listing + describe calls."""
 
-    def __init__(self, collections: list[str], processes: list[str]) -> None:
+    def __init__(
+        self,
+        collections: list[str],
+        processes: list[str],
+        describe: dict | None = None,
+    ) -> None:
         self._collections = collections
         self._processes = processes
+        self._describe = describe or {}
 
     def list_collections(self) -> _FakeListing:
         """Return canned collection entries."""
@@ -31,6 +39,12 @@ class _FakeConnection:
     def list_processes(self) -> _FakeListing:
         """Return canned process entries."""
         return _FakeListing({"id": p} for p in self._processes)
+
+    def describe_collection(self, collection_id: str) -> dict:
+        """Return canned collection metadata, or raise when unknown."""
+        if collection_id not in self._describe:
+            raise KeyError(collection_id)
+        return self._describe[collection_id]
 
 
 class _FakeOpeneoModule:
@@ -129,3 +143,90 @@ class TestValidateRecipe:
         monkeypatch.setitem(sys.modules, "openeo", _FakeOpeneoModule(conn))
         # ndvi exists but mask_scl_dilation/aggregate_temporal_period do not.
         assert refresh.main(["validate-recipe", "sentinel-2-l2a-ndvi-monthly"]) == 1
+
+
+@pytest.mark.openeo
+class TestAudit:
+    """`audit` diffs the curated catalog against the live backend."""
+
+    def _full_module(self) -> "_FakeOpeneoModule":
+        """A fake openeo whose live collections cover every curated id (no drift)."""
+        from earthlens.openeo.catalog import Catalog
+
+        cat = Catalog()
+        live = sorted({c.collection_id for c in cat.datasets.values()})
+        procs = [
+            "mask_scl_dilation",
+            "ndvi",
+            "aggregate_temporal_period",
+            "reduce_dimension",
+            "sar_backscatter",
+        ]
+        return _FakeOpeneoModule(_FakeConnection(collections=live, processes=procs))
+
+    def test_no_drift_exit_0(self, monkeypatch: pytest.MonkeyPatch, capsys):
+        """When every curated id is served, audit reports no drift and exits 0."""
+        monkeypatch.setitem(sys.modules, "openeo", self._full_module())
+        assert audit.main(["audit", "--strict"]) == 0
+        assert "no drift" in capsys.readouterr().out
+
+    def test_missing_collection_strict_exit_1(self, monkeypatch: pytest.MonkeyPatch):
+        """A curated collection the backend no longer serves fails under --strict."""
+        conn = _FakeConnection(collections=["SENTINEL2_L2A"], processes=["ndvi"])
+        monkeypatch.setitem(sys.modules, "openeo", _FakeOpeneoModule(conn))
+        assert audit.main(["audit", "--strict"]) == 1
+
+    def test_drift_without_strict_exit_0(self, monkeypatch: pytest.MonkeyPatch):
+        """Drift without --strict prints the report but exits 0."""
+        conn = _FakeConnection(collections=["SENTINEL2_L2A"], processes=["ndvi"])
+        monkeypatch.setitem(sys.modules, "openeo", _FakeOpeneoModule(conn))
+        assert audit.main(["audit"]) == 0
+
+    def test_connect_failure_exit_1(self, monkeypatch: pytest.MonkeyPatch):
+        """A listing failure exits non-zero."""
+
+        class _BoomModule:
+            def connect(self, url):
+                raise RuntimeError("backend unreachable")
+
+        monkeypatch.setitem(sys.modules, "openeo", _BoomModule())
+        assert audit.main(["audit"]) == 1
+
+
+@pytest.mark.openeo
+class TestProbe:
+    """`probe` describes one collection's live metadata."""
+
+    def _module(self) -> "_FakeOpeneoModule":
+        """A fake openeo whose describe_collection returns canned S2 metadata."""
+        meta = {
+            "title": "Sentinel-2 L2A",
+            "summaries": {"eo:bands": [{"name": "B04"}, {"name": "B08"}], "gsd": [10]},
+            "extent": {
+                "spatial": {"bbox": [[-180, -90, 180, 90]]},
+                "temporal": {"interval": [["2015-06-27T10:25:31Z", None]]},
+            },
+        }
+        conn = _FakeConnection(
+            collections=[], processes=[], describe={"SENTINEL2_L2A": meta}
+        )
+        return _FakeOpeneoModule(conn)
+
+    def test_human_output(self, monkeypatch: pytest.MonkeyPatch, capsys):
+        """The human report prints bands, extent, and gsd."""
+        monkeypatch.setitem(sys.modules, "openeo", self._module())
+        assert probe.main(["SENTINEL2_L2A"]) == 0
+        out = capsys.readouterr().out
+        assert "B04" in out and "Sentinel-2 L2A" in out
+
+    def test_yaml_output(self, monkeypatch: pytest.MonkeyPatch, capsys):
+        """The --yaml mode emits a paste-ready stanza."""
+        monkeypatch.setitem(sys.modules, "openeo", self._module())
+        assert probe.main(["SENTINEL2_L2A", "--yaml"]) == 0
+        out = capsys.readouterr().out
+        assert "collection_id: SENTINEL2_L2A" in out and "default_bands:" in out
+
+    def test_unknown_collection_exit_1(self, monkeypatch: pytest.MonkeyPatch):
+        """An undescribable collection exits non-zero."""
+        monkeypatch.setitem(sys.modules, "openeo", self._module())
+        assert probe.main(["NO_SUCH_COLLECTION"]) == 1

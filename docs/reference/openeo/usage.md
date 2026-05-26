@@ -106,8 +106,12 @@ recipe's `output_format` overrides the backend default.
 
 ## Catalog tooling
 
-`tools/openeo/refresh_openeo_catalog.py` keeps the informational index current
-and validates recipes against the live backend (no auth needed for listing):
+Three scripts under `tools/openeo/` (the same `refresh` / `probe` / `audit` set
+the other backends ship). Listing and describing are **anonymous** — no OIDC
+login is needed for any of them.
+
+**`refresh_openeo_catalog.py`** — keep the informational index current and
+validate a recipe:
 
 ```bash
 # Rebuild available_collections / available_processes in _index.yaml:
@@ -120,8 +124,25 @@ python tools/openeo/refresh_openeo_catalog.py refresh --dry-run
 python tools/openeo/refresh_openeo_catalog.py validate-recipe sentinel-2-l2a-ndvi-monthly
 ```
 
-`validate-recipe` exits non-zero on any drift (a base collection or a process
-the backend no longer advertises).
+**`audit_openeo_datasets.py`** — diff the curated catalog against the live
+backend (curated collections no longer served, recipe processes no longer
+advertised, untracked live collections):
+
+```bash
+python tools/openeo/audit_openeo_datasets.py audit
+python tools/openeo/audit_openeo_datasets.py audit --strict   # exit 1 on any drift
+```
+
+**`probe_openeo_collection.py`** — inspect one collection's live metadata when
+curating a new row (bands, extent, gsd); `--yaml` emits a paste-ready stanza:
+
+```bash
+python tools/openeo/probe_openeo_collection.py SENTINEL2_L2A
+python tools/openeo/probe_openeo_collection.py ESA_WORLDCOVER_10M_2021_V2 --yaml
+```
+
+`validate-recipe` and `audit --strict` exit non-zero on any drift (a base
+collection or a process the backend no longer advertises).
 
 ## Gotchas & limits
 

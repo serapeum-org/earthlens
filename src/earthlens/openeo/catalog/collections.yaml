@@ -1,11 +1,12 @@
 # Curated CDSE openEO collections (logical key -> collection metadata).
 #
-# `collection_id` is the UPPERCASE openEO id verified live against
-# https://openeo.dataspace.copernicus.eu (A1). `bands` is the full band set from
-# `describe_collection`; `default_bands` is what `load_collection` pulls when a
-# request names no bands. These are a curated subset; the full set of every
-# collection id the backend serves is in `_index.yaml::available_collections`.
+# Every collection_id is the UPPERCASE openEO id verified live against
+# https://openeo.dataspace.copernicus.eu (A1 / refresh tool); `bands` is the full
+# band set from `describe_collection`; `default_bands` is what `load_collection`
+# pulls when a request names no bands. This curates the **full** set of 19 CDSE
+# openEO collections (the same set as `_index.yaml::available_collections`).
 collections:
+  # --- Sentinel-2 optical ------------------------------------------------------
   sentinel-2-l2a:
     collection_id: SENTINEL2_L2A
     description: Sentinel-2 MSI Level-2A surface reflectance (atmospherically corrected).
@@ -26,12 +27,14 @@ collections:
     cadence: 5-day
     resolution: 10.0
     bands:
-      [B01, B02, B03, B04, B05, B06, B07, B08, B8A, B09, B10, B11, B12]
+      [B01, B02, B03, B04, B05, B06, B07, B08, B8A, B09, B10, B11, B12,
+       sunAzimuthAngles, sunZenithAngles, viewAzimuthMean, viewZenithMean]
     default_bands: [B02, B03, B04, B08]
     extent:
       start_date: "2015-06-27"
       bbox: [-180.0, -90.0, 180.0, 90.0]
 
+  # --- Sentinel-1 SAR ----------------------------------------------------------
   sentinel-1-grd:
     collection_id: SENTINEL1_GRD
     description: Sentinel-1 C-band SAR Ground Range Detected backscatter.
@@ -41,7 +44,31 @@ collections:
     default_bands: [VV, VH]
     extent:
       start_date: "2014-10-03"
+
+  sentinel-1-global-mosaics:
+    collection_id: SENTINEL1_GLOBAL_MOSAICS
+    description: Sentinel-1 monthly global SAR backscatter mosaics.
+    cadence: monthly
+    resolution: 20.0
+    bands: [VV, VH, HV, HH]
+    default_bands: [VV, VH]
+    extent:
+      start_date: "2020-01-01"
       bbox: [-180.0, -90.0, 180.0, 90.0]
+
+  # --- Sentinel-3 OLCI / SLSTR / SYN -------------------------------------------
+  sentinel-3-olci-l1b:
+    collection_id: SENTINEL3_OLCI_L1B
+    description: Sentinel-3 OLCI Level-1B top-of-atmosphere radiances (21 bands).
+    cadence: ~2-day
+    resolution: 300.0
+    bands:
+      [B01, B02, B03, B04, B05, B06, B07, B08, B09, B10, B11, B12, B13, B14,
+       B15, B16, B17, B18, B19, B20, B21]
+    default_bands: [B08, B06, B04]
+    extent:
+      start_date: "2016-04-17"
+      bbox: [-180.0, -85.0, 180.0, 85.0]
 
   sentinel-3-olci-l2-water:
     collection_id: SENTINEL3_OLCI_L2_WATER
@@ -55,7 +82,6 @@ collections:
     default_bands: [CHL_NN, TSM_NN]
     extent:
       start_date: "2016-04-25"
-      bbox: [-180.0, -90.0, 180.0, 90.0]
 
   sentinel-3-olci-l2-land:
     collection_id: SENTINEL3_OLCI_L2_LAND
@@ -66,8 +92,63 @@ collections:
     default_bands: [OTCI, GIFAPAR]
     extent:
       start_date: "2016-04-25"
-      bbox: [-180.0, -90.0, 180.0, 90.0]
 
+  sentinel-3-slstr:
+    collection_id: SENTINEL3_SLSTR
+    description: Sentinel-3 SLSTR Level-1B radiances/brightness temperatures (9 + 2 fire bands).
+    cadence: ~1-day
+    resolution: 1000.0
+    bands: [S1, S2, S3, S4, S5, S6, S7, S8, S9, F1, F2]
+    default_bands: [S7, S8, S9]
+    extent:
+      start_date: "2016-04-17"
+      bbox: [-180.0, -85.0, 180.0, 85.0]
+
+  sentinel-3-slstr-l2-lst:
+    collection_id: SENTINEL3_SLSTR_L2_LST
+    description: Sentinel-3 SLSTR Level-2 land surface temperature (1 km, daily).
+    cadence: daily
+    resolution: 1000.0
+    bands:
+      [LST, LST_uncertainty, exception, confidence_in, sunAzimuthAngles,
+       sunZenithAngles, viewAzimuthAngles, viewZenithAngles]
+    default_bands: [LST]
+    extent:
+      start_date: "2016-04-17"
+
+  sentinel-3-syn-l2-aod:
+    collection_id: SENTINEL3_SYN_L2_AOD
+    description: Sentinel-3 SYNERGY Level-2 aerosol optical depth (multi-wavelength).
+    cadence: daily
+    bands:
+      [AOD_440, AOD_550, AOD_670, AOD_865, AOD_1600, AOD_2250, FM_AOD550,
+       SSA_440, SSA_550, SSA_670, SSA_865, SSA_1600, SSA_2250, ANG550_865,
+       D_AOD550, AAOD550]
+    default_bands: [AOD_550]
+    extent:
+      start_date: "2018-01-01"
+
+  sentinel-3-syn-l2-syn:
+    collection_id: SENTINEL3_SYN_L2_SYN
+    description: Sentinel-3 SYNERGY Level-2 surface reflectance (OLCI+SLSTR, 300 m).
+    cadence: daily
+    resolution: 300.0
+    bands:
+      [Syn_Oa01_reflectance, Syn_Oa02_reflectance, Syn_Oa03_reflectance,
+       Syn_Oa04_reflectance, Syn_Oa05_reflectance, Syn_Oa06_reflectance,
+       Syn_Oa07_reflectance, Syn_Oa08_reflectance, Syn_Oa09_reflectance,
+       Syn_Oa10_reflectance, Syn_Oa11_reflectance, Syn_Oa12_reflectance,
+       Syn_Oa16_reflectance, Syn_Oa17_reflectance, Syn_Oa18_reflectance,
+       Syn_Oa21_reflectance, Syn_S1N_reflectance, Syn_S1O_reflectance,
+       Syn_S2N_reflectance, Syn_S2O_reflectance, Syn_S3N_reflectance,
+       Syn_S3O_reflectance, Syn_S5N_reflectance, Syn_S5O_reflectance,
+       Syn_S6N_reflectance, Syn_S6O_reflectance, CLOUD_flags, OLC_flags,
+       SLN_flags, SLO_flags, SYN_flags]
+    default_bands: [Syn_Oa08_reflectance, Syn_Oa06_reflectance, Syn_Oa03_reflectance]
+    extent:
+      start_date: "2018-01-01"
+
+  # --- Sentinel-5P atmosphere --------------------------------------------------
   sentinel-5p-l2:
     collection_id: SENTINEL_5P_L2
     description: Sentinel-5P TROPOMI Level-2 atmospheric composition (NO2, CO, O3, SO2, CH4, …).
@@ -82,6 +163,85 @@ collections:
       start_date: "2018-04-30"
       bbox: [-180.0, -85.0, 180.0, 85.0]
 
+  # --- Landsat -----------------------------------------------------------------
+  landsat-bimonthly-mosaic:
+    collection_id: LANDSAT_BIMONTHLY_MOSAIC
+    description: Landsat bi-monthly surface-reflectance mosaic (7 bands).
+    cadence: bimonthly
+    resolution: 30.0
+    bands: [B01, B02, B03, B04, B05, B06, B07]
+    default_bands: [B04, B03, B02]
+    extent:
+      start_date: "1997-01-01"
+      end_date: "2024-12-31"
+      bbox: [-180.0, -90.0, 180.0, 90.0]
+
+  # --- Land cover --------------------------------------------------------------
+  esa-worldcover-2020:
+    collection_id: ESA_WORLDCOVER_10M_2020_V1
+    description: ESA WorldCover global land-cover classification, 10 m, 2020 (v1).
+    cadence: annual
+    resolution: 10.0
+    bands: [MAP]
+    default_bands: [MAP]
+    extent:
+      start_date: "2020-01-01"
+      end_date: "2020-12-31"
+      bbox: [-180.0, -60.0, 180.0, 84.0]
+
+  esa-worldcover-2021:
+    collection_id: ESA_WORLDCOVER_10M_2021_V2
+    description: ESA WorldCover global land-cover classification, 10 m, 2021 (v2).
+    cadence: annual
+    resolution: 10.0
+    bands: [MAP]
+    default_bands: [MAP]
+    extent:
+      start_date: "2021-01-01"
+      end_date: "2021-12-31"
+      bbox: [-180.0, -60.0, 180.0, 84.0]
+
+  # --- Phenology / vegetation productivity (HR-VPP) ----------------------------
+  copernicus-plant-phenology-index:
+    collection_id: COPERNICUS_PLANT_PHENOLOGY_INDEX
+    description: Copernicus HR-VPP seasonal Plant Phenology Index trajectories (10-daily).
+    cadence: 10-daily
+    resolution: 10.0
+    bands: [QFLAG, PPI]
+    default_bands: [PPI]
+    extent:
+      start_date: "2017-01-01"
+      bbox: [-62.08, -21.79, 56.14, 72.10]
+
+  copernicus-vegetation-phenology-productivity-season1:
+    collection_id: COPERNICUS_VEGETATION_PHENOLOGY_PRODUCTIVITY_10M_SEASON1
+    description: Copernicus HR-VPP vegetation phenology & productivity parameters, season 1 (yearly, 10 m).
+    cadence: yearly
+    resolution: 10.0
+    bands:
+      [SOSD, EOSD, MAXD, SOSV, EOSV, MINV, MAXV, AMPL, LENGTH, LSLOPE, RSLOPE,
+       SPROD, TPROD, QFLAG]
+    default_bands: [SOSD, EOSD, LENGTH]
+    extent:
+      start_date: "2017-01-01"
+      end_date: "2024-12-31"
+      bbox: [-62.08, -21.79, 56.14, 72.10]
+
+  copernicus-vegetation-phenology-productivity-season2:
+    collection_id: COPERNICUS_VEGETATION_PHENOLOGY_PRODUCTIVITY_10M_SEASON2
+    description: Copernicus HR-VPP vegetation phenology & productivity parameters, season 2 (yearly, 10 m).
+    cadence: yearly
+    resolution: 10.0
+    bands:
+      [SOSD, EOSD, MAXD, SOSV, EOSV, MINV, MAXV, AMPL, LENGTH, LSLOPE, RSLOPE,
+       SPROD, TPROD, QFLAG]
+    default_bands: [SOSD, EOSD, LENGTH]
+    extent:
+      start_date: "2017-01-01"
+      end_date: "2024-12-31"
+      bbox: [-62.08, -21.79, 56.14, 72.10]
+
+  # --- Elevation ---------------------------------------------------------------
   copernicus-dem-30:
     collection_id: COPERNICUS_30
     description: Copernicus GLO-30 global digital elevation model (30 m).
