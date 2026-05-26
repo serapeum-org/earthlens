@@ -54,6 +54,28 @@ published yet, or a model doesn't carry every step on every cycle).
 | `"skip"` | drop the miss silently |
 | `"raise"` | abort the whole download on the first miss |
 
+## Ensemble members
+
+Ensemble models (`gefs`, `ens`) expose a `members=` axis parallel to `steps=`:
+
+```python
+lens = EarthLens(
+    data_source="nwp",
+    variables={"gefs": ["temperature_2m"]},
+    start="2024-06-01", end="2024-06-01",
+    lat_lim=[40, 45], lon_lim=[-80, -75], path="out/gefs",
+    members=["mean", "1", "2", "3"],     # mean + 3 perturbations
+)
+```
+
+One COG is written per `(cycle, step, member)` (filename suffix `_m{member}`).
+Without `members=`, only the model's **default member** is fetched (`mean` for
+GEFS, `control` for ENS) — keeping a plain request bounded. GEFS members map to
+Herbie's `member=` (`"0"`–`"30"`, `"mean"`); ENS members map to ECMWF
+`type=pf` + `number=` (`"control"` keeps the control forecast). Deterministic
+models ignore `members=`. DWD/Météo-France ensembles (ICON-EPS, PEARP/PEAROME)
+are a follow-on.
+
 ## Cloud mirror selection
 
 `mirror=` chooses where the bytes come from:
