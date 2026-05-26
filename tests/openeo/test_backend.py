@@ -167,7 +167,7 @@ class TestBuildCube:
         assert ("aggregate_temporal_period", "month", "mean") in conn.log
 
     def test_max_cloud_cover_forwarded(self, output_dir: Path):
-        """`max_cloud_cover` is forwarded onto load_collection."""
+        """`max_cloud_cover` is forwarded for an optical collection."""
         backend = _make_backend(
             {"sentinel-2-l2a": ["B04"]}, output_dir, max_cloud_cover=15
         )
@@ -175,6 +175,25 @@ class TestBuildCube:
         backend._fetch(backend._search())
         load = next(e for e in conn.log if e[0] == "load_collection")
         assert load[3] == {"max_cloud_cover": 15}
+
+    def test_max_cloud_cover_rejected_for_non_optical(self, output_dir: Path):
+        """`max_cloud_cover` on a SAR collection raises a clear ValueError."""
+        backend = _make_backend(
+            {"sentinel-1-grd": ["VV"]}, output_dir, max_cloud_cover=15
+        )
+        _bind_fake(backend)
+        with pytest.raises(ValueError, match="only supported for optical"):
+            backend._fetch(backend._search())
+
+    def test_max_cloud_cover_allowed_for_optical_recipe(self, output_dir: Path):
+        """A Sentinel-2 recipe inherits cloud-cover support from its base."""
+        backend = _make_backend(
+            {"sentinel-2-l2a-ndvi-monthly": []}, output_dir, max_cloud_cover=30
+        )
+        conn = _bind_fake(backend)
+        backend._fetch(backend._search())
+        load = next(e for e in conn.log if e[0] == "load_collection")
+        assert load[3] == {"max_cloud_cover": 30}
 
     def test_aggregate_adds_temporal_period_node(self, output_dir: Path):
         """`aggregate=` appends a server-side aggregate_temporal_period node."""

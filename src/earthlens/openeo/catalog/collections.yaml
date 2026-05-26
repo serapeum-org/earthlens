@@ -12,6 +12,7 @@ collections:
     description: Sentinel-2 MSI Level-2A surface reflectance (atmospherically corrected).
     cadence: 5-day
     resolution: 10.0
+    cloud_cover: true
     bands:
       [B01, B02, B03, B04, B05, B06, B07, B08, B8A, B09, B11, B12, WVP, AOT,
        SCL, sunAzimuthAngles, sunZenithAngles, viewAzimuthMean, viewZenithMean,
@@ -26,6 +27,7 @@ collections:
     description: Sentinel-2 MSI Level-1C top-of-atmosphere reflectance.
     cadence: 5-day
     resolution: 10.0
+    cloud_cover: true
     bands:
       [B01, B02, B03, B04, B05, B06, B07, B08, B8A, B09, B10, B11, B12,
        sunAzimuthAngles, sunZenithAngles, viewAzimuthMean, viewZenithMean]

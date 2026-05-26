@@ -264,6 +264,13 @@ class OpenEO(AbstractDataSource):
         bands = self._request_bands(key, resolved)
         load_kwargs: dict[str, Any] = {}
         if self._max_cloud_cover is not None:
+            if not resolved.supports_cloud_cover:
+                raise ValueError(
+                    f"max_cloud_cover is only supported for optical collections "
+                    f"that expose eo:cloud_cover (Sentinel-2); {resolved.key!r} "
+                    f"({resolved.collection_id}) does not. Drop max_cloud_cover "
+                    "for this request."
+                )
             load_kwargs["max_cloud_cover"] = self._max_cloud_cover
         cube = conn.load_collection(
             resolved.collection_id,

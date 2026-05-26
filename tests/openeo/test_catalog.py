@@ -61,6 +61,14 @@ class TestBundledCatalog:
         g = Catalog().resolve("sentinel-1-grd")
         assert g.graph == [] and g.bands == ["VV", "VH"] and not g.is_recipe
 
+    def test_cloud_cover_flag_resolves(self):
+        """Optical collections/recipes resolve supports_cloud_cover=True; others False."""
+        cat = Catalog()
+        assert cat.resolve("sentinel-2-l2a").supports_cloud_cover
+        assert cat.resolve("sentinel-2-l2a-ndvi-monthly").supports_cloud_cover
+        assert not cat.resolve("sentinel-1-grd").supports_cloud_cover
+        assert not cat.resolve("sentinel-5p-no2-monthly").supports_cloud_cover
+
     def test_available_index_covers_curated_ids(self):
         """Every curated collection id is a member of the available index."""
         cat = Catalog()

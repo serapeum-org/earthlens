@@ -109,6 +109,11 @@ class Collection(BaseModel):
         resolution: Native ground sample distance in metres, or `None`.
         extent: Spatial/temporal coverage.
         description: One-line human summary, or `None`.
+        cloud_cover: Whether the collection exposes an `eo:cloud_cover` property
+            that the `max_cloud_cover` `load_collection` filter can act on (the
+            optical missions: Sentinel-2 L1C / L2A). `False` for SAR, atmosphere,
+            elevation, and composite collections, so the backend can reject a
+            `max_cloud_cover=` that the collection would ignore / error on.
     """
 
     model_config = ConfigDict(frozen=True, extra="forbid")
@@ -120,6 +125,7 @@ class Collection(BaseModel):
     resolution: float | None = None
     extent: Extent | None = None
     description: str | None = None
+    cloud_cover: bool = False
 
     @property
     def effective_bands(self) -> list[str]:
@@ -193,6 +199,8 @@ class ResolvedGraph(BaseModel):
         output_format: Preferred output format, or `None` for the backend
             default.
         is_recipe: Whether the key named a recipe (vs a plain collection).
+        supports_cloud_cover: Whether the loaded collection exposes
+            `eo:cloud_cover`, so the backend may forward `max_cloud_cover=`.
     """
 
     model_config = ConfigDict(frozen=True)
@@ -203,6 +211,7 @@ class ResolvedGraph(BaseModel):
     graph: list[dict[str, dict[str, Any]]] = Field(default_factory=list)
     output_format: str | None = None
     is_recipe: bool = False
+    supports_cloud_cover: bool = False
 
 
 def _load_catalog_data(
@@ -433,6 +442,24 @@ class Catalog(AbstractCatalog):
                 f"Known recipes: {sorted(self.recipes)}.{hint}"
             ) from None
 
+    def _collection_id_has_cloud_cover(self, collection_id: str) -> bool:
+        """Whether any curated collection with this id exposes `eo:cloud_cover`.
+
+        Recipes reference a raw `collection_id` (not a logical key), so this
+        reverse-looks-up the curated collection to inherit its `cloud_cover`
+        flag. Returns `False` when the id is not curated.
+
+        Args:
+            collection_id: The UPPERCASE openEO collection id a recipe loads.
+
+        Returns:
+            `True` when a curated collection with that id sets `cloud_cover`.
+        """
+        return any(
+            col.collection_id == collection_id and col.cloud_cover
+            for col in self.datasets.values()
+        )
+
     def is_recipe(self, key: str) -> bool:
         """Return whether `key` names a curated recipe (vs a plain collection).
 
@@ -482,6 +509,9 @@ class Catalog(AbstractCatalog):
                 graph=list(recipe.graph),
                 output_format=recipe.output_format,
                 is_recipe=True,
+                supports_cloud_cover=self._collection_id_has_cloud_cover(
+                    recipe.base_collection
+                ),
             )
         if key in self.datasets:
             collection = self.datasets[key]
@@ -492,6 +522,7 @@ class Catalog(AbstractCatalog):
                 graph=[],
                 output_format=None,
                 is_recipe=False,
+                supports_cloud_cover=collection.cloud_cover,
             )
         import difflib
 

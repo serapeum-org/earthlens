@@ -39,7 +39,7 @@ Multiple keys per call are allowed — one output file is written per key.
 | `process` | `None` | apply this recipe to **every** request key, overriding the inferred recipe/collection |
 | `execute` | `"sync"` | `"sync"` = `DataCube.download` (size-capped); `"batch"` = a polled batch job |
 | `output_format` | `"GTiff"` | openEO output format; a recipe's own `output_format` wins when set |
-| `max_cloud_cover` | `None` | forwarded to `load_collection(max_cloud_cover=…)` (Sentinel-2 property filter) |
+| `max_cloud_cover` | `None` | forwarded to `load_collection(max_cloud_cover=…)`; only for optical collections that expose `eo:cloud_cover` (Sentinel-2). Passing it to a non-optical collection (SAR, atmosphere, DEM) raises `ValueError`. |
 
 > `output_format` is named distinctly from `fmt` (the date-string format
 > inherited from the facade) on purpose — the two never collide.
