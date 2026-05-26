@@ -245,6 +245,26 @@
          <lastmod>2026-05-26</lastmod>
     </url>
     <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/examples/hdx/arbitrary_hdx_id/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/examples/hdx/catalog_explorer/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/examples/hdx/cod_admin_boundaries/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/examples/hdx/hotosm_building_export/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/examples/hdx/wfp_food_security_table/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
          <loc>https://serapeum-org.github.io/earthlens/develop/examples/openaq/multistation_comparison/</loc>
          <lastmod>2026-05-26</lastmod>
     </url>
@@ -254,30 +274,6 @@
     </url>
     <url>
          <loc>https://serapeum-org.github.io/earthlens/develop/examples/openaq/quickstart/</loc>
-         <lastmod>2026-05-26</lastmod>
-    </url>
-    <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/examples/openeo/air_quality_no2_monthly/</loc>
-         <lastmod>2026-05-26</lastmod>
-    </url>
-    <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/examples/openeo/catalog_explorer/</loc>
-         <lastmod>2026-05-26</lastmod>
-    </url>
-    <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/examples/openeo/cloud_masked_composite/</loc>
-         <lastmod>2026-05-26</lastmod>
-    </url>
-    <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/examples/openeo/ocean_chlorophyll_monthly/</loc>
-         <lastmod>2026-05-26</lastmod>
-    </url>
-    <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/examples/openeo/quickstart/</loc>
-         <lastmod>2026-05-26</lastmod>
-    </url>
-    <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/examples/openeo/server_side_aggregate/</loc>
          <lastmod>2026-05-26</lastmod>
     </url>
     <url>
@@ -493,6 +489,22 @@
          <lastmod>2026-05-26</lastmod>
     </url>
     <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/hdx/catalog/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/hdx/hdx/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/hdx/introduction/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/hdx/usage/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
          <loc>https://serapeum-org.github.io/earthlens/develop/reference/openaq/authentication/</loc>
          <lastmod>2026-05-26</lastmod>
     </url>
@@ -506,26 +518,6 @@
     </url>
     <url>
          <loc>https://serapeum-org.github.io/earthlens/develop/reference/openaq/usage/</loc>
-         <lastmod>2026-05-26</lastmod>
-    </url>
-    <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/reference/openeo/authentication/</loc>
-         <lastmod>2026-05-26</lastmod>
-    </url>
-    <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/reference/openeo/datasets/</loc>
-         <lastmod>2026-05-26</lastmod>
-    </url>
-    <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/reference/openeo/introduction/</loc>
-         <lastmod>2026-05-26</lastmod>
-    </url>
-    <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/reference/openeo/openeo/</loc>
-         <lastmod>2026-05-26</lastmod>
-    </url>
-    <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/reference/openeo/usage/</loc>
          <lastmod>2026-05-26</lastmod>
     </url>
     <url>
