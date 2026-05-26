@@ -45,7 +45,7 @@ from earthlens.base import (
     SpatialExtent,
     TemporalExtent,
 )
-from earthlens.eumetsat._helpers import antimeridian_bboxes, safe_product_filename
+from earthlens.eumetsat._helpers import eumdac_bbox, safe_product_filename
 from earthlens.eumetsat.auth import EumetsatAuth, EumetsatCredentials
 from earthlens.eumetsat.catalog import Catalog, DataStoreGroup, EumetsatCollection
 
@@ -223,8 +223,9 @@ class EUMETSAT(AbstractDataSource):
 
         The Data Store search accepts a plain bounding box, so this is a
         thin wrapper over `SpatialExtent.from_pairs`. An earthlens extent
-        cannot itself cross the antimeridian; the search-side split lives
-        in `earthlens.eumetsat._helpers.antimeridian_bboxes`.
+        constrains longitude to a single `[-180, 180]` range with
+        `west <= east`, so it cannot represent an antimeridian-crossing
+        box and `_search` issues exactly one search bbox.
 
         Args:
             lat_lim: `[lat_min, lat_max]` in degrees.
@@ -307,7 +308,12 @@ class EUMETSAT(AbstractDataSource):
         assert self._auth is not None  # set by _initialize
         self._auth.configure()
         store = self._auth.datastore()
-        bboxes = antimeridian_bboxes(self.space)
+        # A `SpatialExtent` constrains longitude to a single `[-180, 180]`
+        # range with `west <= east`, so it cannot represent an
+        # antimeridian-crossing box — a single search bbox always suffices.
+        bbox = eumdac_bbox(
+            self.space.west, self.space.south, self.space.east, self.space.north
+        )
         # `end_date` parses to midnight, so a same-day request (start == end)
         # would otherwise collapse to the zero-width instant 00:00:00 and match
         # (almost) no products. Extend the end bound to the end of its calendar
@@ -319,18 +325,17 @@ class EUMETSAT(AbstractDataSource):
         products: list[RemoteProduct] = []
         for col in self._collections:
             collection = store.get_collection(col.collection_id)
-            for bbox in bboxes:
-                for product in collection.search(
-                    bbox=bbox,
-                    dtstart=dtstart,
-                    dtend=dtend,
-                ):
-                    products.append(
-                        RemoteProduct(
-                            id=str(product),
-                            metadata={"product": product, "collection": col},
-                        )
+            for product in collection.search(
+                bbox=bbox,
+                dtstart=dtstart,
+                dtend=dtend,
+            ):
+                products.append(
+                    RemoteProduct(
+                        id=str(product),
+                        metadata={"product": product, "collection": col},
                     )
+                )
         return products
 
     def _fetch(self, products: list[RemoteProduct]) -> list[Path]:

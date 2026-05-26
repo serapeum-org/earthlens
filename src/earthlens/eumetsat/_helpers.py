@@ -1,18 +1,13 @@
 """Small, dependency-free helpers for the EUMETSAT backend.
 
-Currently the bounding-box formatter that turns an earthlens
-`SpatialExtent` into the comma-separated `W,S,E,N` string `eumdac`'s
-OpenSearch `bbox=` parameter expects (the axis order is the documented
-EUMDAC gotcha — confirmed `W,S,E,N` against `eumdac` 3.1.1), plus the
-antimeridian-split helper that yields the bbox string(s) to search.
+The bounding-box formatter that turns a WGS84 box into the
+comma-separated `W,S,E,N` string `eumdac`'s OpenSearch `bbox=` parameter
+expects (the axis order is the documented EUMDAC gotcha — confirmed
+`W,S,E,N` against `eumdac` 3.1.1), and a filename sanitiser that reduces
+a server-supplied product id to a safe, traversal-free basename.
 """
 
 from __future__ import annotations
-
-from typing import TYPE_CHECKING
-
-if TYPE_CHECKING:
-    from earthlens.base import SpatialExtent
 
 
 def eumdac_bbox(west: float, south: float, east: float, north: float) -> str:
@@ -85,34 +80,3 @@ def safe_product_filename(product_id: str) -> str:
             f"product id {product_id!r} does not yield a usable filename"
         )
     return name
-
-
-def antimeridian_bboxes(space: SpatialExtent) -> list[str]:
-    """Return the `eumdac` bbox string(s) covering a spatial extent.
-
-    An earthlens `SpatialExtent` constrains longitude to `[-180, 180]`
-    with `west <= east`, so it cannot itself represent a box that
-    crosses the antimeridian — such a request is normally split before
-    reaching here. This helper returns a single-element list for the
-    representable case and is the seam where a future antimeridian split
-    would return the two halves.
-
-    Args:
-        space: The validated request extent.
-
-    Returns:
-        list[str]: One `eumdac` bbox string per search box (one element
-            for a standard, non-crossing extent).
-
-    Examples:
-        - A standard extent yields one bbox string:
-            ```python
-            >>> from earthlens.base import SpatialExtent
-            >>> from earthlens.eumetsat._helpers import antimeridian_bboxes
-            >>> space = SpatialExtent.from_pairs(lat_lim=[50, 52], lon_lim=[-1, 1])
-            >>> antimeridian_bboxes(space)
-            ['-1.0,50.0,1.0,52.0']
-
-            ```
-    """
-    return [eumdac_bbox(space.west, space.south, space.east, space.north)]
