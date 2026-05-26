@@ -1,0 +1,162 @@
+# MSG (Meteosat Second Generation) SEVIRI + derived collections, incl. CDRs.
+# Ids, titles and start dates walked from the public browse endpoint
+# (api.eumetsat.int/data/browse/collections) on 2026-05-26. Hand-tuned rows
+# (HRSEVIRI, the S5P gases, ASCAT soil moisture, the MTG suite, ...) keep their
+# vetted metadata; the rest carry browse-derived format/output_kind/cadence
+# heuristics (advisory for the whole-product download) refined per product as
+# needed. Reconcile with tools/eumetsat/audit_eumetsat_catalog.py.
+datasets:
+  msg-cloud-mask:
+    collection_id: "EO:EUM:DAT:MSG:CLM"
+    group: MSG
+    mission: msg
+    output_kind: raster
+    format: grib
+    cadence: 15min
+    selectors: [CLM]
+    tailor_product_type: CLM
+    extent: { lat: [-79.0, 79.0], lon: [-79.0, 79.0] }
+    temporal: { start: 2004-01-19, end: null }
+  msg-cloud-mask-iodc:
+    collection_id: "EO:EUM:DAT:MSG:CLM-IODC"
+    group: MSG
+    mission: msg
+    output_kind: raster
+    format: grib
+    cadence: 15min
+    selectors: [CLM]
+    tailor_product_type: CLM
+    extent: { lat: [-79.0, 79.0], lon: [-34.0, 124.0] }
+    temporal: { start: 2017-02-01, end: null }
+  msg-cloud-top-height:
+    collection_id: "EO:EUM:DAT:MSG:CTH"
+    group: MSG
+    mission: msg
+    output_kind: raster
+    format: netcdf
+    cadence: subdaily
+    selectors: []
+    tailor_product_type: null
+    extent: { lat: [-79, 79], lon: [-79, 79] }
+    temporal: { start: 2005-06-21, end: null }
+  msg-cloud-top-height-2:
+    collection_id: "EO:EUM:DAT:MSG:CTH-IODC"
+    group: MSG
+    mission: msg
+    output_kind: raster
+    format: netcdf
+    cadence: subdaily
+    selectors: []
+    tailor_product_type: null
+    extent: { lat: [-79, 79], lon: [-79, 79] }
+    temporal: { start: 2017-02-01, end: null }
+  msg-fire-risk-map:
+    collection_id: "EO:EUM:DAT:0398"
+    group: MSG
+    mission: msg
+    output_kind: raster
+    format: netcdf
+    cadence: subdaily
+    selectors: []
+    tailor_product_type: null
+    extent: { lat: [-79, 79], lon: [-79, 79] }
+    temporal: { start: 2023-09-21, end: null }
+  msg-hrseviri:
+    collection_id: "EO:EUM:DAT:MSG:HRSEVIRI"
+    group: MSG
+    mission: msg
+    output_kind: raster
+    format: native
+    cadence: 15min
+    selectors: [HRSEVIRI]
+    tailor_product_type: HRSEVIRI
+    extent: { lat: [-79.0, 79.0], lon: [-79.0, 79.0] }
+    temporal: { start: 2004-01-19, end: null }
+  msg-hrseviri-iodc:
+    collection_id: "EO:EUM:DAT:MSG:HRSEVIRI-IODC"
+    group: MSG
+    mission: msg
+    output_kind: raster
+    format: native
+    cadence: 15min
+    selectors: [HRSEVIRI]
+    tailor_product_type: HRSEVIRI
+    extent: { lat: [-79.0, 79.0], lon: [-34.0, 124.0] }
+    temporal: { start: 2017-02-01, end: null }
+  msg-land-surface-temperature-record:
+    collection_id: "EO:EUM:DAT:0088"
+    group: MSG
+    mission: msg
+    output_kind: raster
+    format: netcdf
+    cadence: irregular
+    selectors: []
+    tailor_product_type: null
+    extent: { lat: [-79, 79], lon: [-79, 79] }
+    temporal: { start: 2004-01-21, end: 2015-12-31 }
+  msg-land-surface-temperature-with-directional-effects:
+    collection_id: "EO:EUM:DAT:0394"
+    group: MSG
+    mission: msg
+    output_kind: raster
+    format: netcdf
+    cadence: subdaily
+    selectors: []
+    tailor_product_type: null
+    extent: { lat: [-79, 79], lon: [-79, 79] }
+    temporal: { start: 2023-09-18, end: null }
+  msg-optimal-cloud-analysis-climate-record-release:
+    collection_id: "EO:EUM:DAT:0617"
+    group: MSG
+    mission: msg
+    output_kind: raster
+    format: netcdf
+    cadence: irregular
+    selectors: []
+    tailor_product_type: null
+    extent: { lat: [-79, 79], lon: [-79, 79] }
+    temporal: { start: 2004-01-19, end: 2019-08-31 }
+  msg-rapid-scan-cloud-mask:
+    collection_id: "EO:EUM:DAT:MSG:RSS-CLM"
+    group: MSG
+    mission: msg
+    output_kind: raster
+    format: netcdf
+    cadence: 5min
+    selectors: []
+    tailor_product_type: null
+    extent: { lat: [-79, 79], lon: [-79, 79] }
+    temporal: { start: 2008-10-16, end: null }
+  msg-rss:
+    collection_id: "EO:EUM:DAT:MSG:MSG15-RSS"
+    group: MSG
+    mission: msg
+    output_kind: raster
+    format: native
+    cadence: 5min
+    selectors: [HRSEVIRI]
+    tailor_product_type: HRSEVIRI
+    extent: { lat: [15.0, 70.0], lon: [-79.0, 79.0] }
+    temporal: { start: 2008-05-13, end: null }
+  msg-seviri-rapid-scan-atmospheric-motion-vectors:
+    collection_id: "EO:EUM:DAT:1083"
+    group: MSG
+    mission: msg
+    output_kind: vector
+    format: netcdf
+    cadence: irregular
+    selectors: []
+    tailor_product_type: null
+    extent: { lat: [-79, 79], lon: [-79, 79] }
+    temporal: { start: 2008-05-06, end: 2020-04-03 }
+  msg-seviri-rapid-scan-high-rate-1:
+    collection_id: "EO:EUM:DAT:0962"
+    group: MSG
+    mission: msg
+    output_kind: raster
+    format: native
+    cadence: irregular
+    selectors: []
+    tailor_product_type: null
+    extent: { lat: [-79, 79], lon: [-79, 79] }
+    temporal: { start: 2008-05-06, end: 2021-09-17 }

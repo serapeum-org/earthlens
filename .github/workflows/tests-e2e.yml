@@ -100,6 +100,32 @@ jobs:
         run: |
           pixi run -e py312 pytest -m "e2e and earthdata" -v
 
+  e2e-eumetsat:
+    runs-on: ubuntu-latest
+    if: github.repository == 'serapeum-org/earthlens'
+
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: serapeum-org/github-actions/actions/python-setup/pixi@pixi/v1
+        with:
+          environments: dev
+          activate-environment: dev
+          cache: true
+
+      - name: Run live EUMETSAT Data Store e2e tests
+        # The EUMETSAT e2e test skips itself when these are unset, so this
+        # job is harmless if the secrets are not configured yet. Register a
+        # consumer key/secret at https://api.eumetsat.int/api-key/.
+        env:
+          EUMETSAT_CONSUMER_KEY: ${{ secrets.EUMETSAT_CONSUMER_KEY }}
+          EUMETSAT_CONSUMER_SECRET: ${{ secrets.EUMETSAT_CONSUMER_SECRET }}
+        run: |
+          pixi run -e dev pytest -m "e2e and eumetsat" -v
+
   e2e-stac:
     runs-on: ubuntu-latest
     if: github.repository == 'serapeum-org/earthlens'

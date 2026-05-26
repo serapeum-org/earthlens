@@ -1,0 +1,107 @@
+# MFG (Meteosat First Generation) MVIRI / GSA climate data records.
+# Ids, titles and start dates walked from the public browse endpoint
+# (api.eumetsat.int/data/browse/collections) on 2026-05-26. Hand-tuned rows
+# (HRSEVIRI, the S5P gases, ASCAT soil moisture, the MTG suite, ...) keep their
+# vetted metadata; the rest carry browse-derived format/output_kind/cadence
+# heuristics (advisory for the whole-product download) refined per product as
+# needed. Reconcile with tools/eumetsat/audit_eumetsat_catalog.py.
+datasets:
+  mfg-atmospheric-motion-vectors-climate-record-release:
+    collection_id: "EO:EUM:DAT:0405"
+    group: MFG
+    mission: mfg
+    output_kind: vector
+    format: netcdf
+    cadence: irregular
+    selectors: []
+    tailor_product_type: null
+    extent: { lat: [-79, 79], lon: [-79, 79] }
+    temporal: { start: 1981-09-03, end: 2019-08-31 }
+  mfg-atmospheric-motion-vectors-climate-record-release-2:
+    collection_id: "EO:EUM:DAT:0894"
+    group: MFG
+    mission: mfg
+    output_kind: vector
+    format: netcdf
+    cadence: irregular
+    selectors: []
+    tailor_product_type: null
+    extent: { lat: [-79, 79], lon: [-79, 79] }
+    temporal: { start: 2006-11-28, end: 2017-03-31 }
+  mfg-atmospheric-motion-vectors-climate-record-release-3:
+    collection_id: "EO:EUM:DAT:0895"
+    group: MFG
+    mission: mfg
+    output_kind: vector
+    format: netcdf
+    cadence: irregular
+    selectors: []
+    tailor_product_type: null
+    extent: { lat: [-79, 79], lon: [-79, 79] }
+    temporal: { start: 1998-07-01, end: 2007-04-16 }
+  mfg-gsa-2-climate-record-release-2:
+    collection_id: "EO:EUM:DAT:0300"
+    group: MFG
+    mission: mfg
+    output_kind: raster
+    format: netcdf
+    cadence: irregular
+    selectors: []
+    tailor_product_type: null
+    extent: { lat: [-79, 79], lon: [-79, 79] }
+    temporal: { start: 1982-02-10, end: 2017-12-31 }
+  mfg-gsa-2-climate-record-release-2-2:
+    collection_id: "EO:EUM:DAT:0301"
+    group: MFG
+    mission: mfg
+    output_kind: raster
+    format: netcdf
+    cadence: irregular
+    selectors: []
+    tailor_product_type: null
+    extent: { lat: [-79, 79], lon: [-79, 79] }
+    temporal: { start: 2006-12-07, end: 2017-03-30 }
+  mfg-gsa-2-climate-record-release-2-3:
+    collection_id: "EO:EUM:DAT:0302"
+    group: MFG
+    mission: mfg
+    output_kind: raster
+    format: netcdf
+    cadence: irregular
+    selectors: []
+    tailor_product_type: null
+    extent: { lat: [-79, 79], lon: [-79, 79] }
+    temporal: { start: 1998-07-10, end: 2007-04-10 }
+  mfg-mviri-1-5-climate-record-release:
+    collection_id: "EO:EUM:DAT:0880"
+    group: MFG
+    mission: mfg
+    output_kind: raster
+    format: native
+    cadence: irregular
+    selectors: []
+    tailor_product_type: null
+    extent: { lat: [-79, 79], lon: [-79, 79] }
+    temporal: { start: 1982-08-11, end: 2006-07-19 }
+  mfg-mviri-1-5-climate-record-release-2:
+    collection_id: "EO:EUM:DAT:0881"
+    group: MFG
+    mission: mfg
+    output_kind: raster
+    format: native
+    cadence: irregular
+    selectors: []
+    tailor_product_type: null
+    extent: { lat: [-79, 79], lon: [-79, 79] }
+    temporal: { start: 2006-11-01, end: 2017-04-04 }
+  mfg-mviri-1-5-climate-record-release-3:
+    collection_id: "EO:EUM:DAT:0882"
+    group: MFG
+    mission: mfg
+    output_kind: raster
+    format: native
+    cadence: irregular
+    selectors: []
+    tailor_product_type: null
+    extent: { lat: [-79, 79], lon: [-79, 79] }
+    temporal: { start: 1998-07-01, end: 2006-10-31 }
