@@ -66,6 +66,12 @@ class TestCatalogLoad:
         cat = Catalog(datasets={"x": NWPModel(provider="p")})
         assert list(cat.datasets) == ["x"], cat.datasets
 
+    def test_second_load_hits_cache(self):
+        """A second construction reuses the cached parse for the same file."""
+        first = sorted(Catalog().datasets)
+        second = sorted(Catalog().datasets)
+        assert first == second == ["gefs", "gfs", "hrrr", "icon-global", "ifs-hres"]
+
     def test_empty_datasets_block_raises(self, tmp_path, monkeypatch):
         """A YAML with no datasets: block raises ValueError."""
         monkeypatch.setattr(

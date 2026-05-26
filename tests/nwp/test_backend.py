@@ -238,6 +238,15 @@ class TestFetch:
         paths = b.download(progress_bar=False)
         assert [p.name for p in paths] == ["gfs_2024060100_f000.tif", "gfs_2024060112_f000.tif"]
 
+    def test_api_composes_search_fetch(self, mini_catalog, tmp_path, fake_pyramids):
+        """_api() composes _search + _fetch into the COG list."""
+        b = _make(mini_catalog, tmp_path)
+        b._centres["herbie"] = _CountingCentre(tmp_path)
+        assert [p.name for p in b._api()] == [
+            "gfs_2024060100_f000.tif",
+            "gfs_2024060112_f000.tif",
+        ]
+
 
 class TestFetchErrors:
     """Tests for the per-product `errors` policy (M1)."""
