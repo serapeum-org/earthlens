@@ -1,0 +1,5 @@
+code,title,value,latest_date,source,source_link,notes,explore,units
+WFP01201,Countries of Operation,81,2016-06-01,WFP,http://www.wfp.org/operations/list,Countries with WFP presence in 2015.,,count
+WFP01202,People Reached with Food Assistance,76700000,2016-06-01,WFP,https://data.humdata.org/dataset/wfp-topline-figures,People reached with food assistance in 2015.,,million
+WFP01203,Metrics Tons of Food Delivered,2200000,2016-06-01,WFP,https://data.humdata.org/dataset/wfp-topline-figures,Metric tons of food delivered in 2015.,,million
+WFP01204,Cash & Voucher Transfers (USD),678000000,2016-06-01,WFP,https://data.humdata.org/dataset/wfp-topline-figures,USD value of cash and voucher transfers in 2015. More than 9.6 million people were reached in 2015 with cash-based transfers.,,dollars_million
