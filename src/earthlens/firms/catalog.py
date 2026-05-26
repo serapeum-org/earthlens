@@ -111,11 +111,13 @@ class Sensor(BaseModel):
             the value passed in `variables=[...]` and used as the URL
             `source` path segment.
         name: Human-readable sensor name used in logs and docs.
-        family: `"MODIS"` or `"VIIRS"` — selects the confidence /
-            brightness schema handling in
-            :mod:`earthlens.firms.events` (MODIS confidence is numeric
-            0-100; VIIRS confidence is the categorical token `l`/`n`/`h`,
-            and the brightness column name differs).
+        family: `"MODIS"`, `"VIIRS"`, `"GOES"`, or `"LANDSAT"` — selects
+            the confidence / brightness schema handling in
+            :mod:`earthlens.firms.events`. MODIS and GOES report numeric
+            confidence; VIIRS reports the categorical token `l`/`n`/`h`
+            and LANDSAT reports `l`/`m`/`h`. Brightness comes from
+            `brightness` (MODIS), `bright_ti4` (VIIRS / GOES), or is
+            absent (LANDSAT carries no brightness or FRP column).
         resolution_m: Nominal nadir pixel size in metres (375 for VIIRS,
             1000 for MODIS).
         temporal: The sensor's coverage window and quality tier.
@@ -138,7 +140,7 @@ class Sensor(BaseModel):
 
     code: str
     name: str = ""
-    family: Literal["MODIS", "VIIRS"]
+    family: Literal["MODIS", "VIIRS", "GOES", "LANDSAT"]
     resolution_m: int
     temporal: Temporal = Field(default_factory=Temporal)
     columns: dict[str, SensorColumn] = Field(default_factory=dict)
@@ -169,8 +171,10 @@ class Catalog(AbstractCatalog):
             ```python
             >>> from earthlens.firms import Catalog
             >>> cat = Catalog()
-            >>> cat.codes()
-            ['MODIS_NRT', 'MODIS_SP', 'VIIRS_NOAA20_NRT', 'VIIRS_NOAA21_NRT', 'VIIRS_SNPP_NRT', 'VIIRS_SNPP_SP']
+            >>> cat.codes()  # doctest: +NORMALIZE_WHITESPACE
+            ['BA_MODIS', 'BA_VIIRS', 'GOES_NRT', 'LANDSAT_NRT', 'MODIS_NRT',
+             'MODIS_SP', 'VIIRS_NOAA20_NRT', 'VIIRS_NOAA20_SP',
+             'VIIRS_NOAA21_NRT', 'VIIRS_SNPP_NRT', 'VIIRS_SNPP_SP']
             >>> cat.get_sensor("MODIS_NRT").family
             'MODIS'
             >>> "MODIS_NRT" in cat
@@ -180,10 +184,10 @@ class Catalog(AbstractCatalog):
         - An unknown code raises with a did-you-mean hint:
             ```python
             >>> from earthlens.firms import Catalog
-            >>> Catalog().get_sensor("MODIS_NR")
+            >>> Catalog().get_sensor("MODIS_NR")  # doctest: +ELLIPSIS
             Traceback (most recent call last):
                 ...
-            ValueError: 'MODIS_NR' is not in the FIRMS sensor catalog. Known datasets: ['MODIS_NRT', 'MODIS_SP', 'VIIRS_NOAA20_NRT', 'VIIRS_NOAA21_NRT', 'VIIRS_SNPP_NRT', 'VIIRS_SNPP_SP']. Did you mean 'MODIS_NRT'?
+            ValueError: 'MODIS_NR' is not in the FIRMS sensor catalog. Known datasets: [...]. Did you mean 'MODIS_NRT'?
 
             ```
     """

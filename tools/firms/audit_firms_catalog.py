@@ -148,7 +148,13 @@ def audit(
                 "catalog_columns_absent_live": missing_live,
                 "live_columns_missing_from_catalog": missing_catalog,
             }
-            if missing_live or missing_catalog:
+            # Only a *curated* column that vanished from the live CSV is
+            # real drift. Live columns absent from the catalog are
+            # expected — the catalog curates the meaningful science
+            # columns, not every structural CSV column (scan, track,
+            # version, path, row, …) — so they are reported but do not
+            # trip `--strict`.
+            if missing_live:
                 drift = True
         report["columns"] = columns
 

@@ -2,8 +2,9 @@
 
 [NASA FIRMS](https://firms.modaps.eosdis.nasa.gov/) (Fire Information for
 Resource Management System) distributes **active-fire / thermal-anomaly
-detections** from the MODIS (Terra/Aqua, C6.1) and VIIRS
-(Suomi-NPP / NOAA-20 / NOAA-21) instruments. Each detection is a single
+detections** from the MODIS (Terra/Aqua, C6.1), VIIRS
+(Suomi-NPP / NOAA-20 / NOAA-21), geostationary GOES (ABI), and Landsat
+(8/9) instruments. Each detection is a single
 fire pixel — a point with a location, an acquisition time, a brightness
 temperature, a detection confidence, and a fire-radiative-power (FRP)
 estimate. FIRMS serves both a **near-real-time** stream (detections
@@ -54,10 +55,13 @@ window to study fire onset, spread, and weather drivers.
 
 ## Things to know up front
 
-- **Detections, not burned area.** FIRMS reports where a sensor saw a
+- **Detections, not perimeters.** FIRMS reports where a sensor saw a
   thermal anomaly at overpass time — not the final fire perimeter or the
-  total area burned. Burned-area products (MCD64A1, FireCCI) are Google
-  Earth Engine datasets, not FIRMS's job.
+  total area burned. FIRMS also lists `BA_MODIS` / `BA_VIIRS`
+  burned-area collections, which this backend exposes, but the area CSV
+  API serves them with the **same point-detection schema** (lat/lon/FRP
+  points), not polygons. For true gridded burned-area rasters (MCD64A1,
+  FireCCI) use the Google Earth Engine backend.
 - **A free `MAP_KEY` is required.** Every request carries a `MAP_KEY` as
   a URL path segment. Request a free key at
   <https://firms.modaps.eosdis.nasa.gov/api/map_key/>; see
@@ -68,9 +72,11 @@ window to study fire onset, spread, and weather drivers.
   an empty result, so the backend logs a warning naming the `*_SP`
   variant — it does not silently swap the sensor.
 - **Confidence differs by family.** MODIS reports a numeric `0-100`
-  confidence; VIIRS reports a categorical `l`/`n`/`h`. The backend keeps
-  the raw value and adds a uniform `confidence_pct` so you can filter
-  across families with one `min_confidence=` threshold.
+  confidence; VIIRS reports a categorical `l`/`n`/`h`; LANDSAT reports
+  `l`/`m`/`h`; GOES reports a provider-defined numeric value. The backend
+  keeps the raw value and adds a uniform `confidence_pct` (the categorical
+  tokens map to 25/60/90) so you can filter across families with one
+  `min_confidence=` threshold.
 - **A 5-day-per-request cap and a transaction quota.** FIRMS serves at
   most 5 days per request and one sensor per request, and allows ~5000
   transactions per rolling 10 minutes. The backend chunks longer windows

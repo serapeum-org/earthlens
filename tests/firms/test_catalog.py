@@ -14,12 +14,17 @@ pytestmark = pytest.mark.firms
 
 
 def test_bundled_catalog_loads():
-    """The default Catalog() loads the bundled YAML with all six sensors."""
+    """The default Catalog() loads the bundled YAML with every live sensor."""
     cat = Catalog()
     assert cat.codes() == [
+        "BA_MODIS",
+        "BA_VIIRS",
+        "GOES_NRT",
+        "LANDSAT_NRT",
         "MODIS_NRT",
         "MODIS_SP",
         "VIIRS_NOAA20_NRT",
+        "VIIRS_NOAA20_SP",
         "VIIRS_NOAA21_NRT",
         "VIIRS_SNPP_NRT",
         "VIIRS_SNPP_SP",
@@ -46,7 +51,7 @@ def test_contains_and_membership():
     cat = Catalog()
     assert "MODIS_NRT" in cat
     assert "NOPE" not in cat
-    assert len(cat) == 6
+    assert len(cat) == 11
 
 
 def test_unknown_sensor_raises_did_you_mean():
@@ -94,6 +99,34 @@ def test_missing_sensors_block_raises(tmp_path: Path):
     empty.write_text("other: {}\n")
     with pytest.raises(ValueError, match="missing or has an empty 'sensors:'"):
         Catalog.load(empty)
+
+
+def test_goes_and_landsat_families():
+    """GOES and LANDSAT sensors carry their own family + resolution."""
+    cat = Catalog()
+    assert cat.get_sensor("GOES_NRT").family == "GOES"
+    assert cat.get_sensor("GOES_NRT").resolution_m == 2000
+    landsat = cat.get_sensor("LANDSAT_NRT")
+    assert landsat.family == "LANDSAT"
+    assert landsat.resolution_m == 30
+    # Landsat carries no FRP / brightness columns.
+    assert "frp" not in landsat.columns
+    assert "bright_ti4" not in landsat.columns
+
+
+def test_burned_area_sensors_present():
+    """The burned-area collections are catalogued under their base family."""
+    cat = Catalog()
+    assert cat.get_sensor("BA_MODIS").family == "MODIS"
+    assert cat.get_sensor("BA_VIIRS").family == "VIIRS"
+
+
+def test_noaa20_sp_archive():
+    """VIIRS_NOAA20_SP is the archive twin with the VIIRS schema."""
+    sensor = Catalog().get_sensor("VIIRS_NOAA20_SP")
+    assert sensor.family == "VIIRS"
+    assert sensor.temporal.quality == "SP"
+    assert "bright_ti4" in sensor.columns
 
 
 def test_get_catalog_returns_datasets():

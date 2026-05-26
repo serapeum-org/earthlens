@@ -142,3 +142,31 @@ def test_missing_satellite_column_degrades_to_na():
     frame = _viirs_frame().drop(columns=["satellite"])
     fc = csv_to_fc(frame, "VIIRS_SNPP_NRT", "VIIRS")
     assert pd.isna(fc["satellite"].iloc[0])
+
+
+def test_goes_numeric_confidence_passthrough():
+    """GOES confidence is numeric and passes through unscaled."""
+    frame = _viirs_frame().assign(confidence=[0.967])
+    fc = csv_to_fc(frame, "GOES_NRT", "GOES")
+    assert float(fc["confidence_pct"].iloc[0]) == 0.967
+    assert float(fc["brightness_k"].iloc[0]) == 320.0  # bright_ti4 source
+
+
+def test_landsat_categorical_confidence_and_missing_columns():
+    """LANDSAT maps l/m/h and degrades frp/brightness (no such columns) to NaN."""
+    frame = pd.DataFrame(
+        {
+            "latitude": [46.6],
+            "longitude": [-68.4],
+            "acq_date": ["2026-05-22"],
+            "acq_time": [1524],
+            "satellite": ["L8"],
+            "confidence": ["M"],
+            "daynight": ["D"],
+        }
+    )
+    fc = csv_to_fc(frame, "LANDSAT_NRT", "LANDSAT")
+    assert float(fc["confidence_pct"].iloc[0]) == 60.0
+    assert pd.isna(fc["frp"].iloc[0])
+    assert pd.isna(fc["brightness_k"].iloc[0])
+    assert fc["confidence"].iloc[0] == "M"

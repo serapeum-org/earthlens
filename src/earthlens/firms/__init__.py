@@ -43,8 +43,10 @@ Examples:
 
         ```python
         >>> from earthlens.firms import Catalog
-        >>> Catalog().codes()
-        ['MODIS_NRT', 'MODIS_SP', 'VIIRS_NOAA20_NRT', 'VIIRS_NOAA21_NRT', 'VIIRS_SNPP_NRT', 'VIIRS_SNPP_SP']
+        >>> Catalog().codes()  # doctest: +NORMALIZE_WHITESPACE
+        ['BA_MODIS', 'BA_VIIRS', 'GOES_NRT', 'LANDSAT_NRT', 'MODIS_NRT',
+         'MODIS_SP', 'VIIRS_NOAA20_NRT', 'VIIRS_NOAA20_SP',
+         'VIIRS_NOAA21_NRT', 'VIIRS_SNPP_NRT', 'VIIRS_SNPP_SP']
 
         ```
 """

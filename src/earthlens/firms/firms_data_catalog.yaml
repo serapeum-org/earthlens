@@ -99,3 +99,64 @@ sensors:
       bright_t31: { units: K, long_name: "Brightness temperature, channel 31" }
       frp: { units: MW, long_name: "Fire radiative power" }
       confidence: { units: "%", long_name: "Detection confidence (0-100)" }
+
+  VIIRS_NOAA20_SP:
+    code: VIIRS_NOAA20_SP
+    name: VIIRS NOAA-20 375 m (standard quality, archive)
+    family: VIIRS
+    resolution_m: 375
+    temporal: { start: 2018-04-01, end: null, quality: SP }
+    columns:
+      bright_ti4: { units: K, long_name: "Brightness temperature, I-4 channel" }
+      bright_ti5: { units: K, long_name: "Brightness temperature, I-5 channel" }
+      frp: { units: MW, long_name: "Fire radiative power" }
+      confidence: { units: "1", long_name: "Detection confidence (l/n/h)" }
+
+  GOES_NRT:
+    code: GOES_NRT
+    name: GOES-East/West ABI ~2 km (geostationary, near real-time)
+    family: GOES
+    resolution_m: 2000
+    temporal: { start: 2022-08-09, end: null, quality: NRT }
+    columns:
+      bright_ti4: { units: K, long_name: "Fire brightness temperature (ABI 3.9 um)" }
+      bright_ti5: { units: K, long_name: "Background brightness temperature" }
+      frp: { units: MW, long_name: "Fire radiative power" }
+      # GOES confidence is a provider-defined numeric value (not a 0-100
+      # percent), passed through unscaled into confidence_pct.
+      confidence: { units: "1", long_name: "Detection confidence (numeric, provider scale)" }
+
+  LANDSAT_NRT:
+    code: LANDSAT_NRT
+    name: Landsat 8/9 30 m active fire (near real-time)
+    family: LANDSAT
+    resolution_m: 30
+    # Landsat carries no FRP or brightness column; confidence is a
+    # low/medium/high token and the rows add path/row scene indices.
+    temporal: { start: 2022-06-20, end: null, quality: NRT }
+    columns:
+      confidence: { units: "1", long_name: "Detection confidence (l/m/h)" }
+
+  BA_MODIS:
+    code: BA_MODIS
+    name: MODIS burned-area collection (area-CSV exposes the fire-detection schema)
+    family: MODIS
+    resolution_m: 1000
+    temporal: { start: 2000-11-01, end: null, quality: SP }
+    columns:
+      brightness: { units: K, long_name: "Brightness temperature, channel 21/22" }
+      bright_t31: { units: K, long_name: "Brightness temperature, channel 31" }
+      frp: { units: MW, long_name: "Fire radiative power" }
+      confidence: { units: "%", long_name: "Detection confidence (0-100)" }
+
+  BA_VIIRS:
+    code: BA_VIIRS
+    name: VIIRS burned-area collection (area-CSV exposes the fire-detection schema)
+    family: VIIRS
+    resolution_m: 375
+    temporal: { start: 2012-03-01, end: null, quality: SP }
+    columns:
+      bright_ti4: { units: K, long_name: "Brightness temperature, I-4 channel" }
+      bright_ti5: { units: K, long_name: "Brightness temperature, I-5 channel" }
+      frp: { units: MW, long_name: "Fire radiative power" }
+      confidence: { units: "1", long_name: "Detection confidence (l/n/h)" }

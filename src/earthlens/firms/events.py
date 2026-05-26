@@ -42,9 +42,31 @@ from pyramids.feature.collection import FeatureCollection
 #: WGS84 — the CRS every FIRMS detection FeatureCollection is tagged with.
 DETECTION_CRS = "EPSG:4326"
 
-#: VIIRS reports confidence as a categorical token; these are the
-#: representative percentages the `confidence_pct` column uses.
+#: VIIRS reports confidence as a categorical token (low/nominal/high);
+#: these are the representative percentages the `confidence_pct` column
+#: uses.
 VIIRS_CONFIDENCE_PCT: dict[str, float] = {"l": 25.0, "n": 60.0, "h": 90.0}
+
+#: LANDSAT reports confidence as low/medium/high tokens.
+LANDSAT_CONFIDENCE_PCT: dict[str, float] = {"l": 25.0, "m": 60.0, "h": 90.0}
+
+#: Sensor families whose `confidence` is a categorical token, with the
+#: token → percent map each uses. Families absent here (MODIS, GOES)
+#: report a numeric confidence that passes through `pandas.to_numeric`.
+_CATEGORICAL_CONFIDENCE: dict[str, dict[str, float]] = {
+    "VIIRS": VIIRS_CONFIDENCE_PCT,
+    "LANDSAT": LANDSAT_CONFIDENCE_PCT,
+}
+
+#: The CSV column each family carries its brightness temperature in.
+#: `None` means the family has no brightness column (LANDSAT), so
+#: `brightness_k` degrades to `NaN`.
+_BRIGHTNESS_SOURCE: dict[str, str | None] = {
+    "MODIS": "brightness",
+    "VIIRS": "bright_ti4",
+    "GOES": "bright_ti4",
+    "LANDSAT": None,
+}
 
 #: Ordered attribute columns and their pandas dtypes. The `geometry`
 #: column is added separately by :func:`csv_to_fc` / :func:`empty_fc`.
@@ -137,7 +159,7 @@ def csv_to_fc(
     frame["confidence"] = _as_string(raw_confidence)
     frame["confidence_pct"] = _confidence_pct(raw_confidence, family)
     frame["brightness_k"] = _brightness(df, family)
-    frame["frp"] = pd.to_numeric(df.get("frp"), errors="coerce")
+    frame["frp"] = _numeric(df, "frp")
     frame["daynight"] = _as_string(df.get("daynight"))
 
     if min_confidence is not None:
@@ -251,40 +273,66 @@ def _acq_datetime(df: pd.DataFrame) -> pd.Series:
 def _confidence_pct(raw: pd.Series | None, family: str) -> pd.Series:
     """Derive a uniform 0-100 confidence from the raw column.
 
-    VIIRS `l`/`n`/`h` tokens map to 25/60/90 via
-    :data:`VIIRS_CONFIDENCE_PCT`; MODIS numeric values pass through
-    coerced to float. An unknown token / value becomes `NaN`.
+    Categorical families map their tokens via
+    :data:`_CATEGORICAL_CONFIDENCE` (VIIRS `l`/`n`/`h` → 25/60/90,
+    LANDSAT `l`/`m`/`h` → 25/60/90); numeric families (MODIS, GOES) pass
+    through coerced to float. An unknown token / value becomes `NaN`.
+    GOES reports a provider-defined numeric confidence (not a 0-100
+    percent); it passes through unscaled.
 
     Args:
         raw: The raw `confidence` column, or `None` when absent.
-        family: `"MODIS"` or `"VIIRS"`.
+        family: One of `"MODIS"`, `"VIIRS"`, `"GOES"`, `"LANDSAT"`.
 
     Returns:
         pd.Series: The normalised confidence as floats.
     """
     if raw is None:
         return np.nan
-    if family == "VIIRS":
+    mapping = _CATEGORICAL_CONFIDENCE.get(family)
+    if mapping is not None:
         tokens = raw.astype("string").str.strip().str.lower()
-        return tokens.map(VIIRS_CONFIDENCE_PCT).astype("float64")
+        return tokens.map(mapping).astype("float64")
     return pd.to_numeric(raw, errors="coerce")
 
 
 def _brightness(df: pd.DataFrame, family: str) -> pd.Series:
     """Fill `brightness_k` from the sensor-family-specific column.
 
-    VIIRS detections carry `bright_ti4`; MODIS detections carry
-    `brightness`. A missing column degrades to all-`NaN`.
+    MODIS uses `brightness`; VIIRS and GOES use `bright_ti4`; LANDSAT
+    carries no brightness column, so it degrades to all-`NaN`. A family
+    whose expected column is absent from the frame also degrades to
+    `NaN`.
 
     Args:
         df: One sensor's CSV frame.
-        family: `"MODIS"` or `"VIIRS"`.
+        family: One of `"MODIS"`, `"VIIRS"`, `"GOES"`, `"LANDSAT"`.
 
     Returns:
         pd.Series: The brightness temperature in kelvin.
     """
-    source = "bright_ti4" if family == "VIIRS" else "brightness"
-    column = df.get(source)
+    source = _BRIGHTNESS_SOURCE.get(family, "brightness")
+    column = df.get(source) if source is not None else None
+    if column is None:
+        return pd.Series(np.nan, index=df.index, dtype="float64")
+    return pd.to_numeric(column, errors="coerce")
+
+
+def _numeric(df: pd.DataFrame, name: str) -> pd.Series:
+    """Coerce one CSV column to float, degrading an absent column to `NaN`.
+
+    LANDSAT, for example, carries no `frp` column; rather than letting
+    `pandas.to_numeric(None)` raise, an absent column yields an all-`NaN`
+    series aligned to `df`.
+
+    Args:
+        df: One sensor's CSV frame.
+        name: The column name to coerce.
+
+    Returns:
+        pd.Series: The column as floats, or all-`NaN` when absent.
+    """
+    column = df.get(name)
     if column is None:
         return pd.Series(np.nan, index=df.index, dtype="float64")
     return pd.to_numeric(column, errors="coerce")
