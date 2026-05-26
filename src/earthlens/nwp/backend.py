@@ -98,8 +98,12 @@ class NWP(AbstractDataSource):
                 names, e.g. `{"gfs": ["temperature_2m"]}`.
             lat_lim: `[lat_min, lat_max]` in degrees.
             lon_lim: `[lon_min, lon_max]` in degrees.
-            temporal_resolution: Advisory cadence label. Defaults to
-                `"6hourly"`.
+            temporal_resolution: Advisory label only — **ignored** by
+                NWP. The real cadence is per-model (`cycles_utc` for
+                cycles, `step_cadence_h` for steps), so this argument
+                does not affect the request. Accepted for parity with
+                the other backends and the facade (whose default is
+                `"daily"`); defaults to `"6hourly"` here.
             path: Output directory. Created by the parent class.
             fmt: `strptime` format for `start` / `end`.
             mirror: Cloud-mirror key (`"auto"` lets the centre choose).
