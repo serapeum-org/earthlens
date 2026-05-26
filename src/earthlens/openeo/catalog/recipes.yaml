@@ -1,0 +1,52 @@
+# Curated openEO process-graph recipes (named graph -> fixed steps).
+#
+# Each recipe fixes a base collection + bands + an ordered list of DataCube
+# steps applied after `load_collection`. A step is a single-key mapping
+# `{process: {param: value}}`. A process that is a DataCube method (`ndvi`,
+# `aggregate_temporal_period`, `reduce_dimension`, …) is dispatched to it;
+# a backend-only process (`mask_scl_dilation`, `sar_backscatter`) is applied via
+# the generic `DataCube.process` with the cube bound as `data`. Every process
+# name below was verified present on the CDSE backend's `list_processes` (A1).
+recipes:
+  sentinel-2-l2a-ndvi-monthly:
+    description: Cloud-masked Sentinel-2 NDVI, reduced to a monthly mean (NetCDF).
+    base_collection: SENTINEL2_L2A
+    bands: [B04, B08, SCL]
+    graph:
+      - mask_scl_dilation: {}
+      - ndvi: {nir: B08, red: B04}
+      - aggregate_temporal_period: {period: month, reducer: mean}
+    output_format: netCDF
+
+  sentinel-2-l2a-cloud-masked-composite:
+    description: Cloud-masked Sentinel-2 RGB+NIR median composite over the window (GeoTIFF).
+    base_collection: SENTINEL2_L2A
+    bands: [B02, B03, B04, B08, SCL]
+    graph:
+      - mask_scl_dilation: {}
+      - reduce_dimension: {dimension: t, reducer: median}
+    output_format: GTiff
+
+  sentinel-3-olci-chlorophyll-monthly:
+    description: Sentinel-3 OLCI ocean chlorophyll (neural-net), monthly mean (NetCDF).
+    base_collection: SENTINEL3_OLCI_L2_WATER
+    bands: [CHL_NN]
+    graph:
+      - aggregate_temporal_period: {period: month, reducer: mean}
+    output_format: netCDF
+
+  sentinel-5p-no2-monthly:
+    description: Sentinel-5P TROPOMI NO2 tropospheric column, monthly mean (NetCDF).
+    base_collection: SENTINEL_5P_L2
+    bands: [NO2]
+    graph:
+      - aggregate_temporal_period: {period: month, reducer: mean}
+    output_format: netCDF
+
+  sentinel-1-grd-sigma0:
+    description: Sentinel-1 GRD sigma0 (ellipsoid) backscatter, VV+VH (GeoTIFF).
+    base_collection: SENTINEL1_GRD
+    bands: [VV, VH]
+    graph:
+      - sar_backscatter: {coefficient: sigma0-ellipsoid}
+    output_format: GTiff

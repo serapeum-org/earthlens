@@ -49,6 +49,7 @@ is an optional extra — pick the ones you actually need:
 pip install earthlens[ecmwf]    # ECMWF / Copernicus CDS (cdsapi)
 pip install earthlens[s3]       # ERA5 on AWS S3 (boto3)
 pip install earthlens[gee]      # Google Earth Engine
+pip install earthlens[openeo]   # openEO server-side processing (CDSE)
 pip install earthlens[all]      # everything
 ```
 
@@ -57,6 +58,14 @@ A bare `pip install earthlens` installs only the core dependencies
 Asking the facade for `data_source="ecmwf"` (or `"amazon-s3"`,
 or `"gee"`) without the matching extra raises a clear
 `ImportError` naming the missing extra.
+
+> **Dependency note — `openeo` version pin.** openeo `0.48+` hard-caps
+> `pandas<3.0.0`, which would drag the whole environment down to pandas 2.x.
+> earthlens therefore pins `openeo >=0.47,<0.48` — the newest openeo that runs
+> on **pandas 3** (validated live against CDSE) — so `earthlens[all]` and
+> `earthlens[openeo]` keep pandas 3 for every backend. openeo `0.47` does still
+> cap `xarray<2025.01.2`, so installing it constrains `xarray` (not `pandas`).
+> The upper bound will be lifted once openeo ships a pandas-3-compatible release.
 
 ## From Sources
 
