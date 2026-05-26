@@ -102,6 +102,14 @@ class TestNOAACentre:
         )
         assert fake_herbie.instances[-1].kwargs["product"] == "wrfsfcf"
 
+    def test_fetch_one_splats_request_options(self, fake_herbie, tmp_path):
+        """request_options (e.g. domain for HiResW/HREF) pass through to Herbie."""
+        model = _gfs(model_family="hiresw", product="arw_2p5km", request_options={"domain": "conus"})
+        NOAACentre(tmp_path).fetch_one(
+            model, dt.datetime(2024, 6, 1, 0), 0, ["temperature_2m"], "aws"
+        )
+        assert fake_herbie.instances[-1].kwargs["domain"] == "conus"
+
     def test_fetch_one_threads_show_progress_to_verbose(self, fake_herbie, tmp_path):
         """show_progress is forwarded to Herbie's verbose= (L4)."""
         centre = NOAACentre(tmp_path)

@@ -130,5 +130,9 @@ class NOAACentre(_NWPCentre):
         }
         if model.product is not None:
             kwargs["product"] = model.product
+        # request_options carries any extra Herbie constructor kwargs a model
+        # needs — e.g. `domain` for HiResW / HREF. Splat last so the catalog
+        # row can override a default if it ever needs to.
+        kwargs.update(model.request_options)
         handle = herbie_cls(cycle, **kwargs)
         return Path(handle.download(search))

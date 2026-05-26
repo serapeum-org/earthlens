@@ -25,6 +25,10 @@ datasets:
     bands:
       temperature_2m: ":TMP:2 m above ground:"
       precipitation_acc: ":APCP:surface:"
+      dewpoint_2m: ":DPT:2 m above ground:"
+      wind_u_10m: ":UGRD:10 m above ground:"
+      wind_v_10m: ":VGRD:10 m above ground:"
+      pressure_msl: ":PRMSL:mean sea level:"
 
   gefs:                                   # NOAA NODD ensemble, via Herbie
     provider: noaa-nodd
@@ -42,6 +46,10 @@ datasets:
     bands:
       temperature_2m: ":TMP:2 m above ground:"
       precipitation_acc: ":APCP:surface:"
+      dewpoint_2m: ":DPT:2 m above ground:"
+      wind_u_10m: ":UGRD:10 m above ground:"
+      wind_v_10m: ":VGRD:10 m above ground:"
+      pressure_msl: ":PRMSL:mean sea level:"
 
   hrrr:                                   # NOAA NODD, hourly cycles, via Herbie
     provider: noaa-nodd
@@ -59,6 +67,10 @@ datasets:
     bands:
       temperature_2m: ":TMP:2 m above ground:"
       precipitation_acc: ":APCP:surface:"
+      dewpoint_2m: ":DPT:2 m above ground:"
+      wind_u_10m: ":UGRD:10 m above ground:"
+      wind_v_10m: ":VGRD:10 m above ground:"
+      pressure_msl: ":PRMSL:mean sea level:"
 
   ifs-hres:                               # ECMWF Open Data (IFS HRES)
     provider: ecmwf-opendata
@@ -75,6 +87,10 @@ datasets:
     bands:                                 # ecmwf-opendata param tokens, not Herbie regexes
       temperature_2m: "2t"
       precipitation_acc: "tp"
+      dewpoint_2m: "2d"
+      wind_u_10m: "10u"
+      wind_v_10m: "10v"
+      pressure_msl: "msl"
 
   icon-global:                            # DWD Open Data, direct HTTPS .bz2 (no .idx)
     provider: dwd-opendata
@@ -92,6 +108,10 @@ datasets:
     bands:
       temperature_2m: T_2M
       precipitation_acc: TOT_PREC
+      dewpoint_2m: TD_2M
+      wind_u_10m: U_10M
+      wind_v_10m: V_10M
+      pressure_msl: PMSL
 
   # ---------------------------------------------------------------------------
   # Expanded coverage (beyond the 5 MVP models). These rows are
@@ -115,6 +135,10 @@ datasets:
     bands:
       temperature_2m: ":TMP:2 m above ground:"
       precipitation_acc: ":APCP:surface:"
+      dewpoint_2m: ":DPT:2 m above ground:"
+      wind_u_10m: ":UGRD:10 m above ground:"
+      wind_v_10m: ":VGRD:10 m above ground:"
+      pressure_msl: ":PRMSL:mean sea level:"
 
   nam:                                    # NOAA NODD, NAM 12 km CONUS, via Herbie
     provider: noaa-nodd
@@ -130,6 +154,10 @@ datasets:
     bands:
       temperature_2m: ":TMP:2 m above ground:"
       precipitation_acc: ":APCP:surface:"
+      dewpoint_2m: ":DPT:2 m above ground:"
+      wind_u_10m: ":UGRD:10 m above ground:"
+      wind_v_10m: ":VGRD:10 m above ground:"
+      pressure_msl: ":PRMSL:mean sea level:"
 
   nbm:                                    # NOAA NODD, National Blend of Models, via Herbie
     provider: noaa-nodd
@@ -145,6 +173,10 @@ datasets:
     bands:
       temperature_2m: ":TMP:2 m above ground:"
       precipitation_acc: ":APCP:surface:"
+      dewpoint_2m: ":DPT:2 m above ground:"
+      wind_u_10m: ":UGRD:10 m above ground:"
+      wind_v_10m: ":VGRD:10 m above ground:"
+      pressure_msl: ":PRMSL:mean sea level:"
 
   rrfs:                                   # NOAA NODD, Rapid Refresh Forecast System, via Herbie
     provider: noaa-nodd
@@ -160,6 +192,10 @@ datasets:
     bands:
       temperature_2m: ":TMP:2 m above ground:"
       precipitation_acc: ":APCP:surface:"
+      dewpoint_2m: ":DPT:2 m above ground:"
+      wind_u_10m: ":UGRD:10 m above ground:"
+      wind_v_10m: ":VGRD:10 m above ground:"
+      pressure_msl: ":PRMSL:mean sea level:"
 
   gdps:                                   # ECCC, Global Deterministic Prediction System, via Herbie
     provider: eccc-msc
@@ -174,6 +210,10 @@ datasets:
     bands:
       temperature_2m: ":TMP:2 m above ground:"
       precipitation_acc: ":APCP:surface:"
+      dewpoint_2m: ":DPT:2 m above ground:"
+      wind_u_10m: ":UGRD:10 m above ground:"
+      wind_v_10m: ":VGRD:10 m above ground:"
+      pressure_msl: ":PRMSL:mean sea level:"
 
   rdps:                                   # ECCC, Regional Deterministic Prediction System, via Herbie
     provider: eccc-msc
@@ -188,6 +228,10 @@ datasets:
     bands:
       temperature_2m: ":TMP:2 m above ground:"
       precipitation_acc: ":APCP:surface:"
+      dewpoint_2m: ":DPT:2 m above ground:"
+      wind_u_10m: ":UGRD:10 m above ground:"
+      wind_v_10m: ":VGRD:10 m above ground:"
+      pressure_msl: ":PRMSL:mean sea level:"
 
   hrdps:                                  # ECCC, High-Resolution Deterministic Prediction System, via Herbie
     provider: eccc-msc
@@ -203,6 +247,10 @@ datasets:
     bands:
       temperature_2m: ":TMP:2 m above ground:"
       precipitation_acc: ":APCP:surface:"
+      dewpoint_2m: ":DPT:2 m above ground:"
+      wind_u_10m: ":UGRD:10 m above ground:"
+      wind_v_10m: ":VGRD:10 m above ground:"
+      pressure_msl: ":PRMSL:mean sea level:"
 
   icon-eu:                                # DWD, ICON-EU regular lat-lon (croppable), direct HTTPS
     provider: dwd-opendata
@@ -220,6 +268,10 @@ datasets:
     bands:
       temperature_2m: T_2M
       precipitation_acc: TOT_PREC
+      dewpoint_2m: TD_2M
+      wind_u_10m: U_10M
+      wind_v_10m: V_10M
+      pressure_msl: PMSL
 
   icon-d2:                                # DWD, ICON-D2 native icosahedral (raw fetch; not croppable), direct HTTPS
     provider: dwd-opendata
@@ -239,6 +291,10 @@ datasets:
     bands:
       temperature_2m: t_2m
       precipitation_acc: tot_prec
+      dewpoint_2m: td_2m
+      wind_u_10m: u_10m
+      wind_v_10m: v_10m
+      pressure_msl: pmsl
 
   ens:                                    # ECMWF Open Data, IFS ENS control forecast
     provider: ecmwf-opendata
@@ -254,6 +310,10 @@ datasets:
     bands:
       temperature_2m: "2t"
       precipitation_acc: "tp"
+      dewpoint_2m: "2d"
+      wind_u_10m: "10u"
+      wind_v_10m: "10v"
+      pressure_msl: "msl"
 
   aifs:                                   # ECMWF Open Data, AIFS (data-driven), single model
     provider: ecmwf-opendata
@@ -269,3 +329,87 @@ datasets:
     bands:
       temperature_2m: "2t"
       precipitation_acc: "tp"
+      dewpoint_2m: "2d"
+      wind_u_10m: "10u"
+      wind_v_10m: "10v"
+      pressure_msl: "msl"
+
+  # --- More Herbie families (analyses + windows + ensemble). hafs (hurricanes)
+  # is omitted: it is storm-specific (needs a storm id), not a generic
+  # (model, cycle, step) raster. ---
+
+  rtma:                                   # NOAA, Real-Time Mesoscale Analysis (2.5 km CONUS), via Herbie
+    provider: noaa-nodd
+    model_family: rtma
+    resolution: 2.5km
+    cycles_utc: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23]
+    cadence_h: 1
+    step_cadence_h: 1
+    horizon_h: 0                          # analysis — valid at the cycle time (step 0 only)
+    product: anl
+    backend: herbie
+    mirrors: [aws, nomads]
+    bands:
+      temperature_2m: ":TMP:2 m above ground:"
+      dewpoint_2m: ":DPT:2 m above ground:"
+      wind_u_10m: ":UGRD:10 m above ground:"
+      wind_v_10m: ":VGRD:10 m above ground:"
+      pressure_msl: ":PRMSL:mean sea level:"
+
+  urma:                                   # NOAA, Un-Restricted Mesoscale Analysis (2.5 km CONUS), via Herbie
+    provider: noaa-nodd
+    model_family: urma
+    resolution: 2.5km
+    cycles_utc: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23]
+    cadence_h: 1
+    step_cadence_h: 1
+    horizon_h: 0                          # analysis — step 0 only
+    product: anl
+    backend: herbie
+    mirrors: [aws, nomads]
+    bands:
+      temperature_2m: ":TMP:2 m above ground:"
+      dewpoint_2m: ":DPT:2 m above ground:"
+      wind_u_10m: ":UGRD:10 m above ground:"
+      wind_v_10m: ":VGRD:10 m above ground:"
+      pressure_msl: ":PRMSL:mean sea level:"
+
+  hiresw-arw:                             # NOAA, High-Resolution Window ARW 2.5 km CONUS, via Herbie
+    provider: noaa-nodd
+    model_family: hiresw
+    resolution: 2.5km
+    cycles_utc: [0, 12]
+    cadence_h: 12
+    step_cadence_h: 1
+    horizon_h: 48
+    product: arw_2p5km
+    backend: herbie
+    mirrors: [aws, nomads]
+    request_options: {domain: conus}      # HiResW needs a Herbie domain= kwarg
+    bands:
+      temperature_2m: ":TMP:2 m above ground:"
+      precipitation_acc: ":APCP:surface:"
+      dewpoint_2m: ":DPT:2 m above ground:"
+      wind_u_10m: ":UGRD:10 m above ground:"
+      wind_v_10m: ":VGRD:10 m above ground:"
+      pressure_msl: ":PRMSL:mean sea level:"
+
+  href:                                   # NOAA, High Resolution Ensemble Forecast (mean), via Herbie
+    provider: noaa-nodd
+    model_family: href
+    resolution: 3km
+    cycles_utc: [0, 6, 12, 18]
+    cadence_h: 6
+    step_cadence_h: 1
+    horizon_h: 48
+    product: mean
+    backend: herbie
+    mirrors: [aws, nomads]
+    request_options: {domain: conus}      # HREF needs a Herbie domain= kwarg
+    bands:
+      temperature_2m: ":TMP:2 m above ground:"
+      precipitation_acc: ":APCP:surface:"
+      dewpoint_2m: ":DPT:2 m above ground:"
+      wind_u_10m: ":UGRD:10 m above ground:"
+      wind_v_10m: ":VGRD:10 m above ground:"
+      pressure_msl: ":PRMSL:mean sea level:"

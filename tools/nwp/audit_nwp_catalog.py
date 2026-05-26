@@ -38,8 +38,8 @@ def audit_model(key: str, model: NWPModel) -> list[str]:
         problems.append("no cycles_utc declared")
     if any(not 0 <= h <= 23 for h in model.cycles_utc):
         problems.append(f"cycle hour out of range: {model.cycles_utc}")
-    if model.horizon_h <= 0:
-        problems.append("horizon_h must be positive")
+    if model.horizon_h < 0:
+        problems.append("horizon_h must be non-negative (0 is valid for analyses)")
     if model.backend == "direct-https" and not model.url_template:
         problems.append("direct-https model missing url_template")
     if model.backend == "herbie" and not model.model_family:
