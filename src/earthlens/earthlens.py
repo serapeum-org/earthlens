@@ -138,7 +138,8 @@ class EarthLens:
             ['amazon-s3', 'cdse', 'chc', 'chirps', 'cmems', 'earth-search',
              'earthdata', 'ecmwf', 'eumetsat', 'fdsn', 'firms', 'gdacs', 'gee',
              'google-earth-engine', 'national-water-model', 'nexrad', 'nwm',
-             'nwp', 'openaq', 'planetary-computer', 'radar', 'stac', 'tropycal']
+             'nwp', 'openaq', 'openeo', 'planetary-computer', 'radar', 'stac',
+             'tropycal']
 
             ```
         - Asking for an unknown backend raises `ValueError`:
@@ -175,6 +176,9 @@ class EarthLens:
             alerts (public feed, no credentials); key `"gdacs"`.
         :class:`earthlens.openaq.OpenAQ`: ground-station air-quality
             measurements from OpenAQ v3 (tabular `DataFrame`).
+        :class:`earthlens.openeo.OpenEO`: server-side openEO process graphs
+            (defaults to CDSE openEO); `raster` output, `aggregate=` is a
+            native `aggregate_temporal_period` node; key `"openeo"`.
         :class:`earthlens.tropycal.TropicalCyclone`: tropical-cyclone
             best tracks via `tropycal` (`vector` output); key
             `"tropycal"`.
@@ -213,6 +217,9 @@ class EarthLens:
             # GDACS is a public feed (requests only), so no extra to hint.
             "gdacs": ("earthlens.gdacs", "GDACS", "", {}),
             "openaq": ("earthlens.openaq", "OpenAQ", "openaq", {}),
+            # openEO server-side processing (defaults to CDSE openEO). Builds a
+            # process graph the backend executes; returns the written paths.
+            "openeo": ("earthlens.openeo", "OpenEO", "openeo", {}),
             "tropycal": ("earthlens.tropycal", "TropicalCyclone", "tropycal", {}),
             # FIRMS needs a free MAP_KEY but no SDK (requests + pandas
             # are core), so like GDACS there is no extra to hint.

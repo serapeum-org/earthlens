@@ -85,6 +85,7 @@ class TestRegistry:
             "nwm",
             "nwp",
             "openaq",
+            "openeo",
             "planetary-computer",
             "radar",
             "stac",

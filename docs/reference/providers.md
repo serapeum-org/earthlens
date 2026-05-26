@@ -31,6 +31,7 @@ Backends with no extra (CHC, GDACS, OpenAQ) need only the core install — they 
 | Open NWP forecasts (NOAA NODD / ECMWF Open Data / DWD via Herbie) | `nwp` | raster | none (open buckets) | `nwp` | [NWP](nwp/introduction.md) |
 | NEXRAD Level-II radar (real-time chunk feed) | `radar`, `nexrad` | vector | none (anonymous S3) | `radar` | [NEXRAD radar](radar/introduction.md) |
 | NOAA National Water Model (streamflow / land states) | `nwm`, `national-water-model` | tabular | none (anonymous S3) | `nwm` | [National Water Model](nwm/introduction.md) |
+| openEO server-side processing (defaults to CDSE) | `openeo` | raster | CDSE OIDC (interactive or client-credentials) | `openeo` | [openEO](openeo/introduction.md) |
 
 `Output` is the backend's `OUTPUT_KIND` — `raster` writes GeoTIFF/COG/NetCDF, `vector` writes geometry tables
 (GeoJSON / GeoPackage), and `tabular` writes plain tables (CSV / Parquet). It also governs `aggregate=`: the
