@@ -54,6 +54,7 @@ gee = [
 cmems = ["copernicusmarine >=2.0.0,<3"]
 fdsn = ["obspy >=1.5.0"]
 earthdata = ["earthaccess >=0.18.0; python_version >= '3.12'"]
+eumetsat = ["eumdac >=3.1"]
 stac = ["pyramids-gis[stac]"]
 # cartopy: not imported by earthlens, but `import tropycal.tracks` chains through
 # tropycal.utils.cartopy_utils (module-level `import cartopy`); tropycal omits it
@@ -67,6 +68,7 @@ all = [
     "copernicusmarine >=2.0.0,<3",
     "earthengine-api >=1.7.26",
     "earthaccess >=0.18.0; python_version >= '3.12'",
+    "eumdac >=3.1",
     "google-api-python-client >=2.0",
     "google-cloud-storage >=2.0",
     "obspy >=1.5.0",
@@ -141,6 +143,7 @@ include = ["earthlens", "earthlens.*"]
 "earthlens.cmems" = ["*.yaml", "catalog/*.yaml"]
 "earthlens.ecmwf" = ["*.yaml"]
 "earthlens.earthdata" = ["*.yaml", "catalog/*.yaml", "catalog/*.json"]
+"earthlens.eumetsat" = ["*.yaml", "catalog/*.yaml"]
 "earthlens.fdsn" = ["*.yaml"]
 "earthlens.gee" = ["*.yaml", "catalog/*.yaml"]
 "earthlens.stac" = ["*.yaml", "catalog/*.yaml"]
@@ -212,6 +215,7 @@ markers = [
     "cmems: tests for the Copernicus Marine backend (requires the `cmems` extra: copernicusmarine).",
     "fdsn: tests for the FDSN seismic-event backend (requires the `fdsn` extra: obspy).",
     "earthdata: tests for the NASA Earthdata backend (requires the `earthdata` extra: earthaccess; Python >=3.12).",
+    "eumetsat: tests for the EUMETSAT Data Store backend (requires the `eumetsat` extra: eumdac).",
     "stac: tests for the STAC backend (requires the `stac` extra: pyramids-gis[stac] → pystac-client + stac-asset).",
     "gdacs: tests for the GDACS multi-hazard alert backend (public feed, no extra SDK).",
     "openaq: tests for the OpenAQ v3 air-quality backend (no extra SDK; uses the core `requests` dependency).",
@@ -242,11 +246,12 @@ test-gee = { cmd = "pytest -vvv -m 'gee and not e2e' --cov=src/earthlens --cov-r
 test-cmems = { cmd = "pytest -vvv -m 'cmems and not e2e' --cov=src/earthlens --cov-report=xml --cov-report=term-missing", description = "Run CMEMS-backend tests (requires the `cmems` extra: copernicusmarine)" }
 test-fdsn = { cmd = "pytest -vvv -m 'fdsn and not e2e' --cov=src/earthlens --cov-report=xml --cov-report=term-missing", description = "Run FDSN seismic-event backend tests (requires the `fdsn` extra: obspy)" }
 test-earthdata = { cmd = "pytest -vvv -m 'earthdata and not e2e' --cov=src/earthlens --cov-report=xml --cov-report=term-missing", description = "Run NASA Earthdata backend tests (requires the `earthdata` extra: earthaccess; Python >=3.12)" }
+test-eumetsat = { cmd = "pytest -vvv -m 'eumetsat and not e2e' --cov=src/earthlens --cov-report=xml --cov-report=term-missing", description = "Run EUMETSAT Data Store backend tests (requires the `eumetsat` extra: eumdac)" }
 test-stac = { cmd = "pytest -vvv -m 'stac and not e2e' --cov=src/earthlens --cov-report=xml --cov-report=term-missing", description = "Run STAC-backend tests (requires the `stac` extra: pyramids-gis[stac])" }
 test-gdacs = { cmd = "pytest -vvv -m 'gdacs and not e2e' --cov=src/earthlens --cov-report=xml --cov-report=term-missing", description = "Run GDACS-backend tests (public feed, no extra SDK)" }
 test-openaq = { cmd = "pytest -vvv -m 'openaq and not e2e' --cov=src/earthlens --cov-report=xml --cov-report=term-missing", description = "Run OpenAQ-backend tests (no extra SDK; uses the core requests dependency)" }
 test-tropycal = { cmd = "pytest -vvv -m 'tropycal and not e2e' --cov=src/earthlens --cov-report=xml --cov-report=term-missing", description = "Run Tropycal cyclone-track backend tests (requires the `tropycal` extra: tropycal, cartopy)" }
-test-doctests = { cmd = "pytest --doctest-modules src/earthlens/gee src/earthlens/chc src/earthlens/ecmwf src/earthlens/cmems src/earthlens/fdsn src/earthlens/earthdata src/earthlens/stac src/earthlens/gdacs src/earthlens/openaq src/earthlens/tropycal src/earthlens/base", description = "Run docstring examples across the backend packages (catches drift in catalog / API docstrings)" }
+test-doctests = { cmd = "pytest --doctest-modules src/earthlens/gee src/earthlens/chc src/earthlens/ecmwf src/earthlens/cmems src/earthlens/fdsn src/earthlens/earthdata src/earthlens/eumetsat src/earthlens/stac src/earthlens/gdacs src/earthlens/openaq src/earthlens/tropycal src/earthlens/base", description = "Run docstring examples across the backend packages (catches drift in catalog / API docstrings)" }
 notebooks = { cmd = "pytest --nbval --nbval-lax --verbose docs/examples", description = "check notebooks" }
 jupyter = { cmd = "jupyter lab --no-browser --IdentityProvider.token='' --ServerApp.password='' --port=8889", description = "check notebooks" }
 build-dist = { cmd = "python -m build", description = "Build sdist and wheel for PyPI" }

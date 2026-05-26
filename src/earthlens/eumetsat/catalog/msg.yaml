@@ -1,0 +1,15 @@
+# MSG (Meteosat Second Generation) SEVIRI collections.
+# Native `.nat` products — client-side reading needs the satpy bridge (PY-2);
+# the MVP fetches whole products to disk (G4).
+collections:
+  msg-hrseviri:
+    collection_id: "EO:EUM:DAT:MSG:HRSEVIRI"
+    group: MSG
+    mission: msg
+    output_kind: raster
+    format: native
+    cadence: 15min
+    selectors: [HRSEVIRI]
+    tailor_product_type: HRSEVIRI
+    extent: { lat: [-79, 79], lon: [-79, 79] }
+    temporal: { start: 2004-01-19, end: null }
