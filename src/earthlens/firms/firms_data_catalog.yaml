@@ -137,26 +137,10 @@ sensors:
     columns:
       confidence: { units: "1", long_name: "Detection confidence (l/m/h)" }
 
-  BA_MODIS:
-    code: BA_MODIS
-    name: MODIS burned-area collection (area-CSV exposes the fire-detection schema)
-    family: MODIS
-    resolution_m: 1000
-    temporal: { start: 2000-11-01, end: null, quality: SP }
-    columns:
-      brightness: { units: K, long_name: "Brightness temperature, channel 21/22" }
-      bright_t31: { units: K, long_name: "Brightness temperature, channel 31" }
-      frp: { units: MW, long_name: "Fire radiative power" }
-      confidence: { units: "%", long_name: "Detection confidence (0-100)" }
-
-  BA_VIIRS:
-    code: BA_VIIRS
-    name: VIIRS burned-area collection (area-CSV exposes the fire-detection schema)
-    family: VIIRS
-    resolution_m: 375
-    temporal: { start: 2012-03-01, end: null, quality: SP }
-    columns:
-      bright_ti4: { units: K, long_name: "Brightness temperature, I-4 channel" }
-      bright_ti5: { units: K, long_name: "Brightness temperature, I-5 channel" }
-      frp: { units: MW, long_name: "Fire radiative power" }
-      confidence: { units: "1", long_name: "Detection confidence (l/n/h)" }
+# NOTE: the FIRMS `data_availability` endpoint also lists `BA_MODIS` and
+# `BA_VIIRS`, but those are **burned-area** raster products, not area-CSV
+# active-fire sources — they are not documented area sources and the
+# area-CSV endpoint returns an empty (header-only) response for them. They
+# are intentionally NOT catalogued here; for gridded burned-area use the
+# GEE backend (MCD64A1, FireCCI). The audit tool lists them under
+# EXCLUDED_SOURCES so they do not register as catalog drift.

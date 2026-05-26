@@ -55,9 +55,8 @@ through the area CSV API):
 from earthlens.firms import Catalog
 
 Catalog().codes()
-# ['BA_MODIS', 'BA_VIIRS', 'GOES_NRT', 'LANDSAT_NRT', 'MODIS_NRT',
-#  'MODIS_SP', 'VIIRS_NOAA20_NRT', 'VIIRS_NOAA20_SP', 'VIIRS_NOAA21_NRT',
-#  'VIIRS_SNPP_NRT', 'VIIRS_SNPP_SP']
+# ['GOES_NRT', 'LANDSAT_NRT', 'MODIS_NRT', 'MODIS_SP', 'VIIRS_NOAA20_NRT',
+#  'VIIRS_NOAA20_SP', 'VIIRS_NOAA21_NRT', 'VIIRS_SNPP_NRT', 'VIIRS_SNPP_SP']
 Catalog().get_sensor("VIIRS_SNPP_NRT").resolution_m      # 375
 ```
 
@@ -68,10 +67,10 @@ Resolution and schema vary by family: **MODIS** 1 km, **VIIRS** 375 m,
 **GOES** ~2 km (geostationary), **LANDSAT** 30 m. `GOES_NRT` reports a
 numeric (provider-scale) confidence rather than `l`/`n`/`h`;
 `LANDSAT_NRT` reports `l`/`m`/`h` confidence and carries **no FRP or
-brightness** column (those degrade to `NaN`). The `BA_MODIS` / `BA_VIIRS`
-burned-area collections are exposed too, but the area CSV API serves them
-with the same point detection schema as their base MODIS / VIIRS sensor —
-see the [Introduction](introduction.md) for the burned-area caveat.
+brightness** column (those degrade to `NaN`). Burned-area products
+(`BA_MODIS` / `BA_VIIRS`) are **not** area-CSV sources and are not
+catalogued — use the GEE backend for gridded burned area (see the
+[Introduction](introduction.md)).
 
 > **NRT vs archive.** `*_NRT` sensors cover only ~2 months; `*_SP`
 > sensors hold the archive. Requesting an old window against an `*_NRT`

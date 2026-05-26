@@ -49,6 +49,12 @@ DATA_AVAILABILITY_URL = (
     "https://firms.modaps.eosdis.nasa.gov/api/data_availability/csv/{map_key}/all"
 )
 
+#: `data_availability` lists every FIRMS data_id, including products that
+#: are NOT area-CSV active-fire sources. These are intentionally not in
+#: the catalog (burned-area rasters belong to the GEE backend), so they
+#: are reported as "excluded", not as catalog drift.
+EXCLUDED_SOURCES: frozenset[str] = frozenset({"BA_MODIS", "BA_VIIRS"})
+
 
 def fetch_live_sensors(map_key: str, timeout: float) -> dict[str, dict[str, Any]]:
     """Return the live sensor coverage from the data_availability endpoint.
@@ -128,11 +134,16 @@ def audit(
             status = "ok"
         elif code in catalog_codes:
             status = "catalog-only (no longer served?)"
+        elif code in EXCLUDED_SOURCES:
+            status = "excluded (burned-area, not an area-CSV source)"
         else:
             status = "live-only (missing from catalog)"
         sensors[code] = {"status": status, **live.get(code, {})}
 
-    drift = any(row["status"] != "ok" for row in sensors.values())
+    drift = any(
+        row["status"] not in ("ok", "excluded (burned-area, not an area-CSV source)")
+        for row in sensors.values()
+    )
     report: dict[str, Any] = {"sensors": sensors}
 
     if with_columns:

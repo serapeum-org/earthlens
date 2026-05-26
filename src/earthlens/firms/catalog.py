@@ -172,9 +172,9 @@ class Catalog(AbstractCatalog):
             >>> from earthlens.firms import Catalog
             >>> cat = Catalog()
             >>> cat.codes()  # doctest: +NORMALIZE_WHITESPACE
-            ['BA_MODIS', 'BA_VIIRS', 'GOES_NRT', 'LANDSAT_NRT', 'MODIS_NRT',
-             'MODIS_SP', 'VIIRS_NOAA20_NRT', 'VIIRS_NOAA20_SP',
-             'VIIRS_NOAA21_NRT', 'VIIRS_SNPP_NRT', 'VIIRS_SNPP_SP']
+            ['GOES_NRT', 'LANDSAT_NRT', 'MODIS_NRT', 'MODIS_SP',
+             'VIIRS_NOAA20_NRT', 'VIIRS_NOAA20_SP', 'VIIRS_NOAA21_NRT',
+             'VIIRS_SNPP_NRT', 'VIIRS_SNPP_SP']
             >>> cat.get_sensor("MODIS_NRT").family
             'MODIS'
             >>> "MODIS_NRT" in cat

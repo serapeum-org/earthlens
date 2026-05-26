@@ -57,11 +57,11 @@ window to study fire onset, spread, and weather drivers.
 
 - **Detections, not perimeters.** FIRMS reports where a sensor saw a
   thermal anomaly at overpass time — not the final fire perimeter or the
-  total area burned. FIRMS also lists `BA_MODIS` / `BA_VIIRS`
-  burned-area collections, which this backend exposes, but the area CSV
-  API serves them with the **same point-detection schema** (lat/lon/FRP
-  points), not polygons. For true gridded burned-area rasters (MCD64A1,
-  FireCCI) use the Google Earth Engine backend.
+  total area burned. (FIRMS' `data_availability` index also lists
+  `BA_MODIS` / `BA_VIIRS`, but those are **burned-area raster** products,
+  not area-CSV active-fire sources — they return nothing through this
+  backend and are deliberately not catalogued. For gridded burned-area
+  rasters (MCD64A1, FireCCI) use the Google Earth Engine backend.)
 - **A free `MAP_KEY` is required.** Every request carries a `MAP_KEY` as
   a URL path segment. Request a free key at
   <https://firms.modaps.eosdis.nasa.gov/api/map_key/>; see
