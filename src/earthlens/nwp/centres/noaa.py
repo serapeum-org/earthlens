@@ -126,6 +126,7 @@ class NOAACentre(_NWPCentre):
             "fxx": step,
             "priority": _priority(mirror, model),
             "save_dir": str(self.save_dir),
+            "verbose": self.show_progress,
         }
         if model.product is not None:
             kwargs["product"] = model.product

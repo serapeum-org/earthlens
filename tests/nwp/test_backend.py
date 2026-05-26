@@ -208,6 +208,13 @@ class TestCentreFor:
         assert b._centre_for("herbie") is first
         assert built == ["herbie"]
 
+    def test_threads_show_progress_onto_centre(self, mini_catalog, tmp_path, fake_pyramids):
+        """download(progress_bar=False) sets show_progress on the centre (L4)."""
+        b = _make(mini_catalog, tmp_path)
+        b._centres["herbie"] = _CountingCentre(tmp_path)
+        b.download(progress_bar=False)
+        assert b._centres["herbie"].show_progress is False
+
 
 class TestFetch:
     """Tests for the GRIB2 -> cropped COG pipeline."""

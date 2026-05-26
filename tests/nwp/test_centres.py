@@ -91,6 +91,13 @@ class TestNOAACentre:
         )
         assert fake_herbie.instances[-1].kwargs["product"] == "wrfsfcf"
 
+    def test_fetch_one_threads_show_progress_to_verbose(self, fake_herbie, tmp_path):
+        """show_progress is forwarded to Herbie's verbose= (L4)."""
+        centre = NOAACentre(tmp_path)
+        centre.show_progress = False
+        centre.fetch_one(_gfs(), dt.datetime(2024, 6, 1, 0), 0, ["temperature_2m"], "aws")
+        assert fake_herbie.instances[-1].kwargs["verbose"] is False
+
     def test_import_herbie_success(self, fake_herbie):
         """_import_herbie returns the Herbie class when the SDK is present."""
         assert _import_herbie() is fake_herbie

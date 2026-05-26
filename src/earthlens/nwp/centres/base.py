@@ -46,6 +46,10 @@ class _NWPCentre(ABC):
 
     Attributes:
         save_dir: Directory raw GRIB2 files are written to.
+        show_progress: Whether the centre should show per-download
+            progress. The backend sets it from `download(progress_bar=)`;
+            only centres whose SDK exposes a progress/verbose switch
+            (Herbie) honour it.
     """
 
     def __init__(self, save_dir: Path | str):
@@ -55,6 +59,7 @@ class _NWPCentre(ABC):
             save_dir: Directory raw GRIB2 downloads are written to.
         """
         self.save_dir = Path(save_dir)
+        self.show_progress = True
 
     @abstractmethod
     def fetch_one(

@@ -286,6 +286,9 @@ class NWP(AbstractDataSource):
         """
         if backend not in self._centres:
             self._centres[backend] = resolve_centre(backend, self.root_dir)
+        # Reflect the current download(progress_bar=) onto the centre so a
+        # progress-aware SDK (Herbie) can honour it (L4).
+        self._centres[backend].show_progress = getattr(self, "_show_progress", True)
         return self._centres[backend]
 
     def _search(self) -> list[RemoteProduct]:
