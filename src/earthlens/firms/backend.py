@@ -487,7 +487,7 @@ class FIRMS(AbstractDataSource):
                 when nothing matched.
         """
         products = self._search()
-        if not products:
+        if not products:  # pragma: no cover - defensive: _search always yields >=1 product
             return []
         iterator = tqdm(
             products,
