@@ -289,7 +289,10 @@ class EumetsatAuth(AbstractAuth[EumetsatCredentials]):
             return False
         try:
             return datetime.now() < self._token.expiration
-        except Exception:  # noqa: BLE001 - any read failure → treat as live
+        except (AttributeError, TypeError, ValueError):
+            # The SDK refreshes the bearer lazily, so a token whose
+            # `expiration` is missing/unreadable is treated as live rather
+            # than forcing a re-mint. Genuinely unexpected errors propagate.
             return True
 
     def datastore(self):

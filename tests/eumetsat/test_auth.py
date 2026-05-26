@@ -163,6 +163,20 @@ def test_is_authenticated_unreadable_expiration_treated_live(fake_eumdac):
     assert auth.is_authenticated() is True
 
 
+def test_is_authenticated_propagates_unexpected_error(fake_eumdac):
+    """An unexpected error reading `expiration` is not swallowed."""
+
+    class _Broken:
+        @property
+        def expiration(self):
+            raise RuntimeError("unexpected")
+
+    auth = EumetsatAuth(EumetsatCredentials(consumer_key="k", consumer_secret="s"))
+    auth._token = _Broken()
+    with pytest.raises(RuntimeError, match="unexpected"):
+        auth.is_authenticated()
+
+
 def test_datatailor_before_configure_raises(fake_eumdac):
     """datatailor() before configure() raises AuthenticationError."""
     auth = EumetsatAuth(EumetsatCredentials(consumer_key="k", consumer_secret="s"))
