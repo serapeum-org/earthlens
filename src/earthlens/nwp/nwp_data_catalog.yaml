@@ -3,8 +3,11 @@
 # Top-level `datasets:` maps a model key -> one NWPModel row. `bands:`
 # maps an earthlens parameter name to the centre's selector: a Herbie
 # `search` regex for SDK-backed models (NOAA / ECMWF), or a provider
-# variable token for direct-centre models (DWD ICON). The remaining MVP
-# models (gefs, hrrr, ifs-hres) are seeded in C2.
+# variable token for direct-centre models (DWD ICON, ECMWF Open Data).
+#
+# MVP = 5 models: gfs / gefs / hrrr (NOAA via Herbie), ifs-hres (ECMWF
+# Open Data), icon-global (DWD direct-HTTPS). ECCC, full Météo-France,
+# ENS / AIFS, RRFS are follow-ons (scope guards).
 datasets:
 
   gfs:                                    # NOAA NODD, via Herbie
@@ -21,6 +24,53 @@ datasets:
     bands:
       temperature_2m: ":TMP:2 m above ground:"
       precipitation_acc: ":APCP:surface:"
+
+  gefs:                                   # NOAA NODD ensemble, via Herbie
+    provider: noaa-nodd
+    model_family: gefs
+    resolution: 0.5deg
+    cycles_utc: [0, 6, 12, 18]
+    cadence_h: 6
+    horizon_h: 384
+    product: atmos.5                      # 0.5-degree atmos product
+    format: grib2
+    idx: true
+    backend: herbie
+    mirrors: [aws, google, azure]
+    bands:
+      temperature_2m: ":TMP:2 m above ground:"
+      precipitation_acc: ":APCP:surface:"
+
+  hrrr:                                   # NOAA NODD, hourly cycles, via Herbie
+    provider: noaa-nodd
+    model_family: hrrr
+    resolution: 3km
+    cycles_utc: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23]
+    cadence_h: 1
+    horizon_h: 48                         # 48 h at 00/06/12/18, 18 h otherwise
+    product: wrfsfcf                       # surface fields
+    format: grib2
+    idx: true
+    backend: herbie
+    mirrors: [aws, google, azure]
+    bands:
+      temperature_2m: ":TMP:2 m above ground:"
+      precipitation_acc: ":APCP:surface:"
+
+  ifs-hres:                               # ECMWF Open Data (IFS HRES)
+    provider: ecmwf-opendata
+    model_family: ifs
+    resolution: 0.25deg
+    cycles_utc: [0, 6, 12, 18]
+    cadence_h: 6
+    horizon_h: 240                         # 240 h at 00/12, 90 h at 06/18
+    format: grib2
+    idx: true
+    backend: ecmwf-opendata
+    mirrors: [aws, azure, ecmwf]
+    bands:                                 # ecmwf-opendata param tokens, not Herbie regexes
+      temperature_2m: "2t"
+      precipitation_acc: "tp"
 
   icon-global:                            # DWD Open Data, direct HTTPS .bz2 (no .idx)
     provider: dwd-opendata
