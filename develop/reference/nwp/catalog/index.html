@@ -2657,10 +2657,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#curated-models-mvp" class="md-nav__link">
+  <a href="#curated-models" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Curated models (MVP)
+        Curated models
       
     </span>
   </a>
@@ -5423,10 +5423,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#curated-models-mvp" class="md-nav__link">
+  <a href="#curated-models" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Curated models (MVP)
+        Curated models
       
     </span>
   </a>
@@ -5497,7 +5497,12 @@ are missing:</p>
 </ul>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>conda<span class="w"> </span>install<span class="w"> </span>-c<span class="w"> </span>conda-forge<span class="w"> </span>eccodes<span class="w"> </span>libgdal-grib
 </code></pre></div>
-<h2 id="curated-models-mvp"><a class="toclink" href="#curated-models-mvp">Curated models (MVP)</a><a class="headerlink" href="#curated-models-mvp" title="Permanent link">#</a></h2>
+<h2 id="curated-models"><a class="toclink" href="#curated-models">Curated models</a><a class="headerlink" href="#curated-models" title="Permanent link">#</a></h2>
+<p>The <strong>MVP 5</strong> are live-validated end to end; the <strong>expanded set</strong> is
+metadata-curated from Herbie's templates + provider docs and should be
+vetted with <code>tools/nwp/probe_nwp_model.py &lt;key&gt;</code> before relying on it
+(the <code>errors="warn"</code> fetch policy skips any <code>(cycle, step)</code> a model
+doesn't carry).</p>
 <table>
 <thead>
 <tr>
@@ -5516,7 +5521,7 @@ are missing:</p>
 <td><code>herbie</code></td>
 <td>00/06/12/18</td>
 <td>384 h</td>
-<td>0.25° global</td>
+<td>0.25° global · MVP</td>
 </tr>
 <tr>
 <td><code>gefs</code></td>
@@ -5524,7 +5529,7 @@ are missing:</p>
 <td><code>herbie</code></td>
 <td>00/06/12/18</td>
 <td>384 h</td>
-<td>0.5° ensemble (<code>atmos.5</code>)</td>
+<td>0.5° ensemble (<code>atmos.5</code>) · MVP</td>
 </tr>
 <tr>
 <td><code>hrrr</code></td>
@@ -5532,7 +5537,7 @@ are missing:</p>
 <td><code>herbie</code></td>
 <td>hourly</td>
 <td>48 h¹</td>
-<td>3 km CONUS (<code>wrfsfcf</code>)</td>
+<td>3 km CONUS (<code>wrfsfcf</code>) · MVP</td>
 </tr>
 <tr>
 <td><code>ifs-hres</code></td>
@@ -5540,7 +5545,7 @@ are missing:</p>
 <td><code>ecmwf-opendata</code></td>
 <td>00/06/12/18</td>
 <td>240 h</td>
-<td>0.25° global</td>
+<td>0.25° global · MVP</td>
 </tr>
 <tr>
 <td><code>icon-global</code></td>
@@ -5548,10 +5553,102 @@ are missing:</p>
 <td><code>direct-https</code></td>
 <td>00/06/12/18</td>
 <td>180 h</td>
-<td>native icosahedral grid</td>
+<td>icosahedral (raw fetch) · MVP</td>
+</tr>
+<tr>
+<td><code>rap</code></td>
+<td>NOAA NODD</td>
+<td><code>herbie</code></td>
+<td>hourly</td>
+<td>51 h</td>
+<td>13 km CONUS (<code>awp130pgrb</code>)</td>
+</tr>
+<tr>
+<td><code>nam</code></td>
+<td>NOAA NODD</td>
+<td><code>herbie</code></td>
+<td>00/06/12/18</td>
+<td>84 h</td>
+<td>12 km CONUS (<code>awphys</code>)</td>
+</tr>
+<tr>
+<td><code>nbm</code></td>
+<td>NOAA NODD</td>
+<td><code>herbie</code></td>
+<td>hourly</td>
+<td>264 h</td>
+<td>National Blend (<code>co</code>)</td>
+</tr>
+<tr>
+<td><code>rrfs</code></td>
+<td>NOAA NODD</td>
+<td><code>herbie</code></td>
+<td>hourly</td>
+<td>60 h</td>
+<td>3 km (<code>prslev</code>)</td>
+</tr>
+<tr>
+<td><code>gdps</code></td>
+<td>ECCC MSC</td>
+<td><code>herbie</code></td>
+<td>00/12</td>
+<td>240 h</td>
+<td>15 km global</td>
+</tr>
+<tr>
+<td><code>rdps</code></td>
+<td>ECCC MSC</td>
+<td><code>herbie</code></td>
+<td>00/06/12/18</td>
+<td>84 h</td>
+<td>10 km regional</td>
+</tr>
+<tr>
+<td><code>hrdps</code></td>
+<td>ECCC MSC</td>
+<td><code>herbie</code></td>
+<td>00/06/12/18</td>
+<td>48 h</td>
+<td>2.5 km (<code>continental</code>)</td>
+</tr>
+<tr>
+<td><code>icon-eu</code></td>
+<td>DWD Open Data</td>
+<td><code>direct-https</code></td>
+<td>00/06/12/18</td>
+<td>120 h</td>
+<td><strong>regular lat-lon (croppable)</strong> ✓ probed</td>
+</tr>
+<tr>
+<td><code>icon-d2</code></td>
+<td>DWD Open Data</td>
+<td><code>direct-https</code></td>
+<td>every 3 h</td>
+<td>48 h</td>
+<td>icosahedral (raw fetch) ✓ probed</td>
+</tr>
+<tr>
+<td><code>ens</code></td>
+<td>ECMWF Open Data</td>
+<td><code>ecmwf-opendata</code></td>
+<td>00/06/12/18</td>
+<td>360 h</td>
+<td>IFS ENS control (<code>enfo</code>/<code>cf</code>) ✓ probed</td>
+</tr>
+<tr>
+<td><code>aifs</code></td>
+<td>ECMWF Open Data</td>
+<td><code>ecmwf-opendata</code></td>
+<td>00/06/12/18</td>
+<td>360 h</td>
+<td>data-driven (<code>aifs-single</code>) ✓ probed</td>
 </tr>
 </tbody>
 </table>
+<p>Not yet shipped: <strong>Météo-France</strong> (the <code>direct-boto3</code> centre exists, but the
+<code>mf-nwp-models</code> bucket doesn't expose rolling forecasts in a resolvable
+unsigned layout) and <strong>CFS</strong> (seasonal — a different time axis than
+<code>(cycle, step)</code>).</p>
 <p>¹ <strong>HRRR per-cycle horizon.</strong> The <code>horizon_h</code> is the <em>maximum</em>: HRRR runs to
 48 h only at the 00/06/12/18 synoptic cycles; the other (hourly) cycles run to
 18 h. The catalog stores a single <code>horizon_h</code>, so a long-lead request on an
@@ -5587,16 +5684,20 @@ selector:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.nwp</span><span class="w"> </span><span class="kn">import</span> <span class="n">Catalog</span>
 <a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>
 <a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="n">cat</span> <span class="o">=</span> <span class="n">Catalog</span><span class="p">()</span>
-<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="nb">sorted</span><span class="p">(</span><span class="n">cat</span><span class="o">.</span><span class="n">datasets</span><span class="p">)</span>                       <span class="c1"># [&#39;gefs&#39;, &#39;gfs&#39;, &#39;hrrr&#39;, &#39;icon-global&#39;, &#39;ifs-hres&#39;]</span>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="nb">len</span><span class="p">(</span><span class="n">cat</span><span class="o">.</span><span class="n">datasets</span><span class="p">)</span>                          <span class="c1"># 16</span>
 <a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="n">cat</span><span class="o">.</span><span class="n">get_model</span><span class="p">(</span><span class="s2">&quot;gfs&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">bands</span><span class="p">[</span><span class="s2">&quot;temperature_2m&quot;</span><span class="p">]</span>   <span class="c1"># &#39;:TMP:2 m above ground:&#39;</span>
 </code></pre></div>
 <h2 id="tooling"><a class="toclink" href="#tooling">Tooling</a><a class="headerlink" href="#tooling" title="Permanent link">#</a></h2>
-<p>Two maintenance scripts live under <code>tools/nwp/</code>:</p>
+<p>Three maintenance scripts live under <code>tools/nwp/</code>:</p>
 <ul>
 <li><code>refresh_nwp_catalog.py</code> — print a model summary; <code>--live</code> HEAD-probes
   each <code>direct-https</code> model's latest cycle.</li>
 <li><code>audit_nwp_catalog.py</code> — static consistency lint (backend vs
   <code>url_template</code> / <code>model_family</code>, empty bands, cycle-hour range).</li>
+<li><code>probe_nwp_model.py &lt;key&gt;</code> — live availability check for one model,
+  dispatching on backend (HTTP HEAD / unsigned S3 <code>head_object</code> /
+  <code>Client.latest()</code> / Herbie URL resolution). Use it to vet a catalog
+  row before relying on it.</li>
 </ul>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>pixi<span class="w"> </span>run<span class="w"> </span>-e<span class="w"> </span>dev<span class="w"> </span>python<span class="w"> </span>tools/nwp/refresh_nwp_catalog.py<span class="w"> </span>--live
 <a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>pixi<span class="w"> </span>run<span class="w"> </span>-e<span class="w"> </span>dev<span class="w"> </span>python<span class="w"> </span>tools/nwp/audit_nwp_catalog.py

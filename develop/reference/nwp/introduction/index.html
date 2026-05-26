@@ -5464,7 +5464,7 @@ bbox-cropped Cloud-Optimized GeoTIFFs. It is one subpackage with sibling
 <thead>
 <tr>
 <th>Centre</th>
-<th>Models (MVP)</th>
+<th>Models</th>
 <th>Protocol</th>
 <th>Cost</th>
 </tr>
@@ -5472,26 +5472,34 @@ bbox-cropped Cloud-Optimized GeoTIFFs. It is one subpackage with sibling
 <tbody>
 <tr>
 <td><strong>NOAA NODD</strong></td>
-<td>GFS, GEFS, HRRR</td>
+<td>GFS, GEFS, HRRR, RAP, NAM, NBM, RRFS</td>
 <td><a href="https://herbie.readthedocs.io">Herbie</a> <code>.idx</code> byte-range subset (S3 / GCS / Azure, unsigned)</td>
 <td>free</td>
 </tr>
 <tr>
 <td><strong>ECMWF Open Data</strong></td>
-<td>IFS HRES</td>
+<td>IFS HRES, ENS, AIFS</td>
 <td><code>ecmwf-opendata</code> (<code>s3://ecmwf-forecasts</code>, CC-BY-4.0)</td>
 <td>free</td>
 </tr>
 <tr>
 <td><strong>DWD Open Data</strong></td>
-<td>ICON-global</td>
+<td>ICON-global, ICON-EU, ICON-D2</td>
 <td>plain HTTPS, per-variable <code>.grib2.bz2</code></td>
+<td>free</td>
+</tr>
+<tr>
+<td><strong>ECCC MSC</strong></td>
+<td>GDPS, RDPS, HRDPS</td>
+<td>Herbie (MSC datamart)</td>
 <td>free</td>
 </tr>
 </tbody>
 </table>
-<p>Météo-France (<code>s3://mf-nwp-models</code>), ECCC (GDPS / RDPS / HRDPS), NWM,
-and MRMS are planned follow-ons.</p>
+<p>The 5 MVP models (GFS / GEFS / HRRR / IFS-HRES / ICON-global) are
+live-validated end to end; the rest are metadata-curated — see
+<a href="../catalog/">Catalog &amp; install</a>. <strong>Météo-France</strong> (<code>s3://mf-nwp-models</code>,
+a <code>direct-boto3</code> centre) and <strong>NWM / MRMS / CFS</strong> are follow-ons.</p>
 <h2 id="a-forecast-time-axis-not-an-observation-one"><a class="toclink" href="#a-forecast-time-axis-not-an-observation-one">A forecast time axis, not an observation one</a><a class="headerlink" href="#a-forecast-time-axis-not-an-observation-one" title="Permanent link">#</a></h2>
 <p>Every other earthlens backend is indexed by a single <strong>valid time</strong>
 (when an observation was taken). NWP is different: each datum is indexed
