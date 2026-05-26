@@ -7703,7 +7703,7 @@ packages:
 - pypi: ./
   name: earthlens
   version: 0.6.0
-  sha256: 7ba4ec56ffbebe577b52744eefb0c2cec42b49f46a02a66f0b8d9cea7243e1d3
+  sha256: 9e5a886161dfa986987a50286edb257f30a14236433e2f971b6cc0c3a252b508
   requires_dist:
   - pyramids-gis>=0.23.0
   - geopandas>=1.0.0
@@ -7729,7 +7729,7 @@ packages:
   - obspy>=1.5.0 ; extra == 'fdsn'
   - earthaccess>=0.18.0 ; python_full_version >= '3.12' and extra == 'earthdata'
   - pyramids-gis[stac] ; extra == 'stac'
-  - openeo>=0.30 ; extra == 'openeo'
+  - openeo>=0.47,<0.48 ; extra == 'openeo'
   - tropycal>=1.4 ; extra == 'tropycal'
   - cartopy>=0.22 ; extra == 'tropycal'
   - boto3>=1.43.0 ; extra == 'all'
@@ -7742,7 +7742,7 @@ packages:
   - google-api-python-client>=2.0 ; extra == 'all'
   - google-cloud-storage>=2.0 ; extra == 'all'
   - obspy>=1.5.0 ; extra == 'all'
-  - openeo>=0.30 ; extra == 'all'
+  - openeo>=0.47,<0.48 ; extra == 'all'
   - pyramids-gis[stac] ; extra == 'all'
   - rtree>=1.0.0 ; extra == 'all'
   - tropycal>=1.4 ; extra == 'all'

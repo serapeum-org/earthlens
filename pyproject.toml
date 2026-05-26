@@ -55,9 +55,12 @@ cmems = ["copernicusmarine >=2.0.0,<3"]
 fdsn = ["obspy >=1.5.0"]
 earthdata = ["earthaccess >=0.18.0; python_version >= '3.12'"]
 stac = ["pyramids-gis[stac]"]
-# openeo 0.50 hard-pins pandas<3 and xarray<2025.01.2 — installing this extra
-# downgrades those if the env carries a newer pandas/xarray.
-openeo = ["openeo >=0.30"]
+# Pin openeo to the 0.47.x line: openeo 0.48+ hard-caps pandas<3, which would
+# force a pandas downgrade across the whole shared environment. 0.47.0 is the
+# newest openeo that runs on pandas 3 (validated live against CDSE), so the repo
+# keeps pandas 3 for every backend. (openeo still caps xarray<2025.01.2.) Lift
+# this upper bound once openeo ships a pandas-3-compatible release.
+openeo = ["openeo >=0.47,<0.48"]
 # cartopy: not imported by earthlens, but `import tropycal.tracks` chains through
 # tropycal.utils.cartopy_utils (module-level `import cartopy`); tropycal omits it
 # from its own deps, so earthlens must supply it or the import fails.
@@ -73,7 +76,7 @@ all = [
     "google-api-python-client >=2.0",
     "google-cloud-storage >=2.0",
     "obspy >=1.5.0",
-    "openeo >=0.30",
+    "openeo >=0.47,<0.48",
     "pyramids-gis[stac]",
     "Rtree >=1.0.0",
     "tropycal >=1.4",

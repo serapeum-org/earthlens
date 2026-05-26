@@ -59,12 +59,13 @@ Asking the facade for `data_source="ecmwf"` (or `"amazon-s3"`,
 or `"gee"`) without the matching extra raises a clear
 `ImportError` naming the missing extra.
 
-> **Dependency note — `pandas` / `xarray` ceiling.** The `openeo` client
-> (≤ 0.50) pins `pandas<3.0.0` and `xarray<2025.01.2`. Because `[openeo]` is
-> part of `[all]`, installing `earthlens[all]` (or `earthlens[openeo]`)
-> constrains `pandas` to the 2.x line and `xarray` to `<2025.01.2` in that
-> environment. Install `earthlens[openeo]` in its own virtualenv if you need a
-> newer `pandas`/`xarray` for unrelated work.
+> **Dependency note — `openeo` version pin.** openeo `0.48+` hard-caps
+> `pandas<3.0.0`, which would drag the whole environment down to pandas 2.x.
+> earthlens therefore pins `openeo >=0.47,<0.48` — the newest openeo that runs
+> on **pandas 3** (validated live against CDSE) — so `earthlens[all]` and
+> `earthlens[openeo]` keep pandas 3 for every backend. openeo `0.47` does still
+> cap `xarray<2025.01.2`, so installing it constrains `xarray` (not `pandas`).
+> The upper bound will be lifted once openeo ships a pandas-3-compatible release.
 
 ## From Sources
 
