@@ -37,6 +37,7 @@ from earthlens.openeo.auth import (
 from earthlens.openeo.backend import OpenEO
 from earthlens.openeo.catalog import (
     CATALOG_PATH,
+    Band,
     Catalog,
     Collection,
     Extent,
@@ -47,6 +48,7 @@ from earthlens.openeo.catalog import (
 __all__ = [
     "CATALOG_PATH",
     "AuthenticationError",
+    "Band",
     "Catalog",
     "Collection",
     "Extent",

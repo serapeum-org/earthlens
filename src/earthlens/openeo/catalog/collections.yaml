@@ -1,257 +1,979 @@
 # Curated CDSE openEO collections (logical key -> collection metadata).
 #
 # Every collection_id is the UPPERCASE openEO id verified live against
-# https://openeo.dataspace.copernicus.eu (A1 / refresh tool); `bands` is the full
-# band set from `describe_collection`; `default_bands` is what `load_collection`
-# pulls when a request names no bands. This curates the **full** set of 19 CDSE
-# openEO collections (the same set as `_index.yaml::available_collections`).
+# https://openeo.dataspace.copernicus.eu; the `bands:` mapping carries the
+# per-band metadata from `describe_collection` (eo:bands) -- common_name,
+# description, units, dtype, gsd, center_wavelength, min/max where the backend
+# advertises them. `default_bands` is what `load_collection` pulls when a
+# request names no bands. All 19 CDSE openEO collections are curated (the same
+# set as `_index.yaml::available_collections`); regenerate band metadata with
+# `tools/openeo/probe_openeo_collection.py`.
 collections:
-  # --- Sentinel-2 optical ------------------------------------------------------
   sentinel-2-l2a:
     collection_id: SENTINEL2_L2A
     description: Sentinel-2 MSI Level-2A surface reflectance (atmospherically corrected).
     cadence: 5-day
     resolution: 10.0
     cloud_cover: true
-    bands:
-      [B01, B02, B03, B04, B05, B06, B07, B08, B8A, B09, B11, B12, WVP, AOT,
-       SCL, sunAzimuthAngles, sunZenithAngles, viewAzimuthMean, viewZenithMean,
-       CLD, SNW]
-    default_bands: [B02, B03, B04, B08]
+    default_bands:
+    - B02
+    - B03
+    - B04
+    - B08
     extent:
-      start_date: "2015-06-27"
-      bbox: [-180.0, -90.0, 180.0, 90.0]
-
+      start_date: '2015-06-27'
+      bbox:
+      - -180.0
+      - -90.0
+      - 180.0
+      - 90.0
+    bands:
+      B01:
+        common_name: coastal
+        dtype: int16
+        gsd: 60.0
+        center_wavelength: 0.4427
+      B02:
+        common_name: blue
+        dtype: int16
+        gsd: 10.0
+        center_wavelength: 0.4924
+      B03:
+        common_name: green
+        dtype: int16
+        gsd: 10.0
+        center_wavelength: 0.5598
+      B04:
+        common_name: red
+        dtype: int16
+        gsd: 10.0
+        center_wavelength: 0.6646
+      B05:
+        dtype: int16
+        gsd: 20.0
+        center_wavelength: 0.7041
+      B06:
+        dtype: int16
+        gsd: 20.0
+        center_wavelength: 0.7405
+      B07:
+        dtype: int16
+        gsd: 20.0
+        center_wavelength: 0.7828
+      B08:
+        common_name: nir
+        dtype: int16
+        gsd: 10.0
+        center_wavelength: 0.8328
+      B8A:
+        common_name: nir08
+        dtype: int16
+        gsd: 20.0
+        center_wavelength: 0.8647
+      B09:
+        common_name: nir09
+        dtype: int16
+        gsd: 60.0
+        center_wavelength: 0.9451
+      B11:
+        common_name: swir16
+        dtype: int16
+        gsd: 20.0
+        center_wavelength: 1.6137
+      B12:
+        common_name: swir22
+        dtype: int16
+        gsd: 20.0
+        center_wavelength: 2.2024
+      WVP:
+        gsd: 10.0
+      AOT:
+        gsd: 20.0
+      SCL:
+        gsd: 20.0
+      sunAzimuthAngles:
+        units: deg
+      sunZenithAngles:
+        units: deg
+      viewAzimuthMean:
+        units: deg
+      viewZenithMean:
+        units: deg
+      CLD:
+        gsd: 20.0
+      SNW:
+        gsd: 20.0
   sentinel-2-l1c:
     collection_id: SENTINEL2_L1C
     description: Sentinel-2 MSI Level-1C top-of-atmosphere reflectance.
     cadence: 5-day
     resolution: 10.0
     cloud_cover: true
-    bands:
-      [B01, B02, B03, B04, B05, B06, B07, B08, B8A, B09, B10, B11, B12,
-       sunAzimuthAngles, sunZenithAngles, viewAzimuthMean, viewZenithMean]
-    default_bands: [B02, B03, B04, B08]
+    default_bands:
+    - B02
+    - B03
+    - B04
+    - B08
     extent:
-      start_date: "2015-06-27"
-      bbox: [-180.0, -90.0, 180.0, 90.0]
-
-  # --- Sentinel-1 SAR ----------------------------------------------------------
+      start_date: '2015-06-27'
+      bbox:
+      - -180.0
+      - -90.0
+      - 180.0
+      - 90.0
+    bands:
+      B01:
+        common_name: coastal
+        dtype: int16
+        gsd: 60.0
+        center_wavelength: 0.4427
+      B02:
+        common_name: blue
+        dtype: int16
+        gsd: 10.0
+        center_wavelength: 0.4924
+      B03:
+        common_name: green
+        dtype: int16
+        gsd: 10.0
+        center_wavelength: 0.5598
+      B04:
+        common_name: red
+        dtype: int16
+        gsd: 10.0
+        center_wavelength: 0.6646
+      B05:
+        dtype: int16
+        gsd: 20.0
+        center_wavelength: 0.7041
+      B06:
+        dtype: int16
+        gsd: 20.0
+        center_wavelength: 0.7405
+      B07:
+        dtype: int16
+        gsd: 20.0
+        center_wavelength: 0.7828
+      B08:
+        common_name: nir
+        dtype: int16
+        gsd: 10.0
+        center_wavelength: 0.8328
+      B8A:
+        common_name: nir08
+        dtype: int16
+        gsd: 20.0
+        center_wavelength: 0.8647
+      B09:
+        common_name: nir09
+        dtype: int16
+        gsd: 60.0
+        center_wavelength: 0.9451
+      B10:
+        common_name: cirrus
+        dtype: int16
+        gsd: 60.0
+        center_wavelength: 1.3735
+      B11:
+        common_name: swir16
+        dtype: int16
+        gsd: 20.0
+        center_wavelength: 1.6137
+      B12:
+        common_name: swir22
+        dtype: int16
+        gsd: 20.0
+        center_wavelength: 2.2024
+      sunAzimuthAngles:
+        units: deg
+      sunZenithAngles:
+        units: deg
+      viewAzimuthMean:
+        units: deg
+      viewZenithMean:
+        units: deg
   sentinel-1-grd:
     collection_id: SENTINEL1_GRD
     description: Sentinel-1 C-band SAR Ground Range Detected backscatter.
     cadence: 6-day
     resolution: 10.0
-    bands: [HH, HV, VH, VV]
-    default_bands: [VV, VH]
+    default_bands:
+    - VV
+    - VH
     extent:
-      start_date: "2014-10-03"
-
+      start_date: '2014-10-03'
+    bands:
+      HH:
+        dtype: float
+      HV:
+        dtype: float
+      VH:
+        dtype: float
+      VV:
+        dtype: float
   sentinel-1-global-mosaics:
     collection_id: SENTINEL1_GLOBAL_MOSAICS
     description: Sentinel-1 monthly global SAR backscatter mosaics.
     cadence: monthly
     resolution: 20.0
-    bands: [VV, VH, HV, HH]
-    default_bands: [VV, VH]
+    default_bands:
+    - VV
+    - VH
     extent:
-      start_date: "2020-01-01"
-      bbox: [-180.0, -90.0, 180.0, 90.0]
-
-  # --- Sentinel-3 OLCI / SLSTR / SYN -------------------------------------------
+      start_date: '2020-01-01'
+      bbox:
+      - -180.0
+      - -90.0
+      - 180.0
+      - 90.0
+    bands:
+      VV: {}
+      VH: {}
+      HV: {}
+      HH: {}
   sentinel-3-olci-l1b:
     collection_id: SENTINEL3_OLCI_L1B
     description: Sentinel-3 OLCI Level-1B top-of-atmosphere radiances (21 bands).
     cadence: ~2-day
     resolution: 300.0
-    bands:
-      [B01, B02, B03, B04, B05, B06, B07, B08, B09, B10, B11, B12, B13, B14,
-       B15, B16, B17, B18, B19, B20, B21]
-    default_bands: [B08, B06, B04]
+    default_bands:
+    - B08
+    - B06
+    - B04
     extent:
-      start_date: "2016-04-17"
-      bbox: [-180.0, -85.0, 180.0, 85.0]
-
+      start_date: '2016-04-17'
+      bbox:
+      - -180.0
+      - -85.0
+      - 180.0
+      - 85.0
+    bands:
+      B01:
+        description: Aerosol correction, improved water constituent retrieval
+        dtype: float32
+        center_wavelength: 0.4
+        min: 0.0
+        max: 0.4
+      B02:
+        description: Yellow substance and detrital pigments (turbidity)
+        dtype: float32
+        center_wavelength: 0.4125
+        min: 0.0
+        max: 0.4
+      B03:
+        description: Chlorophyll absorption maximum, biogeochemistry, vegetation
+        dtype: float32
+        center_wavelength: 0.4425
+        min: 0.0
+        max: 0.4
+      B04:
+        description: Chlorophyll
+        dtype: float32
+        center_wavelength: 0.49
+        min: 0.0
+        max: 0.4
+      B05:
+        description: Chlorophyll, sediment, turbidity, red tide
+        dtype: float32
+        center_wavelength: 0.51
+        min: 0.0
+        max: 0.4
+      B06:
+        description: Chlorophyll reference (minimum)
+        dtype: float32
+        center_wavelength: 0.56
+        min: 0.0
+        max: 0.4
+      B07:
+        description: Sediment loading
+        dtype: float32
+        center_wavelength: 0.62
+        min: 0.0
+        max: 0.4
+      B08:
+        description: 2nd Chlorophyll absorption maximum, sediment, yellow substance / vegetation
+        dtype: float32
+        center_wavelength: 0.665
+        min: 0.0
+        max: 0.4
+      B09:
+        description: Improved fluorescence retrieval
+        dtype: float32
+        center_wavelength: 0.67375
+        min: 0.0
+        max: 0.4
+      B10:
+        description: Chlorophyll fluorescence peak, red edge
+        dtype: float32
+        center_wavelength: 0.68125
+        min: 0.0
+        max: 0.4
+      B11:
+        description: Chlorophyll fluorescence baseline, red edge transition
+        dtype: float32
+        center_wavelength: 0.70875
+        min: 0.0
+        max: 0.4
+      B12:
+        description: O2 absorption / clouds, vegetation
+        dtype: float32
+        center_wavelength: 0.75375
+        min: 0.0
+        max: 0.4
+      B13:
+        description: O2 absorption / aerosol correction
+        dtype: float32
+        center_wavelength: 0.76125
+        min: 0.0
+        max: 0.4
+      B14:
+        description: Atmospheric correction
+        dtype: float32
+        center_wavelength: 0.764375
+        min: 0.0
+        max: 0.4
+      B15:
+        description: O2 absorption used for cloud top pressure, fluorescence over land
+        dtype: float32
+        center_wavelength: 0.7675
+        min: 0.0
+        max: 0.4
+      B16:
+        description: Atmospheric / aerosol correction
+        dtype: float32
+        center_wavelength: 0.77875
+        min: 0.0
+        max: 0.4
+      B17:
+        description: Atmospheric / aerosol correction, clouds, pixel co-registration
+        dtype: float32
+        center_wavelength: 0.865
+        min: 0.0
+        max: 0.4
+      B18:
+        description: Water vapour absorption reference. Common reference band with SLSTR. Vegetation monitoring
+        dtype: float32
+        center_wavelength: 0.885
+        min: 0.0
+        max: 0.4
+      B19:
+        description: Water vapour absorption, vegetation monitoring (maximum reflectance)
+        dtype: float32
+        center_wavelength: 0.9
+        min: 0.0
+        max: 0.4
+      B20:
+        description: Water vapour absorption, atmospheric / aerosol correction
+        dtype: float32
+        center_wavelength: 0.94
+        min: 0.0
+        max: 0.4
+      B21:
+        description: Atmospheric / aerosol correction, snow grain size
+        dtype: float32
+        center_wavelength: 1.02
+        min: 0.0
+        max: 0.4
   sentinel-3-olci-l2-water:
     collection_id: SENTINEL3_OLCI_L2_WATER
     description: Sentinel-3 OLCI Level-2 ocean/water products (chlorophyll, TSM, Kd490).
     cadence: ~2-day
     resolution: 300.0
-    bands:
-      [FLAGS, IWV, CHL_OC4ME, TSM_NN, PAR, KD490_M07, A865, T865, CHL_NN,
-       ADG443_NN, B01, B02, B03, B04, B05, B06, B07, B08, B09, B10, B11, B12,
-       B16, B17, B18, B21]
-    default_bands: [CHL_NN, TSM_NN]
+    default_bands:
+    - CHL_NN
+    - TSM_NN
     extent:
-      start_date: "2016-04-25"
-
+      start_date: '2016-04-25'
+    bands:
+      FLAGS:
+        description: Water classification, quality and science flags
+        gsd: 300.0
+      IWV:
+        description: Integrated water vapour column
+        gsd: 300.0
+      CHL_OC4ME:
+        description: Open Water algal pigment concentration, log10 scaled
+        units: log10(mg/m^3)
+        gsd: 300.0
+      TSM_NN:
+        description: Total suspended matter concentration
+        gsd: 300.0
+      PAR:
+        description: Photosynthetically active radiation
+        units: W.m^2
+        gsd: 300.0
+      KD490_M07:
+        description: Diffuse attenuation coefficient at 490nm
+        gsd: 300.0
+      A865:
+        description: Aerosol Angström exponent
+        gsd: 300.0
+      T865:
+        description: Aerosol optical thickness
+        gsd: 300.0
+      CHL_NN:
+        description: Neural net algal pigment concentration (chlorophyll), log10 scaled
+        units: log10(mg/m^3)
+        gsd: 300.0
+      ADG443_NN:
+        description: Coloured Detrital and Dissolved Material absorption
+        gsd: 300.0
+      B01:
+        description: Band 1 - Aerosol correction, improved water constituent retrieval
+        gsd: 300.0
+        center_wavelength: 0.4
+      B02:
+        description: Band 2 - Yellow substance and detrital pigments (turbidity)
+        gsd: 300.0
+        center_wavelength: 0.4125
+      B03:
+        description: Band 3 - Chlorophyll absorption maximum, biogeochemistry, vegetation
+        gsd: 300.0
+        center_wavelength: 0.4425
+      B04:
+        description: Band 4 - Chlorophyll
+        gsd: 300.0
+        center_wavelength: 0.49
+      B05:
+        description: Band 5 - Chlorophyll, sediment, turbidity, red tide
+        gsd: 300.0
+        center_wavelength: 0.51
+      B06:
+        description: Band 6 - Chlorophyll reference (minimum)
+        gsd: 300.0
+        center_wavelength: 0.56
+      B07:
+        description: Band 7 - Sediment loading
+        gsd: 300.0
+        center_wavelength: 0.62
+      B08:
+        description: Band 8 - 2nd Chlorophyll absorption maximum, sediment, yellow substance / vegetation
+        gsd: 300.0
+        center_wavelength: 0.665
+      B09:
+        description: Band 9 - Improved fluorescence retrieval
+        gsd: 300.0
+        center_wavelength: 0.67375
+      B10:
+        description: Band 10 - Chlorophyll fluorescence peak, red edge
+        gsd: 300.0
+        center_wavelength: 0.68125
+      B11:
+        description: Band 11 - Chlorophyll fluorescence baseline, red edge transition
+        gsd: 300.0
+        center_wavelength: 0.70875
+      B12:
+        description: Band 12 - O2 absorption / clouds, vegetation
+        gsd: 300.0
+        center_wavelength: 0.75375
+      B16:
+        description: Atmospheric / aerosol correction
+        gsd: 300.0
+        center_wavelength: 0.77875
+      B17:
+        description: Atmospheric / aerosol correction, clouds, pixel co-registration
+        gsd: 300.0
+        center_wavelength: 0.865
+      B18:
+        description: Water vapour absorption reference. Common reference band with SLSTR. Vegetation monitoring
+        gsd: 300.0
+        center_wavelength: 0.885
+      B21:
+        description: Water vapour absorption, atmospheric / aerosol correction
+        gsd: 300.0
+        center_wavelength: 1.02
   sentinel-3-olci-l2-land:
     collection_id: SENTINEL3_OLCI_L2_LAND
     description: Sentinel-3 OLCI Level-2 land products (OTCI, GIFAPAR).
     cadence: ~2-day
     resolution: 300.0
-    bands: [GIFAPAR, IWV, OTCI, RC681, RC865, LQSF]
-    default_bands: [OTCI, GIFAPAR]
+    default_bands:
+    - OTCI
+    - GIFAPAR
     extent:
-      start_date: "2016-04-25"
-
+      start_date: '2016-04-25'
+    bands:
+      GIFAPAR:
+        description: Fraction of Absorbed Photosynthetically Active Radiation (FAPAR) in the plant canopy
+        gsd: 300.0
+      IWV:
+        description: Total amount of water vapour integrated over an atmosphere column
+        gsd: 300.0
+      OTCI:
+        description: Estimates of the Chlorophyll content in terrestrial vegetation, aims at monitoring
+          vegetation condition and health
+        gsd: 300.0
+      RC681:
+        description: By-products of the GI-FAPAR, the so-called red and NIR rectified reflectances are
+          virtual reflectance largely decontaminated from atmospheric and angular effects, and good proxy
+          to Top of Canopy reflectances.
+        gsd: 300.0
+      RC865:
+        description: By-products of the GI-FAPAR, the so-called red and NIR rectified reflectances are
+          virtual reflectance largely decontaminated from atmospheric and angular effects, and good proxy
+          to Top of Canopy reflectances.
+        gsd: 300.0
+      LQSF:
+        description: Quality and science flags
+        gsd: 300.0
   sentinel-3-slstr:
     collection_id: SENTINEL3_SLSTR
     description: Sentinel-3 SLSTR Level-1B radiances/brightness temperatures (9 + 2 fire bands).
     cadence: ~1-day
     resolution: 1000.0
-    bands: [S1, S2, S3, S4, S5, S6, S7, S8, S9, F1, F2]
-    default_bands: [S7, S8, S9]
+    default_bands:
+    - S7
+    - S8
+    - S9
     extent:
-      start_date: "2016-04-17"
-      bbox: [-180.0, -85.0, 180.0, 85.0]
-
+      start_date: '2016-04-17'
+      bbox:
+      - -180.0
+      - -85.0
+      - 180.0
+      - 85.0
+    bands:
+      S1:
+        description: Cloud screening, vegetation monitoring, aerosol
+        center_wavelength: 0.55427
+      S2:
+        description: NDVI, vegetation monitoring, aerosol
+        center_wavelength: 0.65947
+      S3:
+        description: NDVI, cloud flagging, pixel co-registration
+        center_wavelength: 0.868
+      S4:
+        description: Cirrus detection over land
+        center_wavelength: 1.3748
+      S5:
+        description: Cloud clearing, ice, snow, vegetation monitoring
+        center_wavelength: 1.6134
+      S6:
+        description: Vegetation state and cloud clearing
+        center_wavelength: 2.2557
+      S7:
+        description: SST, LST, Active fire
+        center_wavelength: 3.742
+      S8:
+        description: SST, LST, Active fire
+        center_wavelength: 10.854
+      S9:
+        description: SST, LST
+        center_wavelength: 12.0225
+      F1:
+        description: Active fire
+        center_wavelength: 3.742
+      F2:
+        description: Active fire
+        center_wavelength: 10.854
   sentinel-3-slstr-l2-lst:
     collection_id: SENTINEL3_SLSTR_L2_LST
     description: Sentinel-3 SLSTR Level-2 land surface temperature (1 km, daily).
     cadence: daily
     resolution: 1000.0
-    bands:
-      [LST, LST_uncertainty, exception, confidence_in, sunAzimuthAngles,
-       sunZenithAngles, viewAzimuthAngles, viewZenithAngles]
-    default_bands: [LST]
+    default_bands:
+    - LST
     extent:
-      start_date: "2016-04-17"
-
+      start_date: '2016-04-17'
+    bands:
+      LST:
+        common_name: surface_temperature
+        units: K
+        gsd: 1000.0
+      LST_uncertainty:
+        common_name: surface_temperature_standard_error
+        units: K
+        gsd: 1000.0
+      exception:
+        gsd: 1000.0
+      confidence_in:
+        description: quality control flags including summary_cloud flag
+        gsd: 1000.0
+      sunAzimuthAngles:
+        description: nadir view solar azimuth angles
+        units: deg
+        gsd: 1000.0
+      sunZenithAngles:
+        description: nadir view solar zenith angles
+        units: deg
+        gsd: 1000.0
+      viewAzimuthAngles:
+        description: nadir view satellite azimuth angles
+        units: deg
+        gsd: 1000.0
+      viewZenithAngles:
+        description: nadir view satellite zenith angles
+        units: deg
+        gsd: 1000.0
   sentinel-3-syn-l2-aod:
     collection_id: SENTINEL3_SYN_L2_AOD
     description: Sentinel-3 SYNERGY Level-2 aerosol optical depth (multi-wavelength).
     cadence: daily
-    bands:
-      [AOD_440, AOD_550, AOD_670, AOD_865, AOD_1600, AOD_2250, FM_AOD550,
-       SSA_440, SSA_550, SSA_670, SSA_865, SSA_1600, SSA_2250, ANG550_865,
-       D_AOD550, AAOD550]
-    default_bands: [AOD_550]
+    default_bands:
+    - AOD_550
     extent:
-      start_date: "2018-01-01"
-
+      start_date: '2018-01-01'
+    bands:
+      AOD_440:
+        gsd: 4500.0
+      AOD_550:
+        gsd: 4500.0
+      AOD_670:
+        gsd: 4500.0
+      AOD_865:
+        gsd: 4500.0
+      AOD_1600:
+        gsd: 4500.0
+      AOD_2250:
+        gsd: 4500.0
+      FM_AOD550:
+        gsd: 4500.0
+      SSA_440:
+        gsd: 4500.0
+      SSA_550:
+        gsd: 4500.0
+      SSA_670:
+        gsd: 4500.0
+      SSA_865:
+        gsd: 4500.0
+      SSA_1600:
+        gsd: 4500.0
+      SSA_2250:
+        gsd: 4500.0
+      ANG550_865:
+        gsd: 4500.0
+      D_AOD550:
+        gsd: 4500.0
+      AAOD550:
+        gsd: 4500.0
   sentinel-3-syn-l2-syn:
     collection_id: SENTINEL3_SYN_L2_SYN
     description: Sentinel-3 SYNERGY Level-2 surface reflectance (OLCI+SLSTR, 300 m).
     cadence: daily
     resolution: 300.0
-    bands:
-      [Syn_Oa01_reflectance, Syn_Oa02_reflectance, Syn_Oa03_reflectance,
-       Syn_Oa04_reflectance, Syn_Oa05_reflectance, Syn_Oa06_reflectance,
-       Syn_Oa07_reflectance, Syn_Oa08_reflectance, Syn_Oa09_reflectance,
-       Syn_Oa10_reflectance, Syn_Oa11_reflectance, Syn_Oa12_reflectance,
-       Syn_Oa16_reflectance, Syn_Oa17_reflectance, Syn_Oa18_reflectance,
-       Syn_Oa21_reflectance, Syn_S1N_reflectance, Syn_S1O_reflectance,
-       Syn_S2N_reflectance, Syn_S2O_reflectance, Syn_S3N_reflectance,
-       Syn_S3O_reflectance, Syn_S5N_reflectance, Syn_S5O_reflectance,
-       Syn_S6N_reflectance, Syn_S6O_reflectance, CLOUD_flags, OLC_flags,
-       SLN_flags, SLO_flags, SYN_flags]
-    default_bands: [Syn_Oa08_reflectance, Syn_Oa06_reflectance, Syn_Oa03_reflectance]
+    default_bands:
+    - Syn_Oa08_reflectance
+    - Syn_Oa06_reflectance
+    - Syn_Oa03_reflectance
     extent:
-      start_date: "2018-01-01"
-
-  # --- Sentinel-5P atmosphere --------------------------------------------------
+      start_date: '2018-01-01'
+    bands:
+      Syn_Oa01_reflectance:
+        center_wavelength: 0.4
+      Syn_Oa02_reflectance:
+        center_wavelength: 0.4125
+      Syn_Oa03_reflectance:
+        center_wavelength: 0.4425
+      Syn_Oa04_reflectance:
+        center_wavelength: 0.49
+      Syn_Oa05_reflectance:
+        center_wavelength: 0.51
+      Syn_Oa06_reflectance:
+        center_wavelength: 0.56
+      Syn_Oa07_reflectance:
+        center_wavelength: 0.62
+      Syn_Oa08_reflectance:
+        center_wavelength: 0.665
+      Syn_Oa09_reflectance:
+        center_wavelength: 0.67375
+      Syn_Oa10_reflectance:
+        center_wavelength: 0.68125
+      Syn_Oa11_reflectance:
+        center_wavelength: 0.70875
+      Syn_Oa12_reflectance:
+        center_wavelength: 0.75375
+      Syn_Oa16_reflectance:
+        center_wavelength: 0.77875
+      Syn_Oa17_reflectance:
+        center_wavelength: 0.865
+      Syn_Oa18_reflectance:
+        center_wavelength: 0.885
+      Syn_Oa21_reflectance:
+        center_wavelength: 1.02
+      Syn_S1N_reflectance:
+        center_wavelength: 0.555
+      Syn_S1O_reflectance:
+        center_wavelength: 0.555
+      Syn_S2N_reflectance:
+        center_wavelength: 0.659
+      Syn_S2O_reflectance:
+        center_wavelength: 0.659
+      Syn_S3N_reflectance:
+        center_wavelength: 0.865
+      Syn_S3O_reflectance:
+        center_wavelength: 0.865
+      Syn_S5N_reflectance:
+        center_wavelength: 1.61
+      Syn_S5O_reflectance:
+        center_wavelength: 1.61
+      Syn_S6N_reflectance:
+        center_wavelength: 2.25
+      Syn_S6O_reflectance:
+        center_wavelength: 2.25
+      CLOUD_flags: {}
+      OLC_flags: {}
+      SLN_flags: {}
+      SLO_flags: {}
+      SYN_flags: {}
   sentinel-5p-l2:
     collection_id: SENTINEL_5P_L2
     description: Sentinel-5P TROPOMI Level-2 atmospheric composition (NO2, CO, O3, SO2, CH4, …).
     cadence: daily
     resolution: 5500.0
-    bands:
-      [CO, HCHO, NO2, O3, SO2, CH4, AER_AI_340_380, AER_AI_354_388,
-       CLOUD_BASE_PRESSURE, CLOUD_TOP_PRESSURE, CLOUD_BASE_HEIGHT,
-       CLOUD_TOP_HEIGHT, CLOUD_OPTICAL_THICKNESS, CLOUD_FRACTION, dataMask]
-    default_bands: [NO2]
+    default_bands:
+    - NO2
     extent:
-      start_date: "2018-04-30"
-      bbox: [-180.0, -85.0, 180.0, 85.0]
-
-  # --- Landsat -----------------------------------------------------------------
+      start_date: '2018-04-30'
+      bbox:
+      - -180.0
+      - -85.0
+      - 180.0
+      - 85.0
+    bands:
+      CO:
+        description: Carbon monoxide
+        dtype: float32
+        min: 0.0
+        max: 0.1
+      HCHO:
+        description: Formaldehyde
+        dtype: float32
+        min: 0.0
+        max: 0.001
+      NO2:
+        description: Nitrogen oxide
+        dtype: float32
+        min: 0.0
+        max: 0.0003
+      O3:
+        description: Ozone
+        dtype: float32
+        min: 0.0
+        max: 0.36
+      SO2:
+        description: Sulphur dioxide
+        dtype: float32
+        min: 0.0
+        max: 0.01
+      CH4:
+        description: Methane
+        dtype: float32
+        min: 1600.0
+        max: 2000.0
+      AER_AI_340_380:
+        description: UV (Ultraviolet) Aerosol Index calculated based on wavelengths of 340 nm and 380
+          nm
+        dtype: float32
+        min: -1.0
+        max: 5.0
+      AER_AI_354_388:
+        description: UV (Ultraviolet) Aerosol Index calculated based on wavelengths of 354 nm and 388
+          nm
+        dtype: float32
+        min: -1.0
+        max: 5.0
+      CLOUD_BASE_PRESSURE:
+        description: Cloud base pressure
+        dtype: float32
+        min: 1000.0
+        max: 110000.0
+      CLOUD_TOP_PRESSURE:
+        description: Cloud top pressure
+        dtype: float32
+        min: 1000.0
+        max: 110000.0
+      CLOUD_BASE_HEIGHT:
+        description: Cloud base height
+        dtype: float32
+        min: 0.0
+        max: 20000.0
+      CLOUD_TOP_HEIGHT:
+        description: Cloud top height
+        dtype: float32
+        min: 0.0
+        max: 20000.0
+      CLOUD_OPTICAL_THICKNESS:
+        description: Cloud optical thickness
+        dtype: float32
+        min: 0.0
+        max: 250.0
+      CLOUD_FRACTION:
+        description: Effective radiometric cloud fraction
+        dtype: float32
+        min: 0.0
+        max: 1.0
+      dataMask:
+        description: The mask of data/no data pixels.
+        dtype: uint8
+        min: 0.0
+        max: 1.0
   landsat-bimonthly-mosaic:
     collection_id: LANDSAT_BIMONTHLY_MOSAIC
     description: Landsat bi-monthly surface-reflectance mosaic (7 bands).
     cadence: bimonthly
     resolution: 30.0
-    bands: [B01, B02, B03, B04, B05, B06, B07]
-    default_bands: [B04, B03, B02]
+    default_bands:
+    - B04
+    - B03
+    - B02
     extent:
-      start_date: "1997-01-01"
-      end_date: "2024-12-31"
-      bbox: [-180.0, -90.0, 180.0, 90.0]
-
-  # --- Land cover --------------------------------------------------------------
+      start_date: '1997-01-01'
+      end_date: '2024-12-31'
+      bbox:
+      - -180.0
+      - -90.0
+      - 180.0
+      - 90.0
+    bands:
+      B01:
+        description: Blue
+      B02:
+        description: Green
+      B03:
+        description: Red
+      B04:
+        description: Near Infrared
+      B05:
+        description: Short-wave Infrared 1.6
+      B06:
+        description: Short-wave Infrared 2.2
+      B07:
+        description: Thermal
   esa-worldcover-2020:
     collection_id: ESA_WORLDCOVER_10M_2020_V1
     description: ESA WorldCover global land-cover classification, 10 m, 2020 (v1).
     cadence: annual
     resolution: 10.0
-    bands: [MAP]
-    default_bands: [MAP]
+    default_bands:
+    - MAP
     extent:
-      start_date: "2020-01-01"
-      end_date: "2020-12-31"
-      bbox: [-180.0, -60.0, 180.0, 84.0]
-
+      start_date: '2020-01-01'
+      end_date: '2020-12-31'
+      bbox:
+      - -180.0
+      - -60.0
+      - 180.0
+      - 84.0
+    bands:
+      MAP:
+        dtype: uint8
+        gsd: 10.0
   esa-worldcover-2021:
     collection_id: ESA_WORLDCOVER_10M_2021_V2
     description: ESA WorldCover global land-cover classification, 10 m, 2021 (v2).
     cadence: annual
     resolution: 10.0
-    bands: [MAP]
-    default_bands: [MAP]
+    default_bands:
+    - MAP
     extent:
-      start_date: "2021-01-01"
-      end_date: "2021-12-31"
-      bbox: [-180.0, -60.0, 180.0, 84.0]
-
-  # --- Phenology / vegetation productivity (HR-VPP) ----------------------------
+      start_date: '2021-01-01'
+      end_date: '2021-12-31'
+      bbox:
+      - -180.0
+      - -60.0
+      - 180.0
+      - 84.0
+    bands:
+      MAP:
+        dtype: uint8
+        gsd: 10.0
   copernicus-plant-phenology-index:
     collection_id: COPERNICUS_PLANT_PHENOLOGY_INDEX
     description: Copernicus HR-VPP seasonal Plant Phenology Index trajectories (10-daily).
     cadence: 10-daily
     resolution: 10.0
-    bands: [QFLAG, PPI]
-    default_bands: [PPI]
+    default_bands:
+    - PPI
     extent:
-      start_date: "2017-01-01"
-      bbox: [-62.08, -21.79, 56.14, 72.10]
-
+      start_date: '2017-01-01'
+      bbox:
+      - -62.08
+      - -21.79
+      - 56.14
+      - 72.1
+    bands:
+      QFLAG: {}
+      PPI: {}
   copernicus-vegetation-phenology-productivity-season1:
     collection_id: COPERNICUS_VEGETATION_PHENOLOGY_PRODUCTIVITY_10M_SEASON1
-    description: Copernicus HR-VPP vegetation phenology & productivity parameters, season 1 (yearly, 10 m).
+    description: Copernicus HR-VPP vegetation phenology & productivity parameters, season 1 (yearly, 10
+      m).
     cadence: yearly
     resolution: 10.0
-    bands:
-      [SOSD, EOSD, MAXD, SOSV, EOSV, MINV, MAXV, AMPL, LENGTH, LSLOPE, RSLOPE,
-       SPROD, TPROD, QFLAG]
-    default_bands: [SOSD, EOSD, LENGTH]
+    default_bands:
+    - SOSD
+    - EOSD
+    - LENGTH
     extent:
-      start_date: "2017-01-01"
-      end_date: "2024-12-31"
-      bbox: [-62.08, -21.79, 56.14, 72.10]
-
+      start_date: '2017-01-01'
+      end_date: '2024-12-31'
+      bbox:
+      - -62.08
+      - -21.79
+      - 56.14
+      - 72.1
+    bands:
+      SOSD: {}
+      EOSD: {}
+      MAXD: {}
+      SOSV: {}
+      EOSV: {}
+      MINV: {}
+      MAXV: {}
+      AMPL: {}
+      LENGTH: {}
+      LSLOPE: {}
+      RSLOPE: {}
+      SPROD: {}
+      TPROD: {}
+      QFLAG: {}
   copernicus-vegetation-phenology-productivity-season2:
     collection_id: COPERNICUS_VEGETATION_PHENOLOGY_PRODUCTIVITY_10M_SEASON2
-    description: Copernicus HR-VPP vegetation phenology & productivity parameters, season 2 (yearly, 10 m).
+    description: Copernicus HR-VPP vegetation phenology & productivity parameters, season 2 (yearly, 10
+      m).
     cadence: yearly
     resolution: 10.0
-    bands:
-      [SOSD, EOSD, MAXD, SOSV, EOSV, MINV, MAXV, AMPL, LENGTH, LSLOPE, RSLOPE,
-       SPROD, TPROD, QFLAG]
-    default_bands: [SOSD, EOSD, LENGTH]
+    default_bands:
+    - SOSD
+    - EOSD
+    - LENGTH
     extent:
-      start_date: "2017-01-01"
-      end_date: "2024-12-31"
-      bbox: [-62.08, -21.79, 56.14, 72.10]
-
-  # --- Elevation ---------------------------------------------------------------
+      start_date: '2017-01-01'
+      end_date: '2024-12-31'
+      bbox:
+      - -62.08
+      - -21.79
+      - 56.14
+      - 72.1
+    bands:
+      SOSD: {}
+      EOSD: {}
+      MAXD: {}
+      SOSV: {}
+      EOSV: {}
+      MINV: {}
+      MAXV: {}
+      AMPL: {}
+      LENGTH: {}
+      LSLOPE: {}
+      RSLOPE: {}
+      SPROD: {}
+      TPROD: {}
+      QFLAG: {}
   copernicus-dem-30:
     collection_id: COPERNICUS_30
     description: Copernicus GLO-30 global digital elevation model (30 m).
     cadence: static
     resolution: 30.0
-    bands: [DEM]
-    default_bands: [DEM]
+    default_bands:
+    - DEM
     extent:
-      start_date: "2010-12-12"
-      end_date: "2015-01-16"
-      bbox: [-180.0, -90.0, 180.0, 90.0]
+      start_date: '2010-12-12'
+      end_date: '2015-01-16'
+      bbox:
+      - -180.0
+      - -90.0
+      - 180.0
+      - 90.0
+    bands:
+      DEM: {}

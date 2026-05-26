@@ -86,11 +86,19 @@ class TestBundledCatalog:
         assert cat.get_catalog() is cat.datasets
 
     def test_effective_bands_falls_back_to_all(self):
-        """A collection with no default_bands falls back to all bands."""
+        """A collection with no default_bands falls back to all band names."""
         from earthlens.openeo.catalog import Collection
 
-        col = Collection(collection_id="X", bands=["a", "b"])
+        col = Collection(collection_id="X", bands={"a": {}, "b": {}})
         assert col.effective_bands == ["a", "b"]
+
+    def test_band_metadata_parsed(self):
+        """Bands load as a keyed mapping of Band models with metadata."""
+        from earthlens.openeo.catalog import Band
+
+        b04 = Catalog().get_collection("sentinel-2-l2a").bands["B04"]
+        assert isinstance(b04, Band)
+        assert b04.common_name == "red" and b04.dtype == "int16"
 
 
 @pytest.mark.openeo

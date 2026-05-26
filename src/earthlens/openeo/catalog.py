@@ -95,16 +95,48 @@ class Extent(BaseModel):
     bbox: tuple[float, float, float, float] | None = None
 
 
+class Band(BaseModel):
+    """Per-band metadata for one band of an openEO collection.
+
+    Frozen value object; the band name is the parent mapping key and is not
+    repeated in the body. Mirrors the per-band/asset/variable models the other
+    backends use (`earthlens.gee.Band`, `earthlens.stac.Asset`,
+    `earthlens.cmems.Variable`). Every field is optional because openEO band
+    metadata (`eo:bands`) is uneven across collections.
+
+    Attributes:
+        common_name: STAC `eo:bands` common name (`"red"`, `"nir"`), or `None`.
+        description: Human description of the band, or `None`.
+        units: Physical unit string (openEO `unit`), or `None`.
+        dtype: On-disk data type (`"int16"`, `"float32"`, …), or `None`.
+        gsd: Band ground sample distance in metres, or `None`.
+        center_wavelength: Central wavelength in micrometres (optical), or `None`.
+        min: Typical/declared minimum value, or `None`.
+        max: Typical/declared maximum value, or `None`.
+    """
+
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    common_name: str | None = None
+    description: str | None = None
+    units: str | None = None
+    dtype: str | None = None
+    gsd: float | None = None
+    center_wavelength: float | None = None
+    min: float | None = None
+    max: float | None = None
+
+
 class Collection(BaseModel):
     """One curated CDSE openEO collection, addressed by a logical key.
 
     Attributes:
         collection_id: The UPPERCASE openEO collection id this key loads
             (`"SENTINEL2_L2A"`, `"SENTINEL_5P_L2"`, …).
-        bands: Every band the collection exposes (informational; the full set
-            from `describe_collection`).
+        bands: Band name → :class:`Band` metadata for every band the collection
+            exposes (the full set from `describe_collection`).
         default_bands: Bands pulled when the request names none. Falls back to
-            `bands` when empty.
+            every key of `bands` when empty.
         cadence: Native revisit cadence label, or `None`.
         resolution: Native ground sample distance in metres, or `None`.
         extent: Spatial/temporal coverage.
@@ -119,7 +151,7 @@ class Collection(BaseModel):
     model_config = ConfigDict(frozen=True, extra="forbid")
 
     collection_id: str
-    bands: list[str] = Field(default_factory=list)
+    bands: dict[str, Band] = Field(default_factory=dict)
     default_bands: list[str] = Field(default_factory=list)
     cadence: str | None = None
     resolution: float | None = None
@@ -129,8 +161,8 @@ class Collection(BaseModel):
 
     @property
     def effective_bands(self) -> list[str]:
-        """The bands to request by default (`default_bands`, else all `bands`)."""
-        return list(self.default_bands or self.bands)
+        """The band names to request by default (`default_bands`, else all bands)."""
+        return list(self.default_bands or list(self.bands))
 
 
 class Recipe(BaseModel):
@@ -283,9 +315,14 @@ def _load_catalog_data(
     for col_key, col_body in collections_yaml.items():
         body = dict(col_body or {})
         extent_body = body.pop("extent", None)
+        bands_yaml = dict(body.pop("bands", {}) or {})
         try:
+            bands = {
+                name: Band(**dict(band_body or {}))
+                for name, band_body in bands_yaml.items()
+            }
             extent = Extent(**dict(extent_body)) if extent_body else None
-            collections[col_key] = Collection(extent=extent, **body)
+            collections[col_key] = Collection(extent=extent, bands=bands, **body)
         except ValidationError as exc:
             raise ValueError(
                 f"invalid collection {col_key!r} in {origin['c:' + col_key]}: {exc}"

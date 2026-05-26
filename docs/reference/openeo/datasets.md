@@ -34,9 +34,11 @@ id verified against the live CDSE backend (the curated set equals the full
 | `copernicus-vegetation-phenology-productivity-season2` | `COPERNICUS_VEGETATION_PHENOLOGY_PRODUCTIVITY_10M_SEASON2` | `SOSD, EOSD, LENGTH` | yearly | 10 m |
 | `copernicus-dem-30` | `COPERNICUS_30` | `DEM` | static | 30 m |
 
-Each collection's **full** band list, spatial/temporal extent, and description
-live in `src/earthlens/openeo/catalog/collections.yaml` (and are queryable via
-`Catalog().get_collection(key)`). A few highlights:
+Each collection's **full** band set is curated as a `{band_name: Band}` mapping
+carrying per-band metadata (`common_name`, `description`, `units`, `dtype`,
+`gsd`, `center_wavelength`, `min`/`max` where the backend advertises them) in
+`src/earthlens/openeo/catalog/collections.yaml`, queryable via
+`Catalog().get_collection(key).bands`. A few highlights:
 
 * **`sentinel-2-l2a`** — `B01…B12, B8A, WVP, AOT, SCL, CLD, SNW`, sun/view
   angles (the `SCL` scene-classification band drives `mask_scl_dilation`).
@@ -82,7 +84,8 @@ cat = Catalog()
 sorted(cat.datasets)                 # all 19 curated collection keys
 sorted(cat.recipes)                  # curated recipe keys
 cat.is_recipe("sentinel-2-l2a-ndvi-monthly")          # True
-cat.get_collection("sentinel-2-l2a").bands            # the full band list
+cat.get_collection("sentinel-2-l2a").bands            # {band_name: Band(...)} mapping
+cat.get_collection("sentinel-2-l2a").bands["B04"].common_name   # 'red'
 cat.resolve("sentinel-2-l2a-ndvi-monthly").graph      # the ordered steps
 cat.available_collections                              # the full 19-id index
 cat.available_processes                                # the 143-process index
