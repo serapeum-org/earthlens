@@ -1,0 +1,146 @@
+"""Unit + integration tests for the EUMETSAT backend (mocked `eumdac`)."""
+
+from __future__ import annotations
+
+from pathlib import Path
+
+import pytest
+
+from earthlens.eumetsat import EUMETSAT
+from earthlens.eumetsat.catalog import DataStoreGroup
+
+from tests.eumetsat.conftest import _FakeProduct
+
+pytestmark = pytest.mark.eumetsat
+
+_CREDS = {"consumer_key": "k", "consumer_secret": "s"}
+
+
+def _make_backend(fake_eumdac, tmp_path, variables, **kwargs):
+    """Build an EUMETSAT backend wired to the fake `eumdac` store."""
+    return EUMETSAT(
+        start="2024-01-01",
+        end="2024-01-02",
+        variables=variables,
+        lat_lim=[50.0, 52.0],
+        lon_lim=[-1.0, 1.0],
+        path=str(tmp_path),
+        **_CREDS,
+        **kwargs,
+    )
+
+
+def test_construction_authenticates_and_sets_output_kind(fake_eumdac, tmp_path):
+    """Construction mints a token and copies the row's output_kind."""
+    backend = _make_backend(fake_eumdac, tmp_path, {"msg-hrseviri": ["HRSEVIRI"]})
+    assert backend.OUTPUT_KIND == "raster"
+    assert backend._auth.is_authenticated() is True
+
+
+def test_empty_variables_rejected(fake_eumdac, tmp_path):
+    """An empty variables mapping is rejected at construction."""
+    with pytest.raises(ValueError, match="non-empty"):
+        _make_backend(fake_eumdac, tmp_path, {})
+
+
+def test_unknown_collection_key_rejected(fake_eumdac, tmp_path):
+    """An unknown collection key surfaces the catalog did-you-mean."""
+    with pytest.raises(ValueError, match="Did you mean"):
+        _make_backend(fake_eumdac, tmp_path, {"msg-hrsevir": ["x"]})
+
+
+def test_group_kwarg_disambiguates(fake_eumdac, tmp_path):
+    """A matching group= kwarg is accepted; a mismatch is rejected."""
+    backend = _make_backend(
+        fake_eumdac, tmp_path, {"msg-hrseviri": ["HRSEVIRI"]}, group="MSG"
+    )
+    assert backend._collections[0].group is DataStoreGroup.MSG
+    with pytest.raises(ValueError, match="not the requested group"):
+        _make_backend(
+            fake_eumdac, tmp_path, {"msg-hrseviri": ["HRSEVIRI"]}, group="MTG"
+        )
+
+
+def test_search_calls_collection_with_bbox_and_dates(fake_eumdac, tmp_path):
+    """_search passes the W,S,E,N bbox string and dtstart/dtend datetimes."""
+    fake_eumdac.store.products_for["EO:EUM:DAT:MSG:HRSEVIRI"] = [_FakeProduct("p1")]
+    backend = _make_backend(fake_eumdac, tmp_path, {"msg-hrseviri": ["HRSEVIRI"]})
+    products = backend._search()
+    call = fake_eumdac.store.search_calls[0]
+    assert call["collection"] == "EO:EUM:DAT:MSG:HRSEVIRI"
+    assert call["bbox"] == "-1.0,50.0,1.0,52.0"  # W,S,E,N axis order (A1)
+    assert call["dtstart"] == backend.time.start_date
+    assert call["dtend"] == backend.time.end_date
+    assert [p.id for p in products] == ["p1"]
+
+
+def test_fetch_streams_each_product_to_disk(fake_eumdac, tmp_path):
+    """_fetch writes one file per product, named by the product id."""
+    fake_eumdac.store.products_for["EO:EUM:DAT:MSG:HRSEVIRI"] = [
+        _FakeProduct("alpha", b"AAAA"),
+        _FakeProduct("beta", b"BBBB"),
+    ]
+    backend = _make_backend(fake_eumdac, tmp_path, {"msg-hrseviri": ["HRSEVIRI"]})
+    paths = backend.download(progress_bar=False)
+    assert sorted(p.name for p in paths) == ["alpha", "beta"]
+    assert (tmp_path / "alpha").read_bytes() == b"AAAA"
+
+
+def test_download_empty_search_returns_empty(fake_eumdac, tmp_path):
+    """A search that matches nothing returns an empty list, no fetch."""
+    backend = _make_backend(fake_eumdac, tmp_path, {"msg-hrseviri": ["HRSEVIRI"]})
+    assert backend.download(progress_bar=False) == []
+
+
+def test_multiple_collections_searched(fake_eumdac, tmp_path):
+    """A request naming two same-kind collections searches both."""
+    fake_eumdac.store.products_for["EO:EUM:DAT:MSG:HRSEVIRI"] = [_FakeProduct("a")]
+    fake_eumdac.store.products_for["EO:EUM:DAT:0407"] = [_FakeProduct("b")]
+    backend = _make_backend(
+        fake_eumdac,
+        tmp_path,
+        {"msg-hrseviri": ["HRSEVIRI"], "s3-olci-l2-wfr": ["OL_2_WFR"]},
+    )
+    paths = backend.download(progress_bar=False)
+    assert {p.name for p in paths} == {"a", "b"}
+    assert len(fake_eumdac.store.search_calls) == 2
+
+
+def test_aggregate_raises_pointing_at_data_tailor(fake_eumdac, tmp_path):
+    """download(aggregate=...) raises NotImplementedError naming Data Tailor."""
+    backend = _make_backend(fake_eumdac, tmp_path, {"msg-hrseviri": ["HRSEVIRI"]})
+    with pytest.raises(NotImplementedError, match="Data Tailor"):
+        backend.download(aggregate=object())
+
+
+def test_unify_output_kind_rejects_mixed(fake_eumdac, tmp_path):
+    """A request mixing output kinds is rejected at construction."""
+    from earthlens.eumetsat.catalog import EumetsatCollection
+
+    raster = EumetsatCollection(collection_id="A", group="MSG", output_kind="raster")
+    vector = EumetsatCollection(collection_id="B", group="MSG", output_kind="vector")
+    with pytest.raises(ValueError, match="must share one"):
+        EUMETSAT._unify_output_kind([raster, vector])
+
+
+def test_api_composes_search_and_fetch(fake_eumdac, tmp_path):
+    """The legacy `_api` hook composes search + fetch like download()."""
+    fake_eumdac.store.products_for["EO:EUM:DAT:MSG:HRSEVIRI"] = [_FakeProduct("z")]
+    backend = _make_backend(fake_eumdac, tmp_path, {"msg-hrseviri": ["HRSEVIRI"]})
+    paths = backend._api()
+    assert [p.name for p in paths] == ["z"]
+
+
+def test_search_without_eumdac_raises_friendly_import_error(tmp_path, monkeypatch):
+    """A missing `eumdac` surfaces a friendly ImportError naming the extra."""
+    import sys
+
+    # Construct with a fake so auth/catalog resolve, then hide eumdac for _search.
+    from tests.eumetsat.conftest import _FakeEumdac
+
+    fake = _FakeEumdac()
+    monkeypatch.setitem(sys.modules, "eumdac", fake)
+    backend = _make_backend(fake, tmp_path, {"msg-hrseviri": ["HRSEVIRI"]})
+    monkeypatch.setitem(sys.modules, "eumdac", None)  # force ImportError on re-import
+    with pytest.raises(ImportError, match=r"earthlens\[eumetsat\]"):
+        backend._search()
