@@ -13,7 +13,7 @@ bbox-cropped Cloud-Optimized GeoTIFFs. It is one subpackage with sibling
 | **ECCC MSC** | GDPS, RDPS, HRDPS | Herbie (MSC datamart) | free |
 | **Météo-France** | ARPEGE (world), AROME (France) | WCS API (`portail-api.meteofrance.fr`, API key) | free w/ key |
 
-**22 models**, each exposing up to 12 surface fields — 2 m temperature /
+**32 models** (incl. ICON-EPS / ENS ensembles), each exposing up to 12 surface fields — 2 m temperature /
 dewpoint / relative humidity, 10 m wind (u/v) + gust, precipitation, MSL +
 surface pressure, total cloud cover, CAPE, and downward shortwave radiation. The 5 MVP models (GFS / GEFS / HRRR /
 IFS-HRES / ICON-global) are live-validated end to end; the rest are

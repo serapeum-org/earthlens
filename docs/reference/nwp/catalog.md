@@ -57,6 +57,19 @@ doesn't carry).
 | `href` | NOAA NODD | `herbie` | 00/06/12/18 | 48 h | ensemble mean (`domain=conus`) |
 | `arpege-world` | Météo-France | `meteofrance-api` | 00/06/12/18 | 102 h | 0.25° global · WCS API (key)³ |
 | `arome-france` | Météo-France | `meteofrance-api` | every 3 h | 51 h | 0.025° France · WCS API (key)³ |
+| `nam-conusnest` | NOAA NODD | `herbie` | 00/06/12/18 | 60 h | NAM 5 km CONUS nest |
+| `hiresw-fv3` | NOAA NODD | `herbie` | 00/12 | 48 h | HiResW FV3 2.5 km (`domain=conus`) |
+| `nbm-ak` / `nbm-hi` / `nbm-pr` | NOAA NODD | `herbie` | hourly | 264 h | NBM Alaska / Hawaii / Puerto Rico |
+| `icon-eps` | DWD Open Data | `direct-https` | 00/06/12/18 | 180 h | ICON-EPS ensemble (all members/file; icosahedral; surface-only) |
+| `icon-eu-eps` | DWD Open Data | `direct-https` | 00/06/12/18 | 120 h | ICON-EU-EPS ensemble (icosahedral; surface-only) |
+| `icon-d2-eps` | DWD Open Data | `direct-https` | every 3 h | 48 h | ICON-D2-EPS ensemble (icosahedral; surface-only) |
+| `ens-mean` / `ens-spread` | ECMWF Open Data | `ecmwf-opendata` | 00/06/12/18 | 360 h | ENS mean (`type=em`) / spread (`type=es`) |
+
+**32 models, ~2100 band-entries.** Not catalog-curatable (different data model —
+each needs its own backend): **NWM** (hydrology), **MRMS** / **NEXRAD** (radar),
+**CFS** (seasonal axis), **HAFS** (per-storm). The DWD ICON-EPS / ECMWF ENS rows
+above give the ensemble; GEFS/ENS also expose individual members via `members=`
+(see [usage](usage.md#ensemble-members)).
 
 ³ **Météo-France WCS API.** Served from the authenticated portal
 (`portail-api.meteofrance.fr`), not the static-only `mf-nwp-models` S3 bucket.
@@ -138,7 +151,7 @@ All 20 forecast models carry these at eight pressure levels (the analyses
 from earthlens.nwp import Catalog
 
 cat = Catalog()
-len(cat.datasets)                          # 22
+len(cat.datasets)                          # 32
 cat.get_model("gfs").bands["temperature_2m"]   # ':TMP:2 m above ground:'
 ```
 
