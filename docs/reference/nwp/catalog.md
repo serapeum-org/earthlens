@@ -109,8 +109,7 @@ The DWD tokens are HEAD-validated live for `icon-eu`; the ECMWF flux tokens
 ### Pressure-level (3-D) fields
 
 The Herbie (NOAA / ECCC) and ECMWF models also expose 3-D fields —
-geopotential height, temperature, u-/v-wind at **850 / 500 / 250 hPa**, and
-relative humidity at 850 / 500 hPa (so 26 bands each):
+geopotential height, temperature, u-/v-wind at **925 / 850 / 700 / 500 / 300 / 250 hPa** (so ~42 bands each):
 
 | Parameter | NOAA / ECCC (Herbie) | ECMWF (`param@level`) |
 |-----------|----------------------|-----------------------|
@@ -119,7 +118,7 @@ relative humidity at 850 / 500 hPa (so 26 bands each):
 | `wind_u_250hPa` | `:UGRD:250 mb:` | `u@250` |
 | `relative_humidity_850hPa` | `:RH:850 mb:` | `r@850` |
 
-All 22 models carry these 3-D fields (25–26 bands each). The per-centre
+All 22 forecast models carry these 3-D fields at six pressure levels (925/850/700/500/300/250 hPa; ~42 bands each — analyses rtma/urma stay surface-only). The per-centre
 mechanics differ:
 
 * **Herbie (NOAA/ECCC)** — the level is in the `.idx` regex (`:TMP:850 mb:`); no
