@@ -227,7 +227,7 @@ def import_openeo() -> Any:
     """
     try:
         import openeo
-    except ImportError as exc:  # pragma: no cover - exercised via a stubbed import
+    except ImportError as exc:
         raise ImportError(
             "the openEO backend requires the 'openeo' client. Install it with "
             "`pip install earthlens[openeo]`."
