@@ -108,7 +108,40 @@ class TestBuildCube:
         _, cid, bands, kwargs, spatial, temporal = load
         assert cid == "SENTINEL2_L2A" and bands == ["B04", "B08"]
         assert spatial == {"west": 3.0, "south": 40.0, "east": 4.0, "north": 41.0}
-        assert temporal == ["2023-01-01", "2023-03-31"]
+        # openEO temporal_extent is right-open: the inclusive end (03-31) is
+        # forwarded as the exclusive 04-01 so the last day is included.
+        assert temporal == ["2023-01-01", "2023-04-01"]
+
+    def test_inclusive_end_forwarded_as_exclusive(self, output_dir: Path):
+        """The request's inclusive end is advanced one day for openEO's open bound."""
+        backend = OpenEO(
+            start="2023-06-01",
+            end="2023-06-30",
+            variables={"sentinel-2-l2a": ["B04"]},
+            lat_lim=[40.0, 41.0],
+            lon_lim=[3.0, 4.0],
+            path=output_dir,
+        )
+        conn = _bind_fake(backend)
+        backend._fetch(backend._search())
+        load = next(e for e in conn.log if e[0] == "load_collection")
+        assert load[5] == ["2023-06-01", "2023-07-01"]
+
+    def test_single_day_window_is_non_empty(self, output_dir: Path):
+        """A single-day request maps to a non-empty `[d, d+1)` openEO interval."""
+        backend = OpenEO(
+            start="2023-06-15",
+            end="2023-06-15",
+            variables={"sentinel-2-l2a": ["B04"]},
+            lat_lim=[40.0, 41.0],
+            lon_lim=[3.0, 4.0],
+            path=output_dir,
+        )
+        conn = _bind_fake(backend)
+        backend._fetch(backend._search())
+        load = next(e for e in conn.log if e[0] == "load_collection")
+        assert load[5] == ["2023-06-15", "2023-06-16"]
+        assert load[5][0] != load[5][1]
 
     def test_default_bands_used_when_none_requested(self, output_dir: Path):
         """An empty band list falls back to the collection defaults."""

@@ -269,7 +269,7 @@ class OpenEO(AbstractDataSource):
             },
             temporal_extent=[
                 self.time.start_date.strftime("%Y-%m-%d"),
-                self.time.end_date.strftime("%Y-%m-%d"),
+                _exclusive_end(self.time.end_date),
             ],
             bands=(bands or None),
             **load_kwargs,
@@ -379,6 +379,44 @@ def _apply_step(cube: Any, step: dict[str, dict[str, Any]]) -> Any:
     if callable(method):
         return method(**params)
     return cube.process(name, arguments={"data": cube, **params})
+
+
+def _exclusive_end(end_date: Any) -> str:
+    """Convert an inclusive end date to openEO's exclusive (right-open) bound.
+
+    earthlens presents the request `end` as **inclusive** (matching every other
+    backend); openEO's `load_collection` `temporal_extent` is left-closed,
+    right-open — it *excludes* its end instant. Advancing the bound by one day
+    preserves the inclusive day (and keeps a single-day `start == end` request
+    non-empty).
+
+    Args:
+        end_date: The inclusive end as a `datetime` (from `_check_input_dates`).
+
+    Returns:
+        The exclusive end as a `YYYY-MM-DD` string (`end_date + 1 day`).
+
+    Examples:
+        - The inclusive end is advanced by one day:
+            ```python
+            >>> import datetime as dt
+            >>> from earthlens.openeo.backend import _exclusive_end
+            >>> _exclusive_end(dt.datetime(2023, 6, 30))
+            '2023-07-01'
+
+            ```
+        - A single-day window stays non-empty (`[d, d+1)`):
+            ```python
+            >>> import datetime as dt
+            >>> from earthlens.openeo.backend import _exclusive_end
+            >>> _exclusive_end(dt.datetime(2023, 6, 1))
+            '2023-06-02'
+
+            ```
+    """
+    import datetime as dt
+
+    return (end_date + dt.timedelta(days=1)).strftime("%Y-%m-%d")
 
 
 def _safe_name(key: str) -> str:
