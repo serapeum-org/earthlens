@@ -1,11 +1,10 @@
 # Sentinel-5P (TROPOMI) atmospheric-composition mirror collections on the
 # EUMETSAT Data Store. Delivered as NetCDF (swath) products — pyramids can
-# read them today; the MVP fetches whole products to disk (G4). The numeric
-# Data Store ids are curated from the EUMETSAT browse catalogue; reconcile
-# against the live endpoint with `tools/eumetsat/audit_eumetsat_catalog.py`.
+# read them today; the MVP fetches whole products to disk (G4). Collection ids
+# verified against api.eumetsat.int/data/browse/collections on 2026-05-26.
 collections:
   s5p-l2-no2:
-    collection_id: "EO:EUM:DAT:0080"
+    collection_id: "EO:EUM:DAT:0076"
     group: Sentinel-5P
     mission: sentinel-5p
     output_kind: raster
@@ -17,7 +16,7 @@ collections:
     temporal: { start: 2018-04-30, end: null }
 
   s5p-l2-ch4:
-    collection_id: "EO:EUM:DAT:0081"
+    collection_id: "EO:EUM:DAT:1101"
     group: Sentinel-5P
     mission: sentinel-5p
     output_kind: raster
@@ -29,7 +28,7 @@ collections:
     temporal: { start: 2018-04-30, end: null }
 
   s5p-l2-co:
-    collection_id: "EO:EUM:DAT:0082"
+    collection_id: "EO:EUM:DAT:0073"
     group: Sentinel-5P
     mission: sentinel-5p
     output_kind: raster
@@ -41,7 +40,7 @@ collections:
     temporal: { start: 2018-04-30, end: null }
 
   s5p-l2-o3:
-    collection_id: "EO:EUM:DAT:0083"
+    collection_id: "EO:EUM:DAT:0077"
     group: Sentinel-5P
     mission: sentinel-5p
     output_kind: raster

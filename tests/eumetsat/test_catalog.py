@@ -92,6 +92,19 @@ def test_format_tags_distinguish_native_and_netcdf(catalog):
     assert catalog.get_collection("s3-olci-l2-wfr").format == "netcdf"
 
 
+def test_every_collection_id_matches_eumetsat_pattern(catalog):
+    """Every curated collection_id is a well-formed `EO:EUM:DAT:...` id."""
+    import re
+
+    pattern = re.compile(r"^EO:EUM:DAT:[\w:.-]+$")
+    bad = {
+        key: col.collection_id
+        for key, col in catalog.collections.items()
+        if not pattern.match(col.collection_id)
+    }
+    assert not bad, f"malformed collection ids: {bad}"
+
+
 def test_load_from_single_file(tmp_path):
     """Catalog.load() accepts a single YAML file as well as a directory."""
     single = tmp_path / "one.yaml"
