@@ -66,14 +66,45 @@ class TestGFSLive:
         assert all(p.exists() and p.stat().st_size > 0 for p in paths)
 
 
+class TestIFSLive:
+    """Live ECMWF IFS HRES fetch through the full facade pipeline.
+
+    Needs no eccodes binary (ecmwf-opendata downloads GRIB without
+    decoding), so this exercises fetch -> open_grib -> crop -> write_cog
+    on a regular 0.25° grid end to end.
+    """
+
+    def test_ifs_subset_to_cog(self, tmp_path):
+        """A one-variable IFS f000 request writes a bbox-cropped COG."""
+        # A day fully in the past so every cycle of that day is published.
+        day = (_recent_cycle(hours_ago=48)).strftime("%Y-%m-%d")
+        try:
+            lens = EarthLens(
+                data_source="nwp",
+                variables={"ifs-hres": ["temperature_2m"]},
+                start=day,
+                end=day,
+                lat_lim=[40, 50],
+                lon_lim=[0, 10],
+                path=str(tmp_path),
+                steps=[0],
+                mirror="aws",
+            )
+            paths = lens.download(progress_bar=False)
+        except Exception as exc:  # network / data-availability flake
+            pytest.skip(f"IFS live fetch unavailable: {exc}")
+        assert paths, "expected at least one COG"
+        assert all(p.exists() and p.stat().st_size > 0 for p in paths)
+
+
 class TestICONLive:
     """Live DWD ICON raw-GRIB fetch (no crop — native icosahedral grid)."""
 
     def test_icon_file_downloads(self, tmp_path):
         """A single ICON variable downloads + decompresses to a non-empty GRIB2."""
         model = Catalog().get_model("icon-global")
-        # DWD keeps only ~the last day online; use yesterday's 00Z run.
-        cycle = (_recent_cycle(hours_ago=24)).replace(hour=0)
+        # DWD keeps only ~the last day online; use a fresh cycle (~8 h old).
+        cycle = _recent_cycle(hours_ago=8)
         try:
             out = DWDCentre(tmp_path).fetch_one(
                 model, cycle, 0, ["temperature_2m"], "auto"

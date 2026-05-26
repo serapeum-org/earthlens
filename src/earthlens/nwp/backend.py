@@ -358,7 +358,12 @@ class NWP(AbstractDataSource):
             )
             dataset = open_grib(str(grib_path))
             dataset = self._normalise_longitude(dataset)
-            cropped = dataset.crop(bbox=bbox, epsg=4326)
+            # touch=False avoids pyramids' wrap-cutline correction, which calls
+            # the GDAL/PROJ database for the GRIB driver's reported CRS
+            # (EPSG:9122, WGS84 lon/lat) — a code many bundled PROJ databases
+            # cannot resolve. The plain (non-cutline) crop path needs no such
+            # lookup and subsets a regular NWP grid correctly.
+            cropped = dataset.crop(bbox=bbox, epsg=4326, touch=False)
             target = self.root_dir / cog_name(
                 meta["model_key"], meta["cycle"], meta["step"]
             )

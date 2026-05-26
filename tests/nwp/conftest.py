@@ -82,9 +82,10 @@ class _FakeDataset:
         self.converted = True
         return self
 
-    def crop(self, bbox: Any = None, epsg: Any = None) -> _FakeDataset:
-        """Record the crop bbox / epsg and return self."""
+    def crop(self, bbox: Any = None, epsg: Any = None, touch: bool = True) -> _FakeDataset:
+        """Record the crop bbox / epsg / touch and return self."""
         self.cropped = (tuple(bbox), epsg)
+        self.touch = touch
         return self
 
 
