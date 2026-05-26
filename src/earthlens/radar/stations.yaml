@@ -1,0 +1,33 @@
+# NEXRAD WSR-88D site registry for earthlens.radar.
+#
+# A curated subset of the ~160-site network (id -> name / lat / lon / state),
+# used to give fetched volumes a point geometry and to resolve which radars
+# fall in a bounding box. Any valid four-letter site id can be fetched even if
+# it is absent here (the volume simply gets no geometry). Coordinates are the
+# published WSR-88D antenna locations (degrees; west negative).
+stations:
+  KTLX: {name: "Oklahoma City, OK", latitude: 35.3331, longitude: -97.2778, state: OK}
+  KICT: {name: "Wichita, KS", latitude: 37.6545, longitude: -97.4431, state: KS}
+  KFWS: {name: "Dallas/Fort Worth, TX", latitude: 32.5731, longitude: -97.3031, state: TX}
+  KEWX: {name: "Austin/San Antonio, TX", latitude: 29.7039, longitude: -98.0289, state: TX}
+  KHGX: {name: "Houston/Galveston, TX", latitude: 29.4719, longitude: -95.0792, state: TX}
+  KMAF: {name: "Midland/Odessa, TX", latitude: 31.9433, longitude: -102.1894, state: TX}
+  KLZK: {name: "Little Rock, AR", latitude: 34.8364, longitude: -92.2622, state: AR}
+  KEAX: {name: "Kansas City, MO", latitude: 38.8103, longitude: -94.2644, state: MO}
+  KLSX: {name: "St. Louis, MO", latitude: 38.6986, longitude: -90.6828, state: MO}
+  KLOT: {name: "Chicago, IL", latitude: 41.6044, longitude: -88.0847, state: IL}
+  KMPX: {name: "Minneapolis, MN", latitude: 44.8489, longitude: -93.5656, state: MN}
+  KFTG: {name: "Denver, CO", latitude: 39.7866, longitude: -104.5458, state: CO}
+  KIWA: {name: "Phoenix, AZ", latitude: 33.2891, longitude: -111.6700, state: AZ}
+  KVTX: {name: "Los Angeles, CA", latitude: 34.4117, longitude: -119.1797, state: CA}
+  KMUX: {name: "San Francisco, CA", latitude: 37.1551, longitude: -121.8983, state: CA}
+  KATX: {name: "Seattle, WA", latitude: 48.1947, longitude: -122.4956, state: WA}
+  KFFC: {name: "Atlanta, GA", latitude: 33.3636, longitude: -84.5658, state: GA}
+  KTBW: {name: "Tampa Bay, FL", latitude: 27.7056, longitude: -82.4017, state: FL}
+  KMLB: {name: "Melbourne, FL", latitude: 28.1133, longitude: -80.6542, state: FL}
+  KAMX: {name: "Miami, FL", latitude: 25.6111, longitude: -80.4128, state: FL}
+  KLWX: {name: "Washington/Baltimore", latitude: 38.9753, longitude: -77.4778, state: VA}
+  KDIX: {name: "Philadelphia, PA", latitude: 39.9472, longitude: -74.4108, state: NJ}
+  KOKX: {name: "New York City, NY", latitude: 40.8656, longitude: -72.8639, state: NY}
+  KBOX: {name: "Boston, MA", latitude: 41.9558, longitude: -71.1369, state: MA}
+  KABR: {name: "Aberdeen, SD", latitude: 45.4558, longitude: -98.4131, state: SD}

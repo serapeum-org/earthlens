@@ -79,9 +79,11 @@ class TestRegistry:
             "gdacs",
             "gee",
             "google-earth-engine",
+            "nexrad",
             "nwp",
             "openaq",
             "planetary-computer",
+            "radar",
             "stac",
             "tropycal",
         ]
