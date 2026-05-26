@@ -1,0 +1,95 @@
+# Curated CDSE openEO collections (logical key -> collection metadata).
+#
+# `collection_id` is the UPPERCASE openEO id verified live against
+# https://openeo.dataspace.copernicus.eu (A1). `bands` is the full band set from
+# `describe_collection`; `default_bands` is what `load_collection` pulls when a
+# request names no bands. These are a curated subset; the full set of every
+# collection id the backend serves is in `_index.yaml::available_collections`.
+collections:
+  sentinel-2-l2a:
+    collection_id: SENTINEL2_L2A
+    description: Sentinel-2 MSI Level-2A surface reflectance (atmospherically corrected).
+    cadence: 5-day
+    resolution: 10.0
+    bands:
+      [B01, B02, B03, B04, B05, B06, B07, B08, B8A, B09, B11, B12, WVP, AOT,
+       SCL, sunAzimuthAngles, sunZenithAngles, viewAzimuthMean, viewZenithMean,
+       CLD, SNW]
+    default_bands: [B02, B03, B04, B08]
+    extent:
+      start_date: "2015-06-27"
+      bbox: [-180.0, -90.0, 180.0, 90.0]
+
+  sentinel-2-l1c:
+    collection_id: SENTINEL2_L1C
+    description: Sentinel-2 MSI Level-1C top-of-atmosphere reflectance.
+    cadence: 5-day
+    resolution: 10.0
+    bands:
+      [B01, B02, B03, B04, B05, B06, B07, B08, B8A, B09, B10, B11, B12]
+    default_bands: [B02, B03, B04, B08]
+    extent:
+      start_date: "2015-06-27"
+      bbox: [-180.0, -90.0, 180.0, 90.0]
+
+  sentinel-1-grd:
+    collection_id: SENTINEL1_GRD
+    description: Sentinel-1 C-band SAR Ground Range Detected backscatter.
+    cadence: 6-day
+    resolution: 10.0
+    bands: [HH, HV, VH, VV]
+    default_bands: [VV, VH]
+    extent:
+      start_date: "2014-10-03"
+      bbox: [-180.0, -90.0, 180.0, 90.0]
+
+  sentinel-3-olci-l2-water:
+    collection_id: SENTINEL3_OLCI_L2_WATER
+    description: Sentinel-3 OLCI Level-2 ocean/water products (chlorophyll, TSM, Kd490).
+    cadence: ~2-day
+    resolution: 300.0
+    bands:
+      [FLAGS, IWV, CHL_OC4ME, TSM_NN, PAR, KD490_M07, A865, T865, CHL_NN,
+       ADG443_NN, B01, B02, B03, B04, B05, B06, B07, B08, B09, B10, B11, B12,
+       B16, B17, B18, B21]
+    default_bands: [CHL_NN, TSM_NN]
+    extent:
+      start_date: "2016-04-25"
+      bbox: [-180.0, -90.0, 180.0, 90.0]
+
+  sentinel-3-olci-l2-land:
+    collection_id: SENTINEL3_OLCI_L2_LAND
+    description: Sentinel-3 OLCI Level-2 land products (OTCI, GIFAPAR).
+    cadence: ~2-day
+    resolution: 300.0
+    bands: [GIFAPAR, IWV, OTCI, RC681, RC865, LQSF]
+    default_bands: [OTCI, GIFAPAR]
+    extent:
+      start_date: "2016-04-25"
+      bbox: [-180.0, -90.0, 180.0, 90.0]
+
+  sentinel-5p-l2:
+    collection_id: SENTINEL_5P_L2
+    description: Sentinel-5P TROPOMI Level-2 atmospheric composition (NO2, CO, O3, SO2, CH4, …).
+    cadence: daily
+    resolution: 5500.0
+    bands:
+      [CO, HCHO, NO2, O3, SO2, CH4, AER_AI_340_380, AER_AI_354_388,
+       CLOUD_BASE_PRESSURE, CLOUD_TOP_PRESSURE, CLOUD_BASE_HEIGHT,
+       CLOUD_TOP_HEIGHT, CLOUD_OPTICAL_THICKNESS, CLOUD_FRACTION, dataMask]
+    default_bands: [NO2]
+    extent:
+      start_date: "2018-04-30"
+      bbox: [-180.0, -85.0, 180.0, 85.0]
+
+  copernicus-dem-30:
+    collection_id: COPERNICUS_30
+    description: Copernicus GLO-30 global digital elevation model (30 m).
+    cadence: static
+    resolution: 30.0
+    bands: [DEM]
+    default_bands: [DEM]
+    extent:
+      start_date: "2010-12-12"
+      end_date: "2015-01-16"
+      bbox: [-180.0, -90.0, 180.0, 90.0]
