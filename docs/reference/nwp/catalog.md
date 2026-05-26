@@ -100,11 +100,33 @@ selector:
 | `cape` | `:CAPE:surface:` | `cape` | `CAPE_ML` |
 | `downward_shortwave_radiation` | `:DSWRF:surface:` | `ssrd` | — (no single token) |
 
-11–12 bands per forecast model (analyses `rtma`/`urma` carry the 9 non-flux
-fields). Not every model publishes every band — a requested band a model
-doesn't carry is skipped under `errors="warn"` (it is not a hard error). The
-DWD tokens are HEAD-validated live for `icon-eu`; the ECMWF flux tokens
+11–12 surface bands per forecast model (analyses `rtma`/`urma` carry the 9
+non-flux fields). Not every model publishes every band — a requested band a
+model doesn't carry is skipped under `errors="warn"` (it is not a hard error).
+The DWD tokens are HEAD-validated live for `icon-eu`; the ECMWF flux tokens
 (`cape`/`ssrd`) may be outside the open-data subset for some runs and skip.
+
+### Pressure-level (3-D) fields
+
+The Herbie (NOAA / ECCC) and ECMWF models also expose 3-D fields —
+geopotential height, temperature, u-/v-wind at **850 / 500 / 250 hPa**, and
+relative humidity at 850 / 500 hPa (so 26 bands each):
+
+| Parameter | NOAA / ECCC (Herbie) | ECMWF (`param@level`) |
+|-----------|----------------------|-----------------------|
+| `geopotential_height_500hPa` | `:HGT:500 mb:` | `gh@500` |
+| `temperature_850hPa` | `:TMP:850 mb:` | `t@850` |
+| `wind_u_250hPa` | `:UGRD:250 mb:` | `u@250` |
+| `relative_humidity_850hPa` | `:RH:850 mb:` | `r@850` |
+
+For Herbie the level is part of the `.idx` regex (no special handling). For
+ECMWF the `param@level` token sets `levtype=pl` + `levelist`; the centre issues
+one `retrieve` per level type / level and concatenates them, since
+`ecmwf-opendata` cannot mix level types in a single request.
+
+**DWD ICON** and **Météo-France** 3-D fields are a follow-on — their
+pressure-level data lives under a separate file path / WCS coverage-id structure
+than the single-level rows here.
 
 ```python
 from earthlens.nwp import Catalog
