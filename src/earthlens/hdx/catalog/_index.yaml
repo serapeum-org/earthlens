@@ -1,0 +1,9 @@
+# Informational index of HDX datasets discovered by the C7 refresh tool
+# (tools/hdx/refresh_hdx_catalog.py) for the curated organisations / themes.
+# This is NOT the full ~21k HDX catalogue — it is the curated orgs' datasets,
+# the analogue of earthlens.earthdata's available_datasets index. Runtime code
+# does not consume this list; it is a browse aid surfaced in the docs.
+#
+# Regenerate with:
+#   python -m tools.hdx.refresh_hdx_catalog refresh --org kontur --org hot ...
+available_datasets: []

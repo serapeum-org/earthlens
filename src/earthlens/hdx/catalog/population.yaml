@@ -1,0 +1,16 @@
+# Curated HDX datasets — population & settlement layers.
+#
+# Each entry maps a friendly key to one HDX/CKAN dataset. `hdx_id` is the
+# dataset `name` on data.humdata.org (what Dataset.read_from_hdx takes).
+# `formats` are CKAN format *labels* (what r["format"] returns), not file
+# extensions. `resource_filter` is the default resource filter (a name glob
+# or a format label); empty means "every resource".
+datasets:
+  kontur-population:
+    hdx_id: kontur-population-dataset
+    org: kontur
+    title: "Kontur Population: Global Population Density for 400m H3 Hexagons"
+    themes: [population]
+    formats: [Geopackage]
+    resource_filter: "*.gpkg.gz"
+    output_kinds: [vector]

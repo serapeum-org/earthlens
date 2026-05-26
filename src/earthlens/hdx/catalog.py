@@ -1,0 +1,321 @@
+"""Dataset-catalog loader for the Humanitarian Data Exchange backend.
+
+Hosts :class:`Catalog`, the pydantic-backed reader for the bundled HDX
+catalog. Mirrors the shape of :mod:`earthlens.earthdata.catalog` and
+:mod:`earthlens.cmems.catalog`: the catalog ships as a directory of
+per-theme YAML files at `src/earthlens/hdx/catalog/`
+(`population.yaml`, `buildings.yaml`, `boundaries.yaml`, …) plus a
+single `_index.yaml` carrying the merged `available_datasets:` list
+(the `C7` auto-generated index). Each per-theme file contributes its
+`datasets:` block; the loader unions them into one :class:`Catalog` at
+construction time.
+
+A friendly dataset key (e.g. `"kontur-population"`) resolves to an
+:class:`HdxDataset` via :meth:`Catalog.get_dataset` / `Catalog()["..."]`
+/ :meth:`Catalog.resolve`. The row carries the fields the backend needs
+to address one HDX dataset and filter its resources: the CKAN
+`hdx_id` (the dataset's `name` on `data.humdata.org`), the owning
+`org`, a human `title`, the `themes` it belongs to, the CKAN format
+labels its resources carry (`"Geopackage"`, `"CSV"`, `"GeoTIFF"`), an
+optional default `resource_filter`, and the informational
+`output_kinds` those resources map onto.
+
+`available_datasets:` is the informational index of every HDX dataset
+the `C7` refresh tool found for the curated orgs/themes; the curated
+`datasets:` map is the small vetted subset the maintainer hand-checks.
+The path to the bundled catalog directory lives at
+:data:`CATALOG_PATH`; tests can monkey-patch that module attribute to
+redirect the loader at a temporary directory or single YAML file.
+"""
+
+from __future__ import annotations
+
+from pathlib import Path
+from typing import Any, Literal
+
+from pydantic import BaseModel, ConfigDict, Field, ValidationError
+
+from earthlens.base import AbstractCatalog
+from earthlens.base.yaml_loader import load_yaml_strict
+
+CATALOG_PATH: Path = Path(__file__).parent / "catalog"
+
+# Module-level cache of parsed catalog data, keyed on the resolved path
+# plus a tuple of `(file, mtime_ns)` for every YAML the load touched, so
+# editing any per-theme file invalidates the entry without inspecting
+# every row. Mirrors the Earthdata / CMEMS multi-file pattern.
+_CATALOG_CACHE: dict[Any, tuple[list[str], dict[str, "HdxDataset"]]] = {}
+
+OutputKindLiteral = Literal["raster", "vector", "tabular", "mixed"]
+
+
+def clear_catalog_cache() -> None:
+    """Empty the module-level catalog parse cache.
+
+    Useful in tests that rewrite the catalog on disk and want to force
+    a re-parse. Production callers do not need this — the cache keys
+    include every contributing file's `st_mtime_ns`, so any real file
+    mutation invalidates the entry on its own.
+    """
+    _CATALOG_CACHE.clear()
+
+
+def _yaml_files_for(path: Path) -> list[Path]:
+    """Return the sorted list of YAML files that contribute to a load.
+
+    `path` may point at either a directory of per-theme `*.yaml` files
+    (the default layout) or a single `*.yaml` file (back-compat for
+    tests that monkey-patch :data:`CATALOG_PATH` to a temp file).
+
+    Args:
+        path: Catalog directory or single YAML file.
+
+    Returns:
+        Sorted list of YAML paths. For a directory, every `*.yaml`
+            sibling (including `_index.yaml`); for a file, just that
+            file.
+
+    Raises:
+        ValueError: If `path` is neither an existing directory nor an
+            existing file.
+    """
+    if path.is_dir():
+        return sorted(path.glob("*.yaml"))
+    if path.is_file():
+        return [path]
+    raise ValueError(
+        f"HDX catalog path {path} does not exist (expected a directory of "
+        "per-theme *.yaml files, or a single YAML file)."
+    )
+
+
+def _load_catalog_data(path: Path) -> tuple[list[str], dict[str, "HdxDataset"]]:
+    """Parse, validate, and cache the HDX catalog at `path`.
+
+    Returns a `(available_datasets, datasets)` tuple. When `path` is a
+    directory, every `*.yaml` file is merged: `available_datasets:`
+    lists are concatenated and `datasets:` maps are unioned (a dataset
+    key declared in two files is an error). Cached on the resolved path
+    plus every contributing file's `mtime_ns`.
+
+    Args:
+        path: Catalog directory (default `src/earthlens/hdx/catalog/`)
+            or a single `*.yaml` file.
+
+    Returns:
+        Tuple of `(list[str], dict[str, HdxDataset])` — the merged
+            `available_datasets:` index and the curated `datasets:` map.
+
+    Raises:
+        ValueError: If no file has a `datasets:` block, a dataset key
+            is declared in two files, or a dataset fails validation.
+    """
+    resolved = str(path.resolve())
+    files = _yaml_files_for(path)
+    try:
+        mtime_tuple = tuple((str(f), f.stat().st_mtime_ns) for f in files)
+    except FileNotFoundError:
+        mtime_tuple = ((resolved, 0),)
+    key = (resolved, mtime_tuple)
+    cached = _CATALOG_CACHE.get(key)
+    if cached is not None:
+        return cached
+
+    merged_available: list[str] = []
+    merged_datasets_yaml: dict[str, Any] = {}
+    origin: dict[str, Path] = {}
+    for file_path in files:
+        data = load_yaml_strict(file_path) or {}
+        merged_available.extend(data.get("available_datasets") or [])
+        for ds_key, ds_body in (data.get("datasets") or {}).items():
+            if ds_key in merged_datasets_yaml:
+                raise ValueError(
+                    f"dataset {ds_key!r} declared in two catalog files: "
+                    f"{origin[ds_key]} and {file_path}"
+                )
+            merged_datasets_yaml[ds_key] = ds_body
+            origin[ds_key] = file_path
+
+    if not merged_datasets_yaml:
+        raise ValueError(
+            f"{path} is missing or has an empty 'datasets:' block. "
+            "The catalog must contain at least one curated dataset."
+        )
+
+    structural: dict[str, HdxDataset] = {}
+    for ds_key, ds_body in merged_datasets_yaml.items():
+        try:
+            structural[ds_key] = HdxDataset(**dict(ds_body or {}))
+        except ValidationError as exc:
+            raise ValueError(
+                f"{origin[ds_key]} dataset {ds_key!r} failed validation:\n{exc}"
+            ) from exc
+
+    _CATALOG_CACHE[key] = (merged_available, structural)
+    return _CATALOG_CACHE[key]
+
+
+class HdxDataset(BaseModel):
+    """One curated HDX dataset row.
+
+    Mirrors a single `datasets.<key>:` block in one of the per-theme
+    `catalog/*.yaml` files. The friendly dataset key itself is the
+    parent key in :attr:`Catalog.datasets` and is not stored on the
+    row; :attr:`hdx_id` is the CKAN-side identifier the backend reads.
+
+    Attributes:
+        hdx_id: The HDX/CKAN dataset `name` (the identifier
+            `Dataset.read_from_hdx` takes), e.g.
+            `"kontur-population-dataset"`.
+        org: The owning HDX organisation slug (`"kontur"`, `"hot"`,
+            `"meta-data-for-good"`, …).
+        title: Human-readable dataset title.
+        themes: Theme tags this dataset belongs to (`["population"]`),
+            used for browsing / the docs reference.
+        formats: CKAN format *labels* the dataset's resources carry —
+            `"Geopackage"`, `"CSV"`, `"GeoTIFF"`, `"GeoJSON"` (a label,
+            not a file extension; this is what `r["format"]` returns).
+        resource_filter: Optional default filter applied to the
+            dataset's resources when the request names no explicit
+            filter — a name glob (`"*.gpkg.gz"`) or a CKAN format label
+            (`"Geopackage"`). Empty means "every resource".
+        output_kinds: Informational — the pyramids output kinds the
+            dataset's resources map onto (`["vector"]`, `["raster"]`,
+            `["tabular"]`, or several when the dataset is mixed). The
+            backend's `OUTPUT_KIND` is the fixed class value `"mixed"`;
+            this field documents the per-dataset reality.
+
+    Examples:
+        - Inspect a curated vector row:
+            ```python
+            >>> from earthlens.hdx import Catalog
+            >>> ds = Catalog().get_dataset("kontur-population")
+            >>> ds.org
+            'kontur'
+            >>> ds.output_kinds
+            ['vector']
+
+            ```
+    """
+
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    hdx_id: str
+    org: str = ""
+    title: str = ""
+    themes: list[str] = Field(default_factory=list)
+    formats: list[str] = Field(default_factory=list)
+    resource_filter: str = ""
+    output_kinds: list[OutputKindLiteral] = Field(default_factory=list)
+
+
+class Catalog(AbstractCatalog):
+    """Dataset catalog for the Humanitarian Data Exchange backend.
+
+    Reads the bundled `catalog/` directory (shipped as package data)
+    and exposes its consumed top-level sections as typed pydantic
+    fields. Instantiate with no arguments (`Catalog()`) —
+    :func:`model_post_init` parses the YAML and populates every field
+    in one pass.
+
+    Attributes:
+        available_datasets: Informational list of every HDX dataset the
+            `C7` refresh tool found for the curated orgs/themes. Runtime
+            code does not consume it.
+        datasets: Structural map keyed by the curated dataset key. Each
+            value is an :class:`HdxDataset`.
+
+    Examples:
+        - Resolve a curated dataset:
+            ```python
+            >>> from earthlens.hdx import Catalog
+            >>> "kontur-population" in Catalog()
+            True
+
+            ```
+    """
+
+    _catalog_kind: str = "HDX catalog"
+
+    available_datasets: list[str] = Field(default_factory=list)
+    datasets: dict[str, HdxDataset] = Field(default_factory=dict)
+
+    def model_post_init(self, __context: Any) -> None:
+        """Auto-load the bundled catalog when no datasets were supplied.
+
+        `Catalog()` with no args is sugar for `Catalog.load()` — it
+        reads the bundled `catalog/` directory through the
+        `(path, mtime)`-keyed cache so repeated construction is fast. If
+        the caller passed `datasets=...`, the disk read is skipped.
+
+        Raises:
+            ValueError: When auto-loading, propagates the same errors as
+                :meth:`load`.
+        """
+        if self.datasets:
+            return
+        loaded = Catalog.load()
+        self.available_datasets = loaded.available_datasets
+        self.datasets = loaded.datasets
+
+    @classmethod
+    def load(cls, catalog_path: Path | None = None) -> Catalog:
+        """Read the HDX catalog from disk (cached).
+
+        Args:
+            catalog_path: Path to the `catalog/` directory or a single
+                `*.yaml` file. Defaults to module-level
+                :data:`CATALOG_PATH`.
+
+        Returns:
+            A fully-populated :class:`Catalog`.
+
+        Raises:
+            ValueError: Propagated from :func:`_load_catalog_data`.
+        """
+        catalog_path = catalog_path if catalog_path is not None else CATALOG_PATH
+        available_datasets, datasets = _load_catalog_data(catalog_path)
+        return cls(
+            available_datasets=list(available_datasets),
+            datasets=dict(datasets),
+        )
+
+    def get_catalog(self) -> dict[str, HdxDataset]:
+        """Return the structural per-dataset map.
+
+        Satisfies the abstract base's contract; the actual parsing is
+        done in :func:`model_post_init`.
+
+        Returns:
+            dict[str, HdxDataset]: One entry per curated dataset. Same
+                object as :attr:`datasets`.
+        """
+        return self.datasets
+
+    def resolve(self, key: str) -> HdxDataset:
+        """Resolve a curated dataset key to its :class:`HdxDataset` row.
+
+        Thin wrapper over the base :meth:`get_dataset` (which raises a
+        `ValueError` with a did-you-mean hint on an unknown key), named
+        `resolve` to match the Earthdata backend's catalog surface.
+
+        Args:
+            key: Curated dataset key (a member of :attr:`datasets`).
+
+        Returns:
+            HdxDataset: The resolved row.
+
+        Raises:
+            ValueError: When `key` is unknown (with a did-you-mean
+                hint).
+
+        Examples:
+            - Resolve a key and read its HDX id:
+                ```python
+                >>> from earthlens.hdx import Catalog
+                >>> Catalog().resolve("kontur-population").hdx_id
+                'kontur-population-dataset'
+
+                ```
+        """
+        return self.get_dataset(key)
