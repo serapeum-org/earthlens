@@ -14,3 +14,84 @@ datasets:
     formats: [Geopackage]
     resource_filter: "*.gpkg.gz"
     output_kinds: [vector]
+
+  meta-hrsl-global:
+    hdx_id: highresolutionpopulationdensitymaps
+    org: meta
+    title: "High Resolution Population Density Maps (global, 30m)"
+    themes: [population]
+    formats: [GeoTIFF]
+    resource_filter: GeoTIFF
+    output_kinds: [raster]
+
+  meta-hrsl-nigeria:
+    hdx_id: highresolutionpopulationdensitymaps-nga
+    org: meta
+    title: "Nigeria: High Resolution Population Density Maps + Demographic Estimates"
+    themes: [population]
+    formats: [zip]
+    resource_filter: "*.zip"
+    output_kinds: [raster]
+
+  meta-hrsl-tanzania:
+    hdx_id: highresolutionpopulationdensitymaps-tza
+    org: meta
+    title: "Tanzania: High Resolution Population Density Maps + Demographic Estimates"
+    themes: [population]
+    formats: [zip]
+    resource_filter: "*.zip"
+    output_kinds: [raster]
+
+  meta-hrsl-south-africa:
+    hdx_id: highresolutionpopulationdensitymaps-zaf
+    org: meta
+    title: "South Africa: High Resolution Population Density Maps + Demographic Estimates"
+    themes: [population]
+    formats: [zip]
+    resource_filter: "*.zip"
+    output_kinds: [raster]
+
+  meta-hrsl-drc:
+    hdx_id: highresolutionpopulationdensitymaps-cod
+    org: meta
+    title: "DR Congo: High Resolution Population Density Maps + Demographic Estimates"
+    themes: [population]
+    formats: [zip]
+    resource_filter: "*.zip"
+    output_kinds: [raster]
+
+  worldpop-kenya:
+    hdx_id: worldpop-population-counts-for-kenya
+    org: worldpop
+    title: "Kenya: WorldPop Population Counts (100m gridded)"
+    themes: [population]
+    formats: [GeoTIFF]
+    resource_filter: GeoTIFF
+    output_kinds: [raster]
+
+  worldpop-ethiopia:
+    hdx_id: worldpop-population-counts-for-ethiopia
+    org: worldpop
+    title: "Ethiopia: WorldPop Population Counts (100m gridded)"
+    themes: [population]
+    formats: [GeoTIFF]
+    resource_filter: GeoTIFF
+    output_kinds: [raster]
+
+  worldpop-egypt:
+    hdx_id: worldpop-population-counts-for-egypt
+    org: worldpop
+    title: "Egypt: WorldPop Population Counts (100m gridded)"
+    themes: [population]
+    formats: [GeoTIFF]
+    resource_filter: GeoTIFF
+    output_kinds: [raster]
+
+  worldpop-sudan:
+    hdx_id: worldpop-population-counts-for-sudan
+    org: worldpop
+    title: "Sudan: WorldPop Population Counts (100m gridded)"
+    themes: [population]
+    formats: [GeoTIFF]
+    resource_filter: GeoTIFF
+    output_kinds: [raster]

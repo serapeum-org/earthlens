@@ -1,0 +1,93 @@
+# Curated HDX datasets — HOTOSM OpenStreetMap exports (buildings, roads,
+# waterways, points of interest). All vector; resources come as
+# GeoPackage / Shapefile / GeoJSON per country export.
+datasets:
+  hotosm-srilanka-buildings:
+    hdx_id: hotosm_lka_buildings
+    org: hot
+    title: "Sri Lanka: Buildings (OpenStreetMap Export)"
+    themes: [buildings, openstreetmap]
+    formats: [Geopackage, SHP]
+    resource_filter: Geopackage
+    output_kinds: [vector]
+
+  hotosm-srilanka-roads:
+    hdx_id: hotosm_lka_roads
+    org: hot
+    title: "Sri Lanka: Roads (OpenStreetMap Export)"
+    themes: [roads, openstreetmap]
+    formats: [Geopackage, SHP]
+    resource_filter: Geopackage
+    output_kinds: [vector]
+
+  hotosm-srilanka-waterways:
+    hdx_id: hotosm_lka_waterways
+    org: hot
+    title: "Sri Lanka: Waterways (OpenStreetMap Export)"
+    themes: [waterways, openstreetmap]
+    formats: [Geopackage, SHP, GeoJSON]
+    resource_filter: Geopackage
+    output_kinds: [vector]
+
+  hotosm-srilanka-poi:
+    hdx_id: hotosm_lka_points_of_interest
+    org: hot
+    title: "Sri Lanka: Points of Interest (OpenStreetMap Export)"
+    themes: [poi, openstreetmap]
+    formats: [Geopackage, SHP, GeoJSON]
+    resource_filter: Geopackage
+    output_kinds: [vector]
+
+  hotosm-bangladesh-buildings:
+    hdx_id: hotosm_bgd_buildings
+    org: hot
+    title: "Bangladesh: Buildings (OpenStreetMap Export)"
+    themes: [buildings, openstreetmap]
+    formats: [Geopackage, SHP]
+    resource_filter: Geopackage
+    output_kinds: [vector]
+
+  hotosm-bangladesh-roads:
+    hdx_id: hotosm_bgd_roads
+    org: hot
+    title: "Bangladesh: Roads (OpenStreetMap Export)"
+    themes: [roads, openstreetmap]
+    formats: [Geopackage, SHP]
+    resource_filter: Geopackage
+    output_kinds: [vector]
+
+  hotosm-uganda-buildings:
+    hdx_id: hotosm_uga_buildings
+    org: hot
+    title: "Uganda: Buildings (OpenStreetMap Export)"
+    themes: [buildings, openstreetmap]
+    formats: [Geopackage, SHP]
+    resource_filter: Geopackage
+    output_kinds: [vector]
+
+  hotosm-uganda-roads:
+    hdx_id: hotosm_uga_roads
+    org: hot
+    title: "Uganda: Roads (OpenStreetMap Export)"
+    themes: [roads, openstreetmap]
+    formats: [Geopackage, SHP]
+    resource_filter: Geopackage
+    output_kinds: [vector]
+
+  hotosm-uganda-waterways:
+    hdx_id: hotosm_uga_waterways
+    org: hot
+    title: "Uganda: Waterways (OpenStreetMap Export)"
+    themes: [waterways, openstreetmap]
+    formats: [Geopackage, SHP, GeoJSON]
+    resource_filter: Geopackage
+    output_kinds: [vector]
+
+  hotosm-uruguay-buildings:
+    hdx_id: hotosm_ury_buildings
+    org: hot
+    title: "Uruguay: Buildings (OpenStreetMap Export)"
+    themes: [buildings, openstreetmap]
+    formats: [Geopackage, SHP]
+    resource_filter: Geopackage
+    output_kinds: [vector]
