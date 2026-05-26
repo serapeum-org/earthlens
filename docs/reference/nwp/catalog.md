@@ -123,7 +123,9 @@ The DWD tokens are HEAD-validated live for `icon-eu`; the ECMWF flux tokens
 
 Every forecast model (all centres) also exposes 3-D fields —
 geopotential height, temperature, u-/v-wind, and relative humidity at
-**925 / 850 / 700 / 500 / 300 / 250 / 200 / 100 hPa** (so ~52 bands each):
+**13 isobaric levels: 1000 / 925 / 850 / 700 / 600 / 500 / 400 / 300 / 250 /
+200 / 150 / 100 / 50 hPa** (so ~77 bands each on the global models; the
+ICON-EPS ensembles are surface-only):
 
 | Parameter | NOAA / ECCC (Herbie) | ECMWF (`param@level`) |
 |-----------|----------------------|-----------------------|
