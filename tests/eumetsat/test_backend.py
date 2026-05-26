@@ -69,8 +69,28 @@ def test_search_calls_collection_with_bbox_and_dates(fake_eumdac, tmp_path):
     assert call["collection"] == "EO:EUM:DAT:MSG:HRSEVIRI"
     assert call["bbox"] == "-1.0,50.0,1.0,52.0"  # W,S,E,N axis order (A1)
     assert call["dtstart"] == backend.time.start_date
-    assert call["dtend"] == backend.time.end_date
     assert [p.id for p in products] == ["p1"]
+
+
+def test_search_dtend_extends_to_end_of_day(fake_eumdac, tmp_path):
+    """A same-day window is widened to 23:59:59.999999 so it is not zero-width."""
+    fake_eumdac.store.products_for["EO:EUM:DAT:MSG:HRSEVIRI"] = [_FakeProduct("p1")]
+    backend = EUMETSAT(
+        start="2024-06-01",
+        end="2024-06-01",
+        variables={"msg-hrseviri": ["HRSEVIRI"]},
+        lat_lim=[50.0, 52.0],
+        lon_lim=[-1.0, 1.0],
+        path=str(tmp_path),
+        **_CREDS,
+    )
+    backend._search()
+    call = fake_eumdac.store.search_calls[0]
+    assert call["dtstart"] == backend.time.start_date
+    assert call["dtend"] == backend.time.end_date.replace(
+        hour=23, minute=59, second=59, microsecond=999999
+    )
+    assert call["dtstart"] < call["dtend"]  # window is non-empty
 
 
 def test_fetch_streams_each_product_to_disk(fake_eumdac, tmp_path):

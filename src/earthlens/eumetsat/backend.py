@@ -305,14 +305,22 @@ class EUMETSAT(AbstractDataSource):
         self._auth.configure()
         store = self._auth.datastore()
         bboxes = antimeridian_bboxes(self.space)
+        # `end_date` parses to midnight, so a same-day request (start == end)
+        # would otherwise collapse to the zero-width instant 00:00:00 and match
+        # (almost) no products. Extend the end bound to the end of its calendar
+        # day so an inclusive `end` covers the whole day's products.
+        dtstart = self.time.start_date
+        dtend = self.time.end_date.replace(
+            hour=23, minute=59, second=59, microsecond=999999
+        )
         products: list[RemoteProduct] = []
         for col in self._collections:
             collection = store.get_collection(col.collection_id)
             for bbox in bboxes:
                 for product in collection.search(
                     bbox=bbox,
-                    dtstart=self.time.start_date,
-                    dtend=self.time.end_date,
+                    dtstart=dtstart,
+                    dtend=dtend,
                 ):
                     products.append(
                         RemoteProduct(
