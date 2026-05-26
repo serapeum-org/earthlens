@@ -1,0 +1,316 @@
+# Sentinel-3 marine mirror: OLCI / SLSTR / SRAL, NRT + reprocessed baselines.
+# Ids, titles and start dates walked from the public browse endpoint
+# (api.eumetsat.int/data/browse/collections) on 2026-05-26. Hand-tuned rows
+# (HRSEVIRI, the S5P gases, ASCAT soil moisture, the MTG suite, ...) keep their
+# vetted metadata; the rest carry browse-derived format/output_kind/cadence
+# heuristics (advisory for the whole-product download) refined per product as
+# needed. Reconcile with tools/eumetsat/audit_eumetsat_catalog.py.
+datasets:
+  s3-olci-1b-full-resolution:
+    collection_id: "EO:EUM:DAT:0885"
+    group: Sentinel-3
+    mission: sentinel-3
+    output_kind: raster
+    format: netcdf
+    cadence: subdaily
+    selectors: []
+    tailor_product_type: null
+    extent: { lat: [-90, 90], lon: [-180, 180] }
+    temporal: { start: 2016-04-06, end: 2024-07-25 }
+  s3-olci-1b-reduced-resolution:
+    collection_id: "EO:EUM:DAT:0410"
+    group: Sentinel-3
+    mission: sentinel-3
+    output_kind: raster
+    format: netcdf
+    cadence: subdaily
+    selectors: []
+    tailor_product_type: null
+    extent: { lat: [-90, 90], lon: [-180, 180] }
+    temporal: { start: 2024-07-26, end: null }
+  s3-olci-1b-reduced-resolution-2:
+    collection_id: "EO:EUM:DAT:0886"
+    group: Sentinel-3
+    mission: sentinel-3
+    output_kind: raster
+    format: netcdf
+    cadence: subdaily
+    selectors: []
+    tailor_product_type: null
+    extent: { lat: [-90, 90], lon: [-180, 180] }
+    temporal: { start: 2016-04-06, end: 2024-07-25 }
+  s3-olci-2-ocean-colour-full-resolution:
+    collection_id: "EO:EUM:DAT:0556"
+    group: Sentinel-3
+    mission: sentinel-3
+    output_kind: raster
+    format: netcdf
+    cadence: subdaily
+    selectors: []
+    tailor_product_type: null
+    extent: { lat: [-90, 90], lon: [-180, 180] }
+    temporal: { start: 2016-04-25, end: 2021-04-28 }
+  s3-olci-2-ocean-colour-reduced-resolution:
+    collection_id: "EO:EUM:DAT:0557"
+    group: Sentinel-3
+    mission: sentinel-3
+    output_kind: raster
+    format: netcdf
+    cadence: subdaily
+    selectors: []
+    tailor_product_type: null
+    extent: { lat: [-90, 90], lon: [-180, 180] }
+    temporal: { start: 2016-04-25, end: 2021-04-28 }
+  s3-olci-l1-efr:
+    collection_id: "EO:EUM:DAT:0409"
+    group: Sentinel-3
+    mission: sentinel-3
+    output_kind: raster
+    format: netcdf
+    cadence: subdaily
+    selectors: [OL_1_EFR]
+    tailor_product_type: OLCEFR
+    extent: { lat: [-90.0, 90.0], lon: [-180.0, 180.0] }
+    temporal: { start: 2016-04-25, end: null }
+  s3-olci-l2-wfr:
+    collection_id: "EO:EUM:DAT:0407"
+    group: Sentinel-3
+    mission: sentinel-3
+    output_kind: raster
+    format: netcdf
+    cadence: subdaily
+    selectors: [OL_2_WFR]
+    tailor_product_type: OLCEFR
+    extent: { lat: [-90.0, 90.0], lon: [-180.0, 180.0] }
+    temporal: { start: 2016-04-25, end: null }
+  s3-olci-l2-wrr:
+    collection_id: "EO:EUM:DAT:0408"
+    group: Sentinel-3
+    mission: sentinel-3
+    output_kind: raster
+    format: netcdf
+    cadence: subdaily
+    selectors: [OL_2_WRR]
+    tailor_product_type: OLCERR
+    extent: { lat: [-90.0, 90.0], lon: [-180.0, 180.0] }
+    temporal: { start: 2016-04-25, end: null }
+  s3-slstr-1b-radiances-brightness-temperatures:
+    collection_id: "EO:EUM:DAT:0581"
+    group: Sentinel-3
+    mission: sentinel-3
+    output_kind: raster
+    format: netcdf
+    cadence: subdaily
+    selectors: []
+    tailor_product_type: null
+    extent: { lat: [-90, 90], lon: [-180, 180] }
+    temporal: { start: 2016-04-19, end: 2018-04-04 }
+  s3-slstr-1b-radiances-brightness-temperatures-2:
+    collection_id: "EO:EUM:DAT:0615"
+    group: Sentinel-3
+    mission: sentinel-3
+    output_kind: raster
+    format: netcdf
+    cadence: subdaily
+    selectors: []
+    tailor_product_type: null
+    extent: { lat: [-90, 90], lon: [-180, 180] }
+    temporal: { start: 2018-05-01, end: 2020-02-16 }
+  s3-slstr-2-aerosol-optical-depth:
+    collection_id: "EO:EUM:DAT:0416"
+    group: Sentinel-3
+    mission: sentinel-3
+    output_kind: raster
+    format: netcdf
+    cadence: subdaily
+    selectors: []
+    tailor_product_type: null
+    extent: { lat: [-90, 90], lon: [-180, 180] }
+    temporal: { start: 2021-01-01, end: null }
+  s3-slstr-2-atmospheric-motion-vectors:
+    collection_id: "EO:EUM:DAT:1003"
+    group: Sentinel-3
+    mission: sentinel-3
+    output_kind: vector
+    format: netcdf
+    cadence: subdaily
+    selectors: []
+    tailor_product_type: null
+    extent: { lat: [-90, 90], lon: [-180, 180] }
+    temporal: { start: 2025-11-23, end: null }
+  s3-slstr-2-fire-radiative-power:
+    collection_id: "EO:EUM:DAT:0417"
+    group: Sentinel-3
+    mission: sentinel-3
+    output_kind: raster
+    format: netcdf
+    cadence: subdaily
+    selectors: []
+    tailor_product_type: null
+    extent: { lat: [-90, 90], lon: [-180, 180] }
+    temporal: { start: 2021-01-01, end: null }
+  s3-slstr-2-sea-surface-temperature:
+    collection_id: "EO:EUM:DAT:0582"
+    group: Sentinel-3
+    mission: sentinel-3
+    output_kind: raster
+    format: netcdf
+    cadence: subdaily
+    selectors: []
+    tailor_product_type: null
+    extent: { lat: [-90, 90], lon: [-180, 180] }
+    temporal: { start: 2016-04-18, end: 2018-04-04 }
+  s3-slstr-l1-rbt:
+    collection_id: "EO:EUM:DAT:0411"
+    group: Sentinel-3
+    mission: sentinel-3
+    output_kind: raster
+    format: netcdf
+    cadence: subdaily
+    selectors: [SL_1_RBT]
+    tailor_product_type: SLSL1RBT
+    extent: { lat: [-90.0, 90.0], lon: [-180.0, 180.0] }
+    temporal: { start: 2016-05-01, end: null }
+  s3-slstr-l2-wst:
+    collection_id: "EO:EUM:DAT:0412"
+    group: Sentinel-3
+    mission: sentinel-3
+    output_kind: raster
+    format: netcdf
+    cadence: subdaily
+    selectors: [SL_2_WST]
+    tailor_product_type: SLSL2WST
+    extent: { lat: [-90.0, 90.0], lon: [-180.0, 180.0] }
+    temporal: { start: 2016-05-01, end: null }
+  s3-sral-1a-unpacked-l0-complex-echoes:
+    collection_id: "EO:EUM:DAT:0583"
+    group: Sentinel-3
+    mission: sentinel-3
+    output_kind: raster
+    format: netcdf
+    cadence: subdaily
+    selectors: []
+    tailor_product_type: null
+    extent: { lat: [-90, 90], lon: [-180, 180] }
+    temporal: { start: 2016-03-01, end: 2019-12-31 }
+  s3-sral-1a-unpacked-l0-complex-echoes-2:
+    collection_id: "EO:EUM:DAT:0836"
+    group: Sentinel-3
+    mission: sentinel-3
+    output_kind: raster
+    format: netcdf
+    cadence: subdaily
+    selectors: []
+    tailor_product_type: null
+    extent: { lat: [-90, 90], lon: [-180, 180] }
+    temporal: { start: 2016-05-05, end: 2023-03-09 }
+  s3-sral-1a-unpacked-l0-complex-echos:
+    collection_id: "EO:EUM:DAT:0413"
+    group: Sentinel-3
+    mission: sentinel-3
+    output_kind: raster
+    format: netcdf
+    cadence: subdaily
+    selectors: []
+    tailor_product_type: null
+    extent: { lat: [-90, 90], lon: [-180, 180] }
+    temporal: { start: 2023-03-10, end: null }
+  s3-sral-1b:
+    collection_id: "EO:EUM:DAT:0406"
+    group: Sentinel-3
+    mission: sentinel-3
+    output_kind: raster
+    format: netcdf
+    cadence: subdaily
+    selectors: []
+    tailor_product_type: null
+    extent: { lat: [-90, 90], lon: [-180, 180] }
+    temporal: { start: 2023-03-10, end: null }
+  s3-sral-1b-2:
+    collection_id: "EO:EUM:DAT:0584"
+    group: Sentinel-3
+    mission: sentinel-3
+    output_kind: raster
+    format: netcdf
+    cadence: subdaily
+    selectors: []
+    tailor_product_type: null
+    extent: { lat: [-90, 90], lon: [-180, 180] }
+    temporal: { start: 2016-03-01, end: 2019-12-31 }
+  s3-sral-1b-3:
+    collection_id: "EO:EUM:DAT:0833"
+    group: Sentinel-3
+    mission: sentinel-3
+    output_kind: raster
+    format: netcdf
+    cadence: subdaily
+    selectors: []
+    tailor_product_type: null
+    extent: { lat: [-90, 90], lon: [-180, 180] }
+    temporal: { start: 2016-05-05, end: 2023-03-09 }
+  s3-sral-1b-stack-echoes:
+    collection_id: "EO:EUM:DAT:0414"
+    group: Sentinel-3
+    mission: sentinel-3
+    output_kind: raster
+    format: netcdf
+    cadence: subdaily
+    selectors: []
+    tailor_product_type: null
+    extent: { lat: [-90, 90], lon: [-180, 180] }
+    temporal: { start: 2023-03-10, end: null }
+  s3-sral-1b-stack-echoes-2:
+    collection_id: "EO:EUM:DAT:0585"
+    group: Sentinel-3
+    mission: sentinel-3
+    output_kind: raster
+    format: netcdf
+    cadence: subdaily
+    selectors: []
+    tailor_product_type: null
+    extent: { lat: [-90, 90], lon: [-180, 180] }
+    temporal: { start: 2016-03-01, end: 2019-12-31 }
+  s3-sral-1b-stack-echoes-3:
+    collection_id: "EO:EUM:DAT:0835"
+    group: Sentinel-3
+    mission: sentinel-3
+    output_kind: raster
+    format: netcdf
+    cadence: subdaily
+    selectors: []
+    tailor_product_type: null
+    extent: { lat: [-90, 90], lon: [-180, 180] }
+    temporal: { start: 2016-05-05, end: 2023-03-09 }
+  s3-sral-2-altimetry-global:
+    collection_id: "EO:EUM:DAT:0586"
+    group: Sentinel-3
+    mission: sentinel-3
+    output_kind: raster
+    format: netcdf
+    cadence: subdaily
+    selectors: []
+    tailor_product_type: null
+    extent: { lat: [-90, 90], lon: [-180, 180] }
+    temporal: { start: 2016-03-01, end: 2019-12-31 }
+  s3-sral-2-altimetry-global-2:
+    collection_id: "EO:EUM:DAT:0834"
+    group: Sentinel-3
+    mission: sentinel-3
+    output_kind: raster
+    format: netcdf
+    cadence: subdaily
+    selectors: []
+    tailor_product_type: null
+    extent: { lat: [-90, 90], lon: [-180, 180] }
+    temporal: { start: 2016-05-05, end: 2023-03-09 }
+  s3-sral-l2-wat:
+    collection_id: "EO:EUM:DAT:0415"
+    group: Sentinel-3
+    mission: sentinel-3
+    output_kind: raster
+    format: netcdf
+    cadence: subdaily
+    selectors: [SR_2_WAT]
+    tailor_product_type: SRASRAL2
+    extent: { lat: [-90.0, 90.0], lon: [-180.0, 180.0] }
+    temporal: { start: 2016-03-01, end: null }

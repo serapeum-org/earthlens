@@ -1,0 +1,305 @@
+# MTG (Meteosat Third Generation) collections — see the curated rows below.
+# Ids, titles and start dates walked from the public browse endpoint
+# (api.eumetsat.int/data/browse/collections) on 2026-05-26. Hand-tuned rows
+# (HRSEVIRI, the S5P gases, ASCAT soil moisture, the MTG suite, ...) keep their
+# vetted metadata; the rest carry browse-derived format/output_kind/cadence
+# heuristics (advisory for the whole-product download) refined per product as
+# needed. Reconcile with tools/eumetsat/audit_eumetsat_catalog.py.
+datasets:
+  mtg-active-fire:
+    collection_id: "EO:EUM:DAT:0682"
+    group: MTG
+    mission: mtg
+    output_kind: raster
+    format: netcdf
+    cadence: subdaily
+    selectors: [FIR]
+    tailor_product_type: null
+    extent: { lat: [-79.0, 79.0], lon: [-79.0, 79.0] }
+    temporal: { start: 2025-07-03, end: null }
+  mtg-active-fire-cap:
+    collection_id: "EO:EUM:DAT:0801"
+    group: MTG
+    mission: mtg
+    output_kind: raster
+    format: cap
+    cadence: subdaily
+    selectors: [FIR]
+    tailor_product_type: null
+    extent: { lat: [-79.0, 79.0], lon: [-79.0, 79.0] }
+    temporal: { start: 2025-07-03, end: null }
+  mtg-amv:
+    collection_id: "EO:EUM:DAT:0676"
+    group: MTG
+    mission: mtg
+    output_kind: vector
+    format: netcdf
+    cadence: subdaily
+    selectors: [AMV]
+    tailor_product_type: null
+    extent: { lat: [-79.0, 79.0], lon: [-79.0, 79.0] }
+    temporal: { start: 2025-01-27, end: null }
+  mtg-amv-bufr:
+    collection_id: "EO:EUM:DAT:0998"
+    group: MTG
+    mission: mtg
+    output_kind: vector
+    format: bufr
+    cadence: subdaily
+    selectors: [AMV]
+    tailor_product_type: null
+    extent: { lat: [-79.0, 79.0], lon: [-79.0, 79.0] }
+    temporal: { start: 2025-01-27, end: null }
+  mtg-asr:
+    collection_id: "EO:EUM:DAT:0677"
+    group: MTG
+    mission: mtg
+    output_kind: raster
+    format: netcdf
+    cadence: subdaily
+    selectors: [ASR]
+    tailor_product_type: null
+    extent: { lat: [-79.0, 79.0], lon: [-79.0, 79.0] }
+    temporal: { start: 2025-01-27, end: null }
+  mtg-asr-bufr:
+    collection_id: "EO:EUM:DAT:0799"
+    group: MTG
+    mission: mtg
+    output_kind: raster
+    format: bufr
+    cadence: subdaily
+    selectors: [ASR]
+    tailor_product_type: null
+    extent: { lat: [-79.0, 79.0], lon: [-79.0, 79.0] }
+    temporal: { start: 2025-01-27, end: null }
+  mtg-clear-sky-reflectance:
+    collection_id: "EO:EUM:DAT:0679"
+    group: MTG
+    mission: mtg
+    output_kind: raster
+    format: netcdf
+    cadence: subdaily
+    selectors: [CRM]
+    tailor_product_type: null
+    extent: { lat: [-79.0, 79.0], lon: [-79.0, 79.0] }
+    temporal: { start: 2025-07-03, end: null }
+  mtg-cloud-mask:
+    collection_id: "EO:EUM:DAT:0678"
+    group: MTG
+    mission: mtg
+    output_kind: raster
+    format: netcdf
+    cadence: 10min
+    selectors: [CLM]
+    tailor_product_type: null
+    extent: { lat: [-79.0, 79.0], lon: [-79.0, 79.0] }
+    temporal: { start: 2025-01-27, end: null }
+  mtg-cloud-mask-grib:
+    collection_id: "EO:EUM:DAT:0800"
+    group: MTG
+    mission: mtg
+    output_kind: raster
+    format: grib
+    cadence: 10min
+    selectors: [CLM]
+    tailor_product_type: null
+    extent: { lat: [-79.0, 79.0], lon: [-79.0, 79.0] }
+    temporal: { start: 2025-01-24, end: null }
+  mtg-cloud-type:
+    collection_id: "EO:EUM:DAT:0680"
+    group: MTG
+    mission: mtg
+    output_kind: raster
+    format: netcdf
+    cadence: subdaily
+    selectors: [CT]
+    tailor_product_type: null
+    extent: { lat: [-79.0, 79.0], lon: [-79.0, 79.0] }
+    temporal: { start: 2025-12-10, end: null }
+  mtg-ctth:
+    collection_id: "EO:EUM:DAT:0681"
+    group: MTG
+    mission: mtg
+    output_kind: raster
+    format: netcdf
+    cadence: subdaily
+    selectors: [CTTH]
+    tailor_product_type: null
+    extent: { lat: [-79.0, 79.0], lon: [-79.0, 79.0] }
+    temporal: { start: 2025-12-10, end: null }
+  mtg-fci-l1c:
+    collection_id: "EO:EUM:DAT:0662"
+    group: MTG
+    mission: mtg
+    output_kind: raster
+    format: native
+    cadence: 10min
+    selectors: [FCI-L1C-NR]
+    tailor_product_type: FCIL1C
+    extent: { lat: [-79.0, 79.0], lon: [-79.0, 79.0] }
+    temporal: { start: 2024-09-24, end: null }
+  mtg-fci-l1c-hr:
+    collection_id: "EO:EUM:DAT:0665"
+    group: MTG
+    mission: mtg
+    output_kind: raster
+    format: native
+    cadence: 10min
+    selectors: [FCI-L1C-HR]
+    tailor_product_type: null
+    extent: { lat: [-79.0, 79.0], lon: [-79.0, 79.0] }
+    temporal: { start: 2024-09-24, end: null }
+  mtg-fci-sst:
+    collection_id: "EO:EUM:DAT:0694"
+    group: MTG
+    mission: mtg
+    output_kind: raster
+    format: netcdf
+    cadence: subdaily
+    selectors: [SST]
+    tailor_product_type: null
+    extent: { lat: [-79.0, 79.0], lon: [-79.0, 79.0] }
+    temporal: { start: 2025-08-20, end: null }
+  mtg-instability-indices:
+    collection_id: "EO:EUM:DAT:0683"
+    group: MTG
+    mission: mtg
+    output_kind: raster
+    format: netcdf
+    cadence: subdaily
+    selectors: [GII]
+    tailor_product_type: null
+    extent: { lat: [-79.0, 79.0], lon: [-79.0, 79.0] }
+    temporal: { start: 2025-01-27, end: null }
+  mtg-li-accumulated-flash-area:
+    collection_id: "EO:EUM:DAT:0687"
+    group: MTG
+    mission: mtg
+    output_kind: raster
+    format: netcdf
+    cadence: subdaily
+    selectors: [LI-AFA]
+    tailor_product_type: null
+    extent: { lat: [-79.0, 79.0], lon: [-79.0, 79.0] }
+    temporal: { start: 2024-07-04, end: null }
+  mtg-li-accumulated-flash-radiance:
+    collection_id: "EO:EUM:DAT:0688"
+    group: MTG
+    mission: mtg
+    output_kind: raster
+    format: netcdf
+    cadence: subdaily
+    selectors: [LI-AFR]
+    tailor_product_type: null
+    extent: { lat: [-79.0, 79.0], lon: [-79.0, 79.0] }
+    temporal: { start: 2024-07-04, end: null }
+  mtg-li-accumulated-flashes:
+    collection_id: "EO:EUM:DAT:0686"
+    group: MTG
+    mission: mtg
+    output_kind: raster
+    format: netcdf
+    cadence: subdaily
+    selectors: [LI-AF]
+    tailor_product_type: null
+    extent: { lat: [-79.0, 79.0], lon: [-79.0, 79.0] }
+    temporal: { start: 2024-07-04, end: null }
+  mtg-li-events-filtered:
+    collection_id: "EO:EUM:DAT:0690"
+    group: MTG
+    mission: mtg
+    output_kind: vector
+    format: netcdf
+    cadence: subdaily
+    selectors: [LI-LEF]
+    tailor_product_type: null
+    extent: { lat: [-79.0, 79.0], lon: [-79.0, 79.0] }
+    temporal: { start: 2024-07-04, end: null }
+  mtg-li-flashes:
+    collection_id: "EO:EUM:DAT:0691"
+    group: MTG
+    mission: mtg
+    output_kind: vector
+    format: netcdf
+    cadence: subdaily
+    selectors: [LI-LFL]
+    tailor_product_type: null
+    extent: { lat: [-79.0, 79.0], lon: [-79.0, 79.0] }
+    temporal: { start: 2024-07-04, end: null }
+  mtg-li-groups:
+    collection_id: "EO:EUM:DAT:0782"
+    group: MTG
+    mission: mtg
+    output_kind: vector
+    format: netcdf
+    cadence: subdaily
+    selectors: [LI-LGR]
+    tailor_product_type: null
+    extent: { lat: [-79.0, 79.0], lon: [-79.0, 79.0] }
+    temporal: { start: 2024-07-04, end: null }
+  mtg-lst:
+    collection_id: "EO:EUM:DAT:1088"
+    group: MTG
+    mission: mtg
+    output_kind: raster
+    format: netcdf
+    cadence: subdaily
+    selectors: [LST]
+    tailor_product_type: null
+    extent: { lat: [-79.0, 79.0], lon: [-79.0, 79.0] }
+    temporal: { start: 2025-08-14, end: null }
+  mtg-oca:
+    collection_id: "EO:EUM:DAT:0684"
+    group: MTG
+    mission: mtg
+    output_kind: raster
+    format: netcdf
+    cadence: subdaily
+    selectors: [OCA]
+    tailor_product_type: null
+    extent: { lat: [-79.0, 79.0], lon: [-79.0, 79.0] }
+    temporal: { start: 2025-01-27, end: null }
+  mtg-olr:
+    collection_id: "EO:EUM:DAT:0685"
+    group: MTG
+    mission: mtg
+    output_kind: raster
+    format: netcdf
+    cadence: subdaily
+    selectors: [OLR]
+    tailor_product_type: null
+    extent: { lat: [-79.0, 79.0], lon: [-79.0, 79.0] }
+    temporal: { start: 2025-01-27, end: null }
+  mtg-precip-accumulated:
+    collection_id: "EO:EUM:DAT:1087"
+    group: MTG
+    mission: mtg
+    output_kind: raster
+    format: netcdf
+    cadence: subdaily
+    selectors: [PA]
+    tailor_product_type: null
+    extent: { lat: [-79.0, 79.0], lon: [-79.0, 79.0] }
+    temporal: { start: 2025-08-14, end: null }
+  mtg-precip-rate:
+    collection_id: "EO:EUM:DAT:1086"
+    group: MTG
+    mission: mtg
+    output_kind: raster
+    format: netcdf
+    cadence: subdaily
+    selectors: [PR]
+    tailor_product_type: null
+    extent: { lat: [-79.0, 79.0], lon: [-79.0, 79.0] }
+    temporal: { start: 2025-08-14, end: null }
+  mtg-snow-mask:
+    collection_id: "EO:EUM:DAT:1091"
+    group: MTG
+    mission: mtg
+    output_kind: raster
+    format: netcdf
+    cadence: subdaily
+    selectors: [SNOW]
+    tailor_product_type: null
+    extent: { lat: [-79.0, 79.0], lon: [-79.0, 79.0] }
+    temporal: { start: 2025-08-15, end: null }
