@@ -123,8 +123,8 @@ Every row is one fire pixel; the schema is uniform across sensors:
 | `latitude` / `longitude` | WGS84 |
 | `acq_datetime` | tz-aware UTC (combines `acq_date` + integer-HHMM `acq_time`) |
 | `sensor` | the requested sensor code |
-| `confidence` | raw value (numeric for MODIS, `l`/`n`/`h` for VIIRS) |
-| `confidence_pct` | normalised 0-100 — filter on this |
+| `confidence` | raw value **as a string** (`"85"` for MODIS, `l`/`n`/`h` for VIIRS) |
+| `confidence_pct` | normalised 0-100 (float) — filter on this |
 | `brightness_k` | from `brightness` (MODIS) or `bright_ti4` (VIIRS) |
 | `frp` | fire radiative power (MW) |
 | `daynight` | `D` / `N` |

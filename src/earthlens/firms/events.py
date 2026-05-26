@@ -21,9 +21,12 @@ Two FIRMS data-shape wrinkles are absorbed here:
   numeric 0-100 `confidence`; VIIRS reports a categorical `l`/`n`/`h`
   token. The mapper keeps the raw value in `confidence` *and* derives a
   uniform `confidence_pct` float — VIIRS `l`/`n`/`h` map to 25/60/90,
-  MODIS passes through. A single `brightness_k` column is filled from
-  `brightness` (MODIS) or `bright_ti4` (VIIRS), whichever the sensor
-  provides.
+  MODIS passes through. The raw `confidence` is always rendered **as a
+  string** so the column dtype stays stable across families (categorical
+  `l/n/h` and numeric `85` coexist); numeric consumers should read the
+  float `confidence_pct` rather than re-parsing `confidence`. A single
+  `brightness_k` column is filled from `brightness` (MODIS) or
+  `bright_ti4` (VIIRS), whichever the sensor provides.
 * **`acq_time` is an unpadded integer HHMM** (e.g. `5` = 00:05,
   `1325` = 13:25), so it is split into hours/minutes and added to
   `acq_date` rather than string-concatenated.

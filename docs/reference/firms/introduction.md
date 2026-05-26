@@ -29,8 +29,8 @@ row per fire pixel:
 | `acq_datetime` | acquisition timestamp (tz-aware UTC) |
 | `sensor` | the requested FIRMS sensor code |
 | `satellite` | reporting platform (`Terra`, `Aqua`, `N`, …) |
-| `confidence` | raw confidence — numeric `0-100` (MODIS) or `l`/`n`/`h` (VIIRS) |
-| `confidence_pct` | normalised `0-100` confidence (VIIRS `l`/`n`/`h` → 25/60/90) |
+| `confidence` | raw confidence **as a string** — `"85"` (MODIS) or `l`/`n`/`h` (VIIRS); use `confidence_pct` for numeric work |
+| `confidence_pct` | normalised `0-100` confidence (categorical tokens → 25/60/90; GOES passes its provider value through) |
 | `brightness_k` | brightness temperature in kelvin |
 | `frp` | fire radiative power (MW) |
 | `daynight` | `D` (day) or `N` (night) overpass |
