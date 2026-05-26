@@ -31,11 +31,23 @@ DEFAULT_ENDPOINT: str = OPENEO_ENDPOINTS["cdse"]
 OUTPUT_FORMATS: dict[str, str] = {"GTiff": "tif", "netCDF": "nc"}
 
 #: openEO reducer process names accepted by `aggregate_temporal_period`'s
-#: `reducer=` argument (verified on the CDSE backend, A1). `AggregationConfig.op`
-#: must resolve to one of these.
+#: `reducer=` argument (verified on the CDSE backend, A1).
 OPENEO_REDUCERS: frozenset[str] = frozenset(
     {"mean", "median", "min", "max", "sum", "sd", "first", "last"}
 )
+
+#: `earthlens.aggregate.AggregationConfig.op` vocabulary → openEO reducer name.
+#: The aggregator spells standard deviation `"std"`; openEO spells it `"sd"`.
+#: `"auto"` resolves to `mean` (the aggregator's own default for raster).
+_OP_TO_REDUCER: dict[str, str] = {
+    "auto": "mean",
+    "mean": "mean",
+    "sum": "sum",
+    "min": "min",
+    "max": "max",
+    "std": "sd",
+    "median": "median",
+}
 
 # pandas offset alias (with any leading count stripped) → openEO calendar
 # `period`. openEO `period` is a *calendar vocabulary*, not a pandas freq, so a
@@ -156,20 +168,22 @@ def period_for(freq: str) -> str:
 
 
 def reducer_for(op: str) -> str:
-    """Validate an aggregation op against the openEO reducer process names.
+    """Map an `AggregationConfig.op` to its openEO reducer process name.
 
-    Maps the aggregator's `"auto"` to `"mean"` and otherwise passes `op`
-    straight through after checking it is a reducer the backend accepts.
+    Translates the aggregator's vocabulary (`"auto"` → `mean`, `"std"` → `sd`)
+    and otherwise accepts any openEO reducer name verbatim (so a recipe author
+    can also pass `"median"`/`"first"`/… directly).
 
     Args:
-        op: The `AggregationConfig.op` value (`"auto"`, `"mean"`, `"median"`,
-            `"min"`, `"max"`, `"sum"`, `"sd"`, …).
+        op: The `AggregationConfig.op` value (`"auto"`, `"mean"`, `"sum"`,
+            `"min"`, `"max"`, `"std"`) or a raw openEO reducer name.
 
     Returns:
         The openEO reducer process name to pass to `aggregate_temporal_period`.
 
     Raises:
-        NotImplementedError: If `op` is not a known openEO reducer.
+        NotImplementedError: If `op` is neither a known aggregator op nor a
+            known openEO reducer.
 
     Examples:
         - `"auto"` resolves to `mean`:
@@ -179,14 +193,23 @@ def reducer_for(op: str) -> str:
             'mean'
 
             ```
+        - The aggregator's `"std"` maps to openEO's `sd`:
+            ```python
+            >>> from earthlens.openeo._helpers import reducer_for
+            >>> reducer_for("std")
+            'sd'
+
+            ```
     """
-    resolved = "mean" if op == "auto" else op
-    if resolved not in OPENEO_REDUCERS:
-        raise NotImplementedError(
-            f"openEO reducer {op!r} is not supported; use one of "
-            f"{sorted(OPENEO_REDUCERS)}."
-        )
-    return resolved
+    if op in _OP_TO_REDUCER:
+        return _OP_TO_REDUCER[op]
+    if op in OPENEO_REDUCERS:
+        return op
+    raise NotImplementedError(
+        f"openEO reducer {op!r} is not supported; use an AggregationConfig op "
+        f"({sorted(_OP_TO_REDUCER)}) or an openEO reducer "
+        f"({sorted(OPENEO_REDUCERS)})."
+    )
 
 
 def import_openeo() -> Any:

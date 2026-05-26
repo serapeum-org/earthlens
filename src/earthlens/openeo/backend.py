@@ -36,12 +36,12 @@ from earthlens.base import (
     SpatialExtent,
     TemporalExtent,
 )
-from earthlens.openeo._helpers import OUTPUT_FORMATS
+from earthlens.openeo._helpers import OUTPUT_FORMATS, period_for, reducer_for
 from earthlens.openeo.auth import OpeneoAuth, OpeneoCredentials
 
 if TYPE_CHECKING:
     from earthlens.aggregate import AggregationConfig
-    from earthlens.openeo.catalog import Catalog
+    from earthlens.openeo.catalog import Catalog, ResolvedGraph
 
 
 class OpenEO(AbstractDataSource):
@@ -215,6 +215,107 @@ class OpenEO(AbstractDataSource):
         """Compose `_search` and `_fetch` into the canonical search/fetch shape."""
         return self._api_via_search_fetch()
 
+    def _search(self) -> list[RemoteProduct]:
+        """List the planned graphs without executing anything (cheap dry-run).
+
+        Returns one :class:`RemoteProduct` per requested key; the resolved
+        collection/recipe row rides on `metadata["resolved"]`. No network call —
+        inspecting the result is a "what would I build?" preview.
+
+        Returns:
+            One product per requested collection/recipe key.
+        """
+        return [
+            RemoteProduct(id=key, metadata={"resolved": resolved})
+            for key, resolved in self._resolved.items()
+        ]
+
+    def _request_bands(self, key: str, resolved: ResolvedGraph) -> list[str]:
+        """Pick the bands to load: the request's override, else the row default.
+
+        Args:
+            key: The requested collection/recipe key.
+            resolved: The resolved row for `key`.
+
+        Returns:
+            The bands to pass to `load_collection` (may be empty → all bands).
+        """
+        requested = self._variables.get(key) or []
+        return list(requested) if requested else list(resolved.bands)
+
+    def _build_cube(self, conn: Any, key: str, resolved: ResolvedGraph) -> Any:
+        """Build the openEO `DataCube` for one requested key.
+
+        Loads the collection over the request's bbox + window + bands, applies
+        the recipe's graph steps (if any), and appends a server-side
+        `aggregate_temporal_period` node when `aggregate=` was supplied.
+
+        Args:
+            conn: The authenticated openEO connection.
+            key: The requested collection/recipe key.
+            resolved: The resolved row for `key`.
+
+        Returns:
+            The fully-built `DataCube` ready to download / submit.
+        """
+        bands = self._request_bands(key, resolved)
+        load_kwargs: dict[str, Any] = {}
+        if self._max_cloud_cover is not None:
+            load_kwargs["max_cloud_cover"] = self._max_cloud_cover
+        cube = conn.load_collection(
+            resolved.collection_id,
+            spatial_extent={
+                "west": self.space.west,
+                "south": self.space.south,
+                "east": self.space.east,
+                "north": self.space.north,
+            },
+            temporal_extent=[
+                self.time.start_date.strftime("%Y-%m-%d"),
+                self.time.end_date.strftime("%Y-%m-%d"),
+            ],
+            bands=(bands or None),
+            **load_kwargs,
+        )
+        for step in resolved.graph:
+            cube = _apply_step(cube, step)
+        if self._aggregate is not None:
+            cube = cube.aggregate_temporal_period(
+                period=period_for(self._aggregate.freq),
+                reducer=reducer_for(self._aggregate.op),
+            )
+        return cube
+
+    def _fetch(self, products: list[RemoteProduct]) -> list[Path]:
+        """Build, execute, and download one output file per product.
+
+        For each product: build its `DataCube`, then either download it
+        synchronously (`execute="sync"`, size-capped) or run a polled batch job
+        (`execute="batch"`). The output format is the recipe's `output_format`
+        when set, else the backend's `output_format`.
+
+        Args:
+            products: The list returned by :meth:`_search`.
+
+        Returns:
+            The written file paths, one per product (request key order).
+        """
+        conn = self._auth.connection()
+        out: list[Path] = []
+        for product in products:
+            resolved: ResolvedGraph = product.metadata["resolved"]
+            cube = self._build_cube(conn, product.id, resolved)
+            out_format = resolved.output_format or self._output_format
+            suffix = OUTPUT_FORMATS[out_format]
+            target = Path(self.root_dir) / f"{_safe_name(product.id)}.{suffix}"
+            if self._execute == "batch":
+                job = cube.create_job(out_format=out_format)
+                job.start_and_wait().get_results().download_file(str(target))
+            else:
+                cube.download(str(target), format=out_format)
+            out.append(target)
+        return out
+
     def download(
         self,
         progress_bar: bool = True,
@@ -237,3 +338,70 @@ class OpenEO(AbstractDataSource):
             f"openEO download: {len(paths)} file(s) written to {self.root_dir}"
         )
         return paths
+
+
+def _apply_step(cube: Any, step: dict[str, dict[str, Any]]) -> Any:
+    """Apply one recipe graph step to a `DataCube`.
+
+    A step is a single-key mapping `{process_name: {param: value, ...}}`. When
+    `process_name` is a `DataCube` method (`ndvi`, `aggregate_temporal_period`,
+    `reduce_dimension`, …) it is called directly; otherwise — for a
+    backend-only process such as `mask_scl_dilation` or `sar_backscatter` — the
+    generic `DataCube.process` is used with the cube bound as the `data`
+    argument (`DataCube.process` does not auto-inject `data`).
+
+    Args:
+        cube: The current `DataCube`.
+        step: The single-key `{process: params}` step.
+
+    Returns:
+        The new `DataCube` after the step.
+
+    Examples:
+        - Dispatch to a DataCube method:
+            ```python
+            >>> from earthlens.openeo.backend import _apply_step
+            >>> class _Cube:
+            ...     def ndvi(self, nir, red):
+            ...         return f"ndvi({nir},{red})"
+            >>> _apply_step(_Cube(), {"ndvi": {"nir": "B08", "red": "B04"}})
+            'ndvi(B08,B04)'
+
+            ```
+        - Fall back to the generic process for a backend-only step:
+            ```python
+            >>> from earthlens.openeo.backend import _apply_step
+            >>> class _Cube:
+            ...     def process(self, name, arguments):
+            ...         return (name, sorted(arguments))
+            >>> _apply_step(_Cube(), {"mask_scl_dilation": {}})
+            ('mask_scl_dilation', ['data'])
+
+            ```
+    """
+    ((name, params),) = step.items()
+    method = getattr(cube, name, None)
+    if callable(method):
+        return method(**params)
+    return cube.process(name, arguments={"data": cube, **params})
+
+
+def _safe_name(key: str) -> str:
+    """Flatten a request key to a filename-safe stem (no path separators).
+
+    Args:
+        key: A collection/recipe key.
+
+    Returns:
+        The key with `/` and `\\` replaced by `_`.
+
+    Examples:
+        - A plain key is unchanged:
+            ```python
+            >>> from earthlens.openeo.backend import _safe_name
+            >>> _safe_name("sentinel-2-l2a-ndvi-monthly")
+            'sentinel-2-l2a-ndvi-monthly'
+
+            ```
+    """
+    return key.replace("/", "_").replace("\\", "_")
