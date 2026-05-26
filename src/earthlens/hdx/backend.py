@@ -47,13 +47,16 @@ from pathlib import Path
 from typing import TYPE_CHECKING
 
 import pandas as pd
+from loguru import logger
 
 from earthlens.base import (
     AbstractDataSource,
     OutputKind,
+    RemoteProduct,
     SpatialExtent,
     TemporalExtent,
 )
+from earthlens.hdx._helpers import match_resource
 from earthlens.hdx.catalog import Catalog
 
 if TYPE_CHECKING:
@@ -300,6 +303,94 @@ class HDX(AbstractDataSource):
     def _api(self) -> list[Path]:
         """Compose `_search` and `_fetch` into the canonical C3 shape."""
         return self._api_via_search_fetch()
+
+    def _search(self) -> list[RemoteProduct]:
+        """Resolve every requested dataset and list its matching resources.
+
+        One `Dataset.read_from_hdx` call per target (a curated dataset's
+        `hdx_id` or the `hdx_id=` escape hatch, `G6`); each dataset's
+        resources are filtered with :func:`match_resource` against the
+        target's filter list (`G2`). bbox / time are **not** used — CKAN
+        has no spatial/temporal query. Each surviving resource becomes
+        one :class:`RemoteProduct` whose `metadata` carries the raw SDK
+        resource handle, so :meth:`_fetch` can download without
+        re-querying.
+
+        Returns:
+            list[RemoteProduct]: One product per matching resource,
+                across every requested dataset. An empty list (no
+                resource matched) short-circuits the fetch.
+
+        Raises:
+            ImportError: When the `[hdx]` extra is not installed.
+            ValueError: When a requested `hdx_id` is not found on HDX.
+        """
+        try:
+            from hdx.data.dataset import Dataset
+        except ImportError as exc:
+            raise ImportError(
+                "the HDX backend needs `hdx-python-api`; install "
+                "`pip install earthlens[hdx]`."
+            ) from exc
+
+        products: list[RemoteProduct] = []
+        for hdx_id, filters in self._targets:
+            dataset = Dataset.read_from_hdx(hdx_id)
+            if dataset is None:
+                raise ValueError(
+                    f"HDX dataset {hdx_id!r} not found on the {self._hdx_site!r} "
+                    "site. Check the id (or the catalog key that resolves to it)."
+                )
+            for resource in dataset.get_resources():
+                name = resource.get("name") or ""
+                fmt = resource.get("format") or ""
+                if filters and not any(
+                    match_resource(name, fmt, flt) for flt in filters
+                ):
+                    continue
+                products.append(
+                    RemoteProduct(
+                        id=f"{hdx_id}::{name}",
+                        href=resource.get("url"),
+                        metadata={
+                            "resource": resource,
+                            "format": fmt,
+                            "hdx_id": hdx_id,
+                            "name": name,
+                        },
+                    )
+                )
+        logger.info(
+            f"HDX search resolved {len(self._targets)} dataset(s) to "
+            f"{len(products)} resource(s) to download."
+        )
+        return products
+
+    def _fetch(self, products: list[RemoteProduct]) -> list[Path]:
+        """Download every resource `_search` returned to `self.root_dir`.
+
+        Each resource is downloaded **as-is** in its native format
+        (`G4`); reading / sniffing / converting it into a pyramids type
+        is the deferred `PY-D` work item, not done here. The CKAN format
+        label is already recorded on the product metadata.
+
+        Args:
+            products: The products from :meth:`_search`.
+
+        Returns:
+            list[Path]: Local paths of every downloaded resource, in
+                product order. Empty list when `products` is empty.
+        """
+        out_paths: list[Path] = []
+        for product in products:
+            resource = product.metadata["resource"]
+            _url, local_path = resource.download(folder=str(self.root_dir))
+            out_paths.append(Path(local_path))
+        logger.info(
+            f"HDX download summary: {len(out_paths)} resource file(s) written "
+            f"to {self.root_dir}"
+        )
+        return out_paths
 
     def download(
         self,
