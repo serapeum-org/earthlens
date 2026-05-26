@@ -1,0 +1,42 @@
+# National Water Model (NOAA NWM) configuration catalog.
+#
+# Source: the unsigned AWS bucket `noaa-nwm-pds`. Each configuration's S3 key
+# layout is:
+#   nwm.{YYYYMMDD}/{config-dir}/nwm.t{HH}z.{token}.{product}.f{NNN}.{domain}.nc
+# but the {token}, member, step width, and domain vary per configuration, so
+# every row carries a full `key_template` (str.format over date / cycle / step
+# / product) rather than the backend guessing. Only the two clean CONUS
+# forecast configurations are curated here; regional/coastal/analysis variants
+# (sub-hourly 5-digit steps, `tmNN` analyses) can be added as rows later.
+
+configurations:
+
+  short_range:
+    description: >-
+      Short-Range Forecast (CONUS) — hourly cycles, 18 h deterministic horizon.
+      channel_rt = streamflow on the NHDPlus network (feature_id indexed);
+      land = gridded land-surface states; reservoir; terrain_rt = ponded water
+      / routing.
+    domain: conus
+    cycles_utc: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11,
+                 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23]
+    first_step: 1
+    horizon_h: 18
+    step_cadence_h: 1
+    products: [channel_rt, land, reservoir, terrain_rt]
+    key_template: >-
+      nwm.{date:%Y%m%d}/short_range/nwm.t{cycle:%H}z.short_range.{product}.f{step:03d}.conus.nc
+
+  medium_range_mem1:
+    description: >-
+      Medium-Range Forecast (CONUS), GFS-forced ensemble member 1 — four cycles
+      a day, 240 h horizon. The member rides on the product token in the file
+      name (channel_rt_1, land_1).
+    domain: conus
+    cycles_utc: [0, 6, 12, 18]
+    first_step: 1
+    horizon_h: 240
+    step_cadence_h: 1
+    products: [channel_rt_1, land_1]
+    key_template: >-
+      nwm.{date:%Y%m%d}/medium_range_mem1/nwm.t{cycle:%H}z.medium_range.{product}.f{step:03d}.conus.nc
