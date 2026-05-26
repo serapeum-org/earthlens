@@ -74,6 +74,7 @@ class TestRegistry:
             "earth-search",
             "earthdata",
             "ecmwf",
+            "eumetsat",
             "fdsn",
             "gdacs",
             "gee",
