@@ -124,5 +124,9 @@ def fake_eumdac(monkeypatch):
 @pytest.fixture(autouse=True)
 def _clean_eumetsat_env(monkeypatch):
     """Drop EUMETSAT credential env vars so tests start from a clean slate."""
-    for var in ("EUMETSAT_CONSUMER_KEY", "EUMETSAT_CONSUMER_SECRET", "EUMDAC_CONFIG_DIR"):
+    for var in (
+        "EUMETSAT_CONSUMER_KEY",
+        "EUMETSAT_CONSUMER_SECRET",
+        "EUMDAC_CONFIG_DIR",
+    ):
         monkeypatch.delenv(var, raising=False)

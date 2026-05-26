@@ -43,7 +43,11 @@ def test_available_index_covers_every_curated_id(catalog):
 def test_groups_span_multiple_missions(catalog):
     """The curated set spans several Data Store groups."""
     groups = {c.group for c in catalog.collections.values()}
-    assert {DataStoreGroup.MSG, DataStoreGroup.METOP, DataStoreGroup.SENTINEL_3} <= groups
+    assert {
+        DataStoreGroup.MSG,
+        DataStoreGroup.METOP,
+        DataStoreGroup.SENTINEL_3,
+    } <= groups
 
 
 def test_get_collection_unknown_key_did_you_mean(catalog):

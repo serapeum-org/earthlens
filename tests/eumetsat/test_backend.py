@@ -8,7 +8,6 @@ import pytest
 
 from earthlens.eumetsat import EUMETSAT
 from earthlens.eumetsat.catalog import DataStoreGroup
-
 from tests.eumetsat.conftest import _FakeProduct
 
 pytestmark = pytest.mark.eumetsat

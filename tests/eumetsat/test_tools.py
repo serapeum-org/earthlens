@@ -27,7 +27,7 @@ def test_diff_catalog_reports_each_category():
     store = _load("_store")
     findings = store.diff_catalog(
         live_ids={"A", "B"},
-        curated_ids={"A", "C"},   # C is gone
+        curated_ids={"A", "C"},  # C is gone
         available_ids={"A", "D"},  # D index-gone; B is new
     )
     assert findings["gone"] == ["C"]

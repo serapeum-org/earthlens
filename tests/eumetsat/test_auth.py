@@ -26,7 +26,9 @@ def test_resolve_pair_prefers_env(monkeypatch):
     """Environment variables win over constructor kwargs."""
     monkeypatch.setenv("EUMETSAT_CONSUMER_KEY", "envkey")
     monkeypatch.setenv("EUMETSAT_CONSUMER_SECRET", "envsecret")
-    auth = EumetsatAuth(EumetsatCredentials(consumer_key="argkey", consumer_secret="argsecret"))
+    auth = EumetsatAuth(
+        EumetsatCredentials(consumer_key="argkey", consumer_secret="argsecret")
+    )
     assert auth._resolve_pair() == ("envkey", "envsecret")
 
 
@@ -120,7 +122,9 @@ def test_datastore_and_datatailor_after_configure(fake_eumdac):
 
 def test_context_manager_configures(fake_eumdac):
     """The context-manager form authenticates on enter."""
-    with EumetsatAuth(EumetsatCredentials(consumer_key="k", consumer_secret="s")) as auth:
+    with EumetsatAuth(
+        EumetsatCredentials(consumer_key="k", consumer_secret="s")
+    ) as auth:
         assert auth.is_authenticated() is True
 
 

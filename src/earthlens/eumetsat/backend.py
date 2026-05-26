@@ -169,9 +169,7 @@ class EUMETSAT(AbstractDataSource):
                 "EUMETSAT requires a non-empty `variables` mapping of "
                 "{collection_key: [selector, ...]}."
             )
-        return [
-            self._catalog.resolve(key, group=self._group) for key in variables
-        ]
+        return [self._catalog.resolve(key, group=self._group) for key in variables]
 
     @staticmethod
     def _unify_output_kind(collections: list[EumetsatCollection]) -> OutputKind:

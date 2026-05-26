@@ -22,7 +22,6 @@ import argparse
 import sys
 
 import yaml
-
 from _store import INDEX_PATH, build_datastore, live_collection_ids
 
 _INDEX_HEADER = (
