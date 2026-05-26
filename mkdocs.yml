@@ -165,6 +165,11 @@ nav:
       - Introduction: reference/tropycal/introduction.md
       - Usage: reference/tropycal/usage.md
       - Reference: reference/tropycal/tropycal.md
+    - FIRMS (active fires):
+      - Introduction: reference/firms/introduction.md
+      - Usage: reference/firms/usage.md
+      - Authentication: reference/firms/authentication.md
+      - Reference: reference/firms/firms.md
   - Examples:
     - Authentication: examples/authentication.md
     - Data Sources: examples/data-sources.md
@@ -244,6 +249,10 @@ nav:
       - Hurricane Katrina — intensity timeline: examples/tropycal/katrina_intensity_timeline.ipynb
       - HURDAT2 vs IBTrACS — source comparison: examples/tropycal/source_comparison.ipynb
       - Multi-basin season — ACE by basin: examples/tropycal/multibasin_ace.ipynb
+    - Active fires (FIRMS):
+      - Quickstart — recent fires: examples/firms/quickstart.ipynb
+      - Fire-season time-series: examples/firms/fire_season_timeseries.ipynb
+      - MODIS vs VIIRS comparison: examples/firms/modis_vs_viirs_comparison.ipynb
   - API Reference:
     - EarthLens Facade: reference/earthlens.md
     - AbstractDataSource: reference/abstract-datasource.md

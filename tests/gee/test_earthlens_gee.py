@@ -76,6 +76,7 @@ class TestRegistry:
             "ecmwf",
             "eumetsat",
             "fdsn",
+            "firms",
             "gdacs",
             "gee",
             "google-earth-engine",
