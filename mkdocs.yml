@@ -168,6 +168,10 @@ nav:
       - Usage: reference/nwp/usage.md
       - Catalog & install: reference/nwp/catalog.md
       - Reference: reference/nwp/nwp.md
+    - NEXRAD radar:
+      - Introduction: reference/radar/introduction.md
+      - Usage: reference/radar/usage.md
+      - Reference: reference/radar/radar.md
   - Examples:
     - Authentication: examples/authentication.md
     - Data Sources: examples/data-sources.md
