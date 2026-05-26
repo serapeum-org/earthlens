@@ -136,8 +136,9 @@ class EarthLens:
             >>> from earthlens.earthlens import EarthLens
             >>> sorted(EarthLens.DataSources)  # doctest: +NORMALIZE_WHITESPACE
             ['amazon-s3', 'cdse', 'chc', 'chirps', 'cmems', 'earth-search',
-             'earthdata', 'ecmwf', 'fdsn', 'gdacs', 'gee', 'google-earth-engine',
-             'openaq', 'planetary-computer', 'stac', 'tropycal']
+             'earthdata', 'ecmwf', 'fdsn', 'firms', 'gdacs', 'gee',
+             'google-earth-engine', 'openaq', 'planetary-computer', 'stac',
+             'tropycal']
 
             ```
         - Asking for an unknown backend raises `ValueError`:
@@ -174,6 +175,9 @@ class EarthLens:
         :class:`earthlens.tropycal.TropicalCyclone`: tropical-cyclone
             best tracks via `tropycal` (`vector` output); key
             `"tropycal"`.
+        :class:`earthlens.firms.FIRMS`: NASA FIRMS active-fire
+            detections (MODIS / VIIRS) as a `vector` FeatureCollection;
+            free `MAP_KEY`, no extra; key `"firms"`.
     """
 
     DataSources = _LazyRegistry(
@@ -195,6 +199,9 @@ class EarthLens:
             "gdacs": ("earthlens.gdacs", "GDACS", "", {}),
             "openaq": ("earthlens.openaq", "OpenAQ", "openaq", {}),
             "tropycal": ("earthlens.tropycal", "TropicalCyclone", "tropycal", {}),
+            # FIRMS needs a free MAP_KEY but no SDK (requests + pandas
+            # are core), so like GDACS there is no extra to hint.
+            "firms": ("earthlens.firms", "FIRMS", "", {}),
             # One unified STAC backend over several endpoints. The bare
             # `"stac"` key leaves the endpoint to be inferred from the
             # requested collection; the three endpoint aliases pre-bind

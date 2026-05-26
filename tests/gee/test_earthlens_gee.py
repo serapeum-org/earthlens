@@ -75,6 +75,7 @@ class TestRegistry:
             "earthdata",
             "ecmwf",
             "fdsn",
+            "firms",
             "gdacs",
             "gee",
             "google-earth-engine",
