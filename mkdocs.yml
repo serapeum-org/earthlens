@@ -154,6 +154,12 @@ nav:
       - Usage: reference/openaq/usage.md
       - Authentication: reference/openaq/authentication.md
       - Reference: reference/openaq/openaq.md
+    - openEO (server-side processing):
+      - Introduction: reference/openeo/introduction.md
+      - Usage: reference/openeo/usage.md
+      - Authentication: reference/openeo/authentication.md
+      - Collections & recipes: reference/openeo/datasets.md
+      - Reference: reference/openeo/openeo.md
     - Tropycal (cyclone tracks):
       - Introduction: reference/tropycal/introduction.md
       - Usage: reference/tropycal/usage.md
