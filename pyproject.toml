@@ -54,6 +54,12 @@ gee = [
 cmems = ["copernicusmarine >=2.0.0,<3"]
 fdsn = ["obspy >=1.5.0"]
 earthdata = ["earthaccess >=0.18.0; python_version >= '3.12'"]
+# herbie-data transitively pulls cfgrib + eccodes (its core imports cfgrib at
+# module load); the eccodes *binary* library is an environment requirement,
+# like libgdal-grib for pyramids' GRIB reader — install it via conda-forge
+# (`eccodes`) where the pip wheel cannot find it. earthlens itself imports
+# neither cfgrib nor eccodes directly.
+nwp = ["herbie-data >=2026.3", "ecmwf-opendata >=0.3"]
 stac = ["pyramids-gis[stac]"]
 # cartopy: not imported by earthlens, but `import tropycal.tracks` chains through
 # tropycal.utils.cartopy_utils (module-level `import cartopy`); tropycal omits it
@@ -69,6 +75,8 @@ all = [
     "earthaccess >=0.18.0; python_version >= '3.12'",
     "google-api-python-client >=2.0",
     "google-cloud-storage >=2.0",
+    "herbie-data >=2026.3",
+    "ecmwf-opendata >=0.3",
     "obspy >=1.5.0",
     "pyramids-gis[stac]",
     "Rtree >=1.0.0",
@@ -147,6 +155,7 @@ include = ["earthlens", "earthlens.*"]
 "earthlens.gdacs" = ["*.yaml"]
 "earthlens.openaq" = ["*.yaml"]
 "earthlens.tropycal" = ["*.yaml"]
+"earthlens.nwp" = ["*.yaml"]
 
 [tool.flake8]
 ignore = ["E203", "E266", "E501", "W503", "E722", "C901", "E741", "E731"]
@@ -216,6 +225,7 @@ markers = [
     "gdacs: tests for the GDACS multi-hazard alert backend (public feed, no extra SDK).",
     "openaq: tests for the OpenAQ v3 air-quality backend (no extra SDK; uses the core `requests` dependency).",
     "tropycal: tests for the Tropycal cyclone-track backend (requires the `tropycal` extra: tropycal, cartopy).",
+    "nwp: tests for the NWP forecast backend (requires the `nwp` extra: herbie-data, ecmwf-opendata; GRIB read via pyramids' GDAL driver).",
 ]
 
 [tool.pixi.workspace]
@@ -246,7 +256,8 @@ test-stac = { cmd = "pytest -vvv -m 'stac and not e2e' --cov=src/earthlens --cov
 test-gdacs = { cmd = "pytest -vvv -m 'gdacs and not e2e' --cov=src/earthlens --cov-report=xml --cov-report=term-missing", description = "Run GDACS-backend tests (public feed, no extra SDK)" }
 test-openaq = { cmd = "pytest -vvv -m 'openaq and not e2e' --cov=src/earthlens --cov-report=xml --cov-report=term-missing", description = "Run OpenAQ-backend tests (no extra SDK; uses the core requests dependency)" }
 test-tropycal = { cmd = "pytest -vvv -m 'tropycal and not e2e' --cov=src/earthlens --cov-report=xml --cov-report=term-missing", description = "Run Tropycal cyclone-track backend tests (requires the `tropycal` extra: tropycal, cartopy)" }
-test-doctests = { cmd = "pytest --doctest-modules src/earthlens/gee src/earthlens/chc src/earthlens/ecmwf src/earthlens/cmems src/earthlens/fdsn src/earthlens/earthdata src/earthlens/stac src/earthlens/gdacs src/earthlens/openaq src/earthlens/tropycal src/earthlens/base", description = "Run docstring examples across the backend packages (catches drift in catalog / API docstrings)" }
+test-nwp = { cmd = "pytest -vvv -m 'nwp and not e2e' --cov=src/earthlens --cov-report=xml --cov-report=term-missing", description = "Run NWP forecast backend tests (requires the `nwp` extra: herbie-data, ecmwf-opendata)" }
+test-doctests = { cmd = "pytest --doctest-modules src/earthlens/gee src/earthlens/chc src/earthlens/ecmwf src/earthlens/cmems src/earthlens/fdsn src/earthlens/earthdata src/earthlens/stac src/earthlens/gdacs src/earthlens/openaq src/earthlens/tropycal src/earthlens/nwp src/earthlens/base", description = "Run docstring examples across the backend packages (catches drift in catalog / API docstrings)" }
 notebooks = { cmd = "pytest --nbval --nbval-lax --verbose docs/examples", description = "check notebooks" }
 jupyter = { cmd = "jupyter lab --no-browser --IdentityProvider.token='' --ServerApp.password='' --port=8889", description = "check notebooks" }
 build-dist = { cmd = "python -m build", description = "Build sdist and wheel for PyPI" }

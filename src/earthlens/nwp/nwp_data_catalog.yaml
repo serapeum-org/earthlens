@@ -1,0 +1,39 @@
+# NWP model catalog for earthlens.nwp.
+#
+# Top-level `datasets:` maps a model key -> one NWPModel row. `bands:`
+# maps an earthlens parameter name to the centre's selector: a Herbie
+# `search` regex for SDK-backed models (NOAA / ECMWF), or a provider
+# variable token for direct-centre models (DWD ICON). The remaining MVP
+# models (gefs, hrrr, ifs-hres) are seeded in C2.
+datasets:
+
+  gfs:                                    # NOAA NODD, via Herbie
+    provider: noaa-nodd
+    model_family: gfs
+    resolution: 0.25deg
+    cycles_utc: [0, 6, 12, 18]
+    cadence_h: 6
+    horizon_h: 384
+    format: grib2
+    idx: true
+    backend: herbie
+    mirrors: [aws, google, azure]
+    bands:
+      temperature_2m: ":TMP:2 m above ground:"
+      precipitation_acc: ":APCP:surface:"
+
+  icon-global:                            # DWD Open Data, direct HTTPS .bz2 (no .idx)
+    provider: dwd-opendata
+    model_family: icon
+    resolution: 0.125deg
+    cycles_utc: [0, 6, 12, 18]
+    cadence_h: 6
+    horizon_h: 180
+    format: grib2
+    idx: false
+    backend: direct-https
+    mirrors: [origin]
+    url_template: "https://opendata.dwd.de/weather/nwp/icon/grib/{cycle:%H}/{var_lc}/icon_global_icosahedral_single-level_{date:%Y%m%d%H}_{step:03d}_{var}.grib2.bz2"
+    bands:
+      temperature_2m: T_2M
+      precipitation_acc: TOT_PREC
