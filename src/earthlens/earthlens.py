@@ -137,8 +137,8 @@ class EarthLens:
             >>> sorted(EarthLens.DataSources)  # doctest: +NORMALIZE_WHITESPACE
             ['amazon-s3', 'cdse', 'chc', 'chirps', 'cmems', 'earth-search',
              'earthdata', 'ecmwf', 'eumetsat', 'fdsn', 'firms', 'gdacs', 'gee',
-             'google-earth-engine', 'hdx', 'openaq', 'planetary-computer',
-             'stac', 'tropycal']
+             'google-earth-engine', 'hdx', 'openaq', 'openeo',
+             'planetary-computer', 'stac', 'tropycal']
 
             ```
         - Asking for an unknown backend raises `ValueError`:
@@ -175,6 +175,9 @@ class EarthLens:
             alerts (public feed, no credentials); key `"gdacs"`.
         :class:`earthlens.openaq.OpenAQ`: ground-station air-quality
             measurements from OpenAQ v3 (tabular `DataFrame`).
+        :class:`earthlens.openeo.OpenEO`: server-side openEO process graphs
+            (defaults to CDSE openEO); `raster` output, `aggregate=` is a
+            native `aggregate_temporal_period` node; key `"openeo"`.
         :class:`earthlens.tropycal.TropicalCyclone`: tropical-cyclone
             best tracks via `tropycal` (`vector` output); key
             `"tropycal"`.
@@ -207,6 +210,9 @@ class EarthLens:
             "gdacs": ("earthlens.gdacs", "GDACS", "", {}),
             "hdx": ("earthlens.hdx", "HDX", "hdx", {}),
             "openaq": ("earthlens.openaq", "OpenAQ", "openaq", {}),
+            # openEO server-side processing (defaults to CDSE openEO). Builds a
+            # process graph the backend executes; returns the written paths.
+            "openeo": ("earthlens.openeo", "OpenEO", "openeo", {}),
             "tropycal": ("earthlens.tropycal", "TropicalCyclone", "tropycal", {}),
             # FIRMS needs a free MAP_KEY but no SDK (requests + pandas
             # are core), so like GDACS there is no extra to hint.

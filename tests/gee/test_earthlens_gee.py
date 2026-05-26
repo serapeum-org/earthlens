@@ -82,6 +82,7 @@ class TestRegistry:
             "google-earth-engine",
             "hdx",
             "openaq",
+            "openeo",
             "planetary-computer",
             "stac",
             "tropycal",
