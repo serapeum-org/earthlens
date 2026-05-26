@@ -200,3 +200,20 @@ class TestDWDCentre:
             DWDCentre(tmp_path).fetch_one(
                 model, dt.datetime(2024, 6, 1, 0), 0, ["temperature_2m"], "auto"
             )
+
+    def test_fetch_one_failure_leaves_no_partial_file(self, tmp_path, monkeypatch):
+        """A failure on a later variable leaves no truncated .grib2 (L1)."""
+        import sys
+        import types
+
+        def failing_get(url, timeout=None):
+            raise RuntimeError("network down")
+
+        module = types.ModuleType("requests")
+        module.get = failing_get
+        monkeypatch.setitem(sys.modules, "requests", module)
+        with pytest.raises(RuntimeError, match="network down"):
+            DWDCentre(tmp_path).fetch_one(
+                self._icon(), dt.datetime(2024, 6, 1, 0), 0, ["temperature_2m"], "auto"
+            )
+        assert list(tmp_path.iterdir()) == [], "no partial file should remain"
