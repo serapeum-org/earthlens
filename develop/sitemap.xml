@@ -221,6 +221,14 @@
          <lastmod>2026-05-26</lastmod>
     </url>
     <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/examples/nwp/gfs_temperature/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/examples/nwp/icon_precipitation/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
          <loc>https://serapeum-org.github.io/earthlens/develop/examples/openaq/multistation_comparison/</loc>
          <lastmod>2026-05-26</lastmod>
     </url>
@@ -418,6 +426,22 @@
     </url>
     <url>
          <loc>https://serapeum-org.github.io/earthlens/develop/reference/gee/usage/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/nwp/catalog/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/nwp/introduction/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/nwp/nwp/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/nwp/usage/</loc>
          <lastmod>2026-05-26</lastmod>
     </url>
     <url>
