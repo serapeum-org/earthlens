@@ -295,16 +295,8 @@ class EUMETSAT(AbstractDataSource):
 
         Raises:
             ImportError: When the `[eumetsat]` extra (`eumdac`) is not
-                installed.
+                installed — surfaced by `EumetsatAuth.datastore()`.
         """
-        try:
-            import eumdac  # noqa: F401 - imported to surface a friendly error
-        except ImportError as exc:
-            raise ImportError(
-                "the EUMETSAT backend needs `eumdac`; install "
-                "`pip install earthlens[eumetsat]`."
-            ) from exc
-
         assert self._auth is not None  # set by _initialize
         self._auth.configure()
         store = self._auth.datastore()

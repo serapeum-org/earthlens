@@ -138,6 +138,17 @@ def test_configure_without_eumdac_raises_import_error(monkeypatch):
         auth.configure()
 
 
+def test_datastore_without_eumdac_raises_import_error(fake_eumdac, monkeypatch):
+    """datastore() surfaces the friendly ImportError when eumdac disappears."""
+    import sys
+
+    auth = EumetsatAuth(EumetsatCredentials(consumer_key="k", consumer_secret="s"))
+    auth.configure()
+    monkeypatch.setitem(sys.modules, "eumdac", None)
+    with pytest.raises(ImportError, match=r"earthlens\[eumetsat\]"):
+        auth.datastore()
+
+
 def test_configure_wraps_token_failure(fake_eumdac, monkeypatch):
     """A token-minting failure is wrapped as AuthenticationError."""
 

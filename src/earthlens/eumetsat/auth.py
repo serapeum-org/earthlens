@@ -56,6 +56,30 @@ _DOCS_URL = (
 _CREDENTIALS_LINE = re.compile(r"(\w+),(\w+)")
 
 
+def _import_eumdac():
+    """Import and return the `eumdac` module, or raise a friendly `ImportError`.
+
+    Centralises the lazy SDK import so every entry point that needs
+    `eumdac` (`configure`, `datastore`, `datatailor`) surfaces the same
+    actionable message naming the `earthlens[eumetsat]` extra.
+
+    Returns:
+        module: The imported `eumdac` module.
+
+    Raises:
+        ImportError: When the `[eumetsat]` extra (`eumdac`) is not
+            installed.
+    """
+    try:
+        import eumdac
+    except ImportError as exc:
+        raise ImportError(
+            "the EUMETSAT backend needs `eumdac`, which is not installed. "
+            "Install the extra with `pip install earthlens[eumetsat]`."
+        ) from exc
+    return eumdac
+
+
 class AuthenticationError(_BaseAuthenticationError):
     """Raised when `eumdac` cannot mint an OAuth2 token.
 
@@ -244,14 +268,7 @@ class EumetsatAuth(AbstractAuth[EumetsatCredentials]):
         if self.is_authenticated():
             return
 
-        try:
-            import eumdac  # lazy — only needed when actually authenticating
-        except ImportError as exc:
-            raise ImportError(
-                "the EUMETSAT backend needs `eumdac`, which is not "
-                "installed. Install the extra with "
-                "`pip install earthlens[eumetsat]`."
-            ) from exc
+        eumdac = _import_eumdac()  # lazy — only needed when authenticating
 
         key, secret = self._resolve_pair()
         if not key or not secret:
@@ -303,11 +320,12 @@ class EumetsatAuth(AbstractAuth[EumetsatCredentials]):
                 collections and search products.
 
         Raises:
+            ImportError: When the `[eumetsat]` extra (`eumdac`) is not
+                installed.
             AuthenticationError: When `configure()` has not minted a
                 token yet.
         """
-        import eumdac
-
+        eumdac = _import_eumdac()
         if self._token is None:
             raise AuthenticationError(
                 "datastore() called before configure(); authenticate "
@@ -325,11 +343,12 @@ class EumetsatAuth(AbstractAuth[EumetsatCredentials]):
             eumdac.DataTailor: The Data Tailor client.
 
         Raises:
+            ImportError: When the `[eumetsat]` extra (`eumdac`) is not
+                installed.
             AuthenticationError: When `configure()` has not minted a
                 token yet.
         """
-        import eumdac
-
+        eumdac = _import_eumdac()
         if self._token is None:
             raise AuthenticationError(
                 "datatailor() called before configure(); authenticate "
