@@ -145,6 +145,18 @@
          <lastmod>2026-05-26</lastmod>
     </url>
     <url>
+         <loc>https://serapeum-org.github.io/earthlens/main/examples/firms/fire_season_timeseries/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/main/examples/firms/modis_vs_viirs_comparison/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/main/examples/firms/quickstart/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
          <loc>https://serapeum-org.github.io/earthlens/main/examples/gdacs/country_hazard_profile/</loc>
          <lastmod>2026-05-26</lastmod>
     </url>
@@ -358,6 +370,22 @@
     </url>
     <url>
          <loc>https://serapeum-org.github.io/earthlens/main/reference/fdsn/usage/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/main/reference/firms/authentication/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/main/reference/firms/firms/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/main/reference/firms/introduction/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/main/reference/firms/usage/</loc>
          <lastmod>2026-05-26</lastmod>
     </url>
     <url>
