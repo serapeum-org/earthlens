@@ -143,6 +143,12 @@ class NWPModel(BaseModel):
             selector — a Herbie `search` regex (`":TMP:2 m above
             ground:"`) for SDK models, or a provider var token
             (`"T_2M"`) for direct ones.
+        request_options: Free-form per-centre extras the adapter splats
+            into its request. ECMWF Open Data uses `ecmwf_model` /
+            `stream` / `type` (e.g. `{"ecmwf_model": "aifs-single"}` for
+            AIFS, `{"stream": "enfo", "type": "cf"}` for the ENS control);
+            an unsigned-S3 centre uses `bucket` / `key_template` /
+            `region`. Empty for the simple deterministic models.
 
     Examples:
         - Build a minimal Herbie-backed row and read its selector:
@@ -186,6 +192,7 @@ class NWPModel(BaseModel):
     mirrors: list[str] = Field(default_factory=list)
     url_template: str | None = None
     bands: dict[str, str] = Field(default_factory=dict)
+    request_options: dict[str, Any] = Field(default_factory=dict)
 
 
 class Catalog(AbstractCatalog):
