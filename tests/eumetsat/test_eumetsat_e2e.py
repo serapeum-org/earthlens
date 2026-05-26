@@ -8,6 +8,15 @@ Run with:
 
     EUMETSAT_CONSUMER_KEY=... EUMETSAT_CONSUMER_SECRET=... \\
     pixi run -e dev pytest -m "e2e and eumetsat" tests/eumetsat
+
+The test targets the MSG cloud-mask collection: its products are small
+(~0.5 MB) and reliably present (15-min cadence), so the fetch is quick.
+Geostationary products cover the whole disk regardless of bbox, and the
+collection has a 15-min cadence, so the test fetches a **single** product
+(not the whole window) to keep the download bounded. A download that
+returns HTTP 403 means the account has valid credentials but has not
+accepted that collection's EUMETSAT licence — that is an account-side
+configuration, not a code regression, so it is reported as a skip.
 """
 
 from __future__ import annotations
@@ -25,8 +34,8 @@ _HAVE_CREDS = bool(
     and os.environ.get("EUMETSAT_CONSUMER_SECRET")
 )
 
-# SEVIRI L1.5 has a short publication latency; probe a couple of days back so
-# the window is comfortably populated regardless of the exact run time.
+# The cloud mask has a short publication latency; probe a couple of days back
+# so the window is comfortably populated regardless of the exact run time.
 _PROBE_DATE = (dt.datetime.now(dt.timezone.utc) - dt.timedelta(days=3)).strftime(
     "%Y-%m-%d"
 )
@@ -39,19 +48,42 @@ _PROBE_DATE = (dt.datetime.now(dt.timezone.utc) - dt.timedelta(days=3)).strftime
     reason="set EUMETSAT_CONSUMER_KEY / EUMETSAT_CONSUMER_SECRET to run live EUMETSAT e2e tests",
 )
 class TestEumetsatLiveFetch:
-    """Single small product fetch against a public EUMETSAT collection."""
+    """Authenticate, search, and fetch one small product from the live store."""
 
-    def test_hrseviri_one_day_small_box(self, tmp_path: Path):
-        """MSG SEVIRI — small bbox x short window -> at least one product on disk."""
+    def test_search_and_fetch_one_cloud_mask(self, tmp_path: Path):
+        """Live auth + search returns products, and one fetches to disk.
+
+        Fetches a single MSG cloud-mask product (not the whole window) so the
+        download stays small. A 403 on the fetch means the account has not
+        accepted the collection licence and is reported as a skip.
+        """
         el = EarthLens(
             data_source="eumetsat",
             start=_PROBE_DATE,
             end=_PROBE_DATE,
-            variables={"msg-hrseviri": ["HRSEVIRI"]},
-            lat_lim=[0.0, 5.0],
-            lon_lim=[0.0, 5.0],
+            variables={"msg-cloud-mask": ["CLM"]},
+            lat_lim=[0.0, 10.0],
+            lon_lim=[0.0, 10.0],
             path=str(tmp_path),
         )
-        paths = el.download(progress_bar=False)
-        assert paths, f"no products written into {tmp_path!r}"
-        assert all(Path(p).exists() for p in paths)
+        backend = el.datasource
+        products = backend._search()
+        assert products, "live search returned no cloud-mask products for the window"
+
+        try:
+            paths = backend._fetch(products[:1])
+        except Exception as exc:  # noqa: BLE001 - classify a licence 403 as a skip
+            message = str(exc)
+            if (
+                "403" in message
+                or "Unauthorised" in message
+                or "Unauthorized" in message
+            ):
+                pytest.skip(
+                    "credentials are valid but the account has not accepted the "
+                    f"licence for this collection (HTTP 403): {message}"
+                )
+            raise
+
+        assert paths, "fetch returned no paths"
+        assert paths[0].exists() and paths[0].stat().st_size > 0

@@ -122,8 +122,15 @@ def fake_eumdac(monkeypatch):
 
 
 @pytest.fixture(autouse=True)
-def _clean_eumetsat_env(monkeypatch):
-    """Drop EUMETSAT credential env vars so tests start from a clean slate."""
+def _clean_eumetsat_env(request, monkeypatch):
+    """Drop EUMETSAT credential env vars so unit tests start from a clean slate.
+
+    Skipped for `e2e`-marked tests, which authenticate against the live Data
+    Store and therefore need the real `EUMETSAT_CONSUMER_KEY` /
+    `EUMETSAT_CONSUMER_SECRET` to survive into the test.
+    """
+    if request.node.get_closest_marker("e2e"):
+        return
     for var in (
         "EUMETSAT_CONSUMER_KEY",
         "EUMETSAT_CONSUMER_SECRET",
