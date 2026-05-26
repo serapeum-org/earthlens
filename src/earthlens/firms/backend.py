@@ -73,6 +73,13 @@ _DEFAULT_SENSORS = ["VIIRS_SNPP_NRT"]
 #: (and names the `*_SP` archive variant).
 NRT_RETENTION_DAYS = 60
 
+#: When a request fans out to more than this many `(sensor, chunk)` GETs,
+#: `_search` warns: FIRMS allows ~5000 transactions / 10 min and each GET
+#: is one transaction, so a very wide window x many sensors can approach
+#: the quota (the per-request back-off then paces it, but a heads-up is
+#: cheaper than discovering it mid-download).
+FANOUT_WARN_THRESHOLD = 50
+
 FileFormat = Literal["gpkg", "geojson"]
 
 #: Map output format to the OGR driver and file extension `to_file` uses.
@@ -280,10 +287,18 @@ class FIRMS(AbstractDataSource):
         start_date = self.time.start_date.date()
         end_date = self.time.end_date.date()
         windows = chunk_windows(start_date, end_date)
+        total_gets = len(self.vars) * len(windows)
         logger.info(
             f"FIRMS request: {len(self.vars)} sensor(s) x {len(windows)} chunk(s) "
-            f"= {len(self.vars) * len(windows)} CSV GET(s)"
+            f"= {total_gets} CSV GET(s)"
         )
+        if total_gets > FANOUT_WARN_THRESHOLD:
+            logger.warning(
+                f"FIRMS request fans out to {total_gets} CSV GET(s) (one "
+                f"transaction each); FIRMS allows ~5000 per rolling 10 minutes. "
+                "The per-request back-off will pace this, but consider narrowing "
+                "the window or sensor list for a large pull."
+            )
         products: list[RemoteProduct] = []
         for code in self.vars:
             sensor = self._catalog.get_sensor(code)

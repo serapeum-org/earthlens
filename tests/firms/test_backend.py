@@ -79,6 +79,22 @@ class TestSearchAndUrl:
         with pytest.raises(ValueError, match="Did you mean"):
             backend.download(progress_bar=False)
 
+    def test_large_fanout_warns_about_quota(
+        self, tmp_path: Path, fake_firms: _FakeFirms, warnings_log: list[str]
+    ):
+        """A wide window exceeding the fan-out threshold logs a quota warning."""
+        backend = _make_backend(tmp_path, start="2024-01-01", end="2024-12-31")
+        backend.download(progress_bar=False)
+        assert any("fans out" in msg for msg in warnings_log)
+
+    def test_small_request_no_fanout_warning(
+        self, tmp_path: Path, fake_firms: _FakeFirms, warnings_log: list[str]
+    ):
+        """A small request stays under the threshold and logs no quota warning."""
+        backend = _make_backend(tmp_path)
+        backend.download(progress_bar=False)
+        assert not any("fans out" in msg for msg in warnings_log)
+
 
 @pytest.mark.firms
 class TestFetch:
