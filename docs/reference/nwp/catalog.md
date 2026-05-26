@@ -108,8 +108,9 @@ The DWD tokens are HEAD-validated live for `icon-eu`; the ECMWF flux tokens
 
 ### Pressure-level (3-D) fields
 
-The Herbie (NOAA / ECCC) and ECMWF models also expose 3-D fields —
-geopotential height, temperature, u-/v-wind at **925 / 850 / 700 / 500 / 300 / 250 hPa** (so ~42 bands each):
+Every forecast model (all centres) also exposes 3-D fields —
+geopotential height, temperature, u-/v-wind, and relative humidity at
+**925 / 850 / 700 / 500 / 300 / 250 hPa** (so ~42 bands each):
 
 | Parameter | NOAA / ECCC (Herbie) | ECMWF (`param@level`) |
 |-----------|----------------------|-----------------------|
@@ -118,8 +119,8 @@ geopotential height, temperature, u-/v-wind at **925 / 850 / 700 / 500 / 300 / 2
 | `wind_u_250hPa` | `:UGRD:250 mb:` | `u@250` |
 | `relative_humidity_850hPa` | `:RH:850 mb:` | `r@850` |
 
-All 22 forecast models carry these 3-D fields at six pressure levels (925/850/700/500/300/250 hPa; ~42 bands each — analyses rtma/urma stay surface-only). The per-centre
-mechanics differ:
+All 20 forecast models carry these at six pressure levels (the analyses
+`rtma`/`urma` stay surface-only). The per-centre mechanics differ:
 
 * **Herbie (NOAA/ECCC)** — the level is in the `.idx` regex (`:TMP:850 mb:`); no
   special handling.
@@ -137,7 +138,7 @@ mechanics differ:
 from earthlens.nwp import Catalog
 
 cat = Catalog()
-len(cat.datasets)                          # 16
+len(cat.datasets)                          # 22
 cat.get_model("gfs").bands["temperature_2m"]   # ':TMP:2 m above ground:'
 ```
 
