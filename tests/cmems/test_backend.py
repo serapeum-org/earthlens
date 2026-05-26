@@ -88,6 +88,8 @@ class _FakeVar:
         self.epsg = 4326
 
     def read_array(self) -> np.ndarray:
+        if self._n == 1:
+            return np.zeros((2, 2), dtype="float64")  # single window -> 2D (lat, lon)
         return np.zeros((self._n, 2, 2), dtype="float64")
 
 
@@ -433,6 +435,86 @@ class TestCMEMSDownload:
         nc = types.SimpleNamespace(time_stamp=bad_time_stamp)
         with pytest.raises(ValueError, match="time"):
             CMEMS._window_labels(nc, "1MS")
+
+    def test_window_labels_skips_empty_buckets(self):
+        """Sparse timesteps under a fine `freq` leave empty Grouper buckets unlabelled."""
+        nc = types.SimpleNamespace(time_stamp=["2020-01-01", "2020-03-01"])
+        labels = CMEMS._window_labels(nc, "D")
+        assert labels == ["20200101", "20200301"], (
+            f"one label per timestep expected, empty daily buckets skipped; got {labels}"
+        )
+
+    def test_download_aggregate_at_depth_level(
+        self, fake_cmems: _FakeCmems, cmems_instance: CMEMS, tmp_path: Path,
+        monkeypatch: pytest.MonkeyPatch,
+    ):
+        """`level=` selects a single depth via `sel` instead of collapsing it."""
+        subset = tmp_path / "cmems_mod_glo_phy_my_0.083deg_P1D-m.nc"
+        subset.write_bytes(b"")
+        fake_cmems.subset_response = _FakeResponse(subset)
+        _install_fake_pyramids_reduce(monkeypatch)
+
+        paths = cmems_instance.download(
+            progress_bar=False,
+            aggregate=AggregationConfig(freq="1MS", op="mean", level=0.5),
+        )
+        assert len(paths) == 2, f"expected two monthly windows, got {len(paths)}"
+        assert _FAKE_REDUCE_CALLS == [
+            {"dim": "time", "how": "mean", "groupby_distinct": 2},
+        ], f"depth should be `sel`-ected (no depth reduce), got: {_FAKE_REDUCE_CALLS}"
+
+    def test_download_aggregate_single_window_reshapes_2d(
+        self, fake_cmems: _FakeCmems, cmems_instance: CMEMS, tmp_path: Path,
+        monkeypatch: pytest.MonkeyPatch,
+    ):
+        """A freq collapsing all steps to one window yields a 2-D array, reshaped to 3-D."""
+        subset = tmp_path / "cmems_mod_glo_phy_my_0.083deg_P1D-m.nc"
+        subset.write_bytes(b"")
+        fake_cmems.subset_response = _FakeResponse(subset)
+        _install_fake_pyramids_reduce(monkeypatch)
+
+        paths = cmems_instance.download(
+            progress_bar=False,
+            aggregate=AggregationConfig(freq="YS", op="mean"),
+        )
+        names = sorted(p.name for p in paths)
+        assert names == [
+            "cmems_mod_glo_phy_my_0.083deg_P1D-m_thetao_YS_20200101.tif",
+        ], f"40 daily steps in one calendar year -> one window; got {names}"
+        assert paths[0].exists(), "single-window GeoTIFF should be written"
+
+    def test_aggregate_one_raises_without_time_dimension(
+        self, cmems_instance: CMEMS, tmp_path: Path, monkeypatch: pytest.MonkeyPatch,
+    ):
+        """`_aggregate_one` rejects a NetCDF lacking a `time` dimension."""
+        _install_fake_pyramids_reduce(monkeypatch)
+        monkeypatch.setattr(
+            _FakeNetCDF, "dimension_names", ("depth", "latitude", "longitude")
+        )
+        nc_path = tmp_path / "no_time.nc"
+        nc_path.write_bytes(b"")
+        with pytest.raises(ValueError, match="no `time` dimension"):
+            cmems_instance._aggregate_one(
+                nc_path, AggregationConfig(freq="1MS", op="mean"), "mean"
+            )
+
+    def test_aggregate_one_without_depth_skips_depth_reduce(
+        self, cmems_instance: CMEMS, tmp_path: Path, monkeypatch: pytest.MonkeyPatch,
+    ):
+        """A 2-D (no `depth`) NetCDF goes straight to the time reduce."""
+        _install_fake_pyramids_reduce(monkeypatch)
+        monkeypatch.setattr(
+            _FakeNetCDF, "dimension_names", ("latitude", "longitude", "time")
+        )
+        nc_path = tmp_path / "cmems_mod_glo_phy_my_0.083deg_P1D-m.nc"
+        nc_path.write_bytes(b"")
+        written = cmems_instance._aggregate_one(
+            nc_path, AggregationConfig(freq="1MS", op="mean", out_dir=str(tmp_path)), "mean"
+        )
+        assert len(written) == 2, f"expected two monthly windows, got {len(written)}"
+        assert _FAKE_REDUCE_CALLS == [
+            {"dim": "time", "how": "mean", "groupby_distinct": 2},
+        ], f"no depth dim -> only the time reduce should run, got: {_FAKE_REDUCE_CALLS}"
 
     def test_download_disable_progress_forwards(
         self, fake_cmems: _FakeCmems, cmems_instance: CMEMS, tmp_path: Path
