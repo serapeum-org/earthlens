@@ -1,5 +1,17 @@
 # Change Log
 
+## 0.6.0 (2026-05-26)
+
+### Feat
+
+- **earthdata**: add NASA Earthdata backend (EOSDIS via earthaccess + CMR) (#148)
+- **stac**: unified STAC-API + COG backend (Planetary Computer / CDSE / Earth Search) (#150)
+- **tropycal**: add tropical-cyclone backend with best-track, recon, ships and realtime products (#149)
+- **openaq**: add OpenAQ v3 air-quality backend (#106) (#106)
+- **gdacs**: add GDACS multi-hazard disaster-alert backend (#105)
+- **fdsn**: add FDSN seismic-event backend (first vector output) (#72)
+- **cmems**: add Copernicus Marine (CMEMS) backend (#73)
+
 ## 0.5.0 (2026-05-18)
 
 ### Feat
