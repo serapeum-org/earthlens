@@ -90,12 +90,21 @@ selector:
 | `temperature_2m` | `:TMP:2 m above ground:` | `2t` | `T_2M` |
 | `precipitation_acc` | `:APCP:surface:` | `tp` | `TOT_PREC` |
 | `dewpoint_2m` | `:DPT:2 m above ground:` | `2d` | `TD_2M` |
+| `relative_humidity_2m` | `:RH:2 m above ground:` | `2r` | `RELHUM_2M` |
 | `wind_u_10m` | `:UGRD:10 m above ground:` | `10u` | `U_10M` |
 | `wind_v_10m` | `:VGRD:10 m above ground:` | `10v` | `V_10M` |
+| `wind_gust` | `:GUST:surface:` | `10fg` | `VMAX_10M` |
 | `pressure_msl` | `:PRMSL:mean sea level:` | `msl` | `PMSL` |
+| `surface_pressure` | `:PRES:surface:` | `sp` | `PS` |
+| `total_cloud_cover` | `:TCDC:entire atmosphere:` | `tcc` | `CLCT` |
+| `cape` | `:CAPE:surface:` | `cape` | `CAPE_ML` |
+| `downward_shortwave_radiation` | `:DSWRF:surface:` | `ssrd` | — (no single token) |
 
-Not every model carries every band (e.g. analyses omit `precipitation_acc`); a
-requested band a model doesn't publish is skipped under `errors="warn"`.
+11–12 bands per forecast model (analyses `rtma`/`urma` carry the 9 non-flux
+fields). Not every model publishes every band — a requested band a model
+doesn't carry is skipped under `errors="warn"` (it is not a hard error). The
+DWD tokens are HEAD-validated live for `icon-eu`; the ECMWF flux tokens
+(`cape`/`ssrd`) may be outside the open-data subset for some runs and skip.
 
 ```python
 from earthlens.nwp import Catalog
