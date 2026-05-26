@@ -76,7 +76,5 @@ def safe_product_filename(product_id: str) -> str:
     """
     name = product_id.replace("\\", "/").rsplit("/", 1)[-1].strip()
     if not name or name in (".", ".."):
-        raise ValueError(
-            f"product id {product_id!r} does not yield a usable filename"
-        )
+        raise ValueError(f"product id {product_id!r} does not yield a usable filename")
     return name
