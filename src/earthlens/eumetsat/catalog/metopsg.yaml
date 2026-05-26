@@ -1,0 +1,41 @@
+# Metop-SG (Metop Second Generation) collections.
+# Ids, titles and start dates walked from the public browse endpoint
+# (api.eumetsat.int/data/browse/collections) on 2026-05-26. Hand-tuned rows
+# (HRSEVIRI, the S5P gases, ASCAT soil moisture, the MTG suite, ...) keep their
+# vetted metadata; the rest carry browse-derived format/output_kind/cadence
+# heuristics (advisory for the whole-product download) refined per product as
+# needed. Reconcile with tools/eumetsat/audit_eumetsat_catalog.py.
+datasets:
+  metopsg-aux:
+    collection_id: "EO:EUM:DAT:0520"
+    group: Metop-SG
+    mission: metop-sg
+    output_kind: raster
+    format: other
+    cadence: irregular
+    selectors: [AUX]
+    tailor_product_type: null
+    extent: { lat: [-90.0, 90.0], lon: [-180.0, 180.0] }
+    temporal: { start: 2026-04-28, end: null }
+  metopsg-bufr:
+    collection_id: "EO:EUM:DAT:0892"
+    group: Metop-SG
+    mission: metop-sg
+    output_kind: raster
+    format: bufr
+    cadence: subdaily
+    selectors: [BUFR]
+    tailor_product_type: null
+    extent: { lat: [-90.0, 90.0], lon: [-180.0, 180.0] }
+    temporal: { start: 2026-02-26, end: null }
+  metopsg-gras2-l1b:
+    collection_id: "EO:EUM:DAT:0452"
+    group: Metop-SG
+    mission: metop-sg
+    output_kind: raster
+    format: netcdf
+    cadence: subdaily
+    selectors: [GRAS-L1B]
+    tailor_product_type: null
+    extent: { lat: [-90.0, 90.0], lon: [-180.0, 180.0] }
+    temporal: { start: 2026-02-26, end: null }
