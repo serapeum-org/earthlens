@@ -17,9 +17,15 @@
 #   temporal     : {start, end, quality} — the sensor's coverage window
 #                  and quality tier. NRT (near-real-time) sensors cover
 #                  only roughly the last ~2 months; SP (standard-quality)
-#                  sensors hold the older archive. `end: null` means
-#                  "ongoing". earthlens.firms warns (it does not auto-swap)
-#                  when a request falls outside this window.
+#                  sensors hold the older archive. `end` is intentionally
+#                  `null` for every row: NRT sensors are genuinely ongoing,
+#                  and an SP archive's end advances continuously (it lags
+#                  real time by ~2 months), so pinning a fixed date here
+#                  would go stale — query `data_availability` (or the audit
+#                  tool) for the live max_date. Consequently the runtime
+#                  out-of-coverage *end* warning is inactive until a real
+#                  `end` is set; earthlens.firms still warns (it does not
+#                  auto-swap) on the pre-start and NRT-retention cases.
 #   columns      : the sensor-family-specific CSV columns of interest,
 #                  each with `units` and `long_name`. The common columns
 #                  (latitude/longitude/acq_date/acq_time/satellite/frp/
