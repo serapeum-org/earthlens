@@ -399,12 +399,12 @@ class CMEMS(AbstractDataSource):
         like ECMWF's (per-window GeoTIFFs, not a multidimensional
         NetCDF, which the GDAL netCDF driver cannot write back).
 
-        The window labels are computed here from the file's own decoded
-        time axis (see :meth:`_window_labels`) and handed to `reduce` as
-        an explicit per-timestep label sequence — `reduce`'s
-        frequency-string grouping relies on its native
-        `get_time_variable`, which does not decode the CMEMS time
-        coordinate, so the label form is used instead.
+        The window labels are computed here from the file's CF-decoded
+        time axis (pyramids' `NetCDF.time_stamp`, which parses the CF
+        `units` + `calendar`; see :meth:`_window_labels`) and handed to
+        `reduce` as an explicit per-timestep label sequence, so each
+        output slice carries a start-of-window `YYYYMMDD` label for its
+        filename.
 
         Args:
             nc_path: The NetCDF to reduce.
@@ -440,7 +440,7 @@ class CMEMS(AbstractDataSource):
                 nc = nc.reduce("depth", how="mean", skipna=config.skipna)
                 depth_collapsed = True
 
-        labels = self._window_labels(nc_path, config.freq)
+        labels = self._window_labels(nc, config.freq)
         windows = list(dict.fromkeys(labels))
         reduced = nc.reduce(
             "time", how=how, groupby=labels, skipna=config.skipna
@@ -473,30 +473,35 @@ class CMEMS(AbstractDataSource):
         return written
 
     @staticmethod
-    def _window_labels(nc_path: Path, freq: str) -> list[str]:
+    def _window_labels(nc: NetCDF, freq: str) -> list[str]:
         """Return one window label per timestep, bucketing time by `freq`.
 
-        Decodes the NetCDF's CF time axis (via the pyramids
-        `to_xarray()` bridge + `xarray.decode_cf`, the same path the
-        CMEMS example notebooks use) into a `pandas.DatetimeIndex`, then
+        Reads the NetCDF's CF-decoded time axis from pyramids'
+        :attr:`pyramids.netcdf.NetCDF.time_stamp` (which parses the CF
+        `units` + `calendar`), builds a `pandas.DatetimeIndex`, then
         assigns each timestep the start-of-window timestamp of its
         `freq` bucket. Timesteps in the same window share a label, so
         :meth:`pyramids.netcdf.NetCDF.reduce` coarsens `time` to one
         slice per distinct window.
 
         Args:
-            nc_path: The NetCDF whose time axis to bucket.
+            nc: The NetCDF whose time axis to bucket.
             freq: A pandas offset alias (`"1MS"`, `"7D"`, `"YS"`, …).
 
         Returns:
             list[str]: One `YYYYMMDD` window label per timestep, in
                 file order (length = the time dimension size).
-        """
-        import xarray as xr
-        from pyramids.netcdf import NetCDF
 
-        ds = xr.decode_cf(NetCDF.read_file(str(nc_path)).to_xarray())
-        time_index = pd.DatetimeIndex(ds["time"].values)
+        Raises:
+            ValueError: When the CF `time` axis cannot be decoded.
+        """
+        times = nc.time_stamp
+        if not times:
+            raise ValueError(
+                "cannot decode the NetCDF CF `time` axis for windowing "
+                "(no `time` variable with a CF `units` attribute)."
+            )
+        time_index = pd.DatetimeIndex(pd.to_datetime(list(times)))
         positions = pd.Series(range(len(time_index)), index=time_index)
         label_for: dict[int, str] = {}
         for window_start, group in positions.groupby(pd.Grouper(freq=freq)):

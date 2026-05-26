@@ -106,13 +106,13 @@ class _FakeNetCDF:
     """Minimal pyramids `NetCDF` stub exercising the aggregate path."""
 
     dimension_names = ("depth", "latitude", "longitude", "time")
+    # CF-decoded time axis (pyramids `NetCDF.time_stamp`) — 40 daily steps ->
+    # Jan (31) + Feb (9) 2020 -> two monthly windows. Replaces the old xarray path.
+    time_stamp = [d.isoformat() for d in pd.date_range("2020-01-01", periods=40, freq="D")]
 
     @classmethod
     def read_file(cls, path: str) -> "_FakeNetCDF":
         return cls()
-
-    def to_xarray(self):  # consumed by xr.decode_cf in _window_labels
-        return self
 
     def reduce(self, dim, how="mean", *, groupby=None, skipna=True):
         call: dict[str, Any] = {"dim": dim, "how": how}
@@ -142,7 +142,7 @@ class _FakeDataset:
 
 
 def _install_fake_pyramids_reduce(monkeypatch: pytest.MonkeyPatch) -> None:
-    """Wire fake pyramids `NetCDF`/`Dataset` + xarray time decode for aggregate tests."""
+    """Wire fake pyramids `NetCDF`/`Dataset` for the aggregate path (no xarray)."""
     _FAKE_REDUCE_CALLS.clear()
 
     netcdf_mod = types.ModuleType("pyramids.netcdf")
@@ -152,12 +152,6 @@ def _install_fake_pyramids_reduce(monkeypatch: pytest.MonkeyPatch) -> None:
     dataset_mod = types.ModuleType("pyramids.dataset")
     dataset_mod.Dataset = _FakeDataset
     monkeypatch.setitem(sys.modules, "pyramids.dataset", dataset_mod)
-
-    # 40 daily steps -> Jan (31) + Feb (9) 2020 -> two monthly windows.
-    time_index = pd.date_range("2020-01-01", periods=40, freq="D")
-    xr_mod = types.ModuleType("xarray")
-    xr_mod.decode_cf = lambda ds: {"time": types.SimpleNamespace(values=time_index)}
-    monkeypatch.setitem(sys.modules, "xarray", xr_mod)
 
 
 @pytest.fixture
