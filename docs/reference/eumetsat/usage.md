@@ -21,18 +21,19 @@ el = EarthLens(
 paths = el.download()
 ```
 
-### `variables` — `{collection_key: [selector, ...]}`
+### `variables` — `{dataset_key: [selector, ...]}`
 
-Each key is a **curated collection key** (e.g. `"msg-hrseviri"`,
+Each key is a **curated dataset key** (e.g. `"msg-hrseviri"`,
 `"s3-olci-l2-wfr"`; see the [catalog reference](catalog.md) for the full
 list). The list holds **selectors** that are *informational* — EUMETSAT
 delivers whole products, so you cannot band-subset a download without
 Data Tailor. The selectors seed catalog metadata and the future Data
 Tailor request.
 
-A request may name several collections at once, but they must all share
-one `output_kind` (all curated rows are `raster`, so this is rarely a
-constraint).
+A request may name several datasets at once, but they must all share one
+`output_kind` — most datasets are `raster`, but the point/vector products
+(Atmospheric Motion Vectors, ASCAT winds, the Lightning Imager
+event/flash/group products) are `vector`, so a mixed request is rejected.
 
 ### Bounding box and time window
 
@@ -65,8 +66,9 @@ window.
 
 ## Output kind and `aggregate=`
 
-The backend sets `OUTPUT_KIND` from the resolved collection row (`G1`).
-For the curated MVP collections this is `"raster"`.
+The backend sets `OUTPUT_KIND` from the resolved dataset row (`G1`).
+Most datasets are `"raster"`; the Atmospheric Motion Vector, ASCAT wind,
+and Lightning Imager event/flash/group datasets are `"vector"`.
 
 `aggregate=` is the server-side subset / reduce path, which on the Data
 Store is **Data Tailor** — not part of the MVP. A non-`None`
@@ -95,7 +97,7 @@ Inspect a row's format before assuming it is pyramids-readable:
 
 ```python
 from earthlens.eumetsat import Catalog
-print(Catalog().get_collection("s3-olci-l2-wfr").format)   # 'netcdf'
+print(Catalog().get_dataset("s3-olci-l2-wfr").format)   # 'netcdf'
 ```
 
 ## A few runnable snippets
@@ -106,8 +108,8 @@ print(Catalog().get_collection("s3-olci-l2-wfr").format)   # 'netcdf'
 from earthlens.eumetsat import Catalog
 
 cat = Catalog()
-print(len(cat.collections), "curated collections")
-for key, col in sorted(cat.collections.items()):
+print(len(cat.datasets), "curated collections")
+for key, col in sorted(cat.datasets.items()):
     print(f"{key:32s} {col.group.value:12s} {col.format}")
 ```
 
@@ -157,7 +159,7 @@ Space. Inspect the value with:
 
 ```python
 from earthlens.eumetsat import Catalog
-print(Catalog().get_collection("s5p-l2-no2").timeliness)   # 'nrt'
+print(Catalog().get_dataset("s5p-l2-no2").timeliness)   # 'nrt'
 ```
 
 ## Quotas, rate limits, and gotchas
@@ -174,15 +176,18 @@ print(Catalog().get_collection("s5p-l2-no2").timeliness)   # 'nrt'
 
 ## Catalog tooling
 
-Two scripts under `tools/eumetsat/` keep the catalog honest (they need
-credentials):
+Three scripts under `tools/eumetsat/` keep the catalog honest. They use
+the **public** browse endpoint, so they need **no credentials**:
 
 ```bash
-# Rebuild the available_collections index from the live Data Store
+# Rebuild the available_datasets index from the public browse endpoint
 pixi run -e dev python tools/eumetsat/refresh_eumetsat_catalog.py refresh
 
 # Diff the curated catalog + index against live (CI: --strict)
 pixi run -e dev python tools/eumetsat/audit_eumetsat_catalog.py --strict
+
+# Print one collection's public metadata (by id or curated key)
+pixi run -e dev python tools/eumetsat/probe_eumetsat_product.py msg-hrseviri
 ```
 
 See the [catalog reference](catalog.md) for details.

@@ -5,7 +5,7 @@
 # vetted metadata; the rest carry browse-derived format/output_kind/cadence
 # heuristics (advisory for the whole-product download) refined per product as
 # needed. Reconcile with tools/eumetsat/audit_eumetsat_catalog.py.
-collections:
+datasets:
   osi-saf-amsr2-global-sea-ice-concentration-interim:
     collection_id: "EO:EUM:DAT:1064"
     group: OSI-SAF

@@ -53,7 +53,7 @@ def test_group_kwarg_disambiguates(fake_eumdac, tmp_path):
     backend = _make_backend(
         fake_eumdac, tmp_path, {"msg-hrseviri": ["HRSEVIRI"]}, group="MSG"
     )
-    assert backend._collections[0].group is DataStoreGroup.MSG
+    assert backend._datasets[0].group is DataStoreGroup.MSG
     with pytest.raises(ValueError, match="not the requested group"):
         _make_backend(
             fake_eumdac, tmp_path, {"msg-hrseviri": ["HRSEVIRI"]}, group="MTG"
@@ -123,8 +123,8 @@ def test_download_empty_search_returns_empty(fake_eumdac, tmp_path):
     assert backend.download(progress_bar=False) == []
 
 
-def test_multiple_collections_searched(fake_eumdac, tmp_path):
-    """A request naming two same-kind collections searches both."""
+def test_multiple_datasets_searched(fake_eumdac, tmp_path):
+    """A request naming two same-kind datasets searches both."""
     fake_eumdac.store.products_for["EO:EUM:DAT:MSG:HRSEVIRI"] = [_FakeProduct("a")]
     fake_eumdac.store.products_for["EO:EUM:DAT:0407"] = [_FakeProduct("b")]
     backend = _make_backend(
@@ -146,10 +146,10 @@ def test_aggregate_raises_pointing_at_data_tailor(fake_eumdac, tmp_path):
 
 def test_unify_output_kind_rejects_mixed(fake_eumdac, tmp_path):
     """A request mixing output kinds is rejected at construction."""
-    from earthlens.eumetsat.catalog import EumetsatCollection
+    from earthlens.eumetsat.catalog import EumetsatDataset
 
-    raster = EumetsatCollection(collection_id="A", group="MSG", output_kind="raster")
-    vector = EumetsatCollection(collection_id="B", group="MSG", output_kind="vector")
+    raster = EumetsatDataset(collection_id="A", group="MSG", output_kind="raster")
+    vector = EumetsatDataset(collection_id="B", group="MSG", output_kind="vector")
     with pytest.raises(ValueError, match="must share one"):
         EUMETSAT._unify_output_kind([raster, vector])
 

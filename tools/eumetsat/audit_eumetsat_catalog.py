@@ -1,13 +1,13 @@
 """Audit the curated EUMETSAT catalog against the live Data Store (C8).
 
 The EUMETSAT analog of `tools/gee/audit_gee_datasets.py`. Diffs every
-curated collection row and the `available_collections` index against the
+curated collection row and the `available_datasets` index against the
 collection set the live Data Store currently lists, and reports:
 
 * **gone** — a curated `collection_id` the live store no longer lists
   (renamed / retired collection).
-* **index-gone** — an `available_collections` id no longer live.
-* **new** — a live collection id absent from `available_collections`
+* **index-gone** — an `available_datasets` id no longer live.
+* **new** — a live collection id absent from `available_datasets`
   (the index is stale; re-run the refresh tool).
 
 Run:
@@ -32,8 +32,8 @@ def audit(strict: bool) -> int:
     from earthlens.eumetsat import Catalog
 
     catalog = Catalog()
-    curated_ids = {c.collection_id for c in catalog.collections.values()}
-    available_ids = set(catalog.available_collections)
+    curated_ids = {c.collection_id for c in catalog.datasets.values()}
+    available_ids = set(catalog.available_datasets)
 
     # The browse endpoint is public, so the audit needs no credentials.
     live_ids = set(browse_collection_ids())
@@ -42,9 +42,9 @@ def audit(strict: bool) -> int:
     for cid in findings["gone"]:
         print(f"GONE        {cid}: curated row no longer live")
     for cid in findings["index_gone"]:
-        print(f"INDEX-GONE  {cid}: available_collections entry no longer live")
+        print(f"INDEX-GONE  {cid}: available_datasets entry no longer live")
     for cid in findings["new"]:
-        print(f"NEW         {cid}: live but absent from available_collections")
+        print(f"NEW         {cid}: live but absent from available_datasets")
 
     total = sum(len(v) for v in findings.values())
     if total == 0:

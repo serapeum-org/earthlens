@@ -116,13 +116,13 @@ def diff_catalog(
     Pure function (no I/O) so it is unit-testable. Reports:
 
     * `gone` — a curated `collection_id` the live store no longer lists.
-    * `index_gone` — an `available_collections` id no longer live.
-    * `new` — a live id absent from `available_collections`.
+    * `index_gone` — an `available_datasets` id no longer live.
+    * `new` — a live id absent from `available_datasets`.
 
     Args:
         live_ids: Collection ids the live Data Store lists.
         curated_ids: `collection_id`s of the curated rows.
-        available_ids: ids in the `available_collections` index.
+        available_ids: ids in the `available_datasets` index.
 
     Returns:
         dict[str, list[str]]: Sorted finding lists keyed by category.

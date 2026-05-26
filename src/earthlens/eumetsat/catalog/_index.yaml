@@ -4,7 +4,7 @@
 # this; it is the full-catalog counterpart to the curated `collections:` rows
 # in the per-group files (the GEE / Earthdata pattern: available = the whole
 # provider catalog, curated = the vetted subset).
-available_collections:
+available_datasets:
   - "EO:EUM:CM:METOP:ASCSZFR02"
   - "EO:EUM:CM:METOP:ASCSZOR02"
   - "EO:EUM:CM:METOP:ASCSZRR02"

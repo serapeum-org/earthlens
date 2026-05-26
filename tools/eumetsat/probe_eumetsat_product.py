@@ -36,12 +36,12 @@ def _resolve_to_id(target: str) -> str:
     Returns:
         str: The collection id to probe.
     """
-    if target.startswith("EO:EUM:DAT:"):
+    if target.startswith("EO:EUM:"):
         return target
     try:
         from earthlens.eumetsat import Catalog
 
-        return Catalog().get_collection(target).collection_id
+        return Catalog().get_dataset(target).collection_id
     except Exception as exc:  # noqa: BLE001 - friendly CLI message
         sys.exit(f"{target!r} is neither a collection id nor a curated key: {exc}")
 

@@ -1,8 +1,8 @@
-"""Refresh the EUMETSAT `available_collections` index (C7).
+"""Refresh the EUMETSAT `available_datasets` index (C7).
 
 The EUMETSAT analog of `tools/gee/refresh_gee_catalog.py`. Walks the live
 Data Store collection list (via `eumdac`) and rebuilds the informational
-`available_collections:` index in `catalog/_index.yaml`, and can emit a
+`available_datasets:` index in `catalog/_index.yaml`, and can emit a
 curated stanza for a single collection to paste into a per-group file.
 
 Run:
@@ -32,23 +32,23 @@ _INDEX_HEADER = (
     "# Informational index of every EUMETSAT Data Store collection id, walked from\n"
     "# the public browse endpoint (api.eumetsat.int/data/browse/collections) by\n"
     "# tools/eumetsat/refresh_eumetsat_catalog.py. Runtime code does not consume\n"
-    "# this; it is the full-catalog counterpart to the curated `collections:` rows\n"
+    "# this; it is the full-catalog counterpart to the curated `datasets:` rows\n"
     "# in the per-group files (the GEE / Earthdata pattern: available = the whole\n"
     "# provider catalog, curated = the vetted subset).\n"
 )
 
 
 def _write_index(ids: list[str]) -> None:
-    """Write the `available_collections` index, preserving the header."""
+    """Write the `available_datasets` index, preserving the header."""
     with open(INDEX_PATH, "w", encoding="utf-8") as fh:
         fh.write(_INDEX_HEADER)
-        fh.write("available_collections:\n")
+        fh.write("available_datasets:\n")
         for cid in ids:
             fh.write(f'  - "{cid}"\n')
 
 
 def refresh() -> int:
-    """Rebuild `available_collections` from the public browse endpoint."""
+    """Rebuild `available_datasets` from the public browse endpoint."""
     ids = browse_collection_ids()
     _write_index(ids)
     print(f"wrote {len(ids)} collection ids to {INDEX_PATH}")
@@ -76,7 +76,7 @@ def add_collection(key: str, collection_id: str, group: str) -> int:
         }
     }
     print(f"# {title}")
-    print(yaml.safe_dump({"collections": stanza}, sort_keys=False, allow_unicode=True))
+    print(yaml.safe_dump({"datasets": stanza}, sort_keys=False, allow_unicode=True))
     return 0
 
 
@@ -84,7 +84,7 @@ def main(argv: list[str] | None = None) -> int:
     """Parse arguments and dispatch the refresh / add-collection command."""
     parser = argparse.ArgumentParser(description="Refresh the EUMETSAT catalog index.")
     sub = parser.add_subparsers(dest="command", required=True)
-    sub.add_parser("refresh", help="rebuild available_collections from the live store")
+    sub.add_parser("refresh", help="rebuild available_datasets from the live store")
     add = sub.add_parser("add-collection", help="emit a curated stanza for one id")
     add.add_argument("key", help="friendly catalog key, e.g. msg-hrseviri")
     add.add_argument("collection_id", help="the real EO:EUM:DAT:... id")

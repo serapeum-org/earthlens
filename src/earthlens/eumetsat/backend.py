@@ -4,7 +4,7 @@
 the other earthlens backends — `start`, `end`, `variables`, `lat_lim`,
 `lon_lim`, `temporal_resolution`, `path` — plus a few backend-specific
 kwargs for the OAuth2 consumer key / secret and group disambiguation.
-Each `(collection_key, [selector, ...])` pair in the `variables` mapping
+Each `(dataset_key, [selector, ...])` pair in the `variables` mapping
 names one curated Data Store collection to search (bbox + window) and
 fetch.
 
@@ -47,7 +47,7 @@ from earthlens.base import (
 )
 from earthlens.eumetsat._helpers import eumdac_bbox, safe_product_filename
 from earthlens.eumetsat.auth import EumetsatAuth, EumetsatCredentials
-from earthlens.eumetsat.catalog import Catalog, DataStoreGroup, EumetsatCollection
+from earthlens.eumetsat.catalog import Catalog, DataStoreGroup, EumetsatDataset
 
 if TYPE_CHECKING:
     from earthlens.aggregate import AggregationConfig
@@ -87,7 +87,7 @@ class EUMETSAT(AbstractDataSource):
     ):
         """Initialise an EUMETSAT backend instance.
 
-        Resolves every requested collection key against the catalog
+        Resolves every requested dataset key against the catalog
         **before** calling the parent constructor, so the per-instance
         `OUTPUT_KIND` is set from the resolved row(s). The parent
         `__init__` runs `_initialize` first (token mint), so the
@@ -96,7 +96,7 @@ class EUMETSAT(AbstractDataSource):
         Args:
             start: Inclusive start date as a string (parsed with `fmt`).
             end: Inclusive end date as a string.
-            variables: Mapping from curated collection key to a list of
+            variables: Mapping from curated dataset key to a list of
                 selectors, e.g. `{"msg-hrseviri": ["HRSEVIRI"]}`.
                 Selectors are informational for the whole-product fetch
                 (`G2`).
@@ -119,7 +119,7 @@ class EUMETSAT(AbstractDataSource):
                 credentials file.
 
         Raises:
-            ValueError: When `variables` is empty, a collection key is
+            ValueError: When `variables` is empty, a dataset key is
                 unknown, or the requested collections do not all share
                 one `output_kind`.
         """
@@ -133,10 +133,8 @@ class EUMETSAT(AbstractDataSource):
         self._show_progress = True
 
         self._catalog = Catalog()
-        self._collections: list[EumetsatCollection] = self._resolve_collections(
-            variables
-        )
-        self.OUTPUT_KIND = self._unify_output_kind(self._collections)
+        self._datasets: list[EumetsatDataset] = self._resolve_datasets(variables)
+        self.OUTPUT_KIND = self._unify_output_kind(self._datasets)
 
         super().__init__(
             start=start,
@@ -149,16 +147,16 @@ class EUMETSAT(AbstractDataSource):
             path=path,
         )
 
-    def _resolve_collections(
+    def _resolve_datasets(
         self, variables: dict[str, list[str]]
-    ) -> list[EumetsatCollection]:
-        """Resolve every requested collection key to a catalog row.
+    ) -> list[EumetsatDataset]:
+        """Resolve every requested dataset key to a catalog row.
 
         Args:
-            variables: The `{collection_key: [selector, ...]}` request.
+            variables: The `{dataset_key: [selector, ...]}` request.
 
         Returns:
-            list[EumetsatCollection]: One row per key, in request order.
+            list[EumetsatDataset]: One row per key, in request order.
 
         Raises:
             ValueError: When `variables` is empty or a key is unknown
@@ -167,20 +165,20 @@ class EUMETSAT(AbstractDataSource):
         if not variables:
             raise ValueError(
                 "EUMETSAT requires a non-empty `variables` mapping of "
-                "{collection_key: [selector, ...]}."
+                "{dataset_key: [selector, ...]}."
             )
         return [self._catalog.resolve(key, group=self._group) for key in variables]
 
     @staticmethod
-    def _unify_output_kind(collections: list[EumetsatCollection]) -> OutputKind:
+    def _unify_output_kind(datasets: list[EumetsatDataset]) -> OutputKind:
         """Return the single `output_kind` shared by every requested row.
 
         A backend instance carries exactly one `OUTPUT_KIND`, so a
-        request mixing (say) a raster and a vector collection is
-        ambiguous and rejected here.
+        request mixing (say) a raster and a vector dataset is ambiguous
+        and rejected here.
 
         Args:
-            collections: The resolved collection rows.
+            datasets: The resolved dataset rows.
 
         Returns:
             OutputKind: The shared `output_kind`.
@@ -188,13 +186,13 @@ class EUMETSAT(AbstractDataSource):
         Raises:
             ValueError: When the rows do not all share one `output_kind`.
         """
-        kinds = {col.output_kind for col in collections}
+        kinds = {ds.output_kind for ds in datasets}
         if len(kinds) > 1:
             detail = ", ".join(
-                f"{col.collection_id}={col.output_kind}" for col in collections
+                f"{ds.collection_id}={ds.output_kind}" for ds in datasets
             )
             raise ValueError(
-                "all collections in one EUMETSAT request must share one "
+                "all datasets in one EUMETSAT request must share one "
                 f"output_kind; got mixed kinds ({detail}). Split the "
                 "request into one call per output kind."
             )
@@ -315,8 +313,8 @@ class EUMETSAT(AbstractDataSource):
             hour=23, minute=59, second=59, microsecond=999999
         )
         products: list[RemoteProduct] = []
-        for col in self._collections:
-            collection = store.get_collection(col.collection_id)
+        for ds in self._datasets:
+            collection = store.get_collection(ds.collection_id)
             for product in collection.search(
                 bbox=bbox,
                 dtstart=dtstart,
@@ -325,7 +323,7 @@ class EUMETSAT(AbstractDataSource):
                 products.append(
                     RemoteProduct(
                         id=str(product),
-                        metadata={"product": product, "collection": col},
+                        metadata={"product": product, "dataset": ds},
                     )
                 )
         return products

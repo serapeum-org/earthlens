@@ -5,7 +5,7 @@
 # vetted metadata; the rest carry browse-derived format/output_kind/cadence
 # heuristics (advisory for the whole-product download) refined per product as
 # needed. Reconcile with tools/eumetsat/audit_eumetsat_catalog.py.
-collections:
+datasets:
   mtg-active-fire:
     collection_id: "EO:EUM:DAT:0682"
     group: MTG

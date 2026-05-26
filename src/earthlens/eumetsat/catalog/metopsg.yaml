@@ -5,7 +5,7 @@
 # vetted metadata; the rest carry browse-derived format/output_kind/cadence
 # heuristics (advisory for the whole-product download) refined per product as
 # needed. Reconcile with tools/eumetsat/audit_eumetsat_catalog.py.
-collections:
+datasets:
   metopsg-aux:
     collection_id: "EO:EUM:DAT:0520"
     group: Metop-SG

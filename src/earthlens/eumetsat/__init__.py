@@ -19,7 +19,7 @@ Public surface (re-exported from this package):
   `EUMETSAT.download`.
 * `Catalog` — pydantic-backed loader for the bundled per-group
   `catalog/` directory.
-* `EumetsatCollection` — one curated collection row (collection_id,
+* `EumetsatDataset` — one curated dataset (collection) row (collection_id,
   group, output_kind, format, selectors, tailor_product_type, extent).
 * `DataStoreGroup` — the Data Store group (mission family) enum.
 * `Extent` / `TemporalCoverage` — the spatial / temporal coverage rows.
@@ -46,7 +46,7 @@ from earthlens.eumetsat.catalog import (
     CATALOG_PATH,
     Catalog,
     DataStoreGroup,
-    EumetsatCollection,
+    EumetsatDataset,
     Extent,
     TemporalCoverage,
     clear_catalog_cache,
@@ -59,7 +59,7 @@ __all__ = [
     "DataStoreGroup",
     "EUMETSAT",
     "EumetsatAuth",
-    "EumetsatCollection",
+    "EumetsatDataset",
     "EumetsatCredentials",
     "Extent",
     "TemporalCoverage",

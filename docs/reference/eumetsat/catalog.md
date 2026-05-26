@@ -2,10 +2,12 @@
 
 The EUMETSAT catalog ships as package data: a directory of per-group YAML
 files at `src/earthlens/eumetsat/catalog/` (`mtg.yaml`, `msg.yaml`,
-`metop.yaml`, `sentinel3.yaml`, `sentinel5p.yaml`, `sentinel6.yaml`,
-`osisaf.yaml`) plus a single `_index.yaml` holding the informational
-`available_collections:` index. A duplicate-key-rejecting loader merges
-them into one `Catalog`.
+`mfg.yaml`, `metop.yaml`, `metopsg.yaml`, `sentinel3.yaml`,
+`sentinel5p.yaml`, `sentinel6.yaml`, `osisaf.yaml`, `other.yaml`) plus a
+single `_index.yaml` holding the informational `available_datasets:`
+index. A duplicate-key-rejecting loader merges them into one `Catalog`.
+Mirrors the `earthlens.earthdata` / `earthlens.gee` / `earthlens.cmems`
+catalogs: `datasets` (the curated map) + `available_datasets` (the index).
 
 Each row maps a **friendly key** (what you pass in `variables=`) to the
 real Data Store `EO:EUM:DAT:…` collection id, plus the group, output
@@ -16,24 +18,24 @@ the deferred server-side path), and the spatial / temporal coverage.
 from earthlens.eumetsat import Catalog
 
 cat = Catalog()
-col = cat.get_collection("msg-hrseviri")
-col.collection_id      # 'EO:EUM:DAT:MSG:HRSEVIRI'
-col.group.value        # 'MSG'
-col.format             # 'native'
+ds = cat.get_dataset("msg-hrseviri")
+ds.collection_id      # 'EO:EUM:DAT:MSG:HRSEVIRI'
+ds.group.value        # 'MSG'
+ds.format             # 'native'
 ```
 
 An unknown key raises `ValueError` with a did-you-mean hint; `resolve(key,
 group=...)` additionally asserts the row's Data Store group.
 
-## Curated collections
+## Curated datasets
 
-**Every** live EUMETSAT Data Store collection is curated (all ~180), grouped
-by mission family below. Ids, titles and start dates were walked from the
-public browse endpoint on 2026-05-26. Hand-vetted rows (HRSEVIRI, the
-Sentinel-5P gases, ASCAT soil moisture, the MTG suite, ...) carry tuned
-metadata; the remainder carry browse-derived `format` / `output_kind` /
-`cadence` heuristics (advisory for the whole-product download), refined per
-product as needed and reconciled by the audit tool.
+**Every** live EUMETSAT Data Store collection is curated (all ~180),
+grouped by mission family below. Ids, titles and start dates were walked
+from the public browse endpoint on 2026-05-26. Hand-vetted rows (HRSEVIRI,
+the Sentinel-5P gases, ASCAT soil moisture, the MTG suite, ...) carry
+tuned metadata; the remainder carry browse-derived `format` /
+`output_kind` / `cadence` heuristics (advisory for the whole-product
+download), refined per product as needed and reconciled by the audit tool.
 
 ### MTG (27)
 
@@ -265,7 +267,7 @@ product as needed and reconciled by the audit tool.
 | `eum-ssm-t-2-microwave-humidity-sounder` | `EO:EUM:DAT:0343` | raster | netcdf | irregular | 1994-07-05 | — |
 | `eum-surface-radiation-set` | `EO:EUM:DAT:0863` | raster | netcdf | subdaily | 1983-01-01 | — |
 
-_Total curated collections: 180 across 10 groups — the **entire** EUMETSAT Data Store catalog is curated. The `available_collections` index lists the same 180 ids (walked from the public browse endpoint)._
+_Total curated datasets: 180 across 10 groups — the **entire** EUMETSAT Data Store catalog is curated. The `available_datasets` index lists the same 180 ids (walked from the public browse endpoint)._
 
 ## Catalog tooling
 
@@ -275,7 +277,7 @@ The scripts under `tools/eumetsat/` (not shipped in the wheel) use the
 ### Refresh the index
 
 ```bash
-# Rebuild available_collections from the public browse endpoint (all ~180)
+# Rebuild available_datasets from the public browse endpoint (all ~180)
 pixi run -e dev python tools/eumetsat/refresh_eumetsat_catalog.py refresh
 
 # Emit a curated stanza for one collection (paste into a per-group file)
