@@ -105,6 +105,18 @@ def test_fetch_streams_each_product_to_disk(fake_eumdac, tmp_path):
     assert (tmp_path / "alpha").read_bytes() == b"AAAA"
 
 
+def test_fetch_sanitizes_product_id_with_path_separator(fake_eumdac, tmp_path):
+    """A product id containing a path separator is written under root_dir, not outside it."""
+    fake_eumdac.store.products_for["EO:EUM:DAT:MSG:HRSEVIRI"] = [
+        _FakeProduct("../../escape.nat", b"X")
+    ]
+    backend = _make_backend(fake_eumdac, tmp_path, {"msg-hrseviri": ["HRSEVIRI"]})
+    paths = backend.download(progress_bar=False)
+    assert paths == [tmp_path / "escape.nat"]
+    assert (tmp_path / "escape.nat").read_bytes() == b"X"
+    assert paths[0].parent == tmp_path
+
+
 def test_download_empty_search_returns_empty(fake_eumdac, tmp_path):
     """A search that matches nothing returns an empty list, no fetch."""
     backend = _make_backend(fake_eumdac, tmp_path, {"msg-hrseviri": ["HRSEVIRI"]})

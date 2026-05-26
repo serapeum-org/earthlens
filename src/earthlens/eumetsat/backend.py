@@ -45,7 +45,7 @@ from earthlens.base import (
     SpatialExtent,
     TemporalExtent,
 )
-from earthlens.eumetsat._helpers import antimeridian_bboxes
+from earthlens.eumetsat._helpers import antimeridian_bboxes, safe_product_filename
 from earthlens.eumetsat.auth import EumetsatAuth, EumetsatCredentials
 from earthlens.eumetsat.catalog import Catalog, DataStoreGroup, EumetsatCollection
 
@@ -337,8 +337,10 @@ class EUMETSAT(AbstractDataSource):
         """Stream every product `_search` returned to a local file.
 
         Each `eumdac` product is opened (`Product.open()` — a streaming
-        context manager) and copied to `self.root_dir / str(product)`
-        (the product id is the on-disk filename).
+        context manager) and copied to `self.root_dir / <id>`, where the
+        product id is reduced to a safe basename (`safe_product_filename`)
+        so a server-supplied id with a path separator cannot write outside
+        the output directory.
 
         Args:
             products: The products from `_search`.
@@ -350,7 +352,7 @@ class EUMETSAT(AbstractDataSource):
         out_paths: list[Path] = []
         for rp in products:
             product = rp.metadata["product"]
-            target = self.root_dir / str(product)
+            target = self.root_dir / safe_product_filename(str(product))
             with product.open() as src, open(target, "wb") as dst:
                 shutil.copyfileobj(src, dst)
             out_paths.append(target)
