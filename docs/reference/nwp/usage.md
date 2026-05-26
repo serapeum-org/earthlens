@@ -80,6 +80,14 @@ longitudes), and writes the COG.
     does not crop as a regular lat/lon raster. The download path is
     correct, but for a croppable COG use a regular-lat/lon ICON product.
 
+!!! note "Antimeridian"
+    A bounding box must satisfy `longitude_min <= longitude_max`, so a
+    box that crosses the 180°/−180° dateline (e.g. `lon_lim=[170, -170]`)
+    cannot be expressed in a single request. Global 0–360° grids are
+    shifted to −180..180 when the bbox reaches negative longitudes, but a
+    true dateline-spanning AOI is not split — issue two requests (one per
+    side) and mosaic the results.
+
 ## Aggregating the forecast stack
 
 Pass `aggregate=` to reduce the per-`(cycle, step)` COGs into windowed

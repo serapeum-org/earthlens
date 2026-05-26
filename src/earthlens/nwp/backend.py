@@ -415,6 +415,11 @@ class NWP(AbstractDataSource):
         bbox entirely in the eastern hemisphere needs no shift, so this
         is a no-op unless the request bbox reaches a negative longitude.
 
+        This handles the 0–360 ↔ −180..180 convention only. A bbox that
+        *crosses* the dateline cannot be expressed (the `SpatialExtent`
+        requires `longitude_min <= longitude_max`); split such an AOI
+        into two requests.
+
         Args:
             dataset: The freshly opened GRIB2 `Dataset`.
 
