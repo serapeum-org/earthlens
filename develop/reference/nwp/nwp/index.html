@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -7544,8 +7544,7 @@ output, so the facade always forwards <code>aggregate=</code>.</p>
 <span class="normal"><a href="#__codelineno-0-615">615</a></span>
 <span class="normal"><a href="#__codelineno-0-616">616</a></span>
 <span class="normal"><a href="#__codelineno-0-617">617</a></span>
-<span class="normal"><a href="#__codelineno-0-618">618</a></span>
-<span class="normal"><a href="#__codelineno-0-619">619</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-55" name="__codelineno-0-55"></a><span class="k">class</span><span class="w"> </span><span class="nc">NWP</span><span class="p">(</span><span class="n">AbstractDataSource</span><span class="p">):</span>
+<span class="normal"><a href="#__codelineno-0-618">618</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-55" name="__codelineno-0-55"></a><span class="k">class</span><span class="w"> </span><span class="nc">NWP</span><span class="p">(</span><span class="n">AbstractDataSource</span><span class="p">):</span>
 <a id="__codelineno-0-56" name="__codelineno-0-56"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Open numerical-weather-prediction backend (forecast time axis).</span>
 <a id="__codelineno-0-57" name="__codelineno-0-57"></a>
 <a id="__codelineno-0-58" name="__codelineno-0-58"></a><span class="sd">    Resolves each requested model key against the bundled catalog,</span>
@@ -7946,170 +7945,169 @@ output, so the facade always forwards <code>aggregate=</code>.</p>
 <a id="__codelineno-0-453" name="__codelineno-0-453"></a>        <span class="p">)</span>
 <a id="__codelineno-0-454" name="__codelineno-0-454"></a>        <span class="n">dataset</span> <span class="o">=</span> <span class="n">open_grib</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">grib_path</span><span class="p">))</span>
 <a id="__codelineno-0-455" name="__codelineno-0-455"></a>        <span class="n">dataset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_normalise_longitude</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
-<a id="__codelineno-0-456" name="__codelineno-0-456"></a>        <span class="c1"># touch=False avoids pyramids&#39; wrap-cutline correction, which calls</span>
-<a id="__codelineno-0-457" name="__codelineno-0-457"></a>        <span class="c1"># the GDAL/PROJ database for the GRIB driver&#39;s reported CRS</span>
-<a id="__codelineno-0-458" name="__codelineno-0-458"></a>        <span class="c1"># (EPSG:9122, WGS84 lon/lat) — a code many bundled PROJ databases</span>
-<a id="__codelineno-0-459" name="__codelineno-0-459"></a>        <span class="c1"># cannot resolve. The plain (non-cutline) crop path needs no such</span>
-<a id="__codelineno-0-460" name="__codelineno-0-460"></a>        <span class="c1"># lookup and subsets a regular NWP grid correctly.</span>
-<a id="__codelineno-0-461" name="__codelineno-0-461"></a>        <span class="n">cropped</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">crop</span><span class="p">(</span><span class="n">bbox</span><span class="o">=</span><span class="n">bbox</span><span class="p">,</span> <span class="n">epsg</span><span class="o">=</span><span class="mi">4326</span><span class="p">,</span> <span class="n">touch</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-<a id="__codelineno-0-462" name="__codelineno-0-462"></a>        <span class="n">target</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root_dir</span> <span class="o">/</span> <span class="n">cog_name</span><span class="p">(</span>
-<a id="__codelineno-0-463" name="__codelineno-0-463"></a>            <span class="n">meta</span><span class="p">[</span><span class="s2">&quot;model_key&quot;</span><span class="p">],</span> <span class="n">meta</span><span class="p">[</span><span class="s2">&quot;cycle&quot;</span><span class="p">],</span> <span class="n">meta</span><span class="p">[</span><span class="s2">&quot;step&quot;</span><span class="p">],</span> <span class="n">meta</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;member&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-464" name="__codelineno-0-464"></a>        <span class="p">)</span>
-<a id="__codelineno-0-465" name="__codelineno-0-465"></a>        <span class="n">write_cog</span><span class="p">(</span><span class="n">cropped</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">target</span><span class="p">))</span>
-<a id="__codelineno-0-466" name="__codelineno-0-466"></a>        <span class="k">return</span> <span class="n">target</span>
-<a id="__codelineno-0-467" name="__codelineno-0-467"></a>
-<a id="__codelineno-0-468" name="__codelineno-0-468"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_normalise_longitude</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">):</span>
-<a id="__codelineno-0-469" name="__codelineno-0-469"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Shift a 0–360° global grid to −180..180 when the bbox needs it.</span>
-<a id="__codelineno-0-470" name="__codelineno-0-470"></a>
-<a id="__codelineno-0-471" name="__codelineno-0-471"></a><span class="sd">        `pyramids` `convert_longitude` only applies to a whole-globe</span>
-<a id="__codelineno-0-472" name="__codelineno-0-472"></a><span class="sd">        0–360 raster (it raises otherwise). A regional model (HRRR) or a</span>
-<a id="__codelineno-0-473" name="__codelineno-0-473"></a><span class="sd">        bbox entirely in the eastern hemisphere needs no shift, so this</span>
-<a id="__codelineno-0-474" name="__codelineno-0-474"></a><span class="sd">        is a no-op unless the request bbox reaches a negative longitude.</span>
-<a id="__codelineno-0-475" name="__codelineno-0-475"></a>
-<a id="__codelineno-0-476" name="__codelineno-0-476"></a><span class="sd">        This handles the 0–360 ↔ −180..180 convention only. A bbox that</span>
-<a id="__codelineno-0-477" name="__codelineno-0-477"></a><span class="sd">        *crosses* the dateline cannot be expressed (the `SpatialExtent`</span>
-<a id="__codelineno-0-478" name="__codelineno-0-478"></a><span class="sd">        requires `longitude_min &lt;= longitude_max`); split such an AOI</span>
-<a id="__codelineno-0-479" name="__codelineno-0-479"></a><span class="sd">        into two requests.</span>
-<a id="__codelineno-0-480" name="__codelineno-0-480"></a>
-<a id="__codelineno-0-481" name="__codelineno-0-481"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-482" name="__codelineno-0-482"></a><span class="sd">            dataset: The freshly opened GRIB2 `Dataset`.</span>
-<a id="__codelineno-0-483" name="__codelineno-0-483"></a>
-<a id="__codelineno-0-484" name="__codelineno-0-484"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-485" name="__codelineno-0-485"></a><span class="sd">            The same `Dataset`, or a longitude-shifted copy.</span>
-<a id="__codelineno-0-486" name="__codelineno-0-486"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-487" name="__codelineno-0-487"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">west</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">:</span>
-<a id="__codelineno-0-488" name="__codelineno-0-488"></a>            <span class="k">return</span> <span class="n">dataset</span>
-<a id="__codelineno-0-489" name="__codelineno-0-489"></a>        <span class="k">try</span><span class="p">:</span>
-<a id="__codelineno-0-490" name="__codelineno-0-490"></a>            <span class="k">return</span> <span class="n">dataset</span><span class="o">.</span><span class="n">convert_longitude</span><span class="p">()</span>
-<a id="__codelineno-0-491" name="__codelineno-0-491"></a>        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
-<a id="__codelineno-0-492" name="__codelineno-0-492"></a>            <span class="c1"># Not a 0–360 global raster (e.g. a regional model already in</span>
-<a id="__codelineno-0-493" name="__codelineno-0-493"></a>            <span class="c1"># −180..180); the bbox is already in the dataset&#39;s CRS.</span>
-<a id="__codelineno-0-494" name="__codelineno-0-494"></a>            <span class="k">return</span> <span class="n">dataset</span>
-<a id="__codelineno-0-495" name="__codelineno-0-495"></a>
-<a id="__codelineno-0-496" name="__codelineno-0-496"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
-<a id="__codelineno-0-497" name="__codelineno-0-497"></a>        <span class="bp">self</span><span class="p">,</span>
-<a id="__codelineno-0-498" name="__codelineno-0-498"></a>        <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-<a id="__codelineno-0-499" name="__codelineno-0-499"></a>        <span class="n">aggregate</span><span class="p">:</span> <span class="n">AggregationConfig</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-500" name="__codelineno-0-500"></a>        <span class="n">errors</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;warn&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-501" name="__codelineno-0-501"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
-<a id="__codelineno-0-502" name="__codelineno-0-502"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Fetch the requested forecasts as bbox-cropped COGs.</span>
-<a id="__codelineno-0-503" name="__codelineno-0-503"></a>
-<a id="__codelineno-0-504" name="__codelineno-0-504"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-505" name="__codelineno-0-505"></a><span class="sd">            progress_bar: Whether the centres show per-download progress</span>
-<a id="__codelineno-0-506" name="__codelineno-0-506"></a><span class="sd">                (threaded into Herbie&#39;s `verbose`).</span>
-<a id="__codelineno-0-507" name="__codelineno-0-507"></a><span class="sd">            aggregate: Optional</span>
-<a id="__codelineno-0-508" name="__codelineno-0-508"></a><span class="sd">                :class:`earthlens.aggregate.AggregationConfig`; reduces</span>
-<a id="__codelineno-0-509" name="__codelineno-0-509"></a><span class="sd">                the `(cycle, step)` COG stack (`C6`).</span>
-<a id="__codelineno-0-510" name="__codelineno-0-510"></a><span class="sd">            errors: How to treat a `(cycle, step)` that fails to fetch or</span>
-<a id="__codelineno-0-511" name="__codelineno-0-511"></a><span class="sd">                crop (an unpublished cycle, a step the model does not</span>
-<a id="__codelineno-0-512" name="__codelineno-0-512"></a><span class="sd">                carry):</span>
-<a id="__codelineno-0-513" name="__codelineno-0-513"></a>
-<a id="__codelineno-0-514" name="__codelineno-0-514"></a><span class="sd">                * `&quot;warn&quot;` (default) — log the miss and return the COGs</span>
-<a id="__codelineno-0-515" name="__codelineno-0-515"></a><span class="sd">                  that did succeed.</span>
-<a id="__codelineno-0-516" name="__codelineno-0-516"></a><span class="sd">                * `&quot;skip&quot;` — drop the miss silently.</span>
-<a id="__codelineno-0-517" name="__codelineno-0-517"></a><span class="sd">                * `&quot;raise&quot;` — abort the whole download on the first miss.</span>
-<a id="__codelineno-0-518" name="__codelineno-0-518"></a>
-<a id="__codelineno-0-519" name="__codelineno-0-519"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-520" name="__codelineno-0-520"></a><span class="sd">            list[Path]: One cropped COG per successfully fetched</span>
-<a id="__codelineno-0-521" name="__codelineno-0-521"></a><span class="sd">                `(cycle, step)`, or — when `aggregate` is set — the</span>
-<a id="__codelineno-0-522" name="__codelineno-0-522"></a><span class="sd">                per-window reduced rasters.</span>
-<a id="__codelineno-0-523" name="__codelineno-0-523"></a>
-<a id="__codelineno-0-524" name="__codelineno-0-524"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-525" name="__codelineno-0-525"></a><span class="sd">            ValueError: If `errors` is not one of</span>
-<a id="__codelineno-0-526" name="__codelineno-0-526"></a><span class="sd">                `{&quot;raise&quot;, &quot;warn&quot;, &quot;skip&quot;}`.</span>
-<a id="__codelineno-0-527" name="__codelineno-0-527"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-528" name="__codelineno-0-528"></a>        <span class="k">if</span> <span class="n">errors</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">{</span><span class="s2">&quot;raise&quot;</span><span class="p">,</span> <span class="s2">&quot;warn&quot;</span><span class="p">,</span> <span class="s2">&quot;skip&quot;</span><span class="p">}:</span>
-<a id="__codelineno-0-529" name="__codelineno-0-529"></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-<a id="__codelineno-0-530" name="__codelineno-0-530"></a>                <span class="sa">f</span><span class="s2">&quot;errors must be &#39;raise&#39;, &#39;warn&#39;, or &#39;skip&#39;; got </span><span class="si">{</span><span class="n">errors</span><span class="si">!r}</span><span class="s2">.&quot;</span>
-<a id="__codelineno-0-531" name="__codelineno-0-531"></a>            <span class="p">)</span>
-<a id="__codelineno-0-532" name="__codelineno-0-532"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_show_progress</span> <span class="o">=</span> <span class="n">progress_bar</span>
-<a id="__codelineno-0-533" name="__codelineno-0-533"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_errors</span> <span class="o">=</span> <span class="n">errors</span>
-<a id="__codelineno-0-534" name="__codelineno-0-534"></a>        <span class="n">paths</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api_via_search_fetch</span><span class="p">()</span>
-<a id="__codelineno-0-535" name="__codelineno-0-535"></a>        <span class="k">if</span> <span class="n">aggregate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-536" name="__codelineno-0-536"></a>            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_aggregate</span><span class="p">(</span><span class="n">paths</span><span class="p">,</span> <span class="n">aggregate</span><span class="p">)</span>
-<a id="__codelineno-0-537" name="__codelineno-0-537"></a>        <span class="k">return</span> <span class="n">paths</span>
-<a id="__codelineno-0-538" name="__codelineno-0-538"></a>
-<a id="__codelineno-0-539" name="__codelineno-0-539"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_aggregate</span><span class="p">(</span>
-<a id="__codelineno-0-540" name="__codelineno-0-540"></a>        <span class="bp">self</span><span class="p">,</span> <span class="n">paths</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">],</span> <span class="n">config</span><span class="p">:</span> <span class="n">AggregationConfig</span>
-<a id="__codelineno-0-541" name="__codelineno-0-541"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
-<a id="__codelineno-0-542" name="__codelineno-0-542"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Reduce the `(cycle, step)` COG stack into per-window COGs (`C6`).</span>
-<a id="__codelineno-0-543" name="__codelineno-0-543"></a>
-<a id="__codelineno-0-544" name="__codelineno-0-544"></a><span class="sd">        Labels each COG by the window its **valid time** (`cycle + step`)</span>
-<a id="__codelineno-0-545" name="__codelineno-0-545"></a><span class="sd">        falls in, then reduces the co-registered stack with `config.op`</span>
-<a id="__codelineno-0-546" name="__codelineno-0-546"></a><span class="sd">        via `DatasetCollection.groupby(labels).&lt;op&gt;()` — the COG analog</span>
-<a id="__codelineno-0-547" name="__codelineno-0-547"></a><span class="sd">        of the NetCDF reducer the observation-time backends use. One COG</span>
-<a id="__codelineno-0-548" name="__codelineno-0-548"></a><span class="sd">        is written per window.</span>
-<a id="__codelineno-0-549" name="__codelineno-0-549"></a>
-<a id="__codelineno-0-550" name="__codelineno-0-550"></a><span class="sd">        Aggregation requires a **single model**: different models have</span>
-<a id="__codelineno-0-551" name="__codelineno-0-551"></a><span class="sd">        different native grids and cannot be co-registered into one</span>
-<a id="__codelineno-0-552" name="__codelineno-0-552"></a><span class="sd">        stack, so a multi-model request is rejected here rather than</span>
-<a id="__codelineno-0-553" name="__codelineno-0-553"></a><span class="sd">        silently mixing grids.</span>
-<a id="__codelineno-0-554" name="__codelineno-0-554"></a>
-<a id="__codelineno-0-555" name="__codelineno-0-555"></a><span class="sd">        Accumulated bands (the `*_acc` convention, e.g.</span>
-<a id="__codelineno-0-556" name="__codelineno-0-556"></a><span class="sd">        `precipitation_acc`) are reduced like any other, but a warning is</span>
-<a id="__codelineno-0-557" name="__codelineno-0-557"></a><span class="sd">        logged because summing/averaging an accumulation across steps</span>
-<a id="__codelineno-0-558" name="__codelineno-0-558"></a><span class="sd">        mixes its step-dependent windows and can mislead (`M3`).</span>
-<a id="__codelineno-0-559" name="__codelineno-0-559"></a>
-<a id="__codelineno-0-560" name="__codelineno-0-560"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-561" name="__codelineno-0-561"></a><span class="sd">            paths: The per-`(cycle, step)` COGs from :meth:`_fetch`.</span>
-<a id="__codelineno-0-562" name="__codelineno-0-562"></a><span class="sd">            config: The aggregation request (`freq` window, `op`</span>
-<a id="__codelineno-0-563" name="__codelineno-0-563"></a><span class="sd">                reducer, `out_dir`, `skipna`).</span>
-<a id="__codelineno-0-564" name="__codelineno-0-564"></a>
-<a id="__codelineno-0-565" name="__codelineno-0-565"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-566" name="__codelineno-0-566"></a><span class="sd">            list[Path]: The per-window reduced COG paths.</span>
-<a id="__codelineno-0-567" name="__codelineno-0-567"></a>
-<a id="__codelineno-0-568" name="__codelineno-0-568"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-569" name="__codelineno-0-569"></a><span class="sd">            ValueError: When the request names more than one model.</span>
-<a id="__codelineno-0-570" name="__codelineno-0-570"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-571" name="__codelineno-0-571"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="n">paths</span><span class="p">:</span>
-<a id="__codelineno-0-572" name="__codelineno-0-572"></a>            <span class="k">return</span> <span class="p">[]</span>
-<a id="__codelineno-0-573" name="__codelineno-0-573"></a>        <span class="n">model_keys</span> <span class="o">=</span> <span class="p">{</span><span class="n">key</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_requests</span><span class="p">}</span>
-<a id="__codelineno-0-574" name="__codelineno-0-574"></a>        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">model_keys</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
-<a id="__codelineno-0-575" name="__codelineno-0-575"></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-<a id="__codelineno-0-576" name="__codelineno-0-576"></a>                <span class="s2">&quot;aggregate= over an NWP request needs a single model; &quot;</span>
-<a id="__codelineno-0-577" name="__codelineno-0-577"></a>                <span class="sa">f</span><span class="s2">&quot;got </span><span class="si">{</span><span class="nb">sorted</span><span class="p">(</span><span class="n">model_keys</span><span class="p">)</span><span class="si">}</span><span class="s2">. Different models have different &quot;</span>
-<a id="__codelineno-0-578" name="__codelineno-0-578"></a>                <span class="s2">&quot;native grids and cannot be co-registered into one stack — &quot;</span>
-<a id="__codelineno-0-579" name="__codelineno-0-579"></a>                <span class="s2">&quot;issue one request per model.&quot;</span>
-<a id="__codelineno-0-580" name="__codelineno-0-580"></a>            <span class="p">)</span>
-<a id="__codelineno-0-581" name="__codelineno-0-581"></a>        <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">DatasetCollection</span>
-<a id="__codelineno-0-582" name="__codelineno-0-582"></a>        <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset.cog</span><span class="w"> </span><span class="kn">import</span> <span class="n">write_cog</span>
-<a id="__codelineno-0-583" name="__codelineno-0-583"></a>
-<a id="__codelineno-0-584" name="__codelineno-0-584"></a>        <span class="n">op</span> <span class="o">=</span> <span class="s2">&quot;mean&quot;</span> <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">op</span> <span class="o">==</span> <span class="s2">&quot;auto&quot;</span> <span class="k">else</span> <span class="n">config</span><span class="o">.</span><span class="n">op</span>
-<a id="__codelineno-0-585" name="__codelineno-0-585"></a>        <span class="c1"># Accumulated fields (precipitation_acc / APCP / tp) carry a running</span>
-<a id="__codelineno-0-586" name="__codelineno-0-586"></a>        <span class="c1"># total over a step-dependent window; reducing them across steps by</span>
-<a id="__codelineno-0-587" name="__codelineno-0-587"></a>        <span class="c1"># valid time mixes accumulation intervals and can mislead. Warn rather</span>
-<a id="__codelineno-0-588" name="__codelineno-0-588"></a>        <span class="c1"># than silently produce wrong totals (M3) — de-accumulation is a future</span>
-<a id="__codelineno-0-589" name="__codelineno-0-589"></a>        <span class="c1"># enhancement.</span>
-<a id="__codelineno-0-590" name="__codelineno-0-590"></a>        <span class="n">accumulated</span> <span class="o">=</span> <span class="p">[</span><span class="n">p</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_requests</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span> <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;_acc&quot;</span><span class="p">)]</span>
-<a id="__codelineno-0-591" name="__codelineno-0-591"></a>        <span class="k">if</span> <span class="n">accumulated</span><span class="p">:</span>
-<a id="__codelineno-0-592" name="__codelineno-0-592"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-<a id="__codelineno-0-593" name="__codelineno-0-593"></a>                <span class="sa">f</span><span class="s2">&quot;NWP aggregate: </span><span class="si">{</span><span class="n">accumulated</span><span class="si">}</span><span class="s2"> are accumulated field(s); &quot;</span>
-<a id="__codelineno-0-594" name="__codelineno-0-594"></a>                <span class="sa">f</span><span class="s2">&quot;reducing them by valid time with op=</span><span class="si">{</span><span class="n">op</span><span class="si">!r}</span><span class="s2"> mixes accumulation &quot;</span>
-<a id="__codelineno-0-595" name="__codelineno-0-595"></a>                <span class="s2">&quot;windows and may give misleading totals. Prefer the per-(cycle, &quot;</span>
-<a id="__codelineno-0-596" name="__codelineno-0-596"></a>                <span class="s2">&quot;step) COGs, or de-accumulate before aggregating.&quot;</span>
-<a id="__codelineno-0-597" name="__codelineno-0-597"></a>            <span class="p">)</span>
-<a id="__codelineno-0-598" name="__codelineno-0-598"></a>        <span class="n">out_dir</span> <span class="o">=</span> <span class="p">(</span>
-<a id="__codelineno-0-599" name="__codelineno-0-599"></a>            <span class="n">Path</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">out_dir</span><span class="p">)</span> <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">out_dir</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">Path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">root_dir</span><span class="p">)</span>
-<a id="__codelineno-0-600" name="__codelineno-0-600"></a>        <span class="p">)</span>
-<a id="__codelineno-0-601" name="__codelineno-0-601"></a>        <span class="n">out_dir</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<a id="__codelineno-0-602" name="__codelineno-0-602"></a>
-<a id="__codelineno-0-603" name="__codelineno-0-603"></a>        <span class="n">dated</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">((</span><span class="n">parse_cog_valid_time</span><span class="p">(</span><span class="n">p</span><span class="p">),</span> <span class="nb">str</span><span class="p">(</span><span class="n">p</span><span class="p">))</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">paths</span><span class="p">)</span>
-<a id="__codelineno-0-604" name="__codelineno-0-604"></a>        <span class="n">times</span> <span class="o">=</span> <span class="p">[</span><span class="n">t</span> <span class="k">for</span> <span class="n">t</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">dated</span><span class="p">]</span>
-<a id="__codelineno-0-605" name="__codelineno-0-605"></a>        <span class="n">files</span> <span class="o">=</span> <span class="p">[</span><span class="n">f</span> <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">dated</span><span class="p">]</span>
-<a id="__codelineno-0-606" name="__codelineno-0-606"></a>        <span class="n">labels</span> <span class="o">=</span> <span class="n">window_labels</span><span class="p">(</span><span class="n">times</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">freq</span><span class="p">)</span>
-<a id="__codelineno-0-607" name="__codelineno-0-607"></a>        <span class="n">collection</span> <span class="o">=</span> <span class="n">DatasetCollection</span><span class="o">.</span><span class="n">from_files</span><span class="p">(</span><span class="n">files</span><span class="p">)</span>
-<a id="__codelineno-0-608" name="__codelineno-0-608"></a>        <span class="n">reduced</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">collection</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">labels</span><span class="p">),</span> <span class="n">op</span><span class="p">)(</span><span class="n">skipna</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">skipna</span><span class="p">)</span>
-<a id="__codelineno-0-609" name="__codelineno-0-609"></a>        <span class="n">reference</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">files</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-<a id="__codelineno-0-610" name="__codelineno-0-610"></a>        <span class="n">geo</span><span class="p">,</span> <span class="n">epsg</span> <span class="o">=</span> <span class="n">reference</span><span class="o">.</span><span class="n">geotransform</span><span class="p">,</span> <span class="n">reference</span><span class="o">.</span><span class="n">epsg</span>
-<a id="__codelineno-0-611" name="__codelineno-0-611"></a>        <span class="n">model_key</span> <span class="o">=</span> <span class="n">model_keys</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
-<a id="__codelineno-0-612" name="__codelineno-0-612"></a>        <span class="n">written</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
-<a id="__codelineno-0-613" name="__codelineno-0-613"></a>        <span class="k">for</span> <span class="n">label</span><span class="p">,</span> <span class="n">array</span> <span class="ow">in</span> <span class="n">reduced</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-<a id="__codelineno-0-614" name="__codelineno-0-614"></a>            <span class="n">target</span> <span class="o">=</span> <span class="n">out_dir</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">model_key</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">op</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">config</span><span class="o">.</span><span class="n">freq</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">label</span><span class="si">}</span><span class="s2">.tif&quot;</span>
-<a id="__codelineno-0-615" name="__codelineno-0-615"></a>            <span class="n">write_cog</span><span class="p">(</span>
-<a id="__codelineno-0-616" name="__codelineno-0-616"></a>                <span class="n">Dataset</span><span class="o">.</span><span class="n">create_from_array</span><span class="p">(</span><span class="n">arr</span><span class="o">=</span><span class="n">array</span><span class="p">,</span> <span class="n">geo</span><span class="o">=</span><span class="n">geo</span><span class="p">,</span> <span class="n">epsg</span><span class="o">=</span><span class="n">epsg</span><span class="p">),</span> <span class="nb">str</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
-<a id="__codelineno-0-617" name="__codelineno-0-617"></a>            <span class="p">)</span>
-<a id="__codelineno-0-618" name="__codelineno-0-618"></a>            <span class="n">written</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
-<a id="__codelineno-0-619" name="__codelineno-0-619"></a>        <span class="k">return</span> <span class="n">written</span>
+<a id="__codelineno-0-456" name="__codelineno-0-456"></a>        <span class="c1"># touch=False crops to the bbox *extent*; touch=True takes pyramids&#39;</span>
+<a id="__codelineno-0-457" name="__codelineno-0-457"></a>        <span class="c1"># cutline path, which masks the field but keeps the full grid extent</span>
+<a id="__codelineno-0-458" name="__codelineno-0-458"></a>        <span class="c1"># (and historically crashed on the GRIB driver&#39;s EPSG:9122 CRS — fixed</span>
+<a id="__codelineno-0-459" name="__codelineno-0-459"></a>        <span class="c1"># in pyramids 0.24.1, pyramids#403 / PY-1). We want the bbox window.</span>
+<a id="__codelineno-0-460" name="__codelineno-0-460"></a>        <span class="n">cropped</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">crop</span><span class="p">(</span><span class="n">bbox</span><span class="o">=</span><span class="n">bbox</span><span class="p">,</span> <span class="n">epsg</span><span class="o">=</span><span class="mi">4326</span><span class="p">,</span> <span class="n">touch</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<a id="__codelineno-0-461" name="__codelineno-0-461"></a>        <span class="n">target</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root_dir</span> <span class="o">/</span> <span class="n">cog_name</span><span class="p">(</span>
+<a id="__codelineno-0-462" name="__codelineno-0-462"></a>            <span class="n">meta</span><span class="p">[</span><span class="s2">&quot;model_key&quot;</span><span class="p">],</span> <span class="n">meta</span><span class="p">[</span><span class="s2">&quot;cycle&quot;</span><span class="p">],</span> <span class="n">meta</span><span class="p">[</span><span class="s2">&quot;step&quot;</span><span class="p">],</span> <span class="n">meta</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;member&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-463" name="__codelineno-0-463"></a>        <span class="p">)</span>
+<a id="__codelineno-0-464" name="__codelineno-0-464"></a>        <span class="n">write_cog</span><span class="p">(</span><span class="n">cropped</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">target</span><span class="p">))</span>
+<a id="__codelineno-0-465" name="__codelineno-0-465"></a>        <span class="k">return</span> <span class="n">target</span>
+<a id="__codelineno-0-466" name="__codelineno-0-466"></a>
+<a id="__codelineno-0-467" name="__codelineno-0-467"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_normalise_longitude</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">):</span>
+<a id="__codelineno-0-468" name="__codelineno-0-468"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Shift a 0–360° global grid to −180..180 when the bbox needs it.</span>
+<a id="__codelineno-0-469" name="__codelineno-0-469"></a>
+<a id="__codelineno-0-470" name="__codelineno-0-470"></a><span class="sd">        `pyramids` `convert_longitude` only applies to a whole-globe</span>
+<a id="__codelineno-0-471" name="__codelineno-0-471"></a><span class="sd">        0–360 raster (it raises otherwise). A regional model (HRRR) or a</span>
+<a id="__codelineno-0-472" name="__codelineno-0-472"></a><span class="sd">        bbox entirely in the eastern hemisphere needs no shift, so this</span>
+<a id="__codelineno-0-473" name="__codelineno-0-473"></a><span class="sd">        is a no-op unless the request bbox reaches a negative longitude.</span>
+<a id="__codelineno-0-474" name="__codelineno-0-474"></a>
+<a id="__codelineno-0-475" name="__codelineno-0-475"></a><span class="sd">        This handles the 0–360 ↔ −180..180 convention only. A bbox that</span>
+<a id="__codelineno-0-476" name="__codelineno-0-476"></a><span class="sd">        *crosses* the dateline cannot be expressed (the `SpatialExtent`</span>
+<a id="__codelineno-0-477" name="__codelineno-0-477"></a><span class="sd">        requires `longitude_min &lt;= longitude_max`); split such an AOI</span>
+<a id="__codelineno-0-478" name="__codelineno-0-478"></a><span class="sd">        into two requests.</span>
+<a id="__codelineno-0-479" name="__codelineno-0-479"></a>
+<a id="__codelineno-0-480" name="__codelineno-0-480"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-481" name="__codelineno-0-481"></a><span class="sd">            dataset: The freshly opened GRIB2 `Dataset`.</span>
+<a id="__codelineno-0-482" name="__codelineno-0-482"></a>
+<a id="__codelineno-0-483" name="__codelineno-0-483"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-484" name="__codelineno-0-484"></a><span class="sd">            The same `Dataset`, or a longitude-shifted copy.</span>
+<a id="__codelineno-0-485" name="__codelineno-0-485"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-486" name="__codelineno-0-486"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">west</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">:</span>
+<a id="__codelineno-0-487" name="__codelineno-0-487"></a>            <span class="k">return</span> <span class="n">dataset</span>
+<a id="__codelineno-0-488" name="__codelineno-0-488"></a>        <span class="k">try</span><span class="p">:</span>
+<a id="__codelineno-0-489" name="__codelineno-0-489"></a>            <span class="k">return</span> <span class="n">dataset</span><span class="o">.</span><span class="n">convert_longitude</span><span class="p">()</span>
+<a id="__codelineno-0-490" name="__codelineno-0-490"></a>        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+<a id="__codelineno-0-491" name="__codelineno-0-491"></a>            <span class="c1"># Not a 0–360 global raster (e.g. a regional model already in</span>
+<a id="__codelineno-0-492" name="__codelineno-0-492"></a>            <span class="c1"># −180..180); the bbox is already in the dataset&#39;s CRS.</span>
+<a id="__codelineno-0-493" name="__codelineno-0-493"></a>            <span class="k">return</span> <span class="n">dataset</span>
+<a id="__codelineno-0-494" name="__codelineno-0-494"></a>
+<a id="__codelineno-0-495" name="__codelineno-0-495"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
+<a id="__codelineno-0-496" name="__codelineno-0-496"></a>        <span class="bp">self</span><span class="p">,</span>
+<a id="__codelineno-0-497" name="__codelineno-0-497"></a>        <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+<a id="__codelineno-0-498" name="__codelineno-0-498"></a>        <span class="n">aggregate</span><span class="p">:</span> <span class="n">AggregationConfig</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-499" name="__codelineno-0-499"></a>        <span class="n">errors</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;warn&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-500" name="__codelineno-0-500"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
+<a id="__codelineno-0-501" name="__codelineno-0-501"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Fetch the requested forecasts as bbox-cropped COGs.</span>
+<a id="__codelineno-0-502" name="__codelineno-0-502"></a>
+<a id="__codelineno-0-503" name="__codelineno-0-503"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-504" name="__codelineno-0-504"></a><span class="sd">            progress_bar: Whether the centres show per-download progress</span>
+<a id="__codelineno-0-505" name="__codelineno-0-505"></a><span class="sd">                (threaded into Herbie&#39;s `verbose`).</span>
+<a id="__codelineno-0-506" name="__codelineno-0-506"></a><span class="sd">            aggregate: Optional</span>
+<a id="__codelineno-0-507" name="__codelineno-0-507"></a><span class="sd">                :class:`earthlens.aggregate.AggregationConfig`; reduces</span>
+<a id="__codelineno-0-508" name="__codelineno-0-508"></a><span class="sd">                the `(cycle, step)` COG stack (`C6`).</span>
+<a id="__codelineno-0-509" name="__codelineno-0-509"></a><span class="sd">            errors: How to treat a `(cycle, step)` that fails to fetch or</span>
+<a id="__codelineno-0-510" name="__codelineno-0-510"></a><span class="sd">                crop (an unpublished cycle, a step the model does not</span>
+<a id="__codelineno-0-511" name="__codelineno-0-511"></a><span class="sd">                carry):</span>
+<a id="__codelineno-0-512" name="__codelineno-0-512"></a>
+<a id="__codelineno-0-513" name="__codelineno-0-513"></a><span class="sd">                * `&quot;warn&quot;` (default) — log the miss and return the COGs</span>
+<a id="__codelineno-0-514" name="__codelineno-0-514"></a><span class="sd">                  that did succeed.</span>
+<a id="__codelineno-0-515" name="__codelineno-0-515"></a><span class="sd">                * `&quot;skip&quot;` — drop the miss silently.</span>
+<a id="__codelineno-0-516" name="__codelineno-0-516"></a><span class="sd">                * `&quot;raise&quot;` — abort the whole download on the first miss.</span>
+<a id="__codelineno-0-517" name="__codelineno-0-517"></a>
+<a id="__codelineno-0-518" name="__codelineno-0-518"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-519" name="__codelineno-0-519"></a><span class="sd">            list[Path]: One cropped COG per successfully fetched</span>
+<a id="__codelineno-0-520" name="__codelineno-0-520"></a><span class="sd">                `(cycle, step)`, or — when `aggregate` is set — the</span>
+<a id="__codelineno-0-521" name="__codelineno-0-521"></a><span class="sd">                per-window reduced rasters.</span>
+<a id="__codelineno-0-522" name="__codelineno-0-522"></a>
+<a id="__codelineno-0-523" name="__codelineno-0-523"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-524" name="__codelineno-0-524"></a><span class="sd">            ValueError: If `errors` is not one of</span>
+<a id="__codelineno-0-525" name="__codelineno-0-525"></a><span class="sd">                `{&quot;raise&quot;, &quot;warn&quot;, &quot;skip&quot;}`.</span>
+<a id="__codelineno-0-526" name="__codelineno-0-526"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-527" name="__codelineno-0-527"></a>        <span class="k">if</span> <span class="n">errors</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">{</span><span class="s2">&quot;raise&quot;</span><span class="p">,</span> <span class="s2">&quot;warn&quot;</span><span class="p">,</span> <span class="s2">&quot;skip&quot;</span><span class="p">}:</span>
+<a id="__codelineno-0-528" name="__codelineno-0-528"></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+<a id="__codelineno-0-529" name="__codelineno-0-529"></a>                <span class="sa">f</span><span class="s2">&quot;errors must be &#39;raise&#39;, &#39;warn&#39;, or &#39;skip&#39;; got </span><span class="si">{</span><span class="n">errors</span><span class="si">!r}</span><span class="s2">.&quot;</span>
+<a id="__codelineno-0-530" name="__codelineno-0-530"></a>            <span class="p">)</span>
+<a id="__codelineno-0-531" name="__codelineno-0-531"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_show_progress</span> <span class="o">=</span> <span class="n">progress_bar</span>
+<a id="__codelineno-0-532" name="__codelineno-0-532"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_errors</span> <span class="o">=</span> <span class="n">errors</span>
+<a id="__codelineno-0-533" name="__codelineno-0-533"></a>        <span class="n">paths</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api_via_search_fetch</span><span class="p">()</span>
+<a id="__codelineno-0-534" name="__codelineno-0-534"></a>        <span class="k">if</span> <span class="n">aggregate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-535" name="__codelineno-0-535"></a>            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_aggregate</span><span class="p">(</span><span class="n">paths</span><span class="p">,</span> <span class="n">aggregate</span><span class="p">)</span>
+<a id="__codelineno-0-536" name="__codelineno-0-536"></a>        <span class="k">return</span> <span class="n">paths</span>
+<a id="__codelineno-0-537" name="__codelineno-0-537"></a>
+<a id="__codelineno-0-538" name="__codelineno-0-538"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_aggregate</span><span class="p">(</span>
+<a id="__codelineno-0-539" name="__codelineno-0-539"></a>        <span class="bp">self</span><span class="p">,</span> <span class="n">paths</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">],</span> <span class="n">config</span><span class="p">:</span> <span class="n">AggregationConfig</span>
+<a id="__codelineno-0-540" name="__codelineno-0-540"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
+<a id="__codelineno-0-541" name="__codelineno-0-541"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Reduce the `(cycle, step)` COG stack into per-window COGs (`C6`).</span>
+<a id="__codelineno-0-542" name="__codelineno-0-542"></a>
+<a id="__codelineno-0-543" name="__codelineno-0-543"></a><span class="sd">        Labels each COG by the window its **valid time** (`cycle + step`)</span>
+<a id="__codelineno-0-544" name="__codelineno-0-544"></a><span class="sd">        falls in, then reduces the co-registered stack with `config.op`</span>
+<a id="__codelineno-0-545" name="__codelineno-0-545"></a><span class="sd">        via `DatasetCollection.groupby(labels).&lt;op&gt;()` — the COG analog</span>
+<a id="__codelineno-0-546" name="__codelineno-0-546"></a><span class="sd">        of the NetCDF reducer the observation-time backends use. One COG</span>
+<a id="__codelineno-0-547" name="__codelineno-0-547"></a><span class="sd">        is written per window.</span>
+<a id="__codelineno-0-548" name="__codelineno-0-548"></a>
+<a id="__codelineno-0-549" name="__codelineno-0-549"></a><span class="sd">        Aggregation requires a **single model**: different models have</span>
+<a id="__codelineno-0-550" name="__codelineno-0-550"></a><span class="sd">        different native grids and cannot be co-registered into one</span>
+<a id="__codelineno-0-551" name="__codelineno-0-551"></a><span class="sd">        stack, so a multi-model request is rejected here rather than</span>
+<a id="__codelineno-0-552" name="__codelineno-0-552"></a><span class="sd">        silently mixing grids.</span>
+<a id="__codelineno-0-553" name="__codelineno-0-553"></a>
+<a id="__codelineno-0-554" name="__codelineno-0-554"></a><span class="sd">        Accumulated bands (the `*_acc` convention, e.g.</span>
+<a id="__codelineno-0-555" name="__codelineno-0-555"></a><span class="sd">        `precipitation_acc`) are reduced like any other, but a warning is</span>
+<a id="__codelineno-0-556" name="__codelineno-0-556"></a><span class="sd">        logged because summing/averaging an accumulation across steps</span>
+<a id="__codelineno-0-557" name="__codelineno-0-557"></a><span class="sd">        mixes its step-dependent windows and can mislead (`M3`).</span>
+<a id="__codelineno-0-558" name="__codelineno-0-558"></a>
+<a id="__codelineno-0-559" name="__codelineno-0-559"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-560" name="__codelineno-0-560"></a><span class="sd">            paths: The per-`(cycle, step)` COGs from :meth:`_fetch`.</span>
+<a id="__codelineno-0-561" name="__codelineno-0-561"></a><span class="sd">            config: The aggregation request (`freq` window, `op`</span>
+<a id="__codelineno-0-562" name="__codelineno-0-562"></a><span class="sd">                reducer, `out_dir`, `skipna`).</span>
+<a id="__codelineno-0-563" name="__codelineno-0-563"></a>
+<a id="__codelineno-0-564" name="__codelineno-0-564"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-565" name="__codelineno-0-565"></a><span class="sd">            list[Path]: The per-window reduced COG paths.</span>
+<a id="__codelineno-0-566" name="__codelineno-0-566"></a>
+<a id="__codelineno-0-567" name="__codelineno-0-567"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-568" name="__codelineno-0-568"></a><span class="sd">            ValueError: When the request names more than one model.</span>
+<a id="__codelineno-0-569" name="__codelineno-0-569"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-570" name="__codelineno-0-570"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="n">paths</span><span class="p">:</span>
+<a id="__codelineno-0-571" name="__codelineno-0-571"></a>            <span class="k">return</span> <span class="p">[]</span>
+<a id="__codelineno-0-572" name="__codelineno-0-572"></a>        <span class="n">model_keys</span> <span class="o">=</span> <span class="p">{</span><span class="n">key</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_requests</span><span class="p">}</span>
+<a id="__codelineno-0-573" name="__codelineno-0-573"></a>        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">model_keys</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+<a id="__codelineno-0-574" name="__codelineno-0-574"></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+<a id="__codelineno-0-575" name="__codelineno-0-575"></a>                <span class="s2">&quot;aggregate= over an NWP request needs a single model; &quot;</span>
+<a id="__codelineno-0-576" name="__codelineno-0-576"></a>                <span class="sa">f</span><span class="s2">&quot;got </span><span class="si">{</span><span class="nb">sorted</span><span class="p">(</span><span class="n">model_keys</span><span class="p">)</span><span class="si">}</span><span class="s2">. Different models have different &quot;</span>
+<a id="__codelineno-0-577" name="__codelineno-0-577"></a>                <span class="s2">&quot;native grids and cannot be co-registered into one stack — &quot;</span>
+<a id="__codelineno-0-578" name="__codelineno-0-578"></a>                <span class="s2">&quot;issue one request per model.&quot;</span>
+<a id="__codelineno-0-579" name="__codelineno-0-579"></a>            <span class="p">)</span>
+<a id="__codelineno-0-580" name="__codelineno-0-580"></a>        <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">DatasetCollection</span>
+<a id="__codelineno-0-581" name="__codelineno-0-581"></a>        <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset.cog</span><span class="w"> </span><span class="kn">import</span> <span class="n">write_cog</span>
+<a id="__codelineno-0-582" name="__codelineno-0-582"></a>
+<a id="__codelineno-0-583" name="__codelineno-0-583"></a>        <span class="n">op</span> <span class="o">=</span> <span class="s2">&quot;mean&quot;</span> <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">op</span> <span class="o">==</span> <span class="s2">&quot;auto&quot;</span> <span class="k">else</span> <span class="n">config</span><span class="o">.</span><span class="n">op</span>
+<a id="__codelineno-0-584" name="__codelineno-0-584"></a>        <span class="c1"># Accumulated fields (precipitation_acc / APCP / tp) carry a running</span>
+<a id="__codelineno-0-585" name="__codelineno-0-585"></a>        <span class="c1"># total over a step-dependent window; reducing them across steps by</span>
+<a id="__codelineno-0-586" name="__codelineno-0-586"></a>        <span class="c1"># valid time mixes accumulation intervals and can mislead. Warn rather</span>
+<a id="__codelineno-0-587" name="__codelineno-0-587"></a>        <span class="c1"># than silently produce wrong totals (M3) — de-accumulation is a future</span>
+<a id="__codelineno-0-588" name="__codelineno-0-588"></a>        <span class="c1"># enhancement.</span>
+<a id="__codelineno-0-589" name="__codelineno-0-589"></a>        <span class="n">accumulated</span> <span class="o">=</span> <span class="p">[</span><span class="n">p</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_requests</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span> <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;_acc&quot;</span><span class="p">)]</span>
+<a id="__codelineno-0-590" name="__codelineno-0-590"></a>        <span class="k">if</span> <span class="n">accumulated</span><span class="p">:</span>
+<a id="__codelineno-0-591" name="__codelineno-0-591"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+<a id="__codelineno-0-592" name="__codelineno-0-592"></a>                <span class="sa">f</span><span class="s2">&quot;NWP aggregate: </span><span class="si">{</span><span class="n">accumulated</span><span class="si">}</span><span class="s2"> are accumulated field(s); &quot;</span>
+<a id="__codelineno-0-593" name="__codelineno-0-593"></a>                <span class="sa">f</span><span class="s2">&quot;reducing them by valid time with op=</span><span class="si">{</span><span class="n">op</span><span class="si">!r}</span><span class="s2"> mixes accumulation &quot;</span>
+<a id="__codelineno-0-594" name="__codelineno-0-594"></a>                <span class="s2">&quot;windows and may give misleading totals. Prefer the per-(cycle, &quot;</span>
+<a id="__codelineno-0-595" name="__codelineno-0-595"></a>                <span class="s2">&quot;step) COGs, or de-accumulate before aggregating.&quot;</span>
+<a id="__codelineno-0-596" name="__codelineno-0-596"></a>            <span class="p">)</span>
+<a id="__codelineno-0-597" name="__codelineno-0-597"></a>        <span class="n">out_dir</span> <span class="o">=</span> <span class="p">(</span>
+<a id="__codelineno-0-598" name="__codelineno-0-598"></a>            <span class="n">Path</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">out_dir</span><span class="p">)</span> <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">out_dir</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">Path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">root_dir</span><span class="p">)</span>
+<a id="__codelineno-0-599" name="__codelineno-0-599"></a>        <span class="p">)</span>
+<a id="__codelineno-0-600" name="__codelineno-0-600"></a>        <span class="n">out_dir</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<a id="__codelineno-0-601" name="__codelineno-0-601"></a>
+<a id="__codelineno-0-602" name="__codelineno-0-602"></a>        <span class="n">dated</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">((</span><span class="n">parse_cog_valid_time</span><span class="p">(</span><span class="n">p</span><span class="p">),</span> <span class="nb">str</span><span class="p">(</span><span class="n">p</span><span class="p">))</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">paths</span><span class="p">)</span>
+<a id="__codelineno-0-603" name="__codelineno-0-603"></a>        <span class="n">times</span> <span class="o">=</span> <span class="p">[</span><span class="n">t</span> <span class="k">for</span> <span class="n">t</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">dated</span><span class="p">]</span>
+<a id="__codelineno-0-604" name="__codelineno-0-604"></a>        <span class="n">files</span> <span class="o">=</span> <span class="p">[</span><span class="n">f</span> <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">dated</span><span class="p">]</span>
+<a id="__codelineno-0-605" name="__codelineno-0-605"></a>        <span class="n">labels</span> <span class="o">=</span> <span class="n">window_labels</span><span class="p">(</span><span class="n">times</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">freq</span><span class="p">)</span>
+<a id="__codelineno-0-606" name="__codelineno-0-606"></a>        <span class="n">collection</span> <span class="o">=</span> <span class="n">DatasetCollection</span><span class="o">.</span><span class="n">from_files</span><span class="p">(</span><span class="n">files</span><span class="p">)</span>
+<a id="__codelineno-0-607" name="__codelineno-0-607"></a>        <span class="n">reduced</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">collection</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">labels</span><span class="p">),</span> <span class="n">op</span><span class="p">)(</span><span class="n">skipna</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">skipna</span><span class="p">)</span>
+<a id="__codelineno-0-608" name="__codelineno-0-608"></a>        <span class="n">reference</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">files</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<a id="__codelineno-0-609" name="__codelineno-0-609"></a>        <span class="n">geo</span><span class="p">,</span> <span class="n">epsg</span> <span class="o">=</span> <span class="n">reference</span><span class="o">.</span><span class="n">geotransform</span><span class="p">,</span> <span class="n">reference</span><span class="o">.</span><span class="n">epsg</span>
+<a id="__codelineno-0-610" name="__codelineno-0-610"></a>        <span class="n">model_key</span> <span class="o">=</span> <span class="n">model_keys</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+<a id="__codelineno-0-611" name="__codelineno-0-611"></a>        <span class="n">written</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+<a id="__codelineno-0-612" name="__codelineno-0-612"></a>        <span class="k">for</span> <span class="n">label</span><span class="p">,</span> <span class="n">array</span> <span class="ow">in</span> <span class="n">reduced</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+<a id="__codelineno-0-613" name="__codelineno-0-613"></a>            <span class="n">target</span> <span class="o">=</span> <span class="n">out_dir</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">model_key</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">op</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">config</span><span class="o">.</span><span class="n">freq</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">label</span><span class="si">}</span><span class="s2">.tif&quot;</span>
+<a id="__codelineno-0-614" name="__codelineno-0-614"></a>            <span class="n">write_cog</span><span class="p">(</span>
+<a id="__codelineno-0-615" name="__codelineno-0-615"></a>                <span class="n">Dataset</span><span class="o">.</span><span class="n">create_from_array</span><span class="p">(</span><span class="n">arr</span><span class="o">=</span><span class="n">array</span><span class="p">,</span> <span class="n">geo</span><span class="o">=</span><span class="n">geo</span><span class="p">,</span> <span class="n">epsg</span><span class="o">=</span><span class="n">epsg</span><span class="p">),</span> <span class="nb">str</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
+<a id="__codelineno-0-616" name="__codelineno-0-616"></a>            <span class="p">)</span>
+<a id="__codelineno-0-617" name="__codelineno-0-617"></a>            <span class="n">written</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
+<a id="__codelineno-0-618" name="__codelineno-0-618"></a>        <span class="k">return</span> <span class="n">written</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -8722,7 +8720,8 @@ per-window reduced rasters.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>src/earthlens/nwp/backend.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-496">496</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-495">495</a></span>
+<span class="normal"><a href="#__codelineno-0-496">496</a></span>
 <span class="normal"><a href="#__codelineno-0-497">497</a></span>
 <span class="normal"><a href="#__codelineno-0-498">498</a></span>
 <span class="normal"><a href="#__codelineno-0-499">499</a></span>
@@ -8762,49 +8761,48 @@ per-window reduced rasters.</p>
 <span class="normal"><a href="#__codelineno-0-533">533</a></span>
 <span class="normal"><a href="#__codelineno-0-534">534</a></span>
 <span class="normal"><a href="#__codelineno-0-535">535</a></span>
-<span class="normal"><a href="#__codelineno-0-536">536</a></span>
-<span class="normal"><a href="#__codelineno-0-537">537</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-496" name="__codelineno-0-496"></a><span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
-<a id="__codelineno-0-497" name="__codelineno-0-497"></a>    <span class="bp">self</span><span class="p">,</span>
-<a id="__codelineno-0-498" name="__codelineno-0-498"></a>    <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-<a id="__codelineno-0-499" name="__codelineno-0-499"></a>    <span class="n">aggregate</span><span class="p">:</span> <span class="n">AggregationConfig</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-500" name="__codelineno-0-500"></a>    <span class="n">errors</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;warn&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-501" name="__codelineno-0-501"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
-<a id="__codelineno-0-502" name="__codelineno-0-502"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Fetch the requested forecasts as bbox-cropped COGs.</span>
-<a id="__codelineno-0-503" name="__codelineno-0-503"></a>
-<a id="__codelineno-0-504" name="__codelineno-0-504"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-505" name="__codelineno-0-505"></a><span class="sd">        progress_bar: Whether the centres show per-download progress</span>
-<a id="__codelineno-0-506" name="__codelineno-0-506"></a><span class="sd">            (threaded into Herbie&#39;s `verbose`).</span>
-<a id="__codelineno-0-507" name="__codelineno-0-507"></a><span class="sd">        aggregate: Optional</span>
-<a id="__codelineno-0-508" name="__codelineno-0-508"></a><span class="sd">            :class:`earthlens.aggregate.AggregationConfig`; reduces</span>
-<a id="__codelineno-0-509" name="__codelineno-0-509"></a><span class="sd">            the `(cycle, step)` COG stack (`C6`).</span>
-<a id="__codelineno-0-510" name="__codelineno-0-510"></a><span class="sd">        errors: How to treat a `(cycle, step)` that fails to fetch or</span>
-<a id="__codelineno-0-511" name="__codelineno-0-511"></a><span class="sd">            crop (an unpublished cycle, a step the model does not</span>
-<a id="__codelineno-0-512" name="__codelineno-0-512"></a><span class="sd">            carry):</span>
-<a id="__codelineno-0-513" name="__codelineno-0-513"></a>
-<a id="__codelineno-0-514" name="__codelineno-0-514"></a><span class="sd">            * `&quot;warn&quot;` (default) — log the miss and return the COGs</span>
-<a id="__codelineno-0-515" name="__codelineno-0-515"></a><span class="sd">              that did succeed.</span>
-<a id="__codelineno-0-516" name="__codelineno-0-516"></a><span class="sd">            * `&quot;skip&quot;` — drop the miss silently.</span>
-<a id="__codelineno-0-517" name="__codelineno-0-517"></a><span class="sd">            * `&quot;raise&quot;` — abort the whole download on the first miss.</span>
-<a id="__codelineno-0-518" name="__codelineno-0-518"></a>
-<a id="__codelineno-0-519" name="__codelineno-0-519"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-520" name="__codelineno-0-520"></a><span class="sd">        list[Path]: One cropped COG per successfully fetched</span>
-<a id="__codelineno-0-521" name="__codelineno-0-521"></a><span class="sd">            `(cycle, step)`, or — when `aggregate` is set — the</span>
-<a id="__codelineno-0-522" name="__codelineno-0-522"></a><span class="sd">            per-window reduced rasters.</span>
-<a id="__codelineno-0-523" name="__codelineno-0-523"></a>
-<a id="__codelineno-0-524" name="__codelineno-0-524"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-525" name="__codelineno-0-525"></a><span class="sd">        ValueError: If `errors` is not one of</span>
-<a id="__codelineno-0-526" name="__codelineno-0-526"></a><span class="sd">            `{&quot;raise&quot;, &quot;warn&quot;, &quot;skip&quot;}`.</span>
-<a id="__codelineno-0-527" name="__codelineno-0-527"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-528" name="__codelineno-0-528"></a>    <span class="k">if</span> <span class="n">errors</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">{</span><span class="s2">&quot;raise&quot;</span><span class="p">,</span> <span class="s2">&quot;warn&quot;</span><span class="p">,</span> <span class="s2">&quot;skip&quot;</span><span class="p">}:</span>
-<a id="__codelineno-0-529" name="__codelineno-0-529"></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-<a id="__codelineno-0-530" name="__codelineno-0-530"></a>            <span class="sa">f</span><span class="s2">&quot;errors must be &#39;raise&#39;, &#39;warn&#39;, or &#39;skip&#39;; got </span><span class="si">{</span><span class="n">errors</span><span class="si">!r}</span><span class="s2">.&quot;</span>
-<a id="__codelineno-0-531" name="__codelineno-0-531"></a>        <span class="p">)</span>
-<a id="__codelineno-0-532" name="__codelineno-0-532"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_show_progress</span> <span class="o">=</span> <span class="n">progress_bar</span>
-<a id="__codelineno-0-533" name="__codelineno-0-533"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_errors</span> <span class="o">=</span> <span class="n">errors</span>
-<a id="__codelineno-0-534" name="__codelineno-0-534"></a>    <span class="n">paths</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api_via_search_fetch</span><span class="p">()</span>
-<a id="__codelineno-0-535" name="__codelineno-0-535"></a>    <span class="k">if</span> <span class="n">aggregate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-536" name="__codelineno-0-536"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_aggregate</span><span class="p">(</span><span class="n">paths</span><span class="p">,</span> <span class="n">aggregate</span><span class="p">)</span>
-<a id="__codelineno-0-537" name="__codelineno-0-537"></a>    <span class="k">return</span> <span class="n">paths</span>
+<span class="normal"><a href="#__codelineno-0-536">536</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-495" name="__codelineno-0-495"></a><span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
+<a id="__codelineno-0-496" name="__codelineno-0-496"></a>    <span class="bp">self</span><span class="p">,</span>
+<a id="__codelineno-0-497" name="__codelineno-0-497"></a>    <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+<a id="__codelineno-0-498" name="__codelineno-0-498"></a>    <span class="n">aggregate</span><span class="p">:</span> <span class="n">AggregationConfig</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-499" name="__codelineno-0-499"></a>    <span class="n">errors</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;warn&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-500" name="__codelineno-0-500"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
+<a id="__codelineno-0-501" name="__codelineno-0-501"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Fetch the requested forecasts as bbox-cropped COGs.</span>
+<a id="__codelineno-0-502" name="__codelineno-0-502"></a>
+<a id="__codelineno-0-503" name="__codelineno-0-503"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-504" name="__codelineno-0-504"></a><span class="sd">        progress_bar: Whether the centres show per-download progress</span>
+<a id="__codelineno-0-505" name="__codelineno-0-505"></a><span class="sd">            (threaded into Herbie&#39;s `verbose`).</span>
+<a id="__codelineno-0-506" name="__codelineno-0-506"></a><span class="sd">        aggregate: Optional</span>
+<a id="__codelineno-0-507" name="__codelineno-0-507"></a><span class="sd">            :class:`earthlens.aggregate.AggregationConfig`; reduces</span>
+<a id="__codelineno-0-508" name="__codelineno-0-508"></a><span class="sd">            the `(cycle, step)` COG stack (`C6`).</span>
+<a id="__codelineno-0-509" name="__codelineno-0-509"></a><span class="sd">        errors: How to treat a `(cycle, step)` that fails to fetch or</span>
+<a id="__codelineno-0-510" name="__codelineno-0-510"></a><span class="sd">            crop (an unpublished cycle, a step the model does not</span>
+<a id="__codelineno-0-511" name="__codelineno-0-511"></a><span class="sd">            carry):</span>
+<a id="__codelineno-0-512" name="__codelineno-0-512"></a>
+<a id="__codelineno-0-513" name="__codelineno-0-513"></a><span class="sd">            * `&quot;warn&quot;` (default) — log the miss and return the COGs</span>
+<a id="__codelineno-0-514" name="__codelineno-0-514"></a><span class="sd">              that did succeed.</span>
+<a id="__codelineno-0-515" name="__codelineno-0-515"></a><span class="sd">            * `&quot;skip&quot;` — drop the miss silently.</span>
+<a id="__codelineno-0-516" name="__codelineno-0-516"></a><span class="sd">            * `&quot;raise&quot;` — abort the whole download on the first miss.</span>
+<a id="__codelineno-0-517" name="__codelineno-0-517"></a>
+<a id="__codelineno-0-518" name="__codelineno-0-518"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-519" name="__codelineno-0-519"></a><span class="sd">        list[Path]: One cropped COG per successfully fetched</span>
+<a id="__codelineno-0-520" name="__codelineno-0-520"></a><span class="sd">            `(cycle, step)`, or — when `aggregate` is set — the</span>
+<a id="__codelineno-0-521" name="__codelineno-0-521"></a><span class="sd">            per-window reduced rasters.</span>
+<a id="__codelineno-0-522" name="__codelineno-0-522"></a>
+<a id="__codelineno-0-523" name="__codelineno-0-523"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-524" name="__codelineno-0-524"></a><span class="sd">        ValueError: If `errors` is not one of</span>
+<a id="__codelineno-0-525" name="__codelineno-0-525"></a><span class="sd">            `{&quot;raise&quot;, &quot;warn&quot;, &quot;skip&quot;}`.</span>
+<a id="__codelineno-0-526" name="__codelineno-0-526"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-527" name="__codelineno-0-527"></a>    <span class="k">if</span> <span class="n">errors</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">{</span><span class="s2">&quot;raise&quot;</span><span class="p">,</span> <span class="s2">&quot;warn&quot;</span><span class="p">,</span> <span class="s2">&quot;skip&quot;</span><span class="p">}:</span>
+<a id="__codelineno-0-528" name="__codelineno-0-528"></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+<a id="__codelineno-0-529" name="__codelineno-0-529"></a>            <span class="sa">f</span><span class="s2">&quot;errors must be &#39;raise&#39;, &#39;warn&#39;, or &#39;skip&#39;; got </span><span class="si">{</span><span class="n">errors</span><span class="si">!r}</span><span class="s2">.&quot;</span>
+<a id="__codelineno-0-530" name="__codelineno-0-530"></a>        <span class="p">)</span>
+<a id="__codelineno-0-531" name="__codelineno-0-531"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_show_progress</span> <span class="o">=</span> <span class="n">progress_bar</span>
+<a id="__codelineno-0-532" name="__codelineno-0-532"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_errors</span> <span class="o">=</span> <span class="n">errors</span>
+<a id="__codelineno-0-533" name="__codelineno-0-533"></a>    <span class="n">paths</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api_via_search_fetch</span><span class="p">()</span>
+<a id="__codelineno-0-534" name="__codelineno-0-534"></a>    <span class="k">if</span> <span class="n">aggregate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-535" name="__codelineno-0-535"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_aggregate</span><span class="p">(</span><span class="n">paths</span><span class="p">,</span> <span class="n">aggregate</span><span class="p">)</span>
+<a id="__codelineno-0-536" name="__codelineno-0-536"></a>    <span class="k">return</span> <span class="n">paths</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -9993,8 +9991,7 @@ output, so the facade always forwards <code>aggregate=</code>.</p>
 <span class="normal"><a href="#__codelineno-0-615">615</a></span>
 <span class="normal"><a href="#__codelineno-0-616">616</a></span>
 <span class="normal"><a href="#__codelineno-0-617">617</a></span>
-<span class="normal"><a href="#__codelineno-0-618">618</a></span>
-<span class="normal"><a href="#__codelineno-0-619">619</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-55" name="__codelineno-0-55"></a><span class="k">class</span><span class="w"> </span><span class="nc">NWP</span><span class="p">(</span><span class="n">AbstractDataSource</span><span class="p">):</span>
+<span class="normal"><a href="#__codelineno-0-618">618</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-55" name="__codelineno-0-55"></a><span class="k">class</span><span class="w"> </span><span class="nc">NWP</span><span class="p">(</span><span class="n">AbstractDataSource</span><span class="p">):</span>
 <a id="__codelineno-0-56" name="__codelineno-0-56"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Open numerical-weather-prediction backend (forecast time axis).</span>
 <a id="__codelineno-0-57" name="__codelineno-0-57"></a>
 <a id="__codelineno-0-58" name="__codelineno-0-58"></a><span class="sd">    Resolves each requested model key against the bundled catalog,</span>
@@ -10395,170 +10392,169 @@ output, so the facade always forwards <code>aggregate=</code>.</p>
 <a id="__codelineno-0-453" name="__codelineno-0-453"></a>        <span class="p">)</span>
 <a id="__codelineno-0-454" name="__codelineno-0-454"></a>        <span class="n">dataset</span> <span class="o">=</span> <span class="n">open_grib</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">grib_path</span><span class="p">))</span>
 <a id="__codelineno-0-455" name="__codelineno-0-455"></a>        <span class="n">dataset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_normalise_longitude</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
-<a id="__codelineno-0-456" name="__codelineno-0-456"></a>        <span class="c1"># touch=False avoids pyramids&#39; wrap-cutline correction, which calls</span>
-<a id="__codelineno-0-457" name="__codelineno-0-457"></a>        <span class="c1"># the GDAL/PROJ database for the GRIB driver&#39;s reported CRS</span>
-<a id="__codelineno-0-458" name="__codelineno-0-458"></a>        <span class="c1"># (EPSG:9122, WGS84 lon/lat) — a code many bundled PROJ databases</span>
-<a id="__codelineno-0-459" name="__codelineno-0-459"></a>        <span class="c1"># cannot resolve. The plain (non-cutline) crop path needs no such</span>
-<a id="__codelineno-0-460" name="__codelineno-0-460"></a>        <span class="c1"># lookup and subsets a regular NWP grid correctly.</span>
-<a id="__codelineno-0-461" name="__codelineno-0-461"></a>        <span class="n">cropped</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">crop</span><span class="p">(</span><span class="n">bbox</span><span class="o">=</span><span class="n">bbox</span><span class="p">,</span> <span class="n">epsg</span><span class="o">=</span><span class="mi">4326</span><span class="p">,</span> <span class="n">touch</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-<a id="__codelineno-0-462" name="__codelineno-0-462"></a>        <span class="n">target</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root_dir</span> <span class="o">/</span> <span class="n">cog_name</span><span class="p">(</span>
-<a id="__codelineno-0-463" name="__codelineno-0-463"></a>            <span class="n">meta</span><span class="p">[</span><span class="s2">&quot;model_key&quot;</span><span class="p">],</span> <span class="n">meta</span><span class="p">[</span><span class="s2">&quot;cycle&quot;</span><span class="p">],</span> <span class="n">meta</span><span class="p">[</span><span class="s2">&quot;step&quot;</span><span class="p">],</span> <span class="n">meta</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;member&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-464" name="__codelineno-0-464"></a>        <span class="p">)</span>
-<a id="__codelineno-0-465" name="__codelineno-0-465"></a>        <span class="n">write_cog</span><span class="p">(</span><span class="n">cropped</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">target</span><span class="p">))</span>
-<a id="__codelineno-0-466" name="__codelineno-0-466"></a>        <span class="k">return</span> <span class="n">target</span>
-<a id="__codelineno-0-467" name="__codelineno-0-467"></a>
-<a id="__codelineno-0-468" name="__codelineno-0-468"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_normalise_longitude</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">):</span>
-<a id="__codelineno-0-469" name="__codelineno-0-469"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Shift a 0–360° global grid to −180..180 when the bbox needs it.</span>
-<a id="__codelineno-0-470" name="__codelineno-0-470"></a>
-<a id="__codelineno-0-471" name="__codelineno-0-471"></a><span class="sd">        `pyramids` `convert_longitude` only applies to a whole-globe</span>
-<a id="__codelineno-0-472" name="__codelineno-0-472"></a><span class="sd">        0–360 raster (it raises otherwise). A regional model (HRRR) or a</span>
-<a id="__codelineno-0-473" name="__codelineno-0-473"></a><span class="sd">        bbox entirely in the eastern hemisphere needs no shift, so this</span>
-<a id="__codelineno-0-474" name="__codelineno-0-474"></a><span class="sd">        is a no-op unless the request bbox reaches a negative longitude.</span>
-<a id="__codelineno-0-475" name="__codelineno-0-475"></a>
-<a id="__codelineno-0-476" name="__codelineno-0-476"></a><span class="sd">        This handles the 0–360 ↔ −180..180 convention only. A bbox that</span>
-<a id="__codelineno-0-477" name="__codelineno-0-477"></a><span class="sd">        *crosses* the dateline cannot be expressed (the `SpatialExtent`</span>
-<a id="__codelineno-0-478" name="__codelineno-0-478"></a><span class="sd">        requires `longitude_min &lt;= longitude_max`); split such an AOI</span>
-<a id="__codelineno-0-479" name="__codelineno-0-479"></a><span class="sd">        into two requests.</span>
-<a id="__codelineno-0-480" name="__codelineno-0-480"></a>
-<a id="__codelineno-0-481" name="__codelineno-0-481"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-482" name="__codelineno-0-482"></a><span class="sd">            dataset: The freshly opened GRIB2 `Dataset`.</span>
-<a id="__codelineno-0-483" name="__codelineno-0-483"></a>
-<a id="__codelineno-0-484" name="__codelineno-0-484"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-485" name="__codelineno-0-485"></a><span class="sd">            The same `Dataset`, or a longitude-shifted copy.</span>
-<a id="__codelineno-0-486" name="__codelineno-0-486"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-487" name="__codelineno-0-487"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">west</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">:</span>
-<a id="__codelineno-0-488" name="__codelineno-0-488"></a>            <span class="k">return</span> <span class="n">dataset</span>
-<a id="__codelineno-0-489" name="__codelineno-0-489"></a>        <span class="k">try</span><span class="p">:</span>
-<a id="__codelineno-0-490" name="__codelineno-0-490"></a>            <span class="k">return</span> <span class="n">dataset</span><span class="o">.</span><span class="n">convert_longitude</span><span class="p">()</span>
-<a id="__codelineno-0-491" name="__codelineno-0-491"></a>        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
-<a id="__codelineno-0-492" name="__codelineno-0-492"></a>            <span class="c1"># Not a 0–360 global raster (e.g. a regional model already in</span>
-<a id="__codelineno-0-493" name="__codelineno-0-493"></a>            <span class="c1"># −180..180); the bbox is already in the dataset&#39;s CRS.</span>
-<a id="__codelineno-0-494" name="__codelineno-0-494"></a>            <span class="k">return</span> <span class="n">dataset</span>
-<a id="__codelineno-0-495" name="__codelineno-0-495"></a>
-<a id="__codelineno-0-496" name="__codelineno-0-496"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
-<a id="__codelineno-0-497" name="__codelineno-0-497"></a>        <span class="bp">self</span><span class="p">,</span>
-<a id="__codelineno-0-498" name="__codelineno-0-498"></a>        <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-<a id="__codelineno-0-499" name="__codelineno-0-499"></a>        <span class="n">aggregate</span><span class="p">:</span> <span class="n">AggregationConfig</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-500" name="__codelineno-0-500"></a>        <span class="n">errors</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;warn&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-501" name="__codelineno-0-501"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
-<a id="__codelineno-0-502" name="__codelineno-0-502"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Fetch the requested forecasts as bbox-cropped COGs.</span>
-<a id="__codelineno-0-503" name="__codelineno-0-503"></a>
-<a id="__codelineno-0-504" name="__codelineno-0-504"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-505" name="__codelineno-0-505"></a><span class="sd">            progress_bar: Whether the centres show per-download progress</span>
-<a id="__codelineno-0-506" name="__codelineno-0-506"></a><span class="sd">                (threaded into Herbie&#39;s `verbose`).</span>
-<a id="__codelineno-0-507" name="__codelineno-0-507"></a><span class="sd">            aggregate: Optional</span>
-<a id="__codelineno-0-508" name="__codelineno-0-508"></a><span class="sd">                :class:`earthlens.aggregate.AggregationConfig`; reduces</span>
-<a id="__codelineno-0-509" name="__codelineno-0-509"></a><span class="sd">                the `(cycle, step)` COG stack (`C6`).</span>
-<a id="__codelineno-0-510" name="__codelineno-0-510"></a><span class="sd">            errors: How to treat a `(cycle, step)` that fails to fetch or</span>
-<a id="__codelineno-0-511" name="__codelineno-0-511"></a><span class="sd">                crop (an unpublished cycle, a step the model does not</span>
-<a id="__codelineno-0-512" name="__codelineno-0-512"></a><span class="sd">                carry):</span>
-<a id="__codelineno-0-513" name="__codelineno-0-513"></a>
-<a id="__codelineno-0-514" name="__codelineno-0-514"></a><span class="sd">                * `&quot;warn&quot;` (default) — log the miss and return the COGs</span>
-<a id="__codelineno-0-515" name="__codelineno-0-515"></a><span class="sd">                  that did succeed.</span>
-<a id="__codelineno-0-516" name="__codelineno-0-516"></a><span class="sd">                * `&quot;skip&quot;` — drop the miss silently.</span>
-<a id="__codelineno-0-517" name="__codelineno-0-517"></a><span class="sd">                * `&quot;raise&quot;` — abort the whole download on the first miss.</span>
-<a id="__codelineno-0-518" name="__codelineno-0-518"></a>
-<a id="__codelineno-0-519" name="__codelineno-0-519"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-520" name="__codelineno-0-520"></a><span class="sd">            list[Path]: One cropped COG per successfully fetched</span>
-<a id="__codelineno-0-521" name="__codelineno-0-521"></a><span class="sd">                `(cycle, step)`, or — when `aggregate` is set — the</span>
-<a id="__codelineno-0-522" name="__codelineno-0-522"></a><span class="sd">                per-window reduced rasters.</span>
-<a id="__codelineno-0-523" name="__codelineno-0-523"></a>
-<a id="__codelineno-0-524" name="__codelineno-0-524"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-525" name="__codelineno-0-525"></a><span class="sd">            ValueError: If `errors` is not one of</span>
-<a id="__codelineno-0-526" name="__codelineno-0-526"></a><span class="sd">                `{&quot;raise&quot;, &quot;warn&quot;, &quot;skip&quot;}`.</span>
-<a id="__codelineno-0-527" name="__codelineno-0-527"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-528" name="__codelineno-0-528"></a>        <span class="k">if</span> <span class="n">errors</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">{</span><span class="s2">&quot;raise&quot;</span><span class="p">,</span> <span class="s2">&quot;warn&quot;</span><span class="p">,</span> <span class="s2">&quot;skip&quot;</span><span class="p">}:</span>
-<a id="__codelineno-0-529" name="__codelineno-0-529"></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-<a id="__codelineno-0-530" name="__codelineno-0-530"></a>                <span class="sa">f</span><span class="s2">&quot;errors must be &#39;raise&#39;, &#39;warn&#39;, or &#39;skip&#39;; got </span><span class="si">{</span><span class="n">errors</span><span class="si">!r}</span><span class="s2">.&quot;</span>
-<a id="__codelineno-0-531" name="__codelineno-0-531"></a>            <span class="p">)</span>
-<a id="__codelineno-0-532" name="__codelineno-0-532"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_show_progress</span> <span class="o">=</span> <span class="n">progress_bar</span>
-<a id="__codelineno-0-533" name="__codelineno-0-533"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_errors</span> <span class="o">=</span> <span class="n">errors</span>
-<a id="__codelineno-0-534" name="__codelineno-0-534"></a>        <span class="n">paths</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api_via_search_fetch</span><span class="p">()</span>
-<a id="__codelineno-0-535" name="__codelineno-0-535"></a>        <span class="k">if</span> <span class="n">aggregate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-536" name="__codelineno-0-536"></a>            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_aggregate</span><span class="p">(</span><span class="n">paths</span><span class="p">,</span> <span class="n">aggregate</span><span class="p">)</span>
-<a id="__codelineno-0-537" name="__codelineno-0-537"></a>        <span class="k">return</span> <span class="n">paths</span>
-<a id="__codelineno-0-538" name="__codelineno-0-538"></a>
-<a id="__codelineno-0-539" name="__codelineno-0-539"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_aggregate</span><span class="p">(</span>
-<a id="__codelineno-0-540" name="__codelineno-0-540"></a>        <span class="bp">self</span><span class="p">,</span> <span class="n">paths</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">],</span> <span class="n">config</span><span class="p">:</span> <span class="n">AggregationConfig</span>
-<a id="__codelineno-0-541" name="__codelineno-0-541"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
-<a id="__codelineno-0-542" name="__codelineno-0-542"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Reduce the `(cycle, step)` COG stack into per-window COGs (`C6`).</span>
-<a id="__codelineno-0-543" name="__codelineno-0-543"></a>
-<a id="__codelineno-0-544" name="__codelineno-0-544"></a><span class="sd">        Labels each COG by the window its **valid time** (`cycle + step`)</span>
-<a id="__codelineno-0-545" name="__codelineno-0-545"></a><span class="sd">        falls in, then reduces the co-registered stack with `config.op`</span>
-<a id="__codelineno-0-546" name="__codelineno-0-546"></a><span class="sd">        via `DatasetCollection.groupby(labels).&lt;op&gt;()` — the COG analog</span>
-<a id="__codelineno-0-547" name="__codelineno-0-547"></a><span class="sd">        of the NetCDF reducer the observation-time backends use. One COG</span>
-<a id="__codelineno-0-548" name="__codelineno-0-548"></a><span class="sd">        is written per window.</span>
-<a id="__codelineno-0-549" name="__codelineno-0-549"></a>
-<a id="__codelineno-0-550" name="__codelineno-0-550"></a><span class="sd">        Aggregation requires a **single model**: different models have</span>
-<a id="__codelineno-0-551" name="__codelineno-0-551"></a><span class="sd">        different native grids and cannot be co-registered into one</span>
-<a id="__codelineno-0-552" name="__codelineno-0-552"></a><span class="sd">        stack, so a multi-model request is rejected here rather than</span>
-<a id="__codelineno-0-553" name="__codelineno-0-553"></a><span class="sd">        silently mixing grids.</span>
-<a id="__codelineno-0-554" name="__codelineno-0-554"></a>
-<a id="__codelineno-0-555" name="__codelineno-0-555"></a><span class="sd">        Accumulated bands (the `*_acc` convention, e.g.</span>
-<a id="__codelineno-0-556" name="__codelineno-0-556"></a><span class="sd">        `precipitation_acc`) are reduced like any other, but a warning is</span>
-<a id="__codelineno-0-557" name="__codelineno-0-557"></a><span class="sd">        logged because summing/averaging an accumulation across steps</span>
-<a id="__codelineno-0-558" name="__codelineno-0-558"></a><span class="sd">        mixes its step-dependent windows and can mislead (`M3`).</span>
-<a id="__codelineno-0-559" name="__codelineno-0-559"></a>
-<a id="__codelineno-0-560" name="__codelineno-0-560"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-561" name="__codelineno-0-561"></a><span class="sd">            paths: The per-`(cycle, step)` COGs from :meth:`_fetch`.</span>
-<a id="__codelineno-0-562" name="__codelineno-0-562"></a><span class="sd">            config: The aggregation request (`freq` window, `op`</span>
-<a id="__codelineno-0-563" name="__codelineno-0-563"></a><span class="sd">                reducer, `out_dir`, `skipna`).</span>
-<a id="__codelineno-0-564" name="__codelineno-0-564"></a>
-<a id="__codelineno-0-565" name="__codelineno-0-565"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-566" name="__codelineno-0-566"></a><span class="sd">            list[Path]: The per-window reduced COG paths.</span>
-<a id="__codelineno-0-567" name="__codelineno-0-567"></a>
-<a id="__codelineno-0-568" name="__codelineno-0-568"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-569" name="__codelineno-0-569"></a><span class="sd">            ValueError: When the request names more than one model.</span>
-<a id="__codelineno-0-570" name="__codelineno-0-570"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-571" name="__codelineno-0-571"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="n">paths</span><span class="p">:</span>
-<a id="__codelineno-0-572" name="__codelineno-0-572"></a>            <span class="k">return</span> <span class="p">[]</span>
-<a id="__codelineno-0-573" name="__codelineno-0-573"></a>        <span class="n">model_keys</span> <span class="o">=</span> <span class="p">{</span><span class="n">key</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_requests</span><span class="p">}</span>
-<a id="__codelineno-0-574" name="__codelineno-0-574"></a>        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">model_keys</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
-<a id="__codelineno-0-575" name="__codelineno-0-575"></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-<a id="__codelineno-0-576" name="__codelineno-0-576"></a>                <span class="s2">&quot;aggregate= over an NWP request needs a single model; &quot;</span>
-<a id="__codelineno-0-577" name="__codelineno-0-577"></a>                <span class="sa">f</span><span class="s2">&quot;got </span><span class="si">{</span><span class="nb">sorted</span><span class="p">(</span><span class="n">model_keys</span><span class="p">)</span><span class="si">}</span><span class="s2">. Different models have different &quot;</span>
-<a id="__codelineno-0-578" name="__codelineno-0-578"></a>                <span class="s2">&quot;native grids and cannot be co-registered into one stack — &quot;</span>
-<a id="__codelineno-0-579" name="__codelineno-0-579"></a>                <span class="s2">&quot;issue one request per model.&quot;</span>
-<a id="__codelineno-0-580" name="__codelineno-0-580"></a>            <span class="p">)</span>
-<a id="__codelineno-0-581" name="__codelineno-0-581"></a>        <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">DatasetCollection</span>
-<a id="__codelineno-0-582" name="__codelineno-0-582"></a>        <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset.cog</span><span class="w"> </span><span class="kn">import</span> <span class="n">write_cog</span>
-<a id="__codelineno-0-583" name="__codelineno-0-583"></a>
-<a id="__codelineno-0-584" name="__codelineno-0-584"></a>        <span class="n">op</span> <span class="o">=</span> <span class="s2">&quot;mean&quot;</span> <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">op</span> <span class="o">==</span> <span class="s2">&quot;auto&quot;</span> <span class="k">else</span> <span class="n">config</span><span class="o">.</span><span class="n">op</span>
-<a id="__codelineno-0-585" name="__codelineno-0-585"></a>        <span class="c1"># Accumulated fields (precipitation_acc / APCP / tp) carry a running</span>
-<a id="__codelineno-0-586" name="__codelineno-0-586"></a>        <span class="c1"># total over a step-dependent window; reducing them across steps by</span>
-<a id="__codelineno-0-587" name="__codelineno-0-587"></a>        <span class="c1"># valid time mixes accumulation intervals and can mislead. Warn rather</span>
-<a id="__codelineno-0-588" name="__codelineno-0-588"></a>        <span class="c1"># than silently produce wrong totals (M3) — de-accumulation is a future</span>
-<a id="__codelineno-0-589" name="__codelineno-0-589"></a>        <span class="c1"># enhancement.</span>
-<a id="__codelineno-0-590" name="__codelineno-0-590"></a>        <span class="n">accumulated</span> <span class="o">=</span> <span class="p">[</span><span class="n">p</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_requests</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span> <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;_acc&quot;</span><span class="p">)]</span>
-<a id="__codelineno-0-591" name="__codelineno-0-591"></a>        <span class="k">if</span> <span class="n">accumulated</span><span class="p">:</span>
-<a id="__codelineno-0-592" name="__codelineno-0-592"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-<a id="__codelineno-0-593" name="__codelineno-0-593"></a>                <span class="sa">f</span><span class="s2">&quot;NWP aggregate: </span><span class="si">{</span><span class="n">accumulated</span><span class="si">}</span><span class="s2"> are accumulated field(s); &quot;</span>
-<a id="__codelineno-0-594" name="__codelineno-0-594"></a>                <span class="sa">f</span><span class="s2">&quot;reducing them by valid time with op=</span><span class="si">{</span><span class="n">op</span><span class="si">!r}</span><span class="s2"> mixes accumulation &quot;</span>
-<a id="__codelineno-0-595" name="__codelineno-0-595"></a>                <span class="s2">&quot;windows and may give misleading totals. Prefer the per-(cycle, &quot;</span>
-<a id="__codelineno-0-596" name="__codelineno-0-596"></a>                <span class="s2">&quot;step) COGs, or de-accumulate before aggregating.&quot;</span>
-<a id="__codelineno-0-597" name="__codelineno-0-597"></a>            <span class="p">)</span>
-<a id="__codelineno-0-598" name="__codelineno-0-598"></a>        <span class="n">out_dir</span> <span class="o">=</span> <span class="p">(</span>
-<a id="__codelineno-0-599" name="__codelineno-0-599"></a>            <span class="n">Path</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">out_dir</span><span class="p">)</span> <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">out_dir</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">Path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">root_dir</span><span class="p">)</span>
-<a id="__codelineno-0-600" name="__codelineno-0-600"></a>        <span class="p">)</span>
-<a id="__codelineno-0-601" name="__codelineno-0-601"></a>        <span class="n">out_dir</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<a id="__codelineno-0-602" name="__codelineno-0-602"></a>
-<a id="__codelineno-0-603" name="__codelineno-0-603"></a>        <span class="n">dated</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">((</span><span class="n">parse_cog_valid_time</span><span class="p">(</span><span class="n">p</span><span class="p">),</span> <span class="nb">str</span><span class="p">(</span><span class="n">p</span><span class="p">))</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">paths</span><span class="p">)</span>
-<a id="__codelineno-0-604" name="__codelineno-0-604"></a>        <span class="n">times</span> <span class="o">=</span> <span class="p">[</span><span class="n">t</span> <span class="k">for</span> <span class="n">t</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">dated</span><span class="p">]</span>
-<a id="__codelineno-0-605" name="__codelineno-0-605"></a>        <span class="n">files</span> <span class="o">=</span> <span class="p">[</span><span class="n">f</span> <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">dated</span><span class="p">]</span>
-<a id="__codelineno-0-606" name="__codelineno-0-606"></a>        <span class="n">labels</span> <span class="o">=</span> <span class="n">window_labels</span><span class="p">(</span><span class="n">times</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">freq</span><span class="p">)</span>
-<a id="__codelineno-0-607" name="__codelineno-0-607"></a>        <span class="n">collection</span> <span class="o">=</span> <span class="n">DatasetCollection</span><span class="o">.</span><span class="n">from_files</span><span class="p">(</span><span class="n">files</span><span class="p">)</span>
-<a id="__codelineno-0-608" name="__codelineno-0-608"></a>        <span class="n">reduced</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">collection</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">labels</span><span class="p">),</span> <span class="n">op</span><span class="p">)(</span><span class="n">skipna</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">skipna</span><span class="p">)</span>
-<a id="__codelineno-0-609" name="__codelineno-0-609"></a>        <span class="n">reference</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">files</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-<a id="__codelineno-0-610" name="__codelineno-0-610"></a>        <span class="n">geo</span><span class="p">,</span> <span class="n">epsg</span> <span class="o">=</span> <span class="n">reference</span><span class="o">.</span><span class="n">geotransform</span><span class="p">,</span> <span class="n">reference</span><span class="o">.</span><span class="n">epsg</span>
-<a id="__codelineno-0-611" name="__codelineno-0-611"></a>        <span class="n">model_key</span> <span class="o">=</span> <span class="n">model_keys</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
-<a id="__codelineno-0-612" name="__codelineno-0-612"></a>        <span class="n">written</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
-<a id="__codelineno-0-613" name="__codelineno-0-613"></a>        <span class="k">for</span> <span class="n">label</span><span class="p">,</span> <span class="n">array</span> <span class="ow">in</span> <span class="n">reduced</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-<a id="__codelineno-0-614" name="__codelineno-0-614"></a>            <span class="n">target</span> <span class="o">=</span> <span class="n">out_dir</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">model_key</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">op</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">config</span><span class="o">.</span><span class="n">freq</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">label</span><span class="si">}</span><span class="s2">.tif&quot;</span>
-<a id="__codelineno-0-615" name="__codelineno-0-615"></a>            <span class="n">write_cog</span><span class="p">(</span>
-<a id="__codelineno-0-616" name="__codelineno-0-616"></a>                <span class="n">Dataset</span><span class="o">.</span><span class="n">create_from_array</span><span class="p">(</span><span class="n">arr</span><span class="o">=</span><span class="n">array</span><span class="p">,</span> <span class="n">geo</span><span class="o">=</span><span class="n">geo</span><span class="p">,</span> <span class="n">epsg</span><span class="o">=</span><span class="n">epsg</span><span class="p">),</span> <span class="nb">str</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
-<a id="__codelineno-0-617" name="__codelineno-0-617"></a>            <span class="p">)</span>
-<a id="__codelineno-0-618" name="__codelineno-0-618"></a>            <span class="n">written</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
-<a id="__codelineno-0-619" name="__codelineno-0-619"></a>        <span class="k">return</span> <span class="n">written</span>
+<a id="__codelineno-0-456" name="__codelineno-0-456"></a>        <span class="c1"># touch=False crops to the bbox *extent*; touch=True takes pyramids&#39;</span>
+<a id="__codelineno-0-457" name="__codelineno-0-457"></a>        <span class="c1"># cutline path, which masks the field but keeps the full grid extent</span>
+<a id="__codelineno-0-458" name="__codelineno-0-458"></a>        <span class="c1"># (and historically crashed on the GRIB driver&#39;s EPSG:9122 CRS — fixed</span>
+<a id="__codelineno-0-459" name="__codelineno-0-459"></a>        <span class="c1"># in pyramids 0.24.1, pyramids#403 / PY-1). We want the bbox window.</span>
+<a id="__codelineno-0-460" name="__codelineno-0-460"></a>        <span class="n">cropped</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">crop</span><span class="p">(</span><span class="n">bbox</span><span class="o">=</span><span class="n">bbox</span><span class="p">,</span> <span class="n">epsg</span><span class="o">=</span><span class="mi">4326</span><span class="p">,</span> <span class="n">touch</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<a id="__codelineno-0-461" name="__codelineno-0-461"></a>        <span class="n">target</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root_dir</span> <span class="o">/</span> <span class="n">cog_name</span><span class="p">(</span>
+<a id="__codelineno-0-462" name="__codelineno-0-462"></a>            <span class="n">meta</span><span class="p">[</span><span class="s2">&quot;model_key&quot;</span><span class="p">],</span> <span class="n">meta</span><span class="p">[</span><span class="s2">&quot;cycle&quot;</span><span class="p">],</span> <span class="n">meta</span><span class="p">[</span><span class="s2">&quot;step&quot;</span><span class="p">],</span> <span class="n">meta</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;member&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-463" name="__codelineno-0-463"></a>        <span class="p">)</span>
+<a id="__codelineno-0-464" name="__codelineno-0-464"></a>        <span class="n">write_cog</span><span class="p">(</span><span class="n">cropped</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">target</span><span class="p">))</span>
+<a id="__codelineno-0-465" name="__codelineno-0-465"></a>        <span class="k">return</span> <span class="n">target</span>
+<a id="__codelineno-0-466" name="__codelineno-0-466"></a>
+<a id="__codelineno-0-467" name="__codelineno-0-467"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_normalise_longitude</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">):</span>
+<a id="__codelineno-0-468" name="__codelineno-0-468"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Shift a 0–360° global grid to −180..180 when the bbox needs it.</span>
+<a id="__codelineno-0-469" name="__codelineno-0-469"></a>
+<a id="__codelineno-0-470" name="__codelineno-0-470"></a><span class="sd">        `pyramids` `convert_longitude` only applies to a whole-globe</span>
+<a id="__codelineno-0-471" name="__codelineno-0-471"></a><span class="sd">        0–360 raster (it raises otherwise). A regional model (HRRR) or a</span>
+<a id="__codelineno-0-472" name="__codelineno-0-472"></a><span class="sd">        bbox entirely in the eastern hemisphere needs no shift, so this</span>
+<a id="__codelineno-0-473" name="__codelineno-0-473"></a><span class="sd">        is a no-op unless the request bbox reaches a negative longitude.</span>
+<a id="__codelineno-0-474" name="__codelineno-0-474"></a>
+<a id="__codelineno-0-475" name="__codelineno-0-475"></a><span class="sd">        This handles the 0–360 ↔ −180..180 convention only. A bbox that</span>
+<a id="__codelineno-0-476" name="__codelineno-0-476"></a><span class="sd">        *crosses* the dateline cannot be expressed (the `SpatialExtent`</span>
+<a id="__codelineno-0-477" name="__codelineno-0-477"></a><span class="sd">        requires `longitude_min &lt;= longitude_max`); split such an AOI</span>
+<a id="__codelineno-0-478" name="__codelineno-0-478"></a><span class="sd">        into two requests.</span>
+<a id="__codelineno-0-479" name="__codelineno-0-479"></a>
+<a id="__codelineno-0-480" name="__codelineno-0-480"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-481" name="__codelineno-0-481"></a><span class="sd">            dataset: The freshly opened GRIB2 `Dataset`.</span>
+<a id="__codelineno-0-482" name="__codelineno-0-482"></a>
+<a id="__codelineno-0-483" name="__codelineno-0-483"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-484" name="__codelineno-0-484"></a><span class="sd">            The same `Dataset`, or a longitude-shifted copy.</span>
+<a id="__codelineno-0-485" name="__codelineno-0-485"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-486" name="__codelineno-0-486"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">west</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">:</span>
+<a id="__codelineno-0-487" name="__codelineno-0-487"></a>            <span class="k">return</span> <span class="n">dataset</span>
+<a id="__codelineno-0-488" name="__codelineno-0-488"></a>        <span class="k">try</span><span class="p">:</span>
+<a id="__codelineno-0-489" name="__codelineno-0-489"></a>            <span class="k">return</span> <span class="n">dataset</span><span class="o">.</span><span class="n">convert_longitude</span><span class="p">()</span>
+<a id="__codelineno-0-490" name="__codelineno-0-490"></a>        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+<a id="__codelineno-0-491" name="__codelineno-0-491"></a>            <span class="c1"># Not a 0–360 global raster (e.g. a regional model already in</span>
+<a id="__codelineno-0-492" name="__codelineno-0-492"></a>            <span class="c1"># −180..180); the bbox is already in the dataset&#39;s CRS.</span>
+<a id="__codelineno-0-493" name="__codelineno-0-493"></a>            <span class="k">return</span> <span class="n">dataset</span>
+<a id="__codelineno-0-494" name="__codelineno-0-494"></a>
+<a id="__codelineno-0-495" name="__codelineno-0-495"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
+<a id="__codelineno-0-496" name="__codelineno-0-496"></a>        <span class="bp">self</span><span class="p">,</span>
+<a id="__codelineno-0-497" name="__codelineno-0-497"></a>        <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+<a id="__codelineno-0-498" name="__codelineno-0-498"></a>        <span class="n">aggregate</span><span class="p">:</span> <span class="n">AggregationConfig</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-499" name="__codelineno-0-499"></a>        <span class="n">errors</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;warn&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-500" name="__codelineno-0-500"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
+<a id="__codelineno-0-501" name="__codelineno-0-501"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Fetch the requested forecasts as bbox-cropped COGs.</span>
+<a id="__codelineno-0-502" name="__codelineno-0-502"></a>
+<a id="__codelineno-0-503" name="__codelineno-0-503"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-504" name="__codelineno-0-504"></a><span class="sd">            progress_bar: Whether the centres show per-download progress</span>
+<a id="__codelineno-0-505" name="__codelineno-0-505"></a><span class="sd">                (threaded into Herbie&#39;s `verbose`).</span>
+<a id="__codelineno-0-506" name="__codelineno-0-506"></a><span class="sd">            aggregate: Optional</span>
+<a id="__codelineno-0-507" name="__codelineno-0-507"></a><span class="sd">                :class:`earthlens.aggregate.AggregationConfig`; reduces</span>
+<a id="__codelineno-0-508" name="__codelineno-0-508"></a><span class="sd">                the `(cycle, step)` COG stack (`C6`).</span>
+<a id="__codelineno-0-509" name="__codelineno-0-509"></a><span class="sd">            errors: How to treat a `(cycle, step)` that fails to fetch or</span>
+<a id="__codelineno-0-510" name="__codelineno-0-510"></a><span class="sd">                crop (an unpublished cycle, a step the model does not</span>
+<a id="__codelineno-0-511" name="__codelineno-0-511"></a><span class="sd">                carry):</span>
+<a id="__codelineno-0-512" name="__codelineno-0-512"></a>
+<a id="__codelineno-0-513" name="__codelineno-0-513"></a><span class="sd">                * `&quot;warn&quot;` (default) — log the miss and return the COGs</span>
+<a id="__codelineno-0-514" name="__codelineno-0-514"></a><span class="sd">                  that did succeed.</span>
+<a id="__codelineno-0-515" name="__codelineno-0-515"></a><span class="sd">                * `&quot;skip&quot;` — drop the miss silently.</span>
+<a id="__codelineno-0-516" name="__codelineno-0-516"></a><span class="sd">                * `&quot;raise&quot;` — abort the whole download on the first miss.</span>
+<a id="__codelineno-0-517" name="__codelineno-0-517"></a>
+<a id="__codelineno-0-518" name="__codelineno-0-518"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-519" name="__codelineno-0-519"></a><span class="sd">            list[Path]: One cropped COG per successfully fetched</span>
+<a id="__codelineno-0-520" name="__codelineno-0-520"></a><span class="sd">                `(cycle, step)`, or — when `aggregate` is set — the</span>
+<a id="__codelineno-0-521" name="__codelineno-0-521"></a><span class="sd">                per-window reduced rasters.</span>
+<a id="__codelineno-0-522" name="__codelineno-0-522"></a>
+<a id="__codelineno-0-523" name="__codelineno-0-523"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-524" name="__codelineno-0-524"></a><span class="sd">            ValueError: If `errors` is not one of</span>
+<a id="__codelineno-0-525" name="__codelineno-0-525"></a><span class="sd">                `{&quot;raise&quot;, &quot;warn&quot;, &quot;skip&quot;}`.</span>
+<a id="__codelineno-0-526" name="__codelineno-0-526"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-527" name="__codelineno-0-527"></a>        <span class="k">if</span> <span class="n">errors</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">{</span><span class="s2">&quot;raise&quot;</span><span class="p">,</span> <span class="s2">&quot;warn&quot;</span><span class="p">,</span> <span class="s2">&quot;skip&quot;</span><span class="p">}:</span>
+<a id="__codelineno-0-528" name="__codelineno-0-528"></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+<a id="__codelineno-0-529" name="__codelineno-0-529"></a>                <span class="sa">f</span><span class="s2">&quot;errors must be &#39;raise&#39;, &#39;warn&#39;, or &#39;skip&#39;; got </span><span class="si">{</span><span class="n">errors</span><span class="si">!r}</span><span class="s2">.&quot;</span>
+<a id="__codelineno-0-530" name="__codelineno-0-530"></a>            <span class="p">)</span>
+<a id="__codelineno-0-531" name="__codelineno-0-531"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_show_progress</span> <span class="o">=</span> <span class="n">progress_bar</span>
+<a id="__codelineno-0-532" name="__codelineno-0-532"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_errors</span> <span class="o">=</span> <span class="n">errors</span>
+<a id="__codelineno-0-533" name="__codelineno-0-533"></a>        <span class="n">paths</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api_via_search_fetch</span><span class="p">()</span>
+<a id="__codelineno-0-534" name="__codelineno-0-534"></a>        <span class="k">if</span> <span class="n">aggregate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-535" name="__codelineno-0-535"></a>            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_aggregate</span><span class="p">(</span><span class="n">paths</span><span class="p">,</span> <span class="n">aggregate</span><span class="p">)</span>
+<a id="__codelineno-0-536" name="__codelineno-0-536"></a>        <span class="k">return</span> <span class="n">paths</span>
+<a id="__codelineno-0-537" name="__codelineno-0-537"></a>
+<a id="__codelineno-0-538" name="__codelineno-0-538"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_aggregate</span><span class="p">(</span>
+<a id="__codelineno-0-539" name="__codelineno-0-539"></a>        <span class="bp">self</span><span class="p">,</span> <span class="n">paths</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">],</span> <span class="n">config</span><span class="p">:</span> <span class="n">AggregationConfig</span>
+<a id="__codelineno-0-540" name="__codelineno-0-540"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
+<a id="__codelineno-0-541" name="__codelineno-0-541"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Reduce the `(cycle, step)` COG stack into per-window COGs (`C6`).</span>
+<a id="__codelineno-0-542" name="__codelineno-0-542"></a>
+<a id="__codelineno-0-543" name="__codelineno-0-543"></a><span class="sd">        Labels each COG by the window its **valid time** (`cycle + step`)</span>
+<a id="__codelineno-0-544" name="__codelineno-0-544"></a><span class="sd">        falls in, then reduces the co-registered stack with `config.op`</span>
+<a id="__codelineno-0-545" name="__codelineno-0-545"></a><span class="sd">        via `DatasetCollection.groupby(labels).&lt;op&gt;()` — the COG analog</span>
+<a id="__codelineno-0-546" name="__codelineno-0-546"></a><span class="sd">        of the NetCDF reducer the observation-time backends use. One COG</span>
+<a id="__codelineno-0-547" name="__codelineno-0-547"></a><span class="sd">        is written per window.</span>
+<a id="__codelineno-0-548" name="__codelineno-0-548"></a>
+<a id="__codelineno-0-549" name="__codelineno-0-549"></a><span class="sd">        Aggregation requires a **single model**: different models have</span>
+<a id="__codelineno-0-550" name="__codelineno-0-550"></a><span class="sd">        different native grids and cannot be co-registered into one</span>
+<a id="__codelineno-0-551" name="__codelineno-0-551"></a><span class="sd">        stack, so a multi-model request is rejected here rather than</span>
+<a id="__codelineno-0-552" name="__codelineno-0-552"></a><span class="sd">        silently mixing grids.</span>
+<a id="__codelineno-0-553" name="__codelineno-0-553"></a>
+<a id="__codelineno-0-554" name="__codelineno-0-554"></a><span class="sd">        Accumulated bands (the `*_acc` convention, e.g.</span>
+<a id="__codelineno-0-555" name="__codelineno-0-555"></a><span class="sd">        `precipitation_acc`) are reduced like any other, but a warning is</span>
+<a id="__codelineno-0-556" name="__codelineno-0-556"></a><span class="sd">        logged because summing/averaging an accumulation across steps</span>
+<a id="__codelineno-0-557" name="__codelineno-0-557"></a><span class="sd">        mixes its step-dependent windows and can mislead (`M3`).</span>
+<a id="__codelineno-0-558" name="__codelineno-0-558"></a>
+<a id="__codelineno-0-559" name="__codelineno-0-559"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-560" name="__codelineno-0-560"></a><span class="sd">            paths: The per-`(cycle, step)` COGs from :meth:`_fetch`.</span>
+<a id="__codelineno-0-561" name="__codelineno-0-561"></a><span class="sd">            config: The aggregation request (`freq` window, `op`</span>
+<a id="__codelineno-0-562" name="__codelineno-0-562"></a><span class="sd">                reducer, `out_dir`, `skipna`).</span>
+<a id="__codelineno-0-563" name="__codelineno-0-563"></a>
+<a id="__codelineno-0-564" name="__codelineno-0-564"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-565" name="__codelineno-0-565"></a><span class="sd">            list[Path]: The per-window reduced COG paths.</span>
+<a id="__codelineno-0-566" name="__codelineno-0-566"></a>
+<a id="__codelineno-0-567" name="__codelineno-0-567"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-568" name="__codelineno-0-568"></a><span class="sd">            ValueError: When the request names more than one model.</span>
+<a id="__codelineno-0-569" name="__codelineno-0-569"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-570" name="__codelineno-0-570"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="n">paths</span><span class="p">:</span>
+<a id="__codelineno-0-571" name="__codelineno-0-571"></a>            <span class="k">return</span> <span class="p">[]</span>
+<a id="__codelineno-0-572" name="__codelineno-0-572"></a>        <span class="n">model_keys</span> <span class="o">=</span> <span class="p">{</span><span class="n">key</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_requests</span><span class="p">}</span>
+<a id="__codelineno-0-573" name="__codelineno-0-573"></a>        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">model_keys</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+<a id="__codelineno-0-574" name="__codelineno-0-574"></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+<a id="__codelineno-0-575" name="__codelineno-0-575"></a>                <span class="s2">&quot;aggregate= over an NWP request needs a single model; &quot;</span>
+<a id="__codelineno-0-576" name="__codelineno-0-576"></a>                <span class="sa">f</span><span class="s2">&quot;got </span><span class="si">{</span><span class="nb">sorted</span><span class="p">(</span><span class="n">model_keys</span><span class="p">)</span><span class="si">}</span><span class="s2">. Different models have different &quot;</span>
+<a id="__codelineno-0-577" name="__codelineno-0-577"></a>                <span class="s2">&quot;native grids and cannot be co-registered into one stack — &quot;</span>
+<a id="__codelineno-0-578" name="__codelineno-0-578"></a>                <span class="s2">&quot;issue one request per model.&quot;</span>
+<a id="__codelineno-0-579" name="__codelineno-0-579"></a>            <span class="p">)</span>
+<a id="__codelineno-0-580" name="__codelineno-0-580"></a>        <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">DatasetCollection</span>
+<a id="__codelineno-0-581" name="__codelineno-0-581"></a>        <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset.cog</span><span class="w"> </span><span class="kn">import</span> <span class="n">write_cog</span>
+<a id="__codelineno-0-582" name="__codelineno-0-582"></a>
+<a id="__codelineno-0-583" name="__codelineno-0-583"></a>        <span class="n">op</span> <span class="o">=</span> <span class="s2">&quot;mean&quot;</span> <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">op</span> <span class="o">==</span> <span class="s2">&quot;auto&quot;</span> <span class="k">else</span> <span class="n">config</span><span class="o">.</span><span class="n">op</span>
+<a id="__codelineno-0-584" name="__codelineno-0-584"></a>        <span class="c1"># Accumulated fields (precipitation_acc / APCP / tp) carry a running</span>
+<a id="__codelineno-0-585" name="__codelineno-0-585"></a>        <span class="c1"># total over a step-dependent window; reducing them across steps by</span>
+<a id="__codelineno-0-586" name="__codelineno-0-586"></a>        <span class="c1"># valid time mixes accumulation intervals and can mislead. Warn rather</span>
+<a id="__codelineno-0-587" name="__codelineno-0-587"></a>        <span class="c1"># than silently produce wrong totals (M3) — de-accumulation is a future</span>
+<a id="__codelineno-0-588" name="__codelineno-0-588"></a>        <span class="c1"># enhancement.</span>
+<a id="__codelineno-0-589" name="__codelineno-0-589"></a>        <span class="n">accumulated</span> <span class="o">=</span> <span class="p">[</span><span class="n">p</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_requests</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span> <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;_acc&quot;</span><span class="p">)]</span>
+<a id="__codelineno-0-590" name="__codelineno-0-590"></a>        <span class="k">if</span> <span class="n">accumulated</span><span class="p">:</span>
+<a id="__codelineno-0-591" name="__codelineno-0-591"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+<a id="__codelineno-0-592" name="__codelineno-0-592"></a>                <span class="sa">f</span><span class="s2">&quot;NWP aggregate: </span><span class="si">{</span><span class="n">accumulated</span><span class="si">}</span><span class="s2"> are accumulated field(s); &quot;</span>
+<a id="__codelineno-0-593" name="__codelineno-0-593"></a>                <span class="sa">f</span><span class="s2">&quot;reducing them by valid time with op=</span><span class="si">{</span><span class="n">op</span><span class="si">!r}</span><span class="s2"> mixes accumulation &quot;</span>
+<a id="__codelineno-0-594" name="__codelineno-0-594"></a>                <span class="s2">&quot;windows and may give misleading totals. Prefer the per-(cycle, &quot;</span>
+<a id="__codelineno-0-595" name="__codelineno-0-595"></a>                <span class="s2">&quot;step) COGs, or de-accumulate before aggregating.&quot;</span>
+<a id="__codelineno-0-596" name="__codelineno-0-596"></a>            <span class="p">)</span>
+<a id="__codelineno-0-597" name="__codelineno-0-597"></a>        <span class="n">out_dir</span> <span class="o">=</span> <span class="p">(</span>
+<a id="__codelineno-0-598" name="__codelineno-0-598"></a>            <span class="n">Path</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">out_dir</span><span class="p">)</span> <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">out_dir</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">Path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">root_dir</span><span class="p">)</span>
+<a id="__codelineno-0-599" name="__codelineno-0-599"></a>        <span class="p">)</span>
+<a id="__codelineno-0-600" name="__codelineno-0-600"></a>        <span class="n">out_dir</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<a id="__codelineno-0-601" name="__codelineno-0-601"></a>
+<a id="__codelineno-0-602" name="__codelineno-0-602"></a>        <span class="n">dated</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">((</span><span class="n">parse_cog_valid_time</span><span class="p">(</span><span class="n">p</span><span class="p">),</span> <span class="nb">str</span><span class="p">(</span><span class="n">p</span><span class="p">))</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">paths</span><span class="p">)</span>
+<a id="__codelineno-0-603" name="__codelineno-0-603"></a>        <span class="n">times</span> <span class="o">=</span> <span class="p">[</span><span class="n">t</span> <span class="k">for</span> <span class="n">t</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">dated</span><span class="p">]</span>
+<a id="__codelineno-0-604" name="__codelineno-0-604"></a>        <span class="n">files</span> <span class="o">=</span> <span class="p">[</span><span class="n">f</span> <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">dated</span><span class="p">]</span>
+<a id="__codelineno-0-605" name="__codelineno-0-605"></a>        <span class="n">labels</span> <span class="o">=</span> <span class="n">window_labels</span><span class="p">(</span><span class="n">times</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">freq</span><span class="p">)</span>
+<a id="__codelineno-0-606" name="__codelineno-0-606"></a>        <span class="n">collection</span> <span class="o">=</span> <span class="n">DatasetCollection</span><span class="o">.</span><span class="n">from_files</span><span class="p">(</span><span class="n">files</span><span class="p">)</span>
+<a id="__codelineno-0-607" name="__codelineno-0-607"></a>        <span class="n">reduced</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">collection</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">labels</span><span class="p">),</span> <span class="n">op</span><span class="p">)(</span><span class="n">skipna</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">skipna</span><span class="p">)</span>
+<a id="__codelineno-0-608" name="__codelineno-0-608"></a>        <span class="n">reference</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">files</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<a id="__codelineno-0-609" name="__codelineno-0-609"></a>        <span class="n">geo</span><span class="p">,</span> <span class="n">epsg</span> <span class="o">=</span> <span class="n">reference</span><span class="o">.</span><span class="n">geotransform</span><span class="p">,</span> <span class="n">reference</span><span class="o">.</span><span class="n">epsg</span>
+<a id="__codelineno-0-610" name="__codelineno-0-610"></a>        <span class="n">model_key</span> <span class="o">=</span> <span class="n">model_keys</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+<a id="__codelineno-0-611" name="__codelineno-0-611"></a>        <span class="n">written</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+<a id="__codelineno-0-612" name="__codelineno-0-612"></a>        <span class="k">for</span> <span class="n">label</span><span class="p">,</span> <span class="n">array</span> <span class="ow">in</span> <span class="n">reduced</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+<a id="__codelineno-0-613" name="__codelineno-0-613"></a>            <span class="n">target</span> <span class="o">=</span> <span class="n">out_dir</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">model_key</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">op</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">config</span><span class="o">.</span><span class="n">freq</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">label</span><span class="si">}</span><span class="s2">.tif&quot;</span>
+<a id="__codelineno-0-614" name="__codelineno-0-614"></a>            <span class="n">write_cog</span><span class="p">(</span>
+<a id="__codelineno-0-615" name="__codelineno-0-615"></a>                <span class="n">Dataset</span><span class="o">.</span><span class="n">create_from_array</span><span class="p">(</span><span class="n">arr</span><span class="o">=</span><span class="n">array</span><span class="p">,</span> <span class="n">geo</span><span class="o">=</span><span class="n">geo</span><span class="p">,</span> <span class="n">epsg</span><span class="o">=</span><span class="n">epsg</span><span class="p">),</span> <span class="nb">str</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
+<a id="__codelineno-0-616" name="__codelineno-0-616"></a>            <span class="p">)</span>
+<a id="__codelineno-0-617" name="__codelineno-0-617"></a>            <span class="n">written</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
+<a id="__codelineno-0-618" name="__codelineno-0-618"></a>        <span class="k">return</span> <span class="n">written</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -11171,7 +11167,8 @@ per-window reduced rasters.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>src/earthlens/nwp/backend.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-496">496</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-495">495</a></span>
+<span class="normal"><a href="#__codelineno-0-496">496</a></span>
 <span class="normal"><a href="#__codelineno-0-497">497</a></span>
 <span class="normal"><a href="#__codelineno-0-498">498</a></span>
 <span class="normal"><a href="#__codelineno-0-499">499</a></span>
@@ -11211,49 +11208,48 @@ per-window reduced rasters.</p>
 <span class="normal"><a href="#__codelineno-0-533">533</a></span>
 <span class="normal"><a href="#__codelineno-0-534">534</a></span>
 <span class="normal"><a href="#__codelineno-0-535">535</a></span>
-<span class="normal"><a href="#__codelineno-0-536">536</a></span>
-<span class="normal"><a href="#__codelineno-0-537">537</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-496" name="__codelineno-0-496"></a><span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
-<a id="__codelineno-0-497" name="__codelineno-0-497"></a>    <span class="bp">self</span><span class="p">,</span>
-<a id="__codelineno-0-498" name="__codelineno-0-498"></a>    <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-<a id="__codelineno-0-499" name="__codelineno-0-499"></a>    <span class="n">aggregate</span><span class="p">:</span> <span class="n">AggregationConfig</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-500" name="__codelineno-0-500"></a>    <span class="n">errors</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;warn&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-501" name="__codelineno-0-501"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
-<a id="__codelineno-0-502" name="__codelineno-0-502"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Fetch the requested forecasts as bbox-cropped COGs.</span>
-<a id="__codelineno-0-503" name="__codelineno-0-503"></a>
-<a id="__codelineno-0-504" name="__codelineno-0-504"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-505" name="__codelineno-0-505"></a><span class="sd">        progress_bar: Whether the centres show per-download progress</span>
-<a id="__codelineno-0-506" name="__codelineno-0-506"></a><span class="sd">            (threaded into Herbie&#39;s `verbose`).</span>
-<a id="__codelineno-0-507" name="__codelineno-0-507"></a><span class="sd">        aggregate: Optional</span>
-<a id="__codelineno-0-508" name="__codelineno-0-508"></a><span class="sd">            :class:`earthlens.aggregate.AggregationConfig`; reduces</span>
-<a id="__codelineno-0-509" name="__codelineno-0-509"></a><span class="sd">            the `(cycle, step)` COG stack (`C6`).</span>
-<a id="__codelineno-0-510" name="__codelineno-0-510"></a><span class="sd">        errors: How to treat a `(cycle, step)` that fails to fetch or</span>
-<a id="__codelineno-0-511" name="__codelineno-0-511"></a><span class="sd">            crop (an unpublished cycle, a step the model does not</span>
-<a id="__codelineno-0-512" name="__codelineno-0-512"></a><span class="sd">            carry):</span>
-<a id="__codelineno-0-513" name="__codelineno-0-513"></a>
-<a id="__codelineno-0-514" name="__codelineno-0-514"></a><span class="sd">            * `&quot;warn&quot;` (default) — log the miss and return the COGs</span>
-<a id="__codelineno-0-515" name="__codelineno-0-515"></a><span class="sd">              that did succeed.</span>
-<a id="__codelineno-0-516" name="__codelineno-0-516"></a><span class="sd">            * `&quot;skip&quot;` — drop the miss silently.</span>
-<a id="__codelineno-0-517" name="__codelineno-0-517"></a><span class="sd">            * `&quot;raise&quot;` — abort the whole download on the first miss.</span>
-<a id="__codelineno-0-518" name="__codelineno-0-518"></a>
-<a id="__codelineno-0-519" name="__codelineno-0-519"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-520" name="__codelineno-0-520"></a><span class="sd">        list[Path]: One cropped COG per successfully fetched</span>
-<a id="__codelineno-0-521" name="__codelineno-0-521"></a><span class="sd">            `(cycle, step)`, or — when `aggregate` is set — the</span>
-<a id="__codelineno-0-522" name="__codelineno-0-522"></a><span class="sd">            per-window reduced rasters.</span>
-<a id="__codelineno-0-523" name="__codelineno-0-523"></a>
-<a id="__codelineno-0-524" name="__codelineno-0-524"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-525" name="__codelineno-0-525"></a><span class="sd">        ValueError: If `errors` is not one of</span>
-<a id="__codelineno-0-526" name="__codelineno-0-526"></a><span class="sd">            `{&quot;raise&quot;, &quot;warn&quot;, &quot;skip&quot;}`.</span>
-<a id="__codelineno-0-527" name="__codelineno-0-527"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-528" name="__codelineno-0-528"></a>    <span class="k">if</span> <span class="n">errors</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">{</span><span class="s2">&quot;raise&quot;</span><span class="p">,</span> <span class="s2">&quot;warn&quot;</span><span class="p">,</span> <span class="s2">&quot;skip&quot;</span><span class="p">}:</span>
-<a id="__codelineno-0-529" name="__codelineno-0-529"></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-<a id="__codelineno-0-530" name="__codelineno-0-530"></a>            <span class="sa">f</span><span class="s2">&quot;errors must be &#39;raise&#39;, &#39;warn&#39;, or &#39;skip&#39;; got </span><span class="si">{</span><span class="n">errors</span><span class="si">!r}</span><span class="s2">.&quot;</span>
-<a id="__codelineno-0-531" name="__codelineno-0-531"></a>        <span class="p">)</span>
-<a id="__codelineno-0-532" name="__codelineno-0-532"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_show_progress</span> <span class="o">=</span> <span class="n">progress_bar</span>
-<a id="__codelineno-0-533" name="__codelineno-0-533"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_errors</span> <span class="o">=</span> <span class="n">errors</span>
-<a id="__codelineno-0-534" name="__codelineno-0-534"></a>    <span class="n">paths</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api_via_search_fetch</span><span class="p">()</span>
-<a id="__codelineno-0-535" name="__codelineno-0-535"></a>    <span class="k">if</span> <span class="n">aggregate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-536" name="__codelineno-0-536"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_aggregate</span><span class="p">(</span><span class="n">paths</span><span class="p">,</span> <span class="n">aggregate</span><span class="p">)</span>
-<a id="__codelineno-0-537" name="__codelineno-0-537"></a>    <span class="k">return</span> <span class="n">paths</span>
+<span class="normal"><a href="#__codelineno-0-536">536</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-495" name="__codelineno-0-495"></a><span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
+<a id="__codelineno-0-496" name="__codelineno-0-496"></a>    <span class="bp">self</span><span class="p">,</span>
+<a id="__codelineno-0-497" name="__codelineno-0-497"></a>    <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+<a id="__codelineno-0-498" name="__codelineno-0-498"></a>    <span class="n">aggregate</span><span class="p">:</span> <span class="n">AggregationConfig</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-499" name="__codelineno-0-499"></a>    <span class="n">errors</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;warn&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-500" name="__codelineno-0-500"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
+<a id="__codelineno-0-501" name="__codelineno-0-501"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Fetch the requested forecasts as bbox-cropped COGs.</span>
+<a id="__codelineno-0-502" name="__codelineno-0-502"></a>
+<a id="__codelineno-0-503" name="__codelineno-0-503"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-504" name="__codelineno-0-504"></a><span class="sd">        progress_bar: Whether the centres show per-download progress</span>
+<a id="__codelineno-0-505" name="__codelineno-0-505"></a><span class="sd">            (threaded into Herbie&#39;s `verbose`).</span>
+<a id="__codelineno-0-506" name="__codelineno-0-506"></a><span class="sd">        aggregate: Optional</span>
+<a id="__codelineno-0-507" name="__codelineno-0-507"></a><span class="sd">            :class:`earthlens.aggregate.AggregationConfig`; reduces</span>
+<a id="__codelineno-0-508" name="__codelineno-0-508"></a><span class="sd">            the `(cycle, step)` COG stack (`C6`).</span>
+<a id="__codelineno-0-509" name="__codelineno-0-509"></a><span class="sd">        errors: How to treat a `(cycle, step)` that fails to fetch or</span>
+<a id="__codelineno-0-510" name="__codelineno-0-510"></a><span class="sd">            crop (an unpublished cycle, a step the model does not</span>
+<a id="__codelineno-0-511" name="__codelineno-0-511"></a><span class="sd">            carry):</span>
+<a id="__codelineno-0-512" name="__codelineno-0-512"></a>
+<a id="__codelineno-0-513" name="__codelineno-0-513"></a><span class="sd">            * `&quot;warn&quot;` (default) — log the miss and return the COGs</span>
+<a id="__codelineno-0-514" name="__codelineno-0-514"></a><span class="sd">              that did succeed.</span>
+<a id="__codelineno-0-515" name="__codelineno-0-515"></a><span class="sd">            * `&quot;skip&quot;` — drop the miss silently.</span>
+<a id="__codelineno-0-516" name="__codelineno-0-516"></a><span class="sd">            * `&quot;raise&quot;` — abort the whole download on the first miss.</span>
+<a id="__codelineno-0-517" name="__codelineno-0-517"></a>
+<a id="__codelineno-0-518" name="__codelineno-0-518"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-519" name="__codelineno-0-519"></a><span class="sd">        list[Path]: One cropped COG per successfully fetched</span>
+<a id="__codelineno-0-520" name="__codelineno-0-520"></a><span class="sd">            `(cycle, step)`, or — when `aggregate` is set — the</span>
+<a id="__codelineno-0-521" name="__codelineno-0-521"></a><span class="sd">            per-window reduced rasters.</span>
+<a id="__codelineno-0-522" name="__codelineno-0-522"></a>
+<a id="__codelineno-0-523" name="__codelineno-0-523"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-524" name="__codelineno-0-524"></a><span class="sd">        ValueError: If `errors` is not one of</span>
+<a id="__codelineno-0-525" name="__codelineno-0-525"></a><span class="sd">            `{&quot;raise&quot;, &quot;warn&quot;, &quot;skip&quot;}`.</span>
+<a id="__codelineno-0-526" name="__codelineno-0-526"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-527" name="__codelineno-0-527"></a>    <span class="k">if</span> <span class="n">errors</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">{</span><span class="s2">&quot;raise&quot;</span><span class="p">,</span> <span class="s2">&quot;warn&quot;</span><span class="p">,</span> <span class="s2">&quot;skip&quot;</span><span class="p">}:</span>
+<a id="__codelineno-0-528" name="__codelineno-0-528"></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+<a id="__codelineno-0-529" name="__codelineno-0-529"></a>            <span class="sa">f</span><span class="s2">&quot;errors must be &#39;raise&#39;, &#39;warn&#39;, or &#39;skip&#39;; got </span><span class="si">{</span><span class="n">errors</span><span class="si">!r}</span><span class="s2">.&quot;</span>
+<a id="__codelineno-0-530" name="__codelineno-0-530"></a>        <span class="p">)</span>
+<a id="__codelineno-0-531" name="__codelineno-0-531"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_show_progress</span> <span class="o">=</span> <span class="n">progress_bar</span>
+<a id="__codelineno-0-532" name="__codelineno-0-532"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_errors</span> <span class="o">=</span> <span class="n">errors</span>
+<a id="__codelineno-0-533" name="__codelineno-0-533"></a>    <span class="n">paths</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api_via_search_fetch</span><span class="p">()</span>
+<a id="__codelineno-0-534" name="__codelineno-0-534"></a>    <span class="k">if</span> <span class="n">aggregate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-535" name="__codelineno-0-535"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_aggregate</span><span class="p">(</span><span class="n">paths</span><span class="p">,</span> <span class="n">aggregate</span><span class="p">)</span>
+<a id="__codelineno-0-536" name="__codelineno-0-536"></a>    <span class="k">return</span> <span class="n">paths</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
