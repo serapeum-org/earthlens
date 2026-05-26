@@ -340,3 +340,34 @@ class TestMeteoFranceCentre:
             MeteoFranceCentre(tmp_path).fetch_one(
                 model, dt.datetime(2024, 6, 1, 0), 0, ["temperature_2m"], "auto"
             )
+
+    def test_missing_boto3_raises_friendly(self, monkeypatch, tmp_path):
+        """A missing boto3 surfaces an earthlens[nwp] ImportError."""
+        monkeypatch.setitem(sys.modules, "boto3", None)
+        with pytest.raises(ImportError, match=r"earthlens\[nwp\]"):
+            MeteoFranceCentre(tmp_path).fetch_one(
+                self._mf(), dt.datetime(2024, 6, 1, 0), 0, ["temperature_2m"], "auto"
+            )
+
+    def test_fetch_one_failure_leaves_no_partial_file(self, monkeypatch, tmp_path):
+        """A get_object failure unlinks the partial file and re-raises."""
+        boto3_mod = types.ModuleType("boto3")
+
+        class _Client:
+            def get_object(self, Bucket, Key):
+                raise RuntimeError("s3 down")
+
+        boto3_mod.client = lambda *a, **k: _Client()
+        botocore = types.ModuleType("botocore")
+        botocore.UNSIGNED = object()
+        client_mod = types.ModuleType("botocore.client")
+        client_mod.Config = lambda **k: None
+        botocore.client = client_mod
+        monkeypatch.setitem(sys.modules, "boto3", boto3_mod)
+        monkeypatch.setitem(sys.modules, "botocore", botocore)
+        monkeypatch.setitem(sys.modules, "botocore.client", client_mod)
+        with pytest.raises(RuntimeError, match="s3 down"):
+            MeteoFranceCentre(tmp_path).fetch_one(
+                self._mf(), dt.datetime(2024, 6, 1, 0), 0, ["temperature_2m"], "auto"
+            )
+        assert list(tmp_path.iterdir()) == [], "no partial file should remain"
