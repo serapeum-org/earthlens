@@ -12,12 +12,18 @@ centre carries no provider-specific paths itself. `boto3` is imported
 lazily, so the package imports without the `[s3]`/`[nwp]` extras.
 
 !!! note
-    The exact `mf-nwp-models` key layout for rolling forecasts is not yet
-    pinned (the bucket exposes only `static/` under the model prefixes in
-    a plain unsigned listing), so no Météo-France catalog row ships yet.
-    This adapter is the infrastructure that a verified `key_template` will
-    plug into; use `tools/nwp/probe_nwp_model.py` to confirm a candidate
-    key once the layout is known.
+    No Météo-France catalog row ships, because the open
+    `s3://mf-nwp-models` bucket exposes **only `static/`** (landmask /
+    terrain) under every model prefix (`arpege-world`, `arpege-europe`,
+    `arome-france`, `arome-france-hd`) — verified by an unsigned listing
+    of the bucket root + each prefix. The rolling forecasts are served
+    through Météo-France's **authenticated API portal**
+    (`portail-api.meteofrance.fr`, API-key + REST), which is a different
+    access pattern than this unsigned-S3 adapter. So MF needs a separate
+    auth+REST client (a future enhancement); this `direct-boto3` centre is
+    correct infrastructure for any unsigned-S3 NWP source and the moment a
+    public MF mirror with a real `key_template` exists, a row plugs in
+    here. Use `tools/nwp/probe_nwp_model.py` to confirm a candidate key.
 """
 
 from __future__ import annotations

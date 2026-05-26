@@ -51,11 +51,19 @@ doesn't carry).
 | `icon-d2` | DWD Open Data | `direct-https` | every 3 h | 48 h | icosahedral (raw fetch) ✓ probed |
 | `ens` | ECMWF Open Data | `ecmwf-opendata` | 00/06/12/18 | 360 h | IFS ENS control (`enfo`/`cf`) ✓ probed |
 | `aifs` | ECMWF Open Data | `ecmwf-opendata` | 00/06/12/18 | 360 h | data-driven (`aifs-single`) ✓ probed |
+| `rtma` | NOAA NODD | `herbie` | hourly | 0 h² | 2.5 km CONUS analysis (`anl`) |
+| `urma` | NOAA NODD | `herbie` | hourly | 0 h² | 2.5 km CONUS analysis (`anl`) |
+| `hiresw-arw` | NOAA NODD | `herbie` | 00/12 | 48 h | 2.5 km ARW window (`domain=conus`) |
+| `href` | NOAA NODD | `herbie` | 00/06/12/18 | 48 h | ensemble mean (`domain=conus`) |
 
-Not yet shipped: **Météo-France** (the `direct-boto3` centre exists, but the
-`mf-nwp-models` bucket doesn't expose rolling forecasts in a resolvable
-unsigned layout) and **CFS** (seasonal — a different time axis than
-`(cycle, step)`).
+² **Analyses** (`rtma`/`urma`) have `horizon_h=0` — they are valid *at* the cycle
+time, so only the analysis step (`f000`) is fetched.
+
+Not shipped: **Météo-France** (the `direct-boto3` centre exists, but
+`s3://mf-nwp-models` exposes only `static/` — the rolling forecasts need MF's
+authenticated API portal, a separate auth+REST effort); **CFS** (seasonal — a
+different time axis than `(cycle, step)`); **HAFS** (hurricane model — needs a
+storm id, not a generic `(cycle, step)` raster).
 
 ¹ **HRRR per-cycle horizon.** The `horizon_h` is the *maximum*: HRRR runs to
 48 h only at the 00/06/12/18 synoptic cycles; the other (hourly) cycles run to
@@ -67,10 +75,17 @@ not fetched. Per-cycle horizons are a future catalog enhancement.
 Each model maps the shared earthlens parameter names to its own
 selector:
 
-| Parameter | GFS / GEFS / HRRR (Herbie regex) | IFS (ecmwf token) | ICON (DWD token) |
-|-----------|----------------------------------|-------------------|------------------|
+| Parameter | NOAA / ECCC (Herbie regex) | ECMWF (token) | DWD (token, lc for D2) |
+|-----------|----------------------------|---------------|------------------------|
 | `temperature_2m` | `:TMP:2 m above ground:` | `2t` | `T_2M` |
 | `precipitation_acc` | `:APCP:surface:` | `tp` | `TOT_PREC` |
+| `dewpoint_2m` | `:DPT:2 m above ground:` | `2d` | `TD_2M` |
+| `wind_u_10m` | `:UGRD:10 m above ground:` | `10u` | `U_10M` |
+| `wind_v_10m` | `:VGRD:10 m above ground:` | `10v` | `V_10M` |
+| `pressure_msl` | `:PRMSL:mean sea level:` | `msl` | `PMSL` |
+
+Not every model carries every band (e.g. analyses omit `precipitation_acc`); a
+requested band a model doesn't publish is skipped under `errors="warn"`.
 
 ```python
 from earthlens.nwp import Catalog

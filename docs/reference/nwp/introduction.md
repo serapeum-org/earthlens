@@ -7,15 +7,18 @@ bbox-cropped Cloud-Optimized GeoTIFFs. It is one subpackage with sibling
 
 | Centre | Models | Protocol | Cost |
 |--------|--------|----------|------|
-| **NOAA NODD** | GFS, GEFS, HRRR, RAP, NAM, NBM, RRFS | [Herbie](https://herbie.readthedocs.io) `.idx` byte-range subset (S3 / GCS / Azure, unsigned) | free |
+| **NOAA NODD** | GFS, GEFS, HRRR, RAP, NAM, NBM, RRFS, RTMA, URMA, HiResW, HREF | [Herbie](https://herbie.readthedocs.io) `.idx` byte-range subset (S3 / GCS / Azure, unsigned) | free |
 | **ECMWF Open Data** | IFS HRES, ENS, AIFS | `ecmwf-opendata` (`s3://ecmwf-forecasts`, CC-BY-4.0) | free |
 | **DWD Open Data** | ICON-global, ICON-EU, ICON-D2 | plain HTTPS, per-variable `.grib2.bz2` | free |
 | **ECCC MSC** | GDPS, RDPS, HRDPS | Herbie (MSC datamart) | free |
 
-The 5 MVP models (GFS / GEFS / HRRR / IFS-HRES / ICON-global) are
-live-validated end to end; the rest are metadata-curated — see
-[Catalog & install](catalog.md). **Météo-France** (`s3://mf-nwp-models`,
-a `direct-boto3` centre) and **NWM / MRMS / CFS** are follow-ons.
+**20 models**, each exposing 2 m temperature / dewpoint, 10 m wind (u/v),
+surface precipitation, and MSL pressure. The 5 MVP models (GFS / GEFS / HRRR /
+IFS-HRES / ICON-global) are live-validated end to end; the rest are
+metadata-curated (vet with `tools/nwp/probe_nwp_model.py`) — see
+[Catalog & install](catalog.md). **Météo-France** needs its authenticated API
+portal (the open `s3://mf-nwp-models` bucket is static-only); **NWM / MRMS /
+CFS / HAFS** are follow-ons.
 
 ## A forecast time axis, not an observation one
 
