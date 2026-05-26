@@ -1,6 +1,7 @@
 # MSG (Meteosat Second Generation) SEVIRI collections.
-# Native `.nat` products — client-side reading needs the satpy bridge (PY-2);
-# the MVP fetches whole products to disk (G4).
+# SEVIRI L1.5 image data is delivered as native `.nat` files — client-side
+# reading needs the satpy bridge (PY-2); the MVP fetches whole products to
+# disk (G4). Derived products (cloud mask) ship as GRIB.
 collections:
   msg-hrseviri:
     collection_id: "EO:EUM:DAT:MSG:HRSEVIRI"
@@ -11,5 +12,53 @@ collections:
     cadence: 15min
     selectors: [HRSEVIRI]
     tailor_product_type: HRSEVIRI
+    extent: { lat: [-79, 79], lon: [-79, 79] }   # SEVIRI 0 deg disk
+    temporal: { start: 2004-01-19, end: null }
+
+  msg-hrseviri-iodc:
+    collection_id: "EO:EUM:DAT:MSG:HRSEVIRI-IODC"
+    group: MSG
+    mission: msg
+    output_kind: raster
+    format: native
+    cadence: 15min
+    selectors: [HRSEVIRI]
+    tailor_product_type: HRSEVIRI
+    extent: { lat: [-79, 79], lon: [-34, 124] }   # Indian Ocean service
+    temporal: { start: 2017-02-01, end: null }
+
+  msg-rss:
+    collection_id: "EO:EUM:DAT:MSG:MSG15-RSS"
+    group: MSG
+    mission: msg
+    output_kind: raster
+    format: native
+    cadence: 5min
+    selectors: [HRSEVIRI]
+    tailor_product_type: HRSEVIRI
+    extent: { lat: [15, 70], lon: [-79, 79] }     # rapid-scan northern third
+    temporal: { start: 2008-05-13, end: null }
+
+  msg-cloud-mask:
+    collection_id: "EO:EUM:DAT:MSG:CLM"
+    group: MSG
+    mission: msg
+    output_kind: raster
+    format: grib
+    cadence: 15min
+    selectors: [CLM]
+    tailor_product_type: CLM
     extent: { lat: [-79, 79], lon: [-79, 79] }
     temporal: { start: 2004-01-19, end: null }
+
+  msg-cloud-mask-iodc:
+    collection_id: "EO:EUM:DAT:MSG:CLM-IODC"
+    group: MSG
+    mission: msg
+    output_kind: raster
+    format: grib
+    cadence: 15min
+    selectors: [CLM]
+    tailor_product_type: CLM
+    extent: { lat: [-79, 79], lon: [-34, 124] }
+    temporal: { start: 2017-02-01, end: null }

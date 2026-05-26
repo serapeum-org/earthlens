@@ -1,0 +1,27 @@
+# MTG (Meteosat Third Generation) I1 collections: the FCI imager and the
+# Lightning Imager. Native FCI products need the satpy bridge (PY-2) to read
+# client-side; the MVP fetches whole products to disk (G4).
+collections:
+  mtg-fci-l1c:
+    collection_id: "EO:EUM:DAT:0662"
+    group: MTG
+    mission: mtg
+    output_kind: raster
+    format: native
+    cadence: 10min
+    selectors: [FCI-L1C]
+    tailor_product_type: FCIL1C
+    extent: { lat: [-79, 79], lon: [-79, 79] }   # MTG-I1 0 deg disk
+    temporal: { start: 2024-12-01, end: null }
+
+  mtg-li-l2-afa:
+    collection_id: "EO:EUM:DAT:0691"
+    group: MTG
+    mission: mtg
+    output_kind: raster
+    format: netcdf
+    cadence: 30min
+    selectors: [LI-L2-AFA]
+    tailor_product_type: LIL2AFA
+    extent: { lat: [-79, 79], lon: [-79, 79] }
+    temporal: { start: 2024-12-01, end: null }

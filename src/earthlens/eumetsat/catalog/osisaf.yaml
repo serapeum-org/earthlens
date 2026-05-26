@@ -1,0 +1,30 @@
+# OSI SAF (Ocean & Sea Ice Satellite Application Facility) collections on the
+# EUMETSAT Data Store: sea-ice concentration and sea-surface temperature.
+# Delivered as NetCDF (gridded) — pyramids-readable today; the MVP fetches
+# whole products to disk (G4). The numeric Data Store ids are curated from the
+# EUMETSAT browse catalogue; reconcile against the live endpoint with
+# `tools/eumetsat/audit_eumetsat_catalog.py`.
+collections:
+  osi-saf-sea-ice-conc:
+    collection_id: "EO:EUM:DAT:0008"
+    group: OSI-SAF
+    mission: multi
+    output_kind: raster
+    format: netcdf
+    cadence: daily
+    selectors: [OSI-401-b]
+    tailor_product_type: OSISAFSIC
+    extent: { lat: [-90, 90], lon: [-180, 180] }
+    temporal: { start: 2015-06-01, end: null }
+
+  osi-saf-metop-sst:
+    collection_id: "EO:EUM:DAT:0578"
+    group: OSI-SAF
+    mission: metop
+    output_kind: raster
+    format: netcdf
+    cadence: subdaily
+    selectors: [OSI-SST]
+    tailor_product_type: OSISAFSST
+    extent: { lat: [-90, 90], lon: [-180, 180] }
+    temporal: { start: 2016-01-01, end: null }

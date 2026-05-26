@@ -1,7 +1,19 @@
-# Sentinel-3 mirror collections on the EUMETSAT Data Store.
-# NetCDF products — pyramids-readable today (NetCDF.read_file); the MVP still
-# fetches whole products to disk (G4).
+# Sentinel-3 marine mirror collections on the EUMETSAT Data Store.
+# Delivered as NetCDF (SAFE) products — pyramids-readable today
+# (NetCDF.read_file); the MVP still fetches whole products to disk (G4).
 collections:
+  s3-olci-l1-efr:
+    collection_id: "EO:EUM:DAT:0409"
+    group: Sentinel-3
+    mission: sentinel-3
+    output_kind: raster
+    format: netcdf
+    cadence: subdaily
+    selectors: [OL_1_EFR]
+    tailor_product_type: OLCEFR
+    extent: { lat: [-90, 90], lon: [-180, 180] }
+    temporal: { start: 2016-04-25, end: null }
+
   s3-olci-l2-wfr:
     collection_id: "EO:EUM:DAT:0407"
     group: Sentinel-3
@@ -13,3 +25,51 @@ collections:
     tailor_product_type: OLCEFR
     extent: { lat: [-90, 90], lon: [-180, 180] }
     temporal: { start: 2016-04-25, end: null }
+
+  s3-olci-l2-wrr:
+    collection_id: "EO:EUM:DAT:0408"
+    group: Sentinel-3
+    mission: sentinel-3
+    output_kind: raster
+    format: netcdf
+    cadence: subdaily
+    selectors: [OL_2_WRR]
+    tailor_product_type: OLCERR
+    extent: { lat: [-90, 90], lon: [-180, 180] }
+    temporal: { start: 2016-04-25, end: null }
+
+  s3-slstr-l1-rbt:
+    collection_id: "EO:EUM:DAT:0411"
+    group: Sentinel-3
+    mission: sentinel-3
+    output_kind: raster
+    format: netcdf
+    cadence: subdaily
+    selectors: [SL_1_RBT]
+    tailor_product_type: SLSL1RBT
+    extent: { lat: [-90, 90], lon: [-180, 180] }
+    temporal: { start: 2016-05-01, end: null }
+
+  s3-slstr-l2-wst:
+    collection_id: "EO:EUM:DAT:0412"
+    group: Sentinel-3
+    mission: sentinel-3
+    output_kind: raster
+    format: netcdf
+    cadence: subdaily
+    selectors: [SL_2_WST]
+    tailor_product_type: SLSL2WST
+    extent: { lat: [-90, 90], lon: [-180, 180] }
+    temporal: { start: 2016-05-01, end: null }
+
+  s3-sral-l2-wat:
+    collection_id: "EO:EUM:DAT:0415"
+    group: Sentinel-3
+    mission: sentinel-3
+    output_kind: raster
+    format: netcdf
+    cadence: subdaily
+    selectors: [SR_2_WAT]
+    tailor_product_type: SRASRAL2
+    extent: { lat: [-90, 90], lon: [-180, 180] }
+    temporal: { start: 2016-03-01, end: null }
