@@ -158,6 +158,11 @@ nav:
       - Introduction: reference/tropycal/introduction.md
       - Usage: reference/tropycal/usage.md
       - Reference: reference/tropycal/tropycal.md
+    - NWP (weather forecasts):
+      - Introduction: reference/nwp/introduction.md
+      - Usage: reference/nwp/usage.md
+      - Catalog & install: reference/nwp/catalog.md
+      - Reference: reference/nwp/nwp.md
   - Examples:
     - Authentication: examples/authentication.md
     - Data Sources: examples/data-sources.md

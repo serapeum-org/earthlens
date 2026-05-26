@@ -28,6 +28,7 @@ Backends with no extra (CHC, GDACS, OpenAQ) need only the core install — they 
 | Tropycal tropical-cyclone tracks | `tropycal` | vector (tabular for SHIPS) | none | `tropycal` | [Tropycal](tropycal/introduction.md) |
 | STAC — Planetary Computer / CDSE / Earth Search | `stac`, `cdse` | raster | per-endpoint (anonymous / MPC SAS / CDSE S3) | `stac` | [STAC](stac/introduction.md) |
 | NASA Earthdata (9 EOSDIS DAACs via `earthaccess`) | `earthdata` | per-dataset (raster / vector / tabular) | EDL login or bearer token | `earthdata` | [Earthdata](earthdata/introduction.md) |
+| Open NWP forecasts (NOAA NODD / ECMWF Open Data / DWD via Herbie) | `nwp` | raster | none (open buckets) | `nwp` | [NWP](nwp/introduction.md) |
 
 `Output` is the backend's `OUTPUT_KIND` — `raster` writes GeoTIFF/COG/NetCDF, `vector` writes geometry tables
 (GeoJSON / GeoPackage), and `tabular` writes plain tables (CSV / Parquet). It also governs `aggregate=`: the
