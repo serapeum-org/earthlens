@@ -501,6 +501,11 @@ class NWP(AbstractDataSource):
         stack, so a multi-model request is rejected here rather than
         silently mixing grids.
 
+        Accumulated bands (the `*_acc` convention, e.g.
+        `precipitation_acc`) are reduced like any other, but a warning is
+        logged because summing/averaging an accumulation across steps
+        mixes its step-dependent windows and can mislead (`M3`).
+
         Args:
             paths: The per-`(cycle, step)` COGs from :meth:`_fetch`.
             config: The aggregation request (`freq` window, `op`
