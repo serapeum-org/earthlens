@@ -40,7 +40,6 @@ from __future__ import annotations
 import geopandas as gpd
 import numpy as np
 import pandas as pd
-from loguru import logger
 from pyramids.feature.collection import FeatureCollection
 
 #: WGS84 — the CRS every FIRMS detection FeatureCollection is tagged with.
@@ -176,17 +175,13 @@ def csv_to_fc(
     frame["frp"] = _numeric(df, "frp")
     frame["daynight"] = _as_string(df.get("daynight"))
 
-    if min_confidence is not None:
-        if family in PERCENT_CONFIDENCE_FAMILIES:
-            frame = frame[frame["confidence_pct"] >= min_confidence]
-        else:
-            logger.warning(
-                f"min_confidence={min_confidence} not applied to {sensor}: "
-                f"{family} reports a provider-scale (non 0-100) confidence, so "
-                "thresholding it would silently drop every detection. Rows kept "
-                "unfiltered — filter on the raw `confidence` column yourself if "
-                "needed."
-            )
+    # `min_confidence` applies only to families whose confidence_pct is a
+    # true 0-100 percent; non-percent families (GOES) intentionally skip
+    # the filter (thresholding a ~0-1 provider scale would drop every
+    # row). The backend warns about that once per download, not here per
+    # chunk.
+    if min_confidence is not None and family in PERCENT_CONFIDENCE_FAMILIES:
+        frame = frame[frame["confidence_pct"] >= min_confidence]
     if day_night is not None:
         frame = frame[frame["daynight"] == day_night]
 

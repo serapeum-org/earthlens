@@ -314,6 +314,21 @@ class TestCoverageWarningExtra:
         backend.download(progress_bar=False)
         assert not any("covers only" in msg for msg in warnings_log)
 
+    def test_goes_min_confidence_warns_once_per_download(
+        self, tmp_path: Path, fake_firms: _FakeFirms, warnings_log: list[str]
+    ):
+        """The GOES non-percent-confidence warning fires once, not per chunk."""
+        backend = _make_backend(
+            tmp_path,
+            variables=["GOES_NRT"],
+            start="2024-08-01",
+            end="2024-08-12",  # 3 chunks of 5/5/2
+            min_confidence=50,
+        )
+        backend.download(progress_bar=False)
+        hits = [m for m in warnings_log if "is not applied to" in m and "GOES_NRT" in m]
+        assert len(hits) == 1, f"expected exactly one warning, got {len(hits)}"
+
     def test_old_nrt_sensor_without_sp_variant_omits_hint(
         self, tmp_path: Path, fake_firms: _FakeFirms, warnings_log: list[str]
     ):

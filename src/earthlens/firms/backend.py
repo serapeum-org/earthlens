@@ -300,9 +300,15 @@ class FIRMS(AbstractDataSource):
                 "the window or sensor list for a large pull."
             )
         products: list[RemoteProduct] = []
+        non_percent: list[str] = []
         for code in self.vars:
             sensor = self._catalog.get_sensor(code)
             self._warn_if_out_of_coverage(sensor, start_date, end_date)
+            if (
+                self._min_confidence is not None
+                and sensor.family not in events.PERCENT_CONFIDENCE_FAMILIES
+            ):
+                non_percent.append(code)
             for chunk_start, day_range in windows:
                 products.append(
                     RemoteProduct(
@@ -315,6 +321,13 @@ class FIRMS(AbstractDataSource):
                         },
                     )
                 )
+        if non_percent:
+            logger.warning(
+                f"min_confidence={self._min_confidence} is not applied to "
+                f"{non_percent}: their confidence is a provider-scale (non "
+                "0-100) value, so thresholding would drop every detection; "
+                "those sensors' detections are kept unfiltered."
+            )
         return products
 
     def _warn_if_out_of_coverage(
