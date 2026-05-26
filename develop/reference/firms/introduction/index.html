@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -5353,11 +5353,11 @@ row per fire pixel:</p>
 </tr>
 <tr>
 <td><code>confidence</code></td>
-<td>raw confidence — numeric <code>0-100</code> (MODIS) or <code>l</code>/<code>n</code>/<code>h</code> (VIIRS)</td>
+<td>raw confidence <strong>as a string</strong> — <code>"85"</code> (MODIS) or <code>l</code>/<code>n</code>/<code>h</code> (VIIRS); use <code>confidence_pct</code> for numeric work</td>
 </tr>
 <tr>
 <td><code>confidence_pct</code></td>
-<td>normalised <code>0-100</code> confidence (VIIRS <code>l</code>/<code>n</code>/<code>h</code> → 25/60/90)</td>
+<td>normalised <code>0-100</code> confidence (categorical tokens → 25/60/90; GOES passes its provider value through)</td>
 </tr>
 <tr>
 <td><code>brightness_k</code></td>
@@ -5395,11 +5395,11 @@ window to study fire onset, spread, and weather drivers.</p>
 <ul>
 <li><strong>Detections, not perimeters.</strong> FIRMS reports where a sensor saw a
   thermal anomaly at overpass time — not the final fire perimeter or the
-  total area burned. FIRMS also lists <code>BA_MODIS</code> / <code>BA_VIIRS</code>
-  burned-area collections, which this backend exposes, but the area CSV
-  API serves them with the <strong>same point-detection schema</strong> (lat/lon/FRP
-  points), not polygons. For true gridded burned-area rasters (MCD64A1,
-  FireCCI) use the Google Earth Engine backend.</li>
+  total area burned. (FIRMS' <code>data_availability</code> index also lists
+  <code>BA_MODIS</code> / <code>BA_VIIRS</code>, but those are <strong>burned-area raster</strong> products,
+  not area-CSV active-fire sources — they return nothing through this
+  backend and are deliberately not catalogued. For gridded burned-area
+  rasters (MCD64A1, FireCCI) use the Google Earth Engine backend.)</li>
 <li><strong>A free <code>MAP_KEY</code> is required.</strong> Every request carries a <code>MAP_KEY</code> as
   a URL path segment. Request a free key at
   <a href="https://firms.modaps.eosdis.nasa.gov/api/map_key/">https://firms.modaps.eosdis.nasa.gov/api/map_key/</a>; see
@@ -5412,9 +5412,11 @@ window to study fire onset, spread, and weather drivers.</p>
 <li><strong>Confidence differs by family.</strong> MODIS reports a numeric <code>0-100</code>
   confidence; VIIRS reports a categorical <code>l</code>/<code>n</code>/<code>h</code>; LANDSAT reports
   <code>l</code>/<code>m</code>/<code>h</code>; GOES reports a provider-defined numeric value. The backend
-  keeps the raw value and adds a uniform <code>confidence_pct</code> (the categorical
-  tokens map to 25/60/90) so you can filter across families with one
-  <code>min_confidence=</code> threshold.</li>
+  keeps the raw value and adds a uniform <code>confidence_pct</code> (categorical
+  tokens map to 25/60/90) so one <code>min_confidence=</code> threshold works across
+  MODIS / VIIRS / LANDSAT. GOES confidence is <em>not</em> a 0-100 percent, so
+  <code>min_confidence</code> is skipped for GOES (with a warning) rather than
+  silently dropping its detections.</li>
 <li><strong>A 5-day-per-request cap and a transaction quota.</strong> FIRMS serves at
   most 5 days per request and one sensor per request, and allows ~5000
   transactions per rolling 10 minutes. The backend chunks longer windows

@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -5419,10 +5419,9 @@ through the area CSV API):</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.firms</span><span class="w"> </span><span class="kn">import</span> <span class="n">Catalog</span>
 <a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>
 <a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="n">Catalog</span><span class="p">()</span><span class="o">.</span><span class="n">codes</span><span class="p">()</span>
-<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="c1"># [&#39;BA_MODIS&#39;, &#39;BA_VIIRS&#39;, &#39;GOES_NRT&#39;, &#39;LANDSAT_NRT&#39;, &#39;MODIS_NRT&#39;,</span>
-<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="c1">#  &#39;MODIS_SP&#39;, &#39;VIIRS_NOAA20_NRT&#39;, &#39;VIIRS_NOAA20_SP&#39;, &#39;VIIRS_NOAA21_NRT&#39;,</span>
-<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="c1">#  &#39;VIIRS_SNPP_NRT&#39;, &#39;VIIRS_SNPP_SP&#39;]</span>
-<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="n">Catalog</span><span class="p">()</span><span class="o">.</span><span class="n">get_sensor</span><span class="p">(</span><span class="s2">&quot;VIIRS_SNPP_NRT&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">resolution_m</span>      <span class="c1"># 375</span>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="c1"># [&#39;GOES_NRT&#39;, &#39;LANDSAT_NRT&#39;, &#39;MODIS_NRT&#39;, &#39;MODIS_SP&#39;, &#39;VIIRS_NOAA20_NRT&#39;,</span>
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="c1">#  &#39;VIIRS_NOAA20_SP&#39;, &#39;VIIRS_NOAA21_NRT&#39;, &#39;VIIRS_SNPP_NRT&#39;, &#39;VIIRS_SNPP_SP&#39;]</span>
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="n">Catalog</span><span class="p">()</span><span class="o">.</span><span class="n">get_sensor</span><span class="p">(</span><span class="s2">&quot;VIIRS_SNPP_NRT&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">resolution_m</span>      <span class="c1"># 375</span>
 </code></pre></div>
 <p>An unknown code raises with a did-you-mean hint
 (<code>get_sensor("MODIS_NR")</code> → suggests <code>MODIS_NRT</code>).</p>
@@ -5430,10 +5429,10 @@ through the area CSV API):</p>
 <strong>GOES</strong> ~2 km (geostationary), <strong>LANDSAT</strong> 30 m. <code>GOES_NRT</code> reports a
 numeric (provider-scale) confidence rather than <code>l</code>/<code>n</code>/<code>h</code>;
 <code>LANDSAT_NRT</code> reports <code>l</code>/<code>m</code>/<code>h</code> confidence and carries <strong>no FRP or
-brightness</strong> column (those degrade to <code>NaN</code>). The <code>BA_MODIS</code> / <code>BA_VIIRS</code>
-burned-area collections are exposed too, but the area CSV API serves them
-with the same point detection schema as their base MODIS / VIIRS sensor —
-see the <a href="../introduction/">Introduction</a> for the burned-area caveat.</p>
+brightness</strong> column (those degrade to <code>NaN</code>). Burned-area products
+(<code>BA_MODIS</code> / <code>BA_VIIRS</code>) are <strong>not</strong> area-CSV sources and are not
+catalogued — use the GEE backend for gridded burned area (see the
+<a href="../introduction/">Introduction</a>).</p>
 <blockquote>
 <p><strong>NRT vs archive.</strong> <code>*_NRT</code> sensors cover only ~2 months; <code>*_SP</code>
 sensors hold the archive. Requesting an old window against an <code>*_NRT</code>
@@ -5463,9 +5462,12 @@ server-side equivalent):</p>
 <a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
 </code></pre></div>
 <p><code>min_confidence</code> filters on the <strong>normalised</strong> <code>confidence_pct</code> column,
-so a single threshold works across both families even though MODIS
-reports numeric confidence and VIIRS reports the categorical <code>l</code>/<code>n</code>/<code>h</code>
-(mapped to 25/60/90). <code>day_night</code> keeps only <code>"D"</code> or <code>"N"</code> rows.</p>
+so a single threshold works across MODIS, VIIRS, and LANDSAT even though
+they report confidence differently (numeric 0-100, <code>l</code>/<code>n</code>/<code>h</code>, and
+<code>l</code>/<code>m</code>/<code>h</code> respectively, the tokens mapped to 25/60/90). <strong>GOES</strong> reports
+a provider-scale numeric confidence that is not a 0-100 percent, so
+<code>min_confidence</code> is skipped for GOES (with a logged warning) instead of
+dropping every GOES row. <code>day_night</code> keeps only <code>"D"</code> or <code>"N"</code> rows.</p>
 <h2 id="5-the-output-schema-and-the-confidence-note"><a class="toclink" href="#5-the-output-schema-and-the-confidence-note">5. The output schema and the confidence note</a><a class="headerlink" href="#5-the-output-schema-and-the-confidence-note" title="Permanent link">#</a></h2>
 <p>Every row is one fire pixel; the schema is uniform across sensors:</p>
 <table>
@@ -5490,11 +5492,11 @@ reports numeric confidence and VIIRS reports the categorical <code>l</code>/<cod
 </tr>
 <tr>
 <td><code>confidence</code></td>
-<td>raw value (numeric for MODIS, <code>l</code>/<code>n</code>/<code>h</code> for VIIRS)</td>
+<td>raw value <strong>as a string</strong> (<code>"85"</code> for MODIS, <code>l</code>/<code>n</code>/<code>h</code> for VIIRS)</td>
 </tr>
 <tr>
 <td><code>confidence_pct</code></td>
-<td>normalised 0-100 — filter on this</td>
+<td>normalised 0-100 (float) — filter on this</td>
 </tr>
 <tr>
 <td><code>brightness_k</code></td>
