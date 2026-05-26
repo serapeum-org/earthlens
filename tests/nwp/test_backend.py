@@ -56,6 +56,20 @@ class _CountingCentre:
         return str(self.save_dir / f"{model.model_family}_{cycle:%Y%m%d%H}_f{step:03d}.grib2")
 
 
+class _FlakyCentre(_CountingCentre):
+    """Centre stand-in that raises for one specific forecast step."""
+
+    def __init__(self, save_dir, fail_step):
+        super().__init__(save_dir)
+        self.fail_step = fail_step
+
+    def fetch_one(self, model, cycle, step, params, mirror):
+        """Raise for `fail_step`; otherwise behave like the counting centre."""
+        if step == self.fail_step:
+            raise RuntimeError(f"f{step:03d} not published")
+        return super().fetch_one(model, cycle, step, params, mirror)
+
+
 class TestConstruction:
     """Tests for NWP.__init__ and _resolve_models."""
 
@@ -196,6 +210,39 @@ class TestFetch:
         b._centres["herbie"] = _CountingCentre(tmp_path)
         paths = b.download(progress_bar=False)
         assert [p.name for p in paths] == ["gfs_2024060100_f000.tif", "gfs_2024060112_f000.tif"]
+
+
+class TestFetchErrors:
+    """Tests for the per-product `errors` policy (M1)."""
+
+    def test_warn_returns_partial(self, mini_catalog, tmp_path, fake_pyramids):
+        """errors='warn' skips the failed step and returns the rest."""
+        b = _make(mini_catalog, tmp_path, steps=[0, 6])
+        b._centres["herbie"] = _FlakyCentre(tmp_path, fail_step=6)
+        paths = b.download(progress_bar=False, errors="warn")
+        assert [p.name for p in paths] == [
+            "gfs_2024060100_f000.tif",
+            "gfs_2024060112_f000.tif",
+        ]
+
+    def test_skip_returns_partial(self, mini_catalog, tmp_path, fake_pyramids):
+        """errors='skip' also drops the failed step (silently)."""
+        b = _make(mini_catalog, tmp_path, steps=[0, 6])
+        b._centres["herbie"] = _FlakyCentre(tmp_path, fail_step=6)
+        assert len(b.download(progress_bar=False, errors="skip")) == 2
+
+    def test_raise_propagates(self, mini_catalog, tmp_path, fake_pyramids):
+        """errors='raise' aborts the whole download on the first miss."""
+        b = _make(mini_catalog, tmp_path, steps=[0, 6])
+        b._centres["herbie"] = _FlakyCentre(tmp_path, fail_step=6)
+        with pytest.raises(RuntimeError, match="not published"):
+            b.download(progress_bar=False, errors="raise")
+
+    def test_invalid_errors_rejected(self, mini_catalog, tmp_path):
+        """An unknown errors policy is rejected up front."""
+        b = _make(mini_catalog, tmp_path)
+        with pytest.raises(ValueError, match="errors must be"):
+            b.download(errors="explode")
 
 
 class TestNormaliseLongitude:

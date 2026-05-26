@@ -29,6 +29,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING
 
 import pandas as pd
+from loguru import logger
 
 from earthlens.base import (
     AbstractDataSource,
@@ -330,15 +331,25 @@ class NWP(AbstractDataSource):
         −180..180 first when the bbox reaches into negative longitudes,
         so an Americas crop lands correctly.
 
+        A single `(cycle, step)` can legitimately be unavailable — the
+        latest cycle may not be published yet, or a model may not carry
+        a step on every cycle (`M2`/`M4`). The `errors` policy (set by
+        :meth:`download`, default `"warn"`) governs that: `"warn"` logs
+        the miss and keeps the COGs already produced, `"skip"` drops it
+        silently, and `"raise"` aborts the whole fetch.
+
         Args:
             products: The products from :meth:`_search`.
 
         Returns:
-            list[Path]: One cropped COG path per product, in order.
+            list[Path]: One cropped COG path per successfully fetched
+                product, in order. Shorter than `products` when some
+                were skipped under `errors` in `{"warn", "skip"}`.
         """
         from pyramids.dataset.cog import write_cog
         from pyramids.grib import open_grib
 
+        errors = getattr(self, "_errors", "warn")
         bbox = [
             self.space.west,
             self.space.south,
@@ -347,29 +358,53 @@ class NWP(AbstractDataSource):
         ]
         out: list[Path] = []
         for product in products:
-            meta = product.metadata
-            centre = self._centre_for(meta["model"].backend)
-            grib_path = centre.fetch_one(
-                meta["model"],
-                meta["cycle"],
-                meta["step"],
-                meta["params"],
-                self._mirror,
-            )
-            dataset = open_grib(str(grib_path))
-            dataset = self._normalise_longitude(dataset)
-            # touch=False avoids pyramids' wrap-cutline correction, which calls
-            # the GDAL/PROJ database for the GRIB driver's reported CRS
-            # (EPSG:9122, WGS84 lon/lat) — a code many bundled PROJ databases
-            # cannot resolve. The plain (non-cutline) crop path needs no such
-            # lookup and subsets a regular NWP grid correctly.
-            cropped = dataset.crop(bbox=bbox, epsg=4326, touch=False)
-            target = self.root_dir / cog_name(
-                meta["model_key"], meta["cycle"], meta["step"]
-            )
-            write_cog(cropped, str(target))
-            out.append(target)
+            try:
+                out.append(self._fetch_one(product, bbox, open_grib, write_cog))
+            except Exception as exc:
+                if errors == "raise":
+                    raise
+                if errors == "warn":
+                    logger.warning(
+                        f"NWP: skipping {product.id} — fetch/crop failed: "
+                        f"{type(exc).__name__}: {exc}"
+                    )
         return out
+
+    def _fetch_one(self, product: RemoteProduct, bbox, open_grib, write_cog) -> Path:
+        """Fetch + crop + write the COG for one product (no error handling).
+
+        Args:
+            product: One product from :meth:`_search`.
+            bbox: `[west, south, east, north]` crop box in degrees.
+            open_grib: `pyramids.grib.open_grib`, passed in so the
+                import happens once in :meth:`_fetch`.
+            write_cog: `pyramids.dataset.cog.write_cog`, likewise.
+
+        Returns:
+            pathlib.Path: The written COG path.
+        """
+        meta = product.metadata
+        centre = self._centre_for(meta["model"].backend)
+        grib_path = centre.fetch_one(
+            meta["model"],
+            meta["cycle"],
+            meta["step"],
+            meta["params"],
+            self._mirror,
+        )
+        dataset = open_grib(str(grib_path))
+        dataset = self._normalise_longitude(dataset)
+        # touch=False avoids pyramids' wrap-cutline correction, which calls
+        # the GDAL/PROJ database for the GRIB driver's reported CRS
+        # (EPSG:9122, WGS84 lon/lat) — a code many bundled PROJ databases
+        # cannot resolve. The plain (non-cutline) crop path needs no such
+        # lookup and subsets a regular NWP grid correctly.
+        cropped = dataset.crop(bbox=bbox, epsg=4326, touch=False)
+        target = self.root_dir / cog_name(
+            meta["model_key"], meta["cycle"], meta["step"]
+        )
+        write_cog(cropped, str(target))
+        return target
 
     def _normalise_longitude(self, dataset):
         """Shift a 0–360° global grid to −180..180 when the bbox needs it.
@@ -398,20 +433,40 @@ class NWP(AbstractDataSource):
         self,
         progress_bar: bool = True,
         aggregate: AggregationConfig | None = None,
+        errors: str = "warn",
     ) -> list[Path]:
         """Fetch the requested forecasts as bbox-cropped COGs.
 
         Args:
-            progress_bar: Whether to show per-product progress.
+            progress_bar: Whether the centres show per-download progress
+                (threaded into Herbie's `verbose`).
             aggregate: Optional
                 :class:`earthlens.aggregate.AggregationConfig`; reduces
                 the `(cycle, step)` COG stack (`C6`).
+            errors: How to treat a `(cycle, step)` that fails to fetch or
+                crop (an unpublished cycle, a step the model does not
+                carry):
+
+                * `"warn"` (default) — log the miss and return the COGs
+                  that did succeed.
+                * `"skip"` — drop the miss silently.
+                * `"raise"` — abort the whole download on the first miss.
 
         Returns:
-            list[Path]: One cropped COG per `(cycle, step)`, or — when
-                `aggregate` is set — the per-window reduced rasters.
+            list[Path]: One cropped COG per successfully fetched
+                `(cycle, step)`, or — when `aggregate` is set — the
+                per-window reduced rasters.
+
+        Raises:
+            ValueError: If `errors` is not one of
+                `{"raise", "warn", "skip"}`.
         """
+        if errors not in {"raise", "warn", "skip"}:
+            raise ValueError(
+                f"errors must be 'raise', 'warn', or 'skip'; got {errors!r}."
+            )
         self._show_progress = progress_bar
+        self._errors = errors
         paths = self._api_via_search_fetch()
         if aggregate is not None:
             return self._aggregate(paths, aggregate)
