@@ -176,6 +176,12 @@ nav:
       - Usage: reference/firms/usage.md
       - Authentication: reference/firms/authentication.md
       - Reference: reference/firms/firms.md
+    - USGS Water (NWIS):
+      - Introduction: reference/usgs-water/introduction.md
+      - Usage: reference/usgs-water/usage.md
+      - Authentication: reference/usgs-water/authentication.md
+      - Available data: reference/usgs-water/datasets.md
+      - Reference: reference/usgs-water/usgs_water.md
   - Examples:
     - Authentication: examples/authentication.md
     - Data Sources: examples/data-sources.md
