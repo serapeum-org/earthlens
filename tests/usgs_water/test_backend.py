@@ -48,6 +48,18 @@ def test_resolved_codes_dedupes(usgs_kwargs):
     assert backend._resolved_codes() == ["00060", "00065"]
 
 
+def test_temporal_resolution_alias_selects_instantaneous(usgs_kwargs):
+    """A sub-daily temporal_resolution maps the default service to instantaneous."""
+    backend = USGSWater(**usgs_kwargs(temporal_resolution="hourly"))
+    assert backend._service == "instantaneous"
+
+
+def test_explicit_service_wins_over_temporal_resolution(usgs_kwargs):
+    """An explicit service= is not overridden by temporal_resolution."""
+    backend = USGSWater(**usgs_kwargs(service="samples", temporal_resolution="hourly"))
+    assert backend._service == "samples"
+
+
 def test_daily_modern_calls_get_daily(fake_usgs, usgs_kwargs):
     """A daily download on api=auto calls waterdata.get_daily."""
     df = USGSWater(**usgs_kwargs(service="daily", sites="01646500")).download(

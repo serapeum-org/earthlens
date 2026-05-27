@@ -69,3 +69,17 @@ def test_load_rejects_empty_block(tmp_path):
     empty.write_text("other: {}\n")
     with pytest.raises(ValueError, match="parameters"):
         Catalog.load(empty)
+
+
+def test_load_rejects_bad_row(tmp_path):
+    """A row with an invalid code fails validation with the param name."""
+    bad = tmp_path / "bad.yaml"
+    bad.write_text("parameters:\n  flow: {code: '6'}\n")
+    with pytest.raises(ValueError, match="'flow' failed validation"):
+        Catalog.load(bad)
+
+
+def test_get_catalog_returns_parameters():
+    """get_catalog returns the same parameter map."""
+    catalog = Catalog()
+    assert catalog.get_catalog() is catalog.parameters
