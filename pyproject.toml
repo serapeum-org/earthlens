@@ -262,6 +262,14 @@ platforms = ["win-64", "linux-64", "osx-arm64"]
 [tool.pixi.system-requirements]
 libc = "2.39"
 
+[tool.pixi.dependencies]
+# eccodes C library (conda-forge): herbie-data's cfgrib import chain needs the
+# binary at runtime — the [nwp] extra's pip `eccodes` binding cannot locate the
+# lib on its own — so the NWP backend and its live example notebooks import and
+# run in every pixi env (and in CI's `notebooks` task), not just where a binary
+# happens to be installed.
+eccodes = ">=2.47,<3"
+
 [tool.pixi.pypi-dependencies]
 # Dev/test env pulls every backend's SDK (`[all]`) so the full suite runs.
 earthlens = { path = ".", editable = true, extras = ["all"] }
