@@ -271,6 +271,11 @@ nav:
       - Quickstart — recent fires: examples/firms/quickstart.ipynb
       - Fire-season time-series: examples/firms/fire_season_timeseries.ipynb
       - MODIS vs VIIRS comparison: examples/firms/modis_vs_viirs_comparison.ipynb
+    - National Water Model (NWM):
+      - Catalog explorer (no network): examples/nwm/catalog_explorer.ipynb
+      - Short-range streamflow (live): examples/nwm/streamflow_short_range.ipynb
+      - Short-range land surface (live): examples/nwm/land_surface_short_range.ipynb
+      - Subsetting & deferred features (no network): examples/nwm/deferred_and_subsetting.ipynb
   - API Reference:
     - EarthLens Facade: reference/earthlens.md
     - AbstractDataSource: reference/abstract-datasource.md
