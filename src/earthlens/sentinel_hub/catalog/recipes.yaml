@@ -79,3 +79,115 @@ recipes:
     output_bands: 1
     kind: stats
     description: Sentinel-2 L2A BSI for the Statistical API (with dataMask).
+  sentinel-2-l2a-ndmi:
+    base_collection: SENTINEL2_L2A
+    evalscript: ndmi.js
+    bands: [B08, B11]
+    output_bands: 1
+    kind: render
+    description: Sentinel-2 L2A NDMI (moisture index, FLOAT32).
+  sentinel-2-l2a-ndsi:
+    base_collection: SENTINEL2_L2A
+    evalscript: ndsi.js
+    bands: [B03, B11]
+    output_bands: 1
+    kind: render
+    description: Sentinel-2 L2A NDSI (snow index, FLOAT32).
+  sentinel-2-l2a-savi:
+    base_collection: SENTINEL2_L2A
+    evalscript: savi.js
+    bands: [B04, B08]
+    output_bands: 1
+    kind: render
+    description: Sentinel-2 L2A SAVI (soil-adjusted vegetation index, FLOAT32).
+  sentinel-2-l2a-nbr:
+    base_collection: SENTINEL2_L2A
+    evalscript: nbr.js
+    bands: [B08, B12]
+    output_bands: 1
+    kind: render
+    description: Sentinel-2 L2A NBR (normalized burn ratio, FLOAT32).
+  sentinel-2-l2a-agriculture:
+    base_collection: SENTINEL2_L2A
+    evalscript: agriculture.js
+    bands: [B02, B08, B11]
+    output_bands: 3
+    kind: render
+    description: Sentinel-2 L2A agriculture composite (B11/B08/B02).
+  sentinel-2-l2a-geology:
+    base_collection: SENTINEL2_L2A
+    evalscript: geology.js
+    bands: [B02, B11, B12]
+    output_bands: 3
+    kind: render
+    description: Sentinel-2 L2A geology composite (B12/B11/B02).
+  sentinel-2-l2a-ndmi-stats:
+    base_collection: SENTINEL2_L2A
+    evalscript: ndmi_stats.js
+    bands: [B08, B11]
+    output_bands: 1
+    kind: stats
+    description: Sentinel-2 L2A NDMI for the Statistical API (with dataMask).
+  sentinel-2-l2a-nbr-stats:
+    base_collection: SENTINEL2_L2A
+    evalscript: nbr_stats.js
+    bands: [B08, B12]
+    output_bands: 1
+    kind: stats
+    description: Sentinel-2 L2A NBR for the Statistical API (with dataMask).
+  landsat-ot-l2-ndvi:
+    base_collection: LANDSAT_OT_L2
+    evalscript: landsat_ndvi.js
+    bands: [B04, B05]
+    output_bands: 1
+    kind: render
+    description: Landsat 8/9 L2 NDVI (FLOAT32).
+  landsat-ot-l2-true-colour:
+    base_collection: LANDSAT_OT_L2
+    evalscript: landsat_true_colour.js
+    bands: [B02, B03, B04]
+    output_bands: 3
+    kind: render
+    description: Landsat 8/9 L2 true-colour composite.
+  landsat-ot-l2-ndvi-stats:
+    base_collection: LANDSAT_OT_L2
+    evalscript: landsat_ndvi_stats.js
+    bands: [B04, B05]
+    output_bands: 1
+    kind: stats
+    description: Landsat 8/9 L2 NDVI for the Statistical API (with dataMask).
+  sentinel-1-iw-rgb-ratio:
+    base_collection: SENTINEL1_IW
+    evalscript: sar_rgb_ratio.js
+    bands: [VV, VH]
+    output_bands: 3
+    kind: render
+    description: Sentinel-1 IW dual-pol composite (VV / VH / VV-VH ratio).
+  modis-ndvi:
+    base_collection: MODIS
+    evalscript: modis_ndvi.js
+    bands: [B01, B02]
+    output_bands: 1
+    kind: render
+    description: MODIS MCD43A4 NDVI (FLOAT32).
+  dem-copernicus-30-elevation:
+    base_collection: DEM_COPERNICUS_30
+    evalscript: dem_elevation.js
+    bands: [DEM]
+    output_bands: 1
+    kind: render
+    description: Copernicus DEM GLO-30 elevation in metres (FLOAT32).
+  sentinel-3-slstr-thermal:
+    base_collection: SENTINEL3_SLSTR
+    evalscript: slstr_thermal.js
+    bands: [S8]
+    output_bands: 1
+    kind: render
+    description: Sentinel-3 SLSTR thermal brightness temperature (S8, Kelvin).
+  sentinel-3-olci-true-colour:
+    base_collection: SENTINEL3_OLCI
+    evalscript: olci_true_colour.js
+    bands: [B04, B06, B08]
+    output_bands: 3
+    kind: render
+    description: Sentinel-3 OLCI true-colour composite.

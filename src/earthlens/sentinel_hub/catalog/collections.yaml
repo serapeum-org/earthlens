@@ -90,3 +90,119 @@ collections:
       O3: {description: Ozone total column, units: mol/m^2}
       SO2: {description: Sulphur dioxide total column, units: mol/m^2}
       CH4: {description: Methane column volume mixing ratio, units: ppb}
+  sentinel-1-ew:
+    sh_collection: SENTINEL1_EW
+    description: Sentinel-1 SAR GRD, Extra-Wide swath (HH+HV), polar/maritime.
+    cadence: 6-day
+    resolution: 40.0
+    default_bands: [HH, HV]
+    extent:
+      start_date: "2014-10-03"
+      bbox: [-180.0, -90.0, 180.0, 90.0]
+    bands:
+      HH: {description: Horizontal transmit / horizontal receive backscatter, units: linear}
+      HV: {description: Horizontal transmit / vertical receive backscatter, units: linear}
+  sentinel-3-slstr:
+    sh_collection: SENTINEL3_SLSTR
+    description: Sentinel-3 SLSTR radiance/reflectance (S1-S6) + thermal brightness temperature (S7-S9, F1-F2).
+    cadence: daily
+    resolution: 500.0
+    default_bands: [S3, S2, S1]
+    extent:
+      start_date: "2016-04-19"
+      bbox: [-180.0, -90.0, 180.0, 90.0]
+    bands:
+      S1: {units: reflectance, center_wavelength: 0.554, resolution: 500.0}
+      S2: {units: reflectance, center_wavelength: 0.659, resolution: 500.0}
+      S3: {units: reflectance, center_wavelength: 0.868, resolution: 500.0}
+      S4: {units: reflectance, center_wavelength: 1.374, resolution: 500.0}
+      S5: {units: reflectance, center_wavelength: 1.613, resolution: 500.0}
+      S6: {units: reflectance, center_wavelength: 2.256, resolution: 500.0}
+      S7: {description: Brightness temperature, units: K, center_wavelength: 3.742, resolution: 1000.0}
+      S8: {description: Brightness temperature, units: K, center_wavelength: 10.854, resolution: 1000.0}
+      S9: {description: Brightness temperature, units: K, center_wavelength: 12.0226, resolution: 1000.0}
+      F1: {description: Active-fire brightness temperature, units: K, center_wavelength: 3.742}
+      F2: {description: Active-fire brightness temperature, units: K, center_wavelength: 10.854}
+  landsat-ot-l1:
+    sh_collection: LANDSAT_OT_L1
+    description: Landsat 8/9 OLI-TIRS Level-1 top-of-atmosphere (B01-B09 optical, B10-B11 thermal).
+    cadence: 16-day
+    resolution: 30.0
+    default_bands: [B04, B03, B02]
+    extent:
+      start_date: "2013-03-18"
+      bbox: [-180.0, -90.0, 180.0, 90.0]
+    bands:
+      B01: {common_name: coastal, center_wavelength: 0.443, resolution: 30.0}
+      B02: {common_name: blue, center_wavelength: 0.482, resolution: 30.0}
+      B03: {common_name: green, center_wavelength: 0.561, resolution: 30.0}
+      B04: {common_name: red, center_wavelength: 0.655, resolution: 30.0}
+      B05: {common_name: nir, center_wavelength: 0.865, resolution: 30.0}
+      B06: {common_name: swir16, center_wavelength: 1.609, resolution: 30.0}
+      B07: {common_name: swir22, center_wavelength: 2.201, resolution: 30.0}
+      B08: {common_name: pan, center_wavelength: 0.590, resolution: 15.0}
+      B09: {common_name: cirrus, center_wavelength: 1.373, resolution: 30.0}
+      B10: {description: Thermal infrared 1, units: K, center_wavelength: 10.895, resolution: 100.0}
+      B11: {description: Thermal infrared 2, units: K, center_wavelength: 12.005, resolution: 100.0}
+  landsat-ot-l2:
+    sh_collection: LANDSAT_OT_L2
+    description: Landsat 8/9 OLI-TIRS Level-2 surface reflectance (B01-B07) + surface temperature (B10).
+    cadence: 16-day
+    resolution: 30.0
+    default_bands: [B04, B03, B02]
+    extent:
+      start_date: "2013-03-18"
+      bbox: [-180.0, -90.0, 180.0, 90.0]
+    bands:
+      B01: {common_name: coastal, units: reflectance, center_wavelength: 0.443, resolution: 30.0}
+      B02: {common_name: blue, units: reflectance, center_wavelength: 0.482, resolution: 30.0}
+      B03: {common_name: green, units: reflectance, center_wavelength: 0.561, resolution: 30.0}
+      B04: {common_name: red, units: reflectance, center_wavelength: 0.655, resolution: 30.0}
+      B05: {common_name: nir, units: reflectance, center_wavelength: 0.865, resolution: 30.0}
+      B06: {common_name: swir16, units: reflectance, center_wavelength: 1.609, resolution: 30.0}
+      B07: {common_name: swir22, units: reflectance, center_wavelength: 2.201, resolution: 30.0}
+      B10: {description: Surface temperature, units: K, center_wavelength: 10.895, resolution: 30.0}
+  modis:
+    sh_collection: MODIS
+    description: MODIS MCD43A4 nadir BRDF-adjusted surface reflectance (7 bands).
+    cadence: daily
+    resolution: 500.0
+    default_bands: [B01, B04, B03]
+    extent:
+      start_date: "2000-02-24"
+      bbox: [-180.0, -90.0, 180.0, 90.0]
+    bands:
+      B01: {common_name: red, units: reflectance, center_wavelength: 0.645}
+      B02: {common_name: nir, units: reflectance, center_wavelength: 0.858}
+      B03: {common_name: blue, units: reflectance, center_wavelength: 0.469}
+      B04: {common_name: green, units: reflectance, center_wavelength: 0.555}
+      B05: {common_name: nir2, units: reflectance, center_wavelength: 1.240}
+      B06: {common_name: swir16, units: reflectance, center_wavelength: 1.640}
+      B07: {common_name: swir22, units: reflectance, center_wavelength: 2.130}
+  dem-copernicus-30:
+    sh_collection: DEM_COPERNICUS_30
+    description: Copernicus DEM GLO-30 digital elevation model (30 m).
+    cadence: static
+    resolution: 30.0
+    default_bands: [DEM]
+    extent:
+      bbox: [-180.0, -90.0, 180.0, 90.0]
+    bands:
+      DEM: {description: Elevation above the EGM2008 geoid, units: m}
+  harmonized-landsat-sentinel:
+    sh_collection: HARMONIZED_LANDSAT_SENTINEL
+    description: NASA Harmonized Landsat Sentinel-2 (HLS) surface reflectance, named bands.
+    cadence: 2-3-day
+    resolution: 30.0
+    default_bands: [Red, Green, Blue]
+    extent:
+      start_date: "2015-11-28"
+      bbox: [-180.0, -90.0, 180.0, 90.0]
+    bands:
+      CoastalAerosol: {units: reflectance, center_wavelength: 0.443}
+      Blue: {common_name: blue, units: reflectance, center_wavelength: 0.482}
+      Green: {common_name: green, units: reflectance, center_wavelength: 0.561}
+      Red: {common_name: red, units: reflectance, center_wavelength: 0.655}
+      NIR_Narrow: {common_name: nir, units: reflectance, center_wavelength: 0.865}
+      SWIR1: {common_name: swir16, units: reflectance, center_wavelength: 1.610}
+      SWIR2: {common_name: swir22, units: reflectance, center_wavelength: 2.200}
