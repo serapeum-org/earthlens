@@ -6645,11 +6645,21 @@ the optional dependency (extra) you need to install for it.</p>
 <td><code>openeo</code></td>
 <td><a href="../openeo/introduction/">openEO</a></td>
 </tr>
+<tr>
+<td>Humanitarian Data Exchange (UN OCHA, CKAN)</td>
+<td><code>hdx</code></td>
+<td>mixed</td>
+<td>none (public)</td>
+<td><code>hdx</code></td>
+<td><a href="../hdx/introduction/">HDX</a></td>
+</tr>
 </tbody>
 </table>
 <p><code>Output</code> is the backend's <code>OUTPUT_KIND</code> — <code>raster</code> writes GeoTIFF/COG/NetCDF, <code>vector</code> writes geometry tables
-(GeoJSON / GeoPackage), and <code>tabular</code> writes plain tables (CSV / Parquet). It also governs <code>aggregate=</code>: the
-temporal aggregator is accepted for <code>raster</code> backends and rejected for <code>vector</code> / <code>tabular</code> ones.</p>
+(GeoJSON / GeoPackage), <code>tabular</code> writes plain tables (CSV / Parquet), and <code>mixed</code> (HDX) downloads each
+resource file as-is in whatever format it ships. It also governs <code>aggregate=</code>: the temporal aggregator is
+accepted for <code>raster</code> backends and rejected for <code>vector</code> / <code>tabular</code> ones; HDX (<code>mixed</code>) rejects it because
+resources are returned as-is.</p>
 <h2 id="planned-providers-not-yet-integrated"><a class="toclink" href="#planned-providers-not-yet-integrated">Planned providers (not yet integrated)</a><a class="headerlink" href="#planned-providers-not-yet-integrated" title="Permanent link">#</a></h2>
 <p>These have a completion plan but no code yet — they are <strong>not</strong> available from the facade.</p>
 <table>
