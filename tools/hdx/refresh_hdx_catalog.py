@@ -47,7 +47,7 @@ INDEX_PATH = (
     / "earthlens"
     / "hdx"
     / "catalog"
-    / "_available.json"
+    / "_available.json.gz"
 )
 
 
@@ -172,15 +172,17 @@ def all_metadata() -> dict[str, dict]:
 def write_index(rows: dict[str, dict], index_path: Path = INDEX_PATH) -> int:
     """Rewrite the enriched long-tail JSON index `{hdx_id: {org, title}}`.
 
-    The index is JSON (`_available.json`), kept out of the curated
-    `*.yaml` glob so `Catalog()` parses only the small curated YAMLs and
-    reads this map separately (the `earthlens.earthdata` `_auto.json`
-    pattern). Every id here resolves to a synthesised `HdxDataset` via
-    `Catalog.get_dataset`.
+    The index is gzipped JSON (`_available.json.gz`), kept out of the
+    curated `*.yaml` glob so `Catalog()` parses only the small curated
+    YAMLs and reads this map separately (the `earthlens.earthdata`
+    `_auto.json` pattern). Gzip is suffix-detected, so a plain `.json`
+    path is written uncompressed (used by tests). Every id here resolves
+    to a synthesised `HdxDataset` via `Catalog.get_dataset`.
 
     Args:
         rows: Map from HDX id to its `{org, title}` row.
-        index_path: Path to `catalog/_available.json`.
+        index_path: Path to `catalog/_available.json.gz` (or a plain
+            `.json` path, written uncompressed).
 
     Returns:
         int: The number of ids written.
@@ -204,9 +206,14 @@ def write_index(rows: dict[str, dict], index_path: Path = INDEX_PATH) -> int:
         ),
         "datasets": datasets,
     }
-    index_path.write_text(
-        json.dumps(payload, indent=0, ensure_ascii=False) + "\n", encoding="utf-8"
-    )
+    text = json.dumps(payload, indent=0, ensure_ascii=False) + "\n"
+    if index_path.suffix == ".gz":
+        import gzip
+
+        with gzip.open(index_path, "wt", encoding="utf-8") as handle:
+            handle.write(text)
+    else:
+        index_path.write_text(text, encoding="utf-8")
     return len(datasets)
 
 

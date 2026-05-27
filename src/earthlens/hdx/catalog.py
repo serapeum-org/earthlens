@@ -5,7 +5,7 @@ catalog. Mirrors the shape of :mod:`earthlens.earthdata.catalog` and
 :mod:`earthlens.cmems.catalog`: the catalog ships as a directory of
 per-theme YAML files at `src/earthlens/hdx/catalog/`
 (`population.yaml`, `buildings.yaml`, `boundaries.yaml`, …) plus a
-single `_available.json` carrying the `available_datasets` list
+single gzipped `_available.json.gz` carrying the long-tail index
 (the `C7` auto-generated index). Each per-theme file contributes its
 `datasets:` block; the loader unions them into one :class:`Catalog` at
 construction time.
@@ -53,9 +53,13 @@ _CATALOG_CACHE: dict[Any, tuple[list[str], dict[str, "HdxDataset"]]] = {}
 # `_auto.json` out of the curated YAML glob.
 _AVAILABLE_CACHE: dict[Any, dict[str, dict]] = {}
 
-#: Filename of the JSON `available_datasets` index, kept beside the curated
-#: per-theme YAMLs (and out of the `*.yaml` glob).
-AVAILABLE_INDEX_NAME = "_available.json"
+#: Filename of the gzipped JSON `available_datasets` index, kept beside the
+#: curated per-theme YAMLs (and out of the `*.yaml` glob). Gzipped because the
+#: full ~41k-row index compresses ~9x (≈5 MB → ≈0.5 MB) and decompresses in a
+#: few ms, so the wheel stays small with no meaningful load-time cost.
+AVAILABLE_INDEX_NAME = "_available.json.gz"
+#: Uncompressed fallback name (custom catalog dirs / tests may ship plain JSON).
+AVAILABLE_INDEX_NAME_PLAIN = "_available.json"
 
 OutputKindLiteral = Literal["raster", "vector", "tabular", "mixed"]
 
@@ -96,13 +100,16 @@ def _available_index_path(catalog_path: Path) -> Path:
 
     Args:
         catalog_path: The catalog directory, or a single catalog YAML
-            file (the JSON is then looked for in its parent directory).
+            file (the index is then looked for in its parent directory).
 
     Returns:
-        Path: The sibling `_available.json` (which may not exist).
+        Path: The sibling gzipped `_available.json.gz` when present,
+            else the plain `_available.json` (which may not exist
+            either).
     """
     base = catalog_path if catalog_path.is_dir() else catalog_path.parent
-    return base / AVAILABLE_INDEX_NAME
+    gz = base / AVAILABLE_INDEX_NAME
+    return gz if gz.is_file() else base / AVAILABLE_INDEX_NAME_PLAIN
 
 
 def _load_available(json_path: Path) -> dict[str, dict]:
@@ -110,7 +117,9 @@ def _load_available(json_path: Path) -> dict[str, dict]:
 
     Reads the full HDX index from `json_path` without touching the
     curated YAMLs — a flat `{id: {org, title}}` map that parses in
-    milliseconds. Two on-disk shapes are accepted: the enriched
+    milliseconds. The bundled index is gzipped (`.json.gz`); a plain
+    `.json` is also accepted (custom catalog dirs / tests), detected by
+    suffix. Two on-disk shapes are accepted: the enriched
     `{"datasets": {id: {"org": ..., "title": ...}}}` (current) and the
     older `{"available_datasets": [id, ...]}` (back-compat — those ids
     become thin rows with empty `org` / `title`). Returns an empty map
@@ -118,7 +127,8 @@ def _load_available(json_path: Path) -> dict[str, dict]:
     that ships no index).
 
     Args:
-        json_path: Path to the `_available.json` file.
+        json_path: Path to the `_available.json.gz` (or plain
+            `_available.json`) file.
 
     Returns:
         dict[str, dict]: Map from HDX id to its `{org, title}` row
@@ -132,7 +142,13 @@ def _load_available(json_path: Path) -> dict[str, dict]:
         return cached
     import json
 
-    data = json.loads(json_path.read_text(encoding="utf-8")) or {}
+    if json_path.suffix == ".gz":
+        import gzip
+
+        with gzip.open(json_path, "rt", encoding="utf-8") as handle:
+            data = json.load(handle) or {}
+    else:
+        data = json.loads(json_path.read_text(encoding="utf-8")) or {}
     rows = data.get("datasets")
     if isinstance(rows, dict):
         index = {key_: dict(body or {}) for key_, body in rows.items()}

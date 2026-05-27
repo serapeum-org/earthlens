@@ -194,6 +194,25 @@ class TestLoaderHelpers:
         rows = catalog_mod._load_available(tmp_path / "_available.json")
         assert rows == {"a": {"org": "o", "title": "A"}}
 
+    def test_load_available_reads_gzip(self, tmp_path: Path):
+        """A gzipped `_available.json.gz` index is decompressed and read."""
+        import gzip
+        import json
+
+        path = tmp_path / "_available.json.gz"
+        with gzip.open(path, "wt", encoding="utf-8") as handle:
+            json.dump({"datasets": {"a": {"org": "o", "title": "A"}}}, handle)
+        clear_catalog_cache()
+        rows = catalog_mod._load_available(path)
+        assert rows == {"a": {"org": "o", "title": "A"}}
+
+    def test_available_index_path_prefers_gz(self, tmp_path: Path):
+        """The sibling `.gz` is preferred when present, else the plain `.json`."""
+        (tmp_path / "_available.json").write_text("{}", encoding="utf-8")
+        assert catalog_mod._available_index_path(tmp_path).name == "_available.json"
+        (tmp_path / "_available.json.gz").write_bytes(b"")
+        assert catalog_mod._available_index_path(tmp_path).name == "_available.json.gz"
+
     def test_load_available_legacy_id_list(self, tmp_path: Path):
         """The older `{available_datasets: [...]}` shape yields thin rows."""
         import json
