@@ -391,7 +391,11 @@ class HDX(AbstractDataSource):
         out_paths: list[Path] = []
         for product in products:
             resource = product.metadata["resource"]
-            folder = self.root_dir / product.metadata["hdx_id"]
+            # `hdx_id` is a CKAN slug for curated rows, but arbitrary text via
+            # the `hdx_id=` escape hatch; take only its final path segment so a
+            # crafted value cannot escape `root_dir`.
+            subdir = Path(product.metadata["hdx_id"]).name or "dataset"
+            folder = self.root_dir / subdir
             folder.mkdir(parents=True, exist_ok=True)
             _url, local_path = resource.download(folder=str(folder))
             out_paths.append(Path(local_path))

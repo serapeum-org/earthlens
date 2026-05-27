@@ -66,6 +66,14 @@ class TestWriteIndex:
         assert list(payload["datasets"]) == ["a", "b"]
         assert payload["datasets"]["a"] == {"org": "o-a", "title": "A"}
 
+    def test_gzip_output_is_byte_reproducible(self, tmp_path: Path):
+        """Two writes of the same rows to `.gz` produce identical bytes."""
+        rows = {"b": {"org": "o", "title": "B"}, "a": {"org": "o", "title": "A"}}
+        first, second = tmp_path / "one.json.gz", tmp_path / "two.json.gz"
+        tool.write_index(rows, first)
+        tool.write_index(rows, second)
+        assert first.read_bytes() == second.read_bytes()
+
 
 class TestSearchMetadata:
     """Tests for search_metadata / all_metadata (faked CKAN client)."""

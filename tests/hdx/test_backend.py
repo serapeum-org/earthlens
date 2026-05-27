@@ -188,6 +188,24 @@ class TestFetch:
         backend = HDX(hdx_id="d", path=tmp_path)
         assert backend._fetch([]) == []
 
+    def test_traversal_hdx_id_stays_within_root(self, fake_hdx: FakeHdx, tmp_path):
+        """A traversal-style hdx_id is reduced to its final path segment."""
+        from earthlens.base import RemoteProduct
+
+        backend = HDX(hdx_id="seed", path=tmp_path)
+        product = RemoteProduct(
+            id="x::a.csv",
+            metadata={
+                "resource": FakeResource("a.csv", "CSV"),
+                "hdx_id": "../escape",
+                "name": "a.csv",
+                "format": "CSV",
+            },
+        )
+        (path,) = backend._fetch([product])
+        assert backend.root_dir in path.parents
+        assert path == backend.root_dir / "escape" / "a.csv"
+
 
 class TestDownload:
     """Tests for HDX.download (the facade-facing entry point)."""

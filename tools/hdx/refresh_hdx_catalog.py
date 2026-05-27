@@ -210,8 +210,15 @@ def write_index(rows: dict[str, dict], index_path: Path = INDEX_PATH) -> int:
     if index_path.suffix == ".gz":
         import gzip
 
-        with gzip.open(index_path, "wt", encoding="utf-8") as handle:
-            handle.write(text)
+        # Write deterministically so regenerating an unchanged index produces
+        # no spurious git diff: `mtime=0` zeroes the timestamp and an explicit
+        # empty `filename` suppresses the FNAME header (otherwise GzipFile
+        # derives it from the open file's `.name`, making bytes path-dependent).
+        with open(index_path, "wb") as raw:
+            with gzip.GzipFile(
+                filename="", fileobj=raw, mode="wb", mtime=0
+            ) as handle:
+                handle.write(text.encode("utf-8"))
     else:
         index_path.write_text(text, encoding="utf-8")
     return len(datasets)
