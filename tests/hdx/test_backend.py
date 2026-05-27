@@ -75,6 +75,11 @@ class TestInit:
         with pytest.raises(ValueError, match="HDX catalog"):
             HDX(variables={"not-a-key": []}, path=tmp_path)
 
+    def test_raw_hdx_id_resolves_via_index(self, fake_hdx: FakeHdx, tmp_path):
+        """A raw HDX id (long-tail) is accepted through `variables=`."""
+        backend = HDX(variables={"kontur-population-dataset": []}, path=tmp_path)
+        assert backend._targets == [("kontur-population-dataset", [])]
+
     def test_check_input_dates_resolution_all(self, fake_hdx: FakeHdx, tmp_path):
         """The temporal resolution is the 'all' sentinel."""
         backend = HDX(variables={"kontur-population": []}, path=tmp_path)

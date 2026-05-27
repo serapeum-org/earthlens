@@ -1,7 +1,7 @@
 """Backend that fetches Humanitarian Data Exchange resources via CKAN.
 
 `HDX(AbstractDataSource)` wraps UN OCHA's `hdx-python-api` (a read-only
-client over the CKAN catalogue at `data.humdata.org`, ~21k datasets:
+client over the CKAN catalogue at `data.humdata.org`, ~41k datasets:
 Kontur Population, Meta HRSL / RWI, HOTOSM building & road exports,
 VIDA conflated buildings, UNDP / UNHCR / WFP layers, country
 humanitarian profiles). A request names a curated **dataset** + an
@@ -35,7 +35,7 @@ design:
   no `[hdx]` credential.
 
 Beyond the curated catalog, the `hdx_id=` (+ optional `resource=`)
-escape-hatch kwargs fetch **any** of the ~21k datasets by its HDX id
+escape-hatch kwargs fetch **any** of the ~41k datasets by its HDX id
 without a catalog row (`G6`); when `hdx_id=` is set the catalog is
 bypassed.
 """

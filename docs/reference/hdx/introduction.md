@@ -1,7 +1,7 @@
 # Humanitarian Data Exchange (HDX) — introduction
 
 `earthlens.hdx` is one wrapper over the **CKAN API of UN OCHA's
-[Humanitarian Data Exchange](https://data.humdata.org)** (~21,000
+[Humanitarian Data Exchange](https://data.humdata.org)** (~41,000
 datasets) via the official read-only `hdx-python-api` SDK. A request
 names a curated **dataset** plus an optional **resource filter**; the
 backend resolves the dataset, filters its resources, and downloads the
@@ -11,7 +11,7 @@ matching files to disk.
 
 HDX aggregates humanitarian and geospatial data from hundreds of
 organisations. earthlens ships a curated catalogue across these
-families (and an `hdx_id=` escape hatch for any of the ~21k datasets):
+families (and an `hdx_id=` escape hatch for any of the ~41k datasets):
 
 - **Population & settlement** — Kontur Population (global 400 m H3
   hexagons), Meta High Resolution Settlement Layer (HRSL), WorldPop

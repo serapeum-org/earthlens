@@ -48,7 +48,7 @@ EarthLens(
 
 ### The `hdx_id=` / `resource=` escape hatch
 
-To fetch **any** of the ~21k HDX datasets without a catalogue row, pass
+To fetch **any** of the ~41k HDX datasets without a catalogue row, pass
 `hdx_id=` (and optionally `resource=`). It bypasses the catalogue:
 
 ```python

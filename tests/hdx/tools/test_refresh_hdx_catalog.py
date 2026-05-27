@@ -138,6 +138,22 @@ class TestParser:
         assert ns.command == "refresh" and ns.org == ["kontur", "hot"]
         assert ns.include_curated is True
 
+    def test_refresh_all_parsed(self):
+        """The refresh subcommand parses --all (whole-catalogue mode)."""
+        ns = tool.build_parser().parse_args(["refresh", "--all"])
+        assert ns.command == "refresh" and ns.all is True
+
+
+class TestAllDatasetNames:
+    """Tests for all_dataset_names (whole-catalogue enumeration)."""
+
+    def test_returns_every_registered_id(self, fake_hdx: FakeHdx):
+        """all_dataset_names returns every id the SDK knows."""
+        fake_hdx.add_dataset("ds-1", [])
+        fake_hdx.add_dataset("ds-2", [])
+        names = set(tool.all_dataset_names())
+        assert {"ds-1", "ds-2", "kontur-population-dataset"} <= names
+
     def test_audit_strict_parsed(self):
         """The audit subcommand parses --strict."""
         ns = tool.build_parser().parse_args(["audit", "--strict"])

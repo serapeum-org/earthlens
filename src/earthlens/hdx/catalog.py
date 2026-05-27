@@ -33,7 +33,7 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any, Literal
 
-from pydantic import BaseModel, ConfigDict, Field, ValidationError
+from pydantic import BaseModel, ConfigDict, Field, PrivateAttr, ValidationError
 
 from earthlens.base import AbstractCatalog
 from earthlens.base.yaml_loader import load_yaml_strict
@@ -274,14 +274,17 @@ class Catalog(AbstractCatalog):
     in one pass.
 
     Attributes:
-        available_datasets: Informational list of every HDX dataset the
-            `C7` refresh tool found for the curated orgs/themes. Runtime
-            code does not consume it.
+        available_datasets: The full index of every HDX dataset id (the
+            whole `data.humdata.org` catalogue, ~41k), produced by the
+            `refresh --all` tool. Any id here resolves to a thin
+            :class:`HdxDataset` via :meth:`get_dataset` (the long-tail
+            fallback, mirroring `earthlens.earthdata`'s `_auto.json`);
+            the curated `datasets` carry vetted metadata.
         datasets: Structural map keyed by the curated dataset key. Each
             value is an :class:`HdxDataset`.
 
     Examples:
-        - Resolve a curated dataset:
+        - A curated key is a member; the long tail resolves but is not:
             ```python
             >>> from earthlens.hdx import Catalog
             >>> "kontur-population" in Catalog()
@@ -294,6 +297,9 @@ class Catalog(AbstractCatalog):
 
     available_datasets: list[str] = Field(default_factory=list)
     datasets: dict[str, HdxDataset] = Field(default_factory=dict)
+    #: Cached membership set over :attr:`available_datasets`, built on
+    #: first :meth:`get_dataset` fallback so the lookup is O(1).
+    _available_index: set[str] | None = PrivateAttr(default=None)
 
     def model_post_init(self, __context: Any) -> None:
         """Auto-load the bundled catalog when no datasets were supplied.
@@ -352,6 +358,47 @@ class Catalog(AbstractCatalog):
                 object as :attr:`datasets`.
         """
         return self.datasets
+
+    def get_dataset(self, name: str) -> HdxDataset:
+        """Resolve a key against the curated then the full HDX index.
+
+        Curated `datasets` (hand-vetted, with metadata) win. Otherwise,
+        any id in the full :attr:`available_datasets` index (the whole
+        `data.humdata.org` catalogue) resolves to a **thin**
+        :class:`HdxDataset` carrying just that `hdx_id` — enough for the
+        backend, whose only load-bearing field is `hdx_id` (it fetches
+        the dataset live via `Dataset.read_from_hdx`). This is the
+        long-tail fallback, mirroring `earthlens.earthdata`'s `_auto`
+        resolution. An unknown id raises with a did-you-mean hint.
+
+        Args:
+            name: A curated key (e.g. `"kontur-population"`) or any HDX
+                dataset id in the available index.
+
+        Returns:
+            HdxDataset: The curated row, or a thin synthesised row for an
+                available id.
+
+        Raises:
+            ValueError: When `name` is in neither the curated map nor the
+                available index.
+        """
+        if name in self.datasets:
+            return self.datasets[name]
+        if self._available_index is None:
+            self._available_index = set(self.available_datasets)
+        if name in self._available_index:
+            return HdxDataset(hdx_id=name)
+        import difflib
+
+        pool = list(self.datasets) + list(self.available_datasets)
+        close = difflib.get_close_matches(name, pool, n=1)
+        hint = f" Did you mean {close[0]!r}?" if close else ""
+        raise ValueError(
+            f"{name!r} is not in the {self._catalog_kind} "
+            f"({len(self.datasets)} curated + {len(self.available_datasets)} "
+            f"available).{hint}"
+        )
 
     def resolve(self, key: str) -> HdxDataset:
         """Resolve a curated dataset key to its :class:`HdxDataset` row.

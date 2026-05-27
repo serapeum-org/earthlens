@@ -78,6 +78,11 @@ class FakeDataset(dict):
         """Return the registered dataset for `identifier`, or `None`."""
         return cls.registry.get(identifier)
 
+    @classmethod
+    def get_all_dataset_names(cls, configuration: Any = None) -> list[str]:
+        """Return every registered dataset id (the whole fake catalogue)."""
+        return list(cls.registry)
+
     def get_resources(self) -> list[FakeResource]:
         """Return this dataset's resources."""
         return list(self._resources)

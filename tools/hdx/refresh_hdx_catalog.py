@@ -7,11 +7,14 @@ client. Run with no args to see the subcommand list:
 
 Subcommands:
 
-* `refresh` — run `Dataset.search_in_hdx(...)` filtered by organisation
-  / tag and rewrite the informational `available_datasets:` index in
-  `catalog/_available.json`. This is **not** the full ~21k HDX catalogue —
-  it is the curated orgs' / tags' datasets, the analogue of
-  `tools/gee/refresh_gee_catalog.py`'s `available_datasets:` block.
+* `refresh` — rebuild the `available_datasets` index in
+  `catalog/_available.json`. With `--all`, enumerate the **entire** HDX
+  catalogue (~41k ids) via `Dataset.get_all_dataset_names()`; otherwise
+  filter by `--org` / `--tag` via `Dataset.search_in_hdx(...)`. Every id
+  in this index resolves to a thin `HdxDataset` through
+  `Catalog.get_dataset` (the long-tail fallback), so any HDX dataset is
+  usable by key — the analogue of `tools/gee/refresh_gee_catalog.py`'s
+  `available_datasets:` block plus `earthlens.earthdata`'s `_auto.json`.
 * `add-dataset <key> <hdx_id>` — fetch one dataset's live metadata and
   print a ready-to-paste curated `datasets:` stanza, inferring
   `formats` (CKAN labels) and `output_kinds` from its resources.
@@ -135,6 +138,20 @@ def search_datasets(
     return rows_out
 
 
+def all_dataset_names() -> list[str]:
+    """Return every HDX dataset id (the whole `data.humdata.org` catalogue).
+
+    Wraps `Dataset.get_all_dataset_names()` — one cheap paginated call
+    that returns all ~41k ids without per-dataset requests.
+
+    Returns:
+        list[str]: Every HDX dataset id / name.
+    """
+    from hdx.data.dataset import Dataset
+
+    return list(Dataset.get_all_dataset_names())
+
+
 def write_index(names: list[str], index_path: Path = INDEX_PATH) -> int:
     """Rewrite the `available_datasets` JSON index, sorted and de-duped.
 
@@ -236,17 +253,23 @@ def audit(strict: bool = False) -> int:
 def _cmd_refresh(args: argparse.Namespace) -> int:
     """Run the `refresh` subcommand.
 
-    Searches each requested organisation (and/or tag), unions the
-    results with the curated catalog's own `hdx_id`s so every curated
-    key is a member of the index, and rewrites `_available.json`.
+    With `--all`, enumerates the **entire** HDX catalogue via
+    `Dataset.get_all_dataset_names()` (one cheap paginated call, ~41k
+    ids). Otherwise searches each requested organisation (and/or tag).
+    Either way the result is unioned with the curated catalog's own
+    `hdx_id`s so every curated key is a member, and `_available.json` is
+    rewritten.
     """
     configure()
-    orgs = args.org or [None]
     names: list[str] = []
-    for org in orgs:
-        names.extend(
-            r["hdx_id"] for r in search_datasets(org=org, tag=args.tag, rows=args.rows)
-        )
+    if args.all:
+        names.extend(all_dataset_names())
+    else:
+        for org in args.org or [None]:
+            names.extend(
+                r["hdx_id"]
+                for r in search_datasets(org=org, tag=args.tag, rows=args.rows)
+            )
     if args.include_curated:
         from earthlens.hdx import Catalog
 
@@ -280,6 +303,11 @@ def build_parser() -> argparse.ArgumentParser:
     )
     refresh.add_argument("--tag", default=None, help="tag / theme filter")
     refresh.add_argument("--rows", type=int, default=1000, help="max datasets per org")
+    refresh.add_argument(
+        "--all",
+        action="store_true",
+        help="enumerate the entire HDX catalogue via get_all_dataset_names()",
+    )
     refresh.add_argument(
         "--include-curated",
         action="store_true",

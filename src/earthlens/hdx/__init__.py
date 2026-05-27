@@ -1,7 +1,7 @@
 """Humanitarian Data Exchange backend (CKAN via hdx-python-api).
 
 One unified backend over UN OCHA's Humanitarian Data Exchange
-(`data.humdata.org`, ~21k datasets): a single read-only
+(`data.humdata.org`, ~41k datasets): a single read-only
 `hdx-python-api` client resolves a curated dataset (or an arbitrary HDX
 id), filters its resources, and downloads the matching files to disk.
 HDX is a public catalogue, so there is no authentication.

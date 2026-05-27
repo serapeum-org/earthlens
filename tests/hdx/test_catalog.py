@@ -196,12 +196,31 @@ class TestBundledAvailableIndex:
     """Tests for the bundled JSON available-datasets index."""
 
     def test_index_is_large_and_covers_curated(self):
-        """The bundled index is sizeable and every curated id is a member."""
+        """The bundled index spans the whole HDX catalogue and covers curated."""
         catalog = Catalog()
         index = set(catalog.available_datasets)
-        assert len(index) >= 1000
+        assert len(index) >= 20000
         curated = {row.hdx_id for row in catalog.datasets.values()}
         assert curated <= index
+
+    def test_long_tail_id_resolves_to_thin_row(self):
+        """Any id in the full index resolves to a thin HdxDataset (cached set)."""
+        catalog = Catalog()
+        first, second = catalog.available_datasets[0], catalog.available_datasets[-1]
+        assert catalog.get_dataset(first).hdx_id == first
+        # second resolve reuses the cached membership set
+        assert catalog.get_dataset(second).hdx_id == second
+
+    def test_long_tail_not_a_member(self):
+        """The long tail resolves but is not reported by `in` (curated only)."""
+        catalog = Catalog()
+        some_id = catalog.available_datasets[0]
+        assert some_id not in catalog or some_id in catalog.datasets
+
+    def test_unknown_id_raises_with_hint(self):
+        """An id in neither curated nor the index raises with a hint."""
+        with pytest.raises(ValueError, match="available"):
+            Catalog().get_dataset("definitely-not-an-hdx-dataset-zzz")
 
     def test_catalog_loads_without_yaml_index(self):
         """The curated YAML glob no longer includes a `_index.yaml`."""
