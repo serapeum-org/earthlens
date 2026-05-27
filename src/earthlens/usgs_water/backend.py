@@ -357,7 +357,10 @@ class USGSWater(AbstractDataSource):
                 "service='statistics' for a server-side temporal rollup "
                 "(daily/monthly/annual) instead."
             )
-        frames = [f for f in self._api_via_search_fetch() if not f.empty]
+        # Each frame is already normalised to its service's schema (even
+        # when empty), so concat all of them — preserving the right
+        # columns for non-values services — rather than dropping empties.
+        frames = self._api_via_search_fetch()
         df = (
             pd.concat(frames, ignore_index=True)
             if frames
@@ -390,6 +393,11 @@ class USGSWater(AbstractDataSource):
             list[RemoteProduct]: One product whose `metadata` holds the
                 resolved `codes` and the explicit `sites` (or `None`).
         """
+        if self._service in _SITE_KEYED_SERVICES and not self._sites:
+            raise ValueError(
+                f"service={self._service!r} is keyed by site, not parameter "
+                f"code; pass sites=[...] (e.g. sites='01646500')."
+            )
         codes = [] if self._service in _SITE_KEYED_SERVICES else self._resolved_codes()
         return [
             RemoteProduct(
@@ -427,7 +435,7 @@ class USGSWater(AbstractDataSource):
         codes = product.metadata.get("codes", [])
         sites = product.metadata.get("sites")
         df, flavour = self._call_with_fallback(codes, sites)
-        return _helpers.normalize(df, flavour, self._code_meta(codes))
+        return _helpers.normalize(df, flavour, self._service, self._code_meta(codes))
 
     def _module(self, flavour: str):
         """Lazily import the `dataretrieval` submodule for a flavour.
@@ -504,14 +512,22 @@ class USGSWater(AbstractDataSource):
             ValueError: When `api="waterdata"` is forced for a
                 bbox-only query the modern endpoint cannot serve.
         """
+        has_legacy = _helpers.service_function(self._service, "nwis") is not None
         use_legacy = self._api == "legacy"
+        if use_legacy and not has_legacy:
+            raise ValueError(
+                f"service {self._service!r} has no legacy endpoint (it is "
+                f"modern-only in dataretrieval); use api='auto' or "
+                f"api='waterdata'."
+            )
+
         bbox_only = not sites
         if (
             not use_legacy
             and bbox_only
             and not _helpers.modern_supports_bbox(self._service)
         ):
-            if self._api == "waterdata":
+            if self._api == "waterdata" or not has_legacy:
                 raise ValueError(
                     f"The modern endpoint cannot query service "
                     f"{self._service!r} by bbox (no bbox filter). Pass "
@@ -525,11 +541,14 @@ class USGSWater(AbstractDataSource):
             return self._invoke("waterdata", codes, sites), "waterdata"
         except Exception as exc:  # noqa: BLE001 - re-raised unless a 429 fallback
             anonymous = self._auth is None or not self._auth.is_authenticated()
-            if (
-                self._api == "auto"
-                and anonymous
-                and _helpers.is_rate_limit_error(exc)
-            ):
+            if self._api == "auto" and anonymous and _helpers.is_rate_limit_error(exc):
+                if not has_legacy:
+                    raise RuntimeError(
+                        f"The modern USGS endpoint rate-limited this anonymous "
+                        f"request (HTTP 429) and service {self._service!r} has "
+                        f"no legacy fallback. Set API_USGS_PAT (or pass "
+                        f"api_token=) to use the modern endpoint."
+                    ) from exc
                 self._warn_legacy_fallback()
                 return self._invoke("nwis", codes, sites), "nwis"
             raise
@@ -569,11 +588,18 @@ class USGSWater(AbstractDataSource):
         Returns:
             Path: The written CSV / Parquet file path.
         """
-        codes_part = "_".join(self._resolved_codes() or ["all"])
+        codes = [] if self._service in _SITE_KEYED_SERVICES else self._resolved_codes()
+        codes_part = "_".join(codes or ["all"])
         ext = "parquet" if self._output_format == "parquet" else "csv"
         out_path = self.root_dir / f"usgs_{self._service}_{codes_part}.{ext}"
         if self._output_format == "parquet":
-            df.to_parquet(out_path, index=False)
+            try:
+                df.to_parquet(out_path, index=False)
+            except ImportError as exc:  # pragma: no cover - depends on env
+                raise ImportError(
+                    "Writing Parquet requires 'pyarrow'. Install it (pip "
+                    "install pyarrow) or use output_format='csv'."
+                ) from exc
         else:
             df.to_csv(out_path, index=False)
         return out_path

@@ -31,19 +31,18 @@ from typing import Any
 import pandas as pd
 
 #: Per-service `dataretrieval` function names, by endpoint flavour. A
-#: `None` modern entry means "no modern function — always use legacy"
-#: (none today; every service exists on both as of `dataretrieval`
-#: 1.1.5, with `gwlevels` routed through the daily/continuous fns).
+#: `None` legacy entry means "modern-only — the legacy function was
+#: removed in `dataretrieval` 1.1.5", so there is no legacy fallback
+#: (a 429 on these surfaces an error advising a token). `samples` and
+#: `field-measurements` lost their legacy `nwis` functions
+#: (`get_qwdata` / `get_discharge_measurements`).
 _SERVICE_FN: dict[str, dict[str, str | None]] = {
     "daily": {"waterdata": "get_daily", "nwis": "get_dv"},
     "instantaneous": {"waterdata": "get_continuous", "nwis": "get_iv"},
-    "samples": {"waterdata": "get_samples", "nwis": "get_qwdata"},
+    "samples": {"waterdata": "get_samples", "nwis": None},
     "statistics": {"waterdata": "get_stats_por", "nwis": "get_stats"},
     "gwlevels": {"waterdata": "get_daily", "nwis": "get_dv"},
-    "field-measurements": {
-        "waterdata": "get_field_measurements",
-        "nwis": "get_discharge_measurements",
-    },
+    "field-measurements": {"waterdata": "get_field_measurements", "nwis": None},
     "peaks": {"waterdata": "get_peaks", "nwis": "get_discharge_peaks"},
     "ratings": {"waterdata": "get_ratings", "nwis": "get_ratings"},
     "sites": {"waterdata": "get_monitoring_locations", "nwis": "what_sites"},
@@ -138,6 +137,11 @@ def _site_filter(flavour: str, sites: list[str]) -> dict[str, Any]:
     return {"sites": list(sites)}
 
 
+def _maybe(value: list[str], single_ok: bool = True) -> Any:
+    """Return a lone element for a 1-list, else the list (SDK convenience)."""
+    return value[0] if single_ok and len(value) == 1 else list(value)
+
+
 def query_kwargs(
     *,
     service: str,
@@ -150,11 +154,15 @@ def query_kwargs(
     limit: int | None,
     stat_type: str = "daily",
 ) -> dict[str, Any]:
-    """Build the per-module query kwargs for one service call.
+    """Build the per-module, per-service query kwargs for one call.
 
-    Shapes the time filter, parameter-code filter, and site/bbox filter
-    into the names each module expects (modern `parameter_code` +
-    `time` + `bbox`; legacy `parameterCd` + `start`/`end` + `bBox`).
+    Each service shapes the time / parameter / site / bbox filters into
+    the names its `dataretrieval` function expects. The values services
+    (daily / instantaneous / gwlevels) and `field-measurements` share
+    the modern `parameter_code` + `time` + `bbox` form; `samples` uses
+    the WQP camelCase form (`usgsPCode` / `boundingBox` /
+    `activityStartDate*`); `sites` / `peaks` / `ratings` / `statistics`
+    each have their own shape.
 
     Args:
         service: The selected service plane.
@@ -171,33 +179,124 @@ def query_kwargs(
         dict[str, Any]: Keyword arguments to splat into the resolved
             `dataretrieval` function.
     """
+    if service == "samples":
+        return _samples_kwargs(codes, sites, bbox, start, end)
+    if service == "statistics":
+        return _statistics_kwargs(flavour, codes, sites, stat_type)
+    if service in ("peaks", "ratings"):
+        return _site_keyed_kwargs(service, flavour, sites, bbox, start, end)
+    if service == "sites":
+        return _sites_kwargs(flavour, bbox, limit)
+    return _values_kwargs(flavour, service, codes, sites, bbox, start, end, limit)
+
+
+def _values_kwargs(
+    flavour: str,
+    service: str,
+    codes: list[str],
+    sites: list[str] | None,
+    bbox: list[float],
+    start: str,
+    end: str,
+    limit: int | None,
+) -> dict[str, Any]:
+    """Kwargs for daily / instantaneous / gwlevels / field-measurements."""
     kwargs: dict[str, Any] = {}
     if flavour == "waterdata":
         if codes:
-            kwargs["parameter_code"] = codes if len(codes) > 1 else codes[0]
+            kwargs["parameter_code"] = _maybe(codes)
         if sites:
             kwargs.update(_site_filter("waterdata", sites))
         elif modern_supports_bbox(service):
             kwargs["bbox"] = list(bbox)
-        if service not in ("statistics", "ratings", "peaks"):
-            kwargs["time"] = f"{start}/{end}"
+        kwargs["time"] = f"{start}/{end}"
         if limit is not None:
             kwargs["limit"] = limit
         return kwargs
-
-    # legacy nwis
     if codes:
-        kwargs["parameterCd"] = codes if len(codes) > 1 else codes[0]
+        kwargs["parameterCd"] = _maybe(codes)
     if sites:
         kwargs.update(_site_filter("nwis", sites))
-    elif service != "statistics":
+    else:
         kwargs["bBox"] = f"{bbox[0]},{bbox[1]},{bbox[2]},{bbox[3]}"
-    if service in ("daily", "instantaneous", "gwlevels", "peaks"):
-        kwargs["start"] = start
-        kwargs["end"] = end
-    if service == "statistics":
-        kwargs["statReportType"] = stat_type
+    kwargs["start"] = start
+    kwargs["end"] = end
     return kwargs
+
+
+def _samples_kwargs(
+    codes: list[str],
+    sites: list[str] | None,
+    bbox: list[float],
+    start: str,
+    end: str,
+) -> dict[str, Any]:
+    """WQP-style camelCase kwargs for the modern `get_samples` call."""
+    kwargs: dict[str, Any] = {
+        "activityStartDateLower": start,
+        "activityStartDateUpper": end,
+    }
+    if codes:
+        kwargs["usgsPCode"] = _maybe(codes)
+    if sites:
+        kwargs["monitoringLocationIdentifier"] = [f"USGS-{s}" for s in sites]
+    else:
+        kwargs["boundingBox"] = list(bbox)
+    return kwargs
+
+
+def _statistics_kwargs(
+    flavour: str,
+    codes: list[str],
+    sites: list[str] | None,
+    stat_type: str,
+) -> dict[str, Any]:
+    """Kwargs for the statistics service (modern por / legacy get_stats)."""
+    if flavour == "waterdata":
+        kwargs: dict[str, Any] = {}
+        if codes:
+            kwargs["parameter_code"] = _maybe(codes)
+        if sites:
+            kwargs.update(_site_filter("waterdata", sites))
+        return kwargs
+    kwargs = {"statReportType": stat_type}
+    if codes:
+        kwargs["parameterCd"] = _maybe(codes)
+    if sites:
+        kwargs.update(_site_filter("nwis", sites))
+    return kwargs
+
+
+def _site_keyed_kwargs(
+    service: str,
+    flavour: str,
+    sites: list[str] | None,
+    bbox: list[float],
+    start: str,
+    end: str,
+) -> dict[str, Any]:
+    """Kwargs for the site-keyed services (`peaks`, `ratings`)."""
+    sites = sites or []
+    if service == "ratings":
+        if flavour == "waterdata":
+            return {"monitoring_location_id": f"USGS-{sites[0]}"}
+        return {"site": sites[0]}
+    # peaks
+    if flavour == "waterdata":
+        return _site_filter("waterdata", sites)
+    return {"sites": list(sites), "start": start, "end": end}
+
+
+def _sites_kwargs(
+    flavour: str, bbox: list[float], limit: int | None
+) -> dict[str, Any]:
+    """Kwargs for the site-discovery service."""
+    if flavour == "waterdata":
+        kwargs: dict[str, Any] = {"bbox": list(bbox)}
+        if limit is not None:
+            kwargs["limit"] = limit
+        return kwargs
+    return {"bBox": f"{bbox[0]},{bbox[1]},{bbox[2]},{bbox[3]}"}
 
 
 def _strip_site_prefix(value: Any) -> Any:
@@ -304,21 +403,292 @@ def normalize_legacy_wide(
 def normalize(
     df: pd.DataFrame,
     flavour: str,
+    service: str,
     code_meta: dict[str, tuple[str, str]],
 ) -> pd.DataFrame:
-    """Dispatch a frame to the modern-long or legacy-wide normalizer.
+    """Fold a service's frame into its canonical long schema.
+
+    Dispatches per service: the values services (daily / instantaneous
+    / gwlevels) share the modern-long / legacy-wide normalizers;
+    `samples`, `statistics`, `sites`, `peaks`, and `ratings` each have
+    a bespoke schema.
 
     Args:
-        df: The frame returned by a `dataretrieval` values call.
-        flavour: `"waterdata"` (long) or `"nwis"` (wide).
+        df: The frame returned by a `dataretrieval` call.
+        flavour: `"waterdata"` (long) or `"nwis"` (wide / legacy).
+        service: The selected service plane.
         code_meta: Map from parameter code to `(name, units)`.
 
     Returns:
-        pd.DataFrame: The canonical long-schema frame.
+        pd.DataFrame: The canonical frame for this service.
     """
+    if service == "samples":
+        return normalize_samples(df, code_meta)
+    if service == "statistics":
+        return normalize_statistics(df, flavour, code_meta)
+    if service == "sites":
+        return normalize_sites(df, flavour)
+    if service == "peaks":
+        return normalize_peaks(df, flavour)
+    if service == "ratings":
+        return normalize_ratings(df, flavour)
     if flavour == "waterdata":
         return normalize_modern_long(df, code_meta)
     return normalize_legacy_wide(df, code_meta)
+
+
+#: Output columns for the water-quality `samples` service (canonical
+#: core + QW result fields).
+SAMPLES_COLUMNS: list[str] = [
+    "site_no",
+    "datetime",
+    "parameter_code",
+    "characteristic",
+    "value",
+    "unit",
+    "qualifier",
+    "detection_condition",
+    "detection_limit",
+    "detection_limit_unit",
+    "method",
+    "fraction",
+    "medium",
+]
+
+#: Output columns for the `statistics` service.
+STATS_COLUMNS: list[str] = [
+    "site_no",
+    "parameter_code",
+    "parameter_name",
+    "time_of_year",
+    "value",
+    "percentile",
+    "statistic",
+    "unit",
+]
+
+#: Output columns for the site-discovery (`sites`) service.
+SITE_COLUMNS: list[str] = [
+    "site_no",
+    "station_name",
+    "latitude",
+    "longitude",
+    "huc",
+    "site_type",
+]
+
+#: Output columns for the annual-peak (`peaks`) service.
+PEAKS_COLUMNS: list[str] = ["site_no", "datetime", "peak_value", "gage_height", "qualifier"]
+
+#: Output columns for the stage-discharge rating (`ratings`) service.
+RATINGS_COLUMNS: list[str] = ["stage", "discharge", "storage"]
+
+
+def _first_column(df: pd.DataFrame, names: list[str], default: Any = pd.NA) -> Any:
+    """Return the first present column among `names`, else a scalar `default`."""
+    for name in names:
+        if name in df.columns:
+            return df[name]
+    return default
+
+
+def normalize_samples(
+    df: pd.DataFrame, code_meta: dict[str, tuple[str, str]]
+) -> pd.DataFrame:
+    """Fold a modern WQP `get_samples` profile into the samples schema.
+
+    Maps the WQP result-level columns (`Result_Measure`,
+    `Result_MeasureQualifierCode`, `DetectionLimit_MeasureA`,
+    `ResultAnalyticalMethod_Name`, …) onto :data:`SAMPLES_COLUMNS`.
+
+    Args:
+        df: The modern `get_samples` frame (the WQP profile).
+        code_meta: Map from parameter code to `(name, units)`
+            (unused for value/unit, which come from the result row;
+            kept for signature symmetry).
+
+    Returns:
+        pd.DataFrame: A frame with the :data:`SAMPLES_COLUMNS`.
+    """
+    if df is None or df.empty:
+        return pd.DataFrame({column: [] for column in SAMPLES_COLUMNS})
+    out = pd.DataFrame(index=df.index)
+    out["site_no"] = _first_column(df, ["Location_Identifier"]).map(_strip_site_prefix)
+    out["datetime"] = pd.to_datetime(
+        _first_column(df, ["Activity_StartDateTime", "Activity_StartDate"]),
+        errors="coerce",
+        utc=True,
+    )
+    out["parameter_code"] = _first_column(df, ["USGSpcode"])
+    out["characteristic"] = _first_column(df, ["Result_Characteristic"])
+    out["value"] = pd.to_numeric(_first_column(df, ["Result_Measure"]), errors="coerce")
+    out["unit"] = _first_column(df, ["Result_MeasureUnit"])
+    out["qualifier"] = _first_column(df, ["Result_MeasureQualifierCode"])
+    out["detection_condition"] = _first_column(df, ["Result_ResultDetectionCondition"])
+    out["detection_limit"] = pd.to_numeric(
+        _first_column(df, ["DetectionLimit_MeasureA"]), errors="coerce"
+    )
+    out["detection_limit_unit"] = _first_column(df, ["DetectionLimit_MeasureUnitA"])
+    out["method"] = _first_column(df, ["ResultAnalyticalMethod_Name"])
+    out["fraction"] = _first_column(df, ["Result_SampleFraction"])
+    out["medium"] = _first_column(df, ["Activity_Media"])
+    return out.reset_index(drop=True)[SAMPLES_COLUMNS]
+
+
+def normalize_statistics(
+    df: pd.DataFrame, flavour: str, code_meta: dict[str, tuple[str, str]]
+) -> pd.DataFrame:
+    """Fold a statistics frame (modern por / legacy get_stats) to long.
+
+    Args:
+        df: The statistics frame.
+        flavour: `"waterdata"` (long: `value`/`percentile`/
+            `time_of_year`) or `"nwis"` (`year_nu`/`month_nu`/`mean_va`).
+        code_meta: Map from parameter code to `(name, units)`.
+
+    Returns:
+        pd.DataFrame: A frame with the :data:`STATS_COLUMNS`.
+    """
+    if df is None or df.empty:
+        return pd.DataFrame({column: [] for column in STATS_COLUMNS})
+    out = pd.DataFrame(index=df.index)
+    if flavour == "waterdata":
+        out["site_no"] = _first_column(df, ["monitoring_location_id"]).map(
+            _strip_site_prefix
+        )
+        out["parameter_code"] = _first_column(df, ["parameter_code"])
+        out["time_of_year"] = _first_column(df, ["time_of_year"])
+        out["value"] = pd.to_numeric(_first_column(df, ["value"]), errors="coerce")
+        out["percentile"] = _first_column(df, ["percentile"])
+        out["statistic"] = _first_column(df, ["computation"])
+        out["unit"] = _first_column(df, ["unit_of_measure"])
+    else:
+        out["site_no"] = _first_column(df, ["site_no"])
+        out["parameter_code"] = _first_column(df, ["parameter_cd"])
+        year = _first_column(df, ["year_nu"], default="")
+        month = _first_column(df, ["month_nu"], default="")
+        out["time_of_year"] = (
+            year.astype("string").fillna("")
+            + _join_month(month)
+        )
+        out["value"] = pd.to_numeric(_first_column(df, ["mean_va"]), errors="coerce")
+        out["percentile"] = pd.NA
+        out["statistic"] = "mean"
+        out["unit"] = pd.NA
+    out["parameter_name"] = out["parameter_code"].map(
+        lambda c: code_meta.get(str(c), ("", ""))[0]
+    )
+    return out.reset_index(drop=True)[STATS_COLUMNS]
+
+
+def _join_month(month: Any) -> Any:
+    """Render a legacy `month_nu` column as a `-MM` suffix (or empty)."""
+    if not isinstance(month, pd.Series):
+        return ""
+    return month.map(lambda m: f"-{int(m):02d}" if pd.notna(m) else "")
+
+
+def normalize_sites(df: pd.DataFrame, flavour: str) -> pd.DataFrame:
+    """Fold a site frame (modern monitoring-locations / legacy what_sites).
+
+    Args:
+        df: The site-metadata frame.
+        flavour: `"waterdata"` or `"nwis"`.
+
+    Returns:
+        pd.DataFrame: A frame with the :data:`SITE_COLUMNS`.
+    """
+    if df is None or df.empty:
+        return pd.DataFrame({column: [] for column in SITE_COLUMNS})
+    out = pd.DataFrame(index=df.index)
+    if flavour == "waterdata":
+        out["site_no"] = _first_column(
+            df, ["monitoring_location_id"]
+        ).map(_strip_site_prefix)
+        out["station_name"] = _first_column(df, ["monitoring_location_name"])
+        out["latitude"] = pd.to_numeric(
+            _first_column(df, ["dec_lat_va"]), errors="coerce"
+        )
+        out["longitude"] = pd.to_numeric(
+            _first_column(df, ["dec_long_va"]), errors="coerce"
+        )
+        out["huc"] = _first_column(df, ["hydrologic_unit_code"])
+        out["site_type"] = _first_column(df, ["site_type"])
+    else:
+        out["site_no"] = _first_column(df, ["site_no"])
+        out["station_name"] = _first_column(df, ["station_nm"])
+        out["latitude"] = pd.to_numeric(
+            _first_column(df, ["dec_lat_va"]), errors="coerce"
+        )
+        out["longitude"] = pd.to_numeric(
+            _first_column(df, ["dec_long_va"]), errors="coerce"
+        )
+        out["huc"] = _first_column(df, ["huc_cd"])
+        out["site_type"] = _first_column(df, ["site_tp_cd"])
+    return out.reset_index(drop=True)[SITE_COLUMNS]
+
+
+def normalize_peaks(df: pd.DataFrame, flavour: str) -> pd.DataFrame:
+    """Fold an annual-peak frame (modern get_peaks / legacy peaks) to long.
+
+    Args:
+        df: The peaks frame.
+        flavour: `"waterdata"` or `"nwis"`.
+
+    Returns:
+        pd.DataFrame: A frame with the :data:`PEAKS_COLUMNS`.
+    """
+    if df is None or df.empty:
+        return pd.DataFrame({column: [] for column in PEAKS_COLUMNS})
+    frame = df.reset_index()
+    out = pd.DataFrame(index=frame.index)
+    if flavour == "waterdata":
+        out["site_no"] = _first_column(frame, ["monitoring_location_id"]).map(
+            _strip_site_prefix
+        )
+        out["datetime"] = pd.to_datetime(
+            _first_column(frame, ["time"]), errors="coerce", utc=True
+        )
+        out["peak_value"] = pd.to_numeric(
+            _first_column(frame, ["value"]), errors="coerce"
+        )
+        out["gage_height"] = pd.NA
+        out["qualifier"] = _first_column(frame, ["qualifier"])
+    else:
+        out["site_no"] = _first_column(frame, ["site_no"])
+        out["datetime"] = pd.to_datetime(
+            _first_column(frame, ["datetime", "peak_dt"]), errors="coerce", utc=True
+        )
+        out["peak_value"] = pd.to_numeric(
+            _first_column(frame, ["peak_va"]), errors="coerce"
+        )
+        out["gage_height"] = pd.to_numeric(
+            _first_column(frame, ["gage_ht"]), errors="coerce"
+        )
+        out["qualifier"] = _first_column(frame, ["peak_cd"])
+    return out.reset_index(drop=True)[PEAKS_COLUMNS]
+
+
+def normalize_ratings(df: pd.DataFrame, flavour: str) -> pd.DataFrame:
+    """Fold a stage-discharge rating curve into `stage`/`discharge`/`storage`.
+
+    Args:
+        df: The ratings frame (legacy `INDEP`/`DEP`/`STOR`, or a modern
+            ratings frame with the same triple).
+        flavour: `"waterdata"` or `"nwis"`.
+
+    Returns:
+        pd.DataFrame: A frame with the :data:`RATINGS_COLUMNS`.
+    """
+    if df is None or df.empty:
+        return pd.DataFrame({column: [] for column in RATINGS_COLUMNS})
+    out = pd.DataFrame(index=df.index)
+    out["stage"] = pd.to_numeric(_first_column(df, ["INDEP", "stage"]), errors="coerce")
+    out["discharge"] = pd.to_numeric(
+        _first_column(df, ["DEP", "discharge"]), errors="coerce"
+    )
+    out["storage"] = pd.to_numeric(_first_column(df, ["STOR", "storage"]), errors="coerce")
+    return out.reset_index(drop=True)[RATINGS_COLUMNS]
 
 
 def empty_canonical() -> pd.DataFrame:
