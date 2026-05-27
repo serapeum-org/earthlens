@@ -29,10 +29,13 @@ Backends with no extra (CHC, GDACS, OpenAQ) need only the core install — they 
 | STAC — Planetary Computer / CDSE / Earth Search | `stac`, `cdse` | raster | per-endpoint (anonymous / MPC SAS / CDSE S3) | `stac` | [STAC](stac/introduction.md) |
 | NASA Earthdata (9 EOSDIS DAACs via `earthaccess`) | `earthdata` | per-dataset (raster / vector / tabular) | EDL login or bearer token | `earthdata` | [Earthdata](earthdata/introduction.md) |
 | openEO server-side processing (defaults to CDSE) | `openeo` | raster | CDSE OIDC (interactive or client-credentials) | `openeo` | [openEO](openeo/introduction.md) |
+| Humanitarian Data Exchange (UN OCHA, CKAN) | `hdx` | mixed | none (public) | `hdx` | [HDX](hdx/introduction.md) |
 
 `Output` is the backend's `OUTPUT_KIND` — `raster` writes GeoTIFF/COG/NetCDF, `vector` writes geometry tables
-(GeoJSON / GeoPackage), and `tabular` writes plain tables (CSV / Parquet). It also governs `aggregate=`: the
-temporal aggregator is accepted for `raster` backends and rejected for `vector` / `tabular` ones.
+(GeoJSON / GeoPackage), `tabular` writes plain tables (CSV / Parquet), and `mixed` (HDX) downloads each
+resource file as-is in whatever format it ships. It also governs `aggregate=`: the temporal aggregator is
+accepted for `raster` backends and rejected for `vector` / `tabular` ones; HDX (`mixed`) rejects it because
+resources are returned as-is.
 
 ## Planned providers (not yet integrated)
 
