@@ -25,6 +25,19 @@ are missing:
 conda install -c conda-forge eccodes libgdal-grib
 ```
 
+In the pixi workspace, `eccodes` is declared on the `nwp` feature (used by
+the `dev` / `notebook` environments), so `pixi run -e dev …` provides it
+automatically — the docs and per-Python test-matrix envs stay lean.
+
+!!! note "conda eccodes on Windows"
+    On Windows, conda installs the library as `Library\bin\eccodes.dll`,
+    but the pip `eccodes` binding's `findlibs` looks for `lib\libeccodes.dll`.
+    If `import herbie` still raises `Cannot find the ecCodes library` after
+    the conda install, copy (or symlink) the DLL to the name `findlibs`
+    expects: `copy Library\bin\eccodes.dll lib\libeccodes.dll` inside the
+    environment prefix. Linux / macOS resolve `lib/libeccodes.{so,dylib}`
+    automatically and need no such step.
+
 ## Curated models
 
 The **MVP 5** are live-validated end to end; the **expanded set** is

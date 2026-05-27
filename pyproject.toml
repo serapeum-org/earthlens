@@ -262,14 +262,6 @@ platforms = ["win-64", "linux-64", "osx-arm64"]
 [tool.pixi.system-requirements]
 libc = "2.39"
 
-[tool.pixi.dependencies]
-# eccodes C library (conda-forge): herbie-data's cfgrib import chain needs the
-# binary at runtime — the [nwp] extra's pip `eccodes` binding cannot locate the
-# lib on its own — so the NWP backend and its live example notebooks import and
-# run in every pixi env (and in CI's `notebooks` task), not just where a binary
-# happens to be installed.
-eccodes = ">=2.47,<3"
-
 [tool.pixi.pypi-dependencies]
 # Dev/test env pulls every backend's SDK (`[all]`) so the full suite runs.
 earthlens = { path = ".", editable = true, extras = ["all"] }
@@ -304,13 +296,22 @@ cz-bump = { cmd = "cz bump", description = "Bump version using Commitizen" }
 
 [tool.pixi.environments]
 default = { solve-group = "default" }
-dev = { features = ["dev"], solve-group = "default" }
+dev = { features = ["dev", "nwp"], solve-group = "default" }
 docs = { features = ["docs"], solve-group = "docs" }
 py311 = { features = ["py311", "dev"], solve-group = "py311" }
 py312 = { features = ["py312", "dev"], solve-group = "py312" }
 py313 = { features = ["py313", "dev"], solve-group = "py313" }
 py314 = { features = ["py314", "dev"], solve-group = "py314" }
-notebook = { features = ["dev", "notebook"], solve-group = "default" }
+notebook = { features = ["dev", "notebook", "nwp"], solve-group = "default" }
+
+# eccodes C library (conda-forge): herbie-data's cfgrib import chain needs the
+# binary at runtime (the [nwp] extra's pip `eccodes` binding cannot locate the
+# lib on its own). Scoped to this feature — included only by the `dev` and
+# `notebook` envs, where the NWP backend / live notebooks are exercised — so the
+# docs and per-Python test-matrix envs do not carry the GRIB/netCDF stack. CI's
+# unit suite fakes herbie, so the matrix envs never need the binary.
+[tool.pixi.feature.nwp.dependencies]
+eccodes = ">=2.47,<3"
 
 [tool.pixi.feature.py311.dependencies]
 python = "3.11.*"
