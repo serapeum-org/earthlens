@@ -686,7 +686,8 @@ class SentinelHub(AbstractDataSource):
             The S3 destination URIs, one per product.
 
         Raises:
-            ValueError: When no `batch_output` (S3 bucket) was supplied.
+            ValueError: When no `batch_output` (S3 bucket) was supplied, or the
+                analysed `cost_PU` exceeds `batch_output['max_cost_pu']`.
         """
         sentinelhub = import_sentinelhub()
         if not self._batch_output:
@@ -701,6 +702,7 @@ class SentinelHub(AbstractDataSource):
         grid_id = spec.pop("grid_id", 0)
         buffer_x = spec.pop("buffer_x", None)
         buffer_y = spec.pop("buffer_y", None)
+        max_cost_pu = spec.pop("max_cost_pu", None)
         url = spec.pop("bucket", None) or spec.pop("url", None)
         delivery = client.s3_specification(url=url, **spec)
         tiling = client.tiling_grid_input(
@@ -726,7 +728,24 @@ class SentinelHub(AbstractDataSource):
                 config=cfg,
             )
             batch_request = client.create(base, input=tiling, output=output)
+            # Analyse first so the tile count / cost is known before committing
+            # the (potentially continental, costly) job.
             client.start_analysis(batch_request)
+            batch_request = client.get_request(batch_request)
+            cost_pu = getattr(batch_request, "cost_PU", None)
+            logger.info(
+                f"Sentinel Hub batch: analysed {product.id!r} (cost_PU={cost_pu})"
+            )
+            if (
+                max_cost_pu is not None
+                and cost_pu is not None
+                and cost_pu > max_cost_pu
+            ):
+                raise ValueError(
+                    f"batch analysis estimates cost_PU={cost_pu} for {product.id!r}, "
+                    f"which exceeds batch_output['max_cost_pu']={max_cost_pu}; raise "
+                    "the limit or shrink the request/resolution."
+                )
             client.start_job(batch_request)
             sentinelhub.monitor_batch_process_job(batch_request, client)
             out.append(str(url))

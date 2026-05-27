@@ -312,8 +312,9 @@ class FakeSentinelHubStatistical:
 class FakeBatchProcessRequest:
     """Stand-in for `sentinelhub.BatchProcessRequest`."""
 
-    def __init__(self) -> None:
+    def __init__(self, cost_pu: float = 5.0) -> None:
         self.completion_percentage = 100.0
+        self.cost_PU = cost_pu
 
 
 class FakeBatchProcessClient:
@@ -341,11 +342,18 @@ class FakeBatchProcessClient:
         """Record a raster-output spec."""
         return {"delivery": delivery, **kwargs}
 
+    #: cost_PU the analysed request reports back (overridable per test).
+    cost_pu = 5.0
+
     def create(self, process_request: Any, input: Any, output: Any, **kwargs: Any):
         """Record batch-request creation and return a fake request."""
         self.calls.append("create")
         self.created = {"input": input, "output": output}
-        return FakeBatchProcessRequest()
+        return FakeBatchProcessRequest(cost_pu=type(self).cost_pu)
+
+    def get_request(self, batch_request: Any):
+        """Return the (analysed) request; a read, not a lifecycle step."""
+        return batch_request
 
     def start_analysis(self, batch_request: Any):
         """Record the analysis step."""

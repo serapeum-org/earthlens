@@ -56,6 +56,20 @@ class TestBatchFetch:
         assert delivery["url"] == "s3://bkt/out"
         assert delivery["iam_role_arn"] == "arn:aws:iam::1:role/r"
 
+    def test_max_cost_pu_guard(self, fake_sh, output_dir: Path):
+        """An analysed cost_PU above batch_output['max_cost_pu'] aborts before start_job."""
+        # the fake reports cost_PU=5.0; cap below that to trip the guard
+        backend = _batch_backend(output_dir, batch_output={**_S3, "max_cost_pu": 1.0})
+        with pytest.raises(ValueError, match="exceeds batch_output"):
+            backend.download()
+        client = fake_sh.BatchProcessClient.instances[-1]
+        assert "start_job" not in client.calls  # aborted after analysis
+
+    def test_under_cost_cap_runs(self, fake_sh, output_dir: Path):
+        """A cost cap above the estimate lets the job proceed."""
+        backend = _batch_backend(output_dir, batch_output={**_S3, "max_cost_pu": 100.0})
+        assert backend.download() == ["s3://bkt/out"]
+
     def test_auto_routes_to_batch_with_s3(self, fake_sh, output_dir: Path):
         """A huge AOI with an S3 bucket auto-routes to Batch."""
         backend = SentinelHub(
