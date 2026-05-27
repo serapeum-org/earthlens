@@ -50,6 +50,8 @@ from earthlens.base import (
 from earthlens.overture.catalog import Catalog, Theme
 
 if TYPE_CHECKING:
+    from pyramids.feature.collection import FeatureCollection
+
     from earthlens.aggregate import AggregationConfig
 
 FileFormat = Literal["geoparquet", "gpkg", "geojson"]
@@ -252,8 +254,8 @@ class Overture(AbstractDataSource):
             dates=pd.DatetimeIndex([]),
         )
 
-    def _resolve_plan(self) -> list[tuple[Theme, str]]:
-        """Resolve `variables` into the concrete `(Theme, type)` fetches.
+    def _resolve_plan(self) -> list[tuple[str, Theme, str]]:
+        """Resolve `variables` into the concrete `(theme_name, Theme, type)` fetches.
 
         Each `variables` theme is looked up in the bundled catalog
         (raising with a did-you-mean hint on an unknown theme) and its
@@ -261,17 +263,17 @@ class Overture(AbstractDataSource):
         unknown type, defaulting to the theme's primary type when empty).
 
         Returns:
-            list[tuple[Theme, str]]: One `(theme, type)` pair per type to
-                fetch, in `variables` order.
+            list[tuple[str, Theme, str]]: One `(theme_name, theme, type)`
+                triple per type to fetch, in `variables` order.
 
         Raises:
             ValueError: If a theme name or a requested type is unknown.
         """
-        plan: list[tuple[Theme, str]] = []
+        plan: list[tuple[str, Theme, str]] = []
         for name, requested in self.vars.items():
             theme = self._catalog.get_theme(name)
             for overture_type in theme.resolve_types(requested):
-                plan.append((theme, overture_type))
+                plan.append((name, theme, overture_type))
         return plan
 
     def _guard_bbox(self, theme_names: list[str]) -> None:
@@ -331,30 +333,90 @@ class Overture(AbstractDataSource):
         self._guard_bbox(list(self.vars))
         return [
             RemoteProduct(
-                id=f"{overture_type}",
-                metadata={"theme": theme, "type": overture_type},
+                id=f"{theme_name}/{overture_type}",
+                metadata={
+                    "theme_name": theme_name,
+                    "theme": theme,
+                    "type": overture_type,
+                },
             )
-            for theme, overture_type in plan
+            for theme_name, theme, overture_type in plan
         ]
 
     def _fetch(self, products: list[RemoteProduct]) -> list[Path]:
         """Pull each planned type's GeoParquet and write a FeatureCollection.
 
-        Implemented in C3.
+        For every product, calls the `overturemaps` SDK's
+        `geodataframe(<type>, bbox=, release=)` (bbox pushdown via PyArrow
+        parquet statistics), tags the result `EPSG:4326`, adds the per-row
+        `license_id` column, warns when ODbL-1.0 rows are present, and
+        writes one vector file under `path`. The SDK's unit is the Overture
+        *type* (passed positionally) — there is no `theme=` kwarg.
 
         Args:
             products: The products returned by `_search`.
 
         Returns:
-            list[Path]: The written vector file paths.
-
-        Raises:
-            NotImplementedError: Until C3 wires the fetch path.
+            list[Path]: The written vector file paths, in product order.
         """
-        raise NotImplementedError(
-            "Overture._fetch is implemented in C3 (overturemaps fetch -> "
-            "license_id -> FeatureCollection)."
+        from overturemaps.core import geodataframe
+
+        from earthlens.overture.collection import to_feature_collection
+
+        bbox = (
+            self.space.west,
+            self.space.south,
+            self.space.east,
+            self.space.north,
         )
+        written: list[Path] = []
+        for product in products:
+            theme_name = product.metadata["theme_name"]
+            overture_type = product.metadata["type"]
+            label = product.id
+            logger.info(
+                f"Fetching Overture {overture_type!r} (theme {theme_name!r}) "
+                f"for bbox {bbox} (release={self._release or 'latest'})"
+            )
+            gdf = geodataframe(overture_type, bbox=bbox, release=self._release)
+            collection = to_feature_collection(
+                gdf, label=label, max_features=self._max_features
+            )
+            out_path = self._write(collection, theme_name, overture_type)
+            logger.info(f"{label}: wrote {len(collection)} feature(s) to {out_path}")
+            written.append(out_path)
+        return written
+
+    def _write(
+        self,
+        collection: FeatureCollection,
+        theme_name: str,
+        overture_type: str,
+    ) -> Path:
+        """Write one type's FeatureCollection to a vector file under `root_dir`.
+
+        The filename embeds the theme, type, and release
+        (`overture_<theme>_<type>_<release>.<ext>`) so successive
+        downloads land in distinct files. GeoParquet (the default) is
+        written with `to_parquet` to preserve Overture's nested schema;
+        GPKG / GeoJSON go through `to_file`.
+
+        Args:
+            collection: The features to write.
+            theme_name: Friendly theme name (for the filename).
+            overture_type: Overture feature type (for the filename).
+
+        Returns:
+            Path: Absolute path of the file written.
+        """
+        driver, ext = _FORMATS[self._file_format]
+        stem = f"overture_{theme_name}_{overture_type}_{self._release or 'latest'}"
+        out_path = self.root_dir / f"{stem}.{ext}"
+        if driver == "parquet":
+            collection.to_parquet(str(out_path))
+        else:
+            collection.to_file(str(out_path), driver=driver)
+        return out_path
 
     def _api(self) -> list[Path]:
         """Compose `_search` and `_fetch` into the canonical C3 shape."""

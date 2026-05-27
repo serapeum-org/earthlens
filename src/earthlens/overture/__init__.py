@@ -59,12 +59,18 @@ Examples:
 
 from __future__ import annotations
 
+from earthlens.overture._helpers import LicenseWarning, row_license
 from earthlens.overture.backend import Overture
 from earthlens.overture.catalog import CATALOG_PATH, Catalog, Theme
+from earthlens.overture.collection import empty_fc, to_feature_collection
 
 __all__ = [
     "CATALOG_PATH",
     "Catalog",
+    "LicenseWarning",
     "Overture",
     "Theme",
+    "empty_fc",
+    "row_license",
+    "to_feature_collection",
 ]
