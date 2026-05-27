@@ -137,8 +137,8 @@ class EarthLens:
             >>> sorted(EarthLens.DataSources)  # doctest: +NORMALIZE_WHITESPACE
             ['amazon-s3', 'cdse', 'chc', 'chirps', 'cmems', 'earth-search',
              'earthdata', 'ecmwf', 'eumetsat', 'fdsn', 'firms', 'gdacs', 'gee',
-             'google-earth-engine', 'openaq', 'openeo', 'planetary-computer',
-             'stac', 'tropycal']
+             'google-earth-engine', 'nexrad', 'nwp', 'openaq', 'openeo',
+             'planetary-computer', 'radar', 'stac', 'tropycal']
 
             ```
         - Asking for an unknown backend raises `ValueError`:
@@ -184,6 +184,13 @@ class EarthLens:
         :class:`earthlens.firms.FIRMS`: NASA FIRMS active-fire
             detections (MODIS / VIIRS) as a `vector` FeatureCollection;
             free `MAP_KEY`, no extra; key `"firms"`.
+        :class:`earthlens.nwp.NWP`: open numerical-weather-prediction
+            forecasts (NOAA NODD / ECMWF Open Data / DWD) on a forecast
+            `(cycle, step)` axis, returned as bbox-cropped COGs; key
+            `"nwp"`.
+        :class:`earthlens.radar.Radar`: NEXRAD Level-II radar volumes
+            assembled from the real-time chunk feed (`vector` inventory);
+            keys `"radar"` / `"nexrad"`.
     """
 
     DataSources = _LazyRegistry(
@@ -212,6 +219,12 @@ class EarthLens:
             # FIRMS needs a free MAP_KEY but no SDK (requests + pandas
             # are core), so like GDACS there is no extra to hint.
             "firms": ("earthlens.firms", "FIRMS", "", {}),
+            # Open NWP forecasts (NOAA NODD / ECMWF Open Data / DWD); the
+            # [nwp] extra pulls herbie-data + ecmwf-opendata.
+            "nwp": ("earthlens.nwp", "NWP", "nwp", {}),
+            # NEXRAD Level-II radar (anonymous chunk bucket); alias "nexrad".
+            "radar": ("earthlens.radar", "Radar", "radar", {}),
+            "nexrad": ("earthlens.radar", "Radar", "radar", {}),
             # One unified STAC backend over several endpoints. The bare
             # `"stac"` key leaves the endpoint to be inferred from the
             # requested collection; the three endpoint aliases pre-bind

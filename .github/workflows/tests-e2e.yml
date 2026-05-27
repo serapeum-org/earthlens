@@ -44,7 +44,7 @@ jobs:
           CDSAPI_URL: ${{ secrets.CDSAPI_URL }}
           CDSAPI_KEY: ${{ secrets.CDSAPI_KEY }}
         run: |
-          pixi run -e py312 pytest -m "e2e and not gee and not stac" -v
+          pixi run -e py312 pytest -m "e2e and not gee and not stac and not nwp" -v
 
   e2e-gee:
     runs-on: ubuntu-latest
@@ -151,3 +151,28 @@ jobs:
           CDSE_S3_SECRET_KEY: ${{ secrets.CDSE_S3_SECRET_KEY }}
         run: |
           pixi run -e py312 pytest -m "stac and e2e" -v
+
+  e2e-nwp:
+    runs-on: ubuntu-latest
+    if: github.repository == 'serapeum-org/earthlens'
+
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: serapeum-org/github-actions/actions/python-setup/pixi@pixi/v1
+        with:
+          environments: dev
+          activate-environment: dev
+          cache: true
+
+      - name: Run live NWP e2e tests
+        # The `dev` env carries the eccodes binary (the `nwp` pixi feature), so
+        # the Herbie-fetched models (GFS / NODD) import and download live here —
+        # the py312 lanes lack eccodes and would skip them. NODD / DWD / ECMWF
+        # Open Data are anonymous (no secrets); the suite skips anything that is
+        # transiently unavailable.
+        run: |
+          pixi run -e dev pytest -m "e2e and nwp" -v
