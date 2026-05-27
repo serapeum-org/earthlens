@@ -44,7 +44,7 @@ jobs:
           CDSAPI_URL: ${{ secrets.CDSAPI_URL }}
           CDSAPI_KEY: ${{ secrets.CDSAPI_KEY }}
         run: |
-          pixi run -e py312 pytest -m "e2e and not gee and not stac" -v
+          pixi run -e py312 pytest -m "e2e and not gee and not stac and not sentinel_hub" -v
 
   e2e-gee:
     runs-on: ubuntu-latest
@@ -151,3 +151,29 @@ jobs:
           CDSE_S3_SECRET_KEY: ${{ secrets.CDSE_S3_SECRET_KEY }}
         run: |
           pixi run -e py312 pytest -m "stac and e2e" -v
+
+  e2e-sentinel-hub:
+    runs-on: ubuntu-latest
+    if: github.repository == 'serapeum-org/earthlens'
+
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: serapeum-org/github-actions/actions/python-setup/pixi@pixi/v1
+        with:
+          environments: py312
+          activate-environment: py312
+          cache: true
+
+      - name: Run live Sentinel Hub e2e tests
+        # The Sentinel Hub e2e tests skip themselves when these are unset, so
+        # this job is harmless if the secrets are not configured yet. Batch /
+        # Batch-Statistical are not exercised live (they need a user S3 bucket).
+        env:
+          SH_CLIENT_ID: ${{ secrets.SH_CLIENT_ID }}
+          SH_CLIENT_SECRET: ${{ secrets.SH_CLIENT_SECRET }}
+        run: |
+          pixi run -e py312 pytest -m "sentinel_hub and e2e" -v
