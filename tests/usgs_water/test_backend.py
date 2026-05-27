@@ -257,15 +257,29 @@ def test_gwlevels_routes_through_daily(fake_usgs, usgs_kwargs):
 def test_peaks_requires_sites(fake_usgs, usgs_kwargs):
     """The site-keyed peaks service errors without sites=."""
     backend = USGSWater(**usgs_kwargs(service="peaks"))
-    with pytest.raises(ValueError, match="keyed by site"):
+    with pytest.raises(ValueError, match="requires an explicit sites"):
         backend.download(progress_bar=False)
 
 
 def test_ratings_requires_sites(fake_usgs, usgs_kwargs):
     """The site-keyed ratings service errors without sites=."""
     backend = USGSWater(**usgs_kwargs(service="ratings"))
-    with pytest.raises(ValueError, match="keyed by site"):
+    with pytest.raises(ValueError, match="requires an explicit sites"):
         backend.download(progress_bar=False)
+
+
+def test_statistics_requires_sites(fake_usgs, usgs_kwargs):
+    """Statistics errors without sites= (no bbox filter on either endpoint)."""
+    backend = USGSWater(**usgs_kwargs(service="statistics"))
+    with pytest.raises(ValueError, match="requires an explicit sites"):
+        backend.download(progress_bar=False)
+
+
+def test_statistics_still_resolves_codes(usgs_kwargs):
+    """Statistics keeps parameter codes (not site-keyed), unlike peaks/ratings."""
+    backend = USGSWater(**usgs_kwargs(service="statistics", sites="01646500"))
+    products = backend._search()
+    assert products[0].metadata["codes"] == ["00060"]
 
 
 def test_peaks_legacy_normalizes(fake_usgs, usgs_kwargs):

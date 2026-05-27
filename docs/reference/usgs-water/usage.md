@@ -94,6 +94,11 @@ facade rejects `aggregate=` for tabular backends). Columns: `site_no,
 parameter_code, parameter_name, time_of_year, value, percentile, statistic,
 unit`.
 
+**`statistics` requires an explicit `sites=`** — neither the modern
+`get_stats_date_range` nor the legacy `get_stats` accepts a bounding box, so a
+bbox-only statistics request has no spatial filter and is rejected with a clear
+error. Discover the sites first with `service="sites"` if you only have a bbox.
+
 ```python
 EarthLens(data_source="usgs-water", service="statistics",
           variables=["discharge"], sites="01646500",

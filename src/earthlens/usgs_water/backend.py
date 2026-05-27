@@ -84,6 +84,14 @@ OUTPUT_FORMATS: tuple[str, ...] = ("csv", "parquet")
 #: ignore `variables` and require an explicit `sites=`.
 _SITE_KEYED_SERVICES: frozenset[str] = frozenset({"peaks", "ratings"})
 
+#: Services that require an explicit `sites=` because neither endpoint
+#: offers a spatial (bbox) filter for them. The site-keyed services
+#: above plus `statistics` (the `get_stats_date_range` / `get_stats`
+#: functions take a site, not a bbox, so a bbox-only statistics request
+#: would be spatially unbounded). `statistics` still uses `variables`
+#: (parameter codes), so it is not in :data:`_SITE_KEYED_SERVICES`.
+_SITES_REQUIRED_SERVICES: frozenset[str] = _SITE_KEYED_SERVICES | {"statistics"}
+
 #: Default parameter code when `variables` is empty — discharge (cfs).
 _DEFAULT_CODES: list[str] = ["00060"]
 
@@ -399,11 +407,16 @@ class USGSWater(AbstractDataSource):
         Returns:
             list[RemoteProduct]: One product whose `metadata` holds the
                 resolved `codes` and the explicit `sites` (or `None`).
+
+        Raises:
+            ValueError: When the service requires an explicit `sites=`
+                (no bbox filter is available for it) but none was given.
         """
-        if self._service in _SITE_KEYED_SERVICES and not self._sites:
+        if self._service in _SITES_REQUIRED_SERVICES and not self._sites:
             raise ValueError(
-                f"service={self._service!r} is keyed by site, not parameter "
-                f"code; pass sites=[...] (e.g. sites='01646500')."
+                f"service={self._service!r} requires an explicit sites= "
+                f"(no spatial bbox filter is available for it); pass "
+                f"sites=[...] (e.g. sites='01646500')."
             )
         codes = [] if self._service in _SITE_KEYED_SERVICES else self._resolved_codes()
         return [

@@ -183,7 +183,11 @@ include = ["earthlens", "earthlens.*"]
 "earthlens.overture" = ["*.yaml"]
 "earthlens.nwp" = ["*.yaml"]
 "earthlens.radar" = ["*.yaml"]
-"earthlens.usgs_water" = ["*.yaml"]
+# Ship only the curated catalog; the informational available_parameters.yaml
+# (~1.5 MB, ~19.7k codes) is a repo/tooling + docs artefact that nothing loads
+# at runtime (the Catalog reads only the curated file; raw codes pass through
+# variables= without it), so it is deliberately excluded from the wheel.
+"earthlens.usgs_water" = ["usgs_water_data_catalog.yaml"]
 
 [tool.flake8]
 ignore = ["E203", "E266", "E501", "W503", "E722", "C901", "E741", "E731"]
