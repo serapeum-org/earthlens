@@ -100,14 +100,37 @@ See the [Evalscript V3 reference](https://docs.sentinel-hub.com/api/latest/evals
 
 ## Catalog tooling
 
-`tools/sentinel_hub/refresh_sh_catalog.py` maintains the catalog:
+Three CLIs under `tools/sentinel_hub/` maintain and inspect the catalog (the
+same trio as the GEE / openEO backends):
+
+**`refresh_sh_catalog.py`** — rebuild the `available_collections` index and
+validate recipes:
 
 ```bash
-# rebuild available_collections from the live Catalog API (needs SH_CLIENT_ID/SECRET)
+# rebuild the index offline from the sentinelhub DataCollection enum (no creds)
+python tools/sentinel_hub/refresh_sh_catalog.py refresh --from-sdk
+# or from the live Catalog API (needs SH_CLIENT_ID / SH_CLIENT_SECRET)
 python tools/sentinel_hub/refresh_sh_catalog.py refresh
-python tools/sentinel_hub/refresh_sh_catalog.py refresh --dry-run
+python tools/sentinel_hub/refresh_sh_catalog.py refresh --from-sdk --dry-run
 
 # validate a recipe (its .js exists, is //VERSION=3, stats recipes carry dataMask)
 python tools/sentinel_hub/refresh_sh_catalog.py validate-recipe sentinel-2-l2a-ndvi
 python tools/sentinel_hub/refresh_sh_catalog.py validate-all
+```
+
+**`audit_sh_datasets.py`** — flag drift between the curated catalog and the SDK
+(curated collections / recipe base collections not in the `DataCollection`
+enum, recipe evalscript problems, and untracked enum members); offline:
+
+```bash
+python tools/sentinel_hub/audit_sh_datasets.py audit
+python tools/sentinel_hub/audit_sh_datasets.py audit --strict   # exit 1 on drift
+```
+
+**`probe_sh_collection.py`** — inspect a curated key or a raw `DataCollection`
+member when curating a new collection row; `--yaml` emits a paste-ready stanza:
+
+```bash
+python tools/sentinel_hub/probe_sh_collection.py sentinel-2-l2a
+python tools/sentinel_hub/probe_sh_collection.py SENTINEL3_SLSTR --yaml
 ```

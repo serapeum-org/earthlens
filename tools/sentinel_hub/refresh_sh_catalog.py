@@ -37,27 +37,45 @@ import yaml
 CATALOG_INDEX_PATH = Path("src/earthlens/sentinel_hub/catalog/_index.yaml")
 
 
-def _refresh(args: argparse.Namespace) -> int:
-    """Rebuild `available_collections:` from the live Catalog API.
+def _collection_ids(from_sdk: bool, endpoint: str | None) -> tuple[list[str], str]:
+    """Resolve the available-collection ids + a provenance label.
 
     Args:
-        args: Parsed CLI arguments (`endpoint`, `dry_run`).
+        from_sdk: When `True`, enumerate the `sentinelhub.DataCollection` enum
+            **offline** (no credentials). Otherwise query the live Catalog API.
+        endpoint: Endpoint alias / URL for the live query (ignored offline).
+
+    Returns:
+        `(sorted_ids, source_label)`.
+    """
+    from earthlens.sentinel_hub._helpers import import_sentinelhub
+
+    sentinelhub = import_sentinelhub()
+    if from_sdk:
+        ids = sorted(member.name for member in sentinelhub.DataCollection)
+        return ids, "the sentinelhub DataCollection enum (offline)"
+    from earthlens.sentinel_hub.auth import SentinelHubAuth
+
+    config = SentinelHubAuth(endpoint=endpoint).config()
+    catalog = sentinelhub.SentinelHubCatalog(config=config)
+    ids = sorted({c.get("id") for c in catalog.get_collections() if c.get("id")})
+    return ids, "the live Catalog API"
+
+
+def _refresh(args: argparse.Namespace) -> int:
+    """Rebuild `available_collections:` from the SDK enum or the live Catalog API.
+
+    Args:
+        args: Parsed CLI arguments (`endpoint`, `dry_run`, `from_sdk`).
 
     Returns:
         Process exit code (0 success, 1 on error).
     """
-    from earthlens.sentinel_hub._helpers import import_sentinelhub
-    from earthlens.sentinel_hub.auth import SentinelHubAuth
-
-    sentinelhub = import_sentinelhub()
-    config = SentinelHubAuth(endpoint=args.endpoint).config()
-    catalog = sentinelhub.SentinelHubCatalog(config=config)
-    collections = catalog.get_collections()
-    ids = sorted({c.get("id") for c in collections if c.get("id")})
+    ids, source = _collection_ids(args.from_sdk, args.endpoint)
     text = (
         "# Informational index of the Sentinel Hub data collections the backend\n"
-        "# can render. Rebuilt by tools/sentinel_hub/refresh_sh_catalog.py from\n"
-        f"# the live Catalog API on {dt.date.today().isoformat()}.\n"
+        "# can address. Rebuilt by tools/sentinel_hub/refresh_sh_catalog.py from\n"
+        f"# {source} on {dt.date.today().isoformat()}.\n"
         + yaml.safe_dump({"available_collections": ids}, sort_keys=False)
     )
     if args.dry_run:
@@ -154,6 +172,11 @@ def build_parser() -> argparse.ArgumentParser:
     refresh.add_argument("--endpoint", default=None, help="endpoint alias or base URL")
     refresh.add_argument(
         "--dry-run", action="store_true", help="print instead of writing"
+    )
+    refresh.add_argument(
+        "--from-sdk",
+        action="store_true",
+        help="enumerate the DataCollection enum offline (no credentials)",
     )
     refresh.set_defaults(func=_refresh)
 

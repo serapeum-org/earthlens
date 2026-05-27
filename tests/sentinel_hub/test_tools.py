@@ -10,6 +10,8 @@ import pytest
 _TOOLS_DIR = Path(__file__).resolve().parents[2] / "tools" / "sentinel_hub"
 sys.path.insert(0, str(_TOOLS_DIR))
 
+import audit_sh_datasets as audit  # noqa: E402
+import probe_sh_collection as probe  # noqa: E402
 import refresh_sh_catalog as refresh  # noqa: E402
 
 pytestmark = pytest.mark.sentinel_hub
@@ -50,3 +52,41 @@ class TestRefresh:
         out = capsys.readouterr().out
         assert "available_collections:" in out
         assert "sentinel-2-l2a" in out
+
+    def test_from_sdk_offline(self, capsys):
+        """`refresh --from-sdk --dry-run` enumerates the real enum, no credentials."""
+        assert refresh.main(["refresh", "--from-sdk", "--dry-run"]) == 0
+        out = capsys.readouterr().out
+        assert "SENTINEL2_L2A" in out
+        assert "offline" in out
+
+
+class TestAudit:
+    """`audit` flags curated-vs-SDK drift (against the real DataCollection enum)."""
+
+    def test_audit_clean(self):
+        """The bundled catalog has no hard drift against the SDK enum."""
+        assert audit.main(["audit", "--strict"]) == 0
+
+
+class TestProbe:
+    """`probe` reports curated + enum membership (against the real enum)."""
+
+    def test_probe_curated_key(self, capsys):
+        """Probing a curated key prints its binding + bands."""
+        assert probe.main(["sentinel-2-l2a"]) == 0
+        assert "SENTINEL2_L2A" in capsys.readouterr().out
+
+    def test_probe_yaml_stanza(self, capsys):
+        """`--yaml` emits a collections.yaml stanza."""
+        assert probe.main(["sentinel-2-l2a", "--yaml"]) == 0
+        assert "collections:" in capsys.readouterr().out
+
+    def test_probe_uncurated_enum_member(self, capsys):
+        """An enum member that is not curated is reported, exit 0."""
+        assert probe.main(["LANDSAT_OT_L2"]) == 0
+        assert "not yet curated" in capsys.readouterr().out
+
+    def test_probe_unknown_name(self):
+        """A name that is neither curated nor an enum member exits 1."""
+        assert probe.main(["totally-bogus"]) == 1
