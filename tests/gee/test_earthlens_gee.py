@@ -80,6 +80,8 @@ class TestRegistry:
             "gdacs",
             "gee",
             "google-earth-engine",
+            "national-water-model",
+            "nwm",
             "openaq",
             "openeo",
             "planetary-computer",

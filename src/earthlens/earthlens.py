@@ -137,8 +137,8 @@ class EarthLens:
             >>> sorted(EarthLens.DataSources)  # doctest: +NORMALIZE_WHITESPACE
             ['amazon-s3', 'cdse', 'chc', 'chirps', 'cmems', 'earth-search',
              'earthdata', 'ecmwf', 'eumetsat', 'fdsn', 'firms', 'gdacs', 'gee',
-             'google-earth-engine', 'openaq', 'openeo', 'planetary-computer',
-             'stac', 'tropycal']
+             'google-earth-engine', 'national-water-model', 'nwm', 'openaq',
+             'openeo', 'planetary-computer', 'stac', 'tropycal']
 
             ```
         - Asking for an unknown backend raises `ValueError`:
@@ -184,6 +184,12 @@ class EarthLens:
         :class:`earthlens.firms.FIRMS`: NASA FIRMS active-fire
             detections (MODIS / VIIRS) as a `vector` FeatureCollection;
             free `MAP_KEY`, no extra; key `"firms"`.
+        :class:`earthlens.nwm.NWM`: NOAA National Water Model hydrologic
+            output — per-reach streamflow (`chrtout`, `tabular`) and
+            gridded land surface (`ldasout`, `raster`) — fetched whole
+            from the anonymous `noaa-nwm-pds` bucket; subsetting and the
+            retrospective Zarr are `PY-G`-gated. Keys `"nwm"` /
+            `"national-water-model"`.
     """
 
     DataSources = _LazyRegistry(
@@ -212,6 +218,10 @@ class EarthLens:
             # FIRMS needs a free MAP_KEY but no SDK (requests + pandas
             # are core), so like GDACS there is no extra to hint.
             "firms": ("earthlens.firms", "FIRMS", "", {}),
+            # NOAA National Water Model (anonymous noaa-nwm-pds bucket); the
+            # [nwm] extra pulls boto3. Alias "national-water-model".
+            "nwm": ("earthlens.nwm", "NWM", "nwm", {}),
+            "national-water-model": ("earthlens.nwm", "NWM", "nwm", {}),
             # One unified STAC backend over several endpoints. The bare
             # `"stac"` key leaves the endpoint to be inferred from the
             # requested collection; the three endpoint aliases pre-bind
