@@ -5,7 +5,7 @@ from __future__ import annotations
 import pytest
 
 from earthlens.overture._helpers import CDLA_PERMISSIVE, ODBL, LicenseWarning
-from earthlens.overture.collection import empty_fc, to_feature_collection
+from earthlens.overture.collection import DEFAULT_LICENSE, empty_fc, to_feature_collection
 
 from .conftest import OSM_SOURCES, PERMISSIVE_SOURCES
 
@@ -64,6 +64,12 @@ class TestToFeatureCollection:
         fc = to_feature_collection(None, label="places/place")
         assert len(fc) == 0
 
+    def test_does_not_mutate_input_frame(self, make_gdf):
+        """The input gdf is not mutated (no `license_id` leaks back onto it)."""
+        gdf = make_gdf([PERMISSIVE_SOURCES])
+        to_feature_collection(gdf, label="places/place")
+        assert "license_id" not in gdf.columns
+
 
 @pytest.mark.overture
 class TestEmptyFc:
@@ -76,3 +82,7 @@ class TestEmptyFc:
         assert {"id", "license_id"}.issubset(fc.columns)
         assert "geometry" in fc.columns
         assert fc.crs.to_epsg() == 4326
+
+    def test_default_license_constant(self):
+        """`DEFAULT_LICENSE` re-exports the CDLA-Permissive fallback."""
+        assert DEFAULT_LICENSE == CDLA_PERMISSIVE

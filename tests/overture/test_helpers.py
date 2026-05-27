@@ -56,6 +56,10 @@ class TestRowLicense:
         """No explicit license and not OSM falls back to CDLA-Permissive."""
         assert row_license([{"dataset": "Overture"}]) == CDLA_PERMISSIVE
 
+    def test_empty_string_license_is_ignored(self):
+        """An empty-string `license` is treated as absent (falls back to CDLA)."""
+        assert row_license([{"dataset": "Overture", "license": ""}]) == CDLA_PERMISSIVE
+
     @pytest.mark.parametrize("empty", [None, [], np.nan, 123, "no-structs"])
     def test_empty_or_missing_sources_default_cdla(self, empty):
         """None / empty / NaN / non-iterable / struct-less sources default to CDLA."""

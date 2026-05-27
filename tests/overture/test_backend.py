@@ -66,6 +66,18 @@ class TestOvertureConstruction:
         assert backend.time.start_date is None
         assert backend.time.end_date is None
 
+    def test_only_start_supplied(self, tmp_path: Path):
+        """A start with no end parses start and leaves end None."""
+        backend = _make_backend(tmp_path, start="2026-01-01")
+        assert backend.time.start_date is not None
+        assert backend.time.end_date is None
+
+    def test_only_end_supplied(self, tmp_path: Path):
+        """An end with no start parses end and leaves start None."""
+        backend = _make_backend(tmp_path, end="2026-02-01")
+        assert backend.time.start_date is None
+        assert backend.time.end_date is not None
+
     def test_variables_list_rejected(self, tmp_path: Path):
         """A list `variables` (the GDACS shape) is a TypeError here."""
         with pytest.raises(TypeError, match=r"mapping of theme"):
@@ -344,6 +356,21 @@ class TestFetchAndDownload:
         backend = _make_backend(tmp_path)
         with pytest.raises(NotImplementedError, match=r"aggregate"):
             backend.download(aggregate=object())
+
+    def test_multiple_types_write_multiple_paths(self, tmp_path: Path, fake_overture):
+        """A two-type request writes one file per type, in order."""
+        backend = _make_backend(
+            tmp_path,
+            variables={"transportation": ["segment", "connector"]},
+            lat_lim=[40.757, 40.759],
+            lon_lim=[-73.987, -73.984],
+        )
+        paths = backend.download()
+        assert len(paths) == 2
+        assert [p.name for p in paths] == [
+            "overture_transportation_segment_latest.parquet",
+            "overture_transportation_connector_latest.parquet",
+        ]
 
     def test_api_returns_written_paths(self, tmp_path: Path, fake_overture):
         """`_api` returns the list of written paths via the search/fetch split."""

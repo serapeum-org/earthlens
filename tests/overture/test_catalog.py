@@ -99,6 +99,17 @@ class TestCatalog:
         assert cat["places"].default_type == "place"
         assert len(cat) == 6
 
+    def test_iter_yields_theme_keys(self):
+        """Iterating the catalog yields its curated theme names."""
+        assert set(Catalog()) == {
+            "addresses",
+            "base",
+            "buildings",
+            "divisions",
+            "places",
+            "transportation",
+        }
+
     def test_curated_themes_have_licenses(self):
         """Every curated theme lists ODbL among its licenses."""
         cat = Catalog()
