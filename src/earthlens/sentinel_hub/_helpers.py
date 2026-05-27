@@ -18,19 +18,27 @@ from __future__ import annotations
 from typing import Any
 
 #: The request planes the backend dispatches on (the `api=` kwarg). `None`
-#: selects a plane automatically from the request size + whether a `geometry=`
-#: was supplied (see `earthlens.sentinel_hub.backend`).
+#: selects a plane automatically from the request size, whether a `geometry=`
+#: was supplied, and whether an S3 `batch_output` is configured (see
+#: `earthlens.sentinel_hub.backend`). `"tiling"` is the local-mosaic strategy
+#: (split into ≤2500 px Process tiles + merge) — the medium/large-AOI path that
+#: needs no S3 bucket; `"async"` / `"batch"` deliver server-side to S3 (the SDK's
+#: `AsyncProcessRequest` / `BatchProcessClient` both require an S3 delivery).
 VALID_APIS: tuple[str, ...] = (
     "process",
     "async",
+    "tiling",
     "batch",
     "statistical",
     "batch-statistical",
 )
 
-#: The raster planes (emit GeoTIFFs); the tabular planes emit a table.
-RASTER_APIS: frozenset[str] = frozenset({"process", "async", "batch"})
+#: The raster planes (emit GeoTIFFs / S3 rasters); the tabular planes emit a table.
+RASTER_APIS: frozenset[str] = frozenset({"process", "async", "tiling", "batch"})
 TABULAR_APIS: frozenset[str] = frozenset({"statistical", "batch-statistical"})
+
+#: The planes that deliver server-side to an S3 bucket (need `batch_output`).
+S3_APIS: frozenset[str] = frozenset({"async", "batch", "batch-statistical"})
 
 #: Named Sentinel Hub deployments. Keys are the `endpoint=` aliases; values are
 #: `(sh_base_url, sh_token_url)` verified against the live services (A1). The

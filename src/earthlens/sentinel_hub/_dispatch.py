@@ -9,8 +9,10 @@ was supplied; these functions return the plane name (one of
 The auto-routing rule (`G4` / `G5`), when `api=` is omitted:
 
 * a `geometry=` request → `"statistical"` (zonal stats over the polygon);
-* otherwise a raster render routed by size: `≤ SH_MAX_DIMENSION` → `"process"`,
-  `≤ ASYNC_MAX_DIMENSION` → `"async"`, larger → `"batch"`.
+* otherwise a raster render routed by size: `≤ SH_MAX_DIMENSION` → `"process"`;
+  larger → `"async"` (within the Async ceiling) / `"batch"` (above it) **when an
+  S3 `batch_output` is configured**, else `"tiling"` (the local split + mosaic
+  path, which needs no S3 bucket).
 
 An explicit `api=` is honoured verbatim (only validated), so a user can force
 `"process"` on a request the auto-rule would route elsewhere — the size guard in
@@ -42,13 +44,18 @@ def validate_api(api: str | None) -> None:
         )
 
 
-def auto_select_api(max_side_px: int, has_geometry: bool) -> str:
+def auto_select_api(
+    max_side_px: int, has_geometry: bool, has_s3: bool = False
+) -> str:
     """Pick the plane for a request when `api=` was omitted.
 
     Args:
         max_side_px: The larger of the render's two pixel dimensions.
         has_geometry: Whether a `geometry=` (polygon / FeatureCollection) was
             supplied (selects the tabular Statistical plane).
+        has_s3: Whether an S3 `batch_output` is configured (enables the
+            S3-delivered async / batch planes; otherwise oversized rasters fall
+            back to local tiling).
 
     Returns:
         The selected plane name.
@@ -61,12 +68,21 @@ def auto_select_api(max_side_px: int, has_geometry: bool) -> str:
             'statistical'
 
             ```
-        - A small raster goes to Process; an oversized one to Batch:
+        - A small raster goes to Process; an oversized one without S3 to tiling:
             ```python
             >>> from earthlens.sentinel_hub._dispatch import auto_select_api
             >>> auto_select_api(1024, has_geometry=False)
             'process'
             >>> auto_select_api(40000, has_geometry=False)
+            'tiling'
+
+            ```
+        - With an S3 bucket, oversized rasters go to async / batch:
+            ```python
+            >>> from earthlens.sentinel_hub._dispatch import auto_select_api
+            >>> auto_select_api(8000, has_geometry=False, has_s3=True)
+            'async'
+            >>> auto_select_api(40000, has_geometry=False, has_s3=True)
             'batch'
 
             ```
@@ -75,18 +91,23 @@ def auto_select_api(max_side_px: int, has_geometry: bool) -> str:
         return "statistical"
     if max_side_px <= SH_MAX_DIMENSION:
         return "process"
+    if not has_s3:
+        return "tiling"
     if max_side_px <= ASYNC_MAX_DIMENSION:
         return "async"
     return "batch"
 
 
-def resolve_api(api: str | None, max_side_px: int, has_geometry: bool) -> str:
-    """Validate an explicit `api=`, or auto-select one by size / geometry.
+def resolve_api(
+    api: str | None, max_side_px: int, has_geometry: bool, has_s3: bool = False
+) -> str:
+    """Validate an explicit `api=`, or auto-select one by size / geometry / S3.
 
     Args:
         api: The requested plane, or `None` for auto-selection.
         max_side_px: The larger render dimension in pixels.
         has_geometry: Whether a `geometry=` was supplied.
+        has_s3: Whether an S3 `batch_output` is configured.
 
     Returns:
         The resolved plane name.
@@ -97,4 +118,4 @@ def resolve_api(api: str | None, max_side_px: int, has_geometry: bool) -> str:
     validate_api(api)
     if api is not None:
         return api
-    return auto_select_api(max_side_px, has_geometry)
+    return auto_select_api(max_side_px, has_geometry, has_s3)

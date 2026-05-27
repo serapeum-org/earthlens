@@ -148,6 +148,62 @@ class FakeSentinelHubRequest:
         return self._written
 
 
+class FakeAsyncProcessRequest:
+    """Stand-in for `sentinelhub.AsyncProcessRequest` (S3-delivered)."""
+
+    instances: list[FakeAsyncProcessRequest] = []
+
+    def __init__(
+        self,
+        evalscript: str,
+        input_data: list,
+        responses: list,
+        delivery: Any,
+        bbox: Any = None,
+        size: tuple | None = None,
+        config: Any = None,
+        **kwargs: Any,
+    ) -> None:
+        self.evalscript = evalscript
+        self.input_data = input_data
+        self.responses = responses
+        self.delivery = delivery
+        self.bbox = bbox
+        self.size = size
+        self.config = config
+        self.submitted = False
+        FakeAsyncProcessRequest.instances.append(self)
+
+    @staticmethod
+    def input_data(**kwargs: Any) -> dict:
+        """Record an `input_data` block (same shape as the sync request)."""
+        return FakeSentinelHubRequest.input_data(**kwargs)
+
+    @staticmethod
+    def output_response(identifier: str, response_format: Any, **kwargs: Any) -> dict:
+        """Record an `output_response` block."""
+        return {"identifier": identifier, "format": response_format}
+
+    @staticmethod
+    def s3_specification(url: str, **kwargs: Any) -> dict:
+        """Record an S3 delivery spec."""
+        return {"url": url, **kwargs}
+
+    def get_data(self, save_data: bool = False) -> list:
+        """Pretend to submit the async job."""
+        self.submitted = True
+        return []
+
+    def get_url_list(self) -> list[str]:
+        """Return the (fake) S3 delivery URI for the job."""
+        return [f"{self.delivery['url']}/async-result.tiff"]
+
+
+def fake_get_async_running_status(ids: Any, config: Any = None) -> dict:
+    """Stand-in for `get_async_running_status`: nothing is still running."""
+    return {item: False for item in ids}
+
+
 def fake_bbox_to_dimensions(bbox: Any, resolution: float) -> tuple[int, int]:
     """Deterministic `bbox_to_dimensions`: (degrees * 1000 / resolution) per side."""
     west, south, east, north = bbox.bbox
@@ -166,7 +222,9 @@ class FakeSentinelHub:
     MosaickingOrder = FakeMosaickingOrder
     DataCollection = FakeDataCollection()
     SentinelHubRequest = FakeSentinelHubRequest
+    AsyncProcessRequest = FakeAsyncProcessRequest
     bbox_to_dimensions = staticmethod(fake_bbox_to_dimensions)
+    get_async_running_status = staticmethod(fake_get_async_running_status)
 
 
 @pytest.fixture
@@ -174,6 +232,7 @@ def fake_sh(monkeypatch: pytest.MonkeyPatch) -> FakeSentinelHub:
     """Install the fake `sentinelhub` module and reset recorded requests."""
     module = FakeSentinelHub()
     FakeSentinelHubRequest.instances = []
+    FakeAsyncProcessRequest.instances = []
     monkeypatch.setitem(sys.modules, "sentinelhub", module)
     return module
 

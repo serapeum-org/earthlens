@@ -97,13 +97,29 @@ class TestAutoSelectApi:
         """A bbox within the Process cap routes to Process."""
         assert auto_select_api(SH_MAX_DIMENSION, has_geometry=False) == "process"
 
-    def test_medium_raster_is_async(self):
-        """A bbox above Process but within Async routes to Async."""
-        assert auto_select_api(SH_MAX_DIMENSION + 1, has_geometry=False) == "async"
+    def test_medium_raster_without_s3_is_tiling(self):
+        """A medium bbox with no S3 bucket falls back to local tiling."""
+        assert auto_select_api(SH_MAX_DIMENSION + 1, has_geometry=False) == "tiling"
 
-    def test_huge_raster_is_batch(self):
-        """A bbox above the Async ceiling routes to Batch."""
-        assert auto_select_api(ASYNC_MAX_DIMENSION + 1, has_geometry=False) == "batch"
+    def test_medium_raster_with_s3_is_async(self):
+        """A medium bbox with an S3 bucket routes to Async."""
+        assert (
+            auto_select_api(SH_MAX_DIMENSION + 1, has_geometry=False, has_s3=True)
+            == "async"
+        )
+
+    def test_huge_raster_with_s3_is_batch(self):
+        """A bbox above the Async ceiling (with S3) routes to Batch."""
+        assert (
+            auto_select_api(ASYNC_MAX_DIMENSION + 1, has_geometry=False, has_s3=True)
+            == "batch"
+        )
+
+    def test_huge_raster_without_s3_is_tiling(self):
+        """A huge bbox with no S3 bucket still falls back to tiling."""
+        assert (
+            auto_select_api(ASYNC_MAX_DIMENSION + 1, has_geometry=False) == "tiling"
+        )
 
 
 class TestResolveApi:

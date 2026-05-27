@@ -39,6 +39,7 @@ from earthlens.base import (
 )
 from earthlens.sentinel_hub._dispatch import resolve_api, validate_api
 from earthlens.sentinel_hub._helpers import (
+    ASYNC_MAX_DIMENSION,
     RASTER_APIS,
     SH_MAX_DIMENSION,
     cdse_collection,
@@ -279,9 +280,10 @@ class SentinelHub(AbstractDataSource):
             The resolved plane name.
         """
         has_geometry = self._geometry is not None
+        has_s3 = self._batch_output is not None
         needs_size = self._api is None or self._api in RASTER_APIS
         max_side = max(self._request_size()) if needs_size else 0
-        return resolve_api(self._api, max_side, has_geometry)
+        return resolve_api(self._api, max_side, has_geometry, has_s3)
 
     def _time_interval(self) -> tuple[str, str]:
         """Return the render time interval as ISO `(start, end)` date strings."""
@@ -322,6 +324,7 @@ class SentinelHub(AbstractDataSource):
         fetchers = {
             "process": self._fetch_process,
             "async": self._fetch_async,
+            "tiling": self._fetch_tiling,
             "batch": self._fetch_batch,
             "statistical": self._fetch_statistical,
             "batch-statistical": self._fetch_batch_statistical,
@@ -443,10 +446,95 @@ class SentinelHub(AbstractDataSource):
             out.append(Path(self.root_dir) / written)
         return out
 
-    def _fetch_async(self, products: list[RemoteProduct]) -> list[Path]:
-        """Render via the Async Processing API (C5)."""
+    def _require_s3_delivery(self, sentinelhub: Any) -> Any:
+        """Build the S3 `AccessSpecification` from `batch_output`, or error.
+
+        Args:
+            sentinelhub: The imported `sentinelhub` module.
+
+        Returns:
+            The S3 delivery `AccessSpecification`.
+
+        Raises:
+            ValueError: When no `batch_output` (S3 bucket) was supplied.
+        """
+        if not self._batch_output:
+            raise ValueError(
+                "the async / batch planes deliver server-side to S3, so they "
+                "need batch_output={'bucket': 's3://…', 'iam_role_arn': '…'}. "
+                "Omit api= (or pass api='tiling') for a no-S3 oversized render."
+            )
+        spec = dict(self._batch_output)
+        url = spec.pop("bucket", None) or spec.pop("url", None)
+        return sentinelhub.AsyncProcessRequest.s3_specification(url=url, **spec)
+
+    def _guard_async_size(self, size: tuple[int, int]) -> None:
+        """Reject an Async request beyond the 10000 px ceiling.
+
+        Args:
+            size: The `(width, height)` render size in pixels.
+
+        Raises:
+            ValueError: When either side exceeds :data:`ASYNC_MAX_DIMENSION`.
+        """
+        if max(size) > ASYNC_MAX_DIMENSION:
+            raise ValueError(
+                f"the request renders to {size} px but the Async Processing API "
+                f"caps a request at {ASYNC_MAX_DIMENSION} px/side. Use api='batch' "
+                "for a larger AOI."
+            )
+
+    def _fetch_async(self, products: list[RemoteProduct]) -> list[str]:
+        """Render via the Async Processing API (S3-delivered, ≤10000 px).
+
+        Submits one `AsyncProcessRequest` per row delivering to the `batch_output`
+        S3 bucket, polls `get_async_running_status` to completion, and returns the
+        S3 delivery URIs. Requires an S3 `batch_output` (the SDK's async plane is
+        not a direct synchronous download).
+
+        Args:
+            products: The list returned by :meth:`_search`.
+
+        Returns:
+            The S3 URIs the server delivered to, one per product.
+
+        Raises:
+            ValueError: When no `batch_output` is set or the render exceeds the
+                10000 px Async ceiling.
+        """
+        sentinelhub = import_sentinelhub()
+        cfg = self._auth.config()
+        delivery = self._require_s3_delivery(sentinelhub)
+        sh_bbox = self._bbox()
+        size = self._request_size()
+        self._guard_async_size(size)
+        out: list[str] = []
+        for product in products:
+            resolved: ResolvedRequest = product.metadata["resolved"]
+            evalscript = self._read_evalscript(resolved)
+            request = sentinelhub.AsyncProcessRequest(
+                evalscript=evalscript,
+                input_data=[self._build_input_data(sentinelhub, resolved)],
+                responses=[
+                    sentinelhub.AsyncProcessRequest.output_response(
+                        "default", sentinelhub.MimeType.TIFF
+                    )
+                ],
+                delivery=delivery,
+                bbox=sh_bbox,
+                size=size,
+                config=cfg,
+            )
+            request.get_data(save_data=False)
+            _wait_for_async(sentinelhub, request.get_url_list(), cfg)
+            out.extend(str(url) for url in request.get_url_list())
+        logger.info(f"Sentinel Hub async: delivered {len(out)} object(s) to S3")
+        return out
+
+    def _fetch_tiling(self, products: list[RemoteProduct]) -> list[Path]:
+        """Render an oversized AOI by local tiling + mosaic (C6)."""
         raise NotImplementedError(
-            "the Async Processing plane is implemented in C5."
+            "the local-tiling mosaic plane is implemented in C6."
         )
 
     def _fetch_batch(self, products: list[RemoteProduct]) -> list[Any]:
@@ -490,3 +578,42 @@ class SentinelHub(AbstractDataSource):
             f"{self.root_dir}"
         )
         return results
+
+
+#: Async-plane polling cadence (seconds) and the attempt ceiling (~1 hour).
+_ASYNC_POLL_SECONDS = 10.0
+_ASYNC_MAX_ATTEMPTS = 360
+
+
+def _wait_for_async(
+    sentinelhub: Any,
+    ids: list,
+    config: Any,
+    poll_seconds: float = _ASYNC_POLL_SECONDS,
+    max_attempts: int = _ASYNC_MAX_ATTEMPTS,
+) -> None:
+    """Poll `get_async_running_status` until no listed request is still running.
+
+    Args:
+        sentinelhub: The imported `sentinelhub` module.
+        ids: The async request ids / urls to poll (falsy entries skipped).
+        config: The `SHConfig` to authenticate the status calls.
+        poll_seconds: Delay between status polls.
+        max_attempts: Maximum number of polls before giving up.
+
+    Raises:
+        TimeoutError: When jobs are still running after `max_attempts` polls.
+    """
+    import time
+
+    active = [item for item in ids if item]
+    if not active:
+        return
+    for _ in range(max_attempts):
+        status = sentinelhub.get_async_running_status(active, config)
+        if not any(status.get(item, False) for item in active):
+            return
+        time.sleep(poll_seconds)
+    raise TimeoutError(
+        f"async Sentinel Hub jobs still running after {max_attempts} polls: {active}"
+    )

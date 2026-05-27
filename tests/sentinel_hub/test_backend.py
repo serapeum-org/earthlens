@@ -99,8 +99,8 @@ class TestPlaneRouting:
         )
         assert backend._resolve_plane() == "statistical"
 
-    def test_oversized_bbox_routes_off_process(self, fake_sh, output_dir: Path):
-        """A coarse resolution over a wide bbox routes beyond Process."""
+    def test_oversized_bbox_without_s3_routes_to_tiling(self, fake_sh, output_dir: Path):
+        """A wide bbox with no S3 bucket auto-routes to local tiling."""
         backend = SentinelHub(
             start="2020-06-01",
             end="2020-06-02",
@@ -110,7 +110,7 @@ class TestPlaneRouting:
             path=output_dir,
             resolution=10,
         )
-        assert backend._resolve_plane() in {"async", "batch"}
+        assert backend._resolve_plane() == "tiling"
 
     def test_explicit_api_honoured(self, fake_sh, output_dir: Path):
         """An explicit `api=` overrides size-based routing."""
