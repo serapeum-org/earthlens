@@ -7896,10 +7896,24 @@ medium</code>. <strong>Modern-only</strong> — needs a token for anonymous use 
 facade rejects <code>aggregate=</code> for tabular backends). Columns: <code>site_no,
 parameter_code, parameter_name, time_of_year, value, percentile, statistic,
 unit</code>.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="n">EarthLens</span><span class="p">(</span><span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;usgs-water&quot;</span><span class="p">,</span> <span class="n">service</span><span class="o">=</span><span class="s2">&quot;statistics&quot;</span><span class="p">,</span> <span class="n">stat_type</span><span class="o">=</span><span class="s2">&quot;monthly&quot;</span><span class="p">,</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="n">EarthLens</span><span class="p">(</span><span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;usgs-water&quot;</span><span class="p">,</span> <span class="n">service</span><span class="o">=</span><span class="s2">&quot;statistics&quot;</span><span class="p">,</span>
 <a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>          <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;discharge&quot;</span><span class="p">],</span> <span class="n">sites</span><span class="o">=</span><span class="s2">&quot;01646500&quot;</span><span class="p">,</span>
 <a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>          <span class="n">start</span><span class="o">=</span><span class="s2">&quot;2020-01-01&quot;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">&quot;2021-12-31&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
 </code></pre></div>
+<p><strong>Window semantics differ by endpoint:</strong></p>
+<ul>
+<li><strong>Modern</strong> (<code>api="auto"</code>/<code>"waterdata"</code>, the default) uses
+  <code>get_stats_date_range</code>, which computes <strong>interval statistics within your
+  <code>start</code>/<code>end</code> window</strong> — e.g. monthly means for 2020–2021. The <code>time_of_year</code>
+  column carries each interval's start.</li>
+<li><strong>Legacy</strong> (<code>api="legacy"</code>) uses <code>get_stats</code> with <code>stat_type</code>
+  (<code>"daily"</code>/<code>"monthly"</code>/<code>"annual"</code>), which returns a <strong>period-of-record
+  climatology</strong> (statistics across <em>all</em> years, e.g. the long-term mean for
+  each calendar month). The legacy endpoint has no date-window filter, so
+  <code>start</code>/<code>end</code> are not applied there; <code>stat_type</code> selects the rollup
+  granularity. Use <code>api="legacy"</code> (and a token-free anonymous request) when you
+  want the climatology rather than windowed stats.</li>
+</ul>
 <h3 id="specialized-hydrology-peaks-ratings-field-measurements"><a class="toclink" href="#specialized-hydrology-peaks-ratings-field-measurements">Specialized hydrology — <code>peaks</code>, <code>ratings</code>, <code>field-measurements</code></a><a class="headerlink" href="#specialized-hydrology-peaks-ratings-field-measurements" title="Permanent link">#</a></h3>
 <ul>
 <li><code>peaks</code> — annual peak streamflow (<code>site_no, datetime, peak_value,
