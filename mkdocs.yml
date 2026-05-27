@@ -272,6 +272,13 @@ nav:
       - Quickstart — recent fires: examples/firms/quickstart.ipynb
       - Fire-season time-series: examples/firms/fire_season_timeseries.ipynb
       - MODIS vs VIIRS comparison: examples/firms/modis_vs_viirs_comparison.ipynb
+    - Overture Maps (vector basemap):
+      - Catalog explorer (no network): examples/overture/01_catalog_explorer.ipynb
+      - Places quickstart: examples/overture/02_places_quickstart.ipynb
+      - Building footprints: examples/overture/03_buildings_footprints.ipynb
+      - Per-row licensing: examples/overture/04_per_row_licensing.ipynb
+      - Transportation network: examples/overture/05_transportation_network.ipynb
+      - Multi-theme download: examples/overture/06_multi_theme_download.ipynb
   - API Reference:
     - EarthLens Facade: reference/earthlens.md
     - AbstractDataSource: reference/abstract-datasource.md
