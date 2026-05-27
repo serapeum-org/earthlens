@@ -641,6 +641,10 @@ class SentinelHub(AbstractDataSource):
 
         Returns:
             The merged GeoTIFF paths, one per product (union bounds).
+
+        Raises:
+            ValueError: When a tile still renders above the Process cap (a
+                rounding edge case); lower the `resolution` to re-tile finer.
         """
         import shutil
 
@@ -653,17 +657,29 @@ class SentinelHub(AbstractDataSource):
             width,
             height,
         )
+        # Pre-flight: size every tile once and guard against the Process cap
+        # before rendering any, so a rounding edge case fails fast with a clear
+        # error rather than a mid-run server 500 (and no partial tiles leak).
+        tile_specs: list[tuple[Any, tuple[int, int]]] = []
+        for tile in tiles:
+            sh_bbox = sentinelhub.BBox(tile, crs=sentinelhub.CRS.WGS84)
+            tile_size = sentinelhub.bbox_to_dimensions(
+                sh_bbox, resolution=self._resolution
+            )
+            if max(tile_size) > SH_MAX_DIMENSION:
+                raise ValueError(
+                    f"a local tile renders to {tile_size} px, exceeding the "
+                    f"{SH_MAX_DIMENSION} px Process cap; lower the resolution to "
+                    "re-tile finer."
+                )
+            tile_specs.append((sh_bbox, tile_size))
         out: list[Path] = []
         for product in products:
             resolved: ResolvedRequest = product.metadata["resolved"]
             tile_dir = Path(self.root_dir) / f"_tiles_{_safe_name(product.id)}"
             tile_dir.mkdir(parents=True, exist_ok=True)
             tile_paths: list[str] = []
-            for index, tile in enumerate(tiles):
-                sh_bbox = sentinelhub.BBox(tile, crs=sentinelhub.CRS.WGS84)
-                tile_size = sentinelhub.bbox_to_dimensions(
-                    sh_bbox, resolution=self._resolution
-                )
+            for index, (sh_bbox, tile_size) in enumerate(tile_specs):
                 rendered = self._render_process_tile(
                     sentinelhub,
                     resolved,
