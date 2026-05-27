@@ -82,6 +82,7 @@ class TestRegistry:
             "google-earth-engine",
             "openaq",
             "openeo",
+            "overture",
             "planetary-computer",
             "stac",
             "tropycal",
