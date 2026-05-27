@@ -48,6 +48,40 @@ class FakeConfiguration:
         cls.create_calls.append(kwargs)
         return "https://data.humdata.org"
 
+    @classmethod
+    def remoteckan(cls):
+        """Return a fake CKAN client backed by the dataset registry."""
+        return FakeCkan()
+
+
+class FakeCkan:
+    """Fake `remoteckan` client serving `package_search` from the registry."""
+
+    def call_action(self, action: str, params: dict[str, Any]) -> dict[str, Any]:
+        """Serve a paged `package_search` over the registered datasets."""
+        if action != "package_search":
+            raise ValueError(f"unsupported action {action!r}")
+        items = list(FakeDataset.registry.values())
+        fq = params.get("fq") or ""
+        if fq.startswith("organization:"):
+            wanted = fq.split(":", 1)[1]
+            items = [d for d in items if d.org == wanted]
+        start, rows = params.get("start", 0), params.get("rows", 1000)
+        page = items[start : start + rows]
+        return {
+            "count": len(items),
+            # With a `fl` field-list the real CKAN returns `organization`
+            # as the org slug string, not a dict — mirror that here.
+            "results": [
+                {
+                    "name": d["name"],
+                    "organization": d.org,
+                    "title": d.get("title"),
+                }
+                for d in page
+            ],
+        }
+
 
 class FakeResource(dict):
     """Fake HDX `Resource` — a dict of `name`/`format`/`url` that downloads."""
@@ -69,9 +103,10 @@ class FakeDataset(dict):
 
     registry: dict[str, "FakeDataset"] = {}
 
-    def __init__(self, name: str, resources: list[FakeResource]):
+    def __init__(self, name: str, resources: list[FakeResource], org: str = "fake-org"):
         super().__init__(name=name, title=f"Title for {name}")
         self._resources = resources
+        self.org = org
 
     @classmethod
     def read_from_hdx(cls, identifier: str, configuration: Any = None):
@@ -100,9 +135,11 @@ class FakeHdx:
     Dataset = FakeDataset
 
     @staticmethod
-    def add_dataset(hdx_id: str, resources: list[FakeResource]) -> FakeDataset:
+    def add_dataset(
+        hdx_id: str, resources: list[FakeResource], org: str = "fake-org"
+    ) -> FakeDataset:
         """Register a dataset under `hdx_id` so `read_from_hdx` resolves it."""
-        dataset = FakeDataset(hdx_id, resources)
+        dataset = FakeDataset(hdx_id, resources, org=org)
         FakeDataset.registry[hdx_id] = dataset
         return dataset
 

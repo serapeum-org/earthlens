@@ -31,6 +31,7 @@ from __future__ import annotations
 import argparse
 import sys
 from pathlib import Path
+from typing import Any
 
 import yaml
 
@@ -83,66 +84,63 @@ def kind_for_format(fmt: str) -> str | None:
     return None
 
 
-def search_datasets(
+def search_metadata(
     query: str = "*:*",
-    org: str | None = None,
-    tag: str | None = None,
-    rows: int = 1000,
-    with_formats: bool = False,
-) -> list[dict]:
-    """Search HDX and return lightweight rows for the matching datasets.
+    fq: str | None = None,
+    page_size: int = 1000,
+) -> dict[str, dict]:
+    """Page CKAN `package_search` for lightweight `{id: {org, title}}` rows.
+
+    Uses the SDK's `remoteckan` client with a `fl` field-list so only
+    `name` / `organization` / `title` come back (no heavy resource
+    payloads), paginating until every match is collected.
 
     Args:
-        query: CKAN free-text query (default `"*:*"`, every dataset).
-        org: Optional organisation slug to filter on (CKAN `fq`).
-        tag: Optional tag/theme to filter on (CKAN `fq`).
-        rows: Maximum number of datasets to return (`page_size`).
-        with_formats: When `True`, also fetch each dataset's resources to
-            populate `formats` (one extra request per dataset — slow).
-            The `refresh` index does not need it, so it defaults to
-            `False`.
+        query: CKAN free-text query (default `"*:*"`, every searchable
+            dataset).
+        fq: Optional CKAN filter query (e.g. `"organization:kontur"`).
+        page_size: Rows per request.
 
     Returns:
-        list[dict]: One `{key, hdx_id, org, title, formats}` row per
-            matching dataset (`formats` empty unless `with_formats`).
+        dict[str, dict]: Map from HDX id to its `{org, title}` row.
     """
-    from hdx.data.dataset import Dataset
+    from hdx.api.configuration import Configuration
 
-    filters = []
-    if org:
-        filters.append(f"organization:{org}")
-    if tag:
-        filters.append(f"tags:{tag}")
-    fq = " AND ".join(filters) if filters else None
-    datasets = Dataset.search_in_hdx(query, fq=fq, page_size=rows)
-    rows_out: list[dict] = []
-    for dataset in datasets:
-        if with_formats:
-            try:
-                org_name = dataset.get_organization().get("name")
-            except Exception:  # noqa: BLE001 - org lookup is best-effort metadata
-                org_name = ""
-            formats = sorted({r["format"] for r in dataset.get_resources()})
-        else:
-            org_name = ""
-            formats = []
-        rows_out.append(
-            {
-                "key": dataset["name"],
-                "hdx_id": dataset["name"],
-                "org": org_name,
-                "title": dataset.get("title") or "",
-                "formats": formats,
+    client = Configuration.read().remoteckan()
+    out: dict[str, dict] = {}
+    start = 0
+    while True:
+        params: dict[str, Any] = {
+            "q": query,
+            "fl": "name,organization,title",
+            "rows": page_size,
+            "start": start,
+        }
+        if fq:
+            params["fq"] = fq
+        result = client.call_action("package_search", params)
+        batch = result.get("results") or []
+        for row in batch:
+            org = row.get("organization")
+            # With a `fl` field-list, CKAN returns `organization` as the org
+            # slug string; without it, as a dict. Handle both.
+            org_name = org.get("name") if isinstance(org, dict) else (org or "")
+            out[row["name"]] = {
+                "org": org_name or "",
+                "title": row.get("title") or "",
             }
-        )
-    return rows_out
+        start += len(batch)
+        if not batch or start >= result.get("count", 0):
+            break
+    return out
 
 
 def all_dataset_names() -> list[str]:
     """Return every HDX dataset id (the whole `data.humdata.org` catalogue).
 
     Wraps `Dataset.get_all_dataset_names()` — one cheap paginated call
-    that returns all ~41k ids without per-dataset requests.
+    that returns all ~41k ids (including the non-searchable long tail
+    that `package_search` omits) without per-dataset requests.
 
     Returns:
         list[str]: Every HDX dataset id / name.
@@ -152,37 +150,64 @@ def all_dataset_names() -> list[str]:
     return list(Dataset.get_all_dataset_names())
 
 
-def write_index(names: list[str], index_path: Path = INDEX_PATH) -> int:
-    """Rewrite the `available_datasets` JSON index, sorted and de-duped.
+def all_metadata() -> dict[str, dict]:
+    """Build the enriched index for the **entire** HDX catalogue.
+
+    Unions every id from :func:`all_dataset_names` (the complete ~41k
+    universe) with the `{org, title}` enrichment from
+    :func:`search_metadata` (the ~28k `package_search` exposes). Ids the
+    search does not expose get an empty `{org, title}` row but stay
+    resolvable.
+
+    Returns:
+        dict[str, dict]: Map from every HDX id to its `{org, title}` row.
+    """
+    enriched = search_metadata("*:*")
+    return {
+        name: enriched.get(name, {"org": "", "title": ""})
+        for name in all_dataset_names()
+    }
+
+
+def write_index(rows: dict[str, dict], index_path: Path = INDEX_PATH) -> int:
+    """Rewrite the enriched long-tail JSON index `{hdx_id: {org, title}}`.
 
     The index is JSON (`_available.json`), kept out of the curated
     `*.yaml` glob so `Catalog()` parses only the small curated YAMLs and
-    reads this flat id list separately (the `earthlens.earthdata`
-    `_auto.json` pattern).
+    reads this map separately (the `earthlens.earthdata` `_auto.json`
+    pattern). Every id here resolves to a synthesised `HdxDataset` via
+    `Catalog.get_dataset`.
 
     Args:
-        names: HDX dataset ids to record.
+        rows: Map from HDX id to its `{org, title}` row.
         index_path: Path to `catalog/_available.json`.
 
     Returns:
-        int: The number of unique ids written.
+        int: The number of ids written.
     """
     import json
 
-    unique = sorted(set(names))
+    datasets = {
+        name: {
+            "org": (body or {}).get("org", ""),
+            "title": (body or {}).get("title", ""),
+        }
+        for name, body in sorted(rows.items())
+    }
     payload = {
         "__comment__": (
-            "AUTO-GENERATED by tools/hdx/refresh_hdx_catalog.py. Informational "
-            "index of HDX dataset ids for the curated organisations; NOT the "
-            "full ~21k catalogue and not consumed at runtime. Kept as JSON (out "
-            "of the curated *.yaml glob) so Catalog() stays fast."
+            "AUTO-GENERATED by tools/hdx/refresh_hdx_catalog.py (refresh --all). "
+            "Every HDX dataset id with its org/title; any id here resolves to a "
+            "synthesised HdxDataset via Catalog.get_dataset (the earthdata _auto "
+            "fallback). NOT vetted; the curated per-theme YAMLs carry full "
+            "metadata. Out of the *.yaml glob so Catalog() stays fast."
         ),
-        "available_datasets": unique,
+        "datasets": datasets,
     }
     index_path.write_text(
         json.dumps(payload, indent=0, ensure_ascii=False) + "\n", encoding="utf-8"
     )
-    return len(unique)
+    return len(datasets)
 
 
 def dataset_stanza(key: str, hdx_id: str) -> str:
@@ -261,20 +286,23 @@ def _cmd_refresh(args: argparse.Namespace) -> int:
     rewritten.
     """
     configure()
-    names: list[str] = []
     if args.all:
-        names.extend(all_dataset_names())
+        rows = all_metadata()
     else:
+        rows = {}
         for org in args.org or [None]:
-            names.extend(
-                r["hdx_id"]
-                for r in search_datasets(org=org, tag=args.tag, rows=args.rows)
-            )
+            filters = []
+            if org:
+                filters.append(f"organization:{org}")
+            if args.tag:
+                filters.append(f"tags:{args.tag}")
+            rows.update(search_metadata(fq=" AND ".join(filters) or None))
     if args.include_curated:
         from earthlens.hdx import Catalog
 
-        names.extend(row.hdx_id for row in Catalog().datasets.values())
-    count = write_index(names, INDEX_PATH)
+        for row in Catalog().datasets.values():
+            rows.setdefault(row.hdx_id, {"org": row.org, "title": row.title})
+    count = write_index(rows, INDEX_PATH)
     print(f"Wrote {count} dataset id(s) to {INDEX_PATH}.")
     return 0
 
@@ -302,7 +330,6 @@ def build_parser() -> argparse.ArgumentParser:
         "--org", action="append", default=None, help="organisation slug (repeatable)"
     )
     refresh.add_argument("--tag", default=None, help="tag / theme filter")
-    refresh.add_argument("--rows", type=int, default=1000, help="max datasets per org")
     refresh.add_argument(
         "--all",
         action="store_true",

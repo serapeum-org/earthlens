@@ -49,44 +49,50 @@ class TestKindForFormat:
 
 
 class TestWriteIndex:
-    """Tests for write_index."""
+    """Tests for write_index (enriched `{id: {org, title}}` JSON)."""
 
-    def test_sorts_dedupes_and_counts(self, tmp_path: Path):
-        """The JSON index is written sorted and de-duplicated."""
+    def test_writes_sorted_enriched_rows(self, tmp_path: Path):
+        """The JSON index is written sorted with org/title per id."""
         import json
 
         out = tmp_path / "_available.json"
-        count = tool.write_index(["b", "a", "b", "c"], out)
-        assert count == 3
+        rows = {
+            "b": {"org": "o-b", "title": "B"},
+            "a": {"org": "o-a", "title": "A"},
+        }
+        count = tool.write_index(rows, out)
+        assert count == 2
         payload = json.loads(out.read_text(encoding="utf-8"))
-        assert payload["available_datasets"] == ["a", "b", "c"]
+        assert list(payload["datasets"]) == ["a", "b"]
+        assert payload["datasets"]["a"] == {"org": "o-a", "title": "A"}
 
 
-class TestSearchDatasets:
-    """Tests for search_datasets (faked SDK)."""
+class TestSearchMetadata:
+    """Tests for search_metadata / all_metadata (faked CKAN client)."""
 
-    def test_returns_rows(self, fake_hdx: FakeHdx):
-        """Each matching dataset becomes a lightweight row dict."""
-        fake_hdx.add_dataset("ds-x", [FakeResource("a.csv", "CSV")])
+    def test_search_metadata_returns_org_title(self, fake_hdx: FakeHdx):
+        """package_search rows map to {id: {org, title}}."""
+        tool.configure()
+        fake_hdx.add_dataset("ds-x", [], org="kontur")
+        meta = tool.search_metadata("*:*")
+        assert meta["ds-x"]["org"] == "kontur"
+        assert meta["ds-x"]["title"] == "Title for ds-x"
 
-        def fake_search(query, fq=None, page_size=1000):
-            return [fake_hdx.Dataset.registry["ds-x"]]
+    def test_search_metadata_org_filter(self, fake_hdx: FakeHdx):
+        """An organization fq narrows the result."""
+        tool.configure()
+        fake_hdx.add_dataset("ds-k", [], org="kontur")
+        fake_hdx.add_dataset("ds-h", [], org="hot")
+        meta = tool.search_metadata("*:*", fq="organization:kontur")
+        assert set(meta) == {"ds-k"}
 
-        fake_hdx.Dataset.search_in_hdx = staticmethod(fake_search)
-        rows = tool.search_datasets(org="org", with_formats=True)
-        assert rows[0]["hdx_id"] == "ds-x"
-        assert rows[0]["formats"] == ["CSV"]
-
-    def test_skips_formats_by_default(self, fake_hdx: FakeHdx):
-        """Without with_formats, the slow resource fetch is skipped."""
-        fake_hdx.add_dataset("ds-y", [FakeResource("a.csv", "CSV")])
-
-        def fake_search(query, fq=None, page_size=1000):
-            return [fake_hdx.Dataset.registry["ds-y"]]
-
-        fake_hdx.Dataset.search_in_hdx = staticmethod(fake_search)
-        rows = tool.search_datasets()
-        assert rows[0]["formats"] == [] and rows[0]["org"] == ""
+    def test_all_metadata_covers_every_id(self, fake_hdx: FakeHdx):
+        """all_metadata enriches search hits and keeps unsearchable ids thin."""
+        tool.configure()
+        fake_hdx.add_dataset("ds-enriched", [], org="kontur")
+        meta = tool.all_metadata()
+        assert meta["ds-enriched"]["org"] == "kontur"
+        assert set(meta) == set(fake_hdx.Dataset.registry)
 
 
 class TestDatasetStanza:

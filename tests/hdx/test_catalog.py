@@ -175,21 +175,33 @@ class TestLoaderHelpers:
         """The bundled CATALOG_PATH points at the per-theme directory."""
         assert catalog_mod.CATALOG_PATH.is_dir()
 
-    def test_load_available_reads_json(self, tmp_path: Path):
-        """The JSON `_available.json` index is read and cached."""
+    def test_load_available_reads_enriched_rows(self, tmp_path: Path):
+        """The enriched `{datasets: {id: {org, title}}}` shape is read."""
+        import json
+
+        (tmp_path / "_available.json").write_text(
+            json.dumps({"datasets": {"a": {"org": "o", "title": "A"}}}),
+            encoding="utf-8",
+        )
+        clear_catalog_cache()
+        rows = catalog_mod._load_available(tmp_path / "_available.json")
+        assert rows == {"a": {"org": "o", "title": "A"}}
+
+    def test_load_available_legacy_id_list(self, tmp_path: Path):
+        """The older `{available_datasets: [...]}` shape yields thin rows."""
         import json
 
         (tmp_path / "_available.json").write_text(
             json.dumps({"available_datasets": ["a", "b"]}), encoding="utf-8"
         )
         clear_catalog_cache()
-        names = catalog_mod._load_available(tmp_path / "_available.json")
-        assert names == ["a", "b"]
+        rows = catalog_mod._load_available(tmp_path / "_available.json")
+        assert rows == {"a": {}, "b": {}}
 
     def test_load_available_absent_returns_empty(self, tmp_path: Path):
-        """A missing JSON index yields an empty list (no error)."""
+        """A missing JSON index yields an empty map (no error)."""
         clear_catalog_cache()
-        assert catalog_mod._load_available(tmp_path / "_available.json") == []
+        assert catalog_mod._load_available(tmp_path / "_available.json") == {}
 
 
 class TestBundledAvailableIndex:
@@ -203,13 +215,18 @@ class TestBundledAvailableIndex:
         curated = {row.hdx_id for row in catalog.datasets.values()}
         assert curated <= index
 
-    def test_long_tail_id_resolves_to_thin_row(self):
-        """Any id in the full index resolves to a thin HdxDataset (cached set)."""
+    def test_long_tail_id_resolves(self):
+        """Any id in the full index resolves to an HdxDataset."""
         catalog = Catalog()
         first, second = catalog.available_datasets[0], catalog.available_datasets[-1]
         assert catalog.get_dataset(first).hdx_id == first
-        # second resolve reuses the cached membership set
         assert catalog.get_dataset(second).hdx_id == second
+
+    def test_long_tail_rows_are_enriched(self):
+        """A known searchable id carries org and title in the index."""
+        row = Catalog().get_dataset("kontur-population-dataset")
+        assert row.org == "kontur"
+        assert "Kontur" in row.title
 
     def test_long_tail_not_a_member(self):
         """The long tail resolves but is not reported by `in` (curated only)."""

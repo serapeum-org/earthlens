@@ -51,7 +51,7 @@ _CATALOG_CACHE: dict[Any, tuple[list[str], dict[str, "HdxDataset"]]] = {}
 # fast JSON read (a flat list of ~7k ids) instead of a multi-hundred-millisecond
 # YAML parse, mirroring how `earthlens.earthdata` keeps its long tail in
 # `_auto.json` out of the curated YAML glob.
-_AVAILABLE_CACHE: dict[Any, list[str]] = {}
+_AVAILABLE_CACHE: dict[Any, dict[str, dict]] = {}
 
 #: Filename of the JSON `available_datasets` index, kept beside the curated
 #: per-theme YAMLs (and out of the `*.yaml` glob).
@@ -86,23 +86,27 @@ def _available_index_path(catalog_path: Path) -> Path:
     return base / AVAILABLE_INDEX_NAME
 
 
-def _load_available(json_path: Path) -> list[str]:
-    """Read and cache the JSON `available_datasets` index.
+def _load_available(json_path: Path) -> dict[str, dict]:
+    """Read and cache the JSON long-tail index `{hdx_id: {org, title}}`.
 
-    Reads the `available_datasets` list from `json_path` without touching
-    the curated YAMLs — a flat list of HDX ids that parses in
-    milliseconds. Returns an empty list when the file is absent (e.g. a
-    custom catalog directory in a test that ships no index).
+    Reads the full HDX index from `json_path` without touching the
+    curated YAMLs — a flat `{id: {org, title}}` map that parses in
+    milliseconds. Two on-disk shapes are accepted: the enriched
+    `{"datasets": {id: {"org": ..., "title": ...}}}` (current) and the
+    older `{"available_datasets": [id, ...]}` (back-compat — those ids
+    become thin rows with empty `org` / `title`). Returns an empty map
+    when the file is absent (e.g. a custom catalog directory in a test
+    that ships no index).
 
     Args:
         json_path: Path to the `_available.json` file.
 
     Returns:
-        list[str]: The HDX ids in the index (empty when the file is
-            absent).
+        dict[str, dict]: Map from HDX id to its `{org, title}` row
+            (empty when the file is absent).
     """
     if not json_path.is_file():
-        return []
+        return {}
     key = (str(json_path.resolve()), json_path.stat().st_mtime_ns)
     cached = _AVAILABLE_CACHE.get(key)
     if cached is not None:
@@ -110,9 +114,13 @@ def _load_available(json_path: Path) -> list[str]:
     import json
 
     data = json.loads(json_path.read_text(encoding="utf-8")) or {}
-    names = list(data.get("available_datasets") or [])
-    _AVAILABLE_CACHE[key] = names
-    return names
+    rows = data.get("datasets")
+    if isinstance(rows, dict):
+        index = {key_: dict(body or {}) for key_, body in rows.items()}
+    else:
+        index = {name: {} for name in (data.get("available_datasets") or [])}
+    _AVAILABLE_CACHE[key] = index
+    return index
 
 
 def _yaml_files_for(path: Path) -> list[Path]:
@@ -297,9 +305,10 @@ class Catalog(AbstractCatalog):
 
     available_datasets: list[str] = Field(default_factory=list)
     datasets: dict[str, HdxDataset] = Field(default_factory=dict)
-    #: Cached membership set over :attr:`available_datasets`, built on
-    #: first :meth:`get_dataset` fallback so the lookup is O(1).
-    _available_index: set[str] | None = PrivateAttr(default=None)
+    #: The full long-tail index `{hdx_id: {org, title}}`, used by
+    #: :meth:`get_dataset` to synthesise enriched rows. Set by
+    #: :meth:`load`; defaults to an empty map.
+    _available_rows: dict[str, dict] = PrivateAttr(default_factory=dict)
 
     def model_post_init(self, __context: Any) -> None:
         """Auto-load the bundled catalog when no datasets were supplied.
@@ -318,6 +327,7 @@ class Catalog(AbstractCatalog):
         loaded = Catalog.load()
         self.available_datasets = loaded.available_datasets
         self.datasets = loaded.datasets
+        self._available_rows = loaded._available_rows
 
     @classmethod
     def load(cls, catalog_path: Path | None = None) -> Catalog:
@@ -336,16 +346,19 @@ class Catalog(AbstractCatalog):
         """
         catalog_path = catalog_path if catalog_path is not None else CATALOG_PATH
         yaml_available, datasets = _load_catalog_data(catalog_path)
-        # The bundled index lives in a sibling `_available.json` (fast,
-        # out of the YAML glob); a custom catalog dir may instead carry an
-        # `available_datasets:` block inside its YAML. Union both so either
-        # layout works.
-        json_available = _load_available(_available_index_path(catalog_path))
-        available_datasets = list(dict.fromkeys([*json_available, *yaml_available]))
-        return cls(
-            available_datasets=available_datasets,
+        # The bundled long-tail index lives in a sibling `_available.json`
+        # ({id: {org, title}}, fast, out of the YAML glob); a custom catalog
+        # dir may instead carry an `available_datasets:` block inside its
+        # YAML (thin ids). Union both so either layout works.
+        rows = dict(_load_available(_available_index_path(catalog_path)))
+        for name in yaml_available:
+            rows.setdefault(name, {})
+        catalog = cls(
+            available_datasets=sorted(rows),
             datasets=dict(datasets),
         )
+        catalog._available_rows = rows
+        return catalog
 
     def get_catalog(self) -> dict[str, HdxDataset]:
         """Return the structural per-dataset map.
@@ -362,12 +375,14 @@ class Catalog(AbstractCatalog):
     def get_dataset(self, name: str) -> HdxDataset:
         """Resolve a key against the curated then the full HDX index.
 
-        Curated `datasets` (hand-vetted, with metadata) win. Otherwise,
-        any id in the full :attr:`available_datasets` index (the whole
-        `data.humdata.org` catalogue) resolves to a **thin**
-        :class:`HdxDataset` carrying just that `hdx_id` — enough for the
-        backend, whose only load-bearing field is `hdx_id` (it fetches
-        the dataset live via `Dataset.read_from_hdx`). This is the
+        Curated `datasets` (hand-vetted, with full metadata) win.
+        Otherwise, any id in the full long-tail index (the whole
+        `data.humdata.org` catalogue) resolves to a synthesised
+        :class:`HdxDataset` carrying its `hdx_id` plus the `org` / `title`
+        recorded in `_available.json` (empty for the few ids the CKAN
+        `package_search` walk does not expose). The `hdx_id` is the only
+        load-bearing field — the backend fetches the dataset live via
+        `Dataset.read_from_hdx` — so the row is fully usable. This is the
         long-tail fallback, mirroring `earthlens.earthdata`'s `_auto`
         resolution. An unknown id raises with a did-you-mean hint.
 
@@ -385,10 +400,13 @@ class Catalog(AbstractCatalog):
         """
         if name in self.datasets:
             return self.datasets[name]
-        if self._available_index is None:
-            self._available_index = set(self.available_datasets)
-        if name in self._available_index:
-            return HdxDataset(hdx_id=name)
+        row = self._available_rows.get(name)
+        if row is not None:
+            return HdxDataset(
+                hdx_id=name,
+                org=row.get("org", ""),
+                title=row.get("title", ""),
+            )
         import difflib
 
         pool = list(self.datasets) + list(self.available_datasets)
