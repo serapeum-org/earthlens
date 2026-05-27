@@ -1,0 +1,94 @@
+# Overture Maps theme/type dispatch table.
+#
+# Overture ships a single, small, fixed set of data themes (each a parent
+# partition on `s3://overturemaps-us-west-2`), so this "catalog" is a curated
+# map of the four MVP themes -> their feature types, geometry, representative
+# key columns, and the licenses those rows typically carry. It mirrors the
+# shape of `gdacs_data_catalog.yaml`: one curated block, keyed by the friendly
+# theme name passed in `variables={theme: [type, ...]}`.
+#
+# Unlike GDACS, Overture *does* have a moving part worth indexing: the monthly
+# release (`yyyy-mm-dd.x`). `tools/overture/refresh_overture_catalog.py` lists
+# the available releases (via the official `overturemaps` SDK / the Overture
+# STAC catalog) into the informational `available_releases:` block below; the
+# theme/type set itself is fixed and hand-curated.
+#
+# The theme -> type map is verified against `overturemaps.core.type_theme_map`
+# (overturemaps 1.0.0). The `base` and `addresses` themes are deliberately out
+# of the MVP scope (see the plan's scope guards) and are not curated here.
+themes:
+  buildings:
+    description: >-
+      Building footprints and their parts (2.3 B rows globally). Polygon
+      geometry; the headline Overture theme. Bounded-bbox fetches only — an
+      unbounded box is guarded against in the backend.
+    types: [building, building_part]
+    default_type: building
+    geometry: Polygon
+    key_columns: [id, names, class, subtype, height, num_floors, sources]
+    licenses: [CDLA-Permissive-2.0, ODbL-1.0]
+  places:
+    description: >-
+      Points of interest (57 M POIs) with names, categories, and contact
+      details. Point geometry. Sourced largely from Meta/Foursquare with
+      OSM-derived rows mixed in.
+    types: [place]
+    default_type: place
+    geometry: Point
+    key_columns: [id, names, categories, confidence, addresses, sources]
+    licenses: [CDLA-Permissive-2.0, ODbL-1.0]
+  transportation:
+    description: >-
+      The transportation network (86 M km of roads): routable road/rail/water
+      segments and the connectors that join them. Segment geometry is
+      LineString; connectors are Points.
+    types: [segment, connector]
+    default_type: segment
+    geometry: LineString
+    key_columns: [id, names, subtype, class, connectors, sources]
+    licenses: [CDLA-Permissive-2.0, ODbL-1.0]
+  divisions:
+    description: >-
+      Administrative boundaries and places: division points, their boundary
+      lines, and the filled area polygons. Mostly OSM-derived, so expect
+      ODbL-1.0 rows.
+    types: [division, division_area, division_boundary]
+    default_type: division_area
+    geometry: Polygon
+    key_columns: [id, names, subtype, country, region, sources]
+    licenses: [CDLA-Permissive-2.0, ODbL-1.0]
+  base:
+    description: >-
+      The base map layer: physical and land features the other themes sit on
+      — land polygons, land use, land cover, water bodies, infrastructure
+      (bridges, towers, …) and bathymetry. Types span mixed geometries
+      (polygon-dominant; infrastructure / water also carry lines and points).
+      Largely OSM- and Daylight-derived, so expect ODbL-1.0 rows.
+    types: [land, land_use, land_cover, water, infrastructure, bathymetry]
+    default_type: land
+    geometry: Polygon
+    key_columns: [id, names, subtype, class, sources]
+    licenses: [CDLA-Permissive-2.0, ODbL-1.0]
+  addresses:
+    description: >-
+      Point addresses (street / number / unit / postcode). Very dense — a
+      bounded bbox is required (guarded). Sourced from open address datasets
+      and OSM, so expect a mix of CDLA-Permissive-2.0 and ODbL-1.0 rows.
+    types: [address]
+    default_type: address
+    geometry: Point
+    key_columns: [id, street, number, unit, postcode, country, sources]
+    licenses: [CDLA-Permissive-2.0, ODbL-1.0]
+
+# Informational index of every Overture feature type the SDK exposes (across
+# all themes, including the uncurated `base` / `addresses` themes). Rebuilt by
+# `tools/overture/refresh_overture_catalog.py` from the live SDK; the curated
+# `themes:` block above is a subset. For discoverability, not dispatch.
+available_datasets: [address, bathymetry, building, building_part, connector, division, division_area, division_boundary, infrastructure, land, land_cover, land_use, place, segment, water]
+
+# Informational index of Overture releases, newest first. Rebuilt by
+# `tools/overture/refresh_overture_catalog.py`; the SDK auto-targets the newest
+# when `release=None`, so this block is for discoverability, not dispatch.
+available_releases:
+  - 2026-05-20.0
+  - 2026-04-15.0
