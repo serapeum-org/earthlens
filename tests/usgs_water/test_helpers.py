@@ -225,6 +225,55 @@ def test_normalize_statistics_modern_long():
     assert out["site_no"].iloc[0] == "01646500"
 
 
+def test_normalize_statistics_modern_date_range_uses_start_date():
+    """A windowed get_stats_date_range frame maps time_of_year from start_date."""
+    import pandas as pd
+
+    frame = pd.DataFrame(
+        {
+            "monitoring_location_id": ["USGS-01646500"],
+            "parameter_code": ["00060"],
+            "start_date": ["2021-01-01"],
+            "end_date": ["2021-01-31"],
+            "interval_type": ["month"],
+            "value": [12869.0],
+            "percentile": [pd.NA],
+            "computation": ["arithmetic_mean"],
+            "unit_of_measure": ["ft^3/s"],
+        }
+    )
+    out = _helpers.normalize(frame, "waterdata", "statistics", CODE_META)
+    assert out["time_of_year"].iloc[0] == "2021-01-01"
+    assert out["value"].iloc[0] == 12869.0
+
+
+def test_statistics_modern_kwargs_forward_window():
+    """Modern statistics forwards the window as start_date / end_date."""
+    kw = _helpers.query_kwargs(
+        service="statistics",
+        flavour="waterdata",
+        codes=["00060"],
+        sites=["01646500"],
+        bbox=[0, 0, 0, 0],
+        start="2020-01-01",
+        end="2021-12-31",
+        limit=None,
+    )
+    assert kw["start_date"] == "2020-01-01"
+    assert kw["end_date"] == "2021-12-31"
+
+
+def test_first_column_absent_returns_index_aligned_series():
+    """_first_column returns an index-aligned Series (not a scalar) when absent."""
+    import pandas as pd
+
+    df = pd.DataFrame({"a": [1, 2, 3]})
+    result = _helpers._first_column(df, ["missing"])
+    assert isinstance(result, pd.Series)
+    assert len(result) == 3
+    assert result.isna().all()
+
+
 def test_normalize_statistics_legacy_monthly():
     """Legacy statistics normalize folds year/month into time_of_year."""
     import pandas as pd

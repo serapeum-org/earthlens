@@ -95,10 +95,24 @@ parameter_code, parameter_name, time_of_year, value, percentile, statistic,
 unit`.
 
 ```python
-EarthLens(data_source="usgs-water", service="statistics", stat_type="monthly",
+EarthLens(data_source="usgs-water", service="statistics",
           variables=["discharge"], sites="01646500",
           start="2020-01-01", end="2021-12-31").download()
 ```
+
+**Window semantics differ by endpoint:**
+
+* **Modern** (`api="auto"`/`"waterdata"`, the default) uses
+  `get_stats_date_range`, which computes **interval statistics within your
+  `start`/`end` window** — e.g. monthly means for 2020–2021. The `time_of_year`
+  column carries each interval's start.
+* **Legacy** (`api="legacy"`) uses `get_stats` with `stat_type`
+  (`"daily"`/`"monthly"`/`"annual"`), which returns a **period-of-record
+  climatology** (statistics across *all* years, e.g. the long-term mean for
+  each calendar month). The legacy endpoint has no date-window filter, so
+  `start`/`end` are not applied there; `stat_type` selects the rollup
+  granularity. Use `api="legacy"` (and a token-free anonymous request) when you
+  want the climatology rather than windowed stats.
 
 ### Specialized hydrology — `peaks`, `ratings`, `field-measurements`
 

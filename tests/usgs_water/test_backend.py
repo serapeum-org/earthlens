@@ -60,6 +60,26 @@ def test_explicit_service_wins_over_temporal_resolution(usgs_kwargs):
     assert backend._service == "samples"
 
 
+@pytest.mark.parametrize(
+    "resolution, expected",
+    [
+        ("hourly", "instantaneous"),
+        ("instantaneous", "instantaneous"),
+        ("raw", "instantaneous"),
+        ("daily", "daily"),
+        ("monthly", "daily"),
+        ("yearly", "daily"),
+        ("weekly", "daily"),
+    ],
+)
+def test_temporal_resolution_alias_only_maps_subdaily(
+    usgs_kwargs, resolution, expected
+):
+    """Only explicit sub-daily tokens alias to instantaneous; others stay daily."""
+    backend = USGSWater(**usgs_kwargs(temporal_resolution=resolution))
+    assert backend._service == expected
+
+
 def test_daily_modern_calls_get_daily(fake_usgs, usgs_kwargs):
     """A daily download on api=auto calls waterdata.get_daily."""
     df = USGSWater(**usgs_kwargs(service="daily", sites="01646500")).download(
@@ -191,14 +211,17 @@ def test_samples_429_no_fallback_errors(fake_usgs, usgs_kwargs, monkeypatch):
         backend.download(progress_bar=False)
 
 
-def test_statistics_modern_calls_get_stats_por(fake_usgs, usgs_kwargs):
-    """The statistics service calls modern get_stats_por with sites."""
-    fake_usgs.set_return("get_stats_por", _stats_modern_frame())
+def test_statistics_modern_calls_get_stats_date_range(fake_usgs, usgs_kwargs):
+    """The statistics service calls modern get_stats_date_range, honouring the window."""
+    fake_usgs.set_return("get_stats_date_range", _stats_modern_frame())
     df = USGSWater(**usgs_kwargs(service="statistics", sites="01646500")).download(
         progress_bar=False
     )
-    assert fake_usgs.called() == ["get_stats_por"]
+    assert fake_usgs.called() == ["get_stats_date_range"]
     assert "percentile" in df.columns
+    # the caller's window is forwarded as start_date / end_date
+    kw = fake_usgs.kwargs_for("get_stats_date_range")
+    assert kw["start_date"] == "2023-01-01" and kw["end_date"] == "2023-01-05"
 
 
 def test_statistics_legacy_forwards_stat_type(fake_usgs, usgs_kwargs):
@@ -276,15 +299,17 @@ def _samples_frame():
 
 
 def _stats_modern_frame():
-    """A minimal modern get_stats_por frame."""
+    """A minimal modern get_stats_date_range frame (windowed interval stats)."""
     return pd.DataFrame(
         {
             "monitoring_location_id": ["USGS-01646500"],
             "parameter_code": ["00060"],
-            "time_of_year": ["01-01"],
+            "start_date": ["2023-01-01"],
+            "end_date": ["2023-01-31"],
+            "interval_type": ["month"],
             "value": [123.0],
             "percentile": [50],
-            "computation": ["daily-mean"],
+            "computation": ["arithmetic_mean"],
             "unit_of_measure": ["ft^3/s"],
         }
     )

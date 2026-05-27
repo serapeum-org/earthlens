@@ -48,7 +48,7 @@ def test_backend_kwargs_forwarded(tmp_path, fake_usgs: FakeUSGS):
     """service= / api= ride through **backend_kwargs to the backend."""
     facade = _facade(tmp_path, service="instantaneous", api="legacy")
     assert facade.datasource._service == "instantaneous"
-    assert facade.datasource._api == "legacy"
+    assert facade.datasource._api_flavour == "legacy"
 
 
 def test_aggregate_rejected_for_tabular(tmp_path, fake_usgs: FakeUSGS):

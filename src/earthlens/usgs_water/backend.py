@@ -87,6 +87,14 @@ _SITE_KEYED_SERVICES: frozenset[str] = frozenset({"peaks", "ratings"})
 #: Default parameter code when `variables` is empty — discharge (cfs).
 _DEFAULT_CODES: list[str] = ["00060"]
 
+#: `temporal_resolution` tokens that alias the default service onto
+#: `instantaneous`. Any other value leaves the service at `"daily"`, so
+#: an unrelated label (`"monthly"`, `"yearly"`) never silently switches
+#: the plane — an explicit `service=` is the real selector.
+_SUBDAILY_RESOLUTIONS: frozenset[str] = frozenset(
+    {"instantaneous", "hourly", "sub-daily", "subdaily", "iv", "raw", "15min", "minute"}
+)
+
 
 def _import_dataretrieval():
     """Import the `dataretrieval` SDK lazily with a friendly error.
@@ -214,14 +222,17 @@ class USGSWater(AbstractDataSource):
                 f"got {output_format!r}."
             )
 
-        # `service` wins; otherwise honour the temporal_resolution alias.
-        if service == "daily" and temporal_resolution not in ("daily", ""):
-            service = "instantaneous" if temporal_resolution != "monthly" else "daily"
+        # `service` wins; otherwise honour the temporal_resolution alias —
+        # but only for explicitly sub-daily tokens. Any other value
+        # (e.g. "monthly", "yearly", "") leaves the default daily service
+        # rather than silently selecting instantaneous.
+        if service == "daily" and temporal_resolution.lower() in _SUBDAILY_RESOLUTIONS:
+            service = "instantaneous"
 
         self._api_token = api_token
         self._service = service
         self._sites = [sites] if isinstance(sites, str) else sites
-        self._api = api
+        self._api_flavour = api
         self._output_format: OutputFormat = output_format
         self._stat_type = stat_type
         self._limit = limit
@@ -340,12 +351,13 @@ class USGSWater(AbstractDataSource):
                 server-side temporal rollup instead.
 
         Returns:
-            pd.DataFrame: The long-format observation table.
+            pd.DataFrame: The long-format observation table for the
+                selected `service`.
 
         Raises:
-            NotImplementedError: If `aggregate` is not `None`, or — for
-                now — for services not yet wired in this scaffold (the
-                values services land in C3).
+            NotImplementedError: If `aggregate` is not `None` (tabular
+                output has no gridded reduction; use
+                `service="statistics"` instead).
         """
         if aggregate is not None:
             raise NotImplementedError(
@@ -358,7 +370,7 @@ class USGSWater(AbstractDataSource):
         # Each frame is already normalised to its service's schema (even
         # when empty), so concat all of them — preserving the right
         # columns for non-values services — rather than dropping empties.
-        frames = self._api_via_search_fetch()
+        frames = self._api()
         df = (
             pd.concat(frames, ignore_index=True)
             if frames
@@ -511,7 +523,7 @@ class USGSWater(AbstractDataSource):
                 bbox-only query the modern endpoint cannot serve.
         """
         has_legacy = _helpers.service_function(self._service, "nwis") is not None
-        use_legacy = self._api == "legacy"
+        use_legacy = self._api_flavour == "legacy"
         if use_legacy and not has_legacy:
             raise ValueError(
                 f"service {self._service!r} has no legacy endpoint (it is "
@@ -525,7 +537,7 @@ class USGSWater(AbstractDataSource):
             and bbox_only
             and not _helpers.modern_supports_bbox(self._service)
         ):
-            if self._api == "waterdata" or not has_legacy:
+            if self._api_flavour == "waterdata" or not has_legacy:
                 raise ValueError(
                     f"The modern endpoint cannot query service "
                     f"{self._service!r} by bbox (no bbox filter). Pass "
@@ -539,7 +551,11 @@ class USGSWater(AbstractDataSource):
             return self._invoke("waterdata", codes, sites), "waterdata"
         except Exception as exc:  # noqa: BLE001 - re-raised unless a 429 fallback
             anonymous = self._auth is None or not self._auth.is_authenticated()
-            if self._api == "auto" and anonymous and _helpers.is_rate_limit_error(exc):
+            if (
+                self._api_flavour == "auto"
+                and anonymous
+                and _helpers.is_rate_limit_error(exc)
+            ):
                 if not has_legacy:
                     raise RuntimeError(
                         f"The modern USGS endpoint rate-limited this anonymous "

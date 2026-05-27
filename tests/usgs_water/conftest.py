@@ -122,6 +122,7 @@ _WATERDATA_FNS = [
     "get_daily",
     "get_continuous",
     "get_samples",
+    "get_stats_date_range",
     "get_stats_por",
     "get_field_measurements",
     "get_peaks",

@@ -40,7 +40,7 @@ _SERVICE_FN: dict[str, dict[str, str | None]] = {
     "daily": {"waterdata": "get_daily", "nwis": "get_dv"},
     "instantaneous": {"waterdata": "get_continuous", "nwis": "get_iv"},
     "samples": {"waterdata": "get_samples", "nwis": None},
-    "statistics": {"waterdata": "get_stats_por", "nwis": "get_stats"},
+    "statistics": {"waterdata": "get_stats_date_range", "nwis": "get_stats"},
     "gwlevels": {"waterdata": "get_daily", "nwis": "get_dv"},
     "field-measurements": {"waterdata": "get_field_measurements", "nwis": None},
     "peaks": {"waterdata": "get_peaks", "nwis": "get_discharge_peaks"},
@@ -182,7 +182,7 @@ def query_kwargs(
     if service == "samples":
         return _samples_kwargs(codes, sites, bbox, start, end)
     if service == "statistics":
-        return _statistics_kwargs(flavour, codes, sites, stat_type)
+        return _statistics_kwargs(flavour, codes, sites, stat_type, start, end)
     if service in ("peaks", "ratings"):
         return _site_keyed_kwargs(service, flavour, sites, bbox, start, end)
     if service == "sites":
@@ -250,10 +250,20 @@ def _statistics_kwargs(
     codes: list[str],
     sites: list[str] | None,
     stat_type: str,
+    start: str,
+    end: str,
 ) -> dict[str, Any]:
-    """Kwargs for the statistics service (modern por / legacy get_stats)."""
+    """Kwargs for the statistics service.
+
+    The modern path uses `get_stats_date_range`, which computes interval
+    statistics **within the requested window** (`start_date`/`end_date`),
+    so the caller's date range is honoured. The legacy path uses
+    `get_stats` with `statReportType`, which returns a period-of-record
+    climatology and has no date-window filter — `stat_type` selects the
+    rollup granularity there.
+    """
     if flavour == "waterdata":
-        kwargs: dict[str, Any] = {}
+        kwargs: dict[str, Any] = {"start_date": start, "end_date": end}
         if codes:
             kwargs["parameter_code"] = _maybe(codes)
         if sites:
@@ -488,12 +498,30 @@ PEAKS_COLUMNS: list[str] = [
 RATINGS_COLUMNS: list[str] = ["stage", "discharge", "storage"]
 
 
-def _first_column(df: pd.DataFrame, names: list[str], default: Any = pd.NA) -> Any:
-    """Return the first present column among `names`, else a scalar `default`."""
+def _first_column(
+    df: pd.DataFrame, names: list[str], default: Any = pd.NA
+) -> pd.Series:
+    """Return the first present column among `names` as a Series.
+
+    When none of `names` is present, returns a Series of `default`
+    aligned to the frame's index (not a bare scalar), so callers can
+    always chain `.map()` / `.astype()` / `pd.to_numeric()` on the
+    result without guarding for a missing column — robust to upstream
+    SDK schema drift.
+
+    Args:
+        df: The source frame.
+        names: Candidate column names, in priority order.
+        default: Fill value for the synthetic Series when absent.
+
+    Returns:
+        pd.Series: The matching column, or an index-aligned Series of
+            `default`.
+    """
     for name in names:
         if name in df.columns:
             return df[name]
-    return default
+    return pd.Series(default, index=df.index)
 
 
 def normalize_samples(
@@ -542,12 +570,18 @@ def normalize_samples(
 def normalize_statistics(
     df: pd.DataFrame, flavour: str, code_meta: dict[str, tuple[str, str]]
 ) -> pd.DataFrame:
-    """Fold a statistics frame (modern por / legacy get_stats) to long.
+    """Fold a statistics frame to the long stats schema.
+
+    Handles both modern shapes — `get_stats_date_range` (windowed,
+    `start_date`/`end_date`/`interval_type`) and `get_stats_por`
+    (period-of-record, `time_of_year`) — by reading the period label
+    from whichever column is present. The legacy `get_stats` shape
+    (`year_nu`/`month_nu`/`mean_va`) folds year + month into the
+    `time_of_year` label.
 
     Args:
         df: The statistics frame.
-        flavour: `"waterdata"` (long: `value`/`percentile`/
-            `time_of_year`) or `"nwis"` (`year_nu`/`month_nu`/`mean_va`).
+        flavour: `"waterdata"` (modern long) or `"nwis"` (legacy).
         code_meta: Map from parameter code to `(name, units)`.
 
     Returns:
@@ -561,7 +595,9 @@ def normalize_statistics(
             _strip_site_prefix
         )
         out["parameter_code"] = _first_column(df, ["parameter_code"])
-        out["time_of_year"] = _first_column(df, ["time_of_year"])
+        # `time_of_year` for period-of-record; `start_date` for the
+        # windowed date-range stats — take whichever the frame carries.
+        out["time_of_year"] = _first_column(df, ["time_of_year", "start_date"])
         out["value"] = pd.to_numeric(_first_column(df, ["value"]), errors="coerce")
         out["percentile"] = _first_column(df, ["percentile"])
         out["statistic"] = _first_column(df, ["computation"])
@@ -569,9 +605,9 @@ def normalize_statistics(
     else:
         out["site_no"] = _first_column(df, ["site_no"])
         out["parameter_code"] = _first_column(df, ["parameter_cd"])
-        year = _first_column(df, ["year_nu"], default="")
-        month = _first_column(df, ["month_nu"], default="")
-        out["time_of_year"] = year.astype("string").fillna("") + _join_month(month)
+        year = _first_column(df, ["year_nu"])
+        month = _first_column(df, ["month_nu"])
+        out["time_of_year"] = [_format_time_of_year(y, m) for y, m in zip(year, month)]
         out["value"] = pd.to_numeric(_first_column(df, ["mean_va"]), errors="coerce")
         out["percentile"] = pd.NA
         out["statistic"] = "mean"
@@ -582,11 +618,24 @@ def normalize_statistics(
     return out.reset_index(drop=True)[STATS_COLUMNS]
 
 
-def _join_month(month: Any) -> Any:
-    """Render a legacy `month_nu` column as a `-MM` suffix (or empty)."""
-    if not isinstance(month, pd.Series):
-        return ""
-    return month.map(lambda m: f"-{int(m):02d}" if pd.notna(m) else "")
+def _format_time_of_year(year: Any, month: Any) -> str:
+    """Render a legacy `(year_nu, month_nu)` pair as `YYYY` or `YYYY-MM`.
+
+    Missing parts are dropped, so an annual row (no `month_nu`) yields
+    just the year and a fully-empty row yields `""` — no exceptions on
+    `NA`/empty values.
+
+    Args:
+        year: The `year_nu` cell (int, float, str, or NA).
+        month: The `month_nu` cell (int, float, str, or NA).
+
+    Returns:
+        str: `""`, `"YYYY"`, or `"YYYY-MM"`.
+    """
+    year_part = "" if pd.isna(year) else str(int(year))
+    if pd.isna(month) or year_part == "":
+        return year_part
+    return f"{year_part}-{int(month):02d}"
 
 
 def normalize_sites(df: pd.DataFrame, flavour: str) -> pd.DataFrame:
