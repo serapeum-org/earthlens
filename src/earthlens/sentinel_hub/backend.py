@@ -162,6 +162,8 @@ class SentinelHub(AbstractDataSource):
         self._resolved: dict[str, ResolvedRequest] = {}
         # Aggregation request captured by download(); applied per plane.
         self._aggregate: AggregationConfig | None = None
+        # Per-window time override set by the aggregate= render loop (C10).
+        self._window_override: tuple[str, str] | None = None
         super().__init__(
             start=start,
             end=end,
@@ -288,7 +290,13 @@ class SentinelHub(AbstractDataSource):
         return resolve_api(self._api, max_side, has_geometry, has_s3)
 
     def _time_interval(self) -> tuple[str, str]:
-        """Return the render time interval as ISO `(start, end)` date strings."""
+        """Return the render time interval as ISO `(start, end)` date strings.
+
+        Honours a per-window override set by the `aggregate=` render loop (C10);
+        otherwise the full request window.
+        """
+        if self._window_override is not None:
+            return self._window_override
         return (
             self.time.start_date.strftime("%Y-%m-%d"),
             self.time.end_date.strftime("%Y-%m-%d"),
@@ -866,12 +874,86 @@ class SentinelHub(AbstractDataSource):
             resolved plane.
         """
         self._aggregate = aggregate
-        results = self._api_via_search_fetch()
+        plane = self._resolve_plane()
+        if aggregate is not None and plane in RASTER_APIS:
+            results = self._aggregate_windows(aggregate)
+        else:
+            # Tabular planes apply aggregate via the Statistical
+            # aggregation_interval (see _statistical_interval), so no loop here.
+            results = self._api_via_search_fetch()
         logger.info(
             f"Sentinel Hub download: {len(results)} result(s) written to "
             f"{self.root_dir}"
         )
         return results
+
+    def _aggregate_windows(self, aggregate: AggregationConfig) -> list[Any]:
+        """Render one output per `aggregate.freq` window over the request span.
+
+        Splits `[start, end]` into `freq` windows and renders the resolved raster
+        plane once per window, stamping each local output
+        `{key}_{freq}_{YYYYMMDD}.{suffix}` (the `ecmwf` / `cmems` per-window
+        shape). S3-delivered planes (async / batch) return their per-window URIs
+        unchanged.
+
+        Args:
+            aggregate: The aggregation request (its `freq` drives the windows).
+
+        Returns:
+            The per-window outputs across every requested key.
+        """
+        import pandas as pd
+
+        edges = list(
+            pd.date_range(self.time.start_date, self.time.end_date, freq=aggregate.freq)
+        )
+        if not edges or pd.Timestamp(edges[0]) > pd.Timestamp(self.time.start_date):
+            edges.insert(0, pd.Timestamp(self.time.start_date))
+        results: list[Any] = []
+        keys = list(self._resolved)
+        try:
+            for index, window_start in enumerate(edges):
+                window_end = (
+                    edges[index + 1]
+                    if index + 1 < len(edges)
+                    else pd.Timestamp(self.time.end_date)
+                )
+                self._window_override = (
+                    pd.Timestamp(window_start).strftime("%Y-%m-%d"),
+                    pd.Timestamp(window_end).strftime("%Y-%m-%d"),
+                )
+                stamp = pd.Timestamp(window_start).strftime("%Y%m%d")
+                produced = self._api_via_search_fetch()
+                for key, item in zip(keys, produced):
+                    results.append(self._stamp_window_output(key, item, aggregate, stamp))
+        finally:
+            self._window_override = None
+        return results
+
+    def _stamp_window_output(
+        self, key: str, item: Any, aggregate: AggregationConfig, stamp: str
+    ) -> Any:
+        """Rename a local per-window raster to the stamped name; pass URIs through.
+
+        Args:
+            key: The requested collection/recipe key.
+            item: A produced output (a local `Path`/str, or an S3 URI string).
+            aggregate: The aggregation request (its `freq` labels the file).
+            stamp: The window's `YYYYMMDD` start stamp.
+
+        Returns:
+            The renamed local path, or the original S3 URI string.
+        """
+        source = Path(str(item))
+        if not source.exists():
+            return item
+        suffix = source.suffix or ".tif"
+        target = (
+            Path(self.root_dir)
+            / f"{_safe_name(key)}_{aggregate.freq}_{stamp}{suffix}"
+        )
+        source.replace(target)
+        return target
 
 
 #: The Statistical `calculations` block requesting the 5/50/95 percentiles
