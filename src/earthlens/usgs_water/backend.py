@@ -192,15 +192,20 @@ class USGSWater(AbstractDataSource):
             service: The NWIS / Water Data plane to query — one of
                 :data:`SERVICES`. Defaults to `"daily"`.
             sites: Explicit USGS site number(s) to query, bypassing the
-                bbox site discovery. Required for the site-keyed
-                services (`peaks`, `ratings`).
+                bbox site discovery. **Required** for the services that
+                have no spatial (bbox) filter — `peaks`, `ratings`, and
+                `statistics`; a bbox-only request for one of those raises
+                `ValueError`.
             api: Endpoint selector — `"auto"` (default; modern with a
                 429 fallback to legacy), `"waterdata"` (force modern),
                 or `"legacy"` (force the deprecated `nwis` endpoint).
             output_format: On-disk format — `"csv"` (default) or
                 `"parquet"`.
-            stat_type: For `service="statistics"`, the rollup period —
-                `"daily"`, `"monthly"`, or `"annual"`.
+            stat_type: For `service="statistics"` on the **legacy**
+                endpoint (`api="legacy"`), the `get_stats` rollup period
+                — `"daily"`, `"monthly"`, or `"annual"`. Ignored by the
+                modern endpoint, whose `get_stats_date_range` returns its
+                own intervals over the `start`/`end` window.
             limit: Optional cap on the rows pulled per request (passed
                 through to the modern endpoint's `limit=`). `None`
                 means the SDK default.
@@ -363,6 +368,9 @@ class USGSWater(AbstractDataSource):
             NotImplementedError: If `aggregate` is not `None` (tabular
                 output has no gridded reduction; use
                 `service="statistics"` instead).
+            ValueError: If the selected `service` requires an explicit
+                `sites=` (`peaks` / `ratings` / `statistics`) but none
+                was supplied.
         """
         if aggregate is not None:
             raise NotImplementedError(
