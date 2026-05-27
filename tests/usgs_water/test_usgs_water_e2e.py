@@ -114,7 +114,9 @@ def test_sites_discovery_legacy(tmp_path: Path):
 
 
 @_offline_skip
-@pytest.mark.skipif(not _HAVE_TOKEN, reason="set API_USGS_PAT for the modern samples e2e")
+@pytest.mark.skipif(
+    not _HAVE_TOKEN, reason="set API_USGS_PAT for the modern samples e2e"
+)
 def test_samples_modern(tmp_path: Path):
     """A water-quality samples pull (modern endpoint) returns result rows."""
     df = EarthLens(

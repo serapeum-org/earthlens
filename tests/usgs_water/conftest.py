@@ -97,8 +97,10 @@ class FakeUSGS:
                 raise self._raises[fn_name]
             frame = self._returns.get(fn_name)
             if frame is None:
-                frame = modern_long_frame() if flavour == "waterdata" else (
-                    legacy_wide_frame()
+                frame = (
+                    modern_long_frame()
+                    if flavour == "waterdata"
+                    else (legacy_wide_frame())
                 )
             return frame, {"meta": True}
 

@@ -270,7 +270,12 @@ def test_normalize_peaks_legacy():
     idx = pd.to_datetime(["1990-03-01"], utc=True)
     idx.name = "datetime"
     frame = pd.DataFrame(
-        {"site_no": ["01646500"], "peak_va": [350000.0], "gage_ht": [20.1], "peak_cd": ["5"]},
+        {
+            "site_no": ["01646500"],
+            "peak_va": [350000.0],
+            "gage_ht": [20.1],
+            "peak_cd": ["5"],
+        },
         index=idx,
     )
     out = _helpers.normalize(frame, "nwis", "peaks", CODE_META)
@@ -453,7 +458,9 @@ def test_normalize_sites_modern():
     assert out["station_name"].iloc[0] == "POTOMAC"
 
 
-@pytest.mark.parametrize("service", ["samples", "statistics", "sites", "peaks", "ratings"])
+@pytest.mark.parametrize(
+    "service", ["samples", "statistics", "sites", "peaks", "ratings"]
+)
 def test_normalize_empty_per_service(service):
     """Each service's normalize returns its own zero-row schema when empty."""
     import pandas as pd

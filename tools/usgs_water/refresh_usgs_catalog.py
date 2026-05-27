@@ -75,10 +75,7 @@ def refresh(_args: argparse.Namespace) -> int:
     index: dict[str, dict[str, str]] = {}
     for _, row in frame.iterrows():
         code = str(
-            row.get("parameter_code")
-            or row.get("parameterCode")
-            or row.get("id")
-            or ""
+            row.get("parameter_code") or row.get("parameterCode") or row.get("id") or ""
         ).strip()
         if not code:
             continue
@@ -130,9 +127,9 @@ def validate(_args: argparse.Namespace) -> int:
             if service not in SERVICES:
                 errors.append(f"{name!r}: unknown service {service!r}")
     if AVAILABLE_PATH.exists():
-        index = (
-            yaml.safe_load(AVAILABLE_PATH.read_text(encoding="utf-8")) or {}
-        ).get("available_parameters", {})
+        index = (yaml.safe_load(AVAILABLE_PATH.read_text(encoding="utf-8")) or {}).get(
+            "available_parameters", {}
+        )
         for name, param in catalog.parameters.items():
             if index and param.code not in index:
                 errors.append(f"{name!r}: code {param.code} not in the live index")

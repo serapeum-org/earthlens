@@ -207,9 +207,7 @@ class USGSWater(AbstractDataSource):
                 f"service must be one of {list(SERVICES)}, got {service!r}."
             )
         if api not in API_FLAVOURS:
-            raise ValueError(
-                f"api must be one of {list(API_FLAVOURS)}, got {api!r}."
-            )
+            raise ValueError(f"api must be one of {list(API_FLAVOURS)}, got {api!r}.")
         if output_format not in OUTPUT_FORMATS:
             raise ValueError(
                 f"output_format must be one of {list(OUTPUT_FORMATS)}, "

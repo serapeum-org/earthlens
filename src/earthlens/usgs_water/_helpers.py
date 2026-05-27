@@ -287,9 +287,7 @@ def _site_keyed_kwargs(
     return {"sites": list(sites), "start": start, "end": end}
 
 
-def _sites_kwargs(
-    flavour: str, bbox: list[float], limit: int | None
-) -> dict[str, Any]:
+def _sites_kwargs(flavour: str, bbox: list[float], limit: int | None) -> dict[str, Any]:
     """Kwargs for the site-discovery service."""
     if flavour == "waterdata":
         kwargs: dict[str, Any] = {"bbox": list(bbox)}
@@ -478,7 +476,13 @@ SITE_COLUMNS: list[str] = [
 ]
 
 #: Output columns for the annual-peak (`peaks`) service.
-PEAKS_COLUMNS: list[str] = ["site_no", "datetime", "peak_value", "gage_height", "qualifier"]
+PEAKS_COLUMNS: list[str] = [
+    "site_no",
+    "datetime",
+    "peak_value",
+    "gage_height",
+    "qualifier",
+]
 
 #: Output columns for the stage-discharge rating (`ratings`) service.
 RATINGS_COLUMNS: list[str] = ["stage", "discharge", "storage"]
@@ -567,10 +571,7 @@ def normalize_statistics(
         out["parameter_code"] = _first_column(df, ["parameter_cd"])
         year = _first_column(df, ["year_nu"], default="")
         month = _first_column(df, ["month_nu"], default="")
-        out["time_of_year"] = (
-            year.astype("string").fillna("")
-            + _join_month(month)
-        )
+        out["time_of_year"] = year.astype("string").fillna("") + _join_month(month)
         out["value"] = pd.to_numeric(_first_column(df, ["mean_va"]), errors="coerce")
         out["percentile"] = pd.NA
         out["statistic"] = "mean"
@@ -602,9 +603,9 @@ def normalize_sites(df: pd.DataFrame, flavour: str) -> pd.DataFrame:
         return pd.DataFrame({column: [] for column in SITE_COLUMNS})
     out = pd.DataFrame(index=df.index)
     if flavour == "waterdata":
-        out["site_no"] = _first_column(
-            df, ["monitoring_location_id"]
-        ).map(_strip_site_prefix)
+        out["site_no"] = _first_column(df, ["monitoring_location_id"]).map(
+            _strip_site_prefix
+        )
         out["station_name"] = _first_column(df, ["monitoring_location_name"])
         out["latitude"] = pd.to_numeric(
             _first_column(df, ["dec_lat_va"]), errors="coerce"
@@ -687,7 +688,9 @@ def normalize_ratings(df: pd.DataFrame, flavour: str) -> pd.DataFrame:
     out["discharge"] = pd.to_numeric(
         _first_column(df, ["DEP", "discharge"]), errors="coerce"
     )
-    out["storage"] = pd.to_numeric(_first_column(df, ["STOR", "storage"]), errors="coerce")
+    out["storage"] = pd.to_numeric(
+        _first_column(df, ["STOR", "storage"]), errors="coerce"
+    )
     return out.reset_index(drop=True)[RATINGS_COLUMNS]
 
 

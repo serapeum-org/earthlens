@@ -35,9 +35,7 @@ def test_add_parameter_appends_and_reloads(tmp_path, monkeypatch):
     """add-parameter writes a stanza that reloads cleanly."""
     tool = _load_tool()
     catalog = tmp_path / "cat.yaml"
-    catalog.write_text(
-        "parameters:\n  discharge: {code: '00060', services: [daily]}\n"
-    )
+    catalog.write_text("parameters:\n  discharge: {code: '00060', services: [daily]}\n")
     monkeypatch.setattr(tool, "CATALOG_PATH", catalog)
     monkeypatch.setattr(tool.Catalog, "load", classmethod(lambda cls: None))
     rc = tool.main(["add-parameter", "ph", "00400", "--units", "std units"])

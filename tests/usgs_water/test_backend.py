@@ -167,9 +167,9 @@ def test_empty_result_writes_schema_only(fake_usgs, usgs_kwargs, tmp_path):
 def test_samples_calls_get_samples(fake_usgs, usgs_kwargs):
     """The samples service calls modern waterdata.get_samples."""
     fake_usgs.set_return("get_samples", _samples_frame())
-    df = USGSWater(**usgs_kwargs(service="samples", variables=["dissolved_oxygen"])).download(
-        progress_bar=False
-    )
+    df = USGSWater(
+        **usgs_kwargs(service="samples", variables=["dissolved_oxygen"])
+    ).download(progress_bar=False)
     assert fake_usgs.called() == ["get_samples"]
     assert "detection_limit" in df.columns
     assert df["value"].iloc[0] == 8.5
@@ -205,7 +205,9 @@ def test_statistics_legacy_forwards_stat_type(fake_usgs, usgs_kwargs):
     """Legacy statistics forwards stat_type as statReportType."""
     fake_usgs.set_return("get_stats", _stats_legacy_frame())
     USGSWater(
-        **usgs_kwargs(service="statistics", sites="01646500", api="legacy", stat_type="monthly")
+        **usgs_kwargs(
+            service="statistics", sites="01646500", api="legacy", stat_type="monthly"
+        )
     ).download(progress_bar=False)
     assert fake_usgs.kwargs_for("get_stats")["statReportType"] == "monthly"
 
@@ -213,7 +215,9 @@ def test_statistics_legacy_forwards_stat_type(fake_usgs, usgs_kwargs):
 def test_gwlevels_routes_through_daily(fake_usgs, usgs_kwargs):
     """gwlevels is a parameter family served by get_daily."""
     USGSWater(
-        **usgs_kwargs(service="gwlevels", variables=["groundwater_level"], sites="375907091432201")
+        **usgs_kwargs(
+            service="gwlevels", variables=["groundwater_level"], sites="375907091432201"
+        )
     ).download(progress_bar=False)
     assert fake_usgs.called() == ["get_daily"]
 
@@ -304,7 +308,12 @@ def _peaks_legacy_frame():
     idx = pd.to_datetime(["1990-03-01"], utc=True)
     idx.name = "datetime"
     return pd.DataFrame(
-        {"site_no": ["01646500"], "peak_va": [350000.0], "gage_ht": [20.1], "peak_cd": ["5"]},
+        {
+            "site_no": ["01646500"],
+            "peak_va": [350000.0],
+            "gage_ht": [20.1],
+            "peak_cd": ["5"],
+        },
         index=idx,
     )
 
