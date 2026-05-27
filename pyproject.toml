@@ -27,7 +27,10 @@ classifiers = [
 requires-python = ">= 3.11, <4"
 
 dependencies = [
-    "pyramids-gis >=0.23.0",
+    # >=0.24.1: fixes get_epsg_from_prj returning the unit code EPSG:9122 for
+    # GRIB CRS (pyramids#403 / PY-1), so Dataset.epsg is 4326 and the NWP
+    # crop/COG/aggregate path no longer trips on an unresolvable EPSG.
+    "pyramids-gis >=0.24.1",
     "geopandas >=1.0.0",
     "joblib >=1.5.0",
     "loguru >=0.7.3",
@@ -55,6 +58,17 @@ cmems = ["copernicusmarine >=2.0.0,<3"]
 fdsn = ["obspy >=1.5.0"]
 earthdata = ["earthaccess >=0.18.0; python_version >= '3.12'"]
 eumetsat = ["eumdac >=3.1"]
+# herbie-data transitively pulls cfgrib + eccodes (its core imports cfgrib at
+# module load); the eccodes *binary* library is an environment requirement,
+# like libgdal-grib for pyramids' GRIB reader — install it via conda-forge
+# (`eccodes`) where the pip wheel cannot find it. earthlens itself imports
+# neither cfgrib nor eccodes directly.
+nwp = ["herbie-data >=2026.3", "ecmwf-opendata >=0.3"]
+# NEXRAD Level-II via the unsigned unidata-nexrad-level2-chunks bucket: the MVP
+# only assembles the chunk files (boto3), no decode. `arm-pyart` is the optional
+# reader for the assembled .ar2v volumes (gridding is a follow-on), kept out of
+# the base extra so a fetch-only install stays light.
+radar = ["boto3 >=1.43.0", "botocore >=1.34.0"]
 stac = ["pyramids-gis[stac]"]
 # Pin openeo to the 0.47.x line: openeo 0.48+ hard-caps pandas<3, which would
 # force a pandas downgrade across the whole shared environment. 0.47.0 is the
@@ -67,19 +81,24 @@ sentinel-hub = ["sentinelhub >=3.11.5"]
 # tropycal.utils.cartopy_utils (module-level `import cartopy`); tropycal omits it
 # from its own deps, so earthlens must supply it or the import fails.
 tropycal = ["tropycal >=1.4", "cartopy >=0.22"]
+overture = ["overturemaps >=1.0.0", "duckdb >=1.0.0"]
 all = [
     "boto3 >=1.43.0",
     "botocore >=1.34.0",
     "cartopy >=0.22",
     "cdsapi >=0.7.7",
     "copernicusmarine >=2.0.0,<3",
+    "duckdb >=1.0.0",
     "earthengine-api >=1.7.26",
     "earthaccess >=0.18.0; python_version >= '3.12'",
     "eumdac >=3.1",
     "google-api-python-client >=2.0",
     "google-cloud-storage >=2.0",
+    "herbie-data >=2026.3",
+    "ecmwf-opendata >=0.3",
     "obspy >=1.5.0",
     "openeo >=0.47,<0.48",
+    "overturemaps >=1.0.0",
     "pyramids-gis[stac]",
     "Rtree >=1.0.0",
     "sentinelhub >=3.11.5",
@@ -162,6 +181,9 @@ include = ["earthlens", "earthlens.*"]
 "earthlens.openaq" = ["*.yaml"]
 "earthlens.tropycal" = ["*.yaml"]
 "earthlens.firms" = ["*.yaml"]
+"earthlens.overture" = ["*.yaml"]
+"earthlens.nwp" = ["*.yaml"]
+"earthlens.radar" = ["*.yaml"]
 
 [tool.flake8]
 ignore = ["E203", "E266", "E501", "W503", "E722", "C901", "E741", "E731"]
@@ -235,6 +257,9 @@ markers = [
     "openaq: tests for the OpenAQ v3 air-quality backend (no extra SDK; uses the core `requests` dependency).",
     "tropycal: tests for the Tropycal cyclone-track backend (requires the `tropycal` extra: tropycal, cartopy).",
     "firms: tests for the NASA FIRMS active-fire backend (free MAP_KEY, no extra SDK; uses the core `requests` + `pandas` dependencies).",
+    "overture: tests for the Overture Maps vector backend (requires the `overture` extra: overturemaps).",
+    "nwp: tests for the NWP forecast backend (requires the `nwp` extra: herbie-data, ecmwf-opendata; GRIB read via pyramids' GDAL driver).",
+    "radar: tests for the NEXRAD Level-II radar backend (requires the `radar` extra: boto3; unsigned unidata-nexrad-level2-chunks bucket).",
 ]
 
 [tool.pixi.workspace]
@@ -269,7 +294,10 @@ test-gdacs ={ cmd = "pytest -vvv -m 'gdacs and not e2e' --cov=src/earthlens --co
 test-openaq = { cmd = "pytest -vvv -m 'openaq and not e2e' --cov=src/earthlens --cov-report=xml --cov-report=term-missing", description = "Run OpenAQ-backend tests (no extra SDK; uses the core requests dependency)" }
 test-tropycal = { cmd = "pytest -vvv -m 'tropycal and not e2e' --cov=src/earthlens --cov-report=xml --cov-report=term-missing", description = "Run Tropycal cyclone-track backend tests (requires the `tropycal` extra: tropycal, cartopy)" }
 test-firms = { cmd = "pytest -vvv -m 'firms and not e2e' --cov=src/earthlens --cov-report=xml --cov-report=term-missing", description = "Run NASA FIRMS active-fire backend tests (free MAP_KEY, no extra SDK)" }
-test-doctests = { cmd = "pytest --doctest-modules src/earthlens/gee src/earthlens/chc src/earthlens/ecmwf src/earthlens/cmems src/earthlens/fdsn src/earthlens/earthdata src/earthlens/eumetsat src/earthlens/stac src/earthlens/openeo src/earthlens/sentinel_hub src/earthlens/gdacs src/earthlens/openaq src/earthlens/tropycal src/earthlens/firms src/earthlens/base", description = "Run docstring examples across the backend packages (catches drift in catalog / API docstrings)" }
+test-overture = { cmd = "pytest -vvv -m 'overture and not e2e' --cov=src/earthlens --cov-report=xml --cov-report=term-missing", description = "Run Overture Maps vector backend tests (requires the `overture` extra: overturemaps)" }
+test-nwp = { cmd = "pytest -vvv -m 'nwp and not e2e' --cov=src/earthlens --cov-report=xml --cov-report=term-missing", description = "Run NWP forecast backend tests (requires the `nwp` extra: herbie-data, ecmwf-opendata)" }
+test-radar = { cmd = "pytest -vvv -m 'radar and not e2e' --cov=src/earthlens --cov-report=xml --cov-report=term-missing", description = "Run NEXRAD radar backend tests (requires the `radar` extra: boto3)" }
+test-doctests = { cmd = "pytest --doctest-modules src/earthlens/gee src/earthlens/chc src/earthlens/ecmwf src/earthlens/cmems src/earthlens/fdsn src/earthlens/earthdata src/earthlens/eumetsat src/earthlens/stac src/earthlens/openeo src/earthlens/sentinel_hub src/earthlens/gdacs src/earthlens/openaq src/earthlens/tropycal src/earthlens/firms src/earthlens/overture src/earthlens/nwp src/earthlens/radar src/earthlens/base", description = "Run docstring examples across the backend packages (catches drift in catalog / API docstrings)" }
 notebooks = { cmd = "pytest --nbval --nbval-lax --verbose docs/examples", description = "check notebooks" }
 jupyter = { cmd = "jupyter lab --no-browser --IdentityProvider.token='' --ServerApp.password='' --port=8889", description = "check notebooks" }
 build-dist = { cmd = "python -m build", description = "Build sdist and wheel for PyPI" }
@@ -279,13 +307,22 @@ cz-bump = { cmd = "cz bump", description = "Bump version using Commitizen" }
 
 [tool.pixi.environments]
 default = { solve-group = "default" }
-dev = { features = ["dev"], solve-group = "default" }
+dev = { features = ["dev", "nwp"], solve-group = "default" }
 docs = { features = ["docs"], solve-group = "docs" }
 py311 = { features = ["py311", "dev"], solve-group = "py311" }
 py312 = { features = ["py312", "dev"], solve-group = "py312" }
 py313 = { features = ["py313", "dev"], solve-group = "py313" }
 py314 = { features = ["py314", "dev"], solve-group = "py314" }
-notebook = { features = ["dev", "notebook"], solve-group = "default" }
+notebook = { features = ["dev", "notebook", "nwp"], solve-group = "default" }
+
+# eccodes C library (conda-forge): herbie-data's cfgrib import chain needs the
+# binary at runtime (the [nwp] extra's pip `eccodes` binding cannot locate the
+# lib on its own). Scoped to this feature — included only by the `dev` and
+# `notebook` envs, where the NWP backend / live notebooks are exercised — so the
+# docs and per-Python test-matrix envs do not carry the GRIB/netCDF stack. CI's
+# unit suite fakes herbie, so the matrix envs never need the binary.
+[tool.pixi.feature.nwp.dependencies]
+eccodes = ">=2.47,<3"
 
 [tool.pixi.feature.py311.dependencies]
 python = "3.11.*"
