@@ -138,7 +138,7 @@ class EarthLens:
             ['amazon-s3', 'cdse', 'chc', 'chirps', 'cmems', 'earth-search',
              'earthdata', 'ecmwf', 'eumetsat', 'fdsn', 'firms', 'gdacs', 'gee',
              'google-earth-engine', 'nexrad', 'nwp', 'openaq', 'openeo',
-             'planetary-computer', 'radar', 'stac', 'tropycal']
+             'overture', 'planetary-computer', 'radar', 'stac', 'tropycal']
 
             ```
         - Asking for an unknown backend raises `ValueError`:
@@ -184,6 +184,11 @@ class EarthLens:
         :class:`earthlens.firms.FIRMS`: NASA FIRMS active-fire
             detections (MODIS / VIIRS) as a `vector` FeatureCollection;
             free `MAP_KEY`, no extra; key `"firms"`.
+        :class:`earthlens.overture.Overture`: Overture Maps Foundation
+            GeoParquet (buildings / places / transportation / divisions)
+            over public S3 via `overturemaps`; `vector` FeatureCollection
+            output with a per-row `license_id` column (and an ODbL
+            `LicenseWarning`); no credentials; key `"overture"`.
         :class:`earthlens.nwp.NWP`: open numerical-weather-prediction
             forecasts (NOAA NODD / ECMWF Open Data / DWD) on a forecast
             `(cycle, step)` axis, returned as bbox-cropped COGs; key
@@ -215,6 +220,9 @@ class EarthLens:
             # openEO server-side processing (defaults to CDSE openEO). Builds a
             # process graph the backend executes; returns the written paths.
             "openeo": ("earthlens.openeo", "OpenEO", "openeo", {}),
+            # Overture Maps GeoParquet over public S3 (no creds). Vector
+            # FeatureCollection output with a per-row license_id column.
+            "overture": ("earthlens.overture", "Overture", "overture", {}),
             "tropycal": ("earthlens.tropycal", "TropicalCyclone", "tropycal", {}),
             # FIRMS needs a free MAP_KEY but no SDK (requests + pandas
             # are core), so like GDACS there is no extra to hint.

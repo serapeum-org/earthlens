@@ -176,6 +176,12 @@ nav:
       - Usage: reference/firms/usage.md
       - Authentication: reference/firms/authentication.md
       - Reference: reference/firms/firms.md
+    - Overture Maps (vector basemap):
+      - Introduction: reference/overture/introduction.md
+      - Usage: reference/overture/usage.md
+      - Licensing: reference/overture/licensing.md
+      - Available datasets: reference/overture/datasets.md
+      - Reference: reference/overture/overture.md
     - NWP (weather forecasts):
       - Introduction: reference/nwp/introduction.md
       - Usage: reference/nwp/usage.md
@@ -276,6 +282,14 @@ nav:
       - Quickstart — recent fires: examples/firms/quickstart.ipynb
       - Fire-season time-series: examples/firms/fire_season_timeseries.ipynb
       - MODIS vs VIIRS comparison: examples/firms/modis_vs_viirs_comparison.ipynb
+    - Overture Maps (vector basemap):
+      - Catalog explorer (no network): examples/overture/01_catalog_explorer.ipynb
+      - Places quickstart: examples/overture/02_places_quickstart.ipynb
+      - Building footprints: examples/overture/03_buildings_footprints.ipynb
+      - Per-row licensing: examples/overture/04_per_row_licensing.ipynb
+      - Transportation network: examples/overture/05_transportation_network.ipynb
+      - Multi-theme download: examples/overture/06_multi_theme_download.ipynb
+      - Attribute pushdown (where=): examples/overture/07_attribute_pushdown.ipynb
     - Open NWP forecasts:
       - Catalog explorer (no network): examples/nwp/catalog_explorer.ipynb
       - GFS 2 m temperature (live): examples/nwp/gfs_temperature.ipynb
