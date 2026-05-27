@@ -464,7 +464,7 @@ def _require_overturemaps() -> None:
     """
     try:
         import overturemaps  # noqa: F401
-    except ImportError as exc:  # pragma: no cover - exercised via monkeypatch
+    except ImportError as exc:  # pragma: no cover
         raise ImportError(
             "The Overture backend requires the `overturemaps` SDK. Install "
             "it with `pip install earthlens[overture]`."
