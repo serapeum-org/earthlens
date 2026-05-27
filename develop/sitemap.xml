@@ -325,38 +325,6 @@
          <lastmod>2026-05-27</lastmod>
     </url>
     <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/examples/sentinel-hub/aggregate_monthly/</loc>
-         <lastmod>2026-05-27</lastmod>
-    </url>
-    <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/examples/sentinel-hub/batch_walkthrough/</loc>
-         <lastmod>2026-05-27</lastmod>
-    </url>
-    <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/examples/sentinel-hub/catalog_explorer/</loc>
-         <lastmod>2026-05-27</lastmod>
-    </url>
-    <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/examples/sentinel-hub/custom_evalscript/</loc>
-         <lastmod>2026-05-27</lastmod>
-    </url>
-    <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/examples/sentinel-hub/local_tiling/</loc>
-         <lastmod>2026-05-27</lastmod>
-    </url>
-    <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/examples/sentinel-hub/quickstart_ndvi/</loc>
-         <lastmod>2026-05-27</lastmod>
-    </url>
-    <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/examples/sentinel-hub/statistical_zonal_stats/</loc>
-         <lastmod>2026-05-27</lastmod>
-    </url>
-    <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/examples/sentinel-hub/true_colour/</loc>
-         <lastmod>2026-05-27</lastmod>
-    </url>
-    <url>
          <loc>https://serapeum-org.github.io/earthlens/develop/examples/stac/mpc_landsat_cdse_sentinel_same_aoi/</loc>
          <lastmod>2026-05-27</lastmod>
     </url>
@@ -398,6 +366,22 @@
     </url>
     <url>
          <loc>https://serapeum-org.github.io/earthlens/develop/examples/tropycal/source_comparison/</loc>
+         <lastmod>2026-05-27</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/examples/usgs-water/multi_parameter_and_instantaneous/</loc>
+         <lastmod>2026-05-27</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/examples/usgs-water/peaks_and_ratings/</loc>
+         <lastmod>2026-05-27</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/examples/usgs-water/quickstart_daily_discharge/</loc>
+         <lastmod>2026-05-27</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/examples/usgs-water/site_discovery_and_statistics/</loc>
          <lastmod>2026-05-27</lastmod>
     </url>
     <url>
@@ -657,30 +641,6 @@
          <lastmod>2026-05-27</lastmod>
     </url>
     <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/reference/sentinel-hub/authentication/</loc>
-         <lastmod>2026-05-27</lastmod>
-    </url>
-    <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/reference/sentinel-hub/datasets/</loc>
-         <lastmod>2026-05-27</lastmod>
-    </url>
-    <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/reference/sentinel-hub/introduction/</loc>
-         <lastmod>2026-05-27</lastmod>
-    </url>
-    <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/reference/sentinel-hub/sentinel_hub/</loc>
-         <lastmod>2026-05-27</lastmod>
-    </url>
-    <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/reference/sentinel-hub/statistical-batch/</loc>
-         <lastmod>2026-05-27</lastmod>
-    </url>
-    <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/reference/sentinel-hub/usage/</loc>
-         <lastmod>2026-05-27</lastmod>
-    </url>
-    <url>
          <loc>https://serapeum-org.github.io/earthlens/develop/reference/stac/authentication/</loc>
          <lastmod>2026-05-27</lastmod>
     </url>
@@ -706,6 +666,26 @@
     </url>
     <url>
          <loc>https://serapeum-org.github.io/earthlens/develop/reference/tropycal/usage/</loc>
+         <lastmod>2026-05-27</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/usgs-water/authentication/</loc>
+         <lastmod>2026-05-27</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/usgs-water/datasets/</loc>
+         <lastmod>2026-05-27</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/usgs-water/introduction/</loc>
+         <lastmod>2026-05-27</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/usgs-water/usage/</loc>
+         <lastmod>2026-05-27</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/usgs-water/usgs_water/</loc>
          <lastmod>2026-05-27</lastmod>
     </url>
 </urlset>
