@@ -7,7 +7,7 @@ from pathlib import Path
 
 import pytest
 
-from earthlens.nwm import BUCKET, NWM, Catalog, NWMProduct, NWMVariable
+from earthlens.nwm import BUCKET, NWM
 from earthlens.nwm.backend import (
     _is_missing_key,
     build_key,
@@ -135,30 +135,45 @@ def test_empty_variable_list_selects_all(make_nwm):
 
 
 def test_product_not_in_configuration_rejected(tmp_path):
-    """A product not published under the chosen configuration is rejected."""
-    product = NWMProduct(
-        product="chrtout",
-        output_kind="tabular",
-        s3_token="channel_rt",
-        configurations=["short_range"],
-        variables={"streamflow": NWMVariable(units="m3 s-1")},
-    )
-    cfg = {
-        "short_range": Catalog().get_config("short_range"),
-        "analysis_assim": Catalog().get_config("analysis_assim"),
-    }
-    cat = Catalog(datasets={"chrtout": product}, configurations=cfg)
+    """A product the configuration does not publish is rejected."""
+    # `coastal` exists as a product but `short_range` (conus) does not carry it.
     with pytest.raises(ValueError, match="not published under"):
         NWM(
             start="2026-05-26",
             end="2026-05-26",
-            variables={"chrtout": ["streamflow"]},
+            variables={"coastal": ["elevation"]},
             lat_lim=[-90, 90],
             lon_lim=[-180, 180],
-            configuration="analysis_assim",
+            configuration="short_range",
             path=str(tmp_path),
-            catalog=cat,
         )
+
+
+def test_build_key_subhourly_width(catalog):
+    """The Hawaii short-range domain uses a 5-digit forecast step token."""
+    key = build_key(
+        catalog.get_config("short_range_hawaii"),
+        catalog.get_product("chrtout"),
+        dt.datetime(2026, 5, 26, 0),
+        15,
+        1,
+    )
+    assert key.endswith("nwm.t00z.short_range.channel_rt.f00015.hawaii.nc")
+
+
+def test_coastal_product_is_tabular(make_nwm):
+    """A coastal total_water request resolves to a tabular instance."""
+    nwm = make_nwm(
+        variables={"coastal": ["elevation"]},
+        configuration="short_range_coastal_pacific",
+    )
+    assert nwm.OUTPUT_KIND == "tabular"
+
+
+def test_forcing_product_is_raster(make_nwm):
+    """A forcing request resolves to a raster instance."""
+    nwm = make_nwm(variables={"forcing": ["T2D"]}, configuration="forcing_short_range")
+    assert nwm.OUTPUT_KIND == "raster"
 
 
 def test_bad_member_rejected(make_nwm):

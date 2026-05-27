@@ -13,14 +13,35 @@ pytestmark = [pytest.mark.nwm, pytest.mark.unit]
 
 
 def test_products_listed(catalog):
-    """The bundled catalog exposes the two MVP products."""
-    assert catalog.products() == ["chrtout", "ldasout"]
+    """The bundled catalog exposes all six NWM products."""
+    assert catalog.products() == [
+        "chrtout",
+        "coastal",
+        "forcing",
+        "lakeout",
+        "ldasout",
+        "rtout",
+    ]
 
 
 def test_per_product_output_kind(catalog):
-    """chrtout is tabular (feature_id) and ldasout is raster (gridded)."""
-    assert catalog.get_product("chrtout").output_kind == "tabular"
-    assert catalog.get_product("ldasout").output_kind == "raster"
+    """Feature/lake/node-indexed products are tabular; gridded ones raster."""
+    kinds = {k: catalog.get_product(k).output_kind for k in catalog.products()}
+    assert kinds == {
+        "chrtout": "tabular",
+        "lakeout": "tabular",
+        "coastal": "tabular",
+        "ldasout": "raster",
+        "rtout": "raster",
+        "forcing": "raster",
+    }
+
+
+def test_available_indices(catalog):
+    """The catalog exposes curated-equals-available product and config indices."""
+    assert catalog.available_datasets == catalog.products()
+    assert len(catalog.available_configurations) == len(catalog.configurations)
+    assert "short_range_hawaii" in catalog.available_configurations
 
 
 def test_product_dims_and_token(catalog):
@@ -45,12 +66,10 @@ def test_unknown_product_did_you_mean(catalog):
 
 
 def test_configs_listed(catalog):
-    """The three CONUS configurations are present."""
-    assert sorted(catalog.configurations) == [
-        "analysis_assim",
-        "medium_range",
-        "short_range",
-    ]
+    """All 55 live configurations are curated, including regional/coastal ones."""
+    assert len(catalog.configurations) == 55
+    for key in ("short_range", "analysis_assim", "medium_range", "long_range"):
+        assert key in catalog.configurations
 
 
 def test_config_attributes(catalog):
@@ -59,6 +78,18 @@ def test_config_attributes(catalog):
     assert sr.horizon_h == 18 and sr.step_kind == "forecast"
     assert catalog.get_config("analysis_assim").step_kind == "analysis"
     assert catalog.get_config("medium_range").members == 6
+
+
+def test_subhourly_config_step_width(catalog):
+    """The Hawaii short-range domain is sub-hourly with a 5-digit step width."""
+    hi = catalog.get_config("short_range_hawaii")
+    assert hi.step_width == 5 and hi.step_cadence_h == 15 and hi.domain == "hawaii"
+
+
+def test_config_carries_products(catalog):
+    """A configuration lists the product keys it publishes."""
+    assert "coastal" in catalog.get_config("short_range_coastal_pacific").products
+    assert catalog.get_config("forcing_short_range").products == ["forcing"]
 
 
 def test_unknown_config_did_you_mean(catalog):
@@ -71,7 +102,7 @@ def test_dict_surface(catalog):
     """The catalog supports membership, indexing and length over products."""
     assert "chrtout" in catalog
     assert catalog["ldasout"].output_kind == "raster"
-    assert len(catalog) == 2
+    assert len(catalog) == 6
 
 
 def test_extra_field_rejected(tmp_path):
@@ -148,7 +179,6 @@ def test_injected_catalog_skips_disk(tmp_path):
         product="chrtout",
         output_kind="tabular",
         s3_token="channel_rt",
-        configurations=["short_range"],
         variables={"streamflow": NWMVariable(units="m3 s-1")},
     )
     cfg = {"short_range": Catalog().get_config("short_range")}
