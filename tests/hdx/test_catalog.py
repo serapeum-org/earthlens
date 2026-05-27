@@ -175,6 +175,13 @@ class TestLoaderHelpers:
         """The bundled CATALOG_PATH points at the per-theme directory."""
         assert catalog_mod.CATALOG_PATH.is_dir()
 
+    def test_mtime_ns_existing_and_missing(self, tmp_path: Path):
+        """_mtime_ns returns a stat for a real file and 0 for a missing one."""
+        real = tmp_path / "x.yaml"
+        real.write_text("datasets: {}\n", encoding="utf-8")
+        assert catalog_mod._mtime_ns(real) > 0
+        assert catalog_mod._mtime_ns(tmp_path / "gone.yaml") == 0
+
     def test_load_available_reads_enriched_rows(self, tmp_path: Path):
         """The enriched `{datasets: {id: {org, title}}}` shape is read."""
         import json

@@ -151,13 +151,37 @@ class TestSearch:
 class TestFetch:
     """Tests for HDX._fetch (download resources to disk)."""
 
-    def test_downloads_to_root_dir(self, fake_hdx: FakeHdx, tmp_path):
-        """Resources are downloaded into root_dir and their paths returned."""
+    def test_downloads_into_per_dataset_subdir(self, fake_hdx: FakeHdx, tmp_path):
+        """Resources are downloaded into a per-dataset subdir of root_dir."""
         fake_hdx.add_dataset("d", [FakeResource("a.csv", "CSV")])
         backend = HDX(hdx_id="d", path=tmp_path)
         paths = backend._fetch(backend._search())
-        assert paths == [Path(tmp_path) / "a.csv"]
+        assert paths == [Path(tmp_path) / "d" / "a.csv"]
         assert paths[0].exists()
+
+    def test_same_named_resources_do_not_collide(self, fake_hdx: FakeHdx, tmp_path):
+        """Two datasets with an identically-named resource keep separate files."""
+        from earthlens.base import RemoteProduct
+
+        backend = HDX(hdx_id="seed", path=tmp_path)
+        products = [
+            RemoteProduct(
+                id=f"{hdx_id}::data.csv",
+                metadata={
+                    "resource": FakeResource("data.csv", "CSV"),
+                    "hdx_id": hdx_id,
+                    "name": "data.csv",
+                    "format": "CSV",
+                },
+            )
+            for hdx_id in ("ds-a", "ds-b")
+        ]
+        paths = backend._fetch(products)
+        assert sorted(str(p.relative_to(tmp_path)) for p in paths) == [
+            str(Path("ds-a") / "data.csv"),
+            str(Path("ds-b") / "data.csv"),
+        ]
+        assert len({str(p) for p in paths}) == 2 and all(p.exists() for p in paths)
 
     def test_empty_products_returns_empty(self, fake_hdx: FakeHdx, tmp_path):
         """Fetching no products returns an empty list."""
@@ -187,12 +211,12 @@ class TestDownload:
         backend = HDX(hdx_id="d", resource="*.gpkg", path=tmp_path)
         assert backend.download() == []
 
-    def test_progress_bar_flag_stored(self, fake_hdx: FakeHdx, tmp_path):
-        """The progress_bar flag is recorded on the instance."""
+    def test_progress_bar_is_a_no_op(self, fake_hdx: FakeHdx, tmp_path):
+        """progress_bar is accepted for parity and does not change the result."""
         fake_hdx.add_dataset("d", [FakeResource("a.csv", "CSV")])
         backend = HDX(hdx_id="d", path=tmp_path)
-        backend.download(progress_bar=False)
-        assert backend._show_progress is False
+        assert [p.name for p in backend.download(progress_bar=False)] == ["a.csv"]
+        assert not hasattr(backend, "_show_progress")
 
     def test_api_via_search_fetch(self, fake_hdx: FakeHdx, tmp_path):
         """_api composes the search/fetch split."""

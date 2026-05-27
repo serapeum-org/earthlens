@@ -154,7 +154,6 @@ class HDX(AbstractDataSource):
         self._user_agent = user_agent
         self._hdx_id = hdx_id
         self._resource = resource
-        self._show_progress = True
 
         self._catalog = Catalog()
         self._targets: list[Target] = self._resolve_targets(variables, hdx_id, resource)
@@ -370,12 +369,17 @@ class HDX(AbstractDataSource):
         return products
 
     def _fetch(self, products: list[RemoteProduct]) -> list[Path]:
-        """Download every resource `_search` returned to `self.root_dir`.
+        """Download every resource `_search` returned, namespaced per dataset.
 
         Each resource is downloaded **as-is** in its native format
         (`G4`); reading / sniffing / converting it into a pyramids type
         is the deferred `PY-D` work item, not done here. The CKAN format
         label is already recorded on the product metadata.
+
+        Files are written into a per-dataset subdirectory
+        (`root_dir / <hdx_id> / <resource-name>`) so that two requested
+        datasets carrying a resource with the same file name do not
+        overwrite each other.
 
         Args:
             products: The products from :meth:`_search`.
@@ -387,7 +391,9 @@ class HDX(AbstractDataSource):
         out_paths: list[Path] = []
         for product in products:
             resource = product.metadata["resource"]
-            _url, local_path = resource.download(folder=str(self.root_dir))
+            folder = self.root_dir / product.metadata["hdx_id"]
+            folder.mkdir(parents=True, exist_ok=True)
+            _url, local_path = resource.download(folder=str(folder))
             out_paths.append(Path(local_path))
         logger.info(
             f"HDX download summary: {len(out_paths)} resource file(s) written "
@@ -407,8 +413,9 @@ class HDX(AbstractDataSource):
         `self.root_dir`) and returns the local paths.
 
         Args:
-            progress_bar: Forwarded to the SDK download as a best-effort
-                progress signal.
+            progress_bar: Accepted for signature parity with the other
+                backends; the HDX SDK exposes no per-resource download
+                progress hook, so this is a no-op.
             aggregate: Must be `None`. An HDX resource is returned
                 as-is in its native format (`G4`); there is no gridded
                 reduction to apply, so a non-`None` value is rejected
@@ -429,7 +436,6 @@ class HDX(AbstractDataSource):
                 "there is no meaningful gridded reduction to apply. Call "
                 "download() without aggregate= and post-process the files."
             )
-        self._show_progress = progress_bar
         return self._api_via_search_fetch()
 
 

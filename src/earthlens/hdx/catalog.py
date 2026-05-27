@@ -72,6 +72,25 @@ def clear_catalog_cache() -> None:
     _AVAILABLE_CACHE.clear()
 
 
+def _mtime_ns(path: Path) -> int:
+    """Return a file's modification time in ns, or `0` if it is missing.
+
+    Used to key the parse cache resiliently — a file vanishing between
+    the directory glob and the `stat` (a TOCTOU race) contributes `0`
+    rather than raising, so a concurrent edit cannot crash the loader.
+
+    Args:
+        path: The file to stat.
+
+    Returns:
+        int: `st_mtime_ns`, or `0` when the file does not exist.
+    """
+    try:
+        return path.stat().st_mtime_ns
+    except FileNotFoundError:
+        return 0
+
+
 def _available_index_path(catalog_path: Path) -> Path:
     """Return the `_available.json` path that sits beside a catalog path.
 
@@ -175,10 +194,7 @@ def _load_catalog_data(path: Path) -> tuple[list[str], dict[str, "HdxDataset"]]:
     """
     resolved = str(path.resolve())
     files = _yaml_files_for(path)
-    try:
-        mtime_tuple = tuple((str(f), f.stat().st_mtime_ns) for f in files)
-    except FileNotFoundError:
-        mtime_tuple = ((resolved, 0),)
+    mtime_tuple = tuple((str(f), _mtime_ns(f)) for f in files)
     key = (resolved, mtime_tuple)
     cached = _CATALOG_CACHE.get(key)
     if cached is not None:
@@ -409,8 +425,10 @@ class Catalog(AbstractCatalog):
             )
         import difflib
 
-        pool = list(self.datasets) + list(self.available_datasets)
-        close = difflib.get_close_matches(name, pool, n=1)
+        # Fuzzy-match against the curated keys only: a mistyped key is
+        # almost always a near-miss of a curated name, and running difflib
+        # over the ~41k-id long tail on every miss would be needlessly slow.
+        close = difflib.get_close_matches(name, list(self.datasets), n=1)
         hint = f" Did you mean {close[0]!r}?" if close else ""
         raise ValueError(
             f"{name!r} is not in the {self._catalog_kind} "
