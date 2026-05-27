@@ -458,6 +458,14 @@ class FakeSentinelHubCatalog:
         FakeSentinelHubCatalog.searches.append({"collection": collection, **kwargs})
         return list(FakeSentinelHubCatalog.items)
 
+    def get_collections(self) -> list[dict]:
+        """Return canned collection metadata dicts (for the refresh tool)."""
+        return [
+            {"id": "sentinel-2-l2a"},
+            {"id": "sentinel-1-grd"},
+            {"id": "sentinel-3-olci"},
+        ]
+
 
 def fake_bbox_to_dimensions(bbox: Any, resolution: float) -> tuple[int, int]:
     """Deterministic `bbox_to_dimensions`: (degrees * 1000 / resolution) per side."""
