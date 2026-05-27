@@ -118,3 +118,99 @@ class TestPlaneRouting:
             {"sentinel-2-l2a-ndvi": []}, output_dir, api="statistical"
         )
         assert backend._resolve_plane() == "statistical"
+
+
+class TestProcessFetch:
+    """Process-plane render via the faked SDK (C3)."""
+
+    def test_download_writes_geotiff(self, fake_sh, output_dir: Path):
+        """A Process render builds a request and writes a GeoTIFF."""
+        backend = _make_backend(
+            {"sentinel-2-l2a-ndvi": []},
+            output_dir,
+            client_id="a",
+            client_secret="b",
+        )
+        paths = backend.download()
+        assert len(paths) == 1
+        assert paths[0].exists()
+        assert paths[0].name == "response.tiff"
+
+    def test_request_shape(self, fake_sh, output_dir: Path):
+        """The built request carries the recipe evalscript, window, and TIFF output."""
+        backend = _make_backend(
+            {"sentinel-2-l2a-ndvi": []}, output_dir, client_id="a", client_secret="b"
+        )
+        backend.download()
+        req = fake_sh.SentinelHubRequest.instances[-1]
+        assert "//VERSION=3" in req.evalscript
+        assert req.input_data[0]["time_interval"] == ("2020-06-01", "2020-06-02")
+        assert req.input_data[0]["mosaicking_order"] == "mostRecent"
+        assert req.responses[0]["format"] == "image/tiff"
+
+    def test_cdse_binding_applied(self, fake_sh, output_dir: Path):
+        """The collection is rebound to the CDSE service URL."""
+        backend = _make_backend(
+            {"sentinel-2-l2a-ndvi": []}, output_dir, client_id="a", client_secret="b"
+        )
+        backend.download()
+        req = fake_sh.SentinelHubRequest.instances[-1]
+        collection = req.input_data[0]["data_collection"]
+        assert collection.service_url == "https://sh.dataspace.copernicus.eu"
+
+    def test_maxcc_forwarded(self, fake_sh, output_dir: Path):
+        """`maxcc=` is forwarded to the input_data block when set."""
+        backend = _make_backend(
+            {"sentinel-2-l2a-ndvi": []},
+            output_dir,
+            client_id="a",
+            client_secret="b",
+            maxcc=0.2,
+        )
+        backend.download()
+        req = fake_sh.SentinelHubRequest.instances[-1]
+        assert req.input_data[0]["maxcc"] == 0.2
+
+    def test_custom_inline_evalscript(self, fake_sh, output_dir: Path):
+        """An inline `evalscript=` over a plain collection bypasses the recipe."""
+        inline = "//VERSION=3\nfunction setup(){return {};}"
+        backend = _make_backend(
+            {"sentinel-2-l2a": []},
+            output_dir,
+            client_id="a",
+            client_secret="b",
+            evalscript=inline,
+            api="process",
+        )
+        backend.download()
+        req = fake_sh.SentinelHubRequest.instances[-1]
+        assert req.evalscript == inline
+
+    def test_plain_collection_without_evalscript_errors(self, fake_sh, output_dir: Path):
+        """A plain collection with no `evalscript=` raises a clear error."""
+        backend = _make_backend(
+            {"sentinel-2-l2a": []},
+            output_dir,
+            client_id="a",
+            client_secret="b",
+            api="process",
+        )
+        with pytest.raises(ValueError, match="plain collection"):
+            backend.download()
+
+    def test_forced_process_on_oversized_raises(self, fake_sh, output_dir: Path):
+        """Forcing `api='process'` on an oversized render raises the size guard."""
+        backend = SentinelHub(
+            start="2020-06-01",
+            end="2020-06-02",
+            variables={"sentinel-2-l2a-ndvi": []},
+            lat_lim=[10.0, 40.0],
+            lon_lim=[0.0, 30.0],
+            path=output_dir,
+            resolution=10,
+            api="process",
+            client_id="a",
+            client_secret="b",
+        )
+        with pytest.raises(ValueError, match="Process API caps"):
+            backend.download()

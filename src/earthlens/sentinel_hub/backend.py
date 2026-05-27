@@ -38,8 +38,14 @@ from earthlens.base import (
     TemporalExtent,
 )
 from earthlens.sentinel_hub._dispatch import resolve_api, validate_api
-from earthlens.sentinel_hub._helpers import RASTER_APIS, import_sentinelhub
+from earthlens.sentinel_hub._helpers import (
+    RASTER_APIS,
+    SH_MAX_DIMENSION,
+    cdse_collection,
+    import_sentinelhub,
+)
 from earthlens.sentinel_hub.auth import SentinelHubAuth, SentinelHubCredentials
+from earthlens.sentinel_hub.catalog import read_evalscript
 
 if TYPE_CHECKING:
     from earthlens.aggregate import AggregationConfig
@@ -322,11 +328,120 @@ class SentinelHub(AbstractDataSource):
         }
         return fetchers[plane](products)
 
+    def _read_evalscript(self, resolved: ResolvedRequest) -> str:
+        """Resolve the evalscript source for one request row.
+
+        A custom `evalscript=` (an inline V3 JS string or a `.js` file path)
+        wins over the recipe. Otherwise the recipe's bundled `.js` is read; a
+        plain collection (no recipe evalscript and no custom one) is an error.
+
+        Args:
+            resolved: The resolved request row.
+
+        Returns:
+            The evalscript source string.
+
+        Raises:
+            ValueError: When the key is a plain collection and no `evalscript=`
+                was supplied.
+        """
+        if self._evalscript is not None:
+            candidate = self._evalscript
+            try:
+                path = Path(candidate)
+                if path.is_file():
+                    return path.read_text(encoding="utf-8")
+            except OSError:
+                pass
+            return candidate
+        if resolved.evalscript is None:
+            raise ValueError(
+                f"{resolved.key!r} is a plain collection, so it has no bundled "
+                "evalscript. Pass evalscript= (an inline V3 JS string or a .js "
+                "path), or request an evalscript recipe key instead."
+            )
+        return read_evalscript(resolved.evalscript)
+
+    def _guard_process_size(self, size: tuple[int, int]) -> None:
+        """Reject a Process request whose render exceeds the 2500 px cap.
+
+        Args:
+            size: The `(width, height)` render size in pixels.
+
+        Raises:
+            ValueError: When either side exceeds :data:`SH_MAX_DIMENSION`.
+        """
+        if max(size) > SH_MAX_DIMENSION:
+            raise ValueError(
+                f"the request renders to {size} px but the Process API caps a "
+                f"single request at {SH_MAX_DIMENSION} px/side. Omit api= to "
+                "auto-route to async / batch, or lower the resolution."
+            )
+
+    def _build_input_data(self, sentinelhub: Any, resolved: ResolvedRequest) -> dict:
+        """Build the `SentinelHubRequest.input_data` block for one row.
+
+        Args:
+            sentinelhub: The imported `sentinelhub` module.
+            resolved: The resolved request row.
+
+        Returns:
+            The `input_data` dict (collection, window, mosaicking order, maxcc).
+        """
+        cfg = self._auth.config()
+        collection = cdse_collection(resolved.sh_collection, cfg.sh_base_url)
+        kwargs: dict[str, Any] = {
+            "data_collection": collection,
+            "time_interval": self._time_interval(),
+            "mosaicking_order": self._mosaicking_order,
+        }
+        if self._maxcc is not None:
+            kwargs["maxcc"] = self._maxcc
+        return sentinelhub.SentinelHubRequest.input_data(**kwargs)
+
     def _fetch_process(self, products: list[RemoteProduct]) -> list[Path]:
-        """Render each product synchronously via the Process API (C3)."""
-        raise NotImplementedError(
-            "the Process render plane is implemented in C3."
-        )
+        """Render each product synchronously via the Process API → GeoTIFF on disk.
+
+        Builds one `SentinelHubRequest` per resolved row over the request bbox +
+        window at `resolution`, writes the rendered GeoTIFF under `path`, and
+        returns the written file paths (resolved from the SDK rather than
+        re-hashing).
+
+        Args:
+            products: The list returned by :meth:`_search`.
+
+        Returns:
+            The written GeoTIFF paths, one per product.
+
+        Raises:
+            ValueError: When the render exceeds the Process 2500 px cap.
+        """
+        sentinelhub = import_sentinelhub()
+        cfg = self._auth.config()
+        sh_bbox = self._bbox()
+        size = self._request_size()
+        self._guard_process_size(size)
+        out: list[Path] = []
+        for product in products:
+            resolved: ResolvedRequest = product.metadata["resolved"]
+            evalscript = self._read_evalscript(resolved)
+            request = sentinelhub.SentinelHubRequest(
+                evalscript=evalscript,
+                input_data=[self._build_input_data(sentinelhub, resolved)],
+                responses=[
+                    sentinelhub.SentinelHubRequest.output_response(
+                        "default", sentinelhub.MimeType.TIFF
+                    )
+                ],
+                bbox=sh_bbox,
+                size=size,
+                data_folder=str(self.root_dir),
+                config=cfg,
+            )
+            request.get_data(save_data=True)
+            written = request.get_filename_list()[0]
+            out.append(Path(self.root_dir) / written)
+        return out
 
     def _fetch_async(self, products: list[RemoteProduct]) -> list[Path]:
         """Render via the Async Processing API (C5)."""
