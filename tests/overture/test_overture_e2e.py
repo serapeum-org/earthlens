@@ -70,6 +70,22 @@ class TestOvertureLiveFetch:
                 "ODbL rows present but no LicenseWarning emitted"
             )
 
+    def test_places_geojson_nested_roundtrip(self, tmp_path: Path):
+        """A `places` GeoJSON write round-trips Overture's nested struct columns."""
+        paths = EarthLens(
+            data_source="overture",
+            variables={"places": []},
+            lat_lim=_LAT_LIM,
+            lon_lim=_LON_LIM,
+            path=str(tmp_path),
+            file_format="geojson",
+        ).download(progress_bar=False)
+
+        assert paths[0].suffix == ".geojson", "places should write GeoJSON"
+        gdf = gpd.read_file(paths[0])
+        assert len(gdf) > 0, "the block should contain places"
+        assert "license_id" in gdf.columns, "license_id must survive the GeoJSON write"
+
     def test_release_helpers_live(self):
         """The SDK's release helpers resolve a real, recent release id."""
         from overturemaps.core import get_latest_release

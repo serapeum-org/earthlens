@@ -9,7 +9,7 @@ SDK entry point the backend imports inside `_fetch` and records every
 
 from __future__ import annotations
 
-from collections.abc import Callable, Iterator
+from collections.abc import Callable
 from typing import Any
 
 import geopandas as gpd
@@ -33,6 +33,7 @@ def _make_gdf(
     sources_per_row: list[Any] | None = None,
     *,
     set_crs: bool = False,
+    nested: bool = False,
 ) -> gpd.GeoDataFrame:
     """Build a synthetic Overture `GeoDataFrame` with a `sources` column.
 
@@ -41,18 +42,26 @@ def _make_gdf(
             permissive row.
         set_crs: When `True`, tag the frame `EPSG:4326` (the real SDK
             omits the CRS — the default mirrors that).
+        nested: When `True`, add `names` / `categories` struct columns that
+            mirror Overture's deeply-nested schema, to exercise the
+            GeoJSON / GPKG serialisation path.
 
     Returns:
-        geopandas.GeoDataFrame: id / geometry / sources, one row per cell.
+        geopandas.GeoDataFrame: id / geometry / sources (+ optional nested
+            struct columns), one row per cell.
     """
     if sources_per_row is None:
         sources_per_row = [PERMISSIVE_SOURCES]
     rows = len(sources_per_row)
+    data: dict[str, Any] = {
+        "id": [f"feat-{i}" for i in range(rows)],
+        "sources": sources_per_row,
+    }
+    if nested:
+        data["names"] = [{"primary": f"Place {i}", "common": None} for i in range(rows)]
+        data["categories"] = [{"primary": "restaurant", "alternate": []} for _ in range(rows)]
     gdf = gpd.GeoDataFrame(
-        {
-            "id": [f"feat-{i}" for i in range(rows)],
-            "sources": sources_per_row,
-        },
+        data,
         geometry=[Point(float(i), float(i)) for i in range(rows)],
     )
     if set_crs:
@@ -102,13 +111,3 @@ def fake_overture(monkeypatch: pytest.MonkeyPatch) -> _FakeOverture:
     state = _FakeOverture()
     monkeypatch.setattr("overturemaps.core.geodataframe", state)
     return state
-
-
-@pytest.fixture
-def license_warnings() -> Iterator[list[Any]]:
-    """Capture emitted warnings into a list for the test's duration."""
-    import warnings as _warnings
-
-    with _warnings.catch_warnings(record=True) as record:
-        _warnings.simplefilter("always")
-        yield record

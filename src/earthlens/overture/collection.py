@@ -20,6 +20,7 @@ and the empty path (`empty_fc`) yield a collection carrying at least an
 from __future__ import annotations
 
 import geopandas as gpd
+import pandas as pd
 from loguru import logger
 from pyramids.feature.collection import FeatureCollection
 
@@ -104,8 +105,6 @@ def empty_fc() -> FeatureCollection:
 
             ```
     """
-    import pandas as pd
-
     frame = pd.DataFrame({column: pd.Series([], dtype="object") for column in _EMPTY_COLUMNS})
     gdf = gpd.GeoDataFrame(
         frame, geometry=gpd.GeoSeries([], crs=OVERTURE_CRS), crs=OVERTURE_CRS

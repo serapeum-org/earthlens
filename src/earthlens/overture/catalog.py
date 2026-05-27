@@ -113,9 +113,12 @@ class Theme(BaseModel):
         Args:
             requested: The type list the caller supplied for this theme.
                 An empty list or `None` resolves to `[default_type]`.
+                Duplicates are collapsed (order preserved) so a repeated
+                type is fetched once rather than overwriting its own file.
 
         Returns:
-            list[str]: The concrete Overture types to download.
+            list[str]: The concrete Overture types to download, de-duplicated
+                in first-seen order.
 
         Raises:
             ValueError: If a requested type is not one of this theme's
@@ -129,7 +132,7 @@ class Theme(BaseModel):
                 f"{unknown} are not valid types for this theme; "
                 f"choose from {self.types}."
             )
-        return list(requested)
+        return list(dict.fromkeys(requested))
 
 
 class Catalog(AbstractCatalog):

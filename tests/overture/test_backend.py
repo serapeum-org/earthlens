@@ -87,6 +87,12 @@ class TestOvertureConstruction:
         assert backend._release == "2026-05-20.0"
         assert backend._max_features == 10
 
+    def test_temporal_resolution_pinned_to_all(self, tmp_path: Path):
+        """`temporal_resolution` is pinned to the static sentinel even if 'daily' is passed."""
+        backend = _make_backend(tmp_path, temporal_resolution="daily")
+        assert backend.temporal_resolution == "all"
+        assert backend.time.resolution == "all"
+
 
 @pytest.mark.overture
 class TestResolvePlan:
@@ -138,6 +144,14 @@ class TestResolvePlan:
         backend = _make_backend(tmp_path, variables={"places": ["poi"]})
         with pytest.raises(ValueError, match=r"not valid types"):
             backend._resolve_plan()
+
+    def test_duplicate_types_collapsed(self, tmp_path: Path):
+        """A repeated type resolves to a single fetch (no self-overwrite)."""
+        backend = _make_backend(
+            tmp_path, variables={"buildings": ["building", "building"]}
+        )
+        plan = backend._resolve_plan()
+        assert [t for _n, _theme, t in plan] == ["building"]
 
 
 @pytest.mark.overture
@@ -299,6 +313,31 @@ class TestFetchAndDownload:
         backend = _make_backend(tmp_path, variables={"places": []}, max_features=2)
         gdf = gpd.read_parquet(backend.download()[0])
         assert len(gdf) == 2
+
+    def test_empty_fetch_skips_write(self, tmp_path: Path, fake_overture, make_gdf):
+        """A type matching no features writes nothing and yields no path."""
+        fake_overture.set_gdf("place", make_gdf([]))
+        backend = _make_backend(tmp_path, variables={"places": []})
+        paths = backend.download()
+        assert paths == []
+        assert list(tmp_path.glob("overture_*")) == []
+
+    @pytest.mark.parametrize("file_format", ["geoparquet", "gpkg", "geojson"])
+    def test_write_nested_columns(self, tmp_path: Path, fake_overture, make_gdf, file_format):
+        """Nested struct columns (names/categories) round-trip through every format."""
+        fake_overture.set_gdf(
+            "place", make_gdf([PERMISSIVE_SOURCES, OSM_SOURCES], nested=True)
+        )
+        backend = _make_backend(
+            tmp_path, variables={"places": []}, file_format=file_format
+        )
+        path = backend.download()[0]
+        if file_format == "geoparquet":
+            back = gpd.read_parquet(path)
+        else:
+            back = gpd.read_file(path)
+        assert len(back) == 2
+        assert "license_id" in back.columns
 
     def test_download_rejects_aggregate(self, tmp_path: Path):
         """A non-None aggregate is rejected at the backend."""

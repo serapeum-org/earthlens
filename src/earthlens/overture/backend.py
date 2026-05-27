@@ -193,6 +193,10 @@ class Overture(AbstractDataSource):
             fmt=fmt,
             path=path,
         )
+        # Overture is a static per-release snapshot — pin the sentinel even
+        # when the facade forwards its default `"daily"`, so the attribute
+        # never misrepresents a temporal cadence the backend does not have.
+        self.temporal_resolution = "all"
 
     def _initialize(self) -> None:
         """Verify the `overturemaps` SDK is importable; no auth, no client.
@@ -355,11 +359,16 @@ class Overture(AbstractDataSource):
         writes one vector file under `path`. The SDK's unit is the Overture
         *type* (passed positionally) — there is no `theme=` kwarg.
 
+        A type that matches no features in the bbox is skipped (a warning
+        is logged and no empty file is written), mirroring the shipped
+        vector backends; its path is therefore absent from the result.
+
         Args:
             products: The products returned by `_search`.
 
         Returns:
-            list[Path]: The written vector file paths, in product order.
+            list[Path]: The written vector file paths, in product order;
+                a product that matched no features contributes no path.
         """
         from overturemaps.core import geodataframe
 
@@ -384,6 +393,11 @@ class Overture(AbstractDataSource):
             collection = to_feature_collection(
                 gdf, label=label, max_features=self._max_features
             )
+            if len(collection) == 0:
+                logger.warning(
+                    f"{label}: no features matched the bbox; nothing written."
+                )
+                continue
             out_path = self._write(collection, theme_name, overture_type)
             logger.info(f"{label}: wrote {len(collection)} feature(s) to {out_path}")
             written.append(out_path)
