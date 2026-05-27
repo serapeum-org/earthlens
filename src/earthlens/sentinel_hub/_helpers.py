@@ -182,6 +182,66 @@ def interval_for(freq: str) -> str:
     )
 
 
+def tile_bbox(
+    bbox: tuple[float, float, float, float],
+    width_px: int,
+    height_px: int,
+    max_dim: int = SH_MAX_DIMENSION,
+) -> list[tuple[float, float, float, float]]:
+    """Split a bbox into a grid of sub-bboxes each ≤ `max_dim` px per side.
+
+    Request-shaping arithmetic for the Process-API 2500 px cap: the bbox is
+    divided into `ceil(width_px / max_dim)` × `ceil(height_px / max_dim)` equal
+    tiles in degree space (row-major, south-to-north then west-to-east). The
+    mosaic of the rendered tiles is the responsibility of `pyramids` — this only
+    decides the windows.
+
+    Args:
+        bbox: The `(west, south, east, north)` envelope in degrees.
+        width_px: The full render width in pixels (at the target resolution).
+        height_px: The full render height in pixels.
+        max_dim: The per-tile pixel ceiling (defaults to :data:`SH_MAX_DIMENSION`).
+
+    Returns:
+        The list of `(west, south, east, north)` sub-bboxes (one per tile).
+
+    Examples:
+        - A render within the cap is a single tile (the bbox itself):
+            ```python
+            >>> from earthlens.sentinel_hub._helpers import tile_bbox
+            >>> tile_bbox((0.0, 0.0, 1.0, 1.0), 1000, 1000)
+            [(0.0, 0.0, 1.0, 1.0)]
+
+            ```
+        - A 2× oversized render splits into a 2×2 grid:
+            ```python
+            >>> from earthlens.sentinel_hub._helpers import tile_bbox
+            >>> len(tile_bbox((0.0, 0.0, 1.0, 1.0), 5000, 5000))
+            4
+
+            ```
+    """
+    import math
+
+    west, south, east, north = bbox
+    n_x = max(1, math.ceil(width_px / max_dim))
+    n_y = max(1, math.ceil(height_px / max_dim))
+    step_x = (east - west) / n_x
+    step_y = (north - south) / n_y
+    tiles: list[tuple[float, float, float, float]] = []
+    for row in range(n_y):
+        for col in range(n_x):
+            tiles.append(
+                (
+                    west + col * step_x,
+                    south + row * step_y,
+                    west + (col + 1) * step_x,
+                    south + (row + 1) * step_y,
+                )
+            )
+    return tiles
+
+
 def import_sentinelhub() -> Any:
     """Import and return the `sentinelhub` SDK, or raise a friendly `ImportError`.
 

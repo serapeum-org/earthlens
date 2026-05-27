@@ -44,6 +44,7 @@ from earthlens.sentinel_hub._helpers import (
     SH_MAX_DIMENSION,
     cdse_collection,
     import_sentinelhub,
+    tile_bbox,
 )
 from earthlens.sentinel_hub.auth import SentinelHubAuth, SentinelHubCredentials
 from earthlens.sentinel_hub.catalog import read_evalscript
@@ -420,31 +421,57 @@ class SentinelHub(AbstractDataSource):
             ValueError: When the render exceeds the Process 2500 px cap.
         """
         sentinelhub = import_sentinelhub()
-        cfg = self._auth.config()
         sh_bbox = self._bbox()
         size = self._request_size()
         self._guard_process_size(size)
         out: list[Path] = []
         for product in products:
             resolved: ResolvedRequest = product.metadata["resolved"]
-            evalscript = self._read_evalscript(resolved)
-            request = sentinelhub.SentinelHubRequest(
-                evalscript=evalscript,
-                input_data=[self._build_input_data(sentinelhub, resolved)],
-                responses=[
-                    sentinelhub.SentinelHubRequest.output_response(
-                        "default", sentinelhub.MimeType.TIFF
-                    )
-                ],
-                bbox=sh_bbox,
-                size=size,
-                data_folder=str(self.root_dir),
-                config=cfg,
+            out.append(
+                self._render_process_tile(
+                    sentinelhub, resolved, sh_bbox, size, str(self.root_dir)
+                )
             )
-            request.get_data(save_data=True)
-            written = request.get_filename_list()[0]
-            out.append(Path(self.root_dir) / written)
         return out
+
+    def _render_process_tile(
+        self,
+        sentinelhub: Any,
+        resolved: ResolvedRequest,
+        bbox: Any,
+        size: tuple[int, int],
+        data_folder: str,
+    ) -> Path:
+        """Build + run one Process request and return the written GeoTIFF path.
+
+        Shared by :meth:`_fetch_process` (whole bbox) and :meth:`_fetch_tiling`
+        (per tile).
+
+        Args:
+            sentinelhub: The imported `sentinelhub` module.
+            resolved: The resolved request row.
+            bbox: The `sentinelhub.BBox` to render.
+            size: The `(width, height)` render size for this bbox.
+            data_folder: The directory the SDK writes the GeoTIFF under.
+
+        Returns:
+            The written GeoTIFF path.
+        """
+        request = sentinelhub.SentinelHubRequest(
+            evalscript=self._read_evalscript(resolved),
+            input_data=[self._build_input_data(sentinelhub, resolved)],
+            responses=[
+                sentinelhub.SentinelHubRequest.output_response(
+                    "default", sentinelhub.MimeType.TIFF
+                )
+            ],
+            bbox=bbox,
+            size=size,
+            data_folder=data_folder,
+            config=self._auth.config(),
+        )
+        request.get_data(save_data=True)
+        return Path(data_folder) / request.get_filename_list()[0]
 
     def _require_s3_delivery(self, sentinelhub: Any) -> Any:
         """Build the S3 `AccessSpecification` from `batch_output`, or error.
@@ -532,10 +559,51 @@ class SentinelHub(AbstractDataSource):
         return out
 
     def _fetch_tiling(self, products: list[RemoteProduct]) -> list[Path]:
-        """Render an oversized AOI by local tiling + mosaic (C6)."""
-        raise NotImplementedError(
-            "the local-tiling mosaic plane is implemented in C6."
+        """Render an oversized AOI by local tiling + mosaic (no S3 needed).
+
+        Splits the request bbox into ≤2500 px Process tiles, renders each tile,
+        and mosaics them into one GeoTIFF per product with
+        `pyramids.dataset.merge.merge_rasters`. Tile temporaries are written
+        under a per-product subdirectory and removed after the merge.
+
+        Args:
+            products: The list returned by :meth:`_search`.
+
+        Returns:
+            The merged GeoTIFF paths, one per product (union bounds).
+        """
+        import shutil
+
+        from pyramids.dataset.merge import merge_rasters
+
+        sentinelhub = import_sentinelhub()
+        width, height = self._request_size()
+        tiles = tile_bbox(
+            (self.space.west, self.space.south, self.space.east, self.space.north),
+            width,
+            height,
         )
+        out: list[Path] = []
+        for product in products:
+            resolved: ResolvedRequest = product.metadata["resolved"]
+            tile_dir = Path(self.root_dir) / f"_tiles_{_safe_name(product.id)}"
+            tile_dir.mkdir(parents=True, exist_ok=True)
+            tile_paths: list[str] = []
+            for index, tile in enumerate(tiles):
+                sh_bbox = sentinelhub.BBox(tile, crs=sentinelhub.CRS.WGS84)
+                tile_size = sentinelhub.bbox_to_dimensions(
+                    sh_bbox, resolution=self._resolution
+                )
+                rendered = self._render_process_tile(
+                    sentinelhub, resolved, sh_bbox, tile_size, str(tile_dir / str(index))
+                )
+                tile_paths.append(str(rendered))
+            merged = Path(self.root_dir) / f"{_safe_name(product.id)}.tif"
+            merge_rasters(tile_paths, str(merged))
+            shutil.rmtree(tile_dir, ignore_errors=True)
+            out.append(merged)
+        logger.info(f"Sentinel Hub tiling: merged {len(tiles)} tile(s) per product")
+        return out
 
     def _fetch_batch(self, products: list[RemoteProduct]) -> list[Any]:
         """Render via the Batch Processing API to S3 (C8)."""
@@ -578,6 +646,27 @@ class SentinelHub(AbstractDataSource):
             f"{self.root_dir}"
         )
         return results
+
+
+def _safe_name(key: str) -> str:
+    """Flatten a request key to a filename-safe stem (no path separators).
+
+    Args:
+        key: A collection/recipe key.
+
+    Returns:
+        The key with `/` and `\\` replaced by `_`.
+
+    Examples:
+        - A plain key is unchanged:
+            ```python
+            >>> from earthlens.sentinel_hub.backend import _safe_name
+            >>> _safe_name("sentinel-2-l2a-ndvi")
+            'sentinel-2-l2a-ndvi'
+
+            ```
+    """
+    return key.replace("/", "_").replace("\\", "_")
 
 
 #: Async-plane polling cadence (seconds) and the attempt ceiling (~1 hour).
