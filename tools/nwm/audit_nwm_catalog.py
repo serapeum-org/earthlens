@@ -3,15 +3,15 @@
 Diffs the curated NWM catalog against the live unsigned bucket and flags
 drift:
 
-* **Configuration availability** — every curated configuration
-  (`short_range`, `analysis_assim`, `medium_range`) must still be
-  published under the most recent complete day. Curated-but-absent and
-  live-but-uncurated configurations are reported (the latter as
-  "available", not as an error — the catalog deliberately curates only
-  the clean CONUS subset).
+* **Configuration availability** — every curated configuration must still
+  be published under the most recent complete day (ensemble keys map to
+  their `_mem1` directory). Curated-but-absent and live-but-uncurated
+  configurations are reported; the catalog curates every model-output
+  configuration, so the only expected "uncurated" entry is the
+  `usgs_timeslices` assimilation-input directory.
 * **Product tokens** — each curated product's `s3_token` (`channel_rt`,
-  `land`) must appear among the files of at least one configuration that
-  lists it.
+  `land`, `reservoir`, `terrain_rt`, `forcing`, `total_water`) must appear
+  among the files of at least one configuration that lists it.
 * **Retention** — the live retention window is reported against the
   backend's `OPERATIONAL_RETENTION_DAYS` heuristic so the auto-mode
   boundary can be kept honest.
@@ -85,15 +85,24 @@ def audit(region: str) -> dict[str, Any]:
         cfg for cfg in live_configs - curated_configs if cfg not in curated_live_dirs
     )
 
-    # Each curated product token must appear under at least one of its
-    # configurations on the live bucket.
+    # Each curated product token must appear on the live bucket under at
+    # least one configuration that lists it. Prefer a deterministic config
+    # (its file token is the bare s3_token; an ensemble appends the member).
     client = _client(region)
     day = report["sampled_day"]
     missing_tokens: list[str] = []
     for key, product in catalog.datasets.items():
+        carriers = sorted(
+            (
+                cfgkey
+                for cfgkey, cfg in catalog.configurations.items()
+                if key in cfg.products
+            ),
+            key=lambda k: catalog.configurations[k].members,
+        )
         seen = False
-        for cfg in product.configurations:
-            directory = _live_directory(catalog, cfg)
+        for cfgkey in carriers:
+            directory = _live_directory(catalog, cfgkey)
             if directory in live_configs and product.s3_token in sample_products(
                 client, day, directory
             ):
