@@ -167,6 +167,13 @@ nav:
       - Authentication: reference/openeo/authentication.md
       - Collections & recipes: reference/openeo/datasets.md
       - Reference: reference/openeo/openeo.md
+    - Sentinel Hub (server-side render):
+      - Introduction: reference/sentinel-hub/introduction.md
+      - Usage: reference/sentinel-hub/usage.md
+      - Authentication: reference/sentinel-hub/authentication.md
+      - Collections & recipes: reference/sentinel-hub/datasets.md
+      - Statistical & Batch: reference/sentinel-hub/statistical-batch.md
+      - Reference: reference/sentinel-hub/sentinel_hub.md
     - Tropycal (cyclone tracks):
       - Introduction: reference/tropycal/introduction.md
       - Usage: reference/tropycal/usage.md
