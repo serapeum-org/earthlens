@@ -189,6 +189,7 @@ nav:
     - National Water Model:
       - Introduction: reference/nwm/introduction.md
       - Usage: reference/nwm/usage.md
+      - Catalog & Tooling: reference/nwm/catalog.md
       - Reference: reference/nwm/nwm.md
   - Examples:
     - Authentication: examples/authentication.md
@@ -282,6 +283,8 @@ nav:
       - MODIS vs VIIRS comparison: examples/firms/modis_vs_viirs_comparison.ipynb
     - NEXRAD radar:
       - Catalog explorer (no network): examples/radar/catalog_explorer.ipynb
+    - National Water Model:
+      - Catalog explorer (no network): examples/nwm/catalog_explorer.ipynb
   - API Reference:
     - EarthLens Facade: reference/earthlens.md
     - AbstractDataSource: reference/abstract-datasource.md
