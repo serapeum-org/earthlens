@@ -118,6 +118,12 @@ python tools/sentinel_hub/refresh_sh_catalog.py validate-recipe sentinel-2-l2a-n
 python tools/sentinel_hub/refresh_sh_catalog.py validate-all
 ```
 
+Prefer `--from-sdk`: it lists the UPPERCASE `DataCollection` names
+(`SENTINEL2_L2A`, …) that the backend uses in a collection's `sh_collection`. The
+live `refresh` returns STAC-style ids (`sentinel-2-l2a`, …) in a *different*
+namespace, so it should only be used when you specifically want the live STAC
+ids — otherwise it misaligns the index with the curated catalog.
+
 **`audit_sh_datasets.py`** — flag drift between the curated catalog and the SDK
 (curated collections / recipe base collections not in the `DataCollection`
 enum, recipe evalscript problems, and untracked enum members); offline:

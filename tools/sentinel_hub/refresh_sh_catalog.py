@@ -11,10 +11,18 @@ Run with no args to see the subcommand list:
 
 Subcommands:
 
-* `refresh` — authenticate (OAuth2 client-credentials from `SH_CLIENT_ID` /
-  `SH_CLIENT_SECRET`), call `SentinelHubCatalog.get_collections()`, and rewrite
-  the `available_collections:` list in `_index.yaml`. `--dry-run` prints the
-  regenerated file instead of writing it.
+* `refresh --from-sdk` — **(preferred, offline, no credentials)** enumerate the
+  `sentinelhub.DataCollection` enum and rewrite the `available_collections:` list
+  in `_index.yaml`. These are the UPPERCASE names you pass to the backend via a
+  collection's `sh_collection` (e.g. `SENTINEL2_L2A`), so they line up with the
+  curated catalog.
+* `refresh` — authenticate (OAuth2 client-credentials from `SENTINELHUB_CLIENT_ID`
+  / `SENTINELHUB_CLIENT_SECRET`), call `SentinelHubCatalog.get_collections()`, and
+  rewrite the list. **Caveat:** the live Catalog API returns STAC-style ids
+  (lowercase/hyphenated, e.g. `sentinel-2-l2a`) in a *different* namespace from
+  the `DataCollection` enum names the backend uses — so prefer `--from-sdk` for
+  the index unless you specifically want the live STAC ids. `--dry-run` prints
+  the regenerated file instead of writing it.
 * `validate-recipe <key>` — check the recipe resolves, its bundled `.js` exists,
   starts with `//VERSION=3`, and (for `kind="stats"`) declares a `dataMask`
   band; exit non-zero on any drift. No network.
