@@ -64,6 +64,39 @@ class TestAsyncRequestId:
         """An empty payload yields None."""
         assert _async_request_id([]) is None
 
+    def test_empty_id_falls_back_then_none(self):
+        """An empty-string id is not usable: fall back, else None (N1)."""
+        assert _async_request_id([{"id": "", "requestId": "r"}]) == "r"
+        assert _async_request_id([{"id": ""}]) is None
+
+
+class TestBatchOutputValidation:
+    """A `batch_output` without a bucket/url is rejected (L1)."""
+
+    def test_async_missing_bucket_raises(self, fake_sh, output_dir):
+        """api='async' with a bucket-less batch_output raises a clear error."""
+        backend = _backend(
+            output_dir,
+            lat=[40.0, 40.5],
+            lon=[14.0, 14.5],
+            api="async",
+            batch_output={"iam_role_arn": "arn:aws:iam::1:role/r"},
+        )
+        with pytest.raises(ValueError, match="must include a 'bucket'"):
+            backend.download()
+
+    def test_batch_missing_bucket_raises(self, fake_sh, output_dir):
+        """api='batch' with a bucket-less batch_output raises a clear error."""
+        backend = _backend(
+            output_dir,
+            lat=[10.0, 40.0],
+            lon=[0.0, 30.0],
+            api="batch",
+            batch_output={"iam_role_arn": "arn:aws:iam::1:role/r", "grid_id": 2},
+        )
+        with pytest.raises(ValueError, match="must include a 'bucket'"):
+            backend.download()
+
 
 class TestAsyncMissingId:
     """The async plane copes when no request id can be determined (H1 else-branch)."""

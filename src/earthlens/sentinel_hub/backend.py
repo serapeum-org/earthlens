@@ -546,7 +546,8 @@ class SentinelHub(AbstractDataSource):
             The S3 delivery `AccessSpecification`.
 
         Raises:
-            ValueError: When no `batch_output` (S3 bucket) was supplied.
+            ValueError: When no `batch_output` was supplied, or it carries no
+                `bucket` / `url`.
         """
         if not self._batch_output:
             raise ValueError(
@@ -556,6 +557,11 @@ class SentinelHub(AbstractDataSource):
             )
         spec = dict(self._batch_output)
         url = spec.pop("bucket", None) or spec.pop("url", None)
+        if not url:
+            raise ValueError(
+                "batch_output must include a 'bucket' (or 'url') S3 destination, "
+                f"got {dict(self._batch_output)!r}."
+            )
         return sentinelhub.AsyncProcessRequest.s3_specification(url=url, **spec)
 
     def _guard_async_size(self, size: tuple[int, int]) -> None:
@@ -738,6 +744,11 @@ class SentinelHub(AbstractDataSource):
         buffer_y = spec.pop("buffer_y", None)
         max_cost_pu = spec.pop("max_cost_pu", None)
         url = spec.pop("bucket", None) or spec.pop("url", None)
+        if not url:
+            raise ValueError(
+                "batch_output must include a 'bucket' (or 'url') S3 destination, "
+                f"got {dict(self._batch_output)!r}."
+            )
         delivery = client.s3_specification(url=url, **spec)
         tiling = client.tiling_grid_input(
             grid_id=grid_id,
@@ -1336,7 +1347,9 @@ def _async_request_id(submission: Any) -> str | None:
         return None
     first = submission[0] if isinstance(submission, (list, tuple)) else submission
     if isinstance(first, dict):
-        return first.get("id") or first.get("requestId")
+        # `or None` so an empty/absent id yields None (the caller then skips the
+        # poll) rather than a falsy id that would poll a bogus `…/process/` URL.
+        return first.get("id") or first.get("requestId") or None
     return None
 
 
