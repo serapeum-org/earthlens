@@ -325,6 +325,38 @@
          <lastmod>2026-05-27</lastmod>
     </url>
     <url>
+         <loc>https://serapeum-org.github.io/earthlens/main/examples/sentinel-hub/aggregate_monthly/</loc>
+         <lastmod>2026-05-27</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/main/examples/sentinel-hub/batch_walkthrough/</loc>
+         <lastmod>2026-05-27</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/main/examples/sentinel-hub/catalog_explorer/</loc>
+         <lastmod>2026-05-27</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/main/examples/sentinel-hub/custom_evalscript/</loc>
+         <lastmod>2026-05-27</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/main/examples/sentinel-hub/local_tiling/</loc>
+         <lastmod>2026-05-27</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/main/examples/sentinel-hub/quickstart_ndvi/</loc>
+         <lastmod>2026-05-27</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/main/examples/sentinel-hub/statistical_zonal_stats/</loc>
+         <lastmod>2026-05-27</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/main/examples/sentinel-hub/true_colour/</loc>
+         <lastmod>2026-05-27</lastmod>
+    </url>
+    <url>
          <loc>https://serapeum-org.github.io/earthlens/main/examples/stac/mpc_landsat_cdse_sentinel_same_aoi/</loc>
          <lastmod>2026-05-27</lastmod>
     </url>
@@ -638,6 +670,30 @@
     </url>
     <url>
          <loc>https://serapeum-org.github.io/earthlens/main/reference/radar/usage/</loc>
+         <lastmod>2026-05-27</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/main/reference/sentinel-hub/authentication/</loc>
+         <lastmod>2026-05-27</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/main/reference/sentinel-hub/datasets/</loc>
+         <lastmod>2026-05-27</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/main/reference/sentinel-hub/introduction/</loc>
+         <lastmod>2026-05-27</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/main/reference/sentinel-hub/sentinel_hub/</loc>
+         <lastmod>2026-05-27</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/main/reference/sentinel-hub/statistical-batch/</loc>
+         <lastmod>2026-05-27</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/main/reference/sentinel-hub/usage/</loc>
          <lastmod>2026-05-27</lastmod>
     </url>
     <url>
