@@ -234,6 +234,18 @@ class Catalog(AbstractCatalog):
 
         Returns:
             list[str]: Every curated catalog key, sorted.
+
+        Examples:
+            - List the curated names and check membership:
+                ```python
+                >>> from earthlens.usgs_water import Catalog
+                >>> names = Catalog().available_parameters
+                >>> "discharge" in names
+                True
+                >>> names == sorted(names)
+                True
+
+                ```
         """
         return sorted(self.parameters)
 
@@ -250,6 +262,18 @@ class Catalog(AbstractCatalog):
             ValueError: If `name` is not a known parameter; the message
                 lists the known names and, when a close match exists, a
                 did-you-mean hint.
+
+        Examples:
+            - Resolve a row and read its fields:
+                ```python
+                >>> from earthlens.usgs_water import Catalog
+                >>> p = Catalog().get_parameter("gage_height")
+                >>> p.code
+                '00065'
+                >>> p.units
+                'ft'
+
+                ```
         """
         try:
             return self.parameters[name]
