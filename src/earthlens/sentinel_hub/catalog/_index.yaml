@@ -1,0 +1,17 @@
+# Informational index of the Sentinel Hub data collections the backend can
+# render. Rebuilt by tools/sentinel_hub/refresh_sh_catalog.py from the live
+# Catalog API (SentinelHubCatalog.get_collections). Not a curated layer — the
+# curated collections + bands live in collections.yaml.
+available_collections:
+  - SENTINEL2_L1C
+  - SENTINEL2_L2A
+  - SENTINEL1_IW
+  - SENTINEL1_EW
+  - SENTINEL1_SM
+  - SENTINEL3_OLCI
+  - SENTINEL3_SLSTR
+  - SENTINEL5P
+  - LANDSAT_OT_L1
+  - LANDSAT_OT_L2
+  - MODIS
+  - DEM
