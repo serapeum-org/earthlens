@@ -109,7 +109,7 @@ validate recipes:
 ```bash
 # rebuild the index offline from the sentinelhub DataCollection enum (no creds)
 python tools/sentinel_hub/refresh_sh_catalog.py refresh --from-sdk
-# or from the live Catalog API (needs SH_CLIENT_ID / SH_CLIENT_SECRET)
+# or from the live Catalog API (needs SENTINELHUB_CLIENT_ID / SENTINELHUB_CLIENT_SECRET)
 python tools/sentinel_hub/refresh_sh_catalog.py refresh
 python tools/sentinel_hub/refresh_sh_catalog.py refresh --from-sdk --dry-run
 

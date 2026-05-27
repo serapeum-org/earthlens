@@ -23,8 +23,9 @@ keys — the same account has three separate auth planes.
 
 The backend resolves credentials in this order:
 
-1. **Environment** — `SH_CLIENT_ID` / `SH_CLIENT_SECRET` (and optional
-   `SH_PROFILE`).
+1. **Environment** — `SENTINELHUB_CLIENT_ID` / `SENTINELHUB_CLIENT_SECRET` (and
+   optional `SENTINELHUB_PROFILE`). The `sentinelhub-py`-native `SH_CLIENT_ID` /
+   `SH_CLIENT_SECRET` / `SH_PROFILE` are accepted as a fallback.
 2. **Constructor kwargs** — `client_id=` / `client_secret=` (these win over the
    environment).
 3. **Saved `SHConfig` profile** — `profile=` (a profile written earlier with
@@ -35,15 +36,15 @@ The backend resolves credentials in this order:
 === "bash"
 
     ```bash
-    export SH_CLIENT_ID="your-client-id"
-    export SH_CLIENT_SECRET="your-client-secret"
+    export SENTINELHUB_CLIENT_ID="your-client-id"
+    export SENTINELHUB_CLIENT_SECRET="your-client-secret"
     ```
 
 === "PowerShell"
 
     ```powershell
-    $env:SH_CLIENT_ID = "your-client-id"
-    $env:SH_CLIENT_SECRET = "your-client-secret"
+    $env:SENTINELHUB_CLIENT_ID = "your-client-id"
+    $env:SENTINELHUB_CLIENT_SECRET = "your-client-secret"
     ```
 
 ```python
@@ -55,7 +56,7 @@ el = EarthLens(
     variables={"sentinel-2-l2a-ndvi": []},
     lat_lim=[40.80, 40.83], lon_lim=[14.24, 14.27],
     path="out", resolution=20,
-)  # credentials read from SH_CLIENT_ID / SH_CLIENT_SECRET
+)  # credentials read from SENTINELHUB_CLIENT_ID / SENTINELHUB_CLIENT_SECRET
 ```
 
 ### Explicit keyword arguments

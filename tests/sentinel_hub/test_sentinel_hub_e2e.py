@@ -27,14 +27,21 @@ pytest.importorskip(
 from earthlens.earthlens import EarthLens  # noqa: E402
 
 _SKIP_REASON = (
-    "no Sentinel Hub credentials (set SH_CLIENT_ID / SH_CLIENT_SECRET; mint an "
-    "OAuth client_credentials pair in the CDSE Dashboard)"
+    "no Sentinel Hub credentials (set SENTINELHUB_CLIENT_ID / "
+    "SENTINELHUB_CLIENT_SECRET; mint an OAuth client_credentials pair in the "
+    "CDSE Dashboard)"
 )
 
 
 def _has_credentials() -> bool:
-    """Return whether both SH client-credentials env vars are set."""
-    return bool(os.environ.get("SH_CLIENT_ID") and os.environ.get("SH_CLIENT_SECRET"))
+    """Return whether both client-credentials env vars are set (SENTINELHUB_ or SH_)."""
+    client_id = os.environ.get("SENTINELHUB_CLIENT_ID") or os.environ.get(
+        "SH_CLIENT_ID"
+    )
+    secret = os.environ.get("SENTINELHUB_CLIENT_SECRET") or os.environ.get(
+        "SH_CLIENT_SECRET"
+    )
+    return bool(client_id and secret)
 
 
 # A tiny AOI near Naples + a short window keeps every live render cheap.

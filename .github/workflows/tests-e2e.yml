@@ -173,7 +173,7 @@ jobs:
         # this job is harmless if the secrets are not configured yet. Batch /
         # Batch-Statistical are not exercised live (they need a user S3 bucket).
         env:
-          SH_CLIENT_ID: ${{ secrets.SH_CLIENT_ID }}
-          SH_CLIENT_SECRET: ${{ secrets.SH_CLIENT_SECRET }}
+          SENTINELHUB_CLIENT_ID: ${{ secrets.SENTINELHUB_CLIENT_ID }}
+          SENTINELHUB_CLIENT_SECRET: ${{ secrets.SENTINELHUB_CLIENT_SECRET }}
         run: |
           pixi run -e py312 pytest -m "sentinel_hub and e2e" -v

@@ -25,13 +25,28 @@ class TestCredentials:
         creds = SentinelHubCredentials(client_id="a", client_secret="shh")
         assert creds.client_secret.get_secret_value() == "shh"
 
-    def test_from_env(self, monkeypatch):
-        """`from_env` reads the SH_* variables."""
-        monkeypatch.setenv("SH_CLIENT_ID", "envid")
-        monkeypatch.setenv("SH_CLIENT_SECRET", "envsecret")
+    def test_from_env_descriptive(self, monkeypatch):
+        """`from_env` reads the descriptive SENTINELHUB_* variables."""
+        monkeypatch.setenv("SENTINELHUB_CLIENT_ID", "envid")
+        monkeypatch.setenv("SENTINELHUB_CLIENT_SECRET", "envsecret")
         creds = SentinelHubCredentials.from_env()
         assert creds.client_id == "envid"
         assert creds.client_secret.get_secret_value() == "envsecret"
+
+    def test_from_env_sh_fallback(self, monkeypatch):
+        """`from_env` falls back to the sentinelhub-py-native SH_* variables."""
+        monkeypatch.delenv("SENTINELHUB_CLIENT_ID", raising=False)
+        monkeypatch.delenv("SENTINELHUB_CLIENT_SECRET", raising=False)
+        monkeypatch.setenv("SH_CLIENT_ID", "shid")
+        monkeypatch.setenv("SH_CLIENT_SECRET", "shsecret")
+        creds = SentinelHubCredentials.from_env()
+        assert creds.client_id == "shid"
+
+    def test_descriptive_wins_over_sh(self, monkeypatch):
+        """SENTINELHUB_* takes precedence over the SH_* fallback."""
+        monkeypatch.setenv("SENTINELHUB_CLIENT_ID", "primary")
+        monkeypatch.setenv("SH_CLIENT_ID", "fallback")
+        assert SentinelHubCredentials.from_env().client_id == "primary"
 
 
 class TestConfigure:

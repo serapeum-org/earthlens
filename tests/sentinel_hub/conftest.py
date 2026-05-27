@@ -549,5 +549,12 @@ def _clear_sh_env(
     """
     if request.node.get_closest_marker("e2e"):
         return
-    for key in ("SH_CLIENT_ID", "SH_CLIENT_SECRET", "SH_PROFILE"):
+    for key in (
+        "SENTINELHUB_CLIENT_ID",
+        "SENTINELHUB_CLIENT_SECRET",
+        "SENTINELHUB_PROFILE",
+        "SH_CLIENT_ID",
+        "SH_CLIENT_SECRET",
+        "SH_PROFILE",
+    ):
         monkeypatch.delenv(key, raising=False)

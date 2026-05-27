@@ -11,7 +11,9 @@ login step here: :meth:`SentinelHubAuth.configure` only assembles the
 
 The credential resolution order in :meth:`SentinelHubAuth.configure` is:
 
-1. **environment** — `SH_CLIENT_ID` / `SH_CLIENT_SECRET`.
+1. **environment** — `SENTINELHUB_CLIENT_ID` / `SENTINELHUB_CLIENT_SECRET`
+   (with `SH_CLIENT_ID` / `SH_CLIENT_SECRET` accepted as a `sentinelhub-py`-native
+   fallback).
 2. **kwargs** — an explicit `client_id` / `client_secret` on the credentials
    object (these win over the environment).
 3. **saved profile** — a named `SHConfig` profile written earlier with
@@ -52,15 +54,16 @@ class AuthenticationError(_BaseAuthenticationError):
 class SentinelHubCredentials(BaseModel):
     """Frozen value object holding the Sentinel Hub OAuth credentials.
 
-    All fields are optional: an empty object falls back to the `SH_CLIENT_ID` /
-    `SH_CLIENT_SECRET` environment, then to the named `profile`. Supplying
-    `client_id` (+ `client_secret`) selects the explicit client-credentials
-    pair (which wins over the environment).
+    All fields are optional: an empty object falls back to the
+    `SENTINELHUB_CLIENT_ID` / `SENTINELHUB_CLIENT_SECRET` environment (or the
+    `SH_*` fallback), then to the named `profile`. Supplying `client_id`
+    (+ `client_secret`) selects the explicit client-credentials pair (which wins
+    over the environment).
 
     Attributes:
-        client_id: OAuth client id, or `None` to read `SH_CLIENT_ID`.
+        client_id: OAuth client id, or `None` to read `SENTINELHUB_CLIENT_ID`.
         client_secret: OAuth client secret (kept as a `SecretStr`), or `None` to
-            read `SH_CLIENT_SECRET`.
+            read `SENTINELHUB_CLIENT_SECRET`.
         profile: A saved `SHConfig` profile name to load credentials from when
             no id/secret is supplied, or `None` for the default profile.
 
@@ -90,18 +93,28 @@ class SentinelHubCredentials(BaseModel):
 
     @classmethod
     def from_env(cls) -> SentinelHubCredentials:
-        """Build credentials from the `SH_*` environment variables.
+        """Build credentials from the `SENTINELHUB_*` (or `SH_*`) environment.
 
-        Reads `SH_CLIENT_ID`, `SH_CLIENT_SECRET`, and `SH_PROFILE`. Absent
-        variables stay `None`.
+        Reads the descriptive `SENTINELHUB_CLIENT_ID` / `SENTINELHUB_CLIENT_SECRET`
+        / `SENTINELHUB_PROFILE` variables, falling back to the `sentinelhub-py`
+        native `SH_CLIENT_ID` / `SH_CLIENT_SECRET` / `SH_PROFILE` for users coming
+        from the SDK. Absent variables stay `None`.
 
         Returns:
             The credentials object built from the environment.
         """
         return cls(
-            client_id=os.environ.get("SH_CLIENT_ID"),
-            client_secret=os.environ.get("SH_CLIENT_SECRET"),
-            profile=os.environ.get("SH_PROFILE"),
+            client_id=(
+                os.environ.get("SENTINELHUB_CLIENT_ID")
+                or os.environ.get("SH_CLIENT_ID")
+            ),
+            client_secret=(
+                os.environ.get("SENTINELHUB_CLIENT_SECRET")
+                or os.environ.get("SH_CLIENT_SECRET")
+            ),
+            profile=(
+                os.environ.get("SENTINELHUB_PROFILE") or os.environ.get("SH_PROFILE")
+            ),
         )
 
 
@@ -184,9 +197,9 @@ class SentinelHubAuth(AbstractAuth[SentinelHubCredentials]):
         client_id, client_secret = self._resolve_pair()
         if not (client_id and client_secret) and not self._creds.profile:
             raise AuthenticationError(
-                "no Sentinel Hub credentials found: set SH_CLIENT_ID / "
-                "SH_CLIENT_SECRET (mint an OAuth client_credentials pair in the "
-                f"CDSE Dashboard at {_DASHBOARD_URL}, Grant Type "
+                "no Sentinel Hub credentials found: set SENTINELHUB_CLIENT_ID / "
+                "SENTINELHUB_CLIENT_SECRET (mint an OAuth client_credentials pair "
+                f"in the CDSE Dashboard at {_DASHBOARD_URL}, Grant Type "
                 "'Client Credentials'), pass client_id= / client_secret=, or "
                 "supply a saved SHConfig profile= name."
             )

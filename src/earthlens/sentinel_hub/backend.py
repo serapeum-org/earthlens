@@ -126,9 +126,9 @@ class SentinelHub(AbstractDataSource):
                 (optical collections only).
             batch_output: S3 delivery spec (`{"bucket": ..., "iam_role_arn": ...}`)
                 for the Batch planes.
-            client_id: OAuth client id (else `SH_CLIENT_ID`).
-            client_secret: OAuth client secret (else `SH_CLIENT_SECRET`).
-            profile: A saved `SHConfig` profile name (else `SH_PROFILE`).
+            client_id: OAuth client id (else `SENTINELHUB_CLIENT_ID`).
+            client_secret: OAuth client secret (else `SENTINELHUB_CLIENT_SECRET`).
+            profile: A saved `SHConfig` profile name (else `SENTINELHUB_PROFILE`).
 
         Raises:
             ValueError: When `api` is an unknown plane, or `mosaicking_order` is
