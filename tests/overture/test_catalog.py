@@ -103,16 +103,24 @@ class TestCatalog:
         for name in cat.themes():
             assert "ODbL-1.0" in cat.get_theme(name).licenses, name
 
-    def test_available_releases_default_empty(self):
-        """The bundled YAML ships an empty release index."""
-        assert Catalog().available_releases == []
+    def test_available_releases_indexed(self):
+        """The bundled YAML ships a non-empty, well-formed release index."""
+        releases = Catalog().available_releases
+        assert releases, "the bundled catalog should ship a release index"
+        assert all(r[:2] == "20" for r in releases), releases
 
-    def test_latest_release_none_when_unindexed(self):
-        """`latest_release` is `None` when the index is empty (no network)."""
-        assert Catalog().latest_release() is None
+    def test_latest_release_matches_first_indexed(self):
+        """`latest_release` returns the first (newest) indexed release."""
+        cat = Catalog()
+        assert cat.latest_release() == cat.available_releases[0]
+
+    def test_latest_release_none_when_index_empty(self):
+        """`latest_release` is `None` when the index is explicitly empty."""
+        cat = Catalog(datasets=Catalog().datasets, available_releases=[])
+        assert cat.latest_release() is None
 
     def test_latest_release_returns_newest(self):
-        """`latest_release` returns the first (newest) indexed release."""
+        """`latest_release` returns the first (newest) of a supplied index."""
         cat = Catalog(
             datasets=Catalog().datasets,
             available_releases=["2026-05-20.0", "2026-04-15.0"],

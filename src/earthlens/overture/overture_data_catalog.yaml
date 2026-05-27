@@ -61,4 +61,6 @@ themes:
 # Informational index of Overture releases, newest first. Rebuilt by
 # `tools/overture/refresh_overture_catalog.py`; the SDK auto-targets the newest
 # when `release=None`, so this block is for discoverability, not dispatch.
-available_releases: []
+available_releases:
+  - 2026-05-20.0
+  - 2026-04-15.0
