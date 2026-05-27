@@ -582,7 +582,9 @@ class SentinelHub(AbstractDataSource):
             products: The list returned by :meth:`_search`.
 
         Returns:
-            The S3 URIs the server delivered to, one per product.
+            The S3 **delivery prefix** (the configured `batch_output` bucket), one
+            per product — not the individual written object keys (enumerate the
+            bucket for those; earthlens does not perform S3 listing).
 
         Raises:
             ValueError: When no `batch_output` is set or the render exceeds the
@@ -708,7 +710,10 @@ class SentinelHub(AbstractDataSource):
             products: The list returned by :meth:`_search`.
 
         Returns:
-            The S3 destination URIs, one per product.
+            The S3 **delivery prefix** (the configured `batch_output` bucket), one
+            per product — the server tiles the output under that prefix; enumerate
+            the bucket for the individual tile object keys (earthlens does not
+            perform S3 listing).
 
         Raises:
             ValueError: When no `batch_output` (S3 bucket) was supplied, or the
