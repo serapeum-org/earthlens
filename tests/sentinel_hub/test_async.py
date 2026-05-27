@@ -51,14 +51,21 @@ class TestAsyncFetch:
         with pytest.raises(ValueError, match="deliver server-side to S3"):
             backend.download()
 
-    def test_submits_and_returns_uris(self, fake_sh, output_dir: Path):
-        """An async download submits the job and returns the S3 URI."""
+    def test_submits_and_returns_bucket_uri(self, fake_sh, output_dir: Path):
+        """An async download submits the job and returns the S3 delivery bucket."""
         backend = _medium_backend(output_dir, api="async", batch_output=_S3)
         uris = backend.download()
-        assert uris == ["s3://my-bucket/out/async-result.tiff"]
+        assert uris == ["s3://my-bucket/out"]
         req = fake_sh.AsyncProcessRequest.instances[-1]
         assert req.submitted is True
         assert req.delivery["url"] == "s3://my-bucket/out"
+
+    def test_polls_request_id_not_url(self, fake_sh, output_dir: Path):
+        """Completion is polled on the async request id (a URL-like id would error)."""
+        # The fake get_async_running_status raises on a URL-shaped id, so a clean
+        # download proves the request id (not the delivery URL) is polled.
+        backend = _medium_backend(output_dir, api="async", batch_output=_S3)
+        assert backend.download() == ["s3://my-bucket/out"]
 
     def test_size_guard(self, fake_sh, output_dir: Path):
         """An async render above 10000 px/side is rejected."""

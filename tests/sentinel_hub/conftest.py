@@ -190,9 +190,9 @@ class FakeAsyncProcessRequest:
         return {"url": url, **kwargs}
 
     def get_data(self, save_data: bool = False) -> list:
-        """Pretend to submit the async job."""
+        """Pretend to submit the async job; return the submission JSON (with id)."""
         self.submitted = True
-        return []
+        return [{"id": "async-job-1", "status": "CREATED"}]
 
     def get_url_list(self) -> list[str]:
         """Return the (fake) S3 delivery URI for the job."""
@@ -200,8 +200,20 @@ class FakeAsyncProcessRequest:
 
 
 def fake_get_async_running_status(ids: Any, config: Any = None) -> dict:
-    """Stand-in for `get_async_running_status`: nothing is still running."""
-    return {item: False for item in ids}
+    """Stand-in for `get_async_running_status`: nothing is still running.
+
+    The real endpoint resolves `…/async/process/{id}`, so the ids must be async
+    **request ids**, never delivery URLs — reject a URL-shaped id so a regression
+    that polls the wrong identifier is caught by the tests.
+    """
+    items = list(ids)
+    for item in items:
+        if "://" in str(item):
+            raise AssertionError(
+                f"get_async_running_status expects an async request id, got a "
+                f"URL-like value {item!r}"
+            )
+    return {item: False for item in items}
 
 
 class FakeGeometry:

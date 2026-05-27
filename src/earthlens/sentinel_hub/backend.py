@@ -582,6 +582,7 @@ class SentinelHub(AbstractDataSource):
         sentinelhub = import_sentinelhub()
         cfg = self._auth.config()
         delivery = self._require_s3_delivery(sentinelhub)
+        bucket_uri = self._batch_output.get("bucket") or self._batch_output.get("url")
         sh_bbox = self._bbox()
         size = self._request_size()
         self._guard_async_size(size)
@@ -602,9 +603,19 @@ class SentinelHub(AbstractDataSource):
                 size=size,
                 config=cfg,
             )
-            request.get_data(save_data=False)
-            _wait_for_async(sentinelhub, request.get_url_list(), cfg)
-            out.extend(str(url) for url in request.get_url_list())
+            # AsyncProcessRequest.get_data submits the job and returns the
+            # submission JSON, which carries the async request id; poll on that
+            # id (NOT the delivery URL — get_async_running_status resolves
+            # `…/async/process/{id}`).
+            request_id = _async_request_id(request.get_data(save_data=False))
+            if request_id is not None:
+                _wait_for_async(sentinelhub, [request_id], cfg)
+            else:
+                logger.warning(
+                    "Sentinel Hub async: could not determine the request id from "
+                    "the submission response; skipping the completion poll."
+                )
+            out.append(str(bucket_uri))
         logger.info(f"Sentinel Hub async: delivered {len(out)} object(s) to S3")
         return out
 
@@ -1230,6 +1241,43 @@ def _safe_name(key: str) -> str:
             ```
     """
     return key.replace("/", "_").replace("\\", "_")
+
+
+def _async_request_id(submission: Any) -> str | None:
+    """Extract the async request id from an `AsyncProcessRequest.get_data` payload.
+
+    The Async Process API submission returns a JSON document carrying the job
+    `id`; `get_data` yields it wrapped in a list. This pulls the id out
+    defensively (the only field the completion poll needs).
+
+    Args:
+        submission: The value returned by `AsyncProcessRequest.get_data`.
+
+    Returns:
+        The async request id, or `None` when it cannot be determined.
+
+    Examples:
+        - The id is read from the first response element:
+            ```python
+            >>> from earthlens.sentinel_hub.backend import _async_request_id
+            >>> _async_request_id([{"id": "abc-123", "status": "CREATED"}])
+            'abc-123'
+
+            ```
+        - An empty / unexpected payload yields `None`:
+            ```python
+            >>> from earthlens.sentinel_hub.backend import _async_request_id
+            >>> _async_request_id([]) is None
+            True
+
+            ```
+    """
+    if not submission:
+        return None
+    first = submission[0] if isinstance(submission, (list, tuple)) else submission
+    if isinstance(first, dict):
+        return first.get("id") or first.get("requestId")
+    return None
 
 
 #: Async-plane polling cadence (seconds) and the attempt ceiling (~1 hour).
