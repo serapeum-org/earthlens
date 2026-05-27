@@ -45,6 +45,10 @@ _SAMPLE_BBOX = (-73.987, 40.757, -73.984, 40.759)
 #: can replace only that block and keep the curated `themes:` + comments.
 _RELEASES_BLOCK = re.compile(r"^available_releases:.*\Z", re.DOTALL | re.MULTILINE)
 
+#: Matches the single-line `available_datasets:` flow list so `refresh` can
+#: rewrite it in place from the live SDK's full type universe.
+_DATASETS_LINE = re.compile(r"^available_datasets:.*$", re.MULTILINE)
+
 
 def _list_releases() -> list[str]:
     """Return the available Overture release ids, newest first.
@@ -56,6 +60,21 @@ def _list_releases() -> list[str]:
 
     releases, _latest = get_available_releases()
     return sorted(set(releases), reverse=True)
+
+
+def _list_types() -> list[str]:
+    """Return every Overture feature type the SDK knows, sorted.
+
+    This is the provider's full queryable universe (across all themes,
+    including the uncurated `base` / `addresses` themes) — the
+    `available_datasets` index the curated `themes:` block is a subset of.
+
+    Returns:
+        list[str]: All Overture types (`"address"`, `"building"`, …), sorted.
+    """
+    from overturemaps.core import get_all_overture_types
+
+    return sorted(get_all_overture_types())
 
 
 def _render_block(releases: list[str]) -> str:
@@ -71,19 +90,28 @@ def _render_block(releases: list[str]) -> str:
 
 
 def _refresh(args: argparse.Namespace) -> int:
-    """Rewrite the `available_releases:` block in place from the live SDK."""
+    """Rewrite the `available_datasets:` + `available_releases:` indices from the SDK."""
     releases = _list_releases()
+    types = _list_types()
     text = CATALOG_PATH.read_text(encoding="utf-8")
+
+    datasets_line = "available_datasets: [" + ", ".join(types) + "]"
+    if _DATASETS_LINE.search(text):
+        text = _DATASETS_LINE.sub(datasets_line, text)
+    else:
+        text = text.rstrip("\n") + "\n\n" + datasets_line + "\n"
+
     new_block = _render_block(releases)
     if _RELEASES_BLOCK.search(text):
         text = _RELEASES_BLOCK.sub(new_block.rstrip("\n"), text).rstrip("\n") + "\n"
     else:
         text = text.rstrip("\n") + "\n" + new_block
     CATALOG_PATH.write_text(text, encoding="utf-8")
+
     reloaded = Catalog.load()
     print(
-        f"Wrote {len(releases)} release(s) to {CATALOG_PATH.name}; "
-        f"latest={reloaded.latest_release()!r}."
+        f"Wrote {len(types)} type(s) and {len(releases)} release(s) to "
+        f"{CATALOG_PATH.name}; latest={reloaded.latest_release()!r}."
     )
     return 0
 

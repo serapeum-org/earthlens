@@ -144,7 +144,12 @@ class Catalog(AbstractCatalog):
     `AbstractCatalog.get_dataset`).
 
     Attributes:
-        datasets: Map from the friendly theme name to its `Theme` row.
+        datasets: Map from the friendly theme name to its `Theme` row (the
+            curated subset).
+        available_datasets: Every Overture feature type the SDK exposes,
+            across all themes (including the uncurated `base` / `addresses`
+            themes) — the full queryable universe the curated themes are a
+            subset of. Rebuilt by the refresh tool.
         available_releases: Overture release identifiers (`yyyy-mm-dd.x`),
             newest first, from the bundled YAML's informational index.
 
@@ -192,6 +197,7 @@ class Catalog(AbstractCatalog):
         loaded = Catalog.load()
         self.datasets = loaded.datasets
         self.available_releases = loaded.available_releases
+        self.available_datasets = loaded.available_datasets
 
     @classmethod
     def load(cls, catalog_path: Path | None = None) -> Catalog:
@@ -225,7 +231,12 @@ class Catalog(AbstractCatalog):
                     f"{catalog_path} theme {name!r} failed validation:\n{exc}"
                 ) from exc
         releases = list(data.get("available_releases") or [])
-        return cls(datasets=themes, available_releases=releases)
+        available = list(data.get("available_datasets") or [])
+        return cls(
+            datasets=themes,
+            available_releases=releases,
+            available_datasets=available,
+        )
 
     def get_catalog(self) -> dict[str, Theme]:
         """Return the theme map (satisfies the abstract contract).
@@ -259,6 +270,19 @@ class Catalog(AbstractCatalog):
                 (`["buildings", "divisions", "places", "transportation"]`).
         """
         return sorted(self.datasets)
+
+    def available_types(self) -> list[str]:
+        """Return every Overture feature type in the available index, sorted.
+
+        This is the provider's full queryable universe (all themes,
+        including the uncurated `base` / `addresses`); every curated
+        theme's `types` are a subset of it.
+
+        Returns:
+            list[str]: All Overture types
+                (`["address", "bathymetry", "building", ...]`).
+        """
+        return sorted(self.available_datasets)
 
     def latest_release(self) -> str | None:
         """Return the newest indexed Overture release, or `None` if unindexed.

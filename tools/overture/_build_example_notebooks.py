@@ -67,6 +67,19 @@ def _catalog_explorer() -> nbformat.NotebookNode:
             ),
             new_code_cell("cat.get_theme('buildings').licenses"),
             new_markdown_cell(
+                "The four themes above are the curated MVP. The catalog also "
+                "indexes the **full** Overture type universe (including the "
+                "uncurated `base` / `addresses` themes) so you can see "
+                "everything the provider offers:"
+            ),
+            new_code_cell(
+                "curated = {t for theme in cat.datasets.values() for t in theme.types}\n"
+                "available = set(cat.available_types())\n"
+                "print('all types     :', cat.available_types())\n"
+                "print('curated types :', sorted(curated))\n"
+                "print('deferred (base/addresses):', sorted(available - curated))"
+            ),
+            new_markdown_cell(
                 "The informational release index (newest first). The SDK "
                 "auto-targets the newest when you do not pin a `release`."
             ),

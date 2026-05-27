@@ -58,6 +58,12 @@ themes:
     key_columns: [id, names, subtype, country, region, sources]
     licenses: [CDLA-Permissive-2.0, ODbL-1.0]
 
+# Informational index of every Overture feature type the SDK exposes (across
+# all themes, including the uncurated `base` / `addresses` themes). Rebuilt by
+# `tools/overture/refresh_overture_catalog.py` from the live SDK; the curated
+# `themes:` block above is a subset. For discoverability, not dispatch.
+available_datasets: [address, bathymetry, building, building_part, connector, division, division_area, division_boundary, infrastructure, land, land_cover, land_use, place, segment, water]
+
 # Informational index of Overture releases, newest first. Rebuilt by
 # `tools/overture/refresh_overture_catalog.py`; the SDK auto-targets the newest
 # when `release=None`, so this block is for discoverability, not dispatch.

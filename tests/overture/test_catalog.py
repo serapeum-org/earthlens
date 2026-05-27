@@ -103,6 +103,25 @@ class TestCatalog:
         for name in cat.themes():
             assert "ODbL-1.0" in cat.get_theme(name).licenses, name
 
+    def test_available_datasets_covers_universe(self):
+        """The available index lists every Overture type (curated + deferred)."""
+        available = set(Catalog().available_datasets)
+        assert {"building", "place", "segment", "division_area"} <= available
+        assert {"address", "land", "water"} <= available, "base/addresses indexed too"
+        assert len(available) >= 15
+
+    def test_curated_types_are_subset_of_available(self):
+        """Every curated theme's types are members of the available index."""
+        cat = Catalog()
+        available = set(cat.available_datasets)
+        for name in cat.themes():
+            assert set(cat.get_theme(name).types) <= available, name
+
+    def test_available_types_sorted(self):
+        """`available_types` returns the index sorted."""
+        types = Catalog().available_types()
+        assert types == sorted(types)
+
     def test_available_releases_indexed(self):
         """The bundled YAML ships a non-empty, well-formed release index."""
         releases = Catalog().available_releases

@@ -14,8 +14,39 @@ from earthlens.overture import Catalog
 cat = Catalog()
 cat.themes()                       # ['buildings', 'divisions', 'places', 'transportation']
 cat.get_theme("buildings").types   # ['building', 'building_part']
+cat.available_types()              # all 15 Overture types (curated + deferred)
 cat.available_releases             # ['2026-05-20.0', '2026-04-15.0']
 ```
+
+## Curated vs available
+
+Following the same pattern as the other backends (e.g. GEE), the catalog
+holds two things:
+
+- **Curated `themes:`** — the four MVP themes below, hand-vetted with full
+  metadata (types, geometry, key columns, licenses). These are what
+  `variables={theme: [...]}` dispatches on.
+- **`available_datasets:`** — an auto-generated index of **every** Overture
+  feature type the SDK exposes (rebuilt by the
+  [refresh tool](usage.md#catalog-tooling) from the live SDK), so the
+  catalog reflects the provider's *full* queryable universe. Every curated
+  theme's types are a subset of it.
+
+The full type universe (15 types across 6 themes):
+
+| Theme | Types | Curated? |
+|-------|-------|----------|
+| `buildings` | `building`, `building_part` | ✅ |
+| `places` | `place` | ✅ |
+| `transportation` | `segment`, `connector` | ✅ |
+| `divisions` | `division`, `division_area`, `division_boundary` | ✅ |
+| `base` | `bathymetry`, `infrastructure`, `land`, `land_cover`, `land_use`, `water` | indexed, not curated |
+| `addresses` | `address` | indexed, not curated |
+
+The `base` and `addresses` themes appear in `available_datasets` for
+discoverability but are **not curated** — they are follow-ons (see
+[Out of scope](#out-of-scope)). You can still inspect any of them with the
+`probe` tool.
 
 ## Curated themes
 
