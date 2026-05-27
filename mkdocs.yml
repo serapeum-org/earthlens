@@ -176,6 +176,12 @@ nav:
       - Usage: reference/firms/usage.md
       - Authentication: reference/firms/authentication.md
       - Reference: reference/firms/firms.md
+    - Overture Maps (vector basemap):
+      - Introduction: reference/overture/introduction.md
+      - Usage: reference/overture/usage.md
+      - Licensing: reference/overture/licensing.md
+      - Available datasets: reference/overture/datasets.md
+      - Reference: reference/overture/overture.md
   - Examples:
     - Authentication: examples/authentication.md
     - Data Sources: examples/data-sources.md
