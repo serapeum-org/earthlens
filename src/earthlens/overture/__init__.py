@@ -59,10 +59,12 @@ Examples:
 
 from __future__ import annotations
 
+from earthlens.overture.backend import Overture
 from earthlens.overture.catalog import CATALOG_PATH, Catalog, Theme
 
 __all__ = [
     "CATALOG_PATH",
     "Catalog",
+    "Overture",
     "Theme",
 ]
