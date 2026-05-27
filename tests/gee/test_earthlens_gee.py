@@ -81,6 +81,7 @@ class TestRegistry:
             "gee",
             "google-earth-engine",
             "nexrad",
+            "nwis",
             "nwp",
             "openaq",
             "openeo",
@@ -91,6 +92,8 @@ class TestRegistry:
             "sentinelhub",
             "stac",
             "tropycal",
+            "usgs-nwis",
+            "usgs-water",
         ]
 
     def test_keys_resolve_to_gee_class(self):

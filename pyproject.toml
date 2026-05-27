@@ -82,12 +82,14 @@ sentinel-hub = ["sentinelhub >=3.11.5"]
 # from its own deps, so earthlens must supply it or the import fails.
 tropycal = ["tropycal >=1.4", "cartopy >=0.22"]
 overture = ["overturemaps >=1.0.0", "duckdb >=1.0.0"]
+usgs-water = ["dataretrieval >=1.1.4"]
 all = [
     "boto3 >=1.43.0",
     "botocore >=1.34.0",
     "cartopy >=0.22",
     "cdsapi >=0.7.7",
     "copernicusmarine >=2.0.0,<3",
+    "dataretrieval >=1.1.4",
     "duckdb >=1.0.0",
     "earthengine-api >=1.7.26",
     "earthaccess >=0.18.0; python_version >= '3.12'",
@@ -184,6 +186,11 @@ include = ["earthlens", "earthlens.*"]
 "earthlens.overture" = ["*.yaml"]
 "earthlens.nwp" = ["*.yaml"]
 "earthlens.radar" = ["*.yaml"]
+# Ship only the curated catalog; the informational available_parameters.yaml
+# (~1.5 MB, ~19.7k codes) is a repo/tooling + docs artefact that nothing loads
+# at runtime (the Catalog reads only the curated file; raw codes pass through
+# variables= without it), so it is deliberately excluded from the wheel.
+"earthlens.usgs_water" = ["usgs_water_data_catalog.yaml"]
 
 [tool.flake8]
 ignore = ["E203", "E266", "E501", "W503", "E722", "C901", "E741", "E731"]
@@ -260,6 +267,7 @@ markers = [
     "overture: tests for the Overture Maps vector backend (requires the `overture` extra: overturemaps).",
     "nwp: tests for the NWP forecast backend (requires the `nwp` extra: herbie-data, ecmwf-opendata; GRIB read via pyramids' GDAL driver).",
     "radar: tests for the NEXRAD Level-II radar backend (requires the `radar` extra: boto3; unsigned unidata-nexrad-level2-chunks bucket).",
+    "usgs_water: tests for the USGS NWIS / Water Data backend (requires the `usgs-water` extra: dataretrieval; anonymous access works).",
 ]
 
 [tool.pixi.workspace]
@@ -297,7 +305,8 @@ test-firms = { cmd = "pytest -vvv -m 'firms and not e2e' --cov=src/earthlens --c
 test-overture = { cmd = "pytest -vvv -m 'overture and not e2e' --cov=src/earthlens --cov-report=xml --cov-report=term-missing", description = "Run Overture Maps vector backend tests (requires the `overture` extra: overturemaps)" }
 test-nwp = { cmd = "pytest -vvv -m 'nwp and not e2e' --cov=src/earthlens --cov-report=xml --cov-report=term-missing", description = "Run NWP forecast backend tests (requires the `nwp` extra: herbie-data, ecmwf-opendata)" }
 test-radar = { cmd = "pytest -vvv -m 'radar and not e2e' --cov=src/earthlens --cov-report=xml --cov-report=term-missing", description = "Run NEXRAD radar backend tests (requires the `radar` extra: boto3)" }
-test-doctests = { cmd = "pytest --doctest-modules src/earthlens/gee src/earthlens/chc src/earthlens/ecmwf src/earthlens/cmems src/earthlens/fdsn src/earthlens/earthdata src/earthlens/eumetsat src/earthlens/stac src/earthlens/openeo src/earthlens/sentinel_hub src/earthlens/gdacs src/earthlens/openaq src/earthlens/tropycal src/earthlens/firms src/earthlens/overture src/earthlens/nwp src/earthlens/radar src/earthlens/base", description = "Run docstring examples across the backend packages (catches drift in catalog / API docstrings)" }
+test-usgs-water = { cmd = "pytest -vvv -m 'usgs_water and not e2e' --cov=src/earthlens --cov-report=xml --cov-report=term-missing", description = "Run USGS NWIS / Water Data backend tests (requires the `usgs-water` extra: dataretrieval)" }
+test-doctests = { cmd = "pytest --doctest-modules src/earthlens/gee src/earthlens/chc src/earthlens/ecmwf src/earthlens/cmems src/earthlens/fdsn src/earthlens/earthdata src/earthlens/eumetsat src/earthlens/stac src/earthlens/openeo src/earthlens/sentinel_hub src/earthlens/gdacs src/earthlens/openaq src/earthlens/tropycal src/earthlens/firms src/earthlens/overture src/earthlens/nwp src/earthlens/radar src/earthlens/usgs_water src/earthlens/base", description = "Run docstring examples across the backend packages (catches drift in catalog / API docstrings)" }
 notebooks = { cmd = "pytest --nbval --nbval-lax --verbose docs/examples", description = "check notebooks" }
 jupyter = { cmd = "jupyter lab --no-browser --IdentityProvider.token='' --ServerApp.password='' --port=8889", description = "check notebooks" }
 build-dist = { cmd = "python -m build", description = "Build sdist and wheel for PyPI" }
