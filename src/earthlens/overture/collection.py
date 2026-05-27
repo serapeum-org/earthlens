@@ -57,6 +57,38 @@ def to_feature_collection(
         FeatureCollection: The features tagged `EPSG:4326` with a
             `license_id` column added. An empty input yields a
             schema-correct empty collection.
+
+    Examples:
+        - A CRS-less frame is tagged EPSG:4326 and gains a `license_id`:
+            ```python
+            >>> import geopandas as gpd
+            >>> from shapely.geometry import Point
+            >>> from earthlens.overture.collection import to_feature_collection
+            >>> gdf = gpd.GeoDataFrame(
+            ...     {
+            ...         "id": ["a"],
+            ...         "sources": [[{"dataset": "Overture", "license": "CDLA-Permissive-2.0"}]],
+            ...     },
+            ...     geometry=[Point(0, 0)],
+            ... )
+            >>> fc = to_feature_collection(gdf, label="places/place")
+            >>> fc["license_id"].iloc[0]
+            'CDLA-Permissive-2.0'
+            >>> fc.crs.to_epsg()
+            4326
+
+            ```
+        - An empty input yields a schema-correct empty collection:
+            ```python
+            >>> import geopandas as gpd
+            >>> from earthlens.overture.collection import to_feature_collection
+            >>> empty = to_feature_collection(gpd.GeoDataFrame(), label="places/place")
+            >>> len(empty)
+            0
+            >>> "license_id" in empty.columns
+            True
+
+            ```
     """
     if gdf is None or len(gdf) == 0:
         return empty_fc()

@@ -123,6 +123,23 @@ class Theme(BaseModel):
         Raises:
             ValueError: If a requested type is not one of this theme's
                 `types`.
+
+        Examples:
+            - An empty request resolves to the theme's primary type:
+                ```python
+                >>> from earthlens.overture import Catalog
+                >>> Catalog().get_theme("buildings").resolve_types([])
+                ['building']
+
+                ```
+            - An explicit request is honoured and de-duplicated in order:
+                ```python
+                >>> from earthlens.overture import Catalog
+                >>> theme = Catalog().get_theme("transportation")
+                >>> theme.resolve_types(["connector", "segment", "connector"])
+                ['connector', 'segment']
+
+                ```
         """
         if not requested:
             return [self.default_type]
@@ -262,6 +279,18 @@ class Catalog(AbstractCatalog):
 
         Raises:
             ValueError: If `name` is not a registered theme.
+
+        Examples:
+            - Resolve a theme and read its primary type and geometry:
+                ```python
+                >>> from earthlens.overture import Catalog
+                >>> theme = Catalog().get_theme("places")
+                >>> theme.default_type
+                'place'
+                >>> theme.geometry
+                'Point'
+
+                ```
         """
         return self.get_dataset(name)
 
@@ -270,7 +299,16 @@ class Catalog(AbstractCatalog):
 
         Returns:
             list[str]: The theme names
-                (`["buildings", "divisions", "places", "transportation"]`).
+                (`["addresses", "base", "buildings", ...]`).
+
+        Examples:
+            - List the curated themes:
+                ```python
+                >>> from earthlens.overture import Catalog
+                >>> Catalog().themes()[:3]
+                ['addresses', 'base', 'buildings']
+
+                ```
         """
         return sorted(self.datasets)
 
@@ -284,6 +322,18 @@ class Catalog(AbstractCatalog):
         Returns:
             list[str]: All Overture types
                 (`["address", "bathymetry", "building", ...]`).
+
+        Examples:
+            - The full type universe includes every curated theme's types:
+                ```python
+                >>> from earthlens.overture import Catalog
+                >>> types = Catalog().available_types()
+                >>> "building" in types and "address" in types
+                True
+                >>> len(types)
+                15
+
+                ```
         """
         return sorted(self.available_datasets)
 
@@ -298,5 +348,15 @@ class Catalog(AbstractCatalog):
         Returns:
             str | None: The newest release id (e.g. `"2026-05-20.0"`), or
                 `None` when the index is empty.
+
+        Examples:
+            - The newest release is the head of the index (no network):
+                ```python
+                >>> from earthlens.overture import Catalog
+                >>> release = Catalog().latest_release()
+                >>> release is None or release[:2] == "20"
+                True
+
+                ```
         """
         return self.available_releases[0] if self.available_releases else None

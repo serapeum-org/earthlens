@@ -150,6 +150,32 @@ def derive_license_ids(gdf: pd.DataFrame) -> pd.Series:
     Returns:
         pandas.Series: One `license_id` string per row, index-aligned to
             `gdf`.
+
+    Examples:
+        - Derive a per-row `license_id` from a `sources` column:
+            ```python
+            >>> import pandas as pd
+            >>> from earthlens.overture._helpers import derive_license_ids
+            >>> frame = pd.DataFrame(
+            ...     {
+            ...         "sources": [
+            ...             [{"dataset": "OpenStreetMap", "license": "ODbL-1.0"}],
+            ...             [{"dataset": "Overture", "license": "CDLA-Permissive-2.0"}],
+            ...         ]
+            ...     }
+            ... )
+            >>> list(derive_license_ids(frame))
+            ['ODbL-1.0', 'CDLA-Permissive-2.0']
+
+            ```
+        - A frame with no `sources` column defaults every row to CDLA:
+            ```python
+            >>> import pandas as pd
+            >>> from earthlens.overture._helpers import derive_license_ids
+            >>> list(derive_license_ids(pd.DataFrame({"id": ["a", "b"]})))
+            ['CDLA-Permissive-2.0', 'CDLA-Permissive-2.0']
+
+            ```
     """
     if "sources" not in gdf.columns:
         return pd.Series(
@@ -169,6 +195,24 @@ def warn_if_odbl(license_ids: pd.Series, label: str) -> int:
 
     Returns:
         int: The number of `ODbL-1.0` rows found (0 emits no warning).
+
+    Examples:
+        - A permissive-only series emits nothing and counts zero:
+            ```python
+            >>> import pandas as pd
+            >>> from earthlens.overture._helpers import warn_if_odbl
+            >>> warn_if_odbl(pd.Series(["CDLA-Permissive-2.0", "Apache-2.0"]), "places/place")
+            0
+
+            ```
+        - ODbL rows are counted (and a `LicenseWarning` is emitted):
+            ```python
+            >>> import pandas as pd
+            >>> from earthlens.overture._helpers import warn_if_odbl
+            >>> warn_if_odbl(pd.Series(["ODbL-1.0", "CDLA-Permissive-2.0"]), "buildings/building")
+            1
+
+            ```
     """
     odbl_count = int((license_ids == ODBL).sum())
     if odbl_count:
