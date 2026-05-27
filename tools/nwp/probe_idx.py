@@ -96,6 +96,11 @@ def _idx_url(models_dir: pathlib.Path, model: NWPModel, cycle: dt.datetime, step
     Returns:
         str: The `.idx` sidecar URL (AWS first, else the first source).
     """
+    # Exec the template module as data rather than `import herbie.models.<fam>`:
+    # importing the package triggers herbie/__init__ -> cfgrib -> eccodes (the
+    # binary this probe deliberately avoids). The file is Herbie's own installed
+    # code and this is a dev-only tool (not shipped in the wheel), so running it
+    # is safe.
     namespace = runpy.run_path(str(models_dir / f"{model.model_family}.py"))
     cls = namespace.get(model.model_family) or next(
         v for v in namespace.values() if isinstance(v, type) and hasattr(v, "template")

@@ -31,6 +31,7 @@ from typing import TYPE_CHECKING, Any
 
 import pandas as pd
 from loguru import logger
+from tqdm import tqdm
 
 from earthlens.base import (
     AbstractDataSource,
@@ -237,7 +238,14 @@ class NWM(AbstractDataSource):
         )
 
     def _api(self) -> list[Path]:
-        """Compose `_search` and `_fetch` (returns the fetched paths)."""
+        """Return the fetched NetCDF paths (the raw "paths only" entry).
+
+        `download` is the public entry point — it returns the typed
+        `DataFrame` inventory. `_api` exists to satisfy the
+        `AbstractDataSource` contract and exposes just the written paths
+        for callers (or the C3 `_api_via_search_fetch` composition) that
+        want them without the inventory frame.
+        """
         return self._api_via_search_fetch()
 
     def _cycles_for(self, config: NWMConfig) -> list[int]:
@@ -354,11 +362,33 @@ class NWM(AbstractDataSource):
             list[Path]: One fetched NetCDF path per successful product,
                 in order. Shorter than `products` when some were skipped.
         """
+        return [path for _, path in self._fetch_pairs(products)]
+
+    def _fetch_pairs(
+        self, products: list[RemoteProduct]
+    ) -> list[tuple[RemoteProduct, Path]]:
+        """Download each product, returning `(product, path)` pairs.
+
+        Like :meth:`_fetch` but keeps each path paired with the product
+        it came from, so the inventory needs no filename re-matching. A
+        `(cycle, step)` that is not published is logged and skipped. The
+        loop shows a `tqdm` bar unless `download(progress_bar=False)`
+        disabled it.
+
+        Args:
+            products: The products from :meth:`_search`.
+
+        Returns:
+            list[tuple[RemoteProduct, Path]]: One pair per successfully
+                fetched product, in order.
+        """
         client = _s3_client(self._region)
-        out: list[Path] = []
-        for product in products:
+        out: list[tuple[RemoteProduct, Path]] = []
+        for product in tqdm(
+            products, disable=not getattr(self, "_show_progress", True), desc="nwm"
+        ):
             try:
-                out.append(self._fetch_one(client, product))
+                out.append((product, self._fetch_one(client, product)))
             except Exception as exc:  # noqa: BLE001 - skip the miss, keep going
                 logger.warning(
                     f"nwm: skipping {product.id} — fetch failed: "
@@ -409,19 +439,22 @@ class NWM(AbstractDataSource):
                 "NWM.download(aggregate=...) is not supported — NWM channel_rt "
                 "is feature-id indexed, not a griddable raster."
             )
+        self._show_progress = progress_bar
         products = self._search()
-        paths = self._fetch(products)
-        return self._inventory(products, paths)
+        pairs = self._fetch_pairs(products)
+        return self._inventory(pairs)
 
     @staticmethod
-    def _inventory(products: list[RemoteProduct], paths: list[Path]) -> pd.DataFrame:
-        """Build the DataFrame inventory from products + fetched paths."""
+    def _inventory(pairs: list[tuple[RemoteProduct, Path]]) -> pd.DataFrame:
+        """Build the DataFrame inventory from `(product, path)` pairs.
+
+        Each path is already paired with the product it came from (no
+        filename re-matching), so the metadata attaches unambiguously.
+        """
         columns = ["config", "cycle", "step", "valid_time", "product", "domain", "path"]
-        by_name = {Path(p.href).name: p for p in products}
         rows = []
-        for path in paths:
-            product = by_name.get(path.name)
-            meta = product.metadata if product else {}
+        for product, path in pairs:
+            meta = product.metadata
             cycle = meta.get("cycle")
             step = meta.get("step")
             valid = (

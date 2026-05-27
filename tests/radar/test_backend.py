@@ -119,6 +119,14 @@ class TestSearch:
         fake_s3.list_objects_v2 = paginated
         assert Radar._list_prefixes(fake_s3, "KTLX/") == ["KTLX/100/", "KTLX/101/"]
 
+    def test_first_key_returns_earliest(self, fake_s3):
+        """_first_key returns the lexicographically first chunk of a volume."""
+        assert Radar._first_key(fake_s3, "KTLX/100/") == "KTLX/100/20240601-120000-001-S"
+
+    def test_first_key_empty_prefix_is_none(self, fake_s3):
+        """_first_key returns None when no objects live under the prefix."""
+        assert Radar._first_key(fake_s3, "ZZZZ/") is None
+
 
 class TestFetch:
     """Tests for the chunk assembly."""

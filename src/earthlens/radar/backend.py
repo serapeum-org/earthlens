@@ -33,6 +33,7 @@ from typing import TYPE_CHECKING, Any
 
 import pandas as pd
 from loguru import logger
+from tqdm import tqdm
 
 from earthlens.base import (
     AbstractDataSource,
@@ -195,7 +196,14 @@ class Radar(AbstractDataSource):
         )
 
     def _api(self) -> list[Path]:
-        """Compose `_search` and `_fetch` (returns the assembled paths)."""
+        """Return the assembled `.ar2v` paths (the raw "paths only" entry).
+
+        `download` is the public entry point — it returns the typed
+        `GeoDataFrame` inventory. `_api` exists to satisfy the
+        `AbstractDataSource` contract and exposes just the written paths
+        for callers (or the C3 `_api_via_search_fetch` composition) that
+        want them without the inventory frame.
+        """
         return self._api_via_search_fetch()
 
     def _window(self) -> tuple[dt.datetime, dt.datetime]:
@@ -227,11 +235,18 @@ class Radar(AbstractDataSource):
         for site_id, station in self._stations:
             volume_prefixes = self._list_prefixes(client, f"{site_id}/")
             for vp in volume_prefixes:
+                # Read just the first chunk key (the `S` chunk carries the scan
+                # start) to window-filter cheaply; only list a volume's full
+                # chunk set once it is known to be in range (avoids the N+1
+                # full-listing of every volume).
+                first = self._first_key(client, vp)
+                if first is None:
+                    continue
+                scan = _volume_start(first)
+                if not (start <= scan <= end):
+                    continue
                 chunk_keys = sorted(self._list_keys(client, vp))
                 if not chunk_keys:
-                    continue
-                scan = _volume_start(chunk_keys[0])
-                if not (start <= scan <= end):
                     continue
                 volume = vp.rstrip("/").rsplit("/", 1)[-1]
                 products.append(
@@ -265,6 +280,24 @@ class Radar(AbstractDataSource):
         return out
 
     @staticmethod
+    def _first_key(client: Any, prefix: str) -> str | None:
+        """Return the lexicographically first object key under `prefix`.
+
+        Used to read a volume's `S` (start) chunk — which carries the
+        scan-start timestamp — without listing the whole volume.
+
+        Args:
+            client: The S3 client.
+            prefix: A volume prefix (`"KTLX/871/"`).
+
+        Returns:
+            str | None: The first key, or `None` if the prefix is empty.
+        """
+        resp = client.list_objects_v2(Bucket=BUCKET, Prefix=prefix, MaxKeys=1)
+        contents = resp.get("Contents", [])
+        return contents[0]["Key"] if contents else None
+
+    @staticmethod
     def _list_keys(client: Any, prefix: str) -> list[str]:
         """Return all object keys under `prefix` (paginated)."""
         out: list[str] = []
@@ -295,11 +328,30 @@ class Radar(AbstractDataSource):
             list[Path]: One assembled `.ar2v` path per successfully
                 fetched volume, in product order.
         """
+        return [path for _, path in self._fetch_pairs(products)]
+
+    def _fetch_pairs(self, products: list[RemoteProduct]) -> list[tuple[RemoteProduct, Path]]:
+        """Assemble each volume, returning `(product, path)` pairs.
+
+        Like :meth:`_fetch` but keeps each path paired with the product
+        it came from, so the inventory needs no filename re-matching. A
+        volume whose download fails is logged and skipped. The loop shows
+        a `tqdm` bar unless `download(progress_bar=False)` disabled it.
+
+        Args:
+            products: The products from :meth:`_search`.
+
+        Returns:
+            list[tuple[RemoteProduct, Path]]: One pair per successfully
+                assembled volume, in product order.
+        """
         client = _s3_client(self._region)
-        out: list[Path] = []
-        for product in products:
+        out: list[tuple[RemoteProduct, Path]] = []
+        for product in tqdm(
+            products, disable=not getattr(self, "_show_progress", True), desc="radar"
+        ):
             try:
-                out.append(self._assemble(client, product))
+                out.append((product, self._assemble(client, product)))
             except Exception as exc:  # noqa: BLE001 - skip the bad volume, keep going
                 logger.warning(
                     f"radar: skipping volume {product.id} — assembly failed: "
@@ -352,31 +404,25 @@ class Radar(AbstractDataSource):
                 "Radar.download(aggregate=...) is not supported — raw Level-II "
                 "volumes are not griddable by the pyramids reducer."
             )
+        self._show_progress = progress_bar
         products = self._search()
-        paths = self._fetch(products)
-        return self._inventory(products, paths)
+        pairs = self._fetch_pairs(products)
+        return self._inventory(pairs)
 
     @staticmethod
-    def _inventory(products: list[RemoteProduct], paths: list[Path]):
-        """Build the GeoDataFrame inventory from products + assembled paths."""
+    def _inventory(pairs: list[tuple[RemoteProduct, Path]]):
+        """Build the GeoDataFrame inventory from `(product, path)` pairs.
+
+        Each path is already paired with the product it came from (no
+        filename re-matching), so the metadata attaches unambiguously.
+        """
         import geopandas as gpd
         from shapely.geometry import Point
 
-        by_id = {p.id: p for p in products}
         rows = []
         geoms = []
-        for path in paths:
-            # path stem: {station}_{YYYYMMDD}_{HHMMSS}; match back to a product
-            product = next(
-                (
-                    p
-                    for p in by_id.values()
-                    if path.name.startswith(p.metadata["station_id"])
-                    and p.metadata["start_time"].strftime("%Y%m%d_%H%M%S") in path.name
-                ),
-                None,
-            )
-            meta = product.metadata if product else {}
+        for product, path in pairs:
+            meta = product.metadata
             station: Station | None = meta.get("station")
             rows.append(
                 {
