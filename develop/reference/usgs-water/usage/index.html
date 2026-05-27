@@ -7896,6 +7896,10 @@ medium</code>. <strong>Modern-only</strong> — needs a token for anonymous use 
 facade rejects <code>aggregate=</code> for tabular backends). Columns: <code>site_no,
 parameter_code, parameter_name, time_of_year, value, percentile, statistic,
 unit</code>.</p>
+<p><strong><code>statistics</code> requires an explicit <code>sites=</code></strong> — neither the modern
+<code>get_stats_date_range</code> nor the legacy <code>get_stats</code> accepts a bounding box, so a
+bbox-only statistics request has no spatial filter and is rejected with a clear
+error. Discover the sites first with <code>service="sites"</code> if you only have a bbox.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="n">EarthLens</span><span class="p">(</span><span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;usgs-water&quot;</span><span class="p">,</span> <span class="n">service</span><span class="o">=</span><span class="s2">&quot;statistics&quot;</span><span class="p">,</span>
 <a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>          <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;discharge&quot;</span><span class="p">],</span> <span class="n">sites</span><span class="o">=</span><span class="s2">&quot;01646500&quot;</span><span class="p">,</span>
 <a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>          <span class="n">start</span><span class="o">=</span><span class="s2">&quot;2020-01-01&quot;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">&quot;2021-12-31&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
