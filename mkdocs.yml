@@ -176,6 +176,11 @@ nav:
       - Usage: reference/firms/usage.md
       - Authentication: reference/firms/authentication.md
       - Reference: reference/firms/firms.md
+    - National Water Model:
+      - Introduction: reference/nwm/introduction.md
+      - Usage: reference/nwm/usage.md
+      - Products & configurations: reference/nwm/datasets.md
+      - Reference: reference/nwm/nwm.md
   - Examples:
     - Authentication: examples/authentication.md
     - Data Sources: examples/data-sources.md
