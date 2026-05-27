@@ -278,6 +278,8 @@ nav:
       - MODIS vs VIIRS comparison: examples/firms/modis_vs_viirs_comparison.ipynb
     - Open NWP forecasts:
       - Catalog explorer (no network): examples/nwp/catalog_explorer.ipynb
+      - GFS 2 m temperature (live): examples/nwp/gfs_temperature.ipynb
+      - DWD ICON precipitation (live): examples/nwp/icon_precipitation.ipynb
     - NEXRAD radar:
       - Catalog explorer (no network): examples/radar/catalog_explorer.ipynb
   - API Reference:
