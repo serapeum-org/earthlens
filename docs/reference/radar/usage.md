@@ -32,7 +32,7 @@ inventory = lens.download()   # GeoDataFrame of assembled volumes
 
 - **Stations** — keys of `variables`. Any valid four-letter id works;
   the bundled station catalog provides geometry + bbox discovery for
-  ~25 major sites (a site absent from the catalog still fetches, just
+  the full ~210-site WSR-88D network (a site absent from the catalog still fetches, just
   with no point geometry). `StationCatalog().in_bbox(w, s, e, n)` lists
   the catalogued radars in a box.
 - **Time window** — `start` / `end` filter volumes by scan-start time.

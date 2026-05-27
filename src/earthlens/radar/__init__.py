@@ -10,7 +10,7 @@ Public surface (re-exported from this package):
 
 * :class:`Radar` — the backend; instantiate with a time window, a bbox,
   and a `{station_id: [...]}` mapping, then call :meth:`Radar.download`.
-* :class:`StationCatalog` — loader for the bundled `stations.yaml`.
+* :class:`StationCatalog` — loader for the bundled `radar_data_catalog.yaml`.
 * :class:`Station` — one WSR-88D site row (name / lat / lon / state).
 * :data:`CATALOG_PATH` — absolute path to the bundled station YAML.
 * :data:`BUCKET` — the unsigned chunk bucket name.

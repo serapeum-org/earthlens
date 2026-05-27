@@ -184,6 +184,7 @@ nav:
     - NEXRAD radar:
       - Introduction: reference/radar/introduction.md
       - Usage: reference/radar/usage.md
+      - Catalog & Tooling: reference/radar/catalog.md
       - Reference: reference/radar/radar.md
     - National Water Model:
       - Introduction: reference/nwm/introduction.md
@@ -279,6 +280,8 @@ nav:
       - Quickstart — recent fires: examples/firms/quickstart.ipynb
       - Fire-season time-series: examples/firms/fire_season_timeseries.ipynb
       - MODIS vs VIIRS comparison: examples/firms/modis_vs_viirs_comparison.ipynb
+    - NEXRAD radar:
+      - Catalog explorer (no network): examples/radar/catalog_explorer.ipynb
   - API Reference:
     - EarthLens Facade: reference/earthlens.md
     - AbstractDataSource: reference/abstract-datasource.md

@@ -1,7 +1,7 @@
 """Station registry for the NEXRAD radar backend.
 
 Hosts :class:`StationCatalog`, the pydantic-backed reader for the
-bundled `stations.yaml` — a curated map of WSR-88D site ids
+bundled `radar_data_catalog.yaml` — a curated map of WSR-88D site ids
 (`"KTLX"`) to name / latitude / longitude / state. The catalog gives
 each fetched volume a point geometry and lets a request select the
 radars inside a bounding box.
@@ -22,7 +22,7 @@ from pydantic import BaseModel, ConfigDict, Field, ValidationError
 from earthlens.base import AbstractCatalog
 from earthlens.base.yaml_loader import load_yaml_strict
 
-CATALOG_PATH: Path = Path(__file__).parent / "stations.yaml"
+CATALOG_PATH: Path = Path(__file__).parent / "radar_data_catalog.yaml"
 
 _CATALOG_CACHE: dict[Any, dict[str, "Station"]] = {}
 
@@ -36,7 +36,7 @@ def _load_stations(path: Path) -> dict[str, "Station"]:
     """Parse, validate, and cache the station registry at `path`.
 
     Args:
-        path: Path to `stations.yaml` (or a test override).
+        path: Path to `radar_data_catalog.yaml` (or a test override).
 
     Returns:
         dict[str, Station]: The `stations:` map keyed by site id.
@@ -95,7 +95,7 @@ class Station(BaseModel):
 class StationCatalog(AbstractCatalog):
     """Catalog of NEXRAD WSR-88D sites.
 
-    Reads the bundled `stations.yaml` and exposes its `stations:` block
+    Reads the bundled `radar_data_catalog.yaml` and exposes its `stations:` block
     as a typed `dict[str, Station]`. Instantiate with no arguments
     (`StationCatalog()`).
 
@@ -115,7 +115,7 @@ class StationCatalog(AbstractCatalog):
     datasets: dict[str, Station] = Field(default_factory=dict)
 
     def model_post_init(self, __context: Any) -> None:
-        """Auto-load the bundled `stations.yaml` when no rows were supplied."""
+        """Auto-load the bundled `radar_data_catalog.yaml` when no rows were supplied."""
         if self.datasets:
             return
         self.datasets = _load_stations(CATALOG_PATH)
