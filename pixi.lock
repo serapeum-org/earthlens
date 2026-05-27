@@ -62,6 +62,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/05/7f/798705f5296a58ca505d600456748d1be48078eac8a7050d8a98bc9edb89/decorator-5.3.1-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/84/d0/205d54408c08b13550c733c4b85429e7ead111c7f0014309637425520a9a/deprecated-1.3.1-py2.py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/0c/d5/c5db1ea3394c6e1732fb3286b3bd878b59507a8f77d32a2cebda7d7b7cd4/donfig-0.8.1.post1-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/56/8f/65fc623b51448f2bfba1a9ec6ab3debb4664c0876c0113a5e782600b53ac/duckdb-1.5.3-cp314-cp314-manylinux_2_26_x86_64.manylinux_2_28_x86_64.whl
       - pypi: https://files.pythonhosted.org/packages/bc/15/2b94815f5b5cd0be68d4d3f5846e893f0b8d79371aa54f7985feadfd692b/earthaccess-0.18.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/47/cf/d87c88eed317d1aebe2c46d3be3a4c0bf287ba957f70ccce6dddd202f8c9/earthengine_api-1.7.28-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/b3/a3/f58ff573ba0f678ff8116686e868afe436627b19b457a2aba62cd463c9ad/eccodes-2.47.0-py3-none-any.whl
@@ -134,7 +135,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/10/bd/c038d7cc38edc1aa5bf91ab8068b63d4308c66c4c8bb3cbba7dfbc049f9c/pyparsing-3.3.2-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/05/1e/ada6fb15a1d75b5bd9b554355a69a798c55a7dcc93b8d41596265c1772e3/pyproj-3.7.2-cp314-cp314-manylinux_2_28_x86_64.whl
       - pypi: https://files.pythonhosted.org/packages/ec/bd/227fd09d3c484aa815a59a21bb763c399fae4d0d9119f19577f6f362083f/pyramids_gis-0.25.0-cp314-cp314-manylinux_2_39_x86_64.whl
-      - pypi: https://files.pythonhosted.org/packages/a8/e7/b1884771bb802547d4431a6a8658ce4304cda512907c0914c490f18d88b7/pyshp-3.0.8-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/80/5f/010886558cde80f34f5eeef478a37004b97e3ac30281bd036f398ee342bd/pyshp-3.0.9-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/ad/b4/a9430e72bfc3c458e1fcf8363890994e483052ab052ed93912be4e5b32c8/pystac-1.14.3-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/5d/d2/5f6367b14c9f250d1a6725d18bd1e9584f5ab1587e292f3a847e59189598/pystac_client-0.9.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/79/e2/5fa011e34bf81a3d47fb45e3a2ff86baabbc2853439285205bd14b245922/python_cmr-0.13.0-py3-none-any.whl
@@ -218,6 +219,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/05/7f/798705f5296a58ca505d600456748d1be48078eac8a7050d8a98bc9edb89/decorator-5.3.1-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/84/d0/205d54408c08b13550c733c4b85429e7ead111c7f0014309637425520a9a/deprecated-1.3.1-py2.py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/0c/d5/c5db1ea3394c6e1732fb3286b3bd878b59507a8f77d32a2cebda7d7b7cd4/donfig-0.8.1.post1-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/c9/46/617b51363f5613418c8b224b3cce16b58e6dde80904566bec232579c1d4e/duckdb-1.5.3-cp314-cp314-macosx_11_0_arm64.whl
       - pypi: https://files.pythonhosted.org/packages/bc/15/2b94815f5b5cd0be68d4d3f5846e893f0b8d79371aa54f7985feadfd692b/earthaccess-0.18.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/47/cf/d87c88eed317d1aebe2c46d3be3a4c0bf287ba957f70ccce6dddd202f8c9/earthengine_api-1.7.28-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/b3/a3/f58ff573ba0f678ff8116686e868afe436627b19b457a2aba62cd463c9ad/eccodes-2.47.0-py3-none-any.whl
@@ -289,7 +291,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/10/bd/c038d7cc38edc1aa5bf91ab8068b63d4308c66c4c8bb3cbba7dfbc049f9c/pyparsing-3.3.2-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/04/90/67bd7260b4ea9b8b20b4f58afef6c223ecb3abf368eb4ec5bc2cdef81b49/pyproj-3.7.2.tar.gz
       - pypi: https://files.pythonhosted.org/packages/8d/40/ad558bf67fb59fb08ba7d786b44961cb86ec6f9797b728590e66fe68b8d7/pyramids_gis-0.25.0-cp314-cp314-macosx_11_0_arm64.whl
-      - pypi: https://files.pythonhosted.org/packages/a8/e7/b1884771bb802547d4431a6a8658ce4304cda512907c0914c490f18d88b7/pyshp-3.0.8-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/80/5f/010886558cde80f34f5eeef478a37004b97e3ac30281bd036f398ee342bd/pyshp-3.0.9-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/ad/b4/a9430e72bfc3c458e1fcf8363890994e483052ab052ed93912be4e5b32c8/pystac-1.14.3-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/5d/d2/5f6367b14c9f250d1a6725d18bd1e9584f5ab1587e292f3a847e59189598/pystac_client-0.9.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/79/e2/5fa011e34bf81a3d47fb45e3a2ff86baabbc2853439285205bd14b245922/python_cmr-0.13.0-py3-none-any.whl
@@ -375,6 +377,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/05/7f/798705f5296a58ca505d600456748d1be48078eac8a7050d8a98bc9edb89/decorator-5.3.1-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/84/d0/205d54408c08b13550c733c4b85429e7ead111c7f0014309637425520a9a/deprecated-1.3.1-py2.py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/0c/d5/c5db1ea3394c6e1732fb3286b3bd878b59507a8f77d32a2cebda7d7b7cd4/donfig-0.8.1.post1-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/2b/db/d0274cbe9f5fe219f77c0bdf900ac77103569e83c102a4225ce04cbc607d/duckdb-1.5.3-cp314-cp314-win_amd64.whl
       - pypi: https://files.pythonhosted.org/packages/bc/15/2b94815f5b5cd0be68d4d3f5846e893f0b8d79371aa54f7985feadfd692b/earthaccess-0.18.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/47/cf/d87c88eed317d1aebe2c46d3be3a4c0bf287ba957f70ccce6dddd202f8c9/earthengine_api-1.7.28-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/b3/a3/f58ff573ba0f678ff8116686e868afe436627b19b457a2aba62cd463c9ad/eccodes-2.47.0-py3-none-any.whl
@@ -446,7 +449,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/10/bd/c038d7cc38edc1aa5bf91ab8068b63d4308c66c4c8bb3cbba7dfbc049f9c/pyparsing-3.3.2-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/04/b2/5a6610554306a83a563080c2cf2c57565563eadd280e15388efa00fb5b33/pyproj-3.7.2-cp314-cp314-win_amd64.whl
       - pypi: https://files.pythonhosted.org/packages/c0/da/efa96d9bd76ab935481a2e9f796934e938a3a4058bb30b531301e720619c/pyramids_gis-0.25.0-cp314-cp314-win_amd64.whl
-      - pypi: https://files.pythonhosted.org/packages/a8/e7/b1884771bb802547d4431a6a8658ce4304cda512907c0914c490f18d88b7/pyshp-3.0.8-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/80/5f/010886558cde80f34f5eeef478a37004b97e3ac30281bd036f398ee342bd/pyshp-3.0.9-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/ad/b4/a9430e72bfc3c458e1fcf8363890994e483052ab052ed93912be4e5b32c8/pystac-1.14.3-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/5d/d2/5f6367b14c9f250d1a6725d18bd1e9584f5ab1587e292f3a847e59189598/pystac_client-0.9.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/79/e2/5fa011e34bf81a3d47fb45e3a2ff86baabbc2853439285205bd14b245922/python_cmr-0.13.0-py3-none-any.whl
@@ -620,6 +623,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/33/6b/e0547afaf41bf2c42e52430072fa5658766e3d65bd4b03a563d1b6336f57/distlib-0.4.0-py2.py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/02/10/5da547df7a391dcde17f59520a231527b8571e6f46fc8efb02ccb370ab12/docutils-0.22.4-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/0c/d5/c5db1ea3394c6e1732fb3286b3bd878b59507a8f77d32a2cebda7d7b7cd4/donfig-0.8.1.post1-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/56/8f/65fc623b51448f2bfba1a9ec6ab3debb4664c0876c0113a5e782600b53ac/duckdb-1.5.3-cp314-cp314-manylinux_2_26_x86_64.manylinux_2_28_x86_64.whl
       - pypi: https://files.pythonhosted.org/packages/bc/15/2b94815f5b5cd0be68d4d3f5846e893f0b8d79371aa54f7985feadfd692b/earthaccess-0.18.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/47/cf/d87c88eed317d1aebe2c46d3be3a4c0bf287ba957f70ccce6dddd202f8c9/earthengine_api-1.7.28-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/b3/a3/f58ff573ba0f678ff8116686e868afe436627b19b457a2aba62cd463c9ad/eccodes-2.47.0-py3-none-any.whl
@@ -756,7 +760,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/05/1e/ada6fb15a1d75b5bd9b554355a69a798c55a7dcc93b8d41596265c1772e3/pyproj-3.7.2-cp314-cp314-manylinux_2_28_x86_64.whl
       - pypi: https://files.pythonhosted.org/packages/bd/24/12818598c362d7f300f18e74db45963dbcb85150324092410c8b49405e42/pyproject_hooks-1.2.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/ec/bd/227fd09d3c484aa815a59a21bb763c399fae4d0d9119f19577f6f362083f/pyramids_gis-0.25.0-cp314-cp314-manylinux_2_39_x86_64.whl
-      - pypi: https://files.pythonhosted.org/packages/a8/e7/b1884771bb802547d4431a6a8658ce4304cda512907c0914c490f18d88b7/pyshp-3.0.8-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/80/5f/010886558cde80f34f5eeef478a37004b97e3ac30281bd036f398ee342bd/pyshp-3.0.9-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/ad/b4/a9430e72bfc3c458e1fcf8363890994e483052ab052ed93912be4e5b32c8/pystac-1.14.3-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/5d/d2/5f6367b14c9f250d1a6725d18bd1e9584f5ab1587e292f3a847e59189598/pystac_client-0.9.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/d4/24/a372aaf5c9b7208e7112038812994107bc65a84cd00e0354a88c2c77a617/pytest-9.0.3-py3-none-any.whl
@@ -930,6 +934,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/33/6b/e0547afaf41bf2c42e52430072fa5658766e3d65bd4b03a563d1b6336f57/distlib-0.4.0-py2.py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/02/10/5da547df7a391dcde17f59520a231527b8571e6f46fc8efb02ccb370ab12/docutils-0.22.4-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/0c/d5/c5db1ea3394c6e1732fb3286b3bd878b59507a8f77d32a2cebda7d7b7cd4/donfig-0.8.1.post1-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/c9/46/617b51363f5613418c8b224b3cce16b58e6dde80904566bec232579c1d4e/duckdb-1.5.3-cp314-cp314-macosx_11_0_arm64.whl
       - pypi: https://files.pythonhosted.org/packages/bc/15/2b94815f5b5cd0be68d4d3f5846e893f0b8d79371aa54f7985feadfd692b/earthaccess-0.18.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/47/cf/d87c88eed317d1aebe2c46d3be3a4c0bf287ba957f70ccce6dddd202f8c9/earthengine_api-1.7.28-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/b3/a3/f58ff573ba0f678ff8116686e868afe436627b19b457a2aba62cd463c9ad/eccodes-2.47.0-py3-none-any.whl
@@ -1064,7 +1069,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/04/90/67bd7260b4ea9b8b20b4f58afef6c223ecb3abf368eb4ec5bc2cdef81b49/pyproj-3.7.2.tar.gz
       - pypi: https://files.pythonhosted.org/packages/bd/24/12818598c362d7f300f18e74db45963dbcb85150324092410c8b49405e42/pyproject_hooks-1.2.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/8d/40/ad558bf67fb59fb08ba7d786b44961cb86ec6f9797b728590e66fe68b8d7/pyramids_gis-0.25.0-cp314-cp314-macosx_11_0_arm64.whl
-      - pypi: https://files.pythonhosted.org/packages/a8/e7/b1884771bb802547d4431a6a8658ce4304cda512907c0914c490f18d88b7/pyshp-3.0.8-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/80/5f/010886558cde80f34f5eeef478a37004b97e3ac30281bd036f398ee342bd/pyshp-3.0.9-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/ad/b4/a9430e72bfc3c458e1fcf8363890994e483052ab052ed93912be4e5b32c8/pystac-1.14.3-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/5d/d2/5f6367b14c9f250d1a6725d18bd1e9584f5ab1587e292f3a847e59189598/pystac_client-0.9.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/d4/24/a372aaf5c9b7208e7112038812994107bc65a84cd00e0354a88c2c77a617/pytest-9.0.3-py3-none-any.whl
@@ -1229,6 +1234,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/33/6b/e0547afaf41bf2c42e52430072fa5658766e3d65bd4b03a563d1b6336f57/distlib-0.4.0-py2.py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/02/10/5da547df7a391dcde17f59520a231527b8571e6f46fc8efb02ccb370ab12/docutils-0.22.4-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/0c/d5/c5db1ea3394c6e1732fb3286b3bd878b59507a8f77d32a2cebda7d7b7cd4/donfig-0.8.1.post1-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/2b/db/d0274cbe9f5fe219f77c0bdf900ac77103569e83c102a4225ce04cbc607d/duckdb-1.5.3-cp314-cp314-win_amd64.whl
       - pypi: https://files.pythonhosted.org/packages/bc/15/2b94815f5b5cd0be68d4d3f5846e893f0b8d79371aa54f7985feadfd692b/earthaccess-0.18.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/47/cf/d87c88eed317d1aebe2c46d3be3a4c0bf287ba957f70ccce6dddd202f8c9/earthengine_api-1.7.28-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/b3/a3/f58ff573ba0f678ff8116686e868afe436627b19b457a2aba62cd463c9ad/eccodes-2.47.0-py3-none-any.whl
@@ -1361,7 +1367,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/04/b2/5a6610554306a83a563080c2cf2c57565563eadd280e15388efa00fb5b33/pyproj-3.7.2-cp314-cp314-win_amd64.whl
       - pypi: https://files.pythonhosted.org/packages/bd/24/12818598c362d7f300f18e74db45963dbcb85150324092410c8b49405e42/pyproject_hooks-1.2.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/c0/da/efa96d9bd76ab935481a2e9f796934e938a3a4058bb30b531301e720619c/pyramids_gis-0.25.0-cp314-cp314-win_amd64.whl
-      - pypi: https://files.pythonhosted.org/packages/a8/e7/b1884771bb802547d4431a6a8658ce4304cda512907c0914c490f18d88b7/pyshp-3.0.8-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/80/5f/010886558cde80f34f5eeef478a37004b97e3ac30281bd036f398ee342bd/pyshp-3.0.9-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/ad/b4/a9430e72bfc3c458e1fcf8363890994e483052ab052ed93912be4e5b32c8/pystac-1.14.3-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/5d/d2/5f6367b14c9f250d1a6725d18bd1e9584f5ab1587e292f3a847e59189598/pystac_client-0.9.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/d4/24/a372aaf5c9b7208e7112038812994107bc65a84cd00e0354a88c2c77a617/pytest-9.0.3-py3-none-any.whl
@@ -1505,6 +1511,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/07/6c/aa3f2f849e01cb6a001cd8554a88d4c77c5c1a31c95bdf1cf9301e6d9ef4/defusedxml-0.7.1-py2.py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/84/d0/205d54408c08b13550c733c4b85429e7ead111c7f0014309637425520a9a/deprecated-1.3.1-py2.py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/0c/d5/c5db1ea3394c6e1732fb3286b3bd878b59507a8f77d32a2cebda7d7b7cd4/donfig-0.8.1.post1-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/56/8f/65fc623b51448f2bfba1a9ec6ab3debb4664c0876c0113a5e782600b53ac/duckdb-1.5.3-cp314-cp314-manylinux_2_26_x86_64.manylinux_2_28_x86_64.whl
       - pypi: https://files.pythonhosted.org/packages/bc/15/2b94815f5b5cd0be68d4d3f5846e893f0b8d79371aa54f7985feadfd692b/earthaccess-0.18.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/47/cf/d87c88eed317d1aebe2c46d3be3a4c0bf287ba957f70ccce6dddd202f8c9/earthengine_api-1.7.28-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/b3/a3/f58ff573ba0f678ff8116686e868afe436627b19b457a2aba62cd463c9ad/eccodes-2.47.0-py3-none-any.whl
@@ -1644,7 +1651,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/10/bd/c038d7cc38edc1aa5bf91ab8068b63d4308c66c4c8bb3cbba7dfbc049f9c/pyparsing-3.3.2-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/05/1e/ada6fb15a1d75b5bd9b554355a69a798c55a7dcc93b8d41596265c1772e3/pyproj-3.7.2-cp314-cp314-manylinux_2_28_x86_64.whl
       - pypi: https://files.pythonhosted.org/packages/ec/bd/227fd09d3c484aa815a59a21bb763c399fae4d0d9119f19577f6f362083f/pyramids_gis-0.25.0-cp314-cp314-manylinux_2_39_x86_64.whl
-      - pypi: https://files.pythonhosted.org/packages/a8/e7/b1884771bb802547d4431a6a8658ce4304cda512907c0914c490f18d88b7/pyshp-3.0.8-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/80/5f/010886558cde80f34f5eeef478a37004b97e3ac30281bd036f398ee342bd/pyshp-3.0.9-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/ad/b4/a9430e72bfc3c458e1fcf8363890994e483052ab052ed93912be4e5b32c8/pystac-1.14.3-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/5d/d2/5f6367b14c9f250d1a6725d18bd1e9584f5ab1587e292f3a847e59189598/pystac_client-0.9.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/79/e2/5fa011e34bf81a3d47fb45e3a2ff86baabbc2853439285205bd14b245922/python_cmr-0.13.0-py3-none-any.whl
@@ -1765,6 +1772,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/07/6c/aa3f2f849e01cb6a001cd8554a88d4c77c5c1a31c95bdf1cf9301e6d9ef4/defusedxml-0.7.1-py2.py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/84/d0/205d54408c08b13550c733c4b85429e7ead111c7f0014309637425520a9a/deprecated-1.3.1-py2.py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/0c/d5/c5db1ea3394c6e1732fb3286b3bd878b59507a8f77d32a2cebda7d7b7cd4/donfig-0.8.1.post1-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/c9/46/617b51363f5613418c8b224b3cce16b58e6dde80904566bec232579c1d4e/duckdb-1.5.3-cp314-cp314-macosx_11_0_arm64.whl
       - pypi: https://files.pythonhosted.org/packages/bc/15/2b94815f5b5cd0be68d4d3f5846e893f0b8d79371aa54f7985feadfd692b/earthaccess-0.18.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/47/cf/d87c88eed317d1aebe2c46d3be3a4c0bf287ba957f70ccce6dddd202f8c9/earthengine_api-1.7.28-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/b3/a3/f58ff573ba0f678ff8116686e868afe436627b19b457a2aba62cd463c9ad/eccodes-2.47.0-py3-none-any.whl
@@ -1903,7 +1911,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/10/bd/c038d7cc38edc1aa5bf91ab8068b63d4308c66c4c8bb3cbba7dfbc049f9c/pyparsing-3.3.2-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/04/90/67bd7260b4ea9b8b20b4f58afef6c223ecb3abf368eb4ec5bc2cdef81b49/pyproj-3.7.2.tar.gz
       - pypi: https://files.pythonhosted.org/packages/8d/40/ad558bf67fb59fb08ba7d786b44961cb86ec6f9797b728590e66fe68b8d7/pyramids_gis-0.25.0-cp314-cp314-macosx_11_0_arm64.whl
-      - pypi: https://files.pythonhosted.org/packages/a8/e7/b1884771bb802547d4431a6a8658ce4304cda512907c0914c490f18d88b7/pyshp-3.0.8-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/80/5f/010886558cde80f34f5eeef478a37004b97e3ac30281bd036f398ee342bd/pyshp-3.0.9-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/ad/b4/a9430e72bfc3c458e1fcf8363890994e483052ab052ed93912be4e5b32c8/pystac-1.14.3-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/5d/d2/5f6367b14c9f250d1a6725d18bd1e9584f5ab1587e292f3a847e59189598/pystac_client-0.9.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/79/e2/5fa011e34bf81a3d47fb45e3a2ff86baabbc2853439285205bd14b245922/python_cmr-0.13.0-py3-none-any.whl
@@ -2025,6 +2033,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/07/6c/aa3f2f849e01cb6a001cd8554a88d4c77c5c1a31c95bdf1cf9301e6d9ef4/defusedxml-0.7.1-py2.py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/84/d0/205d54408c08b13550c733c4b85429e7ead111c7f0014309637425520a9a/deprecated-1.3.1-py2.py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/0c/d5/c5db1ea3394c6e1732fb3286b3bd878b59507a8f77d32a2cebda7d7b7cd4/donfig-0.8.1.post1-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/2b/db/d0274cbe9f5fe219f77c0bdf900ac77103569e83c102a4225ce04cbc607d/duckdb-1.5.3-cp314-cp314-win_amd64.whl
       - pypi: https://files.pythonhosted.org/packages/bc/15/2b94815f5b5cd0be68d4d3f5846e893f0b8d79371aa54f7985feadfd692b/earthaccess-0.18.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/47/cf/d87c88eed317d1aebe2c46d3be3a4c0bf287ba957f70ccce6dddd202f8c9/earthengine_api-1.7.28-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/b3/a3/f58ff573ba0f678ff8116686e868afe436627b19b457a2aba62cd463c9ad/eccodes-2.47.0-py3-none-any.whl
@@ -2161,7 +2170,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/10/bd/c038d7cc38edc1aa5bf91ab8068b63d4308c66c4c8bb3cbba7dfbc049f9c/pyparsing-3.3.2-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/04/b2/5a6610554306a83a563080c2cf2c57565563eadd280e15388efa00fb5b33/pyproj-3.7.2-cp314-cp314-win_amd64.whl
       - pypi: https://files.pythonhosted.org/packages/c0/da/efa96d9bd76ab935481a2e9f796934e938a3a4058bb30b531301e720619c/pyramids_gis-0.25.0-cp314-cp314-win_amd64.whl
-      - pypi: https://files.pythonhosted.org/packages/a8/e7/b1884771bb802547d4431a6a8658ce4304cda512907c0914c490f18d88b7/pyshp-3.0.8-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/80/5f/010886558cde80f34f5eeef478a37004b97e3ac30281bd036f398ee342bd/pyshp-3.0.9-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/ad/b4/a9430e72bfc3c458e1fcf8363890994e483052ab052ed93912be4e5b32c8/pystac-1.14.3-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/5d/d2/5f6367b14c9f250d1a6725d18bd1e9584f5ab1587e292f3a847e59189598/pystac_client-0.9.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/79/e2/5fa011e34bf81a3d47fb45e3a2ff86baabbc2853439285205bd14b245922/python_cmr-0.13.0-py3-none-any.whl
@@ -2359,6 +2368,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/33/6b/e0547afaf41bf2c42e52430072fa5658766e3d65bd4b03a563d1b6336f57/distlib-0.4.0-py2.py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/02/10/5da547df7a391dcde17f59520a231527b8571e6f46fc8efb02ccb370ab12/docutils-0.22.4-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/0c/d5/c5db1ea3394c6e1732fb3286b3bd878b59507a8f77d32a2cebda7d7b7cd4/donfig-0.8.1.post1-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/56/8f/65fc623b51448f2bfba1a9ec6ab3debb4664c0876c0113a5e782600b53ac/duckdb-1.5.3-cp314-cp314-manylinux_2_26_x86_64.manylinux_2_28_x86_64.whl
       - pypi: https://files.pythonhosted.org/packages/bc/15/2b94815f5b5cd0be68d4d3f5846e893f0b8d79371aa54f7985feadfd692b/earthaccess-0.18.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/47/cf/d87c88eed317d1aebe2c46d3be3a4c0bf287ba957f70ccce6dddd202f8c9/earthengine_api-1.7.28-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/b3/a3/f58ff573ba0f678ff8116686e868afe436627b19b457a2aba62cd463c9ad/eccodes-2.47.0-py3-none-any.whl
@@ -2495,7 +2505,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/05/1e/ada6fb15a1d75b5bd9b554355a69a798c55a7dcc93b8d41596265c1772e3/pyproj-3.7.2-cp314-cp314-manylinux_2_28_x86_64.whl
       - pypi: https://files.pythonhosted.org/packages/bd/24/12818598c362d7f300f18e74db45963dbcb85150324092410c8b49405e42/pyproject_hooks-1.2.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/ec/bd/227fd09d3c484aa815a59a21bb763c399fae4d0d9119f19577f6f362083f/pyramids_gis-0.25.0-cp314-cp314-manylinux_2_39_x86_64.whl
-      - pypi: https://files.pythonhosted.org/packages/a8/e7/b1884771bb802547d4431a6a8658ce4304cda512907c0914c490f18d88b7/pyshp-3.0.8-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/80/5f/010886558cde80f34f5eeef478a37004b97e3ac30281bd036f398ee342bd/pyshp-3.0.9-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/ad/b4/a9430e72bfc3c458e1fcf8363890994e483052ab052ed93912be4e5b32c8/pystac-1.14.3-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/5d/d2/5f6367b14c9f250d1a6725d18bd1e9584f5ab1587e292f3a847e59189598/pystac_client-0.9.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/d4/24/a372aaf5c9b7208e7112038812994107bc65a84cd00e0354a88c2c77a617/pytest-9.0.3-py3-none-any.whl
@@ -2669,6 +2679,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/33/6b/e0547afaf41bf2c42e52430072fa5658766e3d65bd4b03a563d1b6336f57/distlib-0.4.0-py2.py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/02/10/5da547df7a391dcde17f59520a231527b8571e6f46fc8efb02ccb370ab12/docutils-0.22.4-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/0c/d5/c5db1ea3394c6e1732fb3286b3bd878b59507a8f77d32a2cebda7d7b7cd4/donfig-0.8.1.post1-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/c9/46/617b51363f5613418c8b224b3cce16b58e6dde80904566bec232579c1d4e/duckdb-1.5.3-cp314-cp314-macosx_11_0_arm64.whl
       - pypi: https://files.pythonhosted.org/packages/bc/15/2b94815f5b5cd0be68d4d3f5846e893f0b8d79371aa54f7985feadfd692b/earthaccess-0.18.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/47/cf/d87c88eed317d1aebe2c46d3be3a4c0bf287ba957f70ccce6dddd202f8c9/earthengine_api-1.7.28-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/b3/a3/f58ff573ba0f678ff8116686e868afe436627b19b457a2aba62cd463c9ad/eccodes-2.47.0-py3-none-any.whl
@@ -2803,7 +2814,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/04/90/67bd7260b4ea9b8b20b4f58afef6c223ecb3abf368eb4ec5bc2cdef81b49/pyproj-3.7.2.tar.gz
       - pypi: https://files.pythonhosted.org/packages/bd/24/12818598c362d7f300f18e74db45963dbcb85150324092410c8b49405e42/pyproject_hooks-1.2.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/8d/40/ad558bf67fb59fb08ba7d786b44961cb86ec6f9797b728590e66fe68b8d7/pyramids_gis-0.25.0-cp314-cp314-macosx_11_0_arm64.whl
-      - pypi: https://files.pythonhosted.org/packages/a8/e7/b1884771bb802547d4431a6a8658ce4304cda512907c0914c490f18d88b7/pyshp-3.0.8-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/80/5f/010886558cde80f34f5eeef478a37004b97e3ac30281bd036f398ee342bd/pyshp-3.0.9-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/ad/b4/a9430e72bfc3c458e1fcf8363890994e483052ab052ed93912be4e5b32c8/pystac-1.14.3-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/5d/d2/5f6367b14c9f250d1a6725d18bd1e9584f5ab1587e292f3a847e59189598/pystac_client-0.9.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/d4/24/a372aaf5c9b7208e7112038812994107bc65a84cd00e0354a88c2c77a617/pytest-9.0.3-py3-none-any.whl
@@ -2968,6 +2979,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/33/6b/e0547afaf41bf2c42e52430072fa5658766e3d65bd4b03a563d1b6336f57/distlib-0.4.0-py2.py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/02/10/5da547df7a391dcde17f59520a231527b8571e6f46fc8efb02ccb370ab12/docutils-0.22.4-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/0c/d5/c5db1ea3394c6e1732fb3286b3bd878b59507a8f77d32a2cebda7d7b7cd4/donfig-0.8.1.post1-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/2b/db/d0274cbe9f5fe219f77c0bdf900ac77103569e83c102a4225ce04cbc607d/duckdb-1.5.3-cp314-cp314-win_amd64.whl
       - pypi: https://files.pythonhosted.org/packages/bc/15/2b94815f5b5cd0be68d4d3f5846e893f0b8d79371aa54f7985feadfd692b/earthaccess-0.18.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/47/cf/d87c88eed317d1aebe2c46d3be3a4c0bf287ba957f70ccce6dddd202f8c9/earthengine_api-1.7.28-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/b3/a3/f58ff573ba0f678ff8116686e868afe436627b19b457a2aba62cd463c9ad/eccodes-2.47.0-py3-none-any.whl
@@ -3100,7 +3112,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/04/b2/5a6610554306a83a563080c2cf2c57565563eadd280e15388efa00fb5b33/pyproj-3.7.2-cp314-cp314-win_amd64.whl
       - pypi: https://files.pythonhosted.org/packages/bd/24/12818598c362d7f300f18e74db45963dbcb85150324092410c8b49405e42/pyproject_hooks-1.2.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/c0/da/efa96d9bd76ab935481a2e9f796934e938a3a4058bb30b531301e720619c/pyramids_gis-0.25.0-cp314-cp314-win_amd64.whl
-      - pypi: https://files.pythonhosted.org/packages/a8/e7/b1884771bb802547d4431a6a8658ce4304cda512907c0914c490f18d88b7/pyshp-3.0.8-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/80/5f/010886558cde80f34f5eeef478a37004b97e3ac30281bd036f398ee342bd/pyshp-3.0.9-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/ad/b4/a9430e72bfc3c458e1fcf8363890994e483052ab052ed93912be4e5b32c8/pystac-1.14.3-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/5d/d2/5f6367b14c9f250d1a6725d18bd1e9584f5ab1587e292f3a847e59189598/pystac_client-0.9.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/d4/24/a372aaf5c9b7208e7112038812994107bc65a84cd00e0354a88c2c77a617/pytest-9.0.3-py3-none-any.whl
@@ -3253,6 +3265,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/33/6b/e0547afaf41bf2c42e52430072fa5658766e3d65bd4b03a563d1b6336f57/distlib-0.4.0-py2.py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/02/10/5da547df7a391dcde17f59520a231527b8571e6f46fc8efb02ccb370ab12/docutils-0.22.4-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/0c/d5/c5db1ea3394c6e1732fb3286b3bd878b59507a8f77d32a2cebda7d7b7cd4/donfig-0.8.1.post1-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/99/1f/651f8453f26931e8061b7e27b3090f868868185814ecb9216d0bd71ec8ef/duckdb-1.5.3-cp311-cp311-manylinux_2_26_x86_64.manylinux_2_28_x86_64.whl
       - pypi: https://files.pythonhosted.org/packages/47/cf/d87c88eed317d1aebe2c46d3be3a4c0bf287ba957f70ccce6dddd202f8c9/earthengine_api-1.7.28-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/b3/a3/f58ff573ba0f678ff8116686e868afe436627b19b457a2aba62cd463c9ad/eccodes-2.47.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/25/2f/3b8ec30ece02cfb6d8bba03040ca69011e090728fb330374e42b15f945f1/eccodeslib-2.47.1.20-cp311-cp311-manylinux_2_28_x86_64.whl
@@ -3387,7 +3400,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/ad/ab/9bdb4a6216b712a1f9aab1c0fcbee5d3726f34a366f29c3e8c08a78d6b70/pyproj-3.7.2-cp311-cp311-manylinux_2_28_x86_64.whl
       - pypi: https://files.pythonhosted.org/packages/bd/24/12818598c362d7f300f18e74db45963dbcb85150324092410c8b49405e42/pyproject_hooks-1.2.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/60/0f/d9f1e24e803e76051e4501af49bd50b8412725d4d5ce79c0b19706316a44/pyramids_gis-0.25.0-cp311-cp311-manylinux_2_39_x86_64.whl
-      - pypi: https://files.pythonhosted.org/packages/a8/e7/b1884771bb802547d4431a6a8658ce4304cda512907c0914c490f18d88b7/pyshp-3.0.8-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/80/5f/010886558cde80f34f5eeef478a37004b97e3ac30281bd036f398ee342bd/pyshp-3.0.9-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/ad/b4/a9430e72bfc3c458e1fcf8363890994e483052ab052ed93912be4e5b32c8/pystac-1.14.3-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/5d/d2/5f6367b14c9f250d1a6725d18bd1e9584f5ab1587e292f3a847e59189598/pystac_client-0.9.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/d4/24/a372aaf5c9b7208e7112038812994107bc65a84cd00e0354a88c2c77a617/pytest-9.0.3-py3-none-any.whl
@@ -3518,6 +3531,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/33/6b/e0547afaf41bf2c42e52430072fa5658766e3d65bd4b03a563d1b6336f57/distlib-0.4.0-py2.py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/02/10/5da547df7a391dcde17f59520a231527b8571e6f46fc8efb02ccb370ab12/docutils-0.22.4-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/0c/d5/c5db1ea3394c6e1732fb3286b3bd878b59507a8f77d32a2cebda7d7b7cd4/donfig-0.8.1.post1-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/e1/1a/7bf5ba1b7ea520557e6b2dbee1c85abab016bdac0c1779d9d0ef76c87300/duckdb-1.5.3-cp311-cp311-macosx_11_0_arm64.whl
       - pypi: https://files.pythonhosted.org/packages/47/cf/d87c88eed317d1aebe2c46d3be3a4c0bf287ba957f70ccce6dddd202f8c9/earthengine_api-1.7.28-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/b3/a3/f58ff573ba0f678ff8116686e868afe436627b19b457a2aba62cd463c9ad/eccodes-2.47.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/de/05/0ea21be07c9033b1e9cb1b2b20f1d99ab84df7189845cf53989b6b6c2ffc/eccodeslib-2.47.1.20-cp311-cp311-macosx_13_0_arm64.whl
@@ -3650,7 +3664,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/04/90/67bd7260b4ea9b8b20b4f58afef6c223ecb3abf368eb4ec5bc2cdef81b49/pyproj-3.7.2.tar.gz
       - pypi: https://files.pythonhosted.org/packages/bd/24/12818598c362d7f300f18e74db45963dbcb85150324092410c8b49405e42/pyproject_hooks-1.2.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/87/b7/666fbd6ce0bdcc9670ac4e13bd73e7dee2bf60101d71b29c38121a425ae8/pyramids_gis-0.25.0-cp311-cp311-macosx_11_0_arm64.whl
-      - pypi: https://files.pythonhosted.org/packages/a8/e7/b1884771bb802547d4431a6a8658ce4304cda512907c0914c490f18d88b7/pyshp-3.0.8-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/80/5f/010886558cde80f34f5eeef478a37004b97e3ac30281bd036f398ee342bd/pyshp-3.0.9-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/ad/b4/a9430e72bfc3c458e1fcf8363890994e483052ab052ed93912be4e5b32c8/pystac-1.14.3-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/5d/d2/5f6367b14c9f250d1a6725d18bd1e9584f5ab1587e292f3a847e59189598/pystac_client-0.9.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/d4/24/a372aaf5c9b7208e7112038812994107bc65a84cd00e0354a88c2c77a617/pytest-9.0.3-py3-none-any.whl
@@ -3781,6 +3795,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/33/6b/e0547afaf41bf2c42e52430072fa5658766e3d65bd4b03a563d1b6336f57/distlib-0.4.0-py2.py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/02/10/5da547df7a391dcde17f59520a231527b8571e6f46fc8efb02ccb370ab12/docutils-0.22.4-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/0c/d5/c5db1ea3394c6e1732fb3286b3bd878b59507a8f77d32a2cebda7d7b7cd4/donfig-0.8.1.post1-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/bc/64/e1ffebf010b1631a6fef8d1508f46d4eab3e97c18729af986bb796fa8452/duckdb-1.5.3-cp311-cp311-win_amd64.whl
       - pypi: https://files.pythonhosted.org/packages/47/cf/d87c88eed317d1aebe2c46d3be3a4c0bf287ba957f70ccce6dddd202f8c9/earthengine_api-1.7.28-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/09/40/42bb2d98bc6103194d25fa8da141cd43cabf32277cbf2ab513fe35532196/eccodes-2.47.0-cp311-cp311-win_amd64.whl
       - pypi: https://files.pythonhosted.org/packages/13/a6/27bc3c51cf862c8b70bc8fe21b812b9c1ca6f31ecee9def96c82d93f003b/ecmwf_datastores_client-0.5.1-py3-none-any.whl
@@ -3911,7 +3926,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/79/e0/b95584605cec9ed50b7ebaf7975d1c4ddeec5a86b7a20554ed8b60042bd7/pyproj-3.7.2-cp311-cp311-win_amd64.whl
       - pypi: https://files.pythonhosted.org/packages/bd/24/12818598c362d7f300f18e74db45963dbcb85150324092410c8b49405e42/pyproject_hooks-1.2.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/78/82/66461e44ec51a4319adafe16dca98153a9a05308c1e4a729f23ea03989be/pyramids_gis-0.25.0-cp311-cp311-win_amd64.whl
-      - pypi: https://files.pythonhosted.org/packages/a8/e7/b1884771bb802547d4431a6a8658ce4304cda512907c0914c490f18d88b7/pyshp-3.0.8-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/80/5f/010886558cde80f34f5eeef478a37004b97e3ac30281bd036f398ee342bd/pyshp-3.0.9-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/ad/b4/a9430e72bfc3c458e1fcf8363890994e483052ab052ed93912be4e5b32c8/pystac-1.14.3-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/5d/d2/5f6367b14c9f250d1a6725d18bd1e9584f5ab1587e292f3a847e59189598/pystac_client-0.9.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/d4/24/a372aaf5c9b7208e7112038812994107bc65a84cd00e0354a88c2c77a617/pytest-9.0.3-py3-none-any.whl
@@ -4061,6 +4076,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/33/6b/e0547afaf41bf2c42e52430072fa5658766e3d65bd4b03a563d1b6336f57/distlib-0.4.0-py2.py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/02/10/5da547df7a391dcde17f59520a231527b8571e6f46fc8efb02ccb370ab12/docutils-0.22.4-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/0c/d5/c5db1ea3394c6e1732fb3286b3bd878b59507a8f77d32a2cebda7d7b7cd4/donfig-0.8.1.post1-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/21/cc/2d77af4fff86012f334ef82e6d54a995a86c8745e58074f1218ed7d25171/duckdb-1.5.3-cp312-cp312-manylinux_2_26_x86_64.manylinux_2_28_x86_64.whl
       - pypi: https://files.pythonhosted.org/packages/bc/15/2b94815f5b5cd0be68d4d3f5846e893f0b8d79371aa54f7985feadfd692b/earthaccess-0.18.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/47/cf/d87c88eed317d1aebe2c46d3be3a4c0bf287ba957f70ccce6dddd202f8c9/earthengine_api-1.7.28-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/b3/a3/f58ff573ba0f678ff8116686e868afe436627b19b457a2aba62cd463c9ad/eccodes-2.47.0-py3-none-any.whl
@@ -4197,7 +4213,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/b8/be/212882c450bba74fc8d7d35cbd57e4af84792f0a56194819d98106b075af/pyproj-3.7.2-cp312-cp312-manylinux_2_28_x86_64.whl
       - pypi: https://files.pythonhosted.org/packages/bd/24/12818598c362d7f300f18e74db45963dbcb85150324092410c8b49405e42/pyproject_hooks-1.2.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/ed/b0/48464ec307fdd7ec271a5047eb7112f40384ad04a279511a4bde2e633a8c/pyramids_gis-0.25.0-cp312-cp312-manylinux_2_39_x86_64.whl
-      - pypi: https://files.pythonhosted.org/packages/a8/e7/b1884771bb802547d4431a6a8658ce4304cda512907c0914c490f18d88b7/pyshp-3.0.8-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/80/5f/010886558cde80f34f5eeef478a37004b97e3ac30281bd036f398ee342bd/pyshp-3.0.9-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/ad/b4/a9430e72bfc3c458e1fcf8363890994e483052ab052ed93912be4e5b32c8/pystac-1.14.3-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/5d/d2/5f6367b14c9f250d1a6725d18bd1e9584f5ab1587e292f3a847e59189598/pystac_client-0.9.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/d4/24/a372aaf5c9b7208e7112038812994107bc65a84cd00e0354a88c2c77a617/pytest-9.0.3-py3-none-any.whl
@@ -4331,6 +4347,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/33/6b/e0547afaf41bf2c42e52430072fa5658766e3d65bd4b03a563d1b6336f57/distlib-0.4.0-py2.py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/02/10/5da547df7a391dcde17f59520a231527b8571e6f46fc8efb02ccb370ab12/docutils-0.22.4-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/0c/d5/c5db1ea3394c6e1732fb3286b3bd878b59507a8f77d32a2cebda7d7b7cd4/donfig-0.8.1.post1-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/15/e2/c80af1eac2ab5d35fc2c372ef0a84668842e549fbbf7799277b3fccf3e39/duckdb-1.5.3-cp312-cp312-macosx_11_0_arm64.whl
       - pypi: https://files.pythonhosted.org/packages/bc/15/2b94815f5b5cd0be68d4d3f5846e893f0b8d79371aa54f7985feadfd692b/earthaccess-0.18.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/47/cf/d87c88eed317d1aebe2c46d3be3a4c0bf287ba957f70ccce6dddd202f8c9/earthengine_api-1.7.28-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/b3/a3/f58ff573ba0f678ff8116686e868afe436627b19b457a2aba62cd463c9ad/eccodes-2.47.0-py3-none-any.whl
@@ -4465,7 +4482,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/04/90/67bd7260b4ea9b8b20b4f58afef6c223ecb3abf368eb4ec5bc2cdef81b49/pyproj-3.7.2.tar.gz
       - pypi: https://files.pythonhosted.org/packages/bd/24/12818598c362d7f300f18e74db45963dbcb85150324092410c8b49405e42/pyproject_hooks-1.2.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/b9/d6/32f1b801054368ffd7506bde61641bbe1bdd61d07a1b16f6a75f107797ae/pyramids_gis-0.25.0-cp312-cp312-macosx_11_0_arm64.whl
-      - pypi: https://files.pythonhosted.org/packages/a8/e7/b1884771bb802547d4431a6a8658ce4304cda512907c0914c490f18d88b7/pyshp-3.0.8-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/80/5f/010886558cde80f34f5eeef478a37004b97e3ac30281bd036f398ee342bd/pyshp-3.0.9-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/ad/b4/a9430e72bfc3c458e1fcf8363890994e483052ab052ed93912be4e5b32c8/pystac-1.14.3-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/5d/d2/5f6367b14c9f250d1a6725d18bd1e9584f5ab1587e292f3a847e59189598/pystac_client-0.9.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/d4/24/a372aaf5c9b7208e7112038812994107bc65a84cd00e0354a88c2c77a617/pytest-9.0.3-py3-none-any.whl
@@ -4599,6 +4616,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/33/6b/e0547afaf41bf2c42e52430072fa5658766e3d65bd4b03a563d1b6336f57/distlib-0.4.0-py2.py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/02/10/5da547df7a391dcde17f59520a231527b8571e6f46fc8efb02ccb370ab12/docutils-0.22.4-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/0c/d5/c5db1ea3394c6e1732fb3286b3bd878b59507a8f77d32a2cebda7d7b7cd4/donfig-0.8.1.post1-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/8d/5e/9bc4817a98feb4dab83e56f2245cd3a30d00ee646d4dec7926464e2b3f28/duckdb-1.5.3-cp312-cp312-win_amd64.whl
       - pypi: https://files.pythonhosted.org/packages/bc/15/2b94815f5b5cd0be68d4d3f5846e893f0b8d79371aa54f7985feadfd692b/earthaccess-0.18.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/47/cf/d87c88eed317d1aebe2c46d3be3a4c0bf287ba957f70ccce6dddd202f8c9/earthengine_api-1.7.28-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/31/01/d8bfb2ac2ec4831789a82cc06afc609a599f5f545dc885da1c8671a308e5/eccodes-2.47.0-cp312-cp312-win_amd64.whl
@@ -4731,7 +4749,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/4a/a6/6fe724b72b70f2b00152d77282e14964d60ab092ec225e67c196c9b463e5/pyproj-3.7.2-cp312-cp312-win_amd64.whl
       - pypi: https://files.pythonhosted.org/packages/bd/24/12818598c362d7f300f18e74db45963dbcb85150324092410c8b49405e42/pyproject_hooks-1.2.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/c1/dc/fdeca705e1a6c7e1164f86fa0a4e4666a45182fff1166c243a3ba02dd196/pyramids_gis-0.25.0-cp312-cp312-win_amd64.whl
-      - pypi: https://files.pythonhosted.org/packages/a8/e7/b1884771bb802547d4431a6a8658ce4304cda512907c0914c490f18d88b7/pyshp-3.0.8-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/80/5f/010886558cde80f34f5eeef478a37004b97e3ac30281bd036f398ee342bd/pyshp-3.0.9-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/ad/b4/a9430e72bfc3c458e1fcf8363890994e483052ab052ed93912be4e5b32c8/pystac-1.14.3-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/5d/d2/5f6367b14c9f250d1a6725d18bd1e9584f5ab1587e292f3a847e59189598/pystac_client-0.9.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/d4/24/a372aaf5c9b7208e7112038812994107bc65a84cd00e0354a88c2c77a617/pytest-9.0.3-py3-none-any.whl
@@ -4883,6 +4901,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/33/6b/e0547afaf41bf2c42e52430072fa5658766e3d65bd4b03a563d1b6336f57/distlib-0.4.0-py2.py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/02/10/5da547df7a391dcde17f59520a231527b8571e6f46fc8efb02ccb370ab12/docutils-0.22.4-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/0c/d5/c5db1ea3394c6e1732fb3286b3bd878b59507a8f77d32a2cebda7d7b7cd4/donfig-0.8.1.post1-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/63/4c/0907c3f76adb9dd90e67610b31e0304a35814e65c4c41a354a262c09b885/duckdb-1.5.3-cp313-cp313-manylinux_2_26_x86_64.manylinux_2_28_x86_64.whl
       - pypi: https://files.pythonhosted.org/packages/bc/15/2b94815f5b5cd0be68d4d3f5846e893f0b8d79371aa54f7985feadfd692b/earthaccess-0.18.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/47/cf/d87c88eed317d1aebe2c46d3be3a4c0bf287ba957f70ccce6dddd202f8c9/earthengine_api-1.7.28-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/b3/a3/f58ff573ba0f678ff8116686e868afe436627b19b457a2aba62cd463c9ad/eccodes-2.47.0-py3-none-any.whl
@@ -5019,7 +5038,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/f8/85/c2b1706e51942de19076eff082f8495e57d5151364e78b5bef4af4a1d94a/pyproj-3.7.2-cp313-cp313-manylinux_2_28_x86_64.whl
       - pypi: https://files.pythonhosted.org/packages/bd/24/12818598c362d7f300f18e74db45963dbcb85150324092410c8b49405e42/pyproject_hooks-1.2.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/e9/cc/faee671c3d5a6b92b11d2311ebe2b9bf8cf8d9b9c7424f45b8a556ce5ea4/pyramids_gis-0.25.0-cp313-cp313-manylinux_2_39_x86_64.whl
-      - pypi: https://files.pythonhosted.org/packages/a8/e7/b1884771bb802547d4431a6a8658ce4304cda512907c0914c490f18d88b7/pyshp-3.0.8-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/80/5f/010886558cde80f34f5eeef478a37004b97e3ac30281bd036f398ee342bd/pyshp-3.0.9-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/ad/b4/a9430e72bfc3c458e1fcf8363890994e483052ab052ed93912be4e5b32c8/pystac-1.14.3-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/5d/d2/5f6367b14c9f250d1a6725d18bd1e9584f5ab1587e292f3a847e59189598/pystac_client-0.9.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/d4/24/a372aaf5c9b7208e7112038812994107bc65a84cd00e0354a88c2c77a617/pytest-9.0.3-py3-none-any.whl
@@ -5155,6 +5174,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/33/6b/e0547afaf41bf2c42e52430072fa5658766e3d65bd4b03a563d1b6336f57/distlib-0.4.0-py2.py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/02/10/5da547df7a391dcde17f59520a231527b8571e6f46fc8efb02ccb370ab12/docutils-0.22.4-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/0c/d5/c5db1ea3394c6e1732fb3286b3bd878b59507a8f77d32a2cebda7d7b7cd4/donfig-0.8.1.post1-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/23/fa/beafb91e6e152d2161c4a9cbc472334c87607eb61ad7104b5a7fa8d8d7b1/duckdb-1.5.3-cp313-cp313-macosx_11_0_arm64.whl
       - pypi: https://files.pythonhosted.org/packages/bc/15/2b94815f5b5cd0be68d4d3f5846e893f0b8d79371aa54f7985feadfd692b/earthaccess-0.18.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/47/cf/d87c88eed317d1aebe2c46d3be3a4c0bf287ba957f70ccce6dddd202f8c9/earthengine_api-1.7.28-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/b3/a3/f58ff573ba0f678ff8116686e868afe436627b19b457a2aba62cd463c9ad/eccodes-2.47.0-py3-none-any.whl
@@ -5289,7 +5309,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/04/90/67bd7260b4ea9b8b20b4f58afef6c223ecb3abf368eb4ec5bc2cdef81b49/pyproj-3.7.2.tar.gz
       - pypi: https://files.pythonhosted.org/packages/bd/24/12818598c362d7f300f18e74db45963dbcb85150324092410c8b49405e42/pyproject_hooks-1.2.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/8c/c9/d6923d7883fcd265540bbda4f699d01beb7144bbcea7a0e8423b958912f5/pyramids_gis-0.25.0-cp313-cp313-macosx_11_0_arm64.whl
-      - pypi: https://files.pythonhosted.org/packages/a8/e7/b1884771bb802547d4431a6a8658ce4304cda512907c0914c490f18d88b7/pyshp-3.0.8-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/80/5f/010886558cde80f34f5eeef478a37004b97e3ac30281bd036f398ee342bd/pyshp-3.0.9-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/ad/b4/a9430e72bfc3c458e1fcf8363890994e483052ab052ed93912be4e5b32c8/pystac-1.14.3-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/5d/d2/5f6367b14c9f250d1a6725d18bd1e9584f5ab1587e292f3a847e59189598/pystac_client-0.9.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/d4/24/a372aaf5c9b7208e7112038812994107bc65a84cd00e0354a88c2c77a617/pytest-9.0.3-py3-none-any.whl
@@ -5425,6 +5445,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/33/6b/e0547afaf41bf2c42e52430072fa5658766e3d65bd4b03a563d1b6336f57/distlib-0.4.0-py2.py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/02/10/5da547df7a391dcde17f59520a231527b8571e6f46fc8efb02ccb370ab12/docutils-0.22.4-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/0c/d5/c5db1ea3394c6e1732fb3286b3bd878b59507a8f77d32a2cebda7d7b7cd4/donfig-0.8.1.post1-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/6d/9c/d2f23a7803ddbbd9413f7572ecf66a15120ed5ced7ce5c73e698c1406b76/duckdb-1.5.3-cp313-cp313-win_amd64.whl
       - pypi: https://files.pythonhosted.org/packages/bc/15/2b94815f5b5cd0be68d4d3f5846e893f0b8d79371aa54f7985feadfd692b/earthaccess-0.18.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/47/cf/d87c88eed317d1aebe2c46d3be3a4c0bf287ba957f70ccce6dddd202f8c9/earthengine_api-1.7.28-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/d7/ba/4cbca5157e90d90c318b2acae178d38b0c6c6df73b434e6a2b6a8cb23a2b/eccodes-2.47.0-cp313-cp313-win_amd64.whl
@@ -5557,7 +5578,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/be/0f/747974129cf0d800906f81cd25efd098c96509026e454d4b66868779ab04/pyproj-3.7.2-cp313-cp313-win_amd64.whl
       - pypi: https://files.pythonhosted.org/packages/bd/24/12818598c362d7f300f18e74db45963dbcb85150324092410c8b49405e42/pyproject_hooks-1.2.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/3f/ed/3926f238e02ad1e2a3b307fa7453a6cbebc52c9789f3811c329701797ea2/pyramids_gis-0.25.0-cp313-cp313-win_amd64.whl
-      - pypi: https://files.pythonhosted.org/packages/a8/e7/b1884771bb802547d4431a6a8658ce4304cda512907c0914c490f18d88b7/pyshp-3.0.8-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/80/5f/010886558cde80f34f5eeef478a37004b97e3ac30281bd036f398ee342bd/pyshp-3.0.9-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/ad/b4/a9430e72bfc3c458e1fcf8363890994e483052ab052ed93912be4e5b32c8/pystac-1.14.3-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/5d/d2/5f6367b14c9f250d1a6725d18bd1e9584f5ab1587e292f3a847e59189598/pystac_client-0.9.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/d4/24/a372aaf5c9b7208e7112038812994107bc65a84cd00e0354a88c2c77a617/pytest-9.0.3-py3-none-any.whl
@@ -5709,6 +5730,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/33/6b/e0547afaf41bf2c42e52430072fa5658766e3d65bd4b03a563d1b6336f57/distlib-0.4.0-py2.py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/02/10/5da547df7a391dcde17f59520a231527b8571e6f46fc8efb02ccb370ab12/docutils-0.22.4-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/0c/d5/c5db1ea3394c6e1732fb3286b3bd878b59507a8f77d32a2cebda7d7b7cd4/donfig-0.8.1.post1-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/56/8f/65fc623b51448f2bfba1a9ec6ab3debb4664c0876c0113a5e782600b53ac/duckdb-1.5.3-cp314-cp314-manylinux_2_26_x86_64.manylinux_2_28_x86_64.whl
       - pypi: https://files.pythonhosted.org/packages/bc/15/2b94815f5b5cd0be68d4d3f5846e893f0b8d79371aa54f7985feadfd692b/earthaccess-0.18.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/47/cf/d87c88eed317d1aebe2c46d3be3a4c0bf287ba957f70ccce6dddd202f8c9/earthengine_api-1.7.28-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/b3/a3/f58ff573ba0f678ff8116686e868afe436627b19b457a2aba62cd463c9ad/eccodes-2.47.0-py3-none-any.whl
@@ -5845,7 +5867,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/05/1e/ada6fb15a1d75b5bd9b554355a69a798c55a7dcc93b8d41596265c1772e3/pyproj-3.7.2-cp314-cp314-manylinux_2_28_x86_64.whl
       - pypi: https://files.pythonhosted.org/packages/bd/24/12818598c362d7f300f18e74db45963dbcb85150324092410c8b49405e42/pyproject_hooks-1.2.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/ec/bd/227fd09d3c484aa815a59a21bb763c399fae4d0d9119f19577f6f362083f/pyramids_gis-0.25.0-cp314-cp314-manylinux_2_39_x86_64.whl
-      - pypi: https://files.pythonhosted.org/packages/a8/e7/b1884771bb802547d4431a6a8658ce4304cda512907c0914c490f18d88b7/pyshp-3.0.8-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/80/5f/010886558cde80f34f5eeef478a37004b97e3ac30281bd036f398ee342bd/pyshp-3.0.9-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/ad/b4/a9430e72bfc3c458e1fcf8363890994e483052ab052ed93912be4e5b32c8/pystac-1.14.3-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/5d/d2/5f6367b14c9f250d1a6725d18bd1e9584f5ab1587e292f3a847e59189598/pystac_client-0.9.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/d4/24/a372aaf5c9b7208e7112038812994107bc65a84cd00e0354a88c2c77a617/pytest-9.0.3-py3-none-any.whl
@@ -5982,6 +6004,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/33/6b/e0547afaf41bf2c42e52430072fa5658766e3d65bd4b03a563d1b6336f57/distlib-0.4.0-py2.py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/02/10/5da547df7a391dcde17f59520a231527b8571e6f46fc8efb02ccb370ab12/docutils-0.22.4-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/0c/d5/c5db1ea3394c6e1732fb3286b3bd878b59507a8f77d32a2cebda7d7b7cd4/donfig-0.8.1.post1-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/c9/46/617b51363f5613418c8b224b3cce16b58e6dde80904566bec232579c1d4e/duckdb-1.5.3-cp314-cp314-macosx_11_0_arm64.whl
       - pypi: https://files.pythonhosted.org/packages/bc/15/2b94815f5b5cd0be68d4d3f5846e893f0b8d79371aa54f7985feadfd692b/earthaccess-0.18.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/47/cf/d87c88eed317d1aebe2c46d3be3a4c0bf287ba957f70ccce6dddd202f8c9/earthengine_api-1.7.28-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/b3/a3/f58ff573ba0f678ff8116686e868afe436627b19b457a2aba62cd463c9ad/eccodes-2.47.0-py3-none-any.whl
@@ -6116,7 +6139,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/04/90/67bd7260b4ea9b8b20b4f58afef6c223ecb3abf368eb4ec5bc2cdef81b49/pyproj-3.7.2.tar.gz
       - pypi: https://files.pythonhosted.org/packages/bd/24/12818598c362d7f300f18e74db45963dbcb85150324092410c8b49405e42/pyproject_hooks-1.2.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/8d/40/ad558bf67fb59fb08ba7d786b44961cb86ec6f9797b728590e66fe68b8d7/pyramids_gis-0.25.0-cp314-cp314-macosx_11_0_arm64.whl
-      - pypi: https://files.pythonhosted.org/packages/a8/e7/b1884771bb802547d4431a6a8658ce4304cda512907c0914c490f18d88b7/pyshp-3.0.8-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/80/5f/010886558cde80f34f5eeef478a37004b97e3ac30281bd036f398ee342bd/pyshp-3.0.9-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/ad/b4/a9430e72bfc3c458e1fcf8363890994e483052ab052ed93912be4e5b32c8/pystac-1.14.3-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/5d/d2/5f6367b14c9f250d1a6725d18bd1e9584f5ab1587e292f3a847e59189598/pystac_client-0.9.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/d4/24/a372aaf5c9b7208e7112038812994107bc65a84cd00e0354a88c2c77a617/pytest-9.0.3-py3-none-any.whl
@@ -6253,6 +6276,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/33/6b/e0547afaf41bf2c42e52430072fa5658766e3d65bd4b03a563d1b6336f57/distlib-0.4.0-py2.py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/02/10/5da547df7a391dcde17f59520a231527b8571e6f46fc8efb02ccb370ab12/docutils-0.22.4-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/0c/d5/c5db1ea3394c6e1732fb3286b3bd878b59507a8f77d32a2cebda7d7b7cd4/donfig-0.8.1.post1-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/2b/db/d0274cbe9f5fe219f77c0bdf900ac77103569e83c102a4225ce04cbc607d/duckdb-1.5.3-cp314-cp314-win_amd64.whl
       - pypi: https://files.pythonhosted.org/packages/bc/15/2b94815f5b5cd0be68d4d3f5846e893f0b8d79371aa54f7985feadfd692b/earthaccess-0.18.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/47/cf/d87c88eed317d1aebe2c46d3be3a4c0bf287ba957f70ccce6dddd202f8c9/earthengine_api-1.7.28-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/b3/a3/f58ff573ba0f678ff8116686e868afe436627b19b457a2aba62cd463c9ad/eccodes-2.47.0-py3-none-any.whl
@@ -6385,7 +6409,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/04/b2/5a6610554306a83a563080c2cf2c57565563eadd280e15388efa00fb5b33/pyproj-3.7.2-cp314-cp314-win_amd64.whl
       - pypi: https://files.pythonhosted.org/packages/bd/24/12818598c362d7f300f18e74db45963dbcb85150324092410c8b49405e42/pyproject_hooks-1.2.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/c0/da/efa96d9bd76ab935481a2e9f796934e938a3a4058bb30b531301e720619c/pyramids_gis-0.25.0-cp314-cp314-win_amd64.whl
-      - pypi: https://files.pythonhosted.org/packages/a8/e7/b1884771bb802547d4431a6a8658ce4304cda512907c0914c490f18d88b7/pyshp-3.0.8-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/80/5f/010886558cde80f34f5eeef478a37004b97e3ac30281bd036f398ee342bd/pyshp-3.0.9-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/ad/b4/a9430e72bfc3c458e1fcf8363890994e483052ab052ed93912be4e5b32c8/pystac-1.14.3-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/5d/d2/5f6367b14c9f250d1a6725d18bd1e9584f5ab1587e292f3a847e59189598/pystac_client-0.9.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/d4/24/a372aaf5c9b7208e7112038812994107bc65a84cd00e0354a88c2c77a617/pytest-9.0.3-py3-none-any.whl
@@ -8612,6 +8636,150 @@ packages:
   - pytest ; extra == 'test'
   - cloudpickle ; extra == 'test'
   requires_python: '>=3.8'
+- pypi: https://files.pythonhosted.org/packages/15/e2/c80af1eac2ab5d35fc2c372ef0a84668842e549fbbf7799277b3fccf3e39/duckdb-1.5.3-cp312-cp312-macosx_11_0_arm64.whl
+  name: duckdb
+  version: 1.5.3
+  sha256: 10960400ed60cdf0fe05bab2086fa8eb733889cb0ceca18d07ff9a00c0e0be7b
+  requires_dist:
+  - ipython ; extra == 'all'
+  - fsspec ; extra == 'all'
+  - numpy ; extra == 'all'
+  - pandas ; extra == 'all'
+  - pyarrow ; extra == 'all'
+  - adbc-driver-manager ; extra == 'all'
+  requires_python: '>=3.10.0'
+- pypi: https://files.pythonhosted.org/packages/21/cc/2d77af4fff86012f334ef82e6d54a995a86c8745e58074f1218ed7d25171/duckdb-1.5.3-cp312-cp312-manylinux_2_26_x86_64.manylinux_2_28_x86_64.whl
+  name: duckdb
+  version: 1.5.3
+  sha256: 9fb7516255a8764545e30f7efacea408cc847764a3027b3b0b3e7d1a7bebbc5c
+  requires_dist:
+  - ipython ; extra == 'all'
+  - fsspec ; extra == 'all'
+  - numpy ; extra == 'all'
+  - pandas ; extra == 'all'
+  - pyarrow ; extra == 'all'
+  - adbc-driver-manager ; extra == 'all'
+  requires_python: '>=3.10.0'
+- pypi: https://files.pythonhosted.org/packages/23/fa/beafb91e6e152d2161c4a9cbc472334c87607eb61ad7104b5a7fa8d8d7b1/duckdb-1.5.3-cp313-cp313-macosx_11_0_arm64.whl
+  name: duckdb
+  version: 1.5.3
+  sha256: 3d5db8c0b55e072cf437948ebb5d7e23d7b9d03d905fa5f9145583e65aa447f7
+  requires_dist:
+  - ipython ; extra == 'all'
+  - fsspec ; extra == 'all'
+  - numpy ; extra == 'all'
+  - pandas ; extra == 'all'
+  - pyarrow ; extra == 'all'
+  - adbc-driver-manager ; extra == 'all'
+  requires_python: '>=3.10.0'
+- pypi: https://files.pythonhosted.org/packages/2b/db/d0274cbe9f5fe219f77c0bdf900ac77103569e83c102a4225ce04cbc607d/duckdb-1.5.3-cp314-cp314-win_amd64.whl
+  name: duckdb
+  version: 1.5.3
+  sha256: 33ae08b3e818d7613d8936744b67718c2062c2f530376895bfd89efb51b81538
+  requires_dist:
+  - ipython ; extra == 'all'
+  - fsspec ; extra == 'all'
+  - numpy ; extra == 'all'
+  - pandas ; extra == 'all'
+  - pyarrow ; extra == 'all'
+  - adbc-driver-manager ; extra == 'all'
+  requires_python: '>=3.10.0'
+- pypi: https://files.pythonhosted.org/packages/56/8f/65fc623b51448f2bfba1a9ec6ab3debb4664c0876c0113a5e782600b53ac/duckdb-1.5.3-cp314-cp314-manylinux_2_26_x86_64.manylinux_2_28_x86_64.whl
+  name: duckdb
+  version: 1.5.3
+  sha256: d0405eae18ec6e8210a471c97dbfe87a7e4d605274b7fe572a1f276e92158f13
+  requires_dist:
+  - ipython ; extra == 'all'
+  - fsspec ; extra == 'all'
+  - numpy ; extra == 'all'
+  - pandas ; extra == 'all'
+  - pyarrow ; extra == 'all'
+  - adbc-driver-manager ; extra == 'all'
+  requires_python: '>=3.10.0'
+- pypi: https://files.pythonhosted.org/packages/63/4c/0907c3f76adb9dd90e67610b31e0304a35814e65c4c41a354a262c09b885/duckdb-1.5.3-cp313-cp313-manylinux_2_26_x86_64.manylinux_2_28_x86_64.whl
+  name: duckdb
+  version: 1.5.3
+  sha256: 787df63824f07bf18022dbc3b8ca4b2bfab0ebe616464f55c6e8cd0f59ea762e
+  requires_dist:
+  - ipython ; extra == 'all'
+  - fsspec ; extra == 'all'
+  - numpy ; extra == 'all'
+  - pandas ; extra == 'all'
+  - pyarrow ; extra == 'all'
+  - adbc-driver-manager ; extra == 'all'
+  requires_python: '>=3.10.0'
+- pypi: https://files.pythonhosted.org/packages/6d/9c/d2f23a7803ddbbd9413f7572ecf66a15120ed5ced7ce5c73e698c1406b76/duckdb-1.5.3-cp313-cp313-win_amd64.whl
+  name: duckdb
+  version: 1.5.3
+  sha256: bb5bb5dcdd09d62ee60f0ddbbef918e71cce304ffe28428b1131949d39ffaabf
+  requires_dist:
+  - ipython ; extra == 'all'
+  - fsspec ; extra == 'all'
+  - numpy ; extra == 'all'
+  - pandas ; extra == 'all'
+  - pyarrow ; extra == 'all'
+  - adbc-driver-manager ; extra == 'all'
+  requires_python: '>=3.10.0'
+- pypi: https://files.pythonhosted.org/packages/8d/5e/9bc4817a98feb4dab83e56f2245cd3a30d00ee646d4dec7926464e2b3f28/duckdb-1.5.3-cp312-cp312-win_amd64.whl
+  name: duckdb
+  version: 1.5.3
+  sha256: 8001eccbc28be244dfd04d708526f34ddd6460b47a8aeb5d0e39d6f7f9e3fe15
+  requires_dist:
+  - ipython ; extra == 'all'
+  - fsspec ; extra == 'all'
+  - numpy ; extra == 'all'
+  - pandas ; extra == 'all'
+  - pyarrow ; extra == 'all'
+  - adbc-driver-manager ; extra == 'all'
+  requires_python: '>=3.10.0'
+- pypi: https://files.pythonhosted.org/packages/99/1f/651f8453f26931e8061b7e27b3090f868868185814ecb9216d0bd71ec8ef/duckdb-1.5.3-cp311-cp311-manylinux_2_26_x86_64.manylinux_2_28_x86_64.whl
+  name: duckdb
+  version: 1.5.3
+  sha256: 3248b49cd835ea322574bc6aac0ae7a83be85547f49d4f5f5777cb380ee6627f
+  requires_dist:
+  - ipython ; extra == 'all'
+  - fsspec ; extra == 'all'
+  - numpy ; extra == 'all'
+  - pandas ; extra == 'all'
+  - pyarrow ; extra == 'all'
+  - adbc-driver-manager ; extra == 'all'
+  requires_python: '>=3.10.0'
+- pypi: https://files.pythonhosted.org/packages/bc/64/e1ffebf010b1631a6fef8d1508f46d4eab3e97c18729af986bb796fa8452/duckdb-1.5.3-cp311-cp311-win_amd64.whl
+  name: duckdb
+  version: 1.5.3
+  sha256: f4eff89c12c3a362efa012262e57b7b4ab904a7f79bad9178fe365510077abe8
+  requires_dist:
+  - ipython ; extra == 'all'
+  - fsspec ; extra == 'all'
+  - numpy ; extra == 'all'
+  - pandas ; extra == 'all'
+  - pyarrow ; extra == 'all'
+  - adbc-driver-manager ; extra == 'all'
+  requires_python: '>=3.10.0'
+- pypi: https://files.pythonhosted.org/packages/c9/46/617b51363f5613418c8b224b3cce16b58e6dde80904566bec232579c1d4e/duckdb-1.5.3-cp314-cp314-macosx_11_0_arm64.whl
+  name: duckdb
+  version: 1.5.3
+  sha256: 0b0b4f088a65d77e1217ce5d7eff889e63fedc44281200d899ff47c84d8ff836
+  requires_dist:
+  - ipython ; extra == 'all'
+  - fsspec ; extra == 'all'
+  - numpy ; extra == 'all'
+  - pandas ; extra == 'all'
+  - pyarrow ; extra == 'all'
+  - adbc-driver-manager ; extra == 'all'
+  requires_python: '>=3.10.0'
+- pypi: https://files.pythonhosted.org/packages/e1/1a/7bf5ba1b7ea520557e6b2dbee1c85abab016bdac0c1779d9d0ef76c87300/duckdb-1.5.3-cp311-cp311-macosx_11_0_arm64.whl
+  name: duckdb
+  version: 1.5.3
+  sha256: 70a18f932cf6d87bd0e554613657a515c1443a1724aacfc7ec5137dd28698b03
+  requires_dist:
+  - ipython ; extra == 'all'
+  - fsspec ; extra == 'all'
+  - numpy ; extra == 'all'
+  - pandas ; extra == 'all'
+  - pyarrow ; extra == 'all'
+  - adbc-driver-manager ; extra == 'all'
+  requires_python: '>=3.10.0'
 - pypi: https://files.pythonhosted.org/packages/bc/15/2b94815f5b5cd0be68d4d3f5846e893f0b8d79371aa54f7985feadfd692b/earthaccess-0.18.0-py3-none-any.whl
   name: earthaccess
   version: 0.18.0
@@ -8674,7 +8842,7 @@ packages:
 - pypi: ./
   name: earthlens
   version: 0.6.0
-  sha256: 3dba2cfd37e4e33e072fe1d2f28f3f2ef6728b49df4d19a71395c1a0a107941b
+  sha256: 1495c2b695d4ea96a23916a3b268e93f7484a414a02b5121b6a7c4436fa0b174
   requires_dist:
   - pyramids-gis>=0.24.1
   - geopandas>=1.0.0
@@ -8709,11 +8877,13 @@ packages:
   - tropycal>=1.4 ; extra == 'tropycal'
   - cartopy>=0.22 ; extra == 'tropycal'
   - overturemaps>=1.0.0 ; extra == 'overture'
+  - duckdb>=1.0.0 ; extra == 'overture'
   - boto3>=1.43.0 ; extra == 'all'
   - botocore>=1.34.0 ; extra == 'all'
   - cartopy>=0.22 ; extra == 'all'
   - cdsapi>=0.7.7 ; extra == 'all'
   - copernicusmarine>=2.0.0,<3 ; extra == 'all'
+  - duckdb>=1.0.0 ; extra == 'all'
   - earthengine-api>=1.7.26 ; extra == 'all'
   - earthaccess>=0.18.0 ; python_full_version >= '3.12' and extra == 'all'
   - eumdac>=3.1 ; extra == 'all'
@@ -16998,10 +17168,10 @@ packages:
   - pystac-client>=0.8.0 ; extra == 'stac'
   - stac-asset>=0.4.7 ; extra == 'stac'
   requires_python: '>=3.11,<4'
-- pypi: https://files.pythonhosted.org/packages/a8/e7/b1884771bb802547d4431a6a8658ce4304cda512907c0914c490f18d88b7/pyshp-3.0.8-py3-none-any.whl
+- pypi: https://files.pythonhosted.org/packages/80/5f/010886558cde80f34f5eeef478a37004b97e3ac30281bd036f398ee342bd/pyshp-3.0.9-py3-none-any.whl
   name: pyshp
-  version: 3.0.8
-  sha256: 99a1eea0ffcdb7c12ea718664b2ad4291bb6a69972516c0e3b991ca3a7d0d081
+  version: 3.0.9
+  sha256: 7d0ef9f5cef26ce3cea5099464a7b29f57fc169435c287663b6dbcc260c69ef9
   requires_dist:
   - pyshp-stubs ; extra == 'stubs'
   requires_python: '>=3.9'
