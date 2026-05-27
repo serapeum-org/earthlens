@@ -182,6 +182,16 @@ nav:
       - Licensing: reference/overture/licensing.md
       - Available datasets: reference/overture/datasets.md
       - Reference: reference/overture/overture.md
+    - NWP (weather forecasts):
+      - Introduction: reference/nwp/introduction.md
+      - Usage: reference/nwp/usage.md
+      - Catalog & install: reference/nwp/catalog.md
+      - Reference: reference/nwp/nwp.md
+    - NEXRAD radar:
+      - Introduction: reference/radar/introduction.md
+      - Usage: reference/radar/usage.md
+      - Catalog & Tooling: reference/radar/catalog.md
+      - Reference: reference/radar/radar.md
   - Examples:
     - Authentication: examples/authentication.md
     - Data Sources: examples/data-sources.md
@@ -279,6 +289,12 @@ nav:
       - Per-row licensing: examples/overture/04_per_row_licensing.ipynb
       - Transportation network: examples/overture/05_transportation_network.ipynb
       - Multi-theme download: examples/overture/06_multi_theme_download.ipynb
+    - Open NWP forecasts:
+      - Catalog explorer (no network): examples/nwp/catalog_explorer.ipynb
+      - GFS 2 m temperature (live): examples/nwp/gfs_temperature.ipynb
+      - DWD ICON precipitation (live): examples/nwp/icon_precipitation.ipynb
+    - NEXRAD radar:
+      - Catalog explorer (no network): examples/radar/catalog_explorer.ipynb
   - API Reference:
     - EarthLens Facade: reference/earthlens.md
     - AbstractDataSource: reference/abstract-datasource.md

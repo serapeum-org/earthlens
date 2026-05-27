@@ -80,10 +80,13 @@ class TestRegistry:
             "gdacs",
             "gee",
             "google-earth-engine",
+            "nexrad",
+            "nwp",
             "openaq",
             "openeo",
             "overture",
             "planetary-computer",
+            "radar",
             "stac",
             "tropycal",
         ]
