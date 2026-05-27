@@ -11,6 +11,7 @@ from earthlens.sentinel_hub._dispatch import (
 )
 from earthlens.sentinel_hub._helpers import (
     ASYNC_MAX_DIMENSION,
+    SH_ENDPOINTS,
     SH_MAX_DIMENSION,
     VALID_APIS,
     cdse_collection,
@@ -25,10 +26,8 @@ class TestResolveEndpoint:
     """`resolve_endpoint` alias / URL / default handling."""
 
     def test_default_is_cdse(self):
-        """A `None` endpoint resolves to CDSE-free."""
-        base, token = resolve_endpoint(None)
-        assert base == "https://sh.dataspace.copernicus.eu"
-        assert "dataspace" in token
+        """A `None` endpoint resolves to CDSE-free (exact base + token URLs)."""
+        assert resolve_endpoint(None) == SH_ENDPOINTS["cdse"]
 
     def test_commercial_alias(self):
         """The `commercial` alias resolves to the commercial host."""
@@ -38,12 +37,12 @@ class TestResolveEndpoint:
     def test_full_cdse_url_keeps_cdse_token(self):
         """A full CDSE base URL pairs with the CDSE Keycloak token URL."""
         _, token = resolve_endpoint("https://sh.dataspace.copernicus.eu")
-        assert "dataspace" in token
+        assert token == SH_ENDPOINTS["cdse"][1]
 
     def test_full_commercial_url_keeps_commercial_token(self):
         """A non-CDSE URL pairs with the commercial token URL."""
         _, token = resolve_endpoint("https://sh.example.com")
-        assert "sentinel-hub.com" in token
+        assert token == SH_ENDPOINTS["commercial"][1]
 
     def test_unknown_alias_raises(self):
         """An unknown non-URL string is rejected."""
