@@ -54,6 +54,10 @@ if TYPE_CHECKING:
     from earthlens.aggregate import AggregationConfig
     from earthlens.sentinel_hub.catalog import Catalog, ResolvedRequest
 
+#: The per-pixel scene-selection orders accepted by `mosaicking_order=`
+#: (the `sentinelhub.MosaickingOrder` enum values).
+_VALID_MOSAICKING_ORDERS: tuple[str, ...] = ("mostRecent", "leastRecent", "leastCC")
+
 #: Default per-pixel scene selection passed to `SentinelHubRequest.input_data`.
 _DEFAULT_MOSAICKING_ORDER = "mostRecent"
 
@@ -135,10 +139,10 @@ class SentinelHub(AbstractDataSource):
                 not a recognised value.
         """
         validate_api(api)
-        if mosaicking_order not in {"mostRecent", "leastRecent", "leastCC"}:
+        if mosaicking_order not in _VALID_MOSAICKING_ORDERS:
             raise ValueError(
-                "mosaicking_order must be 'mostRecent', 'leastRecent', or "
-                f"'leastCC', got {mosaicking_order!r}."
+                f"mosaicking_order must be one of {list(_VALID_MOSAICKING_ORDERS)}, "
+                f"got {mosaicking_order!r}."
             )
         self._resolution = resolution
         self._evalscript = evalscript
