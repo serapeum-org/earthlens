@@ -144,7 +144,7 @@ class SentinelHub(AbstractDataSource):
         self._evalscript = evalscript
         self._endpoint = endpoint
         self._mosaicking_order = mosaicking_order
-        self._api = api
+        self._api_mode = api
         self._geometry = geometry
         self._maxcc = maxcc
         self._batch_output = batch_output
@@ -285,9 +285,9 @@ class SentinelHub(AbstractDataSource):
         """
         has_geometry = self._geometry is not None
         has_s3 = self._batch_output is not None
-        needs_size = self._api is None or self._api in RASTER_APIS
+        needs_size = self._api_mode is None or self._api_mode in RASTER_APIS
         max_side = max(self._request_size()) if needs_size else 0
-        return resolve_api(self._api, max_side, has_geometry, has_s3)
+        return resolve_api(self._api_mode, max_side, has_geometry, has_s3)
 
     def _time_interval(self) -> tuple[str, str]:
         """Return the render time interval as ISO `(start, end)` date strings.

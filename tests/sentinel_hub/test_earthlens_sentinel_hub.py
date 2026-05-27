@@ -53,7 +53,7 @@ class TestFacadeRouting:
             api="process",
         )
         assert facade.datasource._resolution == 20.0
-        assert facade.datasource._api == "process"
+        assert facade.datasource._api_mode == "process"
 
 
 class TestFacadeDownload:
