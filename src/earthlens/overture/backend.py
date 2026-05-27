@@ -120,6 +120,7 @@ class Overture(AbstractDataSource):
         max_features: int | None = None,
         file_format: FileFormat = "geoparquet",
         max_bbox_deg2: float | None = None,
+        stream: bool = False,
     ):
         """Initialise an Overture backend instance.
 
@@ -154,6 +155,12 @@ class Overture(AbstractDataSource):
             max_bbox_deg2: Optional override of the per-theme bbox-area
                 cap (square degrees) applied to the guarded themes. `None`
                 uses the built-in per-theme defaults.
+            stream: When `True`, read each type through the SDK's streaming
+                `record_batch_reader` (lower peak memory) instead of
+                materialising the whole bbox via `geodataframe`. Streaming
+                is also used automatically whenever `max_features` is set,
+                so the cap can stop the read early instead of fetching the
+                full bbox and discarding rows.
 
         Raises:
             TypeError: If `variables` is not a mapping of theme -> types.
@@ -182,6 +189,7 @@ class Overture(AbstractDataSource):
         self._max_features = max_features
         self._file_format: FileFormat = file_format
         self._max_bbox_deg2 = max_bbox_deg2
+        self._stream = stream
         self._catalog = Catalog()
         super().__init__(
             start=start,
@@ -352,12 +360,14 @@ class Overture(AbstractDataSource):
     def _fetch(self, products: list[RemoteProduct]) -> list[Path]:
         """Pull each planned type's GeoParquet and write a FeatureCollection.
 
-        For every product, calls the `overturemaps` SDK's
-        `geodataframe(<type>, bbox=, release=)` (bbox pushdown via PyArrow
-        parquet statistics), tags the result `EPSG:4326`, adds the per-row
-        `license_id` column, warns when ODbL-1.0 rows are present, and
-        writes one vector file under `path`. The SDK's unit is the Overture
-        *type* (passed positionally) — there is no `theme=` kwarg.
+        For every product, reads the type's GeoParquet (bbox pushdown via
+        PyArrow parquet statistics) — through the SDK's `geodataframe`, or,
+        when `stream=True` / `max_features` is set, the streaming
+        `record_batch_reader` (see `_read_geodataframe`) — tags the result
+        `EPSG:4326`, adds the per-row `license_id` column, warns when
+        ODbL-1.0 rows are present, and writes one vector file under `path`.
+        The SDK's unit is the Overture *type* (passed positionally) — there
+        is no `theme=` kwarg.
 
         A type that matches no features in the bbox is skipped (a warning
         is logged and no empty file is written), mirroring the shipped
@@ -370,8 +380,6 @@ class Overture(AbstractDataSource):
             list[Path]: The written vector file paths, in product order;
                 a product that matched no features contributes no path.
         """
-        from overturemaps.core import geodataframe
-
         from earthlens.overture.collection import to_feature_collection
 
         bbox = (
@@ -385,11 +393,18 @@ class Overture(AbstractDataSource):
             theme_name = product.metadata["theme_name"]
             overture_type = product.metadata["type"]
             label = product.id
+            mode = "streaming" if (self._stream or self._max_features) else "in-memory"
             logger.info(
                 f"Fetching Overture {overture_type!r} (theme {theme_name!r}) "
-                f"for bbox {bbox} (release={self._release or 'latest'})"
+                f"for bbox {bbox} (release={self._release or 'latest'}, {mode})"
             )
-            gdf = geodataframe(overture_type, bbox=bbox, release=self._release)
+            gdf = _read_geodataframe(
+                overture_type,
+                bbox=bbox,
+                release=self._release,
+                max_features=self._max_features,
+                stream=self._stream,
+            )
             collection = to_feature_collection(
                 gdf, label=label, max_features=self._max_features
             )
@@ -469,6 +484,79 @@ class Overture(AbstractDataSource):
                 "(a GeoDataFrame) directly."
             )
         return self._api()
+
+
+def _read_geodataframe(
+    overture_type: str,
+    bbox: tuple[float, float, float, float],
+    release: str | None,
+    max_features: int | None,
+    stream: bool,
+):
+    """Read one Overture type into a `GeoDataFrame`, materialised or streamed.
+
+    The default path is the SDK's `geodataframe` (materialises the whole
+    bbox). When `stream` is `True`, or `max_features` is set, the streaming
+    `record_batch_reader` is used instead so the read can stop early once
+    `max_features` rows are collected rather than fetching the full bbox.
+
+    Args:
+        overture_type: The Overture feature type (e.g. `"building"`).
+        bbox: `(west, south, east, north)` in degrees (WGS84).
+        release: Overture release id, or `None` for the newest.
+        max_features: Optional cap; when set, the streamed read stops once
+            this many rows are collected and the frame is trimmed to it.
+        stream: Force the streaming reader even when `max_features` is
+            `None`.
+
+    Returns:
+        geopandas.GeoDataFrame: The fetched features (CRS as the SDK
+            returns it — the caller tags `EPSG:4326`).
+    """
+    from overturemaps.core import geodataframe, record_batch_reader
+
+    if not stream and max_features is None:
+        return geodataframe(overture_type, bbox=bbox, release=release)
+    reader = record_batch_reader(overture_type, bbox=bbox, release=release)
+    return _stream_to_geodataframe(reader, max_features)
+
+
+def _stream_to_geodataframe(reader, max_features: int | None):
+    """Assemble a `GeoDataFrame` from a PyArrow `RecordBatchReader`, stopping early.
+
+    Iterates the reader's batches, accumulating until `max_features` rows
+    are reached (when set), then builds the frame from the collected
+    batches. This is the streaming counterpart to `GeoDataFrame.from_arrow`
+    — it avoids reading the whole bbox when a cap is in force.
+
+    Args:
+        reader: The SDK's `record_batch_reader` result, or `None` (an empty
+            match).
+        max_features: Optional row cap; the result is trimmed to it.
+
+    Returns:
+        geopandas.GeoDataFrame: The collected rows (empty when the reader is
+            `None` or yields no batches).
+    """
+    import geopandas as gpd
+    import pyarrow as pa
+
+    if reader is None:
+        return gpd.GeoDataFrame()
+    batches = []
+    rows = 0
+    for batch in reader:
+        batches.append(batch)
+        rows += batch.num_rows
+        if max_features is not None and rows >= max_features:
+            break
+    if not batches:
+        return gpd.GeoDataFrame()
+    table = pa.Table.from_batches(batches, schema=reader.schema)
+    gdf = gpd.GeoDataFrame.from_arrow(table)
+    if max_features is not None and len(gdf) > max_features:
+        gdf = gdf.head(max_features)
+    return gdf
 
 
 def _require_overturemaps() -> None:

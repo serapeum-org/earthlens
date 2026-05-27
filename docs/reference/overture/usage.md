@@ -50,7 +50,8 @@ parquet statistics — no DuckDB), so only the rows inside the box are read.
 |-------|---------|---------|
 | `release` | `None` | Overture release id (`"2026-05-20.0"`). `None` lets the SDK auto-target the newest release. List them with the refresh tool or `Catalog().available_releases`. |
 | `file_format` | `"geoparquet"` | Output format: `"geoparquet"` (default, lossless nested schema), `"gpkg"`, or `"geojson"`. |
-| `max_features` | `None` | Cap on rows kept per fetched type; excess rows are dropped (head) with a warning. `None` keeps all. |
+| `max_features` | `None` | Cap on rows kept per fetched type. When set, the read **streams** (via `record_batch_reader`) and stops early once the cap is reached, rather than fetching the whole bbox and discarding rows. `None` keeps all. |
+| `stream` | `False` | Force the streaming `record_batch_reader` path (lower peak memory) even without `max_features`. Streaming is used automatically whenever `max_features` is set. |
 | `max_bbox_deg2` | `None` | Override the per-theme bbox-area cap (square degrees) for the guarded themes. `None` uses the built-in caps. |
 | `start` / `end` | `None` | Accepted for signature parity but **ignored** — Overture is a static per-release snapshot. |
 | `temporal_resolution` | `"all"` | Sentinel; Overture is not chunked in time. |
@@ -126,6 +127,27 @@ pixi run -e dev python tools/overture/refresh_overture_catalog.py validate --str
 
 # Inspect one type's columns when curating a new theme
 pixi run -e dev python tools/overture/refresh_overture_catalog.py probe building
+```
+
+## Streaming vs in-memory reads
+
+By default each type is materialised in one shot with the SDK's
+`geodataframe`. For a large bounded bbox, pass `stream=True` to read through
+the SDK's `record_batch_reader` instead — features are assembled batch by
+batch, lowering peak memory. When `max_features` is set the backend streams
+**and stops early** once the cap is reached, so it never downloads the whole
+bbox just to discard the surplus:
+
+```python
+EarthLens(
+    data_source="overture",
+    variables={"places": []},
+    lat_lim=[40.74, 40.76],
+    lon_lim=[-74.0, -73.97],
+    path="out",
+    stream=True,          # batch-by-batch read
+    max_features=5000,    # stop after ~5000 rows
+).download()
 ```
 
 ## Known limitations

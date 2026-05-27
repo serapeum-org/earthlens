@@ -74,6 +74,7 @@ class _FakeOverture:
 
     def __init__(self) -> None:
         self.calls: list[dict[str, Any]] = []
+        self.reader_calls: list[dict[str, Any]] = []
         self._gdf_for_type: dict[str, gpd.GeoDataFrame] = {}
         self.default_gdf: gpd.GeoDataFrame = _make_gdf()
 
@@ -89,6 +90,32 @@ class _FakeOverture:
         )
         gdf = self._gdf_for_type.get(overture_type, self.default_gdf)
         return gdf.copy()
+
+    def record_batch_reader(
+        self,
+        overture_type: str,
+        bbox: tuple[float, float, float, float] | None = None,
+        release: str | None = None,
+        **kwargs: Any,
+    ):
+        """Stand-in for `overturemaps.core.record_batch_reader`.
+
+        Encodes the canned `GeoDataFrame` to a geoarrow-WKB table and hands
+        back a `pyarrow.RecordBatchReader` (small chunks) so the streaming
+        path can be exercised offline.
+        """
+        import pyarrow as pa
+
+        self.reader_calls.append(
+            {"type": overture_type, "bbox": bbox, "release": release, "kwargs": kwargs}
+        )
+        gdf = self._gdf_for_type.get(overture_type, self.default_gdf).copy()
+        if gdf.crs is None:
+            gdf = gdf.set_crs("EPSG:4326")
+        table = pa.table(gdf.to_arrow(geometry_encoding="WKB"))
+        return pa.RecordBatchReader.from_batches(
+            table.schema, table.to_batches(max_chunksize=1)
+        )
 
     def set_gdf(self, overture_type: str, gdf: gpd.GeoDataFrame) -> None:
         """Pin the frame returned for one Overture type."""
@@ -110,4 +137,5 @@ def fake_overture(monkeypatch: pytest.MonkeyPatch) -> _FakeOverture:
     """Patch `overturemaps.core.geodataframe` with the recording fake."""
     state = _FakeOverture()
     monkeypatch.setattr("overturemaps.core.geodataframe", state)
+    monkeypatch.setattr("overturemaps.core.record_batch_reader", state.record_batch_reader)
     return state

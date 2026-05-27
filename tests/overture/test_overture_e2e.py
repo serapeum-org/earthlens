@@ -86,6 +86,23 @@ class TestOvertureLiveFetch:
         assert len(gdf) > 0, "the block should contain places"
         assert "license_id" in gdf.columns, "license_id must survive the GeoJSON write"
 
+    def test_streaming_with_max_features_caps_live(self, tmp_path: Path):
+        """Streaming + `max_features` reads via record_batch_reader and caps rows live."""
+        paths = EarthLens(
+            data_source="overture",
+            variables={"places": []},
+            lat_lim=_LAT_LIM,
+            lon_lim=_LON_LIM,
+            path=str(tmp_path),
+            stream=True,
+            max_features=10,
+        ).download(progress_bar=False)
+
+        gdf = gpd.read_parquet(paths[0])
+        assert 0 < len(gdf) <= 10, "streaming cap should bound the row count"
+        assert "license_id" in gdf.columns
+        assert gdf.crs.to_epsg() == 4326
+
     def test_release_helpers_live(self):
         """The SDK's release helpers resolve a real, recent release id."""
         from overturemaps.core import get_latest_release
