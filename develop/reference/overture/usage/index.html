@@ -3147,6 +3147,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#streaming-vs-in-memory-reads" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Streaming vs in-memory reads
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#known-limitations" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -7298,6 +7309,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#streaming-vs-in-memory-reads" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Streaming vs in-memory reads
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#known-limitations" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -7401,7 +7423,12 @@ parquet statistics — no DuckDB), so only the rows inside the box are read.
 <tr>
 <td><code>max_features</code></td>
 <td><code>None</code></td>
-<td>Cap on rows kept per fetched type; excess rows are dropped (head) with a warning. <code>None</code> keeps all.</td>
+<td>Cap on rows kept per fetched type. When set, the read <strong>streams</strong> (via <code>record_batch_reader</code>) and stops early once the cap is reached, rather than fetching the whole bbox and discarding rows. <code>None</code> keeps all.</td>
+</tr>
+<tr>
+<td><code>stream</code></td>
+<td><code>False</code></td>
+<td>Force the streaming <code>record_batch_reader</code> path (lower peak memory) even without <code>max_features</code>. Streaming is used automatically whenever <code>max_features</code> is set.</td>
 </tr>
 <tr>
 <td><code>max_bbox_deg2</code></td>
@@ -7499,6 +7526,23 @@ catalog:</p>
 <a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>
 <a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="c1"># Inspect one type&#39;s columns when curating a new theme</span>
 <a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>pixi<span class="w"> </span>run<span class="w"> </span>-e<span class="w"> </span>dev<span class="w"> </span>python<span class="w"> </span>tools/overture/refresh_overture_catalog.py<span class="w"> </span>probe<span class="w"> </span>building
+</code></pre></div>
+<h2 id="streaming-vs-in-memory-reads"><a class="toclink" href="#streaming-vs-in-memory-reads">Streaming vs in-memory reads</a><a class="headerlink" href="#streaming-vs-in-memory-reads" title="Permanent link">#</a></h2>
+<p>By default each type is materialised in one shot with the SDK's
+<code>geodataframe</code>. For a large bounded bbox, pass <code>stream=True</code> to read through
+the SDK's <code>record_batch_reader</code> instead — features are assembled batch by
+batch, lowering peak memory. When <code>max_features</code> is set the backend streams
+<strong>and stops early</strong> once the cap is reached, so it never downloads the whole
+bbox just to discard the surplus:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="n">EarthLens</span><span class="p">(</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>    <span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;overture&quot;</span><span class="p">,</span>
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>    <span class="n">variables</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;places&quot;</span><span class="p">:</span> <span class="p">[]},</span>
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">40.74</span><span class="p">,</span> <span class="mf">40.76</span><span class="p">],</span>
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>    <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">74.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">73.97</span><span class="p">],</span>
+<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>    <span class="n">path</span><span class="o">=</span><span class="s2">&quot;out&quot;</span><span class="p">,</span>
+<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a>    <span class="n">stream</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>          <span class="c1"># batch-by-batch read</span>
+<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a>    <span class="n">max_features</span><span class="o">=</span><span class="mi">5000</span><span class="p">,</span>    <span class="c1"># stop after ~5000 rows</span>
+<a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
 </code></pre></div>
 <h2 id="known-limitations"><a class="toclink" href="#known-limitations">Known limitations</a><a class="headerlink" href="#known-limitations" title="Permanent link">#</a></h2>
 <ul>
