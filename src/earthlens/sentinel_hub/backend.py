@@ -44,6 +44,7 @@ from earthlens.sentinel_hub._helpers import (
     SH_MAX_DIMENSION,
     cdse_collection,
     import_sentinelhub,
+    interval_for,
     tile_bbox,
 )
 from earthlens.sentinel_hub.auth import SentinelHubAuth, SentinelHubCredentials
@@ -611,11 +612,98 @@ class SentinelHub(AbstractDataSource):
             "the Batch Processing plane is implemented in C8."
         )
 
+    def _statistical_evalscript(self, resolved: ResolvedRequest) -> str:
+        """Resolve the evalscript for a Statistical request (must emit `dataMask`).
+
+        Args:
+            resolved: The resolved request row.
+
+        Returns:
+            The evalscript source.
+
+        Raises:
+            ValueError: When the evalscript does not declare a `dataMask` band
+                (the Statistical API needs it to exclude invalid pixels).
+        """
+        script = self._read_evalscript(resolved)
+        if "dataMask" not in script:
+            raise ValueError(
+                f"the Statistical API requires the evalscript to emit a "
+                f"'dataMask' output band; {resolved.key!r} does not. Use a "
+                "stats recipe (kind='stats', e.g. '…-ndvi-stats') or add a "
+                "dataMask band to your custom evalscript."
+            )
+        return script
+
+    def _statistical_interval(self) -> str:
+        """The Statistical `aggregation_interval`: from `aggregate=`, else `P1D`."""
+        if self._aggregate is not None:
+            return interval_for(self._aggregate.freq)
+        return "P1D"
+
     def _fetch_statistical(self, products: list[RemoteProduct]) -> list[Path]:
-        """Compute zonal statistics via the Statistical API (C7)."""
-        raise NotImplementedError(
-            "the Statistical plane is implemented in C7."
-        )
+        """Compute zonal statistics via the Statistical API → a tidy table.
+
+        Builds one `SentinelHubStatistical` request per geometry per product,
+        flattens the nested interval→output→band→stats tree into rows, and writes
+        one CSV per product (`feature_id` carried for a `FeatureCollection`).
+
+        Args:
+            products: The list returned by :meth:`_search`.
+
+        Returns:
+            The written table paths, one per product.
+
+        Raises:
+            ValueError: When no `geometry=` was supplied, or the evalscript lacks
+                a `dataMask` band.
+        """
+        import pandas as pd
+
+        sentinelhub = import_sentinelhub()
+        if self._geometry is None:
+            raise ValueError(
+                "the Statistical API computes zonal stats over a polygon, so it "
+                "needs geometry= (a shapely geometry, a GeoJSON mapping, or a "
+                "FeatureCollection)."
+            )
+        cfg = self._auth.config()
+        interval = self._statistical_interval()
+        geometries = _iter_geometries(self._geometry)
+        out: list[Path] = []
+        for product in products:
+            resolved: ResolvedRequest = product.metadata["resolved"]
+            evalscript = self._statistical_evalscript(resolved)
+            collection = cdse_collection(resolved.sh_collection, cfg.sh_base_url)
+            rows: list[dict] = []
+            for feature_id, geom in geometries:
+                aggregation = sentinelhub.SentinelHubStatistical.aggregation(
+                    evalscript=evalscript,
+                    time_interval=self._time_interval(),
+                    aggregation_interval=interval,
+                    resolution=(self._resolution, self._resolution),
+                )
+                input_kwargs: dict[str, Any] = {}
+                if self._maxcc is not None:
+                    input_kwargs["maxcc"] = self._maxcc
+                request = sentinelhub.SentinelHubStatistical(
+                    aggregation=aggregation,
+                    input_data=[
+                        sentinelhub.SentinelHubStatistical.input_data(
+                            collection, **input_kwargs
+                        )
+                    ],
+                    geometry=sentinelhub.Geometry(geom, crs=sentinelhub.CRS.WGS84),
+                    calculations=_STAT_CALCULATIONS,
+                    config=cfg,
+                )
+                payload = request.get_data()[0]
+                rows.extend(_flatten_statistics(payload, feature_id=feature_id))
+            target = Path(self.root_dir) / f"{_safe_name(product.id)}.csv"
+            pd.DataFrame(rows).to_csv(target, index=False)
+            out.append(target)
+        logger.info(f"Sentinel Hub statistical: wrote {len(out)} table(s)")
+        return out
 
     def _fetch_batch_statistical(self, products: list[RemoteProduct]) -> list[Path]:
         """Compute zonal statistics via the Batch Statistical API (C9)."""
@@ -646,6 +734,111 @@ class SentinelHub(AbstractDataSource):
             f"{self.root_dir}"
         )
         return results
+
+
+#: The Statistical `calculations` block requesting the 5/50/95 percentiles
+#: alongside the default per-band stats (min/max/mean/stDev/sampleCount).
+_STAT_CALCULATIONS: dict = {
+    "default": {"statistics": {"default": {"percentiles": {"k": [5, 50, 95]}}}}
+}
+
+
+def _iter_geometries(geometry: Any) -> list[tuple[Any, Any]]:
+    """Normalise a `geometry=` value to `(feature_id, geom)` pairs.
+
+    Accepts a GeoJSON `FeatureCollection` / `Feature` / bare-geometry mapping, a
+    shapely geometry, or a list of any of those. A `FeatureCollection` yields one
+    pair per feature (carrying its `id` / `properties.id` / positional index);
+    everything else yields a single pair keyed `0`.
+
+    Args:
+        geometry: The request `geometry=` value.
+
+    Returns:
+        The list of `(feature_id, geom)` pairs to issue Statistical requests for.
+
+    Examples:
+        - A FeatureCollection yields one pair per feature:
+            ```python
+            >>> from earthlens.sentinel_hub.backend import _iter_geometries
+            >>> fc = {"type": "FeatureCollection", "features": [
+            ...     {"type": "Feature", "id": "a", "geometry": {"type": "Point"}},
+            ...     {"type": "Feature", "id": "b", "geometry": {"type": "Point"}}]}
+            >>> [fid for fid, _ in _iter_geometries(fc)]
+            ['a', 'b']
+
+            ```
+    """
+    if isinstance(geometry, dict):
+        kind = geometry.get("type")
+        if kind == "FeatureCollection":
+            pairs: list[tuple[Any, Any]] = []
+            for index, feature in enumerate(geometry.get("features", [])):
+                fid = feature.get("id")
+                if fid is None:
+                    fid = (feature.get("properties") or {}).get("id", index)
+                pairs.append((fid, feature["geometry"]))
+            return pairs
+        if kind == "Feature":
+            return [(geometry.get("id", 0), geometry["geometry"])]
+        return [(0, geometry)]
+    if isinstance(geometry, (list, tuple)):
+        return [(index, geom) for index, geom in enumerate(geometry)]
+    return [(0, geometry)]
+
+
+def _flatten_statistics(payload: dict, feature_id: Any) -> list[dict]:
+    """Flatten a Statistical `get_data()[0]` payload into tidy per-band rows.
+
+    Walks the `data → interval → outputs → bands → stats/percentiles` tree,
+    skipping the `dataMask` output, and emits one row per
+    (interval × output × band) with the standard stats + 5/50/95 percentiles.
+
+    Args:
+        payload: One element of `SentinelHubStatistical.get_data()`.
+        feature_id: The id to stamp on every row (for a `FeatureCollection`).
+
+    Returns:
+        The flattened rows.
+
+    Examples:
+        - One interval with one band yields one row:
+            ```python
+            >>> from earthlens.sentinel_hub.backend import _flatten_statistics
+            >>> payload = {"data": [{"interval": {"from": "2020-06-01T00:00:00Z",
+            ...     "to": "2020-06-02T00:00:00Z"}, "outputs": {"ndvi": {"bands":
+            ...     {"B0": {"stats": {"mean": 0.4, "min": 0.1, "max": 0.7}}}}}}]}
+            >>> rows = _flatten_statistics(payload, feature_id="farm-1")
+            >>> rows[0]["mean"], rows[0]["feature_id"], rows[0]["band"]
+            (0.4, 'farm-1', 'B0')
+
+            ```
+    """
+    rows: list[dict] = []
+    for entry in payload.get("data", []):
+        interval = entry.get("interval", {})
+        for output_name, output_body in (entry.get("outputs") or {}).items():
+            if output_name == "dataMask":
+                continue
+            for band_name, band_body in (output_body.get("bands") or {}).items():
+                stats = band_body.get("stats", {})
+                row = {
+                    "feature_id": feature_id,
+                    "interval_from": interval.get("from"),
+                    "interval_to": interval.get("to"),
+                    "output": output_name,
+                    "band": band_name,
+                    "min": stats.get("min"),
+                    "max": stats.get("max"),
+                    "mean": stats.get("mean"),
+                    "stDev": stats.get("stDev"),
+                    "sampleCount": stats.get("sampleCount"),
+                    "noDataCount": stats.get("noDataCount"),
+                }
+                for percentile, value in (band_body.get("percentiles") or {}).items():
+                    row[f"p{percentile}"] = value
+                rows.append(row)
+    return rows
 
 
 def _safe_name(key: str) -> str:

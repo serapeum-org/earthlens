@@ -204,6 +204,93 @@ def fake_get_async_running_status(ids: Any, config: Any = None) -> dict:
     return {item: False for item in ids}
 
 
+class FakeGeometry:
+    """Stand-in for `sentinelhub.Geometry`."""
+
+    def __init__(self, geometry: Any, crs: Any) -> None:
+        self.geometry = geometry
+        self.crs = crs
+
+
+class FakeSentinelHubStatistical:
+    """Stand-in for `sentinelhub.SentinelHubStatistical` returning canned stats."""
+
+    instances: list[FakeSentinelHubStatistical] = []
+
+    def __init__(
+        self,
+        aggregation: Any,
+        input_data: list,
+        bbox: Any = None,
+        geometry: Any = None,
+        calculations: Any = None,
+        config: Any = None,
+        **kwargs: Any,
+    ) -> None:
+        self.aggregation = aggregation
+        self.input_data = input_data
+        self.geometry = geometry
+        self.calculations = calculations
+        self.config = config
+        FakeSentinelHubStatistical.instances.append(self)
+
+    @staticmethod
+    def aggregation(
+        evalscript: str,
+        time_interval: Any,
+        aggregation_interval: str,
+        size: Any = None,
+        resolution: Any = None,
+        **kwargs: Any,
+    ) -> dict:
+        """Record an aggregation block."""
+        return {
+            "evalscript": evalscript,
+            "time_interval": time_interval,
+            "aggregation_interval": aggregation_interval,
+            "resolution": resolution,
+        }
+
+    @staticmethod
+    def input_data(data_collection: Any, maxcc: float | None = None, **kwargs: Any) -> dict:
+        """Record a statistical input_data block."""
+        return {"data_collection": data_collection, "maxcc": maxcc}
+
+    def get_data(self) -> list:
+        """Return a canned nested interval→output→band→stats payload."""
+        return [
+            {
+                "data": [
+                    {
+                        "interval": {
+                            "from": "2020-06-01T00:00:00Z",
+                            "to": "2020-06-02T00:00:00Z",
+                        },
+                        "outputs": {
+                            "ndvi": {
+                                "bands": {
+                                    "B0": {
+                                        "stats": {
+                                            "min": 0.1,
+                                            "max": 0.8,
+                                            "mean": 0.45,
+                                            "stDev": 0.2,
+                                            "sampleCount": 100,
+                                            "noDataCount": 5,
+                                        },
+                                        "percentiles": {"5": 0.12, "50": 0.46, "95": 0.78},
+                                    }
+                                }
+                            },
+                            "dataMask": {"bands": {"B0": {"stats": {"mean": 1.0}}}},
+                        },
+                    }
+                ],
+                "status": "OK",
+            }
+        ]
+
+
 def fake_bbox_to_dimensions(bbox: Any, resolution: float) -> tuple[int, int]:
     """Deterministic `bbox_to_dimensions`: (degrees * 1000 / resolution) per side."""
     west, south, east, north = bbox.bbox
@@ -223,6 +310,8 @@ class FakeSentinelHub:
     DataCollection = FakeDataCollection()
     SentinelHubRequest = FakeSentinelHubRequest
     AsyncProcessRequest = FakeAsyncProcessRequest
+    SentinelHubStatistical = FakeSentinelHubStatistical
+    Geometry = FakeGeometry
     bbox_to_dimensions = staticmethod(fake_bbox_to_dimensions)
     get_async_running_status = staticmethod(fake_get_async_running_status)
 
@@ -233,6 +322,7 @@ def fake_sh(monkeypatch: pytest.MonkeyPatch) -> FakeSentinelHub:
     module = FakeSentinelHub()
     FakeSentinelHubRequest.instances = []
     FakeAsyncProcessRequest.instances = []
+    FakeSentinelHubStatistical.instances = []
     monkeypatch.setitem(sys.modules, "sentinelhub", module)
     return module
 
