@@ -192,6 +192,12 @@ nav:
       - Usage: reference/radar/usage.md
       - Catalog & Tooling: reference/radar/catalog.md
       - Reference: reference/radar/radar.md
+    - USGS Water (NWIS):
+      - Introduction: reference/usgs-water/introduction.md
+      - Usage: reference/usgs-water/usage.md
+      - Authentication: reference/usgs-water/authentication.md
+      - Available data: reference/usgs-water/datasets.md
+      - Reference: reference/usgs-water/usgs_water.md
   - Examples:
     - Authentication: examples/authentication.md
     - Data Sources: examples/data-sources.md
@@ -296,6 +302,11 @@ nav:
       - DWD ICON precipitation (live): examples/nwp/icon_precipitation.ipynb
     - NEXRAD radar:
       - Catalog explorer (no network): examples/radar/catalog_explorer.ipynb
+    - USGS Water (NWIS):
+      - Quickstart — daily discharge: examples/usgs-water/quickstart_daily_discharge.ipynb
+      - Multi-parameter & instantaneous: examples/usgs-water/multi_parameter_and_instantaneous.ipynb
+      - Site discovery & statistics: examples/usgs-water/site_discovery_and_statistics.ipynb
+      - Annual peaks & rating curves: examples/usgs-water/peaks_and_ratings.ipynb
   - API Reference:
     - EarthLens Facade: reference/earthlens.md
     - AbstractDataSource: reference/abstract-datasource.md
