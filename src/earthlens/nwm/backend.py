@@ -125,11 +125,14 @@ def build_key(
 ) -> str:
     """Assemble the S3 object key for one `(config, product, cycle, step)`.
 
-    Mirrors the verified `noaa-nwm-pds` layout: deterministic runs use the
-    `{family}` directory and the product's `s3_token`; ensemble runs use a
-    `{family}_mem{member}` directory and ride the member on the product
-    token (`channel_rt_1`). Forecast steps format as `fNNN`, analysis
-    steps as `tmNN`. The domain suffixes the file name.
+    Mirrors the verified `noaa-nwm-pds` layout: the directory is the
+    configuration key (`short_range`, `analysis_assim_hawaii`,
+    `short_range_coastal_atlgulf`), with a `_mem{member}` suffix for an
+    ensemble; the file name uses the configuration's `family` token and
+    the product's `s3_token` (the member rides on the token for an
+    ensemble, `channel_rt_1`). The step token is the configuration's
+    prefix (`f` forecast / `tm` analysis) zero-padded to its `step_width`
+    (`f001`, `tm00`, `f00015`). The domain suffixes the file name.
 
     Args:
         config: The resolved configuration row.
@@ -142,12 +145,13 @@ def build_key(
         str: The bucket-relative S3 key.
     """
     if config.members:
-        directory = f"{config.family}_mem{member}"
+        directory = f"{config.key}_mem{member}"
         token = f"{product.s3_token}_{member}"
     else:
-        directory = config.family
+        directory = config.key
         token = product.s3_token
-    step_token = f"f{step:03d}" if config.step_kind == "forecast" else f"tm{step:02d}"
+    prefix = "f" if config.step_kind == "forecast" else "tm"
+    step_token = f"{prefix}{step:0{config.step_width}d}"
     name = (
         f"nwm.t{cycle.hour:02d}z.{config.family}.{token}."
         f"{step_token}.{config.domain}.nc"
@@ -256,11 +260,11 @@ class NWM(AbstractDataSource):
         self._products: list[NWMProduct] = []
         for product_key, names in variables.items():
             product = self._catalog.get_product(product_key)
-            if configuration not in product.configurations:
+            if product_key not in self._config.products:
                 raise ValueError(
                     f"product {product_key!r} is not published under "
-                    f"configuration {configuration!r}; it is available in "
-                    f"{product.configurations}."
+                    f"configuration {configuration!r}; it carries "
+                    f"{self._config.products}."
                 )
             unknown = [n for n in names if n not in product.variables]
             if unknown:

@@ -40,7 +40,7 @@ Examples:
         ```python
         >>> from earthlens.nwm import Catalog
         >>> Catalog().products()
-        ['chrtout', 'ldasout']
+        ['chrtout', 'coastal', 'forcing', 'lakeout', 'ldasout', 'rtout']
 
         ```
 """

@@ -89,8 +89,6 @@ class NWMProduct(BaseModel):
         s3_token: The `{output}` token in the S3 file name
             (`channel_rt`, `land`). For an ensemble configuration the
             member rides on this token (`channel_rt_1`).
-        configurations: The configuration keys this product is published
-            under.
         retro_zarr: The retrospective (v3.0) Zarr store URI for this
             product. Used only by the `PY-G`-gated retrospective path.
         description: Human-readable summary.
@@ -115,7 +113,6 @@ class NWMProduct(BaseModel):
     output_kind: OutputKind
     dims: list[str] = Field(default_factory=list)
     s3_token: str
-    configurations: list[str] = Field(default_factory=list)
     retro_zarr: str = ""
     description: str = ""
     variables: dict[str, NWMVariable] = Field(default_factory=dict)
@@ -139,15 +136,26 @@ class NWMConfig(BaseModel):
             while the file-name family stays `medium_range`.
         cycles_utc: The configuration's daily run hours, in `[0, 23]`.
         step_kind: `"forecast"` (`fNNN` lead steps) or `"analysis"`
-            (`tmNN` look-back steps) — selects the step-token format.
-        first_step: First step published (`1` for forecasts, `0` for
-            analyses); the default step when none is requested.
-        horizon_h: Maximum step.
-        step_cadence_h: Spacing between published steps.
+            (`tmNN` look-back steps) — selects the step-token prefix.
+        step_width: Zero-pad width of the step number in the file name —
+            `3` for hourly CONUS forecasts (`f001`), `2` for analyses
+            (`tm00`), and `4`/`5` for the sub-hourly regional domains
+            (`f0015`, `f00015`).
+        first_step: First step published (`1` for hourly forecasts, `0`
+            for analyses); the default step when none is requested.
+        horizon_h: Maximum step (in the step's own unit — hours for the
+            hourly configurations, minutes for the sub-hourly regional
+            ones).
+        step_cadence_h: Spacing between published steps, in the step's
+            own unit (`1` hour for CONUS, `15` minutes for the sub-hourly
+            regional domains).
         members: Ensemble member count — `0` for a deterministic run, or
             the member count (`6` for `medium_range`) for an ensemble,
             whose directory is `{family}_mem{N}` and whose product token
             carries the member (`channel_rt_1`).
+        products: The product keys this configuration publishes (a subset
+            of :attr:`Catalog.datasets`), e.g. `["chrtout", "ldasout",
+            "lakeout", "rtout"]` for `short_range`.
 
     Examples:
         - Read a configuration's horizon:
@@ -167,10 +175,12 @@ class NWMConfig(BaseModel):
     family: str
     cycles_utc: list[int] = Field(default_factory=list)
     step_kind: Literal["forecast", "analysis"] = "forecast"
+    step_width: int = 3
     first_step: int = 1
     horizon_h: int = 0
     step_cadence_h: int = 1
     members: int = 0
+    products: list[str] = Field(default_factory=list)
 
 
 class Catalog(AbstractCatalog):
@@ -192,6 +202,10 @@ class Catalog(AbstractCatalog):
         datasets: Map from product key to its :class:`NWMProduct` row.
         configurations: Map from configuration key to its
             :class:`NWMConfig` row.
+        available_datasets: Sorted product keys (the curated products are
+            the whole product universe, so this equals `products()`).
+        available_configurations: Sorted configuration keys — the full
+            index of every operational configuration on the bucket.
 
     Examples:
         - List products and resolve one:
@@ -199,7 +213,7 @@ class Catalog(AbstractCatalog):
             >>> from earthlens.nwm import Catalog
             >>> cat = Catalog()
             >>> cat.products()
-            ['chrtout', 'ldasout']
+            ['chrtout', 'coastal', 'forcing', 'lakeout', 'ldasout', 'rtout']
             >>> cat.get_product("ldasout").output_kind
             'raster'
             >>> "short_range" in cat.configurations
@@ -221,23 +235,26 @@ class Catalog(AbstractCatalog):
 
     datasets: dict[str, NWMProduct] = Field(default_factory=dict)
     configurations: dict[str, NWMConfig] = Field(default_factory=dict)
+    available_configurations: list[str] = Field(default_factory=list)
 
     def model_post_init(self, __context: Any) -> None:
         """Auto-load the bundled catalog when no products were supplied.
 
         `Catalog()` with no args reads :data:`CATALOG_PATH` (cached by
         `(path, mtime)`); passing `datasets=...` skips the disk read
-        (used in tests).
+        (used in tests). Either way the `available_*` indices are
+        derived from the loaded maps.
 
         Raises:
             ValueError: Propagated from :meth:`load` when the YAML is
                 missing, empty, or has a malformed row.
         """
-        if self.datasets:
-            return
-        loaded = Catalog.load()
-        self.datasets = loaded.datasets
-        self.configurations = loaded.configurations
+        if not self.datasets:
+            loaded = Catalog.load()
+            self.datasets = loaded.datasets
+            self.configurations = loaded.configurations
+        self.available_datasets = sorted(self.datasets)
+        self.available_configurations = sorted(self.configurations)
 
     @classmethod
     def load(cls, catalog_path: Path | None = None) -> Catalog:
