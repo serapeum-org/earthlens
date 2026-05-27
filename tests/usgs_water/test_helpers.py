@@ -519,6 +519,72 @@ def test_normalize_empty_per_service(service):
     assert len(out.columns) > 0
 
 
+@pytest.mark.parametrize(
+    "service, flavour, param_key",
+    [
+        ("daily", "waterdata", "parameter_code"),
+        ("daily", "nwis", "parameterCd"),
+        ("samples", "waterdata", "usgsPCode"),
+        ("statistics", "waterdata", "parameter_code"),
+        ("statistics", "nwis", "parameterCd"),
+    ],
+)
+def test_query_kwargs_no_codes_omits_parameter_filter(service, flavour, param_key):
+    """With no codes, the parameter filter key is omitted (site-only query)."""
+    kw = _helpers.query_kwargs(
+        service=service,
+        flavour=flavour,
+        codes=[],
+        sites=["01646500"],
+        bbox=[0, 0, 0, 0],
+        start="2023-01-01",
+        end="2023-01-05",
+        limit=None,
+    )
+    assert param_key not in kw
+
+
+@pytest.mark.parametrize(
+    "service", ["daily", "samples", "statistics", "sites", "peaks"]
+)
+def test_normalize_none_frame_returns_empty(service):
+    """normalize tolerates a None frame and returns the empty service schema."""
+    out = _helpers.normalize(None, "nwis", service, CODE_META)
+    assert out.empty
+
+
+@pytest.mark.parametrize(
+    "value, expected",
+    [
+        ("USGS-01646500", "01646500"),
+        ("01646500", "01646500"),
+        (None, None),
+        (12345, 12345),
+    ],
+)
+def test_strip_site_prefix(value, expected):
+    """The USGS- site prefix is stripped only from prefixed strings."""
+    assert _helpers._strip_site_prefix(value) == expected
+
+
+@pytest.mark.parametrize(
+    "year, month, expected",
+    [
+        (2023, 3, "2023-03"),
+        (2023, None, "2023"),
+        (None, 3, ""),
+        (None, None, ""),
+    ],
+)
+def test_format_time_of_year(year, month, expected):
+    """Year/month fold to YYYY-MM, YYYY, or empty with missing parts dropped."""
+    import pandas as pd
+
+    y = pd.NA if year is None else year
+    m = pd.NA if month is None else month
+    assert _helpers._format_time_of_year(y, m) == expected
+
+
 def test_normalize_legacy_wide_no_value_columns():
     """A legacy frame with no code columns normalizes to empty canonical."""
     import pandas as pd

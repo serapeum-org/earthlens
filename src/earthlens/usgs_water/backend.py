@@ -324,15 +324,12 @@ class USGSWater(AbstractDataSource):
         return codes
 
     def _bbox_list(self) -> list[float]:
-        """Return the request bbox as modern `[west, south, east, north]`."""
-        return [self.space.west, self.space.south, self.space.east, self.space.north]
+        """Return the request bbox as modern `[west, south, east, north]`.
 
-    def _bbox_str(self) -> str:
-        """Return the request bbox as legacy `"west,south,east,north"`."""
-        return (
-            f"{self.space.west},{self.space.south},"
-            f"{self.space.east},{self.space.north}"
-        )
+        The legacy `"west,south,east,north"` string form is built inline by
+        :func:`earthlens.usgs_water._helpers.query_kwargs` from this list.
+        """
+        return [self.space.west, self.space.south, self.space.east, self.space.north]
 
     def download(
         self,

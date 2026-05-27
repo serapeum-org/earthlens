@@ -128,6 +128,15 @@ def test_429_falls_back_to_legacy(fake_usgs, usgs_kwargs, monkeypatch):
     assert fake_usgs.called() == ["get_daily", "get_dv"]
 
 
+def test_warn_legacy_fallback_only_once(usgs_kwargs):
+    """The legacy-fallback warning is emitted once, then short-circuits."""
+    backend = USGSWater(**usgs_kwargs())
+    backend._warn_legacy_fallback()
+    assert backend._used_legacy_fallback is True
+    backend._warn_legacy_fallback()
+    assert backend._used_legacy_fallback is True
+
+
 def test_429_not_swallowed_when_token_present(fake_usgs, usgs_kwargs, monkeypatch):
     """With a token, a modern 429 is not silently downgraded to legacy."""
     monkeypatch.setenv("API_USGS_PAT", "tok")

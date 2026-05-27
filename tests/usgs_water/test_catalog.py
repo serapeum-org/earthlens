@@ -72,6 +72,12 @@ def test_load_rejects_empty_block(tmp_path):
         Catalog.load(empty)
 
 
+def test_load_missing_file_raises(tmp_path):
+    """Loading a non-existent catalog path raises rather than returning empty."""
+    with pytest.raises((FileNotFoundError, ValueError)):
+        Catalog.load(tmp_path / "does_not_exist.yaml")
+
+
 def test_load_rejects_bad_row(tmp_path):
     """A row with an invalid code fails validation with the param name."""
     bad = tmp_path / "bad.yaml"
