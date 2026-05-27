@@ -619,3 +619,17 @@ class TestMeteoFranceAPICentre:
                 self._arpege(), dt.datetime(2024, 6, 1, 0), 0, ["temperature_2m"], "auto"
             )
         assert list(tmp_path.iterdir()) == [], "no partial file should remain"
+
+
+def test_base_centre_fetch_one_raises_not_implemented(tmp_path):
+    """The abstract base _NWPCentre.fetch_one body raises NotImplementedError."""
+    import datetime as dt
+
+    from earthlens.nwp.centres.base import _NWPCentre
+
+    class _Bare(_NWPCentre):
+        def fetch_one(self, model, cycle, step, params, mirror, member=None):
+            return super().fetch_one(model, cycle, step, params, mirror, member)
+
+    with pytest.raises(NotImplementedError):
+        _Bare(tmp_path).fetch_one(None, dt.datetime(2026, 1, 1), 0, [], "auto")

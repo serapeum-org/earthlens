@@ -430,3 +430,30 @@ class TestAggregate:
         b._centres["herbie"] = _CountingCentre(tmp_path)
         out = b.download(progress_bar=False, aggregate=self._config(freq="1D", op="mean"))
         assert len(out) == 1 and out[0].name.startswith("gfs_mean_1D_")
+
+
+def test_unknown_backend_raises(tmp_path):
+    """A catalog model with an unrecognised backend is rejected at construction."""
+    from earthlens.nwp import Catalog
+    from earthlens.nwp.catalog import NWPModel
+
+    # backend is a pydantic Literal, so a normal NWPModel cannot hold an unknown
+    # value — model_construct bypasses validation to exercise the runtime guard.
+    bad = NWPModel.model_construct(
+        provider="x",
+        backend="bogus",
+        cycles_utc=[0],
+        horizon_h=0,
+        bands={"temperature_2m": ":TMP:2 m above ground:"},
+    )
+    cat = Catalog(datasets={"bad": bad})
+    with pytest.raises(ValueError, match="unknown backend"):
+        NWP(
+            start="2024-06-01",
+            end="2024-06-01",
+            variables={"bad": ["temperature_2m"]},
+            lat_lim=[40, 45],
+            lon_lim=[-80, -75],
+            path=str(tmp_path),
+            catalog=cat,
+        )

@@ -98,3 +98,17 @@ class TestEnsureDir:
         """Calling on an existing directory is a no-op that still returns it."""
         result = ensure_dir(tmp_path)
         assert result == tmp_path.absolute(), result
+
+
+class TestWindowLabels:
+    """Tests for window_labels (aggregation-window labelling)."""
+
+    def test_empty_freq_bin_skipped(self):
+        """A freq window containing no input times is skipped, not labelled."""
+        import datetime as dt
+
+        from earthlens.nwp._helpers import window_labels
+
+        times = [dt.datetime(2026, 1, 1, 0), dt.datetime(2026, 1, 1, 3)]
+        # hourly bins -> the 01:00 / 02:00 windows are empty and skipped
+        assert window_labels(times, "1h") == ["2026010100", "2026010103"]

@@ -161,3 +161,11 @@ class TestClearCache:
         path.write_text("datasets:\n  only:\n    provider: p\n")
         clear_catalog_cache()
         assert set(Catalog().datasets) == {"only"}
+
+
+def test_load_catalog_data_missing_file_raises(tmp_path):
+    """A non-existent catalog path raises FileNotFoundError from the loader."""
+    from earthlens.nwp.catalog import _load_catalog_data
+
+    with pytest.raises(FileNotFoundError):
+        _load_catalog_data(tmp_path / "absent.yaml")
