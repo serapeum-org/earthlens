@@ -135,27 +135,27 @@ recipes:
     output_bands: 1
     kind: stats
     description: Sentinel-2 L2A NBR for the Statistical API (with dataMask).
-  landsat-ot-l2-ndvi:
-    base_collection: LANDSAT_OT_L2
+  landsat-ot-l1-ndvi:
+    base_collection: LANDSAT_OT_L1
     evalscript: landsat_ndvi.js
     bands: [B04, B05]
     output_bands: 1
     kind: render
-    description: Landsat 8/9 L2 NDVI (FLOAT32).
-  landsat-ot-l2-true-colour:
-    base_collection: LANDSAT_OT_L2
+    description: Landsat 8/9 L1 (TOA) NDVI (FLOAT32).
+  landsat-ot-l1-true-colour:
+    base_collection: LANDSAT_OT_L1
     evalscript: landsat_true_colour.js
     bands: [B02, B03, B04]
     output_bands: 3
     kind: render
-    description: Landsat 8/9 L2 true-colour composite.
-  landsat-ot-l2-ndvi-stats:
-    base_collection: LANDSAT_OT_L2
+    description: Landsat 8/9 L1 (TOA) true-colour composite.
+  landsat-ot-l1-ndvi-stats:
+    base_collection: LANDSAT_OT_L1
     evalscript: landsat_ndvi_stats.js
     bands: [B04, B05]
     output_bands: 1
     kind: stats
-    description: Landsat 8/9 L2 NDVI for the Statistical API (with dataMask).
+    description: Landsat 8/9 L1 (TOA) NDVI for the Statistical API (with dataMask).
   sentinel-1-iw-rgb-ratio:
     base_collection: SENTINEL1_IW
     evalscript: sar_rgb_ratio.js
@@ -163,13 +163,6 @@ recipes:
     output_bands: 3
     kind: render
     description: Sentinel-1 IW dual-pol composite (VV / VH / VV-VH ratio).
-  modis-ndvi:
-    base_collection: MODIS
-    evalscript: modis_ndvi.js
-    bands: [B01, B02]
-    output_bands: 1
-    kind: render
-    description: MODIS MCD43A4 NDVI (FLOAT32).
   dem-copernicus-30-elevation:
     base_collection: DEM_COPERNICUS_30
     evalscript: dem_elevation.js

@@ -29,18 +29,24 @@ cat.resolve("sentinel-2-l2a-ndvi").evalscript        # 'ndvi.js'
 | `sentinel-3-slstr` | `SENTINEL3_SLSTR` | 500 m | daily | S3, S2, S1 |
 | `sentinel-5p-l2` | `SENTINEL5P` | 3500 m | daily | NO2 |
 | `landsat-ot-l1` | `LANDSAT_OT_L1` | 30 m | 16-day | B04, B03, B02 |
-| `landsat-ot-l2` | `LANDSAT_OT_L2` | 30 m | 16-day | B04, B03, B02 |
-| `modis` | `MODIS` | 500 m | daily | B01, B04, B03 |
 | `dem-copernicus-30` | `DEM_COPERNICUS_30` | 30 m | static | DEM |
-| `harmonized-landsat-sentinel` | `HARMONIZED_LANDSAT_SENTINEL` | 30 m | 2–3-day | Red, Green, Blue |
 
 Each collection's `bands` map carries per-band metadata (common name, units,
 native resolution, central wavelength). Sentinel-2 L1C/L2A expose the full MSI
 band set (`B01`–`B12`, `B8A`, plus `SCL` on L2A); Sentinel-5P exposes the
 atmospheric columns (`CO`, `NO2`, `O3`, `SO2`, `CH4`); Sentinel-3 SLSTR adds the
-thermal brightness-temperature bands (`S7`–`S9`, `F1`/`F2`); Landsat OT and HLS
-provide harmonised optical surface reflectance; `DEM_COPERNICUS_30` is a single
-elevation band.
+thermal brightness-temperature bands (`S7`–`S9`, `F1`/`F2`); Landsat OT L1 is
+top-of-atmosphere optical + thermal; `DEM_COPERNICUS_30` is a single elevation
+band.
+
+!!! note "Default endpoint = CDSE-free"
+    The curated collections above are all served by the **default CDSE-free
+    endpoint**. The `sentinelhub` SDK also knows other collections — **MODIS**,
+    **Landsat L2 surface reflectance** (`LANDSAT_OT_L2`), and **HLS**
+    (`HARMONIZED_LANDSAT_SENTINEL`) — that CDSE does **not** serve (they return a
+    `RENDERER_EXCEPTION` "Unable to resolve"). Those are available on the
+    **commercial** Sentinel Hub deployment: pass `endpoint="commercial"` with a
+    commercial subscription and address them via a custom `evalscript=`.
 
 The full set of collection ids Sentinel Hub can serve is kept in the
 informational `available_collections` index (rebuilt by the
@@ -69,10 +75,9 @@ Recipes are split into **render** recipes (write a raster) and **stats** recipes
 | `sentinel-2-l2a-nbr` | `nbr.js` | B08, B12 | 1 | NBR (burn ratio) |
 | `sentinel-2-l2a-agriculture` | `agriculture.js` | B02, B08, B11 | 3 | Agriculture composite |
 | `sentinel-2-l2a-geology` | `geology.js` | B02, B11, B12 | 3 | Geology composite |
-| `landsat-ot-l2-ndvi` | `landsat_ndvi.js` | B04, B05 | 1 | Landsat 8/9 NDVI |
-| `landsat-ot-l2-true-colour` | `landsat_true_colour.js` | B02, B03, B04 | 3 | Landsat 8/9 true-colour |
+| `landsat-ot-l1-ndvi` | `landsat_ndvi.js` | B04, B05 | 1 | Landsat 8/9 L1 NDVI |
+| `landsat-ot-l1-true-colour` | `landsat_true_colour.js` | B02, B03, B04 | 3 | Landsat 8/9 L1 true-colour |
 | `sentinel-1-iw-rgb-ratio` | `sar_rgb_ratio.js` | VV, VH | 3 | SAR dual-pol composite |
-| `modis-ndvi` | `modis_ndvi.js` | B01, B02 | 1 | MODIS NDVI |
 | `dem-copernicus-30-elevation` | `dem_elevation.js` | DEM | 1 | Copernicus DEM elevation |
 | `sentinel-3-slstr-thermal` | `slstr_thermal.js` | S8 | 1 | SLSTR thermal BT (Kelvin) |
 | `sentinel-3-olci-true-colour` | `olci_true_colour.js` | B04, B06, B08 | 3 | OLCI true-colour |
@@ -90,7 +95,7 @@ pixels from the zonal stats.
 | `sentinel-2-l2a-bsi-stats` | `bsi_stats.js` | B02, B04, B08, B11 | BSI for the Statistical API |
 | `sentinel-2-l2a-ndmi-stats` | `ndmi_stats.js` | B08, B11 | NDMI for the Statistical API |
 | `sentinel-2-l2a-nbr-stats` | `nbr_stats.js` | B08, B12 | NBR for the Statistical API |
-| `landsat-ot-l2-ndvi-stats` | `landsat_ndvi_stats.js` | B04, B05 | Landsat 8/9 NDVI for the Statistical API |
+| `landsat-ot-l1-ndvi-stats` | `landsat_ndvi_stats.js` | B04, B05 | Landsat 8/9 L1 NDVI for the Statistical API |
 
 ## Adding a custom evalscript
 

@@ -12,6 +12,7 @@ from earthlens.sentinel_hub.backend import (
     SentinelHub,
     _flatten_statistics,
     _iter_geometries,
+    _stats_frame,
 )
 
 pytestmark = pytest.mark.sentinel_hub
@@ -89,6 +90,24 @@ class TestFlatten:
         assert len(rows) == 1
         assert rows[0]["output"] == "ndvi"
         assert rows[0]["p50"] == 0.5
+
+
+class TestEmptyStats:
+    """An empty stats result writes a valid header-only CSV (not unparseable)."""
+
+    def test_empty_frame_has_header(self):
+        """`_stats_frame([])` is empty but carries the standard columns."""
+        frame = _stats_frame([])
+        assert frame.empty
+        assert "mean" in frame.columns and "feature_id" in frame.columns
+
+    def test_empty_frame_roundtrips(self, tmp_path):
+        """A header-only CSV re-reads without error (0 rows)."""
+        import pandas as pd
+
+        target = tmp_path / "empty.csv"
+        _stats_frame([]).to_csv(target, index=False)
+        assert len(pd.read_csv(target)) == 0
 
 
 class TestStatisticalFetch:

@@ -768,8 +768,6 @@ class SentinelHub(AbstractDataSource):
             ValueError: When no `geometry=` was supplied, or the evalscript lacks
                 a `dataMask` band.
         """
-        import pandas as pd
-
         sentinelhub = import_sentinelhub()
         if self._geometry is None:
             raise ValueError(
@@ -820,8 +818,14 @@ class SentinelHub(AbstractDataSource):
                 )
                 payload = request.get_data()[0]
                 rows.extend(_flatten_statistics(payload, feature_id=feature_id))
+            if not rows:
+                logger.warning(
+                    f"Sentinel Hub statistical: no data returned for "
+                    f"{product.id!r} over the request geometry + window "
+                    "(empty table written)."
+                )
             target = Path(self.root_dir) / f"{_safe_name(product.id)}.csv"
-            pd.DataFrame(rows).to_csv(target, index=False)
+            _stats_frame(rows).to_csv(target, index=False)
             out.append(target)
         logger.info(f"Sentinel Hub statistical: wrote {len(out)} table(s)")
         return out
@@ -846,7 +850,6 @@ class SentinelHub(AbstractDataSource):
             ValueError: When `batch_output` is missing its `input_features` or
                 output bucket, or the evalscript lacks a `dataMask` band.
         """
-        import pandas as pd
         from sentinelhub.aws import AwsBatchStatisticalResults
 
         sentinelhub = import_sentinelhub()
@@ -908,7 +911,7 @@ class SentinelHub(AbstractDataSource):
             for feature_id, payload in zip(ids, payloads):
                 rows.extend(_flatten_statistics(payload, feature_id=feature_id))
             target = Path(self.root_dir) / f"{_safe_name(product.id)}.csv"
-            pd.DataFrame(rows).to_csv(target, index=False)
+            _stats_frame(rows).to_csv(target, index=False)
             out.append(target)
         logger.info(f"Sentinel Hub batch-statistical: wrote {len(out)} table(s)")
         return out
@@ -1018,6 +1021,43 @@ class SentinelHub(AbstractDataSource):
 _STAT_CALCULATIONS: dict = {
     "default": {"statistics": {"default": {"percentiles": {"k": [5, 50, 95]}}}}
 }
+
+#: The column order of the flattened Statistical table. Used as the header when a
+#: query returns no data (e.g. no scene over the polygon in the window), so the
+#: written CSV is a valid empty table rather than an unparseable header-less file.
+_STAT_COLUMNS: tuple[str, ...] = (
+    "feature_id",
+    "interval_from",
+    "interval_to",
+    "output",
+    "band",
+    "min",
+    "max",
+    "mean",
+    "stDev",
+    "sampleCount",
+    "noDataCount",
+    "p5",
+    "p50",
+    "p95",
+)
+
+
+def _stats_frame(rows: list[dict]) -> Any:
+    """Build the Statistical DataFrame, with a header even when `rows` is empty.
+
+    Args:
+        rows: The flattened per-band stat rows (possibly empty).
+
+    Returns:
+        A `pandas.DataFrame` — header-only when no stats were returned, so the
+        written CSV always parses.
+    """
+    import pandas as pd
+
+    if not rows:
+        return pd.DataFrame(columns=list(_STAT_COLUMNS))
+    return pd.DataFrame(rows)
 
 
 def _iter_geometries(geometry: Any) -> list[tuple[Any, Any]]:
