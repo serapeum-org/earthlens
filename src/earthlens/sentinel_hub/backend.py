@@ -164,6 +164,9 @@ class SentinelHub(AbstractDataSource):
         self._aggregate: AggregationConfig | None = None
         # Per-window time override set by the aggregate= render loop (C10).
         self._window_override: tuple[str, str] | None = None
+        # Memoised resolved plane (deterministic from instance state; avoids a
+        # second bbox_to_dimensions call across download() -> _fetch()).
+        self._plane: str | None = None
         super().__init__(
             start=start,
             end=end,
@@ -278,14 +281,20 @@ class SentinelHub(AbstractDataSource):
     def _resolve_plane(self) -> str:
         """Resolve the request plane: explicit `api=`, else auto by size / geometry.
 
+        Memoised: the plane is deterministic from instance state, so the result
+        is computed once (one `bbox_to_dimensions` call) and reused across the
+        `download` -> `_fetch` path.
+
         Returns:
             The resolved plane name.
         """
-        has_geometry = self._geometry is not None
-        has_s3 = self._batch_output is not None
-        needs_size = self._api_mode is None or self._api_mode in RASTER_APIS
-        max_side = max(self._request_size()) if needs_size else 0
-        return resolve_api(self._api_mode, max_side, has_geometry, has_s3)
+        if self._plane is None:
+            has_geometry = self._geometry is not None
+            has_s3 = self._batch_output is not None
+            needs_size = self._api_mode is None or self._api_mode in RASTER_APIS
+            max_side = max(self._request_size()) if needs_size else 0
+            self._plane = resolve_api(self._api_mode, max_side, has_geometry, has_s3)
+        return self._plane
 
     def _time_interval(self) -> tuple[str, str]:
         """Return the render time interval as ISO `(start, end)` date strings.
