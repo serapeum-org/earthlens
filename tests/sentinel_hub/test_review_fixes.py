@@ -9,6 +9,7 @@ All run against the faked SDK (no network).
 
 from __future__ import annotations
 
+import types
 from pathlib import Path
 
 import pytest
@@ -18,6 +19,8 @@ from earthlens.sentinel_hub.backend import (
     SentinelHub,
     _async_request_id,
     _geometry_bounds,
+    _iter_geometries,
+    _wait_for_async,
 )
 
 pytestmark = pytest.mark.sentinel_hub
@@ -216,6 +219,51 @@ class TestGeometryBounds:
         """A mapping with no coordinates raises a clear error."""
         with pytest.raises(ValueError, match="could not extract coordinates"):
             _geometry_bounds({"type": "Polygon", "coordinates": []})
+
+
+class TestIterGeometries:
+    """`_iter_geometries` normalises Feature / list / bare inputs."""
+
+    def test_feature_uses_its_id(self):
+        """A GeoJSON Feature yields one pair carrying its `id`."""
+        feature = {"type": "Feature", "id": "f1", "geometry": {"type": "Point"}}
+        assert _iter_geometries(feature) == [("f1", {"type": "Point"})]
+
+    def test_list_of_geometries_indexed(self):
+        """A list of geometries yields positional ids."""
+        geoms = [{"type": "Point"}, {"type": "Polygon"}]
+        assert _iter_geometries(geoms) == [(0, geoms[0]), (1, geoms[1])]
+
+
+class TestWaitForAsync:
+    """`_wait_for_async` polls the status endpoint until nothing is running."""
+
+    def test_empty_ids_returns_immediately(self):
+        """No active ids → return without polling."""
+        module = types.SimpleNamespace(
+            get_async_running_status=lambda ids, cfg: pytest.fail("should not poll")
+        )
+        _wait_for_async(module, [None, ""], config=None)
+
+    def test_polls_until_done(self, monkeypatch):
+        """A job running once then finished completes after a single re-poll."""
+        monkeypatch.setattr("time.sleep", lambda _s: None)
+        states = iter([{"job-1": True}, {"job-1": False}])
+        module = types.SimpleNamespace(
+            get_async_running_status=lambda ids, cfg: next(states)
+        )
+        _wait_for_async(module, ["job-1"], config=None, poll_seconds=0)
+
+    def test_timeout_raises(self, monkeypatch):
+        """A job that never finishes raises TimeoutError after max_attempts."""
+        monkeypatch.setattr("time.sleep", lambda _s: None)
+        module = types.SimpleNamespace(
+            get_async_running_status=lambda ids, cfg: {"job-1": True}
+        )
+        with pytest.raises(TimeoutError, match="still running"):
+            _wait_for_async(
+                module, ["job-1"], config=None, poll_seconds=0, max_attempts=2
+            )
 
 
 class TestMosaickingConstant:
