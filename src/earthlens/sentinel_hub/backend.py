@@ -1027,11 +1027,15 @@ class SentinelHub(AbstractDataSource):
         keys = list(self._resolved)
         try:
             for index, window_start in enumerate(edges):
-                window_end = (
-                    edges[index + 1]
-                    if index + 1 < len(edges)
-                    else pd.Timestamp(self.time.end_date)
-                )
+                if index + 1 < len(edges):
+                    # End the day before the next window starts so adjacent
+                    # windows don't both claim the shared boundary date (the SH
+                    # time_interval is inclusive on both ends).
+                    window_end = pd.Timestamp(edges[index + 1]) - pd.Timedelta(days=1)
+                    if window_end < pd.Timestamp(window_start):
+                        window_end = pd.Timestamp(window_start)
+                else:
+                    window_end = pd.Timestamp(self.time.end_date)
                 self._window_override = (
                     pd.Timestamp(window_start).strftime("%Y-%m-%d"),
                     pd.Timestamp(window_end).strftime("%Y-%m-%d"),
