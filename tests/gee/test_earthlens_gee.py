@@ -83,6 +83,8 @@ class TestRegistry:
             "openaq",
             "openeo",
             "planetary-computer",
+            "sentinel-hub",
+            "sentinelhub",
             "stac",
             "tropycal",
         ]

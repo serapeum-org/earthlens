@@ -138,7 +138,7 @@ class EarthLens:
             ['amazon-s3', 'cdse', 'chc', 'chirps', 'cmems', 'earth-search',
              'earthdata', 'ecmwf', 'eumetsat', 'fdsn', 'firms', 'gdacs', 'gee',
              'google-earth-engine', 'openaq', 'openeo', 'planetary-computer',
-             'stac', 'tropycal']
+             'sentinel-hub', 'sentinelhub', 'stac', 'tropycal']
 
             ```
         - Asking for an unknown backend raises `ValueError`:
@@ -178,6 +178,10 @@ class EarthLens:
         :class:`earthlens.openeo.OpenEO`: server-side openEO process graphs
             (defaults to CDSE openEO); `raster` output, `aggregate=` is a
             native `aggregate_temporal_period` node; key `"openeo"`.
+        :class:`earthlens.sentinel_hub.SentinelHub`: server-side Sentinel
+            Hub render on CDSE (Process / Async / Batch raster, Statistical /
+            Batch-Statistical tabular); `mixed` output, evalscript-driven;
+            keys `"sentinel-hub"` / `"sentinelhub"`.
         :class:`earthlens.tropycal.TropicalCyclone`: tropical-cyclone
             best tracks via `tropycal` (`vector` output); key
             `"tropycal"`.
@@ -208,6 +212,23 @@ class EarthLens:
             # openEO server-side processing (defaults to CDSE openEO). Builds a
             # process graph the backend executes; returns the written paths.
             "openeo": ("earthlens.openeo", "OpenEO", "openeo", {}),
+            # Sentinel Hub server-side render on CDSE. Builds a bbox/geometry +
+            # evalscript request the server renders; returns written GeoTIFF
+            # paths (raster planes) or table paths / S3 URIs (tabular / batch).
+            # `OUTPUT_KIND="mixed"`. The `"sentinelhub"` alias matches the SDK
+            # spelling.
+            "sentinel-hub": (
+                "earthlens.sentinel_hub",
+                "SentinelHub",
+                "sentinel-hub",
+                {},
+            ),
+            "sentinelhub": (
+                "earthlens.sentinel_hub",
+                "SentinelHub",
+                "sentinel-hub",
+                {},
+            ),
             "tropycal": ("earthlens.tropycal", "TropicalCyclone", "tropycal", {}),
             # FIRMS needs a free MAP_KEY but no SDK (requests + pandas
             # are core), so like GDACS there is no extra to hint.
