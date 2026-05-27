@@ -3158,6 +3158,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#attribute-pushdown-with-where-duckdb" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Attribute pushdown with where= (DuckDB)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#known-limitations" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -6736,6 +6747,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../examples/overture/07_attribute_pushdown/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overture — attribute pushdown with (live)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -7320,6 +7359,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#attribute-pushdown-with-where-duckdb" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Attribute pushdown with where= (DuckDB)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#known-limitations" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -7544,9 +7594,38 @@ bbox just to discard the surplus:</p>
 <a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a>    <span class="n">max_features</span><span class="o">=</span><span class="mi">5000</span><span class="p">,</span>    <span class="c1"># stop after ~5000 rows</span>
 <a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
 </code></pre></div>
+<h2 id="attribute-pushdown-with-where-duckdb"><a class="toclink" href="#attribute-pushdown-with-where-duckdb">Attribute pushdown with <code>where=</code> (DuckDB)</a><a class="headerlink" href="#attribute-pushdown-with-where-duckdb" title="Permanent link">#</a></h2>
+<p>The bbox limits <em>where</em> you fetch; <code>where=</code> limits <em>which rows</em> — pushed down
+to the GeoParquet on S3 via DuckDB, so only matching features leave the
+bucket (not the whole bbox). Pass a raw SQL predicate; it is ANDed onto the
+bbox filter. <code>columns=</code> optionally narrows the projection (<code>id</code> and <code>sources</code>
+are always kept so identity and the per-row <code>license_id</code> survive).</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="n">EarthLens</span><span class="p">(</span>
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>    <span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;overture&quot;</span><span class="p">,</span>
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>    <span class="n">variables</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;buildings&quot;</span><span class="p">:</span> <span class="p">[]},</span>
+<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">40.74</span><span class="p">,</span> <span class="mf">40.76</span><span class="p">],</span>
+<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>    <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">74.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">73.97</span><span class="p">],</span>
+<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>    <span class="n">path</span><span class="o">=</span><span class="s2">&quot;out&quot;</span><span class="p">,</span>
+<a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a>    <span class="n">where</span><span class="o">=</span><span class="s2">&quot;height &gt; 10 AND subtype = &#39;residential&#39;&quot;</span><span class="p">,</span>   <span class="c1"># pushed down to S3</span>
+<a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a>    <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;names&quot;</span><span class="p">,</span> <span class="s2">&quot;height&quot;</span><span class="p">,</span> <span class="s2">&quot;subtype&quot;</span><span class="p">],</span>            <span class="c1"># narrow the projection</span>
+<a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a>    <span class="n">max_features</span><span class="o">=</span><span class="mi">10000</span><span class="p">,</span>                                 <span class="c1"># LIMIT</span>
+<a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
+</code></pre></div>
+<p>Notes:</p>
+<ul>
+<li>The predicate is <strong>raw SQL</strong> evaluated by DuckDB against the parquet
+  schema — you can filter on nested fields (<code>categories.primary = 'restaurant'</code>,
+  <code>names.primary IS NOT NULL</code>), numeric attributes (<code>confidence &gt; 0.9</code>), etc.</li>
+<li>The public bucket is read <strong>anonymously</strong> (no AWS credentials needed, and any
+  in your environment are bypassed).</li>
+<li>Requires <code>duckdb</code> — included in <code>pip install earthlens[overture]</code>.</li>
+<li>Setting <code>where=</code> takes precedence over <code>stream=</code>; <code>max_features</code> becomes a
+  SQL <code>LIMIT</code>.</li>
+</ul>
 <h2 id="known-limitations"><a class="toclink" href="#known-limitations">Known limitations</a><a class="headerlink" href="#known-limitations" title="Permanent link">#</a></h2>
 <ul>
-<li><strong>No DuckDB / SQL pushdown</strong> — only the SDK's PyArrow bbox pushdown.</li>
+<li><strong>No DuckDB attribute pushdown without <code>where=</code></strong> — the plain fetch path uses
+  the SDK's PyArrow bbox pushdown only; attribute filtering needs <code>where=</code>.</li>
 <li><strong>No temporal axis</strong> — pin a <code>release</code> for reproducibility; <code>None</code> drifts
   to the newest monthly release.</li>
 <li><strong><code>base</code> types carry mixed geometries</strong> — <code>land</code> / <code>water</code> /
