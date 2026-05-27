@@ -1,4 +1,11 @@
-"""Unit tests for the Sentinel Hub Async Processing plane (C5, S3-delivered)."""
+"""Unit tests for the Sentinel Hub Async Processing plane (C5, S3-delivered).
+
+These verify the **orchestration shape** against the faked SDK — that the right
+request is built, the correct async request id is polled, and the S3 delivery
+bucket is returned. They are **not** end-to-end behavioural proof: the async
+plane delivers to a user S3 bucket + IAM role and is not run against the live
+service, so a live round-trip remains unverified (see the PR notes).
+"""
 
 from __future__ import annotations
 

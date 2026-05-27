@@ -1,4 +1,10 @@
-"""Unit tests for the Sentinel Hub Batch Processing plane → S3 (C8)."""
+"""Unit tests for the Sentinel Hub Batch Processing plane → S3 (C8).
+
+These verify the **orchestration shape** against the faked SDK — the
+create → analyse → (cost guard) → start → monitor sequence and the tiling/S3
+output wiring. They are **not** end-to-end behavioural proof: Batch delivers to a
+user S3 bucket + IAM role and is not run against the live service.
+"""
 
 from __future__ import annotations
 

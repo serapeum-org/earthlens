@@ -1,4 +1,11 @@
-"""Unit tests for the Sentinel Hub Batch Statistical plane (C9)."""
+"""Unit tests for the Sentinel Hub Batch Statistical plane (C9).
+
+These verify the **orchestration shape** against the faked SDK — the
+create → analyse → start → monitor → retrieve sequence, the S3 input/output
+wiring, and the per-feature flatten. They are **not** end-to-end behavioural
+proof: Batch-Statistical runs over a user S3 GeoPackage + IAM role and is not run
+against the live service.
+"""
 
 from __future__ import annotations
 
