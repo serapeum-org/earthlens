@@ -40,13 +40,16 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Literal
 
 import pandas as pd
+from loguru import logger
 
 from earthlens.base import (
     AbstractDataSource,
     OutputKind,
+    RemoteProduct,
     SpatialExtent,
     TemporalExtent,
 )
+from earthlens.usgs_water import _helpers
 from earthlens.usgs_water.auth import UsgsWaterAuth, UsgsWaterCredentials
 from earthlens.usgs_water.catalog import Catalog
 
@@ -354,11 +357,223 @@ class USGSWater(AbstractDataSource):
                 "service='statistics' for a server-side temporal rollup "
                 "(daily/monthly/annual) instead."
             )
-        return self._api()
-
-    def _api(self) -> pd.DataFrame:
-        """Compose `_search` and `_fetch` (filled by C3 onward)."""
-        raise NotImplementedError(
-            "USGSWater value services are implemented in C3; the C1 scaffold "
-            "only covers construction, validation, auth, and the bbox/date grid."
+        frames = [f for f in self._api_via_search_fetch() if not f.empty]
+        df = (
+            pd.concat(frames, ignore_index=True)
+            if frames
+            else _helpers.empty_canonical()
         )
+        out_path = self._write_table(df)
+        if len(df):
+            logger.info(
+                f"USGSWater {self._service}: {len(df)} row(s) written to {out_path}"
+            )
+        else:
+            logger.warning(
+                f"USGSWater {self._service}: no rows matched; wrote an empty "
+                f"(schema-only) table to {out_path}"
+            )
+        return df
+
+    def _api(self) -> list[pd.DataFrame]:
+        """Compose `_search` and `_fetch` into the canonical C3 shape."""
+        return self._api_via_search_fetch()
+
+    def _search(self) -> list[RemoteProduct]:
+        """Enumerate the products to fetch (one per request, pre-C8).
+
+        The C3 search is a single product carrying the resolved
+        parameter codes and any explicit `sites=`; the real bbox site
+        discovery (one product per monitoring location) lands in C8.
+
+        Returns:
+            list[RemoteProduct]: One product whose `metadata` holds the
+                resolved `codes` and the explicit `sites` (or `None`).
+        """
+        codes = [] if self._service in _SITE_KEYED_SERVICES else self._resolved_codes()
+        return [
+            RemoteProduct(
+                id=self._service,
+                metadata={"codes": codes, "sites": self._sites},
+            )
+        ]
+
+    def _fetch(self, products: list[RemoteProduct]) -> list[pd.DataFrame]:
+        """Query each product's service and normalise to the long schema.
+
+        Widens the inherited `-> list[Path]` contract: a tabular
+        backend returns in-memory long-format frames, not file paths
+        (the write happens in :meth:`download` via :meth:`_write_table`).
+
+        Args:
+            products: The list returned by :meth:`_search`.
+
+        Returns:
+            list[pd.DataFrame]: One canonical long-schema frame per
+                product, same order.
+        """
+        return [self._fetch_one(product) for product in products]
+
+    def _fetch_one(self, product: RemoteProduct) -> pd.DataFrame:
+        """Fetch one product's service frame and normalise it.
+
+        Args:
+            product: One :class:`RemoteProduct` from :meth:`_search`.
+
+        Returns:
+            pd.DataFrame: The canonical long-schema frame for this
+                product (empty when the service returned nothing).
+        """
+        codes = product.metadata.get("codes", [])
+        sites = product.metadata.get("sites")
+        df, flavour = self._call_with_fallback(codes, sites)
+        return _helpers.normalize(df, flavour, self._code_meta(codes))
+
+    def _module(self, flavour: str):
+        """Lazily import the `dataretrieval` submodule for a flavour.
+
+        Args:
+            flavour: `"waterdata"` (modern) or `"nwis"` (legacy).
+
+        Returns:
+            The imported `dataretrieval.waterdata` / `dataretrieval.nwis`
+                module.
+
+        Raises:
+            ImportError: When `dataretrieval` is not installed (names
+                the `earthlens[usgs-water]` extra).
+        """
+        _import_dataretrieval()
+        if flavour == "waterdata":
+            import dataretrieval.waterdata as mod
+        else:
+            import dataretrieval.nwis as mod
+        return mod
+
+    def _invoke(
+        self, flavour: str, codes: list[str], sites: list[str] | None
+    ) -> pd.DataFrame:
+        """Call the resolved service function and return its raw frame.
+
+        Args:
+            flavour: `"waterdata"` or `"nwis"`.
+            codes: Resolved parameter codes.
+            sites: Explicit site numbers, or `None` for a bbox query.
+
+        Returns:
+            pd.DataFrame: The frame returned by the SDK call (the first
+                element when the SDK returns a `(frame, metadata)`
+                tuple).
+        """
+        module = self._module(flavour)
+        function = getattr(module, _helpers.service_function(self._service, flavour))
+        kwargs = _helpers.query_kwargs(
+            service=self._service,
+            flavour=flavour,
+            codes=codes,
+            sites=sites,
+            bbox=self._bbox_list(),
+            start=self.time.start_date.strftime("%Y-%m-%d"),
+            end=self.time.end_date.strftime("%Y-%m-%d"),
+            limit=self._limit,
+            stat_type=self._stat_type,
+        )
+        result = function(**kwargs)
+        return result[0] if isinstance(result, tuple) else result
+
+    def _call_with_fallback(
+        self, codes: list[str], sites: list[str] | None
+    ) -> tuple[pd.DataFrame, str]:
+        """Invoke the service, applying the modern→legacy fallbacks.
+
+        Two fallbacks fold in here (both honouring `api=`): a service
+        the modern endpoint can only query by site (e.g. instantaneous,
+        which has no `bbox`) routes to legacy when only a bbox is given;
+        and a modern HTTP 429 (anonymous rate-limit) under `api="auto"`
+        retries on legacy.
+
+        Args:
+            codes: Resolved parameter codes.
+            sites: Explicit site numbers, or `None` for a bbox query.
+
+        Returns:
+            tuple[pd.DataFrame, str]: The raw frame and the flavour
+                (`"waterdata"` / `"nwis"`) that produced it.
+
+        Raises:
+            ValueError: When `api="waterdata"` is forced for a
+                bbox-only query the modern endpoint cannot serve.
+        """
+        use_legacy = self._api == "legacy"
+        bbox_only = not sites
+        if (
+            not use_legacy
+            and bbox_only
+            and not _helpers.modern_supports_bbox(self._service)
+        ):
+            if self._api == "waterdata":
+                raise ValueError(
+                    f"The modern endpoint cannot query service "
+                    f"{self._service!r} by bbox (no bbox filter). Pass "
+                    f"sites=[...] explicitly, or use api='auto'/'legacy'."
+                )
+            use_legacy = True  # api="auto": legacy supports bBox
+
+        if use_legacy:
+            return self._invoke("nwis", codes, sites), "nwis"
+        try:
+            return self._invoke("waterdata", codes, sites), "waterdata"
+        except Exception as exc:  # noqa: BLE001 - re-raised unless a 429 fallback
+            anonymous = self._auth is None or not self._auth.is_authenticated()
+            if (
+                self._api == "auto"
+                and anonymous
+                and _helpers.is_rate_limit_error(exc)
+            ):
+                self._warn_legacy_fallback()
+                return self._invoke("nwis", codes, sites), "nwis"
+            raise
+
+    def _warn_legacy_fallback(self) -> None:
+        """Log a one-time warning when falling back to the legacy endpoint."""
+        if self._used_legacy_fallback:
+            return
+        self._used_legacy_fallback = True
+        logger.warning(
+            "USGS modern endpoint rate-limited this anonymous request "
+            "(HTTP 429); falling back to the legacy waterservices.usgs.gov "
+            "endpoint. Set API_USGS_PAT (or pass api_token=) to use the "
+            "modern endpoint without throttling."
+        )
+
+    def _code_meta(self, codes: list[str]) -> dict[str, tuple[str, str]]:
+        """Build a `{code: (name, units)}` map from the catalog.
+
+        Args:
+            codes: Resolved 5-digit parameter codes.
+
+        Returns:
+            dict[str, tuple[str, str]]: Friendly name + units per code
+                that the catalog curates; uncurated codes map to
+                `("", "")`.
+        """
+        by_code = {p.code: (p.name, p.units) for p in self._catalog.parameters.values()}
+        return {code: by_code.get(code, ("", "")) for code in codes}
+
+    def _write_table(self, df: pd.DataFrame) -> Path:
+        """Write the long-format table to `root_dir` and return the path.
+
+        Args:
+            df: The canonical long-format frame.
+
+        Returns:
+            Path: The written CSV / Parquet file path.
+        """
+        codes_part = "_".join(self._resolved_codes() or ["all"])
+        ext = "parquet" if self._output_format == "parquet" else "csv"
+        out_path = self.root_dir / f"usgs_{self._service}_{codes_part}.{ext}"
+        if self._output_format == "parquet":
+            df.to_parquet(out_path, index=False)
+        else:
+            df.to_csv(out_path, index=False)
+        return out_path
