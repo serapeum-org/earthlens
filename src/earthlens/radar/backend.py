@@ -85,6 +85,22 @@ def _volume_start(chunk_key: str) -> dt.datetime:
 
     Returns:
         datetime.datetime: The volume start time (naive UTC).
+
+    Examples:
+        - Parse the scan start from a volume's `S` (start) chunk key:
+            ```python
+            >>> from earthlens.radar.backend import _volume_start
+            >>> _volume_start("KTLX/871/20260524-005505-001-S").isoformat()
+            '2026-05-24T00:55:05'
+
+            ```
+        - The leading station / volume path segments are ignored:
+            ```python
+            >>> from earthlens.radar.backend import _volume_start
+            >>> _volume_start("KFWS/12/20240601-120000-003-E").hour
+            12
+
+            ```
     """
     stamp = chunk_key.rsplit("/", 1)[-1]  # 20260524-005505-001-S
     date_part, time_part = stamp.split("-")[:2]

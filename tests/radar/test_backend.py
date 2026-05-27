@@ -127,6 +127,49 @@ class TestSearch:
         """_first_key returns None when no objects live under the prefix."""
         assert Radar._first_key(fake_s3, "ZZZZ/") is None
 
+    def test_search_skips_volume_without_first_key(self, tmp_path, fake_s3, monkeypatch):
+        """A listed volume prefix with no first chunk is skipped (no product)."""
+        b = _make(tmp_path)
+        monkeypatch.setattr(b, "_list_prefixes", lambda client, prefix: ["KTLX/999/"])
+        monkeypatch.setattr(b, "_first_key", lambda client, prefix: None)
+        assert b._search() == []
+
+    def test_search_skips_volume_without_chunks(self, tmp_path, fake_s3, monkeypatch):
+        """An in-window volume whose full chunk list is empty is skipped."""
+        b = _make(tmp_path)
+        monkeypatch.setattr(b, "_list_prefixes", lambda client, prefix: ["KTLX/999/"])
+        monkeypatch.setattr(
+            b, "_first_key", lambda client, prefix: "KTLX/999/20240601-120000-001-S"
+        )
+        monkeypatch.setattr(b, "_list_keys", lambda client, prefix: [])
+        assert b._search() == []
+
+
+class TestWindow:
+    """Tests for the scan-time window helper."""
+
+    def test_window_extends_midnight_end_to_day_end(self, tmp_path):
+        """A date-only (midnight) end is extended to 23:59:59 of that day."""
+        b = _make(tmp_path, start="2024-06-01T00:00:00", end="2024-06-01T00:00:00")
+        _, end = b._window()
+        assert (end.hour, end.minute, end.second) == (23, 59, 59)
+
+    def test_window_keeps_explicit_end_time(self, tmp_path):
+        """A non-midnight end time is returned unchanged."""
+        b = _make(tmp_path, start="2024-06-01T00:00:00", end="2024-06-01T18:30:00")
+        _, end = b._window()
+        assert (end.hour, end.minute, end.second) == (18, 30, 0)
+
+
+class TestApi:
+    """Tests for the `_api` search/fetch composition."""
+
+    def test_api_returns_assembled_paths(self, tmp_path, fake_s3):
+        """_api composes search + fetch and returns the assembled .ar2v paths."""
+        paths = _make(tmp_path)._api()
+        assert len(paths) == 2
+        assert all(p.suffix == ".ar2v" for p in paths)
+
 
 class TestFetch:
     """Tests for the chunk assembly."""

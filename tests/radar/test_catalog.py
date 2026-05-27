@@ -81,6 +81,18 @@ class TestStationCatalog:
         cat = StationCatalog()
         assert cat.get_catalog() is cat.datasets
 
+    def test_missing_file_raises(self, tmp_path):
+        """A non-existent catalog path raises FileNotFoundError from the loader."""
+        with pytest.raises(FileNotFoundError):
+            catalog_mod._load_stations(tmp_path / "absent.yaml")
+
+    def test_explicit_datasets_skip_autoload(self):
+        """Supplying datasets= bypasses the bundled-YAML auto-load."""
+        custom = {"KXXX": Station(name="X", latitude=10.0, longitude=20.0, state="NA")}
+        cat = StationCatalog(datasets=custom)
+        assert cat.datasets == custom
+        assert cat.get_station("KXXX").latitude == 10.0
+
 
 class TestStation:
     """Tests for the Station row model."""
