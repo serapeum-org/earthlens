@@ -174,3 +174,36 @@ class TestLoaderHelpers:
     def test_catalog_path_is_directory(self):
         """The bundled CATALOG_PATH points at the per-theme directory."""
         assert catalog_mod.CATALOG_PATH.is_dir()
+
+    def test_load_available_reads_json(self, tmp_path: Path):
+        """The JSON `_available.json` index is read and cached."""
+        import json
+
+        (tmp_path / "_available.json").write_text(
+            json.dumps({"available_datasets": ["a", "b"]}), encoding="utf-8"
+        )
+        clear_catalog_cache()
+        names = catalog_mod._load_available(tmp_path / "_available.json")
+        assert names == ["a", "b"]
+
+    def test_load_available_absent_returns_empty(self, tmp_path: Path):
+        """A missing JSON index yields an empty list (no error)."""
+        clear_catalog_cache()
+        assert catalog_mod._load_available(tmp_path / "_available.json") == []
+
+
+class TestBundledAvailableIndex:
+    """Tests for the bundled JSON available-datasets index."""
+
+    def test_index_is_large_and_covers_curated(self):
+        """The bundled index is sizeable and every curated id is a member."""
+        catalog = Catalog()
+        index = set(catalog.available_datasets)
+        assert len(index) >= 1000
+        curated = {row.hdx_id for row in catalog.datasets.values()}
+        assert curated <= index
+
+    def test_catalog_loads_without_yaml_index(self):
+        """The curated YAML glob no longer includes a `_index.yaml`."""
+        files = catalog_mod._yaml_files_for(catalog_mod.CATALOG_PATH)
+        assert not any(f.name == "_index.yaml" for f in files)

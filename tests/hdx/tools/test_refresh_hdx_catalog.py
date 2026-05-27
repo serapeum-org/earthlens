@@ -52,14 +52,14 @@ class TestWriteIndex:
     """Tests for write_index."""
 
     def test_sorts_dedupes_and_counts(self, tmp_path: Path):
-        """The index is written sorted, de-duplicated, with a header."""
-        out = tmp_path / "_index.yaml"
+        """The JSON index is written sorted and de-duplicated."""
+        import json
+
+        out = tmp_path / "_available.json"
         count = tool.write_index(["b", "a", "b", "c"], out)
         assert count == 3
-        text = out.read_text(encoding="utf-8")
-        assert "available_datasets" in text
-        body = text.split("available_datasets:")[1]
-        assert body.index("a") < body.index("b") < body.index("c")
+        payload = json.loads(out.read_text(encoding="utf-8"))
+        assert payload["available_datasets"] == ["a", "b", "c"]
 
 
 class TestSearchDatasets:

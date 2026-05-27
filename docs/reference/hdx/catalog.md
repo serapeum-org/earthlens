@@ -11,8 +11,9 @@ default `resource_filter`, and the informational `output_kinds`.
 The catalogue lives as a directory of per-theme YAML files under
 `src/earthlens/hdx/catalog/` (`population.yaml`, `boundaries.yaml`,
 `buildings.yaml`, `socioeconomic.yaml`, `displacement.yaml`,
-`food_security.yaml`, `conflict.yaml`) plus `_index.yaml` for the
-auto-generated index. A dataset key declared in two files is rejected,
+`food_security.yaml`, `conflict.yaml`) plus a JSON `_available.json` for
+the auto-generated index (kept out of the curated `*.yaml` glob so the
+catalog loads fast, mirroring `earthlens.earthdata`'s `_auto.json`). A dataset key declared in two files is rejected,
 and unknown keys raise a `ValueError` with a did-you-mean hint.
 
 ## Curated datasets
@@ -74,7 +75,7 @@ downloaded unless the request names a filter.
 
 ## The `available_datasets:` index
 
-`catalog/_index.yaml` carries an informational list of HDX dataset ids
+`catalog/_available.json` carries an informational list of HDX dataset ids
 discovered for the curated organisations. It is **not** the full ~21k
 catalogue and runtime code does not consume it — it is a browse aid and
 the membership set the audit checks the curated keys against.
@@ -99,7 +100,7 @@ python tools/hdx/refresh_hdx_catalog.py audit --strict
 ```
 
 - **`refresh`** runs `Dataset.search_in_hdx(...)` filtered by
-  organisation / tag and rewrites `_index.yaml`.
+  organisation / tag and rewrites `_available.json`.
 - **`add-dataset`** reads one dataset live and prints a stanza,
   inferring `formats` and `output_kinds` from its resources.
 - **`audit`** loads the bundled catalogue and checks that every curated

@@ -5,7 +5,7 @@ catalog. Mirrors the shape of :mod:`earthlens.earthdata.catalog` and
 :mod:`earthlens.cmems.catalog`: the catalog ships as a directory of
 per-theme YAML files at `src/earthlens/hdx/catalog/`
 (`population.yaml`, `buildings.yaml`, `boundaries.yaml`, …) plus a
-single `_index.yaml` carrying the merged `available_datasets:` list
+single `_available.json` carrying the `available_datasets` list
 (the `C7` auto-generated index). Each per-theme file contributes its
 `datasets:` block; the loader unions them into one :class:`Catalog` at
 construction time.
@@ -45,12 +45,23 @@ CATALOG_PATH: Path = Path(__file__).parent / "catalog"
 # editing any per-theme file invalidates the entry without inspecting
 # every row. Mirrors the Earthdata / CMEMS multi-file pattern.
 _CATALOG_CACHE: dict[Any, tuple[list[str], dict[str, "HdxDataset"]]] = {}
+# Same `(path, mtime_ns)` cache for the auto-generated `available_datasets`
+# index. The index is held as JSON (`_available.json`), not YAML, and parsed
+# separately from the curated per-theme YAMLs — so a `Catalog()` pays only the
+# fast JSON read (a flat list of ~7k ids) instead of a multi-hundred-millisecond
+# YAML parse, mirroring how `earthlens.earthdata` keeps its long tail in
+# `_auto.json` out of the curated YAML glob.
+_AVAILABLE_CACHE: dict[Any, list[str]] = {}
+
+#: Filename of the JSON `available_datasets` index, kept beside the curated
+#: per-theme YAMLs (and out of the `*.yaml` glob).
+AVAILABLE_INDEX_NAME = "_available.json"
 
 OutputKindLiteral = Literal["raster", "vector", "tabular", "mixed"]
 
 
 def clear_catalog_cache() -> None:
-    """Empty the module-level catalog parse cache.
+    """Empty the module-level catalog parse caches.
 
     Useful in tests that rewrite the catalog on disk and want to force
     a re-parse. Production callers do not need this — the cache keys
@@ -58,6 +69,50 @@ def clear_catalog_cache() -> None:
     mutation invalidates the entry on its own.
     """
     _CATALOG_CACHE.clear()
+    _AVAILABLE_CACHE.clear()
+
+
+def _available_index_path(catalog_path: Path) -> Path:
+    """Return the `_available.json` path that sits beside a catalog path.
+
+    Args:
+        catalog_path: The catalog directory, or a single catalog YAML
+            file (the JSON is then looked for in its parent directory).
+
+    Returns:
+        Path: The sibling `_available.json` (which may not exist).
+    """
+    base = catalog_path if catalog_path.is_dir() else catalog_path.parent
+    return base / AVAILABLE_INDEX_NAME
+
+
+def _load_available(json_path: Path) -> list[str]:
+    """Read and cache the JSON `available_datasets` index.
+
+    Reads the `available_datasets` list from `json_path` without touching
+    the curated YAMLs — a flat list of HDX ids that parses in
+    milliseconds. Returns an empty list when the file is absent (e.g. a
+    custom catalog directory in a test that ships no index).
+
+    Args:
+        json_path: Path to the `_available.json` file.
+
+    Returns:
+        list[str]: The HDX ids in the index (empty when the file is
+            absent).
+    """
+    if not json_path.is_file():
+        return []
+    key = (str(json_path.resolve()), json_path.stat().st_mtime_ns)
+    cached = _AVAILABLE_CACHE.get(key)
+    if cached is not None:
+        return cached
+    import json
+
+    data = json.loads(json_path.read_text(encoding="utf-8")) or {}
+    names = list(data.get("available_datasets") or [])
+    _AVAILABLE_CACHE[key] = names
+    return names
 
 
 def _yaml_files_for(path: Path) -> list[Path]:
@@ -72,8 +127,8 @@ def _yaml_files_for(path: Path) -> list[Path]:
 
     Returns:
         Sorted list of YAML paths. For a directory, every `*.yaml`
-            sibling (including `_index.yaml`); for a file, just that
-            file.
+            sibling (the JSON `_available.json` index is read separately);
+            for a file, just that file.
 
     Raises:
         ValueError: If `path` is neither an existing directory nor an
@@ -274,9 +329,15 @@ class Catalog(AbstractCatalog):
             ValueError: Propagated from :func:`_load_catalog_data`.
         """
         catalog_path = catalog_path if catalog_path is not None else CATALOG_PATH
-        available_datasets, datasets = _load_catalog_data(catalog_path)
+        yaml_available, datasets = _load_catalog_data(catalog_path)
+        # The bundled index lives in a sibling `_available.json` (fast,
+        # out of the YAML glob); a custom catalog dir may instead carry an
+        # `available_datasets:` block inside its YAML. Union both so either
+        # layout works.
+        json_available = _load_available(_available_index_path(catalog_path))
+        available_datasets = list(dict.fromkeys([*json_available, *yaml_available]))
         return cls(
-            available_datasets=list(available_datasets),
+            available_datasets=available_datasets,
             datasets=dict(datasets),
         )
 
