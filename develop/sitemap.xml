@@ -245,19 +245,23 @@
          <lastmod>2026-05-27</lastmod>
     </url>
     <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/examples/nwm/catalog_explorer/</loc>
+         <loc>https://serapeum-org.github.io/earthlens/develop/examples/hdx/arbitrary_hdx_id/</loc>
          <lastmod>2026-05-27</lastmod>
     </url>
     <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/examples/nwm/deferred_and_subsetting/</loc>
+         <loc>https://serapeum-org.github.io/earthlens/develop/examples/hdx/catalog_explorer/</loc>
          <lastmod>2026-05-27</lastmod>
     </url>
     <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/examples/nwm/land_surface_short_range/</loc>
+         <loc>https://serapeum-org.github.io/earthlens/develop/examples/hdx/cod_admin_boundaries/</loc>
          <lastmod>2026-05-27</lastmod>
     </url>
     <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/examples/nwm/streamflow_short_range/</loc>
+         <loc>https://serapeum-org.github.io/earthlens/develop/examples/hdx/hotosm_building_export/</loc>
+         <lastmod>2026-05-27</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/examples/hdx/wfp_food_security_table/</loc>
          <lastmod>2026-05-27</lastmod>
     </url>
     <url>
@@ -509,19 +513,19 @@
          <lastmod>2026-05-27</lastmod>
     </url>
     <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/reference/nwm/datasets/</loc>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/hdx/catalog/</loc>
          <lastmod>2026-05-27</lastmod>
     </url>
     <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/reference/nwm/introduction/</loc>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/hdx/hdx/</loc>
          <lastmod>2026-05-27</lastmod>
     </url>
     <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/reference/nwm/nwm/</loc>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/hdx/introduction/</loc>
          <lastmod>2026-05-27</lastmod>
     </url>
     <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/reference/nwm/usage/</loc>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/hdx/usage/</loc>
          <lastmod>2026-05-27</lastmod>
     </url>
     <url>

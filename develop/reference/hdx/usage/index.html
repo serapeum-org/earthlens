@@ -10,13 +10,13 @@
       
       
       
-        <link rel="canonical" href="https://serapeum-org.github.io/earthlens/develop/reference/nwm/usage/">
+        <link rel="canonical" href="https://serapeum-org.github.io/earthlens/develop/reference/hdx/usage/">
       
       
         <link rel="prev" href="../introduction/">
       
       
-        <link rel="next" href="../datasets/">
+        <link rel="next" href="../catalog/">
       
       
         
@@ -83,7 +83,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#noaa-national-water-model-usage" class="md-skip">
+        <a href="#humanitarian-data-exchange-hdx-usage" class="md-skip">
           Skip to content
         </a>
       
@@ -2925,7 +2925,7 @@
   <span class="md-ellipsis">
     
   
-    National Water Model
+    HDX (humanitarian data)
   
 
     
@@ -2941,7 +2941,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    National Water Model
+    HDX (humanitarian data)
   
 
           </label>
@@ -3042,10 +3042,71 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#the-request-shape" class="md-nav__link">
+  <a href="#request-shape" class="md-nav__link">
     <span class="md-ellipsis">
       
-        The request shape
+        Request shape
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Request shape">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#variables-dataset-key-resource-filters" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        variables — dataset key → resource filters
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#the-hdx_id-resource-escape-hatch" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The hdx_id= / resource= escape hatch
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#other-keyword-arguments" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Other keyword arguments
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ignored-arguments-bbox-time" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Ignored arguments (bbox / time)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#output-kind-aggregate" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Output kind &amp; aggregate=
       
     </span>
   </a>
@@ -3053,10 +3114,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#keyword-arguments" class="md-nav__link">
+  <a href="#reading-the-downloaded-files" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Keyword arguments
+        Reading the downloaded files
       
     </span>
   </a>
@@ -3064,54 +3125,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#what-you-get-back" class="md-nav__link">
+  <a href="#rate-limits-gotchas" class="md-nav__link">
     <span class="md-ellipsis">
       
-        What you get back
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#cycles-and-steps" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Cycles and steps
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#why-aggregate-is-rejected" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Why aggregate= is rejected
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#subsetting-and-the-retrospective-archive" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Subsetting and the retrospective archive
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#catalog-tooling" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Catalog tooling
+        Rate limits &amp; gotchas
       
     </span>
   </a>
@@ -3134,14 +3151,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../datasets/" class="md-nav__link">
+      <a href="../catalog/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Products & configurations
+    Catalog & Tooling
   
 
     
@@ -3162,7 +3179,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../nwm/" class="md-nav__link">
+      <a href="../hdx/" class="md-nav__link">
         
   
   
@@ -6128,7 +6145,7 @@
   <span class="md-ellipsis">
     
   
-    National Water Model (NWM)
+    Humanitarian data (HDX)
   
 
     
@@ -6144,7 +6161,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    National Water Model (NWM)
+    Humanitarian data (HDX)
   
 
           </label>
@@ -6157,14 +6174,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/nwm/catalog_explorer/" class="md-nav__link">
+      <a href="../../../examples/hdx/catalog_explorer/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    NWM catalog explorer
+    HDX catalog explorer (no network)
   
 
     
@@ -6185,14 +6202,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/nwm/streamflow_short_range/" class="md-nav__link">
+      <a href="../../../examples/hdx/wfp_food_security_table/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Short-range streamflow ()
+    WFP topline figures (tabular CSV)
   
 
     
@@ -6213,14 +6230,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/nwm/land_surface_short_range/" class="md-nav__link">
+      <a href="../../../examples/hdx/cod_admin_boundaries/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Short-range land surface ()
+    Administrative boundaries (OCHA COD-AB)
   
 
     
@@ -6241,14 +6258,42 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/nwm/deferred_and_subsetting/" class="md-nav__link">
+      <a href="../../../examples/hdx/hotosm_building_export/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Subsetting, aggregation, and the retrospective archive
+    HOTOSM OpenStreetMap export (buildings)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../examples/hdx/arbitrary_hdx_id/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Fetch any HDX dataset by id (escape hatch)
   
 
     
@@ -6502,10 +6547,71 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#the-request-shape" class="md-nav__link">
+  <a href="#request-shape" class="md-nav__link">
     <span class="md-ellipsis">
       
-        The request shape
+        Request shape
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Request shape">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#variables-dataset-key-resource-filters" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        variables — dataset key → resource filters
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#the-hdx_id-resource-escape-hatch" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The hdx_id= / resource= escape hatch
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#other-keyword-arguments" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Other keyword arguments
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ignored-arguments-bbox-time" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Ignored arguments (bbox / time)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#output-kind-aggregate" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Output kind &amp; aggregate=
       
     </span>
   </a>
@@ -6513,10 +6619,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#keyword-arguments" class="md-nav__link">
+  <a href="#reading-the-downloaded-files" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Keyword arguments
+        Reading the downloaded files
       
     </span>
   </a>
@@ -6524,54 +6630,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#what-you-get-back" class="md-nav__link">
+  <a href="#rate-limits-gotchas" class="md-nav__link">
     <span class="md-ellipsis">
       
-        What you get back
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#cycles-and-steps" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Cycles and steps
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#why-aggregate-is-rejected" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Why aggregate= is rejected
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#subsetting-and-the-retrospective-archive" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Subsetting and the retrospective archive
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#catalog-tooling" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Catalog tooling
+        Rate limits &amp; gotchas
       
     </span>
   </a>
@@ -6595,7 +6657,7 @@
 
 
   
-    <a href="https://github.com/serapeum-org/earthlens/edit/master/docs/reference/nwm/usage.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
+    <a href="https://github.com/serapeum-org/earthlens/edit/master/docs/reference/hdx/usage.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
     </a>
@@ -6604,144 +6666,133 @@
     
       
     
-    <a href="https://github.com/serapeum-org/earthlens/raw/master/docs/reference/nwm/usage.md" title="View source of this page" class="md-content__button md-icon">
+    <a href="https://github.com/serapeum-org/earthlens/raw/master/docs/reference/hdx/usage.md" title="View source of this page" class="md-content__button md-icon">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 18c.56 0 1 .44 1 1s-.44 1-1 1-1-.44-1-1 .44-1 1-1m0-3c-2.73 0-5.06 1.66-6 4 .94 2.34 3.27 4 6 4s5.06-1.66 6-4c-.94-2.34-3.27-4-6-4m0 6.5a2.5 2.5 0 0 1-2.5-2.5 2.5 2.5 0 0 1 2.5-2.5 2.5 2.5 0 0 1 2.5 2.5 2.5 2.5 0 0 1-2.5 2.5M9.27 20H6V4h7v5h5v4.07c.7.08 1.36.25 2 .49V8l-6-6H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h4.5a8.2 8.2 0 0 1-1.23-2"/></svg>
     </a>
   
 
 
-<h1 id="noaa-national-water-model-usage"><a class="toclink" href="#noaa-national-water-model-usage">NOAA National Water Model — usage</a><a class="headerlink" href="#noaa-national-water-model-usage" title="Permanent link">#</a></h1>
-<h2 id="the-request-shape"><a class="toclink" href="#the-request-shape">The request shape</a><a class="headerlink" href="#the-request-shape" title="Permanent link">#</a></h2>
-<p>NWM is two-axis: <code>variables = {product: [variable, ...]}</code> selects the
-products, and <code>configuration=</code> picks the operational run that produced
-them.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
+<h1 id="humanitarian-data-exchange-hdx-usage"><a class="toclink" href="#humanitarian-data-exchange-hdx-usage">Humanitarian Data Exchange (HDX) — usage</a><a class="headerlink" href="#humanitarian-data-exchange-hdx-usage" title="Permanent link">#</a></h1>
+<h2 id="request-shape"><a class="toclink" href="#request-shape">Request shape</a><a class="headerlink" href="#request-shape" title="Permanent link">#</a></h2>
+<p>HDX has no bbox/time query, so the request is a mapping from a curated
+<strong>dataset key</strong> to a list of <strong>resource filters</strong>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.earthlens</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="n">lens</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;nwm&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">variables</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;chrtout&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;streamflow&quot;</span><span class="p">]},</span>   <span class="c1"># product -&gt; variables</span>
-<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="n">configuration</span><span class="o">=</span><span class="s2">&quot;short_range&quot;</span><span class="p">,</span>             <span class="c1"># which run</span>
-<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    <span class="n">start</span><span class="o">=</span><span class="s2">&quot;2026-05-26&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    <span class="n">end</span><span class="o">=</span><span class="s2">&quot;2026-05-26&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>    <span class="n">path</span><span class="o">=</span><span class="s2">&quot;./nwm_out&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="p">)</span>
-<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="n">paths</span> <span class="o">=</span> <span class="n">lens</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>                       <span class="c1"># -&gt; list[pathlib.Path]</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="n">paths</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;hdx&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">variables</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;hotosm-uganda-buildings&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;Geopackage&quot;</span><span class="p">]},</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="n">path</span><span class="o">=</span><span class="s2">&quot;data/hdx&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="c1"># -&gt; [PosixPath(&#39;data/hdx/hotosm_uga_buildings_gpkg.zip&#39;), ...]</span>
 </code></pre></div>
-<p>You can also drive the backend directly:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.nwm</span><span class="w"> </span><span class="kn">import</span> <span class="n">NWM</span>
-<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>
-<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="n">nwm</span> <span class="o">=</span> <span class="n">NWM</span><span class="p">(</span>
-<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>    <span class="n">start</span><span class="o">=</span><span class="s2">&quot;2026-05-26&quot;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">&quot;2026-05-26&quot;</span><span class="p">,</span>
-<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>    <span class="n">variables</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;ldasout&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;SOIL_M&quot;</span><span class="p">,</span> <span class="s2">&quot;SNEQV&quot;</span><span class="p">]},</span>
-<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">90</span><span class="p">,</span> <span class="mi">90</span><span class="p">],</span> <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">180</span><span class="p">,</span> <span class="mi">180</span><span class="p">],</span>   <span class="c1"># whole-Earth = no subset</span>
-<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>    <span class="n">configuration</span><span class="o">=</span><span class="s2">&quot;analysis_assim&quot;</span><span class="p">,</span>
-<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>    <span class="n">cycles</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">12</span><span class="p">],</span> <span class="n">steps</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
-<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>    <span class="n">path</span><span class="o">=</span><span class="s2">&quot;./nwm_out&quot;</span><span class="p">,</span>
-<a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="p">)</span>
-<a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a><span class="n">paths</span> <span class="o">=</span> <span class="n">nwm</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
+<p><code>download()</code> returns a <code>list[pathlib.Path]</code> — the local paths of the
+downloaded resource files, in dataset/resource order.</p>
+<h3 id="variables-dataset-key-resource-filters"><a class="toclink" href="#variables-dataset-key-resource-filters"><code>variables</code> — dataset key → resource filters</a><a class="headerlink" href="#variables-dataset-key-resource-filters" title="Permanent link">#</a></h3>
+<ul>
+<li>The <strong>key</strong> is a curated catalogue key (see
+  <a href="../catalog/">Catalog &amp; tooling</a> for the full list).</li>
+<li>The <strong>value</strong> is a list of resource filters. Each filter is either:<ul>
+<li>a <strong>resource-name glob</strong>, e.g. <code>"*.gpkg.gz"</code>, <code>"*.csv"</code>; or</li>
+<li>a <strong>CKAN format label</strong>, e.g. <code>"Geopackage"</code>, <code>"CSV"</code>,
+  <code>"GeoTIFF"</code>, <code>"SHP"</code> (case-insensitive).</li>
+</ul>
+</li>
+<li>An <strong>empty list</strong> falls back to the catalogue row's default
+  <code>resource_filter</code>; if that is also empty, <strong>every</strong> resource of the
+  dataset is downloaded.</li>
+</ul>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="n">EarthLens</span><span class="p">(</span><span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;hdx&quot;</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;kontur-population&quot;</span><span class="p">:</span> <span class="p">[]})</span>          <span class="c1"># default filter</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="n">EarthLens</span><span class="p">(</span><span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;hdx&quot;</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;cod-ab-kenya&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;GeoJSON&quot;</span><span class="p">]})</span>      <span class="c1"># by format label</span>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="n">EarthLens</span><span class="p">(</span><span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;hdx&quot;</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;hotosm-srilanka-roads&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;*.shp.zip&quot;</span><span class="p">]})</span>  <span class="c1"># by name glob</span>
 </code></pre></div>
-<h2 id="keyword-arguments"><a class="toclink" href="#keyword-arguments">Keyword arguments</a><a class="headerlink" href="#keyword-arguments" title="Permanent link">#</a></h2>
+<p>Multiple datasets in one call are allowed:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">EarthLens</span><span class="p">(</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>    <span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;hdx&quot;</span><span class="p">,</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>    <span class="n">variables</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;worldpop-kenya&quot;</span><span class="p">:</span> <span class="p">[],</span> <span class="s2">&quot;worldpop-ethiopia&quot;</span><span class="p">:</span> <span class="p">[]},</span>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="p">)</span>
+</code></pre></div>
+<h3 id="the-hdx_id-resource-escape-hatch"><a class="toclink" href="#the-hdx_id-resource-escape-hatch">The <code>hdx_id=</code> / <code>resource=</code> escape hatch</a><a class="headerlink" href="#the-hdx_id-resource-escape-hatch" title="Permanent link">#</a></h3>
+<p>To fetch <strong>any</strong> of the ~41k HDX datasets without a catalogue row, pass
+<code>hdx_id=</code> (and optionally <code>resource=</code>). It bypasses the catalogue:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">EarthLens</span><span class="p">(</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>    <span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;hdx&quot;</span><span class="p">,</span>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>    <span class="n">variables</span><span class="o">=</span><span class="p">{},</span>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>    <span class="n">hdx_id</span><span class="o">=</span><span class="s2">&quot;wfp-food-prices&quot;</span><span class="p">,</span>
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>    <span class="n">resource</span><span class="o">=</span><span class="s2">&quot;*.csv&quot;</span><span class="p">,</span>
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>    <span class="n">path</span><span class="o">=</span><span class="s2">&quot;data/hdx&quot;</span><span class="p">,</span>
+<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
+</code></pre></div>
+<p><code>resource=</code> accepts a single filter string or a list of them.</p>
+<h3 id="other-keyword-arguments"><a class="toclink" href="#other-keyword-arguments">Other keyword arguments</a><a class="headerlink" href="#other-keyword-arguments" title="Permanent link">#</a></h3>
 <table>
 <thead>
 <tr>
-<th>Argument</th>
+<th>Kwarg</th>
+<th>Default</th>
 <th>Meaning</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><code>variables</code></td>
-<td><code>{product: [variable, ...]}</code>. The MVP downloads whole files, so the variable list is <strong>validated</strong> (unknown names raise) but every variable in the file is fetched. An empty list selects all of the product's variables.</td>
+<td><code>hdx_site</code></td>
+<td><code>"prod"</code></td>
+<td>HDX site to target (<code>"prod"</code> / <code>"stage"</code>).</td>
 </tr>
 <tr>
-<td><code>configuration</code></td>
-<td>The operational run key: <code>"short_range"</code>, <code>"analysis_assim"</code>, or <code>"medium_range"</code>. Default <code>"short_range"</code>.</td>
+<td><code>user_agent</code></td>
+<td><code>"earthlens"</code></td>
+<td>User agent string the SDK requires.</td>
 </tr>
 <tr>
-<td><code>mode</code></td>
-<td><code>"operational"</code> (NetCDF) or <code>"retrospective"</code> (Zarr, <code>PY-G</code>-gated). <code>None</code> (default) auto-routes by the date window.</td>
+<td><code>hdx_id</code></td>
+<td><code>None</code></td>
+<td>Arbitrary HDX dataset id (escape hatch).</td>
 </tr>
 <tr>
-<td><code>member</code></td>
-<td>Ensemble member (1-based) for an ensemble configuration (<code>medium_range</code>, members 1–6); ignored for deterministic runs.</td>
+<td><code>resource</code></td>
+<td><code>None</code></td>
+<td>Resource filter(s) for the escape hatch.</td>
 </tr>
 <tr>
-<td><code>cycles</code></td>
-<td>Restrict the UTC run hours fetched (a subset of the configuration's run hours). Default: every cycle the configuration runs.</td>
-</tr>
-<tr>
-<td><code>steps</code></td>
-<td>Explicit forecast (<code>fNNN</code>) / analysis (<code>tmNN</code>) steps. Wins over <code>horizon</code>.</td>
-</tr>
-<tr>
-<td><code>horizon</code></td>
-<td>Maximum step; expands from the configuration's first step on its cadence.</td>
-</tr>
-<tr>
-<td><code>sites</code></td>
-<td>Explicit <code>feature_id</code>s / USGS gage ids to subset to — <strong><code>PY-G</code>-gated</strong> (raises).</td>
-</tr>
-<tr>
-<td><code>lat_lim</code> / <code>lon_lim</code></td>
-<td>Bounding box. A <strong>whole-Earth</strong> box (<code>[-90, 90]</code> / <code>[-180, 180]</code>) means "no spatial subset" — required to download whole files. A narrower box is a crop and is <strong><code>PY-G</code>-gated</strong>.</td>
-</tr>
-<tr>
-<td><code>path</code></td>
-<td>Output directory for the fetched NetCDF files.</td>
+<td><code>progress_bar</code></td>
+<td><code>True</code></td>
+<td>Best-effort progress signal on download.</td>
 </tr>
 </tbody>
 </table>
-<h2 id="what-you-get-back"><a class="toclink" href="#what-you-get-back">What you get back</a><a class="headerlink" href="#what-you-get-back" title="Permanent link">#</a></h2>
-<p><code>download()</code> returns a <code>list[pathlib.Path]</code> — one <strong>whole-CONUS</strong> NetCDF
-file per <code>(cycle, step, product)</code> it fetched. A <code>(cycle, step)</code> that is
-not yet published is logged and skipped (so one gap does not lose the
-rest of the request). Files are written atomically (a <code>.part</code> rename).</p>
-<p>Each <code>channel_rt</code> file is ~14 MB (all 2.7 M reaches at one timestep) and
-each <code>land</code> file is ~30 MB, so a multi-cycle, multi-step request can be
-large — narrow <code>cycles=</code> / <code>steps=</code> to keep it small.</p>
-<h2 id="cycles-and-steps"><a class="toclink" href="#cycles-and-steps">Cycles and steps</a><a class="headerlink" href="#cycles-and-steps" title="Permanent link">#</a></h2>
+<h3 id="ignored-arguments-bbox-time"><a class="toclink" href="#ignored-arguments-bbox-time">Ignored arguments (<code>bbox</code> / time)</a><a class="headerlink" href="#ignored-arguments-bbox-time" title="Permanent link">#</a></h3>
+<p><code>lat_lim</code> / <code>lon_lim</code> / <code>start</code> / <code>end</code> are accepted (the facade
+requires a bbox) but <strong>not used for the query</strong> — CKAN cannot be
+queried by space or time. They default to the whole globe and a wide
+date window and never narrow the resource selection.</p>
+<h2 id="output-kind-aggregate"><a class="toclink" href="#output-kind-aggregate">Output kind &amp; <code>aggregate=</code></a><a class="headerlink" href="#output-kind-aggregate" title="Permanent link">#</a></h2>
+<p><code>HDX.OUTPUT_KIND</code> is the fixed value <code>"mixed"</code>. The aggregator does not
+apply to arbitrary resource files, so passing <code>aggregate=</code> raises:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="n">EarthLens</span><span class="p">(</span><span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;hdx&quot;</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;kontur-population&quot;</span><span class="p">:</span> <span class="p">[]})</span><span class="o">.</span><span class="n">download</span><span class="p">(</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>    <span class="n">aggregate</span><span class="o">=</span><span class="n">some_config</span>
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="p">)</span>
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="c1"># NotImplementedError: HDX returns resource files as-is ... aggregate= is not applicable.</span>
+</code></pre></div>
+<h2 id="reading-the-downloaded-files"><a class="toclink" href="#reading-the-downloaded-files">Reading the downloaded files</a><a class="headerlink" href="#reading-the-downloaded-files" title="Permanent link">#</a></h2>
+<p>The MVP returns files in their native formats. Reading them is up to
+the caller (e.g. <code>pyramids</code> for GeoPackage / GeoTIFF, <code>pandas</code> for CSV):</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">geopandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">gpd</span>
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="n">paths</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
+<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>    <span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;hdx&quot;</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;cod-ab-kenya&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;GeoJSON&quot;</span><span class="p">]},</span> <span class="n">path</span><span class="o">=</span><span class="s2">&quot;data/hdx&quot;</span>
+<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
+<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="n">gdf</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">paths</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+</code></pre></div>
+<h2 id="rate-limits-gotchas"><a class="toclink" href="#rate-limits-gotchas">Rate limits &amp; gotchas</a><a class="headerlink" href="#rate-limits-gotchas" title="Permanent link">#</a></h2>
 <ul>
-<li><strong><code>short_range</code></strong> runs <strong>hourly</strong> (24 cycles/day) out to an <strong>18 h</strong>
-  forecast horizon (<code>f001</code>…<code>f018</code>).</li>
-<li><strong><code>analysis_assim</code></strong> runs <strong>hourly</strong> and publishes a short look-back
-  (<code>tm00</code>…<code>tm02</code>) — the best-estimate nowcast.</li>
-<li><strong><code>medium_range</code></strong> runs <strong>4×/day</strong> (00/06/12/18 UTC) out to <strong>240 h</strong>,
-  as a 6-member ensemble (the member rides on the file name,
-  <code>channel_rt_1</code>).</li>
+<li>HDX is public and unauthenticated; be considerate with large batches.</li>
+<li>Some resources (Kontur global GeoPackage, HRSL country bundles) are
+  <strong>large</strong> — filter to one resource and a small country where possible.</li>
+<li><code>Configuration.create</code> is a process-global singleton; constructing
+  several <code>HDX</code> instances reuses the one configuration (the backend
+  guards against the SDK's re-create error).</li>
 </ul>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c1"># A 240-hour medium-range ensemble member-2 streamflow forecast, every</span>
-<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="c1"># 6 hours from the 00z cycle:</span>
-<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="n">NWM</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="s2">&quot;2026-05-26&quot;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">&quot;2026-05-26&quot;</span><span class="p">,</span>
-<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>    <span class="n">variables</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;chrtout&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;streamflow&quot;</span><span class="p">]},</span>
-<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">90</span><span class="p">,</span> <span class="mi">90</span><span class="p">],</span> <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">180</span><span class="p">,</span> <span class="mi">180</span><span class="p">],</span>
-<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>    <span class="n">configuration</span><span class="o">=</span><span class="s2">&quot;medium_range&quot;</span><span class="p">,</span> <span class="n">member</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
-<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>    <span class="n">cycles</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">steps</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">241</span><span class="p">,</span> <span class="mi">6</span><span class="p">)),</span>
-<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>    <span class="n">path</span><span class="o">=</span><span class="s2">&quot;./nwm_out&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
-</code></pre></div>
-<h2 id="why-aggregate-is-rejected"><a class="toclink" href="#why-aggregate-is-rejected">Why <code>aggregate=</code> is rejected</a><a class="headerlink" href="#why-aggregate-is-rejected" title="Permanent link">#</a></h2>
-<p><code>chrtout</code> is feature-id-indexed (not a griddable raster), and a gridded
-<code>ldasout</code> temporal reduce needs to <em>read</em> the file — a pyramids <code>PY-G</code>
-capability. So <code>download(aggregate=...)</code> raises <code>NotImplementedError</code>.</p>
-<h2 id="subsetting-and-the-retrospective-archive"><a class="toclink" href="#subsetting-and-the-retrospective-archive">Subsetting and the retrospective archive</a><a class="headerlink" href="#subsetting-and-the-retrospective-archive" title="Permanent link">#</a></h2>
-<p>Operational files are whole-CONUS, so any subset (a <code>sites=</code> list, a
-narrower bbox) needs a read, as does the retrospective Zarr. Until the
-pyramids <code>PY-G</code> reader is released, these raise a clear
-<code>NotImplementedError</code> naming <code>PY-G</code>:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">NWM</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">sites</span><span class="o">=</span><span class="p">[</span><span class="mi">101</span><span class="p">])</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>                       <span class="c1"># raises (PY-G)</span>
-<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="n">NWM</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mi">30</span><span class="p">,</span> <span class="mi">40</span><span class="p">],</span> <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">100</span><span class="p">,</span> <span class="o">-</span><span class="mi">90</span><span class="p">])</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>  <span class="c1"># raises (PY-G)</span>
-<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="n">NWM</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;retrospective&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>              <span class="c1"># raises (PY-G)</span>
-</code></pre></div>
-<h2 id="catalog-tooling"><a class="toclink" href="#catalog-tooling">Catalog tooling</a><a class="headerlink" href="#catalog-tooling" title="Permanent link">#</a></h2>
-<p>Two read-only scripts (not part of the installed package) keep the
-catalog honest against the live bucket:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="c1"># Probe the bucket: retention window + the 69 live configurations.</span>
-<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>pixi<span class="w"> </span>run<span class="w"> </span>-e<span class="w"> </span>dev<span class="w"> </span>python<span class="w"> </span>tools/nwm/refresh_nwm_catalog.py
-<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>pixi<span class="w"> </span>run<span class="w"> </span>-e<span class="w"> </span>dev<span class="w"> </span>python<span class="w"> </span>tools/nwm/refresh_nwm_catalog.py<span class="w"> </span>--format<span class="w"> </span>yaml
-<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>
-<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="c1"># Diff the curated catalog vs live; exit non-zero on drift.</span>
-<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>pixi<span class="w"> </span>run<span class="w"> </span>-e<span class="w"> </span>dev<span class="w"> </span>python<span class="w"> </span>tools/nwm/audit_nwm_catalog.py<span class="w"> </span>--strict
-</code></pre></div>
 
 
 
@@ -6794,13 +6845,13 @@ catalog honest against the live bucket:</p>
         
         
           
-          <a href="../datasets/" class="md-footer__link md-footer__link--next" aria-label="Next: Products &amp; configurations">
+          <a href="../catalog/" class="md-footer__link md-footer__link--next" aria-label="Next: Catalog &amp; Tooling">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                Products & configurations
+                Catalog & Tooling
               </div>
             </div>
             <div class="md-footer__button md-icon">

@@ -10,10 +10,10 @@
       
       
       
-        <link rel="canonical" href="https://serapeum-org.github.io/earthlens/develop/examples/nwm/deferred_and_subsetting/">
+        <link rel="canonical" href="https://serapeum-org.github.io/earthlens/develop/examples/hdx/arbitrary_hdx_id/">
       
       
-        <link rel="prev" href="../land_surface_short_range/">
+        <link rel="prev" href="../hotosm_building_export/">
       
       
         <link rel="next" href="../../../reference/earthlens/">
@@ -27,7 +27,7 @@
     
     
       
-        <title>Subsetting, aggregation, and the retrospective archive - earthlens</title>
+        <title>Fetch any HDX dataset by id (escape hatch) - earthlens</title>
       
     
     
@@ -83,7 +83,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#subsetting-aggregation-and-the-retrospective-archive" class="md-skip">
+        <a href="#fetch-any-hdx-dataset-by-id-escape-hatch" class="md-skip">
           Skip to content
         </a>
       
@@ -123,7 +123,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Subsetting, aggregation, and the retrospective archive
+              Fetch any HDX dataset by id (escape hatch)
             
           </span>
         </div>
@@ -2918,7 +2918,7 @@
   <span class="md-ellipsis">
     
   
-    National Water Model
+    HDX (humanitarian data)
   
 
     
@@ -2934,7 +2934,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    National Water Model
+    HDX (humanitarian data)
   
 
           </label>
@@ -2947,7 +2947,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../reference/nwm/introduction/" class="md-nav__link">
+      <a href="../../../reference/hdx/introduction/" class="md-nav__link">
         
   
   
@@ -2975,7 +2975,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../reference/nwm/usage/" class="md-nav__link">
+      <a href="../../../reference/hdx/usage/" class="md-nav__link">
         
   
   
@@ -3003,14 +3003,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../reference/nwm/datasets/" class="md-nav__link">
+      <a href="../../../reference/hdx/catalog/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Products & configurations
+    Catalog & Tooling
   
 
     
@@ -3031,7 +3031,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../reference/nwm/nwm/" class="md-nav__link">
+      <a href="../../../reference/hdx/hdx/" class="md-nav__link">
         
   
   
@@ -6004,7 +6004,7 @@
   <span class="md-ellipsis">
     
   
-    National Water Model (NWM)
+    Humanitarian data (HDX)
   
 
     
@@ -6020,7 +6020,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    National Water Model (NWM)
+    Humanitarian data (HDX)
   
 
           </label>
@@ -6040,7 +6040,7 @@
   <span class="md-ellipsis">
     
   
-    NWM catalog explorer
+    HDX catalog explorer (no network)
   
 
     
@@ -6061,14 +6061,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../streamflow_short_range/" class="md-nav__link">
+      <a href="../wfp_food_security_table/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Short-range streamflow ()
+    WFP topline figures (tabular CSV)
   
 
     
@@ -6089,14 +6089,42 @@
   
   
     <li class="md-nav__item">
-      <a href="../land_surface_short_range/" class="md-nav__link">
+      <a href="../cod_admin_boundaries/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Short-range land surface ()
+    Administrative boundaries (OCHA COD-AB)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../hotosm_building_export/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    HOTOSM OpenStreetMap export (buildings)
   
 
     
@@ -6126,24 +6154,6 @@
         
       
       
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Subsetting, aggregation, and the retrospective archive
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
       <a href="./" class="md-nav__link md-nav__link--active">
         
   
@@ -6151,7 +6161,7 @@
   <span class="md-ellipsis">
     
   
-    Subsetting, aggregation, and the retrospective archive
+    Fetch any HDX dataset by id (escape hatch)
   
 
     
@@ -6160,69 +6170,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#a-bounding-box-crop-is-gated" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        A bounding-box crop is -gated
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#a-reach-selection-is-gated" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        A reach selection is -gated
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#the-retrospective-zarr-is-gated-and-auto-routed-by-date" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        The retrospective Zarr is -gated (and auto-routed by date)
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#is-rejected" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        is rejected
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
       
     </li>
   
@@ -6462,58 +6409,6 @@
     
   
   
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#a-bounding-box-crop-is-gated" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        A bounding-box crop is -gated
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#a-reach-selection-is-gated" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        A reach selection is -gated
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#the-retrospective-zarr-is-gated-and-auto-routed-by-date" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        The retrospective Zarr is -gated (and auto-routed by date)
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#is-rejected" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        is rejected
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
 </nav>
                   </div>
                 </div>
@@ -6529,7 +6424,7 @@
 
 
   
-    <a href="https://github.com/serapeum-org/earthlens/edit/master/docs/examples/nwm/deferred_and_subsetting.ipynb" title="Edit this page" class="md-content__button md-icon" rel="edit">
+    <a href="https://github.com/serapeum-org/earthlens/edit/master/docs/examples/hdx/arbitrary_hdx_id.ipynb" title="Edit this page" class="md-content__button md-icon" rel="edit">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
     </a>
@@ -6538,7 +6433,7 @@
     
       
     
-    <a href="https://github.com/serapeum-org/earthlens/raw/master/docs/examples/nwm/deferred_and_subsetting.ipynb" title="View source of this page" class="md-content__button md-icon">
+    <a href="https://github.com/serapeum-org/earthlens/raw/master/docs/examples/hdx/arbitrary_hdx_id.ipynb" title="View source of this page" class="md-content__button md-icon">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 18c.56 0 1 .44 1 1s-.44 1-1 1-1-.44-1-1 .44-1 1-1m0-3c-2.73 0-5.06 1.66-6 4 .94 2.34 3.27 4 6 4s5.06-1.66 6-4c-.94-2.34-3.27-4-6-4m0 6.5a2.5 2.5 0 0 1-2.5-2.5 2.5 2.5 0 0 1 2.5-2.5 2.5 2.5 0 0 1 2.5 2.5 2.5 2.5 0 0 1-2.5 2.5M9.27 20H6V4h7v5h5v4.07c.7.08 1.36.25 2 .49V8l-6-6H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h4.5a8.2 8.2 0 0 1-1.23-2"/></svg>
     </a>
@@ -7266,23 +7161,18 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </style>
 <!-- End of mermaid configuration --><div class="jupyter-wrapper">
 <div class="jp-Notebook" data-jp-theme-light="true" data-jp-theme-name="JupyterLab Light">
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=407d545e">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=51ab6a60">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h1 id="subsetting-aggregation-and-the-retrospective-archive">Subsetting, aggregation, and the retrospective archive<a class="anchor-link" href="#subsetting-aggregation-and-the-retrospective-archive">¶</a></h1><p>This notebook needs <strong>no network</strong>. It documents — by running them —
-the behaviours that are deliberately deferred to the pyramids <code>PY-G</code>
-reader (unreleased), so there are no surprises.</p>
-<p>NWM operational files are whole-CONUS, so <strong>any subset needs a read</strong>.
-Until <code>PY-G</code> lands, every subset path raises a clear
-<code>NotImplementedError</code> naming it.</p>
+<h1 id="fetch-any-hdx-dataset-by-id-escape-hatch">Fetch any HDX dataset by id (escape hatch)<a class="anchor-link" href="#fetch-any-hdx-dataset-by-id-escape-hatch">¶</a></h1><p>Beyond the curated catalogue, <code>hdx_id=</code> fetches <strong>any</strong> of the ~21k HDX datasets by its id, with an optional <code>resource=</code> filter. <strong>Live</strong> public query; wrapped for offline <code>nbval-lax</code>.</p>
 </div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=75febdf7">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=440af53f">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7300,47 +7190,24 @@ Until <code>PY-G</code> lands, every subset path raises a clear
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.nwm</span><span class="w"> </span><span class="kn">import</span> <span class="n">NWM</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">earthlens</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
 
-<span class="n">WHOLE</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">90</span><span class="p">,</span> <span class="mi">90</span><span class="p">],</span> <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">180</span><span class="p">,</span> <span class="mi">180</span><span class="p">])</span>
-
-
-<span class="k">def</span><span class="w"> </span><span class="nf">show</span><span class="p">(</span><span class="n">label</span><span class="p">,</span> <span class="n">fn</span><span class="p">):</span>
-    <span class="k">try</span><span class="p">:</span>
-        <span class="n">fn</span><span class="p">()</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="n">label</span><span class="si">}</span><span class="s1">: (no error)'</span><span class="p">)</span>
-    <span class="k">except</span> <span class="ne">NotImplementedError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="n">label</span><span class="si">}</span><span class="s1">: NotImplementedError -&gt; </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">exc</span><span class="p">)[:</span><span class="mi">80</span><span class="p">]</span><span class="si">}</span><span class="s1">...'</span><span class="p">)</span>
+<span class="n">OUT_DIR</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s1">'hdx_output'</span><span class="p">)</span>
+<span class="n">OUT_DIR</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-1">from earthlens.nwm import NWM
+<div class="clipboard-copy-txt" id="cell-1">from pathlib import Path
+from earthlens import EarthLens
 
-WHOLE = dict(lat_lim=[-90, 90], lon_lim=[-180, 180])
-
-
-def show(label, fn):
-    try:
-        fn()
-        print(f'{label}: (no error)')
-    except NotImplementedError as exc:
-        print(f'{label}: NotImplementedError -&gt; {str(exc)[:80]}...')</div>
+OUT_DIR = Path('hdx_output')
+OUT_DIR.mkdir(exist_ok=True)</div>
 </div>
 </div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=1412666d">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="a-bounding-box-crop-is-py-g-gated">A bounding-box crop is <code>PY-G</code>-gated<a class="anchor-link" href="#a-bounding-box-crop-is-py-g-gated">¶</a></h3>
 </div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=9a773b15">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=a32dcdf2">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7358,146 +7225,31 @@ def show(label, fn):
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">bbox</span> <span class="o">=</span> <span class="n">NWM</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="s1">'2026-05-26'</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s1">'2026-05-26'</span><span class="p">,</span>
-           <span class="n">variables</span><span class="o">=</span><span class="p">{</span><span class="s1">'chrtout'</span><span class="p">:</span> <span class="p">[</span><span class="s1">'streamflow'</span><span class="p">]},</span>
-           <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mi">30</span><span class="p">,</span> <span class="mi">40</span><span class="p">],</span> <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">100</span><span class="p">,</span> <span class="o">-</span><span class="mi">90</span><span class="p">])</span>
-<span class="n">show</span><span class="p">(</span><span class="s1">'bbox crop'</span><span class="p">,</span> <span class="k">lambda</span><span class="p">:</span> <span class="n">bbox</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">progress_bar</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">paths</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">paths</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
+        <span class="n">data_source</span><span class="o">=</span><span class="s1">'hdx'</span><span class="p">,</span>
+        <span class="n">variables</span><span class="o">=</span><span class="p">{},</span>
+        <span class="n">hdx_id</span><span class="o">=</span><span class="s1">'wfp-topline-figures'</span><span class="p">,</span>
+        <span class="n">resource</span><span class="o">=</span><span class="s1">'*.csv'</span><span class="p">,</span>
+        <span class="n">path</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">OUT_DIR</span><span class="p">),</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">progress_bar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">'downloaded:'</span><span class="p">,</span> <span class="p">[</span><span class="n">Path</span><span class="p">(</span><span class="n">p</span><span class="p">)</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">paths</span><span class="p">])</span>
+<span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'skipped live query: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">exc</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s1">: </span><span class="si">{</span><span class="n">exc</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-2">bbox = NWM(start='2026-05-26', end='2026-05-26',
-           variables={'chrtout': ['streamflow']},
-           lat_lim=[30, 40], lon_lim=[-100, -90])
-show('bbox crop', lambda: bbox.download(progress_bar=False))</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=70bfec6f">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="a-sites-reach-selection-is-py-g-gated">A <code>sites=</code> reach selection is <code>PY-G</code>-gated<a class="anchor-link" href="#a-sites-reach-selection-is-py-g-gated">¶</a></h3>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=16e7d27d">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="CodeMirror cm-s-jupyter">
-<div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-3">
-<div>
-<span class="notice" hidden="">Copied!</span>
-<svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
-<path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z" fill="currentColor" fill-rule="evenodd"></path>
-<path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z" fill="currentColor" fill-rule="evenodd"></path>
-</svg>
-</div>
-</clipboard-copy>
-</div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">sites</span> <span class="o">=</span> <span class="n">NWM</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="s1">'2026-05-26'</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s1">'2026-05-26'</span><span class="p">,</span>
-            <span class="n">variables</span><span class="o">=</span><span class="p">{</span><span class="s1">'chrtout'</span><span class="p">:</span> <span class="p">[</span><span class="s1">'streamflow'</span><span class="p">]},</span>
-            <span class="n">sites</span><span class="o">=</span><span class="p">[</span><span class="mi">101</span><span class="p">,</span> <span class="mi">202</span><span class="p">],</span> <span class="o">**</span><span class="n">WHOLE</span><span class="p">)</span>
-<span class="n">show</span><span class="p">(</span><span class="s1">'sites='</span><span class="p">,</span> <span class="k">lambda</span><span class="p">:</span> <span class="n">sites</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">progress_bar</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
-</pre></div>
-<div class="clipboard-copy-txt" id="cell-3">sites = NWM(start='2026-05-26', end='2026-05-26',
-            variables={'chrtout': ['streamflow']},
-            sites=[101, 202], **WHOLE)
-show('sites=', lambda: sites.download(progress_bar=False))</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=a3b8853a">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="the-retrospective-zarr-is-py-g-gated-and-auto-routed-by-date">The retrospective Zarr is <code>PY-G</code>-gated (and auto-routed by date)<a class="anchor-link" href="#the-retrospective-zarr-is-py-g-gated-and-auto-routed-by-date">¶</a></h3>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=fda7a91d">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="CodeMirror cm-s-jupyter">
-<div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-4">
-<div>
-<span class="notice" hidden="">Copied!</span>
-<svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
-<path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z" fill="currentColor" fill-rule="evenodd"></path>
-<path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z" fill="currentColor" fill-rule="evenodd"></path>
-</svg>
-</div>
-</clipboard-copy>
-</div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">retro</span> <span class="o">=</span> <span class="n">NWM</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="s1">'2000-01-01'</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s1">'2000-01-02'</span><span class="p">,</span>
-            <span class="n">variables</span><span class="o">=</span><span class="p">{</span><span class="s1">'chrtout'</span><span class="p">:</span> <span class="p">[</span><span class="s1">'streamflow'</span><span class="p">]},</span> <span class="o">**</span><span class="n">WHOLE</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">'auto-routed mode for a year-2000 window:'</span><span class="p">,</span> <span class="n">retro</span><span class="o">.</span><span class="n">_mode</span><span class="p">)</span>
-<span class="n">show</span><span class="p">(</span><span class="s1">'retrospective'</span><span class="p">,</span> <span class="k">lambda</span><span class="p">:</span> <span class="n">retro</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">progress_bar</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
-</pre></div>
-<div class="clipboard-copy-txt" id="cell-4">retro = NWM(start='2000-01-01', end='2000-01-02',
-            variables={'chrtout': ['streamflow']}, **WHOLE)
-print('auto-routed mode for a year-2000 window:', retro._mode)
-show('retrospective', lambda: retro.download(progress_bar=False))</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=04754cf1">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="aggregate-is-rejected"><code>aggregate=</code> is rejected<a class="anchor-link" href="#aggregate-is-rejected">¶</a></h3><p><code>chrtout</code> is feature-id indexed (not griddable) and a gridded <code>ldasout</code>
-reduce needs a read, so the temporal aggregator is not supported.</p>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=5cb4dfc7">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="CodeMirror cm-s-jupyter">
-<div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-5">
-<div>
-<span class="notice" hidden="">Copied!</span>
-<svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
-<path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z" fill="currentColor" fill-rule="evenodd"></path>
-<path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z" fill="currentColor" fill-rule="evenodd"></path>
-</svg>
-</div>
-</clipboard-copy>
-</div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">agg</span> <span class="o">=</span> <span class="n">NWM</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="s1">'2026-05-26'</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s1">'2026-05-26'</span><span class="p">,</span>
-          <span class="n">variables</span><span class="o">=</span><span class="p">{</span><span class="s1">'chrtout'</span><span class="p">:</span> <span class="p">[</span><span class="s1">'streamflow'</span><span class="p">]},</span> <span class="o">**</span><span class="n">WHOLE</span><span class="p">)</span>
-<span class="n">show</span><span class="p">(</span><span class="s1">'aggregate='</span><span class="p">,</span> <span class="k">lambda</span><span class="p">:</span> <span class="n">agg</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">aggregate</span><span class="o">=</span><span class="nb">object</span><span class="p">()))</span>
-</pre></div>
-<div class="clipboard-copy-txt" id="cell-5">agg = NWM(start='2026-05-26', end='2026-05-26',
-          variables={'chrtout': ['streamflow']}, **WHOLE)
-show('aggregate=', lambda: agg.download(aggregate=object()))</div>
+<div class="clipboard-copy-txt" id="cell-2">paths = None
+try:
+    paths = EarthLens(
+        data_source='hdx',
+        variables={},
+        hdx_id='wfp-topline-figures',
+        resource='*.csv',
+        path=str(OUT_DIR),
+    ).download(progress_bar=False)
+    print('downloaded:', [Path(p).name for p in paths])
+except Exception as exc:
+    print(f'skipped live query: {type(exc).__name__}: {exc}')</div>
 </div>
 </div>
 </div>
@@ -7546,7 +7298,7 @@ show('aggregate=', lambda: agg.download(aggregate=object()))</div>
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
           
-          <a href="../land_surface_short_range/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Short-range land surface ()">
+          <a href="../hotosm_building_export/" class="md-footer__link md-footer__link--prev" aria-label="Previous: HOTOSM OpenStreetMap export (buildings)">
             <div class="md-footer__button md-icon">
               
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
@@ -7556,7 +7308,7 @@ show('aggregate=', lambda: agg.download(aggregate=object()))</div>
                 Previous
               </span>
               <div class="md-ellipsis">
-                Short-range land surface ()
+                HOTOSM OpenStreetMap export (buildings)
               </div>
             </div>
           </a>
