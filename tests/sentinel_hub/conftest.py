@@ -95,8 +95,8 @@ class FakeSentinelHubRequest:
         evalscript: str,
         input_data: list,
         responses: list,
-        bbox: Any,
-        size: tuple,
+        bbox: Any = None,
+        size: tuple | None = None,
         data_folder: str | None = None,
         config: Any = None,
         **kwargs: Any,
@@ -291,6 +291,59 @@ class FakeSentinelHubStatistical:
         ]
 
 
+class FakeBatchProcessRequest:
+    """Stand-in for `sentinelhub.BatchProcessRequest`."""
+
+    def __init__(self) -> None:
+        self.completion_percentage = 100.0
+
+
+class FakeBatchProcessClient:
+    """Stand-in for `sentinelhub.BatchProcessClient` recording the job lifecycle."""
+
+    instances: list[FakeBatchProcessClient] = []
+
+    def __init__(self, config: Any = None) -> None:
+        self.config = config
+        self.calls: list[str] = []
+        FakeBatchProcessClient.instances.append(self)
+
+    @staticmethod
+    def s3_specification(url: str, **kwargs: Any) -> dict:
+        """Record an S3 delivery spec."""
+        return {"url": url, **kwargs}
+
+    @staticmethod
+    def tiling_grid_input(grid_id: int, resolution: float, **kwargs: Any) -> dict:
+        """Record a tiling-grid input."""
+        return {"grid_id": grid_id, "resolution": resolution, **kwargs}
+
+    @staticmethod
+    def raster_output(delivery: Any, **kwargs: Any) -> dict:
+        """Record a raster-output spec."""
+        return {"delivery": delivery, **kwargs}
+
+    def create(self, process_request: Any, input: Any, output: Any, **kwargs: Any):
+        """Record batch-request creation and return a fake request."""
+        self.calls.append("create")
+        self.created = {"input": input, "output": output}
+        return FakeBatchProcessRequest()
+
+    def start_analysis(self, batch_request: Any):
+        """Record the analysis step."""
+        self.calls.append("start_analysis")
+
+    def start_job(self, batch_request: Any):
+        """Record the job start."""
+        self.calls.append("start_job")
+
+
+def fake_monitor_batch_process_job(request: Any, client: Any, **kwargs: Any):
+    """Stand-in for `monitor_batch_process_job`: completes immediately."""
+    client.calls.append("monitor")
+    return request
+
+
 def fake_bbox_to_dimensions(bbox: Any, resolution: float) -> tuple[int, int]:
     """Deterministic `bbox_to_dimensions`: (degrees * 1000 / resolution) per side."""
     west, south, east, north = bbox.bbox
@@ -312,8 +365,10 @@ class FakeSentinelHub:
     AsyncProcessRequest = FakeAsyncProcessRequest
     SentinelHubStatistical = FakeSentinelHubStatistical
     Geometry = FakeGeometry
+    BatchProcessClient = FakeBatchProcessClient
     bbox_to_dimensions = staticmethod(fake_bbox_to_dimensions)
     get_async_running_status = staticmethod(fake_get_async_running_status)
+    monitor_batch_process_job = staticmethod(fake_monitor_batch_process_job)
 
 
 @pytest.fixture
@@ -323,6 +378,7 @@ def fake_sh(monkeypatch: pytest.MonkeyPatch) -> FakeSentinelHub:
     FakeSentinelHubRequest.instances = []
     FakeAsyncProcessRequest.instances = []
     FakeSentinelHubStatistical.instances = []
+    FakeBatchProcessClient.instances = []
     monkeypatch.setitem(sys.modules, "sentinelhub", module)
     return module
 

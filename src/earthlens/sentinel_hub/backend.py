@@ -606,11 +606,68 @@ class SentinelHub(AbstractDataSource):
         logger.info(f"Sentinel Hub tiling: merged {len(tiles)} tile(s) per product")
         return out
 
-    def _fetch_batch(self, products: list[RemoteProduct]) -> list[Any]:
-        """Render via the Batch Processing API to S3 (C8)."""
-        raise NotImplementedError(
-            "the Batch Processing plane is implemented in C8."
+    def _fetch_batch(self, products: list[RemoteProduct]) -> list[str]:
+        """Render a very large AOI via the Batch Processing API, tiled to S3.
+
+        Builds the base Process request, then creates a batch request with a
+        server-side tiling grid delivering to the `batch_output` S3 bucket,
+        runs analysis → start → monitor, and returns the S3 destination URIs.
+        Requires an S3 `batch_output` with at least a bucket; `grid_id` selects
+        the tiling grid (default 0).
+
+        Args:
+            products: The list returned by :meth:`_search`.
+
+        Returns:
+            The S3 destination URIs, one per product.
+
+        Raises:
+            ValueError: When no `batch_output` (S3 bucket) was supplied.
+        """
+        sentinelhub = import_sentinelhub()
+        if not self._batch_output:
+            raise ValueError(
+                "the Batch Processing plane tiles server-side to S3, so it needs "
+                "batch_output={'bucket': 's3://…', 'iam_role_arn': '…', "
+                "'grid_id': <int>}."
+            )
+        cfg = self._auth.config()
+        client = sentinelhub.BatchProcessClient(config=cfg)
+        spec = dict(self._batch_output)
+        grid_id = spec.pop("grid_id", 0)
+        buffer_x = spec.pop("buffer_x", None)
+        buffer_y = spec.pop("buffer_y", None)
+        url = spec.pop("bucket", None) or spec.pop("url", None)
+        delivery = client.s3_specification(url=url, **spec)
+        tiling = client.tiling_grid_input(
+            grid_id=grid_id,
+            resolution=self._resolution,
+            buffer_x=buffer_x,
+            buffer_y=buffer_y,
         )
+        output = client.raster_output(delivery=delivery)
+        sh_bbox = self._bbox()
+        out: list[str] = []
+        for product in products:
+            resolved: ResolvedRequest = product.metadata["resolved"]
+            base = sentinelhub.SentinelHubRequest(
+                evalscript=self._read_evalscript(resolved),
+                input_data=[self._build_input_data(sentinelhub, resolved)],
+                responses=[
+                    sentinelhub.SentinelHubRequest.output_response(
+                        "default", sentinelhub.MimeType.TIFF
+                    )
+                ],
+                bbox=sh_bbox,
+                config=cfg,
+            )
+            batch_request = client.create(base, input=tiling, output=output)
+            client.start_analysis(batch_request)
+            client.start_job(batch_request)
+            sentinelhub.monitor_batch_process_job(batch_request, client)
+            out.append(str(url))
+        logger.info(f"Sentinel Hub batch: {len(out)} job(s) delivered to S3")
+        return out
 
     def _statistical_evalscript(self, resolved: ResolvedRequest) -> str:
         """Resolve the evalscript for a Statistical request (must emit `dataMask`).
