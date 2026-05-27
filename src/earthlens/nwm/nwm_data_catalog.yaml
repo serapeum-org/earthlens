@@ -1,0 +1,125 @@
+# NOAA National Water Model (NWM v3.0) data catalog.
+#
+# Two top-level blocks the loader (earthlens.nwm.catalog.Catalog) reads:
+#
+#   products:        the "dataset" rows, keyed by a product key the user
+#                    names in `variables={product: [variable, ...]}`. Each
+#                    product carries its output kind (tabular for the
+#                    stream-reach channel routing, raster for the gridded
+#                    land surface), its dimensions, the S3 filename token,
+#                    the configurations it is published under, the
+#                    retrospective Zarr store, and its variables.
+#
+#   configurations:  the operational run families on `s3://noaa-nwm-pds`,
+#                    keyed by configuration key (`short_range`, ...). Each
+#                    carries the daily run hours, the forecast/analysis
+#                    step scheme, the horizon, the domain, and (for the
+#                    ensembles) the member count. A concrete S3 key is
+#                    assembled from a (configuration, product, cycle, step)
+#                    tuple by the backend.
+#
+# Only the clean CONUS configurations are curated here (the MVP scope:
+# CHRTOUT + LDASOUT operational). Regional (Alaska / Hawaii / Puerto Rico),
+# coastal, forcing, and the `_no_da` / `_extend` / `_blend` analysis
+# variants exist on the bucket (59 in all, see tools/nwm/refresh_nwm_catalog.py)
+# and can be added as rows later.
+
+products:
+
+  chrtout:
+    output_kind: tabular            # streamflow per feature_id, not a raster
+    dims: [feature_id, time]
+    s3_token: channel_rt            # the {output} token in the S3 file name
+    configurations: [short_range, analysis_assim, medium_range]
+    retro_zarr: "s3://noaa-nwm-retrospective-3-0-pds/CONUS/zarr/chrtout.zarr"
+    description: >-
+      Channel routing output (CHRTOUT) — streamflow and velocity on the
+      ~2.7M NHDPlus v2 stream reaches, indexed by feature_id (COMID). One
+      whole-CONUS file (~14 MB) holds every reach at one timestep.
+    variables:
+      streamflow:
+        units: "m3 s-1"
+        long_name: "River channel flow rate"
+      velocity:
+        units: "m s-1"
+        long_name: "River channel flow velocity"
+      nudge:
+        units: "m3 s-1"
+        long_name: "Amount of total flow nudged by data assimilation"
+      qSfcLatRunoff:
+        units: "m3 s-1"
+        long_name: "Runoff from terrain routing"
+      qBucket:
+        units: "m3 s-1"
+        long_name: "Flux from groundwater bucket"
+
+  ldasout:
+    output_kind: raster             # gridded land-surface states (1 km CONUS)
+    dims: [y, x, time]
+    s3_token: land                  # the {output} token in the S3 file name
+    configurations: [short_range, analysis_assim, medium_range]
+    retro_zarr: "s3://noaa-nwm-retrospective-3-0-pds/CONUS/zarr/ldasout.zarr"
+    description: >-
+      Land-surface output (LDASOUT) — gridded Noah-MP states on the 1 km
+      CONUS grid: soil moisture, snow water equivalent, snow depth, and
+      accumulated evapotranspiration.
+    variables:
+      SOIL_M:
+        units: "m3 m-3"
+        long_name: "Volumetric soil moisture"
+      SNEQV:
+        units: "kg m-2"
+        long_name: "Snow water equivalent"
+      SNOWH:
+        units: "m"
+        long_name: "Snow depth"
+      ACCET:
+        units: "mm"
+        long_name: "Accumulated total evapotranspiration"
+      FSNO:
+        units: "1"
+        long_name: "Snow-cover fraction on the ground"
+
+configurations:
+
+  short_range:
+    description: >-
+      Short-Range Forecast (CONUS) — hourly cycles, 18 h deterministic
+      horizon.
+    domain: conus
+    family: short_range             # the {config} token in the S3 file name
+    cycles_utc: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11,
+                 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23]
+    step_kind: forecast             # fNNN forecast steps
+    first_step: 1
+    horizon_h: 18
+    step_cadence_h: 1
+    members: 0                      # deterministic (no ensemble member token)
+
+  analysis_assim:
+    description: >-
+      Analysis and Assimilation (CONUS) — the best-estimate nowcast; hourly
+      cycles, each publishing a short look-back (tm00..tm02).
+    domain: conus
+    family: analysis_assim
+    cycles_utc: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11,
+                 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23]
+    step_kind: analysis             # tmNN look-back steps
+    first_step: 0
+    horizon_h: 2
+    step_cadence_h: 1
+    members: 0
+
+  medium_range:
+    description: >-
+      Medium-Range Forecast (CONUS), GFS-forced ensemble — four cycles a
+      day, 240 h horizon, members 1-6. The member rides on the product
+      token in the file name (channel_rt_1, land_1).
+    domain: conus
+    family: medium_range
+    cycles_utc: [0, 6, 12, 18]
+    step_kind: forecast
+    first_step: 1
+    horizon_h: 240
+    step_cadence_h: 1
+    members: 6                      # ensemble: directory is medium_range_mem{N}
