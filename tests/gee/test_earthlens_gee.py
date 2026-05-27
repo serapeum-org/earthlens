@@ -88,6 +88,8 @@ class TestRegistry:
             "overture",
             "planetary-computer",
             "radar",
+            "sentinel-hub",
+            "sentinelhub",
             "stac",
             "tropycal",
             "usgs-nwis",

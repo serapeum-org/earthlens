@@ -167,6 +167,13 @@ nav:
       - Authentication: reference/openeo/authentication.md
       - Collections & recipes: reference/openeo/datasets.md
       - Reference: reference/openeo/openeo.md
+    - Sentinel Hub (server-side render):
+      - Introduction: reference/sentinel-hub/introduction.md
+      - Usage: reference/sentinel-hub/usage.md
+      - Authentication: reference/sentinel-hub/authentication.md
+      - Collections & recipes: reference/sentinel-hub/datasets.md
+      - Statistical & Batch: reference/sentinel-hub/statistical-batch.md
+      - Reference: reference/sentinel-hub/sentinel_hub.md
     - Tropycal (cyclone tracks):
       - Introduction: reference/tropycal/introduction.md
       - Usage: reference/tropycal/usage.md
@@ -275,6 +282,15 @@ nav:
       - Server-side temporal aggregate: examples/openeo/server_side_aggregate.ipynb
       - Air quality — Sentinel-5P NO2 monthly: examples/openeo/air_quality_no2_monthly.ipynb
       - Ocean colour — Sentinel-3 chlorophyll monthly: examples/openeo/ocean_chlorophyll_monthly.ipynb
+    - Server-side render (Sentinel Hub):
+      - Catalog explorer (no network): examples/sentinel-hub/catalog_explorer.ipynb
+      - Quickstart — Sentinel-2 NDVI: examples/sentinel-hub/quickstart_ndvi.ipynb
+      - True-colour composite: examples/sentinel-hub/true_colour.ipynb
+      - Custom inline evalscript: examples/sentinel-hub/custom_evalscript.ipynb
+      - Oversized AOI — local tiling: examples/sentinel-hub/local_tiling.ipynb
+      - Statistical zonal stats: examples/sentinel-hub/statistical_zonal_stats.ipynb
+      - Windowed monthly aggregate: examples/sentinel-hub/aggregate_monthly.ipynb
+      - Batch processing (S3) walkthrough: examples/sentinel-hub/batch_walkthrough.ipynb
     - Tropical cyclones (Tropycal):
       - Quickstart — Atlantic season: examples/tropycal/quickstart.ipynb
       - Season track map: examples/tropycal/season_track_map.ipynb

@@ -1,0 +1,156 @@
+# Curated Sentinel Hub data collections (logical key -> DataCollection binding).
+# Bands list the optical/SAR/atmosphere bands earthlens' bundled evalscripts and
+# custom evalscripts may reference. The full available-collection index lives in
+# _index.yaml (rebuilt by tools/sentinel_hub/refresh_sh_catalog.py).
+collections:
+  sentinel-2-l1c:
+    sh_collection: SENTINEL2_L1C
+    description: Sentinel-2 MSI Level-1C top-of-atmosphere reflectance.
+    cadence: 5-day
+    resolution: 10.0
+    default_bands: [B04, B03, B02]
+    extent:
+      start_date: "2015-06-23"
+      bbox: [-180.0, -56.0, 180.0, 83.0]
+    bands:
+      B01: {common_name: coastal, units: reflectance, resolution: 60.0, center_wavelength: 0.443}
+      B02: {common_name: blue, units: reflectance, resolution: 10.0, center_wavelength: 0.490}
+      B03: {common_name: green, units: reflectance, resolution: 10.0, center_wavelength: 0.560}
+      B04: {common_name: red, units: reflectance, resolution: 10.0, center_wavelength: 0.665}
+      B05: {common_name: rededge, units: reflectance, resolution: 20.0, center_wavelength: 0.705}
+      B06: {common_name: rededge, units: reflectance, resolution: 20.0, center_wavelength: 0.740}
+      B07: {common_name: rededge, units: reflectance, resolution: 20.0, center_wavelength: 0.783}
+      B08: {common_name: nir, units: reflectance, resolution: 10.0, center_wavelength: 0.842}
+      B8A: {common_name: nir08, units: reflectance, resolution: 20.0, center_wavelength: 0.865}
+      B09: {common_name: nir09, units: reflectance, resolution: 60.0, center_wavelength: 0.945}
+      B10: {common_name: cirrus, units: reflectance, resolution: 60.0, center_wavelength: 1.375}
+      B11: {common_name: swir16, units: reflectance, resolution: 20.0, center_wavelength: 1.610}
+      B12: {common_name: swir22, units: reflectance, resolution: 20.0, center_wavelength: 2.190}
+  sentinel-2-l2a:
+    sh_collection: SENTINEL2_L2A
+    description: Sentinel-2 MSI Level-2A bottom-of-atmosphere reflectance.
+    cadence: 5-day
+    resolution: 10.0
+    default_bands: [B04, B03, B02]
+    extent:
+      start_date: "2017-03-28"
+      bbox: [-180.0, -56.0, 180.0, 83.0]
+    bands:
+      B01: {common_name: coastal, units: reflectance, resolution: 60.0, center_wavelength: 0.443}
+      B02: {common_name: blue, units: reflectance, resolution: 10.0, center_wavelength: 0.490}
+      B03: {common_name: green, units: reflectance, resolution: 10.0, center_wavelength: 0.560}
+      B04: {common_name: red, units: reflectance, resolution: 10.0, center_wavelength: 0.665}
+      B05: {common_name: rededge, units: reflectance, resolution: 20.0, center_wavelength: 0.705}
+      B06: {common_name: rededge, units: reflectance, resolution: 20.0, center_wavelength: 0.740}
+      B07: {common_name: rededge, units: reflectance, resolution: 20.0, center_wavelength: 0.783}
+      B08: {common_name: nir, units: reflectance, resolution: 10.0, center_wavelength: 0.842}
+      B8A: {common_name: nir08, units: reflectance, resolution: 20.0, center_wavelength: 0.865}
+      B09: {common_name: nir09, units: reflectance, resolution: 60.0, center_wavelength: 0.945}
+      B11: {common_name: swir16, units: reflectance, resolution: 20.0, center_wavelength: 1.610}
+      B12: {common_name: swir22, units: reflectance, resolution: 20.0, center_wavelength: 2.190}
+      SCL: {common_name: scl, description: Scene classification map, resolution: 20.0}
+  sentinel-1-iw:
+    sh_collection: SENTINEL1_IW
+    description: Sentinel-1 SAR GRD, Interferometric Wide swath (VV+VH).
+    cadence: 6-day
+    resolution: 10.0
+    default_bands: [VV, VH]
+    extent:
+      start_date: "2014-10-03"
+      bbox: [-180.0, -90.0, 180.0, 90.0]
+    bands:
+      VV: {description: Vertical transmit / vertical receive backscatter, units: linear}
+      VH: {description: Vertical transmit / horizontal receive backscatter, units: linear}
+  sentinel-3-olci:
+    sh_collection: SENTINEL3_OLCI
+    description: Sentinel-3 OLCI Level-1B top-of-atmosphere radiance (21 bands).
+    cadence: 2-day
+    resolution: 300.0
+    default_bands: [B08, B06, B04]
+    extent:
+      start_date: "2016-04-25"
+      bbox: [-180.0, -90.0, 180.0, 90.0]
+    bands:
+      B04: {units: radiance, center_wavelength: 0.490}
+      B06: {units: radiance, center_wavelength: 0.560}
+      B08: {units: radiance, center_wavelength: 0.665}
+      B17: {units: radiance, center_wavelength: 0.865}
+  sentinel-5p-l2:
+    sh_collection: SENTINEL5P
+    description: Sentinel-5P TROPOMI Level-2 atmospheric composition.
+    cadence: daily
+    resolution: 3500.0
+    default_bands: [NO2]
+    extent:
+      start_date: "2018-04-30"
+      bbox: [-180.0, -90.0, 180.0, 90.0]
+    bands:
+      CO: {description: Carbon monoxide total column, units: mol/m^2}
+      NO2: {description: Nitrogen dioxide tropospheric column, units: mol/m^2}
+      O3: {description: Ozone total column, units: mol/m^2}
+      SO2: {description: Sulphur dioxide total column, units: mol/m^2}
+      CH4: {description: Methane column volume mixing ratio, units: ppb}
+  sentinel-1-ew:
+    sh_collection: SENTINEL1_EW
+    description: Sentinel-1 SAR GRD, Extra-Wide swath (HH+HV), polar/maritime.
+    cadence: 6-day
+    resolution: 40.0
+    default_bands: [HH, HV]
+    extent:
+      start_date: "2014-10-03"
+      bbox: [-180.0, -90.0, 180.0, 90.0]
+    bands:
+      HH: {description: Horizontal transmit / horizontal receive backscatter, units: linear}
+      HV: {description: Horizontal transmit / vertical receive backscatter, units: linear}
+  sentinel-3-slstr:
+    sh_collection: SENTINEL3_SLSTR
+    description: Sentinel-3 SLSTR radiance/reflectance (S1-S6) + thermal brightness temperature (S7-S9, F1-F2).
+    cadence: daily
+    resolution: 500.0
+    default_bands: [S3, S2, S1]
+    extent:
+      start_date: "2016-04-19"
+      bbox: [-180.0, -90.0, 180.0, 90.0]
+    bands:
+      S1: {units: reflectance, center_wavelength: 0.554, resolution: 500.0}
+      S2: {units: reflectance, center_wavelength: 0.659, resolution: 500.0}
+      S3: {units: reflectance, center_wavelength: 0.868, resolution: 500.0}
+      S4: {units: reflectance, center_wavelength: 1.374, resolution: 500.0}
+      S5: {units: reflectance, center_wavelength: 1.613, resolution: 500.0}
+      S6: {units: reflectance, center_wavelength: 2.256, resolution: 500.0}
+      S7: {description: Brightness temperature, units: K, center_wavelength: 3.742, resolution: 1000.0}
+      S8: {description: Brightness temperature, units: K, center_wavelength: 10.854, resolution: 1000.0}
+      S9: {description: Brightness temperature, units: K, center_wavelength: 12.0226, resolution: 1000.0}
+      F1: {description: Active-fire brightness temperature, units: K, center_wavelength: 3.742}
+      F2: {description: Active-fire brightness temperature, units: K, center_wavelength: 10.854}
+  landsat-ot-l1:
+    sh_collection: LANDSAT_OT_L1
+    description: Landsat 8/9 OLI-TIRS Level-1 top-of-atmosphere (B01-B09 optical, B10-B11 thermal).
+    cadence: 16-day
+    resolution: 30.0
+    default_bands: [B04, B03, B02]
+    extent:
+      start_date: "2013-03-18"
+      bbox: [-180.0, -90.0, 180.0, 90.0]
+    bands:
+      B01: {common_name: coastal, center_wavelength: 0.443, resolution: 30.0}
+      B02: {common_name: blue, center_wavelength: 0.482, resolution: 30.0}
+      B03: {common_name: green, center_wavelength: 0.561, resolution: 30.0}
+      B04: {common_name: red, center_wavelength: 0.655, resolution: 30.0}
+      B05: {common_name: nir, center_wavelength: 0.865, resolution: 30.0}
+      B06: {common_name: swir16, center_wavelength: 1.609, resolution: 30.0}
+      B07: {common_name: swir22, center_wavelength: 2.201, resolution: 30.0}
+      B08: {common_name: pan, center_wavelength: 0.590, resolution: 15.0}
+      B09: {common_name: cirrus, center_wavelength: 1.373, resolution: 30.0}
+      B10: {description: Thermal infrared 1, units: K, center_wavelength: 10.895, resolution: 100.0}
+      B11: {description: Thermal infrared 2, units: K, center_wavelength: 12.005, resolution: 100.0}
+  dem-copernicus-30:
+    sh_collection: DEM_COPERNICUS_30
+    description: Copernicus DEM GLO-30 digital elevation model (30 m).
+    cadence: static
+    resolution: 30.0
+    default_bands: [DEM]
+    extent:
+      bbox: [-180.0, -90.0, 180.0, 90.0]
+    bands:
+      DEM: {description: Elevation above the EGM2008 geoid, units: m}

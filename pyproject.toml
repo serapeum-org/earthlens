@@ -76,6 +76,7 @@ stac = ["pyramids-gis[stac]"]
 # keeps pandas 3 for every backend. (openeo still caps xarray<2025.01.2.) Lift
 # this upper bound once openeo ships a pandas-3-compatible release.
 openeo = ["openeo >=0.47,<0.48"]
+sentinel-hub = ["sentinelhub >=3.11.5"]
 # cartopy: not imported by earthlens, but `import tropycal.tracks` chains through
 # tropycal.utils.cartopy_utils (module-level `import cartopy`); tropycal omits it
 # from its own deps, so earthlens must supply it or the import fails.
@@ -102,6 +103,7 @@ all = [
     "overturemaps >=1.0.0",
     "pyramids-gis[stac]",
     "Rtree >=1.0.0",
+    "sentinelhub >=3.11.5",
     "tropycal >=1.4",
     "urllib3 >=1.26",
 ]
@@ -176,6 +178,7 @@ include = ["earthlens", "earthlens.*"]
 "earthlens.gee" = ["*.yaml", "catalog/*.yaml"]
 "earthlens.stac" = ["*.yaml", "catalog/*.yaml"]
 "earthlens.openeo" = ["*.yaml", "catalog/*.yaml"]
+"earthlens.sentinel_hub" = ["*.yaml", "catalog/*.yaml", "evalscripts/*.js"]
 "earthlens.gdacs" = ["*.yaml"]
 "earthlens.openaq" = ["*.yaml"]
 "earthlens.tropycal" = ["*.yaml"]
@@ -256,6 +259,7 @@ markers = [
     "eumetsat: tests for the EUMETSAT Data Store backend (requires the `eumetsat` extra: eumdac).",
     "stac: tests for the STAC backend (requires the `stac` extra: pyramids-gis[stac] → pystac-client + stac-asset).",
     "openeo: tests for the openEO server-side-processing backend (requires the `openeo` extra: openeo).",
+    "sentinel_hub: tests for the Sentinel Hub server-side-render backend (requires the `sentinel-hub` extra: sentinelhub).",
     "gdacs: tests for the GDACS multi-hazard alert backend (public feed, no extra SDK).",
     "openaq: tests for the OpenAQ v3 air-quality backend (no extra SDK; uses the core `requests` dependency).",
     "tropycal: tests for the Tropycal cyclone-track backend (requires the `tropycal` extra: tropycal, cartopy).",
@@ -293,7 +297,8 @@ test-earthdata = { cmd = "pytest -vvv -m 'earthdata and not e2e' --cov=src/earth
 test-eumetsat = { cmd = "pytest -vvv -m 'eumetsat and not e2e' --cov=src/earthlens --cov-report=xml --cov-report=term-missing", description = "Run EUMETSAT Data Store backend tests (requires the `eumetsat` extra: eumdac)" }
 test-stac = { cmd = "pytest -vvv -m 'stac and not e2e' --cov=src/earthlens --cov-report=xml --cov-report=term-missing", description = "Run STAC-backend tests (requires the `stac` extra: pyramids-gis[stac])" }
 test-openeo = { cmd = "pytest -vvv -m 'openeo and not e2e' --cov=src/earthlens --cov-report=xml --cov-report=term-missing", description = "Run openEO-backend tests (requires the `openeo` extra: openeo)" }
-test-gdacs = { cmd = "pytest -vvv -m 'gdacs and not e2e' --cov=src/earthlens --cov-report=xml --cov-report=term-missing", description = "Run GDACS-backend tests (public feed, no extra SDK)" }
+test-sentinel-hub = { cmd = "pytest -vvv -m 'sentinel_hub and not e2e' --cov=src/earthlens --cov-report=xml --cov-report=term-missing", description = "Run Sentinel Hub backend tests (requires the `sentinel-hub` extra: sentinelhub)" }
+test-gdacs ={ cmd = "pytest -vvv -m 'gdacs and not e2e' --cov=src/earthlens --cov-report=xml --cov-report=term-missing", description = "Run GDACS-backend tests (public feed, no extra SDK)" }
 test-openaq = { cmd = "pytest -vvv -m 'openaq and not e2e' --cov=src/earthlens --cov-report=xml --cov-report=term-missing", description = "Run OpenAQ-backend tests (no extra SDK; uses the core requests dependency)" }
 test-tropycal = { cmd = "pytest -vvv -m 'tropycal and not e2e' --cov=src/earthlens --cov-report=xml --cov-report=term-missing", description = "Run Tropycal cyclone-track backend tests (requires the `tropycal` extra: tropycal, cartopy)" }
 test-firms = { cmd = "pytest -vvv -m 'firms and not e2e' --cov=src/earthlens --cov-report=xml --cov-report=term-missing", description = "Run NASA FIRMS active-fire backend tests (free MAP_KEY, no extra SDK)" }
@@ -301,7 +306,7 @@ test-overture = { cmd = "pytest -vvv -m 'overture and not e2e' --cov=src/earthle
 test-nwp = { cmd = "pytest -vvv -m 'nwp and not e2e' --cov=src/earthlens --cov-report=xml --cov-report=term-missing", description = "Run NWP forecast backend tests (requires the `nwp` extra: herbie-data, ecmwf-opendata)" }
 test-radar = { cmd = "pytest -vvv -m 'radar and not e2e' --cov=src/earthlens --cov-report=xml --cov-report=term-missing", description = "Run NEXRAD radar backend tests (requires the `radar` extra: boto3)" }
 test-usgs-water = { cmd = "pytest -vvv -m 'usgs_water and not e2e' --cov=src/earthlens --cov-report=xml --cov-report=term-missing", description = "Run USGS NWIS / Water Data backend tests (requires the `usgs-water` extra: dataretrieval)" }
-test-doctests = { cmd = "pytest --doctest-modules src/earthlens/gee src/earthlens/chc src/earthlens/ecmwf src/earthlens/cmems src/earthlens/fdsn src/earthlens/earthdata src/earthlens/eumetsat src/earthlens/stac src/earthlens/openeo src/earthlens/gdacs src/earthlens/openaq src/earthlens/tropycal src/earthlens/firms src/earthlens/overture src/earthlens/nwp src/earthlens/radar src/earthlens/usgs_water src/earthlens/base", description = "Run docstring examples across the backend packages (catches drift in catalog / API docstrings)" }
+test-doctests = { cmd = "pytest --doctest-modules src/earthlens/gee src/earthlens/chc src/earthlens/ecmwf src/earthlens/cmems src/earthlens/fdsn src/earthlens/earthdata src/earthlens/eumetsat src/earthlens/stac src/earthlens/openeo src/earthlens/sentinel_hub src/earthlens/gdacs src/earthlens/openaq src/earthlens/tropycal src/earthlens/firms src/earthlens/overture src/earthlens/nwp src/earthlens/radar src/earthlens/usgs_water src/earthlens/base", description = "Run docstring examples across the backend packages (catches drift in catalog / API docstrings)" }
 notebooks = { cmd = "pytest --nbval --nbval-lax --verbose docs/examples", description = "check notebooks" }
 jupyter = { cmd = "jupyter lab --no-browser --IdentityProvider.token='' --ServerApp.password='' --port=8889", description = "check notebooks" }
 build-dist = { cmd = "python -m build", description = "Build sdist and wheel for PyPI" }

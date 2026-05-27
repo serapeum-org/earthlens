@@ -138,8 +138,8 @@ class EarthLens:
             ['amazon-s3', 'cdse', 'chc', 'chirps', 'cmems', 'earth-search',
              'earthdata', 'ecmwf', 'eumetsat', 'fdsn', 'firms', 'gdacs', 'gee',
              'google-earth-engine', 'nexrad', 'nwis', 'nwp', 'openaq', 'openeo',
-             'overture', 'planetary-computer', 'radar', 'stac', 'tropycal',
-             'usgs-nwis', 'usgs-water']
+             'overture', 'planetary-computer', 'radar', 'sentinel-hub',
+             'sentinelhub', 'stac', 'tropycal', 'usgs-nwis', 'usgs-water']
 
             ```
         - Asking for an unknown backend raises `ValueError`:
@@ -179,6 +179,10 @@ class EarthLens:
         :class:`earthlens.openeo.OpenEO`: server-side openEO process graphs
             (defaults to CDSE openEO); `raster` output, `aggregate=` is a
             native `aggregate_temporal_period` node; key `"openeo"`.
+        :class:`earthlens.sentinel_hub.SentinelHub`: server-side Sentinel
+            Hub render on CDSE (Process / Async / Batch raster, Statistical /
+            Batch-Statistical tabular); `mixed` output, evalscript-driven;
+            keys `"sentinel-hub"` / `"sentinelhub"`.
         :class:`earthlens.tropycal.TropicalCyclone`: tropical-cyclone
             best tracks via `tropycal` (`vector` output); key
             `"tropycal"`.
@@ -227,6 +231,23 @@ class EarthLens:
             # openEO server-side processing (defaults to CDSE openEO). Builds a
             # process graph the backend executes; returns the written paths.
             "openeo": ("earthlens.openeo", "OpenEO", "openeo", {}),
+            # Sentinel Hub server-side render on CDSE. Builds a bbox/geometry +
+            # evalscript request the server renders; returns written GeoTIFF
+            # paths (raster planes) or table paths / S3 URIs (tabular / batch).
+            # `OUTPUT_KIND="mixed"`. The `"sentinelhub"` alias matches the SDK
+            # spelling.
+            "sentinel-hub": (
+                "earthlens.sentinel_hub",
+                "SentinelHub",
+                "sentinel-hub",
+                {},
+            ),
+            "sentinelhub": (
+                "earthlens.sentinel_hub",
+                "SentinelHub",
+                "sentinel-hub",
+                {},
+            ),
             # Overture Maps GeoParquet over public S3 (no creds). Vector
             # FeatureCollection output with a per-row license_id column.
             "overture": ("earthlens.overture", "Overture", "overture", {}),
