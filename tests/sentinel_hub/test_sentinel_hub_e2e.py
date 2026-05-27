@@ -20,7 +20,9 @@ from pathlib import Path
 
 import pytest
 
-pytest.importorskip("sentinelhub", reason="Sentinel Hub e2e needs the [sentinel-hub] extra")
+pytest.importorskip(
+    "sentinelhub", reason="Sentinel Hub e2e needs the [sentinel-hub] extra"
+)
 
 from earthlens.earthlens import EarthLens  # noqa: E402
 

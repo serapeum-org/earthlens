@@ -252,7 +252,9 @@ class FakeSentinelHubStatistical:
         }
 
     @staticmethod
-    def input_data(data_collection: Any, maxcc: float | None = None, **kwargs: Any) -> dict:
+    def input_data(
+        data_collection: Any, maxcc: float | None = None, **kwargs: Any
+    ) -> dict:
         """Record a statistical input_data block."""
         return {"data_collection": data_collection, "maxcc": maxcc}
 
@@ -278,7 +280,11 @@ class FakeSentinelHubStatistical:
                                             "sampleCount": 100,
                                             "noDataCount": 5,
                                         },
-                                        "percentiles": {"5": 0.12, "50": 0.46, "95": 0.78},
+                                        "percentiles": {
+                                            "5": 0.12,
+                                            "50": 0.46,
+                                            "95": 0.78,
+                                        },
                                     }
                                 }
                             },
@@ -394,7 +400,9 @@ class FakeSentinelHubBatchStatistical:
         self.calls.append("start_job")
 
 
-def fake_monitor_batch_statistical_job(batch_request: Any, config: Any = None, **kwargs):
+def fake_monitor_batch_statistical_job(
+    batch_request: Any, config: Any = None, **kwargs
+):
     """Stand-in for `monitor_batch_statistical_job`."""
     return {"status": "DONE"}
 
@@ -420,9 +428,16 @@ class FakeAwsBatchStatisticalResults:
         payload = {
             "data": [
                 {
-                    "interval": {"from": "2020-06-01T00:00:00Z", "to": "2020-06-02T00:00:00Z"},
+                    "interval": {
+                        "from": "2020-06-01T00:00:00Z",
+                        "to": "2020-06-02T00:00:00Z",
+                    },
                     "outputs": {
-                        "ndvi": {"bands": {"B0": {"stats": {"mean": 0.5, "min": 0.2, "max": 0.7}}}},
+                        "ndvi": {
+                            "bands": {
+                                "B0": {"stats": {"mean": 0.5, "min": 0.2, "max": 0.7}}
+                            }
+                        },
                     },
                 }
             ]

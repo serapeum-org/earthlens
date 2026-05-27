@@ -99,7 +99,9 @@ class TestPlaneRouting:
         )
         assert backend._resolve_plane() == "statistical"
 
-    def test_oversized_bbox_without_s3_routes_to_tiling(self, fake_sh, output_dir: Path):
+    def test_oversized_bbox_without_s3_routes_to_tiling(
+        self, fake_sh, output_dir: Path
+    ):
         """A wide bbox with no S3 bucket auto-routes to local tiling."""
         backend = SentinelHub(
             start="2020-06-01",
@@ -186,7 +188,9 @@ class TestProcessFetch:
         req = fake_sh.SentinelHubRequest.instances[-1]
         assert req.evalscript == inline
 
-    def test_plain_collection_without_evalscript_errors(self, fake_sh, output_dir: Path):
+    def test_plain_collection_without_evalscript_errors(
+        self, fake_sh, output_dir: Path
+    ):
         """A plain collection with no `evalscript=` raises a clear error."""
         backend = _make_backend(
             {"sentinel-2-l2a": []},

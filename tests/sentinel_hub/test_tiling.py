@@ -4,9 +4,9 @@ from __future__ import annotations
 
 from pathlib import Path
 
+import pyramids.dataset.merge as merge_mod
 import pytest
 
-import pyramids.dataset.merge as merge_mod
 from earthlens.sentinel_hub.backend import SentinelHub
 
 pytestmark = pytest.mark.sentinel_hub
@@ -58,13 +58,17 @@ class TestTiling:
         assert len(srcs) == 4
         assert dst == str(paths[0])
 
-    def test_tiles_cover_the_request_bbox(self, fake_sh, recorded_merge, output_dir: Path):
+    def test_tiles_cover_the_request_bbox(
+        self, fake_sh, recorded_merge, output_dir: Path
+    ):
         """Four Process requests are built, one per tile."""
         backend = _tiling_backend(output_dir)
         backend.download()
         assert len(fake_sh.SentinelHubRequest.instances) == 4
 
-    def test_tile_temporaries_cleaned_up(self, fake_sh, recorded_merge, output_dir: Path):
+    def test_tile_temporaries_cleaned_up(
+        self, fake_sh, recorded_merge, output_dir: Path
+    ):
         """The per-product tile scratch directory is removed after the merge."""
         backend = _tiling_backend(output_dir)
         backend.download()

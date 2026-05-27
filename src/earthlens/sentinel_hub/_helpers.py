@@ -46,11 +46,11 @@ S3_APIS: frozenset[str] = frozenset({"async", "batch", "batch-statistical"})
 SH_ENDPOINTS: dict[str, tuple[str, str]] = {
     "cdse": (
         "https://sh.dataspace.copernicus.eu",
-        "https://identity.dataspace.copernicus.eu/auth/realms/CDSE/protocol/openid-connect/token",
+        "https://identity.dataspace.copernicus.eu/auth/realms/CDSE/protocol/openid-connect/token",  # noqa: E501
     ),
     "commercial": (
         "https://services.sentinel-hub.com",
-        "https://services.sentinel-hub.com/auth/realms/main/protocol/openid-connect/token",
+        "https://services.sentinel-hub.com/auth/realms/main/protocol/openid-connect/token",  # noqa: E501
     ),
 }
 

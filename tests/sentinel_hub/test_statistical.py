@@ -18,11 +18,15 @@ pytestmark = pytest.mark.sentinel_hub
 
 _POLYGON = {
     "type": "Polygon",
-    "coordinates": [[[14.0, 40.0], [14.1, 40.0], [14.1, 40.1], [14.0, 40.1], [14.0, 40.0]]],
+    "coordinates": [
+        [[14.0, 40.0], [14.1, 40.0], [14.1, 40.1], [14.0, 40.1], [14.0, 40.0]]
+    ],
 }
 
 
-def _stats_backend(output_dir, variables=None, geometry=_POLYGON, **kwargs) -> SentinelHub:
+def _stats_backend(
+    output_dir, variables=None, geometry=_POLYGON, **kwargs
+) -> SentinelHub:
     """A Statistical backend over a small polygon."""
     return SentinelHub(
         start="2020-06-01",
@@ -68,8 +72,14 @@ class TestFlatten:
                 {
                     "interval": {"from": "f", "to": "t"},
                     "outputs": {
-                        "ndvi": {"bands": {"B0": {"stats": {"mean": 0.5},
-                                                  "percentiles": {"50": 0.5}}}},
+                        "ndvi": {
+                            "bands": {
+                                "B0": {
+                                    "stats": {"mean": 0.5},
+                                    "percentiles": {"50": 0.5},
+                                }
+                            }
+                        },
                         "dataMask": {"bands": {"B0": {"stats": {"mean": 1.0}}}},
                     },
                 }

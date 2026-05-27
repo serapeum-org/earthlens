@@ -44,9 +44,7 @@ def validate_api(api: str | None) -> None:
         )
 
 
-def auto_select_api(
-    max_side_px: int, has_geometry: bool, has_s3: bool = False
-) -> str:
+def auto_select_api(max_side_px: int, has_geometry: bool, has_s3: bool = False) -> str:
     """Pick the plane for a request when `api=` was omitted.
 
     Args:

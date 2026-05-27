@@ -117,9 +117,7 @@ class TestAutoSelectApi:
 
     def test_huge_raster_without_s3_is_tiling(self):
         """A huge bbox with no S3 bucket still falls back to tiling."""
-        assert (
-            auto_select_api(ASYNC_MAX_DIMENSION + 1, has_geometry=False) == "tiling"
-        )
+        assert auto_select_api(ASYNC_MAX_DIMENSION + 1, has_geometry=False) == "tiling"
 
 
 class TestResolveApi:

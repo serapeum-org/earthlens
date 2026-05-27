@@ -202,9 +202,7 @@ class SentinelHub(AbstractDataSource):
                 "[band, ...]} with at least one collection or recipe key."
             )
         self._catalog = Catalog()
-        self._resolved = {
-            key: self._catalog.resolve(key) for key in self._variables
-        }
+        self._resolved = {key: self._catalog.resolve(key) for key in self._variables}
         self._auth = SentinelHubAuth(self._credentials, endpoint=self._endpoint)
         return None
 
@@ -647,7 +645,11 @@ class SentinelHub(AbstractDataSource):
                     sh_bbox, resolution=self._resolution
                 )
                 rendered = self._render_process_tile(
-                    sentinelhub, resolved, sh_bbox, tile_size, str(tile_dir / str(index))
+                    sentinelhub,
+                    resolved,
+                    sh_bbox,
+                    tile_size,
+                    str(tile_dir / str(index)),
                 )
                 tile_paths.append(str(rendered))
             merged = Path(self.root_dir) / f"{_safe_name(product.id)}.tif"
@@ -968,7 +970,9 @@ class SentinelHub(AbstractDataSource):
                 stamp = pd.Timestamp(window_start).strftime("%Y%m%d")
                 produced = self._api_via_search_fetch()
                 for key, item in zip(keys, produced):
-                    results.append(self._stamp_window_output(key, item, aggregate, stamp))
+                    results.append(
+                        self._stamp_window_output(key, item, aggregate, stamp)
+                    )
         finally:
             self._window_override = None
         return results
@@ -992,8 +996,7 @@ class SentinelHub(AbstractDataSource):
             return item
         suffix = source.suffix or ".tif"
         target = (
-            Path(self.root_dir)
-            / f"{_safe_name(key)}_{aggregate.freq}_{stamp}{suffix}"
+            Path(self.root_dir) / f"{_safe_name(key)}_{aggregate.freq}_{stamp}{suffix}"
         )
         source.replace(target)
         return target

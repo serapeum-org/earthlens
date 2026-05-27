@@ -148,9 +148,13 @@ def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     sub = parser.add_subparsers(dest="command", required=True)
 
-    refresh = sub.add_parser("refresh", help="rebuild available_collections from the Catalog API")
+    refresh = sub.add_parser(
+        "refresh", help="rebuild available_collections from the Catalog API"
+    )
     refresh.add_argument("--endpoint", default=None, help="endpoint alias or base URL")
-    refresh.add_argument("--dry-run", action="store_true", help="print instead of writing")
+    refresh.add_argument(
+        "--dry-run", action="store_true", help="print instead of writing"
+    )
     refresh.set_defaults(func=_refresh)
 
     validate = sub.add_parser("validate-recipe", help="validate one curated recipe")
