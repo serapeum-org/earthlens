@@ -111,7 +111,7 @@ def test_query_kwargs_statistics_passes_stat_type():
 
 def test_normalize_modern_long_strips_prefix():
     """Modern normalize strips the USGS- prefix and fills the name."""
-    out = _helpers.normalize(modern_long_frame(n=3), "waterdata", CODE_META)
+    out = _helpers.normalize(modern_long_frame(n=3), "waterdata", "daily", CODE_META)
     assert list(out.columns) == _helpers.CANONICAL_COLUMNS
     assert out["site_no"].iloc[0] == "01646500"
     assert out["parameter_name"].iloc[0] == "Discharge"
@@ -120,7 +120,8 @@ def test_normalize_modern_long_strips_prefix():
 
 def test_normalize_legacy_wide_melts():
     """Legacy normalize melts the wide value/qualifier pair to long rows."""
-    out = _helpers.normalize(legacy_wide_frame(n=4, stat="Mean"), "nwis", CODE_META)
+    frame = legacy_wide_frame(n=4, stat="Mean")
+    out = _helpers.normalize(frame, "nwis", "daily", CODE_META)
     assert list(out.columns) == _helpers.CANONICAL_COLUMNS
     assert len(out) == 4
     assert out["statistic_id"].iloc[0] == "Mean"
@@ -144,7 +145,7 @@ def test_normalize_legacy_multi_code_melts_each():
         },
         index=idx,
     )
-    out = _helpers.normalize(frame, "nwis", CODE_META)
+    out = _helpers.normalize(frame, "nwis", "daily", CODE_META)
     assert set(out["parameter_code"]) == {"00060", "00065"}
     assert len(out) == 4
 
@@ -153,6 +154,136 @@ def test_normalize_empty_returns_schema():
     """An empty frame normalizes to a zero-row canonical frame."""
     import pandas as pd
 
-    out = _helpers.normalize(pd.DataFrame(), "waterdata", CODE_META)
+    out = _helpers.normalize(pd.DataFrame(), "waterdata", "daily", CODE_META)
     assert out.empty
     assert list(out.columns) == _helpers.CANONICAL_COLUMNS
+
+
+def test_samples_kwargs_camelcase():
+    """The samples service builds WQP camelCase kwargs."""
+    kw = _helpers.query_kwargs(
+        service="samples",
+        flavour="waterdata",
+        codes=["00300"],
+        sites=None,
+        bbox=[-77.2, 38.9, -77.0, 39.0],
+        start="2018-01-01",
+        end="2018-12-31",
+        limit=None,
+    )
+    assert kw["usgsPCode"] == "00300"
+    assert kw["boundingBox"] == [-77.2, 38.9, -77.0, 39.0]
+    assert kw["activityStartDateLower"] == "2018-01-01"
+
+
+def test_normalize_samples_maps_result_columns():
+    """Samples normalize maps the WQP result columns to the QW schema."""
+    import pandas as pd
+
+    frame = pd.DataFrame(
+        {
+            "Location_Identifier": ["USGS-01646500"],
+            "Activity_StartDateTime": ["2018-05-01T12:00:00Z"],
+            "USGSpcode": ["00300"],
+            "Result_Characteristic": ["Dissolved oxygen"],
+            "Result_Measure": ["8.5"],
+            "Result_MeasureUnit": ["mg/l"],
+            "Result_MeasureQualifierCode": [None],
+            "Result_ResultDetectionCondition": [None],
+            "DetectionLimit_MeasureA": [None],
+            "DetectionLimit_MeasureUnitA": [None],
+            "ResultAnalyticalMethod_Name": ["EPA 360.1"],
+            "Result_SampleFraction": ["Dissolved"],
+            "Activity_Media": ["Water"],
+        }
+    )
+    out = _helpers.normalize(frame, "waterdata", "samples", CODE_META)
+    assert list(out.columns) == _helpers.SAMPLES_COLUMNS
+    assert out["site_no"].iloc[0] == "01646500"
+    assert out["value"].iloc[0] == 8.5
+    assert out["method"].iloc[0] == "EPA 360.1"
+
+
+def test_normalize_statistics_modern_long():
+    """Modern statistics normalize keeps percentile + value columns."""
+    import pandas as pd
+
+    frame = pd.DataFrame(
+        {
+            "monitoring_location_id": ["USGS-01646500"],
+            "parameter_code": ["00060"],
+            "time_of_year": ["01-01"],
+            "value": [123.0],
+            "percentile": [50],
+            "computation": ["daily-mean"],
+            "unit_of_measure": ["ft^3/s"],
+        }
+    )
+    out = _helpers.normalize(frame, "waterdata", "statistics", CODE_META)
+    assert list(out.columns) == _helpers.STATS_COLUMNS
+    assert out["percentile"].iloc[0] == 50
+    assert out["site_no"].iloc[0] == "01646500"
+
+
+def test_normalize_statistics_legacy_monthly():
+    """Legacy statistics normalize folds year/month into time_of_year."""
+    import pandas as pd
+
+    frame = pd.DataFrame(
+        {
+            "site_no": ["01646500"],
+            "parameter_cd": ["00060"],
+            "year_nu": [2023],
+            "month_nu": [3],
+            "mean_va": [13090.0],
+        }
+    )
+    out = _helpers.normalize(frame, "nwis", "statistics", CODE_META)
+    assert out["value"].iloc[0] == 13090.0
+    assert out["time_of_year"].iloc[0] == "2023-03"
+
+
+def test_normalize_sites_legacy():
+    """Legacy what_sites normalize maps to the site schema."""
+    import pandas as pd
+
+    frame = pd.DataFrame(
+        {
+            "site_no": ["01646500"],
+            "station_nm": ["POTOMAC RIVER"],
+            "dec_lat_va": [38.94],
+            "dec_long_va": [-77.12],
+            "huc_cd": ["02070008"],
+            "site_tp_cd": ["ST"],
+        }
+    )
+    out = _helpers.normalize(frame, "nwis", "sites", CODE_META)
+    assert list(out.columns) == _helpers.SITE_COLUMNS
+    assert out["station_name"].iloc[0] == "POTOMAC RIVER"
+    assert out["latitude"].iloc[0] == 38.94
+
+
+def test_normalize_peaks_legacy():
+    """Legacy peaks normalize maps peak_va to peak_value."""
+    import pandas as pd
+
+    idx = pd.to_datetime(["1990-03-01"], utc=True)
+    idx.name = "datetime"
+    frame = pd.DataFrame(
+        {"site_no": ["01646500"], "peak_va": [350000.0], "gage_ht": [20.1], "peak_cd": ["5"]},
+        index=idx,
+    )
+    out = _helpers.normalize(frame, "nwis", "peaks", CODE_META)
+    assert list(out.columns) == _helpers.PEAKS_COLUMNS
+    assert out["peak_value"].iloc[0] == 350000.0
+    assert out["gage_height"].iloc[0] == 20.1
+
+
+def test_normalize_ratings_indep_dep_stor():
+    """Ratings normalize maps INDEP/DEP/STOR to stage/discharge/storage."""
+    import pandas as pd
+
+    frame = pd.DataFrame({"INDEP": [1.0, 2.0], "DEP": [10.0, 40.0], "STOR": [0, 0]})
+    out = _helpers.normalize(frame, "nwis", "ratings", CODE_META)
+    assert list(out.columns) == _helpers.RATINGS_COLUMNS
+    assert out["discharge"].iloc[1] == 40.0

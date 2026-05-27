@@ -150,3 +150,162 @@ def test_empty_result_writes_schema_only(fake_usgs, usgs_kwargs, tmp_path):
     )
     assert df.empty
     assert (tmp_path / "usgs_daily_00060.csv").exists()
+
+
+def test_samples_calls_get_samples(fake_usgs, usgs_kwargs):
+    """The samples service calls modern waterdata.get_samples."""
+    fake_usgs.set_return("get_samples", _samples_frame())
+    df = USGSWater(**usgs_kwargs(service="samples", variables=["dissolved_oxygen"])).download(
+        progress_bar=False
+    )
+    assert fake_usgs.called() == ["get_samples"]
+    assert "detection_limit" in df.columns
+    assert df["value"].iloc[0] == 8.5
+
+
+def test_samples_has_no_legacy_fallback(fake_usgs, usgs_kwargs):
+    """api=legacy on the modern-only samples service errors clearly."""
+    backend = USGSWater(**usgs_kwargs(service="samples", api="legacy"))
+    with pytest.raises(ValueError, match="no legacy endpoint"):
+        backend.download(progress_bar=False)
+
+
+def test_samples_429_no_fallback_errors(fake_usgs, usgs_kwargs, monkeypatch):
+    """A 429 on modern-only samples (anonymous) raises with token advice."""
+    monkeypatch.delenv("API_USGS_PAT", raising=False)
+    fake_usgs.rate_limit("get_samples")
+    backend = USGSWater(**usgs_kwargs(service="samples"))
+    with pytest.raises(RuntimeError, match="API_USGS_PAT"):
+        backend.download(progress_bar=False)
+
+
+def test_statistics_modern_calls_get_stats_por(fake_usgs, usgs_kwargs):
+    """The statistics service calls modern get_stats_por with sites."""
+    fake_usgs.set_return("get_stats_por", _stats_modern_frame())
+    df = USGSWater(**usgs_kwargs(service="statistics", sites="01646500")).download(
+        progress_bar=False
+    )
+    assert fake_usgs.called() == ["get_stats_por"]
+    assert "percentile" in df.columns
+
+
+def test_statistics_legacy_forwards_stat_type(fake_usgs, usgs_kwargs):
+    """Legacy statistics forwards stat_type as statReportType."""
+    fake_usgs.set_return("get_stats", _stats_legacy_frame())
+    USGSWater(
+        **usgs_kwargs(service="statistics", sites="01646500", api="legacy", stat_type="monthly")
+    ).download(progress_bar=False)
+    assert fake_usgs.kwargs_for("get_stats")["statReportType"] == "monthly"
+
+
+def test_gwlevels_routes_through_daily(fake_usgs, usgs_kwargs):
+    """gwlevels is a parameter family served by get_daily."""
+    USGSWater(
+        **usgs_kwargs(service="gwlevels", variables=["groundwater_level"], sites="375907091432201")
+    ).download(progress_bar=False)
+    assert fake_usgs.called() == ["get_daily"]
+
+
+def test_peaks_requires_sites(fake_usgs, usgs_kwargs):
+    """The site-keyed peaks service errors without sites=."""
+    backend = USGSWater(**usgs_kwargs(service="peaks"))
+    with pytest.raises(ValueError, match="keyed by site"):
+        backend.download(progress_bar=False)
+
+
+def test_ratings_requires_sites(fake_usgs, usgs_kwargs):
+    """The site-keyed ratings service errors without sites=."""
+    backend = USGSWater(**usgs_kwargs(service="ratings"))
+    with pytest.raises(ValueError, match="keyed by site"):
+        backend.download(progress_bar=False)
+
+
+def test_peaks_legacy_normalizes(fake_usgs, usgs_kwargs):
+    """A legacy peaks pull normalizes peak_va to peak_value."""
+    fake_usgs.set_return("get_discharge_peaks", _peaks_legacy_frame())
+    df = USGSWater(
+        **usgs_kwargs(service="peaks", sites="01646500", api="legacy")
+    ).download(progress_bar=False)
+    assert fake_usgs.called() == ["get_discharge_peaks"]
+    assert df["peak_value"].iloc[0] == 350000.0
+
+
+def test_sites_discovery_calls_monitoring_locations(fake_usgs, usgs_kwargs):
+    """service=sites calls modern get_monitoring_locations and writes sites."""
+    fake_usgs.set_return("get_monitoring_locations", _sites_modern_frame())
+    df = USGSWater(**usgs_kwargs(service="sites")).download(progress_bar=False)
+    assert fake_usgs.called() == ["get_monitoring_locations"]
+    assert "latitude" in df.columns
+
+
+def _samples_frame():
+    """A minimal modern WQP samples frame for one dissolved-oxygen result."""
+    return pd.DataFrame(
+        {
+            "Location_Identifier": ["USGS-01646500"],
+            "Activity_StartDateTime": ["2018-05-01T12:00:00Z"],
+            "USGSpcode": ["00300"],
+            "Result_Characteristic": ["Dissolved oxygen"],
+            "Result_Measure": ["8.5"],
+            "Result_MeasureUnit": ["mg/l"],
+            "Result_MeasureQualifierCode": [None],
+            "Result_ResultDetectionCondition": [None],
+            "DetectionLimit_MeasureA": [None],
+            "DetectionLimit_MeasureUnitA": [None],
+            "ResultAnalyticalMethod_Name": ["EPA 360.1"],
+            "Result_SampleFraction": ["Dissolved"],
+            "Activity_Media": ["Water"],
+        }
+    )
+
+
+def _stats_modern_frame():
+    """A minimal modern get_stats_por frame."""
+    return pd.DataFrame(
+        {
+            "monitoring_location_id": ["USGS-01646500"],
+            "parameter_code": ["00060"],
+            "time_of_year": ["01-01"],
+            "value": [123.0],
+            "percentile": [50],
+            "computation": ["daily-mean"],
+            "unit_of_measure": ["ft^3/s"],
+        }
+    )
+
+
+def _stats_legacy_frame():
+    """A minimal legacy get_stats monthly frame."""
+    return pd.DataFrame(
+        {
+            "site_no": ["01646500"],
+            "parameter_cd": ["00060"],
+            "year_nu": [2023],
+            "month_nu": [3],
+            "mean_va": [13090.0],
+        }
+    )
+
+
+def _peaks_legacy_frame():
+    """A minimal legacy discharge-peaks frame (datetime index)."""
+    idx = pd.to_datetime(["1990-03-01"], utc=True)
+    idx.name = "datetime"
+    return pd.DataFrame(
+        {"site_no": ["01646500"], "peak_va": [350000.0], "gage_ht": [20.1], "peak_cd": ["5"]},
+        index=idx,
+    )
+
+
+def _sites_modern_frame():
+    """A minimal modern monitoring-locations frame."""
+    return pd.DataFrame(
+        {
+            "monitoring_location_id": ["USGS-01646500"],
+            "monitoring_location_name": ["POTOMAC RIVER"],
+            "dec_lat_va": [38.94],
+            "dec_long_va": [-77.12],
+            "hydrologic_unit_code": ["02070008"],
+            "site_type": ["Stream"],
+        }
+    )
