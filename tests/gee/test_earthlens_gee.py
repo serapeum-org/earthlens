@@ -80,11 +80,14 @@ class TestRegistry:
             "gdacs",
             "gee",
             "google-earth-engine",
+            "nwis",
             "openaq",
             "openeo",
             "planetary-computer",
             "stac",
             "tropycal",
+            "usgs-nwis",
+            "usgs-water",
         ]
 
     def test_keys_resolve_to_gee_class(self):

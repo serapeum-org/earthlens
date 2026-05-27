@@ -137,8 +137,8 @@ class EarthLens:
             >>> sorted(EarthLens.DataSources)  # doctest: +NORMALIZE_WHITESPACE
             ['amazon-s3', 'cdse', 'chc', 'chirps', 'cmems', 'earth-search',
              'earthdata', 'ecmwf', 'eumetsat', 'fdsn', 'firms', 'gdacs', 'gee',
-             'google-earth-engine', 'openaq', 'openeo', 'planetary-computer',
-             'stac', 'tropycal']
+             'google-earth-engine', 'nwis', 'openaq', 'openeo',
+             'planetary-computer', 'stac', 'tropycal', 'usgs-nwis', 'usgs-water']
 
             ```
         - Asking for an unknown backend raises `ValueError`:
@@ -184,6 +184,11 @@ class EarthLens:
         :class:`earthlens.firms.FIRMS`: NASA FIRMS active-fire
             detections (MODIS / VIIRS) as a `vector` FeatureCollection;
             free `MAP_KEY`, no extra; key `"firms"`.
+        :class:`earthlens.usgs_water.USGSWater`: USGS NWIS / Water Data
+            per-site water observations (discharge, gage height,
+            water quality, …) via `dataretrieval` as a `tabular`
+            `DataFrame`; optional `API_USGS_PAT`, anonymous works; keys
+            `"usgs-water"` / `"usgs-nwis"` / `"nwis"`.
     """
 
     DataSources = _LazyRegistry(
@@ -230,6 +235,12 @@ class EarthLens:
                 {"endpoint": "earth-search"},
             ),
             "cdse": ("earthlens.stac", "STAC", "stac", {"endpoint": "cdse"}),
+            # USGS NWIS / Water Data (dataretrieval). Tabular DataFrame of
+            # per-site water observations; anonymous access works. The
+            # "usgs-nwis" / "nwis" aliases point at the same backend.
+            "usgs-water": ("earthlens.usgs_water", "USGSWater", "usgs-water", {}),
+            "usgs-nwis": ("earthlens.usgs_water", "USGSWater", "usgs-water", {}),
+            "nwis": ("earthlens.usgs_water", "USGSWater", "usgs-water", {}),
         }
     )
 
