@@ -763,10 +763,91 @@ class SentinelHub(AbstractDataSource):
         return out
 
     def _fetch_batch_statistical(self, products: list[RemoteProduct]) -> list[Path]:
-        """Compute zonal statistics via the Batch Statistical API (C9)."""
-        raise NotImplementedError(
-            "the Batch Statistical plane is implemented in C9."
-        )
+        """Compute zonal stats over a huge `FeatureCollection` via Batch Statistical.
+
+        Submits one async batch-statistical job per product against the features
+        uploaded to S3 (`batch_output['input_features']`), monitors it, retrieves
+        the per-feature JSON from S3 via `AwsBatchStatisticalResults`, flattens it
+        (reusing the C7 flattener, keyed by `feature_id`), and writes one CSV per
+        product. Requires `batch_output` with an `input_features` S3 GeoPackage
+        and an output bucket.
+
+        Args:
+            products: The list returned by :meth:`_search`.
+
+        Returns:
+            The written table paths, one per product.
+
+        Raises:
+            ValueError: When `batch_output` is missing its `input_features` or
+                output bucket, or the evalscript lacks a `dataMask` band.
+        """
+        import pandas as pd
+        from sentinelhub.aws import AwsBatchStatisticalResults
+
+        sentinelhub = import_sentinelhub()
+        if not self._batch_output:
+            raise ValueError(
+                "the Batch Statistical plane runs over a FeatureCollection on S3, "
+                "so it needs batch_output={'input_features': 's3://…features.gpkg', "
+                "'bucket': 's3://…out', 'iam_role_arn': '…'}."
+            )
+        spec = dict(self._batch_output)
+        features_url = spec.pop("input_features", None)
+        output_url = spec.pop("bucket", None) or spec.pop("output", None)
+        feature_ids = spec.pop("feature_ids", None)
+        if not features_url or not output_url:
+            raise ValueError(
+                "batch-statistical needs batch_output['input_features'] (the S3 "
+                "GeoPackage of features) and an output bucket."
+            )
+        cfg = self._auth.config()
+        interval = self._statistical_interval()
+        client = sentinelhub.SentinelHubBatchStatistical(config=cfg)
+        out: list[Path] = []
+        for product in products:
+            resolved: ResolvedRequest = product.metadata["resolved"]
+            evalscript = self._statistical_evalscript(resolved)
+            aggregation = sentinelhub.SentinelHubStatistical.aggregation(
+                evalscript=evalscript,
+                time_interval=self._time_interval(),
+                aggregation_interval=interval,
+                resolution=(self._resolution, self._resolution),
+            )
+            input_kwargs: dict[str, Any] = {}
+            if self._maxcc is not None:
+                input_kwargs["maxcc"] = self._maxcc
+            batch_request = client.create(
+                input_features=client.s3_specification(url=features_url, **spec),
+                input_data=[
+                    sentinelhub.SentinelHubStatistical.input_data(
+                        cdse_collection(resolved.sh_collection, cfg.sh_base_url),
+                        **input_kwargs,
+                    )
+                ],
+                aggregation=aggregation,
+                calculations=_STAT_CALCULATIONS,
+                output=client.s3_specification(url=output_url, **spec),
+            )
+            client.start_analysis(batch_request)
+            client.start_job(batch_request)
+            sentinelhub.monitor_batch_statistical_job(batch_request, cfg)
+            results = AwsBatchStatisticalResults(
+                batch_request,
+                feature_ids=feature_ids,
+                data_folder=str(self.root_dir),
+                config=cfg,
+            )
+            payloads = results.get_data(save_data=True)
+            rows: list[dict] = []
+            ids = feature_ids if feature_ids is not None else range(len(payloads))
+            for feature_id, payload in zip(ids, payloads):
+                rows.extend(_flatten_statistics(payload, feature_id=feature_id))
+            target = Path(self.root_dir) / f"{_safe_name(product.id)}.csv"
+            pd.DataFrame(rows).to_csv(target, index=False)
+            out.append(target)
+        logger.info(f"Sentinel Hub batch-statistical: wrote {len(out)} table(s)")
+        return out
 
     def download(
         self,

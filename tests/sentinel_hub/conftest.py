@@ -344,6 +344,92 @@ def fake_monitor_batch_process_job(request: Any, client: Any, **kwargs: Any):
     return request
 
 
+class FakeBatchStatisticalRequest:
+    """Stand-in for `sentinelhub.BatchStatisticalRequest`."""
+
+    request_id = "batch-stat-1"
+
+
+class FakeSentinelHubBatchStatistical:
+    """Stand-in for `sentinelhub.SentinelHubBatchStatistical`."""
+
+    instances: list[FakeSentinelHubBatchStatistical] = []
+
+    def __init__(self, config: Any = None) -> None:
+        self.config = config
+        self.calls: list[str] = []
+        self.created: dict = {}
+        FakeSentinelHubBatchStatistical.instances.append(self)
+
+    @staticmethod
+    def s3_specification(url: str, **kwargs: Any) -> dict:
+        """Record an S3 spec."""
+        return {"url": url, **kwargs}
+
+    def create(
+        self,
+        *,
+        input_features: Any,
+        input_data: Any,
+        aggregation: Any,
+        calculations: Any,
+        output: Any,
+        **kwargs: Any,
+    ):
+        """Record batch-statistical creation."""
+        self.calls.append("create")
+        self.created = {
+            "input_features": input_features,
+            "output": output,
+            "aggregation": aggregation,
+        }
+        return FakeBatchStatisticalRequest()
+
+    def start_analysis(self, batch_request: Any):
+        """Record the analysis step."""
+        self.calls.append("start_analysis")
+
+    def start_job(self, batch_request: Any):
+        """Record the job start."""
+        self.calls.append("start_job")
+
+
+def fake_monitor_batch_statistical_job(batch_request: Any, config: Any = None, **kwargs):
+    """Stand-in for `monitor_batch_statistical_job`."""
+    return {"status": "DONE"}
+
+
+class FakeAwsBatchStatisticalResults:
+    """Stand-in for `sentinelhub.aws.AwsBatchStatisticalResults` (per-feature JSON)."""
+
+    def __init__(
+        self,
+        batch_request: Any,
+        *,
+        feature_ids: Any = None,
+        data_folder: str | None = None,
+        config: Any = None,
+    ) -> None:
+        self.batch_request = batch_request
+        self.feature_ids = feature_ids
+        self.data_folder = data_folder
+
+    def get_data(self, save_data: bool = False) -> list:
+        """Return one canned stats payload per requested feature."""
+        ids = self.feature_ids or [0, 1]
+        payload = {
+            "data": [
+                {
+                    "interval": {"from": "2020-06-01T00:00:00Z", "to": "2020-06-02T00:00:00Z"},
+                    "outputs": {
+                        "ndvi": {"bands": {"B0": {"stats": {"mean": 0.5, "min": 0.2, "max": 0.7}}}},
+                    },
+                }
+            ]
+        }
+        return [payload for _ in ids]
+
+
 def fake_bbox_to_dimensions(bbox: Any, resolution: float) -> tuple[int, int]:
     """Deterministic `bbox_to_dimensions`: (degrees * 1000 / resolution) per side."""
     west, south, east, north = bbox.bbox
@@ -366,20 +452,28 @@ class FakeSentinelHub:
     SentinelHubStatistical = FakeSentinelHubStatistical
     Geometry = FakeGeometry
     BatchProcessClient = FakeBatchProcessClient
+    SentinelHubBatchStatistical = FakeSentinelHubBatchStatistical
     bbox_to_dimensions = staticmethod(fake_bbox_to_dimensions)
     get_async_running_status = staticmethod(fake_get_async_running_status)
     monitor_batch_process_job = staticmethod(fake_monitor_batch_process_job)
+    monitor_batch_statistical_job = staticmethod(fake_monitor_batch_statistical_job)
 
 
 @pytest.fixture
 def fake_sh(monkeypatch: pytest.MonkeyPatch) -> FakeSentinelHub:
     """Install the fake `sentinelhub` module and reset recorded requests."""
+    import types
+
     module = FakeSentinelHub()
     FakeSentinelHubRequest.instances = []
     FakeAsyncProcessRequest.instances = []
     FakeSentinelHubStatistical.instances = []
     FakeBatchProcessClient.instances = []
+    FakeSentinelHubBatchStatistical.instances = []
     monkeypatch.setitem(sys.modules, "sentinelhub", module)
+    aws_mod = types.ModuleType("sentinelhub.aws")
+    aws_mod.AwsBatchStatisticalResults = FakeAwsBatchStatisticalResults
+    monkeypatch.setitem(sys.modules, "sentinelhub.aws", aws_mod)
     return module
 
 
