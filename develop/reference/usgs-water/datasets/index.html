@@ -10,13 +10,13 @@
       
       
       
-        <link rel="canonical" href="https://serapeum-org.github.io/earthlens/develop/reference/overture/usage/">
+        <link rel="canonical" href="https://serapeum-org.github.io/earthlens/develop/reference/usgs-water/datasets/">
       
       
-        <link rel="prev" href="../introduction/">
+        <link rel="prev" href="../authentication/">
       
       
-        <link rel="next" href="../licensing/">
+        <link rel="next" href="../usgs_water/">
       
       
         
@@ -27,7 +27,7 @@
     
     
       
-        <title>Usage - earthlens</title>
+        <title>Available data - earthlens</title>
       
     
     
@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -83,7 +83,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#overture-maps-usage" class="md-skip">
+        <a href="#usgs-water-available-data" class="md-skip">
           Skip to content
         </a>
       
@@ -123,7 +123,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Usage
+              Available data
             
           </span>
         </div>
@@ -2899,391 +2899,6 @@
                 
   
   
-    
-  
-  
-  
-    
-    
-    
-    
-      
-      
-    
-    
-    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
-      
-        
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_16" checked>
-        
-          
-          <label class="md-nav__link" for="__nav_3_16" id="__nav_3_16_label" tabindex="0">
-            
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Overture Maps (vector basemap)
-  
-
-    
-  </span>
-  
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_16_label" aria-expanded="true">
-          <label class="md-nav__title" for="__nav_3_16">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    Overture Maps (vector basemap)
-  
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../introduction/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Introduction
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-    
-  
-  
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Usage
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Usage
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#request-shape" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Request shape
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Request shape">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#variables-theme-type" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        variables — {theme: [type, ...]}
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#lat_lim-lon_lim-the-bbox-required" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        lat_lim / lon_lim — the bbox (required)
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#keyword-arguments" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Keyword arguments
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#the-bbox-size-guard" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        The bbox-size guard
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#output-return-value" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Output / return value
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#output-kind-aggregate" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Output kind &amp; aggregate=
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#rate-limits-quotas" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Rate limits / quotas
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#catalog-tooling" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Catalog tooling
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#streaming-vs-in-memory-reads" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Streaming vs in-memory reads
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#attribute-pushdown-with-where-duckdb" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Attribute pushdown with where= (DuckDB)
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#known-limitations" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Known limitations
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../licensing/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Licensing
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../datasets/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Available datasets
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../overture/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Reference
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
   
   
     
@@ -3298,10 +2913,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_17" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_16" >
         
           
-          <label class="md-nav__link" for="__nav_3_17" id="__nav_3_17_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3_16" id="__nav_3_16_label" tabindex="0">
             
   
   
@@ -3319,8 +2934,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_17_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_17">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_16_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_16">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -3468,10 +3083,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_18" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_17" >
         
           
-          <label class="md-nav__link" for="__nav_3_18" id="__nav_3_18_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3_17" id="__nav_3_17_label" tabindex="0">
             
   
   
@@ -3489,8 +3104,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_18_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_18">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_17_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_17">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -3592,6 +3207,286 @@
   
     <li class="md-nav__item">
       <a href="../../radar/radar/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_18" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_3_18" id="__nav_3_18_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    USGS Water (NWIS)
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_18_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3_18">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    USGS Water (NWIS)
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../introduction/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Introduction
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../usage/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Usage
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../authentication/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Authentication
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Available data
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Available data
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#curated-parameter-codes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Curated parameter codes
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-full-parameter-index-tooling" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The full parameter index (tooling)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#services" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Services
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../usgs_water/" class="md-nav__link">
         
   
   
@@ -6557,7 +6452,7 @@
   <span class="md-ellipsis">
     
   
-    Overture Maps (vector basemap)
+    Open NWP forecasts
   
 
     
@@ -6570,260 +6465,6 @@
         
         <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_16_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_4_16">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    Overture Maps (vector basemap)
-  
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../examples/overture/01_catalog_explorer/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Overture — browse the catalog (no network)
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../examples/overture/02_places_quickstart/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Overture — Places quickstart (live)
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../examples/overture/03_buildings_footprints/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Overture — Building footprints (live)
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../examples/overture/04_per_row_licensing/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Overture — per-row licensing (live)
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../examples/overture/05_transportation_network/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Overture — Transportation network (live)
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../examples/overture/06_multi_theme_download/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Overture — multi-theme download (live)
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../examples/overture/07_attribute_pushdown/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Overture — attribute pushdown with (live)
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    
-    
-    
-    
-      
-      
-    
-    
-    <li class="md-nav__item md-nav__item--nested">
-      
-        
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_17" >
-        
-          
-          <label class="md-nav__link" for="__nav_4_17" id="__nav_4_17_label" tabindex="0">
-            
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Open NWP forecasts
-  
-
-    
-  </span>
-  
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_17_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_17">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -6943,10 +6584,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_18" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_17" >
         
           
-          <label class="md-nav__link" for="__nav_4_18" id="__nav_4_18_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_17" id="__nav_4_17_label" tabindex="0">
             
   
   
@@ -6964,8 +6605,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_18_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_18">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_17_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_17">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -6990,6 +6631,176 @@
     
   
     NEXRAD radar — catalog explorer (no network)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_18" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_18" id="__nav_4_18_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    USGS Water (NWIS)
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_18_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_18">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    USGS Water (NWIS)
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../examples/usgs-water/quickstart_daily_discharge/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    USGS Water — daily discharge quickstart
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../examples/usgs-water/multi_parameter_and_instantaneous/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    USGS Water — multi-parameter and instantaneous values
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../examples/usgs-water/site_discovery_and_statistics/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    USGS Water — site discovery, statistics, and Parquet
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../examples/usgs-water/peaks_and_ratings/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    USGS Water — annual peaks and rating curves
   
 
     
@@ -7243,49 +7054,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#request-shape" class="md-nav__link">
+  <a href="#curated-parameter-codes" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Request shape
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Request shape">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#variables-theme-type" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        variables — {theme: [type, ...]}
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#lat_lim-lon_lim-the-bbox-required" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        lat_lim / lon_lim — the bbox (required)
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#keyword-arguments" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Keyword arguments
+        Curated parameter codes
       
     </span>
   </a>
@@ -7293,10 +7065,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#the-bbox-size-guard" class="md-nav__link">
+  <a href="#the-full-parameter-index-tooling" class="md-nav__link">
     <span class="md-ellipsis">
       
-        The bbox-size guard
+        The full parameter index (tooling)
       
     </span>
   </a>
@@ -7304,76 +7076,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#output-return-value" class="md-nav__link">
+  <a href="#services" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Output / return value
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#output-kind-aggregate" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Output kind &amp; aggregate=
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#rate-limits-quotas" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Rate limits / quotas
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#catalog-tooling" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Catalog tooling
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#streaming-vs-in-memory-reads" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Streaming vs in-memory reads
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#attribute-pushdown-with-where-duckdb" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Attribute pushdown with where= (DuckDB)
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#known-limitations" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Known limitations
+        Services
       
     </span>
   </a>
@@ -7397,7 +7103,7 @@
 
 
   
-    <a href="https://github.com/serapeum-org/earthlens/edit/master/docs/reference/overture/usage.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
+    <a href="https://github.com/serapeum-org/earthlens/edit/master/docs/reference/usgs-water/datasets.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
     </a>
@@ -7406,232 +7112,163 @@
     
       
     
-    <a href="https://github.com/serapeum-org/earthlens/raw/master/docs/reference/overture/usage.md" title="View source of this page" class="md-content__button md-icon">
+    <a href="https://github.com/serapeum-org/earthlens/raw/master/docs/reference/usgs-water/datasets.md" title="View source of this page" class="md-content__button md-icon">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 18c.56 0 1 .44 1 1s-.44 1-1 1-1-.44-1-1 .44-1 1-1m0-3c-2.73 0-5.06 1.66-6 4 .94 2.34 3.27 4 6 4s5.06-1.66 6-4c-.94-2.34-3.27-4-6-4m0 6.5a2.5 2.5 0 0 1-2.5-2.5 2.5 2.5 0 0 1 2.5-2.5 2.5 2.5 0 0 1 2.5 2.5 2.5 2.5 0 0 1-2.5 2.5M9.27 20H6V4h7v5h5v4.07c.7.08 1.36.25 2 .49V8l-6-6H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h4.5a8.2 8.2 0 0 1-1.23-2"/></svg>
     </a>
   
 
 
-<h1 id="overture-maps-usage"><a class="toclink" href="#overture-maps-usage">Overture Maps — Usage</a><a class="headerlink" href="#overture-maps-usage" title="Permanent link">#</a></h1>
-<p>This page covers the request shape, every keyword argument, the output,
-the bbox-size guard, and why temporal / <code>aggregate=</code> arguments do not
-apply. For authentication: there is none — the bucket is public and
-anonymous, so <code>pip install earthlens[overture]</code> is the only setup.</p>
-<h2 id="request-shape"><a class="toclink" href="#request-shape">Request shape</a><a class="headerlink" href="#request-shape" title="Permanent link">#</a></h2>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.earthlens</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="n">paths</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;overture&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">variables</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;buildings&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;building&quot;</span><span class="p">]},</span>
-<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">40.757</span><span class="p">,</span> <span class="mf">40.759</span><span class="p">],</span>
-<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">73.987</span><span class="p">,</span> <span class="o">-</span><span class="mf">73.984</span><span class="p">],</span>
-<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    <span class="n">path</span><span class="o">=</span><span class="s2">&quot;out&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>    <span class="n">release</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>            <span class="c1"># default: newest release</span>
-<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>    <span class="n">file_format</span><span class="o">=</span><span class="s2">&quot;geoparquet&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>    <span class="n">max_features</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
-</code></pre></div>
-<h3 id="variables-theme-type"><a class="toclink" href="#variables-theme-type"><code>variables</code> — <code>{theme: [type, ...]}</code></a><a class="headerlink" href="#variables-theme-type" title="Permanent link">#</a></h3>
-<p><code>variables</code> is a <strong>mapping</strong> of friendly theme name to a list of feature
-types (it is <em>not</em> a list of variable names as for the raster backends —
-passing a list raises <code>TypeError</code>):</p>
-<ul>
-<li><code>{"buildings": []}</code> — the theme's <strong>primary type</strong> (<code>building</code>).</li>
-<li><code>{"places": ["place"]}</code> — an explicit type.</li>
-<li><code>{"transportation": ["segment", "connector"]}</code> — several types; one
-  file is written per type.</li>
-<li><code>{"buildings": [], "places": []}</code> — several themes at once.</li>
-</ul>
-<p>An empty type list resolves to the theme's <code>default_type</code>. An unknown
-theme or type raises <code>ValueError</code> with a did-you-mean hint.</p>
-<h3 id="lat_lim-lon_lim-the-bbox-required"><a class="toclink" href="#lat_lim-lon_lim-the-bbox-required"><code>lat_lim</code> / <code>lon_lim</code> — the bbox (required)</a><a class="headerlink" href="#lat_lim-lon_lim-the-bbox-required" title="Permanent link">#</a></h3>
-<p>The bounding box drives the GeoParquet <strong>bbox pushdown</strong> (via PyArrow
-parquet statistics — no DuckDB), so only the rows inside the box are read.
-<code>lat_lim=[south, north]</code>, <code>lon_lim=[west, east]</code>, in degrees (WGS84). A
-<strong>bounded</strong> bbox is required — see the size guard below.</p>
-<h2 id="keyword-arguments"><a class="toclink" href="#keyword-arguments">Keyword arguments</a><a class="headerlink" href="#keyword-arguments" title="Permanent link">#</a></h2>
+<h1 id="usgs-water-available-data"><a class="toclink" href="#usgs-water-available-data">USGS Water — Available data</a><a class="headerlink" href="#usgs-water-available-data" title="Permanent link">#</a></h1>
+<p>USGS NWIS filters its queries by 5-digit <strong>parameter codes</strong> (<code>00060</code>
+discharge, <code>00065</code> gage height, …). For <code>variables=</code> you may pass either a raw
+code or one of the curated <strong>friendly names</strong> below, which the bundled catalog
+resolves to a code. The full USGS parameter-code table is far larger than this
+curated set — <strong>any valid 5-digit code passes through unmapped</strong>, so you are
+never limited to the names listed here.</p>
+<h2 id="curated-parameter-codes"><a class="toclink" href="#curated-parameter-codes">Curated parameter codes</a><a class="headerlink" href="#curated-parameter-codes" title="Permanent link">#</a></h2>
 <table>
 <thead>
 <tr>
-<th>Kwarg</th>
-<th>Default</th>
-<th>Meaning</th>
+<th>Friendly name</th>
+<th>Code</th>
+<th>Name</th>
+<th>Units</th>
+<th>Group</th>
+<th>Services</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><code>release</code></td>
-<td><code>None</code></td>
-<td>Overture release id (<code>"2026-05-20.0"</code>). <code>None</code> lets the SDK auto-target the newest release. List them with the refresh tool or <code>Catalog().available_releases</code>.</td>
+<td><code>discharge</code></td>
+<td><code>00060</code></td>
+<td>Discharge</td>
+<td>ft3/s</td>
+<td>Physical</td>
+<td>daily, instantaneous, statistics, peaks</td>
 </tr>
 <tr>
-<td><code>file_format</code></td>
-<td><code>"geoparquet"</code></td>
-<td>Output format: <code>"geoparquet"</code> (default, lossless nested schema), <code>"gpkg"</code>, or <code>"geojson"</code>.</td>
+<td><code>dissolved_oxygen</code></td>
+<td><code>00300</code></td>
+<td>Dissolved oxygen</td>
+<td>mg/l</td>
+<td>Inorganics</td>
+<td>daily, instantaneous, samples</td>
 </tr>
 <tr>
-<td><code>max_features</code></td>
-<td><code>None</code></td>
-<td>Cap on rows kept per fetched type. When set, the read <strong>streams</strong> (via <code>record_batch_reader</code>) and stops early once the cap is reached, rather than fetching the whole bbox and discarding rows. <code>None</code> keeps all.</td>
+<td><code>gage_height</code></td>
+<td><code>00065</code></td>
+<td>Gage height</td>
+<td>ft</td>
+<td>Physical</td>
+<td>daily, instantaneous, statistics</td>
 </tr>
 <tr>
-<td><code>stream</code></td>
-<td><code>False</code></td>
-<td>Force the streaming <code>record_batch_reader</code> path (lower peak memory) even without <code>max_features</code>. Streaming is used automatically whenever <code>max_features</code> is set.</td>
+<td><code>groundwater_level</code></td>
+<td><code>72019</code></td>
+<td>Depth to water level</td>
+<td>ft below land surface</td>
+<td>Physical</td>
+<td>gwlevels, daily, instantaneous, field-measurements</td>
 </tr>
 <tr>
-<td><code>max_bbox_deg2</code></td>
-<td><code>None</code></td>
-<td>Override the per-theme bbox-area cap (square degrees) for the guarded themes. <code>None</code> uses the built-in caps.</td>
+<td><code>nitrate</code></td>
+<td><code>99133</code></td>
+<td>Nitrate plus nitrite</td>
+<td>mg/l as N</td>
+<td>Nutrients</td>
+<td>daily, instantaneous, samples</td>
 </tr>
 <tr>
-<td><code>start</code> / <code>end</code></td>
-<td><code>None</code></td>
-<td>Accepted for signature parity but <strong>ignored</strong> — Overture is a static per-release snapshot.</td>
+<td><code>ph</code></td>
+<td><code>00400</code></td>
+<td>pH</td>
+<td>std units</td>
+<td>Inorganics</td>
+<td>daily, instantaneous, samples</td>
 </tr>
 <tr>
-<td><code>temporal_resolution</code></td>
-<td><code>"all"</code></td>
-<td>Sentinel; Overture is not chunked in time.</td>
+<td><code>precipitation</code></td>
+<td><code>00045</code></td>
+<td>Precipitation</td>
+<td>in</td>
+<td>Physical</td>
+<td>daily, instantaneous</td>
+</tr>
+<tr>
+<td><code>reservoir_storage</code></td>
+<td><code>00054</code></td>
+<td>Reservoir storage</td>
+<td>ac-ft</td>
+<td>Physical</td>
+<td>daily, instantaneous</td>
+</tr>
+<tr>
+<td><code>specific_conductance</code></td>
+<td><code>00095</code></td>
+<td>Specific conductance</td>
+<td>uS/cm @25C</td>
+<td>Physical</td>
+<td>daily, instantaneous, samples</td>
+</tr>
+<tr>
+<td><code>suspended_sediment</code></td>
+<td><code>80154</code></td>
+<td>Suspended sediment concentration</td>
+<td>mg/l</td>
+<td>Physical</td>
+<td>daily, samples</td>
+</tr>
+<tr>
+<td><code>temperature</code></td>
+<td><code>00010</code></td>
+<td>Water temperature</td>
+<td>degC</td>
+<td>Physical</td>
+<td>daily, instantaneous, samples</td>
+</tr>
+<tr>
+<td><code>turbidity</code></td>
+<td><code>63680</code></td>
+<td>Turbidity</td>
+<td>FNU</td>
+<td>Physical</td>
+<td>daily, instantaneous, samples</td>
 </tr>
 </tbody>
 </table>
-<h2 id="the-bbox-size-guard"><a class="toclink" href="#the-bbox-size-guard">The bbox-size guard</a><a class="headerlink" href="#the-bbox-size-guard" title="Permanent link">#</a></h2>
-<p>Buildings (2.3 B rows) and Transportation (86 M km) cover the whole planet
-at row counts where an unbounded box is a footgun. The backend therefore
-<strong>rejects an oversized or whole-Earth bbox</strong> for the large themes:</p>
-<table>
-<thead>
-<tr>
-<th>Theme</th>
-<th>Default cap</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>buildings</code></td>
-<td>0.5 deg²</td>
-</tr>
-<tr>
-<td><code>transportation</code></td>
-<td>0.5 deg²</td>
-</tr>
-<tr>
-<td><code>base</code></td>
-<td>0.5 deg²</td>
-</tr>
-<tr>
-<td><code>addresses</code></td>
-<td>0.5 deg²</td>
-</tr>
-<tr>
-<td><code>places</code></td>
-<td>9.0 deg²</td>
-</tr>
-<tr>
-<td><code>divisions</code></td>
-<td>unguarded (few rows globally)</td>
-</tr>
-</tbody>
-</table>
-<p>One square degree is ≈ 12 300 km² at the equator. Exceeding a theme's cap
-raises <code>ValueError</code> with guidance to shrink the bbox, raise
-<code>max_bbox_deg2=</code>, or cap with <code>max_features=</code>. A bounded bbox keeps the
-PyArrow pushdown cheap.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1"># This raises: a whole-Earth buildings request is rejected.</span>
-<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="n">EarthLens</span><span class="p">(</span>
-<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>    <span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;overture&quot;</span><span class="p">,</span>
-<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>    <span class="n">variables</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;buildings&quot;</span><span class="p">:</span> <span class="p">[]},</span>
-<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">90</span><span class="p">,</span> <span class="mi">90</span><span class="p">],</span> <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">180</span><span class="p">,</span> <span class="mi">180</span><span class="p">],</span>
-<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>    <span class="n">path</span><span class="o">=</span><span class="s2">&quot;out&quot;</span><span class="p">,</span>
-<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
+<p>Resolve either form:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.usgs_water</span><span class="w"> </span><span class="kn">import</span> <span class="n">Catalog</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="n">cat</span> <span class="o">=</span> <span class="n">Catalog</span><span class="p">()</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="n">cat</span><span class="o">.</span><span class="n">resolve</span><span class="p">(</span><span class="s2">&quot;discharge&quot;</span><span class="p">)</span>   <span class="c1"># -&gt; &quot;00060&quot;</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="n">cat</span><span class="o">.</span><span class="n">resolve</span><span class="p">(</span><span class="s2">&quot;00060&quot;</span><span class="p">)</span>       <span class="c1"># -&gt; &quot;00060&quot;  (raw code passes through)</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="n">cat</span><span class="o">.</span><span class="n">resolve</span><span class="p">(</span><span class="s2">&quot;63680&quot;</span><span class="p">)</span>       <span class="c1"># -&gt; &quot;63680&quot;  (uncurated code, still valid)</span>
 </code></pre></div>
-<h2 id="output-return-value"><a class="toclink" href="#output-return-value">Output / return value</a><a class="headerlink" href="#output-return-value" title="Permanent link">#</a></h2>
-<p><code>download()</code> returns a <code>list[Path]</code> — one written file per requested
-feature type. Filenames embed the theme, type, and release:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>out/overture_buildings_building_2026-05-20.0.parquet
-<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>out/overture_places_place_latest.parquet
+<p>An unknown but close friendly name raises with a did-you-mean hint.</p>
+<h2 id="the-full-parameter-index-tooling"><a class="toclink" href="#the-full-parameter-index-tooling">The full parameter index (tooling)</a><a class="headerlink" href="#the-full-parameter-index-tooling" title="Permanent link">#</a></h2>
+<p>The complete USGS parameter-code table (~25k codes) is not hand-curated.
+<code>tools/usgs_water/refresh_usgs_catalog.py</code> builds an informational
+<code>available_parameters</code> index from the live USGS reference table
+(<code>waterdata.get_reference_table(collection="parameter-codes")</code> — the modern
+replacement for the removed <code>nwis.get_pmcodes</code>):</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1"># Rebuild the informational code index (needs API_USGS_PAT — the modern</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="c1"># reference-table endpoint rate-limits anonymous requests).</span>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>pixi<span class="w"> </span>run<span class="w"> </span>-e<span class="w"> </span>dev<span class="w"> </span>python<span class="w"> </span>tools/usgs_water/refresh_usgs_catalog.py<span class="w"> </span>refresh
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="c1"># Append a curated friendly-name row, then reload to validate it.</span>
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>pixi<span class="w"> </span>run<span class="w"> </span>-e<span class="w"> </span>dev<span class="w"> </span>python<span class="w"> </span>tools/usgs_water/refresh_usgs_catalog.py<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="w">    </span>add-parameter<span class="w"> </span>chlorophyll<span class="w"> </span><span class="m">32209</span><span class="w"> </span>--units<span class="w"> </span><span class="s2">&quot;ug/l&quot;</span><span class="w"> </span>--group<span class="w"> </span>Biological<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="w">    </span>--services<span class="w"> </span>daily<span class="w"> </span>samples
+<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>
+<a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="c1"># Validate: every curated row&#39;s services are known, and (when the index</span>
+<a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a><span class="c1"># exists) every curated code is a real USGS code.</span>
+<a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a>pixi<span class="w"> </span>run<span class="w"> </span>-e<span class="w"> </span>dev<span class="w"> </span>python<span class="w"> </span>tools/usgs_water/refresh_usgs_catalog.py<span class="w"> </span>validate
 </code></pre></div>
-<p>Every output carries a per-row <strong><code>license_id</code></strong> column and is tagged
-<code>EPSG:4326</code>. The SDK returns a CRS-less frame, so the backend sets the CRS
-explicitly before writing.</p>
-<h2 id="output-kind-aggregate"><a class="toclink" href="#output-kind-aggregate">Output kind &amp; <code>aggregate=</code></a><a class="headerlink" href="#output-kind-aggregate" title="Permanent link">#</a></h2>
-<p>Overture declares <code>OUTPUT_KIND = "vector"</code>. The <code>EarthLens</code> facade rejects
-a non-<code>None</code> <code>aggregate=</code> for vector backends with <code>NotImplementedError</code>
-(the aggregator only reduces gridded rasters). Post-process the returned
-<code>GeoDataFrame</code> directly instead.</p>
-<h2 id="rate-limits-quotas"><a class="toclink" href="#rate-limits-quotas">Rate limits / quotas</a><a class="headerlink" href="#rate-limits-quotas" title="Permanent link">#</a></h2>
-<p>None imposed by Overture — the bucket is public and anonymous. The
-practical limit is the bbox size (the pushdown reads only the box), which
-the size guard protects you from misusing.</p>
-<h2 id="catalog-tooling"><a class="toclink" href="#catalog-tooling">Catalog tooling</a><a class="headerlink" href="#catalog-tooling" title="Permanent link">#</a></h2>
-<p><code>tools/overture/refresh_overture_catalog.py</code> maintains the bundled
-catalog:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1"># Rewrite the available_releases index from the live SDK / STAC catalog</span>
-<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>pixi<span class="w"> </span>run<span class="w"> </span>-e<span class="w"> </span>dev<span class="w"> </span>python<span class="w"> </span>tools/overture/refresh_overture_catalog.py<span class="w"> </span>refresh
-<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>
-<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="c1"># Confirm every curated theme/default-type resolves against live data</span>
-<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>pixi<span class="w"> </span>run<span class="w"> </span>-e<span class="w"> </span>dev<span class="w"> </span>python<span class="w"> </span>tools/overture/refresh_overture_catalog.py<span class="w"> </span>validate<span class="w"> </span>--strict
-<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>
-<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="c1"># Inspect one type&#39;s columns when curating a new theme</span>
-<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>pixi<span class="w"> </span>run<span class="w"> </span>-e<span class="w"> </span>dev<span class="w"> </span>python<span class="w"> </span>tools/overture/refresh_overture_catalog.py<span class="w"> </span>probe<span class="w"> </span>building
-</code></pre></div>
-<h2 id="streaming-vs-in-memory-reads"><a class="toclink" href="#streaming-vs-in-memory-reads">Streaming vs in-memory reads</a><a class="headerlink" href="#streaming-vs-in-memory-reads" title="Permanent link">#</a></h2>
-<p>By default each type is materialised in one shot with the SDK's
-<code>geodataframe</code>. For a large bounded bbox, pass <code>stream=True</code> to read through
-the SDK's <code>record_batch_reader</code> instead — features are assembled batch by
-batch, lowering peak memory. When <code>max_features</code> is set the backend streams
-<strong>and stops early</strong> once the cap is reached, so it never downloads the whole
-bbox just to discard the surplus:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="n">EarthLens</span><span class="p">(</span>
-<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>    <span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;overture&quot;</span><span class="p">,</span>
-<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>    <span class="n">variables</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;places&quot;</span><span class="p">:</span> <span class="p">[]},</span>
-<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">40.74</span><span class="p">,</span> <span class="mf">40.76</span><span class="p">],</span>
-<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>    <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">74.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">73.97</span><span class="p">],</span>
-<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>    <span class="n">path</span><span class="o">=</span><span class="s2">&quot;out&quot;</span><span class="p">,</span>
-<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a>    <span class="n">stream</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>          <span class="c1"># batch-by-batch read</span>
-<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a>    <span class="n">max_features</span><span class="o">=</span><span class="mi">5000</span><span class="p">,</span>    <span class="c1"># stop after ~5000 rows</span>
-<a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
-</code></pre></div>
-<h2 id="attribute-pushdown-with-where-duckdb"><a class="toclink" href="#attribute-pushdown-with-where-duckdb">Attribute pushdown with <code>where=</code> (DuckDB)</a><a class="headerlink" href="#attribute-pushdown-with-where-duckdb" title="Permanent link">#</a></h2>
-<p>The bbox limits <em>where</em> you fetch; <code>where=</code> limits <em>which rows</em> — pushed down
-to the GeoParquet on S3 via DuckDB, so only matching features leave the
-bucket (not the whole bbox). Pass a raw SQL predicate; it is ANDed onto the
-bbox filter. <code>columns=</code> optionally narrows the projection (<code>id</code> and <code>sources</code>
-are always kept so identity and the per-row <code>license_id</code> survive).</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="n">EarthLens</span><span class="p">(</span>
-<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>    <span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;overture&quot;</span><span class="p">,</span>
-<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>    <span class="n">variables</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;buildings&quot;</span><span class="p">:</span> <span class="p">[]},</span>
-<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">40.74</span><span class="p">,</span> <span class="mf">40.76</span><span class="p">],</span>
-<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>    <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">74.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">73.97</span><span class="p">],</span>
-<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>    <span class="n">path</span><span class="o">=</span><span class="s2">&quot;out&quot;</span><span class="p">,</span>
-<a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a>    <span class="n">where</span><span class="o">=</span><span class="s2">&quot;height &gt; 10 AND subtype = &#39;residential&#39;&quot;</span><span class="p">,</span>   <span class="c1"># pushed down to S3</span>
-<a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a>    <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;names&quot;</span><span class="p">,</span> <span class="s2">&quot;height&quot;</span><span class="p">,</span> <span class="s2">&quot;subtype&quot;</span><span class="p">],</span>            <span class="c1"># narrow the projection</span>
-<a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a>    <span class="n">max_features</span><span class="o">=</span><span class="mi">10000</span><span class="p">,</span>                                 <span class="c1"># LIMIT</span>
-<a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
-</code></pre></div>
-<p>Notes:</p>
-<ul>
-<li>The predicate is <strong>raw SQL</strong> evaluated by DuckDB against the parquet
-  schema — you can filter on nested fields (<code>categories.primary = 'restaurant'</code>,
-  <code>names.primary IS NOT NULL</code>), numeric attributes (<code>confidence &gt; 0.9</code>), etc.</li>
-<li>The public bucket is read <strong>anonymously</strong> (no AWS credentials needed, and any
-  in your environment are bypassed).</li>
-<li>Requires <code>duckdb</code> — included in <code>pip install earthlens[overture]</code>.</li>
-<li>Setting <code>where=</code> takes precedence over <code>stream=</code>; <code>max_features</code> becomes a
-  SQL <code>LIMIT</code>.</li>
-</ul>
-<h2 id="known-limitations"><a class="toclink" href="#known-limitations">Known limitations</a><a class="headerlink" href="#known-limitations" title="Permanent link">#</a></h2>
-<ul>
-<li><strong>No DuckDB attribute pushdown without <code>where=</code></strong> — the plain fetch path uses
-  the SDK's PyArrow bbox pushdown only; attribute filtering needs <code>where=</code>.</li>
-<li><strong>No temporal axis</strong> — pin a <code>release</code> for reproducibility; <code>None</code> drifts
-  to the newest monthly release.</li>
-<li><strong><code>base</code> types carry mixed geometries</strong> — <code>land</code> / <code>water</code> /
-  <code>infrastructure</code> return a mix of polygons, lines, and points. Filter
-  <code>geometry.geom_type</code> client-side if you need a single kind.</li>
-</ul>
+<h2 id="services"><a class="toclink" href="#services">Services</a><a class="headerlink" href="#services" title="Permanent link">#</a></h2>
+<p>The <code>service=</code> keyword selects the NWIS / Water Data plane; the <code>services</code>
+column above lists where each curated code is typically reported. See
+<a href="../usage/#the-services">Usage</a> for each service's request shape and output
+columns.</p>
 
 
 
@@ -7667,7 +7304,7 @@ are always kept so identity and the per-row <code>license_id</code> survive).</p
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
           
-          <a href="../introduction/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Introduction">
+          <a href="../authentication/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Authentication">
             <div class="md-footer__button md-icon">
               
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
@@ -7677,20 +7314,20 @@ are always kept so identity and the per-row <code>license_id</code> survive).</p
                 Previous
               </span>
               <div class="md-ellipsis">
-                Introduction
+                Authentication
               </div>
             </div>
           </a>
         
         
           
-          <a href="../licensing/" class="md-footer__link md-footer__link--next" aria-label="Next: Licensing">
+          <a href="../usgs_water/" class="md-footer__link md-footer__link--next" aria-label="Next: Reference">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                Licensing
+                Reference
               </div>
             </div>
             <div class="md-footer__button md-icon">
