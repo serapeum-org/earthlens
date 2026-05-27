@@ -539,7 +539,15 @@ def output_dir(tmp_path: Path) -> Path:
 
 
 @pytest.fixture(autouse=True)
-def _clear_sh_env(monkeypatch: pytest.MonkeyPatch) -> None:
-    """Ensure SH_* credentials never leak in from the real environment."""
+def _clear_sh_env(
+    request: pytest.FixtureRequest, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Ensure SH_* credentials never leak into the faked-SDK unit/integration tests.
+
+    Skipped for `e2e`-marked tests, which authenticate against the live service
+    with the real `SH_CLIENT_ID` / `SH_CLIENT_SECRET` from the environment.
+    """
+    if request.node.get_closest_marker("e2e"):
+        return
     for key in ("SH_CLIENT_ID", "SH_CLIENT_SECRET", "SH_PROFILE"):
         monkeypatch.delenv(key, raising=False)

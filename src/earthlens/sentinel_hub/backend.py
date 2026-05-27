@@ -787,11 +787,22 @@ class SentinelHub(AbstractDataSource):
             collection = cdse_collection(resolved.sh_collection, cfg.sh_base_url)
             rows: list[dict] = []
             for feature_id, geom in geometries:
+                # Size the sampling grid in pixels from the geometry's WGS84
+                # bounds via bbox_to_dimensions (which converts metres -> px with
+                # latitude). Passing `resolution=` here would be read in the
+                # geometry CRS units (degrees), so a metre value collapses to a
+                # single pixel and the server rejects the effective resolution.
+                geom_bbox = sentinelhub.BBox(
+                    _geometry_bounds(geom), crs=sentinelhub.CRS.WGS84
+                )
+                size = sentinelhub.bbox_to_dimensions(
+                    geom_bbox, resolution=self._resolution
+                )
                 aggregation = sentinelhub.SentinelHubStatistical.aggregation(
                     evalscript=evalscript,
                     time_interval=self._time_interval(),
                     aggregation_interval=interval,
-                    resolution=(self._resolution, self._resolution),
+                    size=size,
                 )
                 input_kwargs: dict[str, Any] = {}
                 if self._maxcc is not None:
@@ -1051,6 +1062,59 @@ def _iter_geometries(geometry: Any) -> list[tuple[Any, Any]]:
     if isinstance(geometry, (list, tuple)):
         return [(index, geom) for index, geom in enumerate(geometry)]
     return [(0, geometry)]
+
+
+def _geometry_bounds(geom: Any) -> tuple[float, float, float, float]:
+    """Return the `(west, south, east, north)` bounds of a geometry.
+
+    Accepts a shapely geometry (uses `.bounds`) or a GeoJSON geometry mapping
+    (recursively gathers its coordinate pairs). Used to size the Statistical
+    sampling grid in pixels.
+
+    Args:
+        geom: A shapely geometry or a GeoJSON geometry mapping.
+
+    Returns:
+        The `(west, south, east, north)` envelope.
+
+    Raises:
+        ValueError: When no coordinates can be extracted from a mapping.
+
+    Examples:
+        - A GeoJSON polygon's bounds:
+            ```python
+            >>> from earthlens.sentinel_hub.backend import _geometry_bounds
+            >>> poly = {"type": "Polygon", "coordinates":
+            ...     [[[14.0, 40.0], [14.2, 40.0], [14.2, 40.1], [14.0, 40.1]]]}
+            >>> _geometry_bounds(poly)
+            (14.0, 40.0, 14.2, 40.1)
+
+            ```
+    """
+    bounds = getattr(geom, "bounds", None)
+    if bounds is not None and not isinstance(geom, dict):
+        west, south, east, north = bounds
+        return (west, south, east, north)
+    coordinates = geom.get("coordinates", geom) if isinstance(geom, dict) else geom
+    points: list[tuple[float, float]] = []
+
+    def _walk(node: Any) -> None:
+        if (
+            isinstance(node, (list, tuple))
+            and len(node) >= 2
+            and all(isinstance(v, (int, float)) for v in node[:2])
+        ):
+            points.append((node[0], node[1]))
+        elif isinstance(node, (list, tuple)):
+            for child in node:
+                _walk(child)
+
+    _walk(coordinates)
+    if not points:
+        raise ValueError("could not extract coordinates from the geometry.")
+    xs = [p[0] for p in points]
+    ys = [p[1] for p in points]
+    return (min(xs), min(ys), max(xs), max(ys))
 
 
 def _flatten_statistics(payload: dict, feature_id: Any) -> list[dict]:
