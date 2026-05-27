@@ -3,46 +3,59 @@
 The curated catalog (`nwm_data_catalog.yaml`) has two blocks: **products**
 (what a file contains) and **configurations** (which operational run
 produced it). A concrete S3 key is assembled from a
-`(configuration, product, cycle, step)` tuple.
+`(configuration, product, cycle, step)` tuple. The catalog covers **all
+six products** and **all 55 operational configurations** on the bucket;
+`Catalog().available_datasets` and `Catalog().available_configurations`
+are the full indices.
 
 ## Products
 
-### `chrtout` — channel routing (`tabular`)
+| Key | NWM file | `OUTPUT_KIND` | Indexed by | Retrospective Zarr |
+|-----|----------|---------------|------------|--------------------|
+| `chrtout` | `channel_rt` | tabular | `feature_id` (NHDPlus reach) | `chrtout.zarr` |
+| `lakeout` | `reservoir` | tabular | `feature_id` (reservoir) | `lakeout.zarr` |
+| `coastal` | `total_water` | tabular | SCHISM mesh `node` | — |
+| `ldasout` | `land` | raster | 1 km grid (`y`, `x`) | `ldasout.zarr` |
+| `rtout` | `terrain_rt` | raster | 250 m routing grid | — |
+| `forcing` | `forcing` | raster | model grid | `precip.zarr` |
 
-Streamflow and velocity on the ~2.7 M NHDPlus v2 stream reaches, indexed
-by `feature_id` (COMID). S3 token `channel_rt`; ~14 MB per whole-CONUS
-file. Retrospective store:
-`s3://noaa-nwm-retrospective-3-0-pds/CONUS/zarr/chrtout.zarr`.
+Variable sets (units in parentheses), as read from the live files:
 
-| Variable | Units | Description |
-|----------|-------|-------------|
-| `streamflow` | `m3 s-1` | River channel flow rate |
-| `velocity` | `m s-1` | River channel flow velocity |
-| `nudge` | `m3 s-1` | Amount of total flow nudged by data assimilation |
-| `qSfcLatRunoff` | `m3 s-1` | Runoff from terrain routing |
-| `qBucket` | `m3 s-1` | Flux from the groundwater bucket |
+- **`chrtout`** — `streamflow` (m3 s-1), `velocity` (m s-1), `nudge` (m3 s-1), `qSfcLatRunoff` (m3 s-1), `qBucket` (m3 s-1), `qBtmVertRunoff` (m3).
+- **`ldasout`** — `SOIL_M` (m3 m-3), `SNEQV` (kg m-2), `SNOWH` (m), `FSNO` (1), `ACCET` (mm), `SOILSAT_TOP` (1), `SNOWT_AVG` (K).
+- **`lakeout`** — `inflow` (m3 s-1), `outflow` (m3 s-1), `water_sfc_elev` (m), `reservoir_type` (1), `reservoir_assimilated_value` (m3 s-1).
+- **`rtout`** — `zwattablrt` (m), `sfcheadsubrt` (mm).
+- **`forcing`** — `RAINRATE` (mm s-1), `T2D` (K), `Q2D` (kg kg-1), `U2D` (m s-1), `V2D` (m s-1), `PSFC` (Pa), `SWDOWN` (W m-2), `LWDOWN` (W m-2).
+- **`coastal`** — `elevation` (m).
 
-### `ldasout` — land surface (`raster`)
+## Configurations
 
-Gridded Noah-MP land states on the 1 km CONUS grid. S3 token `land`;
-~30 MB per whole-CONUS file. Retrospective store:
-`s3://noaa-nwm-retrospective-3-0-pds/CONUS/zarr/ldasout.zarr`.
-
-| Variable | Units | Description |
-|----------|-------|-------------|
-| `SOIL_M` | `m3 m-3` | Volumetric soil moisture |
-| `SNEQV` | `kg m-2` | Snow water equivalent |
-| `SNOWH` | `m` | Snow depth |
-| `ACCET` | `mm` | Accumulated total evapotranspiration |
-| `FSNO` | `1` | Snow-cover fraction on the ground |
-
-## Configurations (CONUS)
+All 55 are curated. The major CONUS ones:
 
 | Configuration | Cycles/day | Steps | Horizon | Ensemble |
 |---------------|-----------|-------|---------|----------|
 | `short_range` | 24 (hourly) | `f001`…`f018` | 18 h | — |
 | `analysis_assim` | 24 (hourly) | `tm00`…`tm02` | look-back | — |
-| `medium_range` | 4 (00/06/12/18 UTC) | `f001`…`f240` | 240 h | members 1–6 |
+| `analysis_assim_extend` | 1 (16 UTC) | `tm00`…`tm27` | 28 h look-back | — |
+| `analysis_assim_long` | 4 | `tm00`…`tm11` | 12 h look-back | — |
+| `medium_range` | 4 (00/06/12/18) | `f003`…`f240` | 240 h | members 1–6 |
+| `medium_range_blend` / `medium_range_no_da` | 4 | `f003`…`f240` | 240 h | — |
+| `long_range` | 4 | `f006`…`f720` (6 h) | 720 h | members 1–4 |
+| `forcing_*` | per family | — | — | — |
+
+…plus the **regional** domains — `*_alaska`, `*_hawaii`, `*_puertorico`
+(the Hawaii/Puerto Rico short-range runs are **sub-hourly**: 5-digit
+`f00015`, `f00030`, … at a 15-minute cadence) — and the **coastal**
+domains `*_coastal_{atlgulf,hawaii,pacific,puertorico}` (the `coastal`
+product). Each carries the right `cycles_utc`, `step_kind`, `step_width`,
+horizon, cadence, members, and product list. List them all:
+
+```python
+from earthlens.nwm import Catalog
+cat = Catalog()
+cat.available_configurations        # all 55 configuration keys
+cat.get_config("short_range_hawaii").step_width   # 5 (sub-hourly)
+```
 
 ## S3 key layout
 
@@ -50,30 +63,27 @@ Gridded Noah-MP land states on the 1 km CONUS grid. S3 token `land`;
 nwm.{YYYYMMDD}/{configuration-dir}/nwm.t{HH}z.{family}.{output}.{step}.{domain}.nc
 ```
 
-* `{output}` is the product's S3 token (`channel_rt`, `land`).
-* `{step}` is `f{NNN}` for forecasts or `tm{NN}` for analyses.
-* For an **ensemble** the directory is `{family}_mem{N}` and the member
-  rides on the output token (`channel_rt_1`).
-* `{domain}` is `conus` for the curated configurations.
+* The directory is the configuration key (`short_range`,
+  `analysis_assim_hawaii`, `short_range_coastal_atlgulf`), with a
+  `_mem{N}` suffix for an ensemble.
+* `{family}` is the configuration's file-name token, `{output}` the
+  product's S3 token (`channel_rt`, `land`, …); for an ensemble the
+  member rides on the output token (`channel_rt_1`).
+* `{step}` is `f{NNN}` for forecasts or `tm{NN}` for analyses,
+  zero-padded to the configuration's step width (`f001`, `tm00`,
+  `f00015`).
 
 Example:
 `nwm.20260526/short_range/nwm.t00z.short_range.channel_rt.f001.conus.nc`
 
-## Beyond the curated subset
-
-The catalog curates only the clean CONUS configurations (the MVP scope).
-The live bucket carries **69** configurations in total — regional
-(Alaska / Hawaii / Puerto Rico), coastal (`total_water`), forcing, and
-the `_no_da` / `_extend` / `_blend` / `long_range` variants. List them
-all with the refresh tool:
+## Tooling
 
 ```bash
+# Probe the bucket: retention window + every live configuration.
 pixi run -e dev python tools/nwm/refresh_nwm_catalog.py
+# Diff the curated catalog vs live; exit non-zero on drift.
+pixi run -e dev python tools/nwm/audit_nwm_catalog.py --strict
 ```
 
-The retention window is a rolling archive (~500+ days as of 2026-05); the
-audit tool reports it against the backend's auto-mode boundary:
-
-```bash
-pixi run -e dev python tools/nwm/audit_nwm_catalog.py
-```
+The retention window is a rolling archive (~512 days as of 2026-05); the
+audit reports it against the backend's auto-mode boundary.

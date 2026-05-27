@@ -275,6 +275,7 @@ nav:
       - Catalog explorer (no network): examples/nwm/catalog_explorer.ipynb
       - Short-range streamflow (live): examples/nwm/streamflow_short_range.ipynb
       - Short-range land surface (live): examples/nwm/land_surface_short_range.ipynb
+      - Regional, ensemble & coastal configs (live): examples/nwm/regional_ensemble_coastal.ipynb
       - Subsetting & deferred features (no network): examples/nwm/deferred_and_subsetting.ipynb
   - API Reference:
     - EarthLens Facade: reference/earthlens.md

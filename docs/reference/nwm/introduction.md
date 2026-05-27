@@ -23,12 +23,17 @@ depends on the product you ask for:
 | Product key | NWM file | Contents | `OUTPUT_KIND` |
 |-------------|----------|----------|---------------|
 | `chrtout`   | `channel_rt` | Streamflow / velocity on ~2.7 M NHDPlus stream reaches, indexed by `feature_id` (COMID) | **`tabular`** |
-| `ldasout`   | `land`       | Gridded Noah-MP land states (soil moisture, snow, ET) on the 1 km CONUS grid | **`raster`** |
+| `lakeout`   | `reservoir`  | Reservoir inflow / outflow / water-surface elevation per `feature_id` | **`tabular`** |
+| `coastal`   | `total_water`| Coastal sea-surface elevation on the SCHISM unstructured-mesh `node`s | **`tabular`** |
+| `ldasout`   | `land`       | Gridded Noah-MP land states (soil moisture, snow, ET) on the 1 km grid | **`raster`** |
+| `rtout`     | `terrain_rt` | Gridded ponded-water / water-table state on the 250 m routing grid | **`raster`** |
+| `forcing`   | `forcing`    | Gridded meteorological forcing (precip, temperature, wind, radiation) | **`raster`** |
 
-`chrtout` is **not** a lat/lon raster — it is a `feature_id × time`
-table — so `OUTPUT_KIND` is set **per request** from the product(s) you
-name. A single request must not mix the two kinds (it raises
-`ValueError`); split it into one request per kind.
+The feature/lake/node-indexed products are **not** lat/lon rasters — they
+are `index × time` tables — so `OUTPUT_KIND` is set **per request** from
+the product(s) you name. A single request must not mix the two kinds (it
+raises `ValueError`); split it into one request per kind. See
+[products & configurations](datasets.md) for the full variable lists.
 
 Because neither product is a griddable raster that the temporal reducer
 can read, `aggregate=` is rejected for the NWM backend.

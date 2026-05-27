@@ -41,7 +41,7 @@ paths = nwm.download()
 | Argument | Meaning |
 |----------|---------|
 | `variables` | `{product: [variable, ...]}`. The MVP downloads whole files, so the variable list is **validated** (unknown names raise) but every variable in the file is fetched. An empty list selects all of the product's variables. |
-| `configuration` | The operational run key: `"short_range"`, `"analysis_assim"`, or `"medium_range"`. Default `"short_range"`. |
+| `configuration` | The operational run key — any of the 55 in `Catalog().available_configurations` (`"short_range"`, `"analysis_assim"`, `"medium_range"`, `"long_range"`, the `*_alaska` / `*_hawaii` / `*_puertorico` regional and `*_coastal_*` domains, the `forcing_*` runs, …). Default `"short_range"`. |
 | `mode` | `"operational"` (NetCDF) or `"retrospective"` (Zarr, `PY-G`-gated). `None` (default) auto-routes by the date window. |
 | `member` | Ensemble member (1-based) for an ensemble configuration (`medium_range`, members 1–6); ignored for deterministic runs. |
 | `cycles` | Restrict the UTC run hours fetched (a subset of the configuration's run hours). Default: every cycle the configuration runs. |
