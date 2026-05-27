@@ -293,6 +293,34 @@
          <lastmod>2026-05-27</lastmod>
     </url>
     <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/examples/overture/01_catalog_explorer/</loc>
+         <lastmod>2026-05-27</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/examples/overture/02_places_quickstart/</loc>
+         <lastmod>2026-05-27</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/examples/overture/03_buildings_footprints/</loc>
+         <lastmod>2026-05-27</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/examples/overture/04_per_row_licensing/</loc>
+         <lastmod>2026-05-27</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/examples/overture/05_transportation_network/</loc>
+         <lastmod>2026-05-27</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/examples/overture/06_multi_theme_download/</loc>
+         <lastmod>2026-05-27</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/examples/overture/07_attribute_pushdown/</loc>
+         <lastmod>2026-05-27</lastmod>
+    </url>
+    <url>
          <loc>https://serapeum-org.github.io/earthlens/develop/examples/radar/catalog_explorer/</loc>
          <lastmod>2026-05-27</lastmod>
     </url>
@@ -574,6 +602,26 @@
     </url>
     <url>
          <loc>https://serapeum-org.github.io/earthlens/develop/reference/openeo/usage/</loc>
+         <lastmod>2026-05-27</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/overture/datasets/</loc>
+         <lastmod>2026-05-27</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/overture/introduction/</loc>
+         <lastmod>2026-05-27</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/overture/licensing/</loc>
+         <lastmod>2026-05-27</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/overture/overture/</loc>
+         <lastmod>2026-05-27</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/overture/usage/</loc>
          <lastmod>2026-05-27</lastmod>
     </url>
     <url>
