@@ -33,8 +33,69 @@ from earthlens.base.yaml_loader import load_yaml_strict
 
 CATALOG_PATH: Path = Path(__file__).parent / "usgs_water_data_catalog.yaml"
 
+#: Module-level cache of parsed catalog rows, keyed on the resolved path
+#: plus the YAML's `st_mtime_ns`, so editing the file invalidates the
+#: entry without re-parsing on every `Catalog()`. Mirrors the
+#: `_CATALOG_CACHE` pattern in the GEE / ECMWF / CMEMS / FDSN loaders.
+_CATALOG_CACHE: dict[tuple[str, int], dict[str, "Parameter"]] = {}
+
 #: A 5-digit NWIS parameter code (the raw form `resolve` passes through).
 _CODE_RE = re.compile(r"^\d{5}$")
+
+
+def clear_catalog_cache() -> None:
+    """Empty the module-level catalog parse cache.
+
+    Useful in tests that rewrite the catalog on disk and want to force
+    a re-parse. Production callers do not need this — the cache key
+    includes the file's `st_mtime_ns`, so any real edit invalidates the
+    entry on its own.
+    """
+    _CATALOG_CACHE.clear()
+
+
+def _load_catalog_data(path: Path) -> dict[str, "Parameter"]:
+    """Parse, validate, and cache the parameter catalog at `path`.
+
+    Args:
+        path: Path to the catalog YAML (default :data:`CATALOG_PATH`).
+
+    Returns:
+        Mapping from friendly parameter name to its :class:`Parameter`.
+
+    Raises:
+        ValueError: If the file has no `parameters:` block, or a row
+            fails :class:`Parameter` validation.
+    """
+    resolved = str(path.resolve())
+    try:
+        mtime = path.stat().st_mtime_ns
+    except FileNotFoundError:
+        mtime = 0
+    key = (resolved, mtime)
+    cached = _CATALOG_CACHE.get(key)
+    if cached is not None:
+        return cached
+
+    data = load_yaml_strict(path) or {}
+    parameters_yaml = data.get("parameters") or {}
+    if not parameters_yaml:
+        raise ValueError(
+            f"{path} is missing or has an empty 'parameters:' block. "
+            "The USGS Water catalog must list at least one parameter."
+        )
+    rows: dict[str, Parameter] = {}
+    for name, body in parameters_yaml.items():
+        try:
+            rows[name] = Parameter(**dict(body or {}))
+        except ValidationError as exc:
+            raise ValueError(
+                f"{path} parameter {name!r} failed validation:\n{exc}"
+            ) from exc
+
+    _CATALOG_CACHE[key] = rows
+    return rows
+
 
 #: The coarse USGS parameter groups a `Parameter` can belong to.
 ParameterGroup = Literal[
@@ -157,23 +218,7 @@ class Catalog(AbstractCatalog):
                 fails :class:`Parameter` validation.
         """
         catalog_path = catalog_path if catalog_path is not None else CATALOG_PATH
-        data = load_yaml_strict(catalog_path) or {}
-        parameters_yaml = data.get("parameters") or {}
-        if not parameters_yaml:
-            raise ValueError(
-                f"{catalog_path} is missing or has an empty 'parameters:' "
-                "block. The USGS Water catalog must list at least one "
-                "parameter."
-            )
-        parameters: dict[str, Parameter] = {}
-        for name, body in parameters_yaml.items():
-            try:
-                parameters[name] = Parameter(**dict(body or {}))
-            except ValidationError as exc:
-                raise ValueError(
-                    f"{catalog_path} parameter {name!r} failed validation:\n{exc}"
-                ) from exc
-        return cls(parameters=parameters)
+        return cls(parameters=dict(_load_catalog_data(catalog_path)))
 
     def get_catalog(self) -> dict[str, Parameter]:
         """Return the parameter map (satisfies the abstract contract).

@@ -39,7 +39,12 @@ from __future__ import annotations
 
 from earthlens.usgs_water.auth import UsgsWaterAuth, UsgsWaterCredentials
 from earthlens.usgs_water.backend import USGSWater
-from earthlens.usgs_water.catalog import CATALOG_PATH, Catalog, Parameter
+from earthlens.usgs_water.catalog import (
+    CATALOG_PATH,
+    Catalog,
+    Parameter,
+    clear_catalog_cache,
+)
 
 __all__ = [
     "CATALOG_PATH",
@@ -48,4 +53,5 @@ __all__ = [
     "USGSWater",
     "UsgsWaterAuth",
     "UsgsWaterCredentials",
+    "clear_catalog_cache",
 ]

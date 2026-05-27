@@ -6,6 +6,7 @@ import pytest
 from pydantic import ValidationError
 
 from earthlens.usgs_water import Catalog, Parameter
+from earthlens.usgs_water import catalog as catalog_module
 from earthlens.usgs_water.backend import SERVICES
 
 pytestmark = pytest.mark.usgs_water
@@ -83,3 +84,12 @@ def test_get_catalog_returns_parameters():
     """get_catalog returns the same parameter map."""
     catalog = Catalog()
     assert catalog.get_catalog() is catalog.parameters
+
+
+def test_parse_cache_reuses_rows_until_cleared():
+    """Parsing is cached on (path, mtime); clearing forces a re-parse."""
+    catalog_module.clear_catalog_cache()
+    Catalog.load()
+    assert catalog_module._CATALOG_CACHE, "load() should populate the cache"
+    catalog_module.clear_catalog_cache()
+    assert not catalog_module._CATALOG_CACHE, "clear_catalog_cache() empties it"
