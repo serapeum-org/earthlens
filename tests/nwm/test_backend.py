@@ -7,11 +7,11 @@ from pathlib import Path
 
 import pytest
 
-from earthlens.nwm import BUCKET, Catalog, NWM, NWMProduct, NWMVariable
+from earthlens.nwm import BUCKET, NWM, Catalog, NWMProduct, NWMVariable
 from earthlens.nwm.backend import (
+    _is_missing_key,
     build_key,
     enumerate_cycles,
-    _is_missing_key,
 )
 from tests.nwm.conftest import FakeS3
 
@@ -61,7 +61,9 @@ def test_build_key_forecast(catalog):
         1,
         1,
     )
-    assert key == "nwm.20260526/short_range/nwm.t00z.short_range.channel_rt.f001.conus.nc"
+    assert (
+        key == "nwm.20260526/short_range/nwm.t00z.short_range.channel_rt.f001.conus.nc"
+    )
 
 
 def test_build_key_analysis(catalog):
@@ -210,7 +212,9 @@ def test_search_keys_match_layout(make_nwm):
     """Enumerated hrefs are valid noaa-nwm-pds keys."""
     nwm = make_nwm(cycles=[0], steps=[1])
     href = nwm._search()[0].href
-    assert href == "nwm.20260526/short_range/nwm.t00z.short_range.channel_rt.f001.conus.nc"
+    assert (
+        href == "nwm.20260526/short_range/nwm.t00z.short_range.channel_rt.f001.conus.nc"
+    )
 
 
 # -- mode resolution --------------------------------------------------------
@@ -373,10 +377,7 @@ def test_no_xarray_or_zarr_import(name):
     """The NWM source never imports xarray or zarr (PY-G owns the read)."""
     banned = ("import xarray", "import zarr", "from xarray", "from zarr")
     code_lines = [
-        line.strip()
-        for line in (_SRC / name).read_text(encoding="utf-8").splitlines()
+        line.strip() for line in (_SRC / name).read_text(encoding="utf-8").splitlines()
     ]
-    offenders = [
-        line for line in code_lines if any(line.startswith(b) for b in banned)
-    ]
+    offenders = [line for line in code_lines if any(line.startswith(b) for b in banned)]
     assert offenders == []

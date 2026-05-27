@@ -39,14 +39,14 @@ from typing import Any
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent / "src"))
 sys.path.insert(0, str(Path(__file__).parent))
+from refresh_nwm_catalog import (  # noqa: E402
+    _client,
+    build_report,
+    sample_products,
+)
+
 from earthlens.nwm import Catalog  # noqa: E402
 from earthlens.nwm.backend import OPERATIONAL_RETENTION_DAYS  # noqa: E402
-from refresh_nwm_catalog import (  # noqa: E402
-    build_report,
-    list_configurations,
-    sample_products,
-    _client,
-)
 
 
 def _live_directory(catalog: Catalog, key: str) -> str:
@@ -82,9 +82,7 @@ def audit(region: str) -> dict[str, Any]:
         else:
             curated_live_dirs.add(key)
     uncurated_configs = sorted(
-        cfg
-        for cfg in live_configs - curated_configs
-        if cfg not in curated_live_dirs
+        cfg for cfg in live_configs - curated_configs if cfg not in curated_live_dirs
     )
 
     # Each curated product token must appear under at least one of its

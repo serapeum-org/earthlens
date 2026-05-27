@@ -42,7 +42,9 @@ def _client(region: str) -> Any:
     from botocore import UNSIGNED
     from botocore.client import Config
 
-    return boto3.client("s3", region_name=region, config=Config(signature_version=UNSIGNED))
+    return boto3.client(
+        "s3", region_name=region, config=Config(signature_version=UNSIGNED)
+    )
 
 
 def list_date_prefixes(client: Any) -> list[str]:
@@ -63,8 +65,7 @@ def list_configurations(client: Any, day_prefix: str) -> list[str]:
         Bucket=BUCKET, Prefix=f"{day_prefix}/", Delimiter="/"
     )
     return sorted(
-        entry["Prefix"].split("/")[1]
-        for entry in result.get("CommonPrefixes", [])
+        entry["Prefix"].split("/")[1] for entry in result.get("CommonPrefixes", [])
     )
 
 
