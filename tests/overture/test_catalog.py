@@ -71,8 +71,10 @@ class TestCatalog:
     """`Catalog` loading, lookup, and release index."""
 
     def test_themes_sorted(self):
-        """`themes()` lists the four curated themes, sorted."""
+        """`themes()` lists the six curated themes, sorted."""
         assert Catalog().themes() == [
+            "addresses",
+            "base",
             "buildings",
             "divisions",
             "places",
@@ -95,7 +97,7 @@ class TestCatalog:
         cat = Catalog()
         assert "places" in cat
         assert cat["places"].default_type == "place"
-        assert len(cat) == 4
+        assert len(cat) == 6
 
     def test_curated_themes_have_licenses(self):
         """Every curated theme lists ODbL among its licenses."""

@@ -65,6 +65,8 @@ at row counts where an unbounded box is a footgun. The backend therefore
 |-------|-------------|
 | `buildings` | 0.5 deg² |
 | `transportation` | 0.5 deg² |
+| `base` | 0.5 deg² |
+| `addresses` | 0.5 deg² |
 | `places` | 9.0 deg² |
 | `divisions` | unguarded (few rows globally) |
 
@@ -131,5 +133,6 @@ pixi run -e dev python tools/overture/refresh_overture_catalog.py probe building
 - **No DuckDB / SQL pushdown** — only the SDK's PyArrow bbox pushdown.
 - **No temporal axis** — pin a `release` for reproducibility; `None` drifts
   to the newest monthly release.
-- **`base` / `addresses` themes** are out of scope (the curated set is
-  buildings / places / transportation / divisions).
+- **`base` types carry mixed geometries** — `land` / `water` /
+  `infrastructure` return a mix of polygons, lines, and points. Filter
+  `geometry.geom_type` client-side if you need a single kind.

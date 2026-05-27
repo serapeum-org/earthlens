@@ -109,6 +109,24 @@ class TestResolvePlan:
         plan = backend._resolve_plan()
         assert [t for _n, _theme, t in plan] == ["segment", "connector", "place"]
 
+    def test_base_default_type_is_land(self, tmp_path: Path):
+        """The `base` theme's empty type list resolves to `land`."""
+        backend = _make_backend(tmp_path, variables={"base": []})
+        plan = backend._resolve_plan()
+        assert [(n, t) for n, _theme, t in plan] == [("base", "land")]
+
+    def test_addresses_default_type_is_address(self, tmp_path: Path):
+        """The `addresses` theme's empty type list resolves to `address`."""
+        backend = _make_backend(tmp_path, variables={"addresses": []})
+        plan = backend._resolve_plan()
+        assert [(n, t) for n, _theme, t in plan] == [("addresses", "address")]
+
+    def test_base_explicit_types(self, tmp_path: Path):
+        """Explicit `base` types (water, bathymetry) resolve in order."""
+        backend = _make_backend(tmp_path, variables={"base": ["water", "bathymetry"]})
+        plan = backend._resolve_plan()
+        assert [t for _n, _theme, t in plan] == ["water", "bathymetry"]
+
     def test_unknown_theme_raises(self, tmp_path: Path):
         """An unknown theme raises with a did-you-mean hint."""
         backend = _make_backend(tmp_path, variables={"building": []})
@@ -146,6 +164,22 @@ class TestGuardBbox:
         )
         with pytest.raises(ValueError, match=r"'places'"):
             backend._guard_bbox(["places"])
+
+    def test_base_guarded(self, tmp_path: Path):
+        """The `base` theme is guarded against an oversized bbox."""
+        backend = _make_backend(
+            tmp_path, variables={"base": []}, lat_lim=[0, 10], lon_lim=[0, 10]
+        )
+        with pytest.raises(ValueError, match=r"'base'"):
+            backend._guard_bbox(["base"])
+
+    def test_addresses_guarded(self, tmp_path: Path):
+        """The `addresses` theme is guarded against an oversized bbox."""
+        backend = _make_backend(
+            tmp_path, variables={"addresses": []}, lat_lim=[0, 10], lon_lim=[0, 10]
+        )
+        with pytest.raises(ValueError, match=r"'addresses'"):
+            backend._guard_bbox(["addresses"])
 
     def test_divisions_unguarded(self, tmp_path: Path):
         """Divisions are unguarded even over a large bbox."""

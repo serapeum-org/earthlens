@@ -52,7 +52,7 @@ Examples:
         ```python
         >>> from earthlens.overture import Catalog
         >>> Catalog().themes()
-        ['buildings', 'divisions', 'places', 'transportation']
+        ['addresses', 'base', 'buildings', 'divisions', 'places', 'transportation']
 
         ```
 """

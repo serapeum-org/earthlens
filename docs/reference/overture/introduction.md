@@ -10,8 +10,8 @@ pyramids [`FeatureCollection`](https://github.com/Serapieum-of-alex/pyramids)
 
 ## What it covers
 
-Overture organises the world into a handful of **themes**, each a parent
-partition of the GeoParquet store. earthlens curates the four most-used:
+Overture organises the world into six **themes**, each a parent partition
+of the GeoParquet store. earthlens curates all of them:
 
 | Theme | Feature types | Geometry | Scale | Typical licenses |
 |-------|---------------|----------|-------|------------------|
@@ -19,10 +19,10 @@ partition of the GeoParquet store. earthlens curates the four most-used:
 | `places` | `place` | Point | ~57 M POIs | CDLA-Permissive-2.0, **ODbL-1.0** |
 | `transportation` | `segment`, `connector` | LineString / Point | ~86 M km of roads | CDLA-Permissive-2.0, **ODbL-1.0** |
 | `divisions` | `division`, `division_area`, `division_boundary` | Point / Polygon / LineString | admin boundaries | CDLA-Permissive-2.0, **ODbL-1.0** |
+| `base` | `land`, `land_use`, `land_cover`, `water`, `infrastructure`, `bathymetry` | mixed (polygon-dominant) | land/water/infra basemap | CDLA-Permissive-2.0, **ODbL-1.0** |
+| `addresses` | `address` | Point | point addresses | CDLA-Permissive-2.0, **ODbL-1.0** |
 
-The `base` and `addresses` themes exist upstream but are out of scope for
-now (see [Available datasets](datasets.md) for the full theme/type
-reference).
+See [Available datasets](datasets.md) for the full theme/type reference.
 
 ## Output kind
 

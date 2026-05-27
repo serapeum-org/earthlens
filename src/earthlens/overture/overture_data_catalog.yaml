@@ -57,6 +57,28 @@ themes:
     geometry: Polygon
     key_columns: [id, names, subtype, country, region, sources]
     licenses: [CDLA-Permissive-2.0, ODbL-1.0]
+  base:
+    description: >-
+      The base map layer: physical and land features the other themes sit on
+      — land polygons, land use, land cover, water bodies, infrastructure
+      (bridges, towers, …) and bathymetry. Types span mixed geometries
+      (polygon-dominant; infrastructure / water also carry lines and points).
+      Largely OSM- and Daylight-derived, so expect ODbL-1.0 rows.
+    types: [land, land_use, land_cover, water, infrastructure, bathymetry]
+    default_type: land
+    geometry: Polygon
+    key_columns: [id, names, subtype, class, sources]
+    licenses: [CDLA-Permissive-2.0, ODbL-1.0]
+  addresses:
+    description: >-
+      Point addresses (street / number / unit / postcode). Very dense — a
+      bounded bbox is required (guarded). Sourced from open address datasets
+      and OSM, so expect a mix of CDLA-Permissive-2.0 and ODbL-1.0 rows.
+    types: [address]
+    default_type: address
+    geometry: Point
+    key_columns: [id, street, number, unit, postcode, country, sources]
+    licenses: [CDLA-Permissive-2.0, ODbL-1.0]
 
 # Informational index of every Overture feature type the SDK exposes (across
 # all themes, including the uncurated `base` / `addresses` themes). Rebuilt by

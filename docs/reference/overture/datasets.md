@@ -23,16 +23,17 @@ cat.available_releases             # ['2026-05-20.0', '2026-04-15.0']
 Following the same pattern as the other backends (e.g. GEE), the catalog
 holds two things:
 
-- **Curated `themes:`** — the four MVP themes below, hand-vetted with full
+- **Curated `themes:`** — the six themes below, hand-vetted with full
   metadata (types, geometry, key columns, licenses). These are what
   `variables={theme: [...]}` dispatches on.
 - **`available_datasets:`** — an auto-generated index of **every** Overture
   feature type the SDK exposes (rebuilt by the
   [refresh tool](usage.md#catalog-tooling) from the live SDK), so the
   catalog reflects the provider's *full* queryable universe. Every curated
-  theme's types are a subset of it.
+  theme's types are a subset of it — and with all six themes curated, the
+  two sets now coincide.
 
-The full type universe (15 types across 6 themes):
+The full type universe (15 types across all 6 themes — all curated):
 
 | Theme | Types | Curated? |
 |-------|-------|----------|
@@ -40,13 +41,8 @@ The full type universe (15 types across 6 themes):
 | `places` | `place` | ✅ |
 | `transportation` | `segment`, `connector` | ✅ |
 | `divisions` | `division`, `division_area`, `division_boundary` | ✅ |
-| `base` | `bathymetry`, `infrastructure`, `land`, `land_cover`, `land_use`, `water` | indexed, not curated |
-| `addresses` | `address` | indexed, not curated |
-
-The `base` and `addresses` themes appear in `available_datasets` for
-discoverability but are **not curated** — they are follow-ons (see
-[Out of scope](#out-of-scope)). You can still inspect any of them with the
-`probe` tool.
+| `base` | `land`, `land_use`, `land_cover`, `water`, `infrastructure`, `bathymetry` | ✅ |
+| `addresses` | `address` | ✅ |
 
 ## Curated themes
 
@@ -100,6 +96,34 @@ rows globally).
 | Key columns | `id`, `names`, `subtype`, `country`, `region`, `sources` |
 | Licenses | `CDLA-Permissive-2.0`, `ODbL-1.0` |
 
+### `base`
+
+The base map layer the other themes sit on: land, land use, land cover,
+water bodies, infrastructure (bridges, towers, …) and bathymetry. Types
+span **mixed geometries** — polygon-dominant, but `water` / `infrastructure`
+also carry lines and points. Largely OSM- and Daylight-derived. Bounded
+bbox only (guarded).
+
+| Field | Value |
+|-------|-------|
+| Types | `land` (primary), `land_use`, `land_cover`, `water`, `infrastructure`, `bathymetry` |
+| Geometry | Polygon (dominant; mixed across types) |
+| Key columns | `id`, `names`, `subtype`, `class`, `sources` (plus per-type fields: `depth`, `surface`, `elevation`, `is_salt`, …) |
+| Licenses | `CDLA-Permissive-2.0`, `ODbL-1.0` |
+
+### `addresses`
+
+Point addresses (street / number / unit / postcode). Very dense, so a
+**bounded bbox is required** (guarded like buildings). Sourced from open
+address datasets and OSM.
+
+| Field | Value |
+|-------|-------|
+| Types | `address` (primary) |
+| Geometry | Point |
+| Key columns | `id`, `street`, `number`, `unit`, `postcode`, `country`, `sources` |
+| Licenses | `CDLA-Permissive-2.0`, `ODbL-1.0` |
+
 ## Releases
 
 Overture publishes a new **release** roughly monthly, identified
@@ -108,9 +132,10 @@ Overture publishes a new **release** roughly monthly, identified
 auto-targets the newest release when `release=None`. Pin a `release` for
 reproducible downloads.
 
-## Out of scope
+## Coverage
 
-The upstream `base` (land, land use, water, infrastructure, bathymetry)
-and `addresses` themes exist but are **not curated** here. They are
-follow-ons; the curated MVP is buildings / places / transportation /
-divisions.
+All six Overture themes are curated, so `available_datasets` (the full
+type universe) and the curated themes' types coincide — there are no
+deferred themes. The `base` types carry mixed geometries; if you need a
+single geometry kind, request the relevant type and filter
+`geometry.geom_type` client-side.

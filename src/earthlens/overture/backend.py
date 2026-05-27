@@ -81,6 +81,8 @@ _DEFAULT_MAX_BBOX_DEG2: dict[str, float] = {
     "buildings": 0.5,
     "transportation": 0.5,
     "places": 9.0,
+    "base": 0.5,
+    "addresses": 0.5,
 }
 
 

@@ -159,7 +159,7 @@ class Catalog(AbstractCatalog):
             >>> from earthlens.overture import Catalog
             >>> cat = Catalog()
             >>> cat.themes()
-            ['buildings', 'divisions', 'places', 'transportation']
+            ['addresses', 'base', 'buildings', 'divisions', 'places', 'transportation']
             >>> cat.get_theme("buildings").default_type
             'building'
             >>> "places" in cat
@@ -172,7 +172,7 @@ class Catalog(AbstractCatalog):
             >>> Catalog().get_theme("building")
             Traceback (most recent call last):
                 ...
-            ValueError: 'building' is not in the Overture theme catalog. Known datasets: ['buildings', 'divisions', 'places', 'transportation']. Did you mean 'buildings'?
+            ValueError: 'building' is not in the Overture theme catalog. Known datasets: ['addresses', 'base', 'buildings', 'divisions', 'places', 'transportation']. Did you mean 'buildings'?
 
             ```
     """
