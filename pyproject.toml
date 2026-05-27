@@ -66,12 +66,14 @@ openeo = ["openeo >=0.47,<0.48"]
 # tropycal.utils.cartopy_utils (module-level `import cartopy`); tropycal omits it
 # from its own deps, so earthlens must supply it or the import fails.
 tropycal = ["tropycal >=1.4", "cartopy >=0.22"]
+usgs-water = ["dataretrieval >=1.1.4"]
 all = [
     "boto3 >=1.43.0",
     "botocore >=1.34.0",
     "cartopy >=0.22",
     "cdsapi >=0.7.7",
     "copernicusmarine >=2.0.0,<3",
+    "dataretrieval >=1.1.4",
     "earthengine-api >=1.7.26",
     "earthaccess >=0.18.0; python_version >= '3.12'",
     "eumdac >=3.1",
@@ -159,6 +161,7 @@ include = ["earthlens", "earthlens.*"]
 "earthlens.openaq" = ["*.yaml"]
 "earthlens.tropycal" = ["*.yaml"]
 "earthlens.firms" = ["*.yaml"]
+"earthlens.usgs_water" = ["*.yaml"]
 
 [tool.flake8]
 ignore = ["E203", "E266", "E501", "W503", "E722", "C901", "E741", "E731"]
@@ -231,6 +234,7 @@ markers = [
     "openaq: tests for the OpenAQ v3 air-quality backend (no extra SDK; uses the core `requests` dependency).",
     "tropycal: tests for the Tropycal cyclone-track backend (requires the `tropycal` extra: tropycal, cartopy).",
     "firms: tests for the NASA FIRMS active-fire backend (free MAP_KEY, no extra SDK; uses the core `requests` + `pandas` dependencies).",
+    "usgs_water: tests for the USGS NWIS / Water Data backend (requires the `usgs-water` extra: dataretrieval; anonymous access works).",
 ]
 
 [tool.pixi.workspace]
@@ -264,7 +268,8 @@ test-gdacs = { cmd = "pytest -vvv -m 'gdacs and not e2e' --cov=src/earthlens --c
 test-openaq = { cmd = "pytest -vvv -m 'openaq and not e2e' --cov=src/earthlens --cov-report=xml --cov-report=term-missing", description = "Run OpenAQ-backend tests (no extra SDK; uses the core requests dependency)" }
 test-tropycal = { cmd = "pytest -vvv -m 'tropycal and not e2e' --cov=src/earthlens --cov-report=xml --cov-report=term-missing", description = "Run Tropycal cyclone-track backend tests (requires the `tropycal` extra: tropycal, cartopy)" }
 test-firms = { cmd = "pytest -vvv -m 'firms and not e2e' --cov=src/earthlens --cov-report=xml --cov-report=term-missing", description = "Run NASA FIRMS active-fire backend tests (free MAP_KEY, no extra SDK)" }
-test-doctests = { cmd = "pytest --doctest-modules src/earthlens/gee src/earthlens/chc src/earthlens/ecmwf src/earthlens/cmems src/earthlens/fdsn src/earthlens/earthdata src/earthlens/eumetsat src/earthlens/stac src/earthlens/openeo src/earthlens/gdacs src/earthlens/openaq src/earthlens/tropycal src/earthlens/firms src/earthlens/base", description = "Run docstring examples across the backend packages (catches drift in catalog / API docstrings)" }
+test-usgs-water = { cmd = "pytest -vvv -m 'usgs_water and not e2e' --cov=src/earthlens --cov-report=xml --cov-report=term-missing", description = "Run USGS NWIS / Water Data backend tests (requires the `usgs-water` extra: dataretrieval)" }
+test-doctests = { cmd = "pytest --doctest-modules src/earthlens/gee src/earthlens/chc src/earthlens/ecmwf src/earthlens/cmems src/earthlens/fdsn src/earthlens/earthdata src/earthlens/eumetsat src/earthlens/stac src/earthlens/openeo src/earthlens/gdacs src/earthlens/openaq src/earthlens/tropycal src/earthlens/firms src/earthlens/usgs_water src/earthlens/base", description = "Run docstring examples across the backend packages (catches drift in catalog / API docstrings)" }
 notebooks = { cmd = "pytest --nbval --nbval-lax --verbose docs/examples", description = "check notebooks" }
 jupyter = { cmd = "jupyter lab --no-browser --IdentityProvider.token='' --ServerApp.password='' --port=8889", description = "check notebooks" }
 build-dist = { cmd = "python -m build", description = "Build sdist and wheel for PyPI" }
