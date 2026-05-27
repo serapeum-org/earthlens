@@ -137,9 +137,8 @@ class EarthLens:
             >>> sorted(EarthLens.DataSources)  # doctest: +NORMALIZE_WHITESPACE
             ['amazon-s3', 'cdse', 'chc', 'chirps', 'cmems', 'earth-search',
              'earthdata', 'ecmwf', 'eumetsat', 'fdsn', 'firms', 'gdacs', 'gee',
-             'google-earth-engine', 'national-water-model', 'nexrad', 'nwm',
-             'nwp', 'openaq', 'openeo', 'planetary-computer', 'radar', 'stac',
-             'tropycal']
+             'google-earth-engine', 'nexrad', 'nwp', 'openaq', 'openeo',
+             'planetary-computer', 'radar', 'stac', 'tropycal']
 
             ```
         - Asking for an unknown backend raises `ValueError`:
@@ -192,10 +191,6 @@ class EarthLens:
         :class:`earthlens.radar.Radar`: NEXRAD Level-II radar volumes
             assembled from the real-time chunk feed (`vector` inventory);
             keys `"radar"` / `"nexrad"`.
-        :class:`earthlens.nwm.NWM`: NOAA National Water Model hydrologic
-            output (streamflow / land states) fetched from `noaa-nwm-pds`
-            on a forecast `(cycle, step)` axis (`tabular` inventory); keys
-            `"nwm"` / `"national-water-model"`.
     """
 
     DataSources = _LazyRegistry(
@@ -230,10 +225,6 @@ class EarthLens:
             # NEXRAD Level-II radar (anonymous chunk bucket); alias "nexrad".
             "radar": ("earthlens.radar", "Radar", "radar", {}),
             "nexrad": ("earthlens.radar", "Radar", "radar", {}),
-            # NOAA National Water Model (anonymous noaa-nwm-pds bucket);
-            # the [nwm] extra pulls boto3. Alias "national-water-model".
-            "nwm": ("earthlens.nwm", "NWM", "nwm", {}),
-            "national-water-model": ("earthlens.nwm", "NWM", "nwm", {}),
             # One unified STAC backend over several endpoints. The bare
             # `"stac"` key leaves the endpoint to be inferred from the
             # requested collection; the three endpoint aliases pre-bind
