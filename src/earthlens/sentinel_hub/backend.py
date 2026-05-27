@@ -763,8 +763,11 @@ class SentinelHub(AbstractDataSource):
             )
             batch_request = client.create(base, input=tiling, output=output)
             # Analyse first so the tile count / cost is known before committing
-            # the (potentially continental, costly) job.
+            # the (potentially continental, costly) job. start_analysis only
+            # *starts* the analysis phase, so wait for it to finish before
+            # reading cost_PU (otherwise the guard below sees None and is a no-op).
             client.start_analysis(batch_request)
+            sentinelhub.monitor_batch_process_analysis(batch_request, client)
             batch_request = client.get_request(batch_request)
             cost_pu = getattr(batch_request, "cost_PU", None)
             logger.info(

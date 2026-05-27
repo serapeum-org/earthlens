@@ -310,11 +310,15 @@ class FakeSentinelHubStatistical:
 
 
 class FakeBatchProcessRequest:
-    """Stand-in for `sentinelhub.BatchProcessRequest`."""
+    """Stand-in for `sentinelhub.BatchProcessRequest`.
 
-    def __init__(self, cost_pu: float = 5.0) -> None:
+    `cost_PU` starts `None` and is populated only once analysis is monitored
+    (mirrors the live ordering: `start_analysis` merely starts the phase).
+    """
+
+    def __init__(self) -> None:
         self.completion_percentage = 100.0
-        self.cost_PU = cost_pu
+        self.cost_PU = None
 
 
 class FakeBatchProcessClient:
@@ -346,10 +350,10 @@ class FakeBatchProcessClient:
     cost_pu = 5.0
 
     def create(self, process_request: Any, input: Any, output: Any, **kwargs: Any):
-        """Record batch-request creation and return a fake request."""
+        """Record batch-request creation and return a fake request (cost_PU=None)."""
         self.calls.append("create")
         self.created = {"input": input, "output": output}
-        return FakeBatchProcessRequest(cost_pu=type(self).cost_pu)
+        return FakeBatchProcessRequest()
 
     def get_request(self, batch_request: Any):
         """Return the (analysed) request; a read, not a lifecycle step."""
@@ -362,6 +366,16 @@ class FakeBatchProcessClient:
     def start_job(self, batch_request: Any):
         """Record the job start."""
         self.calls.append("start_job")
+
+
+def fake_monitor_batch_process_analysis(request: Any, client: Any, **kwargs: Any):
+    """Stand-in for `monitor_batch_process_analysis`: completes the analysis phase.
+
+    Populates `cost_PU` (as the live monitor does) so the cost guard can read it;
+    a read, not a job-lifecycle step, so it is not recorded in `client.calls`.
+    """
+    request.cost_PU = type(client).cost_pu
+    return request
 
 
 def fake_monitor_batch_process_job(request: Any, client: Any, **kwargs: Any):
@@ -528,6 +542,7 @@ class FakeSentinelHub:
     SentinelHubCatalog = FakeSentinelHubCatalog
     bbox_to_dimensions = staticmethod(fake_bbox_to_dimensions)
     get_async_running_status = staticmethod(fake_get_async_running_status)
+    monitor_batch_process_analysis = staticmethod(fake_monitor_batch_process_analysis)
     monitor_batch_process_job = staticmethod(fake_monitor_batch_process_job)
     monitor_batch_statistical_job = staticmethod(fake_monitor_batch_statistical_job)
 
