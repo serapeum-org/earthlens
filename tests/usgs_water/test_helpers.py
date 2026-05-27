@@ -263,6 +263,35 @@ def test_statistics_modern_kwargs_forward_window():
     assert kw["end_date"] == "2021-12-31"
 
 
+@pytest.mark.parametrize(
+    "service, flavour",
+    [
+        ("instantaneous", "waterdata"),
+        ("statistics", "waterdata"),
+        ("statistics", "nwis"),
+    ],
+)
+def test_query_kwargs_no_sites_omits_site_filter(service, flavour):
+    """With sites=None these builders omit the site filter (no spatial key).
+
+    Exercises the no-sites branch of query_kwargs directly — the backend
+    guards statistics against a missing sites=, but the pure helper does
+    not, so it is independently coverable.
+    """
+    kw = _helpers.query_kwargs(
+        service=service,
+        flavour=flavour,
+        codes=["00060"],
+        sites=None,
+        bbox=[-77.2, 38.9, -77.0, 39.0],
+        start="2023-01-01",
+        end="2023-01-05",
+        limit=None,
+    )
+    assert "monitoring_location_id" not in kw
+    assert "sites" not in kw
+
+
 def test_first_column_absent_returns_index_aligned_series():
     """_first_column returns an index-aligned Series (not a scalar) when absent."""
     import pandas as pd
