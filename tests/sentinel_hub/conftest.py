@@ -430,6 +430,35 @@ class FakeAwsBatchStatisticalResults:
         return [payload for _ in ids]
 
 
+class FakeSentinelHubCatalog:
+    """Stand-in for `sentinelhub.SentinelHubCatalog` returning canned items."""
+
+    #: Items the next `search` returns; tests may override.
+    items: list[dict] = [
+        {
+            "id": "S2_TILE_A",
+            "properties": {"datetime": "2020-06-01T10:00:00Z"},
+            "geometry": {"type": "Polygon", "coordinates": []},
+        },
+        {
+            "id": "S2_TILE_B",
+            "properties": {"datetime": "2020-06-02T10:00:00Z"},
+            "geometry": {"type": "Polygon", "coordinates": []},
+        },
+    ]
+
+    #: Class-level log of every search issued (backend builds its own instance).
+    searches: list[dict] = []
+
+    def __init__(self, config: Any = None) -> None:
+        self.config = config
+
+    def search(self, collection: Any, **kwargs: Any) -> list[dict]:
+        """Record the search args and return the canned items."""
+        FakeSentinelHubCatalog.searches.append({"collection": collection, **kwargs})
+        return list(FakeSentinelHubCatalog.items)
+
+
 def fake_bbox_to_dimensions(bbox: Any, resolution: float) -> tuple[int, int]:
     """Deterministic `bbox_to_dimensions`: (degrees * 1000 / resolution) per side."""
     west, south, east, north = bbox.bbox
@@ -453,6 +482,7 @@ class FakeSentinelHub:
     Geometry = FakeGeometry
     BatchProcessClient = FakeBatchProcessClient
     SentinelHubBatchStatistical = FakeSentinelHubBatchStatistical
+    SentinelHubCatalog = FakeSentinelHubCatalog
     bbox_to_dimensions = staticmethod(fake_bbox_to_dimensions)
     get_async_running_status = staticmethod(fake_get_async_running_status)
     monitor_batch_process_job = staticmethod(fake_monitor_batch_process_job)

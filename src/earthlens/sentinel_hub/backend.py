@@ -320,6 +320,49 @@ class SentinelHub(AbstractDataSource):
             for key, resolved in self._resolved.items()
         ]
 
+    def search(self, limit: int = 100) -> list[RemoteProduct]:
+        """Query the Sentinel Hub Catalog API for scenes intersecting the request.
+
+        A real STAC-style search (distinct from the internal :meth:`_search`
+        fetch-planner): returns one :class:`RemoteProduct` per catalog item that
+        intersects the request bbox + window, so a caller can enumerate coverage
+        before rendering. An empty result is an empty list (not an error).
+
+        Args:
+            limit: Maximum number of items to return per requested collection.
+
+        Returns:
+            One product per catalog item (id + datetime + geometry on metadata).
+        """
+        sentinelhub = import_sentinelhub()
+        cfg = self._auth.config()
+        catalog = sentinelhub.SentinelHubCatalog(config=cfg)
+        sh_bbox = self._bbox()
+        time_interval = self._time_interval()
+        products: list[RemoteProduct] = []
+        seen_collections: set[str] = set()
+        for key, resolved in self._resolved.items():
+            if resolved.sh_collection in seen_collections:
+                continue
+            seen_collections.add(resolved.sh_collection)
+            collection = cdse_collection(resolved.sh_collection, cfg.sh_base_url)
+            for item in catalog.search(
+                collection, bbox=sh_bbox, time=time_interval, limit=limit
+            ):
+                properties = item.get("properties", {})
+                products.append(
+                    RemoteProduct(
+                        id=item.get("id"),
+                        metadata={
+                            "key": key,
+                            "collection": resolved.sh_collection,
+                            "datetime": properties.get("datetime"),
+                            "geometry": item.get("geometry"),
+                        },
+                    )
+                )
+        return products
+
     def _fetch(self, products: list[RemoteProduct]) -> list[Any]:
         """Dispatch to the per-plane fetcher for the resolved `api`.
 
