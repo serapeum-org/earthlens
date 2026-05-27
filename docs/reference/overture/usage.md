@@ -150,9 +150,42 @@ EarthLens(
 ).download()
 ```
 
+## Attribute pushdown with `where=` (DuckDB)
+
+The bbox limits *where* you fetch; `where=` limits *which rows* — pushed down
+to the GeoParquet on S3 via DuckDB, so only matching features leave the
+bucket (not the whole bbox). Pass a raw SQL predicate; it is ANDed onto the
+bbox filter. `columns=` optionally narrows the projection (`id` and `sources`
+are always kept so identity and the per-row `license_id` survive).
+
+```python
+EarthLens(
+    data_source="overture",
+    variables={"buildings": []},
+    lat_lim=[40.74, 40.76],
+    lon_lim=[-74.0, -73.97],
+    path="out",
+    where="height > 10 AND subtype = 'residential'",   # pushed down to S3
+    columns=["names", "height", "subtype"],            # narrow the projection
+    max_features=10000,                                 # LIMIT
+).download()
+```
+
+Notes:
+
+- The predicate is **raw SQL** evaluated by DuckDB against the parquet
+  schema — you can filter on nested fields (`categories.primary = 'restaurant'`,
+  `names.primary IS NOT NULL`), numeric attributes (`confidence > 0.9`), etc.
+- The public bucket is read **anonymously** (no AWS credentials needed, and any
+  in your environment are bypassed).
+- Requires `duckdb` — included in `pip install earthlens[overture]`.
+- Setting `where=` takes precedence over `stream=`; `max_features` becomes a
+  SQL `LIMIT`.
+
 ## Known limitations
 
-- **No DuckDB / SQL pushdown** — only the SDK's PyArrow bbox pushdown.
+- **No DuckDB attribute pushdown without `where=`** — the plain fetch path uses
+  the SDK's PyArrow bbox pushdown only; attribute filtering needs `where=`.
 - **No temporal axis** — pin a `release` for reproducibility; `None` drifts
   to the newest monthly release.
 - **`base` types carry mixed geometries** — `land` / `water` /

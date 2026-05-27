@@ -103,6 +103,24 @@ class TestOvertureLiveFetch:
         assert "license_id" in gdf.columns
         assert gdf.crs.to_epsg() == 4326
 
+    def test_duckdb_where_pushdown_live(self, tmp_path: Path):
+        """A `where=` predicate is pushed to S3 via DuckDB and only matches return."""
+        paths = EarthLens(
+            data_source="overture",
+            variables={"places": []},
+            lat_lim=_LAT_LIM,
+            lon_lim=_LON_LIM,
+            path=str(tmp_path),
+            where="confidence > 0.95",
+            columns=["names", "confidence"],
+        ).download(progress_bar=False)
+
+        gdf = gpd.read_parquet(paths[0])
+        assert len(gdf) > 0, "the block should have high-confidence places"
+        assert (gdf["confidence"] > 0.95).all(), "the predicate must be pushed down"
+        assert "license_id" in gdf.columns, "per-row licensing survives the projection"
+        assert gdf.crs.to_epsg() == 4326
+
     def test_release_helpers_live(self):
         """The SDK's release helpers resolve a real, recent release id."""
         from overturemaps.core import get_latest_release

@@ -312,6 +312,46 @@ def _multi_theme() -> nbformat.NotebookNode:
     )
 
 
+def _attribute_pushdown() -> nbformat.NotebookNode:
+    return _nb(
+        [
+            new_markdown_cell(
+                "# Overture — attribute pushdown with `where=` (live)\n\n"
+                "The bbox limits *where* you fetch; `where=` limits *which rows*, "
+                "pushed down to the GeoParquet on S3 via DuckDB so only matching "
+                "features leave the bucket. Here we keep only high-confidence "
+                "places and a narrow set of columns (`id`/`sources` are retained "
+                "automatically so the per-row `license_id` still works)."
+            ),
+            new_code_cell(BBOX_SETUP),
+            new_code_cell(
+                "from earthlens.earthlens import EarthLens\n\n"
+                "paths = EarthLens(\n"
+                '    data_source="overture",\n'
+                '    variables={"places": []},\n'
+                "    lat_lim=LAT_LIM, lon_lim=LON_LIM, path=OUT,\n"
+                '    where="confidence > 0.95",      # pushed down to S3\n'
+                '    columns=["names", "confidence"],  # narrow projection\n'
+                ").download()\n"
+                "paths"
+            ),
+            new_code_cell(
+                "import geopandas as gpd\n\n"
+                "gdf = gpd.read_parquet(paths[0])\n"
+                "print(len(gdf), 'high-confidence places')\n"
+                "print('all match the predicate:', bool((gdf['confidence'] > 0.95).all()))\n"
+                "gdf[['confidence', 'license_id']].head()"
+            ),
+            new_markdown_cell(
+                "`where=` is raw SQL evaluated by DuckDB against the parquet "
+                "schema, so you can filter nested fields too — e.g. "
+                "`categories.primary = 'restaurant'` for places, or "
+                "`height > 10` for buildings."
+            ),
+        ]
+    )
+
+
 def main() -> int:
     OUT_DIR.mkdir(parents=True, exist_ok=True)
     notebooks = {
@@ -321,6 +361,7 @@ def main() -> int:
         "04_per_row_licensing.ipynb": _per_row_licensing(),
         "05_transportation_network.ipynb": _transportation_network(),
         "06_multi_theme_download.ipynb": _multi_theme(),
+        "07_attribute_pushdown.ipynb": _attribute_pushdown(),
     }
     for name, nb in notebooks.items():
         nbformat.write(nb, OUT_DIR / name)

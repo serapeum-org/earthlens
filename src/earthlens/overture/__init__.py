@@ -63,6 +63,7 @@ from earthlens.overture._helpers import LicenseWarning, row_license
 from earthlens.overture.backend import Overture
 from earthlens.overture.catalog import CATALOG_PATH, Catalog, Theme
 from earthlens.overture.collection import empty_fc, to_feature_collection
+from earthlens.overture.query import build_query, query_overture
 
 __all__ = [
     "CATALOG_PATH",
@@ -70,7 +71,9 @@ __all__ = [
     "LicenseWarning",
     "Overture",
     "Theme",
+    "build_query",
     "empty_fc",
+    "query_overture",
     "row_license",
     "to_feature_collection",
 ]

@@ -289,6 +289,7 @@ nav:
       - Per-row licensing: examples/overture/04_per_row_licensing.ipynb
       - Transportation network: examples/overture/05_transportation_network.ipynb
       - Multi-theme download: examples/overture/06_multi_theme_download.ipynb
+      - Attribute pushdown (where=): examples/overture/07_attribute_pushdown.ipynb
     - Open NWP forecasts:
       - Catalog explorer (no network): examples/nwp/catalog_explorer.ipynb
       - GFS 2 m temperature (live): examples/nwp/gfs_temperature.ipynb

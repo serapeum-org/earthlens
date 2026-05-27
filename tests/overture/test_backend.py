@@ -406,6 +406,73 @@ class TestFetchAndDownload:
 
 
 @pytest.mark.overture
+class TestDuckDBQueryPath:
+    """`where=` / `columns=` route the fetch through the DuckDB query path."""
+
+    def test_where_routes_to_duckdb_not_sdk(
+        self, tmp_path: Path, fake_overture, make_gdf, monkeypatch
+    ):
+        """A `where=` predicate fetches via query_overture, not the SDK."""
+        seen: dict = {}
+
+        def fake_query(theme, otype, release, bbox, where=None, columns=None, limit=None):
+            seen.update(
+                theme=theme, otype=otype, release=release, bbox=bbox,
+                where=where, columns=columns, limit=limit,
+            )
+            return make_gdf([OSM_SOURCES])
+
+        monkeypatch.setattr("earthlens.overture.query.query_overture", fake_query)
+        backend = _make_backend(
+            tmp_path, variables={"buildings": []}, where="height > 10",
+            release="2026-05-20.0",
+        )
+        with pytest.warns(LicenseWarning):
+            paths = backend.download()
+        assert seen["where"] == "height > 10"
+        assert (seen["theme"], seen["otype"]) == ("buildings", "building")
+        assert seen["release"] == "2026-05-20.0"
+        assert fake_overture.calls == [], "geodataframe must not be used with where="
+        assert fake_overture.reader_calls == [], "reader must not be used with where="
+        assert "license_id" in gpd.read_parquet(paths[0]).columns
+
+    def test_columns_and_limit_forwarded(
+        self, tmp_path: Path, make_gdf, monkeypatch
+    ):
+        """`columns` and `max_features` reach query_overture (limit)."""
+        seen: dict = {}
+        monkeypatch.setattr(
+            "earthlens.overture.query.query_overture",
+            lambda *a, **k: seen.update(k) or make_gdf([PERMISSIVE_SOURCES]),
+        )
+        backend = _make_backend(
+            tmp_path, variables={"places": []}, columns=["names"], max_features=5,
+        )
+        backend.download()
+        assert seen["columns"] == ["names"]
+        assert seen["limit"] == 5
+
+    def test_resolve_release_explicit(self, tmp_path: Path):
+        """`_resolve_release` returns the explicit release when given."""
+        backend = _make_backend(tmp_path, variables={"places": []}, release="2020-01-01.0")
+        assert backend._resolve_release() == "2020-01-01.0"
+
+    def test_resolve_release_falls_back_to_index(self, tmp_path: Path):
+        """With no explicit release, `_resolve_release` uses the catalog index."""
+        backend = _make_backend(tmp_path, variables={"places": []})
+        assert backend._resolve_release() == backend._catalog.latest_release()
+
+    def test_resolve_release_falls_back_to_sdk(self, tmp_path: Path, monkeypatch):
+        """With no release and an empty index, it asks the SDK for the latest."""
+        import overturemaps.core as core
+
+        backend = _make_backend(tmp_path, variables={"places": []})
+        backend._catalog.available_releases = []
+        monkeypatch.setattr(core, "get_latest_release", lambda: "2099-12-31.0")
+        assert backend._resolve_release() == "2099-12-31.0"
+
+
+@pytest.mark.overture
 class TestStreamToGeodataframe:
     """`_stream_to_geodataframe` batch assembly + early stop."""
 

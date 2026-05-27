@@ -121,6 +121,8 @@ class Overture(AbstractDataSource):
         file_format: FileFormat = "geoparquet",
         max_bbox_deg2: float | None = None,
         stream: bool = False,
+        where: str | None = None,
+        columns: list[str] | None = None,
     ):
         """Initialise an Overture backend instance.
 
@@ -161,6 +163,16 @@ class Overture(AbstractDataSource):
                 is also used automatically whenever `max_features` is set,
                 so the cap can stop the read early instead of fetching the
                 full bbox and discarding rows.
+            where: Optional raw SQL predicate pushed down to the GeoParquet
+                via DuckDB (e.g. `"height > 10"`,
+                `"categories.primary = 'restaurant'"`), so only matching
+                rows leave S3. ANDed onto the bbox filter. Setting it routes
+                the fetch through the DuckDB path (requires `duckdb`, pulled
+                in by `earthlens[overture]`); takes precedence over `stream`.
+            columns: Optional list of attribute columns to keep when using
+                the DuckDB path (`id` / `sources` are always retained so
+                identity and the per-row `license_id` survive). Ignored on
+                the non-DuckDB paths.
 
         Raises:
             TypeError: If `variables` is not a mapping of theme -> types.
@@ -190,6 +202,8 @@ class Overture(AbstractDataSource):
         self._file_format: FileFormat = file_format
         self._max_bbox_deg2 = max_bbox_deg2
         self._stream = stream
+        self._where = where
+        self._columns = columns
         self._catalog = Catalog()
         super().__init__(
             start=start,
@@ -289,6 +303,26 @@ class Overture(AbstractDataSource):
             for overture_type in theme.resolve_types(requested):
                 plan.append((name, theme, overture_type))
         return plan
+
+    def _resolve_release(self) -> str:
+        """Resolve a concrete release id for the DuckDB S3 path.
+
+        Uses the explicit `release` if given, else the newest entry in the
+        catalog's bundled index, else asks the SDK for the latest release.
+        The DuckDB path needs a concrete id (the `geodataframe` path can
+        leave it `None` and let the SDK pick latest, but the S3 glob can't).
+
+        Returns:
+            str: A concrete release id (e.g. `"2026-05-20.0"`).
+        """
+        if self._release:
+            return self._release
+        indexed = self._catalog.latest_release()
+        if indexed:
+            return indexed
+        from overturemaps.core import get_latest_release
+
+        return get_latest_release()
 
     def _guard_bbox(self, theme_names: list[str]) -> None:
         """Reject an oversized / whole-Earth bbox for the guarded themes.
@@ -393,18 +427,39 @@ class Overture(AbstractDataSource):
             theme_name = product.metadata["theme_name"]
             overture_type = product.metadata["type"]
             label = product.id
-            mode = "streaming" if (self._stream or self._max_features) else "in-memory"
-            logger.info(
-                f"Fetching Overture {overture_type!r} (theme {theme_name!r}) "
-                f"for bbox {bbox} (release={self._release or 'latest'}, {mode})"
-            )
-            gdf = _read_geodataframe(
-                overture_type,
-                bbox=bbox,
-                release=self._release,
-                max_features=self._max_features,
-                stream=self._stream,
-            )
+            if self._where or self._columns:
+                from earthlens.overture.query import query_overture
+
+                release = self._resolve_release()
+                logger.info(
+                    f"Querying Overture {overture_type!r} (theme {theme_name!r}) "
+                    f"via DuckDB for bbox {bbox} (release={release}, "
+                    f"where={self._where!r})"
+                )
+                gdf = query_overture(
+                    theme_name,
+                    overture_type,
+                    release,
+                    bbox,
+                    where=self._where,
+                    columns=self._columns,
+                    limit=self._max_features,
+                )
+            else:
+                mode = (
+                    "streaming" if (self._stream or self._max_features) else "in-memory"
+                )
+                logger.info(
+                    f"Fetching Overture {overture_type!r} (theme {theme_name!r}) "
+                    f"for bbox {bbox} (release={self._release or 'latest'}, {mode})"
+                )
+                gdf = _read_geodataframe(
+                    overture_type,
+                    bbox=bbox,
+                    release=self._release,
+                    max_features=self._max_features,
+                    stream=self._stream,
+                )
             collection = to_feature_collection(
                 gdf, label=label, max_features=self._max_features
             )

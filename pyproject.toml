@@ -80,13 +80,14 @@ openeo = ["openeo >=0.47,<0.48"]
 # tropycal.utils.cartopy_utils (module-level `import cartopy`); tropycal omits it
 # from its own deps, so earthlens must supply it or the import fails.
 tropycal = ["tropycal >=1.4", "cartopy >=0.22"]
-overture = ["overturemaps >=1.0.0"]
+overture = ["overturemaps >=1.0.0", "duckdb >=1.0.0"]
 all = [
     "boto3 >=1.43.0",
     "botocore >=1.34.0",
     "cartopy >=0.22",
     "cdsapi >=0.7.7",
     "copernicusmarine >=2.0.0,<3",
+    "duckdb >=1.0.0",
     "earthengine-api >=1.7.26",
     "earthaccess >=0.18.0; python_version >= '3.12'",
     "eumdac >=3.1",
