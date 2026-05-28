@@ -349,14 +349,18 @@ class GHSL(AbstractDataSource):
 
         op = "mean" if config.op == "auto" else config.op
         groups: dict[str, list[tuple[int, str, Path]]] = defaultdict(list)
+        # Tabular products have no epoch stack to reduce; pass their written
+        # outputs through unchanged rather than dropping them from the result.
+        passthrough: list[Path] = []
         for product, path in zip(products, paths):
             if product.metadata.get("kind") != "raster":
+                passthrough.append(path)
                 continue
             groups[product.metadata["product"]].append(
                 (product.metadata["epoch"], product.metadata["resolution"], path)
             )
 
-        out: list[Path] = []
+        out: list[Path] = list(passthrough)
         for code, items in groups.items():
             items.sort(key=lambda triple: triple[0])
             epochs = [epoch for epoch, _, _ in items]
