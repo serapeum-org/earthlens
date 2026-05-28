@@ -72,20 +72,19 @@ def _sample_url(catalog: Catalog, code: str, release: str) -> str | None:
     epoch = block.epochs[0]
     family = product.family_token()
     if product.kind == "tabular":
-        family_url = f"{BASE_URL}/{family}_GLOBE_{release}"
+        family_url = f"{BASE_URL}/{family}_{block.region}_{release}"
         version = latest_version_dir(family_url)
         zips = [
             n for n in list_remote_dir(f"{family_url}/{version}") if n.endswith(".zip")
         ]
         return f"{family_url}/{version}/{zips[0]}" if zips else None
+    url_kw = dict(version=block.version, region=block.region, nested=block.nested)
     resolution = block.resolutions[0]
     if resolution in block.tiled():
         tiles = tiles_for_bbox(_LAND_BBOX)
         tile = tiles[0] if tiles else "R6_C18"
-        return ghsl_url(
-            family, code, epoch, release, resolution, tile=tile, version=block.version
-        )
-    return ghsl_url(family, code, epoch, release, resolution, version=block.version)
+        return ghsl_url(family, code, epoch, release, resolution, tile=tile, **url_kw)
+    return ghsl_url(family, code, epoch, release, resolution, **url_kw)
 
 
 def _validate(args: argparse.Namespace) -> int:

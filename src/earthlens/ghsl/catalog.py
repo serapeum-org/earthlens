@@ -247,6 +247,11 @@ class Availability(BaseModel):
         tiled_resolutions: Which of `resolutions` ship as a Mollweide tile
             grid rather than a single whole-globe file. `None` falls back to
             `DEFAULT_TILED_RESOLUTIONS`.
+        region: The JRC region token in the path — `"GLOBE"` (default),
+            `"EUROPE"`, or `"ARCTIC"`.
+        nested: Whether the per-epoch directories sit under an intermediate
+            `{stem}_{region}_{release}/` sub-product directory (the R2022A
+            layout) rather than directly under the family directory (R2023A).
     """
 
     model_config = ConfigDict(frozen=True, extra="forbid")
@@ -255,6 +260,8 @@ class Availability(BaseModel):
     resolutions: list[str] = Field(min_length=1)
     version: tuple[str, str] = ("1", "0")
     tiled_resolutions: list[str] | None = None
+    region: str = "GLOBE"
+    nested: bool = False
 
     def source_crs(self) -> frozenset[str]:
         """Return the distinct source CRS tokens these resolutions imply."""

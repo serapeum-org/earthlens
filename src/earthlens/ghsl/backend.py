@@ -349,7 +349,9 @@ class GHSL(AbstractDataSource):
         from earthlens.aggregate import _reduce, _window_groups
 
         op = "mean" if config.op == "auto" else config.op
-        out_dir = Path(config.out_dir) if config.out_dir is not None else Path(self.path)
+        out_dir = (
+            Path(config.out_dir) if config.out_dir is not None else Path(self.path)
+        )
         out_dir.mkdir(parents=True, exist_ok=True)
         groups: dict[str, list[tuple[int, str, Path]]] = defaultdict(list)
         # Tabular products have no epoch stack to reduce; pass their written
@@ -488,15 +490,11 @@ class GHSL(AbstractDataSource):
         product = self._catalog.get(code)
         resolution = self._resolution_for(code)
         block = product.block_for(self._release, epoch, resolution)
-        version = block.version
         family = product.family_token()
+        url_kw = dict(version=block.version, region=block.region, nested=block.nested)
         is_tiled = resolution in block.tiled() and self._tiling != "global"
         if not is_tiled:
-            return [
-                ghsl_url(
-                    family, code, epoch, self._release, resolution, version=version
-                )
-            ]
+            return [ghsl_url(family, code, epoch, self._release, resolution, **url_kw)]
         tiles = tiles_for_bbox(self._bbox)
         if not tiles:
             raise ValueError(
@@ -505,9 +503,7 @@ class GHSL(AbstractDataSource):
                 "AOI, a coarser whole-globe resolution, or tiling='global'."
             )
         return [
-            ghsl_url(
-                family, code, epoch, self._release, resolution, tile=t, version=version
-            )
+            ghsl_url(family, code, epoch, self._release, resolution, tile=t, **url_kw)
             for t in tiles
         ]
 
@@ -732,8 +728,10 @@ class GHSL(AbstractDataSource):
             ValueError: If no version directory / `.zip` is found upstream.
         """
         code = rp.metadata["product"]
-        family = self._catalog.get(code).family_token()
-        family_url = f"{BASE_URL}/{family}_GLOBE_{self._release}"
+        product = self._catalog.get(code)
+        blocks = product.releases.get(self._release) or []
+        region = blocks[0].region if blocks else "GLOBE"
+        family_url = f"{BASE_URL}/{product.family_token()}_{region}_{self._release}"
         version = latest_version_dir(family_url)
         version_url = f"{family_url}/{version}"
         zips = sorted(n for n in list_remote_dir(version_url) if n.endswith(".zip"))

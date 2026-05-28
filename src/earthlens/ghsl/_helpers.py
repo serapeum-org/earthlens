@@ -47,7 +47,9 @@ TILE_SCHEMA_PATH: Path = Path(__file__).parent / "tile_schema.geojson"
 _DENSIFY_PER_EDGE: int = 16
 
 
-def _ghsl_stem(code: str, epoch: int, release: str, crs: str, res_token: str) -> str:
+def _ghsl_stem(
+    code: str, epoch: int, release: str, crs: str, res_token: str, region: str
+) -> str:
     """Build the GHSL file-stem token for one artefact.
 
     Args:
@@ -57,11 +59,12 @@ def _ghsl_stem(code: str, epoch: int, release: str, crs: str, res_token: str) ->
         crs: Source CRS token (`"54009"` / `"4326"`).
         res_token: JRC resolution token (`"100"`, `"1000"`, `"10"`, `"3ss"`,
             `"30ss"`).
+        region: Region token (`"GLOBE"`, `"EUROPE"`, `"ARCTIC"`).
 
     Returns:
         str: e.g. `"GHS_POP_E2020_GLOBE_R2023A_54009_100"`.
     """
-    return f"{code}_E{epoch}_GLOBE_{release}_{crs}_{res_token}"
+    return f"{code}_E{epoch}_{region}_{release}_{crs}_{res_token}"
 
 
 def ghsl_url(
@@ -73,6 +76,8 @@ def ghsl_url(
     *,
     tile: str | None = None,
     version: tuple[str, str] = ("1", "0"),
+    region: str = "GLOBE",
+    nested: bool = False,
 ) -> str:
     """Build the deterministic JRC `.zip` URL for one artefact.
 
@@ -80,7 +85,7 @@ def ghsl_url(
         family: Product-family directory token (`"GHS_POP"`,
             `"GHS_BUILT_H"`).
         code: Product file-stem token (equals `family` except for the
-            `AGBH`/`ANBH`, `FUN`/`MSZ`, `NRES` sub-products).
+            `AGBH`/`ANBH`, `FUN`/`MSZ`, `NRES`, `VEG` sub-products).
         epoch: Reference year.
         release: Release id (`"R2023A"`).
         resolution: Friendly resolution label (`"100m"`); its source CRS is
@@ -88,6 +93,11 @@ def ghsl_url(
         tile: Optional `R{r}_C{c}` tile id; `None` builds the whole-globe URL.
         version: `(major, minor)` data version. `V{maj}-{min}` in the path,
             `V{maj}_{min}` in the filename.
+        region: Region token in the path (`"GLOBE"` default, `"EUROPE"`,
+            `"ARCTIC"`).
+        nested: When `True`, the per-epoch directory sits under an
+            intermediate `{code}_{region}_{release}/` sub-product directory
+            (the R2022A layout).
 
     Returns:
         str: The fully-qualified `.zip` URL.
@@ -96,7 +106,7 @@ def ghsl_url(
         ValueError: If `resolution` is not a known GHSL resolution.
 
     Examples:
-        - The verified whole-globe and per-tile URLs:
+        - The verified R2023A whole-globe + per-tile URLs:
             ```python
             >>> from earthlens.ghsl._helpers import ghsl_url
             >>> ghsl_url("GHS_POP", "GHS_POP", 2020, "R2023A", "100m",
@@ -104,6 +114,14 @@ def ghsl_url(
             'jrc-opendata/GHSL/GHS_POP_GLOBE_R2023A/GHS_POP_E2020_GLOBE_R2023A_54009_100/V1-0/tiles/GHS_POP_E2020_GLOBE_R2023A_54009_100_V1_0_R6_C18.zip'
             >>> ghsl_url("GHS_POP", "GHS_POP", 2020, "R2023A", "1km").split("/V1-0/")[1]
             'GHS_POP_E2020_GLOBE_R2023A_54009_1000_V1_0.zip'
+
+            ```
+        - The nested R2022A layout inserts the sub-product directory:
+            ```python
+            >>> from earthlens.ghsl._helpers import ghsl_url
+            >>> ghsl_url("GHS_BUILT_S", "GHS_BUILT_S_NRES", 2020, "R2022A",
+            ...          "1km", nested=True).split("/ftp/")[1]
+            'jrc-opendata/GHSL/GHS_BUILT_S_GLOBE_R2022A/GHS_BUILT_S_NRES_GLOBE_R2022A/GHS_BUILT_S_NRES_E2020_GLOBE_R2022A_54009_1000/V1-0/GHS_BUILT_S_NRES_E2020_GLOBE_R2022A_54009_1000_V1_0.zip'
 
             ```
     """
@@ -114,12 +132,13 @@ def ghsl_url(
     crs = native_source_crs(resolution)
     res_token = RES_TO_TOKEN[resolution]
     maj, minr = version
-    stem = _ghsl_stem(code, epoch, release, crs, res_token)
-    fam_dir = f"{family}_GLOBE_{release}"
+    stem = _ghsl_stem(code, epoch, release, crs, res_token, region)
+    fam_dir = f"{family}_{region}_{release}"
+    middle = f"{code}_{region}_{release}/" if nested else ""
     suffix = f"_{tile}" if tile else ""
     fname = f"{stem}_V{maj}_{minr}{suffix}.zip"
     sub = "tiles/" if tile else ""
-    return f"{BASE_URL}/{fam_dir}/{stem}/V{maj}-{minr}/{sub}{fname}"
+    return f"{BASE_URL}/{fam_dir}/{middle}{stem}/V{maj}-{minr}/{sub}{fname}"
 
 
 @lru_cache(maxsize=1)
