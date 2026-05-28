@@ -36,7 +36,8 @@ cat.describe("chirps-v3-global-monthly")
 
 ## ECMWF (Copernicus Climate Data Store)
 
-The ECMWF catalog is shipped as `cds_data_catalog.yaml` (package data)
+The ECMWF catalog is shipped as the `catalog/` directory (per-family
+`*.yaml` files + `_index.yaml`, package data)
 and exposes a structural map keyed by CDS dataset short name. Each
 dataset block carries its monthly-aggregate variant, parent-level
 extras, and a per-variable map. There is no flat per-code lookup —
@@ -161,9 +162,9 @@ across three core datasets:
 
 Browse the full list of CDS dataset short names at
 <https://cds.climate.copernicus.eu/datasets?q=era5>. To add a new
-variable, append an entry to
-`src/earthlens/ecmwf/cds_data_catalog.yaml` following the schema
-in the file's header comment.
+variable, append an entry to the matching per-family file under
+`src/earthlens/ecmwf/catalog/` following the schema in
+`_index.yaml`'s header comment.
 
 `get_variable(dataset_name, variable_name)` is the canonical lookup;
 `get_dataset(name)` returns the structural :class:`Dataset` record,

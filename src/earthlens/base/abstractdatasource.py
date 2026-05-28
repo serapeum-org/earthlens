@@ -613,6 +613,12 @@ class AbstractCatalog(BaseModel):
     #: catalog they failed against.
     _catalog_kind: str = "catalog"
 
+    #: Plural noun for the catalog entries, used in :meth:`get_dataset`'s
+    #: did-you-mean message (`"Known {noun}: [...]"`). Defaults to
+    #: `"datasets"`; subclasses whose entries are not "datasets" override
+    #: it (e.g. `"parameters"` for the openaq / usgs_water catalogs).
+    _entry_noun: str = "datasets"
+
     catalog: dict[str, Any] = Field(default_factory=dict)
     available_datasets: list[str] = Field(default_factory=list)
     datasets: dict[str, Any] = Field(default_factory=dict)
@@ -640,9 +646,46 @@ class AbstractCatalog(BaseModel):
         """
         raise NotImplementedError
 
-    def get_variable(self, var_name: str) -> Any:
-        """get the details of a specific variable."""
-        return self.catalog.get(var_name)
+    def get_variable(self, dataset_key: str, variable_name: str) -> Any:
+        """Return one leaf (variable / band / asset) of a dataset.
+
+        Shared two-argument contract for the two-level catalogs: a leaf
+        is addressed by its `(dataset_key, variable_name)` pair, because
+        the same leaf code can appear under more than one dataset (e.g.
+        `"2m-temperature"` lives under several CDS datasets). Concrete
+        overrides return their typed leaf row and raise `ValueError`
+        (with a did-you-mean hint) on an unknown key:
+
+        * chc / ecmwf / cmems — return a `Variable`.
+        * gee — return a `Band` (also exposed as `get_band`).
+        * firms — return a `SensorColumn` (also exposed as `get_column`).
+        * tropycal — return a `TrackField` (also exposed as `get_field`).
+
+        Single-level catalogs (where one row *is* the leaf — fdsn, gdacs,
+        radar, openaq, overture, usgs_water) do not implement this; their
+        rows are addressed directly with :meth:`get_dataset` / `[key]`.
+
+        Note:
+            This supersedes the former single-argument
+            `get_variable(var_name)`, which returned `self.catalog.get(var_name)`.
+            External callers/subclassers that relied on the one-argument
+            form must pass the parent `dataset_key` as well.
+
+        Args:
+            dataset_key: The parent dataset / collection key.
+            variable_name: The leaf code within that dataset.
+
+        Returns:
+            The backend-specific leaf row.
+
+        Raises:
+            NotImplementedError: If the backend has no per-dataset leaf
+                level.
+        """
+        raise NotImplementedError(
+            f"{type(self).__name__} has no per-dataset variable level; "
+            "address its rows with get_dataset() / [key]."
+        )
 
     # -- shared dict-like surface over `datasets` (M1 from catalog-cross-backend-comparison)
 
@@ -671,7 +714,7 @@ class AbstractCatalog(BaseModel):
             hint = f" Did you mean {close[0]!r}?" if close else ""
             raise ValueError(
                 f"{name!r} is not in the {self._catalog_kind}. "
-                f"Known datasets: {sorted(self.datasets)}.{hint}"
+                f"Known {self._entry_noun}: {sorted(self.datasets)}.{hint}"
             ) from None
 
     def __getitem__(self, name: str) -> Any:
@@ -701,14 +744,21 @@ class AbstractCatalog(BaseModel):
         )
 
     def get_provider(self, slug: str) -> Any:
-        """Return the :class:`Provider` for `slug` (with a did-you-mean hint on miss).
+        """Return the provider record for `slug` (with a did-you-mean hint on miss).
+
+        The value type depends on the backend's :attr:`providers` field:
+        most backends store an :class:`earthlens.base.Provider`, but some
+        mirror a domain-specific record (earthdata mirrors its
+        `EarthdataDAAC` from `daacs`, stac its `Endpoint` from
+        `endpoints`).
 
         Args:
             slug: A registered provider slug (e.g. `"nasa-lp-daac"`,
                 `"ucsb-chc"`, `"copernicus"`).
 
         Returns:
-            The matching :class:`earthlens.base.Provider`.
+            The matching provider record (a `Provider`, or the backend's
+            domain-specific provider model).
 
         Raises:
             ValueError: If `slug` is not a registered provider.
@@ -722,6 +772,51 @@ class AbstractCatalog(BaseModel):
                 f"{slug!r} is not a registered provider. "
                 f"Known providers: {sorted(self.providers)}.{hint}"
             ) from None
+
+    def resolve(self, key: str, *args: Any, **kwargs: Any) -> Any:
+        """Map a user-facing key to the concrete thing a request needs.
+
+        Shared convention for every backend that implements a resolve
+        step: take a *logical* catalog key (a friendly name, collection
+        key, or model key) and return the backend-specific value the
+        download path consumes. The return type and any extra
+        positional / keyword arguments are backend-specific by
+        necessity — the catalogs resolve to different things — so this
+        base method only fixes the *verb*, not the signature. The
+        concrete overrides:
+
+        * `nwp.resolve(model_key)` / `usgs_water.resolve(code_or_name)`
+          — return a model key / 5-digit parameter code (`str`).
+        * `stac.resolve(endpoint, collection_key)` — return the upstream
+          collection id for that endpoint (`str`).
+        * `openeo.resolve(key)` / `sentinel_hub.resolve(key)` — return a
+          normalised request object (a `ResolvedGraph` / `ResolvedRequest`)
+          covering both plain collections and recipes.
+        * `earthdata.resolve(key, daac=None)` /
+          `eumetsat.resolve(key, group=None)` — return the dataset row,
+          with an optional second argument to disambiguate a key shared
+          across DAACs / mission groups.
+
+        Backends without a resolve step address their catalog directly
+        through :meth:`get_dataset` / `__getitem__`.
+
+        Args:
+            key: The logical catalog key to resolve.
+            *args: Backend-specific positional arguments (e.g. the STAC
+                endpoint).
+            **kwargs: Backend-specific keyword arguments (e.g.
+                `daac=` / `group=`).
+
+        Returns:
+            The backend-specific resolved value (see the override list).
+
+        Raises:
+            NotImplementedError: If the backend has no resolve step.
+        """
+        raise NotImplementedError(
+            f"{type(self).__name__} has no resolve() step; address its "
+            "catalog with get_dataset() / [key] instead."
+        )
 
     def __str__(self) -> str:
         """Pretty-print the curated `datasets` map as YAML.

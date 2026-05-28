@@ -246,9 +246,9 @@ class Catalog(AbstractCatalog):
         `(path, mtime)`-keyed cache; passing `datasets=...` skips the
         disk read (used by tests that inject a faked catalog).
         """
-        if self.datasets:
-            return
-        self.datasets = _load_catalog_data(CATALOG_PATH)
+        if not self.datasets:
+            self.datasets = _load_catalog_data(CATALOG_PATH)
+        super().model_post_init(__context)
 
     def get_catalog(self) -> dict[str, NWPModel]:
         """Return the structural per-model map (satisfies the base contract)."""

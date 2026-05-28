@@ -9,8 +9,8 @@ Public surface (re-exported from this package):
 * :class:`ECMWF` — the backend itself; instantiate with a date range,
   a bbox, and a list of variable short codes, then call
   :meth:`ECMWF.download` to fetch every variable.
-* :class:`Catalog` — pydantic-backed loader for
-  `cds_data_catalog.yaml`. Exposes the YAML's structure as three
+* :class:`Catalog` — pydantic-backed loader for the bundled CDS catalog
+  (the `catalog/` directory). Exposes the catalog's structure as three
   fields: :attr:`Catalog.available_datasets`, :attr:`Catalog.datasets`,
   and :attr:`Catalog.catalog` (flat per-variable map).
 * :class:`Dataset` — one CDS dataset's section inside the catalog

@@ -1,0 +1,190 @@
+# CDS data catalog for the ECMWF backend.
+#
+# Schema:
+#
+#   available_datasets:                Informational. List of every
+#                                      CDS dataset short name. Read
+#                                      by humans, ignored by the
+#                                      runtime.
+#
+#   datasets.<cds_dataset>:            One entry per CDS dataset
+#                                      that has curated variables.
+#     monthly:                         CDS dataset short name to use
+#                                      when temporal_resolution ==
+#                                      "monthly". Inherited by every
+#                                      variable under this dataset.
+#     pressure_level:                  Optional. Default list of
+#                                      pressure levels (as strings,
+#                                      e.g. ["1000"]) for pressure-
+#                                      level datasets. Propagated to
+#                                      each variable's
+#                                      cds_pressure_level at load
+#                                      time; per-variable rows may
+#                                      override.
+#     variables.<short_code>:          One entry per variable. The
+#                                      <short_code> is the slugified
+#                                      cds_variable (underscores
+#                                      replaced with hyphens), e.g.
+#                                      key "2m-temperature" implies
+#                                      cds_variable "2m_temperature".
+#       cds_variable:                  Optional override of the slug-
+#                                      derived default. Set this only
+#                                      when the request name cannot
+#                                      be obtained by replacing the
+#                                      key's hyphens with underscores.
+#       cds_pressure_level:            Optional override of the
+#                                      parent dataset's
+#                                      pressure_level for this row.
+#       nc_variable:                   Required. Short variable name
+#                                      inside the returned NetCDF
+#                                      (e.g. "t2m" for 2m_temperature).
+#       types:                         Optional. "flux" or "state".
+#                                      Flux variables are accumulated
+#                                      per timestep on CDS, so monthly
+#                                      aggregation multiplies by the
+#                                      number of days in the slice.
+#       units:                         Required. Raw ERA5 unit string
+#                                      emitted by CDS (used in the
+#                                      output filename).
+#
+# Refreshed from the CDS STAC catalogue on 2026-04-26 (134 datasets
+# in `available_datasets`).
+#
+# See: https://cds.climate.copernicus.eu/datasets
+
+version: 3
+available_datasets:
+- reanalysis-carra-height-levels
+- reanalysis-carra-means
+- reanalysis-carra-model-levels
+- reanalysis-carra-pressure-levels
+- reanalysis-carra-single-levels
+- reanalysis-cerra-height-levels
+- reanalysis-cerra-land
+- reanalysis-cerra-model-levels
+- reanalysis-cerra-pressure-levels
+- reanalysis-cerra-single-levels
+- reanalysis-era5-complete
+- reanalysis-era5-land
+- reanalysis-era5-land-monthly-means
+- reanalysis-era5-land-timeseries
+- reanalysis-era5-pressure-levels
+- reanalysis-era5-pressure-levels-monthly-means
+- reanalysis-era5-single-levels
+- reanalysis-era5-single-levels-monthly-means
+- reanalysis-era5-single-levels-timeseries
+- reanalysis-oras5
+- reanalysis-pan-carra
+- reanalysis-pan-carra-means
+- reanalysis-uerra-europe-complete
+- reanalysis-uerra-europe-height-levels
+- reanalysis-uerra-europe-pressure-levels
+- reanalysis-uerra-europe-single-levels
+- reanalysis-uerra-europe-soil-levels
+- derived-drought-historical-monthly
+- derived-era5-land-daily-statistics
+- derived-era5-pressure-levels-daily-statistics
+- derived-era5-single-levels-daily-statistics
+- derived-gridded-glacier-mass-change
+- derived-near-surface-meteorological-variables
+- derived-reanalysis-energy-moisture-budget
+- derived-utci-historical
+- derived-utci-historical-timeseries
+- projections-climate-atlas
+- projections-cmip5-daily-pressure-levels
+- projections-cmip5-daily-single-levels
+- projections-cmip5-monthly-pressure-levels
+- projections-cmip5-monthly-single-levels
+- projections-cmip6
+- projections-cmip6-decadal-prototype
+- projections-cordex-domains-single-levels
+- seasonal-monthly-ocean
+- seasonal-monthly-pressure-levels
+- seasonal-monthly-single-levels
+- seasonal-original-pressure-levels
+- seasonal-original-single-levels
+- seasonal-postprocessed-pressure-levels
+- seasonal-postprocessed-single-levels
+- insitu-comprehensive-upper-air-observation-network
+- insitu-glaciers-extent
+- insitu-gridded-observations-alpine-precipitation
+- insitu-gridded-observations-europe
+- insitu-gridded-observations-global-and-regional
+- insitu-gridded-observations-nordic
+- insitu-observations-gnss
+- insitu-observations-gruan-reference-network
+- insitu-observations-igra-baseline-network
+- insitu-observations-near-surface-temperature-us-climate-reference-network
+- insitu-observations-surface-land
+- insitu-observations-surface-marine
+- insitu-observations-woudc-ozone-total-column-and-profiles
+- satellite-aerosol-properties
+- satellite-albedo
+- satellite-carbon-dioxide
+- satellite-cloud-properties
+- satellite-earth-radiation-budget
+- satellite-fire-burned-area
+- satellite-fire-radiative-power
+- satellite-greenland-ice-sheet-velocity
+- satellite-humidity-profiles
+- satellite-ice-sheet-elevation-change
+- satellite-ice-sheet-mass-balance
+- satellite-ist-sst-global
+- satellite-ist-sst-polar
+- satellite-lai-fapar
+- satellite-lake-water-level
+- satellite-lake-water-temperature
+- satellite-land-cover
+- satellite-land-surface-temperature
+- satellite-methane
+- satellite-ocean-colour
+- satellite-ozone-v1
+- satellite-precipitation
+- satellite-precipitation-microwave
+- satellite-precipitation-microwave-infrared
+- satellite-sea-ice-concentration
+- satellite-sea-ice-drift
+- satellite-sea-ice-edge-type
+- satellite-sea-ice-thickness
+- satellite-sea-level-global
+- satellite-sea-surface-temperature
+- satellite-sea-surface-temperature-ensemble-product
+- satellite-soil-moisture
+- satellite-surface-radiation-budget
+- satellite-terrestrial-water-storage
+- satellite-total-column-water-vapour-land-ocean
+- satellite-total-column-water-vapour-ocean
+- satellite-upper-troposphere-humidity
+- sis-agroclimatic-indicators
+- sis-agrometeorological-indicators
+- sis-biodiversity-cmip5-global
+- sis-biodiversity-cmip5-regional
+- sis-biodiversity-era5-global
+- sis-biodiversity-era5-regional
+- sis-ecde-climate-indicators
+- sis-ecv-cmip5-bias-corrected
+- sis-energy-derived-projections
+- sis-energy-derived-reanalysis
+- sis-energy-pecd
+- sis-european-risk-extreme-precipitation-indicators
+- sis-european-wind-storm-indicators
+- sis-european-wind-storm-reanalysis
+- sis-european-wind-storm-synthetic-events
+- sis-extreme-indices-cmip6
+- sis-health-vector
+- sis-heat-and-cold-spells
+- sis-hydrology-meteorology-derived-projections
+- sis-hydrology-variables-derived-projections
+- sis-hydrology-variables-derived-seasonal-forecast
+- sis-hydrology-variables-derived-seasonal-reforecast
+- sis-marine-properties
+- sis-ocean-wave-indicators
+- sis-ocean-wave-timeseries
+- sis-temperature-statistics
+- sis-tourism-fire-danger-indicators
+- sis-tourism-snow-indicators
+- sis-water-level-change-indicators-cmip6
+- sis-water-level-change-timeseries-cmip6
+- ecv-for-climate-change
+- multi-origin-c3s-atlas
+- provider-c3s-data-rescue-without
