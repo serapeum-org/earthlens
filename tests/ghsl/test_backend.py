@@ -466,3 +466,26 @@ class TestReviewFixes:
                 raise RuntimeError("boom")
 
         _close_dataset(_Boom())
+
+
+@pytest.mark.ghsl
+class TestLegacyRegionalBackend:
+    """Backend wiring for the legacy R2022A nested releases."""
+
+    def test_nested_r2022a_urls(self, tmp_path):
+        """A R2022A built-up request builds the nested double-dir URL."""
+        g = _build(tmp_path, ["GHS_BUILT_S"], release="R2022A", resolution="1km")
+        urls = g._urls_for("GHS_BUILT_S", 2020)
+        assert len(urls) == 1
+        assert "/GHS_BUILT_S_GLOBE_R2022A/GHS_BUILT_S_GLOBE_R2022A/" in urls[0]
+
+    def test_r2022a_epoch_snaps_within_range(self, tmp_path):
+        """R2022A POP over 2000-2020 yields its in-range epochs (no 2025/2030)."""
+        g = _build(
+            tmp_path,
+            ["GHS_POP"],
+            release="R2022A",
+            start="2000-01-01",
+            end="2020-12-31",
+        )
+        assert g._epochs_for("GHS_POP") == [2000, 2005, 2010, 2015, 2020]

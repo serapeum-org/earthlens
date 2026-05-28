@@ -1,0 +1,134 @@
+# GHSL curated catalog — legacy / regional statistical slice.
+#
+# Version-directory tabular products (a single versioned `.zip` of CSV /
+# GeoPackage tables, fetched via _fetch_duc) across the GLOBE, EUROPE, and
+# ARCTIC regions. The `family` field is the JRC family-directory token and
+# `region` selects GLOBE / EUROPE / ARCTIC; the per-release block's epoch list
+# is nominal (the payload is one multitemporal file, so the fetch ignores it).
+#
+# Excluded by nature (documented, not curated): the 11 JRC-marked
+# `---OBSOLETE_RELEASE---` families (LDSMT*, GPW4, EUROSTAT, S1NODSM, S2comp,
+# SMOD_POP*), the imagery / vector products (SDGSAT1, UCDB, OBAT, composite_S2,
+# SDATA) that need a different backend, the ARCTIC *raster* products (a polar
+# version-dir layout, not the Mollweide epoch grid), and GHS_POP_MT R2019A
+# (bespoke 250 m / 9ss resolution tokens).
+
+products:
+
+  # ----- GLOBE statistical tables -----
+  GHS_AGE:
+    family: GHS_AGE
+    aliases: [age, age_structure]
+    unit: ""
+    kind: tabular
+    default_resolution: "table"
+    releases:
+      R2025A:
+        - epochs: [2025]
+          resolutions: ["table"]
+
+  GHS_COUNTRY_STATS_MT:
+    family: GHS_COUNTRY_STATS_MT
+    aliases: [country_stats_mt, country_statistics_mt]
+    unit: ""
+    kind: tabular
+    default_resolution: "table"
+    releases:
+      R2024A:
+        - epochs: [2020]
+          resolutions: ["table"]
+
+  GHS_FUA_UCDB2015:
+    family: GHS_FUA_UCDB2015
+    aliases: [fua, functional_urban_areas]
+    unit: ""
+    kind: tabular
+    default_resolution: "table"
+    releases:
+      R2019A:
+        - epochs: [2015]
+          resolutions: ["table"]
+
+  GHS_STAT_DUCMT:
+    family: GHS_STAT_DUCMT
+    aliases: [stat_ducmt, duc_multitemporal]
+    unit: ""
+    kind: tabular
+    default_resolution: "table"
+    releases:
+      R2019A:
+        - epochs: [2015]
+          resolutions: ["table"]
+
+  GHS_STAT_UCDB2015MT:
+    family: GHS_STAT_UCDB2015MT
+    aliases: [ucdb, urban_centre_database, stat_ucdb]
+    unit: ""
+    kind: tabular
+    default_resolution: "table"
+    releases:
+      R2019A:
+        - epochs: [2015]
+          resolutions: ["table"]
+
+  # ----- EUROPE LAU statistics -----
+  GHS_BUILT_LAUSTAT:
+    family: GHS_BUILT_LAUSTAT
+    aliases: [lau_stat, built_lau_stat]
+    unit: ""
+    kind: tabular
+    default_resolution: "table"
+    releases:
+      R2023A:
+        - epochs: [2020]
+          resolutions: ["table"]
+          region: EUROPE
+
+  GHS_BUILT_LAU2STAT:
+    family: GHS_BUILT_LAU2STAT
+    aliases: [lau2_stat, built_lau2_stat]
+    unit: ""
+    kind: tabular
+    default_resolution: "table"
+    releases:
+      R2022A:
+        - epochs: [2020]
+          resolutions: ["table"]
+          region: EUROPE
+
+  # ----- ARCTIC regional tables (single versioned zip; polar payload) -----
+  GHS_BUSS:
+    family: GHS_BUSS
+    aliases: [buss, business_statistics]
+    unit: ""
+    kind: tabular
+    default_resolution: "table"
+    releases:
+      R2025A:
+        - epochs: [2020]
+          resolutions: ["table"]
+          region: ARCTIC
+
+  GHS_POP_ARCTIC:
+    family: GHS_POP
+    aliases: [pop_arctic, arctic_population]
+    unit: ""
+    kind: tabular
+    default_resolution: "table"
+    releases:
+      R2025A:
+        - epochs: [2020]
+          resolutions: ["table"]
+          region: ARCTIC
+
+  GHS_SMOD_ARCTIC:
+    family: GHS_SMOD
+    aliases: [smod_arctic, arctic_settlement_model]
+    unit: ""
+    kind: tabular
+    default_resolution: "table"
+    releases:
+      R2025A:
+        - epochs: [2020]
+          resolutions: ["table"]
+          region: ARCTIC

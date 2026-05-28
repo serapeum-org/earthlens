@@ -216,3 +216,26 @@ class TestZipSafety:
         session = fake_session({url: make_response(content=zpath.read_bytes())})
         out = download_and_unzip(url, tmp_path / "dl", session=session)
         assert out.suffix == ".tif" and out.exists(), f"expected a .tif, got {out}"
+
+
+@pytest.mark.ghsl
+class TestRegionAndNested:
+    """Region token + nested-layout URL building (legacy/regional families)."""
+
+    def test_region_token_in_path_and_stem(self):
+        """A non-GLOBE region replaces GLOBE in both the dir and the stem."""
+        url = ghsl_url("GHS_X", "GHS_X", 2020, "R2025A", "1km", region="ARCTIC")
+        assert "/GHS_X_ARCTIC_R2025A/" in url
+        assert "GHS_X_E2020_ARCTIC_R2025A_54009_1000" in url
+
+    def test_nested_inserts_subproduct_dir(self):
+        """nested=True inserts the intermediate {code}_{region}_{release} dir."""
+        url = ghsl_url(
+            "GHS_BUILT_S", "GHS_BUILT_S_NRES", 2020, "R2022A", "100m", nested=True
+        )
+        assert "/GHS_BUILT_S_GLOBE_R2022A/GHS_BUILT_S_NRES_GLOBE_R2022A/" in url
+
+    def test_flat_has_no_subproduct_dir(self):
+        """nested=False keeps the R2023A flat layout (no intermediate dir)."""
+        url = ghsl_url("GHS_BUILT_S", "GHS_BUILT_S", 2020, "R2023A", "100m")
+        assert "/GHS_BUILT_S_GLOBE_R2023A/GHS_BUILT_S_E2020_" in url

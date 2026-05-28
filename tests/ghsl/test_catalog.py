@@ -300,3 +300,50 @@ class TestMultiFileCatalog:
         assert second is first, "an unchanged tree must return the cached tuple"
         clear_catalog_cache()
         assert len(_CATALOG_CACHE) == 0
+
+
+@pytest.mark.ghsl
+class TestLegacyRegionalCatalog:
+    """The expanded legacy/regional catalog (R2022A + tabular families)."""
+
+    def test_product_count(self):
+        """The expanded catalog curates 29 products."""
+        assert len(Catalog()) == 29
+
+    def test_r2022a_pop(self):
+        """GHS_POP gains an R2022A release (1975-2020, no 2025/2030)."""
+        cat = Catalog()
+        assert cat.validate("GHS_POP", "R2022A", 2020, "100m")[:2] == (
+            "GHS_POP",
+            "R2022A",
+        )
+        with pytest.raises(ValueError, match="no epoch"):
+            cat.validate("GHS_POP", "R2022A", 2030, "100m")
+
+    def test_r2022a_built_s_is_metric_only(self):
+        """R2022A built-up is 54009-only — arc-second is rejected."""
+        cat = Catalog()
+        assert cat.validate("GHS_BUILT_S", "R2022A", 2018, "10m")
+        with pytest.raises(ValueError, match="no resolution"):
+            cat.validate("GHS_BUILT_S", "R2022A", 2020, "3ss")
+
+    def test_r2022a_block_is_nested(self):
+        """The R2022A built-up blocks set nested=True."""
+        block = Catalog().get("GHS_BUILT_S").block_for("R2022A", 2020, "100m")
+        assert block.nested is True
+        assert (
+            Catalog().get("GHS_POP").block_for("R2022A", 2020, "100m").nested is False
+        )
+
+    def test_built_c_veg_added(self):
+        """GHS_BUILT_C_VEG is curated under the GHS_BUILT_C family (R2022A)."""
+        veg = Catalog().get("GHS_BUILT_C_VEG")
+        assert veg.family_token() == "GHS_BUILT_C"
+        assert "R2022A" in veg.releases
+
+    def test_regional_tabular_families(self):
+        """EUROPE / ARCTIC tabular families carry their region on the block."""
+        cat = Catalog()
+        assert cat.get("GHS_BUILT_LAUSTAT").releases["R2023A"][0].region == "EUROPE"
+        assert cat.get("GHS_POP_ARCTIC").releases["R2025A"][0].region == "ARCTIC"
+        assert cat.get("GHS_AGE").kind == "tabular"

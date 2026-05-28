@@ -17,6 +17,7 @@ available_datasets:
   - GHS_BUILT_H_AGBH
   - GHS_BUILT_C_MSZ
   - GHS_BUILT_C_FUN
+  - GHS_BUILT_C_VEG
   - GHS_SMOD
   - GHS_LAND
   - GHS_DUC
@@ -26,3 +27,14 @@ available_datasets:
   - GHS_WUP_DUC
   - GHS_WUP_MTUC
   - GHS_WUP_COUNTRY_STATS
+  # Legacy / regional statistical families (tabular version-dir downloads)
+  - GHS_AGE
+  - GHS_COUNTRY_STATS_MT
+  - GHS_FUA_UCDB2015
+  - GHS_STAT_DUCMT
+  - GHS_STAT_UCDB2015MT
+  - GHS_BUILT_LAUSTAT
+  - GHS_BUILT_LAU2STAT
+  - GHS_BUSS
+  - GHS_POP_ARCTIC
+  - GHS_SMOD_ARCTIC

@@ -1,9 +1,12 @@
 # GHSL curated catalog — built-up slice (GHS-BUILT-S/V/H/C).
 #
 # Built-up surface (m2), volume (m3), building height (m), and the categorical
-# built-up classification. The AGBH/ANBH, FUN/MSZ, and NRES sub-products live
-# under their parent family directory on the JRC tree but carry their own
-# file-stem token, captured by the `family` field.
+# built-up classification. The AGBH/ANBH, FUN/MSZ/VEG, and NRES sub-products
+# live under their parent family directory on the JRC tree but carry their own
+# file-stem token, captured by the `family` field. R2022A nests the per-epoch
+# directories under an intermediate sub-product directory (`nested: true`);
+# R2022A built-up is 54009-only (the WGS84 arc-second variants arrived in
+# R2023A) and stops at epoch 2020.
 
 products:
 
@@ -15,9 +18,15 @@ products:
       R2023A:
         - epochs: [1975, 1980, 1985, 1990, 1995, 2000, 2005, 2010, 2015, 2020, 2025, 2030]
           resolutions: ["100m", "1km", "3ss", "30ss"]
-        # A single high-resolution 10 m built-up surface layer for epoch 2018.
         - epochs: [2018]
           resolutions: ["10m"]
+      R2022A:
+        - epochs: [1975, 1980, 1985, 1990, 1995, 2000, 2005, 2010, 2015, 2020]
+          resolutions: ["100m", "1km"]
+          nested: true
+        - epochs: [2018]
+          resolutions: ["10m"]
+          nested: true
 
   GHS_BUILT_S_NRES:
     family: GHS_BUILT_S
@@ -28,6 +37,13 @@ products:
       R2023A:
         - epochs: [1975, 1980, 1985, 1990, 1995, 2000, 2005, 2010, 2015, 2020, 2025, 2030]
           resolutions: ["100m", "1km", "3ss", "30ss"]
+      R2022A:
+        - epochs: [1975, 1980, 1985, 1990, 1995, 2000, 2005, 2010, 2015, 2020]
+          resolutions: ["100m", "1km"]
+          nested: true
+        - epochs: [2018]
+          resolutions: ["10m"]
+          nested: true
 
   GHS_BUILT_V:
     aliases: [built_volume, built_up_volume, built_v]
@@ -37,6 +53,10 @@ products:
       R2023A:
         - epochs: [1975, 1980, 1985, 1990, 1995, 2000, 2005, 2010, 2015, 2020, 2025, 2030]
           resolutions: ["100m", "1km", "3ss", "30ss"]
+      R2022A:
+        - epochs: [1975, 1980, 1985, 1990, 1995, 2000, 2005, 2010, 2015, 2020]
+          resolutions: ["100m", "1km"]
+          nested: true
 
   GHS_BUILT_V_NRES:
     family: GHS_BUILT_V
@@ -47,6 +67,10 @@ products:
       R2023A:
         - epochs: [1975, 1980, 1985, 1990, 1995, 2000, 2005, 2010, 2015, 2020, 2025, 2030]
           resolutions: ["100m", "1km", "3ss", "30ss"]
+      R2022A:
+        - epochs: [1975, 1980, 1985, 1990, 1995, 2000, 2005, 2010, 2015, 2020]
+          resolutions: ["100m", "1km"]
+          nested: true
 
   GHS_BUILT_H_ANBH:
     family: GHS_BUILT_H
@@ -57,6 +81,10 @@ products:
       R2023A:
         - epochs: [2018]
           resolutions: ["100m", "3ss"]
+      R2022A:
+        - epochs: [2018]
+          resolutions: ["100m"]
+          nested: true
 
   GHS_BUILT_H_AGBH:
     family: GHS_BUILT_H
@@ -67,6 +95,10 @@ products:
       R2023A:
         - epochs: [2018]
           resolutions: ["100m", "3ss"]
+      R2022A:
+        - epochs: [2018]
+          resolutions: ["100m"]
+          nested: true
 
   GHS_BUILT_C_MSZ:
     family: GHS_BUILT_C
@@ -110,6 +142,10 @@ products:
       R2023A:
         - epochs: [2018]
           resolutions: ["10m"]
+      R2022A:
+        - epochs: [2018]
+          resolutions: ["10m"]
+          nested: true
 
   GHS_BUILT_C_FUN:
     family: GHS_BUILT_C
@@ -127,3 +163,21 @@ products:
       R2023A:
         - epochs: [2018]
           resolutions: ["10m"]
+      R2022A:
+        - epochs: [2018]
+          resolutions: ["10m"]
+          nested: true
+
+  # R2022A-only sub-product: built-up characteristics by vegetation. Shipped
+  # as a classification raster; no authoritative class legend is curated, so
+  # it is treated as a plain raster (bilinear, no colour table).
+  GHS_BUILT_C_VEG:
+    family: GHS_BUILT_C
+    aliases: [built_vegetation, built_c_veg]
+    unit: ""
+    default_resolution: "10m"
+    releases:
+      R2022A:
+        - epochs: [2018]
+          resolutions: ["10m"]
+          nested: true

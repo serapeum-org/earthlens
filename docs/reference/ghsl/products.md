@@ -2,17 +2,18 @@
 
 The catalog (`earthlens.ghsl.Catalog`, backed by the per-family `catalog/`
 directory — `population.yaml`, `built-up.yaml`, `settlement.yaml`, `land.yaml`,
-`projections.yaml`, plus `_index.yaml`) curates **18 GLOBE products** across
-releases R2023A, R2022A (GHS-LAND), and
-R2025A (GHS-WUP projections). Inspect it programmatically:
+`projections.yaml`, `legacy-statistical.yaml`, plus `_index.yaml`) curates
+**29 products** across releases R2019A / R2022A / R2023A / R2024A / R2025A and
+the GLOBE / EUROPE / ARCTIC regions. Inspect it programmatically:
 
 ```python
 from earthlens.ghsl import Catalog
 cat = Catalog()
-cat.available_products()           # all 18 canonical codes
+cat.available_products()           # all 29 canonical codes
 cat.resolve("population")          # -> "GHS_POP"
 cat.get("GHS_SMOD").legend         # categorical class-code -> label map
 cat.validate("GHS_POP", "R2023A", 2020, "100m")   # raises on an invalid combo
+cat.validate("GHS_POP", "R2022A", 2020, "100m")   # legacy release also works
 ```
 
 ## Availability matrix
@@ -82,6 +83,46 @@ write a `{file}.legend.json` sidecar next to the GeoTIFF.
 |---|---|
 | 1 | Residential |
 | 2 | Non-residential |
+
+## Legacy & regional families
+
+Beyond the headline R2023A/R2025A surface, the catalog also curates older
+releases and regional / statistical products:
+
+- **Legacy R2022A GLOBE raster** of the current products — `GHS_POP`,
+  `GHS_SMOD`, `GHS_BUILT_S`(+`_NRES`), `GHS_BUILT_V`(+`_NRES`),
+  `GHS_BUILT_H_ANBH`/`_AGBH`, `GHS_BUILT_C_MSZ`/`_FUN`, plus the R2022A-only
+  `GHS_BUILT_C_VEG`. R2022A stops at epoch 2020, is **Mollweide-only** (the
+  WGS84 arc-second variants arrived in R2023A), and nests its per-epoch
+  directories under a sub-product directory (handled transparently). Request
+  with `release="R2022A"`.
+- **Tabular / statistical families** (downloaded as a versioned `.zip` table,
+  no raster pipeline): `GHS_AGE` (R2025A), `GHS_COUNTRY_STATS_MT` (R2024A),
+  `GHS_FUA_UCDB2015` / `GHS_STAT_DUCMT` / `GHS_STAT_UCDB2015MT` (R2019A),
+  the EUROPE LAU products `GHS_BUILT_LAUSTAT` (R2023A) / `GHS_BUILT_LAU2STAT`
+  (R2022A), and the ARCTIC regional tables `GHS_BUSS` / `GHS_POP_ARCTIC` /
+  `GHS_SMOD_ARCTIC` (R2025A). Pass the product's own `release=` (and the table
+  lands under `path/{code}/`).
+
+### Deliberately not curated
+
+The remaining JRC families are excluded **by nature**, not oversight (the
+`tools/ghsl/refresh_ghsl_catalog.py` manifest records them):
+
+- **JRC-marked obsolete** (each carries a `---OBSOLETE_RELEASE---` marker and
+  dead CRS/resolution tokens): `GHS_BUILT_LDSMT*`, `GHS_POP_GPW4`,
+  `GHS_POP_EUROSTAT`, `GHS_BUILT_S1NODSM`, `GHS_BUILT_S2comp2018`,
+  `GHS_SMOD_POP*`, and the empty R2022A `GHS_DUC`.
+- **Imagery / vector products** that need a different backend, not a raster
+  catalog row: `GHS_SDGSAT1` (RGB imagery), `GHS_UCDB` / `GHS_OBAT` (vector
+  CSV / GeoPackage), `GHS_composite_S2` (Sentinel-2 UTM composite),
+  `GHS_SDATA` (derived multi-layer).
+- **ARCTIC raster** (`GHS_BUILT_S/V/H_ARCTIC`) — a polar version-directory
+  layout on a non-Mollweide grid, not the epoch-tiled scheme this backend
+  models. The ARCTIC *tabular* products above are curated; the ARCTIC rasters
+  are not.
+- **`GHS_POP_MT` (R2019A)** — bespoke 250 m / 9-arc-second resolution tokens
+  outside the standard GHSL set.
 
 ## Catalog tooling
 
