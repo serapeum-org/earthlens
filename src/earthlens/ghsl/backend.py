@@ -22,13 +22,17 @@ import datetime as dt
 from pathlib import Path
 
 import pandas as pd
+import requests
+from loguru import logger
 
 from earthlens.base import OutputKind
 from earthlens.base.abstractdatasource import (
     AbstractDataSource,
+    RemoteProduct,
     SpatialExtent,
     TemporalExtent,
 )
+from earthlens.ghsl._helpers import download_and_unzip, ghsl_url, tiles_for_bbox
 from earthlens.ghsl.auth import GhslAuth
 from earthlens.ghsl.catalog import Catalog
 
@@ -278,6 +282,182 @@ class GHSL(AbstractDataSource):
         self._show_progress = progress_bar
         self._aggregate_cfg = aggregate
         return self._api_via_search_fetch()
+
+    @property
+    def _raw_dir(self) -> Path:
+        """Directory the downloaded `.zip`/`.tif` artefacts are cached in."""
+        return self.root_dir / ".ghsl_cache"
+
+    @property
+    def _bbox(self) -> tuple[float, float, float, float]:
+        """The AOI as `(west, south, east, north)` in degrees."""
+        return (self.space.west, self.space.south, self.space.east, self.space.north)
+
+    def _epochs_for(self, code: str) -> list[int]:
+        """Resolve the epochs to fetch for one product (`C4`; refined in `C6`).
+
+        Precedence: an explicit `epochs=` list wins; then a single `epoch=`;
+        otherwise the catalog epochs falling in the `[start, end]` year range.
+        When the range is narrower than the 5-year step (no epoch in range),
+        snaps to the single nearest catalog epoch.
+
+        Args:
+            code: A canonical product code.
+
+        Returns:
+            list[int]: Sorted epochs to fetch (a subset of the product's
+                catalog epochs for the release).
+
+        Raises:
+            ValueError: If an explicit epoch is not available for the product.
+        """
+        available = self._catalog.get(code).release_epochs(self._release)
+        if self._epochs_arg is not None:
+            requested = list(self._epochs_arg)
+        elif self._epoch_arg is not None:
+            requested = [self._epoch_arg]
+        else:
+            y0, y1 = self.time.start_date.year, self.time.end_date.year
+            requested = [e for e in available if y0 <= e <= y1]
+            if not requested:
+                midpoint = (y0 + y1) / 2
+                nearest = min(available, key=lambda e: abs(e - midpoint))
+                logger.info(
+                    f"GHSL: no {code} epoch in [{y0}, {y1}]; snapping to the "
+                    f"nearest catalog epoch {nearest}."
+                )
+                requested = [nearest]
+        unknown = [e for e in requested if e not in available]
+        if unknown:
+            raise ValueError(
+                f"{code} ({self._release}) has no epoch(s) {unknown}; "
+                f"available epochs: {available}."
+            )
+        return sorted(set(requested))
+
+    def _urls_for(self, code: str, epoch: int) -> list[str]:
+        """Build the JRC `.zip` URL(s) for one `(product, epoch)`.
+
+        Returns the intersecting per-tile URLs for a tiled fine-resolution
+        product (unless `tiling="global"`), otherwise the single whole-globe
+        URL.
+
+        Args:
+            code: A canonical product code.
+            epoch: A reference year (already validated for the product).
+
+        Returns:
+            list[str]: One or more `.zip` URLs.
+
+        Raises:
+            ValueError: If the product is tiled but no land tile intersects
+                the AOI.
+        """
+        product = self._catalog.get(code)
+        resolution = self._resolution_for(code)
+        block = product.block_for(self._release, epoch, resolution)
+        version = block.version
+        family = product.family_token()
+        is_tiled = resolution in block.tiled() and self._tiling != "global"
+        if not is_tiled:
+            return [
+                ghsl_url(family, code, epoch, self._release, resolution, version=version)
+            ]
+        tiles = tiles_for_bbox(self._bbox)
+        if not tiles:
+            raise ValueError(
+                f"no GHSL land tiles intersect the AOI {self._bbox} for {code} "
+                f"at {resolution}; the area may be entirely ocean. Use a land "
+                "AOI, a coarser whole-globe resolution, or tiling='global'."
+            )
+        return [
+            ghsl_url(family, code, epoch, self._release, resolution, tile=t, version=version)
+            for t in tiles
+        ]
+
+    def _search(self) -> list[RemoteProduct]:
+        """Resolve the request to one `RemoteProduct` per `(product, epoch)`.
+
+        No network: each product carries its resolved `.zip` URLs (or, for
+        tabular products, a `kind="tabular"` flag routing it to the DUC
+        side-table fetch) in `metadata` so a dry-run inspection is cheap.
+
+        Returns:
+            list[RemoteProduct]: The download plan.
+        """
+        plan: list[RemoteProduct] = []
+        for code in self._codes:
+            product = self._catalog.get(code)
+            if product.kind == "tabular":
+                plan.append(
+                    RemoteProduct(
+                        id=code,
+                        metadata={"product": code, "kind": "tabular"},
+                    )
+                )
+                continue
+            resolution = self._resolution_for(code)
+            for epoch in self._epochs_for(code):
+                self._catalog.validate(code, self._release, epoch, resolution)
+                plan.append(
+                    RemoteProduct(
+                        id=f"{code}_E{epoch}",
+                        metadata={
+                            "product": code,
+                            "epoch": epoch,
+                            "resolution": resolution,
+                            "categorical": product.categorical,
+                            "kind": "raster",
+                            "urls": self._urls_for(code, epoch),
+                        },
+                    )
+                )
+        return plan
+
+    def _fetch(self, products: list[RemoteProduct]) -> list[Path]:
+        """Download + unzip each product's tiles, then localise via pyramids.
+
+        Args:
+            products: The plan from `_search`.
+
+        Returns:
+            list[Path]: One written GeoTIFF (or table) path per product.
+        """
+        if self._api == "stac":
+            return self._fetch_via_stac(products)
+        session = requests.Session()
+        written: list[Path] = []
+        try:
+            for rp in products:
+                if rp.metadata.get("kind") == "tabular":
+                    written.append(self._fetch_duc(rp))
+                    continue
+                tifs = [
+                    download_and_unzip(url, self._raw_dir, session=session)
+                    for url in rp.metadata["urls"]
+                ]
+                written.append(self._localise(tifs, rp))
+        finally:
+            session.close()
+        return written
+
+    def _localise(self, tifs: list[Path], rp: RemoteProduct) -> Path:
+        """Mosaic + reproject + crop the downloaded tiles (implemented in `C5`)."""
+        raise NotImplementedError(
+            "GHSL._localise (mosaic + reproject + crop) is implemented in C5."
+        )
+
+    def _fetch_via_stac(self, products: list[RemoteProduct]) -> list[Path]:
+        """Fetch via the optional JRC STAC search path (implemented in `C9`)."""
+        raise NotImplementedError(
+            "GHSL api='stac' search path is implemented in C9; use api='direct'."
+        )
+
+    def _fetch_duc(self, rp: RemoteProduct) -> Path:
+        """Download a tabular DUC / WUP-statistics product (implemented in `C7`)."""
+        raise NotImplementedError(
+            "GHSL tabular products (DUC / WUP statistics) are implemented in C7."
+        )
 
 
 def _epsg_int(crs: str | int) -> int:
