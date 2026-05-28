@@ -53,6 +53,10 @@ class TestGhslLiveFetch:
         assert len(paths) == 1, f"expected one GeoTIFF, got {paths}"
         assert _nonempty_geotiff(paths[0]), "the population raster must be non-empty"
 
+    # SMOD has no tiled resolution, so this pulls the whole-globe file
+    # (~300 MB+); marked `slow` so a routine e2e run can drop it with
+    # `-m "e2e and ghsl and not slow"`.
+    @pytest.mark.slow
     def test_smod_categorical_writes_legend_sidecar(self, tmp_path: Path):
         """A GHS-SMOD 2020 pull lands a categorical raster + a legend sidecar."""
         paths = EarthLens(
