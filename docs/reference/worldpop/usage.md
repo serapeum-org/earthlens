@@ -48,13 +48,22 @@ one REST sub-alias:
 | `constrained` | `False` (default) / `True` | settlement-masked vs not |
 | `unadjusted` | `True` (default) / `False` | raw vs UN-adjusted |
 | `resolution` | `"100m"` (default) / `"1km"` | not every product offers both |
-| `scope` | `"countries"` (default) / `"global"` | global = a single mosaic |
+| `scope` | `"countries"` (default) / `"global"` | global = a single mosaic — **not yet fetchable** (see note) |
 | `generation` | `"R2021"` (default) / `"R2025A"` / … | classic vs Global-2 lines |
 | `level` | `"national"` (default) / `"subnational"` | `pwd` only |
 
 A selector tuple that matches no sub-alias raises a `ValueError` listing the
 product's available variants (did-you-mean). Single-variant products
-(`births`, `future_pop`, …) ignore the selectors.
+(`births`, …) ignore the selectors.
+
+!!! warning "Global / continent products are not yet fetchable"
+    The download path queries WorldPop per **ISO3 country**. Global mosaics
+    (`scope="global"`) and the global / continent-only products
+    `future_pop` and `dependency_ratios` are **not** ISO3-keyed — their REST
+    listing has no per-file URLs and needs a separate drill-down that is not
+    implemented yet. Requesting them raises `NotImplementedError` at
+    construction (rather than failing mid-download). Use a country-scoped
+    product / `scope="countries"` for now; global support is a follow-up.
 
 ```python
 # constrained Global-2 2020 100 m population:

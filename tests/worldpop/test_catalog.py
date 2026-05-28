@@ -108,6 +108,18 @@ def test_demographic_flag(catalog):
     assert catalog.get("pop").demographic is False
 
 
+def test_subalias_returns_row(catalog):
+    """subalias() returns the SubAlias row for a product + id."""
+    sub = catalog.subalias("pop", "wpgp")
+    assert sub.id == "wpgp" and sub.scope == "countries"
+
+
+def test_subalias_unknown_id_raises(catalog):
+    """An id not belonging to the product raises listing the valid ids."""
+    with pytest.raises(ValueError, match="has no sub-alias"):
+        catalog.subalias("pop", "not_a_subalias")
+
+
 def test_validate_returns_product_and_subalias(catalog):
     """validate returns the canonical (product, subalias) for a good year."""
     assert catalog.validate("pop", year=2020) == ("pop", "wpgp")

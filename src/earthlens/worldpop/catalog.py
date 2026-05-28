@@ -366,6 +366,28 @@ class Catalog(AbstractCatalog):
             f"Available sub-aliases:\n{options}"
         )
 
+    def subalias(self, product: str, subalias_id: str) -> SubAlias:
+        """Return the `SubAlias` row of a product by its REST id.
+
+        Args:
+            product: A product key or alias (resolved first).
+            subalias_id: A sub-alias id belonging to that product.
+
+        Returns:
+            SubAlias: The matching sub-alias row.
+
+        Raises:
+            ValueError: If `product` is unknown or has no such sub-alias.
+        """
+        code = self.resolve(product)
+        for sub in self.datasets[code].subaliases:
+            if sub.id == subalias_id:
+                return sub
+        raise ValueError(
+            f"{code!r} has no sub-alias {subalias_id!r}; "
+            f"have {[s.id for s in self.datasets[code].subaliases]}."
+        )
+
     def validate(
         self,
         product: str,

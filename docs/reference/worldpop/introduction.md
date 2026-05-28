@@ -40,6 +40,13 @@ selector catalog — its 50+ named layers don't fit the
 `(constrained × resolution × scope × generation)` selector model. See
 [Available datasets](datasets.md) for the full sub-alias matrix.
 
+!!! warning "Global / continent products not yet fetchable"
+    The downloader is per-ISO3, so global mosaics (`scope="global"`) and the
+    global / continent-only products `future_pop` and `dependency_ratios`
+    cannot be downloaded yet (their WorldPop listing isn't ISO3-keyed).
+    They remain in the catalog as metadata, but requesting them raises
+    `NotImplementedError`. See [Usage](usage.md#selectors--a-concrete-sub-alias).
+
 ## Output kind
 
 `WorldPop.OUTPUT_KIND` is `"mixed"`: population products yield AOI-cropped

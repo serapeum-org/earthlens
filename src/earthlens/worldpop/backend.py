@@ -210,6 +210,7 @@ class WorldPop(AbstractDataSource):
             )
             for product in self._products
         }
+        self._guard_unsupported_scope()
         self._iso3s: list[str] = self._resolve_aoi(aoi, lat_lim, lon_lim)
 
         super().__init__(
@@ -222,6 +223,32 @@ class WorldPop(AbstractDataSource):
             fmt=fmt,
             path=path,
         )
+
+    def _guard_unsupported_scope(self) -> None:
+        """Reject global / continent products — the fetch path is ISO3-only.
+
+        WorldPop's per-country GeoTIFFs are downloaded by querying the REST
+        API with `iso3=`. Global mosaics and global / continent-only products
+        (`future_pop`, `dependency_ratios`, the `scope="global"` sub-aliases)
+        are **not** ISO3-keyed — their REST listing returns index records
+        with no per-file URLs and needs a separate drill-down that is not yet
+        implemented. Fail fast at construction with a clear message rather
+        than letting `_search` raise a confusing "no records" later.
+
+        Raises:
+            NotImplementedError: If any requested product resolves to a
+                sub-alias whose `scope` is not `"countries"`.
+        """
+        for product, subalias_id in self._subalias_ids.items():
+            sub = self._catalog.subalias(product, subalias_id)
+            if sub.scope != "countries":
+                raise NotImplementedError(
+                    f"WorldPop {product!r} resolves to the {sub.scope!r}-scope "
+                    f"sub-alias {subalias_id!r}, which is not yet supported: "
+                    "global / continent products are not ISO3-keyed and need a "
+                    "separate fetch path. Use a country-scoped product/selection "
+                    '(scope="countries").'
+                )
 
     def _resolve_aoi(
         self,

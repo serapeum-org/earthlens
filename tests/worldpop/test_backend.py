@@ -43,6 +43,20 @@ def test_unknown_product_raises(wp_kwargs):
         WorldPop(**wp_kwargs(variables=["nope"]))
 
 
+@pytest.mark.parametrize(
+    "kw",
+    [
+        {"resolution": "1km", "scope": "global"},
+        {"variables": ["future_pop"]},
+        {"variables": ["dependency_ratios"]},
+    ],
+)
+def test_global_scope_products_rejected(wp_kwargs, kw):
+    """Global / continent products fail fast (not yet fetchable, per-ISO3 only)."""
+    with pytest.raises(NotImplementedError, match="not yet supported"):
+        WorldPop(**wp_kwargs(**kw))
+
+
 def test_impossible_combo_raises(wp_kwargs):
     """An unavailable selector tuple is rejected at construction."""
     with pytest.raises(ValueError, match="has no variant"):
@@ -242,8 +256,10 @@ def test_worldpoppy_search_skips_rest(wp_kwargs, fake_worldpoppy):
 
 def test_worldpoppy_unmapped_product_raises(wp_kwargs, fake_worldpoppy):
     """A product with no worldpoppy_id raises a clear error in worldpoppy mode."""
+    # urban_change is country-scoped (so it passes the global guard) but carries
+    # no worldpoppy_id mapping.
     backend = WorldPop(
-        **wp_kwargs(variables=["dependency_ratios"], year=2020, api="worldpoppy")
+        **wp_kwargs(variables=["urban_change"], year=2020, api="worldpoppy")
     )
     with pytest.raises(ValueError, match="no worldpoppy_id"):
         backend.download(progress_bar=False)
