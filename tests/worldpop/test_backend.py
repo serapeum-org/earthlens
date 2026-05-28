@@ -254,6 +254,39 @@ def test_worldpoppy_search_skips_rest(wp_kwargs, fake_worldpoppy):
     assert plan and all(rp.href is None for rp in plan)
 
 
+def test_worldpoppy_multiproduct_attribution(wp_kwargs, monkeypatch, tiny_tif_bytes, tmp_path):
+    """Two products via worldpoppy are attributed to distinct files by provenance."""
+    import sys
+    import types
+
+    cache = tmp_path / "wp_cache_multi"
+    cache.mkdir()
+
+    def wp_raster(product_name, aoi, years, download_dry_run=False):
+        # write a product-specific filename so a naive cohort-only match would
+        # mis-assign, but the before/after snapshot attributes correctly.
+        for iso3 in aoi:
+            for year in years:
+                (cache / f"{iso3.lower()}_{product_name}_{year}.tif").write_bytes(
+                    tiny_tif_bytes
+                )
+        return "XARRAY"
+
+    module = types.ModuleType("worldpoppy")
+    module.wp_raster = wp_raster
+    module.get_cache_dir = lambda: str(cache)
+    monkeypatch.setitem(sys.modules, "worldpoppy", module)
+
+    backend = WorldPop(
+        **wp_kwargs(
+            variables=["pop", "pop_density"], year=2020, resolution="1km", api="worldpoppy"
+        )
+    )
+    out = backend.download(progress_bar=False)
+    names = {p.name for p in out if str(p).endswith(".tif")}
+    assert names == {"pop_2020_1km.tif", "pop_density_2020_1km.tif"}
+
+
 def test_worldpoppy_unmapped_product_raises(wp_kwargs, fake_worldpoppy):
     """A product with no worldpoppy_id raises a clear error in worldpoppy mode."""
     # urban_change is country-scoped (so it passes the global guard) but carries

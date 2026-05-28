@@ -632,34 +632,41 @@ class WorldPop(AbstractDataSource):
         from worldpoppy import get_cache_dir, wp_raster
 
         years = self._years()
+        cache = Path(get_cache_dir())
+        groups: dict[
+            tuple[str, int, tuple[str, int] | None], list[tuple[Path, RemoteProduct]]
+        ] = {}
         for product in self._products:
             wp_id = self._catalog.get(product).worldpoppy_id
             if not wp_id:
                 raise ValueError(
                     f"{product!r} has no worldpoppy_id mapping; use api='rest'."
                 )
-            # Populate the cache; the returned xarray.DataArray is discarded.
+            demographic = self._catalog.get(product).demographic
+            # Snapshot the cache around each call so the files this product
+            # produced are attributed to it by provenance, not by filename
+            # convention. If the product was already fully cached (no new
+            # files), fall back to demographic-vs-cohort matching across the
+            # cache for this product.
+            before = set(cache.rglob("*.tif"))
             wp_raster(
                 product_name=wp_id,
                 aoi=self._iso3s,
                 years=years,
-                download_dry_run=True,
+                download_dry_run=True,  # the returned xarray.DataArray is discarded
             )
-        cache = Path(get_cache_dir())
-        groups: dict[
-            tuple[str, int, tuple[str, int] | None], list[tuple[Path, RemoteProduct]]
-        ] = {}
-        for tif in sorted(cache.rglob("*.tif")):
-            match = re.search(r"_(\d{4})\.tif$", tif.name)
-            if match is None:
-                continue
-            year = int(match.group(1))
-            iso3 = tif.name[:3].upper()
-            cohort = cohort_of(tif.name)
-            if iso3 not in self._iso3s or year not in years:
-                continue
-            for product in self._products:
-                demographic = self._catalog.get(product).demographic
+            produced = set(cache.rglob("*.tif")) - before
+            if not produced:
+                produced = set(cache.rglob("*.tif"))
+            for tif in sorted(produced):
+                match = re.search(r"_(\d{4})\.tif$", tif.name)
+                if match is None:
+                    continue
+                year = int(match.group(1))
+                iso3 = tif.name[:3].upper()
+                cohort = cohort_of(tif.name)
+                if iso3 not in self._iso3s or year not in years:
+                    continue
                 if demographic != (cohort is not None):
                     continue
                 rp = RemoteProduct(
@@ -673,7 +680,6 @@ class WorldPop(AbstractDataSource):
                     },
                 )
                 groups.setdefault((product, year, cohort), []).append((tif, rp))
-                break
         return self._finish(groups)
 
     def _localise(self, group: list[tuple[Path, RemoteProduct]]) -> Path:
