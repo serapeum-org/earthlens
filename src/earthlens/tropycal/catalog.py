@@ -200,6 +200,7 @@ class Catalog(AbstractCatalog):
     """
 
     _catalog_kind: str = "Tropycal basin catalog"
+    _entry_noun: str = "basins"
 
     datasets: dict[str, Basin] = Field(default_factory=dict)
 

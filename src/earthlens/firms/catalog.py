@@ -204,6 +204,7 @@ class Catalog(AbstractCatalog):
     """
 
     _catalog_kind: str = "FIRMS sensor catalog"
+    _entry_noun: str = "sensors"
 
     datasets: dict[str, Sensor] = Field(default_factory=dict)
 

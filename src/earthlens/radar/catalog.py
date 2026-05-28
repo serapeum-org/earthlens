@@ -111,6 +111,7 @@ class StationCatalog(AbstractCatalog):
     """
 
     _catalog_kind: str = "NEXRAD station catalog"
+    _entry_noun: str = "stations"
 
     datasets: dict[str, Station] = Field(default_factory=dict)
 

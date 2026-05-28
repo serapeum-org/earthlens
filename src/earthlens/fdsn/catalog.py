@@ -200,6 +200,7 @@ class Catalog(AbstractCatalog):
     """
 
     _catalog_kind: str = "FDSN catalog"
+    _entry_noun: str = "networks"
 
     datasets: dict[str, Provider] = Field(default_factory=dict)
     providers: dict[str, Provider] = Field(default_factory=dict)

@@ -118,6 +118,7 @@ class Catalog(AbstractCatalog):
     """
 
     _catalog_kind: str = "GDACS hazard catalog"
+    _entry_noun: str = "hazard types"
 
     datasets: dict[str, HazardType] = Field(default_factory=dict)
 

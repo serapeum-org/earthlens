@@ -211,6 +211,7 @@ class Catalog(AbstractCatalog):
     """
 
     _catalog_kind: str = "Overture theme catalog"
+    _entry_noun: str = "themes"
 
     datasets: dict[str, Theme] = Field(default_factory=dict)
     available_releases: list[str] = Field(default_factory=list)
