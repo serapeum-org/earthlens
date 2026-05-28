@@ -139,7 +139,8 @@ class EarthLens:
              'earthdata', 'ecmwf', 'eumetsat', 'fdsn', 'firms', 'gdacs', 'gee',
              'google-earth-engine', 'nexrad', 'nwis', 'nwp', 'openaq', 'openeo',
              'overture', 'planetary-computer', 'radar', 'sentinel-hub',
-             'sentinelhub', 'stac', 'tropycal', 'usgs-nwis', 'usgs-water']
+             'sentinelhub', 'stac', 'tropycal', 'usgs-nwis', 'usgs-water',
+             'world-pop', 'worldpop']
 
             ```
         - Asking for an unknown backend raises `ValueError`:
@@ -206,6 +207,12 @@ class EarthLens:
             water quality, …) via `dataretrieval` as a `tabular`
             `DataFrame`; optional `API_USGS_PAT`, anonymous works; keys
             `"usgs-water"` / `"usgs-nwis"` / `"nwis"`.
+        :class:`earthlens.worldpop.WorldPop`: WorldPop open population data
+            hub (CC-BY-4.0, no credentials) — per-country / global gridded
+            population, density, age/sex, births, projections; mosaic +
+            crop to the AOI via `pyramids` with a tidy age/sex table for
+            demographic products; `mixed` output; keys `"worldpop"` /
+            `"world-pop"`.
 
     """
 
@@ -285,6 +292,12 @@ class EarthLens:
             "usgs-water": ("earthlens.usgs_water", "USGSWater", "usgs-water", {}),
             "usgs-nwis": ("earthlens.usgs_water", "USGSWater", "usgs-water", {}),
             "nwis": ("earthlens.usgs_water", "USGSWater", "usgs-water", {}),
+            # WorldPop open population data hub (CC-BY-4.0, no creds). Mosaic +
+            # crop per-country GeoTIFFs to the AOI; demographic products also
+            # emit a tidy age/sex table. `OUTPUT_KIND="mixed"`. Alias
+            # "world-pop". The default REST path needs no extra SDK.
+            "worldpop": ("earthlens.worldpop", "WorldPop", "worldpop", {}),
+            "world-pop": ("earthlens.worldpop", "WorldPop", "worldpop", {}),
         }
     )
 
