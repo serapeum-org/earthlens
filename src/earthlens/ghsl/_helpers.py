@@ -24,6 +24,7 @@ Everything is `.zip`; each zip contains the `.tif` (same stem) plus sidecars.
 from __future__ import annotations
 
 import json
+import re
 import time
 import zipfile
 from functools import lru_cache
@@ -280,6 +281,102 @@ def download_and_unzip(
         extracted.replace(tif_path)
     zip_path.unlink(missing_ok=True)
     return tif_path
+
+
+#: Matches a GHSL data-version directory name (`V1-0`, `V2-0`, `V1-1`, …).
+_VERSION_RE = re.compile(r"^V(\d+)-(\d+)$")
+#: Matches an Apache-autoindex `href="…"` entry.
+_HREF_RE = re.compile(r'href="([^"?][^"]*)"')
+
+
+def list_remote_dir(
+    url: str, *, session: requests.Session | None = None, timeout: float = 60.0
+) -> list[str]:
+    """List the entry names in a JRC Apache-autoindex directory.
+
+    Args:
+        url: Directory URL (with or without a trailing slash).
+        session: Optional shared `requests.Session`.
+        timeout: Request timeout in seconds.
+
+    Returns:
+        list[str]: The `href` entry names (sub-directories keep their trailing
+            slash), excluding the parent-directory and column-sort links.
+    """
+    get = session.get if session is not None else requests.get
+    resp = get(url if url.endswith("/") else url + "/", timeout=timeout)
+    resp.raise_for_status()
+    names = []
+    for href in _HREF_RE.findall(resp.text):
+        if href in ("/", "..", "../") or href.startswith("/"):
+            continue
+        names.append(href)
+    return names
+
+
+def latest_version_dir(
+    family_url: str, *, session: requests.Session | None = None
+) -> str:
+    """Return the highest `V{maj}-{min}` directory name under a family URL.
+
+    Args:
+        family_url: A product-family directory URL (e.g.
+            `…/GHS_DUC_GLOBE_R2023A`).
+        session: Optional shared `requests.Session`.
+
+    Returns:
+        str: The newest version directory name (e.g. `"V2-0"`).
+
+    Raises:
+        ValueError: If no `V{maj}-{min}` directory is found.
+    """
+    versions: list[tuple[int, int, str]] = []
+    for name in list_remote_dir(family_url, session=session):
+        match = _VERSION_RE.match(name.rstrip("/"))
+        if match:
+            versions.append((int(match.group(1)), int(match.group(2)), name.rstrip("/")))
+    if not versions:
+        raise ValueError(f"no V{{maj}}-{{min}} version directory under {family_url}.")
+    versions.sort()
+    return versions[-1][2]
+
+
+def download_and_extract(
+    url: str,
+    dest_dir: Path,
+    *,
+    session: requests.Session | None = None,
+    retries: int = 3,
+    backoff: float = 2.0,
+    timeout: float = 120.0,
+    chunk_size: int = 1 << 20,
+) -> list[Path]:
+    """Stream a `.zip` to `dest_dir` and extract **all** members (tabular path).
+
+    Unlike `download_and_unzip` (which selects the single `.tif`), this keeps
+    every member — used for the tabular DUC / WUP-statistics products whose
+    payload is a CSV / GeoPackage / xlsx, not a raster.
+
+    Args:
+        url: A `.zip` URL.
+        dest_dir: Directory to download + extract into (created if absent).
+        session: Optional shared `requests.Session`.
+        retries: Attempts before giving up.
+        backoff: Base backoff seconds.
+        timeout: Per-request timeout.
+        chunk_size: Streaming chunk size.
+
+    Returns:
+        list[Path]: The extracted member paths (the `.zip` itself is removed).
+    """
+    dest_dir.mkdir(parents=True, exist_ok=True)
+    zip_path = dest_dir / url.rsplit("/", 1)[-1]
+    _download(url, zip_path, session, retries, backoff, timeout, chunk_size)
+    with zipfile.ZipFile(zip_path) as zf:
+        members = [m for m in zf.namelist() if not m.endswith("/")]
+        zf.extractall(dest_dir)
+    zip_path.unlink(missing_ok=True)
+    return [dest_dir / m for m in members]
 
 
 def _download(

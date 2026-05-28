@@ -36,7 +36,15 @@ from earthlens.base.abstractdatasource import (
     SpatialExtent,
     TemporalExtent,
 )
-from earthlens.ghsl._helpers import download_and_unzip, ghsl_url, tiles_for_bbox
+from earthlens.ghsl._helpers import (
+    BASE_URL,
+    download_and_extract,
+    download_and_unzip,
+    ghsl_url,
+    latest_version_dir,
+    list_remote_dir,
+    tiles_for_bbox,
+)
 from earthlens.ghsl.auth import GhslAuth
 from earthlens.ghsl.catalog import Catalog, native_source_crs
 
@@ -601,6 +609,8 @@ class GHSL(AbstractDataSource):
             f"{rp.id}_{resolution}_epsg{self._output_epsg}.tif"
         )
         cropped.to_file(str(target))
+        if categorical:
+            self._write_legend_sidecar(target, rp.metadata["product"])
         _close_dataset(dataset)
         _close_dataset(cropped)
         # Best-effort cleanup of the merge intermediate; on Windows the GDAL
@@ -618,11 +628,58 @@ class GHSL(AbstractDataSource):
             "GHSL api='stac' search path is implemented in C9; use api='direct'."
         )
 
-    def _fetch_duc(self, rp: RemoteProduct) -> Path:
-        """Download a tabular DUC / WUP-statistics product (implemented in `C7`)."""
-        raise NotImplementedError(
-            "GHSL tabular products (DUC / WUP statistics) are implemented in C7."
+    def _write_legend_sidecar(self, target: Path, code: str) -> None:
+        """Write a `{target}.legend.json` class-code → label sidecar.
+
+        Ensures the categorical legend survives regardless of whether the
+        GeoTIFF colour table is preserved by downstream readers.
+
+        Args:
+            target: The written categorical GeoTIFF.
+            code: The product code whose legend to serialise.
+        """
+        import json
+
+        legend = self._catalog.get(code).legend or {}
+        sidecar = target.with_suffix(".legend.json")
+        sidecar.write_text(
+            json.dumps({str(k): v for k, v in legend.items()}, indent=2),
+            encoding="utf-8",
         )
+
+    def _fetch_duc(self, rp: RemoteProduct) -> Path:
+        """Download a tabular DUC / WUP-statistics product as a side table.
+
+        Tabular products do not follow the per-epoch raster URL convention:
+        their payload is a single `.zip` (CSV / GeoPackage / xlsx) under the
+        latest `V{maj}-{min}` directory of the product family. This
+        auto-discovers that directory + zip, downloads and extracts it under
+        `self.path/{code}/`, and returns that directory. No mosaic / reproject
+        / crop, and no GADM polygon join (a scope guard).
+
+        Args:
+            rp: The tabular `RemoteProduct` (its `metadata["product"]` names
+                the catalog code).
+
+        Returns:
+            pathlib.Path: The directory the table was extracted into.
+
+        Raises:
+            ValueError: If no version directory / `.zip` is found upstream.
+        """
+        code = rp.metadata["product"]
+        family = self._catalog.get(code).family_token()
+        family_url = f"{BASE_URL}/{family}_GLOBE_{self._release}"
+        version = latest_version_dir(family_url)
+        version_url = f"{family_url}/{version}"
+        zips = [n for n in list_remote_dir(version_url) if n.endswith(".zip")]
+        if not zips:
+            raise ValueError(
+                f"no .zip table found under {version_url} for {code}."
+            )
+        dest = Path(self.path) / code
+        download_and_extract(f"{version_url}/{zips[0]}", dest)
+        return dest
 
 
 def _close_dataset(dataset: object) -> None:
