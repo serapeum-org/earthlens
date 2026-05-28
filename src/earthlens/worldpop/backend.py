@@ -23,6 +23,7 @@ the `[worldpop]` extra.
 from __future__ import annotations
 
 import datetime as dt
+import re
 import warnings
 from pathlib import Path
 
@@ -335,6 +336,26 @@ class WorldPop(AbstractDataSource):
         """
         out: list[RemoteProduct] = []
         years = self._years()
+        if self._api_mode == "worldpoppy":
+            # The WorldPopPy SDK resolves files itself; the plan is just the
+            # (product, iso3, year) cross-product (no REST query, no URLs).
+            for product in self._products:
+                demographic = self._catalog.get(product).demographic
+                for iso3 in self._iso3s:
+                    for year in years:
+                        out.append(
+                            RemoteProduct(
+                                id=f"{product}_{iso3}_{year}",
+                                href=None,
+                                metadata={
+                                    "product": product,
+                                    "iso3": iso3,
+                                    "year": year,
+                                    "demographic": demographic,
+                                },
+                            )
+                        )
+            return out
         for product in self._products:
             subalias_id = self._subalias_ids[product]
             demographic = self._catalog.get(product).demographic
@@ -427,7 +448,29 @@ class WorldPop(AbstractDataSource):
                 per-window rasters replace the per-year rasters when
                 `aggregate=` is set; tables are always included).
         """
-        groups = self._group_for_mosaic(products)
+        if self._api_mode == "worldpoppy":
+            return self._fetch_via_worldpoppy(products)
+        return self._finish(self._group_for_mosaic(products))
+
+    def _finish(
+        self,
+        groups: dict[
+            tuple[str, int, tuple[str, int] | None], list[tuple[Path, RemoteProduct]]
+        ],
+    ) -> list[Path]:
+        """Localise each group, write demographic tables, and optionally aggregate.
+
+        Shared tail of both the REST and WorldPopPy fetch paths.
+
+        Args:
+            groups: The `(product, year, cohort) -> [(path, product), …]`
+                map of downloaded / cached per-country tiles.
+
+        Returns:
+            list[Path]: The written GeoTIFF + table paths (reduced
+                per-window rasters replace per-year rasters when
+                `aggregate=` is set).
+        """
         localised: dict[tuple[str, int, tuple[str, int] | None], Path] = {
             key: self._localise(group) for key, group in groups.items()
         }
@@ -537,6 +580,72 @@ class WorldPop(AbstractDataSource):
                 ).to_file(str(target))
                 out.append(target)
         return out
+
+    def _fetch_via_worldpoppy(self, products: list[RemoteProduct]) -> list[Path]:
+        """Fetch via the optional WorldPopPy SDK — through its file cache only.
+
+        Calls `wp_raster(..., download_dry_run=True)` to populate the SDK's
+        on-disk cache, **discards the returned `xarray.DataArray`** (CLAUDE.md
+        forbids importing xarray in `src/`), then reads the cached GeoTIFFs
+        from `get_cache_dir()` and runs them through the same localise /
+        table / aggregate tail as the REST path.
+
+        Args:
+            products: The `_search` plan (one item per product / iso3 /
+                year); used to bound which cached files are consumed.
+
+        Returns:
+            list[Path]: The written GeoTIFF + table paths.
+
+        Raises:
+            ValueError: If a requested product has no `worldpoppy_id`.
+        """
+        from worldpoppy import get_cache_dir, wp_raster
+
+        years = self._years()
+        for product in self._products:
+            wp_id = self._catalog.get(product).worldpoppy_id
+            if not wp_id:
+                raise ValueError(
+                    f"{product!r} has no worldpoppy_id mapping; use api='rest'."
+                )
+            # Populate the cache; the returned xarray.DataArray is discarded.
+            wp_raster(
+                product_name=wp_id,
+                aoi=self._iso3s,
+                years=years,
+                download_dry_run=True,
+            )
+        cache = Path(get_cache_dir())
+        groups: dict[
+            tuple[str, int, tuple[str, int] | None], list[tuple[Path, RemoteProduct]]
+        ] = {}
+        for tif in sorted(cache.rglob("*.tif")):
+            match = re.search(r"_(\d{4})\.tif$", tif.name)
+            if match is None:
+                continue
+            year = int(match.group(1))
+            iso3 = tif.name[:3].upper()
+            cohort = cohort_of(tif.name)
+            if iso3 not in self._iso3s or year not in years:
+                continue
+            for product in self._products:
+                demographic = self._catalog.get(product).demographic
+                if demographic != (cohort is not None):
+                    continue
+                rp = RemoteProduct(
+                    id=f"{product}_{iso3}_{year}_{tif.stem}",
+                    href=str(tif),
+                    metadata={
+                        "product": product,
+                        "iso3": iso3,
+                        "year": year,
+                        "demographic": demographic,
+                    },
+                )
+                groups.setdefault((product, year, cohort), []).append((tif, rp))
+                break
+        return self._finish(groups)
 
     def _localise(self, group: list[tuple[Path, RemoteProduct]]) -> Path:
         """Mosaic the per-country GeoTIFFs of one group + crop to the AOI.
