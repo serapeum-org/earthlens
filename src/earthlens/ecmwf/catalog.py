@@ -346,8 +346,8 @@ from earthlens.ecmwf.jobs import (  # noqa: E402 — re-export for back-compat
 class Variable(FluxableLeaf):
     """Per-variable catalog entry consumed by :class:`ECMWF`.
 
-    A frozen pydantic model carrying the metadata for one row in
-    `cds_data_catalog.yaml`. Loaded through :class:`Catalog`, which
+    A frozen pydantic model carrying the metadata for one row in the
+    bundled CDS catalog. Loaded through :class:`Catalog`, which
     rewraps any :class:`pydantic.ValidationError` with the offending
     row's catalog key so a typo in the file (e.g. `cd_dataset` vs
     `cds_dataset`) surfaces at import time, not mid-download.
@@ -432,8 +432,8 @@ class Variable(FluxableLeaf):
 class Dataset(BaseModel):
     """One CDS dataset's section in the catalog.
 
-    Mirrors the shape of a single `datasets.<name>:` block in
-    `cds_data_catalog.yaml` — the monthly-aggregate variant of the
+    Mirrors the shape of a single `datasets.<name>:` block in the
+    bundled CDS catalog — the monthly-aggregate variant of the
     dataset, the default pressure levels (for pressure-level
     datasets), and the per-variable map. Same dataset name is used
     as the parent key in :attr:`Catalog.datasets`; it is not stored
@@ -499,8 +499,9 @@ class Dataset(BaseModel):
 class Catalog(AbstractCatalog):
     """Variable catalog for the CDS-backed ECMWF data source.
 
-    Reads `cds_data_catalog.yaml` (shipped as package data) and
-    exposes its consumed top-level sections as typed pydantic fields.
+    Reads the bundled CDS catalog (the `catalog/` directory, shipped as
+    package data) and exposes its consumed top-level sections as typed
+    pydantic fields.
     Instantiate with no arguments (`Catalog()`) — :func:`model_post_init`
     parses the YAML and populates every field in one pass.
 
@@ -574,7 +575,7 @@ class Catalog(AbstractCatalog):
     providers: dict[str, Provider] = Field(default_factory=dict)
 
     def model_post_init(self, __context: Any) -> None:
-        """Auto-load `cds_data_catalog.yaml` when the user didn't supply one.
+        """Auto-load the bundled CDS catalog when the user didn't supply one.
 
         `Catalog()` with no args is sugar for `Catalog.load()` — it
         reads the bundled YAML through the `(path, mtime_ns)`-keyed
@@ -606,8 +607,9 @@ class Catalog(AbstractCatalog):
         is in the registry; an unregistered slug is a load-time error.
 
         Args:
-            catalog_path: Path to a `cds_data_catalog.yaml`-shaped
-                file. Defaults to module-level :data:`CATALOG_PATH`.
+            catalog_path: Path to a catalog directory (of per-family
+                `*.yaml` files) or a single YAML file. Defaults to
+                module-level :data:`CATALOG_PATH`.
             providers_path: Path to `providers.yaml`. Defaults to
                 module-level :data:`PROVIDERS_PATH`.
 
@@ -676,8 +678,8 @@ class Catalog(AbstractCatalog):
                 `"2m-temperature"`, `"total-precipitation"`).
 
         Returns:
-            Variable: Per-variable metadata loaded from
-            `cds_data_catalog.yaml`.
+            Variable: Per-variable metadata loaded from the bundled
+            CDS catalog.
 
         Raises:
             KeyError: If `dataset_name` is not curated, or if
