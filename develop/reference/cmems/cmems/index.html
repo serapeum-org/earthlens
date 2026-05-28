@@ -11628,11 +11628,11 @@ cadence / domain / temporal coverage / variables map.</p>
 <a id="__codelineno-0-488" name="__codelineno-0-488"></a><span class="sd">            ValueError: When auto-loading, propagates the same</span>
 <a id="__codelineno-0-489" name="__codelineno-0-489"></a><span class="sd">                errors as :meth:`load`.</span>
 <a id="__codelineno-0-490" name="__codelineno-0-490"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-491" name="__codelineno-0-491"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">:</span>
-<a id="__codelineno-0-492" name="__codelineno-0-492"></a>            <span class="k">return</span>
-<a id="__codelineno-0-493" name="__codelineno-0-493"></a>        <span class="n">loaded</span> <span class="o">=</span> <span class="n">Catalog</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
-<a id="__codelineno-0-494" name="__codelineno-0-494"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">available_datasets</span> <span class="o">=</span> <span class="n">loaded</span><span class="o">.</span><span class="n">available_datasets</span>
-<a id="__codelineno-0-495" name="__codelineno-0-495"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span> <span class="o">=</span> <span class="n">loaded</span><span class="o">.</span><span class="n">datasets</span>
+<a id="__codelineno-0-491" name="__codelineno-0-491"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">:</span>
+<a id="__codelineno-0-492" name="__codelineno-0-492"></a>            <span class="n">loaded</span> <span class="o">=</span> <span class="n">Catalog</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
+<a id="__codelineno-0-493" name="__codelineno-0-493"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">available_datasets</span> <span class="o">=</span> <span class="n">loaded</span><span class="o">.</span><span class="n">available_datasets</span>
+<a id="__codelineno-0-494" name="__codelineno-0-494"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span> <span class="o">=</span> <span class="n">loaded</span><span class="o">.</span><span class="n">datasets</span>
+<a id="__codelineno-0-495" name="__codelineno-0-495"></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">model_post_init</span><span class="p">(</span><span class="n">__context</span><span class="p">)</span>
 <a id="__codelineno-0-496" name="__codelineno-0-496"></a>
 <a id="__codelineno-0-497" name="__codelineno-0-497"></a>    <span class="nd">@classmethod</span>
 <a id="__codelineno-0-498" name="__codelineno-0-498"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">load</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">catalog_path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Catalog</span><span class="p">:</span>
@@ -12237,11 +12237,11 @@ errors as :meth:<code>load</code>.</p>
 <a id="__codelineno-0-488" name="__codelineno-0-488"></a><span class="sd">        ValueError: When auto-loading, propagates the same</span>
 <a id="__codelineno-0-489" name="__codelineno-0-489"></a><span class="sd">            errors as :meth:`load`.</span>
 <a id="__codelineno-0-490" name="__codelineno-0-490"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-491" name="__codelineno-0-491"></a>    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">:</span>
-<a id="__codelineno-0-492" name="__codelineno-0-492"></a>        <span class="k">return</span>
-<a id="__codelineno-0-493" name="__codelineno-0-493"></a>    <span class="n">loaded</span> <span class="o">=</span> <span class="n">Catalog</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
-<a id="__codelineno-0-494" name="__codelineno-0-494"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">available_datasets</span> <span class="o">=</span> <span class="n">loaded</span><span class="o">.</span><span class="n">available_datasets</span>
-<a id="__codelineno-0-495" name="__codelineno-0-495"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span> <span class="o">=</span> <span class="n">loaded</span><span class="o">.</span><span class="n">datasets</span>
+<a id="__codelineno-0-491" name="__codelineno-0-491"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">:</span>
+<a id="__codelineno-0-492" name="__codelineno-0-492"></a>        <span class="n">loaded</span> <span class="o">=</span> <span class="n">Catalog</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
+<a id="__codelineno-0-493" name="__codelineno-0-493"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">available_datasets</span> <span class="o">=</span> <span class="n">loaded</span><span class="o">.</span><span class="n">available_datasets</span>
+<a id="__codelineno-0-494" name="__codelineno-0-494"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span> <span class="o">=</span> <span class="n">loaded</span><span class="o">.</span><span class="n">datasets</span>
+<a id="__codelineno-0-495" name="__codelineno-0-495"></a>    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">model_post_init</span><span class="p">(</span><span class="n">__context</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -16572,11 +16572,11 @@ cadence / domain / temporal coverage / variables map.</p>
 <a id="__codelineno-0-488" name="__codelineno-0-488"></a><span class="sd">            ValueError: When auto-loading, propagates the same</span>
 <a id="__codelineno-0-489" name="__codelineno-0-489"></a><span class="sd">                errors as :meth:`load`.</span>
 <a id="__codelineno-0-490" name="__codelineno-0-490"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-491" name="__codelineno-0-491"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">:</span>
-<a id="__codelineno-0-492" name="__codelineno-0-492"></a>            <span class="k">return</span>
-<a id="__codelineno-0-493" name="__codelineno-0-493"></a>        <span class="n">loaded</span> <span class="o">=</span> <span class="n">Catalog</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
-<a id="__codelineno-0-494" name="__codelineno-0-494"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">available_datasets</span> <span class="o">=</span> <span class="n">loaded</span><span class="o">.</span><span class="n">available_datasets</span>
-<a id="__codelineno-0-495" name="__codelineno-0-495"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span> <span class="o">=</span> <span class="n">loaded</span><span class="o">.</span><span class="n">datasets</span>
+<a id="__codelineno-0-491" name="__codelineno-0-491"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">:</span>
+<a id="__codelineno-0-492" name="__codelineno-0-492"></a>            <span class="n">loaded</span> <span class="o">=</span> <span class="n">Catalog</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
+<a id="__codelineno-0-493" name="__codelineno-0-493"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">available_datasets</span> <span class="o">=</span> <span class="n">loaded</span><span class="o">.</span><span class="n">available_datasets</span>
+<a id="__codelineno-0-494" name="__codelineno-0-494"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span> <span class="o">=</span> <span class="n">loaded</span><span class="o">.</span><span class="n">datasets</span>
+<a id="__codelineno-0-495" name="__codelineno-0-495"></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">model_post_init</span><span class="p">(</span><span class="n">__context</span><span class="p">)</span>
 <a id="__codelineno-0-496" name="__codelineno-0-496"></a>
 <a id="__codelineno-0-497" name="__codelineno-0-497"></a>    <span class="nd">@classmethod</span>
 <a id="__codelineno-0-498" name="__codelineno-0-498"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">load</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">catalog_path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Catalog</span><span class="p">:</span>
@@ -17181,11 +17181,11 @@ errors as :meth:<code>load</code>.</p>
 <a id="__codelineno-0-488" name="__codelineno-0-488"></a><span class="sd">        ValueError: When auto-loading, propagates the same</span>
 <a id="__codelineno-0-489" name="__codelineno-0-489"></a><span class="sd">            errors as :meth:`load`.</span>
 <a id="__codelineno-0-490" name="__codelineno-0-490"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-491" name="__codelineno-0-491"></a>    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">:</span>
-<a id="__codelineno-0-492" name="__codelineno-0-492"></a>        <span class="k">return</span>
-<a id="__codelineno-0-493" name="__codelineno-0-493"></a>    <span class="n">loaded</span> <span class="o">=</span> <span class="n">Catalog</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
-<a id="__codelineno-0-494" name="__codelineno-0-494"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">available_datasets</span> <span class="o">=</span> <span class="n">loaded</span><span class="o">.</span><span class="n">available_datasets</span>
-<a id="__codelineno-0-495" name="__codelineno-0-495"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span> <span class="o">=</span> <span class="n">loaded</span><span class="o">.</span><span class="n">datasets</span>
+<a id="__codelineno-0-491" name="__codelineno-0-491"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">:</span>
+<a id="__codelineno-0-492" name="__codelineno-0-492"></a>        <span class="n">loaded</span> <span class="o">=</span> <span class="n">Catalog</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
+<a id="__codelineno-0-493" name="__codelineno-0-493"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">available_datasets</span> <span class="o">=</span> <span class="n">loaded</span><span class="o">.</span><span class="n">available_datasets</span>
+<a id="__codelineno-0-494" name="__codelineno-0-494"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span> <span class="o">=</span> <span class="n">loaded</span><span class="o">.</span><span class="n">datasets</span>
+<a id="__codelineno-0-495" name="__codelineno-0-495"></a>    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">model_post_init</span><span class="p">(</span><span class="n">__context</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
