@@ -155,7 +155,9 @@ class EarthLens:
 
     See Also:
         :class:`earthlens.chc.CHIRPS`: CHIRPS rainfall over FTP.
-        :class:`earthlens.s3.S3`: ERA5 on AWS public S3 bucket.
+        :class:`earthlens.s3.S3`: AWS Open-Data datasets over public S3
+            (ERA5, Sentinel-2, GOES, Copernicus DEM, ESA WorldCover) +
+            an arbitrary-bucket passthrough.
         :class:`earthlens.cmems.CMEMS`: Copernicus Marine ocean
             datasets via `copernicusmarine`.
         :class:`earthlens.earthdata.EarthData`: NASA EOSDIS granules

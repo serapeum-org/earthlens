@@ -101,6 +101,24 @@ class S3(AbstractDataSource):
 
     OUTPUT_KIND = "mixed"
 
+    @classmethod
+    def datasets(cls) -> list[str]:
+        """Return the registered dataset names available to `dataset=`.
+
+        Returns:
+            The sorted registry names (`["copernicus-dem", "era5", ...]`).
+
+        Examples:
+            - Discover the bundled datasets:
+                ```python
+                >>> from earthlens.s3 import S3
+                >>> S3.datasets()
+                ['copernicus-dem', 'era5', 'esa-worldcover', 'goes', 'sentinel-2-l2a']
+
+                ```
+        """
+        return Catalog().dataset_names()
+
     def __init__(
         self,
         start: str,
