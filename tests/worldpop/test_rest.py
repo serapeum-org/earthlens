@@ -63,6 +63,27 @@ def test_files_for_year_empty_records_raises():
         files_for_year([], 2020)
 
 
+def test_files_for_year_drops_non_geotiff():
+    """Non-raster companion files (e.g. ASCII-XYZ zips) are filtered out."""
+    records = [
+        {
+            "popyear": "2020",
+            "files": [
+                "https://x/bdi_ppp_2020_1km_ASCII_XYZ.zip",
+                "https://x/bdi_ppp_2020_1km_Aggregated.tif",
+            ],
+        }
+    ]
+    assert files_for_year(records, 2020) == ["https://x/bdi_ppp_2020_1km_Aggregated.tif"]
+
+
+def test_files_for_year_no_geotiff_raises():
+    """A record with only non-raster files raises a clear error."""
+    records = [{"popyear": "2020", "files": ["https://x/readme.zip"]}]
+    with pytest.raises(ValueError, match="no GeoTIFF"):
+        files_for_year(records, 2020)
+
+
 def test_record_citation_returns_first():
     """record_citation returns the first record's citation text."""
     assert record_citation(pop_records()).startswith("WorldPop")

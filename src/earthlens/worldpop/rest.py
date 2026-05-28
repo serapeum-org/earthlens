@@ -73,26 +73,40 @@ def files_for_year(
             `popyear`.
 
     Returns:
-        list[str]: The matching record's `files` array (one URL for plain
+        list[str]: The matching record's GeoTIFF URLs (one for plain
             population products; many — one per age/sex cohort — for
-            `age_structures`).
+            `age_structures`). Non-raster `files` entries (e.g. the
+            `…_ASCII_XYZ.zip` companion the 1 km products ship) are dropped.
 
     Raises:
-        ValueError: If `records` is empty, or no record has `popyear ==
-            year`; the message lists the available years.
+        ValueError: If `records` is empty, no record has `popyear == year`,
+            or the matching record carries no GeoTIFF; the message lists the
+            available years.
     """
     if not records:
         raise ValueError("WorldPop returned no records for this query.")
     if year is None:
         record = max(records, key=lambda d: int(d["popyear"]))
-        return list(record.get("files", []))
-    for record in records:
-        if int(record["popyear"]) == int(year):
-            return list(record.get("files", []))
-    available = sorted({int(d["popyear"]) for d in records})
-    raise ValueError(
-        f"WorldPop year {year} is not available; have {available}."
-    )
+    else:
+        record = next(
+            (d for d in records if int(d["popyear"]) == int(year)), None
+        )
+        if record is None:
+            available = sorted({int(d["popyear"]) for d in records})
+            raise ValueError(
+                f"WorldPop year {year} is not available; have {available}."
+            )
+    tifs = [
+        url
+        for url in record.get("files", [])
+        if url.lower().endswith((".tif", ".tiff"))
+    ]
+    if not tifs:
+        raise ValueError(
+            f"WorldPop record {record.get('popyear')!r} carries no GeoTIFF; "
+            f"files: {record.get('files', [])}."
+        )
+    return tifs
 
 
 def record_citation(records: list[dict[str, Any]]) -> str | None:
