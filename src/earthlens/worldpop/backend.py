@@ -508,7 +508,29 @@ class WorldPop(AbstractDataSource):
             rasters = self._aggregate_years(localised, self._aggregate_cfg)
         else:
             rasters = list(localised.values())
+        self._sweep_intermediates()
         return rasters + tables
+
+    def _sweep_intermediates(self) -> None:
+        """Best-effort removal of leftover `*_merged.tif` mosaics.
+
+        `_localise` deletes each intermediate inline, but on Windows the GDAL
+        handle may still be open at that point. Once the per-`_localise`
+        datasets are out of scope, a `gc.collect()` releases the handles, so
+        this final sweep clears any that survived. Failures are ignored — the
+        files live in the hidden raw cache dir and are harmless.
+        """
+        import gc
+
+        gc.collect()
+        raw = self._raw_dir()
+        # _localise writes the intermediate with a leading dot, so match both.
+        leftovers = list(raw.glob("*_merged.tif")) + list(raw.glob(".*_merged.tif"))
+        for leftover in leftovers:
+            try:
+                leftover.unlink()
+            except OSError:
+                pass
 
     def _write_demographic_tables(
         self, localised: dict[tuple[str, int, tuple[str, int] | None], Path]
