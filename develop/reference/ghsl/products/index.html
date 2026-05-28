@@ -4121,6 +4121,34 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#legacy-regional-families" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Legacy &amp; regional families
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Legacy &amp; regional families">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#deliberately-not-curated" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Deliberately not curated
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#catalog-tooling" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -8594,6 +8622,34 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#legacy-regional-families" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Legacy &amp; regional families
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Legacy &amp; regional families">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#deliberately-not-curated" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Deliberately not curated
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#catalog-tooling" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -8640,15 +8696,16 @@
 <h1 id="ghsl-available-datasets"><a class="toclink" href="#ghsl-available-datasets">GHSL — Available datasets</a><a class="headerlink" href="#ghsl-available-datasets" title="Permanent link">#</a></h1>
 <p>The catalog (<code>earthlens.ghsl.Catalog</code>, backed by the per-family <code>catalog/</code>
 directory — <code>population.yaml</code>, <code>built-up.yaml</code>, <code>settlement.yaml</code>, <code>land.yaml</code>,
-<code>projections.yaml</code>, plus <code>_index.yaml</code>) curates <strong>18 GLOBE products</strong> across
-releases R2023A, R2022A (GHS-LAND), and
-R2025A (GHS-WUP projections). Inspect it programmatically:</p>
+<code>projections.yaml</code>, <code>legacy-statistical.yaml</code>, plus <code>_index.yaml</code>) curates
+<strong>29 products</strong> across releases R2019A / R2022A / R2023A / R2024A / R2025A and
+the GLOBE / EUROPE / ARCTIC regions. Inspect it programmatically:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.ghsl</span><span class="w"> </span><span class="kn">import</span> <span class="n">Catalog</span>
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="n">cat</span> <span class="o">=</span> <span class="n">Catalog</span><span class="p">()</span>
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="n">cat</span><span class="o">.</span><span class="n">available_products</span><span class="p">()</span>           <span class="c1"># all 18 canonical codes</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="n">cat</span><span class="o">.</span><span class="n">available_products</span><span class="p">()</span>           <span class="c1"># all 29 canonical codes</span>
 <a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="n">cat</span><span class="o">.</span><span class="n">resolve</span><span class="p">(</span><span class="s2">&quot;population&quot;</span><span class="p">)</span>          <span class="c1"># -&gt; &quot;GHS_POP&quot;</span>
 <a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="n">cat</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;GHS_SMOD&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">legend</span>         <span class="c1"># categorical class-code -&gt; label map</span>
 <a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="n">cat</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="s2">&quot;GHS_POP&quot;</span><span class="p">,</span> <span class="s2">&quot;R2023A&quot;</span><span class="p">,</span> <span class="mi">2020</span><span class="p">,</span> <span class="s2">&quot;100m&quot;</span><span class="p">)</span>   <span class="c1"># raises on an invalid combo</span>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="n">cat</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="s2">&quot;GHS_POP&quot;</span><span class="p">,</span> <span class="s2">&quot;R2022A&quot;</span><span class="p">,</span> <span class="mi">2020</span><span class="p">,</span> <span class="s2">&quot;100m&quot;</span><span class="p">)</span>   <span class="c1"># legacy release also works</span>
 </code></pre></div>
 <h2 id="availability-matrix"><a class="toclink" href="#availability-matrix">Availability matrix</a><a class="headerlink" href="#availability-matrix" title="Permanent link">#</a></h2>
 <p>A resolution implies its <strong>source CRS</strong> (metric → Mollweide ESRI:54009;
@@ -8949,6 +9006,44 @@ write a <code>{file}.legend.json</code> sidecar next to the GeoTIFF.</p>
 </tr>
 </tbody>
 </table>
+<h2 id="legacy-regional-families"><a class="toclink" href="#legacy-regional-families">Legacy &amp; regional families</a><a class="headerlink" href="#legacy-regional-families" title="Permanent link">#</a></h2>
+<p>Beyond the headline R2023A/R2025A surface, the catalog also curates older
+releases and regional / statistical products:</p>
+<ul>
+<li><strong>Legacy R2022A GLOBE raster</strong> of the current products — <code>GHS_POP</code>,
+  <code>GHS_SMOD</code>, <code>GHS_BUILT_S</code>(+<code>_NRES</code>), <code>GHS_BUILT_V</code>(+<code>_NRES</code>),
+  <code>GHS_BUILT_H_ANBH</code>/<code>_AGBH</code>, <code>GHS_BUILT_C_MSZ</code>/<code>_FUN</code>, plus the R2022A-only
+  <code>GHS_BUILT_C_VEG</code>. R2022A stops at epoch 2020, is <strong>Mollweide-only</strong> (the
+  WGS84 arc-second variants arrived in R2023A), and nests its per-epoch
+  directories under a sub-product directory (handled transparently). Request
+  with <code>release="R2022A"</code>.</li>
+<li><strong>Tabular / statistical families</strong> (downloaded as a versioned <code>.zip</code> table,
+  no raster pipeline): <code>GHS_AGE</code> (R2025A), <code>GHS_COUNTRY_STATS_MT</code> (R2024A),
+  <code>GHS_FUA_UCDB2015</code> / <code>GHS_STAT_DUCMT</code> / <code>GHS_STAT_UCDB2015MT</code> (R2019A),
+  the EUROPE LAU products <code>GHS_BUILT_LAUSTAT</code> (R2023A) / <code>GHS_BUILT_LAU2STAT</code>
+  (R2022A), and the ARCTIC regional tables <code>GHS_BUSS</code> / <code>GHS_POP_ARCTIC</code> /
+  <code>GHS_SMOD_ARCTIC</code> (R2025A). Pass the product's own <code>release=</code> (and the table
+  lands under <code>path/{code}/</code>).</li>
+</ul>
+<h3 id="deliberately-not-curated"><a class="toclink" href="#deliberately-not-curated">Deliberately not curated</a><a class="headerlink" href="#deliberately-not-curated" title="Permanent link">#</a></h3>
+<p>The remaining JRC families are excluded <strong>by nature</strong>, not oversight (the
+<code>tools/ghsl/refresh_ghsl_catalog.py</code> manifest records them):</p>
+<ul>
+<li><strong>JRC-marked obsolete</strong> (each carries a <code>---OBSOLETE_RELEASE---</code> marker and
+  dead CRS/resolution tokens): <code>GHS_BUILT_LDSMT*</code>, <code>GHS_POP_GPW4</code>,
+  <code>GHS_POP_EUROSTAT</code>, <code>GHS_BUILT_S1NODSM</code>, <code>GHS_BUILT_S2comp2018</code>,
+  <code>GHS_SMOD_POP*</code>, and the empty R2022A <code>GHS_DUC</code>.</li>
+<li><strong>Imagery / vector products</strong> that need a different backend, not a raster
+  catalog row: <code>GHS_SDGSAT1</code> (RGB imagery), <code>GHS_UCDB</code> / <code>GHS_OBAT</code> (vector
+  CSV / GeoPackage), <code>GHS_composite_S2</code> (Sentinel-2 UTM composite),
+  <code>GHS_SDATA</code> (derived multi-layer).</li>
+<li><strong>ARCTIC raster</strong> (<code>GHS_BUILT_S/V/H_ARCTIC</code>) — a polar version-directory
+  layout on a non-Mollweide grid, not the epoch-tiled scheme this backend
+  models. The ARCTIC <em>tabular</em> products above are curated; the ARCTIC rasters
+  are not.</li>
+<li><strong><code>GHS_POP_MT</code> (R2019A)</strong> — bespoke 250 m / 9-arc-second resolution tokens
+  outside the standard GHSL set.</li>
+</ul>
 <h2 id="catalog-tooling"><a class="toclink" href="#catalog-tooling">Catalog tooling</a><a class="headerlink" href="#catalog-tooling" title="Permanent link">#</a></h2>
 <p><code>tools/ghsl/refresh_ghsl_catalog.py</code> maintains this catalog against the live
 tree:</p>
