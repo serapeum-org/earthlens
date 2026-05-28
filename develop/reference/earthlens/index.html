@@ -13,7 +13,7 @@
         <link rel="canonical" href="https://serapeum-org.github.io/earthlens/develop/reference/earthlens/">
       
       
-        <link rel="prev" href="../../examples/ghsl/05_building_height/">
+        <link rel="prev" href="../../examples/worldpop/06_multiyear_aggregate/">
       
       
         <link rel="next" href="../abstract-datasource/">
@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -3880,7 +3880,7 @@
   <span class="md-ellipsis">
     
   
-    GHSL (human settlement)
+    WorldPop (population)
   
 
     
@@ -3896,7 +3896,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    GHSL (human settlement)
+    WorldPop (population)
   
 
           </label>
@@ -3909,7 +3909,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../ghsl/introduction/" class="md-nav__link">
+      <a href="../worldpop/introduction/" class="md-nav__link">
         
   
   
@@ -3937,35 +3937,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../ghsl/authentication/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Authentication
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../ghsl/usage/" class="md-nav__link">
+      <a href="../worldpop/usage/" class="md-nav__link">
         
   
   
@@ -3993,7 +3965,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../ghsl/products/" class="md-nav__link">
+      <a href="../worldpop/datasets/" class="md-nav__link">
         
   
   
@@ -4021,14 +3993,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../ghsl/projections/" class="md-nav__link">
+      <a href="../worldpop/worldpoppy/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Projections & tiling
+    WorldPopPy & no-xarray
   
 
     
@@ -4049,7 +4021,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../ghsl/ghsl/" class="md-nav__link">
+      <a href="../worldpop/worldpop/" class="md-nav__link">
         
   
   
@@ -7949,7 +7921,7 @@
   <span class="md-ellipsis">
     
   
-    GHSL (human settlement)
+    WorldPop (population)
   
 
     
@@ -7965,7 +7937,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    GHSL (human settlement)
+    WorldPop (population)
   
 
           </label>
@@ -7978,14 +7950,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../examples/ghsl/01_catalog_explorer/" class="md-nav__link">
+      <a href="../../examples/worldpop/01_catalog_explorer/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    GHSL — catalog explorer
+    WorldPop — catalog explorer (no network)
   
 
     
@@ -8006,14 +7978,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../examples/ghsl/02_population_quickstart/" class="md-nav__link">
+      <a href="../../examples/worldpop/02_population_quickstart/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    GHSL — population quickstart
+    WorldPop — population quickstart (live)
   
 
     
@@ -8034,14 +8006,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../examples/ghsl/03_builtup_surface/" class="md-nav__link">
+      <a href="../../examples/worldpop/03_constrained_vs_unconstrained/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    GHSL — built-up surface
+    WorldPop — constrained vs unconstrained (live)
   
 
     
@@ -8062,14 +8034,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../examples/ghsl/04_builtup_growth/" class="md-nav__link">
+      <a href="../../examples/worldpop/04_age_sex_pyramid/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    GHSL — built-up growth (multi-epoch + aggregate)
+    WorldPop — age/sex population pyramid (live)
   
 
     
@@ -8090,14 +8062,42 @@
   
   
     <li class="md-nav__item">
-      <a href="../../examples/ghsl/05_building_height/" class="md-nav__link">
+      <a href="../../examples/worldpop/05_multicountry_mosaic/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    GHSL — building height
+    WorldPop — multi-country mosaic (live)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../examples/worldpop/06_multiyear_aggregate/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    WorldPop — multi-year population, aggregated (live)
   
 
     
@@ -8592,10 +8592,10 @@ holds the concrete backend that :meth:<code>download</code> routes to.</p>
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="o">&gt;&gt;&gt;</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">EarthLens</span><span class="o">.</span><span class="n">DataSources</span><span class="p">)</span>  <span class="c1"># doctest: +NORMALIZE_WHITESPACE</span>
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="p">[</span><span class="s1">&#39;amazon-s3&#39;</span><span class="p">,</span> <span class="s1">&#39;cdse&#39;</span><span class="p">,</span> <span class="s1">&#39;chc&#39;</span><span class="p">,</span> <span class="s1">&#39;chirps&#39;</span><span class="p">,</span> <span class="s1">&#39;cmems&#39;</span><span class="p">,</span> <span class="s1">&#39;earth-search&#39;</span><span class="p">,</span>
 <a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a> <span class="s1">&#39;earthdata&#39;</span><span class="p">,</span> <span class="s1">&#39;ecmwf&#39;</span><span class="p">,</span> <span class="s1">&#39;eumetsat&#39;</span><span class="p">,</span> <span class="s1">&#39;fdsn&#39;</span><span class="p">,</span> <span class="s1">&#39;firms&#39;</span><span class="p">,</span> <span class="s1">&#39;gdacs&#39;</span><span class="p">,</span> <span class="s1">&#39;gee&#39;</span><span class="p">,</span>
-<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a> <span class="s1">&#39;ghs&#39;</span><span class="p">,</span> <span class="s1">&#39;ghsl&#39;</span><span class="p">,</span> <span class="s1">&#39;google-earth-engine&#39;</span><span class="p">,</span> <span class="s1">&#39;human-settlement&#39;</span><span class="p">,</span> <span class="s1">&#39;nexrad&#39;</span><span class="p">,</span>
-<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a> <span class="s1">&#39;nwis&#39;</span><span class="p">,</span> <span class="s1">&#39;nwp&#39;</span><span class="p">,</span> <span class="s1">&#39;openaq&#39;</span><span class="p">,</span> <span class="s1">&#39;openeo&#39;</span><span class="p">,</span> <span class="s1">&#39;overture&#39;</span><span class="p">,</span> <span class="s1">&#39;planetary-computer&#39;</span><span class="p">,</span>
-<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a> <span class="s1">&#39;radar&#39;</span><span class="p">,</span> <span class="s1">&#39;sentinel-hub&#39;</span><span class="p">,</span> <span class="s1">&#39;sentinelhub&#39;</span><span class="p">,</span> <span class="s1">&#39;stac&#39;</span><span class="p">,</span> <span class="s1">&#39;tropycal&#39;</span><span class="p">,</span>
-<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a> <span class="s1">&#39;usgs-nwis&#39;</span><span class="p">,</span> <span class="s1">&#39;usgs-water&#39;</span><span class="p">]</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a> <span class="s1">&#39;google-earth-engine&#39;</span><span class="p">,</span> <span class="s1">&#39;nexrad&#39;</span><span class="p">,</span> <span class="s1">&#39;nwis&#39;</span><span class="p">,</span> <span class="s1">&#39;nwp&#39;</span><span class="p">,</span> <span class="s1">&#39;openaq&#39;</span><span class="p">,</span> <span class="s1">&#39;openeo&#39;</span><span class="p">,</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a> <span class="s1">&#39;overture&#39;</span><span class="p">,</span> <span class="s1">&#39;planetary-computer&#39;</span><span class="p">,</span> <span class="s1">&#39;radar&#39;</span><span class="p">,</span> <span class="s1">&#39;sentinel-hub&#39;</span><span class="p">,</span>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a> <span class="s1">&#39;sentinelhub&#39;</span><span class="p">,</span> <span class="s1">&#39;stac&#39;</span><span class="p">,</span> <span class="s1">&#39;tropycal&#39;</span><span class="p">,</span> <span class="s1">&#39;usgs-nwis&#39;</span><span class="p">,</span> <span class="s1">&#39;usgs-water&#39;</span><span class="p">,</span>
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a> <span class="s1">&#39;world-pop&#39;</span><span class="p">,</span> <span class="s1">&#39;worldpop&#39;</span><span class="p">]</span>
 </code></pre></div>
 - Asking for an unknown backend raises <code>ValueError</code>:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="o">&gt;&gt;&gt;</span> <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.earthlens</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
@@ -8662,12 +8662,12 @@ holds the concrete backend that :meth:<code>download</code> routes to.</p>
     water quality, …) via <code>dataretrieval</code> as a <code>tabular</code>
     <code>DataFrame</code>; optional <code>API_USGS_PAT</code>, anonymous works; keys
     <code>"usgs-water"</code> / <code>"usgs-nwis"</code> / <code>"nwis"</code>.
-:class:<code>earthlens.ghsl.GHSL</code>: JRC Global Human Settlement Layer
-    (population / built-up / settlement-model grids + R2025A WUP
-    projections) over open HTTPS, reprojected / mosaicked / cropped
-    to the AOI via <code>pyramids</code> as <code>raster</code> GeoTIFFs (one per
-    product × epoch; <code>aggregate=</code> reduces across epochs); no
-    credentials; keys <code>"ghsl"</code> / <code>"ghs"</code> / <code>"human-settlement"</code>.</p>
+:class:<code>earthlens.worldpop.WorldPop</code>: WorldPop open population data
+    hub (CC-BY-4.0, no credentials) — per-country / global gridded
+    population, density, age/sex, births, projections; mosaic +
+    crop to the AOI via <code>pyramids</code> with a tidy age/sex table for
+    demographic products; <code>mixed</code> output; keys <code>"worldpop"</code> /
+    <code>"world-pop"</code>.</p>
 </details>
 
 
@@ -9186,10 +9186,10 @@ holds the concrete backend that :meth:<code>download</code> routes to.</p>
 <a id="__codelineno-0-137" name="__codelineno-0-137"></a><span class="sd">            &gt;&gt;&gt; sorted(EarthLens.DataSources)  # doctest: +NORMALIZE_WHITESPACE</span>
 <a id="__codelineno-0-138" name="__codelineno-0-138"></a><span class="sd">            [&#39;amazon-s3&#39;, &#39;cdse&#39;, &#39;chc&#39;, &#39;chirps&#39;, &#39;cmems&#39;, &#39;earth-search&#39;,</span>
 <a id="__codelineno-0-139" name="__codelineno-0-139"></a><span class="sd">             &#39;earthdata&#39;, &#39;ecmwf&#39;, &#39;eumetsat&#39;, &#39;fdsn&#39;, &#39;firms&#39;, &#39;gdacs&#39;, &#39;gee&#39;,</span>
-<a id="__codelineno-0-140" name="__codelineno-0-140"></a><span class="sd">             &#39;ghs&#39;, &#39;ghsl&#39;, &#39;google-earth-engine&#39;, &#39;human-settlement&#39;, &#39;nexrad&#39;,</span>
-<a id="__codelineno-0-141" name="__codelineno-0-141"></a><span class="sd">             &#39;nwis&#39;, &#39;nwp&#39;, &#39;openaq&#39;, &#39;openeo&#39;, &#39;overture&#39;, &#39;planetary-computer&#39;,</span>
-<a id="__codelineno-0-142" name="__codelineno-0-142"></a><span class="sd">             &#39;radar&#39;, &#39;sentinel-hub&#39;, &#39;sentinelhub&#39;, &#39;stac&#39;, &#39;tropycal&#39;,</span>
-<a id="__codelineno-0-143" name="__codelineno-0-143"></a><span class="sd">             &#39;usgs-nwis&#39;, &#39;usgs-water&#39;]</span>
+<a id="__codelineno-0-140" name="__codelineno-0-140"></a><span class="sd">             &#39;google-earth-engine&#39;, &#39;nexrad&#39;, &#39;nwis&#39;, &#39;nwp&#39;, &#39;openaq&#39;, &#39;openeo&#39;,</span>
+<a id="__codelineno-0-141" name="__codelineno-0-141"></a><span class="sd">             &#39;overture&#39;, &#39;planetary-computer&#39;, &#39;radar&#39;, &#39;sentinel-hub&#39;,</span>
+<a id="__codelineno-0-142" name="__codelineno-0-142"></a><span class="sd">             &#39;sentinelhub&#39;, &#39;stac&#39;, &#39;tropycal&#39;, &#39;usgs-nwis&#39;, &#39;usgs-water&#39;,</span>
+<a id="__codelineno-0-143" name="__codelineno-0-143"></a><span class="sd">             &#39;world-pop&#39;, &#39;worldpop&#39;]</span>
 <a id="__codelineno-0-144" name="__codelineno-0-144"></a>
 <a id="__codelineno-0-145" name="__codelineno-0-145"></a><span class="sd">            ```</span>
 <a id="__codelineno-0-146" name="__codelineno-0-146"></a><span class="sd">        - Asking for an unknown backend raises `ValueError`:</span>
@@ -9256,12 +9256,12 @@ holds the concrete backend that :meth:<code>download</code> routes to.</p>
 <a id="__codelineno-0-207" name="__codelineno-0-207"></a><span class="sd">            water quality, …) via `dataretrieval` as a `tabular`</span>
 <a id="__codelineno-0-208" name="__codelineno-0-208"></a><span class="sd">            `DataFrame`; optional `API_USGS_PAT`, anonymous works; keys</span>
 <a id="__codelineno-0-209" name="__codelineno-0-209"></a><span class="sd">            `&quot;usgs-water&quot;` / `&quot;usgs-nwis&quot;` / `&quot;nwis&quot;`.</span>
-<a id="__codelineno-0-210" name="__codelineno-0-210"></a><span class="sd">        :class:`earthlens.ghsl.GHSL`: JRC Global Human Settlement Layer</span>
-<a id="__codelineno-0-211" name="__codelineno-0-211"></a><span class="sd">            (population / built-up / settlement-model grids + R2025A WUP</span>
-<a id="__codelineno-0-212" name="__codelineno-0-212"></a><span class="sd">            projections) over open HTTPS, reprojected / mosaicked / cropped</span>
-<a id="__codelineno-0-213" name="__codelineno-0-213"></a><span class="sd">            to the AOI via `pyramids` as `raster` GeoTIFFs (one per</span>
-<a id="__codelineno-0-214" name="__codelineno-0-214"></a><span class="sd">            product × epoch; `aggregate=` reduces across epochs); no</span>
-<a id="__codelineno-0-215" name="__codelineno-0-215"></a><span class="sd">            credentials; keys `&quot;ghsl&quot;` / `&quot;ghs&quot;` / `&quot;human-settlement&quot;`.</span>
+<a id="__codelineno-0-210" name="__codelineno-0-210"></a><span class="sd">        :class:`earthlens.worldpop.WorldPop`: WorldPop open population data</span>
+<a id="__codelineno-0-211" name="__codelineno-0-211"></a><span class="sd">            hub (CC-BY-4.0, no credentials) — per-country / global gridded</span>
+<a id="__codelineno-0-212" name="__codelineno-0-212"></a><span class="sd">            population, density, age/sex, births, projections; mosaic +</span>
+<a id="__codelineno-0-213" name="__codelineno-0-213"></a><span class="sd">            crop to the AOI via `pyramids` with a tidy age/sex table for</span>
+<a id="__codelineno-0-214" name="__codelineno-0-214"></a><span class="sd">            demographic products; `mixed` output; keys `&quot;worldpop&quot;` /</span>
+<a id="__codelineno-0-215" name="__codelineno-0-215"></a><span class="sd">            `&quot;world-pop&quot;`.</span>
 <a id="__codelineno-0-216" name="__codelineno-0-216"></a>
 <a id="__codelineno-0-217" name="__codelineno-0-217"></a><span class="sd">    &quot;&quot;&quot;</span>
 <a id="__codelineno-0-218" name="__codelineno-0-218"></a>
@@ -9307,46 +9307,46 @@ holds the concrete backend that :meth:<code>download</code> routes to.</p>
 <a id="__codelineno-0-258" name="__codelineno-0-258"></a>            <span class="c1"># Overture Maps GeoParquet over public S3 (no creds). Vector</span>
 <a id="__codelineno-0-259" name="__codelineno-0-259"></a>            <span class="c1"># FeatureCollection output with a per-row license_id column.</span>
 <a id="__codelineno-0-260" name="__codelineno-0-260"></a>            <span class="s2">&quot;overture&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;earthlens.overture&quot;</span><span class="p">,</span> <span class="s2">&quot;Overture&quot;</span><span class="p">,</span> <span class="s2">&quot;overture&quot;</span><span class="p">,</span> <span class="p">{}),</span>
-<a id="__codelineno-0-261" name="__codelineno-0-261"></a>            <span class="c1"># JRC Global Human Settlement Layer (open HTTPS, attribution-only).</span>
-<a id="__codelineno-0-262" name="__codelineno-0-262"></a>            <span class="c1"># Download-and-localise raster: tiles/whole-globe .zip -&gt; pyramids</span>
-<a id="__codelineno-0-263" name="__codelineno-0-263"></a>            <span class="c1"># reproject/mosaic/crop. Aliases &quot;ghs&quot; / &quot;human-settlement&quot;.</span>
-<a id="__codelineno-0-264" name="__codelineno-0-264"></a>            <span class="s2">&quot;ghsl&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;earthlens.ghsl&quot;</span><span class="p">,</span> <span class="s2">&quot;GHSL&quot;</span><span class="p">,</span> <span class="s2">&quot;ghsl&quot;</span><span class="p">,</span> <span class="p">{}),</span>
-<a id="__codelineno-0-265" name="__codelineno-0-265"></a>            <span class="s2">&quot;ghs&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;earthlens.ghsl&quot;</span><span class="p">,</span> <span class="s2">&quot;GHSL&quot;</span><span class="p">,</span> <span class="s2">&quot;ghsl&quot;</span><span class="p">,</span> <span class="p">{}),</span>
-<a id="__codelineno-0-266" name="__codelineno-0-266"></a>            <span class="s2">&quot;human-settlement&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;earthlens.ghsl&quot;</span><span class="p">,</span> <span class="s2">&quot;GHSL&quot;</span><span class="p">,</span> <span class="s2">&quot;ghsl&quot;</span><span class="p">,</span> <span class="p">{}),</span>
-<a id="__codelineno-0-267" name="__codelineno-0-267"></a>            <span class="s2">&quot;tropycal&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;earthlens.tropycal&quot;</span><span class="p">,</span> <span class="s2">&quot;TropicalCyclone&quot;</span><span class="p">,</span> <span class="s2">&quot;tropycal&quot;</span><span class="p">,</span> <span class="p">{}),</span>
-<a id="__codelineno-0-268" name="__codelineno-0-268"></a>            <span class="c1"># FIRMS needs a free MAP_KEY but no SDK (requests + pandas</span>
-<a id="__codelineno-0-269" name="__codelineno-0-269"></a>            <span class="c1"># are core), so like GDACS there is no extra to hint.</span>
-<a id="__codelineno-0-270" name="__codelineno-0-270"></a>            <span class="s2">&quot;firms&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;earthlens.firms&quot;</span><span class="p">,</span> <span class="s2">&quot;FIRMS&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="p">{}),</span>
-<a id="__codelineno-0-271" name="__codelineno-0-271"></a>            <span class="c1"># Open NWP forecasts (NOAA NODD / ECMWF Open Data / DWD); the</span>
-<a id="__codelineno-0-272" name="__codelineno-0-272"></a>            <span class="c1"># [nwp] extra pulls herbie-data + ecmwf-opendata.</span>
-<a id="__codelineno-0-273" name="__codelineno-0-273"></a>            <span class="s2">&quot;nwp&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;earthlens.nwp&quot;</span><span class="p">,</span> <span class="s2">&quot;NWP&quot;</span><span class="p">,</span> <span class="s2">&quot;nwp&quot;</span><span class="p">,</span> <span class="p">{}),</span>
-<a id="__codelineno-0-274" name="__codelineno-0-274"></a>            <span class="c1"># NEXRAD Level-II radar (anonymous chunk bucket); alias &quot;nexrad&quot;.</span>
-<a id="__codelineno-0-275" name="__codelineno-0-275"></a>            <span class="s2">&quot;radar&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;earthlens.radar&quot;</span><span class="p">,</span> <span class="s2">&quot;Radar&quot;</span><span class="p">,</span> <span class="s2">&quot;radar&quot;</span><span class="p">,</span> <span class="p">{}),</span>
-<a id="__codelineno-0-276" name="__codelineno-0-276"></a>            <span class="s2">&quot;nexrad&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;earthlens.radar&quot;</span><span class="p">,</span> <span class="s2">&quot;Radar&quot;</span><span class="p">,</span> <span class="s2">&quot;radar&quot;</span><span class="p">,</span> <span class="p">{}),</span>
-<a id="__codelineno-0-277" name="__codelineno-0-277"></a>            <span class="c1"># One unified STAC backend over several endpoints. The bare</span>
-<a id="__codelineno-0-278" name="__codelineno-0-278"></a>            <span class="c1"># `&quot;stac&quot;` key leaves the endpoint to be inferred from the</span>
-<a id="__codelineno-0-279" name="__codelineno-0-279"></a>            <span class="c1"># requested collection; the three endpoint aliases pre-bind</span>
-<a id="__codelineno-0-280" name="__codelineno-0-280"></a>            <span class="c1"># `endpoint=` so `data_source=&quot;cdse&quot;` needs no extra kwarg.</span>
-<a id="__codelineno-0-281" name="__codelineno-0-281"></a>            <span class="s2">&quot;stac&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;earthlens.stac&quot;</span><span class="p">,</span> <span class="s2">&quot;STAC&quot;</span><span class="p">,</span> <span class="s2">&quot;stac&quot;</span><span class="p">,</span> <span class="p">{}),</span>
-<a id="__codelineno-0-282" name="__codelineno-0-282"></a>            <span class="s2">&quot;planetary-computer&quot;</span><span class="p">:</span> <span class="p">(</span>
+<a id="__codelineno-0-261" name="__codelineno-0-261"></a>            <span class="s2">&quot;tropycal&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;earthlens.tropycal&quot;</span><span class="p">,</span> <span class="s2">&quot;TropicalCyclone&quot;</span><span class="p">,</span> <span class="s2">&quot;tropycal&quot;</span><span class="p">,</span> <span class="p">{}),</span>
+<a id="__codelineno-0-262" name="__codelineno-0-262"></a>            <span class="c1"># FIRMS needs a free MAP_KEY but no SDK (requests + pandas</span>
+<a id="__codelineno-0-263" name="__codelineno-0-263"></a>            <span class="c1"># are core), so like GDACS there is no extra to hint.</span>
+<a id="__codelineno-0-264" name="__codelineno-0-264"></a>            <span class="s2">&quot;firms&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;earthlens.firms&quot;</span><span class="p">,</span> <span class="s2">&quot;FIRMS&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="p">{}),</span>
+<a id="__codelineno-0-265" name="__codelineno-0-265"></a>            <span class="c1"># Open NWP forecasts (NOAA NODD / ECMWF Open Data / DWD); the</span>
+<a id="__codelineno-0-266" name="__codelineno-0-266"></a>            <span class="c1"># [nwp] extra pulls herbie-data + ecmwf-opendata.</span>
+<a id="__codelineno-0-267" name="__codelineno-0-267"></a>            <span class="s2">&quot;nwp&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;earthlens.nwp&quot;</span><span class="p">,</span> <span class="s2">&quot;NWP&quot;</span><span class="p">,</span> <span class="s2">&quot;nwp&quot;</span><span class="p">,</span> <span class="p">{}),</span>
+<a id="__codelineno-0-268" name="__codelineno-0-268"></a>            <span class="c1"># NEXRAD Level-II radar (anonymous chunk bucket); alias &quot;nexrad&quot;.</span>
+<a id="__codelineno-0-269" name="__codelineno-0-269"></a>            <span class="s2">&quot;radar&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;earthlens.radar&quot;</span><span class="p">,</span> <span class="s2">&quot;Radar&quot;</span><span class="p">,</span> <span class="s2">&quot;radar&quot;</span><span class="p">,</span> <span class="p">{}),</span>
+<a id="__codelineno-0-270" name="__codelineno-0-270"></a>            <span class="s2">&quot;nexrad&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;earthlens.radar&quot;</span><span class="p">,</span> <span class="s2">&quot;Radar&quot;</span><span class="p">,</span> <span class="s2">&quot;radar&quot;</span><span class="p">,</span> <span class="p">{}),</span>
+<a id="__codelineno-0-271" name="__codelineno-0-271"></a>            <span class="c1"># One unified STAC backend over several endpoints. The bare</span>
+<a id="__codelineno-0-272" name="__codelineno-0-272"></a>            <span class="c1"># `&quot;stac&quot;` key leaves the endpoint to be inferred from the</span>
+<a id="__codelineno-0-273" name="__codelineno-0-273"></a>            <span class="c1"># requested collection; the three endpoint aliases pre-bind</span>
+<a id="__codelineno-0-274" name="__codelineno-0-274"></a>            <span class="c1"># `endpoint=` so `data_source=&quot;cdse&quot;` needs no extra kwarg.</span>
+<a id="__codelineno-0-275" name="__codelineno-0-275"></a>            <span class="s2">&quot;stac&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;earthlens.stac&quot;</span><span class="p">,</span> <span class="s2">&quot;STAC&quot;</span><span class="p">,</span> <span class="s2">&quot;stac&quot;</span><span class="p">,</span> <span class="p">{}),</span>
+<a id="__codelineno-0-276" name="__codelineno-0-276"></a>            <span class="s2">&quot;planetary-computer&quot;</span><span class="p">:</span> <span class="p">(</span>
+<a id="__codelineno-0-277" name="__codelineno-0-277"></a>                <span class="s2">&quot;earthlens.stac&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-278" name="__codelineno-0-278"></a>                <span class="s2">&quot;STAC&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-279" name="__codelineno-0-279"></a>                <span class="s2">&quot;stac&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-280" name="__codelineno-0-280"></a>                <span class="p">{</span><span class="s2">&quot;endpoint&quot;</span><span class="p">:</span> <span class="s2">&quot;planetary-computer&quot;</span><span class="p">},</span>
+<a id="__codelineno-0-281" name="__codelineno-0-281"></a>            <span class="p">),</span>
+<a id="__codelineno-0-282" name="__codelineno-0-282"></a>            <span class="s2">&quot;earth-search&quot;</span><span class="p">:</span> <span class="p">(</span>
 <a id="__codelineno-0-283" name="__codelineno-0-283"></a>                <span class="s2">&quot;earthlens.stac&quot;</span><span class="p">,</span>
 <a id="__codelineno-0-284" name="__codelineno-0-284"></a>                <span class="s2">&quot;STAC&quot;</span><span class="p">,</span>
 <a id="__codelineno-0-285" name="__codelineno-0-285"></a>                <span class="s2">&quot;stac&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-286" name="__codelineno-0-286"></a>                <span class="p">{</span><span class="s2">&quot;endpoint&quot;</span><span class="p">:</span> <span class="s2">&quot;planetary-computer&quot;</span><span class="p">},</span>
+<a id="__codelineno-0-286" name="__codelineno-0-286"></a>                <span class="p">{</span><span class="s2">&quot;endpoint&quot;</span><span class="p">:</span> <span class="s2">&quot;earth-search&quot;</span><span class="p">},</span>
 <a id="__codelineno-0-287" name="__codelineno-0-287"></a>            <span class="p">),</span>
-<a id="__codelineno-0-288" name="__codelineno-0-288"></a>            <span class="s2">&quot;earth-search&quot;</span><span class="p">:</span> <span class="p">(</span>
-<a id="__codelineno-0-289" name="__codelineno-0-289"></a>                <span class="s2">&quot;earthlens.stac&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-290" name="__codelineno-0-290"></a>                <span class="s2">&quot;STAC&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-291" name="__codelineno-0-291"></a>                <span class="s2">&quot;stac&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-292" name="__codelineno-0-292"></a>                <span class="p">{</span><span class="s2">&quot;endpoint&quot;</span><span class="p">:</span> <span class="s2">&quot;earth-search&quot;</span><span class="p">},</span>
-<a id="__codelineno-0-293" name="__codelineno-0-293"></a>            <span class="p">),</span>
-<a id="__codelineno-0-294" name="__codelineno-0-294"></a>            <span class="s2">&quot;cdse&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;earthlens.stac&quot;</span><span class="p">,</span> <span class="s2">&quot;STAC&quot;</span><span class="p">,</span> <span class="s2">&quot;stac&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;endpoint&quot;</span><span class="p">:</span> <span class="s2">&quot;cdse&quot;</span><span class="p">}),</span>
-<a id="__codelineno-0-295" name="__codelineno-0-295"></a>            <span class="c1"># USGS NWIS / Water Data (dataretrieval). Tabular DataFrame of</span>
-<a id="__codelineno-0-296" name="__codelineno-0-296"></a>            <span class="c1"># per-site water observations; anonymous access works. The</span>
-<a id="__codelineno-0-297" name="__codelineno-0-297"></a>            <span class="c1"># &quot;usgs-nwis&quot; / &quot;nwis&quot; aliases point at the same backend.</span>
-<a id="__codelineno-0-298" name="__codelineno-0-298"></a>            <span class="s2">&quot;usgs-water&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;earthlens.usgs_water&quot;</span><span class="p">,</span> <span class="s2">&quot;USGSWater&quot;</span><span class="p">,</span> <span class="s2">&quot;usgs-water&quot;</span><span class="p">,</span> <span class="p">{}),</span>
-<a id="__codelineno-0-299" name="__codelineno-0-299"></a>            <span class="s2">&quot;usgs-nwis&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;earthlens.usgs_water&quot;</span><span class="p">,</span> <span class="s2">&quot;USGSWater&quot;</span><span class="p">,</span> <span class="s2">&quot;usgs-water&quot;</span><span class="p">,</span> <span class="p">{}),</span>
-<a id="__codelineno-0-300" name="__codelineno-0-300"></a>            <span class="s2">&quot;nwis&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;earthlens.usgs_water&quot;</span><span class="p">,</span> <span class="s2">&quot;USGSWater&quot;</span><span class="p">,</span> <span class="s2">&quot;usgs-water&quot;</span><span class="p">,</span> <span class="p">{}),</span>
+<a id="__codelineno-0-288" name="__codelineno-0-288"></a>            <span class="s2">&quot;cdse&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;earthlens.stac&quot;</span><span class="p">,</span> <span class="s2">&quot;STAC&quot;</span><span class="p">,</span> <span class="s2">&quot;stac&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;endpoint&quot;</span><span class="p">:</span> <span class="s2">&quot;cdse&quot;</span><span class="p">}),</span>
+<a id="__codelineno-0-289" name="__codelineno-0-289"></a>            <span class="c1"># USGS NWIS / Water Data (dataretrieval). Tabular DataFrame of</span>
+<a id="__codelineno-0-290" name="__codelineno-0-290"></a>            <span class="c1"># per-site water observations; anonymous access works. The</span>
+<a id="__codelineno-0-291" name="__codelineno-0-291"></a>            <span class="c1"># &quot;usgs-nwis&quot; / &quot;nwis&quot; aliases point at the same backend.</span>
+<a id="__codelineno-0-292" name="__codelineno-0-292"></a>            <span class="s2">&quot;usgs-water&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;earthlens.usgs_water&quot;</span><span class="p">,</span> <span class="s2">&quot;USGSWater&quot;</span><span class="p">,</span> <span class="s2">&quot;usgs-water&quot;</span><span class="p">,</span> <span class="p">{}),</span>
+<a id="__codelineno-0-293" name="__codelineno-0-293"></a>            <span class="s2">&quot;usgs-nwis&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;earthlens.usgs_water&quot;</span><span class="p">,</span> <span class="s2">&quot;USGSWater&quot;</span><span class="p">,</span> <span class="s2">&quot;usgs-water&quot;</span><span class="p">,</span> <span class="p">{}),</span>
+<a id="__codelineno-0-294" name="__codelineno-0-294"></a>            <span class="s2">&quot;nwis&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;earthlens.usgs_water&quot;</span><span class="p">,</span> <span class="s2">&quot;USGSWater&quot;</span><span class="p">,</span> <span class="s2">&quot;usgs-water&quot;</span><span class="p">,</span> <span class="p">{}),</span>
+<a id="__codelineno-0-295" name="__codelineno-0-295"></a>            <span class="c1"># WorldPop open population data hub (CC-BY-4.0, no creds). Mosaic +</span>
+<a id="__codelineno-0-296" name="__codelineno-0-296"></a>            <span class="c1"># crop per-country GeoTIFFs to the AOI; demographic products also</span>
+<a id="__codelineno-0-297" name="__codelineno-0-297"></a>            <span class="c1"># emit a tidy age/sex table. `OUTPUT_KIND=&quot;mixed&quot;`. Alias</span>
+<a id="__codelineno-0-298" name="__codelineno-0-298"></a>            <span class="c1"># &quot;world-pop&quot;. The default REST path needs no extra SDK.</span>
+<a id="__codelineno-0-299" name="__codelineno-0-299"></a>            <span class="s2">&quot;worldpop&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;earthlens.worldpop&quot;</span><span class="p">,</span> <span class="s2">&quot;WorldPop&quot;</span><span class="p">,</span> <span class="s2">&quot;worldpop&quot;</span><span class="p">,</span> <span class="p">{}),</span>
+<a id="__codelineno-0-300" name="__codelineno-0-300"></a>            <span class="s2">&quot;world-pop&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;earthlens.worldpop&quot;</span><span class="p">,</span> <span class="s2">&quot;WorldPop&quot;</span><span class="p">,</span> <span class="s2">&quot;worldpop&quot;</span><span class="p">,</span> <span class="p">{}),</span>
 <a id="__codelineno-0-301" name="__codelineno-0-301"></a>        <span class="p">}</span>
 <a id="__codelineno-0-302" name="__codelineno-0-302"></a>    <span class="p">)</span>
 <a id="__codelineno-0-303" name="__codelineno-0-303"></a>
@@ -10871,7 +10871,7 @@ meaningful gridded reduction.</p>
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
           
-          <a href="../../examples/ghsl/05_building_height/" class="md-footer__link md-footer__link--prev" aria-label="Previous: GHSL — building height">
+          <a href="../../examples/worldpop/06_multiyear_aggregate/" class="md-footer__link md-footer__link--prev" aria-label="Previous: WorldPop — multi-year population, aggregated (live)">
             <div class="md-footer__button md-icon">
               
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
@@ -10881,7 +10881,7 @@ meaningful gridded reduction.</p>
                 Previous
               </span>
               <div class="md-ellipsis">
-                GHSL — building height
+                WorldPop — multi-year population, aggregated (live)
               </div>
             </div>
           </a>
