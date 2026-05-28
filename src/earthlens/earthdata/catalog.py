@@ -504,12 +504,12 @@ class Catalog(AbstractCatalog):
             ValueError: When auto-loading, propagates the same errors
                 as :meth:`load`.
         """
-        if self.datasets:
-            return
-        loaded = Catalog.load()
-        self.available_datasets = loaded.available_datasets
-        self.datasets = loaded.datasets
-        self.daacs = loaded.daacs
+        if not self.datasets:
+            loaded = Catalog.load()
+            self.available_datasets = loaded.available_datasets
+            self.datasets = loaded.datasets
+            self.daacs = loaded.daacs
+        super().model_post_init(__context)
 
     @classmethod
     def load(

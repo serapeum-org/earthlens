@@ -219,6 +219,7 @@ class Catalog(AbstractCatalog):
             self.datasets = dict(_load_basins(CATALOG_PATH))
         if not self.available_datasets:
             self.available_datasets = sorted(self.datasets)
+        super().model_post_init(__context)
 
     @classmethod
     def load(cls, catalog_path: Path | None = None) -> Catalog:

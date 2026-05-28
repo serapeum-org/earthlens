@@ -121,10 +121,10 @@ class Catalog(AbstractCatalog):
             ValueError: Propagated from :meth:`load` when the YAML is
                 missing, empty, or has a malformed hazard row.
         """
-        if self.datasets:
-            return
-        loaded = Catalog.load()
-        self.datasets = loaded.datasets
+        if not self.datasets:
+            loaded = Catalog.load()
+            self.datasets = loaded.datasets
+        super().model_post_init(__context)
 
     @classmethod
     def load(cls, catalog_path: Path | None = None) -> Catalog:

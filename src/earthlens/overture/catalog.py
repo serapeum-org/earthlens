@@ -212,12 +212,12 @@ class Catalog(AbstractCatalog):
             ValueError: Propagated from `load` when the YAML is missing,
                 empty, or has a malformed theme row.
         """
-        if self.datasets:
-            return
-        loaded = Catalog.load()
-        self.datasets = loaded.datasets
-        self.available_releases = loaded.available_releases
-        self.available_datasets = loaded.available_datasets
+        if not self.datasets:
+            loaded = Catalog.load()
+            self.datasets = loaded.datasets
+            self.available_releases = loaded.available_releases
+            self.available_datasets = loaded.available_datasets
+        super().model_post_init(__context)
 
     @classmethod
     def load(cls, catalog_path: Path | None = None) -> Catalog:

@@ -404,13 +404,13 @@ class Catalog(AbstractCatalog):
         Raises:
             ValueError: When auto-loading, propagates the loader's errors.
         """
-        if self.datasets or self.recipes:
-            return
-        loaded = Catalog.load()
-        self.datasets = loaded.datasets
-        self.recipes = loaded.recipes
-        self.available_collections = loaded.available_collections
-        self.available_processes = loaded.available_processes
+        if not (self.datasets or self.recipes):
+            loaded = Catalog.load()
+            self.datasets = loaded.datasets
+            self.recipes = loaded.recipes
+            self.available_collections = loaded.available_collections
+            self.available_processes = loaded.available_processes
+        super().model_post_init(__context)
 
     @classmethod
     def load(cls, catalog_path: Path | None = None) -> Catalog:
