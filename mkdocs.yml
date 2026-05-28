@@ -205,6 +205,12 @@ nav:
       - Authentication: reference/usgs-water/authentication.md
       - Available data: reference/usgs-water/datasets.md
       - Reference: reference/usgs-water/usgs_water.md
+    - WorldPop (population):
+      - Introduction: reference/worldpop/introduction.md
+      - Usage: reference/worldpop/usage.md
+      - Available datasets: reference/worldpop/datasets.md
+      - WorldPopPy & no-xarray: reference/worldpop/worldpoppy.md
+      - Reference: reference/worldpop/worldpop.md
   - Examples:
     - Authentication: examples/authentication.md
     - Data Sources: examples/data-sources.md
