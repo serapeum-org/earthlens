@@ -22,6 +22,7 @@ from __future__ import annotations
 
 import datetime as dt
 import re
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
@@ -47,6 +48,15 @@ _UNSAFE = re.compile(r"[^A-Za-z0-9._-]+")
 def _safe_name(value: str) -> str:
     """Sanitise a product id into a filesystem-safe file stem."""
     return _UNSAFE.sub("_", value).strip("_")
+
+
+@dataclass(frozen=True)
+class _AggregationVariable:
+    """Duck-typed `var_info` for `aggregate_netcdf` (the fields it reads)."""
+
+    nc_variable: str
+    cds_variable: str
+    is_flux: bool = False
 
 
 class S3(AbstractDataSource):
@@ -194,6 +204,7 @@ class S3(AbstractDataSource):
         raw_dir = self.root_dir / "_raw"
         raw_dir.mkdir(parents=True, exist_ok=True)
         default_ext = ".nc" if self._dataset.format == "netcdf" else ".tif"
+        self._product_by_output: dict[str, RemoteProduct] = {}
         written: list[Path] = []
         missing = 0
         for product in tqdm(products, desc="amazon-s3", disable=not products):
@@ -216,7 +227,9 @@ class S3(AbstractDataSource):
                         f"failed to download "
                         f"s3://{product.metadata['bucket']}/{product.href}: {exc}"
                     ) from exc
-            written.append(self._localise(raw, product))
+            out_path = self._localise(raw, product)
+            self._product_by_output[str(out_path)] = product
+            written.append(out_path)
         if not written and missing:
             raise RuntimeError(
                 f"none of the {missing} planned object(s) exist for this "
@@ -269,25 +282,71 @@ class S3(AbstractDataSource):
 
         Args:
             progress_bar: Show a per-product progress bar.
-            aggregate: Optional `AggregationConfig` (NetCDF datasets only;
-                wired in C5). Rejected for COG datasets.
+            aggregate: Optional `AggregationConfig`. Supported for NetCDF
+                datasets (ERA5 / GOES) — each cropped granule is run
+                through `aggregate_netcdf` to emit per-window GeoTIFFs.
+                Rejected for COG datasets.
 
         Returns:
-            The cropped output file paths.
+            The cropped output paths, or — when `aggregate` is set — the
+            per-window aggregated GeoTIFF paths.
 
         Raises:
-            NotImplementedError: If `aggregate` is given (wired in C5).
+            NotImplementedError: If `aggregate` is given for a COG dataset.
         """
+        if aggregate is not None and self._dataset.format != "netcdf":
+            raise NotImplementedError(
+                "aggregate= is only supported for NetCDF datasets "
+                "(e.g. era5, goes); this dataset is stored as COG."
+            )
         paths = self._api_via_search_fetch()
         if aggregate is not None:
             return self._aggregate(paths, aggregate)
         return paths
 
     def _aggregate(self, paths: list[Path], aggregate: Any) -> list[Path]:
-        """Window-aggregate the cropped NetCDFs (wired in C5)."""
-        raise NotImplementedError(
-            "aggregate= support for the S3 backend is wired in task C5."
-        )
+        """Window-aggregate each cropped NetCDF, mirroring the ECMWF path.
+
+        Args:
+            paths: The cropped NetCDF paths from `_fetch`.
+            aggregate: An `earthlens.aggregate.AggregationConfig`.
+
+        Returns:
+            The per-window GeoTIFF paths. A granule that fails to
+            aggregate is logged and skipped (ECMWF behaviour).
+        """
+        from earthlens.aggregate import aggregate_netcdf
+
+        out_dir = Path(aggregate.out_dir) if aggregate.out_dir else self.path / "aggregated"
+        config = aggregate.model_copy(update={"out_dir": out_dir})
+        outputs: list[Path] = []
+        for path in paths:
+            product = self._product_by_output.get(str(path))
+            native = product.metadata.get("variable") if product else None
+            variable = self._variable_for_native(native)
+            var_info = _AggregationVariable(
+                nc_variable=(variable.nc_variable or variable.native)
+                if variable
+                else (native or ""),
+                cds_variable=native or "",
+                is_flux=False,
+            )
+            try:
+                windows = aggregate_netcdf(path, var_info, config)
+            except Exception as exc:  # noqa: BLE001 - log + continue like ECMWF
+                logger.error(f"aggregation failed for {path}: {exc}")
+                continue
+            outputs.extend(w[2] for w in windows if w[2] is not None)
+        return outputs
+
+    def _variable_for_native(self, native: str | None):
+        """Return the dataset `Variable` whose native token matches, or `None`."""
+        if native is None:
+            return None
+        for variable in self._dataset.variables.values():
+            if variable.native == native:
+                return variable
+        return None
 
 
 def _is_missing_object(exc: BaseException) -> bool:

@@ -64,6 +64,9 @@ class Variable(BaseModel):
         stream: ERA5-only — the NCAR product stream the variable lives in
             (`e5.oper.an.sfc`, `e5.oper.fc.sfc.accumu`, ...). `None` for
             datasets without streams.
+        nc_variable: In-file variable name inside the NetCDF granule, used
+            by `aggregate=` to pick the variable. `None` falls back to
+            `native`.
 
     Examples:
         - Build a row and read its native token:
@@ -82,6 +85,7 @@ class Variable(BaseModel):
     units: str = ""
     description: str = ""
     stream: str | None = None
+    nc_variable: str | None = None
 
 
 class Dataset(BaseModel):
