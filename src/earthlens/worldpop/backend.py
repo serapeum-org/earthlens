@@ -52,6 +52,9 @@ _RAW_DIRNAME: str = ".worldpop_raw"
 _DOWNLOAD_JOBS: int = 4
 #: Per-download HTTP timeout in seconds.
 _HTTP_TIMEOUT: int = 120
+#: WorldPop's GeoTIFF no-data value (verified live; merge must preserve it,
+#: since 0 is a valid population count).
+_WORLDPOP_NODATA: float = -99999.0
 
 #: Allowed values for the `api=` access-path selector.
 _API_MODES: frozenset[str] = frozenset({"rest", "worldpoppy"})
@@ -407,21 +410,77 @@ class WorldPop(AbstractDataSource):
         return groups
 
     def _fetch(self, products: list[RemoteProduct]) -> list[Path]:
-        """Download every planned product and return the raw local paths.
+        """Download every planned product and localise each group to the AOI.
 
-        Downloads (idempotently, in parallel) and groups by
-        `(product, year, cohort)` ready for the localise step (`C5`). Until
-        the mosaic/crop step lands, the raw per-country GeoTIFF paths are
-        returned directly.
+        Downloads (idempotently, in parallel), groups by
+        `(product, year, cohort)`, and mosaics + crops each group to the AOI
+        via `pyramids`, writing one GeoTIFF per group.
 
         Args:
             products: The `_search` result.
 
         Returns:
-            list[Path]: The downloaded raw GeoTIFF paths.
+            list[Path]: One AOI-cropped GeoTIFF per `(product, year,
+                cohort)` group.
         """
         groups = self._group_for_mosaic(products)
-        return [path for group in groups.values() for path, _ in group]
+        return [self._localise(group) for group in groups.values()]
+
+    def _localise(self, group: list[tuple[Path, RemoteProduct]]) -> Path:
+        """Mosaic the per-country GeoTIFFs of one group + crop to the AOI.
+
+        WorldPop is WGS84 (EPSG:4326) natively, so no reproject happens
+        unless `crs != 4326`. The crop bbox is always WGS84 regardless of
+        the output CRS (pyramids reprojects the bbox).
+
+        Args:
+            group: `[(local_path, product), …]` for one `(product, year,
+                cohort)` — the per-country tiles to merge.
+
+        Returns:
+            Path: The written AOI-cropped GeoTIFF under `self.path`.
+        """
+        from pyramids.dataset import Dataset
+        from pyramids.dataset.merge import merge_rasters
+
+        tifs = [str(path) for path, _ in group]
+        rp = group[0][1]
+        product = rp.metadata["product"]
+        year = rp.metadata["year"]
+        dst_crs = self._output_epsg if self._output_epsg != 4326 else None
+
+        work = self._raw_dir() / f".{product}_{year}_{Path(rp.href).stem}_merged.tif"
+        merge_rasters(
+            tifs,
+            str(work),
+            method="last",
+            dst_crs=dst_crs,
+            no_data_value=_WORLDPOP_NODATA,
+        )
+        dataset = Dataset.read_file(str(work))
+        cropped = dataset.crop(
+            bbox=[
+                self.space.west,
+                self.space.south,
+                self.space.east,
+                self.space.north,
+            ],
+            epsg=4326,
+        )
+        cohort = cohort_of(rp.href)
+        tag = f"_{cohort[0]}_{cohort[1]}" if cohort else ""
+        target = (
+            Path(self.path) / f"{product}_{year}{tag}_{self._resolution}.tif"
+        )
+        cropped.to_file(str(target))
+        # Best-effort cleanup of the intermediate mosaic; on Windows the GDAL
+        # handle may still hold it open, in which case it stays in the raw
+        # cache dir (harmless — a distinct name per group).
+        try:
+            work.unlink(missing_ok=True)
+        except OSError:
+            pass
+        return target
 
     def _api(self) -> list[Path]:
         """Compose `_search` and `_fetch` into the canonical search/fetch shape."""
