@@ -330,6 +330,12 @@ nav:
       - Multi-parameter & instantaneous: examples/usgs-water/multi_parameter_and_instantaneous.ipynb
       - Site discovery & statistics: examples/usgs-water/site_discovery_and_statistics.ipynb
       - Annual peaks & rating curves: examples/usgs-water/peaks_and_ratings.ipynb
+    - GHSL (human settlement):
+      - Catalog explorer (no network): examples/ghsl/01_catalog_explorer.ipynb
+      - Population quickstart (live): examples/ghsl/02_population_quickstart.ipynb
+      - Built-up surface (live): examples/ghsl/03_builtup_surface.ipynb
+      - Built-up growth — aggregate (live): examples/ghsl/04_builtup_growth.ipynb
+      - Building height (live): examples/ghsl/05_building_height.ipynb
   - API Reference:
     - EarthLens Facade: reference/earthlens.md
     - AbstractDataSource: reference/abstract-datasource.md
