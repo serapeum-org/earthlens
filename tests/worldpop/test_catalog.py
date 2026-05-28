@@ -74,7 +74,14 @@ def test_pick_subalias_global_mosaic(catalog):
 def test_pick_subalias_single_product_ignores_selectors(catalog):
     """A single-sub-alias product returns its id regardless of selectors."""
     assert catalog.pick_subalias("births") == "bic"
-    assert catalog.pick_subalias("future_pop", resolution="100m") == "FPP_v02"
+    # dug has one sub-alias at 100 m (matching the default), so no warning.
+    assert catalog.pick_subalias("dug", resolution="100m") == "dug_g2_v1"
+
+
+def test_pick_subalias_single_product_resolution_mismatch_warns(catalog):
+    """Requesting a resolution the sole sub-alias doesn't offer warns."""
+    with pytest.warns(UserWarning, match="resolution='1km' is ignored"):
+        assert catalog.pick_subalias("urban_change", resolution="1km") == "ucic"
 
 
 def test_pick_subalias_pwd_level(catalog):

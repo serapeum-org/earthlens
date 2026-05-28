@@ -22,6 +22,7 @@ sub-alias matches (did-you-mean).
 from __future__ import annotations
 
 import difflib
+import warnings
 from pathlib import Path
 from typing import Any
 
@@ -313,9 +314,13 @@ class Catalog(AbstractCatalog):
     ) -> str:
         """Resolve the selector kwargs to a single REST sub-alias id.
 
-        A product with exactly one sub-alias (`births`, `future_pop`, …)
-        returns it directly — the selector kwargs do not apply. Otherwise
-        the kwargs must match one sub-alias's
+        A product with exactly one sub-alias (`births`, `urban_change`, …)
+        returns it directly — the selector kwargs do not apply, since there
+        is only one variant. As a guard against a silently-ignored request,
+        a `resolution` that differs from the sole sub-alias's resolution
+        emits a `UserWarning` (the other selectors are product-intrinsic for
+        single-variant products and are not warned on). Otherwise the kwargs
+        must match one sub-alias's
         `(constrained, unadjusted, resolution, scope, generation, level)`
         tuple exactly.
 
@@ -348,7 +353,16 @@ class Catalog(AbstractCatalog):
         code = self.resolve(product)
         row = self.datasets[code]
         if len(row.subaliases) == 1:
-            return row.subaliases[0].id
+            only = row.subaliases[0]
+            if resolution != only.resolution:
+                warnings.warn(
+                    f"{code!r} offers only the {only.resolution!r} sub-alias "
+                    f"{only.id!r}; the requested resolution={resolution!r} is "
+                    "ignored.",
+                    UserWarning,
+                    stacklevel=2,
+                )
+            return only.id
         want = (constrained, unadjusted, resolution, scope, generation, level)
         for sub in row.subaliases:
             if sub.selector() == want:
