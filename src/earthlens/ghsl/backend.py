@@ -20,10 +20,14 @@ from __future__ import annotations
 
 import datetime as dt
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 import pandas as pd
 import requests
 from loguru import logger
+
+if TYPE_CHECKING:
+    from earthlens.aggregate import AggregationConfig
 
 from earthlens.base import OutputKind
 from earthlens.base.abstractdatasource import (
@@ -267,21 +271,126 @@ class GHSL(AbstractDataSource):
         """Compose `_search` and `_fetch` into the canonical C3 shape."""
         return self._api_via_search_fetch()
 
-    def download(self, progress_bar: bool = True, aggregate=None) -> list[Path]:
+    def download(
+        self,
+        progress_bar: bool = True,
+        aggregate: AggregationConfig | None = None,
+    ) -> list[Path]:
         """Fetch the requested products as AOI-cropped GeoTIFFs.
 
         Args:
             progress_bar: Whether per-download progress is shown.
             aggregate: Optional `earthlens.aggregate.AggregationConfig`;
-                reduces the per-epoch raster stack (`C6`).
+                reduces the per-epoch raster stack across the epochs in range
+                (`C6`). Rejected for categorical products (averaging class
+                codes is meaningless).
 
         Returns:
             list[Path]: One GeoTIFF per `(product, epoch)`, or — when
                 `aggregate` is set — the per-window reduced rasters.
+
+        Raises:
+            ValueError: If `aggregate` is set and any requested product is
+                categorical.
         """
         self._show_progress = progress_bar
-        self._aggregate_cfg = aggregate
-        return self._api_via_search_fetch()
+        if aggregate is not None:
+            categorical = [c for c in self._codes if self._catalog.get(c).categorical]
+            if categorical:
+                raise ValueError(
+                    f"cannot aggregate class codes for categorical product(s) "
+                    f"{categorical}; averaging class codes is meaningless. "
+                    "Drop aggregate= (or request a continuous product)."
+                )
+        products = self._search()
+        if not products:
+            return []
+        paths = self._fetch(products)
+        if aggregate is None:
+            return paths
+        return self._aggregate_epochs(products, paths, aggregate)
+
+    def _aggregate_epochs(
+        self,
+        products: list[RemoteProduct],
+        paths: list[Path],
+        config: AggregationConfig,
+    ) -> list[Path]:
+        """Reduce each product's per-epoch raster stack into per-window rasters.
+
+        Groups the written GeoTIFFs by product (the epochs share an identical
+        grid after `_localise`), buckets the discrete epochs into windows with
+        `config.freq` (GHSL epochs are 5-yearly points, so a coarse `freq`
+        collapses them to one output), and reduces each window's stack with
+        `config.op` (`"auto"` resolves to `"mean"`) via the shared
+        `earthlens.aggregate` reducer. One GeoTIFF per `(product, window)`.
+
+        Args:
+            products: The plan from `_search` (same order as `paths`).
+            paths: The per-`(product, epoch)` GeoTIFFs from `_fetch`.
+            config: The aggregation spec (`freq`, `op`, `min_count`).
+
+        Returns:
+            list[Path]: The per-window reduced GeoTIFFs written under
+                `self.path`.
+        """
+        import numpy as np
+        from collections import defaultdict
+
+        from pyramids.dataset import Dataset
+
+        from earthlens.aggregate import _reduce, _window_groups
+
+        op = "mean" if config.op == "auto" else config.op
+        groups: dict[str, list[tuple[int, str, Path]]] = defaultdict(list)
+        for product, path in zip(products, paths):
+            if product.metadata.get("kind") != "raster":
+                continue
+            groups[product.metadata["product"]].append(
+                (product.metadata["epoch"], product.metadata["resolution"], path)
+            )
+
+        out: list[Path] = []
+        for code, items in groups.items():
+            items.sort(key=lambda triple: triple[0])
+            epochs = [epoch for epoch, _, _ in items]
+            resolution = items[0][1]
+            datasets = [Dataset.read_file(str(path)) for _, _, path in items]
+            stack = np.stack(
+                [self._first_band(ds.read_array()) for ds in datasets]
+            ).astype("float64")
+            time_axis = pd.to_datetime([f"{epoch}-01-01" for epoch in epochs])
+            geo = datasets[0].geotransform
+            nodata = datasets[0].no_data_value
+            fill = nodata[0] if isinstance(nodata, (list, tuple)) else nodata
+            for label, mask in _window_groups(time_axis, config.freq):
+                reduced = _reduce(
+                    stack[mask], op, skipna=True, min_count=config.min_count
+                )
+                result = Dataset.create_from_array(
+                    reduced,
+                    geo=geo,
+                    epsg=self._output_epsg,
+                    no_data_value=fill if fill is not None else -9999,
+                )
+                target = Path(self.path) / (
+                    f"{code}_{op}_{label.strftime('%Y')}_{resolution}"
+                    f"_epsg{self._output_epsg}.tif"
+                )
+                result.to_file(str(target))
+                _close_dataset(result)
+                out.append(target)
+            for ds in datasets:
+                _close_dataset(ds)
+        return out
+
+    @staticmethod
+    def _first_band(arr) -> object:
+        """Return the first band of a raster array (2-D as-is, 3-D's band 0)."""
+        import numpy as np
+
+        array = np.asarray(arr)
+        return array[0] if array.ndim == 3 else array
 
     @property
     def _raw_dir(self) -> Path:
