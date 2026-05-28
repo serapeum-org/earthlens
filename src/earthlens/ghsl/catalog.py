@@ -450,12 +450,13 @@ class Catalog(AbstractCatalog):
             ValueError: Propagated from `load` when the catalog is missing,
                 empty, or has a malformed product row.
         """
-        if self.datasets:
-            self._index_aliases()
-            return
-        loaded = Catalog.load()
-        self.datasets = loaded.datasets
-        self.available_datasets = loaded.available_datasets
+        if not self.datasets:
+            loaded = Catalog.load()
+            self.datasets = loaded.datasets
+            self.available_datasets = loaded.available_datasets
+        # Populate the inherited `catalog` field (== get_catalog()) per the
+        # AbstractCatalog contract, then build the alias lookup.
+        super().model_post_init(__context)
         self._index_aliases()
 
     def _index_aliases(self) -> None:
