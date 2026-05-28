@@ -199,7 +199,6 @@ products:
     aliases: [duc, degree_of_urbanisation_classification]
     unit: ""
     kind: tabular
-    categorical: true
     default_resolution: "table"
     releases:
       R2023A:
@@ -263,7 +262,6 @@ products:
     aliases: [wup_duc]
     unit: ""
     kind: tabular
-    categorical: true
     default_resolution: "table"
     releases:
       R2025A:
