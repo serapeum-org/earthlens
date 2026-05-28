@@ -23,8 +23,10 @@ the `[worldpop]` extra.
 from __future__ import annotations
 
 import datetime as dt
+import warnings
 from pathlib import Path
 
+import numpy as np
 import pandas as pd
 import requests
 from joblib import Parallel, delayed
@@ -410,21 +412,131 @@ class WorldPop(AbstractDataSource):
         return groups
 
     def _fetch(self, products: list[RemoteProduct]) -> list[Path]:
-        """Download every planned product and localise each group to the AOI.
+        """Download, localise, tabularise demographics, and optionally aggregate.
 
-        Downloads (idempotently, in parallel), groups by
-        `(product, year, cohort)`, and mosaics + crops each group to the AOI
-        via `pyramids`, writing one GeoTIFF per group.
+        Downloads (idempotently, in parallel), mosaics + crops each
+        `(product, year, cohort)` group to the AOI, writes a tidy age/sex
+        table for demographic products, and — when `aggregate=` was passed
+        to `download` — reduces the per-year rasters across years.
 
         Args:
             products: The `_search` result.
 
         Returns:
-            list[Path]: One AOI-cropped GeoTIFF per `(product, year,
-                cohort)` group.
+            list[Path]: The written GeoTIFF and table paths (the reduced
+                per-window rasters replace the per-year rasters when
+                `aggregate=` is set; tables are always included).
         """
         groups = self._group_for_mosaic(products)
-        return [self._localise(group) for group in groups.values()]
+        localised: dict[tuple[str, int, tuple[str, int] | None], Path] = {
+            key: self._localise(group) for key, group in groups.items()
+        }
+        tables = self._write_demographic_tables(localised)
+        if self._aggregate_cfg is not None:
+            rasters = self._aggregate_years(localised, self._aggregate_cfg)
+        else:
+            rasters = list(localised.values())
+        return rasters + tables
+
+    def _write_demographic_tables(
+        self, localised: dict[tuple[str, int, tuple[str, int] | None], Path]
+    ) -> list[Path]:
+        """Write a tidy age/sex table per `(product, year)` for demographic products.
+
+        For each cohort raster of a demographic product (`age_structures`),
+        the AOI population total is summed and emitted as one tidy row
+        `{aoi, year, sex, age_low, population}`; the rows for a
+        `(product, year)` are written to `{product}_{year}.csv` alongside
+        the per-cohort GeoTIFFs.
+
+        Args:
+            localised: The `(product, year, cohort) -> output_path` map.
+
+        Returns:
+            list[Path]: The written table paths (empty if no demographic
+                product was requested).
+        """
+        rows_by_table: dict[tuple[str, int], list[dict[str, object]]] = {}
+        aoi_label = "+".join(self._iso3s) if self._iso3s else "aoi"
+        for (product, year, cohort), path in localised.items():
+            if cohort is None or not self._catalog.get(product).demographic:
+                continue
+            sex, age_low = cohort
+            rows_by_table.setdefault((product, year), []).append(
+                {
+                    "aoi": aoi_label,
+                    "year": year,
+                    "sex": sex,
+                    "age_low": age_low,
+                    "population": _zonal_sum(path),
+                }
+            )
+        out: list[Path] = []
+        for (product, year), rows in rows_by_table.items():
+            frame = pd.DataFrame(rows).sort_values(["sex", "age_low"])
+            target = Path(self.path) / f"{product}_{year}.csv"
+            frame.to_csv(target, index=False)
+            out.append(target)
+        return out
+
+    def _aggregate_years(
+        self,
+        localised: dict[tuple[str, int, tuple[str, int] | None], Path],
+        cfg,
+    ) -> list[Path]:
+        """Reduce the per-year rasters across years, bucketed by `cfg.freq`.
+
+        Groups the localised rasters by `(product, cohort)`, buckets their
+        years by the pandas offset `cfg.freq`, reduces each bucket with
+        `cfg.op` (`auto` → `mean` for population), and writes one GeoTIFF
+        per window.
+
+        Args:
+            localised: The `(product, year, cohort) -> output_path` map.
+            cfg: An `earthlens.aggregate.AggregationConfig`.
+
+        Returns:
+            list[Path]: One reduced GeoTIFF per `(product, cohort, window)`.
+        """
+        from pyramids.dataset import Dataset
+
+        op = "mean" if cfg.op == "auto" else cfg.op
+        by_series: dict[tuple[str, tuple[str, int] | None], dict[int, Path]] = {}
+        for (product, year, cohort), path in localised.items():
+            by_series.setdefault((product, cohort), {})[year] = path
+
+        out: list[Path] = []
+        for (product, cohort), year_paths in by_series.items():
+            years = sorted(year_paths)
+            index = pd.to_datetime([f"{y}-01-01" for y in years])
+            series = pd.Series(years, index=index)
+            for window_label, bucket in series.groupby(pd.Grouper(freq=cfg.freq)):
+                bucket_years = list(bucket.values)
+                if not bucket_years:
+                    continue
+                template = Dataset.read_file(str(year_paths[bucket_years[0]]))
+                stack = np.stack(
+                    [
+                        _masked_array(Dataset.read_file(str(year_paths[y])))
+                        for y in bucket_years
+                    ]
+                )
+                with warnings.catch_warnings():
+                    # All-no-data cells reduce to NaN; that is expected for
+                    # ocean / outside-AOI pixels, so silence the empty-slice
+                    # RuntimeWarning numpy emits for them.
+                    warnings.simplefilter("ignore", RuntimeWarning)
+                    reduced = _REDUCERS[op](stack, axis=0)
+                tag = f"_{cohort[0]}_{cohort[1]}" if cohort else ""
+                target = (
+                    Path(self.path)
+                    / f"{product}{tag}_{cfg.freq}_{window_label:%Y%m%d}_{op}.tif"
+                )
+                Dataset.create_from_array(
+                    arr=reduced, geo=template.geotransform, epsg=template.epsg
+                ).to_file(str(target))
+                out.append(target)
+        return out
 
     def _localise(self, group: list[tuple[Path, RemoteProduct]]) -> Path:
         """Mosaic the per-country GeoTIFFs of one group + crop to the AOI.
@@ -500,6 +612,50 @@ class WorldPop(AbstractDataSource):
         self._show_progress = progress_bar
         self._aggregate_cfg = aggregate
         return self._api_via_search_fetch()
+
+
+#: Per-op reducers over the year axis (axis 0), NaN-aware (NaN = no-data).
+_REDUCERS = {
+    "mean": np.nanmean,
+    "sum": np.nansum,
+    "min": np.nanmin,
+    "max": np.nanmax,
+    "std": np.nanstd,
+}
+
+
+def _masked_array(dataset) -> np.ndarray:
+    """Return a dataset's first band as a float array with no-data → NaN.
+
+    Args:
+        dataset: An open `pyramids.dataset.Dataset`.
+
+    Returns:
+        np.ndarray: The 2-D float array, no-data cells set to `NaN`.
+    """
+    arr = np.asarray(dataset.read_array(), dtype="float64")
+    if arr.ndim == 3:
+        arr = arr[0]
+    nodata = dataset.no_data_value
+    nodata = nodata[0] if isinstance(nodata, (tuple, list)) else nodata
+    if nodata is not None:
+        arr = np.where(arr == nodata, np.nan, arr)
+    return arr
+
+
+def _zonal_sum(path: Path) -> float:
+    """Return the NaN-aware sum of a single-band raster (no-data excluded).
+
+    Args:
+        path: A localised GeoTIFF path.
+
+    Returns:
+        float: The total of all valid cells (e.g. AOI population for a
+            cohort raster).
+    """
+    from pyramids.dataset import Dataset
+
+    return float(np.nansum(_masked_array(Dataset.read_file(str(path)))))
 
 
 def _require_worldpoppy() -> None:
