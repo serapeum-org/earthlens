@@ -10,13 +10,13 @@
       
       
       
-        <link rel="canonical" href="https://serapeum-org.github.io/earthlens/develop/reference/worldpop/introduction/">
+        <link rel="canonical" href="https://serapeum-org.github.io/earthlens/develop/reference/ghsl/usage/">
       
       
-        <link rel="prev" href="../../usgs-water/usgs_water/">
+        <link rel="prev" href="../authentication/">
       
       
-        <link rel="next" href="../usage/">
+        <link rel="next" href="../products/">
       
       
         
@@ -27,7 +27,7 @@
     
     
       
-        <title>Introduction - earthlens</title>
+        <title>Usage - earthlens</title>
       
     
     
@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -83,7 +83,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#worldpop-introduction" class="md-skip">
+        <a href="#ghsl-usage" class="md-skip">
           Skip to content
         </a>
       
@@ -123,7 +123,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Introduction
+              Usage
             
           </span>
         </div>
@@ -3887,7 +3887,7 @@
   <span class="md-ellipsis">
     
   
-    WorldPop (population)
+    GHSL (human settlement)
   
 
     
@@ -3903,11 +3903,67 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    WorldPop (population)
+    GHSL (human settlement)
   
 
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../introduction/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Introduction
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../authentication/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Authentication
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
             
               
                 
@@ -3932,7 +3988,7 @@
   <span class="md-ellipsis">
     
   
-    Introduction
+    Usage
   
 
     
@@ -3950,7 +4006,7 @@
   <span class="md-ellipsis">
     
   
-    Introduction
+    Usage
   
 
     
@@ -3976,10 +4032,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#what-it-covers" class="md-nav__link">
+  <a href="#request-shape" class="md-nav__link">
     <span class="md-ellipsis">
       
-        What it covers
+        Request shape
       
     </span>
   </a>
@@ -3987,10 +4043,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#output-kind" class="md-nav__link">
+  <a href="#the-kwargs" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Output kind
+        The kwargs
       
     </span>
   </a>
@@ -3998,10 +4054,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#how-it-maps-onto-the-facade" class="md-nav__link">
+  <a href="#output" class="md-nav__link">
     <span class="md-ellipsis">
       
-        How it maps onto the facade
+        Output
       
     </span>
   </a>
@@ -4009,10 +4065,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#install" class="md-nav__link">
+  <a href="#multi-epoch-time-series-aggregate" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Install
+        Multi-epoch time series + aggregate=
       
     </span>
   </a>
@@ -4020,10 +4076,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#see-also" class="md-nav__link">
+  <a href="#notes-gotchas" class="md-nav__link">
     <span class="md-ellipsis">
       
-        See also
+        Notes &amp; gotchas
       
     </span>
   </a>
@@ -4046,35 +4102,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../usage/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Usage
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../datasets/" class="md-nav__link">
+      <a href="../products/" class="md-nav__link">
         
   
   
@@ -4102,14 +4130,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../worldpoppy/" class="md-nav__link">
+      <a href="../projections/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    WorldPopPy & no-xarray
+    Projections & tiling
   
 
     
@@ -4130,7 +4158,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../worldpop/" class="md-nav__link">
+      <a href="../ghsl/" class="md-nav__link">
         
   
   
@@ -8030,7 +8058,7 @@
   <span class="md-ellipsis">
     
   
-    WorldPop (population)
+    GHSL (human settlement)
   
 
     
@@ -8046,7 +8074,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    WorldPop (population)
+    GHSL (human settlement)
   
 
           </label>
@@ -8059,14 +8087,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/worldpop/01_catalog_explorer/" class="md-nav__link">
+      <a href="../../../examples/ghsl/01_catalog_explorer/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    WorldPop — catalog explorer (no network)
+    GHSL — catalog explorer
   
 
     
@@ -8087,14 +8115,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/worldpop/02_population_quickstart/" class="md-nav__link">
+      <a href="../../../examples/ghsl/02_population_quickstart/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    WorldPop — population quickstart (live)
+    GHSL — population quickstart
   
 
     
@@ -8115,14 +8143,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/worldpop/03_constrained_vs_unconstrained/" class="md-nav__link">
+      <a href="../../../examples/ghsl/03_builtup_surface/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    WorldPop — constrained vs unconstrained (live)
+    GHSL — built-up surface
   
 
     
@@ -8143,14 +8171,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/worldpop/04_age_sex_pyramid/" class="md-nav__link">
+      <a href="../../../examples/ghsl/04_builtup_growth/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    WorldPop — age/sex population pyramid (live)
+    GHSL — built-up growth (multi-epoch + aggregate)
   
 
     
@@ -8171,42 +8199,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/worldpop/05_multicountry_mosaic/" class="md-nav__link">
+      <a href="../../../examples/ghsl/05_building_height/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    WorldPop — multi-country mosaic (live)
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../examples/worldpop/06_multiyear_aggregate/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    WorldPop — multi-year population, aggregated (live)
+    GHSL — building height
   
 
     
@@ -8460,10 +8460,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#what-it-covers" class="md-nav__link">
+  <a href="#request-shape" class="md-nav__link">
     <span class="md-ellipsis">
       
-        What it covers
+        Request shape
       
     </span>
   </a>
@@ -8471,10 +8471,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#output-kind" class="md-nav__link">
+  <a href="#the-kwargs" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Output kind
+        The kwargs
       
     </span>
   </a>
@@ -8482,10 +8482,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#how-it-maps-onto-the-facade" class="md-nav__link">
+  <a href="#output" class="md-nav__link">
     <span class="md-ellipsis">
       
-        How it maps onto the facade
+        Output
       
     </span>
   </a>
@@ -8493,10 +8493,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#install" class="md-nav__link">
+  <a href="#multi-epoch-time-series-aggregate" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Install
+        Multi-epoch time series + aggregate=
       
     </span>
   </a>
@@ -8504,10 +8504,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#see-also" class="md-nav__link">
+  <a href="#notes-gotchas" class="md-nav__link">
     <span class="md-ellipsis">
       
-        See also
+        Notes &amp; gotchas
       
     </span>
   </a>
@@ -8531,7 +8531,7 @@
 
 
   
-    <a href="https://github.com/serapeum-org/earthlens/edit/master/docs/reference/worldpop/introduction.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
+    <a href="https://github.com/serapeum-org/earthlens/edit/master/docs/reference/ghsl/usage.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
     </a>
@@ -8540,131 +8540,121 @@
     
       
     
-    <a href="https://github.com/serapeum-org/earthlens/raw/master/docs/reference/worldpop/introduction.md" title="View source of this page" class="md-content__button md-icon">
+    <a href="https://github.com/serapeum-org/earthlens/raw/master/docs/reference/ghsl/usage.md" title="View source of this page" class="md-content__button md-icon">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 18c.56 0 1 .44 1 1s-.44 1-1 1-1-.44-1-1 .44-1 1-1m0-3c-2.73 0-5.06 1.66-6 4 .94 2.34 3.27 4 6 4s5.06-1.66 6-4c-.94-2.34-3.27-4-6-4m0 6.5a2.5 2.5 0 0 1-2.5-2.5 2.5 2.5 0 0 1 2.5-2.5 2.5 2.5 0 0 1 2.5 2.5 2.5 2.5 0 0 1-2.5 2.5M9.27 20H6V4h7v5h5v4.07c.7.08 1.36.25 2 .49V8l-6-6H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h4.5a8.2 8.2 0 0 1-1.23-2"/></svg>
     </a>
   
 
 
-<h1 id="worldpop-introduction"><a class="toclink" href="#worldpop-introduction">WorldPop — Introduction</a><a class="headerlink" href="#worldpop-introduction" title="Permanent link">#</a></h1>
-<p><code>earthlens.worldpop</code> downloads gridded population and demographic data from
-the <strong>WorldPop open population data hub</strong> (<a href="https://hub.worldpop.org"><code>hub.worldpop.org</code></a>).
-It queries the documented WorldPop REST API for the matching per-country
-GeoTIFF URLs, downloads them over anonymous HTTPS, and uses
-<a href="https://github.com/Serapieum-of-alex/pyramids"><code>pyramids</code></a> to mosaic +
-crop (and, on request, reproject) the rasters to your area of interest. For
-demographic products it additionally writes a tidy age/sex table.</p>
-<p>WorldPop data is <strong>open, CC-BY-4.0</strong> (attribution only) — there are no
-credentials, no API key, and no account. The default access path needs only
-the core dependencies (<code>requests</code> + <code>pyramids</code>); see
-<a href="../worldpoppy/">the WorldPopPy path</a> for the optional SDK.</p>
-<h2 id="what-it-covers"><a class="toclink" href="#what-it-covers">What it covers</a><a class="headerlink" href="#what-it-covers" title="Permanent link">#</a></h2>
-<p>A request names one or more <strong>product aliases</strong> via <code>variables=[…]</code>; each
-product resolves to a concrete REST sub-alias through the
-<code>constrained</code> / <code>unadjusted</code> / <code>resolution</code> / <code>scope</code> / <code>generation</code> /
-<code>level</code> selectors. earthlens curates the population &amp; demographic families:</p>
+<h1 id="ghsl-usage"><a class="toclink" href="#ghsl-usage">GHSL — Usage</a><a class="headerlink" href="#ghsl-usage" title="Permanent link">#</a></h1>
+<h2 id="request-shape"><a class="toclink" href="#request-shape">Request shape</a><a class="headerlink" href="#request-shape" title="Permanent link">#</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="n">paths</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;ghsl&quot;</span><span class="p">,</span>              <span class="c1"># or &quot;ghs&quot; / &quot;human-settlement&quot;</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;GHS_POP&quot;</span><span class="p">],</span>           <span class="c1"># product keys or friendly aliases</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="n">start</span><span class="o">=</span><span class="s2">&quot;2020-01-01&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    <span class="n">end</span><span class="o">=</span><span class="s2">&quot;2020-12-31&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">40.3</span><span class="p">,</span> <span class="mf">40.5</span><span class="p">],</span>            <span class="c1"># [south, north] degrees</span>
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>    <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">3.8</span><span class="p">,</span> <span class="o">-</span><span class="mf">3.6</span><span class="p">],</span>            <span class="c1"># [west, east] degrees</span>
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>    <span class="n">path</span><span class="o">=</span><span class="s2">&quot;out/&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>    <span class="c1"># --- GHSL-specific kwargs (all optional) ---</span>
+<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>    <span class="n">release</span><span class="o">=</span><span class="s2">&quot;R2023A&quot;</span><span class="p">,</span>                <span class="c1"># &quot;R2023A&quot; (default) / &quot;R2022A&quot; / &quot;R2025A&quot;</span>
+<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>    <span class="n">resolution</span><span class="o">=</span><span class="s2">&quot;100m&quot;</span><span class="p">,</span>               <span class="c1"># &quot;10m&quot; / &quot;100m&quot; / &quot;1km&quot; / &quot;3ss&quot; / &quot;30ss&quot;</span>
+<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>    <span class="n">crs</span><span class="o">=</span><span class="s2">&quot;EPSG:4326&quot;</span><span class="p">,</span>                 <span class="c1"># output CRS (default WGS84)</span>
+<a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>    <span class="n">tiling</span><span class="o">=</span><span class="s2">&quot;auto&quot;</span><span class="p">,</span>                   <span class="c1"># &quot;auto&quot; (tile+mosaic) / &quot;global&quot;</span>
+<a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a>    <span class="n">api</span><span class="o">=</span><span class="s2">&quot;direct&quot;</span><span class="p">,</span>                    <span class="c1"># &quot;direct&quot; (default); &quot;stac&quot; is unavailable</span>
+<a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a>    <span class="c1"># epoch=2020,  epochs=[2000, 2020],</span>
+<a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">progress_bar</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>        <span class="c1"># -&gt; [Path, ...] one GeoTIFF per (product, epoch)</span>
+</code></pre></div>
+<p><code>variables</code> is a <strong>list of GHSL product keys</strong> — canonical (<code>"GHS_POP"</code>,
+<code>"GHS_SMOD"</code>, <code>"GHS_BUILT_H_ANBH"</code>) or friendly aliases (<code>"population"</code>,
+<code>"settlement_model"</code>, <code>"built_height"</code>, …). Pass several to fetch several
+products in one call.</p>
+<h2 id="the-kwargs"><a class="toclink" href="#the-kwargs">The kwargs</a><a class="headerlink" href="#the-kwargs" title="Permanent link">#</a></h2>
 <table>
 <thead>
 <tr>
-<th>Product alias</th>
-<th>What it is</th>
-<th>Output</th>
+<th>kwarg</th>
+<th>meaning</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><code>pop</code></td>
-<td>population counts (constrained + unconstrained; 100 m / 1 km; per-country + global)</td>
-<td>raster</td>
+<td><code>release</code></td>
+<td>GHSL release: <code>"R2023A"</code> (most products), <code>"R2022A"</code> (GHS-LAND), <code>"R2025A"</code> (WUP projections).</td>
 </tr>
 <tr>
-<td><code>pop_density</code></td>
-<td>population density (1 km)</td>
-<td>raster</td>
+<td><code>epoch</code> / <code>epochs</code></td>
+<td>A single year or an explicit list of reference years (overrides the date window).</td>
 </tr>
 <tr>
-<td><code>pwd</code></td>
-<td>population-weighted density (national / subnational)</td>
-<td>raster</td>
+<td><code>start</code> / <code>end</code></td>
+<td>When <code>epoch(s)</code> are omitted, the 5-yearly GHSL epochs in this window are fetched. A window narrower than the 5-year step snaps to the nearest epoch (logged).</td>
 </tr>
 <tr>
-<td><code>age_structures</code></td>
-<td>age/sex-disaggregated population (the "pyramids")</td>
-<td>rasters <strong>+ table</strong></td>
+<td><code>resolution</code></td>
+<td>Source variant to download. Metric resolutions (<code>10m</code>/<code>100m</code>/<code>1km</code>) are Mollweide (ESRI:54009); arc-second (<code>3ss</code>/<code>30ss</code>) are WGS84. Defaults to each product's <code>default_resolution</code>.</td>
 </tr>
 <tr>
-<td><code>births</code></td>
-<td>annual live births</td>
-<td>raster</td>
+<td><code>crs</code></td>
+<td><strong>Output</strong> CRS (default <code>EPSG:4326</code>). The source is reprojected to it; when it already matches the source CRS, reprojection is skipped.</td>
 </tr>
 <tr>
-<td><code>pregnancies</code></td>
-<td>annual pregnancies</td>
-<td>raster</td>
+<td><code>tiling</code></td>
+<td><code>"auto"</code> selects + mosaics the intersecting Mollweide tiles for fine resolutions; <code>"global"</code> always downloads the whole-globe file.</td>
 </tr>
 <tr>
-<td><code>dependency_ratios</code></td>
-<td>youth / old-age dependency</td>
-<td>raster</td>
-</tr>
-<tr>
-<td><code>urban_change</code></td>
-<td>urban extent change</td>
-<td>raster</td>
-</tr>
-<tr>
-<td><code>gbsg</code></td>
-<td>global built-settlement growth</td>
-<td>raster</td>
-</tr>
-<tr>
-<td><code>dug</code></td>
-<td>degree of urbanisation (Global-2)</td>
-<td>raster</td>
-</tr>
-<tr>
-<td><code>future_pop</code></td>
-<td>SSP population projections to 2100</td>
-<td>raster</td>
+<td><code>api</code></td>
+<td><code>"direct"</code> (deterministic URL builder, the default). <code>"stac"</code> is reserved — no queryable JRC STAC API exists yet, so it raises a clear error.</td>
 </tr>
 </tbody>
 </table>
-<p>The heterogeneous <code>covariates</code> family (nightlights, slope, distances, …) is
-listed by the catalog refresh tool but is <strong>not</strong> part of the curated
-selector catalog — its 50+ named layers don't fit the
-<code>(constrained × resolution × scope × generation)</code> selector model. See
-<a href="../datasets/">Available datasets</a> for the full sub-alias matrix.</p>
-<h2 id="output-kind"><a class="toclink" href="#output-kind">Output kind</a><a class="headerlink" href="#output-kind" title="Permanent link">#</a></h2>
-<p><code>WorldPop.OUTPUT_KIND</code> is <code>"mixed"</code>: population products yield AOI-cropped
-GeoTIFFs, while <code>age_structures</code> additionally emits a per-cohort table. The
-<code>EarthLens</code> facade therefore <strong>forwards</strong> <code>aggregate=</code> (it reduces the
-per-year raster stack across years — see <a href="../usage/">Usage</a>).</p>
-<h2 id="how-it-maps-onto-the-facade"><a class="toclink" href="#how-it-maps-onto-the-facade">How it maps onto the facade</a><a class="headerlink" href="#how-it-maps-onto-the-facade" title="Permanent link">#</a></h2>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.earthlens</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="n">paths</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;worldpop&quot;</span><span class="p">,</span>          <span class="c1"># or the &quot;world-pop&quot; alias</span>
-<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;pop&quot;</span><span class="p">],</span>               <span class="c1"># one or more product aliases</span>
-<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="n">start</span><span class="o">=</span><span class="s2">&quot;2020&quot;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">&quot;2020&quot;</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="s2">&quot;%Y&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">4.7</span><span class="p">,</span> <span class="mf">5.0</span><span class="p">],</span> <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">33.9</span><span class="p">,</span> <span class="mf">41.9</span><span class="p">],</span>
-<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    <span class="n">aoi</span><span class="o">=</span><span class="s2">&quot;KEN&quot;</span><span class="p">,</span>                       <span class="c1"># ISO3 / bbox / GeoDataFrame</span>
-<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>    <span class="n">path</span><span class="o">=</span><span class="s2">&quot;out/&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
-</code></pre></div>
-<h2 id="install"><a class="toclink" href="#install">Install</a><a class="headerlink" href="#install" title="Permanent link">#</a></h2>
-<p>The default REST path needs no extra:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>pip<span class="w"> </span>install<span class="w"> </span>earthlens
-</code></pre></div>
-<p>The optional WorldPopPy path adds the SDK (MPL-2.0, Python ≥3.10):</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>pip<span class="w"> </span>install<span class="w"> </span>earthlens<span class="o">[</span>worldpop<span class="o">]</span>
-</code></pre></div>
-<h2 id="see-also"><a class="toclink" href="#see-also">See also</a><a class="headerlink" href="#see-also" title="Permanent link">#</a></h2>
+<h2 id="output"><a class="toclink" href="#output">Output</a><a class="headerlink" href="#output" title="Permanent link">#</a></h2>
+<p><code>download()</code> returns the written paths:</p>
 <ul>
-<li><a href="../usage/">Usage</a> — the request shape, every selector, and <code>aggregate=</code>.</li>
-<li><a href="../datasets/">Available datasets</a> — the product / sub-alias matrix.</li>
-<li><a href="../worldpoppy/">WorldPopPy path</a> — the optional SDK + the no-xarray design.</li>
-<li><a href="../worldpop/">API reference</a> — the rendered module API.</li>
+<li><strong>Raster products</strong> — one GeoTIFF per <code>(product, epoch)</code>, named
+  <code>{product}_E{epoch}_{resolution}_epsg{code}.tif</code>, reprojected to <code>crs=</code> and
+  cropped to the AOI.</li>
+<li><strong>Categorical products</strong> (SMOD, BUILT-C, WUP-DEGURBA) — additionally carry a
+  <code>{file}.legend.json</code> sidecar (class code → label) and use nearest-neighbour
+  resampling.</li>
+<li><strong>Tabular products</strong> (DUC, WUP statistics) — the table is extracted into a
+  <code>{product}/</code> directory under <code>path</code> (no reprojection / crop).</li>
+</ul>
+<h2 id="multi-epoch-time-series-aggregate"><a class="toclink" href="#multi-epoch-time-series-aggregate">Multi-epoch time series + <code>aggregate=</code></a><a class="headerlink" href="#multi-epoch-time-series-aggregate" title="Permanent link">#</a></h2>
+<p>A window spanning several GHSL epochs writes one GeoTIFF per epoch:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="n">EarthLens</span><span class="p">(</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>    <span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;ghsl&quot;</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;GHS_POP&quot;</span><span class="p">],</span>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>    <span class="n">start</span><span class="o">=</span><span class="s2">&quot;2000-01-01&quot;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">&quot;2020-12-31&quot;</span><span class="p">,</span>        <span class="c1"># -&gt; 2000, 2005, 2010, 2015, 2020</span>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">40.3</span><span class="p">,</span> <span class="mf">40.5</span><span class="p">],</span> <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">3.8</span><span class="p">,</span> <span class="o">-</span><span class="mf">3.6</span><span class="p">],</span> <span class="n">path</span><span class="o">=</span><span class="s2">&quot;out/&quot;</span><span class="p">,</span>
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
+</code></pre></div>
+<p>Pass <code>aggregate=</code> to reduce the per-epoch stack (continuous products only):</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.aggregate</span><span class="w"> </span><span class="kn">import</span> <span class="n">AggregationConfig</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="n">EarthLens</span><span class="p">(</span>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>    <span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;ghsl&quot;</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;GHS_BUILT_S&quot;</span><span class="p">],</span>
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>    <span class="n">start</span><span class="o">=</span><span class="s2">&quot;1975-01-01&quot;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">&quot;2020-12-31&quot;</span><span class="p">,</span>
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">40.3</span><span class="p">,</span> <span class="mf">40.5</span><span class="p">],</span> <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">3.8</span><span class="p">,</span> <span class="o">-</span><span class="mf">3.6</span><span class="p">],</span> <span class="n">path</span><span class="o">=</span><span class="s2">&quot;out/&quot;</span><span class="p">,</span>
+<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">(</span>
+<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>    <span class="n">aggregate</span><span class="o">=</span><span class="n">AggregationConfig</span><span class="p">(</span><span class="n">freq</span><span class="o">=</span><span class="s2">&quot;100YS&quot;</span><span class="p">,</span> <span class="n">op</span><span class="o">=</span><span class="s2">&quot;max&quot;</span><span class="p">),</span>  <span class="c1"># one across-epoch raster</span>
+<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="p">)</span>
+</code></pre></div>
+<p><code>freq</code> buckets the discrete epochs into windows (a coarse <code>freq</code> collapses all
+epochs into one output); <code>op</code> is <code>mean</code> / <code>sum</code> / <code>min</code> / <code>max</code> / <code>std</code>
+(<code>auto</code> resolves to <code>mean</code>). Aggregating a <strong>categorical</strong> product is rejected
+— averaging class codes is meaningless.</p>
+<h2 id="notes-gotchas"><a class="toclink" href="#notes-gotchas">Notes &amp; gotchas</a><a class="headerlink" href="#notes-gotchas" title="Permanent link">#</a></h2>
+<ul>
+<li><strong>Ocean AOIs</strong> — a fine-resolution request whose AOI intersects no land tile
+  raises a clear error (the Mollweide land grid is sparse). Use a land AOI, a
+  coarse whole-globe resolution, or <code>tiling="global"</code>.</li>
+<li><strong>Whole-globe size</strong> — coarse (1 km / 30″) products are single ~300 MB files;
+  the first download is slow, then cached.</li>
+<li><strong>GHS-LAND</strong> is only published at release <code>R2022A</code> — pass <code>release="R2022A"</code>.</li>
+<li>See <a href="../products/">Available datasets</a> for the full availability matrix.</li>
 </ul>
 
 
@@ -8701,7 +8691,7 @@ per-year raster stack across years — see <a href="../usage/">Usage</a>).</p>
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
           
-          <a href="../../usgs-water/usgs_water/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Reference">
+          <a href="../authentication/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Authentication">
             <div class="md-footer__button md-icon">
               
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
@@ -8711,20 +8701,20 @@ per-year raster stack across years — see <a href="../usage/">Usage</a>).</p>
                 Previous
               </span>
               <div class="md-ellipsis">
-                Reference
+                Authentication
               </div>
             </div>
           </a>
         
         
           
-          <a href="../usage/" class="md-footer__link md-footer__link--next" aria-label="Next: Usage">
+          <a href="../products/" class="md-footer__link md-footer__link--next" aria-label="Next: Available datasets">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                Usage
+                Available datasets
               </div>
             </div>
             <div class="md-footer__button md-icon">

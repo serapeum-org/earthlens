@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -4500,7 +4500,7 @@
   <span class="md-ellipsis">
     
   
-    WorldPop (population)
+    GHSL (human settlement)
   
 
     
@@ -4516,7 +4516,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    WorldPop (population)
+    GHSL (human settlement)
   
 
           </label>
@@ -4529,7 +4529,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../worldpop/introduction/" class="md-nav__link">
+      <a href="../../ghsl/introduction/" class="md-nav__link">
         
   
   
@@ -4557,7 +4557,35 @@
   
   
     <li class="md-nav__item">
-      <a href="../../worldpop/usage/" class="md-nav__link">
+      <a href="../../ghsl/authentication/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Authentication
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../ghsl/usage/" class="md-nav__link">
         
   
   
@@ -4585,7 +4613,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../worldpop/datasets/" class="md-nav__link">
+      <a href="../../ghsl/products/" class="md-nav__link">
         
   
   
@@ -4613,14 +4641,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../worldpop/worldpoppy/" class="md-nav__link">
+      <a href="../../ghsl/projections/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    WorldPopPy & no-xarray
+    Projections & tiling
   
 
     
@@ -4641,7 +4669,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../worldpop/worldpop/" class="md-nav__link">
+      <a href="../../ghsl/ghsl/" class="md-nav__link">
         
   
   
@@ -8541,7 +8569,7 @@
   <span class="md-ellipsis">
     
   
-    WorldPop (population)
+    GHSL (human settlement)
   
 
     
@@ -8557,7 +8585,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    WorldPop (population)
+    GHSL (human settlement)
   
 
           </label>
@@ -8570,14 +8598,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/worldpop/01_catalog_explorer/" class="md-nav__link">
+      <a href="../../../examples/ghsl/01_catalog_explorer/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    WorldPop — catalog explorer (no network)
+    GHSL — catalog explorer
   
 
     
@@ -8598,14 +8626,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/worldpop/02_population_quickstart/" class="md-nav__link">
+      <a href="../../../examples/ghsl/02_population_quickstart/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    WorldPop — population quickstart (live)
+    GHSL — population quickstart
   
 
     
@@ -8626,14 +8654,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/worldpop/03_constrained_vs_unconstrained/" class="md-nav__link">
+      <a href="../../../examples/ghsl/03_builtup_surface/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    WorldPop — constrained vs unconstrained (live)
+    GHSL — built-up surface
   
 
     
@@ -8654,14 +8682,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/worldpop/04_age_sex_pyramid/" class="md-nav__link">
+      <a href="../../../examples/ghsl/04_builtup_growth/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    WorldPop — age/sex population pyramid (live)
+    GHSL — built-up growth (multi-epoch + aggregate)
   
 
     
@@ -8682,42 +8710,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/worldpop/05_multicountry_mosaic/" class="md-nav__link">
+      <a href="../../../examples/ghsl/05_building_height/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    WorldPop — multi-country mosaic (live)
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../examples/worldpop/06_multiyear_aggregate/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    WorldPop — multi-year population, aggregated (live)
+    GHSL — building height
   
 
     
@@ -9652,7 +9652,7 @@ this package imports without the extra installed.</p>
 
     <div class="doc doc-contents ">
             <p class="doc doc-class-bases">
-              Bases: <code><a class="autorefs autorefs-internal" title="&lt;code&gt;AuthenticationError&lt;/code&gt; (&lt;code&gt;earthlens.base.auth.AuthenticationError&lt;/code&gt;)" href="../../worldpop/worldpop/#earthlens.worldpop.AuthenticationError">AuthenticationError</a></code></p>
+              Bases: <code><a class="autorefs autorefs-internal" title="&lt;code&gt;AuthenticationError&lt;/code&gt; (&lt;code&gt;earthlens.base.auth.AuthenticationError&lt;/code&gt;)" href="../../ghsl/ghsl/#earthlens.ghsl.AuthenticationError">AuthenticationError</a></code></p>
 
 
 
@@ -9958,11 +9958,11 @@ value is an <code>EumetsatDataset</code>.</p>
 <a id="__codelineno-0-396" name="__codelineno-0-396"></a><span class="sd">            ValueError: When auto-loading, propagates the same errors as</span>
 <a id="__codelineno-0-397" name="__codelineno-0-397"></a><span class="sd">                `load`.</span>
 <a id="__codelineno-0-398" name="__codelineno-0-398"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-399" name="__codelineno-0-399"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">:</span>
-<a id="__codelineno-0-400" name="__codelineno-0-400"></a>            <span class="k">return</span>
-<a id="__codelineno-0-401" name="__codelineno-0-401"></a>        <span class="n">loaded</span> <span class="o">=</span> <span class="n">Catalog</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
-<a id="__codelineno-0-402" name="__codelineno-0-402"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">available_datasets</span> <span class="o">=</span> <span class="n">loaded</span><span class="o">.</span><span class="n">available_datasets</span>
-<a id="__codelineno-0-403" name="__codelineno-0-403"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span> <span class="o">=</span> <span class="n">loaded</span><span class="o">.</span><span class="n">datasets</span>
+<a id="__codelineno-0-399" name="__codelineno-0-399"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">:</span>
+<a id="__codelineno-0-400" name="__codelineno-0-400"></a>            <span class="n">loaded</span> <span class="o">=</span> <span class="n">Catalog</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
+<a id="__codelineno-0-401" name="__codelineno-0-401"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">available_datasets</span> <span class="o">=</span> <span class="n">loaded</span><span class="o">.</span><span class="n">available_datasets</span>
+<a id="__codelineno-0-402" name="__codelineno-0-402"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span> <span class="o">=</span> <span class="n">loaded</span><span class="o">.</span><span class="n">datasets</span>
+<a id="__codelineno-0-403" name="__codelineno-0-403"></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">model_post_init</span><span class="p">(</span><span class="n">__context</span><span class="p">)</span>
 <a id="__codelineno-0-404" name="__codelineno-0-404"></a>
 <a id="__codelineno-0-405" name="__codelineno-0-405"></a>    <span class="nd">@classmethod</span>
 <a id="__codelineno-0-406" name="__codelineno-0-406"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">load</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">catalog_path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Catalog</span><span class="p">:</span>
@@ -10339,11 +10339,11 @@ cache so repeated construction is fast. If the caller passed
 <a id="__codelineno-0-396" name="__codelineno-0-396"></a><span class="sd">        ValueError: When auto-loading, propagates the same errors as</span>
 <a id="__codelineno-0-397" name="__codelineno-0-397"></a><span class="sd">            `load`.</span>
 <a id="__codelineno-0-398" name="__codelineno-0-398"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-399" name="__codelineno-0-399"></a>    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">:</span>
-<a id="__codelineno-0-400" name="__codelineno-0-400"></a>        <span class="k">return</span>
-<a id="__codelineno-0-401" name="__codelineno-0-401"></a>    <span class="n">loaded</span> <span class="o">=</span> <span class="n">Catalog</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
-<a id="__codelineno-0-402" name="__codelineno-0-402"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">available_datasets</span> <span class="o">=</span> <span class="n">loaded</span><span class="o">.</span><span class="n">available_datasets</span>
-<a id="__codelineno-0-403" name="__codelineno-0-403"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span> <span class="o">=</span> <span class="n">loaded</span><span class="o">.</span><span class="n">datasets</span>
+<a id="__codelineno-0-399" name="__codelineno-0-399"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">:</span>
+<a id="__codelineno-0-400" name="__codelineno-0-400"></a>        <span class="n">loaded</span> <span class="o">=</span> <span class="n">Catalog</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
+<a id="__codelineno-0-401" name="__codelineno-0-401"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">available_datasets</span> <span class="o">=</span> <span class="n">loaded</span><span class="o">.</span><span class="n">available_datasets</span>
+<a id="__codelineno-0-402" name="__codelineno-0-402"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span> <span class="o">=</span> <span class="n">loaded</span><span class="o">.</span><span class="n">datasets</span>
+<a id="__codelineno-0-403" name="__codelineno-0-403"></a>    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">model_post_init</span><span class="p">(</span><span class="n">__context</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -15857,11 +15857,11 @@ value is an <code>EumetsatDataset</code>.</p>
 <a id="__codelineno-0-396" name="__codelineno-0-396"></a><span class="sd">            ValueError: When auto-loading, propagates the same errors as</span>
 <a id="__codelineno-0-397" name="__codelineno-0-397"></a><span class="sd">                `load`.</span>
 <a id="__codelineno-0-398" name="__codelineno-0-398"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-399" name="__codelineno-0-399"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">:</span>
-<a id="__codelineno-0-400" name="__codelineno-0-400"></a>            <span class="k">return</span>
-<a id="__codelineno-0-401" name="__codelineno-0-401"></a>        <span class="n">loaded</span> <span class="o">=</span> <span class="n">Catalog</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
-<a id="__codelineno-0-402" name="__codelineno-0-402"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">available_datasets</span> <span class="o">=</span> <span class="n">loaded</span><span class="o">.</span><span class="n">available_datasets</span>
-<a id="__codelineno-0-403" name="__codelineno-0-403"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span> <span class="o">=</span> <span class="n">loaded</span><span class="o">.</span><span class="n">datasets</span>
+<a id="__codelineno-0-399" name="__codelineno-0-399"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">:</span>
+<a id="__codelineno-0-400" name="__codelineno-0-400"></a>            <span class="n">loaded</span> <span class="o">=</span> <span class="n">Catalog</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
+<a id="__codelineno-0-401" name="__codelineno-0-401"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">available_datasets</span> <span class="o">=</span> <span class="n">loaded</span><span class="o">.</span><span class="n">available_datasets</span>
+<a id="__codelineno-0-402" name="__codelineno-0-402"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span> <span class="o">=</span> <span class="n">loaded</span><span class="o">.</span><span class="n">datasets</span>
+<a id="__codelineno-0-403" name="__codelineno-0-403"></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">model_post_init</span><span class="p">(</span><span class="n">__context</span><span class="p">)</span>
 <a id="__codelineno-0-404" name="__codelineno-0-404"></a>
 <a id="__codelineno-0-405" name="__codelineno-0-405"></a>    <span class="nd">@classmethod</span>
 <a id="__codelineno-0-406" name="__codelineno-0-406"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">load</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">catalog_path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Catalog</span><span class="p">:</span>
@@ -16238,11 +16238,11 @@ cache so repeated construction is fast. If the caller passed
 <a id="__codelineno-0-396" name="__codelineno-0-396"></a><span class="sd">        ValueError: When auto-loading, propagates the same errors as</span>
 <a id="__codelineno-0-397" name="__codelineno-0-397"></a><span class="sd">            `load`.</span>
 <a id="__codelineno-0-398" name="__codelineno-0-398"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-399" name="__codelineno-0-399"></a>    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">:</span>
-<a id="__codelineno-0-400" name="__codelineno-0-400"></a>        <span class="k">return</span>
-<a id="__codelineno-0-401" name="__codelineno-0-401"></a>    <span class="n">loaded</span> <span class="o">=</span> <span class="n">Catalog</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
-<a id="__codelineno-0-402" name="__codelineno-0-402"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">available_datasets</span> <span class="o">=</span> <span class="n">loaded</span><span class="o">.</span><span class="n">available_datasets</span>
-<a id="__codelineno-0-403" name="__codelineno-0-403"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span> <span class="o">=</span> <span class="n">loaded</span><span class="o">.</span><span class="n">datasets</span>
+<a id="__codelineno-0-399" name="__codelineno-0-399"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">:</span>
+<a id="__codelineno-0-400" name="__codelineno-0-400"></a>        <span class="n">loaded</span> <span class="o">=</span> <span class="n">Catalog</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
+<a id="__codelineno-0-401" name="__codelineno-0-401"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">available_datasets</span> <span class="o">=</span> <span class="n">loaded</span><span class="o">.</span><span class="n">available_datasets</span>
+<a id="__codelineno-0-402" name="__codelineno-0-402"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span> <span class="o">=</span> <span class="n">loaded</span><span class="o">.</span><span class="n">datasets</span>
+<a id="__codelineno-0-403" name="__codelineno-0-403"></a>    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">model_post_init</span><span class="p">(</span><span class="n">__context</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -17369,7 +17369,7 @@ expired.</p>
 
     <div class="doc doc-contents ">
             <p class="doc doc-class-bases">
-              Bases: <code><a class="autorefs autorefs-internal" title="&lt;code&gt;AuthenticationError&lt;/code&gt; (&lt;code&gt;earthlens.base.auth.AuthenticationError&lt;/code&gt;)" href="../../worldpop/worldpop/#earthlens.worldpop.AuthenticationError">AuthenticationError</a></code></p>
+              Bases: <code><a class="autorefs autorefs-internal" title="&lt;code&gt;AuthenticationError&lt;/code&gt; (&lt;code&gt;earthlens.base.auth.AuthenticationError&lt;/code&gt;)" href="../../ghsl/ghsl/#earthlens.ghsl.AuthenticationError">AuthenticationError</a></code></p>
 
 
 

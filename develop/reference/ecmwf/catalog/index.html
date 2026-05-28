@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -4277,7 +4277,7 @@
   <span class="md-ellipsis">
     
   
-    WorldPop (population)
+    GHSL (human settlement)
   
 
     
@@ -4293,7 +4293,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    WorldPop (population)
+    GHSL (human settlement)
   
 
           </label>
@@ -4306,7 +4306,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../worldpop/introduction/" class="md-nav__link">
+      <a href="../../ghsl/introduction/" class="md-nav__link">
         
   
   
@@ -4334,7 +4334,35 @@
   
   
     <li class="md-nav__item">
-      <a href="../../worldpop/usage/" class="md-nav__link">
+      <a href="../../ghsl/authentication/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Authentication
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../ghsl/usage/" class="md-nav__link">
         
   
   
@@ -4362,7 +4390,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../worldpop/datasets/" class="md-nav__link">
+      <a href="../../ghsl/products/" class="md-nav__link">
         
   
   
@@ -4390,14 +4418,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../worldpop/worldpoppy/" class="md-nav__link">
+      <a href="../../ghsl/projections/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    WorldPopPy & no-xarray
+    Projections & tiling
   
 
     
@@ -4418,7 +4446,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../worldpop/worldpop/" class="md-nav__link">
+      <a href="../../ghsl/ghsl/" class="md-nav__link">
         
   
   
@@ -8318,7 +8346,7 @@
   <span class="md-ellipsis">
     
   
-    WorldPop (population)
+    GHSL (human settlement)
   
 
     
@@ -8334,7 +8362,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    WorldPop (population)
+    GHSL (human settlement)
   
 
           </label>
@@ -8347,14 +8375,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/worldpop/01_catalog_explorer/" class="md-nav__link">
+      <a href="../../../examples/ghsl/01_catalog_explorer/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    WorldPop — catalog explorer (no network)
+    GHSL — catalog explorer
   
 
     
@@ -8375,14 +8403,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/worldpop/02_population_quickstart/" class="md-nav__link">
+      <a href="../../../examples/ghsl/02_population_quickstart/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    WorldPop — population quickstart (live)
+    GHSL — population quickstart
   
 
     
@@ -8403,14 +8431,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/worldpop/03_constrained_vs_unconstrained/" class="md-nav__link">
+      <a href="../../../examples/ghsl/03_builtup_surface/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    WorldPop — constrained vs unconstrained (live)
+    GHSL — built-up surface
   
 
     
@@ -8431,14 +8459,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/worldpop/04_age_sex_pyramid/" class="md-nav__link">
+      <a href="../../../examples/ghsl/04_builtup_growth/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    WorldPop — age/sex population pyramid (live)
+    GHSL — built-up growth (multi-epoch + aggregate)
   
 
     
@@ -8459,42 +8487,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/worldpop/05_multicountry_mosaic/" class="md-nav__link">
+      <a href="../../../examples/ghsl/05_building_height/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    WorldPop — multi-country mosaic (live)
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../examples/worldpop/06_multiyear_aggregate/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    WorldPop — multi-year population, aggregated (live)
+    GHSL — building height
   
 
     
@@ -9124,11 +9124,14 @@
 
 
 <h1 id="catalog-probe-tooling"><a class="toclink" href="#catalog-probe-tooling">Catalog &amp; probe tooling</a><a class="headerlink" href="#catalog-probe-tooling" title="Permanent link">#</a></h1>
-<p>The ECMWF backend uses a curated YAML catalog
-(<code>src/earthlens/ecmwf/cds_data_catalog.yaml</code>) to map user-friendly
-variable codes to the request fields CDS actually accepts. This page
-documents the catalog's structure, how it is maintained, and the tools
-that support catalog work.</p>
+<p>The ECMWF backend uses a curated YAML catalog (the
+<code>src/earthlens/ecmwf/catalog/</code> directory: per-family <code>*.yaml</code> files —
+<code>era5.yaml</code>, <code>carra.yaml</code>, … — plus an <code>_index.yaml</code> with the schema
+header and <code>available_datasets:</code> list) to map user-friendly variable
+codes to the request fields CDS actually accepts. The loader merges
+every file into one catalog at construction time. This page documents
+the catalog's structure, how it is maintained, and the tools that
+support catalog work.</p>
 <h2 id="at-a-glance"><a class="toclink" href="#at-a-glance">At a glance</a><a class="headerlink" href="#at-a-glance" title="Permanent link">#</a></h2>
 <table>
 <thead>
@@ -9139,8 +9142,8 @@ that support catalog work.</p>
 </thead>
 <tbody>
 <tr>
-<td><code>src/earthlens/ecmwf/cds_data_catalog.yaml</code></td>
-<td>The catalog itself — schema described below</td>
+<td><code>src/earthlens/ecmwf/catalog/</code></td>
+<td>The catalog itself — per-family <code>*.yaml</code> + <code>_index.yaml</code>; schema below</td>
 </tr>
 <tr>
 <td><code>src/earthlens/ecmwf/catalog.py</code></td>
