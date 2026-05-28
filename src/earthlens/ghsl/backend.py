@@ -623,9 +623,26 @@ class GHSL(AbstractDataSource):
         return target
 
     def _fetch_via_stac(self, products: list[RemoteProduct]) -> list[Path]:
-        """Fetch via the optional JRC STAC search path (implemented in `C9`)."""
-        raise NotImplementedError(
-            "GHSL api='stac' search path is implemented in C9; use api='direct'."
+        """Fetch via the JRC STAC search path — unconfirmed, raises (`C9`/`G1`).
+
+        The `H21` spec mentioned "STAC at `data.jrc.ec.europa.eu`", but the
+        `A1` verification (2026-05) found JRC exposes only a STAC *browser*, no
+        queryable STAC API (`/stac`, `/collections` all `404`). Until a stable
+        endpoint is confirmed, `api="stac"` raises this documented error rather
+        than guessing a URL; the deterministic `api="direct"` path is fully
+        functional and is the default.
+
+        Args:
+            products: The plan from `_search` (unused — the path is inactive).
+
+        Raises:
+            ValueError: Always — directing the caller to `api="direct"`.
+        """
+        raise ValueError(
+            "GHSL api='stac' is unavailable: no stable, queryable JRC STAC API "
+            "endpoint is confirmed (verified 2026-05 — JRC exposes a STAC "
+            "browser only). Use api='direct' (the default), which serves every "
+            "GHSL product over the deterministic HTTPS file tree."
         )
 
     def _write_legend_sidecar(self, target: Path, code: str) -> None:

@@ -83,10 +83,11 @@ sentinel-hub = ["sentinelhub >=3.11.5"]
 tropycal = ["tropycal >=1.4", "cartopy >=0.22"]
 overture = ["overturemaps >=1.0.0", "duckdb >=1.0.0"]
 usgs-water = ["dataretrieval >=1.1.4"]
-# GHSL is open HTTPS; the deterministic-URL path needs only the core deps
-# (requests + pyramids-gis). The optional STAC search path (api="stac") reuses
-# the pyramids STAC extra rather than declaring a bare pystac-client.
-ghsl = ["pyramids-gis[stac]"]
+# GHSL is open HTTPS and needs no extra SDK: the deterministic-URL path (the
+# default and only functional path) uses only the core deps (requests +
+# pyramids-gis). The api="stac" path is inactive — A1 (2026-05) found no
+# queryable JRC STAC API — so no STAC extra is pulled; revisit if JRC ships one.
+ghsl = []
 all = [
     "boto3 >=1.43.0",
     "botocore >=1.34.0",
