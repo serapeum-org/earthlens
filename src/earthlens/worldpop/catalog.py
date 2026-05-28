@@ -91,6 +91,9 @@ class SubAlias(BaseModel):
             global mosaic).
         generation: The product generation (`"R2021"`, `"R2024B"`,
             `"R2025A"`, `"2024"`).
+        level: Aggregation level for products that publish both
+            (`pwd`): `"national"` or `"subnational"`. `"national"` for
+            every other product.
         years: The years this sub-alias offers, as a single year
             (`"2020"`) or an inclusive range (`"2000-2020"`).
     """
@@ -103,20 +106,22 @@ class SubAlias(BaseModel):
     resolution: str = "100m"
     scope: str = "countries"
     generation: str = "R2021"
+    level: str = "national"
     years: str = "2000-2020"
 
     def years_set(self) -> set[int]:
         """Return the set of years this sub-alias offers (parsed from `years`)."""
         return _years_set(self.years)
 
-    def selector(self) -> tuple[bool, bool, str, str, str]:
-        """Return the `(constrained, unadjusted, resolution, scope, generation)` key."""
+    def selector(self) -> tuple[bool, bool, str, str, str, str]:
+        """Return the selector key (constrained, unadjusted, resolution, scope, generation, level)."""
         return (
             self.constrained,
             self.unadjusted,
             self.resolution,
             self.scope,
             self.generation,
+            self.level,
         )
 
 
@@ -148,7 +153,7 @@ class Product(BaseModel):
     worldpoppy_id: str | None = None
     subaliases: list[SubAlias] = Field(default_factory=list)
 
-    def selectors(self) -> list[tuple[bool, bool, str, str, str]]:
+    def selectors(self) -> list[tuple[bool, bool, str, str, str, str]]:
         """Return every sub-alias selector tuple (for did-you-mean listings)."""
         return [s.selector() for s in self.subaliases]
 
@@ -300,8 +305,15 @@ class Catalog(AbstractCatalog):
         resolution: str = "100m",
         scope: str = "countries",
         generation: str = "R2021",
+        level: str = "national",
     ) -> str:
         """Resolve the selector kwargs to a single REST sub-alias id.
+
+        A product with exactly one sub-alias (`births`, `future_pop`, …)
+        returns it directly — the selector kwargs do not apply. Otherwise
+        the kwargs must match one sub-alias's
+        `(constrained, unadjusted, resolution, scope, generation, level)`
+        tuple exactly.
 
         Args:
             product: A product key or alias (resolved first).
@@ -311,14 +323,14 @@ class Catalog(AbstractCatalog):
             resolution: `"100m"` or `"1km"`.
             scope: `"countries"` or `"global"`.
             generation: One of `GENERATIONS`.
+            level: `"national"` or `"subnational"` (only `pwd` differs).
 
         Returns:
             str: The matching sub-alias id (e.g. `"wpgp"`).
 
         Raises:
             ValueError: If no sub-alias matches the selector; the message
-                lists the product's available `(constrained, unadjusted,
-                resolution, scope, generation)` tuples.
+                lists the product's available sub-alias tuples.
 
         Examples:
             - The classic unconstrained 100 m country series resolves to `wpgp`:
@@ -331,19 +343,23 @@ class Catalog(AbstractCatalog):
         """
         code = self.resolve(product)
         row = self.datasets[code]
-        want = (constrained, unadjusted, resolution, scope, generation)
+        if len(row.subaliases) == 1:
+            return row.subaliases[0].id
+        want = (constrained, unadjusted, resolution, scope, generation, level)
         for sub in row.subaliases:
             if sub.selector() == want:
                 return sub.id
         options = "\n".join(
             f"  - id={s.id!r} constrained={s.constrained} unadjusted={s.unadjusted} "
-            f"resolution={s.resolution!r} scope={s.scope!r} generation={s.generation!r}"
+            f"resolution={s.resolution!r} scope={s.scope!r} generation={s.generation!r} "
+            f"level={s.level!r}"
             for s in row.subaliases
         )
         raise ValueError(
             f"{code!r} has no variant for constrained={constrained}, "
             f"unadjusted={unadjusted}, resolution={resolution!r}, scope={scope!r}, "
-            f"generation={generation!r}. Available sub-aliases:\n{options}"
+            f"generation={generation!r}, level={level!r}. "
+            f"Available sub-aliases:\n{options}"
         )
 
     def validate(
@@ -355,6 +371,7 @@ class Catalog(AbstractCatalog):
         resolution: str = "100m",
         scope: str = "countries",
         generation: str = "R2021",
+        level: str = "national",
         year: int | None = None,
     ) -> tuple[str, str]:
         """Validate a full request and return `(product, subalias_id)`.
@@ -369,6 +386,7 @@ class Catalog(AbstractCatalog):
             resolution: See `pick_subalias`.
             scope: See `pick_subalias`.
             generation: See `pick_subalias`.
+            level: See `pick_subalias`.
             year: Optional year to check against the sub-alias's `years`.
 
         Returns:
@@ -386,6 +404,7 @@ class Catalog(AbstractCatalog):
             resolution=resolution,
             scope=scope,
             generation=generation,
+            level=level,
         )
         if year is not None:
             sub = next(s for s in self.datasets[code].subaliases if s.id == subalias_id)

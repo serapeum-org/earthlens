@@ -38,3 +38,82 @@ products:
       - {id: aswpgponekm,   constrained: false, unadjusted: true, resolution: "1km",  scope: global,    generation: R2021, years: "2000-2020"}
       - {id: ascic_2020,    constrained: true,  unadjusted: true, resolution: "100m", scope: countries, generation: R2021, years: "2020"}
       - {id: ascicua_2020,  constrained: true,  unadjusted: false, resolution: "100m", scope: countries, generation: R2021, years: "2020"}
+
+  pop_density:
+    friendly: [population_density, density, pd]
+    kind: raster
+    demographic: false
+    unit: "people/km2"
+    worldpoppy_id: pd
+    subaliases:
+      - {id: pd_ic_1km,        constrained: false, unadjusted: true,  resolution: "1km", scope: countries, generation: R2021, years: "2000-2020"}
+      - {id: pd_ic_1km_unadj,  constrained: false, unadjusted: false, resolution: "1km", scope: countries, generation: R2021, years: "2000-2020"}
+
+  pwd:
+    friendly: [population_weighted_density]
+    kind: raster
+    demographic: false
+    unit: "people/km2"
+    subaliases:
+      - {id: pwd_national_1km,     constrained: false, unadjusted: true, resolution: "1km",  scope: countries, generation: R2021, level: national,    years: "2000-2020"}
+      - {id: pwd_national_100m,    constrained: false, unadjusted: true, resolution: "100m", scope: countries, generation: R2021, level: national,    years: "2000-2020"}
+      - {id: pwd_subnational_1km,  constrained: false, unadjusted: true, resolution: "1km",  scope: countries, generation: R2021, level: subnational, years: "2000-2020"}
+      - {id: pwd_subnational_100m, constrained: false, unadjusted: true, resolution: "100m", scope: countries, generation: R2021, level: subnational, years: "2000-2020"}
+
+  births:
+    friendly: [births_count]
+    kind: raster
+    demographic: false
+    unit: "births/pixel"
+    worldpoppy_id: births
+    subaliases:
+      - {id: bic, constrained: false, unadjusted: true, resolution: "100m", scope: countries, generation: R2021, years: "2000-2020"}
+
+  pregnancies:
+    friendly: [pregnancies_count]
+    kind: raster
+    demographic: false
+    unit: "pregnancies/pixel"
+    worldpoppy_id: pregnancies
+    subaliases:
+      - {id: individual_countries, constrained: false, unadjusted: true, resolution: "100m", scope: countries, generation: R2021, years: "2000-2020"}
+
+  dependency_ratios:
+    friendly: [dependency_ratio, dependency]
+    kind: raster
+    demographic: false
+    unit: "ratio"
+    subaliases:
+      - {id: drwc, constrained: false, unadjusted: true, resolution: "1km", scope: global, generation: R2021, years: "2000-2020"}
+
+  urban_change:
+    friendly: [urban, urbanisation]
+    kind: raster
+    demographic: false
+    unit: "class"
+    subaliases:
+      - {id: ucic, constrained: false, unadjusted: true, resolution: "100m", scope: countries, generation: R2021, years: "2000-2020"}
+
+  gbsg:
+    friendly: [built_settlement_growth, settlement_growth]
+    kind: raster
+    demographic: false
+    unit: "class"
+    subaliases:
+      - {id: bsgm, constrained: false, unadjusted: true, resolution: "100m", scope: countries, generation: R2021, years: "2000-2020"}
+
+  dug:
+    friendly: [degree_of_urbanisation, degurba]
+    kind: raster
+    demographic: false
+    unit: "class"
+    subaliases:
+      - {id: dug_g2_v1, constrained: true, unadjusted: true, resolution: "100m", scope: countries, generation: R2025A, years: "2015-2030"}
+
+  future_pop:
+    friendly: [projections, population_projection, ssp]
+    kind: raster
+    demographic: false
+    unit: "people/pixel"
+    subaliases:
+      - {id: FPP_v02, constrained: false, unadjusted: true, resolution: "1km", scope: global, generation: R2025A, years: "2025-2100"}

@@ -48,6 +48,8 @@ _API_MODES: frozenset[str] = frozenset({"rest", "worldpoppy"})
 _RESOLUTIONS: frozenset[str] = frozenset({"100m", "1km"})
 #: Allowed values for the `scope=` selector.
 _SCOPES: frozenset[str] = frozenset({"countries", "global"})
+#: Allowed values for the `level=` selector (only `pwd` offers both).
+_LEVELS: frozenset[str] = frozenset({"national", "subnational"})
 
 
 class WorldPop(AbstractDataSource):
@@ -78,6 +80,7 @@ class WorldPop(AbstractDataSource):
         resolution: str = "100m",
         scope: str = "countries",
         generation: str = "R2021",
+        level: str = "national",
         year: int | None = None,
         years: list[int] | None = None,
         crs: str = "EPSG:4326",
@@ -117,6 +120,8 @@ class WorldPop(AbstractDataSource):
                 global mosaic, where the product offers one).
             generation: Product generation — `"R2021"` (default, the
                 classic 2000–2020 line) or a Global-2 line (`"R2025A"`, …).
+            level: `"national"` (default) or `"subnational"` — only the
+                population-weighted-density (`pwd`) product offers both.
             year: A single year to fetch (overrides the date window).
             years: An explicit list of years (overrides the date window
                 and `year`).
@@ -148,6 +153,8 @@ class WorldPop(AbstractDataSource):
             )
         if scope not in _SCOPES:
             raise ValueError(f"scope must be one of {sorted(_SCOPES)}; got {scope!r}.")
+        if level not in _LEVELS:
+            raise ValueError(f"level must be one of {sorted(_LEVELS)}; got {level!r}.")
         if generation not in GENERATIONS:
             raise ValueError(
                 f"generation must be one of {list(GENERATIONS)}; got {generation!r}."
@@ -161,6 +168,7 @@ class WorldPop(AbstractDataSource):
         self._resolution = resolution
         self._scope = scope
         self._generation = generation
+        self._level = level
         self._year_arg = year
         self._years_arg = years
         self._crs = crs
@@ -181,6 +189,7 @@ class WorldPop(AbstractDataSource):
                 resolution=resolution,
                 scope=scope,
                 generation=generation,
+                level=level,
             )
             for product in self._products
         }
