@@ -789,7 +789,10 @@ class WorldPop(AbstractDataSource):
         Args:
             progress_bar: Whether per-download progress is shown.
             aggregate: Optional `earthlens.aggregate.AggregationConfig`;
-                reduces the per-year raster stack across years (`C6`).
+                reduces the per-year raster stack across years. It reduces
+                the **rasters** only — for demographic products the per-cohort
+                age/sex tables are still written per year (the table column is
+                not aggregated).
 
         Returns:
             list[Path]: The written GeoTIFF / table paths.

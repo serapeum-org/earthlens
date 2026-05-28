@@ -112,6 +112,10 @@ EarthLens(
 # -> one window raster: pop_100YS_20000101_mean.tif
 ```
 
+`aggregate=` reduces the **rasters** only. For demographic products
+(`age_structures`) the per-cohort age/sex tables are still written per year —
+the table is not aggregated across years.
+
 !!! note "Population change (delta)"
     A population-*change* (`delta`) reduction is **not** currently available:
     the shared `AggregationConfig.op` is a fixed `Literal`
