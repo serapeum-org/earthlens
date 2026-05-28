@@ -601,9 +601,19 @@ class GHSL(AbstractDataSource):
             touch=False,
         )
         if categorical:
-            cropped.color_table = self._catalog.get(
-                rp.metadata["product"]
-            ).color_table()
+            # The GeoTIFF colour table is best-effort: pyramids needs its
+            # optional viz extra to write one. The legend always survives via
+            # the {target}.legend.json sidecar written below.
+            try:
+                cropped.color_table = self._catalog.get(
+                    rp.metadata["product"]
+                ).color_table()
+            except Exception as exc:  # noqa: BLE001 - optional colour-table dep
+                logger.warning(
+                    f"GHSL: could not embed the colour table for "
+                    f"{rp.metadata['product']} ({type(exc).__name__}); the "
+                    "legend sidecar is still written."
+                )
 
         target = Path(self.path) / (
             f"{rp.id}_{resolution}_epsg{self._output_epsg}.tif"
