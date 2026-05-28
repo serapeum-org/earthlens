@@ -736,9 +736,14 @@ class GHSL(AbstractDataSource):
         family_url = f"{BASE_URL}/{family}_GLOBE_{self._release}"
         version = latest_version_dir(family_url)
         version_url = f"{family_url}/{version}"
-        zips = [n for n in list_remote_dir(version_url) if n.endswith(".zip")]
+        zips = sorted(n for n in list_remote_dir(version_url) if n.endswith(".zip"))
         if not zips:
             raise ValueError(f"no .zip table found under {version_url} for {code}.")
+        if len(zips) > 1:
+            logger.warning(
+                f"GHSL: {code} {version} has multiple table zips {zips}; "
+                f"downloading the first ({zips[0]})."
+            )
         dest = Path(self.path) / code
         download_and_extract(f"{version_url}/{zips[0]}", dest)
         return dest
