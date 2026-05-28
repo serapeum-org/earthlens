@@ -99,3 +99,49 @@ def test_parse_cache_reuses_rows_until_cleared():
     assert catalog_module._CATALOG_CACHE, "load() should populate the cache"
     catalog_module.clear_catalog_cache()
     assert not catalog_module._CATALOG_CACHE, "clear_catalog_cache() empties it"
+
+
+def test_len_counts_parameters():
+    """len(cat) equals the number of parameter rows."""
+    cat = Catalog()
+    assert len(cat) == len(cat.parameters)
+
+
+def test_contains_known_name():
+    """A curated name is `in` the catalog."""
+    assert "discharge" in Catalog()
+
+
+def test_getitem_returns_row():
+    """cat[name] returns the Parameter row."""
+    assert Catalog()["gage_height"].code == "00065"
+
+
+def test_getitem_unknown_raises_keyerror():
+    """cat[unknown] raises KeyError."""
+    with pytest.raises(KeyError):
+        Catalog()["nope"]
+
+
+def test_iter_yields_parameter_names():
+    """Iterating the catalog yields its parameter names."""
+    cat = Catalog()
+    assert set(cat) == set(cat.parameters)
+
+
+def test_parameters_is_datasets_alias():
+    """The parameters property returns the same object as datasets."""
+    cat = Catalog()
+    assert cat.parameters is cat.datasets
+
+
+def test_datasets_construction_skips_disk():
+    """Constructing with datasets= populates the catalog directly."""
+    cat = Catalog(datasets={"flow": Parameter(code="00060", name="Discharge")})
+    assert cat["flow"].code == "00060"
+
+
+def test_parameters_kwarg_routes_to_datasets():
+    """The legacy parameters= kwarg lands in the datasets field."""
+    cat = Catalog(parameters={"flow": Parameter(code="00060")})
+    assert "flow" in cat.datasets

@@ -111,14 +111,15 @@ class StationCatalog(AbstractCatalog):
     """
 
     _catalog_kind: str = "NEXRAD station catalog"
+    _entry_noun: str = "stations"
 
     datasets: dict[str, Station] = Field(default_factory=dict)
 
     def model_post_init(self, __context: Any) -> None:
         """Auto-load the bundled `radar_data_catalog.yaml` when no rows were supplied."""
-        if self.datasets:
-            return
-        self.datasets = _load_stations(CATALOG_PATH)
+        if not self.datasets:
+            self.datasets = _load_stations(CATALOG_PATH)
+        super().model_post_init(__context)
 
     def get_catalog(self) -> dict[str, Station]:
         """Return the structural per-site map (satisfies the base contract)."""

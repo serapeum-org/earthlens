@@ -151,9 +151,7 @@ class TestCatalog:
         with pytest.raises(ValueError, match="legacy MARS keys"):
             Catalog()
 
-    def test_unknown_top_level_key_still_fails_validation(
-        self, monkeypatch, tmp_path
-    ):
+    def test_unknown_top_level_key_still_fails_validation(self, monkeypatch, tmp_path):
         """An unknown key on a Variable row fails the catalog loader with the row name."""
         from earthlens.ecmwf import catalog as catalog_module
 
@@ -854,4 +852,30 @@ class TestCatalog:
 
         monkeypatch.setattr(catalog_module, "CATALOG_PATH", no_vars)
         with pytest.raises(ValueError, match="no variables"):
+            Catalog()
+
+    def test_directory_rejects_duplicate_dataset_key(self, monkeypatch, tmp_path):
+        """A dataset key declared in two family files raises ValueError."""
+        a = tmp_path / "a.yaml"
+        a.write_text(
+            "datasets:\n  dup-ds:\n    variables:\n      v1:\n        nc_variable: a\n",
+            encoding="utf-8",
+        )
+        b = tmp_path / "b.yaml"
+        b.write_text(
+            "datasets:\n  dup-ds:\n    variables:\n      v2:\n        nc_variable: b\n",
+            encoding="utf-8",
+        )
+        from earthlens.ecmwf import catalog as catalog_module
+
+        monkeypatch.setattr(catalog_module, "CATALOG_PATH", tmp_path)
+        with pytest.raises(ValueError, match="duplicate dataset key"):
+            Catalog()
+
+    def test_missing_catalog_path_raises(self, monkeypatch, tmp_path):
+        """A CATALOG_PATH that is neither a dir nor a file raises ValueError."""
+        from earthlens.ecmwf import catalog as catalog_module
+
+        monkeypatch.setattr(catalog_module, "CATALOG_PATH", tmp_path / "nope")
+        with pytest.raises(ValueError, match="does not exist"):
             Catalog()

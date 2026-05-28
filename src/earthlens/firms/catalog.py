@@ -38,6 +38,16 @@ from earthlens.base.yaml_loader import load_yaml_strict
 
 CATALOG_PATH: Path = Path(__file__).parent / "firms_data_catalog.yaml"
 
+#: Module-level parse cache keyed on `(resolved_path, st_mtime_ns)` so a
+#: repeated `Catalog()` skips the YAML parse + pydantic validation. Mirrors
+#: the FDSN / NWP / radar loaders.
+_CATALOG_CACHE: dict[tuple[str, int], dict[str, "Sensor"]] = {}
+
+
+def clear_catalog_cache() -> None:
+    """Empty the module-level catalog parse cache (for tests that rewrite YAML)."""
+    _CATALOG_CACHE.clear()
+
 
 class SensorColumn(BaseModel):
     """One FIRMS CSV column's metadata (the "variable" analog).
@@ -194,6 +204,7 @@ class Catalog(AbstractCatalog):
     """
 
     _catalog_kind: str = "FIRMS sensor catalog"
+    _entry_noun: str = "sensors"
 
     datasets: dict[str, Sensor] = Field(default_factory=dict)
 
@@ -207,10 +218,10 @@ class Catalog(AbstractCatalog):
             ValueError: Propagated from :meth:`load` when the YAML is
                 missing, empty, or has a malformed sensor row.
         """
-        if self.datasets:
-            return
-        loaded = Catalog.load()
-        self.datasets = loaded.datasets
+        if not self.datasets:
+            loaded = Catalog.load()
+            self.datasets = loaded.datasets
+        super().model_post_init(__context)
 
     @classmethod
     def load(cls, catalog_path: Path | None = None) -> Catalog:
@@ -228,6 +239,15 @@ class Catalog(AbstractCatalog):
                 fails :class:`Sensor` validation.
         """
         catalog_path = catalog_path if catalog_path is not None else CATALOG_PATH
+        resolved = str(catalog_path.resolve())
+        try:
+            mtime = catalog_path.stat().st_mtime_ns
+        except FileNotFoundError:
+            mtime = 0
+        key = (resolved, mtime)
+        cached = _CATALOG_CACHE.get(key)
+        if cached is not None:
+            return cls(datasets=dict(cached))
         data = load_yaml_strict(catalog_path) or {}
         sensors_yaml = data.get("sensors") or {}
         if not sensors_yaml:
@@ -243,7 +263,8 @@ class Catalog(AbstractCatalog):
                 raise ValueError(
                     f"{catalog_path} sensor {code!r} failed validation:\n{exc}"
                 ) from exc
-        return cls(datasets=sensors)
+        _CATALOG_CACHE[key] = sensors
+        return cls(datasets=dict(sensors))
 
     def get_catalog(self) -> dict[str, Sensor]:
         """Return the sensor map (satisfies the abstract contract).
@@ -295,6 +316,22 @@ class Catalog(AbstractCatalog):
                 ```
         """
         return self.get_sensor(code).columns[column]
+
+    def get_variable(self, code: str, column: str) -> SensorColumn:
+        """Leaf accessor for the shared two-arg get_variable contract.
+
+        Alias of :meth:`get_column` so the FIRMS leaf is reachable under
+        the same `get_variable(dataset_key, variable_name)` verb the
+        other two-level catalogs use.
+
+        Args:
+            code: A FIRMS source code.
+            column: A CSV column name declared under that sensor.
+
+        Returns:
+            SensorColumn: The matching column metadata.
+        """
+        return self.get_column(code, column)
 
     def codes(self) -> list[str]:
         """Return the registered FIRMS sensor codes, sorted.
