@@ -6,11 +6,12 @@ import sys
 
 import pandas as pd
 import pytest
+import requests
 from pyramids.dataset import Dataset
 
 from earthlens.aggregate import AggregationConfig
 from earthlens.worldpop import WorldPop
-from tests.worldpop.conftest import age_records, pop_records
+from tests.worldpop.conftest import _FakeResponse, age_records, pop_records
 
 pytestmark = pytest.mark.worldpop
 
@@ -229,6 +230,43 @@ def test_404_propagates(wp_kwargs, monkeypatch):
     backend = WorldPop(**wp_kwargs(year=2020))
     with pytest.raises(_rq.HTTPError):
         backend.download(progress_bar=False)
+
+
+def test_http_get_retries_transient_then_succeeds(wp_kwargs, monkeypatch, tiny_tif_bytes):
+    """A transient ConnectionError is retried with backoff, then succeeds."""
+    import earthlens.worldpop.backend as backend_mod
+
+    monkeypatch.setattr(backend_mod.time, "sleep", lambda *_: None)
+    calls = {"n": 0}
+
+    def flaky_get(url, timeout=None):
+        calls["n"] += 1
+        if calls["n"] < 3:
+            raise requests.ConnectionError("dropped")
+        return _FakeResponse(content=tiny_tif_bytes)
+
+    monkeypatch.setattr(requests, "get", flaky_get)
+    backend = WorldPop(**wp_kwargs(year=2020))
+    dest = backend._http_get("https://x/ken_ppp_2020.tif", backend._raw_dir() / "r.tif")
+    assert dest.exists() and calls["n"] == 3
+
+
+def test_http_get_does_not_retry_http_error(wp_kwargs, monkeypatch):
+    """An HTTP status error (404) is not retried — it raises immediately."""
+    import earthlens.worldpop.backend as backend_mod
+
+    monkeypatch.setattr(backend_mod.time, "sleep", lambda *_: None)
+    calls = {"n": 0}
+
+    def not_found(url, timeout=None):
+        calls["n"] += 1
+        return _FakeResponse()  # raise_for_status -> HTTPError
+
+    monkeypatch.setattr(requests, "get", not_found)
+    backend = WorldPop(**wp_kwargs(year=2020))
+    with pytest.raises(requests.HTTPError):
+        backend._http_get("https://x/missing.tif", backend._raw_dir() / "m.tif")
+    assert calls["n"] == 1
 
 
 def test_worldpoppy_missing_extra_raises(wp_kwargs, monkeypatch):

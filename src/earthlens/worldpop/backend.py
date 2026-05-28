@@ -24,6 +24,7 @@ from __future__ import annotations
 
 import datetime as dt
 import re
+import time
 import warnings
 from pathlib import Path
 
@@ -55,6 +56,10 @@ _RAW_DIRNAME: str = ".worldpop_raw"
 _DOWNLOAD_JOBS: int = 4
 #: Per-download HTTP timeout in seconds.
 _HTTP_TIMEOUT: int = 120
+#: Attempts per file download before giving up (transient errors only).
+_MAX_RETRIES: int = 3
+#: Base seconds for the exponential backoff between retries.
+_BACKOFF_BASE: float = 1.0
 #: WorldPop's GeoTIFF no-data value (verified live; merge must preserve it,
 #: since 0 is a valid population count).
 _WORLDPOP_NODATA: float = -99999.0
@@ -418,19 +423,35 @@ class WorldPop(AbstractDataSource):
             url: The GeoTIFF URL.
             dest: Local destination path.
 
+        Transient connection / timeout errors are retried up to
+        `_MAX_RETRIES` with exponential backoff; an HTTP status error (e.g.
+        404) propagates immediately without retry.
+
+        Args:
+            url: The GeoTIFF URL.
+            dest: Local destination path.
+
         Returns:
             Path: `dest`.
 
         Raises:
-            requests.HTTPError: On a non-2xx response (e.g. a 404 names the
-                offending URL).
+            requests.HTTPError: On a non-2xx response (the URL is named).
+            requests.ConnectionError | requests.Timeout: If every retry of a
+                transient network error is exhausted.
         """
         if dest.exists() and dest.stat().st_size > 0:
             return dest
-        resp = requests.get(url, timeout=_HTTP_TIMEOUT)
-        resp.raise_for_status()
-        dest.write_bytes(resp.content)
-        return dest
+        for attempt in range(_MAX_RETRIES):
+            try:
+                resp = requests.get(url, timeout=_HTTP_TIMEOUT)
+                resp.raise_for_status()
+                dest.write_bytes(resp.content)
+                return dest
+            except (requests.ConnectionError, requests.Timeout):
+                if attempt == _MAX_RETRIES - 1:
+                    raise
+                time.sleep(_BACKOFF_BASE * (2**attempt))
+        return dest  # unreachable; the loop returns or raises
 
     def _group_for_mosaic(
         self, products: list[RemoteProduct]
