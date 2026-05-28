@@ -6,18 +6,18 @@ import datetime as dt
 import os
 from typing import Any
 
-import boto3
-import botocore
 import pandas as pd
-from botocore import exceptions
 from loguru import logger
 from tqdm import tqdm
 
 from earthlens.base import AbstractCatalog, AbstractDataSource
+from earthlens.s3.auth import S3Auth, S3Credentials
 
 
 class S3(AbstractDataSource):
     """Amazon S3 data source."""
+
+    OUTPUT_KIND = "mixed"
 
     def __init__(
         self,
@@ -63,28 +63,17 @@ class S3(AbstractDataSource):
         )
 
     def _initialize(self, bucket: str = "era5-pds") -> object:
-        """initialize connection with amazon s3 and create a client.
+        """Build the unsigned S3 client via `S3Auth`.
 
-        Parameters
-        ----------
-        bucket: [str]
-            S3 bucket name.
+        Args:
+            bucket: S3 bucket name. Retained for backward compatibility;
+                the unsigned client is bucket-agnostic.
 
-        Returns
-        -------
-        client: [botocore.client.S3]
-            Amazon S3 client
+        Returns:
+            The `boto3` S3 client built by `S3Auth`.
         """
-        # AWS access / secret keys required
-        # s3 = boto3.resource('s3')
-        # bucket = s3.Bucket(era5_bucket)
-
-        # No AWS keys required
-        client = boto3.client(
-            "s3", config=botocore.client.Config(signature_version=botocore.UNSIGNED)
-        )
-        self.client = client
-        return client
+        self._auth = S3Auth(S3Credentials())
+        return self._auth.client()
 
     def _create_grid(self, lat_lim: list, lon_lim: list):
         """TODO:"""
@@ -185,6 +174,8 @@ class S3(AbstractDataSource):
         -------
         Download the file to your local drive.
         """
+        from botocore import exceptions
+
         if not os.path.isfile(local_dir_fname):  # check if file already exists
             logger.info(f"Downloading {s3_file_path} from S3...")
             try:
@@ -245,33 +236,24 @@ class Catalog(AbstractCatalog):
     bucket: str = "era5-pds"
     client: Any = None
 
-    def model_post_init(self, __context: Any) -> None:
-        super().model_post_init(__context)
-        self.client = self.initialize(bucket=self.bucket)
+    def _ensure_client(self) -> object:
+        """Build the unsigned S3 client on first use (no network at construction)."""
+        if self.client is None:
+            self.client = self.initialize(bucket=self.bucket)
+        return self.client
 
     @staticmethod
     def initialize(bucket: str = "era5-pds") -> object:
-        """initialize connection with amazon s3 and create a client.
+        """Build an unsigned S3 client via `S3Auth`.
 
-        Parameters
-        ----------
-        bucket: [str]
-            S3 bucket name.
+        Args:
+            bucket: S3 bucket name. Retained for backward compatibility;
+                the unsigned client is bucket-agnostic.
 
-        Returns
-        -------
-        client: [botocore.client.S3]
-            Amazon S3 client
+        Returns:
+            The `boto3` S3 client.
         """
-        # AWS access / secret keys required
-        # s3 = boto3.resource('s3')
-        # bucket = s3.Bucket(era5_bucket)
-
-        # No AWS keys required
-        client = boto3.client(
-            "s3", config=botocore.client.Config(signature_version=botocore.UNSIGNED)
-        )
-        return client
+        return S3Auth(S3Credentials()).client()
 
     def get_catalog(self):
         """return the catalog."""
@@ -313,7 +295,8 @@ class Catalog(AbstractCatalog):
         List:
             list of years that have available data.
         """
-        paginator = self.client.get_paginator("list_objects")
+        client = self._ensure_client()
+        paginator = client.get_paginator("list_objects")
         result = paginator.paginate(Bucket=bucket, Delimiter="/")
         # for prefix in result.search('CommonPrefixes'):
         #     print(prefix.get('Prefix'))
@@ -369,7 +352,8 @@ class Catalog(AbstractCatalog):
         date_obj = dt.datetime.strptime(date, fmt)
         # date = dt.date(2022,5,1) # update to desired date
         prefix = date_obj.strftime("%Y/%m/")
-        response = self.client.list_objects_v2(Bucket=bucket, Prefix=prefix)
+        client = self._ensure_client()
+        response = client.list_objects_v2(Bucket=bucket, Prefix=prefix)
         keys = S3.parse_response_metadata(response)
         if absolute_path:
             available_date = keys
