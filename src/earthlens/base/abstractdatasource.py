@@ -665,6 +665,12 @@ class AbstractCatalog(BaseModel):
         radar, openaq, overture, usgs_water) do not implement this; their
         rows are addressed directly with :meth:`get_dataset` / `[key]`.
 
+        Note:
+            This supersedes the former single-argument
+            `get_variable(var_name)`, which returned `self.catalog.get(var_name)`.
+            External callers/subclassers that relied on the one-argument
+            form must pass the parent `dataset_key` as well.
+
         Args:
             dataset_key: The parent dataset / collection key.
             variable_name: The leaf code within that dataset.
