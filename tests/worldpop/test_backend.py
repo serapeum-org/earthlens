@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import sys
+
 import pandas as pd
 import pytest
 from pyramids.dataset import Dataset
@@ -215,8 +217,9 @@ def test_404_propagates(wp_kwargs, monkeypatch):
         backend.download(progress_bar=False)
 
 
-def test_worldpoppy_missing_extra_raises(wp_kwargs):
+def test_worldpoppy_missing_extra_raises(wp_kwargs, monkeypatch):
     """api='worldpoppy' without the SDK raises a friendly ImportError."""
+    monkeypatch.setitem(sys.modules, "worldpoppy", None)  # force import failure
     with pytest.raises(ImportError, match=r"earthlens\[worldpop\]"):
         WorldPop(**wp_kwargs(api="worldpoppy"))
 

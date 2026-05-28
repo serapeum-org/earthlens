@@ -86,6 +86,10 @@ usgs-water = ["dataretrieval >=1.1.4"]
 # WorldPop: the default api="rest" path needs only core requests + pyramids;
 # the optional api="worldpoppy" path consumes WorldPopPy's file cache (never
 # its xarray return). WorldPopPy is MPL-2.0, requires Python >=3.10.
+# Deliberately NOT in `all`: WorldPopPy pulls rasterio/rioxarray, which lack
+# wheels for the 3.13/3.14 wheel-test envs and fail to build there; the REST
+# path (the default) needs nothing extra, and the worldpoppy code path is
+# covered by a stub in the tests.
 worldpop = ["worldpoppy >=0.4"]
 all = [
     "boto3 >=1.43.0",
@@ -110,7 +114,6 @@ all = [
     "sentinelhub >=3.11.5",
     "tropycal >=1.4",
     "urllib3 >=1.26",
-    "worldpoppy >=0.4",
 ]
 
 [dependency-groups]
