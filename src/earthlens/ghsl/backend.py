@@ -609,11 +609,16 @@ class GHSL(AbstractDataSource):
 
         Returns:
             pathlib.Path: The AOI-cropped GeoTIFF written under `self.path`.
+                Returned without re-running the GIS pipeline when it already
+                exists (idempotent, like the tile-level cache).
         """
         from pyramids.dataset import Dataset
         from pyramids.dataset.merge import merge_rasters
 
         resolution = rp.metadata["resolution"]
+        target = Path(self.path) / (f"{rp.id}_{resolution}_epsg{self._output_epsg}.tif")
+        if target.exists():
+            return target
         categorical = rp.metadata["categorical"]
         resampling = "nearest neighbor" if categorical else "bilinear"
         source_is_wgs84 = native_source_crs(resolution) == "4326"
@@ -650,7 +655,6 @@ class GHSL(AbstractDataSource):
                     "legend sidecar is still written."
                 )
 
-        target = Path(self.path) / (f"{rp.id}_{resolution}_epsg{self._output_epsg}.tif")
         cropped.to_file(str(target))
         if categorical:
             self._write_legend_sidecar(target, rp.metadata["product"])
