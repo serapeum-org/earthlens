@@ -40,6 +40,19 @@ from earthlens.base.yaml_loader import load_yaml_strict
 
 CATALOG_PATH: Path = Path(__file__).parent / "overture_data_catalog.yaml"
 
+#: Module-level parse cache keyed on `(resolved_path, st_mtime_ns)` so a
+#: repeated `Catalog()` skips the YAML parse + pydantic validation. Stores the
+#: `(themes, available_releases, available_datasets)` triple. Mirrors the
+#: FDSN / NWP / radar loaders.
+_CATALOG_CACHE: dict[
+    tuple[str, int], tuple[dict[str, "Theme"], list[str], list[str]]
+] = {}
+
+
+def clear_catalog_cache() -> None:
+    """Empty the module-level catalog parse cache (for tests that rewrite YAML)."""
+    _CATALOG_CACHE.clear()
+
 
 class Theme(BaseModel):
     """One Overture theme's dispatch row.
@@ -235,6 +248,20 @@ class Catalog(AbstractCatalog):
                 fails `Theme` validation.
         """
         catalog_path = catalog_path if catalog_path is not None else CATALOG_PATH
+        resolved = str(catalog_path.resolve())
+        try:
+            mtime = catalog_path.stat().st_mtime_ns
+        except FileNotFoundError:
+            mtime = 0
+        key = (resolved, mtime)
+        cached = _CATALOG_CACHE.get(key)
+        if cached is not None:
+            themes, releases, available = cached
+            return cls(
+                datasets=dict(themes),
+                available_releases=list(releases),
+                available_datasets=list(available),
+            )
         data = load_yaml_strict(catalog_path) or {}
         themes_yaml = data.get("themes") or {}
         if not themes_yaml:
@@ -242,7 +269,7 @@ class Catalog(AbstractCatalog):
                 f"{catalog_path} is missing or has an empty 'themes:' block. "
                 "The Overture catalog must list at least one theme."
             )
-        themes: dict[str, Theme] = {}
+        themes = {}
         for name, body in themes_yaml.items():
             try:
                 themes[name] = Theme(**dict(body or {}))
@@ -252,6 +279,7 @@ class Catalog(AbstractCatalog):
                 ) from exc
         releases = list(data.get("available_releases") or [])
         available = list(data.get("available_datasets") or [])
+        _CATALOG_CACHE[key] = (themes, releases, available)
         return cls(
             datasets=themes,
             available_releases=releases,

@@ -29,6 +29,16 @@ from earthlens.base.yaml_loader import load_yaml_strict
 
 CATALOG_PATH: Path = Path(__file__).parent / "openaq_data_catalog.yaml"
 
+#: Module-level parse cache keyed on `(resolved_path, st_mtime_ns)` so a
+#: repeated `Catalog()` skips the YAML parse + pydantic validation. Mirrors
+#: the FDSN / NWP / radar loaders.
+_CATALOG_CACHE: dict[tuple[str, int], dict[str, "Parameter"]] = {}
+
+
+def clear_catalog_cache() -> None:
+    """Empty the module-level catalog parse cache (for tests that rewrite YAML)."""
+    _CATALOG_CACHE.clear()
+
 #: The pollutant groups a `Parameter` can belong to.
 ParameterGroup = Literal["criteria", "particulate", "meteorological", "other"]
 
@@ -202,6 +212,15 @@ class Catalog(AbstractCatalog):
                 row fails :class:`Parameter` validation.
         """
         catalog_path = catalog_path if catalog_path is not None else CATALOG_PATH
+        resolved = str(catalog_path.resolve())
+        try:
+            mtime = catalog_path.stat().st_mtime_ns
+        except FileNotFoundError:
+            mtime = 0
+        key = (resolved, mtime)
+        cached = _CATALOG_CACHE.get(key)
+        if cached is not None:
+            return cls(datasets=dict(cached))
         data = load_yaml_strict(catalog_path) or {}
         parameters_yaml = data.get("parameters") or {}
         if not parameters_yaml:
@@ -217,6 +236,7 @@ class Catalog(AbstractCatalog):
                 raise ValueError(
                     f"{catalog_path} parameter {name!r} failed validation:\n{exc}"
                 ) from exc
+        _CATALOG_CACHE[key] = parameters
         return cls(datasets=parameters)
 
     def get_catalog(self) -> dict[str, Parameter]:
