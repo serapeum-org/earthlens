@@ -281,9 +281,9 @@ class Catalog(AbstractCatalog):
         available = list(data.get("available_datasets") or [])
         _CATALOG_CACHE[key] = (themes, releases, available)
         return cls(
-            datasets=themes,
-            available_releases=releases,
-            available_datasets=available,
+            datasets=dict(themes),
+            available_releases=list(releases),
+            available_datasets=list(available),
         )
 
     def get_catalog(self) -> dict[str, Theme]:

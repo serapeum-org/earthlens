@@ -177,7 +177,7 @@ class Catalog(AbstractCatalog):
                     f"{catalog_path} hazard type {code!r} failed validation:\n{exc}"
                 ) from exc
         _CATALOG_CACHE[key] = hazards
-        return cls(datasets=hazards)
+        return cls(datasets=dict(hazards))
 
     def get_catalog(self) -> dict[str, HazardType]:
         """Return the hazard-type map (satisfies the abstract contract).

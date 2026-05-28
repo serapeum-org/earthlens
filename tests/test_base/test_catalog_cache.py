@@ -49,3 +49,14 @@ def test_load_missing_path_raises(module_name: str, tmp_path):
     module.clear_catalog_cache()
     with pytest.raises((FileNotFoundError, ValueError)):
         module.Catalog.load(tmp_path / "does_not_exist.yaml")
+
+
+@pytest.mark.parametrize("module_name", CACHED_BACKENDS)
+def test_first_load_does_not_alias_cache(module_name: str):
+    """Mutating the first-loaded catalog's datasets must not leak into the cache."""
+    module = importlib.import_module(module_name)
+    module.clear_catalog_cache()
+    first = module.Catalog.load()
+    first.datasets["__injected__"] = next(iter(first.datasets.values()))
+    second = module.Catalog.load()
+    assert "__injected__" not in second.datasets

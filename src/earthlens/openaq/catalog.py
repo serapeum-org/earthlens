@@ -237,7 +237,7 @@ class Catalog(AbstractCatalog):
                     f"{catalog_path} parameter {name!r} failed validation:\n{exc}"
                 ) from exc
         _CATALOG_CACHE[key] = parameters
-        return cls(datasets=parameters)
+        return cls(datasets=dict(parameters))
 
     def get_catalog(self) -> dict[str, Parameter]:
         """Return the parameter map (satisfies the abstract contract).

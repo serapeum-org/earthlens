@@ -263,7 +263,7 @@ class Catalog(AbstractCatalog):
                     f"{catalog_path} sensor {code!r} failed validation:\n{exc}"
                 ) from exc
         _CATALOG_CACHE[key] = sensors
-        return cls(datasets=sensors)
+        return cls(datasets=dict(sensors))
 
     def get_catalog(self) -> dict[str, Sensor]:
         """Return the sensor map (satisfies the abstract contract).
