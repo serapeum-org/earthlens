@@ -160,3 +160,24 @@ def test_dict_surface(catalog):
     """The catalog exposes the dict-like membership + len surface."""
     assert "pop" in catalog
     assert len(catalog) == len(catalog.available_products())
+
+
+def test_get_catalog_returns_datasets(catalog):
+    """get_catalog() returns the same product map as datasets."""
+    assert catalog.get_catalog() is catalog.datasets
+
+
+def test_product_selectors_lists_tuples(catalog):
+    """Product.selectors() returns one selector tuple per sub-alias."""
+    pop = catalog.get("pop")
+    selectors = pop.selectors()
+    assert len(selectors) == len(pop.subaliases)
+    assert all(len(sel) == 6 for sel in selectors)
+
+
+def test_load_rejects_malformed_row(tmp_path):
+    """A product row with an unknown key fails load with a clear error."""
+    bad = tmp_path / "bad.yaml"
+    bad.write_text("products:\n  pop:\n    bogus_key: 1\n", encoding="utf-8")
+    with pytest.raises(ValueError, match="failed validation"):
+        Catalog.load(bad)

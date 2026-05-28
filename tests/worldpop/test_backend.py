@@ -251,6 +251,50 @@ def test_http_get_retries_transient_then_succeeds(wp_kwargs, monkeypatch, tiny_t
     assert dest.exists() and calls["n"] == 3
 
 
+def test_http_get_skips_existing_file(wp_kwargs, monkeypatch, tiny_tif_bytes):
+    """A non-empty destination is returned without re-fetching."""
+    backend = WorldPop(**wp_kwargs(year=2020))
+    dest = backend._raw_dir() / "cached.tif"
+    dest.write_bytes(tiny_tif_bytes)
+
+    def boom(*_a, **_k):
+        raise AssertionError("should not download an existing file")
+
+    monkeypatch.setattr(requests, "get", boom)
+    assert backend._http_get("https://x/cached.tif", dest) == dest
+
+
+def test_http_get_raises_after_retries_exhausted(wp_kwargs, monkeypatch):
+    """A persistent transient error raises once retries are exhausted."""
+    import earthlens.worldpop.backend as backend_mod
+
+    monkeypatch.setattr(backend_mod.time, "sleep", lambda *_: None)
+
+    def always_drop(url, timeout=None):
+        raise requests.ConnectionError("dropped")
+
+    monkeypatch.setattr(requests, "get", always_drop)
+    backend = WorldPop(**wp_kwargs(year=2020))
+    with pytest.raises(requests.ConnectionError):
+        backend._http_get("https://x/ken_ppp_2020.tif", backend._raw_dir() / "r.tif")
+
+
+def test_api_hook_composes_search_fetch(wp_kwargs, patch_http):
+    """The _api ABC hook composes _search + _fetch like download()."""
+    patch_http(pop_records())
+    backend = WorldPop(**wp_kwargs(year=2020))
+    out = backend._api()
+    assert any(str(p).endswith("pop_2020_100m.tif") for p in out)
+
+
+def test_worldpoppy_already_cached_fallback(wp_kwargs, fake_worldpoppy, tiny_tif_bytes):
+    """When wp_raster adds no new file, the cache is matched by the fallback."""
+    (fake_worldpoppy / "ken_ppp_2020.tif").write_bytes(tiny_tif_bytes)  # pre-seed
+    backend = WorldPop(**wp_kwargs(year=2020, api="worldpoppy"))
+    out = backend.download(progress_bar=False)
+    assert any(p.name == "pop_2020_100m.tif" for p in out)
+
+
 def test_http_get_does_not_retry_http_error(wp_kwargs, monkeypatch):
     """An HTTP status error (404) is not retried — it raises immediately."""
     import earthlens.worldpop.backend as backend_mod
