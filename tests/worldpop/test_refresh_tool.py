@@ -50,7 +50,9 @@ def test_refresh_builds_index_with_fake_http():
 
     def fake_get(url, timeout=None):
         return _FakeResponse(
-            json_data={"data": [{"alias": "wpgp"}, {"alias": " "}, {"alias": "wpgp1km"}]}
+            json_data={
+                "data": [{"alias": "wpgp"}, {"alias": " "}, {"alias": "wpgp1km"}]
+            }
         )
 
     index = tool.refresh(get=fake_get)

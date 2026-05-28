@@ -53,10 +53,14 @@ def _json(url: str, get: Getter) -> dict:
     return resp.json()
 
 
-def crawl_subaliases(alias: str, *, base_url: str = BASE_URL, get: Getter = requests.get) -> list[str]:
+def crawl_subaliases(
+    alias: str, *, base_url: str = BASE_URL, get: Getter = requests.get
+) -> list[str]:
     """Return the live sub-alias ids for one product alias (blanks skipped)."""
     data = _json(f"{base_url}/{alias}", get).get("data", [])
-    return [str(row.get("alias")).strip() for row in data if str(row.get("alias")).strip()]
+    return [
+        str(row.get("alias")).strip() for row in data if str(row.get("alias")).strip()
+    ]
 
 
 def refresh(
@@ -82,7 +86,9 @@ def validate_structure(catalog: Catalog) -> list[str]:
             problems.append(f"{alias}: demographic but kind != 'mixed'")
         for sub in product.subaliases:
             if sub.generation not in GENERATIONS:
-                problems.append(f"{alias}/{sub.id}: unknown generation {sub.generation!r}")
+                problems.append(
+                    f"{alias}/{sub.id}: unknown generation {sub.generation!r}"
+                )
             try:
                 sub.years_set()
             except ValueError:
@@ -111,7 +117,9 @@ def _build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     sub = parser.add_subparsers(dest="command", required=True)
     refresh_cmd = sub.add_parser("refresh", help="crawl the hub and write the index")
-    refresh_cmd.add_argument("-o", "--out", help="write the index YAML here (else stdout)")
+    refresh_cmd.add_argument(
+        "-o", "--out", help="write the index YAML here (else stdout)"
+    )
     validate_cmd = sub.add_parser("validate", help="check the curated catalog")
     validate_cmd.add_argument("--live", action="store_true", help="also check upstream")
     validate_cmd.add_argument(

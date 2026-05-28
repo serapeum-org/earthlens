@@ -42,7 +42,9 @@ def test_rest_records_raises_on_http_error(monkeypatch):
 def test_files_for_year_matches_popyear():
     """files_for_year returns the record whose popyear matches."""
     files = files_for_year(pop_records(), 2010)
-    assert files == ["https://data.worldpop.org/GIS/Population/Global_2000_2020/2010/KEN/ken_ppp_2010.tif"]
+    assert files == [
+        "https://data.worldpop.org/GIS/Population/Global_2000_2020/2010/KEN/ken_ppp_2010.tif"
+    ]
 
 
 def test_files_for_year_latest_when_none():
@@ -74,7 +76,9 @@ def test_files_for_year_drops_non_geotiff():
             ],
         }
     ]
-    assert files_for_year(records, 2020) == ["https://x/bdi_ppp_2020_1km_Aggregated.tif"]
+    assert files_for_year(records, 2020) == [
+        "https://x/bdi_ppp_2020_1km_Aggregated.tif"
+    ]
 
 
 def test_files_for_year_no_geotiff_raises():

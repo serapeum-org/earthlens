@@ -114,7 +114,11 @@ class SubAlias(BaseModel):
         return _years_set(self.years)
 
     def selector(self) -> tuple[bool, bool, str, str, str, str]:
-        """Return the selector key (constrained, unadjusted, resolution, scope, generation, level)."""
+        """Return the selector key.
+
+        The key is `(constrained, unadjusted, resolution, scope, generation,
+        level)` — unique within a product.
+        """
         return (
             self.constrained,
             self.unadjusted,
@@ -350,9 +354,9 @@ class Catalog(AbstractCatalog):
             if sub.selector() == want:
                 return sub.id
         options = "\n".join(
-            f"  - id={s.id!r} constrained={s.constrained} unadjusted={s.unadjusted} "
-            f"resolution={s.resolution!r} scope={s.scope!r} generation={s.generation!r} "
-            f"level={s.level!r}"
+            f"  - id={s.id!r} constrained={s.constrained} "
+            f"unadjusted={s.unadjusted} resolution={s.resolution!r} "
+            f"scope={s.scope!r} generation={s.generation!r} level={s.level!r}"
             for s in row.subaliases
         )
         raise ValueError(

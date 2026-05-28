@@ -62,9 +62,7 @@ def rest_records(
     return resp.json().get("data", [])
 
 
-def files_for_year(
-    records: list[dict[str, Any]], year: int | None
-) -> list[str]:
+def files_for_year(records: list[dict[str, Any]], year: int | None) -> list[str]:
     """Return the GeoTIFF URLs for the record whose `popyear` matches `year`.
 
     Args:
@@ -88,9 +86,7 @@ def files_for_year(
     if year is None:
         record = max(records, key=lambda d: int(d["popyear"]))
     else:
-        record = next(
-            (d for d in records if int(d["popyear"]) == int(year)), None
-        )
+        record = next((d for d in records if int(d["popyear"]) == int(year)), None)
         if record is None:
             available = sorted({int(d["popyear"]) for d in records})
             raise ValueError(

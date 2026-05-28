@@ -139,9 +139,7 @@ def _bbox_intersects(a: list[float], b: list[float]) -> bool:
     return not (ae < bw or be < aw or an < bs or bn < as_)
 
 
-def iso3_for_bbox(
-    bbox_wgs84: list[float], table: dict[str, list[float]]
-) -> list[str]:
+def iso3_for_bbox(bbox_wgs84: list[float], table: dict[str, list[float]]) -> list[str]:
     """Return the ISO3 codes whose country bbox intersects `bbox_wgs84`.
 
     Args:

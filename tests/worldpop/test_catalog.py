@@ -79,7 +79,10 @@ def test_pick_subalias_single_product_ignores_selectors(catalog):
 
 def test_pick_subalias_pwd_level(catalog):
     """The pwd product disambiguates by national / subnational level."""
-    assert catalog.pick_subalias("pwd", resolution="1km", level="national") == "pwd_national_1km"
+    assert (
+        catalog.pick_subalias("pwd", resolution="1km", level="national")
+        == "pwd_national_1km"
+    )
     assert (
         catalog.pick_subalias("pwd", resolution="100m", level="subnational")
         == "pwd_subnational_100m"
@@ -90,7 +93,11 @@ def test_pick_subalias_impossible_combo_raises(catalog):
     """An unavailable selector tuple raises listing the sub-aliases."""
     with pytest.raises(ValueError, match="has no variant"):
         catalog.pick_subalias(
-            "pop", constrained=True, resolution="1km", generation="R2021", scope="countries"
+            "pop",
+            constrained=True,
+            resolution="1km",
+            generation="R2021",
+            scope="countries",
         )
 
 

@@ -407,7 +407,9 @@ class WorldPop(AbstractDataSource):
 
     def _group_for_mosaic(
         self, products: list[RemoteProduct]
-    ) -> dict[tuple[str, int, tuple[str, int] | None], list[tuple[Path, RemoteProduct]]]:
+    ) -> dict[
+        tuple[str, int, tuple[str, int] | None], list[tuple[Path, RemoteProduct]]
+    ]:
         """Download every product and group the files for mosaicking.
 
         Groups by `(product, year, cohort)` so multi-country requests merge
@@ -690,9 +692,7 @@ class WorldPop(AbstractDataSource):
         )
         cohort = cohort_of(rp.href)
         tag = f"_{cohort[0]}_{cohort[1]}" if cohort else ""
-        target = (
-            Path(self.path) / f"{product}_{year}{tag}_{self._resolution}.tif"
-        )
+        target = Path(self.path) / f"{product}_{year}{tag}_{self._resolution}.tif"
         cropped.to_file(str(target))
         # Best-effort cleanup of the intermediate mosaic; on Windows the GDAL
         # handle may still hold it open, in which case it stays in the raw

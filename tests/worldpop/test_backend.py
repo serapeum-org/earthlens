@@ -151,7 +151,10 @@ def test_fetch_groups_cohorts_distinctly(wp_kwargs, patch_http):
     csvs = [p for p in out if str(p).endswith(".csv")]
     assert len(tifs) == 36
     assert len(csvs) == 1
-    assert {p.name for p in tifs} >= {"age_structures_2020_f_0_100m.tif", "age_structures_2020_m_80_100m.tif"}
+    assert {p.name for p in tifs} >= {
+        "age_structures_2020_f_0_100m.tif",
+        "age_structures_2020_m_80_100m.tif",
+    }
 
 
 def test_demographic_table_shape(wp_kwargs, patch_http):
@@ -198,7 +201,8 @@ def test_404_propagates(wp_kwargs, monkeypatch):
     """A 404 on a file download surfaces as an error."""
     import requests as _rq
 
-    from tests.worldpop.conftest import _FakeResponse, pop_records as _pr
+    from tests.worldpop.conftest import _FakeResponse
+    from tests.worldpop.conftest import pop_records as _pr
 
     def fake_get(url, params=None, timeout=None):
         if "/rest/data/" in url:

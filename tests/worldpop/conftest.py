@@ -20,7 +20,26 @@ from pyramids.dataset import Dataset
 TIF_WEST, TIF_SOUTH, TIF_EAST, TIF_NORTH = 33.9, -4.7, 41.9, 5.0
 
 #: The 18 WorldPop age-band lower bounds (0 = <1, 1 = 1–4, then 5-year bands).
-AGE_BANDS: tuple[int, ...] = (0, 1, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80)
+AGE_BANDS: tuple[int, ...] = (
+    0,
+    1,
+    5,
+    10,
+    15,
+    20,
+    25,
+    30,
+    35,
+    40,
+    45,
+    50,
+    55,
+    60,
+    65,
+    70,
+    75,
+    80,
+)
 
 
 @pytest.fixture(scope="session")
