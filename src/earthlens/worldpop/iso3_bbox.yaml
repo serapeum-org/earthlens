@@ -1,0 +1,14 @@
+# ISO3 country -> [west, south, east, north] bounding box (WGS84), for the
+# bbox -> intersecting-countries resolution (G5). Seeded here; the full table
+# is generated/refreshed by tools/worldpop/refresh_worldpop_catalog.py (C11).
+bboxes:
+  COM: [43.21, -12.42, 44.54, -11.36]   # Comoros
+  KEN: [33.91, -4.68, 41.91, 5.03]      # Kenya
+  UGA: [29.57, -1.48, 35.04, 4.23]      # Uganda
+  RWA: [28.86, -2.84, 30.90, -1.05]     # Rwanda
+  TZA: [29.34, -11.76, 40.44, -0.99]    # Tanzania
+  BDI: [29.02, -4.47, 30.85, -2.31]     # Burundi
+  VAT: [12.44, 41.90, 12.46, 41.91]     # Vatican City
+  NRU: [166.90, -0.56, 166.96, -0.50]   # Nauru
+  TUV: [176.06, -8.56, 179.86, -5.64]   # Tuvalu
+  SYC: [46.20, -9.75, 56.29, -3.71]     # Seychelles

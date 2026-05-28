@@ -1,0 +1,40 @@
+# WorldPop product / sub-alias availability catalog.
+#
+# Curated from the live WorldPop REST API (hub.worldpop.org/rest/data),
+# verified 2026-05. Each product is a top-level REST alias; each sub-alias
+# pins a concrete variant via the selector tuple
+# (constrained, unadjusted, resolution, scope, generation) -> a REST id.
+#
+# `unadjusted: true` is the raw variant; `false` is the UN-adjusted one.
+# Regenerate / audit with tools/worldpop/refresh_worldpop_catalog.py.
+
+products:
+  pop:
+    friendly: [population, population_counts, ppp]
+    kind: raster
+    demographic: false
+    unit: "people/pixel"
+    worldpoppy_id: ppp
+    subaliases:
+      - {id: wpgp,                constrained: false, unadjusted: true,  resolution: "100m", scope: countries, generation: R2021,  years: "2000-2020"}
+      - {id: wpgpunadj,           constrained: false, unadjusted: false, resolution: "100m", scope: countries, generation: R2021,  years: "2000-2020"}
+      - {id: wpic1km,             constrained: false, unadjusted: true,  resolution: "1km",  scope: countries, generation: R2021,  years: "2000-2020"}
+      - {id: wpicuadj1km,         constrained: false, unadjusted: false, resolution: "1km",  scope: countries, generation: R2021,  years: "2000-2020"}
+      - {id: wpgp1km,             constrained: false, unadjusted: true,  resolution: "1km",  scope: global,    generation: R2021,  years: "2000-2020"}
+      - {id: cic2020_100m,        constrained: true,  unadjusted: true,  resolution: "100m", scope: countries, generation: R2021,  years: "2020"}
+      - {id: cic2020_UNadj_100m,  constrained: true,  unadjusted: false, resolution: "100m", scope: countries, generation: R2021,  years: "2020"}
+      - {id: G2_CN_POP_R25A_100m, constrained: true,  unadjusted: true,  resolution: "100m", scope: countries, generation: R2025A, years: "2015-2030"}
+      - {id: G2_CN_POP_R25A_1km,  constrained: true,  unadjusted: true,  resolution: "1km",  scope: countries, generation: R2025A, years: "2015-2030"}
+      - {id: G2_MOS_POP_R25A_1km, constrained: true,  unadjusted: true,  resolution: "1km",  scope: global,    generation: R2025A, years: "2015-2030"}
+
+  age_structures:
+    friendly: [age_sex, age_structure, demographics]
+    kind: mixed
+    demographic: true            # per-cohort age/sex rasters -> tidy table (C6)
+    unit: "people/pixel"
+    worldpoppy_id: agesex
+    subaliases:
+      - {id: aswpgp,        constrained: false, unadjusted: true, resolution: "100m", scope: countries, generation: R2021, years: "2000-2020"}
+      - {id: aswpgponekm,   constrained: false, unadjusted: true, resolution: "1km",  scope: global,    generation: R2021, years: "2000-2020"}
+      - {id: ascic_2020,    constrained: true,  unadjusted: true, resolution: "100m", scope: countries, generation: R2021, years: "2020"}
+      - {id: ascicua_2020,  constrained: true,  unadjusted: false, resolution: "100m", scope: countries, generation: R2021, years: "2020"}
