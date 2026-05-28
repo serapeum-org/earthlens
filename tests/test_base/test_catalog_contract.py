@@ -86,3 +86,23 @@ def test_available_datasets_mirrors_collection_index(module_name: str, shape: st
     else:
         flat = {cid for ids in cat.available_collections.values() for cid in ids}
         assert set(cat.available_datasets) == flat
+
+
+#: Backends that populate the base `providers` field (some via a domain alias:
+#: earthdata mirrors `daacs`, stac mirrors `endpoints`, fdsn mirrors `datasets`).
+PROVIDER_BACKENDS = [
+    "earthlens.ecmwf.catalog",
+    "earthlens.gee.catalog",
+    "earthlens.earthdata.catalog",
+    "earthlens.stac.catalog",
+    "earthlens.fdsn.catalog",
+]
+
+
+@pytest.mark.parametrize("module_name", PROVIDER_BACKENDS)
+def test_providers_populated_and_resolvable(module_name: str):
+    """The base providers field is non-empty and get_provider() resolves a slug."""
+    cat = _build(module_name, "Catalog")
+    assert cat.providers
+    slug = next(iter(cat.providers))
+    assert cat.get_provider(slug) is cat.providers[slug]
