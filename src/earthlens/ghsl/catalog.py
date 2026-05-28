@@ -5,8 +5,12 @@ families (GHS-POP, GHS-BUILT-S/V/H/C, GHS-SMOD, GHS-LAND, GHS-DUC, and the
 R2025A GHS-WUP projections), each available only for a specific matrix of
 epochs × resolutions × coordinate-reference-systems per release. Unlike a
 large remote index, that matrix is small, slow-changing, and known in
-advance, so it is curated as config-as-code in the bundled
-`ghsl_data_catalog.yaml` and validated here against typed pydantic rows.
+advance, so it is curated as config-as-code in the bundled `catalog/`
+directory — per-family `*.yaml` files (`population.yaml`, `built-up.yaml`,
+`settlement.yaml`, `land.yaml`, `projections.yaml`) plus an `_index.yaml`
+carrying the merged `available_datasets:` list — and validated here against
+typed pydantic rows. The loader merges every file at construction time (the
+GEE / CMEMS multi-file pattern) through a `(path, mtime_ns)` parse cache.
 
 A request names one or more **product keys** — canonical (`"GHS_POP"`) or a
 friendly alias (`"population"`) — plus a `release` / `epoch` / `resolution`
@@ -40,7 +44,126 @@ from pydantic import BaseModel, ConfigDict, Field, PrivateAttr, ValidationError
 from earthlens.base import AbstractCatalog
 from earthlens.base.yaml_loader import load_yaml_strict
 
-CATALOG_PATH: Path = Path(__file__).parent / "ghsl_data_catalog.yaml"
+#: Path to the bundled catalog directory of per-family `*.yaml` files plus the
+#: `_index.yaml` informational index. Tests can monkey-patch this attribute to
+#: redirect the loader at a temporary directory or a single YAML file.
+CATALOG_PATH: Path = Path(__file__).parent / "catalog"
+
+#: Module-level cache of parsed catalog data, keyed on the resolved path plus a
+#: tuple of `(file, mtime_ns)` for every YAML the load touched, so editing any
+#: per-family file invalidates the entry without re-parsing on an unchanged
+#: tree. Mirrors the GEE / CMEMS multi-file pattern.
+_CATALOG_CACHE: dict[Any, tuple[list[str], dict[str, "Product"]]] = {}
+
+
+def clear_catalog_cache() -> None:
+    """Empty the module-level catalog parse cache.
+
+    Useful in tests that rewrite the catalog on disk and want to force a
+    re-parse. Production callers do not need this — the cache keys include
+    every contributing file's `st_mtime_ns`, so any real file mutation
+    invalidates the entry on its own.
+    """
+    _CATALOG_CACHE.clear()
+
+
+def _yaml_files_for(path: Path) -> list[Path]:
+    """Return the sorted YAML files that contribute to a catalog load.
+
+    Args:
+        path: A catalog directory of per-family `*.yaml` files (the default
+            layout, including `_index.yaml`) or a single `*.yaml` file
+            (back-compat for tests / a monolithic catalog).
+
+    Returns:
+        list[Path]: Sorted YAML paths — every `*.yaml` for a directory, or
+            just the one file.
+
+    Raises:
+        ValueError: If `path` is neither an existing directory nor file.
+    """
+    if path.is_dir():
+        return sorted(path.glob("*.yaml"))
+    if path.is_file():
+        return [path]
+    raise ValueError(
+        f"GHSL catalog path {path} does not exist (expected a directory of "
+        "per-family *.yaml files, or a single YAML file)."
+    )
+
+
+def _load_catalog_data(path: Path) -> tuple[list[str], dict[str, "Product"]]:
+    """Parse, validate, and cache the GHSL catalog at `path`.
+
+    When `path` is a directory, every `*.yaml` is merged: `available_datasets:`
+    lists are concatenated and `products:` maps are unioned (a code declared in
+    two files is an error). Cached on the resolved path plus every contributing
+    file's `mtime_ns`, so a second `Catalog()` on an unchanged tree skips both
+    YAML parsing and pydantic validation.
+
+    Args:
+        path: Catalog directory (default `CATALOG_PATH`) or a single `*.yaml`.
+
+    Returns:
+        tuple[list[str], dict[str, Product]]: The merged `available_datasets:`
+            index and the curated product map (keyed by canonical code).
+
+    Raises:
+        ValueError: If no file has a `products:` block, a code is declared in
+            two files, a product row fails validation, or a curated code is
+            absent from `available_datasets:`.
+    """
+    resolved = str(path.resolve())
+    files = _yaml_files_for(path)
+    try:
+        mtime_tuple = tuple((str(f), f.stat().st_mtime_ns) for f in files)
+    except FileNotFoundError:
+        mtime_tuple = ((resolved, 0),)
+    key = (resolved, mtime_tuple)
+    cached = _CATALOG_CACHE.get(key)
+    if cached is not None:
+        return cached
+
+    merged_available: list[str] = []
+    merged_products_yaml: dict[str, Any] = {}
+    origin: dict[str, Path] = {}
+    for file_path in files:
+        data = load_yaml_strict(file_path) or {}
+        merged_available.extend(data.get("available_datasets") or [])
+        for code, body in (data.get("products") or {}).items():
+            if code in merged_products_yaml:
+                raise ValueError(
+                    f"product {code!r} declared in two catalog files: "
+                    f"{origin[code]} and {file_path}"
+                )
+            merged_products_yaml[code] = body
+            origin[code] = file_path
+
+    if not merged_products_yaml:
+        raise ValueError(
+            f"{path} is missing or has an empty 'products:' block. "
+            "The GHSL catalog must list at least one product."
+        )
+
+    available = set(merged_available)
+    products: dict[str, Product] = {}
+    for code, body in merged_products_yaml.items():
+        try:
+            products[code] = Product(code=code, **dict(body or {}))
+        except ValidationError as exc:
+            raise ValueError(
+                f"{origin[code]} product {code!r} failed validation:\n{exc}"
+            ) from exc
+        if available and code not in available:
+            raise ValueError(
+                f"product {code!r} is in 'products:' but missing from "
+                f"'available_datasets:' ({origin[code]}); add it to "
+                "_index.yaml too."
+            )
+
+    _CATALOG_CACHE[key] = (merged_available, products)
+    return _CATALOG_CACHE[key]
+
 
 #: Friendly resolution label → the token used in the JRC file path / name.
 #: Mollweide resolutions are metres (`100`, `1000`, `10`); WGS84 ones are
@@ -290,16 +413,18 @@ class Product(BaseModel):
 class Catalog(AbstractCatalog):
     """Product / availability catalog for the GHSL backend.
 
-    Reads the bundled `ghsl_data_catalog.yaml` and exposes its `products:`
-    block as a map of `Product` rows keyed by canonical code under the
-    inherited `datasets` field (giving `cat["GHS_POP"]`, `"GHS_POP" in cat`,
-    `len(cat)`, and the did-you-mean error for free). Instantiate with no
-    arguments (`Catalog()`); `model_post_init` loads and validates the YAML.
+    Merges the bundled `catalog/` directory's per-family `*.yaml` files and
+    exposes their `products:` blocks as a map of `Product` rows keyed by
+    canonical code under the inherited `datasets` field (giving
+    `cat["GHS_POP"]`, `"GHS_POP" in cat`, `len(cat)`, and the did-you-mean
+    error for free). Instantiate with no arguments (`Catalog()`);
+    `model_post_init` loads and validates the catalog through the parse cache.
 
     Attributes:
         datasets: Map from canonical product code to its `Product` row.
-        available_datasets: Every product code (== curated keys for GHSL —
-            the curated set is the full GLOBE surface).
+        available_datasets: Every product code from `_index.yaml`. For GHSL the
+            curated set is the full in-scope GLOBE surface, so this equals the
+            curated keys (there is no larger auto-discovered universe).
     """
 
     _catalog_kind: str = "GHSL product catalog"
@@ -310,11 +435,12 @@ class Catalog(AbstractCatalog):
     def model_post_init(self, __context: Any) -> None:
         """Auto-load the bundled catalog when no products were supplied.
 
-        `Catalog()` with no args reads `CATALOG_PATH`; passing
-        `datasets=...` skips the disk read (used in tests).
+        `Catalog()` with no args reads `CATALOG_PATH` (through the
+        `(path, mtime_ns)`-keyed parse cache); passing `datasets=...` skips the
+        disk read (used in tests).
 
         Raises:
-            ValueError: Propagated from `load` when the YAML is missing,
+            ValueError: Propagated from `load` when the catalog is missing,
                 empty, or has a malformed product row.
         """
         if self.datasets:
@@ -336,36 +462,30 @@ class Catalog(AbstractCatalog):
 
     @classmethod
     def load(cls, catalog_path: Path | None = None) -> Catalog:
-        """Read the GHSL product catalog from disk.
+        """Read the GHSL product catalog from disk (directory or single file).
+
+        Merges every per-family `*.yaml` in the catalog directory (the curated
+        `products:` blocks + the `_index.yaml` `available_datasets:` list)
+        through the `(path, mtime_ns)`-keyed parse cache.
 
         Args:
-            catalog_path: Path to the catalog YAML. Defaults to the
-                module-level `CATALOG_PATH`.
+            catalog_path: Catalog directory or single YAML file. Defaults to
+                the module-level `CATALOG_PATH`.
 
         Returns:
             A fully-populated `Catalog`.
 
         Raises:
-            ValueError: If the file has no `products:` block, or a row fails
-                `Product` validation.
+            ValueError: If no file has a `products:` block, a code is declared
+                in two files, a row fails `Product` validation, or a curated
+                code is absent from `available_datasets:`.
         """
         catalog_path = catalog_path if catalog_path is not None else CATALOG_PATH
-        data = load_yaml_strict(catalog_path) or {}
-        products_yaml = data.get("products") or {}
-        if not products_yaml:
-            raise ValueError(
-                f"{catalog_path} is missing or has an empty 'products:' block. "
-                "The GHSL catalog must list at least one product."
-            )
-        products: dict[str, Product] = {}
-        for code, body in products_yaml.items():
-            try:
-                products[code] = Product(code=code, **dict(body or {}))
-            except ValidationError as exc:
-                raise ValueError(
-                    f"{catalog_path} product {code!r} failed validation:\n{exc}"
-                ) from exc
-        return cls(datasets=products, available_datasets=sorted(products))
+        available, products = _load_catalog_data(catalog_path)
+        return cls(
+            datasets=dict(products),
+            available_datasets=list(available),
+        )
 
     def get_catalog(self) -> dict[str, Product]:
         """Return the product map (satisfies the abstract contract)."""

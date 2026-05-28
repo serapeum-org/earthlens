@@ -1,0 +1,28 @@
+# Informational index: every GHSL product code curated across the per-family
+# *.yaml files in this directory (population / built-up / settlement / land /
+# projections). The curated `products:` blocks live in those files; every
+# curated product code is a member of this list, and the loader enforces that.
+# GHSL's curated surface is the full in-scope GLOBE set, so this index equals
+# the curated keys (there is no larger auto-discovered universe to track, unlike
+# the GEE / CMEMS STAC walks). Validate against the live JRC tree with
+# `tools/ghsl/refresh_ghsl_catalog.py validate --strict`.
+
+available_datasets:
+  - GHS_POP
+  - GHS_BUILT_S
+  - GHS_BUILT_S_NRES
+  - GHS_BUILT_V
+  - GHS_BUILT_V_NRES
+  - GHS_BUILT_H_ANBH
+  - GHS_BUILT_H_AGBH
+  - GHS_BUILT_C_MSZ
+  - GHS_BUILT_C_FUN
+  - GHS_SMOD
+  - GHS_LAND
+  - GHS_DUC
+  - GHS_WUP_POP
+  - GHS_WUP_BUILT_S
+  - GHS_WUP_DEGURBA
+  - GHS_WUP_DUC
+  - GHS_WUP_MTUC
+  - GHS_WUP_COUNTRY_STATS

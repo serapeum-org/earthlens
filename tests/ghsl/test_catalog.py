@@ -193,3 +193,110 @@ class TestCatalog:
         cat = Catalog()
         assert cat.get("GHS_DUC").kind == "tabular"
         assert cat.get("GHS_WUP_MTUC").kind == "tabular"
+
+
+@pytest.mark.ghsl
+class TestMultiFileCatalog:
+    """The directory layout + `(path, mtime_ns)` parse cache."""
+
+    def _write(self, directory, name, text):
+        """Write a catalog YAML fragment and return its path."""
+        path = directory / name
+        path.write_text(text, encoding="utf-8")
+        return path
+
+    def test_yaml_files_for_directory(self, tmp_path):
+        """A directory yields its sorted *.yaml siblings, skipping non-YAML."""
+        from earthlens.ghsl.catalog import _yaml_files_for
+
+        self._write(tmp_path, "b.yaml", "products: {}\n")
+        self._write(tmp_path, "a.yaml", "products: {}\n")
+        self._write(tmp_path, "notes.txt", "ignore\n")
+        assert [p.name for p in _yaml_files_for(tmp_path)] == ["a.yaml", "b.yaml"]
+
+    def test_yaml_files_for_single_file(self, tmp_path):
+        """A single existing file returns just that file."""
+        from earthlens.ghsl.catalog import _yaml_files_for
+
+        f = self._write(tmp_path, "one.yaml", "products: {}\n")
+        assert _yaml_files_for(f) == [f]
+
+    def test_yaml_files_for_missing_raises(self, tmp_path):
+        """A non-existent path fails loud."""
+        from earthlens.ghsl.catalog import _yaml_files_for
+
+        with pytest.raises(ValueError, match="does not exist"):
+            _yaml_files_for(tmp_path / "nope")
+
+    def test_merges_products_across_files(self, tmp_path):
+        """Products from several files merge into one catalog."""
+        self._write(
+            tmp_path,
+            "_index.yaml",
+            "available_datasets: [GHS_POP, GHS_SMOD]\n",
+        )
+        self._write(
+            tmp_path,
+            "pop.yaml",
+            "products:\n  GHS_POP:\n    default_resolution: '100m'\n"
+            "    releases:\n      R2023A:\n        - epochs: [2020]\n"
+            "          resolutions: ['100m']\n",
+        )
+        self._write(
+            tmp_path,
+            "smod.yaml",
+            "products:\n  GHS_SMOD:\n    categorical: true\n"
+            "    default_resolution: '1km'\n    legend: {30: Urban Centre}\n"
+            "    releases:\n      R2023A:\n        - epochs: [2020]\n"
+            "          resolutions: ['1km']\n",
+        )
+        cat = Catalog.load(tmp_path)
+        assert set(cat.datasets) == {"GHS_POP", "GHS_SMOD"}
+        assert sorted(cat.available_datasets) == ["GHS_POP", "GHS_SMOD"]
+
+    def test_duplicate_code_across_files_raises(self, tmp_path):
+        """The same product code in two files is rejected."""
+        body = (
+            "products:\n  GHS_POP:\n    default_resolution: '100m'\n"
+            "    releases:\n      R2023A:\n        - epochs: [2020]\n"
+            "          resolutions: ['100m']\n"
+        )
+        self._write(tmp_path, "a.yaml", body)
+        self._write(tmp_path, "b.yaml", body)
+        with pytest.raises(ValueError, match="declared in two catalog files"):
+            Catalog.load(tmp_path)
+
+    def test_curated_code_missing_from_index_raises(self, tmp_path):
+        """A curated code absent from available_datasets is rejected."""
+        self._write(tmp_path, "_index.yaml", "available_datasets: [GHS_OTHER]\n")
+        self._write(
+            tmp_path,
+            "pop.yaml",
+            "products:\n  GHS_POP:\n    default_resolution: '100m'\n"
+            "    releases:\n      R2023A:\n        - epochs: [2020]\n"
+            "          resolutions: ['100m']\n",
+        )
+        with pytest.raises(ValueError, match="missing from 'available_datasets:'"):
+            Catalog.load(tmp_path)
+
+    def test_parse_cache_hits_and_clears(self, tmp_path):
+        """A second load on an unchanged tree hits the cache; clear empties it."""
+        from earthlens.ghsl.catalog import (
+            _CATALOG_CACHE,
+            _load_catalog_data,
+            clear_catalog_cache,
+        )
+
+        self._write(
+            tmp_path,
+            "pop.yaml",
+            "products:\n  GHS_POP:\n    default_resolution: '100m'\n"
+            "    releases:\n      R2023A:\n        - epochs: [2020]\n"
+            "          resolutions: ['100m']\n",
+        )
+        clear_catalog_cache()
+        first = _load_catalog_data(tmp_path)
+        second = _load_catalog_data(tmp_path)
+        assert second is first, "an unchanged tree must return the cached tuple"
+        clear_catalog_cache()
+        assert len(_CATALOG_CACHE) == 0

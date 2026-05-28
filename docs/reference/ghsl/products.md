@@ -1,7 +1,9 @@
 # GHSL — Available datasets
 
-The catalog (`earthlens.ghsl.Catalog`, backed by `ghsl_data_catalog.yaml`)
-curates **18 GLOBE products** across releases R2023A, R2022A (GHS-LAND), and
+The catalog (`earthlens.ghsl.Catalog`, backed by the per-family `catalog/`
+directory — `population.yaml`, `built-up.yaml`, `settlement.yaml`, `land.yaml`,
+`projections.yaml`, plus `_index.yaml`) curates **18 GLOBE products** across
+releases R2023A, R2022A (GHS-LAND), and
 R2025A (GHS-WUP projections). Inspect it programmatically:
 
 ```python

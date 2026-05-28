@@ -191,9 +191,9 @@ include = ["earthlens", "earthlens.*"]
 "earthlens.overture" = ["*.yaml"]
 "earthlens.nwp" = ["*.yaml"]
 "earthlens.radar" = ["*.yaml"]
-# GHSL ships the curated availability catalog + the 18x36 Mollweide tile-grid
+# GHSL ships the per-family catalog directory + the 18x36 Mollweide tile-grid
 # index (the JRC land tile schema, converted to GeoJSON) as package data.
-"earthlens.ghsl" = ["*.yaml", "*.geojson"]
+"earthlens.ghsl" = ["*.geojson", "catalog/*.yaml"]
 # Ship only the curated catalog; the informational available_parameters.yaml
 # (~1.5 MB, ~19.7k codes) is a repo/tooling + docs artefact that nothing loads
 # at runtime (the Catalog reads only the curated file; raw codes pass through
