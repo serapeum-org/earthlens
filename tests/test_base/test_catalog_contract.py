@@ -211,3 +211,19 @@ def test_stac_providers_is_a_copy_of_endpoints():
     cat = Catalog()
     assert cat.providers == cat.endpoints
     assert cat.providers is not cat.endpoints
+
+
+def test_parameter_catalog_did_you_mean_uses_parameters_noun():
+    """openaq's unknown-name message uses the 'parameters' entry noun."""
+    from earthlens.openaq import Catalog
+
+    with pytest.raises(ValueError, match="Known parameters:"):
+        Catalog().get_parameter("nope")
+
+
+def test_dataset_catalog_did_you_mean_uses_datasets_noun():
+    """A default-noun catalog's unknown-name message uses 'datasets'."""
+    from earthlens.fdsn import Catalog
+
+    with pytest.raises(ValueError, match="Known datasets:"):
+        Catalog().get_dataset("nope")

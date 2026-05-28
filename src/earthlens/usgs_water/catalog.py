@@ -177,12 +177,13 @@ class Catalog(AbstractCatalog):
             >>> Catalog().resolve("dischrge")
             Traceback (most recent call last):
                 ...
-            ValueError: 'dischrge' is not in the USGS Water parameter catalog. Known datasets: [...]. Did you mean 'discharge'?
+            ValueError: 'dischrge' is not in the USGS Water parameter catalog. Known parameters: [...]. Did you mean 'discharge'?
 
             ```
     """
 
     _catalog_kind: str = "USGS Water parameter catalog"
+    _entry_noun: str = "parameters"
 
     #: The parameter rows live in the base :attr:`datasets` field so the
     #: inherited dict surface (`len`, `in`, `[]`, iteration) and

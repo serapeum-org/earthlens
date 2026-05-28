@@ -613,6 +613,12 @@ class AbstractCatalog(BaseModel):
     #: catalog they failed against.
     _catalog_kind: str = "catalog"
 
+    #: Plural noun for the catalog entries, used in :meth:`get_dataset`'s
+    #: did-you-mean message (`"Known {noun}: [...]"`). Defaults to
+    #: `"datasets"`; subclasses whose entries are not "datasets" override
+    #: it (e.g. `"parameters"` for the openaq / usgs_water catalogs).
+    _entry_noun: str = "datasets"
+
     catalog: dict[str, Any] = Field(default_factory=dict)
     available_datasets: list[str] = Field(default_factory=list)
     datasets: dict[str, Any] = Field(default_factory=dict)
@@ -702,7 +708,7 @@ class AbstractCatalog(BaseModel):
             hint = f" Did you mean {close[0]!r}?" if close else ""
             raise ValueError(
                 f"{name!r} is not in the {self._catalog_kind}. "
-                f"Known datasets: {sorted(self.datasets)}.{hint}"
+                f"Known {self._entry_noun}: {sorted(self.datasets)}.{hint}"
             ) from None
 
     def __getitem__(self, name: str) -> Any:

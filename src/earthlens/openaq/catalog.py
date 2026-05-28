@@ -123,12 +123,13 @@ class Catalog(AbstractCatalog):
             >>> Catalog().get_parameter("pm2.5")
             Traceback (most recent call last):
                 ...
-            ValueError: 'pm2.5' is not in the OpenAQ parameter catalog. Known datasets: [...]. Did you mean 'pm25'?
+            ValueError: 'pm2.5' is not in the OpenAQ parameter catalog. Known parameters: [...]. Did you mean 'pm25'?
 
             ```
     """
 
     _catalog_kind: str = "OpenAQ parameter catalog"
+    _entry_noun: str = "parameters"
 
     #: The parameter rows live in the base :attr:`datasets` field so the
     #: inherited dict surface (`len`, `in`, `[]`, iteration) and
