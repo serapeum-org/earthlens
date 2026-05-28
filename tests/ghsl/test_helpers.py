@@ -172,3 +172,47 @@ class TestRemoteListing:
         names = {p.name for p in out}
         assert names == {"duc.csv", "readme.txt"}
         assert (tmp_path / "ex" / "duc.csv").exists()
+
+
+@pytest.mark.ghsl
+class TestZipSafety:
+    """Zip-Slip rejection + multi-member handling (L3 / N3)."""
+
+    def test_download_and_unzip_rejects_zip_slip(
+        self, tmp_path, fake_session, make_response
+    ):
+        """A `../` member in a tile zip is rejected before extraction (L3)."""
+        zpath = tmp_path / "evil_V1_0.zip"
+        with zipfile.ZipFile(zpath, "w") as archive:
+            archive.writestr("../escape.tif", b"x")
+        url = "https://x/evil_V1_0.zip"
+        session = fake_session({url: make_response(content=zpath.read_bytes())})
+        with pytest.raises(ValueError, match="unsafe path"):
+            download_and_unzip(url, tmp_path / "dl", session=session)
+
+    def test_download_and_extract_rejects_zip_slip(
+        self, tmp_path, fake_session, make_response
+    ):
+        """A `../` member in a tabular zip is rejected before extraction (L3)."""
+        zpath = tmp_path / "evil_V2_0.zip"
+        with zipfile.ZipFile(zpath, "w") as archive:
+            archive.writestr("../escape.csv", b"x")
+        url = "https://x/evil_V2_0.zip"
+        session = fake_session({url: make_response(content=zpath.read_bytes())})
+        with pytest.raises(ValueError, match="unsafe path"):
+            download_and_extract(url, tmp_path / "ex", session=session)
+
+    def test_multiple_tif_members_uses_sorted_first(
+        self, tmp_path, fake_session, make_response
+    ):
+        """A zip with several `.tif` members extracts the sorted-first one (N3)."""
+        t1 = make_tiny_tif(tmp_path / "src_a.tif", epsg=4326)
+        t2 = make_tiny_tif(tmp_path / "src_z.tif", epsg=4326)
+        zpath = tmp_path / "GHS_multi_V1_0.zip"
+        with zipfile.ZipFile(zpath, "w") as archive:
+            archive.write(t2, arcname="zzz.tif")
+            archive.write(t1, arcname="aaa.tif")
+        url = "https://x/GHS_multi_V1_0.zip"
+        session = fake_session({url: make_response(content=zpath.read_bytes())})
+        out = download_and_unzip(url, tmp_path / "dl", session=session)
+        assert out.suffix == ".tif" and out.exists(), f"expected a .tif, got {out}"

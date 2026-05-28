@@ -336,3 +336,133 @@ class TestInternals:
         g._write_legend_sidecar(target, "GHS_SMOD")
         data = json.loads((tmp_path / "x.legend.json").read_text())
         assert data["30"] == "Urban Centre"
+
+
+@pytest.mark.ghsl
+class TestReviewFixes:
+    """New branches added by the PR-review fixes (M1/L1/L2/L4/M3/L5)."""
+
+    def test_multi_tile_uses_parallel_download(self, tmp_path, patched_io, monkeypatch):
+        """A multi-tile product downloads every tile and mosaics them (L1)."""
+        g = _build(tmp_path, ["GHS_POP"])
+        monkeypatch.setattr(
+            g,
+            "_urls_for",
+            lambda code, epoch: [
+                "https://x/GHS_POP_E2020_GLOBE_R2023A_54009_100_V1_0_R6_C18.zip",
+                "https://x/GHS_POP_E2020_GLOBE_R2023A_54009_100_V1_0_R6_C19.zip",
+            ],
+        )
+        out = g.download(progress_bar=False)
+        assert len(out) == 1, f"expected one mosaicked output, got {out}"
+        assert patched_io[-1]["n"] == 2, "both tiles should reach merge_rasters"
+
+    def test_localise_idempotent_skips_remerge(self, tmp_path, patched_io):
+        """A repeated identical download reuses the output without re-merging (L4)."""
+        _build(tmp_path, ["GHS_POP"]).download(progress_bar=False)
+        merges = len(patched_io)
+        _build(tmp_path, ["GHS_POP"]).download(progress_bar=False)
+        assert (
+            len(patched_io) == merges
+        ), "second download must not re-run merge_rasters"
+
+    def test_aggregate_honors_out_dir_and_skipna(self, tmp_path, patched_io):
+        """aggregate= writes under config.out_dir and respects skipna (L2)."""
+        g = _build(tmp_path, ["GHS_POP"], start="2015-01-01", end="2020-12-31")
+        odir = tmp_path / "agg"
+        out = g.download(
+            progress_bar=False,
+            aggregate=AggregationConfig(
+                freq="100YS", op="mean", out_dir=str(odir), skipna=False
+            ),
+        )
+        assert out and all(
+            p.parent == odir for p in out
+        ), f"outputs not under {odir}: {out}"
+
+    def test_aggregate_passes_tabular_through(self, tmp_path, patched_io, monkeypatch):
+        """A mixed raster+tabular aggregate keeps the tabular output (M3)."""
+        monkeypatch.setattr(backend_mod, "latest_version_dir", lambda url: "V2-0")
+        monkeypatch.setattr(
+            backend_mod,
+            "list_remote_dir",
+            lambda url: ["GHS_DUC_MT_GLOBE_R2023A_V2_0.zip"],
+        )
+
+        def fake_extract(url, dest_dir, **kw):
+            Path(dest_dir).mkdir(parents=True, exist_ok=True)
+            (Path(dest_dir) / "duc.csv").write_text("a\n", encoding="utf-8")
+            return [Path(dest_dir) / "duc.csv"]
+
+        monkeypatch.setattr(backend_mod, "download_and_extract", fake_extract)
+        g = _build(
+            tmp_path, ["GHS_POP", "GHS_DUC"], start="2015-01-01", end="2020-12-31"
+        )
+        out = g.download(
+            progress_bar=False, aggregate=AggregationConfig(freq="100YS", op="mean")
+        )
+        names = [p.name for p in out]
+        assert "GHS_DUC" in names, f"tabular output dropped: {names}"
+        assert any(
+            n.startswith("GHS_POP_mean_") for n in names
+        ), f"missing aggregate: {names}"
+
+    def test_aggregate_mismatched_grids_raise(self, tmp_path):
+        """Per-epoch grids that differ in shape raise a clear error (M1)."""
+        import numpy as np
+
+        g = _build(tmp_path, ["GHS_POP"])
+        t1 = make_tiny_tif(
+            tmp_path / "e1.tif", epsg=4326, values=np.zeros((4, 4), "float32")
+        )
+        t2 = make_tiny_tif(
+            tmp_path / "e2.tif",
+            epsg=4326,
+            geo=(-9.0, 0.25, 0.0, 31.0, 0.0, -0.25),
+            values=np.zeros((3, 3), "float32"),
+        )
+        rps = [
+            backend_mod.RemoteProduct(
+                id=f"GHS_POP_E{e}",
+                metadata={
+                    "product": "GHS_POP",
+                    "epoch": e,
+                    "resolution": "100m",
+                    "categorical": False,
+                    "kind": "raster",
+                },
+            )
+            for e in (2000, 2020)
+        ]
+        with pytest.raises(ValueError, match="differ in shape"):
+            g._aggregate_epochs(
+                rps, [t1, t2], AggregationConfig(freq="100YS", op="mean")
+            )
+
+    def test_fetch_duc_multiple_zips_picks_sorted_first(self, tmp_path, monkeypatch):
+        """Multiple table zips -> the sorted-first is downloaded with a warning (L5)."""
+        monkeypatch.setattr(backend_mod, "latest_version_dir", lambda url: "V2-0")
+        monkeypatch.setattr(
+            backend_mod, "list_remote_dir", lambda url: ["b_V2_0.zip", "a_V2_0.zip"]
+        )
+        captured: dict = {}
+
+        def fake_extract(url, dest_dir, **kw):
+            Path(dest_dir).mkdir(parents=True, exist_ok=True)
+            captured["url"] = url
+            return []
+
+        monkeypatch.setattr(backend_mod, "download_and_extract", fake_extract)
+        _build(tmp_path, ["GHS_DUC"]).download(progress_bar=False)
+        assert captured["url"].endswith(
+            "a_V2_0.zip"
+        ), f"expected sorted-first zip, got {captured}"
+
+    def test_close_dataset_swallows_close_error(self):
+        """_close_dataset never raises when close() fails."""
+
+        class _Boom:
+            def close(self):
+                raise RuntimeError("boom")
+
+        _close_dataset(_Boom())
