@@ -205,6 +205,13 @@ nav:
       - Authentication: reference/usgs-water/authentication.md
       - Available data: reference/usgs-water/datasets.md
       - Reference: reference/usgs-water/usgs_water.md
+    - GHSL (human settlement):
+      - Introduction: reference/ghsl/introduction.md
+      - Authentication: reference/ghsl/authentication.md
+      - Usage: reference/ghsl/usage.md
+      - Available datasets: reference/ghsl/products.md
+      - Projections & tiling: reference/ghsl/projections.md
+      - Reference: reference/ghsl/ghsl.md
   - Examples:
     - Authentication: examples/authentication.md
     - Data Sources: examples/data-sources.md
