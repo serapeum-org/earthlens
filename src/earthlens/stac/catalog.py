@@ -331,7 +331,7 @@ class Catalog(AbstractCatalog):
             self.available_collections = loaded.available_collections
             self.datasets = loaded.datasets
         if not self.providers:
-            self.providers = self.endpoints
+            self.providers = dict(self.endpoints)
         if not self.available_datasets:
             self.available_datasets = sorted(
                 {cid for ids in self.available_collections.values() for cid in ids}

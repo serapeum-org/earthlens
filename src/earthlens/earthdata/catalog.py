@@ -510,7 +510,7 @@ class Catalog(AbstractCatalog):
             self.datasets = loaded.datasets
             self.daacs = loaded.daacs
         if not self.providers:
-            self.providers = self.daacs
+            self.providers = dict(self.daacs)
         super().model_post_init(__context)
 
     @classmethod

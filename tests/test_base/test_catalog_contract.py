@@ -193,3 +193,21 @@ def test_tropycal_get_variable_aliases_get_field():
     assert cat.get_variable("north_atlantic", "mslp") is cat.get_field(
         "north_atlantic", "mslp"
     )
+
+
+def test_earthdata_providers_is_a_copy_of_daacs():
+    """earthdata providers mirrors daacs by content but is a distinct dict."""
+    from earthlens.earthdata import Catalog
+
+    cat = Catalog()
+    assert cat.providers == cat.daacs
+    assert cat.providers is not cat.daacs
+
+
+def test_stac_providers_is_a_copy_of_endpoints():
+    """stac providers mirrors endpoints by content but is a distinct dict."""
+    from earthlens.stac import Catalog
+
+    cat = Catalog()
+    assert cat.providers == cat.endpoints
+    assert cat.providers is not cat.endpoints
