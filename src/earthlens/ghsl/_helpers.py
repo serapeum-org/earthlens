@@ -334,7 +334,9 @@ def latest_version_dir(
     for name in list_remote_dir(family_url, session=session):
         match = _VERSION_RE.match(name.rstrip("/"))
         if match:
-            versions.append((int(match.group(1)), int(match.group(2)), name.rstrip("/")))
+            versions.append(
+                (int(match.group(1)), int(match.group(2)), name.rstrip("/"))
+            )
     if not versions:
         raise ValueError(f"no V{{maj}}-{{min}} version directory under {family_url}.")
     versions.sort()

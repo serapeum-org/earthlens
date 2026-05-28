@@ -136,9 +136,7 @@ class GHSL(AbstractDataSource):
                 'e.g. ["GHS_POP"] or ["population"].'
             )
         if api not in _API_MODES:
-            raise ValueError(
-                f"api must be one of {sorted(_API_MODES)}; got {api!r}."
-            )
+            raise ValueError(f"api must be one of {sorted(_API_MODES)}; got {api!r}.")
         if tiling not in _TILING_MODES:
             raise ValueError(
                 f"tiling must be one of {sorted(_TILING_MODES)}; got {tiling!r}."
@@ -342,9 +340,9 @@ class GHSL(AbstractDataSource):
             list[Path]: The per-window reduced GeoTIFFs written under
                 `self.path`.
         """
-        import numpy as np
         from collections import defaultdict
 
+        import numpy as np
         from pyramids.dataset import Dataset
 
         from earthlens.aggregate import _reduce, _window_groups
@@ -478,7 +476,9 @@ class GHSL(AbstractDataSource):
         is_tiled = resolution in block.tiled() and self._tiling != "global"
         if not is_tiled:
             return [
-                ghsl_url(family, code, epoch, self._release, resolution, version=version)
+                ghsl_url(
+                    family, code, epoch, self._release, resolution, version=version
+                )
             ]
         tiles = tiles_for_bbox(self._bbox)
         if not tiles:
@@ -488,7 +488,9 @@ class GHSL(AbstractDataSource):
                 "AOI, a coarser whole-globe resolution, or tiling='global'."
             )
         return [
-            ghsl_url(family, code, epoch, self._release, resolution, tile=t, version=version)
+            ghsl_url(
+                family, code, epoch, self._release, resolution, tile=t, version=version
+            )
             for t in tiles
         ]
 
@@ -615,9 +617,7 @@ class GHSL(AbstractDataSource):
                     "legend sidecar is still written."
                 )
 
-        target = Path(self.path) / (
-            f"{rp.id}_{resolution}_epsg{self._output_epsg}.tif"
-        )
+        target = Path(self.path) / (f"{rp.id}_{resolution}_epsg{self._output_epsg}.tif")
         cropped.to_file(str(target))
         if categorical:
             self._write_legend_sidecar(target, rp.metadata["product"])
@@ -701,9 +701,7 @@ class GHSL(AbstractDataSource):
         version_url = f"{family_url}/{version}"
         zips = [n for n in list_remote_dir(version_url) if n.endswith(".zip")]
         if not zips:
-            raise ValueError(
-                f"no .zip table found under {version_url} for {code}."
-            )
+            raise ValueError(f"no .zip table found under {version_url} for {code}.")
         dest = Path(self.path) / code
         download_and_extract(f"{version_url}/{zips[0]}", dest)
         return dest

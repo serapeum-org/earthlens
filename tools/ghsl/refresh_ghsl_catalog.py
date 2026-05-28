@@ -49,7 +49,9 @@ from earthlens.ghsl._helpers import (  # noqa: E402
 from earthlens.ghsl.catalog import Catalog  # noqa: E402
 
 #: JRC 54009 land tile schema shapefile (redirects to the Copernicus mirror).
-_TILE_SCHEMA_ZIP = "https://ghsl.jrc.ec.europa.eu/download/GHSL_data_54009_shapefile.zip"
+_TILE_SCHEMA_ZIP = (
+    "https://ghsl.jrc.ec.europa.eu/download/GHSL_data_54009_shapefile.zip"
+)
 #: A small Moroccan-coast AOI inside the verified R6_C18 land tile.
 _LAND_BBOX = (-9.0, 30.5, -8.5, 31.0)
 
@@ -72,15 +74,17 @@ def _sample_url(catalog: Catalog, code: str, release: str) -> str | None:
     if product.kind == "tabular":
         family_url = f"{BASE_URL}/{family}_GLOBE_{release}"
         version = latest_version_dir(family_url)
-        zips = [n for n in list_remote_dir(f"{family_url}/{version}")
-                if n.endswith(".zip")]
+        zips = [
+            n for n in list_remote_dir(f"{family_url}/{version}") if n.endswith(".zip")
+        ]
         return f"{family_url}/{version}/{zips[0]}" if zips else None
     resolution = block.resolutions[0]
     if resolution in block.tiled():
         tiles = tiles_for_bbox(_LAND_BBOX)
         tile = tiles[0] if tiles else "R6_C18"
-        return ghsl_url(family, code, epoch, release, resolution,
-                        tile=tile, version=block.version)
+        return ghsl_url(
+            family, code, epoch, release, resolution, tile=tile, version=block.version
+        )
     return ghsl_url(family, code, epoch, release, resolution, version=block.version)
 
 
@@ -163,9 +167,10 @@ def _build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     sub = parser.add_subparsers(dest="command", required=True)
 
-    p_validate = sub.add_parser("validate", help="HEAD curated artefacts + check legends")
-    p_validate.add_argument("--strict", action="store_true",
-                            help="exit 1 on any drift")
+    p_validate = sub.add_parser(
+        "validate", help="HEAD curated artefacts + check legends"
+    )
+    p_validate.add_argument("--strict", action="store_true", help="exit 1 on any drift")
     p_validate.set_defaults(func=_validate)
 
     p_probe = sub.add_parser("probe", help="list the live (epoch, resolution) combos")

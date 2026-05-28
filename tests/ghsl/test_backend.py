@@ -17,8 +17,11 @@ from tests.ghsl.conftest import make_tiny_tif
 def _build(tmp_path: Path, variables, **kw) -> GHSL:
     """Construct a GHSL bound to a tmp output dir over a Moroccan AOI."""
     defaults = dict(
-        start="2020-01-01", end="2020-12-31", lat_lim=[30.5, 31.0],
-        lon_lim=[-9.0, -8.5], path=str(tmp_path),
+        start="2020-01-01",
+        end="2020-12-31",
+        lat_lim=[30.5, 31.0],
+        lon_lim=[-9.0, -8.5],
+        path=str(tmp_path),
     )
     defaults.update(kw)
     return GHSL(variables=variables, **defaults)
@@ -51,9 +54,10 @@ def patched_io(monkeypatch, tmp_path):
 class TestEpsgInt:
     """EPSG-code parsing."""
 
-    @pytest.mark.parametrize("value, expected",
-                             [("EPSG:4326", 4326), ("4326", 4326), (3035, 3035),
-                              ("epsg:3857", 3857)])
+    @pytest.mark.parametrize(
+        "value, expected",
+        [("EPSG:4326", 4326), ("4326", 4326), (3035, 3035), ("epsg:3857", 3857)],
+    )
     def test_parses(self, value, expected):
         """Common EPSG spellings parse to the integer code."""
         assert _epsg_int(value) == expected
@@ -117,7 +121,11 @@ class TestGridsAndDates:
         """The bbox is exposed via the SpatialExtent edges."""
         g = _build(tmp_path, ["GHS_POP"])
         assert (g.space.west, g.space.south, g.space.east, g.space.north) == (
-            -9.0, 30.5, -8.5, 31.0)
+            -9.0,
+            30.5,
+            -8.5,
+            31.0,
+        )
 
     def test_check_input_dates(self, tmp_path):
         """The window parses into a TemporalExtent with year-start cadence."""
@@ -189,8 +197,11 @@ class TestUrlsForAndSearch:
         """_search emits one raster product per (product, epoch)."""
         g = _build(tmp_path, ["GHS_POP"], start="2000-01-01", end="2010-12-31")
         plan = g._search()
-        assert [p.id for p in plan] == ["GHS_POP_E2000", "GHS_POP_E2005",
-                                        "GHS_POP_E2010"]
+        assert [p.id for p in plan] == [
+            "GHS_POP_E2000",
+            "GHS_POP_E2005",
+            "GHS_POP_E2010",
+        ]
         assert plan[0].metadata["kind"] == "raster"
 
     def test_search_tabular_flag(self, tmp_path):
@@ -240,16 +251,18 @@ class TestAggregate:
     def test_aggregate_mean_across_epochs(self, tmp_path, patched_io):
         """aggregate= reduces the per-epoch stack into one window raster."""
         g = _build(tmp_path, ["GHS_POP"], start="2015-01-01", end="2020-12-31")
-        out = g.download(progress_bar=False,
-                         aggregate=AggregationConfig(freq="100YS", op="mean"))
+        out = g.download(
+            progress_bar=False, aggregate=AggregationConfig(freq="100YS", op="mean")
+        )
         assert len(out) == 1 and out[0].name.startswith("GHS_POP_mean_")
 
     def test_aggregate_categorical_rejected(self, tmp_path):
         """aggregate= on a categorical product is rejected up front."""
         g = _build(tmp_path, ["GHS_SMOD"], resolution="30ss")
         with pytest.raises(ValueError, match="cannot aggregate class codes"):
-            g.download(progress_bar=False,
-                       aggregate=AggregationConfig(freq="100YS", op="mean"))
+            g.download(
+                progress_bar=False, aggregate=AggregationConfig(freq="100YS", op="mean")
+            )
 
 
 @pytest.mark.ghsl
@@ -267,8 +280,11 @@ class TestTabularFetch:
             return [Path(dest_dir) / "duc.csv"]
 
         monkeypatch.setattr(backend_mod, "latest_version_dir", lambda url: "V2-0")
-        monkeypatch.setattr(backend_mod, "list_remote_dir",
-                            lambda url: ["GHS_DUC_MT_GLOBE_R2023A_V2_0.zip"])
+        monkeypatch.setattr(
+            backend_mod,
+            "list_remote_dir",
+            lambda url: ["GHS_DUC_MT_GLOBE_R2023A_V2_0.zip"],
+        )
         monkeypatch.setattr(backend_mod, "download_and_extract", fake_extract)
         g = _build(tmp_path, ["GHS_DUC"])
         out = g.download(progress_bar=False)
@@ -278,7 +294,9 @@ class TestTabularFetch:
     def test_fetch_duc_no_zip_raises(self, tmp_path, monkeypatch):
         """_fetch_duc raises when the version dir has no .zip."""
         monkeypatch.setattr(backend_mod, "latest_version_dir", lambda url: "V2-0")
-        monkeypatch.setattr(backend_mod, "list_remote_dir", lambda url: ["copyright.txt"])
+        monkeypatch.setattr(
+            backend_mod, "list_remote_dir", lambda url: ["copyright.txt"]
+        )
         g = _build(tmp_path, ["GHS_DUC"])
         with pytest.raises(ValueError, match="no .zip table"):
             g.download(progress_bar=False)

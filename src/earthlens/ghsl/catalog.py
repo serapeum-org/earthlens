@@ -101,6 +101,7 @@ def native_source_crs(resolution: str) -> str:
             f"known: {sorted(RES_TO_SOURCE_CRS)}."
         ) from None
 
+
 #: Resolutions delivered as a Mollweide tile grid (fine) rather than a single
 #: whole-globe file (coarse). Used as the per-product default when a row does
 #: not override `tiled_resolutions`.
@@ -233,7 +234,9 @@ class Product(BaseModel):
                     out.append(res)
         return out
 
-    def block_for(self, release: str, epoch: int, resolution: str) -> Availability | None:
+    def block_for(
+        self, release: str, epoch: int, resolution: str
+    ) -> Availability | None:
         """Return the availability block matching `(epoch, resolution)`, if any.
 
         Args:

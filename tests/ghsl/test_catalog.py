@@ -19,8 +19,13 @@ class TestNativeSourceCrs:
 
     @pytest.mark.parametrize(
         "resolution, expected",
-        [("10m", "54009"), ("100m", "54009"), ("1km", "54009"),
-         ("3ss", "4326"), ("30ss", "4326")],
+        [
+            ("10m", "54009"),
+            ("100m", "54009"),
+            ("1km", "54009"),
+            ("3ss", "4326"),
+            ("30ss", "4326"),
+        ],
     )
     def test_known_resolutions(self, resolution, expected):
         """Metric resolutions map to 54009, arc-second to 4326."""

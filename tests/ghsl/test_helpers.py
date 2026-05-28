@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import zipfile
-from pathlib import Path
 
 import pytest
 
@@ -70,8 +69,9 @@ class TestTilesForBbox:
     def test_results_are_sorted_natural(self):
         """A wider AOI returns tiles sorted by (row, col)."""
         hits = tiles_for_bbox((-10.0, 35.0, -2.0, 44.0))
-        assert hits == sorted(hits, key=lambda t: (int(t.split("_")[0][1:]),
-                                                   int(t.split("_")[1][1:])))
+        assert hits == sorted(
+            hits, key=lambda t: (int(t.split("_")[0][1:]), int(t.split("_")[1][1:]))
+        )
         assert len(hits) >= 1
 
 
@@ -79,8 +79,9 @@ class TestTilesForBbox:
 class TestDownloadAndUnzip:
     """Streamed download + unzip selecting the .tif member."""
 
-    def test_extracts_tif_skipping_sidecars(self, tmp_path, fake_session,
-                                            make_response):
+    def test_extracts_tif_skipping_sidecars(
+        self, tmp_path, fake_session, make_response
+    ):
         """The .tif is extracted past the PDF/xlsx sidecars."""
         tif = make_tiny_tif(tmp_path / "src.tif", epsg=4326)
         zpath = zip_with_tif(tif, tmp_path / "GHS_POP_x_V1_0.zip")
@@ -121,8 +122,9 @@ class TestDownloadAndUnzip:
         session = fake_session({})
         monkeypatch.setattr(_helpers.time, "sleep", lambda *_: None)
         with pytest.raises(rq.HTTPError):
-            download_and_unzip(url, tmp_path / "dl", session=session,
-                               retries=2, backoff=0.0)
+            download_and_unzip(
+                url, tmp_path / "dl", session=session, retries=2, backoff=0.0
+            )
 
 
 @pytest.mark.ghsl
@@ -156,8 +158,9 @@ class TestRemoteListing:
         with pytest.raises(ValueError, match="version directory"):
             latest_version_dir(url, session=session)
 
-    def test_download_and_extract_keeps_all_members(self, tmp_path, fake_session,
-                                                    make_response):
+    def test_download_and_extract_keeps_all_members(
+        self, tmp_path, fake_session, make_response
+    ):
         """download_and_extract keeps every member (tabular payload)."""
         zpath = tmp_path / "table_V2_0.zip"
         with zipfile.ZipFile(zpath, "w") as archive:
