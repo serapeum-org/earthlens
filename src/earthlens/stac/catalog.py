@@ -315,7 +315,11 @@ class Catalog(AbstractCatalog):
 
         `Catalog()` with no args reads the bundled `catalog/` directory through
         the `(path, mtime)`-keyed cache. If the caller passed `datasets=...`,
-        the disk read is skipped (in-memory catalogs for tests).
+        the disk read is skipped (in-memory catalogs for tests). The base
+        `available_datasets` field is populated with the flattened, sorted
+        union of the per-endpoint `available_collections` index so it is
+        discoverable through the `AbstractCatalog` contract, then
+        `super().model_post_init` populates `catalog` from `get_catalog()`.
 
         Raises:
             ValueError: When auto-loading, propagates the same errors as
@@ -326,6 +330,10 @@ class Catalog(AbstractCatalog):
             self.endpoints = loaded.endpoints
             self.available_collections = loaded.available_collections
             self.datasets = loaded.datasets
+        if not self.available_datasets:
+            self.available_datasets = sorted(
+                {cid for ids in self.available_collections.values() for cid in ids}
+            )
         super().model_post_init(__context)
 
     @classmethod

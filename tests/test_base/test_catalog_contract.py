@@ -64,3 +64,25 @@ def test_dict_surface_matches_datasets(module_name: str, class_name: str):
     assert set(cat) == set(cat.datasets)
     first = next(iter(cat.datasets))
     assert first in cat
+
+
+#: Collection backends that keep a domain `available_collections` index and
+#: mirror it into the base `available_datasets` field. `"list"` backends carry
+#: a flat list; `"dict"` (stac) carries a per-endpoint dict that is flattened.
+COLLECTION_INDEX_BACKENDS = [
+    ("earthlens.openeo.catalog", "list"),
+    ("earthlens.sentinel_hub.catalog", "list"),
+    ("earthlens.stac.catalog", "dict"),
+]
+
+
+@pytest.mark.parametrize("module_name, shape", COLLECTION_INDEX_BACKENDS)
+def test_available_datasets_mirrors_collection_index(module_name: str, shape: str):
+    """The base available_datasets field mirrors the domain collection index."""
+    cat = _build(module_name, "Catalog")
+    assert cat.available_datasets
+    if shape == "list":
+        assert set(cat.available_datasets) == set(cat.available_collections)
+    else:
+        flat = {cid for ids in cat.available_collections.values() for cid in ids}
+        assert set(cat.available_datasets) == flat

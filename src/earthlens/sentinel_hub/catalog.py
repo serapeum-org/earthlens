@@ -394,6 +394,10 @@ class Catalog(AbstractCatalog):
         `Catalog()` with no args reads the bundled `catalog/` directory through
         the `(path, mtime)`-keyed cache. If the caller passed `datasets=` or
         `recipes=`, the disk read is skipped (in-memory catalogs for tests).
+        The base `available_datasets` field is mirrored from
+        `available_collections` so the index is discoverable through the
+        `AbstractCatalog` contract, then `super().model_post_init` populates
+        `catalog` from `get_catalog()`.
 
         Raises:
             ValueError: When auto-loading, propagates the loader's errors.
@@ -403,6 +407,8 @@ class Catalog(AbstractCatalog):
             self.datasets = loaded.datasets
             self.recipes = loaded.recipes
             self.available_collections = loaded.available_collections
+        if not self.available_datasets:
+            self.available_datasets = list(self.available_collections)
         super().model_post_init(__context)
 
     @classmethod
