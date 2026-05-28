@@ -362,9 +362,16 @@ class GHSL(AbstractDataSource):
             epochs = [epoch for epoch, _, _ in items]
             resolution = items[0][1]
             datasets = [Dataset.read_file(str(path)) for _, _, path in items]
-            stack = np.stack(
-                [self._first_band(ds.read_array()) for ds in datasets]
-            ).astype("float64")
+            bands = [self._first_band(ds.read_array()) for ds in datasets]
+            shapes = {epoch: band.shape for epoch, band in zip(epochs, bands)}
+            if len(set(shapes.values())) > 1:
+                raise ValueError(
+                    f"cannot aggregate {code}: its per-epoch grids differ in "
+                    f"shape and cannot be stacked — {shapes}. This usually means "
+                    "the epochs resolved to different tile sets or a download was "
+                    "incomplete; re-run, or request a single epoch."
+                )
+            stack = np.stack(bands).astype("float64")
             time_axis = pd.to_datetime([f"{epoch}-01-01" for epoch in epochs])
             geo = datasets[0].geotransform
             nodata = datasets[0].no_data_value
