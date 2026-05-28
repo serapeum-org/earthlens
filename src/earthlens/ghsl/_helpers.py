@@ -269,6 +269,7 @@ def download_and_unzip(
     zip_path = dest_dir / zip_name
     _download(url, zip_path, session, retries, backoff, timeout, chunk_size)
     with zipfile.ZipFile(zip_path) as zf:
+        _assert_safe_members(zf, dest_dir)
         members = [m for m in zf.namelist() if m.lower().endswith(".tif")]
         if not members:
             raise ValueError(
@@ -281,6 +282,31 @@ def download_and_unzip(
         extracted.replace(tif_path)
     zip_path.unlink(missing_ok=True)
     return tif_path
+
+
+def _assert_safe_members(zf: zipfile.ZipFile, dest_dir: Path) -> None:
+    """Reject archive members that would extract outside `dest_dir` (Zip Slip).
+
+    The JRC tree is a trusted source, but extracting attacker-controlled member
+    names (CWE-22) is the standard untrusted-archive pitfall, so every member's
+    resolved destination is checked to stay within `dest_dir` before any
+    extraction runs.
+
+    Args:
+        zf: An open `zipfile.ZipFile`.
+        dest_dir: The directory members will be extracted into.
+
+    Raises:
+        ValueError: If any member resolves outside `dest_dir`.
+    """
+    base = dest_dir.resolve()
+    for name in zf.namelist():
+        target = (dest_dir / name).resolve()
+        if target != base and base not in target.parents:
+            raise ValueError(
+                f"refusing to extract unsafe path {name!r} from the archive "
+                f"(escapes {dest_dir})."
+            )
 
 
 #: Matches a GHSL data-version directory name (`V1-0`, `V2-0`, `V1-1`, …).
@@ -375,6 +401,7 @@ def download_and_extract(
     zip_path = dest_dir / url.rsplit("/", 1)[-1]
     _download(url, zip_path, session, retries, backoff, timeout, chunk_size)
     with zipfile.ZipFile(zip_path) as zf:
+        _assert_safe_members(zf, dest_dir)
         members = [m for m in zf.namelist() if not m.endswith("/")]
         zf.extractall(dest_dir)
     zip_path.unlink(missing_ok=True)
