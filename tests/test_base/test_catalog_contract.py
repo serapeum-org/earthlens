@@ -13,6 +13,8 @@ import importlib
 
 import pytest
 
+from earthlens.base import AbstractCatalog
+
 #: (module, catalog-class-name) for every backend that ships a catalog.
 CATALOG_BACKENDS = [
     ("earthlens.chc.catalog", "Catalog"),
@@ -106,3 +108,36 @@ def test_providers_populated_and_resolvable(module_name: str):
     assert cat.providers
     slug = next(iter(cat.providers))
     assert cat.get_provider(slug) is cat.providers[slug]
+
+
+#: Backends with no resolve step inherit the base stub (raises).
+NO_RESOLVE_BACKENDS = [
+    "earthlens.firms.catalog",
+    "earthlens.gdacs.catalog",
+    "earthlens.cmems.catalog",
+]
+#: Backends that override resolve() (signatures vary by backend need).
+RESOLVE_BACKENDS = [
+    "earthlens.nwp.catalog",
+    "earthlens.usgs_water.catalog",
+    "earthlens.stac.catalog",
+    "earthlens.openeo.catalog",
+    "earthlens.sentinel_hub.catalog",
+    "earthlens.earthdata.catalog",
+    "earthlens.eumetsat.catalog",
+]
+
+
+@pytest.mark.parametrize("module_name", NO_RESOLVE_BACKENDS)
+def test_resolve_default_raises(module_name: str):
+    """A backend with no resolve step inherits the raising base stub."""
+    cat = _build(module_name, "Catalog")
+    with pytest.raises(NotImplementedError):
+        cat.resolve("anything")
+
+
+@pytest.mark.parametrize("module_name", RESOLVE_BACKENDS)
+def test_resolve_is_overridden(module_name: str):
+    """Backends with a resolve step override the base stub."""
+    cat = _build(module_name, "Catalog")
+    assert type(cat).resolve is not AbstractCatalog.resolve

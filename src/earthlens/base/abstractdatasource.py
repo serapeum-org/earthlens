@@ -723,6 +723,51 @@ class AbstractCatalog(BaseModel):
                 f"Known providers: {sorted(self.providers)}.{hint}"
             ) from None
 
+    def resolve(self, key: str, *args: Any, **kwargs: Any) -> Any:
+        """Map a user-facing key to the concrete thing a request needs.
+
+        Shared convention for every backend that implements a resolve
+        step: take a *logical* catalog key (a friendly name, collection
+        key, or model key) and return the backend-specific value the
+        download path consumes. The return type and any extra
+        positional / keyword arguments are backend-specific by
+        necessity — the catalogs resolve to different things — so this
+        base method only fixes the *verb*, not the signature. The
+        concrete overrides:
+
+        * `nwp.resolve(model_key)` / `usgs_water.resolve(code_or_name)`
+          — return a model key / 5-digit parameter code (`str`).
+        * `stac.resolve(endpoint, collection_key)` — return the upstream
+          collection id for that endpoint (`str`).
+        * `openeo.resolve(key)` / `sentinel_hub.resolve(key)` — return a
+          normalised request object (a `ResolvedGraph` / `ResolvedRequest`)
+          covering both plain collections and recipes.
+        * `earthdata.resolve(key, daac=None)` /
+          `eumetsat.resolve(key, group=None)` — return the dataset row,
+          with an optional second argument to disambiguate a key shared
+          across DAACs / mission groups.
+
+        Backends without a resolve step address their catalog directly
+        through :meth:`get_dataset` / `__getitem__`.
+
+        Args:
+            key: The logical catalog key to resolve.
+            *args: Backend-specific positional arguments (e.g. the STAC
+                endpoint).
+            **kwargs: Backend-specific keyword arguments (e.g.
+                `daac=` / `group=`).
+
+        Returns:
+            The backend-specific resolved value (see the override list).
+
+        Raises:
+            NotImplementedError: If the backend has no resolve step.
+        """
+        raise NotImplementedError(
+            f"{type(self).__name__} has no resolve() step; address its "
+            "catalog with get_dataset() / [key] instead."
+        )
+
     def __str__(self) -> str:
         """Pretty-print the curated `datasets` map as YAML.
 
