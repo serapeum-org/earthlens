@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -8582,8 +8582,10 @@
 
 
 <h1 id="ghsl-available-datasets"><a class="toclink" href="#ghsl-available-datasets">GHSL — Available datasets</a><a class="headerlink" href="#ghsl-available-datasets" title="Permanent link">#</a></h1>
-<p>The catalog (<code>earthlens.ghsl.Catalog</code>, backed by <code>ghsl_data_catalog.yaml</code>)
-curates <strong>18 GLOBE products</strong> across releases R2023A, R2022A (GHS-LAND), and
+<p>The catalog (<code>earthlens.ghsl.Catalog</code>, backed by the per-family <code>catalog/</code>
+directory — <code>population.yaml</code>, <code>built-up.yaml</code>, <code>settlement.yaml</code>, <code>land.yaml</code>,
+<code>projections.yaml</code>, plus <code>_index.yaml</code>) curates <strong>18 GLOBE products</strong> across
+releases R2023A, R2022A (GHS-LAND), and
 R2025A (GHS-WUP projections). Inspect it programmatically:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.ghsl</span><span class="w"> </span><span class="kn">import</span> <span class="n">Catalog</span>
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="n">cat</span> <span class="o">=</span> <span class="n">Catalog</span><span class="p">()</span>
