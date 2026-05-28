@@ -1,12 +1,19 @@
 """Variable-catalog loader for the CDS-backed ECMWF data source.
 
-Hosts :class:`Catalog`, the pydantic-backed reader for
-`cds_data_catalog.yaml`. Split out of :mod:`earthlens.ecmwf.backend`
-so the request / download machinery and the catalog file-IO live in
-separate modules.
+Hosts :class:`Catalog`, the pydantic-backed reader for the bundled
+CDS catalog. The catalog ships as a directory of per-family YAML files
+under `src/earthlens/ecmwf/catalog/` (`era5.yaml`, `carra.yaml`,
+`cerra.yaml`, `cmip5.yaml`, `cordex.yaml`, `seasonal.yaml`,
+`other.yaml`) plus a single `_index.yaml` carrying the schema header
+and the informational `available_datasets:` list. The loader unions
+every file's `datasets:` block into one :class:`Catalog` at
+construction time (a dataset key declared in two files is a load-time
+error), the same way the GEE / CMEMS catalogs merge. Split out of
+:mod:`earthlens.ecmwf.backend` so the request / download machinery and
+the catalog file-IO live in separate modules.
 
-The YAML's two consumed top-level sections each map to a typed
-field on :class:`Catalog`:
+The two consumed top-level sections each map to a typed field on
+:class:`Catalog`:
 
 * `available_datasets` (informational list of CDS dataset names)
   → :attr:`Catalog.available_datasets`
@@ -22,9 +29,10 @@ in both `reanalysis-era5-single-levels` and
 `reanalysis-era5-land`), so the dataset name is part of the
 identity.
 
-The path to the bundled YAML lives at :data:`CATALOG_PATH`; tests
-can monkey-patch that module attribute to redirect the loader at a
-temporary file.
+The path to the bundled catalog directory lives at
+:data:`CATALOG_PATH`; tests can monkey-patch that module attribute to
+redirect the loader at a temporary directory or single YAML file (the
+loader accepts both).
 
 Examples:
     - Construct the catalog and reach the structural map:
@@ -61,7 +69,7 @@ _LEGACY_MARS_KEYS: frozenset[str] = frozenset(
     {"number_para", "download type", "var_name"}
 )
 
-CATALOG_PATH: Path = Path(__file__).parent / "cds_data_catalog.yaml"
+CATALOG_PATH: Path = Path(__file__).parent / "catalog"
 PROVIDERS_PATH: Path = Path(__file__).parent / "providers.yaml"
 
 # Module-level cache of parsed catalog data, keyed on
@@ -69,7 +77,7 @@ PROVIDERS_PATH: Path = Path(__file__).parent / "providers.yaml"
 # script append) invalidates the entry naturally. Mirrors the GEE
 # pattern (H1 / M2) so repeated `Catalog()` construction is ~1 ms
 # instead of paying the YAML parse + pydantic validation each time.
-_CATALOG_CACHE: dict[tuple[str, int], tuple[list[str], dict[str, "Dataset"]]] = {}
+_CATALOG_CACHE: dict[Any, tuple[list[str], dict[str, "Dataset"]]] = {}
 
 
 def clear_catalog_cache() -> None:
@@ -84,37 +92,82 @@ def clear_catalog_cache() -> None:
     _clear_providers_cache_base()
 
 
+def _yaml_files_for(path: Path) -> list[Path]:
+    """Return the sorted YAML files that contribute to a load.
+
+    `path` may be a directory of per-family `*.yaml` files (the default
+    layout — `era5.yaml`, `carra.yaml`, … plus `_index.yaml` carrying
+    `available_datasets:`), or a single `*.yaml` file (back-compat for
+    tests that monkey-patch :data:`CATALOG_PATH` to a temp file).
+
+    Args:
+        path: Catalog directory or single YAML file.
+
+    Returns:
+        Sorted list of YAML paths.
+
+    Raises:
+        ValueError: If `path` is neither an existing directory nor file.
+    """
+    if path.is_dir():
+        return sorted(path.glob("*.yaml"))
+    if path.is_file():
+        return [path]
+    raise ValueError(
+        f"CDS catalog path {path} does not exist (expected a directory of "
+        "per-family *.yaml files, or a single YAML file)."
+    )
+
+
 def _load_catalog_data(path: Path) -> tuple[list[str], dict[str, "Dataset"]]:
     """Parse, validate, and cache the CDS catalog at `path`.
 
-    Returns a `(available_datasets, datasets)` tuple of the same
-    shape :class:`Catalog` exposes. Cached on
-    `(resolved-path, mtime_ns)` so a second `Catalog()` on an
-    unchanged file skips both YAML parsing and pydantic validation.
+    Returns a `(available_datasets, datasets)` tuple of the same shape
+    :class:`Catalog` exposes. When `path` is a directory, every `*.yaml`
+    is merged: `available_datasets:` lists are concatenated and
+    `datasets:` maps are unioned (a dataset key declared in two files is
+    an error). Cached on the resolved path plus every contributing
+    file's `mtime_ns` so a second `Catalog()` on an unchanged catalog
+    skips both YAML parsing and pydantic validation.
 
     Raises:
-        ValueError: If the YAML is missing, has no `datasets:` block,
+        ValueError: If the catalog is missing, has no `datasets:` block,
             has no variables under any dataset, or declares the same
-            key twice anywhere.
+            dataset key twice anywhere.
     """
     resolved = str(path.resolve())
+    files = _yaml_files_for(path)
     try:
-        mtime_ns = path.stat().st_mtime_ns
+        mtime_tuple = tuple((str(f), f.stat().st_mtime_ns) for f in files)
     except FileNotFoundError:
-        mtime_ns = 0
-    key = (resolved, mtime_ns)
+        mtime_tuple = ((resolved, 0),)
+    key = (resolved, mtime_tuple)
     cached = _CATALOG_CACHE.get(key)
     if cached is not None:
         return cached
 
-    data = load_yaml_strict(path) or {}
-    datasets_yaml = data.get("datasets")
+    available: list[str] = []
+    datasets_yaml: dict[str, Any] = {}
+    seen_in: dict[str, str] = {}
+    for yaml_path in files:
+        data = load_yaml_strict(yaml_path) or {}
+        available += list(data.get("available_datasets") or [])
+        for ds_key, ds_body in (data.get("datasets") or {}).items():
+            if ds_key in datasets_yaml:
+                raise ValueError(
+                    f"duplicate dataset key {ds_key!r}: declared in both "
+                    f"`{seen_in[ds_key]}` and `{yaml_path.name}`. Each CDS "
+                    "dataset key must live in exactly one file."
+                )
+            seen_in[ds_key] = yaml_path.name
+            datasets_yaml[ds_key] = ds_body
+
     if not datasets_yaml:
         raise ValueError(
             f"{path} is missing or has an empty "
             "'datasets' key. The catalog must contain at least "
             "one dataset with one variable. See the schema header "
-            "at the top of the file."
+            "in `_index.yaml`."
         )
 
     structural, total_vars = _build_dataset_map(datasets_yaml, path)
@@ -124,10 +177,9 @@ def _load_catalog_data(path: Path) -> tuple[list[str], dict[str, "Dataset"]]:
         raise ValueError(
             f"{path} has no variables under any dataset. "
             "The catalog must contain at least one variable. "
-            "See the schema header at the top of the file."
+            "See the schema header in `_index.yaml`."
         )
 
-    available = list(data.get("available_datasets") or [])
     _CATALOG_CACHE[key] = (available, structural)
     return _CATALOG_CACHE[key]
 
