@@ -35,7 +35,7 @@ from pathlib import Path
 from typing import Any
 
 from pandas import DataFrame
-from pydantic import BaseModel, ConfigDict, Field, ValidationError
+from pydantic import BaseModel, ConfigDict, Field, PrivateAttr, ValidationError
 
 from earthlens.base import AbstractCatalog
 from earthlens.base.yaml_loader import load_yaml_strict
@@ -305,6 +305,7 @@ class Catalog(AbstractCatalog):
     _catalog_kind: str = "GHSL product catalog"
 
     datasets: dict[str, Product] = Field(default_factory=dict)
+    _alias_index: dict[str, str] = PrivateAttr(default_factory=dict)
 
     def model_post_init(self, __context: Any) -> None:
         """Auto-load the bundled catalog when no products were supplied.
@@ -331,7 +332,7 @@ class Catalog(AbstractCatalog):
             index[code.lower()] = code
             for alias in product.aliases:
                 index[alias.lower()] = code
-        object.__setattr__(self, "_alias_index", index)
+        self._alias_index = index
 
     @classmethod
     def load(cls, catalog_path: Path | None = None) -> Catalog:
@@ -412,7 +413,7 @@ class Catalog(AbstractCatalog):
         """
         import difflib
 
-        index: dict[str, str] = getattr(self, "_alias_index", {})
+        index = self._alias_index
         canonical = index.get(key.lower())
         if canonical is not None:
             return canonical
