@@ -270,10 +270,15 @@ def download_and_unzip(
     _download(url, zip_path, session, retries, backoff, timeout, chunk_size)
     with zipfile.ZipFile(zip_path) as zf:
         _assert_safe_members(zf, dest_dir)
-        members = [m for m in zf.namelist() if m.lower().endswith(".tif")]
+        members = sorted(m for m in zf.namelist() if m.lower().endswith(".tif"))
         if not members:
             raise ValueError(
                 f"GHSL zip {url} contains no .tif member (found {zf.namelist()})."
+            )
+        if len(members) > 1:
+            logger.warning(
+                f"GHSL zip {url} has multiple .tif members {members}; "
+                f"using the first ({members[0]})."
             )
         member = members[0]
         zf.extract(member, dest_dir)
