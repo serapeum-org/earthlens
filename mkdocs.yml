@@ -336,6 +336,8 @@ nav:
       - Built-up surface (live): examples/ghsl/03_builtup_surface.ipynb
       - Built-up growth — aggregate (live): examples/ghsl/04_builtup_growth.ipynb
       - Building height (live): examples/ghsl/05_building_height.ipynb
+      - Settlement classes — SMOD (whole-globe): examples/ghsl/06_settlement_classes.ipynb
+      - Population projection to 2100 — WUP: examples/ghsl/07_wup_projection.ipynb
   - API Reference:
     - EarthLens Facade: reference/earthlens.md
     - AbstractDataSource: reference/abstract-datasource.md
