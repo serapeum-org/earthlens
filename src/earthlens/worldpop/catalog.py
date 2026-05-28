@@ -396,6 +396,18 @@ class Catalog(AbstractCatalog):
 
         Raises:
             ValueError: If `product` is unknown or has no such sub-alias.
+
+        Examples:
+            - Look up a sub-alias and read its scope / resolution:
+                ```python
+                >>> from earthlens.worldpop import Catalog
+                >>> sub = Catalog().subalias("pop", "wpgp")
+                >>> sub.scope
+                'countries'
+                >>> sub.resolution
+                '100m'
+
+                ```
         """
         code = self.resolve(product)
         for sub in self.datasets[code].subaliases:
