@@ -137,9 +137,10 @@ class EarthLens:
             >>> sorted(EarthLens.DataSources)  # doctest: +NORMALIZE_WHITESPACE
             ['amazon-s3', 'cdse', 'chc', 'chirps', 'cmems', 'earth-search',
              'earthdata', 'ecmwf', 'eumetsat', 'fdsn', 'firms', 'gdacs', 'gee',
-             'google-earth-engine', 'nexrad', 'nwis', 'nwp', 'openaq', 'openeo',
-             'overture', 'planetary-computer', 'radar', 'sentinel-hub',
-             'sentinelhub', 'stac', 'tropycal', 'usgs-nwis', 'usgs-water']
+             'ghs', 'ghsl', 'google-earth-engine', 'human-settlement', 'nexrad',
+             'nwis', 'nwp', 'openaq', 'openeo', 'overture', 'planetary-computer',
+             'radar', 'sentinel-hub', 'sentinelhub', 'stac', 'tropycal',
+             'usgs-nwis', 'usgs-water']
 
             ```
         - Asking for an unknown backend raises `ValueError`:
@@ -206,6 +207,12 @@ class EarthLens:
             water quality, …) via `dataretrieval` as a `tabular`
             `DataFrame`; optional `API_USGS_PAT`, anonymous works; keys
             `"usgs-water"` / `"usgs-nwis"` / `"nwis"`.
+        :class:`earthlens.ghsl.GHSL`: JRC Global Human Settlement Layer
+            (population / built-up / settlement-model grids + R2025A WUP
+            projections) over open HTTPS, reprojected / mosaicked / cropped
+            to the AOI via `pyramids` as `raster` GeoTIFFs (one per
+            product × epoch; `aggregate=` reduces across epochs); no
+            credentials; keys `"ghsl"` / `"ghs"` / `"human-settlement"`.
 
     """
 
@@ -251,6 +258,12 @@ class EarthLens:
             # Overture Maps GeoParquet over public S3 (no creds). Vector
             # FeatureCollection output with a per-row license_id column.
             "overture": ("earthlens.overture", "Overture", "overture", {}),
+            # JRC Global Human Settlement Layer (open HTTPS, attribution-only).
+            # Download-and-localise raster: tiles/whole-globe .zip -> pyramids
+            # reproject/mosaic/crop. Aliases "ghs" / "human-settlement".
+            "ghsl": ("earthlens.ghsl", "GHSL", "ghsl", {}),
+            "ghs": ("earthlens.ghsl", "GHSL", "ghsl", {}),
+            "human-settlement": ("earthlens.ghsl", "GHSL", "ghsl", {}),
             "tropycal": ("earthlens.tropycal", "TropicalCyclone", "tropycal", {}),
             # FIRMS needs a free MAP_KEY but no SDK (requests + pandas
             # are core), so like GDACS there is no extra to hint.
