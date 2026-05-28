@@ -40,3 +40,12 @@ def test_cached_load_returns_equal_catalog(module_name: str):
     first = module.Catalog.load()
     second = module.Catalog.load()
     assert set(first.datasets) == set(second.datasets)
+
+
+@pytest.mark.parametrize("module_name", CACHED_BACKENDS)
+def test_load_missing_path_raises(module_name: str, tmp_path):
+    """load() on a non-existent path raises (exercises the mtime guard)."""
+    module = importlib.import_module(module_name)
+    module.clear_catalog_cache()
+    with pytest.raises((FileNotFoundError, ValueError)):
+        module.Catalog.load(tmp_path / "does_not_exist.yaml")

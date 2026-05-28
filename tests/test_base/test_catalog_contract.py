@@ -173,3 +173,23 @@ def test_get_variable_default_raises(module_name: str):
     cat = _build(module_name, "Catalog")
     with pytest.raises(NotImplementedError):
         cat.get_variable("dataset", "leaf")
+
+
+def test_firms_get_variable_aliases_get_column():
+    """firms.get_variable returns the same leaf as get_column."""
+    from earthlens.firms import Catalog
+
+    cat = Catalog()
+    assert cat.get_variable("MODIS_NRT", "confidence") is cat.get_column(
+        "MODIS_NRT", "confidence"
+    )
+
+
+def test_tropycal_get_variable_aliases_get_field():
+    """tropycal.get_variable returns the same leaf as get_field."""
+    from earthlens.tropycal import Catalog
+
+    cat = Catalog()
+    assert cat.get_variable("north_atlantic", "mslp") is cat.get_field(
+        "north_atlantic", "mslp"
+    )
