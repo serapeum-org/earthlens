@@ -23,7 +23,6 @@ from pathlib import Path
 from typing import TYPE_CHECKING
 
 import pandas as pd
-import requests
 from loguru import logger
 
 if TYPE_CHECKING:
@@ -547,6 +546,11 @@ class GHSL(AbstractDataSource):
     def _fetch(self, products: list[RemoteProduct]) -> list[Path]:
         """Download + unzip each product's tiles, then localise via pyramids.
 
+        The per-tile downloads of a product are run concurrently with a bounded
+        `joblib` thread pool (the network is the bottleneck; each
+        `download_and_unzip` is idempotent and uses its own request), then the
+        mosaic / reproject / crop runs once per product.
+
         Args:
             products: The plan from `_search`.
 
@@ -555,21 +559,32 @@ class GHSL(AbstractDataSource):
         """
         if self._api == "stac":
             return self._fetch_via_stac(products)
-        session = requests.Session()
         written: list[Path] = []
-        try:
-            for rp in products:
-                if rp.metadata.get("kind") == "tabular":
-                    written.append(self._fetch_duc(rp))
-                    continue
-                tifs = [
-                    download_and_unzip(url, self._raw_dir, session=session)
-                    for url in rp.metadata["urls"]
-                ]
-                written.append(self._localise(tifs, rp))
-        finally:
-            session.close()
+        for rp in products:
+            if rp.metadata.get("kind") == "tabular":
+                written.append(self._fetch_duc(rp))
+                continue
+            tifs = self._download_tiles(rp.metadata["urls"])
+            written.append(self._localise(tifs, rp))
         return written
+
+    def _download_tiles(self, urls: list[str]) -> list[Path]:
+        """Download + unzip a product's tile URLs concurrently (order preserved).
+
+        Args:
+            urls: The `.zip` URLs for one `(product, epoch)`.
+
+        Returns:
+            list[Path]: The extracted `.tif` paths, in `urls` order.
+        """
+        if len(urls) == 1:
+            return [download_and_unzip(urls[0], self._raw_dir)]
+        from joblib import Parallel, delayed
+
+        n_jobs = min(8, len(urls))
+        return Parallel(n_jobs=n_jobs, prefer="threads")(
+            delayed(download_and_unzip)(url, self._raw_dir) for url in urls
+        )
 
     def _localise(self, tifs: list[Path], rp: RemoteProduct) -> Path:
         """Mosaic + reproject + crop the downloaded tiles into one GeoTIFF.
