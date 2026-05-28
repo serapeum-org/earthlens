@@ -30,6 +30,7 @@ datasets:
     cadence: monthly
     lon_convention: "0-360"
     params:
+      builder: era5
       # ERA5 NCAR key: {stream}/{YYYYMM}/e5.{stream}.{token}.ll025sc.{dates}.nc
       default_stream: e5.oper.an.sfc
     default_variables: [t2m]
@@ -108,6 +109,7 @@ datasets:
     temporal: temporal
     cadence: scene
     params:
+      builder: sentinel2
       collection_prefix: sentinel-s2-l2a-cogs
     default_variables: [B04, B03, B02]
     variables:
@@ -138,6 +140,7 @@ datasets:
     temporal: temporal
     cadence: scene
     params:
+      builder: goes
       default_product: ABI-L2-CMIPF
       satellites: {goes16: noaa-goes16, goes18: noaa-goes18}
     default_variables: [C02]
@@ -164,6 +167,7 @@ datasets:
     temporal: static
     cadence: static
     params:
+      builder: copernicus_dem
       tile_degrees: 1
       resolution_token: "10"        # _COG_10_ (30 m); 90 m uses copernicus-dem-90m
       resolutions: {30m: copernicus-dem-30m, 90m: copernicus-dem-90m}
@@ -187,6 +191,7 @@ datasets:
     temporal: static
     cadence: static
     params:
+      builder: esa_worldcover
       tile_degrees: 3
       default_epoch: "2021"
       epochs: {"2020": v100, "2021": v200}
