@@ -260,10 +260,11 @@ class EarthLens:
             "overture": ("earthlens.overture", "Overture", "overture", {}),
             # JRC Global Human Settlement Layer (open HTTPS, attribution-only).
             # Download-and-localise raster: tiles/whole-globe .zip -> pyramids
-            # reproject/mosaic/crop. Aliases "ghs" / "human-settlement".
-            "ghsl": ("earthlens.ghsl", "GHSL", "ghsl", {}),
-            "ghs": ("earthlens.ghsl", "GHSL", "ghsl", {}),
-            "human-settlement": ("earthlens.ghsl", "GHSL", "ghsl", {}),
+            # reproject/mosaic/crop. No extra SDK (requests + pyramids are core),
+            # so no extra to hint. Aliases "ghs" / "human-settlement".
+            "ghsl": ("earthlens.ghsl", "GHSL", "", {}),
+            "ghs": ("earthlens.ghsl", "GHSL", "", {}),
+            "human-settlement": ("earthlens.ghsl", "GHSL", "", {}),
             "tropycal": ("earthlens.tropycal", "TropicalCyclone", "tropycal", {}),
             # FIRMS needs a free MAP_KEY but no SDK (requests + pandas
             # are core), so like GDACS there is no extra to hint.
