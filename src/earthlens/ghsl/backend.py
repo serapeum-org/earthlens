@@ -34,7 +34,7 @@ from earthlens.base.abstractdatasource import (
 )
 from earthlens.ghsl._helpers import download_and_unzip, ghsl_url, tiles_for_bbox
 from earthlens.ghsl.auth import GhslAuth
-from earthlens.ghsl.catalog import Catalog
+from earthlens.ghsl.catalog import Catalog, native_source_crs
 
 #: Allowed values for the `api=` access-path selector.
 _API_MODES: frozenset[str] = frozenset({"direct", "stac"})
@@ -442,10 +442,66 @@ class GHSL(AbstractDataSource):
         return written
 
     def _localise(self, tifs: list[Path], rp: RemoteProduct) -> Path:
-        """Mosaic + reproject + crop the downloaded tiles (implemented in `C5`)."""
-        raise NotImplementedError(
-            "GHSL._localise (mosaic + reproject + crop) is implemented in C5."
+        """Mosaic + reproject + crop the downloaded tiles into one GeoTIFF.
+
+        The pyramids-consuming core: `merge_rasters` mosaics the tiles **and**
+        reprojects them to the output CRS in one call (skipped when the source
+        already matches the output CRS), then `Dataset.crop` clips to the AOI
+        bbox. Categorical products reproject with nearest-neighbour (so class
+        codes are never blended) and carry their colour table.
+
+        Args:
+            tifs: The downloaded source `.tif` tiles (Mollweide or WGS84).
+            rp: The `RemoteProduct` (its `metadata` carries `product`,
+                `epoch`, `resolution`, `categorical`).
+
+        Returns:
+            pathlib.Path: The AOI-cropped GeoTIFF written under `self.path`.
+        """
+        from pyramids.dataset import Dataset
+        from pyramids.dataset.merge import merge_rasters
+
+        resolution = rp.metadata["resolution"]
+        categorical = rp.metadata["categorical"]
+        resampling = "nearest neighbor" if categorical else "bilinear"
+        source_is_wgs84 = native_source_crs(resolution) == "4326"
+        reproject = not (source_is_wgs84 and self._output_epsg == 4326)
+        dst_crs = self._output_epsg if reproject else None
+
+        self._raw_dir.mkdir(parents=True, exist_ok=True)
+        merged = self._raw_dir / f"{rp.id}_merged.tif"
+        merge_rasters(
+            src=[str(t) for t in tifs],
+            dst=str(merged),
+            dst_crs=dst_crs,
+            resampling=resampling,
         )
+
+        dataset = Dataset.read_file(str(merged))
+        cropped = dataset.crop(
+            bbox=[self.space.west, self.space.south, self.space.east, self.space.north],
+            epsg=4326,
+            touch=False,
+        )
+        if categorical:
+            cropped.color_table = self._catalog.get(
+                rp.metadata["product"]
+            ).color_table()
+
+        target = Path(self.path) / (
+            f"{rp.id}_{resolution}_epsg{self._output_epsg}.tif"
+        )
+        cropped.to_file(str(target))
+        _close_dataset(dataset)
+        _close_dataset(cropped)
+        # Best-effort cleanup of the merge intermediate; on Windows the GDAL
+        # handle can briefly outlive the Python object, so a locked file is
+        # left in the cache rather than raising.
+        try:
+            merged.unlink(missing_ok=True)
+        except OSError:
+            pass
+        return target
 
     def _fetch_via_stac(self, products: list[RemoteProduct]) -> list[Path]:
         """Fetch via the optional JRC STAC search path (implemented in `C9`)."""
@@ -458,6 +514,24 @@ class GHSL(AbstractDataSource):
         raise NotImplementedError(
             "GHSL tabular products (DUC / WUP statistics) are implemented in C7."
         )
+
+
+def _close_dataset(dataset: object) -> None:
+    """Release a pyramids `Dataset`'s underlying GDAL handle if it exposes one.
+
+    pyramids `Dataset` objects may hold an open GDAL dataset; closing it lets
+    the OS release the file lock (notably on Windows) before the intermediate
+    is deleted. A no-op when the object has no `close`.
+
+    Args:
+        dataset: A pyramids `Dataset` (or anything with an optional `close`).
+    """
+    closer = getattr(dataset, "close", None)
+    if callable(closer):
+        try:
+            closer()
+        except Exception:  # noqa: BLE001 - best-effort handle release
+            pass
 
 
 def _epsg_int(crs: str | int) -> int:
