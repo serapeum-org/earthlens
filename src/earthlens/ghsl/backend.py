@@ -333,11 +333,13 @@ class GHSL(AbstractDataSource):
         Args:
             products: The plan from `_search` (same order as `paths`).
             paths: The per-`(product, epoch)` GeoTIFFs from `_fetch`.
-            config: The aggregation spec (`freq`, `op`, `min_count`).
+            config: The aggregation spec (`freq`, `op`, `skipna`, `min_count`,
+                `out_dir`).
 
         Returns:
-            list[Path]: The per-window reduced GeoTIFFs written under
-                `self.path`.
+            list[Path]: The per-window reduced GeoTIFFs (written under
+                `config.out_dir` when set, else `self.path`), plus any tabular
+                product outputs passed through unchanged.
         """
         from collections import defaultdict
 
@@ -347,6 +349,8 @@ class GHSL(AbstractDataSource):
         from earthlens.aggregate import _reduce, _window_groups
 
         op = "mean" if config.op == "auto" else config.op
+        out_dir = Path(config.out_dir) if config.out_dir is not None else Path(self.path)
+        out_dir.mkdir(parents=True, exist_ok=True)
         groups: dict[str, list[tuple[int, str, Path]]] = defaultdict(list)
         # Tabular products have no epoch stack to reduce; pass their written
         # outputs through unchanged rather than dropping them from the result.
@@ -381,7 +385,10 @@ class GHSL(AbstractDataSource):
             fill = nodata[0] if isinstance(nodata, (list, tuple)) else nodata
             for label, mask in _window_groups(time_axis, config.freq):
                 reduced = _reduce(
-                    stack[mask], op, skipna=True, min_count=config.min_count
+                    stack[mask],
+                    op,
+                    skipna=config.skipna,
+                    min_count=config.min_count,
                 )
                 result = Dataset.create_from_array(
                     reduced,
@@ -389,7 +396,7 @@ class GHSL(AbstractDataSource):
                     epsg=self._output_epsg,
                     no_data_value=fill if fill is not None else -9999,
                 )
-                target = Path(self.path) / (
+                target = out_dir / (
                     f"{code}_{op}_{label.strftime('%Y')}_{resolution}"
                     f"_epsg{self._output_epsg}.tif"
                 )
