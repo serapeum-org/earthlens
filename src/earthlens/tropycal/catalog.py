@@ -294,6 +294,22 @@ class Catalog(AbstractCatalog):
         """
         return self.get_basin(code).fields[field]
 
+    def get_variable(self, code: str, field: str) -> TrackField:
+        """Leaf accessor for the shared two-arg get_variable contract.
+
+        Alias of :meth:`get_field` so the tropycal leaf is reachable
+        under the same `get_variable(dataset_key, variable_name)` verb
+        the other two-level catalogs use.
+
+        Args:
+            code: A tropycal basin code.
+            field: A track-field short code.
+
+        Returns:
+            TrackField: The matching field metadata.
+        """
+        return self.get_field(code, field)
+
     def sources_for(self, code: str) -> list[str]:
         """Return the data sources that serve a basin.
 

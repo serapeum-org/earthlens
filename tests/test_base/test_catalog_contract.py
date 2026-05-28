@@ -141,3 +141,35 @@ def test_resolve_is_overridden(module_name: str):
     """Backends with a resolve step override the base stub."""
     cat = _build(module_name, "Catalog")
     assert type(cat).resolve is not AbstractCatalog.resolve
+
+
+#: Two-level backends expose the shared 2-arg get_variable(dataset, leaf).
+LEAF_BACKENDS = [
+    "earthlens.chc.catalog",
+    "earthlens.ecmwf.catalog",
+    "earthlens.cmems.catalog",
+    "earthlens.gee.catalog",
+    "earthlens.firms.catalog",
+    "earthlens.tropycal.catalog",
+]
+#: Single-level backends (one row is the leaf) inherit the raising base stub.
+NO_LEAF_BACKENDS = [
+    "earthlens.fdsn.catalog",
+    "earthlens.gdacs.catalog",
+    "earthlens.overture.catalog",
+]
+
+
+@pytest.mark.parametrize("module_name", LEAF_BACKENDS)
+def test_get_variable_is_two_arg_override(module_name: str):
+    """Two-level catalogs override get_variable with the 2-arg contract."""
+    cat = _build(module_name, "Catalog")
+    assert type(cat).get_variable is not AbstractCatalog.get_variable
+
+
+@pytest.mark.parametrize("module_name", NO_LEAF_BACKENDS)
+def test_get_variable_default_raises(module_name: str):
+    """Single-level catalogs inherit the raising base get_variable stub."""
+    cat = _build(module_name, "Catalog")
+    with pytest.raises(NotImplementedError):
+        cat.get_variable("dataset", "leaf")

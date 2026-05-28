@@ -316,6 +316,22 @@ class Catalog(AbstractCatalog):
         """
         return self.get_sensor(code).columns[column]
 
+    def get_variable(self, code: str, column: str) -> SensorColumn:
+        """Leaf accessor for the shared two-arg get_variable contract.
+
+        Alias of :meth:`get_column` so the FIRMS leaf is reachable under
+        the same `get_variable(dataset_key, variable_name)` verb the
+        other two-level catalogs use.
+
+        Args:
+            code: A FIRMS source code.
+            column: A CSV column name declared under that sensor.
+
+        Returns:
+            SensorColumn: The matching column metadata.
+        """
+        return self.get_column(code, column)
+
     def codes(self) -> list[str]:
         """Return the registered FIRMS sensor codes, sorted.
 

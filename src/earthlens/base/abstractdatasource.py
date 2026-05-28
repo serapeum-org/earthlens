@@ -640,9 +640,40 @@ class AbstractCatalog(BaseModel):
         """
         raise NotImplementedError
 
-    def get_variable(self, var_name: str) -> Any:
-        """get the details of a specific variable."""
-        return self.catalog.get(var_name)
+    def get_variable(self, dataset_key: str, variable_name: str) -> Any:
+        """Return one leaf (variable / band / asset) of a dataset.
+
+        Shared two-argument contract for the two-level catalogs: a leaf
+        is addressed by its `(dataset_key, variable_name)` pair, because
+        the same leaf code can appear under more than one dataset (e.g.
+        `"2m-temperature"` lives under several CDS datasets). Concrete
+        overrides return their typed leaf row and raise `ValueError`
+        (with a did-you-mean hint) on an unknown key:
+
+        * chc / ecmwf / cmems — return a `Variable`.
+        * gee — return a `Band` (also exposed as `get_band`).
+        * firms — return a `SensorColumn` (also exposed as `get_column`).
+        * tropycal — return a `TrackField` (also exposed as `get_field`).
+
+        Single-level catalogs (where one row *is* the leaf — fdsn, gdacs,
+        radar, openaq, overture, usgs_water) do not implement this; their
+        rows are addressed directly with :meth:`get_dataset` / `[key]`.
+
+        Args:
+            dataset_key: The parent dataset / collection key.
+            variable_name: The leaf code within that dataset.
+
+        Returns:
+            The backend-specific leaf row.
+
+        Raises:
+            NotImplementedError: If the backend has no per-dataset leaf
+                level.
+        """
+        raise NotImplementedError(
+            f"{type(self).__name__} has no per-dataset variable level; "
+            "address its rows with get_dataset() / [key]."
+        )
 
     # -- shared dict-like surface over `datasets` (M1 from catalog-cross-backend-comparison)
 
