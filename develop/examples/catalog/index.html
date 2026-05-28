@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -8399,7 +8399,8 @@ formats, and a per-variable map.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">cat</span><span class="o">.</span><span class="n">describe</span><span class="p">(</span><span class="s2">&quot;chirps-v3-global-monthly&quot;</span><span class="p">)</span>
 </code></pre></div>
 <h2 id="ecmwf-copernicus-climate-data-store"><a class="toclink" href="#ecmwf-copernicus-climate-data-store">ECMWF (Copernicus Climate Data Store)</a><a class="headerlink" href="#ecmwf-copernicus-climate-data-store" title="Permanent link">#</a></h2>
-<p>The ECMWF catalog is shipped as <code>cds_data_catalog.yaml</code> (package data)
+<p>The ECMWF catalog is shipped as the <code>catalog/</code> directory (per-family
+<code>*.yaml</code> files + <code>_index.yaml</code>, package data)
 and exposes a structural map keyed by CDS dataset short name. Each
 dataset block carries its monthly-aggregate variant, parent-level
 extras, and a per-variable map. There is no flat per-code lookup —
@@ -8514,9 +8515,9 @@ across three core datasets:</p>
 </ul>
 <p>Browse the full list of CDS dataset short names at
 <a href="https://cds.climate.copernicus.eu/datasets?q=era5">https://cds.climate.copernicus.eu/datasets?q=era5</a>. To add a new
-variable, append an entry to
-<code>src/earthlens/ecmwf/cds_data_catalog.yaml</code> following the schema
-in the file's header comment.</p>
+variable, append an entry to the matching per-family file under
+<code>src/earthlens/ecmwf/catalog/</code> following the schema in
+<code>_index.yaml</code>'s header comment.</p>
 <p><code>get_variable(dataset_name, variable_name)</code> is the canonical lookup;
 <code>get_dataset(name)</code> returns the structural :class:<code>Dataset</code> record,
 and <code>describe(name)</code> is a thin serializer over it.</p>

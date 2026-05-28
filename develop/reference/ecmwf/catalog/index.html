@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -8700,11 +8700,14 @@
 
 
 <h1 id="catalog-probe-tooling"><a class="toclink" href="#catalog-probe-tooling">Catalog &amp; probe tooling</a><a class="headerlink" href="#catalog-probe-tooling" title="Permanent link">#</a></h1>
-<p>The ECMWF backend uses a curated YAML catalog
-(<code>src/earthlens/ecmwf/cds_data_catalog.yaml</code>) to map user-friendly
-variable codes to the request fields CDS actually accepts. This page
-documents the catalog's structure, how it is maintained, and the tools
-that support catalog work.</p>
+<p>The ECMWF backend uses a curated YAML catalog (the
+<code>src/earthlens/ecmwf/catalog/</code> directory: per-family <code>*.yaml</code> files —
+<code>era5.yaml</code>, <code>carra.yaml</code>, … — plus an <code>_index.yaml</code> with the schema
+header and <code>available_datasets:</code> list) to map user-friendly variable
+codes to the request fields CDS actually accepts. The loader merges
+every file into one catalog at construction time. This page documents
+the catalog's structure, how it is maintained, and the tools that
+support catalog work.</p>
 <h2 id="at-a-glance"><a class="toclink" href="#at-a-glance">At a glance</a><a class="headerlink" href="#at-a-glance" title="Permanent link">#</a></h2>
 <table>
 <thead>
@@ -8715,8 +8718,8 @@ that support catalog work.</p>
 </thead>
 <tbody>
 <tr>
-<td><code>src/earthlens/ecmwf/cds_data_catalog.yaml</code></td>
-<td>The catalog itself — schema described below</td>
+<td><code>src/earthlens/ecmwf/catalog/</code></td>
+<td>The catalog itself — per-family <code>*.yaml</code> + <code>_index.yaml</code>; schema below</td>
 </tr>
 <tr>
 <td><code>src/earthlens/ecmwf/catalog.py</code></td>

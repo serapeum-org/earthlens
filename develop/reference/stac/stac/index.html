@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -10954,7 +10954,7 @@ endpoint serves (the refreshed index; informational).</p>
 <a id="__codelineno-0-331" name="__codelineno-0-331"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">available_collections</span> <span class="o">=</span> <span class="n">loaded</span><span class="o">.</span><span class="n">available_collections</span>
 <a id="__codelineno-0-332" name="__codelineno-0-332"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span> <span class="o">=</span> <span class="n">loaded</span><span class="o">.</span><span class="n">datasets</span>
 <a id="__codelineno-0-333" name="__codelineno-0-333"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">providers</span><span class="p">:</span>
-<a id="__codelineno-0-334" name="__codelineno-0-334"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">providers</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">endpoints</span>
+<a id="__codelineno-0-334" name="__codelineno-0-334"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">providers</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">endpoints</span><span class="p">)</span>
 <a id="__codelineno-0-335" name="__codelineno-0-335"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">available_datasets</span><span class="p">:</span>
 <a id="__codelineno-0-336" name="__codelineno-0-336"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">available_datasets</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span>
 <a id="__codelineno-0-337" name="__codelineno-0-337"></a>                <span class="p">{</span><span class="n">cid</span> <span class="k">for</span> <span class="n">ids</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">available_collections</span><span class="o">.</span><span class="n">values</span><span class="p">()</span> <span class="k">for</span> <span class="n">cid</span> <span class="ow">in</span> <span class="n">ids</span><span class="p">}</span>
@@ -11692,7 +11692,7 @@ discoverable through the <code>AbstractCatalog</code> contract, then
 <a id="__codelineno-0-331" name="__codelineno-0-331"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">available_collections</span> <span class="o">=</span> <span class="n">loaded</span><span class="o">.</span><span class="n">available_collections</span>
 <a id="__codelineno-0-332" name="__codelineno-0-332"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span> <span class="o">=</span> <span class="n">loaded</span><span class="o">.</span><span class="n">datasets</span>
 <a id="__codelineno-0-333" name="__codelineno-0-333"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">providers</span><span class="p">:</span>
-<a id="__codelineno-0-334" name="__codelineno-0-334"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">providers</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">endpoints</span>
+<a id="__codelineno-0-334" name="__codelineno-0-334"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">providers</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">endpoints</span><span class="p">)</span>
 <a id="__codelineno-0-335" name="__codelineno-0-335"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">available_datasets</span><span class="p">:</span>
 <a id="__codelineno-0-336" name="__codelineno-0-336"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">available_datasets</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span>
 <a id="__codelineno-0-337" name="__codelineno-0-337"></a>            <span class="p">{</span><span class="n">cid</span> <span class="k">for</span> <span class="n">ids</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">available_collections</span><span class="o">.</span><span class="n">values</span><span class="p">()</span> <span class="k">for</span> <span class="n">cid</span> <span class="ow">in</span> <span class="n">ids</span><span class="p">}</span>

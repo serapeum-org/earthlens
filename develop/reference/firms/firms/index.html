@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -9809,7 +9809,7 @@ row.</p>
 <a id="__codelineno-0-263" name="__codelineno-0-263"></a>                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">catalog_path</span><span class="si">}</span><span class="s2"> sensor </span><span class="si">{</span><span class="n">code</span><span class="si">!r}</span><span class="s2"> failed validation:</span><span class="se">\n</span><span class="si">{</span><span class="n">exc</span><span class="si">}</span><span class="s2">&quot;</span>
 <a id="__codelineno-0-264" name="__codelineno-0-264"></a>                <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span>
 <a id="__codelineno-0-265" name="__codelineno-0-265"></a>        <span class="n">_CATALOG_CACHE</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">sensors</span>
-<a id="__codelineno-0-266" name="__codelineno-0-266"></a>        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">datasets</span><span class="o">=</span><span class="n">sensors</span><span class="p">)</span>
+<a id="__codelineno-0-266" name="__codelineno-0-266"></a>        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">datasets</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">sensors</span><span class="p">))</span>
 <a id="__codelineno-0-267" name="__codelineno-0-267"></a>
 <a id="__codelineno-0-268" name="__codelineno-0-268"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Sensor</span><span class="p">]:</span>
 <a id="__codelineno-0-269" name="__codelineno-0-269"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the sensor map (satisfies the abstract contract).</span>
@@ -10639,7 +10639,7 @@ fails :class:<code>Sensor</code> validation.</p>
 <a id="__codelineno-0-263" name="__codelineno-0-263"></a>                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">catalog_path</span><span class="si">}</span><span class="s2"> sensor </span><span class="si">{</span><span class="n">code</span><span class="si">!r}</span><span class="s2"> failed validation:</span><span class="se">\n</span><span class="si">{</span><span class="n">exc</span><span class="si">}</span><span class="s2">&quot;</span>
 <a id="__codelineno-0-264" name="__codelineno-0-264"></a>            <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span>
 <a id="__codelineno-0-265" name="__codelineno-0-265"></a>    <span class="n">_CATALOG_CACHE</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">sensors</span>
-<a id="__codelineno-0-266" name="__codelineno-0-266"></a>    <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">datasets</span><span class="o">=</span><span class="n">sensors</span><span class="p">)</span>
+<a id="__codelineno-0-266" name="__codelineno-0-266"></a>    <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">datasets</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">sensors</span><span class="p">))</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -17299,7 +17299,7 @@ row.</p>
 <a id="__codelineno-0-263" name="__codelineno-0-263"></a>                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">catalog_path</span><span class="si">}</span><span class="s2"> sensor </span><span class="si">{</span><span class="n">code</span><span class="si">!r}</span><span class="s2"> failed validation:</span><span class="se">\n</span><span class="si">{</span><span class="n">exc</span><span class="si">}</span><span class="s2">&quot;</span>
 <a id="__codelineno-0-264" name="__codelineno-0-264"></a>                <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span>
 <a id="__codelineno-0-265" name="__codelineno-0-265"></a>        <span class="n">_CATALOG_CACHE</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">sensors</span>
-<a id="__codelineno-0-266" name="__codelineno-0-266"></a>        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">datasets</span><span class="o">=</span><span class="n">sensors</span><span class="p">)</span>
+<a id="__codelineno-0-266" name="__codelineno-0-266"></a>        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">datasets</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">sensors</span><span class="p">))</span>
 <a id="__codelineno-0-267" name="__codelineno-0-267"></a>
 <a id="__codelineno-0-268" name="__codelineno-0-268"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Sensor</span><span class="p">]:</span>
 <a id="__codelineno-0-269" name="__codelineno-0-269"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the sensor map (satisfies the abstract contract).</span>
@@ -18129,7 +18129,7 @@ fails :class:<code>Sensor</code> validation.</p>
 <a id="__codelineno-0-263" name="__codelineno-0-263"></a>                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">catalog_path</span><span class="si">}</span><span class="s2"> sensor </span><span class="si">{</span><span class="n">code</span><span class="si">!r}</span><span class="s2"> failed validation:</span><span class="se">\n</span><span class="si">{</span><span class="n">exc</span><span class="si">}</span><span class="s2">&quot;</span>
 <a id="__codelineno-0-264" name="__codelineno-0-264"></a>            <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span>
 <a id="__codelineno-0-265" name="__codelineno-0-265"></a>    <span class="n">_CATALOG_CACHE</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">sensors</span>
-<a id="__codelineno-0-266" name="__codelineno-0-266"></a>    <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">datasets</span><span class="o">=</span><span class="n">sensors</span><span class="p">)</span>
+<a id="__codelineno-0-266" name="__codelineno-0-266"></a>    <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">datasets</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">sensors</span><span class="p">))</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>

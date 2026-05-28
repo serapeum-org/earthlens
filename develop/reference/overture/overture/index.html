@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -9698,9 +9698,9 @@ newest first, from the bundled YAML's informational index.</p>
 <a id="__codelineno-0-281" name="__codelineno-0-281"></a>        <span class="n">available</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;available_datasets&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="p">[])</span>
 <a id="__codelineno-0-282" name="__codelineno-0-282"></a>        <span class="n">_CATALOG_CACHE</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">themes</span><span class="p">,</span> <span class="n">releases</span><span class="p">,</span> <span class="n">available</span><span class="p">)</span>
 <a id="__codelineno-0-283" name="__codelineno-0-283"></a>        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
-<a id="__codelineno-0-284" name="__codelineno-0-284"></a>            <span class="n">datasets</span><span class="o">=</span><span class="n">themes</span><span class="p">,</span>
-<a id="__codelineno-0-285" name="__codelineno-0-285"></a>            <span class="n">available_releases</span><span class="o">=</span><span class="n">releases</span><span class="p">,</span>
-<a id="__codelineno-0-286" name="__codelineno-0-286"></a>            <span class="n">available_datasets</span><span class="o">=</span><span class="n">available</span><span class="p">,</span>
+<a id="__codelineno-0-284" name="__codelineno-0-284"></a>            <span class="n">datasets</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">themes</span><span class="p">),</span>
+<a id="__codelineno-0-285" name="__codelineno-0-285"></a>            <span class="n">available_releases</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">releases</span><span class="p">),</span>
+<a id="__codelineno-0-286" name="__codelineno-0-286"></a>            <span class="n">available_datasets</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">available</span><span class="p">),</span>
 <a id="__codelineno-0-287" name="__codelineno-0-287"></a>        <span class="p">)</span>
 <a id="__codelineno-0-288" name="__codelineno-0-288"></a>
 <a id="__codelineno-0-289" name="__codelineno-0-289"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Theme</span><span class="p">]:</span>
@@ -10460,9 +10460,9 @@ fails <code>Theme</code> validation.</p>
 <a id="__codelineno-0-281" name="__codelineno-0-281"></a>    <span class="n">available</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;available_datasets&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="p">[])</span>
 <a id="__codelineno-0-282" name="__codelineno-0-282"></a>    <span class="n">_CATALOG_CACHE</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">themes</span><span class="p">,</span> <span class="n">releases</span><span class="p">,</span> <span class="n">available</span><span class="p">)</span>
 <a id="__codelineno-0-283" name="__codelineno-0-283"></a>    <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
-<a id="__codelineno-0-284" name="__codelineno-0-284"></a>        <span class="n">datasets</span><span class="o">=</span><span class="n">themes</span><span class="p">,</span>
-<a id="__codelineno-0-285" name="__codelineno-0-285"></a>        <span class="n">available_releases</span><span class="o">=</span><span class="n">releases</span><span class="p">,</span>
-<a id="__codelineno-0-286" name="__codelineno-0-286"></a>        <span class="n">available_datasets</span><span class="o">=</span><span class="n">available</span><span class="p">,</span>
+<a id="__codelineno-0-284" name="__codelineno-0-284"></a>        <span class="n">datasets</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">themes</span><span class="p">),</span>
+<a id="__codelineno-0-285" name="__codelineno-0-285"></a>        <span class="n">available_releases</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">releases</span><span class="p">),</span>
+<a id="__codelineno-0-286" name="__codelineno-0-286"></a>        <span class="n">available_datasets</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">available</span><span class="p">),</span>
 <a id="__codelineno-0-287" name="__codelineno-0-287"></a>    <span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -16654,9 +16654,9 @@ newest first, from the bundled YAML's informational index.</p>
 <a id="__codelineno-0-281" name="__codelineno-0-281"></a>        <span class="n">available</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;available_datasets&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="p">[])</span>
 <a id="__codelineno-0-282" name="__codelineno-0-282"></a>        <span class="n">_CATALOG_CACHE</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">themes</span><span class="p">,</span> <span class="n">releases</span><span class="p">,</span> <span class="n">available</span><span class="p">)</span>
 <a id="__codelineno-0-283" name="__codelineno-0-283"></a>        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
-<a id="__codelineno-0-284" name="__codelineno-0-284"></a>            <span class="n">datasets</span><span class="o">=</span><span class="n">themes</span><span class="p">,</span>
-<a id="__codelineno-0-285" name="__codelineno-0-285"></a>            <span class="n">available_releases</span><span class="o">=</span><span class="n">releases</span><span class="p">,</span>
-<a id="__codelineno-0-286" name="__codelineno-0-286"></a>            <span class="n">available_datasets</span><span class="o">=</span><span class="n">available</span><span class="p">,</span>
+<a id="__codelineno-0-284" name="__codelineno-0-284"></a>            <span class="n">datasets</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">themes</span><span class="p">),</span>
+<a id="__codelineno-0-285" name="__codelineno-0-285"></a>            <span class="n">available_releases</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">releases</span><span class="p">),</span>
+<a id="__codelineno-0-286" name="__codelineno-0-286"></a>            <span class="n">available_datasets</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">available</span><span class="p">),</span>
 <a id="__codelineno-0-287" name="__codelineno-0-287"></a>        <span class="p">)</span>
 <a id="__codelineno-0-288" name="__codelineno-0-288"></a>
 <a id="__codelineno-0-289" name="__codelineno-0-289"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Theme</span><span class="p">]:</span>
@@ -17416,9 +17416,9 @@ fails <code>Theme</code> validation.</p>
 <a id="__codelineno-0-281" name="__codelineno-0-281"></a>    <span class="n">available</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;available_datasets&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="p">[])</span>
 <a id="__codelineno-0-282" name="__codelineno-0-282"></a>    <span class="n">_CATALOG_CACHE</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">themes</span><span class="p">,</span> <span class="n">releases</span><span class="p">,</span> <span class="n">available</span><span class="p">)</span>
 <a id="__codelineno-0-283" name="__codelineno-0-283"></a>    <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
-<a id="__codelineno-0-284" name="__codelineno-0-284"></a>        <span class="n">datasets</span><span class="o">=</span><span class="n">themes</span><span class="p">,</span>
-<a id="__codelineno-0-285" name="__codelineno-0-285"></a>        <span class="n">available_releases</span><span class="o">=</span><span class="n">releases</span><span class="p">,</span>
-<a id="__codelineno-0-286" name="__codelineno-0-286"></a>        <span class="n">available_datasets</span><span class="o">=</span><span class="n">available</span><span class="p">,</span>
+<a id="__codelineno-0-284" name="__codelineno-0-284"></a>        <span class="n">datasets</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">themes</span><span class="p">),</span>
+<a id="__codelineno-0-285" name="__codelineno-0-285"></a>        <span class="n">available_releases</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">releases</span><span class="p">),</span>
+<a id="__codelineno-0-286" name="__codelineno-0-286"></a>        <span class="n">available_datasets</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">available</span><span class="p">),</span>
 <a id="__codelineno-0-287" name="__codelineno-0-287"></a>    <span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
