@@ -172,12 +172,12 @@ class GHSL(AbstractDataSource):
                     f"{code} has no release {self._release!r}; "
                     f"available releases: {sorted(product.releases)}."
                 )
-            avail = product.releases[self._release]
             resolution = self._resolution_for(code)
-            if resolution not in avail.resolutions:
+            resolutions = product.release_resolutions(self._release)
+            if resolution not in resolutions:
                 raise ValueError(
                     f"{code} ({self._release}) has no resolution "
-                    f"{resolution!r}; available: {avail.resolutions}."
+                    f"{resolution!r}; available: {resolutions}."
                 )
 
     def _resolution_for(self, code: str) -> str:

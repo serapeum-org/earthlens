@@ -4,28 +4,156 @@
 # tools/ghsl/refresh_ghsl_catalog.py). Each product row carries its canonical
 # code (the YAML key, also the on-disk file-stem token), an optional `family`
 # directory token (defaults to the code; differs only for the AGBH/ANBH,
-# FUN/MSZ, NRES sub-products), friendly `aliases`, and a per-release
-# availability block. A resolution implies its source CRS (metric -> 54009,
+# FUN/MSZ, NRES sub-products), friendly `aliases`, optional categorical
+# `legend` / `colors`, and a per-release availability block list. A request is
+# valid when some block of the chosen release contains both the epoch and the
+# resolution. A resolution implies its source CRS (metric -> 54009,
 # arc-second -> 4326); the user's output CRS is independent.
 #
-# This file is seeded in C1 with one product of each shape (continuous
-# multi-epoch, categorical, single-epoch sub-product) and completed to the full
-# GLOBE surface in C2.
+# Scope (decided with the maintainer): R2023A is the primary release; GHS_LAND
+# is curated at its only release R2022A (a documented exception to the
+# "no pre-R2023A" guard); the R2025A GHS-WUP projection family (to 2100) is
+# fully curated, including the tabular WUP statistics. The 5-yearly epoch steps
+# and the categorical legends are from the GHSL R2023A/R2025A data packages.
 
 products:
 
-  # --- continuous, multi-epoch, fully tiled+whole-globe ----------------------
+  # ===================== R2023A — population =================================
   GHS_POP:
     aliases: [population, pop]
     unit: "people/cell"
-    categorical: false
     default_resolution: "100m"
     releases:
       R2023A:
-        epochs: [1975, 1980, 1985, 1990, 1995, 2000, 2005, 2010, 2015, 2020, 2025, 2030]
-        resolutions: ["100m", "1km", "3ss", "30ss"]
+        - epochs: [1975, 1980, 1985, 1990, 1995, 2000, 2005, 2010, 2015, 2020, 2025, 2030]
+          resolutions: ["100m", "1km", "3ss", "30ss"]
 
-  # --- categorical (Degree of Urbanisation settlement model) -----------------
+  # ===================== R2023A — built-up surface ===========================
+  GHS_BUILT_S:
+    aliases: [built_surface, built_up_surface, built_s]
+    unit: "m2"
+    default_resolution: "100m"
+    releases:
+      R2023A:
+        - epochs: [1975, 1980, 1985, 1990, 1995, 2000, 2005, 2010, 2015, 2020, 2025, 2030]
+          resolutions: ["100m", "1km", "3ss", "30ss"]
+        # A single high-resolution 10 m built-up surface layer for epoch 2018.
+        - epochs: [2018]
+          resolutions: ["10m"]
+
+  GHS_BUILT_S_NRES:
+    family: GHS_BUILT_S
+    aliases: [built_surface_nres, non_residential_surface, built_s_nres]
+    unit: "m2"
+    default_resolution: "100m"
+    releases:
+      R2023A:
+        - epochs: [1975, 1980, 1985, 1990, 1995, 2000, 2005, 2010, 2015, 2020, 2025, 2030]
+          resolutions: ["100m", "1km", "3ss", "30ss"]
+
+  # ===================== R2023A — built-up volume ============================
+  GHS_BUILT_V:
+    aliases: [built_volume, built_up_volume, built_v]
+    unit: "m3"
+    default_resolution: "100m"
+    releases:
+      R2023A:
+        - epochs: [1975, 1980, 1985, 1990, 1995, 2000, 2005, 2010, 2015, 2020, 2025, 2030]
+          resolutions: ["100m", "1km", "3ss", "30ss"]
+
+  GHS_BUILT_V_NRES:
+    family: GHS_BUILT_V
+    aliases: [built_volume_nres, non_residential_volume, built_v_nres]
+    unit: "m3"
+    default_resolution: "100m"
+    releases:
+      R2023A:
+        - epochs: [1975, 1980, 1985, 1990, 1995, 2000, 2005, 2010, 2015, 2020, 2025, 2030]
+          resolutions: ["100m", "1km", "3ss", "30ss"]
+
+  # ===================== R2023A — building height (2018) =====================
+  GHS_BUILT_H_ANBH:
+    family: GHS_BUILT_H
+    aliases: [built_height, building_height, height, anbh, net_building_height]
+    unit: "m"
+    default_resolution: "100m"
+    releases:
+      R2023A:
+        - epochs: [2018]
+          resolutions: ["100m", "3ss"]
+
+  GHS_BUILT_H_AGBH:
+    family: GHS_BUILT_H
+    aliases: [gross_building_height, agbh]
+    unit: "m"
+    default_resolution: "100m"
+    releases:
+      R2023A:
+        - epochs: [2018]
+          resolutions: ["100m", "3ss"]
+
+  # ===================== R2023A — built-up classification (2018, categorical)
+  GHS_BUILT_C_MSZ:
+    family: GHS_BUILT_C
+    aliases: [built_class, morphological_settlement_zone, built_c, built_c_msz]
+    unit: ""
+    categorical: true
+    default_resolution: "10m"
+    legend:
+      1: "Open space, low vegetation"
+      2: "Open space, medium vegetation"
+      3: "Open space, high vegetation"
+      4: "Open space, water"
+      5: "Open space, road surface"
+      11: "Residential, building height <= 3 m"
+      12: "Residential, 3 m < height <= 6 m"
+      13: "Residential, 6 m < height <= 15 m"
+      14: "Residential, 15 m < height <= 30 m"
+      15: "Residential, height > 30 m"
+      21: "Non-residential, building height <= 3 m"
+      22: "Non-residential, 3 m < height <= 6 m"
+      23: "Non-residential, 6 m < height <= 15 m"
+      24: "Non-residential, 15 m < height <= 30 m"
+      25: "Non-residential, height > 30 m"
+    colors:
+      1: "#FFFFCC"
+      2: "#CCF24D"
+      3: "#54A800"
+      4: "#3C50FF"
+      5: "#A9A9A9"
+      11: "#FFD2D2"
+      12: "#FFA8A8"
+      13: "#FF6E6E"
+      14: "#E60000"
+      15: "#A80000"
+      21: "#D9C2F0"
+      22: "#BE9BE0"
+      23: "#9E6FD1"
+      24: "#7E48C2"
+      25: "#5C00A3"
+    releases:
+      R2023A:
+        - epochs: [2018]
+          resolutions: ["10m"]
+
+  GHS_BUILT_C_FUN:
+    family: GHS_BUILT_C
+    aliases: [built_function, functional_classification, built_c_fun]
+    unit: ""
+    categorical: true
+    default_resolution: "10m"
+    legend:
+      1: "Residential"
+      2: "Non-residential"
+    colors:
+      1: "#E60000"
+      2: "#7E48C2"
+    releases:
+      R2023A:
+        - epochs: [2018]
+          resolutions: ["10m"]
+
+  # ===================== R2023A — settlement model (categorical) =============
   GHS_SMOD:
     aliases: [settlement_model, smod, degree_of_urbanisation, degurba]
     unit: ""
@@ -51,17 +179,113 @@ products:
       10: "#73DFFF"
     releases:
       R2023A:
-        epochs: [1975, 1980, 1985, 1990, 1995, 2000, 2005, 2010, 2015, 2020, 2025, 2030]
-        resolutions: ["1km", "30ss"]
+        - epochs: [1975, 1980, 1985, 1990, 1995, 2000, 2005, 2010, 2015, 2020, 2025, 2030]
+          resolutions: ["1km", "30ss"]
 
-  # --- single-epoch sub-product (average net building height) ----------------
-  GHS_BUILT_H_ANBH:
-    family: GHS_BUILT_H
-    aliases: [built_height, building_height, height, anbh]
-    unit: "m"
-    categorical: false
+  # ===================== R2022A — land fraction ==============================
+  # GHS_LAND's only release is R2022A (no R2023A); curated as a documented
+  # exception to the "primary release = R2023A" scope guard.
+  GHS_LAND:
+    aliases: [land, land_fraction]
+    unit: "fraction"
     default_resolution: "100m"
     releases:
+      R2022A:
+        - epochs: [2018]
+          resolutions: ["10m", "100m", "1km"]
+
+  # ===================== R2023A — Degree of Urbanisation classif. (tabular) ==
+  GHS_DUC:
+    aliases: [duc, degree_of_urbanisation_classification]
+    unit: ""
+    kind: tabular
+    categorical: true
+    default_resolution: "table"
+    releases:
       R2023A:
-        epochs: [2018]
-        resolutions: ["100m", "3ss"]
+        - epochs: [1975, 1980, 1985, 1990, 1995, 2000, 2005, 2010, 2015, 2020, 2025, 2030]
+          resolutions: ["table"]
+
+  # ===================== R2025A — GHS-WUP projections to 2100 ================
+  GHS_WUP_POP:
+    aliases: [wup_population, wup_pop, projected_population]
+    unit: "people/cell"
+    default_resolution: "1km"
+    releases:
+      R2025A:
+        - epochs: [1975, 1980, 1985, 1990, 1995, 2000, 2005, 2010, 2015, 2020,
+                   2025, 2030, 2035, 2040, 2045, 2050, 2055, 2060, 2065, 2070,
+                   2075, 2080, 2085, 2090, 2095, 2100]
+          resolutions: ["1km", "30ss"]
+
+  GHS_WUP_BUILT_S:
+    aliases: [wup_built_surface, wup_built_s, projected_built_surface]
+    unit: "m2"
+    default_resolution: "1km"
+    releases:
+      R2025A:
+        - epochs: [1975, 1980, 1985, 1990, 1995, 2000, 2005, 2010, 2015, 2020,
+                   2025, 2030, 2035, 2040, 2045, 2050, 2055, 2060, 2065, 2070,
+                   2075, 2080, 2085, 2090, 2095, 2100]
+          resolutions: ["1km", "30ss"]
+
+  GHS_WUP_DEGURBA:
+    aliases: [wup_degurba, projected_degree_of_urbanisation, wup_smod]
+    unit: ""
+    categorical: true
+    default_resolution: "1km"
+    legend:
+      30: "Urban Centre"
+      23: "Dense Urban Cluster"
+      22: "Semi-dense Urban Cluster"
+      21: "Suburban / Peri-urban"
+      13: "Rural Cluster"
+      12: "Low Density Rural"
+      11: "Very Low Density Rural"
+      10: "Water"
+    colors:
+      30: "#FF0000"
+      23: "#732600"
+      22: "#A87000"
+      21: "#FFFF00"
+      13: "#375623"
+      12: "#7FA86E"
+      11: "#CDF57A"
+      10: "#73DFFF"
+    releases:
+      R2025A:
+        - epochs: [1975, 1980, 1985, 1990, 1995, 2000, 2005, 2010, 2015, 2020,
+                   2025, 2030, 2035, 2040, 2045, 2050, 2055, 2060, 2065, 2070,
+                   2075, 2080, 2085, 2090, 2095, 2100]
+          resolutions: ["1km"]
+
+  GHS_WUP_DUC:
+    aliases: [wup_duc]
+    unit: ""
+    kind: tabular
+    categorical: true
+    default_resolution: "table"
+    releases:
+      R2025A:
+        - epochs: [2025, 2050, 2075, 2100]
+          resolutions: ["table"]
+
+  GHS_WUP_MTUC:
+    aliases: [wup_mtuc, multitemporal_urban_centres]
+    unit: ""
+    kind: tabular
+    default_resolution: "table"
+    releases:
+      R2025A:
+        - epochs: [2025, 2050, 2075, 2100]
+          resolutions: ["table"]
+
+  GHS_WUP_COUNTRY_STATS:
+    aliases: [wup_country_stats, country_statistics]
+    unit: ""
+    kind: tabular
+    default_resolution: "table"
+    releases:
+      R2025A:
+        - epochs: [2025, 2050, 2075, 2100]
+          resolutions: ["table"]

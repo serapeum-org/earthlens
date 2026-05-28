@@ -177,8 +177,13 @@ class Product(BaseModel):
         legend: For categorical products, the class-code → label map.
         colors: Optional class-code → hex-colour map for categorical
             products (e.g. `{30: "#FF0000"}`); paired with `legend`.
-        releases: Per-release availability matrix, keyed by release id
-            (`"R2023A"`, `"R2022A"`, `"R2025A"`).
+        releases: Per-release availability, keyed by release id (`"R2023A"`,
+            `"R2022A"`, `"R2025A"`). Each release maps to a **list** of
+            `Availability` blocks; a request is valid when some block
+            contains both its epoch and resolution. The list expresses
+            products whose epoch set differs by resolution (e.g. GHS-BUILT-S
+            offers a 12-epoch series at 100 m/1 km/arc-sec plus a single
+            2018-only 10 m layer).
     """
 
     model_config = ConfigDict(frozen=True, extra="forbid")
@@ -192,11 +197,58 @@ class Product(BaseModel):
     default_resolution: str | None = None
     legend: dict[int, str] | None = None
     colors: dict[int, str] | None = None
-    releases: dict[str, Availability] = Field(default_factory=dict)
+    releases: dict[str, list[Availability]] = Field(default_factory=dict)
 
     def family_token(self) -> str:
         """Return the product-family directory token (`family` or `code`)."""
         return self.family or self.code
+
+    def release_epochs(self, release: str) -> list[int]:
+        """Return the union of epochs across a release's availability blocks.
+
+        Args:
+            release: A release id present in `releases`.
+
+        Returns:
+            list[int]: Sorted, de-duplicated epochs offered for the release.
+        """
+        epochs: set[int] = set()
+        for block in self.releases.get(release, []):
+            epochs.update(block.epochs)
+        return sorted(epochs)
+
+    def release_resolutions(self, release: str) -> list[str]:
+        """Return the union of resolutions across a release's blocks.
+
+        Args:
+            release: A release id present in `releases`.
+
+        Returns:
+            list[str]: De-duplicated resolution labels (first-seen order).
+        """
+        out: list[str] = []
+        for block in self.releases.get(release, []):
+            for res in block.resolutions:
+                if res not in out:
+                    out.append(res)
+        return out
+
+    def block_for(self, release: str, epoch: int, resolution: str) -> Availability | None:
+        """Return the availability block matching `(epoch, resolution)`, if any.
+
+        Args:
+            release: A release id.
+            epoch: The reference year.
+            resolution: A friendly resolution label.
+
+        Returns:
+            Availability | None: The first block whose `epochs` and
+                `resolutions` both contain the request, or `None`.
+        """
+        for block in self.releases.get(release, []):
+            if epoch in block.epochs and resolution in block.resolutions:
+                return block
+        return None
 
     def color_table(self) -> DataFrame:
         """Return the class legend as a pyramids colour-table `DataFrame`.
@@ -422,15 +474,23 @@ class Catalog(AbstractCatalog):
                 f"{code} has no release {release!r}; "
                 f"available releases: {sorted(row.releases)}."
             )
-        avail = row.releases[release]
-        if epoch not in avail.epochs:
+        epochs = row.release_epochs(release)
+        if epoch not in epochs:
             raise ValueError(
                 f"{code} ({release}) has no epoch {epoch}; "
-                f"available epochs: {avail.epochs}."
+                f"available epochs: {epochs}."
             )
-        if resolution not in avail.resolutions:
+        resolutions = row.release_resolutions(release)
+        if resolution not in resolutions:
             raise ValueError(
                 f"{code} ({release}) has no resolution {resolution!r}; "
-                f"available resolutions: {avail.resolutions}."
+                f"available resolutions: {resolutions}."
+            )
+        if row.block_for(release, epoch, resolution) is None:
+            raise ValueError(
+                f"{code} ({release}) offers epoch {epoch} and resolution "
+                f"{resolution!r} but not together; resolution {resolution!r} "
+                f"is available only for epochs "
+                f"{sorted({e for b in row.releases[release] if resolution in b.resolutions for e in b.epochs})}."
             )
         return code, release, epoch, resolution
