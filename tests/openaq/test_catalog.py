@@ -44,11 +44,36 @@ class TestCatalogLoad:
     def test_known_parameters(self):
         """The bundled catalog lists the curated parameter set."""
         assert sorted(Catalog().parameters) == [
-            "bc", "bc_370", "bc_375", "bc_470", "bc_528", "bc_625", "bc_880",
-            "ch4", "co", "co2", "humidity", "no", "no2", "nox", "o3", "pm1",
-            "pm10", "pm25", "pm4", "pressure", "relativehumidity", "so2",
-            "temperature", "ufp", "um003", "um010", "um025", "um100",
-            "wind_direction", "wind_speed",
+            "bc",
+            "bc_370",
+            "bc_375",
+            "bc_470",
+            "bc_528",
+            "bc_625",
+            "bc_880",
+            "ch4",
+            "co",
+            "co2",
+            "humidity",
+            "no",
+            "no2",
+            "nox",
+            "o3",
+            "pm1",
+            "pm10",
+            "pm25",
+            "pm4",
+            "pressure",
+            "relativehumidity",
+            "so2",
+            "temperature",
+            "ufp",
+            "um003",
+            "um010",
+            "um025",
+            "um100",
+            "wind_direction",
+            "wind_speed",
         ]
 
     def test_pm25_ids(self):
@@ -114,3 +139,56 @@ class TestCatalogLoadErrors:
         """Passing parameters= skips the disk read (no auto-load)."""
         cat = Catalog(parameters={"x": Parameter(name="x", ids=[1])})
         assert sorted(cat.parameters) == ["x"]
+
+
+@pytest.mark.openaq
+class TestCatalogDictSurface:
+    """The inherited AbstractCatalog dict surface backed by `datasets`."""
+
+    def test_len_counts_parameters(self):
+        """len(cat) equals the number of parameter rows."""
+        cat = Catalog()
+        assert len(cat) == len(cat.parameters)
+
+    def test_contains_known_name(self):
+        """A curated name is `in` the catalog."""
+        assert "pm25" in Catalog()
+
+    def test_contains_unknown_name(self):
+        """An unknown name is not `in` the catalog."""
+        assert "nope" not in Catalog()
+
+    def test_getitem_returns_row(self):
+        """cat[name] returns the Parameter row."""
+        assert Catalog()["pm25"].ids == [2]
+
+    def test_getitem_unknown_raises_keyerror(self):
+        """cat[unknown] raises KeyError."""
+        with pytest.raises(KeyError):
+            Catalog()["nope"]
+
+    def test_iter_yields_parameter_names(self):
+        """Iterating the catalog yields its parameter names."""
+        cat = Catalog()
+        assert set(cat) == set(cat.parameters)
+
+
+@pytest.mark.openaq
+class TestParametersDatasetsAlias:
+    """`parameters` aliases the base `datasets` field, both directions."""
+
+    def test_parameters_is_datasets(self):
+        """The parameters property returns the same object as datasets."""
+        cat = Catalog()
+        assert cat.parameters is cat.datasets
+
+    def test_datasets_construction_skips_disk(self):
+        """Constructing with datasets= populates the catalog directly."""
+        cat = Catalog(datasets={"x": Parameter(name="x", ids=[1])})
+        assert sorted(cat.parameters) == ["x"]
+        assert cat["x"].ids == [1]
+
+    def test_parameters_kwarg_routes_to_datasets(self):
+        """The legacy parameters= kwarg lands in the datasets field."""
+        cat = Catalog(parameters={"x": Parameter(name="x", ids=[1])})
+        assert "x" in cat.datasets

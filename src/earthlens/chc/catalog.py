@@ -88,10 +88,10 @@ _TEMPORAL_RESOLUTIONS: tuple[str, ...] = (
 )
 
 import pandas as pd
-import yaml
 from pydantic import BaseModel, ConfigDict, Field, ValidationError, model_validator
 
 from earthlens.base import AbstractCatalog, FluxableLeaf
+from earthlens.base.yaml_loader import load_yaml_strict
 
 CATALOG_PATH: Path = Path(__file__).parent / "catalog"
 
@@ -122,41 +122,6 @@ _CATALOG_CACHE: dict[
 def clear_catalog_cache() -> None:
     """Empty the module-level catalog parse cache (test helper)."""
     _CATALOG_CACHE.clear()
-
-
-class _StrictSafeLoader(yaml.SafeLoader):
-    """:class:`yaml.SafeLoader` that rejects duplicate keys in any mapping.
-
-    Prevents silent shadowing when the same dataset key or variable
-    name is accidentally duplicated inside a single CHC catalog YAML.
-    Cross-file duplicates are caught separately by the directory
-    loader (which keeps a `seen_in: {ds_key: filename}` map and raises
-    `ValueError` on the second occurrence).
-    """
-
-
-def _construct_mapping_no_duplicates(
-    loader: _StrictSafeLoader, node: yaml.MappingNode, deep: bool = False
-) -> dict[Any, Any]:
-    """Build a dict from a YAML mapping node, rejecting duplicate keys."""
-    mapping: dict[Any, Any] = {}
-    for key_node, value_node in node.value:
-        key = loader.construct_object(key_node, deep=deep)
-        if key in mapping:
-            mark = key_node.start_mark
-            raise ValueError(
-                f"duplicate YAML key {key!r} at line {mark.line + 1}, "
-                f"column {mark.column + 1} of {mark.name}: every key in "
-                "a YAML mapping must be unique"
-            )
-        mapping[key] = loader.construct_object(value_node, deep=deep)
-    return mapping
-
-
-_StrictSafeLoader.add_constructor(
-    yaml.resolver.BaseResolver.DEFAULT_MAPPING_TAG,
-    _construct_mapping_no_duplicates,
-)
 
 
 class Variable(FluxableLeaf):
@@ -580,8 +545,7 @@ def _load_catalog_file(
     path: Path,
 ) -> tuple[list[str], dict[str, dict[str, list[float]]], dict[str, "Dataset"]]:
     """Read a legacy single-file CHC catalog into the standard triple."""
-    with open(path, encoding="utf-8") as stream:
-        data = yaml.load(stream, Loader=_StrictSafeLoader) or {}  # nosec B506
+    data = load_yaml_strict(path) or {}
 
     datasets_yaml = data.get("datasets")
     if not datasets_yaml:
@@ -635,8 +599,7 @@ def _load_catalog_directory(
             "more per-family `<family>.yaml` files."
         )
 
-    with index_path.open(encoding="utf-8") as stream:
-        index_data = yaml.load(stream, Loader=_StrictSafeLoader) or {}  # nosec B506
+    index_data = load_yaml_strict(index_path) or {}
     available = list(index_data.get("available_datasets") or [])
     regions_map: dict[str, dict[str, list[float]]] = (
         index_data.get("regions") or {}
@@ -648,8 +611,7 @@ def _load_catalog_directory(
     for yaml_path in sorted(directory.glob("*.yaml")):
         if yaml_path.name == "_index.yaml":
             continue
-        with yaml_path.open(encoding="utf-8") as stream:
-            file_data = yaml.load(stream, Loader=_StrictSafeLoader) or {}  # nosec B506
+        file_data = load_yaml_strict(yaml_path) or {}
         for ds_key, ds_body in (file_data.get("datasets") or {}).items():
             if ds_key in structural:
                 raise ValueError(

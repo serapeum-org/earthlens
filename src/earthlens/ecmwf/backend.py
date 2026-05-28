@@ -184,8 +184,8 @@ class ECMWF(AbstractDataSource):
     Downloads ERA5 reanalysis (and ERA5-Land where the catalog
     indicates) via :class:`cdsapi.Client`. The user-friendly variable
     short codes (e.g. `"2m-temperature"`, `"total-precipitation"`) are resolved through
-    :class:`Catalog`, which loads the per-variable metadata from
-    `cds_data_catalog.yaml`.
+    :class:`Catalog`, which loads the per-variable metadata from the
+    bundled CDS catalog (the `catalog/` directory).
 
     The download pipeline (per variable) is a single step:
 
@@ -235,7 +235,7 @@ class ECMWF(AbstractDataSource):
                 "total-precipitation"]}`. The dataset name must be a
                 key of :attr:`Catalog.datasets`; each variable name
                 must appear under that dataset's `variables:` block.
-                See `cds_data_catalog.yaml` for the registered keys.
+                See the bundled CDS catalog (`catalog/`) for the keys.
                 Required.
             lat_lim: `[lat_min, lat_max]`. Required.
             lon_lim: `[lon_min, lon_max]`. Required.
@@ -628,8 +628,8 @@ class ECMWF(AbstractDataSource):
         See Also:
             :meth:`_api`: Builds and submits the CDS request, returns
                 the path to the NetCDF.
-            :class:`Catalog`: Loads `Variable` instances from
-                `cds_data_catalog.yaml`.
+            :class:`Catalog`: Loads `Variable` instances from the
+                bundled CDS catalog (`catalog/`).
         """
         return self._api(var_info)
 

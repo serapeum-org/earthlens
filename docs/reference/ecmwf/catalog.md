@@ -1,16 +1,19 @@
 # Catalog & probe tooling
 
-The ECMWF backend uses a curated YAML catalog
-(`src/earthlens/ecmwf/cds_data_catalog.yaml`) to map user-friendly
-variable codes to the request fields CDS actually accepts. This page
-documents the catalog's structure, how it is maintained, and the tools
-that support catalog work.
+The ECMWF backend uses a curated YAML catalog (the
+`src/earthlens/ecmwf/catalog/` directory: per-family `*.yaml` files —
+`era5.yaml`, `carra.yaml`, … — plus an `_index.yaml` with the schema
+header and `available_datasets:` list) to map user-friendly variable
+codes to the request fields CDS actually accepts. The loader merges
+every file into one catalog at construction time. This page documents
+the catalog's structure, how it is maintained, and the tools that
+support catalog work.
 
 ## At a glance
 
 | File / tool | Role |
 |---|---|
-| `src/earthlens/ecmwf/cds_data_catalog.yaml` | The catalog itself — schema described below |
+| `src/earthlens/ecmwf/catalog/` | The catalog itself — per-family `*.yaml` + `_index.yaml`; schema below |
 | `src/earthlens/ecmwf/catalog.py` | The loader (`Catalog`, `Dataset`, `Variable`, …) |
 | `tools/ecmwf/refresh_available_datasets.py` | Auto-rewrites the `available_datasets:` index from the live CDS STAC catalogue |
 | `tools/ecmwf/audit_cds_datasets.py` | Walks `available_datasets:` and reports each dataset's `constraints.json` shape — coverage planning |
