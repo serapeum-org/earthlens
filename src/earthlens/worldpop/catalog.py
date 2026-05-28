@@ -179,6 +179,10 @@ class Catalog(AbstractCatalog):
     """
 
     _catalog_kind: str = "WorldPop product catalog"
+    #: Plural noun for the did-you-mean message ("Known products: …"); the
+    #: shared AbstractCatalog reads this (its entries are products, not
+    #: "datasets").
+    _entry_noun: str = "products"
 
     datasets: dict[str, Product] = Field(default_factory=dict)
 
