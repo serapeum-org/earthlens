@@ -26,14 +26,17 @@ import datetime as dt
 from pathlib import Path
 
 import pandas as pd
+import requests
+from joblib import Parallel, delayed
 
-from earthlens.base import OutputKind
+from earthlens.base import OutputKind, RemoteProduct
 from earthlens.base.abstractdatasource import (
     AbstractDataSource,
     SpatialExtent,
     TemporalExtent,
 )
 from earthlens.worldpop._helpers import (
+    cohort_of,
     epsg_int,
     iso3_for_bbox,
     load_iso3_bbox,
@@ -41,6 +44,14 @@ from earthlens.worldpop._helpers import (
 )
 from earthlens.worldpop.auth import WorldPopAuth
 from earthlens.worldpop.catalog import GENERATIONS, Catalog
+from earthlens.worldpop.rest import files_for_year, rest_records
+
+#: Sub-directory under the output path where raw per-country GeoTIFFs land.
+_RAW_DIRNAME: str = ".worldpop_raw"
+#: Default parallelism for per-file HTTPS downloads.
+_DOWNLOAD_JOBS: int = 4
+#: Per-download HTTP timeout in seconds.
+_HTTP_TIMEOUT: int = 120
 
 #: Allowed values for the `api=` access-path selector.
 _API_MODES: frozenset[str] = frozenset({"rest", "worldpoppy"})
@@ -303,6 +314,114 @@ class WorldPop(AbstractDataSource):
         if self._year_arg is not None:
             return [int(self._year_arg)]
         return sorted({d.year for d in self.time.dates})
+
+    def _search(self) -> list[RemoteProduct]:
+        """Plan the download — one `RemoteProduct` per `(product, iso3, year, file)`.
+
+        Queries the REST API once per `(product, iso3)` (records carry every
+        year) and filters client-side to the requested years. For
+        demographic products each year yields many cohort files; for plain
+        population products, one.
+
+        Returns:
+            list[RemoteProduct]: One item per GeoTIFF URL to download, each
+                carrying `product` / `iso3` / `year` / `demographic` /
+                `subalias` metadata.
+        """
+        out: list[RemoteProduct] = []
+        years = self._years()
+        for product in self._products:
+            subalias_id = self._subalias_ids[product]
+            demographic = self._catalog.get(product).demographic
+            for iso3 in self._iso3s:
+                records = rest_records(product, subalias_id, iso3)
+                for year in years:
+                    for url in files_for_year(records, year):
+                        out.append(
+                            RemoteProduct(
+                                id=f"{product}_{iso3}_{year}_{Path(url).stem}",
+                                href=url,
+                                metadata={
+                                    "product": product,
+                                    "iso3": iso3,
+                                    "year": year,
+                                    "subalias": subalias_id,
+                                    "demographic": demographic,
+                                },
+                            )
+                        )
+        return out
+
+    def _raw_dir(self) -> Path:
+        """Return (creating) the directory raw per-country downloads land in."""
+        raw = self.root_dir / _RAW_DIRNAME
+        raw.mkdir(parents=True, exist_ok=True)
+        return raw
+
+    def _http_get(self, url: str, dest: Path) -> Path:
+        """Download `url` to `dest`, skipping when the file already exists.
+
+        Args:
+            url: The GeoTIFF URL.
+            dest: Local destination path.
+
+        Returns:
+            Path: `dest`.
+
+        Raises:
+            requests.HTTPError: On a non-2xx response (e.g. a 404 names the
+                offending URL).
+        """
+        if dest.exists() and dest.stat().st_size > 0:
+            return dest
+        resp = requests.get(url, timeout=_HTTP_TIMEOUT)
+        resp.raise_for_status()
+        dest.write_bytes(resp.content)
+        return dest
+
+    def _group_for_mosaic(
+        self, products: list[RemoteProduct]
+    ) -> dict[tuple[str, int, tuple[str, int] | None], list[tuple[Path, RemoteProduct]]]:
+        """Download every product and group the files for mosaicking.
+
+        Groups by `(product, year, cohort)` so multi-country requests merge
+        correctly and `age_structures` keeps each age/sex cohort separate.
+
+        Args:
+            products: The `_search` result.
+
+        Returns:
+            A mapping `(product, year, cohort) -> [(local_path, product), …]`.
+        """
+        raw = self._raw_dir()
+        paths = Parallel(n_jobs=_DOWNLOAD_JOBS, prefer="threads")(
+            delayed(self._http_get)(rp.href, raw / Path(rp.href).name)
+            for rp in products
+        )
+        groups: dict[
+            tuple[str, int, tuple[str, int] | None], list[tuple[Path, RemoteProduct]]
+        ] = {}
+        for path, rp in zip(paths, products):
+            key = (rp.metadata["product"], rp.metadata["year"], cohort_of(rp.href))
+            groups.setdefault(key, []).append((path, rp))
+        return groups
+
+    def _fetch(self, products: list[RemoteProduct]) -> list[Path]:
+        """Download every planned product and return the raw local paths.
+
+        Downloads (idempotently, in parallel) and groups by
+        `(product, year, cohort)` ready for the localise step (`C5`). Until
+        the mosaic/crop step lands, the raw per-country GeoTIFF paths are
+        returned directly.
+
+        Args:
+            products: The `_search` result.
+
+        Returns:
+            list[Path]: The downloaded raw GeoTIFF paths.
+        """
+        groups = self._group_for_mosaic(products)
+        return [path for group in groups.values() for path, _ in group]
 
     def _api(self) -> list[Path]:
         """Compose `_search` and `_fetch` into the canonical search/fetch shape."""
