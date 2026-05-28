@@ -419,10 +419,6 @@ class WorldPop(AbstractDataSource):
     def _http_get(self, url: str, dest: Path) -> Path:
         """Download `url` to `dest`, skipping when the file already exists.
 
-        Args:
-            url: The GeoTIFF URL.
-            dest: Local destination path.
-
         Transient connection / timeout errors are retried up to
         `_MAX_RETRIES` with exponential backoff; an HTTP status error (e.g.
         404) propagates immediately without retry.
