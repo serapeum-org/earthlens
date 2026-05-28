@@ -738,14 +738,21 @@ class AbstractCatalog(BaseModel):
         )
 
     def get_provider(self, slug: str) -> Any:
-        """Return the :class:`Provider` for `slug` (with a did-you-mean hint on miss).
+        """Return the provider record for `slug` (with a did-you-mean hint on miss).
+
+        The value type depends on the backend's :attr:`providers` field:
+        most backends store an :class:`earthlens.base.Provider`, but some
+        mirror a domain-specific record (earthdata mirrors its
+        `EarthdataDAAC` from `daacs`, stac its `Endpoint` from
+        `endpoints`).
 
         Args:
             slug: A registered provider slug (e.g. `"nasa-lp-daac"`,
                 `"ucsb-chc"`, `"copernicus"`).
 
         Returns:
-            The matching :class:`earthlens.base.Provider`.
+            The matching provider record (a `Provider`, or the backend's
+            domain-specific provider model).
 
         Raises:
             ValueError: If `slug` is not a registered provider.
