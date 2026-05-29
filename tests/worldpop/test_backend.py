@@ -44,18 +44,17 @@ def test_unknown_product_raises(wp_kwargs):
         WorldPop(**wp_kwargs(variables=["nope"]))
 
 
-@pytest.mark.parametrize(
-    "kw",
-    [
-        {"resolution": "1km", "scope": "global"},
-        {"variables": ["future_pop"]},
-        {"variables": ["dependency_ratios"]},
-    ],
-)
-def test_global_scope_products_rejected(wp_kwargs, kw):
-    """Global / continent products fail fast (not yet fetchable, per-ISO3 only)."""
-    with pytest.raises(NotImplementedError, match="not yet supported"):
+@pytest.mark.parametrize("kw", [{"variables": ["future_pop"]}, {"variables": ["dependency_ratios"]}])
+def test_archive_products_rejected(wp_kwargs, kw):
+    """Archive-distributed products (zip / 7z) fail fast at construction."""
+    with pytest.raises(NotImplementedError, match="archives"):
         WorldPop(**wp_kwargs(**kw))
+
+
+def test_global_scope_constructs(wp_kwargs):
+    """A global-mosaic request constructs and resolves the global sub-alias."""
+    backend = WorldPop(**wp_kwargs(resolution="1km", scope="global"))
+    assert backend._subalias_ids == {"pop": "wpgp1km"}
 
 
 def test_impossible_combo_raises(wp_kwargs):
@@ -114,6 +113,41 @@ def test_year_singular(wp_kwargs):
     """A singular year= selects exactly that year."""
     backend = WorldPop(**wp_kwargs(year=2015))
     assert backend._years() == [2015]
+
+
+def _patch_global_http(monkeypatch, tiny_tif_bytes, files):
+    """Patch requests.get to serve a global listing + `?id=` detail + tiny tifs."""
+
+    def fake_get(url, params=None, timeout=None):
+        if url.endswith(".tif"):
+            return _FakeResponse(content=tiny_tif_bytes)
+        if params and "id" in params:
+            return _FakeResponse(json_data={"data": {"id": "1", "files": files}})
+        if "/rest/data/" in url:
+            return _FakeResponse(json_data={"data": [{"id": "1", "popyear": "2000"}]})
+        raise AssertionError(f"unexpected URL: {url}")
+
+    monkeypatch.setattr(requests, "get", fake_get)
+
+
+def test_global_search_plans_global_item(wp_kwargs, monkeypatch, tiny_tif_bytes):
+    """_search plans a global item (iso3='global') for a global-scope request."""
+    _patch_global_http(monkeypatch, tiny_tif_bytes, ["https://x/ppp_2000_1km_Aggregated.tif"])
+    backend = WorldPop(**wp_kwargs(year=2000, resolution="1km", scope="global"))
+    plan = backend._search()
+    assert len(plan) == 1
+    assert plan[0].metadata["iso3"] == "global"
+    assert plan[0].metadata["product"] == "pop"
+
+
+def test_global_download_crops_to_aoi(wp_kwargs, monkeypatch, tiny_tif_bytes):
+    """A global-mosaic download crops the whole-world file to the AOI bbox."""
+    _patch_global_http(monkeypatch, tiny_tif_bytes, ["https://x/ppp_2000_1km_Aggregated.tif"])
+    backend = WorldPop(**wp_kwargs(year=2000, resolution="1km", scope="global"))
+    out = backend.download(progress_bar=False)
+    tifs = [p for p in out if str(p).endswith(".tif")]
+    assert len(tifs) == 1 and tifs[0].name == "pop_2000_1km.tif"
+    assert Dataset.read_file(str(tifs[0])).epsg == 4326
 
 
 def test_search_plan_pop(wp_kwargs, patch_http):

@@ -48,7 +48,11 @@ from earthlens.worldpop._helpers import (
 )
 from earthlens.worldpop.auth import WorldPopAuth
 from earthlens.worldpop.catalog import GENERATIONS, Catalog
-from earthlens.worldpop.rest import files_for_year, rest_records
+from earthlens.worldpop.rest import (
+    files_for_year,
+    global_files_for_year,
+    rest_records,
+)
 
 #: Sub-directory under the output path where raw per-country GeoTIFFs land.
 _RAW_DIRNAME: str = ".worldpop_raw"
@@ -215,7 +219,7 @@ class WorldPop(AbstractDataSource):
             )
             for product in self._products
         }
-        self._guard_unsupported_scope()
+        self._guard_unsupported()
         self._iso3s: list[str] = self._resolve_aoi(aoi, lat_lim, lon_lim)
 
         super().__init__(
@@ -229,30 +233,30 @@ class WorldPop(AbstractDataSource):
             path=path,
         )
 
-    def _guard_unsupported_scope(self) -> None:
-        """Reject global / continent products — the fetch path is ISO3-only.
+    def _guard_unsupported(self) -> None:
+        """Reject archive-distributed products (zip / 7z), which aren't GeoTIFFs.
 
-        WorldPop's per-country GeoTIFFs are downloaded by querying the REST
-        API with `iso3=`. Global mosaics and global / continent-only products
-        (`future_pop`, `dependency_ratios`, the `scope="global"` sub-aliases)
-        are **not** ISO3-keyed — their REST listing returns index records
-        with no per-file URLs and needs a separate drill-down that is not yet
-        implemented. Fail fast at construction with a clear message rather
-        than letting `_search` raise a confusing "no records" later.
+        Per-country and global-mosaic products download per-year GeoTIFFs and
+        are fully supported. The projection / continent products
+        (`future_pop` → SSP `.zip` archives, `dependency_ratios` →
+        per-continent `.7z` archives) ship as multi-file archives the GeoTIFF
+        pipeline cannot localise; fail fast at construction with a clear
+        message rather than letting `_search` raise a confusing "no GeoTIFF"
+        later.
 
         Raises:
-            NotImplementedError: If any requested product resolves to a
-                sub-alias whose `scope` is not `"countries"`.
+            NotImplementedError: If any requested product resolves to an
+                archive-distributed sub-alias.
         """
         for product, subalias_id in self._subalias_ids.items():
             sub = self._catalog.subalias(product, subalias_id)
-            if sub.scope != "countries":
+            if sub.archive:
                 raise NotImplementedError(
-                    f"WorldPop {product!r} resolves to the {sub.scope!r}-scope "
-                    f"sub-alias {subalias_id!r}, which is not yet supported: "
-                    "global / continent products are not ISO3-keyed and need a "
-                    "separate fetch path. Use a country-scoped product/selection "
-                    '(scope="countries").'
+                    f"WorldPop {product!r} resolves to sub-alias {subalias_id!r}, "
+                    "which is distributed as multi-file .zip / .7z archives "
+                    "(SSP scenarios / per-continent), not per-year GeoTIFFs — not "
+                    "supported by the GeoTIFF pipeline. Use a country-scoped or "
+                    "global-mosaic product."
                 )
 
     def _resolve_aoi(
@@ -391,23 +395,61 @@ class WorldPop(AbstractDataSource):
         for product in self._products:
             subalias_id = self._subalias_ids[product]
             demographic = self._catalog.get(product).demographic
-            for iso3 in self._iso3s:
-                records = rest_records(product, subalias_id, iso3)
-                for year in years:
-                    for url in files_for_year(records, year):
-                        out.append(
-                            RemoteProduct(
-                                id=f"{product}_{iso3}_{year}_{Path(url).stem}",
-                                href=url,
-                                metadata={
-                                    "product": product,
-                                    "iso3": iso3,
-                                    "year": year,
-                                    "subalias": subalias_id,
-                                    "demographic": demographic,
-                                },
-                            )
+            if self._catalog.subalias(product, subalias_id).scope == "global":
+                out.extend(self._plan_global(product, subalias_id, demographic, years))
+            else:
+                out.extend(self._plan_countries(product, subalias_id, demographic, years))
+        return out
+
+    def _plan_countries(
+        self, product: str, subalias_id: str, demographic: bool, years: list[int]
+    ) -> list[RemoteProduct]:
+        """Plan per-country downloads for one product (records once per ISO3)."""
+        out: list[RemoteProduct] = []
+        for iso3 in self._iso3s:
+            records = rest_records(product, subalias_id, iso3)
+            for year in years:
+                for url in files_for_year(records, year):
+                    out.append(
+                        RemoteProduct(
+                            id=f"{product}_{iso3}_{year}_{Path(url).stem}",
+                            href=url,
+                            metadata={
+                                "product": product,
+                                "iso3": iso3,
+                                "year": year,
+                                "subalias": subalias_id,
+                                "demographic": demographic,
+                            },
                         )
+                    )
+        return out
+
+    def _plan_global(
+        self, product: str, subalias_id: str, demographic: bool, years: list[int]
+    ) -> list[RemoteProduct]:
+        """Plan global-mosaic downloads for one product (no ISO3; `?id=` detail).
+
+        A global mosaic is one whole-world GeoTIFF per year (or one per
+        age/sex cohort), downloaded once and cropped to the AOI bbox by the
+        localise step — there is no per-country mosaic.
+        """
+        out: list[RemoteProduct] = []
+        for year in years:
+            for url in global_files_for_year(product, subalias_id, year):
+                out.append(
+                    RemoteProduct(
+                        id=f"{product}_global_{year}_{Path(url).stem}",
+                        href=url,
+                        metadata={
+                            "product": product,
+                            "iso3": "global",
+                            "year": year,
+                            "subalias": subalias_id,
+                            "demographic": demographic,
+                        },
+                    )
+                )
         return out
 
     def _raw_dir(self) -> Path:

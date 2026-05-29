@@ -84,7 +84,7 @@ products:
     demographic: false
     unit: "ratio"
     subaliases:
-      - {id: drwc, constrained: false, unadjusted: true, resolution: "1km", scope: global, generation: R2021, years: "2000-2020"}
+      - {id: drwc, constrained: false, unadjusted: true, resolution: "1km", scope: global, generation: R2021, archive: true, years: "2000-2020"}
 
   urban_change:
     friendly: [urban, urbanisation]
@@ -116,4 +116,4 @@ products:
     demographic: false
     unit: "people/pixel"
     subaliases:
-      - {id: FPP_v02, constrained: false, unadjusted: true, resolution: "1km", scope: global, generation: R2025A, years: "2025-2100"}
+      - {id: FPP_v02, constrained: false, unadjusted: true, resolution: "1km", scope: global, generation: R2025A, archive: true, years: "2025-2100"}
