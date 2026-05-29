@@ -175,23 +175,55 @@ class GHSL(AbstractDataSource):
         a bad `release` / `resolution` fails at construction.
 
         Raises:
-            ValueError: If a product has no such release, or the requested
-                (or its default) resolution is not available for it.
+            ValueError: If a product has no usable release (see
+                `_release_for`), or the requested (or its default) resolution
+                is not available for it.
         """
         for code in self._codes:
             product = self._catalog.get(code)
-            if self._release not in product.releases:
-                raise ValueError(
-                    f"{code} has no release {self._release!r}; "
-                    f"available releases: {sorted(product.releases)}."
-                )
+            release = self._release_for(code)
             resolution = self._resolution_for(code)
-            resolutions = product.release_resolutions(self._release)
+            resolutions = product.release_resolutions(release)
             if resolution not in resolutions:
                 raise ValueError(
-                    f"{code} ({self._release}) has no resolution "
+                    f"{code} ({release}) has no resolution "
                     f"{resolution!r}; available: {resolutions}."
                 )
+
+    def _release_for(self, code: str) -> str:
+        """Resolve the release to use for one product.
+
+        Returns the requested `release` when the product offers it; otherwise,
+        when the product exists at exactly one release, falls back to that one
+        (so single-release products like `GHS_LAND` (R2022A) or
+        `GHS_FUA_UCDB2015` (R2019A) work without forcing `release=`, and a
+        request can mix products living at different releases). A product with
+        several releases, none of them the requested one, is ambiguous and
+        raises.
+
+        Args:
+            code: A canonical product code.
+
+        Returns:
+            str: The release id to use for this product.
+
+        Raises:
+            ValueError: If the product has no usable release for the request.
+        """
+        product = self._catalog.get(code)
+        if self._release in product.releases:
+            return self._release
+        if len(product.releases) == 1:
+            only = next(iter(product.releases))
+            logger.info(
+                f"GHSL: {code} has no release {self._release!r}; using its only "
+                f"release {only!r}."
+            )
+            return only
+        raise ValueError(
+            f"{code} has no release {self._release!r}; "
+            f"available releases: {sorted(product.releases)}."
+        )
 
     def _resolution_for(self, code: str) -> str:
         """Return the resolution to use for one product.
@@ -445,7 +477,7 @@ class GHSL(AbstractDataSource):
         Raises:
             ValueError: If an explicit epoch is not available for the product.
         """
-        available = self._catalog.get(code).release_epochs(self._release)
+        available = self._catalog.get(code).release_epochs(self._release_for(code))
         if self._epochs_arg is not None:
             requested = list(self._epochs_arg)
         elif self._epoch_arg is not None:
@@ -464,7 +496,7 @@ class GHSL(AbstractDataSource):
         unknown = [e for e in requested if e not in available]
         if unknown:
             raise ValueError(
-                f"{code} ({self._release}) has no epoch(s) {unknown}; "
+                f"{code} ({self._release_for(code)}) has no epoch(s) {unknown}; "
                 f"available epochs: {available}."
             )
         return sorted(set(requested))
@@ -488,13 +520,14 @@ class GHSL(AbstractDataSource):
                 the AOI.
         """
         product = self._catalog.get(code)
+        release = self._release_for(code)
         resolution = self._resolution_for(code)
-        block = product.block_for(self._release, epoch, resolution)
+        block = product.block_for(release, epoch, resolution)
         family = product.family_token()
         url_kw = dict(version=block.version, region=block.region, nested=block.nested)
         is_tiled = resolution in block.tiled() and self._tiling != "global"
         if not is_tiled:
-            return [ghsl_url(family, code, epoch, self._release, resolution, **url_kw)]
+            return [ghsl_url(family, code, epoch, release, resolution, **url_kw)]
         tiles = tiles_for_bbox(self._bbox)
         if not tiles:
             raise ValueError(
@@ -503,7 +536,7 @@ class GHSL(AbstractDataSource):
                 "AOI, a coarser whole-globe resolution, or tiling='global'."
             )
         return [
-            ghsl_url(family, code, epoch, self._release, resolution, tile=t, **url_kw)
+            ghsl_url(family, code, epoch, release, resolution, tile=t, **url_kw)
             for t in tiles
         ]
 
@@ -529,8 +562,9 @@ class GHSL(AbstractDataSource):
                 )
                 continue
             resolution = self._resolution_for(code)
+            release = self._release_for(code)
             for epoch in self._epochs_for(code):
-                self._catalog.validate(code, self._release, epoch, resolution)
+                self._catalog.validate(code, release, epoch, resolution)
                 plan.append(
                     RemoteProduct(
                         id=f"{code}_E{epoch}",
@@ -641,7 +675,9 @@ class GHSL(AbstractDataSource):
         # legend sidecar are only written when a legend exists (a legend-less
         # categorical product — e.g. GHS_BUILT_C_VEG, whose class codes are not
         # curated — still gets the safe NN resampling, just no colour table).
-        has_legend = categorical and bool(self._catalog.get(rp.metadata["product"]).legend)
+        has_legend = categorical and bool(
+            self._catalog.get(rp.metadata["product"]).legend
+        )
         if has_legend:
             # The GeoTIFF colour table is best-effort: pyramids needs its
             # optional viz extra to write one. The legend always survives via
@@ -735,9 +771,10 @@ class GHSL(AbstractDataSource):
         """
         code = rp.metadata["product"]
         product = self._catalog.get(code)
-        blocks = product.releases.get(self._release) or []
+        release = self._release_for(code)
+        blocks = product.releases.get(release) or []
         region = blocks[0].region if blocks else "GLOBE"
-        family_url = f"{BASE_URL}/{product.family_token()}_{region}_{self._release}"
+        family_url = f"{BASE_URL}/{product.family_token()}_{region}_{release}"
         version = latest_version_dir(family_url)
         version_url = f"{family_url}/{version}"
         zips = sorted(n for n in list_remote_dir(version_url) if n.endswith(".zip"))

@@ -95,14 +95,16 @@ releases and regional / statistical products:
   `GHS_BUILT_C_VEG`. R2022A stops at epoch 2020, is **Mollweide-only** (the
   WGS84 arc-second variants arrived in R2023A), and nests its per-epoch
   directories under a sub-product directory (handled transparently). Request
-  with `release="R2022A"`.
+  with `release="R2022A"` (these products also exist at R2023A, so the release
+  must be given explicitly).
 - **Tabular / statistical families** (downloaded as a versioned `.zip` table,
   no raster pipeline): `GHS_AGE` (R2025A), `GHS_COUNTRY_STATS_MT` (R2024A),
   `GHS_FUA_UCDB2015` / `GHS_STAT_DUCMT` / `GHS_STAT_UCDB2015MT` (R2019A),
   the EUROPE LAU products `GHS_BUILT_LAUSTAT` (R2023A) / `GHS_BUILT_LAU2STAT`
   (R2022A), and the ARCTIC regional tables `GHS_BUSS` / `GHS_POP_ARCTIC` /
-  `GHS_SMOD_ARCTIC` (R2025A). Pass the product's own `release=` (and the table
-  lands under `path/{code}/`).
+  `GHS_SMOD_ARCTIC` (R2025A). Each exists at a single release, so `release=`
+  is auto-detected when omitted (a request may even mix products from
+  different releases); the table lands under `path/{code}/`.
 
 ### Deliberately not curated
 
