@@ -96,7 +96,11 @@ products:
           resolutions: ["table"]
           region: EUROPE
 
-  # ----- ARCTIC regional tables (single versioned zip; polar payload) -----
+  # ----- ARCTIC regional families -----
+  # `kind: tabular` here means "raw versioned-zip download" (the _fetch_duc
+  # path), not literally a table: these ARCTIC products ship as a single
+  # versioned .zip whose payload is a polar (EPSG:3575) raster, downloaded and
+  # extracted as-is (no Mollweide epoch-tile pipeline).
   GHS_BUSS:
     family: GHS_BUSS
     aliases: [buss, business_statistics]

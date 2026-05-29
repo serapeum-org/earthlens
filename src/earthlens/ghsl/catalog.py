@@ -36,7 +36,7 @@ Two GHSL quirks the model captures:
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any
+from typing import Any, Literal
 
 from pandas import DataFrame
 from pydantic import BaseModel, ConfigDict, Field, PrivateAttr, ValidationError
@@ -260,7 +260,7 @@ class Availability(BaseModel):
     resolutions: list[str] = Field(min_length=1)
     version: tuple[str, str] = ("1", "0")
     tiled_resolutions: list[str] | None = None
-    region: str = "GLOBE"
+    region: Literal["GLOBE", "EUROPE", "ARCTIC"] = "GLOBE"
     nested: bool = False
 
     def source_crs(self) -> frozenset[str]:
