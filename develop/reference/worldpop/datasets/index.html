@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -9021,11 +9021,14 @@ tidy table — see <a href="../usage/#demographic-tables">Usage → Demographic 
 resolves the per-year whole-world GeoTIFF via the hub's <code>?id=</code> detail
 endpoint, downloads it, and crops to the AOI. WorldPop has no server-side
 subsetting, so each global 1 km mosaic is a ~1.1 GB download per year.</p>
-<p><code>future_pop</code> (<code>FPP_v02</code>) and <code>dependency_ratios</code> (<code>drwc</code>) are marked
-<code>archive: true</code> in the catalog — they ship as multi-file <code>.zip</code> (per-SSP) /
-<code>.7z</code> (per-continent) archives, not per-year GeoTIFFs, so requesting them
-raises <code>NotImplementedError</code>. They remain as accurate catalog metadata;
-archive extraction + the SSP / continent axes are a follow-up.</p>
+<p><code>dependency_ratios</code> (<code>drwc</code>, <code>archive: "7z"</code>) and <code>future_pop</code> (<code>FPP_v02</code>,
+<code>archive: "zip"</code>) are distributed as multi-file archives, not per-year
+GeoTIFFs; the backend downloads the archive, extracts its GeoTIFFs (<code>py7zr</code>
+for <code>.7z</code>), and crops them to the AOI. <code>dependency_ratios</code> is small and
+per-continent (Asia / Africa only, year 2010, three ratio variants —
+resolved from the AOI's continent). <code>future_pop</code> is per-SSP and <strong>~4 GB per
+scenario</strong>, so it needs <code>allow_large_archive=True</code> + <code>ssp=</code> to opt in. Both
+require the <code>[worldpop]</code> extra.</p>
 <h2 id="not-curated-covariates"><a class="toclink" href="#not-curated-covariates">Not curated: <code>covariates</code></a><a class="headerlink" href="#not-curated-covariates" title="Permanent link">#</a></h2>
 <p>The hub's <code>covariates</code> family (50+ heterogeneous named layers — VIIRS/DMSP
 nightlights, SRTM slope, distance-to-roads/water, Global-2 built-up surface,
