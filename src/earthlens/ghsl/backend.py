@@ -105,8 +105,14 @@ class GHSL(AbstractDataSource):
                 `"yearly"`.
             path: Output directory. Created by the parent class.
             fmt: `strptime` format for `start` / `end`.
-            release: GHSL release id — `"R2023A"` (default), `"R2022A"`
-                (LAND), or `"R2025A"` (WUP projections).
+            release: Requested GHSL release id (default `"R2023A"`). Resolved
+                per product by `_release_for`: used when the product offers it,
+                otherwise the product's only release is used (so single-release
+                products like `GHS_LAND` (R2022A), the R2019A/R2024A statistical
+                families, and the R2025A WUP family resolve without an explicit
+                release, and one request may mix products from different
+                releases); a product with several releases, none requested,
+                raises.
             epoch: A single reference year to fetch (overrides the date
                 window). Mutually informative with `epochs`.
             epochs: An explicit list of reference years (overrides the date
@@ -630,7 +636,10 @@ class GHSL(AbstractDataSource):
         reprojects them to the output CRS in one call (skipped when the source
         already matches the output CRS), then `Dataset.crop` clips to the AOI
         bbox. Categorical products reproject with nearest-neighbour (so class
-        codes are never blended) and carry their colour table.
+        codes are never blended); those with a curated legend also carry a
+        colour table + a `.legend.json` sidecar, while a legend-less categorical
+        product (e.g. `GHS_BUILT_C_VEG`) still gets the safe NN resampling but
+        no colour table or sidecar.
 
         Args:
             tifs: The downloaded source `.tif` tiles (Mollweide or WGS84).
