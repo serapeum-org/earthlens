@@ -347,3 +347,25 @@ class TestLegacyRegionalCatalog:
         assert cat.get("GHS_BUILT_LAUSTAT").releases["R2023A"][0].region == "EUROPE"
         assert cat.get("GHS_POP_ARCTIC").releases["R2025A"][0].region == "ARCTIC"
         assert cat.get("GHS_AGE").kind == "tabular"
+
+
+@pytest.mark.ghsl
+class TestRegionAndVeg:
+    """Region Literal validation + the legend-less categorical VEG product."""
+
+    def test_region_literal_rejects_bad_value(self):
+        """Availability.region is a Literal — a bad region is rejected."""
+        with pytest.raises(Exception):
+            Availability(epochs=[2020], resolutions=["1km"], region="GLOB")
+
+    def test_region_accepts_known_values(self):
+        """GLOBE / EUROPE / ARCTIC are accepted region tokens."""
+        for region in ("GLOBE", "EUROPE", "ARCTIC"):
+            block = Availability(epochs=[2020], resolutions=["table"], region=region)
+            assert block.region == region
+
+    def test_veg_is_categorical_without_legend(self):
+        """GHS_BUILT_C_VEG is flagged categorical but carries no legend."""
+        veg = Catalog().get("GHS_BUILT_C_VEG")
+        assert veg.categorical is True
+        assert veg.legend is None

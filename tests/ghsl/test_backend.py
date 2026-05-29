@@ -489,3 +489,41 @@ class TestLegacyRegionalBackend:
             end="2020-12-31",
         )
         assert g._epochs_for("GHS_POP") == [2000, 2005, 2010, 2015, 2020]
+
+
+@pytest.mark.ghsl
+class TestReleaseResolution:
+    """`_release_for` — requested release, single-release fallback, mixed."""
+
+    def test_uses_requested_release_when_present(self, tmp_path):
+        """The requested release is used when the product offers it."""
+        g = _build(tmp_path, ["GHS_POP"], release="R2022A")
+        assert g._release_for("GHS_POP") == "R2022A"
+
+    def test_single_release_fallback(self, tmp_path):
+        """A single-release product falls back from the default release."""
+        g = _build(tmp_path, ["GHS_LAND"], start="2018-01-01", end="2018-12-31")
+        assert g._release_for("GHS_LAND") == "R2022A"
+
+    def test_mixed_release_request(self, tmp_path):
+        """One request resolves each product to its own release."""
+        g = _build(tmp_path, ["GHS_POP", "GHS_FUA_UCDB2015"])
+        assert g._release_for("GHS_POP") == "R2023A"
+        assert g._release_for("GHS_FUA_UCDB2015") == "R2019A"
+
+    def test_multi_release_mismatch_raises(self, tmp_path):
+        """A product with several releases, none requested, raises."""
+        with pytest.raises(ValueError, match="no release"):
+            _build(tmp_path, ["GHS_POP"], release="R9999Z")
+
+
+@pytest.mark.ghsl
+class TestLegendlessCategorical:
+    """A categorical product with no legend (GHS_BUILT_C_VEG) — NN, no sidecar."""
+
+    def test_veg_uses_nn_and_writes_no_sidecar(self, tmp_path, patched_io):
+        """VEG reprojects with nearest-neighbour and writes no legend sidecar."""
+        g = _build(tmp_path, ["GHS_BUILT_C_VEG"], start="2018-01-01", end="2018-12-31")
+        out = g.download(progress_bar=False)
+        assert patched_io[-1]["resampling"] == "nearest neighbor"
+        assert out and not out[0].with_suffix(".legend.json").exists()
