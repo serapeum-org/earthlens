@@ -79,18 +79,28 @@ reference.
 
 ## Catalog tooling
 
-`tools/worldpop/refresh_worldpop_catalog.py` mirrors the GEE catalog tooling:
+`tools/worldpop/` mirrors the GEE / CHC / tropycal catalog tooling — a
+refresh, an audit, and a probe:
 
 ```bash
-# crawl the hub and write the available_products index (every alias + live sub-aliases)
+# refresh: crawl the hub and write the available_products index (every alias + sub-aliases)
 python tools/worldpop/refresh_worldpop_catalog.py refresh -o available_products.yaml
 
-# structural check of the curated catalog (offline), plus upstream existence (--live)
+# refresh: structural check of the curated catalog (offline) + upstream existence (--live)
 python tools/worldpop/refresh_worldpop_catalog.py validate --live --check-files
+
+# audit: diff the curated catalog vs the live hub; --strict exits non-zero on drift
+python tools/worldpop/audit_worldpop_catalog.py --strict
+
+# probe: capture the live REST shape (aliases, sub-aliases, a sample record) to JSON
+python tools/worldpop/probe_worldpop_rest.py --alias pop --subalias wpgp --iso3 KEN -o probe.json
 ```
 
-`validate` exits non-zero and prints each problem when a curated sub-alias
-has drifted from the live hub.
+The `audit` report flags curated products / sub-aliases the hub no longer
+serves and new upstream products that aren't curated (excluding the
+deliberately out-of-scope specialty families). The `Catalog` also exposes a
+runtime `health()` hygiene report and a `describe(product)` introspection
+helper, matching the other backends' catalogs.
 
 ## Licence
 
