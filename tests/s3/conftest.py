@@ -93,6 +93,22 @@ def tiny_cog(tmp_path_factory) -> Path:
 
 
 @pytest.fixture
+def tiny_era5_nc(tmp_path_factory) -> Path:
+    """A synthetic ERA5-shaped NetCDF: global 0-360 lon, an Italy lat band, 2 times."""
+    import xarray as xr
+
+    path = tmp_path_factory.mktemp("ncfix") / "era5.nc"
+    lon = np.arange(0, 360, 0.25)
+    lat = np.arange(42, 39.75, -0.25)
+    arr = np.random.RandomState(0).rand(2, lat.size, lon.size).astype("float32")
+    xr.Dataset(
+        {"VAR_2T": (("time", "latitude", "longitude"), arr)},
+        coords={"time": np.array([0.0, 1.0]), "latitude": lat, "longitude": lon},
+    ).to_netcdf(path)
+    return path
+
+
+@pytest.fixture
 def fake_client_factory(tiny_cog):
     """Return a builder for a `FakeS3Client` backed by the synthetic COG."""
 

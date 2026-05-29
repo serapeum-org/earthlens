@@ -155,8 +155,47 @@ def test_reproject_branch_runs_for_non_4326(tmp_path, fake_client_factory, patch
     assert len(paths) == 1 and Path(paths[0]).exists()
 
 
+def test_netcdf_localise_rebuilds_and_crops(tmp_path, fake_client_factory, patch_auth, tiny_era5_nc):
+    """An ERA5-style NetCDF is rebuilt to WGS84, lon-wrapped, and cropped."""
+    from earthlens.base import RemoteProduct
+    from pyramids.dataset import Dataset
+
+    patch_auth(fake_client_factory())
+    source = S3(
+        start="2023-12-01", end="2023-12-01",
+        lat_lim=[40.0, 42.0], lon_lim=[12.0, 14.0],
+        dataset="era5", variables=["t2m"], path=str(tmp_path),
+    )
+    product = RemoteProduct(
+        id="t2m_202312", href="x.nc",
+        metadata={"bucket": "nsf-ncar-era5", "variable": "128_167_2t"},
+    )
+    out = source._localise(tiny_era5_nc, product)
+    assert Path(out).suffix == ".tif"
+    cropped = Dataset.read_file(str(out))
+    assert cropped.epsg == 4326 and cropped.shape[1] < 50 and cropped.shape[2] < 50
+
+
+def test_goes_geostationary_localise_deferred(tmp_path, fake_client_factory, patch_auth, tiny_era5_nc):
+    """GOES (geostationary NetCDF) localise raises a clear PY-1 deferral."""
+    from earthlens.base import RemoteProduct
+
+    patch_auth(fake_client_factory())
+    source = S3(
+        start="2024-06-28", end="2024-06-28",
+        lat_lim=[30.0, 32.0], lon_lim=[-100.0, -98.0],
+        dataset="goes", variables=["C13"], path=str(tmp_path),
+    )
+    product = RemoteProduct(
+        id="C13_2024180", href="x.nc",
+        metadata={"bucket": "noaa-goes16", "variable": "C13"},
+    )
+    with pytest.raises(NotImplementedError, match="PY-1"):
+        source._localise(tiny_era5_nc, product)
+
+
 def test_aggregate_runs_per_window(tmp_path, fake_client_factory, patch_auth, monkeypatch):
-    """_aggregate feeds each cropped NetCDF through aggregate_netcdf."""
+    """_aggregate downloads each raw NetCDF and feeds it to aggregate_netcdf."""
     import earthlens.aggregate as agg
     from earthlens.base import RemoteProduct
 
@@ -174,13 +213,11 @@ def test_aggregate_runs_per_window(tmp_path, fake_client_factory, patch_auth, mo
         return [(None, None, out)]
 
     monkeypatch.setattr(agg, "aggregate_netcdf", _fake_aggregate)
-    fake_path = tmp_path / "t2m_202406.nc"
-    fake_path.write_bytes(b"x")
-    source._product_by_output = {
-        str(fake_path): RemoteProduct(
-            id="t2m_202406", href="x", metadata={"variable": "128_167_2t"}
+    products = [
+        RemoteProduct(
+            id="t2m_202406", href="x.nc",
+            metadata={"bucket": "nsf-ncar-era5", "variable": "128_167_2t"},
         )
-    }
-    cfg = AggregationConfig(freq="D", op="mean")
-    results = source._aggregate([fake_path], cfg)
+    ]
+    results = source._aggregate(products, AggregationConfig(freq="D", op="mean"))
     assert results == [out] and captured["nc_variable"] == "128_167_2t"
