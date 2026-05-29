@@ -48,7 +48,7 @@ one REST sub-alias:
 | `constrained` | `False` (default) / `True` | settlement-masked vs not |
 | `unadjusted` | `True` (default) / `False` | raw vs UN-adjusted |
 | `resolution` | `"100m"` (default) / `"1km"` | not every product offers both |
-| `scope` | `"countries"` (default) / `"global"` | global = a single mosaic — **not yet fetchable** (see note) |
+| `scope` | `"countries"` (default) / `"global"` | global = the whole-world mosaic (see note) |
 | `generation` | `"R2021"` (default) / `"R2025A"` / … | classic vs Global-2 lines |
 | `level` | `"national"` (default) / `"subnational"` | `pwd` only |
 
@@ -56,14 +56,20 @@ A selector tuple that matches no sub-alias raises a `ValueError` listing the
 product's available variants (did-you-mean). Single-variant products
 (`births`, …) ignore the selectors.
 
-!!! warning "Global / continent products are not yet fetchable"
-    The download path queries WorldPop per **ISO3 country**. Global mosaics
-    (`scope="global"`) and the global / continent-only products
-    `future_pop` and `dependency_ratios` are **not** ISO3-keyed — their REST
-    listing has no per-file URLs and needs a separate drill-down that is not
-    implemented yet. Requesting them raises `NotImplementedError` at
-    construction (rather than failing mid-download). Use a country-scoped
-    product / `scope="countries"` for now; global support is a follow-up.
+!!! note "Global mosaics download the whole world (~1 GB), then crop"
+    `scope="global"` fetches the per-year whole-world mosaic (`pop` →
+    `wpgp1km`, `age_structures` → `aswpgponekm`, …) via the hub's `?id=`
+    detail endpoint and crops it to your `lat_lim` / `lon_lim`. WorldPop
+    offers **no server-side subsetting**, so each global 1 km mosaic is a
+    full ~1.1 GB download per year before the crop — prefer `scope="countries"`
+    unless you genuinely need the global grid.
+
+!!! warning "future_pop / dependency_ratios are not fetchable"
+    These ship as multi-file **archives** — `future_pop` as per-SSP `.zip`
+    bundles, `dependency_ratios` as per-continent `.7z` archives — not
+    per-year GeoTIFFs, so the GeoTIFF pipeline cannot localise them.
+    Requesting them raises `NotImplementedError` at construction. Archive
+    extraction + the SSP / continent axes are a follow-up.
 
 ```python
 # constrained Global-2 2020 100 m population:

@@ -58,14 +58,19 @@ The filename pattern is `{iso3}_{sex}_{age_low}_{year}.tif`
 (e.g. `ken_f_0_2020.tif`); the AOI population sum per cohort is written to a
 tidy table — see [Usage → Demographic tables](usage.md#demographic-tables).
 
-## Not yet fetchable: global / continent products
+## Global mosaics & archive products
 
-The downloader is per-ISO3. Rows whose `scope` is `global` — the `scope="global"`
-mosaics of `pop` / `age_structures`, and the global / continent-only products
-`future_pop` (`FPP_v02`) and `dependency_ratios` (`drwc`) — are listed above as
-accurate catalog metadata, but their WorldPop listing is **not** ISO3-keyed (no
-per-file URLs), so requesting them raises `NotImplementedError`. Global support
-is a follow-up; use a country-scoped product / `scope="countries"` for now.
+The `scope="global"` mosaics of `pop` / `age_structures` (`wpgp1km`,
+`aswpgponekm`, `G2_MOS_POP_R25A_1km`, …) **are fetchable**: the backend
+resolves the per-year whole-world GeoTIFF via the hub's `?id=` detail
+endpoint, downloads it, and crops to the AOI. WorldPop has no server-side
+subsetting, so each global 1 km mosaic is a ~1.1 GB download per year.
+
+`future_pop` (`FPP_v02`) and `dependency_ratios` (`drwc`) are marked
+`archive: true` in the catalog — they ship as multi-file `.zip` (per-SSP) /
+`.7z` (per-continent) archives, not per-year GeoTIFFs, so requesting them
+raises `NotImplementedError`. They remain as accurate catalog metadata;
+archive extraction + the SSP / continent axes are a follow-up.
 
 ## Not curated: `covariates`
 

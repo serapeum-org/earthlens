@@ -92,3 +92,16 @@ def test_live_multiyear_aggregate(tmp_path: Path):
     )
     tifs = [p for p in out if str(p).endswith(".tif")]
     assert len(tifs) == 1 and "_mean" in tifs[0].name
+
+
+def test_live_global_mosaic_url_resolves():
+    """The live global-mosaic path resolves a per-year whole-world GeoTIFF URL.
+
+    Only the URL is resolved (via the `?id=` detail endpoint) — the global
+    1 km mosaic itself is ~1.1 GB, too large to download in a test.
+    """
+    from earthlens.worldpop.rest import global_files_for_year
+
+    files = global_files_for_year("pop", "wpgp1km", 2000)
+    assert files and files[0].endswith(".tif")
+    assert "1km" in files[0]
