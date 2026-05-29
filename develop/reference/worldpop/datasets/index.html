@@ -4054,10 +4054,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#not-yet-fetchable-global-continent-products" class="md-nav__link">
+  <a href="#global-mosaics-archive-products" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Not yet fetchable: global / continent products
+        Global mosaics &amp; archive products
       
     </span>
   </a>
@@ -8493,10 +8493,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#not-yet-fetchable-global-continent-products" class="md-nav__link">
+  <a href="#global-mosaics-archive-products" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Not yet fetchable: global / continent products
+        Global mosaics &amp; archive products
       
     </span>
   </a>
@@ -9015,13 +9015,17 @@ tabularised (only <code>age_structures</code>). <code>kind = mixed</code> follow
 <p>The filename pattern is <code>{iso3}_{sex}_{age_low}_{year}.tif</code>
 (e.g. <code>ken_f_0_2020.tif</code>); the AOI population sum per cohort is written to a
 tidy table — see <a href="../usage/#demographic-tables">Usage → Demographic tables</a>.</p>
-<h2 id="not-yet-fetchable-global-continent-products"><a class="toclink" href="#not-yet-fetchable-global-continent-products">Not yet fetchable: global / continent products</a><a class="headerlink" href="#not-yet-fetchable-global-continent-products" title="Permanent link">#</a></h2>
-<p>The downloader is per-ISO3. Rows whose <code>scope</code> is <code>global</code> — the <code>scope="global"</code>
-mosaics of <code>pop</code> / <code>age_structures</code>, and the global / continent-only products
-<code>future_pop</code> (<code>FPP_v02</code>) and <code>dependency_ratios</code> (<code>drwc</code>) — are listed above as
-accurate catalog metadata, but their WorldPop listing is <strong>not</strong> ISO3-keyed (no
-per-file URLs), so requesting them raises <code>NotImplementedError</code>. Global support
-is a follow-up; use a country-scoped product / <code>scope="countries"</code> for now.</p>
+<h2 id="global-mosaics-archive-products"><a class="toclink" href="#global-mosaics-archive-products">Global mosaics &amp; archive products</a><a class="headerlink" href="#global-mosaics-archive-products" title="Permanent link">#</a></h2>
+<p>The <code>scope="global"</code> mosaics of <code>pop</code> / <code>age_structures</code> (<code>wpgp1km</code>,
+<code>aswpgponekm</code>, <code>G2_MOS_POP_R25A_1km</code>, …) <strong>are fetchable</strong>: the backend
+resolves the per-year whole-world GeoTIFF via the hub's <code>?id=</code> detail
+endpoint, downloads it, and crops to the AOI. WorldPop has no server-side
+subsetting, so each global 1 km mosaic is a ~1.1 GB download per year.</p>
+<p><code>future_pop</code> (<code>FPP_v02</code>) and <code>dependency_ratios</code> (<code>drwc</code>) are marked
+<code>archive: true</code> in the catalog — they ship as multi-file <code>.zip</code> (per-SSP) /
+<code>.7z</code> (per-continent) archives, not per-year GeoTIFFs, so requesting them
+raises <code>NotImplementedError</code>. They remain as accurate catalog metadata;
+archive extraction + the SSP / continent axes are a follow-up.</p>
 <h2 id="not-curated-covariates"><a class="toclink" href="#not-curated-covariates">Not curated: <code>covariates</code></a><a class="headerlink" href="#not-curated-covariates" title="Permanent link">#</a></h2>
 <p>The hub's <code>covariates</code> family (50+ heterogeneous named layers — VIIRS/DMSP
 nightlights, SRTM slope, distance-to-roads/water, Global-2 built-up surface,

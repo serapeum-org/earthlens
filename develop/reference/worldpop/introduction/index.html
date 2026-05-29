@@ -8635,13 +8635,14 @@ listed by the catalog refresh tool but is <strong>not</strong> part of the curat
 selector catalog — its 50+ named layers don't fit the
 <code>(constrained × resolution × scope × generation)</code> selector model. See
 <a href="../datasets/">Available datasets</a> for the full sub-alias matrix.</p>
-<div class="admonition warning">
-<p class="admonition-title">Global / continent products not yet fetchable</p>
-<p>The downloader is per-ISO3, so global mosaics (<code>scope="global"</code>) and the
-global / continent-only products <code>future_pop</code> and <code>dependency_ratios</code>
-cannot be downloaded yet (their WorldPop listing isn't ISO3-keyed).
-They remain in the catalog as metadata, but requesting them raises
-<code>NotImplementedError</code>. See <a href="../usage/#selectors--a-concrete-sub-alias">Usage</a>.</p>
+<div class="admonition note">
+<p class="admonition-title">Global mosaics fetchable; future_pop / dependency_ratios deferred</p>
+<p><code>scope="global"</code> downloads the per-year whole-world mosaic and crops it
+to the AOI (a ~1.1 GB download per year — no server-side subsetting). The
+projection / continent products <code>future_pop</code> and <code>dependency_ratios</code> ship
+as <code>.zip</code> / <code>.7z</code> <strong>archives</strong> rather than GeoTIFFs, so they remain
+catalog metadata only and raise <code>NotImplementedError</code> if requested. See
+<a href="../usage/#selectors--a-concrete-sub-alias">Usage</a>.</p>
 </div>
 <h2 id="output-kind"><a class="toclink" href="#output-kind">Output kind</a><a class="headerlink" href="#output-kind" title="Permanent link">#</a></h2>
 <p><code>WorldPop.OUTPUT_KIND</code> is <code>"mixed"</code>: population products yield AOI-cropped

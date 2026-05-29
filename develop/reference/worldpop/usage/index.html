@@ -8675,7 +8675,7 @@ one REST sub-alias:</p>
 <tr>
 <td><code>scope</code></td>
 <td><code>"countries"</code> (default) / <code>"global"</code></td>
-<td>global = a single mosaic — <strong>not yet fetchable</strong> (see note)</td>
+<td>global = the whole-world mosaic (see note)</td>
 </tr>
 <tr>
 <td><code>generation</code></td>
@@ -8692,15 +8692,22 @@ one REST sub-alias:</p>
 <p>A selector tuple that matches no sub-alias raises a <code>ValueError</code> listing the
 product's available variants (did-you-mean). Single-variant products
 (<code>births</code>, …) ignore the selectors.</p>
+<div class="admonition note">
+<p class="admonition-title">Global mosaics download the whole world (~1 GB), then crop</p>
+<p><code>scope="global"</code> fetches the per-year whole-world mosaic (<code>pop</code> →
+<code>wpgp1km</code>, <code>age_structures</code> → <code>aswpgponekm</code>, …) via the hub's <code>?id=</code>
+detail endpoint and crops it to your <code>lat_lim</code> / <code>lon_lim</code>. WorldPop
+offers <strong>no server-side subsetting</strong>, so each global 1 km mosaic is a
+full ~1.1 GB download per year before the crop — prefer <code>scope="countries"</code>
+unless you genuinely need the global grid.</p>
+</div>
 <div class="admonition warning">
-<p class="admonition-title">Global / continent products are not yet fetchable</p>
-<p>The download path queries WorldPop per <strong>ISO3 country</strong>. Global mosaics
-(<code>scope="global"</code>) and the global / continent-only products
-<code>future_pop</code> and <code>dependency_ratios</code> are <strong>not</strong> ISO3-keyed — their REST
-listing has no per-file URLs and needs a separate drill-down that is not
-implemented yet. Requesting them raises <code>NotImplementedError</code> at
-construction (rather than failing mid-download). Use a country-scoped
-product / <code>scope="countries"</code> for now; global support is a follow-up.</p>
+<p class="admonition-title">future_pop / dependency_ratios are not fetchable</p>
+<p>These ship as multi-file <strong>archives</strong> — <code>future_pop</code> as per-SSP <code>.zip</code>
+bundles, <code>dependency_ratios</code> as per-continent <code>.7z</code> archives — not
+per-year GeoTIFFs, so the GeoTIFF pipeline cannot localise them.
+Requesting them raises <code>NotImplementedError</code> at construction. Archive
+extraction + the SSP / continent axes are a follow-up.</p>
 </div>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1"># constrained Global-2 2020 100 m population:</span>
 <a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="n">EarthLens</span><span class="p">(</span><span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;worldpop&quot;</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;pop&quot;</span><span class="p">],</span> <span class="n">aoi</span><span class="o">=</span><span class="s2">&quot;RWA&quot;</span><span class="p">,</span>
