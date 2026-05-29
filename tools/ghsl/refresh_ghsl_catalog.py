@@ -64,27 +64,39 @@ def _head(url: str, session: requests.Session) -> int:
         return 0
 
 
-def _sample_url(catalog: Catalog, code: str, release: str) -> str | None:
-    """Build a representative artefact URL for a curated product/release."""
+def _sample_urls(catalog: Catalog, code: str, release: str) -> list[str | None]:
+    """Build a representative artefact URL for every block of a product/release.
+
+    One URL per availability block (each block's first epoch + first
+    resolution), so multi-block products — e.g. GHS-BUILT-S's separate 2018
+    10 m layer — are all HEAD-checked, not just the first block. Tabular
+    products contribute a single version-zip URL.
+    """
     product = catalog.get(code)
     blocks = product.releases[release]
-    block = blocks[0]
-    epoch = block.epochs[0]
     family = product.family_token()
     if product.kind == "tabular":
+        block = blocks[0]
         family_url = f"{BASE_URL}/{family}_{block.region}_{release}"
         version = latest_version_dir(family_url)
         zips = [
             n for n in list_remote_dir(f"{family_url}/{version}") if n.endswith(".zip")
         ]
-        return f"{family_url}/{version}/{zips[0]}" if zips else None
-    url_kw = dict(version=block.version, region=block.region, nested=block.nested)
-    resolution = block.resolutions[0]
-    if resolution in block.tiled():
-        tiles = tiles_for_bbox(_LAND_BBOX)
-        tile = tiles[0] if tiles else "R6_C18"
-        return ghsl_url(family, code, epoch, release, resolution, tile=tile, **url_kw)
-    return ghsl_url(family, code, epoch, release, resolution, **url_kw)
+        return [f"{family_url}/{version}/{zips[0]}" if zips else None]
+    urls: list[str | None] = []
+    for block in blocks:
+        url_kw = dict(version=block.version, region=block.region, nested=block.nested)
+        epoch = block.epochs[0]
+        resolution = block.resolutions[0]
+        if resolution in block.tiled():
+            tiles = tiles_for_bbox(_LAND_BBOX)
+            tile = tiles[0] if tiles else "R6_C18"
+            urls.append(
+                ghsl_url(family, code, epoch, release, resolution, tile=tile, **url_kw)
+            )
+        else:
+            urls.append(ghsl_url(family, code, epoch, release, resolution, **url_kw))
+    return urls
 
 
 def _validate(args: argparse.Namespace) -> int:
@@ -104,16 +116,16 @@ def _validate(args: argparse.Namespace) -> int:
                 print(f"DRIFT  {code}: has colors but no legend")
                 drift += 1
         for release in product.releases:
-            url = _sample_url(catalog, code, release)
-            if url is None:
-                print(f"DRIFT  {code} ({release}): no artefact URL resolvable")
-                drift += 1
-                continue
-            status = _head(url, session)
-            flag = "ok   " if status == 200 else "DRIFT"
-            if status != 200:
-                drift += 1
-            print(f"{flag}  {code} ({release})  {status}  {url}")
+            for url in _sample_urls(catalog, code, release):
+                if url is None:
+                    print(f"DRIFT  {code} ({release}): no artefact URL resolvable")
+                    drift += 1
+                    continue
+                status = _head(url, session)
+                flag = "ok   " if status == 200 else "DRIFT"
+                if status != 200:
+                    drift += 1
+                print(f"{flag}  {code} ({release})  {status}  {url}")
     session.close()
     if drift:
         print(f"\n{drift} drift(s) found.")
