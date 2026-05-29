@@ -189,6 +189,13 @@ class Dataset(BaseModel):
         """
         if not keys:
             keys = self.default_variables or list(self.variables)
+        # A passthrough dataset has no curated variable map; treat the
+        # supplied tokens as raw native tokens.
+        if not self.variables:
+            seen_raw: dict[str, Variable] = {}
+            for key in keys:
+                seen_raw.setdefault(key, Variable(native=key))
+            return list(seen_raw.values())
         seen: dict[str, Variable] = {}
         for key in keys:
             var = self.resolve_variable(key)

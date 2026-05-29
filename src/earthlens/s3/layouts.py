@@ -70,9 +70,9 @@ def plan_products(
         ValueError: If the dataset names an unknown builder, or a
             passthrough spec lacks a usable `key_template`.
     """
-    builder = dataset.params.get("builder") or (
-        "generic_template" if "key_template" in dataset.params else dataset.layout
-    )
+    # Registered datasets carry an explicit builder; a passthrough spec has
+    # none and is always resolved through the generic key-template path.
+    builder = dataset.params.get("builder") or "generic_template"
     fn = _BUILDERS.get(builder)
     if fn is None:
         raise ValueError(
