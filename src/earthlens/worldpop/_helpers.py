@@ -18,9 +18,14 @@ from earthlens.base.yaml_loader import load_yaml_strict
 #: Bundled ISO3 → `[west, south, east, north]` bbox table (WGS84).
 ISO3_BBOX_PATH: Path = Path(__file__).parent / "iso3_bbox.yaml"
 
-#: Matches a WorldPop age/sex cohort filename: `{iso3}_{sex}_{agelow}_{year}.tif`
-#: (e.g. `ken_f_0_2020.tif`, `com_m_80_2000.tif`).
-_COHORT_RE = re.compile(r"^[a-z]{3}_([mf])_(\d+)_(\d{4})\.tif$", re.IGNORECASE)
+#: Matches a WorldPop age/sex cohort filename. Covers the per-country form
+#: `{iso3}_{sex}_{agelow}_{year}.tif` (e.g. `ken_f_0_2020.tif`) and the global
+#: mosaic form `global_{sex}_{agelow}_{year}_{res}.tif` (e.g.
+#: `global_f_0_2000_1km.tif`); the optional trailing resolution token is dropped.
+_COHORT_RE = re.compile(
+    r"^(?:global|[a-z]{3})_([mf])_(\d+)_(\d{4})(?:_\d+k?m)?\.tif$",
+    re.IGNORECASE,
+)
 
 
 def epsg_int(crs: str | int) -> int:
@@ -100,6 +105,8 @@ def cohort_of(url_or_name: str) -> tuple[str, int] | None:
             ('f', 0)
             >>> cohort_of("https://x/com_m_80_2000.tif")
             ('m', 80)
+            >>> cohort_of("global_f_0_2000_1km.tif")
+            ('f', 0)
             >>> cohort_of("ken_ppp_2020.tif") is None
             True
 

@@ -8,7 +8,10 @@ import requests
 from earthlens.worldpop.rest import (
     BASE_URL,
     files_for_year,
+    global_files_for_year,
+    global_records,
     record_citation,
+    record_files,
     rest_records,
 )
 from tests.worldpop.conftest import _FakeResponse, pop_records
@@ -86,6 +89,58 @@ def test_files_for_year_no_geotiff_raises():
     records = [{"popyear": "2020", "files": ["https://x/readme.zip"]}]
     with pytest.raises(ValueError, match="no GeoTIFF"):
         files_for_year(records, 2020)
+
+
+def _fake_global(monkeypatch, summary, detail_files):
+    """Patch requests.get to serve a global listing + a `?id=` detail record."""
+
+    def fake_get(url, params=None, timeout=None):
+        if params and "id" in params:
+            return _FakeResponse(json_data={"data": {"id": params["id"], "files": detail_files}})
+        return _FakeResponse(json_data={"data": summary})
+
+    monkeypatch.setattr(requests, "get", fake_get)
+
+
+def test_global_records_lists_summary(monkeypatch):
+    """global_records returns the per-year summary list (no iso3)."""
+    summary = [{"id": "1", "popyear": "2000"}, {"id": "2", "popyear": "2001"}]
+    _fake_global(monkeypatch, summary, ["https://x/ppp_2000_1km_Aggregated.tif"])
+    assert len(global_records("pop", "wpgp1km")) == 2
+
+
+def test_record_files_filters_tif(monkeypatch):
+    """record_files resolves the ?id= detail and keeps only GeoTIFFs."""
+    _fake_global(
+        monkeypatch,
+        [{"id": "1", "popyear": "2000"}],
+        ["https://x/a.zip", "https://x/ppp_2000_1km_Aggregated.tif"],
+    )
+    assert record_files("pop", "wpgp1km", "1") == [
+        "https://x/ppp_2000_1km_Aggregated.tif"
+    ]
+
+
+def test_global_files_for_year_matches_popyear(monkeypatch):
+    """global_files_for_year picks the year's record then resolves its files."""
+    summary = [{"id": "1", "popyear": "2000"}, {"id": "2", "popyear": "2001"}]
+    _fake_global(monkeypatch, summary, ["https://x/ppp_2000_1km_Aggregated.tif"])
+    files = global_files_for_year("pop", "wpgp1km", 2000)
+    assert files == ["https://x/ppp_2000_1km_Aggregated.tif"]
+
+
+def test_global_files_for_year_missing_raises(monkeypatch):
+    """An unavailable global year raises listing the available years."""
+    _fake_global(monkeypatch, [{"id": "1", "popyear": "2000"}], ["https://x/m.tif"])
+    with pytest.raises(ValueError, match="is not available"):
+        global_files_for_year("pop", "wpgp1km", 1990)
+
+
+def test_global_files_for_year_archive_only_raises(monkeypatch):
+    """A record whose files are archives (no GeoTIFF) raises a clear error."""
+    _fake_global(monkeypatch, [{"id": "1", "popyear": "2000"}], ["https://x/proj.zip"])
+    with pytest.raises(ValueError, match="no GeoTIFF"):
+        global_files_for_year("pop", "wpgp1km", 2000)
 
 
 def test_record_citation_returns_first():
