@@ -163,6 +163,69 @@ class Product(BaseModel):
         return [s.selector() for s in self.subaliases]
 
 
+# Module-level cache of parsed product maps, keyed on `(resolved_path,
+# mtime_ns)` so any real file mutation invalidates the entry naturally.
+# Mirrors the ECMWF / GEE / tropycal catalog caches so repeated `Catalog()`
+# construction skips the YAML parse + pydantic validation.
+_CATALOG_CACHE: dict[tuple[str, int], dict[str, Product]] = {}
+
+
+def clear_catalog_cache() -> None:
+    """Empty the module-level product parse cache.
+
+    Useful in tests that rewrite the catalog on disk and want to force a
+    re-parse. Production callers do not need this — the cache key includes
+    `st_mtime_ns`, so any real file mutation invalidates the entry on its
+    own.
+    """
+    _CATALOG_CACHE.clear()
+
+
+def _load_products(path: Path) -> dict[str, Product]:
+    """Parse, validate, and cache the product map at `path`.
+
+    Cached on `(resolved-path, mtime_ns)` so a second `Catalog()` on an
+    unchanged file skips both YAML parsing and pydantic validation.
+
+    Args:
+        path: Path to a `worldpop_data_catalog.yaml`-shaped file.
+
+    Returns:
+        dict[str, Product]: `alias -> Product` for every curated row.
+
+    Raises:
+        ValueError: If the YAML has no `products:` block or a row fails
+            `Product` validation.
+    """
+    resolved = str(path.resolve())
+    try:
+        mtime_ns = path.stat().st_mtime_ns
+    except FileNotFoundError:
+        mtime_ns = 0
+    key = (resolved, mtime_ns)
+    cached = _CATALOG_CACHE.get(key)
+    if cached is not None:
+        return cached
+
+    data = load_yaml_strict(path) or {}
+    products_yaml = data.get("products") or {}
+    if not products_yaml:
+        raise ValueError(
+            f"{path} is missing or has an empty 'products:' block. "
+            "The WorldPop catalog must list at least one product."
+        )
+    products: dict[str, Product] = {}
+    for alias, body in products_yaml.items():
+        try:
+            products[alias] = Product(alias=alias, **dict(body or {}))
+        except ValidationError as exc:
+            raise ValueError(
+                f"{path} product {alias!r} failed validation:\n{exc}"
+            ) from exc
+    _CATALOG_CACHE[key] = products
+    return products
+
+
 class Catalog(AbstractCatalog):
     """Product / sub-alias availability catalog for the WorldPop backend.
 
@@ -196,12 +259,10 @@ class Catalog(AbstractCatalog):
             ValueError: Propagated from `load` when the YAML is missing,
                 empty, or has a malformed product row.
         """
-        if self.datasets:
-            self._index_aliases()
-            return
-        loaded = Catalog.load()
-        self.datasets = loaded.datasets
-        self.available_datasets = loaded.available_datasets
+        if not self.datasets:
+            self.datasets = dict(_load_products(CATALOG_PATH))
+        if not self.available_datasets:
+            self.available_datasets = sorted(self.datasets)
         self._index_aliases()
 
     def _index_aliases(self) -> None:
@@ -222,29 +283,16 @@ class Catalog(AbstractCatalog):
                 module-level `CATALOG_PATH`.
 
         Returns:
-            A fully-populated `Catalog`.
+            A fully-populated `Catalog` with `datasets` and the
+            `available_datasets` index set.
 
         Raises:
             ValueError: If the file has no `products:` block, or a row
                 fails `Product` validation.
         """
         catalog_path = catalog_path if catalog_path is not None else CATALOG_PATH
-        data = load_yaml_strict(catalog_path) or {}
-        products_yaml = data.get("products") or {}
-        if not products_yaml:
-            raise ValueError(
-                f"{catalog_path} is missing or has an empty 'products:' block. "
-                "The WorldPop catalog must list at least one product."
-            )
-        products: dict[str, Product] = {}
-        for alias, body in products_yaml.items():
-            try:
-                products[alias] = Product(alias=alias, **dict(body or {}))
-            except ValidationError as exc:
-                raise ValueError(
-                    f"{catalog_path} product {alias!r} failed validation:\n{exc}"
-                ) from exc
-        return cls(datasets=products, available_datasets=sorted(products))
+        products = _load_products(catalog_path)
+        return cls(datasets=dict(products), available_datasets=sorted(products))
 
     def get_catalog(self) -> dict[str, Product]:
         """Return the product map (satisfies the abstract contract)."""
@@ -471,3 +519,113 @@ class Catalog(AbstractCatalog):
                     f"available years: {sorted(years)}."
                 )
         return code, subalias_id
+
+    def describe(self, product: str) -> dict[str, Any]:
+        """Return a structured introspection record for a product.
+
+        Mirrors `earthlens.ecmwf.Catalog.describe` / the tropycal catalog: a
+        runtime "what does product X expose?" helper a CLI / notebook can
+        dump without walking the YAML.
+
+        Args:
+            product: A product key or friendly alias (resolved first).
+
+        Returns:
+            dict[str, Any]: Keys `product` (canonical alias), `friendly`,
+            `kind`, `demographic`, `unit`, and `subaliases` (a list of
+            per-variant dicts with `id` / `constrained` / `unadjusted` /
+            `resolution` / `scope` / `generation` / `level` / `years`).
+
+        Raises:
+            ValueError: If `product` is not a curated product.
+
+        Examples:
+            - Describe the population product at a glance:
+                ```python
+                >>> from earthlens.worldpop import Catalog
+                >>> info = Catalog().describe("population")
+                >>> info["product"]
+                'pop'
+                >>> info["kind"]
+                'raster'
+                >>> info["subaliases"][0]["id"]
+                'wpgp'
+
+                ```
+        """
+        code = self.resolve(product)
+        row = self.datasets[code]
+        return {
+            "product": code,
+            "friendly": list(row.friendly),
+            "kind": row.kind,
+            "demographic": row.demographic,
+            "unit": row.unit,
+            "subaliases": [
+                {
+                    "id": sub.id,
+                    "constrained": sub.constrained,
+                    "unadjusted": sub.unadjusted,
+                    "resolution": sub.resolution,
+                    "scope": sub.scope,
+                    "generation": sub.generation,
+                    "level": sub.level,
+                    "years": sub.years,
+                }
+                for sub in row.subaliases
+            ],
+        }
+
+    def health(self) -> dict[str, list[str]]:
+        """Report structural hygiene issues across the loaded catalog.
+
+        Mirrors `earthlens.ecmwf.Catalog.health` / `earthlens.gee.Catalog.health`:
+        returns a mapping `check_name -> sorted list of offenders`. An empty
+        list means the check passes. Schema-level invariants (duplicate keys,
+        unknown fields) are already enforced at load time — these are the
+        residual data-quality checks the pydantic schema cannot express.
+
+        Checks reported:
+
+        * `product_without_subaliases` — products carrying zero sub-aliases.
+        * `demographic_not_mixed` — products flagged `demographic` whose
+          `kind` is not `"mixed"`.
+        * `subalias_unknown_generation` — `"<product>:<id>"` whose
+          `generation` is not in `GENERATIONS`.
+        * `subalias_bad_years` — `"<product>:<id>"` whose `years` spec does
+          not parse.
+
+        Returns:
+            dict[str, list[str]]: The per-check offender lists.
+
+        Examples:
+            - The bundled catalog is clean:
+                ```python
+                >>> from earthlens.worldpop import Catalog
+                >>> Catalog().health()
+                {'product_without_subaliases': [], 'demographic_not_mixed': [], 'subalias_unknown_generation': [], 'subalias_bad_years': []}
+
+                ```
+        """
+        no_subaliases: list[str] = []
+        demographic_not_mixed: list[str] = []
+        unknown_generation: list[str] = []
+        bad_years: list[str] = []
+        for alias, product in self.datasets.items():
+            if not product.subaliases:
+                no_subaliases.append(alias)
+            if product.demographic and product.kind != "mixed":
+                demographic_not_mixed.append(alias)
+            for sub in product.subaliases:
+                if sub.generation not in GENERATIONS:
+                    unknown_generation.append(f"{alias}:{sub.id}")
+                try:
+                    sub.years_set()
+                except ValueError:
+                    bad_years.append(f"{alias}:{sub.id}")
+        return {
+            "product_without_subaliases": sorted(no_subaliases),
+            "demographic_not_mixed": sorted(demographic_not_mixed),
+            "subalias_unknown_generation": sorted(unknown_generation),
+            "subalias_bad_years": sorted(bad_years),
+        }

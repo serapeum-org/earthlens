@@ -181,3 +181,63 @@ def test_load_rejects_malformed_row(tmp_path):
     bad.write_text("products:\n  pop:\n    bogus_key: 1\n", encoding="utf-8")
     with pytest.raises(ValueError, match="failed validation"):
         Catalog.load(bad)
+
+
+def test_parse_cache_reuses_on_unchanged_file():
+    """Two Catalog() builds reuse the cached parse for the unchanged file."""
+    from earthlens.worldpop import clear_catalog_cache
+    from earthlens.worldpop import catalog as catalog_mod
+
+    clear_catalog_cache()
+    Catalog()
+    assert len(catalog_mod._CATALOG_CACHE) == 1
+    Catalog()
+    assert len(catalog_mod._CATALOG_CACHE) == 1
+    clear_catalog_cache()
+    assert len(catalog_mod._CATALOG_CACHE) == 0
+
+
+def test_health_clean_on_bundled_catalog(catalog):
+    """The bundled catalog reports no hygiene problems."""
+    report = catalog.health()
+    assert report == {
+        "product_without_subaliases": [],
+        "demographic_not_mixed": [],
+        "subalias_unknown_generation": [],
+        "subalias_bad_years": [],
+    }
+
+
+def test_health_flags_problems():
+    """health() flags an empty product and a demographic non-mixed product."""
+    from earthlens.worldpop.catalog import Product, SubAlias
+
+    cat = Catalog(
+        datasets={
+            "empty": Product(alias="empty"),
+            "demo": Product(
+                alias="demo",
+                demographic=True,
+                kind="raster",
+                subaliases=[SubAlias(id="x")],
+            ),
+            "weird": Product(
+                alias="weird",
+                subaliases=[SubAlias(id="y", generation="BOGUS", years="not-a-year")],
+            ),
+        }
+    )
+    report = cat.health()
+    assert "empty" in report["product_without_subaliases"]
+    assert "demo" in report["demographic_not_mixed"]
+    assert "weird:y" in report["subalias_unknown_generation"]
+    assert "weird:y" in report["subalias_bad_years"]
+
+
+def test_describe_returns_record(catalog):
+    """describe() returns the product metadata + its sub-alias rows."""
+    info = catalog.describe("population")
+    assert info["product"] == "pop"
+    assert info["kind"] == "raster"
+    assert info["subaliases"][0]["id"] == "wpgp"
+    assert {"scope", "resolution", "years"} <= set(info["subaliases"][0])

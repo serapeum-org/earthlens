@@ -34,6 +34,7 @@ from earthlens.worldpop.catalog import (
     Catalog,
     Product,
     SubAlias,
+    clear_catalog_cache,
 )
 
 __all__ = [
@@ -48,4 +49,5 @@ __all__ = [
     "SubAlias",
     "GENERATIONS",
     "CATALOG_PATH",
+    "clear_catalog_cache",
 ]
