@@ -6,7 +6,9 @@ import pytest
 
 from earthlens.worldpop._helpers import (
     cohort_of,
+    continent_for_bbox,
     epsg_int,
+    extract_geotiffs,
     iso3_for_bbox,
     load_iso3_bbox,
     normalise_iso3,
@@ -84,3 +86,50 @@ def test_iso3_for_bbox_empty_when_no_overlap():
     """A bbox over open ocean intersects no country."""
     table = load_iso3_bbox()
     assert iso3_for_bbox([-30, -40, -29, -39], table) == []
+
+
+@pytest.mark.parametrize(
+    "bbox, expected",
+    [([34, -1, 35, 1], "Africa"), ([76, 26, 78, 28], "Asia")],
+)
+def test_continent_for_bbox(bbox, expected):
+    """continent_for_bbox maps an AOI centre to its continent."""
+    assert continent_for_bbox(bbox) == expected
+
+
+def test_continent_for_bbox_unsupported_raises():
+    """An AOI centre outside the served continents raises."""
+    with pytest.raises(ValueError, match="not in a supported continent"):
+        continent_for_bbox([-30, 0, -29, 1])
+
+
+def test_extract_geotiffs_7z(tmp_path, tiny_tif_bytes):
+    """extract_geotiffs pulls the .tif members out of a .7z archive."""
+    import io
+
+    import py7zr
+
+    archive = tmp_path / "a.7z"
+    with py7zr.SevenZipFile(archive, "w") as zf:
+        zf.writef(io.BytesIO(tiny_tif_bytes), "AFR_2010_SubNat_DepRatio.tif")
+        zf.writef(io.BytesIO(b"readme"), "README.txt")
+    tifs = extract_geotiffs(archive, "7z", tmp_path / "x")
+    assert [p.name for p in tifs] == ["AFR_2010_SubNat_DepRatio.tif"]
+
+
+def test_extract_geotiffs_zip(tmp_path, tiny_tif_bytes):
+    """extract_geotiffs pulls the .tif members out of a .zip archive."""
+    import zipfile
+
+    archive = tmp_path / "a.zip"
+    with zipfile.ZipFile(archive, "w") as zf:
+        zf.writestr("ssp2_2030_1km.tif", tiny_tif_bytes)
+        zf.writestr("notes.txt", b"x")
+    tifs = extract_geotiffs(archive, "zip", tmp_path / "x")
+    assert [p.name for p in tifs] == ["ssp2_2030_1km.tif"]
+
+
+def test_extract_geotiffs_bad_format(tmp_path):
+    """An unknown archive format is rejected."""
+    with pytest.raises(ValueError, match="unsupported archive format"):
+        extract_geotiffs(tmp_path / "a.rar", "rar", tmp_path / "x")

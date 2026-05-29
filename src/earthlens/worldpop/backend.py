@@ -41,7 +41,9 @@ from earthlens.base.abstractdatasource import (
 )
 from earthlens.worldpop._helpers import (
     cohort_of,
+    continent_for_bbox,
     epsg_int,
+    extract_geotiffs,
     iso3_for_bbox,
     load_iso3_bbox,
     normalise_iso3,
@@ -51,6 +53,8 @@ from earthlens.worldpop.catalog import GENERATIONS, Catalog
 from earthlens.worldpop.rest import (
     files_for_year,
     global_files_for_year,
+    global_records,
+    record_archive_files,
     rest_records,
 )
 
@@ -111,6 +115,8 @@ class WorldPop(AbstractDataSource):
         years: list[int] | None = None,
         crs: str = "EPSG:4326",
         api: str = "rest",
+        ssp: str = "SSP2",
+        allow_large_archive: bool = False,
         catalog: Catalog | None = None,
     ):
         """Initialise a WorldPop backend instance.
@@ -200,6 +206,8 @@ class WorldPop(AbstractDataSource):
         self._crs = crs
         self._output_epsg = epsg_int(crs)
         self._api_mode = api
+        self._ssp = ssp
+        self._allow_large_archive = allow_large_archive
         self._auth = WorldPopAuth()
         self._aggregate_cfg = None
         self._show_progress = True
@@ -234,29 +242,25 @@ class WorldPop(AbstractDataSource):
         )
 
     def _guard_unsupported(self) -> None:
-        """Reject archive-distributed products (zip / 7z), which aren't GeoTIFFs.
+        """Gate the multi-GB `.zip` archive products behind an explicit opt-in.
 
-        Per-country and global-mosaic products download per-year GeoTIFFs and
-        are fully supported. The projection / continent products
-        (`future_pop` → SSP `.zip` archives, `dependency_ratios` →
-        per-continent `.7z` archives) ship as multi-file archives the GeoTIFF
-        pipeline cannot localise; fail fast at construction with a clear
-        message rather than letting `_search` raise a confusing "no GeoTIFF"
-        later.
+        Per-country / global-mosaic GeoTIFF products and the small `.7z`
+        per-continent products (`dependency_ratios`) are fetched directly.
+        The `future_pop` SSP `.zip` bundles are **~4 GB each** (×5 scenarios),
+        so they require `allow_large_archive=True` to avoid a multi-GB
+        surprise download.
 
         Raises:
-            NotImplementedError: If any requested product resolves to an
-                archive-distributed sub-alias.
+            NotImplementedError: If a `.zip` archive product is requested
+                without `allow_large_archive=True`.
         """
         for product, subalias_id in self._subalias_ids.items():
             sub = self._catalog.subalias(product, subalias_id)
-            if sub.archive:
+            if sub.archive == "zip" and not self._allow_large_archive:
                 raise NotImplementedError(
-                    f"WorldPop {product!r} resolves to sub-alias {subalias_id!r}, "
-                    "which is distributed as multi-file .zip / .7z archives "
-                    "(SSP scenarios / per-continent), not per-year GeoTIFFs — not "
-                    "supported by the GeoTIFF pipeline. Use a country-scoped or "
-                    "global-mosaic product."
+                    f"WorldPop {product!r} ({subalias_id!r}) ships as ~4 GB per-SSP "
+                    ".zip archives (×5 scenarios). Pass allow_large_archive=True "
+                    "(and an ssp=, e.g. ssp='SSP2') to opt into the large download."
                 )
 
     def _resolve_aoi(
@@ -817,9 +821,37 @@ class WorldPop(AbstractDataSource):
             pass
         return target
 
-    def _api(self) -> list[Path]:
-        """Compose `_search` and `_fetch` into the canonical search/fetch shape."""
+    def _archive_products(self) -> list[str]:
+        """Return the requested products whose sub-alias is archive-distributed."""
+        return [
+            product
+            for product in self._products
+            if self._catalog.subalias(product, self._subalias_ids[product]).archive
+        ]
+
+    def _dispatch(self) -> list[Path]:
+        """Route the request to the archive path or the GeoTIFF search/fetch.
+
+        Archive products (`.7z` / `.zip`) and plain GeoTIFF products cannot
+        be combined in one request — they take different fetch paths.
+
+        Raises:
+            ValueError: If the request mixes archive and GeoTIFF products.
+        """
+        archive = self._archive_products()
+        if archive and len(archive) != len(self._products):
+            raise ValueError(
+                "WorldPop cannot mix archive products "
+                f"({archive}) with GeoTIFF products in one request; fetch them "
+                "separately."
+            )
+        if archive:
+            return self._fetch_archive()
         return self._api_via_search_fetch()
+
+    def _api(self) -> list[Path]:
+        """Dispatch the request (archive path or GeoTIFF search/fetch)."""
+        return self._dispatch()
 
     def download(self, progress_bar: bool = True, aggregate=None) -> list[Path]:
         """Fetch the requested products as AOI-cropped GeoTIFFs (+ tables).
@@ -830,14 +862,104 @@ class WorldPop(AbstractDataSource):
                 reduces the per-year raster stack across years. It reduces
                 the **rasters** only — for demographic products the per-cohort
                 age/sex tables are still written per year (the table column is
-                not aggregated).
+                not aggregated). Ignored by the archive products.
 
         Returns:
             list[Path]: The written GeoTIFF / table paths.
         """
         self._show_progress = progress_bar
         self._aggregate_cfg = aggregate
-        return self._api_via_search_fetch()
+        return self._dispatch()
+
+    def _fetch_archive(self) -> list[Path]:
+        """Fetch archive products (`.7z` / `.zip`): download, extract, crop.
+
+        `dependency_ratios` ships one small `.7z` per continent (the AOI's
+        continent is resolved); `future_pop` ships one ~4 GB `.zip` per SSP
+        scenario (`ssp=`). Each archive's GeoTIFF members are extracted and
+        cropped to the AOI bbox.
+
+        Returns:
+            list[Path]: One cropped GeoTIFF per extracted archive member
+                (year-filtered for the per-year `.zip` products).
+        """
+        out: list[Path] = []
+        bbox = [self.space.west, self.space.south, self.space.east, self.space.north]
+        for product in self._products:
+            subalias_id = self._subalias_ids[product]
+            fmt = self._catalog.subalias(product, subalias_id).archive
+            for url in self._archive_urls(product, subalias_id, fmt, bbox):
+                local = self._http_get(url, self._raw_dir() / Path(url).name)
+                extract_dir = self._raw_dir() / f".{product}_{Path(url).stem}_extract"
+                members = extract_geotiffs(local, fmt, extract_dir)
+                for tif in self._select_archive_members(members, fmt):
+                    out.append(self._crop_archive_member(tif, product, bbox))
+        return out
+
+    def _archive_urls(
+        self, product: str, subalias_id: str, fmt: str, bbox: list[float]
+    ) -> list[str]:
+        """Resolve the archive download URL(s) for one archive product.
+
+        `.7z` (`dependency_ratios`) is per-continent — the AOI's continent
+        selects the record; `.zip` (`future_pop`) is per-SSP — `self._ssp`
+        selects the archive.
+
+        Raises:
+            ValueError: If no record / archive matches the continent or SSP.
+        """
+        records = global_records(product, subalias_id)
+        if fmt == "7z":
+            continent = continent_for_bbox(bbox)
+            record = next(
+                (r for r in records if continent.lower() in r.get("title", "").lower()),
+                None,
+            )
+            if record is None:
+                titles = [r.get("title") for r in records]
+                raise ValueError(
+                    f"WorldPop {product!r} has no {continent!r} archive; "
+                    f"available: {titles}."
+                )
+            return record_archive_files(product, subalias_id, record["id"], "7z")
+        # zip (future_pop): a single record whose files are the per-SSP archives.
+        urls = record_archive_files(product, subalias_id, records[0]["id"], "zip")
+        wanted = [u for u in urls if self._ssp.lower() in Path(u).name.lower()]
+        if not wanted:
+            names = [Path(u).name for u in urls]
+            raise ValueError(
+                f"WorldPop {product!r} has no {self._ssp!r} archive; available: {names}."
+            )
+        return wanted
+
+    def _select_archive_members(self, members: list[Path], fmt: str) -> list[Path]:
+        """Filter extracted GeoTIFFs — by requested year for the per-year `.zip`.
+
+        The `.7z` continent products are a single year (all members kept); the
+        `.zip` SSP projections are per-year, so keep only members whose
+        filename carries one of the requested years.
+        """
+        if fmt != "zip":
+            return members
+        wanted_years = {str(y) for y in self._years()}
+        selected = [
+            m for m in members if set(re.findall(r"(\d{4})", m.stem)) & wanted_years
+        ]
+        return selected or members
+
+    def _crop_archive_member(
+        self, tif: Path, product: str, bbox: list[float]
+    ) -> Path:
+        """Crop one extracted GeoTIFF to the AOI bbox (reproject if `crs != 4326`)."""
+        from pyramids.dataset import Dataset
+
+        dataset = Dataset.read_file(str(tif))
+        cropped = dataset.crop(bbox=bbox, epsg=4326)
+        if self._output_epsg != 4326:
+            cropped = cropped.to_crs(self._output_epsg)
+        target = Path(self.path) / f"{product}_{tif.stem}_{self._resolution}.tif"
+        cropped.to_file(str(target))
+        return target
 
 
 #: Per-op reducers over the year axis (axis 0), NaN-aware (NaN = no-data).

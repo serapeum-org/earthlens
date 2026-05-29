@@ -44,11 +44,120 @@ def test_unknown_product_raises(wp_kwargs):
         WorldPop(**wp_kwargs(variables=["nope"]))
 
 
-@pytest.mark.parametrize("kw", [{"variables": ["future_pop"]}, {"variables": ["dependency_ratios"]}])
-def test_archive_products_rejected(wp_kwargs, kw):
-    """Archive-distributed products (zip / 7z) fail fast at construction."""
-    with pytest.raises(NotImplementedError, match="archives"):
-        WorldPop(**wp_kwargs(**kw))
+def test_future_pop_requires_opt_in(wp_kwargs):
+    """future_pop's ~4 GB .zip archives need allow_large_archive=True."""
+    with pytest.raises(NotImplementedError, match="allow_large_archive"):
+        WorldPop(**wp_kwargs(variables=["future_pop"]))
+
+
+def test_dependency_ratios_constructs(wp_kwargs):
+    """dependency_ratios (.7z) constructs without the large-archive opt-in."""
+    backend = WorldPop(**wp_kwargs(variables=["dependency_ratios"]))
+    assert backend._subalias_ids == {"dependency_ratios": "drwc"}
+
+
+def test_mixing_archive_and_geotiff_rejected(wp_kwargs):
+    """Combining an archive product with a GeoTIFF product in one request errors."""
+    backend = WorldPop(**wp_kwargs(variables=["pop", "dependency_ratios"]))
+    with pytest.raises(ValueError, match="cannot mix archive"):
+        backend.download(progress_bar=False)
+
+
+def _make_7z(tif_bytes, names):
+    """Return bytes of a tiny .7z containing `names`, each holding `tif_bytes`."""
+    import io
+
+    import py7zr
+
+    buf = io.BytesIO()
+    with py7zr.SevenZipFile(buf, "w") as archive:
+        for name in names:
+            archive.writef(io.BytesIO(tif_bytes), name)
+    return buf.getvalue()
+
+
+def _make_zip(tif_bytes, names):
+    """Return bytes of a tiny .zip containing `names`, each holding `tif_bytes`."""
+    import io
+    import zipfile
+
+    buf = io.BytesIO()
+    with zipfile.ZipFile(buf, "w") as archive:
+        for name in names:
+            archive.writestr(name, tif_bytes)
+    return buf.getvalue()
+
+
+def _patch_archive_http(monkeypatch, title, archive_url, archive_bytes):
+    """Serve a global listing + `?id=` detail (archive url) + the archive bytes."""
+
+    def fake_get(url, params=None, timeout=None):
+        if url.endswith((".7z", ".zip")):
+            return _FakeResponse(content=archive_bytes)
+        if params and "id" in params:
+            return _FakeResponse(json_data={"data": {"id": "1", "files": [archive_url]}})
+        if "/rest/data/" in url:
+            return _FakeResponse(json_data={"data": [{"id": "1", "title": title}]})
+        raise AssertionError(f"unexpected URL: {url}")
+
+    monkeypatch.setattr(requests, "get", fake_get)
+
+
+def test_dependency_ratios_extracts_and_crops(wp_kwargs, monkeypatch, tiny_tif_bytes):
+    """dependency_ratios downloads the continent .7z, extracts + crops the ratios."""
+    names = [
+        "AFR_2010_SubNat_DepRatio.tif",
+        "AFR_2010_SubNat_DepRatio_OldAge.tif",
+        "AFR_2010_SubNat_DepRatio_YoungAge.tif",
+    ]
+    archive = _make_7z(tiny_tif_bytes, names)
+    _patch_archive_http(
+        monkeypatch, "Africa 1km Dependency Ratios",
+        "https://x/Africa_1km_Dependency_Ratios.7z", archive,
+    )
+    backend = WorldPop(
+        **wp_kwargs(variables=["dependency_ratios"], resolution="1km", aoi="KEN")
+    )
+    out = backend.download(progress_bar=False)
+    assert len(out) == 3
+    assert {p.name for p in out} == {
+        "dependency_ratios_AFR_2010_SubNat_DepRatio_1km.tif",
+        "dependency_ratios_AFR_2010_SubNat_DepRatio_OldAge_1km.tif",
+        "dependency_ratios_AFR_2010_SubNat_DepRatio_YoungAge_1km.tif",
+    }
+    assert Dataset.read_file(str(out[0])).epsg == 4326
+
+
+def test_dependency_ratios_unsupported_continent_errors(wp_kwargs, monkeypatch, tiny_tif_bytes):
+    """An AOI outside the served continents raises a clear error."""
+    _patch_archive_http(
+        monkeypatch, "Africa 1km Dependency Ratios", "https://x/a.7z",
+        _make_7z(tiny_tif_bytes, ["AFR_2010_SubNat_DepRatio.tif"]),
+    )
+    # a bbox centre over the mid-Atlantic is in no served continent
+    backend = WorldPop(
+        **wp_kwargs(variables=["dependency_ratios"], resolution="1km",
+                    lat_lim=[0.0, 1.0], lon_lim=[-30.0, -29.0])
+    )
+    with pytest.raises(ValueError, match="not in a supported continent"):
+        backend.download(progress_bar=False)
+
+
+def test_future_pop_opt_in_extracts_year(wp_kwargs, monkeypatch, tiny_tif_bytes):
+    """With the opt-in, future_pop extracts the requested year from the SSP zip."""
+    names = ["ssp2_2025_1km.tif", "ssp2_2030_1km.tif", "ssp2_2100_1km.tif"]
+    archive = _make_zip(tiny_tif_bytes, names)
+    _patch_archive_http(
+        monkeypatch, "Global projections",
+        "https://x/FuturePop_SSP2_1km_v0_2.zip", archive,
+    )
+    backend = WorldPop(
+        **wp_kwargs(variables=["future_pop"], resolution="1km", year=2030,
+                    ssp="SSP2", allow_large_archive=True)
+    )
+    out = backend.download(progress_bar=False)
+    assert len(out) == 1
+    assert "2030" in out[0].name
 
 
 def test_global_scope_constructs(wp_kwargs):

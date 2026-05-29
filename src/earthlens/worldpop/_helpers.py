@@ -146,6 +146,101 @@ def _bbox_intersects(a: list[float], b: list[float]) -> bool:
     return not (ae < bw or be < aw or an < bs or bn < as_)
 
 
+#: Rough `[west, south, east, north]` extents for the continents WorldPop's
+#: per-continent products (`dependency_ratios`) are keyed on. Only the
+#: continents the hub actually serves need entries; an AOI outside them is a
+#: clear "unsupported continent" error.
+CONTINENT_BBOX: dict[str, list[float]] = {
+    "Africa": [-26.0, -47.0, 64.0, 38.0],
+    "Asia": [25.0, -11.0, 180.0, 82.0],
+}
+
+
+def continent_for_bbox(
+    bbox_wgs84: list[float], continents: dict[str, list[float]] | None = None
+) -> str:
+    """Return the continent whose extent best contains an AOI bbox.
+
+    Used to pick the right per-continent archive for products keyed on
+    continent (`dependency_ratios`). Matches by the AOI centre point.
+
+    Args:
+        bbox_wgs84: The AOI as `[west, south, east, north]` in degrees.
+        continents: A `name -> [w, s, e, n]` table; defaults to
+            `CONTINENT_BBOX`.
+
+    Returns:
+        str: The matching continent name (`"Africa"`, `"Asia"`).
+
+    Raises:
+        ValueError: If the AOI centre falls in none of the continents.
+
+    Examples:
+        - A Kenyan bbox resolves to Africa:
+            ```python
+            >>> from earthlens.worldpop._helpers import continent_for_bbox
+            >>> continent_for_bbox([34, -1, 35, 1])
+            'Africa'
+
+            ```
+    """
+    table = continents if continents is not None else CONTINENT_BBOX
+    cx = (bbox_wgs84[0] + bbox_wgs84[2]) / 2.0
+    cy = (bbox_wgs84[1] + bbox_wgs84[3]) / 2.0
+    for name, (w, s, e, n) in table.items():
+        if w <= cx <= e and s <= cy <= n:
+            return name
+    raise ValueError(
+        f"AOI centre ({cx:.2f}, {cy:.2f}) is not in a supported continent "
+        f"{sorted(table)}; this product is only published for those continents."
+    )
+
+
+def extract_geotiffs(archive_path: Path, fmt: str, dest_dir: Path) -> list[Path]:
+    """Extract the GeoTIFF members of a `.7z` / `.zip` archive to `dest_dir`.
+
+    Args:
+        archive_path: The downloaded archive.
+        fmt: `"7z"` or `"zip"`.
+        dest_dir: Directory the GeoTIFFs are written to.
+
+    Returns:
+        list[Path]: The extracted `.tif` / `.tiff` paths, sorted.
+
+    Raises:
+        ImportError: If `fmt == "7z"` and the optional `py7zr` is missing.
+        ValueError: If `fmt` is not `"7z"` or `"zip"`.
+    """
+    dest_dir.mkdir(parents=True, exist_ok=True)
+    if fmt == "zip":
+        import zipfile
+
+        with zipfile.ZipFile(archive_path) as zf:
+            members = [m for m in zf.namelist() if m.lower().endswith((".tif", ".tiff"))]
+            for member in members:
+                zf.extract(member, dest_dir)
+    elif fmt == "7z":
+        try:
+            import py7zr
+        except ImportError as exc:
+            raise ImportError(
+                "extracting .7z archives (dependency_ratios) needs py7zr. "
+                "Install it with: pip install earthlens[worldpop]"
+            ) from exc
+        with py7zr.SevenZipFile(archive_path) as zf:
+            members = [
+                n for n in zf.getnames() if n.lower().endswith((".tif", ".tiff"))
+            ]
+            zf.extract(path=dest_dir, targets=members)
+    else:
+        raise ValueError(f"unsupported archive format {fmt!r}; expected '7z' or 'zip'.")
+    return sorted(
+        p
+        for p in dest_dir.rglob("*")
+        if p.suffix.lower() in (".tif", ".tiff")
+    )
+
+
 def iso3_for_bbox(bbox_wgs84: list[float], table: dict[str, list[float]]) -> list[str]:
     """Return the ISO3 codes whose country bbox intersects `bbox_wgs84`.
 

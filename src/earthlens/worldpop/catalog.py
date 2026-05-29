@@ -95,11 +95,11 @@ class SubAlias(BaseModel):
         level: Aggregation level for products that publish both
             (`pwd`): `"national"` or `"subnational"`. `"national"` for
             every other product.
-        archive: Whether the product is distributed as multi-file `.zip` /
-            `.7z` archives (e.g. `future_pop` SSP scenarios,
-            `dependency_ratios` per-continent) rather than per-year
-            GeoTIFFs. Archive products are not fetchable by the GeoTIFF
-            pipeline and are guarded at construction. Defaults to `False`.
+        archive: The archive format the product is distributed in, or `""`
+            for plain per-year GeoTIFFs. `"7z"` (`dependency_ratios`,
+            per-continent) and `"zip"` (`future_pop`, per-SSP) products are
+            downloaded as an archive and extracted before cropping; `"zip"`
+            (multi-GB) additionally requires the `allow_large_archive` opt-in.
         years: The years this sub-alias offers, as a single year
             (`"2020"`) or an inclusive range (`"2000-2020"`).
     """
@@ -113,7 +113,7 @@ class SubAlias(BaseModel):
     scope: str = "countries"
     generation: str = "R2021"
     level: str = "national"
-    archive: bool = False
+    archive: str = ""
     years: str = "2000-2020"
 
     def years_set(self) -> set[int]:

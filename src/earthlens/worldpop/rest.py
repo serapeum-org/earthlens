@@ -247,6 +247,48 @@ def global_files_for_year(
     return tifs
 
 
+def record_archive_files(
+    alias: str,
+    subalias_id: str,
+    record_id: str,
+    fmt: str,
+    *,
+    base_url: str = BASE_URL,
+    session: requests.Session | None = None,
+    timeout: int = _TIMEOUT,
+) -> list[str]:
+    """Return a record's archive URLs (`.zip` / `.7z`) via the `?id=` detail.
+
+    The archive products (`future_pop` per-SSP `.zip`, `dependency_ratios`
+    per-continent `.7z`) carry their downloads as archives, not GeoTIFFs;
+    this returns the URLs ending in `.{fmt}`.
+
+    Args:
+        alias: Top-level product alias.
+        subalias_id: The sub-alias id.
+        record_id: The `id` of a record from `global_records`.
+        fmt: Archive extension to keep — `"zip"` or `"7z"`.
+        base_url: REST base URL (overridable for tests).
+        session: Optional `requests.Session`.
+        timeout: Per-request timeout in seconds.
+
+    Returns:
+        list[str]: The record's archive URLs ending in `.{fmt}`.
+
+    Raises:
+        requests.HTTPError: If the endpoint returns a non-2xx status.
+    """
+    getter = session.get if session is not None else requests.get
+    resp = getter(
+        f"{base_url}/{alias}/{subalias_id}", params={"id": record_id}, timeout=timeout
+    )
+    resp.raise_for_status()
+    data = resp.json().get("data")
+    record = data[0] if isinstance(data, list) and data else (data or {})
+    suffix = f".{fmt.lower()}"
+    return [url for url in (record.get("files") or []) if url.lower().endswith(suffix)]
+
+
 def record_citation(records: list[dict[str, Any]]) -> str | None:
     """Return the `citation` of the first record, or `None` if absent.
 
