@@ -66,11 +66,14 @@ resolves the per-year whole-world GeoTIFF via the hub's `?id=` detail
 endpoint, downloads it, and crops to the AOI. WorldPop has no server-side
 subsetting, so each global 1 km mosaic is a ~1.1 GB download per year.
 
-`future_pop` (`FPP_v02`) and `dependency_ratios` (`drwc`) are marked
-`archive: true` in the catalog — they ship as multi-file `.zip` (per-SSP) /
-`.7z` (per-continent) archives, not per-year GeoTIFFs, so requesting them
-raises `NotImplementedError`. They remain as accurate catalog metadata;
-archive extraction + the SSP / continent axes are a follow-up.
+`dependency_ratios` (`drwc`, `archive: "7z"`) and `future_pop` (`FPP_v02`,
+`archive: "zip"`) are distributed as multi-file archives, not per-year
+GeoTIFFs; the backend downloads the archive, extracts its GeoTIFFs (`py7zr`
+for `.7z`), and crops them to the AOI. `dependency_ratios` is small and
+per-continent (Asia / Africa only, year 2010, three ratio variants —
+resolved from the AOI's continent). `future_pop` is per-SSP and **~4 GB per
+scenario**, so it needs `allow_large_archive=True` + `ssp=` to opt in. Both
+require the `[worldpop]` extra.
 
 ## Not curated: `covariates`
 

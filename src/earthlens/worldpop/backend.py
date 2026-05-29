@@ -162,6 +162,12 @@ class WorldPop(AbstractDataSource):
             api: Access path — `"rest"` (default; direct REST + pyramids,
                 no optional SDK) or `"worldpoppy"` (the optional SDK via its
                 file cache).
+            ssp: SSP scenario for the `future_pop` `.zip` archives
+                (`"SSP1"`…`"SSP5"`; default `"SSP2"`). Ignored by other
+                products.
+            allow_large_archive: Opt-in required to download the multi-GB
+                `future_pop` per-SSP `.zip` archives (~4 GB each). Defaults
+                to `False`.
             catalog: Optional pre-built `Catalog` (tests inject a faked
                 one); defaults to the bundled catalog.
 

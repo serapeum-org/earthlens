@@ -94,6 +94,24 @@ def test_live_multiyear_aggregate(tmp_path: Path):
     assert len(tifs) == 1 and "_mean" in tifs[0].name
 
 
+def test_live_dependency_ratios_archive(tmp_path: Path):
+    """The live dependency_ratios .7z (Africa) extracts + crops to the AOI."""
+    pytest.importorskip("py7zr")
+    from earthlens.earthlens import EarthLens
+
+    # a mainland-Kenya bbox (the continental Africa raster covers it).
+    out = EarthLens(
+        data_source="worldpop",
+        variables=["dependency_ratios"],
+        start="2010", end="2010", fmt="%Y",
+        lat_lim=[-4.0, 4.0], lon_lim=[34.0, 41.0],
+        path=str(tmp_path), aoi="KEN", resolution="1km",
+    ).download(progress_bar=False)
+    tifs = [p for p in out if str(p).endswith(".tif")]
+    assert len(tifs) == 3  # total / old-age / young-age ratios
+    assert all("DepRatio" in p.name for p in tifs)
+
+
 def test_live_global_mosaic_url_resolves():
     """The live global-mosaic path resolves a per-year whole-world GeoTIFF URL.
 

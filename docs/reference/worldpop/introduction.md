@@ -40,13 +40,13 @@ selector catalog — its 50+ named layers don't fit the
 `(constrained × resolution × scope × generation)` selector model. See
 [Available datasets](datasets.md) for the full sub-alias matrix.
 
-!!! note "Global mosaics fetchable; future_pop / dependency_ratios deferred"
+!!! note "Global mosaics and archive products"
     `scope="global"` downloads the per-year whole-world mosaic and crops it
-    to the AOI (a ~1.1 GB download per year — no server-side subsetting). The
-    projection / continent products `future_pop` and `dependency_ratios` ship
-    as `.zip` / `.7z` **archives** rather than GeoTIFFs, so they remain
-    catalog metadata only and raise `NotImplementedError` if requested. See
-    [Usage](usage.md#selectors--a-concrete-sub-alias).
+    to the AOI (a ~1.1 GB download per year — no server-side subsetting).
+    `dependency_ratios` (per-continent `.7z`, Asia / Africa) and `future_pop`
+    (per-SSP `.zip`, ~4 GB — opt in with `allow_large_archive=True` + `ssp=`)
+    are downloaded as archives and extracted; both need the `[worldpop]`
+    extra. See [Usage](usage.md#archive-products-dependency_ratios-future_pop).
 
 ## Output kind
 

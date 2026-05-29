@@ -64,12 +64,34 @@ product's available variants (did-you-mean). Single-variant products
     full ~1.1 GB download per year before the crop — prefer `scope="countries"`
     unless you genuinely need the global grid.
 
-!!! warning "future_pop / dependency_ratios are not fetchable"
-    These ship as multi-file **archives** — `future_pop` as per-SSP `.zip`
-    bundles, `dependency_ratios` as per-continent `.7z` archives — not
-    per-year GeoTIFFs, so the GeoTIFF pipeline cannot localise them.
-    Requesting them raises `NotImplementedError` at construction. Archive
-    extraction + the SSP / continent axes are a follow-up.
+### Archive products (`dependency_ratios`, `future_pop`)
+
+These ship as multi-file **archives** rather than per-year GeoTIFFs; the
+backend downloads the archive, extracts its GeoTIFFs, and crops them to the
+AOI. They need the `[worldpop]` extra (`pip install earthlens[worldpop]`,
+which adds `py7zr` for `.7z`).
+
+- **`dependency_ratios`** — one small per-continent `.7z` (Asia / Africa
+  only upstream). The backend resolves the AOI's continent automatically and
+  writes the three 2010 ratio rasters (total / old-age / young-age). An AOI
+  outside Asia / Africa raises a clear error.
+
+    ```python
+    EarthLens(data_source="worldpop", variables=["dependency_ratios"],
+              start="2010", end="2010", fmt="%Y", aoi="KEN",
+              lat_lim=[-4.7, 5.0], lon_lim=[33.9, 41.9], path="out/").download()
+    ```
+
+- **`future_pop`** — per-SSP `.zip` bundles that are **~4 GB each**, so they
+  require an explicit `allow_large_archive=True` plus `ssp=` (e.g.
+  `"SSP2"`); the backend extracts the requested `year` and crops it.
+
+    ```python
+    EarthLens(data_source="worldpop", variables=["future_pop"],
+              start="2030", end="2030", fmt="%Y", lat_lim=[-4.7, 5.0],
+              lon_lim=[33.9, 41.9], path="out/",
+              ssp="SSP2", allow_large_archive=True).download()
+    ```
 
 ```python
 # constrained Global-2 2020 100 m population:
