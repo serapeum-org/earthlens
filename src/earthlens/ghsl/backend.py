@@ -636,7 +636,13 @@ class GHSL(AbstractDataSource):
             epsg=4326,
             touch=False,
         )
-        if categorical:
+        # A categorical product reprojects with nearest-neighbour (set above)
+        # regardless of whether its class legend is curated; the colour table +
+        # legend sidecar are only written when a legend exists (a legend-less
+        # categorical product — e.g. GHS_BUILT_C_VEG, whose class codes are not
+        # curated — still gets the safe NN resampling, just no colour table).
+        has_legend = categorical and bool(self._catalog.get(rp.metadata["product"]).legend)
+        if has_legend:
             # The GeoTIFF colour table is best-effort: pyramids needs its
             # optional viz extra to write one. The legend always survives via
             # the {target}.legend.json sidecar written below.
@@ -652,7 +658,7 @@ class GHSL(AbstractDataSource):
                 )
 
         cropped.to_file(str(target))
-        if categorical:
+        if has_legend:
             self._write_legend_sidecar(target, rp.metadata["product"])
         _close_dataset(dataset)
         _close_dataset(cropped)

@@ -168,13 +168,16 @@ products:
           resolutions: ["10m"]
           nested: true
 
-  # R2022A-only sub-product: built-up characteristics by vegetation. Shipped
-  # as a classification raster; no authoritative class legend is curated, so
-  # it is treated as a plain raster (bilinear, no colour table).
+  # R2022A-only sub-product: built-up characteristics by vegetation. A
+  # classification raster in the BUILT-C family; its exact class codes are not
+  # curated, so it carries no legend — but it is flagged categorical so the
+  # localise step uses nearest-neighbour resampling (never blends class codes),
+  # which is the safe choice whether or not VEG turns out to be class-coded.
   GHS_BUILT_C_VEG:
     family: GHS_BUILT_C
     aliases: [built_vegetation, built_c_veg]
     unit: ""
+    categorical: true
     default_resolution: "10m"
     releases:
       R2022A:

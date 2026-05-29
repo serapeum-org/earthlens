@@ -95,8 +95,14 @@ def _validate(args: argparse.Namespace) -> int:
     for code in catalog.available_products():
         product = catalog.get(code)
         if product.categorical and not product.legend:
-            print(f"DRIFT  {code}: categorical but no legend")
-            drift += 1
+            # A legend-less categorical product (e.g. GHS_BUILT_C_VEG, codes
+            # uncurated) is intentional — it still reprojects with NN. Note it,
+            # don't fail: it carries no `colors`, just the categorical flag.
+            note = "" if product.colors else " (uncurated codes — NN only)"
+            print(f"note   {code}: categorical without legend{note}")
+            if product.colors:
+                print(f"DRIFT  {code}: has colors but no legend")
+                drift += 1
         for release in product.releases:
             url = _sample_url(catalog, code, release)
             if url is None:
