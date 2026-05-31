@@ -1,0 +1,21 @@
+# GHSL curated catalog — population slice (GHS-POP).
+#
+# One slice of the per-family split of the GHSL catalog. The loader
+# (earthlens.ghsl.catalog.Catalog) merges every *.yaml in this directory into
+# one Catalog at construction time; product codes must be unique across files.
+# A resolution implies its source CRS (metric -> 54009, arc-second -> 4326);
+# the user's output CRS is independent.
+
+products:
+
+  GHS_POP:
+    aliases: [population, pop]
+    unit: "people/cell"
+    default_resolution: "100m"
+    releases:
+      R2023A:
+        - epochs: [1975, 1980, 1985, 1990, 1995, 2000, 2005, 2010, 2015, 2020, 2025, 2030]
+          resolutions: ["100m", "1km", "3ss", "30ss"]
+      R2022A:
+        - epochs: [1975, 1980, 1985, 1990, 1995, 2000, 2005, 2010, 2015, 2020]
+          resolutions: ["100m", "1km", "3ss", "30ss"]

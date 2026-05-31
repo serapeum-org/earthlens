@@ -1,0 +1,15 @@
+# GHSL curated catalog — land slice (GHS-LAND).
+#
+# GHS_LAND's only release is R2022A (no R2023A); curated as a documented
+# exception to the "primary release = R2023A" scope guard.
+
+products:
+
+  GHS_LAND:
+    aliases: [land, land_fraction]
+    unit: "fraction"
+    default_resolution: "100m"
+    releases:
+      R2022A:
+        - epochs: [2018]
+          resolutions: ["10m", "100m", "1km"]
