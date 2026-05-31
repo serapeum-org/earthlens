@@ -88,6 +88,15 @@ usgs-water = ["dataretrieval >=1.1.4"]
 # pyramids-gis). The api="stac" path is inactive — A1 (2026-05) found no
 # queryable JRC STAC API — so no STAC extra is pulled; revisit if JRC ships one.
 ghsl = []
+# WorldPop: the default api="rest" path needs only core requests + pyramids;
+# the optional api="worldpoppy" path consumes WorldPopPy's file cache (never
+# its xarray return). WorldPopPy is MPL-2.0, requires Python >=3.10.
+# py7zr extracts the dependency_ratios per-continent .7z archives. Deliberately
+# NOT in `all`: WorldPopPy pulls rasterio/rioxarray, which lack wheels for the
+# 3.13/3.14 wheel-test envs and fail to build there; the REST path (the default)
+# needs nothing extra, and the worldpoppy / py7zr code paths are covered by a
+# stub / a tiny generated archive in the tests.
+worldpop = ["worldpoppy >=0.4", "py7zr >=0.20"]
 all = [
     "boto3 >=1.43.0",
     "botocore >=1.34.0",
@@ -199,6 +208,7 @@ include = ["earthlens", "earthlens.*"]
 # at runtime (the Catalog reads only the curated file; raw codes pass through
 # variables= without it), so it is deliberately excluded from the wheel.
 "earthlens.usgs_water" = ["usgs_water_data_catalog.yaml"]
+"earthlens.worldpop" = ["*.yaml"]
 
 [tool.flake8]
 ignore = ["E203", "E266", "E501", "W503", "E722", "C901", "E741", "E731"]
@@ -277,6 +287,7 @@ markers = [
     "radar: tests for the NEXRAD Level-II radar backend (requires the `radar` extra: boto3; unsigned unidata-nexrad-level2-chunks bucket).",
     "usgs_water: tests for the USGS NWIS / Water Data backend (requires the `usgs-water` extra: dataretrieval; anonymous access works).",
     "ghsl: tests for the GHSL backend (JRC Global Human Settlement Layer; open HTTPS, no extra SDK for the direct path; localised via pyramids).",
+    "worldpop: tests for the WorldPop population data hub backend (open CC-BY-4.0; default REST path needs only core requests + pyramids, optional `worldpop` extra adds worldpoppy).",
 ]
 
 [tool.pixi.workspace]
@@ -316,7 +327,8 @@ test-nwp = { cmd = "pytest -vvv -m 'nwp and not e2e' --cov=src/earthlens --cov-r
 test-radar = { cmd = "pytest -vvv -m 'radar and not e2e' --cov=src/earthlens --cov-report=xml --cov-report=term-missing", description = "Run NEXRAD radar backend tests (requires the `radar` extra: boto3)" }
 test-usgs-water = { cmd = "pytest -vvv -m 'usgs_water and not e2e' --cov=src/earthlens --cov-report=xml --cov-report=term-missing", description = "Run USGS NWIS / Water Data backend tests (requires the `usgs-water` extra: dataretrieval)" }
 test-ghsl = { cmd = "pytest -vvv -m 'ghsl and not e2e' --cov=src/earthlens --cov-report=xml --cov-report=term-missing", description = "Run GHSL backend tests (open HTTPS; no extra SDK for the direct path; localised via pyramids)" }
-test-doctests = { cmd = "pytest --doctest-modules src/earthlens/gee src/earthlens/chc src/earthlens/ecmwf src/earthlens/cmems src/earthlens/fdsn src/earthlens/earthdata src/earthlens/eumetsat src/earthlens/stac src/earthlens/openeo src/earthlens/sentinel_hub src/earthlens/gdacs src/earthlens/openaq src/earthlens/tropycal src/earthlens/firms src/earthlens/overture src/earthlens/nwp src/earthlens/radar src/earthlens/usgs_water src/earthlens/ghsl src/earthlens/base", description = "Run docstring examples across the backend packages (catches drift in catalog / API docstrings)" }
+test-worldpop = { cmd = "pytest -vvv -m 'worldpop and not e2e' --cov=src/earthlens --cov-report=xml --cov-report=term-missing", description = "Run WorldPop population data hub backend tests (open CC-BY-4.0; REST path needs only core requests + pyramids)" }
+test-doctests = { cmd = "pytest --doctest-modules src/earthlens/gee src/earthlens/chc src/earthlens/ecmwf src/earthlens/cmems src/earthlens/fdsn src/earthlens/earthdata src/earthlens/eumetsat src/earthlens/stac src/earthlens/openeo src/earthlens/sentinel_hub src/earthlens/gdacs src/earthlens/openaq src/earthlens/tropycal src/earthlens/firms src/earthlens/overture src/earthlens/nwp src/earthlens/radar src/earthlens/usgs_water src/earthlens/ghsl src/earthlens/worldpop src/earthlens/base", description = "Run docstring examples across the backend packages (catches drift in catalog / API docstrings)" }
 notebooks = { cmd = "pytest --nbval --nbval-lax --verbose docs/examples", description = "check notebooks" }
 jupyter = { cmd = "jupyter lab --no-browser --IdentityProvider.token='' --ServerApp.password='' --port=8889", description = "check notebooks" }
 build-dist = { cmd = "python -m build", description = "Build sdist and wheel for PyPI" }

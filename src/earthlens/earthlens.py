@@ -140,7 +140,7 @@ class EarthLens:
              'ghs', 'ghsl', 'google-earth-engine', 'human-settlement', 'nexrad',
              'nwis', 'nwp', 'openaq', 'openeo', 'overture', 'planetary-computer',
              'radar', 'sentinel-hub', 'sentinelhub', 'stac', 'tropycal',
-             'usgs-nwis', 'usgs-water']
+             'usgs-nwis', 'usgs-water', 'world-pop', 'worldpop']
 
             ```
         - Asking for an unknown backend raises `ValueError`:
@@ -213,6 +213,12 @@ class EarthLens:
             to the AOI via `pyramids` as `raster` GeoTIFFs (one per
             product × epoch; `aggregate=` reduces across epochs); no
             credentials; keys `"ghsl"` / `"ghs"` / `"human-settlement"`.
+        :class:`earthlens.worldpop.WorldPop`: WorldPop open population data
+            hub (CC-BY-4.0, no credentials) — per-country / global gridded
+            population, density, age/sex, births, projections; mosaic +
+            crop to the AOI via `pyramids` with a tidy age/sex table for
+            demographic products; `mixed` output; keys `"worldpop"` /
+            `"world-pop"`.
 
     """
 
@@ -299,6 +305,12 @@ class EarthLens:
             "usgs-water": ("earthlens.usgs_water", "USGSWater", "usgs-water", {}),
             "usgs-nwis": ("earthlens.usgs_water", "USGSWater", "usgs-water", {}),
             "nwis": ("earthlens.usgs_water", "USGSWater", "usgs-water", {}),
+            # WorldPop open population data hub (CC-BY-4.0, no creds). Mosaic +
+            # crop per-country GeoTIFFs to the AOI; demographic products also
+            # emit a tidy age/sex table. `OUTPUT_KIND="mixed"`. Alias
+            # "world-pop". The default REST path needs no extra SDK.
+            "worldpop": ("earthlens.worldpop", "WorldPop", "worldpop", {}),
+            "world-pop": ("earthlens.worldpop", "WorldPop", "worldpop", {}),
         }
     )
 
