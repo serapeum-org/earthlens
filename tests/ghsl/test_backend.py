@@ -516,6 +516,56 @@ class TestReleaseResolution:
         with pytest.raises(ValueError, match="no release"):
             _build(tmp_path, ["GHS_POP"], release="R9999Z")
 
+    def test_explicit_unavailable_release_raises_no_silent_fallback(self, tmp_path):
+        """An explicit release a single-release product lacks raises (typo guard)."""
+        with pytest.raises(ValueError, match="no release"):
+            _build(
+                tmp_path,
+                ["GHS_LAND"],
+                release="R2099Z",
+                start="2018-01-01",
+                end="2018-12-31",
+            )
+
+    def test_auto_prefers_default_release(self, tmp_path):
+        """release=None resolves to R2023A when the product offers it."""
+        g = _build(tmp_path, ["GHS_POP"])
+        assert g._release_for("GHS_POP") == "R2023A"
+
+    def test_resolution_is_memoized(self, tmp_path):
+        """_release_for caches its result per code."""
+        g = _build(tmp_path, ["GHS_LAND"], start="2018-01-01", end="2018-12-31")
+        for _ in range(3):
+            g._release_for("GHS_LAND")
+        assert g._release_cache == {"GHS_LAND": "R2022A"}
+
+    def test_ambiguous_multi_release_without_default_raises(self, tmp_path):
+        """A multi-release product lacking R2023A with no explicit release raises."""
+        from earthlens.ghsl.catalog import Availability, Catalog, Product
+
+        fake = Catalog(
+            datasets={
+                "GHS_X": Product(
+                    code="GHS_X",
+                    default_resolution="1km",
+                    releases={
+                        "R2022A": [Availability(epochs=[2020], resolutions=["1km"])],
+                        "R2025A": [Availability(epochs=[2020], resolutions=["1km"])],
+                    },
+                )
+            }
+        )
+        with pytest.raises(ValueError, match="none of them the default"):
+            GHSL(
+                variables=["GHS_X"],
+                catalog=fake,
+                start="2020-01-01",
+                end="2020-12-31",
+                lat_lim=[0, 1],
+                lon_lim=[0, 1],
+                path=str(tmp_path),
+            )
+
 
 @pytest.mark.ghsl
 class TestLegendlessCategorical:
