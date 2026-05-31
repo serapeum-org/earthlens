@@ -10,13 +10,13 @@
       
       
       
-        <link rel="canonical" href="https://serapeum-org.github.io/earthlens/develop/reference/s3/usage/">
+        <link rel="canonical" href="https://serapeum-org.github.io/earthlens/develop/reference/ghsl/projections/">
       
       
-        <link rel="prev" href="../authentication/">
+        <link rel="prev" href="../products/">
       
       
-        <link rel="next" href="../datasets/">
+        <link rel="next" href="../ghsl/">
       
       
         
@@ -27,7 +27,7 @@
     
     
       
-        <title>Usage - earthlens</title>
+        <title>Projections & tiling - earthlens</title>
       
     
     
@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -83,7 +83,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#amazon-s3-how-to-download" class="md-skip">
+        <a href="#ghsl-projections-crs-tiling" class="md-skip">
           Skip to content
         </a>
       
@@ -123,7 +123,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Usage
+              Projections & tiling
             
           </span>
         </div>
@@ -803,69 +803,17 @@
                 
   
   
-    
-  
-  
-  
-    
-    
-    
-    
-      
-      
-    
-    
-    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
-      
-        
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_3" checked>
-        
-          
-          <label class="md-nav__link" for="__nav_3_3" id="__nav_3_3_label" tabindex="0">
-            
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Amazon S3 (AWS Open Data)
-  
-
-    
-  </span>
-  
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_3_label" aria-expanded="true">
-          <label class="md-nav__title" for="__nav_3_3">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    Amazon S3 (AWS Open Data)
-  
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
   
   
     <li class="md-nav__item">
-      <a href="../introduction/" class="md-nav__link">
+      <a href="../../s3/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Introduction
+    Amazon S3
   
 
     
@@ -874,267 +822,6 @@
   
 
       </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../authentication/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Authentication
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-    
-  
-  
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Usage
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Usage
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#the-request" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        The request
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="The request">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#constructor-arguments" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Constructor arguments
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#discover-whats-available" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Discover what's available
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#dry-run-what-would-i-download" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Dry-run (what would I download?)
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#the-passthrough-any-public-bucket" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        The passthrough (any public bucket)
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#cropping-reprojection-and-output" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Cropping, reprojection, and output
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#aggregation-aggregate" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Aggregation (aggregate=)
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#known-limitations" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Known limitations
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../datasets/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Available datasets
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../reference/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Reference
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
     </li>
   
 
@@ -4170,6 +3857,325 @@
 
               
             
+              
+                
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_21" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_3_21" id="__nav_3_21_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GHSL (human settlement)
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_21_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3_21">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    GHSL (human settlement)
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../introduction/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Introduction
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../authentication/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Authentication
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../usage/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Usage
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../products/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Available datasets
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Projections & tiling
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Projections & tiling
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#source-crs-mollweide-vs-wgs84" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Source CRS: Mollweide vs WGS84
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#output-crs-when-reprojection-happens" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Output CRS &amp; when reprojection happens
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tiling-tiles-vs-whole-globe" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Tiling: tiles vs whole-globe
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-tile-grid" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The tile grid
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ghsl/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -4339,7 +4345,7 @@
   <span class="md-ellipsis">
     
   
-    Amazon S3 (AWS Open Data)
+    CDS / ECMWF
   
 
     
@@ -4352,176 +4358,6 @@
         
         <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_4_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_4_4">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    Amazon S3 (AWS Open Data)
-  
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../examples/s3/01_catalog_explorer/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    AWS Open-Data S3 — catalog explorer
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../examples/s3/02_copernicus_dem/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Copernicus DEM — download &amp; crop
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../examples/s3/03_esa_worldcover/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    ESA WorldCover — 10 m land cover
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../examples/s3/04_passthrough/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Passthrough — any public bucket
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    
-    
-    
-    
-      
-      
-    
-    
-    <li class="md-nav__item md-nav__item--nested">
-      
-        
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_5" >
-        
-          
-          <label class="md-nav__link" for="__nav_4_5" id="__nav_4_5_label" tabindex="0">
-            
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    CDS / ECMWF
-  
-
-    
-  </span>
-  
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_5_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_5">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -4865,10 +4701,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_6" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_5" >
         
           
-          <label class="md-nav__link" for="__nav_4_6" id="__nav_4_6_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_5" id="__nav_4_5_label" tabindex="0">
             
   
   
@@ -4886,8 +4722,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_6_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_6">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_5">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -5147,10 +4983,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_7" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_6" >
         
           
-          <label class="md-nav__link" for="__nav_4_7" id="__nav_4_7_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_6" id="__nav_4_6_label" tabindex="0">
             
   
   
@@ -5168,8 +5004,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_7_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_7">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_6">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -5401,10 +5237,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_8" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_7" >
         
           
-          <label class="md-nav__link" for="__nav_4_8" id="__nav_4_8_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_7" id="__nav_4_7_label" tabindex="0">
             
   
   
@@ -5422,8 +5258,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_8_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_8">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_7">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -5627,10 +5463,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_9" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_8" >
         
           
-          <label class="md-nav__link" for="__nav_4_9" id="__nav_4_9_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_8" id="__nav_4_8_label" tabindex="0">
             
   
   
@@ -5648,8 +5484,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_9_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_9">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_8">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -5769,10 +5605,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_10" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_9" >
         
           
-          <label class="md-nav__link" for="__nav_4_10" id="__nav_4_10_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_9" id="__nav_4_9_label" tabindex="0">
             
   
   
@@ -5790,8 +5626,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_10_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_10">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_9_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_9">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -6163,10 +5999,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_11" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_10" >
         
           
-          <label class="md-nav__link" for="__nav_4_11" id="__nav_4_11_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_10" id="__nav_4_10_label" tabindex="0">
             
   
   
@@ -6184,8 +6020,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_11_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_11">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_10_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_10">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -6305,10 +6141,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_12" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_11" >
         
           
-          <label class="md-nav__link" for="__nav_4_12" id="__nav_4_12_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_11" id="__nav_4_11_label" tabindex="0">
             
   
   
@@ -6326,8 +6162,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_12_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_12">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_11_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_11">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -6475,10 +6311,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_13" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_12" >
         
           
-          <label class="md-nav__link" for="__nav_4_13" id="__nav_4_13_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_12" id="__nav_4_12_label" tabindex="0">
             
   
   
@@ -6496,8 +6332,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_13_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_13">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_12_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_12">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -6617,10 +6453,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_14" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_13" >
         
           
-          <label class="md-nav__link" for="__nav_4_14" id="__nav_4_14_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_13" id="__nav_4_13_label" tabindex="0">
             
   
   
@@ -6638,8 +6474,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_14_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_14">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_13_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_13">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -6843,10 +6679,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_15" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_14" >
         
           
-          <label class="md-nav__link" for="__nav_4_15" id="__nav_4_15_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_14" id="__nav_4_14_label" tabindex="0">
             
   
   
@@ -6864,8 +6700,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_15_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_15">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_14_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_14">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -7125,10 +6961,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_16" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_15" >
         
           
-          <label class="md-nav__link" for="__nav_4_16" id="__nav_4_16_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_15" id="__nav_4_15_label" tabindex="0">
             
   
   
@@ -7146,8 +6982,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_16_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_16">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_15_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_15">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -7407,10 +7243,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_17" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_16" >
         
           
-          <label class="md-nav__link" for="__nav_4_17" id="__nav_4_17_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_16" id="__nav_4_16_label" tabindex="0">
             
   
   
@@ -7428,8 +7264,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_17_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_17">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_16_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_16">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -7549,10 +7385,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_18" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_17" >
         
           
-          <label class="md-nav__link" for="__nav_4_18" id="__nav_4_18_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_17" id="__nav_4_17_label" tabindex="0">
             
   
   
@@ -7570,8 +7406,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_18_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_18">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_17_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_17">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -7803,10 +7639,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_19" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_18" >
         
           
-          <label class="md-nav__link" for="__nav_4_19" id="__nav_4_19_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_18" id="__nav_4_18_label" tabindex="0">
             
   
   
@@ -7824,8 +7660,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_19_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_19">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_18_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_18">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -7945,10 +7781,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_20" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_19" >
         
           
-          <label class="md-nav__link" for="__nav_4_20" id="__nav_4_20_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_19" id="__nav_4_19_label" tabindex="0">
             
   
   
@@ -7966,8 +7802,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_20_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_20">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_19_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_19">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -8031,10 +7867,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_21" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_20" >
         
           
-          <label class="md-nav__link" for="__nav_4_21" id="__nav_4_21_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_20" id="__nav_4_20_label" tabindex="0">
             
   
   
@@ -8052,8 +7888,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_21_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_21">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_20_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_20">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -8162,6 +7998,260 @@
     
   
     USGS Water — annual peaks and rating curves
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_21" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_21" id="__nav_4_21_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GHSL (human settlement)
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_21_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_21">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    GHSL (human settlement)
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../examples/ghsl/01_catalog_explorer/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GHSL — catalog explorer
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../examples/ghsl/02_population_quickstart/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GHSL — population quickstart
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../examples/ghsl/03_builtup_surface/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GHSL — built-up surface
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../examples/ghsl/04_builtup_growth/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GHSL — built-up growth (multi-epoch + aggregate)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../examples/ghsl/05_building_height/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GHSL — building height
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../examples/ghsl/06_settlement_classes/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GHSL — settlement classes (GHS-SMOD)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../examples/ghsl/07_wup_projection/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GHSL — population projection to 2100 (GHS-WUP, R2025A)
   
 
     
@@ -8415,60 +8505,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#the-request" class="md-nav__link">
+  <a href="#source-crs-mollweide-vs-wgs84" class="md-nav__link">
     <span class="md-ellipsis">
       
-        The request
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="The request">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#constructor-arguments" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Constructor arguments
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#discover-whats-available" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Discover what's available
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#dry-run-what-would-i-download" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Dry-run (what would I download?)
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#the-passthrough-any-public-bucket" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        The passthrough (any public bucket)
+        Source CRS: Mollweide vs WGS84
       
     </span>
   </a>
@@ -8476,10 +8516,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#cropping-reprojection-and-output" class="md-nav__link">
+  <a href="#output-crs-when-reprojection-happens" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Cropping, reprojection, and output
+        Output CRS &amp; when reprojection happens
       
     </span>
   </a>
@@ -8487,10 +8527,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#aggregation-aggregate" class="md-nav__link">
+  <a href="#tiling-tiles-vs-whole-globe" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Aggregation (aggregate=)
+        Tiling: tiles vs whole-globe
       
     </span>
   </a>
@@ -8498,10 +8538,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#known-limitations" class="md-nav__link">
+  <a href="#the-tile-grid" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Known limitations
+        The tile grid
       
     </span>
   </a>
@@ -8525,7 +8565,7 @@
 
 
   
-    <a href="https://github.com/serapeum-org/earthlens/edit/master/docs/reference/s3/usage.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
+    <a href="https://github.com/serapeum-org/earthlens/edit/master/docs/reference/ghsl/projections.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
     </a>
@@ -8534,138 +8574,96 @@
     
       
     
-    <a href="https://github.com/serapeum-org/earthlens/raw/master/docs/reference/s3/usage.md" title="View source of this page" class="md-content__button md-icon">
+    <a href="https://github.com/serapeum-org/earthlens/raw/master/docs/reference/ghsl/projections.md" title="View source of this page" class="md-content__button md-icon">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 18c.56 0 1 .44 1 1s-.44 1-1 1-1-.44-1-1 .44-1 1-1m0-3c-2.73 0-5.06 1.66-6 4 .94 2.34 3.27 4 6 4s5.06-1.66 6-4c-.94-2.34-3.27-4-6-4m0 6.5a2.5 2.5 0 0 1-2.5-2.5 2.5 2.5 0 0 1 2.5-2.5 2.5 2.5 0 0 1 2.5 2.5 2.5 2.5 0 0 1-2.5 2.5M9.27 20H6V4h7v5h5v4.07c.7.08 1.36.25 2 .49V8l-6-6H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h4.5a8.2 8.2 0 0 1-1.23-2"/></svg>
     </a>
   
 
 
-<h1 id="amazon-s3-how-to-download"><a class="toclink" href="#amazon-s3-how-to-download">Amazon S3 — how to download</a><a class="headerlink" href="#amazon-s3-how-to-download" title="Permanent link">#</a></h1>
-<p>Every dataset uses the <strong>same call shape</strong>. You pick a <code>dataset</code>, list
-<code>variables</code> (friendly names, aliases, or raw native tokens), give a lat/lon
-bbox and a date window, and call <code>download()</code>. The result is a <code>list[Path]</code> of
-files cropped to your AOI.</p>
-<h2 id="the-request"><a class="toclink" href="#the-request">The request</a><a class="headerlink" href="#the-request" title="Permanent link">#</a></h2>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.s3</span><span class="w"> </span><span class="kn">import</span> <span class="n">S3</span>
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="n">src</span> <span class="o">=</span> <span class="n">S3</span><span class="p">(</span>
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">start</span><span class="o">=</span><span class="s2">&quot;2024-06-01&quot;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">&quot;2024-06-06&quot;</span><span class="p">,</span>   <span class="c1"># inclusive date window</span>
-<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">30.00</span><span class="p">,</span> <span class="mf">30.06</span><span class="p">],</span>                 <span class="c1"># [lat_min, lat_max]</span>
-<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">31.20</span><span class="p">,</span> <span class="mf">31.26</span><span class="p">],</span>                 <span class="c1"># [lon_min, lon_max]</span>
-<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    <span class="n">dataset</span><span class="o">=</span><span class="s2">&quot;sentinel-2-l2a&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;red&quot;</span><span class="p">,</span> <span class="s2">&quot;nir&quot;</span><span class="p">],</span>               <span class="c1"># friendly aliases -&gt; B04, B08</span>
-<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>    <span class="n">path</span><span class="o">=</span><span class="s2">&quot;out/&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="p">)</span>
-<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="n">paths</span> <span class="o">=</span> <span class="n">src</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>                      <span class="c1"># cropped GeoTIFFs under out/</span>
-</code></pre></div>
-<h3 id="constructor-arguments"><a class="toclink" href="#constructor-arguments">Constructor arguments</a><a class="headerlink" href="#constructor-arguments" title="Permanent link">#</a></h3>
+<h1 id="ghsl-projections-crs-tiling"><a class="toclink" href="#ghsl-projections-crs-tiling">GHSL — Projections, CRS &amp; tiling</a><a class="headerlink" href="#ghsl-projections-crs-tiling" title="Permanent link">#</a></h1>
+<p>GHSL is published in two coordinate systems and two delivery layouts. The
+backend hides the details, but understanding them helps you choose
+<code>resolution</code> / <code>crs</code> / <code>tiling</code>.</p>
+<h2 id="source-crs-mollweide-vs-wgs84"><a class="toclink" href="#source-crs-mollweide-vs-wgs84">Source CRS: Mollweide vs WGS84</a><a class="headerlink" href="#source-crs-mollweide-vs-wgs84" title="Permanent link">#</a></h2>
 <table>
 <thead>
 <tr>
-<th>Argument</th>
-<th>Meaning</th>
+<th>Resolution</th>
+<th>Unit</th>
+<th>Source CRS</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><code>dataset</code></td>
-<td>A registered name (<code>"era5"</code>, <code>"sentinel-2-l2a"</code>, <code>"goes"</code>, <code>"copernicus-dem"</code>, <code>"esa-worldcover"</code>) <strong>or</strong> an inline spec dict (passthrough).</td>
+<td><code>10m</code>, <code>100m</code>, <code>1km</code></td>
+<td>metres</td>
+<td><strong>Mollweide</strong> (ESRI:54009) — equal-area</td>
 </tr>
 <tr>
-<td><code>variables</code></td>
-<td>Variable / band tokens — friendly names, aliases, or raw native tokens. <code>None</code> uses the dataset's defaults.</td>
-</tr>
-<tr>
-<td><code>lat_lim</code> / <code>lon_lim</code></td>
-<td>The AOI bbox in degrees (EPSG:4326).</td>
-</tr>
-<tr>
-<td><code>start</code> / <code>end</code> / <code>fmt</code></td>
-<td>Inclusive date window (ignored for static datasets like DEM / WorldCover).</td>
-</tr>
-<tr>
-<td><code>temporal_resolution</code></td>
-<td><code>"monthly"</code> (default) or <code>"daily"</code> — date stepping for temporal datasets.</td>
-</tr>
-<tr>
-<td><code>bucket</code></td>
-<td>Override the dataset's bucket (e.g. <code>"copernicus-dem-90m"</code>, <code>"noaa-goes18"</code>).</td>
-</tr>
-<tr>
-<td><code>output_format</code></td>
-<td><code>"geotiff"</code> to convert output to GeoTIFF (NetCDF datasets always emit GeoTIFF after cropping).</td>
-</tr>
-<tr>
-<td><code>aws_profile</code></td>
-<td>Optional signed profile (default unsigned).</td>
-</tr>
-<tr>
-<td><code>path</code></td>
-<td>Output directory.</td>
+<td><code>3ss</code>, <code>30ss</code></td>
+<td>arc-seconds</td>
+<td><strong>WGS84</strong> (EPSG:4326)</td>
 </tr>
 </tbody>
 </table>
-<h3 id="discover-whats-available"><a class="toclink" href="#discover-whats-available">Discover what's available</a><a class="headerlink" href="#discover-whats-available" title="Permanent link">#</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="o">&gt;&gt;&gt;</span> <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.s3</span><span class="w"> </span><span class="kn">import</span> <span class="n">S3</span>
-<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="o">&gt;&gt;&gt;</span> <span class="n">S3</span><span class="o">.</span><span class="n">datasets</span><span class="p">()</span>
-<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="p">[</span><span class="s1">&#39;copernicus-dem&#39;</span><span class="p">,</span> <span class="s1">&#39;era5&#39;</span><span class="p">,</span> <span class="s1">&#39;esa-worldcover&#39;</span><span class="p">,</span> <span class="s1">&#39;goes&#39;</span><span class="p">,</span> <span class="s1">&#39;sentinel-2-l2a&#39;</span><span class="p">]</span>
-</code></pre></div>
-<h3 id="dry-run-what-would-i-download"><a class="toclink" href="#dry-run-what-would-i-download">Dry-run (what would I download?)</a><a class="headerlink" href="#dry-run-what-would-i-download" title="Permanent link">#</a></h3>
-<p><code>_search()</code> plans the S3 keys without transferring data:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="o">&gt;&gt;&gt;</span> <span class="n">src</span> <span class="o">=</span> <span class="n">S3</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="s2">&quot;2021-01-01&quot;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">&quot;2021-01-01&quot;</span><span class="p">,</span>
-<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="o">...</span>          <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">0.4</span><span class="p">,</span> <span class="mf">0.6</span><span class="p">],</span> <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">6.4</span><span class="p">,</span> <span class="mf">6.6</span><span class="p">],</span> <span class="n">dataset</span><span class="o">=</span><span class="s2">&quot;copernicus-dem&quot;</span><span class="p">)</span>
-<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="o">&gt;&gt;&gt;</span> <span class="p">[</span><span class="n">p</span><span class="o">.</span><span class="n">href</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">src</span><span class="o">.</span><span class="n">_search</span><span class="p">()]</span>
-<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="p">[</span><span class="s1">&#39;Copernicus_DSM_COG_10_N00_00_E006_00_DEM/Copernicus_DSM_COG_10_N00_00_E006_00_DEM.tif&#39;</span><span class="p">]</span>
-</code></pre></div>
-<h2 id="the-passthrough-any-public-bucket"><a class="toclink" href="#the-passthrough-any-public-bucket">The passthrough (any public bucket)</a><a class="headerlink" href="#the-passthrough-any-public-bucket" title="Permanent link">#</a></h2>
-<p>An unregistered dataset is supplied as an <strong>inline spec dict with the same
-fields</strong> a catalog row uses — invocation is identical to a registered dataset:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">src</span> <span class="o">=</span> <span class="n">S3</span><span class="p">(</span>
-<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>    <span class="n">start</span><span class="o">=</span><span class="s2">&quot;2024-01-01&quot;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">&quot;2024-01-01&quot;</span><span class="p">,</span>
-<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
-<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>    <span class="n">dataset</span><span class="o">=</span><span class="p">{</span>
-<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>        <span class="s2">&quot;bucket&quot;</span><span class="p">:</span> <span class="s2">&quot;my-open-bucket&quot;</span><span class="p">,</span>
-<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>        <span class="s2">&quot;format&quot;</span><span class="p">:</span> <span class="s2">&quot;cog&quot;</span><span class="p">,</span>
-<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>        <span class="s2">&quot;layout&quot;</span><span class="p">:</span> <span class="s2">&quot;deterministic_tiles&quot;</span><span class="p">,</span>
-<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>        <span class="s2">&quot;crs&quot;</span><span class="p">:</span> <span class="mi">4326</span><span class="p">,</span>
-<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>        <span class="s2">&quot;params&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;key_template&quot;</span><span class="p">:</span> <span class="s2">&quot;</span><span class="si">{year}</span><span class="s2">/tile_</span><span class="si">{variable}</span><span class="s2">.tif&quot;</span><span class="p">},</span>
-<a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a>    <span class="p">},</span>
-<a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a>    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;band1&quot;</span><span class="p">],</span>
-<a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a><span class="p">)</span>
-</code></pre></div>
-<p>The <code>key_template</code> may reference <code>{variable}</code>, <code>{year}</code>, <code>{month}</code>, <code>{day}</code>,
-and <code>{doy}</code>.</p>
-<h2 id="cropping-reprojection-and-output"><a class="toclink" href="#cropping-reprojection-and-output">Cropping, reprojection, and output</a><a class="headerlink" href="#cropping-reprojection-and-output" title="Permanent link">#</a></h2>
+<p>JRC distributes the equal-area metric grids in Mollweide (the projection of
+record for GHSL — it preserves area, which matters for counting people and
+summing built-up surface) and the geographic grids in WGS84. <strong>The resolution
+you pick determines the source CRS</strong> — there is no 100 m WGS84 file, nor a 30″
+Mollweide file.</p>
+<h2 id="output-crs-when-reprojection-happens"><a class="toclink" href="#output-crs-when-reprojection-happens">Output CRS &amp; when reprojection happens</a><a class="headerlink" href="#output-crs-when-reprojection-happens" title="Permanent link">#</a></h2>
+<p><code>crs=</code> is the <strong>output</strong> CRS (default <code>EPSG:4326</code>). The backend reprojects the
+downloaded source to it via <code>pyramids</code>:</p>
 <ul>
-<li><strong>WGS84 datasets</strong> (ERA5, Copernicus DEM, ESA WorldCover) are cropped directly
-  to the bbox; ERA5's 0–360 longitudes are wrapped to −180..180.</li>
-<li><strong>Per-file-CRS COGs</strong> (Sentinel-2 UTM) are reprojected to WGS84, then cropped.</li>
-<li><strong>Multi-tile AOIs</strong> (DEM / WorldCover spanning more than one tile) yield <strong>one
-  cropped file per tile</strong>; merging them into a single mosaic is a follow-on
-  (<code>PY-1</code>, a pyramids capability).</li>
-<li><strong>Output</strong>: COG datasets and (cropped) NetCDF datasets write GeoTIFFs; NetCDF
-  time steps become raster bands.</li>
+<li>Source 54009 + output 4326 → <strong>reprojected</strong> (the common case for the 100 m
+  grids).</li>
+<li>Source 4326 + output 4326 → <strong>no reprojection</strong> (the 3″/30″ grids are served
+  in WGS84 already).</li>
+<li>Any other output (e.g. <code>crs="EPSG:3035"</code>) → reprojected.</li>
 </ul>
-<h2 id="aggregation-aggregate"><a class="toclink" href="#aggregation-aggregate">Aggregation (<code>aggregate=</code>)</a><a class="headerlink" href="#aggregation-aggregate" title="Permanent link">#</a></h2>
-<p>NetCDF datasets (currently ERA5) accept an
-<code>earthlens.aggregate.AggregationConfig</code> to emit per-window reductions:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.aggregate</span><span class="w"> </span><span class="kn">import</span> <span class="n">AggregationConfig</span>
-<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>
-<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="n">src</span> <span class="o">=</span> <span class="n">S3</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="s2">&quot;2023-12-01&quot;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">&quot;2023-12-31&quot;</span><span class="p">,</span> <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mi">40</span><span class="p">,</span> <span class="mi">42</span><span class="p">],</span> <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="mi">12</span><span class="p">,</span> <span class="mi">14</span><span class="p">],</span>
-<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>         <span class="n">dataset</span><span class="o">=</span><span class="s2">&quot;era5&quot;</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;t2m&quot;</span><span class="p">],</span> <span class="n">path</span><span class="o">=</span><span class="s2">&quot;out/&quot;</span><span class="p">)</span>
-<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="n">windows</span> <span class="o">=</span> <span class="n">src</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">aggregate</span><span class="o">=</span><span class="n">AggregationConfig</span><span class="p">(</span><span class="n">freq</span><span class="o">=</span><span class="s2">&quot;D&quot;</span><span class="p">,</span> <span class="n">op</span><span class="o">=</span><span class="s2">&quot;mean&quot;</span><span class="p">))</span>
+<p>Continuous products reproject with <strong>bilinear</strong> resampling; categorical
+products (SMOD, BUILT-C, DEGURBA) use <strong>nearest-neighbour</strong> so class codes are
+never blended into non-existent values at tile seams.</p>
+<h2 id="tiling-tiles-vs-whole-globe"><a class="toclink" href="#tiling-tiles-vs-whole-globe">Tiling: tiles vs whole-globe</a><a class="headerlink" href="#tiling-tiles-vs-whole-globe" title="Permanent link">#</a></h2>
+<table>
+<thead>
+<tr>
+<th>Layout</th>
+<th>Resolutions</th>
+<th>Delivery</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Tiled</strong></td>
+<td><code>10m</code>, <code>100m</code>, <code>3ss</code></td>
+<td>a sparse 18×36 Mollweide grid of ~1000 km tiles (<code>R{row}_C{col}</code>), land only</td>
+</tr>
+<tr>
+<td><strong>Whole-globe</strong></td>
+<td><code>1km</code>, <code>30ss</code></td>
+<td>a single global <code>.zip</code> (~300 MB)</td>
+</tr>
+</tbody>
+</table>
+<p>For a tiled product the backend transforms your AOI to Mollweide (densifying
+the bbox edges so the bowed Mollweide image is captured), intersects it with
+the bundled 375-tile land schema (<code>tile_schema.geojson</code>), downloads only the
+intersecting tiles, and mosaics them. <code>tiling="global"</code> overrides this to fetch
+the whole-globe file instead (useful when you want the full grid or your AOI
+spans many tiles).</p>
+<p>If a tiled-product AOI intersects <strong>no</strong> land tile (open ocean), the backend
+raises a clear error rather than producing an empty raster — switch to a land
+AOI, a coarse resolution, or <code>tiling="global"</code>.</p>
+<h2 id="the-tile-grid"><a class="toclink" href="#the-tile-grid">The tile grid</a><a class="headerlink" href="#the-tile-grid" title="Permanent link">#</a></h2>
+<p>The grid is the official JRC <code>GHSL_data_54009_shapefile</code> (the
+<code>GHSL2_0_MWD_L1_tile_schema_land</code> layer), converted to a compact GeoJSON and
+shipped as package data. It is a fixed 18×36 scheme (<code>R1..R18</code> north→south,
+<code>C1..C36</code> west→east) of exactly 1,000,000 m square tiles; only the 375 tiles
+that contain land exist. Regenerate it with:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>python<span class="w"> </span>tools/ghsl/refresh_ghsl_catalog.py<span class="w"> </span>refresh-tiles
 </code></pre></div>
-<p>Aggregation runs on the raw granule's time axis and writes per-window GeoTIFFs to
-<code>aggregate.out_dir</code> (or <code>&lt;path&gt;/aggregated</code>). COG datasets reject <code>aggregate=</code>
-with <code>NotImplementedError</code>.</p>
-<h2 id="known-limitations"><a class="toclink" href="#known-limitations">Known limitations</a><a class="headerlink" href="#known-limitations" title="Permanent link">#</a></h2>
-<ul>
-<li><strong>GOES</strong> (geostationary NetCDF) downloads, but cropping/reprojection to WGS84
-  is deferred to the pyramids <code>PY-1</code> port; <code>_localise</code> raises a clear
-  <code>NotImplementedError</code> until it lands.</li>
-<li><strong>Multi-tile mosaic</strong> is not yet merged (one file per tile) — <code>PY-1</code>.</li>
-</ul>
 
 
 
@@ -8701,7 +8699,7 @@ with <code>NotImplementedError</code>.</p>
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
           
-          <a href="../authentication/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Authentication">
+          <a href="../products/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Available datasets">
             <div class="md-footer__button md-icon">
               
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
@@ -8711,20 +8709,20 @@ with <code>NotImplementedError</code>.</p>
                 Previous
               </span>
               <div class="md-ellipsis">
-                Authentication
+                Available datasets
               </div>
             </div>
           </a>
         
         
           
-          <a href="../datasets/" class="md-footer__link md-footer__link--next" aria-label="Next: Available datasets">
+          <a href="../ghsl/" class="md-footer__link md-footer__link--next" aria-label="Next: Reference">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                Available datasets
+                Reference
               </div>
             </div>
             <div class="md-footer__button md-icon">
