@@ -120,11 +120,14 @@ objs = EarthLens(
 # objs[0] is a pyramids FeatureCollection (a GeoJSON resource)
 ```
 
-`read=True` requires **`pyramids-gis >= 0.27.0`** (which provides
-`read_resource`); on an older pyramids it raises `NotImplementedError`
-with an upgrade hint. The earthlens floor stays `>= 0.23.0` so the
-default path-returning behaviour — and Python 3.14 — keep working on the
-older release; the reader is feature-detected at call time.
+`read=True` requires a **`pyramids-gis` that provides `read_resource`**.
+That reader is implemented in pyramids but not yet in a published
+release (it is on pyramids `main`; the released `0.27.0` does **not**
+include it), so on current pyramids `read=True` raises
+`NotImplementedError` with an upgrade hint. The earthlens floor stays
+`>= 0.23.0` so the default path-returning behaviour — and Python 3.14 —
+keep working; the reader is feature-detected at call time, and the floor
+can be raised once a pyramids release ships it.
 
 ## Rate limits & gotchas
 

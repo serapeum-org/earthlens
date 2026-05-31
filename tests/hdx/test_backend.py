@@ -282,5 +282,5 @@ class TestDownload:
         monkeypatch.setitem(sys.modules, "pyramids", types.ModuleType("pyramids"))
         fake_hdx.add_dataset("d", [FakeResource("a.csv", "CSV")])
         backend = HDX(hdx_id="d", path=tmp_path)
-        with pytest.raises(NotImplementedError, match=r"pyramids-gis >= 0\.27\.0"):
+        with pytest.raises(NotImplementedError, match=r"read_resource"):
             backend.download(read=True)

@@ -473,13 +473,13 @@ class HDX(AbstractDataSource):
     def _load_reader():
         """Return `pyramids.read_resource`, or raise a clear upgrade error.
 
-        The reader (the `PY-D` capability) landed in `pyramids-gis`
-        `0.27.0`; an older install raises `ImportError` on the symbol.
-        Surface that as a `NotImplementedError` naming the required
-        version, mirroring how the Earthdata backend feature-detects
-        `pyramids` reducers rather than hard-pinning the floor (a hard
-        pin would drop Python 3.14, which `0.27.0` does not yet ship a
-        Linux/Windows wheel for).
+        The reader (the `PY-D` capability) is the `pyramids.read_resource`
+        function; an install that predates it raises `ImportError` on the
+        symbol. Surface that as a `NotImplementedError`, mirroring how the
+        Earthdata backend feature-detects `pyramids` reducers rather than
+        hard-pinning the floor — a hard pin is avoided because the reader
+        ships only in an as-yet-unreleased pyramids (it is on `main`, not
+        in `0.27.0`), and pinning it would also drop Python 3.14.
 
         Returns:
             The `pyramids.read_resource` callable.
@@ -492,10 +492,11 @@ class HDX(AbstractDataSource):
             from pyramids import read_resource
         except ImportError as exc:
             raise NotImplementedError(
-                "HDX.download(read=True) needs pyramids-gis >= 0.27.0 (which "
-                "provides `read_resource`); the installed pyramids does not. "
-                "Upgrade pyramids, or call download() without read= to get "
-                "the resource file paths and read them yourself."
+                "HDX.download(read=True) needs a pyramids-gis that provides "
+                "`read_resource` (the resource reader); the installed pyramids "
+                "does not. Upgrade pyramids once a release ships it, or call "
+                "download() without read= to get the resource file paths and "
+                "read them yourself."
             ) from exc
         return read_resource
 
