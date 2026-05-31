@@ -27,10 +27,7 @@ classifiers = [
 requires-python = ">= 3.11, <4"
 
 dependencies = [
-    # >=0.24.1: fixes get_epsg_from_prj returning the unit code EPSG:9122 for
-    # GRIB CRS (pyramids#403 / PY-1), so Dataset.epsg is 4326 and the NWP
-    # crop/COG/aggregate path no longer trips on an unresolvable EPSG.
-    "pyramids-gis >=0.24.1",
+    "pyramids-gis >=0.28.0",
     "geopandas >=1.0.0",
     "joblib >=1.5.0",
     "loguru >=0.7.3",
