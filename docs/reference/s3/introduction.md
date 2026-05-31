@@ -19,6 +19,12 @@ unsigned-accessible (no credentials, public buckets):
 | `goes` | `noaa-goes16` / `-goes18` | NetCDF | NOAA GOES ABI imagery (Americas, near-real-time) |
 | `copernicus-dem` | `copernicus-dem-30m` / `-90m` | COG | Copernicus GLO-30/90 elevation (1° tiles, static) |
 | `esa-worldcover` | `esa-worldcover` | COG | ESA WorldCover 10 m land cover (3° tiles, 2020/2021) |
+| `usgs-landsat` ⚠️ | `usgs-landsat` (us-west-2) | COG | Landsat Collection-2 L2 surface reflectance / temperature — **requester-pays** |
+| `naip-source` ⚠️ | `naip-source` (us-east-1) | COG | USDA NAIP 4-band aerial imagery (US only) — **requester-pays** |
+
+⚠️ **Requester-pays** datasets need valid AWS credentials and **bill the caller's
+AWS account** for every request/download — see [Authentication](authentication.md).
+The other five are keyless/public.
 
 Beyond the registry, an **inline passthrough** lets you point the backend at any
 other public bucket using the same call shape (see [Usage](usage.md)).

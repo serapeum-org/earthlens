@@ -111,6 +111,12 @@ class Dataset(BaseModel):
             `"static"`).
         lon_convention: `"0-360"` when longitudes need wrapping to
             `-180..180` before a bbox crop (ERA5); `None` otherwise.
+        region: AWS region of the bucket (e.g. `"us-west-2"`); `None`
+            uses the client default. Required for some buckets.
+        requester_pays: `True` for requester-pays buckets (e.g.
+            `usgs-landsat`, `naip-source`) — the backend then signs the
+            client and passes `RequestPayer="requester"`, which bills the
+            caller's AWS account. Requires valid AWS credentials.
         description: Human-readable summary.
         params: Layout-specific configuration consumed by `layouts.py`.
         default_variables: Variables fetched when the caller passes none.
@@ -140,6 +146,8 @@ class Dataset(BaseModel):
     temporal: Literal["temporal", "static"] = "temporal"
     cadence: str | None = None
     lon_convention: str | None = None
+    region: str | None = None
+    requester_pays: bool = False
     description: str = ""
     params: dict[str, Any] = Field(default_factory=dict)
     default_variables: list[str] = Field(default_factory=list)
@@ -231,7 +239,7 @@ class Catalog(AbstractCatalog):
             ```python
             >>> from earthlens.s3 import Catalog
             >>> Catalog().dataset_names()
-            ['copernicus-dem', 'era5', 'esa-worldcover', 'goes', 'sentinel-2-l2a']
+            ['copernicus-dem', 'era5', 'esa-worldcover', 'goes', 'naip-source', 'sentinel-2-l2a', 'usgs-landsat']
             >>> Catalog().resolve("era5").bucket
             'nsf-ncar-era5'
 
@@ -253,7 +261,7 @@ class Catalog(AbstractCatalog):
             >>> Catalog().resolve("era-5")
             Traceback (most recent call last):
                 ...
-            ValueError: 'era-5' is not in the S3 dataset registry. Known datasets: ['copernicus-dem', 'era5', 'esa-worldcover', 'goes', 'sentinel-2-l2a']. Did you mean 'era5'?
+            ValueError: 'era-5' is not in the S3 dataset registry. Known datasets: ['copernicus-dem', 'era5', 'esa-worldcover', 'goes', 'naip-source', 'sentinel-2-l2a', 'usgs-landsat']. Did you mean 'era5'?
 
             ```
     """

@@ -105,6 +105,32 @@ Aggregation runs on the raw granule's time axis and writes per-window GeoTIFFs t
 `aggregate.out_dir` (or `<path>/aggregated`). COG datasets reject `aggregate=`
 with `NotImplementedError`.
 
+## Requester-pays datasets (Landsat, NAIP)
+
+`usgs-landsat` and `naip-source` are **requester-pays** buckets: they need valid
+AWS credentials and **bill your AWS account** for each request/download. The
+backend automatically uses a **signed** client and sends
+`RequestPayer="requester"` for these datasets (the other five stay keyless).
+
+Because their native spatial index (Landsat WRS-2 path/row, NAIP USGS quad) is
+not derivable from a lat/lon bbox without a grid lookup, they are addressed by an
+**explicit identifier**, not by bbox discovery (use the STAC backend for
+bbox→scene search):
+
+```python
+# Landsat — by Collection-2 scene id (sensor/path/row/year parsed from it):
+S3(start="2021-09-01", end="2021-09-01", lat_lim=[36.5, 37.0], lon_lim=[-120.5, -120.0],
+   dataset="usgs-landsat", variables=["red", "nir"],
+   scene="LC08_L2SP_039037_20210901_20210910_02_T1").download()
+
+# NAIP — by quad object path (tile=):
+S3(start="2021-10-04", end="2021-10-04", lat_lim=[30.0, 30.1], lon_lim=[-86.0, -85.9],
+   dataset="naip-source",
+   tile="al/2021/100cm/rgbir_cog/30086/m_3008601_ne_16_060_20211004").download()
+```
+
+The bbox is still used to **crop** the downloaded scene to your AOI.
+
 ## Known limitations
 
 - **GOES** (geostationary NetCDF) downloads, but cropping/reprojection to WGS84

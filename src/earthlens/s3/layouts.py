@@ -162,20 +162,31 @@ def _sample_axis(low: float, high: float, step: float = 0.2) -> list[float]:
     return points
 
 
-def _list_keys(client: Any, bucket: str, prefix: str) -> list[str]:
+def _payer(request_payer: bool) -> dict[str, str]:
+    """`RequestPayer` kwargs for a paginator call, empty unless requester-pays."""
+    return {"RequestPayer": "requester"} if request_payer else {}
+
+
+def _list_keys(
+    client: Any, bucket: str, prefix: str, request_payer: bool = False
+) -> list[str]:
     """List object keys under `prefix` (paginated)."""
     keys: list[str] = []
     paginator = client.get_paginator("list_objects_v2")
-    for page in paginator.paginate(Bucket=bucket, Prefix=prefix):
+    for page in paginator.paginate(Bucket=bucket, Prefix=prefix, **_payer(request_payer)):
         keys.extend(obj["Key"] for obj in page.get("Contents", []) if obj.get("Size", 0))
     return keys
 
 
-def _list_prefixes(client: Any, bucket: str, prefix: str) -> list[str]:
+def _list_prefixes(
+    client: Any, bucket: str, prefix: str, request_payer: bool = False
+) -> list[str]:
     """List the common (directory) prefixes immediately under `prefix`."""
     prefixes: list[str] = []
     paginator = client.get_paginator("list_objects_v2")
-    for page in paginator.paginate(Bucket=bucket, Prefix=prefix, Delimiter="/"):
+    for page in paginator.paginate(
+        Bucket=bucket, Prefix=prefix, Delimiter="/", **_payer(request_payer)
+    ):
         prefixes.extend(p["Prefix"] for p in page.get("CommonPrefixes", []))
     return prefixes
 
@@ -194,7 +205,7 @@ def _era5_products(dataset, variables, bbox, dates, client) -> list[RemoteProduc
         for year, month in _year_months(dates):
             prefix = f"{stream}/{year}{month:02d}/"
             token = f".{var.native}."
-            for key in _list_keys(client, dataset.bucket, prefix):
+            for key in _list_keys(client, dataset.bucket, prefix, dataset.requester_pays):
                 if token in key.rsplit("/", 1)[-1] and key.endswith(".nc"):
                     out.append(
                         RemoteProduct(
@@ -218,7 +229,7 @@ def _sentinel2_products(dataset, variables, bbox, dates, client) -> list[RemoteP
     for zone, band, square in _mgrs_tiles(bbox):
         for year, month in _year_months(dates):
             month_prefix = f"{collection}/{zone}/{band}/{square}/{year}/{month}/"
-            for scene_prefix in _list_prefixes(client, dataset.bucket, month_prefix):
+            for scene_prefix in _list_prefixes(client, dataset.bucket, month_prefix, dataset.requester_pays):
                 for var in variables:
                     out.append(
                         RemoteProduct(
@@ -242,10 +253,10 @@ def _goes_products(dataset, variables, bbox, dates, client) -> list[RemoteProduc
     for date in _days(dates):
         doy = date.timetuple().tm_yday
         day_prefix = f"{product}/{date.year}/{doy:03d}/"
-        hour_prefixes = _list_prefixes(client, dataset.bucket, day_prefix)
+        hour_prefixes = _list_prefixes(client, dataset.bucket, day_prefix, dataset.requester_pays)
         if not hour_prefixes:
             continue
-        keys = _list_keys(client, dataset.bucket, hour_prefixes[0])
+        keys = _list_keys(client, dataset.bucket, hour_prefixes[0], dataset.requester_pays)
         for var in variables:
             token = f"{var.native}_G"
             match = next((k for k in keys if token in k.rsplit("/", 1)[-1]), None)
@@ -332,12 +343,18 @@ def _generic_template_products(dataset, variables, bbox, dates, client) -> list[
         raise ValueError(
             "passthrough dataset needs params['key_template'] to resolve keys."
         )
+    # Scene/tile identifiers (e.g. a NAIP quad path) supplied via the
+    # request are exposed to the template alongside the date fields.
+    base_fields: dict[str, Any] = {}
+    for name in ("scene", "tile"):
+        if dataset.params.get(name) is not None:
+            base_fields[name] = dataset.params[name]
     stamps = _days(dates) or [None]
     out: list[RemoteProduct] = []
     for var in variables or [None]:
         native = var.native if var is not None else ""
         for date in stamps:
-            fields: dict[str, Any] = {"variable": native}
+            fields: dict[str, Any] = {"variable": native, **base_fields}
             if date is not None:
                 fields.update(
                     year=date.year,
@@ -356,11 +373,64 @@ def _generic_template_products(dataset, variables, bbox, dates, client) -> list[
     return out
 
 
+_LANDSAT_SENSORS: dict[str, str] = {
+    "LC08": "oli-tirs", "LC09": "oli-tirs",
+    "LO08": "oli", "LO09": "oli",
+    "LT08": "tirs", "LT09": "tirs",
+    "LE07": "etm", "LT05": "tm", "LT04": "tm",
+}
+
+
+def _landsat_sensor(scene: str) -> str:
+    """Map a Landsat scene id's sensor prefix to its bucket folder token."""
+    sensor = _LANDSAT_SENSORS.get(scene[:4])
+    if sensor is None:
+        raise ValueError(
+            f"unrecognised Landsat sensor prefix {scene[:4]!r} in scene {scene!r}; "
+            f"known: {sorted(_LANDSAT_SENSORS)}."
+        )
+    return sensor
+
+
+def _landsat_products(dataset, variables, bbox, dates, client) -> list[RemoteProduct]:
+    """USGS Landsat Collection-2 (requester-pays): one COG per band of a scene.
+
+    Addressed by an explicit Collection-2 scene id (the `scene=` request
+    argument), e.g. `LC08_L2SP_039037_20210901_20210910_02_T1` — its
+    sensor / path / row / year are parsed from the id. Bbox-driven scene
+    discovery (WRS-2 path/row from a lat/lon box) is out of scope; use the
+    STAC backend for that.
+    """
+    scene = dataset.params.get("scene")
+    if not scene:
+        raise ValueError(
+            "usgs-landsat needs scene= (a Collection-2 scene id, e.g. "
+            "'LC08_L2SP_039037_20210901_20210910_02_T1')."
+        )
+    sensor = _landsat_sensor(scene)
+    path, row, year = scene[10:13], scene[13:16], scene[17:21]
+    out: list[RemoteProduct] = []
+    for var in variables:
+        key = (
+            f"collection02/level-2/standard/{sensor}/{year}/{path}/{row}/"
+            f"{scene}/{scene}_{var.native}.TIF"
+        )
+        out.append(
+            RemoteProduct(
+                id=f"{scene}_{var.native}",
+                href=key,
+                metadata={"bucket": dataset.bucket, "variable": var.native, "scene": scene},
+            )
+        )
+    return out
+
+
 _BUILDERS: dict[str, Callable[..., list[RemoteProduct]]] = {
     "era5": _era5_products,
     "sentinel2": _sentinel2_products,
     "goes": _goes_products,
     "copernicus_dem": _copernicus_dem_products,
     "esa_worldcover": _esa_worldcover_products,
+    "landsat": _landsat_products,
     "generic_template": _generic_template_products,
 }

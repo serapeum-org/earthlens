@@ -34,9 +34,11 @@ class FakeS3Client:
         self.missing = set(missing or [])
         self.broken = set(broken or [])
         self.downloaded: list[tuple[str, str]] = []
+        self.extra_args: list[dict | None] = []
 
-    def download_file(self, bucket: str, key: str, dst: str) -> None:
+    def download_file(self, bucket: str, key: str, dst: str, ExtraArgs=None) -> None:
         self.downloaded.append((bucket, key))
+        self.extra_args.append(ExtraArgs)
         if key in self.broken:
             from botocore.exceptions import ClientError
 

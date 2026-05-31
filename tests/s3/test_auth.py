@@ -57,7 +57,7 @@ def test_aws_profile_builds_a_session_client(monkeypatch):
         def __init__(self, profile_name=None):
             calls["profile"] = profile_name
 
-        def client(self, name):
+        def client(self, name, region_name=None):
             calls["service"] = name
             return object()
 
@@ -65,6 +65,23 @@ def test_aws_profile_builds_a_session_client(monkeypatch):
     auth = S3Auth(S3Credentials(aws_profile="myprofile"))
     auth.configure()
     assert calls == {"profile": "myprofile", "service": "s3"}
+
+
+def test_signed_credentials_build_a_signed_client():
+    """signed=True builds a signed client (not the UNSIGNED public one)."""
+    from botocore import UNSIGNED
+
+    auth = S3Auth(S3Credentials(signed=True, region="us-west-2"))
+    client = auth.client()
+    assert client.meta.config.signature_version is not UNSIGNED
+    assert client.meta.region_name == "us-west-2"
+
+
+def test_unsigned_is_used_for_public_buckets():
+    """The default (unsigned) client uses the UNSIGNED signer."""
+    from botocore import UNSIGNED
+
+    assert S3Auth(S3Credentials()).client().meta.config.signature_version is UNSIGNED
 
 
 def test_missing_boto3_raises_friendly_importerror(monkeypatch):

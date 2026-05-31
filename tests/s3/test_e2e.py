@@ -105,6 +105,56 @@ def test_era5_netcdf(tmp_path):
     assert len(paths) == 1 and Path(paths[0]).exists()
 
 
+def _have_aws_credentials() -> bool:
+    """True when a usable AWS credential chain is configured."""
+    import boto3
+
+    return boto3.Session().get_credentials() is not None
+
+
+requester_pays = pytest.mark.skipif(
+    not _have_aws_credentials(),
+    reason="requester-pays datasets need valid AWS credentials (caller is billed)",
+)
+
+
+@requester_pays
+def test_usgs_landsat_requester_pays(tmp_path):
+    """One Landsat Collection-2 band downloads (requester-pays) and crops to WGS84.
+
+    Requires valid AWS credentials; skipped otherwise. The caller's account is
+    billed for the request/egress.
+    """
+    from earthlens.s3 import S3
+
+    source = S3(
+        start="2021-09-01", end="2021-09-01",
+        lat_lim=[36.5, 37.0], lon_lim=[-120.5, -120.0],
+        dataset="usgs-landsat", variables=["red"],
+        scene="LC08_L2SP_039037_20210901_20210910_02_T1", path=str(tmp_path),
+    )
+    written = source._fetch(source._search()[:1])
+    _assert_cropped(written[0])
+
+
+@requester_pays
+def test_naip_requester_pays(tmp_path):
+    """One NAIP quad downloads (requester-pays) and crops to WGS84.
+
+    Requires valid AWS credentials; skipped otherwise.
+    """
+    from earthlens.s3 import S3
+
+    tile = "al/2021/100cm/rgbir_cog/30086/m_3008601_ne_16_060_20211004"
+    source = S3(
+        start="2021-10-04", end="2021-10-04",
+        lat_lim=[30.0, 30.1], lon_lim=[-86.0, -85.9],
+        dataset="naip-source", tile=tile, path=str(tmp_path),
+    )
+    written = source._fetch(source._search()[:1])
+    _assert_cropped(written[0])
+
+
 @pytest.mark.xfail(
     reason="geostationary NetCDF reproject is deferred to the pyramids PY-1 port",
     raises=NotImplementedError,

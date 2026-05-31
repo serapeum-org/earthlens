@@ -1,6 +1,6 @@
 # Amazon S3 — available datasets
 
-The curated registry (rebuilt/validated by `tools/s3/refresh_s3_catalog.py`). Select a dataset with `dataset="<name>"`; resolve variables by friendly name, alias, or raw native token.
+The curated registry (rebuilt/validated by `tools/s3/refresh_s3_catalog.py`). Select a dataset with `dataset="<name>"`; resolve variables by friendly name, alias, or raw native token. Datasets marked **requester-pays** need valid AWS credentials and bill the caller (see [Authentication](authentication.md)).
 
 ## `copernicus-dem`
 
@@ -63,6 +63,17 @@ NOAA GOES-16/18 ABI imagery (noaa-goes16 / noaa-goes18), NetCDF, the Americas, n
 | `C13` | `clean_longwave_window` | `C13` | K | ABI channel 13, 10.3 um. |
 | `C14` | `longwave_window` | `C14` | K | ABI channel 14, 11.2 um. |
 
+## `naip-source` — **requester-pays**
+
+USDA NAIP aerial imagery 4-band (RGB+NIR) COGs (naip-source, us-east-1), US only. REQUESTER-PAYS: needs valid AWS credentials and bills the caller. Addressed by an explicit quad-object path (tile=, e.g. al/2021/100cm/rgbir_cog/30086/m_3008601_ne_16_060_20211004) - bbox->USGS quarter-quad discovery is out of scope. Per-quad UTM CRS (reprojected on crop).
+
+- **Bucket**: `naip-source` · **Format**: cog · **CRS**: per-file (reprojected) · **Region**: us-east-1 · **Temporal**: temporal (quad)
+- **Default variables**: `rgbir`
+
+| Variable | Aliases | Native token | Units | Description |
+|---|---|---|---|---|
+| `rgbir` | `naip`, `rgb_nir` | `rgbir` | reflectance | 4-band NAIP COG (red, green, blue, NIR). |
+
 ## `sentinel-2-l2a`
 
 Sentinel-2 Level-2A surface reflectance Cloud-Optimised GeoTIFFs (Element84 Earth Search, sentinel-cogs), global, 2017-present. One COG per band, organised by MGRS tile. Per-tile UTM CRS (reprojected to the AOI on crop).
@@ -85,3 +96,22 @@ Sentinel-2 Level-2A surface reflectance Cloud-Optimised GeoTIFFs (Element84 Eart
 | `B11` | `swir16` | `B11` | reflectance | SWIR 1.6 um (20 m). |
 | `B12` | `swir22` | `B12` | reflectance | SWIR 2.2 um (20 m). |
 | `SCL` | `scene_classification` | `SCL` | class | Scene classification map (20 m). |
+
+## `usgs-landsat` — **requester-pays**
+
+USGS Landsat Collection-2 Level-2 surface-reflectance / surface-temperature COGs (usgs-landsat, us-west-2). REQUESTER-PAYS: needs valid AWS credentials and bills the caller. Addressed by an explicit Collection-2 scene id (scene=, e.g. LC08_L2SP_039037_20210901_20210910_02_T1) - bbox->WRS-2 path/row discovery is out of scope (use the STAC backend). Per-scene UTM CRS (reprojected to the AOI on crop).
+
+- **Bucket**: `usgs-landsat` · **Format**: cog · **CRS**: per-file (reprojected) · **Region**: us-west-2 · **Temporal**: temporal (scene)
+- **Default variables**: `SR_B4`, `SR_B3`, `SR_B2`
+
+| Variable | Aliases | Native token | Units | Description |
+|---|---|---|---|---|
+| `SR_B1` | `coastal` | `SR_B1` | reflectance | Coastal/aerosol surface reflectance. |
+| `SR_B2` | `blue` | `SR_B2` | reflectance | Blue surface reflectance. |
+| `SR_B3` | `green` | `SR_B3` | reflectance | Green surface reflectance. |
+| `SR_B4` | `red` | `SR_B4` | reflectance | Red surface reflectance. |
+| `SR_B5` | `nir`, `nir08` | `SR_B5` | reflectance | NIR surface reflectance. |
+| `SR_B6` | `swir16` | `SR_B6` | reflectance | SWIR 1.6 um surface reflectance. |
+| `SR_B7` | `swir22` | `SR_B7` | reflectance | SWIR 2.2 um surface reflectance. |
+| `ST_B10` | `lst`, `surface_temperature` | `ST_B10` | K | Surface temperature (thermal). |
+| `QA_PIXEL` | `qa`, `pixel_qa` | `QA_PIXEL` | bitmask | Pixel quality assessment bitmask. |

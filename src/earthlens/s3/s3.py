@@ -113,7 +113,7 @@ class S3(AbstractDataSource):
                 ```python
                 >>> from earthlens.s3 import S3
                 >>> S3.datasets()
-                ['copernicus-dem', 'era5', 'esa-worldcover', 'goes', 'sentinel-2-l2a']
+                ['copernicus-dem', 'era5', 'esa-worldcover', 'goes', 'naip-source', 'sentinel-2-l2a', 'usgs-landsat']
 
                 ```
         """
@@ -133,11 +133,26 @@ class S3(AbstractDataSource):
         bucket: str | None = None,
         output_format: str | None = None,
         aws_profile: str | None = None,
+        scene: str | None = None,
+        tile: str | None = None,
     ):
         self._catalog = Catalog()
         resolved = self._catalog.resolve(dataset)
+        updates: dict[str, Any] = {}
         if bucket:
-            resolved = resolved.model_copy(update={"bucket": bucket})
+            updates["bucket"] = bucket
+        if scene or tile:
+            # Scene/tile identifiers (e.g. a Landsat scene id, a NAIP quad
+            # path) feed the per-dataset key template; carried on params so
+            # the resolver can read them.
+            params = dict(resolved.params)
+            if scene:
+                params["scene"] = scene
+            if tile:
+                params["tile"] = tile
+            updates["params"] = params
+        if updates:
+            resolved = resolved.model_copy(update=updates)
         self._dataset: Dataset = resolved
         self._output_format = output_format
         self._aws_profile = aws_profile
@@ -161,8 +176,14 @@ class S3(AbstractDataSource):
     # -- abstract hooks ------------------------------------------------
 
     def _initialize(self, *args: Any, **kwargs: Any) -> object:
-        """Build the unsigned (or profile-signed) S3 client via `S3Auth`."""
-        self._auth = S3Auth(S3Credentials(aws_profile=self._aws_profile))
+        """Build the S3 client via `S3Auth` (unsigned, or signed for requester-pays)."""
+        self._auth = S3Auth(
+            S3Credentials(
+                aws_profile=self._aws_profile,
+                signed=self._dataset.requester_pays,
+                region=self._dataset.region,
+            )
+        )
         return self._auth.client()
 
     def _create_grid(self, lat_lim: list[float], lon_lim: list[float]) -> SpatialExtent:
@@ -228,8 +249,11 @@ class S3(AbstractDataSource):
         raw = raw_dir / f"{_safe_name(product.id)}{ext}"
         if raw.exists():
             return raw
+        extra = {"RequestPayer": "requester"} if self._dataset.requester_pays else None
         try:
-            client.download_file(product.metadata["bucket"], product.href, str(raw))
+            client.download_file(
+                product.metadata["bucket"], product.href, str(raw), ExtraArgs=extra
+            )
         except Exception as exc:  # noqa: BLE001 - classified below
             if _is_missing_object(exc):
                 logger.warning(

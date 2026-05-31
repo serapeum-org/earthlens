@@ -136,6 +136,47 @@ def test_unknown_builder_raises(catalog):
         plan_products(ds, [], (0, 0, 1, 1), [], None)
 
 
+def test_landsat_builds_keys_from_a_scene_id(catalog):
+    """Landsat parses sensor/path/row/year from the scene id; one key per band."""
+    ls = catalog.resolve("usgs-landsat")
+    ls = ls.model_copy(
+        update={"params": {**ls.params, "scene": "LC08_L2SP_039037_20210901_20210910_02_T1"}}
+    )
+    products = plan_products(ls, ls.resolve_variables(["red", "nir"]), (0, 0, 1, 1), [], None)
+    assert [p.href for p in products] == [
+        "collection02/level-2/standard/oli-tirs/2021/039/037/"
+        "LC08_L2SP_039037_20210901_20210910_02_T1/"
+        "LC08_L2SP_039037_20210901_20210910_02_T1_SR_B4.TIF",
+        "collection02/level-2/standard/oli-tirs/2021/039/037/"
+        "LC08_L2SP_039037_20210901_20210910_02_T1/"
+        "LC08_L2SP_039037_20210901_20210910_02_T1_SR_B5.TIF",
+    ]
+
+
+def test_landsat_without_scene_raises(catalog):
+    """Landsat needs an explicit scene id (no bbox->WRS-2 discovery)."""
+    ls = catalog.resolve("usgs-landsat")
+    with pytest.raises(ValueError, match="needs scene="):
+        plan_products(ls, ls.resolve_variables(["red"]), (0, 0, 1, 1), [], None)
+
+
+def test_landsat_unknown_sensor_raises(catalog):
+    """An unrecognised Landsat sensor prefix is reported clearly."""
+    ls = catalog.resolve("usgs-landsat")
+    ls = ls.model_copy(update={"params": {**ls.params, "scene": "ZZ99_L2SP_039037_2021_x_02_T1"}})
+    with pytest.raises(ValueError, match="unrecognised Landsat sensor"):
+        plan_products(ls, ls.resolve_variables(["red"]), (0, 0, 1, 1), [], None)
+
+
+def test_naip_builds_key_from_a_tile(catalog):
+    """NAIP resolves the quad object path supplied via tile=."""
+    naip = catalog.resolve("naip-source")
+    tile = "al/2021/100cm/rgbir_cog/30086/m_3008601_ne_16_060_20211004"
+    naip = naip.model_copy(update={"params": {**naip.params, "tile": tile}})
+    products = plan_products(naip, naip.resolve_variables(None), (0, 0, 1, 1), [], None)
+    assert products[0].href == f"{tile}.tif"
+
+
 def test_goes_skips_a_day_with_no_frames(catalog, fake_client_factory):
     """A day whose hour prefixes are empty contributes no products."""
     goes = catalog.resolve("goes")

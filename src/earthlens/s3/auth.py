@@ -43,6 +43,9 @@ class S3Credentials(BaseModel):
         aws_profile: Name of a profile in `~/.aws/credentials` /
             `~/.aws/config` to sign requests with. `None` (the default)
             builds an unsigned client suitable for public buckets.
+        signed: Force a signed client from the default credential chain
+            (without naming a profile) — used for requester-pays buckets.
+        region: AWS region to build the client in (`None` = default).
 
     Examples:
         - The default is unsigned (no profile):
@@ -57,6 +60,8 @@ class S3Credentials(BaseModel):
     model_config = ConfigDict(frozen=True, extra="forbid")
 
     aws_profile: str | None = None
+    signed: bool = False
+    region: str | None = None
 
 
 class S3Auth(AbstractAuth[S3Credentials]):
@@ -115,12 +120,18 @@ class S3Auth(AbstractAuth[S3Credentials]):
                 "dependency. Install it with: pip install earthlens[s3]"
             ) from exc
 
+        region = self._creds.region
         if self._creds.aws_profile:
             session = boto3.Session(profile_name=self._creds.aws_profile)
-            self._client = session.client("s3")
+            self._client = session.client("s3", region_name=region)
+        elif self._creds.signed:
+            # Requester-pays buckets need a signed client (default credential
+            # chain); the caller's AWS account is billed for the requests.
+            self._client = boto3.client("s3", region_name=region)
         else:
             self._client = boto3.client(
                 "s3",
+                region_name=region,
                 config=botocore.client.Config(
                     signature_version=botocore.UNSIGNED
                 ),

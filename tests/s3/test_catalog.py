@@ -16,15 +16,31 @@ def catalog():
     return Catalog()
 
 
-def test_lists_the_five_seed_datasets(catalog):
-    """All five curated datasets load, sorted by name."""
+def test_lists_the_seed_datasets(catalog):
+    """All curated datasets load, sorted by name."""
     assert catalog.dataset_names() == [
         "copernicus-dem",
         "era5",
         "esa-worldcover",
         "goes",
+        "naip-source",
         "sentinel-2-l2a",
+        "usgs-landsat",
     ]
+
+
+@pytest.mark.parametrize(
+    "name,region", [("usgs-landsat", "us-west-2"), ("naip-source", "us-east-1")]
+)
+def test_requester_pays_datasets_carry_region(catalog, name, region):
+    """The requester-pays datasets declare requester_pays + their region."""
+    ds = catalog.resolve(name)
+    assert ds.requester_pays is True and ds.region == region
+
+
+def test_public_datasets_are_not_requester_pays(catalog):
+    """The public datasets default to requester_pays=False."""
+    assert catalog.resolve("era5").requester_pays is False
 
 
 def test_era5_resolves_to_the_ncar_bucket(catalog):

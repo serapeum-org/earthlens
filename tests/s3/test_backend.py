@@ -111,6 +111,55 @@ def test_datasets_lists_the_registry():
     assert "era5" in S3.datasets() and "goes" in S3.datasets()
 
 
+def test_requester_pays_uses_a_signed_client(tmp_path):
+    """A requester-pays dataset builds a signed client in the region (not UNSIGNED)."""
+    from botocore import UNSIGNED
+
+    source = S3(
+        start="2021-09-01", end="2021-09-01", lat_lim=[0, 1], lon_lim=[0, 1],
+        dataset="usgs-landsat", variables=["red"],
+        scene="LC08_L2SP_039037_20210901_20210910_02_T1", path=str(tmp_path),
+    )
+    assert source._dataset.requester_pays is True
+    client = source._auth.client()
+    assert client.meta.config.signature_version is not UNSIGNED
+    assert client.meta.region_name == "us-west-2"
+
+
+def test_requester_pays_passes_request_payer_on_download(tmp_path, fake_client_factory, patch_auth):
+    """download_file is called with ExtraArgs RequestPayer=requester for requester-pays."""
+    client = fake_client_factory()
+    patch_auth(client)
+    source = S3(
+        start="2021-09-01", end="2021-09-01", lat_lim=[0.4, 0.6], lon_lim=[6.4, 6.6],
+        dataset="usgs-landsat", variables=["red"],
+        scene="LC08_L2SP_039037_20210901_20210910_02_T1", path=str(tmp_path),
+    )
+    source.download(progress_bar=False)
+    assert client.extra_args == [{"RequestPayer": "requester"}]
+
+
+def test_public_download_has_no_request_payer(tmp_path, fake_client_factory, patch_auth):
+    """A public dataset downloads with no RequestPayer ExtraArgs."""
+    client = fake_client_factory()
+    patch_auth(client)
+    _dem_source(tmp_path).download(progress_bar=False)
+    assert client.extra_args == [None]
+
+
+def test_landsat_scene_resolves_band_keys(tmp_path, fake_client_factory, patch_auth):
+    """The scene= argument flows into the per-band Landsat keys."""
+    patch_auth(fake_client_factory())
+    source = S3(
+        start="2021-09-01", end="2021-09-01", lat_lim=[0, 1], lon_lim=[0, 1],
+        dataset="usgs-landsat", variables=["red", "nir"],
+        scene="LC08_L2SP_039037_20210901_20210910_02_T1", path=str(tmp_path),
+    )
+    hrefs = [p.href for p in source._search()]
+    assert all("LC08_L2SP_039037" in h and h.endswith(".TIF") for h in hrefs)
+    assert hrefs[0].endswith("_SR_B4.TIF") and hrefs[1].endswith("_SR_B5.TIF")
+
+
 def test_api_composes_search_and_fetch(tmp_path, fake_client_factory, patch_auth):
     """_api returns the same paths as the search/fetch composition."""
     patch_auth(fake_client_factory())

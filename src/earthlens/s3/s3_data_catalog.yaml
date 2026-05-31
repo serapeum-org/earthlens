@@ -203,6 +203,63 @@ datasets:
         units: class
         description: 11-class land-cover map (ESA WorldCover legend).
 
+  usgs-landsat:
+    description: >-
+      USGS Landsat Collection-2 Level-2 surface-reflectance / surface-temperature
+      COGs (usgs-landsat, us-west-2). REQUESTER-PAYS: needs valid AWS credentials
+      and bills the caller. Addressed by an explicit Collection-2 scene id
+      (scene=, e.g. LC08_L2SP_039037_20210901_20210910_02_T1) - bbox->WRS-2
+      path/row discovery is out of scope (use the STAC backend). Per-scene UTM
+      CRS (reprojected to the AOI on crop).
+    bucket: usgs-landsat
+    region: us-west-2
+    requester_pays: true
+    format: cog
+    crs: null
+    layout: prefix_listing
+    temporal: temporal
+    cadence: scene
+    params:
+      builder: landsat
+    default_variables: [SR_B4, SR_B3, SR_B2]
+    variables:
+      SR_B1: {aliases: [coastal], native: SR_B1, units: reflectance, description: Coastal/aerosol surface reflectance.}
+      SR_B2: {aliases: [blue], native: SR_B2, units: reflectance, description: Blue surface reflectance.}
+      SR_B3: {aliases: [green], native: SR_B3, units: reflectance, description: Green surface reflectance.}
+      SR_B4: {aliases: [red], native: SR_B4, units: reflectance, description: Red surface reflectance.}
+      SR_B5: {aliases: [nir, nir08], native: SR_B5, units: reflectance, description: NIR surface reflectance.}
+      SR_B6: {aliases: [swir16], native: SR_B6, units: reflectance, description: SWIR 1.6 um surface reflectance.}
+      SR_B7: {aliases: [swir22], native: SR_B7, units: reflectance, description: SWIR 2.2 um surface reflectance.}
+      ST_B10: {aliases: [lst, surface_temperature], native: ST_B10, units: K, description: Surface temperature (thermal).}
+      QA_PIXEL: {aliases: [qa, pixel_qa], native: QA_PIXEL, units: bitmask, description: Pixel quality assessment bitmask.}
+
+  naip-source:
+    description: >-
+      USDA NAIP aerial imagery 4-band (RGB+NIR) COGs (naip-source, us-east-1),
+      US only. REQUESTER-PAYS: needs valid AWS credentials and bills the caller.
+      Addressed by an explicit quad-object path (tile=, e.g.
+      al/2021/100cm/rgbir_cog/30086/m_3008601_ne_16_060_20211004) - bbox->USGS
+      quarter-quad discovery is out of scope. Per-quad UTM CRS (reprojected on
+      crop).
+    bucket: naip-source
+    region: us-east-1
+    requester_pays: true
+    format: cog
+    crs: null
+    layout: prefix_listing
+    temporal: temporal
+    cadence: quad
+    params:
+      builder: generic_template
+      key_template: "{tile}.tif"
+    default_variables: [rgbir]
+    variables:
+      rgbir:
+        aliases: [naip, rgb_nir]
+        native: rgbir
+        units: reflectance
+        description: 4-band NAIP COG (red, green, blue, NIR).
+
 # Informational index of every bucket the registry can reach (curated +
 # requester-pays + passthrough hint). Rebuilt by tools/s3/refresh_s3_catalog.py.
 available_datasets:
@@ -211,3 +268,5 @@ available_datasets:
   - goes
   - copernicus-dem
   - esa-worldcover
+  - usgs-landsat
+  - naip-source
