@@ -10,10 +10,10 @@
       
       
       
-        <link rel="canonical" href="https://serapeum-org.github.io/earthlens/develop/reference/worldpop/usage/">
+        <link rel="canonical" href="https://serapeum-org.github.io/earthlens/develop/reference/s3/usage/">
       
       
-        <link rel="prev" href="../introduction/">
+        <link rel="prev" href="../authentication/">
       
       
         <link rel="next" href="../datasets/">
@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -83,7 +83,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#worldpop-usage" class="md-skip">
+        <a href="#amazon-s3-how-to-download" class="md-skip">
           Skip to content
         </a>
       
@@ -803,17 +803,69 @@
                 
   
   
+    
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_3" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_3_3" id="__nav_3_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Amazon S3 (AWS Open Data)
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Amazon S3 (AWS Open Data)
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
   
   
     <li class="md-nav__item">
-      <a href="../../s3/" class="md-nav__link">
+      <a href="../introduction/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Amazon S3
+    Introduction
   
 
     
@@ -822,6 +874,267 @@
   
 
       </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../authentication/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Authentication
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Usage
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Usage
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#the-request" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The request
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="The request">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#constructor-arguments" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Constructor arguments
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#discover-whats-available" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Discover what's available
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dry-run-what-would-i-download" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Dry-run (what would I download?)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-passthrough-any-public-bucket" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The passthrough (any public bucket)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cropping-reprojection-and-output" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cropping, reprojection, and output
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#aggregation-aggregate" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Aggregation (aggregate=)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#known-limitations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Known limitations
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../datasets/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Available datasets
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
     </li>
   
 
@@ -3857,358 +4170,6 @@
 
               
             
-              
-                
-  
-  
-    
-  
-  
-  
-    
-    
-    
-    
-      
-      
-    
-    
-    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
-      
-        
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_21" checked>
-        
-          
-          <label class="md-nav__link" for="__nav_3_21" id="__nav_3_21_label" tabindex="0">
-            
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    WorldPop (population)
-  
-
-    
-  </span>
-  
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_21_label" aria-expanded="true">
-          <label class="md-nav__title" for="__nav_3_21">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    WorldPop (population)
-  
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../introduction/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Introduction
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-    
-  
-  
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Usage
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Usage
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#the-request-shape" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        The request shape
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#variables-product-aliases" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        variables — product aliases
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#selectors-a-concrete-sub-alias" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Selectors → a concrete sub-alias
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Selectors → a concrete sub-alias">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#archive-products-dependency_ratios-future_pop" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Archive products (dependency_ratios, future_pop)
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#the-aoi" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        The AOI
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#years" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Years
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#multi-year-reduction-aggregate" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Multi-year reduction — aggregate=
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#demographic-tables" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Demographic tables
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#output-crs" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Output CRS
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../datasets/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Available datasets
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../worldpoppy/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    WorldPopPy & no-xarray
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../worldpop/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Reference
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
-    </li>
-  
-
-              
-            
           </ul>
         </nav>
       
@@ -4378,7 +4339,7 @@
   <span class="md-ellipsis">
     
   
-    CDS / ECMWF
+    Amazon S3 (AWS Open Data)
   
 
     
@@ -4391,6 +4352,176 @@
         
         <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_4_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_4_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Amazon S3 (AWS Open Data)
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../examples/s3/01_catalog_explorer/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    AWS Open-Data S3 — catalog explorer
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../examples/s3/02_copernicus_dem/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Copernicus DEM — download &amp; crop
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../examples/s3/03_esa_worldcover/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ESA WorldCover — 10 m land cover
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../examples/s3/04_passthrough/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Passthrough — any public bucket
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_5" id="__nav_4_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CDS / ECMWF
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_5">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -4734,10 +4865,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_5" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_6" >
         
           
-          <label class="md-nav__link" for="__nav_4_5" id="__nav_4_5_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_6" id="__nav_4_6_label" tabindex="0">
             
   
   
@@ -4755,8 +4886,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_5_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_5">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_6">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -5016,10 +5147,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_6" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_7" >
         
           
-          <label class="md-nav__link" for="__nav_4_6" id="__nav_4_6_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_7" id="__nav_4_7_label" tabindex="0">
             
   
   
@@ -5037,8 +5168,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_6_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_6">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_7">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -5270,10 +5401,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_7" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_8" >
         
           
-          <label class="md-nav__link" for="__nav_4_7" id="__nav_4_7_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_8" id="__nav_4_8_label" tabindex="0">
             
   
   
@@ -5291,8 +5422,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_7_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_7">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_8">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -5496,10 +5627,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_8" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_9" >
         
           
-          <label class="md-nav__link" for="__nav_4_8" id="__nav_4_8_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_9" id="__nav_4_9_label" tabindex="0">
             
   
   
@@ -5517,8 +5648,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_8_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_8">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_9_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_9">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -5638,10 +5769,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_9" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_10" >
         
           
-          <label class="md-nav__link" for="__nav_4_9" id="__nav_4_9_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_10" id="__nav_4_10_label" tabindex="0">
             
   
   
@@ -5659,8 +5790,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_9_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_9">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_10_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_10">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -6032,10 +6163,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_10" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_11" >
         
           
-          <label class="md-nav__link" for="__nav_4_10" id="__nav_4_10_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_11" id="__nav_4_11_label" tabindex="0">
             
   
   
@@ -6053,8 +6184,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_10_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_10">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_11_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_11">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -6174,10 +6305,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_11" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_12" >
         
           
-          <label class="md-nav__link" for="__nav_4_11" id="__nav_4_11_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_12" id="__nav_4_12_label" tabindex="0">
             
   
   
@@ -6195,8 +6326,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_11_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_11">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_12_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_12">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -6344,10 +6475,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_12" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_13" >
         
           
-          <label class="md-nav__link" for="__nav_4_12" id="__nav_4_12_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_13" id="__nav_4_13_label" tabindex="0">
             
   
   
@@ -6365,8 +6496,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_12_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_12">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_13_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_13">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -6486,10 +6617,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_13" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_14" >
         
           
-          <label class="md-nav__link" for="__nav_4_13" id="__nav_4_13_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_14" id="__nav_4_14_label" tabindex="0">
             
   
   
@@ -6507,8 +6638,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_13_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_13">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_14_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_14">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -6712,10 +6843,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_14" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_15" >
         
           
-          <label class="md-nav__link" for="__nav_4_14" id="__nav_4_14_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_15" id="__nav_4_15_label" tabindex="0">
             
   
   
@@ -6733,8 +6864,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_14_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_14">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_15_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_15">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -6994,10 +7125,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_15" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_16" >
         
           
-          <label class="md-nav__link" for="__nav_4_15" id="__nav_4_15_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_16" id="__nav_4_16_label" tabindex="0">
             
   
   
@@ -7015,8 +7146,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_15_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_15">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_16_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_16">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -7276,10 +7407,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_16" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_17" >
         
           
-          <label class="md-nav__link" for="__nav_4_16" id="__nav_4_16_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_17" id="__nav_4_17_label" tabindex="0">
             
   
   
@@ -7297,8 +7428,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_16_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_16">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_17_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_17">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -7418,10 +7549,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_17" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_18" >
         
           
-          <label class="md-nav__link" for="__nav_4_17" id="__nav_4_17_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_18" id="__nav_4_18_label" tabindex="0">
             
   
   
@@ -7439,8 +7570,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_17_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_17">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_18_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_18">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -7672,10 +7803,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_18" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_19" >
         
           
-          <label class="md-nav__link" for="__nav_4_18" id="__nav_4_18_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_19" id="__nav_4_19_label" tabindex="0">
             
   
   
@@ -7693,8 +7824,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_18_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_18">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_19_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_19">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -7814,10 +7945,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_19" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_20" >
         
           
-          <label class="md-nav__link" for="__nav_4_19" id="__nav_4_19_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_20" id="__nav_4_20_label" tabindex="0">
             
   
   
@@ -7835,8 +7966,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_19_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_19">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_20_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_20">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -7900,10 +8031,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_20" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_21" >
         
           
-          <label class="md-nav__link" for="__nav_4_20" id="__nav_4_20_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_21" id="__nav_4_21_label" tabindex="0">
             
   
   
@@ -7921,8 +8052,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_20_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_20">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_21_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_21">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -8031,232 +8162,6 @@
     
   
     USGS Water — annual peaks and rating curves
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    
-    
-    
-    
-      
-      
-    
-    
-    <li class="md-nav__item md-nav__item--nested">
-      
-        
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_21" >
-        
-          
-          <label class="md-nav__link" for="__nav_4_21" id="__nav_4_21_label" tabindex="0">
-            
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    WorldPop (population)
-  
-
-    
-  </span>
-  
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_21_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_21">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    WorldPop (population)
-  
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../examples/worldpop/01_catalog_explorer/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    WorldPop — catalog explorer (no network)
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../examples/worldpop/02_population_quickstart/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    WorldPop — population quickstart (live)
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../examples/worldpop/03_constrained_vs_unconstrained/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    WorldPop — constrained vs unconstrained (live)
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../examples/worldpop/04_age_sex_pyramid/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    WorldPop — age/sex population pyramid (live)
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../examples/worldpop/05_multicountry_mosaic/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    WorldPop — multi-country mosaic (live)
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../examples/worldpop/06_multiyear_aggregate/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    WorldPop — multi-year population, aggregated (live)
   
 
     
@@ -8510,44 +8415,44 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#the-request-shape" class="md-nav__link">
+  <a href="#the-request" class="md-nav__link">
     <span class="md-ellipsis">
       
-        The request shape
+        The request
       
     </span>
   </a>
   
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#variables-product-aliases" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        variables — product aliases
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#selectors-a-concrete-sub-alias" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Selectors → a concrete sub-alias
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Selectors → a concrete sub-alias">
+    <nav class="md-nav" aria-label="The request">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#archive-products-dependency_ratios-future_pop" class="md-nav__link">
+  <a href="#constructor-arguments" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Archive products (dependency_ratios, future_pop)
+        Constructor arguments
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#discover-whats-available" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Discover what's available
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dry-run-what-would-i-download" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Dry-run (what would I download?)
       
     </span>
   </a>
@@ -8560,10 +8465,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#the-aoi" class="md-nav__link">
+  <a href="#the-passthrough-any-public-bucket" class="md-nav__link">
     <span class="md-ellipsis">
       
-        The AOI
+        The passthrough (any public bucket)
       
     </span>
   </a>
@@ -8571,10 +8476,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#years" class="md-nav__link">
+  <a href="#cropping-reprojection-and-output" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Years
+        Cropping, reprojection, and output
       
     </span>
   </a>
@@ -8582,10 +8487,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#multi-year-reduction-aggregate" class="md-nav__link">
+  <a href="#aggregation-aggregate" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Multi-year reduction — aggregate=
+        Aggregation (aggregate=)
       
     </span>
   </a>
@@ -8593,21 +8498,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#demographic-tables" class="md-nav__link">
+  <a href="#known-limitations" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Demographic tables
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#output-crs" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Output CRS
+        Known limitations
       
     </span>
   </a>
@@ -8631,7 +8525,7 @@
 
 
   
-    <a href="https://github.com/serapeum-org/earthlens/edit/master/docs/reference/worldpop/usage.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
+    <a href="https://github.com/serapeum-org/earthlens/edit/master/docs/reference/s3/usage.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
     </a>
@@ -8640,185 +8534,138 @@
     
       
     
-    <a href="https://github.com/serapeum-org/earthlens/raw/master/docs/reference/worldpop/usage.md" title="View source of this page" class="md-content__button md-icon">
+    <a href="https://github.com/serapeum-org/earthlens/raw/master/docs/reference/s3/usage.md" title="View source of this page" class="md-content__button md-icon">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 18c.56 0 1 .44 1 1s-.44 1-1 1-1-.44-1-1 .44-1 1-1m0-3c-2.73 0-5.06 1.66-6 4 .94 2.34 3.27 4 6 4s5.06-1.66 6-4c-.94-2.34-3.27-4-6-4m0 6.5a2.5 2.5 0 0 1-2.5-2.5 2.5 2.5 0 0 1 2.5-2.5 2.5 2.5 0 0 1 2.5 2.5 2.5 2.5 0 0 1-2.5 2.5M9.27 20H6V4h7v5h5v4.07c.7.08 1.36.25 2 .49V8l-6-6H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h4.5a8.2 8.2 0 0 1-1.23-2"/></svg>
     </a>
   
 
 
-<h1 id="worldpop-usage"><a class="toclink" href="#worldpop-usage">WorldPop — Usage</a><a class="headerlink" href="#worldpop-usage" title="Permanent link">#</a></h1>
-<p>A WorldPop request is <strong>an AOI + a time window + one or more product
-aliases</strong>, plus selectors that pin the concrete WorldPop variant. No
-credentials are needed.</p>
-<h2 id="the-request-shape"><a class="toclink" href="#the-request-shape">The request shape</a><a class="headerlink" href="#the-request-shape" title="Permanent link">#</a></h2>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.earthlens</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
+<h1 id="amazon-s3-how-to-download"><a class="toclink" href="#amazon-s3-how-to-download">Amazon S3 — how to download</a><a class="headerlink" href="#amazon-s3-how-to-download" title="Permanent link">#</a></h1>
+<p>Every dataset uses the <strong>same call shape</strong>. You pick a <code>dataset</code>, list
+<code>variables</code> (friendly names, aliases, or raw native tokens), give a lat/lon
+bbox and a date window, and call <code>download()</code>. The result is a <code>list[Path]</code> of
+files cropped to your AOI.</p>
+<h2 id="the-request"><a class="toclink" href="#the-request">The request</a><a class="headerlink" href="#the-request" title="Permanent link">#</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.s3</span><span class="w"> </span><span class="kn">import</span> <span class="n">S3</span>
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="n">paths</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;worldpop&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;pop&quot;</span><span class="p">],</span>               <span class="c1"># product aliases (canonical or friendly)</span>
-<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="n">start</span><span class="o">=</span><span class="s2">&quot;2020&quot;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">&quot;2020&quot;</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="s2">&quot;%Y&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">4.7</span><span class="p">,</span> <span class="mf">5.0</span><span class="p">],</span> <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">33.9</span><span class="p">,</span> <span class="mf">41.9</span><span class="p">],</span>
-<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    <span class="n">aoi</span><span class="o">=</span><span class="s2">&quot;KEN&quot;</span><span class="p">,</span>                       <span class="c1"># ISO3 / list / bbox / GeoDataFrame</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="n">src</span> <span class="o">=</span> <span class="n">S3</span><span class="p">(</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">start</span><span class="o">=</span><span class="s2">&quot;2024-06-01&quot;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">&quot;2024-06-06&quot;</span><span class="p">,</span>   <span class="c1"># inclusive date window</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">30.00</span><span class="p">,</span> <span class="mf">30.06</span><span class="p">],</span>                 <span class="c1"># [lat_min, lat_max]</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">31.20</span><span class="p">,</span> <span class="mf">31.26</span><span class="p">],</span>                 <span class="c1"># [lon_min, lon_max]</span>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    <span class="n">dataset</span><span class="o">=</span><span class="s2">&quot;sentinel-2-l2a&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;red&quot;</span><span class="p">,</span> <span class="s2">&quot;nir&quot;</span><span class="p">],</span>               <span class="c1"># friendly aliases -&gt; B04, B08</span>
 <a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>    <span class="n">path</span><span class="o">=</span><span class="s2">&quot;out/&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>    <span class="c1"># selectors (all optional):</span>
-<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>    <span class="n">constrained</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>               <span class="c1"># settlement-masked vs unconstrained</span>
-<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>    <span class="n">unadjusted</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>                 <span class="c1"># raw vs UN-adjusted</span>
-<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>    <span class="n">resolution</span><span class="o">=</span><span class="s2">&quot;100m&quot;</span><span class="p">,</span>               <span class="c1"># &quot;100m&quot; | &quot;1km&quot;</span>
-<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>    <span class="n">scope</span><span class="o">=</span><span class="s2">&quot;countries&quot;</span><span class="p">,</span>               <span class="c1"># &quot;countries&quot; | &quot;global&quot;</span>
-<a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>    <span class="n">generation</span><span class="o">=</span><span class="s2">&quot;R2021&quot;</span><span class="p">,</span>              <span class="c1"># &quot;R2021&quot; | &quot;R2025A&quot; | &quot;R2024B&quot; | &quot;2024&quot;</span>
-<a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a>    <span class="n">level</span><span class="o">=</span><span class="s2">&quot;national&quot;</span><span class="p">,</span>                <span class="c1"># &quot;national&quot; | &quot;subnational&quot; (pwd only)</span>
-<a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a>    <span class="n">crs</span><span class="o">=</span><span class="s2">&quot;EPSG:4326&quot;</span><span class="p">,</span>                 <span class="c1"># output CRS; native WGS84 = no reproject</span>
-<a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a>    <span class="n">api</span><span class="o">=</span><span class="s2">&quot;rest&quot;</span><span class="p">,</span>                      <span class="c1"># &quot;rest&quot; (default) | &quot;worldpoppy&quot;</span>
-<a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">progress_bar</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="p">)</span>
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="n">paths</span> <span class="o">=</span> <span class="n">src</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>                      <span class="c1"># cropped GeoTIFFs under out/</span>
 </code></pre></div>
-<p><code>download()</code> returns the list of written paths — one cropped GeoTIFF per
-<code>(product, year, cohort)</code>, plus a <code>.csv</code> table for demographic products.</p>
-<h2 id="variables-product-aliases"><a class="toclink" href="#variables-product-aliases"><code>variables</code> — product aliases</a><a class="headerlink" href="#variables-product-aliases" title="Permanent link">#</a></h2>
-<p><code>variables</code> is a <code>list[str]</code> of WorldPop product keys. Canonical aliases
-(<code>"pop"</code>, <code>"age_structures"</code>, <code>"births"</code>, …) or friendly ones
-(<code>"population"</code>, <code>"age_sex"</code>, <code>"demographics"</code>, …) both resolve. See
-<a href="../datasets/">Available datasets</a> for the full list.</p>
-<h2 id="selectors-a-concrete-sub-alias"><a class="toclink" href="#selectors-a-concrete-sub-alias">Selectors → a concrete sub-alias</a><a class="headerlink" href="#selectors-a-concrete-sub-alias" title="Permanent link">#</a></h2>
-<p>Each product is published in several variants; the selectors pick exactly
-one REST sub-alias:</p>
+<h3 id="constructor-arguments"><a class="toclink" href="#constructor-arguments">Constructor arguments</a><a class="headerlink" href="#constructor-arguments" title="Permanent link">#</a></h3>
 <table>
 <thead>
 <tr>
-<th>Selector</th>
-<th>Values</th>
-<th>Notes</th>
+<th>Argument</th>
+<th>Meaning</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><code>constrained</code></td>
-<td><code>False</code> (default) / <code>True</code></td>
-<td>settlement-masked vs not</td>
+<td><code>dataset</code></td>
+<td>A registered name (<code>"era5"</code>, <code>"sentinel-2-l2a"</code>, <code>"goes"</code>, <code>"copernicus-dem"</code>, <code>"esa-worldcover"</code>) <strong>or</strong> an inline spec dict (passthrough).</td>
 </tr>
 <tr>
-<td><code>unadjusted</code></td>
-<td><code>True</code> (default) / <code>False</code></td>
-<td>raw vs UN-adjusted</td>
+<td><code>variables</code></td>
+<td>Variable / band tokens — friendly names, aliases, or raw native tokens. <code>None</code> uses the dataset's defaults.</td>
 </tr>
 <tr>
-<td><code>resolution</code></td>
-<td><code>"100m"</code> (default) / <code>"1km"</code></td>
-<td>not every product offers both</td>
+<td><code>lat_lim</code> / <code>lon_lim</code></td>
+<td>The AOI bbox in degrees (EPSG:4326).</td>
 </tr>
 <tr>
-<td><code>scope</code></td>
-<td><code>"countries"</code> (default) / <code>"global"</code></td>
-<td>global = the whole-world mosaic (see note)</td>
+<td><code>start</code> / <code>end</code> / <code>fmt</code></td>
+<td>Inclusive date window (ignored for static datasets like DEM / WorldCover).</td>
 </tr>
 <tr>
-<td><code>generation</code></td>
-<td><code>"R2021"</code> (default) / <code>"R2025A"</code> / …</td>
-<td>classic vs Global-2 lines</td>
+<td><code>temporal_resolution</code></td>
+<td><code>"monthly"</code> (default) or <code>"daily"</code> — date stepping for temporal datasets.</td>
 </tr>
 <tr>
-<td><code>level</code></td>
-<td><code>"national"</code> (default) / <code>"subnational"</code></td>
-<td><code>pwd</code> only</td>
+<td><code>bucket</code></td>
+<td>Override the dataset's bucket (e.g. <code>"copernicus-dem-90m"</code>, <code>"noaa-goes18"</code>).</td>
+</tr>
+<tr>
+<td><code>output_format</code></td>
+<td><code>"geotiff"</code> to convert output to GeoTIFF (NetCDF datasets always emit GeoTIFF after cropping).</td>
+</tr>
+<tr>
+<td><code>aws_profile</code></td>
+<td>Optional signed profile (default unsigned).</td>
+</tr>
+<tr>
+<td><code>path</code></td>
+<td>Output directory.</td>
 </tr>
 </tbody>
 </table>
-<p>A selector tuple that matches no sub-alias raises a <code>ValueError</code> listing the
-product's available variants (did-you-mean). Single-variant products
-(<code>births</code>, …) ignore the selectors.</p>
-<div class="admonition note">
-<p class="admonition-title">Global mosaics download the whole world (~1 GB), then crop</p>
-<p><code>scope="global"</code> fetches the per-year whole-world mosaic (<code>pop</code> →
-<code>wpgp1km</code>, <code>age_structures</code> → <code>aswpgponekm</code>, …) via the hub's <code>?id=</code>
-detail endpoint and crops it to your <code>lat_lim</code> / <code>lon_lim</code>. WorldPop
-offers <strong>no server-side subsetting</strong>, so each global 1 km mosaic is a
-full ~1.1 GB download per year before the crop — prefer <code>scope="countries"</code>
-unless you genuinely need the global grid.</p>
-</div>
-<h3 id="archive-products-dependency_ratios-future_pop"><a class="toclink" href="#archive-products-dependency_ratios-future_pop">Archive products (<code>dependency_ratios</code>, <code>future_pop</code>)</a><a class="headerlink" href="#archive-products-dependency_ratios-future_pop" title="Permanent link">#</a></h3>
-<p>These ship as multi-file <strong>archives</strong> rather than per-year GeoTIFFs; the
-backend downloads the archive, extracts its GeoTIFFs, and crops them to the
-AOI. They need the <code>[worldpop]</code> extra (<code>pip install earthlens[worldpop]</code>,
-which adds <code>py7zr</code> for <code>.7z</code>).</p>
+<h3 id="discover-whats-available"><a class="toclink" href="#discover-whats-available">Discover what's available</a><a class="headerlink" href="#discover-whats-available" title="Permanent link">#</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="o">&gt;&gt;&gt;</span> <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.s3</span><span class="w"> </span><span class="kn">import</span> <span class="n">S3</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="o">&gt;&gt;&gt;</span> <span class="n">S3</span><span class="o">.</span><span class="n">datasets</span><span class="p">()</span>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="p">[</span><span class="s1">&#39;copernicus-dem&#39;</span><span class="p">,</span> <span class="s1">&#39;era5&#39;</span><span class="p">,</span> <span class="s1">&#39;esa-worldcover&#39;</span><span class="p">,</span> <span class="s1">&#39;goes&#39;</span><span class="p">,</span> <span class="s1">&#39;sentinel-2-l2a&#39;</span><span class="p">]</span>
+</code></pre></div>
+<h3 id="dry-run-what-would-i-download"><a class="toclink" href="#dry-run-what-would-i-download">Dry-run (what would I download?)</a><a class="headerlink" href="#dry-run-what-would-i-download" title="Permanent link">#</a></h3>
+<p><code>_search()</code> plans the S3 keys without transferring data:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="o">&gt;&gt;&gt;</span> <span class="n">src</span> <span class="o">=</span> <span class="n">S3</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="s2">&quot;2021-01-01&quot;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">&quot;2021-01-01&quot;</span><span class="p">,</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="o">...</span>          <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">0.4</span><span class="p">,</span> <span class="mf">0.6</span><span class="p">],</span> <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">6.4</span><span class="p">,</span> <span class="mf">6.6</span><span class="p">],</span> <span class="n">dataset</span><span class="o">=</span><span class="s2">&quot;copernicus-dem&quot;</span><span class="p">)</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="o">&gt;&gt;&gt;</span> <span class="p">[</span><span class="n">p</span><span class="o">.</span><span class="n">href</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">src</span><span class="o">.</span><span class="n">_search</span><span class="p">()]</span>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="p">[</span><span class="s1">&#39;Copernicus_DSM_COG_10_N00_00_E006_00_DEM/Copernicus_DSM_COG_10_N00_00_E006_00_DEM.tif&#39;</span><span class="p">]</span>
+</code></pre></div>
+<h2 id="the-passthrough-any-public-bucket"><a class="toclink" href="#the-passthrough-any-public-bucket">The passthrough (any public bucket)</a><a class="headerlink" href="#the-passthrough-any-public-bucket" title="Permanent link">#</a></h2>
+<p>An unregistered dataset is supplied as an <strong>inline spec dict with the same
+fields</strong> a catalog row uses — invocation is identical to a registered dataset:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">src</span> <span class="o">=</span> <span class="n">S3</span><span class="p">(</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>    <span class="n">start</span><span class="o">=</span><span class="s2">&quot;2024-01-01&quot;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">&quot;2024-01-01&quot;</span><span class="p">,</span>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>    <span class="n">dataset</span><span class="o">=</span><span class="p">{</span>
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>        <span class="s2">&quot;bucket&quot;</span><span class="p">:</span> <span class="s2">&quot;my-open-bucket&quot;</span><span class="p">,</span>
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>        <span class="s2">&quot;format&quot;</span><span class="p">:</span> <span class="s2">&quot;cog&quot;</span><span class="p">,</span>
+<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>        <span class="s2">&quot;layout&quot;</span><span class="p">:</span> <span class="s2">&quot;deterministic_tiles&quot;</span><span class="p">,</span>
+<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>        <span class="s2">&quot;crs&quot;</span><span class="p">:</span> <span class="mi">4326</span><span class="p">,</span>
+<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>        <span class="s2">&quot;params&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;key_template&quot;</span><span class="p">:</span> <span class="s2">&quot;</span><span class="si">{year}</span><span class="s2">/tile_</span><span class="si">{variable}</span><span class="s2">.tif&quot;</span><span class="p">},</span>
+<a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a>    <span class="p">},</span>
+<a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a>    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;band1&quot;</span><span class="p">],</span>
+<a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a><span class="p">)</span>
+</code></pre></div>
+<p>The <code>key_template</code> may reference <code>{variable}</code>, <code>{year}</code>, <code>{month}</code>, <code>{day}</code>,
+and <code>{doy}</code>.</p>
+<h2 id="cropping-reprojection-and-output"><a class="toclink" href="#cropping-reprojection-and-output">Cropping, reprojection, and output</a><a class="headerlink" href="#cropping-reprojection-and-output" title="Permanent link">#</a></h2>
 <ul>
-<li>
-<p><strong><code>dependency_ratios</code></strong> — one small per-continent <code>.7z</code> (Asia / Africa
-  only upstream). The backend resolves the AOI's continent automatically and
-  writes the three 2010 ratio rasters (total / old-age / young-age). An AOI
-  outside Asia / Africa raises a clear error.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="n">EarthLens</span><span class="p">(</span><span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;worldpop&quot;</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;dependency_ratios&quot;</span><span class="p">],</span>
-<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>          <span class="n">start</span><span class="o">=</span><span class="s2">&quot;2010&quot;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">&quot;2010&quot;</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="s2">&quot;%Y&quot;</span><span class="p">,</span> <span class="n">aoi</span><span class="o">=</span><span class="s2">&quot;KEN&quot;</span><span class="p">,</span>
-<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>          <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">4.7</span><span class="p">,</span> <span class="mf">5.0</span><span class="p">],</span> <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">33.9</span><span class="p">,</span> <span class="mf">41.9</span><span class="p">],</span> <span class="n">path</span><span class="o">=</span><span class="s2">&quot;out/&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
-</code></pre></div>
-</li>
-<li>
-<p><strong><code>future_pop</code></strong> — per-SSP <code>.zip</code> bundles that are <strong>~4 GB each</strong>, so they
-  require an explicit <code>allow_large_archive=True</code> plus <code>ssp=</code> (e.g.
-  <code>"SSP2"</code>); the backend extracts the requested <code>year</code> and crops it.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">EarthLens</span><span class="p">(</span><span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;worldpop&quot;</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;future_pop&quot;</span><span class="p">],</span>
-<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>          <span class="n">start</span><span class="o">=</span><span class="s2">&quot;2030&quot;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">&quot;2030&quot;</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="s2">&quot;%Y&quot;</span><span class="p">,</span> <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">4.7</span><span class="p">,</span> <span class="mf">5.0</span><span class="p">],</span>
-<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>          <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">33.9</span><span class="p">,</span> <span class="mf">41.9</span><span class="p">],</span> <span class="n">path</span><span class="o">=</span><span class="s2">&quot;out/&quot;</span><span class="p">,</span>
-<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>          <span class="n">ssp</span><span class="o">=</span><span class="s2">&quot;SSP2&quot;</span><span class="p">,</span> <span class="n">allow_large_archive</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
-</code></pre></div>
-</li>
+<li><strong>WGS84 datasets</strong> (ERA5, Copernicus DEM, ESA WorldCover) are cropped directly
+  to the bbox; ERA5's 0–360 longitudes are wrapped to −180..180.</li>
+<li><strong>Per-file-CRS COGs</strong> (Sentinel-2 UTM) are reprojected to WGS84, then cropped.</li>
+<li><strong>Multi-tile AOIs</strong> (DEM / WorldCover spanning more than one tile) yield <strong>one
+  cropped file per tile</strong>; merging them into a single mosaic is a follow-on
+  (<code>PY-1</code>, a pyramids capability).</li>
+<li><strong>Output</strong>: COG datasets and (cropped) NetCDF datasets write GeoTIFFs; NetCDF
+  time steps become raster bands.</li>
 </ul>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1"># constrained Global-2 2020 100 m population:</span>
-<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="n">EarthLens</span><span class="p">(</span><span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;worldpop&quot;</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;pop&quot;</span><span class="p">],</span> <span class="n">aoi</span><span class="o">=</span><span class="s2">&quot;RWA&quot;</span><span class="p">,</span>
-<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>          <span class="n">start</span><span class="o">=</span><span class="s2">&quot;2020&quot;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">&quot;2020&quot;</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="s2">&quot;%Y&quot;</span><span class="p">,</span> <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">3</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="mi">29</span><span class="p">,</span><span class="mi">31</span><span class="p">],</span>
-<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>          <span class="n">constrained</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">generation</span><span class="o">=</span><span class="s2">&quot;R2025A&quot;</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="s2">&quot;out/&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
-</code></pre></div>
-<h2 id="the-aoi"><a class="toclink" href="#the-aoi">The AOI</a><a class="headerlink" href="#the-aoi" title="Permanent link">#</a></h2>
-<p><code>aoi</code> accepts any of:</p>
-<ul>
-<li>an <strong>ISO3 string</strong> — <code>aoi="KEN"</code> (used directly);</li>
-<li>a <strong>list of ISO3 strings</strong> — <code>aoi=["KEN", "UGA"]</code>;</li>
-<li>a <strong>bbox</strong> <code>[w, s, e, n]</code> — intersected with the bundled country-bbox
-  table to find the countries;</li>
-<li>a <strong><code>GeoDataFrame</code></strong> — its total bounds are intersected likewise;</li>
-<li><strong><code>None</code></strong> (default) — derive the countries from <code>lat_lim</code> / <code>lon_lim</code>.</li>
-</ul>
-<p>Per-country rasters are mosaicked and cropped to the AOI bbox. The bbox →
-country table uses each country's mainland extent, so a bbox over mainland
-France will not match France's overseas territories — pass <code>aoi="&lt;ISO3&gt;"</code>
-explicitly to target an overseas territory.</p>
-<h2 id="years"><a class="toclink" href="#years">Years</a><a class="headerlink" href="#years" title="Permanent link">#</a></h2>
-<p><code>start</code>/<code>end</code> (parsed with <code>fmt</code>) select every year in range; <code>year=</code> picks
-one; <code>years=[…]</code> picks an explicit set (it wins over the window). A year
-outside a product's availability raises listing the valid years.</p>
-<h2 id="multi-year-reduction-aggregate"><a class="toclink" href="#multi-year-reduction-aggregate">Multi-year reduction — <code>aggregate=</code></a><a class="headerlink" href="#multi-year-reduction-aggregate" title="Permanent link">#</a></h2>
-<p>Because <code>OUTPUT_KIND="mixed"</code>, the facade forwards an
-<code>AggregationConfig</code>. It reduces the per-year raster stack across years,
-bucketed by <code>freq</code>, with <code>op</code> ∈ <code>mean</code> / <code>sum</code> / <code>min</code> / <code>max</code> / <code>std</code>
-(<code>auto</code> → <code>mean</code> for population):</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens</span><span class="w"> </span><span class="kn">import</span> <span class="n">AggregationConfig</span>
+<h2 id="aggregation-aggregate"><a class="toclink" href="#aggregation-aggregate">Aggregation (<code>aggregate=</code>)</a><a class="headerlink" href="#aggregation-aggregate" title="Permanent link">#</a></h2>
+<p>NetCDF datasets (currently ERA5) accept an
+<code>earthlens.aggregate.AggregationConfig</code> to emit per-window reductions:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.aggregate</span><span class="w"> </span><span class="kn">import</span> <span class="n">AggregationConfig</span>
 <a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>
-<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="n">EarthLens</span><span class="p">(</span>
-<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>    <span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;worldpop&quot;</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;pop&quot;</span><span class="p">],</span> <span class="n">aoi</span><span class="o">=</span><span class="s2">&quot;KEN&quot;</span><span class="p">,</span>
-<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>    <span class="n">start</span><span class="o">=</span><span class="s2">&quot;2000&quot;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">&quot;2020&quot;</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="s2">&quot;%Y&quot;</span><span class="p">,</span>
-<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">4.7</span><span class="p">,</span> <span class="mf">5.0</span><span class="p">],</span> <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">33.9</span><span class="p">,</span> <span class="mf">41.9</span><span class="p">],</span> <span class="n">path</span><span class="o">=</span><span class="s2">&quot;out/&quot;</span><span class="p">,</span>
-<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">aggregate</span><span class="o">=</span><span class="n">AggregationConfig</span><span class="p">(</span><span class="n">freq</span><span class="o">=</span><span class="s2">&quot;100YS&quot;</span><span class="p">,</span> <span class="n">op</span><span class="o">=</span><span class="s2">&quot;mean&quot;</span><span class="p">))</span>
-<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="c1"># -&gt; one window raster: pop_100YS_20000101_mean.tif</span>
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="n">src</span> <span class="o">=</span> <span class="n">S3</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="s2">&quot;2023-12-01&quot;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">&quot;2023-12-31&quot;</span><span class="p">,</span> <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mi">40</span><span class="p">,</span> <span class="mi">42</span><span class="p">],</span> <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="mi">12</span><span class="p">,</span> <span class="mi">14</span><span class="p">],</span>
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>         <span class="n">dataset</span><span class="o">=</span><span class="s2">&quot;era5&quot;</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;t2m&quot;</span><span class="p">],</span> <span class="n">path</span><span class="o">=</span><span class="s2">&quot;out/&quot;</span><span class="p">)</span>
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="n">windows</span> <span class="o">=</span> <span class="n">src</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">aggregate</span><span class="o">=</span><span class="n">AggregationConfig</span><span class="p">(</span><span class="n">freq</span><span class="o">=</span><span class="s2">&quot;D&quot;</span><span class="p">,</span> <span class="n">op</span><span class="o">=</span><span class="s2">&quot;mean&quot;</span><span class="p">))</span>
 </code></pre></div>
-<p><code>aggregate=</code> reduces the <strong>rasters</strong> only. For demographic products
-(<code>age_structures</code>) the per-cohort age/sex tables are still written per year —
-the table is not aggregated across years.</p>
-<div class="admonition note">
-<p class="admonition-title">Population change (delta)</p>
-<p>A population-<em>change</em> (<code>delta</code>) reduction is <strong>not</strong> currently available:
-the shared <code>AggregationConfig.op</code> is a fixed <code>Literal</code>
-(<code>mean</code>/<code>sum</code>/<code>min</code>/<code>max</code>/<code>std</code>/<code>auto</code>) that does not include <code>delta</code>.
-Compute change from two single-year pulls, or open an issue to extend the
-shared aggregator.</p>
-</div>
-<h2 id="demographic-tables"><a class="toclink" href="#demographic-tables">Demographic tables</a><a class="headerlink" href="#demographic-tables" title="Permanent link">#</a></h2>
-<p>For <code>age_structures</code>, each <code>(sex, age_band)</code> cohort raster is written <strong>and</strong>
-its AOI population total is summed into a tidy table
-<code>{aoi, year, sex, age_low, population}</code> at <code>age_structures_{year}.csv</code> — the
-input for a population-pyramid plot.</p>
-<h2 id="output-crs"><a class="toclink" href="#output-crs">Output CRS</a><a class="headerlink" href="#output-crs" title="Permanent link">#</a></h2>
-<p>WorldPop is delivered in WGS84 (EPSG:4326), so the default <code>crs="EPSG:4326"</code>
-performs <strong>no reproject</strong>. Set <code>crs="EPSG:3857"</code> (etc.) to reproject the
-localised raster; the AOI crop bbox stays WGS84 regardless.</p>
+<p>Aggregation runs on the raw granule's time axis and writes per-window GeoTIFFs to
+<code>aggregate.out_dir</code> (or <code>&lt;path&gt;/aggregated</code>). COG datasets reject <code>aggregate=</code>
+with <code>NotImplementedError</code>.</p>
+<h2 id="known-limitations"><a class="toclink" href="#known-limitations">Known limitations</a><a class="headerlink" href="#known-limitations" title="Permanent link">#</a></h2>
+<ul>
+<li><strong>GOES</strong> (geostationary NetCDF) downloads, but cropping/reprojection to WGS84
+  is deferred to the pyramids <code>PY-1</code> port; <code>_localise</code> raises a clear
+  <code>NotImplementedError</code> until it lands.</li>
+<li><strong>Multi-tile mosaic</strong> is not yet merged (one file per tile) — <code>PY-1</code>.</li>
+</ul>
 
 
 
@@ -8854,7 +8701,7 @@ localised raster; the AOI crop bbox stays WGS84 regardless.</p>
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
           
-          <a href="../introduction/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Introduction">
+          <a href="../authentication/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Authentication">
             <div class="md-footer__button md-icon">
               
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
@@ -8864,7 +8711,7 @@ localised raster; the AOI crop bbox stays WGS84 regardless.</p>
                 Previous
               </span>
               <div class="md-ellipsis">
-                Introduction
+                Authentication
               </div>
             </div>
           </a>
