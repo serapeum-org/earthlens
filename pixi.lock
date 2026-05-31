@@ -9190,7 +9190,7 @@ packages:
 - pypi: ./
   name: earthlens
   version: 0.6.0
-  sha256: 84ea07b61f7c5c0e040f73eb19be68dac879e19d84ac66b289a402d290ba9edb
+  sha256: 9f4a661954eec1499e42d6660b15924fea3e4c14029959edc43f79fb1fe7f72a
   requires_dist:
   - pyramids-gis>=0.24.1
   - geopandas>=1.0.0
@@ -9228,6 +9228,8 @@ packages:
   - overturemaps>=1.0.0 ; extra == 'overture'
   - duckdb>=1.0.0 ; extra == 'overture'
   - dataretrieval>=1.1.4 ; extra == 'usgs-water'
+  - worldpoppy>=0.4 ; extra == 'worldpop'
+  - py7zr>=0.20 ; extra == 'worldpop'
   - boto3>=1.43.0 ; extra == 'all'
   - botocore>=1.34.0 ; extra == 'all'
   - cartopy>=0.22 ; extra == 'all'
