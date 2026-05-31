@@ -325,22 +325,6 @@
          <lastmod>2026-05-31</lastmod>
     </url>
     <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/examples/s3/01_catalog_explorer/</loc>
-         <lastmod>2026-05-31</lastmod>
-    </url>
-    <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/examples/s3/02_copernicus_dem/</loc>
-         <lastmod>2026-05-31</lastmod>
-    </url>
-    <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/examples/s3/03_esa_worldcover/</loc>
-         <lastmod>2026-05-31</lastmod>
-    </url>
-    <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/examples/s3/04_passthrough/</loc>
-         <lastmod>2026-05-31</lastmod>
-    </url>
-    <url>
          <loc>https://serapeum-org.github.io/earthlens/develop/examples/sentinel-hub/aggregate_monthly/</loc>
          <lastmod>2026-05-31</lastmod>
     </url>
@@ -433,6 +417,42 @@
          <lastmod>2026-05-31</lastmod>
     </url>
     <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/examples/worldpop/01_catalog_explorer/</loc>
+         <lastmod>2026-05-31</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/examples/worldpop/02_population_quickstart/</loc>
+         <lastmod>2026-05-31</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/examples/worldpop/03_constrained_vs_unconstrained/</loc>
+         <lastmod>2026-05-31</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/examples/worldpop/04_age_sex_pyramid/</loc>
+         <lastmod>2026-05-31</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/examples/worldpop/05_multicountry_mosaic/</loc>
+         <lastmod>2026-05-31</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/examples/worldpop/06_multiyear_aggregate/</loc>
+         <lastmod>2026-05-31</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/examples/worldpop/07_covariates_nightlights/</loc>
+         <lastmod>2026-05-31</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/examples/worldpop/08_dependency_ratios/</loc>
+         <lastmod>2026-05-31</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/examples/worldpop/09_global_mosaic/</loc>
+         <lastmod>2026-05-31</lastmod>
+    </url>
+    <url>
          <loc>https://serapeum-org.github.io/earthlens/develop/overview/architecture/</loc>
          <lastmod>2026-05-31</lastmod>
     </url>
@@ -454,6 +474,10 @@
     </url>
     <url>
          <loc>https://serapeum-org.github.io/earthlens/develop/reference/providers/</loc>
+         <lastmod>2026-05-31</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/s3/</loc>
          <lastmod>2026-05-31</lastmod>
     </url>
     <url>
@@ -685,26 +709,6 @@
          <lastmod>2026-05-31</lastmod>
     </url>
     <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/reference/s3/authentication/</loc>
-         <lastmod>2026-05-31</lastmod>
-    </url>
-    <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/reference/s3/datasets/</loc>
-         <lastmod>2026-05-31</lastmod>
-    </url>
-    <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/reference/s3/introduction/</loc>
-         <lastmod>2026-05-31</lastmod>
-    </url>
-    <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/reference/s3/reference/</loc>
-         <lastmod>2026-05-31</lastmod>
-    </url>
-    <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/reference/s3/usage/</loc>
-         <lastmod>2026-05-31</lastmod>
-    </url>
-    <url>
          <loc>https://serapeum-org.github.io/earthlens/develop/reference/sentinel-hub/authentication/</loc>
          <lastmod>2026-05-31</lastmod>
     </url>
@@ -774,6 +778,26 @@
     </url>
     <url>
          <loc>https://serapeum-org.github.io/earthlens/develop/reference/usgs-water/usgs_water/</loc>
+         <lastmod>2026-05-31</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/worldpop/datasets/</loc>
+         <lastmod>2026-05-31</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/worldpop/introduction/</loc>
+         <lastmod>2026-05-31</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/worldpop/usage/</loc>
+         <lastmod>2026-05-31</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/worldpop/worldpop/</loc>
+         <lastmod>2026-05-31</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/worldpop/worldpoppy/</loc>
          <lastmod>2026-05-31</lastmod>
     </url>
 </urlset>
