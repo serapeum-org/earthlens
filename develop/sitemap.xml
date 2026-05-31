@@ -325,6 +325,22 @@
          <lastmod>2026-05-31</lastmod>
     </url>
     <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/examples/s3/01_catalog_explorer/</loc>
+         <lastmod>2026-05-31</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/examples/s3/02_copernicus_dem/</loc>
+         <lastmod>2026-05-31</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/examples/s3/03_esa_worldcover/</loc>
+         <lastmod>2026-05-31</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/examples/s3/04_passthrough/</loc>
+         <lastmod>2026-05-31</lastmod>
+    </url>
+    <url>
          <loc>https://serapeum-org.github.io/earthlens/develop/examples/sentinel-hub/aggregate_monthly/</loc>
          <lastmod>2026-05-31</lastmod>
     </url>
@@ -474,10 +490,6 @@
     </url>
     <url>
          <loc>https://serapeum-org.github.io/earthlens/develop/reference/providers/</loc>
-         <lastmod>2026-05-31</lastmod>
-    </url>
-    <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/reference/s3/</loc>
          <lastmod>2026-05-31</lastmod>
     </url>
     <url>
@@ -706,6 +718,26 @@
     </url>
     <url>
          <loc>https://serapeum-org.github.io/earthlens/develop/reference/radar/usage/</loc>
+         <lastmod>2026-05-31</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/s3/authentication/</loc>
+         <lastmod>2026-05-31</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/s3/datasets/</loc>
+         <lastmod>2026-05-31</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/s3/introduction/</loc>
+         <lastmod>2026-05-31</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/s3/reference/</loc>
+         <lastmod>2026-05-31</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/s3/usage/</loc>
          <lastmod>2026-05-31</lastmod>
     </url>
     <url>
