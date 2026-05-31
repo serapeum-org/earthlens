@@ -14,7 +14,7 @@ paths = EarthLens(
     lon_lim=[-3.8, -3.6],            # [west, east] degrees
     path="out/",
     # --- GHSL-specific kwargs (all optional) ---
-    release="R2023A",                # "R2023A" (default) / "R2022A" / "R2025A"
+    release=None,                    # None = auto-resolve per product; or an explicit id
     resolution="100m",               # "10m" / "100m" / "1km" / "3ss" / "30ss"
     crs="EPSG:4326",                 # output CRS (default WGS84)
     tiling="auto",                   # "auto" (tile+mosaic) / "global"
@@ -32,7 +32,7 @@ products in one call.
 
 | kwarg | meaning |
 |---|---|
-| `release` | GHSL release: `"R2023A"` (most products), `"R2022A"` (GHS-LAND), `"R2025A"` (WUP projections). |
+| `release` | GHSL release, or `None` (default) to auto-resolve per product: `"R2023A"` when offered, else the product's single release (so `GHS_LAND` (R2022A), the R2019A/R2024A statistical families, and the R2025A WUP family need no explicit release; a request may even mix releases). An **explicit** release must be available for every product — a typo raises. |
 | `epoch` / `epochs` | A single year or an explicit list of reference years (overrides the date window). |
 | `start` / `end` | When `epoch(s)` are omitted, the 5-yearly GHSL epochs in this window are fetched. A window narrower than the 5-year step snaps to the nearest epoch (logged). |
 | `resolution` | Source variant to download. Metric resolutions (`10m`/`100m`/`1km`) are Mollweide (ESRI:54009); arc-second (`3ss`/`30ss`) are WGS84. Defaults to each product's `default_resolution`. |
@@ -91,5 +91,6 @@ epochs into one output); `op` is `mean` / `sum` / `min` / `max` / `std`
   coarse whole-globe resolution, or `tiling="global"`.
 * **Whole-globe size** — coarse (1 km / 30″) products are single ~300 MB files;
   the first download is slow, then cached.
-* **GHS-LAND** is only published at release `R2022A` — pass `release="R2022A"`.
+* **GHS-LAND** is only published at release `R2022A`; with `release=None`
+  (the default) it auto-resolves there, so no explicit release is needed.
 * See [Available datasets](products.md) for the full availability matrix.

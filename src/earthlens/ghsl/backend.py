@@ -51,6 +51,8 @@ from earthlens.ghsl.catalog import Catalog, native_source_crs
 _API_MODES: frozenset[str] = frozenset({"direct", "stac"})
 #: Allowed values for the `tiling=` selector.
 _TILING_MODES: frozenset[str] = frozenset({"auto", "global"})
+#: The primary release auto-resolution prefers when `release=` is omitted.
+_DEFAULT_RELEASE: str = "R2023A"
 
 
 class GHSL(AbstractDataSource):
@@ -75,7 +77,7 @@ class GHSL(AbstractDataSource):
         path: Path | str = "",
         fmt: str = "%Y-%m-%d",
         *,
-        release: str = "R2023A",
+        release: str | None = None,
         epoch: int | None = None,
         epochs: list[int] | None = None,
         resolution: str | None = None,
@@ -105,14 +107,16 @@ class GHSL(AbstractDataSource):
                 `"yearly"`.
             path: Output directory. Created by the parent class.
             fmt: `strptime` format for `start` / `end`.
-            release: Requested GHSL release id (default `"R2023A"`). Resolved
-                per product by `_release_for`: used when the product offers it,
-                otherwise the product's only release is used (so single-release
-                products like `GHS_LAND` (R2022A), the R2019A/R2024A statistical
-                families, and the R2025A WUP family resolve without an explicit
-                release, and one request may mix products from different
-                releases); a product with several releases, none requested,
-                raises.
+            release: GHSL release id, or `None` (default) to auto-resolve per
+                product via `_release_for`. An **explicit** release must be
+                available for every requested product (an unavailable one
+                raises — a typo is not silently accepted). When `None`, each
+                product resolves to the default release `"R2023A"` if it offers
+                it, else to its single release (so single-release products like
+                `GHS_LAND` (R2022A), the R2019A/R2024A statistical families, and
+                the R2025A WUP family work without an explicit release, and one
+                request may mix products from different releases); a product
+                with several releases, none of them the default, raises.
             epoch: A single reference year to fetch (overrides the date
                 window). Mutually informative with `epochs`.
             epochs: An explicit list of reference years (overrides the date
@@ -149,6 +153,7 @@ class GHSL(AbstractDataSource):
 
         self._catalog = catalog if catalog is not None else Catalog()
         self._release = release
+        self._release_cache: dict[str, str] = {}
         self._epoch_arg = epoch
         self._epochs_arg = epochs
         self._resolution_arg = resolution
@@ -197,15 +202,17 @@ class GHSL(AbstractDataSource):
                 )
 
     def _release_for(self, code: str) -> str:
-        """Resolve the release to use for one product.
+        """Resolve (and memoise) the release to use for one product.
 
-        Returns the requested `release` when the product offers it; otherwise,
-        when the product exists at exactly one release, falls back to that one
-        (so single-release products like `GHS_LAND` (R2022A) or
+        When `release=` was given explicitly, it must be available for the
+        product — an unavailable release raises, so a typo is never silently
+        accepted. When `release` is `None` (auto), the product resolves to the
+        default release `_DEFAULT_RELEASE` if it offers it, else to its single
+        release (so single-release products like `GHS_LAND` (R2022A) or
         `GHS_FUA_UCDB2015` (R2019A) work without forcing `release=`, and a
-        request can mix products living at different releases). A product with
-        several releases, none of them the requested one, is ambiguous and
-        raises.
+        request can mix products at different releases); a product with several
+        releases, none of them the default, is ambiguous and raises. The result
+        is cached per code so it is computed once.
 
         Args:
             code: A canonical product code.
@@ -216,20 +223,29 @@ class GHSL(AbstractDataSource):
         Raises:
             ValueError: If the product has no usable release for the request.
         """
+        cached = self._release_cache.get(code)
+        if cached is not None:
+            return cached
         product = self._catalog.get(code)
-        if self._release in product.releases:
-            return self._release
-        if len(product.releases) == 1:
-            only = next(iter(product.releases))
-            logger.info(
-                f"GHSL: {code} has no release {self._release!r}; using its only "
-                f"release {only!r}."
+        if self._release is not None:
+            if self._release not in product.releases:
+                raise ValueError(
+                    f"{code} has no release {self._release!r}; "
+                    f"available releases: {sorted(product.releases)}."
+                )
+            resolved = self._release
+        elif _DEFAULT_RELEASE in product.releases:
+            resolved = _DEFAULT_RELEASE
+        elif len(product.releases) == 1:
+            resolved = next(iter(product.releases))
+        else:
+            raise ValueError(
+                f"{code} is published at several releases "
+                f"{sorted(product.releases)}, none of them the default "
+                f"{_DEFAULT_RELEASE!r}; pass an explicit release=."
             )
-            return only
-        raise ValueError(
-            f"{code} has no release {self._release!r}; "
-            f"available releases: {sorted(product.releases)}."
-        )
+        self._release_cache[code] = resolved
+        return resolved
 
     def _resolution_for(self, code: str) -> str:
         """Return the resolution to use for one product.
