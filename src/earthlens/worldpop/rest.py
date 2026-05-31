@@ -83,12 +83,16 @@ def files_for_year(records: list[dict[str, Any]], year: int | None) -> list[str]
     """
     if not records:
         raise ValueError("WorldPop returned no records for this query.")
-    if year is None:
-        record = max(records, key=lambda d: int(d["popyear"]))
+    dated = [r for r in records if r.get("popyear") is not None]
+    if not dated:
+        # Undated single record (e.g. a covariate layer): year does not apply.
+        record = records[0]
+    elif year is None:
+        record = max(dated, key=lambda d: int(d["popyear"]))
     else:
-        record = next((d for d in records if int(d["popyear"]) == int(year)), None)
+        record = next((d for d in dated if int(d["popyear"]) == int(year)), None)
         if record is None:
-            available = sorted({int(d["popyear"]) for d in records})
+            available = sorted({int(d["popyear"]) for d in dated})
             raise ValueError(
                 f"WorldPop year {year} is not available; have {available}."
             )

@@ -241,3 +241,17 @@ def test_describe_returns_record(catalog):
     assert info["kind"] == "raster"
     assert info["subaliases"][0]["id"] == "wpgp"
     assert {"scope", "resolution", "years"} <= set(info["subaliases"][0])
+
+
+def test_covariates_curated(catalog):
+    """All 54 covariate layers are curated as products routing to 'covariates'."""
+    covs = [p for p in catalog.available_products() if catalog.get(p).rest_alias == "covariates"]
+    assert len(covs) == 54
+    assert catalog.get("cviirs").endpoint() == "covariates"
+    assert catalog.get("pop").endpoint() == "pop"  # non-covariate uses its key
+
+
+def test_covariate_describe_has_description(catalog):
+    """A covariate's describe() carries the hub title."""
+    info = catalog.describe("cviirs")
+    assert info["product"] == "cviirs"

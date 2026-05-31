@@ -117,3 +117,383 @@ products:
     unit: "people/pixel"
     subaliases:
       - {id: FPP_v02, constrained: false, unadjusted: true, resolution: "1km", scope: global, generation: R2025A, archive: "zip", years: "2025-2100"}
+
+  # --- covariates (auxiliary geospatial layers; REST alias 'covariates') ---
+  cdistosmroads:
+    rest_alias: covariates
+    description: "Distance to OSM major roads 2016"
+    kind: raster
+    unit: covariate
+    subaliases:
+      - {id: "cdistosmroads", constrained: false, unadjusted: true, resolution: "100m", scope: countries, generation: R2021, years: "2000-2020"}
+  cdistosmroadinter:
+    rest_alias: covariates
+    description: "Distance to OSM major road intersections 2016"
+    kind: raster
+    unit: covariate
+    subaliases:
+      - {id: "cdistosmroadinter", constrained: false, unadjusted: true, resolution: "100m", scope: countries, generation: R2021, years: "2000-2020"}
+  cdistosmwaterways:
+    rest_alias: covariates
+    description: "Distance to OSM major waterways 2016"
+    kind: raster
+    unit: covariate
+    subaliases:
+      - {id: "cdistosmwaterways", constrained: false, unadjusted: true, resolution: "100m", scope: countries, generation: R2021, years: "2000-2020"}
+  cdistwdpa:
+    rest_alias: covariates
+    description: "Distance to IUCN strict nature reserve and wilderness area edges 2000-2017"
+    kind: raster
+    unit: covariate
+    subaliases:
+      - {id: "cdistwdpa", constrained: false, unadjusted: true, resolution: "100m", scope: countries, generation: R2021, years: "2000-2020"}
+  cviirs:
+    rest_alias: covariates
+    description: "Resampled VIIRS night-time lights 2012-2016"
+    kind: raster
+    unit: covariate
+    subaliases:
+      - {id: "cviirs", constrained: false, unadjusted: true, resolution: "100m", scope: countries, generation: R2021, years: "2000-2020"}
+  cdmsp:
+    rest_alias: covariates
+    description: "Resampled DMSP-OLS night-time lights 2000-2011"
+    kind: raster
+    unit: covariate
+    subaliases:
+      - {id: "cdmsp", constrained: false, unadjusted: true, resolution: "100m", scope: countries, generation: R2021, years: "2000-2020"}
+  esaccilc2000:
+    rest_alias: covariates
+    description: "Distance to edges of reclassified ESA-CCI-LC classes 2000"
+    kind: raster
+    unit: covariate
+    subaliases:
+      - {id: "esaccilc2000", constrained: false, unadjusted: true, resolution: "100m", scope: countries, generation: R2021, years: "2000"}
+  esaccilc2001:
+    rest_alias: covariates
+    description: "Distance to edges of reclassified ESA-CCI-LC classes 2001"
+    kind: raster
+    unit: covariate
+    subaliases:
+      - {id: "esaccilc2001", constrained: false, unadjusted: true, resolution: "100m", scope: countries, generation: R2021, years: "2001"}
+  esaccilc2002:
+    rest_alias: covariates
+    description: "Distance to edges of reclassified ESA-CCI-LC classes 2002"
+    kind: raster
+    unit: covariate
+    subaliases:
+      - {id: "esaccilc2002", constrained: false, unadjusted: true, resolution: "100m", scope: countries, generation: R2021, years: "2002"}
+  esaccilc2003:
+    rest_alias: covariates
+    description: "Distance to edges of reclassified ESA-CCI-LC classes 2003"
+    kind: raster
+    unit: covariate
+    subaliases:
+      - {id: "esaccilc2003", constrained: false, unadjusted: true, resolution: "100m", scope: countries, generation: R2021, years: "2003"}
+  esaccilc2004:
+    rest_alias: covariates
+    description: "Distance to edges of reclassified ESA-CCI-LC classes 2004"
+    kind: raster
+    unit: covariate
+    subaliases:
+      - {id: "esaccilc2004", constrained: false, unadjusted: true, resolution: "100m", scope: countries, generation: R2021, years: "2004"}
+  esaccilc2005:
+    rest_alias: covariates
+    description: "Distance to edges of reclassified ESA-CCI-LC classes 2005"
+    kind: raster
+    unit: covariate
+    subaliases:
+      - {id: "esaccilc2005", constrained: false, unadjusted: true, resolution: "100m", scope: countries, generation: R2021, years: "2005"}
+  esaccilc2006:
+    rest_alias: covariates
+    description: "Distance to edges of reclassified ESA-CCI-LC classes 2006"
+    kind: raster
+    unit: covariate
+    subaliases:
+      - {id: "esaccilc2006", constrained: false, unadjusted: true, resolution: "100m", scope: countries, generation: R2021, years: "2006"}
+  esaccilc2007:
+    rest_alias: covariates
+    description: "Distance to edges of reclassified ESA-CCI-LC classes 2007"
+    kind: raster
+    unit: covariate
+    subaliases:
+      - {id: "esaccilc2007", constrained: false, unadjusted: true, resolution: "100m", scope: countries, generation: R2021, years: "2007"}
+  esaccilc2008:
+    rest_alias: covariates
+    description: "Distance to edges of reclassified ESA-CCI-LC classes 2008"
+    kind: raster
+    unit: covariate
+    subaliases:
+      - {id: "esaccilc2008", constrained: false, unadjusted: true, resolution: "100m", scope: countries, generation: R2021, years: "2008"}
+  esaccilc2009:
+    rest_alias: covariates
+    description: "Distance to edges of reclassified ESA-CCI-LC classes 2009"
+    kind: raster
+    unit: covariate
+    subaliases:
+      - {id: "esaccilc2009", constrained: false, unadjusted: true, resolution: "100m", scope: countries, generation: R2021, years: "2009"}
+  esaccilc2010:
+    rest_alias: covariates
+    description: "Distance to edges of reclassified ESA-CCI-LC classes 2010"
+    kind: raster
+    unit: covariate
+    subaliases:
+      - {id: "esaccilc2010", constrained: false, unadjusted: true, resolution: "100m", scope: countries, generation: R2021, years: "2010"}
+  esaccilc2011:
+    rest_alias: covariates
+    description: "Distance to edges of reclassified ESA-CCI-LC classes 2011"
+    kind: raster
+    unit: covariate
+    subaliases:
+      - {id: "esaccilc2011", constrained: false, unadjusted: true, resolution: "100m", scope: countries, generation: R2021, years: "2011"}
+  esaccilc2012:
+    rest_alias: covariates
+    description: "Distance to edges of reclassified ESA-CCI-LC classes 2012"
+    kind: raster
+    unit: covariate
+    subaliases:
+      - {id: "esaccilc2012", constrained: false, unadjusted: true, resolution: "100m", scope: countries, generation: R2021, years: "2012"}
+  esaccilc2013:
+    rest_alias: covariates
+    description: "Distance to edges of reclassified ESA-CCI-LC classes 2013"
+    kind: raster
+    unit: covariate
+    subaliases:
+      - {id: "esaccilc2013", constrained: false, unadjusted: true, resolution: "100m", scope: countries, generation: R2021, years: "2013"}
+  esaccilc2014:
+    rest_alias: covariates
+    description: "Distance to edges of reclassified ESA-CCI-LC classes 2014"
+    kind: raster
+    unit: covariate
+    subaliases:
+      - {id: "esaccilc2014", constrained: false, unadjusted: true, resolution: "100m", scope: countries, generation: R2021, years: "2014"}
+  esaccilc2015:
+    rest_alias: covariates
+    description: "Distance to edges of reclassified ESA-CCI-LC classes 2015"
+    kind: raster
+    unit: covariate
+    subaliases:
+      - {id: "esaccilc2015", constrained: false, unadjusted: true, resolution: "100m", scope: countries, generation: R2021, years: "2015"}
+  wpgpsrtmslope:
+    rest_alias: covariates
+    description: "SRTM-based slope per country 2000"
+    kind: raster
+    unit: covariate
+    subaliases:
+      - {id: "wpgpsrtmslope", constrained: false, unadjusted: true, resolution: "100m", scope: countries, generation: R2021, years: "2000"}
+  wpgpsrtmtopo:
+    rest_alias: covariates
+    description: "SRTM-based elevation per country 2000"
+    kind: raster
+    unit: covariate
+    subaliases:
+      - {id: "wpgpsrtmtopo", constrained: false, unadjusted: true, resolution: "100m", scope: countries, generation: R2021, years: "2000"}
+  gpdstcoastline:
+    rest_alias: covariates
+    description: "Distance to open-water coastline per country (for the whole 2000-2020 period)"
+    kind: raster
+    unit: covariate
+    subaliases:
+      - {id: "gpdstcoastline", constrained: false, unadjusted: true, resolution: "100m", scope: countries, generation: R2021, years: "2000-2020"}
+  gpdstesaccilcinlandw:
+    rest_alias: covariates
+    description: "Distance to ESA-CCI-LC inland water per country (for the whole 2000-2012)"
+    kind: raster
+    unit: covariate
+    subaliases:
+      - {id: "gpdstesaccilcinlandw", constrained: false, unadjusted: true, resolution: "100m", scope: countries, generation: R2021, years: "2000-2020"}
+  MERIT_Elevation_200:
+    rest_alias: covariates
+    description: "MERIT Elevation 2007"
+    kind: raster
+    unit: covariate
+    subaliases:
+      - {id: "MERIT_Elevation_200", constrained: false, unadjusted: true, resolution: "100m", scope: countries, generation: R2021, years: "2000-2020"}
+  MERIT_Slope_2007:
+    rest_alias: covariates
+    description: "MERIT Slope 2007"
+    kind: raster
+    unit: covariate
+    subaliases:
+      - {id: "MERIT_Slope_2007", constrained: false, unadjusted: true, resolution: "100m", scope: countries, generation: R2021, years: "2007"}
+  G2_DST_Coastline:
+    rest_alias: covariates
+    description: "Distance to open-water coastline 2021"
+    kind: raster
+    unit: covariate
+    subaliases:
+      - {id: "G2_DST_Coastline", constrained: false, unadjusted: true, resolution: "100m", scope: countries, generation: R2021, years: "2007"}
+  G2_DST_inwater:
+    rest_alias: covariates
+    description: "Distance to inland water 2021"
+    kind: raster
+    unit: covariate
+    subaliases:
+      - {id: "G2_DST_inwater", constrained: false, unadjusted: true, resolution: "100m", scope: countries, generation: R2021, years: "2021"}
+  G2_Temperature:
+    rest_alias: covariates
+    description: "Annual Mean Surface Temperature 2015-2023"
+    kind: raster
+    unit: covariate
+    subaliases:
+      - {id: "G2_Temperature", constrained: false, unadjusted: true, resolution: "100m", scope: countries, generation: R2021, years: "2000-2020"}
+  G2_Precipitation:
+    rest_alias: covariates
+    description: "Annual Mean Precipitation 2015-2023"
+    kind: raster
+    unit: covariate
+    subaliases:
+      - {id: "G2_Precipitation", constrained: false, unadjusted: true, resolution: "100m", scope: countries, generation: R2021, years: "2000-2020"}
+  G2_NT_lights:
+    rest_alias: covariates
+    description: "Nighttime Lights 2015-2023"
+    kind: raster
+    unit: covariate
+    subaliases:
+      - {id: "G2_NT_lights", constrained: false, unadjusted: true, resolution: "100m", scope: countries, generation: R2021, years: "2000-2020"}
+  G2_NT_Lights_F:
+    rest_alias: covariates
+    description: "Nighttime Lights 2015-2023 (flares/volcanoes filtered)"
+    kind: raster
+    unit: covariate
+    subaliases:
+      - {id: "G2_NT_Lights_F", constrained: false, unadjusted: true, resolution: "100m", scope: countries, generation: R2021, years: "2000-2020"}
+  G2_DST_ESA_2015:
+    rest_alias: covariates
+    description: "Distance to edges of reclassified ESA-CCI-LC classes 2015 R2004V1"
+    kind: raster
+    unit: covariate
+    subaliases:
+      - {id: "G2_DST_ESA_2015", constrained: false, unadjusted: true, resolution: "100m", scope: countries, generation: R2021, years: "2015"}
+  G2_DST_ESA_2016:
+    rest_alias: covariates
+    description: "Distance to edges of reclassified ESA-CCI-LC classes 2016 R2004V1"
+    kind: raster
+    unit: covariate
+    subaliases:
+      - {id: "G2_DST_ESA_2016", constrained: false, unadjusted: true, resolution: "100m", scope: countries, generation: R2021, years: "2016"}
+  G2_DST_ESA_2017:
+    rest_alias: covariates
+    description: "Distance to edges of reclassified ESA-CCI-LC classes 2017 R2004V1"
+    kind: raster
+    unit: covariate
+    subaliases:
+      - {id: "G2_DST_ESA_2017", constrained: false, unadjusted: true, resolution: "100m", scope: countries, generation: R2021, years: "2017"}
+  G2_DST_ESA_2018:
+    rest_alias: covariates
+    description: "Distance to edges of reclassified ESA-CCI-LC classes 2018 R2004V1"
+    kind: raster
+    unit: covariate
+    subaliases:
+      - {id: "G2_DST_ESA_2018", constrained: false, unadjusted: true, resolution: "100m", scope: countries, generation: R2021, years: "2018"}
+  G2_DST_ESA_2019:
+    rest_alias: covariates
+    description: "Distance to edges of reclassified ESA-CCI-LC classes 2019 R2004V1"
+    kind: raster
+    unit: covariate
+    subaliases:
+      - {id: "G2_DST_ESA_2019", constrained: false, unadjusted: true, resolution: "100m", scope: countries, generation: R2021, years: "2019"}
+  G2_DST_ESA_2020:
+    rest_alias: covariates
+    description: "Distance to edges of reclassified ESA-CCI-LC classes 2020 R2004V1"
+    kind: raster
+    unit: covariate
+    subaliases:
+      - {id: "G2_DST_ESA_2020", constrained: false, unadjusted: true, resolution: "100m", scope: countries, generation: R2021, years: "2020"}
+  G2_DST_ESA_2021:
+    rest_alias: covariates
+    description: "Distance to edges of reclassified ESA-CCI-LC classes 2021 R2004V1"
+    kind: raster
+    unit: covariate
+    subaliases:
+      - {id: "G2_DST_ESA_2021", constrained: false, unadjusted: true, resolution: "100m", scope: countries, generation: R2021, years: "2021"}
+  G2_DST_ESA_2022:
+    rest_alias: covariates
+    description: "Distance to edges of reclassified ESA-CCI-LC classes 2022 R2004V1"
+    kind: raster
+    unit: covariate
+    subaliases:
+      - {id: "G2_DST_ESA_2022", constrained: false, unadjusted: true, resolution: "100m", scope: countries, generation: R2021, years: "2022"}
+  G2_DST_RINT:
+    rest_alias: covariates
+    description: "Distance to OSM major road intersections 2023"
+    kind: raster
+    unit: covariate
+    subaliases:
+      - {id: "G2_DST_RINT", constrained: false, unadjusted: true, resolution: "100m", scope: countries, generation: R2021, years: "2023"}
+  G2_DST_WBODIES:
+    rest_alias: covariates
+    description: "Distance to OSM major waterways 2023"
+    kind: raster
+    unit: covariate
+    subaliases:
+      - {id: "G2_DST_WBODIES", constrained: false, unadjusted: true, resolution: "100m", scope: countries, generation: R2021, years: "2023"}
+  G2_DST_ROADS:
+    rest_alias: covariates
+    description: "Distance to OSM major roads 2023"
+    kind: raster
+    unit: covariate
+    subaliases:
+      - {id: "G2_DST_ROADS", constrained: false, unadjusted: true, resolution: "100m", scope: countries, generation: R2021, years: "2023"}
+  DST_IUCN_C1:
+    rest_alias: covariates
+    description: "Distance to IUCN strict nature reserve and wilderness area edges 2015-2022  R2024V1"
+    kind: raster
+    unit: covariate
+    subaliases:
+      - {id: "DST_IUCN_C1", constrained: false, unadjusted: true, resolution: "100m", scope: countries, generation: R2021, years: "2000-2020"}
+  DST_IUCN_C0:
+    rest_alias: covariates
+    description: "Distances to IUCN national park, national monument, etc.. 2015-2022  R2024V1"
+    kind: raster
+    unit: covariate
+    subaliases:
+      - {id: "DST_IUCN_C0", constrained: false, unadjusted: true, resolution: "100m", scope: countries, generation: R2021, years: "2000-2020"}
+  G2_BUILT_S:
+    rest_alias: covariates
+    description: "Built-up Surface 2015-2030"
+    kind: raster
+    unit: covariate
+    subaliases:
+      - {id: "G2_BUILT_S", constrained: false, unadjusted: true, resolution: "100m", scope: countries, generation: R2021, years: "2000-2020"}
+  G2_BUILT_V:
+    rest_alias: covariates
+    description: "Built-up Volume 2015-2030"
+    kind: raster
+    unit: covariate
+    subaliases:
+      - {id: "G2_BUILT_V", constrained: false, unadjusted: true, resolution: "100m", scope: countries, generation: R2021, years: "2000-2020"}
+  G2_DST_BUILT_S:
+    rest_alias: covariates
+    description: "Distance to  Built-up Surface 2015-2030"
+    kind: raster
+    unit: covariate
+    subaliases:
+      - {id: "G2_DST_BUILT_S", constrained: false, unadjusted: true, resolution: "100m", scope: countries, generation: R2021, years: "2000-2020"}
+  G2_GL_PAT:
+    rest_alias: covariates
+    description: "Gridded maps of building patterns - Google (PIB)"
+    kind: raster
+    unit: covariate
+    subaliases:
+      - {id: "G2_GL_PAT", constrained: false, unadjusted: true, resolution: "100m", scope: countries, generation: R2021, years: "2000-2020"}
+  G2_GL_PAT_BCB:
+    rest_alias: covariates
+    description: "Gridded maps of building patterns - Google (BCB)"
+    kind: raster
+    unit: covariate
+    subaliases:
+      - {id: "G2_GL_PAT_BCB", constrained: false, unadjusted: true, resolution: "100m", scope: countries, generation: R2021, years: "2000-2020"}
+  G2_MS_PAT_PIB:
+    rest_alias: covariates
+    description: "Gridded maps of building patterns - Microsoft (PIB)"
+    kind: raster
+    unit: covariate
+    subaliases:
+      - {id: "G2_MS_PAT_PIB", constrained: false, unadjusted: true, resolution: "100m", scope: countries, generation: R2021, years: "2000-2020"}
+  G2_MS_PAT_BCB:
+    rest_alias: covariates
+    description: "Gridded maps of building patterns - Microsoft (BCB)"
+    kind: raster
+    unit: covariate
+    subaliases:
+      - {id: "G2_MS_PAT_BCB", constrained: false, unadjusted: true, resolution: "100m", scope: countries, generation: R2021, years: "2000-2020"}

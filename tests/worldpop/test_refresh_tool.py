@@ -101,13 +101,13 @@ def test_main_validate_returns_zero(capsys):
 
 
 def _clean_live(catalog):
-    """Build (top_aliases, subaliases) that exactly mirror the curated catalog."""
+    """Build (top_aliases, subaliases) that mirror the curated catalog by endpoint."""
     audit_mod = _load("audit_worldpop_catalog")
-    top = list(catalog.available_products()) + list(audit_mod.EXPECTED_UNCURATED)
-    subs = {
-        p: [s.id for s in catalog.get(p).subaliases]
-        for p in catalog.available_products()
-    }
+    subs: dict[str, list[str]] = {}
+    for product in catalog.available_products():
+        endpoint = catalog.get(product).endpoint()
+        subs.setdefault(endpoint, []).extend(s.id for s in catalog.get(product).subaliases)
+    top = list(subs) + list(audit_mod.EXPECTED_UNCURATED)
     return top, subs
 
 

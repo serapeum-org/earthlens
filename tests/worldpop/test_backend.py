@@ -259,6 +259,23 @@ def test_global_download_crops_to_aoi(wp_kwargs, monkeypatch, tiny_tif_bytes):
     assert Dataset.read_file(str(tifs[0])).epsg == 4326
 
 
+def test_covariate_fetch_undated(wp_kwargs, patch_http):
+    """A covariate (undated, rest_alias=covariates) downloads + crops once per file."""
+    records = [
+        {
+            "files": [
+                "https://data.worldpop.org/GIS/Covariates/KEN/ken_viirs_100m_2012.tif",
+                "https://data.worldpop.org/GIS/Covariates/KEN/ken_viirs_100m_2013.tif",
+            ]
+        }
+    ]
+    patch_http(records)
+    backend = WorldPop(**wp_kwargs(variables=["cviirs"]))
+    out = backend.download(progress_bar=False)
+    tifs = [p for p in out if str(p).endswith(".tif")]
+    assert {p.name for p in tifs} == {"cviirs_2012_100m.tif", "cviirs_2013_100m.tif"}
+
+
 def test_search_plan_pop(wp_kwargs, patch_http):
     """_search plans one product per (product, iso3, year) file for pop."""
     patch_http(pop_records())

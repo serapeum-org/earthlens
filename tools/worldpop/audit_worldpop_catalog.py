@@ -36,7 +36,6 @@ Getter = Callable[..., requests.Response]
 #: bespoke/auxiliary products out of the population-grid scope.
 EXPECTED_UNCURATED: frozenset[str] = frozenset(
     {
-        "covariates",
         "adminareas",
         "dahi",
         "internal_migration_f",
@@ -85,17 +84,25 @@ def audit(
         A mapping `check_name -> sorted list of offenders`. Every empty list
         means that check passes; an all-empty report is clean.
     """
-    curated = set(catalog.available_products())
+    # Products are keyed locally, but each maps to a top-level REST endpoint
+    # (covariate products share the `covariates` endpoint via rest_alias).
+    endpoints = {p: catalog.get(p).endpoint() for p in catalog.available_products()}
+    curated_endpoints = set(endpoints.values())
     live = _live_aliases(base_url=base_url, get=get)
 
-    missing_upstream = sorted(curated - live)
-    not_curated = sorted(live - curated - EXPECTED_UNCURATED)
+    missing_upstream = sorted(curated_endpoints - live)
+    not_curated = sorted(live - curated_endpoints - EXPECTED_UNCURATED)
 
+    # Cache the live sub-aliases per endpoint (the covariates endpoint is hit once).
+    live_ids: dict[str, set[str]] = {}
     subalias_drift: list[str] = []
-    for product in sorted(curated & live):
-        live_ids = _live_subaliases(product, base_url=base_url, get=get)
+    for product, endpoint in endpoints.items():
+        if endpoint not in live:
+            continue
+        if endpoint not in live_ids:
+            live_ids[endpoint] = _live_subaliases(endpoint, base_url=base_url, get=get)
         for sub in catalog.get(product).subaliases:
-            if sub.id not in live_ids:
+            if sub.id not in live_ids[endpoint]:
                 subalias_drift.append(f"{product}:{sub.id}")
 
     return {

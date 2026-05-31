@@ -99,15 +99,24 @@ def validate_structure(catalog: Catalog) -> list[str]:
 def validate_live(
     catalog: Catalog, *, base_url: str = BASE_URL, get: Getter = requests.get
 ) -> list[str]:
-    """Return curated sub-aliases that no longer exist upstream."""
+    """Return curated sub-aliases that no longer exist upstream.
+
+    Products are checked against their REST **endpoint** (`rest_alias` or the
+    key) — the covariate products all share the `covariates` endpoint.
+    """
     problems: list[str] = []
+    live_cache: dict[str, set[str]] = {}
     for alias, product in catalog.datasets.items():
-        if alias not in KNOWN_ALIASES:
-            problems.append(f"{alias}: not a known top-level alias")
+        endpoint = product.endpoint()
+        if endpoint not in KNOWN_ALIASES:
+            problems.append(f"{alias}: endpoint {endpoint!r} is not a known alias")
             continue
-        live = set(crawl_subaliases(alias, base_url=base_url, get=get))
+        if endpoint not in live_cache:
+            live_cache[endpoint] = set(
+                crawl_subaliases(endpoint, base_url=base_url, get=get)
+            )
         for sub in product.subaliases:
-            if sub.id not in live:
+            if sub.id not in live_cache[endpoint]:
                 problems.append(f"{alias}/{sub.id}: missing upstream")
     return problems
 
@@ -150,7 +159,7 @@ def main(argv: list[str] | None = None) -> int:
         for alias, product in catalog.datasets.items():
             sub = product.subaliases[0]
             try:
-                rest_records(alias, sub.id, "COM")
+                rest_records(product.endpoint(), sub.id, "COM")
             except requests.HTTPError:
                 problems.append(f"{alias}/{sub.id}: sample query failed")
     for problem in problems:

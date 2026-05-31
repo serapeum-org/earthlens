@@ -151,6 +151,12 @@ class Product(BaseModel):
         unit: Human-readable unit of the values (`"people/pixel"`).
         worldpoppy_id: The matching WorldPopPy product id for the optional
             `api="worldpoppy"` path, or `None` if unmapped.
+        rest_alias: The top-level REST alias to query when it differs from
+            the catalog key. Empty (the default) means "use the key". The
+            covariate products set this to `"covariates"` (they are
+            sub-aliases of the shared `covariates` endpoint).
+        description: Human-readable description of the product (the hub's
+            title), shown in docs / `describe`.
         subaliases: The concrete variants this product offers.
     """
 
@@ -162,7 +168,13 @@ class Product(BaseModel):
     demographic: bool = False
     unit: str = ""
     worldpoppy_id: str | None = None
+    rest_alias: str = ""
+    description: str = ""
     subaliases: list[SubAlias] = Field(default_factory=list)
+
+    def endpoint(self) -> str:
+        """Return the REST alias to query (`rest_alias` or the product key)."""
+        return self.rest_alias or self.alias
 
     def selectors(self) -> list[tuple[bool, bool, str, str, str, str]]:
         """Return every sub-alias selector tuple (for did-you-mean listings)."""

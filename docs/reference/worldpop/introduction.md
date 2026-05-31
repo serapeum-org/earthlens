@@ -33,12 +33,12 @@ product resolves to a concrete REST sub-alias through the
 | `gbsg` | global built-settlement growth | raster |
 | `dug` | degree of urbanisation (Global-2) | raster |
 | `future_pop` | SSP population projections to 2100 | raster |
+| `covariates` (54 layers) | nightlights, slope/elevation, distances, built-up, … | raster |
 
-The heterogeneous `covariates` family (nightlights, slope, distances, …) is
-listed by the catalog refresh tool but is **not** part of the curated
-selector catalog — its 50+ named layers don't fit the
-`(constrained × resolution × scope × generation)` selector model. See
-[Available datasets](datasets.md) for the full sub-alias matrix.
+The `covariates` family is curated as **54 individual products** (selected by
+id, e.g. `variables=["cviirs"]`), routed through the shared `covariates` REST
+endpoint. See [Available datasets](datasets.md#covariates-54-layers) for
+details and the full sub-alias matrix.
 
 !!! note "Global mosaics and archive products"
     `scope="global"` downloads the per-year whole-world mosaic and crops it

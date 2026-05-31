@@ -164,3 +164,9 @@ def test_rest_records_uses_session_when_given(monkeypatch):
 
     rest_records("pop", "wpgp", "KEN", session=_Session())
     assert calls["n"] == 1
+
+
+def test_files_for_year_undated_record():
+    """An undated record (covariate) returns its files regardless of year."""
+    records = [{"files": ["https://x/ken_viirs_100m_2012.tif"]}]  # no popyear
+    assert files_for_year(records, 2099) == ["https://x/ken_viirs_100m_2012.tif"]

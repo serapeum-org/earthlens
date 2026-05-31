@@ -75,15 +75,22 @@ resolved from the AOI's continent). `future_pop` is per-SSP and **~4 GB per
 scenario**, so it needs `allow_large_archive=True` + `ssp=` to opt in. Both
 require the `[worldpop]` extra.
 
-## Not curated: `covariates`
+## Covariates (54 layers)
 
-The hub's `covariates` family (50+ heterogeneous named layers — VIIRS/DMSP
-nightlights, SRTM slope, distance-to-roads/water, Global-2 built-up surface,
-…) is **not** part of the curated selector catalog because its layers are
-named one-offs that don't fit the
-`(constrained × resolution × scope × generation)` model. The
-[catalog tool](#catalog-tooling) lists every live covariate sub-alias for
-reference.
+The hub's `covariates` family — VIIRS/DMSP nightlights, SRTM slope/elevation,
+distance-to-roads/water, ESA-CCI land-cover distances, Global-2 built-up
+surface/volume, building patterns, … — is fully curated: each of the **54
+layers is its own product** (selected by its id, e.g.
+`variables=["cviirs"]`), routed through the shared `covariates` REST endpoint
+(`rest_alias: covariates`). They are per-country GeoTIFFs and use the normal
+country fetch path. List them with `Catalog().describe(<id>)` or the audit
+tool; each product carries the hub's title as its `description`.
+
+```python
+EarthLens(data_source="worldpop", variables=["cviirs"],  # VIIRS nightlights
+          start="2012", end="2016", fmt="%Y", aoi="KEN",
+          lat_lim=[-4.7, 5.0], lon_lim=[33.9, 41.9], path="out/").download()
+```
 
 ## Catalog tooling
 

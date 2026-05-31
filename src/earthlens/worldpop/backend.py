@@ -414,20 +414,28 @@ class WorldPop(AbstractDataSource):
     def _plan_countries(
         self, product: str, subalias_id: str, demographic: bool, years: list[int]
     ) -> list[RemoteProduct]:
-        """Plan per-country downloads for one product (records once per ISO3)."""
+        """Plan per-country downloads for one product (records once per ISO3).
+
+        Covariate layers are **undated** (one record, `popyear` is `None`),
+        so they are planned once per ISO3 with the year read from the
+        filename rather than looped over the requested years.
+        """
+        endpoint = self._catalog.get(product).endpoint()
         out: list[RemoteProduct] = []
         for iso3 in self._iso3s:
-            records = rest_records(product, subalias_id, iso3)
-            for year in years:
+            records = rest_records(endpoint, subalias_id, iso3)
+            undated = not any(rec.get("popyear") for rec in records)
+            for year in [None] if undated else years:
                 for url in files_for_year(records, year):
+                    resolved_year = year if year is not None else _year_in(url)
                     out.append(
                         RemoteProduct(
-                            id=f"{product}_{iso3}_{year}_{Path(url).stem}",
+                            id=f"{product}_{iso3}_{resolved_year}_{Path(url).stem}",
                             href=url,
                             metadata={
                                 "product": product,
                                 "iso3": iso3,
-                                "year": year,
+                                "year": resolved_year,
                                 "subalias": subalias_id,
                                 "demographic": demographic,
                             },
@@ -1010,6 +1018,19 @@ def _zonal_sum(path: Path) -> float:
     from pyramids.dataset import Dataset
 
     return float(np.nansum(_masked_array(Dataset.read_file(str(path)))))
+
+
+def _year_in(name: str) -> int:
+    """Return the last 4-digit year in a filename / URL, or 0 if none.
+
+    Args:
+        name: A filename or URL (e.g. `ken_viirs_100m_2012.tif`).
+
+    Returns:
+        int: The last 4-digit token (a year), or 0 when none is present.
+    """
+    years = re.findall(r"(19|20)\d{2}", name.rsplit("/", 1)[-1])
+    return int(re.findall(r"(?:19|20)\d{2}", name.rsplit("/", 1)[-1])[-1]) if years else 0
 
 
 def _require_worldpoppy() -> None:
