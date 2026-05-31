@@ -336,6 +336,9 @@ nav:
       - Age/sex population pyramid: examples/worldpop/04_age_sex_pyramid.ipynb
       - Multi-country mosaic: examples/worldpop/05_multicountry_mosaic.ipynb
       - Multi-year aggregate: examples/worldpop/06_multiyear_aggregate.ipynb
+      - Covariates — nightlights: examples/worldpop/07_covariates_nightlights.ipynb
+      - Dependency ratios (archive): examples/worldpop/08_dependency_ratios.ipynb
+      - Global mosaics (URL resolution): examples/worldpop/09_global_mosaic.ipynb
   - API Reference:
     - EarthLens Facade: reference/earthlens.md
     - AbstractDataSource: reference/abstract-datasource.md

@@ -579,6 +579,8 @@ class Catalog(AbstractCatalog):
             "kind": row.kind,
             "demographic": row.demographic,
             "unit": row.unit,
+            "description": row.description,
+            "endpoint": row.endpoint(),
             "subaliases": [
                 {
                     "id": sub.id,
