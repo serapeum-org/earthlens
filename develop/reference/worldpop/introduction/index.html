@@ -10,13 +10,13 @@
       
       
       
-        <link rel="canonical" href="https://serapeum-org.github.io/earthlens/develop/reference/ghsl/projections/">
+        <link rel="canonical" href="https://serapeum-org.github.io/earthlens/develop/reference/worldpop/introduction/">
       
       
-        <link rel="prev" href="../products/">
+        <link rel="prev" href="../../usgs-water/usgs_water/">
       
       
-        <link rel="next" href="../ghsl/">
+        <link rel="next" href="../usage/">
       
       
         
@@ -27,7 +27,7 @@
     
     
       
-        <title>Projections & tiling - earthlens</title>
+        <title>Introduction - earthlens</title>
       
     
     
@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -83,7 +83,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#ghsl-projections-crs-tiling" class="md-skip">
+        <a href="#worldpop-introduction" class="md-skip">
           Skip to content
         </a>
       
@@ -123,7 +123,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Projections & tiling
+              Introduction
             
           </span>
         </div>
@@ -3887,7 +3887,7 @@
   <span class="md-ellipsis">
     
   
-    GHSL (human settlement)
+    WorldPop (population)
   
 
     
@@ -3903,7 +3903,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    GHSL (human settlement)
+    WorldPop (population)
   
 
           </label>
@@ -3913,10 +3913,37 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../introduction/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Introduction
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -3932,34 +3959,81 @@
   
 
       </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../authentication/" class="md-nav__link">
+      
         
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
   
   
-  <span class="md-ellipsis">
+  
     
   
-    Authentication
   
-
-    
-  </span>
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#what-it-covers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What it covers
+      
+    </span>
+  </a>
   
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#output-kind" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Output kind
+      
+    </span>
+  </a>
   
-
-      </a>
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#how-it-maps-onto-the-facade" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How it maps onto the facade
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#install" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Install
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#see-also" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        See also
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -4000,7 +4074,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../products/" class="md-nav__link">
+      <a href="../datasets/" class="md-nav__link">
         
   
   
@@ -4025,44 +4099,17 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Projections & tiling
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../worldpoppy/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Projections & tiling
+    WorldPopPy & no-xarray
   
 
     
@@ -4071,70 +4118,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#source-crs-mollweide-vs-wgs84" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Source CRS: Mollweide vs WGS84
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#output-crs-when-reprojection-happens" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Output CRS &amp; when reprojection happens
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#tiling-tiles-vs-whole-globe" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Tiling: tiles vs whole-globe
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#the-tile-grid" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        The tile grid
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -4147,7 +4130,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../ghsl/" class="md-nav__link">
+      <a href="../worldpop/" class="md-nav__link">
         
   
   
@@ -8047,7 +8030,7 @@
   <span class="md-ellipsis">
     
   
-    GHSL (human settlement)
+    WorldPop (population)
   
 
     
@@ -8063,7 +8046,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    GHSL (human settlement)
+    WorldPop (population)
   
 
           </label>
@@ -8076,14 +8059,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/ghsl/01_catalog_explorer/" class="md-nav__link">
+      <a href="../../../examples/worldpop/01_catalog_explorer/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    GHSL — catalog explorer
+    WorldPop — catalog explorer (no network)
   
 
     
@@ -8104,14 +8087,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/ghsl/02_population_quickstart/" class="md-nav__link">
+      <a href="../../../examples/worldpop/02_population_quickstart/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    GHSL — population quickstart
+    WorldPop — population quickstart (live)
   
 
     
@@ -8132,14 +8115,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/ghsl/03_builtup_surface/" class="md-nav__link">
+      <a href="../../../examples/worldpop/03_constrained_vs_unconstrained/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    GHSL — built-up surface
+    WorldPop — constrained vs unconstrained (live)
   
 
     
@@ -8160,14 +8143,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/ghsl/04_builtup_growth/" class="md-nav__link">
+      <a href="../../../examples/worldpop/04_age_sex_pyramid/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    GHSL — built-up growth (multi-epoch + aggregate)
+    WorldPop — age/sex population pyramid (live)
   
 
     
@@ -8188,14 +8171,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/ghsl/05_building_height/" class="md-nav__link">
+      <a href="../../../examples/worldpop/05_multicountry_mosaic/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    GHSL — building height
+    WorldPop — multi-country mosaic (live)
   
 
     
@@ -8216,14 +8199,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/ghsl/06_settlement_classes/" class="md-nav__link">
+      <a href="../../../examples/worldpop/06_multiyear_aggregate/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    GHSL — settlement classes (GHS-SMOD)
+    WorldPop — multi-year population, aggregated (live)
   
 
     
@@ -8244,14 +8227,70 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/ghsl/07_wup_projection/" class="md-nav__link">
+      <a href="../../../examples/worldpop/07_covariates_nightlights/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    GHSL — population projection to 2100 (GHS-WUP, R2025A)
+    WorldPop — covariates: VIIRS night-time lights (live)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../examples/worldpop/08_dependency_ratios/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    WorldPop — dependency ratios (archive, live)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../examples/worldpop/09_global_mosaic/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    WorldPop — global mosaics (live URL resolution)
   
 
     
@@ -8505,10 +8544,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#source-crs-mollweide-vs-wgs84" class="md-nav__link">
+  <a href="#what-it-covers" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Source CRS: Mollweide vs WGS84
+        What it covers
       
     </span>
   </a>
@@ -8516,10 +8555,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#output-crs-when-reprojection-happens" class="md-nav__link">
+  <a href="#output-kind" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Output CRS &amp; when reprojection happens
+        Output kind
       
     </span>
   </a>
@@ -8527,10 +8566,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#tiling-tiles-vs-whole-globe" class="md-nav__link">
+  <a href="#how-it-maps-onto-the-facade" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Tiling: tiles vs whole-globe
+        How it maps onto the facade
       
     </span>
   </a>
@@ -8538,10 +8577,21 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#the-tile-grid" class="md-nav__link">
+  <a href="#install" class="md-nav__link">
     <span class="md-ellipsis">
       
-        The tile grid
+        Install
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#see-also" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        See also
       
     </span>
   </a>
@@ -8565,7 +8615,7 @@
 
 
   
-    <a href="https://github.com/serapeum-org/earthlens/edit/master/docs/reference/ghsl/projections.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
+    <a href="https://github.com/serapeum-org/earthlens/edit/master/docs/reference/worldpop/introduction.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
     </a>
@@ -8574,96 +8624,145 @@
     
       
     
-    <a href="https://github.com/serapeum-org/earthlens/raw/master/docs/reference/ghsl/projections.md" title="View source of this page" class="md-content__button md-icon">
+    <a href="https://github.com/serapeum-org/earthlens/raw/master/docs/reference/worldpop/introduction.md" title="View source of this page" class="md-content__button md-icon">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 18c.56 0 1 .44 1 1s-.44 1-1 1-1-.44-1-1 .44-1 1-1m0-3c-2.73 0-5.06 1.66-6 4 .94 2.34 3.27 4 6 4s5.06-1.66 6-4c-.94-2.34-3.27-4-6-4m0 6.5a2.5 2.5 0 0 1-2.5-2.5 2.5 2.5 0 0 1 2.5-2.5 2.5 2.5 0 0 1 2.5 2.5 2.5 2.5 0 0 1-2.5 2.5M9.27 20H6V4h7v5h5v4.07c.7.08 1.36.25 2 .49V8l-6-6H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h4.5a8.2 8.2 0 0 1-1.23-2"/></svg>
     </a>
   
 
 
-<h1 id="ghsl-projections-crs-tiling"><a class="toclink" href="#ghsl-projections-crs-tiling">GHSL — Projections, CRS &amp; tiling</a><a class="headerlink" href="#ghsl-projections-crs-tiling" title="Permanent link">#</a></h1>
-<p>GHSL is published in two coordinate systems and two delivery layouts. The
-backend hides the details, but understanding them helps you choose
-<code>resolution</code> / <code>crs</code> / <code>tiling</code>.</p>
-<h2 id="source-crs-mollweide-vs-wgs84"><a class="toclink" href="#source-crs-mollweide-vs-wgs84">Source CRS: Mollweide vs WGS84</a><a class="headerlink" href="#source-crs-mollweide-vs-wgs84" title="Permanent link">#</a></h2>
+<h1 id="worldpop-introduction"><a class="toclink" href="#worldpop-introduction">WorldPop — Introduction</a><a class="headerlink" href="#worldpop-introduction" title="Permanent link">#</a></h1>
+<p><code>earthlens.worldpop</code> downloads gridded population and demographic data from
+the <strong>WorldPop open population data hub</strong> (<a href="https://hub.worldpop.org"><code>hub.worldpop.org</code></a>).
+It queries the documented WorldPop REST API for the matching per-country
+GeoTIFF URLs, downloads them over anonymous HTTPS, and uses
+<a href="https://github.com/Serapieum-of-alex/pyramids"><code>pyramids</code></a> to mosaic +
+crop (and, on request, reproject) the rasters to your area of interest. For
+demographic products it additionally writes a tidy age/sex table.</p>
+<p>WorldPop data is <strong>open, CC-BY-4.0</strong> (attribution only) — there are no
+credentials, no API key, and no account. The default access path needs only
+the core dependencies (<code>requests</code> + <code>pyramids</code>); see
+<a href="../worldpoppy/">the WorldPopPy path</a> for the optional SDK.</p>
+<h2 id="what-it-covers"><a class="toclink" href="#what-it-covers">What it covers</a><a class="headerlink" href="#what-it-covers" title="Permanent link">#</a></h2>
+<p>A request names one or more <strong>product aliases</strong> via <code>variables=[…]</code>; each
+product resolves to a concrete REST sub-alias through the
+<code>constrained</code> / <code>unadjusted</code> / <code>resolution</code> / <code>scope</code> / <code>generation</code> /
+<code>level</code> selectors. earthlens curates the population &amp; demographic families:</p>
 <table>
 <thead>
 <tr>
-<th>Resolution</th>
-<th>Unit</th>
-<th>Source CRS</th>
+<th>Product alias</th>
+<th>What it is</th>
+<th>Output</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><code>10m</code>, <code>100m</code>, <code>1km</code></td>
-<td>metres</td>
-<td><strong>Mollweide</strong> (ESRI:54009) — equal-area</td>
+<td><code>pop</code></td>
+<td>population counts (constrained + unconstrained; 100 m / 1 km; per-country + global)</td>
+<td>raster</td>
 </tr>
 <tr>
-<td><code>3ss</code>, <code>30ss</code></td>
-<td>arc-seconds</td>
-<td><strong>WGS84</strong> (EPSG:4326)</td>
+<td><code>pop_density</code></td>
+<td>population density (1 km)</td>
+<td>raster</td>
+</tr>
+<tr>
+<td><code>pwd</code></td>
+<td>population-weighted density (national / subnational)</td>
+<td>raster</td>
+</tr>
+<tr>
+<td><code>age_structures</code></td>
+<td>age/sex-disaggregated population (the "pyramids")</td>
+<td>rasters <strong>+ table</strong></td>
+</tr>
+<tr>
+<td><code>births</code></td>
+<td>annual live births</td>
+<td>raster</td>
+</tr>
+<tr>
+<td><code>pregnancies</code></td>
+<td>annual pregnancies</td>
+<td>raster</td>
+</tr>
+<tr>
+<td><code>dependency_ratios</code></td>
+<td>youth / old-age dependency</td>
+<td>raster</td>
+</tr>
+<tr>
+<td><code>urban_change</code></td>
+<td>urban extent change</td>
+<td>raster</td>
+</tr>
+<tr>
+<td><code>gbsg</code></td>
+<td>global built-settlement growth</td>
+<td>raster</td>
+</tr>
+<tr>
+<td><code>dug</code></td>
+<td>degree of urbanisation (Global-2)</td>
+<td>raster</td>
+</tr>
+<tr>
+<td><code>future_pop</code></td>
+<td>SSP population projections to 2100</td>
+<td>raster</td>
+</tr>
+<tr>
+<td><code>covariates</code> (54 layers)</td>
+<td>nightlights, slope/elevation, distances, built-up, …</td>
+<td>raster</td>
 </tr>
 </tbody>
 </table>
-<p>JRC distributes the equal-area metric grids in Mollweide (the projection of
-record for GHSL — it preserves area, which matters for counting people and
-summing built-up surface) and the geographic grids in WGS84. <strong>The resolution
-you pick determines the source CRS</strong> — there is no 100 m WGS84 file, nor a 30″
-Mollweide file.</p>
-<h2 id="output-crs-when-reprojection-happens"><a class="toclink" href="#output-crs-when-reprojection-happens">Output CRS &amp; when reprojection happens</a><a class="headerlink" href="#output-crs-when-reprojection-happens" title="Permanent link">#</a></h2>
-<p><code>crs=</code> is the <strong>output</strong> CRS (default <code>EPSG:4326</code>). The backend reprojects the
-downloaded source to it via <code>pyramids</code>:</p>
-<ul>
-<li>Source 54009 + output 4326 → <strong>reprojected</strong> (the common case for the 100 m
-  grids).</li>
-<li>Source 4326 + output 4326 → <strong>no reprojection</strong> (the 3″/30″ grids are served
-  in WGS84 already).</li>
-<li>Any other output (e.g. <code>crs="EPSG:3035"</code>) → reprojected.</li>
-</ul>
-<p>Continuous products reproject with <strong>bilinear</strong> resampling; categorical
-products (SMOD, BUILT-C, DEGURBA) use <strong>nearest-neighbour</strong> so class codes are
-never blended into non-existent values at tile seams.</p>
-<h2 id="tiling-tiles-vs-whole-globe"><a class="toclink" href="#tiling-tiles-vs-whole-globe">Tiling: tiles vs whole-globe</a><a class="headerlink" href="#tiling-tiles-vs-whole-globe" title="Permanent link">#</a></h2>
-<table>
-<thead>
-<tr>
-<th>Layout</th>
-<th>Resolutions</th>
-<th>Delivery</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><strong>Tiled</strong></td>
-<td><code>10m</code>, <code>100m</code>, <code>3ss</code></td>
-<td>a sparse 18×36 Mollweide grid of ~1000 km tiles (<code>R{row}_C{col}</code>), land only</td>
-</tr>
-<tr>
-<td><strong>Whole-globe</strong></td>
-<td><code>1km</code>, <code>30ss</code></td>
-<td>a single global <code>.zip</code> (~300 MB)</td>
-</tr>
-</tbody>
-</table>
-<p>For a tiled product the backend transforms your AOI to Mollweide (densifying
-the bbox edges so the bowed Mollweide image is captured), intersects it with
-the bundled 375-tile land schema (<code>tile_schema.geojson</code>), downloads only the
-intersecting tiles, and mosaics them. <code>tiling="global"</code> overrides this to fetch
-the whole-globe file instead (useful when you want the full grid or your AOI
-spans many tiles).</p>
-<p>If a tiled-product AOI intersects <strong>no</strong> land tile (open ocean), the backend
-raises a clear error rather than producing an empty raster — switch to a land
-AOI, a coarse resolution, or <code>tiling="global"</code>.</p>
-<h2 id="the-tile-grid"><a class="toclink" href="#the-tile-grid">The tile grid</a><a class="headerlink" href="#the-tile-grid" title="Permanent link">#</a></h2>
-<p>The grid is the official JRC <code>GHSL_data_54009_shapefile</code> (the
-<code>GHSL2_0_MWD_L1_tile_schema_land</code> layer), converted to a compact GeoJSON and
-shipped as package data. It is a fixed 18×36 scheme (<code>R1..R18</code> north→south,
-<code>C1..C36</code> west→east) of exactly 1,000,000 m square tiles; only the 375 tiles
-that contain land exist. Regenerate it with:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>python<span class="w"> </span>tools/ghsl/refresh_ghsl_catalog.py<span class="w"> </span>refresh-tiles
+<p>The <code>covariates</code> family is curated as <strong>54 individual products</strong> (selected by
+id, e.g. <code>variables=["cviirs"]</code>), routed through the shared <code>covariates</code> REST
+endpoint. See <a href="../datasets/#covariates-54-layers">Available datasets</a> for
+details and the full sub-alias matrix.</p>
+<div class="admonition note">
+<p class="admonition-title">Global mosaics and archive products</p>
+<p><code>scope="global"</code> downloads the per-year whole-world mosaic and crops it
+to the AOI (a ~1.1 GB download per year — no server-side subsetting).
+<code>dependency_ratios</code> (per-continent <code>.7z</code>, Asia / Africa) and <code>future_pop</code>
+(per-SSP <code>.zip</code>, ~4 GB — opt in with <code>allow_large_archive=True</code> + <code>ssp=</code>)
+are downloaded as archives and extracted; both need the <code>[worldpop]</code>
+extra. See <a href="../usage/#archive-products-dependency_ratios-future_pop">Usage</a>.</p>
+</div>
+<h2 id="output-kind"><a class="toclink" href="#output-kind">Output kind</a><a class="headerlink" href="#output-kind" title="Permanent link">#</a></h2>
+<p><code>WorldPop.OUTPUT_KIND</code> is <code>"mixed"</code>: population products yield AOI-cropped
+GeoTIFFs, while <code>age_structures</code> additionally emits a per-cohort table. The
+<code>EarthLens</code> facade therefore <strong>forwards</strong> <code>aggregate=</code> (it reduces the
+per-year raster stack across years — see <a href="../usage/">Usage</a>).</p>
+<h2 id="how-it-maps-onto-the-facade"><a class="toclink" href="#how-it-maps-onto-the-facade">How it maps onto the facade</a><a class="headerlink" href="#how-it-maps-onto-the-facade" title="Permanent link">#</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.earthlens</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="n">paths</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;worldpop&quot;</span><span class="p">,</span>          <span class="c1"># or the &quot;world-pop&quot; alias</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;pop&quot;</span><span class="p">],</span>               <span class="c1"># one or more product aliases</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="n">start</span><span class="o">=</span><span class="s2">&quot;2020&quot;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">&quot;2020&quot;</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="s2">&quot;%Y&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">4.7</span><span class="p">,</span> <span class="mf">5.0</span><span class="p">],</span> <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">33.9</span><span class="p">,</span> <span class="mf">41.9</span><span class="p">],</span>
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    <span class="n">aoi</span><span class="o">=</span><span class="s2">&quot;KEN&quot;</span><span class="p">,</span>                       <span class="c1"># ISO3 / bbox / GeoDataFrame</span>
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>    <span class="n">path</span><span class="o">=</span><span class="s2">&quot;out/&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
 </code></pre></div>
+<h2 id="install"><a class="toclink" href="#install">Install</a><a class="headerlink" href="#install" title="Permanent link">#</a></h2>
+<p>The default REST path needs no extra:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>pip<span class="w"> </span>install<span class="w"> </span>earthlens
+</code></pre></div>
+<p>The optional WorldPopPy path adds the SDK (MPL-2.0, Python ≥3.10):</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>pip<span class="w"> </span>install<span class="w"> </span>earthlens<span class="o">[</span>worldpop<span class="o">]</span>
+</code></pre></div>
+<h2 id="see-also"><a class="toclink" href="#see-also">See also</a><a class="headerlink" href="#see-also" title="Permanent link">#</a></h2>
+<ul>
+<li><a href="../usage/">Usage</a> — the request shape, every selector, and <code>aggregate=</code>.</li>
+<li><a href="../datasets/">Available datasets</a> — the product / sub-alias matrix.</li>
+<li><a href="../worldpoppy/">WorldPopPy path</a> — the optional SDK + the no-xarray design.</li>
+<li><a href="../worldpop/">API reference</a> — the rendered module API.</li>
+</ul>
 
 
 
@@ -8699,7 +8798,7 @@ that contain land exist. Regenerate it with:</p>
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
           
-          <a href="../products/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Available datasets">
+          <a href="../../usgs-water/usgs_water/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Reference">
             <div class="md-footer__button md-icon">
               
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
@@ -8709,20 +8808,20 @@ that contain land exist. Regenerate it with:</p>
                 Previous
               </span>
               <div class="md-ellipsis">
-                Available datasets
+                Reference
               </div>
             </div>
           </a>
         
         
           
-          <a href="../ghsl/" class="md-footer__link md-footer__link--next" aria-label="Next: Reference">
+          <a href="../usage/" class="md-footer__link md-footer__link--next" aria-label="Next: Usage">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                Reference
+                Usage
               </div>
             </div>
             <div class="md-footer__button md-icon">
