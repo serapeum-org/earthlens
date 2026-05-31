@@ -409,12 +409,15 @@ class HDX(AbstractDataSource):
         self,
         progress_bar: bool = True,
         aggregate: AggregationConfig | None = None,
-    ) -> list[Path]:
+        read: bool = False,
+    ) -> list[Path] | list:
         """Resolve the requested datasets and download their resources.
 
         Composes :meth:`_search` (resolve each dataset → filter its
         resources) and :meth:`_fetch` (download the matching files to
-        `self.root_dir`) and returns the local paths.
+        `self.root_dir`). By default returns the local file paths; with
+        `read=True` each downloaded resource is additionally read into
+        its pyramids type via `pyramids.read_resource` (`M1`).
 
         Args:
             progress_bar: Accepted for signature parity with the other
@@ -425,13 +428,26 @@ class HDX(AbstractDataSource):
                 reduction to apply, so a non-`None` value is rejected
                 even though the facade forwards `aggregate=` for a
                 `"mixed"` backend (`G1`).
+            read: When `True`, read each downloaded resource into its
+                pyramids type — a `Dataset` (raster), a
+                `FeatureCollection` (vector), or a `DataFrame` (tabular)
+                — dispatched by the recorded CKAN format label, instead
+                of returning raw paths. Needs `pyramids-gis >= 0.27.0`
+                (which provides `read_resource`); a non-`None` value is
+                otherwise rejected with a clear upgrade message. Defaults
+                to `False` (return paths).
 
         Returns:
             list[Path]: Local paths of every downloaded resource, in
-                dataset/resource order.
+                dataset/resource order — when `read=False` (default).
+            list: One read pyramids object per resource (a
+                `Dataset` / `FeatureCollection` / `DataFrame`), in the
+                same order — when `read=True`.
 
         Raises:
-            NotImplementedError: If `aggregate` is not `None`.
+            NotImplementedError: If `aggregate` is not `None`, or if
+                `read=True` but the installed pyramids has no
+                `read_resource` (upgrade to `pyramids-gis >= 0.27.0`).
         """
         if aggregate is not None:
             raise NotImplementedError(
@@ -440,7 +456,48 @@ class HDX(AbstractDataSource):
                 "there is no meaningful gridded reduction to apply. Call "
                 "download() without aggregate= and post-process the files."
             )
-        return self._api_via_search_fetch()
+        if not read:
+            return self._api_via_search_fetch()
+
+        read_resource = self._load_reader()
+        products = self._search()
+        if not products:
+            return []
+        paths = self._fetch(products)
+        return [
+            read_resource(path, fmt=product.metadata.get("format") or None)
+            for path, product in zip(paths, products)
+        ]
+
+    @staticmethod
+    def _load_reader():
+        """Return `pyramids.read_resource`, or raise a clear upgrade error.
+
+        The reader (the `PY-D` capability) landed in `pyramids-gis`
+        `0.27.0`; an older install raises `ImportError` on the symbol.
+        Surface that as a `NotImplementedError` naming the required
+        version, mirroring how the Earthdata backend feature-detects
+        `pyramids` reducers rather than hard-pinning the floor (a hard
+        pin would drop Python 3.14, which `0.27.0` does not yet ship a
+        Linux/Windows wheel for).
+
+        Returns:
+            The `pyramids.read_resource` callable.
+
+        Raises:
+            NotImplementedError: When the installed pyramids predates the
+                reader.
+        """
+        try:
+            from pyramids import read_resource
+        except ImportError as exc:
+            raise NotImplementedError(
+                "HDX.download(read=True) needs pyramids-gis >= 0.27.0 (which "
+                "provides `read_resource`); the installed pyramids does not. "
+                "Upgrade pyramids, or call download() without read= to get "
+                "the resource file paths and read them yourself."
+            ) from exc
+        return read_resource
 
 
 def _as_filter_list(value: str | list[str] | None) -> list[str]:

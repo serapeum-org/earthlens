@@ -241,3 +241,46 @@ class TestDownload:
         fake_hdx.add_dataset("d", [FakeResource("a.csv", "CSV")])
         backend = HDX(hdx_id="d", path=tmp_path)
         assert [p.name for p in backend._api()] == ["a.csv"]
+
+    def test_read_maps_paths_through_read_resource(
+        self, fake_hdx: FakeHdx, tmp_path, monkeypatch
+    ):
+        """read=True reads each downloaded path via pyramids.read_resource."""
+        calls = []
+
+        def fake_read_resource(path, fmt=None):
+            calls.append((Path(path).name, fmt))
+            return f"obj:{Path(path).name}:{fmt}"
+
+        monkeypatch.setattr("pyramids.read_resource", fake_read_resource, raising=False)
+        fake_hdx.add_dataset(
+            "d", [FakeResource("a.gpkg", "Geopackage"), FakeResource("b.csv", "CSV")]
+        )
+        backend = HDX(hdx_id="d", path=tmp_path)
+        result = backend.download(read=True)
+        assert result == ["obj:a.gpkg:Geopackage", "obj:b.csv:CSV"]
+        assert calls == [("a.gpkg", "Geopackage"), ("b.csv", "CSV")]
+
+    def test_read_empty_search_returns_empty(
+        self, fake_hdx: FakeHdx, tmp_path, monkeypatch
+    ):
+        """read=True with no matching resource returns an empty list."""
+        monkeypatch.setattr(
+            "pyramids.read_resource", lambda path, fmt=None: None, raising=False
+        )
+        fake_hdx.add_dataset("d", [FakeResource("a.csv", "CSV")])
+        backend = HDX(hdx_id="d", resource="*.gpkg", path=tmp_path)
+        assert backend.download(read=True) == []
+
+    def test_read_without_reader_raises_upgrade_error(
+        self, fake_hdx: FakeHdx, tmp_path, monkeypatch
+    ):
+        """read=True with a pyramids lacking read_resource raises an upgrade hint."""
+        import sys
+        import types
+
+        monkeypatch.setitem(sys.modules, "pyramids", types.ModuleType("pyramids"))
+        fake_hdx.add_dataset("d", [FakeResource("a.csv", "CSV")])
+        backend = HDX(hdx_id="d", path=tmp_path)
+        with pytest.raises(NotImplementedError, match=r"pyramids-gis >= 0\.27\.0"):
+            backend.download(read=True)

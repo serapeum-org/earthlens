@@ -94,8 +94,8 @@ EarthLens(data_source="hdx", variables={"kontur-population": []}).download(
 
 ## Reading the downloaded files
 
-The MVP returns files in their native formats. Reading them is up to
-the caller (e.g. `pyramids` for GeoPackage / GeoTIFF, `pandas` for CSV):
+By default `download()` returns native-format file paths, leaving reading
+to the caller:
 
 ```python
 import geopandas as gpd
@@ -105,6 +105,26 @@ paths = EarthLens(
 ).download()
 gdf = gpd.read_file(paths[0])
 ```
+
+### `read=True` — read into pyramids types directly
+
+Pass `read=True` to have each downloaded resource read into its pyramids
+type — a `Dataset` (raster), a `FeatureCollection` (vector), or a
+`DataFrame` (tabular) — dispatched by the recorded CKAN format label,
+with `.gz` / `.zip` containers transparently decompressed:
+
+```python
+objs = EarthLens(
+    data_source="hdx", variables={"cod-ab-kenya": ["GeoJSON"]}, path="data/hdx"
+).download(read=True)
+# objs[0] is a pyramids FeatureCollection (a GeoJSON resource)
+```
+
+`read=True` requires **`pyramids-gis >= 0.27.0`** (which provides
+`read_resource`); on an older pyramids it raises `NotImplementedError`
+with an upgrade hint. The earthlens floor stays `>= 0.23.0` so the
+default path-returning behaviour — and Python 3.14 — keep working on the
+older release; the reader is feature-detected at call time.
 
 ## Rate limits & gotchas
 
