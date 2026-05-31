@@ -115,6 +115,11 @@ all = [
     "obspy >=1.5.0",
     "openeo >=0.47,<0.48",
     "overturemaps >=1.0.0",
+    # py7zr only (the WorldPop .7z extractor): pure-Python, wheels on every
+    # version, so it is safe in `all` and the wheel-test suite can import it.
+    # worldpoppy itself stays OUT of `all` (it pulls rasterio/rioxarray, which
+    # lack 3.13/3.14 wheels) — see the [worldpop] extra note above.
+    "py7zr >=0.20",
     "pyramids-gis[stac]",
     "Rtree >=1.0.0",
     "sentinelhub >=3.11.5",
