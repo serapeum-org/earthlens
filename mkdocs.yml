@@ -205,6 +205,12 @@ nav:
       - Authentication: reference/usgs-water/authentication.md
       - Available data: reference/usgs-water/datasets.md
       - Reference: reference/usgs-water/usgs_water.md
+    - WorldPop (population):
+      - Introduction: reference/worldpop/introduction.md
+      - Usage: reference/worldpop/usage.md
+      - Available datasets: reference/worldpop/datasets.md
+      - WorldPopPy & no-xarray: reference/worldpop/worldpoppy.md
+      - Reference: reference/worldpop/worldpop.md
   - Examples:
     - Authentication: examples/authentication.md
     - Data Sources: examples/data-sources.md
@@ -323,6 +329,16 @@ nav:
       - Multi-parameter & instantaneous: examples/usgs-water/multi_parameter_and_instantaneous.ipynb
       - Site discovery & statistics: examples/usgs-water/site_discovery_and_statistics.ipynb
       - Annual peaks & rating curves: examples/usgs-water/peaks_and_ratings.ipynb
+    - WorldPop (population):
+      - Catalog explorer (no network): examples/worldpop/01_catalog_explorer.ipynb
+      - Population quickstart: examples/worldpop/02_population_quickstart.ipynb
+      - Constrained vs unconstrained: examples/worldpop/03_constrained_vs_unconstrained.ipynb
+      - Age/sex population pyramid: examples/worldpop/04_age_sex_pyramid.ipynb
+      - Multi-country mosaic: examples/worldpop/05_multicountry_mosaic.ipynb
+      - Multi-year aggregate: examples/worldpop/06_multiyear_aggregate.ipynb
+      - Covariates — nightlights: examples/worldpop/07_covariates_nightlights.ipynb
+      - Dependency ratios (archive): examples/worldpop/08_dependency_ratios.ipynb
+      - Global mosaics (URL resolution): examples/worldpop/09_global_mosaic.ipynb
   - API Reference:
     - EarthLens Facade: reference/earthlens.md
     - AbstractDataSource: reference/abstract-datasource.md
