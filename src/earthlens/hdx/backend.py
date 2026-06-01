@@ -474,12 +474,11 @@ class HDX(AbstractDataSource):
         """Return `pyramids.read_resource`, or raise a clear upgrade error.
 
         The reader (the `PY-D` capability) is the `pyramids.read_resource`
-        function; an install that predates it raises `ImportError` on the
-        symbol. Surface that as a `NotImplementedError`, mirroring how the
-        Earthdata backend feature-detects `pyramids` reducers rather than
-        hard-pinning the floor — a hard pin is avoided because the reader
-        ships only in an as-yet-unreleased pyramids (it is on `main`, not
-        in `0.27.0`), and pinning it would also drop Python 3.14.
+        function, available in `pyramids-gis >= 0.29.0`. The package floor
+        already requires that, so this normally just imports; the guard
+        stays as defense for a partial / source install that predates the
+        reader, surfaced as a `NotImplementedError` (mirroring how the
+        Earthdata backend feature-detects its `pyramids` reducers).
 
         Returns:
             The `pyramids.read_resource` callable.
@@ -492,11 +491,10 @@ class HDX(AbstractDataSource):
             from pyramids import read_resource
         except ImportError as exc:
             raise NotImplementedError(
-                "HDX.download(read=True) needs a pyramids-gis that provides "
-                "`read_resource` (the resource reader); the installed pyramids "
-                "does not. Upgrade pyramids once a release ships it, or call "
-                "download() without read= to get the resource file paths and "
-                "read them yourself."
+                "HDX.download(read=True) needs `pyramids.read_resource` "
+                "(pyramids-gis >= 0.29.0); the installed pyramids does not "
+                "provide it. Upgrade pyramids, or call download() without "
+                "read= to get the resource file paths and read them yourself."
             ) from exc
         return read_resource
 

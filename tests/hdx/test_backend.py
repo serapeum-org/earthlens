@@ -284,3 +284,16 @@ class TestDownload:
         backend = HDX(hdx_id="d", path=tmp_path)
         with pytest.raises(NotImplementedError, match=r"read_resource"):
             backend.download(read=True)
+
+    @pytest.mark.integration
+    def test_read_true_real_pyramids_reader(self, fake_hdx: FakeHdx, tmp_path):
+        """read=True returns real pyramids objects via the installed reader."""
+        pytest.importorskip("pyramids")
+        from pyramids import read_resource as _rr  # noqa: F401 - availability gate
+
+        fake_hdx.add_dataset("real", [FakeResource("t.csv", "CSV")])
+        backend = HDX(hdx_id="real", path=tmp_path)
+        objs = backend.download(read=True)
+        import pandas as pd
+
+        assert len(objs) == 1 and isinstance(objs[0], pd.DataFrame)
