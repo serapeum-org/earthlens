@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -1061,6 +1061,17 @@
     <span class="md-ellipsis">
       
         Requester-pays datasets (Landsat, NAIP)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#volume-cost-notes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Volume &amp; cost notes
       
     </span>
   </a>
@@ -9508,6 +9519,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#volume-cost-notes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Volume &amp; cost notes
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#known-limitations" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -9689,6 +9711,17 @@ bbox→scene search):</p>
 <a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a>   <span class="n">tile</span><span class="o">=</span><span class="s2">&quot;al/2021/100cm/rgbir_cog/30086/m_3008601_ne_16_060_20211004&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
 </code></pre></div>
 <p>The bbox is still used to <strong>crop</strong> the downloaded scene to your AOI.</p>
+<h2 id="volume-cost-notes"><a class="toclink" href="#volume-cost-notes">Volume &amp; cost notes</a><a class="headerlink" href="#volume-cost-notes" title="Permanent link">#</a></h2>
+<ul>
+<li><strong>Sentinel-2 scene discovery has no cloud filter.</strong> A wide AOI or a long date
+  window can match many scenes (every revisit), each band a separate COG. The
+  backend logs the planned object count, and <code>max_scenes=N</code> caps the scenes kept
+  per (tile, month) to the most recent <code>N</code> (with a warning when it truncates).
+  For cloud-cover / latest filtering, use the STAC backend.</li>
+<li><strong>GOES warps the full disk.</strong> Each GOES frame is reprojected as a whole
+  (~5500×5500) before cropping, so a tiny AOI still reads the full disk; one
+  frame is fast but many channels × days re-warp it.</li>
+</ul>
 <h2 id="known-limitations"><a class="toclink" href="#known-limitations">Known limitations</a><a class="headerlink" href="#known-limitations" title="Permanent link">#</a></h2>
 <ul>
 <li><strong>Multi-tile mosaic</strong> is not yet merged: a Copernicus DEM / ESA WorldCover AOI
