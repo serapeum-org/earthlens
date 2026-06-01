@@ -131,6 +131,17 @@ S3(start="2021-10-04", end="2021-10-04", lat_lim=[30.0, 30.1], lon_lim=[-86.0, -
 
 The bbox is still used to **crop** the downloaded scene to your AOI.
 
+## Volume & cost notes
+
+- **Sentinel-2 scene discovery has no cloud filter.** A wide AOI or a long date
+  window can match many scenes (every revisit), each band a separate COG. The
+  backend logs the planned object count, and `max_scenes=N` caps the scenes kept
+  per (tile, month) to the most recent `N` (with a warning when it truncates).
+  For cloud-cover / latest filtering, use the STAC backend.
+- **GOES warps the full disk.** Each GOES frame is reprojected as a whole
+  (~5500×5500) before cropping, so a tiny AOI still reads the full disk; one
+  frame is fast but many channels × days re-warp it.
+
 ## Known limitations
 
 - **Multi-tile mosaic** is not yet merged: a Copernicus DEM / ESA WorldCover AOI

@@ -135,22 +135,22 @@ class S3(AbstractDataSource):
         aws_profile: str | None = None,
         scene: str | None = None,
         tile: str | None = None,
+        max_scenes: int | None = None,
     ):
         self._catalog = Catalog()
         resolved = self._catalog.resolve(dataset)
         updates: dict[str, Any] = {}
         if bucket:
             updates["bucket"] = bucket
-        if scene or tile:
-            # Scene/tile identifiers (e.g. a Landsat scene id, a NAIP quad
-            # path) feed the per-dataset key template; carried on params so
-            # the resolver can read them.
-            params = dict(resolved.params)
-            if scene:
-                params["scene"] = scene
-            if tile:
-                params["tile"] = tile
-            updates["params"] = params
+        # Scene/tile identifiers (Landsat scene id, NAIP quad path) and the
+        # Sentinel-2 max_scenes cap feed the resolver via params.
+        extra_params = {
+            k: v
+            for k, v in (("scene", scene), ("tile", tile), ("max_scenes", max_scenes))
+            if v is not None
+        }
+        if extra_params:
+            updates["params"] = {**resolved.params, **extra_params}
         if updates:
             resolved = resolved.model_copy(update=updates)
         self._dataset: Dataset = resolved
@@ -226,10 +226,14 @@ class S3(AbstractDataSource):
         """Plan the S3 products satisfying this request (no bulk transfer)."""
         keys = self.vars if isinstance(self.vars, list) else [self.vars]
         variables = self._dataset.resolve_variables(keys)
-        return plan_products(
+        products = plan_products(
             self._dataset, variables, self._bbox(), list(self.time.dates),
             self._auth.client(),
         )
+        # Surface the request volume so a wide AOI / long window is never a
+        # silent surprise (e.g. many Sentinel-2 scenes).
+        logger.info(f"amazon-s3: planned {len(products)} object(s) for {self._dataset.bucket}")
+        return products
 
     def _raw_dir(self) -> Path:
         """Return (creating if needed) the directory raw granules download to."""

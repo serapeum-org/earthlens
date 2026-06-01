@@ -104,6 +104,28 @@ def test_sentinel2_lists_scenes_over_mgrs_tiles(catalog, fake_client_factory):
     assert len(products) == 2 and all(p.href.endswith("B04.tif") for p in products)
 
 
+def test_sentinel2_max_scenes_caps_and_dedupes_ids(catalog, fake_client_factory):
+    """max_scenes keeps the most-recent scenes; each scene gets a distinct product id (M4/N1)."""
+    s2 = catalog.resolve("sentinel-2-l2a")
+    s2 = s2.model_copy(update={"params": {**s2.params, "max_scenes": 1}})
+    client = fake_client_factory(
+        listing={
+            "sentinel-cogs": [
+                "sentinel-s2-l2a-cogs/31/U/DQ/2024/6/0/B04.tif",
+                "sentinel-s2-l2a-cogs/31/U/DQ/2024/6/1/B04.tif",
+                "sentinel-s2-l2a-cogs/31/U/DQ/2024/6/2/B04.tif",
+            ]
+        }
+    )
+    products = plan_products(
+        s2, [s2.resolve_variable("red")], (2.2, 48.8, 2.5, 48.9),
+        pd.date_range("2024-06-01", "2024-06-15"), client,
+    )
+    assert len(products) == 1  # capped from 3 scenes
+    assert products[0].metadata["scene"].endswith("/2/")  # kept the most recent
+    assert "_2_" in products[0].id  # scene sequence is part of the id (no collisions)
+
+
 def test_passthrough_template_formats_per_date(catalog):
     """A passthrough key_template is formatted per variable and date."""
     ds = catalog.resolve(

@@ -25,6 +25,8 @@ from __future__ import annotations
 import math
 from typing import TYPE_CHECKING, Any, Callable, Iterable
 
+from loguru import logger
+
 from earthlens.base import RemoteProduct
 
 if TYPE_CHECKING:  # pragma: no cover
@@ -223,17 +225,32 @@ def _era5_products(dataset, variables, bbox, dates, client) -> list[RemoteProduc
 
 
 def _sentinel2_products(dataset, variables, bbox, dates, client) -> list[RemoteProduct]:
-    """Sentinel-2 L2A (sentinel-cogs): one COG per (band, scene) over the MGRS tiles."""
+    """Sentinel-2 L2A (sentinel-cogs): one COG per (band, scene) over the MGRS tiles.
+
+    bbox->scene discovery has no cloud filter; a wide AOI / long window can
+    match many scenes. `params["max_scenes"]` (the `max_scenes=` request arg)
+    caps the scenes kept per (tile, month) — the most recent ones — with a
+    warning when truncating. The STAC backend is the cloud/latest-filtered path.
+    """
     collection = dataset.params["collection_prefix"]
+    max_scenes = dataset.params.get("max_scenes")
     out: list[RemoteProduct] = []
     for zone, band, square in _mgrs_tiles(bbox):
         for year, month in _year_months(dates):
             month_prefix = f"{collection}/{zone}/{band}/{square}/{year}/{month}/"
-            for scene_prefix in _list_prefixes(client, dataset.bucket, month_prefix, dataset.requester_pays):
+            scenes = _list_prefixes(client, dataset.bucket, month_prefix, dataset.requester_pays)
+            if max_scenes is not None and len(scenes) > max_scenes:
+                logger.warning(
+                    f"sentinel-2: {len(scenes)} scenes under {month_prefix}; "
+                    f"keeping the {max_scenes} most recent (max_scenes={max_scenes})."
+                )
+                scenes = sorted(scenes)[-max_scenes:]
+            for scene_prefix in scenes:
                 for var in variables:
                     out.append(
                         RemoteProduct(
-                            id=f"{zone}{band}{square}_{year}{month:02d}_{var.native}",
+                            id=f"{zone}{band}{square}_{year}{month:02d}_"
+                            f"{scene_prefix.rstrip('/').rsplit('/', 1)[-1]}_{var.native}",
                             href=f"{scene_prefix}{var.native}.tif",
                             metadata={
                                 "bucket": dataset.bucket,
@@ -256,11 +273,17 @@ def _goes_products(dataset, variables, bbox, dates, client) -> list[RemoteProduc
         hour_prefixes = _list_prefixes(client, dataset.bucket, day_prefix, dataset.requester_pays)
         if not hour_prefixes:
             continue
+        # One frame per day: the first frame of the first hour. The day has many
+        # frames (every ~10-15 min); the rest are intentionally not planned.
         keys = _list_keys(client, dataset.bucket, hour_prefixes[0], dataset.requester_pays)
         for var in variables:
             token = f"{var.native}_G"
             match = next((k for k in keys if token in k.rsplit("/", 1)[-1]), None)
             if match is not None:
+                logger.info(
+                    f"goes: selected frame {match.rsplit('/', 1)[-1]} for "
+                    f"{date.year}-{doy:03d} {var.native} (one frame/day)."
+                )
                 out.append(
                     RemoteProduct(
                         id=f"{var.native}_{date.year}{doy:03d}",
