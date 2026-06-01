@@ -254,16 +254,30 @@ class S3(AbstractDataSource):
             client.download_file(
                 product.metadata["bucket"], product.href, str(raw), ExtraArgs=extra
             )
-        except Exception as exc:  # noqa: BLE001 - classified below
+        except Exception as exc:  # noqa: BLE001 - classified by S3 error code
+            bucket = product.metadata["bucket"]
             if _is_missing_object(exc):
                 logger.warning(
-                    f"object not found, skipping: "
-                    f"s3://{product.metadata['bucket']}/{product.href}"
+                    f"object not found, skipping: s3://{bucket}/{product.href}"
                 )
                 return None
+            code = _error_code(exc)
+            if code in {"403", "AccessDenied"}:
+                hint = (
+                    " This is a requester-pays dataset: check that your AWS "
+                    "credentials are valid and that RequestPayer is set."
+                    if self._dataset.requester_pays
+                    else ""
+                )
+                raise PermissionError(
+                    f"access denied for s3://{bucket}/{product.href}.{hint}"
+                ) from exc
+            if code == "NoSuchBucket":
+                raise RuntimeError(
+                    f"bucket not found: s3://{bucket} (check the dataset / bucket name)."
+                ) from exc
             raise RuntimeError(
-                f"failed to download "
-                f"s3://{product.metadata['bucket']}/{product.href}: {exc}"
+                f"failed to download s3://{bucket}/{product.href}: {exc}"
             ) from exc
         return raw
 
@@ -373,14 +387,26 @@ class S3(AbstractDataSource):
         return cube.to_crs(4326)
 
     def _nc_variable_name(self, nc: Any, product: RemoteProduct) -> str:
-        """Resolve the in-file NetCDF variable name for `product`."""
+        """Resolve the in-file NetCDF data-variable name for `product`.
+
+        Prefers the catalog row's pinned `nc_variable`; otherwise picks the
+        variable with the most dimensions (the gridded data variable rather
+        than a 1-D auxiliary like ERA5's `utc_date` or GOES's `band_id`).
+        """
         names = list(nc.variable_names)
         if len(names) == 1:
             return names[0]
         variable = self._variable_for_native(product.metadata.get("variable"))
         if variable and variable.nc_variable and variable.nc_variable in names:
             return variable.nc_variable
-        return names[0]
+
+        def _rank(name: str) -> int:
+            try:
+                return len(nc.get_variable(name).shape)
+            except Exception:  # noqa: BLE001 - unreadable variable ranks lowest
+                return 0
+
+        return max(names, key=_rank)
 
     # -- public API ----------------------------------------------------
 
@@ -433,6 +459,7 @@ class S3(AbstractDataSource):
             The per-window GeoTIFF paths.
         """
         from earthlens.aggregate import aggregate_netcdf
+        from pyramids.netcdf import NetCDF
 
         client = self._auth.client()
         raw_dir = self._raw_dir()
@@ -444,11 +471,13 @@ class S3(AbstractDataSource):
             if raw is None:
                 continue
             native = product.metadata.get("variable")
-            variable = self._variable_for_native(native)
+            # Resolve the *in-file* variable name from the granule (e.g. ERA5
+            # `128_167_2t` -> `VAR_2T`); the native token is not the NetCDF
+            # variable name, so passing it would make aggregate_netcdf find
+            # nothing.
+            nc_variable = self._nc_variable_name(NetCDF.read_file(str(raw)), product)
             var_info = _AggregationVariable(
-                nc_variable=(variable.nc_variable or variable.native)
-                if variable
-                else (native or ""),
+                nc_variable=nc_variable,
                 cds_variable=native or "",
                 is_flux=False,
             )
@@ -493,10 +522,17 @@ def _wrap_longitude_0_360(arr, geo):
     return rolled, new_geo
 
 
-def _is_missing_object(exc: BaseException) -> bool:
-    """Classify an S3 download error as a missing-object (404/NoSuchKey/403)."""
+def _error_code(exc: BaseException) -> str:
+    """Return the S3 error code from a botocore exception, or `""`."""
     response = getattr(exc, "response", None)
-    code = (response or {}).get("Error", {}).get("Code", "")
-    return code in {"404", "NoSuchKey", "NoSuchBucket", "403", "AccessDenied"} or (
-        "Not Found" in str(exc)
-    )
+    return (response or {}).get("Error", {}).get("Code", "")
+
+
+def _is_missing_object(exc: BaseException) -> bool:
+    """True only for a genuinely-absent object (404 / NoSuchKey).
+
+    Auth (`403` / `AccessDenied`) and bucket (`NoSuchBucket`) errors are
+    deliberately excluded — the caller classifies those separately so a
+    credential / billing / typo failure is never reported as "no data".
+    """
+    return _error_code(exc) in {"404", "NoSuchKey"} or "Not Found" in str(exc)

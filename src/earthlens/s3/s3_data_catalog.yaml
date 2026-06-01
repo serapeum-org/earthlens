@@ -38,60 +38,70 @@ datasets:
       t2m:
         aliases: [2t, 2m_temperature, air_temperature_at_2_metres]
         native: 128_167_2t
+        nc_variable: VAR_2T
         stream: e5.oper.an.sfc
         units: K
         description: 2 metre temperature.
       d2m:
         aliases: [2d, 2m_dewpoint_temperature]
         native: 128_168_2d
+        nc_variable: VAR_2D
         stream: e5.oper.an.sfc
         units: K
         description: 2 metre dewpoint temperature.
       sp:
         aliases: [surface_pressure]
         native: 128_134_sp
+        nc_variable: VAR_SP
         stream: e5.oper.an.sfc
         units: Pa
         description: Surface pressure.
       msl:
         aliases: [mean_sea_level_pressure, air_pressure_at_mean_sea_level]
         native: 128_151_msl
+        nc_variable: VAR_MSL
         stream: e5.oper.an.sfc
         units: Pa
         description: Mean sea level pressure.
       u10:
         aliases: [10u, 10m_u_component_of_wind, eastward_wind_at_10_metres]
         native: 128_165_10u
+        nc_variable: VAR_10U
         stream: e5.oper.an.sfc
         units: m s-1
         description: 10 metre U wind component.
       v10:
         aliases: [10v, 10m_v_component_of_wind, northward_wind_at_10_metres]
         native: 128_166_10v
+        nc_variable: VAR_10V
         stream: e5.oper.an.sfc
         units: m s-1
         description: 10 metre V wind component.
       sst:
         aliases: [sea_surface_temperature]
         native: 128_034_sstk
+        nc_variable: VAR_SSTK
         stream: e5.oper.an.sfc
         units: K
         description: Sea surface temperature.
       skt:
         aliases: [skin_temperature]
         native: 128_235_skt
+        nc_variable: VAR_SKT
         stream: e5.oper.an.sfc
         units: K
         description: Skin temperature.
       tcc:
         aliases: [total_cloud_cover]
         native: 128_164_tcc
+        nc_variable: VAR_TCC
         stream: e5.oper.an.sfc
         units: "(0-1)"
         description: Total cloud cover.
       sd:
         aliases: [snow_depth]
         native: 128_141_sd
+        nc_variable: VAR_SD
         stream: e5.oper.an.sfc
         units: m of water equivalent
         description: Snow depth.

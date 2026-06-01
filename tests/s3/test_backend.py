@@ -175,6 +175,37 @@ def test_non_missing_download_error_raises(tmp_path, fake_client_factory, patch_
         source.download(progress_bar=False)
 
 
+def test_access_denied_raises_permission_error_not_skip(tmp_path, fake_client_factory, patch_auth):
+    """A 403/AccessDenied is a permission error, not a missing object (M1)."""
+    source = _dem_source(tmp_path)
+    client = fake_client_factory(denied=[source._search()[0].href])
+    patch_auth(client)
+    with pytest.raises(PermissionError, match="access denied"):
+        source.download(progress_bar=False)
+
+
+def test_access_denied_names_requester_pays(tmp_path, fake_client_factory, patch_auth):
+    """For requester-pays datasets the AccessDenied message points at credentials."""
+    source = S3(
+        start="2021-09-01", end="2021-09-01", lat_lim=[0.4, 0.6], lon_lim=[6.4, 6.6],
+        dataset="usgs-landsat", variables=["red"],
+        scene="LC08_L2SP_039037_20210901_20210910_02_T1", path=str(tmp_path),
+    )
+    client = fake_client_factory(denied=[source._search()[0].href])
+    patch_auth(client)
+    with pytest.raises(PermissionError, match="requester-pays.*credentials"):
+        source.download(progress_bar=False)
+
+
+def test_no_such_bucket_raises_clear_error(tmp_path, fake_client_factory, patch_auth):
+    """A NoSuchBucket is reported as a bucket error, not 'no data' (M1)."""
+    source = _dem_source(tmp_path)
+    client = fake_client_factory(no_bucket=[source._search()[0].href])
+    patch_auth(client)
+    with pytest.raises(RuntimeError, match="bucket not found"):
+        source.download(progress_bar=False)
+
+
 def test_variable_for_native_handles_none(tmp_path, fake_client_factory, patch_auth):
     """The variable lookup returns None for an unknown / missing token."""
     patch_auth(fake_client_factory())
@@ -202,6 +233,33 @@ def test_reproject_branch_runs_for_non_4326(tmp_path, fake_client_factory, patch
     # the passthrough variable token is opaque; resolve_variables passes it raw
     paths = source.download(progress_bar=False)
     assert len(paths) == 1 and Path(paths[0]).exists()
+
+
+def test_nc_variable_name_picks_gridded_over_helper(tmp_path, fake_client_factory, patch_auth):
+    """With multiple variables and no usable pin, the gridded data var wins over a 1-D helper (M3)."""
+    import numpy as np
+    import xarray as xr
+    from earthlens.base import RemoteProduct
+    from pyramids.netcdf import NetCDF
+
+    patch_auth(fake_client_factory())
+    nc_path = tmp_path / "multivar.nc"
+    lat = np.arange(42, 39.75, -0.25)
+    lon = np.arange(0, 360, 0.25)
+    xr.Dataset(
+        {
+            "VAR_2T": (("time", "latitude", "longitude"),
+                       np.zeros((2, lat.size, lon.size), "float32")),
+            "utc_date": (("time",), np.array([0.0, 1.0])),  # 1-D auxiliary
+        },
+        coords={"time": [0.0, 1.0], "latitude": lat, "longitude": lon},
+    ).to_netcdf(nc_path)
+
+    source = S3(start="2024-06-01", end="2024-06-01", lat_lim=[40, 42], lon_lim=[12, 14],
+                dataset="era5", variables=["t2m"], path=str(tmp_path))
+    # a product whose token has no pinned nc_variable in this file -> gridded fallback
+    product = RemoteProduct(id="x", href="x.nc", metadata={"bucket": "b", "variable": "unknown"})
+    assert source._nc_variable_name(NetCDF.read_file(str(nc_path)), product) == "VAR_2T"
 
 
 def test_netcdf_localise_rebuilds_and_crops(tmp_path, fake_client_factory, patch_auth, tiny_era5_nc):
@@ -246,8 +304,8 @@ def test_goes_geostationary_localise_warps_to_wgs84(tmp_path, fake_client_factor
     assert cropped.epsg == 4326 and cropped.shape[1] >= 1 and cropped.shape[2] >= 1
 
 
-def test_aggregate_runs_per_window(tmp_path, fake_client_factory, patch_auth, monkeypatch):
-    """_aggregate downloads each raw NetCDF and feeds it to aggregate_netcdf."""
+def test_aggregate_resolves_in_file_variable_and_runs(tmp_path, fake_client_factory, patch_auth, monkeypatch, tiny_era5_nc):
+    """_aggregate resolves the in-file NetCDF variable (VAR_2T, not the native token) (M2)."""
     import earthlens.aggregate as agg
     from earthlens.base import RemoteProduct
 
@@ -265,6 +323,8 @@ def test_aggregate_runs_per_window(tmp_path, fake_client_factory, patch_auth, mo
         return [(None, None, out)]
 
     monkeypatch.setattr(agg, "aggregate_netcdf", _fake_aggregate)
+    # the raw granule is a real NetCDF whose data variable is VAR_2T
+    monkeypatch.setattr(source, "_download_raw", lambda c, p, d: tiny_era5_nc)
     products = [
         RemoteProduct(
             id="t2m_202406", href="x.nc",
@@ -272,4 +332,5 @@ def test_aggregate_runs_per_window(tmp_path, fake_client_factory, patch_auth, mo
         )
     ]
     results = source._aggregate(products, AggregationConfig(freq="D", op="mean"))
-    assert results == [out] and captured["nc_variable"] == "128_167_2t"
+    assert results == [out]
+    assert captured["nc_variable"] == "VAR_2T"  # not the native token "128_167_2t"

@@ -28,29 +28,30 @@ class FakeS3Client:
             `ClientError` (to exercise the skip-missing path).
     """
 
-    def __init__(self, listing=None, fixture=None, missing=None, broken=None):
+    def __init__(self, listing=None, fixture=None, missing=None, broken=None, denied=None, no_bucket=None):
         self.listing = listing or {}
         self.fixture = fixture
         self.missing = set(missing or [])
         self.broken = set(broken or [])
+        self.denied = set(denied or [])
+        self.no_bucket = set(no_bucket or [])
         self.downloaded: list[tuple[str, str]] = []
         self.extra_args: list[dict | None] = []
 
     def download_file(self, bucket: str, key: str, dst: str, ExtraArgs=None) -> None:
+        from botocore.exceptions import ClientError
+
         self.downloaded.append((bucket, key))
         self.extra_args.append(ExtraArgs)
-        if key in self.broken:
-            from botocore.exceptions import ClientError
-
-            raise ClientError(
-                {"Error": {"Code": "500", "Message": "Internal Error"}}, "GetObject"
-            )
-        if key in self.missing:
-            from botocore.exceptions import ClientError
-
-            raise ClientError(
-                {"Error": {"Code": "404", "Message": "Not Found"}}, "HeadObject"
-            )
+        codes = {
+            tuple(self.broken): ("500", "Internal Error"),
+            tuple(self.denied): ("AccessDenied", "Access Denied"),
+            tuple(self.no_bucket): ("NoSuchBucket", "The specified bucket does not exist"),
+            tuple(self.missing): ("404", "Not Found"),
+        }
+        for keyset, (code, msg) in codes.items():
+            if key in keyset:
+                raise ClientError({"Error": {"Code": code, "Message": msg}}, "GetObject")
         import shutil
 
         shutil.copyfile(self.fixture, dst)
@@ -146,9 +147,10 @@ def tiny_goes_nc(tmp_path_factory) -> Path:
 def fake_client_factory(tiny_cog):
     """Return a builder for a `FakeS3Client` backed by the synthetic COG."""
 
-    def _build(listing=None, missing=None, broken=None) -> FakeS3Client:
+    def _build(listing=None, missing=None, broken=None, denied=None, no_bucket=None) -> FakeS3Client:
         return FakeS3Client(
-            listing=listing, fixture=tiny_cog, missing=missing, broken=broken
+            listing=listing, fixture=tiny_cog, missing=missing, broken=broken,
+            denied=denied, no_bucket=no_bucket,
         )
 
     return _build
