@@ -20,13 +20,21 @@ Two properties shape the backend:
   table); `ldasout` is `raster` (a 1 km grid). `OUTPUT_KIND` is set per
   instance from the resolved products, and a request mixing kinds raises
   `ValueError`. The facade rejects `aggregate=` for either.
-* **Whole-CONUS download MVP.** An operational NWM file is whole-CONUS
-  (~14 MB for `channel_rt`, ~30 MB for `land`). The MVP downloads the
-  whole files (boto3, no read). **Any subset** — by `sites=` /
-  `feature_id` / a narrower bbox, or `mode="retrospective"` (the 1.4 TB
-  Zarr) — needs a *read*, which is a pyramids capability (`PY-G`,
-  unreleased), so it raises a clear `NotImplementedError` naming `PY-G`.
-  earthlens never imports `xarray` / `zarr` directly.
+* **Whole-CONUS download + subset/decode.** An operational NWM file is
+  whole-CONUS (~14 MB for `channel_rt`, ~30 MB for `land`). A plain
+  request downloads the whole files (boto3, no read). A **subset** — by
+  `sites=` (`feature_id` / USGS `gage_id`), a narrower bbox, or a
+  `[start, end]` window — and the **retrospective** archive
+  (`mode="retrospective"`, the 1.4 TB Zarr) are read through
+  `pyramids.netcdf.LabeledDataset` (pyramids ≥ 0.29.0): for the
+  feature/lake/node-indexed **tabular** products (`chrtout`, `lakeout`,
+  `coastal`) the reader opens the store anonymously and lazily, selects
+  the labels/bbox/time, and writes a tidy `feature_id × time` table
+  (Parquet). earthlens never imports `xarray` / `zarr` itself — pyramids
+  owns the read. Subsetting / retrospective for the **gridded** products
+  (`ldasout`, `rtout`, `forcing`) still needs a gridded cloud-cube reader
+  that pyramids does not yet expose, so those raise a clear
+  `NotImplementedError`; their whole-file operational download works.
 """
 
 from __future__ import annotations
@@ -54,8 +62,8 @@ if TYPE_CHECKING:
 #: The unsigned AWS bucket holding NWM operational output.
 BUCKET = "noaa-nwm-pds"
 
-#: The retrospective (v3.0) Zarr bucket — reached only through the
-#: `PY-G` pyramids reader (unreleased), never downloaded whole.
+#: The retrospective (v3.0) Zarr bucket — read (never downloaded whole)
+#: through `pyramids.netcdf.LabeledDataset` for the tabular products.
 RETRO_BUCKET = "noaa-nwm-retrospective-3-0-pds"
 
 #: Approximate operational retention: `noaa-nwm-pds` keeps a rolling
@@ -63,13 +71,16 @@ RETRO_BUCKET = "noaa-nwm-retrospective-3-0-pds"
 #: days ago auto-routes to the retrospective mode.
 OPERATIONAL_RETENTION_DAYS = 500
 
-#: Shared `PY-G` deferral message — every subset path raises this.
-_PYG_MESSAGE = (
-    "needs the pyramids cloud-Zarr / feature_id-NetCDF reader (PY-G), which is "
-    "unreleased. NWM operational files are whole-CONUS, so any subset requires a "
-    "read; earthlens does not import xarray/zarr directly. Request the whole "
-    "files (no sites=/feature_id and a whole-Earth bbox) to download them, or "
-    "wait for the pyramids PY-G reader for subsetting and the retrospective Zarr."
+#: Deferral message for the gridded (raster) subset / retrospective path —
+#: the `LabeledDataset` reader handles label-indexed (tabular) stores; a
+#: gridded cloud-cube reader is not yet available in pyramids.
+_GRIDDED_SUBSET_MESSAGE = (
+    "NWM subsetting and the retrospective archive are currently supported only "
+    "for the feature/lake/node-indexed tabular products (chrtout, lakeout, "
+    "coastal) via the pyramids LabeledDataset reader. Subsetting the gridded "
+    "products (ldasout, rtout, forcing) needs a gridded cloud-cube reader that "
+    "pyramids does not yet expose; request them without a subset to download the "
+    "whole operational files."
 )
 
 
@@ -258,6 +269,7 @@ class NWM(AbstractDataSource):
         self._show_progress = True
 
         self._products: list[NWMProduct] = []
+        self._requested: dict[str, list[str]] = {}
         for product_key, names in variables.items():
             product = self._catalog.get_product(product_key)
             if product_key not in self._config.products:
@@ -273,6 +285,7 @@ class NWM(AbstractDataSource):
                     f"available: {sorted(product.variables)}."
                 )
             self._products.append(product)
+            self._requested[product_key] = list(names)
 
         kinds = {p.output_kind for p in self._products}
         if len(kinds) > 1:
@@ -412,14 +425,15 @@ class NWM(AbstractDataSource):
         return steps
 
     def _wants_subset(self) -> bool:
-        """Return whether the request asks for a subset (needs `PY-G`).
+        """Return whether the request asks for a subset (needs a read).
 
         A subset is requested when `sites=` was given or the bbox is
-        narrower than whole-Earth. Operational files are whole-CONUS, so
-        any subset needs a read.
+        narrower than whole-Earth. Operational files are whole-CONUS, so a
+        subset is read + sliced through the pyramids reader rather than
+        downloaded whole.
 
         Returns:
-            bool: `True` when a subset (and therefore `PY-G`) is needed.
+            bool: `True` when a subset is requested.
         """
         if self._sites is not None:
             return True
@@ -479,29 +493,35 @@ class NWM(AbstractDataSource):
         return products
 
     def _fetch(self, products: list[RemoteProduct]) -> list[Path]:
-        """Download each product's whole-CONUS NetCDF into the output dir.
+        """Route the request to the whole-file, subset, or retrospective path.
 
-        Any subset path (`sites=` / a narrower bbox, or
-        `mode="retrospective"`) raises `NotImplementedError` naming
-        `PY-G`. Otherwise each S3 key is fetched (unsigned boto3, atomic
-        `.part` rename); a `(cycle, step)` not yet published is logged and
-        skipped so one miss does not lose the rest.
+        * `mode="retrospective"` → read each product's Zarr store through
+          the pyramids reader and write a tidy table (tabular products).
+        * operational + a `sites=`/bbox subset → download the whole files,
+          then read + slice each through the pyramids reader (tabular).
+        * operational + no subset → download the whole-CONUS NetCDFs
+          (unsigned boto3, atomic `.part`; a `(cycle, step)` not yet
+          published is logged and skipped).
+
+        Subsetting / retrospective for the gridded (raster) products is
+        not yet supported (see :data:`_GRIDDED_SUBSET_MESSAGE`).
 
         Args:
             products: The products from :meth:`_search`.
 
         Returns:
-            list[Path]: One fetched NetCDF path per successful product,
-                in order. Shorter than `products` when some were skipped.
+            list[Path]: The written paths (NetCDFs for a whole-file
+                download; Parquet tables for a subset / retrospective
+                read), in order.
 
         Raises:
-            NotImplementedError: For any subset / retrospective request
-                (names `PY-G`).
+            NotImplementedError: For a subset / retrospective request
+                against a gridded (raster) product.
         """
         if self._mode == "retrospective":
-            raise NotImplementedError(f"NWM mode='retrospective' {_PYG_MESSAGE}")
+            return self._fetch_retrospective(products)
         if self._wants_subset():
-            raise NotImplementedError(f"NWM subsetting (sites=/bbox) {_PYG_MESSAGE}")
+            return self._fetch_operational_subset(products)
         client = self._client()
         out: list[Path] = []
         for product in tqdm(
@@ -510,6 +530,177 @@ class NWM(AbstractDataSource):
             fetched = self._fetch_one(client, product)
             if fetched is not None:
                 out.append(fetched)
+        return out
+
+    def _require_tabular(self, product: NWMProduct) -> None:
+        """Raise unless `product` is tabular (the read path's scope).
+
+        Args:
+            product: The resolved product row.
+
+        Raises:
+            NotImplementedError: When `product` is a gridded (raster)
+                product — its subset / retrospective read is not yet
+                supported.
+        """
+        if product.output_kind != "tabular":
+            raise NotImplementedError(
+                f"NWM product {product.product!r} is {product.output_kind!r}; "
+                f"{_GRIDDED_SUBSET_MESSAGE}"
+            )
+
+    def _reader(self) -> Any:
+        """Return the pyramids `LabeledDataset` reader class (lazy import).
+
+        Returns:
+            The `pyramids.netcdf.LabeledDataset` class.
+
+        Raises:
+            ImportError: When the reader is unavailable (names the extra
+                and the minimum pyramids version).
+        """
+        try:
+            from pyramids.netcdf import LabeledDataset
+        except ImportError as exc:
+            raise ImportError(
+                "NWM subsetting / retrospective reads need the pyramids "
+                "LabeledDataset reader; install `pip install "
+                "earthlens[nwm]` (pyramids-gis[lazy,xarray,parquet] >= 0.29.0)."
+            ) from exc
+        return LabeledDataset
+
+    def _feature_ids(self) -> list[int] | None:
+        """Return the explicit `feature_id`s from `sites=`, or `None`.
+
+        `sites=` may carry raw `feature_id` integers (selected directly)
+        or USGS `gage_id` strings (joined via the in-file `gage_id`
+        coord). Integer-valued entries are returned here; the `gage_id`
+        strings are resolved by :meth:`_gage_ids`.
+
+        Returns:
+            list[int] | None: The integer `feature_id`s, or `None` when
+                none were given.
+        """
+        if not self._sites:
+            return None
+        ids = [s for s in self._sites if isinstance(s, int)]
+        return ids or None
+
+    def _gage_ids(self) -> list[str] | None:
+        """Return the USGS `gage_id` strings from `sites=`, or `None`."""
+        if not self._sites:
+            return None
+        gages = [str(s) for s in self._sites if not isinstance(s, int)]
+        return gages or None
+
+    def _select_and_write(
+        self, cube: Any, product: NWMProduct, stem: str, *, slice_time: bool
+    ) -> Path:
+        """Apply the request's label/bbox(/time) selection and write a table.
+
+        Args:
+            cube: An opened `LabeledDataset` for one tabular product.
+            product: The resolved product row.
+            stem: File-name stem for the written Parquet table.
+            slice_time: Apply the `[start, end]` window on the `time`
+                axis. `True` for the retrospective archive (the store
+                spans the whole record); `False` for an operational file
+                (already a single chosen `(cycle, step)` timestep).
+
+        Returns:
+            Path: The written `.parquet` path.
+        """
+        feature_ids = self._feature_ids()
+        if feature_ids is not None:
+            cube = cube.select(feature_id=feature_ids)
+        gage_ids = self._gage_ids()
+        if gage_ids is not None:
+            cube = cube.select_by_coord("gage_id", gage_ids)
+        if self._sites is None and self._wants_subset():
+            cube = cube.select_bbox(
+                (
+                    self.space.west,
+                    self.space.south,
+                    self.space.east,
+                    self.space.north,
+                )
+            )
+        if slice_time:
+            cube = cube.select_time(self.time.start_date, self.time.end_date)
+        out_path = self.root_dir / f"{stem}.parquet"
+        return Path(cube.to_parquet(out_path))
+
+    def _fetch_retrospective(self, products: list[RemoteProduct]) -> list[Path]:
+        """Read + slice the retrospective Zarr for each tabular product.
+
+        Opens each product's `retro_zarr` store anonymously and lazily
+        through the pyramids reader, applies the `sites=`/bbox/time
+        selection, and writes a tidy `feature_id × time` Parquet table.
+
+        Args:
+            products: The retrospective products from :meth:`_search`.
+
+        Returns:
+            list[Path]: One written Parquet path per product.
+
+        Raises:
+            NotImplementedError: For a gridded (raster) product.
+        """
+        reader = self._reader()
+        out: list[Path] = []
+        for rp in tqdm(
+            products, disable=not self._show_progress, desc="nwm-retro", unit="store"
+        ):
+            product = self._catalog.get_product(rp.metadata["product"])
+            self._require_tabular(product)
+            cube = reader.read_file(
+                rp.href, anon=True, variables=self._requested[product.product]
+            )
+            stem = (
+                f"{product.product}_retro_"
+                f"{self.time.start_date:%Y%m%d}_{self.time.end_date:%Y%m%d}"
+            )
+            out.append(self._select_and_write(cube, product, stem, slice_time=True))
+        return out
+
+    def _fetch_operational_subset(self, products: list[RemoteProduct]) -> list[Path]:
+        """Download whole operational files, then read + slice each (tabular).
+
+        The operational files are whole-CONUS, so a `sites=`/bbox subset
+        first downloads each file (unsigned boto3) and then reads + slices
+        it through the pyramids reader into a tidy Parquet table. The
+        fetched NetCDF is left in place alongside the Parquet (it is the
+        as-fetched source; only the Parquet path is returned).
+
+        Args:
+            products: The operational products from :meth:`_search`.
+
+        Returns:
+            list[Path]: One written Parquet path per fetched file.
+
+        Raises:
+            NotImplementedError: For a gridded (raster) product.
+        """
+        for product in self._products:
+            self._require_tabular(product)
+        reader = self._reader()
+        client = self._client()
+        out: list[Path] = []
+        for rp in tqdm(
+            products, disable=not self._show_progress, desc="nwm", unit="file"
+        ):
+            downloaded = self._fetch_one(client, rp)
+            if downloaded is None:
+                continue
+            product = self._catalog.get_product(rp.metadata["product"])
+            cube = reader.read_file(
+                str(downloaded), variables=self._requested[product.product]
+            )
+            written = self._select_and_write(
+                cube, product, downloaded.stem, slice_time=False
+            )
+            _close_quietly(cube)
+            out.append(written)
         return out
 
     def _client(self) -> Any:
@@ -571,38 +762,60 @@ class NWM(AbstractDataSource):
         progress_bar: bool = True,
         aggregate: AggregationConfig | None = None,
     ) -> list[Path]:
-        """Fetch the requested NWM files and return the written paths.
+        """Fetch the requested NWM data and return the written paths.
 
         Runs the cheap :meth:`_search` (key enumeration) then
-        :meth:`_fetch` (the whole-CONUS downloads). A subset request
-        (`sites=` / a narrower bbox / `mode="retrospective"`) raises
-        `NotImplementedError` naming `PY-G`.
+        :meth:`_fetch`, which routes by mode and subset:
+
+        * a plain operational request downloads the whole-CONUS NetCDFs;
+        * a `sites=`/bbox subset or `mode="retrospective"` reads + slices
+          the tabular products (`chrtout`, `lakeout`, `coastal`) through
+          the pyramids `LabeledDataset` reader and writes Parquet tables;
+        * a subset / retrospective request for a gridded product raises
+          `NotImplementedError`.
 
         Args:
-            progress_bar: Show a per-file progress bar. Defaults to
+            progress_bar: Show a per-item progress bar. Defaults to
                 `True`.
             aggregate: Must be `None`. NWM `chrtout` is feature-id
-                indexed (not griddable) and a gridded `ldasout` reduce
-                needs a read (`PY-G`), so aggregation is unsupported. The
+                indexed (not griddable) and a gridded reduce needs a
+                separate reader, so aggregation is unsupported. The
                 facade already rejects a non-`None` `aggregate=` for a
                 non-raster backend; this guards direct callers.
 
         Returns:
-            list[Path]: The whole-CONUS NetCDF paths written, in order.
-                Empty when nothing in the window was available.
+            list[Path]: The written paths — whole-CONUS NetCDFs for a
+                plain operational request, or Parquet tables for a
+                subset / retrospective read. Empty when nothing in the
+                window was available.
 
         Raises:
-            NotImplementedError: If `aggregate` is not `None`, or for any
-                subset / retrospective request (names `PY-G`).
+            NotImplementedError: If `aggregate` is not `None`, or for a
+                subset / retrospective request against a gridded product.
         """
         if aggregate is not None:
             raise NotImplementedError(
                 "NWM.download(aggregate=...) is not supported — chrtout is "
-                "feature-id indexed (not griddable) and a gridded ldasout reduce "
-                "needs the pyramids reader (PY-G)."
+                "feature-id indexed (not griddable) and a gridded reduce needs a "
+                "separate gridded reader."
             )
         self._show_progress = progress_bar
         return self._api_via_search_fetch()
+
+
+def _close_quietly(cube: Any) -> None:
+    """Close a `LabeledDataset`'s underlying store, ignoring any error.
+
+    Releasing the file handle lets the intermediate NetCDF be removed on
+    Windows (where an open handle blocks `unlink`).
+
+    Args:
+        cube: An opened `LabeledDataset`.
+    """
+    try:
+        cube.dataset.close()
+    except Exception:  # noqa: BLE001 - best-effort handle release
+        pass
 
 
 def _is_missing_key(exc: BaseException) -> bool:

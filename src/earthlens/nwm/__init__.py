@@ -11,17 +11,25 @@ picks the operational run (`short_range`, `analysis_assim`,
 `medium_range`), which runs on UTC `cycles` and publishes forecast
 (`fNNN`) / analysis (`tmNN`) `steps`.
 
-This is a **whole-CONUS download** backend: operational files (~14 MB
-`channel_rt`, ~30 MB `land`) are fetched whole. Any subset — `sites=` /
-`feature_id` / a narrower bbox, or the retrospective Zarr
-(`mode="retrospective"`) — needs a read, which is the pyramids `PY-G`
-capability (unreleased), so it raises a clear `NotImplementedError`
-naming `PY-G`. earthlens never imports `xarray` / `zarr`.
+A plain operational request **downloads the whole-CONUS files** (~14 MB
+`channel_rt`, ~30 MB `land`). A **subset** — `sites=` (`feature_id` /
+USGS `gage_id`), a narrower bbox, or a `[start, end]` window — and the
+**retrospective** archive (`mode="retrospective"`, the 1.4 TB Zarr) are
+read through `pyramids.netcdf.LabeledDataset` (pyramids ≥ 0.29.0): for
+the feature/lake/node-indexed **tabular** products (`chrtout`,
+`lakeout`, `coastal`) the reader opens the store anonymously and lazily,
+selects the labels/bbox/time, and writes a tidy `feature_id × time`
+Parquet table. earthlens never imports `xarray` / `zarr` itself —
+pyramids owns the read. Subsetting / retrospective for the **gridded**
+products (`ldasout`, `rtout`, `forcing`) still needs a gridded
+cloud-cube reader pyramids does not yet expose, so those raise a clear
+`NotImplementedError`; their whole-file operational download works.
 
-The `[nwm]` extra pulls `boto3` (unsigned S3); it is imported lazily, so
-the package imports — and `NWM(...)` constructs — without the extra
-installed (the `ImportError` naming `earthlens[nwm]` surfaces at
-`download()` time).
+The `[nwm]` extra pulls `boto3` (unsigned S3) plus
+`pyramids-gis[lazy,xarray,parquet]` (the `LabeledDataset` reader); both
+are imported lazily, so the package imports — and `NWM(...)` constructs
+— without the extra installed (a friendly `ImportError` naming
+`earthlens[nwm]` surfaces at `download()` time).
 
 Public surface (re-exported from this package):
 
