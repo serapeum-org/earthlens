@@ -188,6 +188,27 @@ class TestFetch:
         backend = HDX(hdx_id="d", path=tmp_path)
         assert backend._fetch([]) == []
 
+    def test_parallel_download_preserves_order(self, fake_hdx: FakeHdx, tmp_path):
+        """cores>1 downloads on a thread pool, preserving product order."""
+        from earthlens.base import RemoteProduct
+
+        backend = HDX(hdx_id="seed", path=tmp_path, cores=4)
+        products = [
+            RemoteProduct(
+                id=f"ds::r{i}.csv",
+                metadata={
+                    "resource": FakeResource(f"r{i}.csv", "CSV"),
+                    "hdx_id": "ds",
+                    "name": f"r{i}.csv",
+                    "format": "CSV",
+                },
+            )
+            for i in range(5)
+        ]
+        paths = backend._fetch(products)
+        assert [p.name for p in paths] == [f"r{i}.csv" for i in range(5)]
+        assert all(p.exists() for p in paths)
+
     def test_traversal_hdx_id_stays_within_root(self, fake_hdx: FakeHdx, tmp_path):
         """A traversal-style hdx_id is reduced to its final path segment."""
         from earthlens.base import RemoteProduct
@@ -297,3 +318,58 @@ class TestDownload:
         import pandas as pd
 
         assert len(objs) == 1 and isinstance(objs[0], pd.DataFrame)
+
+
+class TestRetries:
+    """Tests for _with_retries and its use in _search (L2)."""
+
+    def test_retries_then_succeeds(self, monkeypatch):
+        """A transient failure is retried until it succeeds."""
+        from earthlens.hdx import backend as backend_mod
+
+        monkeypatch.setattr(backend_mod.time, "sleep", lambda *a: None)
+        calls = []
+
+        def flaky():
+            calls.append(1)
+            if len(calls) < 3:
+                raise RuntimeError("transient 503")
+            return "ok"
+
+        assert backend_mod._with_retries(flaky, attempts=4, base_delay=0) == "ok"
+        assert len(calls) == 3
+
+    def test_final_failure_propagates(self, monkeypatch):
+        """After exhausting attempts the last exception propagates."""
+        from earthlens.hdx import backend as backend_mod
+
+        monkeypatch.setattr(backend_mod.time, "sleep", lambda *a: None)
+
+        def always_fail():
+            raise ValueError("boom")
+
+        with pytest.raises(ValueError, match="boom"):
+            backend_mod._with_retries(always_fail, attempts=3, base_delay=0)
+
+    def test_search_retries_read_from_hdx(
+        self, fake_hdx: FakeHdx, tmp_path, monkeypatch
+    ):
+        """_search retries a flaky read_from_hdx and then resolves."""
+        from earthlens.hdx import backend as backend_mod
+
+        monkeypatch.setattr(backend_mod.time, "sleep", lambda *a: None)
+        fake_hdx.add_dataset("d", [FakeResource("a.csv", "CSV")])
+        real_read = fake_hdx.Dataset.read_from_hdx
+        state = {"n": 0}
+
+        def flaky_read(identifier, configuration=None):
+            state["n"] += 1
+            if state["n"] < 2:
+                raise RuntimeError("transient")
+            return real_read(identifier)
+
+        monkeypatch.setattr(fake_hdx.Dataset, "read_from_hdx", staticmethod(flaky_read))
+        backend = HDX(hdx_id="d", path=tmp_path)
+        products = backend._search()
+        assert [p.metadata["name"] for p in products] == ["a.csv"]
+        assert state["n"] == 2

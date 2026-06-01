@@ -102,6 +102,62 @@ class TestSearchMetadata:
         assert meta["ds-enriched"]["org"] == "kontur"
         assert set(meta) == set(fake_hdx.Dataset.registry)
 
+    def test_search_metadata_retries_transient_failure(
+        self, fake_hdx: FakeHdx, monkeypatch
+    ):
+        """A transient package_search failure is retried, then succeeds (L2)."""
+        from earthlens.hdx import backend as backend_mod
+
+        monkeypatch.setattr(backend_mod.time, "sleep", lambda *a: None)
+        tool.configure()
+        fake_hdx.add_dataset("ds-x", [], org="kontur")
+        real_client = fake_hdx.Configuration.remoteckan()
+        state = {"n": 0}
+
+        def flaky_call(action, params):
+            state["n"] += 1
+            if state["n"] < 2:
+                raise RuntimeError("transient 503")
+            return real_client.call_action(action, params)
+
+        monkeypatch.setattr(
+            fake_hdx.Configuration,
+            "remoteckan",
+            classmethod(
+                lambda cls: type("C", (), {"call_action": staticmethod(flaky_call)})()
+            ),
+        )
+        meta = tool.search_metadata("*:*")
+        assert "ds-x" in meta and state["n"] == 2
+
+
+class TestEnrichGaps:
+    """Tests for enrich_gaps (L3, faked SDK)."""
+
+    def test_fills_empty_rows_only(self, fake_hdx: FakeHdx, monkeypatch):
+        """Rows with empty org/title are filled; populated rows are left alone."""
+        from earthlens.hdx import backend as backend_mod
+
+        monkeypatch.setattr(backend_mod.time, "sleep", lambda *a: None)
+        tool.configure()
+        fake_hdx.add_dataset("gap", [], org="kontur")
+        rows = {
+            "gap": {"org": "", "title": ""},
+            "kept": {"org": "preset", "title": "Preset"},
+        }
+        out = tool.enrich_gaps(rows)
+        assert out["gap"] == {"org": "kontur", "title": "Title for gap"}
+        assert out["kept"] == {"org": "preset", "title": "Preset"}
+
+    def test_unresolvable_gap_stays_empty(self, fake_hdx: FakeHdx, monkeypatch):
+        """A gap id that does not resolve keeps its empty row."""
+        from earthlens.hdx import backend as backend_mod
+
+        monkeypatch.setattr(backend_mod.time, "sleep", lambda *a: None)
+        tool.configure()
+        rows = {"ghost": {"org": "", "title": ""}}
+        assert tool.enrich_gaps(rows)["ghost"] == {"org": "", "title": ""}
+
 
 class TestDatasetStanza:
     """Tests for dataset_stanza (faked SDK)."""
@@ -156,6 +212,11 @@ class TestParser:
         """The refresh subcommand parses --all (whole-catalogue mode)."""
         ns = tool.build_parser().parse_args(["refresh", "--all"])
         assert ns.command == "refresh" and ns.all is True
+
+    def test_refresh_enrich_gaps_parsed(self):
+        """The refresh subcommand parses --enrich-gaps."""
+        ns = tool.build_parser().parse_args(["refresh", "--all", "--enrich-gaps"])
+        assert ns.enrich_gaps is True
 
 
 class TestAllDatasetNames:

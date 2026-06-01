@@ -104,6 +104,7 @@ def search_metadata(
     Returns:
         dict[str, dict]: Map from HDX id to its `{org, title}` row.
     """
+    from earthlens.hdx.backend import _with_retries
     from hdx.api.configuration import Configuration
 
     client = Configuration.read().remoteckan()
@@ -118,7 +119,9 @@ def search_metadata(
         }
         if fq:
             params["fq"] = fq
-        result = client.call_action("package_search", params)
+        result = _with_retries(
+            lambda params=params: client.call_action("package_search", params)
+        )
         batch = result.get("results") or []
         for row in batch:
             org = row.get("organization")
@@ -169,6 +172,40 @@ def all_metadata() -> dict[str, dict]:
     }
 
 
+def enrich_gaps(rows: dict[str, dict]) -> dict[str, dict]:
+    """Fill `org` / `title` for rows that `package_search` left empty (`L3`).
+
+    The `package_search` walk only exposes "searchable" datasets, so the
+    ~13.5k archived / request-data / non-indexed ids land with empty
+    `org` / `title`. This second pass reads each such id directly via
+    `Dataset.read_from_hdx` — **one HTTP call per gap row**, so it is
+    slow and opt-in (`refresh --all --enrich-gaps`). Each read is wrapped
+    in the shared retry/backoff. Rows already carrying `org` or `title`
+    are skipped. Mutates and returns `rows`.
+
+    Args:
+        rows: The `{hdx_id: {org, title}}` map to fill in place.
+
+    Returns:
+        dict[str, dict]: The same map with gaps filled where possible.
+    """
+    from earthlens.hdx.backend import _with_retries
+    from hdx.data.dataset import Dataset
+
+    gaps = [k for k, v in rows.items() if not (v.get("org") or v.get("title"))]
+    for i, hdx_id in enumerate(gaps, 1):
+        dataset = _with_retries(lambda hdx_id=hdx_id: Dataset.read_from_hdx(hdx_id))
+        if dataset is not None:
+            org = dataset.get("organization")
+            rows[hdx_id] = {
+                "org": (org.get("name") if isinstance(org, dict) else org) or "",
+                "title": dataset.get("title") or "",
+            }
+        if i % 500 == 0:
+            print(f"  enriched {i}/{len(gaps)} gap rows…")
+    return rows
+
+
 def write_index(rows: dict[str, dict], index_path: Path = INDEX_PATH) -> int:
     """Rewrite the enriched long-tail JSON index `{hdx_id: {org, title}}`.
 
@@ -215,9 +252,7 @@ def write_index(rows: dict[str, dict], index_path: Path = INDEX_PATH) -> int:
         # empty `filename` suppresses the FNAME header (otherwise GzipFile
         # derives it from the open file's `.name`, making bytes path-dependent).
         with open(index_path, "wb") as raw:
-            with gzip.GzipFile(
-                filename="", fileobj=raw, mode="wb", mtime=0
-            ) as handle:
+            with gzip.GzipFile(filename="", fileobj=raw, mode="wb", mtime=0) as handle:
                 handle.write(text.encode("utf-8"))
     else:
         index_path.write_text(text, encoding="utf-8")
@@ -316,6 +351,8 @@ def _cmd_refresh(args: argparse.Namespace) -> int:
 
         for row in Catalog().datasets.values():
             rows.setdefault(row.hdx_id, {"org": row.org, "title": row.title})
+    if getattr(args, "enrich_gaps", False):
+        enrich_gaps(rows)
     count = write_index(rows, INDEX_PATH)
     print(f"Wrote {count} dataset id(s) to {INDEX_PATH}.")
     return 0
@@ -353,6 +390,13 @@ def build_parser() -> argparse.ArgumentParser:
         "--include-curated",
         action="store_true",
         help="union the result with the bundled catalog's curated ids",
+    )
+    refresh.add_argument(
+        "--enrich-gaps",
+        action="store_true",
+        dest="enrich_gaps",
+        help="fill org/title for rows package_search omits via one read each "
+        "(slow; ~13.5k extra calls)",
     )
     refresh.set_defaults(func=_cmd_refresh)
 

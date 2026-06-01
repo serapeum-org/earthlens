@@ -71,7 +71,9 @@ EarthLens(
 | `user_agent` | `"earthlens"` | User agent string the SDK requires. |
 | `hdx_id` | `None` | Arbitrary HDX dataset id (escape hatch). |
 | `resource` | `None` | Resource filter(s) for the escape hatch. |
-| `progress_bar` | `True` | Best-effort progress signal on download. |
+| `cores` | `1` | Worker threads for downloading resources; `>1` downloads concurrently (order preserved). |
+| `max_retries` | `4` | Attempts per CKAN read, with exponential backoff (`1` disables retrying). |
+| `progress_bar` | `True` | Accepted for parity; the HDX SDK exposes no progress hook (no-op). |
 
 ### Ignored arguments (`bbox` / time)
 

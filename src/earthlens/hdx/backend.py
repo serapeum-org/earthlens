@@ -43,8 +43,9 @@ bypassed.
 from __future__ import annotations
 
 import datetime as dt
+import time
 from pathlib import Path
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Callable, TypeVar
 
 import pandas as pd
 from loguru import logger
@@ -65,6 +66,36 @@ if TYPE_CHECKING:
 #: Resolved `(hdx_id, [resource_filter, ...])` download target. An empty
 #: filter list means "every resource of the dataset".
 Target = tuple[str, list[str]]
+
+_T = TypeVar("_T")
+
+
+def _with_retries(
+    call: Callable[[], _T], *, attempts: int = 4, base_delay: float = 1.0
+) -> _T:
+    """Call `call`, retrying transient failures with exponential backoff.
+
+    CKAN reads occasionally fail with a transient 5xx / rate-limit; one
+    flaky response should not abort a whole resolve. Retries up to
+    `attempts` times with `base_delay * 2**n` seconds between tries
+    (1s, 2s, 4s, …); the final attempt's exception propagates unchanged.
+    `attempts <= 1` disables retrying.
+
+    Args:
+        call: A zero-argument callable performing the network read.
+        attempts: Total number of tries before giving up.
+        base_delay: Seconds for the first backoff; doubles each retry.
+
+    Returns:
+        Whatever `call` returns on the first successful attempt.
+    """
+    for attempt in range(max(attempts - 1, 0)):
+        try:
+            return call()
+        except Exception:  # noqa: BLE001 - retry any transient SDK/HTTP error
+            time.sleep(base_delay * 2**attempt)
+    # Final attempt (or the only one when attempts <= 1): let it raise.
+    return call()
 
 
 class HDX(AbstractDataSource):
@@ -99,6 +130,8 @@ class HDX(AbstractDataSource):
         user_agent: str = "earthlens",
         hdx_id: str | None = None,
         resource: str | list[str] | None = None,
+        cores: int = 1,
+        max_retries: int = 4,
     ):
         """Initialise an HDX backend instance.
 
@@ -139,6 +172,15 @@ class HDX(AbstractDataSource):
             resource: Optional resource filter(s) for the `hdx_id=`
                 escape hatch — a single glob / format label or a list of
                 them.
+            cores: Number of worker threads for downloading resources in
+                :meth:`_fetch`. `1` (default) downloads sequentially;
+                `> 1` downloads concurrently (I/O-bound HTTP, so threads),
+                preserving result order. Mirrors the CHC backend's
+                `cores=`.
+            max_retries: Total attempts for each CKAN read in
+                :meth:`_search` (`Dataset.read_from_hdx`) before giving
+                up, with exponential backoff between tries. `1` disables
+                retrying. Defaults to `4` (≈1s, 2s, 4s backoff).
 
         Raises:
             ValueError: When neither `variables` nor `hdx_id=` is given,
@@ -154,6 +196,8 @@ class HDX(AbstractDataSource):
         self._user_agent = user_agent
         self._hdx_id = hdx_id
         self._resource = resource
+        self._cores = cores
+        self._max_retries = max_retries
 
         self._catalog = Catalog()
         self._targets: list[Target] = self._resolve_targets(variables, hdx_id, resource)
@@ -337,7 +381,10 @@ class HDX(AbstractDataSource):
 
         products: list[RemoteProduct] = []
         for hdx_id, filters in self._targets:
-            dataset = Dataset.read_from_hdx(hdx_id)
+            dataset = _with_retries(
+                lambda hdx_id=hdx_id: Dataset.read_from_hdx(hdx_id),
+                attempts=self._max_retries,
+            )
             if dataset is None:
                 raise ValueError(
                     f"HDX dataset {hdx_id!r} not found on the {self._hdx_site!r} "
@@ -379,7 +426,9 @@ class HDX(AbstractDataSource):
         Files are written into a per-dataset subdirectory
         (`root_dir / <hdx_id> / <resource-name>`) so that two requested
         datasets carrying a resource with the same file name do not
-        overwrite each other.
+        overwrite each other. When `cores > 1` the per-resource downloads
+        run on a thread pool (the work is I/O-bound HTTP), preserving the
+        input order in the result.
 
         Args:
             products: The products from :meth:`_search`.
@@ -388,22 +437,38 @@ class HDX(AbstractDataSource):
             list[Path]: Local paths of every downloaded resource, in
                 product order. Empty list when `products` is empty.
         """
-        out_paths: list[Path] = []
-        for product in products:
-            resource = product.metadata["resource"]
-            # `hdx_id` is a CKAN slug for curated rows, but arbitrary text via
-            # the `hdx_id=` escape hatch; take only its final path segment so a
-            # crafted value cannot escape `root_dir`.
-            subdir = Path(product.metadata["hdx_id"]).name or "dataset"
-            folder = self.root_dir / subdir
-            folder.mkdir(parents=True, exist_ok=True)
-            _url, local_path = resource.download(folder=str(folder))
-            out_paths.append(Path(local_path))
+        if self._cores > 1 and len(products) > 1:
+            from joblib import Parallel, delayed
+
+            out_paths = Parallel(n_jobs=self._cores, prefer="threads")(
+                delayed(self._download_one)(product) for product in products
+            )
+        else:
+            out_paths = [self._download_one(product) for product in products]
         logger.info(
             f"HDX download summary: {len(out_paths)} resource file(s) written "
             f"to {self.root_dir}"
         )
         return out_paths
+
+    def _download_one(self, product: RemoteProduct) -> Path:
+        """Download one product's resource into its per-dataset subdir.
+
+        Args:
+            product: A product from :meth:`_search`.
+
+        Returns:
+            Path: The local path of the downloaded resource file.
+        """
+        resource = product.metadata["resource"]
+        # `hdx_id` is a CKAN slug for curated rows, but arbitrary text via
+        # the `hdx_id=` escape hatch; take only its final path segment so a
+        # crafted value cannot escape `root_dir`.
+        subdir = Path(product.metadata["hdx_id"]).name or "dataset"
+        folder = self.root_dir / subdir
+        folder.mkdir(parents=True, exist_ok=True)
+        _url, local_path = resource.download(folder=str(folder))
+        return Path(local_path)
 
     def download(
         self,

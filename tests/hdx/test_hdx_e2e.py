@@ -69,3 +69,26 @@ class TestHdxLiveDownload:
         assert any(
             p.metadata["format"].lower() == "geopackage" for p in products
         ), "expected a Geopackage resource per the catalog"
+
+    def test_stage_site_constructs_without_error(self, tmp_path: Path):
+        """hdx_site='stage' is accepted and constructs without raising (L4).
+
+        Verifies the `hdx_site='stage'` path: the backend constructs (which
+        runs `_initialize` → the guarded `Configuration.read()/create()`) and
+        a search does not raise a *configuration* error. Two caveats keep this
+        intentionally light: HDX `Configuration` is a process-global singleton,
+        so when this runs after a prod test in the same process the existing
+        config is reused; and staging is not guaranteed to mirror prod, so a
+        `ValueError` (dataset not found) from the search is tolerated.
+        """
+        backend = HDX(
+            variables={"wfp-topline-figures": []},
+            hdx_site="stage",
+            path=str(tmp_path),
+        )
+        assert backend._hdx_site == "stage"
+        try:
+            backend._search()
+        except ValueError:
+            # stage may not host this dataset — acceptable; config path worked.
+            pass

@@ -104,7 +104,9 @@ class FakeDataset(dict):
     registry: dict[str, "FakeDataset"] = {}
 
     def __init__(self, name: str, resources: list[FakeResource], org: str = "fake-org"):
-        super().__init__(name=name, title=f"Title for {name}")
+        super().__init__(
+            name=name, title=f"Title for {name}", organization={"name": org}
+        )
         self._resources = resources
         self.org = org
 
