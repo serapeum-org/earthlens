@@ -188,6 +188,11 @@ nav:
       - Usage: reference/nwm/usage.md
       - Products & configurations: reference/nwm/datasets.md
       - Reference: reference/nwm/nwm.md
+    - HDX (humanitarian data):
+      - Introduction: reference/hdx/introduction.md
+      - Usage: reference/hdx/usage.md
+      - Catalog & Tooling: reference/hdx/catalog.md
+      - Reference: reference/hdx/hdx.md
     - Overture Maps (vector basemap):
       - Introduction: reference/overture/introduction.md
       - Usage: reference/overture/usage.md
@@ -328,6 +333,12 @@ nav:
       - Short-range land surface (live): examples/nwm/land_surface_short_range.ipynb
       - Regional, ensemble & coastal configs (live): examples/nwm/regional_ensemble_coastal.ipynb
       - Subsetting & retrospective (live): examples/nwm/deferred_and_subsetting.ipynb
+    - Humanitarian data (HDX):
+      - Catalog explorer (no network): examples/hdx/catalog_explorer.ipynb
+      - WFP food-security table (live): examples/hdx/wfp_food_security_table.ipynb
+      - COD administrative boundaries (live): examples/hdx/cod_admin_boundaries.ipynb
+      - HOTOSM building export (live): examples/hdx/hotosm_building_export.ipynb
+      - Arbitrary HDX id (live): examples/hdx/arbitrary_hdx_id.ipynb
     - Overture Maps (vector basemap):
       - Catalog explorer (no network): examples/overture/01_catalog_explorer.ipynb
       - Places quickstart: examples/overture/02_places_quickstart.ipynb

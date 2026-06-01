@@ -82,6 +82,7 @@ class TestRegistry:
             "ghs",
             "ghsl",
             "google-earth-engine",
+            "hdx",
             "human-settlement",
             "national-water-model",
             "nexrad",

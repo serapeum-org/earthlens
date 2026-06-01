@@ -32,10 +32,13 @@ Backends with no extra (CHC, GDACS, OpenAQ) need only the core install — they 
 | NEXRAD Level-II radar (real-time chunk feed) | `radar`, `nexrad` | vector | none (anonymous S3) | `radar` | [NEXRAD radar](radar/introduction.md) |
 | openEO server-side processing (defaults to CDSE) | `openeo` | raster | CDSE OIDC (interactive or client-credentials) | `openeo` | [openEO](openeo/introduction.md) |
 | NOAA National Water Model (`noaa-nwm-pds`) | `nwm`, `national-water-model` | per-product (`chrtout` tabular / `ldasout` raster) | unsigned AWS (public bucket) | `nwm` | [NWM](nwm/introduction.md) |
+| Humanitarian Data Exchange (UN OCHA, CKAN) | `hdx` | mixed | none (public) | `hdx` | [HDX](hdx/introduction.md) |
 
 `Output` is the backend's `OUTPUT_KIND` — `raster` writes GeoTIFF/COG/NetCDF, `vector` writes geometry tables
-(GeoJSON / GeoPackage), and `tabular` writes plain tables (CSV / Parquet). It also governs `aggregate=`: the
-temporal aggregator is accepted for `raster` backends and rejected for `vector` / `tabular` ones.
+(GeoJSON / GeoPackage), `tabular` writes plain tables (CSV / Parquet), and `mixed` (HDX) downloads each
+resource file as-is in whatever format it ships. It also governs `aggregate=`: the temporal aggregator is
+accepted for `raster` backends and rejected for `vector` / `tabular` ones; HDX (`mixed`) rejects it because
+resources are returned as-is.
 
 ## Planned providers (not yet integrated)
 

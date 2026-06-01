@@ -137,7 +137,7 @@ class EarthLens:
             >>> sorted(EarthLens.DataSources)  # doctest: +NORMALIZE_WHITESPACE
             ['amazon-s3', 'cdse', 'chc', 'chirps', 'cmems', 'earth-search',
              'earthdata', 'ecmwf', 'eumetsat', 'fdsn', 'firms', 'gdacs', 'gee',
-             'ghs', 'ghsl', 'google-earth-engine', 'human-settlement',
+             'ghs', 'ghsl', 'google-earth-engine', 'hdx', 'human-settlement',
              'national-water-model', 'nexrad', 'nwis', 'nwm', 'nwp', 'openaq',
              'openeo', 'overture', 'planetary-computer', 'radar', 'sentinel-hub',
              'sentinelhub', 'stac', 'tropycal', 'usgs-nwis', 'usgs-water',
@@ -197,6 +197,10 @@ class EarthLens:
             from the anonymous `noaa-nwm-pds` bucket; tabular subsetting +
             the retrospective Zarr read via pyramids `LabeledDataset`. Keys
             `"nwm"` / `"national-water-model"`.
+        :class:`earthlens.hdx.HDX`: Humanitarian Data Exchange resources
+            via CKAN (`hdx-python-api`); the first `mixed`-output
+            backend (downloads CSV / GeoTIFF / GeoPackage / … files
+            as-is); public, no credentials; key `"hdx"`.
         :class:`earthlens.overture.Overture`: Overture Maps Foundation
             GeoParquet (buildings / places / transportation / divisions)
             over public S3 via `overturemaps`; `vector` FeatureCollection
@@ -247,6 +251,7 @@ class EarthLens:
             "google-earth-engine": ("earthlens.gee", "GEE", "gee", {}),
             # GDACS is a public feed (requests only), so no extra to hint.
             "gdacs": ("earthlens.gdacs", "GDACS", "", {}),
+            "hdx": ("earthlens.hdx", "HDX", "hdx", {}),
             "openaq": ("earthlens.openaq", "OpenAQ", "openaq", {}),
             # openEO server-side processing (defaults to CDSE openEO). Builds a
             # process graph the backend executes; returns the written paths.
@@ -348,8 +353,8 @@ class EarthLens:
             data_source: Backend key — one of `"chc"` (alias
                 `"chirps"`), `"amazon-s3"`, `"cmems"`, `"ecmwf"`,
                 `"fdsn"`, `"gdacs"`, `"gee"` (alias
-                `"google-earth-engine"`), or `"openaq"`. Defaults to
-                `"chc"`.
+                `"google-earth-engine"`), `"hdx"`, or `"openaq"`.
+                Defaults to `"chc"`.
             temporal_resolution: `"daily"` or `"monthly"` for most
                 backends; the GEE backend also accepts `"raw"` and
                 `"yearly"`. The concrete backend may accept a narrower

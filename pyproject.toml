@@ -64,6 +64,7 @@ nwm = [
     "pyramids-gis[lazy,xarray,parquet] >=0.29.0",
 ]
 earthdata = ["earthaccess >=0.18.0; python_version >= '3.12'"]
+hdx = ["hdx-python-api >=6,<7"]
 eumetsat = ["eumdac >=3.1"]
 nwp = ["herbie-data >=2026.3", "ecmwf-opendata >=0.3"]
 radar = ["boto3 >=1.43.0", "botocore >=1.34.0"]
@@ -90,6 +91,7 @@ all = [
     "duckdb >=1.0.0",
     "earthengine-api >=1.7.26",
     "earthaccess >=0.18.0; python_version >= '3.12'",
+    "hdx-python-api >=6,<7",
     "eumdac >=3.1",
     "google-api-python-client >=2.0",
     "google-cloud-storage >=2.0",
@@ -172,6 +174,7 @@ include = ["earthlens", "earthlens.*"]
 "earthlens.cmems" = ["*.yaml", "catalog/*.yaml"]
 "earthlens.ecmwf" = ["*.yaml", "catalog/*.yaml"]
 "earthlens.earthdata" = ["*.yaml", "catalog/*.yaml", "catalog/*.json"]
+"earthlens.hdx" = ["*.yaml", "catalog/*.yaml", "catalog/*.json", "catalog/*.json.gz"]
 "earthlens.eumetsat" = ["*.yaml", "catalog/*.yaml"]
 "earthlens.fdsn" = ["*.yaml"]
 "earthlens.gee" = ["*.yaml", "catalog/*.yaml"]
@@ -260,6 +263,7 @@ markers = [
     "cmems: tests for the Copernicus Marine backend (requires the `cmems` extra: copernicusmarine).",
     "fdsn: tests for the FDSN seismic-event backend (requires the `fdsn` extra: obspy).",
     "earthdata: tests for the NASA Earthdata backend (requires the `earthdata` extra: earthaccess; Python >=3.12).",
+    "hdx: tests for the Humanitarian Data Exchange backend (requires the `hdx` extra: hdx-python-api).",
     "eumetsat: tests for the EUMETSAT Data Store backend (requires the `eumetsat` extra: eumdac).",
     "stac: tests for the STAC backend (requires the `stac` extra: pyramids-gis[stac] → pystac-client + stac-asset).",
     "openeo: tests for the openEO server-side-processing backend (requires the `openeo` extra: openeo).",
@@ -301,6 +305,7 @@ test-gee = { cmd = "pytest -vvv -m 'gee and not e2e' --cov=src/earthlens --cov-r
 test-cmems = { cmd = "pytest -vvv -m 'cmems and not e2e' --cov=src/earthlens --cov-report=xml --cov-report=term-missing", description = "Run CMEMS-backend tests (requires the `cmems` extra: copernicusmarine)" }
 test-fdsn = { cmd = "pytest -vvv -m 'fdsn and not e2e' --cov=src/earthlens --cov-report=xml --cov-report=term-missing", description = "Run FDSN seismic-event backend tests (requires the `fdsn` extra: obspy)" }
 test-earthdata = { cmd = "pytest -vvv -m 'earthdata and not e2e' --cov=src/earthlens --cov-report=xml --cov-report=term-missing", description = "Run NASA Earthdata backend tests (requires the `earthdata` extra: earthaccess; Python >=3.12)" }
+test-hdx = { cmd = "pytest -vvv -m 'hdx and not e2e' --cov=src/earthlens --cov-report=xml --cov-report=term-missing", description = "Run Humanitarian Data Exchange backend tests (requires the `hdx` extra: hdx-python-api)" }
 test-eumetsat = { cmd = "pytest -vvv -m 'eumetsat and not e2e' --cov=src/earthlens --cov-report=xml --cov-report=term-missing", description = "Run EUMETSAT Data Store backend tests (requires the `eumetsat` extra: eumdac)" }
 test-stac = { cmd = "pytest -vvv -m 'stac and not e2e' --cov=src/earthlens --cov-report=xml --cov-report=term-missing", description = "Run STAC-backend tests (requires the `stac` extra: pyramids-gis[stac])" }
 test-openeo = { cmd = "pytest -vvv -m 'openeo and not e2e' --cov=src/earthlens --cov-report=xml --cov-report=term-missing", description = "Run openEO-backend tests (requires the `openeo` extra: openeo)" }
@@ -316,7 +321,7 @@ test-radar = { cmd = "pytest -vvv -m 'radar and not e2e' --cov=src/earthlens --c
 test-usgs-water = { cmd = "pytest -vvv -m 'usgs_water and not e2e' --cov=src/earthlens --cov-report=xml --cov-report=term-missing", description = "Run USGS NWIS / Water Data backend tests (requires the `usgs-water` extra: dataretrieval)" }
 test-ghsl = { cmd = "pytest -vvv -m 'ghsl and not e2e' --cov=src/earthlens --cov-report=xml --cov-report=term-missing", description = "Run GHSL backend tests (open HTTPS; no extra SDK for the direct path; localised via pyramids)" }
 test-worldpop = { cmd = "pytest -vvv -m 'worldpop and not e2e' --cov=src/earthlens --cov-report=xml --cov-report=term-missing", description = "Run WorldPop population data hub backend tests (open CC-BY-4.0; REST path needs only core requests + pyramids)" }
-test-doctests = { cmd = "pytest --doctest-modules src/earthlens/gee src/earthlens/chc src/earthlens/ecmwf src/earthlens/cmems src/earthlens/fdsn src/earthlens/earthdata src/earthlens/eumetsat src/earthlens/stac src/earthlens/openeo src/earthlens/sentinel_hub src/earthlens/gdacs src/earthlens/openaq src/earthlens/tropycal src/earthlens/firms src/earthlens/nwm src/earthlens/overture src/earthlens/nwp src/earthlens/radar src/earthlens/usgs_water src/earthlens/ghsl src/earthlens/worldpop src/earthlens/base", description = "Run docstring examples across the backend packages (catches drift in catalog / API docstrings)" }
+test-doctests = { cmd = "pytest --doctest-modules src/earthlens/gee src/earthlens/chc src/earthlens/ecmwf src/earthlens/cmems src/earthlens/fdsn src/earthlens/earthdata src/earthlens/hdx src/earthlens/eumetsat src/earthlens/stac src/earthlens/openeo src/earthlens/sentinel_hub src/earthlens/gdacs src/earthlens/openaq src/earthlens/tropycal src/earthlens/firms src/earthlens/nwm src/earthlens/overture src/earthlens/nwp src/earthlens/radar src/earthlens/usgs_water src/earthlens/ghsl src/earthlens/worldpop src/earthlens/base", description = "Run docstring examples across the backend packages (catches drift in catalog / API docstrings)" }
 notebooks = { cmd = "pytest --nbval --nbval-lax --verbose docs/examples", description = "check notebooks" }
 jupyter = { cmd = "jupyter lab --no-browser --IdentityProvider.token='' --ServerApp.password='' --port=8889", description = "check notebooks" }
 build-dist = { cmd = "python -m build", description = "Build sdist and wheel for PyPI" }
