@@ -1,0 +1,89 @@
+# GHSL curated catalog — R2025A GHS-WUP projections slice.
+#
+# The World Urbanization Prospects family: long-range population / built-up /
+# Degree-of-Urbanisation projections to 2100 (raster) plus the tabular WUP
+# statistics (DUC / MTUC / country stats).
+
+products:
+
+  GHS_WUP_POP:
+    aliases: [wup_population, wup_pop, projected_population]
+    unit: "people/cell"
+    default_resolution: "1km"
+    releases:
+      R2025A:
+        - epochs: [1975, 1980, 1985, 1990, 1995, 2000, 2005, 2010, 2015, 2020,
+                   2025, 2030, 2035, 2040, 2045, 2050, 2055, 2060, 2065, 2070,
+                   2075, 2080, 2085, 2090, 2095, 2100]
+          resolutions: ["1km", "30ss"]
+
+  GHS_WUP_BUILT_S:
+    aliases: [wup_built_surface, wup_built_s, projected_built_surface]
+    unit: "m2"
+    default_resolution: "1km"
+    releases:
+      R2025A:
+        - epochs: [1975, 1980, 1985, 1990, 1995, 2000, 2005, 2010, 2015, 2020,
+                   2025, 2030, 2035, 2040, 2045, 2050, 2055, 2060, 2065, 2070,
+                   2075, 2080, 2085, 2090, 2095, 2100]
+          resolutions: ["1km", "30ss"]
+
+  GHS_WUP_DEGURBA:
+    aliases: [wup_degurba, projected_degree_of_urbanisation, wup_smod]
+    unit: ""
+    categorical: true
+    default_resolution: "1km"
+    legend:
+      30: "Urban Centre"
+      23: "Dense Urban Cluster"
+      22: "Semi-dense Urban Cluster"
+      21: "Suburban / Peri-urban"
+      13: "Rural Cluster"
+      12: "Low Density Rural"
+      11: "Very Low Density Rural"
+      10: "Water"
+    colors:
+      30: "#FF0000"
+      23: "#732600"
+      22: "#A87000"
+      21: "#FFFF00"
+      13: "#375623"
+      12: "#7FA86E"
+      11: "#CDF57A"
+      10: "#73DFFF"
+    releases:
+      R2025A:
+        - epochs: [1975, 1980, 1985, 1990, 1995, 2000, 2005, 2010, 2015, 2020,
+                   2025, 2030, 2035, 2040, 2045, 2050, 2055, 2060, 2065, 2070,
+                   2075, 2080, 2085, 2090, 2095, 2100]
+          resolutions: ["1km"]
+
+  GHS_WUP_DUC:
+    aliases: [wup_duc]
+    unit: ""
+    kind: tabular
+    default_resolution: "table"
+    releases:
+      R2025A:
+        - epochs: [2025, 2050, 2075, 2100]
+          resolutions: ["table"]
+
+  GHS_WUP_MTUC:
+    aliases: [wup_mtuc, multitemporal_urban_centres]
+    unit: ""
+    kind: tabular
+    default_resolution: "table"
+    releases:
+      R2025A:
+        - epochs: [2025, 2050, 2075, 2100]
+          resolutions: ["table"]
+
+  GHS_WUP_COUNTRY_STATS:
+    aliases: [wup_country_stats, country_statistics]
+    unit: ""
+    kind: tabular
+    default_resolution: "table"
+    releases:
+      R2025A:
+        - epochs: [2025, 2050, 2075, 2100]
+          resolutions: ["table"]
