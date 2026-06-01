@@ -155,15 +155,15 @@ datasets:
       satellites: {goes16: noaa-goes16, goes18: noaa-goes18}
     default_variables: [C02]
     variables:
-      C01: {aliases: [blue], native: C01, units: reflectance, description: "ABI channel 1, 0.47 um (blue)."}
-      C02: {aliases: [red], native: C02, units: reflectance, description: "ABI channel 2, 0.64 um (red)."}
-      C03: {aliases: [veggie], native: C03, units: reflectance, description: "ABI channel 3, 0.86 um (veggie/NIR)."}
-      C07: {aliases: [shortwave_window], native: C07, units: K, description: "ABI channel 7, 3.9 um."}
-      C08: {aliases: [upper_water_vapour], native: C08, units: K, description: "ABI channel 8, 6.2 um."}
-      C09: {aliases: [mid_water_vapour], native: C09, units: K, description: "ABI channel 9, 6.9 um."}
-      C10: {aliases: [lower_water_vapour], native: C10, units: K, description: "ABI channel 10, 7.3 um."}
-      C13: {aliases: [clean_longwave_window], native: C13, units: K, description: "ABI channel 13, 10.3 um."}
-      C14: {aliases: [longwave_window], native: C14, units: K, description: "ABI channel 14, 11.2 um."}
+      C01: {aliases: [blue], native: C01, nc_variable: CMI, units: reflectance, description: "ABI channel 1, 0.47 um (blue)."}
+      C02: {aliases: [red], native: C02, nc_variable: CMI, units: reflectance, description: "ABI channel 2, 0.64 um (red)."}
+      C03: {aliases: [veggie], native: C03, nc_variable: CMI, units: reflectance, description: "ABI channel 3, 0.86 um (veggie/NIR)."}
+      C07: {aliases: [shortwave_window], native: C07, nc_variable: CMI, units: K, description: "ABI channel 7, 3.9 um."}
+      C08: {aliases: [upper_water_vapour], native: C08, nc_variable: CMI, units: K, description: "ABI channel 8, 6.2 um."}
+      C09: {aliases: [mid_water_vapour], native: C09, nc_variable: CMI, units: K, description: "ABI channel 9, 6.9 um."}
+      C10: {aliases: [lower_water_vapour], native: C10, nc_variable: CMI, units: K, description: "ABI channel 10, 7.3 um."}
+      C13: {aliases: [clean_longwave_window], native: C13, nc_variable: CMI, units: K, description: "ABI channel 13, 10.3 um."}
+      C14: {aliases: [longwave_window], native: C14, nc_variable: CMI, units: K, description: "ABI channel 14, 11.2 um."}
 
   copernicus-dem:
     description: >-

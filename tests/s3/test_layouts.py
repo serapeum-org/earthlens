@@ -148,6 +148,30 @@ def test_passthrough_without_template_raises(catalog):
         plan_products(ds, [], (0, 0, 1, 1), [], None)
 
 
+def test_sample_axis_handles_reversed_and_endpoint():
+    """_sample_axis swaps reversed bounds and always includes both ends."""
+    from earthlens.s3.layouts import _sample_axis
+
+    assert _sample_axis(2.0, 1.0)[0] == 1.0  # reversed bounds are swapped
+    pts = _sample_axis(0.0, 0.5, step=0.2)
+    assert pts[0] == 0.0 and pts[-1] == 0.5  # endpoint appended
+    exact = _sample_axis(0.0, 0.4, step=0.2)
+    assert exact[-1] == 0.4 and exact.count(0.4) == 1  # endpoint already present, not duplicated
+
+
+def test_goes_channel_with_no_matching_key_is_skipped(catalog, fake_client_factory):
+    """A GOES channel with no matching object in the hour yields no product."""
+    goes = catalog.resolve("goes")
+    client = fake_client_factory(
+        listing={"noaa-goes16": ["ABI-L2-CMIPF/2024/180/00/OR_ABI-L2-CMIPF-M6C02_G16_s.nc"]}
+    )
+    products = plan_products(
+        goes, [goes.resolve_variable("C13")], (-100, 30, -99, 31),
+        pd.to_datetime(["2024-06-28"]), client,
+    )
+    assert products == []  # only C02 is present, C13 requested
+
+
 def test_unknown_builder_raises(catalog):
     """A bogus builder token is reported with the known set."""
     ds = catalog.resolve(

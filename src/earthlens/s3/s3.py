@@ -137,6 +137,18 @@ class S3(AbstractDataSource):
         tile: str | None = None,
         max_scenes: int | None = None,
     ):
+        """Resolve the dataset and wire up the request (see the class docstring for args).
+
+        The constructor arguments are documented on the class. `scene` /
+        `tile` supply the explicit identifier for the identifier-addressed
+        datasets (Landsat scene id, NAIP quad path); `max_scenes` caps the
+        Sentinel-2 scenes kept per (tile, month). They are carried onto the
+        resolved dataset's `params` so the per-dataset resolver can read them.
+
+        Raises:
+            ValueError: If `dataset` is an unknown name or an inline spec that
+                fails validation (propagated from `Catalog.resolve`).
+        """
         self._catalog = Catalog()
         resolved = self._catalog.resolve(dataset)
         updates: dict[str, Any] = {}
@@ -404,13 +416,33 @@ class S3(AbstractDataSource):
         if variable and variable.nc_variable and variable.nc_variable in names:
             return variable.nc_variable
 
-        def _rank(name: str) -> int:
+        def _rank(name: str) -> tuple[int, int]:
+            # Rank by dimensionality, then de-prioritise known auxiliary
+            # variables (quality flags, coordinate bounds, date helpers) so a
+            # 2-D `DQF` never outranks a 2-D `CMI` on a tie.
+            auxiliary = name in {"DQF"} or name.endswith(("_bounds", "_date", "_id"))
             try:
-                return len(nc.get_variable(name).shape)
-            except Exception:  # noqa: BLE001 - unreadable variable ranks lowest
-                return 0
+                ndim = len(nc.get_variable(name).shape)
+            except Exception:  # noqa: BLE001
+                # pyramids raises (e.g. RuntimeError "Invalid iXDim/iYDim") for a
+                # 1-D auxiliary it cannot read as a grid; rank it lowest.
+                ndim = 0
+            return (ndim, 0 if auxiliary else 1)
 
         return max(names, key=_rank)
+
+    def _resolve_nc_variable(self, raw: Path, product: RemoteProduct) -> str:
+        """In-file NetCDF variable for `product`, opening the granule only if unpinned.
+
+        Uses the catalog's pinned `nc_variable` when present (no I/O); otherwise
+        reads the granule and falls back to `_nc_variable_name`.
+        """
+        variable = self._variable_for_native(product.metadata.get("variable"))
+        if variable and variable.nc_variable:
+            return variable.nc_variable
+        from pyramids.netcdf import NetCDF
+
+        return self._nc_variable_name(NetCDF.read_file(str(raw)), product)
 
     # -- public API ----------------------------------------------------
 
@@ -463,7 +495,6 @@ class S3(AbstractDataSource):
             The per-window GeoTIFF paths.
         """
         from earthlens.aggregate import aggregate_netcdf
-        from pyramids.netcdf import NetCDF
 
         client = self._auth.client()
         raw_dir = self._raw_dir()
@@ -475,11 +506,11 @@ class S3(AbstractDataSource):
             if raw is None:
                 continue
             native = product.metadata.get("variable")
-            # Resolve the *in-file* variable name from the granule (e.g. ERA5
-            # `128_167_2t` -> `VAR_2T`); the native token is not the NetCDF
-            # variable name, so passing it would make aggregate_netcdf find
-            # nothing.
-            nc_variable = self._nc_variable_name(NetCDF.read_file(str(raw)), product)
+            # Resolve the *in-file* variable name (e.g. ERA5 `128_167_2t` ->
+            # `VAR_2T`); the native token is not the NetCDF variable name. Prefer
+            # the catalog's pinned `nc_variable` so the granule is not re-opened
+            # just to read it (aggregate_netcdf opens it anyway).
+            nc_variable = self._resolve_nc_variable(raw, product)
             var_info = _AggregationVariable(
                 nc_variable=nc_variable,
                 cds_variable=native or "",

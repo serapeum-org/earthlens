@@ -194,6 +194,24 @@ class Dataset(BaseModel):
         Returns:
             The resolved `Variable` rows, de-duplicated in first-seen
             order by native token.
+
+        Examples:
+            - Resolve a list of friendly names / aliases to native tokens:
+                ```python
+                >>> from earthlens.s3 import Catalog
+                >>> s2 = Catalog().get_dataset("sentinel-2-l2a")
+                >>> [v.native for v in s2.resolve_variables(["red", "nir"])]
+                ['B04', 'B08']
+
+                ```
+            - `None` falls back to the dataset defaults:
+                ```python
+                >>> from earthlens.s3 import Catalog
+                >>> s2 = Catalog().get_dataset("sentinel-2-l2a")
+                >>> [v.native for v in s2.resolve_variables(None)]
+                ['B04', 'B03', 'B02']
+
+                ```
         """
         if not keys:
             keys = self.default_variables or list(self.variables)
@@ -370,5 +388,18 @@ class Catalog(AbstractCatalog):
         return self.get_dataset(dataset)
 
     def dataset_names(self) -> list[str]:
-        """Return the registered dataset names, sorted."""
+        """Return the registered dataset names, sorted.
+
+        Returns:
+            The sorted registry names.
+
+        Examples:
+            - List every registered dataset:
+                ```python
+                >>> from earthlens.s3 import Catalog
+                >>> Catalog().dataset_names()
+                ['copernicus-dem', 'era5', 'esa-worldcover', 'goes', 'naip-source', 'sentinel-2-l2a', 'usgs-landsat']
+
+                ```
+        """
         return sorted(self.datasets)

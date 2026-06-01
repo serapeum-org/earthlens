@@ -235,6 +235,35 @@ def test_reproject_branch_runs_for_non_4326(tmp_path, fake_client_factory, patch
     assert len(paths) == 1 and Path(paths[0]).exists()
 
 
+def test_goes_selects_cmi_over_dqf(tmp_path, fake_client_factory, patch_auth):
+    """GOES resolves the data variable CMI, never the same-rank DQF quality flag (review M1)."""
+    import numpy as np
+    import xarray as xr
+    from earthlens.base import RemoteProduct
+    from pyramids.netcdf import NetCDF
+
+    patch_auth(fake_client_factory())
+    nc_path = tmp_path / "goes_cmi_dqf.nc"
+    n = 8
+    # DQF deliberately listed before CMI to defeat a naive first-at-max-rank pick
+    xr.Dataset(
+        {
+            "DQF": (("y", "x"), np.zeros((n, n), "float32")),
+            "CMI": (("y", "x"), np.ones((n, n), "float32")),
+        },
+        coords={"y": np.arange(n, dtype="float64"), "x": np.arange(n, dtype="float64")},
+    ).to_netcdf(nc_path)
+
+    source = S3(start="2024-06-28", end="2024-06-28", lat_lim=[30, 32], lon_lim=[-100, -98],
+                dataset="goes", variables=["C13"], path=str(tmp_path))
+    product = RemoteProduct(id="x", href="x.nc", metadata={"bucket": "b", "variable": "C13"})
+    # pinned nc_variable wins outright:
+    assert source._nc_variable_name(NetCDF.read_file(str(nc_path)), product) == "CMI"
+    # and even an unpinned token falls back to the tie-break, which avoids DQF:
+    unpinned = RemoteProduct(id="x", href="x.nc", metadata={"bucket": "b", "variable": "zzz"})
+    assert source._nc_variable_name(NetCDF.read_file(str(nc_path)), unpinned) == "CMI"
+
+
 def test_nc_variable_name_picks_gridded_over_helper(tmp_path, fake_client_factory, patch_auth):
     """With multiple variables and no usable pin, the gridded data var wins over a 1-D helper (M3)."""
     import numpy as np
@@ -302,6 +331,74 @@ def test_goes_geostationary_localise_warps_to_wgs84(tmp_path, fake_client_factor
     out = source._localise(tiny_goes_nc, product)
     cropped = Dataset.read_file(str(out))
     assert cropped.epsg == 4326 and cropped.shape[1] >= 1 and cropped.shape[2] >= 1
+
+
+def test_variables_accepts_a_single_string(tmp_path, fake_client_factory, patch_auth):
+    """A bare string variable is normalised to a one-element list."""
+    patch_auth(fake_client_factory())
+    source = _dem_source(tmp_path, variables="elevation")
+    assert source.vars == ["elevation"]
+
+
+def test_netcdf_no_lon_wrap_branch(tmp_path, fake_client_factory, patch_auth, tiny_era5_nc):
+    """A NetCDF dataset without the 0-360 convention skips the longitude wrap."""
+    from earthlens.base import RemoteProduct
+    from pyramids.dataset import Dataset
+
+    patch_auth(fake_client_factory())
+    source = S3(
+        start="2023-12-01", end="2023-12-01", lat_lim=[40.0, 42.0], lon_lim=[12.0, 14.0],
+        dataset={"bucket": "b", "format": "netcdf", "layout": "prefix_listing", "crs": 4326},
+        variables=["VAR_2T"], path=str(tmp_path),
+    )
+    assert source._dataset.lon_convention is None
+    out = source._localise(tiny_era5_nc, RemoteProduct(id="x", href="x.nc", metadata={"bucket": "b", "variable": "VAR_2T"}))
+    assert Dataset.read_file(str(out)).epsg == 4326
+
+
+def test_resolve_nc_variable_reads_file_when_unpinned(tmp_path, fake_client_factory, patch_auth, tiny_era5_nc):
+    """With no pinned nc_variable, _resolve_nc_variable falls back to reading the granule."""
+    from earthlens.base import RemoteProduct
+
+    patch_auth(fake_client_factory())
+    source = S3(
+        start="2024-06-01", end="2024-06-01", lat_lim=[0, 1], lon_lim=[0, 1],
+        dataset={"bucket": "b", "format": "netcdf", "layout": "prefix_listing", "crs": 4326},
+        variables=["x"], path=str(tmp_path),
+    )
+    product = RemoteProduct(id="x", href="x.nc", metadata={"bucket": "b", "variable": "x"})
+    assert source._resolve_nc_variable(tiny_era5_nc, product) == "VAR_2T"
+
+
+def test_download_aggregate_routes_for_netcdf(tmp_path, fake_client_factory, patch_auth, monkeypatch):
+    """download(aggregate=) for a NetCDF dataset routes into _aggregate."""
+    patch_auth(fake_client_factory())
+    source = S3(start="2024-06-01", end="2024-06-01", lat_lim=[0, 1], lon_lim=[0, 1],
+                dataset="era5", path=str(tmp_path))
+    monkeypatch.setattr(source, "_search", lambda: [])
+    monkeypatch.setattr(source, "_aggregate", lambda products, agg: ["sentinel"])
+    assert source.download(aggregate=AggregationConfig(freq="D", op="mean")) == ["sentinel"]
+
+
+def test_aggregate_skips_missing_and_failed(tmp_path, fake_client_factory, patch_auth, monkeypatch):
+    """_aggregate skips a missing granule and a granule whose aggregation raises."""
+    import earthlens.aggregate as agg
+    from earthlens.base import RemoteProduct
+
+    patch_auth(fake_client_factory())
+    source = S3(start="2024-06-01", end="2024-06-01", lat_lim=[0, 1], lon_lim=[0, 1],
+                dataset="era5", path=str(tmp_path))
+    p_missing = RemoteProduct(id="m", href="m.nc", metadata={"bucket": "b", "variable": "128_167_2t"})
+    p_fail = RemoteProduct(id="f", href="f.nc", metadata={"bucket": "b", "variable": "128_167_2t"})
+    raws = {"m": None, "f": tmp_path / "f.nc"}
+    (tmp_path / "f.nc").write_bytes(b"x")
+    monkeypatch.setattr(source, "_download_raw", lambda c, p, d: raws[p.id])
+
+    def _boom(path, var_info, config):
+        raise RuntimeError("bad granule")
+
+    monkeypatch.setattr(agg, "aggregate_netcdf", _boom)
+    assert source._aggregate([p_missing, p_fail], AggregationConfig(freq="D", op="mean")) == []
 
 
 def test_aggregate_resolves_in_file_variable_and_runs(tmp_path, fake_client_factory, patch_auth, monkeypatch, tiny_era5_nc):

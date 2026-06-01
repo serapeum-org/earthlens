@@ -71,6 +71,28 @@ def plan_products(
     Raises:
         ValueError: If the dataset names an unknown builder, or a
             passthrough spec lacks a usable `key_template`.
+
+    Examples:
+        - Plan the Copernicus DEM tile keys for a bbox (deterministic, no client):
+            ```python
+            >>> from earthlens.s3 import Catalog
+            >>> from earthlens.s3.layouts import plan_products
+            >>> dem = Catalog().get_dataset("copernicus-dem")
+            >>> products = plan_products(dem, dem.resolve_variables(None), (6.4, 0.4, 6.6, 0.6), [])
+            >>> products[0].href
+            'Copernicus_DSM_COG_10_N00_00_E006_00_DEM/Copernicus_DSM_COG_10_N00_00_E006_00_DEM.tif'
+
+            ```
+        - A bbox spanning two 1-degree tiles plans one product per tile:
+            ```python
+            >>> from earthlens.s3 import Catalog
+            >>> from earthlens.s3.layouts import plan_products
+            >>> dem = Catalog().get_dataset("copernicus-dem")
+            >>> products = plan_products(dem, dem.resolve_variables(None), (5.5, 0.5, 7.5, 0.5), [])
+            >>> [p.metadata["tile"] for p in products]
+            ['N00E005', 'N00E006', 'N00E007']
+
+            ```
     """
     # Registered datasets carry an explicit builder; a passthrough spec has
     # none and is always resolved through the generic key-template path.
@@ -224,13 +246,20 @@ def _era5_products(dataset, variables, bbox, dates, client) -> list[RemoteProduc
     return out
 
 
+def _scene_index(scene_prefix: str) -> int:
+    """Numeric trailing index of a Sentinel-2 scene prefix (`.../6/10/` -> 10)."""
+    tail = scene_prefix.rstrip("/").rsplit("/", 1)[-1]
+    return int(tail) if tail.isdigit() else -1
+
+
 def _sentinel2_products(dataset, variables, bbox, dates, client) -> list[RemoteProduct]:
     """Sentinel-2 L2A (sentinel-cogs): one COG per (band, scene) over the MGRS tiles.
 
     bbox->scene discovery has no cloud filter; a wide AOI / long window can
     match many scenes. `params["max_scenes"]` (the `max_scenes=` request arg)
-    caps the scenes kept per (tile, month) — the most recent ones — with a
-    warning when truncating. The STAC backend is the cloud/latest-filtered path.
+    caps the scenes kept per (tile, month) — the highest-indexed ones — with a
+    warning when truncating. The scene index is not a strict recency signal, so
+    use the STAC backend for true latest / cloud-cover filtering.
     """
     collection = dataset.params["collection_prefix"]
     max_scenes = dataset.params.get("max_scenes")
@@ -242,9 +271,9 @@ def _sentinel2_products(dataset, variables, bbox, dates, client) -> list[RemoteP
             if max_scenes is not None and len(scenes) > max_scenes:
                 logger.warning(
                     f"sentinel-2: {len(scenes)} scenes under {month_prefix}; "
-                    f"keeping the {max_scenes} most recent (max_scenes={max_scenes})."
+                    f"keeping the {max_scenes} highest-indexed (max_scenes={max_scenes})."
                 )
-                scenes = sorted(scenes)[-max_scenes:]
+                scenes = sorted(scenes, key=_scene_index)[-max_scenes:]
             for scene_prefix in scenes:
                 for var in variables:
                     out.append(
