@@ -42,13 +42,13 @@ paths = nwm.download()
 |----------|---------|
 | `variables` | `{product: [variable, ...]}`. The MVP downloads whole files, so the variable list is **validated** (unknown names raise) but every variable in the file is fetched. An empty list selects all of the product's variables. |
 | `configuration` | The operational run key — any of the 55 in `Catalog().available_configurations` (`"short_range"`, `"analysis_assim"`, `"medium_range"`, `"long_range"`, the `*_alaska` / `*_hawaii` / `*_puertorico` regional and `*_coastal_*` domains, the `forcing_*` runs, …). Default `"short_range"`. |
-| `mode` | `"operational"` (NetCDF) or `"retrospective"` (Zarr, `PY-G`-gated). `None` (default) auto-routes by the date window. |
+| `mode` | `"operational"` (NetCDF) or `"retrospective"` (Zarr — tabular products only). `None` (default) auto-routes by the date window. |
 | `member` | Ensemble member (1-based) for an ensemble configuration (`medium_range`, members 1–6); ignored for deterministic runs. |
 | `cycles` | Restrict the UTC run hours fetched (a subset of the configuration's run hours). Default: every cycle the configuration runs. |
 | `steps` | Explicit forecast (`fNNN`) / analysis (`tmNN`) steps. Wins over `horizon`. |
 | `horizon` | Maximum step; expands from the configuration's first step on its cadence. |
-| `sites` | Explicit `feature_id`s / USGS gage ids to subset to — **`PY-G`-gated** (raises). |
-| `lat_lim` / `lon_lim` | Bounding box. A **whole-Earth** box (`[-90, 90]` / `[-180, 180]`) means "no spatial subset" — required to download whole files. A narrower box is a crop and is **`PY-G`-gated**. |
+| `sites` | Explicit `feature_id`s and/or USGS `gage_id` strings to subset to (tabular products) — read + sliced through the pyramids reader into a Parquet table. |
+| `lat_lim` / `lon_lim` | Bounding box. A **whole-Earth** box (`[-90, 90]` / `[-180, 180]`) means "no spatial subset" → whole-file download. A narrower box subsets the tabular products by their in-file lat/lon coords. |
 | `path` | Output directory for the fetched NetCDF files. |
 
 ## What you get back
@@ -86,21 +86,39 @@ NWM(start="2026-05-26", end="2026-05-26",
 ## Why `aggregate=` is rejected
 
 `chrtout` is feature-id-indexed (not a griddable raster), and a gridded
-`ldasout` temporal reduce needs to *read* the file — a pyramids `PY-G`
-capability. So `download(aggregate=...)` raises `NotImplementedError`.
+temporal reduce needs a separate gridded reader. So
+`download(aggregate=...)` raises `NotImplementedError`.
 
 ## Subsetting and the retrospective archive
 
-Operational files are whole-CONUS, so any subset (a `sites=` list, a
-narrower bbox) needs a read, as does the retrospective Zarr. Until the
-pyramids `PY-G` reader is released, these raise a clear
-`NotImplementedError` naming `PY-G`:
+Operational files are whole-CONUS, so a subset is *read* rather than
+downloaded whole, through `pyramids.netcdf.LabeledDataset`
+(pyramids ≥ 0.29.0) — earthlens never imports `xarray`/`zarr` itself. For
+the **tabular** products (`chrtout`, `lakeout`, `coastal`) a `sites=`
+list, a bbox, or the retrospective Zarr opens anonymously + lazily,
+slices, and writes a tidy `feature_id × time` **Parquet** table:
 
 ```python
-NWM(..., sites=[101]).download()                       # raises (PY-G)
-NWM(..., lat_lim=[30, 40], lon_lim=[-100, -90]).download()  # raises (PY-G)
-NWM(..., mode="retrospective").download()              # raises (PY-G)
+# Retrospective streamflow for three reaches over a window -> Parquet
+NWM(start="2010-06-01", end="2010-06-30",
+    variables={"chrtout": ["streamflow"]},
+    lat_lim=[-90, 90], lon_lim=[-180, 180],
+    configuration="analysis_assim", mode="retrospective",
+    sites=[101, 179, 181],          # feature_ids; USGS gage_id strings also work
+    path="./nwm_out").download()    # -> [Path('chrtout_retro_20100601_20100630.parquet')]
+
+# Operational subset by a bbox (downloads the whole file, then slices it)
+NWM(start="2026-05-26", end="2026-05-26",
+    variables={"chrtout": ["streamflow"]},
+    lat_lim=[39, 40], lon_lim=[-77, -76],
+    configuration="analysis_assim", cycles=[0], steps=[0],
+    path="./nwm_out").download()    # -> a Parquet table for the reaches in the box
 ```
+
+Subsetting / retrospective for the **gridded** products (`ldasout`,
+`rtout`, `forcing`) needs a gridded cloud-cube reader pyramids does not
+yet expose, so those raise a clear `NotImplementedError`; request them
+without a subset to download the whole operational files.
 
 ## Catalog tooling
 

@@ -49,27 +49,32 @@ The mode auto-routes from the date window (recent → operational, old →
 retrospective), or you can force it with `mode=`. The **operational
 whole-file download** is the shipped capability.
 
-## What is shipped vs deferred (the `PY-G` caveat)
+## Whole-file download vs. subset / retrospective
 
 An operational NWM file is **whole-CONUS** — one `channel_rt` file
 (~14 MB) holds *every* one of the 2.7 M reaches at a single timestep, and
-a `land` file is ~30 MB. The MVP **downloads those whole files** (no
-read, no `xarray`).
+a `land` file is ~30 MB. A plain operational request (whole-Earth bbox,
+no `sites=`) **downloads those whole files**.
 
-**Any subset** needs a read of the file, and reading cloud Zarr /
-`feature_id` NetCDF is a GIS-I/O primitive that belongs in
-[pyramids](https://github.com/serapeum-org/pyramids) (tracked as the
-unreleased `PY-G` capability), **not** an `xarray` import in earthlens.
-So until `PY-G` lands, the following raise a clear `NotImplementedError`
-naming `PY-G`:
+A **subset** or the **retrospective** archive is *read* rather than
+downloaded whole, through
+[pyramids](https://github.com/serapeum-org/pyramids)'s
+`pyramids.netcdf.LabeledDataset` (pyramids ≥ 0.29.0) — earthlens never
+imports `xarray` / `zarr` itself; pyramids owns the read. For the
+**tabular** products (`chrtout`, `lakeout`, `coastal`):
 
-* a `sites=` selection (explicit `feature_id`s or USGS gage ids),
-* a bbox narrower than whole-Earth (a spatial crop),
-* `mode="retrospective"` (the 1.4 TB Zarr, which is always subset, never
-  downloaded whole).
+* a `sites=` selection (explicit `feature_id`s or USGS `gage_id`s),
+* a bbox narrower than whole-Earth,
+* `mode="retrospective"` (the 1.4 TB Zarr, always subset, never
+  downloaded whole),
 
-A plain operational request (whole-Earth bbox, no `sites=`) downloads the
-whole files today.
+are opened anonymously + lazily, sliced, and written as a tidy
+`feature_id × time` **Parquet** table.
+
+Subsetting / retrospective for the **gridded** products (`ldasout`,
+`rtout`, `forcing`) still needs a gridded cloud-cube reader that pyramids
+does not yet expose, so those raise a clear `NotImplementedError`; their
+whole-file operational download works.
 
 ## See also
 
