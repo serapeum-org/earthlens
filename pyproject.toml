@@ -85,7 +85,12 @@ all = [
     "earthlens[overture]",
     "earthlens[usgs-water]",
     "earthlens[ghsl]",
-    "earthlens[worldpop]",
+    # NOT earthlens[worldpop]: worldpoppy's tree (rioxarray/rasterio/dask)
+    # collides with copernicusmarine's zarr->numcodecs->deprecated->wrapt chain
+    # and makes pip backtrack to a wrapt sdist that fails to build on 3.12+
+    # (`from inspect import formatargspec`, removed in 3.11) — confirmed by the
+    # wheel matrix. Take only worldpop's pure-Python py7zr extractor here.
+    "py7zr >=0.20",
 ]
 
 [dependency-groups]
