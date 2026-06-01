@@ -183,6 +183,11 @@ nav:
       - Usage: reference/firms/usage.md
       - Authentication: reference/firms/authentication.md
       - Reference: reference/firms/firms.md
+    - HDX (humanitarian data):
+      - Introduction: reference/hdx/introduction.md
+      - Usage: reference/hdx/usage.md
+      - Catalog & Tooling: reference/hdx/catalog.md
+      - Reference: reference/hdx/hdx.md
     - Overture Maps (vector basemap):
       - Introduction: reference/overture/introduction.md
       - Usage: reference/overture/usage.md
@@ -317,6 +322,12 @@ nav:
       - Quickstart — recent fires: examples/firms/quickstart.ipynb
       - Fire-season time-series: examples/firms/fire_season_timeseries.ipynb
       - MODIS vs VIIRS comparison: examples/firms/modis_vs_viirs_comparison.ipynb
+    - Humanitarian data (HDX):
+      - Catalog explorer (no network): examples/hdx/catalog_explorer.ipynb
+      - WFP food-security table (live): examples/hdx/wfp_food_security_table.ipynb
+      - COD administrative boundaries (live): examples/hdx/cod_admin_boundaries.ipynb
+      - HOTOSM building export (live): examples/hdx/hotosm_building_export.ipynb
+      - Arbitrary HDX id (live): examples/hdx/arbitrary_hdx_id.ipynb
     - Overture Maps (vector basemap):
       - Catalog explorer (no network): examples/overture/01_catalog_explorer.ipynb
       - Places quickstart: examples/overture/02_places_quickstart.ipynb

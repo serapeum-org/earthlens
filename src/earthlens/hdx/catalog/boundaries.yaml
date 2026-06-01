@@ -1,0 +1,121 @@
+# Curated HDX datasets — administrative boundaries.
+#
+# Kontur global/national boundary GeoPackages and OCHA Common Operational
+# Datasets (COD-AB) administrative boundaries. All vector.
+datasets:
+  kontur-boundaries:
+    hdx_id: kontur-boundaries
+    org: kontur
+    title: "Kontur Boundaries: Global administrative divisions with aggregated population"
+    themes: [boundaries, population]
+    formats: [Geopackage]
+    resource_filter: "*.gpkg.gz"
+    output_kinds: [vector]
+
+  kontur-boundaries-afghanistan:
+    hdx_id: kontur-boundaries-afghanistan
+    org: kontur
+    title: "Afghanistan: Administrative Division with Aggregated Population"
+    themes: [boundaries, population]
+    formats: [Geopackage]
+    resource_filter: "*.gpkg.gz"
+    output_kinds: [vector]
+
+  kontur-boundaries-albania:
+    hdx_id: kontur-boundaries-albania
+    org: kontur
+    title: "Albania: Administrative Division with Aggregated Population"
+    themes: [boundaries, population]
+    formats: [Geopackage]
+    resource_filter: "*.gpkg.gz"
+    output_kinds: [vector]
+
+  kontur-boundaries-algeria:
+    hdx_id: kontur-boundaries-algeria
+    org: kontur
+    title: "Algeria: Administrative Division with Aggregated Population"
+    themes: [boundaries, population]
+    formats: [Geopackage]
+    resource_filter: "*.gpkg.gz"
+    output_kinds: [vector]
+
+  kontur-boundaries-angola:
+    hdx_id: kontur-boundaries-angola
+    org: kontur
+    title: "Angola: Administrative Division with Aggregated Population"
+    themes: [boundaries, population]
+    formats: [Geopackage]
+    resource_filter: "*.gpkg.gz"
+    output_kinds: [vector]
+
+  cod-ab-mali:
+    hdx_id: cod-ab-mli
+    org: ocha-fiss
+    title: "Mali: Subnational Administrative Boundaries (COD-AB)"
+    themes: [boundaries]
+    formats: [SHP, GeoJSON, Geodatabase]
+    resource_filter: SHP
+    output_kinds: [vector]
+
+  cod-ab-kenya:
+    hdx_id: cod-ab-ken
+    org: ocha-fiss
+    title: "Kenya: Subnational Administrative Boundaries (COD-AB)"
+    themes: [boundaries]
+    formats: [SHP, GeoJSON, Geodatabase]
+    resource_filter: SHP
+    output_kinds: [vector]
+
+  cod-ab-somalia:
+    hdx_id: cod-ab-som
+    org: ocha-fiss
+    title: "Somalia: Subnational Administrative Boundaries (COD-AB)"
+    themes: [boundaries]
+    formats: [SHP, GeoJSON, Geodatabase]
+    resource_filter: SHP
+    output_kinds: [vector]
+
+  cod-ab-peru:
+    hdx_id: cod-ab-per
+    org: ocha-fiss
+    title: "Peru: Subnational Administrative Boundaries (COD-AB)"
+    themes: [boundaries]
+    formats: [SHP, GeoJSON, Geodatabase]
+    resource_filter: SHP
+    output_kinds: [vector]
+
+  cod-ab-liberia:
+    hdx_id: cod-ab-lbr
+    org: ocha-fiss
+    title: "Liberia: Subnational Administrative Boundaries (COD-AB)"
+    themes: [boundaries]
+    formats: [SHP, GeoJSON, Geodatabase]
+    resource_filter: SHP
+    output_kinds: [vector]
+
+  cod-ab-cameroon:
+    hdx_id: cod-ab-cmr
+    org: ocha-fiss
+    title: "Cameroon: Subnational Administrative Boundaries (COD-AB)"
+    themes: [boundaries]
+    formats: [SHP, GeoJSON, Geodatabase]
+    resource_filter: SHP
+    output_kinds: [vector]
+
+  cod-ab-ghana:
+    hdx_id: cod-ab-gha
+    org: ocha-fiss
+    title: "Ghana: Subnational Administrative Boundaries (COD-AB)"
+    themes: [boundaries]
+    formats: [SHP, GeoJSON, Geodatabase]
+    resource_filter: SHP
+    output_kinds: [vector]
+
+  cod-ab-senegal:
+    hdx_id: cod-ab-sen
+    org: ocha-fiss
+    title: "Senegal: Subnational Administrative Boundaries (COD-AB)"
+    themes: [boundaries]
+    formats: [SHP, GeoJSON, Geodatabase]
+    resource_filter: SHP
+    output_kinds: [vector]
