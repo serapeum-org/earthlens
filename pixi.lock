@@ -9487,7 +9487,7 @@ packages:
 - pypi: ./
   name: earthlens
   version: 0.6.0
-  sha256: c60ace609fe97a599da367e94fe57bec2cf01e6415c06053eb8e46697dab889d
+  sha256: 2b02a1e556fcfe203b6373110207812ff28ac2b5ed2c9065f52a8a7df6c57594
   requires_dist:
   - pyramids-gis>=0.28.0
   - geopandas>=1.0.0
@@ -9527,23 +9527,29 @@ packages:
   - dataretrieval>=1.1.4 ; extra == 'usgs-water'
   - worldpoppy>=0.4 ; extra == 'worldpop'
   - py7zr>=0.20 ; extra == 'worldpop'
-  - earthlens[s3] ; extra == 'all'
-  - earthlens[ecmwf] ; extra == 'all'
-  - earthlens[gee] ; extra == 'all'
-  - earthlens[cmems] ; extra == 'all'
-  - earthlens[fdsn] ; extra == 'all'
-  - earthlens[earthdata] ; extra == 'all'
-  - earthlens[eumetsat] ; extra == 'all'
-  - earthlens[nwp] ; extra == 'all'
-  - earthlens[radar] ; extra == 'all'
-  - earthlens[stac] ; extra == 'all'
-  - earthlens[openeo] ; extra == 'all'
-  - earthlens[sentinel-hub] ; extra == 'all'
-  - earthlens[tropycal] ; extra == 'all'
-  - earthlens[overture] ; extra == 'all'
-  - earthlens[usgs-water] ; extra == 'all'
-  - earthlens[ghsl] ; extra == 'all'
+  - boto3>=1.43.0 ; extra == 'all'
+  - botocore>=1.34.0 ; extra == 'all'
+  - cartopy>=0.22 ; extra == 'all'
+  - cdsapi>=0.7.7 ; extra == 'all'
+  - copernicusmarine>=2.0.0,<3 ; extra == 'all'
+  - dataretrieval>=1.1.4 ; extra == 'all'
+  - duckdb>=1.0.0 ; extra == 'all'
+  - earthengine-api>=1.7.26 ; extra == 'all'
+  - earthaccess>=0.18.0 ; python_full_version >= '3.12' and extra == 'all'
+  - eumdac>=3.1 ; extra == 'all'
+  - google-api-python-client>=2.0 ; extra == 'all'
+  - google-cloud-storage>=2.0 ; extra == 'all'
+  - herbie-data>=2026.3 ; extra == 'all'
+  - ecmwf-opendata>=0.3 ; extra == 'all'
+  - obspy>=1.5.0 ; extra == 'all'
+  - openeo>=0.47,<0.48 ; extra == 'all'
+  - overturemaps>=1.0.0 ; extra == 'all'
   - py7zr>=0.20 ; extra == 'all'
+  - pyramids-gis[stac] ; extra == 'all'
+  - rtree>=1.0.0 ; extra == 'all'
+  - sentinelhub>=3.11.5 ; extra == 'all'
+  - tropycal>=1.4 ; extra == 'all'
+  - urllib3>=1.26 ; extra == 'all'
   requires_python: '>=3.11,<4'
 - pypi: https://files.pythonhosted.org/packages/09/40/42bb2d98bc6103194d25fa8da141cd43cabf32277cbf2ab513fe35532196/eccodes-2.47.0-cp311-cp311-win_amd64.whl
   name: eccodes
