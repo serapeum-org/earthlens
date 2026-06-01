@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -13375,7 +13375,7 @@ value to gate <code>aggregate=</code>.</p>
 <a id="__codelineno-0-642" name="__codelineno-0-642"></a>                <span class="s2">&quot;pyramids&#39; DatasetCollection.groupby, which the installed &quot;</span>
 <a id="__codelineno-0-643" name="__codelineno-0-643"></a>                <span class="s2">&quot;pyramids build does not provide.&quot;</span>
 <a id="__codelineno-0-644" name="__codelineno-0-644"></a>            <span class="p">)</span>
-<a id="__codelineno-0-645" name="__codelineno-0-645"></a>        <span class="n">collection</span> <span class="o">=</span> <span class="n">DatasetCollection</span><span class="o">.</span><span class="n">read_file</span><span class="p">([</span><span class="nb">str</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">paths</span><span class="p">])</span>
+<a id="__codelineno-0-645" name="__codelineno-0-645"></a>        <span class="n">collection</span> <span class="o">=</span> <span class="n">DatasetCollection</span><span class="o">.</span><span class="n">from_files</span><span class="p">([</span><span class="nb">str</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">paths</span><span class="p">])</span>
 <a id="__codelineno-0-646" name="__codelineno-0-646"></a>        <span class="n">grouped</span> <span class="o">=</span> <span class="n">collection</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">freq</span><span class="p">)</span>
 <a id="__codelineno-0-647" name="__codelineno-0-647"></a>        <span class="k">return</span> <span class="p">[</span><span class="n">Path</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">grouped</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">root_dir</span><span class="p">))]</span>
 </code></pre></div></td></tr></table></div>
@@ -17415,7 +17415,7 @@ value to gate <code>aggregate=</code>.</p>
 <a id="__codelineno-0-642" name="__codelineno-0-642"></a>                <span class="s2">&quot;pyramids&#39; DatasetCollection.groupby, which the installed &quot;</span>
 <a id="__codelineno-0-643" name="__codelineno-0-643"></a>                <span class="s2">&quot;pyramids build does not provide.&quot;</span>
 <a id="__codelineno-0-644" name="__codelineno-0-644"></a>            <span class="p">)</span>
-<a id="__codelineno-0-645" name="__codelineno-0-645"></a>        <span class="n">collection</span> <span class="o">=</span> <span class="n">DatasetCollection</span><span class="o">.</span><span class="n">read_file</span><span class="p">([</span><span class="nb">str</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">paths</span><span class="p">])</span>
+<a id="__codelineno-0-645" name="__codelineno-0-645"></a>        <span class="n">collection</span> <span class="o">=</span> <span class="n">DatasetCollection</span><span class="o">.</span><span class="n">from_files</span><span class="p">([</span><span class="nb">str</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">paths</span><span class="p">])</span>
 <a id="__codelineno-0-646" name="__codelineno-0-646"></a>        <span class="n">grouped</span> <span class="o">=</span> <span class="n">collection</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">freq</span><span class="p">)</span>
 <a id="__codelineno-0-647" name="__codelineno-0-647"></a>        <span class="k">return</span> <span class="p">[</span><span class="n">Path</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">grouped</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">root_dir</span><span class="p">))]</span>
 </code></pre></div></td></tr></table></div>
