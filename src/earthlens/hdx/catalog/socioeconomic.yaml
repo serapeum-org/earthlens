@@ -1,0 +1,47 @@
+# Curated HDX datasets — socioeconomic indicators (UNDP Human Development
+# Reports Office). Tabular CSV / XLSX indicator tables.
+datasets:
+  undp-human-development-index:
+    hdx_id: human-development-index-hdi
+    org: undp-human-development-reports-office
+    title: "Human Development Index (HDI)"
+    themes: [socioeconomic, development]
+    formats: [CSV]
+    resource_filter: CSV
+    output_kinds: [tabular]
+
+  undp-gender-inequality-index:
+    hdx_id: gender-inequality-index
+    org: undp-human-development-reports-office
+    title: "Gender Inequality Index (GII)"
+    themes: [socioeconomic, gender]
+    formats: [CSV]
+    resource_filter: CSV
+    output_kinds: [tabular]
+
+  undp-multidimensional-poverty-index:
+    hdx_id: multidimensional-poverty-index
+    org: undp-human-development-reports-office
+    title: "Multidimensional Poverty Index (MPI)"
+    themes: [socioeconomic, poverty]
+    formats: [CSV]
+    resource_filter: CSV
+    output_kinds: [tabular]
+
+  undp-population-trends:
+    hdx_id: population-trends
+    org: undp-human-development-reports-office
+    title: "Population Trends"
+    themes: [socioeconomic, population]
+    formats: [CSV]
+    resource_filter: CSV
+    output_kinds: [tabular]
+
+  undp-hdi-trends:
+    hdx_id: human-development-index-trends
+    org: undp-human-development-reports-office
+    title: "Human Development Index Trends"
+    themes: [socioeconomic, development]
+    formats: [XLSX]
+    resource_filter: ""
+    output_kinds: [tabular]

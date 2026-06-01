@@ -1,0 +1,29 @@
+# Curated HDX datasets — conflict & political violence (ACLED). Tabular
+# event/fatality tables (XLSX).
+datasets:
+  acled-civilian-targeting:
+    hdx_id: civilian-targeting-events-and-fatalities
+    org: acled
+    title: "Civilian Targeting Events and Fatalities"
+    themes: [conflict, protection]
+    formats: [XLSX]
+    resource_filter: ""
+    output_kinds: [tabular]
+
+  acled-political-violence:
+    hdx_id: political-violence-events-and-fatalities
+    org: acled
+    title: "Political Violence Events and Fatalities"
+    themes: [conflict]
+    formats: [XLSX]
+    resource_filter: ""
+    output_kinds: [tabular]
+
+  acled-demonstrations:
+    hdx_id: demonstration-events
+    org: acled
+    title: "Demonstration Events (Protests and Riots)"
+    themes: [conflict]
+    formats: [XLSX]
+    resource_filter: ""
+    output_kinds: [tabular]

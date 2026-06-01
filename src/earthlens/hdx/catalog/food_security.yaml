@@ -1,0 +1,38 @@
+# Curated HDX datasets — food security & market prices (WFP). Tabular
+# CSV / XLSX indicator tables.
+datasets:
+  wfp-food-prices:
+    hdx_id: wfp-food-prices
+    org: wfp
+    title: "WFP Food Prices"
+    themes: [food-security, markets]
+    formats: [CSV]
+    resource_filter: CSV
+    output_kinds: [tabular]
+
+  wfp-food-consumption-score:
+    hdx_id: food-consumption-score-fcs
+    org: wfp
+    title: "Food Consumption Score (FCS)"
+    themes: [food-security]
+    formats: [CSV]
+    resource_filter: CSV
+    output_kinds: [tabular]
+
+  wfp-coping-strategy-index:
+    hdx_id: coping-strategy-index-csi
+    org: wfp
+    title: "Coping Strategy Index (CSI)"
+    themes: [food-security]
+    formats: [CSV]
+    resource_filter: CSV
+    output_kinds: [tabular]
+
+  wfp-topline-figures:
+    hdx_id: wfp-topline-figures
+    org: wfp
+    title: "WFP Topline Figures"
+    themes: [food-security]
+    formats: [CSV]
+    resource_filter: CSV
+    output_kinds: [tabular]
