@@ -1,7 +1,8 @@
-"""Fixtures for the NWM backend tests: a sample catalog and a fake S3 client."""
+"""Fixtures for the NWM backend tests: a sample catalog and fake S3 + reader."""
 
 from __future__ import annotations
 
+from pathlib import Path
 from typing import Any
 
 import pytest
@@ -34,6 +35,72 @@ class FakeS3:
         if self.available is not None and Key not in self.available:
             raise ClientError({"Error": {"Code": "NoSuchKey"}}, "GetObject")
         return {"Body": _FakeBody(b"netcdf:" + Key.encode())}
+
+
+class FakeLabeled:
+    """In-memory `LabeledDataset` double recording the selection chain.
+
+    Each `select*` returns `self` (records the call); `to_parquet` writes a
+    sentinel file and returns its path so the backend's wiring is exercised
+    without any real NetCDF/Zarr or network.
+    """
+
+    #: Class-level log of `(method, args)` across every instance, so a test
+    #: can assert what the backend asked the reader to do.
+    calls: list[tuple[str, Any]] = []
+
+    def __init__(self, href: str, variables: Any) -> None:
+        self.href = href
+        self.variables = variables
+        self.dataset = self  # so `_close_quietly(cube)` finds `.dataset.close()`
+
+    @classmethod
+    def read_file(cls, path, *, anon: bool = False, variables=None, **kw):
+        """Record the open and return a fresh recording instance."""
+        cls.calls.append(("read_file", {"path": str(path), "anon": anon}))
+        return cls(str(path), variables)
+
+    def select(self, **labels: Any) -> "FakeLabeled":
+        """Record a label selection."""
+        FakeLabeled.calls.append(("select", labels))
+        return self
+
+    def select_by_coord(self, coord: str, values: Any) -> "FakeLabeled":
+        """Record a secondary-coordinate (gage_id) selection."""
+        FakeLabeled.calls.append(("select_by_coord", (coord, list(values))))
+        return self
+
+    def select_bbox(self, bbox: Any, **kw: Any) -> "FakeLabeled":
+        """Record a bbox selection."""
+        FakeLabeled.calls.append(("select_bbox", tuple(bbox)))
+        return self
+
+    def select_time(self, start: Any, end: Any, **kw: Any) -> "FakeLabeled":
+        """Record a time-window selection."""
+        FakeLabeled.calls.append(("select_time", (start, end)))
+        return self
+
+    def to_parquet(self, path, **kw: Any) -> Path:
+        """Write a sentinel Parquet file and return its path."""
+        path = Path(path)
+        path.write_bytes(b"PAR1-fake")
+        FakeLabeled.calls.append(("to_parquet", str(path)))
+        return path
+
+    def close(self) -> None:
+        """No-op handle release."""
+
+
+@pytest.fixture
+def fake_reader(monkeypatch):
+    """Factory wiring `FakeLabeled` onto an NWM instance's `_reader`."""
+
+    def _patch(nwm: NWM) -> type[FakeLabeled]:
+        FakeLabeled.calls = []
+        monkeypatch.setattr(nwm, "_reader", lambda: FakeLabeled)
+        return FakeLabeled
+
+    return _patch
 
 
 @pytest.fixture

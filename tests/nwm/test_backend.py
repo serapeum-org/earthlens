@@ -303,23 +303,82 @@ def test_download_aggregate_rejected(make_nwm):
         make_nwm().download(aggregate=object())
 
 
-def test_download_bbox_subset_defers_to_pyg(make_nwm):
-    """A bbox subset raises NotImplementedError naming PY-G."""
-    nwm = make_nwm(lat_lim=[30, 40], lon_lim=[-100, -90])
-    with pytest.raises(NotImplementedError, match="PY-G"):
+def test_retrospective_tabular_writes_parquet(make_nwm, fake_reader):
+    """A retrospective chrtout request reads the Zarr and writes a Parquet table."""
+    nwm = make_nwm(mode="retrospective", sites=[101, 179])
+    reader = fake_reader(nwm)
+    paths = nwm.download(progress_bar=False)
+    assert len(paths) == 1 and paths[0].suffix == ".parquet" and paths[0].exists()
+    methods = [c[0] for c in reader.calls]
+    assert methods == ["read_file", "select", "select_time", "to_parquet"]
+    # opened the product's retro Zarr anonymously
+    assert reader.calls[0][1]["anon"] is True
+    assert reader.calls[0][1]["path"].endswith("chrtout.zarr")
+    # selected the requested feature_ids
+    assert reader.calls[1][1] == {"feature_id": [101, 179]}
+
+
+def test_retrospective_gage_ids_join(make_nwm, fake_reader):
+    """USGS gage_id strings route to select_by_coord, not feature_id select."""
+    nwm = make_nwm(mode="retrospective", sites=["01010000", "01010500"])
+    reader = fake_reader(nwm)
+    nwm.download(progress_bar=False)
+    methods = [c[0] for c in reader.calls]
+    assert "select_by_coord" in methods
+    by_coord = next(c for c in reader.calls if c[0] == "select_by_coord")
+    assert by_coord[1] == ("gage_id", ["01010000", "01010500"])
+
+
+def test_retrospective_bbox_selection(make_nwm, fake_reader):
+    """A bbox (no sites=) routes to select_bbox with (W, S, E, N)."""
+    nwm = make_nwm(mode="retrospective", lat_lim=[39.0, 40.0], lon_lim=[-77.0, -76.0])
+    reader = fake_reader(nwm)
+    nwm.download(progress_bar=False)
+    bbox = next(c for c in reader.calls if c[0] == "select_bbox")
+    assert bbox[1] == (-77.0, -76.0, 40.0, 39.0) or bbox[1] == (
+        -77.0,
+        39.0,
+        -76.0,
+        40.0,
+    )
+
+
+def test_retrospective_gridded_rejected(make_nwm):
+    """A retrospective request for a gridded product is rejected."""
+    nwm = make_nwm(
+        variables={"ldasout": ["SOIL_M"]},
+        configuration="analysis_assim",
+        mode="retrospective",
+        sites=[101],
+    )
+    with pytest.raises(NotImplementedError, match="gridded"):
         nwm.download(progress_bar=False)
 
 
-def test_download_sites_defers_to_pyg(make_nwm):
-    """A sites= subset raises NotImplementedError naming PY-G."""
-    with pytest.raises(NotImplementedError, match="PY-G"):
-        make_nwm(sites=[101]).download(progress_bar=False)
+def test_operational_subset_downloads_then_reads(make_nwm, fake_reader, patch_client):
+    """An operational sites= subset downloads the file then reads + writes Parquet."""
+    nwm = make_nwm(cycles=[0], steps=[1], sites=[101])
+    patch_client(nwm, FakeS3(available=None))
+    reader = fake_reader(nwm)
+    paths = nwm.download(progress_bar=False)
+    assert len(paths) == 1 and paths[0].suffix == ".parquet"
+    methods = [c[0] for c in reader.calls]
+    # operational subset selects labels but does NOT time-slice a single step
+    assert "read_file" in methods and "select" in methods
+    assert "select_time" not in methods
+    assert reader.calls[0][1]["anon"] is False  # local downloaded file
 
 
-def test_download_retrospective_defers_to_pyg(make_nwm):
-    """A retrospective request raises NotImplementedError naming PY-G."""
-    nwm = make_nwm(mode="retrospective")
-    with pytest.raises(NotImplementedError, match="PY-G"):
+def test_operational_subset_gridded_rejected(make_nwm, patch_client):
+    """An operational gridded subset is rejected before any download."""
+    nwm = make_nwm(
+        variables={"ldasout": ["SOIL_M"]},
+        configuration="short_range",
+        cycles=[0],
+        steps=[1],
+        sites=[101],
+    )
+    with pytest.raises(NotImplementedError, match="gridded"):
         nwm.download(progress_bar=False)
 
 
@@ -328,6 +387,36 @@ def test_retrospective_search_carries_zarr_uri(make_nwm):
     nwm = make_nwm(mode="retrospective")
     href = nwm._search()[0].href
     assert href.startswith("s3://noaa-nwm-retrospective-3-0-pds")
+
+
+def test_feature_ids_and_gage_ids_split(make_nwm):
+    """sites= splits into integer feature_ids and string gage_ids."""
+    nwm = make_nwm(sites=[101, "01010000", 179])
+    assert nwm._feature_ids() == [101, 179]
+    assert nwm._gage_ids() == ["01010000"]
+    assert make_nwm()._feature_ids() is None and make_nwm()._gage_ids() is None
+
+
+def test_operational_subset_skips_unpublished(make_nwm, fake_reader, patch_client):
+    """An unpublished key in an operational subset is skipped, not read."""
+    nwm = make_nwm(cycles=[0], steps=[1], sites=[101])
+    patch_client(nwm, FakeS3(available=set()))  # nothing published
+    reader = fake_reader(nwm)
+    paths = nwm.download(progress_bar=False)
+    assert paths == []
+    assert reader.calls == []  # nothing downloaded -> reader never invoked
+
+
+def test_close_quietly_swallows_errors():
+    """_close_quietly never raises, even when the store's close() fails."""
+    from earthlens.nwm.backend import _close_quietly
+
+    class _Bad:
+        @property
+        def dataset(self):
+            raise RuntimeError("boom")
+
+    _close_quietly(_Bad())  # must not raise
 
 
 def test_api_composes_search_fetch(make_nwm, patch_client):

@@ -64,3 +64,29 @@ def test_download_one_short_range_channel_rt(tmp_path):
     # a real file, not a truncated error body.
     assert written.stat().st_size > 1_000_000
     assert written.name.endswith(".conus.nc")
+
+
+@pytest.mark.skipif(not _network_available(), reason="noaa-nwm-pds unreachable")
+def test_retrospective_streamflow_subset(tmp_path):
+    """Subset the retrospective chrtout Zarr to a few reaches and a short window."""
+    import pandas as pd
+
+    nwm = NWM(
+        start="2010-06-01",
+        end="2010-06-02",
+        variables={"chrtout": ["streamflow"]},
+        lat_lim=[-90.0, 90.0],
+        lon_lim=[-180.0, 180.0],
+        configuration="analysis_assim",
+        mode="retrospective",
+        sites=[101, 179, 181],
+        path=str(tmp_path),
+    )
+    paths = nwm.download(progress_bar=False)
+    assert len(paths) == 1
+    table = Path(paths[0])
+    assert table.exists() and table.suffix == ".parquet"
+    frame = pd.read_parquet(table)
+    # the tidy feature_id x time table carries the requested reaches + variable
+    assert "streamflow" in frame.columns
+    assert set(frame["feature_id"].unique()) == {101, 179, 181}
