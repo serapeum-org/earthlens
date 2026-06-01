@@ -27,10 +27,7 @@ classifiers = [
 requires-python = ">= 3.11, <4"
 
 dependencies = [
-    # >=0.24.1: fixes get_epsg_from_prj returning the unit code EPSG:9122 for
-    # GRIB CRS (pyramids#403 / PY-1), so Dataset.epsg is 4326 and the NWP
-    # crop/COG/aggregate path no longer trips on an unresolvable EPSG.
-    "pyramids-gis >=0.24.1",
+    "pyramids-gis >=0.28.0",
     "geopandas >=1.0.0",
     "joblib >=1.5.0",
     "loguru >=0.7.3",
@@ -58,23 +55,9 @@ cmems = ["copernicusmarine >=2.0.0,<3"]
 fdsn = ["obspy >=1.5.0"]
 earthdata = ["earthaccess >=0.18.0; python_version >= '3.12'"]
 eumetsat = ["eumdac >=3.1"]
-# herbie-data transitively pulls cfgrib + eccodes (its core imports cfgrib at
-# module load); the eccodes *binary* library is an environment requirement,
-# like libgdal-grib for pyramids' GRIB reader — install it via conda-forge
-# (`eccodes`) where the pip wheel cannot find it. earthlens itself imports
-# neither cfgrib nor eccodes directly.
 nwp = ["herbie-data >=2026.3", "ecmwf-opendata >=0.3"]
-# NEXRAD Level-II via the unsigned unidata-nexrad-level2-chunks bucket: the MVP
-# only assembles the chunk files (boto3), no decode. `arm-pyart` is the optional
-# reader for the assembled .ar2v volumes (gridding is a follow-on), kept out of
-# the base extra so a fetch-only install stays light.
 radar = ["boto3 >=1.43.0", "botocore >=1.34.0"]
 stac = ["pyramids-gis[stac]"]
-# Pin openeo to the 0.47.x line: openeo 0.48+ hard-caps pandas<3, which would
-# force a pandas downgrade across the whole shared environment. 0.47.0 is the
-# newest openeo that runs on pandas 3 (validated live against CDSE), so the repo
-# keeps pandas 3 for every backend. (openeo still caps xarray<2025.01.2.) Lift
-# this upper bound once openeo ships a pandas-3-compatible release.
 openeo = ["openeo >=0.47,<0.48"]
 sentinel-hub = ["sentinelhub >=3.11.5"]
 # cartopy: not imported by earthlens, but `import tropycal.tracks` chains through
@@ -83,20 +66,10 @@ sentinel-hub = ["sentinelhub >=3.11.5"]
 tropycal = ["tropycal >=1.4", "cartopy >=0.22"]
 overture = ["overturemaps >=1.0.0", "duckdb >=1.0.0"]
 usgs-water = ["dataretrieval >=1.1.4"]
-# GHSL is open HTTPS and needs no extra SDK: the deterministic-URL path (the
-# default and only functional path) uses only the core deps (requests +
-# pyramids-gis). The api="stac" path is inactive — A1 (2026-05) found no
-# queryable JRC STAC API — so no STAC extra is pulled; revisit if JRC ships one.
 ghsl = []
-# WorldPop: the default api="rest" path needs only core requests + pyramids;
-# the optional api="worldpoppy" path consumes WorldPopPy's file cache (never
-# its xarray return). WorldPopPy is MPL-2.0, requires Python >=3.10.
-# py7zr extracts the dependency_ratios per-continent .7z archives. Deliberately
-# NOT in `all`: WorldPopPy pulls rasterio/rioxarray, which lack wheels for the
-# 3.13/3.14 wheel-test envs and fail to build there; the REST path (the default)
-# needs nothing extra, and the worldpoppy / py7zr code paths are covered by a
-# stub / a tiny generated archive in the tests.
 worldpop = ["worldpoppy >=0.4", "py7zr >=0.20"]
+# Flat list, not `earthlens[<extra>]` self-references: those make pip explore
+# old PyPI earthlens releases and backtrack onto an unbuildable wrapt sdist.
 all = [
     "boto3 >=1.43.0",
     "botocore >=1.34.0",
@@ -115,6 +88,8 @@ all = [
     "obspy >=1.5.0",
     "openeo >=0.47,<0.48",
     "overturemaps >=1.0.0",
+    "py7zr >=0.20",
+    "worldpoppy >=0.4",
     "pyramids-gis[stac]",
     "Rtree >=1.0.0",
     "sentinelhub >=3.11.5",

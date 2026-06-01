@@ -11,6 +11,7 @@ testable without the network.
 from __future__ import annotations
 
 import re
+import stat
 from pathlib import Path
 
 from earthlens.base.yaml_loader import load_yaml_strict
@@ -234,11 +235,18 @@ def extract_geotiffs(archive_path: Path, fmt: str, dest_dir: Path) -> list[Path]
             zf.extract(path=dest_dir, targets=members)
     else:
         raise ValueError(f"unsupported archive format {fmt!r}; expected '7z' or 'zip'.")
-    return sorted(
+    extracted = sorted(
         p
         for p in dest_dir.rglob("*")
         if p.suffix.lower() in (".tif", ".tiff")
     )
+    # Normalise the extracted files' permissions: py7zr restores the POSIX
+    # mode stored in the archive, and these WorldPop members carry a
+    # restrictive mode, so on Linux the downstream GDAL read fails with
+    # "Permission denied". Force user read/write so the crop can open them.
+    for tif in extracted:
+        tif.chmod(tif.stat().st_mode | stat.S_IRUSR | stat.S_IWUSR)
+    return extracted
 
 
 def iso3_for_bbox(bbox_wgs84: list[float], table: dict[str, list[float]]) -> list[str]:
