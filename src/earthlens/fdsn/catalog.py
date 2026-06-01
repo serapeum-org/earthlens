@@ -200,6 +200,7 @@ class Catalog(AbstractCatalog):
     """
 
     _catalog_kind: str = "FDSN catalog"
+    _entry_noun: str = "networks"
 
     datasets: dict[str, Provider] = Field(default_factory=dict)
     providers: dict[str, Provider] = Field(default_factory=dict)
@@ -221,10 +222,11 @@ class Catalog(AbstractCatalog):
                 self.datasets = self.providers
             if not self.providers:
                 self.providers = self.datasets
-            return
-        rows = _load_catalog_data(CATALOG_PATH)
-        self.datasets = dict(rows)
-        self.providers = self.datasets
+        else:
+            rows = _load_catalog_data(CATALOG_PATH)
+            self.datasets = dict(rows)
+            self.providers = self.datasets
+        super().model_post_init(__context)
 
     @classmethod
     def load(cls, catalog_path: Path | None = None) -> Catalog:

@@ -1,0 +1,86 @@
+# USGS Water parameter-code catalog (curated).
+#
+# Maps friendly names -> 5-digit NWIS parameter codes plus light metadata
+# (units, USGS parameter group, and the canonical `service=` planes the code
+# is typically available on). Raw 5-digit codes are accepted directly by
+# Catalog.resolve() without appearing here, so this list covers only the
+# common codes; tools/usgs_water/refresh_usgs_catalog.py builds the full
+# informational `available_parameters` index from the live USGS reference
+# table.
+#
+# `services` uses the canonical service= vocabulary (daily / instantaneous /
+# samples / statistics / gwlevels / field-measurements / peaks / ratings /
+# sites), NOT the legacy NWIS short codes (iv/dv/qw).
+parameters:
+  discharge:
+    code: "00060"
+    name: Discharge
+    units: ft3/s
+    group: Physical
+    services: [daily, instantaneous, statistics, peaks]
+  gage_height:
+    code: "00065"
+    name: Gage height
+    units: ft
+    group: Physical
+    services: [daily, instantaneous, statistics]
+  temperature:
+    code: "00010"
+    name: Water temperature
+    units: degC
+    group: Physical
+    services: [daily, instantaneous, samples]
+  specific_conductance:
+    code: "00095"
+    name: Specific conductance
+    units: uS/cm @25C
+    group: Physical
+    services: [daily, instantaneous, samples]
+  dissolved_oxygen:
+    code: "00300"
+    name: Dissolved oxygen
+    units: mg/l
+    group: Inorganics
+    services: [daily, instantaneous, samples]
+  ph:
+    code: "00400"
+    name: pH
+    units: std units
+    group: Inorganics
+    services: [daily, instantaneous, samples]
+  turbidity:
+    code: "63680"
+    name: Turbidity
+    units: FNU
+    group: Physical
+    services: [daily, instantaneous, samples]
+  precipitation:
+    code: "00045"
+    name: Precipitation
+    units: in
+    group: Physical
+    services: [daily, instantaneous]
+  nitrate:
+    code: "99133"
+    name: Nitrate plus nitrite
+    units: mg/l as N
+    group: Nutrients
+    services: [daily, instantaneous, samples]
+  groundwater_level:
+    code: "72019"
+    name: Depth to water level
+    units: ft below land surface
+    group: Physical
+    services: [gwlevels, daily, instantaneous, field-measurements]
+  reservoir_storage:
+    code: "00054"
+    name: Reservoir storage
+    units: ac-ft
+    group: Physical
+    services: [daily, instantaneous]
+  suspended_sediment:
+    code: "80154"
+    name: Suspended sediment concentration
+    units: mg/l
+    group: Physical
+    services: [daily, samples]

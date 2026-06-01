@@ -642,6 +642,6 @@ class EarthData(AbstractDataSource):
                 "pyramids' DatasetCollection.groupby, which the installed "
                 "pyramids build does not provide."
             )
-        collection = DatasetCollection.read_file([str(p) for p in paths])
+        collection = DatasetCollection.from_files([str(p) for p in paths])
         grouped = collection.groupby(config.freq)
         return [Path(p) for p in grouped.to_file(str(self.root_dir))]

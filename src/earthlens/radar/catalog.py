@@ -1,0 +1,171 @@
+"""Station registry for the NEXRAD radar backend.
+
+Hosts :class:`StationCatalog`, the pydantic-backed reader for the
+bundled `radar_data_catalog.yaml` — a curated map of WSR-88D site ids
+(`"KTLX"`) to name / latitude / longitude / state. The catalog gives
+each fetched volume a point geometry and lets a request select the
+radars inside a bounding box.
+
+The catalog is **informational**: any valid four-letter site id can be
+fetched even if it is absent here (the volume just gets no geometry).
+The path to the bundled YAML lives at :data:`CATALOG_PATH`;
+monkey-patch it to redirect the loader in tests.
+"""
+
+from __future__ import annotations
+
+from pathlib import Path
+from typing import Any
+
+from pydantic import BaseModel, ConfigDict, Field, ValidationError
+
+from earthlens.base import AbstractCatalog
+from earthlens.base.yaml_loader import load_yaml_strict
+
+CATALOG_PATH: Path = Path(__file__).parent / "radar_data_catalog.yaml"
+
+_CATALOG_CACHE: dict[Any, dict[str, "Station"]] = {}
+
+
+def clear_catalog_cache() -> None:
+    """Empty the module-level station-catalog parse cache."""
+    _CATALOG_CACHE.clear()
+
+
+def _load_stations(path: Path) -> dict[str, "Station"]:
+    """Parse, validate, and cache the station registry at `path`.
+
+    Args:
+        path: Path to `radar_data_catalog.yaml` (or a test override).
+
+    Returns:
+        dict[str, Station]: The `stations:` map keyed by site id.
+
+    Raises:
+        ValueError: If the file has no `stations:` block or a row fails
+            validation.
+    """
+    resolved = str(path.resolve())
+    try:
+        mtime = path.stat().st_mtime_ns
+    except FileNotFoundError:
+        mtime = 0
+    key = (resolved, mtime)
+    cached = _CATALOG_CACHE.get(key)
+    if cached is not None:
+        return cached
+
+    data = load_yaml_strict(path) or {}
+    rows = data.get("stations") or {}
+    if not rows:
+        raise ValueError(f"{path} is missing or has an empty 'stations:' block.")
+    stations: dict[str, Station] = {}
+    for site_id, body in rows.items():
+        try:
+            stations[site_id] = Station(**(body or {}))
+        except ValidationError as exc:
+            raise ValueError(
+                f"{path} station {site_id!r} failed validation:\n{exc}"
+            ) from exc
+    _CATALOG_CACHE[key] = stations
+    return stations
+
+
+class Station(BaseModel):
+    """One WSR-88D radar site.
+
+    The site id (e.g. `"KTLX"`) is the parent key in
+    :attr:`StationCatalog.datasets` and is not stored on the row.
+
+    Attributes:
+        name: Human-readable site name / location.
+        latitude: Site latitude in degrees (south negative).
+        longitude: Site longitude in degrees (west negative).
+        state: Two-letter US state / territory code.
+    """
+
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    name: str = ""
+    latitude: float = Field(ge=-90.0, le=90.0)
+    longitude: float = Field(ge=-180.0, le=180.0)
+    state: str = ""
+
+
+class StationCatalog(AbstractCatalog):
+    """Catalog of NEXRAD WSR-88D sites.
+
+    Reads the bundled `radar_data_catalog.yaml` and exposes its `stations:` block
+    as a typed `dict[str, Station]`. Instantiate with no arguments
+    (`StationCatalog()`).
+
+    Examples:
+        - Look up a site and read its location:
+            ```python
+            >>> from earthlens.radar import StationCatalog
+            >>> ktlx = StationCatalog().get_station("KTLX")
+            >>> (round(ktlx.latitude, 2), round(ktlx.longitude, 2))
+            (35.33, -97.28)
+
+            ```
+    """
+
+    _catalog_kind: str = "NEXRAD station catalog"
+    _entry_noun: str = "stations"
+
+    datasets: dict[str, Station] = Field(default_factory=dict)
+
+    def model_post_init(self, __context: Any) -> None:
+        """Auto-load the bundled `radar_data_catalog.yaml` when no rows were supplied."""
+        if not self.datasets:
+            self.datasets = _load_stations(CATALOG_PATH)
+        super().model_post_init(__context)
+
+    def get_catalog(self) -> dict[str, Station]:
+        """Return the structural per-site map (satisfies the base contract)."""
+        return self.datasets
+
+    def get_station(self, site_id: str) -> Station:
+        """Resolve a site id to its :class:`Station` (did-you-mean on miss).
+
+        Args:
+            site_id: A four-letter WSR-88D id (e.g. `"KTLX"`).
+
+        Returns:
+            Station: The resolved site.
+
+        Raises:
+            ValueError: When `site_id` is unknown (with a did-you-mean
+                hint from the base class).
+        """
+        return self.get_dataset(site_id)
+
+    def in_bbox(
+        self, west: float, south: float, east: float, north: float
+    ) -> list[str]:
+        """Return the site ids whose location falls inside a bbox.
+
+        Args:
+            west: West edge in degrees.
+            south: South edge in degrees.
+            east: East edge in degrees.
+            north: North edge in degrees.
+
+        Returns:
+            list[str]: Matching site ids, sorted.
+
+        Examples:
+            - Find the catalogued sites over the south-central US:
+                ```python
+                >>> from earthlens.radar import StationCatalog
+                >>> "KTLX" in StationCatalog().in_bbox(-100, 33, -95, 37)
+                True
+
+                ```
+        """
+        hits = [
+            sid
+            for sid, s in self.datasets.items()
+            if west <= s.longitude <= east and south <= s.latitude <= north
+        ]
+        return sorted(hits)

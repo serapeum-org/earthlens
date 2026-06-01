@@ -1,0 +1,800 @@
+# CDS catalog — seasonal family. See _index.yaml for the schema.
+
+datasets:
+  seasonal-original-single-levels:
+    product_type:
+    - reanalysis
+    extras:
+      originating_centre: ecmwf
+      system: '5'
+      leadtime_hour:
+      - '24'
+    variables:
+      2m-temperature-seasonal-orig:
+        cds_variable: 2m_temperature
+        nc_variable: t2m
+        types: state
+        units: K
+      10m-v-component-of-wind-seasonal-orig:
+        cds_variable: 10m_v_component_of_wind
+        nc_variable: v10
+        types: state
+        units: m s**-1
+      100m-u-component-of-wind-seasonal-orig:
+        cds_variable: 100m_u_component_of_wind
+        nc_variable: u100
+        types: state
+        units: m s**-1
+      100m-v-component-of-wind-seasonal-orig:
+        cds_variable: 100m_v_component_of_wind
+        nc_variable: v100
+        types: state
+        units: m s**-1
+      10m-u-component-of-wind-seasonal-orig:
+        cds_variable: 10m_u_component_of_wind
+        nc_variable: u10
+        types: state
+        units: m s**-1
+      10m-wind-gust-since-previous-post-processing-seasonal-orig:
+        cds_variable: 10m_wind_gust_since_previous_post_processing
+        nc_variable: 10fg
+        types: state
+        units: m s**-1
+      2m-dewpoint-temperature-seasonal-orig:
+        cds_variable: 2m_dewpoint_temperature
+        nc_variable: d2m
+        types: state
+        units: K
+      eastward-turbulent-surface-stress-seasonal-orig:
+        cds_variable: eastward_turbulent_surface_stress
+        nc_variable: ewss
+        types: state
+        units: N m**-2 s
+      evaporation-seasonal-orig:
+        cds_variable: evaporation
+        nc_variable: erate
+        types: flux
+        units: m of water equivalent s**-1
+      land-sea-mask-seasonal-orig:
+        cds_variable: land_sea_mask
+        nc_variable: lsm
+        types: state
+        units: (0 - 1)
+      maximum-2m-temperature-in-the-last-24-hours-seasonal-orig:
+        cds_variable: maximum_2m_temperature_in_the_last_24_hours
+        nc_variable: mx2t24
+        types: state
+        units: K
+      mean-sea-level-pressure-seasonal-orig:
+        cds_variable: mean_sea_level_pressure
+        nc_variable: msl
+        types: state
+        units: Pa
+      minimum-2m-temperature-in-the-last-24-hours-seasonal-orig:
+        cds_variable: minimum_2m_temperature_in_the_last_24_hours
+        nc_variable: mn2t24
+        types: state
+        units: K
+      northward-turbulent-surface-stress-seasonal-orig:
+        cds_variable: northward_turbulent_surface_stress
+        nc_variable: nsss
+        types: state
+        units: N m**-2 s
+      orography-seasonal-orig:
+        cds_variable: orography
+        nc_variable: orog
+        types: state
+        units: m
+      runoff-seasonal-orig:
+        cds_variable: runoff
+        nc_variable: ro
+        types: flux
+        units: m
+      sea-ice-cover-seasonal-orig:
+        cds_variable: sea_ice_cover
+        nc_variable: siconc
+        types: state
+        units: (0 - 1)
+      sea-surface-temperature-seasonal-orig:
+        cds_variable: sea_surface_temperature
+        nc_variable: sst
+        types: state
+        units: K
+      snow-cover-seasonal-orig:
+        cds_variable: snow_cover
+        nc_variable: snowc
+        types: state
+        units: '%'
+      snow-density-seasonal-orig:
+        cds_variable: snow_density
+        nc_variable: rsn
+        types: state
+        units: kg m**-3
+      snow-depth-seasonal-orig:
+        cds_variable: snow_depth
+        nc_variable: sd
+        types: state
+        units: m of water equivalent
+      snowfall-seasonal-orig:
+        cds_variable: snowfall
+        nc_variable: mtsfr
+        types: flux
+        units: m of water equivalent s**-1
+      soil-temperature-level-1-seasonal-orig:
+        cds_variable: soil_temperature_level_1
+        nc_variable: stl1
+        types: state
+        units: K
+      sub-surface-runoff-seasonal-orig:
+        cds_variable: sub_surface_runoff
+        nc_variable: ssro
+        types: flux
+        units: m
+      surface-latent-heat-flux-seasonal-orig:
+        cds_variable: surface_latent_heat_flux
+        nc_variable: mslhfl
+        types: flux
+        units: W m**-2
+      surface-net-solar-radiation-seasonal-orig:
+        cds_variable: surface_net_solar_radiation
+        nc_variable: ssr
+        types: flux
+        units: J m**-2
+      surface-net-thermal-radiation-seasonal-orig:
+        cds_variable: surface_net_thermal_radiation
+        nc_variable: str
+        types: flux
+        units: J m**-2
+      surface-runoff-seasonal-orig:
+        cds_variable: surface_runoff
+        nc_variable: sro
+        types: flux
+        units: kg m**-2
+      surface-sensible-heat-flux-seasonal-orig:
+        cds_variable: surface_sensible_heat_flux
+        nc_variable: msshfl
+        types: flux
+        units: W m**-2
+      surface-solar-radiation-downwards-seasonal-orig:
+        cds_variable: surface_solar_radiation_downwards
+        nc_variable: msdsrf
+        types: flux
+        units: W m**-2
+      surface-thermal-radiation-downwards-seasonal-orig:
+        cds_variable: surface_thermal_radiation_downwards
+        nc_variable: msdtrf
+        types: flux
+        units: W m**-2
+      toa-incident-solar-radiation-seasonal-orig:
+        cds_variable: toa_incident_solar_radiation
+        nc_variable: tisr
+        types: state
+        units: J m**-2
+      top-net-solar-radiation-seasonal-orig:
+        cds_variable: top_net_solar_radiation
+        nc_variable: tsr
+        types: flux
+        units: J m**-2
+      top-net-thermal-radiation-seasonal-orig:
+        cds_variable: top_net_thermal_radiation
+        nc_variable: ttr
+        types: flux
+        units: J m**-2
+      total-cloud-cover-seasonal-orig:
+        cds_variable: total_cloud_cover
+        nc_variable: tcc
+        types: state
+        units: (0 - 1)
+      total-column-cloud-ice-water-seasonal-orig:
+        cds_variable: total_column_cloud_ice_water
+        nc_variable: tciw
+        types: state
+        units: kg m**-2
+      total-column-cloud-liquid-water-seasonal-orig:
+        cds_variable: total_column_cloud_liquid_water
+        nc_variable: tclw
+        types: state
+        units: kg m**-2
+      total-column-water-vapour-seasonal-orig:
+        cds_variable: total_column_water_vapour
+        nc_variable: tcwv
+        types: state
+        units: kg m**-2
+      total-precipitation-seasonal-orig:
+        cds_variable: total_precipitation
+        nc_variable: tprate
+        types: flux
+        units: m s**-1
+      volumetric-soil-moisture-seasonal-orig:
+        cds_variable: volumetric_soil_moisture
+        nc_variable: vsw
+        types: state
+        units: m**3 m**-3
+  seasonal-postprocessed-single-levels:
+    product_type:
+    - reanalysis
+    extras:
+      product_type:
+      - ensemble_mean
+      originating_centre: ukmo
+      system: '12'
+      leadtime_month:
+      - '1'
+    variables:
+      2m-dewpoint-temperature-anomaly-seasonal-pp:
+        cds_variable: 2m_dewpoint_temperature_anomaly
+        nc_variable: d2a
+        types: state
+        units: K
+      2m-temperature-anomaly-seasonal-pp:
+        cds_variable: 2m_temperature_anomaly
+        nc_variable: t2a
+        types: state
+        units: K
+      100-metre-u-wind-component-anomaly-seasonal-pp:
+        cds_variable: 100_metre_u_wind_component_anomaly
+        nc_variable: ua100
+        types: state
+        units: m s**-1
+      100-metre-v-wind-component-anomaly-seasonal-pp:
+        cds_variable: 100_metre_v_wind_component_anomaly
+        nc_variable: va100
+        types: state
+        units: m s**-1
+      100-metre-wind-speed-anomaly-seasonal-pp:
+        cds_variable: 100_metre_wind_speed_anomaly
+        nc_variable: sia100
+        types: state
+        units: m s**-1
+      10m-u-component-of-wind-anomaly-seasonal-pp:
+        cds_variable: 10m_u_component_of_wind_anomaly
+        nc_variable: u10a
+        types: state
+        units: m s**-1
+      10m-v-component-of-wind-anomaly-seasonal-pp:
+        cds_variable: 10m_v_component_of_wind_anomaly
+        nc_variable: v10a
+        types: state
+        units: m s**-1
+      10m-wind-gust-anomaly-seasonal-pp:
+        cds_variable: 10m_wind_gust_anomaly
+        nc_variable: 10fga
+        types: state
+        units: m s**-1
+      10m-wind-speed-anomaly-seasonal-pp:
+        cds_variable: 10m_wind_speed_anomaly
+        nc_variable: si10a
+        types: state
+        units: m s**-1
+      east-west-surface-stress-anomalous-rate-of-accumulation-seasonal-pp:
+        cds_variable: east_west_surface_stress_anomalous_rate_of_accumulation
+        nc_variable: ewssa
+        types: flux
+        units: N m**-2 s
+      evaporation-anomalous-rate-of-accumulation-seasonal-pp:
+        cds_variable: evaporation_anomalous_rate_of_accumulation
+        nc_variable: ea
+        types: flux
+        units: kg m**-2 s**-1
+      maximum-2m-temperature-in-the-last-24-hours-anomaly-seasonal-pp:
+        cds_variable: maximum_2m_temperature_in_the_last_24_hours_anomaly
+        nc_variable: mx2t24a
+        types: state
+        units: K
+      mean-sea-level-pressure-anomaly-seasonal-pp:
+        cds_variable: mean_sea_level_pressure_anomaly
+        nc_variable: msla
+        types: state
+        units: Pa
+      mean-sub-surface-runoff-rate-anomaly-seasonal-pp:
+        cds_variable: mean_sub_surface_runoff_rate_anomaly
+        nc_variable: mssrora
+        types: flux
+        units: kg m**-2 s**-1
+      mean-surface-runoff-rate-anomaly-seasonal-pp:
+        cds_variable: mean_surface_runoff_rate_anomaly
+        nc_variable: msrora
+        types: flux
+        units: kg m**-2 s**-1
+      minimum-2m-temperature-in-the-last-24-hours-anomaly-seasonal-pp:
+        cds_variable: minimum_2m_temperature_in_the_last_24_hours_anomaly
+        nc_variable: mn2t24a
+        types: state
+        units: K
+      north-south-surface-stress-anomalous-rate-of-accumulation-seasonal-pp:
+        cds_variable: north_south_surface_stress_anomalous_rate_of_accumulation
+        nc_variable: nsssa
+        types: flux
+        units: N m**-2 s
+      runoff-anomalous-rate-of-accumulation-seasonal-pp:
+        cds_variable: runoff_anomalous_rate_of_accumulation
+        nc_variable: roa
+        types: flux
+        units: kg m**-2 s**-1
+      sea-ice-cover-anomaly-seasonal-pp:
+        cds_variable: sea_ice_cover_anomaly
+        nc_variable: sica
+        types: state
+        units: (0 - 1)
+      sea-surface-temperature-anomaly-seasonal-pp:
+        cds_variable: sea_surface_temperature_anomaly
+        nc_variable: ssta
+        types: state
+        units: K
+      snow-density-anomaly-seasonal-pp:
+        cds_variable: snow_density_anomaly
+        nc_variable: rsna
+        types: state
+        units: kg m**-3
+      snow-depth-anomaly-seasonal-pp:
+        cds_variable: snow_depth_anomaly
+        nc_variable: sda
+        types: state
+        units: m of water equivalent
+      snowfall-anomalous-rate-of-accumulation-seasonal-pp:
+        cds_variable: snowfall_anomalous_rate_of_accumulation
+        nc_variable: sfa
+        types: flux
+        units: kg m**-2 s**-1
+      soil-temperature-anomaly-level-1-seasonal-pp:
+        cds_variable: soil_temperature_anomaly_level_1
+        nc_variable: stl1a
+        types: state
+        units: K
+      solar-insolation-anomalous-rate-of-accumulation-seasonal-pp:
+        cds_variable: solar_insolation_anomalous_rate_of_accumulation
+        nc_variable: siraa
+        types: flux
+        units: J m**-2
+      surface-latent-heat-flux-anomalous-rate-of-accumulation-seasonal-pp:
+        cds_variable: surface_latent_heat_flux_anomalous_rate_of_accumulation
+        nc_variable: slhfa
+        types: flux
+        units: W m**-2
+      surface-sensible-heat-flux-anomalous-rate-of-accumulation-seasonal-pp:
+        cds_variable: surface_sensible_heat_flux_anomalous_rate_of_accumulation
+        nc_variable: sshfa
+        types: flux
+        units: W m**-2
+      surface-solar-radiation-anomalous-rate-of-accumulation-seasonal-pp:
+        cds_variable: surface_solar_radiation_anomalous_rate_of_accumulation
+        nc_variable: ssra
+        types: flux
+        units: W m**-2
+      surface-solar-radiation-downwards-anomalous-rate-of-accumulation-seasonal-pp:
+        cds_variable: surface_solar_radiation_downwards_anomalous_rate_of_accumulation
+        nc_variable: ssrda
+        types: flux
+        units: W m**-2
+      surface-thermal-radiation-anomalous-rate-of-accumulation-seasonal-pp:
+        cds_variable: surface_thermal_radiation_anomalous_rate_of_accumulation
+        nc_variable: stra
+        types: flux
+        units: W m**-2
+      surface-thermal-radiation-downwards-anomalous-rate-of-accumulation-seasonal-pp:
+        cds_variable: surface_thermal_radiation_downwards_anomalous_rate_of_accumulation
+        nc_variable: strda
+        types: flux
+        units: W m**-2
+      top-solar-radiation-anomalous-rate-of-accumulation-seasonal-pp:
+        cds_variable: top_solar_radiation_anomalous_rate_of_accumulation
+        nc_variable: tsra
+        types: flux
+        units: W m**-2
+      top-thermal-radiation-anomalous-rate-of-accumulation-seasonal-pp:
+        cds_variable: top_thermal_radiation_anomalous_rate_of_accumulation
+        nc_variable: ttra
+        types: flux
+        units: W m**-2
+      total-cloud-cover-anomaly-seasonal-pp:
+        cds_variable: total_cloud_cover_anomaly
+        nc_variable: tcca
+        types: state
+        units: (0 - 1)
+      total-column-ice-water-anomaly-seasonal-pp:
+        cds_variable: total_column_ice_water_anomaly
+        nc_variable: tciwa
+        types: state
+        units: kg m**-2
+      total-column-liquid-water-anomaly-seasonal-pp:
+        cds_variable: total_column_liquid_water_anomaly
+        nc_variable: tclwa
+        types: state
+        units: kg m**-2
+      total-column-water-vapour-anomaly-seasonal-pp:
+        cds_variable: total_column_water_vapour_anomaly
+        nc_variable: tcwva
+        types: state
+        units: kg m**-2
+      total-precipitation-anomalous-rate-of-accumulation-seasonal-pp:
+        cds_variable: total_precipitation_anomalous_rate_of_accumulation
+        nc_variable: tpa
+        types: flux
+        units: m s**-1
+  seasonal-monthly-pressure-levels:
+    product_type:
+    - reanalysis
+    pressure_level:
+    - '10'
+    extras:
+      product_type:
+      - ensemble_mean
+      originating_centre: ukmo
+      system: '601'
+      leadtime_month:
+      - '1'
+    variables:
+      geopotential-seasonal-p:
+        cds_variable: geopotential
+        nc_variable: z
+        types: state
+        units: m**2 s**-2
+      specific-humidity-seasonal-p:
+        cds_variable: specific_humidity
+        nc_variable: q
+        types: state
+        units: kg kg**-1
+      temperature-seasonal-p:
+        cds_variable: temperature
+        nc_variable: t
+        types: state
+        units: K
+      u-component-of-wind-seasonal-p:
+        cds_variable: u_component_of_wind
+        nc_variable: u
+        types: state
+        units: m s**-1
+      v-component-of-wind-seasonal-p:
+        cds_variable: v_component_of_wind
+        nc_variable: v
+        types: state
+        units: m s**-1
+  seasonal-original-pressure-levels:
+    product_type:
+    - reanalysis
+    pressure_level:
+    - '10'
+    extras:
+      originating_centre: ukmo
+      system: '601'
+      leadtime_hour:
+      - '6'
+    variables:
+      geopotential-seasonal-orig-p:
+        cds_variable: geopotential
+        nc_variable: z
+        types: state
+        units: m**2 s**-2
+      specific-humidity-seasonal-orig-p:
+        cds_variable: specific_humidity
+        nc_variable: q
+        types: state
+        units: kg kg**-1
+      temperature-seasonal-orig-p:
+        cds_variable: temperature
+        nc_variable: t
+        types: state
+        units: K
+      u-component-of-wind-seasonal-orig-p:
+        cds_variable: u_component_of_wind
+        nc_variable: u
+        types: state
+        units: m s**-1
+      v-component-of-wind-seasonal-orig-p:
+        cds_variable: v_component_of_wind
+        nc_variable: v
+        types: state
+        units: m s**-1
+  seasonal-postprocessed-pressure-levels:
+    product_type:
+    - reanalysis
+    pressure_level:
+    - '10'
+    extras:
+      product_type:
+      - ensemble_mean
+      originating_centre: ukmo
+      system: '601'
+      leadtime_month:
+      - '1'
+    variables:
+      geopotential-anomaly-seasonal-pp-p:
+        cds_variable: geopotential_anomaly
+        nc_variable: za
+        types: state
+        units: m**2 s**-2
+      specific-humidity-anomaly-seasonal-pp-p:
+        cds_variable: specific_humidity_anomaly
+        nc_variable: qa
+        types: state
+        units: kg kg**-1
+      temperature-anomaly-seasonal-pp-p:
+        cds_variable: temperature_anomaly
+        nc_variable: ta
+        types: state
+        units: K
+      u-component-of-wind-anomaly-seasonal-pp-p:
+        cds_variable: u_component_of_wind_anomaly
+        nc_variable: ua
+        types: state
+        units: m s**-1
+      v-component-of-wind-anomaly-seasonal-pp-p:
+        cds_variable: v_component_of_wind_anomaly
+        nc_variable: va
+        types: state
+        units: m s**-1
+  seasonal-monthly-ocean:
+    product_type:
+    - reanalysis
+    extras:
+      product_type:
+      - hindcast
+      originating_centre: ukmo
+      system: '601'
+    variables:
+      depth-avg-potential-temperature-300m-seasonal-ocean:
+        cds_variable: depth_average_potential_temperature_of_upper_300m
+        nc_variable: thetaot300
+        types: state
+        units: K
+      depth-average-potential-temperature-of-upper-300m-seasonal-ocean:
+        cds_variable: depth_average_potential_temperature_of_upper_300m
+        nc_variable: thetaot300
+        types: state
+        units: K
+      depth-average-salinity-of-upper-300m-seasonal-ocean:
+        cds_variable: depth_average_salinity_of_upper_300m
+        nc_variable: sot300
+        types: state
+        units: 1e-3
+      depth-of-14-c-isotherm-seasonal-ocean:
+        cds_variable: depth_of_14_c_isotherm
+        nc_variable: t14d
+        types: state
+        units: m
+      depth-of-17-c-isotherm-seasonal-ocean:
+        cds_variable: depth_of_17_c_isotherm
+        nc_variable: t17d
+        types: state
+        units: m
+      depth-of-20-c-isotherm-seasonal-ocean:
+        cds_variable: depth_of_20_c_isotherm
+        nc_variable: t20d
+        types: state
+        units: m
+      depth-of-26-c-isotherm-seasonal-ocean:
+        cds_variable: depth_of_26_c_isotherm
+        nc_variable: t26d
+        types: state
+        units: m
+      depth-of-28-c-isotherm-seasonal-ocean:
+        cds_variable: depth_of_28_c_isotherm
+        nc_variable: t28d
+        types: state
+        units: m
+      mixed-layer-depth-0-01-seasonal-ocean:
+        cds_variable: mixed_layer_depth_0_01
+        nc_variable: mlotst001
+        types: state
+        units: m
+      mixed-layer-depth-0-03-seasonal-ocean:
+        cds_variable: mixed_layer_depth_0_03
+        nc_variable: mlotst003
+        types: state
+        units: m
+      sea-ice-thickness-seasonal-ocean:
+        cds_variable: sea_ice_thickness
+        nc_variable: siti
+        types: state
+        units: m
+      sea-surface-height-above-geoid-seasonal-ocean:
+        cds_variable: sea_surface_height_above_geoid
+        nc_variable: zos
+        types: state
+        units: m
+      sea-surface-salinity-seasonal-ocean:
+        cds_variable: sea_surface_salinity
+        nc_variable: sos
+        types: state
+        units: 1e-3
+  seasonal-monthly-single-levels:
+    product_type:
+    - reanalysis
+    extras:
+      product_type:
+      - monthly_mean
+      originating_centre: ecmwf
+      system: '5'
+      leadtime_month:
+      - '1'
+    variables:
+      2m-temperature-seasonal:
+        cds_variable: 2m_temperature
+        nc_variable: t2m
+        types: state
+        units: K
+      total-precipitation-seasonal:
+        cds_variable: total_precipitation
+        nc_variable: tprate
+        types: flux
+        units: m s**-1
+      10m-wind-speed-seasonal:
+        cds_variable: 10m_wind_speed
+        nc_variable: si10
+        types: state
+        units: m s**-1
+      2m-dewpoint-temperature-seasonal:
+        cds_variable: 2m_dewpoint_temperature
+        nc_variable: d2m
+        types: state
+        units: K
+      evaporation-seasonal:
+        cds_variable: evaporation
+        nc_variable: erate
+        types: flux
+        units: m of water equivalent s**-1
+      snowfall-seasonal:
+        cds_variable: snowfall
+        nc_variable: mtsfr
+        types: flux
+        units: m of water equivalent s**-1
+      surface-solar-radiation-seasonal:
+        cds_variable: surface_solar_radiation
+        nc_variable: msnsrf
+        types: flux
+        units: W m**-2
+      surface-sensible-heat-flux-seasonal:
+        cds_variable: surface_sensible_heat_flux
+        nc_variable: msshfl
+        types: flux
+        units: W m**-2
+      sea-surface-temperature-seasonal:
+        cds_variable: sea_surface_temperature
+        nc_variable: sst
+        types: state
+        units: K
+      sea-ice-cover-seasonal:
+        cds_variable: sea_ice_cover
+        nc_variable: siconc
+        types: state
+        units: (0 - 1)
+      total-cloud-cover-seasonal:
+        cds_variable: total_cloud_cover
+        nc_variable: tcc
+        types: state
+        units: (0 - 1)
+      10m-u-component-of-wind-seasonal:
+        cds_variable: 10m_u_component_of_wind
+        nc_variable: u10
+        types: state
+        units: m s**-1
+      10m-v-component-of-wind-seasonal:
+        cds_variable: 10m_v_component_of_wind
+        nc_variable: v10
+        types: state
+        units: m s**-1
+      mean-sea-level-pressure-seasonal:
+        cds_variable: mean_sea_level_pressure
+        nc_variable: msl
+        types: state
+        units: Pa
+      surface-thermal-radiation-downwards-seasonal:
+        cds_variable: surface_thermal_radiation_downwards
+        nc_variable: msdtrf
+        types: flux
+        units: W m**-2
+      surface-solar-radiation-downwards-seasonal:
+        cds_variable: surface_solar_radiation_downwards
+        nc_variable: msdsrf
+        types: flux
+        units: W m**-2
+      surface-latent-heat-flux-seasonal:
+        cds_variable: surface_latent_heat_flux
+        nc_variable: mslhfl
+        types: flux
+        units: W m**-2
+      snow-depth-seasonal:
+        cds_variable: snow_depth
+        nc_variable: sd
+        types: state
+        units: m of water equivalent
+      100m-u-component-of-wind-seasonal:
+        cds_variable: 100m_u_component_of_wind
+        nc_variable: u100
+        types: state
+        units: m s**-1
+      100m-v-component-of-wind-seasonal:
+        cds_variable: 100m_v_component_of_wind
+        nc_variable: v100
+        types: state
+        units: m s**-1
+      100m-wind-speed-seasonal:
+        cds_variable: 100m_wind_speed
+        nc_variable: si100
+        types: state
+        units: m s**-1
+      10m-wind-gust-since-previous-post-processing-seasonal:
+        cds_variable: 10m_wind_gust_since_previous_post_processing
+        nc_variable: 10fg
+        types: state
+        units: m s**-1
+      east-west-surface-stress-rate-of-accumulation-seasonal:
+        cds_variable: east_west_surface_stress_rate_of_accumulation
+        nc_variable: ewss
+        types: flux
+        units: N m**-2 s
+      maximum-2m-temperature-in-the-last-24-hours-seasonal:
+        cds_variable: maximum_2m_temperature_in_the_last_24_hours
+        nc_variable: mx2t24
+        types: state
+        units: K
+      mean-sub-surface-runoff-rate-seasonal:
+        cds_variable: mean_sub_surface_runoff_rate
+        nc_variable: mssror
+        types: flux
+        units: kg m**-2 s**-1
+      mean-surface-runoff-rate-seasonal:
+        cds_variable: mean_surface_runoff_rate
+        nc_variable: msror
+        types: flux
+        units: kg m**-2 s**-1
+      minimum-2m-temperature-in-the-last-24-hours-seasonal:
+        cds_variable: minimum_2m_temperature_in_the_last_24_hours
+        nc_variable: mn2t24
+        types: state
+        units: K
+      north-south-surface-stress-rate-of-accumulation-seasonal:
+        cds_variable: north_south_surface_stress_rate_of_accumulation
+        nc_variable: nsss
+        types: flux
+        units: N m**-2 s
+      runoff-seasonal:
+        cds_variable: runoff
+        nc_variable: ro
+        types: flux
+        units: m
+      snow-density-seasonal:
+        cds_variable: snow_density
+        nc_variable: rsn
+        types: state
+        units: kg m**-3
+      soil-temperature-level-1-seasonal:
+        cds_variable: soil_temperature_level_1
+        nc_variable: stl1
+        types: state
+        units: K
+      solar-insolation-rate-of-accumulation-seasonal:
+        cds_variable: solar_insolation_rate_of_accumulation
+        nc_variable: sira
+        types: flux
+        units: J m**-2
+      surface-thermal-radiation-seasonal:
+        cds_variable: surface_thermal_radiation
+        nc_variable: str
+        types: flux
+        units: J m**-2
+      top-solar-radiation-seasonal:
+        cds_variable: top_solar_radiation
+        nc_variable: tsr
+        types: flux
+        units: J m**-2
+      top-thermal-radiation-seasonal:
+        cds_variable: top_thermal_radiation
+        nc_variable: ttr
+        types: flux
+        units: J m**-2
+      total-column-cloud-ice-water-seasonal:
+        cds_variable: total_column_cloud_ice_water
+        nc_variable: tciw
+        types: state
+        units: kg m**-2
+      total-column-cloud-liquid-water-seasonal:
+        cds_variable: total_column_cloud_liquid_water
+        nc_variable: tclw
+        types: state
+        units: kg m**-2
+      total-column-water-vapour-seasonal:
+        cds_variable: total_column_water_vapour
+        nc_variable: tcwv
+        types: state
+        units: kg m**-2

@@ -396,11 +396,11 @@ class Catalog(AbstractCatalog):
             ValueError: When auto-loading, propagates the same errors as
                 `load`.
         """
-        if self.datasets:
-            return
-        loaded = Catalog.load()
-        self.available_datasets = loaded.available_datasets
-        self.datasets = loaded.datasets
+        if not self.datasets:
+            loaded = Catalog.load()
+            self.available_datasets = loaded.available_datasets
+            self.datasets = loaded.datasets
+        super().model_post_init(__context)
 
     @classmethod
     def load(cls, catalog_path: Path | None = None) -> Catalog:
