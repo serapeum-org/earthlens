@@ -497,10 +497,10 @@ class HDX(AbstractDataSource):
                 pyramids type — a `Dataset` (raster), a
                 `FeatureCollection` (vector), or a `DataFrame` (tabular)
                 — dispatched by the recorded CKAN format label, instead
-                of returning raw paths. Needs `pyramids-gis >= 0.27.0`
-                (which provides `read_resource`); a non-`None` value is
-                otherwise rejected with a clear upgrade message. Defaults
-                to `False` (return paths).
+                of returning raw paths. Needs `pyramids-gis >= 0.29.0`
+                (which provides `read_resource`); on an older pyramids it
+                is rejected with a clear upgrade message. Defaults to
+                `False` (return paths).
 
         Returns:
             list[Path]: Local paths of every downloaded resource, in
@@ -512,7 +512,7 @@ class HDX(AbstractDataSource):
         Raises:
             NotImplementedError: If `aggregate` is not `None`, or if
                 `read=True` but the installed pyramids has no
-                `read_resource` (upgrade to `pyramids-gis >= 0.27.0`).
+                `read_resource` (upgrade to `pyramids-gis >= 0.29.0`).
         """
         if aggregate is not None:
             raise NotImplementedError(
