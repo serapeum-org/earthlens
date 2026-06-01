@@ -1,0 +1,186 @@
+# GHSL curated catalog — built-up slice (GHS-BUILT-S/V/H/C).
+#
+# Built-up surface (m2), volume (m3), building height (m), and the categorical
+# built-up classification. The AGBH/ANBH, FUN/MSZ/VEG, and NRES sub-products
+# live under their parent family directory on the JRC tree but carry their own
+# file-stem token, captured by the `family` field. R2022A nests the per-epoch
+# directories under an intermediate sub-product directory (`nested: true`);
+# R2022A built-up is 54009-only (the WGS84 arc-second variants arrived in
+# R2023A) and stops at epoch 2020.
+
+products:
+
+  GHS_BUILT_S:
+    aliases: [built_surface, built_up_surface, built_s]
+    unit: "m2"
+    default_resolution: "100m"
+    releases:
+      R2023A:
+        - epochs: [1975, 1980, 1985, 1990, 1995, 2000, 2005, 2010, 2015, 2020, 2025, 2030]
+          resolutions: ["100m", "1km", "3ss", "30ss"]
+        - epochs: [2018]
+          resolutions: ["10m"]
+      R2022A:
+        - epochs: [1975, 1980, 1985, 1990, 1995, 2000, 2005, 2010, 2015, 2020]
+          resolutions: ["100m", "1km"]
+          nested: true
+        - epochs: [2018]
+          resolutions: ["10m"]
+          nested: true
+
+  GHS_BUILT_S_NRES:
+    family: GHS_BUILT_S
+    aliases: [built_surface_nres, non_residential_surface, built_s_nres]
+    unit: "m2"
+    default_resolution: "100m"
+    releases:
+      R2023A:
+        - epochs: [1975, 1980, 1985, 1990, 1995, 2000, 2005, 2010, 2015, 2020, 2025, 2030]
+          resolutions: ["100m", "1km", "3ss", "30ss"]
+      R2022A:
+        - epochs: [1975, 1980, 1985, 1990, 1995, 2000, 2005, 2010, 2015, 2020]
+          resolutions: ["100m", "1km"]
+          nested: true
+        - epochs: [2018]
+          resolutions: ["10m"]
+          nested: true
+
+  GHS_BUILT_V:
+    aliases: [built_volume, built_up_volume, built_v]
+    unit: "m3"
+    default_resolution: "100m"
+    releases:
+      R2023A:
+        - epochs: [1975, 1980, 1985, 1990, 1995, 2000, 2005, 2010, 2015, 2020, 2025, 2030]
+          resolutions: ["100m", "1km", "3ss", "30ss"]
+      R2022A:
+        - epochs: [1975, 1980, 1985, 1990, 1995, 2000, 2005, 2010, 2015, 2020]
+          resolutions: ["100m", "1km"]
+          nested: true
+
+  GHS_BUILT_V_NRES:
+    family: GHS_BUILT_V
+    aliases: [built_volume_nres, non_residential_volume, built_v_nres]
+    unit: "m3"
+    default_resolution: "100m"
+    releases:
+      R2023A:
+        - epochs: [1975, 1980, 1985, 1990, 1995, 2000, 2005, 2010, 2015, 2020, 2025, 2030]
+          resolutions: ["100m", "1km", "3ss", "30ss"]
+      R2022A:
+        - epochs: [1975, 1980, 1985, 1990, 1995, 2000, 2005, 2010, 2015, 2020]
+          resolutions: ["100m", "1km"]
+          nested: true
+
+  GHS_BUILT_H_ANBH:
+    family: GHS_BUILT_H
+    aliases: [built_height, building_height, height, anbh, net_building_height]
+    unit: "m"
+    default_resolution: "100m"
+    releases:
+      R2023A:
+        - epochs: [2018]
+          resolutions: ["100m", "3ss"]
+      R2022A:
+        - epochs: [2018]
+          resolutions: ["100m"]
+          nested: true
+
+  GHS_BUILT_H_AGBH:
+    family: GHS_BUILT_H
+    aliases: [gross_building_height, agbh]
+    unit: "m"
+    default_resolution: "100m"
+    releases:
+      R2023A:
+        - epochs: [2018]
+          resolutions: ["100m", "3ss"]
+      R2022A:
+        - epochs: [2018]
+          resolutions: ["100m"]
+          nested: true
+
+  GHS_BUILT_C_MSZ:
+    family: GHS_BUILT_C
+    aliases: [built_class, morphological_settlement_zone, built_c, built_c_msz]
+    unit: ""
+    categorical: true
+    default_resolution: "10m"
+    legend:
+      1: "Open space, low vegetation"
+      2: "Open space, medium vegetation"
+      3: "Open space, high vegetation"
+      4: "Open space, water"
+      5: "Open space, road surface"
+      11: "Residential, building height <= 3 m"
+      12: "Residential, 3 m < height <= 6 m"
+      13: "Residential, 6 m < height <= 15 m"
+      14: "Residential, 15 m < height <= 30 m"
+      15: "Residential, height > 30 m"
+      21: "Non-residential, building height <= 3 m"
+      22: "Non-residential, 3 m < height <= 6 m"
+      23: "Non-residential, 6 m < height <= 15 m"
+      24: "Non-residential, 15 m < height <= 30 m"
+      25: "Non-residential, height > 30 m"
+    colors:
+      1: "#FFFFCC"
+      2: "#CCF24D"
+      3: "#54A800"
+      4: "#3C50FF"
+      5: "#A9A9A9"
+      11: "#FFD2D2"
+      12: "#FFA8A8"
+      13: "#FF6E6E"
+      14: "#E60000"
+      15: "#A80000"
+      21: "#D9C2F0"
+      22: "#BE9BE0"
+      23: "#9E6FD1"
+      24: "#7E48C2"
+      25: "#5C00A3"
+    releases:
+      R2023A:
+        - epochs: [2018]
+          resolutions: ["10m"]
+      R2022A:
+        - epochs: [2018]
+          resolutions: ["10m"]
+          nested: true
+
+  GHS_BUILT_C_FUN:
+    family: GHS_BUILT_C
+    aliases: [built_function, functional_classification, built_c_fun]
+    unit: ""
+    categorical: true
+    default_resolution: "10m"
+    legend:
+      1: "Residential"
+      2: "Non-residential"
+    colors:
+      1: "#E60000"
+      2: "#7E48C2"
+    releases:
+      R2023A:
+        - epochs: [2018]
+          resolutions: ["10m"]
+      R2022A:
+        - epochs: [2018]
+          resolutions: ["10m"]
+          nested: true
+
+  # R2022A-only sub-product: built-up characteristics by vegetation. A
+  # classification raster in the BUILT-C family; its exact class codes are not
+  # curated, so it carries no legend — but it is flagged categorical so the
+  # localise step uses nearest-neighbour resampling (never blends class codes),
+  # which is the safe choice whether or not VEG turns out to be class-coded.
+  GHS_BUILT_C_VEG:
+    family: GHS_BUILT_C
+    aliases: [built_vegetation, built_c_veg]
+    unit: ""
+    categorical: true
+    default_resolution: "10m"
+    releases:
+      R2022A:
+        - epochs: [2018]
+          resolutions: ["10m"]
+          nested: true

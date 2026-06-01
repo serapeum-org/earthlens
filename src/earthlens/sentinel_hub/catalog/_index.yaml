@@ -1,0 +1,34 @@
+# Informational index of the Sentinel Hub data collections the backend can
+# address. Generated from the sentinelhub DataCollection enum by
+# tools/sentinel_hub/refresh_sh_catalog.py (`refresh --from-sdk`, offline) and
+# refreshable from the live Catalog API (`refresh`). Not a curated layer — the
+# curated collections + bands live in collections.yaml.
+available_collections:
+  - DEM
+  - DEM_COPERNICUS_30
+  - DEM_COPERNICUS_90
+  - DEM_MAPZEN
+  - HARMONIZED_LANDSAT_SENTINEL
+  - LANDSAT_ETM_L1
+  - LANDSAT_ETM_L2
+  - LANDSAT_MSS_L1
+  - LANDSAT_OT_L1
+  - LANDSAT_OT_L2
+  - LANDSAT_TM_L1
+  - LANDSAT_TM_L2
+  - MODIS
+  - SENTINEL1
+  - SENTINEL1_EW
+  - SENTINEL1_EW_ASC
+  - SENTINEL1_EW_DES
+  - SENTINEL1_EW_SH
+  - SENTINEL1_EW_SH_ASC
+  - SENTINEL1_EW_SH_DES
+  - SENTINEL1_IW
+  - SENTINEL1_IW_ASC
+  - SENTINEL1_IW_DES
+  - SENTINEL2_L1C
+  - SENTINEL2_L2A
+  - SENTINEL3_OLCI
+  - SENTINEL3_SLSTR
+  - SENTINEL5P

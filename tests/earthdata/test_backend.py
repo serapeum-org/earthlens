@@ -104,12 +104,12 @@ class _FakeCollection:
 
 
 class _FakeDatasetCollection:
-    """Fake pyramids DatasetCollection with read_file + groupby."""
+    """Fake pyramids DatasetCollection with from_files + groupby."""
 
     groupby = True
 
     @staticmethod
-    def read_file(paths):
+    def from_files(paths):
         """Return a fake collection over the given paths."""
         return _FakeCollection(paths)
 

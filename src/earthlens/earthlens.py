@@ -137,8 +137,11 @@ class EarthLens:
             >>> sorted(EarthLens.DataSources)  # doctest: +NORMALIZE_WHITESPACE
             ['amazon-s3', 'cdse', 'chc', 'chirps', 'cmems', 'earth-search',
              'earthdata', 'ecmwf', 'eumetsat', 'fdsn', 'firms', 'gdacs', 'gee',
-             'google-earth-engine', 'national-water-model', 'nwm', 'openaq',
-             'openeo', 'planetary-computer', 'stac', 'tropycal']
+             'ghs', 'ghsl', 'google-earth-engine', 'human-settlement',
+             'national-water-model', 'nexrad', 'nwis', 'nwm', 'nwp', 'openaq',
+             'openeo', 'overture', 'planetary-computer', 'radar', 'sentinel-hub',
+             'sentinelhub', 'stac', 'tropycal', 'usgs-nwis', 'usgs-water',
+             'world-pop', 'worldpop']
 
             ```
         - Asking for an unknown backend raises `ValueError`:
@@ -178,6 +181,10 @@ class EarthLens:
         :class:`earthlens.openeo.OpenEO`: server-side openEO process graphs
             (defaults to CDSE openEO); `raster` output, `aggregate=` is a
             native `aggregate_temporal_period` node; key `"openeo"`.
+        :class:`earthlens.sentinel_hub.SentinelHub`: server-side Sentinel
+            Hub render on CDSE (Process / Async / Batch raster, Statistical /
+            Batch-Statistical tabular); `mixed` output, evalscript-driven;
+            keys `"sentinel-hub"` / `"sentinelhub"`.
         :class:`earthlens.tropycal.TropicalCyclone`: tropical-cyclone
             best tracks via `tropycal` (`vector` output); key
             `"tropycal"`.
@@ -187,9 +194,39 @@ class EarthLens:
         :class:`earthlens.nwm.NWM`: NOAA National Water Model hydrologic
             output — per-reach streamflow (`chrtout`, `tabular`) and
             gridded land surface (`ldasout`, `raster`) — fetched whole
-            from the anonymous `noaa-nwm-pds` bucket; subsetting and the
-            retrospective Zarr are `PY-G`-gated. Keys `"nwm"` /
-            `"national-water-model"`.
+            from the anonymous `noaa-nwm-pds` bucket; tabular subsetting +
+            the retrospective Zarr read via pyramids `LabeledDataset`. Keys
+            `"nwm"` / `"national-water-model"`.
+        :class:`earthlens.overture.Overture`: Overture Maps Foundation
+            GeoParquet (buildings / places / transportation / divisions)
+            over public S3 via `overturemaps`; `vector` FeatureCollection
+            output with a per-row `license_id` column (and an ODbL
+            `LicenseWarning`); no credentials; key `"overture"`.
+        :class:`earthlens.nwp.NWP`: open numerical-weather-prediction
+            forecasts (NOAA NODD / ECMWF Open Data / DWD) on a forecast
+            `(cycle, step)` axis, returned as bbox-cropped COGs; key
+            `"nwp"`.
+        :class:`earthlens.radar.Radar`: NEXRAD Level-II radar volumes
+            assembled from the real-time chunk feed (`vector` inventory);
+            keys `"radar"` / `"nexrad"`.
+        :class:`earthlens.usgs_water.USGSWater`: USGS NWIS / Water Data
+            per-site water observations (discharge, gage height,
+            water quality, …) via `dataretrieval` as a `tabular`
+            `DataFrame`; optional `API_USGS_PAT`, anonymous works; keys
+            `"usgs-water"` / `"usgs-nwis"` / `"nwis"`.
+        :class:`earthlens.ghsl.GHSL`: JRC Global Human Settlement Layer
+            (population / built-up / settlement-model grids + R2025A WUP
+            projections) over open HTTPS, reprojected / mosaicked / cropped
+            to the AOI via `pyramids` as `raster` GeoTIFFs (one per
+            product × epoch; `aggregate=` reduces across epochs); no
+            credentials; keys `"ghsl"` / `"ghs"` / `"human-settlement"`.
+        :class:`earthlens.worldpop.WorldPop`: WorldPop open population data
+            hub (CC-BY-4.0, no credentials) — per-country / global gridded
+            population, density, age/sex, births, projections; mosaic +
+            crop to the AOI via `pyramids` with a tidy age/sex table for
+            demographic products; `mixed` output; keys `"worldpop"` /
+            `"world-pop"`.
+
     """
 
     DataSources = _LazyRegistry(
@@ -214,6 +251,33 @@ class EarthLens:
             # openEO server-side processing (defaults to CDSE openEO). Builds a
             # process graph the backend executes; returns the written paths.
             "openeo": ("earthlens.openeo", "OpenEO", "openeo", {}),
+            # Sentinel Hub server-side render on CDSE. Builds a bbox/geometry +
+            # evalscript request the server renders; returns written GeoTIFF
+            # paths (raster planes) or table paths / S3 URIs (tabular / batch).
+            # `OUTPUT_KIND="mixed"`. The `"sentinelhub"` alias matches the SDK
+            # spelling.
+            "sentinel-hub": (
+                "earthlens.sentinel_hub",
+                "SentinelHub",
+                "sentinel-hub",
+                {},
+            ),
+            "sentinelhub": (
+                "earthlens.sentinel_hub",
+                "SentinelHub",
+                "sentinel-hub",
+                {},
+            ),
+            # Overture Maps GeoParquet over public S3 (no creds). Vector
+            # FeatureCollection output with a per-row license_id column.
+            "overture": ("earthlens.overture", "Overture", "overture", {}),
+            # JRC Global Human Settlement Layer (open HTTPS, attribution-only).
+            # Download-and-localise raster: tiles/whole-globe .zip -> pyramids
+            # reproject/mosaic/crop. No extra SDK (requests + pyramids are core),
+            # so no extra to hint. Aliases "ghs" / "human-settlement".
+            "ghsl": ("earthlens.ghsl", "GHSL", "", {}),
+            "ghs": ("earthlens.ghsl", "GHSL", "", {}),
+            "human-settlement": ("earthlens.ghsl", "GHSL", "", {}),
             "tropycal": ("earthlens.tropycal", "TropicalCyclone", "tropycal", {}),
             # FIRMS needs a free MAP_KEY but no SDK (requests + pandas
             # are core), so like GDACS there is no extra to hint.
@@ -222,6 +286,12 @@ class EarthLens:
             # [nwm] extra pulls boto3. Alias "national-water-model".
             "nwm": ("earthlens.nwm", "NWM", "nwm", {}),
             "national-water-model": ("earthlens.nwm", "NWM", "nwm", {}),
+            # Open NWP forecasts (NOAA NODD / ECMWF Open Data / DWD); the
+            # [nwp] extra pulls herbie-data + ecmwf-opendata.
+            "nwp": ("earthlens.nwp", "NWP", "nwp", {}),
+            # NEXRAD Level-II radar (anonymous chunk bucket); alias "nexrad".
+            "radar": ("earthlens.radar", "Radar", "radar", {}),
+            "nexrad": ("earthlens.radar", "Radar", "radar", {}),
             # One unified STAC backend over several endpoints. The bare
             # `"stac"` key leaves the endpoint to be inferred from the
             # requested collection; the three endpoint aliases pre-bind
@@ -240,6 +310,18 @@ class EarthLens:
                 {"endpoint": "earth-search"},
             ),
             "cdse": ("earthlens.stac", "STAC", "stac", {"endpoint": "cdse"}),
+            # USGS NWIS / Water Data (dataretrieval). Tabular DataFrame of
+            # per-site water observations; anonymous access works. The
+            # "usgs-nwis" / "nwis" aliases point at the same backend.
+            "usgs-water": ("earthlens.usgs_water", "USGSWater", "usgs-water", {}),
+            "usgs-nwis": ("earthlens.usgs_water", "USGSWater", "usgs-water", {}),
+            "nwis": ("earthlens.usgs_water", "USGSWater", "usgs-water", {}),
+            # WorldPop open population data hub (CC-BY-4.0, no creds). Mosaic +
+            # crop per-country GeoTIFFs to the AOI; demographic products also
+            # emit a tidy age/sex table. `OUTPUT_KIND="mixed"`. Alias
+            # "world-pop". The default REST path needs no extra SDK.
+            "worldpop": ("earthlens.worldpop", "WorldPop", "worldpop", {}),
+            "world-pop": ("earthlens.worldpop", "WorldPop", "worldpop", {}),
         }
     )
 

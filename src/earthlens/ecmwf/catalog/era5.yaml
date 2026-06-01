@@ -1,0 +1,1098 @@
+# CDS catalog — era5 family. See _index.yaml for the schema.
+
+datasets:
+  reanalysis-era5-single-levels:
+    product_type:
+    - reanalysis
+    monthly: reanalysis-era5-single-levels-monthly-means
+    monthly_product_type:
+    - monthly_averaged_reanalysis
+    variables:
+      2m-temperature:
+        nc_variable: t2m
+        types: state
+        units: K
+      2m-dewpoint-temperature:
+        nc_variable: d2m
+        types: state
+        units: K
+      surface-pressure:
+        nc_variable: sp
+        types: state
+        units: Pa
+      total-precipitation:
+        nc_variable: tp
+        types: flux
+        units: m
+      evaporation:
+        nc_variable: e
+        types: flux
+        units: m of water equivalent
+      runoff:
+        nc_variable: ro
+        types: flux
+        units: m
+      surface-runoff:
+        nc_variable: sro
+        types: flux
+        units: m
+      sub-surface-runoff:
+        nc_variable: ssro
+        types: flux
+        units: m
+      10m-u-component-of-wind:
+        nc_variable: u10
+        types: state
+        units: m s**-1
+      10m-v-component-of-wind:
+        nc_variable: v10
+        types: state
+        units: m s**-1
+      10m-wind-speed:
+        nc_variable: si10
+        types: state
+        units: m s**-1
+      forecast-albedo:
+        nc_variable: fal
+        types: state
+        units: (0 - 1)
+      high-cloud-cover:
+        nc_variable: hcc
+        types: state
+        units: (0 - 1)
+      forecast-surface-roughness:
+        nc_variable: fsr
+        types: state
+        units: m
+      surface-net-solar-radiation:
+        nc_variable: ssr
+        types: flux
+        units: J m**-2
+      100m-u-component-of-wind:
+        nc_variable: u100
+        units: m s**-1
+      100m-v-component-of-wind:
+        nc_variable: v100
+        units: m s**-1
+      10m-u-component-of-neutral-wind:
+        nc_variable: u10n
+        units: m s**-1
+      10m-v-component-of-neutral-wind:
+        nc_variable: v10n
+        units: m s**-1
+      10m-wind-gust-since-previous-post-processing:
+        nc_variable: fg10
+        units: m s**-1
+      air-density-over-the-oceans:
+        nc_variable: rhoao
+        units: kg m**-3
+      angle-of-sub-gridscale-orography:
+        nc_variable: anor
+        units: radians
+      anisotropy-of-sub-gridscale-orography:
+        nc_variable: isor
+        units: Numeric
+      benjamin-feir-index:
+        nc_variable: bfi
+        units: dimensionless
+      boundary-layer-dissipation:
+        nc_variable: bld
+        units: J m**-2
+      boundary-layer-height:
+        nc_variable: blh
+        units: m
+      charnock:
+        nc_variable: chnk
+        units: Numeric
+      clear-sky-direct-solar-radiation-at-surface:
+        nc_variable: cdir
+        units: J m**-2
+      cloud-base-height:
+        nc_variable: cbh
+        units: m
+      coefficient-of-drag-with-waves:
+        nc_variable: cdww
+        units: dimensionless
+      convective-available-potential-energy:
+        nc_variable: cape
+        units: J kg**-1
+      convective-inhibition:
+        nc_variable: cin
+        units: J kg**-1
+      convective-precipitation:
+        nc_variable: avg_cpr
+        units: kg m**-2 s**-1
+      convective-rain-rate:
+        nc_variable: crr
+        units: kg m**-2 s**-1
+      convective-snowfall:
+        nc_variable: avg_csfr
+        units: kg m**-2 s**-1
+      convective-snowfall-rate-water-equivalent:
+        nc_variable: avg_csfr
+        units: kg m**-2 s**-1
+      downward-uv-radiation-at-the-surface:
+        nc_variable: avg_sduvrf
+        units: W m**-2
+      duct-base-height:
+        nc_variable: dctb
+        units: m
+      eastward-gravity-wave-surface-stress:
+        nc_variable: lgws
+        units: N m**-2 s
+      eastward-turbulent-surface-stress:
+        nc_variable: ewss
+        units: N m**-2 s
+      forecast-logarithm-of-surface-roughness-for-heat:
+        nc_variable: flsr
+        units: Numeric
+      free-convective-velocity-over-the-oceans:
+        nc_variable: wstar
+        units: m s**-1
+      friction-velocity:
+        nc_variable: zust
+        units: m s**-1
+      gravity-wave-dissipation:
+        nc_variable: gwd
+        units: J m**-2
+      high-vegetation-cover:
+        nc_variable: cvh
+        units: (0 - 1)
+      ice-temperature-layer-1:
+        nc_variable: istl1
+        units: K
+      ice-temperature-layer-2:
+        nc_variable: istl2
+        units: K
+      ice-temperature-layer-3:
+        nc_variable: istl3
+        units: K
+      ice-temperature-layer-4:
+        nc_variable: istl4
+        units: K
+      instantaneous-10m-wind-gust:
+        nc_variable: i10fg
+        units: m s**-1
+      instantaneous-eastward-turbulent-surface-stress:
+        nc_variable: iews
+        units: N m**-2
+      instantaneous-large-scale-surface-precipitation-fraction:
+        nc_variable: ilspf
+        units: Proportion
+      instantaneous-moisture-flux:
+        nc_variable: ie
+        units: kg m**-2 s**-1
+      instantaneous-northward-turbulent-surface-stress:
+        nc_variable: inss
+        units: N m**-2
+      instantaneous-surface-sensible-heat-flux:
+        nc_variable: ishf
+        units: W m**-2
+      k-index:
+        nc_variable: kx
+        units: K
+      lake-bottom-temperature:
+        nc_variable: lblt
+        units: K
+      lake-cover:
+        nc_variable: cl
+        units: (0 - 1)
+      lake-depth:
+        nc_variable: dl
+        units: m
+      lake-ice-depth:
+        nc_variable: licd
+        units: m
+      lake-ice-temperature:
+        nc_variable: lict
+        units: K
+      lake-mix-layer-depth:
+        nc_variable: lmld
+        units: m
+      lake-mix-layer-temperature:
+        nc_variable: lmlt
+        units: K
+      lake-shape-factor:
+        nc_variable: lshf
+        units: dimensionless
+      lake-total-layer-temperature:
+        nc_variable: ltlt
+        units: K
+      land-sea-mask:
+        nc_variable: lsm
+        units: (0 - 1)
+      large-scale-precipitation:
+        nc_variable: lspf
+        units: s
+      large-scale-precipitation-fraction:
+        nc_variable: lspf
+        units: s
+      large-scale-rain-rate:
+        nc_variable: lsrr
+        units: kg m**-2 s**-1
+      large-scale-snowfall:
+        nc_variable: avg_lssfr
+        units: kg m**-2 s**-1
+      large-scale-snowfall-rate-water-equivalent:
+        nc_variable: avg_lssfr
+        units: kg m**-2 s**-1
+      leaf-area-index-high-vegetation:
+        nc_variable: lai_hv
+        units: m**2 m**-2
+      leaf-area-index-low-vegetation:
+        nc_variable: lai_lv
+        units: m**2 m**-2
+      low-cloud-cover:
+        nc_variable: lcc
+        units: (0 - 1)
+      low-vegetation-cover:
+        nc_variable: cvl
+        units: (0 - 1)
+      maximum-2m-temperature-since-previous-post-processing:
+        nc_variable: mx2t
+        units: K
+      maximum-individual-wave-height:
+        nc_variable: hmax
+        units: m
+      maximum-total-precipitation-rate-since-previous-post-processing:
+        nc_variable: mxtpr
+        units: kg m**-2 s**-1
+      mean-boundary-layer-dissipation:
+        nc_variable: avg_ibld
+        units: W m**-2
+      mean-convective-precipitation-rate:
+        nc_variable: avg_cpr
+        units: kg m**-2 s**-1
+      mean-convective-snowfall-rate:
+        nc_variable: avg_csfr
+        units: kg m**-2 s**-1
+      mean-direction-of-total-swell:
+        nc_variable: mdts
+        units: degrees
+      mean-direction-of-wind-waves:
+        nc_variable: mdww
+        units: degrees
+      mean-eastward-gravity-wave-surface-stress:
+        nc_variable: avg_iegwss
+        units: N m**-2
+      mean-eastward-turbulent-surface-stress:
+        nc_variable: avg_iews
+        units: N m**-2
+      mean-evaporation-rate:
+        nc_variable: avg_ie
+        units: kg m**-2 s**-1
+      mean-gravity-wave-dissipation:
+        nc_variable: avg_igwd
+        units: W m**-2
+      mean-large-scale-precipitation-fraction:
+        nc_variable: avg_ilspf
+        units: Proportion
+      mean-large-scale-precipitation-rate:
+        nc_variable: avg_lsprate
+        units: kg m**-2 s**-1
+      mean-large-scale-snowfall-rate:
+        nc_variable: avg_lssfr
+        units: kg m**-2 s**-1
+      mean-northward-gravity-wave-surface-stress:
+        nc_variable: avg_ingwss
+        units: N m**-2
+      mean-northward-turbulent-surface-stress:
+        nc_variable: avg_inss
+        units: N m**-2
+      mean-period-of-total-swell:
+        nc_variable: mpts
+        units: s
+      mean-period-of-wind-waves:
+        nc_variable: mpww
+        units: s
+      mean-potential-evaporation-rate:
+        nc_variable: avg_pevr
+        units: kg m**-2 s**-1
+      mean-runoff-rate:
+        nc_variable: avg_surfror
+        units: kg m**-2 s**-1
+      mean-sea-level-pressure:
+        nc_variable: msl
+        units: Pa
+      mean-snow-evaporation-rate:
+        nc_variable: avg_esrwe
+        units: kg m**-2 s**-1
+      mean-snowfall-rate:
+        nc_variable: avg_tsrwe
+        units: kg m**-2 s**-1
+      mean-snowmelt-rate:
+        nc_variable: avg_smr
+        units: kg m**-2 s**-1
+      mean-square-slope-of-waves:
+        nc_variable: msqs
+        units: dimensionless
+      mean-sub-surface-runoff-rate:
+        nc_variable: avg_ssurfror
+        units: kg m**-2 s**-1
+      mean-surface-direct-short-wave-radiation-flux:
+        nc_variable: avg_sdirswrf
+        units: W m**-2
+      mean-surface-direct-short-wave-radiation-flux-clear-sky:
+        nc_variable: avg_sdirswrfcs
+        units: W m**-2
+      mean-surface-downward-long-wave-radiation-flux:
+        nc_variable: avg_sdlwrf
+        units: W m**-2
+      mean-surface-downward-long-wave-radiation-flux-clear-sky:
+        nc_variable: avg_sdlwrfcs
+        units: W m**-2
+      mean-surface-downward-short-wave-radiation-flux:
+        nc_variable: avg_sdswrf
+        units: W m**-2
+      mean-surface-downward-short-wave-radiation-flux-clear-sky:
+        nc_variable: avg_sdswrfcs
+        units: W m**-2
+      mean-surface-downward-uv-radiation-flux:
+        nc_variable: avg_sduvrf
+        units: W m**-2
+      mean-surface-latent-heat-flux:
+        nc_variable: avg_slhtf
+        units: W m**-2
+      mean-surface-net-long-wave-radiation-flux:
+        nc_variable: avg_snlwrf
+        units: W m**-2
+      mean-surface-net-long-wave-radiation-flux-clear-sky:
+        nc_variable: avg_snlwrfcs
+        units: W m**-2
+      mean-surface-net-short-wave-radiation-flux:
+        nc_variable: avg_snswrf
+        units: W m**-2
+      mean-surface-net-short-wave-radiation-flux-clear-sky:
+        nc_variable: avg_snswrfcs
+        units: W m**-2
+      mean-surface-runoff-rate:
+        nc_variable: avg_surfror
+        units: kg m**-2 s**-1
+      mean-surface-sensible-heat-flux:
+        nc_variable: avg_ishf
+        units: W m**-2
+      mean-top-downward-short-wave-radiation-flux:
+        nc_variable: avg_tdswrf
+        units: W m**-2
+      mean-top-net-long-wave-radiation-flux:
+        nc_variable: avg_tnlwrf
+        units: W m**-2
+      mean-top-net-long-wave-radiation-flux-clear-sky:
+        nc_variable: avg_tnlwrfcs
+        units: W m**-2
+      mean-top-net-short-wave-radiation-flux:
+        nc_variable: avg_tnswrf
+        units: W m**-2
+      mean-top-net-short-wave-radiation-flux-clear-sky:
+        nc_variable: avg_tnswrfcs
+        units: W m**-2
+      mean-total-precipitation-rate:
+        nc_variable: avg_tprate
+        units: kg m**-2 s**-1
+      mean-vertical-gradient-of-refractivity-inside-trapping-layer:
+        nc_variable: dndza
+        units: m**-1
+      mean-vertically-integrated-moisture-divergence:
+        nc_variable: avg_vimdf
+        units: kg m**-2 s**-1
+      mean-wave-direction:
+        nc_variable: mwd
+        units: Degree true
+      mean-wave-direction-of-first-swell-partition:
+        nc_variable: mwd1
+        units: degrees
+      mean-wave-direction-of-second-swell-partition:
+        nc_variable: mwd2
+        units: degrees
+      mean-wave-direction-of-third-swell-partition:
+        nc_variable: mwd3
+        units: degrees
+      mean-wave-period:
+        nc_variable: mp2
+        units: s
+      mean-wave-period-based-on-first-moment:
+        nc_variable: mp1
+        units: s
+      mean-wave-period-based-on-first-moment-for-swell:
+        nc_variable: p1ps
+        units: s
+      mean-wave-period-based-on-first-moment-for-wind-waves:
+        nc_variable: p1ww
+        units: s
+      mean-wave-period-based-on-second-moment-for-swell:
+        nc_variable: p2ps
+        units: s
+      mean-wave-period-based-on-second-moment-for-wind-waves:
+        nc_variable: p2ww
+        units: s
+      mean-wave-period-of-first-swell-partition:
+        nc_variable: mwp1
+        units: s
+      mean-wave-period-of-second-swell-partition:
+        nc_variable: mwp2
+        units: s
+      mean-wave-period-of-third-swell-partition:
+        nc_variable: mwp3
+        units: s
+      mean-zero-crossing-wave-period:
+        nc_variable: mp2
+        units: s
+      medium-cloud-cover:
+        nc_variable: mcc
+        units: (0 - 1)
+      minimum-2m-temperature-since-previous-post-processing:
+        nc_variable: mn2t
+        units: K
+      minimum-total-precipitation-rate-since-previous-post-processing:
+        nc_variable: mntpr
+        units: kg m**-2 s**-1
+      minimum-vertical-gradient-of-refractivity-inside-trapping-layer:
+        nc_variable: dndzn
+        units: m**-1
+      model-bathymetry:
+        nc_variable: wmb
+        units: m
+      near-ir-albedo-for-diffuse-radiation:
+        nc_variable: alnid
+        units: (0 - 1)
+      near-ir-albedo-for-direct-radiation:
+        nc_variable: alnip
+        units: (0 - 1)
+      normalized-energy-flux-into-ocean:
+        nc_variable: phioc
+        units: Numeric
+      normalized-energy-flux-into-waves:
+        nc_variable: phiaw
+        units: Numeric
+      normalized-stress-into-ocean:
+        nc_variable: tauoc
+        units: Numeric
+      northward-gravity-wave-surface-stress:
+        nc_variable: mgws
+        units: N m**-2 s
+      northward-turbulent-surface-stress:
+        nc_variable: nsss
+        units: N m**-2 s
+      ocean-surface-stress-equivalent-10m-neutral-wind-direction:
+        nc_variable: dwi
+        units: degrees
+      ocean-surface-stress-equivalent-10m-neutral-wind-speed:
+        nc_variable: wind
+        units: m s**-1
+      peak-wave-period:
+        nc_variable: pp1d
+        units: s
+      period-corresponding-to-maximum-individual-wave-height:
+        nc_variable: tmax
+        units: s
+      potential-evaporation:
+        nc_variable: avg_pevr
+        units: kg m**-2 s**-1
+      precipitation-type:
+        nc_variable: ptype
+        units: (Code table 4.201)
+      sea-ice-cover:
+        nc_variable: siconc
+        units: (0 - 1)
+      sea-surface-temperature:
+        nc_variable: sst
+        units: K
+      significant-height-of-combined-wind-waves-and-swell:
+        nc_variable: swh
+        units: m
+      significant-height-of-total-swell:
+        nc_variable: shts
+        units: m
+      significant-height-of-wind-waves:
+        nc_variable: shww
+        units: m
+      significant-wave-height-of-first-swell-partition:
+        nc_variable: swh1
+        units: m
+      significant-wave-height-of-second-swell-partition:
+        nc_variable: swh2
+        units: m
+      significant-wave-height-of-third-swell-partition:
+        nc_variable: swh3
+        units: m
+      skin-reservoir-content:
+        nc_variable: src
+        units: m of water equivalent
+      skin-temperature:
+        nc_variable: skt
+        units: K
+      slope-of-sub-gridscale-orography:
+        nc_variable: slor
+        units: Numeric
+      snow-albedo:
+        nc_variable: asn
+        units: (0 - 1)
+      snow-density:
+        nc_variable: rsn
+        units: kg m**-3
+      snow-depth:
+        nc_variable: sd
+        units: m of water equivalent
+      snow-evaporation:
+        nc_variable: avg_esrwe
+        units: kg m**-2 s**-1
+      snowfall:
+        nc_variable: avg_tsrwe
+        units: kg m**-2 s**-1
+      snowmelt:
+        nc_variable: smlt
+        units: m of water equivalent
+      soil-temperature-level-1:
+        nc_variable: stl1
+        units: K
+      soil-temperature-level-2:
+        nc_variable: stl2
+        units: K
+      soil-temperature-level-3:
+        nc_variable: stl3
+        units: K
+      soil-temperature-level-4:
+        nc_variable: stl4
+        units: K
+      soil-type:
+        nc_variable: slt
+        units: (Code table 4.213)
+      standard-deviation-of-filtered-subgrid-orography:
+        nc_variable: sdfor
+        units: m
+      standard-deviation-of-orography:
+        nc_variable: sdor
+        units: m
+      surface-latent-heat-flux:
+        nc_variable: avg_slhtf
+        units: W m**-2
+      surface-net-solar-radiation-clear-sky:
+        nc_variable: ssrc
+        units: J m**-2
+      surface-net-thermal-radiation:
+        nc_variable: str
+        units: J m**-2
+      surface-net-thermal-radiation-clear-sky:
+        nc_variable: strc
+        units: J m**-2
+      surface-sensible-heat-flux:
+        nc_variable: sshf
+        units: J m**-2
+      surface-solar-radiation-downward-clear-sky:
+        nc_variable: ssrdc
+        units: J m**-2
+      surface-solar-radiation-downwards:
+        nc_variable: ssrd
+        units: J m**-2
+      surface-thermal-radiation-downward-clear-sky:
+        nc_variable: strdc
+        units: J m**-2
+      surface-thermal-radiation-downwards:
+        nc_variable: strd
+        units: J m**-2
+      temperature-of-snow-layer:
+        nc_variable: tsn
+        units: K
+      toa-incident-solar-radiation:
+        nc_variable: tisr
+        units: J m**-2
+      top-net-solar-radiation:
+        nc_variable: tsr
+        units: J m**-2
+      top-net-solar-radiation-clear-sky:
+        nc_variable: tsrc
+        units: J m**-2
+      top-net-thermal-radiation:
+        nc_variable: ttr
+        units: J m**-2
+      top-net-thermal-radiation-clear-sky:
+        nc_variable: ttrc
+        units: J m**-2
+      total-cloud-cover:
+        nc_variable: tcc
+        units: (0 - 1)
+      total-column-cloud-ice-water:
+        nc_variable: tciw
+        units: kg m**-2
+      total-column-cloud-liquid-water:
+        nc_variable: tclw
+        units: kg m**-2
+      total-column-ozone:
+        nc_variable: tco3
+        units: kg m**-2
+      total-column-rain-water:
+        nc_variable: tcrw
+        units: kg m**-2
+      total-column-snow-water:
+        nc_variable: tcsw
+        units: kg m**-2
+      total-column-supercooled-liquid-water:
+        nc_variable: tcslw
+        units: kg m**-2
+      total-column-water:
+        nc_variable: tcw
+        units: kg m**-2
+      total-column-water-vapour:
+        nc_variable: tcwv
+        units: kg m**-2
+      total-sky-direct-solar-radiation-at-surface:
+        nc_variable: fdir
+        units: J m**-2
+      total-totals-index:
+        nc_variable: totalx
+        units: K
+      trapping-layer-base-height:
+        nc_variable: tplb
+        units: m
+      trapping-layer-top-height:
+        nc_variable: tplt
+        units: m
+      type-of-high-vegetation:
+        nc_variable: tvh
+        units: (Code table 4.234)
+      type-of-low-vegetation:
+        nc_variable: tvl
+        units: (Code table 4.234)
+      u-component-stokes-drift:
+        nc_variable: ust
+        units: m s**-1
+      uv-visible-albedo-for-diffuse-radiation:
+        nc_variable: aluvd
+        units: (0 - 1)
+      uv-visible-albedo-for-direct-radiation:
+        nc_variable: aluvp
+        units: (0 - 1)
+      v-component-stokes-drift:
+        nc_variable: vst
+        units: m s**-1
+      vertical-integral-of-divergence-of-cloud-frozen-water-flux:
+        nc_variable: viiwd
+        units: kg m**-2 s**-1
+      vertical-integral-of-divergence-of-cloud-liquid-water-flux:
+        nc_variable: vilwd
+        units: kg m**-2 s**-1
+      vertical-integral-of-divergence-of-geopotential-flux:
+        nc_variable: vigd
+        units: W m**-2
+      vertical-integral-of-divergence-of-kinetic-energy-flux:
+        nc_variable: viked
+        units: W m**-2
+      vertical-integral-of-divergence-of-mass-flux:
+        nc_variable: vimad
+        units: kg m**-2 s**-1
+      vertical-integral-of-divergence-of-moisture-flux:
+        nc_variable: vimdf
+        units: kg m**-2 s**-1
+      vertical-integral-of-divergence-of-ozone-flux:
+        nc_variable: viozd
+        units: kg m**-2 s**-1
+      vertical-integral-of-divergence-of-thermal-energy-flux:
+        nc_variable: vithed
+        units: W m**-2
+      vertical-integral-of-divergence-of-total-energy-flux:
+        nc_variable: vited
+        units: W m**-2
+      vertical-integral-of-eastward-cloud-frozen-water-flux:
+        nc_variable: viiwe
+        units: kg m**-1 s**-1
+      vertical-integral-of-eastward-cloud-liquid-water-flux:
+        nc_variable: vilwe
+        units: kg m**-1 s**-1
+      vertical-integral-of-eastward-geopotential-flux:
+        nc_variable: vige
+        units: W m**-1
+      vertical-integral-of-eastward-heat-flux:
+        nc_variable: vithee
+        units: W m**-1
+      vertical-integral-of-eastward-kinetic-energy-flux:
+        nc_variable: vikee
+        units: W m**-1
+      vertical-integral-of-eastward-mass-flux:
+        nc_variable: vimae
+        units: kg m**-1 s**-1
+      vertical-integral-of-eastward-ozone-flux:
+        nc_variable: vioze
+        units: kg m**-1 s**-1
+      vertical-integral-of-eastward-total-energy-flux:
+        nc_variable: vitee
+        units: W m**-1
+      vertical-integral-of-eastward-water-vapour-flux:
+        nc_variable: viwve
+        units: kg m**-1 s**-1
+      vertical-integral-of-energy-conversion:
+        nc_variable: viec
+        units: W m**-2
+      vertical-integral-of-kinetic-energy:
+        nc_variable: vike
+        units: J m**-2
+      vertical-integral-of-mass-of-atmosphere:
+        nc_variable: vima
+        units: kg m**-2
+      vertical-integral-of-mass-tendency:
+        nc_variable: vimat
+        units: kg m**-2 s**-1
+      vertical-integral-of-northward-cloud-frozen-water-flux:
+        nc_variable: viiwn
+        units: kg m**-1 s**-1
+      vertical-integral-of-northward-cloud-liquid-water-flux:
+        nc_variable: vilwn
+        units: kg m**-1 s**-1
+      vertical-integral-of-northward-geopotential-flux:
+        nc_variable: vign
+        units: W m**-1
+      vertical-integral-of-northward-heat-flux:
+        nc_variable: vithen
+        units: W m**-1
+      vertical-integral-of-northward-kinetic-energy-flux:
+        nc_variable: viken
+        units: W m**-1
+      vertical-integral-of-northward-mass-flux:
+        nc_variable: viman
+        units: kg m**-1 s**-1
+      vertical-integral-of-northward-ozone-flux:
+        nc_variable: viozn
+        units: kg m**-1 s**-1
+      vertical-integral-of-northward-total-energy-flux:
+        nc_variable: viten
+        units: W m**-1
+      vertical-integral-of-northward-water-vapour-flux:
+        nc_variable: viwvn
+        units: kg m**-1 s**-1
+      vertical-integral-of-potential-and-internal-energy:
+        nc_variable: vipie
+        units: J m**-2
+      vertical-integral-of-potential-internal-and-latent-energy:
+        nc_variable: vipile
+        units: J m**-2
+      vertical-integral-of-temperature:
+        nc_variable: vit
+        units: K kg m**-2
+      vertical-integral-of-thermal-energy:
+        nc_variable: vithed
+        units: W m**-2
+      vertical-integral-of-total-energy:
+        nc_variable: vitoe
+        units: J m**-2
+      vertically-integrated-moisture-divergence:
+        nc_variable: vimd
+        units: kg m**-2
+      volumetric-soil-water-layer-1:
+        nc_variable: swvl1
+        units: m**3 m**-3
+      volumetric-soil-water-layer-2:
+        nc_variable: swvl2
+        units: m**3 m**-3
+      volumetric-soil-water-layer-3:
+        nc_variable: swvl3
+        units: m**3 m**-3
+      volumetric-soil-water-layer-4:
+        nc_variable: swvl4
+        units: m**3 m**-3
+      wave-spectral-directional-width:
+        nc_variable: wdw
+        units: radians
+      wave-spectral-directional-width-for-swell:
+        nc_variable: dwps
+        units: radians
+      wave-spectral-directional-width-for-wind-waves:
+        nc_variable: dwww
+        units: radians
+      wave-spectral-kurtosis:
+        nc_variable: wsk
+        units: dimensionless
+      wave-spectral-peakedness:
+        nc_variable: wsp
+        units: dimensionless
+      wave-spectral-skewness:
+        nc_variable: wss
+        units: Numeric
+      zero-degree-level:
+        nc_variable: deg0l
+        units: m
+  reanalysis-era5-pressure-levels:
+    product_type:
+    - reanalysis
+    monthly: reanalysis-era5-pressure-levels-monthly-means
+    monthly_product_type:
+    - monthly_averaged_reanalysis
+    pressure_level:
+    - '1000'
+    variables:
+      temperature:
+        nc_variable: t
+        types: state
+        units: K
+      specific-humidity:
+        nc_variable: q
+        types: state
+        units: kg kg**-1
+      relative-humidity:
+        nc_variable: r
+        types: state
+        units: '%'
+      geopotential:
+        nc_variable: z
+        units: m**2 s**-2
+      divergence:
+        nc_variable: vimd
+        units: kg m**-2
+      fraction-of-cloud-cover:
+        nc_variable: cc
+        units: (0 - 1)
+      ozone-mass-mixing-ratio:
+        nc_variable: o3
+        units: kg kg**-1
+      potential-vorticity:
+        nc_variable: pv
+        units: K m**2 kg**-1 s**-1
+      specific-cloud-ice-water-content:
+        nc_variable: ciwc
+        units: kg kg**-1
+      specific-cloud-liquid-water-content:
+        nc_variable: clwc
+        units: kg kg**-1
+      specific-rain-water-content:
+        nc_variable: crwc
+        units: kg kg**-1
+      specific-snow-water-content:
+        nc_variable: cswc
+        units: kg kg**-1
+      u-component-of-wind:
+        nc_variable: u100
+        units: m s**-1
+      v-component-of-wind:
+        nc_variable: v100
+        units: m s**-1
+      vertical-velocity:
+        nc_variable: w
+        units: Pa s**-1
+      vorticity:
+        nc_variable: vo
+        units: s**-1
+  reanalysis-era5-land:
+    product_type:
+    - reanalysis
+    monthly: reanalysis-era5-land-monthly-means
+    monthly_product_type:
+    - monthly_averaged_reanalysis
+    variables:
+      10m-u-component-of-wind:
+        nc_variable: u10
+        types: state
+        units: m s**-1
+      10m-v-component-of-wind:
+        nc_variable: v10
+        types: state
+        units: m s**-1
+      2m-dewpoint-temperature:
+        nc_variable: d2m
+        types: state
+        units: K
+      2m-temperature:
+        nc_variable: t2m
+        types: state
+        units: K
+      evaporation-from-bare-soil:
+        nc_variable: evabs
+        types: flux
+        units: m of water equivalent
+      evaporation-from-open-water-surfaces-excluding-oceans:
+        nc_variable: evaow
+        types: flux
+        units: m of water equivalent
+      evaporation-from-the-top-of-canopy:
+        nc_variable: evatc
+        types: flux
+        units: m of water equivalent
+      evaporation-from-vegetation-transpiration:
+        nc_variable: evavt
+        types: flux
+        units: m of water equivalent
+      forecast-albedo:
+        nc_variable: fal
+        types: state
+        units: (0 - 1)
+      geopotential:
+        nc_variable: z
+        units: m**2 s**-2
+      glacier-mask:
+        nc_variable: glm
+        units: fraction
+      high-vegetation-cover:
+        nc_variable: cvh
+        units: (0 - 1)
+      lake-bottom-temperature:
+        nc_variable: lblt
+        units: K
+      lake-cover:
+        nc_variable: cl
+        units: (0 - 1)
+      lake-ice-depth:
+        nc_variable: licd
+        units: m
+      lake-ice-temperature:
+        nc_variable: lict
+        units: K
+      lake-mix-layer-depth:
+        nc_variable: lmld
+        units: m
+      lake-mix-layer-temperature:
+        nc_variable: lmlt
+        units: K
+      lake-shape-factor:
+        nc_variable: lshf
+        units: dimensionless
+      lake-total-depth:
+        nc_variable: dl
+        units: m
+      lake-total-layer-temperature:
+        nc_variable: ltlt
+        units: K
+      land-sea-mask:
+        nc_variable: lsm
+        units: (0 - 1)
+      leaf-area-index-high-vegetation:
+        nc_variable: lai_hv
+        units: m**2 m**-2
+      leaf-area-index-low-vegetation:
+        nc_variable: lai_lv
+        units: m**2 m**-2
+      low-vegetation-cover:
+        nc_variable: cvl
+        units: (0 - 1)
+      potential-evaporation:
+        nc_variable: pev
+        types: flux
+        units: m
+      runoff:
+        nc_variable: ro
+        types: flux
+        units: m
+      skin-reservoir-content:
+        nc_variable: src
+        units: m of water equivalent
+      skin-temperature:
+        nc_variable: skt
+        types: state
+        units: K
+      snow-albedo:
+        nc_variable: asn
+        types: state
+        units: (0 - 1)
+      snow-cover:
+        nc_variable: snowc
+        types: state
+        units: '%'
+      snow-density:
+        nc_variable: rsn
+        types: state
+        units: kg m**-3
+      snow-depth:
+        nc_variable: sde
+        types: state
+        units: m
+      snow-depth-water-equivalent:
+        nc_variable: sd
+        types: state
+        units: m of water equivalent
+      snow-evaporation:
+        nc_variable: es
+        types: flux
+        units: m of water equivalent
+      snowfall:
+        nc_variable: sf
+        types: flux
+        units: m of water equivalent
+      snowmelt:
+        nc_variable: smlt
+        types: flux
+        units: m of water equivalent
+      soil-temperature-level-1:
+        nc_variable: stl1
+        types: state
+        units: K
+      soil-temperature-level-2:
+        nc_variable: stl2
+        types: state
+        units: K
+      soil-temperature-level-3:
+        nc_variable: stl3
+        types: state
+        units: K
+      soil-temperature-level-4:
+        nc_variable: stl4
+        types: state
+        units: K
+      soil-type:
+        nc_variable: slt
+        units: '~'
+      sub-surface-runoff:
+        nc_variable: ssro
+        types: flux
+        units: m
+      surface-latent-heat-flux:
+        nc_variable: slhf
+        types: flux
+        units: J m**-2
+      surface-net-solar-radiation:
+        nc_variable: ssr
+        types: flux
+        units: J m**-2
+      surface-net-thermal-radiation:
+        nc_variable: str
+        types: flux
+        units: J m**-2
+      surface-pressure:
+        nc_variable: sp
+        types: state
+        units: Pa
+      surface-runoff:
+        nc_variable: sro
+        types: flux
+        units: m
+      surface-sensible-heat-flux:
+        nc_variable: sshf
+        types: flux
+        units: J m**-2
+      surface-solar-radiation-downwards:
+        nc_variable: ssrd
+        types: flux
+        units: J m**-2
+      surface-thermal-radiation-downwards:
+        nc_variable: strd
+        types: flux
+        units: J m**-2
+      temperature-of-snow-layer:
+        nc_variable: tsn
+        types: state
+        units: K
+      total-evaporation:
+        nc_variable: e
+        types: flux
+        units: m of water equivalent
+      total-precipitation:
+        nc_variable: tp
+        types: flux
+        units: m
+      type-of-high-vegetation:
+        nc_variable: tvh
+        units: '~'
+      type-of-low-vegetation:
+        nc_variable: tvl
+        units: '~'
+      volumetric-soil-water-layer-1:
+        nc_variable: swvl1
+        types: state
+        units: m**3 m**-3
+      volumetric-soil-water-layer-2:
+        nc_variable: swvl2
+        types: state
+        units: m**3 m**-3
+      volumetric-soil-water-layer-3:
+        nc_variable: swvl3
+        types: state
+        units: m**3 m**-3
+      volumetric-soil-water-layer-4:
+        nc_variable: swvl4
+        types: state
+        units: m**3 m**-3

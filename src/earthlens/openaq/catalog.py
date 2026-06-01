@@ -19,16 +19,25 @@ bundled YAML and is monkey-patchable in tests.
 
 from __future__ import annotations
 
-import difflib
 from pathlib import Path
 from typing import Any, Literal
 
-from pydantic import BaseModel, ConfigDict, Field, ValidationError
+from pydantic import BaseModel, ConfigDict, Field, ValidationError, model_validator
 
 from earthlens.base import AbstractCatalog
 from earthlens.base.yaml_loader import load_yaml_strict
 
 CATALOG_PATH: Path = Path(__file__).parent / "openaq_data_catalog.yaml"
+
+#: Module-level parse cache keyed on `(resolved_path, st_mtime_ns)` so a
+#: repeated `Catalog()` skips the YAML parse + pydantic validation. Mirrors
+#: the FDSN / NWP / radar loaders.
+_CATALOG_CACHE: dict[tuple[str, int], dict[str, "Parameter"]] = {}
+
+
+def clear_catalog_cache() -> None:
+    """Empty the module-level catalog parse cache (for tests that rewrite YAML)."""
+    _CATALOG_CACHE.clear()
 
 #: The pollutant groups a `Parameter` can belong to.
 ParameterGroup = Literal["criteria", "particulate", "meteorological", "other"]
@@ -120,23 +129,73 @@ class Catalog(AbstractCatalog):
     """
 
     _catalog_kind: str = "OpenAQ parameter catalog"
+    _entry_noun: str = "parameters"
 
-    parameters: dict[str, Parameter] = Field(default_factory=dict)
+    #: The parameter rows live in the base :attr:`datasets` field so the
+    #: inherited dict surface (`len`, `in`, `[]`, iteration) and
+    #: :meth:`get_dataset`'s did-you-mean hint work unchanged. The field
+    #: is narrowed here to :class:`Parameter` values; :attr:`parameters`
+    #: is the domain-named read alias.
+    datasets: dict[str, Parameter] = Field(default_factory=dict)
+
+    @model_validator(mode="before")
+    @classmethod
+    def _accept_parameters_alias(cls, data: Any) -> Any:
+        """Accept the legacy `parameters=` kwarg as an alias for `datasets`.
+
+        Older callers (and tests) construct `Catalog(parameters={...})`.
+        The rows now live in the base `datasets` field, so rewrite that
+        key on the way in. An explicit `datasets=` always wins.
+
+        Args:
+            data: The raw model input (a mapping when constructed with
+                keyword arguments).
+
+        Returns:
+            The input with `parameters` renamed to `datasets`, untouched
+            otherwise.
+        """
+        if isinstance(data, dict) and "parameters" in data and "datasets" not in data:
+            data = dict(data)
+            data["datasets"] = data.pop("parameters")
+        return data
+
+    @property
+    def parameters(self) -> dict[str, Parameter]:
+        """The parameter map — alias for the base :attr:`datasets` field.
+
+        Returns:
+            dict[str, Parameter]: The same mapping stored in
+                :attr:`datasets`.
+
+        Examples:
+            - The alias and the base field are the same object:
+                ```python
+                >>> from earthlens.openaq import Catalog
+                >>> cat = Catalog()
+                >>> cat.parameters is cat.datasets
+                True
+                >>> cat.parameters["pm25"].ids
+                [2]
+
+                ```
+        """
+        return self.datasets
 
     def model_post_init(self, __context: Any) -> None:
         """Auto-load the bundled catalog when no parameters were supplied.
 
         `Catalog()` with no args reads :data:`CATALOG_PATH`; passing
-        `parameters=...` skips the disk read (used in tests).
+        `parameters=...` (or `datasets=...`) skips the disk read (used
+        in tests).
 
         Raises:
             ValueError: Propagated from :meth:`load` when the YAML is
                 missing, empty, or has a malformed parameter row.
         """
-        if self.parameters:
-            return
-        loaded = Catalog.load()
-        self.parameters = loaded.parameters
+        if not self.datasets:
+            self.datasets = Catalog.load().datasets
+        super().model_post_init(__context)
 
     @classmethod
     def load(cls, catalog_path: Path | None = None) -> Catalog:
@@ -154,6 +213,15 @@ class Catalog(AbstractCatalog):
                 row fails :class:`Parameter` validation.
         """
         catalog_path = catalog_path if catalog_path is not None else CATALOG_PATH
+        resolved = str(catalog_path.resolve())
+        try:
+            mtime = catalog_path.stat().st_mtime_ns
+        except FileNotFoundError:
+            mtime = 0
+        key = (resolved, mtime)
+        cached = _CATALOG_CACHE.get(key)
+        if cached is not None:
+            return cls(datasets=dict(cached))
         data = load_yaml_strict(catalog_path) or {}
         parameters_yaml = data.get("parameters") or {}
         if not parameters_yaml:
@@ -169,18 +237,23 @@ class Catalog(AbstractCatalog):
                 raise ValueError(
                     f"{catalog_path} parameter {name!r} failed validation:\n{exc}"
                 ) from exc
-        return cls(parameters=parameters)
+        _CATALOG_CACHE[key] = parameters
+        return cls(datasets=dict(parameters))
 
     def get_catalog(self) -> dict[str, Parameter]:
         """Return the parameter map (satisfies the abstract contract).
 
         Returns:
-            dict[str, Parameter]: Same object as :attr:`parameters`.
+            dict[str, Parameter]: Same object as :attr:`datasets` /
+                :attr:`parameters`.
         """
-        return self.parameters
+        return self.datasets
 
     def get_parameter(self, name: str) -> Parameter:
         """Resolve a pollutant name to its :class:`Parameter` row.
+
+        Thin wrapper over the inherited :meth:`get_dataset`, which raises
+        a `ValueError` with a did-you-mean hint on an unknown name.
 
         Args:
             name: A user-facing parameter name (`"pm25"`, `"no2"`).
@@ -190,18 +263,10 @@ class Catalog(AbstractCatalog):
 
         Raises:
             ValueError: If `name` is not a known parameter; the
-                message lists the known names and, when a close match
-                exists, a did-you-mean hint.
+                message names the catalog kind and, when a close match
+                exists, adds a did-you-mean hint.
         """
-        try:
-            return self.parameters[name]
-        except KeyError:
-            close = difflib.get_close_matches(name, self.parameters, n=1)
-            hint = f" Did you mean {close[0]!r}?" if close else ""
-            raise ValueError(
-                f"{name!r} is not in the {self._catalog_kind}. "
-                f"Known parameters: {sorted(self.parameters)}.{hint}"
-            ) from None
+        return self.get_dataset(name)
 
     def ids_for(self, names: list[str]) -> list[int]:
         """Resolve names to the union of their OpenAQ ids (all unit variants).

@@ -167,6 +167,13 @@ nav:
       - Authentication: reference/openeo/authentication.md
       - Collections & recipes: reference/openeo/datasets.md
       - Reference: reference/openeo/openeo.md
+    - Sentinel Hub (server-side render):
+      - Introduction: reference/sentinel-hub/introduction.md
+      - Usage: reference/sentinel-hub/usage.md
+      - Authentication: reference/sentinel-hub/authentication.md
+      - Collections & recipes: reference/sentinel-hub/datasets.md
+      - Statistical & Batch: reference/sentinel-hub/statistical-batch.md
+      - Reference: reference/sentinel-hub/sentinel_hub.md
     - Tropycal (cyclone tracks):
       - Introduction: reference/tropycal/introduction.md
       - Usage: reference/tropycal/usage.md
@@ -181,6 +188,41 @@ nav:
       - Usage: reference/nwm/usage.md
       - Products & configurations: reference/nwm/datasets.md
       - Reference: reference/nwm/nwm.md
+    - Overture Maps (vector basemap):
+      - Introduction: reference/overture/introduction.md
+      - Usage: reference/overture/usage.md
+      - Licensing: reference/overture/licensing.md
+      - Available datasets: reference/overture/datasets.md
+      - Reference: reference/overture/overture.md
+    - NWP (weather forecasts):
+      - Introduction: reference/nwp/introduction.md
+      - Usage: reference/nwp/usage.md
+      - Catalog & install: reference/nwp/catalog.md
+      - Reference: reference/nwp/nwp.md
+    - NEXRAD radar:
+      - Introduction: reference/radar/introduction.md
+      - Usage: reference/radar/usage.md
+      - Catalog & Tooling: reference/radar/catalog.md
+      - Reference: reference/radar/radar.md
+    - USGS Water (NWIS):
+      - Introduction: reference/usgs-water/introduction.md
+      - Usage: reference/usgs-water/usage.md
+      - Authentication: reference/usgs-water/authentication.md
+      - Available data: reference/usgs-water/datasets.md
+      - Reference: reference/usgs-water/usgs_water.md
+    - GHSL (human settlement):
+      - Introduction: reference/ghsl/introduction.md
+      - Authentication: reference/ghsl/authentication.md
+      - Usage: reference/ghsl/usage.md
+      - Available datasets: reference/ghsl/products.md
+      - Projections & tiling: reference/ghsl/projections.md
+      - Reference: reference/ghsl/ghsl.md
+    - WorldPop (population):
+      - Introduction: reference/worldpop/introduction.md
+      - Usage: reference/worldpop/usage.md
+      - Available datasets: reference/worldpop/datasets.md
+      - WorldPopPy & no-xarray: reference/worldpop/worldpoppy.md
+      - Reference: reference/worldpop/worldpop.md
   - Examples:
     - Authentication: examples/authentication.md
     - Data Sources: examples/data-sources.md
@@ -258,6 +300,15 @@ nav:
       - Server-side temporal aggregate: examples/openeo/server_side_aggregate.ipynb
       - Air quality — Sentinel-5P NO2 monthly: examples/openeo/air_quality_no2_monthly.ipynb
       - Ocean colour — Sentinel-3 chlorophyll monthly: examples/openeo/ocean_chlorophyll_monthly.ipynb
+    - Server-side render (Sentinel Hub):
+      - Catalog explorer (no network): examples/sentinel-hub/catalog_explorer.ipynb
+      - Quickstart — Sentinel-2 NDVI: examples/sentinel-hub/quickstart_ndvi.ipynb
+      - True-colour composite: examples/sentinel-hub/true_colour.ipynb
+      - Custom inline evalscript: examples/sentinel-hub/custom_evalscript.ipynb
+      - Oversized AOI — local tiling: examples/sentinel-hub/local_tiling.ipynb
+      - Statistical zonal stats: examples/sentinel-hub/statistical_zonal_stats.ipynb
+      - Windowed monthly aggregate: examples/sentinel-hub/aggregate_monthly.ipynb
+      - Batch processing (S3) walkthrough: examples/sentinel-hub/batch_walkthrough.ipynb
     - Tropical cyclones (Tropycal):
       - Quickstart — Atlantic season: examples/tropycal/quickstart.ipynb
       - Season track map: examples/tropycal/season_track_map.ipynb
@@ -276,7 +327,44 @@ nav:
       - Short-range streamflow (live): examples/nwm/streamflow_short_range.ipynb
       - Short-range land surface (live): examples/nwm/land_surface_short_range.ipynb
       - Regional, ensemble & coastal configs (live): examples/nwm/regional_ensemble_coastal.ipynb
-      - Subsetting & deferred features (no network): examples/nwm/deferred_and_subsetting.ipynb
+      - Subsetting & retrospective (live): examples/nwm/deferred_and_subsetting.ipynb
+    - Overture Maps (vector basemap):
+      - Catalog explorer (no network): examples/overture/01_catalog_explorer.ipynb
+      - Places quickstart: examples/overture/02_places_quickstart.ipynb
+      - Building footprints: examples/overture/03_buildings_footprints.ipynb
+      - Per-row licensing: examples/overture/04_per_row_licensing.ipynb
+      - Transportation network: examples/overture/05_transportation_network.ipynb
+      - Multi-theme download: examples/overture/06_multi_theme_download.ipynb
+      - Attribute pushdown (where=): examples/overture/07_attribute_pushdown.ipynb
+    - Open NWP forecasts:
+      - Catalog explorer (no network): examples/nwp/catalog_explorer.ipynb
+      - GFS 2 m temperature (live): examples/nwp/gfs_temperature.ipynb
+      - DWD ICON precipitation (live): examples/nwp/icon_precipitation.ipynb
+    - NEXRAD radar:
+      - Catalog explorer (no network): examples/radar/catalog_explorer.ipynb
+    - USGS Water (NWIS):
+      - Quickstart — daily discharge: examples/usgs-water/quickstart_daily_discharge.ipynb
+      - Multi-parameter & instantaneous: examples/usgs-water/multi_parameter_and_instantaneous.ipynb
+      - Site discovery & statistics: examples/usgs-water/site_discovery_and_statistics.ipynb
+      - Annual peaks & rating curves: examples/usgs-water/peaks_and_ratings.ipynb
+    - GHSL (human settlement):
+      - Catalog explorer (no network): examples/ghsl/01_catalog_explorer.ipynb
+      - Population quickstart (live): examples/ghsl/02_population_quickstart.ipynb
+      - Built-up surface (live): examples/ghsl/03_builtup_surface.ipynb
+      - Built-up growth — aggregate (live): examples/ghsl/04_builtup_growth.ipynb
+      - Building height (live): examples/ghsl/05_building_height.ipynb
+      - Settlement classes — SMOD (whole-globe): examples/ghsl/06_settlement_classes.ipynb
+      - Population projection to 2100 — WUP: examples/ghsl/07_wup_projection.ipynb
+    - WorldPop (population):
+      - Catalog explorer (no network): examples/worldpop/01_catalog_explorer.ipynb
+      - Population quickstart: examples/worldpop/02_population_quickstart.ipynb
+      - Constrained vs unconstrained: examples/worldpop/03_constrained_vs_unconstrained.ipynb
+      - Age/sex population pyramid: examples/worldpop/04_age_sex_pyramid.ipynb
+      - Multi-country mosaic: examples/worldpop/05_multicountry_mosaic.ipynb
+      - Multi-year aggregate: examples/worldpop/06_multiyear_aggregate.ipynb
+      - Covariates — nightlights: examples/worldpop/07_covariates_nightlights.ipynb
+      - Dependency ratios (archive): examples/worldpop/08_dependency_ratios.ipynb
+      - Global mosaics (URL resolution): examples/worldpop/09_global_mosaic.ipynb
   - API Reference:
     - EarthLens Facade: reference/earthlens.md
     - AbstractDataSource: reference/abstract-datasource.md
