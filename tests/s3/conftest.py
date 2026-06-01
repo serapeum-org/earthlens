@@ -111,6 +111,38 @@ def tiny_era5_nc(tmp_path_factory) -> Path:
 
 
 @pytest.fixture
+def tiny_goes_nc(tmp_path_factory) -> Path:
+    """A synthetic GOES-shaped geostationary NetCDF (CF goes_imager_projection)."""
+    import xarray as xr
+
+    path = tmp_path_factory.mktemp("goesfix") / "goes.nc"
+    n = 64
+    x = np.linspace(-0.05, 0.05, n)
+    y = np.linspace(0.14, 0.10, n)  # scan-angle radians, y descending
+    arr = np.random.RandomState(0).rand(n, n).astype("float32")
+    ds = xr.Dataset(
+        {"CMI": (("y", "x"), arr, {"grid_mapping": "goes_imager_projection"})},
+        coords={
+            "y": ("y", y, {"units": "rad", "standard_name": "projection_y_coordinate"}),
+            "x": ("x", x, {"units": "rad", "standard_name": "projection_x_coordinate"}),
+        },
+    )
+    ds["goes_imager_projection"] = xr.DataArray(
+        0,
+        attrs={
+            "grid_mapping_name": "geostationary",
+            "perspective_point_height": 35786023.0,
+            "semi_major_axis": 6378137.0,
+            "semi_minor_axis": 6356752.31414,
+            "longitude_of_projection_origin": -75.0,
+            "sweep_angle_axis": "x",
+        },
+    )
+    ds.to_netcdf(path)
+    return path
+
+
+@pytest.fixture
 def fake_client_factory(tiny_cog):
     """Return a builder for a `FakeS3Client` backed by the synthetic COG."""
 

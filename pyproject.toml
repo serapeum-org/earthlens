@@ -28,9 +28,12 @@ requires-python = ">= 3.11, <4"
 
 dependencies = [
     # >=0.24.1: fixes get_epsg_from_prj returning the unit code EPSG:9122 for
-    # GRIB CRS (pyramids#403 / PY-1), so Dataset.epsg is 4326 and the NWP
+    # GRIB CRS (pyramids#403), so Dataset.epsg is 4326 and the NWP
     # crop/COG/aggregate path no longer trips on an unresolvable EPSG.
-    "pyramids-gis >=0.24.1",
+    # >=0.28.0: georeferences geostationary (GOES ABI) NetCDF reads — scales the
+    # scan-angle geotransform to metres — so earthlens.s3 dataset="goes" can warp
+    # to WGS84 and crop (pyramids#452 / PY-1a).
+    "pyramids-gis >=0.28.0",
     "geopandas >=1.0.0",
     "joblib >=1.5.0",
     "loguru >=0.7.3",

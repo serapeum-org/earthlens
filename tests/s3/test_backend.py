@@ -225,22 +225,25 @@ def test_netcdf_localise_rebuilds_and_crops(tmp_path, fake_client_factory, patch
     assert cropped.epsg == 4326 and cropped.shape[1] < 50 and cropped.shape[2] < 50
 
 
-def test_goes_geostationary_localise_deferred(tmp_path, fake_client_factory, patch_auth, tiny_era5_nc):
-    """GOES (geostationary NetCDF) localise raises a clear PY-1 deferral."""
+def test_goes_geostationary_localise_warps_to_wgs84(tmp_path, fake_client_factory, patch_auth, tiny_goes_nc):
+    """GOES (geostationary NetCDF) localise warps the scan-angle grid to WGS84 + crops."""
     from earthlens.base import RemoteProduct
+    from pyramids.dataset import Dataset
 
     patch_auth(fake_client_factory())
+    # AOI inside the synthetic frame's warped extent (~[-120, 36, -29, 63]).
     source = S3(
         start="2024-06-28", end="2024-06-28",
-        lat_lim=[30.0, 32.0], lon_lim=[-100.0, -98.0],
+        lat_lim=[40.0, 42.0], lon_lim=[-90.0, -88.0],
         dataset="goes", variables=["C13"], path=str(tmp_path),
     )
     product = RemoteProduct(
         id="C13_2024180", href="x.nc",
         metadata={"bucket": "noaa-goes16", "variable": "C13"},
     )
-    with pytest.raises(NotImplementedError, match="PY-1"):
-        source._localise(tiny_era5_nc, product)
+    out = source._localise(tiny_goes_nc, product)
+    cropped = Dataset.read_file(str(out))
+    assert cropped.epsg == 4326 and cropped.shape[1] >= 1 and cropped.shape[2] >= 1
 
 
 def test_aggregate_runs_per_window(tmp_path, fake_client_factory, patch_auth, monkeypatch):

@@ -155,16 +155,10 @@ def test_naip_requester_pays(tmp_path):
     _assert_cropped(written[0])
 
 
-@pytest.mark.xfail(
-    reason="geostationary NetCDF reproject is deferred to the pyramids PY-1 port",
-    raises=NotImplementedError,
-    strict=True,
-)
 def test_goes_reprojects_from_geostationary(tmp_path):
-    """One GOES ABI frame downloads; cropping is deferred to PY-1 (geostationary warp).
+    """One GOES ABI frame downloads, warps geostationary->WGS84, and crops.
 
-    The search/download half works; `_localise` raises `NotImplementedError`
-    until pyramids exposes a geostationary reproject (PY-1).
+    Relies on pyramids >=0.28 georeferencing the scan-angle grid on read.
     """
     from earthlens.s3 import S3
 
@@ -175,4 +169,5 @@ def test_goes_reprojects_from_geostationary(tmp_path):
     )
     products = source._search()
     assert products, "no GOES frames found"
-    source._fetch(products[:1])
+    written = source._fetch(products[:1])
+    _assert_cropped(written[0])

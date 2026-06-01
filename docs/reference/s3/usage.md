@@ -133,7 +133,9 @@ The bbox is still used to **crop** the downloaded scene to your AOI.
 
 ## Known limitations
 
-- **GOES** (geostationary NetCDF) downloads, but cropping/reprojection to WGS84
-  is deferred to the pyramids `PY-1` port; `_localise` raises a clear
-  `NotImplementedError` until it lands.
-- **Multi-tile mosaic** is not yet merged (one file per tile) — `PY-1`.
+- **Multi-tile mosaic** is not yet merged: a Copernicus DEM / ESA WorldCover AOI
+  spanning more than one tile returns one cropped file per tile (a follow-on
+  using pyramids `merge_rasters`).
+
+GOES geostationary imagery now downloads, warps to WGS84, and crops like any
+other dataset (requires `pyramids-gis >=0.28`).

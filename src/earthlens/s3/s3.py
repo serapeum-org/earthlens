@@ -299,8 +299,8 @@ class S3(AbstractDataSource):
         UTM / geostationary COGs are reprojected to WGS84 first). ERA5-style
         regular-grid NetCDF granules carry no GDAL-readable SRS, so they are
         rebuilt into a WGS84 raster (time as bands) before cropping.
-        Geostationary NetCDF (GOES) needs a warp pyramids does not yet expose
-        cleanly and is deferred to the `PY-1` port.
+        Geostationary NetCDF (GOES) is warped to WGS84 via pyramids, which
+        georeferences the scan-angle grid on read (pyramids >=0.28).
 
         Args:
             raw: The downloaded source file.
@@ -308,22 +308,18 @@ class S3(AbstractDataSource):
 
         Returns:
             The path of the cropped output file.
-
-        Raises:
-            NotImplementedError: For geostationary NetCDF (GOES) until the
-                `PY-1` pyramids reproject lands.
         """
         from pyramids.dataset import Dataset as PyramidsDataset
 
         west, south, east, north = self._bbox()
         if self._dataset.format == "netcdf":
             if self._dataset.crs is None:
-                raise NotImplementedError(
-                    "geostationary NetCDF reprojection (e.g. GOES) is deferred "
-                    "to the pyramids PY-1 port; the granule downloaded to "
-                    f"{raw} but cannot yet be cropped to WGS84 client-side."
-                )
-            data = self._netcdf_to_wgs84_raster(raw, product)
+                # Geostationary NetCDF (GOES): pyramids (>=0.28) georeferences
+                # the scan-angle grid from the CF grid-mapping on read, so the
+                # variable warps to WGS84 directly.
+                data = self._geostationary_to_wgs84(raw, product)
+            else:
+                data = self._netcdf_to_wgs84_raster(raw, product)
         else:
             data = PyramidsDataset.read_file(str(raw))
             if self._dataset.crs is None:
@@ -362,6 +358,19 @@ class S3(AbstractDataSource):
         if self._dataset.lon_convention == "0-360":
             arr, geo = _wrap_longitude_0_360(arr, geo)
         return PyramidsDataset.create_from_array(arr=arr, geo=geo, epsg=4326)
+
+    def _geostationary_to_wgs84(self, raw: Path, product: RemoteProduct):
+        """Warp a geostationary NetCDF variable (e.g. GOES ABI) to WGS84.
+
+        pyramids (>=0.28) georeferences the scan-angle grid from the CF
+        `goes_imager_projection` grid-mapping when it reads the granule, so
+        the data variable reprojects to EPSG:4326 directly.
+        """
+        from pyramids.netcdf import NetCDF
+
+        nc = NetCDF.read_file(str(raw))
+        cube = nc.get_variable(self._nc_variable_name(nc, product))
+        return cube.to_crs(4326)
 
     def _nc_variable_name(self, nc: Any, product: RemoteProduct) -> str:
         """Resolve the in-file NetCDF variable name for `product`."""
