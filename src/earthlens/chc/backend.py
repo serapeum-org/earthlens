@@ -171,14 +171,14 @@ class CHIRPS(AbstractDataSource):
 
     def __init__(
         self,
+        start: str | None = None,
+        end: str | None = None,
         variables: dict[str, list[str]] | list[str] | None = None,
         lat_lim: list[float] | None = None,
         lon_lim: list[float] | None = None,
         temporal_resolution: str = "daily",
-        start: str | None = None,
-        end: str | None = None,
-        path: Path | str = "",
         fmt: str = "%Y-%m-%d",
+        path: Path | str = "",
     ):
         """Initialize a CHIRPS backend.
 
