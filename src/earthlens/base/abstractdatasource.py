@@ -450,7 +450,17 @@ class AbstractDataSource(ABC):
 
     @abstractmethod
     def download(self):
-        """Wrapper over all the given variables."""
+        """Download every requested variable and return the produced artifacts.
+
+        The return shape tracks :attr:`OUTPUT_KIND`: `"raster"` /
+        `"mixed"` file-writing backends return the list of written
+        paths (`list[Path]`); `"vector"` backends return an in-memory
+        `FeatureCollection` (radar returns a `GeoDataFrame`);
+        `"tabular"` backends return a `pandas.DataFrame`. The two
+        not-yet-migrated legacy backends (CHIRPS, ECMWF) still return
+        `None` and write their files to `self.root_dir` as a side
+        effect.
+        """
         # loop over dates if the downloaded rasters/netcdf are for a specific date out of the required
         # list of dates
         pass

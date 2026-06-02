@@ -521,10 +521,20 @@ class EarthLens:
             **kwargs: Forwarded as keywords to `backend.download`.
 
         Returns:
-            Whatever the bound backend's `download` returns: `None` for
-            CHIRPS / S3 / ECMWF (they write files to `path` as a side
-            effect), or the list of written GeoTIFF paths / export
-            destination strings for the GEE backend.
+            Whatever the bound backend's `download` returns. The shape
+            tracks the backend's `OUTPUT_KIND`:
+
+            * `"raster"` / `"mixed"` file-writers — the list of written
+              paths (`list[Path]`); GEE may also return export
+              destination strings / `TaskInfo` for async exports.
+            * `"vector"` — an in-memory `FeatureCollection` (e.g. FDSN,
+              FIRMS, GDACS); radar returns a `GeoDataFrame`.
+            * `"tabular"` — a `pandas.DataFrame` (e.g. OpenAQ,
+              USGS Water).
+
+            Exceptions (pending the legacy `_search`/`_fetch`
+            migration): CHIRPS and ECMWF still return `None` and write
+            their files to `path` as a side effect.
 
         Raises:
             AuthenticationError: When the ECMWF backend cannot
