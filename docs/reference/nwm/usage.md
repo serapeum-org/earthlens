@@ -53,10 +53,19 @@ paths = nwm.download()
 
 ## What you get back
 
-`download()` returns a `list[pathlib.Path]` — one **whole-CONUS** NetCDF
-file per `(cycle, step, product)` it fetched. A `(cycle, step)` that is
-not yet published is logged and skipped (so one gap does not lose the
-rest of the request). Files are written atomically (a `.part` rename).
+A plain (no-subset) request returns a `list[pathlib.Path]` — one
+**whole-CONUS** NetCDF file per `(cycle, step, product)` it fetched. Each
+output name flattens the full S3 key (`nwm.{date}_{config}_…`) so a
+multi-day window stays unique (the NWM basename alone omits the date). A
+`(cycle, step)` that is not yet published is logged and skipped (so one
+gap does not lose the rest). Files are written atomically (a `.part`
+rename).
+
+A **subset** request returns the subset artefacts instead — `.parquet`
+tables (tabular products) or `.tif` COGs (gridded products). The fetched
+whole-CONUS `.nc` is **left in place** alongside them as the as-fetched
+source, so a small-bbox request still produces a large `.nc` plus the
+small output; delete the `.nc` yourself if you only want the subset.
 
 Each `channel_rt` file is ~14 MB (all 2.7 M reaches at one timestep) and
 each `land` file is ~30 MB, so a multi-cycle, multi-step request can be

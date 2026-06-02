@@ -288,6 +288,30 @@ def test_download_writes_whole_files(make_nwm, patch_client):
     assert all(bucket == BUCKET for bucket, _ in fake.requested)
 
 
+def test_download_multi_day_writes_distinct_files(make_nwm, patch_client):
+    """A multi-day window with the same cycle/step writes one file per day.
+
+    The NWM basename omits the date (it lives in the S3 key prefix), so the
+    output name must flatten the full key to stay unique — otherwise day 2
+    would overwrite day 1.
+    """
+    nwm = make_nwm(
+        start="2026-05-26",
+        end="2026-05-28",
+        configuration="analysis_assim",
+        cycles=[0],
+        steps=[0],
+    )
+    patch_client(nwm, FakeS3(available=None))
+    paths = nwm.download(progress_bar=False)
+    assert len(paths) == 3
+    # distinct on-disk files (no overwrite), each carrying its day's bytes
+    assert len({str(p) for p in paths}) == 3
+    assert {p.read_bytes() for p in paths} == {
+        b"netcdf:" + key.encode() for key in (rp.href for rp in nwm._search())
+    }
+
+
 def test_download_skips_unpublished_keys(make_nwm, patch_client):
     """A key that is not published is skipped, not fatal."""
     nwm = make_nwm(cycles=[0, 12], steps=[1])

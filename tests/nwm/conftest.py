@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import io
 from pathlib import Path
 from typing import Any
 
@@ -12,14 +13,18 @@ from earthlens.nwm import NWM, Catalog
 
 
 class _FakeBody:
-    """Minimal stand-in for a boto3 streaming body."""
+    """Minimal file-like stand-in for a boto3 streaming body.
+
+    Exposes `read(size=-1)` so `shutil.copyfileobj` can stream it to disk
+    the way the backend streams the real `StreamingBody`.
+    """
 
     def __init__(self, data: bytes) -> None:
-        self._data = data
+        self._buffer = io.BytesIO(data)
 
-    def read(self) -> bytes:
-        """Return the whole payload."""
-        return self._data
+    def read(self, size: int = -1) -> bytes:
+        """Return up to `size` bytes (whole payload when `size < 0`)."""
+        return self._buffer.read(size)
 
 
 class FakeS3:
@@ -106,11 +111,9 @@ def fake_reader(monkeypatch):
 class _FakeGridDataset:
     """Stand-in for a pyramids `Dataset` returned by `NetCDF.subset`."""
 
-    def to_file(self, path: str, **kw) -> None:
-        """Write a sentinel GeoTIFF."""
-        from pathlib import Path
-
-        Path(path).write_bytes(b"II*\x00-fake-tiff")
+    def to_cog(self, path: str, **kw) -> None:
+        """Write a sentinel COG GeoTIFF."""
+        Path(path).write_bytes(b"II*\x00-fake-cog")
 
 
 class FakeNetCDF:

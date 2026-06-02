@@ -42,6 +42,7 @@ Two properties shape the backend:
 from __future__ import annotations
 
 import datetime as dt
+import shutil
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
@@ -589,14 +590,14 @@ class NWM(AbstractDataSource):
         """
         if not self._sites:
             return None
-        ids = [s for s in self._sites if isinstance(s, int)]
+        ids = [s for s in self._sites if _is_int(s)]
         return ids or None
 
     def _gage_ids(self) -> list[str] | None:
         """Return the USGS `gage_id` strings from `sites=`, or `None`."""
         if not self._sites:
             return None
-        gages = [str(s) for s in self._sites if not isinstance(s, int)]
+        gages = [str(s) for s in self._sites if not _is_int(s)]
         return gages or None
 
     def _select_and_write(
@@ -682,7 +683,7 @@ class NWM(AbstractDataSource):
                     ) from exc
                 raise
             out_path = self.root_dir / f"{path.stem}_{variable}.tif"
-            dataset.to_file(str(out_path))
+            dataset.to_cog(str(out_path))
             out.append(Path(out_path))
         _close_quietly(nc)
         return out
@@ -796,6 +797,14 @@ class NWM(AbstractDataSource):
     def _fetch_one(self, client: Any, product: RemoteProduct) -> Path | None:
         """Download one product's NetCDF file (atomic `.part` rename).
 
+        The output name flattens the **full** S3 key (date prefix +
+        configuration directory + basename), so it is unique per
+        `(date, configuration, cycle, step, product, member)` — the NWM
+        basename alone omits the date, so two days with the same
+        cycle/step would otherwise collide and overwrite. The body is
+        streamed to disk in chunks rather than buffered whole in memory
+        (a `land` file can be ~220 MB).
+
         Args:
             client: The unsigned boto3 client.
             product: One :class:`RemoteProduct` from :meth:`_search`.
@@ -805,12 +814,12 @@ class NWM(AbstractDataSource):
                 published (logged and skipped).
         """
         key = product.href
-        target = self.root_dir / Path(key).name
+        target = self.root_dir / key.replace("/", "_")
         tmp = target.with_name(target.name + ".part")
         try:
-            body = client.get_object(Bucket=BUCKET, Key=key)["Body"].read()
+            body = client.get_object(Bucket=BUCKET, Key=key)["Body"]
             with open(tmp, "wb") as handle:
-                handle.write(body)
+                shutil.copyfileobj(body, handle)
             tmp.replace(target)
         except BaseException as exc:
             tmp.unlink(missing_ok=True)
@@ -868,6 +877,21 @@ class NWM(AbstractDataSource):
             )
         self._show_progress = progress_bar
         return self._api_via_search_fetch()
+
+
+def _is_int(value: Any) -> bool:
+    """Return whether `value` is a genuine integer (and not a `bool`).
+
+    `bool` is a subclass of `int`, so a plain `isinstance(value, int)`
+    would read `sites=[True]` as `feature_id=1`; this excludes it.
+
+    Args:
+        value: A `sites=` entry (a `feature_id` int or a `gage_id` str).
+
+    Returns:
+        bool: `True` for an `int` that is not a `bool`.
+    """
+    return isinstance(value, int) and not isinstance(value, bool)
 
 
 def _close_quietly(cube: Any) -> None:
