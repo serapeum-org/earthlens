@@ -10641,10 +10641,10 @@ instance attribute, so both forms work.</p>
 <a id="__codelineno-0-463" name="__codelineno-0-463"></a><span class="sd">        `&quot;mixed&quot;` file-writing backends return the list of written</span>
 <a id="__codelineno-0-464" name="__codelineno-0-464"></a><span class="sd">        paths (`list[Path]`); `&quot;vector&quot;` backends return an in-memory</span>
 <a id="__codelineno-0-465" name="__codelineno-0-465"></a><span class="sd">        `FeatureCollection` (radar returns a `GeoDataFrame`);</span>
-<a id="__codelineno-0-466" name="__codelineno-0-466"></a><span class="sd">        `&quot;tabular&quot;` backends return a `pandas.DataFrame`. The two</span>
-<a id="__codelineno-0-467" name="__codelineno-0-467"></a><span class="sd">        not-yet-migrated legacy backends (CHIRPS, ECMWF) still return</span>
-<a id="__codelineno-0-468" name="__codelineno-0-468"></a><span class="sd">        `None` and write their files to `self.root_dir` as a side</span>
-<a id="__codelineno-0-469" name="__codelineno-0-469"></a><span class="sd">        effect.</span>
+<a id="__codelineno-0-466" name="__codelineno-0-466"></a><span class="sd">        `&quot;tabular&quot;` backends return a `pandas.DataFrame`. Every backend</span>
+<a id="__codelineno-0-467" name="__codelineno-0-467"></a><span class="sd">        now returns its produced artifacts (the legacy CHIRPS / ECMWF</span>
+<a id="__codelineno-0-468" name="__codelineno-0-468"></a><span class="sd">        backends return their written `list[Path]` and also leave the</span>
+<a id="__codelineno-0-469" name="__codelineno-0-469"></a><span class="sd">        files on disk under `self.root_dir`).</span>
 <a id="__codelineno-0-470" name="__codelineno-0-470"></a>
 <a id="__codelineno-0-471" name="__codelineno-0-471"></a><span class="sd">        Partial-failure policy is per backend and currently varies:</span>
 <a id="__codelineno-0-472" name="__codelineno-0-472"></a><span class="sd">        most multi-item backends are **skip-and-continue** — a single</span>
@@ -11219,10 +11219,10 @@ Defaults to the current working directory.</p>
 <code>"mixed"</code> file-writing backends return the list of written
 paths (<code>list[Path]</code>); <code>"vector"</code> backends return an in-memory
 <code>FeatureCollection</code> (radar returns a <code>GeoDataFrame</code>);
-<code>"tabular"</code> backends return a <code>pandas.DataFrame</code>. The two
-not-yet-migrated legacy backends (CHIRPS, ECMWF) still return
-<code>None</code> and write their files to <code>self.root_dir</code> as a side
-effect.</p>
+<code>"tabular"</code> backends return a <code>pandas.DataFrame</code>. Every backend
+now returns its produced artifacts (the legacy CHIRPS / ECMWF
+backends return their written <code>list[Path]</code> and also leave the
+files on disk under <code>self.root_dir</code>).</p>
 <p>Partial-failure policy is per backend and currently varies:
 most multi-item backends are <strong>skip-and-continue</strong> — a single
 failed <code>(dataset, variable)</code> / chunk / sensor is logged and the
@@ -11269,10 +11269,10 @@ the policy becomes uniformly caller-controllable.</p>
 <a id="__codelineno-0-463" name="__codelineno-0-463"></a><span class="sd">    `&quot;mixed&quot;` file-writing backends return the list of written</span>
 <a id="__codelineno-0-464" name="__codelineno-0-464"></a><span class="sd">    paths (`list[Path]`); `&quot;vector&quot;` backends return an in-memory</span>
 <a id="__codelineno-0-465" name="__codelineno-0-465"></a><span class="sd">    `FeatureCollection` (radar returns a `GeoDataFrame`);</span>
-<a id="__codelineno-0-466" name="__codelineno-0-466"></a><span class="sd">    `&quot;tabular&quot;` backends return a `pandas.DataFrame`. The two</span>
-<a id="__codelineno-0-467" name="__codelineno-0-467"></a><span class="sd">    not-yet-migrated legacy backends (CHIRPS, ECMWF) still return</span>
-<a id="__codelineno-0-468" name="__codelineno-0-468"></a><span class="sd">    `None` and write their files to `self.root_dir` as a side</span>
-<a id="__codelineno-0-469" name="__codelineno-0-469"></a><span class="sd">    effect.</span>
+<a id="__codelineno-0-466" name="__codelineno-0-466"></a><span class="sd">    `&quot;tabular&quot;` backends return a `pandas.DataFrame`. Every backend</span>
+<a id="__codelineno-0-467" name="__codelineno-0-467"></a><span class="sd">    now returns its produced artifacts (the legacy CHIRPS / ECMWF</span>
+<a id="__codelineno-0-468" name="__codelineno-0-468"></a><span class="sd">    backends return their written `list[Path]` and also leave the</span>
+<a id="__codelineno-0-469" name="__codelineno-0-469"></a><span class="sd">    files on disk under `self.root_dir`).</span>
 <a id="__codelineno-0-470" name="__codelineno-0-470"></a>
 <a id="__codelineno-0-471" name="__codelineno-0-471"></a><span class="sd">    Partial-failure policy is per backend and currently varies:</span>
 <a id="__codelineno-0-472" name="__codelineno-0-472"></a><span class="sd">    most multi-item backends are **skip-and-continue** — a single</span>

@@ -10493,8 +10493,7 @@ holds the concrete backend that :meth:<code>download</code> routes to.</p>
 <span class="normal"><a href="#__codelineno-0-636">636</a></span>
 <span class="normal"><a href="#__codelineno-0-637">637</a></span>
 <span class="normal"><a href="#__codelineno-0-638">638</a></span>
-<span class="normal"><a href="#__codelineno-0-639">639</a></span>
-<span class="normal"><a href="#__codelineno-0-640">640</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-109" name="__codelineno-0-109"></a><span class="k">class</span><span class="w"> </span><span class="nc">EarthLens</span><span class="p">:</span>
+<span class="normal"><a href="#__codelineno-0-639">639</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-109" name="__codelineno-0-109"></a><span class="k">class</span><span class="w"> </span><span class="nc">EarthLens</span><span class="p">:</span>
 <a id="__codelineno-0-110" name="__codelineno-0-110"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Facade that routes a download to the requested backend.</span>
 <a id="__codelineno-0-111" name="__codelineno-0-111"></a>
 <a id="__codelineno-0-112" name="__codelineno-0-112"></a><span class="sd">    The class-level :attr:`DataSources` mapping resolves a string key</span>
@@ -10943,89 +10942,88 @@ holds the concrete backend that :meth:<code>download</code> routes to.</p>
 <a id="__codelineno-0-555" name="__codelineno-0-555"></a><span class="sd">            * `&quot;tabular&quot;` — a `pandas.DataFrame` (e.g. OpenAQ,</span>
 <a id="__codelineno-0-556" name="__codelineno-0-556"></a><span class="sd">              USGS Water).</span>
 <a id="__codelineno-0-557" name="__codelineno-0-557"></a>
-<a id="__codelineno-0-558" name="__codelineno-0-558"></a><span class="sd">            Exceptions (pending the legacy `_search`/`_fetch`</span>
-<a id="__codelineno-0-559" name="__codelineno-0-559"></a><span class="sd">            migration): CHIRPS and ECMWF still return `None` and write</span>
-<a id="__codelineno-0-560" name="__codelineno-0-560"></a><span class="sd">            their files to `path` as a side effect.</span>
-<a id="__codelineno-0-561" name="__codelineno-0-561"></a>
-<a id="__codelineno-0-562" name="__codelineno-0-562"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-563" name="__codelineno-0-563"></a><span class="sd">            AuthenticationError: When the ECMWF backend cannot</span>
-<a id="__codelineno-0-564" name="__codelineno-0-564"></a><span class="sd">                authenticate against CDS (typically a missing</span>
-<a id="__codelineno-0-565" name="__codelineno-0-565"></a><span class="sd">                `~/.cdsapirc`). See</span>
-<a id="__codelineno-0-566" name="__codelineno-0-566"></a><span class="sd">                :class:`earthlens.ecmwf.AuthenticationError`.</span>
-<a id="__codelineno-0-567" name="__codelineno-0-567"></a><span class="sd">            KeyError: When any backend receives an unknown variable</span>
-<a id="__codelineno-0-568" name="__codelineno-0-568"></a><span class="sd">                code that the catalog cannot resolve.</span>
-<a id="__codelineno-0-569" name="__codelineno-0-569"></a><span class="sd">            NotImplementedError: When `aggregate=` is not `None` and</span>
-<a id="__codelineno-0-570" name="__codelineno-0-570"></a><span class="sd">                the bound backend&#39;s `OUTPUT_KIND` is `&quot;vector&quot;` or</span>
-<a id="__codelineno-0-571" name="__codelineno-0-571"></a><span class="sd">                `&quot;tabular&quot;`. The aggregator only handles gridded</span>
-<a id="__codelineno-0-572" name="__codelineno-0-572"></a><span class="sd">                raster outputs; vector / tabular backends emit</span>
-<a id="__codelineno-0-573" name="__codelineno-0-573"></a><span class="sd">                `GeoDataFrame` / `DataFrame` rows that have no</span>
-<a id="__codelineno-0-574" name="__codelineno-0-574"></a><span class="sd">                meaningful gridded reduction.</span>
-<a id="__codelineno-0-575" name="__codelineno-0-575"></a>
-<a id="__codelineno-0-576" name="__codelineno-0-576"></a><span class="sd">        Examples:</span>
-<a id="__codelineno-0-577" name="__codelineno-0-577"></a><span class="sd">            - End-to-end CHIRPS download. Marked `# doctest: +SKIP`</span>
-<a id="__codelineno-0-578" name="__codelineno-0-578"></a><span class="sd">              because it makes a live FTP connection:</span>
-<a id="__codelineno-0-579" name="__codelineno-0-579"></a>
-<a id="__codelineno-0-580" name="__codelineno-0-580"></a><span class="sd">                ```python</span>
-<a id="__codelineno-0-581" name="__codelineno-0-581"></a><span class="sd">                &gt;&gt;&gt; from earthlens.earthlens import EarthLens</span>
-<a id="__codelineno-0-582" name="__codelineno-0-582"></a><span class="sd">                &gt;&gt;&gt; earthlens = EarthLens(  # doctest: +SKIP</span>
-<a id="__codelineno-0-583" name="__codelineno-0-583"></a><span class="sd">                ...     data_source=&quot;chc&quot;,</span>
-<a id="__codelineno-0-584" name="__codelineno-0-584"></a><span class="sd">                ...     start=&quot;2009-01-01&quot;,</span>
-<a id="__codelineno-0-585" name="__codelineno-0-585"></a><span class="sd">                ...     end=&quot;2009-01-02&quot;,</span>
-<a id="__codelineno-0-586" name="__codelineno-0-586"></a><span class="sd">                ...     variables=[&quot;precipitation&quot;],</span>
-<a id="__codelineno-0-587" name="__codelineno-0-587"></a><span class="sd">                ...     lat_lim=[4.19, 4.64],</span>
-<a id="__codelineno-0-588" name="__codelineno-0-588"></a><span class="sd">                ...     lon_lim=[-75.65, -74.73],</span>
-<a id="__codelineno-0-589" name="__codelineno-0-589"></a><span class="sd">                ...     path=&quot;examples/data/chirps&quot;,</span>
-<a id="__codelineno-0-590" name="__codelineno-0-590"></a><span class="sd">                ... )</span>
-<a id="__codelineno-0-591" name="__codelineno-0-591"></a><span class="sd">                &gt;&gt;&gt; earthlens.download()  # doctest: +SKIP</span>
-<a id="__codelineno-0-592" name="__codelineno-0-592"></a>
-<a id="__codelineno-0-593" name="__codelineno-0-593"></a><span class="sd">                ```</span>
-<a id="__codelineno-0-594" name="__codelineno-0-594"></a><span class="sd">            - ECMWF download via the facade. Marked</span>
-<a id="__codelineno-0-595" name="__codelineno-0-595"></a><span class="sd">              `# doctest: +SKIP` because CDS requires</span>
-<a id="__codelineno-0-596" name="__codelineno-0-596"></a><span class="sd">              `~/.cdsapirc` and the request blocks for minutes</span>
-<a id="__codelineno-0-597" name="__codelineno-0-597"></a><span class="sd">              while the queue serves it:</span>
-<a id="__codelineno-0-598" name="__codelineno-0-598"></a>
-<a id="__codelineno-0-599" name="__codelineno-0-599"></a><span class="sd">                ```python</span>
-<a id="__codelineno-0-600" name="__codelineno-0-600"></a><span class="sd">                &gt;&gt;&gt; from earthlens.earthlens import EarthLens</span>
-<a id="__codelineno-0-601" name="__codelineno-0-601"></a><span class="sd">                &gt;&gt;&gt; earthlens = EarthLens(  # doctest: +SKIP</span>
-<a id="__codelineno-0-602" name="__codelineno-0-602"></a><span class="sd">                ...     data_source=&quot;ecmwf&quot;,</span>
-<a id="__codelineno-0-603" name="__codelineno-0-603"></a><span class="sd">                ...     start=&quot;2022-01-01&quot;,</span>
-<a id="__codelineno-0-604" name="__codelineno-0-604"></a><span class="sd">                ...     end=&quot;2022-01-01&quot;,</span>
-<a id="__codelineno-0-605" name="__codelineno-0-605"></a><span class="sd">                ...     variables={</span>
-<a id="__codelineno-0-606" name="__codelineno-0-606"></a><span class="sd">                ...         &quot;reanalysis-era5-single-levels&quot;: [&quot;2m-temperature&quot;],</span>
-<a id="__codelineno-0-607" name="__codelineno-0-607"></a><span class="sd">                ...     },</span>
-<a id="__codelineno-0-608" name="__codelineno-0-608"></a><span class="sd">                ...     lat_lim=[4.0, 5.0],</span>
-<a id="__codelineno-0-609" name="__codelineno-0-609"></a><span class="sd">                ...     lon_lim=[-75.0, -74.0],</span>
-<a id="__codelineno-0-610" name="__codelineno-0-610"></a><span class="sd">                ...     path=&quot;examples/data/era5&quot;,</span>
-<a id="__codelineno-0-611" name="__codelineno-0-611"></a><span class="sd">                ... )</span>
-<a id="__codelineno-0-612" name="__codelineno-0-612"></a><span class="sd">                &gt;&gt;&gt; earthlens.download()  # doctest: +SKIP</span>
-<a id="__codelineno-0-613" name="__codelineno-0-613"></a>
-<a id="__codelineno-0-614" name="__codelineno-0-614"></a><span class="sd">                ```</span>
-<a id="__codelineno-0-615" name="__codelineno-0-615"></a>
-<a id="__codelineno-0-616" name="__codelineno-0-616"></a><span class="sd">        See Also:</span>
-<a id="__codelineno-0-617" name="__codelineno-0-617"></a><span class="sd">            :meth:`earthlens.chc.CHIRPS.download`: CHIRPS</span>
-<a id="__codelineno-0-618" name="__codelineno-0-618"></a><span class="sd">                backend implementation, including the `cores=`</span>
-<a id="__codelineno-0-619" name="__codelineno-0-619"></a><span class="sd">                keyword for parallel retrieval.</span>
-<a id="__codelineno-0-620" name="__codelineno-0-620"></a><span class="sd">            :meth:`earthlens.s3.S3.download`: S3/ERA5 backend</span>
-<a id="__codelineno-0-621" name="__codelineno-0-621"></a><span class="sd">                implementation.</span>
-<a id="__codelineno-0-622" name="__codelineno-0-622"></a><span class="sd">            :meth:`earthlens.ecmwf.ECMWF.download`: ECMWF/CDS</span>
-<a id="__codelineno-0-623" name="__codelineno-0-623"></a><span class="sd">                backend implementation.</span>
-<a id="__codelineno-0-624" name="__codelineno-0-624"></a><span class="sd">            :meth:`earthlens.gee.GEE.download`: Google Earth Engine</span>
-<a id="__codelineno-0-625" name="__codelineno-0-625"></a><span class="sd">                backend implementation (`export_via`, the 32768-px</span>
-<a id="__codelineno-0-626" name="__codelineno-0-626"></a><span class="sd">                synchronous cap).</span>
-<a id="__codelineno-0-627" name="__codelineno-0-627"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-628" name="__codelineno-0-628"></a>        <span class="k">if</span> <span class="n">aggregate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-629" name="__codelineno-0-629"></a>            <span class="n">output_kind</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasource</span><span class="p">,</span> <span class="s2">&quot;OUTPUT_KIND&quot;</span><span class="p">,</span> <span class="s2">&quot;raster&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-630" name="__codelineno-0-630"></a>            <span class="k">if</span> <span class="n">output_kind</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">{</span><span class="s2">&quot;raster&quot;</span><span class="p">,</span> <span class="s2">&quot;mixed&quot;</span><span class="p">}:</span>
-<a id="__codelineno-0-631" name="__codelineno-0-631"></a>                <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
-<a id="__codelineno-0-632" name="__codelineno-0-632"></a>                    <span class="sa">f</span><span class="s2">&quot;aggregate= is not supported for &quot;</span>
-<a id="__codelineno-0-633" name="__codelineno-0-633"></a>                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasource</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> backends &quot;</span>
-<a id="__codelineno-0-634" name="__codelineno-0-634"></a>                    <span class="sa">f</span><span class="s2">&quot;(OUTPUT_KIND=</span><span class="si">{</span><span class="n">output_kind</span><span class="si">!r}</span><span class="s2">). The aggregator only &quot;</span>
-<a id="__codelineno-0-635" name="__codelineno-0-635"></a>                    <span class="sa">f</span><span class="s2">&quot;handles gridded raster outputs; vector / tabular &quot;</span>
-<a id="__codelineno-0-636" name="__codelineno-0-636"></a>                    <span class="sa">f</span><span class="s2">&quot;backends emit GeoDataFrames or DataFrames that do &quot;</span>
-<a id="__codelineno-0-637" name="__codelineno-0-637"></a>                    <span class="sa">f</span><span class="s2">&quot;not have a meaningful gridded reduction.&quot;</span>
-<a id="__codelineno-0-638" name="__codelineno-0-638"></a>                <span class="p">)</span>
-<a id="__codelineno-0-639" name="__codelineno-0-639"></a>            <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;aggregate&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">aggregate</span>
-<a id="__codelineno-0-640" name="__codelineno-0-640"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasource</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">progress_bar</span><span class="o">=</span><span class="n">progress_bar</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+<a id="__codelineno-0-558" name="__codelineno-0-558"></a><span class="sd">            The legacy CHIRPS / ECMWF backends return their written</span>
+<a id="__codelineno-0-559" name="__codelineno-0-559"></a><span class="sd">            `list[Path]` and also leave the files on disk under `path`.</span>
+<a id="__codelineno-0-560" name="__codelineno-0-560"></a>
+<a id="__codelineno-0-561" name="__codelineno-0-561"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-562" name="__codelineno-0-562"></a><span class="sd">            AuthenticationError: When the ECMWF backend cannot</span>
+<a id="__codelineno-0-563" name="__codelineno-0-563"></a><span class="sd">                authenticate against CDS (typically a missing</span>
+<a id="__codelineno-0-564" name="__codelineno-0-564"></a><span class="sd">                `~/.cdsapirc`). See</span>
+<a id="__codelineno-0-565" name="__codelineno-0-565"></a><span class="sd">                :class:`earthlens.ecmwf.AuthenticationError`.</span>
+<a id="__codelineno-0-566" name="__codelineno-0-566"></a><span class="sd">            KeyError: When any backend receives an unknown variable</span>
+<a id="__codelineno-0-567" name="__codelineno-0-567"></a><span class="sd">                code that the catalog cannot resolve.</span>
+<a id="__codelineno-0-568" name="__codelineno-0-568"></a><span class="sd">            NotImplementedError: When `aggregate=` is not `None` and</span>
+<a id="__codelineno-0-569" name="__codelineno-0-569"></a><span class="sd">                the bound backend&#39;s `OUTPUT_KIND` is `&quot;vector&quot;` or</span>
+<a id="__codelineno-0-570" name="__codelineno-0-570"></a><span class="sd">                `&quot;tabular&quot;`. The aggregator only handles gridded</span>
+<a id="__codelineno-0-571" name="__codelineno-0-571"></a><span class="sd">                raster outputs; vector / tabular backends emit</span>
+<a id="__codelineno-0-572" name="__codelineno-0-572"></a><span class="sd">                `GeoDataFrame` / `DataFrame` rows that have no</span>
+<a id="__codelineno-0-573" name="__codelineno-0-573"></a><span class="sd">                meaningful gridded reduction.</span>
+<a id="__codelineno-0-574" name="__codelineno-0-574"></a>
+<a id="__codelineno-0-575" name="__codelineno-0-575"></a><span class="sd">        Examples:</span>
+<a id="__codelineno-0-576" name="__codelineno-0-576"></a><span class="sd">            - End-to-end CHIRPS download. Marked `# doctest: +SKIP`</span>
+<a id="__codelineno-0-577" name="__codelineno-0-577"></a><span class="sd">              because it makes a live FTP connection:</span>
+<a id="__codelineno-0-578" name="__codelineno-0-578"></a>
+<a id="__codelineno-0-579" name="__codelineno-0-579"></a><span class="sd">                ```python</span>
+<a id="__codelineno-0-580" name="__codelineno-0-580"></a><span class="sd">                &gt;&gt;&gt; from earthlens.earthlens import EarthLens</span>
+<a id="__codelineno-0-581" name="__codelineno-0-581"></a><span class="sd">                &gt;&gt;&gt; earthlens = EarthLens(  # doctest: +SKIP</span>
+<a id="__codelineno-0-582" name="__codelineno-0-582"></a><span class="sd">                ...     data_source=&quot;chc&quot;,</span>
+<a id="__codelineno-0-583" name="__codelineno-0-583"></a><span class="sd">                ...     start=&quot;2009-01-01&quot;,</span>
+<a id="__codelineno-0-584" name="__codelineno-0-584"></a><span class="sd">                ...     end=&quot;2009-01-02&quot;,</span>
+<a id="__codelineno-0-585" name="__codelineno-0-585"></a><span class="sd">                ...     variables=[&quot;precipitation&quot;],</span>
+<a id="__codelineno-0-586" name="__codelineno-0-586"></a><span class="sd">                ...     lat_lim=[4.19, 4.64],</span>
+<a id="__codelineno-0-587" name="__codelineno-0-587"></a><span class="sd">                ...     lon_lim=[-75.65, -74.73],</span>
+<a id="__codelineno-0-588" name="__codelineno-0-588"></a><span class="sd">                ...     path=&quot;examples/data/chirps&quot;,</span>
+<a id="__codelineno-0-589" name="__codelineno-0-589"></a><span class="sd">                ... )</span>
+<a id="__codelineno-0-590" name="__codelineno-0-590"></a><span class="sd">                &gt;&gt;&gt; earthlens.download()  # doctest: +SKIP</span>
+<a id="__codelineno-0-591" name="__codelineno-0-591"></a>
+<a id="__codelineno-0-592" name="__codelineno-0-592"></a><span class="sd">                ```</span>
+<a id="__codelineno-0-593" name="__codelineno-0-593"></a><span class="sd">            - ECMWF download via the facade. Marked</span>
+<a id="__codelineno-0-594" name="__codelineno-0-594"></a><span class="sd">              `# doctest: +SKIP` because CDS requires</span>
+<a id="__codelineno-0-595" name="__codelineno-0-595"></a><span class="sd">              `~/.cdsapirc` and the request blocks for minutes</span>
+<a id="__codelineno-0-596" name="__codelineno-0-596"></a><span class="sd">              while the queue serves it:</span>
+<a id="__codelineno-0-597" name="__codelineno-0-597"></a>
+<a id="__codelineno-0-598" name="__codelineno-0-598"></a><span class="sd">                ```python</span>
+<a id="__codelineno-0-599" name="__codelineno-0-599"></a><span class="sd">                &gt;&gt;&gt; from earthlens.earthlens import EarthLens</span>
+<a id="__codelineno-0-600" name="__codelineno-0-600"></a><span class="sd">                &gt;&gt;&gt; earthlens = EarthLens(  # doctest: +SKIP</span>
+<a id="__codelineno-0-601" name="__codelineno-0-601"></a><span class="sd">                ...     data_source=&quot;ecmwf&quot;,</span>
+<a id="__codelineno-0-602" name="__codelineno-0-602"></a><span class="sd">                ...     start=&quot;2022-01-01&quot;,</span>
+<a id="__codelineno-0-603" name="__codelineno-0-603"></a><span class="sd">                ...     end=&quot;2022-01-01&quot;,</span>
+<a id="__codelineno-0-604" name="__codelineno-0-604"></a><span class="sd">                ...     variables={</span>
+<a id="__codelineno-0-605" name="__codelineno-0-605"></a><span class="sd">                ...         &quot;reanalysis-era5-single-levels&quot;: [&quot;2m-temperature&quot;],</span>
+<a id="__codelineno-0-606" name="__codelineno-0-606"></a><span class="sd">                ...     },</span>
+<a id="__codelineno-0-607" name="__codelineno-0-607"></a><span class="sd">                ...     lat_lim=[4.0, 5.0],</span>
+<a id="__codelineno-0-608" name="__codelineno-0-608"></a><span class="sd">                ...     lon_lim=[-75.0, -74.0],</span>
+<a id="__codelineno-0-609" name="__codelineno-0-609"></a><span class="sd">                ...     path=&quot;examples/data/era5&quot;,</span>
+<a id="__codelineno-0-610" name="__codelineno-0-610"></a><span class="sd">                ... )</span>
+<a id="__codelineno-0-611" name="__codelineno-0-611"></a><span class="sd">                &gt;&gt;&gt; earthlens.download()  # doctest: +SKIP</span>
+<a id="__codelineno-0-612" name="__codelineno-0-612"></a>
+<a id="__codelineno-0-613" name="__codelineno-0-613"></a><span class="sd">                ```</span>
+<a id="__codelineno-0-614" name="__codelineno-0-614"></a>
+<a id="__codelineno-0-615" name="__codelineno-0-615"></a><span class="sd">        See Also:</span>
+<a id="__codelineno-0-616" name="__codelineno-0-616"></a><span class="sd">            :meth:`earthlens.chc.CHIRPS.download`: CHIRPS</span>
+<a id="__codelineno-0-617" name="__codelineno-0-617"></a><span class="sd">                backend implementation, including the `cores=`</span>
+<a id="__codelineno-0-618" name="__codelineno-0-618"></a><span class="sd">                keyword for parallel retrieval.</span>
+<a id="__codelineno-0-619" name="__codelineno-0-619"></a><span class="sd">            :meth:`earthlens.s3.S3.download`: S3/ERA5 backend</span>
+<a id="__codelineno-0-620" name="__codelineno-0-620"></a><span class="sd">                implementation.</span>
+<a id="__codelineno-0-621" name="__codelineno-0-621"></a><span class="sd">            :meth:`earthlens.ecmwf.ECMWF.download`: ECMWF/CDS</span>
+<a id="__codelineno-0-622" name="__codelineno-0-622"></a><span class="sd">                backend implementation.</span>
+<a id="__codelineno-0-623" name="__codelineno-0-623"></a><span class="sd">            :meth:`earthlens.gee.GEE.download`: Google Earth Engine</span>
+<a id="__codelineno-0-624" name="__codelineno-0-624"></a><span class="sd">                backend implementation (`export_via`, the 32768-px</span>
+<a id="__codelineno-0-625" name="__codelineno-0-625"></a><span class="sd">                synchronous cap).</span>
+<a id="__codelineno-0-626" name="__codelineno-0-626"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-627" name="__codelineno-0-627"></a>        <span class="k">if</span> <span class="n">aggregate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-628" name="__codelineno-0-628"></a>            <span class="n">output_kind</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasource</span><span class="p">,</span> <span class="s2">&quot;OUTPUT_KIND&quot;</span><span class="p">,</span> <span class="s2">&quot;raster&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-629" name="__codelineno-0-629"></a>            <span class="k">if</span> <span class="n">output_kind</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">{</span><span class="s2">&quot;raster&quot;</span><span class="p">,</span> <span class="s2">&quot;mixed&quot;</span><span class="p">}:</span>
+<a id="__codelineno-0-630" name="__codelineno-0-630"></a>                <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+<a id="__codelineno-0-631" name="__codelineno-0-631"></a>                    <span class="sa">f</span><span class="s2">&quot;aggregate= is not supported for &quot;</span>
+<a id="__codelineno-0-632" name="__codelineno-0-632"></a>                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasource</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> backends &quot;</span>
+<a id="__codelineno-0-633" name="__codelineno-0-633"></a>                    <span class="sa">f</span><span class="s2">&quot;(OUTPUT_KIND=</span><span class="si">{</span><span class="n">output_kind</span><span class="si">!r}</span><span class="s2">). The aggregator only &quot;</span>
+<a id="__codelineno-0-634" name="__codelineno-0-634"></a>                    <span class="sa">f</span><span class="s2">&quot;handles gridded raster outputs; vector / tabular &quot;</span>
+<a id="__codelineno-0-635" name="__codelineno-0-635"></a>                    <span class="sa">f</span><span class="s2">&quot;backends emit GeoDataFrames or DataFrames that do &quot;</span>
+<a id="__codelineno-0-636" name="__codelineno-0-636"></a>                    <span class="sa">f</span><span class="s2">&quot;not have a meaningful gridded reduction.&quot;</span>
+<a id="__codelineno-0-637" name="__codelineno-0-637"></a>                <span class="p">)</span>
+<a id="__codelineno-0-638" name="__codelineno-0-638"></a>            <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;aggregate&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">aggregate</span>
+<a id="__codelineno-0-639" name="__codelineno-0-639"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasource</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">progress_bar</span><span class="o">=</span><span class="n">progress_bar</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -11967,7 +11965,7 @@ USGS Water).</li>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Exceptions (pending the legacy <code>_search</code>/<code>_fetch</code></p>
+                <p>The legacy CHIRPS / ECMWF backends return their written</p>
               </div>
             </td>
           </tr>
@@ -11977,17 +11975,7 @@ USGS Water).</li>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>migration): CHIRPS and ECMWF still return <code>None</code> and write</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                  <code><span title="typing.Any">Any</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>their files to <code>path</code> as a side effect.</p>
+                <p><code>list[Path]</code> and also leave the files on disk under <code>path</code>.</p>
               </div>
             </td>
           </tr>
@@ -12227,8 +12215,7 @@ meaningful gridded reduction.</p>
 <span class="normal"><a href="#__codelineno-0-636">636</a></span>
 <span class="normal"><a href="#__codelineno-0-637">637</a></span>
 <span class="normal"><a href="#__codelineno-0-638">638</a></span>
-<span class="normal"><a href="#__codelineno-0-639">639</a></span>
-<span class="normal"><a href="#__codelineno-0-640">640</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-514" name="__codelineno-0-514"></a><span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
+<span class="normal"><a href="#__codelineno-0-639">639</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-514" name="__codelineno-0-514"></a><span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
 <a id="__codelineno-0-515" name="__codelineno-0-515"></a>    <span class="bp">self</span><span class="p">,</span>
 <a id="__codelineno-0-516" name="__codelineno-0-516"></a>    <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
 <a id="__codelineno-0-517" name="__codelineno-0-517"></a>    <span class="n">aggregate</span><span class="p">:</span> <span class="n">AggregationConfig</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -12272,89 +12259,88 @@ meaningful gridded reduction.</p>
 <a id="__codelineno-0-555" name="__codelineno-0-555"></a><span class="sd">        * `&quot;tabular&quot;` — a `pandas.DataFrame` (e.g. OpenAQ,</span>
 <a id="__codelineno-0-556" name="__codelineno-0-556"></a><span class="sd">          USGS Water).</span>
 <a id="__codelineno-0-557" name="__codelineno-0-557"></a>
-<a id="__codelineno-0-558" name="__codelineno-0-558"></a><span class="sd">        Exceptions (pending the legacy `_search`/`_fetch`</span>
-<a id="__codelineno-0-559" name="__codelineno-0-559"></a><span class="sd">        migration): CHIRPS and ECMWF still return `None` and write</span>
-<a id="__codelineno-0-560" name="__codelineno-0-560"></a><span class="sd">        their files to `path` as a side effect.</span>
-<a id="__codelineno-0-561" name="__codelineno-0-561"></a>
-<a id="__codelineno-0-562" name="__codelineno-0-562"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-563" name="__codelineno-0-563"></a><span class="sd">        AuthenticationError: When the ECMWF backend cannot</span>
-<a id="__codelineno-0-564" name="__codelineno-0-564"></a><span class="sd">            authenticate against CDS (typically a missing</span>
-<a id="__codelineno-0-565" name="__codelineno-0-565"></a><span class="sd">            `~/.cdsapirc`). See</span>
-<a id="__codelineno-0-566" name="__codelineno-0-566"></a><span class="sd">            :class:`earthlens.ecmwf.AuthenticationError`.</span>
-<a id="__codelineno-0-567" name="__codelineno-0-567"></a><span class="sd">        KeyError: When any backend receives an unknown variable</span>
-<a id="__codelineno-0-568" name="__codelineno-0-568"></a><span class="sd">            code that the catalog cannot resolve.</span>
-<a id="__codelineno-0-569" name="__codelineno-0-569"></a><span class="sd">        NotImplementedError: When `aggregate=` is not `None` and</span>
-<a id="__codelineno-0-570" name="__codelineno-0-570"></a><span class="sd">            the bound backend&#39;s `OUTPUT_KIND` is `&quot;vector&quot;` or</span>
-<a id="__codelineno-0-571" name="__codelineno-0-571"></a><span class="sd">            `&quot;tabular&quot;`. The aggregator only handles gridded</span>
-<a id="__codelineno-0-572" name="__codelineno-0-572"></a><span class="sd">            raster outputs; vector / tabular backends emit</span>
-<a id="__codelineno-0-573" name="__codelineno-0-573"></a><span class="sd">            `GeoDataFrame` / `DataFrame` rows that have no</span>
-<a id="__codelineno-0-574" name="__codelineno-0-574"></a><span class="sd">            meaningful gridded reduction.</span>
-<a id="__codelineno-0-575" name="__codelineno-0-575"></a>
-<a id="__codelineno-0-576" name="__codelineno-0-576"></a><span class="sd">    Examples:</span>
-<a id="__codelineno-0-577" name="__codelineno-0-577"></a><span class="sd">        - End-to-end CHIRPS download. Marked `# doctest: +SKIP`</span>
-<a id="__codelineno-0-578" name="__codelineno-0-578"></a><span class="sd">          because it makes a live FTP connection:</span>
-<a id="__codelineno-0-579" name="__codelineno-0-579"></a>
-<a id="__codelineno-0-580" name="__codelineno-0-580"></a><span class="sd">            ```python</span>
-<a id="__codelineno-0-581" name="__codelineno-0-581"></a><span class="sd">            &gt;&gt;&gt; from earthlens.earthlens import EarthLens</span>
-<a id="__codelineno-0-582" name="__codelineno-0-582"></a><span class="sd">            &gt;&gt;&gt; earthlens = EarthLens(  # doctest: +SKIP</span>
-<a id="__codelineno-0-583" name="__codelineno-0-583"></a><span class="sd">            ...     data_source=&quot;chc&quot;,</span>
-<a id="__codelineno-0-584" name="__codelineno-0-584"></a><span class="sd">            ...     start=&quot;2009-01-01&quot;,</span>
-<a id="__codelineno-0-585" name="__codelineno-0-585"></a><span class="sd">            ...     end=&quot;2009-01-02&quot;,</span>
-<a id="__codelineno-0-586" name="__codelineno-0-586"></a><span class="sd">            ...     variables=[&quot;precipitation&quot;],</span>
-<a id="__codelineno-0-587" name="__codelineno-0-587"></a><span class="sd">            ...     lat_lim=[4.19, 4.64],</span>
-<a id="__codelineno-0-588" name="__codelineno-0-588"></a><span class="sd">            ...     lon_lim=[-75.65, -74.73],</span>
-<a id="__codelineno-0-589" name="__codelineno-0-589"></a><span class="sd">            ...     path=&quot;examples/data/chirps&quot;,</span>
-<a id="__codelineno-0-590" name="__codelineno-0-590"></a><span class="sd">            ... )</span>
-<a id="__codelineno-0-591" name="__codelineno-0-591"></a><span class="sd">            &gt;&gt;&gt; earthlens.download()  # doctest: +SKIP</span>
-<a id="__codelineno-0-592" name="__codelineno-0-592"></a>
-<a id="__codelineno-0-593" name="__codelineno-0-593"></a><span class="sd">            ```</span>
-<a id="__codelineno-0-594" name="__codelineno-0-594"></a><span class="sd">        - ECMWF download via the facade. Marked</span>
-<a id="__codelineno-0-595" name="__codelineno-0-595"></a><span class="sd">          `# doctest: +SKIP` because CDS requires</span>
-<a id="__codelineno-0-596" name="__codelineno-0-596"></a><span class="sd">          `~/.cdsapirc` and the request blocks for minutes</span>
-<a id="__codelineno-0-597" name="__codelineno-0-597"></a><span class="sd">          while the queue serves it:</span>
-<a id="__codelineno-0-598" name="__codelineno-0-598"></a>
-<a id="__codelineno-0-599" name="__codelineno-0-599"></a><span class="sd">            ```python</span>
-<a id="__codelineno-0-600" name="__codelineno-0-600"></a><span class="sd">            &gt;&gt;&gt; from earthlens.earthlens import EarthLens</span>
-<a id="__codelineno-0-601" name="__codelineno-0-601"></a><span class="sd">            &gt;&gt;&gt; earthlens = EarthLens(  # doctest: +SKIP</span>
-<a id="__codelineno-0-602" name="__codelineno-0-602"></a><span class="sd">            ...     data_source=&quot;ecmwf&quot;,</span>
-<a id="__codelineno-0-603" name="__codelineno-0-603"></a><span class="sd">            ...     start=&quot;2022-01-01&quot;,</span>
-<a id="__codelineno-0-604" name="__codelineno-0-604"></a><span class="sd">            ...     end=&quot;2022-01-01&quot;,</span>
-<a id="__codelineno-0-605" name="__codelineno-0-605"></a><span class="sd">            ...     variables={</span>
-<a id="__codelineno-0-606" name="__codelineno-0-606"></a><span class="sd">            ...         &quot;reanalysis-era5-single-levels&quot;: [&quot;2m-temperature&quot;],</span>
-<a id="__codelineno-0-607" name="__codelineno-0-607"></a><span class="sd">            ...     },</span>
-<a id="__codelineno-0-608" name="__codelineno-0-608"></a><span class="sd">            ...     lat_lim=[4.0, 5.0],</span>
-<a id="__codelineno-0-609" name="__codelineno-0-609"></a><span class="sd">            ...     lon_lim=[-75.0, -74.0],</span>
-<a id="__codelineno-0-610" name="__codelineno-0-610"></a><span class="sd">            ...     path=&quot;examples/data/era5&quot;,</span>
-<a id="__codelineno-0-611" name="__codelineno-0-611"></a><span class="sd">            ... )</span>
-<a id="__codelineno-0-612" name="__codelineno-0-612"></a><span class="sd">            &gt;&gt;&gt; earthlens.download()  # doctest: +SKIP</span>
-<a id="__codelineno-0-613" name="__codelineno-0-613"></a>
-<a id="__codelineno-0-614" name="__codelineno-0-614"></a><span class="sd">            ```</span>
-<a id="__codelineno-0-615" name="__codelineno-0-615"></a>
-<a id="__codelineno-0-616" name="__codelineno-0-616"></a><span class="sd">    See Also:</span>
-<a id="__codelineno-0-617" name="__codelineno-0-617"></a><span class="sd">        :meth:`earthlens.chc.CHIRPS.download`: CHIRPS</span>
-<a id="__codelineno-0-618" name="__codelineno-0-618"></a><span class="sd">            backend implementation, including the `cores=`</span>
-<a id="__codelineno-0-619" name="__codelineno-0-619"></a><span class="sd">            keyword for parallel retrieval.</span>
-<a id="__codelineno-0-620" name="__codelineno-0-620"></a><span class="sd">        :meth:`earthlens.s3.S3.download`: S3/ERA5 backend</span>
-<a id="__codelineno-0-621" name="__codelineno-0-621"></a><span class="sd">            implementation.</span>
-<a id="__codelineno-0-622" name="__codelineno-0-622"></a><span class="sd">        :meth:`earthlens.ecmwf.ECMWF.download`: ECMWF/CDS</span>
-<a id="__codelineno-0-623" name="__codelineno-0-623"></a><span class="sd">            backend implementation.</span>
-<a id="__codelineno-0-624" name="__codelineno-0-624"></a><span class="sd">        :meth:`earthlens.gee.GEE.download`: Google Earth Engine</span>
-<a id="__codelineno-0-625" name="__codelineno-0-625"></a><span class="sd">            backend implementation (`export_via`, the 32768-px</span>
-<a id="__codelineno-0-626" name="__codelineno-0-626"></a><span class="sd">            synchronous cap).</span>
-<a id="__codelineno-0-627" name="__codelineno-0-627"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-628" name="__codelineno-0-628"></a>    <span class="k">if</span> <span class="n">aggregate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-629" name="__codelineno-0-629"></a>        <span class="n">output_kind</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasource</span><span class="p">,</span> <span class="s2">&quot;OUTPUT_KIND&quot;</span><span class="p">,</span> <span class="s2">&quot;raster&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-630" name="__codelineno-0-630"></a>        <span class="k">if</span> <span class="n">output_kind</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">{</span><span class="s2">&quot;raster&quot;</span><span class="p">,</span> <span class="s2">&quot;mixed&quot;</span><span class="p">}:</span>
-<a id="__codelineno-0-631" name="__codelineno-0-631"></a>            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
-<a id="__codelineno-0-632" name="__codelineno-0-632"></a>                <span class="sa">f</span><span class="s2">&quot;aggregate= is not supported for &quot;</span>
-<a id="__codelineno-0-633" name="__codelineno-0-633"></a>                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasource</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> backends &quot;</span>
-<a id="__codelineno-0-634" name="__codelineno-0-634"></a>                <span class="sa">f</span><span class="s2">&quot;(OUTPUT_KIND=</span><span class="si">{</span><span class="n">output_kind</span><span class="si">!r}</span><span class="s2">). The aggregator only &quot;</span>
-<a id="__codelineno-0-635" name="__codelineno-0-635"></a>                <span class="sa">f</span><span class="s2">&quot;handles gridded raster outputs; vector / tabular &quot;</span>
-<a id="__codelineno-0-636" name="__codelineno-0-636"></a>                <span class="sa">f</span><span class="s2">&quot;backends emit GeoDataFrames or DataFrames that do &quot;</span>
-<a id="__codelineno-0-637" name="__codelineno-0-637"></a>                <span class="sa">f</span><span class="s2">&quot;not have a meaningful gridded reduction.&quot;</span>
-<a id="__codelineno-0-638" name="__codelineno-0-638"></a>            <span class="p">)</span>
-<a id="__codelineno-0-639" name="__codelineno-0-639"></a>        <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;aggregate&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">aggregate</span>
-<a id="__codelineno-0-640" name="__codelineno-0-640"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasource</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">progress_bar</span><span class="o">=</span><span class="n">progress_bar</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+<a id="__codelineno-0-558" name="__codelineno-0-558"></a><span class="sd">        The legacy CHIRPS / ECMWF backends return their written</span>
+<a id="__codelineno-0-559" name="__codelineno-0-559"></a><span class="sd">        `list[Path]` and also leave the files on disk under `path`.</span>
+<a id="__codelineno-0-560" name="__codelineno-0-560"></a>
+<a id="__codelineno-0-561" name="__codelineno-0-561"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-562" name="__codelineno-0-562"></a><span class="sd">        AuthenticationError: When the ECMWF backend cannot</span>
+<a id="__codelineno-0-563" name="__codelineno-0-563"></a><span class="sd">            authenticate against CDS (typically a missing</span>
+<a id="__codelineno-0-564" name="__codelineno-0-564"></a><span class="sd">            `~/.cdsapirc`). See</span>
+<a id="__codelineno-0-565" name="__codelineno-0-565"></a><span class="sd">            :class:`earthlens.ecmwf.AuthenticationError`.</span>
+<a id="__codelineno-0-566" name="__codelineno-0-566"></a><span class="sd">        KeyError: When any backend receives an unknown variable</span>
+<a id="__codelineno-0-567" name="__codelineno-0-567"></a><span class="sd">            code that the catalog cannot resolve.</span>
+<a id="__codelineno-0-568" name="__codelineno-0-568"></a><span class="sd">        NotImplementedError: When `aggregate=` is not `None` and</span>
+<a id="__codelineno-0-569" name="__codelineno-0-569"></a><span class="sd">            the bound backend&#39;s `OUTPUT_KIND` is `&quot;vector&quot;` or</span>
+<a id="__codelineno-0-570" name="__codelineno-0-570"></a><span class="sd">            `&quot;tabular&quot;`. The aggregator only handles gridded</span>
+<a id="__codelineno-0-571" name="__codelineno-0-571"></a><span class="sd">            raster outputs; vector / tabular backends emit</span>
+<a id="__codelineno-0-572" name="__codelineno-0-572"></a><span class="sd">            `GeoDataFrame` / `DataFrame` rows that have no</span>
+<a id="__codelineno-0-573" name="__codelineno-0-573"></a><span class="sd">            meaningful gridded reduction.</span>
+<a id="__codelineno-0-574" name="__codelineno-0-574"></a>
+<a id="__codelineno-0-575" name="__codelineno-0-575"></a><span class="sd">    Examples:</span>
+<a id="__codelineno-0-576" name="__codelineno-0-576"></a><span class="sd">        - End-to-end CHIRPS download. Marked `# doctest: +SKIP`</span>
+<a id="__codelineno-0-577" name="__codelineno-0-577"></a><span class="sd">          because it makes a live FTP connection:</span>
+<a id="__codelineno-0-578" name="__codelineno-0-578"></a>
+<a id="__codelineno-0-579" name="__codelineno-0-579"></a><span class="sd">            ```python</span>
+<a id="__codelineno-0-580" name="__codelineno-0-580"></a><span class="sd">            &gt;&gt;&gt; from earthlens.earthlens import EarthLens</span>
+<a id="__codelineno-0-581" name="__codelineno-0-581"></a><span class="sd">            &gt;&gt;&gt; earthlens = EarthLens(  # doctest: +SKIP</span>
+<a id="__codelineno-0-582" name="__codelineno-0-582"></a><span class="sd">            ...     data_source=&quot;chc&quot;,</span>
+<a id="__codelineno-0-583" name="__codelineno-0-583"></a><span class="sd">            ...     start=&quot;2009-01-01&quot;,</span>
+<a id="__codelineno-0-584" name="__codelineno-0-584"></a><span class="sd">            ...     end=&quot;2009-01-02&quot;,</span>
+<a id="__codelineno-0-585" name="__codelineno-0-585"></a><span class="sd">            ...     variables=[&quot;precipitation&quot;],</span>
+<a id="__codelineno-0-586" name="__codelineno-0-586"></a><span class="sd">            ...     lat_lim=[4.19, 4.64],</span>
+<a id="__codelineno-0-587" name="__codelineno-0-587"></a><span class="sd">            ...     lon_lim=[-75.65, -74.73],</span>
+<a id="__codelineno-0-588" name="__codelineno-0-588"></a><span class="sd">            ...     path=&quot;examples/data/chirps&quot;,</span>
+<a id="__codelineno-0-589" name="__codelineno-0-589"></a><span class="sd">            ... )</span>
+<a id="__codelineno-0-590" name="__codelineno-0-590"></a><span class="sd">            &gt;&gt;&gt; earthlens.download()  # doctest: +SKIP</span>
+<a id="__codelineno-0-591" name="__codelineno-0-591"></a>
+<a id="__codelineno-0-592" name="__codelineno-0-592"></a><span class="sd">            ```</span>
+<a id="__codelineno-0-593" name="__codelineno-0-593"></a><span class="sd">        - ECMWF download via the facade. Marked</span>
+<a id="__codelineno-0-594" name="__codelineno-0-594"></a><span class="sd">          `# doctest: +SKIP` because CDS requires</span>
+<a id="__codelineno-0-595" name="__codelineno-0-595"></a><span class="sd">          `~/.cdsapirc` and the request blocks for minutes</span>
+<a id="__codelineno-0-596" name="__codelineno-0-596"></a><span class="sd">          while the queue serves it:</span>
+<a id="__codelineno-0-597" name="__codelineno-0-597"></a>
+<a id="__codelineno-0-598" name="__codelineno-0-598"></a><span class="sd">            ```python</span>
+<a id="__codelineno-0-599" name="__codelineno-0-599"></a><span class="sd">            &gt;&gt;&gt; from earthlens.earthlens import EarthLens</span>
+<a id="__codelineno-0-600" name="__codelineno-0-600"></a><span class="sd">            &gt;&gt;&gt; earthlens = EarthLens(  # doctest: +SKIP</span>
+<a id="__codelineno-0-601" name="__codelineno-0-601"></a><span class="sd">            ...     data_source=&quot;ecmwf&quot;,</span>
+<a id="__codelineno-0-602" name="__codelineno-0-602"></a><span class="sd">            ...     start=&quot;2022-01-01&quot;,</span>
+<a id="__codelineno-0-603" name="__codelineno-0-603"></a><span class="sd">            ...     end=&quot;2022-01-01&quot;,</span>
+<a id="__codelineno-0-604" name="__codelineno-0-604"></a><span class="sd">            ...     variables={</span>
+<a id="__codelineno-0-605" name="__codelineno-0-605"></a><span class="sd">            ...         &quot;reanalysis-era5-single-levels&quot;: [&quot;2m-temperature&quot;],</span>
+<a id="__codelineno-0-606" name="__codelineno-0-606"></a><span class="sd">            ...     },</span>
+<a id="__codelineno-0-607" name="__codelineno-0-607"></a><span class="sd">            ...     lat_lim=[4.0, 5.0],</span>
+<a id="__codelineno-0-608" name="__codelineno-0-608"></a><span class="sd">            ...     lon_lim=[-75.0, -74.0],</span>
+<a id="__codelineno-0-609" name="__codelineno-0-609"></a><span class="sd">            ...     path=&quot;examples/data/era5&quot;,</span>
+<a id="__codelineno-0-610" name="__codelineno-0-610"></a><span class="sd">            ... )</span>
+<a id="__codelineno-0-611" name="__codelineno-0-611"></a><span class="sd">            &gt;&gt;&gt; earthlens.download()  # doctest: +SKIP</span>
+<a id="__codelineno-0-612" name="__codelineno-0-612"></a>
+<a id="__codelineno-0-613" name="__codelineno-0-613"></a><span class="sd">            ```</span>
+<a id="__codelineno-0-614" name="__codelineno-0-614"></a>
+<a id="__codelineno-0-615" name="__codelineno-0-615"></a><span class="sd">    See Also:</span>
+<a id="__codelineno-0-616" name="__codelineno-0-616"></a><span class="sd">        :meth:`earthlens.chc.CHIRPS.download`: CHIRPS</span>
+<a id="__codelineno-0-617" name="__codelineno-0-617"></a><span class="sd">            backend implementation, including the `cores=`</span>
+<a id="__codelineno-0-618" name="__codelineno-0-618"></a><span class="sd">            keyword for parallel retrieval.</span>
+<a id="__codelineno-0-619" name="__codelineno-0-619"></a><span class="sd">        :meth:`earthlens.s3.S3.download`: S3/ERA5 backend</span>
+<a id="__codelineno-0-620" name="__codelineno-0-620"></a><span class="sd">            implementation.</span>
+<a id="__codelineno-0-621" name="__codelineno-0-621"></a><span class="sd">        :meth:`earthlens.ecmwf.ECMWF.download`: ECMWF/CDS</span>
+<a id="__codelineno-0-622" name="__codelineno-0-622"></a><span class="sd">            backend implementation.</span>
+<a id="__codelineno-0-623" name="__codelineno-0-623"></a><span class="sd">        :meth:`earthlens.gee.GEE.download`: Google Earth Engine</span>
+<a id="__codelineno-0-624" name="__codelineno-0-624"></a><span class="sd">            backend implementation (`export_via`, the 32768-px</span>
+<a id="__codelineno-0-625" name="__codelineno-0-625"></a><span class="sd">            synchronous cap).</span>
+<a id="__codelineno-0-626" name="__codelineno-0-626"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-627" name="__codelineno-0-627"></a>    <span class="k">if</span> <span class="n">aggregate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-628" name="__codelineno-0-628"></a>        <span class="n">output_kind</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasource</span><span class="p">,</span> <span class="s2">&quot;OUTPUT_KIND&quot;</span><span class="p">,</span> <span class="s2">&quot;raster&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-629" name="__codelineno-0-629"></a>        <span class="k">if</span> <span class="n">output_kind</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">{</span><span class="s2">&quot;raster&quot;</span><span class="p">,</span> <span class="s2">&quot;mixed&quot;</span><span class="p">}:</span>
+<a id="__codelineno-0-630" name="__codelineno-0-630"></a>            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+<a id="__codelineno-0-631" name="__codelineno-0-631"></a>                <span class="sa">f</span><span class="s2">&quot;aggregate= is not supported for &quot;</span>
+<a id="__codelineno-0-632" name="__codelineno-0-632"></a>                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasource</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> backends &quot;</span>
+<a id="__codelineno-0-633" name="__codelineno-0-633"></a>                <span class="sa">f</span><span class="s2">&quot;(OUTPUT_KIND=</span><span class="si">{</span><span class="n">output_kind</span><span class="si">!r}</span><span class="s2">). The aggregator only &quot;</span>
+<a id="__codelineno-0-634" name="__codelineno-0-634"></a>                <span class="sa">f</span><span class="s2">&quot;handles gridded raster outputs; vector / tabular &quot;</span>
+<a id="__codelineno-0-635" name="__codelineno-0-635"></a>                <span class="sa">f</span><span class="s2">&quot;backends emit GeoDataFrames or DataFrames that do &quot;</span>
+<a id="__codelineno-0-636" name="__codelineno-0-636"></a>                <span class="sa">f</span><span class="s2">&quot;not have a meaningful gridded reduction.&quot;</span>
+<a id="__codelineno-0-637" name="__codelineno-0-637"></a>            <span class="p">)</span>
+<a id="__codelineno-0-638" name="__codelineno-0-638"></a>        <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;aggregate&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">aggregate</span>
+<a id="__codelineno-0-639" name="__codelineno-0-639"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasource</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">progress_bar</span><span class="o">=</span><span class="n">progress_bar</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
