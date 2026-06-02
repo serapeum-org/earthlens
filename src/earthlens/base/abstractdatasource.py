@@ -342,9 +342,16 @@ class AbstractDataSource(ABC):
             `aggregate_netcdf` flow); `"vector"` and `"tabular"`
             reject it with :class:`NotImplementedError`; `"mixed"`
             forwards it unchanged. Subclasses override the class
-            attribute; the default is `"raster"` so the four
-            backends shipped before C1 (CHIRPS, S3, ECMWF, GEE) all
-            keep their existing behaviour with no source change.
+            attribute; the default is `"raster"`.
+
+            Most backends fix `OUTPUT_KIND` as a class attribute. A few
+            backends whose output shape is only known once the requested
+            dataset(s) are resolved set it **per instance** in
+            `__init__` instead — a sanctioned override: earthdata and
+            eumetsat copy the resolved dataset's `output_kind` onto
+            `self.OUTPUT_KIND`, and tropycal sets `"tabular"` for its
+            `ships` product (else `"vector"`). The facade reads the
+            instance attribute, so both forms work.
     """
 
     OUTPUT_KIND: OutputKind = "raster"
