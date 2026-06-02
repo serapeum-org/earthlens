@@ -162,7 +162,7 @@ class EarthLens:
             an arbitrary-bucket passthrough.
         :class:`earthlens.cmems.CMEMS`: Copernicus Marine ocean
             datasets via `copernicusmarine`.
-        :class:`earthlens.earthdata.EarthData`: NASA EOSDIS granules
+        :class:`earthlens.earthdata.Earthdata`: NASA EOSDIS granules
             across 9 DAACs via `earthaccess` + CMR; the first backend
             whose `OUTPUT_KIND` is per-dataset (raster / vector /
             tabular), not fixed.
@@ -239,7 +239,7 @@ class EarthLens:
             "chirps": ("earthlens.chc", "CHIRPS", "", {}),
             "amazon-s3": ("earthlens.s3", "S3", "s3", {}),
             "cmems": ("earthlens.cmems", "CMEMS", "cmems", {}),
-            "earthdata": ("earthlens.earthdata", "EarthData", "earthdata", {}),
+            "earthdata": ("earthlens.earthdata", "Earthdata", "earthdata", {}),
             "ecmwf": ("earthlens.ecmwf", "ECMWF", "ecmwf", {}),
             "eumetsat": ("earthlens.eumetsat", "EUMETSAT", "eumetsat", {}),
             "fdsn": ("earthlens.fdsn", "FDSN", "fdsn", {}),

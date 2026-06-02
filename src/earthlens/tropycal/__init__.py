@@ -55,7 +55,7 @@ Examples:
 
 from __future__ import annotations
 
-from earthlens.tropycal.backend import TropicalCyclone
+from earthlens.tropycal.backend import TropicalCyclone, Tropycal
 from earthlens.tropycal.catalog import (
     CATALOG_PATH,
     Basin,
@@ -76,6 +76,7 @@ __all__ = [
     "Catalog",
     "TrackField",
     "TropicalCyclone",
+    "Tropycal",
     "clear_catalog_cache",
     "empty_fc",
     "empty_recon_fc",

@@ -1,6 +1,6 @@
 """Backend that fetches NASA Earthdata granules via earthaccess + CMR.
 
-`EarthData(AbstractDataSource)` accepts the same constructor surface
+`Earthdata(AbstractDataSource)` accepts the same constructor surface
 as the other earthlens backends — `start`, `end`, `variables`,
 `lat_lim`, `lon_lim`, `temporal_resolution`, `path` — plus a few
 backend-specific kwargs for authentication, DAAC disambiguation, and
@@ -53,7 +53,7 @@ if TYPE_CHECKING:
     from earthlens.aggregate import AggregationConfig
 
 
-class EarthData(AbstractDataSource):
+class Earthdata(AbstractDataSource):
     """NASA Earthdata backend (per-dataset output kind).
 
     Wraps `earthaccess` + CMR so a user can search a curated NASA
@@ -181,7 +181,7 @@ class EarthData(AbstractDataSource):
         """
         if not variables:
             raise ValueError(
-                "EarthData requires a non-empty `variables` mapping of "
+                "Earthdata requires a non-empty `variables` mapping of "
                 "{dataset_key: [band, ...]}."
             )
         # `daac=` disambiguates a single short_name served by more than one
@@ -224,7 +224,7 @@ class EarthData(AbstractDataSource):
                 f"{ds.short_name}={ds.output_kind}" for ds in datasets
             )
             raise ValueError(
-                "all datasets in one EarthData request must share one "
+                "all datasets in one Earthdata request must share one "
                 f"output_kind; got mixed kinds ({detail}). Split the "
                 "request into one call per output kind."
             )
@@ -595,7 +595,7 @@ class EarthData(AbstractDataSource):
 
         if not hasattr(NetCDF, "reduce"):
             raise NotImplementedError(
-                "EarthData.download(aggregate=...) needs pyramids' "
+                "Earthdata.download(aggregate=...) needs pyramids' "
                 "NetCDF.reduce, which the installed pyramids build does "
                 "not provide. Upgrade pyramids, or call download() without "
                 "aggregate= and post-process the granules directly."
@@ -638,10 +638,16 @@ class EarthData(AbstractDataSource):
 
         if not hasattr(DatasetCollection, "groupby"):
             raise NotImplementedError(
-                "EarthData.download(aggregate=...) for a granule stack needs "
+                "Earthdata.download(aggregate=...) for a granule stack needs "
                 "pyramids' DatasetCollection.groupby, which the installed "
                 "pyramids build does not provide."
             )
         collection = DatasetCollection.from_files([str(p) for p in paths])
         grouped = collection.groupby(config.freq)
         return [Path(p) for p in grouped.to_file(str(self.root_dir))]
+
+
+#: Back-compat alias for the original camel-cased class name. NASA brands the
+#: service "Earthdata" (one word), so `Earthdata` is the canonical class name;
+#: `EarthData` remains importable for existing callers.
+EarthData = Earthdata

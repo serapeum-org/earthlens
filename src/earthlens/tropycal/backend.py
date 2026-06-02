@@ -851,3 +851,9 @@ class TropicalCyclone(AbstractDataSource):
         out_path = self.root_dir / f"tropycal_{self._product}_{unit}_{label}.{ext}"
         collection.to_file(str(out_path), driver=driver)
         return out_path
+
+
+#: Convenience alias matching the package / library name (the other backend
+#: classes are named after their provider / library). `TropicalCyclone` stays
+#: the canonical, descriptive class name.
+Tropycal = TropicalCyclone

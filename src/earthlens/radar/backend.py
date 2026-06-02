@@ -412,6 +412,14 @@ class Radar(AbstractDataSource):
                 from the catalog). Empty (with the right columns) when no
                 volume falls in the window.
 
+                Intentionally a `GeoDataFrame` inventory (one row per
+                downloaded volume + its on-disk `path`), not the
+                `FeatureCollection` the event/footprint `"vector"`
+                backends (FDSN, FIRMS, GDACS) return — the rows index
+                bulky files rather than describe point/polygon features.
+                The base `download` contract lists radar as this
+                documented exception.
+
         Raises:
             NotImplementedError: If `aggregate` is not `None`.
         """
