@@ -14,21 +14,22 @@ picks the operational run (`short_range`, `analysis_assim`,
 A plain operational request **downloads the whole-CONUS files** (~14 MB
 `channel_rt`, ~30 MB `land`). A **subset** — `sites=` (`feature_id` /
 USGS `gage_id`), a narrower bbox, or a `[start, end]` window — and the
-**retrospective** archive (`mode="retrospective"`, the 1.4 TB Zarr) are
-read through `pyramids.netcdf.LabeledDataset` (pyramids ≥ 0.29.0): for
-the feature/lake/node-indexed **tabular** products (`chrtout`,
-`lakeout`, `coastal`) the reader opens the store anonymously and lazily,
-selects the labels/bbox/time, and writes a tidy `feature_id × time`
-Parquet table. earthlens never imports `xarray` / `zarr` itself —
-pyramids owns the read. Subsetting / retrospective for the **gridded**
-products (`ldasout`, `rtout`, `forcing`) still needs a gridded
-cloud-cube reader pyramids does not yet expose, so those raise a clear
-`NotImplementedError`; their whole-file operational download works.
+**retrospective** archive (`mode="retrospective"`) are read through
+pyramids (≥ 0.30.0): the feature/lake/node-indexed **tabular** products
+(`chrtout`, `lakeout`, `coastal`) go through
+`pyramids.netcdf.LabeledDataset` (open anon + lazily, select
+labels/bbox/time, write a tidy `feature_id × time` Parquet table); the
+**gridded** products (`ldasout`, `rtout`, `forcing`) go through
+`pyramids.netcdf.NetCDF.subset` (an operational bbox crop on the native
+grid → GeoTIFF). earthlens never imports `xarray` / `zarr` itself —
+pyramids owns the read. The gridded **retrospective** (and a variable
+with an interleaved vertical/layer dimension, e.g. `SOIL_M`) is deferred
+with a clear `NotImplementedError`.
 
 The `[nwm]` extra pulls `boto3` (unsigned S3) plus
-`pyramids-gis[lazy,xarray,parquet]` (the `LabeledDataset` reader); both
-are imported lazily, so the package imports — and `NWM(...)` constructs
-— without the extra installed (a friendly `ImportError` naming
+`pyramids-gis[lazy,xarray,parquet]` (the pyramids readers); both are
+imported lazily, so the package imports — and `NWM(...)` constructs —
+without the extra installed (a friendly `ImportError` naming
 `earthlens[nwm]` surfaces at `download()` time).
 
 Public surface (re-exported from this package):

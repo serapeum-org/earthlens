@@ -369,16 +369,73 @@ def test_operational_subset_downloads_then_reads(make_nwm, fake_reader, patch_cl
     assert reader.calls[0][1]["anon"] is False  # local downloaded file
 
 
-def test_operational_subset_gridded_rejected(make_nwm, patch_client):
-    """An operational gridded subset is rejected before any download."""
+def test_operational_gridded_bbox_writes_geotiff(make_nwm, fake_netcdf, patch_client):
+    """An operational gridded bbox subset reads + crops each variable to GeoTIFF."""
     nwm = make_nwm(
-        variables={"ldasout": ["SOIL_M"]},
+        variables={"ldasout": ["SNEQV", "SNOWH"]},
+        configuration="short_range",
+        cycles=[0],
+        steps=[1],
+        lat_lim=[39, 40],
+        lon_lim=[-78, -75],
+    )
+    patch_client(nwm, FakeS3(available=None))
+    netcdf = fake_netcdf(nwm)
+    paths = nwm.download(progress_bar=False)
+    # one GeoTIFF per requested variable
+    assert len(paths) == 2 and all(p.suffix == ".tif" for p in paths)
+    subsets = [c for c in netcdf.calls if c[0] == "subset"]
+    assert [c[1]["variable"] for c in subsets] == ["SNEQV", "SNOWH"]
+    # bbox forwarded as (W, S, E, N), time=0 (single operational timestep)
+    assert subsets[0][1]["time"] == 0
+    assert subsets[0][1]["bbox"] == (-78.0, 39.0, -75.0, 40.0)
+
+
+def test_operational_gridded_sites_rejected(make_nwm, patch_client):
+    """sites= does not apply to a gridded product (raises ValueError)."""
+    nwm = make_nwm(
+        variables={"ldasout": ["SNEQV"]},
         configuration="short_range",
         cycles=[0],
         steps=[1],
         sites=[101],
     )
-    with pytest.raises(NotImplementedError, match="gridded"):
+    patch_client(nwm, FakeS3(available=None))
+    with pytest.raises(ValueError, match="does not apply to the gridded"):
+        nwm.download(progress_bar=False)
+
+
+def test_operational_gridded_interleaved_layer_var_rejected(
+    make_nwm, monkeypatch, patch_client
+):
+    """A multi-layer (interleaved) variable raises a clear NotImplementedError."""
+    nwm = make_nwm(
+        variables={"ldasout": ["SOIL_M"]},
+        configuration="short_range",
+        cycles=[0],
+        steps=[1],
+        lat_lim=[39, 40],
+        lon_lim=[-78, -75],
+    )
+    patch_client(nwm, FakeS3(available=None))
+
+    class _Interleaved:
+        dataset = None
+
+        @classmethod
+        def read_file(cls, path, **kw):
+            return cls()
+
+        def subset(self, *a, **k):
+            raise ValueError(
+                "the y dimension 'soil_layers_stag' has no 1-D coordinate variable"
+            )
+
+        def close(self):
+            pass
+
+    monkeypatch.setattr(nwm, "_netcdf_reader", lambda: _Interleaved)
+    with pytest.raises(NotImplementedError, match="layer dimension interleaved"):
         nwm.download(progress_bar=False)
 
 

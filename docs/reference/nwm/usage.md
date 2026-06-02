@@ -92,11 +92,13 @@ temporal reduce needs a separate gridded reader. So
 ## Subsetting and the retrospective archive
 
 Operational files are whole-CONUS, so a subset is *read* rather than
-downloaded whole, through `pyramids.netcdf.LabeledDataset`
-(pyramids ≥ 0.29.0) — earthlens never imports `xarray`/`zarr` itself. For
-the **tabular** products (`chrtout`, `lakeout`, `coastal`) a `sites=`
-list, a bbox, or the retrospective Zarr opens anonymously + lazily,
-slices, and writes a tidy `feature_id × time` **Parquet** table:
+downloaded whole, through pyramids (≥ 0.30.0) — earthlens never imports
+`xarray`/`zarr` itself.
+
+**Tabular** products (`chrtout`, `lakeout`, `coastal`) — a `sites=` list,
+a bbox, or the retrospective Zarr opens anonymously + lazily through
+`pyramids.netcdf.LabeledDataset`, slices, and writes a tidy
+`feature_id × time` **Parquet** table:
 
 ```python
 # Retrospective streamflow for three reaches over a window -> Parquet
@@ -106,19 +108,36 @@ NWM(start="2010-06-01", end="2010-06-30",
     configuration="analysis_assim", mode="retrospective",
     sites=[101, 179, 181],          # feature_ids; USGS gage_id strings also work
     path="./nwm_out").download()    # -> [Path('chrtout_retro_20100601_20100630.parquet')]
-
-# Operational subset by a bbox (downloads the whole file, then slices it)
-NWM(start="2026-05-26", end="2026-05-26",
-    variables={"chrtout": ["streamflow"]},
-    lat_lim=[39, 40], lon_lim=[-77, -76],
-    configuration="analysis_assim", cycles=[0], steps=[0],
-    path="./nwm_out").download()    # -> a Parquet table for the reaches in the box
 ```
 
-Subsetting / retrospective for the **gridded** products (`ldasout`,
-`rtout`, `forcing`) needs a gridded cloud-cube reader pyramids does not
-yet expose, so those raise a clear `NotImplementedError`; request them
-without a subset to download the whole operational files.
+**Gridded** products (`ldasout`, `rtout`, `forcing`) — an **operational**
+bbox subset downloads the whole file, then `pyramids.netcdf.NetCDF.subset`
+windows each variable on its native Lambert-Conformal-Conic grid and
+writes one **GeoTIFF** per variable:
+
+```python
+# Operational gridded subset: snow water equivalent over a bbox -> GeoTIFF
+NWM(start="2026-05-26", end="2026-05-26",
+    variables={"ldasout": ["SNEQV"]},
+    lat_lim=[39, 40], lon_lim=[-78, -75],
+    configuration="analysis_assim", cycles=[0], steps=[0],
+    path="./nwm_out").download()    # -> [Path('..._SNEQV.tif')]
+```
+
+Two gridded caveats:
+
+* **`sites=` does not apply** to a gridded product (a grid has no
+  `feature_id`) — use a bbox; passing `sites=` raises `ValueError`.
+* A variable with a **vertical/layer dimension interleaved between its y
+  and x axes** (e.g. `ldasout` `SOIL_M`, with 4 soil layers) cannot be
+  windowed by the current reader and raises a clear `NotImplementedError`
+  — request a single-level variable (`SNEQV`, `SNOWH`, `ACCET`, …) or
+  download the whole file without a bbox.
+* The gridded **retrospective** (`mode="retrospective"`) is **deferred**:
+  the retro Zarr does not surface CF time units, so a `[start, end]`
+  window cannot be mapped to the integer timesteps the reader selects by.
+  It raises a clear `NotImplementedError`; use `mode="operational"` for a
+  gridded bbox, or a tabular product for a retrospective time series.
 
 ## Catalog tooling
 

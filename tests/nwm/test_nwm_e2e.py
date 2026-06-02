@@ -90,3 +90,23 @@ def test_retrospective_streamflow_subset(tmp_path):
     # the tidy feature_id x time table carries the requested reaches + variable
     assert "streamflow" in frame.columns
     assert set(frame["feature_id"].unique()) == {101, 179, 181}
+
+
+@pytest.mark.skipif(not _network_available(), reason="noaa-nwm-pds unreachable")
+def test_operational_gridded_bbox_to_geotiff(tmp_path):
+    """Bbox-crop one recent gridded ldasout variable to a GeoTIFF."""
+    nwm = NWM(
+        start=_PROBE_DATE,
+        end=_PROBE_DATE,
+        variables={"ldasout": ["SNEQV"]},
+        lat_lim=[39.0, 40.0],
+        lon_lim=[-78.0, -75.0],
+        configuration="analysis_assim",
+        cycles=[0],
+        steps=[0],
+        path=str(tmp_path),
+    )
+    paths = nwm.download(progress_bar=False)
+    assert len(paths) == 1
+    tif = Path(paths[0])
+    assert tif.exists() and tif.suffix == ".tif" and tif.stat().st_size > 0

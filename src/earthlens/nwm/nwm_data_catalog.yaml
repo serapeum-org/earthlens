@@ -100,6 +100,7 @@ products:
     - x
     - time
     s3_token: terrain_rt
+    retro_zarr: s3://noaa-nwm-retrospective-3-0-pds/CONUS/zarr/rtout.zarr
     description: Terrain routing (RTOUT) - gridded ponded-water and water-table state on the high-resolution
       routing grid.
     variables:
@@ -116,7 +117,6 @@ products:
     - x
     - time
     s3_token: forcing
-    retro_zarr: s3://noaa-nwm-retrospective-3-0-pds/CONUS/zarr/precip.zarr
     description: Meteorological forcing - the gridded inputs driving the land-surface model (precipitation,
       temperature, humidity, wind, pressure, radiation).
     variables:

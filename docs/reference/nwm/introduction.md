@@ -71,10 +71,13 @@ imports `xarray` / `zarr` itself; pyramids owns the read. For the
 are opened anonymously + lazily, sliced, and written as a tidy
 `feature_id × time` **Parquet** table.
 
-Subsetting / retrospective for the **gridded** products (`ldasout`,
-`rtout`, `forcing`) still needs a gridded cloud-cube reader that pyramids
-does not yet expose, so those raise a clear `NotImplementedError`; their
-whole-file operational download works.
+For the **gridded** products (`ldasout`, `rtout`, `forcing`) an
+**operational** bbox subset is read through `pyramids.netcdf.NetCDF.subset`
+— each variable is windowed on its native grid and written as a
+**GeoTIFF**. (`sites=` doesn't apply to a grid; a variable with an
+interleaved vertical/layer dimension, e.g. `SOIL_M`, and the gridded
+**retrospective** are deferred with a clear `NotImplementedError` — see
+[usage](usage.md).)
 
 ## See also
 

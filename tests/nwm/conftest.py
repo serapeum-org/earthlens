@@ -103,6 +103,54 @@ def fake_reader(monkeypatch):
     return _patch
 
 
+class _FakeGridDataset:
+    """Stand-in for a pyramids `Dataset` returned by `NetCDF.subset`."""
+
+    def to_file(self, path: str, **kw) -> None:
+        """Write a sentinel GeoTIFF."""
+        from pathlib import Path
+
+        Path(path).write_bytes(b"II*\x00-fake-tiff")
+
+
+class FakeNetCDF:
+    """In-memory `pyramids.netcdf.NetCDF` double recording `subset` calls."""
+
+    calls: list[tuple[str, Any]] = []
+
+    def __init__(self, path: str) -> None:
+        self.path = path
+        self.dataset = self  # so `_close_quietly` finds `.dataset.close()`
+
+    @classmethod
+    def read_file(cls, path, **kw) -> "FakeNetCDF":
+        """Record the open and return a recording instance."""
+        cls.calls.append(("read_file", str(path)))
+        return cls(str(path))
+
+    def subset(self, variable, *, time=None, bbox=None, crs=4326, **dims):
+        """Record a windowed subset and return a fake Dataset."""
+        FakeNetCDF.calls.append(
+            ("subset", {"variable": variable, "time": time, "bbox": bbox})
+        )
+        return _FakeGridDataset()
+
+    def close(self) -> None:
+        """No-op handle release."""
+
+
+@pytest.fixture
+def fake_netcdf(monkeypatch):
+    """Factory wiring `FakeNetCDF` onto an NWM instance's `_netcdf_reader`."""
+
+    def _patch(nwm: NWM) -> type[FakeNetCDF]:
+        FakeNetCDF.calls = []
+        monkeypatch.setattr(nwm, "_netcdf_reader", lambda: FakeNetCDF)
+        return FakeNetCDF
+
+    return _patch
+
+
 @pytest.fixture
 def catalog() -> Catalog:
     """The bundled NWM catalog."""
