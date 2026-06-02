@@ -10735,7 +10735,15 @@ pyramids-reducible).</p>
 <span class="normal"><a href="#__codelineno-0-452">452</a></span>
 <span class="normal"><a href="#__codelineno-0-453">453</a></span>
 <span class="normal"><a href="#__codelineno-0-454">454</a></span>
-<span class="normal"><a href="#__codelineno-0-455">455</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-110" name="__codelineno-0-110"></a><span class="k">class</span><span class="w"> </span><span class="nc">Radar</span><span class="p">(</span><span class="n">AbstractDataSource</span><span class="p">):</span>
+<span class="normal"><a href="#__codelineno-0-455">455</a></span>
+<span class="normal"><a href="#__codelineno-0-456">456</a></span>
+<span class="normal"><a href="#__codelineno-0-457">457</a></span>
+<span class="normal"><a href="#__codelineno-0-458">458</a></span>
+<span class="normal"><a href="#__codelineno-0-459">459</a></span>
+<span class="normal"><a href="#__codelineno-0-460">460</a></span>
+<span class="normal"><a href="#__codelineno-0-461">461</a></span>
+<span class="normal"><a href="#__codelineno-0-462">462</a></span>
+<span class="normal"><a href="#__codelineno-0-463">463</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-110" name="__codelineno-0-110"></a><span class="k">class</span><span class="w"> </span><span class="nc">Radar</span><span class="p">(</span><span class="n">AbstractDataSource</span><span class="p">):</span>
 <a id="__codelineno-0-111" name="__codelineno-0-111"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;NEXRAD Level-II radar backend (real-time chunk feed).</span>
 <a id="__codelineno-0-112" name="__codelineno-0-112"></a>
 <a id="__codelineno-0-113" name="__codelineno-0-113"></a><span class="sd">    Attributes:</span>
@@ -11040,47 +11048,55 @@ pyramids-reducible).</p>
 <a id="__codelineno-0-412" name="__codelineno-0-412"></a><span class="sd">                from the catalog). Empty (with the right columns) when no</span>
 <a id="__codelineno-0-413" name="__codelineno-0-413"></a><span class="sd">                volume falls in the window.</span>
 <a id="__codelineno-0-414" name="__codelineno-0-414"></a>
-<a id="__codelineno-0-415" name="__codelineno-0-415"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-416" name="__codelineno-0-416"></a><span class="sd">            NotImplementedError: If `aggregate` is not `None`.</span>
-<a id="__codelineno-0-417" name="__codelineno-0-417"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-418" name="__codelineno-0-418"></a>        <span class="k">if</span> <span class="n">aggregate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-419" name="__codelineno-0-419"></a>            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
-<a id="__codelineno-0-420" name="__codelineno-0-420"></a>                <span class="s2">&quot;Radar.download(aggregate=...) is not supported — raw Level-II &quot;</span>
-<a id="__codelineno-0-421" name="__codelineno-0-421"></a>                <span class="s2">&quot;volumes are not griddable by the pyramids reducer.&quot;</span>
-<a id="__codelineno-0-422" name="__codelineno-0-422"></a>            <span class="p">)</span>
-<a id="__codelineno-0-423" name="__codelineno-0-423"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_show_progress</span> <span class="o">=</span> <span class="n">progress_bar</span>
-<a id="__codelineno-0-424" name="__codelineno-0-424"></a>        <span class="n">products</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_search</span><span class="p">()</span>
-<a id="__codelineno-0-425" name="__codelineno-0-425"></a>        <span class="n">pairs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fetch_pairs</span><span class="p">(</span><span class="n">products</span><span class="p">)</span>
-<a id="__codelineno-0-426" name="__codelineno-0-426"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_inventory</span><span class="p">(</span><span class="n">pairs</span><span class="p">)</span>
-<a id="__codelineno-0-427" name="__codelineno-0-427"></a>
-<a id="__codelineno-0-428" name="__codelineno-0-428"></a>    <span class="nd">@staticmethod</span>
-<a id="__codelineno-0-429" name="__codelineno-0-429"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_inventory</span><span class="p">(</span><span class="n">pairs</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="n">RemoteProduct</span><span class="p">,</span> <span class="n">Path</span><span class="p">]]):</span>
-<a id="__codelineno-0-430" name="__codelineno-0-430"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Build the GeoDataFrame inventory from `(product, path)` pairs.</span>
-<a id="__codelineno-0-431" name="__codelineno-0-431"></a>
-<a id="__codelineno-0-432" name="__codelineno-0-432"></a><span class="sd">        Each path is already paired with the product it came from (no</span>
-<a id="__codelineno-0-433" name="__codelineno-0-433"></a><span class="sd">        filename re-matching), so the metadata attaches unambiguously.</span>
-<a id="__codelineno-0-434" name="__codelineno-0-434"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-435" name="__codelineno-0-435"></a>        <span class="kn">import</span><span class="w"> </span><span class="nn">geopandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">gpd</span>
-<a id="__codelineno-0-436" name="__codelineno-0-436"></a>        <span class="kn">from</span><span class="w"> </span><span class="nn">shapely.geometry</span><span class="w"> </span><span class="kn">import</span> <span class="n">Point</span>
-<a id="__codelineno-0-437" name="__codelineno-0-437"></a>
-<a id="__codelineno-0-438" name="__codelineno-0-438"></a>        <span class="n">rows</span> <span class="o">=</span> <span class="p">[]</span>
-<a id="__codelineno-0-439" name="__codelineno-0-439"></a>        <span class="n">geoms</span> <span class="o">=</span> <span class="p">[]</span>
-<a id="__codelineno-0-440" name="__codelineno-0-440"></a>        <span class="k">for</span> <span class="n">product</span><span class="p">,</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">pairs</span><span class="p">:</span>
-<a id="__codelineno-0-441" name="__codelineno-0-441"></a>            <span class="n">meta</span> <span class="o">=</span> <span class="n">product</span><span class="o">.</span><span class="n">metadata</span>
-<a id="__codelineno-0-442" name="__codelineno-0-442"></a>            <span class="n">station</span><span class="p">:</span> <span class="n">Station</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">meta</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;station&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-443" name="__codelineno-0-443"></a>            <span class="n">rows</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-<a id="__codelineno-0-444" name="__codelineno-0-444"></a>                <span class="p">{</span>
-<a id="__codelineno-0-445" name="__codelineno-0-445"></a>                    <span class="s2">&quot;station_id&quot;</span><span class="p">:</span> <span class="n">meta</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;station_id&quot;</span><span class="p">),</span>
-<a id="__codelineno-0-446" name="__codelineno-0-446"></a>                    <span class="s2">&quot;volume&quot;</span><span class="p">:</span> <span class="n">meta</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;volume&quot;</span><span class="p">),</span>
-<a id="__codelineno-0-447" name="__codelineno-0-447"></a>                    <span class="s2">&quot;scan_time&quot;</span><span class="p">:</span> <span class="n">meta</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;start_time&quot;</span><span class="p">),</span>
-<a id="__codelineno-0-448" name="__codelineno-0-448"></a>                    <span class="s2">&quot;n_chunks&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">meta</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;chunk_keys&quot;</span><span class="p">,</span> <span class="p">[])),</span>
-<a id="__codelineno-0-449" name="__codelineno-0-449"></a>                    <span class="s2">&quot;path&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">path</span><span class="p">),</span>
-<a id="__codelineno-0-450" name="__codelineno-0-450"></a>                <span class="p">}</span>
-<a id="__codelineno-0-451" name="__codelineno-0-451"></a>            <span class="p">)</span>
-<a id="__codelineno-0-452" name="__codelineno-0-452"></a>            <span class="n">geoms</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-<a id="__codelineno-0-453" name="__codelineno-0-453"></a>                <span class="n">Point</span><span class="p">(</span><span class="n">station</span><span class="o">.</span><span class="n">longitude</span><span class="p">,</span> <span class="n">station</span><span class="o">.</span><span class="n">latitude</span><span class="p">)</span> <span class="k">if</span> <span class="n">station</span> <span class="k">else</span> <span class="kc">None</span>
-<a id="__codelineno-0-454" name="__codelineno-0-454"></a>            <span class="p">)</span>
-<a id="__codelineno-0-455" name="__codelineno-0-455"></a>        <span class="k">return</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">(</span><span class="n">rows</span><span class="p">,</span> <span class="n">geometry</span><span class="o">=</span><span class="n">geoms</span><span class="p">,</span> <span class="n">crs</span><span class="o">=</span><span class="s2">&quot;EPSG:4326&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-415" name="__codelineno-0-415"></a><span class="sd">                Intentionally a `GeoDataFrame` inventory (one row per</span>
+<a id="__codelineno-0-416" name="__codelineno-0-416"></a><span class="sd">                downloaded volume + its on-disk `path`), not the</span>
+<a id="__codelineno-0-417" name="__codelineno-0-417"></a><span class="sd">                `FeatureCollection` the event/footprint `&quot;vector&quot;`</span>
+<a id="__codelineno-0-418" name="__codelineno-0-418"></a><span class="sd">                backends (FDSN, FIRMS, GDACS) return — the rows index</span>
+<a id="__codelineno-0-419" name="__codelineno-0-419"></a><span class="sd">                bulky files rather than describe point/polygon features.</span>
+<a id="__codelineno-0-420" name="__codelineno-0-420"></a><span class="sd">                The base `download` contract lists radar as this</span>
+<a id="__codelineno-0-421" name="__codelineno-0-421"></a><span class="sd">                documented exception.</span>
+<a id="__codelineno-0-422" name="__codelineno-0-422"></a>
+<a id="__codelineno-0-423" name="__codelineno-0-423"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-424" name="__codelineno-0-424"></a><span class="sd">            NotImplementedError: If `aggregate` is not `None`.</span>
+<a id="__codelineno-0-425" name="__codelineno-0-425"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-426" name="__codelineno-0-426"></a>        <span class="k">if</span> <span class="n">aggregate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-427" name="__codelineno-0-427"></a>            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+<a id="__codelineno-0-428" name="__codelineno-0-428"></a>                <span class="s2">&quot;Radar.download(aggregate=...) is not supported — raw Level-II &quot;</span>
+<a id="__codelineno-0-429" name="__codelineno-0-429"></a>                <span class="s2">&quot;volumes are not griddable by the pyramids reducer.&quot;</span>
+<a id="__codelineno-0-430" name="__codelineno-0-430"></a>            <span class="p">)</span>
+<a id="__codelineno-0-431" name="__codelineno-0-431"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_show_progress</span> <span class="o">=</span> <span class="n">progress_bar</span>
+<a id="__codelineno-0-432" name="__codelineno-0-432"></a>        <span class="n">products</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_search</span><span class="p">()</span>
+<a id="__codelineno-0-433" name="__codelineno-0-433"></a>        <span class="n">pairs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fetch_pairs</span><span class="p">(</span><span class="n">products</span><span class="p">)</span>
+<a id="__codelineno-0-434" name="__codelineno-0-434"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_inventory</span><span class="p">(</span><span class="n">pairs</span><span class="p">)</span>
+<a id="__codelineno-0-435" name="__codelineno-0-435"></a>
+<a id="__codelineno-0-436" name="__codelineno-0-436"></a>    <span class="nd">@staticmethod</span>
+<a id="__codelineno-0-437" name="__codelineno-0-437"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_inventory</span><span class="p">(</span><span class="n">pairs</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="n">RemoteProduct</span><span class="p">,</span> <span class="n">Path</span><span class="p">]]):</span>
+<a id="__codelineno-0-438" name="__codelineno-0-438"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Build the GeoDataFrame inventory from `(product, path)` pairs.</span>
+<a id="__codelineno-0-439" name="__codelineno-0-439"></a>
+<a id="__codelineno-0-440" name="__codelineno-0-440"></a><span class="sd">        Each path is already paired with the product it came from (no</span>
+<a id="__codelineno-0-441" name="__codelineno-0-441"></a><span class="sd">        filename re-matching), so the metadata attaches unambiguously.</span>
+<a id="__codelineno-0-442" name="__codelineno-0-442"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-443" name="__codelineno-0-443"></a>        <span class="kn">import</span><span class="w"> </span><span class="nn">geopandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">gpd</span>
+<a id="__codelineno-0-444" name="__codelineno-0-444"></a>        <span class="kn">from</span><span class="w"> </span><span class="nn">shapely.geometry</span><span class="w"> </span><span class="kn">import</span> <span class="n">Point</span>
+<a id="__codelineno-0-445" name="__codelineno-0-445"></a>
+<a id="__codelineno-0-446" name="__codelineno-0-446"></a>        <span class="n">rows</span> <span class="o">=</span> <span class="p">[]</span>
+<a id="__codelineno-0-447" name="__codelineno-0-447"></a>        <span class="n">geoms</span> <span class="o">=</span> <span class="p">[]</span>
+<a id="__codelineno-0-448" name="__codelineno-0-448"></a>        <span class="k">for</span> <span class="n">product</span><span class="p">,</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">pairs</span><span class="p">:</span>
+<a id="__codelineno-0-449" name="__codelineno-0-449"></a>            <span class="n">meta</span> <span class="o">=</span> <span class="n">product</span><span class="o">.</span><span class="n">metadata</span>
+<a id="__codelineno-0-450" name="__codelineno-0-450"></a>            <span class="n">station</span><span class="p">:</span> <span class="n">Station</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">meta</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;station&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-451" name="__codelineno-0-451"></a>            <span class="n">rows</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+<a id="__codelineno-0-452" name="__codelineno-0-452"></a>                <span class="p">{</span>
+<a id="__codelineno-0-453" name="__codelineno-0-453"></a>                    <span class="s2">&quot;station_id&quot;</span><span class="p">:</span> <span class="n">meta</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;station_id&quot;</span><span class="p">),</span>
+<a id="__codelineno-0-454" name="__codelineno-0-454"></a>                    <span class="s2">&quot;volume&quot;</span><span class="p">:</span> <span class="n">meta</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;volume&quot;</span><span class="p">),</span>
+<a id="__codelineno-0-455" name="__codelineno-0-455"></a>                    <span class="s2">&quot;scan_time&quot;</span><span class="p">:</span> <span class="n">meta</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;start_time&quot;</span><span class="p">),</span>
+<a id="__codelineno-0-456" name="__codelineno-0-456"></a>                    <span class="s2">&quot;n_chunks&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">meta</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;chunk_keys&quot;</span><span class="p">,</span> <span class="p">[])),</span>
+<a id="__codelineno-0-457" name="__codelineno-0-457"></a>                    <span class="s2">&quot;path&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">path</span><span class="p">),</span>
+<a id="__codelineno-0-458" name="__codelineno-0-458"></a>                <span class="p">}</span>
+<a id="__codelineno-0-459" name="__codelineno-0-459"></a>            <span class="p">)</span>
+<a id="__codelineno-0-460" name="__codelineno-0-460"></a>            <span class="n">geoms</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+<a id="__codelineno-0-461" name="__codelineno-0-461"></a>                <span class="n">Point</span><span class="p">(</span><span class="n">station</span><span class="o">.</span><span class="n">longitude</span><span class="p">,</span> <span class="n">station</span><span class="o">.</span><span class="n">latitude</span><span class="p">)</span> <span class="k">if</span> <span class="n">station</span> <span class="k">else</span> <span class="kc">None</span>
+<a id="__codelineno-0-462" name="__codelineno-0-462"></a>            <span class="p">)</span>
+<a id="__codelineno-0-463" name="__codelineno-0-463"></a>        <span class="k">return</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">(</span><span class="n">rows</span><span class="p">,</span> <span class="n">geometry</span><span class="o">=</span><span class="n">geoms</span><span class="p">,</span> <span class="n">crs</span><span class="o">=</span><span class="s2">&quot;EPSG:4326&quot;</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -11518,6 +11534,13 @@ pyramids-reducible. The facade already rejects a non-<code>None</code>
 and a station-point <code>geometry</code> (<code>None</code> for sites absent
 from the catalog). Empty (with the right columns) when no
 volume falls in the window.</p>
+<p>Intentionally a <code>GeoDataFrame</code> inventory (one row per
+downloaded volume + its on-disk <code>path</code>), not the
+<code>FeatureCollection</code> the event/footprint <code>"vector"</code>
+backends (FDSN, FIRMS, GDACS) return — the rows index
+bulky files rather than describe point/polygon features.
+The base <code>download</code> contract lists radar as this
+documented exception.</p>
               </div>
             </td>
           </tr>
@@ -11581,7 +11604,15 @@ volume falls in the window.</p>
 <span class="normal"><a href="#__codelineno-0-423">423</a></span>
 <span class="normal"><a href="#__codelineno-0-424">424</a></span>
 <span class="normal"><a href="#__codelineno-0-425">425</a></span>
-<span class="normal"><a href="#__codelineno-0-426">426</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-395" name="__codelineno-0-395"></a><span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
+<span class="normal"><a href="#__codelineno-0-426">426</a></span>
+<span class="normal"><a href="#__codelineno-0-427">427</a></span>
+<span class="normal"><a href="#__codelineno-0-428">428</a></span>
+<span class="normal"><a href="#__codelineno-0-429">429</a></span>
+<span class="normal"><a href="#__codelineno-0-430">430</a></span>
+<span class="normal"><a href="#__codelineno-0-431">431</a></span>
+<span class="normal"><a href="#__codelineno-0-432">432</a></span>
+<span class="normal"><a href="#__codelineno-0-433">433</a></span>
+<span class="normal"><a href="#__codelineno-0-434">434</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-395" name="__codelineno-0-395"></a><span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
 <a id="__codelineno-0-396" name="__codelineno-0-396"></a>    <span class="bp">self</span><span class="p">,</span>
 <a id="__codelineno-0-397" name="__codelineno-0-397"></a>    <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
 <a id="__codelineno-0-398" name="__codelineno-0-398"></a>    <span class="n">aggregate</span><span class="p">:</span> <span class="n">AggregationConfig</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -11601,18 +11632,26 @@ volume falls in the window.</p>
 <a id="__codelineno-0-412" name="__codelineno-0-412"></a><span class="sd">            from the catalog). Empty (with the right columns) when no</span>
 <a id="__codelineno-0-413" name="__codelineno-0-413"></a><span class="sd">            volume falls in the window.</span>
 <a id="__codelineno-0-414" name="__codelineno-0-414"></a>
-<a id="__codelineno-0-415" name="__codelineno-0-415"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-416" name="__codelineno-0-416"></a><span class="sd">        NotImplementedError: If `aggregate` is not `None`.</span>
-<a id="__codelineno-0-417" name="__codelineno-0-417"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-418" name="__codelineno-0-418"></a>    <span class="k">if</span> <span class="n">aggregate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-419" name="__codelineno-0-419"></a>        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
-<a id="__codelineno-0-420" name="__codelineno-0-420"></a>            <span class="s2">&quot;Radar.download(aggregate=...) is not supported — raw Level-II &quot;</span>
-<a id="__codelineno-0-421" name="__codelineno-0-421"></a>            <span class="s2">&quot;volumes are not griddable by the pyramids reducer.&quot;</span>
-<a id="__codelineno-0-422" name="__codelineno-0-422"></a>        <span class="p">)</span>
-<a id="__codelineno-0-423" name="__codelineno-0-423"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_show_progress</span> <span class="o">=</span> <span class="n">progress_bar</span>
-<a id="__codelineno-0-424" name="__codelineno-0-424"></a>    <span class="n">products</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_search</span><span class="p">()</span>
-<a id="__codelineno-0-425" name="__codelineno-0-425"></a>    <span class="n">pairs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fetch_pairs</span><span class="p">(</span><span class="n">products</span><span class="p">)</span>
-<a id="__codelineno-0-426" name="__codelineno-0-426"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_inventory</span><span class="p">(</span><span class="n">pairs</span><span class="p">)</span>
+<a id="__codelineno-0-415" name="__codelineno-0-415"></a><span class="sd">            Intentionally a `GeoDataFrame` inventory (one row per</span>
+<a id="__codelineno-0-416" name="__codelineno-0-416"></a><span class="sd">            downloaded volume + its on-disk `path`), not the</span>
+<a id="__codelineno-0-417" name="__codelineno-0-417"></a><span class="sd">            `FeatureCollection` the event/footprint `&quot;vector&quot;`</span>
+<a id="__codelineno-0-418" name="__codelineno-0-418"></a><span class="sd">            backends (FDSN, FIRMS, GDACS) return — the rows index</span>
+<a id="__codelineno-0-419" name="__codelineno-0-419"></a><span class="sd">            bulky files rather than describe point/polygon features.</span>
+<a id="__codelineno-0-420" name="__codelineno-0-420"></a><span class="sd">            The base `download` contract lists radar as this</span>
+<a id="__codelineno-0-421" name="__codelineno-0-421"></a><span class="sd">            documented exception.</span>
+<a id="__codelineno-0-422" name="__codelineno-0-422"></a>
+<a id="__codelineno-0-423" name="__codelineno-0-423"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-424" name="__codelineno-0-424"></a><span class="sd">        NotImplementedError: If `aggregate` is not `None`.</span>
+<a id="__codelineno-0-425" name="__codelineno-0-425"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-426" name="__codelineno-0-426"></a>    <span class="k">if</span> <span class="n">aggregate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-427" name="__codelineno-0-427"></a>        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+<a id="__codelineno-0-428" name="__codelineno-0-428"></a>            <span class="s2">&quot;Radar.download(aggregate=...) is not supported — raw Level-II &quot;</span>
+<a id="__codelineno-0-429" name="__codelineno-0-429"></a>            <span class="s2">&quot;volumes are not griddable by the pyramids reducer.&quot;</span>
+<a id="__codelineno-0-430" name="__codelineno-0-430"></a>        <span class="p">)</span>
+<a id="__codelineno-0-431" name="__codelineno-0-431"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_show_progress</span> <span class="o">=</span> <span class="n">progress_bar</span>
+<a id="__codelineno-0-432" name="__codelineno-0-432"></a>    <span class="n">products</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_search</span><span class="p">()</span>
+<a id="__codelineno-0-433" name="__codelineno-0-433"></a>    <span class="n">pairs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fetch_pairs</span><span class="p">(</span><span class="n">products</span><span class="p">)</span>
+<a id="__codelineno-0-434" name="__codelineno-0-434"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_inventory</span><span class="p">(</span><span class="n">pairs</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -12835,7 +12874,15 @@ pyramids-reducible).</p>
 <span class="normal"><a href="#__codelineno-0-452">452</a></span>
 <span class="normal"><a href="#__codelineno-0-453">453</a></span>
 <span class="normal"><a href="#__codelineno-0-454">454</a></span>
-<span class="normal"><a href="#__codelineno-0-455">455</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-110" name="__codelineno-0-110"></a><span class="k">class</span><span class="w"> </span><span class="nc">Radar</span><span class="p">(</span><span class="n">AbstractDataSource</span><span class="p">):</span>
+<span class="normal"><a href="#__codelineno-0-455">455</a></span>
+<span class="normal"><a href="#__codelineno-0-456">456</a></span>
+<span class="normal"><a href="#__codelineno-0-457">457</a></span>
+<span class="normal"><a href="#__codelineno-0-458">458</a></span>
+<span class="normal"><a href="#__codelineno-0-459">459</a></span>
+<span class="normal"><a href="#__codelineno-0-460">460</a></span>
+<span class="normal"><a href="#__codelineno-0-461">461</a></span>
+<span class="normal"><a href="#__codelineno-0-462">462</a></span>
+<span class="normal"><a href="#__codelineno-0-463">463</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-110" name="__codelineno-0-110"></a><span class="k">class</span><span class="w"> </span><span class="nc">Radar</span><span class="p">(</span><span class="n">AbstractDataSource</span><span class="p">):</span>
 <a id="__codelineno-0-111" name="__codelineno-0-111"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;NEXRAD Level-II radar backend (real-time chunk feed).</span>
 <a id="__codelineno-0-112" name="__codelineno-0-112"></a>
 <a id="__codelineno-0-113" name="__codelineno-0-113"></a><span class="sd">    Attributes:</span>
@@ -13140,47 +13187,55 @@ pyramids-reducible).</p>
 <a id="__codelineno-0-412" name="__codelineno-0-412"></a><span class="sd">                from the catalog). Empty (with the right columns) when no</span>
 <a id="__codelineno-0-413" name="__codelineno-0-413"></a><span class="sd">                volume falls in the window.</span>
 <a id="__codelineno-0-414" name="__codelineno-0-414"></a>
-<a id="__codelineno-0-415" name="__codelineno-0-415"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-416" name="__codelineno-0-416"></a><span class="sd">            NotImplementedError: If `aggregate` is not `None`.</span>
-<a id="__codelineno-0-417" name="__codelineno-0-417"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-418" name="__codelineno-0-418"></a>        <span class="k">if</span> <span class="n">aggregate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-419" name="__codelineno-0-419"></a>            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
-<a id="__codelineno-0-420" name="__codelineno-0-420"></a>                <span class="s2">&quot;Radar.download(aggregate=...) is not supported — raw Level-II &quot;</span>
-<a id="__codelineno-0-421" name="__codelineno-0-421"></a>                <span class="s2">&quot;volumes are not griddable by the pyramids reducer.&quot;</span>
-<a id="__codelineno-0-422" name="__codelineno-0-422"></a>            <span class="p">)</span>
-<a id="__codelineno-0-423" name="__codelineno-0-423"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_show_progress</span> <span class="o">=</span> <span class="n">progress_bar</span>
-<a id="__codelineno-0-424" name="__codelineno-0-424"></a>        <span class="n">products</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_search</span><span class="p">()</span>
-<a id="__codelineno-0-425" name="__codelineno-0-425"></a>        <span class="n">pairs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fetch_pairs</span><span class="p">(</span><span class="n">products</span><span class="p">)</span>
-<a id="__codelineno-0-426" name="__codelineno-0-426"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_inventory</span><span class="p">(</span><span class="n">pairs</span><span class="p">)</span>
-<a id="__codelineno-0-427" name="__codelineno-0-427"></a>
-<a id="__codelineno-0-428" name="__codelineno-0-428"></a>    <span class="nd">@staticmethod</span>
-<a id="__codelineno-0-429" name="__codelineno-0-429"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_inventory</span><span class="p">(</span><span class="n">pairs</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="n">RemoteProduct</span><span class="p">,</span> <span class="n">Path</span><span class="p">]]):</span>
-<a id="__codelineno-0-430" name="__codelineno-0-430"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Build the GeoDataFrame inventory from `(product, path)` pairs.</span>
-<a id="__codelineno-0-431" name="__codelineno-0-431"></a>
-<a id="__codelineno-0-432" name="__codelineno-0-432"></a><span class="sd">        Each path is already paired with the product it came from (no</span>
-<a id="__codelineno-0-433" name="__codelineno-0-433"></a><span class="sd">        filename re-matching), so the metadata attaches unambiguously.</span>
-<a id="__codelineno-0-434" name="__codelineno-0-434"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-435" name="__codelineno-0-435"></a>        <span class="kn">import</span><span class="w"> </span><span class="nn">geopandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">gpd</span>
-<a id="__codelineno-0-436" name="__codelineno-0-436"></a>        <span class="kn">from</span><span class="w"> </span><span class="nn">shapely.geometry</span><span class="w"> </span><span class="kn">import</span> <span class="n">Point</span>
-<a id="__codelineno-0-437" name="__codelineno-0-437"></a>
-<a id="__codelineno-0-438" name="__codelineno-0-438"></a>        <span class="n">rows</span> <span class="o">=</span> <span class="p">[]</span>
-<a id="__codelineno-0-439" name="__codelineno-0-439"></a>        <span class="n">geoms</span> <span class="o">=</span> <span class="p">[]</span>
-<a id="__codelineno-0-440" name="__codelineno-0-440"></a>        <span class="k">for</span> <span class="n">product</span><span class="p">,</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">pairs</span><span class="p">:</span>
-<a id="__codelineno-0-441" name="__codelineno-0-441"></a>            <span class="n">meta</span> <span class="o">=</span> <span class="n">product</span><span class="o">.</span><span class="n">metadata</span>
-<a id="__codelineno-0-442" name="__codelineno-0-442"></a>            <span class="n">station</span><span class="p">:</span> <span class="n">Station</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">meta</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;station&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-443" name="__codelineno-0-443"></a>            <span class="n">rows</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-<a id="__codelineno-0-444" name="__codelineno-0-444"></a>                <span class="p">{</span>
-<a id="__codelineno-0-445" name="__codelineno-0-445"></a>                    <span class="s2">&quot;station_id&quot;</span><span class="p">:</span> <span class="n">meta</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;station_id&quot;</span><span class="p">),</span>
-<a id="__codelineno-0-446" name="__codelineno-0-446"></a>                    <span class="s2">&quot;volume&quot;</span><span class="p">:</span> <span class="n">meta</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;volume&quot;</span><span class="p">),</span>
-<a id="__codelineno-0-447" name="__codelineno-0-447"></a>                    <span class="s2">&quot;scan_time&quot;</span><span class="p">:</span> <span class="n">meta</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;start_time&quot;</span><span class="p">),</span>
-<a id="__codelineno-0-448" name="__codelineno-0-448"></a>                    <span class="s2">&quot;n_chunks&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">meta</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;chunk_keys&quot;</span><span class="p">,</span> <span class="p">[])),</span>
-<a id="__codelineno-0-449" name="__codelineno-0-449"></a>                    <span class="s2">&quot;path&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">path</span><span class="p">),</span>
-<a id="__codelineno-0-450" name="__codelineno-0-450"></a>                <span class="p">}</span>
-<a id="__codelineno-0-451" name="__codelineno-0-451"></a>            <span class="p">)</span>
-<a id="__codelineno-0-452" name="__codelineno-0-452"></a>            <span class="n">geoms</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-<a id="__codelineno-0-453" name="__codelineno-0-453"></a>                <span class="n">Point</span><span class="p">(</span><span class="n">station</span><span class="o">.</span><span class="n">longitude</span><span class="p">,</span> <span class="n">station</span><span class="o">.</span><span class="n">latitude</span><span class="p">)</span> <span class="k">if</span> <span class="n">station</span> <span class="k">else</span> <span class="kc">None</span>
-<a id="__codelineno-0-454" name="__codelineno-0-454"></a>            <span class="p">)</span>
-<a id="__codelineno-0-455" name="__codelineno-0-455"></a>        <span class="k">return</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">(</span><span class="n">rows</span><span class="p">,</span> <span class="n">geometry</span><span class="o">=</span><span class="n">geoms</span><span class="p">,</span> <span class="n">crs</span><span class="o">=</span><span class="s2">&quot;EPSG:4326&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-415" name="__codelineno-0-415"></a><span class="sd">                Intentionally a `GeoDataFrame` inventory (one row per</span>
+<a id="__codelineno-0-416" name="__codelineno-0-416"></a><span class="sd">                downloaded volume + its on-disk `path`), not the</span>
+<a id="__codelineno-0-417" name="__codelineno-0-417"></a><span class="sd">                `FeatureCollection` the event/footprint `&quot;vector&quot;`</span>
+<a id="__codelineno-0-418" name="__codelineno-0-418"></a><span class="sd">                backends (FDSN, FIRMS, GDACS) return — the rows index</span>
+<a id="__codelineno-0-419" name="__codelineno-0-419"></a><span class="sd">                bulky files rather than describe point/polygon features.</span>
+<a id="__codelineno-0-420" name="__codelineno-0-420"></a><span class="sd">                The base `download` contract lists radar as this</span>
+<a id="__codelineno-0-421" name="__codelineno-0-421"></a><span class="sd">                documented exception.</span>
+<a id="__codelineno-0-422" name="__codelineno-0-422"></a>
+<a id="__codelineno-0-423" name="__codelineno-0-423"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-424" name="__codelineno-0-424"></a><span class="sd">            NotImplementedError: If `aggregate` is not `None`.</span>
+<a id="__codelineno-0-425" name="__codelineno-0-425"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-426" name="__codelineno-0-426"></a>        <span class="k">if</span> <span class="n">aggregate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-427" name="__codelineno-0-427"></a>            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+<a id="__codelineno-0-428" name="__codelineno-0-428"></a>                <span class="s2">&quot;Radar.download(aggregate=...) is not supported — raw Level-II &quot;</span>
+<a id="__codelineno-0-429" name="__codelineno-0-429"></a>                <span class="s2">&quot;volumes are not griddable by the pyramids reducer.&quot;</span>
+<a id="__codelineno-0-430" name="__codelineno-0-430"></a>            <span class="p">)</span>
+<a id="__codelineno-0-431" name="__codelineno-0-431"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_show_progress</span> <span class="o">=</span> <span class="n">progress_bar</span>
+<a id="__codelineno-0-432" name="__codelineno-0-432"></a>        <span class="n">products</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_search</span><span class="p">()</span>
+<a id="__codelineno-0-433" name="__codelineno-0-433"></a>        <span class="n">pairs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fetch_pairs</span><span class="p">(</span><span class="n">products</span><span class="p">)</span>
+<a id="__codelineno-0-434" name="__codelineno-0-434"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_inventory</span><span class="p">(</span><span class="n">pairs</span><span class="p">)</span>
+<a id="__codelineno-0-435" name="__codelineno-0-435"></a>
+<a id="__codelineno-0-436" name="__codelineno-0-436"></a>    <span class="nd">@staticmethod</span>
+<a id="__codelineno-0-437" name="__codelineno-0-437"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_inventory</span><span class="p">(</span><span class="n">pairs</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="n">RemoteProduct</span><span class="p">,</span> <span class="n">Path</span><span class="p">]]):</span>
+<a id="__codelineno-0-438" name="__codelineno-0-438"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Build the GeoDataFrame inventory from `(product, path)` pairs.</span>
+<a id="__codelineno-0-439" name="__codelineno-0-439"></a>
+<a id="__codelineno-0-440" name="__codelineno-0-440"></a><span class="sd">        Each path is already paired with the product it came from (no</span>
+<a id="__codelineno-0-441" name="__codelineno-0-441"></a><span class="sd">        filename re-matching), so the metadata attaches unambiguously.</span>
+<a id="__codelineno-0-442" name="__codelineno-0-442"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-443" name="__codelineno-0-443"></a>        <span class="kn">import</span><span class="w"> </span><span class="nn">geopandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">gpd</span>
+<a id="__codelineno-0-444" name="__codelineno-0-444"></a>        <span class="kn">from</span><span class="w"> </span><span class="nn">shapely.geometry</span><span class="w"> </span><span class="kn">import</span> <span class="n">Point</span>
+<a id="__codelineno-0-445" name="__codelineno-0-445"></a>
+<a id="__codelineno-0-446" name="__codelineno-0-446"></a>        <span class="n">rows</span> <span class="o">=</span> <span class="p">[]</span>
+<a id="__codelineno-0-447" name="__codelineno-0-447"></a>        <span class="n">geoms</span> <span class="o">=</span> <span class="p">[]</span>
+<a id="__codelineno-0-448" name="__codelineno-0-448"></a>        <span class="k">for</span> <span class="n">product</span><span class="p">,</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">pairs</span><span class="p">:</span>
+<a id="__codelineno-0-449" name="__codelineno-0-449"></a>            <span class="n">meta</span> <span class="o">=</span> <span class="n">product</span><span class="o">.</span><span class="n">metadata</span>
+<a id="__codelineno-0-450" name="__codelineno-0-450"></a>            <span class="n">station</span><span class="p">:</span> <span class="n">Station</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">meta</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;station&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-451" name="__codelineno-0-451"></a>            <span class="n">rows</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+<a id="__codelineno-0-452" name="__codelineno-0-452"></a>                <span class="p">{</span>
+<a id="__codelineno-0-453" name="__codelineno-0-453"></a>                    <span class="s2">&quot;station_id&quot;</span><span class="p">:</span> <span class="n">meta</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;station_id&quot;</span><span class="p">),</span>
+<a id="__codelineno-0-454" name="__codelineno-0-454"></a>                    <span class="s2">&quot;volume&quot;</span><span class="p">:</span> <span class="n">meta</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;volume&quot;</span><span class="p">),</span>
+<a id="__codelineno-0-455" name="__codelineno-0-455"></a>                    <span class="s2">&quot;scan_time&quot;</span><span class="p">:</span> <span class="n">meta</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;start_time&quot;</span><span class="p">),</span>
+<a id="__codelineno-0-456" name="__codelineno-0-456"></a>                    <span class="s2">&quot;n_chunks&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">meta</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;chunk_keys&quot;</span><span class="p">,</span> <span class="p">[])),</span>
+<a id="__codelineno-0-457" name="__codelineno-0-457"></a>                    <span class="s2">&quot;path&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">path</span><span class="p">),</span>
+<a id="__codelineno-0-458" name="__codelineno-0-458"></a>                <span class="p">}</span>
+<a id="__codelineno-0-459" name="__codelineno-0-459"></a>            <span class="p">)</span>
+<a id="__codelineno-0-460" name="__codelineno-0-460"></a>            <span class="n">geoms</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+<a id="__codelineno-0-461" name="__codelineno-0-461"></a>                <span class="n">Point</span><span class="p">(</span><span class="n">station</span><span class="o">.</span><span class="n">longitude</span><span class="p">,</span> <span class="n">station</span><span class="o">.</span><span class="n">latitude</span><span class="p">)</span> <span class="k">if</span> <span class="n">station</span> <span class="k">else</span> <span class="kc">None</span>
+<a id="__codelineno-0-462" name="__codelineno-0-462"></a>            <span class="p">)</span>
+<a id="__codelineno-0-463" name="__codelineno-0-463"></a>        <span class="k">return</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">(</span><span class="n">rows</span><span class="p">,</span> <span class="n">geometry</span><span class="o">=</span><span class="n">geoms</span><span class="p">,</span> <span class="n">crs</span><span class="o">=</span><span class="s2">&quot;EPSG:4326&quot;</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -13618,6 +13673,13 @@ pyramids-reducible. The facade already rejects a non-<code>None</code>
 and a station-point <code>geometry</code> (<code>None</code> for sites absent
 from the catalog). Empty (with the right columns) when no
 volume falls in the window.</p>
+<p>Intentionally a <code>GeoDataFrame</code> inventory (one row per
+downloaded volume + its on-disk <code>path</code>), not the
+<code>FeatureCollection</code> the event/footprint <code>"vector"</code>
+backends (FDSN, FIRMS, GDACS) return — the rows index
+bulky files rather than describe point/polygon features.
+The base <code>download</code> contract lists radar as this
+documented exception.</p>
               </div>
             </td>
           </tr>
@@ -13681,7 +13743,15 @@ volume falls in the window.</p>
 <span class="normal"><a href="#__codelineno-0-423">423</a></span>
 <span class="normal"><a href="#__codelineno-0-424">424</a></span>
 <span class="normal"><a href="#__codelineno-0-425">425</a></span>
-<span class="normal"><a href="#__codelineno-0-426">426</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-395" name="__codelineno-0-395"></a><span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
+<span class="normal"><a href="#__codelineno-0-426">426</a></span>
+<span class="normal"><a href="#__codelineno-0-427">427</a></span>
+<span class="normal"><a href="#__codelineno-0-428">428</a></span>
+<span class="normal"><a href="#__codelineno-0-429">429</a></span>
+<span class="normal"><a href="#__codelineno-0-430">430</a></span>
+<span class="normal"><a href="#__codelineno-0-431">431</a></span>
+<span class="normal"><a href="#__codelineno-0-432">432</a></span>
+<span class="normal"><a href="#__codelineno-0-433">433</a></span>
+<span class="normal"><a href="#__codelineno-0-434">434</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-395" name="__codelineno-0-395"></a><span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
 <a id="__codelineno-0-396" name="__codelineno-0-396"></a>    <span class="bp">self</span><span class="p">,</span>
 <a id="__codelineno-0-397" name="__codelineno-0-397"></a>    <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
 <a id="__codelineno-0-398" name="__codelineno-0-398"></a>    <span class="n">aggregate</span><span class="p">:</span> <span class="n">AggregationConfig</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -13701,18 +13771,26 @@ volume falls in the window.</p>
 <a id="__codelineno-0-412" name="__codelineno-0-412"></a><span class="sd">            from the catalog). Empty (with the right columns) when no</span>
 <a id="__codelineno-0-413" name="__codelineno-0-413"></a><span class="sd">            volume falls in the window.</span>
 <a id="__codelineno-0-414" name="__codelineno-0-414"></a>
-<a id="__codelineno-0-415" name="__codelineno-0-415"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-416" name="__codelineno-0-416"></a><span class="sd">        NotImplementedError: If `aggregate` is not `None`.</span>
-<a id="__codelineno-0-417" name="__codelineno-0-417"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-418" name="__codelineno-0-418"></a>    <span class="k">if</span> <span class="n">aggregate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-419" name="__codelineno-0-419"></a>        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
-<a id="__codelineno-0-420" name="__codelineno-0-420"></a>            <span class="s2">&quot;Radar.download(aggregate=...) is not supported — raw Level-II &quot;</span>
-<a id="__codelineno-0-421" name="__codelineno-0-421"></a>            <span class="s2">&quot;volumes are not griddable by the pyramids reducer.&quot;</span>
-<a id="__codelineno-0-422" name="__codelineno-0-422"></a>        <span class="p">)</span>
-<a id="__codelineno-0-423" name="__codelineno-0-423"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_show_progress</span> <span class="o">=</span> <span class="n">progress_bar</span>
-<a id="__codelineno-0-424" name="__codelineno-0-424"></a>    <span class="n">products</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_search</span><span class="p">()</span>
-<a id="__codelineno-0-425" name="__codelineno-0-425"></a>    <span class="n">pairs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fetch_pairs</span><span class="p">(</span><span class="n">products</span><span class="p">)</span>
-<a id="__codelineno-0-426" name="__codelineno-0-426"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_inventory</span><span class="p">(</span><span class="n">pairs</span><span class="p">)</span>
+<a id="__codelineno-0-415" name="__codelineno-0-415"></a><span class="sd">            Intentionally a `GeoDataFrame` inventory (one row per</span>
+<a id="__codelineno-0-416" name="__codelineno-0-416"></a><span class="sd">            downloaded volume + its on-disk `path`), not the</span>
+<a id="__codelineno-0-417" name="__codelineno-0-417"></a><span class="sd">            `FeatureCollection` the event/footprint `&quot;vector&quot;`</span>
+<a id="__codelineno-0-418" name="__codelineno-0-418"></a><span class="sd">            backends (FDSN, FIRMS, GDACS) return — the rows index</span>
+<a id="__codelineno-0-419" name="__codelineno-0-419"></a><span class="sd">            bulky files rather than describe point/polygon features.</span>
+<a id="__codelineno-0-420" name="__codelineno-0-420"></a><span class="sd">            The base `download` contract lists radar as this</span>
+<a id="__codelineno-0-421" name="__codelineno-0-421"></a><span class="sd">            documented exception.</span>
+<a id="__codelineno-0-422" name="__codelineno-0-422"></a>
+<a id="__codelineno-0-423" name="__codelineno-0-423"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-424" name="__codelineno-0-424"></a><span class="sd">        NotImplementedError: If `aggregate` is not `None`.</span>
+<a id="__codelineno-0-425" name="__codelineno-0-425"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-426" name="__codelineno-0-426"></a>    <span class="k">if</span> <span class="n">aggregate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-427" name="__codelineno-0-427"></a>        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+<a id="__codelineno-0-428" name="__codelineno-0-428"></a>            <span class="s2">&quot;Radar.download(aggregate=...) is not supported — raw Level-II &quot;</span>
+<a id="__codelineno-0-429" name="__codelineno-0-429"></a>            <span class="s2">&quot;volumes are not griddable by the pyramids reducer.&quot;</span>
+<a id="__codelineno-0-430" name="__codelineno-0-430"></a>        <span class="p">)</span>
+<a id="__codelineno-0-431" name="__codelineno-0-431"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_show_progress</span> <span class="o">=</span> <span class="n">progress_bar</span>
+<a id="__codelineno-0-432" name="__codelineno-0-432"></a>    <span class="n">products</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_search</span><span class="p">()</span>
+<a id="__codelineno-0-433" name="__codelineno-0-433"></a>    <span class="n">pairs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fetch_pairs</span><span class="p">(</span><span class="n">products</span><span class="p">)</span>
+<a id="__codelineno-0-434" name="__codelineno-0-434"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_inventory</span><span class="p">(</span><span class="n">pairs</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>

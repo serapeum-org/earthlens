@@ -9889,7 +9889,7 @@ holds the concrete backend that :meth:<code>download</code> routes to.</p>
     an arbitrary-bucket passthrough.
 :class:<code>earthlens.cmems.CMEMS</code>: Copernicus Marine ocean
     datasets via <code>copernicusmarine</code>.
-:class:<code>earthlens.earthdata.EarthData</code>: NASA EOSDIS granules
+:class:<code>earthlens.earthdata.Earthdata</code>: NASA EOSDIS granules
     across 9 DAACs via <code>earthaccess</code> + CMR; the first backend
     whose <code>OUTPUT_KIND</code> is per-dataset (raster / vector /
     tabular), not fixed.
@@ -10550,7 +10550,7 @@ holds the concrete backend that :meth:<code>download</code> routes to.</p>
 <a id="__codelineno-0-162" name="__codelineno-0-162"></a><span class="sd">            an arbitrary-bucket passthrough.</span>
 <a id="__codelineno-0-163" name="__codelineno-0-163"></a><span class="sd">        :class:`earthlens.cmems.CMEMS`: Copernicus Marine ocean</span>
 <a id="__codelineno-0-164" name="__codelineno-0-164"></a><span class="sd">            datasets via `copernicusmarine`.</span>
-<a id="__codelineno-0-165" name="__codelineno-0-165"></a><span class="sd">        :class:`earthlens.earthdata.EarthData`: NASA EOSDIS granules</span>
+<a id="__codelineno-0-165" name="__codelineno-0-165"></a><span class="sd">        :class:`earthlens.earthdata.Earthdata`: NASA EOSDIS granules</span>
 <a id="__codelineno-0-166" name="__codelineno-0-166"></a><span class="sd">            across 9 DAACs via `earthaccess` + CMR; the first backend</span>
 <a id="__codelineno-0-167" name="__codelineno-0-167"></a><span class="sd">            whose `OUTPUT_KIND` is per-dataset (raster / vector /</span>
 <a id="__codelineno-0-168" name="__codelineno-0-168"></a><span class="sd">            tabular), not fixed.</span>
@@ -10627,7 +10627,7 @@ holds the concrete backend that :meth:<code>download</code> routes to.</p>
 <a id="__codelineno-0-239" name="__codelineno-0-239"></a>            <span class="s2">&quot;chirps&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;earthlens.chc&quot;</span><span class="p">,</span> <span class="s2">&quot;CHIRPS&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="p">{}),</span>
 <a id="__codelineno-0-240" name="__codelineno-0-240"></a>            <span class="s2">&quot;amazon-s3&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;earthlens.s3&quot;</span><span class="p">,</span> <span class="s2">&quot;S3&quot;</span><span class="p">,</span> <span class="s2">&quot;s3&quot;</span><span class="p">,</span> <span class="p">{}),</span>
 <a id="__codelineno-0-241" name="__codelineno-0-241"></a>            <span class="s2">&quot;cmems&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;earthlens.cmems&quot;</span><span class="p">,</span> <span class="s2">&quot;CMEMS&quot;</span><span class="p">,</span> <span class="s2">&quot;cmems&quot;</span><span class="p">,</span> <span class="p">{}),</span>
-<a id="__codelineno-0-242" name="__codelineno-0-242"></a>            <span class="s2">&quot;earthdata&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;earthlens.earthdata&quot;</span><span class="p">,</span> <span class="s2">&quot;EarthData&quot;</span><span class="p">,</span> <span class="s2">&quot;earthdata&quot;</span><span class="p">,</span> <span class="p">{}),</span>
+<a id="__codelineno-0-242" name="__codelineno-0-242"></a>            <span class="s2">&quot;earthdata&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;earthlens.earthdata&quot;</span><span class="p">,</span> <span class="s2">&quot;Earthdata&quot;</span><span class="p">,</span> <span class="s2">&quot;earthdata&quot;</span><span class="p">,</span> <span class="p">{}),</span>
 <a id="__codelineno-0-243" name="__codelineno-0-243"></a>            <span class="s2">&quot;ecmwf&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;earthlens.ecmwf&quot;</span><span class="p">,</span> <span class="s2">&quot;ECMWF&quot;</span><span class="p">,</span> <span class="s2">&quot;ecmwf&quot;</span><span class="p">,</span> <span class="p">{}),</span>
 <a id="__codelineno-0-244" name="__codelineno-0-244"></a>            <span class="s2">&quot;eumetsat&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;earthlens.eumetsat&quot;</span><span class="p">,</span> <span class="s2">&quot;EUMETSAT&quot;</span><span class="p">,</span> <span class="s2">&quot;eumetsat&quot;</span><span class="p">,</span> <span class="p">{}),</span>
 <a id="__codelineno-0-245" name="__codelineno-0-245"></a>            <span class="s2">&quot;fdsn&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;earthlens.fdsn&quot;</span><span class="p">,</span> <span class="s2">&quot;FDSN&quot;</span><span class="p">,</span> <span class="s2">&quot;fdsn&quot;</span><span class="p">,</span> <span class="p">{}),</span>
