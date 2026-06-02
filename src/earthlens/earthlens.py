@@ -350,7 +350,21 @@ class EarthLens:
             temporal_resolution: `"daily"` or `"monthly"` for most
                 backends; the GEE backend also accepts `"raw"` and
                 `"yearly"`. The concrete backend may accept a narrower
-                set; check its `temporal_resolution` handling.
+                set; check its `temporal_resolution` handling. Note the
+                meaning is backend-specific:
+
+                * a **download-loop cadence** that spaces the per-step
+                  requests — CHIRPS, S3, ECMWF, GEE;
+                * an **advisory label** only — NWP (the real cadence
+                  comes from each model's metadata);
+                * a **server-side rollup selector** — OpenAQ (picks the
+                  measurements vs. hourly/daily endpoint);
+                * a **service selector** — USGS Water (sub-daily maps to
+                  the instantaneous service);
+                * **ignored / forced to `"all"`** for the snapshot
+                  backends with no per-step time axis — Overture,
+                  Tropycal, FDSN, FIRMS, GDACS, Radar.
+
                 Defaults to `"daily"`.
             start: Inclusive start date as a string (parsed with
                 `fmt`). Defaults to `None`.
