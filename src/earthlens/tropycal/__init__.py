@@ -55,7 +55,13 @@ Examples:
 
 from __future__ import annotations
 
-from earthlens.tropycal.backend import TropicalCyclone, Tropycal
+from earthlens.tropycal._compat import ensure_pkg_resources
+
+# tropycal 1.4 imports the setuptools-removed `pkg_resources` at module load;
+# install a stand-in (when absent) before the backend lazily imports tropycal.
+ensure_pkg_resources()
+
+from earthlens.tropycal.backend import TropicalCyclone, Tropycal  # noqa: E402
 from earthlens.tropycal.catalog import (
     CATALOG_PATH,
     Basin,

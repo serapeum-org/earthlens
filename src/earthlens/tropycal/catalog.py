@@ -194,7 +194,7 @@ class Catalog(AbstractCatalog):
             >>> Catalog().get_basin("north_altantic")
             Traceback (most recent call last):
                 ...
-            ValueError: 'north_altantic' is not in the Tropycal basin catalog. Known datasets: ['all', 'australia', 'both', 'east_pacific', 'north_atlantic', 'north_indian', 'south_atlantic', 'south_indian', 'south_pacific', 'west_pacific']. Did you mean 'north_atlantic'?
+            ValueError: 'north_altantic' is not in the Tropycal basin catalog. Known basins: ['all', 'australia', 'both', 'east_pacific', 'north_atlantic', 'north_indian', 'south_atlantic', 'south_indian', 'south_pacific', 'west_pacific']. Did you mean 'north_atlantic'?
 
             ```
     """
