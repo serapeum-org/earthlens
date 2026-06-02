@@ -44,9 +44,8 @@ class NWMVariable(BaseModel):
     """One variable carried by an NWM product (the "variable" analog).
 
     A frozen value object with descriptive metadata only — NWM variables
-    carry no request-shaping parameters because the MVP downloads whole
-    files (subsetting a single variable out of a file is a read, deferred
-    to pyramids `PY-G`).
+    carry no request-shaping parameters; subsetting a single variable out
+    of a file is a read, performed by the pyramids reader at fetch time.
 
     Attributes:
         units: Physical unit (`"m3 s-1"`, `"m3 m-3"`, `"1"` for a
@@ -90,7 +89,8 @@ class NWMProduct(BaseModel):
             (`channel_rt`, `land`). For an ensemble configuration the
             member rides on this token (`channel_rt_1`).
         retro_zarr: The retrospective (v3.0) Zarr store URI for this
-            product. Used only by the `PY-G`-gated retrospective path.
+            product. Read by the `mode="retrospective"` fetch path
+            (tabular products).
         description: Human-readable summary.
         variables: Per-variable metadata keyed by variable name.
 

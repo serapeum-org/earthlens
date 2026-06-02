@@ -225,8 +225,8 @@ class NWM(AbstractDataSource):
                 fetched. An empty list selects all of the product's
                 variables.
             lat_lim: `[lat_min, lat_max]` in degrees. A whole-Earth box
-                (`[-90, 90]`) means "no spatial subset"; a narrower box
-                is a subset request and is `PY-G`-gated (see the module
+                (`[-90, 90]`) means "no spatial subset"; a narrower box is
+                a subset request (read + cropped, see the module
                 docstring).
             lon_lim: `[lon_min, lon_max]` in degrees.
             temporal_resolution: Advisory label (NWM cadence is fixed by
@@ -236,8 +236,8 @@ class NWM(AbstractDataSource):
             configuration: The operational configuration key
                 (`"short_range"`, `"analysis_assim"`, `"medium_range"`).
             mode: `"operational"` (NetCDF on `noaa-nwm-pds`) or
-                `"retrospective"` (Zarr, `PY-G`-gated). `None` auto-routes
-                by the date window.
+                `"retrospective"` (the v3.0 Zarr; tabular products only).
+                `None` auto-routes by the date window.
             member: Ensemble member (1-based) for an ensemble
                 configuration; ignored for deterministic ones.
             cycles: Restrict the run hours fetched (a subset of the
@@ -246,7 +246,7 @@ class NWM(AbstractDataSource):
             horizon: Maximum step; expands from the configuration's
                 `first_step` on its `step_cadence_h`.
             sites: Explicit `feature_id`s / USGS `gage_id`s to subset to
-                — `PY-G`-gated (any non-`None` value raises).
+                (tabular products only; rejected for a gridded product).
             region: AWS region of the bucket.
             catalog: Optional pre-built :class:`Catalog` (tests inject
                 one); defaults to the bundled catalog.
@@ -456,8 +456,8 @@ class NWM(AbstractDataSource):
         For the operational mode, crosses every in-window cycle with every
         requested step and product, formatting the exact S3 key (no
         re-listing). For the retrospective mode, emits one product per
-        requested NWM product carrying the Zarr store URI (handled by the
-        `PY-G`-gated fetch).
+        requested NWM product carrying the Zarr store URI (read by
+        :meth:`_fetch_retrospective`).
 
         Returns:
             list[RemoteProduct]: One product per item to fetch; each
