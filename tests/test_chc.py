@@ -31,6 +31,20 @@ def test_chirps_download_rejects_aggregate(tmp_path):
         chirps.download(aggregate=object())
 
 
+def test_chirps_catalog_property_aliases_private(tmp_path):
+    """The public `catalog` attribute is a back-compat alias of `_catalog`."""
+    chirps = CHIRPS(
+        start="2020-01-01",
+        end="2020-01-02",
+        variables=["precipitation"],
+        temporal_resolution="daily",
+        lat_lim=[4.0, 5.0],
+        lon_lim=[-75.0, -74.0],
+        path=str(tmp_path),
+    )
+    assert chirps.catalog is chirps._catalog
+
+
 @pytest.fixture(scope="module")
 def test_create_chirps_object(
     dates: list,

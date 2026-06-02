@@ -164,6 +164,11 @@ class CHIRPS(AbstractDataSource):
     OUTPUT_KIND: OutputKind = "raster"
     api_url: str = "data.chc.ucsb.edu"
 
+    @property
+    def catalog(self):
+        """The bundled CHC :class:`~earthlens.chc.Catalog` (alias of `_catalog`)."""
+        return self._catalog
+
     def __init__(
         self,
         variables: dict[str, list[str]] | list[str] | None = None,
@@ -227,7 +232,7 @@ class CHIRPS(AbstractDataSource):
         if end is None:
             end = str(pd.Timestamp.now().date())
 
-        self.catalog = catalog
+        self._catalog = catalog
 
         super().__init__(
             start=start,
@@ -411,7 +416,7 @@ class CHIRPS(AbstractDataSource):
         failed: list[tuple[tuple[str, str], BaseException]] = []
 
         for ds_key, var_names in self.vars.items():
-            dataset = self.catalog.datasets[ds_key]
+            dataset = self._catalog.datasets[ds_key]
             for var_name in var_names:
                 var = dataset.variables[var_name]
                 logger.info(
