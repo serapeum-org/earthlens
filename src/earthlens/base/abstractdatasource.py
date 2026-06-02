@@ -467,6 +467,16 @@ class AbstractDataSource(ABC):
         not-yet-migrated legacy backends (CHIRPS, ECMWF) still return
         `None` and write their files to `self.root_dir` as a side
         effect.
+
+        Partial-failure policy is per backend and currently varies:
+        most multi-item backends are **skip-and-continue** — a single
+        failed `(dataset, variable)` / chunk / sensor is logged and the
+        batch proceeds, with a success/failure summary at the end
+        (CHIRPS, CMEMS, FDSN, FIRMS, …) — while single-shot backends
+        propagate the error. NWP exposes this as an explicit
+        `errors="warn" | "raise" | "ignore"` argument; new backends
+        with a per-item loop should follow that `errors=` convention so
+        the policy becomes uniformly caller-controllable.
         """
         # loop over dates if the downloaded rasters/netcdf are for a specific date out of the required
         # list of dates
