@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -634,6 +634,67 @@
       
     </span>
   </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#subpackage-layout-style" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Subpackage layout &amp; style
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Subpackage layout &amp; style">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#module-layout" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Module layout
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#catalog-storage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Catalog storage
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#catalog-loader-api" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Catalog loader API
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#auth" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Auth
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -9784,6 +9845,67 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#subpackage-layout-style" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Subpackage layout &amp; style
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Subpackage layout &amp; style">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#module-layout" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Module layout
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#catalog-storage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Catalog storage
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#catalog-loader-api" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Catalog loader API
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#auth" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Auth
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -10113,6 +10235,86 @@ Hold "Ctrl" to enable pan &amp; zoom
     end</code></pre> 
     
 </div>
+<h2 id="subpackage-layout-style"><a class="toclink" href="#subpackage-layout-style">Subpackage layout &amp; style</a><a class="headerlink" href="#subpackage-layout-style" title="Permanent link">#</a></h2>
+<p>Every provider backend under <code>src/earthlens/&lt;pkg&gt;/</code> follows one layout so the
+backends read the same way; a new backend should match it.</p>
+<h3 id="module-layout"><a class="toclink" href="#module-layout">Module layout</a><a class="headerlink" href="#module-layout" title="Permanent link">#</a></h3>
+<table>
+<thead>
+<tr>
+<th>File</th>
+<th>Role</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>__init__.py</code></td>
+<td>Module docstring (required) + <code>__all__</code>; re-exports the public surface.</td>
+</tr>
+<tr>
+<td><code>backend.py</code></td>
+<td>The <code>AbstractDataSource</code> subclass <code>&lt;Provider&gt;</code>. Always <code>backend.py</code> — never <code>&lt;pkg&gt;.py</code>.</td>
+</tr>
+<tr>
+<td><code>catalog.py</code></td>
+<td>The catalog loader (see below).</td>
+</tr>
+<tr>
+<td><code>catalog/</code> <strong>or</strong> <code>&lt;pkg&gt;_data_catalog.yaml</code></td>
+<td>The catalog data (see "Catalog storage").</td>
+</tr>
+<tr>
+<td><code>auth.py</code></td>
+<td>Auth surface, when the provider needs credentials (see "Auth").</td>
+</tr>
+<tr>
+<td><code>_helpers.py</code></td>
+<td>Private, stateless helpers (optional).</td>
+</tr>
+<tr>
+<td><code>events.py</code></td>
+<td>Vector-event → <code>FeatureCollection</code> builders (vector backends only).</td>
+</tr>
+<tr>
+<td><code>providers.yaml</code></td>
+<td>Provider registry (backends that populate the base <code>providers</code> field).</td>
+</tr>
+</tbody>
+</table>
+<p>Per-backend tooling lives at repo-level <code>tools/&lt;pkg&gt;/</code>; tests in <code>tests/&lt;pkg&gt;/</code>
+(or <code>tests/test_&lt;pkg&gt;/</code>). Backend-specific extras (e.g. <code>gee/filters.py</code>,
+<code>ecmwf/constraints.py</code>, <code>sentinel_hub/evalscripts/</code>) sit alongside these.</p>
+<h3 id="catalog-storage"><a class="toclink" href="#catalog-storage">Catalog storage</a><a class="headerlink" href="#catalog-storage" title="Permanent link">#</a></h3>
+<p>Which storage shape a backend uses is decided by a rule, not ad hoc:</p>
+<ul>
+<li><strong>Sharded <code>catalog/</code> directory</strong> — per-family <code>&lt;family&gt;.yaml</code> files plus an
+  <code>_index.yaml</code> holding the informational <code>available_*</code> index. Used for large
+  or multi-family catalogs (gee, cmems, earthdata, eumetsat, stac, openeo,
+  sentinel_hub, ghsl, chc).</li>
+<li><strong>Single <code>&lt;pkg&gt;_data_catalog.yaml</code></strong> at the package root — for a small,
+  single-family enumeration (fdsn, gdacs, firms, radar, tropycal, openaq,
+  usgs_water, overture, nwp, s3, worldpop).</li>
+<li><strong>Large-index variant</strong> — when the upstream "every dataset" index is too big
+  to keep inline it lives in a sibling gzipped/plain JSON kept out of the
+  <code>*.yaml</code> glob (earthdata <code>catalog/_auto.json</code>, hdx <code>catalog/_available.json.gz</code>)
+  while the curated rows stay in <code>*.yaml</code>.</li>
+</ul>
+<p>Both shapes load through the same loader, which also accepts a single <code>*.yaml</code>
+file (used by tests that monkey-patch <code>CATALOG_PATH</code>).</p>
+<h3 id="catalog-loader-api"><a class="toclink" href="#catalog-loader-api">Catalog loader API</a><a class="headerlink" href="#catalog-loader-api" title="Permanent link">#</a></h3>
+<p><code>catalog.py</code> always exposes a module-level <code>CATALOG_PATH</code>, a
+<code>clear_catalog_cache()</code> helper, a <code>(path, mtime_ns)</code> parse cache, and a pydantic
+<code>Catalog</code> class (radar keeps a <code>StationCatalog</code> alias) that subclasses
+<code>AbstractCatalog</code>, chains <code>super().model_post_init()</code>, and parses through the
+shared <code>earthlens.base.yaml_loader.load_yaml_strict</code>.</p>
+<h3 id="auth"><a class="toclink" href="#auth">Auth</a><a class="headerlink" href="#auth" title="Permanent link">#</a></h3>
+<p>When a provider needs credentials the auth surface lives in <code>auth.py</code> as a
+<code>&lt;Provider&gt;Auth</code> + <code>&lt;Provider&gt;Credentials</code> pair with env-var fallbacks, raising
+<code>AuthenticationError</code> on failure. Sanctioned exceptions: a multi-endpoint
+backend may use a signer model instead (stac: <code>signers.py</code> + <code>auth_cdse.py</code>),
+and a backend whose SDK owns auth (ecmwf via <code>~/.cdsapirc</code>) may keep its
+<code>AuthenticationError</code> in <code>backend.py</code>. Public/anonymous backends (chc, gdacs,
+hdx, overture, tropycal) have no auth module.</p>
 
 
 
