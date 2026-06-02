@@ -530,14 +530,14 @@ class AbstractDataSource(ABC):
             f"_search and _fetch (post-C3)."
         )
 
-    def _fetch(self, products: list[RemoteProduct]) -> list[Path]:
+    def _fetch(self, products: list[RemoteProduct]) -> list[Any]:
         """Download the bytes of every product `_search` returned.
 
         Default raises `NotImplementedError` (see `_search`).
         Backends that opt into the search/fetch split override this
         to iterate over `products` — either sequentially or via
         `joblib.Parallel` / `concurrent.futures` — and write each
-        one to disk.
+        one to disk (or build it in memory).
 
         Args:
             products: The list returned by `_search` (or a
@@ -545,9 +545,13 @@ class AbstractDataSource(ABC):
                 returns an empty list.
 
         Returns:
-            list[Path]: The local file paths written, in the same
-                order as `products`. Empty list when `products` is
-                empty (no-op fetch is legal).
+            list[Any]: One element per product, in `products` order.
+                The element type tracks :attr:`OUTPUT_KIND`: written
+                `Path`s for `"raster"` / `"mixed"`, `FeatureCollection`
+                fragments for `"vector"`, and `DataFrame` fragments for
+                `"tabular"` (these are concatenated by the backend's
+                `download`). Empty list when `products` is empty (no-op
+                fetch is legal).
 
         Raises:
             NotImplementedError: When the subclass keeps the legacy
@@ -559,7 +563,7 @@ class AbstractDataSource(ABC):
             f"_search and _fetch (post-C3)."
         )
 
-    def _api_via_search_fetch(self) -> list[Path]:
+    def _api_via_search_fetch(self) -> list[Any]:
         """Canonical `_api` body for backends using the C3 split.
 
         Backends that override `_search` and `_fetch` usually want
@@ -578,7 +582,8 @@ class AbstractDataSource(ABC):
         parallel and most return nothing.
 
         Returns:
-            list[Path]: Whatever `_fetch` returned. An empty list
+            list[Any]: Whatever `_fetch` returned (element type tracks
+                :attr:`OUTPUT_KIND` — see :meth:`_fetch`). An empty list
                 when `_search` returned no products.
         """
         products = self._search()
