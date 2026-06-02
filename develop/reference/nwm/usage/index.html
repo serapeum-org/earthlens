@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -10313,10 +10313,18 @@ them.</p>
 </tbody>
 </table>
 <h2 id="what-you-get-back"><a class="toclink" href="#what-you-get-back">What you get back</a><a class="headerlink" href="#what-you-get-back" title="Permanent link">#</a></h2>
-<p><code>download()</code> returns a <code>list[pathlib.Path]</code> — one <strong>whole-CONUS</strong> NetCDF
-file per <code>(cycle, step, product)</code> it fetched. A <code>(cycle, step)</code> that is
-not yet published is logged and skipped (so one gap does not lose the
-rest of the request). Files are written atomically (a <code>.part</code> rename).</p>
+<p>A plain (no-subset) request returns a <code>list[pathlib.Path]</code> — one
+<strong>whole-CONUS</strong> NetCDF file per <code>(cycle, step, product)</code> it fetched. Each
+output name flattens the full S3 key (<code>nwm.{date}_{config}_…</code>) so a
+multi-day window stays unique (the NWM basename alone omits the date). A
+<code>(cycle, step)</code> that is not yet published is logged and skipped (so one
+gap does not lose the rest). Files are written atomically (a <code>.part</code>
+rename).</p>
+<p>A <strong>subset</strong> request returns the subset artefacts instead — <code>.parquet</code>
+tables (tabular products) or <code>.tif</code> COGs (gridded products). The fetched
+whole-CONUS <code>.nc</code> is <strong>left in place</strong> alongside them as the as-fetched
+source, so a small-bbox request still produces a large <code>.nc</code> plus the
+small output; delete the <code>.nc</code> yourself if you only want the subset.</p>
 <p>Each <code>channel_rt</code> file is ~14 MB (all 2.7 M reaches at one timestep) and
 each <code>land</code> file is ~30 MB, so a multi-cycle, multi-step request can be
 large — narrow <code>cycles=</code> / <code>steps=</code> to keep it small.</p>
