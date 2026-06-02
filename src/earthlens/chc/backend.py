@@ -46,7 +46,12 @@ from pyramids._io import extract_from_gz
 from pyramids.dataset import Dataset
 from tqdm import tqdm
 
-from earthlens.base import AbstractDataSource, SpatialExtent, TemporalExtent
+from earthlens.base import (
+    AbstractDataSource,
+    OutputKind,
+    SpatialExtent,
+    TemporalExtent,
+)
 from earthlens.chc.catalog import Catalog
 from earthlens.chc.catalog import Dataset as ChcDataset
 from earthlens.chc.catalog import Variable
@@ -156,18 +161,24 @@ class CHIRPS(AbstractDataSource):
             once at construction; resolves dataset keys to metadata.
     """
 
+    OUTPUT_KIND: OutputKind = "raster"
     api_url: str = "data.chc.ucsb.edu"
+
+    @property
+    def catalog(self):
+        """The bundled CHC :class:`~earthlens.chc.Catalog` (alias of `_catalog`)."""
+        return self._catalog
 
     def __init__(
         self,
+        start: str | None = None,
+        end: str | None = None,
         variables: dict[str, list[str]] | list[str] | None = None,
         lat_lim: list[float] | None = None,
         lon_lim: list[float] | None = None,
         temporal_resolution: str = "daily",
-        start: str | None = None,
-        end: str | None = None,
-        path: Path | str = "",
         fmt: str = "%Y-%m-%d",
+        path: Path | str = "",
     ):
         """Initialize a CHIRPS backend.
 
@@ -221,7 +232,7 @@ class CHIRPS(AbstractDataSource):
         if end is None:
             end = str(pd.Timestamp.now().date())
 
-        self.catalog = catalog
+        self._catalog = catalog
 
         super().__init__(
             start=start,
@@ -344,8 +355,9 @@ class CHIRPS(AbstractDataSource):
         self,
         progress_bar: bool = True,
         cores: int | None = None,
+        aggregate: object | None = None,
         **_kwargs: object,
-    ) -> None:
+    ) -> list[Path]:
         """Download every `(dataset, variable)` pair in `self.vars`.
 
         Args:
@@ -353,14 +365,19 @@ class CHIRPS(AbstractDataSource):
                 bar. Defaults to `True`.
             cores: Number of joblib workers for parallel per-date
                 retrieval. `None` (or `0`) runs sequentially.
-            **_kwargs: Reserved; the facade may pass `aggregate=` (a
-                no-op for CHIRPS, which has no aggregator wiring).
+            aggregate: Not supported by CHIRPS — a non-`None` value
+                raises `NotImplementedError` rather than being
+                silently ignored. CHIRPS writes per-date GeoTIFFs and
+                has no aggregator wiring (unlike the NetCDF-emitting
+                ECMWF backend).
+            **_kwargs: Reserved for other forwarded keyword arguments.
 
         Returns:
-            None. Per-date GeoTIFFs land at
-            `<self.root_dir>/<ds_key>_<var_name>_<date>.tif`.
-            Per-variable failures are logged but do not abort the
-            rest of the loop.
+            list[Path]: The written GeoTIFF paths
+            (`<self.root_dir>/<ds_key>_<var_name>_<date>.tif`), across
+            every `(dataset, variable)` and date. Per-variable and
+            per-date failures are logged and omitted from the list (they
+            do not abort the rest of the loop).
 
         Examples:
             - Legacy shape (CHIRPS-2.0 global daily):
@@ -389,11 +406,19 @@ class CHIRPS(AbstractDataSource):
 
                 ```
         """
+        if aggregate is not None:
+            raise NotImplementedError(
+                "aggregate= is not supported for the CHIRPS backend. It "
+                "writes per-date GeoTIFFs and has no aggregator wiring "
+                "(unlike the NetCDF-emitting ECMWF backend); reduce the "
+                "downloaded rasters yourself."
+            )
         succeeded: list[tuple[str, str]] = []
         failed: list[tuple[tuple[str, str], BaseException]] = []
+        out_paths: list[Path] = []
 
         for ds_key, var_names in self.vars.items():
-            dataset = self.catalog.datasets[ds_key]
+            dataset = self._catalog.datasets[ds_key]
             for var_name in var_names:
                 var = dataset.variables[var_name]
                 logger.info(
@@ -402,12 +427,14 @@ class CHIRPS(AbstractDataSource):
                     f"{self.time.end_date.date()}"
                 )
                 try:
-                    self._download_dataset(
-                        ds_key,
-                        dataset,
-                        var,
-                        progress_bar=progress_bar,
-                        cores=cores,
+                    out_paths.extend(
+                        self._download_dataset(
+                            ds_key,
+                            dataset,
+                            var,
+                            progress_bar=progress_bar,
+                            cores=cores,
+                        )
                     )
                 except Exception as exc:  # noqa: BLE001 - log + continue so one bad variable doesn't kill the batch
                     logger.error(
@@ -433,6 +460,8 @@ class CHIRPS(AbstractDataSource):
                 f"succeeded ({succeeded})"
             )
 
+        return out_paths
+
     def _download_dataset(
         self,
         ds_key: str,
@@ -440,19 +469,23 @@ class CHIRPS(AbstractDataSource):
         var: Variable,
         progress_bar: bool = True,
         cores: int | None = None,
-    ) -> None:
+    ) -> list[Path]:
         """Iterate the per-dataset date range and dispatch :meth:`_api`.
 
         Branches on `dataset.is_discrete`: datasets that publish a fixed
         set of multi-year archive files (`discrete_files`, e.g. CenTrends)
         are routed through :meth:`_download_discrete`, which fetches each
         listed filename once instead of doing date substitution.
+
+        Returns:
+            list[Path]: The GeoTIFF paths written for this `(ds, var)`
+                (empty when the window does not overlap the dataset, or
+                every date was skipped / failed).
         """
         if dataset.is_discrete:
-            self._download_discrete(
+            return self._download_discrete(
                 ds_key, dataset, var, progress_bar=progress_bar
             )
-            return
 
         ds_start = pd.Timestamp(dataset.start_date)
         ds_end = pd.Timestamp(dataset.end_date) if dataset.end_date else None
@@ -469,7 +502,7 @@ class CHIRPS(AbstractDataSource):
                 f"window [{ds_start.date()}, "
                 f"{ds_end.date() if ds_end else 'now'}]; skipping"
             )
-            return
+            return []
 
         dates = pd.date_range(
             window_start, window_end, freq=dataset.pandas_freq
@@ -487,6 +520,7 @@ class CHIRPS(AbstractDataSource):
         # socket from one bad date doesn't poison the rest of the
         # batch. The parallel branch keeps a per-file login because
         # joblib workers can't share the unpicklable FTP socket.
+        paths: list[Path] = []
         if not cores:
             failed: list[tuple[pd.Timestamp, BaseException]] = []
             ftp_session = _open_ftp()
@@ -495,10 +529,15 @@ class CHIRPS(AbstractDataSource):
                     dates, desc=f"CHIRPS {ds_key}", disable=not progress_bar
                 ):
                     try:
-                        self._api(ds_key, dataset, var, date, ftp=ftp_session)
+                        path = self._api(
+                            ds_key, dataset, var, date, ftp=ftp_session
+                        )
                     except Exception as exc:  # noqa: BLE001 - log + continue per date
                         failed.append((date, exc))
                         ftp_session = _reopen_ftp(ftp_session)
+                    else:
+                        if path is not None:
+                            paths.append(path)
             finally:
                 _close_ftp_quietly(ftp_session)
         else:
@@ -506,7 +545,8 @@ class CHIRPS(AbstractDataSource):
                 delayed(self._api_or_capture)(ds_key, dataset, var, date)
                 for date in dates
             )
-            failed = [r for r in results if r is not None]
+            paths = [p for p, _exc in results if p is not None]
+            failed = [exc for _p, exc in results if exc is not None]
         if failed:
             sample = ", ".join(
                 f"{d.date()} ({type(exc).__name__})" for d, exc in failed[:3]
@@ -516,6 +556,7 @@ class CHIRPS(AbstractDataSource):
                 f"{ds_key}/{var.name}: {len(failed)}/{len(dates)} dates "
                 f"failed; first 3: {sample}{tail}"
             )
+        return paths
 
     def _api_or_capture(
         self,
@@ -523,20 +564,21 @@ class CHIRPS(AbstractDataSource):
         dataset: ChcDataset,
         var: Variable,
         date: pd.Timestamp,
-    ) -> tuple[pd.Timestamp, BaseException] | None:
-        """Run `_api` and return the exception instead of raising (M1 helper).
+    ) -> tuple[Path | None, tuple[pd.Timestamp, BaseException] | None]:
+        """Run `_api`, capturing the path or the exception (M1 helper).
 
         Used by the joblib-parallel branch of `_download_dataset` so a
         single bad date doesn't take down the rest of the batch.
-        Returns `None` on success, `(date, exc)` on failure. The
+        Returns `(path, None)` on success (`path` is `None` when the
+        date was skipped) and `(None, (date, exc))` on failure. The
         sequential branch handles its own try/except inline and does
         not call this.
         """
         try:
-            self._api(ds_key, dataset, var, date)
-            return None
+            path = self._api(ds_key, dataset, var, date)
+            return (path, None)
         except Exception as exc:  # noqa: BLE001 - log + continue per date
-            return (date, exc)
+            return (None, (date, exc))
 
     def _download_discrete(
         self,
@@ -544,7 +586,7 @@ class CHIRPS(AbstractDataSource):
         dataset: ChcDataset,
         var: Variable,
         progress_bar: bool = True,
-    ) -> None:
+    ) -> list[Path]:
         """Fetch each entry in `dataset.discrete_files` once.
 
         For datasets that publish a fixed set of archive files
@@ -576,6 +618,7 @@ class CHIRPS(AbstractDataSource):
         # L5: one shared anonymous-login round-trip across the whole
         # discrete-files batch. CHPclim v2 in particular is 12 files
         # served from the same dir; pre-L5 that meant 12 logins.
+        paths: list[Path] = []
         ftp_session = _open_ftp()
         try:
             for filename in iterable:
@@ -583,8 +626,10 @@ class CHIRPS(AbstractDataSource):
                 self._fetch_ftp(ftp_base, filename, local_path, ftp=ftp_session)
                 if is_2d_raster:
                     self._clip_raster_in_place(local_path)
+                paths.append(local_path)
         finally:
             _close_ftp_quietly(ftp_session)
+        return paths
 
     def _clip_raster_in_place(self, path: Path) -> None:
         """Read a 2-D raster at `path`, clip to `self.space`, write back.

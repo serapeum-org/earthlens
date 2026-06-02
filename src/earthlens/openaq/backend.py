@@ -36,7 +36,6 @@ from typing import TYPE_CHECKING, Any, Literal
 
 import pandas as pd
 from loguru import logger
-from tqdm import tqdm
 
 from earthlens.base import (
     AbstractDataSource,
@@ -526,16 +525,9 @@ class OpenAQ(AbstractDataSource):
             list[pd.DataFrame]: One frame per product (same order as
                 `_search`), or `[]` when nothing matched.
         """
-        products = self._search()
-        if not products:
-            return []
-        iterator = tqdm(
-            products,
-            disable=not progress_bar,
-            desc="OpenAQ sensors",
-            unit="sensor",
+        return self._search_fetch_each(
+            progress_bar=progress_bar, desc="OpenAQ sensors", unit="sensor"
         )
-        return [self._fetch_one(product) for product in iterator]
 
 
 def _empty_frame() -> pd.DataFrame:

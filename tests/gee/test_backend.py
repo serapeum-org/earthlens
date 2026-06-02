@@ -1078,3 +1078,8 @@ class TestDownloadEndToEnd:
         """A request window outside a dataset's extent yields no files."""
         gee = make_gee(start="2020-01-01", end="2020-01-02")
         assert gee.download(progress_bar=False) == []
+
+
+def test_gee_declares_raster_output_kind():
+    """GEE declares OUTPUT_KIND='raster' so the facade forwards aggregate=."""
+    assert GEE.OUTPUT_KIND == "raster"

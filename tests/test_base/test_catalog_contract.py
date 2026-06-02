@@ -26,6 +26,7 @@ CATALOG_BACKENDS = [
     ("earthlens.firms.catalog", "Catalog"),
     ("earthlens.gdacs.catalog", "Catalog"),
     ("earthlens.gee.catalog", "Catalog"),
+    ("earthlens.ghsl.catalog", "Catalog"),
     ("earthlens.nwp.catalog", "Catalog"),
     ("earthlens.openaq.catalog", "Catalog"),
     ("earthlens.openeo.catalog", "Catalog"),
@@ -118,6 +119,7 @@ NO_RESOLVE_BACKENDS = [
 ]
 #: Backends that override resolve() (signatures vary by backend need).
 RESOLVE_BACKENDS = [
+    "earthlens.ghsl.catalog",
     "earthlens.nwp.catalog",
     "earthlens.usgs_water.catalog",
     "earthlens.stac.catalog",

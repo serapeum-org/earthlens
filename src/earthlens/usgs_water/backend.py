@@ -352,7 +352,10 @@ class USGSWater(AbstractDataSource):
         """Fetch the selected service, write the table, and return it.
 
         Args:
-            progress_bar: Show a progress bar over the fetch.
+            progress_bar: Accepted for signature parity with the other
+                backends. USGS Water issues one bulk `dataretrieval`
+                call per service rather than a per-item loop, so there
+                is no progress bar to show — this is a no-op.
             aggregate: Must be `None`. USGS Water output is tabular, so
                 there is no gridded reduction; the facade already
                 rejects a non-`None` `aggregate=` for a `tabular`

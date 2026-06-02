@@ -23,11 +23,12 @@ the assembled volumes (via `pyart`) is a downstream follow-on.
 from __future__ import annotations
 
 from earthlens.radar.backend import BUCKET, Radar
-from earthlens.radar.catalog import CATALOG_PATH, Station, StationCatalog
+from earthlens.radar.catalog import CATALOG_PATH, Catalog, Station, StationCatalog
 
 __all__ = [
     "BUCKET",
     "CATALOG_PATH",
+    "Catalog",
     "Radar",
     "Station",
     "StationCatalog",

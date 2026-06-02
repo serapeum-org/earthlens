@@ -79,7 +79,11 @@ class TestRegistry:
             "firms",
             "gdacs",
             "gee",
+            "ghs",
+            "ghsl",
             "google-earth-engine",
+            "hdx",
+            "human-settlement",
             "nexrad",
             "nwis",
             "nwp",
@@ -94,6 +98,8 @@ class TestRegistry:
             "tropycal",
             "usgs-nwis",
             "usgs-water",
+            "world-pop",
+            "worldpop",
         ]
 
     def test_keys_resolve_to_gee_class(self):

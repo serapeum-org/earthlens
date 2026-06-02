@@ -137,9 +137,11 @@ class EarthLens:
             >>> sorted(EarthLens.DataSources)  # doctest: +NORMALIZE_WHITESPACE
             ['amazon-s3', 'cdse', 'chc', 'chirps', 'cmems', 'earth-search',
              'earthdata', 'ecmwf', 'eumetsat', 'fdsn', 'firms', 'gdacs', 'gee',
-             'google-earth-engine', 'nexrad', 'nwis', 'nwp', 'openaq', 'openeo',
-             'overture', 'planetary-computer', 'radar', 'sentinel-hub',
-             'sentinelhub', 'stac', 'tropycal', 'usgs-nwis', 'usgs-water']
+             'ghs', 'ghsl', 'google-earth-engine', 'hdx', 'human-settlement',
+             'nexrad', 'nwis', 'nwp', 'openaq', 'openeo', 'overture',
+             'planetary-computer', 'radar', 'sentinel-hub', 'sentinelhub',
+             'stac', 'tropycal', 'usgs-nwis', 'usgs-water', 'world-pop',
+             'worldpop']
 
             ```
         - Asking for an unknown backend raises `ValueError`:
@@ -155,10 +157,12 @@ class EarthLens:
 
     See Also:
         :class:`earthlens.chc.CHIRPS`: CHIRPS rainfall over FTP.
-        :class:`earthlens.s3.S3`: ERA5 on AWS public S3 bucket.
+        :class:`earthlens.s3.S3`: AWS Open-Data datasets over public S3
+            (ERA5, Sentinel-2, GOES, Copernicus DEM, ESA WorldCover) +
+            an arbitrary-bucket passthrough.
         :class:`earthlens.cmems.CMEMS`: Copernicus Marine ocean
             datasets via `copernicusmarine`.
-        :class:`earthlens.earthdata.EarthData`: NASA EOSDIS granules
+        :class:`earthlens.earthdata.Earthdata`: NASA EOSDIS granules
             across 9 DAACs via `earthaccess` + CMR; the first backend
             whose `OUTPUT_KIND` is per-dataset (raster / vector /
             tabular), not fixed.
@@ -189,6 +193,10 @@ class EarthLens:
         :class:`earthlens.firms.FIRMS`: NASA FIRMS active-fire
             detections (MODIS / VIIRS) as a `vector` FeatureCollection;
             free `MAP_KEY`, no extra; key `"firms"`.
+        :class:`earthlens.hdx.HDX`: Humanitarian Data Exchange resources
+            via CKAN (`hdx-python-api`); the first `mixed`-output
+            backend (downloads CSV / GeoTIFF / GeoPackage / … files
+            as-is); public, no credentials; key `"hdx"`.
         :class:`earthlens.overture.Overture`: Overture Maps Foundation
             GeoParquet (buildings / places / transportation / divisions)
             over public S3 via `overturemaps`; `vector` FeatureCollection
@@ -206,6 +214,18 @@ class EarthLens:
             water quality, …) via `dataretrieval` as a `tabular`
             `DataFrame`; optional `API_USGS_PAT`, anonymous works; keys
             `"usgs-water"` / `"usgs-nwis"` / `"nwis"`.
+        :class:`earthlens.ghsl.GHSL`: JRC Global Human Settlement Layer
+            (population / built-up / settlement-model grids + R2025A WUP
+            projections) over open HTTPS, reprojected / mosaicked / cropped
+            to the AOI via `pyramids` as `raster` GeoTIFFs (one per
+            product × epoch; `aggregate=` reduces across epochs); no
+            credentials; keys `"ghsl"` / `"ghs"` / `"human-settlement"`.
+        :class:`earthlens.worldpop.WorldPop`: WorldPop open population data
+            hub (CC-BY-4.0, no credentials) — per-country / global gridded
+            population, density, age/sex, births, projections; mosaic +
+            crop to the AOI via `pyramids` with a tidy age/sex table for
+            demographic products; `mixed` output; keys `"worldpop"` /
+            `"world-pop"`.
 
     """
 
@@ -219,7 +239,7 @@ class EarthLens:
             "chirps": ("earthlens.chc", "CHIRPS", "", {}),
             "amazon-s3": ("earthlens.s3", "S3", "s3", {}),
             "cmems": ("earthlens.cmems", "CMEMS", "cmems", {}),
-            "earthdata": ("earthlens.earthdata", "EarthData", "earthdata", {}),
+            "earthdata": ("earthlens.earthdata", "Earthdata", "earthdata", {}),
             "ecmwf": ("earthlens.ecmwf", "ECMWF", "ecmwf", {}),
             "eumetsat": ("earthlens.eumetsat", "EUMETSAT", "eumetsat", {}),
             "fdsn": ("earthlens.fdsn", "FDSN", "fdsn", {}),
@@ -227,6 +247,7 @@ class EarthLens:
             "google-earth-engine": ("earthlens.gee", "GEE", "gee", {}),
             # GDACS is a public feed (requests only), so no extra to hint.
             "gdacs": ("earthlens.gdacs", "GDACS", "", {}),
+            "hdx": ("earthlens.hdx", "HDX", "hdx", {}),
             "openaq": ("earthlens.openaq", "OpenAQ", "openaq", {}),
             # openEO server-side processing (defaults to CDSE openEO). Builds a
             # process graph the backend executes; returns the written paths.
@@ -251,6 +272,13 @@ class EarthLens:
             # Overture Maps GeoParquet over public S3 (no creds). Vector
             # FeatureCollection output with a per-row license_id column.
             "overture": ("earthlens.overture", "Overture", "overture", {}),
+            # JRC Global Human Settlement Layer (open HTTPS, attribution-only).
+            # Download-and-localise raster: tiles/whole-globe .zip -> pyramids
+            # reproject/mosaic/crop. No extra SDK (requests + pyramids are core),
+            # so no extra to hint. Aliases "ghs" / "human-settlement".
+            "ghsl": ("earthlens.ghsl", "GHSL", "", {}),
+            "ghs": ("earthlens.ghsl", "GHSL", "", {}),
+            "human-settlement": ("earthlens.ghsl", "GHSL", "", {}),
             "tropycal": ("earthlens.tropycal", "TropicalCyclone", "tropycal", {}),
             # FIRMS needs a free MAP_KEY but no SDK (requests + pandas
             # are core), so like GDACS there is no extra to hint.
@@ -285,6 +313,12 @@ class EarthLens:
             "usgs-water": ("earthlens.usgs_water", "USGSWater", "usgs-water", {}),
             "usgs-nwis": ("earthlens.usgs_water", "USGSWater", "usgs-water", {}),
             "nwis": ("earthlens.usgs_water", "USGSWater", "usgs-water", {}),
+            # WorldPop open population data hub (CC-BY-4.0, no creds). Mosaic +
+            # crop per-country GeoTIFFs to the AOI; demographic products also
+            # emit a tidy age/sex table. `OUTPUT_KIND="mixed"`. Alias
+            # "world-pop". The default REST path needs no extra SDK.
+            "worldpop": ("earthlens.worldpop", "WorldPop", "worldpop", {}),
+            "world-pop": ("earthlens.worldpop", "WorldPop", "worldpop", {}),
         }
     )
 
@@ -308,15 +342,38 @@ class EarthLens:
         instantiates the concrete backend bound to `self.datasource`.
 
         Args:
-            data_source: Backend key — one of `"chc"` (alias
-                `"chirps"`), `"amazon-s3"`, `"cmems"`, `"ecmwf"`,
-                `"fdsn"`, `"gdacs"`, `"gee"` (alias
-                `"google-earth-engine"`), or `"openaq"`. Defaults to
-                `"chc"`.
+            data_source: Backend key. One of the registered keys in
+                :attr:`DataSources` — `"chc"` (alias `"chirps"`),
+                `"amazon-s3"`, `"cmems"`, `"earthdata"`, `"ecmwf"`,
+                `"eumetsat"`, `"fdsn"`, `"firms"`, `"gdacs"`, `"gee"`
+                (alias `"google-earth-engine"`), `"ghsl"` (aliases
+                `"ghs"` / `"human-settlement"`), `"hdx"`, `"nwp"`,
+                `"openaq"`, `"openeo"`, `"overture"`, `"radar"` (alias
+                `"nexrad"`), `"sentinel-hub"` (alias `"sentinelhub"`),
+                `"stac"` (with endpoint aliases `"planetary-computer"` /
+                `"earth-search"` / `"cdse"`), `"tropycal"`,
+                `"usgs-water"` (aliases `"usgs-nwis"` / `"nwis"`), or
+                `"worldpop"` (alias `"world-pop"`). See
+                `sorted(EarthLens.DataSources)` for the live list.
+                Defaults to `"chc"`.
             temporal_resolution: `"daily"` or `"monthly"` for most
                 backends; the GEE backend also accepts `"raw"` and
                 `"yearly"`. The concrete backend may accept a narrower
-                set; check its `temporal_resolution` handling.
+                set; check its `temporal_resolution` handling. Note the
+                meaning is backend-specific:
+
+                * a **download-loop cadence** that spaces the per-step
+                  requests — CHIRPS, S3, ECMWF, GEE;
+                * an **advisory label** only — NWP (the real cadence
+                  comes from each model's metadata);
+                * a **server-side rollup selector** — OpenAQ (picks the
+                  measurements vs. hourly/daily endpoint);
+                * a **service selector** — USGS Water (sub-daily maps to
+                  the instantaneous service);
+                * **ignored / forced to `"all"`** for the snapshot
+                  backends with no per-step time axis — Overture,
+                  Tropycal, FDSN, FIRMS, GDACS, Radar.
+
                 Defaults to `"daily"`.
             start: Inclusive start date as a string (parsed with
                 `fmt`). Defaults to `None`.
@@ -487,10 +544,19 @@ class EarthLens:
             **kwargs: Forwarded as keywords to `backend.download`.
 
         Returns:
-            Whatever the bound backend's `download` returns: `None` for
-            CHIRPS / S3 / ECMWF (they write files to `path` as a side
-            effect), or the list of written GeoTIFF paths / export
-            destination strings for the GEE backend.
+            Whatever the bound backend's `download` returns. The shape
+            tracks the backend's `OUTPUT_KIND`:
+
+            * `"raster"` / `"mixed"` file-writers — the list of written
+              paths (`list[Path]`); GEE may also return export
+              destination strings / `TaskInfo` for async exports.
+            * `"vector"` — an in-memory `FeatureCollection` (e.g. FDSN,
+              FIRMS, GDACS); radar returns a `GeoDataFrame`.
+            * `"tabular"` — a `pandas.DataFrame` (e.g. OpenAQ,
+              USGS Water).
+
+            The legacy CHIRPS / ECMWF backends return their written
+            `list[Path]` and also leave the files on disk under `path`.
 
         Raises:
             AuthenticationError: When the ECMWF backend cannot

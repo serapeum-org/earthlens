@@ -1,0 +1,282 @@
+# AWS Open-Data S3 dataset registry for `earthlens.s3`.
+#
+# One curated block per registered public-S3 dataset. The backend selects a
+# dataset with `dataset="<name>"` (or an inline spec dict for the passthrough)
+# and answers a uniform request (`variables=[...]`, bbox, dates) by resolving,
+# per dataset, onto its bucket + key layout + format + CRS. Every per-provider
+# difference lives here so all datasets share one call shape.
+#
+# Layout families (consumed by `layouts.py`):
+#   prefix_listing      - compute an S3 prefix, list it, match variable tokens
+#                         (era5, sentinel-2-l2a, goes)
+#   deterministic_tiles - compute lat/lon tile names from the bbox, no listing
+#                         (copernicus-dem, esa-worldcover)
+#
+# Verified unsigned-accessible 2026-05-29. era5-pds (Planet OS) is DEAD (403);
+# ERA5 is served from nsf-ncar-era5. usgs-landsat / naip are requester-pays
+# (out of the first cut).
+
+datasets:
+  era5:
+    description: >-
+      ECMWF ERA5 global reanalysis on NSF NCAR's public mirror
+      (nsf-ncar-era5), hourly data in monthly NetCDF granules, 1940-present,
+      0.25deg WGS84. Replaces the deprecated era5-pds bucket.
+    bucket: nsf-ncar-era5
+    format: netcdf
+    crs: 4326
+    layout: prefix_listing
+    temporal: temporal
+    cadence: monthly
+    lon_convention: "0-360"
+    params:
+      builder: era5
+      # ERA5 NCAR key: {stream}/{YYYYMM}/e5.{stream}.{token}.ll025sc.{dates}.nc
+      default_stream: e5.oper.an.sfc
+    default_variables: [t2m]
+    variables:
+      t2m:
+        aliases: [2t, 2m_temperature, air_temperature_at_2_metres]
+        native: 128_167_2t
+        nc_variable: VAR_2T
+        stream: e5.oper.an.sfc
+        units: K
+        description: 2 metre temperature.
+      d2m:
+        aliases: [2d, 2m_dewpoint_temperature]
+        native: 128_168_2d
+        nc_variable: VAR_2D
+        stream: e5.oper.an.sfc
+        units: K
+        description: 2 metre dewpoint temperature.
+      sp:
+        aliases: [surface_pressure]
+        native: 128_134_sp
+        nc_variable: VAR_SP
+        stream: e5.oper.an.sfc
+        units: Pa
+        description: Surface pressure.
+      msl:
+        aliases: [mean_sea_level_pressure, air_pressure_at_mean_sea_level]
+        native: 128_151_msl
+        nc_variable: VAR_MSL
+        stream: e5.oper.an.sfc
+        units: Pa
+        description: Mean sea level pressure.
+      u10:
+        aliases: [10u, 10m_u_component_of_wind, eastward_wind_at_10_metres]
+        native: 128_165_10u
+        nc_variable: VAR_10U
+        stream: e5.oper.an.sfc
+        units: m s-1
+        description: 10 metre U wind component.
+      v10:
+        aliases: [10v, 10m_v_component_of_wind, northward_wind_at_10_metres]
+        native: 128_166_10v
+        nc_variable: VAR_10V
+        stream: e5.oper.an.sfc
+        units: m s-1
+        description: 10 metre V wind component.
+      sst:
+        aliases: [sea_surface_temperature]
+        native: 128_034_sstk
+        nc_variable: VAR_SSTK
+        stream: e5.oper.an.sfc
+        units: K
+        description: Sea surface temperature.
+      skt:
+        aliases: [skin_temperature]
+        native: 128_235_skt
+        nc_variable: VAR_SKT
+        stream: e5.oper.an.sfc
+        units: K
+        description: Skin temperature.
+      tcc:
+        aliases: [total_cloud_cover]
+        native: 128_164_tcc
+        nc_variable: VAR_TCC
+        stream: e5.oper.an.sfc
+        units: "(0-1)"
+        description: Total cloud cover.
+      sd:
+        aliases: [snow_depth]
+        native: 128_141_sd
+        nc_variable: VAR_SD
+        stream: e5.oper.an.sfc
+        units: m of water equivalent
+        description: Snow depth.
+
+  sentinel-2-l2a:
+    description: >-
+      Sentinel-2 Level-2A surface reflectance Cloud-Optimised GeoTIFFs
+      (Element84 Earth Search, sentinel-cogs), global, 2017-present. One COG
+      per band, organised by MGRS tile. Per-tile UTM CRS (reprojected to the
+      AOI on crop).
+    bucket: sentinel-cogs
+    format: cog
+    crs: null                       # per-UTM-zone; reprojected on crop
+    layout: prefix_listing
+    temporal: temporal
+    cadence: scene
+    params:
+      builder: sentinel2
+      collection_prefix: sentinel-s2-l2a-cogs
+    default_variables: [B04, B03, B02]
+    variables:
+      B01: {aliases: [coastal], native: B01, units: reflectance, description: Coastal aerosol (60 m).}
+      B02: {aliases: [blue], native: B02, units: reflectance, description: Blue (10 m).}
+      B03: {aliases: [green], native: B03, units: reflectance, description: Green (10 m).}
+      B04: {aliases: [red], native: B04, units: reflectance, description: Red (10 m).}
+      B05: {aliases: [rededge1], native: B05, units: reflectance, description: Red edge 1 (20 m).}
+      B06: {aliases: [rededge2], native: B06, units: reflectance, description: Red edge 2 (20 m).}
+      B07: {aliases: [rededge3], native: B07, units: reflectance, description: Red edge 3 (20 m).}
+      B08: {aliases: [nir], native: B08, units: reflectance, description: NIR (10 m).}
+      B8A: {aliases: [nir08, narrow_nir], native: B8A, units: reflectance, description: Narrow NIR (20 m).}
+      B09: {aliases: [water_vapour], native: B09, units: reflectance, description: Water vapour (60 m).}
+      B11: {aliases: [swir16], native: B11, units: reflectance, description: SWIR 1.6 um (20 m).}
+      B12: {aliases: [swir22], native: B12, units: reflectance, description: SWIR 2.2 um (20 m).}
+      SCL: {aliases: [scene_classification], native: SCL, units: class, description: Scene classification map (20 m).}
+
+  goes:
+    description: >-
+      NOAA GOES-16/18 ABI imagery (noaa-goes16 / noaa-goes18), NetCDF, the
+      Americas, near-real-time. Default product ABI-L2-CMIPF (cloud & moisture
+      imagery, full disk). Geostationary projection (reprojected to the AOI on
+      crop).
+    bucket: noaa-goes16
+    format: netcdf
+    crs: null                       # geostationary; reprojected on crop
+    layout: prefix_listing
+    temporal: temporal
+    cadence: scene
+    params:
+      builder: goes
+      default_product: ABI-L2-CMIPF
+      satellites: {goes16: noaa-goes16, goes18: noaa-goes18}
+    default_variables: [C02]
+    variables:
+      C01: {aliases: [blue], native: C01, nc_variable: CMI, units: reflectance, description: "ABI channel 1, 0.47 um (blue)."}
+      C02: {aliases: [red], native: C02, nc_variable: CMI, units: reflectance, description: "ABI channel 2, 0.64 um (red)."}
+      C03: {aliases: [veggie], native: C03, nc_variable: CMI, units: reflectance, description: "ABI channel 3, 0.86 um (veggie/NIR)."}
+      C07: {aliases: [shortwave_window], native: C07, nc_variable: CMI, units: K, description: "ABI channel 7, 3.9 um."}
+      C08: {aliases: [upper_water_vapour], native: C08, nc_variable: CMI, units: K, description: "ABI channel 8, 6.2 um."}
+      C09: {aliases: [mid_water_vapour], native: C09, nc_variable: CMI, units: K, description: "ABI channel 9, 6.9 um."}
+      C10: {aliases: [lower_water_vapour], native: C10, nc_variable: CMI, units: K, description: "ABI channel 10, 7.3 um."}
+      C13: {aliases: [clean_longwave_window], native: C13, nc_variable: CMI, units: K, description: "ABI channel 13, 10.3 um."}
+      C14: {aliases: [longwave_window], native: C14, nc_variable: CMI, units: K, description: "ABI channel 14, 11.2 um."}
+
+  copernicus-dem:
+    description: >-
+      Copernicus GLO-30 global digital elevation model (copernicus-dem-30m),
+      Cloud-Optimised GeoTIFFs on a 1-degree lat/lon tile grid, WGS84. Static
+      (no time axis). The 90 m product (copernicus-dem-90m) is selectable.
+    bucket: copernicus-dem-30m
+    format: cog
+    crs: 4326
+    layout: deterministic_tiles
+    temporal: static
+    cadence: static
+    params:
+      builder: copernicus_dem
+      tile_degrees: 1
+      resolution_token: "10"        # _COG_10_ (30 m); 90 m uses copernicus-dem-90m
+      resolutions: {30m: copernicus-dem-30m, 90m: copernicus-dem-90m}
+    default_variables: [elevation]
+    variables:
+      elevation:
+        aliases: [dem, dsm, height]
+        native: DEM
+        units: m
+        description: Ellipsoidal height (GLO-30 DSM).
+
+  esa-worldcover:
+    description: >-
+      ESA WorldCover 10 m global land-cover Cloud-Optimised GeoTIFFs
+      (esa-worldcover), 3-degree tile grid, WGS84. Static; two epochs -
+      2020 (v100) and 2021 (v200). Single-band categorical map.
+    bucket: esa-worldcover
+    format: cog
+    crs: 4326
+    layout: deterministic_tiles
+    temporal: static
+    cadence: static
+    params:
+      builder: esa_worldcover
+      tile_degrees: 3
+      default_epoch: "2021"
+      epochs: {"2020": v100, "2021": v200}
+    default_variables: [map]
+    variables:
+      map:
+        aliases: [landcover, land_cover, lc]
+        native: Map
+        units: class
+        description: 11-class land-cover map (ESA WorldCover legend).
+
+  usgs-landsat:
+    description: >-
+      USGS Landsat Collection-2 Level-2 surface-reflectance / surface-temperature
+      COGs (usgs-landsat, us-west-2). REQUESTER-PAYS: needs valid AWS credentials
+      and bills the caller. Addressed by an explicit Collection-2 scene id
+      (scene=, e.g. LC08_L2SP_039037_20210901_20210910_02_T1) - bbox->WRS-2
+      path/row discovery is out of scope (use the STAC backend). Per-scene UTM
+      CRS (reprojected to the AOI on crop).
+    bucket: usgs-landsat
+    region: us-west-2
+    requester_pays: true
+    format: cog
+    crs: null
+    layout: prefix_listing
+    temporal: temporal
+    cadence: scene
+    params:
+      builder: landsat
+    default_variables: [SR_B4, SR_B3, SR_B2]
+    variables:
+      SR_B1: {aliases: [coastal], native: SR_B1, units: reflectance, description: Coastal/aerosol surface reflectance.}
+      SR_B2: {aliases: [blue], native: SR_B2, units: reflectance, description: Blue surface reflectance.}
+      SR_B3: {aliases: [green], native: SR_B3, units: reflectance, description: Green surface reflectance.}
+      SR_B4: {aliases: [red], native: SR_B4, units: reflectance, description: Red surface reflectance.}
+      SR_B5: {aliases: [nir, nir08], native: SR_B5, units: reflectance, description: NIR surface reflectance.}
+      SR_B6: {aliases: [swir16], native: SR_B6, units: reflectance, description: SWIR 1.6 um surface reflectance.}
+      SR_B7: {aliases: [swir22], native: SR_B7, units: reflectance, description: SWIR 2.2 um surface reflectance.}
+      ST_B10: {aliases: [lst, surface_temperature], native: ST_B10, units: K, description: Surface temperature (thermal).}
+      QA_PIXEL: {aliases: [qa, pixel_qa], native: QA_PIXEL, units: bitmask, description: Pixel quality assessment bitmask.}
+
+  naip-source:
+    description: >-
+      USDA NAIP aerial imagery 4-band (RGB+NIR) COGs (naip-source, us-east-1),
+      US only. REQUESTER-PAYS: needs valid AWS credentials and bills the caller.
+      Addressed by an explicit quad-object path (tile=, e.g.
+      al/2021/100cm/rgbir_cog/30086/m_3008601_ne_16_060_20211004) - bbox->USGS
+      quarter-quad discovery is out of scope. Per-quad UTM CRS (reprojected on
+      crop).
+    bucket: naip-source
+    region: us-east-1
+    requester_pays: true
+    format: cog
+    crs: null
+    layout: prefix_listing
+    temporal: temporal
+    cadence: quad
+    params:
+      builder: generic_template
+      key_template: "{tile}.tif"
+    default_variables: [rgbir]
+    variables:
+      rgbir:
+        aliases: [naip, rgb_nir]
+        native: rgbir
+        units: reflectance
+        description: 4-band NAIP COG (red, green, blue, NIR).
+
+# Informational index of every bucket the registry can reach (curated +
+# requester-pays + passthrough hint). Rebuilt by tools/s3/refresh_s3_catalog.py.
+available_datasets:
+  - era5
+  - sentinel-2-l2a
+  - goes
+  - copernicus-dem
+  - esa-worldcover
+  - usgs-landsat
+  - naip-source

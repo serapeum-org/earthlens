@@ -1,0 +1,38 @@
+# Curated HDX datasets — forced displacement & refugees (UNHCR). Tabular
+# CSV / XLS / XLSX statistics tables.
+datasets:
+  unhcr-refugee-monthly-arrivals:
+    hdx_id: unhcr-refugee-monthly-arrivals-by-country
+    org: unhcr
+    title: "UNHCR Refugee Monthly Arrivals by Country"
+    themes: [displacement, refugees]
+    formats: [CSV, XLSX]
+    resource_filter: CSV
+    output_kinds: [tabular]
+
+  unhcr-statistical-yearbooks:
+    hdx_id: unhcr-statistical-yearbooks
+    org: unhcr
+    title: "UNHCR Statistical Yearbooks"
+    themes: [displacement, refugees]
+    formats: [XLS]
+    resource_filter: ""
+    output_kinds: [tabular]
+
+  unhcr-refugees-from-yemen:
+    hdx_id: number-of-refugees-from-yemen
+    org: unhcr
+    title: "Number of Refugees from Yemen"
+    themes: [displacement, refugees]
+    formats: [CSV]
+    resource_filter: CSV
+    output_kinds: [tabular]
+
+  unhcr-refugees-from-colombia:
+    hdx_id: number-of-refugees-from-colombia
+    org: unhcr
+    title: "Number of Refugees from Colombia"
+    themes: [displacement, refugees]
+    formats: [CSV]
+    resource_filter: CSV
+    output_kinds: [tabular]

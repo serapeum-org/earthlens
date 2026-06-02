@@ -91,22 +91,20 @@ class TestPerDateResilience:
         assert "1/5 dates" in joined, joined
         assert "RuntimeError" in joined, joined
 
-    def test_api_or_capture_returns_none_on_success(self, tmp_path: Path):
-        """`_api_or_capture` returns `None` when `_api` doesn't raise."""
+    def test_api_or_capture_returns_path_on_success(self, tmp_path: Path):
+        """`_api_or_capture` returns `(path, None)` when `_api` succeeds."""
         chirps = _build_chirps(tmp_path)
-        # Stub `_api` to be a no-op.
-        chirps._api = lambda *a, **kw: None  # type: ignore[assignment]
+        written = tmp_path / "out.tif"
+        chirps._api = lambda *a, **kw: written  # type: ignore[assignment]
         ds = chirps.catalog.datasets["global-daily"]
         var = ds.variables["precipitation"]
         result = chirps._api_or_capture(
             "global-daily", ds, var, pd.Timestamp("2020-01-01")
         )
-        assert result is None
+        assert result == (written, None)
 
-    def test_api_or_capture_returns_date_and_exception_on_failure(
-        self, tmp_path: Path
-    ):
-        """`_api_or_capture` returns `(date, exc)` when `_api` raises."""
+    def test_api_or_capture_returns_error_on_failure(self, tmp_path: Path):
+        """`_api_or_capture` returns `(None, (date, exc))` when `_api` raises."""
         chirps = _build_chirps(tmp_path)
 
         def _boom(*a, **kw):
@@ -116,9 +114,9 @@ class TestPerDateResilience:
         ds = chirps.catalog.datasets["global-daily"]
         var = ds.variables["precipitation"]
         date = pd.Timestamp("2020-01-01")
-        result = chirps._api_or_capture("global-daily", ds, var, date)
-        assert result is not None
-        captured_date, captured_exc = result
+        path, err = chirps._api_or_capture("global-daily", ds, var, date)
+        assert path is None
+        captured_date, captured_exc = err
         assert captured_date == date
         assert isinstance(captured_exc, RuntimeError)
         assert "synthetic" in str(captured_exc)

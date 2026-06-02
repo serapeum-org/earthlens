@@ -342,9 +342,16 @@ class AbstractDataSource(ABC):
             `aggregate_netcdf` flow); `"vector"` and `"tabular"`
             reject it with :class:`NotImplementedError`; `"mixed"`
             forwards it unchanged. Subclasses override the class
-            attribute; the default is `"raster"` so the four
-            backends shipped before C1 (CHIRPS, S3, ECMWF, GEE) all
-            keep their existing behaviour with no source change.
+            attribute; the default is `"raster"`.
+
+            Most backends fix `OUTPUT_KIND` as a class attribute. A few
+            backends whose output shape is only known once the requested
+            dataset(s) are resolved set it **per instance** in
+            `__init__` instead — a sanctioned override: earthdata and
+            eumetsat copy the resolved dataset's `output_kind` onto
+            `self.OUTPUT_KIND`, and tropycal sets `"tabular"` for its
+            `ships` product (else `"vector"`). The facade reads the
+            instance attribute, so both forms work.
     """
 
     OUTPUT_KIND: OutputKind = "raster"
@@ -450,7 +457,27 @@ class AbstractDataSource(ABC):
 
     @abstractmethod
     def download(self):
-        """Wrapper over all the given variables."""
+        """Download every requested variable and return the produced artifacts.
+
+        The return shape tracks :attr:`OUTPUT_KIND`: `"raster"` /
+        `"mixed"` file-writing backends return the list of written
+        paths (`list[Path]`); `"vector"` backends return an in-memory
+        `FeatureCollection` (radar returns a `GeoDataFrame`);
+        `"tabular"` backends return a `pandas.DataFrame`. Every backend
+        now returns its produced artifacts (the legacy CHIRPS / ECMWF
+        backends return their written `list[Path]` and also leave the
+        files on disk under `self.root_dir`).
+
+        Partial-failure policy is per backend and currently varies:
+        most multi-item backends are **skip-and-continue** — a single
+        failed `(dataset, variable)` / chunk / sensor is logged and the
+        batch proceeds, with a success/failure summary at the end
+        (CHIRPS, CMEMS, FDSN, FIRMS, …) — while single-shot backends
+        propagate the error. NWP exposes this as an explicit
+        `errors="warn" | "raise" | "ignore"` argument; new backends
+        with a per-item loop should follow that `errors=` convention so
+        the policy becomes uniformly caller-controllable.
+        """
         # loop over dates if the downloaded rasters/netcdf are for a specific date out of the required
         # list of dates
         pass
@@ -520,14 +547,14 @@ class AbstractDataSource(ABC):
             f"_search and _fetch (post-C3)."
         )
 
-    def _fetch(self, products: list[RemoteProduct]) -> list[Path]:
+    def _fetch(self, products: list[RemoteProduct]) -> list[Any]:
         """Download the bytes of every product `_search` returned.
 
         Default raises `NotImplementedError` (see `_search`).
         Backends that opt into the search/fetch split override this
         to iterate over `products` — either sequentially or via
         `joblib.Parallel` / `concurrent.futures` — and write each
-        one to disk.
+        one to disk (or build it in memory).
 
         Args:
             products: The list returned by `_search` (or a
@@ -535,9 +562,13 @@ class AbstractDataSource(ABC):
                 returns an empty list.
 
         Returns:
-            list[Path]: The local file paths written, in the same
-                order as `products`. Empty list when `products` is
-                empty (no-op fetch is legal).
+            list[Any]: One element per product, in `products` order.
+                The element type tracks :attr:`OUTPUT_KIND`: written
+                `Path`s for `"raster"` / `"mixed"`, `FeatureCollection`
+                fragments for `"vector"`, and `DataFrame` fragments for
+                `"tabular"` (these are concatenated by the backend's
+                `download`). Empty list when `products` is empty (no-op
+                fetch is legal).
 
         Raises:
             NotImplementedError: When the subclass keeps the legacy
@@ -549,7 +580,7 @@ class AbstractDataSource(ABC):
             f"_search and _fetch (post-C3)."
         )
 
-    def _api_via_search_fetch(self) -> list[Path]:
+    def _api_via_search_fetch(self) -> list[Any]:
         """Canonical `_api` body for backends using the C3 split.
 
         Backends that override `_search` and `_fetch` usually want
@@ -568,13 +599,70 @@ class AbstractDataSource(ABC):
         parallel and most return nothing.
 
         Returns:
-            list[Path]: Whatever `_fetch` returned. An empty list
+            list[Any]: Whatever `_fetch` returned (element type tracks
+                :attr:`OUTPUT_KIND` — see :meth:`_fetch`). An empty list
                 when `_search` returned no products.
         """
         products = self._search()
         if not products:
             return []
         return self._fetch(products)
+
+    def _fetch_one(self, product: RemoteProduct) -> Any:
+        """Fetch a single product — the per-product hook for `_search_fetch_each`.
+
+        Default raises `NotImplementedError`. Backends that want a
+        per-item progress bar override this (instead of, or alongside,
+        the whole-list `_fetch`) so `_search_fetch_each` can map it over
+        the `_search` results under a `tqdm` bar.
+
+        Raises:
+            NotImplementedError: When the backend does not opt into the
+                per-product fetch hook.
+        """
+        raise NotImplementedError(
+            f"{type(self).__name__} does not implement _fetch_one."
+        )
+
+    def _search_fetch_each(
+        self,
+        *,
+        progress_bar: bool = False,
+        desc: str | None = None,
+        unit: str = "item",
+    ) -> list[Any]:
+        """C3 composition with an optional per-product `tqdm` progress bar.
+
+        Like :meth:`_api_via_search_fetch`, but maps the per-product
+        :meth:`_fetch_one` hook over the `_search` results so a `tqdm`
+        bar can show per-item progress — the shared form of the
+        progress-aware composition several backends (FIRMS, OpenAQ)
+        previously duplicated. Backends that fetch the whole product
+        list at once, or need bespoke progress / partial-failure
+        handling (e.g. CMEMS), keep their own composition.
+
+        Args:
+            progress_bar: Show the per-product `tqdm` bar when `True`.
+            desc: `tqdm` description; defaults to the class name.
+            unit: `tqdm` unit label.
+
+        Returns:
+            list[Any]: One :meth:`_fetch_one` result per product
+                (element type tracks :attr:`OUTPUT_KIND`), or `[]` when
+                `_search` matched nothing.
+        """
+        products = self._search()
+        if not products:
+            return []
+        from tqdm import tqdm
+
+        iterator = tqdm(
+            products,
+            disable=not progress_bar,
+            desc=desc or type(self).__name__,
+            unit=unit,
+        )
+        return [self._fetch_one(product) for product in iterator]
 
 
 class AbstractCatalog(BaseModel):

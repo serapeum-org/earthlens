@@ -114,7 +114,12 @@ nav:
       - Usage: reference/chc/usage.md
       - Catalog & Tooling: reference/chc/catalog.md
       - Reference: reference/chc/chc.md
-    - Amazon S3: reference/s3.md
+    - Amazon S3 (AWS Open Data):
+      - Introduction: reference/s3/introduction.md
+      - Authentication: reference/s3/authentication.md
+      - Usage: reference/s3/usage.md
+      - Available datasets: reference/s3/datasets.md
+      - Reference: reference/s3/reference.md
     - CMEMS (Copernicus Marine):
       - Introduction: reference/cmems/introduction.md
       - Usage: reference/cmems/usage.md
@@ -183,6 +188,11 @@ nav:
       - Usage: reference/firms/usage.md
       - Authentication: reference/firms/authentication.md
       - Reference: reference/firms/firms.md
+    - HDX (humanitarian data):
+      - Introduction: reference/hdx/introduction.md
+      - Usage: reference/hdx/usage.md
+      - Catalog & Tooling: reference/hdx/catalog.md
+      - Reference: reference/hdx/hdx.md
     - Overture Maps (vector basemap):
       - Introduction: reference/overture/introduction.md
       - Usage: reference/overture/usage.md
@@ -205,10 +215,28 @@ nav:
       - Authentication: reference/usgs-water/authentication.md
       - Available data: reference/usgs-water/datasets.md
       - Reference: reference/usgs-water/usgs_water.md
+    - GHSL (human settlement):
+      - Introduction: reference/ghsl/introduction.md
+      - Authentication: reference/ghsl/authentication.md
+      - Usage: reference/ghsl/usage.md
+      - Available datasets: reference/ghsl/products.md
+      - Projections & tiling: reference/ghsl/projections.md
+      - Reference: reference/ghsl/ghsl.md
+    - WorldPop (population):
+      - Introduction: reference/worldpop/introduction.md
+      - Usage: reference/worldpop/usage.md
+      - Available datasets: reference/worldpop/datasets.md
+      - WorldPopPy & no-xarray: reference/worldpop/worldpoppy.md
+      - Reference: reference/worldpop/worldpop.md
   - Examples:
     - Authentication: examples/authentication.md
     - Data Sources: examples/data-sources.md
     - Data Catalog: examples/catalog.md
+    - Amazon S3 (AWS Open Data):
+      - Catalog explorer (no network): examples/s3/01_catalog_explorer.ipynb
+      - Copernicus DEM — download & crop: examples/s3/02_copernicus_dem.ipynb
+      - ESA WorldCover — land cover: examples/s3/03_esa_worldcover.ipynb
+      - Passthrough — any public bucket: examples/s3/04_passthrough.ipynb
     - CDS / ECMWF:
       - Quickstart: examples/ecmwf/cds_quickstart.ipynb
       - Hydrology — water balance: examples/ecmwf/hydrology_water_balance.ipynb
@@ -304,6 +332,12 @@ nav:
       - Quickstart — recent fires: examples/firms/quickstart.ipynb
       - Fire-season time-series: examples/firms/fire_season_timeseries.ipynb
       - MODIS vs VIIRS comparison: examples/firms/modis_vs_viirs_comparison.ipynb
+    - Humanitarian data (HDX):
+      - Catalog explorer (no network): examples/hdx/catalog_explorer.ipynb
+      - WFP food-security table (live): examples/hdx/wfp_food_security_table.ipynb
+      - COD administrative boundaries (live): examples/hdx/cod_admin_boundaries.ipynb
+      - HOTOSM building export (live): examples/hdx/hotosm_building_export.ipynb
+      - Arbitrary HDX id (live): examples/hdx/arbitrary_hdx_id.ipynb
     - Overture Maps (vector basemap):
       - Catalog explorer (no network): examples/overture/01_catalog_explorer.ipynb
       - Places quickstart: examples/overture/02_places_quickstart.ipynb
@@ -323,6 +357,24 @@ nav:
       - Multi-parameter & instantaneous: examples/usgs-water/multi_parameter_and_instantaneous.ipynb
       - Site discovery & statistics: examples/usgs-water/site_discovery_and_statistics.ipynb
       - Annual peaks & rating curves: examples/usgs-water/peaks_and_ratings.ipynb
+    - GHSL (human settlement):
+      - Catalog explorer (no network): examples/ghsl/01_catalog_explorer.ipynb
+      - Population quickstart (live): examples/ghsl/02_population_quickstart.ipynb
+      - Built-up surface (live): examples/ghsl/03_builtup_surface.ipynb
+      - Built-up growth — aggregate (live): examples/ghsl/04_builtup_growth.ipynb
+      - Building height (live): examples/ghsl/05_building_height.ipynb
+      - Settlement classes — SMOD (whole-globe): examples/ghsl/06_settlement_classes.ipynb
+      - Population projection to 2100 — WUP: examples/ghsl/07_wup_projection.ipynb
+    - WorldPop (population):
+      - Catalog explorer (no network): examples/worldpop/01_catalog_explorer.ipynb
+      - Population quickstart: examples/worldpop/02_population_quickstart.ipynb
+      - Constrained vs unconstrained: examples/worldpop/03_constrained_vs_unconstrained.ipynb
+      - Age/sex population pyramid: examples/worldpop/04_age_sex_pyramid.ipynb
+      - Multi-country mosaic: examples/worldpop/05_multicountry_mosaic.ipynb
+      - Multi-year aggregate: examples/worldpop/06_multiyear_aggregate.ipynb
+      - Covariates — nightlights: examples/worldpop/07_covariates_nightlights.ipynb
+      - Dependency ratios (archive): examples/worldpop/08_dependency_ratios.ipynb
+      - Global mosaics (URL resolution): examples/worldpop/09_global_mosaic.ipynb
   - API Reference:
     - EarthLens Facade: reference/earthlens.md
     - AbstractDataSource: reference/abstract-datasource.md

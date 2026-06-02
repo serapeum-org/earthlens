@@ -1,0 +1,50 @@
+# GHSL curated catalog — settlement slice (GHS-SMOD, GHS-DUC).
+#
+# The settlement model (Degree of Urbanisation, categorical raster) and the
+# tabular Degree-of-Urbanisation classification of admin units.
+
+products:
+
+  GHS_SMOD:
+    aliases: [settlement_model, smod, degree_of_urbanisation, degurba]
+    unit: ""
+    categorical: true
+    default_resolution: "1km"
+    legend:
+      30: "Urban Centre"
+      23: "Dense Urban Cluster"
+      22: "Semi-dense Urban Cluster"
+      21: "Suburban / Peri-urban"
+      13: "Rural Cluster"
+      12: "Low Density Rural"
+      11: "Very Low Density Rural"
+      10: "Water"
+    colors:
+      30: "#FF0000"
+      23: "#732600"
+      22: "#A87000"
+      21: "#FFFF00"
+      13: "#375623"
+      12: "#7FA86E"
+      11: "#CDF57A"
+      10: "#73DFFF"
+    releases:
+      R2023A:
+        - epochs: [1975, 1980, 1985, 1990, 1995, 2000, 2005, 2010, 2015, 2020, 2025, 2030]
+          resolutions: ["1km", "30ss"]
+      R2022A:
+        # R2022A SMOD is 1 km / 54009 only (the 30ss WGS84 variant arrived in R2023A).
+        - epochs: [1975, 1980, 1985, 1990, 1995, 2000, 2005, 2010, 2015, 2020]
+          resolutions: ["1km"]
+
+  GHS_DUC:
+    aliases: [duc, degree_of_urbanisation_classification]
+    unit: ""
+    kind: tabular
+    default_resolution: "table"
+    releases:
+      R2023A:
+        - epochs: [1975, 1980, 1985, 1990, 1995, 2000, 2005, 2010, 2015, 2020, 2025, 2030]
+          resolutions: ["table"]
+      # R2022A DUC is an obsolete empty release (---OBSOLETE_RELEASE--- marker,
+      # no data zip) — not curated.
