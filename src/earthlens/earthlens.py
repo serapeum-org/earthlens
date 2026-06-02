@@ -162,7 +162,7 @@ class EarthLens:
             an arbitrary-bucket passthrough.
         :class:`earthlens.cmems.CMEMS`: Copernicus Marine ocean
             datasets via `copernicusmarine`.
-        :class:`earthlens.earthdata.EarthData`: NASA EOSDIS granules
+        :class:`earthlens.earthdata.Earthdata`: NASA EOSDIS granules
             across 9 DAACs via `earthaccess` + CMR; the first backend
             whose `OUTPUT_KIND` is per-dataset (raster / vector /
             tabular), not fixed.
@@ -239,7 +239,7 @@ class EarthLens:
             "chirps": ("earthlens.chc", "CHIRPS", "", {}),
             "amazon-s3": ("earthlens.s3", "S3", "s3", {}),
             "cmems": ("earthlens.cmems", "CMEMS", "cmems", {}),
-            "earthdata": ("earthlens.earthdata", "EarthData", "earthdata", {}),
+            "earthdata": ("earthlens.earthdata", "Earthdata", "earthdata", {}),
             "ecmwf": ("earthlens.ecmwf", "ECMWF", "ecmwf", {}),
             "eumetsat": ("earthlens.eumetsat", "EUMETSAT", "eumetsat", {}),
             "fdsn": ("earthlens.fdsn", "FDSN", "fdsn", {}),
@@ -342,15 +342,38 @@ class EarthLens:
         instantiates the concrete backend bound to `self.datasource`.
 
         Args:
-            data_source: Backend key — one of `"chc"` (alias
-                `"chirps"`), `"amazon-s3"`, `"cmems"`, `"ecmwf"`,
-                `"fdsn"`, `"gdacs"`, `"gee"` (alias
-                `"google-earth-engine"`), `"hdx"`, or `"openaq"`.
+            data_source: Backend key. One of the registered keys in
+                :attr:`DataSources` — `"chc"` (alias `"chirps"`),
+                `"amazon-s3"`, `"cmems"`, `"earthdata"`, `"ecmwf"`,
+                `"eumetsat"`, `"fdsn"`, `"firms"`, `"gdacs"`, `"gee"`
+                (alias `"google-earth-engine"`), `"ghsl"` (aliases
+                `"ghs"` / `"human-settlement"`), `"hdx"`, `"nwp"`,
+                `"openaq"`, `"openeo"`, `"overture"`, `"radar"` (alias
+                `"nexrad"`), `"sentinel-hub"` (alias `"sentinelhub"`),
+                `"stac"` (with endpoint aliases `"planetary-computer"` /
+                `"earth-search"` / `"cdse"`), `"tropycal"`,
+                `"usgs-water"` (aliases `"usgs-nwis"` / `"nwis"`), or
+                `"worldpop"` (alias `"world-pop"`). See
+                `sorted(EarthLens.DataSources)` for the live list.
                 Defaults to `"chc"`.
             temporal_resolution: `"daily"` or `"monthly"` for most
                 backends; the GEE backend also accepts `"raw"` and
                 `"yearly"`. The concrete backend may accept a narrower
-                set; check its `temporal_resolution` handling.
+                set; check its `temporal_resolution` handling. Note the
+                meaning is backend-specific:
+
+                * a **download-loop cadence** that spaces the per-step
+                  requests — CHIRPS, S3, ECMWF, GEE;
+                * an **advisory label** only — NWP (the real cadence
+                  comes from each model's metadata);
+                * a **server-side rollup selector** — OpenAQ (picks the
+                  measurements vs. hourly/daily endpoint);
+                * a **service selector** — USGS Water (sub-daily maps to
+                  the instantaneous service);
+                * **ignored / forced to `"all"`** for the snapshot
+                  backends with no per-step time axis — Overture,
+                  Tropycal, FDSN, FIRMS, GDACS, Radar.
+
                 Defaults to `"daily"`.
             start: Inclusive start date as a string (parsed with
                 `fmt`). Defaults to `None`.
@@ -521,10 +544,19 @@ class EarthLens:
             **kwargs: Forwarded as keywords to `backend.download`.
 
         Returns:
-            Whatever the bound backend's `download` returns: `None` for
-            CHIRPS / S3 / ECMWF (they write files to `path` as a side
-            effect), or the list of written GeoTIFF paths / export
-            destination strings for the GEE backend.
+            Whatever the bound backend's `download` returns. The shape
+            tracks the backend's `OUTPUT_KIND`:
+
+            * `"raster"` / `"mixed"` file-writers — the list of written
+              paths (`list[Path]`); GEE may also return export
+              destination strings / `TaskInfo` for async exports.
+            * `"vector"` — an in-memory `FeatureCollection` (e.g. FDSN,
+              FIRMS, GDACS); radar returns a `GeoDataFrame`.
+            * `"tabular"` — a `pandas.DataFrame` (e.g. OpenAQ,
+              USGS Water).
+
+            The legacy CHIRPS / ECMWF backends return their written
+            `list[Path]` and also leave the files on disk under `path`.
 
         Raises:
             AuthenticationError: When the ECMWF backend cannot

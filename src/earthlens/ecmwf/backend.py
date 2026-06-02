@@ -15,6 +15,7 @@ from loguru import logger
 from earthlens.aggregate import AggregationConfig, aggregate_netcdf
 from earthlens.base import (
     AbstractDataSource,
+    OutputKind,
     SpatialExtent,
     TemporalExtent,
 )
@@ -206,6 +207,8 @@ class ECMWF(AbstractDataSource):
     :meth:`_create_grid`) and is sourced from
     :data:`ERA5_GRID_DEGREES`.
     """
+
+    OUTPUT_KIND: OutputKind = "raster"
 
     def __init__(
         self,
@@ -430,7 +433,7 @@ class ECMWF(AbstractDataSource):
         self,
         progress_bar: bool = True,
         aggregate: AggregationConfig | None = None,
-    ):
+    ) -> list[Path]:
         """Download every `(dataset, variable)` pair in `self.vars` from CDS.
 
         Iterates the user-supplied `variables` mapping (CDS dataset
@@ -492,10 +495,12 @@ class ECMWF(AbstractDataSource):
                 `docs/reference/aggregation.md` for the full
                 walkthrough.
         Returns:
-            None. Per-variable NetCDFs land at
-            `<self.root_dir>/<cds_variable>_<cds_dataset>.nc`. When
-            `aggregate` is set, per-window GeoTIFFs land at
+            list[Path]: The written output paths — one per-variable
+            NetCDF at `<self.root_dir>/<cds_variable>_<cds_dataset>.nc`,
+            or, when `aggregate` is set, the per-window GeoTIFFs at
             `<aggregate.out_dir or self.root_dir/aggregated>/<cds_variable>_<freq>_<window>.tif`.
+            Variables whose download (or aggregate) failed are logged
+            and omitted from the returned list.
 
         Raises:
             KeyError: If any dataset key in `self.vars` is not a
@@ -540,6 +545,7 @@ class ECMWF(AbstractDataSource):
         catalog = Catalog()
         succeeded: list[tuple[str, str]] = []
         failed: list[tuple[tuple[str, str], BaseException]] = []
+        out_paths: list[Path] = []
 
         effective_aggregate: AggregationConfig | None = None
         if aggregate is not None:
@@ -573,7 +579,9 @@ class ECMWF(AbstractDataSource):
 
                 if effective_aggregate is not None:
                     try:
-                        aggregate_netcdf(nc_path, var_info, effective_aggregate)
+                        agg = aggregate_netcdf(
+                            nc_path, var_info, effective_aggregate
+                        )
                     except Exception as exc:  # noqa: BLE001 - log + continue so one bad aggregate doesn't kill the batch
                         logger.error(
                             f"ECMWF aggregate for {dataset_name}/{var} failed: "
@@ -581,6 +589,9 @@ class ECMWF(AbstractDataSource):
                         )
                         failed.append(((dataset_name, var), exc))
                         continue
+                    out_paths.extend(p for _, _, p in agg if p is not None)
+                else:
+                    out_paths.append(nc_path)
 
                 succeeded.append((dataset_name, var))
 
@@ -597,6 +608,8 @@ class ECMWF(AbstractDataSource):
                 f"ECMWF download summary: all {len(succeeded)} "
                 f"variables succeeded ({succeeded})"
             )
+
+        return out_paths
 
     def _download_dataset(
         self,

@@ -11,6 +11,59 @@ from earthlens.chc import CHIRPS
 pytestmark = [pytest.mark.chc]
 
 
+def test_chirps_declares_raster_output_kind():
+    """CHIRPS declares OUTPUT_KIND='raster' so the facade forwards aggregate=."""
+    assert CHIRPS.OUTPUT_KIND == "raster"
+
+
+def test_chirps_download_rejects_aggregate(tmp_path):
+    """CHIRPS raises NotImplementedError for aggregate= instead of silently dropping it."""
+    chirps = CHIRPS(
+        start="2020-01-01",
+        end="2020-01-02",
+        variables=["precipitation"],
+        temporal_resolution="daily",
+        lat_lim=[4.0, 5.0],
+        lon_lim=[-75.0, -74.0],
+        path=str(tmp_path),
+    )
+    with pytest.raises(NotImplementedError, match="aggregate="):
+        chirps.download(aggregate=object())
+
+
+def test_chirps_catalog_property_aliases_private(tmp_path):
+    """The public `catalog` attribute is a back-compat alias of `_catalog`."""
+    chirps = CHIRPS(
+        start="2020-01-01",
+        end="2020-01-02",
+        variables=["precipitation"],
+        temporal_resolution="daily",
+        lat_lim=[4.0, 5.0],
+        lon_lim=[-75.0, -74.0],
+        path=str(tmp_path),
+    )
+    assert chirps.catalog is chirps._catalog
+
+
+def test_chirps_download_returns_written_paths(tmp_path, monkeypatch):
+    """download() returns the GeoTIFF paths collected from _download_dataset."""
+    chirps = CHIRPS(
+        start="2020-01-01",
+        end="2020-01-02",
+        variables=["precipitation"],
+        temporal_resolution="daily",
+        lat_lim=[4.0, 5.0],
+        lon_lim=[-75.0, -74.0],
+        path=str(tmp_path),
+    )
+    fake = [tmp_path / "a.tif", tmp_path / "b.tif"]
+    monkeypatch.setattr(chirps, "_download_dataset", lambda *a, **k: fake)
+
+    result = chirps.download(progress_bar=False)
+
+    assert result == fake
+
+
 @pytest.fixture(scope="module")
 def test_create_chirps_object(
     dates: list,

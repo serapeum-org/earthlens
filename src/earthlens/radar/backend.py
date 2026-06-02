@@ -42,7 +42,7 @@ from earthlens.base import (
     SpatialExtent,
     TemporalExtent,
 )
-from earthlens.radar.catalog import Station, StationCatalog
+from earthlens.radar.catalog import Station, Catalog
 
 if TYPE_CHECKING:
     from earthlens.aggregate import AggregationConfig
@@ -131,7 +131,7 @@ class Radar(AbstractDataSource):
         fmt: str = "%Y-%m-%dT%H:%M:%S",
         *,
         region: str = "us-east-1",
-        catalog: StationCatalog | None = None,
+        catalog: Catalog | None = None,
     ):
         """Initialise a radar backend instance.
 
@@ -150,7 +150,7 @@ class Radar(AbstractDataSource):
                 ISO datetime (`"%Y-%m-%dT%H:%M:%S"`) since the feed is
                 sub-hourly real-time.
             region: AWS region of the chunk bucket.
-            catalog: Optional pre-built :class:`StationCatalog` (tests
+            catalog: Optional pre-built :class:`Catalog` (tests
                 inject a faked one).
 
         Raises:
@@ -162,7 +162,7 @@ class Radar(AbstractDataSource):
                 "{station_id: [...]}."
             )
         self._region = region
-        self._catalog = catalog if catalog is not None else StationCatalog()
+        self._catalog = catalog if catalog is not None else Catalog()
         self._stations: list[tuple[str, Station | None]] = [
             (site_id, self._catalog.datasets.get(site_id)) for site_id in variables
         ]
@@ -411,6 +411,14 @@ class Radar(AbstractDataSource):
                 and a station-point `geometry` (`None` for sites absent
                 from the catalog). Empty (with the right columns) when no
                 volume falls in the window.
+
+                Intentionally a `GeoDataFrame` inventory (one row per
+                downloaded volume + its on-disk `path`), not the
+                `FeatureCollection` the event/footprint `"vector"`
+                backends (FDSN, FIRMS, GDACS) return — the rows index
+                bulky files rather than describe point/polygon features.
+                The base `download` contract lists radar as this
+                documented exception.
 
         Raises:
             NotImplementedError: If `aggregate` is not `None`.

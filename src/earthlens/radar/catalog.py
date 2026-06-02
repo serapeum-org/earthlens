@@ -1,6 +1,6 @@
 """Station registry for the NEXRAD radar backend.
 
-Hosts :class:`StationCatalog`, the pydantic-backed reader for the
+Hosts :class:`Catalog`, the pydantic-backed reader for the
 bundled `radar_data_catalog.yaml` — a curated map of WSR-88D site ids
 (`"KTLX"`) to name / latitude / longitude / state. The catalog gives
 each fetched volume a point geometry and lets a request select the
@@ -75,7 +75,7 @@ class Station(BaseModel):
     """One WSR-88D radar site.
 
     The site id (e.g. `"KTLX"`) is the parent key in
-    :attr:`StationCatalog.datasets` and is not stored on the row.
+    :attr:`Catalog.datasets` and is not stored on the row.
 
     Attributes:
         name: Human-readable site name / location.
@@ -92,18 +92,18 @@ class Station(BaseModel):
     state: str = ""
 
 
-class StationCatalog(AbstractCatalog):
+class Catalog(AbstractCatalog):
     """Catalog of NEXRAD WSR-88D sites.
 
     Reads the bundled `radar_data_catalog.yaml` and exposes its `stations:` block
     as a typed `dict[str, Station]`. Instantiate with no arguments
-    (`StationCatalog()`).
+    (`Catalog()`).
 
     Examples:
         - Look up a site and read its location:
             ```python
-            >>> from earthlens.radar import StationCatalog
-            >>> ktlx = StationCatalog().get_station("KTLX")
+            >>> from earthlens.radar import Catalog
+            >>> ktlx = Catalog().get_station("KTLX")
             >>> (round(ktlx.latitude, 2), round(ktlx.longitude, 2))
             (35.33, -97.28)
 
@@ -157,8 +157,8 @@ class StationCatalog(AbstractCatalog):
         Examples:
             - Find the catalogued sites over the south-central US:
                 ```python
-                >>> from earthlens.radar import StationCatalog
-                >>> "KTLX" in StationCatalog().in_bbox(-100, 33, -95, 37)
+                >>> from earthlens.radar import Catalog
+                >>> "KTLX" in Catalog().in_bbox(-100, 33, -95, 37)
                 True
 
                 ```
@@ -169,3 +169,9 @@ class StationCatalog(AbstractCatalog):
             if west <= s.longitude <= east and south <= s.latitude <= north
         ]
         return sorted(hits)
+
+
+#: Back-compat alias — the radar catalog was originally `StationCatalog`.
+#: `Catalog` is the canonical name (uniform with every other backend);
+#: `StationCatalog` stays importable.
+StationCatalog = Catalog

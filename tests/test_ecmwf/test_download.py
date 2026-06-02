@@ -49,6 +49,24 @@ class TestDownloadIteration:
             cat.get_variable("reanalysis-era5-single-levels", "total-precipitation"),
         ]
 
+    def test_download_returns_written_paths(self, ecmwf_stub):
+        """download() returns the per-variable NetCDF paths from _download_dataset."""
+        from pathlib import Path
+
+        ecmwf_stub.vars = {
+            "reanalysis-era5-single-levels": [
+                "2m-temperature",
+                "total-precipitation",
+            ],
+        }
+        ecmwf_stub._download_dataset = MagicMock(
+            side_effect=[Path("a.nc"), Path("b.nc")]
+        )
+
+        result = ecmwf_stub.download(progress_bar=False)
+
+        assert result == [Path("a.nc"), Path("b.nc")]
+
     def test_download_does_not_read_self_variables(self, ecmwf_stub):
         """`download()` must not depend on a non-existent `self.variables`."""
         ecmwf_stub.vars = {
