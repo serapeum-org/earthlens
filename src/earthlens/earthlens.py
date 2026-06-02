@@ -555,9 +555,8 @@ class EarthLens:
             * `"tabular"` — a `pandas.DataFrame` (e.g. OpenAQ,
               USGS Water).
 
-            Exceptions (pending the legacy `_search`/`_fetch`
-            migration): CHIRPS and ECMWF still return `None` and write
-            their files to `path` as a side effect.
+            The legacy CHIRPS / ECMWF backends return their written
+            `list[Path]` and also leave the files on disk under `path`.
 
         Raises:
             AuthenticationError: When the ECMWF backend cannot

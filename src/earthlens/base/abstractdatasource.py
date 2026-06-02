@@ -463,10 +463,10 @@ class AbstractDataSource(ABC):
         `"mixed"` file-writing backends return the list of written
         paths (`list[Path]`); `"vector"` backends return an in-memory
         `FeatureCollection` (radar returns a `GeoDataFrame`);
-        `"tabular"` backends return a `pandas.DataFrame`. The two
-        not-yet-migrated legacy backends (CHIRPS, ECMWF) still return
-        `None` and write their files to `self.root_dir` as a side
-        effect.
+        `"tabular"` backends return a `pandas.DataFrame`. Every backend
+        now returns its produced artifacts (the legacy CHIRPS / ECMWF
+        backends return their written `list[Path]` and also leave the
+        files on disk under `self.root_dir`).
 
         Partial-failure policy is per backend and currently varies:
         most multi-item backends are **skip-and-continue** — a single
