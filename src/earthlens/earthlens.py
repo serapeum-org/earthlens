@@ -342,10 +342,19 @@ class EarthLens:
         instantiates the concrete backend bound to `self.datasource`.
 
         Args:
-            data_source: Backend key — one of `"chc"` (alias
-                `"chirps"`), `"amazon-s3"`, `"cmems"`, `"ecmwf"`,
-                `"fdsn"`, `"gdacs"`, `"gee"` (alias
-                `"google-earth-engine"`), `"hdx"`, or `"openaq"`.
+            data_source: Backend key. One of the registered keys in
+                :attr:`DataSources` — `"chc"` (alias `"chirps"`),
+                `"amazon-s3"`, `"cmems"`, `"earthdata"`, `"ecmwf"`,
+                `"eumetsat"`, `"fdsn"`, `"firms"`, `"gdacs"`, `"gee"`
+                (alias `"google-earth-engine"`), `"ghsl"` (aliases
+                `"ghs"` / `"human-settlement"`), `"hdx"`, `"nwp"`,
+                `"openaq"`, `"openeo"`, `"overture"`, `"radar"` (alias
+                `"nexrad"`), `"sentinel-hub"` (alias `"sentinelhub"`),
+                `"stac"` (with endpoint aliases `"planetary-computer"` /
+                `"earth-search"` / `"cdse"`), `"tropycal"`,
+                `"usgs-water"` (aliases `"usgs-nwis"` / `"nwis"`), or
+                `"worldpop"` (alias `"world-pop"`). See
+                `sorted(EarthLens.DataSources)` for the live list.
                 Defaults to `"chc"`.
             temporal_resolution: `"daily"` or `"monthly"` for most
                 backends; the GEE backend also accepts `"raw"` and
