@@ -56,7 +56,12 @@ from pyramids.dataset import Dataset as PyramidsDataset
 from pyramids.dataset.merge import merge_rasters
 from tqdm import tqdm
 
-from earthlens.base import AbstractDataSource, SpatialExtent, TemporalExtent
+from earthlens.base import (
+    AbstractDataSource,
+    OutputKind,
+    SpatialExtent,
+    TemporalExtent,
+)
 from earthlens.gee._helpers import (
     EE_MAX_DIMENSION,
     reduce_collection,
@@ -248,6 +253,8 @@ class GEE(AbstractDataSource):
             >>> paths = gee.download()  # doctest: +SKIP
             ```
     """
+
+    OUTPUT_KIND: OutputKind = "raster"
 
     def __init__(
         self,

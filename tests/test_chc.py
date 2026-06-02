@@ -11,6 +11,26 @@ from earthlens.chc import CHIRPS
 pytestmark = [pytest.mark.chc]
 
 
+def test_chirps_declares_raster_output_kind():
+    """CHIRPS declares OUTPUT_KIND='raster' so the facade forwards aggregate=."""
+    assert CHIRPS.OUTPUT_KIND == "raster"
+
+
+def test_chirps_download_rejects_aggregate(tmp_path):
+    """CHIRPS raises NotImplementedError for aggregate= instead of silently dropping it."""
+    chirps = CHIRPS(
+        start="2020-01-01",
+        end="2020-01-02",
+        variables=["precipitation"],
+        temporal_resolution="daily",
+        lat_lim=[4.0, 5.0],
+        lon_lim=[-75.0, -74.0],
+        path=str(tmp_path),
+    )
+    with pytest.raises(NotImplementedError, match="aggregate="):
+        chirps.download(aggregate=object())
+
+
 @pytest.fixture(scope="module")
 def test_create_chirps_object(
     dates: list,

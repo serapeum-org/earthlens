@@ -46,7 +46,12 @@ from pyramids._io import extract_from_gz
 from pyramids.dataset import Dataset
 from tqdm import tqdm
 
-from earthlens.base import AbstractDataSource, SpatialExtent, TemporalExtent
+from earthlens.base import (
+    AbstractDataSource,
+    OutputKind,
+    SpatialExtent,
+    TemporalExtent,
+)
 from earthlens.chc.catalog import Catalog
 from earthlens.chc.catalog import Dataset as ChcDataset
 from earthlens.chc.catalog import Variable
@@ -156,6 +161,7 @@ class CHIRPS(AbstractDataSource):
             once at construction; resolves dataset keys to metadata.
     """
 
+    OUTPUT_KIND: OutputKind = "raster"
     api_url: str = "data.chc.ucsb.edu"
 
     def __init__(
@@ -344,6 +350,7 @@ class CHIRPS(AbstractDataSource):
         self,
         progress_bar: bool = True,
         cores: int | None = None,
+        aggregate: object | None = None,
         **_kwargs: object,
     ) -> None:
         """Download every `(dataset, variable)` pair in `self.vars`.
@@ -353,8 +360,12 @@ class CHIRPS(AbstractDataSource):
                 bar. Defaults to `True`.
             cores: Number of joblib workers for parallel per-date
                 retrieval. `None` (or `0`) runs sequentially.
-            **_kwargs: Reserved; the facade may pass `aggregate=` (a
-                no-op for CHIRPS, which has no aggregator wiring).
+            aggregate: Not supported by CHIRPS — a non-`None` value
+                raises `NotImplementedError` rather than being
+                silently ignored. CHIRPS writes per-date GeoTIFFs and
+                has no aggregator wiring (unlike the NetCDF-emitting
+                ECMWF backend).
+            **_kwargs: Reserved for other forwarded keyword arguments.
 
         Returns:
             None. Per-date GeoTIFFs land at
@@ -389,6 +400,13 @@ class CHIRPS(AbstractDataSource):
 
                 ```
         """
+        if aggregate is not None:
+            raise NotImplementedError(
+                "aggregate= is not supported for the CHIRPS backend. It "
+                "writes per-date GeoTIFFs and has no aggregator wiring "
+                "(unlike the NetCDF-emitting ECMWF backend); reduce the "
+                "downloaded rasters yourself."
+            )
         succeeded: list[tuple[str, str]] = []
         failed: list[tuple[tuple[str, str], BaseException]] = []
 

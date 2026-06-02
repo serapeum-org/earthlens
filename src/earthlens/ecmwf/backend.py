@@ -15,6 +15,7 @@ from loguru import logger
 from earthlens.aggregate import AggregationConfig, aggregate_netcdf
 from earthlens.base import (
     AbstractDataSource,
+    OutputKind,
     SpatialExtent,
     TemporalExtent,
 )
@@ -206,6 +207,8 @@ class ECMWF(AbstractDataSource):
     :meth:`_create_grid`) and is sourced from
     :data:`ERA5_GRID_DEGREES`.
     """
+
+    OUTPUT_KIND: OutputKind = "raster"
 
     def __init__(
         self,
