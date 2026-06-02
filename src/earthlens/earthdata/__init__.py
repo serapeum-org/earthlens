@@ -43,7 +43,7 @@ from earthlens.earthdata.auth import (
     EarthdataAuth,
     EarthdataCredentials,
 )
-from earthlens.earthdata.backend import EarthData
+from earthlens.earthdata.backend import EarthData, Earthdata
 from earthlens.earthdata.catalog import (
     CATALOG_PATH,
     PROVIDERS_PATH,
@@ -60,6 +60,7 @@ __all__ = [
     "PROVIDERS_PATH",
     "Catalog",
     "EarthData",
+    "Earthdata",
     "EarthdataAuth",
     "EarthdataCredentials",
     "EarthdataDAAC",

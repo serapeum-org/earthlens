@@ -98,3 +98,8 @@ class TestParentClassWiring:
         assert request["variable"] == ["2m_temperature"]
         assert target_str == str(target)
         assert target.parent == tmp_path.resolve()
+
+
+def test_ecmwf_declares_raster_output_kind():
+    """ECMWF declares OUTPUT_KIND='raster' so the facade forwards aggregate=."""
+    assert ECMWF.OUTPUT_KIND == "raster"

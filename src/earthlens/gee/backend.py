@@ -56,7 +56,12 @@ from pyramids.dataset import Dataset as PyramidsDataset
 from pyramids.dataset.merge import merge_rasters
 from tqdm import tqdm
 
-from earthlens.base import AbstractDataSource, SpatialExtent, TemporalExtent
+from earthlens.base import (
+    AbstractDataSource,
+    OutputKind,
+    SpatialExtent,
+    TemporalExtent,
+)
 from earthlens.gee._helpers import (
     EE_MAX_DIMENSION,
     reduce_collection,
@@ -249,6 +254,13 @@ class GEE(AbstractDataSource):
             ```
     """
 
+    OUTPUT_KIND: OutputKind = "raster"
+
+    @property
+    def catalog(self):
+        """The bundled GEE :class:`~earthlens.gee.Catalog` (alias of `_catalog`)."""
+        return self._catalog
+
     def __init__(
         self,
         start: str,
@@ -297,7 +309,7 @@ class GEE(AbstractDataSource):
         # These must be set before `super().__init__` runs, because the
         # parent constructor immediately calls `self._initialize()` (and
         # `_create_grid` / `_check_input_dates`), which read them.
-        self.catalog = Catalog()
+        self._catalog = Catalog()
         self._service_account = service_account
         self._service_key = service_key
         self._project = project
@@ -552,7 +564,7 @@ class GEE(AbstractDataSource):
             ValueError: If `asset_id` or any band is not in the catalog,
                 or if a write fails the size guard (see :meth:`_api`).
         """
-        var_info = self.catalog.get_dataset(asset_id)
+        var_info = self._catalog.get_dataset(asset_id)
         for band in bands:
             var_info.get_band(band)  # raises ValueError with a suggestion
 
