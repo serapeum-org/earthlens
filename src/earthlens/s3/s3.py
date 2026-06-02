@@ -1,23 +1,123 @@
-"""Amazon S3."""
+"""AWS Open-Data S3 backend.
+
+`S3` fetches public AWS Open-Data datasets over unsigned S3. A request
+picks a `dataset` (a registered name such as `"era5"`, `"sentinel-2-l2a"`,
+`"goes"`, `"copernicus-dem"`, `"esa-worldcover"`, or an inline spec dict
+for the passthrough path) and a uniform set of selectors (`variables`,
+the lat/lon bbox, and the date window). The backend resolves the dataset
+to its bucket + key layout via the registry catalog, lists/derives the
+S3 keys with the per-dataset resolver, downloads each granule (unsigned),
+and crops/reprojects it to the AOI with pyramids — so every dataset is
+driven through one code path and returns the same `list[Path]`.
+
+The download orchestration uses the search/fetch split:
+:meth:`S3._search` plans the products (cheap, no bulk transfer) and
+:meth:`S3._fetch` downloads + localises them. Multi-tile AOIs (Copernicus
+DEM / ESA WorldCover spanning more than one tile) currently yield one
+cropped file per tile; merging them into a single mosaic is deferred to
+the pyramids `PY-1` port.
+"""
 
 from __future__ import annotations
 
 import datetime as dt
-import os
+import re
+from dataclasses import dataclass
+from pathlib import Path
 from typing import Any
 
-import boto3
-import botocore
 import pandas as pd
-from botocore import exceptions
 from loguru import logger
 from tqdm import tqdm
 
-from earthlens.base import AbstractCatalog, AbstractDataSource
+from earthlens.base import (
+    AbstractDataSource,
+    RemoteProduct,
+    SpatialExtent,
+    TemporalExtent,
+)
+from earthlens.s3.auth import S3Auth, S3Credentials
+from earthlens.s3.catalog import Catalog, Dataset
+from earthlens.s3.layouts import plan_products
+
+__all__ = ["S3"]
+
+_UNSAFE = re.compile(r"[^A-Za-z0-9._-]+")
+
+
+def _safe_name(value: str) -> str:
+    """Sanitise a product id into a filesystem-safe file stem."""
+    return _UNSAFE.sub("_", value).strip("_")
+
+
+@dataclass(frozen=True)
+class _AggregationVariable:
+    """Duck-typed `var_info` for `aggregate_netcdf` (the fields it reads)."""
+
+    nc_variable: str
+    cds_variable: str
+    is_flux: bool = False
 
 
 class S3(AbstractDataSource):
-    """Amazon S3 data source."""
+    """Unified backend for public AWS Open-Data datasets over unsigned S3.
+
+    Args:
+        start: Inclusive start date string (parsed with `fmt`).
+        end: Inclusive end date string.
+        lat_lim: `[lat_min, lat_max]` AOI bounds in degrees.
+        lon_lim: `[lon_min, lon_max]` AOI bounds in degrees.
+        dataset: A registered dataset name (`"era5"`, `"sentinel-2-l2a"`,
+            `"goes"`, `"copernicus-dem"`, `"esa-worldcover"`) or an inline
+            spec dict for the passthrough path.
+        variables: Variable / band tokens (friendly names, aliases, or raw
+            native tokens). `None` uses the dataset's default variables.
+        temporal_resolution: `"monthly"` or `"daily"`; controls the date
+            stepping for temporal datasets (ignored for static ones).
+        path: Output directory for the cropped files.
+        fmt: `strptime` format for `start` / `end`.
+        bucket: Optional override of the dataset's bucket (e.g. switch
+            Copernicus DEM to the 90 m bucket, or GOES to `noaa-goes18`).
+        output_format: `"geotiff"` to convert NetCDF output to GeoTIFF;
+            `None` keeps the dataset's native format.
+        aws_profile: Optional named AWS profile for signed access; the
+            default is unsigned public access.
+
+    Examples:
+        - Resolve which products a request would download (no transfer):
+            ```python
+            >>> from earthlens.s3 import S3
+            >>> src = S3(
+            ...     start="2021-01-01", end="2021-01-01",
+            ...     lat_lim=[0.4, 0.6], lon_lim=[6.4, 6.6],
+            ...     dataset="copernicus-dem",
+            ... )
+            >>> products = src._search()
+            >>> products[0].href
+            'Copernicus_DSM_COG_10_N00_00_E006_00_DEM/Copernicus_DSM_COG_10_N00_00_E006_00_DEM.tif'
+
+            ```
+    """
+
+    OUTPUT_KIND = "mixed"
+
+    @classmethod
+    def datasets(cls) -> list[str]:
+        """Return the registered dataset names available to `dataset=`.
+
+        Returns:
+            The sorted registry names (`["copernicus-dem", "era5", ...]`).
+
+        Examples:
+            - Discover the bundled datasets:
+                ```python
+                >>> from earthlens.s3 import S3
+                >>> S3.datasets()
+                ['copernicus-dem', 'era5', 'esa-worldcover', 'goes', 'naip-source', 'sentinel-2-l2a', 'usgs-landsat']
+
+                ```
+        """
+        return Catalog().dataset_names()
 
     def __init__(
         self,
@@ -25,32 +125,55 @@ class S3(AbstractDataSource):
         end: str,
         lat_lim: list[float],
         lon_lim: list[float],
+        dataset: str | dict[str, Any] = "era5",
+        variables: list[str] | str | None = None,
         temporal_resolution: str = "monthly",
         path: str = "",
-        variables: list[str] | str = "precipitation_amount_1hour_Accumulation",
         fmt: str = "%Y-%m-%d",
+        bucket: str | None = None,
+        output_format: str | None = None,
+        aws_profile: str | None = None,
+        scene: str | None = None,
+        tile: str | None = None,
+        max_scenes: int | None = None,
     ):
-        """S3.
+        """Resolve the dataset and wire up the request (see the class docstring for args).
 
-        Parameters
-        ----------
-        temporal_resolution (str, optional):
-            'daily' or 'monthly'. Defaults to 'daily'.
-        start (str, optional):
-            [description]. Defaults to ''.
-        end (str, optional):
-            [description]. Defaults to ''.
-        path (str, optional):
-            Path where you want to save the downloaded data. Defaults to ''.
-        variables (list, optional):
-            Variable code: VariablesInfo('day').descriptions.keys(). Defaults to [].
-        lat_lim (list, optional):
-            [ymin, ymax] (values must be between -50 and 50). Defaults to [].
-        lon_lim (list, optional):
-            [xmin, xmax] (values must be between -180 and 180). Defaults to [].
-        fmt (str, optional):
-            [description]. Defaults to "%Y-%m-%d".
+        The constructor arguments are documented on the class. `scene` /
+        `tile` supply the explicit identifier for the identifier-addressed
+        datasets (Landsat scene id, NAIP quad path); `max_scenes` caps the
+        Sentinel-2 scenes kept per (tile, month). They are carried onto the
+        resolved dataset's `params` so the per-dataset resolver can read them.
+
+        Raises:
+            ValueError: If `dataset` is an unknown name or an inline spec that
+                fails validation (propagated from `Catalog.resolve`).
         """
+        self._catalog = Catalog()
+        resolved = self._catalog.resolve(dataset)
+        updates: dict[str, Any] = {}
+        if bucket:
+            updates["bucket"] = bucket
+        # Scene/tile identifiers (Landsat scene id, NAIP quad path) and the
+        # Sentinel-2 max_scenes cap feed the resolver via params.
+        extra_params = {
+            k: v
+            for k, v in (("scene", scene), ("tile", tile), ("max_scenes", max_scenes))
+            if v is not None
+        }
+        if extra_params:
+            updates["params"] = {**resolved.params, **extra_params}
+        if updates:
+            resolved = resolved.model_copy(update=updates)
+        self._dataset: Dataset = resolved
+        self._output_format = output_format
+        self._aws_profile = aws_profile
+
+        if variables is None:
+            variables = list(self._dataset.default_variables)
+        elif isinstance(variables, str):
+            variables = [variables]
+
         super().__init__(
             start=start,
             end=end,
@@ -62,317 +185,389 @@ class S3(AbstractDataSource):
             path=path,
         )
 
-    def _initialize(self, bucket: str = "era5-pds") -> object:
-        """initialize connection with amazon s3 and create a client.
+    # -- abstract hooks ------------------------------------------------
 
-        Parameters
-        ----------
-        bucket: [str]
-            S3 bucket name.
-
-        Returns
-        -------
-        client: [botocore.client.S3]
-            Amazon S3 client
-        """
-        # AWS access / secret keys required
-        # s3 = boto3.resource('s3')
-        # bucket = s3.Bucket(era5_bucket)
-
-        # No AWS keys required
-        client = boto3.client(
-            "s3", config=botocore.client.Config(signature_version=botocore.UNSIGNED)
+    def _initialize(self, *args: Any, **kwargs: Any) -> object:
+        """Build the S3 client via `S3Auth` (unsigned, or signed for requester-pays)."""
+        self._auth = S3Auth(
+            S3Credentials(
+                aws_profile=self._aws_profile,
+                signed=self._dataset.requester_pays,
+                region=self._dataset.region,
+            )
         )
-        self.client = client
-        return client
+        return self._auth.client()
 
-    def _create_grid(self, lat_lim: list, lon_lim: list):
-        """TODO:"""
-        pass
+    def _create_grid(self, lat_lim: list[float], lon_lim: list[float]) -> SpatialExtent:
+        """Capture the AOI bbox as a `SpatialExtent`."""
+        return SpatialExtent.from_pairs(lat_lim=lat_lim, lon_lim=lon_lim)
 
     def _check_input_dates(
         self, start: str, end: str, temporal_resolution: str, fmt: str
-    ):
-        """check validity of input dates.
-
-        Parameters
-        ----------
-        temporal_resolution: (str, optional)
-            [description]. Defaults to 'daily'.
-        start: (str, optional)
-            [description]. Defaults to ''.
-        end: (str, optional)
-            [description]. Defaults to ''.
-        fmt: (str, optional)
-            [description]. Defaults to "%Y-%m-%d".
-        """
-        self.start = dt.datetime.strptime(start, fmt)
-        self.end = dt.datetime.strptime(end, fmt)
-
-        # Set required data for the daily option
-        if temporal_resolution == "daily":
-            self.dates = pd.date_range(self.start, self.end, freq="D")
-        elif temporal_resolution == "monthly":
-            self.dates = pd.date_range(self.start, self.end, freq="MS")
-
-    def download(self, progress_bar: bool = True):
-        """Download wrapper over all given variables.
-
-        ECMWF method downloads ECMWF daily data for a given variable, temporal_resolution
-        interval, and spatial extent.
-
-
-        Parameters
-        ----------
-        progress_bar : TYPE, optional
-            0 or 1. to display the progress bar
-        dataset:[str]
-            Default is "interim"
-
-        Returns
-        -------
-        None.
-        """
-        catalog = Catalog()
-        for var in self.vars:
-            var_info = catalog.get_variable(var)
-            var_s3_name = var_info.get("bucket_name")
-            self._download_dataset(var_s3_name, progress_bar=progress_bar)
-
-    def _download_dataset(self, var: str, progress_bar: bool = True):
-        """Download a climate variable.
-
-                    This function downloads ECMWF six-hourly, daily or monthly data.
-
-        Parameters
-        ----------
-        var: [str]
-            variable detailed information
-            >>> {
-            >>>     'descriptions': 'Evaporation [m of water]',
-            >>>     'units': 'mm',
-            >>>     'types': 'flux',
-            >>>     'temporal resolution': ['six hours', 'daily', 'monthly'],
-            >>>     'file name': 'Evaporation',
-            >>> }
-        progress_bar: [bool]
-            True if you want to display a progress bar.
-        """
-        for date in tqdm(self.dates, desc="Progress", disable=not progress_bar):
-            year = date.strftime("%Y")
-            month = date.strftime("%m")
-            # file path patterns for remote S3 objects and corresponding local file
-            s3_data_key = f"{year}/{month}/data/{var}.nc"
-            downloaded_file_dir = (
-                f"{self.path}/{year}{month}_{self.temporal_resolution}_{var}.nc"
-            )
-
-            self._api(s3_data_key, downloaded_file_dir)
-
-    def _api(self, s3_file_path: str, local_dir_fname: str, bucket: str = "era5-pds"):
-        """Download file from s3 bucket.
-
-        Parameters
-        ----------
-        s3_file_path: str
-            the whole path for the file inside the bcket. i.e. "2022/02/main.nc"
-        local_dir_fname: [str]
-            absolute path for the file name and directory in your local drive.
-        bucket: [str]
-            bucket name. Default is "era5-pds"
-
-        Returns
-        -------
-        Download the file to your local drive.
-        """
-        if not os.path.isfile(local_dir_fname):  # check if file already exists
-            logger.info(f"Downloading {s3_file_path} from S3...")
-            try:
-                self.client.download_file(bucket, s3_file_path, local_dir_fname)
-            except exceptions.ClientError:
-                logger.error(
-                    f"Error while downloading the {s3_file_path} please check the file name"
-                )
+    ) -> TemporalExtent:
+        """Build the request date index, honouring static-vs-temporal datasets."""
+        start_date = dt.datetime.strptime(start, fmt)
+        end_date = dt.datetime.strptime(end, fmt)
+        if self._dataset.temporal == "static":
+            resolution = "MS"
+            dates = pd.DatetimeIndex([start_date])
         else:
-            logger.info(f"The file {local_dir_fname} already in your local directory")
-
-    @staticmethod
-    def parse_response_metadata(response: dict[str, str]):
-        """parse client response.
-
-        Parameters
-        ----------
-        response:
-            Dict returned by boto3 S3 calls. Example shape (placeholder
-            values shown for clarity — real `HostId` / `x-amz-id-2`
-            are opaque high-entropy strings):
-        >>> {
-        >>>     'RequestId': '<example-request-id>',
-        >>>     'HostId': '<example-host-id>',
-        >>>     'HTTPStatusCode': 200,
-        >>>     'HTTPHeaders': {'x-amz-id-2': '<example-amz-id-2>',
-        >>>     'x-amz-request-id': '<example-request-id>',
-        >>>     'date': 'Sun, 15 Jan 2023 22:36:28 GMT',
-        >>>     'x-amz-bucket-region': 'us-east-1',
-        >>>     'content-type': 'application/xml',
-        >>>     'transfer-encoding': 'chunked',
-        >>>     'server': 'AmazonS3'},
-        >>>     'RetryAttempts': 0
-        >>> }
-        """
-        response_meta = response.get("ResponseMetadata")
-        keys = []
-        if response_meta.get("HTTPStatusCode") == 200:
-            contents_list = response.get("Contents")
-            if contents_list is None:
-                logger.info("No objects are available")  # {date.strftime('%B, %Y')}
-            else:
-                for obj in contents_list:
-                    keys.append(obj.get("Key"))
-                logger.info(
-                    f"There are {len(keys)} objects available; first 10: "
-                    f"{keys[:10]}"
-                )
-        else:
-            logger.error("There was an error with your request.")
-
-        return keys
-
-
-class Catalog(AbstractCatalog):
-    """S3 data catalog."""
-
-    bucket: str = "era5-pds"
-    client: Any = None
-
-    def model_post_init(self, __context: Any) -> None:
-        super().model_post_init(__context)
-        self.client = self.initialize(bucket=self.bucket)
-
-    @staticmethod
-    def initialize(bucket: str = "era5-pds") -> object:
-        """initialize connection with amazon s3 and create a client.
-
-        Parameters
-        ----------
-        bucket: [str]
-            S3 bucket name.
-
-        Returns
-        -------
-        client: [botocore.client.S3]
-            Amazon S3 client
-        """
-        # AWS access / secret keys required
-        # s3 = boto3.resource('s3')
-        # bucket = s3.Bucket(era5_bucket)
-
-        # No AWS keys required
-        client = boto3.client(
-            "s3", config=botocore.client.Config(signature_version=botocore.UNSIGNED)
+            resolution = "MS" if temporal_resolution == "monthly" else "D"
+            dates = pd.date_range(start_date, end_date, freq=resolution)
+            if len(dates) == 0:
+                dates = pd.DatetimeIndex([start_date])
+        return TemporalExtent(
+            start_date=start_date,
+            end_date=end_date,
+            resolution=resolution,
+            dates=dates,
         )
-        return client
 
-    def get_catalog(self):
-        """return the catalog."""
-        return {
-            "precipitation": {
-                "descriptions": "rainfall [mm/temporal_resolution]",
-                "units": "mm/temporal_resolution",
-                "temporal resolution": ["daily", "monthly"],
-                "file name": "rainfall",
-                "var_name": "R",
-                "bucket_name": "precipitation_amount_1hour_Accumulation",
-            }
-        }
+    # -- search / fetch ------------------------------------------------
 
-    def get_variable(self, var_name) -> dict[str, str]:
-        """get the details of a specific variable."""
-        return super().get_variable(var_name)
+    def _bbox(self) -> tuple[float, float, float, float]:
+        """Return the AOI as `(west, south, east, north)`."""
+        return (
+            self.space.longitude_min,
+            self.space.latitude_min,
+            self.space.longitude_max,
+            self.space.latitude_max,
+        )
 
-    def get_available_years(self, bucket: str = "era5-pds"):
-        """The ERA5 data is chunked into distinct NetCDF files per variable, each containing a month of hourly data. These files are organized in the S3 bucket by year, month, and variable name.
+    def _search(self) -> list[RemoteProduct]:
+        """Plan the S3 products satisfying this request (no bulk transfer)."""
+        keys = self.vars if isinstance(self.vars, list) else [self.vars]
+        variables = self._dataset.resolve_variables(keys)
+        products = plan_products(
+            self._dataset, variables, self._bbox(), list(self.time.dates),
+            self._auth.client(),
+        )
+        # Surface the request volume so a wide AOI / long window is never a
+        # silent surprise (e.g. many Sentinel-2 scenes).
+        logger.info(f"amazon-s3: planned {len(products)} object(s) for {self._dataset.bucket}")
+        return products
 
-        The data is structured as follows:
+    def _raw_dir(self) -> Path:
+        """Return (creating if needed) the directory raw granules download to."""
+        raw_dir = self.root_dir / "_raw"
+        raw_dir.mkdir(parents=True, exist_ok=True)
+        return raw_dir
 
-        /{year}/{month}/main.nc
-                       /data/{var1}.nc
-                            /{var2}.nc
-                            /{....}.nc
-                            /{varN}.nc
+    def _download_raw(self, client: Any, product: RemoteProduct, raw_dir: Path) -> Path | None:
+        """Download one product to `raw_dir` (idempotent); `None` if absent.
 
-        - where year is expressed as four digits (e.g. YYYY) and month as two digits (e.g. MM).
-
-        Parameters
-        ----------
-        bucket: [str]
-            S3 bucket name
-
-        Returns
-        -------
-        List:
-            list of years that have available data.
+        A missing object (404 / NoSuchKey — e.g. a DEM tile over ocean) is
+        logged and returns `None`; any other error is re-raised wrapped so
+        it is never silently swallowed.
         """
-        paginator = self.client.get_paginator("list_objects")
-        result = paginator.paginate(Bucket=bucket, Delimiter="/")
-        # for prefix in result.search('CommonPrefixes'):
-        #     print(prefix.get('Prefix'))
-        years = [i.get("Prefix")[:-1] for i in result.search("CommonPrefixes")]
-        return years
+        default_ext = ".nc" if self._dataset.format == "netcdf" else ".tif"
+        ext = Path(product.href).suffix or default_ext
+        raw = raw_dir / f"{_safe_name(product.id)}{ext}"
+        if raw.exists():
+            return raw
+        extra = {"RequestPayer": "requester"} if self._dataset.requester_pays else None
+        try:
+            client.download_file(
+                product.metadata["bucket"], product.href, str(raw), ExtraArgs=extra
+            )
+        except Exception as exc:  # noqa: BLE001 - classified by S3 error code
+            bucket = product.metadata["bucket"]
+            if _is_missing_object(exc):
+                logger.warning(
+                    f"object not found, skipping: s3://{bucket}/{product.href}"
+                )
+                return None
+            code = _error_code(exc)
+            if code in {"403", "AccessDenied"}:
+                hint = (
+                    " This is a requester-pays dataset: check that your AWS "
+                    "credentials are valid and that RequestPayer is set."
+                    if self._dataset.requester_pays
+                    else ""
+                )
+                raise PermissionError(
+                    f"access denied for s3://{bucket}/{product.href}.{hint}"
+                ) from exc
+            if code == "NoSuchBucket":
+                raise RuntimeError(
+                    f"bucket not found: s3://{bucket} (check the dataset / bucket name)."
+                ) from exc
+            raise RuntimeError(
+                f"failed to download s3://{bucket}/{product.href}: {exc}"
+            ) from exc
+        return raw
 
-    def get_available_data(
-        self,
-        date: str,
-        bucket: str = "era5-pds",
-        fmt: str = "%Y-%m-%d",
-        absolute_path: bool = False,
-    ) -> list[str]:
-        """get the available data at a given year.
+    def _fetch(self, products: list[RemoteProduct]) -> list[Path]:
+        """Download each product (idempotent) and crop it to the AOI.
 
-        - Granule variable structure and metadata attributes are stored in main.nc. This file contains coordinate and
-        auxiliary variable data. This file is also annotated using NetCDF CF metadata conventions.
-
-        Parameters
-        ----------
-        date: [str]
-            date i.e. "YYYY-mm-dd"
-        bucket: [str]
-            The bucket you want to get its available data. Default is 'era5-pds'.
-        fmt: [str]
-            Date format. Default is "%Y-%m-%d".
-        absolute_path: [bool]
-            True if you want to get the file names including the whole path inside the bucket.
-            Default is False.
-            >>> absolute_path = True
-            [
-                '2022/05/air_pressure_at_mean_sea_level.nc',
-                 '2022/05/air_temperature_at_2_metres.nc',
-                 '2022/05/air_temperature_at_2_metres_1hour_Maximum.nc',
-                 '2022/05/air_temperature_at_2_metres_1hour_Minimum.nc',
-                 '2022/05/dew_point_temperature_at_2_metres.nc',
-                 '2022/05/eastward_wind_at_100_metres.nc'
-             ]
-            >>> absolute_path = False
-            [
-                'air_pressure_at_mean_sea_level.nc',
-                'air_temperature_at_2_metres.nc',
-                'air_temperature_at_2_metres_1hour_Maximum.nc',
-                'air_temperature_at_2_metres_1hour_Minimum.nc',
-                'dew_point_temperature_at_2_metres.nc',
-                'eastward_wind_at_100_metres.nc'
-             ]
-        Returns
-        -------
-        List:
-            available data in a list
+        Objects that are absent (e.g. Copernicus DEM / WorldCover tiles
+        over ocean) are skipped; if every product is missing, a
+        `RuntimeError` is raised so a wholly empty result is not silently
+        returned.
         """
-        date_obj = dt.datetime.strptime(date, fmt)
-        # date = dt.date(2022,5,1) # update to desired date
-        prefix = date_obj.strftime("%Y/%m/")
-        response = self.client.list_objects_v2(Bucket=bucket, Prefix=prefix)
-        keys = S3.parse_response_metadata(response)
-        if absolute_path:
-            available_date = keys
+        client = self._auth.client()
+        raw_dir = self._raw_dir()
+        written: list[Path] = []
+        missing = 0
+        for product in tqdm(products, desc="amazon-s3", disable=not products):
+            raw = self._download_raw(client, product, raw_dir)
+            if raw is None:
+                missing += 1
+                continue
+            written.append(self._localise(raw, product))
+        if not written and missing:
+            raise RuntimeError(
+                f"none of the {missing} planned object(s) exist for this "
+                "request; check the bbox / date window / variables."
+            )
+        return written
+
+    def _localise(self, raw: Path, product: RemoteProduct) -> Path:
+        """Crop a downloaded granule to the AOI and write it.
+
+        COG granules carry a CRS and are cropped directly (per-file
+        UTM / geostationary COGs are reprojected to WGS84 first). ERA5-style
+        regular-grid NetCDF granules carry no GDAL-readable SRS, so they are
+        rebuilt into a WGS84 raster (time as bands) before cropping.
+        Geostationary NetCDF (GOES) is warped to WGS84 via pyramids, which
+        georeferences the scan-angle grid on read (pyramids >=0.28).
+
+        Args:
+            raw: The downloaded source file.
+            product: The `RemoteProduct` that produced `raw`.
+
+        Returns:
+            The path of the cropped output file.
+        """
+        from pyramids.dataset import Dataset as PyramidsDataset
+
+        west, south, east, north = self._bbox()
+        if self._dataset.format == "netcdf":
+            if self._dataset.crs is None:
+                # Geostationary NetCDF (GOES): pyramids (>=0.28) georeferences
+                # the scan-angle grid from the CF grid-mapping on read, so the
+                # variable warps to WGS84 directly.
+                data = self._geostationary_to_wgs84(raw, product)
+            else:
+                data = self._netcdf_to_wgs84_raster(raw, product)
         else:
-            available_date = [i.split("/")[-1] for i in keys]
-        return available_date
+            data = PyramidsDataset.read_file(str(raw))
+            if self._dataset.crs is None:
+                data = data.to_crs(4326)
+        # touch=False clips to the bbox extent; the default touch=True keeps
+        # every cell that touches the mask and leaves the extent uncropped.
+        data = data.crop(bbox=[west, south, east, north], epsg=4326, touch=False)
+
+        # A rebuilt NetCDF is a raster (time as bands), so NetCDF datasets
+        # also write a GeoTIFF.
+        as_geotiff = (
+            self._output_format == "geotiff"
+            or self._dataset.format in ("cog", "netcdf")
+        )
+        out_ext = ".tif" if as_geotiff else ".nc"
+        out_path = self.path / f"{_safe_name(product.id)}{out_ext}"
+        data.to_file(str(out_path))
+        return out_path
+
+    def _netcdf_to_wgs84_raster(self, raw: Path, product: RemoteProduct):
+        """Rebuild a regular-grid NetCDF variable as a WGS84 pyramids raster.
+
+        Reads the granule's data variable as an array + geotransform and
+        builds a `Dataset` tagged EPSG:4326 — NetCDF cubes do not expose a
+        source SRS the crop warp can read, so cropping the cube directly
+        fails. Longitudes in the 0-360 convention are wrapped to -180..180.
+        """
+        import numpy as np
+        from pyramids.dataset import Dataset as PyramidsDataset
+        from pyramids.netcdf import NetCDF
+
+        nc = NetCDF.read_file(str(raw))
+        cube = nc.get_variable(self._nc_variable_name(nc, product))
+        arr = np.asarray(cube.read_array())
+        geo = tuple(cube.geotransform)
+        if self._dataset.lon_convention == "0-360":
+            arr, geo = _wrap_longitude_0_360(arr, geo)
+        return PyramidsDataset.create_from_array(arr=arr, geo=geo, epsg=4326)
+
+    def _geostationary_to_wgs84(self, raw: Path, product: RemoteProduct):
+        """Warp a geostationary NetCDF variable (e.g. GOES ABI) to WGS84.
+
+        pyramids (>=0.28) georeferences the scan-angle grid from the CF
+        `goes_imager_projection` grid-mapping when it reads the granule, so
+        the data variable reprojects to EPSG:4326 directly.
+        """
+        from pyramids.netcdf import NetCDF
+
+        nc = NetCDF.read_file(str(raw))
+        cube = nc.get_variable(self._nc_variable_name(nc, product))
+        return cube.to_crs(4326)
+
+    def _nc_variable_name(self, nc: Any, product: RemoteProduct) -> str:
+        """Resolve the in-file NetCDF data-variable name for `product`.
+
+        Prefers the catalog row's pinned `nc_variable`; otherwise picks the
+        variable with the most dimensions (the gridded data variable rather
+        than a 1-D auxiliary like ERA5's `utc_date` or GOES's `band_id`).
+        """
+        names = list(nc.variable_names)
+        if len(names) == 1:
+            return names[0]
+        variable = self._variable_for_native(product.metadata.get("variable"))
+        if variable and variable.nc_variable and variable.nc_variable in names:
+            return variable.nc_variable
+
+        def _rank(name: str) -> tuple[int, int]:
+            # Rank by dimensionality, then de-prioritise known auxiliary
+            # variables (quality flags, coordinate bounds, date helpers) so a
+            # 2-D `DQF` never outranks a 2-D `CMI` on a tie.
+            auxiliary = name in {"DQF"} or name.endswith(("_bounds", "_date", "_id"))
+            try:
+                ndim = len(nc.get_variable(name).shape)
+            except Exception:  # noqa: BLE001
+                # pyramids raises (e.g. RuntimeError "Invalid iXDim/iYDim") for a
+                # 1-D auxiliary it cannot read as a grid; rank it lowest.
+                ndim = 0
+            return (ndim, 0 if auxiliary else 1)
+
+        return max(names, key=_rank)
+
+    def _resolve_nc_variable(self, raw: Path, product: RemoteProduct) -> str:
+        """In-file NetCDF variable for `product`, opening the granule only if unpinned.
+
+        Uses the catalog's pinned `nc_variable` when present (no I/O); otherwise
+        reads the granule and falls back to `_nc_variable_name`.
+        """
+        variable = self._variable_for_native(product.metadata.get("variable"))
+        if variable and variable.nc_variable:
+            return variable.nc_variable
+        from pyramids.netcdf import NetCDF
+
+        return self._nc_variable_name(NetCDF.read_file(str(raw)), product)
+
+    # -- public API ----------------------------------------------------
+
+    def _api(self, *args: Any, **kwargs: Any) -> list[Path]:
+        """Compose `_search` + `_fetch` (the canonical post-C3 body)."""
+        return self._api_via_search_fetch()
+
+    def download(
+        self, progress_bar: bool = True, aggregate: Any | None = None
+    ) -> list[Path]:
+        """Download every planned product, cropped to the AOI.
+
+        Args:
+            progress_bar: Show a per-product progress bar.
+            aggregate: Optional `AggregationConfig`. Supported for NetCDF
+                datasets (currently ERA5) — each raw granule is run through
+                `aggregate_netcdf` to emit per-window GeoTIFFs. Rejected for
+                COG datasets.
+
+        Returns:
+            The cropped output paths, or — when `aggregate` is set — the
+            per-window aggregated GeoTIFF paths.
+
+        Raises:
+            NotImplementedError: If `aggregate` is given for a COG dataset.
+        """
+        if aggregate is not None and self._dataset.format != "netcdf":
+            raise NotImplementedError(
+                "aggregate= is only supported for NetCDF datasets "
+                "(e.g. era5); this dataset is stored as COG."
+            )
+        products = self._search()
+        if aggregate is not None:
+            return self._aggregate(products, aggregate)
+        return self._fetch(products)
+
+    def _aggregate(self, products: list[RemoteProduct], aggregate: Any) -> list[Path]:
+        """Window-aggregate the raw NetCDF granules, mirroring the ECMWF path.
+
+        Aggregation reads the granule's time axis, so it runs on the raw
+        NetCDF (not the cropped GeoTIFF). Per-window GeoTIFFs are written to
+        `aggregate.out_dir` or `<path>/aggregated`. A granule that fails to
+        aggregate is logged and skipped (ECMWF behaviour).
+
+        Args:
+            products: The planned products from `_search`.
+            aggregate: An `earthlens.aggregate.AggregationConfig`.
+
+        Returns:
+            The per-window GeoTIFF paths.
+        """
+        from earthlens.aggregate import aggregate_netcdf
+
+        client = self._auth.client()
+        raw_dir = self._raw_dir()
+        out_dir = Path(aggregate.out_dir) if aggregate.out_dir else self.path / "aggregated"
+        config = aggregate.model_copy(update={"out_dir": out_dir})
+        outputs: list[Path] = []
+        for product in products:
+            raw = self._download_raw(client, product, raw_dir)
+            if raw is None:
+                continue
+            native = product.metadata.get("variable")
+            # Resolve the *in-file* variable name (e.g. ERA5 `128_167_2t` ->
+            # `VAR_2T`); the native token is not the NetCDF variable name. Prefer
+            # the catalog's pinned `nc_variable` so the granule is not re-opened
+            # just to read it (aggregate_netcdf opens it anyway).
+            nc_variable = self._resolve_nc_variable(raw, product)
+            var_info = _AggregationVariable(
+                nc_variable=nc_variable,
+                cds_variable=native or "",
+                is_flux=False,
+            )
+            try:
+                windows = aggregate_netcdf(raw, var_info, config)
+            except Exception as exc:  # noqa: BLE001 - log + continue like ECMWF
+                logger.error(f"aggregation failed for {raw}: {exc}")
+                continue
+            outputs.extend(w[2] for w in windows if w[2] is not None)
+        return outputs
+
+    def _variable_for_native(self, native: str | None):
+        """Return the dataset `Variable` whose native token matches, or `None`."""
+        if native is None:
+            return None
+        for variable in self._dataset.variables.values():
+            if variable.native == native:
+                return variable
+        return None
+
+
+def _wrap_longitude_0_360(arr, geo):
+    """Roll a global 0-360-longitude array + geotransform to -180..180.
+
+    Assumes a global longitude span (the ERA5 grid): the second half of
+    the columns (>= 180 degrees) moves to the front as the negative
+    longitudes, and the geotransform origin shifts west by 180 degrees.
+
+    Args:
+        arr: Array whose last axis is longitude (`(..., rows, cols)`).
+        geo: The GDAL 6-tuple geotransform for `arr`.
+
+    Returns:
+        The rolled `(array, geotransform)` pair in the -180..180 convention.
+    """
+    import numpy as np
+
+    cols = arr.shape[-1]
+    half = cols // 2
+    rolled = np.concatenate([arr[..., half:], arr[..., :half]], axis=-1)
+    new_geo = (geo[0] - 180.0, geo[1], geo[2], geo[3], geo[4], geo[5])
+    return rolled, new_geo
+
+
+def _error_code(exc: BaseException) -> str:
+    """Return the S3 error code from a botocore exception, or `""`."""
+    response = getattr(exc, "response", None)
+    return (response or {}).get("Error", {}).get("Code", "")
+
+
+def _is_missing_object(exc: BaseException) -> bool:
+    """True only for a genuinely-absent object (404 / NoSuchKey).
+
+    Auth (`403` / `AccessDenied`) and bucket (`NoSuchBucket`) errors are
+    deliberately excluded — the caller classifies those separately so a
+    credential / billing / typo failure is never reported as "no data".
+    """
+    return _error_code(exc) in {"404", "NoSuchKey"} or "Not Found" in str(exc)

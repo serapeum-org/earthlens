@@ -114,7 +114,12 @@ nav:
       - Usage: reference/chc/usage.md
       - Catalog & Tooling: reference/chc/catalog.md
       - Reference: reference/chc/chc.md
-    - Amazon S3: reference/s3.md
+    - Amazon S3 (AWS Open Data):
+      - Introduction: reference/s3/introduction.md
+      - Authentication: reference/s3/authentication.md
+      - Usage: reference/s3/usage.md
+      - Available datasets: reference/s3/datasets.md
+      - Reference: reference/s3/reference.md
     - CMEMS (Copernicus Marine):
       - Introduction: reference/cmems/introduction.md
       - Usage: reference/cmems/usage.md
@@ -227,6 +232,11 @@ nav:
     - Authentication: examples/authentication.md
     - Data Sources: examples/data-sources.md
     - Data Catalog: examples/catalog.md
+    - Amazon S3 (AWS Open Data):
+      - Catalog explorer (no network): examples/s3/01_catalog_explorer.ipynb
+      - Copernicus DEM — download & crop: examples/s3/02_copernicus_dem.ipynb
+      - ESA WorldCover — land cover: examples/s3/03_esa_worldcover.ipynb
+      - Passthrough — any public bucket: examples/s3/04_passthrough.ipynb
     - CDS / ECMWF:
       - Quickstart: examples/ecmwf/cds_quickstart.ipynb
       - Hydrology — water balance: examples/ecmwf/hydrology_water_balance.ipynb

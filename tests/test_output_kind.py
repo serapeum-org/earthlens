@@ -45,12 +45,18 @@ class TestAbstractDataSourceOutputKindDefault:
         """`AbstractDataSource.OUTPUT_KIND` defaults to the raster literal."""
         assert AbstractDataSource.OUTPUT_KIND == "raster"
 
-    @pytest.mark.parametrize("backend_cls", [CHIRPS, S3, ECMWF])
+    @pytest.mark.parametrize("backend_cls", [CHIRPS, ECMWF])
     def test_existing_backends_inherit_raster(self, backend_cls):
-        """CHIRPS / S3 / ECMWF inherit the raster default unchanged (C1 back-compat)."""
+        """CHIRPS / ECMWF inherit the raster default unchanged (C1 back-compat)."""
         assert backend_cls.OUTPUT_KIND == "raster", (
             f"{backend_cls.__name__} drifted from raster: "
             f"{backend_cls.OUTPUT_KIND!r}"
+        )
+
+    def test_s3_backend_is_mixed(self):
+        """The S3 backend is multi-dataset (NetCDF + COG), so it declares mixed."""
+        assert S3.OUTPUT_KIND == "mixed", (
+            f"S3 should be mixed (multi-dataset), got {S3.OUTPUT_KIND!r}"
         )
 
     def test_gee_backend_inherits_raster(self):
