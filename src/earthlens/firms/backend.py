@@ -38,7 +38,6 @@ from typing import TYPE_CHECKING, Literal
 import pandas as pd
 import requests
 from loguru import logger
-from tqdm import tqdm
 
 from earthlens.base import (
     AbstractDataSource,
@@ -499,16 +498,9 @@ class FIRMS(AbstractDataSource):
             list[FeatureCollection]: One collection per product, or `[]`
                 when nothing matched.
         """
-        products = self._search()
-        if not products:  # pragma: no cover - defensive: _search always yields >=1 product
-            return []
-        iterator = tqdm(
-            products,
-            disable=not progress_bar,
-            desc="FIRMS chunks",
-            unit="chunk",
+        return self._search_fetch_each(
+            progress_bar=progress_bar, desc="FIRMS chunks", unit="chunk"
         )
-        return [self._fetch_one(product) for product in iterator]
 
     def download(
         self,

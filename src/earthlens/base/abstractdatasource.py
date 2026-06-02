@@ -591,6 +591,62 @@ class AbstractDataSource(ABC):
             return []
         return self._fetch(products)
 
+    def _fetch_one(self, product: RemoteProduct) -> Any:
+        """Fetch a single product — the per-product hook for `_search_fetch_each`.
+
+        Default raises `NotImplementedError`. Backends that want a
+        per-item progress bar override this (instead of, or alongside,
+        the whole-list `_fetch`) so `_search_fetch_each` can map it over
+        the `_search` results under a `tqdm` bar.
+
+        Raises:
+            NotImplementedError: When the backend does not opt into the
+                per-product fetch hook.
+        """
+        raise NotImplementedError(
+            f"{type(self).__name__} does not implement _fetch_one."
+        )
+
+    def _search_fetch_each(
+        self,
+        *,
+        progress_bar: bool = False,
+        desc: str | None = None,
+        unit: str = "item",
+    ) -> list[Any]:
+        """C3 composition with an optional per-product `tqdm` progress bar.
+
+        Like :meth:`_api_via_search_fetch`, but maps the per-product
+        :meth:`_fetch_one` hook over the `_search` results so a `tqdm`
+        bar can show per-item progress — the shared form of the
+        progress-aware composition several backends (FIRMS, OpenAQ)
+        previously duplicated. Backends that fetch the whole product
+        list at once, or need bespoke progress / partial-failure
+        handling (e.g. CMEMS), keep their own composition.
+
+        Args:
+            progress_bar: Show the per-product `tqdm` bar when `True`.
+            desc: `tqdm` description; defaults to the class name.
+            unit: `tqdm` unit label.
+
+        Returns:
+            list[Any]: One :meth:`_fetch_one` result per product
+                (element type tracks :attr:`OUTPUT_KIND`), or `[]` when
+                `_search` matched nothing.
+        """
+        products = self._search()
+        if not products:
+            return []
+        from tqdm import tqdm
+
+        iterator = tqdm(
+            products,
+            disable=not progress_bar,
+            desc=desc or type(self).__name__,
+            unit=unit,
+        )
+        return [self._fetch_one(product) for product in iterator]
+
 
 class AbstractCatalog(BaseModel):
     """Abstract base class for per-data-source variable catalogs.
