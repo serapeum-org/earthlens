@@ -3,12 +3,15 @@
 from __future__ import annotations
 
 import datetime as dt
+import sys
+import types
 from pathlib import Path
 
 import pytest
 
 from earthlens.nwm import BUCKET, NWM
 from earthlens.nwm.backend import (
+    _is_int,
     _is_missing_key,
     build_key,
     enumerate_cycles,
@@ -552,6 +555,77 @@ def test_is_missing_key_false_on_other_error():
 def test_is_missing_key_false_without_response():
     """An exception without a response dict is not a missing key."""
     assert _is_missing_key(RuntimeError("boom")) is False
+
+
+def test_is_int_excludes_bool():
+    """_is_int accepts ints but rejects bool (an int subclass)."""
+    assert _is_int(101) is True
+    assert _is_int(True) is False and _is_int("01010000") is False
+
+
+# -- lazy-import error branches ---------------------------------------------
+
+
+def test_reader_missing_dep_friendly_error(make_nwm, monkeypatch):
+    """A missing LabeledDataset surfaces a friendly ImportError naming the extra."""
+    monkeypatch.setitem(
+        sys.modules, "pyramids.netcdf", types.ModuleType("pyramids.netcdf")
+    )
+    with pytest.raises(ImportError, match=r"earthlens\[nwm\]"):
+        make_nwm()._reader()
+
+
+def test_netcdf_reader_missing_dep_friendly_error(make_nwm, monkeypatch):
+    """A missing NetCDF reader surfaces a friendly ImportError naming the extra."""
+    monkeypatch.setitem(
+        sys.modules, "pyramids.netcdf", types.ModuleType("pyramids.netcdf")
+    )
+    with pytest.raises(ImportError, match=r"earthlens\[nwm\]"):
+        make_nwm()._netcdf_reader()
+
+
+def test_client_missing_boto3_friendly_error(make_nwm, monkeypatch):
+    """A missing boto3 surfaces a friendly ImportError naming the extra."""
+    monkeypatch.setitem(sys.modules, "boto3", None)
+    with pytest.raises(ImportError, match=r"earthlens\[nwm\]"):
+        make_nwm()._client()
+
+
+def test_readers_resolve_pyramids_classes(make_nwm):
+    """The lazy readers resolve the real pyramids classes when installed."""
+    nwm = make_nwm()
+    assert nwm._reader().__name__ == "LabeledDataset"
+    assert nwm._netcdf_reader().__name__ == "NetCDF"
+
+
+def test_gridded_other_value_error_propagates(make_nwm, monkeypatch, patch_client):
+    """A non-interleaved ValueError from subset propagates unchanged (not wrapped)."""
+    nwm = make_nwm(
+        variables={"ldasout": ["SNEQV"]},
+        configuration="short_range",
+        cycles=[0],
+        steps=[1],
+        lat_lim=[39, 40],
+        lon_lim=[-78, -75],
+    )
+    patch_client(nwm, FakeS3(available=None))
+
+    class _Boom:
+        dataset = None
+
+        @classmethod
+        def read_file(cls, path, **kw):
+            return cls()
+
+        def subset(self, *a, **k):
+            raise ValueError("something else entirely")
+
+        def close(self):
+            pass
+
+    monkeypatch.setattr(nwm, "_netcdf_reader", lambda: _Boom)
+    with pytest.raises(ValueError, match="something else entirely"):
+        nwm.download(progress_bar=False)
 
 
 # -- no xarray / zarr in the source -----------------------------------------

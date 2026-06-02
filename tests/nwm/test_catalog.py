@@ -223,3 +223,10 @@ def test_unknown_config_without_close_match(catalog):
     """An unrelated configuration key raises without a did-you-mean hint."""
     with pytest.raises(ValueError, match="is not an NWM configuration"):
         catalog.get_config("zzzzzz")
+
+
+def test_load_missing_file_uses_zero_mtime(tmp_path):
+    """Loading a non-existent path takes the mtime=0 branch then fails to open."""
+    clear_catalog_cache()
+    with pytest.raises(FileNotFoundError):
+        Catalog.load(tmp_path / "does-not-exist.yaml")
