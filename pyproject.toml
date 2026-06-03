@@ -1,6 +1,6 @@
 [project]
 name = "earthlens"
-version = "0.6.0"
+version = "0.7.0"
 description = "remote sensing package"
 readme = {file = "README.md", content-type = "text/markdown"}
 authors = [
@@ -33,7 +33,7 @@ dependencies = [
     # >=0.28.0: georeferences geostationary (GOES ABI) NetCDF reads — scales the
     # scan-angle geotransform to metres — so earthlens.s3 dataset="goes" can warp
     # to WGS84 and crop (pyramids#452 / PY-1a).
-    "pyramids-gis >=0.29.0",
+    "pyramids-gis >=0.31.0",
     "geopandas >=1.0.0",
     "joblib >=1.5.0",
     "loguru >=0.7.3",
