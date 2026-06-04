@@ -137,6 +137,32 @@ def list_backends() -> list[BackendInfo]:
     return sorted(backends, key=lambda b: b.provider)
 
 
+def known_provider_keys() -> set[str]:
+    """Return every accepted provider selector — canonical ids and aliases.
+
+    Used to validate a `--provider` selection before a scan.
+
+    Returns:
+        The union of canonical provider ids and all their registry aliases.
+
+    Examples:
+        - Both the canonical id and its aliases are accepted:
+
+            ```python
+            >>> from earthlens.cli.adapter import known_provider_keys
+            >>> keys = known_provider_keys()
+            >>> {"chc", "chirps", "amazon-s3"} <= keys
+            True
+
+            ```
+    """
+    keys: set[str] = set()
+    for info in list_backends():
+        keys.add(info.provider)
+        keys.update(info.aliases)
+    return keys
+
+
 def load_catalog(info: BackendInfo) -> Any:
     """Load and construct a backend's `Catalog` by reflection.
 
