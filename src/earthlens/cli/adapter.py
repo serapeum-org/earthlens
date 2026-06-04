@@ -181,6 +181,35 @@ def record_title(record: Any) -> str:
     Returns:
         The first non-empty of the record's `title` / `long_name` /
         `description` / `name` / `site_name`, else `""`.
+
+    Examples:
+        - The first populated label field wins, trimmed:
+
+            ```python
+            >>> from types import SimpleNamespace
+            >>> from earthlens.cli.adapter import record_title
+            >>> record_title(SimpleNamespace(title="ERA5 hourly single levels"))
+            'ERA5 hourly single levels'
+
+            ```
+        - `title` is skipped when blank, falling through to `description`:
+
+            ```python
+            >>> from types import SimpleNamespace
+            >>> from earthlens.cli.adapter import record_title
+            >>> record_title(SimpleNamespace(title="  ", description=" Sea ice "))
+            'Sea ice'
+
+            ```
+        - A record with no label field yields the empty string:
+
+            ```python
+            >>> from types import SimpleNamespace
+            >>> from earthlens.cli.adapter import record_title
+            >>> record_title(SimpleNamespace(bucket="era5-pds"))
+            ''
+
+            ```
     """
     for attr in _TITLE_FIELDS:
         value = getattr(record, attr, None)

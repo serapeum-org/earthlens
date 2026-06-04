@@ -283,6 +283,7 @@ markers = [
     "usgs_water: tests for the USGS NWIS / Water Data backend (requires the `usgs-water` extra: dataretrieval; anonymous access works).",
     "ghsl: tests for the GHSL backend (JRC Global Human Settlement Layer; open HTTPS, no extra SDK for the direct path; localised via pyramids).",
     "worldpop: tests for the WorldPop population data hub backend (open CC-BY-4.0; default REST path needs only core requests + pyramids, optional `worldpop` extra adds worldpoppy).",
+    "cli: tests for the `earthlens` console script / federated catalog-query CLI (requires the `cli` extra: typer, rich).",
 ]
 
 [tool.pixi.workspace]

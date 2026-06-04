@@ -59,6 +59,24 @@ def _facet_token(value: Any) -> str:
 
     Returns:
         A trimmed token string, or `""` when there is nothing useful.
+
+    Examples:
+        - Strings are trimmed; cadence objects collapse to a unit token;
+          single-item lists unwrap:
+
+            ```python
+            >>> from types import SimpleNamespace
+            >>> from earthlens.cli.table import _facet_token
+            >>> _facet_token("  daily ")
+            'daily'
+            >>> _facet_token(SimpleNamespace(interval=1, unit="day"))
+            'day'
+            >>> _facet_token(SimpleNamespace(interval=16, unit="day"))
+            '16 day'
+            >>> _facet_token([0.05])
+            '0.05'
+
+            ```
     """
     if value is None or isinstance(value, bool):
         return ""
@@ -100,6 +118,33 @@ class CatalogRow:
         license: License token (e.g. `"proprietary"`), or `""`.
         record: The backend's pydantic dataset record, kept for the
             `show` command. Excluded from equality / repr.
+
+    Examples:
+        - Read a row's facets and free-text search blob:
+
+            ```python
+            >>> from earthlens.cli.table import CatalogRow
+            >>> row = CatalogRow(
+            ...     "ecmwf", "reanalysis-era5-single-levels",
+            ...     "ERA5 hourly single levels", "1 day", "0.25", "",
+            ... )
+            >>> row.facet("provider")
+            'ecmwf'
+            >>> row.facet("cadence")
+            '1 day'
+            >>> "era5" in row.search_text
+            True
+
+            ```
+        - An unknown facet name returns the empty string:
+
+            ```python
+            >>> from earthlens.cli.table import CatalogRow
+            >>> row = CatalogRow("s3", "era5", "ERA5 on AWS", "monthly", "", "")
+            >>> row.facet("instrument")
+            ''
+
+            ```
     """
 
     provider: str
@@ -149,6 +194,34 @@ class CatalogTable:
             error) — surfaced to the user, never silently dropped.
         providers: Canonical ids of the backends that were scanned
             (whether or not they loaded), sorted.
+
+    Examples:
+        - Inspect the distinct facet values across a small table:
+
+            ```python
+            >>> from earthlens.cli.table import CatalogRow, CatalogTable
+            >>> rows = (
+            ...     CatalogRow("chc", "chirps-daily", "", "daily", "0.05", ""),
+            ...     CatalogRow("gee", "ECMWF/ERA5/DAILY", "ERA5", "1 day", "", ""),
+            ... )
+            >>> table = CatalogTable(rows=rows, errors=(), providers=("chc", "gee"))
+            >>> table.facet_values("provider")
+            ['chc', 'gee']
+            >>> table.facet_values("cadence")
+            ['1 day', 'daily']
+
+            ```
+        - `present_facets` lists only the facets that carry any value
+          (here `license` is empty everywhere, so it is dropped):
+
+            ```python
+            >>> from earthlens.cli.table import CatalogRow, CatalogTable
+            >>> rows = (CatalogRow("chc", "chirps-daily", "", "daily", "0.05", ""),)
+            >>> table = CatalogTable(rows=rows, errors=(), providers=("chc",))
+            >>> table.present_facets()
+            ['provider', 'cadence', 'resolution']
+
+            ```
     """
 
     rows: tuple[CatalogRow, ...]
