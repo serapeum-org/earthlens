@@ -205,6 +205,11 @@ def search(
     except ValueError as exc:
         raise typer.BadParameter(str(exc)) from exc
 
+    if ids_only and (count or facets_only):
+        raise typer.BadParameter(
+            "--ids-only cannot be combined with --count / --facets-only"
+        )
+
     catalog = build_table(providers=providers, include_available=include_available)
     rows = sort_rows(apply_filters(free_text(catalog.rows, query), filters))
     print_load_warnings(catalog.errors)

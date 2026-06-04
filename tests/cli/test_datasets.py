@@ -171,6 +171,14 @@ class TestSearch:
         result = runner.invoke(app, ["datasets", "search", "-p", "s3", "--facets-only"])
         assert "FACET" in result.output and "{" not in result.output
 
+    @pytest.mark.parametrize("mode", ["--count", "--facets-only"])
+    def test_ids_only_rejected_with_terminal_modes(self, mode):
+        """--ids-only is rejected alongside the scalar/aggregate output modes."""
+        result = runner.invoke(
+            app, ["datasets", "search", "-p", "s3", mode, "--ids-only"]
+        )
+        assert result.exit_code == 2, f"{mode} + --ids-only should be rejected"
+
 
 class TestList:
     """Tests for `datasets list`."""
