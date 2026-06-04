@@ -17,11 +17,29 @@ from rich.table import Table
 
 from earthlens.cli.table import CatalogRow, LoadError
 
-#: Column key -> header, in display order, for the federated row tables.
-_ROW_COLUMNS: tuple[tuple[str, str], ...] = (
-    ("provider", "PROVIDER"),
-    ("dataset_id", "DATASET ID"),
-    ("title", "TITLE"),
+#: Header label for each :class:`~earthlens.cli.table.CatalogRow` column.
+_COLUMN_HEADERS: dict[str, str] = {
+    "provider": "PROVIDER",
+    "dataset_id": "DATASET ID",
+    "title": "TITLE",
+    "cadence": "CADENCE",
+    "resolution": "RESOLUTION",
+    "license": "LICENSE",
+}
+
+#: Column set for the search / where result tables.
+DEFAULT_COLUMNS: tuple[str, ...] = ("provider", "dataset_id", "title")
+
+#: Compact column set — `list`'s names-only default.
+COMPACT_COLUMNS: tuple[str, ...] = ("provider", "dataset_id")
+
+#: Detailed column set — `list --full`.
+FULL_COLUMNS: tuple[str, ...] = (
+    "provider",
+    "dataset_id",
+    "title",
+    "cadence",
+    "resolution",
 )
 
 
@@ -121,21 +139,28 @@ def rows_to_ids(rows: Iterable[CatalogRow]) -> str:
     return "\n".join(f"{row.provider}\t{row.dataset_id}" for row in rows)
 
 
-def rows_table(rows: Sequence[CatalogRow], title: str | None = None) -> Table:
-    """Build a Rich table of `provider / dataset id / title` for `rows`.
+def rows_table(
+    rows: Sequence[CatalogRow],
+    title: str | None = None,
+    columns: tuple[str, ...] = DEFAULT_COLUMNS,
+) -> Table:
+    """Build a Rich table of the chosen `columns` for `rows`.
 
     Args:
         rows: The rows to tabulate.
         title: Optional table title (e.g. a result summary).
+        columns: The :class:`~earthlens.cli.table.CatalogRow` attributes to
+            show, in order. Defaults to provider / dataset id / title; use
+            :data:`COMPACT_COLUMNS` or :data:`FULL_COLUMNS` for `list`.
 
     Returns:
         A populated :class:`rich.table.Table`.
     """
     table = Table(title=title, header_style="bold", show_lines=False)
-    for _key, header in _ROW_COLUMNS:
-        table.add_column(header, overflow="fold")
+    for column in columns:
+        table.add_column(_COLUMN_HEADERS[column], overflow="fold")
     for row in rows:
-        table.add_row(row.provider, row.dataset_id, row.title or "")
+        table.add_row(*(getattr(row, column) or "" for column in columns))
     return table
 
 

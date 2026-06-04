@@ -21,6 +21,8 @@ from earthlens.cli.query import (
     sort_rows,
 )
 from earthlens.cli.render import (
+    COMPACT_COLUMNS,
+    FULL_COLUMNS,
     counts_table,
     err_console,
     out_console,
@@ -191,3 +193,50 @@ def search(
     if limit and limit > 0:
         rows = rows[:limit]
     _emit_rows(rows, json_output=json_output, ids_only=ids_only)
+
+
+@datasets_app.command("list")
+def list_datasets(
+    provider: list[str] = typer.Option(
+        None,
+        "--provider",
+        "-p",
+        help="Restrict to these providers (repeatable / comma-separated).",
+    ),
+    full: bool = typer.Option(
+        False,
+        "--full",
+        "-l",
+        help="Show title / cadence / resolution columns, not just ids.",
+    ),
+    json_output: bool = typer.Option(
+        False, "--json", "-j", help="Emit a JSON array (for piping)."
+    ),
+    ids_only: bool = typer.Option(
+        False, "--ids-only", help="Emit bare `provider<TAB>id` lines (for piping)."
+    ),
+) -> None:
+    """List datasets across providers (offline; reads the bundled catalogs).
+
+    Names-only by default (`provider` / `dataset id`); `--full` adds the
+    title, cadence and resolution columns. Scope to one or more backends
+    with `--provider`. No network access is performed.
+    """
+    providers = _resolve_providers(provider)
+    catalog = build_table(providers=providers)
+    rows = sort_rows(catalog.rows)
+    print_load_warnings(catalog.errors)
+
+    if json_output:
+        typer.echo(rows_to_json(rows))
+        return
+    if ids_only:
+        typer.echo(rows_to_ids(rows))
+        return
+    out_console().print(
+        rows_table(rows, columns=FULL_COLUMNS if full else COMPACT_COLUMNS)
+    )
+    err_console().print(
+        f"[dim]{len(rows)} dataset(s) across "
+        f"{len(catalog.providers)} provider(s).[/dim]"
+    )
