@@ -63,13 +63,7 @@ class TestProbeHelpers:
         assert available is True, f"chc should resolve: {detail}"
 
     def test_sdk_unavailable_is_reported(self):
-        """A backend whose registry key cannot resolve reports unavailable.
-
-        Test scenario:
-            A crafted BackendInfo with an unregistered alias makes the
-            registry lookup raise; the probe must catch it and return a
-            `(False, reason)` pair rather than propagating.
-        """
+        """A backend whose registry key cannot resolve reports unavailable."""
         bogus = BackendInfo(
             provider="bogus", module="earthlens.bogus", extra="", aliases=("nope",)
         )

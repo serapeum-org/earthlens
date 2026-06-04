@@ -362,6 +362,6 @@ def build_table(
 
 
 def clear_table_cache() -> None:
-    """Drop the process-lifetime table cache (used by tests)."""
+    """Drop the process-lifetime table cache so the next build reloads."""
     with _CACHE_LOCK:
         _CACHE.clear()

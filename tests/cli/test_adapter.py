@@ -153,12 +153,7 @@ class TestLoadAllRows:
         assert {r.provider for r in rows} == {"chc"}, "chirps alias -> chc"
 
     def test_failure_is_isolated(self, monkeypatch):
-        """A backend that fails to load is captured as a LoadError, not raised.
-
-        Test scenario:
-            Patching load_catalog to raise for every backend must yield no
-            rows and one LoadError per scanned backend, never propagating.
-        """
+        """A backend that fails to load is captured as a LoadError, not raised."""
 
         def _boom(info: BackendInfo):
             raise RuntimeError("simulated SDK failure")
