@@ -55,6 +55,33 @@ class TestWhere:
         result = runner.invoke(app, ["datasets", "where", "x", "-p", "bogus"])
         assert result.exit_code == 2, "BadParameter -> exit 2"
 
+    def test_did_you_mean_on_typo(self):
+        """A near-miss (transposed) query exits non-zero with a suggestion."""
+        result = runner.invoke(app, ["datasets", "where", "chrip-daily", "-p", "chc"])
+        assert result.exit_code == 1, "typo still misses"
+        assert "Did you mean" in result.output, "suggests a close dataset id"
+
+    def test_include_available_widens_the_search(self):
+        """--include-available can surface ids absent from the curated set."""
+        curated = runner.invoke(
+            app, ["datasets", "where", "building", "-p", "overture", "--ids-only"]
+        )
+        widened = runner.invoke(
+            app,
+            [
+                "datasets",
+                "where",
+                "building",
+                "-p",
+                "overture",
+                "--include-available",
+                "--ids-only",
+            ],
+        )
+        widened_lines = [ln for ln in widened.output.splitlines() if ln.strip()]
+        curated_lines = [ln for ln in curated.output.splitlines() if ln.strip()]
+        assert len(widened_lines) >= len(curated_lines), "available widens results"
+
     def test_conflicting_output_modes_rejected(self):
         """--json and --ids-only together is a usage error."""
         result = runner.invoke(

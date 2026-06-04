@@ -116,6 +116,10 @@ class CatalogRow:
         cadence: Temporal-cadence token (e.g. `"daily"`, `"1 day"`), or `""`.
         resolution: Spatial-resolution token (e.g. `"30"`, `"0.05"`), or `""`.
         license: License token (e.g. `"proprietary"`), or `""`.
+        curated: `True` for a hand-curated catalog dataset (with metadata);
+            `False` for an id surfaced only from the upstream
+            `available_*` index under `--include-available` (id-only, no
+            metadata).
         record: The backend's pydantic dataset record, kept for the
             `show` command. Excluded from equality / repr.
 
@@ -153,6 +157,7 @@ class CatalogRow:
     cadence: str
     resolution: str
     license: str
+    curated: bool = True
     record: Any = field(compare=False, repr=False, default=None)
 
     @property
@@ -244,16 +249,41 @@ def _matches(info: BackendInfo, wanted: set[str] | None) -> bool:
     return info.provider in wanted or bool(wanted.intersection(info.aliases))
 
 
-def _load_one(info: BackendInfo) -> tuple[list[CatalogRow], LoadError | None]:
-    """Load one backend's catalog into rows, capturing any failure."""
+def _load_one(
+    info: BackendInfo,
+) -> tuple[list[CatalogRow], list[str], LoadError | None]:
+    """Load one backend's catalog, capturing rows, the upstream index, failures.
+
+    Args:
+        info: The backend to load.
+
+    Returns:
+        A `(rows, available_ids, error)` triple. `available_ids` is the
+        backend's full `available_datasets` index (used only under
+        `--include-available`); `error` is non-None when the catalog could
+        not be loaded (and `rows` / `available_ids` are then empty).
+    """
     try:
         catalog = load_catalog(info)
     except Exception as exc:  # noqa: BLE001 — isolate one backend's failure
-        return [], LoadError(provider=info.provider, error=str(exc))
-    return [_to_row(raw) for raw in iter_catalog_rows(info, catalog)], None
+        return [], [], LoadError(provider=info.provider, error=str(exc))
+    rows = [_to_row(raw) for raw in iter_catalog_rows(info, catalog)]
+    available = [str(ident) for ident in getattr(catalog, "available_datasets", [])]
+    return rows, available, None
 
 
-_CACHE: dict[tuple[str, ...] | None, CatalogTable] = {}
+def _available_rows(
+    provider: str, available_ids: list[str], curated_ids: set[str]
+) -> list[CatalogRow]:
+    """Build id-only rows for upstream ids not already curated for `provider`."""
+    return [
+        CatalogRow(provider, ident, "", "", "", "", curated=False)
+        for ident in available_ids
+        if ident not in curated_ids
+    ]
+
+
+_CACHE: dict[tuple[tuple[str, ...] | None, bool], CatalogTable] = {}
 _CACHE_LOCK = threading.Lock()
 
 
@@ -261,17 +291,22 @@ def build_table(
     providers: list[str] | None = None,
     *,
     refresh: bool = False,
+    include_available: bool = False,
 ) -> CatalogTable:
     """Build (or return a cached) normalised table of every backend's catalog.
 
     Loads the requested backends and flattens them into one
-    :class:`CatalogTable`. The result is cached per `providers` selection
-    for the process lifetime; pass `refresh=True` to rebuild.
+    :class:`CatalogTable`. The result is cached per `(providers,
+    include_available)` selection for the process lifetime; pass
+    `refresh=True` to rebuild.
 
     Args:
         providers: Restrict to these canonical provider ids (or registry
             aliases). `None` scans every backend.
         refresh: Rebuild even if a cached table exists.
+        include_available: Also fold in each backend's upstream
+            `available_datasets` index as id-only rows (`curated=False`) —
+            thousands of extra ids for earthdata / hdx, hence opt-in.
 
     Returns:
         The normalised, immutable catalog table.
@@ -289,7 +324,7 @@ def build_table(
 
             ```
     """
-    key = tuple(sorted(providers)) if providers else None
+    key = (tuple(sorted(providers)) if providers else None, include_available)
     if not refresh:
         with _CACHE_LOCK:
             cached = _CACHE.get(key)
@@ -301,11 +336,20 @@ def build_table(
 
     rows: list[CatalogRow] = []
     errors: list[LoadError] = []
+    available_by_provider: list[tuple[str, list[str]]] = []
     for info in backends:
-        backend_rows, error = _load_one(info)
+        backend_rows, available_ids, error = _load_one(info)
         rows.extend(backend_rows)
         if error is not None:
             errors.append(error)
+        elif include_available:
+            available_by_provider.append((info.provider, available_ids))
+
+    if include_available:
+        curated_ids = {(row.provider, row.dataset_id) for row in rows}
+        for provider, available_ids in available_by_provider:
+            seen = {ident for prov, ident in curated_ids if prov == provider}
+            rows.extend(_available_rows(provider, available_ids, seen))
 
     table = CatalogTable(
         rows=tuple(rows),

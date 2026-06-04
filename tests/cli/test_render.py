@@ -30,8 +30,8 @@ def _row(provider="s3", dataset_id="era5", title="ERA5", cadence="monthly"):
 class TestRowToDict:
     """Tests for row_to_dict."""
 
-    def test_projects_six_columns(self):
-        """The dict carries the six string columns and not the record."""
+    def test_projects_flat_columns(self):
+        """The dict carries the flat columns (incl. curated) and not the record."""
         data = row_to_dict(_row())
         assert set(data) == {
             "provider",
@@ -40,6 +40,7 @@ class TestRowToDict:
             "cadence",
             "resolution",
             "license",
+            "curated",
         }
         assert "record" not in data, "the pydantic record is dropped"
 

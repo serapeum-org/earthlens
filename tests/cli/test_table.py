@@ -124,6 +124,11 @@ class TestCatalogRow:
         b = CatalogRow("s3", "era5", "ERA5", "monthly", "", "", record=object())
         assert a == b, "record participates in neither eq nor hash"
 
+    def test_curated_defaults_true(self):
+        """A row is curated unless explicitly marked otherwise."""
+        assert CatalogRow("s3", "era5", "ERA5", "", "", "").curated is True
+        assert CatalogRow("s3", "x", "", "", "", "", curated=False).curated is False
+
 
 class TestCatalogTable:
     """Tests for CatalogTable."""
@@ -209,6 +214,26 @@ class TestBuildTable:
         radar = build_table(providers=["radar"])
         assert chc is not radar, "distinct selections -> distinct tables"
         assert radar.providers == ("radar",), "radar selection scoped"
+
+    def test_rows_are_curated_by_default(self):
+        """A plain build yields only curated rows."""
+        table = build_table(providers=["overture"])
+        assert all(row.curated for row in table.rows), "curated rows only"
+
+    def test_include_available_adds_uncurated_rows(self):
+        """--include-available folds in extra id-only (curated=False) rows."""
+        curated = build_table(providers=["overture"])
+        widened = build_table(providers=["overture"], include_available=True)
+        assert len(widened.rows) > len(curated.rows), "available index adds rows"
+        extra = [row for row in widened.rows if not row.curated]
+        assert extra, "the extra rows are flagged curated=False"
+        assert all(row.title == "" for row in extra), "available rows are id-only"
+
+    def test_include_available_is_cached_separately(self):
+        """The include_available flag is part of the cache key."""
+        plain = build_table(providers=["overture"])
+        widened = build_table(providers=["overture"], include_available=True)
+        assert plain is not widened, "distinct flag -> distinct cached table"
 
 
 class TestClearTableCache:

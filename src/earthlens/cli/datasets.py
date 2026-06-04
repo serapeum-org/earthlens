@@ -109,6 +109,11 @@ def where(
     exact: bool = typer.Option(
         False, "--exact", help="Match the dataset id exactly (no substring search)."
     ),
+    include_available: bool = typer.Option(
+        False,
+        "--include-available",
+        help="Also search each backend's full upstream id index (slower).",
+    ),
     json_output: bool = typer.Option(
         False, "--json", "-j", help="Emit a JSON array (for piping)."
     ),
@@ -122,17 +127,22 @@ def where(
     an exact dataset-id match wins, otherwise a case-insensitive substring
     match against the id and title. Results are ordered by the configurable
     provider precedence (see `EARTHLENS_PROVIDER_PRIORITY`). Exits non-zero
-    when nothing matches, so it composes in shell pipelines.
+    (with a did-you-mean hint) when nothing matches, so it composes in shell
+    pipelines.
     """
     providers = _resolve_providers(provider)
-    catalog = build_table(providers=providers)
+    catalog = build_table(providers=providers, include_available=include_available)
     matches = exact_first(match_rows(catalog.rows, name, exact=exact), name)
 
     print_load_warnings(catalog.errors)
     _emit_rows(matches, json_output=json_output, ids_only=ids_only)
     if not matches:
         if not (json_output or ids_only):
-            err_console().print(f"[red]No dataset matches {name!r}.[/red]")
+            close = difflib.get_close_matches(
+                name, [row.dataset_id for row in catalog.rows], n=3
+            )
+            hint = f" Did you mean: {', '.join(close)}?" if close else ""
+            err_console().print(f"[red]No dataset matches {name!r}.[/red]{hint}")
         raise typer.Exit(code=1)
 
 
@@ -164,6 +174,11 @@ def search(
         "--facets-only",
         help="Print per-facet value counts instead of rows.",
     ),
+    include_available: bool = typer.Option(
+        False,
+        "--include-available",
+        help="Also search each backend's full upstream id index (slower).",
+    ),
     json_output: bool = typer.Option(
         False, "--json", "-j", help="Emit a JSON array (for piping)."
     ),
@@ -185,7 +200,7 @@ def search(
     except ValueError as exc:
         raise typer.BadParameter(str(exc)) from exc
 
-    catalog = build_table(providers=providers)
+    catalog = build_table(providers=providers, include_available=include_available)
     rows = sort_rows(apply_filters(free_text(catalog.rows, query), filters))
     print_load_warnings(catalog.errors)
 
@@ -215,6 +230,11 @@ def list_datasets(
         "-l",
         help="Show title / cadence / resolution columns, not just ids.",
     ),
+    include_available: bool = typer.Option(
+        False,
+        "--include-available",
+        help="Also include each backend's full upstream id index (slower).",
+    ),
     json_output: bool = typer.Option(
         False, "--json", "-j", help="Emit a JSON array (for piping)."
     ),
@@ -229,7 +249,7 @@ def list_datasets(
     with `--provider`. No network access is performed.
     """
     providers = _resolve_providers(provider)
-    catalog = build_table(providers=providers)
+    catalog = build_table(providers=providers, include_available=include_available)
     rows = sort_rows(catalog.rows)
     print_load_warnings(catalog.errors)
 

@@ -72,8 +72,8 @@ def row_to_dict(row: CatalogRow) -> dict[str, str]:
             >>> row = CatalogRow("s3", "era5", "ERA5", "monthly", "0.25", "")
             >>> row_to_dict(row)["dataset_id"]
             'era5'
-            >>> sorted(row_to_dict(row))
-            ['cadence', 'dataset_id', 'license', 'provider', 'resolution', 'title']
+            >>> row_to_dict(row)["curated"]
+            True
 
             ```
     """
@@ -84,6 +84,7 @@ def row_to_dict(row: CatalogRow) -> dict[str, str]:
         "cadence": row.cadence,
         "resolution": row.resolution,
         "license": row.license,
+        "curated": row.curated,
     }
 
 
