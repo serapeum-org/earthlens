@@ -138,9 +138,10 @@ def where(
     _emit_rows(matches, json_output=json_output, ids_only=ids_only)
     if not matches:
         if not (json_output or ids_only):
-            close = difflib.get_close_matches(
-                name, [row.dataset_id for row in catalog.rows], n=3
-            )
+            # Suggest from curated ids only — the upstream available index
+            # can be tens of thousands of ids, too many to fuzzy-rank here.
+            curated_ids = [row.dataset_id for row in catalog.rows if row.curated]
+            close = difflib.get_close_matches(name, curated_ids, n=3)
             hint = f" Did you mean: {', '.join(close)}?" if close else ""
             err_console().print(f"[red]No dataset matches {name!r}.[/red]{hint}")
         raise typer.Exit(code=1)
@@ -167,12 +168,14 @@ def search(
         0, "--limit", "-n", help="Cap the number of rows shown (0 = no cap)."
     ),
     count: bool = typer.Option(
-        False, "--count", help="Print only the number of matches."
+        False,
+        "--count",
+        help="Print only the match count (a bare number, or {\"count\": N} with --json).",
     ),
     facets_only: bool = typer.Option(
         False,
         "--facets-only",
-        help="Print per-facet value counts instead of rows.",
+        help="Print per-facet value counts instead of rows (honours --json).",
     ),
     include_available: bool = typer.Option(
         False,
@@ -192,7 +195,9 @@ def search(
     `--filter facet=value` narrowing (logical AND over `provider`, `cadence`,
     `resolution`, `license`). `--count` prints just the total; `--facets-only`
     prints the distribution of matches per facet value (cheap to probe a big
-    federation); `--limit` caps the rows shown.
+    federation); `--limit` caps the rows shown. Both `--count` and
+    `--facets-only` honour `--json` (a `{"count": N}` object and a
+    `{facet: [{value, count}]}` object respectively) for piping.
     """
     providers = _resolve_providers(provider)
     try:
@@ -205,11 +210,23 @@ def search(
     print_load_warnings(catalog.errors)
 
     if count:
-        typer.echo(str(len(rows)))
+        typer.echo(json.dumps({"count": len(rows)}) if json_output else str(len(rows)))
         return
     if facets_only:
         counts = {facet: facet_counts(rows, facet) for facet in FACET_NAMES}
-        out_console().print(counts_table({f: c for f, c in counts.items() if c}))
+        present = {facet: pairs for facet, pairs in counts.items() if pairs}
+        if json_output:
+            typer.echo(
+                json.dumps(
+                    {
+                        facet: [{"value": v, "count": c} for v, c in pairs]
+                        for facet, pairs in present.items()
+                    },
+                    indent=2,
+                )
+            )
+            return
+        out_console().print(counts_table(present))
         return
     if limit and limit > 0:
         rows = rows[:limit]

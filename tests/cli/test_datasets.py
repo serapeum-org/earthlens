@@ -8,6 +8,7 @@ import pytest
 from typer.testing import CliRunner
 
 from earthlens.cli.app import app
+from earthlens.cli.table import build_table
 
 pytestmark = pytest.mark.cli
 
@@ -60,6 +61,19 @@ class TestWhere:
         result = runner.invoke(app, ["datasets", "where", "chrip-daily", "-p", "chc"])
         assert result.exit_code == 1, "typo still misses"
         assert "Did you mean" in result.output, "suggests a close dataset id"
+
+    def test_did_you_mean_suggests_curated_only(self):
+        """Under --include-available, suggestions come from curated ids only."""
+        curated = {row.dataset_id for row in build_table(providers=["overture"]).rows}
+        result = runner.invoke(
+            app,
+            ["datasets", "where", "buildingz", "-p", "overture", "--include-available"],
+        )
+        assert result.exit_code == 1, "typo still misses"
+        assert "Did you mean" in result.output, "suggestion offered"
+        suggested = result.output.split("Did you mean:", 1)[1].rstrip("?\n ")
+        tokens = [tok.strip() for tok in suggested.split(",") if tok.strip()]
+        assert tokens and all(tok in curated for tok in tokens), "only curated ids"
 
     def test_include_available_widens_the_search(self):
         """--include-available can surface ids absent from the curated set."""
@@ -134,6 +148,28 @@ class TestSearch:
             app, ["datasets", "search", "-p", "s3", "-n", "1", "--json"]
         )
         assert len(json.loads(result.output)) <= 1, "limit respected"
+
+    def test_count_json_emits_object(self):
+        """--count --json emits a {"count": N} object, not a bare number."""
+        result = runner.invoke(
+            app, ["datasets", "search", "-p", "s3", "--count", "--json"]
+        )
+        payload = json.loads(result.output)
+        assert set(payload) == {"count"} and payload["count"] > 0, "single count key"
+
+    def test_facets_only_json_emits_per_facet(self):
+        """--facets-only --json emits a {facet: [{value, count}]} object."""
+        result = runner.invoke(
+            app, ["datasets", "search", "-p", "s3", "--facets-only", "--json"]
+        )
+        payload = json.loads(result.output)
+        assert [v["value"] for v in payload["provider"]] == ["s3"], "provider facet"
+        assert payload["provider"][0]["count"] > 0, "count carried"
+
+    def test_facets_only_table_still_default(self):
+        """--facets-only without --json still prints the Rich table."""
+        result = runner.invoke(app, ["datasets", "search", "-p", "s3", "--facets-only"])
+        assert "FACET" in result.output and "{" not in result.output
 
 
 class TestList:

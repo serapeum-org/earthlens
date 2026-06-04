@@ -30,6 +30,9 @@ from earthlens.earthlens import EarthLens
 #: Record fields tried, in order, when a backend stores its curated rows
 #: under a field other than `datasets` (openaq/usgs_water expose
 #: `parameters`, radar `stations`, …). `datasets` is always tried first.
+#: Defensive: every backend currently populates `datasets`, so the later
+#: fallbacks are a safety net for a future divergent backend, not a path
+#: any shipped catalog takes today.
 _ROW_FIELDS = ("datasets", "parameters", "stations", "sensors", "models")
 
 #: Attributes tried, in order, to derive a human-readable label for a
@@ -116,10 +119,8 @@ def list_backends() -> list[BackendInfo]:
 
             ```
     """
-    # `_mapping` is `key -> (module, class_name, extra, default_kwargs)`.
-    mapping = EarthLens.DataSources._mapping
     by_module: dict[str, dict[str, Any]] = {}
-    for key, (module, _class_name, extra, _defaults) in mapping.items():
+    for key, module, extra in EarthLens.DataSources.entries():
         entry = by_module.setdefault(module, {"extra": "", "aliases": set()})
         entry["aliases"].add(key)
         if extra and not entry["extra"]:

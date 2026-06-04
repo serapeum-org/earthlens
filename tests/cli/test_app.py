@@ -2,11 +2,14 @@
 
 from __future__ import annotations
 
+import subprocess
+import sys
+
 import pytest
 from typer.testing import CliRunner
 
 from earthlens.cli import app as cli_app
-from earthlens.cli.app import app
+from earthlens.cli.app import app, main
 
 pytestmark = pytest.mark.cli
 
@@ -42,3 +45,21 @@ class TestApp:
         """`earthlens providers --help` renders the group's help."""
         result = runner.invoke(app, ["providers", "--help"])
         assert result.exit_code == 0, f"providers --help failed: {result.output}"
+
+    def test_main_runs_the_app(self, monkeypatch):
+        """main() drives the app; --help exits cleanly with code 0."""
+        monkeypatch.setattr(sys, "argv", ["earthlens", "--help"])
+        with pytest.raises(SystemExit) as exc_info:
+            main()
+        assert exc_info.value.code == 0, "main() --help exits 0"
+
+    def test_python_m_entrypoint(self):
+        """`python -m earthlens.cli --help` runs and prints usage."""
+        result = subprocess.run(
+            [sys.executable, "-m", "earthlens.cli", "--help"],
+            capture_output=True,
+            text=True,
+            timeout=120,
+        )
+        assert result.returncode == 0, f"module entrypoint failed: {result.stderr}"
+        assert "Usage" in result.stdout, "usage banner printed"

@@ -11,12 +11,14 @@ from earthlens.cli.adapter import (
     BackendInfo,
     LoadError,
     RawRow,
+    _row_mapping,
     iter_catalog_rows,
     list_backends,
     load_all_rows,
     load_catalog,
     record_title,
 )
+from earthlens.earthlens import EarthLens
 
 pytestmark = pytest.mark.cli
 
@@ -59,6 +61,42 @@ class TestListBackends:
         by_provider = {b.provider: b for b in list_backends()}
         assert by_provider["gee"].extra == "gee", "gee needs its SDK extra"
         assert by_provider["chc"].extra == "", "chc is SDK-free (anonymous FTP)"
+
+
+class TestRegistryEntries:
+    """Tests for EarthLens.DataSources.entries (consumed by list_backends)."""
+
+    def test_yields_key_module_extra_triples(self):
+        """entries() exposes each key's backing module and pip extra."""
+        entries = {
+            key: (module, extra)
+            for key, module, extra in EarthLens.DataSources.entries()
+        }
+        assert entries["chc"] == ("earthlens.chc", ""), "SDK-free backend"
+        assert entries["gee"] == ("earthlens.gee", "gee"), "extra captured"
+
+    def test_one_entry_per_registry_key(self):
+        """entries() yields exactly one triple per registered key."""
+        entries = list(EarthLens.DataSources.entries())
+        assert len(entries) == len(EarthLens.DataSources), "one per key"
+
+
+class TestRowMapping:
+    """Tests for the _row_mapping divergence absorber."""
+
+    def test_prefers_datasets(self):
+        """A populated `datasets` field is used directly."""
+        catalog = SimpleNamespace(datasets={"a": 1}, parameters={"x": 2})
+        assert _row_mapping(catalog) == {"a": 1}, "datasets wins"
+
+    def test_falls_back_to_alternate_field(self):
+        """An empty `datasets` falls back to the first populated alt field."""
+        catalog = SimpleNamespace(datasets={}, parameters={"pm25": object()})
+        assert set(_row_mapping(catalog)) == {"pm25"}, "parameters used"
+
+    def test_empty_when_nothing_populated(self):
+        """No populated row field yields an empty mapping."""
+        assert _row_mapping(SimpleNamespace(datasets={})) == {}, "empty -> {}"
 
 
 class TestRecordTitle:
