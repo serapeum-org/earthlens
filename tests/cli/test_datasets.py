@@ -7,6 +7,7 @@ import json
 import pytest
 from typer.testing import CliRunner
 
+from earthlens.cli import curate as curate_mod
 from earthlens.cli import refresh as refresh_mod
 from earthlens.cli.app import app
 from earthlens.cli.table import build_table
@@ -266,6 +267,48 @@ class TestRefresh:
         result = runner.invoke(app, ["datasets", "refresh", "stac", "--write"])
         assert result.exit_code == 0, f"refresh --write failed: {result.output}"
         assert "wrote" in result.output and "_index.yaml" in result.output
+
+
+class TestProbe:
+    """Tests for `datasets probe` (curation seed; network mocked)."""
+
+    _SAMPLE = {
+        "features": [
+            {
+                "assets": {
+                    "B04": {"type": "image/tiff", "eo:bands": [{"common_name": "red"}]}
+                }
+            }
+        ]
+    }
+
+    def test_unsupported_provider_exits_nonzero(self):
+        """A provider with no prober reports unsupported and exits 1."""
+        result = runner.invoke(app, ["datasets", "probe", "chc", "whatever"])
+        assert result.exit_code == 1, "unsupported -> exit 1"
+        assert "unsupported" in result.output, "reason shown"
+
+    def test_multiple_providers_rejected(self):
+        """probe takes exactly one provider, not 'all'."""
+        result = runner.invoke(app, ["datasets", "probe", "all", "x"])
+        assert result.exit_code == 2, "'all' rejected for probe"
+
+    def test_schema_json_with_mocked_sample(self, monkeypatch):
+        """--json emits the parsed band/asset schema."""
+        monkeypatch.setattr(curate_mod, "_get_json", lambda url: self._SAMPLE)
+        result = runner.invoke(
+            app, ["datasets", "probe", "stac", "sentinel-2-l2a", "--json"]
+        )
+        payload = json.loads(result.output)
+        assert payload["status"] == "ok", "probe succeeded"
+        assert payload["assets"]["B04"]["common_name"] == "red", "schema parsed"
+
+    def test_table_lists_assets(self, monkeypatch):
+        """The default table lists each probed asset."""
+        monkeypatch.setattr(curate_mod, "_get_json", lambda url: self._SAMPLE)
+        result = runner.invoke(app, ["datasets", "probe", "stac", "sentinel-2-l2a"])
+        assert result.exit_code == 0, f"probe failed: {result.output}"
+        assert "ASSET" in result.output and "B04" in result.output
 
 
 class TestShow:

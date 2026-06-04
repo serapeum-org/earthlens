@@ -379,3 +379,30 @@ def refresh_table(outcomes) -> Table:
             outcome.detail,
         )
     return table
+
+
+def probe_table(result) -> Table:
+    """Build an asset/band schema table from a probe result.
+
+    Args:
+        result: A `ProbeResult` (duck-typed: `.assets` mapping of asset key
+            to `{media_type, common_name, dtype, nodata}`).
+
+    Returns:
+        A :class:`rich.table.Table`; missing fields render as `-`.
+    """
+    table = Table(header_style="bold", show_lines=False)
+    table.add_column("ASSET", overflow="fold")
+    table.add_column("MEDIA TYPE", overflow="fold")
+    table.add_column("COMMON NAME", overflow="fold")
+    table.add_column("DTYPE", overflow="fold")
+    table.add_column("NODATA", justify="right")
+    for key, schema in result.assets.items():
+        table.add_row(
+            key,
+            str(schema.get("media_type") or "-"),
+            str(schema.get("common_name") or "-"),
+            str(schema.get("dtype") or "-"),
+            "-" if schema.get("nodata") is None else str(schema.get("nodata")),
+        )
+    return table

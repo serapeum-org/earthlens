@@ -23,6 +23,7 @@ from earthlens.cli.query import (
     parse_filters,
     sort_rows,
 )
+from earthlens.cli.curate import probe_dataset
 from earthlens.cli.refresh import refresh_one
 from earthlens.cli.render import (
     COMPACT_COLUMNS,
@@ -32,6 +33,7 @@ from earthlens.cli.render import (
     kv_table,
     out_console,
     print_load_warnings,
+    probe_table,
     record_json,
     record_table,
     refresh_table,
@@ -478,3 +480,37 @@ def refresh(
                 f"[green]wrote {outcome.live_count} ids[/green] "
                 f"({outcome.provider}) -> {outcome.written}"
             )
+
+
+@datasets_app.command()
+def probe(
+    provider: str = typer.Argument(..., help="Provider id (or alias)."),
+    dataset: str = typer.Argument(
+        ..., help="Dataset / collection id to sample for its band-asset schema."
+    ),
+    json_output: bool = typer.Option(
+        False, "--json", "-j", help="Emit the schema as JSON (for piping)."
+    ),
+) -> None:
+    """Sample one dataset LIVE and print its band/asset schema (curation seed).
+
+    Like `refresh`, this goes to the **network**: it fetches one sample record
+    from the provider and records each asset's media type and band metadata
+    (common name, dtype, nodata) — the seed a maintainer reviews before adding
+    the dataset to the curated catalog. Only providers with a public sample
+    endpoint are supported (currently STAC); others report `unsupported`.
+    """
+    backends = _select_refresh_backends(provider)
+    if len(backends) != 1:
+        raise typer.BadParameter("probe takes exactly one provider")
+    result = probe_dataset(backends[0], dataset)
+
+    if json_output:
+        typer.echo(json.dumps(result.to_dict(), indent=2))
+    elif result.status == "ok":
+        out_console().print(probe_table(result))
+    else:
+        err_console().print(f"[red]{result.status}:[/red] {result.detail}")
+
+    if result.status != "ok":
+        raise typer.Exit(code=1)
