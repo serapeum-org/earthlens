@@ -155,6 +155,20 @@ def rows_table(
 
     Returns:
         A populated :class:`rich.table.Table`.
+
+    Examples:
+        - The default table has one row per dataset and three columns:
+
+            ```python
+            >>> from earthlens.cli.table import CatalogRow
+            >>> from earthlens.cli.render import rows_table
+            >>> table = rows_table([CatalogRow("s3", "era5", "ERA5", "", "", "")])
+            >>> table.row_count
+            1
+            >>> [column.header for column in table.columns]
+            ['PROVIDER', 'DATASET ID', 'TITLE']
+
+            ```
     """
     table = Table(title=title, header_style="bold", show_lines=False)
     for column in columns:
@@ -194,6 +208,19 @@ def counts_table(counts_by_facet: dict[str, list[tuple[str, int]]]) -> Table:
     Returns:
         A populated :class:`rich.table.Table`; facets with no values are
         skipped.
+
+    Examples:
+        - One row per `(facet, value)` pair, three columns:
+
+            ```python
+            >>> from earthlens.cli.render import counts_table
+            >>> table = counts_table({"provider": [("chc", 2), ("gee", 1)]})
+            >>> table.row_count
+            2
+            >>> [column.header for column in table.columns]
+            ['FACET', 'VALUE', 'COUNT']
+
+            ```
     """
     table = Table(header_style="bold", show_lines=False)
     table.add_column("FACET", overflow="fold")
