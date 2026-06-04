@@ -13,9 +13,10 @@ priority list decides which appears first, overridable via the
 from __future__ import annotations
 
 import os
+from collections import Counter
 from collections.abc import Iterable
 
-from earthlens.cli.table import CatalogRow
+from earthlens.cli.table import FACET_NAMES, CatalogRow
 
 #: Default provider precedence for ordering federated results. Providers
 #: not listed here sort after these, alphabetically. The intent is that the
@@ -232,3 +233,149 @@ def exact_first(
     exact_hits = [row for row in rows if is_exact(row, query)]
     partial = [row for row in rows if not is_exact(row, query)]
     return sort_rows(exact_hits, priority) + sort_rows(partial, priority)
+
+
+def free_text(rows: Iterable[CatalogRow], query: str) -> list[CatalogRow]:
+    """Filter rows by a free-text query over `provider id title`.
+
+    Args:
+        rows: The rows to filter.
+        query: A case-insensitive substring; an empty/blank query matches
+            every row (so `--filter`-only searches work).
+
+    Returns:
+        The rows whose search blob contains `query`, in input order.
+
+    Examples:
+        - A blank query keeps everything; a term narrows by the search blob:
+
+            ```python
+            >>> from earthlens.cli.table import CatalogRow
+            >>> from earthlens.cli.query import free_text
+            >>> rows = [
+            ...     CatalogRow("ecmwf", "reanalysis-era5-land", "ERA5-Land", "", "", ""),
+            ...     CatalogRow("chc", "chirps", "Rainfall", "", "", ""),
+            ... ]
+            >>> len(free_text(rows, ""))
+            2
+            >>> [r.provider for r in free_text(rows, "rainfall")]
+            ['chc']
+
+            ```
+    """
+    needle = query.strip().lower()
+    rows = list(rows)
+    if not needle:
+        return rows
+    return [row for row in rows if needle in row.search_text]
+
+
+def parse_filters(values: Iterable[str]) -> dict[str, str]:
+    """Parse `facet=value` filter tokens into a mapping.
+
+    Args:
+        values: Raw `--filter` tokens (each `facet=value`).
+
+    Returns:
+        A `{facet: value}` mapping (later duplicates win).
+
+    Raises:
+        ValueError: If a token is malformed or names an unknown facet.
+
+    Examples:
+        - Well-formed tokens parse into a mapping:
+
+            ```python
+            >>> from earthlens.cli.query import parse_filters
+            >>> parse_filters(["provider=chc", "cadence=daily"])
+            {'provider': 'chc', 'cadence': 'daily'}
+
+            ```
+        - An unknown facet is rejected:
+
+            ```python
+            >>> from earthlens.cli.query import parse_filters
+            >>> parse_filters(["colour=blue"])
+            Traceback (most recent call last):
+                ...
+            ValueError: unknown filter facet 'colour'; choose from cadence, license, provider, resolution
+
+            ```
+    """
+    filters: dict[str, str] = {}
+    for token in values:
+        if "=" not in token:
+            raise ValueError(f"filter {token!r} must be of the form facet=value")
+        key, value = token.split("=", 1)
+        key = key.strip().lower()
+        if key not in FACET_NAMES:
+            choices = ", ".join(sorted(FACET_NAMES))
+            raise ValueError(f"unknown filter facet {key!r}; choose from {choices}")
+        filters[key] = value.strip()
+    return filters
+
+
+def apply_filters(
+    rows: Iterable[CatalogRow], filters: dict[str, str]
+) -> list[CatalogRow]:
+    """Keep rows matching every `facet=value` filter (case-insensitively).
+
+    Args:
+        rows: The rows to filter.
+        filters: A `{facet: value}` mapping (see :func:`parse_filters`).
+
+    Returns:
+        The rows where each filtered facet equals its requested value.
+
+    Examples:
+        - All filters must match (logical AND):
+
+            ```python
+            >>> from earthlens.cli.table import CatalogRow
+            >>> from earthlens.cli.query import apply_filters
+            >>> rows = [
+            ...     CatalogRow("chc", "chirps-daily", "", "daily", "", ""),
+            ...     CatalogRow("chc", "chirps-monthly", "", "monthly", "", ""),
+            ... ]
+            >>> [r.dataset_id for r in apply_filters(rows, {"cadence": "daily"})]
+            ['chirps-daily']
+
+            ```
+    """
+    rows = list(rows)
+    for facet, value in filters.items():
+        wanted = value.lower()
+        rows = [row for row in rows if row.facet(facet).lower() == wanted]
+    return rows
+
+
+def facet_counts(rows: Iterable[CatalogRow], facet: str) -> list[tuple[str, int]]:
+    """Count rows per distinct non-empty value of `facet`.
+
+    Args:
+        rows: The rows to aggregate.
+        facet: The facet column to group by.
+
+    Returns:
+        `(value, count)` pairs sorted by descending count, then value.
+
+    Examples:
+        - Group a small result set by provider:
+
+            ```python
+            >>> from earthlens.cli.table import CatalogRow
+            >>> from earthlens.cli.query import facet_counts
+            >>> rows = [
+            ...     CatalogRow("chc", "a", "", "", "", ""),
+            ...     CatalogRow("chc", "b", "", "", "", ""),
+            ...     CatalogRow("gee", "c", "", "", "", ""),
+            ... ]
+            >>> facet_counts(rows, "provider")
+            [('chc', 2), ('gee', 1)]
+
+            ```
+    """
+    counter: Counter[str] = Counter(
+        value for row in rows if (value := row.facet(facet))
+    )
+    return sorted(counter.items(), key=lambda kv: (-kv[1], kv[0]))

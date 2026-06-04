@@ -11,8 +11,17 @@ from __future__ import annotations
 import typer
 
 from earthlens.cli.adapter import known_provider_keys
-from earthlens.cli.query import exact_first, match_rows
+from earthlens.cli.query import (
+    apply_filters,
+    exact_first,
+    facet_counts,
+    free_text,
+    match_rows,
+    parse_filters,
+    sort_rows,
+)
 from earthlens.cli.render import (
+    counts_table,
     err_console,
     out_console,
     print_load_warnings,
@@ -20,7 +29,7 @@ from earthlens.cli.render import (
     rows_to_ids,
     rows_to_json,
 )
-from earthlens.cli.table import build_table
+from earthlens.cli.table import FACET_NAMES, build_table
 
 #: Typer sub-application mounted at `earthlens datasets`.
 datasets_app = typer.Typer(
@@ -117,3 +126,68 @@ def where(
         if not (json_output or ids_only):
             err_console().print(f"[red]No dataset matches {name!r}.[/red]")
         raise typer.Exit(code=1)
+
+
+@datasets_app.command()
+def search(
+    query: str = typer.Argument(
+        "", help="Free-text query over provider / id / title (blank = all)."
+    ),
+    provider: list[str] = typer.Option(
+        None,
+        "--provider",
+        "-p",
+        help="Restrict to these providers (repeatable / comma-separated).",
+    ),
+    filter_: list[str] = typer.Option(
+        None,
+        "--filter",
+        "-f",
+        help="Narrow by facet (repeatable AND), e.g. --filter cadence=daily.",
+    ),
+    limit: int = typer.Option(
+        0, "--limit", "-n", help="Cap the number of rows shown (0 = no cap)."
+    ),
+    count: bool = typer.Option(
+        False, "--count", help="Print only the number of matches."
+    ),
+    facets_only: bool = typer.Option(
+        False,
+        "--facets-only",
+        help="Print per-facet value counts instead of rows.",
+    ),
+    json_output: bool = typer.Option(
+        False, "--json", "-j", help="Emit a JSON array (for piping)."
+    ),
+    ids_only: bool = typer.Option(
+        False, "--ids-only", help="Emit bare `provider<TAB>id` lines (for piping)."
+    ),
+) -> None:
+    """Free-text + faceted search across every provider's catalog.
+
+    Combines a free-text `query` (over provider / id / title) with repeatable
+    `--filter facet=value` narrowing (logical AND over `provider`, `cadence`,
+    `resolution`, `license`). `--count` prints just the total; `--facets-only`
+    prints the distribution of matches per facet value (cheap to probe a big
+    federation); `--limit` caps the rows shown.
+    """
+    providers = _resolve_providers(provider)
+    try:
+        filters = parse_filters(filter_ or [])
+    except ValueError as exc:
+        raise typer.BadParameter(str(exc)) from exc
+
+    catalog = build_table(providers=providers)
+    rows = sort_rows(apply_filters(free_text(catalog.rows, query), filters))
+    print_load_warnings(catalog.errors)
+
+    if count:
+        typer.echo(str(len(rows)))
+        return
+    if facets_only:
+        counts = {facet: facet_counts(rows, facet) for facet in FACET_NAMES}
+        out_console().print(counts_table({f: c for f, c in counts.items() if c}))
+        return
+    if limit and limit > 0:
+        rows = rows[:limit]
+    _emit_rows(rows, json_output=json_output, ids_only=ids_only)

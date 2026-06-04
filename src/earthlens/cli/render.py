@@ -157,3 +157,24 @@ def print_load_warnings(
             f"[yellow]warning:[/yellow] skipped provider "
             f"{error.provider!r}: {error.error}"
         )
+
+
+def counts_table(counts_by_facet: dict[str, list[tuple[str, int]]]) -> Table:
+    """Build a `FACET / VALUE / COUNT` table from per-facet count lists.
+
+    Args:
+        counts_by_facet: Mapping of facet name to its `(value, count)` pairs
+            (e.g. from :func:`earthlens.cli.query.facet_counts`).
+
+    Returns:
+        A populated :class:`rich.table.Table`; facets with no values are
+        skipped.
+    """
+    table = Table(header_style="bold", show_lines=False)
+    table.add_column("FACET", overflow="fold")
+    table.add_column("VALUE", overflow="fold")
+    table.add_column("COUNT", justify="right")
+    for facet, counts in counts_by_facet.items():
+        for value, count in counts:
+            table.add_row(facet, value, str(count))
+    return table
