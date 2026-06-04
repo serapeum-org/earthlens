@@ -8,6 +8,8 @@ the sub-application object and the commands attached to it:
 
 from __future__ import annotations
 
+import difflib
+
 import typer
 
 from earthlens.cli.adapter import known_provider_keys
@@ -27,6 +29,8 @@ from earthlens.cli.render import (
     err_console,
     out_console,
     print_load_warnings,
+    record_json,
+    record_table,
     rows_table,
     rows_to_ids,
     rows_to_json,
@@ -240,3 +244,41 @@ def list_datasets(
         f"[dim]{len(rows)} dataset(s) across "
         f"{len(catalog.providers)} provider(s).[/dim]"
     )
+
+
+@datasets_app.command()
+def show(
+    provider: str = typer.Argument(..., help="Provider id (or alias)."),
+    dataset: str = typer.Argument(..., help="Dataset id within that provider."),
+    json_output: bool = typer.Option(
+        False, "--json", "-j", help="Emit the full record as JSON."
+    ),
+) -> None:
+    """Show the full catalog record for one dataset.
+
+    Dumps every field of the backend's pydantic record (title, extent,
+    cadence, resolution, variables / bands, license, …) as a table or, with
+    `--json`, as a JSON object. Suggests near matches when the dataset id is
+    not found within the provider.
+    """
+    selectors = _resolve_providers([provider])
+    catalog = build_table(providers=selectors)
+    print_load_warnings(catalog.errors)
+
+    wanted = dataset.strip().lower()
+    match = next(
+        (row for row in catalog.rows if row.dataset_id.lower() == wanted), None
+    )
+    if match is None:
+        ids = [row.dataset_id for row in catalog.rows]
+        close = difflib.get_close_matches(dataset, ids, n=1)
+        hint = f" Did you mean {close[0]!r}?" if close else ""
+        err_console().print(
+            f"[red]{provider!r} has no dataset {dataset!r}.[/red]{hint}"
+        )
+        raise typer.Exit(code=1)
+
+    if json_output:
+        typer.echo(record_json(match))
+        return
+    out_console().print(record_table(match))

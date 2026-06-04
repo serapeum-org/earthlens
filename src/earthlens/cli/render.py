@@ -230,3 +230,88 @@ def counts_table(counts_by_facet: dict[str, list[tuple[str, int]]]) -> Table:
         for value, count in counts:
             table.add_row(facet, value, str(count))
     return table
+
+
+def _is_scalar(value: object) -> bool:
+    """True for values cheap to print inline (str / number / bool / None)."""
+    return value is None or isinstance(value, (str, int, float, bool))
+
+
+def _format_value(value: object) -> str:
+    """Render a record field value compactly for the detail table.
+
+    Small all-scalar dicts (e.g. a `cadence` of `{interval, unit}`) render
+    as `key=value` pairs; larger / nested dicts collapse to a count plus
+    their first keys (e.g. a `variables` map shows the variable names).
+    """
+    if isinstance(value, dict):
+        if not value:
+            return "{}"
+        if len(value) <= 4 and all(_is_scalar(v) for v in value.values()):
+            return ", ".join(f"{key}={val}" for key, val in value.items())
+        keys = list(value)
+        head = ", ".join(str(key) for key in keys[:8])
+        more = "" if len(keys) <= 8 else f", … (+{len(keys) - 8})"
+        return f"[{len(keys)}] {head}{more}"
+    if isinstance(value, (list, tuple)):
+        if not value:
+            return "[]"
+        head = ", ".join(str(item) for item in value[:8])
+        more = "" if len(value) <= 8 else " …"
+        return f"[{len(value)}] {head}{more}"
+    return str(value)
+
+
+def record_json(row: CatalogRow) -> str:
+    """Serialise a row's full backend record to indented JSON.
+
+    Args:
+        row: The catalog row whose `record` to dump.
+
+    Returns:
+        A JSON object string carrying `provider` / `dataset_id` plus every
+        field of the backend's pydantic record.
+
+    Examples:
+        - The provider and dataset id always lead the object:
+
+            ```python
+            >>> import json
+            >>> from earthlens.cli.table import CatalogRow
+            >>> from earthlens.cli.render import record_json
+            >>> row = CatalogRow("s3", "era5", "ERA5", "monthly", "", "")
+            >>> json.loads(record_json(row))["dataset_id"]
+            'era5'
+
+            ```
+    """
+    data: dict[str, object] = {
+        "provider": row.provider,
+        "dataset_id": row.dataset_id,
+    }
+    record = row.record
+    if record is not None and hasattr(record, "model_dump"):
+        data.update(record.model_dump(mode="json"))
+    return json.dumps(data, indent=2, default=str)
+
+
+def record_table(row: CatalogRow) -> Table:
+    """Build a `FIELD / VALUE` detail table for a row's backend record.
+
+    Args:
+        row: The catalog row to describe.
+
+    Returns:
+        A :class:`rich.table.Table` with one row per record field; nested
+        dict / list fields are summarised by size and first members.
+    """
+    table = Table(header_style="bold", show_lines=False)
+    table.add_column("FIELD", overflow="fold")
+    table.add_column("VALUE", overflow="fold")
+    table.add_row("provider", row.provider)
+    table.add_row("dataset_id", row.dataset_id)
+    record = row.record
+    if record is not None and hasattr(record, "model_dump"):
+        for field_name, value in record.model_dump().items():
+            table.add_row(field_name, _format_value(value))
+    return table
