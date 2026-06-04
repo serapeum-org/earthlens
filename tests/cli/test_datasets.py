@@ -7,6 +7,7 @@ import json
 import pytest
 from typer.testing import CliRunner
 
+from earthlens.cli import refresh as refresh_mod
 from earthlens.cli.app import app
 from earthlens.cli.table import build_table
 
@@ -199,6 +200,54 @@ class TestList:
         result = runner.invoke(app, ["datasets", "list", "-p", "s3", "--json"])
         payload = json.loads(result.output)
         assert payload and all(r["provider"] == "s3" for r in payload), "all s3"
+
+
+class TestRefresh:
+    """Tests for `datasets refresh` (the one online command; network mocked)."""
+
+    def test_unsupported_provider_exits_zero(self):
+        """A provider with no live endpoint reports unsupported, exit 0."""
+        result = runner.invoke(app, ["datasets", "refresh", "chc"])
+        assert result.exit_code == 0, f"refresh failed: {result.output}"
+        assert "unsupported" in result.output, "chc reported unsupported"
+
+    def test_unknown_provider_rejected(self):
+        """An unknown selector token is a usage error."""
+        result = runner.invoke(app, ["datasets", "refresh", "bogus"])
+        assert result.exit_code == 2, "unknown provider -> exit 2"
+
+    def test_all_covers_every_backend(self, monkeypatch):
+        """'all' refreshes every backend (stac live-mocked, rest unsupported)."""
+        monkeypatch.setattr(
+            refresh_mod, "_get_json", lambda url: {"collections": [], "links": []}
+        )
+        result = runner.invoke(app, ["datasets", "refresh", "all", "--json"])
+        payload = json.loads(result.output)
+        assert len(payload) == 22, "one outcome per backend"
+        assert any(o["provider"] == "stac" for o in payload), "stac included"
+
+    def test_stac_json_reports_new_ids(self, monkeypatch):
+        """A live id absent from the bundle shows up as new (mocked)."""
+        monkeypatch.setattr(
+            refresh_mod,
+            "_get_json",
+            lambda url: {"collections": [{"id": "new-z"}], "links": []},
+        )
+        result = runner.invoke(app, ["datasets", "refresh", "stac", "--json"])
+        payload = json.loads(result.output)
+        assert payload[0]["provider"] == "stac" and payload[0]["status"] == "ok"
+        assert "new-z" in payload[0]["new_ids"], "the new id surfaces"
+
+    def test_show_ids_lists_new_ids(self, monkeypatch):
+        """--show-ids prints each new upstream id under the table."""
+        monkeypatch.setattr(
+            refresh_mod,
+            "_get_json",
+            lambda url: {"collections": [{"id": "brand-new-collection"}], "links": []},
+        )
+        result = runner.invoke(app, ["datasets", "refresh", "stac", "--show-ids"])
+        assert "new upstream ids" in result.output, "section header shown"
+        assert "brand-new-collection" in result.output, "the id is listed"
 
 
 class TestShow:

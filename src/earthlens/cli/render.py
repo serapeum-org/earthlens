@@ -349,3 +349,33 @@ def kv_table(header_a: str, header_b: str, pairs, justify_b: str = "left") -> Ta
     for left, right in pairs:
         table.add_row(str(left), str(right))
     return table
+
+
+def refresh_table(outcomes) -> Table:
+    """Build a per-provider summary table of live-refresh outcomes.
+
+    Args:
+        outcomes: An iterable of `RefreshOutcome` (duck-typed: `provider`,
+            `status`, `live_count`, `bundled_count`, `new_ids`, `detail`).
+
+    Returns:
+        A :class:`rich.table.Table`; counts show `-` for non-`ok` rows.
+    """
+    table = Table(header_style="bold", show_lines=False)
+    table.add_column("PROVIDER", overflow="fold")
+    table.add_column("STATUS", overflow="fold")
+    table.add_column("LIVE", justify="right")
+    table.add_column("BUNDLED", justify="right")
+    table.add_column("NEW", justify="right")
+    table.add_column("DETAIL", overflow="fold")
+    for outcome in outcomes:
+        ok = outcome.status == "ok"
+        table.add_row(
+            outcome.provider,
+            outcome.status,
+            str(outcome.live_count) if ok else "-",
+            str(outcome.bundled_count) if ok else "-",
+            str(len(outcome.new_ids)) if ok else "-",
+            outcome.detail,
+        )
+    return table

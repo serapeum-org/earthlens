@@ -13,7 +13,7 @@ import json
 
 import typer
 
-from earthlens.cli.adapter import known_provider_keys
+from earthlens.cli.adapter import BackendInfo, known_provider_keys, list_backends
 from earthlens.cli.query import (
     apply_filters,
     exact_first,
@@ -23,6 +23,7 @@ from earthlens.cli.query import (
     parse_filters,
     sort_rows,
 )
+from earthlens.cli.refresh import refresh_one
 from earthlens.cli.render import (
     COMPACT_COLUMNS,
     FULL_COLUMNS,
@@ -33,6 +34,7 @@ from earthlens.cli.render import (
     print_load_warnings,
     record_json,
     record_table,
+    refresh_table,
     rows_table,
     rows_to_ids,
     rows_to_json,
@@ -381,3 +383,80 @@ def facets(
     out_console().print(
         kv_table("FACET", "DISTINCT VALUES", summary, justify_b="right")
     )
+
+
+def _select_refresh_backends(selector: str) -> list[BackendInfo]:
+    """Resolve the `refresh` argument to a list of backends.
+
+    Args:
+        selector: `"all"`, or one / a comma-separated list of provider ids
+            or aliases.
+
+    Returns:
+        The matching backends (every backend for `"all"`).
+
+    Raises:
+        typer.BadParameter: If the selector is empty or names an unknown
+            provider.
+    """
+    backends = list_backends()
+    if selector.strip().lower() == "all":
+        return backends
+    tokens = [tok.strip() for tok in selector.split(",") if tok.strip()]
+    if not tokens:
+        raise typer.BadParameter("name one or more providers, or 'all'")
+    unknown = sorted(t for t in tokens if t not in known_provider_keys())
+    if unknown:
+        raise typer.BadParameter(f"unknown provider(s): {', '.join(unknown)}")
+    wanted = set(tokens)
+    return [
+        info
+        for info in backends
+        if info.provider in wanted or wanted.intersection(info.aliases)
+    ]
+
+
+@datasets_app.command()
+def refresh(
+    providers: str = typer.Argument(
+        ...,
+        help="Provider(s) to refresh: a name, a comma-separated list, or 'all'.",
+    ),
+    show_ids: bool = typer.Option(
+        False,
+        "--show-ids",
+        help="Also list the new upstream ids, not just the counts.",
+    ),
+    json_output: bool = typer.Option(
+        False, "--json", "-j", help="Emit the outcomes as JSON (for piping)."
+    ),
+) -> None:
+    """Fetch each provider's LIVE upstream index and diff it against the bundle.
+
+    Unlike every other command, `refresh` goes to the **network**: it calls
+    a provider's public API to list its current datasets / collections and
+    reports what is new or gone versus the bundled `available_datasets`.
+    Only providers with a public, no-auth listing endpoint are supported
+    (others report `unsupported`), so `refresh all` degrades gracefully.
+    """
+    selected = _select_refresh_backends(providers)
+    if not json_output:
+        err_console().print(
+            f"[dim]Querying live upstream indexes for "
+            f"{len(selected)} provider(s)...[/dim]"
+        )
+    outcomes = [refresh_one(info) for info in selected]
+
+    if json_output:
+        typer.echo(json.dumps([o.to_dict() for o in outcomes], indent=2))
+        return
+
+    out_console().print(refresh_table(outcomes))
+    if show_ids:
+        for outcome in outcomes:
+            if outcome.status == "ok" and outcome.new_ids:
+                out_console().print(
+                    f"[bold]new upstream ids ({outcome.provider}):[/bold]"
+                )
+                for ident in outcome.new_ids:
+                    out_console().print(f"  {ident}")
