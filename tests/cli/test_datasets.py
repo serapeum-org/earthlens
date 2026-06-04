@@ -128,3 +128,51 @@ class TestList:
         result = runner.invoke(app, ["datasets", "list", "-p", "s3", "--json"])
         payload = json.loads(result.output)
         assert payload and all(r["provider"] == "s3" for r in payload), "all s3"
+
+
+class TestShow:
+    """Tests for `datasets show`."""
+
+    def test_shows_record_fields(self):
+        """The detail table includes backend-specific record fields."""
+        result = runner.invoke(app, ["datasets", "show", "s3", "era5"])
+        assert result.exit_code == 0, f"show failed: {result.output}"
+        assert "bucket" in result.output, "s3 record field shown"
+
+    def test_json_dumps_full_record(self):
+        """--json carries provider, id and the record fields."""
+        result = runner.invoke(app, ["datasets", "show", "s3", "era5", "--json"])
+        payload = json.loads(result.output)
+        assert payload["provider"] == "s3" and payload["dataset_id"] == "era5"
+        assert "bucket" in payload, "record fields merged into the object"
+
+    def test_missing_dataset_exits_nonzero(self):
+        """An absent dataset id exits non-zero with a suggestion."""
+        result = runner.invoke(app, ["datasets", "show", "s3", "era6"])
+        assert result.exit_code == 1, "missing dataset -> exit 1"
+
+
+class TestFacets:
+    """Tests for `datasets facets`."""
+
+    def test_summary_lists_facets(self):
+        """With no --values, each facet and its distinct-value count is shown."""
+        result = runner.invoke(app, ["datasets", "facets", "-p", "s3"])
+        assert result.exit_code == 0, f"facets failed: {result.output}"
+        assert "FACET" in result.output and "DISTINCT" in result.output
+
+    def test_values_enumerates_counts(self):
+        """--values shows the distinct values of the chosen facet."""
+        result = runner.invoke(
+            app, ["datasets", "facets", "--values", "provider", "-p", "s3", "--json"]
+        )
+        payload = json.loads(result.output)
+        assert [p["value"] for p in payload] == ["s3"], "only the scoped provider"
+        assert payload[0]["count"] > 0, "the scoped provider has datasets"
+
+    def test_unknown_facet_rejected(self):
+        """An unknown --values facet is a usage error."""
+        result = runner.invoke(
+            app, ["datasets", "facets", "--values", "bogus", "-p", "s3"]
+        )
+        assert result.exit_code == 2, "unknown facet -> exit 2"
