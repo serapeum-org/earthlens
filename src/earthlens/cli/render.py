@@ -315,3 +315,36 @@ def record_table(row: CatalogRow) -> Table:
         for field_name, value in record.model_dump().items():
             table.add_row(field_name, _format_value(value))
     return table
+
+
+def kv_table(header_a: str, header_b: str, pairs, justify_b: str = "left") -> Table:
+    """Build a simple two-column table from `(a, b)` pairs.
+
+    Args:
+        header_a: Header for the first (left) column.
+        header_b: Header for the second column.
+        pairs: An iterable of `(a, b)` rows; both are stringified.
+        justify_b: Justification for the second column (e.g. `"right"`).
+
+    Returns:
+        A populated :class:`rich.table.Table`.
+
+    Examples:
+        - Two columns, one row per pair:
+
+            ```python
+            >>> from earthlens.cli.render import kv_table
+            >>> table = kv_table("FACET", "DISTINCT", [("provider", 22)])
+            >>> table.row_count
+            1
+            >>> [column.header for column in table.columns]
+            ['FACET', 'DISTINCT']
+
+            ```
+    """
+    table = Table(header_style="bold", show_lines=False)
+    table.add_column(header_a, overflow="fold")
+    table.add_column(header_b, justify=justify_b, overflow="fold")
+    for left, right in pairs:
+        table.add_row(str(left), str(right))
+    return table

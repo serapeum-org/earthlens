@@ -9,6 +9,7 @@ the sub-application object and the commands attached to it:
 from __future__ import annotations
 
 import difflib
+import json
 
 import typer
 
@@ -27,6 +28,7 @@ from earthlens.cli.render import (
     FULL_COLUMNS,
     counts_table,
     err_console,
+    kv_table,
     out_console,
     print_load_warnings,
     record_json,
@@ -282,3 +284,58 @@ def show(
         typer.echo(record_json(match))
         return
     out_console().print(record_table(match))
+
+
+@datasets_app.command()
+def facets(
+    values: str = typer.Option(
+        None,
+        "--values",
+        help="Enumerate the distinct values of this facet across the results.",
+    ),
+    provider: list[str] = typer.Option(
+        None,
+        "--provider",
+        "-p",
+        help="Restrict to these providers (repeatable / comma-separated).",
+    ),
+    json_output: bool = typer.Option(
+        False, "--json", "-j", help="Emit JSON (for piping)."
+    ),
+) -> None:
+    """Discover what you can filter on, and which values exist.
+
+    With no `--values`, lists each facet (`provider`, `cadence`,
+    `resolution`, `license`) with how many distinct values it has. With
+    `--values <facet>`, enumerates that facet's distinct values and how
+    many datasets carry each — the vocabulary to feed `search --filter`.
+    """
+    if values is not None and values not in FACET_NAMES:
+        choices = ", ".join(FACET_NAMES)
+        raise typer.BadParameter(f"unknown facet {values!r}; choose from {choices}")
+
+    providers = _resolve_providers(provider)
+    catalog = build_table(providers=providers)
+    print_load_warnings(catalog.errors)
+
+    if values is not None:
+        counts = facet_counts(catalog.rows, values)
+        if json_output:
+            typer.echo(
+                json.dumps([{"value": v, "count": c} for v, c in counts], indent=2)
+            )
+            return
+        out_console().print(kv_table("VALUE", "COUNT", counts, justify_b="right"))
+        return
+
+    summary = [(facet, len(catalog.facet_values(facet))) for facet in FACET_NAMES]
+    if json_output:
+        typer.echo(
+            json.dumps(
+                [{"facet": f, "distinct_values": n} for f, n in summary], indent=2
+            )
+        )
+        return
+    out_console().print(
+        kv_table("FACET", "DISTINCT VALUES", summary, justify_b="right")
+    )
