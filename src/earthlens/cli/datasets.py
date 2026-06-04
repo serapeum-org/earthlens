@@ -427,6 +427,13 @@ def refresh(
         "--show-ids",
         help="Also list the new upstream ids, not just the counts.",
     ),
+    write: bool = typer.Option(
+        False,
+        "--write",
+        "--update-catalog",
+        help="Rewrite the bundled available_* index from the live fetch "
+        "(modifies the package's catalog files; for editable installs).",
+    ),
     json_output: bool = typer.Option(
         False, "--json", "-j", help="Emit the outcomes as JSON (for piping)."
     ),
@@ -438,14 +445,19 @@ def refresh(
     reports what is new or gone versus the bundled `available_datasets`.
     Only providers with a public, no-auth listing endpoint are supported
     (others report `unsupported`), so `refresh all` degrades gracefully.
+
+    With `--write` it also rewrites the bundled `available_*` index in place
+    from the live fetch — the maintainer "update the shipped catalog" step,
+    meaningful in an editable / source checkout.
     """
     selected = _select_refresh_backends(providers)
     if not json_output:
+        action = "Updating" if write else "Querying"
         err_console().print(
-            f"[dim]Querying live upstream indexes for "
+            f"[dim]{action} live upstream indexes for "
             f"{len(selected)} provider(s)...[/dim]"
         )
-    outcomes = [refresh_one(info) for info in selected]
+    outcomes = [refresh_one(info, write=write) for info in selected]
 
     if json_output:
         typer.echo(json.dumps([o.to_dict() for o in outcomes], indent=2))
@@ -460,3 +472,9 @@ def refresh(
                 )
                 for ident in outcome.new_ids:
                     out_console().print(f"  {ident}")
+    for outcome in outcomes:
+        if outcome.written:
+            out_console().print(
+                f"[green]wrote {outcome.live_count} ids[/green] "
+                f"({outcome.provider}) -> {outcome.written}"
+            )

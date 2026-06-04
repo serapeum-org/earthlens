@@ -249,6 +249,24 @@ class TestRefresh:
         assert "new upstream ids" in result.output, "section header shown"
         assert "brand-new-collection" in result.output, "the id is listed"
 
+    def test_write_reports_written_path(self, tmp_path, monkeypatch):
+        """--write rewrites the (temp-redirected) catalog and reports the path."""
+        import shutil
+
+        import earthlens.stac.catalog as stac_catalog
+
+        dst = tmp_path / "catalog"
+        shutil.copytree(stac_catalog.CATALOG_PATH, dst)
+        monkeypatch.setattr(stac_catalog, "CATALOG_PATH", dst)
+        monkeypatch.setattr(
+            refresh_mod,
+            "_get_json",
+            lambda url: {"collections": [{"id": "x"}], "links": []},
+        )
+        result = runner.invoke(app, ["datasets", "refresh", "stac", "--write"])
+        assert result.exit_code == 0, f"refresh --write failed: {result.output}"
+        assert "wrote" in result.output and "_index.yaml" in result.output
+
 
 class TestShow:
     """Tests for `datasets show`."""

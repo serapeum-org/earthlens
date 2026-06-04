@@ -15,11 +15,13 @@ Adding a provider is one entry in :data:`_REFRESHERS`.
 
 from __future__ import annotations
 
+import importlib
 from collections.abc import Callable, Iterable
 from dataclasses import dataclass, field
 from typing import Any
 
 import requests
+import yaml
 
 from earthlens.cli.adapter import BackendInfo, load_catalog
 
@@ -45,6 +47,8 @@ class RefreshOutcome:
         bundled_count: Number of ids in the bundled `available_datasets`.
         new_ids: Ids present live but absent from the bundled index.
         removed_ids: Ids in the bundled index but absent live.
+        written: Path of the bundled catalog file rewritten under
+            `--write`, or `""` when nothing was written.
     """
 
     provider: str
@@ -54,6 +58,7 @@ class RefreshOutcome:
     bundled_count: int = 0
     new_ids: list[str] = field(default_factory=list)
     removed_ids: list[str] = field(default_factory=list)
+    written: str = ""
 
     def to_dict(self) -> dict[str, Any]:
         """Project the outcome to a JSON-friendly dict.
@@ -85,6 +90,7 @@ class RefreshOutcome:
             "bundled_count": self.bundled_count,
             "new_ids": self.new_ids,
             "removed_ids": self.removed_ids,
+            "written": self.written,
         }
 
 
@@ -95,20 +101,25 @@ def _get_json(url: str) -> dict[str, Any]:
     return response.json()
 
 
-def _stac_collection_ids(catalog: Any) -> list[str]:
-    """List every collection id across a STAC catalog's endpoints, live.
+def _stac_grouped(catalog: Any) -> dict[str, list[str]]:
+    """List collection ids per STAC endpoint, live.
 
     Hits `{endpoint.url}/collections` for each configured endpoint and
     follows `rel="next"` pagination links (bounded by :data:`_MAX_PAGES`).
+    The per-endpoint grouping is what `--write` persists back into the
+    `available_collections:` block; callers wanting a flat list use
+    :func:`_flatten`.
 
     Args:
         catalog: The loaded STAC `Catalog` (exposes `endpoints`).
 
     Returns:
-        The sorted, de-duplicated collection ids returned live.
+        A mapping of endpoint name to its sorted, de-duplicated collection
+        ids, in the catalog's endpoint order.
     """
-    ids: set[str] = set()
-    for endpoint in catalog.endpoints.values():
+    grouped: dict[str, list[str]] = {}
+    for name, endpoint in catalog.endpoints.items():
+        ids: set[str] = set()
         url: str | None = endpoint.url.rstrip("/") + "/collections"
         pages = 0
         while url and pages < _MAX_PAGES:
@@ -126,15 +137,81 @@ def _stac_collection_ids(catalog: Any) -> list[str]:
                 None,
             )
             pages += 1
-    return sorted(ids)
+        grouped[name] = sorted(ids)
+    return grouped
 
 
-#: Provider id -> a callable taking the loaded catalog and returning the
-#: provider's live id list. Only providers with a public, no-auth listing
-#: endpoint appear here.
-_REFRESHERS: dict[str, Callable[[Any], list[str]]] = {
-    "stac": _stac_collection_ids,
+def _write_stac(info: BackendInfo, grouped: dict[str, list[str]]) -> str:
+    """Rewrite STAC's `available_collections:` block from a live fetch.
+
+    Replaces only the `available_collections:` block of the bundled
+    `_index.yaml`, preserving the header comments and the `endpoints:`
+    block above it verbatim. Meaningful in an editable / source checkout
+    (it rewrites the package's catalog file); in an installed wheel it
+    rewrites the copy under `site-packages`.
+
+    Args:
+        info: The STAC backend.
+        grouped: Endpoint-name -> live collection ids (see :func:`_stac_grouped`).
+
+    Returns:
+        The path of the file rewritten.
+
+    Raises:
+        ValueError: If the index file has no `available_collections:` block.
+    """
+    module = importlib.import_module(f"{info.module}.catalog")
+    index_path = module.CATALOG_PATH / "_index.yaml"
+    text = index_path.read_text(encoding="utf-8")
+    marker = "\navailable_collections:"
+    if marker not in text:
+        raise ValueError(f"no available_collections block in {index_path}")
+    head = text.split(marker, 1)[0].rstrip("\n")
+    block = yaml.safe_dump(
+        {"available_collections": grouped},
+        sort_keys=False,
+        default_flow_style=False,
+        allow_unicode=True,
+        width=10000,
+    )
+    index_path.write_text(f"{head}\n\n{block}", encoding="utf-8")
+    return str(index_path)
+
+
+#: Provider id -> a callable taking the loaded catalog and returning its
+#: live ids grouped (e.g. per STAC endpoint). Only providers with a public,
+#: no-auth listing endpoint appear here.
+_REFRESHERS: dict[str, Callable[[Any], dict[str, list[str]]]] = {
+    "stac": _stac_grouped,
 }
+
+#: Provider id -> a callable that persists a grouped live fetch back into
+#: the bundled catalog (the `--write` half). A subset of `_REFRESHERS`.
+_WRITERS: dict[str, Callable[[BackendInfo, dict[str, list[str]]], str]] = {
+    "stac": _write_stac,
+}
+
+
+def _flatten(grouped: dict[str, list[str]]) -> list[str]:
+    """Flatten grouped live ids into one sorted, de-duplicated list.
+
+    Args:
+        grouped: A mapping of group name to its id list.
+
+    Returns:
+        The sorted union of every group's ids.
+
+    Examples:
+        - Ids are unioned and de-duplicated across groups:
+
+            ```python
+            >>> from earthlens.cli.refresh import _flatten
+            >>> _flatten({"a": ["x", "y"], "b": ["y", "z"]})
+            ['x', 'y', 'z']
+
+            ```
+    """
+    return sorted({ident for ids in grouped.values() for ident in ids})
 
 
 def supported_providers() -> list[str]:
@@ -189,15 +266,17 @@ def _diff(
     )
 
 
-def refresh_one(info: BackendInfo) -> RefreshOutcome:
-    """Refresh one provider's live index and diff it against the bundle.
+def refresh_one(info: BackendInfo, write: bool = False) -> RefreshOutcome:
+    """Refresh one provider's live index, diff it, and optionally persist it.
 
     A provider with no registered refresher returns an `"unsupported"`
-    outcome; any error fetching / parsing the live index returns an
-    `"error"` outcome — neither raises, so `refresh all` never aborts.
+    outcome; any error fetching / parsing / writing returns an `"error"`
+    outcome — neither raises, so `refresh all` never aborts.
 
     Args:
         info: The backend to refresh.
+        write: When `True`, rewrite the bundled `available_*` index from the
+            live fetch (providers without a writer report it in `detail`).
 
     Returns:
         The :class:`RefreshOutcome` for `info`.
@@ -211,16 +290,41 @@ def refresh_one(info: BackendInfo) -> RefreshOutcome:
         )
     try:
         catalog = load_catalog(info)
-        live = lister(catalog)
+        grouped = lister(catalog)
     except Exception as exc:  # noqa: BLE001 — network / parse failures are reported
         return RefreshOutcome(provider=info.provider, status="error", detail=str(exc))
+
+    live = _flatten(grouped)
     bundled = getattr(catalog, "available_datasets", [])
     live_count, bundled_count, new_ids, removed_ids = _diff(live, bundled)
+
+    written = ""
+    detail = ""
+    if write:
+        writer = _WRITERS.get(info.provider)
+        if writer is None:
+            detail = "live read only; --write is not supported for this provider"
+        else:
+            try:
+                written = writer(info, grouped)
+            except Exception as exc:  # noqa: BLE001 — write failures are reported
+                return RefreshOutcome(
+                    provider=info.provider,
+                    status="error",
+                    detail=f"write failed: {exc}",
+                    live_count=live_count,
+                    bundled_count=bundled_count,
+                    new_ids=new_ids,
+                    removed_ids=removed_ids,
+                )
+
     return RefreshOutcome(
         provider=info.provider,
         status="ok",
+        detail=detail,
         live_count=live_count,
         bundled_count=bundled_count,
         new_ids=new_ids,
         removed_ids=removed_ids,
+        written=written,
     )

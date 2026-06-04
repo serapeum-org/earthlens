@@ -1,14 +1,19 @@
-"""Unit tests for `earthlens.cli.refresh` (network mocked)."""
+"""Unit tests for `earthlens.cli.refresh` (network mocked, writes to tmp)."""
 
 from __future__ import annotations
 
-import pytest
+import shutil
 
+import pytest
+import yaml
+
+import earthlens.stac.catalog as stac_catalog
 from earthlens.cli import refresh as refresh_mod
 from earthlens.cli.adapter import list_backends
 from earthlens.cli.refresh import (
     RefreshOutcome,
     _diff,
+    _flatten,
     refresh_one,
     supported_providers,
 )
@@ -33,12 +38,92 @@ class TestDiff:
         assert _diff(["a", "a", "b"], ["a"]) == (2, 1, ["b"], [])
 
 
+class TestFlatten:
+    """Tests for _flatten."""
+
+    def test_unions_and_sorts(self):
+        """Grouped ids flatten to a sorted, de-duplicated list."""
+        assert _flatten({"a": ["x", "y"], "b": ["y", "z"]}) == ["x", "y", "z"]
+
+
 class TestSupportedProviders:
     """Tests for supported_providers."""
 
     def test_stac_is_supported(self):
         """STAC has a live refresher wired up."""
         assert "stac" in supported_providers(), "stac should be refreshable"
+
+
+@pytest.fixture
+def stac_catalog_copy(tmp_path, monkeypatch):
+    """Redirect the STAC catalog dir to a writable temp copy.
+
+    Copies the whole sharded catalog (so `load_catalog` still works) and
+    points `CATALOG_PATH` at it, so `--write` rewrites the copy and never
+    the repo's bundled file.
+
+    Returns:
+        The temp catalog directory.
+    """
+    dst = tmp_path / "catalog"
+    shutil.copytree(stac_catalog.CATALOG_PATH, dst)
+    monkeypatch.setattr(stac_catalog, "CATALOG_PATH", dst)
+    return dst
+
+
+class TestWrite:
+    """Tests for the `--write` (catalog-update) half of refresh_one."""
+
+    def test_rewrites_available_collections_block(self, stac_catalog_copy, monkeypatch):
+        """--write rewrites available_collections, preserving endpoints."""
+        monkeypatch.setattr(
+            refresh_mod,
+            "_get_json",
+            lambda url: {"collections": [{"id": "only-one"}], "links": []},
+        )
+        outcome = refresh_one(_info("stac"), write=True)
+        assert outcome.status == "ok", "write succeeded"
+        assert outcome.written.endswith("_index.yaml"), "the index file was written"
+        data = yaml.safe_load((stac_catalog_copy / "_index.yaml").read_text("utf-8"))
+        assert list(data["endpoints"]) == [
+            "planetary-computer",
+            "cdse",
+            "earth-search",
+        ], "endpoints block preserved"
+        assert data["available_collections"]["planetary-computer"] == ["only-one"]
+
+    def test_preserves_header_comment(self, stac_catalog_copy, monkeypatch):
+        """The file's leading comment block survives the rewrite."""
+        monkeypatch.setattr(
+            refresh_mod, "_get_json", lambda url: {"collections": [], "links": []}
+        )
+        refresh_one(_info("stac"), write=True)
+        text = (stac_catalog_copy / "_index.yaml").read_text("utf-8")
+        assert text.startswith("# STAC catalog index"), "header comment kept"
+
+    def test_unsupported_writer_reports_detail(self, monkeypatch):
+        """A provider that can read live but not write reports it in detail."""
+        monkeypatch.setattr(
+            refresh_mod, "_get_json", lambda url: {"collections": [], "links": []}
+        )
+        monkeypatch.delitem(refresh_mod._WRITERS, "stac")
+        outcome = refresh_one(_info("stac"), write=True)
+        assert outcome.status == "ok", "the live read still succeeded"
+        assert "not supported" in outcome.detail, "write-unsupported noted"
+
+    def test_write_error_is_captured(self, monkeypatch):
+        """A write failure reports 'error' rather than raising."""
+        monkeypatch.setattr(
+            refresh_mod, "_get_json", lambda url: {"collections": [], "links": []}
+        )
+
+        def boom(info, grouped):
+            raise OSError("disk full")
+
+        monkeypatch.setitem(refresh_mod._WRITERS, "stac", boom)
+        outcome = refresh_one(_info("stac"), write=True)
+        assert outcome.status == "error", "failure captured"
+        assert "write failed" in outcome.detail, "reason preserved"
 
 
 class TestRefreshOutcome:
