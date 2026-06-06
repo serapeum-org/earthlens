@@ -316,6 +316,34 @@ def _openaq_grouped(catalog: Any) -> dict[str, list[str]]:
     return {"openaq": names}
 
 
+def _cmems_describe() -> Any:
+    """Return the live Copernicus Marine catalogue (SDK call, public)."""
+    import copernicusmarine
+
+    return copernicusmarine.describe(disable_progress_bar=True)
+
+
+def _cmems_grouped(catalog: Any) -> dict[str, list[str]]:
+    """List every CMEMS dataset id across the live catalogue (public SDK).
+
+    Walks `copernicusmarine.describe().products[].datasets[].dataset_id`.
+
+    Args:
+        catalog: The loaded CMEMS `Catalog` (unused; the SDK is the source).
+
+    Returns:
+        A single-group mapping `{"cmems": [sorted dataset ids]}`.
+    """
+    result = _cmems_describe()
+    ids = {
+        did
+        for product in getattr(result, "products", []) or []
+        for dataset in getattr(product, "datasets", []) or []
+        if (did := getattr(dataset, "dataset_id", None))
+    }
+    return {"cmems": sorted(str(i) for i in ids)}
+
+
 #: Provider id -> a callable taking the loaded catalog and returning its
 #: live ids grouped (e.g. per STAC endpoint). Public providers need no
 #: credentials; credentialed ones (openaq) read their key from the env.
@@ -325,6 +353,7 @@ _REFRESHERS: dict[str, Callable[[Any], dict[str, list[str]]]] = {
     "hdx": _hdx_grouped,
     "earthdata": _earthdata_grouped,
     "openaq": _openaq_grouped,
+    "cmems": _cmems_grouped,
 }
 
 #: Provider id -> a callable that persists a grouped live fetch back into

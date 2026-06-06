@@ -54,7 +54,7 @@ class TestSupportedProviders:
 
     def test_public_providers_supported(self):
         """The wired-up providers all appear."""
-        assert {"stac", "openeo", "hdx", "earthdata", "openaq"} <= set(
+        assert {"stac", "openeo", "hdx", "earthdata", "openaq", "cmems"} <= set(
             supported_providers()
         )
 
@@ -127,6 +127,30 @@ class TestOpenaqRefresher:
         outcome = audit_one(_info("openaq"))
         assert outcome.status == "ok", "audit ran"
         assert "pm25" not in outcome.untracked, "curated live id is not untracked"
+
+
+class TestCmemsRefresher:
+    """Tests for the CMEMS (copernicusmarine) lister."""
+
+    def test_walks_products_and_datasets(self, monkeypatch):
+        """cmems refresh flattens products[].datasets[].dataset_id."""
+        from types import SimpleNamespace
+
+        fake = SimpleNamespace(
+            products=[
+                SimpleNamespace(datasets=[SimpleNamespace(dataset_id="a")]),
+                SimpleNamespace(
+                    datasets=[
+                        SimpleNamespace(dataset_id="b"),
+                        SimpleNamespace(dataset_id="c"),
+                    ]
+                ),
+            ]
+        )
+        monkeypatch.setattr(refresh_mod, "_cmems_describe", lambda: fake)
+        outcome = refresh_one(_info("cmems"))
+        assert outcome.status == "ok", "cmems refresh ran"
+        assert outcome.live_count == 3, "a/b/c across two products"
 
 
 @pytest.fixture
