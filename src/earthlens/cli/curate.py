@@ -338,6 +338,33 @@ def _earthdata_probe(catalog: Any, dataset: str) -> dict[str, dict[str, Any]]:
     return schema
 
 
+def _hdx_probe(catalog: Any, dataset: str) -> dict[str, dict[str, Any]]:
+    """Probe an HDX dataset's resources (files) via public CKAN package_show.
+
+    HDX datasets are file bundles rather than band/variable rasters, so the
+    "schema" is the resource list — each downloadable file and its format.
+
+    Args:
+        catalog: The loaded HDX `Catalog` (resolves a key's `hdx_id`).
+        dataset: A curated key or a CKAN dataset name.
+
+    Returns:
+        Mapping of resource (file) name to `{format}`.
+    """
+    record = catalog.datasets.get(dataset)
+    hdx_id = getattr(record, "hdx_id", None) or dataset
+    body = _get_json(
+        "https://data.humdata.org/api/3/action/package_show", params={"id": hdx_id}
+    )
+    resources = (body.get("result") or {}).get("resources", [])
+    schema: dict[str, dict[str, Any]] = {}
+    for resource in resources:
+        name = resource.get("name")
+        if name:
+            schema[str(name)] = {"format": resource.get("format")}
+    return schema
+
+
 def _cmems_describe_dataset(dataset_id: str) -> Any:
     """Return the live Copernicus Marine catalogue for one dataset (SDK)."""
     import copernicusmarine
@@ -387,6 +414,7 @@ _PROBERS: dict[str, Callable[[Any, str], dict[str, dict[str, Any]]]] = {
     "sentinel_hub": _sentinel_hub_probe,
     "cmems": _cmems_probe,
     "earthdata": _earthdata_probe,
+    "hdx": _hdx_probe,
 }
 
 

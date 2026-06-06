@@ -73,9 +73,36 @@ class TestSupportedProviders:
 
     def test_probers_wired_up(self):
         """The wired-up curation probers all appear."""
-        assert {"stac", "openeo", "gee", "sentinel_hub", "cmems", "earthdata"} <= set(
-            supported_providers()
+        assert {
+            "stac",
+            "openeo",
+            "gee",
+            "sentinel_hub",
+            "cmems",
+            "earthdata",
+            "hdx",
+        } <= set(supported_providers())
+
+
+class TestHdxProbe:
+    """Tests for the HDX resource prober (public CKAN)."""
+
+    def test_lists_resources(self, monkeypatch):
+        """hdx probe reads package_show resources into a file/format schema."""
+        from earthlens.cli import curate as curate_mod
+
+        monkeypatch.setattr(
+            curate_mod,
+            "_get_json",
+            lambda url, **kw: {
+                "result": {
+                    "resources": [{"name": "pop.gpkg.gz", "format": "Geopackage"}]
+                }
+            },
         )
+        result = probe_dataset(_info("hdx"), "kontur-population")
+        assert result.status == "ok", "hdx probe ran"
+        assert result.assets["pop.gpkg.gz"]["format"] == "Geopackage", "resource parsed"
 
 
 class TestEarthdataProbe:
