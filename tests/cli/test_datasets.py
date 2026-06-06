@@ -208,9 +208,9 @@ class TestRefresh:
 
     def test_unsupported_provider_exits_zero(self):
         """A provider with no live endpoint reports unsupported, exit 0."""
-        result = runner.invoke(app, ["datasets", "refresh", "chc"])
+        result = runner.invoke(app, ["datasets", "refresh", "gdacs"])
         assert result.exit_code == 0, f"refresh failed: {result.output}"
-        assert "unsupported" in result.output, "chc reported unsupported"
+        assert "unsupported" in result.output, "gdacs reported unsupported"
 
     def test_unknown_provider_rejected(self):
         """An unknown selector token is a usage error."""
@@ -218,9 +218,14 @@ class TestRefresh:
         assert result.exit_code == 2, "unknown provider -> exit 2"
 
     def test_all_covers_every_backend(self, monkeypatch):
-        """'all' refreshes every backend (stac live-mocked, rest unsupported)."""
+        """'all' refreshes every backend (stac stubbed, rest unsupported).
+
+        Replaces the whole refresher registry with a single offline stac
+        stub so `refresh all` stays fully offline — the other refreshers
+        reach live HTTP / FTP / SDK sources `_get_json` alone can't mock.
+        """
         monkeypatch.setattr(
-            refresh_mod, "_get_json", lambda url: {"collections": [], "links": []}
+            refresh_mod, "_REFRESHERS", {"stac": lambda catalog: {"stac": []}}
         )
         result = runner.invoke(app, ["datasets", "refresh", "all", "--json"])
         payload = json.loads(result.output)
@@ -274,9 +279,9 @@ class TestAudit:
 
     def test_unsupported_provider_exits_zero(self):
         """A provider with no live endpoint reports unsupported, exit 0."""
-        result = runner.invoke(app, ["datasets", "audit", "chc"])
+        result = runner.invoke(app, ["datasets", "audit", "gdacs"])
         assert result.exit_code == 0, f"audit failed: {result.output}"
-        assert "unsupported" in result.output, "chc reported unsupported"
+        assert "unsupported" in result.output, "gdacs reported unsupported"
 
     def test_unknown_provider_rejected(self):
         """An unknown selector token is a usage error."""

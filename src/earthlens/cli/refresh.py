@@ -7,9 +7,14 @@ it makes live HTTP requests to a provider's public API to fetch its
 bundled `available_datasets` index so the user can see what has appeared
 or disappeared upstream.
 
-Only providers with a public listing endpoint (or public SDK call) have a
-refresher wired up in :data:`_REFRESHERS`; every other provider reports
-`unsupported` so `refresh all` degrades gracefully instead of failing.
+Only providers with a public listing endpoint (or public SDK call, or
+anonymous FTP tree) have a refresher wired up in :data:`_REFRESHERS`; every
+other provider reports `unsupported` so `refresh all` degrades gracefully
+instead of failing. The live ids are diffed against the bundled index that
+fits the provider — usually `available_datasets`, but a backend whose
+refresh axis differs (Overture's `available_releases`, CHC's `ftp_bases`
+paths, or radar / firms / fdsn whose `datasets` map *is* the index) resolves
+its own via :func:`_bundled_ids`.
 
 The `--write` half (:data:`_WRITERS`) persists a live fetch back into the
 bundled informational index. It covers every refresher whose index is a
@@ -29,6 +34,7 @@ import re
 from collections.abc import Callable, Iterable
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass, field
+from ftplib import FTP, error_perm  # nosec B402  # noqa: S402
 from pathlib import Path
 from typing import Any
 
@@ -826,6 +832,119 @@ def _overture_grouped(catalog: Any) -> dict[str, list[str]]:
     return {"overture": sorted(set(_overture_release_ids()))}
 
 
+#: CHC anonymous-FTP host and the products root walked for coverage.
+_CHC_FTP_HOST = "data.chc.ucsb.edu"
+_CHC_ROOT = "pub/org/chc/products"
+#: How far the BFS descends below the root before giving up on a branch.
+_CHC_MAX_DEPTH = 6
+#: Suffixes that mark a leaf "data file" (so its directory is a product dir).
+_CHC_DATA_SUFFIXES = (
+    ".tif",
+    ".tif.gz",
+    ".tiff",
+    ".nc",
+    ".nc4",
+    ".bil",
+    ".bil.gz",
+    ".bin",
+    ".cog",
+    ".png",
+    ".grb",
+    ".grib",
+)
+_CHC_YEAR_RE = re.compile(r"^(19|20)\d{2}$")
+
+
+def _chc_is_product_listing(entries: list[str]) -> bool:
+    """Return whether a directory listing marks a CHC product directory.
+
+    A product directory is one whose children are data files (`.tif`,
+    `.nc`, `.bil`, ...) or year-named subdirectories; anything else is an
+    intermediate directory to descend into.
+
+    Args:
+        entries: The directory's child names.
+
+    Returns:
+        `True` if the listing looks like a product directory.
+    """
+    has_data = any(name.lower().endswith(_CHC_DATA_SUFFIXES) for name in entries)
+    has_years = any(_CHC_YEAR_RE.fullmatch(name) for name in entries)
+    return has_data or has_years
+
+
+def _chc_walk(ftp: FTP, root: str, max_depth: int) -> list[str]:
+    """BFS-walk `root` and return every discovered CHC product directory.
+
+    Mirrors `tools/chc/refresh_chc_catalog.py`: descends intermediate
+    directories until a product directory is reached or `max_depth` levels
+    below `root`. Unreachable / permission-denied directories are skipped.
+
+    Args:
+        ftp: A logged-in FTP connection.
+        root: The products root to walk from (no trailing slash).
+        max_depth: Maximum levels to descend below `root`.
+
+    Returns:
+        The sorted product-directory paths (each `.../`-terminated).
+    """
+    discovered: list[str] = []
+    queue: list[tuple[str, int]] = [(root, 0)]
+    while queue:
+        path, depth = queue.pop(0)
+        try:
+            ftp.cwd("/")
+            ftp.cwd(path)
+            entries = sorted(ftp.nlst())
+        except (error_perm, OSError):
+            continue
+        if _chc_is_product_listing(entries):
+            discovered.append(path.rstrip("/") + "/")
+            continue
+        if depth >= max_depth:
+            continue
+        for entry in entries:
+            if "." in entry:  # an unrecognised file (e.g. README.txt)
+                continue
+            queue.append((f"{path.rstrip('/')}/{entry}/", depth + 1))
+    return sorted(discovered)
+
+
+def _chc_discovered_paths() -> list[str]:
+    """Return every CHC product directory from a live anonymous-FTP walk."""
+    with FTP(_CHC_FTP_HOST, timeout=_TIMEOUT) as ftp:  # nosec B321
+        ftp.login()
+        return _chc_walk(ftp, _CHC_ROOT, _CHC_MAX_DEPTH)
+
+
+def _chc_grouped(catalog: Any) -> dict[str, list[str]]:
+    """List every CHC product directory from the live FTP tree (anonymous).
+
+    CHC's refreshable axis is the set of FTP product directories, diffed
+    against the distinct `ftp_bases` the catalog references (see
+    :func:`_chc_ftp_bases`) — not the hand-curated `available_datasets:`
+    slugs, which are a human-curation artefact the diff cannot derive.
+
+    Args:
+        catalog: The loaded CHC `Catalog` (unused; the FTP tree is the source).
+
+    Returns:
+        A single-group mapping `{"chc": [sorted product directories]}`.
+    """
+    return {"chc": sorted({p.rstrip("/") + "/" for p in _chc_discovered_paths()})}
+
+
+def _chc_ftp_bases(catalog: Any) -> list[str]:
+    """Return the distinct `ftp_bases` paths the CHC catalog references."""
+    return sorted(
+        {
+            base.rstrip("/") + "/"
+            for dataset in catalog.datasets.values()
+            for base in dataset.ftp_bases.values()
+        }
+    )
+
+
 #: Provider id -> a callable taking the loaded catalog and returning its
 #: live ids grouped (e.g. per STAC endpoint). Public providers need no
 #: credentials; credentialed ones (openaq, firms) read their key from the env.
@@ -846,6 +965,7 @@ _REFRESHERS: dict[str, Callable[[Any], dict[str, list[str]]]] = {
     "firms": _firms_grouped,
     "fdsn": _fdsn_grouped,
     "overture": _overture_grouped,
+    "chc": _chc_grouped,
 }
 
 #: Provider id -> a callable that persists a grouped live fetch back into
@@ -1049,6 +1169,7 @@ _CURATED_IDS: dict[str, Callable[[Any], list[str]]] = {
     "usgs_water": _curated_attr_ids("code"),
     "fdsn": _curated_attr_ids("fdsn_id"),
     "overture": _curated_releases,
+    "chc": _chc_ftp_bases,
 }
 
 #: Provider id -> the catalog attribute holding its persisted informational
@@ -1056,14 +1177,21 @@ _CURATED_IDS: dict[str, Callable[[Any], list[str]]] = {
 #: its date-stamped `available_releases` instead.
 _INDEX_ATTR: dict[str, str] = {"overture": "available_releases"}
 
+#: Provider id -> a callable computing the bundled ids to diff against, for
+#: backends whose refresh axis is neither `available_datasets` nor a simple
+#: attribute. CHC diffs the live FTP tree against its `ftp_bases` paths (not
+#: the hand-curated `available_datasets:` slugs the diff cannot derive).
+_BUNDLED_IDS: dict[str, Callable[[Any], list[str]]] = {"chc": _chc_ftp_bases}
+
 
 def _bundled_ids(catalog: Any, provider: str) -> list[str]:
     """Return the bundled ids a provider's live fetch is diffed against.
 
-    Prefers the persisted informational index (`available_datasets`, or
-    Overture's `available_releases`); when a backend keeps no such block —
-    its `datasets` map *is* the index (radar / firms / fdsn) — falls back
-    to the curated ids (`_CURATED_IDS`) or, failing that, the dataset keys.
+    Resolution order: an explicit `_BUNDLED_IDS` resolver (a computed axis
+    such as CHC's `ftp_bases`); else the persisted informational index
+    (`available_datasets`, or Overture's `available_releases`); else, for a
+    backend whose `datasets` map *is* the index (radar / firms / fdsn), the
+    curated ids (`_CURATED_IDS`) or, failing that, the dataset keys.
 
     Args:
         catalog: The loaded provider catalog.
@@ -1072,6 +1200,9 @@ def _bundled_ids(catalog: Any, provider: str) -> list[str]:
     Returns:
         The id list to diff the live fetch against.
     """
+    custom = _BUNDLED_IDS.get(provider)
+    if custom:
+        return custom(catalog)
     persisted = [
         str(value)
         for value in getattr(
