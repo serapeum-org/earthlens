@@ -360,11 +360,11 @@ class TestProbe:
         assert payload["assets"]["B04"]["common_name"] == "red", "schema parsed"
 
     def test_table_lists_assets(self, monkeypatch):
-        """The default table lists each probed asset."""
+        """The default table lists each probed entry under the NAME column."""
         monkeypatch.setattr(curate_mod, "_get_json", lambda url: self._SAMPLE)
         result = runner.invoke(app, ["datasets", "probe", "stac", "sentinel-2-l2a"])
         assert result.exit_code == 0, f"probe failed: {result.output}"
-        assert "ASSET" in result.output and "B04" in result.output
+        assert "NAME" in result.output and "B04" in result.output
 
 
 class TestShow:

@@ -382,29 +382,35 @@ def refresh_table(outcomes) -> Table:
 
 
 def probe_table(result) -> Table:
-    """Build an asset/band schema table from a probe result.
+    """Build a schema table from a probe result, with dynamic columns.
+
+    Each provider's probe yields a different per-entry field set (STAC asset
+    media-type/dtype, GEE/openEO band common-name/units, …), so the columns
+    are the union of the entries' field keys — a `NAME` column plus one per
+    field seen, in first-seen order.
 
     Args:
-        result: A `ProbeResult` (duck-typed: `.assets` mapping of asset key
-            to `{media_type, common_name, dtype, nodata}`).
+        result: A `ProbeResult` (duck-typed: `.assets` mapping of entry name
+            to a `{field: value}` schema dict).
 
     Returns:
         A :class:`rich.table.Table`; missing fields render as `-`.
     """
+    field_keys: list[str] = []
+    for schema in result.assets.values():
+        for key in schema:
+            if key not in field_keys:
+                field_keys.append(key)
     table = Table(header_style="bold", show_lines=False)
-    table.add_column("ASSET", overflow="fold")
-    table.add_column("MEDIA TYPE", overflow="fold")
-    table.add_column("COMMON NAME", overflow="fold")
-    table.add_column("DTYPE", overflow="fold")
-    table.add_column("NODATA", justify="right")
-    for key, schema in result.assets.items():
-        table.add_row(
-            key,
-            str(schema.get("media_type") or "-"),
-            str(schema.get("common_name") or "-"),
-            str(schema.get("dtype") or "-"),
-            "-" if schema.get("nodata") is None else str(schema.get("nodata")),
-        )
+    table.add_column("NAME", overflow="fold")
+    for key in field_keys:
+        table.add_column(key.upper(), overflow="fold")
+    for name, schema in result.assets.items():
+        cells = [
+            "-" if schema.get(key) is None else str(schema.get(key))
+            for key in field_keys
+        ]
+        table.add_row(name, *cells)
     return table
 
 

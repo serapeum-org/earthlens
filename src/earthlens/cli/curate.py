@@ -178,10 +178,86 @@ def _stac_probe(catalog: Any, dataset: str) -> dict[str, dict[str, Any]]:
     raise ValueError(f"no sample item found for {dataset!r}{suffix}")
 
 
+def _bands_from_summaries(body: dict[str, Any]) -> list[dict[str, Any]]:
+    """Return a STAC doc's `summaries.eo:bands` (or `gee:bands`) list."""
+    summaries = body.get("summaries", {}) or {}
+    return summaries.get("eo:bands") or summaries.get("gee:bands") or []
+
+
+def _openeo_probe(catalog: Any, dataset: str) -> dict[str, dict[str, Any]]:
+    """Probe an openEO collection's band schema (public `/collections/{id}`).
+
+    Args:
+        catalog: The loaded openEO `Catalog` (unused; the endpoint is fixed).
+        dataset: The collection id.
+
+    Returns:
+        Mapping of band name to `{common_name, dtype, gsd, unit}`. Falls back
+        to the `cube:dimensions` band names (empty schema) when the
+        collection carries no `eo:bands`.
+    """
+    url = f"https://openeo.dataspace.copernicus.eu/openeo/1.2/collections/{dataset}"
+    body = _get_json(url)
+    bands = _bands_from_summaries(body)
+    if bands:
+        return {
+            str(band["name"]): {
+                "common_name": band.get("common_name"),
+                "dtype": band.get("data_type"),
+                "gsd": band.get("gsd"),
+                "unit": band.get("unit"),
+            }
+            for band in bands
+            if band.get("name")
+        }
+    dimensions = body.get("cube:dimensions", {}) or {}
+    names = next(
+        (
+            dim.get("values", [])
+            for dim in dimensions.values()
+            if dim.get("type") == "bands"
+        ),
+        [],
+    )
+    return {str(name): {} for name in names}
+
+
+def _gee_probe(catalog: Any, dataset: str) -> dict[str, dict[str, Any]]:
+    """Probe a GEE asset's band schema from its public EE STAC document.
+
+    Args:
+        catalog: The loaded GEE `Catalog` (unused; the STAC doc is the source).
+        dataset: The Earth Engine asset id (e.g. `NASA/GDDP-CMIP6`).
+
+    Returns:
+        Mapping of band name to `{units, gsd, description}`.
+    """
+    provider = dataset.split("/", 1)[0]
+    filename = dataset.replace("/", "_") + ".json"
+    url = (
+        f"https://storage.googleapis.com/earthengine-stac/catalog/{provider}/{filename}"
+    )
+    body = _get_json(url)
+    schema: dict[str, dict[str, Any]] = {}
+    for band in _bands_from_summaries(body):
+        name = band.get("name")
+        if not name:
+            continue
+        gsd = band.get("gsd")
+        schema[str(name)] = {
+            "units": band.get("gee:units"),
+            "gsd": gsd[0] if isinstance(gsd, list) and gsd else gsd,
+            "description": (band.get("description") or "").strip()[:60],
+        }
+    return schema
+
+
 #: Provider id -> a callable taking the loaded catalog and a dataset id and
-#: returning its per-asset schema. STAC only for now.
+#: returning its per-entry schema.
 _PROBERS: dict[str, Callable[[Any, str], dict[str, dict[str, Any]]]] = {
     "stac": _stac_probe,
+    "openeo": _openeo_probe,
+    "gee": _gee_probe,
 }
 
 

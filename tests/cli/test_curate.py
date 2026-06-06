@@ -71,9 +71,54 @@ class TestAssetSchema:
 class TestSupportedProviders:
     """Tests for supported_providers."""
 
-    def test_stac_is_supported(self):
-        """STAC has a curation prober wired up."""
-        assert "stac" in supported_providers(), "stac should be probeable"
+    def test_probers_wired_up(self):
+        """STAC, openEO and GEE all have curation probers."""
+        assert {"stac", "openeo", "gee"} <= set(supported_providers())
+
+
+class TestOpeneoProbe:
+    """Tests for the openEO band prober."""
+
+    def test_extracts_band_schema(self, monkeypatch):
+        """openeo probe reads summaries.eo:bands into a band schema."""
+        from earthlens.cli import curate as curate_mod
+
+        monkeypatch.setattr(
+            curate_mod,
+            "_get_json",
+            lambda url, **kw: {
+                "summaries": {
+                    "eo:bands": [
+                        {"name": "B04", "common_name": "red", "data_type": "int16"}
+                    ]
+                }
+            },
+        )
+        result = probe_dataset(_info("openeo"), "SENTINEL2_L2A")
+        assert result.status == "ok", "openeo probe ran"
+        assert result.assets["B04"]["common_name"] == "red", "band parsed"
+
+
+class TestGeeProbe:
+    """Tests for the GEE band prober."""
+
+    def test_extracts_band_schema(self, monkeypatch):
+        """gee probe reads its STAC doc's eo:bands (gee:units / gsd)."""
+        from earthlens.cli import curate as curate_mod
+
+        monkeypatch.setattr(
+            curate_mod,
+            "_get_json",
+            lambda url, **kw: {
+                "summaries": {
+                    "eo:bands": [{"name": "hurs", "gee:units": "%", "gsd": [27830]}]
+                }
+            },
+        )
+        result = probe_dataset(_info("gee"), "NASA/GDDP-CMIP6")
+        assert result.status == "ok", "gee probe ran"
+        assert result.assets["hurs"]["units"] == "%", "units parsed"
+        assert result.assets["hurs"]["gsd"] == 27830, "gsd unwrapped from list"
 
 
 class TestProbeResult:
