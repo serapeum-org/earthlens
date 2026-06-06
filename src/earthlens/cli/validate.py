@@ -93,10 +93,111 @@ def _validate_nwp(catalog: Any) -> tuple[int, list[str]]:
     return len(models), issues
 
 
+def _lint(
+    catalog: Any, check: Callable[[str, Any], list[str]]
+) -> tuple[int, list[str]]:
+    """Run a per-record `check(key, record) -> [issue, …]` over a catalog."""
+    issues: list[str] = []
+    for key, record in catalog.datasets.items():
+        issues.extend(check(key, record))
+    return len(catalog.datasets), issues
+
+
+def _require(key: str, record: Any, fields: tuple[str, ...]) -> list[str]:
+    """Return an issue per `field` that is empty/None on `record`."""
+    return [
+        f"{key}: missing {field}"
+        for field in fields
+        if not getattr(record, field, None)
+    ]
+
+
+def _validate_s3(catalog: Any) -> tuple[int, list[str]]:
+    """Each S3 dataset needs a bucket and a format."""
+    return _lint(catalog, lambda k, r: _require(k, r, ("bucket", "format")))
+
+
+def _validate_ghsl(catalog: Any) -> tuple[int, list[str]]:
+    """Each GHSL product needs a code and at least one release.
+
+    `family` is a soft grouping that is legitimately empty for top-level
+    products (e.g. GHS_POP is its own family), so it is not required.
+    """
+    return _lint(catalog, lambda k, r: _require(k, r, ("code", "releases")))
+
+
+def _validate_overture(catalog: Any) -> tuple[int, list[str]]:
+    """Each Overture theme needs types and a default_type drawn from them."""
+
+    def check(key: str, record: Any) -> list[str]:
+        issues = _require(key, record, ("types", "default_type"))
+        types = getattr(record, "types", None) or []
+        default = getattr(record, "default_type", None)
+        if default and types and default not in types:
+            issues.append(f"{key}: default_type {default!r} not in types")
+        return issues
+
+    return _lint(catalog, check)
+
+
+def _validate_fdsn(catalog: Any) -> tuple[int, list[str]]:
+    """Each FDSN network needs an fdsn_id."""
+    return _lint(catalog, lambda k, r: _require(k, r, ("fdsn_id",)))
+
+
+def _validate_firms(catalog: Any) -> tuple[int, list[str]]:
+    """Each FIRMS sensor needs a code and a non-empty columns map."""
+    return _lint(catalog, lambda k, r: _require(k, r, ("code", "columns")))
+
+
+def _validate_radar(catalog: Any) -> tuple[int, list[str]]:
+    """Each radar station needs a name and in-range latitude / longitude."""
+
+    def check(key: str, record: Any) -> list[str]:
+        issues = _require(key, record, ("name",))
+        lat = getattr(record, "latitude", None)
+        lon = getattr(record, "longitude", None)
+        if not (isinstance(lat, (int, float)) and -90 <= lat <= 90):
+            issues.append(f"{key}: latitude {lat!r} out of range")
+        if not (isinstance(lon, (int, float)) and -180 <= lon <= 180):
+            issues.append(f"{key}: longitude {lon!r} out of range")
+        return issues
+
+    return _lint(catalog, check)
+
+
+def _validate_tropycal(catalog: Any) -> tuple[int, list[str]]:
+    """Each Tropycal basin needs at least one declared source."""
+    return _lint(catalog, lambda k, r: _require(k, r, ("sources",)))
+
+
+def _validate_chc(catalog: Any) -> tuple[int, list[str]]:
+    """Each CHC dataset needs FTP bases, a file pattern, and variables."""
+
+    def check(key: str, record: Any) -> list[str]:
+        issues = _require(key, record, ("ftp_bases", "variables"))
+        if not (
+            getattr(record, "file_patterns", None)
+            or getattr(record, "discrete_files", None)
+        ):
+            issues.append(f"{key}: no file_patterns or discrete_files")
+        return issues
+
+    return _lint(catalog, check)
+
+
 #: Provider id -> a callable taking the loaded catalog and returning
 #: `(checked, issues)`. Providers without one report `"unsupported"`.
 _VALIDATORS: dict[str, Callable[[Any], tuple[int, list[str]]]] = {
     "nwp": _validate_nwp,
+    "s3": _validate_s3,
+    "ghsl": _validate_ghsl,
+    "overture": _validate_overture,
+    "fdsn": _validate_fdsn,
+    "firms": _validate_firms,
+    "radar": _validate_radar,
+    "tropycal": _validate_tropycal,
+    "chc": _validate_chc,
 }
 
 

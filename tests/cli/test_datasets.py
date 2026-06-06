@@ -315,9 +315,9 @@ class TestValidate:
         assert payload[0]["issues"] == [], "no structural issues"
 
     def test_unsupported_provider(self):
-        """A provider with no validator reports unsupported."""
-        result = runner.invoke(app, ["datasets", "validate", "s3"])
-        assert "unsupported" in result.output, "s3 has no validator"
+        """A catalog-backed provider reports unsupported (uses refresh/audit)."""
+        result = runner.invoke(app, ["datasets", "validate", "cmems"])
+        assert "unsupported" in result.output, "cmems has no validator"
 
     def test_unknown_provider_rejected(self):
         """An unknown selector token is a usage error."""
