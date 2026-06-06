@@ -52,9 +52,9 @@ class TestFlatten:
 class TestSupportedProviders:
     """Tests for supported_providers."""
 
-    def test_stac_and_openeo_supported(self):
-        """STAC and openEO both have live refreshers wired up."""
-        assert {"stac", "openeo"} <= set(supported_providers()), "both refreshable"
+    def test_public_providers_supported(self):
+        """The wired-up public providers all appear."""
+        assert {"stac", "openeo", "hdx"} <= set(supported_providers())
 
 
 class TestOpeneoRefresher:
@@ -70,6 +70,21 @@ class TestOpeneoRefresher:
         outcome = refresh_one(_info("openeo"))
         assert outcome.status == "ok", "openeo refresh ran"
         assert outcome.live_count == 2, "two collection ids listed"
+
+
+class TestHdxRefresher:
+    """Tests for the HDX (CKAN) lister."""
+
+    def test_lists_package_names(self, monkeypatch):
+        """hdx refresh reads CKAN package_list and audits by hdx_id."""
+        monkeypatch.setattr(
+            refresh_mod,
+            "_get_json",
+            lambda url: {"result": ["kontur-boundaries", "kontur-population"]},
+        )
+        outcome = refresh_one(_info("hdx"))
+        assert outcome.status == "ok", "hdx refresh ran"
+        assert outcome.live_count == 2, "two package names listed"
 
 
 @pytest.fixture

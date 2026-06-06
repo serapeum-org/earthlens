@@ -198,12 +198,30 @@ def _openeo_grouped(catalog: Any) -> dict[str, list[str]]:
     return {"openeo": ids}
 
 
+#: HDX CKAN dataset-name listing (public, anonymous).
+_HDX_PACKAGE_LIST_URL = "https://data.humdata.org/api/3/action/package_list"
+
+
+def _hdx_grouped(catalog: Any) -> dict[str, list[str]]:
+    """List every HDX (CKAN) dataset name, live (public, anonymous).
+
+    Args:
+        catalog: The loaded HDX `Catalog` (unused; the endpoint is fixed).
+
+    Returns:
+        A single-group mapping `{"hdx": [sorted dataset names]}`.
+    """
+    body = _get_json(_HDX_PACKAGE_LIST_URL)
+    return {"hdx": sorted(str(name) for name in body.get("result", []))}
+
+
 #: Provider id -> a callable taking the loaded catalog and returning its
 #: live ids grouped (e.g. per STAC endpoint). Only providers with a public,
 #: no-auth listing endpoint appear here.
 _REFRESHERS: dict[str, Callable[[Any], dict[str, list[str]]]] = {
     "stac": _stac_grouped,
     "openeo": _openeo_grouped,
+    "hdx": _hdx_grouped,
 }
 
 #: Provider id -> a callable that persists a grouped live fetch back into
@@ -352,11 +370,35 @@ def _curated_collection_ids(catalog: Any) -> list[str]:
     )
 
 
+def _curated_attr_ids(attr: str) -> Callable[[Any], list[str]]:
+    """Build a curated-id resolver that reads `attr` off each record.
+
+    Args:
+        attr: The record attribute holding the upstream id (e.g. `"hdx_id"`,
+            `"short_name"`).
+
+    Returns:
+        A function mapping a catalog to its sorted, de-duplicated upstream ids.
+    """
+
+    def resolver(catalog: Any) -> list[str]:
+        return sorted(
+            {
+                value
+                for record in catalog.datasets.values()
+                if (value := getattr(record, attr, None))
+            }
+        )
+
+    return resolver
+
+
 #: Provider id -> a callable returning the upstream ids the catalog curates
 #: (for the `audit` drift check). Falls back to the dataset keys otherwise.
 _CURATED_IDS: dict[str, Callable[[Any], list[str]]] = {
     "stac": _curated_collection_ids,
     "openeo": _curated_collection_ids,
+    "hdx": _curated_attr_ids("hdx_id"),
 }
 
 
