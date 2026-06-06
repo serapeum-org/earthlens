@@ -81,7 +81,26 @@ class TestSupportedProviders:
             "cmems",
             "earthdata",
             "hdx",
+            "firms",
         } <= set(supported_providers())
+
+
+class TestFirmsProbe:
+    """Tests for the FIRMS CSV-column prober."""
+
+    def test_columns_and_inferred_dtypes(self, monkeypatch):
+        """firms probe reads the CSV header and infers each column's dtype."""
+        from earthlens.cli import curate as curate_mod
+
+        monkeypatch.setattr(
+            curate_mod,
+            "_firms_csv_lines",
+            lambda code: ["latitude,frp,satellite", "1.5,10,N"],
+        )
+        result = probe_dataset(_info("firms"), "VIIRS_SNPP_NRT")
+        assert result.status == "ok", "firms probe ran"
+        assert result.assets["latitude"]["dtype"] == "float", "float inferred"
+        assert result.assets["satellite"]["dtype"] == "str", "str inferred"
 
 
 class TestHdxProbe:
