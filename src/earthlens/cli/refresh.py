@@ -18,6 +18,7 @@ from __future__ import annotations
 import importlib
 import os
 from collections.abc import Callable, Iterable
+from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass, field
 from typing import Any
 
@@ -392,6 +393,67 @@ def _sentinel_hub_grouped(catalog: Any) -> dict[str, list[str]]:
     return {"sentinel_hub": sorted(set(_sh_data_collection_names()))}
 
 
+#: Public Earth Engine STAC catalog root (no credentials for the catalog).
+_GEE_STAC_ROOT = "https://storage.googleapis.com/earthengine-stac/catalog/catalog.json"
+
+
+def _gee_dataset_hrefs() -> list[str]:
+    """Walk the public EE STAC tree and return every dataset STAC-doc href.
+
+    BFS over `rel="child"` links from the root (absolute hrefs); links to
+    `…/catalog.json` are sub-catalogs to recurse, the rest are dataset docs.
+
+    Returns:
+        The dataset STAC-document hrefs (one per Earth Engine asset).
+    """
+    hrefs: list[str] = []
+    queue = [_GEE_STAC_ROOT]
+    seen: set[str] = set()
+    while queue:
+        url = queue.pop()
+        if url in seen:
+            continue
+        seen.add(url)
+        try:
+            node = _get_json(url)
+        except Exception:  # noqa: BLE001 — skip an unreachable sub-catalog
+            continue
+        for link in node.get("links", []):
+            if link.get("rel") != "child":
+                continue
+            href = link.get("href")
+            if not href:
+                continue
+            (queue if href.endswith("/catalog.json") else hrefs).append(href)
+    return hrefs
+
+
+def _gee_fetch_id(href: str) -> str | None:
+    """Return a dataset STAC doc's `id` (its EE asset id), or None on error."""
+    try:
+        return _get_json(href).get("id")
+    except Exception:  # noqa: BLE001 — a single unreachable doc is skipped
+        return None
+
+
+def _gee_grouped(catalog: Any) -> dict[str, list[str]]:
+    """List every Earth Engine asset id from the public STAC catalog.
+
+    Walks the STAC tree for dataset docs, then fetches each doc's `id`
+    concurrently (pure HTTP, no SDK / credentials).
+
+    Args:
+        catalog: The loaded GEE `Catalog` (unused; the STAC tree is the source).
+
+    Returns:
+        A single-group mapping `{"gee": [sorted asset ids]}`.
+    """
+    hrefs = _gee_dataset_hrefs()
+    with ThreadPoolExecutor(max_workers=16) as pool:
+        ids = {str(cid) for cid in pool.map(_gee_fetch_id, hrefs) if cid}
+    return {"gee": sorted(ids)}
+
+
 #: Provider id -> a callable taking the loaded catalog and returning its
 #: live ids grouped (e.g. per STAC endpoint). Public providers need no
 #: credentials; credentialed ones (openaq) read their key from the env.
@@ -404,6 +466,7 @@ _REFRESHERS: dict[str, Callable[[Any], dict[str, list[str]]]] = {
     "cmems": _cmems_grouped,
     "eumetsat": _eumetsat_grouped,
     "sentinel_hub": _sentinel_hub_grouped,
+    "gee": _gee_grouped,
 }
 
 #: Provider id -> a callable that persists a grouped live fetch back into

@@ -63,6 +63,7 @@ class TestSupportedProviders:
             "cmems",
             "eumetsat",
             "sentinel_hub",
+            "gee",
         } <= set(supported_providers())
 
 
@@ -188,6 +189,22 @@ class TestSentinelHubRefresher:
         outcome = refresh_one(_info("sentinel_hub"))
         assert outcome.status == "ok", "sentinel_hub refresh ran"
         assert outcome.live_count == 2, "two collection names listed"
+
+
+class TestGeeRefresher:
+    """Tests for the GEE (EE STAC walk) lister."""
+
+    def test_fetches_ids_for_each_dataset_href(self, monkeypatch):
+        """gee refresh walks the tree then fetches each dataset doc's id."""
+        monkeypatch.setattr(
+            refresh_mod, "_gee_dataset_hrefs", lambda: ["h/a", "h/b", "h/c"]
+        )
+        monkeypatch.setattr(
+            refresh_mod, "_gee_fetch_id", lambda href: href.rsplit("/", 1)[1].upper()
+        )
+        outcome = refresh_one(_info("gee"))
+        assert outcome.status == "ok", "gee refresh ran"
+        assert outcome.live_count == 3, "A/B/C ids fetched"
 
 
 @pytest.fixture
