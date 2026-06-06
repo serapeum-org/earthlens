@@ -171,6 +171,11 @@ def _validate_tropycal(catalog: Any) -> tuple[int, list[str]]:
     return _lint(catalog, lambda k, r: _require(k, r, ("sources",)))
 
 
+def _validate_gdacs(catalog: Any) -> tuple[int, list[str]]:
+    """Each GDACS hazard type needs a name and a description."""
+    return _lint(catalog, lambda k, r: _require(k, r, ("name", "description")))
+
+
 def _validate_chc(catalog: Any) -> tuple[int, list[str]]:
     """Each CHC dataset needs FTP bases, a file pattern, and variables."""
 
@@ -197,6 +202,7 @@ _VALIDATORS: dict[str, Callable[[Any], tuple[int, list[str]]]] = {
     "firms": _validate_firms,
     "radar": _validate_radar,
     "tropycal": _validate_tropycal,
+    "gdacs": _validate_gdacs,
     "chc": _validate_chc,
 }
 

@@ -56,6 +56,7 @@ class TestSupportedProviders:
         """The wired-up providers all appear."""
         assert {
             "stac",
+            "ecmwf",
             "openeo",
             "hdx",
             "earthdata",
@@ -67,6 +68,25 @@ class TestSupportedProviders:
             "worldpop",
             "usgs_water",
         } <= set(supported_providers())
+
+    def test_twelve_catalog_backed_providers(self):
+        """All twelve catalog-backed providers have refresh/audit."""
+        assert len(supported_providers()) == 12, sorted(supported_providers())
+
+
+class TestEcmwfRefresher:
+    """Tests for the ECMWF (CDS catalogue) lister."""
+
+    def test_lists_cds_collection_ids(self, monkeypatch):
+        """ecmwf refresh reads the public CDS catalogue collection ids."""
+        monkeypatch.setattr(
+            refresh_mod,
+            "_get_json",
+            lambda url, **kw: {"collections": [{"id": "reanalysis-era5-land"}]},
+        )
+        outcome = refresh_one(_info("ecmwf"))
+        assert outcome.status == "ok", "ecmwf refresh ran"
+        assert outcome.live_count == 1, "one CDS dataset id listed"
 
 
 class TestOpeneoRefresher:

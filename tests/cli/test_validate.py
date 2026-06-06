@@ -33,6 +33,7 @@ _CURATED_ENUM = (
     "firms",
     "radar",
     "tropycal",
+    "gdacs",
     "chc",
 )
 

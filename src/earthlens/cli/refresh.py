@@ -195,6 +195,27 @@ def _write_stac(info: BackendInfo, grouped: dict[str, list[str]]) -> str:
     return str(index_path)
 
 
+#: Copernicus CDS public STAC catalogue (collection listing needs no auth).
+_CDS_COLLECTIONS_URL = "https://cds.climate.copernicus.eu/api/catalogue/v1/collections"
+
+
+def _ecmwf_grouped(catalog: Any) -> dict[str, list[str]]:
+    """List the Copernicus CDS dataset ids, live (public catalogue).
+
+    Listing the CDS catalogue needs no credentials (only data *retrieval*
+    does); each collection's `id` is a CDS dataset name.
+
+    Args:
+        catalog: The loaded ECMWF `Catalog` (unused; the endpoint is fixed).
+
+    Returns:
+        A single-group mapping `{"ecmwf": [sorted CDS dataset ids]}`.
+    """
+    body = _get_json(_CDS_COLLECTIONS_URL)
+    ids = sorted({str(c["id"]) for c in body.get("collections", []) if c.get("id")})
+    return {"ecmwf": ids}
+
+
 #: CDSE openEO collections endpoint (public; the backend's default host).
 _OPENEO_COLLECTIONS_URL = (
     "https://openeo.dataspace.copernicus.eu/openeo/1.2/collections"
@@ -522,6 +543,7 @@ def _usgs_water_grouped(catalog: Any) -> dict[str, list[str]]:
 #: credentials; credentialed ones (openaq) read their key from the env.
 _REFRESHERS: dict[str, Callable[[Any], dict[str, list[str]]]] = {
     "stac": _stac_grouped,
+    "ecmwf": _ecmwf_grouped,
     "openeo": _openeo_grouped,
     "hdx": _hdx_grouped,
     "earthdata": _earthdata_grouped,
