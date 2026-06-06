@@ -344,6 +344,29 @@ def _cmems_grouped(catalog: Any) -> dict[str, list[str]]:
     return {"cmems": sorted(str(i) for i in ids)}
 
 
+#: EUMETSAT public browse collections endpoint (no credentials).
+_EUMETSAT_BROWSE_URL = "https://api.eumetsat.int/data/browse/collections"
+
+
+def _eumetsat_grouped(catalog: Any) -> dict[str, list[str]]:
+    """List EUMETSAT collection ids from the public browse endpoint.
+
+    Listing collections needs no credentials (only data *access* does); each
+    browse link's `title` is the `EO:EUM:...` collection id.
+
+    Args:
+        catalog: The loaded EUMETSAT `Catalog` (unused; the endpoint is fixed).
+
+    Returns:
+        A single-group mapping `{"eumetsat": [sorted collection ids]}`.
+    """
+    body = _get_json(_EUMETSAT_BROWSE_URL, params={"format": "json"})
+    ids = sorted(
+        {str(link["title"]) for link in body.get("links", []) if link.get("title")}
+    )
+    return {"eumetsat": ids}
+
+
 #: Provider id -> a callable taking the loaded catalog and returning its
 #: live ids grouped (e.g. per STAC endpoint). Public providers need no
 #: credentials; credentialed ones (openaq) read their key from the env.
@@ -354,6 +377,7 @@ _REFRESHERS: dict[str, Callable[[Any], dict[str, list[str]]]] = {
     "earthdata": _earthdata_grouped,
     "openaq": _openaq_grouped,
     "cmems": _cmems_grouped,
+    "eumetsat": _eumetsat_grouped,
 }
 
 #: Provider id -> a callable that persists a grouped live fetch back into
@@ -532,6 +556,7 @@ _CURATED_IDS: dict[str, Callable[[Any], list[str]]] = {
     "openeo": _curated_collection_ids,
     "hdx": _curated_attr_ids("hdx_id"),
     "earthdata": _curated_attr_ids("short_name"),
+    "eumetsat": _curated_collection_ids,
 }
 
 

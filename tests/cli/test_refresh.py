@@ -54,9 +54,15 @@ class TestSupportedProviders:
 
     def test_public_providers_supported(self):
         """The wired-up providers all appear."""
-        assert {"stac", "openeo", "hdx", "earthdata", "openaq", "cmems"} <= set(
-            supported_providers()
-        )
+        assert {
+            "stac",
+            "openeo",
+            "hdx",
+            "earthdata",
+            "openaq",
+            "cmems",
+            "eumetsat",
+        } <= set(supported_providers())
 
 
 class TestOpeneoRefresher:
@@ -151,6 +157,23 @@ class TestCmemsRefresher:
         outcome = refresh_one(_info("cmems"))
         assert outcome.status == "ok", "cmems refresh ran"
         assert outcome.live_count == 3, "a/b/c across two products"
+
+
+class TestEumetsatRefresher:
+    """Tests for the EUMETSAT (public browse) lister."""
+
+    def test_lists_collection_ids_from_links(self, monkeypatch):
+        """eumetsat refresh reads each browse link's title as the id."""
+        monkeypatch.setattr(
+            refresh_mod,
+            "_get_json",
+            lambda url, **kw: {
+                "links": [{"title": "EO:EUM:DAT:1"}, {"title": "EO:EUM:DAT:2"}]
+            },
+        )
+        outcome = refresh_one(_info("eumetsat"))
+        assert outcome.status == "ok", "eumetsat refresh ran"
+        assert outcome.live_count == 2, "two collection ids listed"
 
 
 @pytest.fixture
