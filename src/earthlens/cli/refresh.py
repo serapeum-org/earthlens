@@ -367,6 +367,31 @@ def _eumetsat_grouped(catalog: Any) -> dict[str, list[str]]:
     return {"eumetsat": ids}
 
 
+def _sh_data_collection_names() -> list[str]:
+    """Return the `sentinelhub.DataCollection` enum member names (no auth)."""
+    from earthlens.sentinel_hub._helpers import import_sentinelhub
+
+    return [member.name for member in import_sentinelhub().DataCollection]
+
+
+def _sentinel_hub_grouped(catalog: Any) -> dict[str, list[str]]:
+    """List Sentinel Hub collections from the SDK's `DataCollection` enum.
+
+    Listing the supported collections needs no credentials — it is the
+    sentinelhub SDK's authoritative registry (the same source the bundled
+    `available_collections` index was built from); data *access* is what
+    needs CDSE OAuth.
+
+    Args:
+        catalog: The loaded Sentinel Hub `Catalog` (unused; the SDK is the
+            source).
+
+    Returns:
+        A single-group mapping `{"sentinel_hub": [sorted collection names]}`.
+    """
+    return {"sentinel_hub": sorted(set(_sh_data_collection_names()))}
+
+
 #: Provider id -> a callable taking the loaded catalog and returning its
 #: live ids grouped (e.g. per STAC endpoint). Public providers need no
 #: credentials; credentialed ones (openaq) read their key from the env.
@@ -378,6 +403,7 @@ _REFRESHERS: dict[str, Callable[[Any], dict[str, list[str]]]] = {
     "openaq": _openaq_grouped,
     "cmems": _cmems_grouped,
     "eumetsat": _eumetsat_grouped,
+    "sentinel_hub": _sentinel_hub_grouped,
 }
 
 #: Provider id -> a callable that persists a grouped live fetch back into
@@ -557,6 +583,7 @@ _CURATED_IDS: dict[str, Callable[[Any], list[str]]] = {
     "hdx": _curated_attr_ids("hdx_id"),
     "earthdata": _curated_attr_ids("short_name"),
     "eumetsat": _curated_collection_ids,
+    "sentinel_hub": _curated_attr_ids("sh_collection"),
 }
 
 
