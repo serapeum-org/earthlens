@@ -266,6 +266,115 @@ def _diff(
     )
 
 
+@dataclass
+class AuditOutcome:
+    """The result of auditing one provider's curated catalog against live.
+
+    Attributes:
+        provider: Canonical provider id.
+        status: `"ok"`, `"unsupported"` (no live endpoint), or `"error"`.
+        detail: Failure reason for `"error"` / `"unsupported"`, else empty.
+        live_count: Number of distinct ids served live.
+        curated_count: Number of curated upstream ids checked.
+        broken: Curated upstream ids no longer served live (actionable drift).
+        untracked: Live ids absent from the bundled index (informational).
+    """
+
+    provider: str
+    status: str
+    detail: str = ""
+    live_count: int = 0
+    curated_count: int = 0
+    broken: list[str] = field(default_factory=list)
+    untracked: list[str] = field(default_factory=list)
+
+    def to_dict(self) -> dict[str, Any]:
+        """Project the audit outcome to a JSON-friendly dict.
+
+        Returns:
+            A mapping of every field, suitable for `json.dumps`.
+
+        Examples:
+            - A drifted dataset shows up under `broken`:
+
+                ```python
+                >>> from earthlens.cli.refresh import AuditOutcome
+                >>> AuditOutcome("stac", "ok", broken=["gone"]).to_dict()["broken"]
+                ['gone']
+
+                ```
+        """
+        return {
+            "provider": self.provider,
+            "status": self.status,
+            "detail": self.detail,
+            "live_count": self.live_count,
+            "curated_count": self.curated_count,
+            "broken": self.broken,
+            "untracked": self.untracked,
+        }
+
+
+def _stac_curated_ids(catalog: Any) -> list[str]:
+    """Return the upstream collection ids the STAC catalog curates."""
+    return sorted(
+        {
+            cid
+            for record in catalog.datasets.values()
+            if (cid := getattr(record, "collection_id", None))
+        }
+    )
+
+
+#: Provider id -> a callable returning the upstream ids the catalog curates
+#: (for the `audit` drift check). Falls back to the dataset keys otherwise.
+_CURATED_IDS: dict[str, Callable[[Any], list[str]]] = {
+    "stac": _stac_curated_ids,
+}
+
+
+def audit_one(info: BackendInfo) -> AuditOutcome:
+    """Audit a provider's curated catalog against its live index.
+
+    Flags `broken` curated upstream ids the provider no longer serves (the
+    actionable drift a `--strict` CI gate fails on) and, informationally,
+    `untracked` live ids missing from the bundled index. Reuses the same
+    live refresher as :func:`refresh_one`; providers without one report
+    `"unsupported"`, and fetch failures report `"error"` — never raises.
+
+    Args:
+        info: The backend to audit.
+
+    Returns:
+        The :class:`AuditOutcome` for `info`.
+    """
+    lister = _REFRESHERS.get(info.provider)
+    if lister is None:
+        return AuditOutcome(
+            provider=info.provider,
+            status="unsupported",
+            detail="no public live-listing endpoint wired up",
+        )
+    try:
+        catalog = load_catalog(info)
+        grouped = lister(catalog)
+    except Exception as exc:  # noqa: BLE001 — network / parse failures are reported
+        return AuditOutcome(provider=info.provider, status="error", detail=str(exc))
+
+    live = set(_flatten(grouped))
+    curated_fn = _CURATED_IDS.get(info.provider)
+    curated = set(curated_fn(catalog)) if curated_fn else set(catalog.datasets)
+    available = {str(ident) for ident in getattr(catalog, "available_datasets", [])}
+    return AuditOutcome(
+        provider=info.provider,
+        status="ok",
+        live_count=len(live),
+        curated_count=len(curated),
+        broken=sorted(curated - live),
+        untracked=sorted(live - available),
+    )
+
+
 def refresh_one(info: BackendInfo, write: bool = False) -> RefreshOutcome:
     """Refresh one provider's live index, diff it, and optionally persist it.
 

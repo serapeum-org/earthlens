@@ -406,3 +406,35 @@ def probe_table(result) -> Table:
             "-" if schema.get("nodata") is None else str(schema.get("nodata")),
         )
     return table
+
+
+def audit_table(outcomes) -> Table:
+    """Build a per-provider summary table of audit outcomes.
+
+    Args:
+        outcomes: An iterable of `AuditOutcome` (duck-typed: `provider`,
+            `status`, `live_count`, `curated_count`, `broken`, `detail`).
+
+    Returns:
+        A :class:`rich.table.Table`; counts show `-` for non-`ok` rows.
+    """
+    table = Table(header_style="bold", show_lines=False)
+    table.add_column("PROVIDER", overflow="fold")
+    table.add_column("STATUS", overflow="fold")
+    table.add_column("CURATED", justify="right")
+    table.add_column("LIVE", justify="right")
+    table.add_column("BROKEN", justify="right")
+    table.add_column("UNTRACKED", justify="right")
+    table.add_column("DETAIL", overflow="fold")
+    for outcome in outcomes:
+        ok = outcome.status == "ok"
+        table.add_row(
+            outcome.provider,
+            outcome.status,
+            str(outcome.curated_count) if ok else "-",
+            str(outcome.live_count) if ok else "-",
+            str(len(outcome.broken)) if ok else "-",
+            str(len(outcome.untracked)) if ok else "-",
+            outcome.detail,
+        )
+    return table

@@ -11,9 +11,12 @@ import earthlens.stac.catalog as stac_catalog
 from earthlens.cli import refresh as refresh_mod
 from earthlens.cli.adapter import list_backends
 from earthlens.cli.refresh import (
+    AuditOutcome,
     RefreshOutcome,
     _diff,
     _flatten,
+    _stac_curated_ids,
+    audit_one,
     refresh_one,
     supported_providers,
 )
@@ -124,6 +127,57 @@ class TestWrite:
         outcome = refresh_one(_info("stac"), write=True)
         assert outcome.status == "error", "failure captured"
         assert "write failed" in outcome.detail, "reason preserved"
+
+
+class TestStacCuratedIds:
+    """Tests for _stac_curated_ids."""
+
+    def test_returns_curated_collection_ids(self):
+        """Every curated STAC record contributes its upstream collection id."""
+        from earthlens.cli.adapter import load_catalog
+
+        ids = _stac_curated_ids(load_catalog(_info("stac")))
+        assert ids and all(isinstance(i, str) for i in ids), "non-empty str ids"
+        assert ids == sorted(set(ids)), "sorted + de-duplicated"
+
+
+class TestAuditOne:
+    """Tests for audit_one."""
+
+    def test_unsupported_provider(self):
+        """A provider with no refresher reports 'unsupported'."""
+        assert audit_one(_info("chc")).status == "unsupported"
+
+    def test_reports_broken_and_untracked(self, monkeypatch):
+        """Curated ids absent live are 'broken'; live ids off-index 'untracked'."""
+        monkeypatch.setattr(
+            refresh_mod,
+            "_get_json",
+            lambda url: {"collections": [{"id": "only-live"}], "links": []},
+        )
+        outcome = audit_one(_info("stac"))
+        assert outcome.status == "ok", "audit ran"
+        assert outcome.broken, "curated collections not in the tiny live set are broken"
+        assert outcome.untracked == ["only-live"], "live id absent from index"
+
+    def test_network_error_is_captured(self, monkeypatch):
+        """A failed request reports 'error' rather than raising."""
+
+        def boom(url):
+            raise RuntimeError("connection refused")
+
+        monkeypatch.setattr(refresh_mod, "_get_json", boom)
+        assert audit_one(_info("stac")).status == "error", "failure captured"
+
+
+class TestAuditOutcome:
+    """Tests for AuditOutcome."""
+
+    def test_to_dict_exposes_broken(self):
+        """to_dict carries the broken-drift list."""
+        assert AuditOutcome("stac", "ok", broken=["gone"]).to_dict()["broken"] == [
+            "gone"
+        ]
 
 
 class TestRefreshOutcome:

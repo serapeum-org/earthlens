@@ -269,6 +269,41 @@ class TestRefresh:
         assert "wrote" in result.output and "_index.yaml" in result.output
 
 
+class TestAudit:
+    """Tests for `datasets audit` (curated-vs-live drift; network mocked)."""
+
+    def test_unsupported_provider_exits_zero(self):
+        """A provider with no live endpoint reports unsupported, exit 0."""
+        result = runner.invoke(app, ["datasets", "audit", "chc"])
+        assert result.exit_code == 0, f"audit failed: {result.output}"
+        assert "unsupported" in result.output, "chc reported unsupported"
+
+    def test_unknown_provider_rejected(self):
+        """An unknown selector token is a usage error."""
+        result = runner.invoke(app, ["datasets", "audit", "bogus"])
+        assert result.exit_code == 2, "unknown provider -> exit 2"
+
+    def test_json_reports_broken(self, monkeypatch):
+        """--json carries the broken/untracked drift lists."""
+        monkeypatch.setattr(
+            refresh_mod,
+            "_get_json",
+            lambda url: {"collections": [{"id": "only-live"}], "links": []},
+        )
+        result = runner.invoke(app, ["datasets", "audit", "stac", "--json"])
+        payload = json.loads(result.output)
+        assert payload[0]["status"] == "ok", "audit ran"
+        assert payload[0]["broken"], "curated drift surfaced"
+
+    def test_strict_exits_nonzero_on_drift(self, monkeypatch):
+        """--strict exits 1 when a curated dataset is no longer served live."""
+        monkeypatch.setattr(
+            refresh_mod, "_get_json", lambda url: {"collections": [], "links": []}
+        )
+        result = runner.invoke(app, ["datasets", "audit", "stac", "--strict"])
+        assert result.exit_code == 1, "drift under --strict -> exit 1"
+
+
 class TestProbe:
     """Tests for `datasets probe` (curation seed; network mocked)."""
 

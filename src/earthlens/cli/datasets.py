@@ -24,10 +24,11 @@ from earthlens.cli.query import (
     sort_rows,
 )
 from earthlens.cli.curate import probe_dataset
-from earthlens.cli.refresh import refresh_one
+from earthlens.cli.refresh import audit_one, refresh_one
 from earthlens.cli.render import (
     COMPACT_COLUMNS,
     FULL_COLUMNS,
+    audit_table,
     counts_table,
     err_console,
     kv_table,
@@ -513,4 +514,48 @@ def probe(
         err_console().print(f"[red]{result.status}:[/red] {result.detail}")
 
     if result.status != "ok":
+        raise typer.Exit(code=1)
+
+
+@datasets_app.command()
+def audit(
+    providers: str = typer.Argument(
+        ...,
+        help="Provider(s) to audit: a name, a comma-separated list, or 'all'.",
+    ),
+    strict: bool = typer.Option(
+        False,
+        "--strict",
+        help="Exit non-zero if any curated dataset is no longer served live.",
+    ),
+    json_output: bool = typer.Option(
+        False, "--json", "-j", help="Emit the outcomes as JSON (for piping)."
+    ),
+) -> None:
+    """Audit curated datasets against what each provider serves LIVE.
+
+    Goes to the **network** (like `refresh`): flags `broken` curated datasets
+    the provider no longer serves — the drift a `--strict` CI gate fails on —
+    and, informationally, live ids missing from the bundled index. Providers
+    without a public listing endpoint report `unsupported`.
+    """
+    selected = _select_refresh_backends(providers)
+    if not json_output:
+        err_console().print(
+            f"[dim]Auditing {len(selected)} provider(s) against live...[/dim]"
+        )
+    outcomes = [audit_one(info) for info in selected]
+
+    if json_output:
+        typer.echo(json.dumps([o.to_dict() for o in outcomes], indent=2))
+    else:
+        out_console().print(audit_table(outcomes))
+        for outcome in outcomes:
+            if outcome.status == "ok" and outcome.broken:
+                out_console().print(
+                    f"[red]broken in {outcome.provider}:[/red] "
+                    f"{', '.join(outcome.broken)}"
+                )
+
+    if strict and any(o.broken for o in outcomes):
         raise typer.Exit(code=1)
