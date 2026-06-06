@@ -72,8 +72,19 @@ class TestSupportedProviders:
     """Tests for supported_providers."""
 
     def test_probers_wired_up(self):
-        """STAC, openEO and GEE all have curation probers."""
-        assert {"stac", "openeo", "gee"} <= set(supported_providers())
+        """STAC, openEO, GEE and Sentinel Hub all have curation probers."""
+        assert {"stac", "openeo", "gee", "sentinel_hub"} <= set(supported_providers())
+
+
+class TestSentinelHubProbe:
+    """Tests for the Sentinel Hub band prober (offline SDK)."""
+
+    def test_resolves_curated_key_to_bands(self):
+        """A curated key resolves to the SDK collection's bands (offline)."""
+        result = probe_dataset(_info("sentinel_hub"), "sentinel-2-l2a")
+        assert result.status == "ok", f"sentinel_hub probe failed: {result.detail}"
+        assert "B04" in result.assets, "Sentinel-2 bands probed"
+        assert result.assets["B04"]["units"], "band units recorded"
 
 
 class TestOpeneoProbe:

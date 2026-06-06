@@ -252,12 +252,45 @@ def _gee_probe(catalog: Any, dataset: str) -> dict[str, dict[str, Any]]:
     return schema
 
 
+def _sentinel_hub_probe(catalog: Any, dataset: str) -> dict[str, dict[str, Any]]:
+    """Probe a Sentinel Hub collection's bands from the SDK (offline, no auth).
+
+    Args:
+        catalog: The loaded Sentinel Hub `Catalog` (used to resolve a curated
+            key to its `sh_collection` name).
+        dataset: A curated key (e.g. `sentinel-2-l2a`) or an SDK collection
+            name (e.g. `SENTINEL2_L2A`).
+
+    Returns:
+        Mapping of band name to `{units, output_types}`.
+
+    Raises:
+        KeyError: If `dataset` resolves to no known `DataCollection`.
+    """
+    from earthlens.sentinel_hub._helpers import import_sentinelhub
+
+    sentinelhub = import_sentinelhub()
+    record = catalog.datasets.get(dataset)
+    name = getattr(record, "sh_collection", None) or dataset
+    collection = sentinelhub.DataCollection[name]
+    schema: dict[str, dict[str, Any]] = {}
+    for band in getattr(collection, "bands", None) or []:
+        units = getattr(band, "units", None) or ()
+        types = getattr(band, "output_types", None) or ()
+        schema[str(band.name)] = {
+            "units": ", ".join(str(getattr(u, "value", u)) for u in units),
+            "output_types": ", ".join(getattr(t, "__name__", str(t)) for t in types),
+        }
+    return schema
+
+
 #: Provider id -> a callable taking the loaded catalog and a dataset id and
 #: returning its per-entry schema.
 _PROBERS: dict[str, Callable[[Any, str], dict[str, dict[str, Any]]]] = {
     "stac": _stac_probe,
     "openeo": _openeo_probe,
     "gee": _gee_probe,
+    "sentinel_hub": _sentinel_hub_probe,
 }
 
 
