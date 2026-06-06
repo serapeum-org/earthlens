@@ -16,6 +16,7 @@ Adding a provider is one entry in :data:`_REFRESHERS`.
 from __future__ import annotations
 
 import importlib
+import os
 from collections.abc import Callable, Iterable
 from dataclasses import dataclass, field
 from typing import Any
@@ -94,9 +95,24 @@ class RefreshOutcome:
         }
 
 
-def _get_json(url: str) -> dict[str, Any]:
-    """GET `url` and return the parsed JSON body (raising on HTTP error)."""
-    response = requests.get(url, timeout=_TIMEOUT)
+def _get_json(
+    url: str,
+    *,
+    headers: dict[str, str] | None = None,
+    params: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    """GET `url` and return the parsed JSON body (raising on HTTP error).
+
+    Args:
+        url: The endpoint to fetch.
+        headers: Optional request headers (e.g. an `X-API-Key` for a
+            credentialed provider).
+        params: Optional query parameters.
+
+    Returns:
+        The parsed JSON body.
+    """
+    response = requests.get(url, headers=headers, params=params, timeout=_TIMEOUT)
     response.raise_for_status()
     return response.json()
 
@@ -272,14 +288,43 @@ def _earthdata_grouped(catalog: Any) -> dict[str, list[str]]:
     return grouped
 
 
+#: OpenAQ parameters endpoint (needs an `OPENAQ_API_KEY` header).
+_OPENAQ_PARAMETERS_URL = "https://api.openaq.org/v3/parameters"
+
+
+def _openaq_grouped(catalog: Any) -> dict[str, list[str]]:
+    """List the OpenAQ parameter names, live (needs `OPENAQ_API_KEY`).
+
+    The key is read from the environment; without it the request fails and
+    `refresh_one` reports an `"error"` outcome.
+
+    Args:
+        catalog: The loaded OpenAQ `Catalog` (unused; the endpoint is fixed).
+
+    Returns:
+        A single-group mapping `{"openaq": [sorted parameter names]}`.
+    """
+    key = os.environ.get("OPENAQ_API_KEY", "")
+    body = _get_json(
+        _OPENAQ_PARAMETERS_URL,
+        headers={"X-API-Key": key} if key else None,
+        params={"limit": 1000},
+    )
+    names = sorted(
+        {str(row["name"]) for row in body.get("results", []) if row.get("name")}
+    )
+    return {"openaq": names}
+
+
 #: Provider id -> a callable taking the loaded catalog and returning its
-#: live ids grouped (e.g. per STAC endpoint). Only providers with a public,
-#: no-auth listing endpoint appear here.
+#: live ids grouped (e.g. per STAC endpoint). Public providers need no
+#: credentials; credentialed ones (openaq) read their key from the env.
 _REFRESHERS: dict[str, Callable[[Any], dict[str, list[str]]]] = {
     "stac": _stac_grouped,
     "openeo": _openeo_grouped,
     "hdx": _hdx_grouped,
     "earthdata": _earthdata_grouped,
+    "openaq": _openaq_grouped,
 }
 
 #: Provider id -> a callable that persists a grouped live fetch back into
@@ -499,7 +544,10 @@ def audit_one(info: BackendInfo) -> AuditOutcome:
         live_count=len(live),
         curated_count=len(curated),
         broken=sorted(curated - live),
-        untracked=sorted(live - available),
+        # Untracked = live ids earthlens tracks nowhere — neither curated nor
+        # in the available index (so a provider whose index lives elsewhere,
+        # like openaq's `parameters`, doesn't report its curated rows as drift).
+        untracked=sorted(live - available - curated),
     )
 
 

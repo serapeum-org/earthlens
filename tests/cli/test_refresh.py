@@ -53,8 +53,10 @@ class TestSupportedProviders:
     """Tests for supported_providers."""
 
     def test_public_providers_supported(self):
-        """The wired-up public providers all appear."""
-        assert {"stac", "openeo", "hdx", "earthdata"} <= set(supported_providers())
+        """The wired-up providers all appear."""
+        assert {"stac", "openeo", "hdx", "earthdata", "openaq"} <= set(
+            supported_providers()
+        )
 
 
 class TestOpeneoRefresher:
@@ -99,6 +101,32 @@ class TestEarthdataRefresher:
         outcome = refresh_one(_info("earthdata"))
         assert outcome.status == "ok", "earthdata refresh ran"
         assert outcome.live_count == 3, "A/B/C gathered across two pages"
+
+
+class TestOpenaqRefresher:
+    """Tests for the OpenAQ lister."""
+
+    def test_lists_parameter_names(self, monkeypatch):
+        """openaq refresh reads the v3 /parameters name list."""
+        monkeypatch.setattr(
+            refresh_mod,
+            "_get_json",
+            lambda url, **kw: {"results": [{"name": "pm25"}, {"name": "o3"}]},
+        )
+        outcome = refresh_one(_info("openaq"))
+        assert outcome.status == "ok", "openaq refresh ran"
+        assert outcome.live_count == 2, "two parameter names listed"
+
+    def test_audit_no_untracked_when_curated_covers_live(self, monkeypatch):
+        """A provider whose index lives elsewhere reports no false untracked."""
+        monkeypatch.setattr(
+            refresh_mod,
+            "_get_json",
+            lambda url, **kw: {"results": [{"name": "pm25"}]},
+        )
+        outcome = audit_one(_info("openaq"))
+        assert outcome.status == "ok", "audit ran"
+        assert "pm25" not in outcome.untracked, "curated live id is not untracked"
 
 
 @pytest.fixture
