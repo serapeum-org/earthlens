@@ -54,7 +54,7 @@ class TestSupportedProviders:
 
     def test_public_providers_supported(self):
         """The wired-up public providers all appear."""
-        assert {"stac", "openeo", "hdx"} <= set(supported_providers())
+        assert {"stac", "openeo", "hdx", "earthdata"} <= set(supported_providers())
 
 
 class TestOpeneoRefresher:
@@ -85,6 +85,20 @@ class TestHdxRefresher:
         outcome = refresh_one(_info("hdx"))
         assert outcome.status == "ok", "hdx refresh ran"
         assert outcome.live_count == 2, "two package names listed"
+
+
+class TestEarthdataRefresher:
+    """Tests for the earthdata (CMR) lister."""
+
+    def test_walks_providers_and_paginates(self, monkeypatch):
+        """Each provider's CMR pages are gathered into the short-name set."""
+        pages = {None: (["A", "B"], "cursor"), "cursor": (["C"], None)}
+        monkeypatch.setattr(
+            refresh_mod, "_cmr_page", lambda provider, after: pages[after]
+        )
+        outcome = refresh_one(_info("earthdata"))
+        assert outcome.status == "ok", "earthdata refresh ran"
+        assert outcome.live_count == 3, "A/B/C gathered across two pages"
 
 
 @pytest.fixture

@@ -215,6 +215,63 @@ def _hdx_grouped(catalog: Any) -> dict[str, list[str]]:
     return {"hdx": sorted(str(name) for name in body.get("result", []))}
 
 
+#: NASA CMR collection search (public, anonymous; UMM-JSON).
+_CMR_COLLECTIONS_URL = "https://cmr.earthdata.nasa.gov/search/collections.umm_json"
+
+
+def _cmr_page(provider: str, search_after: str | None) -> tuple[list[str], str | None]:
+    """Fetch one CMR collections page for `provider`.
+
+    Args:
+        provider: A CMR provider code (e.g. `"GES_DISC"`).
+        search_after: The `CMR-Search-After` cursor from the previous page,
+            or `None` for the first page.
+
+    Returns:
+        `(short_names, next_search_after)` — the page's collection short
+        names and the cursor for the next page (`None` when exhausted).
+    """
+    headers = {"CMR-Search-After": search_after} if search_after else {}
+    response = requests.get(
+        _CMR_COLLECTIONS_URL,
+        params={"provider": provider, "page_size": 2000},
+        headers=headers,
+        timeout=_TIMEOUT,
+    )
+    response.raise_for_status()
+    names = [
+        short
+        for item in response.json().get("items", [])
+        if (short := item.get("umm", {}).get("ShortName"))
+    ]
+    return names, response.headers.get("CMR-Search-After")
+
+
+def _earthdata_grouped(catalog: Any) -> dict[str, list[str]]:
+    """List collection short names per CMR provider, live (public, anonymous).
+
+    Walks `CMR-Search-After` pagination for each provider in the catalog's
+    registry (bounded by :data:`_MAX_PAGES` pages per provider).
+
+    Args:
+        catalog: The loaded Earthdata `Catalog` (exposes `providers`).
+
+    Returns:
+        A mapping of CMR provider code to its sorted collection short names.
+    """
+    grouped: dict[str, list[str]] = {}
+    for code in sorted(catalog.providers):
+        names: set[str] = set()
+        search_after: str | None = None
+        for _ in range(_MAX_PAGES):
+            page, search_after = _cmr_page(code, search_after)
+            names.update(str(name) for name in page)
+            if not search_after:
+                break
+        grouped[code] = sorted(names)
+    return grouped
+
+
 #: Provider id -> a callable taking the loaded catalog and returning its
 #: live ids grouped (e.g. per STAC endpoint). Only providers with a public,
 #: no-auth listing endpoint appear here.
@@ -222,6 +279,7 @@ _REFRESHERS: dict[str, Callable[[Any], dict[str, list[str]]]] = {
     "stac": _stac_grouped,
     "openeo": _openeo_grouped,
     "hdx": _hdx_grouped,
+    "earthdata": _earthdata_grouped,
 }
 
 #: Provider id -> a callable that persists a grouped live fetch back into
@@ -399,6 +457,7 @@ _CURATED_IDS: dict[str, Callable[[Any], list[str]]] = {
     "stac": _curated_collection_ids,
     "openeo": _curated_collection_ids,
     "hdx": _curated_attr_ids("hdx_id"),
+    "earthdata": _curated_attr_ids("short_name"),
 }
 
 
