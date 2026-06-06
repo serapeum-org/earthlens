@@ -454,6 +454,69 @@ def _gee_grouped(catalog: Any) -> dict[str, list[str]]:
     return {"gee": sorted(ids)}
 
 
+#: WorldPop public REST data hub (alias -> sub-alias crawl, no credentials).
+_WORLDPOP_REST_URL = "https://hub.worldpop.org/rest/data"
+
+
+def _worldpop_grouped(catalog: Any) -> dict[str, list[str]]:
+    """List WorldPop sub-alias ids per product alias, live (public REST).
+
+    Fetches the top-level alias list, then each alias's sub-alias rows; a
+    row's `alias` field is the sub-alias id (e.g. `G2_BUILT_S`, `wpgp`) —
+    the same namespace the curated records and `available_datasets` use.
+
+    Args:
+        catalog: The loaded WorldPop `Catalog` (unused; the REST is the source).
+
+    Returns:
+        A mapping of product alias to its sorted sub-alias ids.
+    """
+    top = _get_json(_WORLDPOP_REST_URL).get("data", [])
+    grouped: dict[str, list[str]] = {}
+    for entry in top:
+        alias = entry.get("alias")
+        if not alias:
+            continue
+        rows = _get_json(f"{_WORLDPOP_REST_URL}/{alias}").get("data", [])
+        grouped[str(alias)] = sorted(
+            {sub for row in rows if (sub := str(row.get("alias", "")).strip())}
+        )
+    return grouped
+
+
+def _worldpop_curated_ids(catalog: Any) -> list[str]:
+    """Return the sub-alias ids the WorldPop catalog curates (flattened)."""
+    return sorted(
+        {
+            sid
+            for record in catalog.datasets.values()
+            for sub in (getattr(record, "subaliases", None) or [])
+            if (sid := getattr(sub, "id", None))
+        }
+    )
+
+
+def _usgs_parameter_codes() -> list[str]:
+    """Return every USGS parameter code from the live reference table (SDK)."""
+    from dataretrieval import waterdata
+
+    result = waterdata.get_reference_table(collection="parameter-codes")
+    frame = result[0] if isinstance(result, tuple) else result
+    return [str(code) for code in frame["parameter_code"]]
+
+
+def _usgs_water_grouped(catalog: Any) -> dict[str, list[str]]:
+    """List every USGS parameter code, live (public `dataretrieval` SDK).
+
+    Args:
+        catalog: The loaded USGS Water `Catalog` (unused; the SDK is the source).
+
+    Returns:
+        A single-group mapping `{"usgs_water": [sorted parameter codes]}`.
+    """
+    return {"usgs_water": sorted(set(_usgs_parameter_codes()))}
+
+
 #: Provider id -> a callable taking the loaded catalog and returning its
 #: live ids grouped (e.g. per STAC endpoint). Public providers need no
 #: credentials; credentialed ones (openaq) read their key from the env.
@@ -467,6 +530,8 @@ _REFRESHERS: dict[str, Callable[[Any], dict[str, list[str]]]] = {
     "eumetsat": _eumetsat_grouped,
     "sentinel_hub": _sentinel_hub_grouped,
     "gee": _gee_grouped,
+    "worldpop": _worldpop_grouped,
+    "usgs_water": _usgs_water_grouped,
 }
 
 #: Provider id -> a callable that persists a grouped live fetch back into
@@ -647,6 +712,8 @@ _CURATED_IDS: dict[str, Callable[[Any], list[str]]] = {
     "earthdata": _curated_attr_ids("short_name"),
     "eumetsat": _curated_collection_ids,
     "sentinel_hub": _curated_attr_ids("sh_collection"),
+    "worldpop": _worldpop_curated_ids,
+    "usgs_water": _curated_attr_ids("code"),
 }
 
 

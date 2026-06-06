@@ -64,6 +64,8 @@ class TestSupportedProviders:
             "eumetsat",
             "sentinel_hub",
             "gee",
+            "worldpop",
+            "usgs_water",
         } <= set(supported_providers())
 
 
@@ -205,6 +207,44 @@ class TestGeeRefresher:
         outcome = refresh_one(_info("gee"))
         assert outcome.status == "ok", "gee refresh ran"
         assert outcome.live_count == 3, "A/B/C ids fetched"
+
+
+class TestWorldpopRefresher:
+    """Tests for the WorldPop (REST sub-alias crawl) lister."""
+
+    def test_crawls_aliases_to_subaliases(self, monkeypatch):
+        """worldpop refresh crawls top aliases then each alias's sub-aliases."""
+
+        def fake(url, **kw):
+            if url.endswith("/rest/data"):
+                return {"data": [{"alias": "pop"}, {"alias": "births"}]}
+            return {"data": [{"alias": "wpgp"}, {"alias": "G2_BUILT_S"}]}
+
+        monkeypatch.setattr(refresh_mod, "_get_json", fake)
+        outcome = refresh_one(_info("worldpop"))
+        assert outcome.status == "ok", "worldpop refresh ran"
+        assert outcome.live_count == 2, "deduped sub-alias ids across aliases"
+
+
+class TestUsgsWaterRefresher:
+    """Tests for the USGS Water (dataretrieval) lister."""
+
+    def test_lists_parameter_codes(self, monkeypatch):
+        """usgs_water refresh reads the reference-table parameter codes."""
+        monkeypatch.setattr(
+            refresh_mod, "_usgs_parameter_codes", lambda: ["00060", "00065", "00060"]
+        )
+        outcome = refresh_one(_info("usgs_water"))
+        assert outcome.status == "ok", "usgs_water refresh ran"
+        assert outcome.live_count == 2, "deduped codes"
+
+    def test_audit_curated_codes_not_broken(self, monkeypatch):
+        """Curated codes present live are not flagged broken."""
+        monkeypatch.setattr(
+            refresh_mod, "_usgs_parameter_codes", lambda: ["00060", "00065", "00010"]
+        )
+        outcome = audit_one(_info("usgs_water"))
+        assert "00060" not in outcome.broken, "a live curated code is not broken"
 
 
 @pytest.fixture
