@@ -2,6 +2,9 @@
 
 from __future__ import annotations
 
+import gzip
+import importlib
+import json
 import shutil
 
 import pytest
@@ -9,13 +12,14 @@ import yaml
 
 import earthlens.stac.catalog as stac_catalog
 from earthlens.cli import refresh as refresh_mod
-from earthlens.cli.adapter import list_backends
+from earthlens.cli.adapter import list_backends, load_catalog
 from earthlens.cli.refresh import (
     AuditOutcome,
     RefreshOutcome,
     _curated_collection_ids,
     _diff,
     _flatten,
+    _replace_index_block,
     audit_one,
     refresh_one,
     supported_providers,
@@ -337,6 +341,118 @@ class TestWrite:
         outcome = refresh_one(_info("stac"), write=True)
         assert outcome.status == "error", "failure captured"
         assert "write failed" in outcome.detail, "reason preserved"
+
+
+class TestReplaceIndexBlock:
+    """Tests for _replace_index_block."""
+
+    def test_replaces_only_target_block(self, tmp_path):
+        """A sibling block and the header comment survive the rewrite."""
+        path = tmp_path / "_index.yaml"
+        path.write_text(
+            "# header\n"
+            "available_collections:\n- OLD_A\n- OLD_B\n"
+            "available_processes:\n- absolute\n- add\n",
+            "utf-8",
+        )
+        _replace_index_block(path, "available_collections", ["NEW_X"])
+        data = yaml.safe_load(path.read_text("utf-8"))
+        assert data["available_collections"] == ["NEW_X"], "target replaced"
+        assert data["available_processes"] == ["absolute", "add"], "sibling kept"
+        assert path.read_text("utf-8").startswith("# header"), "header kept"
+
+    def test_missing_block_raises(self, tmp_path):
+        """A file without the block raises ValueError."""
+        path = tmp_path / "_index.yaml"
+        path.write_text("other: 1\n", "utf-8")
+        with pytest.raises(ValueError, match="no available_datasets"):
+            _replace_index_block(path, "available_datasets", ["a"])
+
+
+def _catalog_copy(provider, tmp_path, monkeypatch):
+    """Copy a provider's catalog and point its CATALOG_PATH at the copy."""
+    info = _info(provider)
+    module = importlib.import_module(f"{info.module}.catalog")
+    dst = tmp_path / provider
+    shutil.copytree(module.CATALOG_PATH, dst)
+    monkeypatch.setattr(module, "CATALOG_PATH", dst)
+    module.clear_catalog_cache()
+    return info, module, dst
+
+
+class TestIndexWriters:
+    """Tests for the generic `_index_writer` writers (round-trip)."""
+
+    @pytest.mark.parametrize(
+        "provider", ["ecmwf", "openeo", "cmems", "eumetsat", "sentinel_hub", "gee"]
+    )
+    def test_round_trips_real_catalog(self, provider, tmp_path, monkeypatch):
+        """Writing a provider's own ids back leaves the loader's index intact.
+
+        Args:
+            provider: The catalog-backed provider to round-trip.
+        """
+        info, module, _dst = _catalog_copy(provider, tmp_path, monkeypatch)
+        before = sorted(load_catalog(info).available_datasets)
+        path = refresh_mod._WRITERS[provider](info, {provider: before})
+        module.clear_catalog_cache()
+        after = sorted(load_catalog(info).available_datasets)
+        assert after == before, f"{provider} index drifted on round-trip"
+        assert path.endswith("_index.yaml"), "wrote the sharded index file"
+
+    def test_openeo_preserves_processes_block(self, tmp_path, monkeypatch):
+        """openeo --write rewrites collections without touching processes."""
+        info, module, dst = _catalog_copy("openeo", tmp_path, monkeypatch)
+        before = yaml.safe_load((dst / "_index.yaml").read_text("utf-8"))
+        refresh_mod._WRITERS["openeo"](info, {"openeo": ["ONLY_ONE"]})
+        after = yaml.safe_load((dst / "_index.yaml").read_text("utf-8"))
+        assert after["available_collections"] == ["ONLY_ONE"], "collections rewritten"
+        assert after["available_processes"] == before["available_processes"], "kept"
+
+
+class TestHdxWriter:
+    """Tests for the merge-preserving HDX sidecar writer."""
+
+    def test_merges_metadata_and_drops_gone(self, tmp_path, monkeypatch):
+        """Surviving ids keep org/title; new ids get bare rows; gone ids drop."""
+        info, _module, dst = _catalog_copy("hdx", tmp_path, monkeypatch)
+        sidecar = dst / "_available.json.gz"
+        with gzip.open(sidecar, "wt", encoding="utf-8") as handle:
+            json.dump(
+                {
+                    "__comment__": "x",
+                    "datasets": {
+                        "keep": {"org": "O", "title": "T"},
+                        "gone": {"org": "g", "title": "g"},
+                    },
+                },
+                handle,
+            )
+        refresh_mod._WRITERS["hdx"](info, {"hdx": ["keep", "newone"]})
+        with gzip.open(sidecar, "rt", encoding="utf-8") as handle:
+            rows = json.load(handle)["datasets"]
+        assert rows["keep"] == {"org": "O", "title": "T"}, "metadata preserved"
+        assert rows["newone"] == {"org": "", "title": ""}, "new id bare"
+        assert "gone" not in rows, "id absent upstream dropped"
+
+
+class TestWriteEcmwfThroughRefreshOne:
+    """Tests for refresh_one(write=True) on a generic-writer provider."""
+
+    def test_writes_index_from_live_fetch(self, tmp_path, monkeypatch):
+        """ecmwf --write persists the live CDS ids into available_datasets."""
+        info, module, dst = _catalog_copy("ecmwf", tmp_path, monkeypatch)
+        monkeypatch.setattr(
+            refresh_mod,
+            "_get_json",
+            lambda url, **kw: {"collections": [{"id": "reanalysis-era5-land"}]},
+        )
+        outcome = refresh_one(info, write=True)
+        assert outcome.status == "ok", "write succeeded"
+        assert outcome.written.endswith("_index.yaml"), "index file written"
+        module.clear_catalog_cache()
+        data = yaml.safe_load((dst / "_index.yaml").read_text("utf-8"))
+        assert data["available_datasets"] == ["reanalysis-era5-land"], "live persisted"
 
 
 class TestCuratedCollectionIds:

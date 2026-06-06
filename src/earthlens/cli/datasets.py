@@ -14,6 +14,7 @@ import json
 import typer
 
 from earthlens.cli.adapter import BackendInfo, known_provider_keys, list_backends
+from earthlens.cli.curate import probe_dataset
 from earthlens.cli.query import (
     apply_filters,
     exact_first,
@@ -23,7 +24,6 @@ from earthlens.cli.query import (
     parse_filters,
     sort_rows,
 )
-from earthlens.cli.curate import probe_dataset
 from earthlens.cli.refresh import audit_one, refresh_one
 from earthlens.cli.render import (
     COMPACT_COLUMNS,
@@ -43,8 +43,8 @@ from earthlens.cli.render import (
     rows_to_json,
     validate_table,
 )
-from earthlens.cli.validate import validate_one
 from earthlens.cli.table import FACET_NAMES, build_table
+from earthlens.cli.validate import validate_one
 
 #: Typer sub-application mounted at `earthlens datasets`.
 datasets_app = typer.Typer(
@@ -453,7 +453,9 @@ def refresh(
 
     With `--write` it also rewrites the bundled `available_*` index in place
     from the live fetch — the maintainer "update the shipped catalog" step,
-    meaningful in an editable / source checkout.
+    meaningful in an editable / source checkout. Providers whose index is
+    computed from the curated rows at load time (no on-disk block) report
+    "live read only" instead of writing.
     """
     selected = _select_refresh_backends(providers)
     if not json_output:

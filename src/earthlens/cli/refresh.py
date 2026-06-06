@@ -7,19 +7,29 @@ it makes live HTTP requests to a provider's public API to fetch its
 bundled `available_datasets` index so the user can see what has appeared
 or disappeared upstream.
 
-Only providers with a public, no-auth listing endpoint have a refresher
-wired up (currently STAC's `/collections`); every other provider reports
+Only providers with a public listing endpoint (or public SDK call) have a
+refresher wired up in :data:`_REFRESHERS`; every other provider reports
 `unsupported` so `refresh all` degrades gracefully instead of failing.
-Adding a provider is one entry in :data:`_REFRESHERS`.
+
+The `--write` half (:data:`_WRITERS`) persists a live fetch back into the
+bundled informational index. It covers every refresher whose index is a
+real on-disk block — the sharded `_index.yaml` providers and HDX's gzipped
+sidecar. Providers whose `available_*` index is *computed* from the curated
+rows at load time (openaq, worldpop, usgs_water) have nothing to rewrite and
+report "live read only" under `--write` by design.
 """
 
 from __future__ import annotations
 
+import gzip
 import importlib
+import json
 import os
+import re
 from collections.abc import Callable, Iterable
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass, field
+from pathlib import Path
 from typing import Any
 
 import requests
@@ -193,6 +203,130 @@ def _write_stac(info: BackendInfo, grouped: dict[str, list[str]]) -> str:
     )
     index_path.write_text(f"{head}\n\n{block}", encoding="utf-8")
     return str(index_path)
+
+
+def _index_path(info: BackendInfo) -> Path:
+    """Return the bundled index file a provider's `--write` rewrites.
+
+    Resolves the catalog's `CATALOG_PATH`: a sharded layout (a directory)
+    keeps its informational index in `_index.yaml`; a single-file layout
+    *is* the catalog file itself.
+
+    Args:
+        info: The backend whose catalog path to resolve.
+
+    Returns:
+        The `_index.yaml` under a sharded `catalog/` directory, or the
+        single `<pkg>_data_catalog.yaml` file.
+    """
+    base = importlib.import_module(f"{info.module}.catalog").CATALOG_PATH
+    return base / "_index.yaml" if base.is_dir() else base
+
+
+def _replace_index_block(path: Path, block_key: str, payload: Any) -> None:
+    """Replace exactly one top-level block of a YAML index in place.
+
+    Rewrites the `{block_key}:` block (from its key line up to the next
+    column-zero key, or end of file) with `payload`, leaving every other
+    block — and the header comments above it — byte-for-byte intact. This
+    is what lets a provider whose `_index.yaml` holds more than one block
+    (e.g. openEO's `available_collections:` *and* `available_processes:`)
+    be rewritten without disturbing the sibling block.
+
+    Args:
+        path: The YAML index file to rewrite.
+        block_key: The top-level key whose block is replaced.
+        payload: The new value for `block_key` (a flat list, or a grouped
+            mapping for backends that persist their index grouped).
+
+    Raises:
+        ValueError: If `path` has no `{block_key}:` block.
+    """
+    lines = path.read_text(encoding="utf-8").splitlines(keepends=True)
+    start = next(
+        (i for i, line in enumerate(lines) if line.startswith(f"{block_key}:")),
+        None,
+    )
+    if start is None:
+        raise ValueError(f"no {block_key}: block in {path}")
+    end = len(lines)
+    for j in range(start + 1, len(lines)):
+        if re.match(r"[A-Za-z_][A-Za-z0-9_]*:", lines[j]):
+            end = j
+            break
+    block = yaml.safe_dump(
+        {block_key: payload},
+        sort_keys=False,
+        default_flow_style=False,
+        allow_unicode=True,
+        width=10000,
+    )
+    path.write_text("".join(lines[:start]) + block + "".join(lines[end:]), "utf-8")
+
+
+def _index_writer(
+    block_key: str, *, grouped: bool = False
+) -> Callable[[BackendInfo, dict[str, list[str]]], str]:
+    """Build a writer that persists a live fetch into a YAML index block.
+
+    The returned writer flattens the grouped live fetch (or keeps it
+    grouped, for backends that persist their index per-group) and splices
+    it into the provider's `_index.yaml` via :func:`_replace_index_block`.
+
+    Args:
+        block_key: The index block to rewrite (`"available_datasets"` or
+            `"available_collections"`).
+        grouped: When `True`, persist the per-group mapping verbatim;
+            when `False`, persist the flat sorted union.
+
+    Returns:
+        A `(info, grouped_ids) -> written_path` writer for `_WRITERS`.
+    """
+
+    def writer(info: BackendInfo, grouped_ids: dict[str, list[str]]) -> str:
+        path = _index_path(info)
+        payload = grouped_ids if grouped else _flatten(grouped_ids)
+        _replace_index_block(path, block_key, payload)
+        return str(path)
+
+    return writer
+
+
+def _write_hdx(info: BackendInfo, grouped: dict[str, list[str]]) -> str:
+    """Rewrite HDX's gzipped `_available.json.gz` index, merge-preserving.
+
+    The live CKAN `package_list` returns only dataset *names*, whereas the
+    sidecar carries an `{org, title}` row per name. To avoid discarding
+    that metadata, surviving names keep their existing row and only
+    genuinely-new names get a bare row; names gone upstream are dropped.
+    (Full `org`/`title` enrichment for new names still belongs to
+    `tools/hdx/refresh_hdx_catalog.py`, which fetches `package_show`.)
+
+    Args:
+        info: The HDX backend.
+        grouped: Group name -> live dataset names (see :func:`_hdx_grouped`).
+
+    Returns:
+        The path of the sidecar rewritten.
+    """
+    path = _index_path(info).parent / "_available.json.gz"
+    try:
+        with gzip.open(path, "rt", encoding="utf-8") as handle:
+            previous = json.load(handle).get("datasets", {})
+    except FileNotFoundError:
+        previous = {}
+    datasets = {
+        name: previous.get(name, {"org": "", "title": ""}) for name in _flatten(grouped)
+    }
+    payload = {
+        "__comment__": "AUTO-GENERATED by `earthlens datasets refresh hdx --write`. "
+        "Every HDX dataset id with its org/title; new ids carry empty "
+        "org/title until enriched by tools/hdx/refresh_hdx_catalog.py.",
+        "datasets": datasets,
+    }
+    with gzip.open(path, "wt", encoding="utf-8") as handle:
+        json.dump(payload, handle, ensure_ascii=False, indent=1)
+    return str(path)
 
 
 #: Copernicus CDS public STAC catalogue (collection listing needs no auth).
@@ -557,9 +691,20 @@ _REFRESHERS: dict[str, Callable[[Any], dict[str, list[str]]]] = {
 }
 
 #: Provider id -> a callable that persists a grouped live fetch back into
-#: the bundled catalog (the `--write` half). A subset of `_REFRESHERS`.
+#: the bundled catalog (the `--write` half). A subset of `_REFRESHERS`:
+#: providers whose informational index is computed from the curated rows at
+#: load time (openaq, worldpop, usgs_water) have no on-disk block to rewrite
+#: and intentionally report "live read only" instead.
 _WRITERS: dict[str, Callable[[BackendInfo, dict[str, list[str]]], str]] = {
     "stac": _write_stac,
+    "ecmwf": _index_writer("available_datasets"),
+    "openeo": _index_writer("available_collections"),
+    "cmems": _index_writer("available_datasets"),
+    "eumetsat": _index_writer("available_datasets"),
+    "sentinel_hub": _index_writer("available_collections"),
+    "gee": _index_writer("available_datasets"),
+    "earthdata": _index_writer("available_datasets"),
+    "hdx": _write_hdx,
 }
 
 
