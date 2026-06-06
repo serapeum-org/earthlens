@@ -178,11 +178,32 @@ def _write_stac(info: BackendInfo, grouped: dict[str, list[str]]) -> str:
     return str(index_path)
 
 
+#: CDSE openEO collections endpoint (public; the backend's default host).
+_OPENEO_COLLECTIONS_URL = (
+    "https://openeo.dataspace.copernicus.eu/openeo/1.2/collections"
+)
+
+
+def _openeo_grouped(catalog: Any) -> dict[str, list[str]]:
+    """List the CDSE openEO collection ids, live (public, anonymous).
+
+    Args:
+        catalog: The loaded openEO `Catalog` (unused; the endpoint is fixed).
+
+    Returns:
+        A single-group mapping `{"openeo": [sorted collection ids]}`.
+    """
+    body = _get_json(_OPENEO_COLLECTIONS_URL)
+    ids = sorted({str(c["id"]) for c in body.get("collections", []) if c.get("id")})
+    return {"openeo": ids}
+
+
 #: Provider id -> a callable taking the loaded catalog and returning its
 #: live ids grouped (e.g. per STAC endpoint). Only providers with a public,
 #: no-auth listing endpoint appear here.
 _REFRESHERS: dict[str, Callable[[Any], dict[str, list[str]]]] = {
     "stac": _stac_grouped,
+    "openeo": _openeo_grouped,
 }
 
 #: Provider id -> a callable that persists a grouped live fetch back into
@@ -315,8 +336,13 @@ class AuditOutcome:
         }
 
 
-def _stac_curated_ids(catalog: Any) -> list[str]:
-    """Return the upstream collection ids the STAC catalog curates."""
+def _curated_collection_ids(catalog: Any) -> list[str]:
+    """Return the upstream `collection_id`s a catalog's records curate.
+
+    Used by `audit` for backends whose curated keys are logical aliases
+    (e.g. `sentinel-2-l2a`) distinct from the upstream id the provider
+    actually serves (e.g. `SENTINEL2_L2A`), which lives in `collection_id`.
+    """
     return sorted(
         {
             cid
@@ -329,7 +355,8 @@ def _stac_curated_ids(catalog: Any) -> list[str]:
 #: Provider id -> a callable returning the upstream ids the catalog curates
 #: (for the `audit` drift check). Falls back to the dataset keys otherwise.
 _CURATED_IDS: dict[str, Callable[[Any], list[str]]] = {
-    "stac": _stac_curated_ids,
+    "stac": _curated_collection_ids,
+    "openeo": _curated_collection_ids,
 }
 
 

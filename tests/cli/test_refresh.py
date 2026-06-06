@@ -13,9 +13,9 @@ from earthlens.cli.adapter import list_backends
 from earthlens.cli.refresh import (
     AuditOutcome,
     RefreshOutcome,
+    _curated_collection_ids,
     _diff,
     _flatten,
-    _stac_curated_ids,
     audit_one,
     refresh_one,
     supported_providers,
@@ -52,9 +52,24 @@ class TestFlatten:
 class TestSupportedProviders:
     """Tests for supported_providers."""
 
-    def test_stac_is_supported(self):
-        """STAC has a live refresher wired up."""
-        assert "stac" in supported_providers(), "stac should be refreshable"
+    def test_stac_and_openeo_supported(self):
+        """STAC and openEO both have live refreshers wired up."""
+        assert {"stac", "openeo"} <= set(supported_providers()), "both refreshable"
+
+
+class TestOpeneoRefresher:
+    """Tests for the openEO lister."""
+
+    def test_lists_collection_ids(self, monkeypatch):
+        """openeo refresh reads the public /collections id list."""
+        monkeypatch.setattr(
+            refresh_mod,
+            "_get_json",
+            lambda url: {"collections": [{"id": "SENTINEL2_L2A"}, {"id": "S1_GRD"}]},
+        )
+        outcome = refresh_one(_info("openeo"))
+        assert outcome.status == "ok", "openeo refresh ran"
+        assert outcome.live_count == 2, "two collection ids listed"
 
 
 @pytest.fixture
@@ -129,14 +144,14 @@ class TestWrite:
         assert "write failed" in outcome.detail, "reason preserved"
 
 
-class TestStacCuratedIds:
-    """Tests for _stac_curated_ids."""
+class TestCuratedCollectionIds:
+    """Tests for _curated_collection_ids."""
 
     def test_returns_curated_collection_ids(self):
         """Every curated STAC record contributes its upstream collection id."""
         from earthlens.cli.adapter import load_catalog
 
-        ids = _stac_curated_ids(load_catalog(_info("stac")))
+        ids = _curated_collection_ids(load_catalog(_info("stac")))
         assert ids and all(isinstance(i, str) for i in ids), "non-empty str ids"
         assert ids == sorted(set(ids)), "sorted + de-duplicated"
 
