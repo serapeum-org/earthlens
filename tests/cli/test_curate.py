@@ -72,8 +72,35 @@ class TestSupportedProviders:
     """Tests for supported_providers."""
 
     def test_probers_wired_up(self):
-        """STAC, openEO, GEE and Sentinel Hub all have curation probers."""
-        assert {"stac", "openeo", "gee", "sentinel_hub"} <= set(supported_providers())
+        """The wired-up curation probers all appear."""
+        assert {"stac", "openeo", "gee", "sentinel_hub", "cmems"} <= set(
+            supported_providers()
+        )
+
+
+class TestCmemsProbe:
+    """Tests for the CMEMS variable prober (SDK describe)."""
+
+    def test_walks_nested_variables(self, monkeypatch):
+        """cmems probe flattens the nested products→…→variables to a schema."""
+        from types import SimpleNamespace
+
+        from earthlens.cli import curate as curate_mod
+
+        variable = SimpleNamespace(
+            short_name="thetao", standard_name="sea_water_temp", units="degC"
+        )
+        service = SimpleNamespace(variables=[variable])
+        part = SimpleNamespace(services=[service])
+        version = SimpleNamespace(parts=[part])
+        entry = SimpleNamespace(versions=[version])
+        catalogue = SimpleNamespace(products=[SimpleNamespace(datasets=[entry])])
+        monkeypatch.setattr(
+            curate_mod, "_cmems_describe_dataset", lambda dataset_id: catalogue
+        )
+        result = probe_dataset(_info("cmems"), "cmems_mod_glo_phy")
+        assert result.status == "ok", "cmems probe ran"
+        assert result.assets["thetao"]["units"] == "degC", "variable units parsed"
 
 
 class TestSentinelHubProbe:

@@ -284,6 +284,46 @@ def _sentinel_hub_probe(catalog: Any, dataset: str) -> dict[str, dict[str, Any]]
     return schema
 
 
+def _cmems_describe_dataset(dataset_id: str) -> Any:
+    """Return the live Copernicus Marine catalogue for one dataset (SDK)."""
+    import copernicusmarine
+
+    return copernicusmarine.describe(dataset_id=dataset_id, disable_progress_bar=True)
+
+
+def _cmems_probe(catalog: Any, dataset: str) -> dict[str, dict[str, Any]]:
+    """Probe a CMEMS dataset's variables (public `copernicusmarine.describe`).
+
+    Walks the nested catalogue
+    (`products[].datasets[].versions[].parts[].services[].variables[]`) and
+    records each variable's standard name and units.
+
+    Args:
+        catalog: The loaded CMEMS `Catalog` (unused; the SDK is the source).
+        dataset: The CMEMS dataset id.
+
+    Returns:
+        Mapping of variable short name to `{standard_name, units}`.
+    """
+    result = _cmems_describe_dataset(dataset)
+    schema: dict[str, dict[str, Any]] = {}
+    for product in getattr(result, "products", []) or []:
+        for entry in getattr(product, "datasets", []) or []:
+            for version in getattr(entry, "versions", []) or []:
+                for part in getattr(version, "parts", []) or []:
+                    for service in getattr(part, "services", []) or []:
+                        for variable in getattr(service, "variables", []) or []:
+                            name = getattr(variable, "short_name", None)
+                            if name:
+                                schema[str(name)] = {
+                                    "standard_name": getattr(
+                                        variable, "standard_name", None
+                                    ),
+                                    "units": getattr(variable, "units", None),
+                                }
+    return schema
+
+
 #: Provider id -> a callable taking the loaded catalog and a dataset id and
 #: returning its per-entry schema.
 _PROBERS: dict[str, Callable[[Any, str], dict[str, dict[str, Any]]]] = {
@@ -291,6 +331,7 @@ _PROBERS: dict[str, Callable[[Any, str], dict[str, dict[str, Any]]]] = {
     "openeo": _openeo_probe,
     "gee": _gee_probe,
     "sentinel_hub": _sentinel_hub_probe,
+    "cmems": _cmems_probe,
 }
 
 
