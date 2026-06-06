@@ -73,9 +73,50 @@ class TestSupportedProviders:
 
     def test_probers_wired_up(self):
         """The wired-up curation probers all appear."""
-        assert {"stac", "openeo", "gee", "sentinel_hub", "cmems"} <= set(
+        assert {"stac", "openeo", "gee", "sentinel_hub", "cmems", "earthdata"} <= set(
             supported_providers()
         )
+
+
+class TestEarthdataProbe:
+    """Tests for the Earthdata UMM-Var prober (public CMR)."""
+
+    def test_resolves_collection_then_variables(self, monkeypatch):
+        """earthdata probe follows associations.variables to UMM-Var records."""
+        from earthlens.cli import curate as curate_mod
+
+        def fake(url, **kw):
+            if "collections" in url:
+                return {"items": [{"meta": {"associations": {"variables": ["V1"]}}}]}
+            return {
+                "items": [
+                    {
+                        "umm": {
+                            "Name": "precipitation",
+                            "LongName": "Precipitation rate",
+                            "Units": "mm/hr",
+                            "DataType": "float32",
+                        }
+                    }
+                ]
+            }
+
+        monkeypatch.setattr(curate_mod, "_get_json", fake)
+        result = probe_dataset(_info("earthdata"), "GPM_3IMERGHH")
+        assert result.status == "ok", "earthdata probe ran"
+        assert result.assets["precipitation"]["units"] == "mm/hr", "UMM-Var parsed"
+
+    def test_collection_with_no_variables_is_empty(self, monkeypatch):
+        """A collection with no associated variables yields an empty schema."""
+        from earthlens.cli import curate as curate_mod
+
+        monkeypatch.setattr(
+            curate_mod,
+            "_get_json",
+            lambda url, **kw: {"items": [{"meta": {"associations": {}}}]},
+        )
+        result = probe_dataset(_info("earthdata"), "SOME_COLLECTION")
+        assert result.status == "ok" and result.assets == {}, "empty UMM-Var"
 
 
 class TestCmemsProbe:

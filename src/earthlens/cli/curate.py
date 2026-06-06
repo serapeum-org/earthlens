@@ -284,6 +284,60 @@ def _sentinel_hub_probe(catalog: Any, dataset: str) -> dict[str, dict[str, Any]]
     return schema
 
 
+#: NASA CMR search endpoints (public, anonymous).
+_CMR_COLLECTIONS_URL = "https://cmr.earthdata.nasa.gov/search/collections.umm_json"
+_CMR_VARIABLES_URL = "https://cmr.earthdata.nasa.gov/search/variables.umm_json"
+
+
+def _earthdata_probe(catalog: Any, dataset: str) -> dict[str, dict[str, Any]]:
+    """Probe an Earthdata collection's UMM-Var variables (public CMR).
+
+    Resolves the dataset to its CMR collection, reads the collection's
+    associated variable concept-ids (`meta.associations.variables`), and
+    fetches their UMM-Var records. Many collections register no variables —
+    then the schema is empty, which is accurate.
+
+    Args:
+        catalog: The loaded Earthdata `Catalog` (resolves a key's short_name
+            / provider).
+        dataset: A curated key or a CMR collection short name.
+
+    Returns:
+        Mapping of variable name to `{long_name, units, data_type}`.
+
+    Raises:
+        ValueError: If no CMR collection matches the dataset.
+    """
+    record = catalog.datasets.get(dataset)
+    short_name = getattr(record, "short_name", None) or dataset
+    params: dict[str, Any] = {"short_name": short_name, "page_size": 1}
+    provider = getattr(record, "provider", None)
+    if provider:
+        params["provider"] = provider
+    collections = _get_json(_CMR_COLLECTIONS_URL, params=params).get("items", [])
+    if not collections:
+        raise ValueError(f"no CMR collection for {short_name!r}")
+    variable_ids = (
+        collections[0].get("meta", {}).get("associations", {}).get("variables", [])
+    )
+    if not variable_ids:
+        return {}
+    body = _get_json(
+        _CMR_VARIABLES_URL, params={"concept_id": variable_ids, "page_size": 2000}
+    )
+    schema: dict[str, dict[str, Any]] = {}
+    for item in body.get("items", []):
+        umm = item.get("umm", {})
+        name = umm.get("Name")
+        if name:
+            schema[str(name)] = {
+                "long_name": umm.get("LongName"),
+                "units": umm.get("Units"),
+                "data_type": umm.get("DataType"),
+            }
+    return schema
+
+
 def _cmems_describe_dataset(dataset_id: str) -> Any:
     """Return the live Copernicus Marine catalogue for one dataset (SDK)."""
     import copernicusmarine
@@ -332,6 +386,7 @@ _PROBERS: dict[str, Callable[[Any, str], dict[str, dict[str, Any]]]] = {
     "gee": _gee_probe,
     "sentinel_hub": _sentinel_hub_probe,
     "cmems": _cmems_probe,
+    "earthdata": _earthdata_probe,
 }
 
 
