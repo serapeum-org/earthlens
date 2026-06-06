@@ -71,11 +71,15 @@ class TestSupportedProviders:
             "gee",
             "worldpop",
             "usgs_water",
+            "radar",
+            "firms",
+            "fdsn",
+            "overture",
         } <= set(supported_providers())
 
-    def test_twelve_catalog_backed_providers(self):
-        """All twelve catalog-backed providers have refresh/audit."""
-        assert len(supported_providers()) == 12, sorted(supported_providers())
+    def test_sixteen_refreshable_providers(self):
+        """Every provider with a faithful live listing has refresh/audit."""
+        assert len(supported_providers()) == 16, sorted(supported_providers())
 
 
 class TestEcmwfRefresher:
@@ -271,6 +275,82 @@ class TestUsgsWaterRefresher:
         assert "00060" not in outcome.broken, "a live curated code is not broken"
 
 
+_RADAR_TABLE = (
+    "NCDCID   ICAO  NAME            ST\n"
+    "-------- ----- --------------- --\n"
+    "10000001 KABR  ABERDEEN        SD\n"
+    "10000002 PAEC  NOME            AK\n"
+    "10000003 xx    BAD ROW         ZZ\n"
+)
+
+
+class TestRadarRefresher:
+    """Tests for the radar (NOAA HOMR) lister."""
+
+    def test_parses_icao_ids(self):
+        """Only four-letter alphabetic ICAO ids are parsed from the table."""
+        assert refresh_mod._radar_station_ids(_RADAR_TABLE) == ["KABR", "PAEC"]
+
+    def test_refresh_diffs_against_curated_stations(self, monkeypatch):
+        """radar has no available_* block, so live diffs vs curated stations."""
+        monkeypatch.setattr(refresh_mod, "_get_text", lambda url: _RADAR_TABLE)
+        outcome = refresh_one(_info("radar"))
+        assert outcome.status == "ok", "radar refresh ran"
+        assert outcome.live_count == 2, "two ICAO ids parsed"
+        assert outcome.bundled_count > 2, "diffed against the curated station set"
+
+
+class TestFirmsRefresher:
+    """Tests for the FIRMS (data_availability) lister."""
+
+    def test_lists_sensor_ids_excluding_burned_area(self, monkeypatch):
+        """firms refresh parses data_id and drops the burned-area products."""
+        monkeypatch.setattr(
+            refresh_mod,
+            "_get_text",
+            lambda url: "data_id,min_date,max_date\n"
+            "VIIRS_SNPP_NRT,2020,2026\nBA_MODIS,2000,2026\nMODIS_NRT,2019,2026\n",
+        )
+        outcome = refresh_one(_info("firms"))
+        assert outcome.status == "ok", "firms refresh ran"
+        assert outcome.live_count == 2, "BA_MODIS excluded"
+
+    def test_non_csv_body_is_error(self, monkeypatch):
+        """A non-CSV body (bad key / quota) reports 'error', not raised."""
+        monkeypatch.setattr(refresh_mod, "_get_text", lambda url: "Invalid MAP_KEY")
+        assert refresh_one(_info("firms")).status == "error", "bad body captured"
+
+
+class TestFdsnRefresher:
+    """Tests for the FDSN (obspy URL_MAPPINGS) lister."""
+
+    def test_diffs_obspy_providers_against_curated(self, monkeypatch):
+        """fdsn live providers diff against the curated fdsn_id set."""
+        monkeypatch.setattr(
+            refresh_mod, "_fdsn_provider_ids", lambda: ["USGS", "IRIS", "NEWCENTER"]
+        )
+        outcome = refresh_one(_info("fdsn"))
+        assert outcome.status == "ok", "fdsn refresh ran"
+        assert outcome.live_count == 3, "three obspy providers listed"
+        assert "NEWCENTER" in outcome.new_ids, "an uncurated centre is new"
+
+
+class TestOvertureRefresher:
+    """Tests for the Overture (releases) lister."""
+
+    def test_diffs_releases_not_feature_types(self, monkeypatch):
+        """overture diffs the live releases against available_releases."""
+        monkeypatch.setattr(
+            refresh_mod,
+            "_overture_release_ids",
+            lambda: ["2099-01-01.0", "2026-05-20.0"],
+        )
+        outcome = refresh_one(_info("overture"))
+        assert outcome.status == "ok", "overture refresh ran"
+        assert "2099-01-01.0" in outcome.new_ids, "a new release is flagged"
+        assert all("-" in rid for rid in outcome.removed_ids), "diffed vs releases"
+
+
 @pytest.fixture
 def stac_catalog_copy(tmp_path, monkeypatch):
     """Redirect the STAC catalog dir to a writable temp copy.
@@ -370,11 +450,15 @@ class TestReplaceIndexBlock:
 
 
 def _catalog_copy(provider, tmp_path, monkeypatch):
-    """Copy a provider's catalog and point its CATALOG_PATH at the copy."""
+    """Copy a provider's catalog (dir or single file) and repoint CATALOG_PATH."""
     info = _info(provider)
     module = importlib.import_module(f"{info.module}.catalog")
-    dst = tmp_path / provider
-    shutil.copytree(module.CATALOG_PATH, dst)
+    src = module.CATALOG_PATH
+    dst = tmp_path / src.name
+    if src.is_dir():
+        shutil.copytree(src, dst)
+    else:
+        shutil.copy(src, dst)
     monkeypatch.setattr(module, "CATALOG_PATH", dst)
     module.clear_catalog_cache()
     return info, module, dst
@@ -408,6 +492,15 @@ class TestIndexWriters:
         after = yaml.safe_load((dst / "_index.yaml").read_text("utf-8"))
         assert after["available_collections"] == ["ONLY_ONE"], "collections rewritten"
         assert after["available_processes"] == before["available_processes"], "kept"
+
+    def test_overture_writes_releases_keeps_feature_types(self, tmp_path, monkeypatch):
+        """overture --write rewrites available_releases, keeping the type set."""
+        info, module, dst = _catalog_copy("overture", tmp_path, monkeypatch)
+        before = yaml.safe_load(dst.read_text("utf-8"))
+        refresh_mod._WRITERS["overture"](info, {"overture": ["2099-01-01.0"]})
+        after = yaml.safe_load(dst.read_text("utf-8"))
+        assert after["available_releases"] == ["2099-01-01.0"], "releases rewritten"
+        assert after["available_datasets"] == before["available_datasets"], "types kept"
 
 
 class TestHdxWriter:

@@ -672,9 +672,163 @@ def _usgs_water_grouped(catalog: Any) -> dict[str, list[str]]:
     return {"usgs_water": sorted(set(_usgs_parameter_codes()))}
 
 
+def _get_text(url: str) -> str:
+    """GET `url` and return the response body as text (raising on HTTP error)."""
+    response = requests.get(url, timeout=_TIMEOUT)
+    response.raise_for_status()
+    return response.text
+
+
+#: NOAA HOMR registry of every WSR-88D / NEXRAD site (public, fixed-width).
+_RADAR_STATIONS_URL = "https://www.ncei.noaa.gov/access/homr/file/nexrad-stations.txt"
+
+
+def _radar_station_ids(text: str) -> list[str]:
+    """Parse the HOMR `nexrad-stations.txt` body into its ICAO id column.
+
+    The file is a fixed-width table: a header row, a row of dash runs
+    marking each column's span, then one row per site. Only the four-letter
+    alphabetic ICAO ids are kept (the same shape the catalog keys on).
+
+    Args:
+        text: The full `nexrad-stations.txt` body.
+
+    Returns:
+        The sorted, de-duplicated four-letter ICAO ids.
+    """
+    lines = text.splitlines()
+    if len(lines) < 3:
+        return []
+    separator = lines[1]
+    spans: list[tuple[int, int]] = []
+    start: int | None = None
+    for i, char in enumerate(separator):
+        if char == "-" and start is None:
+            start = i
+        elif char != "-" and start is not None:
+            spans.append((start, i))
+            start = None
+    if start is not None:
+        spans.append((start, len(separator)))
+    columns = [lines[0][s:e].strip() for s, e in spans]
+    try:
+        icao_span = spans[columns.index("ICAO")]
+    except ValueError:
+        return []
+    ids = {
+        icao
+        for row in lines[2:]
+        if (icao := row[icao_span[0] : icao_span[1]].strip())
+        and len(icao) == 4
+        and icao.isalpha()
+    }
+    return sorted(ids)
+
+
+def _radar_grouped(catalog: Any) -> dict[str, list[str]]:
+    """List every live NEXRAD ICAO id from the public NOAA HOMR registry.
+
+    Args:
+        catalog: The loaded radar `Catalog` (unused; the registry is fixed).
+
+    Returns:
+        A single-group mapping `{"radar": [sorted ICAO ids]}`.
+    """
+    return {"radar": _radar_station_ids(_get_text(_RADAR_STATIONS_URL))}
+
+
+#: FIRMS data-availability listing of every served sensor (needs a MAP_KEY).
+_FIRMS_DATA_AVAIL_URL = (
+    "https://firms.modaps.eosdis.nasa.gov/api/data_availability/csv/{map_key}/all"
+)
+
+#: data_availability also lists burned-area products that are not area-CSV
+#: active-fire sources; they belong to the GEE backend, not the catalog.
+_FIRMS_EXCLUDED = frozenset({"BA_MODIS", "BA_VIIRS"})
+
+
+def _firms_grouped(catalog: Any) -> dict[str, list[str]]:
+    """List every live FIRMS sensor id from the data_availability endpoint.
+
+    Reads the `FIRMS_MAP_KEY` from the environment (without it the request
+    fails and `refresh_one` reports an `"error"`), then parses the
+    `data_id` column, dropping the burned-area products the catalog
+    deliberately excludes.
+
+    Args:
+        catalog: The loaded FIRMS `Catalog` (unused; the endpoint is fixed).
+
+    Returns:
+        A single-group mapping `{"firms": [sorted sensor ids]}`.
+    """
+    key = os.environ.get("FIRMS_MAP_KEY", "")
+    text = _get_text(_FIRMS_DATA_AVAIL_URL.format(map_key=key))
+    rows = text.splitlines()
+    if not rows or not rows[0].lower().startswith("data_id"):
+        raise RuntimeError(f"data_availability returned a non-CSV body: {text[:120]}")
+    ids = {
+        code
+        for row in rows[1:]
+        if (code := row.split(",", 1)[0].strip()) and code not in _FIRMS_EXCLUDED
+    }
+    return {"firms": sorted(ids)}
+
+
+def _fdsn_provider_ids() -> list[str]:
+    """Return every FDSN provider id obspy can reach (`URL_MAPPINGS` keys)."""
+    from obspy.clients.fdsn.header import URL_MAPPINGS
+
+    return [str(name) for name in URL_MAPPINGS]
+
+
+def _fdsn_grouped(catalog: Any) -> dict[str, list[str]]:
+    """List every FDSN provider id obspy can reach (SDK enum, no network).
+
+    The universe is obspy's `URL_MAPPINGS` registry — the same source the
+    curated providers are drawn from — so a diff surfaces FDSN data centres
+    obspy has gained or dropped since the catalog was curated.
+
+    Args:
+        catalog: The loaded FDSN `Catalog` (unused; obspy is the source).
+
+    Returns:
+        A single-group mapping `{"fdsn": [sorted provider ids]}`.
+    """
+    return {"fdsn": sorted(set(_fdsn_provider_ids()))}
+
+
+def _overture_release_ids() -> list[str]:
+    """Return every available Overture release id (`overturemaps` SDK).
+
+    `get_available_releases()` returns a `(all_releases, latest)` tuple;
+    only the release list is taken.
+    """
+    from overturemaps.core import get_available_releases
+
+    result = get_available_releases()
+    releases = result[0] if isinstance(result, tuple) else result
+    return [str(release) for release in releases]
+
+
+def _overture_grouped(catalog: Any) -> dict[str, list[str]]:
+    """List every available Overture release via the `overturemaps` SDK.
+
+    Overture's refreshable axis is its *releases* (date-stamped data
+    versions), not the fixed theme/type set — so this diffs against the
+    catalog's `available_releases:` index, not `available_datasets:`.
+
+    Args:
+        catalog: The loaded Overture `Catalog` (unused; the SDK is the source).
+
+    Returns:
+        A single-group mapping `{"overture": [sorted release ids]}`.
+    """
+    return {"overture": sorted(set(_overture_release_ids()))}
+
+
 #: Provider id -> a callable taking the loaded catalog and returning its
 #: live ids grouped (e.g. per STAC endpoint). Public providers need no
-#: credentials; credentialed ones (openaq) read their key from the env.
+#: credentials; credentialed ones (openaq, firms) read their key from the env.
 _REFRESHERS: dict[str, Callable[[Any], dict[str, list[str]]]] = {
     "stac": _stac_grouped,
     "ecmwf": _ecmwf_grouped,
@@ -688,6 +842,10 @@ _REFRESHERS: dict[str, Callable[[Any], dict[str, list[str]]]] = {
     "gee": _gee_grouped,
     "worldpop": _worldpop_grouped,
     "usgs_water": _usgs_water_grouped,
+    "radar": _radar_grouped,
+    "firms": _firms_grouped,
+    "fdsn": _fdsn_grouped,
+    "overture": _overture_grouped,
 }
 
 #: Provider id -> a callable that persists a grouped live fetch back into
@@ -705,6 +863,7 @@ _WRITERS: dict[str, Callable[[BackendInfo, dict[str, list[str]]], str]] = {
     "gee": _index_writer("available_datasets"),
     "earthdata": _index_writer("available_datasets"),
     "hdx": _write_hdx,
+    "overture": _index_writer("available_releases"),
 }
 
 
@@ -870,6 +1029,13 @@ def _curated_attr_ids(attr: str) -> Callable[[Any], list[str]]:
     return resolver
 
 
+def _curated_releases(catalog: Any) -> list[str]:
+    """Return the Overture releases the catalog tracks (its refresh axis)."""
+    return sorted(
+        str(release) for release in getattr(catalog, "available_releases", [])
+    )
+
+
 #: Provider id -> a callable returning the upstream ids the catalog curates
 #: (for the `audit` drift check). Falls back to the dataset keys otherwise.
 _CURATED_IDS: dict[str, Callable[[Any], list[str]]] = {
@@ -881,7 +1047,42 @@ _CURATED_IDS: dict[str, Callable[[Any], list[str]]] = {
     "sentinel_hub": _curated_attr_ids("sh_collection"),
     "worldpop": _worldpop_curated_ids,
     "usgs_water": _curated_attr_ids("code"),
+    "fdsn": _curated_attr_ids("fdsn_id"),
+    "overture": _curated_releases,
 }
+
+#: Provider id -> the catalog attribute holding its persisted informational
+#: index. Defaults to `available_datasets`; Overture's refreshable axis is
+#: its date-stamped `available_releases` instead.
+_INDEX_ATTR: dict[str, str] = {"overture": "available_releases"}
+
+
+def _bundled_ids(catalog: Any, provider: str) -> list[str]:
+    """Return the bundled ids a provider's live fetch is diffed against.
+
+    Prefers the persisted informational index (`available_datasets`, or
+    Overture's `available_releases`); when a backend keeps no such block —
+    its `datasets` map *is* the index (radar / firms / fdsn) — falls back
+    to the curated ids (`_CURATED_IDS`) or, failing that, the dataset keys.
+
+    Args:
+        catalog: The loaded provider catalog.
+        provider: The canonical provider id.
+
+    Returns:
+        The id list to diff the live fetch against.
+    """
+    persisted = [
+        str(value)
+        for value in getattr(
+            catalog, _INDEX_ATTR.get(provider, "available_datasets"), []
+        )
+        or []
+    ]
+    if persisted:
+        return persisted
+    resolver = _CURATED_IDS.get(provider)
+    return resolver(catalog) if resolver else [str(key) for key in catalog.datasets]
 
 
 def audit_one(info: BackendInfo) -> AuditOutcome:
@@ -915,7 +1116,8 @@ def audit_one(info: BackendInfo) -> AuditOutcome:
     live = set(_flatten(grouped))
     curated_fn = _CURATED_IDS.get(info.provider)
     curated = set(curated_fn(catalog)) if curated_fn else set(catalog.datasets)
-    available = {str(ident) for ident in getattr(catalog, "available_datasets", [])}
+    index_attr = _INDEX_ATTR.get(info.provider, "available_datasets")
+    available = {str(ident) for ident in getattr(catalog, index_attr, [])}
     return AuditOutcome(
         provider=info.provider,
         status="ok",
@@ -958,7 +1160,7 @@ def refresh_one(info: BackendInfo, write: bool = False) -> RefreshOutcome:
         return RefreshOutcome(provider=info.provider, status="error", detail=str(exc))
 
     live = _flatten(grouped)
-    bundled = getattr(catalog, "available_datasets", [])
+    bundled = _bundled_ids(catalog, info.provider)
     live_count, bundled_count, new_ids, removed_ids = _diff(live, bundled)
 
     written = ""
