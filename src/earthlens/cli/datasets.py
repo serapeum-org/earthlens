@@ -41,7 +41,9 @@ from earthlens.cli.render import (
     rows_table,
     rows_to_ids,
     rows_to_json,
+    validate_table,
 )
+from earthlens.cli.validate import validate_one
 from earthlens.cli.table import FACET_NAMES, build_table
 
 #: Typer sub-application mounted at `earthlens datasets`.
@@ -558,4 +560,40 @@ def audit(
                 )
 
     if strict and any(o.broken for o in outcomes):
+        raise typer.Exit(code=1)
+
+
+@datasets_app.command()
+def validate(
+    providers: str = typer.Argument(
+        ...,
+        help="Provider(s) to validate: a name, a comma-separated list, or 'all'.",
+    ),
+    strict: bool = typer.Option(
+        False, "--strict", help="Exit non-zero if any curated entry has an issue."
+    ),
+    json_output: bool = typer.Option(
+        False, "--json", "-j", help="Emit the results as JSON (for piping)."
+    ),
+) -> None:
+    """Validate each curated entry of a provider (per-entry, not index-diff).
+
+    For curated-enumeration providers (no discoverable upstream index, so
+    `refresh`/`audit` do not apply), this checks each curated entry — an
+    offline structural lint or a liveness probe, depending on the provider.
+    Providers without a validator report `unsupported`. `--strict` exits
+    non-zero if any entry fails (for CI gating).
+    """
+    selected = _select_refresh_backends(providers)
+    results = [validate_one(info) for info in selected]
+
+    if json_output:
+        typer.echo(json.dumps([r.to_dict() for r in results], indent=2))
+    else:
+        out_console().print(validate_table(results))
+        for result in results:
+            for issue in result.issues:
+                out_console().print(f"[red]{result.provider}:[/red] {issue}")
+
+    if strict and any(r.issues for r in results):
         raise typer.Exit(code=1)

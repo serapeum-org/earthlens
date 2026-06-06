@@ -438,3 +438,31 @@ def audit_table(outcomes) -> Table:
             outcome.detail,
         )
     return table
+
+
+def validate_table(results) -> Table:
+    """Build a per-provider summary table of validation results.
+
+    Args:
+        results: An iterable of `ValidateResult` (duck-typed: `provider`,
+            `status`, `checked`, `issues`, `detail`).
+
+    Returns:
+        A :class:`rich.table.Table`; counts show `-` for non-`ok` rows.
+    """
+    table = Table(header_style="bold", show_lines=False)
+    table.add_column("PROVIDER", overflow="fold")
+    table.add_column("STATUS", overflow="fold")
+    table.add_column("CHECKED", justify="right")
+    table.add_column("ISSUES", justify="right")
+    table.add_column("DETAIL", overflow="fold")
+    for result in results:
+        ok = result.status == "ok"
+        table.add_row(
+            result.provider,
+            result.status,
+            str(result.checked) if ok else "-",
+            str(len(result.issues)) if ok else "-",
+            result.detail,
+        )
+    return table

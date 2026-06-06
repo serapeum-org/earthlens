@@ -304,6 +304,27 @@ class TestAudit:
         assert result.exit_code == 1, "drift under --strict -> exit 1"
 
 
+class TestValidate:
+    """Tests for `datasets validate` (per-entry checks)."""
+
+    def test_nwp_validates_clean(self):
+        """nwp's offline structural lint passes for the bundled catalog."""
+        result = runner.invoke(app, ["datasets", "validate", "nwp", "--json"])
+        payload = json.loads(result.output)
+        assert payload[0]["status"] == "ok", "nwp validated"
+        assert payload[0]["issues"] == [], "no structural issues"
+
+    def test_unsupported_provider(self):
+        """A provider with no validator reports unsupported."""
+        result = runner.invoke(app, ["datasets", "validate", "s3"])
+        assert "unsupported" in result.output, "s3 has no validator"
+
+    def test_unknown_provider_rejected(self):
+        """An unknown selector token is a usage error."""
+        result = runner.invoke(app, ["datasets", "validate", "bogus"])
+        assert result.exit_code == 2, "unknown provider -> exit 2"
+
+
 class TestProbe:
     """Tests for `datasets probe` (curation seed; network mocked)."""
 
