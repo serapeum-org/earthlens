@@ -280,11 +280,11 @@ class TestUsgsWaterRefresher:
 
 
 _RADAR_TABLE = (
-    "NCDCID   ICAO  NAME            ST\n"
-    "-------- ----- --------------- --\n"
-    "10000001 KABR  ABERDEEN        SD\n"
-    "10000002 PAEC  NOME            AK\n"
-    "10000003 xx    BAD ROW         ZZ\n"
+    "NCDCID   ICAO  NAME            ST LAT      LON\n"
+    "-------- ----- --------------- -- -------- ---------\n"
+    "10000001 KABR  ABERDEEN        SD 45.4558  -98.4133\n"
+    "10000002 PAEC  NOME            AK 64.5114  -165.295\n"
+    "10000003 xx    BAD ROW         ZZ 0.0      0.0\n"
 )
 
 
@@ -522,7 +522,7 @@ class TestIndexWriters:
     """Tests for the generic `_index_writer` writers (round-trip)."""
 
     @pytest.mark.parametrize(
-        "provider", ["ecmwf", "openeo", "cmems", "eumetsat", "sentinel_hub", "gee"]
+        "provider", ["ecmwf", "cmems", "eumetsat", "sentinel_hub", "gee"]
     )
     def test_round_trips_real_catalog(self, provider, tmp_path, monkeypatch):
         """Writing a provider's own ids back leaves the loader's index intact.
@@ -538,14 +538,33 @@ class TestIndexWriters:
         assert after == before, f"{provider} index drifted on round-trip"
         assert path.endswith("_index.yaml"), "wrote the sharded index file"
 
-    def test_openeo_preserves_processes_block(self, tmp_path, monkeypatch):
-        """openeo --write rewrites collections without touching processes."""
+    def test_openeo_writes_both_collections_and_processes(self, tmp_path, monkeypatch):
+        """openeo --write rewrites available_collections AND available_processes."""
         info, module, dst = _catalog_copy("openeo", tmp_path, monkeypatch)
-        before = yaml.safe_load((dst / "_index.yaml").read_text("utf-8"))
+        monkeypatch.setattr(
+            refresh_mod, "_openeo_process_ids", lambda: ["load_collection", "ndvi"]
+        )
         refresh_mod._WRITERS["openeo"](info, {"openeo": ["ONLY_ONE"]})
         after = yaml.safe_load((dst / "_index.yaml").read_text("utf-8"))
         assert after["available_collections"] == ["ONLY_ONE"], "collections rewritten"
-        assert after["available_processes"] == before["available_processes"], "kept"
+        assert after["available_processes"] == ["load_collection", "ndvi"], "procs too"
+
+    def test_radar_regenerates_stations_block(self, tmp_path, monkeypatch):
+        """radar --write re-parses HOMR into the full curated stations: block."""
+        info, module, dst = _catalog_copy("radar", tmp_path, monkeypatch)
+        homr = (
+            "NCDCID   ICAO  NAME            ST LAT      LON\n"
+            "-------- ----- --------------- -- -------- ---------\n"
+            "10000001 KABR  ABERDEEN        SD 45.4558  -98.4133\n"
+            "10000002 PAEC  NOME            AK 64.5114  -165.295\n"
+        )
+        monkeypatch.setattr(refresh_mod, "_get_text", lambda url: homr)
+        refresh_mod._WRITERS["radar"](info, {"radar": []})
+        module.clear_catalog_cache()
+        catalog = load_catalog(info)
+        assert sorted(catalog.datasets) == ["KABR", "PAEC"], "stations regenerated"
+        assert catalog.datasets["KABR"].name == "Aberdeen", "row fields parsed"
+        assert catalog.datasets["KABR"].latitude == 45.4558, "latitude parsed"
 
     def test_overture_writes_releases_keeps_feature_types(self, tmp_path, monkeypatch):
         """overture --write rewrites available_releases, keeping the type set."""

@@ -376,6 +376,36 @@ def _openeo_grouped(catalog: Any) -> dict[str, list[str]]:
     return {"openeo": ids}
 
 
+#: CDSE openEO processes endpoint (public; pairs with the collections one).
+_OPENEO_PROCESSES_URL = "https://openeo.dataspace.copernicus.eu/openeo/1.2/processes"
+
+
+def _openeo_process_ids() -> list[str]:
+    """List the live CDSE openEO process ids (public, anonymous)."""
+    body = _get_json(_OPENEO_PROCESSES_URL)
+    return sorted({str(p["id"]) for p in body.get("processes", []) if p.get("id")})
+
+
+def _write_openeo(info: BackendInfo, grouped: dict[str, list[str]]) -> str:
+    """Rewrite openEO's `available_collections` AND `available_processes`.
+
+    The collection index comes from the live fetch (`grouped`); the process
+    index is fetched separately — so `--write` keeps both informational
+    blocks of `_index.yaml` current (the generic writer only does one).
+
+    Args:
+        info: The openEO backend.
+        grouped: Group name -> live collection ids (see :func:`_openeo_grouped`).
+
+    Returns:
+        The path of the rewritten `_index.yaml`.
+    """
+    path = _index_path(info)
+    _replace_index_block(path, "available_collections", _flatten(grouped))
+    _replace_index_block(path, "available_processes", _openeo_process_ids())
+    return str(path)
+
+
 #: HDX CKAN dataset-name listing (public, anonymous).
 _HDX_PACKAGE_LIST_URL = "https://data.humdata.org/api/3/action/package_list"
 
@@ -689,46 +719,71 @@ def _get_text(url: str) -> str:
 _RADAR_STATIONS_URL = "https://www.ncei.noaa.gov/access/homr/file/nexrad-stations.txt"
 
 
-def _radar_station_ids(text: str) -> list[str]:
-    """Parse the HOMR `nexrad-stations.txt` body into its ICAO id column.
+def _radar_column_spans(separator: str) -> list[tuple[int, int]]:
+    """Return one `(start, end)` slice per dash-run column in the rule line."""
+    spans: list[tuple[int, int]] = []
+    start: int | None = None
+    for index, char in enumerate(separator):
+        if char == "-" and start is None:
+            start = index
+        elif char != "-" and start is not None:
+            spans.append((start, index))
+            start = None
+    if start is not None:
+        spans.append((start, len(separator)))
+    return spans
+
+
+def _radar_station_rows(text: str) -> dict[str, dict[str, Any]]:
+    """Parse the HOMR `nexrad-stations.txt` body into full station rows.
 
     The file is a fixed-width table: a header row, a row of dash runs
-    marking each column's span, then one row per site. Only the four-letter
-    alphabetic ICAO ids are kept (the same shape the catalog keys on).
+    marking each column's span, then one row per site. Keeps the four-letter
+    alphabetic ICAO sites with in-range coordinates — the shape of the
+    catalog's `stations:` block.
 
     Args:
         text: The full `nexrad-stations.txt` body.
 
     Returns:
-        The sorted, de-duplicated four-letter ICAO ids.
+        Mapping of ICAO id to `{name, latitude, longitude, state}`, sorted.
     """
     lines = text.splitlines()
     if len(lines) < 3:
-        return []
-    separator = lines[1]
-    spans: list[tuple[int, int]] = []
-    start: int | None = None
-    for i, char in enumerate(separator):
-        if char == "-" and start is None:
-            start = i
-        elif char != "-" and start is not None:
-            spans.append((start, i))
-            start = None
-    if start is not None:
-        spans.append((start, len(separator)))
-    columns = [lines[0][s:e].strip() for s, e in spans]
-    try:
-        icao_span = spans[columns.index("ICAO")]
-    except ValueError:
-        return []
-    ids = {
-        icao
-        for row in lines[2:]
-        if (icao := row[icao_span[0] : icao_span[1]].strip())
-        and len(icao) == 4
-        and icao.isalpha()
-    }
-    return sorted(ids)
+        return {}
+    spans = _radar_column_spans(lines[1])
+    columns = {lines[0][s:e].strip(): (s, e) for s, e in spans}
+    if "ICAO" not in columns:
+        return {}
+
+    def cell(row: str, name: str) -> str:
+        start, end = columns[name]
+        return row[start:end].strip()
+
+    rows: dict[str, dict[str, Any]] = {}
+    for row in lines[2:]:
+        icao = cell(row, "ICAO")
+        if len(icao) != 4 or not icao.isalpha():
+            continue
+        try:
+            lat = round(float(cell(row, "LAT")), 4)
+            lon = round(float(cell(row, "LON")), 4)
+        except (ValueError, KeyError):
+            continue
+        if not (-90 <= lat <= 90 and -180 <= lon <= 180):
+            continue
+        rows[icao] = {
+            "name": cell(row, "NAME").title(),
+            "latitude": lat,
+            "longitude": lon,
+            "state": cell(row, "ST") if "ST" in columns else "",
+        }
+    return dict(sorted(rows.items()))
+
+
+def _radar_station_ids(text: str) -> list[str]:
+    """Return the sorted ICAO ids from the HOMR table (id column only)."""
+    return sorted(_radar_station_rows(text))
 
 
 def _radar_grouped(catalog: Any) -> dict[str, list[str]]:
@@ -741,6 +796,28 @@ def _radar_grouped(catalog: Any) -> dict[str, list[str]]:
         A single-group mapping `{"radar": [sorted ICAO ids]}`.
     """
     return {"radar": _radar_station_ids(_get_text(_RADAR_STATIONS_URL))}
+
+
+def _write_radar(info: BackendInfo, grouped: dict[str, list[str]]) -> str:
+    """Regenerate radar's curated `stations:` block from NOAA HOMR.
+
+    Unlike the `available_*` writers, this rewrites the *curated* station
+    registry itself — re-parsing the HOMR table into full `{name, latitude,
+    longitude, state}` rows (the radar catalog has no separate index; its
+    `stations:` map is the catalog).
+
+    Args:
+        info: The radar backend.
+        grouped: The live id fetch (unused; the full table is re-fetched).
+
+    Returns:
+        The path of the rewritten catalog file.
+    """
+    path = _index_path(info)
+    _replace_index_block(
+        path, "stations", _radar_station_rows(_get_text(_RADAR_STATIONS_URL))
+    )
+    return str(path)
 
 
 #: FIRMS data-availability listing of every served sensor (needs a MAP_KEY).
@@ -976,7 +1053,7 @@ _REFRESHERS: dict[str, Callable[[Any], dict[str, list[str]]]] = {
 _WRITERS: dict[str, Callable[[BackendInfo, dict[str, list[str]]], str]] = {
     "stac": _write_stac,
     "ecmwf": _index_writer("available_datasets"),
-    "openeo": _index_writer("available_collections"),
+    "openeo": _write_openeo,
     "cmems": _index_writer("available_datasets"),
     "eumetsat": _index_writer("available_datasets"),
     "sentinel_hub": _index_writer("available_collections"),
@@ -984,6 +1061,7 @@ _WRITERS: dict[str, Callable[[BackendInfo, dict[str, list[str]]], str]] = {
     "earthdata": _index_writer("available_datasets"),
     "hdx": _write_hdx,
     "overture": _index_writer("available_releases"),
+    "radar": _write_radar,
 }
 
 
