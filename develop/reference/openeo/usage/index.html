@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -10061,10 +10061,11 @@ advertised, untracked live collections):</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>python<span class="w"> </span>tools/openeo/audit_openeo_datasets.py<span class="w"> </span>audit
 <a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>python<span class="w"> </span>tools/openeo/audit_openeo_datasets.py<span class="w"> </span>audit<span class="w"> </span>--strict<span class="w">   </span><span class="c1"># exit 1 on any drift</span>
 </code></pre></div>
-<p><strong><code>probe_openeo_collection.py</code></strong> — inspect one collection's live metadata when
-curating a new row (bands, extent, gsd); <code>--yaml</code> emits a paste-ready stanza:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>python<span class="w"> </span>tools/openeo/probe_openeo_collection.py<span class="w"> </span>SENTINEL2_L2A
-<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>python<span class="w"> </span>tools/openeo/probe_openeo_collection.py<span class="w"> </span>ESA_WORLDCOVER_10M_2021_V2<span class="w"> </span>--yaml
+<p><strong><code>earthlens datasets probe openeo &lt;id&gt;</code></strong> — inspect one collection's live
+metadata when curating a new row: the band schema plus one <code>dim:&lt;axis&gt;</code> row
+per non-band cube axis (the spatial bbox / temporal interval):</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>earthlens<span class="w"> </span>datasets<span class="w"> </span>probe<span class="w"> </span>openeo<span class="w"> </span>SENTINEL2_L2A
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>earthlens<span class="w"> </span>datasets<span class="w"> </span>probe<span class="w"> </span>openeo<span class="w"> </span>ESA_WORLDCOVER_10M_2021_V2<span class="w"> </span>--json
 </code></pre></div>
 <p><code>validate-recipe</code> and <code>audit --strict</code> exit non-zero on any drift (a base
 collection or a process the backend no longer advertises).</p>

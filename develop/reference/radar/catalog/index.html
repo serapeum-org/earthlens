@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -9774,32 +9774,33 @@ NOAA WSR-88D network.</p>
 <p><code>get_station</code> raises a <code>ValueError</code> with a did-you-mean hint for an
 unknown id, matching the other backends' catalogs.</p>
 <h2 id="tooling"><a class="toclink" href="#tooling">Tooling</a><a class="headerlink" href="#tooling" title="Permanent link">#</a></h2>
-<p>Two scripts under <code>tools/radar/</code> keep the catalog honest:</p>
+<p>Two <code>earthlens datasets</code> verbs keep the catalog honest:</p>
 <table>
 <thead>
 <tr>
-<th>Tool</th>
+<th>Command</th>
 <th>Purpose</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><code>refresh_radar_catalog.py</code></td>
+<td><code>refresh radar --write</code></td>
 <td>Regenerate <code>radar_data_catalog.yaml</code> from NOAA HOMR's authoritative <a href="https://www.ncei.noaa.gov/access/homr/file/nexrad-stations.txt"><code>nexrad-stations.txt</code></a> (fixed-width parse; ICAO / name / state / lat / lon).</td>
 </tr>
 <tr>
-<td><code>audit_radar_catalog.py</code></td>
-<td>Cross-check the catalog against the <strong>live</strong> chunk feed — reports <code>streaming</code> / <code>idle</code> / <code>uncatalogued</code> sites (a liveness snapshot, not a correctness check).</td>
+<td><code>validate radar --live</code></td>
+<td>Cross-check the catalog against the <strong>live</strong> chunk feed — flags an unreachable / empty feed, or an id-format mismatch (the feed is non-empty but no catalogued station is in it).</td>
 </tr>
 </tbody>
 </table>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>pixi<span class="w"> </span>run<span class="w"> </span>-e<span class="w"> </span>dev<span class="w"> </span>python<span class="w"> </span>tools/radar/refresh_radar_catalog.py<span class="w">          </span><span class="c1"># rewrite the catalog</span>
-<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>pixi<span class="w"> </span>run<span class="w"> </span>-e<span class="w"> </span>dev<span class="w"> </span>python<span class="w"> </span>tools/radar/refresh_radar_catalog.py<span class="w"> </span>--dry-run
-<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>pixi<span class="w"> </span>run<span class="w"> </span>-e<span class="w"> </span>dev<span class="w"> </span>python<span class="w"> </span>tools/radar/audit_radar_catalog.py<span class="w">            </span><span class="c1"># live coverage snapshot</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>earthlens<span class="w"> </span>datasets<span class="w"> </span>refresh<span class="w"> </span>radar<span class="w">           </span><span class="c1"># diff the catalog against live HOMR</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>earthlens<span class="w"> </span>datasets<span class="w"> </span>refresh<span class="w"> </span>radar<span class="w"> </span>--write<span class="w">    </span><span class="c1"># rewrite the catalog</span>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>earthlens<span class="w"> </span>datasets<span class="w"> </span>validate<span class="w"> </span>radar<span class="w"> </span>--live<span class="w">    </span><span class="c1"># confirm the real-time feed is reachable</span>
 </code></pre></div>
-<p>Because the feed is a rolling ~1–2 h buffer, the audit's <code>idle</code> bucket is
-expected to be non-empty at any instant (sites between scans or briefly
-offline) — it is not a defect.</p>
+<p>Because the feed is a rolling ~1–2 h buffer, per-station idleness is expected
+at any instant (sites between scans or briefly offline) — so <code>validate
+--live</code> only flags a fully empty feed or a wholesale id mismatch, not per-site
+idleness.</p>
 
 
 
