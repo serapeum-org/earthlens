@@ -45,7 +45,12 @@ dependencies = [
     "requests >=2.28.1",
     "shapely >=2.0.0",
     "tqdm >=4.66.0",
+    "typer >=0.12",
+    "rich >=13",
 ]
+
+[project.scripts]
+earthlens = "earthlens.cli:app"
 
 [project.optional-dependencies]
 s3 = ["boto3 >=1.43.0", "botocore >=1.34.0"]
@@ -75,34 +80,9 @@ overture = ["overturemaps >=1.0.0", "duckdb >=1.0.0"]
 usgs-water = ["dataretrieval >=1.1.4"]
 ghsl = []
 worldpop = ["worldpoppy >=0.4", "py7zr >=0.20"]
-# Flat list, not `earthlens[<extra>]` self-references: those make pip explore
-# old PyPI earthlens releases and backtrack onto an unbuildable wrapt sdist.
+# Self-referential: the union of every backend extra, without re-listing deps.
 all = [
-    "boto3 >=1.43.0",
-    "botocore >=1.34.0",
-    "cartopy >=0.22",
-    "cdsapi >=0.7.7",
-    "copernicusmarine >=2.0.0,<3",
-    "dataretrieval >=1.1.4",
-    "duckdb >=1.0.0",
-    "earthengine-api >=1.7.26",
-    "earthaccess >=0.18.0; python_version >= '3.12'",
-    "hdx-python-api >=6,<7",
-    "eumdac >=3.1",
-    "google-api-python-client >=2.0",
-    "google-cloud-storage >=2.0",
-    "herbie-data >=2026.3",
-    "ecmwf-opendata >=0.3",
-    "obspy >=1.5.0",
-    "openeo >=0.47,<0.48",
-    "overturemaps >=1.0.0",
-    "py7zr >=0.20",
-    "worldpoppy >=0.4",
-    "pyramids-gis[stac]",
-    "Rtree >=1.0.0",
-    "sentinelhub >=3.11.5",
-    "tropycal >=1.4",
-    "urllib3 >=1.26",
+    "earthlens[s3,ecmwf,gee,cmems,fdsn,earthdata,hdx,eumetsat,nwp,radar,stac,openeo,sentinel-hub,tropycal,overture,usgs-water,ghsl,worldpop]",
 ]
 
 [dependency-groups]
@@ -274,6 +254,7 @@ markers = [
     "usgs_water: tests for the USGS NWIS / Water Data backend (requires the `usgs-water` extra: dataretrieval; anonymous access works).",
     "ghsl: tests for the GHSL backend (JRC Global Human Settlement Layer; open HTTPS, no extra SDK for the direct path; localised via pyramids).",
     "worldpop: tests for the WorldPop population data hub backend (open CC-BY-4.0; default REST path needs only core requests + pyramids, optional `worldpop` extra adds worldpoppy).",
+    "cli: tests for the `earthlens` console script / federated catalog-query CLI (requires the `cli` extra: typer, rich).",
 ]
 
 [tool.pixi.workspace]
@@ -315,7 +296,8 @@ test-radar = { cmd = "pytest -vvv -m 'radar and not e2e' --cov=src/earthlens --c
 test-usgs-water = { cmd = "pytest -vvv -m 'usgs_water and not e2e' --cov=src/earthlens --cov-report=xml --cov-report=term-missing", description = "Run USGS NWIS / Water Data backend tests (requires the `usgs-water` extra: dataretrieval)" }
 test-ghsl = { cmd = "pytest -vvv -m 'ghsl and not e2e' --cov=src/earthlens --cov-report=xml --cov-report=term-missing", description = "Run GHSL backend tests (open HTTPS; no extra SDK for the direct path; localised via pyramids)" }
 test-worldpop = { cmd = "pytest -vvv -m 'worldpop and not e2e' --cov=src/earthlens --cov-report=xml --cov-report=term-missing", description = "Run WorldPop population data hub backend tests (open CC-BY-4.0; REST path needs only core requests + pyramids)" }
-test-doctests = { cmd = "pytest --doctest-modules src/earthlens/gee src/earthlens/chc src/earthlens/ecmwf src/earthlens/cmems src/earthlens/fdsn src/earthlens/earthdata src/earthlens/hdx src/earthlens/eumetsat src/earthlens/stac src/earthlens/openeo src/earthlens/sentinel_hub src/earthlens/gdacs src/earthlens/openaq src/earthlens/tropycal src/earthlens/firms src/earthlens/overture src/earthlens/nwp src/earthlens/radar src/earthlens/usgs_water src/earthlens/ghsl src/earthlens/worldpop src/earthlens/grids src/earthlens/base", description = "Run docstring examples across the backend packages (catches drift in catalog / API docstrings)" }
+test-cli = { cmd = "pytest -vvv -m 'cli and not slow' --cov=src/earthlens --cov-report=xml --cov-report=term-missing", description = "Run federated catalog-query CLI tests (requires the `cli` extra: typer, rich)" }
+test-doctests = { cmd = "pytest --doctest-modules src/earthlens/gee src/earthlens/chc src/earthlens/ecmwf src/earthlens/cmems src/earthlens/fdsn src/earthlens/earthdata src/earthlens/hdx src/earthlens/eumetsat src/earthlens/stac src/earthlens/openeo src/earthlens/sentinel_hub src/earthlens/gdacs src/earthlens/openaq src/earthlens/tropycal src/earthlens/firms src/earthlens/overture src/earthlens/nwp src/earthlens/radar src/earthlens/usgs_water src/earthlens/ghsl src/earthlens/worldpop src/earthlens/cli src/earthlens/grids src/earthlens/base", description = "Run docstring examples across the backend packages (catches drift in catalog / API docstrings)" }
 notebooks = { cmd = "pytest --nbval --nbval-lax --verbose docs/examples", description = "check notebooks" }
 jupyter = { cmd = "jupyter lab --no-browser --IdentityProvider.token='' --ServerApp.password='' --port=8889", description = "check notebooks" }
 build-dist = { cmd = "python -m build", description = "Build sdist and wheel for PyPI" }

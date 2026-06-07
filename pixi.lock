@@ -10995,7 +10995,7 @@ packages:
 - pypi: ./
   name: earthlens
   version: 0.7.0
-  sha256: 30ca89c26feba136bcbd94d3b10376197a8419b477cc07f13866ebbb8d4091be
+  sha256: 66c9f09d0751bdf36b7a5219c66b24313f9e142dfd288c6820fc53e0a4f5cf14
   requires_dist:
   - pyramids-gis>=0.31.0
   - geopandas>=1.0.0
@@ -11009,6 +11009,8 @@ packages:
   - requests>=2.28.1
   - shapely>=2.0.0
   - tqdm>=4.66.0
+  - typer>=0.12
+  - rich>=13
   - boto3>=1.43.0 ; extra == 's3'
   - botocore>=1.34.0 ; extra == 's3'
   - cdsapi>=0.7.7 ; extra == 'ecmwf'
@@ -11036,31 +11038,7 @@ packages:
   - dataretrieval>=1.1.4 ; extra == 'usgs-water'
   - worldpoppy>=0.4 ; extra == 'worldpop'
   - py7zr>=0.20 ; extra == 'worldpop'
-  - boto3>=1.43.0 ; extra == 'all'
-  - botocore>=1.34.0 ; extra == 'all'
-  - cartopy>=0.22 ; extra == 'all'
-  - cdsapi>=0.7.7 ; extra == 'all'
-  - copernicusmarine>=2.0.0,<3 ; extra == 'all'
-  - dataretrieval>=1.1.4 ; extra == 'all'
-  - duckdb>=1.0.0 ; extra == 'all'
-  - earthengine-api>=1.7.26 ; extra == 'all'
-  - earthaccess>=0.18.0 ; python_full_version >= '3.12' and extra == 'all'
-  - hdx-python-api>=6,<7 ; extra == 'all'
-  - eumdac>=3.1 ; extra == 'all'
-  - google-api-python-client>=2.0 ; extra == 'all'
-  - google-cloud-storage>=2.0 ; extra == 'all'
-  - herbie-data>=2026.3 ; extra == 'all'
-  - ecmwf-opendata>=0.3 ; extra == 'all'
-  - obspy>=1.5.0 ; extra == 'all'
-  - openeo>=0.47,<0.48 ; extra == 'all'
-  - overturemaps>=1.0.0 ; extra == 'all'
-  - py7zr>=0.20 ; extra == 'all'
-  - worldpoppy>=0.4 ; extra == 'all'
-  - pyramids-gis[stac] ; extra == 'all'
-  - rtree>=1.0.0 ; extra == 'all'
-  - sentinelhub>=3.11.5 ; extra == 'all'
-  - tropycal>=1.4 ; extra == 'all'
-  - urllib3>=1.26 ; extra == 'all'
+  - earthlens[s3,ecmwf,gee,cmems,fdsn,earthdata,hdx,eumetsat,nwp,radar,stac,openeo,sentinel-hub,tropycal,overture,usgs-water,ghsl,worldpop] ; extra == 'all'
   requires_python: '>=3.11,<4'
 - pypi: https://files.pythonhosted.org/packages/09/40/42bb2d98bc6103194d25fa8da141cd43cabf32277cbf2ab513fe35532196/eccodes-2.47.0-cp311-cp311-win_amd64.whl
   name: eccodes
