@@ -3,8 +3,8 @@
 A small helper for curating a new collection row: it calls
 `Connection.describe_collection(<id>)` and prints the band list, spatial /
 temporal extent, ground sample distance, and cube dimensions — the fields you
-copy into `catalog/collections.yaml`. The openEO analogue of
-`tools/stac/probe_stac_assets.py` / `tools/cmems/probe_cmems_netcdf.py`.
+copy into `catalog/collections.yaml` — the richer openEO probe (extent +
+cube dimensions beyond the bands `earthlens datasets probe openeo` lists).
 
     python tools/openeo/probe_openeo_collection.py SENTINEL2_L2A
     python tools/openeo/probe_openeo_collection.py SENTINEL_5P_L2 --yaml

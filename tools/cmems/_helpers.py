@@ -2,11 +2,11 @@
 
 Single home for the bundled-catalog path, the cadence / domain
 inference rules, the `(version, part, service, variable)` walker over
-:func:`copernicusmarine.describe` results, the canonical stanza
-emitter, and the YAML splice helpers used by `refresh_cmems_catalog`,
-the future `probe_cmems_netcdf`, and the future
-`audit_cmems_datasets`. Centralising these keeps the three tools in
-lock-step on the YAML shape they read and write.
+:func:`copernicusmarine.describe` results, the canonical stanza emitter,
+the YAML splice helpers, and the shared rate-limit detector (also used by
+`tools/usgs_water/refresh_usgs_catalog.py`). The CMEMS refresh/probe/audit
+tools were retired once the `earthlens datasets` CLI covered them; this
+module is kept for the surviving consumers + tests.
 
 Not part of the installed package — `sys.path.insert` against
 `Path(__file__).parent` before importing.
