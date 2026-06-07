@@ -888,3 +888,103 @@ class TestRefreshOne:
         outcome = refresh_one(_info("stac"))
         assert outcome.status == "error", "failure captured, not raised"
         assert "connection refused" in outcome.detail, "reason preserved"
+
+
+class TestGeeDatasetHrefs:
+    """Tests for the EE STAC tree walk."""
+
+    def test_bfs_collects_dataset_hrefs(self, monkeypatch):
+        """The walk recurses sub-catalogs and collects dataset doc hrefs."""
+        tree = {
+            refresh_mod._GEE_STAC_ROOT: {
+                "links": [
+                    {"rel": "child", "href": "https://x/sub/catalog.json"},
+                    {"rel": "child", "href": "https://x/ds_a.json"},
+                    {"rel": "self", "href": "ignored"},
+                    {"rel": "child"},
+                ]
+            },
+            "https://x/sub/catalog.json": {
+                "links": [{"rel": "child", "href": "https://x/ds_b.json"}]
+            },
+        }
+
+        def fake_get(url):
+            if url == "https://x/unreachable":
+                raise RuntimeError("boom")
+            return tree[url]
+
+        monkeypatch.setattr(refresh_mod, "_get_json", fake_get)
+        hrefs = refresh_mod._gee_dataset_hrefs()
+        assert set(hrefs) == {"https://x/ds_a.json", "https://x/ds_b.json"}, hrefs
+
+    def test_unreachable_subcatalog_skipped(self, monkeypatch):
+        """An unreachable sub-catalog is skipped rather than raising."""
+
+        def fake_get(url):
+            raise RuntimeError("offline")
+
+        monkeypatch.setattr(refresh_mod, "_get_json", fake_get)
+        assert refresh_mod._gee_dataset_hrefs() == [], "all unreachable -> []"
+
+
+class TestCmrPage:
+    """Tests for the Earthdata CMR pagination helper."""
+
+    def test_reads_short_names_and_cursor(self, monkeypatch):
+        """A CMR page yields its ShortNames and the next search-after cursor."""
+        import types
+
+        def fake_get(url, params=None, headers=None, timeout=None):
+            return types.SimpleNamespace(
+                json=lambda: {"items": [{"umm": {"ShortName": "GPM"}}, {"umm": {}}]},
+                headers={"CMR-Search-After": "cursor2"},
+                raise_for_status=lambda: None,
+            )
+
+        monkeypatch.setattr(refresh_mod.requests, "get", fake_get)
+        names, cursor = refresh_mod._cmr_page("GES_DISC", None)
+        assert names == ["GPM"], "only items with a ShortName are kept"
+        assert cursor == "cursor2", "next cursor carried"
+
+
+class TestUsgsParameterTable:
+    """Tests for the USGS reference-table parsers (dataretrieval mocked)."""
+
+    def _patch_frame(self, monkeypatch, rows):
+        """Patch dataretrieval to return a tiny pandas frame of `rows`."""
+        import pandas as pd
+        from dataretrieval import waterdata
+
+        monkeypatch.setattr(
+            waterdata, "get_reference_table", lambda collection=None: pd.DataFrame(rows)
+        )
+
+    def test_codes_listed(self, monkeypatch):
+        """_usgs_parameter_codes returns every parameter_code as a string."""
+        self._patch_frame(monkeypatch, [{"parameter_code": 60}, {"parameter_code": 10}])
+        assert refresh_mod._usgs_parameter_codes() == ["60", "10"], "codes stringified"
+
+    def test_rows_keyed_by_code(self, monkeypatch):
+        """_usgs_parameter_rows keys name/group/unit by the parameter code."""
+        self._patch_frame(
+            monkeypatch,
+            [
+                {
+                    "parameter_code": "00060",
+                    "parameter_name": "Discharge",
+                    "parameter_group_code": "PHY",
+                    "unit_of_measure": "ft3/s",
+                }
+            ],
+        )
+        rows = refresh_mod._usgs_parameter_rows()
+        assert rows["00060"]["name"] == "Discharge", "name parsed"
+        assert rows["00060"]["unit"] == "ft3/s", "unit parsed"
+
+    def test_blank_codes_skipped(self, monkeypatch):
+        """A row with no usable code is dropped."""
+        self._patch_frame(
+            monkeypatch, [{"parameter_code": ""}, {"parameter_code": "1"}]
+        )
+        assert list(refresh_mod._usgs_parameter_rows()) == ["1"], "blank code dropped"

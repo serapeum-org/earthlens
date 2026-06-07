@@ -10,8 +10,12 @@ from rich.console import Console
 from earthlens.cli.render import (
     COMPACT_COLUMNS,
     FULL_COLUMNS,
+    _format_value,
     counts_table,
+    coverage_table,
     print_load_warnings,
+    record_json,
+    record_table,
     row_to_dict,
     rows_table,
     rows_to_ids,
@@ -25,6 +29,14 @@ pytestmark = pytest.mark.cli
 def _row(provider="s3", dataset_id="era5", title="ERA5", cadence="monthly"):
     """Build a CatalogRow for render tests."""
     return CatalogRow(provider, dataset_id, title, cadence, "0.25", "open")
+
+
+def _render(table):
+    """Render a Rich table to plain text for substring assertions."""
+    console = Console(force_terminal=False, width=200)
+    with console.capture() as capture:
+        console.print(table)
+    return capture.get()
 
 
 class TestRowToDict:
@@ -123,3 +135,95 @@ class TestPrintLoadWarnings:
         print_load_warnings([])
         captured = capsys.readouterr()
         assert captured.out == "" and captured.err == "", "silent when healthy"
+
+
+class TestFormatValue:
+    """Tests for _format_value (the record-table value summariser)."""
+
+    @pytest.mark.parametrize(
+        "value, expected",
+        [
+            ({}, "{}"),
+            ([], "[]"),
+            ({"a": 1, "b": 2}, "a=1, b=2"),
+        ],
+    )
+    def test_small_scalars(self, value, expected):
+        """Empty / small scalar containers render inline.
+
+        Args:
+            value: The field value.
+            expected: The rendered summary.
+        """
+        assert _format_value(value) == expected, f"{value!r}"
+
+    def test_large_dict_summarised_by_keys(self):
+        """A dict over four entries collapses to a count plus its first keys."""
+        out = _format_value({str(i): i for i in range(10)})
+        assert out.startswith("[10] "), "count prefix shown"
+        assert "(+2)" in out, "overflow count shown"
+
+    def test_long_list_summarised(self):
+        """A list over eight items collapses to a count plus a head + ellipsis."""
+        out = _format_value(list(range(10)))
+        assert out.startswith("[10] ") and out.endswith("…"), "list summarised"
+
+
+class TestRecordRenderers:
+    """Tests for record_table / record_json with a model-backed row."""
+
+    def _model_row(self):
+        """A CatalogRow whose record exposes model_dump."""
+        from pydantic import BaseModel
+
+        class Rec(BaseModel):
+            code: str = "00060"
+            extra: dict = {"a": 1}
+
+        row = _row()
+        object.__setattr__(row, "record", Rec())
+        return row
+
+    def test_record_table_lists_model_fields(self):
+        """record_table renders one row per model field plus provider/id."""
+        table = record_table(self._model_row())
+        rendered = _render(table)
+        assert "code" in rendered and "00060" in rendered, "model field shown"
+
+    def test_record_json_merges_model_dump(self):
+        """record_json merges the model_dump into the provider/id envelope."""
+        payload = json.loads(record_json(self._model_row()))
+        assert payload["code"] == "00060", "model field merged"
+        assert payload["provider"] == "s3", "envelope kept"
+
+    def test_record_table_without_model(self):
+        """A row whose record has no model_dump still renders provider/id."""
+        rendered = _render(record_table(_row()))
+        assert "provider" in rendered and "era5" in rendered, "base rows shown"
+
+
+class TestCoverageTable:
+    """Tests for coverage_table."""
+
+    def test_mixed_ok_and_error_rows(self):
+        """An ok row shows per-bucket counts; a non-ok row shows dashes."""
+        from types import SimpleNamespace
+
+        outcomes = [
+            SimpleNamespace(
+                provider="gee",
+                status="ok",
+                counts={
+                    "DONE": 3,
+                    "addressable": 1,
+                    "thin": 0,
+                    "table": 0,
+                    "missing": 0,
+                },
+                detail="",
+            ),
+            SimpleNamespace(provider="x", status="error", counts={}, detail="boom"),
+        ]
+        rendered = _render(coverage_table(outcomes))
+        assert "3" in rendered and "boom" in rendered, "counts + detail shown"
+        assert "-" in rendered, "non-ok row dashed"

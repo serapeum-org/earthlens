@@ -621,3 +621,361 @@ class TestProbeDataset:
         monkeypatch.setattr(curate_mod, "_get_json", boom)
         result = probe_dataset(_info("stac"), "sentinel-2-l2a")
         assert result.status == "error", "failure captured"
+
+
+class TestInferDtype:
+    """Tests for _infer_dtype."""
+
+    @pytest.mark.parametrize(
+        "value, expected",
+        [("42", "int"), ("3.14", "float"), ("hot", "str"), ("", "str"), (None, "str")],
+    )
+    def test_classification(self, value, expected):
+        """A sample string is classified int / float / str (blank -> str).
+
+        Args:
+            value: The sampled cell value.
+            expected: The inferred coarse dtype.
+        """
+        assert curate_mod._infer_dtype(value) == expected, f"{value!r}->{expected}"
+
+
+class TestEcmwfProberBranches:
+    """Branch coverage for the ECMWF constraints prober."""
+
+    def test_unions_variables_across_rows(self, monkeypatch):
+        """The variable values across all constraint rows are unioned + sorted."""
+        monkeypatch.setattr(
+            curate_mod,
+            "_ecmwf_constraints",
+            lambda d: [{"variable": ["t2m", "sp"]}, {"variable": ["t2m", "msl"]}],
+        )
+        result = probe_dataset(_info("ecmwf"), "reanalysis-era5-single-levels")
+        assert sorted(result.assets) == ["msl", "sp", "t2m"], "vars unioned + sorted"
+
+    def test_constraints_helper_delegates(self, monkeypatch):
+        """_ecmwf_constraints delegates to the package fetch_constraints."""
+        import earthlens.ecmwf.constraints as constraints
+
+        monkeypatch.setattr(
+            constraints, "fetch_constraints", lambda d: [{"variable": []}]
+        )
+        assert curate_mod._ecmwf_constraints("x") == [{"variable": []}]
+
+
+class TestGhslProberBranches:
+    """Branch coverage for the offline GHSL matrix prober."""
+
+    def test_enumerates_release_matrix(self):
+        """A curated product reports its epoch@resolution -> release/crs matrix."""
+        from earthlens.cli.adapter import load_catalog
+
+        dataset = next(iter(load_catalog(_info("ghsl")).datasets))
+        result = probe_dataset(_info("ghsl"), dataset)
+        assert result.status == "ok" and result.assets, "matrix enumerated"
+        first = next(iter(result.assets.values()))
+        assert "release" in first and "crs" in first, "release + crs reported"
+
+    def test_unknown_product_is_error(self):
+        """An unknown GHSL product reports 'error'."""
+        result = probe_dataset(_info("ghsl"), "not-a-ghsl-product")
+        assert result.status == "error", "unknown product -> error"
+
+
+class TestS3ProberBranches:
+    """Branch coverage for the S3 bucket-listing prober."""
+
+    def test_lists_sample_keys(self, monkeypatch):
+        """A registered dataset lists a few object keys under its bucket."""
+        from earthlens.cli.adapter import load_catalog
+
+        monkeypatch.setattr(curate_mod, "_s3_sample_keys", lambda b, p, r: ["a", "b"])
+        dataset = next(iter(load_catalog(_info("s3")).datasets))
+        result = probe_dataset(_info("s3"), dataset)
+        assert "a" in result.assets and "b" in result.assets, "keys listed"
+
+    def test_unknown_dataset_is_error(self):
+        """An unregistered S3 dataset reports 'error'."""
+        result = probe_dataset(_info("s3"), "not-a-bucket")
+        assert result.status == "error", "unknown dataset -> error"
+
+    def test_sample_keys_helper_uses_unsigned_client(self, monkeypatch):
+        """_s3_sample_keys returns the Contents keys from an unsigned client."""
+        import earthlens.s3.auth as s3_auth
+
+        class FakeClient:
+            def list_objects_v2(self, **kw):
+                return {"Contents": [{"Key": "k1"}, {"Key": "k2"}]}
+
+        class FakeAuth:
+            def __init__(self, creds):
+                pass
+
+            def client(self):
+                return FakeClient()
+
+        monkeypatch.setattr(s3_auth, "S3Auth", FakeAuth)
+        assert curate_mod._s3_sample_keys("b", "p", None) == ["k1", "k2"]
+
+
+class TestOvertureProberBranches:
+    """Branch coverage for the Overture column prober."""
+
+    def test_records_column_dtypes(self, monkeypatch):
+        """Each Overture column's dtype is recorded under the column name."""
+        from earthlens.cli.adapter import load_catalog
+
+        monkeypatch.setattr(
+            curate_mod,
+            "_overture_columns",
+            lambda t: {"id": "string", "geom": "geometry"},
+        )
+        dataset = next(iter(load_catalog(_info("overture")).datasets))
+        result = probe_dataset(_info("overture"), dataset)
+        assert result.assets["id"]["dtype"] == "string", "column dtype recorded"
+
+    def test_columns_helper_reads_dtypes(self, monkeypatch):
+        """_overture_columns maps a geodataframe's dtypes to {name: str(dtype)}."""
+        import overturemaps.core as core
+
+        class FakeFrame:
+            dtypes = {"id": "int64", "geometry": "geometry"}
+
+        monkeypatch.setattr(core, "geodataframe", lambda t, bbox: FakeFrame())
+        out = curate_mod._overture_columns("building")
+        assert out == {"id": "int64", "geometry": "geometry"}, "dtypes stringified"
+
+
+class TestFirmsProberBranches:
+    """Branch coverage for the FIRMS CSV prober."""
+
+    def test_parses_header_and_first_row(self, monkeypatch):
+        """The CSV header columns map to dtypes inferred from the first row."""
+        from earthlens.cli.adapter import load_catalog
+
+        monkeypatch.setattr(
+            curate_mod,
+            "_firms_csv_lines",
+            lambda code: ["latitude,confidence,sat", "1.5,90,N"],
+        )
+        dataset = next(iter(load_catalog(_info("firms")).datasets))
+        result = probe_dataset(_info("firms"), dataset)
+        assert result.assets["latitude"]["dtype"] == "float", "float column inferred"
+        assert result.assets["confidence"]["dtype"] == "int", "int column inferred"
+
+    def test_empty_csv_yields_empty_schema(self, monkeypatch):
+        """An empty CSV sample yields an empty schema, not an error."""
+        from earthlens.cli.adapter import load_catalog
+
+        monkeypatch.setattr(curate_mod, "_firms_csv_lines", lambda code: [])
+        dataset = next(iter(load_catalog(_info("firms")).datasets))
+        result = probe_dataset(_info("firms"), dataset)
+        assert result.status == "ok" and result.assets == {}, "empty -> {}"
+
+    def test_csv_lines_helper_fetches_with_key(self, monkeypatch):
+        """_firms_csv_lines requests the area CSV and splits the body into lines."""
+        import types
+
+        monkeypatch.setenv("FIRMS_MAP_KEY", "K")
+
+        def fake_get(url, timeout=None):
+            assert "/K/" in url, f"map key embedded in URL: {url}"
+            return types.SimpleNamespace(text="a,b\n1,2", raise_for_status=lambda: None)
+
+        monkeypatch.setattr(curate_mod.requests, "get", fake_get)
+        assert curate_mod._firms_csv_lines("VIIRS") == ["a,b", "1,2"]
+
+
+class TestEarthdataProberBranches:
+    """Branch coverage for the Earthdata UMM-Var prober."""
+
+    def test_reads_variable_records(self, monkeypatch):
+        """A collection with associated variables yields their UMM-Var schema."""
+        from earthlens.cli.adapter import load_catalog
+
+        def fake_get(url, params=None):
+            if "collections" in url:
+                return {"items": [{"meta": {"associations": {"variables": ["V1"]}}}]}
+            return {
+                "items": [
+                    {
+                        "umm": {
+                            "Name": "precip",
+                            "LongName": "Precipitation",
+                            "Units": "mm",
+                            "DataType": "float32",
+                        }
+                    }
+                ]
+            }
+
+        monkeypatch.setattr(curate_mod, "_get_json", fake_get)
+        dataset = next(iter(load_catalog(_info("earthdata")).datasets))
+        result = probe_dataset(_info("earthdata"), dataset)
+        assert result.assets["precip"]["units"] == "mm", "variable units read"
+
+    def test_no_collection_is_error(self, monkeypatch):
+        """A short name CMR does not know reports 'error'."""
+        monkeypatch.setattr(
+            curate_mod, "_get_json", lambda url, params=None: {"items": []}
+        )
+        result = probe_dataset(_info("earthdata"), "NOPE")
+        assert result.status == "error", "no collection -> error"
+
+    def test_no_variables_yields_empty(self, monkeypatch):
+        """A collection with no associated variables yields an empty schema."""
+        from earthlens.cli.adapter import load_catalog
+
+        monkeypatch.setattr(
+            curate_mod,
+            "_get_json",
+            lambda url, params=None: {"items": [{"meta": {"associations": {}}}]},
+        )
+        dataset = next(iter(load_catalog(_info("earthdata")).datasets))
+        result = probe_dataset(_info("earthdata"), dataset)
+        assert result.status == "ok" and result.assets == {}, "no vars -> {}"
+
+
+class TestWorldpopResolve:
+    """Tests for _worldpop_resolve + the records helper."""
+
+    def test_resolves_subalias_to_parent(self):
+        """A sub-alias id resolves to its (parent_alias, sub_alias)."""
+        from earthlens.cli.adapter import load_catalog
+
+        catalog = load_catalog(_info("worldpop"))
+        alias, row = next(
+            (a, r)
+            for a, r in catalog.datasets.items()
+            if getattr(r, "subaliases", None)
+        )
+        sub_id = row.subaliases[0].id
+        assert curate_mod._worldpop_resolve(catalog, sub_id) == (alias, sub_id)
+
+    def test_unknown_dataset_raises(self):
+        """A dataset matching no product or sub-alias raises ValueError."""
+        from earthlens.cli.adapter import load_catalog
+
+        with pytest.raises(ValueError, match="no WorldPop"):
+            curate_mod._worldpop_resolve(load_catalog(_info("worldpop")), "nope")
+
+    def test_records_helper_delegates(self, monkeypatch):
+        """_worldpop_records delegates to the package rest_records."""
+        import earthlens.worldpop.rest as rest
+
+        monkeypatch.setattr(rest, "rest_records", lambda a, s, i: [{"id": 1}])
+        assert curate_mod._worldpop_records("a", "s", "USA") == [{"id": 1}]
+
+
+class TestNwpHelpers:
+    """Tests for the NWP availability dispatch + cycle helpers."""
+
+    def test_recent_cycle_is_in_the_past(self):
+        """_nwp_recent_cycle returns a datetime at or before ~now."""
+        import datetime as dt
+
+        from earthlens.nwp.catalog import NWPModel
+
+        cycle = curate_mod._nwp_recent_cycle(
+            NWPModel(provider="p", backend="direct-https", cycles_utc=[0, 12])
+        )
+        assert cycle <= dt.datetime.now(dt.UTC).replace(tzinfo=None), "cycle in past"
+
+    def test_availability_unknown_backend(self):
+        """An unrecognised backend reports that no probe exists."""
+        import datetime as dt
+        from types import SimpleNamespace
+
+        model = SimpleNamespace(backend="mystery", bands={}, request_options={})
+        out = curate_mod._nwp_availability(model, dt.datetime(2024, 1, 1), 0)
+        assert "no live availability probe" in out, "unknown backend reported"
+
+    def test_availability_direct_boto3_head_object(self, monkeypatch):
+        """A direct-boto3 model HEADs the object and reports its size."""
+        import datetime as dt
+        import sys
+        import types
+
+        from earthlens.nwp.catalog import NWPModel
+
+        boto3 = types.ModuleType("boto3")
+        botocore = types.ModuleType("botocore")
+        botocore_client = types.ModuleType("botocore.client")
+        botocore.UNSIGNED = object()
+        botocore_client.Config = lambda **kw: None
+
+        class FakeS3:
+            def head_object(self, Bucket, Key):
+                return {"ContentLength": 1234}
+
+        boto3.client = lambda *a, **kw: FakeS3()
+        monkeypatch.setitem(sys.modules, "boto3", boto3)
+        monkeypatch.setitem(sys.modules, "botocore", botocore)
+        monkeypatch.setitem(sys.modules, "botocore.client", botocore_client)
+        model = NWPModel(
+            provider="p",
+            backend="direct-boto3",
+            bands={"t": "T"},
+            request_options={"bucket": "b", "key_template": "{var}.grib"},
+        )
+        out = curate_mod._nwp_availability(model, dt.datetime(2024, 1, 1), 0)
+        assert "1234 bytes" in out, "head_object size reported"
+
+
+class TestChcSampleFiles:
+    """Tests for the anonymous-FTP CHC sampler."""
+
+    def test_lists_directory(self, monkeypatch):
+        """_chc_sample_files logs in, cds to the base, and returns sorted names."""
+        import earthlens.cli.curate as cm
+
+        class FakeFTP:
+            def __init__(self, host, timeout=None):
+                pass
+
+            def __enter__(self):
+                return self
+
+            def __exit__(self, *a):
+                return False
+
+            def login(self):
+                pass
+
+            def cwd(self, base):
+                pass
+
+            def nlst(self):
+                return ["b.tif", "a.tif"]
+
+        monkeypatch.setattr(cm, "FTP", FakeFTP, raising=False)
+        import ftplib
+
+        monkeypatch.setattr(ftplib, "FTP", FakeFTP)
+        assert cm._chc_sample_files("/x", limit=1) == ["a.tif"], "sorted + capped"
+
+    def test_availability_meteofrance_needs_key(self, monkeypatch):
+        """A meteofrance model with no API key reports the missing-credential."""
+        import datetime as dt
+
+        from earthlens.nwp.catalog import NWPModel
+
+        monkeypatch.delenv("METEO_FRANCE_API_KEY", raising=False)
+        monkeypatch.delenv("MF_API_KEY", raising=False)
+        model = NWPModel(
+            provider="mf",
+            backend="meteofrance-api",
+            request_options={"api_base": "https://x", "coverage_service": "svc"},
+        )
+        out = curate_mod._nwp_availability(model, dt.datetime(2024, 1, 1), 0)
+        assert "METEO_FRANCE_API_KEY" in out, "missing key reported"
+
+    def test_availability_direct_boto3_missing_options(self):
+        """A direct-boto3 model lacking bucket/key/bands reports the gap."""
+        import datetime as dt
+
+        from earthlens.nwp.catalog import NWPModel
+
+        model = NWPModel(provider="p", backend="direct-boto3")
+        out = curate_mod._nwp_availability(model, dt.datetime(2024, 1, 1), 0)
+        assert "bucket" in out, "missing options reported"

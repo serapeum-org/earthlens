@@ -300,3 +300,234 @@ def load_nwp():
     from earthlens.cli.adapter import load_catalog
 
     return load_catalog(_info("nwp"))
+
+
+class TestOfflineValidatorBranches:
+    """Negative-path coverage for the offline structural validators."""
+
+    def test_nwp_herbie_missing_model_family(self):
+        """A herbie model with no model_family is flagged."""
+        catalog = SimpleNamespace(
+            datasets={
+                "bad": SimpleNamespace(
+                    backend="herbie",
+                    model_family="",
+                    url_template=None,
+                    bands={"t": 1},
+                    cycles_utc=[0],
+                )
+            }
+        )
+        _checked, issues = _validate_nwp(catalog)
+        assert any("model_family" in i for i in issues), "herbie family flagged"
+
+    def test_usgs_water_unknown_service_flagged(self):
+        """A parameter declaring an unknown service is flagged."""
+        from earthlens.cli.validate import _validate_usgs_water
+
+        catalog = SimpleNamespace(
+            datasets={"q": SimpleNamespace(services=["daily", "not-a-service"])}
+        )
+        _checked, issues = _validate_usgs_water(catalog)
+        assert any("not-a-service" in i for i in issues), "unknown service flagged"
+
+    def test_sentinel_hub_bad_evalscript_flagged(self, monkeypatch):
+        """A recipe whose evalscript lacks //VERSION=3 + dataMask is flagged."""
+        from earthlens.cli import validate as vm
+        from earthlens.cli.validate import _validate_sentinel_hub
+
+        monkeypatch.setattr(
+            "earthlens.sentinel_hub.read_evalscript",
+            lambda name: "// not versioned\nreturn x;",
+        )
+        catalog = SimpleNamespace(
+            recipes={
+                "r": SimpleNamespace(evalscript="r.js", kind="stats"),
+                "blank": SimpleNamespace(evalscript=None, kind="render"),
+            }
+        )
+        _checked, issues = _validate_sentinel_hub(catalog)
+        assert any("//VERSION=3" in i for i in issues), "version header flagged"
+        assert any("dataMask" in i for i in issues), "stats dataMask flagged"
+        assert vm is not None
+
+
+class TestLivePrimitives:
+    """Cover the thin live-reachability primitive helpers (SDK mocked)."""
+
+    def test_http_head_returns_status(self, monkeypatch):
+        """_http_head returns the HEAD response status code."""
+        from earthlens.cli.validate import _http_head
+
+        monkeypatch.setattr(
+            validate_mod.requests,
+            "head",
+            lambda url, timeout=None, allow_redirects=None: SimpleNamespace(
+                status_code=204
+            ),
+        )
+        assert _http_head("https://x") == 204, "status code returned"
+
+    def test_openeo_live_lists_unions_ids(self, monkeypatch):
+        """_openeo_live_lists collects collection + process ids from the API."""
+        from earthlens.cli.validate import _openeo_live_lists
+
+        def fake_get(url):
+            if "processes" in url:
+                return {"processes": [{"id": "ndvi"}, {"no": "id"}]}
+            return {"collections": [{"id": "S2"}]}
+
+        monkeypatch.setattr(validate_mod, "_get_json", fake_get)
+        collections, processes = _openeo_live_lists()
+        assert collections == {"S2"} and processes == {"ndvi"}, "ids unioned"
+
+    def test_s3_live_keys_lists_one(self, monkeypatch):
+        """_s3_live_keys returns the object keys from an unsigned client."""
+        import earthlens.s3.auth as s3_auth
+        from earthlens.cli.validate import _s3_live_keys
+
+        class FakeClient:
+            def list_objects_v2(self, **kw):
+                return {"Contents": [{"Key": "k"}]}
+
+        class FakeAuth:
+            def __init__(self, creds):
+                pass
+
+            def client(self):
+                return FakeClient()
+
+        monkeypatch.setattr(s3_auth, "S3Auth", FakeAuth)
+        assert _s3_live_keys("b", "p", None) == ["k"], "object key returned"
+
+    def test_radar_feed_stations_paginates(self, monkeypatch):
+        """_radar_feed_stations follows the continuation token across pages."""
+        import earthlens.radar.backend as radar_backend
+        from earthlens.cli.validate import _radar_feed_stations
+
+        pages = [
+            {
+                "CommonPrefixes": [{"Prefix": "KAAA/"}],
+                "IsTruncated": True,
+                "NextContinuationToken": "t",
+            },
+            {"CommonPrefixes": [{"Prefix": "KBBB/"}], "IsTruncated": False},
+        ]
+
+        class FakeClient:
+            def __init__(self):
+                self.calls = 0
+
+            def list_objects_v2(self, **kw):
+                page = pages[self.calls]
+                self.calls += 1
+                return page
+
+        monkeypatch.setattr(radar_backend, "_s3_client", lambda region: FakeClient())
+        assert _radar_feed_stations() == {"KAAA", "KBBB"}, "both pages collected"
+
+    def test_overture_live_sample_reports_sources(self, monkeypatch):
+        """_overture_live_sample returns (row_count, has_sources_column)."""
+        import overturemaps.core as core
+
+        from earthlens.cli.validate import _overture_live_sample
+
+        class FakeFrame:
+            columns = ["id", "sources"]
+
+            def __len__(self):
+                return 2
+
+        monkeypatch.setattr(core, "geodataframe", lambda t, bbox: FakeFrame())
+        rows, has_sources = _overture_live_sample("building")
+        assert rows == 2 and has_sources is True, "rows + sources column reported"
+
+
+class TestLiveValidatorBranches:
+    """Branch coverage for the live validators using fake catalogs."""
+
+    def test_live_ghsl_reports_url_error(self, monkeypatch):
+        """A ghsl_url failure is reported as an issue rather than raised."""
+        import earthlens.ghsl._helpers as helpers
+
+        def boom(*a, **kw):
+            raise RuntimeError("bad url")
+
+        monkeypatch.setattr(helpers, "ghsl_url", boom)
+        result = validate_one(_info("ghsl"), live=True)
+        assert result.status == "ok", "errors captured, not raised"
+
+    def test_live_nwp_skips_non_direct_https(self, monkeypatch):
+        """Non-direct-https models are skipped by the nwp live check."""
+        from earthlens.cli.validate import _live_nwp
+
+        catalog = SimpleNamespace(
+            datasets={"h": SimpleNamespace(backend="herbie", cycles_utc=[0])}
+        )
+        checked, issues = _live_nwp(catalog)
+        assert checked == 0 and issues == [], "herbie model skipped"
+
+    def test_live_ecmwf_reports_fetch_failure(self):
+        """A dataset whose constraints fetch raises is reported, not raised."""
+        from earthlens.cli.validate import _live_ecmwf
+
+        def boom(key):
+            raise RuntimeError("offline")
+
+        catalog = SimpleNamespace(datasets={"d": object()}, minimal_valid_request=boom)
+        checked, issues = _live_ecmwf(catalog)
+        assert any("constraints fetch failed" in i for i in issues), "failure reported"
+
+    def test_sentinel_hub_missing_evalscript_file(self, monkeypatch):
+        """A recipe whose evalscript file is missing is flagged."""
+        from earthlens.cli.validate import _validate_sentinel_hub
+
+        def missing(name):
+            raise FileNotFoundError(f"{name} not found")
+
+        monkeypatch.setattr("earthlens.sentinel_hub.read_evalscript", missing)
+        catalog = SimpleNamespace(
+            recipes={"r": SimpleNamespace(evalscript="gone.js", kind="render")}
+        )
+        _checked, issues = _validate_sentinel_hub(catalog)
+        assert any("gone.js" in i for i in issues), "missing file flagged"
+
+    def test_live_s3_reports_bucket_error(self, monkeypatch):
+        """A bucket whose listing raises is reported as drift, not raised."""
+
+        def boom(b, p, r):
+            raise RuntimeError("403")
+
+        monkeypatch.setattr(validate_mod, "_s3_live_keys", boom)
+        result = validate_one(_info("s3"), live=True)
+        assert any("bucket error" in i for i in result.issues), "error captured"
+
+    def test_live_overture_reports_fetch_failure(self, monkeypatch):
+        """An Overture type whose fetch raises is reported, not raised."""
+
+        def boom(t):
+            raise RuntimeError("network")
+
+        monkeypatch.setattr(validate_mod, "_overture_live_sample", boom)
+        result = validate_one(_info("overture"), live=True)
+        assert any("fetch failed" in i for i in result.issues), "fetch failure reported"
+
+    def test_nwp_latest_cycle_none_without_cycles(self):
+        """_nwp_latest_cycle returns None for a model with no cycle hours."""
+        from earthlens.cli.validate import _nwp_latest_cycle
+
+        assert _nwp_latest_cycle(SimpleNamespace(cycles_utc=[])) is None
+
+    def test_live_nwp_skips_model_without_url(self):
+        """A direct-https model with no url_template/bands is skipped, not flagged."""
+        from earthlens.cli.validate import _live_nwp
+
+        catalog = SimpleNamespace(
+            datasets={
+                "x": SimpleNamespace(
+                    backend="direct-https", cycles_utc=[0], url_template="", bands={}
+                )
+            }
+        )
+        checked, issues = _live_nwp(catalog)
+        assert checked == 0 and issues == [], "incomplete model skipped"

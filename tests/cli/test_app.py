@@ -63,3 +63,10 @@ class TestApp:
         )
         assert result.returncode == 0, f"module entrypoint failed: {result.stderr}"
         assert "Usage" in result.stdout, "usage banner printed"
+
+    def test_dunder_main_module_imports_main(self):
+        """`earthlens.cli.__main__` re-exports the same entrypoint as the app."""
+        import importlib
+
+        dunder_main = importlib.import_module("earthlens.cli.__main__")
+        assert dunder_main.main is main, "__main__ wires the app's main()"

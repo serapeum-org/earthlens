@@ -627,3 +627,51 @@ class TestFacets:
             app, ["datasets", "facets", "--values", "bogus", "-p", "s3"]
         )
         assert result.exit_code == 2, "unknown facet -> exit 2"
+
+    def test_summary_json(self):
+        """The facet summary honours --json with a distinct-values object list."""
+        result = runner.invoke(app, ["datasets", "facets", "-p", "s3", "--json"])
+        payload = json.loads(result.output)
+        assert any(item["facet"] == "provider" for item in payload), "facet listed"
+        assert all("distinct_values" in item for item in payload), "counts carried"
+
+
+class TestCommandBranches:
+    """Coverage for shared command-branch edges (selectors + JSON/strict)."""
+
+    def test_provider_split_empty_tokens_scans_all(self):
+        """A -p value of only separators resolves to no restriction (scan all)."""
+        result = runner.invoke(app, ["datasets", "where", "era5", "-p", ","])
+        assert result.exit_code in (0, 1), "empty selector tolerated, not a usage error"
+
+    def test_refresh_empty_selector_rejected(self):
+        """A blank refresh selector is a usage error."""
+        result = runner.invoke(app, ["datasets", "refresh", " "])
+        assert result.exit_code == 2, "blank selector -> exit 2"
+
+    def test_curate_requires_single_provider(self):
+        """curate with a comma-list of providers is a usage error."""
+        result = runner.invoke(app, ["datasets", "curate", "hdx,gee", "x"])
+        assert result.exit_code == 2, "multiple providers -> exit 2"
+
+    def test_validate_json_output(self):
+        """validate honours --json with a per-provider result array."""
+        result = runner.invoke(app, ["datasets", "validate", "nwp", "--json"])
+        payload = json.loads(result.output)
+        assert payload[0]["provider"] == "nwp", "result carries the provider"
+
+    def test_validate_surfaces_issues_and_strict_exits(self, monkeypatch):
+        """validate prints each issue and --strict exits non-zero when any fail."""
+        from earthlens.cli.validate import ValidateResult
+
+        monkeypatch.setattr(
+            datasets_mod,
+            "validate_one",
+            lambda info, live=False: ValidateResult(
+                info.provider, "ok", checked=1, issues=["bad thing"]
+            ),
+        )
+        shown = runner.invoke(app, ["datasets", "validate", "nwp"])
+        assert "bad thing" in shown.output, "issue surfaced"
+        strict = runner.invoke(app, ["datasets", "validate", "nwp", "--strict"])
+        assert strict.exit_code == 1, "issues under --strict -> exit 1"

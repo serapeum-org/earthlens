@@ -56,6 +56,13 @@ class TestProbeHelpers:
         info = next(b for b in list_backends() if b.provider == "chc")
         assert _dataset_count(info) > 0, "chc catalog is non-empty"
 
+    def test_dataset_count_none_when_catalog_unloadable(self):
+        """A backend whose catalog cannot load reports None (best-effort)."""
+        bogus = BackendInfo(
+            provider="bogus", module="earthlens.bogus", extra="", aliases=()
+        )
+        assert _dataset_count(bogus) is None, "unloadable catalog -> None"
+
     def test_sdk_available_for_sdk_free_backend(self):
         """An SDK-free backend resolves its class without error."""
         info = next(b for b in list_backends() if b.provider == "chc")

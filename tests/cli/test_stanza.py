@@ -299,3 +299,75 @@ class TestStanzaResult:
     def test_to_yaml_empty_when_no_row(self):
         """An unsupported/error result renders no YAML."""
         assert StanzaResult("chc", "x", "x", "unsupported").to_yaml() == ""
+
+
+class TestInferOutputKind:
+    """Tests for the Earthdata output-kind heuristic."""
+
+    def test_geojson_format_is_vector(self):
+        """A geojson format maps to a vector output kind."""
+        from earthlens.cli.stanza import _infer_output_kind
+
+        assert _infer_output_kind("X", "geojson") == "vector", "geojson -> vector"
+
+    def test_csv_format_is_tabular(self):
+        """A csv format maps to a tabular output kind."""
+        from earthlens.cli.stanza import _infer_output_kind
+
+        assert _infer_output_kind("X", "csv") == "tabular", "csv -> tabular"
+
+    def test_vector_short_name_hint(self):
+        """A GEDI short name maps to vector even with no format hint."""
+        from earthlens.cli.stanza import _infer_output_kind
+
+        assert _infer_output_kind("GEDI02_A") == "vector", "GEDI -> vector"
+
+    def test_default_is_raster(self):
+        """An unhinted gridded product defaults to raster."""
+        from earthlens.cli.stanza import _infer_output_kind
+
+        assert _infer_output_kind("MOD11A1", "cog") == "raster", "default raster"
+
+
+class TestGeeLiveBands:
+    """Tests for _gee_live_bands (Earth Engine mocked)."""
+
+    def test_reads_bands_off_first_image(self, monkeypatch):
+        """An image-collection asset resolves its first image's band names."""
+        import sys
+        import types
+
+        import earthlens.gee.auth as auth_mod
+
+        fake_ee = types.ModuleType("ee")
+
+        class _Img:
+            def bandNames(self):
+                return self
+
+            def getInfo(self):
+                return ["B1", "B2"]
+
+        class _IC:
+            def first(self):
+                return _Img()
+
+        fake_ee.data = types.SimpleNamespace(
+            getAsset=lambda aid: {"type": "IMAGE_COLLECTION"}
+        )
+        fake_ee.Image = lambda x: _Img()
+        fake_ee.ImageCollection = lambda aid: _IC()
+        monkeypatch.setitem(sys.modules, "ee", fake_ee)
+
+        class FakeAuth:
+            def __init__(self, creds):
+                pass
+
+            def configure(self):
+                pass
+
+        monkeypatch.setattr(auth_mod, "EarthEngineAuth", FakeAuth)
+        monkeypatch.setattr(auth_mod, "EarthEngineCredentials", lambda: None)
+        ee_type, bands = stanza_mod._gee_live_bands("projects/x/y")
+        assert ee_type == "image_collection", "asset type lowercased"
+        assert sorted(bands) == ["B1", "B2"], "live band names read"
