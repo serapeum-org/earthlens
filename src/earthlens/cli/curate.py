@@ -383,7 +383,22 @@ def _infer_dtype(value: str | None) -> str:
 
 
 def _firms_csv_lines(code: str) -> list[str]:
-    """Return a tiny FIRMS area-CSV sample's lines (needs `FIRMS_MAP_KEY`)."""
+    """Return a tiny FIRMS area-CSV sample's lines (needs `FIRMS_MAP_KEY`).
+
+    The map key is carried in the request URL path, so a failed request is
+    re-raised with the key masked — it must never leak into a
+    `ProbeResult.detail` / `--json` output / CI log.
+
+    Args:
+        code: The FIRMS sensor code (e.g. `VIIRS_SNPP_NRT`).
+
+    Returns:
+        The sampled CSV body split into lines.
+
+    Raises:
+        RuntimeError: If the request fails; the message has the
+            `FIRMS_MAP_KEY` redacted.
+    """
     key = os.environ.get("FIRMS_MAP_KEY", "")
     url = f"https://firms.modaps.eosdis.nasa.gov/api/area/csv/{key}/{code}/world/1"
     try:
@@ -862,6 +877,21 @@ def _nwp_idx_url(models_dir: Any, model: Any, cycle: Any, step: int) -> str:
     Reads Herbie's own template file as data (via `runpy`) rather than
     importing `herbie` (whose package init pulls the `cfgrib`/`eccodes`
     stack), then evaluates it against a stub to recover the AWS/NOMADS URL.
+    Because `runpy.run_path` executes the named file, the catalog-supplied
+    `model_family` is validated to a bare identifier first so it can only
+    name a file inside herbie's installed `models/` dir.
+
+    Args:
+        models_dir: The installed `herbie/models` template directory.
+        model: The curated NWP model record (uses `model_family` / `product`).
+        cycle: The model run datetime to format into the URL.
+        step: The forecast step (hours) to format into the URL.
+
+    Returns:
+        The `.idx` URL for the requested cycle / step.
+
+    Raises:
+        ValueError: If `model_family` is not a bare `[A-Za-z0-9_]+` identifier.
     """
     import runpy
 

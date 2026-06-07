@@ -150,6 +150,24 @@ def _redact(text: str, secret: str) -> str:
 
     Returns:
         `text` with every occurrence of `secret` replaced by `***`.
+
+    Examples:
+        - A key embedded in a URL is masked:
+
+            ```python
+            >>> from earthlens.cli.refresh import _redact
+            >>> _redact("for url: https://x/csv/SEKRET/all", "SEKRET")
+            'for url: https://x/csv/***/all'
+
+            ```
+        - An empty secret leaves the text untouched:
+
+            ```python
+            >>> from earthlens.cli.refresh import _redact
+            >>> _redact("nothing to hide", "")
+            'nothing to hide'
+
+            ```
     """
     return text.replace(secret, "***") if secret else text
 
@@ -254,10 +272,12 @@ def _replace_index_block(path: Path, block_key: str, payload: Any) -> None:
 
     Rewrites the `{block_key}:` block (from its key line up to the next
     column-zero key, or end of file) with `payload`, leaving every other
-    block — and the header comments above it — byte-for-byte intact. This
-    is what lets a provider whose `_index.yaml` holds more than one block
+    block byte-for-byte intact — including the header comments above the
+    block and any comment / blank lines that sit immediately above the next
+    block (those belong to *it* and are preserved, not swallowed). This is
+    what lets a provider whose `_index.yaml` holds more than one block
     (e.g. openEO's `available_collections:` *and* `available_processes:`)
-    be rewritten without disturbing the sibling block.
+    be rewritten without disturbing the sibling block or its comments.
 
     Args:
         path: The YAML index file to rewrite.
@@ -882,13 +902,16 @@ def _radar_station_rows(text: str) -> dict[str, dict[str, Any]]:
     The file is a fixed-width table: a header row, a row of dash runs
     marking each column's span, then one row per site. Keeps the four-letter
     alphabetic ICAO sites with in-range coordinates — the shape of the
-    catalog's `stations:` block.
+    catalog's `stations:` block. Returns an empty mapping (rather than
+    raising) when the table is too short or its header lacks any of the
+    required `ICAO` / `NAME` / `LAT` / `LON` columns.
 
     Args:
         text: The full `nexrad-stations.txt` body.
 
     Returns:
-        Mapping of ICAO id to `{name, latitude, longitude, state}`, sorted.
+        Mapping of ICAO id to `{name, latitude, longitude, state}`, sorted
+        (`state` is `""` when the table carries no `ST` column).
     """
     lines = text.splitlines()
     if len(lines) < 3:
@@ -981,13 +1004,19 @@ def _firms_grouped(catalog: Any) -> dict[str, list[str]]:
     Reads the `FIRMS_MAP_KEY` from the environment (without it the request
     fails and `refresh_one` reports an `"error"`), then parses the
     `data_id` column, dropping the burned-area products the catalog
-    deliberately excludes.
+    deliberately excludes. The key is carried in the request URL path, so a
+    failed fetch is re-raised with the key masked (via :func:`_redact`) — it
+    must never reach the surfaced `detail`.
 
     Args:
         catalog: The loaded FIRMS `Catalog` (unused; the endpoint is fixed).
 
     Returns:
         A single-group mapping `{"firms": [sorted sensor ids]}`.
+
+    Raises:
+        RuntimeError: If the data_availability fetch fails; the message has
+            the `FIRMS_MAP_KEY` redacted.
     """
     key = os.environ.get("FIRMS_MAP_KEY", "")
     try:
@@ -1696,6 +1725,9 @@ def refresh_one(info: BackendInfo, write: bool = False) -> RefreshOutcome:
         info: The backend to refresh.
         write: When `True`, rewrite the bundled `available_*` index from the
             live fetch (providers without a writer report it in `detail`).
+            As a seatbelt against a transient outage blanking a populated
+            index, a write whose live fetch returned **no ids** is refused
+            (the skip is reported in `detail`, not treated as an error).
 
     Returns:
         The :class:`RefreshOutcome` for `info`.
