@@ -26,11 +26,12 @@ Subcommands:
 * ``minimal-stanza <id> ...`` — synthesise a placeholder stanza
   (empty bands) for asset ids the STAC walker can't reach, mainly
   community ``projects/...`` paths.
-* ``compact`` — read raw ``refresh --with-bands`` output on stdin and
-  write the catalog's terser style on stdout (picks
-  ``default_reducer`` from asset-id keywords, repairs truncated
-  quotes, drops ``# TODO:`` comments, normalises line endings, quotes
-  numeric / YAML-bool band names).
+
+The former standalone ``compact`` subcommand (a stdin -> stdout
+post-processor for raw ``refresh --with-bands`` output) was removed: the
+``earthlens datasets curate gee <id>`` CLI verb now emits already-compacted
+rows directly. The compaction logic survives as :func:`compact_text`, still
+used internally by ``add-ids``.
 
 Exits 0 on success, 1 on any HTTP / parse / EE-API error.
 Not part of the installed package.
@@ -67,6 +68,7 @@ _GLOBAL_BBOX = [-180, -90, 180, 90]
 # ---------------------------------------------------------------------------
 # refresh — STAC walk + _index.yaml rewrite + optional --with-bands stanzas
 # ---------------------------------------------------------------------------
+
 
 def categorise(ids: list[str]) -> list[tuple[str, list[str]]]:
     """Group asset ids by their provider (first path segment), sorted.
@@ -192,24 +194,34 @@ def stanza_for(asset_id: str) -> str:
         lines.append(f"    provider: {_yaml_str(providers[0].get('name', '') or '')}")
     lines.append(f"    ee_type: {ee_type}")
     if interval.get("interval") and interval.get("unit"):
-        lines.append(f"    cadence: {{ interval: {interval['interval']}, unit: {interval['unit']} }}")
+        lines.append(
+            f"    cadence: {{ interval: {interval['interval']}, unit: {interval['unit']} }}"
+        )
     if spatial_res is not None:
         lines.append(f"    spatial_resolution: {_num(spatial_res)}")
     lines.append("    extent:")
     start = (temporal[0] or "")[:10] if temporal and temporal[0] else "1970-01-01"
     lines.append(f'      start_date: "{start}"')
-    lines.append("      end_date: null            # TODO: confirm (null = continuously updated)")
+    lines.append(
+        "      end_date: null            # TODO: confirm (null = continuously updated)"
+    )
     if spatial_bbox and list(spatial_bbox) != _GLOBAL_BBOX:
         lines.append(f"      bbox: {list(spatial_bbox)}")
-    lines.append("    default_reducer: median     # TODO: verify (median for optical scenes, mean for rates/fields, mosaic for tiled/annual maps)")
+    lines.append(
+        "    default_reducer: median     # TODO: verify (median for optical scenes, mean for rates/fields, mosaic for tiled/annual maps)"
+    )
     if doc.get("gee:terms_of_use"):
-        lines.append(f"    terms: {_yaml_str(_first_line(doc['gee:terms_of_use']) or '')}")
+        lines.append(
+            f"    terms: {_yaml_str(_first_line(doc['gee:terms_of_use']) or '')}"
+        )
     if doc.get("gee:user_uploaded"):
         lines.append("    source: republished")
     lines.append("    bands:")
     for band in eo_bands:
         lines.append(f"      {band.get('name')}:")
-        lines.append(f"        description: {_yaml_str(_first_line(band.get('description')) or band.get('name', ''))}")
+        lines.append(
+            f"        description: {_yaml_str(_first_line(band.get('description')) or band.get('name', ''))}"
+        )
         if band.get("gee:units"):
             lines.append(f"        units: {_yaml_str(band['gee:units'])}")
         if band.get("gee:scale") is not None:
@@ -238,7 +250,9 @@ def _yaml_str(value) -> str:
     dumping a top-level scalar.
     """
     text = str(value).strip()
-    return yaml.safe_dump(text, default_flow_style=False, allow_unicode=True).split("\n", 1)[0]
+    return yaml.safe_dump(text, default_flow_style=False, allow_unicode=True).split(
+        "\n", 1
+    )[0]
 
 
 def _num(value) -> str:
@@ -269,7 +283,9 @@ def _cmd_refresh(args: argparse.Namespace) -> int:
 
     if args.with_bands:
         for asset_id in args.with_bands:
-            print(f"\n# ---- paste under `datasets:` ----\n{stanza_for(asset_id)}", end="")
+            print(
+                f"\n# ---- paste under `datasets:` ----\n{stanza_for(asset_id)}", end=""
+            )
     return 0
 
 
@@ -279,10 +295,34 @@ def _cmd_refresh(args: argparse.Namespace) -> int:
 
 _REDUCER_RULES: list[tuple[re.Pattern[str], str]] = [
     (re.compile(r"CHIRP|GPM|IMERG|PERSIANN|GSMaP|TRMM|precip|rainfall", re.I), "mean"),
-    (re.compile(r"CHIRTS|TEMP|temperature|LST|TMIN|TMAX|GRIDMET|DAYMET|PRISM|MACAv2|GDDP|TerraClimate|MERRA|GLDAS|FLDAS|NLDAS|GFS|CFS|ERA5|RTMA|HRRR|NCEP|reanalysis|FLUX|RAD|radiation|SMAP|SPL3|SPL4|soil_moist|moist|GRACE|water_storage|TWS|drought|PDSI|SPI|SPEI|HEAT_FLUX|GRIDSAT|PATMOS|SST_PATHFINDER|SST_WHOI|GCOM-C", re.I), "mean"),
-    (re.compile(r"NLCD|landcover|land_cover|forest_age|forest_change|hansen|primary|landform|topo|mTPI|CHILI|GIMP|DEM|GMTED|SRTM|NASADEM|TOPO|ETOPO|GTOPO|NAIP|GHSL|BUILT|SMOD|POP|population|WorldPop|GFSAD|EUCROPMAP|CORINE|WorldCover|CGLS|SLGA|SoilGrids|FROM-GLC|GAIA|fnf|FNF|NALCMS|RCMAP|GFCC|TCC|TC_v|GEDI04_B|landscape|reef|FireCCI|MCD64|MOD14|MYD14|burned|biomass|WSF|GFC2020|EVT|GHS|GRIDDED|forest|ALOS_landform|landforms|GIMP", re.I), "mosaic"),
-    (re.compile(r"S2$|S2/|Sentinel-2|HARMONIZED|Landsat|MOD09|MYD09|MOD13|MYD13|MOD43|MYD43|MCD43|MCD19|MCD18|HLS|MOD15|MYD15|VNP09|VNP13|MODIS|surface[_ ]reflectance|TOA|reflectance|optical|MSI|HYPERION|AVHRR/SR|AVHRR/NDVI|AVHRR_PHENOLOGY|AVNIR|VIIRS|GOES|ASTER|MAIAC|BRDF|albedo", re.I), "median"),
-    (re.compile(r"S5P|NO2|/CO/|/CO_|HCHO|SO2|/O3|CH4|aerosol|AER_AI|cloud|atmosphere|MOD08|MYD08|atmos|CAMS|methane|MethaneAIR|sea_surface|SST|salinity|salin|ocean|HYCOM|GLOBathy|chla|CHLA|chlorophyll|Rrs|RRS|biomass_carbon|forest_carbon|GEDI|MOD17|MYD17|MOD16|MYD16|MOD15|MYD15|LAI|FPAR|EVI|NDVI|GPP|NPP|NEE|/ET/|evapotrans|productivity|vegetation_index|gridded|MARINE", re.I), "mean"),
+    (
+        re.compile(
+            r"CHIRTS|TEMP|temperature|LST|TMIN|TMAX|GRIDMET|DAYMET|PRISM|MACAv2|GDDP|TerraClimate|MERRA|GLDAS|FLDAS|NLDAS|GFS|CFS|ERA5|RTMA|HRRR|NCEP|reanalysis|FLUX|RAD|radiation|SMAP|SPL3|SPL4|soil_moist|moist|GRACE|water_storage|TWS|drought|PDSI|SPI|SPEI|HEAT_FLUX|GRIDSAT|PATMOS|SST_PATHFINDER|SST_WHOI|GCOM-C",
+            re.I,
+        ),
+        "mean",
+    ),
+    (
+        re.compile(
+            r"NLCD|landcover|land_cover|forest_age|forest_change|hansen|primary|landform|topo|mTPI|CHILI|GIMP|DEM|GMTED|SRTM|NASADEM|TOPO|ETOPO|GTOPO|NAIP|GHSL|BUILT|SMOD|POP|population|WorldPop|GFSAD|EUCROPMAP|CORINE|WorldCover|CGLS|SLGA|SoilGrids|FROM-GLC|GAIA|fnf|FNF|NALCMS|RCMAP|GFCC|TCC|TC_v|GEDI04_B|landscape|reef|FireCCI|MCD64|MOD14|MYD14|burned|biomass|WSF|GFC2020|EVT|GHS|GRIDDED|forest|ALOS_landform|landforms|GIMP",
+            re.I,
+        ),
+        "mosaic",
+    ),
+    (
+        re.compile(
+            r"S2$|S2/|Sentinel-2|HARMONIZED|Landsat|MOD09|MYD09|MOD13|MYD13|MOD43|MYD43|MCD43|MCD19|MCD18|HLS|MOD15|MYD15|VNP09|VNP13|MODIS|surface[_ ]reflectance|TOA|reflectance|optical|MSI|HYPERION|AVHRR/SR|AVHRR/NDVI|AVHRR_PHENOLOGY|AVNIR|VIIRS|GOES|ASTER|MAIAC|BRDF|albedo",
+            re.I,
+        ),
+        "median",
+    ),
+    (
+        re.compile(
+            r"S5P|NO2|/CO/|/CO_|HCHO|SO2|/O3|CH4|aerosol|AER_AI|cloud|atmosphere|MOD08|MYD08|atmos|CAMS|methane|MethaneAIR|sea_surface|SST|salinity|salin|ocean|HYCOM|GLOBathy|chla|CHLA|chlorophyll|Rrs|RRS|biomass_carbon|forest_carbon|GEDI|MOD17|MYD17|MOD16|MYD16|MOD15|MYD15|LAI|FPAR|EVI|NDVI|GPP|NPP|NEE|/ET/|evapotrans|productivity|vegetation_index|gridded|MARINE",
+            re.I,
+        ),
+        "mean",
+    ),
 ]
 
 
@@ -302,12 +342,28 @@ _HTML_ENTITY = {
 }
 
 _BOOL_BANDS = {
-    "y", "Y", "yes", "Yes", "YES",
-    "n", "N", "no", "No", "NO",
-    "true", "True", "TRUE",
-    "false", "False", "FALSE",
-    "on", "On", "ON",
-    "off", "Off", "OFF",
+    "y",
+    "Y",
+    "yes",
+    "Yes",
+    "YES",
+    "n",
+    "N",
+    "no",
+    "No",
+    "NO",
+    "true",
+    "True",
+    "TRUE",
+    "false",
+    "False",
+    "FALSE",
+    "on",
+    "On",
+    "ON",
+    "off",
+    "Off",
+    "OFF",
 }
 
 
@@ -396,34 +452,65 @@ def compact_text(raw_text: str) -> str:
     return re.sub(r"\n{3,}", "\n\n", text).rstrip("\n") + "\n"
 
 
-def _cmd_compact(args: argparse.Namespace) -> int:
-    sys.stdout.write(compact_text(sys.stdin.read()))
-    return 0
-
-
 # ---------------------------------------------------------------------------
 # minimal-stanza — synthesise empty-bands placeholder for ids the STAC misses
 # ---------------------------------------------------------------------------
 
 _PROJECT_PROVIDER: dict[str, tuple[str, str]] = {
-    "edf-methanesat-ee": ("Environmental Defense Fund (EDF) — MethaneSAT", "Free for use under EDF MethaneSAT terms."),
-    "ee-kbas-in-gee": ("Key Biodiversity Areas (KBAs) republication", "Free for use under KBAs terms."),
-    "ee-pkurelab": ("Peking University Remote Sensing Lab (PKU REL)", "Free for use with citation (PKU REL)."),
-    "forestdatapartnership": ("Forest Data Partnership", "Free for use under the Forest Data Partnership terms."),
-    "gcp-public-data-weathernext": ("Google WeatherNext / GCP Public Data", "Free for use under Google Cloud public-data terms."),
-    "gcpm041u-lemur": ("Lemur Forest Inventory (gcpm041u)", "Free for use with citation."),
-    "global-pasture-watch": ("Global Pasture Watch", "Free for use (Global Pasture Watch)."),
-    "global-precipitation-nowcast": ("Google Global Precipitation Nowcast", "Free for use under Google Cloud public-data terms."),
-    "gtac-data-publish": ("USDA Forest Service GTAC", "Public domain (USDA Forest Service)."),
+    "edf-methanesat-ee": (
+        "Environmental Defense Fund (EDF) — MethaneSAT",
+        "Free for use under EDF MethaneSAT terms.",
+    ),
+    "ee-kbas-in-gee": (
+        "Key Biodiversity Areas (KBAs) republication",
+        "Free for use under KBAs terms.",
+    ),
+    "ee-pkurelab": (
+        "Peking University Remote Sensing Lab (PKU REL)",
+        "Free for use with citation (PKU REL).",
+    ),
+    "forestdatapartnership": (
+        "Forest Data Partnership",
+        "Free for use under the Forest Data Partnership terms.",
+    ),
+    "gcp-public-data-weathernext": (
+        "Google WeatherNext / GCP Public Data",
+        "Free for use under Google Cloud public-data terms.",
+    ),
+    "gcpm041u-lemur": (
+        "Lemur Forest Inventory (gcpm041u)",
+        "Free for use with citation.",
+    ),
+    "global-pasture-watch": (
+        "Global Pasture Watch",
+        "Free for use (Global Pasture Watch).",
+    ),
+    "global-precipitation-nowcast": (
+        "Google Global Precipitation Nowcast",
+        "Free for use under Google Cloud public-data terms.",
+    ),
+    "gtac-data-publish": (
+        "USDA Forest Service GTAC",
+        "Public domain (USDA Forest Service).",
+    ),
     "landandcarbon": ("WRI Land and Carbon", "CC-BY-4.0."),
     "malariaatlasproject": ("Oxford Malaria Atlas Project", "CC-BY-NC-SA-4.0."),
     "mapbiomas-public": ("MapBiomas", "CC-BY-SA-4.0."),
     "nature-trace": ("Nature Trace", "Free for use (Nature Trace)."),
-    "neon-prod-earthengine": ("National Ecological Observatory Network (NEON)", "Public domain (NEON Science)."),
+    "neon-prod-earthengine": (
+        "National Ecological Observatory Network (NEON)",
+        "Public domain (NEON Science).",
+    ),
     "ngis-cat": ("Geoscience Australia / DEA (NGIS catalogue)", "CC-BY-4.0."),
     "openet": ("OpenET, Inc.", "CC-BY-4.0."),
-    "planet-nicfi": ("Planet Labs (NICFI programme)", "Free for non-commercial use under Planet NICFI terms."),
-    "pml_evapotranspiration": ("PML_V2 Evapotranspiration team", "Free for use with citation (PML_V2)."),
+    "planet-nicfi": (
+        "Planet Labs (NICFI programme)",
+        "Free for non-commercial use under Planet NICFI terms.",
+    ),
+    "pml_evapotranspiration": (
+        "PML_V2 Evapotranspiration team",
+        "Free for use with citation (PML_V2).",
+    ),
     "sat-io": ("Sat-IO open-datasets republication", "Varies — see source."),
 }
 
@@ -472,6 +559,7 @@ def _cmd_minimal_stanza(args: argparse.Namespace) -> int:
 # add-ids — fetch --with-bands, compact, append to the right category file
 # ---------------------------------------------------------------------------
 
+
 def _cmd_add_ids(args: argparse.Namespace) -> int:
     sys.path.insert(0, "src")
     from earthlens.gee import Catalog
@@ -509,7 +597,9 @@ def _cmd_add_ids(args: argparse.Namespace) -> int:
                 f"# Created by refresh_gee_catalog.py add-ids. Edit in place.\n\n"
                 f"datasets:\n"
             ).encode("utf-8")
-        target.write_bytes(existing_bytes + b"".join(s.encode("utf-8") for s in stanzas))
+        target.write_bytes(
+            existing_bytes + b"".join(s.encode("utf-8") for s in stanzas)
+        )
 
     clear_catalog_cache()
     cat2 = Catalog()
@@ -530,9 +620,28 @@ _EE_TYPE_MAP = {
 }
 
 _BOOL_BAND_NAMES = {
-    "y", "Y", "yes", "Yes", "YES", "n", "N", "no", "No", "NO",
-    "true", "True", "TRUE", "false", "False", "FALSE",
-    "on", "On", "ON", "off", "Off", "OFF",
+    "y",
+    "Y",
+    "yes",
+    "Yes",
+    "YES",
+    "n",
+    "N",
+    "no",
+    "No",
+    "NO",
+    "true",
+    "True",
+    "TRUE",
+    "false",
+    "False",
+    "FALSE",
+    "on",
+    "On",
+    "ON",
+    "off",
+    "Off",
+    "OFF",
 }
 
 
@@ -549,7 +658,9 @@ def _looks_like_placeholder_title(title: str | None) -> bool:
     return "(community-published catalog reference)" in title or title.strip() == ""
 
 
-def _get_band_info(asset_id: str, asset: dict[str, Any], ee_mod) -> list[dict[str, Any]]:
+def _get_band_info(
+    asset_id: str, asset: dict[str, Any], ee_mod
+) -> list[dict[str, Any]]:
     bands = asset.get("bands") or []
     if bands:
         return list(bands)
@@ -592,18 +703,36 @@ def _hydrate_one(asset_id: str, ee_mod) -> dict[str, Any] | None:
         print(f"  ! {asset_id}: getAsset failed: {exc}")
         return None
     ee_type = _EE_TYPE_MAP.get(asset.get("type", "").upper(), "image_collection")
-    bands = _get_band_info(asset_id, asset, ee_mod) if ee_type in {"image", "image_collection"} else []
+    bands = (
+        _get_band_info(asset_id, asset, ee_mod)
+        if ee_type in {"image", "image_collection"}
+        else []
+    )
     sd, ed = _date_window(asset)
     raw_title = _properties_text(asset, "title", "system:asset_title", "system:title")
     if not raw_title:
-        return {"ee_type": ee_type, "title": None, "start_date": sd, "end_date": ed, "bands": bands}
+        return {
+            "ee_type": ee_type,
+            "title": None,
+            "start_date": sd,
+            "end_date": ed,
+            "bands": bands,
+        }
     cleaned_title = _strip_html(raw_title)
     if len(cleaned_title) > 180:
         cleaned_title = cleaned_title[:180].rstrip()
-    return {"ee_type": ee_type, "title": cleaned_title or None, "start_date": sd, "end_date": ed, "bands": bands}
+    return {
+        "ee_type": ee_type,
+        "title": cleaned_title or None,
+        "start_date": sd,
+        "end_date": ed,
+        "bands": bands,
+    }
 
 
-def _rewrite_stanza(text: str, asset_id: str, payload: dict[str, Any], existing_title: str | None) -> str:
+def _rewrite_stanza(
+    text: str, asset_id: str, payload: dict[str, Any], existing_title: str | None
+) -> str:
     """Replace the placeholder bands / ee_type / dates / title for `asset_id`."""
     key = re.escape(asset_id)
     pattern = re.compile(rf"(?ms)^  {key}:\n(.*?)(?=^  [A-Za-z0-9/_.-]+:|\Z)")
@@ -615,7 +744,9 @@ def _rewrite_stanza(text: str, asset_id: str, payload: dict[str, Any], existing_
     new_block = block
 
     if payload["ee_type"]:
-        new_block = re.sub(r"(    ee_type: )[^\n]+", rf"\1{payload['ee_type']}", new_block, count=1)
+        new_block = re.sub(
+            r"(    ee_type: )[^\n]+", rf"\1{payload['ee_type']}", new_block, count=1
+        )
 
     if payload["title"] and _looks_like_placeholder_title(existing_title):
         title_yaml = payload["title"].replace("'", "''")
@@ -677,7 +808,7 @@ def _rewrite_stanza(text: str, asset_id: str, payload: dict[str, Any], existing_
             )
         new_block = replaced
 
-    return text[: m.start()] + f"  {asset_id}:\n" + new_block + text[m.end():]
+    return text[: m.start()] + f"  {asset_id}:\n" + new_block + text[m.end() :]
 
 
 class _FileCache:
@@ -782,32 +913,63 @@ def _file_for_existing_asset(asset_id: str) -> Path:
 # CLI dispatch
 # ---------------------------------------------------------------------------
 
+
 def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    parser = argparse.ArgumentParser(
+        description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
+    )
     sub = parser.add_subparsers(dest="cmd", required=True)
 
-    p_refresh = sub.add_parser("refresh", help="STAC walk + rewrite _index.yaml (+ optional --with-bands stanzas)")
-    p_refresh.add_argument("--catalog-index", type=Path, default=CATALOG_INDEX_PATH, help="path to catalog/_index.yaml")
-    p_refresh.add_argument("--dry-run", action="store_true", help="print the new available_datasets: block instead of writing")
-    p_refresh.add_argument("--with-bands", nargs="+", metavar="ASSET_ID", help="also print a ready-to-paste datasets: stanza for each id")
-    p_refresh.add_argument("-v", "--verbose", action="store_true", help="print STAC-walk progress")
+    p_refresh = sub.add_parser(
+        "refresh",
+        help="STAC walk + rewrite _index.yaml (+ optional --with-bands stanzas)",
+    )
+    p_refresh.add_argument(
+        "--catalog-index",
+        type=Path,
+        default=CATALOG_INDEX_PATH,
+        help="path to catalog/_index.yaml",
+    )
+    p_refresh.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="print the new available_datasets: block instead of writing",
+    )
+    p_refresh.add_argument(
+        "--with-bands",
+        nargs="+",
+        metavar="ASSET_ID",
+        help="also print a ready-to-paste datasets: stanza for each id",
+    )
+    p_refresh.add_argument(
+        "-v", "--verbose", action="store_true", help="print STAC-walk progress"
+    )
     p_refresh.set_defaults(func=_cmd_refresh)
 
-    p_add = sub.add_parser("add-ids", help="fetch + compact + append stanzas to the right per-category catalog file")
+    p_add = sub.add_parser(
+        "add-ids",
+        help="fetch + compact + append stanzas to the right per-category catalog file",
+    )
     p_add.add_argument("asset_ids", nargs="+", metavar="ASSET_ID")
     p_add.set_defaults(func=_cmd_add_ids)
 
-    p_hyd = sub.add_parser("hydrate-live", help="fill empty-bands stanzas via live ee.data.getAsset")
-    p_hyd.add_argument("--limit", type=int, default=0, help="hydrate at most N assets (0 = no limit)")
-    p_hyd.add_argument("--save-every", type=int, default=25, help="save YAML every N assets")
+    p_hyd = sub.add_parser(
+        "hydrate-live", help="fill empty-bands stanzas via live ee.data.getAsset"
+    )
+    p_hyd.add_argument(
+        "--limit", type=int, default=0, help="hydrate at most N assets (0 = no limit)"
+    )
+    p_hyd.add_argument(
+        "--save-every", type=int, default=25, help="save YAML every N assets"
+    )
     p_hyd.set_defaults(func=_cmd_hydrate_live)
 
-    p_min = sub.add_parser("minimal-stanza", help="emit placeholder stanzas for asset ids the STAC walker can't reach")
+    p_min = sub.add_parser(
+        "minimal-stanza",
+        help="emit placeholder stanzas for asset ids the STAC walker can't reach",
+    )
     p_min.add_argument("asset_ids", nargs="+", metavar="ASSET_ID")
     p_min.set_defaults(func=_cmd_minimal_stanza)
-
-    p_cpt = sub.add_parser("compact", help="stdin -> stdout post-processor for raw `refresh --with-bands` output")
-    p_cpt.set_defaults(func=_cmd_compact)
 
     args = parser.parse_args(argv)
     return args.func(args)
