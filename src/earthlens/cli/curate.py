@@ -841,11 +841,13 @@ class _TemplateStub:
     """Minimal Herbie stand-in so a model template's f-strings resolve."""
 
     def __init__(self, date: Any, fxx: int, product: str) -> None:
+        """Capture the cycle date, forecast step, and product the template reads."""
         self.date = date
         self.fxx = fxx
         self.product = product
 
     def __getattr__(self, name: str) -> str:
+        """Resolve any attribute the template touches to an empty string."""
         return ""
 
 
@@ -1037,6 +1039,7 @@ def _ecmwf_deep_sample(dataset: str) -> dict[str, dict[str, Any]]:
     row = rows[0]
 
     def first(key: str, fallback: str) -> str:
+        """Return the first listed value for `key` in the row, else `fallback`."""
         value = row.get(key)
         return value[0] if isinstance(value, list) and value else fallback
 

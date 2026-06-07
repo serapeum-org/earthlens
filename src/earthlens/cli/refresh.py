@@ -293,6 +293,7 @@ def _index_writer(
     """
 
     def writer(info: BackendInfo, grouped_ids: dict[str, list[str]]) -> str:
+        """Rewrite `info`'s index block from the live ids; return the file path."""
         path = _index_path(info)
         payload = grouped_ids if grouped else _flatten(grouped_ids)
         _replace_index_block(path, block_key, payload)
@@ -874,6 +875,7 @@ def _radar_station_rows(text: str) -> dict[str, dict[str, Any]]:
         return {}
 
     def cell(row: str, name: str) -> str:
+        """Return the stripped value of the fixed-width `name` column in `row`."""
         start, end = columns[name]
         return row[start:end].strip()
 
@@ -1412,6 +1414,7 @@ def _curated_attr_ids(attr: str) -> Callable[[Any], list[str]]:
     """
 
     def resolver(catalog: Any) -> list[str]:
+        """Return the catalog's sorted, de-duplicated `attr` upstream ids."""
         return sorted(
             {
                 value

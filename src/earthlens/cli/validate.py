@@ -134,6 +134,7 @@ def _validate_overture(catalog: Any) -> tuple[int, list[str]]:
     """Each Overture theme needs types and a default_type drawn from them."""
 
     def check(key: str, record: Any) -> list[str]:
+        """Flag a theme missing types/default_type or whose default is unlisted."""
         issues = _require(key, record, ("types", "default_type"))
         types = getattr(record, "types", None) or []
         default = getattr(record, "default_type", None)
@@ -158,6 +159,7 @@ def _validate_radar(catalog: Any) -> tuple[int, list[str]]:
     """Each radar station needs a name and in-range latitude / longitude."""
 
     def check(key: str, record: Any) -> list[str]:
+        """Flag a station missing a name or with out-of-range coordinates."""
         issues = _require(key, record, ("name",))
         lat = getattr(record, "latitude", None)
         lon = getattr(record, "longitude", None)
@@ -229,6 +231,7 @@ def _validate_chc(catalog: Any) -> tuple[int, list[str]]:
     """Each CHC dataset needs FTP bases, a file pattern, and variables."""
 
     def check(key: str, record: Any) -> list[str]:
+        """Flag a dataset missing ftp_bases, variables, or a file pattern."""
         issues = _require(key, record, ("ftp_bases", "variables"))
         if not (
             getattr(record, "file_patterns", None)
@@ -255,6 +258,7 @@ def _validate_usgs_water(catalog: Any) -> tuple[int, list[str]]:
     from earthlens.usgs_water.backend import SERVICES
 
     def check(key: str, record: Any) -> list[str]:
+        """Flag a parameter declaring a service that is not a known service name."""
         return [
             f"{key}: unknown service {service!r}"
             for service in getattr(record, "services", None) or []
