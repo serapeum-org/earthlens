@@ -38,9 +38,9 @@ class TestYamlComments:
         assert "year/month/" in text
 
     def test_gefs_yaml_points_at_the_probe_tool(self):
-        """gefs.yaml's banner names the probe tool so a maintainer knows where to look."""
+        """gefs.yaml's banner names the probe verb so a maintainer knows where to look."""
         text = (CATALOG_PATH / "gefs.yaml").read_text(encoding="utf-8")
-        assert "probe_chirps_gefs.py" in text
+        assert "probe chc" in text
 
     def test_derived_yaml_explains_static_climatology(self):
         """derived.yaml retains the CHPclim static-climatology rationale post-M7 merge."""

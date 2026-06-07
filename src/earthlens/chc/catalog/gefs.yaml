@@ -6,7 +6,7 @@
 # (`chirps-gefs-v3-daily`, `chirps-gefs-v3-dekad-lead0`,
 # `chirps-gefs-v3-pentad-lead0`) previously lived here with
 # file_patterns marked "Provisional". A 2026-05-15 probe via
-# `tools/chc/probe_chirps_gefs.py` found that:
+# `earthlens datasets probe chc <key>` found that:
 #   * the v3-daily dir is partitioned as `year/month/`, not `year/`;
 #   * the v3-dekad-lead0 and v3-pentad-lead0 dirs each split into
 #     `anom/`, `data/`, and `zscore/` subdirs.

@@ -199,34 +199,47 @@ def _openeo_probe(catalog: Any, dataset: str) -> dict[str, dict[str, Any]]:
         dataset: The collection id.
 
     Returns:
-        Mapping of band name to `{common_name, dtype, gsd, unit}`. Falls back
-        to the `cube:dimensions` band names (empty schema) when the
-        collection carries no `eo:bands`.
+        Mapping of band name to `{common_name, dtype, gsd, unit}` (falling
+        back to the `cube:dimensions` band names when the collection carries
+        no `eo:bands`), plus one `dim:<axis>` row per non-band cube axis
+        carrying `{type, extent, step}` (the spatial bbox / temporal interval).
     """
     url = f"https://openeo.dataspace.copernicus.eu/openeo/1.2/collections/{dataset}"
     body = _get_json(url)
+    schema: dict[str, dict[str, Any]] = {}
     bands = _bands_from_summaries(body)
-    if bands:
-        return {
-            str(band["name"]): {
-                "common_name": band.get("common_name"),
-                "dtype": band.get("data_type"),
-                "gsd": band.get("gsd"),
-                "unit": band.get("unit"),
-            }
-            for band in bands
-            if band.get("name")
-        }
     dimensions = body.get("cube:dimensions", {}) or {}
-    names = next(
-        (
-            dim.get("values", [])
-            for dim in dimensions.values()
-            if dim.get("type") == "bands"
-        ),
-        [],
-    )
-    return {str(name): {} for name in names}
+    if bands:
+        for band in bands:
+            if band.get("name"):
+                schema[str(band["name"])] = {
+                    "common_name": band.get("common_name"),
+                    "dtype": band.get("data_type"),
+                    "gsd": band.get("gsd"),
+                    "unit": band.get("unit"),
+                }
+    else:
+        band_names = next(
+            (
+                dim.get("values", [])
+                for dim in dimensions.values()
+                if dim.get("type") == "bands"
+            ),
+            [],
+        )
+        schema = {str(name): {} for name in band_names}
+    # Enrich with the non-band cube axes so the spatial bbox + temporal
+    # interval + axis steps show up too (what the retired probe tool added
+    # over the plain band list).
+    for name, dim in dimensions.items():
+        if dim.get("type") == "bands":
+            continue
+        schema[f"dim:{name}"] = {
+            "type": dim.get("type") or dim.get("axis"),
+            "extent": dim.get("extent"),
+            "step": dim.get("step"),
+        }
+    return schema
 
 
 def _gee_probe(catalog: Any, dataset: str) -> dict[str, dict[str, Any]]:
@@ -269,7 +282,9 @@ def _sentinel_hub_probe(catalog: Any, dataset: str) -> dict[str, dict[str, Any]]
             name (e.g. `SENTINEL2_L2A`).
 
     Returns:
-        Mapping of band name to `{units, output_types}`.
+        Mapping of band name to `{units, output_types}`, plus — when
+        `dataset` is a curated key — a `collection:<key>` row carrying the
+        bound `sh_collection`, native `resolution`, and `cadence`.
 
     Raises:
         KeyError: If `dataset` resolves to no known `DataCollection`.
@@ -281,6 +296,12 @@ def _sentinel_hub_probe(catalog: Any, dataset: str) -> dict[str, dict[str, Any]]
     name = getattr(record, "sh_collection", None) or dataset
     collection = sentinelhub.DataCollection[name]
     schema: dict[str, dict[str, Any]] = {}
+    if record is not None:
+        schema[f"collection:{dataset}"] = {
+            "sh_collection": name,
+            "resolution": getattr(record, "resolution", None),
+            "cadence": getattr(record, "cadence", None),
+        }
     for band in getattr(collection, "bands", None) or []:
         units = getattr(band, "units", None) or ()
         types = getattr(band, "output_types", None) or ()
@@ -695,6 +716,42 @@ def _chc_sample_files(ftp_base: str, limit: int = 10) -> list[str]:
         return sorted(ftp.nlst())[:limit]
 
 
+def _suggest_pattern(filenames: list[str]) -> str:
+    """Infer a `{year}.{month}.{day}`-style template from a sample filename.
+
+    Ported from the retired `tools/chc/probe_chirps_gefs.py`: tags 4-digit
+    years, 3-digit day-of-year runs, then the first two dotted 2-digit
+    segments as month / day. A seed for the catalog `file_patterns` — the
+    maintainer eyeballs it against the listing and refines.
+
+    Args:
+        filenames: The sampled directory listing.
+
+    Returns:
+        The first filename transformed into a template, or `""` when empty.
+    """
+    if not filenames:
+        return ""
+    pattern = re.sub(r"\b(19|20)\d{2}\b", "{year}", filenames[0])
+    pattern = re.sub(r"(?<!\d)(\d{3})(?!\d)", "{doy}", pattern)
+    seen_month = False
+    out: list[str] = []
+    for piece in re.split(r"(\{year\})", pattern):
+        if piece == "{year}":
+            out.append(piece)
+            continue
+        new_piece = piece
+        if not seen_month:
+            new_piece, hits = re.subn(
+                r"(?<=\.)(\d{2})(?=\.|$)", "{month}", new_piece, count=1
+            )
+            seen_month = bool(hits)
+        if seen_month and "{day}" not in new_piece:
+            new_piece = re.sub(r"(?<=\.)(\d{2})(?=\.|$)", "{day}", new_piece, count=1)
+        out.append(new_piece)
+    return "".join(out)
+
+
 def _chc_probe(catalog: Any, dataset: str) -> dict[str, dict[str, Any]]:
     """Probe a CHC dataset's FTP directory for a sample of filenames.
 
@@ -703,7 +760,9 @@ def _chc_probe(catalog: Any, dataset: str) -> dict[str, dict[str, Any]]:
         dataset: A curated CHC dataset key.
 
     Returns:
-        Mapping of sample filename to `{}` (the seed for the file pattern).
+        Mapping of sample filename to `{}`, plus a `(suggested pattern)` row
+        carrying a `{pattern}` template inferred from the listing (the seed
+        for the catalog `file_patterns`).
 
     Raises:
         ValueError: If the dataset has no `ftp_bases`.
@@ -712,7 +771,12 @@ def _chc_probe(catalog: Any, dataset: str) -> dict[str, dict[str, Any]]:
     bases = list(getattr(record, "ftp_bases", {}).values()) if record else []
     if not bases:
         raise ValueError(f"no ftp_bases for {dataset!r}")
-    return {name: {} for name in _chc_sample_files(bases[0])}
+    files = _chc_sample_files(bases[0])
+    schema: dict[str, dict[str, Any]] = {name: {} for name in files}
+    pattern = _suggest_pattern(files)
+    if pattern:
+        schema["(suggested pattern)"] = {"pattern": pattern}
+    return schema
 
 
 def _tropycal_fields(basin: str, source: str) -> dict[str, dict[str, Any]]:

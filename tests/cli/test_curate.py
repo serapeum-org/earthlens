@@ -200,6 +200,12 @@ class TestSentinelHubProbe:
         assert "B04" in result.assets, "Sentinel-2 bands probed"
         assert result.assets["B04"]["units"], "band units recorded"
 
+    def test_curated_key_adds_collection_row(self):
+        """A curated key also surfaces a collection: row with sh_collection."""
+        result = probe_dataset(_info("sentinel_hub"), "sentinel-2-l2a")
+        row = result.assets.get("collection:sentinel-2-l2a")
+        assert row and row["sh_collection"], "collection summary row present"
+
 
 class TestOpeneoProbe:
     """Tests for the openEO band prober."""
@@ -222,6 +228,27 @@ class TestOpeneoProbe:
         result = probe_dataset(_info("openeo"), "SENTINEL2_L2A")
         assert result.status == "ok", "openeo probe ran"
         assert result.assets["B04"]["common_name"] == "red", "band parsed"
+
+    def test_surfaces_cube_dimensions(self, monkeypatch):
+        """Non-band cube axes appear as dim: rows carrying type + extent."""
+        from earthlens.cli import curate as curate_mod
+
+        monkeypatch.setattr(
+            curate_mod,
+            "_get_json",
+            lambda url, **kw: {
+                "summaries": {"eo:bands": [{"name": "B04"}]},
+                "cube:dimensions": {
+                    "t": {"type": "temporal", "extent": ["2015-01-01", None]},
+                    "bands": {"type": "bands", "values": ["B04"]},
+                },
+            },
+        )
+        result = probe_dataset(_info("openeo"), "SENTINEL2_L2A")
+        assert "B04" in result.assets, "band still listed"
+        assert result.assets["dim:t"]["type"] == "temporal", "temporal axis surfaced"
+        assert result.assets["dim:t"]["extent"] == ["2015-01-01", None], "extent kept"
+        assert "dim:bands" not in result.assets, "bands axis not duplicated"
 
 
 class TestGeeProbe:
@@ -367,6 +394,24 @@ class TestChcProbe:
         result = probe_dataset(_info("chc"), dataset)
         assert result.status == "ok", "chc probe ran"
         assert "a.tif" in result.assets, "sample filename listed"
+
+    def test_suggests_a_filename_pattern(self, monkeypatch):
+        """chc probe adds a (suggested pattern) row inferred from the listing."""
+        from earthlens.cli.adapter import load_catalog
+
+        monkeypatch.setattr(
+            curate_mod,
+            "_chc_sample_files",
+            lambda base, limit=10: ["chirps-v2.0.2009.01.01.tif"],
+        )
+        dataset = next(iter(load_catalog(_info("chc")).datasets))
+        result = probe_dataset(_info("chc"), dataset)
+        suggestion = result.assets.get("(suggested pattern)", {}).get("pattern", "")
+        assert suggestion == "chirps-v2.0.{year}.{month}.{day}.tif", suggestion
+
+    def test_suggest_pattern_empty_listing(self):
+        """The pattern suggester returns empty for an empty listing."""
+        assert curate_mod._suggest_pattern([]) == ""
 
 
 class TestTropycalProbe:

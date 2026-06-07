@@ -169,9 +169,54 @@ def _validate_radar(catalog: Any) -> tuple[int, list[str]]:
     return _lint(catalog, check)
 
 
+#: tropycal's basin universe and which sources serve each (no `jtwc` source;
+#: `both` is HURDAT NA+EP, `all` is IBTrACS global). Ported from the retired
+#: `tools/tropycal/audit_tropycal_catalog.py`.
+_SDK_BASIN_SOURCES: dict[str, list[str]] = {
+    "north_atlantic": ["ibtracs", "hurdat"],
+    "east_pacific": ["ibtracs", "hurdat"],
+    "both": ["hurdat"],
+    "west_pacific": ["ibtracs"],
+    "north_indian": ["ibtracs"],
+    "south_indian": ["ibtracs"],
+    "australia": ["ibtracs"],
+    "south_pacific": ["ibtracs"],
+    "south_atlantic": ["ibtracs"],
+    "all": ["ibtracs"],
+}
+
+
 def _validate_tropycal(catalog: Any) -> tuple[int, list[str]]:
-    """Each Tropycal basin needs at least one declared source."""
-    return _lint(catalog, lambda k, r: _require(k, r, ("sources",)))
+    """Each Tropycal basin needs a source, and must match the SDK universe.
+
+    Beyond the per-row `sources` requirement, this diffs the catalog against
+    tropycal's supported basin/source universe (the offline check the retired
+    `audit_tropycal_catalog.py` ran): a curated basin tropycal no longer
+    serves, a tropycal basin missing from the catalog, or a declared
+    `(basin, source)` pair tropycal does not support.
+
+    Args:
+        catalog: The loaded Tropycal `Catalog`.
+
+    Returns:
+        `(checked, issues)`.
+    """
+    checked, issues = _lint(catalog, lambda k, r: _require(k, r, ("sources",)))
+    catalog_basins = set(catalog.datasets)
+    sdk_basins = set(_SDK_BASIN_SOURCES)
+    issues += [
+        f"{code}: basin not in tropycal's supported universe"
+        for code in sorted(catalog_basins - sdk_basins)
+    ]
+    issues += [
+        f"{code}: tropycal basin missing from the catalog"
+        for code in sorted(sdk_basins - catalog_basins)
+    ]
+    for code in sorted(catalog_basins & sdk_basins):
+        declared = set(getattr(catalog.datasets[code], "sources", None) or [])
+        for bad in sorted(declared - set(_SDK_BASIN_SOURCES[code])):
+            issues.append(f"{code}: source {bad!r} not supported by tropycal")
+    return checked, issues
 
 
 def _validate_gdacs(catalog: Any) -> tuple[int, list[str]]:
@@ -438,6 +483,62 @@ def _live_openeo(catalog: Any) -> tuple[int, list[str]]:
     return len(recipes), issues
 
 
+def _radar_feed_stations(region: str = "us-east-1") -> set[str]:
+    """Return the station ids currently present in the NEXRAD chunk feed.
+
+    Lists the top-level `{STATION}/` prefixes in the unsigned
+    `unidata-nexrad-level2-chunks` bucket (the real-time feed
+    `earthlens.radar` fetches from). Ported from the retired
+    `tools/radar/audit_radar_catalog.py`.
+
+    Args:
+        region: AWS region of the bucket.
+
+    Returns:
+        The set of station-id prefixes currently in the feed.
+    """
+    from earthlens.radar.backend import BUCKET, _s3_client
+
+    client = _s3_client(region)
+    stations: set[str] = set()
+    token: str | None = None
+    while True:
+        kwargs: dict[str, Any] = {"Bucket": BUCKET, "Delimiter": "/"}
+        if token:
+            kwargs["ContinuationToken"] = token
+        response = client.list_objects_v2(**kwargs)
+        stations.update(
+            prefix["Prefix"].rstrip("/")
+            for prefix in response.get("CommonPrefixes", [])
+        )
+        token = response.get("NextContinuationToken")
+        if not response.get("IsTruncated"):
+            break
+    return stations
+
+
+def _live_radar(catalog: Any) -> tuple[int, list[str]]:
+    """Confirm the real-time NEXRAD chunk feed is reachable and lines up.
+
+    Flags a hard failure (feed served nothing → unreachable / outage) or an
+    id-format mismatch (the feed is non-empty but no catalogued station is in
+    it). Per-station idleness is expected — the feed is a rolling ~1-2 h
+    buffer — so it is not flagged.
+    """
+    catalogued = set(catalog.datasets)
+    feed = _radar_feed_stations()
+    if not feed:
+        return len(catalogued), [
+            "NEXRAD chunk feed served no stations (unreachable / outage?)"
+        ]
+    if not (catalogued & feed):
+        return len(catalogued), [
+            "no catalogued station is in the live feed "
+            "(id format may not match the feed prefixes)"
+        ]
+    return len(catalogued), []
+
+
 #: Provider id -> a live reachability validator (the `--live` half). May add
 #: a provider not in :data:`_VALIDATORS` (e.g. openeo is live-only).
 _LIVE_VALIDATORS: dict[str, Callable[[Any], tuple[int, list[str]]]] = {
@@ -445,6 +546,7 @@ _LIVE_VALIDATORS: dict[str, Callable[[Any], tuple[int, list[str]]]] = {
     "overture": _live_overture,
     "ghsl": _live_ghsl,
     "openeo": _live_openeo,
+    "radar": _live_radar,
 }
 
 
