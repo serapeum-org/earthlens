@@ -475,6 +475,48 @@ class TestDeepProbers:
         result = probe_dataset(_info("stac"), "sentinel-2-l2a", deep=True)
         assert result.status == "ok", "stac --deep fell back to the light prober"
 
+    def test_nwp_availability_direct_https_builds_url(self, monkeypatch):
+        """_nwp_availability HEADs the first band's URL for a direct-https model."""
+        import datetime as dt
+        import sys
+        import types
+
+        from earthlens.nwp.catalog import NWPModel
+
+        calls = {}
+
+        class _Resp:
+            status_code = 200
+
+        def fake_head(url, timeout=None, allow_redirects=None):
+            calls["url"] = url
+            return _Resp()
+
+        fake = types.ModuleType("requests")
+        fake.head = fake_head
+        monkeypatch.setitem(sys.modules, "requests", fake)
+        model = NWPModel(
+            provider="dwd-opendata",
+            backend="direct-https",
+            cycles_utc=[0],
+            url_template="https://x/{var_lc}/f{step:03d}_{var}.bz2",
+            bands={"temperature_2m": "T_2M"},
+        )
+        result = curate_mod._nwp_availability(model, dt.datetime(2024, 6, 1, 0), 0)
+        assert "HTTP 200" in result and calls["url"] == "https://x/t_2m/f000_T_2M.bz2"
+
+    def test_nwp_availability_herbie_unavailable(self, monkeypatch):
+        """_nwp_availability reports herbie missing rather than raising."""
+        import datetime as dt
+        import sys
+
+        from earthlens.nwp.catalog import NWPModel
+
+        monkeypatch.setitem(sys.modules, "herbie", None)
+        model = NWPModel(provider="noaa-nodd", model_family="gfs", backend="herbie")
+        result = curate_mod._nwp_availability(model, dt.datetime(2024, 6, 1, 0), 0)
+        assert "herbie unavailable" in result
+
     def test_nwp_deep_reports_live_availability(self, monkeypatch):
         """nwp --deep reports the model's live availability for a recent cycle."""
         from earthlens.cli.adapter import load_catalog
