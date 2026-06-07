@@ -21,6 +21,8 @@ from earthlens.stac.signers import (
     build_signer,
 )
 
+from .conftest import make_item
+
 _EARTHDATA_ENV = ("EARTHDATA_TOKEN", "EARTHDATA_PAT", "EARTHDATA_USERNAME", "EARTHDATA_PASSWORD")
 _CDSE_ENV = ("CDSE_USERNAME", "CDSE_PASSWORD")
 
@@ -61,20 +63,6 @@ def _patch_urlopen_actions(monkeypatch, actions):
 
     monkeypatch.setattr(urllib.request, "urlopen", _fake)
     return calls
-
-
-class _Asset:
-    """A STAC asset stand-in carrying just a mutable href."""
-
-    def __init__(self, href: str) -> None:
-        self.href = href
-
-
-class _Item:
-    """A STAC item stand-in exposing an assets mapping."""
-
-    def __init__(self, assets: dict) -> None:
-        self.assets = assets
 
 
 @pytest.mark.stac
@@ -193,13 +181,16 @@ class TestPlanetaryComputerSigner:
 
     def test_sign_item_rewrites_item_object(self):
         """sign_item rewrites each asset href on an Item with an assets mapping."""
-        asset = _Asset("https://example.com/a.tif")
-        assert PlanetaryComputerSigner().sign_item(_Item({"red": asset})) is None
-        assert asset.href == "https://example.com/a.tif"
+        item = make_item("a", "2024-01-05", {"red": "https://example.com/a.tif"})
+        assert PlanetaryComputerSigner().sign_item(item) is None
+        assert item.assets["red"].href == "https://example.com/a.tif"
 
     def test_sign_item_rewrites_item_collection(self):
         """sign_item iterates an ItemCollection (an iterable of Items)."""
-        items = [_Item({"b": _Asset("https://h/a.tif")}), _Item({"b": _Asset("https://h/b.tif")})]
+        items = [
+            make_item("a", "2024-01-05", {"b": "https://h/a.tif"}),
+            make_item("b", "2024-01-05", {"b": "https://h/b.tif"}),
+        ]
         assert PlanetaryComputerSigner().sign_item(iter(items)) is None
 
     def test_sign_item_rewrites_raw_dict(self):
@@ -210,7 +201,7 @@ class TestPlanetaryComputerSigner:
 
     def test_sign_item_skips_item_without_assets(self):
         """An Item whose assets are empty is skipped without error."""
-        assert PlanetaryComputerSigner().sign_item(_Item({})) is None
+        assert PlanetaryComputerSigner().sign_item(make_item("x", "2024-01-05", {})) is None
 
     def test_sign_item_handles_non_iterable(self):
         """A non-iterable, asset-less argument is treated as a single item."""
@@ -218,9 +209,10 @@ class TestPlanetaryComputerSigner:
 
     def test_sign_item_skips_asset_without_href(self):
         """An asset object whose href is None is left untouched."""
-        asset = _Asset(None)
-        PlanetaryComputerSigner().sign_item(_Item({"red": asset}))
-        assert asset.href is None
+        item = make_item("x", "2024-01-05", {"red": "placeholder"})
+        item.assets["red"].href = None
+        PlanetaryComputerSigner().sign_item(item)
+        assert item.assets["red"].href is None
 
     def test_blob_href_without_container_passes_through(self):
         """A blob URL with no container path segment is not signed."""
