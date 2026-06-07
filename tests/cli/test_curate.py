@@ -979,3 +979,261 @@ class TestChcSampleFiles:
         model = NWPModel(provider="p", backend="direct-boto3")
         out = curate_mod._nwp_availability(model, dt.datetime(2024, 1, 1), 0)
         assert "bucket" in out, "missing options reported"
+
+
+class TestDeepSamplers:
+    """Cover the credentialed deep-sample SDK bodies (SDKs faked)."""
+
+    def test_cmems_deep_sample_reads_data_vars(self, monkeypatch):
+        """_cmems_deep_sample reads each NetCDF data_var's attrs + dtype."""
+        import sys
+        import types
+
+        fake = types.ModuleType("copernicusmarine")
+
+        class _Var:
+            attrs = {
+                "units": "degC",
+                "standard_name": "sea_water_temp",
+                "long_name": "Temp",
+            }
+            dtype = "float32"
+
+        fake.open_dataset = lambda dataset_id=None: types.SimpleNamespace(
+            data_vars={"thetao": _Var()}
+        )
+        monkeypatch.setitem(sys.modules, "copernicusmarine", fake)
+        out = curate_mod._cmems_deep_sample("x")
+        assert out["thetao"]["units"] == "degC", "units read"
+        assert out["thetao"]["dtype"] == "float32", "dtype stringified"
+
+    def test_cmems_describe_dataset_delegates(self, monkeypatch):
+        """_cmems_describe_dataset calls the SDK describe and returns it."""
+        import sys
+        import types
+
+        fake = types.ModuleType("copernicusmarine")
+        fake.describe = lambda dataset_id=None, disable_progress_bar=None: "CAT"
+        monkeypatch.setitem(sys.modules, "copernicusmarine", fake)
+        assert curate_mod._cmems_describe_dataset("x") == "CAT"
+
+    def test_earthdata_deep_sample_reads_granule(self, monkeypatch):
+        """_earthdata_deep_sample logs in, searches, and reads a granule link."""
+        import sys
+        import types
+
+        fake = types.ModuleType("earthaccess")
+        fake.login = lambda strategy=None: None
+        fake.search_data = lambda **kw: [
+            types.SimpleNamespace(data_links=lambda: ["https://h/g.nc4"])
+        ]
+        monkeypatch.setitem(sys.modules, "earthaccess", fake)
+        out = curate_mod._earthdata_deep_sample("GPM", "07", "GES_DISC")
+        assert out["g.nc4"]["format"] == "netcdf4", "granule format inferred"
+
+    def test_earthdata_deep_sample_empty(self, monkeypatch):
+        """No granules yields an empty schema."""
+        import sys
+        import types
+
+        fake = types.ModuleType("earthaccess")
+        fake.login = lambda strategy=None: None
+        fake.search_data = lambda **kw: []
+        monkeypatch.setitem(sys.modules, "earthaccess", fake)
+        assert curate_mod._earthdata_deep_sample("X", "", "") == {}
+
+    def test_ecmwf_deep_sample_reads_netcdf(self, monkeypatch):
+        """_ecmwf_deep_sample retrieves a tiny NetCDF and reads var metadata."""
+        import sys
+        import types
+
+        monkeypatch.setattr(
+            curate_mod,
+            "_ecmwf_constraints",
+            lambda d: [{"variable": ["2m_temperature"], "year": ["2020"]}],
+        )
+        cdsapi = types.ModuleType("cdsapi")
+        cdsapi.Client = lambda: types.SimpleNamespace(
+            retrieve=lambda ds, req, target: open(target, "w").close()
+        )
+        netcdf = types.ModuleType("netCDF4")
+
+        class _Handle:
+            variables = {
+                "t2m": types.SimpleNamespace(long_name="2 metre temperature", units="K")
+            }
+
+            def __enter__(self):
+                return self
+
+            def __exit__(self, *a):
+                return False
+
+        netcdf.Dataset = lambda path: _Handle()
+        monkeypatch.setitem(sys.modules, "cdsapi", cdsapi)
+        monkeypatch.setitem(sys.modules, "netCDF4", netcdf)
+        out = curate_mod._ecmwf_deep_sample("reanalysis-era5-single-levels")
+        assert out["t2m"]["units"] == "K", "retrieved var units read"
+
+    def test_ecmwf_deep_sample_no_constraints(self, monkeypatch):
+        """No constraints rows yields an empty schema (after the SDK imports)."""
+        import sys
+        import types
+
+        monkeypatch.setitem(sys.modules, "cdsapi", types.ModuleType("cdsapi"))
+        monkeypatch.setitem(sys.modules, "netCDF4", types.ModuleType("netCDF4"))
+        monkeypatch.setattr(curate_mod, "_ecmwf_constraints", lambda d: [])
+        assert curate_mod._ecmwf_deep_sample("x") == {}
+
+
+class TestNwpAvailabilityBackends:
+    """Cover the remaining _nwp_availability backend branches (SDKs faked)."""
+
+    def test_ecmwf_opendata_latest(self, monkeypatch):
+        """The ecmwf-opendata backend reports the latest cycle from the client."""
+        import datetime as dt
+        import sys
+        import types
+
+        from earthlens.nwp.catalog import NWPModel
+
+        opendata = types.ModuleType("ecmwf.opendata")
+        opendata.Client = lambda source=None, model=None: types.SimpleNamespace(
+            latest=lambda **kw: dt.datetime(2024, 6, 1, 0)
+        )
+        monkeypatch.setitem(sys.modules, "ecmwf", types.ModuleType("ecmwf"))
+        monkeypatch.setitem(sys.modules, "ecmwf.opendata", opendata)
+        model = NWPModel(
+            provider="p", backend="ecmwf-opendata", request_options={"type": "fc"}
+        )
+        out = curate_mod._nwp_availability(model, dt.datetime(2024, 1, 1), 0)
+        assert "latest cycle" in out, "latest cycle reported"
+
+    def test_herbie_resolves_grib(self, monkeypatch):
+        """The herbie backend reports the resolved GRIB path."""
+        import datetime as dt
+        import sys
+        import types
+
+        from earthlens.nwp.catalog import NWPModel
+
+        herbie = types.ModuleType("herbie")
+        herbie.Herbie = lambda cycle, **kw: types.SimpleNamespace(grib="s3://x.grib")
+        monkeypatch.setitem(sys.modules, "herbie", herbie)
+        model = NWPModel(provider="p", backend="herbie", model_family="gfs")
+        out = curate_mod._nwp_availability(model, dt.datetime(2024, 1, 1), 0)
+        assert "resolved" in out, "GRIB path reported"
+
+    def test_direct_https_unreachable(self, monkeypatch):
+        """A direct-https HEAD failure is reported as unreachable, not raised."""
+        import datetime as dt
+
+        from earthlens.nwp.catalog import NWPModel
+
+        def boom(url, timeout=None, allow_redirects=None):
+            raise RuntimeError("dns")
+
+        monkeypatch.setattr(curate_mod.requests, "head", boom)
+        model = NWPModel(
+            provider="p",
+            backend="direct-https",
+            url_template="https://x/{var}",
+            bands={"t": "T"},
+        )
+        out = curate_mod._nwp_availability(model, dt.datetime(2024, 1, 1), 0)
+        assert "unreachable" in out, "HEAD failure reported"
+
+    def test_tropycal_fields_samples_season(self, monkeypatch):
+        """_tropycal_fields samples a season's storms and records column dtypes."""
+        import sys
+        import types
+
+        class _Frame:
+            columns = ["vmax", "mslp"]
+
+            def __getitem__(self, key):
+                return types.SimpleNamespace(dtype="int64")
+
+        td = types.SimpleNamespace(
+            get_season=lambda year: types.SimpleNamespace(
+                summary=lambda: {"id": ["AL012020"]}
+            ),
+            get_storm=lambda sid: types.SimpleNamespace(
+                to_dataframe=lambda attrs_as_columns=False: _Frame()
+            ),
+        )
+        tropycal = types.ModuleType("tropycal")
+        tracks = types.ModuleType("tropycal.tracks")
+        tracks.TrackDataset = lambda basin=None, source=None: td
+        monkeypatch.setitem(sys.modules, "tropycal", tropycal)
+        monkeypatch.setitem(sys.modules, "tropycal.tracks", tracks)
+        out = curate_mod._tropycal_fields("north_atlantic", "hurdat")
+        assert out["vmax"]["dtype"] == "int64", "column dtype recorded"
+
+
+class TestNwpIdx:
+    """Cover the Herbie `.idx` URL + body helpers (runpy / requests mocked)."""
+
+    def test_idx_url_from_template(self, monkeypatch):
+        """_nwp_idx_url evaluates the template against a stub to recover the URL."""
+        import datetime as dt
+        import pathlib
+        import runpy
+
+        from earthlens.nwp.catalog import NWPModel
+
+        class _Tmpl:
+            @staticmethod
+            def template(stub):
+                stub.SOURCES = {"aws": "https://aws/file"}
+
+        monkeypatch.setattr(runpy, "run_path", lambda p: {"gfs": _Tmpl})
+        model = NWPModel(
+            provider="p", backend="direct-https", model_family="gfs", product=""
+        )
+        url = curate_mod._nwp_idx_url(
+            pathlib.Path("/x"), model, dt.datetime(2024, 1, 1), 0
+        )
+        assert url == "https://aws/file.idx", "aws source + .idx suffix"
+
+    def test_idx_body_returns_reachable_text(self, monkeypatch):
+        """_nwp_idx_body returns the first reachable cycle's .idx text."""
+        import pathlib
+        import types
+
+        from earthlens.nwp.catalog import NWPModel
+
+        monkeypatch.setattr(
+            curate_mod, "_herbie_models_dir", lambda: pathlib.Path("/x")
+        )
+        monkeypatch.setattr(curate_mod, "_nwp_idx_url", lambda md, m, c, s: "https://x")
+        monkeypatch.setattr(
+            curate_mod.requests,
+            "get",
+            lambda url, timeout=None: types.SimpleNamespace(
+                status_code=200, text="1:0:VAR:\n"
+            ),
+        )
+        model = NWPModel(
+            provider="p", backend="direct-https", horizon_h=6, bands={"t": "VAR"}
+        )
+        assert curate_mod._nwp_idx_body(model) == "1:0:VAR:\n", "idx text returned"
+
+    def test_idx_body_unreachable_raises(self, monkeypatch):
+        """When no cycle is reachable, _nwp_idx_body raises ValueError."""
+        import pathlib
+
+        from earthlens.nwp.catalog import NWPModel
+
+        monkeypatch.setattr(
+            curate_mod, "_herbie_models_dir", lambda: pathlib.Path("/x")
+        )
+        monkeypatch.setattr(curate_mod, "_nwp_idx_url", lambda md, m, c, s: "https://x")
+
+        def boom(url, timeout=None):
+            raise RuntimeError("offline")
+
+        monkeypatch.setattr(curate_mod.requests, "get", boom)
+        model = NWPModel(provider="p", backend="direct-https", bands={"t": "VAR"})
+        with pytest.raises(ValueError, match="no recent"):
+            curate_mod._nwp_idx_body(model)
