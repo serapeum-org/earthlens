@@ -56,5 +56,5 @@ fast on your machine instead of after sitting in the CDS queue. Pass
 is valid (or when CDS constraints are temporarily unavailable).
 
 See [Usage](usage.md) for the request shape and a runnable example, and
-[Aggregation](../aggregation.md) for reducing the downloaded NetCDF stack
+[Aggregation](../../aggregation.md) for reducing the downloaded NetCDF stack
 into windowed composites.

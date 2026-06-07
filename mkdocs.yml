@@ -107,6 +107,7 @@ nav:
   - Guide:
     - Installation: installation.md
     - Architecture: overview/architecture.md
+    - Temporal aggregation: aggregation.md
   - Data Sources:
     - Supported providers: reference/providers.md
     - CHC (CHIRPS / CHIRTS / SPI / SPEI / …):
@@ -135,7 +136,6 @@ nav:
       - Introduction: reference/ecmwf/introduction.md
       - Usage: reference/ecmwf/usage.md
       - Catalog & Probes: reference/ecmwf/catalog.md
-      - Aggregation: reference/aggregation.md
       - Reference: reference/ecmwf/ecmwf.md
     - EUMETSAT (Data Store):
       - Introduction: reference/eumetsat/introduction.md

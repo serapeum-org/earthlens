@@ -96,7 +96,7 @@ lens.download(
 ```
 
 Aggregated GeoTIFFs land under `<path>/aggregated/`. See
-[Aggregation](../aggregation.md) for the full `op="auto"` walkthrough and the
+[Aggregation](../../aggregation.md) for the full `op="auto"` walkthrough and the
 flux-vs-state distinction.
 
 ## Notebook examples
