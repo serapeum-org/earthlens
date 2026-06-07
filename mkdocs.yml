@@ -42,8 +42,6 @@ theme:
     toggle:
       icon: material/weather-night
       name: Switch to system preference
-  primary: indigo
-  accent: indigo
   icon:
     repo: fontawesome/brands/github
 
@@ -85,7 +83,6 @@ markdown_extensions:
         - name: mermaid
           class: mermaid
           format: !!python/name:pymdownx.superfences.fence_code_format
-  - pymdownx.tabbed
   - pymdownx.inlinehilite
   - pymdownx.snippets
   - pymdownx.tabbed:
@@ -386,6 +383,7 @@ nav:
     - AbstractDataSource: reference/abstract-datasource.md
   - About:
     - Change Log: change-log.md
+    - License: LICENSE.md
 
 extra:
   social:
