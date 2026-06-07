@@ -14,6 +14,7 @@ Each provider plugs a validator into :data:`_VALIDATORS` returning
 
 from __future__ import annotations
 
+import datetime as dt
 from collections.abc import Callable
 from dataclasses import dataclass, field
 from typing import Any
@@ -539,14 +540,105 @@ def _live_radar(catalog: Any) -> tuple[int, list[str]]:
     return len(catalogued), []
 
 
+def _nwp_latest_cycle(model: Any, hours_ago: int = 6) -> dt.datetime | None:
+    """Return a model's most recent expected run datetime (or None).
+
+    Ported from the retired `tools/nwp/refresh_nwp_catalog.py`.
+
+    Args:
+        model: A curated NWP model record (duck-typed: `cycles_utc`).
+        hours_ago: How far back to look for the latest published cycle.
+
+    Returns:
+        The most recent cycle datetime at or before `now - hours_ago`,
+        or None when the model declares no cycle hours.
+    """
+    if not getattr(model, "cycles_utc", None):
+        return None
+    moment = dt.datetime.now(dt.UTC).replace(tzinfo=None) - dt.timedelta(
+        hours=hours_ago
+    )
+    for day_offset in (0, 1):
+        day = moment - dt.timedelta(days=day_offset)
+        for hour in sorted(model.cycles_utc, reverse=True):
+            candidate = day.replace(hour=hour, minute=0, second=0, microsecond=0)
+            if candidate <= moment:
+                return candidate
+    return None
+
+
+def _live_nwp(catalog: Any) -> tuple[int, list[str]]:
+    """HEAD each direct-https NWP model's latest expected cycle URL.
+
+    Folds the retired `refresh_nwp_catalog.py --live`: only `direct-https`
+    models (e.g. DWD ICON) can be checked with a cheap HEAD — Herbie / ECMWF
+    models would need their SDKs to resolve a cycle, so they are skipped.
+    """
+    issues: list[str] = []
+    checked = 0
+    for key, model in catalog.datasets.items():
+        if getattr(model, "backend", None) != "direct-https":
+            continue
+        cycle = _nwp_latest_cycle(model)
+        url_template = getattr(model, "url_template", None)
+        bands = getattr(model, "bands", None)
+        if cycle is None or not url_template or not bands:
+            continue
+        checked += 1
+        var = next(iter(bands.values()))
+        url = url_template.format(
+            cycle=cycle, date=cycle, step=0, var=var, var_lc=str(var).lower()
+        )
+        try:
+            status = _http_head(url)
+        except Exception as exc:  # noqa: BLE001 — reported as drift
+            issues.append(f"{key}: latest cycle unreachable ({type(exc).__name__})")
+            continue
+        if status != 200:
+            issues.append(f"{key}: HTTP {status} for latest cycle {url}")
+    return checked, issues
+
+
+def _live_ecmwf(catalog: Any) -> tuple[int, list[str]]:
+    """Confirm each ECMWF dataset can build a constraint-valid minimal request.
+
+    Folds the local gate of the retired `tools/ecmwf/probe_open_datasets.py`:
+    for every curated dataset, build a minimal request from its public
+    `constraints.json` and run the same `RequestValidator` the backend uses
+    before a retrieve. Datasets that publish no constraints (so no request can
+    be built) are skipped, not flagged. Stateless — no CDS credentials or
+    queue submission (per-dataset live retrieval stays `probe ecmwf --deep`).
+    """
+    from earthlens.ecmwf.constraints import RequestValidator
+
+    issues: list[str] = []
+    checked = 0
+    for key in catalog.datasets:
+        try:
+            request = catalog.minimal_valid_request(key)
+        except Exception as exc:  # noqa: BLE001 — reported as drift
+            issues.append(f"{key}: constraints fetch failed ({exc})")
+            continue
+        if set(request) <= {"data_format"}:
+            continue  # no published constraints -> nothing to validate
+        checked += 1
+        try:
+            RequestValidator(key, request).check()
+        except ValueError as exc:
+            issues.append(f"{key}: {str(exc).splitlines()[0][:90]}")
+    return checked, issues
+
+
 #: Provider id -> a live reachability validator (the `--live` half). May add
-#: a provider not in :data:`_VALIDATORS` (e.g. openeo is live-only).
+#: a provider not in :data:`_VALIDATORS` (e.g. openeo / ecmwf are live-only).
 _LIVE_VALIDATORS: dict[str, Callable[[Any], tuple[int, list[str]]]] = {
     "s3": _live_s3,
     "overture": _live_overture,
     "ghsl": _live_ghsl,
     "openeo": _live_openeo,
     "radar": _live_radar,
+    "nwp": _live_nwp,
+    "ecmwf": _live_ecmwf,
 }
 
 

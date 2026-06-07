@@ -10,6 +10,7 @@ from earthlens.cli import validate as validate_mod
 from earthlens.cli.adapter import list_backends
 from earthlens.cli.validate import (
     ValidateResult,
+    _live_ecmwf,
     _validate_nwp,
     _validate_overture,
     _validate_radar,
@@ -240,6 +241,49 @@ class TestLiveValidators:
         )
         result = validate_one(_info("radar"), live=True)
         assert result.issues == [], "streaming station -> clean"
+
+    def test_nwp_live_flags_non_200_cycle(self, monkeypatch):
+        """A direct-https model whose latest cycle does not HEAD 200 is flagged."""
+        monkeypatch.setattr(validate_mod, "_http_head", lambda url: 404)
+        result = validate_one(_info("nwp"), live=True)
+        assert result.status == "ok" and result.issues, "404 cycle -> issue"
+
+    def test_nwp_live_clean_at_200(self, monkeypatch):
+        """All direct-https latest cycles HEADing 200 clear the nwp live check."""
+        monkeypatch.setattr(validate_mod, "_http_head", lambda url: 200)
+        result = validate_one(_info("nwp"), live=True)
+        assert result.issues == [], "all 200 -> clean"
+
+    def test_ecmwf_live_flags_invalid_request(self, monkeypatch):
+        """An ECMWF dataset whose minimal request fails the validator is flagged."""
+        import earthlens.ecmwf.constraints as constraints
+
+        catalog = SimpleNamespace(
+            datasets={"good": object(), "nocon": object(), "bad": object()},
+            minimal_valid_request=lambda key: {
+                "good": {"data_format": "netcdf", "variable": ["x"]},
+                "nocon": {"data_format": "netcdf"},
+                "bad": {"data_format": "netcdf", "variable": ["y"]},
+            }[key],
+        )
+
+        class FakeValidator:
+            def __init__(self, dataset, request):
+                self.dataset = dataset
+
+            def check(self):
+                if self.dataset == "bad":
+                    raise ValueError("missing required selector 'level'")
+
+        monkeypatch.setattr(constraints, "RequestValidator", FakeValidator)
+        checked, issues = _live_ecmwf(catalog)
+        assert checked == 2, "the no-constraints dataset is skipped"
+        assert any("bad" in i for i in issues), "invalid request flagged"
+
+    def test_supported_providers_live_adds_ecmwf_and_nwp(self):
+        """ecmwf gains a live-only validator; nwp gains a live one on top."""
+        assert "ecmwf" in supported_providers(live=True)
+        assert "nwp" in supported_providers(live=True)
 
 
 class TestValidateResult:
