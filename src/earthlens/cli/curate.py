@@ -653,6 +653,98 @@ def _ghsl_probe(catalog: Any, dataset: str) -> dict[str, dict[str, Any]]:
     return schema
 
 
+def _ecmwf_constraints(dataset: str) -> list[dict[str, Any]]:
+    """Return a CDS dataset's public `constraints.json` rows (no creds)."""
+    from earthlens.ecmwf.constraints import fetch_constraints
+
+    return fetch_constraints(dataset)
+
+
+def _ecmwf_probe(catalog: Any, dataset: str) -> dict[str, dict[str, Any]]:
+    """Probe an ECMWF/CDS dataset's variables from its public constraints.
+
+    Reads `constraints.json` (public, no credentials — only data retrieval
+    needs `~/.cdsapirc`) and unions the `variable` values across rows.
+
+    Args:
+        catalog: The loaded ECMWF `Catalog` (unused; the CDS dataset is the key).
+        dataset: A CDS dataset id (e.g. `reanalysis-era5-single-levels`).
+
+    Returns:
+        Mapping of variable name to `{}` (the seed for the catalog `variables`).
+    """
+    variables = sorted(
+        {
+            variable
+            for row in _ecmwf_constraints(dataset)
+            for variable in (row.get("variable") or [])
+        }
+    )
+    return {str(variable): {} for variable in variables}
+
+
+def _chc_sample_files(ftp_base: str, limit: int = 10) -> list[str]:
+    """Return a sample of filenames under a CHC FTP directory (anonymous)."""
+    from ftplib import FTP  # nosec B402
+
+    with FTP("data.chc.ucsb.edu", timeout=_TIMEOUT) as ftp:  # nosec B321
+        ftp.login()
+        ftp.cwd(ftp_base)
+        return sorted(ftp.nlst())[:limit]
+
+
+def _chc_probe(catalog: Any, dataset: str) -> dict[str, dict[str, Any]]:
+    """Probe a CHC dataset's FTP directory for a sample of filenames.
+
+    Args:
+        catalog: The loaded CHC `Catalog` (resolves the dataset's `ftp_bases`).
+        dataset: A curated CHC dataset key.
+
+    Returns:
+        Mapping of sample filename to `{}` (the seed for the file pattern).
+
+    Raises:
+        ValueError: If the dataset has no `ftp_bases`.
+    """
+    record = catalog.datasets.get(dataset)
+    bases = list(getattr(record, "ftp_bases", {}).values()) if record else []
+    if not bases:
+        raise ValueError(f"no ftp_bases for {dataset!r}")
+    return {name: {} for name in _chc_sample_files(bases[0])}
+
+
+def _tropycal_fields(basin: str, source: str) -> dict[str, dict[str, Any]]:
+    """Return a basin's `Storm.to_dataframe()` field schema (samples a season)."""
+    import datetime as dt
+
+    import tropycal.tracks as tracks
+
+    track_dataset = tracks.TrackDataset(basin=basin, source=source)
+    year = dt.datetime.now(dt.UTC).year - 1
+    storm_ids = list(track_dataset.get_season(year).summary().get("id") or [])[:3]
+    fields: dict[str, dict[str, Any]] = {}
+    for storm_id in storm_ids:
+        frame = track_dataset.get_storm(storm_id).to_dataframe(attrs_as_columns=True)
+        for column in frame.columns:
+            fields.setdefault(str(column), {"dtype": str(frame[column].dtype)})
+    return fields
+
+
+def _tropycal_probe(catalog: Any, dataset: str) -> dict[str, dict[str, Any]]:
+    """Probe a Tropycal basin's live `to_dataframe()` field schema (SDK).
+
+    Args:
+        catalog: The loaded Tropycal `Catalog` (resolves the basin's sources).
+        dataset: A basin code (e.g. `north_atlantic`).
+
+    Returns:
+        Mapping of field name to `{dtype}`.
+    """
+    record = catalog.datasets.get(dataset)
+    sources = getattr(record, "sources", None) or ["hurdat"]
+    return _tropycal_fields(dataset, sources[0])
+
+
 #: Provider id -> a callable taking the loaded catalog and a dataset id and
 #: returning its per-entry schema.
 _PROBERS: dict[str, Callable[[Any, str], dict[str, dict[str, Any]]]] = {
@@ -669,6 +761,9 @@ _PROBERS: dict[str, Callable[[Any, str], dict[str, dict[str, Any]]]] = {
     "overture": _overture_probe,
     "s3": _s3_probe,
     "ghsl": _ghsl_probe,
+    "ecmwf": _ecmwf_probe,
+    "chc": _chc_probe,
+    "tropycal": _tropycal_probe,
 }
 
 

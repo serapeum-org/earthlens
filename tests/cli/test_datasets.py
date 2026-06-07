@@ -400,7 +400,7 @@ class TestProbe:
 
     def test_unsupported_provider_exits_nonzero(self):
         """A provider with no prober reports unsupported and exits 1."""
-        result = runner.invoke(app, ["datasets", "probe", "chc", "whatever"])
+        result = runner.invoke(app, ["datasets", "probe", "gdacs", "whatever"])
         assert result.exit_code == 1, "unsupported -> exit 1"
         assert "unsupported" in result.output, "reason shown"
 

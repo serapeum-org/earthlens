@@ -338,6 +338,53 @@ class TestGhslProbe:
         assert "release" in entry and "crs" in entry, "release + crs recorded"
 
 
+class TestEcmwfProbe:
+    """Tests for the ECMWF constraints prober (public, no creds)."""
+
+    def test_unions_variables_from_constraints(self, monkeypatch):
+        """ecmwf probe unions the `variable` values across constraint rows."""
+        monkeypatch.setattr(
+            curate_mod,
+            "_ecmwf_constraints",
+            lambda d: [{"variable": ["2m_temperature", "tp"]}, {"variable": ["tp"]}],
+        )
+        result = probe_dataset(_info("ecmwf"), "reanalysis-era5-single-levels")
+        assert result.status == "ok", "ecmwf probe ran"
+        assert sorted(result.assets) == ["2m_temperature", "tp"], "vars unioned"
+
+
+class TestChcProbe:
+    """Tests for the CHC FTP-sample prober (anonymous FTP)."""
+
+    def test_lists_sample_filenames(self, monkeypatch):
+        """chc probe lists a sample of filenames under the dataset's ftp_base."""
+        from earthlens.cli.adapter import load_catalog
+
+        monkeypatch.setattr(
+            curate_mod, "_chc_sample_files", lambda base, limit=10: ["a.tif", "b.tif"]
+        )
+        dataset = next(iter(load_catalog(_info("chc")).datasets))
+        result = probe_dataset(_info("chc"), dataset)
+        assert result.status == "ok", "chc probe ran"
+        assert "a.tif" in result.assets, "sample filename listed"
+
+
+class TestTropycalProbe:
+    """Tests for the Tropycal basin prober (SDK)."""
+
+    def test_reads_field_schema(self, monkeypatch):
+        """tropycal probe records the to_dataframe() field dtypes."""
+        from earthlens.cli.adapter import load_catalog
+
+        monkeypatch.setattr(
+            curate_mod, "_tropycal_fields", lambda b, s: {"vmax": {"dtype": "int64"}}
+        )
+        basin = next(iter(load_catalog(_info("tropycal")).datasets))
+        result = probe_dataset(_info("tropycal"), basin)
+        assert result.status == "ok", "tropycal probe ran"
+        assert result.assets["vmax"]["dtype"] == "int64", "field dtype recorded"
+
+
 class TestProbeResult:
     """Tests for ProbeResult."""
 
@@ -352,8 +399,8 @@ class TestProbeDataset:
 
     def test_unsupported_provider(self):
         """A provider with no prober reports 'unsupported' (no network)."""
-        result = probe_dataset(_info("chc"), "anything")
-        assert result.status == "unsupported", "chc cannot be probed"
+        result = probe_dataset(_info("gdacs"), "anything")
+        assert result.status == "unsupported", "gdacs cannot be probed"
 
     def test_ok_with_mocked_sample(self, monkeypatch):
         """A live sample item is parsed into the asset schema."""
