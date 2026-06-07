@@ -113,7 +113,7 @@ nav:
     - CHC (CHIRPS / CHIRTS / SPI / SPEI / …):
       - Introduction: reference/chc/introduction.md
       - Usage: reference/chc/usage.md
-      - Catalog & Tooling: reference/chc/catalog.md
+      - Catalog & tooling: reference/chc/catalog.md
       - Reference: reference/chc/chc.md
     - Amazon S3 (AWS Open Data):
       - Introduction: reference/s3/introduction.md
@@ -130,18 +130,18 @@ nav:
       - Introduction: reference/earthdata/introduction.md
       - Usage: reference/earthdata/usage.md
       - Authentication: reference/earthdata/authentication.md
-      - Catalog & Tooling: reference/earthdata/catalog.md
+      - Catalog & tooling: reference/earthdata/catalog.md
       - Reference: reference/earthdata/earthdata.md
     - ECMWF:
       - Introduction: reference/ecmwf/introduction.md
       - Usage: reference/ecmwf/usage.md
-      - Catalog & Probes: reference/ecmwf/catalog.md
+      - Catalog & tooling: reference/ecmwf/catalog.md
       - Reference: reference/ecmwf/ecmwf.md
     - EUMETSAT (Data Store):
       - Introduction: reference/eumetsat/introduction.md
       - Usage: reference/eumetsat/usage.md
       - Authentication: reference/eumetsat/authentication.md
-      - Catalog & Tooling: reference/eumetsat/catalog.md
+      - Catalog & tooling: reference/eumetsat/catalog.md
       - Data Tailor (deferred): reference/eumetsat/data-tailor.md
       - Reference: reference/eumetsat/eumetsat.md
     - FDSN (earthquakes):
@@ -193,7 +193,7 @@ nav:
     - HDX (humanitarian data):
       - Introduction: reference/hdx/introduction.md
       - Usage: reference/hdx/usage.md
-      - Catalog & Tooling: reference/hdx/catalog.md
+      - Catalog & tooling: reference/hdx/catalog.md
       - Reference: reference/hdx/hdx.md
     - Overture Maps (vector basemap):
       - Introduction: reference/overture/introduction.md
@@ -204,18 +204,18 @@ nav:
     - NWP (weather forecasts):
       - Introduction: reference/nwp/introduction.md
       - Usage: reference/nwp/usage.md
-      - Catalog & install: reference/nwp/catalog.md
+      - Catalog & tooling: reference/nwp/catalog.md
       - Reference: reference/nwp/nwp.md
     - NEXRAD radar:
       - Introduction: reference/radar/introduction.md
       - Usage: reference/radar/usage.md
-      - Catalog & Tooling: reference/radar/catalog.md
+      - Catalog & tooling: reference/radar/catalog.md
       - Reference: reference/radar/radar.md
     - USGS Water (NWIS):
       - Introduction: reference/usgs-water/introduction.md
       - Usage: reference/usgs-water/usage.md
       - Authentication: reference/usgs-water/authentication.md
-      - Available data: reference/usgs-water/datasets.md
+      - Available datasets: reference/usgs-water/datasets.md
       - Reference: reference/usgs-water/usgs_water.md
     - GHSL (human settlement):
       - Introduction: reference/ghsl/introduction.md
