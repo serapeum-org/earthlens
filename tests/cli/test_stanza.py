@@ -217,6 +217,59 @@ class TestEmitStanza:
         assert result.key == "00060", "key defaulted to the id"
 
 
+class TestWriteStanza:
+    """Tests for write_stanza (the curate --write file insertion)."""
+
+    def test_usgs_water_appends_to_single_file(self, tmp_path, monkeypatch):
+        """A single-file provider appends the row under parameters: in place."""
+        import importlib
+
+        import yaml
+
+        from earthlens.cli import stanza as sm
+        from earthlens.cli.adapter import load_catalog
+
+        info = _info("usgs_water")
+        module = importlib.import_module(f"{info.module}.catalog")
+        import shutil
+
+        dst = tmp_path / "usgs_water_data_catalog.yaml"
+        shutil.copy(module.CATALOG_PATH, dst)
+        monkeypatch.setattr(module, "CATALOG_PATH", dst)
+        module.clear_catalog_cache()
+        result = emit_stanza(info, "99999", key="my_param", name="Test", units="x")
+        path = sm.write_stanza(info, result, None)
+        module.clear_catalog_cache()
+        catalog = load_catalog(info)
+        assert catalog.datasets["my_param"].code == "99999", "row appended + reloads"
+        assert yaml.safe_load(open(path))["parameters"]["my_param"], "under parameters:"
+
+    def test_sharded_requires_target(self):
+        """A sharded-catalog provider without --target raises a clear error."""
+        result = StanzaResult("gee", "FOO/BAR", "FOO/BAR", "ok", row={"title": "x"})
+        with pytest.raises(ValueError, match="--target"):
+            stanza_mod.write_stanza(_info("gee"), result, None)
+
+    def test_duplicate_key_rejected(self, tmp_path, monkeypatch):
+        """Writing a key that already exists raises rather than duplicating."""
+        import importlib
+        import shutil
+
+        from earthlens.cli import stanza as sm
+        from earthlens.cli.adapter import load_catalog
+
+        info = _info("usgs_water")
+        module = importlib.import_module(f"{info.module}.catalog")
+        dst = tmp_path / "usgs_water_data_catalog.yaml"
+        shutil.copy(module.CATALOG_PATH, dst)
+        monkeypatch.setattr(module, "CATALOG_PATH", dst)
+        module.clear_catalog_cache()
+        existing = next(iter(load_catalog(info).datasets))
+        result = StanzaResult("usgs_water", existing, "x", "ok", row={"code": "1"})
+        with pytest.raises(ValueError, match="already curated"):
+            sm.write_stanza(info, result, None)
+
+
 class TestStanzaResult:
     """Tests for StanzaResult."""
 

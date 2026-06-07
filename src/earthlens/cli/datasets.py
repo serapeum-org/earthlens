@@ -43,7 +43,7 @@ from earthlens.cli.render import (
     rows_to_json,
     validate_table,
 )
-from earthlens.cli.stanza import emit_stanza
+from earthlens.cli.stanza import emit_stanza, write_stanza
 from earthlens.cli.table import FACET_NAMES, build_table
 from earthlens.cli.validate import validate_one
 
@@ -611,17 +611,30 @@ def curate(
     service: list[str] = typer.Option(
         None, "--service", help="usgs_water: repeatable service the code serves."
     ),
+    write: bool = typer.Option(
+        False,
+        "--write",
+        help="Insert the seeded row into the catalog file (else print only).",
+    ),
+    target: str = typer.Option(
+        "",
+        "--target",
+        help="Per-family file stem under catalog/ to write into "
+        "(sharded providers; defaults to --daac / --group).",
+    ),
     json_output: bool = typer.Option(
         False, "--json", "-j", help="Emit the seeded row as JSON (for piping)."
     ),
 ) -> None:
-    """Author a paste-ready curated `datasets:` row from one upstream id.
+    """Author a curated `datasets:` row from one upstream id.
 
     The authoring companion to `probe`: it fetches one upstream id's
-    metadata and prints a seeded `datasets:` YAML row (inferring
-    `output_kind` / `format` / bands where it can) for you to vet and paste
-    into the per-family catalog file. Print-only — it never edits a catalog.
-    Only providers with a stanza emitter are supported (earthdata, hdx,
+    metadata and seeds a `datasets:` YAML row (inferring `output_kind` /
+    `format` / bands where it can). By default it prints the row for you to
+    vet and paste; with `--write` it appends the row into the catalog file
+    (single-file providers like usgs_water write in place; sharded providers
+    need `--target <file-stem>`, defaulting to `--daac` / `--group`). Only
+    providers with a stanza emitter are supported (earthdata, hdx,
     usgs_water, eumetsat, gee); others report `unsupported`.
     """
     backends = _select_refresh_backends(provider)
@@ -643,19 +656,32 @@ def curate(
         services=service or None,
     )
 
+    if result.status != "ok":
+        if json_output:
+            typer.echo(json.dumps(result.to_dict(), indent=2))
+        else:
+            err_console().print(f"[red]{result.status}:[/red] {result.detail}")
+        raise typer.Exit(code=1)
+
+    if write:
+        target_stem = target or daac or group or None
+        try:
+            written = write_stanza(backends[0], result, target_stem)
+        except ValueError as exc:
+            raise typer.BadParameter(str(exc)) from exc
+        out_console().print(
+            f"[green]wrote {result.key}[/green] ({result.provider}) -> {written}"
+        )
+        return
+
     if json_output:
         typer.echo(json.dumps(result.to_dict(), indent=2))
-    elif result.status == "ok":
+    else:
         out_console().print(
             f"[dim]# paste into the curated datasets: block "
             f"({result.provider})[/dim]"
         )
         typer.echo(result.to_yaml())
-    else:
-        err_console().print(f"[red]{result.status}:[/red] {result.detail}")
-
-    if result.status != "ok":
-        raise typer.Exit(code=1)
 
 
 @datasets_app.command()

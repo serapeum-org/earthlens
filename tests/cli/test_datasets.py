@@ -375,6 +375,38 @@ class TestCurate:
         payload = json.loads(result.output)
         assert payload["status"] == "ok" and payload["row"]["hdx_id"]
 
+    def test_write_appends_to_catalog(self, tmp_path, monkeypatch):
+        """curate --write inserts the row into the (temp) catalog file."""
+        import importlib
+        import shutil
+
+        info = next(
+            b
+            for b in __import__(
+                "earthlens.cli.adapter", fromlist=["list_backends"]
+            ).list_backends()
+            if b.provider == "usgs_water"
+        )
+        module = importlib.import_module(f"{info.module}.catalog")
+        dst = tmp_path / "usgs_water_data_catalog.yaml"
+        shutil.copy(module.CATALOG_PATH, dst)
+        monkeypatch.setattr(module, "CATALOG_PATH", dst)
+        module.clear_catalog_cache()
+        result = runner.invoke(
+            app,
+            [
+                "datasets",
+                "curate",
+                "usgs_water",
+                "98765",
+                "--key",
+                "cli_param",
+                "--write",
+            ],
+        )
+        assert result.exit_code == 0, f"curate --write failed: {result.output}"
+        assert "wrote cli_param" in result.output and "cli_param" in dst.read_text()
+
     def test_unsupported_provider_exits_nonzero(self):
         """A provider with no emitter reports unsupported and exits 1."""
         result = runner.invoke(app, ["datasets", "curate", "chc", "anything"])

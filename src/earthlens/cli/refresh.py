@@ -1093,6 +1093,23 @@ def _chc_ftp_bases(catalog: Any) -> list[str]:
     )
 
 
+def _s3_grouped(catalog: Any) -> dict[str, list[str]]:
+    """List the S3 registry's dataset names (its `available_datasets` universe).
+
+    The AWS Open-Data S3 backend has no single live "list all" endpoint — its
+    universe *is* the curated registry — so the refresher returns the curated
+    dataset names. `--write` then regenerates the in-file `available_datasets:`
+    block from them (the `tools/s3/refresh_s3_catalog.py:refresh` step).
+
+    Args:
+        catalog: The loaded S3 `Catalog`.
+
+    Returns:
+        A single-group mapping `{"s3": [sorted registered dataset names]}`.
+    """
+    return {"s3": sorted(str(key) for key in catalog.datasets)}
+
+
 #: JRC 54009 land tile-schema shapefile (the GHSL Mollweide tile grid source).
 _GHSL_TILE_SCHEMA_ZIP = (
     "https://ghsl.jrc.ec.europa.eu/download/GHSL_data_54009_shapefile.zip"
@@ -1171,6 +1188,7 @@ _REFRESHERS: dict[str, Callable[[Any], dict[str, list[str]]]] = {
     "fdsn": _fdsn_grouped,
     "overture": _overture_grouped,
     "chc": _chc_grouped,
+    "s3": _s3_grouped,
 }
 
 #: Provider id -> a callable that persists a grouped live fetch back into
@@ -1190,6 +1208,7 @@ _WRITERS: dict[str, Callable[[BackendInfo, dict[str, list[str]]], str]] = {
     "hdx": _write_hdx,
     "overture": _index_writer("available_releases"),
     "radar": _write_radar,
+    "s3": _index_writer("available_datasets"),
     "usgs_water": _write_usgs_water,
     "worldpop": _write_worldpop,
     "openaq": _write_openaq,

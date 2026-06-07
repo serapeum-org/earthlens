@@ -16,6 +16,8 @@ report `unsupported`. Adding one is a single entry in :data:`_EMITTERS`.
 
 from __future__ import annotations
 
+import importlib
+import re
 from collections.abc import Callable
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -526,3 +528,93 @@ def emit_stanza(
         status="ok",
         row=row,
     )
+
+
+#: Provider id -> the YAML block its curated rows live under.
+_STANZA_BLOCK: dict[str, str] = {"usgs_water": "parameters"}
+
+#: Provider id -> the opt name whose value names the per-family target file
+#: (sharded catalogs) when `--target` is not given explicitly.
+_DEFAULT_TARGET_OPT: dict[str, str] = {
+    "earthdata": "daac",
+    "eumetsat": "group",
+    "hdx": "group",
+}
+
+
+def _append_to_block(path: Path, block: str, key: str, row: dict[str, Any]) -> None:
+    """Append a `{key: row}` entry under `block:` in `path`, preserving the rest.
+
+    Splices the new entry in at the end of the existing `block:` block (or
+    appends a fresh `block:` at end of file), leaving every other line —
+    header comments, sibling blocks, the other rows — byte-for-byte intact.
+
+    Args:
+        path: The catalog YAML file to edit.
+        block: The top-level block the row belongs under (`datasets` /
+            `parameters`).
+        key: The friendly catalog key for the new row.
+        row: The seeded row fields.
+
+    Raises:
+        ValueError: If `key` is already curated in `path`.
+    """
+    text = path.read_text(encoding="utf-8") if path.exists() else ""
+    parsed = (yaml.safe_load(text) or {}) if text.strip() else {}
+    if key in (parsed.get(block) or {}):
+        raise ValueError(f"{key!r} is already curated in {path.name}")
+    dumped = yaml.safe_dump({key: row}, sort_keys=False, allow_unicode=True)
+    entry = "".join(
+        ("  " + line if line.strip() else line)
+        for line in dumped.splitlines(keepends=True)
+    )
+    lines = text.splitlines(keepends=True)
+    start = next(
+        (i for i, line in enumerate(lines) if line.startswith(f"{block}:")), None
+    )
+    if start is None:
+        prefix = text if not text or text.endswith("\n") else text + "\n"
+        path.write_text(f"{prefix}{block}:\n{entry}", encoding="utf-8")
+        return
+    end = len(lines)
+    for j in range(start + 1, len(lines)):
+        if re.match(r"[A-Za-z_][A-Za-z0-9_]*:", lines[j]):
+            end = j
+            break
+    lines.insert(end, entry)
+    path.write_text("".join(lines), encoding="utf-8")
+
+
+def write_stanza(info: BackendInfo, result: StanzaResult, target: str | None) -> str:
+    """Insert a seeded row into the curated catalog file (the `--write` half).
+
+    Appends `result.row` under the provider's block (`parameters:` for
+    usgs_water, else `datasets:`). Sharded catalogs need a `target` file
+    stem (the per-family file under `catalog/`); single-file catalogs
+    ignore it.
+
+    Args:
+        info: The backend the row belongs to.
+        result: The `ok` :class:`StanzaResult` to persist.
+        target: The per-family file stem (sharded catalogs only).
+
+    Returns:
+        The path of the catalog file written.
+
+    Raises:
+        ValueError: If a sharded catalog is missing `target`, or the key is
+            already curated.
+    """
+    base = importlib.import_module(f"{info.module}.catalog").CATALOG_PATH
+    block = _STANZA_BLOCK.get(info.provider, "datasets")
+    if base.is_dir():
+        if not target:
+            raise ValueError(
+                f"{info.provider} has a sharded catalog; pass --target <file-stem> "
+                "(the per-family file under catalog/) to write the row"
+            )
+        path = base / f"{target}.yaml"
+    else:
+        path = base
+    _append_to_block(path, block, result.key, result.row)
+    return str(path)
