@@ -137,6 +137,23 @@ def _get_json(
     return response.json()
 
 
+def _redact(text: str, secret: str) -> str:
+    """Mask `secret` (e.g. an API key) wherever it appears in `text`.
+
+    Used to scrub a credential out of an error message before it is surfaced
+    in an outcome `detail` — some providers (FIRMS) carry the key in the
+    request URL, which `requests` echoes verbatim in `HTTPError`.
+
+    Args:
+        text: The message that may contain the secret.
+        secret: The secret to mask (a no-op when empty).
+
+    Returns:
+        `text` with every occurrence of `secret` replaced by `***`.
+    """
+    return text.replace(secret, "***") if secret else text
+
+
 def _stac_grouped(catalog: Any) -> dict[str, list[str]]:
     """List collection ids per STAC endpoint, live.
 
@@ -263,6 +280,13 @@ def _replace_index_block(path: Path, block_key: str, payload: Any) -> None:
         if re.match(r"[A-Za-z_][A-Za-z0-9_]*:", lines[j]):
             end = j
             break
+    # Comment / blank lines immediately above the next block belong to *it*,
+    # not to the block being replaced — back the cut up over them so they are
+    # preserved rather than swallowed into the rewritten span.
+    while end > start + 1 and (
+        not lines[end - 1].strip() or lines[end - 1].lstrip().startswith("#")
+    ):
+        end -= 1
     block = yaml.safe_dump(
         {block_key: payload},
         sort_keys=False,
@@ -871,7 +895,9 @@ def _radar_station_rows(text: str) -> dict[str, dict[str, Any]]:
         return {}
     spans = _radar_column_spans(lines[1])
     columns = {lines[0][s:e].strip(): (s, e) for s, e in spans}
-    if "ICAO" not in columns:
+    # ICAO / NAME / LAT / LON are read unconditionally below; bail cleanly if
+    # the upstream table ever drops one rather than raising a KeyError.
+    if not {"ICAO", "NAME", "LAT", "LON"} <= set(columns):
         return {}
 
     def cell(row: str, name: str) -> str:
@@ -964,7 +990,10 @@ def _firms_grouped(catalog: Any) -> dict[str, list[str]]:
         A single-group mapping `{"firms": [sorted sensor ids]}`.
     """
     key = os.environ.get("FIRMS_MAP_KEY", "")
-    text = _get_text(_FIRMS_DATA_AVAIL_URL.format(map_key=key))
+    try:
+        text = _get_text(_FIRMS_DATA_AVAIL_URL.format(map_key=key))
+    except Exception as exc:  # noqa: BLE001 — scrub the key from the URL in the error
+        raise RuntimeError(_redact(str(exc), key)) from None
     rows = text.splitlines()
     if not rows or not rows[0].lower().startswith("data_id"):
         raise RuntimeError(f"data_availability returned a non-CSV body: {text[:120]}")
@@ -1694,6 +1723,14 @@ def refresh_one(info: BackendInfo, write: bool = False) -> RefreshOutcome:
         writer = _WRITERS.get(info.provider)
         if writer is None:
             detail = "live read only; --write is not supported for this provider"
+        elif not live:
+            # Seatbelt: an empty live fetch (transient outage, unexpected body,
+            # an SDK returning nothing) must never overwrite a populated bundled
+            # index with `[]`. Refuse the write and report it instead.
+            detail = (
+                "live fetch returned 0 ids; refusing to overwrite the index "
+                "(re-run when the source is reachable, or edit by hand)"
+            )
         else:
             try:
                 written = writer(info, grouped)

@@ -26,7 +26,7 @@ from typing import Any
 import requests
 
 from earthlens.cli.adapter import BackendInfo, load_catalog
-from earthlens.cli.refresh import _TIMEOUT, _get_json
+from earthlens.cli.refresh import _TIMEOUT, _get_json, _redact
 
 
 @dataclass
@@ -386,8 +386,13 @@ def _firms_csv_lines(code: str) -> list[str]:
     """Return a tiny FIRMS area-CSV sample's lines (needs `FIRMS_MAP_KEY`)."""
     key = os.environ.get("FIRMS_MAP_KEY", "")
     url = f"https://firms.modaps.eosdis.nasa.gov/api/area/csv/{key}/{code}/world/1"
-    response = requests.get(url, timeout=_TIMEOUT)
-    response.raise_for_status()
+    try:
+        response = requests.get(url, timeout=_TIMEOUT)
+        response.raise_for_status()
+    except requests.RequestException as exc:
+        # The key sits in the URL path; scrub it from the surfaced error so it
+        # cannot leak into a ProbeResult.detail / --json output / CI log.
+        raise RuntimeError(_redact(str(exc), key)) from None
     return response.text.splitlines()
 
 
@@ -860,7 +865,13 @@ def _nwp_idx_url(models_dir: Any, model: Any, cycle: Any, step: int) -> str:
     """
     import runpy
 
-    namespace = runpy.run_path(str(models_dir / f"{model.model_family}.py"))
+    # `runpy.run_path` executes the named file, so guard the catalog-supplied
+    # `model_family` to a bare identifier: it must name a file inside herbie's
+    # installed models/ dir, never traverse out of it or smuggle in a path.
+    family = model.model_family or ""
+    if not re.fullmatch(r"[A-Za-z0-9_]+", family):
+        raise ValueError(f"unsafe model_family for .idx template: {family!r}")
+    namespace = runpy.run_path(str(models_dir / f"{family}.py"))
     template_cls = namespace.get(model.model_family) or next(
         value
         for value in namespace.values()

@@ -538,7 +538,9 @@ class TestWrite:
     def test_write_error_is_captured(self, monkeypatch):
         """A write failure reports 'error' rather than raising."""
         monkeypatch.setattr(
-            refresh_mod, "_get_json", lambda url: {"collections": [], "links": []}
+            refresh_mod,
+            "_get_json",
+            lambda url: {"collections": [{"id": "x"}], "links": []},
         )
 
         def boom(info, grouped):
@@ -548,6 +550,23 @@ class TestWrite:
         outcome = refresh_one(_info("stac"), write=True)
         assert outcome.status == "error", "failure captured"
         assert "write failed" in outcome.detail, "reason preserved"
+
+    def test_empty_live_fetch_refuses_to_write(self, monkeypatch):
+        """An empty live fetch must not overwrite the index; the writer is skipped."""
+        monkeypatch.setattr(
+            refresh_mod, "_get_json", lambda url: {"collections": [], "links": []}
+        )
+        called = {"wrote": False}
+
+        def writer(info, grouped):
+            called["wrote"] = True
+            return "x"
+
+        monkeypatch.setitem(refresh_mod._WRITERS, "stac", writer)
+        outcome = refresh_one(_info("stac"), write=True)
+        assert outcome.status == "ok", "empty fetch is not an error"
+        assert called["wrote"] is False, "writer must not run on an empty fetch"
+        assert "refusing to overwrite" in outcome.detail, "skip is reported"
 
 
 class TestReplaceIndexBlock:
@@ -574,6 +593,64 @@ class TestReplaceIndexBlock:
         path.write_text("other: 1\n", "utf-8")
         with pytest.raises(ValueError, match="no available_datasets"):
             _replace_index_block(path, "available_datasets", ["a"])
+
+    def test_preserves_comment_above_next_block(self, tmp_path):
+        """A comment between the replaced block and its sibling is not swallowed."""
+        path = tmp_path / "_index.yaml"
+        path.write_text(
+            "available_collections:\n- OLD\n"
+            "\n# processes follow\navailable_processes:\n- add\n",
+            "utf-8",
+        )
+        _replace_index_block(path, "available_collections", ["NEW"])
+        text = path.read_text("utf-8")
+        assert "# processes follow" in text, "inter-block comment preserved"
+        data = yaml.safe_load(text)
+        assert data["available_collections"] == ["NEW"]
+        assert data["available_processes"] == ["add"], "sibling intact"
+
+
+class TestRedact:
+    """Tests for _redact (credential scrubbing in error messages)."""
+
+    def test_masks_the_secret(self):
+        """An occurrence of the secret is replaced with ***."""
+        from earthlens.cli.refresh import _redact
+
+        assert _redact("for url: .../csv/SEKRET/all", "SEKRET") == (
+            "for url: .../csv/***/all"
+        )
+
+    def test_empty_secret_is_noop(self):
+        """An empty secret leaves the text unchanged."""
+        from earthlens.cli.refresh import _redact
+
+        assert _redact("nothing to hide", "") == "nothing to hide"
+
+
+class TestFirmsKeyRedaction:
+    """The FIRMS map key must never appear in a surfaced refresh error."""
+
+    def test_refresh_firms_error_scrubs_key(self, monkeypatch):
+        """A FIRMS HTTP error (URL holds the key) is reported with the key masked."""
+        monkeypatch.setenv("FIRMS_MAP_KEY", "TOPSECRETKEY")
+
+        def boom(url):
+            raise RuntimeError(f"404 Client Error for url: {url}")
+
+        monkeypatch.setattr(refresh_mod, "_get_text", boom)
+        outcome = refresh_one(_info("firms"))
+        assert outcome.status == "error", "error captured"
+        assert "TOPSECRETKEY" not in outcome.detail, "map key scrubbed from detail"
+
+
+class TestRadarMissingColumns:
+    """_radar_station_rows degrades cleanly when a required column is absent."""
+
+    def test_missing_name_column_returns_empty(self):
+        """A HOMR header without NAME yields {} instead of raising KeyError."""
+        text = "ICAO  LAT      LON\n----- -------- --------\nKABR  45.0     -98.0"
+        assert refresh_mod._radar_station_rows(text) == {}
 
 
 def _catalog_copy(provider, tmp_path, monkeypatch):

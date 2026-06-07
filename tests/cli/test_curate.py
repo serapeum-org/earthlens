@@ -1237,3 +1237,34 @@ class TestNwpIdx:
         model = NWPModel(provider="p", backend="direct-https", bands={"t": "VAR"})
         with pytest.raises(ValueError, match="no recent"):
             curate_mod._nwp_idx_body(model)
+
+    def test_idx_url_rejects_unsafe_model_family(self):
+        """A model_family that is not a bare identifier is refused before runpy."""
+        import pathlib
+
+        from earthlens.nwp.catalog import NWPModel
+
+        model = NWPModel(
+            provider="p", backend="direct-https", model_family="../evil", product=""
+        )
+        with pytest.raises(ValueError, match="unsafe model_family"):
+            curate_mod._nwp_idx_url(pathlib.Path("/x"), model, "2024-01-01", 0)
+
+
+class TestFirmsKeyRedaction:
+    """The FIRMS map key (in the URL path) must not leak into a surfaced error."""
+
+    def test_csv_lines_error_scrubs_key(self, monkeypatch):
+        """A failed FIRMS request raises with the map key masked out."""
+        import requests as real_requests
+
+        monkeypatch.setenv("FIRMS_MAP_KEY", "TOPSECRETKEY")
+
+        def boom(url, timeout=None):
+            raise real_requests.RequestException(f"500 Server Error for url: {url}")
+
+        monkeypatch.setattr(curate_mod.requests, "get", boom)
+        with pytest.raises(RuntimeError) as exc:
+            curate_mod._firms_csv_lines("VIIRS_SNPP_NRT")
+        assert "TOPSECRETKEY" not in str(exc.value), "map key scrubbed from the error"
+        assert "***" in str(exc.value), "key replaced with a mask"
