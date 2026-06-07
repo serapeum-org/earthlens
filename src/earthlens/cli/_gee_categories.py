@@ -1,40 +1,14 @@
-"""Regroup the GEE catalog from per-provider files into per-category files.
+"""Auto-categorise a GEE asset id into its per-family catalog file.
 
-Walks every ``catalog/*.yaml`` (except ``_index.yaml``) in the bundled
-catalog, classifies each dataset stanza into one of a small fixed set of
-data-type categories (``optical-multispectral``, ``sar-radar``,
-``climate-reanalysis``, ``precipitation``, ``elevation-terrain``,
-``land-cover-change``, ``atmosphere-chemistry``, ``hydrology-water``,
-``community``, ``other``) and re-writes the catalog directory grouped by
-category. Per-stanza text is sliced verbatim (preserving comments,
-ordering, and formatting); only the per-file headers and the
-``datasets:`` wrapper are re-emitted.
-
-Classification uses, in priority order:
-
-1. Exact / prefix matches on the asset id (highest signal).
-2. Title keyword matches.
-3. Provider field hints.
-4. A safety net that drops to ``other`` (printed at the end so the long
-   tail can be reviewed).
-
-Run with ``--dry-run`` to print the bucket distribution without
-touching disk. Idempotent: running it on an already-categorised tree
-produces the same output.
+The category rules ported from the retired `tools/gee/_recategorize_catalog.py`.
+`curate gee --write` uses :func:`categorise_asset` to pick which per-family
+`catalog/<category>.yaml` file a freshly seeded row belongs in, so the
+maintainer no longer has to pass `--target` for the common case. The rule
+table is keyword/prefix-driven and is a *seed* — the maintainer can still
+move a stanza by hand or override the file with `--target`.
 """
 
 from __future__ import annotations
-
-import argparse
-import sys
-from collections import defaultdict
-from pathlib import Path
-
-sys.path.insert(0, str(Path(__file__).parent))
-from _catalog_io import split_stanzas, title_of  # noqa: E402
-
-REPO = Path(__file__).resolve().parents[2]
-CATALOG_DIR = REPO / "src" / "earthlens" / "gee" / "catalog"
 
 # All categories we emit, in display / file-order. Anything not matched
 # by the rules table lands in ``other``.
@@ -60,7 +34,6 @@ CATEGORIES = [
 _RULES: list[tuple[str, str, str]] = [
     # --- community (projects/...) ---
     ("id_prefix", "projects/", "community"),
-
     # --- population / boundaries / infrastructure / vector POI (route to 'other' explicitly) ---
     ("id_prefix", "CIESIN/GPWv", "other"),
     ("id_prefix", "WorldPop/", "other"),
@@ -89,7 +62,6 @@ _RULES: list[tuple[str, str, str]] = [
     ("id_prefix", "CSIRO/SLGA", "other"),
     ("id_prefix", "USDA/SOLUS100", "other"),
     ("id_prefix", "JRC/LUCAS", "other"),
-
     # --- precipitation (resolve before optical so MODIS/CHIRPS/IMERG hit) ---
     ("id_prefix", "UCSB-CHG/CHIRPS", "precipitation"),
     ("id_prefix", "UCSB-CHG/CHIRP/", "precipitation"),
@@ -106,10 +78,8 @@ _RULES: list[tuple[str, str, str]] = [
     ("title_kw", "precipitation", "precipitation"),
     ("title_kw", "rainfall", "precipitation"),
     ("title_kw", "rain rate", "precipitation"),
-
     # --- evapotranspiration (resolve before catch-all 'climate' / 'optical' kicks in) ---
     ("id_prefix", "OpenET/", "hydrology-water"),
-
     # --- glaciers / marine / surface water that needs explicit hits ---
     ("id_prefix", "GLIMS/", "hydrology-water"),
     ("id_prefix", "GLCF/GLS_WATER", "hydrology-water"),
@@ -117,7 +87,6 @@ _RULES: list[tuple[str, str, str]] = [
     ("id_prefix", "WRI/Aqueduct_Water_Risk/", "hydrology-water"),
     ("id_prefix", "UQ/murray/Intertidal/", "hydrology-water"),
     ("id_prefix", "JCU/Murray/GIC/", "hydrology-water"),
-
     # --- elevation / terrain / bathymetry / lidar height ---
     ("id_prefix", "USGS/SRTMGL1", "elevation-terrain"),
     ("id_prefix", "USGS/3DEP", "elevation-terrain"),
@@ -159,7 +128,6 @@ _RULES: list[tuple[str, str, str]] = [
     ("title_kw", "canopy height", "elevation-terrain"),
     ("title_kw", "ice mass", "elevation-terrain"),
     ("title_kw", "ice surface", "elevation-terrain"),
-
     # --- SAR / radar ---
     ("id_prefix", "COPERNICUS/S1_", "sar-radar"),
     ("id_prefix", "COPERNICUS/S1", "sar-radar"),
@@ -170,7 +138,6 @@ _RULES: list[tuple[str, str, str]] = [
     ("title_kw", "synthetic aperture radar", "sar-radar"),
     ("title_kw", "palsar", "sar-radar"),
     ("title_kw", "sar mosaic", "sar-radar"),
-
     # --- atmosphere / air chemistry ---
     ("id_prefix", "COPERNICUS/S5P/", "atmosphere-chemistry"),
     ("id_prefix", "ECMWF/CAMS/", "atmosphere-chemistry"),
@@ -199,7 +166,6 @@ _RULES: list[tuple[str, str, str]] = [
     ("title_kw", "formaldehyde", "atmosphere-chemistry"),
     ("title_kw", "atmospheric composition", "atmosphere-chemistry"),
     ("title_kw", "ghg ", "atmosphere-chemistry"),
-
     # --- climate reanalysis / model output ---
     ("id_prefix", "ECMWF/ERA5", "climate-reanalysis"),
     ("id_prefix", "ECMWF/", "climate-reanalysis"),
@@ -241,7 +207,6 @@ _RULES: list[tuple[str, str, str]] = [
     ("title_kw", "cmip", "climate-reanalysis"),
     ("title_kw", "climate forecast", "climate-reanalysis"),
     ("title_kw", "drought index", "climate-reanalysis"),
-
     # --- hydrology / water / ocean / snow / ice ---
     ("id_prefix", "JRC/GSW1_", "hydrology-water"),
     ("id_prefix", "JRC/GSW/", "hydrology-water"),
@@ -290,7 +255,6 @@ _RULES: list[tuple[str, str, str]] = [
     ("title_kw", "watershed", "hydrology-water"),
     ("title_kw", "water surface", "hydrology-water"),
     ("title_kw", "surface water", "hydrology-water"),
-
     # --- land cover / change / forest / cropland / fire / built / vegetation indices ---
     ("id_prefix", "UMD/hansen/", "land-cover-change"),
     ("id_prefix", "GLAD/", "land-cover-change"),
@@ -385,7 +349,6 @@ _RULES: list[tuple[str, str, str]] = [
     ("title_kw", "urban", "land-cover-change"),
     ("title_kw", "phenology", "land-cover-change"),
     ("title_kw", "albedo", "land-cover-change"),
-
     # --- optical multispectral (catch-all for remaining MODIS / Landsat / Sentinel-2 / VIIRS / GOES) ---
     ("id_prefix", "LANDSAT/", "optical-multispectral"),
     ("id_prefix", "COPERNICUS/S2", "optical-multispectral"),
@@ -422,7 +385,7 @@ _RULES: list[tuple[str, str, str]] = [
 ]
 
 
-def _categorise(asset_id: str, title: str) -> str:
+def categorise_asset(asset_id: str, title: str) -> str:
     """Return the bucket name for one (asset_id, title) pair."""
     title_lc = title.lower()
     for kind, needle, category in _RULES:
@@ -433,73 +396,3 @@ def _categorise(asset_id: str, title: str) -> str:
         if kind == "title_kw" and needle in title_lc:
             return category
     return "other"
-
-
-def main() -> int:
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--dry-run", action="store_true", help="print bucket counts only")
-    parser.add_argument("--show-other", action="store_true", help="list every asset id that lands in 'other'")
-    args = parser.parse_args()
-
-    files = sorted(p for p in CATALOG_DIR.glob("*.yaml") if p.name != "_index.yaml")
-    if not files:
-        print(f"no catalog *.yaml files under {CATALOG_DIR}", file=sys.stderr)
-        return 1
-
-    by_cat: dict[str, list[tuple[str, str]]] = defaultdict(list)
-    asset_ids: list[str] = []
-    for path in files:
-        text = path.read_text(encoding="utf-8")
-        for asset_id, stanza in split_stanzas(text):
-            title = title_of(stanza)
-            cat = _categorise(asset_id, title)
-            by_cat[cat].append((asset_id, stanza))
-            asset_ids.append(asset_id)
-
-    total = sum(len(v) for v in by_cat.values())
-    print(f"classified {total} datasets across {len(files)} files:")
-    for cat in CATEGORIES:
-        n = len(by_cat.get(cat, []))
-        print(f"  {n:5d}  {cat}.yaml")
-    other = sorted(aid for aid, _ in by_cat.get("other", []))
-    if args.show_other and other:
-        print(f"\n--- 'other' bucket ({len(other)}) ---")
-        for aid in other:
-            print(f"  {aid}")
-    if args.dry_run:
-        return 0
-
-    # Read the existing _index.yaml verbatim so we don't churn its order.
-    index_text = (CATALOG_DIR / "_index.yaml").read_text(encoding="utf-8")
-
-    # Delete old per-provider files (everything except _index.yaml).
-    for path in files:
-        path.unlink()
-
-    for cat in CATEGORIES:
-        stanzas = by_cat.get(cat, [])
-        if not stanzas:
-            continue
-        out = CATALOG_DIR / f"{cat}.yaml"
-        parts = [
-            f"# Auto-grouped slice of the GEE catalog: {cat}.\n",
-            f"# {len(stanzas)} dataset(s). Edit in place; the loader merges every\n",
-            "# *.yaml file in this directory into one Catalog at import time.\n",
-            "\n",
-            "datasets:\n",
-        ]
-        for _, stanza in sorted(stanzas, key=lambda p: p[0]):
-            parts.append(stanza)
-            if not stanza.endswith("\n"):
-                parts.append("\n")
-        out.write_text("".join(parts), encoding="utf-8")
-
-    # _index.yaml is preserved as-is.
-    (CATALOG_DIR / "_index.yaml").write_text(index_text, encoding="utf-8")
-
-    print(f"\nwrote {len([c for c in CATEGORIES if by_cat.get(c)])} category files under {CATALOG_DIR}")
-    return 0
-
-
-if __name__ == "__main__":
-    sys.exit(main())

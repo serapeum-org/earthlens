@@ -245,10 +245,28 @@ class TestWriteStanza:
         assert yaml.safe_load(open(path))["parameters"]["my_param"], "under parameters:"
 
     def test_sharded_requires_target(self):
-        """A sharded-catalog provider without --target raises a clear error."""
-        result = StanzaResult("gee", "FOO/BAR", "FOO/BAR", "ok", row={"title": "x"})
+        """A sharded-catalog provider without --target (and no auto-pick) errors."""
+        result = StanzaResult("earthdata", "x", "X", "ok", row={"short_name": "X"})
         with pytest.raises(ValueError, match="--target"):
-            stanza_mod.write_stanza(_info("gee"), result, None)
+            stanza_mod.write_stanza(_info("earthdata"), result, None)
+
+    def test_gee_auto_categorises_target(self, tmp_path, monkeypatch):
+        """gee without --target auto-picks the per-family file from the asset id."""
+        import importlib
+
+        info = _info("gee")
+        module = importlib.import_module(f"{info.module}.catalog")
+        monkeypatch.setattr(module, "CATALOG_PATH", tmp_path)
+        result = StanzaResult(
+            "gee",
+            "s1grd",
+            "COPERNICUS/S1_GRD",
+            "ok",
+            row={"title": "Sentinel-1 SAR GRD"},
+        )
+        written = stanza_mod.write_stanza(info, result, None)
+        assert written.endswith("sar-radar.yaml"), "SAR asset routed to sar-radar"
+        assert (tmp_path / "sar-radar.yaml").exists(), "the category file was written"
 
     def test_duplicate_key_rejected(self, tmp_path, monkeypatch):
         """Writing a key that already exists raises rather than duplicating."""

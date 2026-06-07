@@ -660,7 +660,7 @@ class Catalog(AbstractCatalog):
         Returns a mapping from a check name to the list of asset ids
         (or provider slugs) that fail it. An empty list means the
         check is currently passing; an empty dict means the catalog
-        is clean. Intended for `tools/gee/audit_gee_datasets.py` and
+        is clean. Surfaced by `earthlens datasets validate gee` and
         CI hygiene checks.
 
         Checks reported:

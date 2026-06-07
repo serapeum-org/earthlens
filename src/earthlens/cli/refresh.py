@@ -648,6 +648,52 @@ def _gee_grouped(catalog: Any) -> dict[str, list[str]]:
     return {"gee": sorted(ids)}
 
 
+#: Public per-asset STAC-doc URL base (the id -> doc filename convention).
+_GEE_STAC_DOC_BASE = "https://storage.googleapis.com/earthengine-stac/catalog"
+
+
+def _gee_stac_or_none(asset_id: str) -> dict[str, Any] | None:
+    """Fetch one Earth Engine asset's public STAC document, or None on error.
+
+    Args:
+        asset_id: The Earth Engine asset id (e.g. `LANDSAT/LC09/C02/T1_L2`).
+
+    Returns:
+        The parsed STAC document, or None when it 404s / is unreadable.
+    """
+    provider = asset_id.split("/", 1)[0]
+    url = f"{_GEE_STAC_DOC_BASE}/{provider}/{asset_id.replace('/', '_')}.json"
+    try:
+        return _get_json(url)
+    except Exception:  # noqa: BLE001 — a missing/unreadable doc -> "missing"
+        return None
+
+
+def _gee_classify(asset_id: str, curated: set[str]) -> str:
+    """Bucket one asset id for the curation-coverage report.
+
+    Args:
+        asset_id: The Earth Engine asset id to classify.
+        curated: The set of asset ids already in the curated `datasets:` map.
+
+    Returns:
+        One of `"DONE"` (already curated), `"table"` (a FeatureCollection,
+        out of raster scope), `"addressable"` (has bands carrying usable
+        metadata — a `gee:units` / `gee:scale`), `"thin"` (no usable band
+        metadata, needs hand-modelling), or `"missing"` (no STAC doc).
+    """
+    if asset_id in curated:
+        return "DONE"
+    doc = _gee_stac_or_none(asset_id)
+    if doc is None:
+        return "missing"
+    if doc.get("gee:type") == "table":
+        return "table"
+    bands = (doc.get("summaries", {}) or {}).get("eo:bands") or []
+    has_meta = any(b.get("gee:units") or b.get("gee:scale") is not None for b in bands)
+    return "addressable" if (bands and has_meta) else "thin"
+
+
 #: WorldPop public REST data hub (alias -> sub-alias crawl, no credentials).
 _WORLDPOP_REST_URL = "https://hub.worldpop.org/rest/data"
 
@@ -1487,6 +1533,123 @@ def audit_one(info: BackendInfo) -> AuditOutcome:
         # in the available index (so a provider whose index lives elsewhere,
         # like openaq's `parameters`, doesn't report its curated rows as drift).
         untracked=sorted(live - available - curated),
+    )
+
+
+#: The fixed coverage buckets a curation-coverage classifier reports, in
+#: display order.
+_COVERAGE_BUCKETS = ("DONE", "addressable", "thin", "table", "missing")
+
+
+@dataclass
+class CoverageOutcome:
+    """The result of classifying a provider's available universe for curation.
+
+    Distinct from :class:`AuditOutcome` (drift of curated-vs-live): coverage
+    answers "of everything the provider exposes, how much is curated, and
+    what is worth curating next".
+
+    Attributes:
+        provider: Canonical provider id.
+        status: `"ok"`, `"unsupported"` (no classifier), or `"error"`.
+        detail: Failure reason for `"error"` / `"unsupported"`, else empty.
+        counts: Per-bucket counts (see :data:`_COVERAGE_BUCKETS`).
+        todo: The `addressable`-but-not-yet-curated ids worth curating next.
+    """
+
+    provider: str
+    status: str
+    detail: str = ""
+    counts: dict[str, int] = field(default_factory=dict)
+    todo: list[str] = field(default_factory=list)
+
+    def to_dict(self) -> dict[str, Any]:
+        """Project the coverage outcome to a JSON-friendly dict.
+
+        Returns:
+            A mapping of every field, suitable for `json.dumps`.
+
+        Examples:
+            - The per-bucket counts ride along under `counts`:
+
+                ```python
+                >>> from earthlens.cli.refresh import CoverageOutcome
+                >>> CoverageOutcome("gee", "ok", counts={"DONE": 3}).to_dict()["counts"]
+                {'DONE': 3}
+
+                ```
+        """
+        return {
+            "provider": self.provider,
+            "status": self.status,
+            "detail": self.detail,
+            "counts": self.counts,
+            "todo": self.todo,
+        }
+
+
+def _gee_coverage(catalog: Any) -> tuple[dict[str, int], list[str]]:
+    """Classify every `available_datasets:` id of the GEE catalog.
+
+    Args:
+        catalog: The loaded GEE `Catalog`.
+
+    Returns:
+        `(counts, todo)` — per-bucket counts and the sorted `addressable`
+        ids not yet curated.
+
+    Raises:
+        ValueError: If the `available_datasets:` index is empty.
+    """
+    available = [str(ident) for ident in getattr(catalog, "available_datasets", [])]
+    if not available:
+        raise ValueError(
+            "available_datasets: is empty — run `refresh gee --write` first"
+        )
+    curated = set(catalog.datasets)
+    buckets: dict[str, list[str]] = {}
+    for asset_id in available:
+        buckets.setdefault(_gee_classify(asset_id, curated), []).append(asset_id)
+    counts = {bucket: len(buckets.get(bucket, [])) for bucket in _COVERAGE_BUCKETS}
+    return counts, sorted(buckets.get("addressable", []))
+
+
+#: Provider id -> a callable returning `(counts, todo)` for `audit --coverage`.
+#: Only providers with a discoverable available-universe distinct from their
+#: curated rows (currently only gee's `available_datasets:` index) qualify.
+_COVERAGE: dict[str, Callable[[Any], tuple[dict[str, int], list[str]]]] = {
+    "gee": _gee_coverage,
+}
+
+
+def coverage_one(info: BackendInfo) -> CoverageOutcome:
+    """Classify a provider's available universe by curation status.
+
+    Powers `audit --coverage`: walks the provider's `available_*` index and
+    buckets each id (already curated / worth curating / out of scope / gone).
+    Providers without a classifier report `"unsupported"`; fetch failures
+    report `"error"` — never raises.
+
+    Args:
+        info: The backend to classify.
+
+    Returns:
+        The :class:`CoverageOutcome` for `info`.
+    """
+    classifier = _COVERAGE.get(info.provider)
+    if classifier is None:
+        return CoverageOutcome(
+            provider=info.provider,
+            status="unsupported",
+            detail="no curation-coverage classifier wired up for this provider",
+        )
+    try:
+        catalog = load_catalog(info)
+        counts, todo = classifier(catalog)
+    except Exception as exc:  # noqa: BLE001 — network / parse failures are reported
+        return CoverageOutcome(provider=info.provider, status="error", detail=str(exc))
+    return CoverageOutcome(
+        provider=info.provider, status="ok", counts=counts, todo=todo
     )
 
 

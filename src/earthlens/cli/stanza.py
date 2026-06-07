@@ -26,6 +26,7 @@ from urllib.parse import quote
 
 import yaml
 
+from earthlens.cli._gee_categories import categorise_asset
 from earthlens.cli.adapter import BackendInfo, load_catalog
 from earthlens.cli.refresh import _get_json
 
@@ -608,6 +609,10 @@ def write_stanza(info: BackendInfo, result: StanzaResult, target: str | None) ->
     base = importlib.import_module(f"{info.module}.catalog").CATALOG_PATH
     block = _STANZA_BLOCK.get(info.provider, "datasets")
     if base.is_dir():
+        if not target and info.provider == "gee":
+            target = categorise_asset(
+                result.upstream_id, str(result.row.get("title", ""))
+            )
         if not target:
             raise ValueError(
                 f"{info.provider} has a sharded catalog; pass --target <file-stem> "

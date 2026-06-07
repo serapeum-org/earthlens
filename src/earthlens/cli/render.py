@@ -446,6 +446,35 @@ def audit_table(outcomes) -> Table:
     return table
 
 
+def coverage_table(outcomes) -> Table:
+    """Build a per-provider curation-coverage table.
+
+    Args:
+        outcomes: An iterable of `CoverageOutcome` (duck-typed: `provider`,
+            `status`, `counts`, `todo`, `detail`).
+
+    Returns:
+        A :class:`rich.table.Table` with one column per coverage bucket;
+        counts show `-` for non-`ok` rows.
+    """
+    buckets = ("DONE", "addressable", "thin", "table", "missing")
+    table = Table(header_style="bold", show_lines=False)
+    table.add_column("PROVIDER", overflow="fold")
+    table.add_column("STATUS", overflow="fold")
+    for bucket in buckets:
+        table.add_column(bucket.upper(), justify="right")
+    table.add_column("DETAIL", overflow="fold")
+    for outcome in outcomes:
+        ok = outcome.status == "ok"
+        table.add_row(
+            outcome.provider,
+            outcome.status,
+            *(str(outcome.counts.get(b, 0)) if ok else "-" for b in buckets),
+            outcome.detail,
+        )
+    return table
+
+
 def validate_table(results) -> Table:
     """Build a per-provider summary table of validation results.
 

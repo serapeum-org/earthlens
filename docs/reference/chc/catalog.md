@@ -15,7 +15,7 @@ the tooling that supports catalog work.
 | `src/earthlens/chc/catalog.py` | The loader (`Catalog`, `Dataset`, `Variable`, `_build_chc_dataset`, `_load_catalog_data`, `_StrictSafeLoader`) |
 | `src/earthlens/chc/backend.py` | The `CHIRPS` class — consumes the catalog through `Dataset.ftp_bases` / `Dataset.file_patterns` / `Dataset.discrete_files` |
 | `tools/chc/refresh_chc_catalog.py` | Walks `data.chc.ucsb.edu` and regenerates the `available_datasets:` index |
-| `tools/chc/audit_chc_datasets.py` | Coverage / staleness classifier (parallel of `tools/gee/audit_gee_datasets.py`) |
+| `tools/chc/audit_chc_datasets.py` | Coverage / staleness classifier (parallel of `earthlens datasets audit gee --coverage`) |
 | `tools/chc/probe_chirps_gefs.py` | CHIRPS-GEFS FTP probe — was used to verify the v3 file patterns before they were withdrawn |
 
 ## Layout — per-family split
@@ -293,15 +293,14 @@ occurrence).
 Walks `data.chc.ucsb.edu` and regenerates the
 `available_datasets:` index in `_index.yaml`. Run after CHC publishes
 a new product. CHC analogue of
-`tools/gee/refresh_gee_catalog.py` and
-`tools/ecmwf/refresh_available_datasets.py`.
+`earthlens datasets refresh gee --write`.
 
 ### `tools/chc/audit_chc_datasets.py`
 
 Coverage / staleness classifier. Walks the catalog and reports which
 shipped datasets have been verified against the live FTP (and which
 haven't been touched since N days). Parallel of
-`tools/gee/audit_gee_datasets.py`.
+`earthlens datasets audit gee --coverage`.
 
 ### `tools/chc/probe_chirps_gefs.py`
 

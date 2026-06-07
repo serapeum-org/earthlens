@@ -16,12 +16,15 @@ from earthlens.cli import refresh as refresh_mod
 from earthlens.cli.adapter import list_backends, load_catalog
 from earthlens.cli.refresh import (
     AuditOutcome,
+    CoverageOutcome,
     RefreshOutcome,
     _curated_collection_ids,
     _diff,
     _flatten,
+    _gee_classify,
     _replace_index_block,
     audit_one,
+    coverage_one,
     refresh_one,
     supported_providers,
 )
@@ -241,6 +244,74 @@ class TestGeeRefresher:
         outcome = refresh_one(_info("gee"))
         assert outcome.status == "ok", "gee refresh ran"
         assert outcome.live_count == 3, "A/B/C ids fetched"
+
+
+class TestGeeClassify:
+    """Tests for the gee curation-coverage classifier (network mocked)."""
+
+    def test_curated_id_is_done(self, monkeypatch):
+        """An already-curated asset is bucketed DONE without a fetch."""
+        monkeypatch.setattr(
+            refresh_mod, "_gee_stac_or_none", lambda aid: pytest.fail("no fetch")
+        )
+        assert _gee_classify("X/Y", {"X/Y"}) == "DONE"
+
+    def test_bands_with_metadata_are_addressable(self, monkeypatch):
+        """An image with a band carrying gee:units is addressable."""
+        monkeypatch.setattr(
+            refresh_mod,
+            "_gee_stac_or_none",
+            lambda aid: {"summaries": {"eo:bands": [{"name": "B1", "gee:units": "K"}]}},
+        )
+        assert _gee_classify("X/Y", set()) == "addressable"
+
+    def test_bare_bands_are_thin(self, monkeypatch):
+        """An image whose bands carry no usable metadata is thin."""
+        monkeypatch.setattr(
+            refresh_mod,
+            "_gee_stac_or_none",
+            lambda aid: {"summaries": {"eo:bands": [{"name": "B1"}]}},
+        )
+        assert _gee_classify("X/Y", set()) == "thin"
+
+    def test_feature_collection_is_table(self, monkeypatch):
+        """A FeatureCollection is bucketed table (out of raster scope)."""
+        monkeypatch.setattr(
+            refresh_mod, "_gee_stac_or_none", lambda aid: {"gee:type": "table"}
+        )
+        assert _gee_classify("X/Y", set()) == "table"
+
+    def test_no_doc_is_missing(self, monkeypatch):
+        """An asset with no STAC document is bucketed missing."""
+        monkeypatch.setattr(refresh_mod, "_gee_stac_or_none", lambda aid: None)
+        assert _gee_classify("X/Y", set()) == "missing"
+
+
+class TestCoverageOne:
+    """Tests for coverage_one (the `audit --coverage` driver)."""
+
+    def test_gee_buckets_available_universe(self, monkeypatch):
+        """coverage_one classifies each available id and lists the addressable todo."""
+        monkeypatch.setitem(
+            refresh_mod._COVERAGE,
+            "gee",
+            lambda catalog: (
+                {"DONE": 1, "addressable": 1, "thin": 1, "table": 0, "missing": 0},
+                ["B"],
+            ),
+        )
+        outcome = coverage_one(_info("gee"))
+        assert outcome.status == "ok", "gee coverage ran"
+        assert outcome.counts["addressable"] == 1 and outcome.todo == ["B"]
+
+    def test_unsupported_provider(self):
+        """A provider with no classifier reports unsupported."""
+        assert coverage_one(_info("gdacs")).status == "unsupported"
+
+    def test_to_dict_carries_counts(self):
+        """CoverageOutcome.to_dict round-trips the buckets."""
+        data = CoverageOutcome("gee", "ok", counts={"DONE": 2}).to_dict()
+        assert data["counts"] == {"DONE": 2}
 
 
 class TestWorldpopRefresher:

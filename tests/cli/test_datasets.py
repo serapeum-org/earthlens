@@ -7,10 +7,13 @@ import json
 import pytest
 from typer.testing import CliRunner
 
+from earthlens.cli import _gee_hydrate as hydrate_mod
 from earthlens.cli import curate as curate_mod
+from earthlens.cli import datasets as datasets_mod
 from earthlens.cli import refresh as refresh_mod
 from earthlens.cli import stanza as stanza_mod
 from earthlens.cli.app import app
+from earthlens.cli.refresh import CoverageOutcome
 from earthlens.cli.table import build_table
 
 pytestmark = pytest.mark.cli
@@ -347,6 +350,31 @@ class TestAudit:
         result = runner.invoke(app, ["datasets", "audit", "stac", "--strict"])
         assert result.exit_code == 1, "drift under --strict -> exit 1"
 
+    def test_coverage_reports_buckets(self, monkeypatch):
+        """--coverage prints the curation buckets + the addressable todo list."""
+        monkeypatch.setattr(
+            datasets_mod,
+            "coverage_one",
+            lambda info: CoverageOutcome(
+                info.provider,
+                "ok",
+                counts={
+                    "DONE": 5,
+                    "addressable": 2,
+                    "thin": 1,
+                    "table": 0,
+                    "missing": 0,
+                },
+                todo=["NEW/ONE", "NEW/TWO"],
+            ),
+        )
+        result = runner.invoke(
+            app, ["datasets", "audit", "gee", "--coverage", "--json"]
+        )
+        assert result.exit_code == 0, f"coverage failed: {result.output}"
+        payload = json.loads(result.output)
+        assert payload[0]["counts"]["addressable"] == 2 and payload[0]["todo"]
+
 
 class TestCurate:
     """Tests for `datasets curate` (stanza-emit; network mocked)."""
@@ -417,6 +445,41 @@ class TestCurate:
         """An unknown selector token is a usage error."""
         result = runner.invoke(app, ["datasets", "curate", "bogus", "x"])
         assert result.exit_code == 2, "unknown provider -> exit 2"
+
+    def test_fill_empty_runs_bulk_hydrate(self, monkeypatch):
+        """gee --fill-empty --write drives the bulk hydrate and reports a summary."""
+        monkeypatch.setattr(
+            hydrate_mod,
+            "bulk_hydrate_empty",
+            lambda limit=None: {
+                "candidates": 3,
+                "hydrated": 2,
+                "skipped": 1,
+                "filled": ["A", "B"],
+            },
+        )
+        result = runner.invoke(
+            app, ["datasets", "curate", "gee", "--fill-empty", "--write"]
+        )
+        assert result.exit_code == 0, f"fill-empty failed: {result.output}"
+        assert "hydrated 2" in result.output and "/ 3" in result.output
+
+    def test_fill_empty_requires_write(self):
+        """--fill-empty without --write is a usage error (it mutates the catalog)."""
+        result = runner.invoke(app, ["datasets", "curate", "gee", "--fill-empty"])
+        assert result.exit_code == 2, "fill-empty without --write -> exit 2"
+
+    def test_fill_empty_gee_only(self):
+        """--fill-empty on a non-gee provider is rejected."""
+        result = runner.invoke(
+            app, ["datasets", "curate", "usgs_water", "--fill-empty", "--write"]
+        )
+        assert result.exit_code == 2, "fill-empty non-gee -> exit 2"
+
+    def test_missing_upstream_id_rejected(self):
+        """curate without an upstream id (and no --fill-empty) is a usage error."""
+        result = runner.invoke(app, ["datasets", "curate", "usgs_water"])
+        assert result.exit_code == 2, "missing id -> exit 2"
 
 
 class TestValidate:

@@ -24,12 +24,18 @@ from earthlens.cli.query import (
     parse_filters,
     sort_rows,
 )
-from earthlens.cli.refresh import _TILE_REGENS, audit_one, refresh_one
+from earthlens.cli.refresh import (
+    _TILE_REGENS,
+    audit_one,
+    coverage_one,
+    refresh_one,
+)
 from earthlens.cli.render import (
     COMPACT_COLUMNS,
     FULL_COLUMNS,
     audit_table,
     counts_table,
+    coverage_table,
     err_console,
     kv_table,
     out_console,
@@ -582,7 +588,9 @@ def probe(
 def curate(
     provider: str = typer.Argument(..., help="Provider id (or alias)."),
     upstream_id: str = typer.Argument(
-        ..., help="Upstream id to seed a curated row from (short name / id / code)."
+        "",
+        help="Upstream id to seed a curated row from (short name / id / code). "
+        "Omit only with gee --fill-empty.",
     ),
     key: str = typer.Option(
         "", "--key", help="Friendly catalog key for the row (default: the id)."
@@ -594,6 +602,15 @@ def curate(
         False,
         "--hydrate",
         help="gee: read bands live from Earth Engine (needs GEE creds).",
+    ),
+    fill_empty: bool = typer.Option(
+        False,
+        "--fill-empty",
+        help="gee: bulk-hydrate EVERY empty-band curated row in place from "
+        "Earth Engine (needs --write + GEE creds; ignores upstream_id).",
+    ),
+    limit: int = typer.Option(
+        0, "--limit", help="gee --fill-empty: only hydrate the first N rows (0=all)."
     ),
     version: str = typer.Option("", "--version", help="earthdata: collection version."),
     cmr_provider: str = typer.Option(
@@ -640,6 +657,15 @@ def curate(
     backends = _select_refresh_backends(provider)
     if len(backends) != 1:
         raise typer.BadParameter("curate takes exactly one provider")
+
+    if fill_empty:
+        _curate_fill_empty(backends[0], write=write, limit=limit or None)
+        return
+    if not upstream_id:
+        raise typer.BadParameter(
+            "curate needs an upstream_id (unless gee --fill-empty)"
+        )
+
     result = emit_stanza(
         backends[0],
         upstream_id,
@@ -684,6 +710,28 @@ def curate(
         typer.echo(result.to_yaml())
 
 
+def _curate_fill_empty(info, *, write: bool, limit: int | None) -> None:
+    """Run `curate gee --fill-empty`: bulk-hydrate empty-band rows in place.
+
+    Args:
+        info: The backend (must be gee).
+        write: `--fill-empty` mutates the catalog, so `--write` is required.
+        limit: Only hydrate the first N empty rows (None = all).
+    """
+    if info.provider != "gee":
+        raise typer.BadParameter("--fill-empty is only supported for gee")
+    if not write:
+        raise typer.BadParameter("--fill-empty rewrites the catalog; pass --write")
+    from earthlens.cli._gee_hydrate import bulk_hydrate_empty
+
+    summary = bulk_hydrate_empty(limit=limit)
+    out_console().print(
+        f"[green]hydrated {summary['hydrated']}[/green] / "
+        f"{summary['candidates']} empty-band rows "
+        f"(skipped {summary['skipped']})"
+    )
+
+
 @datasets_app.command()
 def audit(
     providers: str = typer.Argument(
@@ -695,6 +743,12 @@ def audit(
         "--strict",
         help="Exit non-zero if any curated dataset is no longer served live.",
     ),
+    coverage: bool = typer.Option(
+        False,
+        "--coverage",
+        help="Classify the available universe by curation status "
+        "(DONE/addressable/thin/table/missing) instead of drift. gee only.",
+    ),
     json_output: bool = typer.Option(
         False, "--json", "-j", help="Emit the outcomes as JSON (for piping)."
     ),
@@ -704,9 +758,17 @@ def audit(
     Goes to the **network** (like `refresh`): flags `broken` curated datasets
     the provider no longer serves — the drift a `--strict` CI gate fails on —
     and, informationally, live ids missing from the bundled index. Providers
-    without a public listing endpoint report `unsupported`.
+    without a public listing endpoint report `unsupported`. With `--coverage`
+    it switches to a **curation-coverage** report instead: it buckets every id
+    in the provider's available universe as already curated (DONE), worth
+    curating (addressable), needing hand-modelling (thin), out of raster scope
+    (table), or gone (missing), and lists the highest-value `addressable` ids
+    to curate next (currently gee only).
     """
     selected = _select_refresh_backends(providers)
+    if coverage:
+        _audit_coverage(selected, json_output=json_output)
+        return
     if not json_output:
         err_console().print(
             f"[dim]Auditing {len(selected)} provider(s) against live...[/dim]"
@@ -726,6 +788,32 @@ def audit(
 
     if strict and any(o.broken for o in outcomes):
         raise typer.Exit(code=1)
+
+
+def _audit_coverage(selected, *, json_output: bool) -> None:
+    """Render the `audit --coverage` curation-coverage report.
+
+    Args:
+        selected: The backends to classify.
+        json_output: Emit JSON instead of the rich table + TODO list.
+    """
+    if not json_output:
+        err_console().print(
+            f"[dim]Classifying {len(selected)} provider(s) for curation "
+            "coverage...[/dim]"
+        )
+    outcomes = [coverage_one(info) for info in selected]
+    if json_output:
+        typer.echo(json.dumps([o.to_dict() for o in outcomes], indent=2))
+        return
+    out_console().print(coverage_table(outcomes))
+    for outcome in outcomes:
+        if outcome.status == "ok" and outcome.todo:
+            shown = ", ".join(outcome.todo[:20])
+            more = "" if len(outcome.todo) <= 20 else f" … (+{len(outcome.todo) - 20})"
+            out_console().print(
+                f"[yellow]curate next in {outcome.provider}:[/yellow] {shown}{more}"
+            )
 
 
 @datasets_app.command()
