@@ -11,7 +11,7 @@ pip install earthlens[<extra>]      # e.g. earthlens[ecmwf]
 pip install earthlens[all]          # every backend's SDK
 ```
 
-Backends with no extra (CHC, GDACS, OpenAQ) need only the core install — they use anonymous FTP or plain HTTP.
+Backends with no extra (CHC, GDACS, FIRMS, OpenAQ, GHSL) need only the core install — they use anonymous FTP or plain HTTP.
 
 ## Integrated providers
 
