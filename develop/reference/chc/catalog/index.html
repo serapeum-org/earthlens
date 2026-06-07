@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -539,34 +539,6 @@
 
               
             
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../cli/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Command-line interface
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
           </ul>
         </nav>
       
@@ -1004,10 +976,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#earthlens-datasets-probe-chc-key" class="md-nav__link">
+  <a href="#toolschcprobe_chirps_gefspy" class="md-nav__link">
     <span class="md-ellipsis">
       
-        earthlens datasets probe chc &lt;key&gt;
+        tools/chc/probe_chirps_gefs.py
       
     </span>
   </a>
@@ -10076,10 +10048,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#earthlens-datasets-probe-chc-key" class="md-nav__link">
+  <a href="#toolschcprobe_chirps_gefspy" class="md-nav__link">
     <span class="md-ellipsis">
       
-        earthlens datasets probe chc &lt;key&gt;
+        tools/chc/probe_chirps_gefs.py
       
     </span>
   </a>
@@ -10172,11 +10144,11 @@ the tooling that supports catalog work.</p>
 </tr>
 <tr>
 <td><code>tools/chc/audit_chc_datasets.py</code></td>
-<td>Coverage / staleness classifier (parallel of <code>earthlens datasets audit gee --coverage</code>)</td>
+<td>Coverage / staleness classifier (parallel of <code>tools/gee/audit_gee_datasets.py</code>)</td>
 </tr>
 <tr>
-<td><code>earthlens datasets probe chc &lt;key&gt;</code></td>
-<td>CHIRPS FTP probe — samples a directory's filenames + suggests a <code>file_patterns</code> template (used to verify the GEFS v3 patterns before they were withdrawn)</td>
+<td><code>tools/chc/probe_chirps_gefs.py</code></td>
+<td>CHIRPS-GEFS FTP probe — was used to verify the v3 file patterns before they were withdrawn</td>
 </tr>
 </tbody>
 </table>
@@ -10455,18 +10427,18 @@ occurrence).</p>
 <p>Walks <code>data.chc.ucsb.edu</code> and regenerates the
 <code>available_datasets:</code> index in <code>_index.yaml</code>. Run after CHC publishes
 a new product. CHC analogue of
-<code>earthlens datasets refresh gee --write</code>.</p>
+<code>tools/gee/refresh_gee_catalog.py</code> and
+<code>tools/ecmwf/refresh_available_datasets.py</code>.</p>
 <h3 id="toolschcaudit_chc_datasetspy"><a class="toclink" href="#toolschcaudit_chc_datasetspy"><code>tools/chc/audit_chc_datasets.py</code></a><a class="headerlink" href="#toolschcaudit_chc_datasetspy" title="Permanent link">#</a></h3>
 <p>Coverage / staleness classifier. Walks the catalog and reports which
 shipped datasets have been verified against the live FTP (and which
 haven't been touched since N days). Parallel of
-<code>earthlens datasets audit gee --coverage</code>.</p>
-<h3 id="earthlens-datasets-probe-chc-key"><a class="toclink" href="#earthlens-datasets-probe-chc-key"><code>earthlens datasets probe chc &lt;key&gt;</code></a><a class="headerlink" href="#earthlens-datasets-probe-chc-key" title="Permanent link">#</a></h3>
-<p>CHIRPS FTP probe. Lists a sample of the real filenames under a
-dataset's <code>ftp_base</code> on the live FTP and adds a <code>(suggested pattern)</code>
-row carrying a <code>file_patterns</code> template inferred from the listing.
-Run against the GEFS keys, it was the basis for the H2 decision to
-<strong>withdraw</strong> the
+<code>tools/gee/audit_gee_datasets.py</code>.</p>
+<h3 id="toolschcprobe_chirps_gefspy"><a class="toclink" href="#toolschcprobe_chirps_gefspy"><code>tools/chc/probe_chirps_gefs.py</code></a><a class="headerlink" href="#toolschcprobe_chirps_gefspy" title="Permanent link">#</a></h3>
+<p>CHIRPS-GEFS-specific FTP probe. Lists the real contents of each
+<code>CHIRPS-GEFS/...</code> directory on the live FTP, prints a sample of
+filenames, and suggests a filename template inferred from the
+listing. Was the basis for the H2 decision to <strong>withdraw</strong> the
 CHIRPS-GEFS v3 rows — the probe found the directory shape didn't
 match the YAML's provisional patterns
 (<code>year/</code> partitioning vs the YAML's <code>year/month/</code> assumption;
