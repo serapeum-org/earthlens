@@ -42,6 +42,17 @@ class TestFromHealpix:
         with pytest.raises(ValueError, match="power of two"):
             from_healpix(np.arange(108.0), nside=3, nest=True, cell_size=20.0)
 
+    def test_nested_nside4_exercises_index_conversion(self):
+        """A larger NESTED grid (nside=4) regrids through the bit-deinterleave path."""
+        ds = from_healpix(np.arange(192.0), nside=4, nest=True, cell_size=15.0)
+        assert ds.band_count == 1
+
+    def test_explicit_bbox_is_honoured(self):
+        """An explicit global bbox pins the output extent."""
+        ds = from_healpix(np.arange(12.0), cell_size=30.0, bbox=(-180, -90, 180, 90))
+        assert ds.band_count == 1
+        assert ds.epsg == 4326
+
 
 class TestFromOctahedral:
     """`from_octahedral` regrids ragged per-point fields."""
@@ -58,6 +69,14 @@ class TestFromOctahedral:
         """Coordinate/value arrays of unequal length are rejected."""
         with pytest.raises(ValueError, match="equal length"):
             from_octahedral(np.zeros(4), np.zeros(3), np.zeros(4), cell_size=1.0)
+
+    def test_explicit_bbox_is_honoured(self):
+        """An explicit bbox pins the output extent."""
+        lats = np.array([0.0, 0.0, 5.0, 5.0])
+        lons = np.array([0.0, 5.0, 0.0, 5.0])
+        values = np.array([1.0, 2.0, 3.0, 4.0])
+        ds = from_octahedral(lats, lons, values, cell_size=1.0, bbox=(0, 0, 5, 5))
+        assert ds.band_count == 1
 
 
 class TestFromOrca:
@@ -86,3 +105,11 @@ class TestFromOrca:
         """A grid smaller than 2x2 cannot form quad cells."""
         with pytest.raises(ValueError, match="at least 2 x 2"):
             from_orca(np.zeros((1, 3)), np.zeros((1, 3)), np.zeros((1, 3)), cell_size=0.5)
+
+    def test_nan_values_are_tolerated(self):
+        """NaN-masked nodes are averaged away without raising (all-NaN face path)."""
+        lon2d = np.array([[0.0, 1.0, 2.0], [0.0, 1.0, 2.0]])
+        lat2d = np.array([[0.0, 0.0, 0.0], [1.0, 1.0, 1.0]])
+        data2d = np.array([[np.nan, np.nan, 3.0], [np.nan, np.nan, 6.0]])
+        ds = from_orca(lon2d, lat2d, data2d, cell_size=0.5, nodata=-1.0)
+        assert ds.band_count == 1
