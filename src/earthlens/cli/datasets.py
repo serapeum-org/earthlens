@@ -534,6 +534,11 @@ def curate(
     minimal: bool = typer.Option(
         False, "--minimal", help="Emit a placeholder row without a live fetch."
     ),
+    hydrate: bool = typer.Option(
+        False,
+        "--hydrate",
+        help="gee: read bands live from Earth Engine (needs GEE creds).",
+    ),
     version: str = typer.Option("", "--version", help="earthdata: collection version."),
     cmr_provider: str = typer.Option(
         "", "--cmr-provider", help="earthdata: CMR provider code (e.g. GES_DISC)."
@@ -571,6 +576,7 @@ def curate(
         upstream_id,
         key=key or None,
         minimal=minimal,
+        hydrate=hydrate,
         version=version,
         cmr_provider=cmr_provider,
         daac=daac,

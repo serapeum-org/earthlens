@@ -182,6 +182,18 @@ class TestGeeEmitter:
         result = emit_stanza(_info("gee"), "projects/foo/bar", minimal=True)
         assert result.status == "ok" and result.row["bands"] == {}
 
+    def test_hydrate_reads_bands_from_earth_engine(self, monkeypatch):
+        """--hydrate seeds bands from a live Earth Engine query (creds-gated)."""
+        monkeypatch.setattr(
+            stanza_mod,
+            "_gee_live_bands",
+            lambda asset_id: ("image", {"B1": {}, "B2": {}}),
+        )
+        result = emit_stanza(_info("gee"), "projects/foo/bar", hydrate=True)
+        assert result.status == "ok", "gee hydrate ran"
+        assert result.row["ee_type"] == "image", "ee_type from EE asset"
+        assert sorted(result.row["bands"]) == ["B1", "B2"], "live bands seeded"
+
 
 class TestEmitStanza:
     """Tests for emit_stanza dispatch."""

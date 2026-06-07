@@ -338,6 +338,35 @@ def _gee_stac_doc(asset_id: str) -> dict[str, Any]:
     return _get_json(f"{_GEE_STAC_BASE}/{provider}/{filename}")
 
 
+def _gee_live_bands(asset_id: str) -> tuple[str, dict[str, dict[str, Any]]]:
+    """Query Earth Engine live for an asset's `(ee_type, bands)` (needs creds).
+
+    The credentialed fallback for assets the public STAC tree can't reach
+    (mainly community `projects/...` ids). Authenticates the service
+    account (`GEE_SERVICE_ACCOUNT` / `GEE_SERVICE_KEY`) and reads the band
+    names off the asset's first image.
+
+    Args:
+        asset_id: The Earth Engine asset id.
+
+    Returns:
+        `(ee_type, {band: {}})` — the asset type (lowercased) and its bands.
+    """
+    import ee
+
+    from earthlens.gee.auth import EarthEngineAuth, EarthEngineCredentials
+
+    EarthEngineAuth(EarthEngineCredentials()).configure()
+    ee_type = (ee.data.getAsset(asset_id).get("type") or "IMAGE_COLLECTION").lower()
+    image = (
+        ee.Image(asset_id)
+        if ee_type == "image"
+        else ee.ImageCollection(asset_id).first()
+    )
+    bands = ee.Image(image).bandNames().getInfo() or []
+    return ee_type, {str(band): {} for band in bands}
+
+
 def _gsd_to_metres(gsd: Any) -> float | None:
     """Return a band `gsd` as a float (unwrapping a `[value]` list)."""
     value = gsd[0] if isinstance(gsd, list) and gsd else gsd
@@ -350,7 +379,9 @@ def _emit_gee(catalog: Any, upstream_id: str, **opts: Any) -> dict[str, Any]:
     Args:
         catalog: The loaded GEE `Catalog` (unused; STAC is the source).
         upstream_id: The Earth Engine asset id (e.g. `NASA/GDDP-CMIP6`).
-        **opts: `minimal` emits a placeholder row with empty bands.
+        **opts: `minimal` emits a placeholder row with empty bands;
+            `hydrate` reads the bands live from Earth Engine (needs creds —
+            the fallback for assets the public STAC tree can't reach).
 
     Returns:
         The seeded row (title / ee_type / cadence / extent / bands).
@@ -361,6 +392,14 @@ def _emit_gee(catalog: Any, upstream_id: str, **opts: Any) -> dict[str, Any]:
             "ee_type": "image_collection",
             "default_reducer": "median",
             "bands": {},
+        }
+    if opts.get("hydrate"):
+        ee_type, bands = _gee_live_bands(upstream_id)
+        return {
+            "title": upstream_id,
+            "ee_type": ee_type,
+            "default_reducer": "median",
+            "bands": bands,
         }
     doc = _gee_stac_doc(upstream_id)
     extent = doc.get("extent", {})
