@@ -539,6 +539,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cli/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Command-line interface
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -10269,19 +10297,19 @@ ICON-EPS ensembles are surface-only):</p>
 <a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="n">cat</span><span class="o">.</span><span class="n">get_model</span><span class="p">(</span><span class="s2">&quot;gfs&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">bands</span><span class="p">[</span><span class="s2">&quot;temperature_2m&quot;</span><span class="p">]</span>   <span class="c1"># &#39;:TMP:2 m above ground:&#39;</span>
 </code></pre></div>
 <h2 id="tooling"><a class="toclink" href="#tooling">Tooling</a><a class="headerlink" href="#tooling" title="Permanent link">#</a></h2>
-<p>Three maintenance scripts live under <code>tools/nwp/</code>:</p>
+<p>The <code>earthlens datasets</code> verbs keep the catalog honest:</p>
 <ul>
-<li><code>refresh_nwp_catalog.py</code> — print a model summary; <code>--live</code> HEAD-probes
-  each <code>direct-https</code> model's latest cycle.</li>
-<li><code>audit_nwp_catalog.py</code> — static consistency lint (backend vs
-  <code>url_template</code> / <code>model_family</code>, empty bands, cycle-hour range).</li>
-<li><code>probe_nwp_model.py &lt;key&gt;</code> — live availability check for one model,
-  dispatching on backend (HTTP HEAD / unsigned S3 <code>head_object</code> /
-  <code>Client.latest()</code> / Herbie URL resolution). Use it to vet a catalog
-  row before relying on it.</li>
+<li><code>list nwp</code> / <code>show nwp &lt;key&gt;</code> — the model summary (backend, cycles,
+  horizon, bands).</li>
+<li><code>validate nwp</code> — static consistency lint (<code>url_template</code> / band map /
+  cycle-hour range).</li>
+<li><code>validate nwp --live</code> — HEAD-probes each <code>direct-https</code> model's latest
+  expected cycle URL to confirm the source is serving.</li>
+<li><code>probe nwp &lt;key&gt;</code> — read the model's GRIB <code>.idx</code> and report which catalog
+  band tokens are present. Use it to vet a row before relying on it.</li>
 </ul>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>pixi<span class="w"> </span>run<span class="w"> </span>-e<span class="w"> </span>dev<span class="w"> </span>python<span class="w"> </span>tools/nwp/refresh_nwp_catalog.py<span class="w"> </span>--live
-<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>pixi<span class="w"> </span>run<span class="w"> </span>-e<span class="w"> </span>dev<span class="w"> </span>python<span class="w"> </span>tools/nwp/audit_nwp_catalog.py
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>earthlens<span class="w"> </span>datasets<span class="w"> </span>validate<span class="w"> </span>nwp<span class="w"> </span>--live
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>earthlens<span class="w"> </span>datasets<span class="w"> </span>probe<span class="w"> </span>nwp<span class="w"> </span>icon-global
 </code></pre></div>
 
 

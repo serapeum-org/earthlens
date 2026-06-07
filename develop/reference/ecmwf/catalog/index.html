@@ -539,6 +539,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cli/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Command-line interface
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -1723,21 +1751,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#toolsecmwfprobe_open_datasetspy" class="md-nav__link">
+  <a href="#earthlens-datasets-validate-ecmwf-live" class="md-nav__link">
     <span class="md-ellipsis">
       
-        tools/ecmwf/probe_open_datasets.py
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#toolsecmwfdownload_probe_resultspy" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        tools/ecmwf/download_probe_results.py
+        earthlens datasets validate ecmwf --live
       
     </span>
   </a>
@@ -10231,21 +10248,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#toolsecmwfprobe_open_datasetspy" class="md-nav__link">
+  <a href="#earthlens-datasets-validate-ecmwf-live" class="md-nav__link">
     <span class="md-ellipsis">
       
-        tools/ecmwf/probe_open_datasets.py
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#toolsecmwfdownload_probe_resultspy" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        tools/ecmwf/download_probe_results.py
+        earthlens datasets validate ecmwf --live
       
     </span>
   </a>
@@ -10430,16 +10436,12 @@ support catalog work.</p>
 <td>Walks <code>available_datasets:</code> and reports each dataset's <code>constraints.json</code> shape — coverage planning</td>
 </tr>
 <tr>
-<td><code>tools/ecmwf/probe_open_datasets.py</code></td>
-<td>Submits one fire-and-forget retrieve per dataset to verify it actually serves data</td>
+<td><code>earthlens datasets validate ecmwf --live</code></td>
+<td>Builds a <code>constraints.json</code>-valid minimal request per dataset and runs the pre-flight <code>RequestValidator</code> (no CDS submission)</td>
 </tr>
 <tr>
-<td><code>tools/ecmwf/probe_cds_netcdf.py</code></td>
-<td>Submits a real retrieve for specific variables and extracts their NetCDF short names and units</td>
-</tr>
-<tr>
-<td><code>tools/ecmwf/download_probe_results.py</code></td>
-<td>Waits for queued probes to finish, downloads the NetCDFs locally</td>
+<td><code>earthlens datasets probe ecmwf &lt;id&gt; --deep</code></td>
+<td>Submits a real tiny retrieve for one dataset and extracts its NetCDF short names and units</td>
 </tr>
 <tr>
 <td><code>tools/ecmwf/bulk_add_remaining.py</code> / <code>bulk_apply.py</code> / <code>bulk_inject.py</code></td>
@@ -10959,26 +10961,20 @@ HTTP / parse error.</p>
 glance which datasets are ready to add and which need bespoke
 modelling (typically extras keys like <code>domain</code>, <code>experiment</code>,
 <code>leadtime_hour</code>, …).</p>
-<h3 id="toolsecmwfprobe_open_datasetspy"><a class="toclink" href="#toolsecmwfprobe_open_datasetspy"><code>tools/ecmwf/probe_open_datasets.py</code></a><a class="headerlink" href="#toolsecmwfprobe_open_datasetspy" title="Permanent link">#</a></h3>
-<p>Fire-and-forget retrieve probe per dataset. For each entry, asks
-<code>Catalog.minimal_valid_request</code> for a known-valid request derived
-from <code>constraints.json</code>, runs the local pre-flight
-<code>RequestValidator</code>, and submits via async HTTP only if validation
-passes.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>pixi<span class="w"> </span>run<span class="w"> </span>-e<span class="w"> </span>dev<span class="w"> </span>python<span class="w"> </span>tools/ecmwf/probe_open_datasets.py
+<h3 id="earthlens-datasets-validate-ecmwf-live"><a class="toclink" href="#earthlens-datasets-validate-ecmwf-live"><code>earthlens datasets validate ecmwf --live</code></a><a class="headerlink" href="#earthlens-datasets-validate-ecmwf-live" title="Permanent link">#</a></h3>
+<p>Per-dataset request-validity check. For each curated dataset it asks
+<code>Catalog.minimal_valid_request</code> for a known-valid request derived from
+<code>constraints.json</code> and runs the same pre-flight <code>RequestValidator</code> the
+backend uses — flagging datasets whose minimal request fails. It is
+stateless: no CDS credentials and no queue submission (datasets that
+publish no constraints are skipped).</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>earthlens<span class="w"> </span>datasets<span class="w"> </span>validate<span class="w"> </span>ecmwf<span class="w"> </span>--live
 </code></pre></div>
-<p>Submits probes and returns immediately. Pair with
-<code>download_probe_results.py</code> to wait for queue completion and harvest
-the resulting NetCDFs.</p>
-<h3 id="toolsecmwfdownload_probe_resultspy"><a class="toclink" href="#toolsecmwfdownload_probe_resultspy"><code>tools/ecmwf/download_probe_results.py</code></a><a class="headerlink" href="#toolsecmwfdownload_probe_resultspy" title="Permanent link">#</a></h3>
-<p>Waits for queued probes to finish and downloads the result NetCDFs
-into <code>C:/tmp/cds_probe/</code>. Thin wrapper around
-<code>Catalog.list_recent_jobs</code> and <code>Catalog.download_job</code> — no separate
-HTTP plumbing.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>pixi<span class="w"> </span>run<span class="w"> </span>-e<span class="w"> </span>dev<span class="w"> </span>python<span class="w"> </span>tools/ecmwf/download_probe_results.py
-<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>pixi<span class="w"> </span>run<span class="w"> </span>-e<span class="w"> </span>dev<span class="w"> </span>python<span class="w"> </span>tools/ecmwf/download_probe_results.py<span class="w"> </span>--max-age-min<span class="w"> </span><span class="m">60</span>
+<p>To confirm a single dataset actually serves data (and read its NetCDF
+short names / units), submit a real tiny retrieve with <code>probe --deep</code>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>earthlens<span class="w"> </span>datasets<span class="w"> </span>probe<span class="w"> </span>ecmwf<span class="w"> </span>&lt;dataset-short-name&gt;<span class="w"> </span>--deep
 </code></pre></div>
-<p>After this finishes, the cached NetCDFs are ready for nc-variable
+<p>The probed NetCDF metadata is ready for nc-variable
 extraction by <code>probe_cds_netcdf.py</code> or hand inspection.</p>
 <h3 id="toolsecmwfprobe_cds_netcdfpy"><a class="toclink" href="#toolsecmwfprobe_cds_netcdfpy"><code>tools/ecmwf/probe_cds_netcdf.py</code></a><a class="headerlink" href="#toolsecmwfprobe_cds_netcdfpy" title="Permanent link">#</a></h3>
 <p>Submits a real retrieve for a <em>specific</em> set of CDS variables on a
@@ -11037,17 +11033,13 @@ the package doesn't yet support:</p>
 <li>
 <p><strong>Probe a known-good variable</strong> to discover its NetCDF
    short name and units:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>pixi<span class="w"> </span>run<span class="w"> </span>-e<span class="w"> </span>dev<span class="w"> </span>python<span class="w"> </span>tools/ecmwf/probe_open_datasets.py
-<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>pixi<span class="w"> </span>run<span class="w"> </span>-e<span class="w"> </span>dev<span class="w"> </span>python<span class="w"> </span>tools/ecmwf/download_probe_results.py
-<a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a>pixi<span class="w"> </span>run<span class="w"> </span>-e<span class="w"> </span>dev<span class="w"> </span>python<span class="w"> </span>tools/ecmwf/probe_cds_netcdf.py<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a><span class="w">    </span>--dataset<span class="w"> </span>&lt;dataset-short-name&gt;<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a><span class="w">    </span>--variables<span class="w"> </span>&lt;cds_variable_1&gt;,&lt;cds_variable_2&gt;<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a><span class="w">    </span>--out<span class="w"> </span>C:/tmp/cds_probe/&lt;dataset&gt;.json
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>earthlens<span class="w"> </span>datasets<span class="w"> </span>validate<span class="w"> </span>ecmwf<span class="w"> </span>--live<span class="w">      </span><span class="c1"># check every dataset&#39;s request is constructible</span>
+<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>earthlens<span class="w"> </span>datasets<span class="w"> </span>probe<span class="w"> </span>ecmwf<span class="w"> </span>&lt;dataset-short-name&gt;<span class="w"> </span>--deep
 </code></pre></div>
 </li>
 </ol>
-<p>The JSON sidecar maps each <code>cds_variable</code> to its <code>nc_variable</code> and
-   <code>units</code>.</p>
+<p><code>probe --deep</code> submits a real tiny retrieve and reports each
+   variable's <code>nc_variable</code> and <code>units</code>.</p>
 <ol>
 <li>
 <p><strong>Author the YAML entry</strong> under <code>datasets:</code>. At minimum:</p>
