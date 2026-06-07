@@ -234,6 +234,9 @@ nav:
     - Authentication: examples/authentication.md
     - Data Sources: examples/data-sources.md
     - Data Catalog: examples/catalog.md
+    - CHC (CHIRPS / CHIRTS / SPI / SPEI / …):
+      - Catalog explorer (no network): examples/chc/catalog_explorer.ipynb
+      - Daily rainfall quickstart (live): examples/chc/quickstart.ipynb
     - Amazon S3 (AWS Open Data):
       - Catalog explorer (no network): examples/s3/01_catalog_explorer.ipynb
       - Copernicus DEM — download & crop: examples/s3/02_copernicus_dem.ipynb
