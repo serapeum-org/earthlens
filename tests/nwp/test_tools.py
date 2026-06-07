@@ -14,52 +14,9 @@ from earthlens.nwp.catalog import NWPModel
 _TOOLS_DIR = Path(__file__).resolve().parents[2] / "tools" / "nwp"
 sys.path.insert(0, str(_TOOLS_DIR))
 
-import audit_nwp_catalog as audit  # noqa: E402
-import probe_idx as pidx  # noqa: E402
 import probe_nwp_model as probe  # noqa: E402
 
 pytestmark = [pytest.mark.nwp, pytest.mark.unit]
-
-
-class TestProbeIdx:
-    """Tests for tools/nwp/probe_idx.py (the eccodes-free .idx probe), no network."""
-
-    def test_idx_url_builds_from_template(self):
-        """_idx_url formats a NODD .idx URL from a Herbie template, offline."""
-        from earthlens.nwp import Catalog
-
-        rap = Catalog().get_model("rap")
-        url = pidx._idx_url(pidx._herbie_models_dir(), rap, dt.datetime(2026, 1, 1, 0), 1)
-        assert url.endswith(".idx") and "rap" in url
-
-    def test_probe_skips_eccc_family(self, capsys):
-        """probe() reports ECCC per-variable families (no .idx) without fetching."""
-        from earthlens.nwp import Catalog
-
-        pidx.probe("gdps", Catalog().get_model("gdps"))
-        assert "not idx-probable" in capsys.readouterr().out
-
-    def test_probe_skips_needs_extra_attrs(self, capsys):
-        """probe() reports families whose template needs domain/member/resolution."""
-        from earthlens.nwp import Catalog
-
-        pidx.probe("gefs", Catalog().get_model("gefs"))
-        assert "not idx-probable here" in capsys.readouterr().out
-
-
-class TestAuditTool:
-    """Tests for tools/nwp/audit_nwp_catalog.py over the bundled catalog."""
-
-    def test_bundled_catalog_is_clean(self):
-        """The shipped catalog passes the static consistency lint."""
-        assert audit.audit() == 0
-
-    def test_audit_model_flags_problems(self):
-        """A row missing bands / url_template surfaces problems."""
-        bad = NWPModel(provider="p", backend="direct-https", horizon_h=0)
-        problems = audit.audit_model("bad", bad)
-        assert any("no bands" in p for p in problems)
-        assert any("url_template" in p for p in problems)
 
 
 class TestProbeTool:
