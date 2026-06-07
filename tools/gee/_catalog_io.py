@@ -2,10 +2,9 @@
 
 Single home for the YAML stanza / title regexes, the
 asset-id → per-category-file resolver, and the in-place stanza-span
-locator used by `_hydrate_placeholders` / `_run_batch` / `add-ids` /
-`_migrate_source` / `_recategorize_catalog`. Centralising these
-prevents the regex drifting out of sync across the four-five tools
-that all need to slice the same YAML shape (M3 in
+locator used by `refresh_gee_catalog` (`add-ids` / `hydrate-live`) and
+`_recategorize_catalog`. Centralising these prevents the regex drifting
+out of sync across the tools that slice the same YAML shape (M3 in
 ``planning/code-quality-cleanup.md``).
 
 Not part of the installed package.
