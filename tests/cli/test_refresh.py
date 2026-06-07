@@ -652,6 +652,16 @@ class TestRadarMissingColumns:
         text = "ICAO  LAT      LON\n----- -------- --------\nKABR  45.0     -98.0"
         assert refresh_mod._radar_station_rows(text) == {}
 
+    def test_absent_st_column_defaults_state_blank(self):
+        """A table with the required columns but no ST keeps the row, state=''."""
+        text = (
+            "ICAO  NAME       LAT      LON\n"
+            "----- ---------- -------- --------\n"
+            "KABR  ABERDEEN   45.0     -98.0"
+        )
+        rows = refresh_mod._radar_station_rows(text)
+        assert rows["KABR"]["state"] == "", "absent ST column -> empty state"
+
 
 def _catalog_copy(provider, tmp_path, monkeypatch):
     """Copy a provider's catalog (dir or single file) and repoint CATALOG_PATH."""
