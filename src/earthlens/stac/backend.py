@@ -11,11 +11,12 @@ GeoTIFF per `(collection, date)` to `path`.
 The GIS heavy lifting lives in pyramids (per the pyramids/earthlens split):
 `pyramids.stac.open_client` / `resolved_href` / `read_extension_metadata`,
 `pyramids.dataset.merge`'s `merge_rasters` / `stack_bands(align=True)`,
-`Dataset.crop`, and `pyramids.dataset.cog.write_cog`. earthlens owns only the
-CDSE S3 signer (`earthlens.stac.signers`; the generic + Planetary Computer
-signers come from `pyramids.stac`), the endpoint × collection × asset catalog,
-and the search→load→write orchestration. There is no `odc-stac` / `stackstac`
-dependency.
+`Dataset.crop`, and `pyramids.dataset.cog.write_cog`. earthlens owns the
+provider signers (`earthlens.stac.signers` — Planetary Computer / Earthdata /
+CDSE bearer / CDSE S3; the generic `Signer` protocol + `anonymous` /
+`aws-requester-pays` signers come from `pyramids.stac`), the endpoint ×
+collection × asset catalog, and the search→load→write orchestration. There is
+no `odc-stac` / `stackstac` dependency.
 
 `OUTPUT_KIND = "raster"`, so the `EarthLens` facade forwards
 `aggregate=AggregationConfig(...)` to `download()` rather than rejecting it.

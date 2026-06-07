@@ -2,11 +2,50 @@
 
 from __future__ import annotations
 
+import json
+import time
+import urllib.request
+
 import pytest
 
 from earthlens.base import AuthenticationError
 from earthlens.stac import auth_cdse
-from earthlens.stac.signers import CdseS3Signer, build_signer
+from earthlens.stac.signers import (
+    CDSESigner,
+    CdseS3Signer,
+    EarthdataSigner,
+    PlanetaryComputerSigner,
+    build_signer,
+)
+
+
+class _FakeResponse:
+    """A urlopen() context-manager stand-in returning a fixed JSON payload."""
+
+    def __init__(self, payload: dict) -> None:
+        self._body = json.dumps(payload).encode("utf-8")
+
+    def __enter__(self) -> _FakeResponse:
+        return self
+
+    def __exit__(self, *exc: object) -> None:
+        return None
+
+    def read(self) -> bytes:
+        return self._body
+
+
+def _patch_urlopen(monkeypatch, payloads):
+    """Patch urllib.request.urlopen to pop successive JSON payloads; count calls."""
+    queue = list(payloads)
+    calls = {"n": 0}
+
+    def _fake(request, timeout=None):
+        calls["n"] += 1
+        return _FakeResponse(queue.pop(0) if len(queue) > 1 else queue[0])
+
+    monkeypatch.setattr(urllib.request, "urlopen", _fake)
+    return calls
 
 
 @pytest.mark.stac
@@ -62,6 +101,110 @@ class TestCdseS3Signer:
 
 
 @pytest.mark.stac
+class TestPlanetaryComputerSigner:
+    """The native PC SAS signer mints + appends tokens without the SDK."""
+
+    def test_name_and_empty_gdal_env(self):
+        """The credential rides the URL, so the GDAL env is empty."""
+        signer = PlanetaryComputerSigner()
+        assert signer.name == "planetary-computer"
+        assert signer.gdal_env() == {}
+
+    def test_non_pc_href_passthrough(self):
+        """A non-PC href is returned unchanged."""
+        assert (
+            PlanetaryComputerSigner().sign_href("https://example.com/a.tif")
+            == "https://example.com/a.tif"
+        )
+
+    def test_already_signed_passthrough(self):
+        """An href already carrying SAS query keys is left as-is."""
+        signed = "https://x.blob.core.windows.net/c/b.tif?se=2034&sig=abc"
+        assert PlanetaryComputerSigner().sign_href(signed) == signed
+
+    def test_public_bucket_never_signed(self):
+        """The public ai4edatasetspublicassets bucket is never signed."""
+        pub = "https://ai4edatasetspublicassets.blob.core.windows.net/c/b.tif"
+        assert PlanetaryComputerSigner().sign_href(pub) == pub
+
+    def test_blob_href_gets_token_appended_and_cached(self, monkeypatch):
+        """A PC blob href gets its SAS token appended; tokens are cached per container."""
+        signer = PlanetaryComputerSigner()
+        calls = {"n": 0}
+
+        def _fetch(account, container):
+            calls["n"] += 1
+            return "se=x&sig=y", time.time() + 3600.0
+
+        monkeypatch.setattr(signer, "_fetch_token", _fetch)
+        href = "https://acct.blob.core.windows.net/cont/blob.tif"
+        out = signer.sign_href(href)
+        assert out == href + "?se=x&sig=y"
+        signer.sign_href(href)
+        assert calls["n"] == 1
+
+    def test_fetch_token_reads_pc_endpoint(self, monkeypatch):
+        """_fetch_token GETs the token + parses the msft:expiry epoch."""
+        _patch_urlopen(
+            monkeypatch, [{"token": "se=tok", "msft:expiry": "2099-01-01T00:00:00Z"}]
+        )
+        token, expiry = PlanetaryComputerSigner()._fetch_token("acct", "cont")
+        assert token == "se=tok"
+        assert expiry > time.time()
+
+
+@pytest.mark.stac
+class TestEarthdataSigner:
+    """The EDL bearer signer uses a static token or mints one over HTTP Basic."""
+
+    def test_static_token_in_gdal_env(self):
+        """A pre-minted token is sent in the GDAL Authorization header."""
+        signer = EarthdataSigner(token="edl-tok")
+        assert signer.gdal_env()["GDAL_HTTP_HEADERS"] == "Authorization: Bearer edl-tok"
+
+    def test_minted_token_used_when_no_static(self, monkeypatch):
+        """With credentials and no static token, a token is minted and used."""
+        _patch_urlopen(
+            monkeypatch,
+            [{"access_token": "minted", "expiration_date": "2099-01-01T00:00:00Z"}],
+        )
+        signer = EarthdataSigner(username="u", password="p")
+        assert "Bearer minted" in signer.gdal_env()["GDAL_HTTP_HEADERS"]
+
+    def test_missing_credentials_raises(self, monkeypatch):
+        """No token and no username/password raises a clear ValueError."""
+        for var in ("EARTHDATA_TOKEN", "EARTHDATA_PAT", "EARTHDATA_USERNAME", "EARTHDATA_PASSWORD"):
+            monkeypatch.delenv(var, raising=False)
+        with pytest.raises(ValueError, match="EARTHDATA_USERNAME"):
+            EarthdataSigner().gdal_env()
+
+
+@pytest.mark.stac
+class TestCDSESigner:
+    """The CDSE Keycloak bearer signer mints + refreshes an access token."""
+
+    def test_password_grant_mints_token(self, monkeypatch):
+        """A password grant yields a bearer header from the minted access token."""
+        _patch_urlopen(
+            monkeypatch,
+            [{"access_token": "acc", "refresh_token": "ref", "expires_in": 600}],
+        )
+        signer = CDSESigner(username="u", password="p")
+        assert signer.gdal_env()["GDAL_HTTP_HEADERS"] == "Authorization: Bearer acc"
+
+    def test_missing_credentials_raises(self, monkeypatch):
+        """No username/password raises a clear ValueError."""
+        for var in ("CDSE_USERNAME", "CDSE_PASSWORD"):
+            monkeypatch.delenv(var, raising=False)
+        with pytest.raises(ValueError, match="CDSE_USERNAME"):
+            CDSESigner().gdal_env()
+
+    def test_bearer_is_not_url_side(self):
+        """sign_href is identity — CDSE bearer auth is header-side."""
+        assert CDSESigner(username="u", password="p").sign_href("x") == "x"
+
+
+@pytest.mark.stac
 class TestBuildSigner:
     """`build_signer` dispatches a catalog signer name to the right object."""
 
@@ -75,9 +218,23 @@ class TestBuildSigner:
         assert signer.name == "aws-requester-pays"
         assert signer.region == "us-west-2"
 
-    def test_mpc_sas(self, fake_pyramids):
-        """The mpc-sas name resolves to pyramids' native PlanetaryComputerSigner."""
-        assert build_signer("mpc-sas").name == "planetary-computer"
+    def test_mpc_sas_resolves_to_local_signer(self):
+        """The mpc-sas name resolves to earthlens' own PlanetaryComputerSigner."""
+        signer = build_signer("mpc-sas")
+        assert isinstance(signer, PlanetaryComputerSigner)
+        assert signer.name == "planetary-computer"
+
+    def test_earthdata_from_kwargs(self):
+        """The earthdata name resolves to EarthdataSigner using a supplied token."""
+        signer = build_signer("earthdata", token="edl-tok")
+        assert isinstance(signer, EarthdataSigner)
+        assert "Bearer edl-tok" in signer.gdal_env()["GDAL_HTTP_HEADERS"]
+
+    def test_cdse_resolves_to_bearer_signer(self):
+        """The cdse name resolves to the CDSE Keycloak bearer signer."""
+        signer = build_signer("cdse", username="u", password="p")
+        assert isinstance(signer, CDSESigner)
+        assert signer.name == "cdse"
 
     def test_cdse_s3_from_kwargs(self):
         """The cdse-s3 name resolves to CdseS3Signer using the supplied keys."""

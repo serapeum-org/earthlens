@@ -233,8 +233,14 @@ class TestFetch:
         stac._fetch(stac._search())
         assert _FakeCloudConfig.active_extras[-1]["AWS_S3_ENDPOINT"]
 
-    def test_signed_hrefs_reach_merge(self, fake_pyramids, tmp_path):
+    def test_signed_hrefs_reach_merge(self, fake_pyramids, tmp_path, monkeypatch):
         """MPC signs each tile href before it is handed to the mosaic step."""
+        # The mpc-sas endpoint builds earthlens' own PlanetaryComputerSigner; patch
+        # its sign_href to a deterministic transform (no network, no real PC host).
+        monkeypatch.setattr(
+            "earthlens.stac.signers.PlanetaryComputerSigner.sign_href",
+            lambda self, href: href + "?sas=token",
+        )
         fake_pyramids.items_by_collection["sentinel-2-l2a"] = [
             make_item("a", "2024-01-05", {"B04": "https://h/a_b04.tif"}),
             make_item("b", "2024-01-05", {"B04": "https://h/b_b04.tif"}),
