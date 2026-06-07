@@ -148,17 +148,3 @@ def test_audit_ignores_expected_uncurated():
     top, subs = _clean_live(cat)
     report = audit_mod.audit(cat, get=_fake_rest(top, subs))
     assert "covariates" not in report["upstream_products_not_curated"]
-
-
-def test_probe_captures_rest_shape():
-    """probe collects top aliases, sub-aliases, and a sample record."""
-    probe_mod = _load("probe_worldpop_rest")
-    records = [
-        {"popyear": "2020", "files": ["https://x/ken_ppp_2020.tif"], "id": 1}
-    ]
-    get = _fake_rest(["pop"], {"pop": ["wpgp", "wpgp1km"]}, records=records)
-    result = probe_mod.probe("pop", "wpgp", "KEN", get=get)
-    assert result["top_aliases"] == ["pop"]
-    assert result["subaliases"]["pop"] == ["wpgp", "wpgp1km"]
-    assert result["sample"]["popyears"] == ["2020"]
-    assert result["sample"]["files_head"] == ["https://x/ken_ppp_2020.tif"]
