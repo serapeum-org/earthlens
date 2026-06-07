@@ -17,6 +17,7 @@ their CLI seed would need credentials or a slow whole-archive read.
 from __future__ import annotations
 
 import os
+import re
 from collections.abc import Callable
 from dataclasses import dataclass, field
 from typing import Any
@@ -745,6 +746,129 @@ def _tropycal_probe(catalog: Any, dataset: str) -> dict[str, dict[str, Any]]:
     return _tropycal_fields(dataset, sources[0])
 
 
+#: ECCC models ship one whole GRIB per variable (no `.idx` byte-index), so the
+#: idx-token check can't apply; template families whose URL also needs
+#: domain / member / resolution aren't synthesised here either.
+_NWP_NO_IDX_FAMILIES = {"gdps", "rdps", "hrdps"}
+_NWP_NEEDS_EXTRA_ATTRS = {"hiresw", "href", "gefs"}
+
+
+def _herbie_models_dir() -> Any:
+    """Locate the installed `herbie/models` template directory.
+
+    Raises:
+        FileNotFoundError: When `herbie` is not importable (install
+            `earthlens[nwp]`; the templates are read as data, no eccodes).
+    """
+    import pathlib
+    import sys
+
+    for entry in sys.path:
+        candidate = pathlib.Path(entry) / "herbie" / "models"
+        if candidate.is_dir():
+            return candidate
+    raise FileNotFoundError(
+        "herbie is not installed; install `pip install earthlens[nwp]`"
+    )
+
+
+class _TemplateStub:
+    """Minimal Herbie stand-in so a model template's f-strings resolve."""
+
+    def __init__(self, date: Any, fxx: int, product: str) -> None:
+        self.date = date
+        self.fxx = fxx
+        self.product = product
+
+    def __getattr__(self, name: str) -> str:
+        return ""
+
+
+def _nwp_idx_url(models_dir: Any, model: Any, cycle: Any, step: int) -> str:
+    """Format a model's `.idx` URL from its installed Herbie template.
+
+    Reads Herbie's own template file as data (via `runpy`) rather than
+    importing `herbie` (whose package init pulls the `cfgrib`/`eccodes`
+    stack), then evaluates it against a stub to recover the AWS/NOMADS URL.
+    """
+    import runpy
+
+    namespace = runpy.run_path(str(models_dir / f"{model.model_family}.py"))
+    template_cls = namespace.get(model.model_family) or next(
+        value
+        for value in namespace.values()
+        if isinstance(value, type) and hasattr(value, "template")
+    )
+    stub = _TemplateStub(cycle, step, getattr(model, "product", "") or "")
+    template_cls.template(stub)
+    if not getattr(model, "product", "") and getattr(stub, "PRODUCTS", None):
+        stub = _TemplateStub(cycle, step, list(stub.PRODUCTS)[0])
+        template_cls.template(stub)
+    sources = stub.SOURCES
+    base = sources.get("aws") or sources.get("nomads") or next(iter(sources.values()))
+    return base + ".idx"
+
+
+def _nwp_idx_body(model: Any) -> str:
+    """Fetch the live `.idx` text for a model's most recent reachable cycle.
+
+    Raises:
+        ValueError: If no recent cycle's `.idx` is reachable.
+    """
+    import datetime as dt
+
+    models_dir = _herbie_models_dir()
+    step = 1 if (getattr(model, "horizon_h", 0) or 0) >= 1 else 0
+    for days_back in (1, 2):
+        cycle = (
+            dt.datetime.now(dt.UTC).replace(tzinfo=None) - dt.timedelta(days=days_back)
+        ).replace(hour=0, minute=0, second=0, microsecond=0)
+        url = _nwp_idx_url(models_dir, model, cycle, step)
+        try:
+            response = requests.get(url, timeout=_TIMEOUT)
+        except Exception:  # noqa: BLE001 — try the previous day
+            continue
+        if response.status_code == 200:
+            return response.text
+    raise ValueError("no recent .idx is reachable for this model")
+
+
+def _nwp_probe(catalog: Any, dataset: str) -> dict[str, dict[str, Any]]:
+    """Probe an NWP model's bands against its live GRIB `.idx` (no eccodes).
+
+    Reads Herbie's installed template to build the `.idx` URL for a recent
+    cycle, fetches it, and reports which of the model's catalog band tokens
+    are present — the live drift check `tools/nwp/probe_idx.py` does.
+
+    Args:
+        catalog: The loaded NWP `Catalog`.
+        dataset: A curated model key.
+
+    Returns:
+        Mapping of band name to `{token, present}`.
+
+    Raises:
+        ValueError: For models with no `.idx` (ECCC) or whose template needs
+            domain / member / resolution, or an unknown model key.
+    """
+    model = catalog.datasets.get(dataset)
+    if model is None:
+        raise ValueError(f"unknown NWP model {dataset!r}")
+    family = getattr(model, "model_family", None)
+    if family in _NWP_NO_IDX_FAMILIES:
+        raise ValueError(f"{dataset}: ECCC per-variable files have no .idx to probe")
+    if family in _NWP_NEEDS_EXTRA_ATTRS:
+        raise ValueError(
+            f"{dataset}: template needs domain/member/resolution; use the SDK"
+        )
+    body = _nwp_idx_body(model)
+    bands = getattr(model, "bands", None) or {}
+    return {
+        str(band): {"token": token, "present": bool(re.search(re.escape(token), body))}
+        for band, token in bands.items()
+    }
+
+
 #: Provider id -> a callable taking the loaded catalog and a dataset id and
 #: returning its per-entry schema.
 _PROBERS: dict[str, Callable[[Any, str], dict[str, dict[str, Any]]]] = {
@@ -764,6 +888,7 @@ _PROBERS: dict[str, Callable[[Any, str], dict[str, dict[str, Any]]]] = {
     "ecmwf": _ecmwf_probe,
     "chc": _chc_probe,
     "tropycal": _tropycal_probe,
+    "nwp": _nwp_probe,
 }
 
 

@@ -256,6 +256,38 @@ class TestRefresh:
         assert "new upstream ids" in result.output, "section header shown"
         assert "brand-new-collection" in result.output, "the id is listed"
 
+    def test_tiles_regenerates_ghsl_geojson(self, tmp_path, monkeypatch):
+        """--tiles regenerates the GHSL tile artefact and reports it (mocked)."""
+        import earthlens.ghsl._helpers as ghsl_helpers
+        import geopandas as gpd
+        from shapely.geometry import box
+
+        from earthlens.cli import refresh as refresh_mod
+
+        frame = gpd.GeoDataFrame(
+            {"tile_id": ["R1_C1"], "left": [0], "top": [1], "right": [1],
+             "bottom": [0], "geometry": [box(0, 0, 1, 1)]},
+            crs="ESRI:54009",
+        )
+        monkeypatch.setattr(refresh_mod, "_ghsl_tile_frame", lambda: frame)
+        monkeypatch.setattr(
+            ghsl_helpers, "TILE_SCHEMA_PATH", tmp_path / "tile_schema.geojson"
+        )
+        result = runner.invoke(
+            app, ["datasets", "refresh", "ghsl", "--tiles", "--json"]
+        )
+        payload = json.loads(result.output)
+        assert payload[0]["status"] == "ok", "ghsl tile regen ran (mocked)"
+        assert payload[0]["tiles"] == 1, "one tile written"
+
+    def test_tiles_unsupported_provider(self):
+        """--tiles on a non-tile provider reports unsupported, not a crash."""
+        result = runner.invoke(
+            app, ["datasets", "refresh", "stac", "--tiles", "--json"]
+        )
+        payload = json.loads(result.output)
+        assert payload[0]["status"] == "unsupported", "stac has no tile artefact"
+
     def test_write_reports_written_path(self, tmp_path, monkeypatch):
         """--write rewrites the (temp-redirected) catalog and reports the path."""
         import shutil

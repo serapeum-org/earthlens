@@ -385,6 +385,49 @@ class TestTropycalProbe:
         assert result.assets["vmax"]["dtype"] == "int64", "field dtype recorded"
 
 
+class TestNwpProbe:
+    """Tests for the NWP `.idx` band prober (Herbie template, no eccodes)."""
+
+    def test_reports_band_presence(self, monkeypatch):
+        """nwp probe flags which catalog band tokens appear in the live .idx."""
+        from earthlens.cli.adapter import load_catalog
+
+        catalog = load_catalog(_info("nwp"))
+        model_key = next(
+            key
+            for key, model in catalog.datasets.items()
+            if getattr(model, "model_family", None)
+            not in curate_mod._NWP_NO_IDX_FAMILIES | curate_mod._NWP_NEEDS_EXTRA_ATTRS
+            and (getattr(model, "bands", None) or {})
+        )
+        token = next(iter(catalog.datasets[model_key].bands.values()))
+        monkeypatch.setattr(
+            curate_mod, "_nwp_idx_body", lambda model: f"1:0:d=x:{token}:surface:\n"
+        )
+        result = probe_dataset(_info("nwp"), model_key)
+        assert result.status == "ok", "nwp probe ran"
+        assert any(v["present"] for v in result.assets.values()), "a band present"
+
+    def test_no_idx_family_is_error(self):
+        """An ECCC model (no .idx) reports 'error' with the reason."""
+        from earthlens.cli.adapter import load_catalog
+
+        catalog = load_catalog(_info("nwp"))
+        eccc = next(
+            (
+                key
+                for key, model in catalog.datasets.items()
+                if getattr(model, "model_family", None)
+                in curate_mod._NWP_NO_IDX_FAMILIES
+            ),
+            None,
+        )
+        if eccc is None:
+            pytest.skip("no ECCC model in the catalog")
+        result = probe_dataset(_info("nwp"), eccc)
+        assert result.status == "error" and "no .idx" in result.detail
+
+
 class TestProbeResult:
     """Tests for ProbeResult."""
 

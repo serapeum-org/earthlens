@@ -24,7 +24,7 @@ from earthlens.cli.query import (
     parse_filters,
     sort_rows,
 )
-from earthlens.cli.refresh import audit_one, refresh_one
+from earthlens.cli.refresh import _TILE_REGENS, audit_one, refresh_one
 from earthlens.cli.render import (
     COMPACT_COLUMNS,
     FULL_COLUMNS,
@@ -422,6 +422,44 @@ def _select_refresh_backends(selector: str) -> list[BackendInfo]:
     ]
 
 
+def _refresh_tiles(selected: list[BackendInfo], *, json_output: bool) -> None:
+    """Regenerate the bundled GIS tile artefact for each `--tiles` provider."""
+    results: list[dict[str, object]] = []
+    for info in selected:
+        regen = _TILE_REGENS.get(info.provider)
+        if regen is None:
+            results.append({"provider": info.provider, "status": "unsupported"})
+            continue
+        try:
+            path, count = regen()
+            results.append(
+                {
+                    "provider": info.provider,
+                    "status": "ok",
+                    "tiles": count,
+                    "written": path,
+                }
+            )
+        except Exception as exc:  # noqa: BLE001 — surfaced, not raised
+            results.append(
+                {"provider": info.provider, "status": "error", "detail": str(exc)}
+            )
+    if json_output:
+        typer.echo(json.dumps(results, indent=2))
+        return
+    for result in results:
+        if result["status"] == "ok":
+            out_console().print(
+                f"[green]wrote {result['tiles']} tiles[/green] "
+                f"({result['provider']}) -> {result['written']}"
+            )
+        else:
+            err_console().print(
+                f"[red]{result['status']}:[/red] {result['provider']} "
+                f"{result.get('detail', 'no tile artefact for this provider')}"
+            )
+
+
 @datasets_app.command()
 def refresh(
     providers: str = typer.Argument(
@@ -440,6 +478,12 @@ def refresh(
         help="Rewrite the bundled available_* index from the live fetch "
         "(modifies the package's catalog files; for editable installs).",
     ),
+    tiles: bool = typer.Option(
+        False,
+        "--tiles",
+        help="Regenerate a bundled GIS tile artefact instead of the index "
+        "(GHSL only: rebuilds tile_schema.geojson from the JRC shapefile).",
+    ),
     json_output: bool = typer.Option(
         False, "--json", "-j", help="Emit the outcomes as JSON (for piping)."
     ),
@@ -456,9 +500,13 @@ def refresh(
     from the live fetch — the maintainer "update the shipped catalog" step,
     meaningful in an editable / source checkout. Providers whose index is
     computed from the curated rows at load time (no on-disk block) report
-    "live read only" instead of writing.
+    "live read only" instead of writing. `--tiles` instead regenerates a
+    bundled GIS tile artefact (GHSL's `tile_schema.geojson`).
     """
     selected = _select_refresh_backends(providers)
+    if tiles:
+        _refresh_tiles(selected, json_output=json_output)
+        return
     if not json_output:
         action = "Updating" if write else "Querying"
         err_console().print(
