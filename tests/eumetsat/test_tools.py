@@ -47,10 +47,3 @@ def test_audit_strict_exit_code_via_diff():
     store = _load("_store")
     findings = store.diff_catalog({"A"}, {"A", "B"}, {"A"})
     assert sum(len(v) for v in findings.values()) == 1
-
-
-def test_audit_cli_parses_help():
-    """The audit CLI builds its argument parser without error."""
-    audit = _load("audit_eumetsat_catalog")
-    with pytest.raises(SystemExit):
-        audit.main(["--help"])

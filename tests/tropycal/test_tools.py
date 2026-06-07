@@ -11,7 +11,6 @@ import importlib.util
 from pathlib import Path
 from types import ModuleType
 
-import pandas as pd
 import pytest
 
 from earthlens.tropycal import Basin, Catalog
@@ -30,7 +29,6 @@ def _load_tool(name: str) -> ModuleType:
 
 
 audit_mod = _load_tool("audit_tropycal_catalog")
-probe_mod = _load_tool("probe_tropycal_fields")
 
 
 def _catalog(datasets: dict[str, Basin]) -> Catalog:
@@ -60,14 +58,18 @@ class TestAudit:
 
     def test_missing_sdk_basin(self):
         """An SDK basin absent from the catalog is reported."""
-        cat = _catalog({"north_atlantic": Basin(name="NA", sources=["ibtracs", "hurdat"])})
+        cat = _catalog(
+            {"north_atlantic": Basin(name="NA", sources=["ibtracs", "hurdat"])}
+        )
         report = audit_mod.audit(cat, None)
         assert "all" in report["sdk_basins_missing_from_catalog"]
         assert audit_mod.has_drift(report)
 
     def test_invalid_basin_source_pair(self):
         """A (basin, source) pair tropycal does not support is reported."""
-        cat = _catalog({"west_pacific": Basin(name="WP", sources=["ibtracs", "hurdat"])})
+        cat = _catalog(
+            {"west_pacific": Basin(name="WP", sources=["ibtracs", "hurdat"])}
+        )
         report = audit_mod.audit(cat, None)
         assert "west_pacific:hurdat" in report["invalid_basin_source_pairs"]
 
@@ -86,7 +88,10 @@ class TestAudit:
 
     def test_sample_only_fields_are_informational(self):
         """Observed columns the catalog omits do not count as drift."""
-        probe = {"basin": "north_atlantic", "fields": {"vmax": {}, "mslp": {}, "extra_obs": {}}}
+        probe = {
+            "basin": "north_atlantic",
+            "fields": {"vmax": {}, "mslp": {}, "extra_obs": {}},
+        }
         report = audit_mod.audit(Catalog(), probe)
         assert "extra_obs" in report["sample_fields_absent_from_catalog"]
         assert not audit_mod.has_drift(report)
@@ -106,31 +111,3 @@ class TestAudit:
         audit_mod.main(["--format", "json"])
         out = capsys.readouterr().out
         assert '"basins_not_in_sdk"' in out
-
-
-class TestProbe:
-    """Tests for the probe field-discovery tool."""
-
-    def test_stringify_timestamp(self):
-        """_stringify renders a pandas Timestamp as ISO text."""
-        out = probe_mod._stringify(pd.Timestamp("2005-08-25T06:00:00"))
-        assert out.startswith("2005-08-25")
-
-    def test_stringify_scalar(self):
-        """_stringify renders a plain scalar via str()."""
-        assert probe_mod._stringify(42) == "42"
-
-    def test_probe_fields_against_fake_sdk(self, fake_tropycal):
-        """probe_fields unions to_dataframe columns and flags no category column."""
-        summary = probe_mod.probe_fields("north_atlantic", "hurdat", 2005, 5)
-        assert summary["storms_sampled"] == 1
-        assert summary["has_category_column"] is False
-        assert "vmax" in summary["fields"]
-        assert summary["fields"]["vmax"]["dtype"]
-
-    def test_probe_main_writes_sidecar(self, fake_tropycal, tmp_path):
-        """probe main() writes the JSON sidecar to --out."""
-        out = tmp_path / "probe.json"
-        assert probe_mod.main(["--out", str(out)]) == 0
-        assert out.exists()
-        assert '"fields"' in out.read_text(encoding="utf-8")

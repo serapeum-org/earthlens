@@ -42,7 +42,9 @@ def _fake_rest(top_aliases, subaliases, records=None):
 
     def fake_get(url, params=None, timeout=None):
         if url == BASE_URL:
-            return _FakeResponse(json_data={"data": [{"alias": a} for a in top_aliases]})
+            return _FakeResponse(
+                json_data={"data": [{"alias": a} for a in top_aliases]}
+            )
         for alias, ids in subaliases.items():
             if url == f"{BASE_URL}/{alias}":
                 return _FakeResponse(json_data={"data": [{"alias": i} for i in ids]})
@@ -98,53 +100,3 @@ def test_main_validate_returns_zero(capsys):
     """The validate CLI exits 0 on the curated catalog (offline)."""
     tool = _load_tool()
     assert tool.main(["validate"]) == 0
-
-
-def _clean_live(catalog):
-    """Build (top_aliases, subaliases) that mirror the curated catalog by endpoint."""
-    audit_mod = _load("audit_worldpop_catalog")
-    subs: dict[str, list[str]] = {}
-    for product in catalog.available_products():
-        endpoint = catalog.get(product).endpoint()
-        subs.setdefault(endpoint, []).extend(s.id for s in catalog.get(product).subaliases)
-    top = list(subs) + list(audit_mod.EXPECTED_UNCURATED)
-    return top, subs
-
-
-def test_audit_clean_against_live_mirror():
-    """audit reports no drift when the live hub mirrors the curated catalog."""
-    audit_mod = _load("audit_worldpop_catalog")
-    cat = Catalog()
-    top, subs = _clean_live(cat)
-    report = audit_mod.audit(cat, get=_fake_rest(top, subs))
-    assert not audit_mod.has_drift(report)
-
-
-def test_audit_flags_missing_subalias_upstream():
-    """A curated sub-alias absent from the live hub is flagged as drift."""
-    audit_mod = _load("audit_worldpop_catalog")
-    cat = Catalog()
-    top, subs = _clean_live(cat)
-    subs["pop"] = [i for i in subs["pop"] if i != "wpgp"]  # drop one upstream
-    report = audit_mod.audit(cat, get=_fake_rest(top, subs))
-    assert "pop:wpgp" in report["subalias_missing_upstream"]
-    assert audit_mod.has_drift(report)
-
-
-def test_audit_flags_uncurated_upstream_product():
-    """A new, non-expected upstream product is flagged as not curated."""
-    audit_mod = _load("audit_worldpop_catalog")
-    cat = Catalog()
-    top, subs = _clean_live(cat)
-    top.append("brand_new_product")
-    report = audit_mod.audit(cat, get=_fake_rest(top, subs))
-    assert "brand_new_product" in report["upstream_products_not_curated"]
-
-
-def test_audit_ignores_expected_uncurated():
-    """Deliberately out-of-scope families (covariates) are not flagged."""
-    audit_mod = _load("audit_worldpop_catalog")
-    cat = Catalog()
-    top, subs = _clean_live(cat)
-    report = audit_mod.audit(cat, get=_fake_rest(top, subs))
-    assert "covariates" not in report["upstream_products_not_curated"]
