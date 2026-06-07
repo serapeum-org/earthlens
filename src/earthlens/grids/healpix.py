@@ -18,7 +18,7 @@ import math
 import numpy as np
 from geopandas import GeoDataFrame, points_from_xy
 
-from pyramids.dataset.dataset import Dataset
+from pyramids.dataset import Dataset
 from pyramids.dataset.ops.interpolate import grid_points
 
 # Per-base-face ring/phi offsets for the NESTED -> RING index conversion, matching the

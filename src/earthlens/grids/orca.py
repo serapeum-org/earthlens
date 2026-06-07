@@ -18,7 +18,7 @@ import numpy as np
 from pyramids.netcdf.ugrid.dataset import UgridDataset
 
 if TYPE_CHECKING:  # pragma: no cover - typing only
-    from pyramids.dataset.dataset import Dataset
+    from pyramids.dataset import Dataset
 
 
 def from_orca(
