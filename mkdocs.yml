@@ -232,6 +232,10 @@ nav:
     - Authentication: examples/authentication.md
     - Data Sources: examples/data-sources.md
     - Data Catalog: examples/catalog.md
+    - Showcase — real-world events:
+      - Suez Canal blockage (Ever Given): examples/showcase/suez_canal_ever_given.ipynb
+      - Gaza change detection (2023→2024): examples/showcase/gaza_damage_assessment.ipynb
+      - Strait of Hormuz vessel traffic: examples/showcase/strait_of_hormuz_ships.ipynb
     - CHC (CHIRPS / CHIRTS / SPI / SPEI / …):
       - Catalog explorer (no network): examples/chc/catalog_explorer.ipynb
       - Daily rainfall quickstart (live): examples/chc/quickstart.ipynb
