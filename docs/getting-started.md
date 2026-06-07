@@ -53,16 +53,18 @@ quickstart](examples/chc/quickstart.ipynb).
 
 ## 4. What `download()` returns
 
-The return value depends on the backend:
+`download()` returns whatever the backend produced, and the shape depends on the
+backend's output kind:
 
-- **CHC, Amazon S3, ECMWF** write files as a side effect and return `None`.
-- **GEE** returns the list of written GeoTIFF paths / export destinations.
-- The newer backends (GHSL, WorldPop, Sentinel Hub, Overture, …) return the
-  written paths or a table, per their reference pages.
+- **Raster backends** (CHC, Amazon S3, ECMWF, GEE, GHSL, WorldPop, …) return the
+  list of written file paths (`list[Path]`) — GeoTIFFs / NetCDFs, or export
+  destinations for GEE's async exports.
+- **Vector / tabular backends** (FDSN, GDACS, Overture, OpenAQ, USGS Water,
+  Tropycal, …) return the assembled `GeoDataFrame` / `DataFrame`.
 
-Either way the data lands under the `path=` you supply. Read the result back
-with [pyramids](https://github.com/serapeum-org/pyramids) (the GIS backend),
-e.g. `pyramids.dataset.Dataset.read_file(...)`.
+Either way the files land under the `path=` you supply. Read a raster result
+back with [pyramids](https://github.com/serapeum-org/pyramids) (the GIS
+backend), e.g. `pyramids.dataset.Dataset.read_file(...)`.
 
 ## 5. Common constructor arguments
 
