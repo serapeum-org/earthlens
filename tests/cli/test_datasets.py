@@ -364,6 +364,21 @@ class TestValidate:
         result = runner.invoke(app, ["datasets", "validate", "cmems"])
         assert "unsupported" in result.output, "cmems has no validator"
 
+    def test_usgs_water_validates_clean(self):
+        """The usgs_water offline validator passes for the bundled catalog."""
+        result = runner.invoke(app, ["datasets", "validate", "usgs_water", "--json"])
+        payload = json.loads(result.output)
+        assert payload[0]["status"] == "ok" and payload[0]["issues"] == []
+
+    def test_live_flag_runs_live_validator(self, monkeypatch):
+        """--live routes through the reachability validator (mocked)."""
+        from earthlens.cli import validate as validate_mod
+
+        monkeypatch.setattr(validate_mod, "_http_head", lambda url: 200)
+        result = runner.invoke(app, ["datasets", "validate", "ghsl", "--live", "-j"])
+        payload = json.loads(result.output)
+        assert payload[0]["status"] == "ok", "ghsl live validate ran"
+
     def test_unknown_provider_rejected(self):
         """An unknown selector token is a usage error."""
         result = runner.invoke(app, ["datasets", "validate", "bogus"])

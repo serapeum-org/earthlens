@@ -18,7 +18,10 @@ from collections.abc import Callable
 from dataclasses import dataclass, field
 from typing import Any
 
+import requests
+
 from earthlens.cli.adapter import BackendInfo, load_catalog
+from earthlens.cli.refresh import _TIMEOUT, _get_json
 
 
 @dataclass
@@ -191,6 +194,63 @@ def _validate_chc(catalog: Any) -> tuple[int, list[str]]:
     return _lint(catalog, check)
 
 
+def _validate_usgs_water(catalog: Any) -> tuple[int, list[str]]:
+    """Each USGS Water parameter's `services` must be known service names.
+
+    Mirrors `tools/usgs_water/refresh_usgs_catalog.py:validate`: every
+    declared service must be in `earthlens.usgs_water.backend.SERVICES`.
+
+    Args:
+        catalog: The loaded USGS Water `Catalog`.
+
+    Returns:
+        `(checked, issues)`.
+    """
+    from earthlens.usgs_water.backend import SERVICES
+
+    def check(key: str, record: Any) -> list[str]:
+        return [
+            f"{key}: unknown service {service!r}"
+            for service in getattr(record, "services", None) or []
+            if service not in SERVICES
+        ]
+
+    return _lint(catalog, check)
+
+
+def _validate_sentinel_hub(catalog: Any) -> tuple[int, list[str]]:
+    """Each Sentinel Hub recipe's evalscript `.js` must be well-formed.
+
+    Mirrors `tools/sentinel_hub/refresh_sh_catalog.py:validate-recipe`
+    (offline): the bundled `.js` must exist, start with `//VERSION=3`, and
+    a `"stats"` recipe must declare a `dataMask` band.
+
+    Args:
+        catalog: The loaded Sentinel Hub `Catalog` (exposes `recipes`).
+
+    Returns:
+        `(checked, issues)` — the recipe count and one message per problem.
+    """
+    from earthlens.sentinel_hub import read_evalscript
+
+    recipes = getattr(catalog, "recipes", None) or {}
+    issues: list[str] = []
+    for key, recipe in recipes.items():
+        script_name = getattr(recipe, "evalscript", None)
+        if not script_name:
+            continue
+        try:
+            script = read_evalscript(script_name)
+        except FileNotFoundError as exc:
+            issues.append(f"{key}: {exc}")
+            continue
+        if script.splitlines()[0].strip() != "//VERSION=3":
+            issues.append(f"{key}: {script_name} does not start with //VERSION=3")
+        if getattr(recipe, "kind", None) == "stats" and "dataMask" not in script:
+            issues.append(f"{key}: {script_name} stats recipe has no dataMask band")
+    return len(recipes), issues
+
+
 #: Provider id -> a callable taking the loaded catalog and returning
 #: `(checked, issues)`. Providers without one report `"unsupported"`.
 _VALIDATORS: dict[str, Callable[[Any], tuple[int, list[str]]]] = {
@@ -204,11 +264,172 @@ _VALIDATORS: dict[str, Callable[[Any], tuple[int, list[str]]]] = {
     "tropycal": _validate_tropycal,
     "gdacs": _validate_gdacs,
     "chc": _validate_chc,
+    "usgs_water": _validate_usgs_water,
+    "sentinel_hub": _validate_sentinel_hub,
 }
 
 
-def supported_providers() -> list[str]:
+# --------------------------------------------------------------------------- #
+# Live reachability validators (the `--live` half) — confirm a curated entry
+# still resolves upstream. A superset of the offline lint; opt-in because it
+# goes to the network / SDK. Each live source sits behind a mockable helper.
+# --------------------------------------------------------------------------- #
+def _s3_live_keys(bucket: str, prefix: str, region: str | None) -> list[str]:
+    """Return one object key under `prefix` (unsigned `boto3`)."""
+    from earthlens.s3.auth import S3Auth, S3Credentials
+
+    client = S3Auth(S3Credentials(region=region)).client()
+    response = client.list_objects_v2(Bucket=bucket, Prefix=prefix, MaxKeys=1)
+    return [item["Key"] for item in response.get("Contents", [])]
+
+
+def _live_s3(catalog: Any) -> tuple[int, list[str]]:
+    """Confirm every S3 dataset's bucket still serves an object (unsigned)."""
+    issues: list[str] = []
+    for key, record in catalog.datasets.items():
+        try:
+            keys = _s3_live_keys(
+                record.bucket,
+                getattr(record, "prefix", "") or "",
+                getattr(record, "region", None),
+            )
+        except Exception as exc:  # noqa: BLE001 — reported as drift
+            issues.append(f"{key}: bucket error ({exc})")
+            continue
+        if not keys:
+            issues.append(f"{key}: no objects under s3://{record.bucket}")
+    return len(catalog.datasets), issues
+
+
+#: A tiny bbox (Times Square block) for the live Overture fetch.
+_OVERTURE_BBOX = (-73.9876, 40.7561, -73.9851, 40.7577)
+
+
+def _overture_live_sample(overture_type: str) -> tuple[int, bool]:
+    """Fetch a tiny bbox; return `(row_count, has_sources_column)`."""
+    from overturemaps.core import geodataframe
+
+    frame = geodataframe(overture_type, bbox=_OVERTURE_BBOX)
+    return len(frame), "sources" in frame.columns
+
+
+def _live_overture(catalog: Any) -> tuple[int, list[str]]:
+    """Confirm each Overture type resolves live and carries a `sources` column."""
+    issues: list[str] = []
+    for key, record in catalog.datasets.items():
+        overture_type = getattr(record, "default_type", None) or key
+        try:
+            _rows, has_sources = _overture_live_sample(overture_type)
+        except Exception as exc:  # noqa: BLE001 — reported as drift
+            issues.append(f"{key}/{overture_type}: fetch failed ({exc})")
+            continue
+        if not has_sources:
+            issues.append(f"{key}/{overture_type}: no 'sources' column")
+    return len(catalog.datasets), issues
+
+
+def _http_head(url: str) -> int:
+    """Return the HTTP status of a HEAD request (following redirects)."""
+    return requests.head(url, timeout=_TIMEOUT, allow_redirects=True).status_code
+
+
+def _live_ghsl(catalog: Any) -> tuple[int, list[str]]:
+    """HEAD one whole-globe artefact per GHSL product/release.
+
+    Skips releases whose every resolution ships only as tiles (real-tile
+    sampling stays in `tools/ghsl/refresh_ghsl_catalog.py`).
+    """
+    from earthlens.ghsl._helpers import RES_TO_TOKEN, ghsl_url
+
+    issues: list[str] = []
+    for code, product in catalog.datasets.items():
+        # Tabular products (resolution "table") have no raster artefact URL —
+        # their live check is the maintainer table-zip path in tools/ghsl.
+        if getattr(product, "kind", "raster") == "tabular":
+            continue
+        for release, blocks in (getattr(product, "releases", None) or {}).items():
+            block = blocks[0]
+            whole_globe = [
+                r
+                for r in block.resolutions
+                if r not in block.tiled() and r in RES_TO_TOKEN
+            ]
+            if not whole_globe:
+                continue
+            try:
+                url = ghsl_url(
+                    product.family or code,
+                    code,
+                    block.epochs[0],
+                    release,
+                    whole_globe[0],
+                    version=block.version,
+                    region=block.region,
+                    nested=block.nested,
+                )
+                status = _http_head(url)
+            except Exception as exc:  # noqa: BLE001 — reported as drift
+                issues.append(f"{code} ({release}): {exc}")
+                continue
+            if status != 200:
+                issues.append(f"{code} ({release}): HTTP {status} for {url}")
+    return len(catalog.datasets), issues
+
+
+#: CDSE openEO processes endpoint (public; pairs with the collections one).
+_OPENEO_PROCESSES_URL = "https://openeo.dataspace.copernicus.eu/openeo/1.2/processes"
+
+
+def _openeo_live_lists() -> tuple[set[str], set[str]]:
+    """Return the live `(collection_ids, process_ids)` sets (public CDSE)."""
+    from earthlens.cli.refresh import _OPENEO_COLLECTIONS_URL
+
+    collections = {
+        c["id"]
+        for c in _get_json(_OPENEO_COLLECTIONS_URL).get("collections", [])
+        if c.get("id")
+    }
+    processes = {
+        p["id"]
+        for p in _get_json(_OPENEO_PROCESSES_URL).get("processes", [])
+        if p.get("id")
+    }
+    return collections, processes
+
+
+def _live_openeo(catalog: Any) -> tuple[int, list[str]]:
+    """Confirm each openEO recipe's base collection + processes exist live."""
+    recipes = getattr(catalog, "recipes", None) or {}
+    if not recipes:
+        return 0, []
+    collections, processes = _openeo_live_lists()
+    issues: list[str] = []
+    for key, recipe in recipes.items():
+        base = getattr(recipe, "base_collection", None)
+        if base and base not in collections:
+            issues.append(f"{key}: base_collection {base!r} not served live")
+        for process in getattr(recipe, "processes", None) or []:
+            if process not in processes:
+                issues.append(f"{key}: process {process!r} not served live")
+    return len(recipes), issues
+
+
+#: Provider id -> a live reachability validator (the `--live` half). May add
+#: a provider not in :data:`_VALIDATORS` (e.g. openeo is live-only).
+_LIVE_VALIDATORS: dict[str, Callable[[Any], tuple[int, list[str]]]] = {
+    "s3": _live_s3,
+    "overture": _live_overture,
+    "ghsl": _live_ghsl,
+    "openeo": _live_openeo,
+}
+
+
+def supported_providers(live: bool = False) -> list[str]:
     """Return the provider ids that have a validator wired up.
+
+    Args:
+        live: When `True`, include providers that only have a `--live`
+            reachability validator (e.g. openeo).
 
     Returns:
         The sorted provider ids `validate` can check.
@@ -223,31 +444,47 @@ def supported_providers() -> list[str]:
 
             ```
     """
-    return sorted(_VALIDATORS)
+    providers = set(_VALIDATORS)
+    if live:
+        providers |= set(_LIVE_VALIDATORS)
+    return sorted(providers)
 
 
-def validate_one(info: BackendInfo) -> ValidateResult:
+def validate_one(info: BackendInfo, live: bool = False) -> ValidateResult:
     """Validate one provider's curated entries.
 
-    A provider with no validator returns `"unsupported"`; any error
-    running the validator returns `"error"` — neither raises.
+    Always runs the offline structural lint when one exists; with
+    `live=True` it additionally runs the live reachability validator (a
+    network / SDK round-trip per entry). A provider with neither returns
+    `"unsupported"`; any error returns `"error"` — neither raises.
 
     Args:
         info: The backend to validate.
+        live: When `True`, also run the live reachability validator.
 
     Returns:
         The :class:`ValidateResult` for `info`.
     """
-    validator = _VALIDATORS.get(info.provider)
-    if validator is None:
+    offline = _VALIDATORS.get(info.provider)
+    live_validator = _LIVE_VALIDATORS.get(info.provider) if live else None
+    if offline is None and live_validator is None:
+        detail = (
+            "no validator wired up for this provider"
+            if not live or info.provider not in _LIVE_VALIDATORS
+            else "no live validator wired up for this provider"
+        )
         return ValidateResult(
-            provider=info.provider,
-            status="unsupported",
-            detail="no validator wired up for this provider",
+            provider=info.provider, status="unsupported", detail=detail
         )
     try:
         catalog = load_catalog(info)
-        checked, issues = validator(catalog)
+        checked = 0
+        issues: list[str] = []
+        for validator in (offline, live_validator):
+            if validator is not None:
+                count, found = validator(catalog)
+                checked += count
+                issues.extend(found)
     except Exception as exc:  # noqa: BLE001 — validation failures are reported
         return ValidateResult(provider=info.provider, status="error", detail=str(exc))
     return ValidateResult(

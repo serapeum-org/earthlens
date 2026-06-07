@@ -649,6 +649,11 @@ def validate(
     strict: bool = typer.Option(
         False, "--strict", help="Exit non-zero if any curated entry has an issue."
     ),
+    live: bool = typer.Option(
+        False,
+        "--live",
+        help="Also run the live reachability check (network/SDK; opt-in).",
+    ),
     json_output: bool = typer.Option(
         False, "--json", "-j", help="Emit the results as JSON (for piping)."
     ),
@@ -657,12 +662,15 @@ def validate(
 
     For curated-enumeration providers (no discoverable upstream index, so
     `refresh`/`audit` do not apply), this checks each curated entry — an
-    offline structural lint or a liveness probe, depending on the provider.
-    Providers without a validator report `unsupported`. `--strict` exits
-    non-zero if any entry fails (for CI gating).
+    offline structural lint by default. With `--live` it additionally goes
+    to the **network/SDK** to confirm each entry still resolves upstream
+    (e.g. an S3 object is reachable, an Overture type still serves a
+    `sources` column, a GHSL artefact HEADs 200, an openEO recipe's base
+    collection / processes are live). Providers without a validator report
+    `unsupported`. `--strict` exits non-zero if any entry fails (CI gating).
     """
     selected = _select_refresh_backends(providers)
-    results = [validate_one(info) for info in selected]
+    results = [validate_one(info, live=live) for info in selected]
 
     if json_output:
         typer.echo(json.dumps([r.to_dict() for r in results], indent=2))
