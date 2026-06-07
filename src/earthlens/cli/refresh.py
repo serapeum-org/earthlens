@@ -17,11 +17,14 @@ paths, or radar / firms / fdsn whose `datasets` map *is* the index) resolves
 its own via :func:`_bundled_ids`.
 
 The `--write` half (:data:`_WRITERS`) persists a live fetch back into the
-bundled informational index. It covers every refresher whose index is a
-real on-disk block — the sharded `_index.yaml` providers and HDX's gzipped
-sidecar. Providers whose `available_*` index is *computed* from the curated
-rows at load time (openaq, worldpop, usgs_water) have nothing to rewrite and
-report "live read only" under `--write` by design.
+bundled informational index. For the sharded `_index.yaml` providers (and
+HDX's gzipped sidecar) it rewrites the in-file block; for the providers
+whose `available_*` attribute is *computed* from the curated rows at load
+time (openaq, worldpop, usgs_water) it instead writes the full live universe
+to a sibling `available_*.yaml` the runtime does not load (the maintainer /
+docs artefact the tools used to produce). Only the few backends with no
+machine-writable index at all (chc's curated slugs, fdsn / firms whose
+`datasets` map *is* the catalog) stay read-only under `--write`.
 """
 
 from __future__ import annotations
@@ -708,6 +711,74 @@ def _usgs_water_grouped(catalog: Any) -> dict[str, list[str]]:
     return {"usgs_water": sorted(set(_usgs_parameter_codes()))}
 
 
+def _usgs_parameter_rows() -> dict[str, dict[str, str]]:
+    """Return the live USGS parameter table keyed by code (name/group/unit)."""
+    from dataretrieval import waterdata
+
+    result = waterdata.get_reference_table(collection="parameter-codes")
+    frame = result[0] if isinstance(result, tuple) else result
+    rows: dict[str, dict[str, str]] = {}
+    for _, row in frame.iterrows():
+        code = str(
+            row.get("parameter_code") or row.get("parameterCode") or row.get("id") or ""
+        ).strip()
+        if not code:
+            continue
+        rows[code] = {
+            "name": str(row.get("parameter_name") or row.get("name") or ""),
+            "group": str(row.get("parameter_group_code") or row.get("group") or ""),
+            "unit": str(row.get("unit_of_measure") or row.get("unit") or ""),
+        }
+    return dict(sorted(rows.items()))
+
+
+def _write_sibling_index(info: BackendInfo, filename: str, payload: Any) -> str:
+    """Write an informational `available_*` index file next to the catalog.
+
+    For the computed-index providers (openaq / worldpop / usgs_water) whose
+    `available_*` attribute is derived from the curated rows at load time:
+    `--write` persists the *full* live universe to a sibling YAML the
+    runtime does not load (the maintainer / docs artefact the tools wrote).
+
+    Args:
+        info: The backend whose catalog directory receives the sibling.
+        filename: The sibling file name (e.g. `available_parameters.yaml`).
+        payload: The mapping to dump (already keyed by its block name).
+
+    Returns:
+        The path of the sibling index written.
+    """
+    path = _index_path(info).parent / filename
+    path.write_text(
+        yaml.safe_dump(payload, sort_keys=False, allow_unicode=True),
+        encoding="utf-8",
+    )
+    return str(path)
+
+
+def _write_usgs_water(info: BackendInfo, grouped: dict[str, list[str]]) -> str:
+    """Rewrite USGS Water's sibling `available_parameters.yaml` (full table)."""
+    return _write_sibling_index(
+        info,
+        "available_parameters.yaml",
+        {"available_parameters": _usgs_parameter_rows()},
+    )
+
+
+def _write_worldpop(info: BackendInfo, grouped: dict[str, list[str]]) -> str:
+    """Rewrite WorldPop's sibling `available_products.yaml` (alias -> sub-aliases)."""
+    return _write_sibling_index(
+        info, "available_products.yaml", {"available_products": grouped}
+    )
+
+
+def _write_openaq(info: BackendInfo, grouped: dict[str, list[str]]) -> str:
+    """Rewrite OpenAQ's sibling `available_parameters.yaml` (full live list)."""
+    return _write_sibling_index(
+        info, "available_parameters.yaml", {"available_parameters": _flatten(grouped)}
+    )
+
+
 def _get_text(url: str) -> str:
     """GET `url` and return the response body as text (raising on HTTP error)."""
     response = requests.get(url, timeout=_TIMEOUT)
@@ -1062,6 +1133,9 @@ _WRITERS: dict[str, Callable[[BackendInfo, dict[str, list[str]]], str]] = {
     "hdx": _write_hdx,
     "overture": _index_writer("available_releases"),
     "radar": _write_radar,
+    "usgs_water": _write_usgs_water,
+    "worldpop": _write_worldpop,
+    "openaq": _write_openaq,
 }
 
 

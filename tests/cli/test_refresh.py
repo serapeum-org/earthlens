@@ -5,6 +5,7 @@ from __future__ import annotations
 import gzip
 import importlib
 import json
+import pathlib
 import shutil
 
 import pytest
@@ -600,6 +601,47 @@ class TestHdxWriter:
         assert rows["keep"] == {"org": "O", "title": "T"}, "metadata preserved"
         assert rows["newone"] == {"org": "", "title": ""}, "new id bare"
         assert "gone" not in rows, "id absent upstream dropped"
+
+
+class TestComputedIndexWriters:
+    """Tests for the sibling-index writers (openaq / worldpop / usgs_water)."""
+
+    def test_worldpop_writes_available_products_sibling(self, tmp_path, monkeypatch):
+        """worldpop --write persists the grouped crawl to a sibling YAML."""
+        info, module, dst = _catalog_copy("worldpop", tmp_path, monkeypatch)
+        path = refresh_mod._WRITERS["worldpop"](info, {"pop": ["wpgp", "wpgp1km"]})
+        data = yaml.safe_load(pathlib.Path(path).read_text("utf-8"))
+        assert pathlib.Path(path).name == "available_products.yaml", "sibling written"
+        assert data["available_products"]["pop"] == ["wpgp", "wpgp1km"], "crawl kept"
+
+    def test_openaq_writes_available_parameters_sibling(self, tmp_path, monkeypatch):
+        """openaq --write persists the flat live parameter list to a sibling."""
+        info, module, dst = _catalog_copy("openaq", tmp_path, monkeypatch)
+        path = refresh_mod._WRITERS["openaq"](info, {"openaq": ["o3", "pm25"]})
+        data = yaml.safe_load(pathlib.Path(path).read_text("utf-8"))
+        assert data["available_parameters"] == ["o3", "pm25"], "flat list written"
+
+    def test_usgs_water_writes_parameter_table_sibling(self, tmp_path, monkeypatch):
+        """usgs_water --write persists the full reference table to a sibling."""
+        info, module, dst = _catalog_copy("usgs_water", tmp_path, monkeypatch)
+        monkeypatch.setattr(
+            refresh_mod,
+            "_usgs_parameter_rows",
+            lambda: {"00060": {"name": "Discharge", "group": "PHY", "unit": "ft3/s"}},
+        )
+        path = refresh_mod._WRITERS["usgs_water"](info, {"usgs_water": ["00060"]})
+        data = yaml.safe_load(pathlib.Path(path).read_text("utf-8"))
+        assert data["available_parameters"]["00060"]["unit"] == "ft3/s", "table written"
+
+    def test_refresh_one_write_reports_sibling_path(self, tmp_path, monkeypatch):
+        """refresh_one(write=True) returns the sibling path for openaq."""
+        info, module, dst = _catalog_copy("openaq", tmp_path, monkeypatch)
+        monkeypatch.setattr(
+            refresh_mod, "_get_json", lambda url, **kw: {"results": [{"name": "pm25"}]}
+        )
+        outcome = refresh_one(info, write=True)
+        assert outcome.status == "ok", "openaq write ran"
+        assert outcome.written.endswith("available_parameters.yaml"), "sibling path"
 
 
 class TestWriteEcmwfThroughRefreshOne:
