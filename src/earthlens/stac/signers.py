@@ -707,9 +707,11 @@ def build_signer(signer_type: str, **creds: Any) -> Any:
     if signer_type == "mpc-sas":
         return PlanetaryComputerSigner()
     if signer_type == "earthdata":
-        return EarthdataSigner(**creds)
+        keys = ("username", "password", "token", "refresh_window", "timeout")
+        return EarthdataSigner(**{k: creds[k] for k in keys if k in creds})
     if signer_type == "cdse":
-        return CDSESigner(**creds)
+        keys = ("username", "password", "client_id", "refresh_window", "timeout")
+        return CDSESigner(**{k: creds[k] for k in keys if k in creds})
     if signer_type == "cdse-s3":
         from earthlens.stac import auth_cdse
 
