@@ -22,7 +22,7 @@ def from_octahedral(
     values: np.ndarray,
     *,
     cell_size: float,
-    algorithm: str = "nearest",
+    method: str = "nearest",
     epsg: int = 4326,
     bbox: tuple[float, float, float, float] | None = None,
 ) -> Dataset:
@@ -37,7 +37,7 @@ def from_octahedral(
         lons: 1-D array of point longitudes, same length as `lats`.
         values: 1-D array of field values, same length as `lats`.
         cell_size: Output pixel size in the target CRS units.
-        algorithm: A `gdal.Grid` algorithm string (e.g. `"nearest"`,
+        method: A `gdal.Grid` algorithm string (e.g. `"nearest"`,
             `"invdist:power=2.0:smoothing=0.0"`, `"linear"`).
         epsg: Output EPSG code.
         bbox: Optional `(minx, miny, maxx, maxy)` output extent in the target CRS.
@@ -58,7 +58,7 @@ def from_octahedral(
             >>> lats = np.array([0.0, 0.0, 5.0, 5.0])
             >>> lons = np.array([0.0, 5.0, 0.0, 5.0])
             >>> values = np.array([1.0, 2.0, 3.0, 4.0])
-            >>> ds = from_octahedral(lats, lons, values, cell_size=1.0, algorithm="nearest")
+            >>> ds = from_octahedral(lats, lons, values, cell_size=1.0, method="nearest")
             >>> (ds.rows, ds.columns, ds.band_count)
             (5, 5, 1)
 
@@ -98,7 +98,7 @@ def from_octahedral(
         gdf,
         "z",
         Dataset,
-        algorithm=algorithm,
+        algorithm=method,
         cell_size=cell_size,
         bbox=bbox,
         epsg=epsg,

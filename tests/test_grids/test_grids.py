@@ -51,7 +51,7 @@ class TestFromOctahedral:
         lats = np.array([0.0, 0.0, 5.0, 5.0])
         lons = np.array([0.0, 5.0, 0.0, 5.0])
         values = np.array([1.0, 2.0, 3.0, 4.0])
-        ds = from_octahedral(lats, lons, values, cell_size=1.0, algorithm="nearest")
+        ds = from_octahedral(lats, lons, values, cell_size=1.0, method="nearest")
         assert (ds.rows, ds.columns, ds.band_count) == (5, 5, 1)
 
     def test_unequal_length_raises(self):
