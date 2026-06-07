@@ -7,10 +7,11 @@ with what each provider serves live. It never downloads science data — for tha
 
 ## Install & invoke
 
-The CLI ships behind the `cli` extra (it pulls `typer` + `rich`; both are also in `[all]`):
+The CLI ships with the base package — `typer` + `rich` are core dependencies, so a plain install gives a
+working `earthlens` command:
 
 ```bash
-pip install "earthlens[cli]"
+pip install earthlens
 ```
 
 Two equivalent entry points:
