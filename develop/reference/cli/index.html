@@ -10,31 +10,31 @@
       
       
       
-        <link rel="canonical" href="https://serapeum-org.github.io/earthlens/develop/reference/sentinel-hub/datasets/">
+        <link rel="canonical" href="https://serapeum-org.github.io/earthlens/develop/reference/cli/">
       
       
-        <link rel="prev" href="../authentication/">
+        <link rel="prev" href="../../overview/architecture/">
       
       
-        <link rel="next" href="../statistical-batch/">
+        <link rel="next" href="../providers/">
       
       
         
       
       
-      <link rel="icon" href="../../../assets/images/favicon.png">
+      <link rel="icon" href="../../assets/images/favicon.png">
       <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
     
     
       
-        <title>Collections & recipes - earthlens</title>
+        <title>Command-line interface - earthlens</title>
       
     
     
-      <link rel="stylesheet" href="../../../assets/stylesheets/main.484c7ddc.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
       
         
-        <link rel="stylesheet" href="../../../assets/stylesheets/palette.ab4e12ef.min.css">
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
       
       
 
@@ -53,11 +53,11 @@
       
     
     
-      <link rel="stylesheet" href="../../../assets/_mkdocstrings.css">
+      <link rel="stylesheet" href="../../assets/_mkdocstrings.css">
     
-      <link rel="stylesheet" href="../../../assets/stylesheets/panzoom.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/panzoom.css">
     
-    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
 
@@ -83,7 +83,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#sentinel-hub-collections-evalscript-recipes" class="md-skip">
+        <a href="#command-line-interface-earthlens" class="md-skip">
           Skip to content
         </a>
       
@@ -103,7 +103,7 @@
 
 <header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../.." title="earthlens" class="md-header__button md-logo" aria-label="earthlens" data-md-component="logo">
+    <a href="../.." title="earthlens" class="md-header__button md-logo" aria-label="earthlens" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
@@ -123,7 +123,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Collections & recipes
+              Command-line interface
             
           </span>
         </div>
@@ -240,7 +240,7 @@
   
   
     <li class="md-tabs__item">
-      <a href="../../.." class="md-tabs__link">
+      <a href="../.." class="md-tabs__link">
         
   
   
@@ -257,11 +257,13 @@
   
   
   
+    
+  
   
     
     
-      <li class="md-tabs__item">
-        <a href="../../../installation/" class="md-tabs__link">
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../../installation/" class="md-tabs__link">
           
   
   
@@ -277,13 +279,11 @@
   
   
   
-    
-  
   
     
     
-      <li class="md-tabs__item md-tabs__item--active">
-        <a href="../../providers/" class="md-tabs__link">
+      <li class="md-tabs__item">
+        <a href="../providers/" class="md-tabs__link">
           
   
   
@@ -303,7 +303,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../../examples/authentication/" class="md-tabs__link">
+        <a href="../../examples/authentication/" class="md-tabs__link">
           
   
   
@@ -323,7 +323,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../earthlens/" class="md-tabs__link">
+        <a href="../earthlens/" class="md-tabs__link">
           
   
   
@@ -343,7 +343,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../../change-log/" class="md-tabs__link">
+        <a href="../../change-log/" class="md-tabs__link">
           
   
   
@@ -383,7 +383,7 @@
 
 <nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../.." title="earthlens" class="md-nav__button md-logo" aria-label="earthlens" data-md-component="logo">
+    <a href="../.." title="earthlens" class="md-nav__button md-logo" aria-label="earthlens" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
@@ -413,7 +413,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../.." class="md-nav__link">
+      <a href="../.." class="md-nav__link">
         
   
   
@@ -429,147 +429,6 @@
   
 
       </a>
-    </li>
-  
-
-    
-      
-      
-  
-  
-  
-  
-    
-    
-    
-    
-      
-      
-    
-    
-    <li class="md-nav__item md-nav__item--nested">
-      
-        
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
-        
-          
-          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
-            
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Guide
-  
-
-    
-  </span>
-  
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_2">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    Guide
-  
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../installation/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Installation
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../overview/architecture/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Architecture
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../cli/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Command-line interface
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
     </li>
   
 
@@ -597,10 +456,447 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
         
           
-          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Guide
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Guide
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../installation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Installation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../overview/architecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Command-line interface
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Command-line interface
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#install-invoke" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Install &amp; invoke
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#concepts-that-apply-to-every-command" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Concepts that apply to every command
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Concepts that apply to every command">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#provider-selectors" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Provider selectors
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#output-modes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Output modes
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#provider-precedence" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Provider precedence
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#exit-codes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Exit codes
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#what-hits-the-network" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What hits the network
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#earthlens-datasets" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        earthlens datasets
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="earthlens datasets">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#where-name-which-providers-expose-a-dataset" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        where &lt;name&gt; — which provider(s) expose a dataset
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#search-query-free-text-faceted-search" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        search [query] — free-text + faceted search
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#list-list-curated-datasets" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        list — list curated datasets
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#show-provider-dataset-full-record-for-one-dataset" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        show &lt;provider&gt; &lt;dataset&gt; — full record for one dataset
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#facets-value-distribution-across-facets" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        facets — value distribution across facets
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#refresh-providers-diff-the-bundled-index-against-live-optionally-persist" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        refresh &lt;providers&gt; — diff the bundled index against live, optionally persist
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#audit-providers-curated-vs-live-drift-and-coverage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        audit &lt;providers&gt; — curated-vs-live drift (and coverage)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#validate-providers-per-entry-checks-offline-lint-optional-live" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        validate &lt;providers&gt; — per-entry checks (offline lint, optional live)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#probe-provider-dataset-sample-one-datasets-schema" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        probe &lt;provider&gt; &lt;dataset&gt; — sample one dataset's schema
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#curate-provider-upstream_id-author-a-curated-row" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        curate &lt;provider&gt; [upstream_id] — author a curated row
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#earthlens-providers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        earthlens providers
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="earthlens providers">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#list-the-backends-and-their-health" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        list — the backends and their health
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#verb-cheat-sheet" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Verb cheat-sheet
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
             
   
   
@@ -618,7 +914,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_3">
             <span class="md-nav__icon md-icon"></span>
             
@@ -636,7 +932,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../providers/" class="md-nav__link">
+      <a href="../providers/" class="md-nav__link">
         
   
   
@@ -714,7 +1010,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../chc/introduction/" class="md-nav__link">
+      <a href="../chc/introduction/" class="md-nav__link">
         
   
   
@@ -742,7 +1038,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../chc/usage/" class="md-nav__link">
+      <a href="../chc/usage/" class="md-nav__link">
         
   
   
@@ -770,7 +1066,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../chc/catalog/" class="md-nav__link">
+      <a href="../chc/catalog/" class="md-nav__link">
         
   
   
@@ -798,7 +1094,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../chc/chc/" class="md-nav__link">
+      <a href="../chc/chc/" class="md-nav__link">
         
   
   
@@ -884,7 +1180,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../s3/introduction/" class="md-nav__link">
+      <a href="../s3/introduction/" class="md-nav__link">
         
   
   
@@ -912,7 +1208,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../s3/authentication/" class="md-nav__link">
+      <a href="../s3/authentication/" class="md-nav__link">
         
   
   
@@ -940,7 +1236,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../s3/usage/" class="md-nav__link">
+      <a href="../s3/usage/" class="md-nav__link">
         
   
   
@@ -968,7 +1264,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../s3/datasets/" class="md-nav__link">
+      <a href="../s3/datasets/" class="md-nav__link">
         
   
   
@@ -996,7 +1292,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../s3/reference/" class="md-nav__link">
+      <a href="../s3/reference/" class="md-nav__link">
         
   
   
@@ -1082,7 +1378,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../cmems/introduction/" class="md-nav__link">
+      <a href="../cmems/introduction/" class="md-nav__link">
         
   
   
@@ -1110,7 +1406,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../cmems/usage/" class="md-nav__link">
+      <a href="../cmems/usage/" class="md-nav__link">
         
   
   
@@ -1138,7 +1434,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../cmems/authentication/" class="md-nav__link">
+      <a href="../cmems/authentication/" class="md-nav__link">
         
   
   
@@ -1166,7 +1462,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../cmems/cmems/" class="md-nav__link">
+      <a href="../cmems/cmems/" class="md-nav__link">
         
   
   
@@ -1252,7 +1548,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../earthdata/introduction/" class="md-nav__link">
+      <a href="../earthdata/introduction/" class="md-nav__link">
         
   
   
@@ -1280,7 +1576,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../earthdata/usage/" class="md-nav__link">
+      <a href="../earthdata/usage/" class="md-nav__link">
         
   
   
@@ -1308,7 +1604,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../earthdata/authentication/" class="md-nav__link">
+      <a href="../earthdata/authentication/" class="md-nav__link">
         
   
   
@@ -1336,7 +1632,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../earthdata/catalog/" class="md-nav__link">
+      <a href="../earthdata/catalog/" class="md-nav__link">
         
   
   
@@ -1364,7 +1660,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../earthdata/earthdata/" class="md-nav__link">
+      <a href="../earthdata/earthdata/" class="md-nav__link">
         
   
   
@@ -1450,7 +1746,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../ecmwf/" class="md-nav__link">
+      <a href="../ecmwf/" class="md-nav__link">
         
   
   
@@ -1478,7 +1774,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../ecmwf/catalog/" class="md-nav__link">
+      <a href="../ecmwf/catalog/" class="md-nav__link">
         
   
   
@@ -1506,7 +1802,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../aggregation/" class="md-nav__link">
+      <a href="../aggregation/" class="md-nav__link">
         
   
   
@@ -1592,7 +1888,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../eumetsat/introduction/" class="md-nav__link">
+      <a href="../eumetsat/introduction/" class="md-nav__link">
         
   
   
@@ -1620,7 +1916,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../eumetsat/usage/" class="md-nav__link">
+      <a href="../eumetsat/usage/" class="md-nav__link">
         
   
   
@@ -1648,7 +1944,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../eumetsat/authentication/" class="md-nav__link">
+      <a href="../eumetsat/authentication/" class="md-nav__link">
         
   
   
@@ -1676,7 +1972,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../eumetsat/catalog/" class="md-nav__link">
+      <a href="../eumetsat/catalog/" class="md-nav__link">
         
   
   
@@ -1704,7 +2000,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../eumetsat/data-tailor/" class="md-nav__link">
+      <a href="../eumetsat/data-tailor/" class="md-nav__link">
         
   
   
@@ -1732,7 +2028,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../eumetsat/eumetsat/" class="md-nav__link">
+      <a href="../eumetsat/eumetsat/" class="md-nav__link">
         
   
   
@@ -1818,7 +2114,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../fdsn/introduction/" class="md-nav__link">
+      <a href="../fdsn/introduction/" class="md-nav__link">
         
   
   
@@ -1846,7 +2142,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../fdsn/usage/" class="md-nav__link">
+      <a href="../fdsn/usage/" class="md-nav__link">
         
   
   
@@ -1874,7 +2170,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../fdsn/fdsn/" class="md-nav__link">
+      <a href="../fdsn/fdsn/" class="md-nav__link">
         
   
   
@@ -1960,7 +2256,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../gee/introduction/" class="md-nav__link">
+      <a href="../gee/introduction/" class="md-nav__link">
         
   
   
@@ -1988,7 +2284,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../gee/registering-a-project/" class="md-nav__link">
+      <a href="../gee/registering-a-project/" class="md-nav__link">
         
   
   
@@ -2016,7 +2312,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../gee/service-account-setup/" class="md-nav__link">
+      <a href="../gee/service-account-setup/" class="md-nav__link">
         
   
   
@@ -2044,7 +2340,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../gee/usage/" class="md-nav__link">
+      <a href="../gee/usage/" class="md-nav__link">
         
   
   
@@ -2072,7 +2368,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../gee/gee/" class="md-nav__link">
+      <a href="../gee/gee/" class="md-nav__link">
         
   
   
@@ -2158,7 +2454,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../stac/introduction/" class="md-nav__link">
+      <a href="../stac/introduction/" class="md-nav__link">
         
   
   
@@ -2186,7 +2482,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../stac/usage/" class="md-nav__link">
+      <a href="../stac/usage/" class="md-nav__link">
         
   
   
@@ -2214,7 +2510,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../stac/authentication/" class="md-nav__link">
+      <a href="../stac/authentication/" class="md-nav__link">
         
   
   
@@ -2242,7 +2538,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../stac/stac/" class="md-nav__link">
+      <a href="../stac/stac/" class="md-nav__link">
         
   
   
@@ -2328,7 +2624,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../gdacs/introduction/" class="md-nav__link">
+      <a href="../gdacs/introduction/" class="md-nav__link">
         
   
   
@@ -2356,7 +2652,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../gdacs/usage/" class="md-nav__link">
+      <a href="../gdacs/usage/" class="md-nav__link">
         
   
   
@@ -2384,7 +2680,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../gdacs/gdacs/" class="md-nav__link">
+      <a href="../gdacs/gdacs/" class="md-nav__link">
         
   
   
@@ -2470,7 +2766,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../openaq/introduction/" class="md-nav__link">
+      <a href="../openaq/introduction/" class="md-nav__link">
         
   
   
@@ -2498,7 +2794,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../openaq/usage/" class="md-nav__link">
+      <a href="../openaq/usage/" class="md-nav__link">
         
   
   
@@ -2526,7 +2822,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../openaq/authentication/" class="md-nav__link">
+      <a href="../openaq/authentication/" class="md-nav__link">
         
   
   
@@ -2554,7 +2850,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../openaq/openaq/" class="md-nav__link">
+      <a href="../openaq/openaq/" class="md-nav__link">
         
   
   
@@ -2640,7 +2936,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../openeo/introduction/" class="md-nav__link">
+      <a href="../openeo/introduction/" class="md-nav__link">
         
   
   
@@ -2668,7 +2964,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../openeo/usage/" class="md-nav__link">
+      <a href="../openeo/usage/" class="md-nav__link">
         
   
   
@@ -2696,7 +2992,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../openeo/authentication/" class="md-nav__link">
+      <a href="../openeo/authentication/" class="md-nav__link">
         
   
   
@@ -2724,7 +3020,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../openeo/datasets/" class="md-nav__link">
+      <a href="../openeo/datasets/" class="md-nav__link">
         
   
   
@@ -2752,7 +3048,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../openeo/openeo/" class="md-nav__link">
+      <a href="../openeo/openeo/" class="md-nav__link">
         
   
   
@@ -2785,8 +3081,6 @@
                 
   
   
-    
-  
   
   
     
@@ -2797,11 +3091,11 @@
       
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_14" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_14" >
         
           
           <label class="md-nav__link" for="__nav_3_14" id="__nav_3_14_label" tabindex="0">
@@ -2822,7 +3116,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_14_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_14_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_3_14">
             <span class="md-nav__icon md-icon"></span>
             
@@ -2840,7 +3134,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../introduction/" class="md-nav__link">
+      <a href="../sentinel-hub/introduction/" class="md-nav__link">
         
   
   
@@ -2868,7 +3162,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../usage/" class="md-nav__link">
+      <a href="../sentinel-hub/usage/" class="md-nav__link">
         
   
   
@@ -2896,7 +3190,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../authentication/" class="md-nav__link">
+      <a href="../sentinel-hub/authentication/" class="md-nav__link">
         
   
   
@@ -2921,37 +3215,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Collections & recipes
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../sentinel-hub/datasets/" class="md-nav__link">
         
   
   
@@ -2967,98 +3234,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#curated-collections" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Curated collections
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#curated-evalscript-recipes" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Curated evalscript recipes
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Curated evalscript recipes">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#render-recipes-kindrender" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Render recipes (kind="render")
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#statistical-recipes-kindstats" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Statistical recipes (kind="stats")
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#adding-a-custom-evalscript" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Adding a custom evalscript
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#catalog-tooling" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Catalog tooling
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -3071,7 +3246,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../statistical-batch/" class="md-nav__link">
+      <a href="../sentinel-hub/statistical-batch/" class="md-nav__link">
         
   
   
@@ -3099,7 +3274,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../sentinel_hub/" class="md-nav__link">
+      <a href="../sentinel-hub/sentinel_hub/" class="md-nav__link">
         
   
   
@@ -3185,7 +3360,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../tropycal/introduction/" class="md-nav__link">
+      <a href="../tropycal/introduction/" class="md-nav__link">
         
   
   
@@ -3213,7 +3388,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../tropycal/usage/" class="md-nav__link">
+      <a href="../tropycal/usage/" class="md-nav__link">
         
   
   
@@ -3241,7 +3416,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../tropycal/tropycal/" class="md-nav__link">
+      <a href="../tropycal/tropycal/" class="md-nav__link">
         
   
   
@@ -3327,7 +3502,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../firms/introduction/" class="md-nav__link">
+      <a href="../firms/introduction/" class="md-nav__link">
         
   
   
@@ -3355,7 +3530,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../firms/usage/" class="md-nav__link">
+      <a href="../firms/usage/" class="md-nav__link">
         
   
   
@@ -3383,7 +3558,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../firms/authentication/" class="md-nav__link">
+      <a href="../firms/authentication/" class="md-nav__link">
         
   
   
@@ -3411,7 +3586,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../firms/firms/" class="md-nav__link">
+      <a href="../firms/firms/" class="md-nav__link">
         
   
   
@@ -3497,7 +3672,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../hdx/introduction/" class="md-nav__link">
+      <a href="../hdx/introduction/" class="md-nav__link">
         
   
   
@@ -3525,7 +3700,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../hdx/usage/" class="md-nav__link">
+      <a href="../hdx/usage/" class="md-nav__link">
         
   
   
@@ -3553,7 +3728,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../hdx/catalog/" class="md-nav__link">
+      <a href="../hdx/catalog/" class="md-nav__link">
         
   
   
@@ -3581,7 +3756,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../hdx/hdx/" class="md-nav__link">
+      <a href="../hdx/hdx/" class="md-nav__link">
         
   
   
@@ -3667,7 +3842,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../overture/introduction/" class="md-nav__link">
+      <a href="../overture/introduction/" class="md-nav__link">
         
   
   
@@ -3695,7 +3870,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../overture/usage/" class="md-nav__link">
+      <a href="../overture/usage/" class="md-nav__link">
         
   
   
@@ -3723,7 +3898,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../overture/licensing/" class="md-nav__link">
+      <a href="../overture/licensing/" class="md-nav__link">
         
   
   
@@ -3751,7 +3926,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../overture/datasets/" class="md-nav__link">
+      <a href="../overture/datasets/" class="md-nav__link">
         
   
   
@@ -3779,7 +3954,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../overture/overture/" class="md-nav__link">
+      <a href="../overture/overture/" class="md-nav__link">
         
   
   
@@ -3865,7 +4040,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../nwp/introduction/" class="md-nav__link">
+      <a href="../nwp/introduction/" class="md-nav__link">
         
   
   
@@ -3893,7 +4068,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../nwp/usage/" class="md-nav__link">
+      <a href="../nwp/usage/" class="md-nav__link">
         
   
   
@@ -3921,7 +4096,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../nwp/catalog/" class="md-nav__link">
+      <a href="../nwp/catalog/" class="md-nav__link">
         
   
   
@@ -3949,7 +4124,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../nwp/nwp/" class="md-nav__link">
+      <a href="../nwp/nwp/" class="md-nav__link">
         
   
   
@@ -4035,7 +4210,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../radar/introduction/" class="md-nav__link">
+      <a href="../radar/introduction/" class="md-nav__link">
         
   
   
@@ -4063,7 +4238,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../radar/usage/" class="md-nav__link">
+      <a href="../radar/usage/" class="md-nav__link">
         
   
   
@@ -4091,7 +4266,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../radar/catalog/" class="md-nav__link">
+      <a href="../radar/catalog/" class="md-nav__link">
         
   
   
@@ -4119,7 +4294,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../radar/radar/" class="md-nav__link">
+      <a href="../radar/radar/" class="md-nav__link">
         
   
   
@@ -4205,7 +4380,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../usgs-water/introduction/" class="md-nav__link">
+      <a href="../usgs-water/introduction/" class="md-nav__link">
         
   
   
@@ -4233,7 +4408,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../usgs-water/usage/" class="md-nav__link">
+      <a href="../usgs-water/usage/" class="md-nav__link">
         
   
   
@@ -4261,7 +4436,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../usgs-water/authentication/" class="md-nav__link">
+      <a href="../usgs-water/authentication/" class="md-nav__link">
         
   
   
@@ -4289,7 +4464,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../usgs-water/datasets/" class="md-nav__link">
+      <a href="../usgs-water/datasets/" class="md-nav__link">
         
   
   
@@ -4317,7 +4492,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../usgs-water/usgs_water/" class="md-nav__link">
+      <a href="../usgs-water/usgs_water/" class="md-nav__link">
         
   
   
@@ -4403,7 +4578,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../ghsl/introduction/" class="md-nav__link">
+      <a href="../ghsl/introduction/" class="md-nav__link">
         
   
   
@@ -4431,7 +4606,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../ghsl/authentication/" class="md-nav__link">
+      <a href="../ghsl/authentication/" class="md-nav__link">
         
   
   
@@ -4459,7 +4634,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../ghsl/usage/" class="md-nav__link">
+      <a href="../ghsl/usage/" class="md-nav__link">
         
   
   
@@ -4487,7 +4662,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../ghsl/products/" class="md-nav__link">
+      <a href="../ghsl/products/" class="md-nav__link">
         
   
   
@@ -4515,7 +4690,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../ghsl/projections/" class="md-nav__link">
+      <a href="../ghsl/projections/" class="md-nav__link">
         
   
   
@@ -4543,7 +4718,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../ghsl/ghsl/" class="md-nav__link">
+      <a href="../ghsl/ghsl/" class="md-nav__link">
         
   
   
@@ -4629,7 +4804,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../worldpop/introduction/" class="md-nav__link">
+      <a href="../worldpop/introduction/" class="md-nav__link">
         
   
   
@@ -4657,7 +4832,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../worldpop/usage/" class="md-nav__link">
+      <a href="../worldpop/usage/" class="md-nav__link">
         
   
   
@@ -4685,7 +4860,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../worldpop/datasets/" class="md-nav__link">
+      <a href="../worldpop/datasets/" class="md-nav__link">
         
   
   
@@ -4713,7 +4888,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../worldpop/worldpoppy/" class="md-nav__link">
+      <a href="../worldpop/worldpoppy/" class="md-nav__link">
         
   
   
@@ -4741,7 +4916,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../worldpop/worldpop/" class="md-nav__link">
+      <a href="../worldpop/worldpop/" class="md-nav__link">
         
   
   
@@ -4834,7 +5009,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/authentication/" class="md-nav__link">
+      <a href="../../examples/authentication/" class="md-nav__link">
         
   
   
@@ -4862,7 +5037,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/data-sources/" class="md-nav__link">
+      <a href="../../examples/data-sources/" class="md-nav__link">
         
   
   
@@ -4890,7 +5065,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/catalog/" class="md-nav__link">
+      <a href="../../examples/catalog/" class="md-nav__link">
         
   
   
@@ -4968,7 +5143,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/s3/01_catalog_explorer/" class="md-nav__link">
+      <a href="../../examples/s3/01_catalog_explorer/" class="md-nav__link">
         
   
   
@@ -4996,7 +5171,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/s3/02_copernicus_dem/" class="md-nav__link">
+      <a href="../../examples/s3/02_copernicus_dem/" class="md-nav__link">
         
   
   
@@ -5024,7 +5199,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/s3/03_esa_worldcover/" class="md-nav__link">
+      <a href="../../examples/s3/03_esa_worldcover/" class="md-nav__link">
         
   
   
@@ -5052,7 +5227,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/s3/04_passthrough/" class="md-nav__link">
+      <a href="../../examples/s3/04_passthrough/" class="md-nav__link">
         
   
   
@@ -5138,7 +5313,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/ecmwf/cds_quickstart/" class="md-nav__link">
+      <a href="../../examples/ecmwf/cds_quickstart/" class="md-nav__link">
         
   
   
@@ -5166,7 +5341,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/ecmwf/hydrology_water_balance/" class="md-nav__link">
+      <a href="../../examples/ecmwf/hydrology_water_balance/" class="md-nav__link">
         
   
   
@@ -5194,7 +5369,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/ecmwf/oceanography_sst_sea_ice/" class="md-nav__link">
+      <a href="../../examples/ecmwf/oceanography_sst_sea_ice/" class="md-nav__link">
         
   
   
@@ -5222,7 +5397,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/ecmwf/atmosphere_pressure_levels/" class="md-nav__link">
+      <a href="../../examples/ecmwf/atmosphere_pressure_levels/" class="md-nav__link">
         
   
   
@@ -5250,7 +5425,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/ecmwf/agriculture_crop_water/" class="md-nav__link">
+      <a href="../../examples/ecmwf/agriculture_crop_water/" class="md-nav__link">
         
   
   
@@ -5278,7 +5453,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/ecmwf/solar_resource_assessment/" class="md-nav__link">
+      <a href="../../examples/ecmwf/solar_resource_assessment/" class="md-nav__link">
         
   
   
@@ -5306,7 +5481,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/ecmwf/wind_energy_resource/" class="md-nav__link">
+      <a href="../../examples/ecmwf/wind_energy_resource/" class="md-nav__link">
         
   
   
@@ -5334,7 +5509,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/ecmwf/snow_cryosphere_winter/" class="md-nav__link">
+      <a href="../../examples/ecmwf/snow_cryosphere_winter/" class="md-nav__link">
         
   
   
@@ -5362,7 +5537,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/ecmwf/heat_waves_public_health/" class="md-nav__link">
+      <a href="../../examples/ecmwf/heat_waves_public_health/" class="md-nav__link">
         
   
   
@@ -5390,7 +5565,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/ecmwf/climate_change_anomalies/" class="md-nav__link">
+      <a href="../../examples/ecmwf/climate_change_anomalies/" class="md-nav__link">
         
   
   
@@ -5418,7 +5593,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/ecmwf/drought_precipitation_deficit/" class="md-nav__link">
+      <a href="../../examples/ecmwf/drought_precipitation_deficit/" class="md-nav__link">
         
   
   
@@ -5504,7 +5679,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/cmems/catalog_explorer/" class="md-nav__link">
+      <a href="../../examples/cmems/catalog_explorer/" class="md-nav__link">
         
   
   
@@ -5532,7 +5707,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/cmems/quickstart/" class="md-nav__link">
+      <a href="../../examples/cmems/quickstart/" class="md-nav__link">
         
   
   
@@ -5560,7 +5735,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/cmems/glorys_thermocline_timeseries/" class="md-nav__link">
+      <a href="../../examples/cmems/glorys_thermocline_timeseries/" class="md-nav__link">
         
   
   
@@ -5588,7 +5763,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/cmems/pisces_chlorophyll_seasonal_cycle/" class="md-nav__link">
+      <a href="../../examples/cmems/pisces_chlorophyll_seasonal_cycle/" class="md-nav__link">
         
   
   
@@ -5616,7 +5791,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/cmems/altimetry_sla_coastal_signal/" class="md-nav__link">
+      <a href="../../examples/cmems/altimetry_sla_coastal_signal/" class="md-nav__link">
         
   
   
@@ -5644,7 +5819,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/cmems/seaice_arctic_thickness/" class="md-nav__link">
+      <a href="../../examples/cmems/seaice_arctic_thickness/" class="md-nav__link">
         
   
   
@@ -5672,7 +5847,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/cmems/global_wave_significant_height/" class="md-nav__link">
+      <a href="../../examples/cmems/global_wave_significant_height/" class="md-nav__link">
         
   
   
@@ -5700,7 +5875,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/cmems/mediterranean_sst_map/" class="md-nav__link">
+      <a href="../../examples/cmems/mediterranean_sst_map/" class="md-nav__link">
         
   
   
@@ -5786,7 +5961,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/earthdata/catalog_explorer/" class="md-nav__link">
+      <a href="../../examples/earthdata/catalog_explorer/" class="md-nav__link">
         
   
   
@@ -5814,7 +5989,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/earthdata/output_kinds/" class="md-nav__link">
+      <a href="../../examples/earthdata/output_kinds/" class="md-nav__link">
         
   
   
@@ -5842,7 +6017,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/earthdata/imerg_precipitation/" class="md-nav__link">
+      <a href="../../examples/earthdata/imerg_precipitation/" class="md-nav__link">
         
   
   
@@ -5870,7 +6045,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/earthdata/gedi_l4a_footprints/" class="md-nav__link">
+      <a href="../../examples/earthdata/gedi_l4a_footprints/" class="md-nav__link">
         
   
   
@@ -5898,7 +6073,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/earthdata/pace_ocean_colour/" class="md-nav__link">
+      <a href="../../examples/earthdata/pace_ocean_colour/" class="md-nav__link">
         
   
   
@@ -5926,7 +6101,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/earthdata/smap_soil_moisture/" class="md-nav__link">
+      <a href="../../examples/earthdata/smap_soil_moisture/" class="md-nav__link">
         
   
   
@@ -5954,7 +6129,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/earthdata/opera_s1_backscatter/" class="md-nav__link">
+      <a href="../../examples/earthdata/opera_s1_backscatter/" class="md-nav__link">
         
   
   
@@ -6040,7 +6215,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/eumetsat/catalog_explorer/" class="md-nav__link">
+      <a href="../../examples/eumetsat/catalog_explorer/" class="md-nav__link">
         
   
   
@@ -6068,7 +6243,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/eumetsat/output_kinds_and_formats/" class="md-nav__link">
+      <a href="../../examples/eumetsat/output_kinds_and_formats/" class="md-nav__link">
         
   
   
@@ -6096,7 +6271,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/eumetsat/msg_hrseviri_fetch/" class="md-nav__link">
+      <a href="../../examples/eumetsat/msg_hrseviri_fetch/" class="md-nav__link">
         
   
   
@@ -6124,7 +6299,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/eumetsat/sentinel3_olci_ocean_colour/" class="md-nav__link">
+      <a href="../../examples/eumetsat/sentinel3_olci_ocean_colour/" class="md-nav__link">
         
   
   
@@ -6152,7 +6327,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/eumetsat/sentinel5p_no2/" class="md-nav__link">
+      <a href="../../examples/eumetsat/sentinel5p_no2/" class="md-nav__link">
         
   
   
@@ -6180,7 +6355,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/eumetsat/metop_ascat_soil_moisture/" class="md-nav__link">
+      <a href="../../examples/eumetsat/metop_ascat_soil_moisture/" class="md-nav__link">
         
   
   
@@ -6266,7 +6441,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/fdsn/quickstart/" class="md-nav__link">
+      <a href="../../examples/fdsn/quickstart/" class="md-nav__link">
         
   
   
@@ -6294,7 +6469,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/fdsn/global_seismicity_map/" class="md-nav__link">
+      <a href="../../examples/fdsn/global_seismicity_map/" class="md-nav__link">
         
   
   
@@ -6322,7 +6497,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/fdsn/regional_sequence/" class="md-nav__link">
+      <a href="../../examples/fdsn/regional_sequence/" class="md-nav__link">
         
   
   
@@ -6408,7 +6583,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/gee/quickstart/" class="md-nav__link">
+      <a href="../../examples/gee/quickstart/" class="md-nav__link">
         
   
   
@@ -6436,7 +6611,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/gee/atmosphere-chemistry/" class="md-nav__link">
+      <a href="../../examples/gee/atmosphere-chemistry/" class="md-nav__link">
         
   
   
@@ -6464,7 +6639,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/gee/climate-reanalysis/" class="md-nav__link">
+      <a href="../../examples/gee/climate-reanalysis/" class="md-nav__link">
         
   
   
@@ -6492,7 +6667,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/gee/community/" class="md-nav__link">
+      <a href="../../examples/gee/community/" class="md-nav__link">
         
   
   
@@ -6520,7 +6695,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/gee/elevation-terrain/" class="md-nav__link">
+      <a href="../../examples/gee/elevation-terrain/" class="md-nav__link">
         
   
   
@@ -6548,7 +6723,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/gee/hydrology-water/" class="md-nav__link">
+      <a href="../../examples/gee/hydrology-water/" class="md-nav__link">
         
   
   
@@ -6576,7 +6751,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/gee/land-cover-change/" class="md-nav__link">
+      <a href="../../examples/gee/land-cover-change/" class="md-nav__link">
         
   
   
@@ -6604,7 +6779,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/gee/optical-multispectral/" class="md-nav__link">
+      <a href="../../examples/gee/optical-multispectral/" class="md-nav__link">
         
   
   
@@ -6632,7 +6807,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/gee/other/" class="md-nav__link">
+      <a href="../../examples/gee/other/" class="md-nav__link">
         
   
   
@@ -6660,7 +6835,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/gee/precipitation/" class="md-nav__link">
+      <a href="../../examples/gee/precipitation/" class="md-nav__link">
         
   
   
@@ -6688,7 +6863,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/gee/sar-radar/" class="md-nav__link">
+      <a href="../../examples/gee/sar-radar/" class="md-nav__link">
         
   
   
@@ -6716,7 +6891,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/gee/track-batch-exports/" class="md-nav__link">
+      <a href="../../examples/gee/track-batch-exports/" class="md-nav__link">
         
   
   
@@ -6802,7 +6977,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/stac/quickstart/" class="md-nav__link">
+      <a href="../../examples/stac/quickstart/" class="md-nav__link">
         
   
   
@@ -6830,7 +7005,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/stac/sentinel2_ndvi_timeseries/" class="md-nav__link">
+      <a href="../../examples/stac/sentinel2_ndvi_timeseries/" class="md-nav__link">
         
   
   
@@ -6858,7 +7033,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/stac/mpc_landsat_cdse_sentinel_same_aoi/" class="md-nav__link">
+      <a href="../../examples/stac/mpc_landsat_cdse_sentinel_same_aoi/" class="md-nav__link">
         
   
   
@@ -6944,7 +7119,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/gdacs/quickstart/" class="md-nav__link">
+      <a href="../../examples/gdacs/quickstart/" class="md-nav__link">
         
   
   
@@ -6972,7 +7147,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/gdacs/global_hazard_dashboard/" class="md-nav__link">
+      <a href="../../examples/gdacs/global_hazard_dashboard/" class="md-nav__link">
         
   
   
@@ -7000,7 +7175,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/gdacs/eq_tc_overlay/" class="md-nav__link">
+      <a href="../../examples/gdacs/eq_tc_overlay/" class="md-nav__link">
         
   
   
@@ -7028,7 +7203,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/gdacs/country_hazard_profile/" class="md-nav__link">
+      <a href="../../examples/gdacs/country_hazard_profile/" class="md-nav__link">
         
   
   
@@ -7114,7 +7289,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/openaq/quickstart/" class="md-nav__link">
+      <a href="../../examples/openaq/quickstart/" class="md-nav__link">
         
   
   
@@ -7142,7 +7317,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/openaq/pm25_city_timeseries/" class="md-nav__link">
+      <a href="../../examples/openaq/pm25_city_timeseries/" class="md-nav__link">
         
   
   
@@ -7170,7 +7345,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/openaq/multistation_comparison/" class="md-nav__link">
+      <a href="../../examples/openaq/multistation_comparison/" class="md-nav__link">
         
   
   
@@ -7256,7 +7431,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/openeo/catalog_explorer/" class="md-nav__link">
+      <a href="../../examples/openeo/catalog_explorer/" class="md-nav__link">
         
   
   
@@ -7284,7 +7459,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/openeo/quickstart/" class="md-nav__link">
+      <a href="../../examples/openeo/quickstart/" class="md-nav__link">
         
   
   
@@ -7312,7 +7487,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/openeo/cloud_masked_composite/" class="md-nav__link">
+      <a href="../../examples/openeo/cloud_masked_composite/" class="md-nav__link">
         
   
   
@@ -7340,7 +7515,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/openeo/server_side_aggregate/" class="md-nav__link">
+      <a href="../../examples/openeo/server_side_aggregate/" class="md-nav__link">
         
   
   
@@ -7368,7 +7543,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/openeo/air_quality_no2_monthly/" class="md-nav__link">
+      <a href="../../examples/openeo/air_quality_no2_monthly/" class="md-nav__link">
         
   
   
@@ -7396,7 +7571,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/openeo/ocean_chlorophyll_monthly/" class="md-nav__link">
+      <a href="../../examples/openeo/ocean_chlorophyll_monthly/" class="md-nav__link">
         
   
   
@@ -7482,7 +7657,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/sentinel-hub/catalog_explorer/" class="md-nav__link">
+      <a href="../../examples/sentinel-hub/catalog_explorer/" class="md-nav__link">
         
   
   
@@ -7510,7 +7685,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/sentinel-hub/quickstart_ndvi/" class="md-nav__link">
+      <a href="../../examples/sentinel-hub/quickstart_ndvi/" class="md-nav__link">
         
   
   
@@ -7538,7 +7713,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/sentinel-hub/true_colour/" class="md-nav__link">
+      <a href="../../examples/sentinel-hub/true_colour/" class="md-nav__link">
         
   
   
@@ -7566,7 +7741,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/sentinel-hub/custom_evalscript/" class="md-nav__link">
+      <a href="../../examples/sentinel-hub/custom_evalscript/" class="md-nav__link">
         
   
   
@@ -7594,7 +7769,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/sentinel-hub/local_tiling/" class="md-nav__link">
+      <a href="../../examples/sentinel-hub/local_tiling/" class="md-nav__link">
         
   
   
@@ -7622,7 +7797,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/sentinel-hub/statistical_zonal_stats/" class="md-nav__link">
+      <a href="../../examples/sentinel-hub/statistical_zonal_stats/" class="md-nav__link">
         
   
   
@@ -7650,7 +7825,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/sentinel-hub/aggregate_monthly/" class="md-nav__link">
+      <a href="../../examples/sentinel-hub/aggregate_monthly/" class="md-nav__link">
         
   
   
@@ -7678,7 +7853,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/sentinel-hub/batch_walkthrough/" class="md-nav__link">
+      <a href="../../examples/sentinel-hub/batch_walkthrough/" class="md-nav__link">
         
   
   
@@ -7764,7 +7939,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/tropycal/quickstart/" class="md-nav__link">
+      <a href="../../examples/tropycal/quickstart/" class="md-nav__link">
         
   
   
@@ -7792,7 +7967,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/tropycal/season_track_map/" class="md-nav__link">
+      <a href="../../examples/tropycal/season_track_map/" class="md-nav__link">
         
   
   
@@ -7820,7 +7995,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/tropycal/landfall_density/" class="md-nav__link">
+      <a href="../../examples/tropycal/landfall_density/" class="md-nav__link">
         
   
   
@@ -7848,7 +8023,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/tropycal/recon_katrina/" class="md-nav__link">
+      <a href="../../examples/tropycal/recon_katrina/" class="md-nav__link">
         
   
   
@@ -7876,7 +8051,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/tropycal/ships_intensity_forecast/" class="md-nav__link">
+      <a href="../../examples/tropycal/ships_intensity_forecast/" class="md-nav__link">
         
   
   
@@ -7904,7 +8079,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/tropycal/katrina_intensity_timeline/" class="md-nav__link">
+      <a href="../../examples/tropycal/katrina_intensity_timeline/" class="md-nav__link">
         
   
   
@@ -7932,7 +8107,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/tropycal/source_comparison/" class="md-nav__link">
+      <a href="../../examples/tropycal/source_comparison/" class="md-nav__link">
         
   
   
@@ -7960,7 +8135,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/tropycal/multibasin_ace/" class="md-nav__link">
+      <a href="../../examples/tropycal/multibasin_ace/" class="md-nav__link">
         
   
   
@@ -8046,7 +8221,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/firms/quickstart/" class="md-nav__link">
+      <a href="../../examples/firms/quickstart/" class="md-nav__link">
         
   
   
@@ -8074,7 +8249,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/firms/fire_season_timeseries/" class="md-nav__link">
+      <a href="../../examples/firms/fire_season_timeseries/" class="md-nav__link">
         
   
   
@@ -8102,7 +8277,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/firms/modis_vs_viirs_comparison/" class="md-nav__link">
+      <a href="../../examples/firms/modis_vs_viirs_comparison/" class="md-nav__link">
         
   
   
@@ -8188,7 +8363,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/hdx/catalog_explorer/" class="md-nav__link">
+      <a href="../../examples/hdx/catalog_explorer/" class="md-nav__link">
         
   
   
@@ -8216,7 +8391,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/hdx/wfp_food_security_table/" class="md-nav__link">
+      <a href="../../examples/hdx/wfp_food_security_table/" class="md-nav__link">
         
   
   
@@ -8244,7 +8419,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/hdx/cod_admin_boundaries/" class="md-nav__link">
+      <a href="../../examples/hdx/cod_admin_boundaries/" class="md-nav__link">
         
   
   
@@ -8272,7 +8447,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/hdx/hotosm_building_export/" class="md-nav__link">
+      <a href="../../examples/hdx/hotosm_building_export/" class="md-nav__link">
         
   
   
@@ -8300,7 +8475,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/hdx/arbitrary_hdx_id/" class="md-nav__link">
+      <a href="../../examples/hdx/arbitrary_hdx_id/" class="md-nav__link">
         
   
   
@@ -8386,7 +8561,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/overture/01_catalog_explorer/" class="md-nav__link">
+      <a href="../../examples/overture/01_catalog_explorer/" class="md-nav__link">
         
   
   
@@ -8414,7 +8589,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/overture/02_places_quickstart/" class="md-nav__link">
+      <a href="../../examples/overture/02_places_quickstart/" class="md-nav__link">
         
   
   
@@ -8442,7 +8617,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/overture/03_buildings_footprints/" class="md-nav__link">
+      <a href="../../examples/overture/03_buildings_footprints/" class="md-nav__link">
         
   
   
@@ -8470,7 +8645,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/overture/04_per_row_licensing/" class="md-nav__link">
+      <a href="../../examples/overture/04_per_row_licensing/" class="md-nav__link">
         
   
   
@@ -8498,7 +8673,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/overture/05_transportation_network/" class="md-nav__link">
+      <a href="../../examples/overture/05_transportation_network/" class="md-nav__link">
         
   
   
@@ -8526,7 +8701,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/overture/06_multi_theme_download/" class="md-nav__link">
+      <a href="../../examples/overture/06_multi_theme_download/" class="md-nav__link">
         
   
   
@@ -8554,7 +8729,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/overture/07_attribute_pushdown/" class="md-nav__link">
+      <a href="../../examples/overture/07_attribute_pushdown/" class="md-nav__link">
         
   
   
@@ -8640,7 +8815,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/nwp/catalog_explorer/" class="md-nav__link">
+      <a href="../../examples/nwp/catalog_explorer/" class="md-nav__link">
         
   
   
@@ -8668,7 +8843,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/nwp/gfs_temperature/" class="md-nav__link">
+      <a href="../../examples/nwp/gfs_temperature/" class="md-nav__link">
         
   
   
@@ -8696,7 +8871,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/nwp/icon_precipitation/" class="md-nav__link">
+      <a href="../../examples/nwp/icon_precipitation/" class="md-nav__link">
         
   
   
@@ -8782,7 +8957,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/radar/catalog_explorer/" class="md-nav__link">
+      <a href="../../examples/radar/catalog_explorer/" class="md-nav__link">
         
   
   
@@ -8868,7 +9043,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/usgs-water/quickstart_daily_discharge/" class="md-nav__link">
+      <a href="../../examples/usgs-water/quickstart_daily_discharge/" class="md-nav__link">
         
   
   
@@ -8896,7 +9071,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/usgs-water/multi_parameter_and_instantaneous/" class="md-nav__link">
+      <a href="../../examples/usgs-water/multi_parameter_and_instantaneous/" class="md-nav__link">
         
   
   
@@ -8924,7 +9099,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/usgs-water/site_discovery_and_statistics/" class="md-nav__link">
+      <a href="../../examples/usgs-water/site_discovery_and_statistics/" class="md-nav__link">
         
   
   
@@ -8952,7 +9127,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/usgs-water/peaks_and_ratings/" class="md-nav__link">
+      <a href="../../examples/usgs-water/peaks_and_ratings/" class="md-nav__link">
         
   
   
@@ -9038,7 +9213,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/ghsl/01_catalog_explorer/" class="md-nav__link">
+      <a href="../../examples/ghsl/01_catalog_explorer/" class="md-nav__link">
         
   
   
@@ -9066,7 +9241,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/ghsl/02_population_quickstart/" class="md-nav__link">
+      <a href="../../examples/ghsl/02_population_quickstart/" class="md-nav__link">
         
   
   
@@ -9094,7 +9269,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/ghsl/03_builtup_surface/" class="md-nav__link">
+      <a href="../../examples/ghsl/03_builtup_surface/" class="md-nav__link">
         
   
   
@@ -9122,7 +9297,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/ghsl/04_builtup_growth/" class="md-nav__link">
+      <a href="../../examples/ghsl/04_builtup_growth/" class="md-nav__link">
         
   
   
@@ -9150,7 +9325,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/ghsl/05_building_height/" class="md-nav__link">
+      <a href="../../examples/ghsl/05_building_height/" class="md-nav__link">
         
   
   
@@ -9178,7 +9353,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/ghsl/06_settlement_classes/" class="md-nav__link">
+      <a href="../../examples/ghsl/06_settlement_classes/" class="md-nav__link">
         
   
   
@@ -9206,7 +9381,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/ghsl/07_wup_projection/" class="md-nav__link">
+      <a href="../../examples/ghsl/07_wup_projection/" class="md-nav__link">
         
   
   
@@ -9292,7 +9467,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/worldpop/01_catalog_explorer/" class="md-nav__link">
+      <a href="../../examples/worldpop/01_catalog_explorer/" class="md-nav__link">
         
   
   
@@ -9320,7 +9495,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/worldpop/02_population_quickstart/" class="md-nav__link">
+      <a href="../../examples/worldpop/02_population_quickstart/" class="md-nav__link">
         
   
   
@@ -9348,7 +9523,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/worldpop/03_constrained_vs_unconstrained/" class="md-nav__link">
+      <a href="../../examples/worldpop/03_constrained_vs_unconstrained/" class="md-nav__link">
         
   
   
@@ -9376,7 +9551,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/worldpop/04_age_sex_pyramid/" class="md-nav__link">
+      <a href="../../examples/worldpop/04_age_sex_pyramid/" class="md-nav__link">
         
   
   
@@ -9404,7 +9579,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/worldpop/05_multicountry_mosaic/" class="md-nav__link">
+      <a href="../../examples/worldpop/05_multicountry_mosaic/" class="md-nav__link">
         
   
   
@@ -9432,7 +9607,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/worldpop/06_multiyear_aggregate/" class="md-nav__link">
+      <a href="../../examples/worldpop/06_multiyear_aggregate/" class="md-nav__link">
         
   
   
@@ -9460,7 +9635,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/worldpop/07_covariates_nightlights/" class="md-nav__link">
+      <a href="../../examples/worldpop/07_covariates_nightlights/" class="md-nav__link">
         
   
   
@@ -9488,7 +9663,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/worldpop/08_dependency_ratios/" class="md-nav__link">
+      <a href="../../examples/worldpop/08_dependency_ratios/" class="md-nav__link">
         
   
   
@@ -9516,7 +9691,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/worldpop/09_global_mosaic/" class="md-nav__link">
+      <a href="../../examples/worldpop/09_global_mosaic/" class="md-nav__link">
         
   
   
@@ -9609,7 +9784,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../earthlens/" class="md-nav__link">
+      <a href="../earthlens/" class="md-nav__link">
         
   
   
@@ -9637,7 +9812,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../abstract-datasource/" class="md-nav__link">
+      <a href="../abstract-datasource/" class="md-nav__link">
         
   
   
@@ -9722,7 +9897,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../change-log/" class="md-nav__link">
+      <a href="../../change-log/" class="md-nav__link">
         
   
   
@@ -9777,10 +9952,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#curated-collections" class="md-nav__link">
+  <a href="#install-invoke" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Curated collections
+        Install &amp; invoke
       
     </span>
   </a>
@@ -9788,22 +9963,22 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#curated-evalscript-recipes" class="md-nav__link">
+  <a href="#concepts-that-apply-to-every-command" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Curated evalscript recipes
+        Concepts that apply to every command
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Curated evalscript recipes">
+    <nav class="md-nav" aria-label="Concepts that apply to every command">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#render-recipes-kindrender" class="md-nav__link">
+  <a href="#provider-selectors" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Render recipes (kind="render")
+        Provider selectors
       
     </span>
   </a>
@@ -9811,10 +9986,43 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#statistical-recipes-kindstats" class="md-nav__link">
+  <a href="#output-modes" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Statistical recipes (kind="stats")
+        Output modes
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#provider-precedence" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Provider precedence
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#exit-codes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Exit codes
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#what-hits-the-network" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What hits the network
       
     </span>
   </a>
@@ -9827,21 +10035,165 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#adding-a-custom-evalscript" class="md-nav__link">
+  <a href="#earthlens-datasets" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Adding a custom evalscript
+        earthlens datasets
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="earthlens datasets">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#where-name-which-providers-expose-a-dataset" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        where &lt;name&gt; — which provider(s) expose a dataset
       
     </span>
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#catalog-tooling" class="md-nav__link">
+        
+          <li class="md-nav__item">
+  <a href="#search-query-free-text-faceted-search" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Catalog tooling
+        search [query] — free-text + faceted search
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#list-list-curated-datasets" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        list — list curated datasets
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#show-provider-dataset-full-record-for-one-dataset" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        show &lt;provider&gt; &lt;dataset&gt; — full record for one dataset
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#facets-value-distribution-across-facets" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        facets — value distribution across facets
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#refresh-providers-diff-the-bundled-index-against-live-optionally-persist" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        refresh &lt;providers&gt; — diff the bundled index against live, optionally persist
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#audit-providers-curated-vs-live-drift-and-coverage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        audit &lt;providers&gt; — curated-vs-live drift (and coverage)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#validate-providers-per-entry-checks-offline-lint-optional-live" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        validate &lt;providers&gt; — per-entry checks (offline lint, optional live)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#probe-provider-dataset-sample-one-datasets-schema" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        probe &lt;provider&gt; &lt;dataset&gt; — sample one dataset's schema
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#curate-provider-upstream_id-author-a-curated-row" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        curate &lt;provider&gt; [upstream_id] — author a curated row
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#earthlens-providers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        earthlens providers
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="earthlens providers">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#list-the-backends-and-their-health" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        list — the backends and their health
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#verb-cheat-sheet" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Verb cheat-sheet
       
     </span>
   </a>
@@ -9865,7 +10217,7 @@
 
 
   
-    <a href="https://github.com/serapeum-org/earthlens/edit/master/docs/reference/sentinel-hub/datasets.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
+    <a href="https://github.com/serapeum-org/earthlens/edit/master/docs/reference/cli.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
     </a>
@@ -9874,389 +10226,514 @@
     
       
     
-    <a href="https://github.com/serapeum-org/earthlens/raw/master/docs/reference/sentinel-hub/datasets.md" title="View source of this page" class="md-content__button md-icon">
+    <a href="https://github.com/serapeum-org/earthlens/raw/master/docs/reference/cli.md" title="View source of this page" class="md-content__button md-icon">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 18c.56 0 1 .44 1 1s-.44 1-1 1-1-.44-1-1 .44-1 1-1m0-3c-2.73 0-5.06 1.66-6 4 .94 2.34 3.27 4 6 4s5.06-1.66 6-4c-.94-2.34-3.27-4-6-4m0 6.5a2.5 2.5 0 0 1-2.5-2.5 2.5 2.5 0 0 1 2.5-2.5 2.5 2.5 0 0 1 2.5 2.5 2.5 2.5 0 0 1-2.5 2.5M9.27 20H6V4h7v5h5v4.07c.7.08 1.36.25 2 .49V8l-6-6H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h4.5a8.2 8.2 0 0 1-1.23-2"/></svg>
     </a>
   
 
 
-<h1 id="sentinel-hub-collections-evalscript-recipes"><a class="toclink" href="#sentinel-hub-collections-evalscript-recipes">Sentinel Hub — collections &amp; evalscript recipes</a><a class="headerlink" href="#sentinel-hub-collections-evalscript-recipes" title="Permanent link">#</a></h1>
-<p>The catalog has <strong>two layers</strong> (the headline design decision): curated <strong>data
-collections</strong> and a bundled library of <strong>evalscript recipes</strong>. A request names
-either a recipe (which pins its collection + render logic) or a collection (plus
-an explicit <code>evalscript=</code>).</p>
-<p>The catalog ships as package data under
-<code>src/earthlens/sentinel_hub/catalog/</code> and the evalscript <code>.js</code> files under
-<code>src/earthlens/sentinel_hub/evalscripts/</code>. Load it directly with:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.sentinel_hub</span><span class="w"> </span><span class="kn">import</span> <span class="n">Catalog</span>
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="n">cat</span> <span class="o">=</span> <span class="n">Catalog</span><span class="p">()</span>
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="n">cat</span><span class="o">.</span><span class="n">is_recipe</span><span class="p">(</span><span class="s2">&quot;sentinel-2-l2a-ndvi&quot;</span><span class="p">)</span>            <span class="c1"># True</span>
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="n">cat</span><span class="o">.</span><span class="n">get_collection</span><span class="p">(</span><span class="s2">&quot;sentinel-2-l2a&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">sh_collection</span>   <span class="c1"># &#39;SENTINEL2_L2A&#39;</span>
-<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="n">cat</span><span class="o">.</span><span class="n">resolve</span><span class="p">(</span><span class="s2">&quot;sentinel-2-l2a-ndvi&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">evalscript</span>        <span class="c1"># &#39;ndvi.js&#39;</span>
+<h1 id="command-line-interface-earthlens"><a class="toclink" href="#command-line-interface-earthlens">Command-line interface (<code>earthlens</code>)</a><a class="headerlink" href="#command-line-interface-earthlens" title="Permanent link">#</a></h1>
+<p>The <code>earthlens</code> console script is a <strong>federated, read-first catalog tool</strong>: it queries every backend's
+bundled catalog from one shell entry point, and adds maintainer verbs for keeping those catalogs in sync
+with what each provider serves live. It never downloads science data — for that you use the Python
+<code>EarthLens</code> facade.</p>
+<h2 id="install-invoke"><a class="toclink" href="#install-invoke">Install &amp; invoke</a><a class="headerlink" href="#install-invoke" title="Permanent link">#</a></h2>
+<p>The CLI ships with the base package — <code>typer</code> + <code>rich</code> are core dependencies, so a plain install gives a
+working <code>earthlens</code> command:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>pip<span class="w"> </span>install<span class="w"> </span>earthlens
 </code></pre></div>
-<h2 id="curated-collections"><a class="toclink" href="#curated-collections">Curated collections</a><a class="headerlink" href="#curated-collections" title="Permanent link">#</a></h2>
+<p>Two equivalent entry points:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>earthlens<span class="w"> </span>--help<span class="w">                 </span><span class="c1"># the installed console script</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>python<span class="w"> </span>-m<span class="w"> </span>earthlens.cli<span class="w"> </span>--help<span class="w">   </span><span class="c1"># the same app, no script on PATH</span>
+</code></pre></div>
+<p>The app has two command groups:</p>
 <table>
 <thead>
 <tr>
-<th>Key</th>
-<th><code>DataCollection</code></th>
-<th>Resolution</th>
-<th>Cadence</th>
-<th>Default bands</th>
+<th>Group</th>
+<th>Purpose</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><code>sentinel-2-l1c</code></td>
-<td><code>SENTINEL2_L1C</code></td>
-<td>10 m</td>
-<td>5-day</td>
-<td>B04, B03, B02</td>
+<td><code>earthlens datasets …</code></td>
+<td>find, inspect, and maintain datasets across all providers</td>
 </tr>
 <tr>
-<td><code>sentinel-2-l2a</code></td>
-<td><code>SENTINEL2_L2A</code></td>
-<td>10 m</td>
-<td>5-day</td>
-<td>B04, B03, B02</td>
-</tr>
-<tr>
-<td><code>sentinel-1-iw</code></td>
-<td><code>SENTINEL1_IW</code></td>
-<td>10 m</td>
-<td>6-day</td>
-<td>VV, VH</td>
-</tr>
-<tr>
-<td><code>sentinel-1-ew</code></td>
-<td><code>SENTINEL1_EW</code></td>
-<td>40 m</td>
-<td>6-day</td>
-<td>HH, HV</td>
-</tr>
-<tr>
-<td><code>sentinel-3-olci</code></td>
-<td><code>SENTINEL3_OLCI</code></td>
-<td>300 m</td>
-<td>2-day</td>
-<td>B08, B06, B04</td>
-</tr>
-<tr>
-<td><code>sentinel-3-slstr</code></td>
-<td><code>SENTINEL3_SLSTR</code></td>
-<td>500 m</td>
-<td>daily</td>
-<td>S3, S2, S1</td>
-</tr>
-<tr>
-<td><code>sentinel-5p-l2</code></td>
-<td><code>SENTINEL5P</code></td>
-<td>3500 m</td>
-<td>daily</td>
-<td>NO2</td>
-</tr>
-<tr>
-<td><code>landsat-ot-l1</code></td>
-<td><code>LANDSAT_OT_L1</code></td>
-<td>30 m</td>
-<td>16-day</td>
-<td>B04, B03, B02</td>
-</tr>
-<tr>
-<td><code>dem-copernicus-30</code></td>
-<td><code>DEM_COPERNICUS_30</code></td>
-<td>30 m</td>
-<td>static</td>
-<td>DEM</td>
+<td><code>earthlens providers …</code></td>
+<td>list the backends and probe their SDK / catalog health</td>
 </tr>
 </tbody>
 </table>
-<p>Each collection's <code>bands</code> map carries per-band metadata (common name, units,
-native resolution, central wavelength). Sentinel-2 L1C/L2A expose the full MSI
-band set (<code>B01</code>–<code>B12</code>, <code>B8A</code>, plus <code>SCL</code> on L2A); Sentinel-5P exposes the
-atmospheric columns (<code>CO</code>, <code>NO2</code>, <code>O3</code>, <code>SO2</code>, <code>CH4</code>); Sentinel-3 SLSTR adds the
-thermal brightness-temperature bands (<code>S7</code>–<code>S9</code>, <code>F1</code>/<code>F2</code>); Landsat OT L1 is
-top-of-atmosphere optical + thermal; <code>DEM_COPERNICUS_30</code> is a single elevation
-band.</p>
-<div class="admonition note">
-<p class="admonition-title">Default endpoint = CDSE-free</p>
-<p>The curated collections above are all served by the <strong>default CDSE-free
-endpoint</strong>. The <code>sentinelhub</code> SDK also knows other collections — <strong>MODIS</strong>,
-<strong>Landsat L2 surface reflectance</strong> (<code>LANDSAT_OT_L2</code>), and <strong>HLS</strong>
-(<code>HARMONIZED_LANDSAT_SENTINEL</code>) — that CDSE does <strong>not</strong> serve (they return a
-<code>RENDERER_EXCEPTION</code> "Unable to resolve"). Those are available on the
-<strong>commercial</strong> Sentinel Hub deployment: pass <code>endpoint="commercial"</code> with a
-commercial subscription and address them via a custom <code>evalscript=</code>.</p>
-</div>
-<p>The full set of collection ids Sentinel Hub can serve is kept in the
-informational <code>available_collections</code> index (rebuilt by the
-<a href="#catalog-tooling">refresh tool</a>); the table above is the <strong>curated</strong> subset with
-vetted band metadata.</p>
-<h2 id="curated-evalscript-recipes"><a class="toclink" href="#curated-evalscript-recipes">Curated evalscript recipes</a><a class="headerlink" href="#curated-evalscript-recipes" title="Permanent link">#</a></h2>
-<p>Recipes are split into <strong>render</strong> recipes (write a raster) and <strong>stats</strong> recipes
-(emit the <code>dataMask</code> band the Statistical API requires).</p>
-<h3 id="render-recipes-kindrender"><a class="toclink" href="#render-recipes-kindrender">Render recipes (<code>kind="render"</code>)</a><a class="headerlink" href="#render-recipes-kindrender" title="Permanent link">#</a></h3>
+<p>Running a group with no command (or <code>--help</code>) prints its usage.</p>
+<h2 id="concepts-that-apply-to-every-command"><a class="toclink" href="#concepts-that-apply-to-every-command">Concepts that apply to every command</a><a class="headerlink" href="#concepts-that-apply-to-every-command" title="Permanent link">#</a></h2>
+<h3 id="provider-selectors"><a class="toclink" href="#provider-selectors">Provider selectors</a><a class="headerlink" href="#provider-selectors" title="Permanent link">#</a></h3>
+<p>Anywhere a command takes a provider, you can use the canonical id <strong>or an alias</strong>, and (for the
+multi-provider verbs) a comma-separated list or the literal <code>all</code>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>earthlens<span class="w"> </span>datasets<span class="w"> </span>where<span class="w"> </span>era5<span class="w"> </span>-p<span class="w"> </span>s3<span class="w">            </span><span class="c1"># canonical id</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>earthlens<span class="w"> </span>datasets<span class="w"> </span>where<span class="w"> </span>era5<span class="w"> </span>-p<span class="w"> </span>amazon-s3<span class="w">     </span><span class="c1"># alias for s3</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>earthlens<span class="w"> </span>datasets<span class="w"> </span>refresh<span class="w"> </span>stac,openeo<span class="w">         </span><span class="c1"># a comma list</span>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>earthlens<span class="w"> </span>datasets<span class="w"> </span>validate<span class="w"> </span>all<span class="w">                </span><span class="c1"># every provider</span>
+</code></pre></div>
+<p>Canonical ids: <code>chc</code>, <code>s3</code>, <code>cmems</code>, <code>ecmwf</code>, <code>earthdata</code>, <code>eumetsat</code>, <code>fdsn</code>, <code>firms</code>, <code>gdacs</code>, <code>gee</code>,
+<code>ghsl</code>, <code>hdx</code>, <code>nwp</code>, <code>openaq</code>, <code>openeo</code>, <code>overture</code>, <code>radar</code>, <code>sentinel_hub</code>, <code>stac</code>, <code>tropycal</code>,
+<code>usgs_water</code>, <code>worldpop</code>. Common aliases include <code>amazon-s3</code>, <code>chirps</code>, <code>google-earth-engine</code>,
+<code>sentinel-hub</code>/<code>sentinelhub</code>, <code>nexrad</code>, <code>nwis</code>/<code>usgs-water</code>, <code>world-pop</code>, <code>human-settlement</code>/<code>ghs</code>,
+<code>earth-search</code>/<code>planetary-computer</code>/<code>cdse</code> (STAC endpoints). An unknown selector is a <strong>usage error</strong>
+(exit code <code>2</code>).</p>
+<h3 id="output-modes"><a class="toclink" href="#output-modes">Output modes</a><a class="headerlink" href="#output-modes" title="Permanent link">#</a></h3>
+<p>Most read commands accept:</p>
+<ul>
+<li><em>(default)</em> — a rich table to stdout, with a dim summary line to stderr.</li>
+<li><code>--json</code> / <code>-j</code> — a parseable JSON array/object to stdout (for piping).</li>
+<li><code>--ids-only</code> — bare <code>provider&lt;TAB&gt;id</code> lines (for shell pipelines).</li>
+</ul>
+<p><code>--json</code> and <code>--ids-only</code> are mutually exclusive (using both is a usage error).</p>
+<h3 id="provider-precedence"><a class="toclink" href="#provider-precedence">Provider precedence</a><a class="headerlink" href="#provider-precedence" title="Permanent link">#</a></h3>
+<p>Results are ordered by a configurable provider priority. Override it with the
+<code>EARTHLENS_PROVIDER_PRIORITY</code> environment variable (a comma-separated provider list); providers not
+listed sort after the listed ones:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="nv">EARTHLENS_PROVIDER_PRIORITY</span><span class="o">=</span>gee,stac,s3<span class="w"> </span>earthlens<span class="w"> </span>datasets<span class="w"> </span>where<span class="w"> </span>ndvi
+</code></pre></div>
+<h3 id="exit-codes"><a class="toclink" href="#exit-codes">Exit codes</a><a class="headerlink" href="#exit-codes" title="Permanent link">#</a></h3>
+<ul>
+<li><code>0</code> — success.</li>
+<li><code>1</code> — a meaningful "no result / failed" outcome a pipeline can branch on (e.g. <code>where</code> found nothing;
+  <code>curate</code> on an unsupported provider; <code>--strict</code> found drift / issues).</li>
+<li><code>2</code> — a usage error (unknown provider, conflicting flags, missing argument).</li>
+</ul>
+<h3 id="what-hits-the-network"><a class="toclink" href="#what-hits-the-network">What hits the network</a><a class="headerlink" href="#what-hits-the-network" title="Permanent link">#</a></h3>
+<p><code>where</code> / <code>search</code> / <code>list</code> / <code>show</code> / <code>facets</code> read only the <strong>bundled</strong> catalogs (offline, instant) —
+unless you pass <code>--include-available</code>, which also scans each backend's full upstream id index. The
+maintainer verbs <code>refresh</code> / <code>audit</code> / <code>probe</code> / <code>validate --live</code> go to the <strong>network / SDKs</strong>;
+<code>validate</code> (without <code>--live</code>) and <code>curate</code> (without <code>--write</code>/<code>--hydrate</code>/<code>--fill-empty</code>) are otherwise
+local. Credentialed paths read keys from the environment / <code>~/.cdsapirc</code> (e.g. <code>FIRMS_MAP_KEY</code>,
+<code>OPENAQ_API_KEY</code>, GEE service account, CDS key) — see each backend's authentication page.</p>
+<hr />
+<h2 id="earthlens-datasets"><a class="toclink" href="#earthlens-datasets"><code>earthlens datasets</code></a><a class="headerlink" href="#earthlens-datasets" title="Permanent link">#</a></h2>
+<h3 id="where-name-which-providers-expose-a-dataset"><a class="toclink" href="#where-name-which-providers-expose-a-dataset"><code>where &lt;name&gt;</code> — which provider(s) expose a dataset</a><a class="headerlink" href="#where-name-which-providers-expose-a-dataset" title="Permanent link">#</a></h3>
+<p>The headline use case. Scans every backend's catalog for <code>name</code>: an exact dataset-id match wins,
+otherwise a case-insensitive substring match over id and title. Exits <code>1</code> (with a did-you-mean hint) when
+nothing matches, so it composes in pipelines.</p>
 <table>
 <thead>
 <tr>
-<th>Key</th>
-<th>Evalscript</th>
-<th>Bands</th>
-<th>Output bands</th>
-<th>Description</th>
+<th>Option</th>
+<th>Meaning</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><code>sentinel-2-l2a-ndvi</code></td>
-<td><code>ndvi.js</code></td>
-<td>B04, B08</td>
-<td>1</td>
-<td>NDVI (FLOAT32)</td>
+<td><code>-p, --provider</code></td>
+<td>restrict to these providers (repeatable / comma-separated)</td>
 </tr>
 <tr>
-<td><code>sentinel-2-l2a-true-colour</code></td>
-<td><code>true_colour.js</code></td>
-<td>B02, B03, B04</td>
-<td>3</td>
-<td>True-colour RGB</td>
+<td><code>--exact</code></td>
+<td>match the dataset id exactly (no substring search)</td>
 </tr>
 <tr>
-<td><code>sentinel-2-l2a-false-colour</code></td>
-<td><code>false_colour.js</code></td>
-<td>B03, B04, B08</td>
-<td>3</td>
-<td>False-colour (vegetation)</td>
+<td><code>--include-available</code></td>
+<td>also search each backend's full upstream id index (slower)</td>
 </tr>
 <tr>
-<td><code>sentinel-2-l2a-ndwi</code></td>
-<td><code>ndwi.js</code></td>
-<td>B03, B08</td>
-<td>1</td>
-<td>NDWI (water)</td>
+<td><code>-j, --json</code></td>
+<td>emit a JSON array of matches</td>
 </tr>
 <tr>
-<td><code>sentinel-2-l2a-evi</code></td>
-<td><code>evi.js</code></td>
-<td>B02, B04, B08</td>
-<td>1</td>
-<td>EVI</td>
-</tr>
-<tr>
-<td><code>sentinel-2-l2a-bsi</code></td>
-<td><code>bsi.js</code></td>
-<td>B02, B04, B08, B11</td>
-<td>1</td>
-<td>Bare Soil Index</td>
-</tr>
-<tr>
-<td><code>sentinel-2-l2a-swir-composite</code></td>
-<td><code>swir_composite.js</code></td>
-<td>B04, B08, B12</td>
-<td>3</td>
-<td>SWIR composite</td>
-</tr>
-<tr>
-<td><code>sentinel-2-l2a-ndmi</code></td>
-<td><code>ndmi.js</code></td>
-<td>B08, B11</td>
-<td>1</td>
-<td>NDMI (moisture)</td>
-</tr>
-<tr>
-<td><code>sentinel-2-l2a-ndsi</code></td>
-<td><code>ndsi.js</code></td>
-<td>B03, B11</td>
-<td>1</td>
-<td>NDSI (snow)</td>
-</tr>
-<tr>
-<td><code>sentinel-2-l2a-savi</code></td>
-<td><code>savi.js</code></td>
-<td>B04, B08</td>
-<td>1</td>
-<td>SAVI (soil-adjusted veg)</td>
-</tr>
-<tr>
-<td><code>sentinel-2-l2a-nbr</code></td>
-<td><code>nbr.js</code></td>
-<td>B08, B12</td>
-<td>1</td>
-<td>NBR (burn ratio)</td>
-</tr>
-<tr>
-<td><code>sentinel-2-l2a-agriculture</code></td>
-<td><code>agriculture.js</code></td>
-<td>B02, B08, B11</td>
-<td>3</td>
-<td>Agriculture composite</td>
-</tr>
-<tr>
-<td><code>sentinel-2-l2a-geology</code></td>
-<td><code>geology.js</code></td>
-<td>B02, B11, B12</td>
-<td>3</td>
-<td>Geology composite</td>
-</tr>
-<tr>
-<td><code>landsat-ot-l1-ndvi</code></td>
-<td><code>landsat_ndvi.js</code></td>
-<td>B04, B05</td>
-<td>1</td>
-<td>Landsat 8/9 L1 NDVI</td>
-</tr>
-<tr>
-<td><code>landsat-ot-l1-true-colour</code></td>
-<td><code>landsat_true_colour.js</code></td>
-<td>B02, B03, B04</td>
-<td>3</td>
-<td>Landsat 8/9 L1 true-colour</td>
-</tr>
-<tr>
-<td><code>sentinel-1-iw-rgb-ratio</code></td>
-<td><code>sar_rgb_ratio.js</code></td>
-<td>VV, VH</td>
-<td>3</td>
-<td>SAR dual-pol composite</td>
-</tr>
-<tr>
-<td><code>dem-copernicus-30-elevation</code></td>
-<td><code>dem_elevation.js</code></td>
-<td>DEM</td>
-<td>1</td>
-<td>Copernicus DEM elevation</td>
-</tr>
-<tr>
-<td><code>sentinel-3-slstr-thermal</code></td>
-<td><code>slstr_thermal.js</code></td>
-<td>S8</td>
-<td>1</td>
-<td>SLSTR thermal BT (Kelvin)</td>
-</tr>
-<tr>
-<td><code>sentinel-3-olci-true-colour</code></td>
-<td><code>olci_true_colour.js</code></td>
-<td>B04, B06, B08</td>
-<td>3</td>
-<td>OLCI true-colour</td>
+<td><code>--ids-only</code></td>
+<td>emit <code>provider&lt;TAB&gt;id</code> lines</td>
 </tr>
 </tbody>
 </table>
-<h3 id="statistical-recipes-kindstats"><a class="toclink" href="#statistical-recipes-kindstats">Statistical recipes (<code>kind="stats"</code>)</a><a class="headerlink" href="#statistical-recipes-kindstats" title="Permanent link">#</a></h3>
-<p>Each adds a <code>dataMask</code> output band so the Statistical API can exclude invalid
-pixels from the zonal stats.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>earthlens<span class="w"> </span>datasets<span class="w"> </span>where<span class="w"> </span>era5<span class="w">                       </span><span class="c1"># across all providers</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>earthlens<span class="w"> </span>datasets<span class="w"> </span>where<span class="w"> </span>era5<span class="w"> </span>-p<span class="w"> </span>s3<span class="w"> </span>--exact<span class="w">         </span><span class="c1"># only the exact id, in s3</span>
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>earthlens<span class="w"> </span>datasets<span class="w"> </span>where<span class="w"> </span>buildings<span class="w"> </span>-p<span class="w"> </span>overture<span class="w"> </span>-j<span class="w">   </span><span class="c1"># JSON for piping</span>
+</code></pre></div>
+<h3 id="search-query-free-text-faceted-search"><a class="toclink" href="#search-query-free-text-faceted-search"><code>search [query]</code> — free-text + faceted search</a><a class="headerlink" href="#search-query-free-text-faceted-search" title="Permanent link">#</a></h3>
+<p>Combines a free-text <code>query</code> (over provider / id / title) with repeatable <code>--filter facet=value</code>
+narrowing (logical AND). A blank query matches everything.</p>
 <table>
 <thead>
 <tr>
-<th>Key</th>
-<th>Evalscript</th>
-<th>Bands</th>
-<th>Description</th>
+<th>Option</th>
+<th>Meaning</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><code>sentinel-2-l2a-ndvi-stats</code></td>
-<td><code>ndvi_stats.js</code></td>
-<td>B04, B08</td>
-<td>NDVI for the Statistical API</td>
+<td><code>-p, --provider</code></td>
+<td>restrict to these providers</td>
 </tr>
 <tr>
-<td><code>sentinel-2-l2a-ndwi-stats</code></td>
-<td><code>ndwi_stats.js</code></td>
-<td>B03, B08</td>
-<td>NDWI for the Statistical API</td>
+<td><code>-f, --filter</code></td>
+<td>narrow by facet, e.g. <code>--filter cadence=daily</code> (repeatable; facets: <code>provider</code>, <code>cadence</code>, <code>resolution</code>, <code>license</code>)</td>
 </tr>
 <tr>
-<td><code>sentinel-2-l2a-evi-stats</code></td>
-<td><code>evi_stats.js</code></td>
-<td>B02, B04, B08</td>
-<td>EVI for the Statistical API</td>
+<td><code>-n, --limit</code></td>
+<td>cap the rows shown (<code>0</code> = no cap)</td>
 </tr>
 <tr>
-<td><code>sentinel-2-l2a-bsi-stats</code></td>
-<td><code>bsi_stats.js</code></td>
-<td>B02, B04, B08, B11</td>
-<td>BSI for the Statistical API</td>
+<td><code>--count</code></td>
+<td>print only the match count (<code>{"count": N}</code> with <code>--json</code>)</td>
 </tr>
 <tr>
-<td><code>sentinel-2-l2a-ndmi-stats</code></td>
-<td><code>ndmi_stats.js</code></td>
-<td>B08, B11</td>
-<td>NDMI for the Statistical API</td>
+<td><code>--facets-only</code></td>
+<td>print per-facet value counts instead of rows (honours <code>--json</code>)</td>
 </tr>
 <tr>
-<td><code>sentinel-2-l2a-nbr-stats</code></td>
-<td><code>nbr_stats.js</code></td>
-<td>B08, B12</td>
-<td>NBR for the Statistical API</td>
+<td><code>--include-available</code></td>
+<td>also search the full upstream id index</td>
 </tr>
 <tr>
-<td><code>landsat-ot-l1-ndvi-stats</code></td>
-<td><code>landsat_ndvi_stats.js</code></td>
-<td>B04, B05</td>
-<td>Landsat 8/9 L1 NDVI for the Statistical API</td>
+<td><code>-j, --json</code> / <code>--ids-only</code></td>
+<td>output modes</td>
 </tr>
 </tbody>
 </table>
-<h2 id="adding-a-custom-evalscript"><a class="toclink" href="#adding-a-custom-evalscript">Adding a custom evalscript</a><a class="headerlink" href="#adding-a-custom-evalscript" title="Permanent link">#</a></h2>
-<p>You do <strong>not</strong> have to add a recipe to use a custom band-math program. Pass
-<code>evalscript=</code> (an inline V3 JS string or a path to a <code>.js</code> file) together with a
-plain collection key:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="n">el</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
-<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>    <span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;sentinel-hub&quot;</span><span class="p">,</span>
-<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>    <span class="n">variables</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;sentinel-2-l2a&quot;</span><span class="p">:</span> <span class="p">[]},</span>   <span class="c1"># plain collection</span>
-<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>    <span class="n">evalscript</span><span class="o">=</span><span class="s2">&quot;path/to/my_index.js&quot;</span><span class="p">,</span>   <span class="c1"># or an inline V3 string</span>
-<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>    <span class="o">...</span><span class="p">,</span>
-<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>earthlens<span class="w"> </span>datasets<span class="w"> </span>search<span class="w"> </span>precipitation<span class="w"> </span>--filter<span class="w"> </span><span class="nv">cadence</span><span class="o">=</span>daily
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>earthlens<span class="w"> </span>datasets<span class="w"> </span>search<span class="w"> </span>-p<span class="w"> </span>gee<span class="w"> </span>--facets-only<span class="w">        </span><span class="c1"># what facet values exist</span>
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>earthlens<span class="w"> </span>datasets<span class="w"> </span>search<span class="w"> </span>-p<span class="w"> </span>s3<span class="w"> </span>--count<span class="w">               </span><span class="c1"># just a number</span>
 </code></pre></div>
-<p>A custom evalscript for the <strong>Statistical</strong> plane <strong>must</strong> declare a <code>dataMask</code>
-output band, e.g.:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c1">//VERSION=3</span>
-<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="kd">function</span><span class="w"> </span><span class="nx">setup</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">input</span><span class="o">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;B04&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;B08&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;dataMask&quot;</span><span class="p">],</span><span class="w"> </span><span class="nx">output</span><span class="o">:</span><span class="w"> </span><span class="p">[</span>
-<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="nx">id</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;ndvi&quot;</span><span class="p">,</span><span class="w"> </span><span class="nx">bands</span><span class="o">:</span><span class="w"> </span><span class="mf">1</span><span class="p">,</span><span class="w"> </span><span class="nx">sampleType</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;FLOAT32&quot;</span><span class="w"> </span><span class="p">},</span>
-<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="nx">id</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;dataMask&quot;</span><span class="p">,</span><span class="w"> </span><span class="nx">bands</span><span class="o">:</span><span class="w"> </span><span class="mf">1</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="p">]</span><span class="w"> </span><span class="p">};</span>
-<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="p">}</span>
-<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="kd">function</span><span class="w"> </span><span class="nx">evaluatePixel</span><span class="p">(</span><span class="nx">s</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">ndvi</span><span class="o">:</span><span class="w"> </span><span class="p">[(</span><span class="nx">s</span><span class="p">.</span><span class="nx">B08</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="nx">s</span><span class="p">.</span><span class="nx">B04</span><span class="p">)</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="p">(</span><span class="nx">s</span><span class="p">.</span><span class="nx">B08</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nx">s</span><span class="p">.</span><span class="nx">B04</span><span class="p">)],</span><span class="w"> </span><span class="nx">dataMask</span><span class="o">:</span><span class="w"> </span><span class="p">[</span><span class="nx">s</span><span class="p">.</span><span class="nx">dataMask</span><span class="p">]</span><span class="w"> </span><span class="p">};</span>
-<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="p">}</span>
+<h3 id="list-list-curated-datasets"><a class="toclink" href="#list-list-curated-datasets"><code>list</code> — list curated datasets</a><a class="headerlink" href="#list-list-curated-datasets" title="Permanent link">#</a></h3>
+<p>Lists the curated datasets (optionally widened with <code>--include-available</code>).</p>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>-p, --provider</code></td>
+<td>restrict to these providers</td>
+</tr>
+<tr>
+<td><code>--full</code></td>
+<td>add cadence + resolution columns</td>
+</tr>
+<tr>
+<td><code>--include-available</code></td>
+<td>include each backend's full upstream id index</td>
+</tr>
+<tr>
+<td><code>-j, --json</code> / <code>--ids-only</code></td>
+<td>output modes</td>
+</tr>
+</tbody>
+</table>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>earthlens<span class="w"> </span>datasets<span class="w"> </span>list<span class="w"> </span>-p<span class="w"> </span>chc<span class="w"> </span>--full
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>earthlens<span class="w"> </span>datasets<span class="w"> </span>list<span class="w"> </span>-p<span class="w"> </span>gee<span class="w"> </span>--include-available<span class="w"> </span>--ids-only<span class="w"> </span><span class="p">|</span><span class="w"> </span>wc<span class="w"> </span>-l
 </code></pre></div>
-<p>See the <a href="https://docs.sentinel-hub.com/api/latest/evalscript/v3/">Evalscript V3 reference</a>.</p>
-<h2 id="catalog-tooling"><a class="toclink" href="#catalog-tooling">Catalog tooling</a><a class="headerlink" href="#catalog-tooling" title="Permanent link">#</a></h2>
-<p>Three CLIs under <code>tools/sentinel_hub/</code> maintain and inspect the catalog (the
-same trio as the GEE / openEO backends):</p>
-<p><strong><code>refresh_sh_catalog.py</code></strong> — rebuild the <code>available_collections</code> index and
-validate recipes:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1"># rebuild the index offline from the sentinelhub DataCollection enum (no creds)</span>
-<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>python<span class="w"> </span>tools/sentinel_hub/refresh_sh_catalog.py<span class="w"> </span>refresh<span class="w"> </span>--from-sdk
-<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="c1"># or from the live Catalog API (needs SENTINELHUB_CLIENT_ID / SENTINELHUB_CLIENT_SECRET)</span>
-<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>python<span class="w"> </span>tools/sentinel_hub/refresh_sh_catalog.py<span class="w"> </span>refresh
-<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>python<span class="w"> </span>tools/sentinel_hub/refresh_sh_catalog.py<span class="w"> </span>refresh<span class="w"> </span>--from-sdk<span class="w"> </span>--dry-run
-<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>
-<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="c1"># validate a recipe (its .js exists, is //VERSION=3, stats recipes carry dataMask)</span>
-<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>python<span class="w"> </span>tools/sentinel_hub/refresh_sh_catalog.py<span class="w"> </span>validate-recipe<span class="w"> </span>sentinel-2-l2a-ndvi
-<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>python<span class="w"> </span>tools/sentinel_hub/refresh_sh_catalog.py<span class="w"> </span>validate-all
+<h3 id="show-provider-dataset-full-record-for-one-dataset"><a class="toclink" href="#show-provider-dataset-full-record-for-one-dataset"><code>show &lt;provider&gt; &lt;dataset&gt;</code> — full record for one dataset</a><a class="headerlink" href="#show-provider-dataset-full-record-for-one-dataset" title="Permanent link">#</a></h3>
+<p>Prints the complete curated record (every field the backend's pydantic model carries).</p>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>-j, --json</code></td>
+<td>dump the full record as JSON</td>
+</tr>
+</tbody>
+</table>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>earthlens<span class="w"> </span>datasets<span class="w"> </span>show<span class="w"> </span>chc<span class="w"> </span>chirps-daily
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>earthlens<span class="w"> </span>datasets<span class="w"> </span>show<span class="w"> </span>gee<span class="w"> </span>NASA/GDDP-CMIP6<span class="w"> </span>--json
 </code></pre></div>
-<p>Prefer <code>--from-sdk</code>: it lists the UPPERCASE <code>DataCollection</code> names
-(<code>SENTINEL2_L2A</code>, …) that the backend uses in a collection's <code>sh_collection</code>. The
-live <code>refresh</code> returns STAC-style ids (<code>sentinel-2-l2a</code>, …) in a <em>different</em>
-namespace, so it should only be used when you specifically want the live STAC
-ids — otherwise it misaligns the index with the curated catalog.</p>
-<p><strong><code>audit_sh_datasets.py</code></strong> — flag drift between the curated catalog and the SDK
-(curated collections / recipe base collections not in the <code>DataCollection</code>
-enum, recipe evalscript problems, and untracked enum members); offline:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>python<span class="w"> </span>tools/sentinel_hub/audit_sh_datasets.py<span class="w"> </span>audit
-<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>python<span class="w"> </span>tools/sentinel_hub/audit_sh_datasets.py<span class="w"> </span>audit<span class="w"> </span>--strict<span class="w">   </span><span class="c1"># exit 1 on drift</span>
+<h3 id="facets-value-distribution-across-facets"><a class="toclink" href="#facets-value-distribution-across-facets"><code>facets</code> — value distribution across facets</a><a class="headerlink" href="#facets-value-distribution-across-facets" title="Permanent link">#</a></h3>
+<p>With no <code>--values</code>, prints each facet and its distinct-value count; with <code>--values &lt;facet&gt;</code>, enumerates
+that facet's values and their counts.</p>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>--values</code></td>
+<td>enumerate the distinct values of this facet</td>
+</tr>
+<tr>
+<td><code>-p, --provider</code></td>
+<td>restrict to these providers</td>
+</tr>
+<tr>
+<td><code>-j, --json</code></td>
+<td>JSON output</td>
+</tr>
+</tbody>
+</table>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>earthlens<span class="w"> </span>datasets<span class="w"> </span>facets<span class="w"> </span>-p<span class="w"> </span>s3<span class="w">                  </span><span class="c1"># facet summary</span>
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>earthlens<span class="w"> </span>datasets<span class="w"> </span>facets<span class="w"> </span>--values<span class="w"> </span>cadence<span class="w"> </span>-j<span class="w">    </span><span class="c1"># distinct cadence values</span>
 </code></pre></div>
-<p><strong><code>earthlens datasets probe sentinel_hub &lt;key&gt;</code></strong> — inspect a curated key (or a
-raw <code>DataCollection</code> member) when curating a new collection row: the band
-schema plus a <code>collection:&lt;key&gt;</code> row carrying the bound <code>sh_collection</code>,
-native resolution, and cadence (an unknown name reports <code>error</code>):</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>earthlens<span class="w"> </span>datasets<span class="w"> </span>probe<span class="w"> </span>sentinel_hub<span class="w"> </span>sentinel-2-l2a
-<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>earthlens<span class="w"> </span>datasets<span class="w"> </span>probe<span class="w"> </span>sentinel_hub<span class="w"> </span>SENTINEL3_SLSTR<span class="w"> </span>--json
+<h3 id="refresh-providers-diff-the-bundled-index-against-live-optionally-persist"><a class="toclink" href="#refresh-providers-diff-the-bundled-index-against-live-optionally-persist"><code>refresh &lt;providers&gt;</code> — diff the bundled index against live, optionally persist</a><a class="headerlink" href="#refresh-providers-diff-the-bundled-index-against-live-optionally-persist" title="Permanent link">#</a></h3>
+<p>Goes to the network: fetches each provider's live id universe and diffs it against the bundled
+<code>available_*</code> index, reporting new / removed ids. With <code>--write</code> it rewrites the bundled index in place
+(a maintainer action — review the git diff before committing). Providers without a public listing endpoint
+report <code>unsupported</code>.</p>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>--show-ids</code></td>
+<td>list the actual new / removed ids, not just counts</td>
+</tr>
+<tr>
+<td><code>--write</code></td>
+<td>rewrite the bundled <code>available_*</code> index from the live fetch</td>
+</tr>
+<tr>
+<td><code>--tiles</code></td>
+<td>regenerate a provider's bundled tile grid (ghsl) instead of the id index</td>
+</tr>
+<tr>
+<td><code>-j, --json</code></td>
+<td>JSON output</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Safety</strong>: a <code>--write</code> whose live fetch returns <strong>zero ids</strong> (a transient outage / unexpected body) is
+refused rather than blanking a populated index — the skip is reported in the outcome detail.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>earthlens<span class="w"> </span>datasets<span class="w"> </span>refresh<span class="w"> </span>gee<span class="w">                   </span><span class="c1"># show drift counts</span>
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>earthlens<span class="w"> </span>datasets<span class="w"> </span>refresh<span class="w"> </span>stac<span class="w"> </span>--show-ids<span class="w">       </span><span class="c1"># which ids changed</span>
+<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>earthlens<span class="w"> </span>datasets<span class="w"> </span>refresh<span class="w"> </span>gee<span class="w"> </span>--write<span class="w">           </span><span class="c1"># regenerate available_datasets</span>
+<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a>earthlens<span class="w"> </span>datasets<span class="w"> </span>refresh<span class="w"> </span>ghsl<span class="w"> </span>--tiles<span class="w">          </span><span class="c1"># regenerate the tile grid</span>
 </code></pre></div>
+<h3 id="audit-providers-curated-vs-live-drift-and-coverage"><a class="toclink" href="#audit-providers-curated-vs-live-drift-and-coverage"><code>audit &lt;providers&gt;</code> — curated-vs-live drift (and coverage)</a><a class="headerlink" href="#audit-providers-curated-vs-live-drift-and-coverage" title="Permanent link">#</a></h3>
+<p>Like <code>refresh</code>, but focused on the <strong>curated</strong> rows: flags <code>broken</code> curated ids the provider no longer
+serves (the drift a CI gate fails on) and, informationally, live ids missing from the index.</p>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>--strict</code></td>
+<td>exit non-zero if any curated dataset is no longer served live</td>
+</tr>
+<tr>
+<td><code>--coverage</code></td>
+<td>switch to a <strong>curation-coverage</strong> report — classify the available universe into DONE / addressable / thin / table / missing, and list the highest-value ids to curate next (currently <code>gee</code>)</td>
+</tr>
+<tr>
+<td><code>-j, --json</code></td>
+<td>JSON output</td>
+</tr>
+</tbody>
+</table>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>earthlens<span class="w"> </span>datasets<span class="w"> </span>audit<span class="w"> </span>stac<span class="w"> </span>--strict<span class="w">           </span><span class="c1"># CI drift gate</span>
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>earthlens<span class="w"> </span>datasets<span class="w"> </span>audit<span class="w"> </span>gee<span class="w"> </span>--coverage<span class="w">          </span><span class="c1"># what&#39;s worth curating next</span>
+</code></pre></div>
+<h3 id="validate-providers-per-entry-checks-offline-lint-optional-live"><a class="toclink" href="#validate-providers-per-entry-checks-offline-lint-optional-live"><code>validate &lt;providers&gt;</code> — per-entry checks (offline lint, optional live)</a><a class="headerlink" href="#validate-providers-per-entry-checks-offline-lint-optional-live" title="Permanent link">#</a></h3>
+<p>For curated-enumeration providers (no discoverable upstream index, so <code>refresh</code>/<code>audit</code> do not apply),
+this checks each curated entry. Offline by default (a structural lint); <code>--live</code> adds a
+network/SDK reachability check (an S3 object resolves, an Overture type serves a <code>sources</code> column, a GHSL
+artefact HEADs 200, an openEO recipe's base collection / processes are live, an NWP model's latest cycle
+is reachable, an ECMWF dataset's minimal request is constraint-valid, the NEXRAD feed is reachable).</p>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>--strict</code></td>
+<td>exit non-zero if any curated entry has an issue</td>
+</tr>
+<tr>
+<td><code>--live</code></td>
+<td>also run the live reachability check (network / SDK; opt-in)</td>
+</tr>
+<tr>
+<td><code>-j, --json</code></td>
+<td>JSON output</td>
+</tr>
+</tbody>
+</table>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>earthlens<span class="w"> </span>datasets<span class="w"> </span>validate<span class="w"> </span>nwp<span class="w">                   </span><span class="c1"># offline structural lint</span>
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>earthlens<span class="w"> </span>datasets<span class="w"> </span>validate<span class="w"> </span>s3<span class="w"> </span>--live<span class="w"> </span>--strict<span class="w">    </span><span class="c1"># reachability gate for CI</span>
+</code></pre></div>
+<h3 id="probe-provider-dataset-sample-one-datasets-schema"><a class="toclink" href="#probe-provider-dataset-sample-one-datasets-schema"><code>probe &lt;provider&gt; &lt;dataset&gt;</code> — sample one dataset's schema</a><a class="headerlink" href="#probe-provider-dataset-sample-one-datasets-schema" title="Permanent link">#</a></h3>
+<p>Samples a single dataset to seed its catalog metadata: the per-asset / band / variable / column schema.
+The light path uses a public endpoint; <code>--deep</code> swaps in a credentialed sampler that reads the <em>real</em>
+on-disk schema (e.g. CMEMS opens the NetCDF, ECMWF retrieves a tiny slice, Earthdata samples a granule).</p>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>--deep</code></td>
+<td>use the credentialed deep sampler instead of the light public probe</td>
+</tr>
+<tr>
+<td><code>-j, --json</code></td>
+<td>JSON output</td>
+</tr>
+</tbody>
+</table>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>earthlens<span class="w"> </span>datasets<span class="w"> </span>probe<span class="w"> </span>stac<span class="w"> </span>sentinel-2-l2a<span class="w">      </span><span class="c1"># band schema from a sample item</span>
+<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>earthlens<span class="w"> </span>datasets<span class="w"> </span>probe<span class="w"> </span>cmems<span class="w"> </span>cmems_mod_glo_phy<span class="w"> </span>--deep<span class="w">   </span><span class="c1"># real NetCDF variables</span>
+<a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a>earthlens<span class="w"> </span>datasets<span class="w"> </span>probe<span class="w"> </span>nwp<span class="w"> </span>icon-global<span class="w">          </span><span class="c1"># which band tokens are in the .idx</span>
+</code></pre></div>
+<h3 id="curate-provider-upstream_id-author-a-curated-row"><a class="toclink" href="#curate-provider-upstream_id-author-a-curated-row"><code>curate &lt;provider&gt; [upstream_id]</code> — author a curated row</a><a class="headerlink" href="#curate-provider-upstream_id-author-a-curated-row" title="Permanent link">#</a></h3>
+<p>The authoring companion to <code>probe</code>: fetches one upstream id's metadata and emits a paste-ready
+<code>datasets:</code> YAML row (inferring <code>output_kind</code> / <code>format</code> / bands where it can). By default it prints the
+row to vet and paste; <code>--write</code> appends it into the catalog file. Supported providers: <code>earthdata</code>,
+<code>hdx</code>, <code>usgs_water</code>, <code>eumetsat</code>, <code>gee</code>.</p>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>--key</code></td>
+<td>friendly catalog key for the row (default: the upstream id)</td>
+</tr>
+<tr>
+<td><code>--minimal</code></td>
+<td>emit a placeholder row without a live fetch (where supported)</td>
+</tr>
+<tr>
+<td><code>--hydrate</code></td>
+<td>gee: read bands live from Earth Engine (needs GEE creds)</td>
+</tr>
+<tr>
+<td><code>--fill-empty</code></td>
+<td>gee: bulk-hydrate <strong>every</strong> empty-band curated row in place (needs <code>--write</code> + creds; ignores <code>upstream_id</code>)</td>
+</tr>
+<tr>
+<td><code>--limit</code></td>
+<td>gee <code>--fill-empty</code>: only hydrate the first N rows (<code>0</code> = all)</td>
+</tr>
+<tr>
+<td><code>--write</code></td>
+<td>append the seeded row into the catalog file (else print only)</td>
+</tr>
+<tr>
+<td><code>--target</code></td>
+<td>per-family file stem under <code>catalog/</code> to write into (sharded providers; gee auto-picks, others default to <code>--daac</code> / <code>--group</code>)</td>
+</tr>
+<tr>
+<td><code>--version</code>, <code>--cmr-provider</code>, <code>--daac</code>, <code>--cloud-hosted</code></td>
+<td>earthdata seed options</td>
+</tr>
+<tr>
+<td><code>--name</code>, <code>--units</code>, <code>--group</code>, <code>--service</code></td>
+<td>usgs_water seed options</td>
+</tr>
+<tr>
+<td><code>-j, --json</code></td>
+<td>emit the seeded row as JSON</td>
+</tr>
+</tbody>
+</table>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>earthlens<span class="w"> </span>datasets<span class="w"> </span>curate<span class="w"> </span>usgs_water<span class="w"> </span><span class="m">00060</span><span class="w"> </span>--key<span class="w"> </span>discharge<span class="w"> </span>--units<span class="w"> </span>ft3/s
+<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>earthlens<span class="w"> </span>datasets<span class="w"> </span>curate<span class="w"> </span>gee<span class="w"> </span>NASA/GDDP-CMIP6<span class="w"> </span>--write<span class="w">     </span><span class="c1"># auto-categorised file</span>
+<a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a>earthlens<span class="w"> </span>datasets<span class="w"> </span>curate<span class="w"> </span>earthdata<span class="w"> </span>GPM_3IMERGHH<span class="w"> </span>--version<span class="w"> </span><span class="m">07</span><span class="w"> </span>--cmr-provider<span class="w"> </span>GES_DISC
+<a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a>earthlens<span class="w"> </span>datasets<span class="w"> </span>curate<span class="w"> </span>gee<span class="w"> </span>--fill-empty<span class="w"> </span>--write<span class="w">       </span><span class="c1"># bulk-hydrate placeholders</span>
+</code></pre></div>
+<hr />
+<h2 id="earthlens-providers"><a class="toclink" href="#earthlens-providers"><code>earthlens providers</code></a><a class="headerlink" href="#earthlens-providers" title="Permanent link">#</a></h2>
+<h3 id="list-the-backends-and-their-health"><a class="toclink" href="#list-the-backends-and-their-health"><code>list</code> — the backends and their health</a><a class="headerlink" href="#list-the-backends-and-their-health" title="Permanent link">#</a></h3>
+<p>Lists every backend (id, aliases, pip extra). With <code>--check</code> it additionally probes each backend's SDK
+availability and bundled catalog dataset count.</p>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>--check</code></td>
+<td>probe SDK availability + catalog dataset counts (slower)</td>
+</tr>
+<tr>
+<td><code>-j, --json</code></td>
+<td>JSON output</td>
+</tr>
+</tbody>
+</table>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>earthlens<span class="w"> </span>providers<span class="w"> </span>list
+<a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a>earthlens<span class="w"> </span>providers<span class="w"> </span>list<span class="w"> </span>--check<span class="w">          </span><span class="c1"># which optional SDKs are installed</span>
+</code></pre></div>
+<hr />
+<h2 id="verb-cheat-sheet"><a class="toclink" href="#verb-cheat-sheet">Verb cheat-sheet</a><a class="headerlink" href="#verb-cheat-sheet" title="Permanent link">#</a></h2>
+<table>
+<thead>
+<tr>
+<th>I want to…</th>
+<th>Use</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>find which provider has a dataset</td>
+<td><code>datasets where &lt;name&gt;</code></td>
+</tr>
+<tr>
+<td>explore / filter the catalog</td>
+<td><code>datasets search</code>, <code>datasets facets</code></td>
+</tr>
+<tr>
+<td>see one dataset's full record</td>
+<td><code>datasets show &lt;provider&gt; &lt;id&gt;</code></td>
+</tr>
+<tr>
+<td>check what the provider serves now vs the bundled index</td>
+<td><code>datasets refresh &lt;p&gt;</code></td>
+</tr>
+<tr>
+<td>gate CI on curated-vs-live drift</td>
+<td><code>datasets audit &lt;p&gt; --strict</code></td>
+</tr>
+<tr>
+<td>see what's worth curating next</td>
+<td><code>datasets audit gee --coverage</code></td>
+</tr>
+<tr>
+<td>lint / reachability-check curated entries</td>
+<td><code>datasets validate &lt;p&gt; [--live] [--strict]</code></td>
+</tr>
+<tr>
+<td>inspect a dataset's real schema</td>
+<td><code>datasets probe &lt;p&gt; &lt;id&gt; [--deep]</code></td>
+</tr>
+<tr>
+<td>author a new curated row</td>
+<td><code>datasets curate &lt;p&gt; &lt;id&gt; [--write]</code></td>
+</tr>
+<tr>
+<td>see backends + installed SDKs</td>
+<td><code>providers list [--check]</code></td>
+</tr>
+</tbody>
+</table>
 
 
 
@@ -10292,7 +10769,7 @@ native resolution, and cadence (an unknown name reports <code>error</code>):</p>
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
           
-          <a href="../authentication/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Authentication">
+          <a href="../../overview/architecture/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Architecture">
             <div class="md-footer__button md-icon">
               
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
@@ -10302,20 +10779,20 @@ native resolution, and cadence (an unknown name reports <code>error</code>):</p>
                 Previous
               </span>
               <div class="md-ellipsis">
-                Authentication
+                Architecture
               </div>
             </div>
           </a>
         
         
           
-          <a href="../statistical-batch/" class="md-footer__link md-footer__link--next" aria-label="Next: Statistical &amp; Batch">
+          <a href="../providers/" class="md-footer__link md-footer__link--next" aria-label="Next: Supported providers">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                Statistical & Batch
+                Supported providers
               </div>
             </div>
             <div class="md-footer__button md-icon">
@@ -10368,14 +10845,14 @@ native resolution, and cadence (an unknown name reports <code>error</code>):</p>
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "../../..", "features": ["navigation.instant", "navigation.tracking", "navigation.footer", "navigation.tabs", "navigation.tabs.sticky", "navigation.top", "content.code.copy", "content.code.annotate", "content.action.edit", "content.action.view", "content.tooltips", "search.highlight", "search.suggest", "toc.follow", "announce.dismiss"], "search": "../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.footer", "navigation.tabs", "navigation.tabs.sticky", "navigation.top", "content.code.copy", "content.code.annotate", "content.action.edit", "content.action.view", "content.tooltips", "search.highlight", "search.suggest", "toc.follow", "announce.dismiss"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
     
     
-      <script src="../../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
       
-        <script src="../../../assets/javascripts/panzoom.min.js"></script>
+        <script src="../../assets/javascripts/panzoom.min.js"></script>
       
-        <script src="../../../assets/javascripts/zoompan.js"></script>
+        <script src="../../assets/javascripts/zoompan.js"></script>
       
     
   </body>
