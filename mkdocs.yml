@@ -106,6 +106,7 @@ nav:
   - Home: index.md
   - Guide:
     - Installation: installation.md
+    - Getting started: getting-started.md
     - Architecture: overview/architecture.md
     - Temporal aggregation: aggregation.md
   - Data Sources:
