@@ -17,9 +17,8 @@ support catalog work.
 | `src/earthlens/ecmwf/catalog.py` | The loader (`Catalog`, `Dataset`, `Variable`, …) |
 | `tools/ecmwf/refresh_available_datasets.py` | Auto-rewrites the `available_datasets:` index from the live CDS STAC catalogue |
 | `tools/ecmwf/audit_cds_datasets.py` | Walks `available_datasets:` and reports each dataset's `constraints.json` shape — coverage planning |
-| `tools/ecmwf/probe_open_datasets.py` | Submits one fire-and-forget retrieve per dataset to verify it actually serves data |
-| `tools/ecmwf/probe_cds_netcdf.py` | Submits a real retrieve for specific variables and extracts their NetCDF short names and units |
-| `tools/ecmwf/download_probe_results.py` | Waits for queued probes to finish, downloads the NetCDFs locally |
+| `earthlens datasets validate ecmwf --live` | Builds a `constraints.json`-valid minimal request per dataset and runs the pre-flight `RequestValidator` (no CDS submission) |
+| `earthlens datasets probe ecmwf <id> --deep` | Submits a real tiny retrieve for one dataset and extracts its NetCDF short names and units |
 | `tools/ecmwf/bulk_add_remaining.py` / `bulk_apply.py` / `bulk_inject.py` | Bulk-emit and inject YAML rows for the gated-dataset families (CARRA-means, ORAS5, etc.) |
 
 ## Catalog structure
@@ -609,35 +608,27 @@ glance which datasets are ready to add and which need bespoke
 modelling (typically extras keys like `domain`, `experiment`,
 `leadtime_hour`, …).
 
-### `tools/ecmwf/probe_open_datasets.py`
+### `earthlens datasets validate ecmwf --live`
 
-Fire-and-forget retrieve probe per dataset. For each entry, asks
-`Catalog.minimal_valid_request` for a known-valid request derived
-from `constraints.json`, runs the local pre-flight
-`RequestValidator`, and submits via async HTTP only if validation
-passes.
-
-```bash
-pixi run -e dev python tools/ecmwf/probe_open_datasets.py
-```
-
-Submits probes and returns immediately. Pair with
-`download_probe_results.py` to wait for queue completion and harvest
-the resulting NetCDFs.
-
-### `tools/ecmwf/download_probe_results.py`
-
-Waits for queued probes to finish and downloads the result NetCDFs
-into `C:/tmp/cds_probe/`. Thin wrapper around
-`Catalog.list_recent_jobs` and `Catalog.download_job` — no separate
-HTTP plumbing.
+Per-dataset request-validity check. For each curated dataset it asks
+`Catalog.minimal_valid_request` for a known-valid request derived from
+`constraints.json` and runs the same pre-flight `RequestValidator` the
+backend uses — flagging datasets whose minimal request fails. It is
+stateless: no CDS credentials and no queue submission (datasets that
+publish no constraints are skipped).
 
 ```bash
-pixi run -e dev python tools/ecmwf/download_probe_results.py
-pixi run -e dev python tools/ecmwf/download_probe_results.py --max-age-min 60
+earthlens datasets validate ecmwf --live
 ```
 
-After this finishes, the cached NetCDFs are ready for nc-variable
+To confirm a single dataset actually serves data (and read its NetCDF
+short names / units), submit a real tiny retrieve with `probe --deep`:
+
+```bash
+earthlens datasets probe ecmwf <dataset-short-name> --deep
+```
+
+The probed NetCDF metadata is ready for nc-variable
 extraction by `probe_cds_netcdf.py` or hand inspection.
 
 ### `tools/ecmwf/probe_cds_netcdf.py`
@@ -712,16 +703,12 @@ the package doesn't yet support:
    short name and units:
 
     ```bash
-    pixi run -e dev python tools/ecmwf/probe_open_datasets.py
-    pixi run -e dev python tools/ecmwf/download_probe_results.py
-    pixi run -e dev python tools/ecmwf/probe_cds_netcdf.py \
-        --dataset <dataset-short-name> \
-        --variables <cds_variable_1>,<cds_variable_2> \
-        --out C:/tmp/cds_probe/<dataset>.json
+    earthlens datasets validate ecmwf --live      # check every dataset's request is constructible
+    earthlens datasets probe ecmwf <dataset-short-name> --deep
     ```
 
-   The JSON sidecar maps each `cds_variable` to its `nc_variable` and
-   `units`.
+   `probe --deep` submits a real tiny retrieve and reports each
+   variable's `nc_variable` and `units`.
 
 3. **Author the YAML entry** under `datasets:`. At minimum:
 

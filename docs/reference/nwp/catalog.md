@@ -172,18 +172,18 @@ cat.get_model("gfs").bands["temperature_2m"]   # ':TMP:2 m above ground:'
 
 ## Tooling
 
-Three maintenance scripts live under `tools/nwp/`:
+The `earthlens datasets` verbs keep the catalog honest:
 
-* `refresh_nwp_catalog.py` — print a model summary; `--live` HEAD-probes
-  each `direct-https` model's latest cycle.
-* `audit_nwp_catalog.py` — static consistency lint (backend vs
-  `url_template` / `model_family`, empty bands, cycle-hour range).
-* `probe_nwp_model.py <key>` — live availability check for one model,
-  dispatching on backend (HTTP HEAD / unsigned S3 `head_object` /
-  `Client.latest()` / Herbie URL resolution). Use it to vet a catalog
-  row before relying on it.
+* `list nwp` / `show nwp <key>` — the model summary (backend, cycles,
+  horizon, bands).
+* `validate nwp` — static consistency lint (`url_template` / band map /
+  cycle-hour range).
+* `validate nwp --live` — HEAD-probes each `direct-https` model's latest
+  expected cycle URL to confirm the source is serving.
+* `probe nwp <key>` — read the model's GRIB `.idx` and report which catalog
+  band tokens are present. Use it to vet a row before relying on it.
 
 ```bash
-pixi run -e dev python tools/nwp/refresh_nwp_catalog.py --live
-pixi run -e dev python tools/nwp/audit_nwp_catalog.py
+earthlens datasets validate nwp --live
+earthlens datasets probe nwp icon-global
 ```

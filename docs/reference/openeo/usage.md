@@ -133,12 +133,13 @@ python tools/openeo/audit_openeo_datasets.py audit
 python tools/openeo/audit_openeo_datasets.py audit --strict   # exit 1 on any drift
 ```
 
-**`probe_openeo_collection.py`** — inspect one collection's live metadata when
-curating a new row (bands, extent, gsd); `--yaml` emits a paste-ready stanza:
+**`earthlens datasets probe openeo <id>`** — inspect one collection's live
+metadata when curating a new row: the band schema plus one `dim:<axis>` row
+per non-band cube axis (the spatial bbox / temporal interval):
 
 ```bash
-python tools/openeo/probe_openeo_collection.py SENTINEL2_L2A
-python tools/openeo/probe_openeo_collection.py ESA_WORLDCOVER_10M_2021_V2 --yaml
+earthlens datasets probe openeo SENTINEL2_L2A
+earthlens datasets probe openeo ESA_WORLDCOVER_10M_2021_V2 --json
 ```
 
 `validate-recipe` and `audit --strict` exit non-zero on any drift (a base

@@ -15,8 +15,8 @@ the tooling that supports catalog work.
 | `src/earthlens/chc/catalog.py` | The loader (`Catalog`, `Dataset`, `Variable`, `_build_chc_dataset`, `_load_catalog_data`, `_StrictSafeLoader`) |
 | `src/earthlens/chc/backend.py` | The `CHIRPS` class — consumes the catalog through `Dataset.ftp_bases` / `Dataset.file_patterns` / `Dataset.discrete_files` |
 | `tools/chc/refresh_chc_catalog.py` | Walks `data.chc.ucsb.edu` and regenerates the `available_datasets:` index |
-| `tools/chc/audit_chc_datasets.py` | Coverage / staleness classifier (parallel of `tools/gee/audit_gee_datasets.py`) |
-| `tools/chc/probe_chirps_gefs.py` | CHIRPS-GEFS FTP probe — was used to verify the v3 file patterns before they were withdrawn |
+| `tools/chc/audit_chc_datasets.py` | Coverage / staleness classifier (parallel of `earthlens datasets audit gee --coverage`) |
+| `earthlens datasets probe chc <key>` | CHIRPS FTP probe — samples a directory's filenames + suggests a `file_patterns` template (used to verify the GEFS v3 patterns before they were withdrawn) |
 
 ## Layout — per-family split
 
@@ -293,22 +293,22 @@ occurrence).
 Walks `data.chc.ucsb.edu` and regenerates the
 `available_datasets:` index in `_index.yaml`. Run after CHC publishes
 a new product. CHC analogue of
-`tools/gee/refresh_gee_catalog.py` and
-`tools/ecmwf/refresh_available_datasets.py`.
+`earthlens datasets refresh gee --write`.
 
 ### `tools/chc/audit_chc_datasets.py`
 
 Coverage / staleness classifier. Walks the catalog and reports which
 shipped datasets have been verified against the live FTP (and which
 haven't been touched since N days). Parallel of
-`tools/gee/audit_gee_datasets.py`.
+`earthlens datasets audit gee --coverage`.
 
-### `tools/chc/probe_chirps_gefs.py`
+### `earthlens datasets probe chc <key>`
 
-CHIRPS-GEFS-specific FTP probe. Lists the real contents of each
-`CHIRPS-GEFS/...` directory on the live FTP, prints a sample of
-filenames, and suggests a filename template inferred from the
-listing. Was the basis for the H2 decision to **withdraw** the
+CHIRPS FTP probe. Lists a sample of the real filenames under a
+dataset's `ftp_base` on the live FTP and adds a `(suggested pattern)`
+row carrying a `file_patterns` template inferred from the listing.
+Run against the GEFS keys, it was the basis for the H2 decision to
+**withdraw** the
 CHIRPS-GEFS v3 rows — the probe found the directory shape didn't
 match the YAML's provisional patterns
 (`year/` partitioning vs the YAML's `year/month/` assumption;
