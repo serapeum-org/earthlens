@@ -7,9 +7,11 @@ per-band / per-asset metadata (media type, common name, dtype, nodata) a
 maintainer reviews before pasting into the catalog. This is the CLI port of the
 `tools/*/probe_*.py` scripts.
 
-Like `refresh`, only providers with a public, no-auth, no-SDK sample endpoint
-have a prober wired up (currently STAC via plain `requests`); others report
-`unsupported`. Adding one is a single entry in :data:`_PROBERS`.
+Like `refresh`, only providers with a usable sample source have a prober
+wired up; others report `unsupported`. Adding one is a single entry in
+:data:`_PROBERS`. The heavier credentialed / GRIB-`.idx` / full-basin
+sampling probes (ecmwf cdsapi, nwp, tropycal, chc) stay in `tools/` —
+their CLI seed would need credentials or a slow whole-archive read.
 """
 
 from __future__ import annotations
@@ -460,6 +462,197 @@ def _cmems_probe(catalog: Any, dataset: str) -> dict[str, dict[str, Any]]:
     return schema
 
 
+#: EUMETSAT public browse collections endpoint (no credentials).
+_EUMETSAT_BROWSE_URL = "https://api.eumetsat.int/data/browse/collections"
+
+
+def _eumetsat_probe(catalog: Any, dataset: str) -> dict[str, dict[str, Any]]:
+    """Probe an EUMETSAT collection's public browse metadata (no auth).
+
+    Args:
+        catalog: The loaded EUMETSAT `Catalog` (resolves a key's
+            `collection_id`).
+        dataset: A curated key or an `EO:EUM:DAT:…` collection id.
+
+    Returns:
+        A single-entry mapping `{collection_id: {title, abstract, date,
+        updated}}`.
+    """
+    from urllib.parse import quote
+
+    record = catalog.datasets.get(dataset)
+    collection_id = getattr(record, "collection_id", None) or dataset
+    body = _get_json(
+        f"{_EUMETSAT_BROWSE_URL}/{quote(collection_id, safe='')}",
+        params={"format": "json"},
+    )
+    props = (body.get("collection") or {}).get("properties") or {}
+    return {
+        collection_id: {
+            "title": props.get("title"),
+            "abstract": (props.get("abstract") or "")[:200],
+            "date": props.get("date"),
+            "updated": props.get("updated"),
+        }
+    }
+
+
+def _worldpop_resolve(catalog: Any, dataset: str) -> tuple[str, str]:
+    """Resolve `dataset` to a `(product_alias, sub_alias)` pair.
+
+    Accepts a product alias (uses its first sub-alias) or a sub-alias id
+    (finds its parent product).
+
+    Raises:
+        ValueError: If `dataset` matches no product or sub-alias.
+    """
+    record = catalog.datasets.get(dataset)
+    if record is not None:
+        subs = getattr(record, "subaliases", None) or []
+        if subs:
+            return dataset, getattr(subs[0], "id", dataset)
+    for alias, row in catalog.datasets.items():
+        for sub in getattr(row, "subaliases", None) or []:
+            if getattr(sub, "id", None) == dataset:
+                return alias, dataset
+    raise ValueError(f"no WorldPop product or sub-alias matches {dataset!r}")
+
+
+def _worldpop_records(alias: str, sub_alias: str, iso3: str) -> list[dict[str, Any]]:
+    """Return the live WorldPop records for one `(alias, sub_alias, iso3)`."""
+    from earthlens.worldpop.rest import rest_records
+
+    return rest_records(alias, sub_alias, iso3)
+
+
+def _worldpop_probe(catalog: Any, dataset: str) -> dict[str, dict[str, Any]]:
+    """Probe a WorldPop sub-alias's live REST record shape (public).
+
+    Samples one country's records and records each record field's dtype —
+    the seed for the catalog's sub-alias maps.
+
+    Args:
+        catalog: The loaded WorldPop `Catalog` (resolves the product alias).
+        dataset: A product alias or a sub-alias id.
+
+    Returns:
+        Mapping of record field name to `{dtype}` (`popyears` carries the
+        sampled year spread).
+    """
+    alias, sub_alias = _worldpop_resolve(catalog, dataset)
+    records = _worldpop_records(alias, sub_alias, "USA")
+    if not records:
+        return {}
+    schema: dict[str, dict[str, Any]] = {
+        field: {"dtype": type(value).__name__} for field, value in records[0].items()
+    }
+    schema["popyears"] = {
+        "dtype": "list",
+        "values": sorted({str(r.get("popyear")) for r in records if r.get("popyear")}),
+    }
+    return schema
+
+
+#: A tiny bbox (Times Square block: W, S, E, N) for the Overture probe.
+_OVERTURE_BBOX = (-73.9876, 40.7561, -73.9851, 40.7577)
+
+
+def _overture_columns(overture_type: str) -> dict[str, str]:
+    """Return `{column: dtype}` for a tiny Overture bbox fetch (public SDK)."""
+    from overturemaps import core
+
+    frame = core.geodataframe(overture_type, bbox=_OVERTURE_BBOX)
+    return {str(name): str(dtype) for name, dtype in frame.dtypes.items()}
+
+
+def _overture_probe(catalog: Any, dataset: str) -> dict[str, dict[str, Any]]:
+    """Probe an Overture feature type's column schema (public `overturemaps`).
+
+    Fetches a tiny bbox for the type and records each column's dtype.
+
+    Args:
+        catalog: The loaded Overture `Catalog` (resolves a theme key's
+            `default_type`).
+        dataset: A curated theme key or an Overture feature type.
+
+    Returns:
+        Mapping of column name to `{dtype}`.
+    """
+    record = catalog.datasets.get(dataset)
+    overture_type = getattr(record, "default_type", None) or dataset
+    return {
+        column: {"dtype": dtype}
+        for column, dtype in _overture_columns(overture_type).items()
+    }
+
+
+def _s3_sample_keys(bucket: str, prefix: str, region: str | None) -> list[str]:
+    """Return up to five object keys under `prefix` (unsigned `boto3`)."""
+    from earthlens.s3.auth import S3Auth, S3Credentials
+
+    client = S3Auth(S3Credentials(region=region)).client()
+    response = client.list_objects_v2(Bucket=bucket, Prefix=prefix, MaxKeys=5)
+    return [item["Key"] for item in response.get("Contents", [])]
+
+
+def _s3_probe(catalog: Any, dataset: str) -> dict[str, dict[str, Any]]:
+    """Probe an AWS Open-Data dataset's bucket layout (unsigned `boto3`).
+
+    Lists a few object keys under the dataset's bucket — the seed for
+    confirming a dataset's on-disk key layout.
+
+    Args:
+        catalog: The loaded S3 `Catalog` (resolves a key's bucket/prefix).
+        dataset: A registered dataset name.
+
+    Returns:
+        Mapping of object key to `{}`.
+
+    Raises:
+        ValueError: If `dataset` is not a registered S3 dataset.
+    """
+    record = catalog.datasets.get(dataset)
+    if record is None:
+        raise ValueError(f"unknown S3 dataset {dataset!r}")
+    keys = _s3_sample_keys(
+        record.bucket,
+        getattr(record, "prefix", "") or "",
+        getattr(record, "region", None),
+    )
+    return {key: {} for key in keys}
+
+
+def _ghsl_probe(catalog: Any, dataset: str) -> dict[str, dict[str, Any]]:
+    """Report a GHSL product's curated (epoch, resolution) matrix (offline).
+
+    GHSL has no per-dataset sample endpoint; its availability is the curated
+    `releases` matrix, so this enumerates each release's epoch x resolution
+    blocks (and the source CRS each resolution implies) straight from the
+    bundled catalog.
+
+    Args:
+        catalog: The loaded GHSL `Catalog`.
+        dataset: A curated product code / alias.
+
+    Returns:
+        Mapping of `"{epoch}@{resolution}"` to `{release, crs}`.
+
+    Raises:
+        ValueError: If `dataset` is not a curated GHSL product.
+    """
+    record = catalog.datasets.get(dataset)
+    if record is None:
+        raise ValueError(f"unknown GHSL product {dataset!r}")
+    schema: dict[str, dict[str, Any]] = {}
+    for release, blocks in (getattr(record, "releases", None) or {}).items():
+        for block in blocks:
+            crs = ", ".join(sorted(block.source_crs()))
+            for epoch in block.epochs:
+                for resolution in block.resolutions:
+                    schema[f"{epoch}@{resolution}"] = {"release": release, "crs": crs}
+    return schema
+
+
 #: Provider id -> a callable taking the loaded catalog and a dataset id and
 #: returning its per-entry schema.
 _PROBERS: dict[str, Callable[[Any, str], dict[str, dict[str, Any]]]] = {
@@ -471,6 +664,11 @@ _PROBERS: dict[str, Callable[[Any, str], dict[str, dict[str, Any]]]] = {
     "earthdata": _earthdata_probe,
     "hdx": _hdx_probe,
     "firms": _firms_probe,
+    "eumetsat": _eumetsat_probe,
+    "worldpop": _worldpop_probe,
+    "overture": _overture_probe,
+    "s3": _s3_probe,
+    "ghsl": _ghsl_probe,
 }
 
 

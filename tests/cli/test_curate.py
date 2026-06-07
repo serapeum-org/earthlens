@@ -246,6 +246,98 @@ class TestGeeProbe:
         assert result.assets["hurs"]["gsd"] == 27830, "gsd unwrapped from list"
 
 
+class TestEumetsatProbe:
+    """Tests for the EUMETSAT browse prober (public, no auth)."""
+
+    def test_reads_browse_metadata(self, monkeypatch):
+        """eumetsat probe reads the public browse title/abstract/date."""
+        monkeypatch.setattr(
+            curate_mod,
+            "_get_json",
+            lambda url, **kw: {
+                "collection": {"properties": {"title": "HRSEVIRI", "date": "2020"}}
+            },
+        )
+        result = probe_dataset(_info("eumetsat"), "EO:EUM:DAT:MSG:HRSEVIRI")
+        assert result.status == "ok", "eumetsat probe ran"
+        entry = next(iter(result.assets.values()))
+        assert entry["title"] == "HRSEVIRI", "title parsed"
+
+
+class TestWorldpopProbe:
+    """Tests for the WorldPop REST prober (public)."""
+
+    def test_samples_record_fields(self, monkeypatch):
+        """worldpop probe records each REST record field's dtype + popyears."""
+        monkeypatch.setattr(
+            curate_mod,
+            "_worldpop_records",
+            lambda alias, sub, iso3: [
+                {"id": 1, "title": "t", "popyear": "2020"},
+                {"id": 2, "popyear": "2021"},
+            ],
+        )
+        info = _info("worldpop")
+        from earthlens.cli.adapter import load_catalog
+
+        alias = next(iter(load_catalog(info).datasets))
+        result = probe_dataset(info, alias)
+        assert result.status == "ok", "worldpop probe ran"
+        assert result.assets["popyears"]["values"] == ["2020", "2021"], "years unioned"
+
+
+class TestOvertureProbe:
+    """Tests for the Overture column prober (public SDK)."""
+
+    def test_reads_column_dtypes(self, monkeypatch):
+        """overture probe records each column's dtype from a tiny bbox."""
+        monkeypatch.setattr(
+            curate_mod,
+            "_overture_columns",
+            lambda overture_type: {"id": "object", "height": "float64"},
+        )
+        info = _info("overture")
+        from earthlens.cli.adapter import load_catalog
+
+        key = next(iter(load_catalog(info).datasets))
+        result = probe_dataset(info, key)
+        assert result.status == "ok", "overture probe ran"
+        assert result.assets["height"]["dtype"] == "float64", "dtype recorded"
+
+
+class TestS3Probe:
+    """Tests for the S3 bucket prober (unsigned boto3)."""
+
+    def test_lists_sample_keys(self, monkeypatch):
+        """s3 probe lists a few object keys under the dataset's bucket."""
+        monkeypatch.setattr(
+            curate_mod, "_s3_sample_keys", lambda b, p, region: ["a/2020.tif"]
+        )
+        info = _info("s3")
+        from earthlens.cli.adapter import load_catalog
+
+        key = next(iter(load_catalog(info).datasets))
+        result = probe_dataset(info, key)
+        assert result.status == "ok", "s3 probe ran"
+        assert "a/2020.tif" in result.assets, "object key listed"
+
+
+class TestGhslProbe:
+    """Tests for the GHSL availability prober (offline, from the catalog)."""
+
+    def test_enumerates_epoch_resolution_matrix(self):
+        """ghsl probe reports the curated epoch x resolution blocks offline."""
+        info = _info("ghsl")
+        from earthlens.cli.adapter import load_catalog
+
+        product = next(iter(load_catalog(info).datasets))
+        result = probe_dataset(info, product)
+        assert result.status == "ok", f"ghsl probe failed: {result.detail}"
+        assert result.assets, "at least one (epoch, resolution) block"
+        entry = next(iter(result.assets.values()))
+        assert "release" in entry and "crs" in entry, "release + crs recorded"
+
+
 class TestProbeResult:
     """Tests for ProbeResult."""
 
