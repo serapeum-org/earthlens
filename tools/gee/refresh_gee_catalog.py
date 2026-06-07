@@ -577,7 +577,7 @@ def _cmd_add_ids(args: argparse.Namespace) -> int:
 
     raw = io.StringIO()
     for aid in fresh:
-        raw.write(f"\n# ---- paste under `datasets:` ----\n")
+        raw.write("\n# ---- paste under `datasets:` ----\n")
         raw.write(stanza_for(aid))
     compact = compact_text(raw.getvalue())
 
