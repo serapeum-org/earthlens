@@ -43,6 +43,7 @@ from earthlens.cli.render import (
     rows_to_json,
     validate_table,
 )
+from earthlens.cli.stanza import emit_stanza
 from earthlens.cli.table import FACET_NAMES, build_table
 from earthlens.cli.validate import validate_one
 
@@ -514,6 +515,80 @@ def probe(
         typer.echo(json.dumps(result.to_dict(), indent=2))
     elif result.status == "ok":
         out_console().print(probe_table(result))
+    else:
+        err_console().print(f"[red]{result.status}:[/red] {result.detail}")
+
+    if result.status != "ok":
+        raise typer.Exit(code=1)
+
+
+@datasets_app.command()
+def curate(
+    provider: str = typer.Argument(..., help="Provider id (or alias)."),
+    upstream_id: str = typer.Argument(
+        ..., help="Upstream id to seed a curated row from (short name / id / code)."
+    ),
+    key: str = typer.Option(
+        "", "--key", help="Friendly catalog key for the row (default: the id)."
+    ),
+    minimal: bool = typer.Option(
+        False, "--minimal", help="Emit a placeholder row without a live fetch."
+    ),
+    version: str = typer.Option("", "--version", help="earthdata: collection version."),
+    cmr_provider: str = typer.Option(
+        "", "--cmr-provider", help="earthdata: CMR provider code (e.g. GES_DISC)."
+    ),
+    daac: str = typer.Option("", "--daac", help="earthdata: DAAC label."),
+    cloud_hosted: bool = typer.Option(
+        False, "--cloud-hosted", help="earthdata: mark the collection cloud-hosted."
+    ),
+    name: str = typer.Option("", "--name", help="usgs_water: human-readable name."),
+    units: str = typer.Option("", "--units", help="usgs_water: reporting units."),
+    group: str = typer.Option(
+        "", "--group", help="usgs_water group / eumetsat Data Store group."
+    ),
+    service: list[str] = typer.Option(
+        None, "--service", help="usgs_water: repeatable service the code serves."
+    ),
+    json_output: bool = typer.Option(
+        False, "--json", "-j", help="Emit the seeded row as JSON (for piping)."
+    ),
+) -> None:
+    """Author a paste-ready curated `datasets:` row from one upstream id.
+
+    The authoring companion to `probe`: it fetches one upstream id's
+    metadata and prints a seeded `datasets:` YAML row (inferring
+    `output_kind` / `format` / bands where it can) for you to vet and paste
+    into the per-family catalog file. Print-only — it never edits a catalog.
+    Only providers with a stanza emitter are supported (earthdata, hdx,
+    usgs_water, eumetsat, gee); others report `unsupported`.
+    """
+    backends = _select_refresh_backends(provider)
+    if len(backends) != 1:
+        raise typer.BadParameter("curate takes exactly one provider")
+    result = emit_stanza(
+        backends[0],
+        upstream_id,
+        key=key or None,
+        minimal=minimal,
+        version=version,
+        cmr_provider=cmr_provider,
+        daac=daac,
+        cloud_hosted=cloud_hosted,
+        name=name,
+        units=units,
+        group=group,
+        services=service or None,
+    )
+
+    if json_output:
+        typer.echo(json.dumps(result.to_dict(), indent=2))
+    elif result.status == "ok":
+        out_console().print(
+            f"[dim]# paste into the curated datasets: block "
+            f"({result.provider})[/dim]"
+        )
+        typer.echo(result.to_yaml())
     else:
         err_console().print(f"[red]{result.status}:[/red] {result.detail}")
 

@@ -9,6 +9,7 @@ from typer.testing import CliRunner
 
 from earthlens.cli import curate as curate_mod
 from earthlens.cli import refresh as refresh_mod
+from earthlens.cli import stanza as stanza_mod
 from earthlens.cli.app import app
 from earthlens.cli.table import build_table
 
@@ -307,6 +308,45 @@ class TestAudit:
         )
         result = runner.invoke(app, ["datasets", "audit", "stac", "--strict"])
         assert result.exit_code == 1, "drift under --strict -> exit 1"
+
+
+class TestCurate:
+    """Tests for `datasets curate` (stanza-emit; network mocked)."""
+
+    def test_usgs_water_emits_yaml(self):
+        """A pure-args provider prints a paste-ready datasets: stanza."""
+        result = runner.invoke(
+            app,
+            ["datasets", "curate", "usgs_water", "00060", "--key", "discharge"],
+        )
+        assert result.exit_code == 0, f"curate failed: {result.output}"
+        assert "datasets:" in result.output and "code: '00060'" in result.output
+
+    def test_json_output(self, monkeypatch):
+        """--json emits the seeded row object."""
+        monkeypatch.setattr(
+            stanza_mod,
+            "_get_json",
+            lambda url, **kw: {
+                "result": {"title": "P", "resources": [{"name": "a", "format": "CSV"}]}
+            },
+        )
+        result = runner.invoke(
+            app, ["datasets", "curate", "hdx", "kontur-population", "--json"]
+        )
+        payload = json.loads(result.output)
+        assert payload["status"] == "ok" and payload["row"]["hdx_id"]
+
+    def test_unsupported_provider_exits_nonzero(self):
+        """A provider with no emitter reports unsupported and exits 1."""
+        result = runner.invoke(app, ["datasets", "curate", "chc", "anything"])
+        assert result.exit_code == 1, "unsupported -> exit 1"
+        assert "unsupported" in result.output
+
+    def test_unknown_provider_rejected(self):
+        """An unknown selector token is a usage error."""
+        result = runner.invoke(app, ["datasets", "curate", "bogus", "x"])
+        assert result.exit_code == 2, "unknown provider -> exit 2"
 
 
 class TestValidate:
