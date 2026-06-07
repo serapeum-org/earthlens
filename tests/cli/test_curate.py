@@ -475,6 +475,24 @@ class TestDeepProbers:
         result = probe_dataset(_info("stac"), "sentinel-2-l2a", deep=True)
         assert result.status == "ok", "stac --deep fell back to the light prober"
 
+    def test_nwp_deep_reports_live_availability(self, monkeypatch):
+        """nwp --deep reports the model's live availability for a recent cycle."""
+        from earthlens.cli.adapter import load_catalog
+
+        monkeypatch.setattr(
+            curate_mod, "_nwp_availability", lambda model, cycle, step: "HTTP 200 (ok)"
+        )
+        catalog = load_catalog(_info("nwp"))
+        model_key = next(
+            key
+            for key, model in catalog.datasets.items()
+            if getattr(model, "backend", None) == "direct-https"
+        )
+        result = probe_dataset(_info("nwp"), model_key, deep=True)
+        assert result.status == "ok", "nwp deep probe ran"
+        entry = next(iter(result.assets.values()))
+        assert "HTTP 200" in entry["status"], "availability status reported"
+
 
 class TestProbeResult:
     """Tests for ProbeResult."""

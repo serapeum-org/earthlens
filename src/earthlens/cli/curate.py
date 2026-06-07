@@ -9,9 +9,10 @@ maintainer reviews before pasting into the catalog. This is the CLI port of the
 
 Like `refresh`, only providers with a usable sample source have a prober
 wired up; others report `unsupported`. Adding one is a single entry in
-:data:`_PROBERS`. The heavier credentialed / GRIB-`.idx` / full-basin
-sampling probes (ecmwf cdsapi, nwp, tropycal, chc) stay in `tools/` —
-their CLI seed would need credentials or a slow whole-archive read.
+:data:`_PROBERS`. The heavier **credentialed** samplers (real NetCDF /
+granule / CDS retrieval / full NWP availability) live in :data:`_DEEP_PROBERS`
+and are reached with `probe --deep` (cmems, earthdata, ecmwf, nwp); `--deep`
+falls back to the light prober for providers without a deep sampler.
 """
 
 from __future__ import annotations
@@ -1006,11 +1007,168 @@ def _ecmwf_deep_probe(catalog: Any, dataset: str) -> dict[str, dict[str, Any]]:
     return _ecmwf_deep_sample(dataset)
 
 
+def _nwp_recent_cycle(model: Any) -> Any:
+    """Return the model's most recent run datetime (~8 h in the past)."""
+    import datetime as dt
+
+    moment = dt.datetime.now(dt.UTC).replace(tzinfo=None) - dt.timedelta(hours=8)
+    hours = sorted(getattr(model, "cycles_utc", None) or []) or [0]
+    for day_offset in (0, 1):
+        day = moment - dt.timedelta(days=day_offset)
+        for hour in reversed(hours):
+            candidate = day.replace(hour=hour, minute=0, second=0, microsecond=0)
+            if candidate <= moment:
+                return candidate
+    return moment.replace(hour=hours[0], minute=0, second=0, microsecond=0)
+
+
+def _nwp_availability(model: Any, cycle: Any, step: int) -> str:
+    """Return a live 'is this fetchable now?' status, dispatching on backend.
+
+    Ports `tools/nwp/probe_nwp_model.py`: a cheap availability check per
+    centre (HTTP HEAD / unsigned-S3 head_object / ecmwf-opendata latest /
+    Météo-France GetCapabilities / Herbie GRIB resolve). No bulk download.
+    """
+    backend = getattr(model, "backend", None)
+    bands = getattr(model, "bands", None) or {}
+    options = getattr(model, "request_options", None) or {}
+
+    if backend == "direct-https":
+        if not getattr(model, "url_template", None) or not bands:
+            return "no url_template/bands"
+        import requests
+
+        var = next(iter(bands.values()))
+        url = model.url_template.format(
+            cycle=cycle, date=cycle, step=step, var=var, var_lc=var.lower()
+        )
+        try:
+            code = requests.head(
+                url, timeout=_TIMEOUT, allow_redirects=True
+            ).status_code
+            return f"HTTP {code} ({url})"
+        except Exception as exc:  # noqa: BLE001 — reported, not raised
+            return f"unreachable: {type(exc).__name__} ({url})"
+
+    if backend == "direct-boto3":
+        bucket = options.get("bucket")
+        key_template = options.get("key_template") or getattr(model, "url_template", "")
+        if not (bucket and key_template and bands):
+            return "no bucket/key_template/bands"
+        import boto3
+        from botocore import UNSIGNED
+        from botocore.client import Config
+
+        var = next(iter(bands.values()))
+        key = key_template.format(
+            cycle=cycle, date=cycle, step=step, var=var, var_lc=var.lower()
+        )
+        client = boto3.client(
+            "s3",
+            region_name=options.get("region", "eu-west-1"),
+            config=Config(signature_version=UNSIGNED),
+        )
+        try:
+            head = client.head_object(Bucket=bucket, Key=key)
+            return f"OK {head['ContentLength']} bytes (s3://{bucket}/{key})"
+        except Exception as exc:  # noqa: BLE001 — reported, not raised
+            return f"unreachable: {type(exc).__name__} (s3://{bucket}/{key})"
+
+    if backend == "ecmwf-opendata":
+        try:
+            from ecmwf.opendata import Client
+        except ImportError:
+            return "ecmwf-opendata not installed (pip install earthlens[nwp])"
+        client = Client(source="aws", model=options.get("ecmwf_model", "ifs"))
+        request = {"type": options.get("type", "fc"), "step": 0}
+        if options.get("stream"):
+            request["stream"] = options["stream"]
+        try:
+            return f"latest cycle {client.latest(**request):%Y-%m-%d %HZ}"
+        except Exception as exc:  # noqa: BLE001 — reported, not raised
+            return f"unreachable: {type(exc).__name__}: {exc}"
+
+    if backend == "meteofrance-api":
+        import os
+
+        import requests
+
+        api_base, service = options.get("api_base"), options.get("coverage_service")
+        if not (api_base and service):
+            return "no api_base/coverage_service in request_options"
+        key = os.environ.get("METEO_FRANCE_API_KEY") or os.environ.get("MF_API_KEY")
+        if not key:
+            return "needs METEO_FRANCE_API_KEY"
+        url = f"{api_base}/wcs/{service}/GetCapabilities"
+        try:
+            code = requests.get(
+                url,
+                params={"service": "WCS", "version": "2.0.1"},
+                headers={"apikey": key},
+                timeout=_TIMEOUT,
+            ).status_code
+            return f"HTTP {code} ({url})"
+        except Exception as exc:  # noqa: BLE001 — reported, not raised
+            return f"unreachable: {type(exc).__name__} ({url})"
+
+    if backend == "herbie":
+        import contextlib
+        import io
+
+        try:
+            with contextlib.redirect_stdout(io.StringIO()):
+                from herbie import Herbie
+        except Exception:  # noqa: BLE001 — optional SDK / eccodes binary
+            return "herbie unavailable (needs the [nwp] extra + eccodes binary)"
+        kwargs: dict[str, Any] = {"model": model.model_family, "fxx": step}
+        if getattr(model, "product", None) is not None:
+            kwargs["product"] = model.product
+        try:
+            with contextlib.redirect_stdout(io.StringIO()):
+                grib = Herbie(cycle, **kwargs).grib
+            return f"resolved {grib}" if grib else "no GRIB at this cycle/step"
+        except Exception as exc:  # noqa: BLE001 — reported, not raised
+            return f"unreachable: {type(exc).__name__}: {exc}"
+
+    return f"no live availability probe for backend {backend!r}"
+
+
+def _nwp_deep_sample(model: Any, step: int) -> dict[str, dict[str, Any]]:
+    """Return a model's live availability for its most recent cycle."""
+    cycle = _nwp_recent_cycle(model)
+    backend = getattr(model, "backend", "?")
+    return {
+        f"{backend} @ {cycle:%Y-%m-%d %HZ}": {
+            "status": _nwp_availability(model, cycle, step),
+            "step": step,
+        }
+    }
+
+
+def _nwp_deep_probe(catalog: Any, dataset: str) -> dict[str, dict[str, Any]]:
+    """Deep-probe an NWP model's live availability (full dispatch, not .idx).
+
+    Ports `tools/nwp/probe_nwp_model.py`: checks whether the model's most
+    recent cycle is fetchable right now via its real backend (Herbie needs
+    the eccodes binary; ecmwf-opendata / boto3 / meteofrance need their
+    SDKs / keys). The light `probe nwp` only checks `.idx` band tokens.
+
+    Raises:
+        ValueError: If `dataset` is not a curated NWP model.
+    """
+    model = catalog.datasets.get(dataset)
+    if model is None:
+        raise ValueError(f"unknown NWP model {dataset!r}")
+    step = 1 if (getattr(model, "horizon_h", 0) or 0) >= 1 else 0
+    return _nwp_deep_sample(model, step)
+
+
 #: Provider id -> a credentialed deep sampler (the `--deep` half of probe).
 _DEEP_PROBERS: dict[str, Callable[[Any, str], dict[str, dict[str, Any]]]] = {
     "cmems": _cmems_deep_probe,
     "earthdata": _earthdata_deep_probe,
     "ecmwf": _ecmwf_deep_probe,
+    "nwp": _nwp_deep_probe,
 }
 
 

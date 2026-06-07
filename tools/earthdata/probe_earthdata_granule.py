@@ -1,6 +1,6 @@
 """Probe one sample granule to seed a catalog row (C9).
 
-The CMR analog of ``tools/ecmwf/probe_cds_netcdf.py``. For a given
+The CMR granule-sampling probe (the deep-probe analogue for Earthdata). For a given
 collection, search CMR for one granule in a tiny window, record its
 download URL / on-disk format and an inferred `output_kind`, and write a
 JSON sidecar that seeds the catalog `format` / `output_kind` (and, when

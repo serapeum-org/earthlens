@@ -20,14 +20,44 @@ from __future__ import annotations
 
 import argparse
 import json
+import zipfile
 from pathlib import Path
 from typing import Any
 
-from probe_cds_netcdf import collect_metadata, maybe_unzip
+from pyramids.netcdf import NetCDF
 
 from earthlens.ecmwf import Catalog
 
 CACHE_DIR = Path("C:/tmp/cds_probe")
+
+
+def maybe_unzip(nc_path: Path) -> Path:
+    """If CDS returned a zip wrapping NetCDFs, unzip and return the dir."""
+    extracted = nc_path.with_suffix(".extracted")
+    if zipfile.is_zipfile(nc_path):
+        if not extracted.exists():
+            extracted.mkdir()
+            with zipfile.ZipFile(nc_path) as zf:
+                zf.extractall(extracted)  # nosec B202 — trusted CDS payload
+        return extracted
+    return nc_path
+
+
+def collect_metadata(path: Path) -> dict[str, dict[str, str]]:
+    """Walk ``path`` (file or dir) and collect long_name + units per nc var."""
+    files = sorted(path.glob("*.nc")) if path.is_dir() else [path]
+    skip = {"latitude", "longitude", "time", "valid_time", "number", "expver"}
+    out: dict[str, dict[str, str]] = {}
+    for nc in files:
+        with NetCDF.read_file(str(nc), read_only=True) as fh:
+            for name, var in fh.meta_data.variables.items():
+                if name in skip:
+                    continue
+                long_name = getattr(var, "long_name", "") or ""
+                units = getattr(var, "unit", "") or ""
+                if long_name or units:
+                    out[name] = {"long_name": long_name, "units": units}
+    return out
 
 
 def main() -> int:
