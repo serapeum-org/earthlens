@@ -132,9 +132,11 @@ nav:
       - Catalog & Tooling: reference/earthdata/catalog.md
       - Reference: reference/earthdata/earthdata.md
     - ECMWF:
-      - Reference: reference/ecmwf.md
+      - Introduction: reference/ecmwf/introduction.md
+      - Usage: reference/ecmwf/usage.md
       - Catalog & Probes: reference/ecmwf/catalog.md
       - Aggregation: reference/aggregation.md
+      - Reference: reference/ecmwf/ecmwf.md
     - EUMETSAT (Data Store):
       - Introduction: reference/eumetsat/introduction.md
       - Usage: reference/eumetsat/usage.md

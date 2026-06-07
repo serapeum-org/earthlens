@@ -18,8 +18,8 @@ Backends with no extra (CHC, GDACS, OpenAQ) need only the core install — they 
 | Provider | `data_source` key(s) | Output | Auth | Extra | Docs |
 |---|---|---|---|---|---|
 | Climate Hazards Center (CHIRPS / CHIRTS / SPI / SPEI / WBGT / …) | `chc`, `chirps` | raster | anonymous FTP | — | [CHC](chc/introduction.md) |
-| ERA5 on AWS (`era5-pds`) | `amazon-s3` | raster | unsigned AWS (public bucket) | `s3` | [Amazon S3](s3.md) |
-| ECMWF Climate Data Store | `ecmwf` | raster | `~/.cdsapirc` token | `ecmwf` | [ECMWF](ecmwf.md) |
+| AWS Open Data (ERA5 / Sentinel-2 / Copernicus DEM / ESA WorldCover) | `amazon-s3` | raster | unsigned AWS (public buckets) | `s3` | [Amazon S3](s3/introduction.md) |
+| ECMWF Climate Data Store | `ecmwf` | raster | `~/.cdsapirc` token | `ecmwf` | [ECMWF](ecmwf/introduction.md) |
 | Google Earth Engine | `gee`, `google-earth-engine` | raster | service account | `gee` | [GEE](gee/introduction.md) |
 | Copernicus Marine (CMEMS) | `cmems` | raster | Copernicus Marine login | `cmems` | [CMEMS](cmems/introduction.md) |
 | FDSN seismic events (USGS / EMSC / INGV / …) | `fdsn` | vector | none | `fdsn` | [FDSN](fdsn/introduction.md) |
