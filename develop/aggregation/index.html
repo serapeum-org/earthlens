@@ -10,31 +10,31 @@
       
       
       
-        <link rel="canonical" href="https://serapeum-org.github.io/earthlens/develop/reference/aggregation/">
+        <link rel="canonical" href="https://serapeum-org.github.io/earthlens/develop/aggregation/">
       
       
-        <link rel="prev" href="../ecmwf/catalog/">
+        <link rel="prev" href="../overview/architecture/">
       
       
-        <link rel="next" href="../eumetsat/introduction/">
+        <link rel="next" href="../reference/providers/">
       
       
         
       
       
-      <link rel="icon" href="../../assets/images/favicon.png">
+      <link rel="icon" href="../assets/images/favicon.png">
       <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
     
     
       
-        <title>Aggregation - earthlens</title>
+        <title>Temporal aggregation - earthlens</title>
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
       
         
-        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
       
       
 
@@ -53,18 +53,18 @@
       
     
     
-      <link rel="stylesheet" href="../../assets/_mkdocstrings.css">
+      <link rel="stylesheet" href="../assets/_mkdocstrings.css">
     
-      <link rel="stylesheet" href="../../assets/stylesheets/panzoom.css">
+      <link rel="stylesheet" href="../assets/stylesheets/panzoom.css">
     
-    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
 
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -103,7 +103,7 @@
 
 <header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../.." title="earthlens" class="md-header__button md-logo" aria-label="earthlens" data-md-component="logo">
+    <a href=".." title="earthlens" class="md-header__button md-logo" aria-label="earthlens" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
@@ -123,7 +123,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Aggregation
+              Temporal aggregation
             
           </span>
         </div>
@@ -240,7 +240,7 @@
   
   
     <li class="md-tabs__item">
-      <a href="../.." class="md-tabs__link">
+      <a href=".." class="md-tabs__link">
         
   
   
@@ -257,11 +257,13 @@
   
   
   
+    
+  
   
     
     
-      <li class="md-tabs__item">
-        <a href="../../installation/" class="md-tabs__link">
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../installation/" class="md-tabs__link">
           
   
   
@@ -277,13 +279,11 @@
   
   
   
-    
-  
   
     
     
-      <li class="md-tabs__item md-tabs__item--active">
-        <a href="../providers/" class="md-tabs__link">
+      <li class="md-tabs__item">
+        <a href="../reference/providers/" class="md-tabs__link">
           
   
   
@@ -303,7 +303,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../examples/authentication/" class="md-tabs__link">
+        <a href="../examples/authentication/" class="md-tabs__link">
           
   
   
@@ -323,7 +323,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../earthlens/" class="md-tabs__link">
+        <a href="../reference/earthlens/" class="md-tabs__link">
           
   
   
@@ -343,7 +343,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../change-log/" class="md-tabs__link">
+        <a href="../change-log/" class="md-tabs__link">
           
   
   
@@ -383,7 +383,7 @@
 
 <nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../.." title="earthlens" class="md-nav__button md-logo" aria-label="earthlens" data-md-component="logo">
+    <a href=".." title="earthlens" class="md-nav__button md-logo" aria-label="earthlens" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
@@ -413,7 +413,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../.." class="md-nav__link">
+      <a href=".." class="md-nav__link">
         
   
   
@@ -429,119 +429,6 @@
   
 
       </a>
-    </li>
-  
-
-    
-      
-      
-  
-  
-  
-  
-    
-    
-    
-    
-      
-      
-    
-    
-    <li class="md-nav__item md-nav__item--nested">
-      
-        
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
-        
-          
-          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
-            
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Guide
-  
-
-    
-  </span>
-  
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_2">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    Guide
-  
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../installation/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Installation
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../overview/architecture/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Architecture
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
     </li>
   
 
@@ -569,17 +456,17 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
         
           
-          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
             
   
   
   <span class="md-ellipsis">
     
   
-    Data Sources
+    Guide
   
 
     
@@ -590,12 +477,12 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
-          <label class="md-nav__title" for="__nav_3">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
             <span class="md-nav__icon md-icon"></span>
             
   
-    Data Sources
+    Guide
   
 
           </label>
@@ -608,92 +495,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../providers/" class="md-nav__link">
+      <a href="../installation/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Supported providers
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    
-    
-    
-    
-      
-      
-    
-    
-    <li class="md-nav__item md-nav__item--nested">
-      
-        
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_2" >
-        
-          
-          <label class="md-nav__link" for="__nav_3_2" id="__nav_3_2_label" tabindex="0">
-            
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    CHC (CHIRPS / CHIRTS / SPI / SPEI / …)
-  
-
-    
-  </span>
-  
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_2_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_2">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    CHC (CHIRPS / CHIRTS / SPI / SPEI / …)
-  
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../chc/introduction/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Introduction
+    Installation
   
 
     
@@ -714,14 +523,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../chc/usage/" class="md-nav__link">
+      <a href="../getting-started/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Usage
+    Getting started
   
 
     
@@ -742,724 +551,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../chc/catalog/" class="md-nav__link">
+      <a href="../overview/architecture/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Catalog & Tooling
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../chc/chc/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Reference
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    
-    
-    
-    
-      
-      
-    
-    
-    <li class="md-nav__item md-nav__item--nested">
-      
-        
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_3" >
-        
-          
-          <label class="md-nav__link" for="__nav_3_3" id="__nav_3_3_label" tabindex="0">
-            
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Amazon S3 (AWS Open Data)
-  
-
-    
-  </span>
-  
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_3_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_3">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    Amazon S3 (AWS Open Data)
-  
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../s3/introduction/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Introduction
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../s3/authentication/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Authentication
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../s3/usage/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Usage
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../s3/datasets/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Available datasets
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../s3/reference/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Reference
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    
-    
-    
-    
-      
-      
-    
-    
-    <li class="md-nav__item md-nav__item--nested">
-      
-        
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_4" >
-        
-          
-          <label class="md-nav__link" for="__nav_3_4" id="__nav_3_4_label" tabindex="0">
-            
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    CMEMS (Copernicus Marine)
-  
-
-    
-  </span>
-  
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_4_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_4">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    CMEMS (Copernicus Marine)
-  
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../cmems/introduction/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Introduction
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../cmems/usage/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Usage
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../cmems/authentication/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Authentication
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../cmems/cmems/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Reference
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    
-    
-    
-    
-      
-      
-    
-    
-    <li class="md-nav__item md-nav__item--nested">
-      
-        
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_5" >
-        
-          
-          <label class="md-nav__link" for="__nav_3_5" id="__nav_3_5_label" tabindex="0">
-            
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Earthdata (NASA EOSDIS)
-  
-
-    
-  </span>
-  
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_5_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_5">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    Earthdata (NASA EOSDIS)
-  
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../earthdata/introduction/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Introduction
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../earthdata/usage/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Usage
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../earthdata/authentication/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Authentication
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../earthdata/catalog/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Catalog & Tooling
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../earthdata/earthdata/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Reference
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-    
-  
-  
-  
-    
-    
-    
-    
-      
-      
-    
-    
-    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
-      
-        
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_6" checked>
-        
-          
-          <label class="md-nav__link" for="__nav_3_6" id="__nav_3_6_label" tabindex="0">
-            
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    ECMWF
-  
-
-    
-  </span>
-  
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_6_label" aria-expanded="true">
-          <label class="md-nav__title" for="__nav_3_6">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    ECMWF
-  
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../ecmwf/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Reference
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../ecmwf/catalog/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Catalog & Probes
+    Architecture
   
 
     
@@ -1496,7 +595,7 @@
   <span class="md-ellipsis">
     
   
-    Aggregation
+    Temporal aggregation
   
 
     
@@ -1514,7 +613,7 @@
   <span class="md-ellipsis">
     
   
-    Aggregation
+    Temporal aggregation
   
 
     
@@ -1775,6 +874,989 @@
     </li>
   
 
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Data Sources
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Data Sources
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/providers/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Supported providers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_2" id="__nav_3_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CHC (CHIRPS / CHIRTS / SPI / SPEI / …)
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    CHC (CHIRPS / CHIRTS / SPI / SPEI / …)
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/chc/introduction/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Introduction
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/chc/usage/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Usage
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/chc/catalog/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Catalog & tooling
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/chc/chc/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_3" id="__nav_3_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Amazon S3 (AWS Open Data)
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Amazon S3 (AWS Open Data)
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/s3/introduction/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Introduction
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/s3/authentication/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Authentication
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/s3/usage/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Usage
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/s3/datasets/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Available datasets
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/s3/reference/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_4" id="__nav_3_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CMEMS (Copernicus Marine)
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    CMEMS (Copernicus Marine)
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/cmems/introduction/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Introduction
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/cmems/usage/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Usage
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/cmems/authentication/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Authentication
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/cmems/cmems/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_5" id="__nav_3_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Earthdata (NASA EOSDIS)
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Earthdata (NASA EOSDIS)
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/earthdata/introduction/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Introduction
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/earthdata/usage/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Usage
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/earthdata/authentication/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Authentication
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/earthdata/catalog/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Catalog & tooling
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/earthdata/earthdata/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_6" id="__nav_3_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ECMWF
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    ECMWF
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/ecmwf/introduction/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Introduction
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/ecmwf/usage/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Usage
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/ecmwf/catalog/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Catalog & tooling
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/ecmwf/ecmwf/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
               
             
               
@@ -1834,7 +1916,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../eumetsat/introduction/" class="md-nav__link">
+      <a href="../reference/eumetsat/introduction/" class="md-nav__link">
         
   
   
@@ -1862,7 +1944,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../eumetsat/usage/" class="md-nav__link">
+      <a href="../reference/eumetsat/usage/" class="md-nav__link">
         
   
   
@@ -1890,7 +1972,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../eumetsat/authentication/" class="md-nav__link">
+      <a href="../reference/eumetsat/authentication/" class="md-nav__link">
         
   
   
@@ -1918,14 +2000,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../eumetsat/catalog/" class="md-nav__link">
+      <a href="../reference/eumetsat/catalog/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Catalog & Tooling
+    Catalog & tooling
   
 
     
@@ -1946,7 +2028,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../eumetsat/data-tailor/" class="md-nav__link">
+      <a href="../reference/eumetsat/data-tailor/" class="md-nav__link">
         
   
   
@@ -1974,7 +2056,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../eumetsat/eumetsat/" class="md-nav__link">
+      <a href="../reference/eumetsat/eumetsat/" class="md-nav__link">
         
   
   
@@ -2060,7 +2142,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../fdsn/introduction/" class="md-nav__link">
+      <a href="../reference/fdsn/introduction/" class="md-nav__link">
         
   
   
@@ -2088,7 +2170,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../fdsn/usage/" class="md-nav__link">
+      <a href="../reference/fdsn/usage/" class="md-nav__link">
         
   
   
@@ -2116,7 +2198,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../fdsn/fdsn/" class="md-nav__link">
+      <a href="../reference/fdsn/fdsn/" class="md-nav__link">
         
   
   
@@ -2202,7 +2284,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../gee/introduction/" class="md-nav__link">
+      <a href="../reference/gee/introduction/" class="md-nav__link">
         
   
   
@@ -2230,7 +2312,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../gee/registering-a-project/" class="md-nav__link">
+      <a href="../reference/gee/registering-a-project/" class="md-nav__link">
         
   
   
@@ -2258,7 +2340,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../gee/service-account-setup/" class="md-nav__link">
+      <a href="../reference/gee/service-account-setup/" class="md-nav__link">
         
   
   
@@ -2286,7 +2368,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../gee/usage/" class="md-nav__link">
+      <a href="../reference/gee/usage/" class="md-nav__link">
         
   
   
@@ -2314,7 +2396,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../gee/gee/" class="md-nav__link">
+      <a href="../reference/gee/gee/" class="md-nav__link">
         
   
   
@@ -2400,7 +2482,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../stac/introduction/" class="md-nav__link">
+      <a href="../reference/stac/introduction/" class="md-nav__link">
         
   
   
@@ -2428,7 +2510,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../stac/usage/" class="md-nav__link">
+      <a href="../reference/stac/usage/" class="md-nav__link">
         
   
   
@@ -2456,7 +2538,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../stac/authentication/" class="md-nav__link">
+      <a href="../reference/stac/authentication/" class="md-nav__link">
         
   
   
@@ -2484,7 +2566,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../stac/stac/" class="md-nav__link">
+      <a href="../reference/stac/stac/" class="md-nav__link">
         
   
   
@@ -2570,7 +2652,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../gdacs/introduction/" class="md-nav__link">
+      <a href="../reference/gdacs/introduction/" class="md-nav__link">
         
   
   
@@ -2598,7 +2680,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../gdacs/usage/" class="md-nav__link">
+      <a href="../reference/gdacs/usage/" class="md-nav__link">
         
   
   
@@ -2626,7 +2708,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../gdacs/gdacs/" class="md-nav__link">
+      <a href="../reference/gdacs/gdacs/" class="md-nav__link">
         
   
   
@@ -2712,7 +2794,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../openaq/introduction/" class="md-nav__link">
+      <a href="../reference/openaq/introduction/" class="md-nav__link">
         
   
   
@@ -2740,7 +2822,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../openaq/usage/" class="md-nav__link">
+      <a href="../reference/openaq/usage/" class="md-nav__link">
         
   
   
@@ -2768,7 +2850,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../openaq/authentication/" class="md-nav__link">
+      <a href="../reference/openaq/authentication/" class="md-nav__link">
         
   
   
@@ -2796,7 +2878,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../openaq/openaq/" class="md-nav__link">
+      <a href="../reference/openaq/openaq/" class="md-nav__link">
         
   
   
@@ -2882,7 +2964,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../openeo/introduction/" class="md-nav__link">
+      <a href="../reference/openeo/introduction/" class="md-nav__link">
         
   
   
@@ -2910,7 +2992,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../openeo/usage/" class="md-nav__link">
+      <a href="../reference/openeo/usage/" class="md-nav__link">
         
   
   
@@ -2938,7 +3020,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../openeo/authentication/" class="md-nav__link">
+      <a href="../reference/openeo/authentication/" class="md-nav__link">
         
   
   
@@ -2966,7 +3048,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../openeo/datasets/" class="md-nav__link">
+      <a href="../reference/openeo/datasets/" class="md-nav__link">
         
   
   
@@ -2994,7 +3076,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../openeo/openeo/" class="md-nav__link">
+      <a href="../reference/openeo/openeo/" class="md-nav__link">
         
   
   
@@ -3080,7 +3162,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../sentinel-hub/introduction/" class="md-nav__link">
+      <a href="../reference/sentinel-hub/introduction/" class="md-nav__link">
         
   
   
@@ -3108,7 +3190,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../sentinel-hub/usage/" class="md-nav__link">
+      <a href="../reference/sentinel-hub/usage/" class="md-nav__link">
         
   
   
@@ -3136,7 +3218,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../sentinel-hub/authentication/" class="md-nav__link">
+      <a href="../reference/sentinel-hub/authentication/" class="md-nav__link">
         
   
   
@@ -3164,7 +3246,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../sentinel-hub/datasets/" class="md-nav__link">
+      <a href="../reference/sentinel-hub/datasets/" class="md-nav__link">
         
   
   
@@ -3192,7 +3274,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../sentinel-hub/statistical-batch/" class="md-nav__link">
+      <a href="../reference/sentinel-hub/statistical-batch/" class="md-nav__link">
         
   
   
@@ -3220,7 +3302,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../sentinel-hub/sentinel_hub/" class="md-nav__link">
+      <a href="../reference/sentinel-hub/sentinel_hub/" class="md-nav__link">
         
   
   
@@ -3306,7 +3388,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../tropycal/introduction/" class="md-nav__link">
+      <a href="../reference/tropycal/introduction/" class="md-nav__link">
         
   
   
@@ -3334,7 +3416,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../tropycal/usage/" class="md-nav__link">
+      <a href="../reference/tropycal/usage/" class="md-nav__link">
         
   
   
@@ -3362,7 +3444,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../tropycal/tropycal/" class="md-nav__link">
+      <a href="../reference/tropycal/tropycal/" class="md-nav__link">
         
   
   
@@ -3448,7 +3530,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../firms/introduction/" class="md-nav__link">
+      <a href="../reference/firms/introduction/" class="md-nav__link">
         
   
   
@@ -3476,7 +3558,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../firms/usage/" class="md-nav__link">
+      <a href="../reference/firms/usage/" class="md-nav__link">
         
   
   
@@ -3504,7 +3586,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../firms/authentication/" class="md-nav__link">
+      <a href="../reference/firms/authentication/" class="md-nav__link">
         
   
   
@@ -3532,7 +3614,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../firms/firms/" class="md-nav__link">
+      <a href="../reference/firms/firms/" class="md-nav__link">
         
   
   
@@ -3618,7 +3700,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../hdx/introduction/" class="md-nav__link">
+      <a href="../reference/hdx/introduction/" class="md-nav__link">
         
   
   
@@ -3646,7 +3728,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../hdx/usage/" class="md-nav__link">
+      <a href="../reference/hdx/usage/" class="md-nav__link">
         
   
   
@@ -3674,14 +3756,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../hdx/catalog/" class="md-nav__link">
+      <a href="../reference/hdx/catalog/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Catalog & Tooling
+    Catalog & tooling
   
 
     
@@ -3702,7 +3784,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../hdx/hdx/" class="md-nav__link">
+      <a href="../reference/hdx/hdx/" class="md-nav__link">
         
   
   
@@ -3788,7 +3870,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../overture/introduction/" class="md-nav__link">
+      <a href="../reference/overture/introduction/" class="md-nav__link">
         
   
   
@@ -3816,7 +3898,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../overture/usage/" class="md-nav__link">
+      <a href="../reference/overture/usage/" class="md-nav__link">
         
   
   
@@ -3844,7 +3926,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../overture/licensing/" class="md-nav__link">
+      <a href="../reference/overture/licensing/" class="md-nav__link">
         
   
   
@@ -3872,7 +3954,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../overture/datasets/" class="md-nav__link">
+      <a href="../reference/overture/datasets/" class="md-nav__link">
         
   
   
@@ -3900,7 +3982,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../overture/overture/" class="md-nav__link">
+      <a href="../reference/overture/overture/" class="md-nav__link">
         
   
   
@@ -3986,7 +4068,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../nwp/introduction/" class="md-nav__link">
+      <a href="../reference/nwp/introduction/" class="md-nav__link">
         
   
   
@@ -4014,7 +4096,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../nwp/usage/" class="md-nav__link">
+      <a href="../reference/nwp/usage/" class="md-nav__link">
         
   
   
@@ -4042,14 +4124,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../nwp/catalog/" class="md-nav__link">
+      <a href="../reference/nwp/catalog/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Catalog & install
+    Catalog & tooling
   
 
     
@@ -4070,7 +4152,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../nwp/nwp/" class="md-nav__link">
+      <a href="../reference/nwp/nwp/" class="md-nav__link">
         
   
   
@@ -4156,7 +4238,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../radar/introduction/" class="md-nav__link">
+      <a href="../reference/radar/introduction/" class="md-nav__link">
         
   
   
@@ -4184,7 +4266,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../radar/usage/" class="md-nav__link">
+      <a href="../reference/radar/usage/" class="md-nav__link">
         
   
   
@@ -4212,14 +4294,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../radar/catalog/" class="md-nav__link">
+      <a href="../reference/radar/catalog/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Catalog & Tooling
+    Catalog & tooling
   
 
     
@@ -4240,7 +4322,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../radar/radar/" class="md-nav__link">
+      <a href="../reference/radar/radar/" class="md-nav__link">
         
   
   
@@ -4326,7 +4408,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../usgs-water/introduction/" class="md-nav__link">
+      <a href="../reference/usgs-water/introduction/" class="md-nav__link">
         
   
   
@@ -4354,7 +4436,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../usgs-water/usage/" class="md-nav__link">
+      <a href="../reference/usgs-water/usage/" class="md-nav__link">
         
   
   
@@ -4382,7 +4464,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../usgs-water/authentication/" class="md-nav__link">
+      <a href="../reference/usgs-water/authentication/" class="md-nav__link">
         
   
   
@@ -4410,14 +4492,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../usgs-water/datasets/" class="md-nav__link">
+      <a href="../reference/usgs-water/datasets/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Available data
+    Available datasets
   
 
     
@@ -4438,7 +4520,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../usgs-water/usgs_water/" class="md-nav__link">
+      <a href="../reference/usgs-water/usgs_water/" class="md-nav__link">
         
   
   
@@ -4524,7 +4606,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../ghsl/introduction/" class="md-nav__link">
+      <a href="../reference/ghsl/introduction/" class="md-nav__link">
         
   
   
@@ -4552,7 +4634,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../ghsl/authentication/" class="md-nav__link">
+      <a href="../reference/ghsl/authentication/" class="md-nav__link">
         
   
   
@@ -4580,7 +4662,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../ghsl/usage/" class="md-nav__link">
+      <a href="../reference/ghsl/usage/" class="md-nav__link">
         
   
   
@@ -4608,7 +4690,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../ghsl/products/" class="md-nav__link">
+      <a href="../reference/ghsl/products/" class="md-nav__link">
         
   
   
@@ -4636,7 +4718,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../ghsl/projections/" class="md-nav__link">
+      <a href="../reference/ghsl/projections/" class="md-nav__link">
         
   
   
@@ -4664,7 +4746,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../ghsl/ghsl/" class="md-nav__link">
+      <a href="../reference/ghsl/ghsl/" class="md-nav__link">
         
   
   
@@ -4750,7 +4832,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../worldpop/introduction/" class="md-nav__link">
+      <a href="../reference/worldpop/introduction/" class="md-nav__link">
         
   
   
@@ -4778,7 +4860,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../worldpop/usage/" class="md-nav__link">
+      <a href="../reference/worldpop/usage/" class="md-nav__link">
         
   
   
@@ -4806,7 +4888,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../worldpop/datasets/" class="md-nav__link">
+      <a href="../reference/worldpop/datasets/" class="md-nav__link">
         
   
   
@@ -4834,7 +4916,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../worldpop/worldpoppy/" class="md-nav__link">
+      <a href="../reference/worldpop/worldpoppy/" class="md-nav__link">
         
   
   
@@ -4862,7 +4944,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../worldpop/worldpop/" class="md-nav__link">
+      <a href="../reference/worldpop/worldpop/" class="md-nav__link">
         
   
   
@@ -4955,7 +5037,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../examples/authentication/" class="md-nav__link">
+      <a href="../examples/authentication/" class="md-nav__link">
         
   
   
@@ -4983,7 +5065,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../examples/data-sources/" class="md-nav__link">
+      <a href="../examples/data-sources/" class="md-nav__link">
         
   
   
@@ -5011,7 +5093,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../examples/catalog/" class="md-nav__link">
+      <a href="../examples/catalog/" class="md-nav__link">
         
   
   
@@ -5060,7 +5142,7 @@
   <span class="md-ellipsis">
     
   
-    Amazon S3 (AWS Open Data)
+    CHC (CHIRPS / CHIRTS / SPI / SPEI / …)
   
 
     
@@ -5076,7 +5158,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    Amazon S3 (AWS Open Data)
+    CHC (CHIRPS / CHIRTS / SPI / SPEI / …)
   
 
           </label>
@@ -5089,14 +5171,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../examples/s3/01_catalog_explorer/" class="md-nav__link">
+      <a href="../examples/chc/catalog_explorer/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    AWS Open-Data S3 — catalog explorer
+    CHC (CHIRPS) — catalog explorer (no network)
   
 
     
@@ -5117,70 +5199,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../examples/s3/02_copernicus_dem/" class="md-nav__link">
+      <a href="../examples/chc/quickstart/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Copernicus DEM — download &amp; crop
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../examples/s3/03_esa_worldcover/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    ESA WorldCover — 10 m land cover
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../examples/s3/04_passthrough/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Passthrough — any public bucket
+    CHC (CHIRPS) — daily rainfall quickstart (live)
   
 
     
@@ -5230,7 +5256,7 @@
   <span class="md-ellipsis">
     
   
-    CDS / ECMWF
+    Amazon S3 (AWS Open Data)
   
 
     
@@ -5246,7 +5272,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    CDS / ECMWF
+    Amazon S3 (AWS Open Data)
   
 
           </label>
@@ -5259,14 +5285,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../examples/ecmwf/cds_quickstart/" class="md-nav__link">
+      <a href="../examples/s3/01_catalog_explorer/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    CDS quickstart — downloading ERA5 via the facade
+    AWS Open-Data S3 — catalog explorer
   
 
     
@@ -5287,14 +5313,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../examples/ecmwf/hydrology_water_balance/" class="md-nav__link">
+      <a href="../examples/s3/02_copernicus_dem/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Hydrology — catchment water balance from ERA5
+    Copernicus DEM — download &amp; crop
   
 
     
@@ -5315,14 +5341,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../examples/ecmwf/oceanography_sst_sea_ice/" class="md-nav__link">
+      <a href="../examples/s3/03_esa_worldcover/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Oceanography — North Atlantic SST and sea-ice cover
+    ESA WorldCover — 10 m land cover
   
 
     
@@ -5343,210 +5369,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../examples/ecmwf/atmosphere_pressure_levels/" class="md-nav__link">
+      <a href="../examples/s3/04_passthrough/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Atmosphere — pressure-level temperature &amp; jet-stream wind
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../examples/ecmwf/agriculture_crop_water/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Agriculture — crop water demand and soil moisture
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../examples/ecmwf/solar_resource_assessment/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Solar — PV resource assessment from ERA5
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../examples/ecmwf/wind_energy_resource/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Wind energy — hub-height wind resource
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../examples/ecmwf/snow_cryosphere_winter/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Snow &amp; cryosphere — Alpine winter snowpack
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../examples/ecmwf/heat_waves_public_health/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Heat waves &amp; public health — apparent temperature
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../examples/ecmwf/climate_change_anomalies/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Climate change — temperature anomalies vs a baseline
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../examples/ecmwf/drought_precipitation_deficit/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Drought monitoring — SPI from monthly precipitation
+    Passthrough — any public bucket
   
 
     
@@ -5625,7 +5455,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../examples/cmems/catalog_explorer/" class="md-nav__link">
+      <a href="../examples/cmems/catalog_explorer/" class="md-nav__link">
         
   
   
@@ -5653,7 +5483,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../examples/cmems/quickstart/" class="md-nav__link">
+      <a href="../examples/cmems/quickstart/" class="md-nav__link">
         
   
   
@@ -5681,7 +5511,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../examples/cmems/glorys_thermocline_timeseries/" class="md-nav__link">
+      <a href="../examples/cmems/glorys_thermocline_timeseries/" class="md-nav__link">
         
   
   
@@ -5709,7 +5539,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../examples/cmems/pisces_chlorophyll_seasonal_cycle/" class="md-nav__link">
+      <a href="../examples/cmems/pisces_chlorophyll_seasonal_cycle/" class="md-nav__link">
         
   
   
@@ -5737,7 +5567,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../examples/cmems/altimetry_sla_coastal_signal/" class="md-nav__link">
+      <a href="../examples/cmems/altimetry_sla_coastal_signal/" class="md-nav__link">
         
   
   
@@ -5765,7 +5595,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../examples/cmems/seaice_arctic_thickness/" class="md-nav__link">
+      <a href="../examples/cmems/seaice_arctic_thickness/" class="md-nav__link">
         
   
   
@@ -5793,7 +5623,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../examples/cmems/global_wave_significant_height/" class="md-nav__link">
+      <a href="../examples/cmems/global_wave_significant_height/" class="md-nav__link">
         
   
   
@@ -5821,7 +5651,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../examples/cmems/mediterranean_sst_map/" class="md-nav__link">
+      <a href="../examples/cmems/mediterranean_sst_map/" class="md-nav__link">
         
   
   
@@ -5907,7 +5737,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../examples/earthdata/catalog_explorer/" class="md-nav__link">
+      <a href="../examples/earthdata/catalog_explorer/" class="md-nav__link">
         
   
   
@@ -5935,7 +5765,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../examples/earthdata/output_kinds/" class="md-nav__link">
+      <a href="../examples/earthdata/output_kinds/" class="md-nav__link">
         
   
   
@@ -5963,7 +5793,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../examples/earthdata/imerg_precipitation/" class="md-nav__link">
+      <a href="../examples/earthdata/imerg_precipitation/" class="md-nav__link">
         
   
   
@@ -5991,7 +5821,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../examples/earthdata/gedi_l4a_footprints/" class="md-nav__link">
+      <a href="../examples/earthdata/gedi_l4a_footprints/" class="md-nav__link">
         
   
   
@@ -6019,7 +5849,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../examples/earthdata/pace_ocean_colour/" class="md-nav__link">
+      <a href="../examples/earthdata/pace_ocean_colour/" class="md-nav__link">
         
   
   
@@ -6047,7 +5877,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../examples/earthdata/smap_soil_moisture/" class="md-nav__link">
+      <a href="../examples/earthdata/smap_soil_moisture/" class="md-nav__link">
         
   
   
@@ -6075,7 +5905,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../examples/earthdata/opera_s1_backscatter/" class="md-nav__link">
+      <a href="../examples/earthdata/opera_s1_backscatter/" class="md-nav__link">
         
   
   
@@ -6132,7 +5962,7 @@
   <span class="md-ellipsis">
     
   
-    EUMETSAT Data Store
+    CDS / ECMWF
   
 
     
@@ -6148,7 +5978,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    EUMETSAT Data Store
+    CDS / ECMWF
   
 
           </label>
@@ -6161,14 +5991,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../examples/eumetsat/catalog_explorer/" class="md-nav__link">
+      <a href="../examples/ecmwf/cds_quickstart/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Browse the EUMETSAT catalog (no network)
+    CDS quickstart — downloading ERA5 via the facade
   
 
     
@@ -6189,14 +6019,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../examples/eumetsat/output_kinds_and_formats/" class="md-nav__link">
+      <a href="../examples/ecmwf/hydrology_water_balance/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Output kinds &amp; product formats (no network)
+    Hydrology — catchment water balance from ERA5
   
 
     
@@ -6217,14 +6047,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../examples/eumetsat/msg_hrseviri_fetch/" class="md-nav__link">
+      <a href="../examples/ecmwf/oceanography_sst_sea_ice/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    MSG SEVIRI L1.5 full-disk imagery
+    Oceanography — North Atlantic SST and sea-ice cover
   
 
     
@@ -6245,14 +6075,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../examples/eumetsat/sentinel3_olci_ocean_colour/" class="md-nav__link">
+      <a href="../examples/ecmwf/atmosphere_pressure_levels/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Sentinel-3 OLCI L2 ocean colour
+    Atmosphere — pressure-level temperature &amp; jet-stream wind
   
 
     
@@ -6273,14 +6103,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../examples/eumetsat/sentinel5p_no2/" class="md-nav__link">
+      <a href="../examples/ecmwf/agriculture_crop_water/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Sentinel-5P TROPOMI NO2
+    Agriculture — crop water demand and soil moisture
   
 
     
@@ -6301,14 +6131,154 @@
   
   
     <li class="md-nav__item">
-      <a href="../../examples/eumetsat/metop_ascat_soil_moisture/" class="md-nav__link">
+      <a href="../examples/ecmwf/solar_resource_assessment/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Metop ASCAT soil moisture
+    Solar — PV resource assessment from ERA5
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/ecmwf/wind_energy_resource/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Wind energy — hub-height wind resource
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/ecmwf/snow_cryosphere_winter/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Snow &amp; cryosphere — Alpine winter snowpack
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/ecmwf/heat_waves_public_health/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Heat waves &amp; public health — apparent temperature
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/ecmwf/climate_change_anomalies/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Climate change — temperature anomalies vs a baseline
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/ecmwf/drought_precipitation_deficit/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Drought monitoring — SPI from monthly precipitation
   
 
     
@@ -6358,7 +6328,7 @@
   <span class="md-ellipsis">
     
   
-    Seismic events (FDSN)
+    EUMETSAT Data Store
   
 
     
@@ -6374,7 +6344,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    Seismic events (FDSN)
+    EUMETSAT Data Store
   
 
           </label>
@@ -6387,14 +6357,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../examples/fdsn/quickstart/" class="md-nav__link">
+      <a href="../examples/eumetsat/catalog_explorer/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    FDSN quickstart — recent earthquakes
+    Browse the EUMETSAT catalog (no network)
   
 
     
@@ -6415,14 +6385,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../examples/fdsn/global_seismicity_map/" class="md-nav__link">
+      <a href="../examples/eumetsat/output_kinds_and_formats/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Global seismicity map — one year of M5+
+    Output kinds &amp; product formats (no network)
   
 
     
@@ -6443,14 +6413,98 @@
   
   
     <li class="md-nav__item">
-      <a href="../../examples/fdsn/regional_sequence/" class="md-nav__link">
+      <a href="../examples/eumetsat/msg_hrseviri_fetch/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Regional aftershock sequence
+    MSG SEVIRI L1.5 full-disk imagery
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/eumetsat/sentinel3_olci_ocean_colour/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sentinel-3 OLCI L2 ocean colour
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/eumetsat/sentinel5p_no2/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sentinel-5P TROPOMI NO2
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/eumetsat/metop_ascat_soil_moisture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Metop ASCAT soil moisture
   
 
     
@@ -6500,7 +6554,7 @@
   <span class="md-ellipsis">
     
   
-    Google Earth Engine
+    Seismic events (FDSN)
   
 
     
@@ -6516,7 +6570,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    Google Earth Engine
+    Seismic events (FDSN)
   
 
           </label>
@@ -6529,14 +6583,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../examples/gee/quickstart/" class="md-nav__link">
+      <a href="../examples/fdsn/quickstart/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Quick start — Earth Engine via the facade
+    FDSN quickstart — recent earthquakes
   
 
     
@@ -6557,14 +6611,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../examples/gee/atmosphere-chemistry/" class="md-nav__link">
+      <a href="../examples/fdsn/global_seismicity_map/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Atmosphere &amp; chemistry — Sentinel-5P NO2
+    Global seismicity map — one year of M5+
   
 
     
@@ -6585,266 +6639,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../examples/gee/climate-reanalysis/" class="md-nav__link">
+      <a href="../examples/fdsn/regional_sequence/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Climate reanalysis — ERA5-Land monthly 2 m temperature
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../examples/gee/community/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Community — Planet NICFI 2024 basemap
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../examples/gee/elevation-terrain/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Elevation &amp; terrain — SRTM 30 m
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../examples/gee/hydrology-water/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Hydrology &amp; water — JRC Global Surface Water (v1.4)
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../examples/gee/land-cover-change/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Land cover &amp; change — ESA WorldCover v200 (2021)
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../examples/gee/optical-multispectral/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Optical / multispectral — Sentinel-2 SR Harmonized
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../examples/gee/other/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Other — CIESIN GPWv4 population density
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../examples/gee/precipitation/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Precipitation — CHIRPS daily rainfall
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../examples/gee/sar-radar/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    SAR / radar — Sentinel-1 GRD VV backscatter
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../examples/gee/track-batch-exports/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Tracking asynchronous Earth Engine exports
+    Regional aftershock sequence
   
 
     
@@ -6894,7 +6696,7 @@
   <span class="md-ellipsis">
     
   
-    Satellite imagery (STAC)
+    Google Earth Engine
   
 
     
@@ -6910,7 +6712,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    Satellite imagery (STAC)
+    Google Earth Engine
   
 
           </label>
@@ -6923,14 +6725,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../examples/stac/quickstart/" class="md-nav__link">
+      <a href="../examples/gee/quickstart/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    STAC quickstart — Sentinel-2 COGs from Earth Search
+    Quick start — Earth Engine via the facade
   
 
     
@@ -6951,14 +6753,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../examples/stac/sentinel2_ndvi_timeseries/" class="md-nav__link">
+      <a href="../examples/gee/atmosphere-chemistry/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Sentinel-2 monthly NDVI time-series (Earth Search)
+    Atmosphere &amp; chemistry — Sentinel-5P NO2
   
 
     
@@ -6979,14 +6781,266 @@
   
   
     <li class="md-nav__item">
-      <a href="../../examples/stac/mpc_landsat_cdse_sentinel_same_aoi/" class="md-nav__link">
+      <a href="../examples/gee/climate-reanalysis/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Same AOI across providers: MPC + CDSE
+    Climate reanalysis — ERA5-Land monthly 2 m temperature
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/gee/community/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Community — Planet NICFI 2024 basemap
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/gee/elevation-terrain/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Elevation &amp; terrain — SRTM 30 m
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/gee/hydrology-water/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Hydrology &amp; water — JRC Global Surface Water (v1.4)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/gee/land-cover-change/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Land cover &amp; change — ESA WorldCover v200 (2021)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/gee/optical-multispectral/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Optical / multispectral — Sentinel-2 SR Harmonized
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/gee/other/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Other — CIESIN GPWv4 population density
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/gee/precipitation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Precipitation — CHIRPS daily rainfall
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/gee/sar-radar/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SAR / radar — Sentinel-1 GRD VV backscatter
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/gee/track-batch-exports/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tracking asynchronous Earth Engine exports
   
 
     
@@ -7036,7 +7090,7 @@
   <span class="md-ellipsis">
     
   
-    Disaster alerts (GDACS)
+    Satellite imagery (STAC)
   
 
     
@@ -7052,7 +7106,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    Disaster alerts (GDACS)
+    Satellite imagery (STAC)
   
 
           </label>
@@ -7065,14 +7119,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../examples/gdacs/quickstart/" class="md-nav__link">
+      <a href="../examples/stac/quickstart/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    GDACS quickstart — recent disaster alerts
+    STAC quickstart — Sentinel-2 COGs from Earth Search
   
 
     
@@ -7093,14 +7147,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../examples/gdacs/global_hazard_dashboard/" class="md-nav__link">
+      <a href="../examples/stac/sentinel2_ndvi_timeseries/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    GDACS global hazard dashboard
+    Sentinel-2 monthly NDVI time-series (Earth Search)
   
 
     
@@ -7121,42 +7175,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../examples/gdacs/eq_tc_overlay/" class="md-nav__link">
+      <a href="../examples/stac/mpc_landsat_cdse_sentinel_same_aoi/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    GDACS earthquakes + tropical cyclones overlay
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../examples/gdacs/country_hazard_profile/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    GDACS country hazard profile
+    Same AOI across providers: MPC + CDSE
   
 
     
@@ -7206,7 +7232,7 @@
   <span class="md-ellipsis">
     
   
-    Air quality (OpenAQ)
+    Disaster alerts (GDACS)
   
 
     
@@ -7222,7 +7248,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    Air quality (OpenAQ)
+    Disaster alerts (GDACS)
   
 
           </label>
@@ -7235,14 +7261,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../examples/openaq/quickstart/" class="md-nav__link">
+      <a href="../examples/gdacs/quickstart/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    OpenAQ quickstart — PM2.5 over a city
+    GDACS quickstart — recent disaster alerts
   
 
     
@@ -7263,14 +7289,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../examples/openaq/pm25_city_timeseries/" class="md-nav__link">
+      <a href="../examples/gdacs/global_hazard_dashboard/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    PM2.5 city time-series vs. the WHO guideline
+    GDACS global hazard dashboard
   
 
     
@@ -7291,14 +7317,42 @@
   
   
     <li class="md-nav__item">
-      <a href="../../examples/openaq/multistation_comparison/" class="md-nav__link">
+      <a href="../examples/gdacs/eq_tc_overlay/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Multi-station NO2 — the traffic diurnal cycle
+    GDACS earthquakes + tropical cyclones overlay
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/gdacs/country_hazard_profile/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GDACS country hazard profile
   
 
     
@@ -7348,7 +7402,7 @@
   <span class="md-ellipsis">
     
   
-    Server-side processing (openEO)
+    Air quality (OpenAQ)
   
 
     
@@ -7364,7 +7418,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    Server-side processing (openEO)
+    Air quality (OpenAQ)
   
 
           </label>
@@ -7377,14 +7431,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../examples/openeo/catalog_explorer/" class="md-nav__link">
+      <a href="../examples/openaq/quickstart/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    openEO catalog explorer (no network, no auth)
+    OpenAQ quickstart — PM2.5 over a city
   
 
     
@@ -7405,14 +7459,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../examples/openeo/quickstart/" class="md-nav__link">
+      <a href="../examples/openaq/pm25_city_timeseries/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Quick start - Sentinel-2 NDVI monthly via openEO
+    PM2.5 city time-series vs. the WHO guideline
   
 
     
@@ -7433,98 +7487,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../examples/openeo/cloud_masked_composite/" class="md-nav__link">
+      <a href="../examples/openaq/multistation_comparison/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Sentinel-2 cloud-masked median composite via openEO
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../examples/openeo/server_side_aggregate/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Server-side temporal aggregation with
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../examples/openeo/air_quality_no2_monthly/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Air quality - Sentinel-5P NO2 monthly mean via openEO
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../examples/openeo/ocean_chlorophyll_monthly/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Ocean colour - Sentinel-3 OLCI chlorophyll monthly via openEO
+    Multi-station NO2 — the traffic diurnal cycle
   
 
     
@@ -7574,7 +7544,7 @@
   <span class="md-ellipsis">
     
   
-    Server-side render (Sentinel Hub)
+    Server-side processing (openEO)
   
 
     
@@ -7590,7 +7560,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    Server-side render (Sentinel Hub)
+    Server-side processing (openEO)
   
 
           </label>
@@ -7603,14 +7573,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../examples/sentinel-hub/catalog_explorer/" class="md-nav__link">
+      <a href="../examples/openeo/catalog_explorer/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Catalog explorer (no network)
+    openEO catalog explorer (no network, no auth)
   
 
     
@@ -7631,14 +7601,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../examples/sentinel-hub/quickstart_ndvi/" class="md-nav__link">
+      <a href="../examples/openeo/quickstart/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Quick start — Sentinel-2 NDVI (Process API)
+    Quick start - Sentinel-2 NDVI monthly via openEO
   
 
     
@@ -7659,14 +7629,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../examples/sentinel-hub/true_colour/" class="md-nav__link">
+      <a href="../examples/openeo/cloud_masked_composite/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    True-colour composite (Process API)
+    Sentinel-2 cloud-masked median composite via openEO
   
 
     
@@ -7687,14 +7657,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../examples/sentinel-hub/custom_evalscript/" class="md-nav__link">
+      <a href="../examples/openeo/server_side_aggregate/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Custom inline evalscript
+    Server-side temporal aggregation with
   
 
     
@@ -7715,14 +7685,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../examples/sentinel-hub/local_tiling/" class="md-nav__link">
+      <a href="../examples/openeo/air_quality_no2_monthly/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Oversized AOI — local tiling + mosaic
+    Air quality - Sentinel-5P NO2 monthly mean via openEO
   
 
     
@@ -7743,70 +7713,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../examples/sentinel-hub/statistical_zonal_stats/" class="md-nav__link">
+      <a href="../examples/openeo/ocean_chlorophyll_monthly/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Statistical API — zonal NDVI stats over a polygon
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../examples/sentinel-hub/aggregate_monthly/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Windowed — a monthly NDVI series
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../examples/sentinel-hub/batch_walkthrough/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Batch Processing walkthrough (S3)
+    Ocean colour - Sentinel-3 OLCI chlorophyll monthly via openEO
   
 
     
@@ -7856,7 +7770,7 @@
   <span class="md-ellipsis">
     
   
-    Tropical cyclones (Tropycal)
+    Server-side render (Sentinel Hub)
   
 
     
@@ -7872,7 +7786,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    Tropical cyclones (Tropycal)
+    Server-side render (Sentinel Hub)
   
 
           </label>
@@ -7885,14 +7799,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../examples/tropycal/quickstart/" class="md-nav__link">
+      <a href="../examples/sentinel-hub/catalog_explorer/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Tropycal quickstart — one Atlantic season
+    Catalog explorer (no network)
   
 
     
@@ -7913,14 +7827,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../examples/tropycal/season_track_map/" class="md-nav__link">
+      <a href="../examples/sentinel-hub/quickstart_ndvi/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Season track map — one basin, one season
+    Quick start — Sentinel-2 NDVI (Process API)
   
 
     
@@ -7941,14 +7855,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../examples/tropycal/landfall_density/" class="md-nav__link">
+      <a href="../examples/sentinel-hub/true_colour/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Multi-decade landfall density
+    True-colour composite (Process API)
   
 
     
@@ -7969,14 +7883,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../examples/tropycal/recon_katrina/" class="md-nav__link">
+      <a href="../examples/sentinel-hub/custom_evalscript/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Recon observations — Hurricane Katrina (2005)
+    Custom inline evalscript
   
 
     
@@ -7997,14 +7911,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../examples/tropycal/ships_intensity_forecast/" class="md-nav__link">
+      <a href="../examples/sentinel-hub/local_tiling/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    SHIPS intensity forecast — Hurricane Ian (2022)
+    Oversized AOI — local tiling + mosaic
   
 
     
@@ -8025,14 +7939,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../examples/tropycal/katrina_intensity_timeline/" class="md-nav__link">
+      <a href="../examples/sentinel-hub/statistical_zonal_stats/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Hurricane Katrina — intensity timeline (2005)
+    Statistical API — zonal NDVI stats over a polygon
   
 
     
@@ -8053,14 +7967,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../examples/tropycal/source_comparison/" class="md-nav__link">
+      <a href="../examples/sentinel-hub/aggregate_monthly/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    HURDAT2 vs IBTrACS — source comparison
+    Windowed — a monthly NDVI series
   
 
     
@@ -8081,14 +7995,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../examples/tropycal/multibasin_ace/" class="md-nav__link">
+      <a href="../examples/sentinel-hub/batch_walkthrough/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Multi-basin season — ACE by basin
+    Batch Processing walkthrough (S3)
   
 
     
@@ -8138,7 +8052,7 @@
   <span class="md-ellipsis">
     
   
-    Active fires (FIRMS)
+    Tropical cyclones (Tropycal)
   
 
     
@@ -8154,7 +8068,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    Active fires (FIRMS)
+    Tropical cyclones (Tropycal)
   
 
           </label>
@@ -8167,14 +8081,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../examples/firms/quickstart/" class="md-nav__link">
+      <a href="../examples/tropycal/quickstart/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    FIRMS quickstart — recent active fires
+    Tropycal quickstart — one Atlantic season
   
 
     
@@ -8195,14 +8109,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../examples/firms/fire_season_timeseries/" class="md-nav__link">
+      <a href="../examples/tropycal/season_track_map/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    FIRMS — fire-season time-series
+    Season track map — one basin, one season
   
 
     
@@ -8223,14 +8137,154 @@
   
   
     <li class="md-nav__item">
-      <a href="../../examples/firms/modis_vs_viirs_comparison/" class="md-nav__link">
+      <a href="../examples/tropycal/landfall_density/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    FIRMS — MODIS vs VIIRS
+    Multi-decade landfall density
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/tropycal/recon_katrina/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Recon observations — Hurricane Katrina (2005)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/tropycal/ships_intensity_forecast/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SHIPS intensity forecast — Hurricane Ian (2022)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/tropycal/katrina_intensity_timeline/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Hurricane Katrina — intensity timeline (2005)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/tropycal/source_comparison/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    HURDAT2 vs IBTrACS — source comparison
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/tropycal/multibasin_ace/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Multi-basin season — ACE by basin
   
 
     
@@ -8280,7 +8334,7 @@
   <span class="md-ellipsis">
     
   
-    Humanitarian data (HDX)
+    Active fires (FIRMS)
   
 
     
@@ -8296,7 +8350,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    Humanitarian data (HDX)
+    Active fires (FIRMS)
   
 
           </label>
@@ -8309,14 +8363,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../examples/hdx/catalog_explorer/" class="md-nav__link">
+      <a href="../examples/firms/quickstart/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    HDX catalog explorer (no network)
+    FIRMS quickstart — recent active fires
   
 
     
@@ -8337,14 +8391,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../examples/hdx/wfp_food_security_table/" class="md-nav__link">
+      <a href="../examples/firms/fire_season_timeseries/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    WFP topline figures (tabular CSV)
+    FIRMS — fire-season time-series
   
 
     
@@ -8365,70 +8419,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../examples/hdx/cod_admin_boundaries/" class="md-nav__link">
+      <a href="../examples/firms/modis_vs_viirs_comparison/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Administrative boundaries (OCHA COD-AB)
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../examples/hdx/hotosm_building_export/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    HOTOSM OpenStreetMap export (buildings)
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../examples/hdx/arbitrary_hdx_id/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Fetch any HDX dataset by id (escape hatch)
+    FIRMS — MODIS vs VIIRS
   
 
     
@@ -8478,7 +8476,7 @@
   <span class="md-ellipsis">
     
   
-    Overture Maps (vector basemap)
+    Humanitarian data (HDX)
   
 
     
@@ -8494,7 +8492,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    Overture Maps (vector basemap)
+    Humanitarian data (HDX)
   
 
           </label>
@@ -8507,14 +8505,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../examples/overture/01_catalog_explorer/" class="md-nav__link">
+      <a href="../examples/hdx/catalog_explorer/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Overture — browse the catalog (no network)
+    HDX catalog explorer (no network)
   
 
     
@@ -8535,14 +8533,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../examples/overture/02_places_quickstart/" class="md-nav__link">
+      <a href="../examples/hdx/wfp_food_security_table/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Overture — Places quickstart (live)
+    WFP topline figures (tabular CSV)
   
 
     
@@ -8563,14 +8561,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../examples/overture/03_buildings_footprints/" class="md-nav__link">
+      <a href="../examples/hdx/cod_admin_boundaries/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Overture — Building footprints (live)
+    Administrative boundaries (OCHA COD-AB)
   
 
     
@@ -8591,14 +8589,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../examples/overture/04_per_row_licensing/" class="md-nav__link">
+      <a href="../examples/hdx/hotosm_building_export/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Overture — per-row licensing (live)
+    HOTOSM OpenStreetMap export (buildings)
   
 
     
@@ -8619,70 +8617,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../examples/overture/05_transportation_network/" class="md-nav__link">
+      <a href="../examples/hdx/arbitrary_hdx_id/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Overture — Transportation network (live)
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../examples/overture/06_multi_theme_download/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Overture — multi-theme download (live)
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../examples/overture/07_attribute_pushdown/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Overture — attribute pushdown with (live)
+    Fetch any HDX dataset by id (escape hatch)
   
 
     
@@ -8732,7 +8674,7 @@
   <span class="md-ellipsis">
     
   
-    Open NWP forecasts
+    Overture Maps (vector basemap)
   
 
     
@@ -8748,7 +8690,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    Open NWP forecasts
+    Overture Maps (vector basemap)
   
 
           </label>
@@ -8761,14 +8703,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../examples/nwp/catalog_explorer/" class="md-nav__link">
+      <a href="../examples/overture/01_catalog_explorer/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Open NWP forecasts — catalog explorer (no network)
+    Overture — browse the catalog (no network)
   
 
     
@@ -8789,14 +8731,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../examples/nwp/gfs_temperature/" class="md-nav__link">
+      <a href="../examples/overture/02_places_quickstart/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    GFS 2 m temperature — NWP quickstart
+    Overture — Places quickstart (live)
   
 
     
@@ -8817,14 +8759,126 @@
   
   
     <li class="md-nav__item">
-      <a href="../../examples/nwp/icon_precipitation/" class="md-nav__link">
+      <a href="../examples/overture/03_buildings_footprints/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    DWD ICON precipitation — direct-HTTPS fetch
+    Overture — Building footprints (live)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/overture/04_per_row_licensing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overture — per-row licensing (live)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/overture/05_transportation_network/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overture — Transportation network (live)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/overture/06_multi_theme_download/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overture — multi-theme download (live)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/overture/07_attribute_pushdown/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overture — attribute pushdown with (live)
   
 
     
@@ -8874,7 +8928,7 @@
   <span class="md-ellipsis">
     
   
-    NEXRAD radar
+    Open NWP forecasts
   
 
     
@@ -8890,7 +8944,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    NEXRAD radar
+    Open NWP forecasts
   
 
           </label>
@@ -8903,14 +8957,70 @@
   
   
     <li class="md-nav__item">
-      <a href="../../examples/radar/catalog_explorer/" class="md-nav__link">
+      <a href="../examples/nwp/catalog_explorer/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    NEXRAD radar — catalog explorer (no network)
+    Open NWP forecasts — catalog explorer (no network)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/nwp/gfs_temperature/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GFS 2 m temperature — NWP quickstart
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/nwp/icon_precipitation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    DWD ICON precipitation — direct-HTTPS fetch
   
 
     
@@ -8960,7 +9070,7 @@
   <span class="md-ellipsis">
     
   
-    USGS Water (NWIS)
+    NEXRAD radar
   
 
     
@@ -8976,7 +9086,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    USGS Water (NWIS)
+    NEXRAD radar
   
 
           </label>
@@ -8989,98 +9099,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../examples/usgs-water/quickstart_daily_discharge/" class="md-nav__link">
+      <a href="../examples/radar/catalog_explorer/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    USGS Water — daily discharge quickstart
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../examples/usgs-water/multi_parameter_and_instantaneous/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    USGS Water — multi-parameter and instantaneous values
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../examples/usgs-water/site_discovery_and_statistics/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    USGS Water — site discovery, statistics, and Parquet
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../examples/usgs-water/peaks_and_ratings/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    USGS Water — annual peaks and rating curves
+    NEXRAD radar — catalog explorer (no network)
   
 
     
@@ -9130,7 +9156,7 @@
   <span class="md-ellipsis">
     
   
-    GHSL (human settlement)
+    USGS Water (NWIS)
   
 
     
@@ -9146,7 +9172,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    GHSL (human settlement)
+    USGS Water (NWIS)
   
 
           </label>
@@ -9159,14 +9185,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../examples/ghsl/01_catalog_explorer/" class="md-nav__link">
+      <a href="../examples/usgs-water/quickstart_daily_discharge/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    GHSL — catalog explorer
+    USGS Water — daily discharge quickstart
   
 
     
@@ -9187,14 +9213,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../examples/ghsl/02_population_quickstart/" class="md-nav__link">
+      <a href="../examples/usgs-water/multi_parameter_and_instantaneous/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    GHSL — population quickstart
+    USGS Water — multi-parameter and instantaneous values
   
 
     
@@ -9215,14 +9241,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../examples/ghsl/03_builtup_surface/" class="md-nav__link">
+      <a href="../examples/usgs-water/site_discovery_and_statistics/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    GHSL — built-up surface
+    USGS Water — site discovery, statistics, and Parquet
   
 
     
@@ -9243,98 +9269,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../examples/ghsl/04_builtup_growth/" class="md-nav__link">
+      <a href="../examples/usgs-water/peaks_and_ratings/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    GHSL — built-up growth (multi-epoch + aggregate)
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../examples/ghsl/05_building_height/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    GHSL — building height
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../examples/ghsl/06_settlement_classes/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    GHSL — settlement classes (GHS-SMOD)
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../examples/ghsl/07_wup_projection/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    GHSL — population projection to 2100 (GHS-WUP, R2025A)
+    USGS Water — annual peaks and rating curves
   
 
     
@@ -9384,7 +9326,7 @@
   <span class="md-ellipsis">
     
   
-    WorldPop (population)
+    GHSL (human settlement)
   
 
     
@@ -9397,6 +9339,260 @@
         
         <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_24_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_4_24">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    GHSL (human settlement)
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/ghsl/01_catalog_explorer/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GHSL — catalog explorer
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/ghsl/02_population_quickstart/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GHSL — population quickstart
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/ghsl/03_builtup_surface/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GHSL — built-up surface
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/ghsl/04_builtup_growth/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GHSL — built-up growth (multi-epoch + aggregate)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/ghsl/05_building_height/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GHSL — building height
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/ghsl/06_settlement_classes/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GHSL — settlement classes (GHS-SMOD)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/ghsl/07_wup_projection/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GHSL — population projection to 2100 (GHS-WUP, R2025A)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_25" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_25" id="__nav_4_25_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    WorldPop (population)
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_25_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_25">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -9413,7 +9609,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../examples/worldpop/01_catalog_explorer/" class="md-nav__link">
+      <a href="../examples/worldpop/01_catalog_explorer/" class="md-nav__link">
         
   
   
@@ -9441,7 +9637,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../examples/worldpop/02_population_quickstart/" class="md-nav__link">
+      <a href="../examples/worldpop/02_population_quickstart/" class="md-nav__link">
         
   
   
@@ -9469,7 +9665,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../examples/worldpop/03_constrained_vs_unconstrained/" class="md-nav__link">
+      <a href="../examples/worldpop/03_constrained_vs_unconstrained/" class="md-nav__link">
         
   
   
@@ -9497,7 +9693,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../examples/worldpop/04_age_sex_pyramid/" class="md-nav__link">
+      <a href="../examples/worldpop/04_age_sex_pyramid/" class="md-nav__link">
         
   
   
@@ -9525,7 +9721,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../examples/worldpop/05_multicountry_mosaic/" class="md-nav__link">
+      <a href="../examples/worldpop/05_multicountry_mosaic/" class="md-nav__link">
         
   
   
@@ -9553,7 +9749,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../examples/worldpop/06_multiyear_aggregate/" class="md-nav__link">
+      <a href="../examples/worldpop/06_multiyear_aggregate/" class="md-nav__link">
         
   
   
@@ -9581,7 +9777,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../examples/worldpop/07_covariates_nightlights/" class="md-nav__link">
+      <a href="../examples/worldpop/07_covariates_nightlights/" class="md-nav__link">
         
   
   
@@ -9609,7 +9805,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../examples/worldpop/08_dependency_ratios/" class="md-nav__link">
+      <a href="../examples/worldpop/08_dependency_ratios/" class="md-nav__link">
         
   
   
@@ -9637,7 +9833,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../examples/worldpop/09_global_mosaic/" class="md-nav__link">
+      <a href="../examples/worldpop/09_global_mosaic/" class="md-nav__link">
         
   
   
@@ -9730,7 +9926,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../earthlens/" class="md-nav__link">
+      <a href="../reference/earthlens/" class="md-nav__link">
         
   
   
@@ -9758,7 +9954,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../abstract-datasource/" class="md-nav__link">
+      <a href="../reference/abstract-datasource/" class="md-nav__link">
         
   
   
@@ -9843,7 +10039,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../change-log/" class="md-nav__link">
+      <a href="../change-log/" class="md-nav__link">
         
   
   
@@ -9851,6 +10047,34 @@
     
   
     Change Log
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../LICENSE/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    License
   
 
     
@@ -10135,7 +10359,7 @@
 
 
   
-    <a href="https://github.com/serapeum-org/earthlens/edit/master/docs/reference/aggregation.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
+    <a href="https://github.com/serapeum-org/earthlens/edit/master/docs/aggregation.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
     </a>
@@ -10144,7 +10368,7 @@
     
       
     
-    <a href="https://github.com/serapeum-org/earthlens/raw/master/docs/reference/aggregation.md" title="View source of this page" class="md-content__button md-icon">
+    <a href="https://github.com/serapeum-org/earthlens/raw/master/docs/aggregation.md" title="View source of this page" class="md-content__button md-icon">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 18c.56 0 1 .44 1 1s-.44 1-1 1-1-.44-1-1 .44-1 1-1m0-3c-2.73 0-5.06 1.66-6 4 .94 2.34 3.27 4 6 4s5.06-1.66 6-4c-.94-2.34-3.27-4-6-4m0 6.5a2.5 2.5 0 0 1-2.5-2.5 2.5 2.5 0 0 1 2.5-2.5 2.5 2.5 0 0 1 2.5 2.5 2.5 2.5 0 0 1-2.5 2.5M9.27 20H6V4h7v5h5v4.07c.7.08 1.36.25 2 .49V8l-6-6H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h4.5a8.2 8.2 0 0 1-1.23-2"/></svg>
     </a>
@@ -10613,7 +10837,7 @@ the full list.</p>
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
           
-          <a href="../ecmwf/catalog/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Catalog &amp; Probes">
+          <a href="../overview/architecture/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Architecture">
             <div class="md-footer__button md-icon">
               
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
@@ -10623,20 +10847,20 @@ the full list.</p>
                 Previous
               </span>
               <div class="md-ellipsis">
-                Catalog & Probes
+                Architecture
               </div>
             </div>
           </a>
         
         
           
-          <a href="../eumetsat/introduction/" class="md-footer__link md-footer__link--next" aria-label="Next: Introduction">
+          <a href="../reference/providers/" class="md-footer__link md-footer__link--next" aria-label="Next: Supported providers">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                Introduction
+                Supported providers
               </div>
             </div>
             <div class="md-footer__button md-icon">
@@ -10689,14 +10913,14 @@ the full list.</p>
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.footer", "navigation.tabs", "navigation.tabs.sticky", "navigation.top", "content.code.copy", "content.code.annotate", "content.action.edit", "content.action.view", "content.tooltips", "search.highlight", "search.suggest", "toc.follow", "announce.dismiss"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.instant", "navigation.tracking", "navigation.footer", "navigation.tabs", "navigation.tabs.sticky", "navigation.top", "content.code.copy", "content.code.annotate", "content.action.edit", "content.action.view", "content.tooltips", "search.highlight", "search.suggest", "toc.follow", "announce.dismiss"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
     
     
-      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
       
-        <script src="../../assets/javascripts/panzoom.min.js"></script>
+        <script src="../assets/javascripts/panzoom.min.js"></script>
       
-        <script src="../../assets/javascripts/zoompan.js"></script>
+        <script src="../assets/javascripts/zoompan.js"></script>
       
     
   </body>
