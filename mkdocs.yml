@@ -243,18 +243,6 @@ nav:
       - Copernicus DEM — download & crop: examples/s3/02_copernicus_dem.ipynb
       - ESA WorldCover — land cover: examples/s3/03_esa_worldcover.ipynb
       - Passthrough — any public bucket: examples/s3/04_passthrough.ipynb
-    - CDS / ECMWF:
-      - Quickstart: examples/ecmwf/cds_quickstart.ipynb
-      - Hydrology — water balance: examples/ecmwf/hydrology_water_balance.ipynb
-      - Oceanography — SST & sea ice: examples/ecmwf/oceanography_sst_sea_ice.ipynb
-      - Atmosphere — pressure levels: examples/ecmwf/atmosphere_pressure_levels.ipynb
-      - Agriculture — crop water demand: examples/ecmwf/agriculture_crop_water.ipynb
-      - Solar — PV resource assessment: examples/ecmwf/solar_resource_assessment.ipynb
-      - Wind — hub-height resource: examples/ecmwf/wind_energy_resource.ipynb
-      - Snow & cryosphere — winter snowpack: examples/ecmwf/snow_cryosphere_winter.ipynb
-      - Heat waves — public health: examples/ecmwf/heat_waves_public_health.ipynb
-      - Climate change — temperature anomalies: examples/ecmwf/climate_change_anomalies.ipynb
-      - Drought — SPI from precipitation: examples/ecmwf/drought_precipitation_deficit.ipynb
     - Copernicus Marine:
       - Catalog explorer (no network): examples/cmems/catalog_explorer.ipynb
       - Quickstart — OSTIA SST: examples/cmems/quickstart.ipynb
@@ -272,6 +260,18 @@ nav:
       - PACE ocean-colour chlorophyll (live): examples/earthdata/pace_ocean_colour.ipynb
       - SMAP soil moisture (live): examples/earthdata/smap_soil_moisture.ipynb
       - OPERA Sentinel-1 SAR backscatter (live): examples/earthdata/opera_s1_backscatter.ipynb
+    - CDS / ECMWF:
+      - Quickstart: examples/ecmwf/cds_quickstart.ipynb
+      - Hydrology — water balance: examples/ecmwf/hydrology_water_balance.ipynb
+      - Oceanography — SST & sea ice: examples/ecmwf/oceanography_sst_sea_ice.ipynb
+      - Atmosphere — pressure levels: examples/ecmwf/atmosphere_pressure_levels.ipynb
+      - Agriculture — crop water demand: examples/ecmwf/agriculture_crop_water.ipynb
+      - Solar — PV resource assessment: examples/ecmwf/solar_resource_assessment.ipynb
+      - Wind — hub-height resource: examples/ecmwf/wind_energy_resource.ipynb
+      - Snow & cryosphere — winter snowpack: examples/ecmwf/snow_cryosphere_winter.ipynb
+      - Heat waves — public health: examples/ecmwf/heat_waves_public_health.ipynb
+      - Climate change — temperature anomalies: examples/ecmwf/climate_change_anomalies.ipynb
+      - Drought — SPI from precipitation: examples/ecmwf/drought_precipitation_deficit.ipynb
     - EUMETSAT Data Store:
       - Catalog explorer (no network): examples/eumetsat/catalog_explorer.ipynb
       - Output kinds & formats (no network): examples/eumetsat/output_kinds_and_formats.ipynb
