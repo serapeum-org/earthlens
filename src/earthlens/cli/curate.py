@@ -869,6 +869,151 @@ def _nwp_probe(catalog: Any, dataset: str) -> dict[str, dict[str, Any]]:
     }
 
 
+# --------------------------------------------------------------------------- #
+# Deep probers (the `--deep` half) — credentialed, data-downloading samplers
+# that read the REAL on-disk schema, vs the light public metadata probers
+# above. Each live call sits behind a mockable helper; the credentials come
+# from the environment (copernicusmarine / earthaccess) or ~/.cdsapirc.
+# --------------------------------------------------------------------------- #
+def _cmems_deep_sample(dataset_id: str) -> dict[str, dict[str, Any]]:
+    """Open a CMEMS dataset lazily and read its real NetCDF variables (creds)."""
+    import copernicusmarine
+
+    dataset = copernicusmarine.open_dataset(dataset_id=dataset_id)
+    schema: dict[str, dict[str, Any]] = {}
+    for name, variable in dataset.data_vars.items():
+        attrs = variable.attrs
+        schema[str(name)] = {
+            "units": attrs.get("units"),
+            "standard_name": attrs.get("standard_name"),
+            "long_name": attrs.get("long_name"),
+            "dtype": str(variable.dtype),
+        }
+    return schema
+
+
+def _cmems_deep_probe(catalog: Any, dataset: str) -> dict[str, dict[str, Any]]:
+    """Deep-probe a CMEMS dataset's true NetCDF variable schema (credentialed).
+
+    Unlike the light `describe` prober, this opens the dataset (lazily, no
+    full download) to read the variable names / units / dtype as they
+    actually appear in the served NetCDF. Needs
+    `COPERNICUSMARINE_SERVICE_USERNAME` / `_PASSWORD`.
+    """
+    return _cmems_deep_sample(dataset)
+
+
+def _earthdata_deep_sample(
+    short_name: str, version: str, provider: str
+) -> dict[str, dict[str, Any]]:
+    """Search one recent granule and record its format / output_kind (creds)."""
+    import datetime as dt
+
+    import earthaccess
+
+    from earthlens.cli.stanza import _format_from_extension, _infer_output_kind
+
+    earthaccess.login(strategy="environment")
+    end = dt.datetime.now(dt.UTC)
+    start = end - dt.timedelta(days=30)
+    granules = earthaccess.search_data(
+        short_name=short_name,
+        version=version or None,
+        provider=provider or None,
+        temporal=(start.isoformat(), end.isoformat()),
+        count=1,
+    )
+    if not granules:
+        return {}
+    links = getattr(granules[0], "data_links", list)() or [""]
+    url = links[0]
+    fmt = _format_from_extension(url) or "unknown"
+    name = url.rsplit("/", 1)[-1] or short_name
+    return {
+        name: {
+            "format": fmt,
+            "output_kind": _infer_output_kind(short_name, fmt),
+            "url": url,
+        }
+    }
+
+
+def _earthdata_deep_probe(catalog: Any, dataset: str) -> dict[str, dict[str, Any]]:
+    """Deep-probe an Earthdata collection by sampling a real granule (creds).
+
+    Unlike the light UMM-Var prober, this searches CMR for one recent
+    granule and records its on-disk format + inferred output_kind. Needs
+    `EARTHDATA_USERNAME` / `EARTHDATA_PASSWORD`.
+    """
+    record = catalog.datasets.get(dataset)
+    short_name = getattr(record, "short_name", None) or dataset
+    return _earthdata_deep_sample(
+        short_name,
+        str(getattr(record, "version", "") or ""),
+        str(getattr(record, "provider", "") or ""),
+    )
+
+
+def _ecmwf_deep_sample(dataset: str) -> dict[str, dict[str, Any]]:
+    """Retrieve a tiny CDS NetCDF and read each variable's long_name/units.
+
+    Builds a minimal request from the dataset's first `constraints.json`
+    row, retrieves it via `cdsapi` (`~/.cdsapirc`), and reads the NetCDF.
+    """
+    import tempfile
+    from pathlib import Path
+
+    import cdsapi
+    import netCDF4  # noqa: F401 — the reader below
+
+    rows = _ecmwf_constraints(dataset)
+    if not rows:
+        return {}
+    row = rows[0]
+
+    def first(key: str, fallback: str) -> str:
+        value = row.get(key)
+        return value[0] if isinstance(value, list) and value else fallback
+
+    request: dict[str, Any] = {
+        "variable": first("variable", "2m_temperature"),
+        "year": first("year", "2020"),
+        "month": first("month", "01"),
+        "day": first("day", "01"),
+        "time": first("time", "00:00"),
+        "data_format": "netcdf",
+    }
+    target = Path(tempfile.mkdtemp()) / "probe.nc"
+    cdsapi.Client().retrieve(dataset, request, str(target))
+    with netCDF4.Dataset(str(target)) as handle:  # noqa: F821 — imported above
+        schema: dict[str, dict[str, Any]] = {}
+        for name, variable in handle.variables.items():
+            long_name = getattr(variable, "long_name", "")
+            units = getattr(variable, "units", "")
+            if long_name or units:
+                schema[str(name)] = {"long_name": long_name, "units": units}
+    return schema
+
+
+def _ecmwf_deep_probe(catalog: Any, dataset: str) -> dict[str, dict[str, Any]]:
+    """Deep-probe an ECMWF/CDS dataset by retrieving a tiny NetCDF (creds).
+
+    Unlike the light constraints prober (variable *names* only), this
+    actually retrieves a minimal slice via cdsapi to read each variable's
+    real `long_name` / `units`. Needs `~/.cdsapirc`; the CDS queue can take
+    minutes.
+    """
+    return _ecmwf_deep_sample(dataset)
+
+
+#: Provider id -> a credentialed deep sampler (the `--deep` half of probe).
+_DEEP_PROBERS: dict[str, Callable[[Any, str], dict[str, dict[str, Any]]]] = {
+    "cmems": _cmems_deep_probe,
+    "earthdata": _earthdata_deep_probe,
+    "ecmwf": _ecmwf_deep_probe,
+}
+
+
 #: Provider id -> a callable taking the loaded catalog and a dataset id and
 #: returning its per-entry schema.
 _PROBERS: dict[str, Callable[[Any, str], dict[str, dict[str, Any]]]] = {
@@ -892,8 +1037,13 @@ _PROBERS: dict[str, Callable[[Any, str], dict[str, dict[str, Any]]]] = {
 }
 
 
-def supported_providers() -> list[str]:
+def supported_providers(deep: bool = False) -> list[str]:
     """Return the provider ids that have a curation prober wired up.
+
+    Args:
+        deep: When `True`, include providers that only have a credentialed
+            `--deep` sampler (none currently — every deep provider also has
+            a light prober).
 
     Returns:
         The sorted provider ids `probe` can sample.
@@ -908,29 +1058,38 @@ def supported_providers() -> list[str]:
 
             ```
     """
-    return sorted(_PROBERS)
+    providers = set(_PROBERS)
+    if deep:
+        providers |= set(_DEEP_PROBERS)
+    return sorted(providers)
 
 
-def probe_dataset(info: BackendInfo, dataset: str) -> ProbeResult:
+def probe_dataset(info: BackendInfo, dataset: str, deep: bool = False) -> ProbeResult:
     """Probe one dataset's asset/band schema from a live sample record.
 
-    A provider with no prober returns `"unsupported"`; any fetch / parse
-    failure returns `"error"` — neither raises.
+    With `deep=True` it uses the credentialed heavy sampler (real NetCDF /
+    granule / CDS retrieval) when the provider has one, falling back to the
+    light public prober otherwise. A provider with neither returns
+    `"unsupported"`; any fetch / parse failure returns `"error"` — neither
+    raises.
 
     Args:
         info: The backend the dataset belongs to.
         dataset: The dataset / collection id to probe.
+        deep: Use the credentialed deep sampler when available.
 
     Returns:
         The :class:`ProbeResult`.
     """
-    prober = _PROBERS.get(info.provider)
+    prober = (_DEEP_PROBERS.get(info.provider) if deep else None) or _PROBERS.get(
+        info.provider
+    )
     if prober is None:
         return ProbeResult(
             provider=info.provider,
             dataset=dataset,
             status="unsupported",
-            detail="no public sample endpoint wired up for probing",
+            detail="no sample endpoint wired up for probing",
         )
     try:
         catalog = load_catalog(info)

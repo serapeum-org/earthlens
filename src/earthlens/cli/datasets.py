@@ -542,6 +542,12 @@ def probe(
     dataset: str = typer.Argument(
         ..., help="Dataset / collection id to sample for its band-asset schema."
     ),
+    deep: bool = typer.Option(
+        False,
+        "--deep",
+        help="Use the credentialed heavy sampler (real NetCDF/granule/CDS "
+        "retrieval) where available — cmems / earthdata / ecmwf; needs creds.",
+    ),
     json_output: bool = typer.Option(
         False, "--json", "-j", help="Emit the schema as JSON (for piping)."
     ),
@@ -551,13 +557,15 @@ def probe(
     Like `refresh`, this goes to the **network**: it fetches one sample record
     from the provider and records each asset's media type and band metadata
     (common name, dtype, nodata) — the seed a maintainer reviews before adding
-    the dataset to the curated catalog. Only providers with a public sample
-    endpoint are supported (currently STAC); others report `unsupported`.
+    the dataset to the curated catalog. `--deep` swaps the light public probe
+    for a credentialed sampler that reads the *real* on-disk schema (cmems
+    opens the NetCDF, earthdata samples a granule, ecmwf retrieves via cdsapi);
+    it needs the provider's credentials and can be slow.
     """
     backends = _select_refresh_backends(provider)
     if len(backends) != 1:
         raise typer.BadParameter("probe takes exactly one provider")
-    result = probe_dataset(backends[0], dataset)
+    result = probe_dataset(backends[0], dataset, deep=deep)
 
     if json_output:
         typer.echo(json.dumps(result.to_dict(), indent=2))

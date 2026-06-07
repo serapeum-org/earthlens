@@ -428,6 +428,54 @@ class TestNwpProbe:
         assert result.status == "error" and "no .idx" in result.detail
 
 
+class TestDeepProbers:
+    """Tests for the credentialed `--deep` samplers (creds/network mocked)."""
+
+    def test_cmems_deep_reads_netcdf_vars(self, monkeypatch):
+        """cmems --deep reads the real NetCDF variable schema."""
+        monkeypatch.setattr(
+            curate_mod,
+            "_cmems_deep_sample",
+            lambda dsid: {"thetao": {"units": "degC", "dtype": "float32"}},
+        )
+        result = probe_dataset(_info("cmems"), "cmems_mod_glo_phy", deep=True)
+        assert result.status == "ok", "cmems deep probe ran"
+        assert result.assets["thetao"]["units"] == "degC", "real var units read"
+
+    def test_earthdata_deep_samples_granule(self, monkeypatch):
+        """earthdata --deep records a sampled granule's format."""
+        from earthlens.cli.adapter import load_catalog
+
+        monkeypatch.setattr(
+            curate_mod,
+            "_earthdata_deep_sample",
+            lambda sn, v, p: {"g.nc4": {"format": "netcdf4", "output_kind": "raster"}},
+        )
+        dataset = next(iter(load_catalog(_info("earthdata")).datasets))
+        result = probe_dataset(_info("earthdata"), dataset, deep=True)
+        assert result.status == "ok", "earthdata deep probe ran"
+        assert result.assets["g.nc4"]["format"] == "netcdf4", "granule format read"
+
+    def test_ecmwf_deep_reads_retrieved_netcdf(self, monkeypatch):
+        """ecmwf --deep reads long_name/units from a retrieved NetCDF."""
+        monkeypatch.setattr(
+            curate_mod,
+            "_ecmwf_deep_sample",
+            lambda d: {"t2m": {"long_name": "2 metre temperature", "units": "K"}},
+        )
+        result = probe_dataset(
+            _info("ecmwf"), "reanalysis-era5-single-levels", deep=True
+        )
+        assert result.status == "ok", "ecmwf deep probe ran"
+        assert result.assets["t2m"]["units"] == "K", "retrieved var units read"
+
+    def test_deep_falls_back_to_light_prober(self, monkeypatch):
+        """--deep on a provider with no deep sampler uses the light prober."""
+        monkeypatch.setattr(curate_mod, "_get_json", lambda url: _SAMPLE_ITEM)
+        result = probe_dataset(_info("stac"), "sentinel-2-l2a", deep=True)
+        assert result.status == "ok", "stac --deep fell back to the light prober"
+
+
 class TestProbeResult:
     """Tests for ProbeResult."""
 

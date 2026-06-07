@@ -258,15 +258,21 @@ class TestRefresh:
 
     def test_tiles_regenerates_ghsl_geojson(self, tmp_path, monkeypatch):
         """--tiles regenerates the GHSL tile artefact and reports it (mocked)."""
-        import earthlens.ghsl._helpers as ghsl_helpers
         import geopandas as gpd
         from shapely.geometry import box
 
+        import earthlens.ghsl._helpers as ghsl_helpers
         from earthlens.cli import refresh as refresh_mod
 
         frame = gpd.GeoDataFrame(
-            {"tile_id": ["R1_C1"], "left": [0], "top": [1], "right": [1],
-             "bottom": [0], "geometry": [box(0, 0, 1, 1)]},
+            {
+                "tile_id": ["R1_C1"],
+                "left": [0],
+                "top": [1],
+                "right": [1],
+                "bottom": [0],
+                "geometry": [box(0, 0, 1, 1)],
+            },
             crs="ESRI:54009",
         )
         monkeypatch.setattr(refresh_mod, "_ghsl_tile_frame", lambda: frame)
@@ -429,6 +435,27 @@ class TestProbe:
             }
         ]
     }
+
+    def test_deep_flag_routes_to_credentialed_sampler(self, monkeypatch):
+        """probe --deep uses the deep sampler (creds mocked)."""
+        from earthlens.cli import curate as curate_mod
+
+        monkeypatch.setattr(
+            curate_mod, "_ecmwf_deep_sample", lambda d: {"t2m": {"units": "K"}}
+        )
+        result = runner.invoke(
+            app,
+            [
+                "datasets",
+                "probe",
+                "ecmwf",
+                "reanalysis-era5-single-levels",
+                "--deep",
+                "--json",
+            ],
+        )
+        payload = json.loads(result.output)
+        assert payload["status"] == "ok" and payload["assets"]["t2m"]["units"] == "K"
 
     def test_unsupported_provider_exits_nonzero(self):
         """A provider with no prober reports unsupported and exits 1."""
