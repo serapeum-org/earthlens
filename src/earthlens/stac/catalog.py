@@ -39,7 +39,9 @@ CATALOG_PATH: Path = Path(__file__).parent / "catalog"
 # Mirrors the GEE / CMEMS multi-file caches.
 _CATALOG_CACHE: dict[Any, tuple[dict[str, "Endpoint"], dict[str, list[str]], dict[str, "Collection"]]] = {}
 
-SignerType = Literal["anonymous", "aws-requester-pays", "mpc-sas", "cdse-s3"]
+SignerType = Literal[
+    "anonymous", "aws-requester-pays", "mpc-sas", "earthdata", "cdse", "cdse-s3"
+]
 
 
 def clear_catalog_cache() -> None:

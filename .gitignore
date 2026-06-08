@@ -158,14 +158,13 @@ planning/
 # GEE STAC catalog tool cache (tools/gee/audit_gee_datasets.py)
 tools/gee/_gee_stac_cache/
 
-# CHC tool runtime caches (audit + refresh probes)
-tools/chc/_audit_cache.json
-tools/chc/_discovered_paths.json
-
 # Per-notebook data + outputs under docs/examples/* — checked-in
 # notebooks reference these but the actual binary blobs (era5 .tif /
 # .nc, GEE export tifs) are reproduced on demand by running the
 # notebooks against live services. They must NOT enter git.
+# Pyramids reprojection test scratch (reproduced on demand by the tests)
+tests/data/netcdf/era5_repro_pyramids_*
+
 docs/examples/ecmwf/data/
 docs/examples/gee/out/
 docs/examples/cmems/data/

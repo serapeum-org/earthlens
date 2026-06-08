@@ -27,19 +27,20 @@ unknown id, matching the other backends' catalogs.
 
 ## Tooling
 
-Two scripts under `tools/radar/` keep the catalog honest:
+Two `earthlens datasets` verbs keep the catalog honest:
 
-| Tool | Purpose |
-|------|---------|
-| `refresh_radar_catalog.py` | Regenerate `radar_data_catalog.yaml` from NOAA HOMR's authoritative [`nexrad-stations.txt`](https://www.ncei.noaa.gov/access/homr/file/nexrad-stations.txt) (fixed-width parse; ICAO / name / state / lat / lon). |
-| `audit_radar_catalog.py` | Cross-check the catalog against the **live** chunk feed — reports `streaming` / `idle` / `uncatalogued` sites (a liveness snapshot, not a correctness check). |
+| Command | Purpose |
+|---------|---------|
+| `refresh radar --write` | Regenerate `radar_data_catalog.yaml` from NOAA HOMR's authoritative [`nexrad-stations.txt`](https://www.ncei.noaa.gov/access/homr/file/nexrad-stations.txt) (fixed-width parse; ICAO / name / state / lat / lon). |
+| `validate radar --live` | Cross-check the catalog against the **live** chunk feed — flags an unreachable / empty feed, or an id-format mismatch (the feed is non-empty but no catalogued station is in it). |
 
 ```bash
-pixi run -e dev python tools/radar/refresh_radar_catalog.py          # rewrite the catalog
-pixi run -e dev python tools/radar/refresh_radar_catalog.py --dry-run
-pixi run -e dev python tools/radar/audit_radar_catalog.py            # live coverage snapshot
+earthlens datasets refresh radar           # diff the catalog against live HOMR
+earthlens datasets refresh radar --write    # rewrite the catalog
+earthlens datasets validate radar --live    # confirm the real-time feed is reachable
 ```
 
-Because the feed is a rolling ~1–2 h buffer, the audit's `idle` bucket is
-expected to be non-empty at any instant (sites between scans or briefly
-offline) — it is not a defect.
+Because the feed is a rolling ~1–2 h buffer, per-station idleness is expected
+at any instant (sites between scans or briefly offline) — so `validate
+--live` only flags a fully empty feed or a wholesale id mismatch, not per-site
+idleness.

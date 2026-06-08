@@ -1,7 +1,7 @@
 # Informational index: every Earth Engine asset id discovered by
-# tools/gee/refresh_gee_catalog.py during its last STAC walk, in walk
-# order. The curated subset lives in the per-provider *.yaml files in
-# this directory; edit those, not this list (the refresh tool rewrites
+# `earthlens datasets refresh gee --write` during its last STAC walk, in
+# walk order. The curated subset lives in the per-provider *.yaml files in
+# this directory; edit those, not this list (refresh --write rewrites
 # this file in place).
 
 available_datasets:
