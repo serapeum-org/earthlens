@@ -245,6 +245,7 @@ nav:
       - Hurricane Ian track (Tropycal): examples/showcase/hurricane_ian.ipynb
       - Strait of Hormuz vessel traffic: examples/showcase/strait_of_hormuz_ships.ipynb
       - NO₂ over China, COVID lockdown: examples/showcase/no2_covid_lockdown.ipynb
+      - Mediterranean marine heatwave (CMEMS): examples/showcase/marine_heatwave_mediterranean.ipynb
     - CHC (CHIRPS / CHIRTS / SPI / SPEI / …):
       - Catalog explorer (no network): examples/chc/catalog_explorer.ipynb
       - Daily rainfall quickstart (live): examples/chc/quickstart.ipynb
