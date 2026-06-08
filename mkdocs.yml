@@ -189,6 +189,11 @@ nav:
       - Usage: reference/firms/usage.md
       - Authentication: reference/firms/authentication.md
       - Reference: reference/firms/firms.md
+    - National Water Model:
+      - Introduction: reference/nwm/introduction.md
+      - Usage: reference/nwm/usage.md
+      - Products & configurations: reference/nwm/datasets.md
+      - Reference: reference/nwm/nwm.md
     - HDX (humanitarian data):
       - Introduction: reference/hdx/introduction.md
       - Usage: reference/hdx/usage.md
@@ -352,6 +357,12 @@ nav:
       - Quickstart — recent fires: examples/firms/quickstart.ipynb
       - Fire-season time-series: examples/firms/fire_season_timeseries.ipynb
       - MODIS vs VIIRS comparison: examples/firms/modis_vs_viirs_comparison.ipynb
+    - National Water Model (NWM):
+      - Catalog explorer (no network): examples/nwm/catalog_explorer.ipynb
+      - Short-range streamflow (live): examples/nwm/streamflow_short_range.ipynb
+      - Short-range land surface (live): examples/nwm/land_surface_short_range.ipynb
+      - Regional, ensemble & coastal configs (live): examples/nwm/regional_ensemble_coastal.ipynb
+      - Subsetting & retrospective (live): examples/nwm/deferred_and_subsetting.ipynb
     - Humanitarian data (HDX):
       - Catalog explorer (no network): examples/hdx/catalog_explorer.ipynb
       - WFP food-security table (live): examples/hdx/wfp_food_security_table.ipynb

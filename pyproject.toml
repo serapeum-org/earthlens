@@ -33,6 +33,8 @@ dependencies = [
     # >=0.28.0: georeferences geostationary (GOES ABI) NetCDF reads — scales the
     # scan-angle geotransform to metres — so earthlens.s3 dataset="goes" can warp
     # to WGS84 and crop (pyramids#452 / PY-1a).
+    # >=0.30.0: adds NetCDF.subset for windowed gridded cloud-cube reads
+    # (pyramids#462), used by earthlens.nwm for gridded operational subsetting.
     # >=0.32.0: fixes DatasetCollection.plot() crashing (float - NoneType) on
     # rasters with no no-data value set (pyramids#480) — used by the showcase
     # notebooks to animate Dataset stacks.
@@ -67,6 +69,16 @@ gee = [
 ]
 cmems = ["copernicusmarine >=2.0.0,<3"]
 fdsn = ["obspy >=1.5.0"]
+# NOAA National Water Model via the unsigned noaa-nwm-pds bucket. boto3 fetches
+# the whole-CONUS operational NetCDF files; pyramids-gis[lazy,xarray,parquet]
+# supplies the LabeledDataset reader (earthlens.nwm.NWM, 0.29.0+) that subsets
+# the retrospective Zarr and feature_id-indexed files and writes tabular output
+# — earthlens still never imports xarray/zarr itself (pyramids owns the read).
+nwm = [
+    "boto3 >=1.43.0",
+    "botocore >=1.34.0",
+    "pyramids-gis[lazy,xarray,parquet] >=0.30.0",
+]
 earthdata = ["earthaccess >=0.18.0; python_version >= '3.12'"]
 hdx = ["hdx-python-api >=6,<7"]
 eumetsat = ["eumdac >=3.1"]
@@ -85,7 +97,7 @@ ghsl = []
 worldpop = ["worldpoppy >=0.4", "py7zr >=0.20"]
 # Self-referential: the union of every backend extra, without re-listing deps.
 all = [
-    "earthlens[s3,ecmwf,gee,cmems,fdsn,earthdata,hdx,eumetsat,nwp,radar,stac,openeo,sentinel-hub,tropycal,overture,usgs-water,ghsl,worldpop]",
+    "earthlens[s3,ecmwf,gee,cmems,fdsn,earthdata,hdx,eumetsat,nwp,nwm,radar,stac,openeo,sentinel-hub,tropycal,overture,usgs-water,ghsl,worldpop]",
 ]
 
 [dependency-groups]
@@ -170,6 +182,7 @@ include = ["earthlens", "earthlens.*"]
 "earthlens.openaq" = ["*.yaml"]
 "earthlens.tropycal" = ["*.yaml"]
 "earthlens.firms" = ["*.yaml"]
+"earthlens.nwm" = ["*.yaml"]
 "earthlens.overture" = ["*.yaml"]
 "earthlens.nwp" = ["*.yaml"]
 "earthlens.radar" = ["*.yaml"]
@@ -257,6 +270,7 @@ markers = [
     "openaq: tests for the OpenAQ v3 air-quality backend (no extra SDK; uses the core `requests` dependency).",
     "tropycal: tests for the Tropycal cyclone-track backend (requires the `tropycal` extra: tropycal, cartopy).",
     "firms: tests for the NASA FIRMS active-fire backend (free MAP_KEY, no extra SDK; uses the core `requests` + `pandas` dependencies).",
+    "nwm: tests for the NOAA National Water Model backend (requires the `nwm` extra: boto3; unsigned noaa-nwm-pds bucket).",
     "overture: tests for the Overture Maps vector backend (requires the `overture` extra: overturemaps).",
     "nwp: tests for the NWP forecast backend (requires the `nwp` extra: herbie-data, ecmwf-opendata; GRIB read via pyramids' GDAL driver).",
     "radar: tests for the NEXRAD Level-II radar backend (requires the `radar` extra: boto3; unsigned unidata-nexrad-level2-chunks bucket).",
@@ -299,6 +313,7 @@ test-gdacs ={ cmd = "pytest -vvv -m 'gdacs and not e2e' --cov=src/earthlens --co
 test-openaq = { cmd = "pytest -vvv -m 'openaq and not e2e' --cov=src/earthlens --cov-report=xml --cov-report=term-missing", description = "Run OpenAQ-backend tests (no extra SDK; uses the core requests dependency)" }
 test-tropycal = { cmd = "pytest -vvv -m 'tropycal and not e2e' --cov=src/earthlens --cov-report=xml --cov-report=term-missing", description = "Run Tropycal cyclone-track backend tests (requires the `tropycal` extra: tropycal, cartopy)" }
 test-firms = { cmd = "pytest -vvv -m 'firms and not e2e' --cov=src/earthlens --cov-report=xml --cov-report=term-missing", description = "Run NASA FIRMS active-fire backend tests (free MAP_KEY, no extra SDK)" }
+test-nwm = { cmd = "pytest -vvv -m 'nwm and not e2e' --cov=src/earthlens --cov-report=xml --cov-report=term-missing", description = "Run NOAA National Water Model backend tests (requires the `nwm` extra: boto3)" }
 test-overture = { cmd = "pytest -vvv -m 'overture and not e2e' --cov=src/earthlens --cov-report=xml --cov-report=term-missing", description = "Run Overture Maps vector backend tests (requires the `overture` extra: overturemaps)" }
 test-nwp = { cmd = "pytest -vvv -m 'nwp and not e2e' --cov=src/earthlens --cov-report=xml --cov-report=term-missing", description = "Run NWP forecast backend tests (requires the `nwp` extra: herbie-data, ecmwf-opendata)" }
 test-radar = { cmd = "pytest -vvv -m 'radar and not e2e' --cov=src/earthlens --cov-report=xml --cov-report=term-missing", description = "Run NEXRAD radar backend tests (requires the `radar` extra: boto3)" }
@@ -306,7 +321,7 @@ test-usgs-water = { cmd = "pytest -vvv -m 'usgs_water and not e2e' --cov=src/ear
 test-ghsl = { cmd = "pytest -vvv -m 'ghsl and not e2e' --cov=src/earthlens --cov-report=xml --cov-report=term-missing", description = "Run GHSL backend tests (open HTTPS; no extra SDK for the direct path; localised via pyramids)" }
 test-worldpop = { cmd = "pytest -vvv -m 'worldpop and not e2e' --cov=src/earthlens --cov-report=xml --cov-report=term-missing", description = "Run WorldPop population data hub backend tests (open CC-BY-4.0; REST path needs only core requests + pyramids)" }
 test-cli = { cmd = "pytest -vvv -m 'cli and not slow' --cov=src/earthlens --cov-report=xml --cov-report=term-missing", description = "Run federated catalog-query CLI tests (requires the `cli` extra: typer, rich)" }
-test-doctests = { cmd = "pytest --doctest-modules src/earthlens/gee src/earthlens/chc src/earthlens/ecmwf src/earthlens/cmems src/earthlens/fdsn src/earthlens/earthdata src/earthlens/hdx src/earthlens/eumetsat src/earthlens/stac src/earthlens/openeo src/earthlens/sentinel_hub src/earthlens/gdacs src/earthlens/openaq src/earthlens/tropycal src/earthlens/firms src/earthlens/overture src/earthlens/nwp src/earthlens/radar src/earthlens/usgs_water src/earthlens/ghsl src/earthlens/worldpop src/earthlens/cli src/earthlens/grids src/earthlens/base", description = "Run docstring examples across the backend packages (catches drift in catalog / API docstrings)" }
+test-doctests = { cmd = "pytest --doctest-modules src/earthlens/gee src/earthlens/chc src/earthlens/ecmwf src/earthlens/cmems src/earthlens/fdsn src/earthlens/earthdata src/earthlens/hdx src/earthlens/eumetsat src/earthlens/stac src/earthlens/openeo src/earthlens/sentinel_hub src/earthlens/gdacs src/earthlens/openaq src/earthlens/tropycal src/earthlens/firms src/earthlens/nwm src/earthlens/overture src/earthlens/nwp src/earthlens/radar src/earthlens/usgs_water src/earthlens/ghsl src/earthlens/worldpop src/earthlens/cli src/earthlens/grids src/earthlens/base", description = "Run docstring examples across the backend packages (catches drift in catalog / API docstrings)" }
 notebooks = { cmd = "pytest --nbval --nbval-lax --verbose docs/examples", description = "check notebooks" }
 jupyter = { cmd = "jupyter lab --no-browser --IdentityProvider.token='' --ServerApp.password='' --port=8889", description = "check notebooks" }
 build-dist = { cmd = "python -m build", description = "Build sdist and wheel for PyPI" }

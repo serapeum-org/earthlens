@@ -7,6 +7,7 @@ import importlib
 import json
 import pathlib
 import shutil
+from types import SimpleNamespace
 
 import pytest
 import yaml
@@ -79,16 +80,18 @@ class TestSupportedProviders:
             "firms",
             "fdsn",
             "overture",
+            "nwm",
         } <= set(supported_providers())
 
     def test_chc_is_refreshable(self):
         """CHC's FTP product-tree walk is wired up."""
         assert "chc" in supported_providers()
 
-    def test_eighteen_refreshable_providers(self):
-        """Every provider with a refreshable index has refresh/audit (incl. s3)."""
-        assert len(supported_providers()) == 18, sorted(supported_providers())
+    def test_nineteen_refreshable_providers(self):
+        """Every provider with a refreshable index has refresh/audit (incl. s3, nwm)."""
+        assert len(supported_providers()) == 19, sorted(supported_providers())
         assert "s3" in supported_providers(), "s3 regenerates its index from curated"
+        assert "nwm" in supported_providers(), "nwm walks its operational bucket"
 
 
 class TestEcmwfRefresher:
@@ -426,6 +429,147 @@ class TestOvertureRefresher:
         assert outcome.status == "ok", "overture refresh ran"
         assert "2099-01-01.0" in outcome.new_ids, "a new release is flagged"
         assert all("-" in rid for rid in outcome.removed_ids), "diffed vs releases"
+
+
+class TestNwmRefresher:
+    """Tests for the NWM (unsigned operational-bucket walk) lister."""
+
+    def test_collapses_ensemble_members_to_base_config(self):
+        """A `_mem<N>` member directory collapses to its base config key."""
+        assert refresh_mod._nwm_collapse_member("medium_range_mem3") == "medium_range"
+        assert refresh_mod._nwm_collapse_member("short_range") == "short_range"
+
+    def test_refresh_diffs_collapsed_live_against_configurations(self, monkeypatch):
+        """Live config dirs collapse to the curated namespace before the diff."""
+        catalog = load_catalog(_info("nwm"))
+        # Express the curated configs live, exploding one ensemble into members
+        # and adding the uncurated assimilation-input directory.
+        live_dirs = [
+            f"{key}_mem1" if cfg.members else key
+            for key, cfg in catalog.configurations.items()
+        ] + ["usgs_timeslices"]
+        monkeypatch.setattr(refresh_mod, "_nwm_live_config_dirs", lambda: live_dirs)
+        outcome = refresh_one(_info("nwm"))
+        assert outcome.status == "ok", "nwm refresh ran"
+        assert (
+            outcome.live_count == len(catalog.configurations) + 1
+        ), "members collapsed"
+        assert outcome.new_ids == ["usgs_timeslices"], "only the uncurated dir is new"
+        assert not outcome.removed_ids, "every curated config is still live"
+
+    def test_audit_curated_config_not_broken_uncurated_untracked(self, monkeypatch):
+        """A live curated config is not broken; usgs_timeslices is untracked."""
+        catalog = load_catalog(_info("nwm"))
+        live_dirs = [
+            f"{key}_mem1" if cfg.members else key
+            for key, cfg in catalog.configurations.items()
+        ] + ["usgs_timeslices"]
+        monkeypatch.setattr(refresh_mod, "_nwm_live_config_dirs", lambda: live_dirs)
+        outcome = audit_one(_info("nwm"))
+        assert outcome.status == "ok", "nwm audit ran"
+        assert (
+            "short_range" not in outcome.broken
+        ), "a live curated config is not broken"
+        assert "usgs_timeslices" in outcome.untracked, "the uncurated dir is untracked"
+
+    def test_refresh_has_no_writer(self, monkeypatch):
+        """nwm's index is derived from curated rows, so --write is a no-op read."""
+        monkeypatch.setattr(
+            refresh_mod, "_nwm_live_config_dirs", lambda: ["short_range"]
+        )
+        outcome = refresh_one(_info("nwm"), write=True)
+        assert outcome.status == "ok", "nwm refresh ran"
+        assert not outcome.written, "no on-disk index block to rewrite"
+        assert "live read only" in outcome.detail, "reported as read-only"
+
+
+class _FakeNwmClient:
+    """A minimal in-memory S3 stand-in for the NWM bucket-primitive tests.
+
+    Serves `get_paginator(...).paginate()` from `date_pages` (the
+    `nwm.YYYYMMDD/` prefix walk) and `list_objects_v2(...)` from
+    `dir_prefixes` (one day's configuration directories).
+    """
+
+    def __init__(self, date_pages=None, dir_prefixes=None):
+        self._date_pages = date_pages or []
+        self._dir_prefixes = dir_prefixes or []
+
+    def get_paginator(self, operation):
+        """Return a paginator whose `paginate` yields the canned date pages."""
+        assert operation == "list_objects_v2", operation
+        return SimpleNamespace(paginate=lambda **kw: iter(self._date_pages))
+
+    def list_objects_v2(self, **kwargs):
+        """Return the canned configuration-directory `CommonPrefixes`."""
+        return {"CommonPrefixes": self._dir_prefixes}
+
+
+def _date_page(*days):
+    """Build a paginator page of `nwm.<day>/` common prefixes."""
+    return {"CommonPrefixes": [{"Prefix": f"nwm.{day}/"} for day in days]}
+
+
+class TestNwmBucketPrimitives:
+    """Tests for the shared NWM bucket primitives in refresh.py."""
+
+    def test_unsigned_client_is_us_east_1_s3(self):
+        """`_nwm_unsigned_client` builds an unsigned us-east-1 S3 client offline."""
+        client = refresh_mod._nwm_unsigned_client()
+        assert client.meta.region_name == "us-east-1", "region pinned to us-east-1"
+        assert (
+            client.meta.service_model.service_name == "s3"
+        ), "an S3 client is returned"
+
+    def test_latest_complete_day_picks_day_before_latest(self):
+        """The day before the newest prefix is chosen (newest may be partial)."""
+        client = _FakeNwmClient(
+            date_pages=[_date_page("20260601", "20260603", "20260602")]
+        )
+        assert (
+            refresh_mod._nwm_latest_complete_day(client) == "nwm.20260602"
+        ), "second-newest day selected"
+
+    def test_latest_complete_day_single_day_uses_only_day(self):
+        """With a single published day, that day is used as-is."""
+        client = _FakeNwmClient(date_pages=[_date_page("20260601")])
+        assert refresh_mod._nwm_latest_complete_day(client) == "nwm.20260601"
+
+    def test_latest_complete_day_ignores_non_nwm_prefixes(self):
+        """Prefixes that do not start with `nwm.` are skipped."""
+        client = _FakeNwmClient(date_pages=[{"CommonPrefixes": [{"Prefix": "index/"}]}])
+        with pytest.raises(RuntimeError, match=r"no nwm\.YYYYMMDD"):
+            refresh_mod._nwm_latest_complete_day(client)
+
+    def test_config_dirs_parses_and_sorts_directory_names(self):
+        """Configuration directory names are parsed from the day's prefixes."""
+        client = _FakeNwmClient(
+            dir_prefixes=[
+                {"Prefix": "nwm.20260602/short_range/"},
+                {"Prefix": "nwm.20260602/medium_range_mem1/"},
+            ]
+        )
+        assert refresh_mod._nwm_config_dirs(client, "nwm.20260602") == [
+            "medium_range_mem1",
+            "short_range",
+        ], "directory names parsed and sorted"
+
+    def test_live_config_dirs_composes_the_primitives(self, monkeypatch):
+        """`_nwm_live_config_dirs` wires client -> day -> dirs together."""
+        monkeypatch.setattr(refresh_mod, "_nwm_unsigned_client", lambda: "CLIENT")
+        monkeypatch.setattr(
+            refresh_mod,
+            "_nwm_latest_complete_day",
+            lambda client: "DAY" if client == "CLIENT" else "WRONG",
+        )
+        monkeypatch.setattr(
+            refresh_mod,
+            "_nwm_config_dirs",
+            lambda client, day: (
+                ["a", "b"] if (client, day) == ("CLIENT", "DAY") else []
+            ),
+        )
+        assert refresh_mod._nwm_live_config_dirs() == ["a", "b"], "primitives composed"
 
 
 class _FakeFTP:
