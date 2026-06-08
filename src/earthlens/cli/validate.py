@@ -658,61 +658,57 @@ def _live_ecmwf(catalog: Any) -> tuple[int, list[str]]:
     return checked, issues
 
 
-#: Region the unsigned NWM operational bucket is sampled from.
-_NWM_REGION = "us-east-1"
+#: First-page object cap when sampling a configuration directory's tokens.
+_NWM_SAMPLE_KEYS = 400
 
 
-def _nwm_live_token_map() -> dict[str, set[str]]:
-    """Map each live NWM configuration directory to its product `{output}` tokens.
+def _nwm_sample_tokens(client: Any, day: str, directory: str) -> set[str]:
+    """Return the distinct product `{output}` tokens under one config directory.
 
-    Builds an unsigned `boto3` client for the public `noaa-nwm-pds` bucket,
-    finds the most recent complete `nwm.YYYYMMDD/` day (the latest may be
-    mid-publication), and samples the distinct product tokens (`channel_rt`,
-    `land`, ...) parsed from each configuration directory's file names. The
-    single network seam the live NWM check sits behind.
+    Samples the first :data:`_NWM_SAMPLE_KEYS` objects of
+    `{day}/{directory}/` on `noaa-nwm-pds` and parses each file's `{output}`
+    token from the `nwm.tHHz.<family>.<output>.<step>.<domain>.nc` layout.
+    For an ensemble directory the token carries the member suffix
+    (`channel_rt_1`); :func:`_nwm_token_present` handles that.
+
+    Args:
+        client: An unsigned S3 client (see `refresh._nwm_unsigned_client`).
+        day: An `nwm.YYYYMMDD` prefix.
+        directory: A configuration directory name under `day`.
 
     Returns:
-        Mapping of configuration directory name to its set of product tokens.
-
-    Raises:
-        RuntimeError: If the bucket exposes no `nwm.YYYYMMDD/` date prefix.
+        The set of product `{output}` tokens seen in the sample.
     """
-    import boto3
-    from botocore import UNSIGNED
-    from botocore.client import Config
-
     from earthlens.nwm import BUCKET
 
-    client = boto3.client(
-        "s3", region_name=_NWM_REGION, config=Config(signature_version=UNSIGNED)
+    sample = client.list_objects_v2(
+        Bucket=BUCKET, Prefix=f"{day}/{directory}/", MaxKeys=_NWM_SAMPLE_KEYS
     )
-    paginator = client.get_paginator("list_objects_v2")
-    days = sorted(
-        prefix.rstrip("/")
-        for page in paginator.paginate(Bucket=BUCKET, Delimiter="/")
-        for entry in page.get("CommonPrefixes", [])
-        if (prefix := entry["Prefix"]).startswith("nwm.")
-    )
-    if not days:
-        raise RuntimeError(f"no nwm.YYYYMMDD/ prefixes found on {BUCKET}")
-    day = days[-2] if len(days) > 1 else days[-1]
-    listing = client.list_objects_v2(Bucket=BUCKET, Prefix=f"{day}/", Delimiter="/")
-    directories = [
-        entry["Prefix"].split("/")[1] for entry in listing.get("CommonPrefixes", [])
-    ]
-    token_map: dict[str, set[str]] = {}
-    for directory in directories:
-        sample = client.list_objects_v2(
-            Bucket=BUCKET, Prefix=f"{day}/{directory}/", MaxKeys=400
-        )
-        tokens: set[str] = set()
-        for entry in sample.get("Contents", []):
-            # nwm.tHHz.<family>.<output>.<step>.<domain>.nc
-            parts = entry["Key"].split("/")[-1].split(".")
-            if len(parts) >= 6:
-                tokens.add(parts[3])
-        token_map[directory] = tokens
-    return token_map
+    tokens: set[str] = set()
+    for entry in sample.get("Contents", []):
+        parts = entry["Key"].split("/")[-1].split(".")
+        if len(parts) >= 6:
+            tokens.add(parts[3])
+    return tokens
+
+
+def _nwm_token_present(s3_token: str, tokens: set[str]) -> bool:
+    """Whether a product's bare `s3_token` shows among sampled file tokens.
+
+    Matches the bare token (a deterministic carrier's file token *is* the
+    `s3_token`) or its ensemble form `{s3_token}_{member}` (an ensemble
+    carrier rides the member on the token, e.g. `channel_rt_1`), so an
+    ensemble-only carrier is honoured rather than mis-reported.
+
+    Args:
+        s3_token: The product's bare `{output}` token (e.g. `channel_rt`).
+        tokens: The sampled file tokens for one configuration directory.
+
+    Returns:
+        `True` if the product's token (bare or member-suffixed) is present.
+    """
+    prefix = f"{s3_token}_"
+    return any(token == s3_token or token.startswith(prefix) for token in tokens)
 
 
 def _nwm_config_directory(config: Any, key: str) -> str:
@@ -727,8 +723,9 @@ def _live_nwm(catalog: Any) -> tuple[int, list[str]]:
     `tools/nwm/audit_nwm_catalog.py`: every curated product's file token
     (`channel_rt`, `land`, ...) must show up among the live files of at least
     one configuration that publishes it. Carriers are tried deterministic-first
-    (an ensemble directory appends the member, so the bare token shows under a
-    `members == 0` carrier), matching the bucket's file naming.
+    and sampling stops at the first hit, so a clean run touches only as many
+    configuration directories as needed (reusing the shared NWM bucket
+    primitives from `earthlens.cli.refresh`).
 
     Args:
         catalog: The loaded NWM `Catalog`.
@@ -737,7 +734,10 @@ def _live_nwm(catalog: Any) -> tuple[int, list[str]]:
         `(checked, issues)` — the product count and one message per token not
         found live under any carrier configuration.
     """
-    token_map = _nwm_live_token_map()
+    from earthlens.cli.refresh import _nwm_latest_complete_day, _nwm_unsigned_client
+
+    client = _nwm_unsigned_client()
+    day = _nwm_latest_complete_day(client)
     issues: list[str] = []
     for key, product in catalog.datasets.items():
         carriers = sorted(
@@ -748,17 +748,18 @@ def _live_nwm(catalog: Any) -> tuple[int, list[str]]:
             ),
             key=lambda k: catalog.configurations[k].members,
         )
-        seen = any(
-            product.s3_token
-            in token_map.get(
-                _nwm_config_directory(catalog.configurations[cfg_key], cfg_key), set()
-            )
-            for cfg_key in carriers
-        )
+        seen = False
+        for cfg_key in carriers:
+            directory = _nwm_config_directory(catalog.configurations[cfg_key], cfg_key)
+            if _nwm_token_present(
+                product.s3_token, _nwm_sample_tokens(client, day, directory)
+            ):
+                seen = True
+                break
         if not seen:
             issues.append(
                 f"{key}: s3_token {product.s3_token!r} not found live under "
-                f"any of its {len(carriers)} carrier configuration(s)"
+                "any carrier configuration"
             )
     return len(catalog.datasets), issues
 

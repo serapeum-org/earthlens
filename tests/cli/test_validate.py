@@ -281,9 +281,23 @@ class TestLiveValidators:
         assert checked == 2, "the no-constraints dataset is skipped"
         assert any("bad" in i for i in issues), "invalid request flagged"
 
+    def test_nwm_token_present_matches_bare_and_ensemble(self):
+        """A bare token matches; an ensemble `{token}_{member}` form matches too."""
+        from earthlens.cli.validate import _nwm_token_present
+
+        assert _nwm_token_present("channel_rt", {"channel_rt"}), "bare token"
+        assert _nwm_token_present("channel_rt", {"channel_rt_1"}), "ensemble member"
+        assert not _nwm_token_present("channel_rt", {"land", "reservoir"}), "absent"
+
     def test_nwm_live_flags_token_absent_from_bucket(self, monkeypatch):
         """A product whose s3_token shows on no live carrier config is flagged."""
-        monkeypatch.setattr(validate_mod, "_nwm_live_token_map", lambda: {})
+        from earthlens.cli import refresh as refresh_mod
+
+        monkeypatch.setattr(refresh_mod, "_nwm_unsigned_client", lambda: object())
+        monkeypatch.setattr(refresh_mod, "_nwm_latest_complete_day", lambda c: "nwm.0")
+        monkeypatch.setattr(
+            validate_mod, "_nwm_sample_tokens", lambda c, d, dir_: set()
+        )
         result = validate_one(_info("nwm"), live=True)
         assert result.status == "ok", "nwm live validator ran"
         assert result.issues, "an empty bucket flags every product token"
@@ -291,15 +305,17 @@ class TestLiveValidators:
 
     def test_nwm_live_clean_when_tokens_present(self, monkeypatch):
         """Every product's token appearing under a carrier config clears live."""
+        from earthlens.cli import refresh as refresh_mod
         from earthlens.cli.adapter import load_catalog
 
-        catalog = load_catalog(_info("nwm"))
-        all_tokens = {product.s3_token for product in catalog.datasets.values()}
-        token_map = {
-            validate_mod._nwm_config_directory(config, key): set(all_tokens)
-            for key, config in catalog.configurations.items()
+        all_tokens = {
+            product.s3_token for product in load_catalog(_info("nwm")).datasets.values()
         }
-        monkeypatch.setattr(validate_mod, "_nwm_live_token_map", lambda: token_map)
+        monkeypatch.setattr(refresh_mod, "_nwm_unsigned_client", lambda: object())
+        monkeypatch.setattr(refresh_mod, "_nwm_latest_complete_day", lambda c: "nwm.0")
+        monkeypatch.setattr(
+            validate_mod, "_nwm_sample_tokens", lambda c, d, dir_: set(all_tokens)
+        )
         result = validate_one(_info("nwm"), live=True)
         assert result.issues == [], "every token present under a carrier -> clean"
 

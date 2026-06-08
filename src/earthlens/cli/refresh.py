@@ -1242,30 +1242,44 @@ def _nwm_collapse_member(directory: str) -> str:
     return _NWM_MEMBER_RE.sub("", directory)
 
 
-def _nwm_live_config_dirs() -> list[str]:
-    """Return the configuration directories under the latest complete NWM day.
+def _nwm_unsigned_client() -> Any:
+    """Return an unsigned `boto3` S3 client for the public `noaa-nwm-pds` bucket.
 
-    Builds an unsigned boto3 client for the public `noaa-nwm-pds` bucket,
-    lists the `nwm.YYYYMMDD/` date prefixes, and returns the configuration
-    directories published under the most recent *complete* day (the latest
-    prefix may be mid-publication, so the day before it is sampled).
+    The single place the NWM CLI tooling (`refresh` here, `validate --live` in
+    :mod:`earthlens.cli.validate`) builds its anonymous client, so the region
+    and signature config live in one home.
 
     Returns:
-        The raw configuration directory names (ensemble members still
-        carry their `_mem<N>` suffix).
-
-    Raises:
-        RuntimeError: If the bucket exposes no `nwm.YYYYMMDD/` date prefix.
+        An unsigned `boto3` S3 client.
     """
     import boto3
     from botocore import UNSIGNED
     from botocore.client import Config
 
-    from earthlens.nwm import BUCKET
-
-    client = boto3.client(
+    return boto3.client(
         "s3", region_name=_NWM_REGION, config=Config(signature_version=UNSIGNED)
     )
+
+
+def _nwm_latest_complete_day(client: Any) -> str:
+    """Return the most recent *complete* `nwm.YYYYMMDD/` day prefix.
+
+    Lists the `nwm.YYYYMMDD/` date prefixes and returns the day before the
+    latest (the newest prefix may be mid-publication), falling back to the
+    only day when just one is present. Shared by the NWM refresh and
+    `validate --live` walks so the "complete day" heuristic lives in one home.
+
+    Args:
+        client: An unsigned S3 client (see :func:`_nwm_unsigned_client`).
+
+    Returns:
+        The selected `nwm.YYYYMMDD` prefix (no trailing slash).
+
+    Raises:
+        RuntimeError: If the bucket exposes no `nwm.YYYYMMDD/` date prefix.
+    """
+    from earthlens.nwm import BUCKET
+
     paginator = client.get_paginator("list_objects_v2")
     days = sorted(
         prefix.rstrip("/")
@@ -1275,13 +1289,45 @@ def _nwm_live_config_dirs() -> list[str]:
     )
     if not days:
         raise RuntimeError(f"no nwm.YYYYMMDD/ prefixes found on {BUCKET}")
-    complete_day = days[-2] if len(days) > 1 else days[-1]
-    result = client.list_objects_v2(
-        Bucket=BUCKET, Prefix=f"{complete_day}/", Delimiter="/"
-    )
+    return days[-2] if len(days) > 1 else days[-1]
+
+
+def _nwm_config_dirs(client: Any, day: str) -> list[str]:
+    """Return the configuration directory names published under one NWM day.
+
+    Args:
+        client: An unsigned S3 client (see :func:`_nwm_unsigned_client`).
+        day: An `nwm.YYYYMMDD` prefix (see :func:`_nwm_latest_complete_day`).
+
+    Returns:
+        The raw configuration directory names (ensemble members still carry
+        their `_mem<N>` suffix), sorted.
+    """
+    from earthlens.nwm import BUCKET
+
+    result = client.list_objects_v2(Bucket=BUCKET, Prefix=f"{day}/", Delimiter="/")
     return sorted(
         entry["Prefix"].split("/")[1] for entry in result.get("CommonPrefixes", [])
     )
+
+
+def _nwm_live_config_dirs() -> list[str]:
+    """Return the configuration directories under the latest complete NWM day.
+
+    Composes the shared NWM bucket primitives: an unsigned client
+    (:func:`_nwm_unsigned_client`), the most recent complete day
+    (:func:`_nwm_latest_complete_day`), and that day's configuration
+    directories (:func:`_nwm_config_dirs`).
+
+    Returns:
+        The raw configuration directory names (ensemble members still carry
+        their `_mem<N>` suffix).
+
+    Raises:
+        RuntimeError: If the bucket exposes no `nwm.YYYYMMDD/` date prefix.
+    """
+    client = _nwm_unsigned_client()
+    return _nwm_config_dirs(client, _nwm_latest_complete_day(client))
 
 
 def _nwm_grouped(catalog: Any) -> dict[str, list[str]]:
