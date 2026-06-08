@@ -33,7 +33,10 @@ dependencies = [
     # >=0.28.0: georeferences geostationary (GOES ABI) NetCDF reads — scales the
     # scan-angle geotransform to metres — so earthlens.s3 dataset="goes" can warp
     # to WGS84 and crop (pyramids#452 / PY-1a).
-    "pyramids-gis >=0.31.0",
+    # >=0.32.0: fixes DatasetCollection.plot() crashing (float - NoneType) on
+    # rasters with no no-data value set (pyramids#480) — used by the showcase
+    # notebooks to animate Dataset stacks.
+    "pyramids-gis >=0.32.0",
     "geopandas >=1.0.0",
     "joblib >=1.5.0",
     "loguru >=0.7.3",
@@ -110,6 +113,10 @@ dev = [
     "nbval >=0.11.0",
     # matplotlib: example notebooks plot with it; not a runtime dep.
     "matplotlib >=3.5",
+    # pyramids-gis[viz] (cleopatra): the showcase notebooks render rasters and
+    # animate Dataset stacks via Dataset.plot / DatasetCollection.plot; not a
+    # runtime dep of earthlens itself.
+    "pyramids-gis[viz] >=0.32.0",
     "pre-commit >=3.7.1",
     "pre-commit-hooks >=4.6.0",
     "pytest >=8.2.2",
@@ -139,6 +146,8 @@ docs = [
     "notebook<7.0",
     # matplotlib: mkdocs-jupyter runs the notebooks at build time.
     "matplotlib >=3.5",
+    # pyramids-gis[viz] (cleopatra): showcase notebooks plot/animate Datasets.
+    "pyramids-gis[viz] >=0.32.0",
 ]
 
 notebook = [
