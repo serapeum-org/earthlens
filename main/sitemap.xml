@@ -293,6 +293,26 @@
          <lastmod>2026-06-08</lastmod>
     </url>
     <url>
+         <loc>https://serapeum-org.github.io/earthlens/main/examples/nwm/catalog_explorer/</loc>
+         <lastmod>2026-06-08</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/main/examples/nwm/deferred_and_subsetting/</loc>
+         <lastmod>2026-06-08</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/main/examples/nwm/land_surface_short_range/</loc>
+         <lastmod>2026-06-08</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/main/examples/nwm/regional_ensemble_coastal/</loc>
+         <lastmod>2026-06-08</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/main/examples/nwm/streamflow_short_range/</loc>
+         <lastmod>2026-06-08</lastmod>
+    </url>
+    <url>
          <loc>https://serapeum-org.github.io/earthlens/main/examples/nwp/catalog_explorer/</loc>
          <lastmod>2026-06-08</lastmod>
     </url>
@@ -722,6 +742,22 @@
     </url>
     <url>
          <loc>https://serapeum-org.github.io/earthlens/main/reference/hdx/usage/</loc>
+         <lastmod>2026-06-08</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/main/reference/nwm/datasets/</loc>
+         <lastmod>2026-06-08</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/main/reference/nwm/introduction/</loc>
+         <lastmod>2026-06-08</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/main/reference/nwm/nwm/</loc>
+         <lastmod>2026-06-08</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/main/reference/nwm/usage/</loc>
          <lastmod>2026-06-08</lastmod>
     </url>
     <url>
