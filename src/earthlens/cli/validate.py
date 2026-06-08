@@ -706,13 +706,68 @@ def _nwm_token_present(s3_token: str, tokens: set[str]) -> bool:
 
     Returns:
         `True` if the product's token (bare or member-suffixed) is present.
+
+    Examples:
+        - A deterministic carrier's bare token counts as present:
+            ```python
+            >>> from earthlens.cli.validate import _nwm_token_present
+            >>> _nwm_token_present("channel_rt", {"channel_rt", "land"})
+            True
+
+            ```
+        - An ensemble carrier's `{token}_{member}` file token counts too:
+            ```python
+            >>> from earthlens.cli.validate import _nwm_token_present
+            >>> _nwm_token_present("channel_rt", {"channel_rt_1"})
+            True
+
+            ```
+        - A token absent from the sample is not present:
+            ```python
+            >>> from earthlens.cli.validate import _nwm_token_present
+            >>> _nwm_token_present("channel_rt", {"land", "reservoir"})
+            False
+
+            ```
     """
     prefix = f"{s3_token}_"
     return any(token == s3_token or token.startswith(prefix) for token in tokens)
 
 
 def _nwm_config_directory(config: Any, key: str) -> str:
-    """Return the live bucket directory for a configuration (members -> `_mem1`)."""
+    """Return the live bucket directory for an NWM configuration.
+
+    A deterministic configuration is published under its bare `key`
+    directory; an ensemble configuration (`members > 0`) publishes each
+    member under `{key}_mem<N>`, so member 1 (`{key}_mem1`) is the directory
+    sampled for the product-token check.
+
+    Args:
+        config: The configuration row (duck-typed: reads `members`).
+        key: The configuration key (its bare directory name).
+
+    Returns:
+        The configuration's live directory name (`{key}_mem1` for an
+        ensemble, `key` otherwise).
+
+    Examples:
+        - A deterministic configuration maps to its bare directory:
+            ```python
+            >>> from types import SimpleNamespace
+            >>> from earthlens.cli.validate import _nwm_config_directory
+            >>> _nwm_config_directory(SimpleNamespace(members=0), "short_range")
+            'short_range'
+
+            ```
+        - An ensemble configuration maps to its member-1 directory:
+            ```python
+            >>> from types import SimpleNamespace
+            >>> from earthlens.cli.validate import _nwm_config_directory
+            >>> _nwm_config_directory(SimpleNamespace(members=6), "medium_range")
+            'medium_range_mem1'
+
+            ```
+    """
     return f"{key}_mem1" if getattr(config, "members", 0) else key
 
 
