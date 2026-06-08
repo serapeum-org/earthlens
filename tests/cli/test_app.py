@@ -1,0 +1,72 @@
+"""Smoke tests for the Typer application wiring (`earthlens.cli.app`)."""
+
+from __future__ import annotations
+
+import subprocess
+import sys
+
+import pytest
+from typer.testing import CliRunner
+
+from earthlens.cli import app as cli_app
+from earthlens.cli.app import app, main
+
+pytestmark = pytest.mark.cli
+
+runner = CliRunner()
+
+
+class TestApp:
+    """Tests for the root Typer application."""
+
+    def test_app_is_exported(self):
+        """The package re-exports the same app object the script points at."""
+        assert cli_app is app, "earthlens.cli.app re-exports the root app"
+
+    def test_root_help_lists_command_groups(self):
+        """`earthlens --help` advertises the datasets and providers groups."""
+        result = runner.invoke(app, ["--help"])
+        assert result.exit_code == 0, f"--help failed: {result.output}"
+        assert "datasets" in result.output, "datasets group is mounted"
+        assert "providers" in result.output, "providers group is mounted"
+
+    def test_no_args_shows_help(self):
+        """Invoking with no command shows help (no_args_is_help)."""
+        result = runner.invoke(app, [])
+        assert "Usage" in result.output, "bare invocation prints usage"
+
+    def test_datasets_group_help(self):
+        """`earthlens datasets --help` renders the group's help."""
+        result = runner.invoke(app, ["datasets", "--help"])
+        assert result.exit_code == 0, f"datasets --help failed: {result.output}"
+        assert "datasets" in result.output.lower(), "group help mentions datasets"
+
+    def test_providers_group_help(self):
+        """`earthlens providers --help` renders the group's help."""
+        result = runner.invoke(app, ["providers", "--help"])
+        assert result.exit_code == 0, f"providers --help failed: {result.output}"
+
+    def test_main_runs_the_app(self, monkeypatch):
+        """main() drives the app; --help exits cleanly with code 0."""
+        monkeypatch.setattr(sys, "argv", ["earthlens", "--help"])
+        with pytest.raises(SystemExit) as exc_info:
+            main()
+        assert exc_info.value.code == 0, "main() --help exits 0"
+
+    def test_python_m_entrypoint(self):
+        """`python -m earthlens.cli --help` runs and prints usage."""
+        result = subprocess.run(
+            [sys.executable, "-m", "earthlens.cli", "--help"],
+            capture_output=True,
+            text=True,
+            timeout=120,
+        )
+        assert result.returncode == 0, f"module entrypoint failed: {result.stderr}"
+        assert "Usage" in result.stdout, "usage banner printed"
+
+    def test_dunder_main_module_imports_main(self):
+        """`earthlens.cli.__main__` re-exports the same entrypoint as the app."""
+        import importlib
+
+        dunder_main = importlib.import_module("earthlens.cli.__main__")
+        assert dunder_main.main is main, "__main__ wires the app's main()"

@@ -15,7 +15,7 @@ SDK into a friendly `ImportError` naming the extra to install.
 from __future__ import annotations
 
 import importlib
-from collections.abc import Mapping
+from collections.abc import Iterator, Mapping
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
@@ -92,6 +92,37 @@ class _LazyRegistry(Mapping):
                 ```
         """
         return dict(self._mapping[key][3])
+
+    def entries(self) -> Iterator[tuple[str, str, str]]:
+        """Yield `(key, module, extras)` for every registered backend key.
+
+        A stable public view over the registry's internals — callers that
+        need each key's backing module / pip-extra (e.g. tooling that
+        enumerates the backends) should use this rather than reaching into
+        the private mapping, so the internal tuple shape can change freely.
+
+        Yields:
+            One `(key, module_name, extras)` triple per registered key.
+            `extras` is the empty string for SDK-free backends.
+
+        Examples:
+            - Every key resolves to its backend module and pip extra:
+
+                ```python
+                >>> from earthlens.earthlens import EarthLens
+                >>> entries = dict(
+                ...     (key, (module, extra))
+                ...     for key, module, extra in EarthLens.DataSources.entries()
+                ... )
+                >>> entries["chc"]
+                ('earthlens.chc', '')
+                >>> entries["gee"]
+                ('earthlens.gee', 'gee')
+
+                ```
+        """
+        for key, (module, _class_name, extras, _defaults) in self._mapping.items():
+            yield key, module, extras
 
     def __getitem__(self, key: str) -> type[AbstractDataSource]:
         module_name, class_name, extras, _defaults = self._mapping[key]

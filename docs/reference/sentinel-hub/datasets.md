@@ -164,10 +164,12 @@ python tools/sentinel_hub/audit_sh_datasets.py audit
 python tools/sentinel_hub/audit_sh_datasets.py audit --strict   # exit 1 on drift
 ```
 
-**`probe_sh_collection.py`** — inspect a curated key or a raw `DataCollection`
-member when curating a new collection row; `--yaml` emits a paste-ready stanza:
+**`earthlens datasets probe sentinel_hub <key>`** — inspect a curated key (or a
+raw `DataCollection` member) when curating a new collection row: the band
+schema plus a `collection:<key>` row carrying the bound `sh_collection`,
+native resolution, and cadence (an unknown name reports `error`):
 
 ```bash
-python tools/sentinel_hub/probe_sh_collection.py sentinel-2-l2a
-python tools/sentinel_hub/probe_sh_collection.py SENTINEL3_SLSTR --yaml
+earthlens datasets probe sentinel_hub sentinel-2-l2a
+earthlens datasets probe sentinel_hub SENTINEL3_SLSTR --json
 ```

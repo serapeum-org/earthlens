@@ -107,6 +107,7 @@ nav:
   - Guide:
     - Installation: installation.md
     - Architecture: overview/architecture.md
+    - Command-line interface: reference/cli.md
   - Data Sources:
     - Supported providers: reference/providers.md
     - CHC (CHIRPS / CHIRTS / SPI / SPEI / …):

@@ -1,5 +1,32 @@
 # Change Log
 
+## 0.7.0 (2026-06-03)
+
+### Feat
+
+- **s3**: rework earthlens.s3 into a registry-driven multi-dataset AWS Open-Data backend (#308)
+- **hdx**: add Humanitarian Data Exchange backend (#216)
+- **ghsl**: add JRC Global Human Settlement Layer backend (earthlens.ghsl) (#295)
+- **worldpop**: add WorldPop population data hub backend (earthlens.worldpop) (#306)
+- **catalog**: align catalog design across all backends with the AbstractCatalog contract (#294)
+- **sentinel-hub**: add Sentinel Hub server-side-render backend (#259)
+- **usgs-water**: add USGS NWIS / Water Data backend (earthlens.usgs_water) (#260)
+- **overture**: add Overture Maps vector backend (earthlens.overture) (#247)
+- **nwp**: add open NWP forecast backend + NEXRAD radar (NOAA/ECMWF/DWD/MF) (#194)
+- **openeo**: add openEO server-side-processing backend (CDSE) (#205)
+- **eumetsat**: add EUMETSAT Data Store backend (earthlens.eumetsat) (#204)
+- **firms**: add NASA FIRMS active-fire backend (#192)
+
+### Fix
+
+- **tropycal**: shim pkg_resources so tropycal imports under setuptools>=81 (#307)
+- **ci**: add py7zr to the [all] extra so the wheel suite installs it (#338)
+
+### Refactor
+
+- **provider**: align backend API surface and subpackage layout (#372)
+- **cmems**: decode the CF time axis via pyramids NetCDF, drop xarray (#206)
+
 ## 0.6.0 (2026-05-26)
 
 ### Feat
