@@ -79,11 +79,14 @@ Example:
 ## Tooling
 
 ```bash
-# Probe the bucket: retention window + every live configuration.
-pixi run -e dev python tools/nwm/refresh_nwm_catalog.py
-# Diff the curated catalog vs live; exit non-zero on drift.
-pixi run -e dev python tools/nwm/audit_nwm_catalog.py --strict
+# List the live configurations and diff them against the bundled catalog.
+earthlens datasets refresh nwm
+# Flag any curated configuration no longer served live; exit non-zero on drift.
+earthlens datasets audit nwm --strict
 ```
 
-The retention window is a rolling archive (~512 days as of 2026-05); the
-audit reports it against the backend's auto-mode boundary.
+Both commands walk the most recent complete `nwm.YYYYMMDD/` day on the
+unsigned `noaa-nwm-pds` bucket (ensemble-member directories are collapsed to
+their base configuration key). The assimilation-input `usgs_timeslices`
+directory is a live configuration the catalog deliberately does not curate,
+so it surfaces as an untracked id (informational), not drift.

@@ -150,14 +150,19 @@ Two gridded caveats:
 
 ## Catalog tooling
 
-Two read-only scripts (not part of the installed package) keep the
-catalog honest against the live bucket:
+The federated `earthlens datasets` CLI keeps the catalog honest against the
+live bucket (no standalone scripts — the same `refresh`/`audit` commands every
+backend shares):
 
 ```bash
-# Probe the bucket: retention window + the 69 live configurations.
-pixi run -e dev python tools/nwm/refresh_nwm_catalog.py
-pixi run -e dev python tools/nwm/refresh_nwm_catalog.py --format yaml
-
-# Diff the curated catalog vs live; exit non-zero on drift.
-pixi run -e dev python tools/nwm/audit_nwm_catalog.py --strict
+# List the live configurations and diff them against the bundled catalog.
+earthlens datasets refresh nwm
+# Flag any curated configuration no longer served live; exit non-zero on drift.
+earthlens datasets audit nwm --strict
 ```
+
+Both walk the most recent complete `nwm.YYYYMMDD/` day on the unsigned
+`noaa-nwm-pds` bucket, collapsing ensemble-member directories to their base
+configuration key. NWM's refreshable axis is its `available_configurations`
+index; `--write` is not supported (the index is derived from the curated
+rows, so `refresh nwm --write` reports "live read only").

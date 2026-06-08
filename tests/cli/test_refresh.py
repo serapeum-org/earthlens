@@ -79,16 +79,18 @@ class TestSupportedProviders:
             "firms",
             "fdsn",
             "overture",
+            "nwm",
         } <= set(supported_providers())
 
     def test_chc_is_refreshable(self):
         """CHC's FTP product-tree walk is wired up."""
         assert "chc" in supported_providers()
 
-    def test_eighteen_refreshable_providers(self):
-        """Every provider with a refreshable index has refresh/audit (incl. s3)."""
-        assert len(supported_providers()) == 18, sorted(supported_providers())
+    def test_nineteen_refreshable_providers(self):
+        """Every provider with a refreshable index has refresh/audit (incl. s3, nwm)."""
+        assert len(supported_providers()) == 19, sorted(supported_providers())
         assert "s3" in supported_providers(), "s3 regenerates its index from curated"
+        assert "nwm" in supported_providers(), "nwm walks its operational bucket"
 
 
 class TestEcmwfRefresher:
@@ -426,6 +428,58 @@ class TestOvertureRefresher:
         assert outcome.status == "ok", "overture refresh ran"
         assert "2099-01-01.0" in outcome.new_ids, "a new release is flagged"
         assert all("-" in rid for rid in outcome.removed_ids), "diffed vs releases"
+
+
+class TestNwmRefresher:
+    """Tests for the NWM (unsigned operational-bucket walk) lister."""
+
+    def test_collapses_ensemble_members_to_base_config(self):
+        """A `_mem<N>` member directory collapses to its base config key."""
+        assert refresh_mod._nwm_collapse_member("medium_range_mem3") == "medium_range"
+        assert refresh_mod._nwm_collapse_member("short_range") == "short_range"
+
+    def test_refresh_diffs_collapsed_live_against_configurations(self, monkeypatch):
+        """Live config dirs collapse to the curated namespace before the diff."""
+        catalog = load_catalog(_info("nwm"))
+        # Express the curated configs live, exploding one ensemble into members
+        # and adding the uncurated assimilation-input directory.
+        live_dirs = [
+            f"{key}_mem1" if cfg.members else key
+            for key, cfg in catalog.configurations.items()
+        ] + ["usgs_timeslices"]
+        monkeypatch.setattr(refresh_mod, "_nwm_live_config_dirs", lambda: live_dirs)
+        outcome = refresh_one(_info("nwm"))
+        assert outcome.status == "ok", "nwm refresh ran"
+        assert (
+            outcome.live_count == len(catalog.configurations) + 1
+        ), "members collapsed"
+        assert outcome.new_ids == ["usgs_timeslices"], "only the uncurated dir is new"
+        assert not outcome.removed_ids, "every curated config is still live"
+
+    def test_audit_curated_config_not_broken_uncurated_untracked(self, monkeypatch):
+        """A live curated config is not broken; usgs_timeslices is untracked."""
+        catalog = load_catalog(_info("nwm"))
+        live_dirs = [
+            f"{key}_mem1" if cfg.members else key
+            for key, cfg in catalog.configurations.items()
+        ] + ["usgs_timeslices"]
+        monkeypatch.setattr(refresh_mod, "_nwm_live_config_dirs", lambda: live_dirs)
+        outcome = audit_one(_info("nwm"))
+        assert outcome.status == "ok", "nwm audit ran"
+        assert (
+            "short_range" not in outcome.broken
+        ), "a live curated config is not broken"
+        assert "usgs_timeslices" in outcome.untracked, "the uncurated dir is untracked"
+
+    def test_refresh_has_no_writer(self, monkeypatch):
+        """nwm's index is derived from curated rows, so --write is a no-op read."""
+        monkeypatch.setattr(
+            refresh_mod, "_nwm_live_config_dirs", lambda: ["short_range"]
+        )
+        outcome = refresh_one(_info("nwm"), write=True)
+        assert outcome.status == "ok", "nwm refresh ran"
+        assert not outcome.written, "no on-disk index block to rewrite"
+        assert "live read only" in outcome.detail, "reported as read-only"
 
 
 class _FakeFTP:

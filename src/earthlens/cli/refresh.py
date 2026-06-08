@@ -1199,6 +1199,117 @@ def _chc_ftp_bases(catalog: Any) -> list[str]:
     )
 
 
+#: Region the unsigned NWM operational bucket is listed from.
+_NWM_REGION = "us-east-1"
+
+#: A trailing `_mem<N>` ensemble-member directory suffix (e.g.
+#: `medium_range_mem3`) — collapsed back to its base configuration key.
+_NWM_MEMBER_RE = re.compile(r"_mem\d+$")
+
+
+def _nwm_collapse_member(directory: str) -> str:
+    """Collapse an NWM ensemble-member directory to its configuration key.
+
+    The operational bucket publishes each ensemble member under its own
+    `{config}_mem<N>` directory; the curated catalog keys an ensemble by its
+    bare `{config}` name. Stripping the `_mem<N>` suffix maps a live
+    directory back into the curated namespace so the diff lines up.
+
+    Args:
+        directory: A live configuration directory name.
+
+    Returns:
+        The base configuration key (unchanged when not a member directory).
+
+    Examples:
+        - An ensemble member collapses to its base configuration:
+
+            ```python
+            >>> from earthlens.cli.refresh import _nwm_collapse_member
+            >>> _nwm_collapse_member("medium_range_mem3")
+            'medium_range'
+
+            ```
+        - A non-ensemble directory is returned unchanged:
+
+            ```python
+            >>> from earthlens.cli.refresh import _nwm_collapse_member
+            >>> _nwm_collapse_member("short_range")
+            'short_range'
+
+            ```
+    """
+    return _NWM_MEMBER_RE.sub("", directory)
+
+
+def _nwm_live_config_dirs() -> list[str]:
+    """Return the configuration directories under the latest complete NWM day.
+
+    Builds an unsigned boto3 client for the public `noaa-nwm-pds` bucket,
+    lists the `nwm.YYYYMMDD/` date prefixes, and returns the configuration
+    directories published under the most recent *complete* day (the latest
+    prefix may be mid-publication, so the day before it is sampled).
+
+    Returns:
+        The raw configuration directory names (ensemble members still
+        carry their `_mem<N>` suffix).
+
+    Raises:
+        RuntimeError: If the bucket exposes no `nwm.YYYYMMDD/` date prefix.
+    """
+    import boto3
+    from botocore import UNSIGNED
+    from botocore.client import Config
+
+    from earthlens.nwm import BUCKET
+
+    client = boto3.client(
+        "s3", region_name=_NWM_REGION, config=Config(signature_version=UNSIGNED)
+    )
+    paginator = client.get_paginator("list_objects_v2")
+    days = sorted(
+        prefix.rstrip("/")
+        for page in paginator.paginate(Bucket=BUCKET, Delimiter="/")
+        for entry in page.get("CommonPrefixes", [])
+        if (prefix := entry["Prefix"]).startswith("nwm.")
+    )
+    if not days:
+        raise RuntimeError(f"no nwm.YYYYMMDD/ prefixes found on {BUCKET}")
+    complete_day = days[-2] if len(days) > 1 else days[-1]
+    result = client.list_objects_v2(
+        Bucket=BUCKET, Prefix=f"{complete_day}/", Delimiter="/"
+    )
+    return sorted(
+        entry["Prefix"].split("/")[1] for entry in result.get("CommonPrefixes", [])
+    )
+
+
+def _nwm_grouped(catalog: Any) -> dict[str, list[str]]:
+    """List the live NWM configurations from the unsigned operational bucket.
+
+    Walks the most recent complete `nwm.YYYYMMDD/` day on `noaa-nwm-pds`
+    and collapses each ensemble-member directory to its base configuration
+    key (see :func:`_nwm_collapse_member`), so the live set is diffed
+    against the catalog's `available_configurations:` index in the same
+    namespace. The assimilation-input `usgs_timeslices` directory is a live
+    configuration the catalog deliberately does not curate, so it surfaces
+    as an untracked id (informational), not drift.
+
+    Args:
+        catalog: The loaded NWM `Catalog` (unused; the bucket is the source).
+
+    Returns:
+        A single-group mapping `{"nwm": [sorted configuration keys]}`.
+    """
+    dirs = {_nwm_collapse_member(name) for name in _nwm_live_config_dirs()}
+    return {"nwm": sorted(dirs)}
+
+
+def _nwm_curated_configs(catalog: Any) -> list[str]:
+    """Return the configuration keys the NWM catalog curates (its refresh axis)."""
+    return sorted(catalog.configurations)
+
+
 def _s3_grouped(catalog: Any) -> dict[str, list[str]]:
     """List the S3 registry's dataset names (its `available_datasets` universe).
 
@@ -1295,6 +1406,7 @@ _REFRESHERS: dict[str, Callable[[Any], dict[str, list[str]]]] = {
     "overture": _overture_grouped,
     "chc": _chc_grouped,
     "s3": _s3_grouped,
+    "nwm": _nwm_grouped,
 }
 
 #: Provider id -> a callable that persists a grouped live fetch back into
@@ -1505,12 +1617,16 @@ _CURATED_IDS: dict[str, Callable[[Any], list[str]]] = {
     "fdsn": _curated_attr_ids("fdsn_id"),
     "overture": _curated_releases,
     "chc": _chc_ftp_bases,
+    "nwm": _nwm_curated_configs,
 }
 
 #: Provider id -> the catalog attribute holding its persisted informational
 #: index. Defaults to `available_datasets`; Overture's refreshable axis is
-#: its date-stamped `available_releases` instead.
-_INDEX_ATTR: dict[str, str] = {"overture": "available_releases"}
+#: its date-stamped `available_releases`, NWM's is its `available_configurations`.
+_INDEX_ATTR: dict[str, str] = {
+    "overture": "available_releases",
+    "nwm": "available_configurations",
+}
 
 #: Provider id -> a callable computing the bundled ids to diff against, for
 #: backends whose refresh axis is neither `available_datasets` nor a simple
