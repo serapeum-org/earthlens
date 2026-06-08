@@ -169,10 +169,10 @@ class EarthLens:
             ['amazon-s3', 'cdse', 'chc', 'chirps', 'cmems', 'earth-search',
              'earthdata', 'ecmwf', 'eumetsat', 'fdsn', 'firms', 'gdacs', 'gee',
              'ghs', 'ghsl', 'google-earth-engine', 'hdx', 'human-settlement',
-             'nexrad', 'nwis', 'nwp', 'openaq', 'openeo', 'overture',
-             'planetary-computer', 'radar', 'sentinel-hub', 'sentinelhub',
-             'stac', 'tropycal', 'usgs-nwis', 'usgs-water', 'world-pop',
-             'worldpop']
+             'national-water-model', 'nexrad', 'nwis', 'nwm', 'nwp', 'openaq',
+             'openeo', 'overture', 'planetary-computer', 'radar', 'sentinel-hub',
+             'sentinelhub', 'stac', 'tropycal', 'usgs-nwis', 'usgs-water',
+             'world-pop', 'worldpop']
 
             ```
         - Asking for an unknown backend raises `ValueError`:
@@ -224,6 +224,12 @@ class EarthLens:
         :class:`earthlens.firms.FIRMS`: NASA FIRMS active-fire
             detections (MODIS / VIIRS) as a `vector` FeatureCollection;
             free `MAP_KEY`, no extra; key `"firms"`.
+        :class:`earthlens.nwm.NWM`: NOAA National Water Model hydrologic
+            output — per-reach streamflow (`chrtout`, `tabular`) and
+            gridded land surface (`ldasout`, `raster`) — fetched whole
+            from the anonymous `noaa-nwm-pds` bucket; tabular subsetting +
+            the retrospective Zarr read via pyramids `LabeledDataset`. Keys
+            `"nwm"` / `"national-water-model"`.
         :class:`earthlens.hdx.HDX`: Humanitarian Data Exchange resources
             via CKAN (`hdx-python-api`); the first `mixed`-output
             backend (downloads CSV / GeoTIFF / GeoPackage / … files
@@ -314,6 +320,10 @@ class EarthLens:
             # FIRMS needs a free MAP_KEY but no SDK (requests + pandas
             # are core), so like GDACS there is no extra to hint.
             "firms": ("earthlens.firms", "FIRMS", "", {}),
+            # NOAA National Water Model (anonymous noaa-nwm-pds bucket); the
+            # [nwm] extra pulls boto3. Alias "national-water-model".
+            "nwm": ("earthlens.nwm", "NWM", "nwm", {}),
+            "national-water-model": ("earthlens.nwm", "NWM", "nwm", {}),
             # Open NWP forecasts (NOAA NODD / ECMWF Open Data / DWD); the
             # [nwp] extra pulls herbie-data + ecmwf-opendata.
             "nwp": ("earthlens.nwp", "NWP", "nwp", {}),

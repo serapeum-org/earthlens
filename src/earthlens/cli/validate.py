@@ -324,10 +324,35 @@ def _validate_worldpop(catalog: Any) -> tuple[int, list[str]]:
     return len(catalog.datasets), issues
 
 
+def _validate_nwm(catalog: Any) -> tuple[int, list[str]]:
+    """Structural lint of the curated NWM products and configurations.
+
+    Mirrors the offline half of the retired `tools/nwm/audit_nwm_catalog.py`:
+    every product needs an `s3_token` and a non-empty `variables` map, and
+    every configuration's `products` must reference a curated product key.
+
+    Args:
+        catalog: The loaded NWM `Catalog`.
+
+    Returns:
+        `(checked, issues)` — the product count and one message per problem.
+    """
+    products = catalog.datasets
+    issues: list[str] = []
+    for key, product in products.items():
+        issues.extend(_require(key, product, ("s3_token", "variables")))
+    for cfg_key, config in catalog.configurations.items():
+        for product_key in getattr(config, "products", None) or []:
+            if product_key not in products:
+                issues.append(f"{cfg_key}: references unknown product {product_key!r}")
+    return len(products), issues
+
+
 #: Provider id -> a callable taking the loaded catalog and returning
 #: `(checked, issues)`. Providers without one report `"unsupported"`.
 _VALIDATORS: dict[str, Callable[[Any], tuple[int, list[str]]]] = {
     "nwp": _validate_nwp,
+    "nwm": _validate_nwm,
     "s3": _validate_s3,
     "ghsl": _validate_ghsl,
     "overture": _validate_overture,
@@ -633,10 +658,172 @@ def _live_ecmwf(catalog: Any) -> tuple[int, list[str]]:
     return checked, issues
 
 
+#: First-page object cap when sampling a configuration directory's tokens.
+_NWM_SAMPLE_KEYS = 400
+
+
+def _nwm_sample_tokens(client: Any, day: str, directory: str) -> set[str]:
+    """Return the distinct product `{output}` tokens under one config directory.
+
+    Samples the first :data:`_NWM_SAMPLE_KEYS` objects of
+    `{day}/{directory}/` on `noaa-nwm-pds` and parses each file's `{output}`
+    token from the `nwm.tHHz.<family>.<output>.<step>.<domain>.nc` layout.
+    For an ensemble directory the token carries the member suffix
+    (`channel_rt_1`); :func:`_nwm_token_present` handles that.
+
+    Args:
+        client: An unsigned S3 client (see `refresh._nwm_unsigned_client`).
+        day: An `nwm.YYYYMMDD` prefix.
+        directory: A configuration directory name under `day`.
+
+    Returns:
+        The set of product `{output}` tokens seen in the sample.
+    """
+    from earthlens.nwm import BUCKET
+
+    sample = client.list_objects_v2(
+        Bucket=BUCKET, Prefix=f"{day}/{directory}/", MaxKeys=_NWM_SAMPLE_KEYS
+    )
+    tokens: set[str] = set()
+    for entry in sample.get("Contents", []):
+        parts = entry["Key"].split("/")[-1].split(".")
+        if len(parts) >= 6:
+            tokens.add(parts[3])
+    return tokens
+
+
+def _nwm_token_present(s3_token: str, tokens: set[str]) -> bool:
+    """Whether a product's bare `s3_token` shows among sampled file tokens.
+
+    Matches the bare token (a deterministic carrier's file token *is* the
+    `s3_token`) or its ensemble form `{s3_token}_{member}` (an ensemble
+    carrier rides the member on the token, e.g. `channel_rt_1`), so an
+    ensemble-only carrier is honoured rather than mis-reported.
+
+    Args:
+        s3_token: The product's bare `{output}` token (e.g. `channel_rt`).
+        tokens: The sampled file tokens for one configuration directory.
+
+    Returns:
+        `True` if the product's token (bare or member-suffixed) is present.
+
+    Examples:
+        - A deterministic carrier's bare token counts as present:
+            ```python
+            >>> from earthlens.cli.validate import _nwm_token_present
+            >>> _nwm_token_present("channel_rt", {"channel_rt", "land"})
+            True
+
+            ```
+        - An ensemble carrier's `{token}_{member}` file token counts too:
+            ```python
+            >>> from earthlens.cli.validate import _nwm_token_present
+            >>> _nwm_token_present("channel_rt", {"channel_rt_1"})
+            True
+
+            ```
+        - A token absent from the sample is not present:
+            ```python
+            >>> from earthlens.cli.validate import _nwm_token_present
+            >>> _nwm_token_present("channel_rt", {"land", "reservoir"})
+            False
+
+            ```
+    """
+    prefix = f"{s3_token}_"
+    return any(token == s3_token or token.startswith(prefix) for token in tokens)
+
+
+def _nwm_config_directory(config: Any, key: str) -> str:
+    """Return the live bucket directory for an NWM configuration.
+
+    A deterministic configuration is published under its bare `key`
+    directory; an ensemble configuration (`members > 0`) publishes each
+    member under `{key}_mem<N>`, so member 1 (`{key}_mem1`) is the directory
+    sampled for the product-token check.
+
+    Args:
+        config: The configuration row (duck-typed: reads `members`).
+        key: The configuration key (its bare directory name).
+
+    Returns:
+        The configuration's live directory name (`{key}_mem1` for an
+        ensemble, `key` otherwise).
+
+    Examples:
+        - A deterministic configuration maps to its bare directory:
+            ```python
+            >>> from types import SimpleNamespace
+            >>> from earthlens.cli.validate import _nwm_config_directory
+            >>> _nwm_config_directory(SimpleNamespace(members=0), "short_range")
+            'short_range'
+
+            ```
+        - An ensemble configuration maps to its member-1 directory:
+            ```python
+            >>> from types import SimpleNamespace
+            >>> from earthlens.cli.validate import _nwm_config_directory
+            >>> _nwm_config_directory(SimpleNamespace(members=6), "medium_range")
+            'medium_range_mem1'
+
+            ```
+    """
+    return f"{key}_mem1" if getattr(config, "members", 0) else key
+
+
+def _live_nwm(catalog: Any) -> tuple[int, list[str]]:
+    """Confirm each NWM product's `s3_token` appears live under a carrier config.
+
+    Ports the product-token check of the retired
+    `tools/nwm/audit_nwm_catalog.py`: every curated product's file token
+    (`channel_rt`, `land`, ...) must show up among the live files of at least
+    one configuration that publishes it. Carriers are tried deterministic-first
+    and sampling stops at the first hit, so a clean run touches only as many
+    configuration directories as needed (reusing the shared NWM bucket
+    primitives from `earthlens.cli.refresh`).
+
+    Args:
+        catalog: The loaded NWM `Catalog`.
+
+    Returns:
+        `(checked, issues)` — the product count and one message per token not
+        found live under any carrier configuration.
+    """
+    from earthlens.cli.refresh import _nwm_latest_complete_day, _nwm_unsigned_client
+
+    client = _nwm_unsigned_client()
+    day = _nwm_latest_complete_day(client)
+    issues: list[str] = []
+    for key, product in catalog.datasets.items():
+        carriers = sorted(
+            (
+                cfg_key
+                for cfg_key, config in catalog.configurations.items()
+                if key in (getattr(config, "products", None) or [])
+            ),
+            key=lambda k: catalog.configurations[k].members,
+        )
+        seen = False
+        for cfg_key in carriers:
+            directory = _nwm_config_directory(catalog.configurations[cfg_key], cfg_key)
+            if _nwm_token_present(
+                product.s3_token, _nwm_sample_tokens(client, day, directory)
+            ):
+                seen = True
+                break
+        if not seen:
+            issues.append(
+                f"{key}: s3_token {product.s3_token!r} not found live under "
+                "any carrier configuration"
+            )
+    return len(catalog.datasets), issues
+
+
 #: Provider id -> a live reachability validator (the `--live` half). May add
 #: a provider not in :data:`_VALIDATORS` (e.g. openeo / ecmwf are live-only).
 _LIVE_VALIDATORS: dict[str, Callable[[Any], tuple[int, list[str]]]] = {
     "s3": _live_s3,
+    "nwm": _live_nwm,
     "overture": _live_overture,
     "ghsl": _live_ghsl,
     "openeo": _live_openeo,
