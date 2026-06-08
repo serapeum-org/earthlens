@@ -324,10 +324,35 @@ def _validate_worldpop(catalog: Any) -> tuple[int, list[str]]:
     return len(catalog.datasets), issues
 
 
+def _validate_nwm(catalog: Any) -> tuple[int, list[str]]:
+    """Structural lint of the curated NWM products and configurations.
+
+    Mirrors the offline half of the retired `tools/nwm/audit_nwm_catalog.py`:
+    every product needs an `s3_token` and a non-empty `variables` map, and
+    every configuration's `products` must reference a curated product key.
+
+    Args:
+        catalog: The loaded NWM `Catalog`.
+
+    Returns:
+        `(checked, issues)` — the product count and one message per problem.
+    """
+    products = catalog.datasets
+    issues: list[str] = []
+    for key, product in products.items():
+        issues.extend(_require(key, product, ("s3_token", "variables")))
+    for cfg_key, config in catalog.configurations.items():
+        for product_key in getattr(config, "products", None) or []:
+            if product_key not in products:
+                issues.append(f"{cfg_key}: references unknown product {product_key!r}")
+    return len(products), issues
+
+
 #: Provider id -> a callable taking the loaded catalog and returning
 #: `(checked, issues)`. Providers without one report `"unsupported"`.
 _VALIDATORS: dict[str, Callable[[Any], tuple[int, list[str]]]] = {
     "nwp": _validate_nwp,
+    "nwm": _validate_nwm,
     "s3": _validate_s3,
     "ghsl": _validate_ghsl,
     "overture": _validate_overture,
@@ -633,10 +658,116 @@ def _live_ecmwf(catalog: Any) -> tuple[int, list[str]]:
     return checked, issues
 
 
+#: Region the unsigned NWM operational bucket is sampled from.
+_NWM_REGION = "us-east-1"
+
+
+def _nwm_live_token_map() -> dict[str, set[str]]:
+    """Map each live NWM configuration directory to its product `{output}` tokens.
+
+    Builds an unsigned `boto3` client for the public `noaa-nwm-pds` bucket,
+    finds the most recent complete `nwm.YYYYMMDD/` day (the latest may be
+    mid-publication), and samples the distinct product tokens (`channel_rt`,
+    `land`, ...) parsed from each configuration directory's file names. The
+    single network seam the live NWM check sits behind.
+
+    Returns:
+        Mapping of configuration directory name to its set of product tokens.
+
+    Raises:
+        RuntimeError: If the bucket exposes no `nwm.YYYYMMDD/` date prefix.
+    """
+    import boto3
+    from botocore import UNSIGNED
+    from botocore.client import Config
+
+    from earthlens.nwm import BUCKET
+
+    client = boto3.client(
+        "s3", region_name=_NWM_REGION, config=Config(signature_version=UNSIGNED)
+    )
+    paginator = client.get_paginator("list_objects_v2")
+    days = sorted(
+        prefix.rstrip("/")
+        for page in paginator.paginate(Bucket=BUCKET, Delimiter="/")
+        for entry in page.get("CommonPrefixes", [])
+        if (prefix := entry["Prefix"]).startswith("nwm.")
+    )
+    if not days:
+        raise RuntimeError(f"no nwm.YYYYMMDD/ prefixes found on {BUCKET}")
+    day = days[-2] if len(days) > 1 else days[-1]
+    listing = client.list_objects_v2(Bucket=BUCKET, Prefix=f"{day}/", Delimiter="/")
+    directories = [
+        entry["Prefix"].split("/")[1] for entry in listing.get("CommonPrefixes", [])
+    ]
+    token_map: dict[str, set[str]] = {}
+    for directory in directories:
+        sample = client.list_objects_v2(
+            Bucket=BUCKET, Prefix=f"{day}/{directory}/", MaxKeys=400
+        )
+        tokens: set[str] = set()
+        for entry in sample.get("Contents", []):
+            # nwm.tHHz.<family>.<output>.<step>.<domain>.nc
+            parts = entry["Key"].split("/")[-1].split(".")
+            if len(parts) >= 6:
+                tokens.add(parts[3])
+        token_map[directory] = tokens
+    return token_map
+
+
+def _nwm_config_directory(config: Any, key: str) -> str:
+    """Return the live bucket directory for a configuration (members -> `_mem1`)."""
+    return f"{key}_mem1" if getattr(config, "members", 0) else key
+
+
+def _live_nwm(catalog: Any) -> tuple[int, list[str]]:
+    """Confirm each NWM product's `s3_token` appears live under a carrier config.
+
+    Ports the product-token check of the retired
+    `tools/nwm/audit_nwm_catalog.py`: every curated product's file token
+    (`channel_rt`, `land`, ...) must show up among the live files of at least
+    one configuration that publishes it. Carriers are tried deterministic-first
+    (an ensemble directory appends the member, so the bare token shows under a
+    `members == 0` carrier), matching the bucket's file naming.
+
+    Args:
+        catalog: The loaded NWM `Catalog`.
+
+    Returns:
+        `(checked, issues)` — the product count and one message per token not
+        found live under any carrier configuration.
+    """
+    token_map = _nwm_live_token_map()
+    issues: list[str] = []
+    for key, product in catalog.datasets.items():
+        carriers = sorted(
+            (
+                cfg_key
+                for cfg_key, config in catalog.configurations.items()
+                if key in (getattr(config, "products", None) or [])
+            ),
+            key=lambda k: catalog.configurations[k].members,
+        )
+        seen = any(
+            product.s3_token
+            in token_map.get(
+                _nwm_config_directory(catalog.configurations[cfg_key], cfg_key), set()
+            )
+            for cfg_key in carriers
+        )
+        if not seen:
+            issues.append(
+                f"{key}: s3_token {product.s3_token!r} not found live under "
+                f"any of its {len(carriers)} carrier configuration(s)"
+            )
+    return len(catalog.datasets), issues
+
+
 #: Provider id -> a live reachability validator (the `--live` half). May add
 #: a provider not in :data:`_VALIDATORS` (e.g. openeo / ecmwf are live-only).
 _LIVE_VALIDATORS: dict[str, Callable[[Any], tuple[int, list[str]]]] = {
     "s3": _live_s3,
+    "nwm": _live_nwm,
     "overture": _live_overture,
     "ghsl": _live_ghsl,
     "openeo": _live_openeo,

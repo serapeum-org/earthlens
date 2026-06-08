@@ -29,6 +29,7 @@ def _info(provider):
 
 _CURATED_ENUM = (
     "nwp",
+    "nwm",
     "s3",
     "ghsl",
     "overture",
@@ -279,6 +280,28 @@ class TestLiveValidators:
         checked, issues = _live_ecmwf(catalog)
         assert checked == 2, "the no-constraints dataset is skipped"
         assert any("bad" in i for i in issues), "invalid request flagged"
+
+    def test_nwm_live_flags_token_absent_from_bucket(self, monkeypatch):
+        """A product whose s3_token shows on no live carrier config is flagged."""
+        monkeypatch.setattr(validate_mod, "_nwm_live_token_map", lambda: {})
+        result = validate_one(_info("nwm"), live=True)
+        assert result.status == "ok", "nwm live validator ran"
+        assert result.issues, "an empty bucket flags every product token"
+        assert all("s3_token" in issue for issue in result.issues), "token messages"
+
+    def test_nwm_live_clean_when_tokens_present(self, monkeypatch):
+        """Every product's token appearing under a carrier config clears live."""
+        from earthlens.cli.adapter import load_catalog
+
+        catalog = load_catalog(_info("nwm"))
+        all_tokens = {product.s3_token for product in catalog.datasets.values()}
+        token_map = {
+            validate_mod._nwm_config_directory(config, key): set(all_tokens)
+            for key, config in catalog.configurations.items()
+        }
+        monkeypatch.setattr(validate_mod, "_nwm_live_token_map", lambda: token_map)
+        result = validate_one(_info("nwm"), live=True)
+        assert result.issues == [], "every token present under a carrier -> clean"
 
     def test_supported_providers_live_adds_ecmwf_and_nwp(self):
         """ecmwf gains a live-only validator; nwp gains a live one on top."""
