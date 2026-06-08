@@ -18,6 +18,14 @@ on:
     workflows: ['github-release']
     types: [completed]
 
+# Serialise deploys to the shared `gh-pages` branch: every PR/main/release
+# deploy pushes the built docs to the same branch, so overlapping runs race
+# and the loser fails with `! [rejected] ... fetch first`. One global group
+# (not keyed by ref) makes them queue instead of racing.
+concurrency:
+  group: mkdocs-gh-pages-deploy
+  cancel-in-progress: false
+
 jobs:
   deploy-pr:
       if: github.event_name == 'pull_request'
