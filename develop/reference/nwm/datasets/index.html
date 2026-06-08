@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -10365,13 +10365,16 @@ horizon, cadence, members, and product list. List them all:</p>
 <p>Example:
 <code>nwm.20260526/short_range/nwm.t00z.short_range.channel_rt.f001.conus.nc</code></p>
 <h2 id="tooling"><a class="toclink" href="#tooling">Tooling</a><a class="headerlink" href="#tooling" title="Permanent link">#</a></h2>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c1"># Probe the bucket: retention window + every live configuration.</span>
-<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>pixi<span class="w"> </span>run<span class="w"> </span>-e<span class="w"> </span>dev<span class="w"> </span>python<span class="w"> </span>tools/nwm/refresh_nwm_catalog.py
-<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="c1"># Diff the curated catalog vs live; exit non-zero on drift.</span>
-<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>pixi<span class="w"> </span>run<span class="w"> </span>-e<span class="w"> </span>dev<span class="w"> </span>python<span class="w"> </span>tools/nwm/audit_nwm_catalog.py<span class="w"> </span>--strict
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c1"># List the live configurations and diff them against the bundled catalog.</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>earthlens<span class="w"> </span>datasets<span class="w"> </span>refresh<span class="w"> </span>nwm
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="c1"># Flag any curated configuration no longer served live; exit non-zero on drift.</span>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>earthlens<span class="w"> </span>datasets<span class="w"> </span>audit<span class="w"> </span>nwm<span class="w"> </span>--strict
 </code></pre></div>
-<p>The retention window is a rolling archive (~512 days as of 2026-05); the
-audit reports it against the backend's auto-mode boundary.</p>
+<p>Both commands walk the most recent complete <code>nwm.YYYYMMDD/</code> day on the
+unsigned <code>noaa-nwm-pds</code> bucket (ensemble-member directories are collapsed to
+their base configuration key). The assimilation-input <code>usgs_timeslices</code>
+directory is a live configuration the catalog deliberately does not curate,
+so it surfaces as an untracked id (informational), not drift.</p>
 
 
 

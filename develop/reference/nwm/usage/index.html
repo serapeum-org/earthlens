@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -10422,15 +10422,19 @@ writes one <strong>GeoTIFF</strong> per variable:</p>
   gridded bbox, or a tabular product for a retrospective time series.</li>
 </ul>
 <h2 id="catalog-tooling"><a class="toclink" href="#catalog-tooling">Catalog tooling</a><a class="headerlink" href="#catalog-tooling" title="Permanent link">#</a></h2>
-<p>Two read-only scripts (not part of the installed package) keep the
-catalog honest against the live bucket:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="c1"># Probe the bucket: retention window + the 69 live configurations.</span>
-<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>pixi<span class="w"> </span>run<span class="w"> </span>-e<span class="w"> </span>dev<span class="w"> </span>python<span class="w"> </span>tools/nwm/refresh_nwm_catalog.py
-<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>pixi<span class="w"> </span>run<span class="w"> </span>-e<span class="w"> </span>dev<span class="w"> </span>python<span class="w"> </span>tools/nwm/refresh_nwm_catalog.py<span class="w"> </span>--format<span class="w"> </span>yaml
-<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>
-<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="c1"># Diff the curated catalog vs live; exit non-zero on drift.</span>
-<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>pixi<span class="w"> </span>run<span class="w"> </span>-e<span class="w"> </span>dev<span class="w"> </span>python<span class="w"> </span>tools/nwm/audit_nwm_catalog.py<span class="w"> </span>--strict
+<p>The federated <code>earthlens datasets</code> CLI keeps the catalog honest against the
+live bucket (no standalone scripts — the same <code>refresh</code>/<code>audit</code> commands every
+backend shares):</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="c1"># List the live configurations and diff them against the bundled catalog.</span>
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>earthlens<span class="w"> </span>datasets<span class="w"> </span>refresh<span class="w"> </span>nwm
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="c1"># Flag any curated configuration no longer served live; exit non-zero on drift.</span>
+<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>earthlens<span class="w"> </span>datasets<span class="w"> </span>audit<span class="w"> </span>nwm<span class="w"> </span>--strict
 </code></pre></div>
+<p>Both walk the most recent complete <code>nwm.YYYYMMDD/</code> day on the unsigned
+<code>noaa-nwm-pds</code> bucket, collapsing ensemble-member directories to their base
+configuration key. NWM's refreshable axis is its <code>available_configurations</code>
+index; <code>--write</code> is not supported (the index is derived from the curated
+rows, so <code>refresh nwm --write</code> reports "live read only").</p>
 
 
 
