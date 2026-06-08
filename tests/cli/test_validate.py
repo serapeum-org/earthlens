@@ -325,6 +325,157 @@ class TestLiveValidators:
         assert "nwp" in supported_providers(live=True)
 
 
+class _FakeSampleClient:
+    """A minimal S3 stand-in serving canned `Contents` for token sampling."""
+
+    def __init__(self, contents):
+        self._contents = contents
+
+    def list_objects_v2(self, **kwargs):
+        """Return the canned object `Contents` regardless of the prefix."""
+        return {"Contents": self._contents}
+
+
+def _key(directory, output):
+    """Build a NWM object key with the given `{output}` token."""
+    return f"nwm.20260602/{directory}/nwm.t00z.short_range.{output}.f001.conus.nc"
+
+
+class TestNwmValidateInternals:
+    """Direct tests for the NWM validate helpers (network mocked)."""
+
+    def test_sample_tokens_parses_output_and_skips_short_names(self):
+        """The `{output}` token is parsed; names with too few parts are skipped."""
+        client = _FakeSampleClient(
+            [
+                {"Key": _key("short_range", "channel_rt")},
+                {"Key": "nwm.20260602/short_range/nwm.t00z.land.nc"},
+            ]
+        )
+        tokens = validate_mod._nwm_sample_tokens(client, "nwm.20260602", "short_range")
+        assert tokens == {"channel_rt"}, f"only the well-formed token parsed: {tokens}"
+
+    def test_sample_tokens_empty_listing_returns_empty_set(self):
+        """A directory with no objects samples an empty token set."""
+        tokens = validate_mod._nwm_sample_tokens(_FakeSampleClient([]), "d", "x")
+        assert tokens == set(), f"expected empty set, got {tokens}"
+
+    def test_config_directory_appends_mem1_for_ensembles(self):
+        """An ensemble config maps to its `_mem1` directory; deterministic stays bare."""
+        ensemble = SimpleNamespace(members=6)
+        deterministic = SimpleNamespace(members=0)
+        assert validate_mod._nwm_config_directory(ensemble, "medium_range") == (
+            "medium_range_mem1"
+        ), "ensemble appends _mem1"
+        assert (
+            validate_mod._nwm_config_directory(deterministic, "short_range")
+            == "short_range"
+        ), "deterministic stays bare"
+
+    @pytest.mark.parametrize(
+        "tokens, expected",
+        [
+            ({"channel_rt"}, True),
+            ({"channel_rt_1"}, True),
+            ({"channel_rt_12"}, True),
+            ({"land", "reservoir"}, False),
+            (set(), False),
+        ],
+    )
+    def test_token_present_bare_and_ensemble_forms(self, tokens, expected):
+        """A bare token or its `{token}_{member}` ensemble form counts as present.
+
+        Args:
+            tokens: The sampled file tokens for one configuration directory.
+            expected: Whether `channel_rt` should be reported present.
+        """
+        assert (
+            validate_mod._nwm_token_present("channel_rt", tokens) is expected
+        ), f"_nwm_token_present('channel_rt', {tokens}) should be {expected}"
+
+    def test_validate_nwm_flags_empty_variables(self):
+        """A product with an empty `variables` map is flagged by the offline lint."""
+        catalog = SimpleNamespace(
+            datasets={"bad": SimpleNamespace(s3_token="x", variables={})},
+            configurations={},
+        )
+        checked, issues = validate_mod._validate_nwm(catalog)
+        assert checked == 1, "one product inspected"
+        assert any("variables" in issue for issue in issues), "empty variables flagged"
+
+    def test_validate_nwm_flags_unknown_product_in_configuration(self):
+        """A configuration referencing an uncurated product key is flagged."""
+        catalog = SimpleNamespace(
+            datasets={
+                "chrtout": SimpleNamespace(
+                    s3_token="channel_rt", variables={"streamflow": object()}
+                )
+            },
+            configurations={
+                "short_range": SimpleNamespace(products=["chrtout", "ghost"])
+            },
+        )
+        _checked, issues = validate_mod._validate_nwm(catalog)
+        assert any(
+            "ghost" in issue and "unknown product" in issue for issue in issues
+        ), f"dangling product reference flagged: {issues}"
+
+    def test_validate_nwm_clean_minimal_catalog(self):
+        """A coherent minimal catalog produces no offline issues."""
+        catalog = SimpleNamespace(
+            datasets={
+                "chrtout": SimpleNamespace(
+                    s3_token="channel_rt", variables={"streamflow": object()}
+                )
+            },
+            configurations={"short_range": SimpleNamespace(products=["chrtout"])},
+        )
+        checked, issues = validate_mod._validate_nwm(catalog)
+        assert checked == 1 and issues == [], f"coherent catalog is clean: {issues}"
+
+    def test_live_nwm_flags_only_the_absent_product(self, monkeypatch):
+        """`_live_nwm` flags exactly the product whose token no carrier serves."""
+        from earthlens.cli import refresh as refresh_mod
+
+        catalog = SimpleNamespace(
+            datasets={
+                "a": SimpleNamespace(s3_token="ta"),
+                "b": SimpleNamespace(s3_token="tb"),
+            },
+            configurations={"cfg": SimpleNamespace(members=0, products=["a", "b"])},
+        )
+        monkeypatch.setattr(refresh_mod, "_nwm_unsigned_client", lambda: object())
+        monkeypatch.setattr(refresh_mod, "_nwm_latest_complete_day", lambda c: "d")
+        monkeypatch.setattr(
+            validate_mod, "_nwm_sample_tokens", lambda c, d, dir_: {"ta"}
+        )
+        checked, issues = validate_mod._live_nwm(catalog)
+        assert checked == 2, "both products inspected"
+        assert len(issues) == 1 and "b" in issues[0], f"only 'b' flagged: {issues}"
+
+    def test_live_nwm_ensemble_carrier_matches_member_token(self, monkeypatch):
+        """An ensemble-only carrier's `{token}_{member}` file satisfies the check."""
+        from earthlens.cli import refresh as refresh_mod
+
+        catalog = SimpleNamespace(
+            datasets={"a": SimpleNamespace(s3_token="channel_rt")},
+            configurations={"ens": SimpleNamespace(members=6, products=["a"])},
+        )
+        captured = {}
+
+        def _sample(client, day, directory):
+            """Record the sampled directory and return the member-suffixed token."""
+            captured["dir"] = directory
+            return {"channel_rt_1"}
+
+        monkeypatch.setattr(refresh_mod, "_nwm_unsigned_client", lambda: object())
+        monkeypatch.setattr(refresh_mod, "_nwm_latest_complete_day", lambda c: "d")
+        monkeypatch.setattr(validate_mod, "_nwm_sample_tokens", _sample)
+        checked, issues = validate_mod._live_nwm(catalog)
+        assert issues == [], "the ensemble member token satisfies the bare token"
+        assert captured["dir"] == "ens_mem1", "the ensemble member-1 directory sampled"
+
+
 class TestValidateResult:
     """Tests for ValidateResult."""
 

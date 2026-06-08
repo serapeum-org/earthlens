@@ -7,6 +7,7 @@ import importlib
 import json
 import pathlib
 import shutil
+from types import SimpleNamespace
 
 import pytest
 import yaml
@@ -480,6 +481,95 @@ class TestNwmRefresher:
         assert outcome.status == "ok", "nwm refresh ran"
         assert not outcome.written, "no on-disk index block to rewrite"
         assert "live read only" in outcome.detail, "reported as read-only"
+
+
+class _FakeNwmClient:
+    """A minimal in-memory S3 stand-in for the NWM bucket-primitive tests.
+
+    Serves `get_paginator(...).paginate()` from `date_pages` (the
+    `nwm.YYYYMMDD/` prefix walk) and `list_objects_v2(...)` from
+    `dir_prefixes` (one day's configuration directories).
+    """
+
+    def __init__(self, date_pages=None, dir_prefixes=None):
+        self._date_pages = date_pages or []
+        self._dir_prefixes = dir_prefixes or []
+
+    def get_paginator(self, operation):
+        """Return a paginator whose `paginate` yields the canned date pages."""
+        assert operation == "list_objects_v2", operation
+        return SimpleNamespace(paginate=lambda **kw: iter(self._date_pages))
+
+    def list_objects_v2(self, **kwargs):
+        """Return the canned configuration-directory `CommonPrefixes`."""
+        return {"CommonPrefixes": self._dir_prefixes}
+
+
+def _date_page(*days):
+    """Build a paginator page of `nwm.<day>/` common prefixes."""
+    return {"CommonPrefixes": [{"Prefix": f"nwm.{day}/"} for day in days]}
+
+
+class TestNwmBucketPrimitives:
+    """Tests for the shared NWM bucket primitives in refresh.py."""
+
+    def test_unsigned_client_is_us_east_1_s3(self):
+        """`_nwm_unsigned_client` builds an unsigned us-east-1 S3 client offline."""
+        client = refresh_mod._nwm_unsigned_client()
+        assert client.meta.region_name == "us-east-1", "region pinned to us-east-1"
+        assert (
+            client.meta.service_model.service_name == "s3"
+        ), "an S3 client is returned"
+
+    def test_latest_complete_day_picks_day_before_latest(self):
+        """The day before the newest prefix is chosen (newest may be partial)."""
+        client = _FakeNwmClient(
+            date_pages=[_date_page("20260601", "20260603", "20260602")]
+        )
+        assert (
+            refresh_mod._nwm_latest_complete_day(client) == "nwm.20260602"
+        ), "second-newest day selected"
+
+    def test_latest_complete_day_single_day_uses_only_day(self):
+        """With a single published day, that day is used as-is."""
+        client = _FakeNwmClient(date_pages=[_date_page("20260601")])
+        assert refresh_mod._nwm_latest_complete_day(client) == "nwm.20260601"
+
+    def test_latest_complete_day_ignores_non_nwm_prefixes(self):
+        """Prefixes that do not start with `nwm.` are skipped."""
+        client = _FakeNwmClient(date_pages=[{"CommonPrefixes": [{"Prefix": "index/"}]}])
+        with pytest.raises(RuntimeError, match=r"no nwm\.YYYYMMDD"):
+            refresh_mod._nwm_latest_complete_day(client)
+
+    def test_config_dirs_parses_and_sorts_directory_names(self):
+        """Configuration directory names are parsed from the day's prefixes."""
+        client = _FakeNwmClient(
+            dir_prefixes=[
+                {"Prefix": "nwm.20260602/short_range/"},
+                {"Prefix": "nwm.20260602/medium_range_mem1/"},
+            ]
+        )
+        assert refresh_mod._nwm_config_dirs(client, "nwm.20260602") == [
+            "medium_range_mem1",
+            "short_range",
+        ], "directory names parsed and sorted"
+
+    def test_live_config_dirs_composes_the_primitives(self, monkeypatch):
+        """`_nwm_live_config_dirs` wires client -> day -> dirs together."""
+        monkeypatch.setattr(refresh_mod, "_nwm_unsigned_client", lambda: "CLIENT")
+        monkeypatch.setattr(
+            refresh_mod,
+            "_nwm_latest_complete_day",
+            lambda client: "DAY" if client == "CLIENT" else "WRONG",
+        )
+        monkeypatch.setattr(
+            refresh_mod,
+            "_nwm_config_dirs",
+            lambda client, day: (
+                ["a", "b"] if (client, day) == ("CLIENT", "DAY") else []
+            ),
+        )
+        assert refresh_mod._nwm_live_config_dirs() == ["a", "b"], "primitives composed"
 
 
 class _FakeFTP:
