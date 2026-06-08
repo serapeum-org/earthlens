@@ -29,6 +29,17 @@ def _build_stac(tmp_path, endpoint="earth-search", variables=None, **kwargs):
     )
 
 
+class _BuildSignerSpy:
+    """Records the `(signer_type, creds)` of each `build_signer` call."""
+
+    def __init__(self):
+        self.calls = []
+
+    def __call__(self, signer_type, **creds):
+        self.calls.append((signer_type, creds))
+        return object()
+
+
 @pytest.mark.stac
 class TestOutputKind:
     """The backend declares the raster output shape."""
@@ -233,8 +244,14 @@ class TestFetch:
         stac._fetch(stac._search())
         assert _FakeCloudConfig.active_extras[-1]["AWS_S3_ENDPOINT"]
 
-    def test_signed_hrefs_reach_merge(self, fake_pyramids, tmp_path):
+    def test_signed_hrefs_reach_merge(self, fake_pyramids, tmp_path, monkeypatch):
         """MPC signs each tile href before it is handed to the mosaic step."""
+        # The mpc-sas endpoint builds earthlens' own PlanetaryComputerSigner; patch
+        # its sign_href to a deterministic transform (no network, no real PC host).
+        monkeypatch.setattr(
+            "earthlens.stac.signers.PlanetaryComputerSigner.sign_href",
+            lambda self, href: href + "?sas=token",
+        )
         fake_pyramids.items_by_collection["sentinel-2-l2a"] = [
             make_item("a", "2024-01-05", {"B04": "https://h/a_b04.tif"}),
             make_item("b", "2024-01-05", {"B04": "https://h/b_b04.tif"}),
@@ -383,6 +400,50 @@ class TestSignerOverride:
         stac._fetch(stac._search())
         assert _FakeCloudConfig.active_extras[-1].get("AWS_REQUEST_PAYER") == "requester"
         assert fake_pyramids.merge_calls[0][0][0].startswith("/vsis3/usgs-landsat/")
+
+
+@pytest.mark.stac
+class TestSignerCredentials:
+    """The backend forwards bearer + S3 credentials to build_signer (L1)."""
+
+    def test_signer_credentials_drops_unset_kwargs(self, fake_pyramids, tmp_path):
+        """_signer_credentials returns only the set creds; unset token/client_id are dropped."""
+        stac = _build_stac(tmp_path, endpoint="earth-search", username="u", password="p")
+        creds = stac._signer_credentials()
+        assert creds["username"] == "u"
+        assert creds["password"] == "p"
+        assert "token" not in creds
+        assert "client_id" not in creds
+
+    def test_initialize_forwards_credentials_to_build_signer(
+        self, fake_pyramids, tmp_path, monkeypatch
+    ):
+        """_initialize forwards the set bearer creds to build_signer (client_id dropped)."""
+        spy = _BuildSignerSpy()
+        monkeypatch.setattr("earthlens.stac.signers.build_signer", spy)
+        _build_stac(tmp_path, endpoint="earth-search", username="u", password="p", token="t")
+        creds = spy.calls[0][1]
+        assert creds["username"] == "u"
+        assert creds["password"] == "p"
+        assert creds["token"] == "t"
+        assert "client_id" not in creds
+
+    def test_signer_for_forwards_credentials_to_build_signer(
+        self, fake_pyramids, tmp_path, monkeypatch
+    ):
+        """_signer_for forwards the set bearer creds when building an override signer."""
+        spy = _BuildSignerSpy()
+        monkeypatch.setattr("earthlens.stac.signers.build_signer", spy)
+        stac = _build_stac(
+            tmp_path,
+            endpoint="earth-search",
+            variables={"earth-search/landsat-c2-l2": ["red"]},
+            username="u",
+            password="p",
+        )
+        stac._signer_for("earth-search/landsat-c2-l2")
+        override_calls = [creds for kind, creds in spy.calls if kind == "aws-requester-pays"]
+        assert override_calls and override_calls[0]["username"] == "u"
 
 
 @pytest.mark.stac

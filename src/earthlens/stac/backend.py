@@ -11,11 +11,12 @@ GeoTIFF per `(collection, date)` to `path`.
 The GIS heavy lifting lives in pyramids (per the pyramids/earthlens split):
 `pyramids.stac.open_client` / `resolved_href` / `read_extension_metadata`,
 `pyramids.dataset.merge`'s `merge_rasters` / `stack_bands(align=True)`,
-`Dataset.crop`, and `pyramids.dataset.cog.write_cog`. earthlens owns only the
-CDSE S3 signer (`earthlens.stac.signers`; the generic + Planetary Computer
-signers come from `pyramids.stac`), the endpoint × collection × asset catalog,
-and the search→load→write orchestration. There is no `odc-stac` / `stackstac`
-dependency.
+`Dataset.crop`, and `pyramids.dataset.cog.write_cog`. earthlens owns the
+provider signers (`earthlens.stac.signers` — Planetary Computer / Earthdata /
+CDSE bearer / CDSE S3; the generic `Signer` protocol + `anonymous` /
+`aws-requester-pays` signers come from `pyramids.stac`), the endpoint ×
+collection × asset catalog, and the search→load→write orchestration. There is
+no `odc-stac` / `stackstac` dependency.
 
 `OUTPUT_KIND = "raster"`, so the `EarthLens` facade forwards
 `aggregate=AggregationConfig(...)` to `download()` rather than rejecting it.
@@ -68,6 +69,10 @@ class STAC(AbstractDataSource):
         region: str | None = None,
         access_key: str | None = None,
         secret_key: str | None = None,
+        username: str | None = None,
+        password: str | None = None,
+        token: str | None = None,
+        client_id: str | None = None,
         max_items: int | None = None,
     ):
         """Initialise a STAC backend instance.
@@ -94,6 +99,14 @@ class STAC(AbstractDataSource):
             region: Optional AWS region for requester-pays / S3 endpoints.
             access_key: CDSE S3 access key (else `CDSE_S3_ACCESS_KEY`).
             secret_key: CDSE S3 secret key (else `CDSE_S3_SECRET_KEY`).
+            username: Bearer-signer username for an `earthdata` / `cdse`
+                endpoint (else `EARTHDATA_USERNAME` / `CDSE_USERNAME`).
+            password: Bearer-signer password for an `earthdata` / `cdse`
+                endpoint (else `EARTHDATA_PASSWORD` / `CDSE_PASSWORD`).
+            token: Pre-minted Earthdata bearer token for an `earthdata`
+                endpoint (else `EARTHDATA_TOKEN` / `EARTHDATA_PAT`).
+            client_id: Keycloak client id for a `cdse` bearer endpoint
+                (defaults to `cdse-public` in the signer).
             max_items: Optional cap on the number of items per collection
                 search (mainly for tests / smoke pulls).
         """
@@ -104,6 +117,10 @@ class STAC(AbstractDataSource):
         self._region = region
         self._access_key = access_key
         self._secret_key = secret_key
+        self._username = username
+        self._password = password
+        self._token = token
+        self._client_id = client_id
         self._max_items = max_items
         # Stored before super().__init__ because the base constructor calls
         # _initialize() (which needs the request) before it sets self.vars.
@@ -167,10 +184,7 @@ class STAC(AbstractDataSource):
                     "or pass endpoint= explicitly."
                 )
         self._signer = build_signer(
-            self._endpoint_obj.signer,
-            region=self._region or self._endpoint_obj.region,
-            access_key=self._access_key,
-            secret_key=self._secret_key,
+            self._endpoint_obj.signer, **self._signer_credentials()
         )
 
         from pyramids.stac import open_client
@@ -363,14 +377,31 @@ class STAC(AbstractDataSource):
         if cached is None:
             from earthlens.stac.signers import build_signer
 
-            cached = build_signer(
-                override,
-                region=self._region or self._endpoint_obj.region,
-                access_key=self._access_key,
-                secret_key=self._secret_key,
-            )
+            cached = build_signer(override, **self._signer_credentials())
             self._signer_cache[override] = cached
         return cached
+
+    def _signer_credentials(self) -> dict[str, Any]:
+        """Assemble the non-`None` credential kwargs forwarded to `build_signer`.
+
+        `build_signer` whitelists the kwargs each signer accepts, so the full
+        set is safe to pass; `None` values are dropped so an unset `client_id`
+        does not override the CDSE signer's default.
+
+        Returns:
+            A mapping of the set credential kwargs (`region`, `access_key`,
+            `secret_key`, `username`, `password`, `token`, `client_id`).
+        """
+        creds = {
+            "region": self._region or self._endpoint_obj.region,
+            "access_key": self._access_key,
+            "secret_key": self._secret_key,
+            "username": self._username,
+            "password": self._password,
+            "token": self._token,
+            "client_id": self._client_id,
+        }
+        return {key: value for key, value in creds.items() if value is not None}
 
     def _target_crs(self, group: list[RemoteProduct]) -> int | None:
         """Pick the mosaic target CRS for a date group, without opening rasters.

@@ -5,6 +5,8 @@ environments:
     - url: https://conda.anaconda.org/conda-forge/
     indexes:
     - https://pypi.org/simple
+    options:
+      pypi-prerelease-mode: if-necessary-or-explicit
     packages:
       linux-64:
       - conda: https://conda.anaconda.org/conda-forge/linux-64/_openmp_mutex-4.5-20_gnu.conda
@@ -734,6 +736,8 @@ environments:
     - url: https://conda.anaconda.org/conda-forge/
     indexes:
     - https://pypi.org/simple
+    options:
+      pypi-prerelease-mode: if-necessary-or-explicit
     packages:
       linux-64:
       - conda: https://conda.anaconda.org/conda-forge/linux-64/_openmp_mutex-4.5-20_gnu.conda
@@ -1890,6 +1894,8 @@ environments:
     - url: https://conda.anaconda.org/conda-forge/
     indexes:
     - https://pypi.org/simple
+    options:
+      pypi-prerelease-mode: if-necessary-or-explicit
     packages:
       linux-64:
       - conda: https://conda.anaconda.org/conda-forge/linux-64/_openmp_mutex-4.5-20_gnu.conda
@@ -2906,6 +2912,8 @@ environments:
     - url: https://conda.anaconda.org/conda-forge/
     indexes:
     - https://pypi.org/simple
+    options:
+      pypi-prerelease-mode: if-necessary-or-explicit
     packages:
       linux-64:
       - conda: https://conda.anaconda.org/conda-forge/linux-64/_openmp_mutex-4.5-20_gnu.conda
@@ -4062,6 +4070,8 @@ environments:
     - url: https://conda.anaconda.org/conda-forge/
     indexes:
     - https://pypi.org/simple
+    options:
+      pypi-prerelease-mode: if-necessary-or-explicit
     packages:
       linux-64:
       - conda: https://conda.anaconda.org/conda-forge/linux-64/_openmp_mutex-4.5-20_gnu.conda
@@ -5094,6 +5104,8 @@ environments:
     - url: https://conda.anaconda.org/conda-forge/
     indexes:
     - https://pypi.org/simple
+    options:
+      pypi-prerelease-mode: if-necessary-or-explicit
     packages:
       linux-64:
       - conda: https://conda.anaconda.org/conda-forge/linux-64/_openmp_mutex-4.5-20_gnu.conda
@@ -6129,6 +6141,8 @@ environments:
     - url: https://conda.anaconda.org/conda-forge/
     indexes:
     - https://pypi.org/simple
+    options:
+      pypi-prerelease-mode: if-necessary-or-explicit
     packages:
       linux-64:
       - conda: https://conda.anaconda.org/conda-forge/linux-64/_openmp_mutex-4.5-20_gnu.conda
@@ -7167,6 +7181,8 @@ environments:
     - url: https://conda.anaconda.org/conda-forge/
     indexes:
     - https://pypi.org/simple
+    options:
+      pypi-prerelease-mode: if-necessary-or-explicit
     packages:
       linux-64:
       - conda: https://conda.anaconda.org/conda-forge/linux-64/_openmp_mutex-4.5-20_gnu.conda
@@ -10979,7 +10995,7 @@ packages:
 - pypi: ./
   name: earthlens
   version: 0.7.0
-  sha256: f52263e8763e7a73a0cf91f45d67be85b0572cc96e5ab7974fa20fd3fdf73287
+  sha256: 66c9f09d0751bdf36b7a5219c66b24313f9e142dfd288c6820fc53e0a4f5cf14
   requires_dist:
   - pyramids-gis>=0.31.0
   - geopandas>=1.0.0
@@ -11024,7 +11040,6 @@ packages:
   - py7zr>=0.20 ; extra == 'worldpop'
   - earthlens[s3,ecmwf,gee,cmems,fdsn,earthdata,hdx,eumetsat,nwp,radar,stac,openeo,sentinel-hub,tropycal,overture,usgs-water,ghsl,worldpop] ; extra == 'all'
   requires_python: '>=3.11,<4'
-  editable: true
 - pypi: https://files.pythonhosted.org/packages/09/40/42bb2d98bc6103194d25fa8da141cd43cabf32277cbf2ab513fe35532196/eccodes-2.47.0-cp311-cp311-win_amd64.whl
   name: eccodes
   version: 2.47.0
