@@ -247,6 +247,7 @@ nav:
       - NO₂ over China, COVID lockdown: examples/showcase/no2_covid_lockdown.ipynb
       - Mediterranean marine heatwave (CMEMS): examples/showcase/marine_heatwave_mediterranean.ipynb
       - NYC wildfire-smoke air quality (OpenAQ): examples/showcase/wildfire_smoke_air_quality.ipynb
+      - Hurricane Harvey rainfall (NASA GPM/Earthdata): examples/showcase/hurricane_harvey_rainfall.ipynb
     - CHC (CHIRPS / CHIRTS / SPI / SPEI / …):
       - Catalog explorer (no network): examples/chc/catalog_explorer.ipynb
       - Daily rainfall quickstart (live): examples/chc/quickstart.ipynb
