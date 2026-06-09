@@ -213,6 +213,45 @@ class TestECMWFBackend:
             ecmwf.root_dir == tmp_path.resolve()
         ), f"root_dir should be the tmp path; got {ecmwf.root_dir}"
 
+    def test_dataset_arg_composes_variables_dict(self, tmp_path, monkeypatch):
+        """`dataset=` + a list yields the same vars as the nested-dict form."""
+        monkeypatch.setattr(cdsapi, "Client", lambda: _SentinelClient())
+
+        earthlens = EarthLens(
+            data_source="ecmwf",
+            temporal_resolution="monthly",
+            start="2022-01-01",
+            end="2022-02-01",
+            dataset="reanalysis-era5-single-levels",
+            variables=["2m-temperature", "total-precipitation"],
+            lat_lim=[4.0, 5.0],
+            lon_lim=[-75.0, -74.0],
+            path=str(tmp_path),
+        )
+
+        assert earthlens.datasource.vars == {
+            "reanalysis-era5-single-levels": [
+                "2m-temperature",
+                "total-precipitation",
+            ],
+        }, f"dataset= should compose the keyed dict; got {earthlens.datasource.vars!r}"
+
+    def test_dataset_arg_with_dict_variables_raises(self, tmp_path, monkeypatch):
+        """`dataset=` together with a dict `variables` is rejected."""
+        monkeypatch.setattr(cdsapi, "Client", lambda: _SentinelClient())
+
+        with pytest.raises(ValueError, match="pass variables= as a list"):
+            EarthLens(
+                data_source="ecmwf",
+                start="2022-01-01",
+                end="2022-02-01",
+                dataset="reanalysis-era5-single-levels",
+                variables={"reanalysis-era5-single-levels": ["2m-temperature"]},
+                lat_lim=[4.0, 5.0],
+                lon_lim=[-75.0, -74.0],
+                path=str(tmp_path),
+            )
+
     def test_full_download_through_facade_routes_to_cdsapi(self, tmp_path, monkeypatch):
         """End-to-end: `EarthLens(...).download()` reaches CDS.
 

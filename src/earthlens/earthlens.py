@@ -379,6 +379,7 @@ class EarthLens:
         fmt: str = "%Y-%m-%d",
         aoi: Any = None,
         buffer: float | None = None,
+        dataset: str | None = None,
         **backend_kwargs: object,
     ):
         """Resolve the backend and construct it with the user's parameters.
@@ -426,6 +427,16 @@ class EarthLens:
             end: Inclusive end date as a string. Defaults to `None`.
             path: Output directory. Created by the backend if it does
                 not exist. Defaults to the current working directory.
+            dataset: Explicit dataset / collection key, the ergonomic
+                alternative to keying it into `variables`. When given
+                with a plain `variables` list, the facade composes the
+                backend's request for you — the S3 backend receives it
+                as a native `dataset` argument, and the dataset-keyed
+                backends (ECMWF, GEE, CHC, …) receive the composed
+                `{dataset: variables}` dict. Passing `dataset` together
+                with a dict `variables` raises `ValueError` for the
+                dataset-keyed backends. Defaults to `None` (the legacy
+                nested-dict `variables` call is unchanged).
             variables: Backend-specific variable specification.
                 Shape depends on the backend:
 
@@ -588,15 +599,25 @@ class EarthLens:
             **backend_kwargs,
         }
 
-        self.datasource = self.DataSources[data_source](
+        backend_cls = self.DataSources[data_source]
+
+        # `dataset=` + a plain `variables` list is resolved into the
+        # shape each backend wants — a native `dataset` kwarg for the S3
+        # backend, or the legacy `{dataset: variables}` dict for the
+        # dataset-keyed backends. With `dataset=None` this is a no-op.
+        from earthlens.base._requests import normalize_dataset_variables
+
+        request_kwargs = normalize_dataset_variables(backend_cls, dataset, variables)
+
+        self.datasource = backend_cls(
             start=start,
             end=end,
-            variables=variables,
             lat_lim=lat_lim,
             lon_lim=lon_lim,
             temporal_resolution=temporal_resolution,
             path=path,
             fmt=fmt,
+            **request_kwargs,
             **merged_kwargs,
         )
 
