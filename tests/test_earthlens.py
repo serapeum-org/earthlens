@@ -473,6 +473,20 @@ class TestFacadeAoi:
         with pytest.raises(ValueError, match="buffer= only applies"):
             self._build(tmp_path, buffer=0.5)
 
+    def test_accepts_date_objects(self, tmp_path):
+        """The facade threads date objects through to the backend window."""
+        import datetime as dt
+
+        space_time = EarthLens(
+            data_source="chc",
+            variables=["precipitation"],
+            start=dt.date(2009, 1, 1),
+            end=dt.date(2009, 1, 2),
+            path=str(tmp_path),
+        ).datasource.time
+        assert space_time.start_date == dt.datetime(2009, 1, 1)
+        assert space_time.end_date == dt.datetime(2009, 1, 2)
+
     def test_native_aoi_backend_rejects_buffer(self):
         """A backend that owns aoi= (WorldPop) rejects buffer= up front."""
         pytest.importorskip("earthlens.worldpop")

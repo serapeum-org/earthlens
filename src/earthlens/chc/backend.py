@@ -51,6 +51,7 @@ from earthlens.base import (
     OutputKind,
     SpatialExtent,
     TemporalExtent,
+    to_datetime,
 )
 from earthlens.chc.catalog import Catalog
 from earthlens.chc.catalog import Dataset as ChcDataset
@@ -326,8 +327,8 @@ class CHIRPS(AbstractDataSource):
             `self.time.dates` would otherwise get a misleading daily
             index for a `monthly` or `6-hourly` dataset.
         """
-        start_dt = dt.datetime.strptime(start, fmt)
-        end_dt = dt.datetime.strptime(end, fmt)
+        start_dt = to_datetime(start, fmt)
+        end_dt = to_datetime(end, fmt)
         return TemporalExtent(
             start_date=start_dt,
             end_date=end_dt,

@@ -18,6 +18,7 @@ from earthlens.base import (
     OutputKind,
     SpatialExtent,
     TemporalExtent,
+    to_datetime,
 )
 from earthlens.ecmwf.catalog import Catalog, Variable
 from earthlens.ecmwf.constraints import RequestValidator
@@ -298,8 +299,8 @@ class ECMWF(AbstractDataSource):
                 `"daily"` nor `"monthly"`, or if the parsed
                 `start` is later than the parsed `end`.
         """
-        start = dt.datetime.strptime(start, fmt)
-        end = dt.datetime.strptime(end, fmt)
+        start = to_datetime(start, fmt)
+        end = to_datetime(end, fmt)
 
         if temporal_resolution == "daily":
             dates = pd.date_range(start, end, freq="D")

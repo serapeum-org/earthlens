@@ -17,6 +17,7 @@ from __future__ import annotations
 import difflib
 import importlib
 from collections.abc import Iterator, Mapping
+from datetime import date, datetime
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
@@ -371,8 +372,8 @@ class EarthLens:
         variables: dict[str, list[str]] | list[str],
         data_source: str = "chc",
         temporal_resolution: str = "daily",
-        start: str | None = None,
-        end: str | None = None,
+        start: str | datetime | date | None = None,
+        end: str | datetime | date | None = None,
         path: Path | str = "",
         lat_lim: list[float] | None = None,
         lon_lim: list[float] | None = None,
@@ -422,9 +423,11 @@ class EarthLens:
                   Tropycal, FDSN, FIRMS, GDACS, Radar.
 
                 Defaults to `"daily"`.
-            start: Inclusive start date as a string (parsed with
-                `fmt`). Defaults to `None`.
-            end: Inclusive end date as a string. Defaults to `None`.
+            start: Inclusive start date. A string (parsed with `fmt`,
+                falling back to ISO-8601), or a `datetime` / `date` /
+                `pandas.Timestamp` object. Defaults to `None`.
+            end: Inclusive end date, same accepted types as `start`.
+                Defaults to `None`.
             path: Output directory. Created by the backend if it does
                 not exist. Defaults to the current working directory.
             dataset: Explicit dataset / collection key, the ergonomic
@@ -467,8 +470,11 @@ class EarthLens:
             lon_lim: `[lon_min, lon_max]`. Defaults to
                 :data:`DEFAULT_LONGITUDE_LIMIT` (whole Earth). Mutually
                 exclusive with `aoi`.
-            fmt: `strptime` format for `start` and `end`.
-                Defaults to `"%Y-%m-%d"`.
+            fmt: `strptime` format tried first when `start` / `end` are
+                strings; a non-matching string falls back to an ISO-8601
+                parse, and `datetime` / `date` objects ignore it. An
+                optional override rather than a requirement. Defaults to
+                `"%Y-%m-%d"`.
             aoi: A single area-of-interest, the ergonomic alternative to
                 the `lat_lim` / `lon_lim` pair. Accepts a bbox
                 `[min_lon, min_lat, max_lon, max_lat]` (GeoJSON W, S, E,

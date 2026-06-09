@@ -35,6 +35,7 @@ from earthlens.base import (
     RemoteProduct,
     SpatialExtent,
     TemporalExtent,
+    to_datetime,
 )
 from earthlens.s3.auth import S3Auth, S3Credentials
 from earthlens.s3.catalog import Catalog, Dataset
@@ -206,8 +207,8 @@ class S3(AbstractDataSource):
         self, start: str, end: str, temporal_resolution: str, fmt: str
     ) -> TemporalExtent:
         """Build the request date index, honouring static-vs-temporal datasets."""
-        start_date = dt.datetime.strptime(start, fmt)
-        end_date = dt.datetime.strptime(end, fmt)
+        start_date = to_datetime(start, fmt)
+        end_date = to_datetime(end, fmt)
         if self._dataset.temporal == "static":
             resolution = "MS"
             dates = pd.DatetimeIndex([start_date])

@@ -61,6 +61,7 @@ from earthlens.base import (
     OutputKind,
     SpatialExtent,
     TemporalExtent,
+    to_datetime,
 )
 from earthlens.gee._helpers import (
     EE_MAX_DIMENSION,
@@ -131,13 +132,13 @@ def _validate_pure_config(
             f"'yearly', got {temporal_resolution!r}"
         )
     try:
-        start_dt = dt.datetime.strptime(start, fmt)
+        start_dt = to_datetime(start, fmt)
     except (ValueError, TypeError) as exc:
         raise ValueError(
             f"start={start!r} is not parseable with fmt={fmt!r}: {exc}"
         ) from exc
     try:
-        end_dt = dt.datetime.strptime(end, fmt)
+        end_dt = to_datetime(end, fmt)
     except (ValueError, TypeError) as exc:
         raise ValueError(
             f"end={end!r} is not parseable with fmt={fmt!r}: {exc}"
@@ -437,8 +438,8 @@ class GEE(AbstractDataSource):
             ValueError: If `temporal_resolution` is not one of `"raw"`,
                 `"daily"`, `"monthly"`, `"yearly"`, or if `start > end`.
         """
-        start_dt = dt.datetime.strptime(start, fmt)
-        end_dt = dt.datetime.strptime(end, fmt)
+        start_dt = to_datetime(start, fmt)
+        end_dt = to_datetime(end, fmt)
         if temporal_resolution == "raw":
             dates = pd.DatetimeIndex([start_dt])
         elif temporal_resolution in _RESOLUTION_FREQ:

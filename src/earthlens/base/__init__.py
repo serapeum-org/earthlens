@@ -15,10 +15,15 @@ from earthlens.base.abstractdatasource import (
     SpatialExtent,
     TemporalExtent,
 )
+from earthlens.base._dates import to_datetime
 from earthlens.base.auth import AbstractAuth, AuthenticationError
 from earthlens.base.leaves import FluxableLeaf
 from earthlens.base.providers import Provider, clear_providers_cache, load_providers
-from earthlens.base.spatial import METRES_PER_DEGREE, estimate_pixel_dims
+from earthlens.base.spatial import (
+    METRES_PER_DEGREE,
+    estimate_pixel_dims,
+    normalize_aoi,
+)
 
 __all__ = [
     "AbstractAuth",
@@ -35,4 +40,6 @@ __all__ = [
     "clear_providers_cache",
     "estimate_pixel_dims",
     "load_providers",
+    "normalize_aoi",
+    "to_datetime",
 ]
