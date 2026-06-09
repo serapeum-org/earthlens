@@ -23,7 +23,7 @@ from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
     from earthlens.aggregate import AggregationConfig
-    from earthlens.base import AbstractCatalog, AbstractDataSource
+    from earthlens.base import AbstractCatalog, AbstractDataSource, RemoteProduct
 
 
 #: Default longitude bounds used when `lon_lim` is not supplied
@@ -811,6 +811,92 @@ class EarthLens:
         if hits:
             return hits[:20]
         return difflib.get_close_matches(text, pool, n=10, cutoff=0.3)
+
+    def search(self) -> list[RemoteProduct]:
+        """List the products this request matches, without downloading them.
+
+        The cheap, dry-run half of the search→fetch split: it queries the
+        backend's catalog and returns one
+        :class:`~earthlens.base.RemoteProduct` per item that
+        :meth:`download` would fetch, so you can inspect or filter the
+        result first.
+
+        Returns:
+            One :class:`~earthlens.base.RemoteProduct` per matching item;
+            the empty list when nothing matches.
+
+        Raises:
+            NotImplementedError: If the bound backend keeps the legacy
+                `_api`-only flow (CHIRPS, S3, ECMWF, GEE) and exposes no
+                searchable product list — call :meth:`download` directly.
+
+        Examples:
+            - Preview a STAC search without fetching any bytes (live;
+              skipped here):
+                ```python
+                >>> from earthlens.earthlens import EarthLens
+                >>> products = EarthLens(  # doctest: +SKIP
+                ...     data_source="earth-search",
+                ...     dataset="sentinel-2-l2a",
+                ...     variables=["red"],
+                ...     start="2024-01-01", end="2024-01-31",
+                ...     aoi=[-75.0, 4.0, -74.0, 5.0],
+                ... ).search()
+
+                ```
+        """
+        try:
+            return self.datasource._search()
+        except NotImplementedError as exc:
+            raise NotImplementedError(
+                f"the {type(self.datasource).__name__} backend does not "
+                f"support search()/preview()/count(); call download() instead."
+            ) from exc
+
+    def count(self) -> int:
+        """Return how many products this request matches, without downloading.
+
+        Uses the backend's :meth:`~earthlens.base.AbstractDataSource._count`
+        hook, which a backend with a cheap server-side total overrides;
+        otherwise it counts a :meth:`search`.
+
+        Returns:
+            The number of matching products.
+
+        Raises:
+            NotImplementedError: If the bound backend exposes no
+                searchable product list (see :meth:`search`).
+        """
+        try:
+            return self.datasource._count()
+        except NotImplementedError as exc:
+            raise NotImplementedError(
+                f"the {type(self.datasource).__name__} backend does not "
+                f"support search()/preview()/count(); call download() instead."
+            ) from exc
+
+    def preview(self, n: int = 10) -> list[dict[str, Any]]:
+        """Return the first `n` matching products as plain dicts.
+
+        A notebook-friendly view over :meth:`search`: each product is
+        flattened to `{"id": ..., "href": ..., **metadata}` for quick
+        tabular display before committing to a download.
+
+        Args:
+            n: Maximum number of products to return. Defaults to 10.
+
+        Returns:
+            Up to `n` dicts, each carrying the product `id`, `href`, and
+            its backend-specific metadata.
+
+        Raises:
+            NotImplementedError: If the bound backend exposes no
+                searchable product list (see :meth:`search`).
+        """
+        return [
+            {"id": product.id, "href": product.href, **product.metadata}
+            for product in self.search()[:n]
+        ]
 
     def download(
         self,

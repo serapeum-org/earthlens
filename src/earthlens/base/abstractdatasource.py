@@ -547,6 +547,23 @@ class AbstractDataSource(ABC):
             f"_search and _fetch (post-C3)."
         )
 
+    def _count(self) -> int:
+        """Return how many products :meth:`_search` would yield, without fetching.
+
+        Default implementation runs :meth:`_search` and counts the
+        result. Backends with a cheap server-side total (e.g. a STAC
+        `numberMatched` read with `limit=1`) should override this to
+        avoid materialising the whole product list.
+
+        Returns:
+            int: The number of products the current request matches.
+
+        Raises:
+            NotImplementedError: When the backend keeps the legacy
+                `_api`-only flow and implements no :meth:`_search`.
+        """
+        return len(self._search())
+
     def _fetch(self, products: list[RemoteProduct]) -> list[Any]:
         """Download the bytes of every product `_search` returned.
 

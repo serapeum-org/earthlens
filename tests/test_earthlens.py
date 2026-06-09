@@ -422,6 +422,61 @@ class TestTopLevelReExports:
 
 
 @pytest.mark.chc
+class TestFacadeSearch:
+    """The facade's search() / count() / preview() dry-run surface."""
+
+    def _facade(self, tmp_path):
+        return EarthLens(
+            data_source="chc",
+            variables=["precipitation"],
+            start="2009-01-01",
+            end="2009-01-02",
+            path=str(tmp_path),
+        )
+
+    def test_search_on_legacy_backend_raises(self, tmp_path):
+        """A legacy _api-only backend rejects search() with guidance."""
+        with pytest.raises(NotImplementedError, match="search\\(\\)/preview"):
+            self._facade(tmp_path).search()
+
+    def test_count_on_legacy_backend_raises(self, tmp_path):
+        """A legacy backend rejects count() with the same guidance."""
+        with pytest.raises(NotImplementedError, match="call download"):
+            self._facade(tmp_path).count()
+
+    def test_search_delegates_to_backend(self, tmp_path, monkeypatch):
+        """search() returns the backend's _search products."""
+        from earthlens.base import RemoteProduct
+
+        facade = self._facade(tmp_path)
+        products = [RemoteProduct(id="a"), RemoteProduct(id="b")]
+        monkeypatch.setattr(facade.datasource, "_search", lambda: products)
+        assert facade.search() == products, "search() should return the products"
+
+    def test_count_uses_search_length(self, tmp_path, monkeypatch):
+        """count() falls back to the length of _search."""
+        from earthlens.base import RemoteProduct
+
+        facade = self._facade(tmp_path)
+        monkeypatch.setattr(
+            facade.datasource, "_search", lambda: [RemoteProduct(id=str(i)) for i in range(3)]
+        )
+        assert facade.count() == 3, "count() should match the product count"
+
+    def test_preview_flattens_products(self, tmp_path, monkeypatch):
+        """preview() flattens id / href / metadata and caps at n."""
+        from earthlens.base import RemoteProduct
+
+        facade = self._facade(tmp_path)
+        products = [
+            RemoteProduct(id="a", href="h1", metadata={"cloud": 5}),
+            RemoteProduct(id="b", href="h2"),
+        ]
+        monkeypatch.setattr(facade.datasource, "_search", lambda: products)
+        assert facade.preview(1) == [{"id": "a", "href": "h1", "cloud": 5}]
+
+
+@pytest.mark.chc
 class TestFacadeDiscovery:
     """The facade's catalog-discovery classmethods."""
 
