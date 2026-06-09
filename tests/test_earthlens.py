@@ -167,7 +167,7 @@ class TestECMWFBackend:
 
     def test_unknown_data_source_still_raises(self, tmp_path):
         """Unknown `data_source` values still raise `ValueError`."""
-        with pytest.raises(ValueError, match="not supported"):
+        with pytest.raises(ValueError, match="is not a supported data source"):
             EarthLens(
                 data_source="not-a-real-source",
                 start="2022-01-01",

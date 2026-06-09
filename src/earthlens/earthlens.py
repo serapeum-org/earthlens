@@ -14,6 +14,7 @@ SDK into a friendly `ImportError` naming the extra to install.
 
 from __future__ import annotations
 
+import difflib
 import importlib
 from collections.abc import Iterator, Mapping
 from pathlib import Path
@@ -179,10 +180,12 @@ class EarthLens:
 
             ```python
             >>> from earthlens.earthlens import EarthLens
-            >>> EarthLens(variables=[], data_source="not-a-real-source")
+            >>> EarthLens(  # doctest: +ELLIPSIS
+            ...     variables=[], data_source="not-a-real-source"
+            ... )
             Traceback (most recent call last):
                 ...
-            ValueError: not-a-real-source not supported
+            ValueError: 'not-a-real-source' is not a supported data source. ...
 
             ```
 
@@ -493,10 +496,12 @@ class EarthLens:
 
                 ```python
                 >>> from earthlens.earthlens import EarthLens
-                >>> EarthLens(variables=[], data_source="bogus")
+                >>> EarthLens(  # doctest: +ELLIPSIS
+                ...     variables=[], data_source="bogus"
+                ... )
                 Traceback (most recent call last):
                     ...
-                ValueError: bogus not supported
+                ValueError: 'bogus' is not a supported data source. ...
 
                 ```
             - Construct an ECMWF-backed facade. Marked
@@ -525,7 +530,14 @@ class EarthLens:
             :meth:`download`: Triggers the actual retrieval.
         """
         if data_source not in self.DataSources:
-            raise ValueError(f"{data_source} not supported")
+            close = difflib.get_close_matches(
+                data_source, list(self.DataSources), n=1
+            )
+            hint = f" Did you mean {close[0]!r}?" if close else ""
+            raise ValueError(
+                f"{data_source!r} is not a supported data source. "
+                f"Known: {sorted(self.DataSources)}.{hint}"
+            )
 
         if lat_lim is None:
             lat_lim = DEFAULT_LATITUDE_LIMIT

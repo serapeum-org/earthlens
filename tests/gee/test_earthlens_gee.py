@@ -164,7 +164,9 @@ class TestFacadeConstruction:
 
     def test_unknown_data_source_raises_value_error(self):
         """An unknown `data_source` is rejected before any backend import."""
-        with pytest.raises(ValueError, match="nope not supported"):
+        with pytest.raises(
+            ValueError, match="'nope' is not a supported data source"
+        ):
             EarthLens(variables=[], data_source="nope")
 
 
