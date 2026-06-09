@@ -569,11 +569,26 @@ class EarthLens:
                 f"Known: {sorted(self.DataSources)}.{hint}"
             )
 
+        backend_cls = self.DataSources[data_source]
+        import inspect
+
+        backend_params = inspect.signature(backend_cls.__init__).parameters
+
         # A single `aoi=` supersedes the legacy `lat_lim` / `lon_lim`
         # pair. It accepts a bbox, a point (+ `buffer`), a shapely /
         # GeoJSON / WKT geometry, or a GeoDataFrame, and is reduced to
-        # the `[min, max]` pairs every backend already consumes.
-        if aoi is not None:
+        # the `[min, max]` pairs every backend already consumes. A backend
+        # that declares its own richer `aoi` parameter (e.g. WorldPop's
+        # ISO3 / bbox / GeoDataFrame) instead receives `aoi` verbatim and
+        # interprets it itself.
+        if aoi is not None and "aoi" in backend_params:
+            if buffer is not None:
+                raise ValueError(
+                    f"buffer= is not supported by the {data_source!r} backend, "
+                    "which interprets aoi= itself"
+                )
+            backend_kwargs = {**backend_kwargs, "aoi": aoi}
+        elif aoi is not None:
             if lat_lim is not None or lon_lim is not None:
                 raise ValueError(
                     "pass either aoi= or lat_lim=/lon_lim=, not both"
@@ -598,8 +613,6 @@ class EarthLens:
             **self.DataSources.default_kwargs(data_source),
             **backend_kwargs,
         }
-
-        backend_cls = self.DataSources[data_source]
 
         # `dataset=` + a plain `variables` list is resolved into the
         # shape each backend wants — a native `dataset` kwarg for the S3

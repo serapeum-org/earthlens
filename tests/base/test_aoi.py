@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import pytest
 
-from earthlens.base.spatial import normalize_aoi
+from earthlens.base.spatial import estimate_pixel_dims, normalize_aoi
 
 # The bbox every form below describes: lon in [-75, -74], lat in [4, 5].
 EXPECTED = ([4.0, 5.0], [-75.0, -74.0])
@@ -57,6 +57,11 @@ class TestNormalizeAoiPoint:
         lat_lim, _ = normalize_aoi((0.0, 89.8), buffer=0.5)
         assert lat_lim == [89.3, 90.0]
 
+    def test_point_buffer_clamps_longitude_to_dateline(self):
+        """A buffered point near the dateline clamps longitude to 180."""
+        _, lon_lim = normalize_aoi((179.8, 0.0), buffer=0.5)
+        assert lon_lim == [179.3, 180.0]
+
 
 class TestNormalizeAoiGeometry:
     """Geometry forms of the aoi= input."""
@@ -92,6 +97,60 @@ class TestNormalizeAoiGeometry:
         """A mapping carrying a precomputed GeoJSON bbox is honoured."""
         assert normalize_aoi({"type": "Polygon", "bbox": [-75, 4, -74, 5]}) == EXPECTED
 
+    def test_geojson_3d_bbox_member(self):
+        """A 6-element (3-D) GeoJSON bbox drops the elevation ordinates."""
+        aoi = {"type": "Polygon", "bbox": [-75, 4, 0, -74, 5, 100]}
+        assert normalize_aoi(aoi) == EXPECTED
+
+    def test_feature_collection(self):
+        """A FeatureCollection envelopes all its features."""
+        aoi = {
+            "type": "FeatureCollection",
+            "features": [
+                {
+                    "type": "Feature",
+                    "properties": {},
+                    "geometry": {"type": "Point", "coordinates": [-75, 4]},
+                },
+                {
+                    "type": "Feature",
+                    "properties": {},
+                    "geometry": {"type": "Point", "coordinates": [-74, 5]},
+                },
+            ],
+        }
+        assert normalize_aoi(aoi) == EXPECTED
+
+    def test_geometry_collection(self):
+        """A GeometryCollection envelopes all its geometries."""
+        aoi = {
+            "type": "GeometryCollection",
+            "geometries": [
+                {"type": "Point", "coordinates": [-75, 4]},
+                {"type": "Point", "coordinates": [-74, 5]},
+            ],
+        }
+        assert normalize_aoi(aoi) == EXPECTED
+
+
+class TestNormalizeAoiMalformedGeojson:
+    """GeoJSON mappings that cannot define an area."""
+
+    def test_empty_feature_collection_raises(self):
+        """An empty FeatureCollection cannot define an aoi."""
+        with pytest.raises(ValueError, match="empty FeatureCollection"):
+            normalize_aoi({"type": "FeatureCollection", "features": []})
+
+    def test_geometry_without_coordinates_raises(self):
+        """A geometry with empty coordinates has no positions."""
+        with pytest.raises(ValueError, match="no coordinates"):
+            normalize_aoi({"type": "Polygon", "coordinates": []})
+
+    def test_unrecognised_mapping_raises(self):
+        """A typed mapping with no geometry payload is rejected."""
+        with pytest.raises(ValueError, match="not a recognised GeoJSON"):
+            normalize_aoi({"type": "Nonsense"})
+
     def test_shapely_geometry_via_geo_interface(self):
         """A shapely geometry is reduced through __geo_interface__."""
         shapely = pytest.importorskip("shapely")
@@ -122,3 +181,26 @@ class TestNormalizeAoiErrors:
         """An integer is not a recognised aoi."""
         with pytest.raises(TypeError, match="unsupported aoi type"):
             normalize_aoi(42)
+
+
+class TestEstimatePixelDims:
+    """The bbox-to-pixel-grid pre-flight estimate and its guards."""
+
+    def test_nominal_grid(self):
+        """A small box at a coarse scale is a handful of pixels."""
+        assert estimate_pixel_dims(31.0, 30.0, 31.1, 30.1, 90.0) == (124, 124)
+
+    def test_non_positive_scale_raises(self):
+        """A non-positive scale is rejected."""
+        with pytest.raises(ValueError, match="scale_m must be positive"):
+            estimate_pixel_dims(31.0, 30.0, 31.1, 30.1, 0.0)
+
+    def test_inverted_longitude_raises(self):
+        """east < west is rejected."""
+        with pytest.raises(ValueError, match=r"east .* < west"):
+            estimate_pixel_dims(31.1, 30.0, 31.0, 30.1, 90.0)
+
+    def test_inverted_latitude_raises(self):
+        """north < south is rejected."""
+        with pytest.raises(ValueError, match=r"north .* < south"):
+            estimate_pixel_dims(31.0, 30.1, 31.1, 30.0, 90.0)

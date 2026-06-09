@@ -472,3 +472,16 @@ class TestFacadeAoi:
         """buffer= without a point aoi= is rejected."""
         with pytest.raises(ValueError, match="buffer= only applies"):
             self._build(tmp_path, buffer=0.5)
+
+    def test_native_aoi_backend_rejects_buffer(self):
+        """A backend that owns aoi= (WorldPop) rejects buffer= up front."""
+        pytest.importorskip("earthlens.worldpop")
+        with pytest.raises(ValueError, match="buffer= is not supported"):
+            EarthLens(
+                data_source="worldpop",
+                variables=["population"],
+                start="2020-01-01",
+                end="2020-12-31",
+                aoi="USA",
+                buffer=0.5,
+            )
