@@ -62,7 +62,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -10875,7 +10875,7 @@
 <a href="https://github.com/pre-commit/pre-commit"><img alt="pre-commit" src="https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&amp;logoColor=white" /></a>
 <a href="https://codecov.io/gh/serapeum-org/earthlens"><img alt="codecov" src="https://codecov.io/gh/serapeum-org/earthlens/branch/main/graph/badge.svg" /></a></p>
 <p><strong>earthlens</strong> is a Python package providing a single, unified API for downloading
-satellite, climate, and geospatial data from <strong>22 providers</strong> — climate
+satellite, climate, and geospatial data from <strong>23 providers</strong> — climate
 reanalysis, satellite imagery, ocean models, weather forecasts, natural-hazard
 feeds, air quality, population, and more. Pick a <code>data_source</code>, describe the area
 and dates you want, and call <code>download()</code>; the matching backend handles auth,
@@ -10921,7 +10921,7 @@ as <code>data_source=</code>.</p>
 </tr>
 <tr>
 <td><strong>Hydrology</strong></td>
-<td>USGS Water — NWIS (<code>usgs-water</code>)</td>
+<td>USGS Water — NWIS (<code>usgs-water</code>) · NOAA National Water Model (<code>nwm</code>)</td>
 </tr>
 <tr>
 <td><strong>Vector &amp; humanitarian</strong></td>
@@ -10957,7 +10957,7 @@ Hold "Ctrl" to enable pan &amp; zoom
     EarthLens --&gt; Imagery["Satellite imagery&lt;br/&gt;gee · stac · sentinel-hub&lt;br/&gt;openeo · eumetsat · earthdata"]
     EarthLens --&gt; Ocean["Ocean &amp; archives&lt;br/&gt;cmems · amazon-s3"]
     EarthLens --&gt; Hazards["Hazards &amp; events&lt;br/&gt;gdacs · fdsn · firms&lt;br/&gt;tropycal · radar"]
-    EarthLens --&gt; People["Air, population &amp; water&lt;br/&gt;openaq · ghsl · worldpop · usgs-water"]
+    EarthLens --&gt; People["Air, population &amp; water&lt;br/&gt;openaq · ghsl · worldpop&lt;br/&gt;usgs-water · nwm"]
     EarthLens --&gt; Vector["Vector &amp; humanitarian&lt;br/&gt;overture · hdx"]</code></pre> 
     
 </div>

@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -756,17 +756,6 @@
     <span class="md-ellipsis">
       
         Integrated providers
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#planned-providers-not-yet-integrated" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Planned providers (not yet integrated)
       
     </span>
   </a>
@@ -10807,17 +10796,6 @@
   
 </li>
       
-        <li class="md-nav__item">
-  <a href="#planned-providers-not-yet-integrated" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Planned providers (not yet integrated)
-      
-    </span>
-  </a>
-  
-</li>
-      
     </ul>
   
 </nav>
@@ -11001,32 +10979,69 @@ the optional dependency (extra) you need to install for it.</p>
 <td><code>hdx</code></td>
 <td><a href="../hdx/introduction/">HDX</a></td>
 </tr>
-</tbody>
-</table>
-<p><code>Output</code> is the backend's <code>OUTPUT_KIND</code> — <code>raster</code> writes GeoTIFF/COG/NetCDF, <code>vector</code> writes geometry tables
-(GeoJSON / GeoPackage), <code>tabular</code> writes plain tables (CSV / Parquet), and <code>mixed</code> (HDX) downloads each
-resource file as-is in whatever format it ships. It also governs <code>aggregate=</code>: the temporal aggregator is
-accepted for <code>raster</code> backends and rejected for <code>vector</code> / <code>tabular</code> ones; HDX (<code>mixed</code>) rejects it because
-resources are returned as-is.</p>
-<h2 id="planned-providers-not-yet-integrated"><a class="toclink" href="#planned-providers-not-yet-integrated">Planned providers (not yet integrated)</a><a class="headerlink" href="#planned-providers-not-yet-integrated" title="Permanent link">#</a></h2>
-<p>These have a completion plan but no code yet — they are <strong>not</strong> available from the facade.</p>
-<table>
-<thead>
-<tr>
-<th>Provider</th>
-<th>Planned key</th>
-<th>Notes</th>
-</tr>
-</thead>
-<tbody>
 <tr>
 <td>NASA FIRMS active fire detections</td>
 <td><code>firms</code></td>
-<td><code>MAP_KEY</code> auth</td>
+<td>vector</td>
+<td><code>FIRMS_MAP_KEY</code></td>
+<td>—</td>
+<td><a href="../firms/introduction/">FIRMS</a></td>
+</tr>
+<tr>
+<td>EUMETSAT Data Store</td>
+<td><code>eumetsat</code></td>
+<td>per-dataset (raster default)</td>
+<td>consumer key / secret</td>
+<td><code>eumetsat</code></td>
+<td><a href="../eumetsat/introduction/">EUMETSAT</a></td>
+</tr>
+<tr>
+<td>Sentinel Hub server-side render (CDSE)</td>
+<td><code>sentinel-hub</code>, <code>sentinelhub</code></td>
+<td>mixed (raster / tabular per plane)</td>
+<td>OAuth client id / secret</td>
+<td><code>sentinel-hub</code></td>
+<td><a href="../sentinel-hub/introduction/">Sentinel Hub</a></td>
+</tr>
+<tr>
+<td>Overture Maps vector basemap</td>
+<td><code>overture</code></td>
+<td>vector</td>
+<td>none (public)</td>
+<td><code>overture</code></td>
+<td><a href="../overture/introduction/">Overture</a></td>
+</tr>
+<tr>
+<td>USGS Water — NWIS / Water Data</td>
+<td><code>usgs-water</code>, <code>usgs-nwis</code>, <code>nwis</code></td>
+<td>tabular</td>
+<td>none</td>
+<td><code>usgs-water</code></td>
+<td><a href="../usgs-water/introduction/">USGS Water</a></td>
+</tr>
+<tr>
+<td>JRC Global Human Settlement Layer</td>
+<td><code>ghsl</code>, <code>ghs</code>, <code>human-settlement</code></td>
+<td>raster</td>
+<td>none (open HTTPS)</td>
+<td>—</td>
+<td><a href="../ghsl/introduction/">GHSL</a></td>
+</tr>
+<tr>
+<td>WorldPop population data hub</td>
+<td><code>worldpop</code>, <code>world-pop</code></td>
+<td>mixed (rasters + age/sex tables)</td>
+<td>none (CC-BY-4.0)</td>
+<td><code>worldpop</code> (optional)</td>
+<td><a href="../worldpop/introduction/">WorldPop</a></td>
 </tr>
 </tbody>
 </table>
-<p>For the full roadmap of providers beyond these, see the project's planning notes.</p>
+<p><code>Output</code> is the backend's <code>OUTPUT_KIND</code> — <code>raster</code> writes GeoTIFF/COG/NetCDF, <code>vector</code> writes geometry tables
+(GeoJSON / GeoPackage), <code>tabular</code> writes plain tables (CSV / Parquet), and <code>mixed</code> (HDX, Sentinel Hub, WorldPop)
+covers backends whose products vary by request. It also governs <code>aggregate=</code>: the temporal aggregator is
+accepted for <code>raster</code> backends and rejected for <code>vector</code> / <code>tabular</code> ones; the <code>mixed</code> backends reject it
+because their products are returned as-is.</p>
 
 
 
