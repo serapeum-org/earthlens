@@ -9,7 +9,7 @@
 [![codecov](https://codecov.io/gh/serapeum-org/earthlens/branch/main/graph/badge.svg)](https://codecov.io/gh/serapeum-org/earthlens)
 
 **earthlens** is a Python package providing a single, unified API for downloading
-satellite, climate, and geospatial data from **22 providers** — climate
+satellite, climate, and geospatial data from **23 providers** — climate
 reanalysis, satellite imagery, ocean models, weather forecasts, natural-hazard
 feeds, air quality, population, and more. Pick a `data_source`, describe the area
 and dates you want, and call `download()`; the matching backend handles auth,
@@ -29,7 +29,7 @@ as `data_source=`.
 | **Natural hazards & events** | GDACS disaster alerts (`gdacs`) · FDSN earthquakes (`fdsn`) · FIRMS active fires (`firms`) · Tropycal cyclone tracks (`tropycal`) · NEXRAD radar (`radar`) |
 | **Air quality** | OpenAQ (`openaq`) |
 | **Population & settlement** | JRC Global Human Settlement Layer (`ghsl`) · WorldPop (`worldpop`) |
-| **Hydrology** | USGS Water — NWIS (`usgs-water`) |
+| **Hydrology** | USGS Water — NWIS (`usgs-water`) · NOAA National Water Model (`nwm`) |
 | **Vector & humanitarian** | Overture Maps basemap (`overture`) · Humanitarian Data Exchange — HDX (`hdx`) |
 
 ```mermaid
@@ -38,7 +38,7 @@ graph LR
     EarthLens --> Imagery["Satellite imagery<br/>gee · stac · sentinel-hub<br/>openeo · eumetsat · earthdata"]
     EarthLens --> Ocean["Ocean & archives<br/>cmems · amazon-s3"]
     EarthLens --> Hazards["Hazards & events<br/>gdacs · fdsn · firms<br/>tropycal · radar"]
-    EarthLens --> People["Air, population & water<br/>openaq · ghsl · worldpop · usgs-water"]
+    EarthLens --> People["Air, population & water<br/>openaq · ghsl · worldpop<br/>usgs-water · nwm"]
     EarthLens --> Vector["Vector & humanitarian<br/>overture · hdx"]
 ```
 

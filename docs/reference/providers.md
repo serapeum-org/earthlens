@@ -33,19 +33,16 @@ Backends with no extra (CHC, GDACS, FIRMS, OpenAQ, GHSL) need only the core inst
 | openEO server-side processing (defaults to CDSE) | `openeo` | raster | CDSE OIDC (interactive or client-credentials) | `openeo` | [openEO](openeo/introduction.md) |
 | NOAA National Water Model (`noaa-nwm-pds`) | `nwm`, `national-water-model` | per-product (`chrtout` tabular / `ldasout` raster) | unsigned AWS (public bucket) | `nwm` | [NWM](nwm/introduction.md) |
 | Humanitarian Data Exchange (UN OCHA, CKAN) | `hdx` | mixed | none (public) | `hdx` | [HDX](hdx/introduction.md) |
+| NASA FIRMS active fire detections | `firms` | vector | `FIRMS_MAP_KEY` | — | [FIRMS](firms/introduction.md) |
+| EUMETSAT Data Store | `eumetsat` | per-dataset (raster default) | consumer key / secret | `eumetsat` | [EUMETSAT](eumetsat/introduction.md) |
+| Sentinel Hub server-side render (CDSE) | `sentinel-hub`, `sentinelhub` | mixed (raster / tabular per plane) | OAuth client id / secret | `sentinel-hub` | [Sentinel Hub](sentinel-hub/introduction.md) |
+| Overture Maps vector basemap | `overture` | vector | none (public) | `overture` | [Overture](overture/introduction.md) |
+| USGS Water — NWIS / Water Data | `usgs-water`, `usgs-nwis`, `nwis` | tabular | none | `usgs-water` | [USGS Water](usgs-water/introduction.md) |
+| JRC Global Human Settlement Layer | `ghsl`, `ghs`, `human-settlement` | raster | none (open HTTPS) | — | [GHSL](ghsl/introduction.md) |
+| WorldPop population data hub | `worldpop`, `world-pop` | mixed (rasters + age/sex tables) | none (CC-BY-4.0) | `worldpop` (optional) | [WorldPop](worldpop/introduction.md) |
 
 `Output` is the backend's `OUTPUT_KIND` — `raster` writes GeoTIFF/COG/NetCDF, `vector` writes geometry tables
-(GeoJSON / GeoPackage), `tabular` writes plain tables (CSV / Parquet), and `mixed` (HDX) downloads each
-resource file as-is in whatever format it ships. It also governs `aggregate=`: the temporal aggregator is
-accepted for `raster` backends and rejected for `vector` / `tabular` ones; HDX (`mixed`) rejects it because
-resources are returned as-is.
-
-## Planned providers (not yet integrated)
-
-These have a completion plan but no code yet — they are **not** available from the facade.
-
-| Provider | Planned key | Notes |
-|---|---|---|
-| NASA FIRMS active fire detections | `firms` | `MAP_KEY` auth |
-
-For the full roadmap of providers beyond these, see the project's planning notes.
+(GeoJSON / GeoPackage), `tabular` writes plain tables (CSV / Parquet), and `mixed` (HDX, Sentinel Hub, WorldPop)
+covers backends whose products vary by request. It also governs `aggregate=`: the temporal aggregator is
+accepted for `raster` backends and rejected for `vector` / `tabular` ones; the `mixed` backends reject it
+because their products are returned as-is.
