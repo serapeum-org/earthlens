@@ -377,6 +377,8 @@ class EarthLens:
         lat_lim: list[float] | None = None,
         lon_lim: list[float] | None = None,
         fmt: str = "%Y-%m-%d",
+        aoi: Any = None,
+        buffer: float | None = None,
         **backend_kwargs: object,
     ):
         """Resolve the backend and construct it with the user's parameters.
@@ -449,11 +451,26 @@ class EarthLens:
 
                 Defaults to `None`.
             lat_lim: `[lat_min, lat_max]`. Defaults to
-                :data:`DEFAULT_LATITUDE_LIMIT` (whole Earth).
+                :data:`DEFAULT_LATITUDE_LIMIT` (whole Earth). Mutually
+                exclusive with `aoi`.
             lon_lim: `[lon_min, lon_max]`. Defaults to
-                :data:`DEFAULT_LONGITUDE_LIMIT` (whole Earth).
+                :data:`DEFAULT_LONGITUDE_LIMIT` (whole Earth). Mutually
+                exclusive with `aoi`.
             fmt: `strptime` format for `start` and `end`.
                 Defaults to `"%Y-%m-%d"`.
+            aoi: A single area-of-interest, the ergonomic alternative to
+                the `lat_lim` / `lon_lim` pair. Accepts a bbox
+                `[min_lon, min_lat, max_lon, max_lat]` (GeoJSON W, S, E,
+                N order), a bbox mapping, a `(lon, lat)` point (with
+                `buffer`), a shapely geometry, any `__geo_interface__`
+                object, a GeoJSON geometry / Feature, a WKT string, or a
+                `GeoDataFrame` / `GeoSeries`. Reduced to `lat_lim` /
+                `lon_lim` by :func:`earthlens.base.spatial.normalize_aoi`.
+                Passing both `aoi` and `lat_lim` / `lon_lim` raises
+                `ValueError`. Defaults to `None`.
+            buffer: Half-width in degrees applied to a `(lon, lat)` point
+                `aoi` to grow it into a square box. Only valid together
+                with a point `aoi`. Defaults to `None`.
             **backend_kwargs: Extra keyword arguments forwarded
                 verbatim to the chosen backend's constructor — for
                 backend-specific options the facade does not name
@@ -465,7 +482,9 @@ class EarthLens:
 
         Raises:
             ValueError: If `data_source` is not a key of
-                :attr:`DataSources`.
+                :attr:`DataSources`, if both `aoi` and
+                `lat_lim` / `lon_lim` are given, if `buffer` is given
+                without a point `aoi`, or if `aoi` is malformed.
             AuthenticationError: If the backend cannot authenticate —
                 ECMWF (missing `~/.cdsapirc`; see
                 :class:`earthlens.ecmwf.AuthenticationError`) or GEE
@@ -537,6 +556,23 @@ class EarthLens:
             raise ValueError(
                 f"{data_source!r} is not a supported data source. "
                 f"Known: {sorted(self.DataSources)}.{hint}"
+            )
+
+        # A single `aoi=` supersedes the legacy `lat_lim` / `lon_lim`
+        # pair. It accepts a bbox, a point (+ `buffer`), a shapely /
+        # GeoJSON / WKT geometry, or a GeoDataFrame, and is reduced to
+        # the `[min, max]` pairs every backend already consumes.
+        if aoi is not None:
+            if lat_lim is not None or lon_lim is not None:
+                raise ValueError(
+                    "pass either aoi= or lat_lim=/lon_lim=, not both"
+                )
+            from earthlens.base.spatial import normalize_aoi
+
+            lat_lim, lon_lim = normalize_aoi(aoi, buffer=buffer)
+        elif buffer is not None:
+            raise ValueError(
+                "buffer= only applies to a point aoi=(lon, lat); pass aoi= too"
             )
 
         if lat_lim is None:

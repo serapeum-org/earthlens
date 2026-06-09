@@ -380,3 +380,56 @@ class TestTopLevelReExports:
             "EarthLens",
             "aggregate_netcdf",
         ], f"Unexpected top-level __all__: {earthlens.__all__!r}"
+
+
+@pytest.mark.chc
+class TestFacadeAoi:
+    """The facade's aoi= parameter routes to the backend's spatial extent."""
+
+    def _build(self, tmp_path, **kwargs):
+        return EarthLens(
+            data_source="chc",
+            variables=["precipitation"],
+            start="2009-01-01",
+            end="2009-01-02",
+            path=str(tmp_path),
+            **kwargs,
+        ).datasource.space
+
+    def test_aoi_bbox_sets_spatial_extent(self, tmp_path):
+        """A bbox aoi= populates the backend's SpatialExtent edges."""
+        space = self._build(tmp_path, aoi=[-75.65, 4.19, -74.73, 4.64])
+        assert (space.south, space.north, space.west, space.east) == (
+            4.19,
+            4.64,
+            -75.65,
+            -74.73,
+        )
+
+    def test_aoi_matches_legacy_lat_lon_pairs(self, tmp_path):
+        """aoi= and the legacy lat_lim/lon_lim pair yield the same extent."""
+        via_aoi = self._build(tmp_path, aoi=[-75.65, 4.19, -74.73, 4.64])
+        via_pairs = self._build(
+            tmp_path, lat_lim=[4.19, 4.64], lon_lim=[-75.65, -74.73]
+        )
+        assert via_aoi == via_pairs
+
+    def test_aoi_point_with_buffer(self, tmp_path):
+        """A point aoi= with buffer builds a square extent."""
+        space = self._build(tmp_path, aoi=(-75.0, 4.0), buffer=0.25)
+        assert (space.south, space.north, space.west, space.east) == (
+            3.75,
+            4.25,
+            -75.25,
+            -74.75,
+        )
+
+    def test_aoi_with_lat_lim_raises(self, tmp_path):
+        """Passing both aoi= and lat_lim= is rejected."""
+        with pytest.raises(ValueError, match="either aoi= or lat_lim"):
+            self._build(tmp_path, aoi=[-75.65, 4.19, -74.73, 4.64], lat_lim=[4, 5])
+
+    def test_buffer_without_aoi_raises(self, tmp_path):
+        """buffer= without a point aoi= is rejected."""
+        with pytest.raises(ValueError, match="buffer= only applies"):
+            self._build(tmp_path, buffer=0.5)
