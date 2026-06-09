@@ -23,7 +23,7 @@ from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
     from earthlens.aggregate import AggregationConfig
-    from earthlens.base import AbstractDataSource
+    from earthlens.base import AbstractCatalog, AbstractDataSource
 
 
 #: Default longitude bounds used when `lon_lim` is not supplied
@@ -565,15 +565,7 @@ class EarthLens:
         See Also:
             :meth:`download`: Triggers the actual retrieval.
         """
-        if data_source not in self.DataSources:
-            close = difflib.get_close_matches(
-                data_source, list(self.DataSources), n=1
-            )
-            hint = f" Did you mean {close[0]!r}?" if close else ""
-            raise ValueError(
-                f"{data_source!r} is not a supported data source. "
-                f"Known: {sorted(self.DataSources)}.{hint}"
-            )
+        self._check_source(data_source)
 
         backend_cls = self.DataSources[data_source]
         import inspect
@@ -639,6 +631,186 @@ class EarthLens:
             **request_kwargs,
             **merged_kwargs,
         )
+
+    @classmethod
+    def _check_source(cls, data_source: str) -> None:
+        """Validate `data_source` against the registry, with a did-you-mean hint.
+
+        Args:
+            data_source: The backend key to validate.
+
+        Raises:
+            ValueError: If `data_source` is not a registered key. The
+                message names the closest registered key (via `difflib`)
+                and lists the known keys.
+        """
+        if data_source not in cls.DataSources:
+            close = difflib.get_close_matches(
+                data_source, list(cls.DataSources), n=1
+            )
+            hint = f" Did you mean {close[0]!r}?" if close else ""
+            raise ValueError(
+                f"{data_source!r} is not a supported data source. "
+                f"Known: {sorted(cls.DataSources)}.{hint}"
+            )
+
+    @classmethod
+    def catalog(cls, data_source: str) -> AbstractCatalog:
+        """Return the dataset / variable catalog for a backend.
+
+        The catalogs hold the curated dataset and variable metadata
+        (cadence, extent, bands) each backend ships, so they are the
+        natural place to discover valid `dataset=` / `variables=` values
+        without constructing the backend or hitting the network.
+
+        Args:
+            data_source: A registered backend key (see
+                `sorted(EarthLens.DataSources)`).
+
+        Returns:
+            The backend's `Catalog` instance, loaded from its bundled
+            data.
+
+        Raises:
+            ValueError: If `data_source` is not a registered key.
+            ImportError: If the backend's optional SDK is required to
+                import its module and is not installed.
+            NotImplementedError: If the backend ships no catalog.
+
+        Examples:
+            - The CHC catalog exposes its curated datasets:
+                ```python
+                >>> from earthlens.earthlens import EarthLens
+                >>> catalog = EarthLens.catalog("chc")
+                >>> len(catalog) > 0
+                True
+
+                ```
+        """
+        cls._check_source(data_source)
+        module_name, extras = next(
+            (mod, extra)
+            for key, mod, extra in cls.DataSources.entries()
+            if key == data_source
+        )
+        try:
+            module = importlib.import_module(module_name)
+        except ImportError as exc:
+            hint = (
+                f" Install with `pip install earthlens[{extras}]`."
+                if extras
+                else ""
+            )
+            raise ImportError(
+                f"Backend {data_source!r} catalog is unavailable — its "
+                f"runtime dependency is not installed.{hint}"
+            ) from exc
+        catalog_cls = getattr(module, "Catalog", None)
+        if catalog_cls is None:
+            raise NotImplementedError(
+                f"the {data_source!r} backend ships no catalog to query"
+            )
+        return catalog_cls()
+
+    @classmethod
+    def list_datasets(cls, data_source: str) -> list[str]:
+        """List a backend's curated dataset keys.
+
+        Args:
+            data_source: A registered backend key.
+
+        Returns:
+            The sorted curated dataset keys — the values accepted by
+            `dataset=` (and `describe_dataset`).
+
+        Raises:
+            ValueError: If `data_source` is not a registered key.
+
+        Examples:
+            - CHC ships a curated dataset for African monthly rainfall:
+                ```python
+                >>> from earthlens.earthlens import EarthLens
+                >>> "africa-monthly" in EarthLens.list_datasets("chc")
+                True
+
+                ```
+        """
+        return sorted(cls.catalog(data_source).datasets)
+
+    @classmethod
+    def describe_dataset(cls, data_source: str, key: str) -> Any:
+        """Return the catalog record for one dataset.
+
+        Args:
+            data_source: A registered backend key.
+            key: A curated dataset key (see :meth:`list_datasets`).
+
+        Returns:
+            The backend-specific dataset record (carries the dataset's
+            variables / bands, cadence, and extent).
+
+        Raises:
+            ValueError: If `data_source` is unknown, or `key` is not a
+                curated dataset (the message suggests the closest key).
+
+        Examples:
+            - Inspect a CHC dataset's declared variables:
+                ```python
+                >>> from earthlens.earthlens import EarthLens
+                >>> dataset = EarthLens.describe_dataset("chc", "africa-monthly")
+                >>> bool(dataset.variables)
+                True
+
+                ```
+            - An unknown key is rejected with a did-you-mean hint:
+                ```python
+                >>> from earthlens.earthlens import EarthLens
+                >>> EarthLens.describe_dataset(  # doctest: +ELLIPSIS
+                ...     "chc", "africa-month"
+                ... )
+                Traceback (most recent call last):
+                    ...
+                ValueError: 'africa-month' is not in the ...
+
+                ```
+        """
+        return cls.catalog(data_source).get_dataset(key)
+
+    @classmethod
+    def guess_dataset(cls, data_source: str, text: str) -> list[str]:
+        """Search a backend's datasets by free text.
+
+        A discovery aid in the spirit of eodag's `guess_product_type`:
+        case-insensitive substring matches first (capped), falling back
+        to `difflib` fuzzy matches when nothing contains `text`. Searches
+        the full `available_datasets` universe plus the curated keys.
+
+        Args:
+            data_source: A registered backend key.
+            text: The free-text fragment to search for.
+
+        Returns:
+            Matching dataset keys, best matches first (may be empty).
+
+        Raises:
+            ValueError: If `data_source` is not a registered key.
+
+        Examples:
+            - Find the CHC monthly datasets:
+                ```python
+                >>> from earthlens.earthlens import EarthLens
+                >>> "africa-monthly" in EarthLens.guess_dataset("chc", "monthly")
+                True
+
+                ```
+        """
+        cat = cls.catalog(data_source)
+        pool = sorted(set(cat.available_datasets) | set(cat.datasets))
+        lowered = text.lower()
+        hits = [name for name in pool if lowered in name.lower()]
+        if hits:
+            return hits[:20]
+        return difflib.get_close_matches(text, pool, n=10, cutoff=0.3)
 
     def download(
         self,

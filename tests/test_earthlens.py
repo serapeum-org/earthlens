@@ -422,6 +422,54 @@ class TestTopLevelReExports:
 
 
 @pytest.mark.chc
+class TestFacadeDiscovery:
+    """The facade's catalog-discovery classmethods."""
+
+    def test_catalog_returns_loaded_catalog(self):
+        """catalog() returns the backend's loaded catalog."""
+        catalog = EarthLens.catalog("chc")
+        assert len(catalog) > 0, "the CHC catalog should expose datasets"
+
+    def test_list_datasets_includes_known_key(self):
+        """list_datasets() returns the curated dataset keys."""
+        keys = EarthLens.list_datasets("chc")
+        assert "africa-monthly" in keys, f"missing africa-monthly in {keys[:5]}..."
+
+    def test_describe_dataset_returns_record(self):
+        """describe_dataset() returns a record carrying variables."""
+        dataset = EarthLens.describe_dataset("chc", "africa-monthly")
+        assert dataset.variables, "the dataset record should declare variables"
+
+    def test_describe_unknown_dataset_raises(self):
+        """describe_dataset() suggests the closest key on a miss."""
+        with pytest.raises(ValueError, match="africa-monthly"):
+            EarthLens.describe_dataset("chc", "africa-month")
+
+    def test_guess_dataset_substring(self):
+        """guess_dataset() finds datasets by case-insensitive substring."""
+        hits = EarthLens.guess_dataset("chc", "MONTHLY")
+        assert "africa-monthly" in hits, f"substring search missed it: {hits}"
+
+    def test_guess_dataset_fuzzy_fallback(self):
+        """guess_dataset() falls back to fuzzy matches when no substring hits."""
+        hits = EarthLens.guess_dataset("chc", "africa-dialy")
+        assert any("africa-daily" == h for h in hits), f"no fuzzy match in {hits}"
+
+    def test_discovery_unknown_source_raises(self):
+        """An unknown data_source is rejected with a did-you-mean hint."""
+        with pytest.raises(ValueError, match="is not a supported data source"):
+            EarthLens.list_datasets("chrips")
+
+    def test_catalog_missing_raises_not_implemented(self, monkeypatch):
+        """A backend whose module ships no Catalog raises NotImplementedError."""
+        import earthlens.chc as chc_module
+
+        monkeypatch.delattr(chc_module, "Catalog", raising=False)
+        with pytest.raises(NotImplementedError, match="no catalog"):
+            EarthLens.catalog("chc")
+
+
+@pytest.mark.chc
 class TestFacadeAoi:
     """The facade's aoi= parameter routes to the backend's spatial extent."""
 
