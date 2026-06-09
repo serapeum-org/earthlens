@@ -1,0 +1,12 @@
+# ggshield (GitGuardian CLI) configuration.
+#
+# The "Generic Password" detector false-positives on docstring prose in the
+# STAC signers module (`password: CDSE password (env `CDSE_PASSWORD` when
+# `None`).` — an Args description, not a credential; the file contains no
+# literal secrets). Exclude it from secret scanning so pre-commit / CI
+# ggshield runs stay green. The corresponding dashboard incident is 33133783.
+version: 2
+
+secret:
+  ignored_paths:
+    - src/earthlens/stac/signers.py
