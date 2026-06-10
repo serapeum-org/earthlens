@@ -11521,7 +11521,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <span class="n">growth</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
     <span class="n">data_source</span><span class="o">=</span><span class="s1">'ghsl'</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">'GHS_BUILT_S'</span><span class="p">],</span>
     <span class="n">start</span><span class="o">=</span><span class="s1">'2000-01-01'</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s1">'2020-12-31'</span><span class="p">,</span> <span class="n">epochs</span><span class="o">=</span><span class="p">[</span><span class="mi">2000</span><span class="p">,</span> <span class="mi">2020</span><span class="p">],</span>
-    <span class="n">aoi</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">9.20</span><span class="p">,</span> <span class="mf">38.68</span><span class="p">,</span> <span class="o">-</span><span class="mf">9.10</span><span class="p">,</span> <span class="mf">38.78</span><span class="p">],</span> <span class="n">path</span><span class="o">=</span><span class="n">out</span><span class="p">,</span>
+    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">38.68</span><span class="p">,</span> <span class="mf">38.78</span><span class="p">],</span> <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">9.20</span><span class="p">,</span> <span class="o">-</span><span class="mf">9.10</span><span class="p">],</span> <span class="n">path</span><span class="o">=</span><span class="n">out</span><span class="p">,</span>
 <span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">progress_bar</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">aggregate</span><span class="o">=</span><span class="n">AggregationConfig</span><span class="p">(</span><span class="n">freq</span><span class="o">=</span><span class="s1">'100YS'</span><span class="p">,</span> <span class="n">op</span><span class="o">=</span><span class="s1">'max'</span><span class="p">))</span>
 <span class="n">growth</span>
 </pre></div>
@@ -11532,7 +11532,7 @@ out = tempfile.mkdtemp()
 growth = EarthLens(
     data_source='ghsl', variables=['GHS_BUILT_S'],
     start='2000-01-01', end='2020-12-31', epochs=[2000, 2020],
-    aoi=[-9.20, 38.68, -9.10, 38.78], path=out,
+    lat_lim=[38.68, 38.78], lon_lim=[-9.20, -9.10], path=out,
 ).download(progress_bar=False, aggregate=AggregationConfig(freq='100YS', op='max'))
 growth</div>
 </div>

@@ -11577,8 +11577,8 @@ OUT = "_overture_out"</div>
 
 <span class="n">paths</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
     <span class="n">data_source</span><span class="o">=</span><span class="s2">"overture"</span><span class="p">,</span>
-    <span class="n">dataset</span><span class="o">=</span><span class="s2">"places"</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="p">[],</span>
-    <span class="n">aoi</span><span class="o">=</span><span class="p">[</span><span class="n">LON_LIM</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">LAT_LIM</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">LON_LIM</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">LAT_LIM</span><span class="p">[</span><span class="mi">1</span><span class="p">]],</span> <span class="n">path</span><span class="o">=</span><span class="n">OUT</span><span class="p">,</span>
+    <span class="n">variables</span><span class="o">=</span><span class="p">{</span><span class="s2">"places"</span><span class="p">:</span> <span class="p">[]},</span>
+    <span class="n">lat_lim</span><span class="o">=</span><span class="n">LAT_LIM</span><span class="p">,</span> <span class="n">lon_lim</span><span class="o">=</span><span class="n">LON_LIM</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="n">OUT</span><span class="p">,</span>
     <span class="n">where</span><span class="o">=</span><span class="s2">"confidence &gt; 0.95"</span><span class="p">,</span>      <span class="c1"># pushed down to S3</span>
     <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">"names"</span><span class="p">,</span> <span class="s2">"confidence"</span><span class="p">],</span>  <span class="c1"># narrow projection</span>
 <span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
@@ -11588,8 +11588,8 @@ OUT = "_overture_out"</div>
 
 paths = EarthLens(
     data_source="overture",
-    dataset="places", variables=[],
-    aoi=[LON_LIM[0], LAT_LIM[0], LON_LIM[1], LAT_LIM[1]], path=OUT,
+    variables={"places": []},
+    lat_lim=LAT_LIM, lon_lim=LON_LIM, path=OUT,
     where="confidence &gt; 0.95",      # pushed down to S3
     columns=["names", "confidence"],  # narrow projection
 ).download()
@@ -11618,9 +11618,9 @@ paths</div>
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jupyter-widgets jp-OutputArea-output" id="0d03d83d-4ef1-46b4-9112-7de7abcbb4fe" tabindex="0">
+<div class="jupyter-widgets jp-OutputArea-output" id="97e2f70a-fc42-40f8-82bf-0ffbcc222108" tabindex="0">
 <script type="text/javascript">
-var element = document.getElementById('0d03d83d-4ef1-46b4-9112-7de7abcbb4fe');
+var element = document.getElementById('97e2f70a-fc42-40f8-82bf-0ffbcc222108');
 </script>
 <script type="application/vnd.jupyter.widget-view+json">
 {"model_id": "bdd58be510644453bc45ebb9968183cf", "version_major": 2, "version_minor": 0}

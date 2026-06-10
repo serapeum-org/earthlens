@@ -11619,7 +11619,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
         <span class="n">data_source</span><span class="o">=</span><span class="s1">'tropycal'</span><span class="p">,</span> <span class="n">product</span><span class="o">=</span><span class="s1">'ships'</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">'AL092022'</span><span class="p">],</span>
         <span class="n">basin</span><span class="o">=</span><span class="s1">'north_atlantic'</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="s1">'hurdat'</span><span class="p">,</span> <span class="n">ships_time</span><span class="o">=</span><span class="s1">'2022-09-27 00:00'</span><span class="p">,</span>
         <span class="n">start</span><span class="o">=</span><span class="s1">'2022-09-20'</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s1">'2022-10-01'</span><span class="p">,</span>
-        <span class="n">aoi</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">180</span><span class="p">,</span> <span class="o">-</span><span class="mi">90</span><span class="p">,</span> <span class="mi">180</span><span class="p">,</span> <span class="mi">90</span><span class="p">],</span> <span class="n">path</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">OUT_DIR</span><span class="p">),</span>
+        <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">90</span><span class="p">,</span> <span class="mi">90</span><span class="p">],</span> <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">180</span><span class="p">,</span> <span class="mi">180</span><span class="p">],</span> <span class="n">path</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">OUT_DIR</span><span class="p">),</span>
     <span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">progress_bar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="s1">'SHIPS table shape:'</span><span class="p">,</span> <span class="kc">None</span> <span class="k">if</span> <span class="n">ships</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">ships</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
 <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
@@ -11637,7 +11637,7 @@ try:
         data_source='tropycal', product='ships', variables=['AL092022'],
         basin='north_atlantic', source='hurdat', ships_time='2022-09-27 00:00',
         start='2022-09-20', end='2022-10-01',
-        aoi=[-180, -90, 180, 90], path=str(OUT_DIR),
+        lat_lim=[-90, 90], lon_lim=[-180, 180], path=str(OUT_DIR),
     ).download(progress_bar=False)
     print('SHIPS table shape:', None if ships is None else ships.shape)
 except Exception as exc:

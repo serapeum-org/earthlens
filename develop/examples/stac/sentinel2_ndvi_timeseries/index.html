@@ -11485,7 +11485,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </style>
 <!-- End of mermaid configuration --><div class="jupyter-wrapper">
 <div class="jp-Notebook" data-jp-theme-light="true" data-jp-theme-name="JupyterLab Light">
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=242cf9fe">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=5abc4636">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -11496,7 +11496,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=911a416b">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=29abf8fa">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -11522,8 +11522,8 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <span class="n">el</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
     <span class="n">data_source</span><span class="o">=</span><span class="s2">"earth-search"</span><span class="p">,</span>
     <span class="n">start</span><span class="o">=</span><span class="s2">"2024-06-01"</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">"2024-07-31"</span><span class="p">,</span>
-    <span class="n">dataset</span><span class="o">=</span><span class="s2">"sentinel-2-l2a"</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">"red"</span><span class="p">,</span> <span class="s2">"nir"</span><span class="p">],</span>
-    <span class="n">aoi</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">3.72</span><span class="p">,</span> <span class="mf">40.40</span><span class="p">,</span> <span class="o">-</span><span class="mf">3.67</span><span class="p">,</span> <span class="mf">40.45</span><span class="p">],</span>
+    <span class="n">variables</span><span class="o">=</span><span class="p">{</span><span class="s2">"sentinel-2-l2a"</span><span class="p">:</span> <span class="p">[</span><span class="s2">"red"</span><span class="p">,</span> <span class="s2">"nir"</span><span class="p">]},</span>
+    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">40.40</span><span class="p">,</span> <span class="mf">40.45</span><span class="p">],</span> <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">3.72</span><span class="p">,</span> <span class="o">-</span><span class="mf">3.67</span><span class="p">],</span>
     <span class="n">path</span><span class="o">=</span><span class="n">out</span><span class="p">,</span> <span class="n">max_items</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="k">try</span><span class="p">:</span>
@@ -11541,8 +11541,8 @@ out = tempfile.mkdtemp()
 el = EarthLens(
     data_source="earth-search",
     start="2024-06-01", end="2024-07-31",
-    dataset="sentinel-2-l2a", variables=["red", "nir"],
-    aoi=[-3.72, 40.40, -3.67, 40.45],
+    variables={"sentinel-2-l2a": ["red", "nir"]},
+    lat_lim=[40.40, 40.45], lon_lim=[-3.72, -3.67],
     path=out, max_items=2,
 )
 try:
@@ -11557,7 +11557,7 @@ except Exception as exc:  # noqa: BLE001 - stays runnable offline
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=78704d6f">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=58d2a6bb">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -11568,7 +11568,7 @@ except Exception as exc:  # noqa: BLE001 - stays runnable offline
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=511a2be2">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=d7d14b77">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>

@@ -11596,7 +11596,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </style>
 <!-- End of mermaid configuration --><div class="jupyter-wrapper">
 <div class="jp-Notebook" data-jp-theme-light="true" data-jp-theme-name="JupyterLab Light">
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=f28da616">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=87fcdee3">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -11608,7 +11608,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=fbbdf08c">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=d754dc41">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -11619,7 +11619,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=0b7fb771">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=07a0133a">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -11656,7 +11656,7 @@ print("default assets:", cat.get_collection("sentinel-2-l2a").default_assets)</d
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=b301c6bc">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=d2035800">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -11667,7 +11667,7 @@ print("default assets:", cat.get_collection("sentinel-2-l2a").default_assets)</d
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=02701abe">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=d99e6360">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -11692,8 +11692,9 @@ print("default assets:", cat.get_collection("sentinel-2-l2a").default_assets)</d
     <span class="n">data_source</span><span class="o">=</span><span class="s2">"earth-search"</span><span class="p">,</span>
     <span class="n">start</span><span class="o">=</span><span class="s2">"2024-06-01"</span><span class="p">,</span>
     <span class="n">end</span><span class="o">=</span><span class="s2">"2024-06-20"</span><span class="p">,</span>
-    <span class="n">dataset</span><span class="o">=</span><span class="s2">"sentinel-2-l2a"</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">"red"</span><span class="p">,</span> <span class="s2">"green"</span><span class="p">,</span> <span class="s2">"blue"</span><span class="p">],</span>
-    <span class="n">aoi</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">3.72</span><span class="p">,</span> <span class="mf">40.40</span><span class="p">,</span> <span class="o">-</span><span class="mf">3.67</span><span class="p">,</span> <span class="mf">40.45</span><span class="p">],</span>
+    <span class="n">variables</span><span class="o">=</span><span class="p">{</span><span class="s2">"sentinel-2-l2a"</span><span class="p">:</span> <span class="p">[</span><span class="s2">"red"</span><span class="p">,</span> <span class="s2">"green"</span><span class="p">,</span> <span class="s2">"blue"</span><span class="p">]},</span>
+    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">40.40</span><span class="p">,</span> <span class="mf">40.45</span><span class="p">],</span>
+    <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">3.72</span><span class="p">,</span> <span class="o">-</span><span class="mf">3.67</span><span class="p">],</span>
     <span class="n">path</span><span class="o">=</span><span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">(),</span>
     <span class="n">max_items</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
 <span class="p">)</span>
@@ -11711,8 +11712,9 @@ el = EarthLens(
     data_source="earth-search",
     start="2024-06-01",
     end="2024-06-20",
-    dataset="sentinel-2-l2a", variables=["red", "green", "blue"],
-    aoi=[-3.72, 40.40, -3.67, 40.45],
+    variables={"sentinel-2-l2a": ["red", "green", "blue"]},
+    lat_lim=[40.40, 40.45],
+    lon_lim=[-3.72, -3.67],
     path=tempfile.mkdtemp(),
     max_items=1,
 )
@@ -11728,7 +11730,7 @@ paths</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=969e24da">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=1ac33424">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -11739,7 +11741,7 @@ paths</div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=3c90f301">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=69481a8a">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -11780,7 +11782,7 @@ else:
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=c02ac924">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=0a40da98">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>

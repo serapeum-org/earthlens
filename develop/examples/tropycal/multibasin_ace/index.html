@@ -11558,7 +11558,8 @@ OUT_DIR.mkdir(exist_ok=True)</div>
         <span class="n">data_source</span><span class="o">=</span><span class="s1">'tropycal'</span><span class="p">,</span>
         <span class="n">start</span><span class="o">=</span><span class="s1">'2018-05-01'</span><span class="p">,</span>
         <span class="n">end</span><span class="o">=</span><span class="s1">'2018-12-01'</span><span class="p">,</span>
-        <span class="n">aoi</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">160.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">10.0</span><span class="p">,</span> <span class="mf">60.0</span><span class="p">],</span>
+        <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">60.0</span><span class="p">],</span>
+        <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">160.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">10.0</span><span class="p">],</span>
         <span class="n">source</span><span class="o">=</span><span class="s1">'hurdat'</span><span class="p">,</span>
         <span class="n">geometry</span><span class="o">=</span><span class="s1">'track'</span><span class="p">,</span>
         <span class="n">path</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">OUT_DIR</span><span class="p">),</span>
@@ -11574,7 +11575,8 @@ try:
         data_source='tropycal',
         start='2018-05-01',
         end='2018-12-01',
-        aoi=[-160.0, 0.0, -10.0, 60.0],
+        lat_lim=[0.0, 60.0],
+        lon_lim=[-160.0, -10.0],
         source='hurdat',
         geometry='track',
         path=str(OUT_DIR),
