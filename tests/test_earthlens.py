@@ -693,6 +693,51 @@ class TestFacadeConstructorOrder:
             EarthLens("chc", **self._base(tmp_path))
 
 
+class TestFacadeTimeRange:
+    """The single time= range splits into start/end (L1)."""
+
+    def _window(self, tmp_path, **kwargs):
+        time = EarthLens(
+            "chc", variables=["precipitation"], path=str(tmp_path), **kwargs
+        ).datasource.time
+        return (
+            time.start_date.date().isoformat(),
+            time.end_date.date().isoformat(),
+        )
+
+    def test_interval_string(self, tmp_path):
+        """time='a/b' sets start and end."""
+        assert self._window(tmp_path, time="2020-01-01/2020-01-31") == (
+            "2020-01-01",
+            "2020-01-31",
+        )
+
+    def test_tuple(self, tmp_path):
+        """time=(a, b) sets start and end."""
+        assert self._window(tmp_path, time=("2020-01-01", "2020-02-01")) == (
+            "2020-01-01",
+            "2020-02-01",
+        )
+
+    def test_slice(self, tmp_path):
+        """time=slice(a, b) sets start and end."""
+        assert self._window(tmp_path, time=slice("2020-01-01", "2020-03-01")) == (
+            "2020-01-01",
+            "2020-03-01",
+        )
+
+    def test_time_with_start_end_raises(self, tmp_path):
+        """Passing both time= and start=/end= is rejected."""
+        with pytest.raises(ValueError, match="either time= or start="):
+            EarthLens(
+                "chc",
+                variables=["precipitation"],
+                path=str(tmp_path),
+                time="2020-01-01/2020-02-01",
+                start="2020-01-01",
+            )
+
+
 @pytest.mark.chc
 class TestFacadePath:
     """The facade's output-path defaulting."""

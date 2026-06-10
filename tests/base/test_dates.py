@@ -5,7 +5,7 @@ import datetime as dt
 import pandas as pd
 import pytest
 
-from earthlens.base import to_datetime
+from earthlens.base import split_time, to_datetime
 
 
 class TestToDatetime:
@@ -52,3 +52,47 @@ class TestToDatetime:
         """A string that is neither fmt- nor ISO-parseable raises."""
         with pytest.raises(ValueError):
             to_datetime("not-a-date", fmt="%Y-%m-%d")
+
+
+class TestSplitTime:
+    """Splitting a single time= range into a (start, end) pair."""
+
+    def test_interval_string(self):
+        """A STAC-style 'a/b' string splits on the slash."""
+        assert split_time("2020-01-01/2020-01-31") == ("2020-01-01", "2020-01-31")
+
+    def test_open_ended_interval(self):
+        """An empty half of the interval becomes None (open-ended)."""
+        assert split_time("2020-01-01/") == ("2020-01-01", None)
+        assert split_time("/2020-01-31") == (None, "2020-01-31")
+
+    def test_two_sequence(self):
+        """A (start, end) tuple / list is returned verbatim."""
+        assert split_time(("2020-01-01", "2020-02-01")) == ("2020-01-01", "2020-02-01")
+        assert split_time(["a", "b"]) == ("a", "b")
+
+    def test_slice(self):
+        """A slice maps start/stop to (start, end)."""
+        assert split_time(slice("2020-01-01", "2020-03-01")) == (
+            "2020-01-01",
+            "2020-03-01",
+        )
+
+    def test_single_string_is_an_instant(self):
+        """A plain date string with no slash is a single instant."""
+        assert split_time("2020-01-01") == ("2020-01-01", "2020-01-01")
+
+    def test_single_date_object_is_an_instant(self):
+        """A date / datetime object is a single instant."""
+        day = dt.date(2020, 1, 1)
+        assert split_time(day) == (day, day)
+
+    def test_wrong_length_sequence_raises(self):
+        """A sequence that is not exactly two elements is rejected."""
+        with pytest.raises(ValueError, match="2 elements"):
+            split_time(("2020-01-01", "2020-02-01", "2020-03-01"))
+
+    def test_unsupported_type_raises(self):
+        """A non-range value is rejected with a clear message."""
+        with pytest.raises(TypeError, match="time= must be"):
+            split_time(2020)

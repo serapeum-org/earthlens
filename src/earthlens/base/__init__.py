@@ -7,7 +7,7 @@ into the private module layout.
 
 from __future__ import annotations
 
-from earthlens.base._dates import to_datetime
+from earthlens.base._dates import split_time, to_datetime
 from earthlens.base.abstractdatasource import (
     AbstractCatalog,
     AbstractDataSource,
@@ -49,5 +49,6 @@ __all__ = [
     "load_providers",
     "normalize_aoi",
     "resolve_aoi",
+    "split_time",
     "to_datetime",
 ]

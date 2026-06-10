@@ -437,6 +437,7 @@ class EarthLens:
         buffer: float | None = None,
         dataset: str | None = None,
         cadence: str | None = None,
+        time: Any = None,
         **backend_kwargs: object,
     ):
         """Resolve the backend and construct it with the user's parameters.
@@ -491,6 +492,12 @@ class EarthLens:
                 `pandas.Timestamp` object. Defaults to `None`.
             end: Inclusive end date, same accepted types as `start`.
                 Defaults to `None`.
+            time: A single time range, the ergonomic alternative to the
+                `start` / `end` pair (STAC `"a/b"` / earthaccess `(a, b)`
+                idiom). Accepts a `"start/end"` string, a `(start, end)`
+                2-sequence, a `slice`, or a single date (an instant). Splits
+                into `start` / `end`; passing it together with `start` /
+                `end` raises `ValueError`. Defaults to `None`.
             path: Output directory. Created by the backend if it does
                 not exist. When omitted (`None`), defaults to
                 `./earthlens-data/<data_source>/` rather than the current
@@ -665,6 +672,16 @@ class EarthLens:
         # `temporal_resolution`; when given it simply overrides it.
         if cadence is not None:
             temporal_resolution = cadence
+
+        # A single `time=` range supersedes the separate `start` / `end`
+        # pair (STAC `"a/b"` / earthaccess `(a, b)` idiom). Split it into
+        # the `start` / `end` the backend already consumes.
+        if time is not None:
+            if start is not None or end is not None:
+                raise ValueError("pass either time= or start=/end=, not both")
+            from earthlens.base import split_time
+
+            start, end = split_time(time)
 
         backend_cls = self.DataSources[data_source]
         backend_params = inspect.signature(backend_cls.__init__).parameters
@@ -1366,6 +1383,7 @@ def download(
     buffer: float | None = None,
     temporal_resolution: str = "daily",
     cadence: str | None = None,
+    time: Any = None,
     fmt: str = "%Y-%m-%d",
     progress_bar: bool = True,
     aggregate: AggregationConfig | None = None,
@@ -1387,6 +1405,9 @@ def download(
             :class:`EarthLens`).
         start: Inclusive start date (string / `datetime` / `date`).
         end: Inclusive end date.
+        time: A single time range (`"a/b"` string / `(a, b)` pair / `slice` /
+            single date) — the ergonomic alternative to `start` / `end`;
+            mutually exclusive with them.
         path: Output directory; defaults to
             `./earthlens-data/<data_source>/` when omitted.
         lat_lim: Legacy `[lat_min, lat_max]` pair — prefer `aoi=` (mutually
@@ -1441,6 +1462,7 @@ def download(
         buffer=buffer,
         temporal_resolution=temporal_resolution,
         cadence=cadence,
+        time=time,
         fmt=fmt,
         **backend_kwargs,
     )
@@ -1485,6 +1507,7 @@ def search(
     buffer: float | None = None,
     temporal_resolution: str = "daily",
     cadence: str | None = None,
+    time: Any = None,
     fmt: str = "%Y-%m-%d",
     **backend_kwargs: object,
 ) -> list[RemoteProduct]:
@@ -1501,6 +1524,9 @@ def search(
         dataset: Explicit dataset / collection key.
         start: Inclusive start date (string / `datetime` / `date`).
         end: Inclusive end date.
+        time: A single time range (`"a/b"` string / `(a, b)` pair / `slice` /
+            single date) — the ergonomic alternative to `start` / `end`;
+            mutually exclusive with them.
         path: Output directory (unused by a dry-run search, but accepted for
             signature parity with :func:`download`).
         lat_lim: Legacy `[lat_min, lat_max]` pair — prefer `aoi=` (mutually
@@ -1534,6 +1560,7 @@ def search(
         buffer=buffer,
         temporal_resolution=temporal_resolution,
         cadence=cadence,
+        time=time,
         fmt=fmt,
         **backend_kwargs,
     ).search()

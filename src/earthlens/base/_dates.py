@@ -80,3 +80,70 @@ def to_datetime(value: Any, fmt: str | None = None) -> dt.datetime:
         f"start / end must be a datetime, date, or string; got "
         f"{type(value).__name__}"
     )
+
+
+def split_time(value: Any) -> tuple[Any, Any]:
+    """Split a single time-range value into a `(start, end)` pair.
+
+    The ergonomic alternative to passing `start` / `end` separately, in the
+    spirit of STAC's `datetime="a/b"` and earthaccess's `temporal=(a, b)`.
+    The two halves keep their original types and are parsed downstream by
+    :func:`to_datetime`. Accepted forms:
+
+    * a `"start/end"` string (STAC interval) — split on the first `/`; an
+      empty half (`"a/"` / `"/b"`) becomes `None` (open-ended);
+    * a `(start, end)` / `[start, end]` 2-sequence;
+    * a `slice(start, stop)` — `value.start` / `value.stop`;
+    * a single date-like string / `datetime` / `date` — an instant, returned
+      as `(value, value)`.
+
+    Args:
+        value: The time range in any of the accepted forms.
+
+    Returns:
+        `(start, end)`, each a date-like value (or `None` for an open half).
+
+    Raises:
+        ValueError: If a sequence does not have exactly two elements.
+        TypeError: If `value` is of an unsupported type.
+
+    Examples:
+        - A STAC-style interval string splits on `/`:
+            ```python
+            >>> split_time("2020-01-01/2020-01-31")
+            ('2020-01-01', '2020-01-31')
+
+            ```
+        - A two-tuple is returned verbatim:
+            ```python
+            >>> split_time(("2020-01-01", "2020-02-01"))
+            ('2020-01-01', '2020-02-01')
+
+            ```
+        - A single date is an instant (start == end):
+            ```python
+            >>> split_time("2020-01-01")
+            ('2020-01-01', '2020-01-01')
+
+            ```
+    """
+    if isinstance(value, slice):
+        return value.start, value.stop
+    if isinstance(value, str):
+        if "/" in value:
+            start, _, end = value.partition("/")
+            return (start.strip() or None), (end.strip() or None)
+        return value, value
+    if isinstance(value, (dt.datetime, dt.date)):
+        return value, value
+    if isinstance(value, (tuple, list)):
+        if len(value) != 2:
+            raise ValueError(
+                f"time= sequence must have 2 elements [start, end]; "
+                f"got {len(value)}"
+            )
+        return value[0], value[1]
+    raise TypeError(
+        "time= must be a 'start/end' string, a (start, end) pair, a slice, "
+        f"or a single date; got {type(value).__name__}"
+    )
