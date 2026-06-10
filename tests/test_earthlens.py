@@ -489,6 +489,42 @@ class TestFacadeCadence:
         assert resolved == "monthly", f"got {resolved}"
 
 
+class TestFacadeConstructorOrder:
+    """data_source is the first positional; the legacy order is shimmed."""
+
+    def _base(self, tmp_path):
+        return dict(start="2009-01-01", end="2009-01-02", path=str(tmp_path))
+
+    def test_data_source_first_positional(self, tmp_path):
+        """EarthLens('chc', variables=[...]) puts data_source first."""
+        el = EarthLens("chc", variables=["precipitation"], **self._base(tmp_path))
+        assert type(el.datasource).__name__ == "CHIRPS", "data_source-first failed"
+
+    def test_keyword_order_still_works(self, tmp_path):
+        """The all-keyword call (variables=, data_source=) is unaffected."""
+        el = EarthLens(
+            variables=["precipitation"], data_source="chc", **self._base(tmp_path)
+        )
+        assert type(el.datasource).__name__ == "CHIRPS", "keyword call failed"
+
+    def test_legacy_positional_order_warns_and_swaps(self, tmp_path):
+        """The legacy EarthLens(variables, data_source) order warns and swaps."""
+        with pytest.warns(DeprecationWarning, match="data_source first"):
+            el = EarthLens(["precipitation"], "chc", **self._base(tmp_path))
+        assert el.datasource.vars == {"global-daily": ["precipitation"]}, "swap failed"
+
+    def test_legacy_single_positional_list_defaults_chc(self, tmp_path):
+        """A lone EarthLens([...]) variables list defaults the source to chc."""
+        with pytest.warns(DeprecationWarning):
+            el = EarthLens(["precipitation"], **self._base(tmp_path))
+        assert type(el.datasource).__name__ == "CHIRPS", "default source failed"
+
+    def test_missing_variables_raises(self, tmp_path):
+        """A source with no variables= raises a clear error, not a backend TypeError."""
+        with pytest.raises(ValueError, match="variables= is required"):
+            EarthLens("chc", **self._base(tmp_path))
+
+
 @pytest.mark.chc
 class TestFacadePath:
     """The facade's output-path defaulting."""

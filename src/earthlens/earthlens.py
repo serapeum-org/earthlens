@@ -17,6 +17,7 @@ from __future__ import annotations
 import difflib
 import importlib
 import inspect
+import warnings
 from collections.abc import Iterator, Mapping
 from datetime import date, datetime
 from pathlib import Path
@@ -372,8 +373,8 @@ class EarthLens:
 
     def __init__(
         self,
-        variables: dict[str, list[str]] | list[str],
         data_source: str = "chc",
+        variables: dict[str, list[str]] | list[str] | None = None,
         temporal_resolution: str = "daily",
         start: str | datetime | date | None = None,
         end: str | datetime | date | None = None,
@@ -580,6 +581,29 @@ class EarthLens:
         See Also:
             :meth:`download`: Triggers the actual retrieval.
         """
+        # Back-compat for the legacy positional order
+        # `EarthLens(variables, data_source, ...)`. `data_source` is now
+        # the first positional; a caller who passed `variables` first sends
+        # a list / dict where a source key (a `str`) is expected, so detect
+        # that and swap, with a deprecation warning. Runs before
+        # `_check_source` so the (now-correct) key is the one validated.
+        if not isinstance(data_source, str):
+            warnings.warn(
+                "EarthLens(variables, data_source, ...) is deprecated; pass "
+                "data_source first: EarthLens(data_source, variables=...).",
+                DeprecationWarning,
+                stacklevel=2,
+            )
+            data_source, variables = (
+                variables if isinstance(variables, str) else "chc",
+                data_source,
+            )
+        if variables is None:
+            raise ValueError(
+                "variables= is required, e.g. "
+                "EarthLens('chc', variables=['precipitation'])."
+            )
+
         self._check_source(data_source)
 
         # `cadence=` is the clearer alias for the download-cadence role of
