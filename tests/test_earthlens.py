@@ -421,6 +421,40 @@ class TestTopLevelReExports:
         ], f"Unexpected top-level __all__: {earthlens.__all__!r}"
 
 
+@pytest.mark.chc
+class TestFacadePath:
+    """The facade's output-path defaulting."""
+
+    def test_omitted_path_defaults_to_named_subdir(self, tmp_path, monkeypatch):
+        """An omitted path writes under ./earthlens-data/<source>/."""
+        from pathlib import Path
+
+        monkeypatch.chdir(tmp_path)
+        backend = EarthLens(
+            data_source="chc",
+            variables=["precipitation"],
+            start="2009-01-01",
+            end="2009-01-02",
+        ).datasource
+        expected = Path.cwd() / "earthlens-data" / "chc"
+        assert backend.root_dir == expected, f"got {backend.root_dir}"
+        assert backend.root_dir.is_dir(), "the default directory should be created"
+
+    def test_empty_path_still_uses_cwd(self, tmp_path, monkeypatch):
+        """An explicit path='' opts into the current working directory."""
+        from pathlib import Path
+
+        monkeypatch.chdir(tmp_path)
+        backend = EarthLens(
+            data_source="chc",
+            variables=["precipitation"],
+            start="2009-01-01",
+            end="2009-01-02",
+            path="",
+        ).datasource
+        assert backend.root_dir == Path.cwd(), f"got {backend.root_dir}"
+
+
 class TestFacadeOptions:
     """The facade's backend-option discovery and early kwarg validation."""
 

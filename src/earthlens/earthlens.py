@@ -22,6 +22,8 @@ from datetime import date, datetime
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
+from loguru import logger
+
 if TYPE_CHECKING:
     from earthlens.aggregate import AggregationConfig
     from earthlens.base import AbstractCatalog, AbstractDataSource, RemoteProduct
@@ -375,7 +377,7 @@ class EarthLens:
         temporal_resolution: str = "daily",
         start: str | datetime | date | None = None,
         end: str | datetime | date | None = None,
-        path: Path | str = "",
+        path: Path | str | None = None,
         lat_lim: list[float] | None = None,
         lon_lim: list[float] | None = None,
         fmt: str = "%Y-%m-%d",
@@ -430,7 +432,9 @@ class EarthLens:
             end: Inclusive end date, same accepted types as `start`.
                 Defaults to `None`.
             path: Output directory. Created by the backend if it does
-                not exist. Defaults to the current working directory.
+                not exist. When omitted (`None`), defaults to
+                `./earthlens-data/<data_source>/` rather than the current
+                working directory; pass `path=""` to opt into the CWD.
             dataset: Explicit dataset / collection key, the ergonomic
                 alternative to keying it into `variables`. When given
                 with a plain `variables` list, the facade composes the
@@ -602,6 +606,15 @@ class EarthLens:
             lat_lim = DEFAULT_LATITUDE_LIMIT
         if lon_lim is None:
             lon_lim = DEFAULT_LONGITUDE_LIMIT
+
+        # An omitted `path` writes to a named per-source subdirectory
+        # rather than scattering files into the current working directory.
+        # An explicit `path=""` still means the CWD (a deliberate choice).
+        if path is None:
+            path = Path("earthlens-data") / data_source
+            logger.info(
+                f"No `path` given; writing {data_source!r} output under {path}/."
+            )
 
         # Per-key defaults (e.g. the STAC endpoint aliases pre-bind
         # `endpoint=`) are merged *under* the user's kwargs, so an
