@@ -58,6 +58,7 @@ from tqdm import tqdm
 
 from earthlens.base import (
     AbstractDataSource,
+    LazyClientMixin,
     OutputKind,
     SpatialExtent,
     TemporalExtent,
@@ -150,7 +151,7 @@ def _validate_pure_config(
         )
 
 
-class GEE(AbstractDataSource):
+class GEE(LazyClientMixin, AbstractDataSource):
     """Google Earth Engine data source.
 
     Args:
@@ -342,8 +343,33 @@ class GEE(AbstractDataSource):
             path=path,
         )
 
-    def _initialize(self) -> Any:
-        """Authenticate and initialise the Earth Engine connection.
+    def _initialize(self) -> None:
+        """Validate credentials presence; defer the Earth Engine connection.
+
+        Runs the cheap, offline precondition (a `service_account` +
+        `service_key` pair, or an explicit `project`) so a misconfigured
+        request fails fast at construction, then returns `None`. The
+        actual `ee.Authenticate()` / `ee.Initialize(...)` is deferred to
+        first access to `self.client` (see :meth:`_open_client`), so
+        constructing the backend never blocks on auth.
+
+        Returns:
+            None: Always.
+
+        Raises:
+            AuthenticationError: If neither a `service_account` +
+                `service_key` pair nor an explicit `project` was given.
+        """
+        if not (self._service_account and self._service_key) and not self._project:
+            raise AuthenticationError(
+                "the GEE backend needs either service_account + service_key, "
+                "or an explicit project= (with cached/ADC credentials). See "
+                "https://developers.google.com/earth-engine/guides/service_account."
+            )
+        return None
+
+    def _open_client(self) -> Any:
+        """Authenticate and initialise the Earth Engine connection (lazily).
 
         Uses a service-account key when `service_account` + `service_key`
         were given (via :class:`EarthEngineAuth`); otherwise runs
@@ -353,14 +379,14 @@ class GEE(AbstractDataSource):
         so on a headless box (CI, Docker, remote shell) it will hang
         or fail with whatever the EE SDK emits natively; use
         service-account auth for non-interactive use. The resolved
-        project id is stored on :attr:`project`.
+        project id is stored on :attr:`project`. Called by
+        :attr:`~earthlens.base.LazyClientMixin.client` on first use.
 
         Returns:
-            The `ee` module (truthy, so the parent stores it as
-            `self.client`).
+            The `ee` module (cached as `self.client`).
 
         Raises:
-            AuthenticationError: If credentials are missing/invalid, no
+            AuthenticationError: If credentials are invalid, no
                 project can be resolved, the
                 project is not registered for Earth Engine, or the
                 service account lacks the required IAM role on it.
@@ -370,12 +396,6 @@ class GEE(AbstractDataSource):
                 self._service_account, self._service_key, self._project
             )
             return ee
-        if not self._project:
-            raise AuthenticationError(
-                "the GEE backend needs either service_account + service_key, "
-                "or an explicit project= (with cached/ADC credentials). See "
-                "https://developers.google.com/earth-engine/guides/service_account."
-            )
         try:
             ee.Authenticate()
             ee.Initialize(project=self._project)
@@ -536,6 +556,8 @@ class GEE(AbstractDataSource):
                 "aggregate= is not yet supported by the GEE backend "
                 "(planned — see the GEE plan task M3)."
             )
+        # Trigger the lazy Earth Engine auth/init before any `ee` call.
+        _ = self.client
         outputs: list[Path | str | TaskInfo] = []
         for asset_id, bands in self.vars.items():
             outputs.extend(self._download_dataset(asset_id, list(bands), progress_bar))

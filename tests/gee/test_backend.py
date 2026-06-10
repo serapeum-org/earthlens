@@ -303,13 +303,14 @@ class TestInit:
     """Tests for `GEE.__init__` and the captured attributes."""
 
     def test_constructs_and_sets_attributes(self, make_gee):
-        """A valid construction wires up the catalog, project, and config."""
+        """A valid construction wires up the catalog and config; auth is lazy."""
         gee = make_gee()
         assert gee.catalog.get_dataset("USGS/SRTMGL1_003").ee_type == "image"
-        assert gee.project == "fake-project"
         assert gee.scale == 90.0 and gee.crs == "EPSG:4326"
         assert isinstance(gee.space, SpatialExtent) and isinstance(gee.time, TemporalExtent)
+        # Opening the client lazily runs auth and resolves the project.
         assert gee.client is backend_module.ee
+        assert gee.project == "fake-project"
 
     def test_bad_export_via_rejected(self, make_gee):
         """An unknown `export_via` raises `ValueError` at construction."""
