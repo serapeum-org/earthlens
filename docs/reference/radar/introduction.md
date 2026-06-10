@@ -44,3 +44,13 @@ volumes (via `pyart`) is a downstream follow-on — this backend fetches
 and inventories; it does not decode.
 
 See [Usage](usage.md) for the request shape.
+
+!!! note "Why only a catalog-explorer example"
+    The Examples tab ships a single radar notebook — the offline
+    [catalog explorer](../../examples/radar/catalog_explorer.ipynb). A live
+    download recipe is deliberately omitted: the chunk bucket holds only the
+    last hour or two of volumes, so a notebook with committed outputs would go
+    stale immediately (whatever scans existed at authoring time are long gone),
+    and re-running it at docs-build time would depend on whichever sites
+    happen to be scanning right then. The request shape in [Usage](usage.md) is
+    the reproducible reference instead.

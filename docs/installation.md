@@ -46,18 +46,42 @@ Then install a release of earthlens from PyPI. Each backend's SDK
 is an optional extra — pick the ones you actually need:
 
 ```bash
-pip install earthlens[ecmwf]    # ECMWF / Copernicus CDS (cdsapi)
-pip install earthlens[s3]       # ERA5 on AWS S3 (boto3)
+pip install earthlens[ecmwf]    # ECMWF / Copernicus CDS
 pip install earthlens[gee]      # Google Earth Engine
-pip install earthlens[openeo]   # openEO server-side processing (CDSE)
+pip install earthlens[cmems]    # Copernicus Marine
 pip install earthlens[all]      # everything
 ```
 
+### Available extras
+
+| Extra | Backend(s) | Pulls |
+|-------|------------|-------|
+| `s3` | Amazon S3 (AWS Open Data) | `boto3`, `botocore` |
+| `ecmwf` | ECMWF / Copernicus CDS | `cdsapi` |
+| `gee` | Google Earth Engine | `earthengine-api`, `google-api-python-client`, `google-cloud-storage`, `Rtree` |
+| `cmems` | Copernicus Marine | `copernicusmarine` |
+| `earthdata` | NASA Earthdata | `earthaccess` (Python ≥ 3.12) |
+| `eumetsat` | EUMETSAT Data Store | `eumdac` |
+| `fdsn` | FDSN seismic events | `obspy` |
+| `stac` | STAC (MPC / Earth Search / CDSE) | `pyramids-gis[stac]` |
+| `openeo` | openEO server-side processing | `openeo` |
+| `sentinel-hub` | Sentinel Hub render | `sentinelhub` |
+| `nwp` | Open NWP forecasts | `herbie-data`, `ecmwf-opendata` |
+| `radar` | NEXRAD radar | `boto3`, `botocore` |
+| `hdx` | Humanitarian Data Exchange | `hdx-python-api` |
+| `overture` | Overture Maps | `overturemaps`, `duckdb` |
+| `tropycal` | Tropical cyclones | `tropycal`, `cartopy` |
+| `usgs-water` | USGS Water (NWIS) | `dataretrieval` |
+| `worldpop` | WorldPop | `worldpoppy`, `py7zr` |
+| `all` | every backend above | all of the above |
+
 A bare `pip install earthlens` installs only the core dependencies
-(numpy, pandas, etc.) plus the CHIRPS FTP backend (no SDK needed).
-Asking the facade for `data_source="ecmwf"` (or `"amazon-s3"`,
-or `"gee"`) without the matching extra raises a clear
-`ImportError` naming the missing extra.
+(numpy, pandas, pyramids-gis, requests, …), which is enough for the
+backends that need no extra SDK: **CHC / CHIRPS** (anonymous FTP),
+**GDACS**, **FIRMS**, **OpenAQ**, and **GHSL** (plain HTTPS + the core
+GIS stack). Asking the facade for a backend whose extra is missing
+(e.g. `data_source="ecmwf"` without `earthlens[ecmwf]`) raises a clear
+`ImportError` naming the extra to install.
 
 > **Dependency note — `openeo` version pin.** openeo `0.48+` hard-caps
 > `pandas<3.0.0`, which would drag the whole environment down to pandas 2.x.

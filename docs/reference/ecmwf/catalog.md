@@ -769,6 +769,6 @@ The runtime contract that the catalog YAML feeds:
 
 ## See also
 
-- [ECMWF backend reference](../ecmwf.md) — class-level API reference.
+- [ECMWF backend reference](ecmwf.md) — class-level API reference.
 - `src/earthlens/ecmwf/catalog.py` — loader source; `Catalog.model_post_init` is the authoritative description of how YAML rows become `Variable` instances.
 - `planning/cdsapi/all-catalog.md` — historical record of the catalog's evolution and per-dataset coverage decisions.
