@@ -461,6 +461,22 @@ class TestFunctionalDownload:
         assert captured["init"]["variables"] == ["precipitation"]
         assert captured["download"] == {"progress_bar": False, "aggregate": None}
 
+    def test_facade_download_forwards_backend_return(self, tmp_path, monkeypatch):
+        """EarthLens(...).download() returns the backend's value, never None (H2)."""
+        facade = EarthLens(
+            "chc",
+            variables=["precipitation"],
+            start="2009-01-01",
+            end="2009-01-02",
+            path=str(tmp_path),
+        )
+        sentinel = [tmp_path / "a.tif", tmp_path / "b.tif"]
+        monkeypatch.setattr(facade.datasource, "download", lambda *a, **k: sentinel)
+        result = facade.download(progress_bar=False)
+        assert (
+            result is sentinel
+        ), f"facade must forward the backend paths; got {result}"
+
 
 @pytest.mark.chc
 class TestFacadeCadence:
