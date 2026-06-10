@@ -643,6 +643,17 @@ class TestFacadeDiscovery:
         with pytest.raises(NotImplementedError, match="no catalog"):
             EarthLens.catalog("chc")
 
+    def test_catalog_missing_sdk_raises_importerror(self, monkeypatch):
+        """A backend whose module fails to import surfaces a friendly ImportError."""
+        from earthlens import earthlens as facade_module
+
+        def _boom(name):
+            raise ImportError("no SDK")
+
+        monkeypatch.setattr(facade_module.importlib, "import_module", _boom)
+        with pytest.raises(ImportError, match="catalog is unavailable"):
+            EarthLens.catalog("gee")
+
 
 @pytest.mark.chc
 class TestFacadeAoi:
