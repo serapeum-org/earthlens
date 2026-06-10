@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import difflib
+import functools
+import inspect
 import os
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
@@ -427,6 +429,72 @@ class AbstractDataSource(ABC):
     """
 
     OUTPUT_KIND: OutputKind = "raster"
+
+    def __init_subclass__(cls, **kwargs: Any) -> None:
+        """Give every backend the facade's ergonomic constructor sugar.
+
+        Wraps each concrete backend's `__init__` so that — whether reached
+        through the `EarthLens` facade or by constructing the backend
+        class directly — it also accepts:
+
+        * `aoi` (+ `buffer`): any shape :func:`earthlens.base.spatial.normalize_aoi`
+          understands, reduced to `lat_lim` / `lon_lim`; a backend that
+          declares its own `aoi` (WorldPop) keeps it;
+        * `cadence`: a clearer alias for `temporal_resolution`;
+        * `dataset`: split out of a single-key `variables` dict (or passed
+          through to a backend with a native `dataset`, e.g. S3).
+
+        The original `__init__` is preserved as the wrapper's `__wrapped__`,
+        so signature introspection (e.g. `EarthLens.options_for`) and the
+        facade's kwarg validation still see the backend's real parameters.
+        """
+        super().__init_subclass__(**kwargs)
+        orig = cls.__dict__.get("__init__")
+        if orig is None or getattr(orig, "_ergonomic", False):
+            return
+        params = inspect.signature(orig).parameters
+        native_aoi = "aoi" in params
+        native_dataset = "dataset" in params
+
+        @functools.wraps(orig)
+        def __init__(self, *args, aoi=None, buffer=None, cadence=None, dataset=None, **kw):
+            if cadence is not None:
+                kw["temporal_resolution"] = cadence
+            if dataset is not None:
+                if native_dataset:
+                    kw["dataset"] = dataset
+                elif isinstance(kw.get("variables"), dict):
+                    raise ValueError(
+                        "pass variables= as a list when using dataset=, or omit "
+                        "dataset= and key the variables dict yourself"
+                    )
+                else:
+                    v = kw.get("variables")
+                    kw["variables"] = {dataset: list(v) if v is not None else []}
+            if aoi is not None:
+                if native_aoi:
+                    if buffer is not None:
+                        raise ValueError(
+                            f"buffer= is not supported by {cls.__name__}, which "
+                            "interprets aoi= itself"
+                        )
+                    kw["aoi"] = aoi
+                else:
+                    if kw.get("lat_lim") is not None or kw.get("lon_lim") is not None:
+                        raise ValueError(
+                            "pass either aoi= or lat_lim=/lon_lim=, not both"
+                        )
+                    from earthlens.base.spatial import normalize_aoi
+
+                    kw["lat_lim"], kw["lon_lim"] = normalize_aoi(aoi, buffer=buffer)
+            elif buffer is not None:
+                raise ValueError(
+                    "buffer= only applies to a point aoi=(lon, lat); pass aoi= too"
+                )
+            orig(self, *args, **kw)
+
+        __init__._ergonomic = True
+        cls.__init__ = __init__
 
     def __init__(
         self,
