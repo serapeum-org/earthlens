@@ -199,13 +199,14 @@ class EUMETSAT(AbstractDataSource):
         return kinds.pop()
 
     def _initialize(self):
-        """Build the `EumetsatAuth` and run `configure()` (mint the token).
+        """Build the `EumetsatAuth`; defer token minting to fetch.
 
         Returns `None` — `eumdac` keeps the token on the `EumetsatAuth`
-        instance, so the parent class binds no opaque `self.client`.
-
-        Raises:
-            AuthenticationError: When token minting fails.
+        instance, so the parent class binds no opaque `self.client`. The
+        token minting (`EumetsatAuth.configure`, which contacts the auth
+        server) is deferred: :meth:`_fetch` already calls the idempotent
+        `configure()` before downloading, so constructing the backend
+        never authenticates and `_search()` stays offline.
         """
         creds = EumetsatCredentials(
             consumer_key=self._consumer_key,
@@ -213,7 +214,6 @@ class EUMETSAT(AbstractDataSource):
             credentials_file=self._credentials_file,
         )
         self._auth = EumetsatAuth(creds)
-        self._auth.configure()
         return None
 
     def _create_grid(self, lat_lim: list, lon_lim: list) -> SpatialExtent:

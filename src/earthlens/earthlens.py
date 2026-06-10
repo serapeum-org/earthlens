@@ -513,11 +513,15 @@ class EarthLens:
                 :attr:`DataSources`, if both `aoi` and
                 `lat_lim` / `lon_lim` are given, if `buffer` is given
                 without a point `aoi`, or if `aoi` is malformed.
-            AuthenticationError: If the backend cannot authenticate —
-                ECMWF (missing `~/.cdsapirc`; see
-                :class:`earthlens.ecmwf.AuthenticationError`) or GEE
-                (missing/invalid service key, unregistered project; see
-                :class:`earthlens.gee.AuthenticationError`).
+            AuthenticationError: For backends that defer auth
+                (ECMWF, GEE, STAC, CMEMS, …) the network handshake is
+                lazy, so an auth failure surfaces on the first
+                `download()` / `search()`, not here. GEE is the
+                exception that still raises at construction — but only
+                its *offline* precondition (neither `service_account` +
+                `service_key` nor an explicit `project=` was given); its
+                actual Earth Engine errors (invalid key, unregistered
+                project) are also deferred to first use.
             ImportError: If the chosen backend's optional SDK is not
                 installed (e.g. `data_source="gee"` without
                 `pip install earthlens[gee]`).

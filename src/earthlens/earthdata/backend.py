@@ -231,14 +231,15 @@ class Earthdata(AbstractDataSource):
         return kinds.pop()
 
     def _initialize(self):
-        """Build the :class:`EarthdataAuth` and run `configure()` (EDL login).
+        """Build the :class:`EarthdataAuth`; defer the EDL login to fetch.
 
-        Returns `None` — `earthaccess` keeps the authenticated handle
-        on the :class:`EarthdataAuth` instance (and a persisted token),
-        so the parent class binds no opaque `self.client`.
-
-        Raises:
-            AuthenticationError: When EDL login fails.
+        Returns `None` — `earthaccess` keeps the authenticated handle on
+        the :class:`EarthdataAuth` instance (and a persisted token), so
+        the parent class binds no opaque `self.client`. The EDL login
+        (`EarthdataAuth.configure`, which contacts the auth server) is
+        deferred: :meth:`_fetch` already calls the idempotent
+        `configure()` before downloading, so constructing the backend
+        never authenticates and `_search()` stays offline.
         """
         creds = EarthdataCredentials(
             username=self._username,
@@ -247,7 +248,6 @@ class Earthdata(AbstractDataSource):
             netrc_path=self._netrc_path,
         )
         self._auth = EarthdataAuth(creds)
-        self._auth.configure()
         return None
 
     def _create_grid(self, lat_lim: list, lon_lim: list) -> SpatialExtent:

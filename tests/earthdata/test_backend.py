@@ -160,10 +160,12 @@ class TestConstruction:
         with pytest.raises(ValueError, match="Did you mean"):
             _make(tmp_path, {"GPM_3IMERGHHL": ["precipitation"]})
 
-    def test_login_runs_at_construction(self, fake_earthaccess, edl_env, tmp_path):
-        """Construction authenticates once via earthaccess.login."""
-        _make(tmp_path, {"GPM_3IMERGHHL_07": ["precipitation"]})
-        assert len(fake_earthaccess.login_calls) == 1
+    def test_login_deferred_until_fetch(self, fake_earthaccess, edl_env, tmp_path):
+        """Construction does not authenticate; login is deferred to first fetch."""
+        obj = _make(tmp_path, {"GPM_3IMERGHHL_07": ["precipitation"]})
+        assert len(fake_earthaccess.login_calls) == 0, "construction must not log in"
+        obj._auth.configure()
+        assert len(fake_earthaccess.login_calls) == 1, "configure() authenticates once"
 
 
 class TestSearch:
