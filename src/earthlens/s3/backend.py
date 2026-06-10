@@ -35,6 +35,7 @@ from earthlens.base import (
     RemoteProduct,
     SpatialExtent,
     TemporalExtent,
+    crop_to_aoi,
     to_datetime,
 )
 from earthlens.s3.auth import S3Auth, S3Credentials
@@ -240,12 +241,17 @@ class S3(AbstractDataSource):
         keys = self.vars if isinstance(self.vars, list) else [self.vars]
         variables = self._dataset.resolve_variables(keys)
         products = plan_products(
-            self._dataset, variables, self._bbox(), list(self.time.dates),
+            self._dataset,
+            variables,
+            self._bbox(),
+            list(self.time.dates),
             self._auth.client(),
         )
         # Surface the request volume so a wide AOI / long window is never a
         # silent surprise (e.g. many Sentinel-2 scenes).
-        logger.info(f"amazon-s3: planned {len(products)} object(s) for {self._dataset.bucket}")
+        logger.info(
+            f"amazon-s3: planned {len(products)} object(s) for {self._dataset.bucket}"
+        )
         return products
 
     def _raw_dir(self) -> Path:
@@ -254,7 +260,9 @@ class S3(AbstractDataSource):
         raw_dir.mkdir(parents=True, exist_ok=True)
         return raw_dir
 
-    def _download_raw(self, client: Any, product: RemoteProduct, raw_dir: Path) -> Path | None:
+    def _download_raw(
+        self, client: Any, product: RemoteProduct, raw_dir: Path
+    ) -> Path | None:
         """Download one product to `raw_dir` (idempotent); `None` if absent.
 
         A missing object (404 / NoSuchKey — e.g. a DEM tile over ocean) is
@@ -357,13 +365,16 @@ class S3(AbstractDataSource):
                 data = data.to_crs(4326)
         # touch=False clips to the bbox extent; the default touch=True keeps
         # every cell that touches the mask and leaves the extent uncropped.
-        data = data.crop(bbox=[west, south, east, north], epsg=4326, touch=False)
+        # A polygon aoi= masks to the exact shape (see crop_to_aoi).
+        data = crop_to_aoi(
+            data, self.space, bbox=[west, south, east, north], touch=False
+        )
 
         # A rebuilt NetCDF is a raster (time as bands), so NetCDF datasets
         # also write a GeoTIFF.
-        as_geotiff = (
-            self._output_format == "geotiff"
-            or self._dataset.format in ("cog", "netcdf")
+        as_geotiff = self._output_format == "geotiff" or self._dataset.format in (
+            "cog",
+            "netcdf",
         )
         out_ext = ".tif" if as_geotiff else ".nc"
         out_path = self.path / f"{_safe_name(product.id)}{out_ext}"
@@ -499,7 +510,9 @@ class S3(AbstractDataSource):
 
         client = self._auth.client()
         raw_dir = self._raw_dir()
-        out_dir = Path(aggregate.out_dir) if aggregate.out_dir else self.path / "aggregated"
+        out_dir = (
+            Path(aggregate.out_dir) if aggregate.out_dir else self.path / "aggregated"
+        )
         config = aggregate.model_copy(update={"out_dir": out_dir})
         outputs: list[Path] = []
         for product in products:

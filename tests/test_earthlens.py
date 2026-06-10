@@ -136,7 +136,8 @@ class TestECMWFBackend:
     def test_ecmwf_is_registered_in_data_sources(self):
         """`EarthLens.DataSources` maps `"ecmwf"` to :class:`ECMWF`."""
         assert "ecmwf" in EarthLens.DataSources, (
-            f"'ecmwf' missing from DataSources keys: " f"{sorted(EarthLens.DataSources)}"
+            f"'ecmwf' missing from DataSources keys: "
+            f"{sorted(EarthLens.DataSources)}"
         )
         assert EarthLens.DataSources["ecmwf"] is ECMWF, (
             f"DataSources['ecmwf'] should be the ECMWF class; got "
@@ -255,13 +256,13 @@ class TestECMWFBackend:
     def test_full_download_through_facade_routes_to_cdsapi(self, tmp_path, monkeypatch):
         """End-to-end: `EarthLens(...).download()` reaches CDS.
 
-            * Two cdsapi.Client.retrieve calls — one per variable
-            * Each retrieve receives the right dataset name and
-              `variable=[cds_variable]` from the catalog
+        * Two cdsapi.Client.retrieve calls — one per variable
+        * Each retrieve receives the right dataset name and
+          `variable=[cds_variable]` from the catalog
 
-            Per-date GeoTIFF post-processing is intentionally not
-            part of the package; see
-            `examples/post_process_ecmwf_netcdf.py`.
+        Per-date GeoTIFF post-processing is intentionally not
+        part of the package; see
+        `examples/post_process_ecmwf_netcdf.py`.
         """
         retrieved = []
 
@@ -368,12 +369,12 @@ class TestEarthLensDownloadAggregate:
         cfg = AggregationConfig(freq="1D")
         stub_facade.download(progress_bar=False, aggregate=cfg)
         _, kwargs = stub_facade.datasource.download.call_args
-        assert kwargs.get("progress_bar") is False, (
-            f"`progress_bar` should still be forwarded; got kwargs={kwargs!r}"
-        )
-        assert kwargs.get("aggregate") is cfg, (
-            f"`aggregate` should be forwarded alongside; got kwargs={kwargs!r}"
-        )
+        assert (
+            kwargs.get("progress_bar") is False
+        ), f"`progress_bar` should still be forwarded; got kwargs={kwargs!r}"
+        assert (
+            kwargs.get("aggregate") is cfg
+        ), f"`aggregate` should be forwarded alongside; got kwargs={kwargs!r}"
 
     def test_extra_kwargs_pass_through_unchanged(self, stub_facade):
         """Backend-specific kwargs (e.g. CHIRPS `cores=`) still pass through."""
@@ -402,9 +403,9 @@ class TestTopLevelReExports:
         """`AggregationConfig` and `aggregate_netcdf` resolve at top level."""
         import earthlens
 
-        assert earthlens.AggregationConfig is AggregationConfig, (
-            f"Top-level AggregationConfig drift: {earthlens.AggregationConfig!r}"
-        )
+        assert (
+            earthlens.AggregationConfig is AggregationConfig
+        ), f"Top-level AggregationConfig drift: {earthlens.AggregationConfig!r}"
         assert callable(earthlens.aggregate_netcdf), (
             f"Top-level aggregate_netcdf must be callable; got "
             f"{earthlens.aggregate_netcdf!r}"
@@ -675,7 +676,9 @@ class TestFacadeSearch:
 
         facade = self._facade(tmp_path)
         monkeypatch.setattr(
-            facade.datasource, "_search", lambda: [RemoteProduct(id=str(i)) for i in range(3)]
+            facade.datasource,
+            "_search",
+            lambda: [RemoteProduct(id=str(i)) for i in range(3)],
         )
         assert facade.count() == 3, "count() should match the product count"
 
@@ -792,6 +795,21 @@ class TestFacadeAoi:
             -75.25,
             -74.75,
         )
+
+    def test_aoi_polygon_attaches_mask(self, tmp_path):
+        """A polygon aoi= attaches a GeoDataFrame mask to the backend extent."""
+        gpd = pytest.importorskip("geopandas")
+        shapely = pytest.importorskip("shapely")
+        poly = shapely.geometry.Polygon([(-75, 4), (-74, 4), (-74.5, 5)])
+        gdf = gpd.GeoDataFrame(geometry=[poly], crs="EPSG:4326")
+        space = self._build(tmp_path, aoi=gdf)
+        assert space.geometry is not None, "polygon aoi should attach a mask"
+        assert (space.west, space.east) == (-75.0, -74.0), "bbox envelope wrong"
+
+    def test_aoi_bbox_attaches_no_mask(self, tmp_path):
+        """A bbox aoi= leaves the extent's geometry as None."""
+        space = self._build(tmp_path, aoi=[-75.65, 4.19, -74.73, 4.64])
+        assert space.geometry is None, f"bbox should attach no mask: {space.geometry!r}"
 
     def test_aoi_with_lat_lim_raises(self, tmp_path):
         """Passing both aoi= and lat_lim= is rejected."""

@@ -22,8 +22,10 @@ from earthlens.base.leaves import FluxableLeaf
 from earthlens.base.providers import Provider, clear_providers_cache, load_providers
 from earthlens.base.spatial import (
     METRES_PER_DEGREE,
+    crop_to_aoi,
     estimate_pixel_dims,
     normalize_aoi,
+    resolve_aoi,
 )
 
 __all__ = [
@@ -40,8 +42,10 @@ __all__ = [
     "SpatialExtent",
     "TemporalExtent",
     "clear_providers_cache",
+    "crop_to_aoi",
     "estimate_pixel_dims",
     "load_providers",
     "normalize_aoi",
+    "resolve_aoi",
     "to_datetime",
 ]

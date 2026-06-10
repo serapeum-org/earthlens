@@ -71,6 +71,54 @@ class TestBackendDirectErgonomics:
         ), "wrapped __init__ must still expose the real (no **kwargs) signature"
 
 
+class TestBackendPolygonMask:
+    """A polygon aoi= records a mask on space; a bbox aoi= does not."""
+
+    def _chc(self, tmp_path, **kwargs):
+        return CHIRPS(
+            variables=["precipitation"],
+            start="2009-01-01",
+            end="2009-01-02",
+            path=str(tmp_path),
+            **kwargs,
+        )
+
+    def test_polygon_aoi_attaches_geometry(self, tmp_path):
+        """A polygon aoi= sets the bbox envelope and a GeoDataFrame mask."""
+        gpd = pytest.importorskip("geopandas")
+        shapely = pytest.importorskip("shapely")
+        poly = shapely.geometry.Polygon([(-75, 4), (-74, 4), (-74.5, 5)])
+        gdf = gpd.GeoDataFrame(geometry=[poly], crs="EPSG:4326")
+        space = self._chc(tmp_path, aoi=gdf).space
+        assert space.geometry is not None, "polygon aoi should attach a mask"
+        assert isinstance(space.geometry, gpd.GeoDataFrame), f"{space.geometry!r}"
+        assert (space.west, space.east) == (-75.0, -74.0), "bbox envelope wrong"
+
+    def test_bbox_aoi_leaves_geometry_none(self, tmp_path):
+        """A plain bbox aoi= leaves space.geometry as None (bbox clip is exact)."""
+        space = self._chc(tmp_path, aoi=[-75.0, 4.0, -74.0, 5.0]).space
+        assert space.geometry is None, f"bbox should attach no mask: {space.geometry!r}"
+
+    def test_attach_clip_geometry_copies_extent(self, tmp_path):
+        """_attach_clip_geometry replaces space with a geometry-bearing copy."""
+        backend = self._chc(tmp_path, aoi=[-75.0, 4.0, -74.0, 5.0])
+        before = backend.space
+        sentinel = object()
+        backend._attach_clip_geometry(sentinel)
+        assert backend.space.geometry is sentinel, "geometry not attached"
+        assert (backend.space.west, backend.space.east) == (before.west, before.east)
+        assert before.geometry is None, "original frozen extent must be unchanged"
+
+    def test_geometry_excluded_from_serialisation(self, tmp_path):
+        """The mask is excluded from model_dump so it never breaks serialisation."""
+        gpd = pytest.importorskip("geopandas")
+        shapely = pytest.importorskip("shapely")
+        poly = shapely.geometry.Polygon([(-75, 4), (-74, 4), (-74.5, 5)])
+        gdf = gpd.GeoDataFrame(geometry=[poly], crs="EPSG:4326")
+        space = self._chc(tmp_path, aoi=gdf).space
+        assert "geometry" not in space.model_dump(), "geometry must not serialise"
+
+
 @pytest.mark.ecmwf
 class TestBackendDirectDatasetSplit:
     """dataset= splits into the keyed variables dict on a dataset-keyed backend."""
@@ -121,7 +169,9 @@ class TestAuthenticate:
             lon_lim=[-75, -74],
             path=str(tmp_path),
         )
-        assert chc.authenticate() is chc, "authenticate() should return self for chaining"
+        assert (
+            chc.authenticate() is chc
+        ), "authenticate() should return self for chaining"
 
     def test_authentication_errors_share_a_base(self):
         """Every backend's AuthenticationError subclasses the shared base."""

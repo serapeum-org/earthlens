@@ -219,6 +219,19 @@ class SpatialExtent(BaseModel):
     resolution: float | None = Field(
         default=None, gt=0.0, description="Grid cell size in degrees"
     )
+    geometry: Any = Field(
+        default=None,
+        exclude=True,
+        repr=False,
+        description=(
+            "Optional WGS84 polygon mask (a geopandas `GeoDataFrame`) "
+            "captured when the request's area of interest was a polygon "
+            "rather than a plain bbox. Raster backends that clip via "
+            "`pyramids.Dataset.crop` use it to mask the fetched bbox to "
+            "the exact polygon; `None` means clip to the rectangular "
+            "bbox only. Excluded from serialisation."
+        ),
+    )
 
     @model_validator(mode="after")
     def _check_min_le_max(self) -> SpatialExtent:
@@ -457,7 +470,10 @@ class AbstractDataSource(ABC):
         native_dataset = "dataset" in params
 
         @functools.wraps(orig)
-        def __init__(self, *args, aoi=None, buffer=None, cadence=None, dataset=None, **kw):
+        def __init__(
+            self, *args, aoi=None, buffer=None, cadence=None, dataset=None, **kw
+        ):
+            clip_geometry = None
             if cadence is not None:
                 kw["temporal_resolution"] = cadence
             if dataset is not None:
@@ -484,14 +500,18 @@ class AbstractDataSource(ABC):
                         raise ValueError(
                             "pass either aoi= or lat_lim=/lon_lim=, not both"
                         )
-                    from earthlens.base.spatial import normalize_aoi
+                    from earthlens.base.spatial import resolve_aoi
 
-                    kw["lat_lim"], kw["lon_lim"] = normalize_aoi(aoi, buffer=buffer)
+                    kw["lat_lim"], kw["lon_lim"], clip_geometry = resolve_aoi(
+                        aoi, buffer=buffer
+                    )
             elif buffer is not None:
                 raise ValueError(
                     "buffer= only applies to a point aoi=(lon, lat); pass aoi= too"
                 )
             orig(self, *args, **kw)
+            if clip_geometry is not None:
+                self._attach_clip_geometry(clip_geometry)
 
         __init__._ergonomic = True
         cls.__init__ = __init__
@@ -573,6 +593,23 @@ class AbstractDataSource(ABC):
         self.path = self.root_dir
         if not os.path.exists(self.root_dir):
             os.makedirs(self.root_dir)
+
+    def _attach_clip_geometry(self, geometry: Any) -> None:
+        """Record a polygon mask on `self.space` for precise clipping.
+
+        Called by the ergonomic `__init__` wrapper when the request's
+        `aoi=` was a polygon rather than a plain bbox. The geometry is
+        stored on the (frozen) :class:`SpatialExtent` via a copy so that
+        raster backends clipping through `pyramids.Dataset.crop` can mask
+        the fetched bbox down to the exact shape. A no-op when `self.space`
+        is not a :class:`SpatialExtent`.
+
+        Args:
+            geometry: A WGS84 `GeoDataFrame` polygon mask.
+        """
+        space = getattr(self, "space", None)
+        if isinstance(space, SpatialExtent):
+            self.space = space.model_copy(update={"geometry": geometry})
 
     def authenticate(self) -> AbstractDataSource:
         """Eagerly establish the backend's authenticated connection.

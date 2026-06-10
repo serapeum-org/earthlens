@@ -35,6 +35,7 @@ from earthlens.base.abstractdatasource import (
     SpatialExtent,
     TemporalExtent,
 )
+from earthlens.base.spatial import crop_to_aoi
 from earthlens.ghsl._helpers import (
     BASE_URL,
     download_and_extract,
@@ -690,9 +691,10 @@ class GHSL(AbstractDataSource):
         )
 
         dataset = Dataset.read_file(str(merged))
-        cropped = dataset.crop(
+        cropped = crop_to_aoi(
+            dataset,
+            self.space,
             bbox=[self.space.west, self.space.south, self.space.east, self.space.north],
-            epsg=4326,
             touch=False,
         )
         # A categorical product reprojects with nearest-neighbour (set above)

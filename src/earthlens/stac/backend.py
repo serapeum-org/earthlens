@@ -36,6 +36,7 @@ from earthlens.base import (
     RemoteProduct,
     SpatialExtent,
     TemporalExtent,
+    crop_to_aoi,
 )
 
 if TYPE_CHECKING:
@@ -179,7 +180,10 @@ class STAC(LazyClientMixin, AbstractDataSource):
         # otherwise a later collection would silently search the wrong API.
         for col_key in self._variables:
             collection = self._catalog.get_collection(col_key)
-            if self._endpoint != collection.endpoint and self._endpoint not in collection.aliases:
+            if (
+                self._endpoint != collection.endpoint
+                and self._endpoint not in collection.aliases
+            ):
                 raise ValueError(
                     f"collection {col_key!r} is not served by endpoint "
                     f"{self._endpoint!r} (home {collection.endpoint!r}, aliases "
@@ -353,8 +357,11 @@ class STAC(LazyClientMixin, AbstractDataSource):
                     # reprojects mismatched-CRS tiles onto one grid in a single
                     # pass (multi-UTM Sentinel-2). A single tile is handled too.
                     merge_rasters(
-                        [str(h) for h in hrefs], str(tmp), method="last",
-                        dst_crs=target_crs, no_data_value=nodata,
+                        [str(h) for h in hrefs],
+                        str(tmp),
+                        method="last",
+                        dst_crs=target_crs,
+                        no_data_value=nodata,
                     )
                     band_paths.append(tmp)
                 stacked = self._stack_bands(band_paths, list(assets), nodata)
@@ -363,8 +370,12 @@ class STAC(LazyClientMixin, AbstractDataSource):
                 part = f"_part{idx}" if multi else ""
                 target = Path(self.root_dir) / f"{safe_key}_{date}{part}.tif"
                 # crop wants the bbox as a keyword in an explicit CRS; the AOI
-                # is WGS84 while the mosaic is in the tiles' native CRS.
-                write_cog(stacked.crop(bbox=list(bbox_key), epsg=4326), str(target))
+                # is WGS84 while the mosaic is in the tiles' native CRS. A
+                # polygon aoi= masks to the exact shape (see crop_to_aoi).
+                write_cog(
+                    crop_to_aoi(stacked, self.space, bbox=list(bbox_key), touch=True),
+                    str(target),
+                )
             out.append(target)
             self._written.append((collection_key, date, idx, target))
             _cleanup(band_paths)
@@ -462,7 +473,9 @@ class STAC(LazyClientMixin, AbstractDataSource):
                 return asset.nodata
         return 0
 
-    def _stack_bands(self, band_paths: list[Path], assets: list[str], nodata: float | int) -> Any:
+    def _stack_bands(
+        self, band_paths: list[Path], assets: list[str], nodata: float | int
+    ) -> Any:
         """Stack per-band mosaics into one multiband `Dataset`.
 
         Delegates to pyramids' `stack_bands(align=True, no_data_value=…)`: same
@@ -486,8 +499,10 @@ class STAC(LazyClientMixin, AbstractDataSource):
         from pyramids.dataset.merge import stack_bands
 
         return stack_bands(
-            [str(p) for p in band_paths], band_names=list(assets),
-            align=True, no_data_value=nodata,
+            [str(p) for p in band_paths],
+            band_names=list(assets),
+            align=True,
+            no_data_value=nodata,
         )
 
     def download(
@@ -536,7 +551,9 @@ class STAC(LazyClientMixin, AbstractDataSource):
         from pyramids.dataset.cog import write_cog
 
         op = "mean" if config.op == "auto" else config.op
-        out_dir = Path(config.out_dir) if config.out_dir is not None else Path(self.root_dir)
+        out_dir = (
+            Path(config.out_dir) if config.out_dir is not None else Path(self.root_dir)
+        )
         out_dir.mkdir(parents=True, exist_ok=True)
 
         groups: dict[tuple[str, int], list[tuple[str, Path]]] = {}
@@ -555,8 +572,13 @@ class STAC(LazyClientMixin, AbstractDataSource):
             geo, epsg = _geo_of(Dataset, files[0])
             part = f"_part{idx}" if multi else ""
             for label, array in reduced.items():
-                target = out_dir / f"{collection_key}_{op}_{config.freq}_{label}{part}.tif"
-                write_cog(Dataset.create_from_array(arr=array, geo=geo, epsg=epsg), str(target))
+                target = (
+                    out_dir / f"{collection_key}_{op}_{config.freq}_{label}{part}.tif"
+                )
+                write_cog(
+                    Dataset.create_from_array(arr=array, geo=geo, epsg=epsg),
+                    str(target),
+                )
                 written.append(target)
         # The per-date COGs are intermediates of the aggregation; drop them so
         # the caller is left with only the per-window outputs.
@@ -682,7 +704,7 @@ def _to_vsi(href: str) -> str:
         The GDAL-readable href.
     """
     if href.startswith("s3://"):
-        return "/vsis3/" + href[len("s3://"):]
+        return "/vsis3/" + href[len("s3://") :]
     return href
 
 

@@ -2,7 +2,12 @@ from __future__ import annotations
 
 import pytest
 
-from earthlens.base.spatial import estimate_pixel_dims, normalize_aoi
+from earthlens.base.spatial import (
+    crop_to_aoi,
+    estimate_pixel_dims,
+    normalize_aoi,
+    resolve_aoi,
+)
 
 # The bbox every form below describes: lon in [-75, -74], lat in [4, 5].
 EXPECTED = ([4.0, 5.0], [-75.0, -74.0])
@@ -86,9 +91,7 @@ class TestNormalizeAoiGeometry:
             "properties": {},
             "geometry": {
                 "type": "Polygon",
-                "coordinates": [
-                    [[-75, 4], [-74, 4], [-74, 5], [-75, 5], [-75, 4]]
-                ],
+                "coordinates": [[[-75, 4], [-74, 4], [-74, 5], [-75, 5], [-75, 4]]],
             },
         }
         assert normalize_aoi(feature) == EXPECTED
@@ -163,6 +166,17 @@ class TestNormalizeAoiMalformedGeojson:
         gdf = gpd.GeoDataFrame(geometry=[shapely.geometry.box(-75, 4, -74, 5)])
         assert normalize_aoi(gdf) == EXPECTED
 
+    def test_projected_geodataframe_is_reprojected(self):
+        """A non-4326 GeoDataFrame is reprojected to lon/lat before its bbox."""
+        gpd = pytest.importorskip("geopandas")
+        shapely = pytest.importorskip("shapely")
+        gdf = gpd.GeoDataFrame(
+            geometry=[shapely.geometry.box(-75, 4, -74, 5)], crs="EPSG:4326"
+        )
+        lat_lim, lon_lim = normalize_aoi(gdf.to_crs(3857))
+        assert lat_lim == pytest.approx([4.0, 5.0]), f"got {lat_lim}"
+        assert lon_lim == pytest.approx([-75.0, -74.0]), f"got {lon_lim}"
+
 
 class TestNormalizeAoiErrors:
     """Malformed aoi= inputs."""
@@ -204,3 +218,125 @@ class TestEstimatePixelDims:
         """north < south is rejected."""
         with pytest.raises(ValueError, match=r"north .* < south"):
             estimate_pixel_dims(31.0, 30.1, 31.1, 30.0, 90.0)
+
+
+# A non-rectangular polygon whose envelope is the EXPECTED bbox.
+_TRIANGLE_WKT = "POLYGON ((-75 4, -74 4, -74.5 5, -75 4))"
+
+
+class TestResolveAoiGeometry:
+    """resolve_aoi returns the same bbox as normalize_aoi plus a polygon mask."""
+
+    def test_bbox_list_has_no_geometry(self):
+        """A plain bbox is rectangular, so no polygon mask is produced."""
+        lat_lim, lon_lim, geom = resolve_aoi([-75.0, 4.0, -74.0, 5.0])
+        assert (lat_lim, lon_lim) == EXPECTED, f"bbox mismatch: {lat_lim}, {lon_lim}"
+        assert geom is None, f"a bbox should yield no mask, got {geom!r}"
+
+    def test_point_with_buffer_has_no_geometry(self):
+        """A buffered point is a square box, so no polygon mask is produced."""
+        _, _, geom = resolve_aoi((-74.5, 4.5), buffer=0.5)
+        assert geom is None, f"a point box should yield no mask, got {geom!r}"
+
+    def test_wkt_polygon_yields_geodataframe_mask(self):
+        """A WKT polygon yields its envelope bbox plus a GeoDataFrame mask."""
+        pytest.importorskip("geopandas")
+        lat_lim, lon_lim, geom = resolve_aoi(_TRIANGLE_WKT)
+        assert (lat_lim, lon_lim) == EXPECTED, f"envelope mismatch: {lat_lim}"
+        assert geom is not None and geom.crs.to_epsg() == 4326, f"bad mask: {geom!r}"
+
+    def test_wkt_bbox_polygon_is_still_a_mask(self):
+        """Even a rectangular WKT polygon is carried as a mask (it is a Polygon)."""
+        pytest.importorskip("geopandas")
+        _, _, geom = resolve_aoi("POLYGON ((-75 4, -74 4, -74 5, -75 5, -75 4))")
+        assert geom is not None, "a Polygon geometry should always be a mask"
+
+    def test_geojson_polygon_yields_mask(self):
+        """A GeoJSON Polygon mapping yields a GeoDataFrame mask."""
+        pytest.importorskip("geopandas")
+        gj = {
+            "type": "Polygon",
+            "coordinates": [[[-75, 4], [-74, 4], [-74.5, 5], [-75, 4]]],
+        }
+        _, _, geom = resolve_aoi(gj)
+        assert geom is not None, "a GeoJSON Polygon should yield a mask"
+
+    def test_geojson_point_yields_no_mask(self):
+        """A GeoJSON Point has no area, so no polygon mask is produced."""
+        gj = {"type": "Point", "coordinates": [-74.5, 4.5], "bbox": [-75, 4, -74, 5]}
+        _, _, geom = resolve_aoi(gj)
+        assert geom is None, f"a Point should yield no mask, got {geom!r}"
+
+    def test_geodataframe_polygon_yields_mask(self):
+        """A GeoDataFrame of polygons is carried through as the mask."""
+        gpd = pytest.importorskip("geopandas")
+        shapely = pytest.importorskip("shapely")
+        gdf = gpd.GeoDataFrame(
+            geometry=[shapely.geometry.box(-75, 4, -74, 5)], crs="EPSG:4326"
+        )
+        _, _, geom = resolve_aoi(gdf)
+        assert geom is not None and geom.crs.to_epsg() == 4326, f"bad mask: {geom!r}"
+
+    def test_geoseries_polygon_wrapped_as_geodataframe(self):
+        """A GeoSeries mask is wrapped into a single-CRS GeoDataFrame."""
+        gpd = pytest.importorskip("geopandas")
+        shapely = pytest.importorskip("shapely")
+        gs = gpd.GeoSeries([shapely.geometry.box(-75, 4, -74, 5)], crs="EPSG:4326")
+        _, _, geom = resolve_aoi(gs)
+        assert isinstance(geom, gpd.GeoDataFrame), f"want GeoDataFrame, got {geom!r}"
+
+    def test_projected_geodataframe_mask_is_reprojected(self):
+        """A projected mask is reprojected to WGS84 before being carried."""
+        gpd = pytest.importorskip("geopandas")
+        shapely = pytest.importorskip("shapely")
+        gdf = gpd.GeoDataFrame(
+            geometry=[shapely.geometry.box(-75, 4, -74, 5)], crs="EPSG:4326"
+        )
+        _, _, geom = resolve_aoi(gdf.to_crs(3857))
+        assert geom.crs.to_epsg() == 4326, f"mask not reprojected: {geom.crs}"
+
+
+class _FakeCropDataset:
+    """A stand-in pyramids Dataset that records how crop() was called."""
+
+    def __init__(self):
+        self.call = None
+
+    def crop(self, mask=None, touch=True, *, bbox=None, epsg=None):
+        self.call = {"mask": mask, "bbox": bbox, "epsg": epsg, "touch": touch}
+        return self
+
+
+class _ExtentStub:
+    """A SpatialExtent-like object carrying only an optional geometry."""
+
+    def __init__(self, geometry=None):
+        self.geometry = geometry
+
+
+class TestCropToAoi:
+    """crop_to_aoi dispatches to a polygon mask or a bbox crop."""
+
+    def test_no_geometry_crops_to_bbox(self):
+        """With no geometry, the bbox path is taken with the given touch/epsg."""
+        ds = _FakeCropDataset()
+        crop_to_aoi(ds, _ExtentStub(), bbox=[-75, 4, -74, 5], touch=False)
+        assert ds.call["bbox"] == [-75, 4, -74, 5], f"bad bbox: {ds.call}"
+        assert ds.call["mask"] is None, f"mask should be unused: {ds.call}"
+        assert ds.call["touch"] is False, f"touch not forwarded: {ds.call}"
+
+    def test_geometry_crops_to_mask(self):
+        """With a geometry, the mask path is taken and touch is forced True."""
+        ds = _FakeCropDataset()
+        sentinel = object()
+        space = _ExtentStub(geometry=sentinel)
+        crop_to_aoi(ds, space, bbox=[-75, 4, -74, 5], touch=False)
+        assert ds.call["mask"] is sentinel, f"mask not used: {ds.call}"
+        assert ds.call["bbox"] is None, f"bbox should be unused: {ds.call}"
+        assert ds.call["touch"] is True, f"mask path keeps touching cells: {ds.call}"
+
+    def test_plain_object_without_geometry_attr_uses_bbox(self):
+        """A space object lacking a geometry attribute falls back to the bbox."""
+        ds = _FakeCropDataset()
+        crop_to_aoi(ds, object(), bbox=[-75, 4, -74, 5])
+        assert ds.call["bbox"] == [-75, 4, -74, 5], f"bad bbox: {ds.call}"

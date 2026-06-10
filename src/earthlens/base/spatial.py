@@ -154,7 +154,9 @@ def _geojson_bounds(obj: Mapping[str, Any]) -> tuple[float, float, float, float]
     if geo_type == "Feature":
         return _geojson_bounds(obj["geometry"])
     if geo_type in ("FeatureCollection", "GeometryCollection"):
-        members = obj["features"] if geo_type == "FeatureCollection" else obj["geometries"]
+        members = (
+            obj["features"] if geo_type == "FeatureCollection" else obj["geometries"]
+        )
         boxes = [_geojson_bounds(member) for member in members]
         if not boxes:
             raise ValueError(f"empty {geo_type} cannot define an aoi")
@@ -198,6 +200,187 @@ def _bbox_dict_bounds(obj: Mapping[str, Any]) -> tuple[float, float, float, floa
     return edges["min_lon"], edges["min_lat"], edges["max_lon"], edges["max_lat"]
 
 
+_POLYGONAL_GEOM_TYPES = frozenset({"Polygon", "MultiPolygon"})
+
+
+def _polygon_or_none(shape: Any) -> Any:
+    """Return `shape` if it is a (multi)polygon, else `None`.
+
+    A point, line, or empty geometry has no area to mask with, so the
+    request falls back to a plain bbox clip.
+
+    Args:
+        shape: A shapely geometry (anything exposing `geom_type`).
+
+    Returns:
+        The geometry when it is a `Polygon` / `MultiPolygon`, else `None`.
+    """
+    return shape if getattr(shape, "geom_type", None) in _POLYGONAL_GEOM_TYPES else None
+
+
+def _geojson_polygon(obj: Mapping[str, Any]) -> Any:
+    """Return a shapely (multi)polygon for a GeoJSON mapping, or `None`.
+
+    Mirrors :func:`_geojson_bounds`'s structural handling (bare geometry,
+    `Feature`, `FeatureCollection`) but yields the dissolved polygon
+    geometry rather than its envelope. Non-polygonal or unparseable input
+    returns `None` so the caller clips to the bbox instead.
+
+    Args:
+        obj: A GeoJSON-like mapping.
+
+    Returns:
+        A shapely `Polygon` / `MultiPolygon` (the union, for collections),
+        or `None`.
+    """
+    try:
+        from shapely.geometry import shape as _shape
+        from shapely.ops import unary_union
+    except ImportError:
+        return None
+    geo_type = obj.get("type")
+    if geo_type == "Feature":
+        geometry = obj.get("geometry")
+        return _geojson_polygon(geometry) if geometry else None
+    if geo_type in ("FeatureCollection", "GeometryCollection"):
+        key = "features" if geo_type == "FeatureCollection" else "geometries"
+        geoms = [_geojson_polygon(m) for m in obj.get(key, [])]
+        geoms = [g for g in geoms if g is not None]
+        return _polygon_or_none(unary_union(geoms)) if geoms else None
+    if "coordinates" not in obj:
+        return None
+    try:
+        return _polygon_or_none(_shape(obj))
+    except (KeyError, ValueError, TypeError, AttributeError):
+        return None
+
+
+def _to_clip_gdf(geom: Any) -> Any:
+    """Wrap a polygon mask as a WGS84 `GeoDataFrame`, or pass through `None`.
+
+    Accepts a shapely geometry, a `GeoSeries`, or an already-built
+    `GeoDataFrame` and returns a single-CRS `GeoDataFrame` suitable as the
+    `mask=` argument of `pyramids.Dataset.crop`. A frame with no declared
+    CRS is taken as WGS84. Returns `None` when `geom` is `None` or when
+    `geopandas` is not installed (the request then clips to the bbox).
+
+    Args:
+        geom: A shapely (multi)polygon, `GeoSeries`, `GeoDataFrame`, or
+            `None`.
+
+    Returns:
+        A WGS84 `GeoDataFrame`, or `None`.
+    """
+    if geom is None:
+        return None
+    try:
+        import geopandas as gpd
+    except ImportError:
+        return None
+    if isinstance(geom, gpd.GeoDataFrame):
+        gdf = geom
+    elif isinstance(geom, gpd.GeoSeries):
+        gdf = gpd.GeoDataFrame(geometry=geom.reset_index(drop=True))
+    else:
+        gdf = gpd.GeoDataFrame(geometry=[geom], crs="EPSG:4326")
+    if gdf.crs is None:
+        gdf = gdf.set_crs("EPSG:4326")
+    return gdf
+
+
+def resolve_aoi(
+    aoi: Any, buffer: float | None = None
+) -> tuple[list[float], list[float], Any]:
+    """Coerce a flexible area-of-interest into `(lat_lim, lon_lim, geometry)`.
+
+    The same flexible `aoi` channel as :func:`normalize_aoi`, but it also
+    returns the polygon mask when the area of interest had a real
+    (non-rectangular) shape. Raster backends that clip via
+    `pyramids.Dataset.crop` use that mask to clip the fetched bbox to the
+    exact polygon; for bbox / point inputs the geometry is `None` and a
+    plain bbox clip is exact. See :func:`normalize_aoi` for the accepted
+    `aoi` forms and the bbox semantics.
+
+    Args:
+        aoi: The area of interest in any of the accepted forms.
+        buffer: Half-width in degrees for the `(lon, lat)` point form.
+
+    Returns:
+        `(lat_lim, lon_lim, geometry)` where the pairs are `[min, max]`
+        floats in degrees and `geometry` is a WGS84 `GeoDataFrame` polygon
+        mask (or `None` for a bbox / point aoi, or when `geopandas` is
+        unavailable).
+
+    Raises:
+        ValueError: If `aoi` is malformed, a point is given without
+            `buffer`, or the resulting box is degenerate / inverted.
+        TypeError: If `aoi` is of an unsupported type.
+    """
+    geom: Any = None
+    if isinstance(aoi, str):
+        from shapely import wkt
+
+        shape = wkt.loads(aoi)
+        min_lon, min_lat, max_lon, max_lat = shape.bounds
+        geom = _polygon_or_none(shape)
+    elif isinstance(aoi, Mapping):
+        if "type" in aoi or "coordinates" in aoi or "bbox" in aoi:
+            min_lon, min_lat, max_lon, max_lat = _geojson_bounds(aoi)
+            geom = _geojson_polygon(aoi)
+        else:
+            min_lon, min_lat, max_lon, max_lat = _bbox_dict_bounds(aoi)
+    elif hasattr(aoi, "total_bounds"):  # geopandas GeoDataFrame / GeoSeries
+        # `total_bounds` is in the frame's own CRS; reproject to WGS84
+        # lon/lat first so a projected frame (e.g. UTM / Web Mercator)
+        # does not yield a metre-valued, out-of-range bbox. A frame with
+        # no CRS is taken as-is (already lon/lat).
+        crs = getattr(aoi, "crs", None)
+        if crs is not None and crs.to_epsg() != 4326:
+            aoi = aoi.to_crs(4326)
+        min_lon, min_lat, max_lon, max_lat = (float(v) for v in aoi.total_bounds)
+        geom_type = getattr(aoi, "geom_type", None)
+        if geom_type is not None and any(
+            t in _POLYGONAL_GEOM_TYPES for t in geom_type.unique()
+        ):
+            geom = aoi
+    elif hasattr(aoi, "__geo_interface__"):  # shapely geometry, etc.
+        gi = aoi.__geo_interface__
+        min_lon, min_lat, max_lon, max_lat = _geojson_bounds(gi)
+        geom = _geojson_polygon(gi)
+    elif isinstance(aoi, Sequence) and not isinstance(aoi, str):
+        if len(aoi) == 4:
+            min_lon, min_lat, max_lon, max_lat = (float(v) for v in aoi)
+        elif len(aoi) == 2:
+            if buffer is None:
+                raise ValueError(
+                    "a point aoi=(lon, lat) requires buffer= (a half-width "
+                    "in degrees) to define an area"
+                )
+            lon, lat = float(aoi[0]), float(aoi[1])
+            min_lon, max_lon = lon - buffer, lon + buffer
+            min_lat, max_lat = lat - buffer, lat + buffer
+            min_lat, max_lat = max(min_lat, -90.0), min(max_lat, 90.0)
+            min_lon, max_lon = max(min_lon, -180.0), min(max_lon, 180.0)
+        else:
+            raise ValueError(
+                f"a bbox aoi must have 4 values [W, S, E, N] or a point 2 "
+                f"values [lon, lat]; got {len(aoi)}"
+            )
+    else:
+        raise TypeError(
+            f"unsupported aoi type {type(aoi).__name__}; pass a bbox "
+            "[W, S, E, N], a (lon, lat) point with buffer=, a shapely "
+            "geometry / GeoJSON / WKT, or a GeoDataFrame"
+        )
+
+    if min_lon > max_lon or min_lat > max_lat:
+        raise ValueError(
+            f"aoi has inverted bounds: "
+            f"lon [{min_lon}, {max_lon}], lat [{min_lat}, {max_lat}]"
+        )
+    return [min_lat, max_lat], [min_lon, max_lon], _to_clip_gdf(geom)
+
+
 def normalize_aoi(
     aoi: Any, buffer: float | None = None
 ) -> tuple[list[float], list[float]]:
@@ -221,7 +404,9 @@ def normalize_aoi(
 
     All coordinates are assumed to be WGS84 degrees. The returned pairs
     use the internal `[min, max]` shape that every backend's
-    `_create_grid` already consumes, so no backend has to change.
+    `_create_grid` already consumes, so no backend has to change. This is
+    the bbox-only view of :func:`resolve_aoi`; use that when you also need
+    the polygon mask for precise (non-rectangular) clipping.
 
     Args:
         aoi: The area of interest in any of the accepted forms above.
@@ -266,48 +451,43 @@ def normalize_aoi(
 
             ```
     """
-    if isinstance(aoi, str):
-        from shapely import wkt
+    lat_lim, lon_lim, _geometry = resolve_aoi(aoi, buffer=buffer)
+    return lat_lim, lon_lim
 
-        min_lon, min_lat, max_lon, max_lat = wkt.loads(aoi).bounds
-    elif isinstance(aoi, Mapping):
-        if "type" in aoi or "coordinates" in aoi or "bbox" in aoi:
-            min_lon, min_lat, max_lon, max_lat = _geojson_bounds(aoi)
-        else:
-            min_lon, min_lat, max_lon, max_lat = _bbox_dict_bounds(aoi)
-    elif hasattr(aoi, "total_bounds"):  # geopandas GeoDataFrame / GeoSeries
-        min_lon, min_lat, max_lon, max_lat = (float(v) for v in aoi.total_bounds)
-    elif hasattr(aoi, "__geo_interface__"):  # shapely geometry, etc.
-        min_lon, min_lat, max_lon, max_lat = _geojson_bounds(aoi.__geo_interface__)
-    elif isinstance(aoi, Sequence) and not isinstance(aoi, str):
-        if len(aoi) == 4:
-            min_lon, min_lat, max_lon, max_lat = (float(v) for v in aoi)
-        elif len(aoi) == 2:
-            if buffer is None:
-                raise ValueError(
-                    "a point aoi=(lon, lat) requires buffer= (a half-width "
-                    "in degrees) to define an area"
-                )
-            lon, lat = float(aoi[0]), float(aoi[1])
-            min_lon, max_lon = lon - buffer, lon + buffer
-            min_lat, max_lat = lat - buffer, lat + buffer
-            min_lat, max_lat = max(min_lat, -90.0), min(max_lat, 90.0)
-            min_lon, max_lon = max(min_lon, -180.0), min(max_lon, 180.0)
-        else:
-            raise ValueError(
-                f"a bbox aoi must have 4 values [W, S, E, N] or a point 2 "
-                f"values [lon, lat]; got {len(aoi)}"
-            )
-    else:
-        raise TypeError(
-            f"unsupported aoi type {type(aoi).__name__}; pass a bbox "
-            "[W, S, E, N], a (lon, lat) point with buffer=, a shapely "
-            "geometry / GeoJSON / WKT, or a GeoDataFrame"
-        )
 
-    if min_lon > max_lon or min_lat > max_lat:
-        raise ValueError(
-            f"aoi has inverted bounds: "
-            f"lon [{min_lon}, {max_lon}], lat [{min_lat}, {max_lat}]"
-        )
-    return [min_lat, max_lat], [min_lon, max_lon]
+def crop_to_aoi(
+    dataset: Any,
+    space: Any,
+    *,
+    bbox: Sequence[float],
+    epsg: Any = 4326,
+    touch: bool = False,
+) -> Any:
+    """Crop a pyramids `Dataset` to a polygon mask if present, else a bbox.
+
+    When `space` carries a polygon `geometry` — set when the request's
+    `aoi=` was a polygon rather than a plain bbox — the dataset is masked
+    to that exact shape via `Dataset.crop(mask=...)`, so pixels outside the
+    polygon become no-data and the raster is trimmed to the polygon's cell
+    extent. Otherwise it is cropped to the rectangular `bbox`. Centralising
+    the choice lets every raster backend honour a polygon `aoi=` the same
+    way without duplicating the branch.
+
+    Args:
+        dataset: A `pyramids.Dataset` (anything exposing `crop`).
+        space: A :class:`~earthlens.base.abstractdatasource.SpatialExtent`
+            (anything exposing an optional `geometry`).
+        bbox: The fallback `(west, south, east, north)` quadruple, used
+            when `space` has no polygon `geometry`.
+        epsg: CRS of `bbox`. Defaults to `4326`.
+        touch: For the bbox path, whether to keep cells merely touching the
+            box. Ignored on the polygon-mask path, which always keeps
+            touching cells. Defaults to `False`.
+
+    Returns:
+        A new cropped `Dataset`.
+    """
+    geometry = getattr(space, "geometry", None)
+    if geometry is not None:
+        return dataset.crop(mask=geometry, touch=True)
+    return dataset.crop(bbox=list(bbox), epsg=epsg, touch=touch)

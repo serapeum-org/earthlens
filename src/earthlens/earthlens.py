@@ -597,6 +597,7 @@ class EarthLens:
         # that declares its own richer `aoi` parameter (e.g. WorldPop's
         # ISO3 / bbox / GeoDataFrame) instead receives `aoi` verbatim and
         # interprets it itself.
+        clip_geometry = None
         if aoi is not None and "aoi" in backend_params:
             if buffer is not None:
                 raise ValueError(
@@ -606,12 +607,10 @@ class EarthLens:
             backend_kwargs = {**backend_kwargs, "aoi": aoi}
         elif aoi is not None:
             if lat_lim is not None or lon_lim is not None:
-                raise ValueError(
-                    "pass either aoi= or lat_lim=/lon_lim=, not both"
-                )
-            from earthlens.base.spatial import normalize_aoi
+                raise ValueError("pass either aoi= or lat_lim=/lon_lim=, not both")
+            from earthlens.base.spatial import resolve_aoi
 
-            lat_lim, lon_lim = normalize_aoi(aoi, buffer=buffer)
+            lat_lim, lon_lim, clip_geometry = resolve_aoi(aoi, buffer=buffer)
         elif buffer is not None:
             raise ValueError(
                 "buffer= only applies to a point aoi=(lon, lat); pass aoi= too"
@@ -663,6 +662,10 @@ class EarthLens:
             **request_kwargs,
             **merged_kwargs,
         )
+        # A polygon `aoi=` records its mask on the backend's spatial extent
+        # so raster backends clip the fetched bbox to the exact shape.
+        if clip_geometry is not None:
+            self.datasource._attach_clip_geometry(clip_geometry)
 
     @classmethod
     def _check_source(cls, data_source: str) -> None:
@@ -677,9 +680,7 @@ class EarthLens:
                 and lists the known keys.
         """
         if data_source not in cls.DataSources:
-            close = difflib.get_close_matches(
-                data_source, list(cls.DataSources), n=1
-            )
+            close = difflib.get_close_matches(data_source, list(cls.DataSources), n=1)
             hint = f" Did you mean {close[0]!r}?" if close else ""
             raise ValueError(
                 f"{data_source!r} is not a supported data source. "
@@ -740,8 +741,7 @@ class EarthLens:
             name
             for name, parameter in params.items()
             if name not in cls._FACADE_PARAMS
-            and parameter.kind
-            not in (parameter.VAR_KEYWORD, parameter.VAR_POSITIONAL)
+            and parameter.kind not in (parameter.VAR_KEYWORD, parameter.VAR_POSITIONAL)
         )
 
     @classmethod
@@ -814,11 +814,7 @@ class EarthLens:
         try:
             module = importlib.import_module(module_name)
         except ImportError as exc:
-            hint = (
-                f" Install with `pip install earthlens[{extras}]`."
-                if extras
-                else ""
-            )
+            hint = f" Install with `pip install earthlens[{extras}]`." if extras else ""
             raise ImportError(
                 f"Backend {data_source!r} catalog is unavailable — its "
                 f"runtime dependency is not installed.{hint}"

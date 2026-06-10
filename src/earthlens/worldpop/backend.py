@@ -39,6 +39,7 @@ from earthlens.base.abstractdatasource import (
     SpatialExtent,
     TemporalExtent,
 )
+from earthlens.base.spatial import crop_to_aoi, resolve_aoi
 from earthlens.worldpop._helpers import (
     cohort_of,
     continent_for_bbox,
@@ -247,6 +248,16 @@ class WorldPop(AbstractDataSource):
             path=path,
         )
 
+        # A polygon AOI (a GeoDataFrame / geometry, not an ISO3 code or
+        # bbox) masks the fetched country mosaics to the exact shape; the
+        # ISO3 set above already selected which countries to fetch.
+        if aoi is not None and (
+            hasattr(aoi, "total_bounds") or hasattr(aoi, "__geo_interface__")
+        ):
+            _, _, geometry = resolve_aoi(aoi)
+            if geometry is not None:
+                self._attach_clip_geometry(geometry)
+
     def _guard_unsupported(self) -> None:
         """Gate the multi-GB `.zip` archive products behind an explicit opt-in.
 
@@ -292,8 +303,11 @@ class WorldPop(AbstractDataSource):
             return sorted({normalise_iso3(code) for code in aoi})
         if isinstance(aoi, list) and len(aoi) == 4 and isinstance(aoi[0], (int, float)):
             bbox = [float(x) for x in aoi]
-        elif aoi is not None and hasattr(aoi, "total_bounds"):
-            bbox = [float(x) for x in aoi.total_bounds]  # a GeoDataFrame
+        elif aoi is not None and hasattr(aoi, "total_bounds"):  # a GeoDataFrame
+            crs = getattr(aoi, "crs", None)
+            if crs is not None and crs.to_epsg() != 4326:
+                aoi = aoi.to_crs(4326)
+            bbox = [float(x) for x in aoi.total_bounds]
         else:
             bbox = [lon_lim[0], lat_lim[0], lon_lim[1], lat_lim[1]]
         return iso3_for_bbox(bbox, load_iso3_bbox())
@@ -408,7 +422,9 @@ class WorldPop(AbstractDataSource):
             if self._catalog.subalias(product, subalias_id).scope == "global":
                 out.extend(self._plan_global(product, subalias_id, demographic, years))
             else:
-                out.extend(self._plan_countries(product, subalias_id, demographic, years))
+                out.extend(
+                    self._plan_countries(product, subalias_id, demographic, years)
+                )
         return out
 
     def _plan_countries(
@@ -813,14 +829,16 @@ class WorldPop(AbstractDataSource):
             no_data_value=_WORLDPOP_NODATA,
         )
         dataset = Dataset.read_file(str(work))
-        cropped = dataset.crop(
+        cropped = crop_to_aoi(
+            dataset,
+            self.space,
             bbox=[
                 self.space.west,
                 self.space.south,
                 self.space.east,
                 self.space.north,
             ],
-            epsg=4326,
+            touch=True,
         )
         cohort = cohort_of(rp.href)
         tag = f"_{cohort[0]}_{cohort[1]}" if cohort else ""
@@ -961,14 +979,12 @@ class WorldPop(AbstractDataSource):
         ]
         return selected or members
 
-    def _crop_archive_member(
-        self, tif: Path, product: str, bbox: list[float]
-    ) -> Path:
+    def _crop_archive_member(self, tif: Path, product: str, bbox: list[float]) -> Path:
         """Crop one extracted GeoTIFF to the AOI bbox (reproject if `crs != 4326`)."""
         from pyramids.dataset import Dataset
 
         dataset = Dataset.read_file(str(tif))
-        cropped = dataset.crop(bbox=bbox, epsg=4326)
+        cropped = crop_to_aoi(dataset, self.space, bbox=bbox, touch=True)
         if self._output_epsg != 4326:
             cropped = cropped.to_crs(self._output_epsg)
         target = Path(self.path) / f"{product}_{tif.stem}_{self._resolution}.tif"
@@ -1030,7 +1046,9 @@ def _year_in(name: str) -> int:
         int: The last 4-digit token (a year), or 0 when none is present.
     """
     years = re.findall(r"(19|20)\d{2}", name.rsplit("/", 1)[-1])
-    return int(re.findall(r"(?:19|20)\d{2}", name.rsplit("/", 1)[-1])[-1]) if years else 0
+    return (
+        int(re.findall(r"(?:19|20)\d{2}", name.rsplit("/", 1)[-1])[-1]) if years else 0
+    )
 
 
 def _require_worldpoppy() -> None:
