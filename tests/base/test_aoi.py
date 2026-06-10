@@ -5,6 +5,7 @@ import pytest
 from earthlens.base.spatial import (
     crop_to_aoi,
     estimate_pixel_dims,
+    mask_to_geometry,
     normalize_aoi,
     resolve_aoi,
 )
@@ -340,3 +341,27 @@ class TestCropToAoi:
         ds = _FakeCropDataset()
         crop_to_aoi(ds, object(), bbox=[-75, 4, -74, 5])
         assert ds.call["bbox"] == [-75, 4, -74, 5], f"bad bbox: {ds.call}"
+
+
+class TestMaskToGeometry:
+    """mask_to_geometry masks only when a polygon is present (no bbox arg)."""
+
+    def test_no_geometry_returns_dataset_unchanged(self):
+        """Without a geometry the dataset is returned untouched (no crop call)."""
+        ds = _FakeCropDataset()
+        result = mask_to_geometry(ds, _ExtentStub())
+        assert result is ds, "dataset should be returned unchanged"
+        assert ds.call is None, f"crop should not be called: {ds.call}"
+
+    def test_geometry_masks(self):
+        """With a geometry the dataset is masked via crop(mask=...)."""
+        ds = _FakeCropDataset()
+        sentinel = object()
+        mask_to_geometry(ds, _ExtentStub(geometry=sentinel))
+        assert ds.call["mask"] is sentinel, f"mask not used: {ds.call}"
+        assert ds.call["touch"] is True, f"touch should default True: {ds.call}"
+
+    def test_plain_object_returns_unchanged(self):
+        """A space lacking a geometry attribute returns the dataset unchanged."""
+        ds = _FakeCropDataset()
+        assert mask_to_geometry(ds, object()) is ds, "should be unchanged"

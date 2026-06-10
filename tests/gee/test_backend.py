@@ -114,7 +114,9 @@ class _FakeGeometry:
 class _FakeTask:
     """Stands in for an `ee.batch.Task` returned by `ee.batch.Export.image.to*`."""
 
-    def __init__(self, kwargs: dict, states: list[str] | None = None, error: str | None = None):
+    def __init__(
+        self, kwargs: dict, states: list[str] | None = None, error: str | None = None
+    ):
         self.kwargs = kwargs
         self._states = list(states or ["COMPLETED"])
         self._error = error
@@ -218,17 +220,32 @@ class _FakePyramidsDataset:
         cls.from_archive_calls = []
 
     @classmethod
-    def from_bytes(cls, data, *, suffix: str = ".tif", name=None, read_only: bool = True):
+    def from_bytes(
+        cls, data, *, suffix: str = ".tif", name=None, read_only: bool = True
+    ):
         cls.from_bytes_calls.append({"data": data, "suffix": suffix})
         return _FakePyramidsHandle(data)
 
     @classmethod
-    def from_archive(cls, url_or_path, *, kind: str = "auto", member_glob: str = "*",
-                     band_names=None, align: bool = False, no_data_value=None, path=None):
-        cls.from_archive_calls.append({
-            "url_or_path": str(url_or_path), "kind": kind,
-            "member_glob": member_glob, "path": path,
-        })
+    def from_archive(
+        cls,
+        url_or_path,
+        *,
+        kind: str = "auto",
+        member_glob: str = "*",
+        band_names=None,
+        align: bool = False,
+        no_data_value=None,
+        path=None,
+    ):
+        cls.from_archive_calls.append(
+            {
+                "url_or_path": str(url_or_path),
+                "kind": kind,
+                "member_glob": member_glob,
+                "path": path,
+            }
+        )
         from pathlib import Path as _Path
 
         if path is not None:
@@ -253,15 +270,25 @@ def fake_ee(monkeypatch) -> _FakeEE:
     fake = _FakeEE()
     monkeypatch.setattr(backend_module, "ee", fake)
     monkeypatch.setattr(
-        backend_module, "requests",
-        SimpleNamespace(get=lambda url, timeout=None: _FakeHTTPResponse(_FAKE_TIFF_BYTES)),
+        backend_module,
+        "requests",
+        SimpleNamespace(
+            get=lambda url, timeout=None: _FakeHTTPResponse(_FAKE_TIFF_BYTES)
+        ),
     )
     _FakePyramidsDataset.reset()
     monkeypatch.setattr(backend_module, "PyramidsDataset", _FakePyramidsDataset)
-    monkeypatch.setattr(backend_module, "create_feature", lambda gdf: SimpleNamespace(geometry=lambda: _FakeGeometry("from-gdf")))
     monkeypatch.setattr(
-        backend_module.EarthEngineAuth, "initialize",
-        staticmethod(lambda service_account, service_key, project=None: project or "fake-project"),
+        backend_module,
+        "create_feature",
+        lambda gdf: SimpleNamespace(geometry=lambda: _FakeGeometry("from-gdf")),
+    )
+    monkeypatch.setattr(
+        backend_module.EarthEngineAuth,
+        "initialize",
+        staticmethod(
+            lambda service_account, service_key, project=None: project or "fake-project"
+        ),
     )
     return fake
 
@@ -307,7 +334,9 @@ class TestInit:
         gee = make_gee()
         assert gee.catalog.get_dataset("USGS/SRTMGL1_003").ee_type == "image"
         assert gee.scale == 90.0 and gee.crs == "EPSG:4326"
-        assert isinstance(gee.space, SpatialExtent) and isinstance(gee.time, TemporalExtent)
+        assert isinstance(gee.space, SpatialExtent) and isinstance(
+            gee.time, TemporalExtent
+        )
         # Opening the client lazily runs auth and resolves the project.
         assert gee.client is backend_module.ee
         assert gee.project == "fake-project"
@@ -338,22 +367,36 @@ class TestInit:
         monkeypatch.setattr(backend_module, "Catalog", _ExplodingCatalog)
         with pytest.raises(ValueError, match="export_via must be"):
             GEE(
-                start="2000-02-11", end="2000-02-12",
+                start="2000-02-11",
+                end="2000-02-12",
                 variables={"USGS/SRTMGL1_003": ["elevation"]},
-                lat_lim=[29.9, 30.0], lon_lim=[31.2, 31.3], path=str(tmp_path),
+                lat_lim=[29.9, 30.0],
+                lon_lim=[31.2, 31.3],
+                path=str(tmp_path),
                 export_via="ftp",
             )
-        assert loads == 0, "Catalog() should not be constructed when export_via is invalid"
+        assert (
+            loads == 0
+        ), "Catalog() should not be constructed when export_via is invalid"
 
-    @pytest.mark.parametrize("kwargs, match", [
-        ({"temporal_resolution": "hourly"}, r"temporal_resolution must be 'raw'"),
-        ({"start": "2024-13-01"}, r"start='2024-13-01' is not parseable"),
-        ({"end": "not-a-date"}, r"end='not-a-date' is not parseable"),
-        ({"start": "2024-06-01", "end": "2024-05-01"},
-         r"start='2024-06-01' is after end='2024-05-01'"),
-    ])
+    @pytest.mark.parametrize(
+        "kwargs, match",
+        [
+            ({"temporal_resolution": "hourly"}, r"temporal_resolution must be 'raw'"),
+            ({"start": "2024-13-01"}, r"start='2024-13-01' is not parseable"),
+            ({"end": "not-a-date"}, r"end='not-a-date' is not parseable"),
+            (
+                {"start": "2024-06-01", "end": "2024-05-01"},
+                r"start='2024-06-01' is after end='2024-05-01'",
+            ),
+        ],
+    )
     def test_bad_pure_config_fails_before_catalog_load(
-        self, monkeypatch, tmp_path, kwargs, match,
+        self,
+        monkeypatch,
+        tmp_path,
+        kwargs,
+        match,
     ):
         """L6: bad date / temporal_resolution short-circuits the catalog parse."""
         from earthlens.gee import backend as backend_module
@@ -370,9 +413,12 @@ class TestInit:
 
         monkeypatch.setattr(backend_module, "Catalog", _ExplodingCatalog)
         defaults = dict(
-            start="2000-02-11", end="2000-02-12",
+            start="2000-02-11",
+            end="2000-02-12",
             variables={"USGS/SRTMGL1_003": ["elevation"]},
-            lat_lim=[29.9, 30.0], lon_lim=[31.2, 31.3], path=str(tmp_path),
+            lat_lim=[29.9, 30.0],
+            lon_lim=[31.2, 31.3],
+            path=str(tmp_path),
         )
         defaults.update(kwargs)
         with pytest.raises(ValueError, match=match):
@@ -385,10 +431,14 @@ class TestInit:
 
         with pytest.raises(AuthenticationError, match="needs either service_account"):
             GEE(
-                start="2000-02-11", end="2000-02-12",
+                start="2000-02-11",
+                end="2000-02-12",
                 variables={"USGS/SRTMGL1_003": ["elevation"]},
-                lat_lim=[29.9, 30.0], lon_lim=[31.2, 31.3], path=str(tmp_path),
+                lat_lim=[29.9, 30.0],
+                lon_lim=[31.2, 31.3],
+                path=str(tmp_path),
             )
+
 
 class TestCheckInputDates:
     """Tests for `GEE._check_input_dates`."""
@@ -463,9 +513,12 @@ class TestClampWindowToExtent:
                 return fixed_now
 
         monkeypatch.setattr(backend_module.dt, "datetime", _FixedDatetime)
-        gee = make_gee(start="2020-01-01", end="2099-01-01",
-                       variables={"UCSB-CHG/CHIRPS/DAILY": ["precipitation"]},
-                       scale=5566.0)
+        gee = make_gee(
+            start="2020-01-01",
+            end="2099-01-01",
+            variables={"UCSB-CHG/CHIRPS/DAILY": ["precipitation"]},
+            scale=5566.0,
+        )
         ds = gee.catalog.get_dataset("UCSB-CHG/CHIRPS/DAILY")
         start, end_excl = gee._clamp_window_to_extent(ds)
         assert start == dt.datetime(2020, 1, 1)
@@ -479,17 +532,24 @@ class TestDiscoverExtent:
         """`discover_extent=False` (the default) never calls `_discover_ee_extent`."""
         calls: list[str] = []
         monkeypatch.setattr(
-            GEE, "_discover_ee_extent",
+            GEE,
+            "_discover_ee_extent",
             lambda self, var_info: calls.append(var_info.id) or (None, None),
         )
-        gee = make_gee(variables={"UCSB-CHG/CHIRPS/DAILY": ["precipitation"]},
-                       scale=5566.0, start="2024-01-01", end="2024-01-02")
+        gee = make_gee(
+            variables={"UCSB-CHG/CHIRPS/DAILY": ["precipitation"]},
+            scale=5566.0,
+            start="2024-01-01",
+            end="2024-01-02",
+        )
         ds = gee.catalog.get_dataset("UCSB-CHG/CHIRPS/DAILY")
         gee._clamp_window_to_extent(ds)
         assert calls == []
 
     def test_discover_extent_clamps_to_ee_max_when_catalog_open_ended(
-        self, make_gee, monkeypatch,
+        self,
+        make_gee,
+        monkeypatch,
     ):
         """For `end_date is None`, EE max becomes the upper bound (cached per asset)."""
         ee_max = dt.datetime(2025, 12, 15)
@@ -502,7 +562,9 @@ class TestDiscoverExtent:
         monkeypatch.setattr(GEE, "_discover_ee_extent", _fake_discover)
         gee = make_gee(
             variables={"UCSB-CHG/CHIRPS/DAILY": ["precipitation"]},
-            scale=5566.0, start="2020-01-01", end="2099-01-01",
+            scale=5566.0,
+            start="2020-01-01",
+            end="2099-01-01",
             discover_extent=True,
         )
         ds = gee.catalog.get_dataset("UCSB-CHG/CHIRPS/DAILY")
@@ -525,11 +587,15 @@ class TestDiscoverExtent:
 
         monkeypatch.setattr(backend_module.dt, "datetime", _FixedDatetime)
         monkeypatch.setattr(
-            GEE, "_discover_ee_extent", lambda self, var_info: (None, None),
+            GEE,
+            "_discover_ee_extent",
+            lambda self, var_info: (None, None),
         )
         gee = make_gee(
             variables={"UCSB-CHG/CHIRPS/DAILY": ["precipitation"]},
-            scale=5566.0, start="2020-01-01", end="2099-01-01",
+            scale=5566.0,
+            start="2020-01-01",
+            end="2099-01-01",
             discover_extent=True,
         )
         ds = gee.catalog.get_dataset("UCSB-CHG/CHIRPS/DAILY")
@@ -560,7 +626,9 @@ class TestDiscoverExtent:
                 return _FakeReducedFC()
 
         gee = make_gee(discover_extent=True)
-        monkeypatch.setattr(backend_module.ee, "ImageCollection", _FakeCollection, raising=False)
+        monkeypatch.setattr(
+            backend_module.ee, "ImageCollection", _FakeCollection, raising=False
+        )
         monkeypatch.setattr(backend_module.ee, "Reducer", _FakeReducer, raising=False)
 
         ds = gee.catalog.get_dataset("UCSB-CHG/CHIRPS/DAILY")
@@ -568,8 +636,12 @@ class TestDiscoverExtent:
         assert captured["asset"] == "UCSB-CHG/CHIRPS/DAILY"
         assert captured["reducer"] == "REDUCER:minMax"
         assert captured["properties"] == ["system:time_start"]
-        assert min_dt == dt.datetime.fromtimestamp(1700000000, tz=dt.timezone.utc).replace(tzinfo=None)
-        assert max_dt == dt.datetime.fromtimestamp(1750000000, tz=dt.timezone.utc).replace(tzinfo=None)
+        assert min_dt == dt.datetime.fromtimestamp(
+            1700000000, tz=dt.timezone.utc
+        ).replace(tzinfo=None)
+        assert max_dt == dt.datetime.fromtimestamp(
+            1750000000, tz=dt.timezone.utc
+        ).replace(tzinfo=None)
 
     def test_real_discover_swallows_ee_errors(self, make_gee, monkeypatch):
         """Network / EE failures inside `_discover_ee_extent` return `(None, None)`."""
@@ -582,9 +654,12 @@ class TestDiscoverExtent:
                 raise RuntimeError("network down")
 
         gee = make_gee(discover_extent=True)
-        monkeypatch.setattr(backend_module.ee, "ImageCollection", _ExplodingCollection, raising=False)
         monkeypatch.setattr(
-            backend_module.ee, "Reducer",
+            backend_module.ee, "ImageCollection", _ExplodingCollection, raising=False
+        )
+        monkeypatch.setattr(
+            backend_module.ee,
+            "Reducer",
             SimpleNamespace(minMax=lambda: "REDUCER:minMax"),
             raising=False,
         )
@@ -607,9 +682,12 @@ class TestDiscoverExtent:
                 return _EmptyReducedFC()
 
         gee = make_gee(discover_extent=True)
-        monkeypatch.setattr(backend_module.ee, "ImageCollection", _EmptyCollection, raising=False)
         monkeypatch.setattr(
-            backend_module.ee, "Reducer",
+            backend_module.ee, "ImageCollection", _EmptyCollection, raising=False
+        )
+        monkeypatch.setattr(
+            backend_module.ee,
+            "Reducer",
             SimpleNamespace(minMax=lambda: "REDUCER:minMax"),
             raising=False,
         )
@@ -627,7 +705,9 @@ class TestDiscoverExtent:
         monkeypatch.setattr(GEE, "_discover_ee_extent", _fake_discover)
         gee = make_gee(
             variables={"UCSB-CHG/CHIRPS/DAILY": ["precipitation"]},
-            scale=5566.0, start="2020-01-01", end="2099-01-01",
+            scale=5566.0,
+            start="2020-01-01",
+            end="2099-01-01",
             discover_extent=True,
         )
         ds = gee.catalog.get_dataset("UCSB-CHG/CHIRPS/DAILY")
@@ -636,7 +716,9 @@ class TestDiscoverExtent:
         assert calls == ["UCSB-CHG/CHIRPS/DAILY"]
 
     def test_extent_cache_is_shared_across_gee_instances(
-        self, make_gee, monkeypatch,
+        self,
+        make_gee,
+        monkeypatch,
     ):
         """L5: a second `GEE(...)` reuses the cached extent — no extra round trip."""
         calls: list[str] = []
@@ -652,7 +734,9 @@ class TestDiscoverExtent:
 
         gee_a = make_gee(
             variables={"UCSB-CHG/CHIRPS/DAILY": ["precipitation"]},
-            scale=5566.0, start="2020-01-01", end="2099-01-01",
+            scale=5566.0,
+            start="2020-01-01",
+            end="2099-01-01",
             discover_extent=True,
         )
         ds = gee_a.catalog.get_dataset("UCSB-CHG/CHIRPS/DAILY")
@@ -661,14 +745,16 @@ class TestDiscoverExtent:
         # Fresh instance — should hit the module-level cache, not re-query EE.
         gee_b = make_gee(
             variables={"UCSB-CHG/CHIRPS/DAILY": ["precipitation"]},
-            scale=5566.0, start="2020-01-01", end="2099-01-01",
+            scale=5566.0,
+            start="2020-01-01",
+            end="2099-01-01",
             discover_extent=True,
         )
         gee_b._maybe_discover_ee_extent(ds)
 
-        assert calls == ["UCSB-CHG/CHIRPS/DAILY"], (
-            f"second instance should hit the shared cache; got {calls}"
-        )
+        assert calls == [
+            "UCSB-CHG/CHIRPS/DAILY"
+        ], f"second instance should hit the shared cache; got {calls}"
 
     def test_clear_extent_cache_drops_every_entry(self, make_gee, monkeypatch):
         """`clear_extent_cache()` forces the next call to re-query EE."""
@@ -683,7 +769,9 @@ class TestDiscoverExtent:
         monkeypatch.setattr(GEE, "_discover_ee_extent", _fake_discover)
         gee = make_gee(
             variables={"UCSB-CHG/CHIRPS/DAILY": ["precipitation"]},
-            scale=5566.0, start="2020-01-01", end="2099-01-01",
+            scale=5566.0,
+            start="2020-01-01",
+            end="2099-01-01",
             discover_extent=True,
         )
         ds = gee.catalog.get_dataset("UCSB-CHG/CHIRPS/DAILY")
@@ -703,7 +791,9 @@ class TestDownloadRejections:
 
     def test_drive_without_folder_rejected_at_construction(self, make_gee):
         """`export_via="drive"` requires `drive_folder` at construction."""
-        with pytest.raises(ValueError, match="export_via='drive' requires drive_folder"):
+        with pytest.raises(
+            ValueError, match="export_via='drive' requires drive_folder"
+        ):
             make_gee(export_via="drive")
 
     def test_gcs_without_bucket_rejected_at_construction(self, make_gee):
@@ -720,7 +810,7 @@ class TestExportViaBatch:
         gee = make_gee(export_via="drive", drive_folder="ee_out")
         results = gee.download(progress_bar=False)
         assert results == ["drive://ee_out/USGS_SRTMGL1_003_elevation_20000211"]
-        (method, kwargs), = gee.client.export_image.calls
+        ((method, kwargs),) = gee.client.export_image.calls
         assert method == "toDrive"
         assert kwargs["folder"] == "ee_out" and kwargs["scale"] == 90.0
         assert kwargs["crs"] == "EPSG:4326" and kwargs["maxPixels"] == 1e13
@@ -731,7 +821,7 @@ class TestExportViaBatch:
         gee = make_gee(export_via="gcs", gcs_bucket="my-bucket")
         results = gee.download(progress_bar=False)
         assert results == ["gs://my-bucket/USGS_SRTMGL1_003_elevation_20000211"]
-        (method, kwargs), = gee.client.export_image.calls
+        ((method, kwargs),) = gee.client.export_image.calls
         assert method == "toCloudStorage" and kwargs["bucket"] == "my-bucket"
 
     def test_failed_export_task_raises(self, make_gee):
@@ -800,24 +890,25 @@ class TestExportViaAsset:
 
     def test_asset_export_queues_to_asset_and_returns_ee_uri(self, make_gee):
         """An Asset export queues a `toAsset` task and returns `ee://<asset>/<prefix>`."""
-        gee = make_gee(
-            export_via="asset", asset_id="projects/p/assets/my-folder"
-        )
+        gee = make_gee(export_via="asset", asset_id="projects/p/assets/my-folder")
         results = gee.download(progress_bar=False)
-        assert results == ["ee://projects/p/assets/my-folder/USGS_SRTMGL1_003_elevation_20000211"]
-        (method, kwargs), = gee.client.export_image.calls
+        assert results == [
+            "ee://projects/p/assets/my-folder/USGS_SRTMGL1_003_elevation_20000211"
+        ]
+        ((method, kwargs),) = gee.client.export_image.calls
         assert method == "toAsset"
-        assert kwargs["assetId"] == "projects/p/assets/my-folder/USGS_SRTMGL1_003_elevation_20000211"
+        assert (
+            kwargs["assetId"]
+            == "projects/p/assets/my-folder/USGS_SRTMGL1_003_elevation_20000211"
+        )
         assert "fileNamePrefix" not in kwargs  # `toAsset` doesn't use it
         assert kwargs["scale"] == 90.0 and kwargs["maxPixels"] == 1e13
 
     def test_trailing_slash_on_asset_id_is_tolerated(self, make_gee):
         """A trailing `/` on `asset_id` is stripped to avoid a double slash."""
-        gee = make_gee(
-            export_via="asset", asset_id="projects/p/assets/my-folder/"
-        )
+        gee = make_gee(export_via="asset", asset_id="projects/p/assets/my-folder/")
         gee.download(progress_bar=False)
-        (_, kwargs), = gee.client.export_image.calls
+        ((_, kwargs),) = gee.client.export_image.calls
         assert "//" not in kwargs["assetId"].split(":", 1)[-1]
         assert kwargs["assetId"].startswith("projects/p/assets/my-folder/")
         assert "//" not in kwargs["assetId"]
@@ -828,16 +919,22 @@ class TestBuildCollection:
 
     def test_image_collection_chain(self, make_gee):
         """A collection dataset is filtered by date, bounds, then bands."""
-        gee = make_gee(variables={"UCSB-CHG/CHIRPS/DAILY": ["precipitation"]}, scale=5566.0)
+        gee = make_gee(
+            variables={"UCSB-CHG/CHIRPS/DAILY": ["precipitation"]}, scale=5566.0
+        )
         ds = gee.catalog.get_dataset("UCSB-CHG/CHIRPS/DAILY")
-        col = gee._build_collection(ds, ["precipitation"], dt.datetime(2020, 6, 1), dt.datetime(2020, 6, 2))
+        col = gee._build_collection(
+            ds, ["precipitation"], dt.datetime(2020, 6, 1), dt.datetime(2020, 6, 2)
+        )
         assert col.method_names() == ["filterDate", "filterBounds", "select"]
 
     def test_static_image_skips_filter_date(self, make_gee):
         """A static `image` dataset is *not* date-filtered."""
         gee = make_gee()
         ds = gee.catalog.get_dataset("USGS/SRTMGL1_003")
-        col = gee._build_collection(ds, ["elevation"], dt.datetime(2000, 2, 11), dt.datetime(2000, 2, 13))
+        col = gee._build_collection(
+            ds, ["elevation"], dt.datetime(2000, 2, 11), dt.datetime(2000, 2, 13)
+        )
         assert col.method_names() == ["filterBounds", "select"]
         assert gee.client.image_log == ["USGS/SRTMGL1_003"]
 
@@ -847,11 +944,20 @@ class TestComposite:
 
     def test_raw_yields_single_bucket(self, make_gee):
         """`temporal_resolution="raw"` yields one `(start, image)` bucket."""
-        gee = make_gee(start="2020-06-01", end="2020-06-30", temporal_resolution="raw",
-                       variables={"UCSB-CHG/CHIRPS/DAILY": ["precipitation"]}, scale=5566.0)
+        gee = make_gee(
+            start="2020-06-01",
+            end="2020-06-30",
+            temporal_resolution="raw",
+            variables={"UCSB-CHG/CHIRPS/DAILY": ["precipitation"]},
+            scale=5566.0,
+        )
         ds = gee.catalog.get_dataset("UCSB-CHG/CHIRPS/DAILY")
-        col = gee._build_collection(ds, ["precipitation"], dt.datetime(2020, 6, 1), dt.datetime(2020, 7, 1))
-        buckets = list(gee._composite(col, ds, dt.datetime(2020, 6, 1), dt.datetime(2020, 7, 1)))
+        col = gee._build_collection(
+            ds, ["precipitation"], dt.datetime(2020, 6, 1), dt.datetime(2020, 7, 1)
+        )
+        buckets = list(
+            gee._composite(col, ds, dt.datetime(2020, 6, 1), dt.datetime(2020, 7, 1))
+        )
         assert len(buckets) == 1
         when, image = buckets[0]
         assert when == dt.datetime(2020, 6, 1)
@@ -859,29 +965,54 @@ class TestComposite:
 
     def test_monthly_yields_one_bucket_per_month(self, make_gee):
         """Monthly resolution splits the window into per-month buckets."""
-        gee = make_gee(start="2020-06-01", end="2020-07-31", temporal_resolution="monthly",
-                       variables={"UCSB-CHG/CHIRPS/DAILY": ["precipitation"]}, scale=5566.0)
+        gee = make_gee(
+            start="2020-06-01",
+            end="2020-07-31",
+            temporal_resolution="monthly",
+            variables={"UCSB-CHG/CHIRPS/DAILY": ["precipitation"]},
+            scale=5566.0,
+        )
         ds = gee.catalog.get_dataset("UCSB-CHG/CHIRPS/DAILY")
-        col = gee._build_collection(ds, ["precipitation"], dt.datetime(2020, 6, 1), dt.datetime(2020, 8, 1))
-        buckets = list(gee._composite(col, ds, dt.datetime(2020, 6, 1), dt.datetime(2020, 8, 1)))
-        assert [w for w, _ in buckets] == [dt.datetime(2020, 6, 1), dt.datetime(2020, 7, 1)]
+        col = gee._build_collection(
+            ds, ["precipitation"], dt.datetime(2020, 6, 1), dt.datetime(2020, 8, 1)
+        )
+        buckets = list(
+            gee._composite(col, ds, dt.datetime(2020, 6, 1), dt.datetime(2020, 8, 1))
+        )
+        assert [w for w, _ in buckets] == [
+            dt.datetime(2020, 6, 1),
+            dt.datetime(2020, 7, 1),
+        ]
         assert all(img.reducer == "mean" for _, img in buckets)
 
     def test_static_image_one_bucket_regardless_of_resolution(self, make_gee):
         """A static `image` dataset always yields a single bucket."""
         gee = make_gee(temporal_resolution="monthly")
         ds = gee.catalog.get_dataset("USGS/SRTMGL1_003")
-        col = gee._build_collection(ds, ["elevation"], dt.datetime(2000, 2, 11), dt.datetime(2000, 2, 13))
-        buckets = list(gee._composite(col, ds, dt.datetime(2000, 2, 11), dt.datetime(2000, 2, 13)))
+        col = gee._build_collection(
+            ds, ["elevation"], dt.datetime(2000, 2, 11), dt.datetime(2000, 2, 13)
+        )
+        buckets = list(
+            gee._composite(col, ds, dt.datetime(2000, 2, 11), dt.datetime(2000, 2, 13))
+        )
         assert len(buckets) == 1
 
     def test_reducer_override(self, make_gee):
         """The constructor `reducer` overrides the dataset's `default_reducer`."""
-        gee = make_gee(reducer="median", variables={"UCSB-CHG/CHIRPS/DAILY": ["precipitation"]},
-                       start="2020-06-01", end="2020-06-02", scale=5566.0)
+        gee = make_gee(
+            reducer="median",
+            variables={"UCSB-CHG/CHIRPS/DAILY": ["precipitation"]},
+            start="2020-06-01",
+            end="2020-06-02",
+            scale=5566.0,
+        )
         ds = gee.catalog.get_dataset("UCSB-CHG/CHIRPS/DAILY")
-        col = gee._build_collection(ds, ["precipitation"], dt.datetime(2020, 6, 1), dt.datetime(2020, 6, 3))
-        (_, image), = gee._composite(col, ds, dt.datetime(2020, 6, 1), dt.datetime(2020, 6, 3))
+        col = gee._build_collection(
+            ds, ["precipitation"], dt.datetime(2020, 6, 1), dt.datetime(2020, 6, 3)
+        )
+        ((_, image),) = gee._composite(
+            col, ds, dt.datetime(2020, 6, 1), dt.datetime(2020, 6, 3)
+        )
         assert image.reducer == "median"
 
 
@@ -890,8 +1021,13 @@ class TestApi:
 
     def test_size_guard_rejects_oversized_request(self, make_gee):
         """A bbox×scale exceeding 32768 px per axis raises a clear `ValueError`."""
-        gee = make_gee(start="2000-02-11", end="2000-02-12", lat_lim=[0.0, 40.0],
-                       lon_lim=[0.0, 40.0], scale=30.0)
+        gee = make_gee(
+            start="2000-02-11",
+            end="2000-02-12",
+            lat_lim=[0.0, 40.0],
+            lon_lim=[0.0, 40.0],
+            scale=30.0,
+        )
         with pytest.raises(ValueError, match="32768-px"):
             gee.download(progress_bar=False)
 
@@ -899,8 +1035,13 @@ class TestApi:
         """`_api` raises when there is no `scale` and no dataset `spatial_resolution`."""
         gee = make_gee(scale=None)
         gee.scale = None
-        bare = Dataset(id="DEMO/IMG", title="x", ee_type="image",
-                       extent=Extent(start_date="2000-01-01"), spatial_resolution=None)
+        bare = Dataset(
+            id="DEMO/IMG",
+            title="x",
+            ee_type="image",
+            extent=Extent(start_date="2000-01-01"),
+            spatial_resolution=None,
+        )
         with pytest.raises(ValueError, match="no output scale"):
             gee._api(_FakeImage(), bare, ["b"], dt.datetime(2000, 1, 1))
 
@@ -928,8 +1069,11 @@ class TestApi:
         with zipfile.ZipFile(buf, "w") as zf:
             zf.writestr("inner.tif", b"data")
         monkeypatch.setattr(
-            backend_module, "requests",
-            SimpleNamespace(get=lambda url, timeout=None: _FakeHTTPResponse(buf.getvalue())),
+            backend_module,
+            "requests",
+            SimpleNamespace(
+                get=lambda url, timeout=None: _FakeHTTPResponse(buf.getvalue())
+            ),
         )
         paths = make_gee().download(progress_bar=False)
         target = paths[0]
@@ -950,7 +1094,9 @@ class TestApi:
             captured["timeout"] = timeout
             return _FakeHTTPResponse(_FAKE_TIFF_BYTES)
 
-        monkeypatch.setattr(backend_module, "requests", SimpleNamespace(get=_capture_get))
+        monkeypatch.setattr(
+            backend_module, "requests", SimpleNamespace(get=_capture_get)
+        )
         make_gee(http_timeout=42.5).download(progress_bar=False)
         assert captured["timeout"] == 42.5
 
@@ -959,8 +1105,12 @@ class TestApi:
         gee = make_gee(scale=120.0, crs="EPSG:3857")
         # Reach the image the pipeline produced by re-running the build/composite:
         ds = gee.catalog.get_dataset("USGS/SRTMGL1_003")
-        col = gee._build_collection(ds, ["elevation"], dt.datetime(2000, 2, 11), dt.datetime(2000, 2, 13))
-        (_, image), = gee._composite(col, ds, dt.datetime(2000, 2, 11), dt.datetime(2000, 2, 13))
+        col = gee._build_collection(
+            ds, ["elevation"], dt.datetime(2000, 2, 11), dt.datetime(2000, 2, 13)
+        )
+        ((_, image),) = gee._composite(
+            col, ds, dt.datetime(2000, 2, 11), dt.datetime(2000, 2, 13)
+        )
         gee._api(image, ds, ["elevation"], dt.datetime(2000, 2, 11))
         assert image.download_params["format"] == "GEO_TIFF"
         assert image.download_params["scale"] == 120.0
@@ -987,12 +1137,15 @@ class TestAutoSplit:
 
         def _fake_merge(src, dst, **kwargs):
             from pathlib import Path as _Path
+
             merge_calls.append({"src": list(src), "dst": str(dst), "kwargs": kwargs})
             _Path(dst).write_bytes(b"merged")
 
         monkeypatch.setattr(backend_module, "merge_rasters", _fake_merge)
 
-        gee = make_gee(lat_lim=[0.0, 40.0], lon_lim=[0.0, 40.0], scale=30.0, auto_split=True)
+        gee = make_gee(
+            lat_lim=[0.0, 40.0], lon_lim=[0.0, 40.0], scale=30.0, auto_split=True
+        )
         paths = gee.download(progress_bar=False)
 
         assert len(paths) == 1
@@ -1016,11 +1169,14 @@ class TestAutoSplit:
         from earthlens.gee._helpers import EE_MAX_DIMENSION as _CAP
 
         monkeypatch.setattr(
-            backend_module, "merge_rasters",
+            backend_module,
+            "merge_rasters",
             lambda src, dst, **k: Path(dst).write_bytes(b"merged"),
         )
 
-        gee = make_gee(lat_lim=[0.0, 40.0], lon_lim=[0.0, 40.0], scale=30.0, auto_split=True)
+        gee = make_gee(
+            lat_lim=[0.0, 40.0], lon_lim=[0.0, 40.0], scale=30.0, auto_split=True
+        )
         gee.download(progress_bar=False)
 
         # The fake `ee.Image` records every `getDownloadURL` call's params.
@@ -1034,10 +1190,16 @@ class TestAutoSplit:
         # Replay the image's recorded download_params_list:
         ds = gee.catalog.get_dataset("USGS/SRTMGL1_003")
         col = gee._build_collection(
-            ds, ["elevation"], dt.datetime(2000, 2, 11), dt.datetime(2000, 2, 13),
+            ds,
+            ["elevation"],
+            dt.datetime(2000, 2, 11),
+            dt.datetime(2000, 2, 13),
         )
-        (_, image), = gee._composite(
-            col, ds, dt.datetime(2000, 2, 11), dt.datetime(2000, 2, 13),
+        ((_, image),) = gee._composite(
+            col,
+            ds,
+            dt.datetime(2000, 2, 11),
+            dt.datetime(2000, 2, 13),
         )
         gee._api(image, ds, ["elevation"], dt.datetime(2000, 2, 11))
 
@@ -1066,14 +1228,42 @@ class TestEeRegion:
         region = gee._ee_region()
         assert isinstance(region, _FakeGeometry) and region.coords == "from-gdf"
 
+    def test_polygon_aoi_used_when_no_region(self, make_gee):
+        """A polygon aoi= (no region=) clips through create_feature too."""
+        gpd = pytest.importorskip("geopandas")
+        shapely = pytest.importorskip("shapely")
+        poly = shapely.geometry.Polygon([(-5, 10), (5, 10), (0, 20)])
+        gdf = gpd.GeoDataFrame(geometry=[poly], crs="EPSG:4326")
+        gee = make_gee(aoi=gdf, lat_lim=None, lon_lim=None)
+        assert gee.space.geometry is not None, "polygon aoi should attach a mask"
+        region = gee._ee_region()
+        assert isinstance(region, _FakeGeometry) and region.coords == "from-gdf"
+
+    def test_bbox_aoi_still_uses_rectangle(self, make_gee):
+        """A bbox aoi= attaches no mask, so the clip stays an ee Rectangle."""
+        gee = make_gee(aoi=[-5.0, 10.0, 5.0, 20.0], lat_lim=None, lon_lim=None)
+        assert gee.space.geometry is None, "a bbox aoi attaches no mask"
+        region = gee._ee_region()
+        assert region.coords == [
+            -5.0,
+            10.0,
+            5.0,
+            20.0,
+        ], f"bad rectangle: {region.coords}"
+
 
 class TestDownloadEndToEnd:
     """An end-to-end `download()` over the fakes."""
 
     def test_multi_bucket_collection_download(self, make_gee, tmp_path):
         """A monthly CHIRPS request writes one GeoTIFF per month."""
-        gee = make_gee(start="2020-06-01", end="2020-07-31", temporal_resolution="monthly",
-                       variables={"UCSB-CHG/CHIRPS/DAILY": ["precipitation"]}, scale=5566.0)
+        gee = make_gee(
+            start="2020-06-01",
+            end="2020-07-31",
+            temporal_resolution="monthly",
+            variables={"UCSB-CHG/CHIRPS/DAILY": ["precipitation"]},
+            scale=5566.0,
+        )
         paths = gee.download(progress_bar=False)
         names = sorted(p.name for p in paths)
         assert names == [

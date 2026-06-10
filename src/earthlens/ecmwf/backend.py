@@ -15,13 +15,15 @@ from loguru import logger
 from earthlens.aggregate import AggregationConfig, aggregate_netcdf
 from earthlens.base import (
     AbstractDataSource,
+)
+from earthlens.base import AuthenticationError as _BaseAuthenticationError
+from earthlens.base import (
     LazyClientMixin,
     OutputKind,
     SpatialExtent,
     TemporalExtent,
     to_datetime,
 )
-from earthlens.base import AuthenticationError as _BaseAuthenticationError
 from earthlens.ecmwf.catalog import Catalog, Variable
 from earthlens.ecmwf.constraints import RequestValidator
 
@@ -378,7 +380,9 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
         """
         try:
             client = cdsapi.Client()
-        except Exception as exc:  # noqa: BLE001 - cdsapi raises a variety of types; classify here and re-raise as AuthenticationError
+        except (
+            Exception
+        ) as exc:  # noqa: BLE001 - cdsapi raises a variety of types; classify here and re-raise as AuthenticationError
             if _looks_like_missing_credentials(exc):
                 raise AuthenticationError(
                     "cdsapi could not authenticate against the Climate "
@@ -588,7 +592,9 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
                     nc_path = self._download_dataset(
                         var_info, progress_bar=progress_bar
                     )
-                except Exception as exc:  # noqa: BLE001 - log + continue so one bad variable doesn't kill the batch
+                except (
+                    Exception
+                ) as exc:  # noqa: BLE001 - log + continue so one bad variable doesn't kill the batch
                     logger.error(
                         f"ECMWF download for {dataset_name}/{var} failed: "
                         f"{type(exc).__name__}: {exc}"
@@ -598,10 +604,10 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
 
                 if effective_aggregate is not None:
                     try:
-                        agg = aggregate_netcdf(
-                            nc_path, var_info, effective_aggregate
-                        )
-                    except Exception as exc:  # noqa: BLE001 - log + continue so one bad aggregate doesn't kill the batch
+                        agg = aggregate_netcdf(nc_path, var_info, effective_aggregate)
+                    except (
+                        Exception
+                    ) as exc:  # noqa: BLE001 - log + continue so one bad aggregate doesn't kill the batch
                         logger.error(
                             f"ECMWF aggregate for {dataset_name}/{var} failed: "
                             f"{type(exc).__name__}: {exc}"
@@ -777,7 +783,9 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
         logger.info(f"Requesting {dataset} from CDS; this may take several minutes")
         try:
             self.client.retrieve(dataset, request, str(target))
-        except Exception as exc:  # noqa: BLE001 - cdsapi raises a variety of types; classify here and re-raise as PermissionError when licence-related
+        except (
+            Exception
+        ) as exc:  # noqa: BLE001 - cdsapi raises a variety of types; classify here and re-raise as PermissionError when licence-related
             if _looks_like_licence_not_accepted(exc):
                 raise PermissionError(
                     f"CDS rejected the request for {dataset!r}: licence "
@@ -789,7 +797,49 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
                 ) from exc
             raise
         _unwrap_zipped_netcdf(target)
+        self._mask_netcdf_to_geometry(target)
         return target
+
+    def _mask_netcdf_to_geometry(self, target: Path) -> None:
+        """Mask a written NetCDF cube to a polygon `aoi=`, if one was given.
+
+        The CDS `area` field already crops server-side to the bbox; this
+        trims the bbox corners to the exact polygon when the request's
+        `aoi=` was a polygon (carried on `self.space.geometry`). Every
+        variable / time slice is masked via `pyramids.NetCDF.crop`, written
+        through a sibling temp file that atomically replaces the original
+        so a partial write cannot corrupt the cube. A no-op for a bbox /
+        point `aoi=`.
+
+        Best-effort: a multi-variable CDS cube can currently trip a
+        `pyramids.NetCDF.crop` limitation (it calls `crop` on each raw
+        `MDArray`). When that happens the bbox-cropped NetCDF is kept and a
+        warning is logged rather than failing the download — polygon
+        masking starts working automatically once pyramids supports it.
+
+        Args:
+            target: Path to the NetCDF written by `_api`.
+        """
+        geometry = getattr(self.space, "geometry", None)
+        if geometry is None:
+            return
+        from pyramids.netcdf import NetCDF
+
+        cube = NetCDF.read_file(str(target))
+        try:
+            masked = cube.crop(mask=geometry, touch=True)
+            tmp = target.with_name(target.stem + ".masked" + target.suffix)
+            masked.to_file(str(tmp))
+        except (AttributeError, NotImplementedError, ValueError) as exc:
+            logger.warning(
+                f"polygon aoi= masking skipped for {target.name}; the bbox "
+                f"crop is retained. pyramids could not mask this NetCDF cube "
+                f"({type(exc).__name__}: {exc})."
+            )
+            return
+        finally:
+            cube.close()
+        os.replace(tmp, target)
 
     def _build_request(self, var_info: Variable) -> dict[str, Any]:
         """Assemble the CDS retrieve-request dict for one variable.

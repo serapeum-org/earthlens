@@ -463,7 +463,9 @@ class GEE(LazyClientMixin, AbstractDataSource):
         if temporal_resolution == "raw":
             dates = pd.DatetimeIndex([start_dt])
         elif temporal_resolution in _RESOLUTION_FREQ:
-            dates = pd.date_range(start_dt, end_dt, freq=_RESOLUTION_FREQ[temporal_resolution])
+            dates = pd.date_range(
+                start_dt, end_dt, freq=_RESOLUTION_FREQ[temporal_resolution]
+            )
         else:
             raise ValueError(
                 "temporal_resolution must be 'raw', 'daily', 'monthly', or "
@@ -667,7 +669,11 @@ class GEE(LazyClientMixin, AbstractDataSource):
         freq = _RESOLUTION_FREQ[self.temporal_resolution]
         bucket_starts = pd.date_range(start, end, freq=freq, inclusive="left")
         for i, bucket_start in enumerate(bucket_starts):
-            bucket_end = bucket_starts[i + 1] if i + 1 < len(bucket_starts) else pd.Timestamp(end)
+            bucket_end = (
+                bucket_starts[i + 1]
+                if i + 1 < len(bucket_starts)
+                else pd.Timestamp(end)
+            )
             window = collection.filterDate(
                 bucket_start.strftime("%Y-%m-%d"), bucket_end.strftime("%Y-%m-%d")
             )
@@ -726,7 +732,9 @@ class GEE(LazyClientMixin, AbstractDataSource):
             return self._export_via_url(image, var_info, float(scale), region, prefix)
         return self._export_via_batch(image, float(scale), region, prefix)
 
-    def _export_via_url(self, image, var_info: Dataset, scale: float, region, prefix: str) -> Path:
+    def _export_via_url(
+        self, image, var_info: Dataset, scale: float, region, prefix: str
+    ) -> Path:
         """Fetch a GeoTIFF from `image.getDownloadURL`; enforce the 32768-px cap.
 
         Earth Engine returns a single GeoTIFF when one band is exported and
@@ -757,9 +765,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
             )
         return self._download_one_url_tile(image, region, scale, prefix)
 
-    def _download_one_url_tile(
-        self, image, region, scale: float, prefix: str
-    ) -> Path:
+    def _download_one_url_tile(self, image, region, scale: float, prefix: str) -> Path:
         """Issue one `getDownloadURL` request → tif at `<prefix>.tif`.
 
         Single-tile worker shared by the small-AOI path and the
@@ -823,12 +829,12 @@ class GEE(LazyClientMixin, AbstractDataSource):
         merge_rasters([str(p) for p in tile_paths], str(target))
         for p in tile_paths:
             p.unlink(missing_ok=True)
-        logger.info(
-            f"Stitched {len(tile_paths)} tile(s) into {target} via pyramids."
-        )
+        logger.info(f"Stitched {len(tile_paths)} tile(s) into {target} via pyramids.")
         return target
 
-    def _export_via_batch(self, image, scale: float, region, prefix: str) -> str | TaskInfo:
+    def _export_via_batch(
+        self, image, scale: float, region, prefix: str
+    ) -> str | TaskInfo:
         """Queue an `ee.batch.Export.image.to{Drive,CloudStorage,Asset}` task.
 
         When `wait_for_export=True` (the default) blocks until the task
@@ -871,23 +877,29 @@ class GEE(LazyClientMixin, AbstractDataSource):
             )
             return info
         wait_for_task(task, progress_bar=True)
-        logger.info(f"Exported {destination} (pull it from the {self.export_via} destination)")
+        logger.info(
+            f"Exported {destination} (pull it from the {self.export_via} destination)"
+        )
         return destination
 
     def _ee_region(self):
         """Return the `ee.Geometry` to clip / filter requests to.
 
         Uses the constructor `region` `GeoDataFrame` (converted via
-        :func:`earthlens.gee.features.create_feature`) when given,
-        otherwise an `ee.Geometry.Rectangle` built from the lat/lon
-        bbox. Computed once and cached.
+        :func:`earthlens.gee.features.create_feature`) when given, else a
+        polygon `aoi=` carried on `self.space.geometry` (the unified
+        ergonomic channel), and otherwise an `ee.Geometry.Rectangle` built
+        from the lat/lon bbox. Computed once and cached.
 
         Returns:
             The `ee.Geometry`.
         """
         if self._ee_geometry is None:
+            aoi_geometry = getattr(self.space, "geometry", None)
             if self.region is not None:
                 self._ee_geometry = create_feature(self.region).geometry()
+            elif aoi_geometry is not None:
+                self._ee_geometry = create_feature(aoi_geometry).geometry()
             else:
                 self._ee_geometry = ee.Geometry.Rectangle(
                     [
@@ -932,9 +944,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
             return None, None
         return start, end_excl
 
-    def _effective_extent(
-        self, var_info: Dataset
-    ) -> tuple[dt.datetime, dt.datetime]:
+    def _effective_extent(self, var_info: Dataset) -> tuple[dt.datetime, dt.datetime]:
         """Resolve a dataset's effective `(start, end_exclusive)` extent.
 
         The catalog's `start_date` is always a curated string (the
@@ -955,10 +965,9 @@ class GEE(LazyClientMixin, AbstractDataSource):
         catalog_end_str = var_info.extent.end_date
 
         if catalog_end_str is not None:
-            ds_end_excl = (
-                dt.datetime.strptime(catalog_end_str, "%Y-%m-%d")
-                + dt.timedelta(days=1)
-            )
+            ds_end_excl = dt.datetime.strptime(
+                catalog_end_str, "%Y-%m-%d"
+            ) + dt.timedelta(days=1)
             return ds_start, ds_end_excl
 
         _, ee_end = self._maybe_discover_ee_extent(var_info)
@@ -967,10 +976,9 @@ class GEE(LazyClientMixin, AbstractDataSource):
 
         # `now()` would be local-naive; the rest of the path is naive
         # UTC, so use a naive UTC value.
-        ds_end_excl = (
-            dt.datetime.now(dt.timezone.utc).replace(tzinfo=None)
-            + dt.timedelta(days=1)
-        )
+        ds_end_excl = dt.datetime.now(dt.timezone.utc).replace(
+            tzinfo=None
+        ) + dt.timedelta(days=1)
         return ds_start, ds_end_excl
 
     def _maybe_discover_ee_extent(
@@ -1013,9 +1021,12 @@ class GEE(LazyClientMixin, AbstractDataSource):
         """
         try:
             collection = ee.ImageCollection(var_info.id)
-            result = collection.reduceColumns(
-                ee.Reducer.minMax(), ["system:time_start"]
-            ).getInfo() or {}
+            result = (
+                collection.reduceColumns(
+                    ee.Reducer.minMax(), ["system:time_start"]
+                ).getInfo()
+                or {}
+            )
         except Exception as exc:  # noqa: BLE001 - downgrade EE errors to a warning
             logger.warning(
                 f"discover_extent: reduceColumns(minMax) failed for "

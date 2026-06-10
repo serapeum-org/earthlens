@@ -491,3 +491,29 @@ def crop_to_aoi(
     if geometry is not None:
         return dataset.crop(mask=geometry, touch=True)
     return dataset.crop(bbox=list(bbox), epsg=epsg, touch=touch)
+
+
+def mask_to_geometry(dataset: Any, space: Any, *, touch: bool = True) -> Any:
+    """Mask an already-bbox-clipped `Dataset` / `NetCDF` to a polygon, if any.
+
+    The counterpart to :func:`crop_to_aoi` for backends that have *already*
+    cropped to the bbox by another route — CHIRPS's in-array numpy clip, or
+    a server-side bbox (ECMWF's CDS `area`, a NetCDF cube). When `space`
+    carries a polygon `geometry`, the dataset is masked to that exact shape
+    via `crop(mask=...)`; otherwise it is returned unchanged.
+
+    Args:
+        dataset: A `pyramids.Dataset` / `NetCDF` (anything exposing `crop`).
+        space: A :class:`~earthlens.base.abstractdatasource.SpatialExtent`
+            (anything exposing an optional `geometry`).
+        touch: Whether to keep cells merely touching the polygon. Defaults
+            to `True`.
+
+    Returns:
+        The masked `Dataset` when a polygon `geometry` is present, else the
+        original `dataset` untouched.
+    """
+    geometry = getattr(space, "geometry", None)
+    if geometry is None:
+        return dataset
+    return dataset.crop(mask=geometry, touch=touch)

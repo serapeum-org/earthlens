@@ -7,6 +7,7 @@ into the private module layout.
 
 from __future__ import annotations
 
+from earthlens.base._dates import to_datetime
 from earthlens.base.abstractdatasource import (
     AbstractCatalog,
     AbstractDataSource,
@@ -16,7 +17,6 @@ from earthlens.base.abstractdatasource import (
     SpatialExtent,
     TemporalExtent,
 )
-from earthlens.base._dates import to_datetime
 from earthlens.base.auth import AbstractAuth, AuthenticationError
 from earthlens.base.leaves import FluxableLeaf
 from earthlens.base.providers import Provider, clear_providers_cache, load_providers
@@ -24,6 +24,7 @@ from earthlens.base.spatial import (
     METRES_PER_DEGREE,
     crop_to_aoi,
     estimate_pixel_dims,
+    mask_to_geometry,
     normalize_aoi,
     resolve_aoi,
 )
@@ -43,6 +44,7 @@ __all__ = [
     "TemporalExtent",
     "clear_providers_cache",
     "crop_to_aoi",
+    "mask_to_geometry",
     "estimate_pixel_dims",
     "load_providers",
     "normalize_aoi",
