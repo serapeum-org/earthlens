@@ -179,17 +179,15 @@ class CMEMS(AbstractDataSource):
         )
 
     def _initialize(self):
-        """Build the :class:`CmemsAuth` and run `configure()`.
+        """Build the :class:`CmemsAuth`; defer `configure()` to download.
 
-        Returns `None` so the parent class does not bind any
-        opaque object to `self.client` — the toolbox has no
-        per-instance client; credentials live in a config file that
-        every subsequent `copernicusmarine.subset()` call reads.
-
-        Raises:
-            AuthenticationError: When :meth:`CmemsAuth.configure`
-                fails (no credentials, rejected credentials, auth
-                server unreachable).
+        Returns `None` so the parent class does not bind any opaque
+        object to `self.client` — the toolbox has no per-instance client;
+        credentials live in a config file that every subsequent
+        `copernicusmarine.subset()` call reads. The actual
+        :meth:`CmemsAuth.configure` (which contacts the auth server) is
+        deferred to the first :meth:`download`, so constructing the
+        backend never authenticates and `_search()` stays offline.
         """
         creds = CmemsCredentials(
             username=self._service_username,
@@ -197,7 +195,6 @@ class CMEMS(AbstractDataSource):
             credentials_file=self._credentials_file,
         )
         self._auth = CmemsAuth(creds)
-        self._auth.configure()
         return None
 
     def _create_grid(self, lat_lim: list, lon_lim: list) -> SpatialExtent:
@@ -304,6 +301,10 @@ class CMEMS(AbstractDataSource):
                 GeoTIFF paths instead.
 
         Raises:
+            AuthenticationError: When :meth:`CmemsAuth.configure` fails
+                (no credentials, rejected credentials, or the auth server
+                unreachable) — now surfaced on first download rather than
+                at construction.
             NotImplementedError: When `aggregate` is set but the
                 installed pyramids has no `NetCDF.reduce`.
             RuntimeError: When **every** `(dataset_id, variables)`
@@ -313,6 +314,8 @@ class CMEMS(AbstractDataSource):
                 dataset ids and exception types, and the per-product
                 toolbox exceptions are logged at ERROR.
         """
+        # Authenticate lazily on first download (deferred out of __init__).
+        self._auth.configure()
         out_paths = self._api_via_search_fetch_with_progress(progress_bar)
 
         if aggregate is not None:

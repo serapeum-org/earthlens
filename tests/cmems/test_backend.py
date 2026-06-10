@@ -208,13 +208,19 @@ class TestCMEMSConstruction:
             f"got {cmems_instance.time.resolution!r}"
         )
 
-    def test_init_authenticates_once(self, fake_cmems: _FakeCmems, cmems_instance: CMEMS):
-        """Construction triggers exactly one toolbox login call."""
-        assert len(fake_cmems.login_calls) == 1, (
-            f"expected 1 login call during construction, got {len(fake_cmems.login_calls)}"
+    def test_construction_defers_authentication(
+        self, fake_cmems: _FakeCmems, cmems_instance: CMEMS
+    ):
+        """Construction stores the auth offline but does not log in."""
+        assert len(fake_cmems.login_calls) == 0, (
+            f"construction must not authenticate, got {len(fake_cmems.login_calls)}"
         )
         assert cmems_instance._auth is not None, "CmemsAuth must be stored on the instance"
         assert isinstance(cmems_instance._auth, CmemsAuth)
+        cmems_instance._auth.configure()
+        assert len(fake_cmems.login_calls) == 1, "first configure() authenticates once"
+        cmems_instance._auth.configure()
+        assert len(fake_cmems.login_calls) == 1, "configure() is idempotent"
 
 
 @pytest.mark.cmems
