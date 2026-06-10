@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -11758,6 +11758,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <span class="kn">from</span><span class="w"> </span><span class="nn">loguru</span><span class="w"> </span><span class="kn">import</span> <span class="n">logger</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">IPython.display</span><span class="w"> </span><span class="kn">import</span> <span class="n">Image</span><span class="p">,</span> <span class="n">display</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">AuthenticationError</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">DatasetCollection</span>   <span class="c1"># pyramids' own IO + plotting</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">scipy</span><span class="w"> </span><span class="kn">import</span> <span class="n">ndimage</span>
 
@@ -11773,9 +11774,10 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
         <span class="n">path</span><span class="o">=</span><span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">(),</span> <span class="n">scale</span><span class="o">=</span><span class="n">scale</span><span class="p">,</span> <span class="n">reducer</span><span class="o">=</span><span class="n">reducer</span><span class="p">,</span>
         <span class="n">service_account</span><span class="o">=</span><span class="n">SERVICE_ACCOUNT</span><span class="p">,</span> <span class="n">service_key</span><span class="o">=</span><span class="n">SERVICE_KEY</span><span class="p">)</span>
     <span class="k">try</span><span class="p">:</span>
-        <span class="n">p</span> <span class="o">=</span> <span class="n">el</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">progress_bar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>  <span class="c1"># noqa: BLE001 - needs GEE credentials</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">"download skipped:"</span><span class="p">,</span> <span class="n">exc</span><span class="p">);</span> <span class="k">return</span> <span class="kc">None</span>
+        <span class="n">el</span><span class="o">.</span><span class="n">authenticate</span><span class="p">()</span>                 <span class="c1"># only auth can fail here</span>
+    <span class="k">except</span> <span class="n">AuthenticationError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">"auth skipped:"</span><span class="p">,</span> <span class="n">exc</span><span class="p">);</span> <span class="k">return</span> <span class="kc">None</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="n">el</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">progress_bar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>   <span class="c1"># real errors now surface</span>
     <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="k">if</span> <span class="n">p</span> <span class="k">else</span> <span class="kc">None</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">read</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
@@ -11801,6 +11803,7 @@ import numpy as np, matplotlib.pyplot as plt
 from loguru import logger
 from IPython.display import Image, display
 from earthlens import EarthLens
+from earthlens.base import AuthenticationError
 from pyramids.dataset import Dataset, DatasetCollection   # pyramids' own IO + plotting
 from scipy import ndimage
 
@@ -11816,9 +11819,10 @@ def grab(collection, aoi, start, end, bands, scale, reducer="median"):
         path=tempfile.mkdtemp(), scale=scale, reducer=reducer,
         service_account=SERVICE_ACCOUNT, service_key=SERVICE_KEY)
     try:
-        p = el.download(progress_bar=False)
-    except Exception as exc:  # noqa: BLE001 - needs GEE credentials
-        print("download skipped:", exc); return None
+        el.authenticate()                 # only auth can fail here
+    except AuthenticationError as exc:
+        print("auth skipped:", exc); return None
+    p = el.download(progress_bar=False)   # real errors now surface
     return str(p[0]) if p else None
 
 def read(path):
