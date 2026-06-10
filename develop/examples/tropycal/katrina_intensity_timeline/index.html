@@ -11560,7 +11560,8 @@ OUT_DIR.mkdir(exist_ok=True)</div>
         <span class="n">data_source</span><span class="o">=</span><span class="s1">'tropycal'</span><span class="p">,</span>
         <span class="n">start</span><span class="o">=</span><span class="s1">'2005-08-23'</span><span class="p">,</span>
         <span class="n">end</span><span class="o">=</span><span class="s1">'2005-08-31'</span><span class="p">,</span>
-        <span class="n">aoi</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">95.0</span><span class="p">,</span> <span class="mf">15.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">60.0</span><span class="p">,</span> <span class="mf">35.0</span><span class="p">],</span>
+        <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">15.0</span><span class="p">,</span> <span class="mf">35.0</span><span class="p">],</span>
+        <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">95.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">60.0</span><span class="p">],</span>
         <span class="n">source</span><span class="o">=</span><span class="s1">'hurdat'</span><span class="p">,</span>
         <span class="n">path</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">OUT_DIR</span><span class="p">),</span>
     <span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">progress_bar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
@@ -11577,7 +11578,8 @@ try:
         data_source='tropycal',
         start='2005-08-23',
         end='2005-08-31',
-        aoi=[-95.0, 15.0, -60.0, 35.0],
+        lat_lim=[15.0, 35.0],
+        lon_lim=[-95.0, -60.0],
         source='hurdat',
         path=str(OUT_DIR),
     ).download(progress_bar=False)

@@ -11708,14 +11708,17 @@ variability that monthly aggregation would smooth out.</p>
 
 <span class="n">earthlens</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
     <span class="n">data_source</span><span class="o">=</span><span class="s2">"ecmwf"</span><span class="p">,</span>
-    <span class="n">cadence</span><span class="o">=</span><span class="s2">"daily"</span><span class="p">,</span>
+    <span class="n">temporal_resolution</span><span class="o">=</span><span class="s2">"daily"</span><span class="p">,</span>
     <span class="n">start</span><span class="o">=</span><span class="s2">"2022-06-01"</span><span class="p">,</span>
     <span class="n">end</span><span class="o">=</span><span class="s2">"2022-08-31"</span><span class="p">,</span>
-    <span class="n">dataset</span><span class="o">=</span><span class="s2">"reanalysis-era5-single-levels"</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="p">[</span>
+    <span class="n">variables</span><span class="o">=</span><span class="p">{</span>
+        <span class="s2">"reanalysis-era5-single-levels"</span><span class="p">:</span> <span class="p">[</span>
             <span class="s2">"2m-temperature"</span><span class="p">,</span>
             <span class="s2">"2m-dewpoint-temperature"</span><span class="p">,</span>
         <span class="p">],</span>
-    <span class="n">aoi</span><span class="o">=</span><span class="p">[</span><span class="mf">23.0</span><span class="p">,</span> <span class="mf">37.0</span><span class="p">,</span> <span class="mf">24.0</span><span class="p">,</span> <span class="mf">38.0</span><span class="p">],</span>
+    <span class="p">},</span>
+    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">37.0</span><span class="p">,</span> <span class="mf">38.0</span><span class="p">],</span>
+    <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">23.0</span><span class="p">,</span> <span class="mf">24.0</span><span class="p">],</span>
     <span class="n">path</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">OUT</span><span class="p">),</span>
 <span class="p">)</span>
 <span class="n">earthlens</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">aggregate</span><span class="o">=</span><span class="n">AggregationConfig</span><span class="p">(</span><span class="n">freq</span><span class="o">=</span><span class="s2">"1D"</span><span class="p">,</span> <span class="n">op</span><span class="o">=</span><span class="s2">"mean"</span><span class="p">))</span>
@@ -11728,14 +11731,17 @@ OUT.mkdir(parents=True, exist_ok=True)
 
 earthlens = EarthLens(
     data_source="ecmwf",
-    cadence="daily",
+    temporal_resolution="daily",
     start="2022-06-01",
     end="2022-08-31",
-    dataset="reanalysis-era5-single-levels", variables=[
+    variables={
+        "reanalysis-era5-single-levels": [
             "2m-temperature",
             "2m-dewpoint-temperature",
         ],
-    aoi=[23.0, 37.0, 24.0, 38.0],
+    },
+    lat_lim=[37.0, 38.0],
+    lon_lim=[23.0, 24.0],
     path=str(OUT),
 )
 earthlens.download(aggregate=AggregationConfig(freq="1D", op="mean"))</div>
@@ -11798,9 +11804,9 @@ earthlens.download(aggregate=AggregationConfig(freq="1D", op="mean"))</div>
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jupyter-widgets jp-OutputArea-output" id="84bb2bfe-f29f-4221-8b04-5c84add1e6c3" tabindex="0">
+<div class="jupyter-widgets jp-OutputArea-output" id="4743c4ef-c178-44ed-8cc6-f716e0890a04" tabindex="0">
 <script type="text/javascript">
-var element = document.getElementById('84bb2bfe-f29f-4221-8b04-5c84add1e6c3');
+var element = document.getElementById('4743c4ef-c178-44ed-8cc6-f716e0890a04');
 </script>
 <script type="application/vnd.jupyter.widget-view+json">
 {"model_id": "79b1fd9f446a477194495e0f7074b8dc", "version_major": 2, "version_minor": 0}
@@ -11893,9 +11899,9 @@ var element = document.getElementById('84bb2bfe-f29f-4221-8b04-5c84add1e6c3');
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jupyter-widgets jp-OutputArea-output" id="ae38fa3f-5e14-48aa-b1d6-c857a3968c4a" tabindex="0">
+<div class="jupyter-widgets jp-OutputArea-output" id="c2b60935-9492-4d1b-b47c-879ed24b3322" tabindex="0">
 <script type="text/javascript">
-var element = document.getElementById('ae38fa3f-5e14-48aa-b1d6-c857a3968c4a');
+var element = document.getElementById('c2b60935-9492-4d1b-b47c-879ed24b3322');
 </script>
 <script type="application/vnd.jupyter.widget-view+json">
 {"model_id": "cf3c23e4f4664a2d8a79b43efc7e260c", "version_major": 2, "version_minor": 0}

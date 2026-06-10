@@ -11709,15 +11709,18 @@ Engadine area. Range Oct 2021–Jun 2022 covers a full snow season.</p>
 
 <span class="n">earthlens</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
     <span class="n">data_source</span><span class="o">=</span><span class="s2">"ecmwf"</span><span class="p">,</span>
-    <span class="n">cadence</span><span class="o">=</span><span class="s2">"monthly"</span><span class="p">,</span>
+    <span class="n">temporal_resolution</span><span class="o">=</span><span class="s2">"monthly"</span><span class="p">,</span>
     <span class="n">start</span><span class="o">=</span><span class="s2">"2021-10-01"</span><span class="p">,</span>
     <span class="n">end</span><span class="o">=</span><span class="s2">"2022-06-01"</span><span class="p">,</span>
-    <span class="n">dataset</span><span class="o">=</span><span class="s2">"reanalysis-era5-land-monthly-means"</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="p">[</span>
+    <span class="n">variables</span><span class="o">=</span><span class="p">{</span>
+        <span class="s2">"reanalysis-era5-land-monthly-means"</span><span class="p">:</span> <span class="p">[</span>
             <span class="s2">"snow-depth"</span><span class="p">,</span>
             <span class="s2">"snow-depth-water-equivalent"</span><span class="p">,</span>
             <span class="s2">"2m-temperature"</span><span class="p">,</span>
         <span class="p">],</span>
-    <span class="n">aoi</span><span class="o">=</span><span class="p">[</span><span class="mf">10.0</span><span class="p">,</span> <span class="mf">46.0</span><span class="p">,</span> <span class="mf">11.0</span><span class="p">,</span> <span class="mf">47.0</span><span class="p">],</span>
+    <span class="p">},</span>
+    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">46.0</span><span class="p">,</span> <span class="mf">47.0</span><span class="p">],</span>
+    <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">10.0</span><span class="p">,</span> <span class="mf">11.0</span><span class="p">],</span>
     <span class="n">path</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">OUT</span><span class="p">),</span>
 <span class="p">)</span>
 <span class="n">earthlens</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">aggregate</span><span class="o">=</span><span class="n">AggregationConfig</span><span class="p">(</span><span class="n">freq</span><span class="o">=</span><span class="s2">"1MS"</span><span class="p">,</span> <span class="n">op</span><span class="o">=</span><span class="s2">"auto"</span><span class="p">,</span> <span class="n">cell_size</span><span class="o">=</span><span class="mf">0.1</span><span class="p">))</span>
@@ -11730,15 +11733,18 @@ OUT.mkdir(parents=True, exist_ok=True)
 
 earthlens = EarthLens(
     data_source="ecmwf",
-    cadence="monthly",
+    temporal_resolution="monthly",
     start="2021-10-01",
     end="2022-06-01",
-    dataset="reanalysis-era5-land-monthly-means", variables=[
+    variables={
+        "reanalysis-era5-land-monthly-means": [
             "snow-depth",
             "snow-depth-water-equivalent",
             "2m-temperature",
         ],
-    aoi=[10.0, 46.0, 11.0, 47.0],
+    },
+    lat_lim=[46.0, 47.0],
+    lon_lim=[10.0, 11.0],
     path=str(OUT),
 )
 earthlens.download(aggregate=AggregationConfig(freq="1MS", op="auto", cell_size=0.1))</div>
@@ -11794,9 +11800,9 @@ earthlens.download(aggregate=AggregationConfig(freq="1MS", op="auto", cell_size=
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jupyter-widgets jp-OutputArea-output" id="bcab11a1-103e-4093-8a62-1b53aaa34cf5" tabindex="0">
+<div class="jupyter-widgets jp-OutputArea-output" id="5e2ca717-d41c-4b1b-a2d7-941b5660125c" tabindex="0">
 <script type="text/javascript">
-var element = document.getElementById('bcab11a1-103e-4093-8a62-1b53aaa34cf5');
+var element = document.getElementById('5e2ca717-d41c-4b1b-a2d7-941b5660125c');
 </script>
 <script type="application/vnd.jupyter.widget-view+json">
 {"model_id": "ee948b099ac64f8fbcc6c4a81c51ff7f", "version_major": 2, "version_minor": 0}
@@ -11896,9 +11902,9 @@ var element = document.getElementById('bcab11a1-103e-4093-8a62-1b53aaa34cf5');
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jupyter-widgets jp-OutputArea-output" id="f4c9e9bd-2f72-4873-b360-474c251051f4" tabindex="0">
+<div class="jupyter-widgets jp-OutputArea-output" id="a74237ba-944a-4514-9d86-f98605dee9b5" tabindex="0">
 <script type="text/javascript">
-var element = document.getElementById('f4c9e9bd-2f72-4873-b360-474c251051f4');
+var element = document.getElementById('a74237ba-944a-4514-9d86-f98605dee9b5');
 </script>
 <script type="application/vnd.jupyter.widget-view+json">
 {"model_id": "7638cce2fb7b4778991701305789c126", "version_major": 2, "version_minor": 0}
@@ -11991,9 +11997,9 @@ var element = document.getElementById('f4c9e9bd-2f72-4873-b360-474c251051f4');
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jupyter-widgets jp-OutputArea-output" id="f7128a17-6c76-4f5d-8645-97fbc920e7e3" tabindex="0">
+<div class="jupyter-widgets jp-OutputArea-output" id="aa4fbe56-538a-4501-b95f-fb027a515a00" tabindex="0">
 <script type="text/javascript">
-var element = document.getElementById('f7128a17-6c76-4f5d-8645-97fbc920e7e3');
+var element = document.getElementById('aa4fbe56-538a-4501-b95f-fb027a515a00');
 </script>
 <script type="application/vnd.jupyter.widget-view+json">
 {"model_id": "004bcee36b3543d0b20be2daf4150849", "version_major": 2, "version_minor": 0}

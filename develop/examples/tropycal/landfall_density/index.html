@@ -11596,7 +11596,8 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
         <span class="n">data_source</span><span class="o">=</span><span class="s1">'tropycal'</span><span class="p">,</span>
         <span class="n">start</span><span class="o">=</span><span class="s1">'1980-01-01'</span><span class="p">,</span>
         <span class="n">end</span><span class="o">=</span><span class="s1">'2020-12-31'</span><span class="p">,</span>
-        <span class="n">aoi</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">100.0</span><span class="p">,</span> <span class="mf">20.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">70.0</span><span class="p">,</span> <span class="mf">40.0</span><span class="p">],</span>
+        <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">20.0</span><span class="p">,</span> <span class="mf">40.0</span><span class="p">],</span>
+        <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">100.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">70.0</span><span class="p">],</span>
         <span class="n">source</span><span class="o">=</span><span class="s1">'ibtracs'</span><span class="p">,</span>
         <span class="n">path</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">OUT_DIR</span><span class="p">),</span>
     <span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">progress_bar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
@@ -11618,7 +11619,8 @@ try:
         data_source='tropycal',
         start='1980-01-01',
         end='2020-12-31',
-        aoi=[-100.0, 20.0, -70.0, 40.0],
+        lat_lim=[20.0, 40.0],
+        lon_lim=[-100.0, -70.0],
         source='ibtracs',
         path=str(OUT_DIR),
     ).download(progress_bar=False)

@@ -11574,7 +11574,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </style>
 <!-- End of mermaid configuration --><div class="jupyter-wrapper">
 <div class="jp-Notebook" data-jp-theme-light="true" data-jp-theme-name="JupyterLab Light">
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=e0f60353">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=ff634806">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -11585,7 +11585,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=b241adbe">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=2b335e66">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -11622,7 +11622,7 @@ print("MPC S2 id:", cat.resolve("planetary-computer", "sentinel-2-l2a"))</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=4dca6e24">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=27ea411b">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -11633,7 +11633,7 @@ print("MPC S2 id:", cat.resolve("planetary-computer", "sentinel-2-l2a"))</div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=f653a121">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=53a3b4a7">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -11658,7 +11658,7 @@ print("MPC S2 id:", cat.resolve("planetary-computer", "sentinel-2-l2a"))</div>
 <span class="k">try</span><span class="p">:</span>
     <span class="n">mpc</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
         <span class="n">data_source</span><span class="o">=</span><span class="s2">"planetary-computer"</span><span class="p">,</span>
-        <span class="n">dataset</span><span class="o">=</span><span class="s2">"sentinel-2-l2a"</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">"B04"</span><span class="p">,</span> <span class="s2">"B03"</span><span class="p">,</span> <span class="s2">"B02"</span><span class="p">],</span>
+        <span class="n">variables</span><span class="o">=</span><span class="p">{</span><span class="s2">"sentinel-2-l2a"</span><span class="p">:</span> <span class="p">[</span><span class="s2">"B04"</span><span class="p">,</span> <span class="s2">"B03"</span><span class="p">,</span> <span class="s2">"B02"</span><span class="p">]},</span>
         <span class="n">path</span><span class="o">=</span><span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">(),</span> <span class="n">max_items</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="o">**</span><span class="n">aoi</span><span class="p">,</span>
     <span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
 <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>  <span class="c1"># noqa: BLE001 - stays runnable offline</span>
@@ -11673,7 +11673,7 @@ aoi = dict(lat_lim=[40.40, 40.45], lon_lim=[-3.72, -3.67], start="2024-06-01", e
 try:
     mpc = EarthLens(
         data_source="planetary-computer",
-        dataset="sentinel-2-l2a", variables=["B04", "B03", "B02"],
+        variables={"sentinel-2-l2a": ["B04", "B03", "B02"]},
         path=tempfile.mkdtemp(), max_items=1, **aoi,
     ).download()
 except Exception as exc:  # noqa: BLE001 - stays runnable offline
@@ -11686,7 +11686,7 @@ except Exception as exc:  # noqa: BLE001 - stays runnable offline
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=521f0414">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=c5913c29">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>

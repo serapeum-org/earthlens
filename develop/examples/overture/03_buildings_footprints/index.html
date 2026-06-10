@@ -11549,8 +11549,9 @@ OUT = "_overture_out"</div>
 
 <span class="n">paths</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
     <span class="n">data_source</span><span class="o">=</span><span class="s2">"overture"</span><span class="p">,</span>
-    <span class="n">dataset</span><span class="o">=</span><span class="s2">"buildings"</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="p">[],</span>
-    <span class="n">aoi</span><span class="o">=</span><span class="p">[</span><span class="n">LON_LIM</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">LAT_LIM</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">LON_LIM</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">LAT_LIM</span><span class="p">[</span><span class="mi">1</span><span class="p">]],</span>
+    <span class="n">variables</span><span class="o">=</span><span class="p">{</span><span class="s2">"buildings"</span><span class="p">:</span> <span class="p">[]},</span>
+    <span class="n">lat_lim</span><span class="o">=</span><span class="n">LAT_LIM</span><span class="p">,</span>
+    <span class="n">lon_lim</span><span class="o">=</span><span class="n">LON_LIM</span><span class="p">,</span>
     <span class="n">path</span><span class="o">=</span><span class="n">OUT</span><span class="p">,</span>
     <span class="n">file_format</span><span class="o">=</span><span class="s2">"geoparquet"</span><span class="p">,</span>
 <span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
@@ -11560,8 +11561,9 @@ OUT = "_overture_out"</div>
 
 paths = EarthLens(
     data_source="overture",
-    dataset="buildings", variables=[],
-    aoi=[LON_LIM[0], LAT_LIM[0], LON_LIM[1], LAT_LIM[1]],
+    variables={"buildings": []},
+    lat_lim=LAT_LIM,
+    lon_lim=LON_LIM,
     path=OUT,
     file_format="geoparquet",
 ).download()
@@ -11799,8 +11801,8 @@ ax.set_axis_off()</div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="k">try</span><span class="p">:</span>
     <span class="n">EarthLens</span><span class="p">(</span>
         <span class="n">data_source</span><span class="o">=</span><span class="s2">"overture"</span><span class="p">,</span>
-        <span class="n">dataset</span><span class="o">=</span><span class="s2">"buildings"</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="p">[],</span>
-        <span class="n">aoi</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">180</span><span class="p">,</span> <span class="o">-</span><span class="mi">90</span><span class="p">,</span> <span class="mi">180</span><span class="p">,</span> <span class="mi">90</span><span class="p">],</span>
+        <span class="n">variables</span><span class="o">=</span><span class="p">{</span><span class="s2">"buildings"</span><span class="p">:</span> <span class="p">[]},</span>
+        <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">90</span><span class="p">,</span> <span class="mi">90</span><span class="p">],</span> <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">180</span><span class="p">,</span> <span class="mi">180</span><span class="p">],</span>
         <span class="n">path</span><span class="o">=</span><span class="n">OUT</span><span class="p">,</span>
     <span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
 <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
@@ -11809,8 +11811,8 @@ ax.set_axis_off()</div>
 <div class="clipboard-copy-txt" id="cell-5">try:
     EarthLens(
         data_source="overture",
-        dataset="buildings", variables=[],
-        aoi=[-180, -90, 180, 90],
+        variables={"buildings": []},
+        lat_lim=[-90, 90], lon_lim=[-180, 180],
         path=OUT,
     ).download()
 except ValueError as exc:

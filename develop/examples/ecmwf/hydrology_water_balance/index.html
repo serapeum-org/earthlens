@@ -11819,15 +11819,18 @@ request body skips the <code>day</code> field. The aggregation runs at <code>1MS
 
 <span class="n">earthlens</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
     <span class="n">data_source</span><span class="o">=</span><span class="s2">"ecmwf"</span><span class="p">,</span>
-    <span class="n">cadence</span><span class="o">=</span><span class="s2">"monthly"</span><span class="p">,</span>
+    <span class="n">temporal_resolution</span><span class="o">=</span><span class="s2">"monthly"</span><span class="p">,</span>
     <span class="n">start</span><span class="o">=</span><span class="s2">"2022-01-01"</span><span class="p">,</span>
     <span class="n">end</span><span class="o">=</span><span class="s2">"2022-12-01"</span><span class="p">,</span>
-    <span class="n">dataset</span><span class="o">=</span><span class="s2">"reanalysis-era5-single-levels-monthly-means"</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="p">[</span>
+    <span class="n">variables</span><span class="o">=</span><span class="p">{</span>
+        <span class="s2">"reanalysis-era5-single-levels-monthly-means"</span><span class="p">:</span> <span class="p">[</span>
             <span class="s2">"total-precipitation"</span><span class="p">,</span>
             <span class="s2">"evaporation"</span><span class="p">,</span>
             <span class="s2">"surface-runoff"</span><span class="p">,</span>
         <span class="p">],</span>
-    <span class="n">aoi</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">75.0</span><span class="p">,</span> <span class="mf">4.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">74.0</span><span class="p">,</span> <span class="mf">5.0</span><span class="p">],</span>
+    <span class="p">},</span>
+    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">4.0</span><span class="p">,</span> <span class="mf">5.0</span><span class="p">],</span>
+    <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">75.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">74.0</span><span class="p">],</span>
     <span class="n">path</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">OUT</span><span class="p">),</span>
 <span class="p">)</span>
 <span class="n">earthlens</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">aggregate</span><span class="o">=</span><span class="n">AggregationConfig</span><span class="p">(</span><span class="n">freq</span><span class="o">=</span><span class="s2">"1MS"</span><span class="p">,</span> <span class="n">op</span><span class="o">=</span><span class="s2">"auto"</span><span class="p">))</span>
@@ -11840,15 +11843,18 @@ OUT.mkdir(parents=True, exist_ok=True)
 
 earthlens = EarthLens(
     data_source="ecmwf",
-    cadence="monthly",
+    temporal_resolution="monthly",
     start="2022-01-01",
     end="2022-12-01",
-    dataset="reanalysis-era5-single-levels-monthly-means", variables=[
+    variables={
+        "reanalysis-era5-single-levels-monthly-means": [
             "total-precipitation",
             "evaporation",
             "surface-runoff",
         ],
-    aoi=[-75.0, 4.0, -74.0, 5.0],
+    },
+    lat_lim=[4.0, 5.0],
+    lon_lim=[-75.0, -74.0],
     path=str(OUT),
 )
 earthlens.download(aggregate=AggregationConfig(freq="1MS", op="auto"))</div>
@@ -11904,9 +11910,9 @@ earthlens.download(aggregate=AggregationConfig(freq="1MS", op="auto"))</div>
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jupyter-widgets jp-OutputArea-output" id="a65177b2-0ce8-4166-96b5-d5433d610360" tabindex="0">
+<div class="jupyter-widgets jp-OutputArea-output" id="f761b062-e94c-435d-b371-156964b6856c" tabindex="0">
 <script type="text/javascript">
-var element = document.getElementById('a65177b2-0ce8-4166-96b5-d5433d610360');
+var element = document.getElementById('f761b062-e94c-435d-b371-156964b6856c');
 </script>
 <script type="application/vnd.jupyter.widget-view+json">
 {"model_id": "2512d5ed1a4246e48481d64288c8e22b", "version_major": 2, "version_minor": 0}
@@ -11985,9 +11991,9 @@ var element = document.getElementById('a65177b2-0ce8-4166-96b5-d5433d610360');
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jupyter-widgets jp-OutputArea-output" id="f575e9c6-e35d-49c0-a9e3-e86e3efd8f52" tabindex="0">
+<div class="jupyter-widgets jp-OutputArea-output" id="36cf3921-2247-4ee3-a046-a0a305776814" tabindex="0">
 <script type="text/javascript">
-var element = document.getElementById('f575e9c6-e35d-49c0-a9e3-e86e3efd8f52');
+var element = document.getElementById('36cf3921-2247-4ee3-a046-a0a305776814');
 </script>
 <script type="application/vnd.jupyter.widget-view+json">
 {"model_id": "8e308878db0e492bb82b80a8d5cf9f60", "version_major": 2, "version_minor": 0}
@@ -12073,9 +12079,9 @@ var element = document.getElementById('f575e9c6-e35d-49c0-a9e3-e86e3efd8f52');
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jupyter-widgets jp-OutputArea-output" id="4b7491b3-2238-47e8-b5f7-9854d4c42428" tabindex="0">
+<div class="jupyter-widgets jp-OutputArea-output" id="ddf6faf2-a4d4-4051-880c-24fb5a7d5503" tabindex="0">
 <script type="text/javascript">
-var element = document.getElementById('4b7491b3-2238-47e8-b5f7-9854d4c42428');
+var element = document.getElementById('ddf6faf2-a4d4-4051-880c-24fb5a7d5503');
 </script>
 <script type="application/vnd.jupyter.widget-view+json">
 {"model_id": "38d6fb386d0e47e0925330ebcebcce6e", "version_major": 2, "version_minor": 0}

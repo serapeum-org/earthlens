@@ -11813,9 +11813,10 @@ backend via its <code>_LazyRegistry</code>; the remaining kwargs forward verbati
     <span class="n">data_source</span><span class="o">=</span><span class="s1">'gee'</span><span class="p">,</span>
     <span class="n">start</span><span class="o">=</span><span class="s1">'2020-06-01'</span><span class="p">,</span>
     <span class="n">end</span><span class="o">=</span><span class="s1">'2020-08-31'</span><span class="p">,</span>
-    <span class="n">cadence</span><span class="o">=</span><span class="s1">'monthly'</span><span class="p">,</span>
-    <span class="n">dataset</span><span class="o">=</span><span class="s1">'UCSB-CHG/CHIRPS/DAILY'</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">'precipitation'</span><span class="p">],</span>
-    <span class="n">aoi</span><span class="o">=</span><span class="p">[</span><span class="mf">30.0</span><span class="p">,</span> <span class="mf">28.0</span><span class="p">,</span> <span class="mf">34.0</span><span class="p">,</span> <span class="mf">32.0</span><span class="p">],</span>
+    <span class="n">temporal_resolution</span><span class="o">=</span><span class="s1">'monthly'</span><span class="p">,</span>
+    <span class="n">variables</span><span class="o">=</span><span class="p">{</span><span class="s1">'UCSB-CHG/CHIRPS/DAILY'</span><span class="p">:</span> <span class="p">[</span><span class="s1">'precipitation'</span><span class="p">]},</span>
+    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">28.0</span><span class="p">,</span> <span class="mf">32.0</span><span class="p">],</span>
+    <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">30.0</span><span class="p">,</span> <span class="mf">34.0</span><span class="p">],</span>
     <span class="n">path</span><span class="o">=</span><span class="s1">'out/quickstart'</span><span class="p">,</span>
     <span class="n">scale</span><span class="o">=</span><span class="mi">5566</span><span class="p">,</span>
     <span class="n">service_account</span><span class="o">=</span><span class="n">SERVICE_ACCOUNT</span><span class="p">,</span>
@@ -11829,9 +11830,10 @@ backend via its <code>_LazyRegistry</code>; the remaining kwargs forward verbati
     data_source='gee',
     start='2020-06-01',
     end='2020-08-31',
-    cadence='monthly',
-    dataset='UCSB-CHG/CHIRPS/DAILY', variables=['precipitation'],
-    aoi=[30.0, 28.0, 34.0, 32.0],
+    temporal_resolution='monthly',
+    variables={'UCSB-CHG/CHIRPS/DAILY': ['precipitation']},
+    lat_lim=[28.0, 32.0],
+    lon_lim=[30.0, 34.0],
     path='out/quickstart',
     scale=5566,
     service_account=SERVICE_ACCOUNT,

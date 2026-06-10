@@ -11800,13 +11800,16 @@ seasonal cycle and inter-annual variability.</p>
 
 <span class="n">earthlens</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
     <span class="n">data_source</span><span class="o">=</span><span class="s2">"ecmwf"</span><span class="p">,</span>
-    <span class="n">cadence</span><span class="o">=</span><span class="s2">"monthly"</span><span class="p">,</span>
+    <span class="n">temporal_resolution</span><span class="o">=</span><span class="s2">"monthly"</span><span class="p">,</span>
     <span class="n">start</span><span class="o">=</span><span class="s2">"2021-01-01"</span><span class="p">,</span>
     <span class="n">end</span><span class="o">=</span><span class="s2">"2022-12-01"</span><span class="p">,</span>
-    <span class="n">dataset</span><span class="o">=</span><span class="s2">"reanalysis-era5-single-levels-monthly-means"</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="p">[</span>
+    <span class="n">variables</span><span class="o">=</span><span class="p">{</span>
+        <span class="s2">"reanalysis-era5-single-levels-monthly-means"</span><span class="p">:</span> <span class="p">[</span>
             <span class="s2">"surface-solar-radiation-downwards"</span><span class="p">,</span>
         <span class="p">],</span>
-    <span class="n">aoi</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">6.0</span><span class="p">,</span> <span class="mf">37.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">5.0</span><span class="p">,</span> <span class="mf">38.0</span><span class="p">],</span>
+    <span class="p">},</span>
+    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">37.0</span><span class="p">,</span> <span class="mf">38.0</span><span class="p">],</span>
+    <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">6.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">5.0</span><span class="p">],</span>
     <span class="n">path</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">OUT</span><span class="p">),</span>
 <span class="p">)</span>
 <span class="n">earthlens</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">aggregate</span><span class="o">=</span><span class="n">AggregationConfig</span><span class="p">(</span><span class="n">freq</span><span class="o">=</span><span class="s2">"1MS"</span><span class="p">,</span> <span class="n">op</span><span class="o">=</span><span class="s2">"auto"</span><span class="p">))</span>
@@ -11819,13 +11822,16 @@ OUT.mkdir(parents=True, exist_ok=True)
 
 earthlens = EarthLens(
     data_source="ecmwf",
-    cadence="monthly",
+    temporal_resolution="monthly",
     start="2021-01-01",
     end="2022-12-01",
-    dataset="reanalysis-era5-single-levels-monthly-means", variables=[
+    variables={
+        "reanalysis-era5-single-levels-monthly-means": [
             "surface-solar-radiation-downwards",
         ],
-    aoi=[-6.0, 37.0, -5.0, 38.0],
+    },
+    lat_lim=[37.0, 38.0],
+    lon_lim=[-6.0, -5.0],
     path=str(OUT),
 )
 earthlens.download(aggregate=AggregationConfig(freq="1MS", op="auto"))</div>
@@ -11881,9 +11887,9 @@ earthlens.download(aggregate=AggregationConfig(freq="1MS", op="auto"))</div>
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jupyter-widgets jp-OutputArea-output" id="e805b28e-fc9d-4efa-9184-eb4f4204724e" tabindex="0">
+<div class="jupyter-widgets jp-OutputArea-output" id="fc70a6e6-6b83-44da-9741-8b9c99e3362a" tabindex="0">
 <script type="text/javascript">
-var element = document.getElementById('e805b28e-fc9d-4efa-9184-eb4f4204724e');
+var element = document.getElementById('fc70a6e6-6b83-44da-9741-8b9c99e3362a');
 </script>
 <script type="application/vnd.jupyter.widget-view+json">
 {"model_id": "e6b1f0ba16424235b9a11248e8b18ff4", "version_major": 2, "version_minor": 0}

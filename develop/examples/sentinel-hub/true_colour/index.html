@@ -11709,9 +11709,9 @@ def run_or_skip(facade, **download_kwargs):
 
 <span class="n">facade</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
     <span class="n">data_source</span><span class="o">=</span><span class="s1">'sentinel-hub'</span><span class="p">,</span>
-    <span class="n">dataset</span><span class="o">=</span><span class="s1">'sentinel-2-l2a-true-colour'</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="p">[],</span>
+    <span class="n">variables</span><span class="o">=</span><span class="p">{</span><span class="s1">'sentinel-2-l2a-true-colour'</span><span class="p">:</span> <span class="p">[]},</span>
     <span class="n">start</span><span class="o">=</span><span class="s1">'2020-07-01'</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s1">'2020-07-15'</span><span class="p">,</span>
-    <span class="n">aoi</span><span class="o">=</span><span class="p">[</span><span class="mf">2.34</span><span class="p">,</span> <span class="mf">48.85</span><span class="p">,</span> <span class="mf">2.36</span><span class="p">,</span> <span class="mf">48.87</span><span class="p">],</span>
+    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">48.85</span><span class="p">,</span> <span class="mf">48.87</span><span class="p">],</span> <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">2.34</span><span class="p">,</span> <span class="mf">2.36</span><span class="p">],</span>
     <span class="n">path</span><span class="o">=</span><span class="s1">'data/sh-true-colour'</span><span class="p">,</span> <span class="n">resolution</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
     <span class="n">mosaicking_order</span><span class="o">=</span><span class="s1">'leastCC'</span><span class="p">,</span>
 <span class="p">)</span>
@@ -11722,9 +11722,9 @@ def run_or_skip(facade, **download_kwargs):
 
 facade = EarthLens(
     data_source='sentinel-hub',
-    dataset='sentinel-2-l2a-true-colour', variables=[],
+    variables={'sentinel-2-l2a-true-colour': []},
     start='2020-07-01', end='2020-07-15',
-    aoi=[2.34, 48.85, 2.36, 48.87],
+    lat_lim=[48.85, 48.87], lon_lim=[2.34, 2.36],
     path='data/sh-true-colour', resolution=10,
     mosaicking_order='leastCC',
 )

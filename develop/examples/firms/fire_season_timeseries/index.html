@@ -11680,7 +11680,8 @@ print('FIRMS_MAP_KEY set:', HAS_KEY)
             <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">'VIIRS_SNPP_NRT'</span><span class="p">],</span>
             <span class="n">start</span><span class="o">=</span><span class="n">START</span><span class="p">,</span>
             <span class="n">end</span><span class="o">=</span><span class="n">END</span><span class="p">,</span>
-            <span class="n">aoi</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">124.0</span><span class="p">,</span> <span class="mf">36.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">118.0</span><span class="p">,</span> <span class="mf">42.0</span><span class="p">],</span>   <span class="c1"># Northern California / Pacific NW</span>
+            <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">36.0</span><span class="p">,</span> <span class="mf">42.0</span><span class="p">],</span>
+            <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">124.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">118.0</span><span class="p">],</span>   <span class="c1"># Northern California / Pacific NW</span>
             <span class="n">path</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">OUT_DIR</span><span class="p">),</span>
         <span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">progress_bar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
         <span class="nb">print</span><span class="p">(</span><span class="s1">'detections:'</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">fires</span><span class="p">))</span>
@@ -11699,7 +11700,8 @@ if HAS_KEY:
             variables=['VIIRS_SNPP_NRT'],
             start=START,
             end=END,
-            aoi=[-124.0, 36.0, -118.0, 42.0],   # Northern California / Pacific NW
+            lat_lim=[36.0, 42.0],
+            lon_lim=[-124.0, -118.0],   # Northern California / Pacific NW
             path=str(OUT_DIR),
         ).download(progress_bar=False)
         print('detections:', len(fires))

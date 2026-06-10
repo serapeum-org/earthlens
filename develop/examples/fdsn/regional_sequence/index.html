@@ -11658,7 +11658,8 @@ OUT_DIR.mkdir(exist_ok=True)</div>
         <span class="n">data_source</span><span class="o">=</span><span class="s1">'fdsn'</span><span class="p">,</span>
         <span class="n">start</span><span class="o">=</span><span class="s1">'2019-07-04'</span><span class="p">,</span>
         <span class="n">end</span><span class="o">=</span><span class="s1">'2019-08-04'</span><span class="p">,</span>
-        <span class="n">aoi</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">117.9</span><span class="p">,</span> <span class="mf">35.4</span><span class="p">,</span> <span class="o">-</span><span class="mf">117.2</span><span class="p">,</span> <span class="mf">36.1</span><span class="p">],</span>
+        <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">35.4</span><span class="p">,</span> <span class="mf">36.1</span><span class="p">],</span>
+        <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">117.9</span><span class="p">,</span> <span class="o">-</span><span class="mf">117.2</span><span class="p">],</span>
         <span class="n">min_magnitude</span><span class="o">=</span><span class="mf">2.5</span><span class="p">,</span>
         <span class="n">path</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">OUT_DIR</span><span class="p">),</span>
     <span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
@@ -11675,7 +11676,8 @@ try:
         data_source='fdsn',
         start='2019-07-04',
         end='2019-08-04',
-        aoi=[-117.9, 35.4, -117.2, 36.1],
+        lat_lim=[35.4, 36.1],
+        lon_lim=[-117.9, -117.2],
         min_magnitude=2.5,
         path=str(OUT_DIR),
     ).download()
