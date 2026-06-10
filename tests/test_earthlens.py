@@ -420,6 +420,9 @@ class TestTopLevelReExports:
             "EarthLens",
             "aggregate_netcdf",
             "download",
+            "find",
+            "search",
+            "sources",
         ], f"Unexpected top-level __all__: {earthlens.__all__!r}"
 
 
@@ -564,6 +567,67 @@ class TestFacadeLoad:
         )
         assert result == ["loaded"], "download(load=True) should return load()"
         assert calls.get("load") and "download" not in calls, "should call load()"
+
+
+class TestTopLevelDiscovery:
+    """Module-level sources() / search() / find() conveniences (M1)."""
+
+    def test_sources_lists_registered_keys(self):
+        """sources() returns the sorted registered data_source keys."""
+        import earthlens
+
+        keys = earthlens.sources()
+        assert keys == sorted(keys), "sources() should be sorted"
+        assert "chc" in keys and "gee" in keys, f"missing core keys: {keys[:5]}"
+
+    def test_sources_is_exported(self):
+        """sources / search / find are on the package surface."""
+        import earthlens
+
+        assert all(
+            callable(getattr(earthlens, name)) for name in ("sources", "search", "find")
+        ), "sources/search/find must be callable package attributes"
+
+    def test_search_delegates_to_facade(self, monkeypatch):
+        """search() builds an EarthLens and returns its .search()."""
+        import earthlens
+        from earthlens import earthlens as facade_module
+
+        captured = {}
+
+        class _FakeFacade:
+            def __init__(self, **kwargs):
+                captured["init"] = kwargs
+
+            def search(self):
+                captured["search"] = True
+                return ["product"]
+
+        monkeypatch.setattr(facade_module, "EarthLens", _FakeFacade)
+        result = earthlens.search(data_source="stac", variables=["red"])
+        assert result == ["product"], "search() should return facade.search()"
+        assert captured["init"]["data_source"] == "stac"
+        assert captured.get("search"), "facade.search() should be called"
+
+    def test_find_aggregates_guess_dataset(self, monkeypatch):
+        """find() collects guess_dataset hits and skips sources that raise."""
+        import earthlens
+        from earthlens import earthlens as facade_module
+
+        monkeypatch.setattr(facade_module, "sources", lambda: ["chc", "gee", "broken"])
+
+        def _fake_guess(cls, source, text):
+            if source == "broken":
+                raise ImportError("no SDK")
+            return [f"{source}-ds"] if source == "chc" else []
+
+        monkeypatch.setattr(
+            facade_module.EarthLens,
+            "guess_dataset",
+            classmethod(_fake_guess),
+        )
+        result = earthlens.find("precip")
+        assert result == {"chc": ["chc-ds"]}, f"unexpected find() result: {result}"
 
 
 @pytest.mark.chc

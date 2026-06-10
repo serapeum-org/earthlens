@@ -1441,3 +1441,127 @@ def download(
     if load:
         return facade.load(progress_bar=progress_bar, aggregate=aggregate)
     return facade.download(progress_bar=progress_bar, aggregate=aggregate)
+
+
+def sources() -> list[str]:
+    """Return the sorted list of registered `data_source` keys.
+
+    The top-level discovery entry point — no class needed to see what
+    backends `earthlens.download(...)` / :class:`EarthLens` accept.
+
+    Returns:
+        Every registered key (including aliases), sorted.
+
+    Examples:
+        - The CHIRPS and GEE keys are registered:
+            ```python
+            >>> import earthlens
+            >>> keys = earthlens.sources()
+            >>> "chc" in keys and "gee" in keys
+            True
+
+            ```
+    """
+    return sorted(EarthLens.DataSources)
+
+
+def search(
+    data_source: str = "chc",
+    *,
+    variables: dict[str, list[str]] | list[str] | None = None,
+    dataset: str | None = None,
+    start: str | datetime | date | None = None,
+    end: str | datetime | date | None = None,
+    path: Path | str | None = None,
+    lat_lim: list[float] | None = None,
+    lon_lim: list[float] | None = None,
+    aoi: Any = None,
+    buffer: float | None = None,
+    temporal_resolution: str = "daily",
+    cadence: str | None = None,
+    fmt: str = "%Y-%m-%d",
+    **backend_kwargs: object,
+) -> list[RemoteProduct]:
+    """Construct an :class:`EarthLens` and run a dry-run `search` in one call.
+
+    The one-shot counterpart to :func:`download` for the search→fetch split:
+    it forwards every request argument to :class:`EarthLens` and returns
+    :meth:`EarthLens.search` — the products a download *would* fetch — without
+    downloading anything.
+
+    Args:
+        data_source: Backend key (see :func:`sources`). Defaults to `"chc"`.
+        variables: Variable specification, as for :class:`EarthLens`.
+        dataset: Explicit dataset / collection key.
+        start: Inclusive start date (string / `datetime` / `date`).
+        end: Inclusive end date.
+        path: Output directory (unused by a dry-run search, but accepted for
+            signature parity with :func:`download`).
+        lat_lim: `[lat_min, lat_max]` (mutually exclusive with `aoi`).
+        lon_lim: `[lon_min, lon_max]` (mutually exclusive with `aoi`).
+        aoi: A single area-of-interest (bbox / point+`buffer` / geometry).
+        buffer: Half-width in degrees for a point `aoi`.
+        temporal_resolution: Backend cadence / label. Defaults to `"daily"`.
+        cadence: Clearer alias for `temporal_resolution`.
+        fmt: `strptime` format override for string dates.
+        **backend_kwargs: Extra backend-specific options.
+
+    Returns:
+        One :class:`~earthlens.base.RemoteProduct` per matching item.
+
+    Raises:
+        NotImplementedError: If the backend exposes no searchable product
+            list (see :meth:`EarthLens.search`).
+    """
+    return EarthLens(
+        data_source=data_source,
+        variables=variables,
+        dataset=dataset,
+        start=start,
+        end=end,
+        path=path,
+        lat_lim=lat_lim,
+        lon_lim=lon_lim,
+        aoi=aoi,
+        buffer=buffer,
+        temporal_resolution=temporal_resolution,
+        cadence=cadence,
+        fmt=fmt,
+        **backend_kwargs,
+    ).search()
+
+
+def find(text: str) -> dict[str, list[str]]:
+    """Find which sources expose a dataset matching `text`.
+
+    A best-effort, cross-source discovery aid: it runs
+    :meth:`EarthLens.guess_dataset` (case-insensitive substring, then fuzzy)
+    against every registered source and collects the hits. A source whose SDK
+    is not installed, or that has no free-text catalog, is skipped rather than
+    failing the whole call — so the result covers the installed backends.
+
+    Args:
+        text: Free-text dataset query, e.g. `"precipitation"` or `"era5"`.
+
+    Returns:
+        A mapping `{data_source: [matching dataset key, ...]}` for every
+        source with at least one match, in sorted-source order.
+
+    Examples:
+        - Find sources whose catalog mentions precipitation (live; skipped):
+            ```python
+            >>> import earthlens
+            >>> earthlens.find("precipitation")  # doctest: +SKIP
+            {'chc': ['global-daily', ...], ...}
+
+            ```
+    """
+    matches: dict[str, list[str]] = {}
+    for source in sources():
+        try:
+            hits = EarthLens.guess_dataset(source, text)
+        except Exception:  # noqa: BLE001 - skip uninstalled / catalog-less backends
+            continue
+        if hits:
+            matches[source] = hits
+    return matches
