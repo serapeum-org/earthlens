@@ -11,15 +11,15 @@ pip install earthlens[<extra>]      # e.g. earthlens[ecmwf]
 pip install earthlens[all]          # every backend's SDK
 ```
 
-Backends with no extra (CHC, GDACS, OpenAQ) need only the core install — they use anonymous FTP or plain HTTP.
+Backends with no extra (CHC, GDACS, FIRMS, OpenAQ, GHSL) need only the core install — they use anonymous FTP or plain HTTP.
 
 ## Integrated providers
 
 | Provider | `data_source` key(s) | Output | Auth | Extra | Docs |
 |---|---|---|---|---|---|
 | Climate Hazards Center (CHIRPS / CHIRTS / SPI / SPEI / WBGT / …) | `chc`, `chirps` | raster | anonymous FTP | — | [CHC](chc/introduction.md) |
-| ERA5 on AWS (`era5-pds`) | `amazon-s3` | raster | unsigned AWS (public bucket) | `s3` | [Amazon S3](s3.md) |
-| ECMWF Climate Data Store | `ecmwf` | raster | `~/.cdsapirc` token | `ecmwf` | [ECMWF](ecmwf.md) |
+| AWS Open Data (ERA5 / Sentinel-2 / Copernicus DEM / ESA WorldCover) | `amazon-s3` | raster | unsigned AWS (public buckets) | `s3` | [Amazon S3](s3/introduction.md) |
+| ECMWF Climate Data Store | `ecmwf` | raster | `~/.cdsapirc` token | `ecmwf` | [ECMWF](ecmwf/introduction.md) |
 | Google Earth Engine | `gee`, `google-earth-engine` | raster | service account | `gee` | [GEE](gee/introduction.md) |
 | Copernicus Marine (CMEMS) | `cmems` | raster | Copernicus Marine login | `cmems` | [CMEMS](cmems/introduction.md) |
 | FDSN seismic events (USGS / EMSC / INGV / …) | `fdsn` | vector | none | `fdsn` | [FDSN](fdsn/introduction.md) |
@@ -33,19 +33,16 @@ Backends with no extra (CHC, GDACS, OpenAQ) need only the core install — they 
 | openEO server-side processing (defaults to CDSE) | `openeo` | raster | CDSE OIDC (interactive or client-credentials) | `openeo` | [openEO](openeo/introduction.md) |
 | NOAA National Water Model (`noaa-nwm-pds`) | `nwm`, `national-water-model` | per-product (`chrtout` tabular / `ldasout` raster) | unsigned AWS (public bucket) | `nwm` | [NWM](nwm/introduction.md) |
 | Humanitarian Data Exchange (UN OCHA, CKAN) | `hdx` | mixed | none (public) | `hdx` | [HDX](hdx/introduction.md) |
+| NASA FIRMS active fire detections | `firms` | vector | `FIRMS_MAP_KEY` | — | [FIRMS](firms/introduction.md) |
+| EUMETSAT Data Store | `eumetsat` | per-dataset (raster default) | consumer key / secret | `eumetsat` | [EUMETSAT](eumetsat/introduction.md) |
+| Sentinel Hub server-side render (CDSE) | `sentinel-hub`, `sentinelhub` | mixed (raster / tabular per plane) | OAuth client id / secret | `sentinel-hub` | [Sentinel Hub](sentinel-hub/introduction.md) |
+| Overture Maps vector basemap | `overture` | vector | none (public) | `overture` | [Overture](overture/introduction.md) |
+| USGS Water — NWIS / Water Data | `usgs-water`, `usgs-nwis`, `nwis` | tabular | none | `usgs-water` | [USGS Water](usgs-water/introduction.md) |
+| JRC Global Human Settlement Layer | `ghsl`, `ghs`, `human-settlement` | raster | none (open HTTPS) | — | [GHSL](ghsl/introduction.md) |
+| WorldPop population data hub | `worldpop`, `world-pop` | mixed (rasters + age/sex tables) | none (CC-BY-4.0) | `worldpop` (optional) | [WorldPop](worldpop/introduction.md) |
 
 `Output` is the backend's `OUTPUT_KIND` — `raster` writes GeoTIFF/COG/NetCDF, `vector` writes geometry tables
-(GeoJSON / GeoPackage), `tabular` writes plain tables (CSV / Parquet), and `mixed` (HDX) downloads each
-resource file as-is in whatever format it ships. It also governs `aggregate=`: the temporal aggregator is
-accepted for `raster` backends and rejected for `vector` / `tabular` ones; HDX (`mixed`) rejects it because
-resources are returned as-is.
-
-## Planned providers (not yet integrated)
-
-These have a completion plan but no code yet — they are **not** available from the facade.
-
-| Provider | Planned key | Notes |
-|---|---|---|
-| NASA FIRMS active fire detections | `firms` | `MAP_KEY` auth |
-
-For the full roadmap of providers beyond these, see the project's planning notes.
+(GeoJSON / GeoPackage), `tabular` writes plain tables (CSV / Parquet), and `mixed` (HDX, Sentinel Hub, WorldPop)
+covers backends whose products vary by request. It also governs `aggregate=`: the temporal aggregator is
+accepted for `raster` backends and rejected for `vector` / `tabular` ones; the `mixed` backends reject it
+because their products are returned as-is.

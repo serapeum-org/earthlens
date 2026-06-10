@@ -42,8 +42,6 @@ theme:
     toggle:
       icon: material/weather-night
       name: Switch to system preference
-  primary: indigo
-  accent: indigo
   icon:
     repo: fontawesome/brands/github
 
@@ -85,7 +83,6 @@ markdown_extensions:
         - name: mermaid
           class: mermaid
           format: !!python/name:pymdownx.superfences.fence_code_format
-  - pymdownx.tabbed
   - pymdownx.inlinehilite
   - pymdownx.snippets
   - pymdownx.tabbed:
@@ -106,14 +103,16 @@ nav:
   - Home: index.md
   - Guide:
     - Installation: installation.md
+    - Getting started: getting-started.md
     - Architecture: overview/architecture.md
+    - Temporal aggregation: aggregation.md
     - Command-line interface: reference/cli.md
   - Data Sources:
     - Supported providers: reference/providers.md
     - CHC (CHIRPS / CHIRTS / SPI / SPEI / …):
       - Introduction: reference/chc/introduction.md
       - Usage: reference/chc/usage.md
-      - Catalog & Tooling: reference/chc/catalog.md
+      - Catalog & tooling: reference/chc/catalog.md
       - Reference: reference/chc/chc.md
     - Amazon S3 (AWS Open Data):
       - Introduction: reference/s3/introduction.md
@@ -130,17 +129,18 @@ nav:
       - Introduction: reference/earthdata/introduction.md
       - Usage: reference/earthdata/usage.md
       - Authentication: reference/earthdata/authentication.md
-      - Catalog & Tooling: reference/earthdata/catalog.md
+      - Catalog & tooling: reference/earthdata/catalog.md
       - Reference: reference/earthdata/earthdata.md
     - ECMWF:
-      - Reference: reference/ecmwf.md
-      - Catalog & Probes: reference/ecmwf/catalog.md
-      - Aggregation: reference/aggregation.md
+      - Introduction: reference/ecmwf/introduction.md
+      - Usage: reference/ecmwf/usage.md
+      - Catalog & tooling: reference/ecmwf/catalog.md
+      - Reference: reference/ecmwf/ecmwf.md
     - EUMETSAT (Data Store):
       - Introduction: reference/eumetsat/introduction.md
       - Usage: reference/eumetsat/usage.md
       - Authentication: reference/eumetsat/authentication.md
-      - Catalog & Tooling: reference/eumetsat/catalog.md
+      - Catalog & tooling: reference/eumetsat/catalog.md
       - Data Tailor (deferred): reference/eumetsat/data-tailor.md
       - Reference: reference/eumetsat/eumetsat.md
     - FDSN (earthquakes):
@@ -197,7 +197,7 @@ nav:
     - HDX (humanitarian data):
       - Introduction: reference/hdx/introduction.md
       - Usage: reference/hdx/usage.md
-      - Catalog & Tooling: reference/hdx/catalog.md
+      - Catalog & tooling: reference/hdx/catalog.md
       - Reference: reference/hdx/hdx.md
     - Overture Maps (vector basemap):
       - Introduction: reference/overture/introduction.md
@@ -208,18 +208,18 @@ nav:
     - NWP (weather forecasts):
       - Introduction: reference/nwp/introduction.md
       - Usage: reference/nwp/usage.md
-      - Catalog & install: reference/nwp/catalog.md
+      - Catalog & tooling: reference/nwp/catalog.md
       - Reference: reference/nwp/nwp.md
     - NEXRAD radar:
       - Introduction: reference/radar/introduction.md
       - Usage: reference/radar/usage.md
-      - Catalog & Tooling: reference/radar/catalog.md
+      - Catalog & tooling: reference/radar/catalog.md
       - Reference: reference/radar/radar.md
     - USGS Water (NWIS):
       - Introduction: reference/usgs-water/introduction.md
       - Usage: reference/usgs-water/usage.md
       - Authentication: reference/usgs-water/authentication.md
-      - Available data: reference/usgs-water/datasets.md
+      - Available datasets: reference/usgs-water/datasets.md
       - Reference: reference/usgs-water/usgs_water.md
     - GHSL (human settlement):
       - Introduction: reference/ghsl/introduction.md
@@ -238,23 +238,30 @@ nav:
     - Authentication: examples/authentication.md
     - Data Sources: examples/data-sources.md
     - Data Catalog: examples/catalog.md
+    - Showcase — real-world events:
+      - Suez Canal blockage (Ever Given): examples/showcase/suez_canal_ever_given.ipynb
+      - Hunga Tonga eruption: examples/showcase/tonga_eruption.ipynb
+      - Pakistan 2022 floods (SAR): examples/showcase/pakistan_floods_2022.ipynb
+      - GERD reservoir filling (time-lapse): examples/showcase/gerd_reservoir_filling.ipynb
+      - Gaza change detection (2023→2024): examples/showcase/gaza_damage_assessment.ipynb
+      - Horn of Africa drought (CHIRPS): examples/showcase/horn_of_africa_drought.ipynb
+      - 2023 Canada wildfires (FIRMS): examples/showcase/canada_wildfires_2023.ipynb
+      - Türkiye–Syria earthquake (FDSN): examples/showcase/turkey_syria_earthquake.ipynb
+      - Hurricane Ian track (Tropycal): examples/showcase/hurricane_ian.ipynb
+      - Strait of Hormuz vessel traffic: examples/showcase/strait_of_hormuz_ships.ipynb
+      - NO₂ over China, COVID lockdown: examples/showcase/no2_covid_lockdown.ipynb
+      - Mediterranean marine heatwave (CMEMS): examples/showcase/marine_heatwave_mediterranean.ipynb
+      - NYC wildfire-smoke air quality (OpenAQ): examples/showcase/wildfire_smoke_air_quality.ipynb
+      - Hurricane Harvey rainfall (NASA GPM/Earthdata): examples/showcase/hurricane_harvey_rainfall.ipynb
+      - Hurricane Ian from GOES (geostationary, S3): examples/showcase/goes_hurricane_ian.ipynb
+    - CHC (CHIRPS / CHIRTS / SPI / SPEI / …):
+      - Catalog explorer (no network): examples/chc/catalog_explorer.ipynb
+      - Daily rainfall quickstart (live): examples/chc/quickstart.ipynb
     - Amazon S3 (AWS Open Data):
       - Catalog explorer (no network): examples/s3/01_catalog_explorer.ipynb
       - Copernicus DEM — download & crop: examples/s3/02_copernicus_dem.ipynb
       - ESA WorldCover — land cover: examples/s3/03_esa_worldcover.ipynb
       - Passthrough — any public bucket: examples/s3/04_passthrough.ipynb
-    - CDS / ECMWF:
-      - Quickstart: examples/ecmwf/cds_quickstart.ipynb
-      - Hydrology — water balance: examples/ecmwf/hydrology_water_balance.ipynb
-      - Oceanography — SST & sea ice: examples/ecmwf/oceanography_sst_sea_ice.ipynb
-      - Atmosphere — pressure levels: examples/ecmwf/atmosphere_pressure_levels.ipynb
-      - Agriculture — crop water demand: examples/ecmwf/agriculture_crop_water.ipynb
-      - Solar — PV resource assessment: examples/ecmwf/solar_resource_assessment.ipynb
-      - Wind — hub-height resource: examples/ecmwf/wind_energy_resource.ipynb
-      - Snow & cryosphere — winter snowpack: examples/ecmwf/snow_cryosphere_winter.ipynb
-      - Heat waves — public health: examples/ecmwf/heat_waves_public_health.ipynb
-      - Climate change — temperature anomalies: examples/ecmwf/climate_change_anomalies.ipynb
-      - Drought — SPI from precipitation: examples/ecmwf/drought_precipitation_deficit.ipynb
     - Copernicus Marine:
       - Catalog explorer (no network): examples/cmems/catalog_explorer.ipynb
       - Quickstart — OSTIA SST: examples/cmems/quickstart.ipynb
@@ -272,6 +279,18 @@ nav:
       - PACE ocean-colour chlorophyll (live): examples/earthdata/pace_ocean_colour.ipynb
       - SMAP soil moisture (live): examples/earthdata/smap_soil_moisture.ipynb
       - OPERA Sentinel-1 SAR backscatter (live): examples/earthdata/opera_s1_backscatter.ipynb
+    - CDS / ECMWF:
+      - Quickstart: examples/ecmwf/cds_quickstart.ipynb
+      - Hydrology — water balance: examples/ecmwf/hydrology_water_balance.ipynb
+      - Oceanography — SST & sea ice: examples/ecmwf/oceanography_sst_sea_ice.ipynb
+      - Atmosphere — pressure levels: examples/ecmwf/atmosphere_pressure_levels.ipynb
+      - Agriculture — crop water demand: examples/ecmwf/agriculture_crop_water.ipynb
+      - Solar — PV resource assessment: examples/ecmwf/solar_resource_assessment.ipynb
+      - Wind — hub-height resource: examples/ecmwf/wind_energy_resource.ipynb
+      - Snow & cryosphere — winter snowpack: examples/ecmwf/snow_cryosphere_winter.ipynb
+      - Heat waves — public health: examples/ecmwf/heat_waves_public_health.ipynb
+      - Climate change — temperature anomalies: examples/ecmwf/climate_change_anomalies.ipynb
+      - Drought — SPI from precipitation: examples/ecmwf/drought_precipitation_deficit.ipynb
     - EUMETSAT Data Store:
       - Catalog explorer (no network): examples/eumetsat/catalog_explorer.ipynb
       - Output kinds & formats (no network): examples/eumetsat/output_kinds_and_formats.ipynb
@@ -392,6 +411,7 @@ nav:
     - AbstractDataSource: reference/abstract-datasource.md
   - About:
     - Change Log: change-log.md
+    - License: LICENSE.md
 
 extra:
   social:

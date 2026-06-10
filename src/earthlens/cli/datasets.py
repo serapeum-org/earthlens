@@ -457,7 +457,8 @@ def _refresh_tiles(selected: list[BackendInfo], *, json_output: bool) -> None:
         if result["status"] == "ok":
             out_console().print(
                 f"[green]wrote {result['tiles']} tiles[/green] "
-                f"({result['provider']}) -> {result['written']}"
+                f"({result['provider']}) -> {result['written']}",
+                soft_wrap=True,
             )
         else:
             err_console().print(
@@ -538,7 +539,8 @@ def refresh(
         if outcome.written:
             out_console().print(
                 f"[green]wrote {outcome.live_count} ids[/green] "
-                f"({outcome.provider}) -> {outcome.written}"
+                f"({outcome.provider}) -> {outcome.written}",
+                soft_wrap=True,
             )
 
 
@@ -696,7 +698,8 @@ def curate(
         except ValueError as exc:
             raise typer.BadParameter(str(exc)) from exc
         out_console().print(
-            f"[green]wrote {result.key}[/green] ({result.provider}) -> {written}"
+            f"[green]wrote {result.key}[/green] ({result.provider}) -> {written}",
+            soft_wrap=True,
         )
         return
 
