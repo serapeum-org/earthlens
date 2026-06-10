@@ -11726,9 +11726,9 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <span class="n">sst_ts</span> <span class="o">=</span> <span class="kc">None</span>
 <span class="k">try</span><span class="p">:</span>
     <span class="n">paths</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
-        <span class="n">data_source</span><span class="o">=</span><span class="s2">"cmems"</span><span class="p">,</span> <span class="n">temporal_resolution</span><span class="o">=</span><span class="s2">"daily"</span><span class="p">,</span>
-        <span class="n">variables</span><span class="o">=</span><span class="p">{</span><span class="s2">"cmems_SST_MED_SST_L4_REP_OBSERVATIONS_010_021"</span><span class="p">:</span> <span class="p">[</span><span class="s2">"analysed_sst"</span><span class="p">]},</span>
-        <span class="n">start</span><span class="o">=</span><span class="n">START</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="n">END</span><span class="p">,</span> <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">42.0</span><span class="p">,</span> <span class="mf">43.5</span><span class="p">],</span> <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">6.5</span><span class="p">,</span> <span class="mf">9.0</span><span class="p">],</span>
+        <span class="n">data_source</span><span class="o">=</span><span class="s2">"cmems"</span><span class="p">,</span> <span class="n">cadence</span><span class="o">=</span><span class="s2">"daily"</span><span class="p">,</span>
+        <span class="n">dataset</span><span class="o">=</span><span class="s2">"cmems_SST_MED_SST_L4_REP_OBSERVATIONS_010_021"</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">"analysed_sst"</span><span class="p">],</span>
+        <span class="n">start</span><span class="o">=</span><span class="n">START</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="n">END</span><span class="p">,</span> <span class="n">aoi</span><span class="o">=</span><span class="p">[</span><span class="mf">6.5</span><span class="p">,</span> <span class="mf">42.0</span><span class="p">,</span> <span class="mf">9.0</span><span class="p">,</span> <span class="mf">43.5</span><span class="p">],</span>
         <span class="n">path</span><span class="o">=</span><span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">(),</span> <span class="n">service_username</span><span class="o">=</span><span class="n">USER</span><span class="p">,</span> <span class="n">service_password</span><span class="o">=</span><span class="n">PWD</span><span class="p">,</span>
     <span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
     <span class="n">nc</span> <span class="o">=</span> <span class="n">NetCDF</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">paths</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">read_only</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -11760,9 +11760,9 @@ START, END = "2011-01-01", "2023-12-31"
 sst_ts = None
 try:
     paths = EarthLens(
-        data_source="cmems", temporal_resolution="daily",
-        variables={"cmems_SST_MED_SST_L4_REP_OBSERVATIONS_010_021": ["analysed_sst"]},
-        start=START, end=END, lat_lim=[42.0, 43.5], lon_lim=[6.5, 9.0],
+        data_source="cmems", cadence="daily",
+        dataset="cmems_SST_MED_SST_L4_REP_OBSERVATIONS_010_021", variables=["analysed_sst"],
+        start=START, end=END, aoi=[6.5, 42.0, 9.0, 43.5],
         path=tempfile.mkdtemp(), service_username=USER, service_password=PWD,
     ).download()
     nc = NetCDF.read_file(str(paths[0]), read_only=True)

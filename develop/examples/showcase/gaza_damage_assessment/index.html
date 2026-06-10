@@ -11805,10 +11805,10 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
         <span class="n">data_source</span><span class="o">=</span><span class="s2">"gee"</span><span class="p">,</span>
         <span class="n">start</span><span class="o">=</span><span class="n">day</span><span class="p">,</span>
         <span class="n">end</span><span class="o">=</span><span class="n">day</span><span class="p">,</span>
-        <span class="n">temporal_resolution</span><span class="o">=</span><span class="s2">"raw"</span><span class="p">,</span>
-        <span class="n">variables</span><span class="o">=</span><span class="p">{</span><span class="n">COLL</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span><span class="n">bands</span><span class="p">)},</span>
-        <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="n">AOI</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">AOI</span><span class="p">[</span><span class="mi">3</span><span class="p">]],</span>
-        <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="n">AOI</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">AOI</span><span class="p">[</span><span class="mi">2</span><span class="p">]],</span>
+        <span class="n">cadence</span><span class="o">=</span><span class="s2">"raw"</span><span class="p">,</span>
+        <span class="n">dataset</span><span class="o">=</span><span class="n">COLL</span><span class="p">,</span>
+        <span class="n">variables</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">bands</span><span class="p">),</span>
+        <span class="n">aoi</span><span class="o">=</span><span class="n">AOI</span><span class="p">,</span>
         <span class="n">path</span><span class="o">=</span><span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">(),</span>
         <span class="n">scale</span><span class="o">=</span><span class="n">scale</span><span class="p">,</span>
         <span class="n">reducer</span><span class="o">=</span><span class="s2">"median"</span><span class="p">,</span>
@@ -11865,10 +11865,10 @@ def grab(bands, day, scale=10):
         data_source="gee",
         start=day,
         end=day,
-        temporal_resolution="raw",
-        variables={COLL: list(bands)},
-        lat_lim=[AOI[1], AOI[3]],
-        lon_lim=[AOI[0], AOI[2]],
+        cadence="raw",
+        dataset=COLL,
+        variables=list(bands),
+        aoi=AOI,
         path=tempfile.mkdtemp(),
         scale=scale,
         reducer="median",

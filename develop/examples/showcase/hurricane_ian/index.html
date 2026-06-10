@@ -11768,7 +11768,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
     <span class="n">fixes</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
         <span class="n">data_source</span><span class="o">=</span><span class="s2">"tropycal"</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">"north_atlantic"</span><span class="p">],</span>
         <span class="n">start</span><span class="o">=</span><span class="s2">"2022-09-23"</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">"2022-10-01"</span><span class="p">,</span>
-        <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">12.0</span><span class="p">,</span> <span class="mf">34.0</span><span class="p">],</span> <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">90.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">70.0</span><span class="p">],</span>
+        <span class="n">aoi</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">90.0</span><span class="p">,</span> <span class="mf">12.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">70.0</span><span class="p">,</span> <span class="mf">34.0</span><span class="p">],</span>
         <span class="n">source</span><span class="o">=</span><span class="s2">"hurdat"</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">(),</span>
     <span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">progress_bar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
     <span class="n">fixes</span> <span class="o">=</span> <span class="n">fixes</span><span class="p">[</span><span class="n">fixes</span><span class="p">[</span><span class="s2">"name"</span><span class="p">]</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="o">==</span> <span class="s2">"IAN"</span><span class="p">]</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="s2">"time"</span><span class="p">)</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -11790,7 +11790,7 @@ try:
     fixes = EarthLens(
         data_source="tropycal", variables=["north_atlantic"],
         start="2022-09-23", end="2022-10-01",
-        lat_lim=[12.0, 34.0], lon_lim=[-90.0, -70.0],
+        aoi=[-90.0, 12.0, -70.0, 34.0],
         source="hurdat", path=tempfile.mkdtemp(),
     ).download(progress_bar=False)
     fixes = fixes[fixes["name"].str.upper() == "IAN"].sort_values("time").reset_index(drop=True)

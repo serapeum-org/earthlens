@@ -11769,7 +11769,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
     <span class="n">quakes</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
         <span class="n">data_source</span><span class="o">=</span><span class="s2">"fdsn"</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">"USGS"</span><span class="p">],</span>
         <span class="n">start</span><span class="o">=</span><span class="s2">"2023-02-06"</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">"2023-03-31"</span><span class="p">,</span>
-        <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">35.0</span><span class="p">,</span> <span class="mf">39.5</span><span class="p">],</span> <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">35.0</span><span class="p">,</span> <span class="mf">39.5</span><span class="p">],</span>
+        <span class="n">aoi</span><span class="o">=</span><span class="p">[</span><span class="mf">35.0</span><span class="p">,</span> <span class="mf">35.0</span><span class="p">,</span> <span class="mf">39.5</span><span class="p">,</span> <span class="mf">39.5</span><span class="p">],</span>
         <span class="n">min_magnitude</span><span class="o">=</span><span class="mf">4.0</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">(),</span>
     <span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
     <span class="n">quakes</span><span class="p">[</span><span class="s2">"time"</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">quakes</span><span class="p">[</span><span class="s2">"time"</span><span class="p">])</span>
@@ -11790,7 +11790,7 @@ try:
     quakes = EarthLens(
         data_source="fdsn", variables=["USGS"],
         start="2023-02-06", end="2023-03-31",
-        lat_lim=[35.0, 39.5], lon_lim=[35.0, 39.5],
+        aoi=[35.0, 35.0, 39.5, 39.5],
         min_magnitude=4.0, path=tempfile.mkdtemp(),
     ).download()
     quakes["time"] = pd.to_datetime(quakes["time"])

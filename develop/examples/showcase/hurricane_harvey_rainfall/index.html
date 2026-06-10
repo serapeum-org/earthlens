@@ -11698,9 +11698,9 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <span class="n">paths</span> <span class="o">=</span> <span class="kc">None</span>
 <span class="k">try</span><span class="p">:</span>
     <span class="n">paths</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
-        <span class="n">data_source</span><span class="o">=</span><span class="s2">"earthdata"</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="p">{</span><span class="s2">"GPM_3IMERGDF_07"</span><span class="p">:</span> <span class="p">[</span><span class="s2">"precipitation"</span><span class="p">]},</span>
+        <span class="n">data_source</span><span class="o">=</span><span class="s2">"earthdata"</span><span class="p">,</span> <span class="n">dataset</span><span class="o">=</span><span class="s2">"GPM_3IMERGDF_07"</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">"precipitation"</span><span class="p">],</span>
         <span class="n">start</span><span class="o">=</span><span class="s2">"2017-08-25"</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">"2017-08-31"</span><span class="p">,</span>
-        <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">27.0</span><span class="p">,</span> <span class="mf">32.0</span><span class="p">],</span> <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">99.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">93.0</span><span class="p">],</span> <span class="n">path</span><span class="o">=</span><span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">(),</span>
+        <span class="n">aoi</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">99.0</span><span class="p">,</span> <span class="mf">27.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">93.0</span><span class="p">,</span> <span class="mf">32.0</span><span class="p">],</span> <span class="n">path</span><span class="o">=</span><span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">(),</span>
     <span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">progress_bar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">paths</span><span class="p">)</span><span class="si">}</span><span class="s2"> daily IMERG granules"</span><span class="p">)</span>
 <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>  <span class="c1"># noqa: BLE001</span>
@@ -11717,9 +11717,9 @@ logger.disable("earthlens"); logger.disable("pyramids")
 paths = None
 try:
     paths = EarthLens(
-        data_source="earthdata", variables={"GPM_3IMERGDF_07": ["precipitation"]},
+        data_source="earthdata", dataset="GPM_3IMERGDF_07", variables=["precipitation"],
         start="2017-08-25", end="2017-08-31",
-        lat_lim=[27.0, 32.0], lon_lim=[-99.0, -93.0], path=tempfile.mkdtemp(),
+        aoi=[-99.0, 27.0, -93.0, 32.0], path=tempfile.mkdtemp(),
     ).download(progress_bar=False)
     print(f"{len(paths)} daily IMERG granules")
 except Exception as exc:  # noqa: BLE001

@@ -11680,7 +11680,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
         <span class="n">pm</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
             <span class="n">data_source</span><span class="o">=</span><span class="s2">"openaq"</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">"pm25"</span><span class="p">],</span>
             <span class="n">start</span><span class="o">=</span><span class="s2">"2023-06-01"</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">"2023-06-12"</span><span class="p">,</span>
-            <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">40.5</span><span class="p">,</span> <span class="mf">41.0</span><span class="p">],</span> <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">74.1</span><span class="p">,</span> <span class="o">-</span><span class="mf">73.7</span><span class="p">],</span>   <span class="c1"># New York City</span>
+            <span class="n">aoi</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">74.1</span><span class="p">,</span> <span class="mf">40.5</span><span class="p">,</span> <span class="o">-</span><span class="mf">73.7</span><span class="p">,</span> <span class="mf">41.0</span><span class="p">],</span>   <span class="c1"># New York City (W, S, E, N)</span>
             <span class="n">path</span><span class="o">=</span><span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">(),</span>
         <span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">progress_bar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
         <span class="n">pm</span><span class="p">[</span><span class="s2">"datetime_utc"</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">pm</span><span class="p">[</span><span class="s2">"datetime_utc"</span><span class="p">],</span> <span class="n">utc</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -11705,7 +11705,7 @@ if os.environ.get("OPENAQ_API_KEY"):
         pm = EarthLens(
             data_source="openaq", variables=["pm25"],
             start="2023-06-01", end="2023-06-12",
-            lat_lim=[40.5, 41.0], lon_lim=[-74.1, -73.7],   # New York City
+            aoi=[-74.1, 40.5, -73.7, 41.0],   # New York City (W, S, E, N)
             path=tempfile.mkdtemp(),
         ).download(progress_bar=False)
         pm["datetime_utc"] = pd.to_datetime(pm["datetime_utc"], utc=True)
