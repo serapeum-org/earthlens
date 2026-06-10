@@ -660,9 +660,10 @@ class EarthLens:
                 variables if isinstance(variables, str) else "chc",
                 data_source,
             )
-        if variables is None:
+        if variables is None and dataset is None:
             raise ValueError(
-                "variables= is required, e.g. "
+                "variables= is required (or pass dataset= for a "
+                "dataset-keyed backend), e.g. "
                 "EarthLens('chc', variables=['precipitation'])."
             )
 
