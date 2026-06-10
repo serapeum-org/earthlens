@@ -516,8 +516,11 @@ def _crop_to_mask(dataset: Any, geometry: Any, *, touch: bool) -> Any:
     Returns:
         The masked `Dataset`.
     """
+    # `no_data_value` is normally a per-band tuple, e.g. `(None,)` /
+    # `(-9999.0,)`. Guard on list/tuple so a missing attribute or a bare
+    # scalar never trips the all-None iteration.
     nodata = getattr(dataset, "no_data_value", None)
-    if nodata is not None and all(v is None for v in nodata):
+    if isinstance(nodata, (list, tuple)) and all(v is None for v in nodata):
         logger.warning(
             "polygon aoi= mask applied to a raster with no no-data value; "
             "cells outside the polygon but inside its bounding box cannot be "
