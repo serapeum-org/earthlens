@@ -11691,39 +11691,47 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span><span class="o">,</span><span class="w"> </span><span class="nn">xarray</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">xr</span><span class="o">,</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">loguru</span><span class="w"> </span><span class="kn">import</span> <span class="n">logger</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">AuthenticationError</span>
 
 <span class="n">logger</span><span class="o">.</span><span class="n">disable</span><span class="p">(</span><span class="s2">"earthlens"</span><span class="p">);</span> <span class="n">logger</span><span class="o">.</span><span class="n">disable</span><span class="p">(</span><span class="s2">"pyramids"</span><span class="p">)</span>
 
 <span class="c1"># Daily IMERG Final Run v07; one global granule per day (we crop to Texas after).</span>
 <span class="n">paths</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="n">el</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
+    <span class="n">data_source</span><span class="o">=</span><span class="s2">"earthdata"</span><span class="p">,</span> <span class="n">dataset</span><span class="o">=</span><span class="s2">"GPM_3IMERGDF_07"</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">"precipitation"</span><span class="p">],</span>
+    <span class="n">start</span><span class="o">=</span><span class="s2">"2017-08-25"</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">"2017-08-31"</span><span class="p">,</span>
+    <span class="n">aoi</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">99.0</span><span class="p">,</span> <span class="mf">27.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">93.0</span><span class="p">,</span> <span class="mf">32.0</span><span class="p">],</span> <span class="n">path</span><span class="o">=</span><span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">(),</span>
+<span class="p">)</span>
 <span class="k">try</span><span class="p">:</span>
-    <span class="n">paths</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
-        <span class="n">data_source</span><span class="o">=</span><span class="s2">"earthdata"</span><span class="p">,</span> <span class="n">dataset</span><span class="o">=</span><span class="s2">"GPM_3IMERGDF_07"</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">"precipitation"</span><span class="p">],</span>
-        <span class="n">start</span><span class="o">=</span><span class="s2">"2017-08-25"</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">"2017-08-31"</span><span class="p">,</span>
-        <span class="n">aoi</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">99.0</span><span class="p">,</span> <span class="mf">27.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">93.0</span><span class="p">,</span> <span class="mf">32.0</span><span class="p">],</span> <span class="n">path</span><span class="o">=</span><span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">(),</span>
-    <span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">progress_bar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">paths</span><span class="p">)</span><span class="si">}</span><span class="s2"> daily IMERG granules"</span><span class="p">)</span>
-<span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>  <span class="c1"># noqa: BLE001</span>
+    <span class="n">el</span><span class="o">.</span><span class="n">authenticate</span><span class="p">()</span>
+<span class="k">except</span> <span class="n">AuthenticationError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>  <span class="c1"># noqa: BLE001</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">"Earthdata download skipped (needs credentials):"</span><span class="p">,</span> <span class="n">exc</span><span class="p">)</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">paths</span> <span class="o">=</span> <span class="n">el</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">progress_bar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">paths</span><span class="p">)</span><span class="si">}</span><span class="s2"> daily IMERG granules"</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-1">import os, tempfile
 import numpy as np, xarray as xr, matplotlib.pyplot as plt
 from loguru import logger
 from earthlens import EarthLens
+from earthlens.base import AuthenticationError
 
 logger.disable("earthlens"); logger.disable("pyramids")
 
 # Daily IMERG Final Run v07; one global granule per day (we crop to Texas after).
 paths = None
+el = EarthLens(
+    data_source="earthdata", dataset="GPM_3IMERGDF_07", variables=["precipitation"],
+    start="2017-08-25", end="2017-08-31",
+    aoi=[-99.0, 27.0, -93.0, 32.0], path=tempfile.mkdtemp(),
+)
 try:
-    paths = EarthLens(
-        data_source="earthdata", dataset="GPM_3IMERGDF_07", variables=["precipitation"],
-        start="2017-08-25", end="2017-08-31",
-        aoi=[-99.0, 27.0, -93.0, 32.0], path=tempfile.mkdtemp(),
-    ).download(progress_bar=False)
-    print(f"{len(paths)} daily IMERG granules")
-except Exception as exc:  # noqa: BLE001
-    print("Earthdata download skipped (needs credentials):", exc)</div>
+    el.authenticate()
+except AuthenticationError as exc:  # noqa: BLE001
+    print("Earthdata download skipped (needs credentials):", exc)
+else:
+    paths = el.download(progress_bar=False)
+    print(f"{len(paths)} daily IMERG granules")</div>
 </div>
 </div>
 </div>
