@@ -108,6 +108,31 @@ class TestBackendDirectDatasetSplit:
             )
 
 
+class TestAuthenticate:
+    """The explicit authenticate() surface and the unified error type."""
+
+    def test_no_auth_backend_is_noop(self, tmp_path):
+        """authenticate() on a credential-free backend (CHIRPS) returns self."""
+        chc = CHIRPS(
+            variables=["precipitation"],
+            start="2009-01-01",
+            end="2009-01-02",
+            lat_lim=[4, 5],
+            lon_lim=[-75, -74],
+            path=str(tmp_path),
+        )
+        assert chc.authenticate() is chc, "authenticate() should return self for chaining"
+
+    def test_authentication_errors_share_a_base(self):
+        """Every backend's AuthenticationError subclasses the shared base."""
+        from earthlens.base import AuthenticationError as BaseAuthError
+        from earthlens.ecmwf import AuthenticationError as EcmwfAuthError
+        from earthlens.gee import AuthenticationError as GeeAuthError
+
+        assert issubclass(EcmwfAuthError, BaseAuthError), "ECMWF must subclass base"
+        assert issubclass(GeeAuthError, BaseAuthError), "GEE must subclass base"
+
+
 class TestLazyClientMixin:
     """The mixin's default _open_client guard."""
 

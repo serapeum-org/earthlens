@@ -983,6 +983,42 @@ class EarthLens:
             own |= set(dir(datasource))
         return sorted(own)
 
+    def authenticate(self) -> EarthLens:
+        """Eagerly authenticate the bound backend; raise on failure.
+
+        The explicit, fail-fast counterpart to the lazy authentication
+        that otherwise happens on the first :meth:`download` / `search`.
+        Delegates to
+        :meth:`earthlens.base.AbstractDataSource.authenticate` — opening
+        the network client or running the credential step — and is a
+        no-op for credential-free backends. Lets callers separate "do I
+        have valid credentials?" from the download itself, e.g. wrap only
+        `authenticate()` in a `try/except AuthenticationError`.
+
+        Returns:
+            The facade, so it chains:
+            `EarthLens(...).authenticate().download()`.
+
+        Raises:
+            AuthenticationError: If the backend cannot authenticate.
+
+        Examples:
+            - Verify credentials up front, then download (live; skipped
+              here):
+                ```python
+                >>> from earthlens.earthlens import EarthLens
+                >>> EarthLens(  # doctest: +SKIP
+                ...     data_source="ecmwf",
+                ...     dataset="reanalysis-era5-single-levels",
+                ...     variables=["2m-temperature"],
+                ...     start="2022-01-01", end="2022-01-01",
+                ... ).authenticate().download()
+
+                ```
+        """
+        self.datasource.authenticate()
+        return self
+
     def search(self) -> list[RemoteProduct]:
         """List the products this request matches, without downloading them.
 

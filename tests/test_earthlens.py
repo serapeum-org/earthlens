@@ -625,6 +625,17 @@ class TestFacadeDelegation:
         names = dir(facade)
         assert "vars" in names and "download" in names, "dir() should merge both"
 
+    def test_authenticate_returns_facade_and_delegates(self, tmp_path, monkeypatch):
+        """authenticate() forwards to the backend and returns the facade."""
+        facade = self._facade(tmp_path)
+        called = []
+        monkeypatch.setattr(
+            facade.datasource, "authenticate", lambda: called.append(True)
+        )
+        result = facade.authenticate()
+        assert result is facade, "authenticate() should return the facade for chaining"
+        assert called == [True], "should delegate to the backend's authenticate()"
+
 
 @pytest.mark.chc
 class TestFacadeSearch:

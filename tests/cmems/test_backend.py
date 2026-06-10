@@ -222,6 +222,14 @@ class TestCMEMSConstruction:
         cmems_instance._auth.configure()
         assert len(fake_cmems.login_calls) == 1, "configure() is idempotent"
 
+    def test_authenticate_runs_configure(
+        self, fake_cmems: _FakeCmems, cmems_instance: CMEMS
+    ):
+        """authenticate() eagerly runs the deferred toolbox login once."""
+        assert len(fake_cmems.login_calls) == 0, "construction must not authenticate"
+        assert cmems_instance.authenticate() is cmems_instance, "returns self"
+        assert len(fake_cmems.login_calls) == 1, "authenticate() runs configure once"
+
 
 @pytest.mark.cmems
 class TestCMEMSSearch:

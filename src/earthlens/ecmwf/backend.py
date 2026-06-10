@@ -21,6 +21,7 @@ from earthlens.base import (
     TemporalExtent,
     to_datetime,
 )
+from earthlens.base import AuthenticationError as _BaseAuthenticationError
 from earthlens.ecmwf.catalog import Catalog, Variable
 from earthlens.ecmwf.constraints import RequestValidator
 
@@ -49,7 +50,7 @@ _REQUEST_KIND_STRIPS: dict[str, tuple[str, ...]] = {
 }
 
 
-class AuthenticationError(Exception):
+class AuthenticationError(_BaseAuthenticationError):
     """Raised when cdsapi cannot authenticate against the Climate Data Store.
 
     The ECMWF backend uses :class:`cdsapi.Client` to talk to CDS. The

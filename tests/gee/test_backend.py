@@ -312,6 +312,13 @@ class TestInit:
         assert gee.client is backend_module.ee
         assert gee.project == "fake-project"
 
+    def test_authenticate_opens_client(self, make_gee):
+        """authenticate() eagerly opens the Earth Engine connection."""
+        gee = make_gee()
+        assert gee.authenticate() is gee, "authenticate() returns self for chaining"
+        assert gee.client is backend_module.ee
+        assert gee.project == "fake-project"
+
     def test_bad_export_via_rejected(self, make_gee):
         """An unknown `export_via` raises `ValueError` at construction."""
         with pytest.raises(ValueError, match="export_via must be"):

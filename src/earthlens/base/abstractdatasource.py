@@ -574,6 +574,33 @@ class AbstractDataSource(ABC):
         if not os.path.exists(self.root_dir):
             os.makedirs(self.root_dir)
 
+    def authenticate(self) -> AbstractDataSource:
+        """Eagerly establish the backend's authenticated connection.
+
+        The explicit, fail-fast counterpart to the lazy authentication
+        that otherwise happens on the first :meth:`download` / `search`:
+        it opens the network client for backends that have one (those
+        mixing in :class:`LazyClientMixin` — e.g. GEE, ECMWF, STAC) or
+        runs the credential `configure()` step for backends that hold an
+        auth object (CMEMS, Earthdata, EUMETSAT, …), raising
+        :class:`~earthlens.base.AuthenticationError` on failure. It is a
+        no-op for credential-free backends (CHIRPS, GDACS, Overture, …),
+        and is idempotent.
+
+        Returns:
+            The backend instance, so callers can chain
+            `EarthLens(...).authenticate().download()`.
+
+        Raises:
+            AuthenticationError: If the backend cannot authenticate.
+        """
+        if isinstance(self, LazyClientMixin):
+            # Accessing `client` runs the cached `_open_client` (auth).
+            _ = self.client
+        elif getattr(self, "_auth", None) is not None:
+            self._auth.configure()
+        return self
+
     @abstractmethod
     def _check_input_dates(
         self, start: str, end: str, temporal_resolution: str, fmt: str
