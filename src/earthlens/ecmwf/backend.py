@@ -811,11 +811,12 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
         so a partial write cannot corrupt the cube. A no-op for a bbox /
         point `aoi=`.
 
-        Best-effort: a multi-variable CDS cube can currently trip a
-        `pyramids.NetCDF.crop` limitation (it calls `crop` on each raw
-        `MDArray`). When that happens the bbox-cropped NetCDF is kept and a
-        warning is logged rather than failing the download — polygon
-        masking starts working automatically once pyramids supports it.
+        Best-effort: a CDS cube ships a non-spatial aux variable (ERA5's
+        `expver`) that currently trips `pyramids.NetCDF.crop` — it calls
+        `crop` on that raw `MDArray` (serapeum-org/pyramids#513). When that
+        happens the bbox-cropped NetCDF is kept and a warning is logged
+        rather than failing the download — polygon masking starts working
+        automatically once pyramids skips non-spatial variables.
 
         Args:
             target: Path to the NetCDF written by `_api`.
