@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -11784,7 +11784,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span><span class="o">,</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span><span class="o">,</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">loguru</span><span class="w"> </span><span class="kn">import</span> <span class="n">logger</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">IPython.display</span><span class="w"> </span><span class="kn">import</span> <span class="n">Image</span><span class="p">,</span> <span class="n">display</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">earthlens</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">earthlens</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">DatasetCollection</span>   <span class="c1"># pyramids' own IO + plotting</span>
 
 <span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">"ignore"</span><span class="p">)</span>
@@ -11801,22 +11801,22 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">grab</span><span class="p">(</span><span class="n">bands</span><span class="p">,</span> <span class="n">day</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""Download one Sentinel-2 median composite for `day`; return its GeoTIFF path (or None)."""</span>
-    <span class="n">el</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
-        <span class="n">data_source</span><span class="o">=</span><span class="s2">"gee"</span><span class="p">,</span>
-        <span class="n">start</span><span class="o">=</span><span class="n">day</span><span class="p">,</span>
-        <span class="n">end</span><span class="o">=</span><span class="n">day</span><span class="p">,</span>
-        <span class="n">cadence</span><span class="o">=</span><span class="s2">"raw"</span><span class="p">,</span>
-        <span class="n">dataset</span><span class="o">=</span><span class="n">COLL</span><span class="p">,</span>
-        <span class="n">variables</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">bands</span><span class="p">),</span>
-        <span class="n">aoi</span><span class="o">=</span><span class="n">AOI</span><span class="p">,</span>
-        <span class="n">path</span><span class="o">=</span><span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">(),</span>
-        <span class="n">scale</span><span class="o">=</span><span class="n">scale</span><span class="p">,</span>
-        <span class="n">reducer</span><span class="o">=</span><span class="s2">"median"</span><span class="p">,</span>
-        <span class="n">service_account</span><span class="o">=</span><span class="n">SERVICE_ACCOUNT</span><span class="p">,</span>
-        <span class="n">service_key</span><span class="o">=</span><span class="n">SERVICE_KEY</span>
-    <span class="p">)</span>
     <span class="k">try</span><span class="p">:</span>
-        <span class="n">p</span> <span class="o">=</span> <span class="n">el</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">progress_bar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">earthlens</span><span class="o">.</span><span class="n">download</span><span class="p">(</span>
+            <span class="n">data_source</span><span class="o">=</span><span class="s2">"gee"</span><span class="p">,</span>
+            <span class="n">start</span><span class="o">=</span><span class="n">day</span><span class="p">,</span>
+            <span class="n">end</span><span class="o">=</span><span class="n">day</span><span class="p">,</span>
+            <span class="n">cadence</span><span class="o">=</span><span class="s2">"raw"</span><span class="p">,</span>
+            <span class="n">dataset</span><span class="o">=</span><span class="n">COLL</span><span class="p">,</span>
+            <span class="n">variables</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">bands</span><span class="p">),</span>
+            <span class="n">aoi</span><span class="o">=</span><span class="n">AOI</span><span class="p">,</span>
+            <span class="n">path</span><span class="o">=</span><span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">(),</span>
+            <span class="n">scale</span><span class="o">=</span><span class="n">scale</span><span class="p">,</span>
+            <span class="n">reducer</span><span class="o">=</span><span class="s2">"median"</span><span class="p">,</span>
+            <span class="n">service_account</span><span class="o">=</span><span class="n">SERVICE_ACCOUNT</span><span class="p">,</span>
+            <span class="n">service_key</span><span class="o">=</span><span class="n">SERVICE_KEY</span><span class="p">,</span>
+            <span class="n">progress_bar</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="p">)</span>
     <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>  <span class="c1"># noqa: BLE001 - needs GEE credentials</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">"download skipped:"</span><span class="p">,</span> <span class="n">exc</span><span class="p">);</span> <span class="k">return</span> <span class="kc">None</span>
     <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="k">if</span> <span class="n">p</span> <span class="k">else</span> <span class="kc">None</span>
@@ -11844,7 +11844,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 import numpy as np, pandas as pd, matplotlib.pyplot as plt
 from loguru import logger
 from IPython.display import Image, display
-from earthlens import EarthLens
+import earthlens
 from pyramids.dataset import Dataset, DatasetCollection   # pyramids' own IO + plotting
 
 warnings.filterwarnings("ignore")
@@ -11861,22 +11861,22 @@ rgb_dir, ndvi_dir = tempfile.mkdtemp(), tempfile.mkdtemp()
 
 def grab(bands, day, scale=10):
     """Download one Sentinel-2 median composite for `day`; return its GeoTIFF path (or None)."""
-    el = EarthLens(
-        data_source="gee",
-        start=day,
-        end=day,
-        cadence="raw",
-        dataset=COLL,
-        variables=list(bands),
-        aoi=AOI,
-        path=tempfile.mkdtemp(),
-        scale=scale,
-        reducer="median",
-        service_account=SERVICE_ACCOUNT,
-        service_key=SERVICE_KEY
-    )
     try:
-        p = el.download(progress_bar=False)
+        p = earthlens.download(
+            data_source="gee",
+            start=day,
+            end=day,
+            cadence="raw",
+            dataset=COLL,
+            variables=list(bands),
+            aoi=AOI,
+            path=tempfile.mkdtemp(),
+            scale=scale,
+            reducer="median",
+            service_account=SERVICE_ACCOUNT,
+            service_key=SERVICE_KEY,
+            progress_bar=False,
+        )
     except Exception as exc:  # noqa: BLE001 - needs GEE credentials
         print("download skipped:", exc); return None
     return str(p[0]) if p else None
