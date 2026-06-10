@@ -11668,8 +11668,7 @@ print('window:', START, 'to', END, '| box lat', LAT_LIM, 'lon', LON_LIM)</div>
         <span class="n">data_source</span><span class="o">=</span><span class="s1">'gdacs'</span><span class="p">,</span>
         <span class="n">start</span><span class="o">=</span><span class="n">START</span><span class="p">,</span>
         <span class="n">end</span><span class="o">=</span><span class="n">END</span><span class="p">,</span>
-        <span class="n">lat_lim</span><span class="o">=</span><span class="n">LAT_LIM</span><span class="p">,</span>
-        <span class="n">lon_lim</span><span class="o">=</span><span class="n">LON_LIM</span><span class="p">,</span>
+        <span class="n">aoi</span><span class="o">=</span><span class="p">[</span><span class="n">LON_LIM</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">LAT_LIM</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">LON_LIM</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">LAT_LIM</span><span class="p">[</span><span class="mi">1</span><span class="p">]],</span>
         <span class="n">alert_level</span><span class="o">=</span><span class="p">[</span><span class="s1">'Green'</span><span class="p">,</span> <span class="s1">'Orange'</span><span class="p">,</span> <span class="s1">'Red'</span><span class="p">],</span>
         <span class="n">path</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">OUT_DIR</span><span class="p">),</span>
     <span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
@@ -11685,8 +11684,7 @@ try:
         data_source='gdacs',
         start=START,
         end=END,
-        lat_lim=LAT_LIM,
-        lon_lim=LON_LIM,
+        aoi=[LON_LIM[0], LAT_LIM[0], LON_LIM[1], LAT_LIM[1]],
         alert_level=['Green', 'Orange', 'Red'],
         path=str(OUT_DIR),
     ).download()

@@ -11706,17 +11706,14 @@ reconstruct the speed magnitude $|\mathbf{v}| = \sqrt{u^2 + v^2}$.</p>
 
 <span class="n">earthlens</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
     <span class="n">data_source</span><span class="o">=</span><span class="s2">"ecmwf"</span><span class="p">,</span>
-    <span class="n">temporal_resolution</span><span class="o">=</span><span class="s2">"monthly"</span><span class="p">,</span>
+    <span class="n">cadence</span><span class="o">=</span><span class="s2">"monthly"</span><span class="p">,</span>
     <span class="n">start</span><span class="o">=</span><span class="s2">"2022-01-01"</span><span class="p">,</span>
     <span class="n">end</span><span class="o">=</span><span class="s2">"2022-12-01"</span><span class="p">,</span>
-    <span class="n">variables</span><span class="o">=</span><span class="p">{</span>
-        <span class="s2">"reanalysis-era5-single-levels-monthly-means"</span><span class="p">:</span> <span class="p">[</span>
+    <span class="n">dataset</span><span class="o">=</span><span class="s2">"reanalysis-era5-single-levels-monthly-means"</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="p">[</span>
             <span class="s2">"100m-u-component-of-wind"</span><span class="p">,</span>
             <span class="s2">"100m-v-component-of-wind"</span><span class="p">,</span>
         <span class="p">],</span>
-    <span class="p">},</span>
-    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">53.0</span><span class="p">,</span> <span class="mf">54.0</span><span class="p">],</span>
-    <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">8.0</span><span class="p">,</span> <span class="mf">9.0</span><span class="p">],</span>
+    <span class="n">aoi</span><span class="o">=</span><span class="p">[</span><span class="mf">8.0</span><span class="p">,</span> <span class="mf">53.0</span><span class="p">,</span> <span class="mf">9.0</span><span class="p">,</span> <span class="mf">54.0</span><span class="p">],</span>
     <span class="n">path</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">OUT</span><span class="p">),</span>
 <span class="p">)</span>
 <span class="n">earthlens</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">aggregate</span><span class="o">=</span><span class="n">AggregationConfig</span><span class="p">(</span><span class="n">freq</span><span class="o">=</span><span class="s2">"1MS"</span><span class="p">,</span> <span class="n">op</span><span class="o">=</span><span class="s2">"auto"</span><span class="p">))</span>
@@ -11729,17 +11726,14 @@ OUT.mkdir(parents=True, exist_ok=True)
 
 earthlens = EarthLens(
     data_source="ecmwf",
-    temporal_resolution="monthly",
+    cadence="monthly",
     start="2022-01-01",
     end="2022-12-01",
-    variables={
-        "reanalysis-era5-single-levels-monthly-means": [
+    dataset="reanalysis-era5-single-levels-monthly-means", variables=[
             "100m-u-component-of-wind",
             "100m-v-component-of-wind",
         ],
-    },
-    lat_lim=[53.0, 54.0],
-    lon_lim=[8.0, 9.0],
+    aoi=[8.0, 53.0, 9.0, 54.0],
     path=str(OUT),
 )
 earthlens.download(aggregate=AggregationConfig(freq="1MS", op="auto"))</div>
@@ -11795,9 +11789,9 @@ earthlens.download(aggregate=AggregationConfig(freq="1MS", op="auto"))</div>
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jupyter-widgets jp-OutputArea-output" id="e51eafed-da3b-4df9-bb86-018e71e24186" tabindex="0">
+<div class="jupyter-widgets jp-OutputArea-output" id="be5e19a8-e9ab-41db-9710-6ed2f0b27b13" tabindex="0">
 <script type="text/javascript">
-var element = document.getElementById('e51eafed-da3b-4df9-bb86-018e71e24186');
+var element = document.getElementById('be5e19a8-e9ab-41db-9710-6ed2f0b27b13');
 </script>
 <script type="application/vnd.jupyter.widget-view+json">
 {"model_id": "b22230adb7e4400c90172d2d5ebef2ef", "version_major": 2, "version_minor": 0}
@@ -11876,9 +11870,9 @@ var element = document.getElementById('e51eafed-da3b-4df9-bb86-018e71e24186');
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jupyter-widgets jp-OutputArea-output" id="649861df-d08d-47e7-b127-d3da9915b757" tabindex="0">
+<div class="jupyter-widgets jp-OutputArea-output" id="d5a5ff40-b759-4516-9f99-0167479048bb" tabindex="0">
 <script type="text/javascript">
-var element = document.getElementById('649861df-d08d-47e7-b127-d3da9915b757');
+var element = document.getElementById('d5a5ff40-b759-4516-9f99-0167479048bb');
 </script>
 <script type="application/vnd.jupyter.widget-view+json">
 {"model_id": "e6447597621f4cdf946a1049c7d29d32", "version_major": 2, "version_minor": 0}

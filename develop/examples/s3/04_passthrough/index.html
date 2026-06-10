@@ -11514,16 +11514,16 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.s3</span><span class="w"> </span><span class="kn">import</span> <span class="n">S3</span>
-<span class="n">src</span> <span class="o">=</span> <span class="n">S3</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="s1">'2024-01-01'</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s1">'2024-01-01'</span><span class="p">,</span> <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span> <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
+<span class="n">src</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span><span class="n">data_source</span><span class="o">=</span><span class="s2">"amazon-s3"</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="s1">'2024-01-01'</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s1">'2024-01-01'</span><span class="p">,</span> <span class="n">aoi</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
          <span class="n">dataset</span><span class="o">=</span><span class="p">{</span><span class="s1">'bucket'</span><span class="p">:</span><span class="s1">'my-open-bucket'</span><span class="p">,</span><span class="s1">'format'</span><span class="p">:</span><span class="s1">'cog'</span><span class="p">,</span><span class="s1">'layout'</span><span class="p">:</span><span class="s1">'deterministic_tiles'</span><span class="p">,</span>
                   <span class="s1">'params'</span><span class="p">:{</span><span class="s1">'key_template'</span><span class="p">:</span><span class="s1">'</span><span class="si">{year}</span><span class="s1">/tile_</span><span class="si">{variable}</span><span class="s1">.tif'</span><span class="p">}},</span>
          <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">'band1'</span><span class="p">])</span>
 <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">src</span><span class="o">.</span><span class="n">_search</span><span class="p">():</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s1">'bucket'</span><span class="p">],</span> <span class="s1">'-&gt;'</span><span class="p">,</span> <span class="n">p</span><span class="o">.</span><span class="n">href</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-1">from earthlens.s3 import S3
-src = S3(start='2024-01-01', end='2024-01-01', lat_lim=[0,1], lon_lim=[0,1],
+<div class="clipboard-copy-txt" id="cell-1">from earthlens import EarthLens
+src = EarthLens(data_source="amazon-s3", start='2024-01-01', end='2024-01-01', aoi=[0, 0, 1, 1],
          dataset={'bucket':'my-open-bucket','format':'cog','layout':'deterministic_tiles',
                   'params':{'key_template':'{year}/tile_{variable}.tif'}},
          variables=['band1'])

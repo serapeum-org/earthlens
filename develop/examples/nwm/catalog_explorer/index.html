@@ -11775,23 +11775,23 @@ whole-file download.</p>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.nwm</span><span class="w"> </span><span class="kn">import</span> <span class="n">NWM</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
 
-<span class="n">nwm</span> <span class="o">=</span> <span class="n">NWM</span><span class="p">(</span>
+<span class="n">nwm</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span><span class="n">data_source</span><span class="o">=</span><span class="s2">"nwm"</span><span class="p">,</span>
     <span class="n">start</span><span class="o">=</span><span class="s1">'2026-05-26'</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s1">'2026-05-26'</span><span class="p">,</span>
-    <span class="n">variables</span><span class="o">=</span><span class="p">{</span><span class="s1">'chrtout'</span><span class="p">:</span> <span class="p">[</span><span class="s1">'streamflow'</span><span class="p">]},</span>
-    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">90</span><span class="p">,</span> <span class="mi">90</span><span class="p">],</span> <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">180</span><span class="p">,</span> <span class="mi">180</span><span class="p">],</span>
+    <span class="n">dataset</span><span class="o">=</span><span class="s1">'chrtout'</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">'streamflow'</span><span class="p">],</span>
+    <span class="n">aoi</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">180</span><span class="p">,</span> <span class="o">-</span><span class="mi">90</span><span class="p">,</span> <span class="mi">180</span><span class="p">,</span> <span class="mi">90</span><span class="p">],</span>
     <span class="n">configuration</span><span class="o">=</span><span class="s1">'short_range'</span><span class="p">,</span> <span class="n">cycles</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">6</span><span class="p">],</span> <span class="n">steps</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span>
 <span class="p">)</span>
 <span class="k">for</span> <span class="n">rp</span> <span class="ow">in</span> <span class="n">nwm</span><span class="o">.</span><span class="n">_search</span><span class="p">():</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">rp</span><span class="o">.</span><span class="n">href</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-4">from earthlens.nwm import NWM
+<div class="clipboard-copy-txt" id="cell-4">from earthlens import EarthLens
 
-nwm = NWM(
+nwm = EarthLens(data_source="nwm",
     start='2026-05-26', end='2026-05-26',
-    variables={'chrtout': ['streamflow']},
-    lat_lim=[-90, 90], lon_lim=[-180, 180],
+    dataset='chrtout', variables=['streamflow'],
+    aoi=[-180, -90, 180, 90],
     configuration='short_range', cycles=[0, 6], steps=[1, 3],
 )
 for rp in nwm._search():
@@ -11832,18 +11832,18 @@ the product token (<code>channel_rt_1</code>):</p>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">ens</span> <span class="o">=</span> <span class="n">NWM</span><span class="p">(</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">ens</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span><span class="n">data_source</span><span class="o">=</span><span class="s2">"nwm"</span><span class="p">,</span>
     <span class="n">start</span><span class="o">=</span><span class="s1">'2026-05-26'</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s1">'2026-05-26'</span><span class="p">,</span>
-    <span class="n">variables</span><span class="o">=</span><span class="p">{</span><span class="s1">'chrtout'</span><span class="p">:</span> <span class="p">[</span><span class="s1">'streamflow'</span><span class="p">]},</span>
-    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">90</span><span class="p">,</span> <span class="mi">90</span><span class="p">],</span> <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">180</span><span class="p">,</span> <span class="mi">180</span><span class="p">],</span>
+    <span class="n">dataset</span><span class="o">=</span><span class="s1">'chrtout'</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">'streamflow'</span><span class="p">],</span>
+    <span class="n">aoi</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">180</span><span class="p">,</span> <span class="o">-</span><span class="mi">90</span><span class="p">,</span> <span class="mi">180</span><span class="p">,</span> <span class="mi">90</span><span class="p">],</span>
     <span class="n">configuration</span><span class="o">=</span><span class="s1">'medium_range'</span><span class="p">,</span> <span class="n">member</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">cycles</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">steps</span><span class="o">=</span><span class="p">[</span><span class="mi">240</span><span class="p">],</span>
 <span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">ens</span><span class="o">.</span><span class="n">_search</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">href</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-5">ens = NWM(
+<div class="clipboard-copy-txt" id="cell-5">ens = EarthLens(data_source="nwm",
     start='2026-05-26', end='2026-05-26',
-    variables={'chrtout': ['streamflow']},
-    lat_lim=[-90, 90], lon_lim=[-180, 180],
+    dataset='chrtout', variables=['streamflow'],
+    aoi=[-180, -90, 180, 90],
     configuration='medium_range', member=3, cycles=[0], steps=[240],
 )
 print(ens._search()[0].href)</div>

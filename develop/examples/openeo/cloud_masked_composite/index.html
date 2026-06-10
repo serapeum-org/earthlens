@@ -11740,9 +11740,9 @@ def run_or_skip(facade, **download_kwargs):
 
 <span class="n">facade</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
     <span class="n">data_source</span><span class="o">=</span><span class="s1">'openeo'</span><span class="p">,</span>
-    <span class="n">variables</span><span class="o">=</span><span class="p">{</span><span class="s1">'sentinel-2-l2a-cloud-masked-composite'</span><span class="p">:</span> <span class="p">[]},</span>
+    <span class="n">dataset</span><span class="o">=</span><span class="s1">'sentinel-2-l2a-cloud-masked-composite'</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="p">[],</span>
     <span class="n">start</span><span class="o">=</span><span class="s1">'2023-07-01'</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s1">'2023-07-31'</span><span class="p">,</span>
-    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">40.40</span><span class="p">,</span> <span class="mf">40.45</span><span class="p">],</span> <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">3.67</span><span class="p">,</span> <span class="mf">3.72</span><span class="p">],</span>
+    <span class="n">aoi</span><span class="o">=</span><span class="p">[</span><span class="mf">3.67</span><span class="p">,</span> <span class="mf">40.40</span><span class="p">,</span> <span class="mf">3.72</span><span class="p">,</span> <span class="mf">40.45</span><span class="p">],</span>
     <span class="n">path</span><span class="o">=</span><span class="s1">'data/openeo-composite'</span><span class="p">,</span>
     <span class="n">max_cloud_cover</span><span class="o">=</span><span class="mi">60</span><span class="p">,</span>
 <span class="p">)</span>
@@ -11752,9 +11752,9 @@ def run_or_skip(facade, **download_kwargs):
 
 facade = EarthLens(
     data_source='openeo',
-    variables={'sentinel-2-l2a-cloud-masked-composite': []},
+    dataset='sentinel-2-l2a-cloud-masked-composite', variables=[],
     start='2023-07-01', end='2023-07-31',
-    lat_lim=[40.40, 40.45], lon_lim=[3.67, 3.72],
+    aoi=[3.67, 40.40, 3.72, 40.45],
     path='data/openeo-composite',
     max_cloud_cover=60,
 )

@@ -11903,10 +11903,9 @@ verbatim.</p>
     <span class="n">data_source</span><span class="o">=</span><span class="s1">'cmems'</span><span class="p">,</span>
     <span class="n">start</span><span class="o">=</span><span class="n">START</span><span class="p">,</span>
     <span class="n">end</span><span class="o">=</span><span class="n">END</span><span class="p">,</span>
-    <span class="n">temporal_resolution</span><span class="o">=</span><span class="s1">'daily'</span><span class="p">,</span>
-    <span class="n">variables</span><span class="o">=</span><span class="p">{</span><span class="s1">'METOFFICE-GLO-SST-L4-NRT-OBS-SST-V2'</span><span class="p">:</span> <span class="p">[</span><span class="s1">'analysed_sst'</span><span class="p">]},</span>
-    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">30.0</span><span class="p">,</span> <span class="mf">36.0</span><span class="p">],</span>
-    <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">10.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">4.0</span><span class="p">],</span>
+    <span class="n">cadence</span><span class="o">=</span><span class="s1">'daily'</span><span class="p">,</span>
+    <span class="n">dataset</span><span class="o">=</span><span class="s1">'METOFFICE-GLO-SST-L4-NRT-OBS-SST-V2'</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">'analysed_sst'</span><span class="p">],</span>
+    <span class="n">aoi</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">10.0</span><span class="p">,</span> <span class="mf">30.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">4.0</span><span class="p">,</span> <span class="mf">36.0</span><span class="p">],</span>
     <span class="n">path</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">OUT_DIR</span><span class="p">),</span>
     <span class="n">service_username</span><span class="o">=</span><span class="n">SERVICE_USERNAME</span><span class="p">,</span>
     <span class="n">service_password</span><span class="o">=</span><span class="n">SERVICE_PASSWORD</span><span class="p">,</span>
@@ -11919,10 +11918,9 @@ verbatim.</p>
     data_source='cmems',
     start=START,
     end=END,
-    temporal_resolution='daily',
-    variables={'METOFFICE-GLO-SST-L4-NRT-OBS-SST-V2': ['analysed_sst']},
-    lat_lim=[30.0, 36.0],
-    lon_lim=[-10.0, -4.0],
+    cadence='daily',
+    dataset='METOFFICE-GLO-SST-L4-NRT-OBS-SST-V2', variables=['analysed_sst'],
+    aoi=[-10.0, 30.0, -4.0, 36.0],
     path=str(OUT_DIR),
     service_username=SERVICE_USERNAME,
     service_password=SERVICE_PASSWORD,
@@ -12028,15 +12026,12 @@ check against the <code>CMEMS</code> class directly.</p>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.cmems</span><span class="w"> </span><span class="kn">import</span> <span class="n">CMEMS</span>
-
-<span class="n">cmems</span> <span class="o">=</span> <span class="n">CMEMS</span><span class="p">(</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">cmems</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span><span class="n">data_source</span><span class="o">=</span><span class="s2">"cmems"</span><span class="p">,</span>
     <span class="n">start</span><span class="o">=</span><span class="n">START</span><span class="p">,</span>
     <span class="n">end</span><span class="o">=</span><span class="n">END</span><span class="p">,</span>
-    <span class="n">temporal_resolution</span><span class="o">=</span><span class="s1">'daily'</span><span class="p">,</span>
-    <span class="n">variables</span><span class="o">=</span><span class="p">{</span><span class="s1">'METOFFICE-GLO-SST-L4-NRT-OBS-SST-V2'</span><span class="p">:</span> <span class="p">[</span><span class="s1">'analysed_sst'</span><span class="p">]},</span>
-    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">30.0</span><span class="p">,</span> <span class="mf">36.0</span><span class="p">],</span>
-    <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">10.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">4.0</span><span class="p">],</span>
+    <span class="n">cadence</span><span class="o">=</span><span class="s1">'daily'</span><span class="p">,</span>
+    <span class="n">dataset</span><span class="o">=</span><span class="s1">'METOFFICE-GLO-SST-L4-NRT-OBS-SST-V2'</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">'analysed_sst'</span><span class="p">],</span>
+    <span class="n">aoi</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">10.0</span><span class="p">,</span> <span class="mf">30.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">4.0</span><span class="p">,</span> <span class="mf">36.0</span><span class="p">],</span>
     <span class="n">path</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">OUT_DIR</span><span class="p">),</span>
     <span class="n">service_username</span><span class="o">=</span><span class="n">SERVICE_USERNAME</span><span class="p">,</span>
     <span class="n">service_password</span><span class="o">=</span><span class="n">SERVICE_PASSWORD</span><span class="p">,</span>
@@ -12045,15 +12040,12 @@ check against the <code>CMEMS</code> class directly.</p>
 <span class="n">paths</span> <span class="o">=</span> <span class="n">cmems</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">paths</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-4">from earthlens.cmems import CMEMS
-
-cmems = CMEMS(
+<div class="clipboard-copy-txt" id="cell-4">cmems = EarthLens(data_source="cmems",
     start=START,
     end=END,
-    temporal_resolution='daily',
-    variables={'METOFFICE-GLO-SST-L4-NRT-OBS-SST-V2': ['analysed_sst']},
-    lat_lim=[30.0, 36.0],
-    lon_lim=[-10.0, -4.0],
+    cadence='daily',
+    dataset='METOFFICE-GLO-SST-L4-NRT-OBS-SST-V2', variables=['analysed_sst'],
+    aoi=[-10.0, 30.0, -4.0, 36.0],
     path=str(OUT_DIR),
     service_username=SERVICE_USERNAME,
     service_password=SERVICE_PASSWORD,

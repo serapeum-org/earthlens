@@ -11670,12 +11670,12 @@ no whole-store download.</p>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">tempfile</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.nwm</span><span class="w"> </span><span class="kn">import</span> <span class="n">NWM</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">earthlens</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
 
-<span class="n">nwm</span> <span class="o">=</span> <span class="n">NWM</span><span class="p">(</span>
+<span class="n">nwm</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span><span class="n">data_source</span><span class="o">=</span><span class="s2">"nwm"</span><span class="p">,</span>
     <span class="n">start</span><span class="o">=</span><span class="s1">'2010-06-01'</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s1">'2010-06-02'</span><span class="p">,</span>
-    <span class="n">variables</span><span class="o">=</span><span class="p">{</span><span class="s1">'chrtout'</span><span class="p">:</span> <span class="p">[</span><span class="s1">'streamflow'</span><span class="p">]},</span>
-    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">90</span><span class="p">,</span> <span class="mi">90</span><span class="p">],</span> <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">180</span><span class="p">,</span> <span class="mi">180</span><span class="p">],</span>
+    <span class="n">dataset</span><span class="o">=</span><span class="s1">'chrtout'</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">'streamflow'</span><span class="p">],</span>
+    <span class="n">aoi</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">180</span><span class="p">,</span> <span class="o">-</span><span class="mi">90</span><span class="p">,</span> <span class="mi">180</span><span class="p">,</span> <span class="mi">90</span><span class="p">],</span>
     <span class="n">configuration</span><span class="o">=</span><span class="s1">'analysis_assim'</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">'retrospective'</span><span class="p">,</span>
     <span class="n">sites</span><span class="o">=</span><span class="p">[</span><span class="mi">101</span><span class="p">,</span> <span class="mi">179</span><span class="p">,</span> <span class="mi">181</span><span class="p">],</span>
     <span class="n">path</span><span class="o">=</span><span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="s1">'nwm_retro_'</span><span class="p">),</span>
@@ -11688,12 +11688,12 @@ no whole-store download.</p>
 <div class="clipboard-copy-txt" id="cell-1">import tempfile
 from pathlib import Path
 import pandas as pd
-from earthlens.nwm import NWM
+from earthlens import EarthLens
 
-nwm = NWM(
+nwm = EarthLens(data_source="nwm",
     start='2010-06-01', end='2010-06-02',
-    variables={'chrtout': ['streamflow']},
-    lat_lim=[-90, 90], lon_lim=[-180, 180],
+    dataset='chrtout', variables=['streamflow'],
+    aoi=[-180, -90, 180, 90],
     configuration='analysis_assim', mode='retrospective',
     sites=[101, 179, 181],
     path=tempfile.mkdtemp(prefix='nwm_retro_'),
@@ -11780,17 +11780,17 @@ those to the in-file <code>gage_id</code> coordinate join instead of <code>featu
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># (enumerated, not downloaded here) — gage_id strings vs feature_id ints</span>
-<span class="n">g</span> <span class="o">=</span> <span class="n">NWM</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="s1">'2010-06-01'</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s1">'2010-06-02'</span><span class="p">,</span>
-        <span class="n">variables</span><span class="o">=</span><span class="p">{</span><span class="s1">'chrtout'</span><span class="p">:</span> <span class="p">[</span><span class="s1">'streamflow'</span><span class="p">]},</span>
-        <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">90</span><span class="p">,</span> <span class="mi">90</span><span class="p">],</span> <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">180</span><span class="p">,</span> <span class="mi">180</span><span class="p">],</span>
+<span class="n">g</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span><span class="n">data_source</span><span class="o">=</span><span class="s2">"nwm"</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="s1">'2010-06-01'</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s1">'2010-06-02'</span><span class="p">,</span>
+        <span class="n">dataset</span><span class="o">=</span><span class="s1">'chrtout'</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">'streamflow'</span><span class="p">],</span>
+        <span class="n">aoi</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">180</span><span class="p">,</span> <span class="o">-</span><span class="mi">90</span><span class="p">,</span> <span class="mi">180</span><span class="p">,</span> <span class="mi">90</span><span class="p">],</span>
         <span class="n">configuration</span><span class="o">=</span><span class="s1">'analysis_assim'</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">'retrospective'</span><span class="p">,</span>
         <span class="n">sites</span><span class="o">=</span><span class="p">[</span><span class="mi">101</span><span class="p">,</span> <span class="s1">'01010000'</span><span class="p">])</span>
 <span class="nb">print</span><span class="p">(</span><span class="s1">'feature_id ints:'</span><span class="p">,</span> <span class="n">g</span><span class="o">.</span><span class="n">_feature_ids</span><span class="p">(),</span> <span class="s1">'| gage_id strings:'</span><span class="p">,</span> <span class="n">g</span><span class="o">.</span><span class="n">_gage_ids</span><span class="p">())</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-3"># (enumerated, not downloaded here) — gage_id strings vs feature_id ints
-g = NWM(start='2010-06-01', end='2010-06-02',
-        variables={'chrtout': ['streamflow']},
-        lat_lim=[-90, 90], lon_lim=[-180, 180],
+g = EarthLens(data_source="nwm", start='2010-06-01', end='2010-06-02',
+        dataset='chrtout', variables=['streamflow'],
+        aoi=[-180, -90, 180, 90],
         configuration='analysis_assim', mode='retrospective',
         sites=[101, '01010000'])
 print('feature_id ints:', g._feature_ids(), '| gage_id strings:', g._gage_ids())</div>
@@ -11838,9 +11838,9 @@ does not yet expose, so it raises a clear <code>NotImplementedError</code>. Thei
     <span class="k">except</span> <span class="ne">NotImplementedError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
         <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="n">label</span><span class="si">}</span><span class="s1">: NotImplementedError -&gt; </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">exc</span><span class="p">)[:</span><span class="mi">70</span><span class="p">]</span><span class="si">}</span><span class="s1">...'</span><span class="p">)</span>
 
-<span class="n">grid</span> <span class="o">=</span> <span class="n">NWM</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="s1">'2010-06-01'</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s1">'2010-06-02'</span><span class="p">,</span>
-           <span class="n">variables</span><span class="o">=</span><span class="p">{</span><span class="s1">'ldasout'</span><span class="p">:</span> <span class="p">[</span><span class="s1">'SOIL_M'</span><span class="p">]},</span>
-           <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">90</span><span class="p">,</span> <span class="mi">90</span><span class="p">],</span> <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">180</span><span class="p">,</span> <span class="mi">180</span><span class="p">],</span>
+<span class="n">grid</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span><span class="n">data_source</span><span class="o">=</span><span class="s2">"nwm"</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="s1">'2010-06-01'</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s1">'2010-06-02'</span><span class="p">,</span>
+           <span class="n">dataset</span><span class="o">=</span><span class="s1">'ldasout'</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">'SOIL_M'</span><span class="p">],</span>
+           <span class="n">aoi</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">180</span><span class="p">,</span> <span class="o">-</span><span class="mi">90</span><span class="p">,</span> <span class="mi">180</span><span class="p">,</span> <span class="mi">90</span><span class="p">],</span>
            <span class="n">configuration</span><span class="o">=</span><span class="s1">'analysis_assim'</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">'retrospective'</span><span class="p">,</span> <span class="n">sites</span><span class="o">=</span><span class="p">[</span><span class="mi">101</span><span class="p">])</span>
 <span class="n">show</span><span class="p">(</span><span class="s1">'gridded retrospective subset'</span><span class="p">,</span> <span class="k">lambda</span><span class="p">:</span> <span class="n">grid</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">progress_bar</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
 </pre></div>
@@ -11850,9 +11850,9 @@ does not yet expose, so it raises a clear <code>NotImplementedError</code>. Thei
     except NotImplementedError as exc:
         print(f'{label}: NotImplementedError -&gt; {str(exc)[:70]}...')
 
-grid = NWM(start='2010-06-01', end='2010-06-02',
-           variables={'ldasout': ['SOIL_M']},
-           lat_lim=[-90, 90], lon_lim=[-180, 180],
+grid = EarthLens(data_source="nwm", start='2010-06-01', end='2010-06-02',
+           dataset='ldasout', variables=['SOIL_M'],
+           aoi=[-180, -90, 180, 90],
            configuration='analysis_assim', mode='retrospective', sites=[101])
 show('gridded retrospective subset', lambda: grid.download(progress_bar=False))</div>
 </div>
@@ -11891,15 +11891,15 @@ needs a separate reader, so the temporal aggregator is unsupported.</p>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">agg</span> <span class="o">=</span> <span class="n">NWM</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="s1">'2010-06-01'</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s1">'2010-06-02'</span><span class="p">,</span>
-          <span class="n">variables</span><span class="o">=</span><span class="p">{</span><span class="s1">'chrtout'</span><span class="p">:</span> <span class="p">[</span><span class="s1">'streamflow'</span><span class="p">]},</span>
-          <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">90</span><span class="p">,</span> <span class="mi">90</span><span class="p">],</span> <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">180</span><span class="p">,</span> <span class="mi">180</span><span class="p">],</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">agg</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span><span class="n">data_source</span><span class="o">=</span><span class="s2">"nwm"</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="s1">'2010-06-01'</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s1">'2010-06-02'</span><span class="p">,</span>
+          <span class="n">dataset</span><span class="o">=</span><span class="s1">'chrtout'</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">'streamflow'</span><span class="p">],</span>
+          <span class="n">aoi</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">180</span><span class="p">,</span> <span class="o">-</span><span class="mi">90</span><span class="p">,</span> <span class="mi">180</span><span class="p">,</span> <span class="mi">90</span><span class="p">],</span>
           <span class="n">configuration</span><span class="o">=</span><span class="s1">'analysis_assim'</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">'retrospective'</span><span class="p">)</span>
 <span class="n">show</span><span class="p">(</span><span class="s1">'aggregate='</span><span class="p">,</span> <span class="k">lambda</span><span class="p">:</span> <span class="n">agg</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">aggregate</span><span class="o">=</span><span class="nb">object</span><span class="p">()))</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-5">agg = NWM(start='2010-06-01', end='2010-06-02',
-          variables={'chrtout': ['streamflow']},
-          lat_lim=[-90, 90], lon_lim=[-180, 180],
+<div class="clipboard-copy-txt" id="cell-5">agg = EarthLens(data_source="nwm", start='2010-06-01', end='2010-06-02',
+          dataset='chrtout', variables=['streamflow'],
+          aoi=[-180, -90, 180, 90],
           configuration='analysis_assim', mode='retrospective')
 show('aggregate=', lambda: agg.download(aggregate=object()))</div>
 </div>

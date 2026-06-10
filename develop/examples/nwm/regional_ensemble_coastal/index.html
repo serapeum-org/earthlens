@@ -11760,13 +11760,13 @@ print('domain:', hi.domain, '| step_width:', hi.step_width,
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">dt</span><span class="o">,</span><span class="w"> </span><span class="nn">tempfile</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.nwm</span><span class="w"> </span><span class="kn">import</span> <span class="n">NWM</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">earthlens</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
 
 <span class="n">date</span> <span class="o">=</span> <span class="p">(</span><span class="n">dt</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span> <span class="o">-</span> <span class="n">dt</span><span class="o">.</span><span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="mi">3</span><span class="p">))</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">'%Y-%m-</span><span class="si">%d</span><span class="s1">'</span><span class="p">)</span>
-<span class="n">nwm</span> <span class="o">=</span> <span class="n">NWM</span><span class="p">(</span>
+<span class="n">nwm</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span><span class="n">data_source</span><span class="o">=</span><span class="s2">"nwm"</span><span class="p">,</span>
     <span class="n">start</span><span class="o">=</span><span class="n">date</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="n">date</span><span class="p">,</span>
-    <span class="n">variables</span><span class="o">=</span><span class="p">{</span><span class="s1">'chrtout'</span><span class="p">:</span> <span class="p">[</span><span class="s1">'streamflow'</span><span class="p">]},</span>
-    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">90</span><span class="p">,</span> <span class="mi">90</span><span class="p">],</span> <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">180</span><span class="p">,</span> <span class="mi">180</span><span class="p">],</span>
+    <span class="n">dataset</span><span class="o">=</span><span class="s1">'chrtout'</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">'streamflow'</span><span class="p">],</span>
+    <span class="n">aoi</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">180</span><span class="p">,</span> <span class="o">-</span><span class="mi">90</span><span class="p">,</span> <span class="mi">180</span><span class="p">,</span> <span class="mi">90</span><span class="p">],</span>
     <span class="n">configuration</span><span class="o">=</span><span class="s1">'short_range_hawaii'</span><span class="p">,</span> <span class="n">cycles</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">steps</span><span class="o">=</span><span class="p">[</span><span class="mi">15</span><span class="p">],</span>
     <span class="n">path</span><span class="o">=</span><span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="s1">'nwm_hi_'</span><span class="p">),</span>
 <span class="p">)</span>
@@ -11778,13 +11778,13 @@ print('domain:', hi.domain, '| step_width:', hi.step_width,
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-3">import datetime as dt, tempfile
 from pathlib import Path
-from earthlens.nwm import NWM
+from earthlens import EarthLens
 
 date = (dt.datetime.now() - dt.timedelta(days=3)).strftime('%Y-%m-%d')
-nwm = NWM(
+nwm = EarthLens(data_source="nwm",
     start=date, end=date,
-    variables={'chrtout': ['streamflow']},
-    lat_lim=[-90, 90], lon_lim=[-180, 180],
+    dataset='chrtout', variables=['streamflow'],
+    aoi=[-180, -90, 180, 90],
     configuration='short_range_hawaii', cycles=[0], steps=[15],
     path=tempfile.mkdtemp(prefix='nwm_hi_'),
 )
@@ -11829,18 +11829,18 @@ token (<code>channel_rt_2</code>) — shown here as the enumerated key (no downl
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">ens</span> <span class="o">=</span> <span class="n">NWM</span><span class="p">(</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">ens</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span><span class="n">data_source</span><span class="o">=</span><span class="s2">"nwm"</span><span class="p">,</span>
     <span class="n">start</span><span class="o">=</span><span class="n">date</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="n">date</span><span class="p">,</span>
-    <span class="n">variables</span><span class="o">=</span><span class="p">{</span><span class="s1">'ldasout'</span><span class="p">:</span> <span class="p">[</span><span class="s1">'SOIL_M'</span><span class="p">]},</span>
-    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">90</span><span class="p">,</span> <span class="mi">90</span><span class="p">],</span> <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">180</span><span class="p">,</span> <span class="mi">180</span><span class="p">],</span>
+    <span class="n">dataset</span><span class="o">=</span><span class="s1">'ldasout'</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">'SOIL_M'</span><span class="p">],</span>
+    <span class="n">aoi</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">180</span><span class="p">,</span> <span class="o">-</span><span class="mi">90</span><span class="p">,</span> <span class="mi">180</span><span class="p">,</span> <span class="mi">90</span><span class="p">],</span>
     <span class="n">configuration</span><span class="o">=</span><span class="s1">'medium_range'</span><span class="p">,</span> <span class="n">member</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">cycles</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">steps</span><span class="o">=</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span>
 <span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">ens</span><span class="o">.</span><span class="n">_search</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">href</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">'/'</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">1</span><span class="p">])</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-4">ens = NWM(
+<div class="clipboard-copy-txt" id="cell-4">ens = EarthLens(data_source="nwm",
     start=date, end=date,
-    variables={'ldasout': ['SOIL_M']},
-    lat_lim=[-90, 90], lon_lim=[-180, 180],
+    dataset='ldasout', variables=['SOIL_M'],
+    aoi=[-180, -90, 180, 90],
     configuration='medium_range', member=2, cycles=[0], steps=[3],
 )
 print(ens._search()[0].href.split('/', 1)[1])</div>

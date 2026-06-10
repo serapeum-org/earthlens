@@ -11762,8 +11762,8 @@ subset call.</p>
     <span class="n">data_source</span><span class="o">=</span><span class="s1">'cmems'</span><span class="p">,</span>
     <span class="n">start</span><span class="o">=</span><span class="s1">'2018-01-01'</span><span class="p">,</span>
     <span class="n">end</span><span class="o">=</span><span class="s1">'2020-12-31'</span><span class="p">,</span>
-    <span class="n">temporal_resolution</span><span class="o">=</span><span class="s1">'daily'</span><span class="p">,</span>
-    <span class="n">variables</span><span class="o">=</span><span class="p">{</span><span class="n">DATASET_ID</span><span class="p">:</span> <span class="n">VARIABLES</span><span class="p">},</span>
+    <span class="n">cadence</span><span class="o">=</span><span class="s1">'daily'</span><span class="p">,</span>
+    <span class="n">dataset</span><span class="o">=</span><span class="n">DATASET_ID</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="n">VARIABLES</span><span class="p">,</span>
     <span class="o">**</span><span class="n">BBOX</span><span class="p">,</span>
     <span class="n">path</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">OUT_DIR</span><span class="p">),</span>
     <span class="n">minimum_depth</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
@@ -11778,8 +11778,8 @@ subset call.</p>
     data_source='cmems',
     start='2018-01-01',
     end='2020-12-31',
-    temporal_resolution='daily',
-    variables={DATASET_ID: VARIABLES},
+    cadence='daily',
+    dataset=DATASET_ID, variables=VARIABLES,
     **BBOX,
     path=str(OUT_DIR),
     minimum_depth=0.0,
@@ -11876,9 +11876,9 @@ print(paths)</div>
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jupyter-widgets jp-OutputArea-output" id="2afccd38-8aaa-4638-a6bd-2d2485519f2e" tabindex="0">
+<div class="jupyter-widgets jp-OutputArea-output" id="aaed242a-b654-4453-ab89-1ea9f964f772" tabindex="0">
 <script type="text/javascript">
-var element = document.getElementById('2afccd38-8aaa-4638-a6bd-2d2485519f2e');
+var element = document.getElementById('aaed242a-b654-4453-ab89-1ea9f964f772');
 </script>
 <script type="application/vnd.jupyter.widget-view+json">
 {"model_id": "207c116d17be436f9d0be666889c63e4", "version_major": 2, "version_minor": 0}

@@ -11514,10 +11514,12 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.s3</span><span class="w"> </span><span class="kn">import</span> <span class="n">S3</span><span class="p">,</span> <span class="n">Catalog</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.s3</span><span class="w"> </span><span class="kn">import</span> <span class="n">Catalog</span>
 <span class="n">S3</span><span class="o">.</span><span class="n">datasets</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-1">from earthlens.s3 import S3, Catalog
+<div class="clipboard-copy-txt" id="cell-1">from earthlens import EarthLens
+from earthlens.s3 import Catalog
 S3.datasets()</div>
 </div>
 </div>
@@ -11629,11 +11631,11 @@ sorted(era5.variables)</div>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">src</span> <span class="o">=</span> <span class="n">S3</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="s1">'2021-01-01'</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s1">'2021-01-01'</span><span class="p">,</span> <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">0.4</span><span class="p">,</span><span class="mf">0.6</span><span class="p">],</span> <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">6.4</span><span class="p">,</span><span class="mf">6.6</span><span class="p">],</span> <span class="n">dataset</span><span class="o">=</span><span class="s1">'copernicus-dem'</span><span class="p">)</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">src</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span><span class="n">data_source</span><span class="o">=</span><span class="s2">"amazon-s3"</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="s1">'2021-01-01'</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s1">'2021-01-01'</span><span class="p">,</span> <span class="n">aoi</span><span class="o">=</span><span class="p">[</span><span class="mf">6.4</span><span class="p">,</span> <span class="mf">0.4</span><span class="p">,</span> <span class="mf">6.6</span><span class="p">,</span> <span class="mf">0.6</span><span class="p">],</span> <span class="n">dataset</span><span class="o">=</span><span class="s1">'copernicus-dem'</span><span class="p">)</span>
 <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">src</span><span class="o">.</span><span class="n">_search</span><span class="p">():</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">href</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-4">src = S3(start='2021-01-01', end='2021-01-01', lat_lim=[0.4,0.6], lon_lim=[6.4,6.6], dataset='copernicus-dem')
+<div class="clipboard-copy-txt" id="cell-4">src = EarthLens(data_source="amazon-s3", start='2021-01-01', end='2021-01-01', aoi=[6.4, 0.4, 6.6, 0.6], dataset='copernicus-dem')
 for p in src._search():
     print(p.href)</div>
 </div>

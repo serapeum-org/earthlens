@@ -11953,15 +11953,12 @@ with the default catalog values, see <code>cds_quickstart.ipynb</code>.</p>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.ecmwf</span><span class="w"> </span><span class="kn">import</span> <span class="n">ECMWF</span>
-
-<span class="n">ecmwf</span> <span class="o">=</span> <span class="n">ECMWF</span><span class="p">(</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">ecmwf</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span><span class="n">data_source</span><span class="o">=</span><span class="s2">"ecmwf"</span><span class="p">,</span>
     <span class="n">start</span><span class="o">=</span><span class="s2">"2022-01-01"</span><span class="p">,</span>
     <span class="n">end</span><span class="o">=</span><span class="s2">"2022-01-07"</span><span class="p">,</span>
-    <span class="n">temporal_resolution</span><span class="o">=</span><span class="s2">"daily"</span><span class="p">,</span>
-    <span class="n">variables</span><span class="o">=</span><span class="p">{</span><span class="s2">"reanalysis-era5-pressure-levels"</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span><span class="n">PATCHED</span><span class="p">)},</span>
-    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">30.0</span><span class="p">,</span> <span class="mf">65.0</span><span class="p">],</span>
-    <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">50.0</span><span class="p">,</span> <span class="mf">30.0</span><span class="p">],</span>
+    <span class="n">cadence</span><span class="o">=</span><span class="s2">"daily"</span><span class="p">,</span>
+    <span class="n">dataset</span><span class="o">=</span><span class="s2">"reanalysis-era5-pressure-levels"</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">PATCHED</span><span class="p">),</span>
+    <span class="n">aoi</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">50.0</span><span class="p">,</span> <span class="mf">30.0</span><span class="p">,</span> <span class="mf">30.0</span><span class="p">,</span> <span class="mf">65.0</span><span class="p">],</span>
     <span class="n">path</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">OUT</span><span class="p">),</span>
 <span class="p">)</span>
 <span class="k">for</span> <span class="n">code</span><span class="p">,</span> <span class="n">var_info</span> <span class="ow">in</span> <span class="n">PATCHED</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
@@ -11969,15 +11966,12 @@ with the default catalog values, see <code>cds_quickstart.ipynb</code>.</p>
     <span class="n">ecmwf</span><span class="o">.</span><span class="n">_api</span><span class="p">(</span><span class="n">var_info</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">"done"</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-3">from earthlens.ecmwf import ECMWF
-
-ecmwf = ECMWF(
+<div class="clipboard-copy-txt" id="cell-3">ecmwf = EarthLens(data_source="ecmwf",
     start="2022-01-01",
     end="2022-01-07",
-    temporal_resolution="daily",
-    variables={"reanalysis-era5-pressure-levels": list(PATCHED)},
-    lat_lim=[30.0, 65.0],
-    lon_lim=[-50.0, 30.0],
+    cadence="daily",
+    dataset="reanalysis-era5-pressure-levels", variables=list(PATCHED),
+    aoi=[-50.0, 30.0, 30.0, 65.0],
     path=str(OUT),
 )
 for code, var_info in PATCHED.items():
@@ -12036,9 +12030,9 @@ print("done")</div>
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jupyter-widgets jp-OutputArea-output" id="ef33868c-7fbf-48fa-bae8-37a97dbf0802" tabindex="0">
+<div class="jupyter-widgets jp-OutputArea-output" id="813c5f33-9190-4db0-9617-223ac2577bd0" tabindex="0">
 <script type="text/javascript">
-var element = document.getElementById('ef33868c-7fbf-48fa-bae8-37a97dbf0802');
+var element = document.getElementById('813c5f33-9190-4db0-9617-223ac2577bd0');
 </script>
 <script type="application/vnd.jupyter.widget-view+json">
 {"model_id": "c75fe74215f44d33a7e674ef02413cd6", "version_major": 2, "version_minor": 0}
@@ -12082,9 +12076,9 @@ var element = document.getElementById('ef33868c-7fbf-48fa-bae8-37a97dbf0802');
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jupyter-widgets jp-OutputArea-output" id="8b90aa25-aab2-4ace-b361-27f7d7cf54df" tabindex="0">
+<div class="jupyter-widgets jp-OutputArea-output" id="20dec122-5ee7-4b5d-85ca-e62228d939fc" tabindex="0">
 <script type="text/javascript">
-var element = document.getElementById('8b90aa25-aab2-4ace-b361-27f7d7cf54df');
+var element = document.getElementById('20dec122-5ee7-4b5d-85ca-e62228d939fc');
 </script>
 <script type="application/vnd.jupyter.widget-view+json">
 {"model_id": "fcc3e985717640dc918384af1a514682", "version_major": 2, "version_minor": 0}
@@ -12135,9 +12129,9 @@ var element = document.getElementById('8b90aa25-aab2-4ace-b361-27f7d7cf54df');
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jupyter-widgets jp-OutputArea-output" id="85fe488d-db10-414e-a0f0-920e3b30a585" tabindex="0">
+<div class="jupyter-widgets jp-OutputArea-output" id="98e94f76-495d-49c4-8679-6d2b16226ff5" tabindex="0">
 <script type="text/javascript">
-var element = document.getElementById('85fe488d-db10-414e-a0f0-920e3b30a585');
+var element = document.getElementById('98e94f76-495d-49c4-8679-6d2b16226ff5');
 </script>
 <script type="application/vnd.jupyter.widget-view+json">
 {"model_id": "4a63f8ead77c425188a2f50002c45e47", "version_major": 2, "version_minor": 0}

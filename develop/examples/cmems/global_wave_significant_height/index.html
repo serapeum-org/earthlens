@@ -11730,10 +11730,9 @@ VHM0 units: m
     <span class="n">data_source</span><span class="o">=</span><span class="s1">'cmems'</span><span class="p">,</span>
     <span class="n">start</span><span class="o">=</span><span class="s1">'2014-02-08'</span><span class="p">,</span>
     <span class="n">end</span><span class="o">=</span><span class="s1">'2014-02-10'</span><span class="p">,</span>
-    <span class="n">temporal_resolution</span><span class="o">=</span><span class="s1">'hourly'</span><span class="p">,</span>
-    <span class="n">variables</span><span class="o">=</span><span class="p">{</span><span class="n">DATASET_ID</span><span class="p">:</span> <span class="p">[</span><span class="s1">'VHM0'</span><span class="p">]},</span>
-    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">40.0</span><span class="p">,</span> <span class="mf">55.0</span><span class="p">],</span>
-    <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">30.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">5.0</span><span class="p">],</span>
+    <span class="n">cadence</span><span class="o">=</span><span class="s1">'hourly'</span><span class="p">,</span>
+    <span class="n">dataset</span><span class="o">=</span><span class="n">DATASET_ID</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">'VHM0'</span><span class="p">],</span>
+    <span class="n">aoi</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">30.0</span><span class="p">,</span> <span class="mf">40.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">5.0</span><span class="p">,</span> <span class="mf">55.0</span><span class="p">],</span>
     <span class="n">path</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">OUT_DIR</span><span class="p">),</span>
     <span class="n">service_username</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'COPERNICUSMARINE_SERVICE_USERNAME'</span><span class="p">),</span>
     <span class="n">service_password</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'COPERNICUSMARINE_SERVICE_PASSWORD'</span><span class="p">),</span>
@@ -11745,10 +11744,9 @@ VHM0 units: m
     data_source='cmems',
     start='2014-02-08',
     end='2014-02-10',
-    temporal_resolution='hourly',
-    variables={DATASET_ID: ['VHM0']},
-    lat_lim=[40.0, 55.0],
-    lon_lim=[-30.0, -5.0],
+    cadence='hourly',
+    dataset=DATASET_ID, variables=['VHM0'],
+    aoi=[-30.0, 40.0, -5.0, 55.0],
     path=str(OUT_DIR),
     service_username=os.environ.get('COPERNICUSMARINE_SERVICE_USERNAME'),
     service_password=os.environ.get('COPERNICUSMARINE_SERVICE_PASSWORD'),

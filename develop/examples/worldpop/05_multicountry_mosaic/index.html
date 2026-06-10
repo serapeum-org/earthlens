@@ -11515,20 +11515,20 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">tempfile</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.worldpop</span><span class="w"> </span><span class="kn">import</span> <span class="n">WorldPop</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">earthlens</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
 <span class="n">d</span> <span class="o">=</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">()</span>
-<span class="n">backend</span> <span class="o">=</span> <span class="n">WorldPop</span><span class="p">(</span><span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">'pop'</span><span class="p">],</span> <span class="n">start</span><span class="o">=</span><span class="s1">'2020'</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s1">'2020'</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="s1">'%Y'</span><span class="p">,</span>
-                   <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">2.9</span><span class="p">,</span> <span class="o">-</span><span class="mf">2.3</span><span class="p">],</span> <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">29.0</span><span class="p">,</span> <span class="mf">30.0</span><span class="p">],</span> <span class="n">path</span><span class="o">=</span><span class="n">d</span><span class="p">,</span>
+<span class="n">backend</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span><span class="n">data_source</span><span class="o">=</span><span class="s2">"worldpop"</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">'pop'</span><span class="p">],</span> <span class="n">start</span><span class="o">=</span><span class="s1">'2020'</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s1">'2020'</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="s1">'%Y'</span><span class="p">,</span>
+                   <span class="n">aoi</span><span class="o">=</span><span class="p">[</span><span class="mf">29.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">2.9</span><span class="p">,</span> <span class="mf">30.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">2.3</span><span class="p">],</span> <span class="n">path</span><span class="o">=</span><span class="n">d</span><span class="p">,</span>
                    <span class="n">resolution</span><span class="o">=</span><span class="s1">'1km'</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s1">'countries in AOI:'</span><span class="p">,</span> <span class="n">backend</span><span class="o">.</span><span class="n">_iso3s</span><span class="p">)</span>
 <span class="n">paths</span> <span class="o">=</span> <span class="n">backend</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">progress_bar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s1">'written:'</span><span class="p">,</span> <span class="p">[</span><span class="n">p</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">paths</span><span class="p">])</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-1">import tempfile
-from earthlens.worldpop import WorldPop
+from earthlens import EarthLens
 d = tempfile.mkdtemp()
-backend = WorldPop(variables=['pop'], start='2020', end='2020', fmt='%Y',
-                   lat_lim=[-2.9, -2.3], lon_lim=[29.0, 30.0], path=d,
+backend = EarthLens(data_source="worldpop", variables=['pop'], start='2020', end='2020', fmt='%Y',
+                   aoi=[29.0, -2.9, 30.0, -2.3], path=d,
                    resolution='1km')
 print('countries in AOI:', backend._iso3s)
 paths = backend.download(progress_bar=False)

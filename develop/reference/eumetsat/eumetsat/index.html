@@ -13579,21 +13579,21 @@ gate <code>aggregate=</code>.</p>
 <a id="__codelineno-0-199" name="__codelineno-0-199"></a>        <span class="k">return</span> <span class="n">kinds</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
 <a id="__codelineno-0-200" name="__codelineno-0-200"></a>
 <a id="__codelineno-0-201" name="__codelineno-0-201"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_initialize</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<a id="__codelineno-0-202" name="__codelineno-0-202"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Build the `EumetsatAuth` and run `configure()` (mint the token).</span>
+<a id="__codelineno-0-202" name="__codelineno-0-202"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Build the `EumetsatAuth`; defer token minting to fetch.</span>
 <a id="__codelineno-0-203" name="__codelineno-0-203"></a>
 <a id="__codelineno-0-204" name="__codelineno-0-204"></a><span class="sd">        Returns `None` — `eumdac` keeps the token on the `EumetsatAuth`</span>
-<a id="__codelineno-0-205" name="__codelineno-0-205"></a><span class="sd">        instance, so the parent class binds no opaque `self.client`.</span>
-<a id="__codelineno-0-206" name="__codelineno-0-206"></a>
-<a id="__codelineno-0-207" name="__codelineno-0-207"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-208" name="__codelineno-0-208"></a><span class="sd">            AuthenticationError: When token minting fails.</span>
-<a id="__codelineno-0-209" name="__codelineno-0-209"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-210" name="__codelineno-0-210"></a>        <span class="n">creds</span> <span class="o">=</span> <span class="n">EumetsatCredentials</span><span class="p">(</span>
-<a id="__codelineno-0-211" name="__codelineno-0-211"></a>            <span class="n">consumer_key</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_consumer_key</span><span class="p">,</span>
-<a id="__codelineno-0-212" name="__codelineno-0-212"></a>            <span class="n">consumer_secret</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_consumer_secret</span><span class="p">,</span>
-<a id="__codelineno-0-213" name="__codelineno-0-213"></a>            <span class="n">credentials_file</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_credentials_file</span><span class="p">,</span>
-<a id="__codelineno-0-214" name="__codelineno-0-214"></a>        <span class="p">)</span>
-<a id="__codelineno-0-215" name="__codelineno-0-215"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_auth</span> <span class="o">=</span> <span class="n">EumetsatAuth</span><span class="p">(</span><span class="n">creds</span><span class="p">)</span>
-<a id="__codelineno-0-216" name="__codelineno-0-216"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_auth</span><span class="o">.</span><span class="n">configure</span><span class="p">()</span>
+<a id="__codelineno-0-205" name="__codelineno-0-205"></a><span class="sd">        instance, so the parent class binds no opaque `self.client`. The</span>
+<a id="__codelineno-0-206" name="__codelineno-0-206"></a><span class="sd">        token minting (`EumetsatAuth.configure`, which contacts the auth</span>
+<a id="__codelineno-0-207" name="__codelineno-0-207"></a><span class="sd">        server) is deferred: :meth:`_fetch` already calls the idempotent</span>
+<a id="__codelineno-0-208" name="__codelineno-0-208"></a><span class="sd">        `configure()` before downloading, so constructing the backend</span>
+<a id="__codelineno-0-209" name="__codelineno-0-209"></a><span class="sd">        never authenticates and `_search()` stays offline.</span>
+<a id="__codelineno-0-210" name="__codelineno-0-210"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-211" name="__codelineno-0-211"></a>        <span class="n">creds</span> <span class="o">=</span> <span class="n">EumetsatCredentials</span><span class="p">(</span>
+<a id="__codelineno-0-212" name="__codelineno-0-212"></a>            <span class="n">consumer_key</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_consumer_key</span><span class="p">,</span>
+<a id="__codelineno-0-213" name="__codelineno-0-213"></a>            <span class="n">consumer_secret</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_consumer_secret</span><span class="p">,</span>
+<a id="__codelineno-0-214" name="__codelineno-0-214"></a>            <span class="n">credentials_file</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_credentials_file</span><span class="p">,</span>
+<a id="__codelineno-0-215" name="__codelineno-0-215"></a>        <span class="p">)</span>
+<a id="__codelineno-0-216" name="__codelineno-0-216"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_auth</span> <span class="o">=</span> <span class="n">EumetsatAuth</span><span class="p">(</span><span class="n">creds</span><span class="p">)</span>
 <a id="__codelineno-0-217" name="__codelineno-0-217"></a>        <span class="k">return</span> <span class="kc">None</span>
 <a id="__codelineno-0-218" name="__codelineno-0-218"></a>
 <a id="__codelineno-0-219" name="__codelineno-0-219"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_create_grid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lat_lim</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">lon_lim</span><span class="p">:</span> <span class="nb">list</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SpatialExtent</span><span class="p">:</span>
@@ -17068,21 +17068,21 @@ gate <code>aggregate=</code>.</p>
 <a id="__codelineno-0-199" name="__codelineno-0-199"></a>        <span class="k">return</span> <span class="n">kinds</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
 <a id="__codelineno-0-200" name="__codelineno-0-200"></a>
 <a id="__codelineno-0-201" name="__codelineno-0-201"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_initialize</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<a id="__codelineno-0-202" name="__codelineno-0-202"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Build the `EumetsatAuth` and run `configure()` (mint the token).</span>
+<a id="__codelineno-0-202" name="__codelineno-0-202"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Build the `EumetsatAuth`; defer token minting to fetch.</span>
 <a id="__codelineno-0-203" name="__codelineno-0-203"></a>
 <a id="__codelineno-0-204" name="__codelineno-0-204"></a><span class="sd">        Returns `None` — `eumdac` keeps the token on the `EumetsatAuth`</span>
-<a id="__codelineno-0-205" name="__codelineno-0-205"></a><span class="sd">        instance, so the parent class binds no opaque `self.client`.</span>
-<a id="__codelineno-0-206" name="__codelineno-0-206"></a>
-<a id="__codelineno-0-207" name="__codelineno-0-207"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-208" name="__codelineno-0-208"></a><span class="sd">            AuthenticationError: When token minting fails.</span>
-<a id="__codelineno-0-209" name="__codelineno-0-209"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-210" name="__codelineno-0-210"></a>        <span class="n">creds</span> <span class="o">=</span> <span class="n">EumetsatCredentials</span><span class="p">(</span>
-<a id="__codelineno-0-211" name="__codelineno-0-211"></a>            <span class="n">consumer_key</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_consumer_key</span><span class="p">,</span>
-<a id="__codelineno-0-212" name="__codelineno-0-212"></a>            <span class="n">consumer_secret</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_consumer_secret</span><span class="p">,</span>
-<a id="__codelineno-0-213" name="__codelineno-0-213"></a>            <span class="n">credentials_file</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_credentials_file</span><span class="p">,</span>
-<a id="__codelineno-0-214" name="__codelineno-0-214"></a>        <span class="p">)</span>
-<a id="__codelineno-0-215" name="__codelineno-0-215"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_auth</span> <span class="o">=</span> <span class="n">EumetsatAuth</span><span class="p">(</span><span class="n">creds</span><span class="p">)</span>
-<a id="__codelineno-0-216" name="__codelineno-0-216"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_auth</span><span class="o">.</span><span class="n">configure</span><span class="p">()</span>
+<a id="__codelineno-0-205" name="__codelineno-0-205"></a><span class="sd">        instance, so the parent class binds no opaque `self.client`. The</span>
+<a id="__codelineno-0-206" name="__codelineno-0-206"></a><span class="sd">        token minting (`EumetsatAuth.configure`, which contacts the auth</span>
+<a id="__codelineno-0-207" name="__codelineno-0-207"></a><span class="sd">        server) is deferred: :meth:`_fetch` already calls the idempotent</span>
+<a id="__codelineno-0-208" name="__codelineno-0-208"></a><span class="sd">        `configure()` before downloading, so constructing the backend</span>
+<a id="__codelineno-0-209" name="__codelineno-0-209"></a><span class="sd">        never authenticates and `_search()` stays offline.</span>
+<a id="__codelineno-0-210" name="__codelineno-0-210"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-211" name="__codelineno-0-211"></a>        <span class="n">creds</span> <span class="o">=</span> <span class="n">EumetsatCredentials</span><span class="p">(</span>
+<a id="__codelineno-0-212" name="__codelineno-0-212"></a>            <span class="n">consumer_key</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_consumer_key</span><span class="p">,</span>
+<a id="__codelineno-0-213" name="__codelineno-0-213"></a>            <span class="n">consumer_secret</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_consumer_secret</span><span class="p">,</span>
+<a id="__codelineno-0-214" name="__codelineno-0-214"></a>            <span class="n">credentials_file</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_credentials_file</span><span class="p">,</span>
+<a id="__codelineno-0-215" name="__codelineno-0-215"></a>        <span class="p">)</span>
+<a id="__codelineno-0-216" name="__codelineno-0-216"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_auth</span> <span class="o">=</span> <span class="n">EumetsatAuth</span><span class="p">(</span><span class="n">creds</span><span class="p">)</span>
 <a id="__codelineno-0-217" name="__codelineno-0-217"></a>        <span class="k">return</span> <span class="kc">None</span>
 <a id="__codelineno-0-218" name="__codelineno-0-218"></a>
 <a id="__codelineno-0-219" name="__codelineno-0-219"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_create_grid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lat_lim</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">lon_lim</span><span class="p">:</span> <span class="nb">list</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SpatialExtent</span><span class="p">:</span>

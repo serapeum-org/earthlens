@@ -11787,7 +11787,8 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span> <span class="k">as</span> <span class="n">PyramidsDataset</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.gee</span><span class="w"> </span><span class="kn">import</span> <span class="n">GEE</span><span class="p">,</span> <span class="n">Catalog</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">earthlens</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.gee</span><span class="w"> </span><span class="kn">import</span> <span class="n">Catalog</span>
 
 <span class="n">OUT_DIR</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s1">'out'</span><span class="p">)</span> <span class="o">/</span> <span class="s1">'community'</span>
 <span class="n">OUT_DIR</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -11803,7 +11804,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 from pyramids.dataset import Dataset as PyramidsDataset
 
-from earthlens.gee import GEE, Catalog
+from earthlens import EarthLens
+from earthlens.gee import Catalog
 
 OUT_DIR = Path('out') / 'community'
 OUT_DIR.mkdir(parents=True, exist_ok=True)
@@ -11949,13 +11951,12 @@ band ids (first 5):  ['R', 'G', 'B', 'N', 'Q']
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="k">try</span><span class="p">:</span>
-    <span class="n">gee</span> <span class="o">=</span> <span class="n">GEE</span><span class="p">(</span>
+    <span class="n">gee</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span><span class="n">data_source</span><span class="o">=</span><span class="s2">"gee"</span><span class="p">,</span>
         <span class="n">start</span><span class="o">=</span><span class="s1">'2024-01-01'</span><span class="p">,</span>
         <span class="n">end</span><span class="o">=</span><span class="s1">'2024-03-31'</span><span class="p">,</span>
-        <span class="n">variables</span><span class="o">=</span><span class="p">{</span><span class="s1">'projects/planet-nicfi/assets/basemaps/africa'</span><span class="p">:</span> <span class="p">[</span><span class="s1">'R'</span><span class="p">]},</span>
-        <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">1.5</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.4</span><span class="p">],</span>
-        <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">29.5</span><span class="p">,</span> <span class="mf">29.6</span><span class="p">],</span>
-        <span class="n">temporal_resolution</span><span class="o">=</span><span class="s1">'raw'</span><span class="p">,</span>
+        <span class="n">dataset</span><span class="o">=</span><span class="s1">'projects/planet-nicfi/assets/basemaps/africa'</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">'R'</span><span class="p">],</span>
+        <span class="n">aoi</span><span class="o">=</span><span class="p">[</span><span class="mf">29.5</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.5</span><span class="p">,</span> <span class="mf">29.6</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.4</span><span class="p">],</span>
+        <span class="n">cadence</span><span class="o">=</span><span class="s1">'raw'</span><span class="p">,</span>
         <span class="n">path</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">OUT_DIR</span><span class="p">),</span>
         <span class="n">service_account</span><span class="o">=</span><span class="n">SERVICE_ACCOUNT</span><span class="p">,</span>
         <span class="n">service_key</span><span class="o">=</span><span class="n">SERVICE_KEY</span><span class="p">,</span>
@@ -11976,13 +11977,12 @@ band ids (first 5):  ['R', 'G', 'B', 'N', 'Q']
         <span class="k">raise</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-3">try:
-    gee = GEE(
+    gee = EarthLens(data_source="gee",
         start='2024-01-01',
         end='2024-03-31',
-        variables={'projects/planet-nicfi/assets/basemaps/africa': ['R']},
-        lat_lim=[-1.5, -1.4],
-        lon_lim=[29.5, 29.6],
-        temporal_resolution='raw',
+        dataset='projects/planet-nicfi/assets/basemaps/africa', variables=['R'],
+        aoi=[29.5, -1.5, 29.6, -1.4],
+        cadence='raw',
         path=str(OUT_DIR),
         service_account=SERVICE_ACCOUNT,
         service_key=SERVICE_KEY,
@@ -12250,13 +12250,12 @@ print(f'created folder: {DEMO_FOLDER}')</div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">submitted_ok</span> <span class="o">=</span> <span class="kc">False</span>
 <span class="n">task_info</span> <span class="o">=</span> <span class="kc">None</span>
 <span class="k">try</span><span class="p">:</span>
-    <span class="n">async_gee</span> <span class="o">=</span> <span class="n">GEE</span><span class="p">(</span>
+    <span class="n">async_gee</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span><span class="n">data_source</span><span class="o">=</span><span class="s2">"gee"</span><span class="p">,</span>
         <span class="n">start</span><span class="o">=</span><span class="s1">'2024-01-01'</span><span class="p">,</span>
         <span class="n">end</span><span class="o">=</span><span class="s1">'2024-03-31'</span><span class="p">,</span>
-        <span class="n">variables</span><span class="o">=</span><span class="p">{</span><span class="s1">'projects/planet-nicfi/assets/basemaps/africa'</span><span class="p">:</span> <span class="p">[</span><span class="s1">'R'</span><span class="p">]},</span>
-        <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">1.5</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.4</span><span class="p">],</span>
-        <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">29.5</span><span class="p">,</span> <span class="mf">29.6</span><span class="p">],</span>
-        <span class="n">temporal_resolution</span><span class="o">=</span><span class="s1">'raw'</span><span class="p">,</span>
+        <span class="n">dataset</span><span class="o">=</span><span class="s1">'projects/planet-nicfi/assets/basemaps/africa'</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">'R'</span><span class="p">],</span>
+        <span class="n">aoi</span><span class="o">=</span><span class="p">[</span><span class="mf">29.5</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.5</span><span class="p">,</span> <span class="mf">29.6</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.4</span><span class="p">],</span>
+        <span class="n">cadence</span><span class="o">=</span><span class="s1">'raw'</span><span class="p">,</span>
         <span class="n">path</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">OUT_DIR</span><span class="p">),</span>
         <span class="n">service_account</span><span class="o">=</span><span class="n">SERVICE_ACCOUNT</span><span class="p">,</span>
         <span class="n">service_key</span><span class="o">=</span><span class="n">SERVICE_KEY</span><span class="p">,</span>
@@ -12280,13 +12279,12 @@ print(f'created folder: {DEMO_FOLDER}')</div>
 <div class="clipboard-copy-txt" id="cell-6">submitted_ok = False
 task_info = None
 try:
-    async_gee = GEE(
+    async_gee = EarthLens(data_source="gee",
         start='2024-01-01',
         end='2024-03-31',
-        variables={'projects/planet-nicfi/assets/basemaps/africa': ['R']},
-        lat_lim=[-1.5, -1.4],
-        lon_lim=[29.5, 29.6],
-        temporal_resolution='raw',
+        dataset='projects/planet-nicfi/assets/basemaps/africa', variables=['R'],
+        aoi=[29.5, -1.5, 29.6, -1.4],
+        cadence='raw',
         path=str(OUT_DIR),
         service_account=SERVICE_ACCOUNT,
         service_key=SERVICE_KEY,
