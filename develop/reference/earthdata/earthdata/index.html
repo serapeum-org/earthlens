@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -14588,13 +14588,7 @@ value to gate <code>aggregate=</code>.</p>
 <span class="normal"><a href="#__codelineno-0-638">638</a></span>
 <span class="normal"><a href="#__codelineno-0-639">639</a></span>
 <span class="normal"><a href="#__codelineno-0-640">640</a></span>
-<span class="normal"><a href="#__codelineno-0-641">641</a></span>
-<span class="normal"><a href="#__codelineno-0-642">642</a></span>
-<span class="normal"><a href="#__codelineno-0-643">643</a></span>
-<span class="normal"><a href="#__codelineno-0-644">644</a></span>
-<span class="normal"><a href="#__codelineno-0-645">645</a></span>
-<span class="normal"><a href="#__codelineno-0-646">646</a></span>
-<span class="normal"><a href="#__codelineno-0-647">647</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-56" name="__codelineno-0-56"></a><span class="k">class</span><span class="w"> </span><span class="nc">Earthdata</span><span class="p">(</span><span class="n">AbstractDataSource</span><span class="p">):</span>
+<span class="normal"><a href="#__codelineno-0-641">641</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-56" name="__codelineno-0-56"></a><span class="k">class</span><span class="w"> </span><span class="nc">Earthdata</span><span class="p">(</span><span class="n">AbstractDataSource</span><span class="p">):</span>
 <a id="__codelineno-0-57" name="__codelineno-0-57"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;NASA Earthdata backend (per-dataset output kind).</span>
 <a id="__codelineno-0-58" name="__codelineno-0-58"></a>
 <a id="__codelineno-0-59" name="__codelineno-0-59"></a><span class="sd">    Wraps `earthaccess` + CMR so a user can search a curated NASA</span>
@@ -14761,26 +14755,26 @@ value to gate <code>aggregate=</code>.</p>
 <a id="__codelineno-0-220" name="__codelineno-0-220"></a><span class="sd">        &quot;&quot;&quot;</span>
 <a id="__codelineno-0-221" name="__codelineno-0-221"></a>        <span class="n">kinds</span> <span class="o">=</span> <span class="p">{</span><span class="n">ds</span><span class="o">.</span><span class="n">output_kind</span> <span class="k">for</span> <span class="n">ds</span> <span class="ow">in</span> <span class="n">datasets</span><span class="p">}</span>
 <a id="__codelineno-0-222" name="__codelineno-0-222"></a>        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">kinds</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
-<a id="__codelineno-0-223" name="__codelineno-0-223"></a>            <span class="n">detail</span> <span class="o">=</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-<a id="__codelineno-0-224" name="__codelineno-0-224"></a>                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">ds</span><span class="o">.</span><span class="n">short_name</span><span class="si">}</span><span class="s2">=</span><span class="si">{</span><span class="n">ds</span><span class="o">.</span><span class="n">output_kind</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">ds</span> <span class="ow">in</span> <span class="n">datasets</span>
-<a id="__codelineno-0-225" name="__codelineno-0-225"></a>            <span class="p">)</span>
-<a id="__codelineno-0-226" name="__codelineno-0-226"></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-<a id="__codelineno-0-227" name="__codelineno-0-227"></a>                <span class="s2">&quot;all datasets in one Earthdata request must share one &quot;</span>
-<a id="__codelineno-0-228" name="__codelineno-0-228"></a>                <span class="sa">f</span><span class="s2">&quot;output_kind; got mixed kinds (</span><span class="si">{</span><span class="n">detail</span><span class="si">}</span><span class="s2">). Split the &quot;</span>
-<a id="__codelineno-0-229" name="__codelineno-0-229"></a>                <span class="s2">&quot;request into one call per output kind.&quot;</span>
-<a id="__codelineno-0-230" name="__codelineno-0-230"></a>            <span class="p">)</span>
-<a id="__codelineno-0-231" name="__codelineno-0-231"></a>        <span class="k">return</span> <span class="n">kinds</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
-<a id="__codelineno-0-232" name="__codelineno-0-232"></a>
-<a id="__codelineno-0-233" name="__codelineno-0-233"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_initialize</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<a id="__codelineno-0-234" name="__codelineno-0-234"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Build the :class:`EarthdataAuth`; defer the EDL login to fetch.</span>
-<a id="__codelineno-0-235" name="__codelineno-0-235"></a>
-<a id="__codelineno-0-236" name="__codelineno-0-236"></a><span class="sd">        Returns `None` — `earthaccess` keeps the authenticated handle on</span>
-<a id="__codelineno-0-237" name="__codelineno-0-237"></a><span class="sd">        the :class:`EarthdataAuth` instance (and a persisted token), so</span>
-<a id="__codelineno-0-238" name="__codelineno-0-238"></a><span class="sd">        the parent class binds no opaque `self.client`. The EDL login</span>
-<a id="__codelineno-0-239" name="__codelineno-0-239"></a><span class="sd">        (`EarthdataAuth.configure`, which contacts the auth server) is</span>
-<a id="__codelineno-0-240" name="__codelineno-0-240"></a><span class="sd">        deferred: :meth:`_fetch` already calls the idempotent</span>
-<a id="__codelineno-0-241" name="__codelineno-0-241"></a><span class="sd">        `configure()` before downloading, so constructing the backend</span>
-<a id="__codelineno-0-242" name="__codelineno-0-242"></a><span class="sd">        never authenticates and `_search()` stays offline.</span>
+<a id="__codelineno-0-223" name="__codelineno-0-223"></a>            <span class="n">detail</span> <span class="o">=</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">ds</span><span class="o">.</span><span class="n">short_name</span><span class="si">}</span><span class="s2">=</span><span class="si">{</span><span class="n">ds</span><span class="o">.</span><span class="n">output_kind</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">ds</span> <span class="ow">in</span> <span class="n">datasets</span><span class="p">)</span>
+<a id="__codelineno-0-224" name="__codelineno-0-224"></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+<a id="__codelineno-0-225" name="__codelineno-0-225"></a>                <span class="s2">&quot;all datasets in one Earthdata request must share one &quot;</span>
+<a id="__codelineno-0-226" name="__codelineno-0-226"></a>                <span class="sa">f</span><span class="s2">&quot;output_kind; got mixed kinds (</span><span class="si">{</span><span class="n">detail</span><span class="si">}</span><span class="s2">). Split the &quot;</span>
+<a id="__codelineno-0-227" name="__codelineno-0-227"></a>                <span class="s2">&quot;request into one call per output kind.&quot;</span>
+<a id="__codelineno-0-228" name="__codelineno-0-228"></a>            <span class="p">)</span>
+<a id="__codelineno-0-229" name="__codelineno-0-229"></a>        <span class="k">return</span> <span class="n">kinds</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+<a id="__codelineno-0-230" name="__codelineno-0-230"></a>
+<a id="__codelineno-0-231" name="__codelineno-0-231"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_initialize</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<a id="__codelineno-0-232" name="__codelineno-0-232"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Build the :class:`EarthdataAuth`; defer the EDL login.</span>
+<a id="__codelineno-0-233" name="__codelineno-0-233"></a>
+<a id="__codelineno-0-234" name="__codelineno-0-234"></a><span class="sd">        Returns `None` — `earthaccess` keeps the authenticated handle on</span>
+<a id="__codelineno-0-235" name="__codelineno-0-235"></a><span class="sd">        the :class:`EarthdataAuth` instance (and a persisted token), so</span>
+<a id="__codelineno-0-236" name="__codelineno-0-236"></a><span class="sd">        the parent class binds no opaque `self.client`. The EDL login</span>
+<a id="__codelineno-0-237" name="__codelineno-0-237"></a><span class="sd">        (`EarthdataAuth.configure`, which contacts the auth server) is</span>
+<a id="__codelineno-0-238" name="__codelineno-0-238"></a><span class="sd">        deferred out of construction: it runs on the first :meth:`_search`</span>
+<a id="__codelineno-0-239" name="__codelineno-0-239"></a><span class="sd">        (CMR granule search authenticates via the idempotent `configure()`),</span>
+<a id="__codelineno-0-240" name="__codelineno-0-240"></a><span class="sd">        so constructing the backend never authenticates — but note that a</span>
+<a id="__codelineno-0-241" name="__codelineno-0-241"></a><span class="sd">        dry-run `search()` does, since CMR access goes through the same</span>
+<a id="__codelineno-0-242" name="__codelineno-0-242"></a><span class="sd">        `earthaccess` session.</span>
 <a id="__codelineno-0-243" name="__codelineno-0-243"></a><span class="sd">        &quot;&quot;&quot;</span>
 <a id="__codelineno-0-244" name="__codelineno-0-244"></a>        <span class="n">creds</span> <span class="o">=</span> <span class="n">EarthdataCredentials</span><span class="p">(</span>
 <a id="__codelineno-0-245" name="__codelineno-0-245"></a>            <span class="n">username</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_username</span><span class="p">,</span>
@@ -15010,182 +15004,176 @@ value to gate <code>aggregate=</code>.</p>
 <a id="__codelineno-0-469" name="__codelineno-0-469"></a><span class="sd">                `region`.</span>
 <a id="__codelineno-0-470" name="__codelineno-0-470"></a><span class="sd">        &quot;&quot;&quot;</span>
 <a id="__codelineno-0-471" name="__codelineno-0-471"></a>        <span class="n">caller</span> <span class="o">=</span> <span class="p">(</span>
-<a id="__codelineno-0-472" name="__codelineno-0-472"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">_region</span>
-<a id="__codelineno-0-473" name="__codelineno-0-473"></a>            <span class="ow">or</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;AWS_REGION&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-474" name="__codelineno-0-474"></a>            <span class="ow">or</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;AWS_DEFAULT_REGION&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-475" name="__codelineno-0-475"></a>        <span class="p">)</span>
-<a id="__codelineno-0-476" name="__codelineno-0-476"></a>        <span class="k">return</span> <span class="n">caller</span> <span class="o">==</span> <span class="n">region</span>
-<a id="__codelineno-0-477" name="__codelineno-0-477"></a>
-<a id="__codelineno-0-478" name="__codelineno-0-478"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
-<a id="__codelineno-0-479" name="__codelineno-0-479"></a>        <span class="bp">self</span><span class="p">,</span>
-<a id="__codelineno-0-480" name="__codelineno-0-480"></a>        <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-<a id="__codelineno-0-481" name="__codelineno-0-481"></a>        <span class="n">aggregate</span><span class="p">:</span> <span class="n">AggregationConfig</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-482" name="__codelineno-0-482"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
-<a id="__codelineno-0-483" name="__codelineno-0-483"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Search CMR, fetch the granules, return their local paths.</span>
-<a id="__codelineno-0-484" name="__codelineno-0-484"></a>
-<a id="__codelineno-0-485" name="__codelineno-0-485"></a><span class="sd">        Composes :meth:`_search` and :meth:`_fetch` to pull every</span>
-<a id="__codelineno-0-486" name="__codelineno-0-486"></a><span class="sd">        granule matching the request bbox + window to `self.root_dir`</span>
-<a id="__codelineno-0-487" name="__codelineno-0-487"></a><span class="sd">        (or in-region S3 handles). When `aggregate` is given, the</span>
-<a id="__codelineno-0-488" name="__codelineno-0-488"></a><span class="sd">        fetched granules are reduced per-window via the existing</span>
-<a id="__codelineno-0-489" name="__codelineno-0-489"></a><span class="sd">        pyramids reducer (`G6`) — the facade only forwards `aggregate=`</span>
-<a id="__codelineno-0-490" name="__codelineno-0-490"></a><span class="sd">        for a `&quot;raster&quot;` instance, having rejected it for `&quot;vector&quot;` /</span>
-<a id="__codelineno-0-491" name="__codelineno-0-491"></a><span class="sd">        `&quot;tabular&quot;`.</span>
-<a id="__codelineno-0-492" name="__codelineno-0-492"></a>
-<a id="__codelineno-0-493" name="__codelineno-0-493"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-494" name="__codelineno-0-494"></a><span class="sd">            progress_bar: Forwarded to `earthaccess` as `show_progress`</span>
-<a id="__codelineno-0-495" name="__codelineno-0-495"></a><span class="sd">                on the download / open call, so `False` suppresses the</span>
-<a id="__codelineno-0-496" name="__codelineno-0-496"></a><span class="sd">                per-granule progress bar.</span>
-<a id="__codelineno-0-497" name="__codelineno-0-497"></a><span class="sd">            aggregate: Optional</span>
-<a id="__codelineno-0-498" name="__codelineno-0-498"></a><span class="sd">                :class:`earthlens.aggregate.AggregationConfig`. Only</span>
-<a id="__codelineno-0-499" name="__codelineno-0-499"></a><span class="sd">                reached for a `&quot;raster&quot;` instance.</span>
-<a id="__codelineno-0-500" name="__codelineno-0-500"></a>
-<a id="__codelineno-0-501" name="__codelineno-0-501"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-502" name="__codelineno-0-502"></a><span class="sd">            list[Path]: The fetched granule paths, or — when</span>
-<a id="__codelineno-0-503" name="__codelineno-0-503"></a><span class="sd">                `aggregate` is set — the per-window reduced raster</span>
-<a id="__codelineno-0-504" name="__codelineno-0-504"></a><span class="sd">                paths.</span>
-<a id="__codelineno-0-505" name="__codelineno-0-505"></a>
-<a id="__codelineno-0-506" name="__codelineno-0-506"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-507" name="__codelineno-0-507"></a><span class="sd">            NotImplementedError: When `aggregate` is set but the</span>
-<a id="__codelineno-0-508" name="__codelineno-0-508"></a><span class="sd">                installed pyramids exposes no `NetCDF.reduce` /</span>
-<a id="__codelineno-0-509" name="__codelineno-0-509"></a><span class="sd">                `DatasetCollection.groupby` for the fetched format.</span>
-<a id="__codelineno-0-510" name="__codelineno-0-510"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-511" name="__codelineno-0-511"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_show_progress</span> <span class="o">=</span> <span class="n">progress_bar</span>
-<a id="__codelineno-0-512" name="__codelineno-0-512"></a>        <span class="n">paths</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api_via_search_fetch</span><span class="p">()</span>
-<a id="__codelineno-0-513" name="__codelineno-0-513"></a>        <span class="k">if</span> <span class="n">aggregate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-514" name="__codelineno-0-514"></a>            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_aggregate</span><span class="p">(</span><span class="n">paths</span><span class="p">,</span> <span class="n">aggregate</span><span class="p">)</span>
-<a id="__codelineno-0-515" name="__codelineno-0-515"></a>        <span class="k">return</span> <span class="n">paths</span>
-<a id="__codelineno-0-516" name="__codelineno-0-516"></a>
-<a id="__codelineno-0-517" name="__codelineno-0-517"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_aggregate</span><span class="p">(</span>
-<a id="__codelineno-0-518" name="__codelineno-0-518"></a>        <span class="bp">self</span><span class="p">,</span> <span class="n">paths</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">],</span> <span class="n">config</span><span class="p">:</span> <span class="n">AggregationConfig</span>
-<a id="__codelineno-0-519" name="__codelineno-0-519"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
-<a id="__codelineno-0-520" name="__codelineno-0-520"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Reduce fetched raster granules per-window via pyramids (`G6`).</span>
-<a id="__codelineno-0-521" name="__codelineno-0-521"></a>
-<a id="__codelineno-0-522" name="__codelineno-0-522"></a><span class="sd">        The routing is **axis-driven, not format-driven** — it depends</span>
-<a id="__codelineno-0-523" name="__codelineno-0-523"></a><span class="sd">        on where the time axis lives, not on the file extension:</span>
-<a id="__codelineno-0-524" name="__codelineno-0-524"></a>
-<a id="__codelineno-0-525" name="__codelineno-0-525"></a><span class="sd">        * The common Earthdata case is a **stack of single-timestep</span>
-<a id="__codelineno-0-526" name="__codelineno-0-526"></a><span class="sd">          granules** (one file per overpass / half-hour / day, NetCDF</span>
-<a id="__codelineno-0-527" name="__codelineno-0-527"></a><span class="sd">          *or* COG). That whole stack is windowed by</span>
-<a id="__codelineno-0-528" name="__codelineno-0-528"></a><span class="sd">          :meth:`pyramids.dataset.DatasetCollection.groupby` (the STAC</span>
-<a id="__codelineno-0-529" name="__codelineno-0-529"></a><span class="sd">          path) — one reduced raster per `config.freq` window.</span>
-<a id="__codelineno-0-530" name="__codelineno-0-530"></a><span class="sd">        * The rarer case is a **single granule that already carries a</span>
-<a id="__codelineno-0-531" name="__codelineno-0-531"></a><span class="sd">          multi-timestep time axis inside it** (one NetCDF cube). Its</span>
-<a id="__codelineno-0-532" name="__codelineno-0-532"></a><span class="sd">          internal `time` axis is collapsed by</span>
-<a id="__codelineno-0-533" name="__codelineno-0-533"></a><span class="sd">          :meth:`pyramids.netcdf.NetCDF.reduce` (the CMEMS path).</span>
-<a id="__codelineno-0-534" name="__codelineno-0-534"></a>
-<a id="__codelineno-0-535" name="__codelineno-0-535"></a><span class="sd">        A single COG (one timestep, no internal axis) falls through to</span>
-<a id="__codelineno-0-536" name="__codelineno-0-536"></a><span class="sd">        the stack path as a one-element stack (a single window).</span>
+<a id="__codelineno-0-472" name="__codelineno-0-472"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">_region</span> <span class="ow">or</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;AWS_REGION&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;AWS_DEFAULT_REGION&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-473" name="__codelineno-0-473"></a>        <span class="p">)</span>
+<a id="__codelineno-0-474" name="__codelineno-0-474"></a>        <span class="k">return</span> <span class="n">caller</span> <span class="o">==</span> <span class="n">region</span>
+<a id="__codelineno-0-475" name="__codelineno-0-475"></a>
+<a id="__codelineno-0-476" name="__codelineno-0-476"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
+<a id="__codelineno-0-477" name="__codelineno-0-477"></a>        <span class="bp">self</span><span class="p">,</span>
+<a id="__codelineno-0-478" name="__codelineno-0-478"></a>        <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+<a id="__codelineno-0-479" name="__codelineno-0-479"></a>        <span class="n">aggregate</span><span class="p">:</span> <span class="n">AggregationConfig</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-480" name="__codelineno-0-480"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
+<a id="__codelineno-0-481" name="__codelineno-0-481"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Search CMR, fetch the granules, return their local paths.</span>
+<a id="__codelineno-0-482" name="__codelineno-0-482"></a>
+<a id="__codelineno-0-483" name="__codelineno-0-483"></a><span class="sd">        Composes :meth:`_search` and :meth:`_fetch` to pull every</span>
+<a id="__codelineno-0-484" name="__codelineno-0-484"></a><span class="sd">        granule matching the request bbox + window to `self.root_dir`</span>
+<a id="__codelineno-0-485" name="__codelineno-0-485"></a><span class="sd">        (or in-region S3 handles). When `aggregate` is given, the</span>
+<a id="__codelineno-0-486" name="__codelineno-0-486"></a><span class="sd">        fetched granules are reduced per-window via the existing</span>
+<a id="__codelineno-0-487" name="__codelineno-0-487"></a><span class="sd">        pyramids reducer (`G6`) — the facade only forwards `aggregate=`</span>
+<a id="__codelineno-0-488" name="__codelineno-0-488"></a><span class="sd">        for a `&quot;raster&quot;` instance, having rejected it for `&quot;vector&quot;` /</span>
+<a id="__codelineno-0-489" name="__codelineno-0-489"></a><span class="sd">        `&quot;tabular&quot;`.</span>
+<a id="__codelineno-0-490" name="__codelineno-0-490"></a>
+<a id="__codelineno-0-491" name="__codelineno-0-491"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-492" name="__codelineno-0-492"></a><span class="sd">            progress_bar: Forwarded to `earthaccess` as `show_progress`</span>
+<a id="__codelineno-0-493" name="__codelineno-0-493"></a><span class="sd">                on the download / open call, so `False` suppresses the</span>
+<a id="__codelineno-0-494" name="__codelineno-0-494"></a><span class="sd">                per-granule progress bar.</span>
+<a id="__codelineno-0-495" name="__codelineno-0-495"></a><span class="sd">            aggregate: Optional</span>
+<a id="__codelineno-0-496" name="__codelineno-0-496"></a><span class="sd">                :class:`earthlens.aggregate.AggregationConfig`. Only</span>
+<a id="__codelineno-0-497" name="__codelineno-0-497"></a><span class="sd">                reached for a `&quot;raster&quot;` instance.</span>
+<a id="__codelineno-0-498" name="__codelineno-0-498"></a>
+<a id="__codelineno-0-499" name="__codelineno-0-499"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-500" name="__codelineno-0-500"></a><span class="sd">            list[Path]: The fetched granule paths, or — when</span>
+<a id="__codelineno-0-501" name="__codelineno-0-501"></a><span class="sd">                `aggregate` is set — the per-window reduced raster</span>
+<a id="__codelineno-0-502" name="__codelineno-0-502"></a><span class="sd">                paths.</span>
+<a id="__codelineno-0-503" name="__codelineno-0-503"></a>
+<a id="__codelineno-0-504" name="__codelineno-0-504"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-505" name="__codelineno-0-505"></a><span class="sd">            NotImplementedError: When `aggregate` is set but the</span>
+<a id="__codelineno-0-506" name="__codelineno-0-506"></a><span class="sd">                installed pyramids exposes no `NetCDF.reduce` /</span>
+<a id="__codelineno-0-507" name="__codelineno-0-507"></a><span class="sd">                `DatasetCollection.groupby` for the fetched format.</span>
+<a id="__codelineno-0-508" name="__codelineno-0-508"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-509" name="__codelineno-0-509"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_show_progress</span> <span class="o">=</span> <span class="n">progress_bar</span>
+<a id="__codelineno-0-510" name="__codelineno-0-510"></a>        <span class="n">paths</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api_via_search_fetch</span><span class="p">()</span>
+<a id="__codelineno-0-511" name="__codelineno-0-511"></a>        <span class="k">if</span> <span class="n">aggregate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-512" name="__codelineno-0-512"></a>            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_aggregate</span><span class="p">(</span><span class="n">paths</span><span class="p">,</span> <span class="n">aggregate</span><span class="p">)</span>
+<a id="__codelineno-0-513" name="__codelineno-0-513"></a>        <span class="k">return</span> <span class="n">paths</span>
+<a id="__codelineno-0-514" name="__codelineno-0-514"></a>
+<a id="__codelineno-0-515" name="__codelineno-0-515"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_aggregate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">paths</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">],</span> <span class="n">config</span><span class="p">:</span> <span class="n">AggregationConfig</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
+<a id="__codelineno-0-516" name="__codelineno-0-516"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Reduce fetched raster granules per-window via pyramids (`G6`).</span>
+<a id="__codelineno-0-517" name="__codelineno-0-517"></a>
+<a id="__codelineno-0-518" name="__codelineno-0-518"></a><span class="sd">        The routing is **axis-driven, not format-driven** — it depends</span>
+<a id="__codelineno-0-519" name="__codelineno-0-519"></a><span class="sd">        on where the time axis lives, not on the file extension:</span>
+<a id="__codelineno-0-520" name="__codelineno-0-520"></a>
+<a id="__codelineno-0-521" name="__codelineno-0-521"></a><span class="sd">        * The common Earthdata case is a **stack of single-timestep</span>
+<a id="__codelineno-0-522" name="__codelineno-0-522"></a><span class="sd">          granules** (one file per overpass / half-hour / day, NetCDF</span>
+<a id="__codelineno-0-523" name="__codelineno-0-523"></a><span class="sd">          *or* COG). That whole stack is windowed by</span>
+<a id="__codelineno-0-524" name="__codelineno-0-524"></a><span class="sd">          :meth:`pyramids.dataset.DatasetCollection.groupby` (the STAC</span>
+<a id="__codelineno-0-525" name="__codelineno-0-525"></a><span class="sd">          path) — one reduced raster per `config.freq` window.</span>
+<a id="__codelineno-0-526" name="__codelineno-0-526"></a><span class="sd">        * The rarer case is a **single granule that already carries a</span>
+<a id="__codelineno-0-527" name="__codelineno-0-527"></a><span class="sd">          multi-timestep time axis inside it** (one NetCDF cube). Its</span>
+<a id="__codelineno-0-528" name="__codelineno-0-528"></a><span class="sd">          internal `time` axis is collapsed by</span>
+<a id="__codelineno-0-529" name="__codelineno-0-529"></a><span class="sd">          :meth:`pyramids.netcdf.NetCDF.reduce` (the CMEMS path).</span>
+<a id="__codelineno-0-530" name="__codelineno-0-530"></a>
+<a id="__codelineno-0-531" name="__codelineno-0-531"></a><span class="sd">        A single COG (one timestep, no internal axis) falls through to</span>
+<a id="__codelineno-0-532" name="__codelineno-0-532"></a><span class="sd">        the stack path as a one-element stack (a single window).</span>
+<a id="__codelineno-0-533" name="__codelineno-0-533"></a>
+<a id="__codelineno-0-534" name="__codelineno-0-534"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-535" name="__codelineno-0-535"></a><span class="sd">            paths: The fetched granule paths.</span>
+<a id="__codelineno-0-536" name="__codelineno-0-536"></a><span class="sd">            config: The aggregation request.</span>
 <a id="__codelineno-0-537" name="__codelineno-0-537"></a>
-<a id="__codelineno-0-538" name="__codelineno-0-538"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-539" name="__codelineno-0-539"></a><span class="sd">            paths: The fetched granule paths.</span>
-<a id="__codelineno-0-540" name="__codelineno-0-540"></a><span class="sd">            config: The aggregation request.</span>
-<a id="__codelineno-0-541" name="__codelineno-0-541"></a>
-<a id="__codelineno-0-542" name="__codelineno-0-542"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-543" name="__codelineno-0-543"></a><span class="sd">            list[Path]: The reduced raster paths.</span>
-<a id="__codelineno-0-544" name="__codelineno-0-544"></a>
-<a id="__codelineno-0-545" name="__codelineno-0-545"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-546" name="__codelineno-0-546"></a><span class="sd">            NotImplementedError: When the installed pyramids lacks the</span>
-<a id="__codelineno-0-547" name="__codelineno-0-547"></a><span class="sd">                reducer the chosen path needs.</span>
-<a id="__codelineno-0-548" name="__codelineno-0-548"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-549" name="__codelineno-0-549"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="n">paths</span><span class="p">:</span>
-<a id="__codelineno-0-550" name="__codelineno-0-550"></a>            <span class="k">return</span> <span class="p">[]</span>
-<a id="__codelineno-0-551" name="__codelineno-0-551"></a>        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">paths</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_netcdf_like</span><span class="p">(</span><span class="n">paths</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
-<a id="__codelineno-0-552" name="__codelineno-0-552"></a>            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_reduce_internal_axis</span><span class="p">(</span><span class="n">paths</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">config</span><span class="p">)</span>
-<a id="__codelineno-0-553" name="__codelineno-0-553"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_reduce_stack</span><span class="p">(</span><span class="n">paths</span><span class="p">,</span> <span class="n">config</span><span class="p">)</span>
+<a id="__codelineno-0-538" name="__codelineno-0-538"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-539" name="__codelineno-0-539"></a><span class="sd">            list[Path]: The reduced raster paths.</span>
+<a id="__codelineno-0-540" name="__codelineno-0-540"></a>
+<a id="__codelineno-0-541" name="__codelineno-0-541"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-542" name="__codelineno-0-542"></a><span class="sd">            NotImplementedError: When the installed pyramids lacks the</span>
+<a id="__codelineno-0-543" name="__codelineno-0-543"></a><span class="sd">                reducer the chosen path needs.</span>
+<a id="__codelineno-0-544" name="__codelineno-0-544"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-545" name="__codelineno-0-545"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="n">paths</span><span class="p">:</span>
+<a id="__codelineno-0-546" name="__codelineno-0-546"></a>            <span class="k">return</span> <span class="p">[]</span>
+<a id="__codelineno-0-547" name="__codelineno-0-547"></a>        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">paths</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_netcdf_like</span><span class="p">(</span><span class="n">paths</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+<a id="__codelineno-0-548" name="__codelineno-0-548"></a>            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_reduce_internal_axis</span><span class="p">(</span><span class="n">paths</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">config</span><span class="p">)</span>
+<a id="__codelineno-0-549" name="__codelineno-0-549"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_reduce_stack</span><span class="p">(</span><span class="n">paths</span><span class="p">,</span> <span class="n">config</span><span class="p">)</span>
+<a id="__codelineno-0-550" name="__codelineno-0-550"></a>
+<a id="__codelineno-0-551" name="__codelineno-0-551"></a>    <span class="nd">@staticmethod</span>
+<a id="__codelineno-0-552" name="__codelineno-0-552"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_is_netcdf_like</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<a id="__codelineno-0-553" name="__codelineno-0-553"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return whether a path is a NetCDF / HDF granule (has an internal axis).</span>
 <a id="__codelineno-0-554" name="__codelineno-0-554"></a>
-<a id="__codelineno-0-555" name="__codelineno-0-555"></a>    <span class="nd">@staticmethod</span>
-<a id="__codelineno-0-556" name="__codelineno-0-556"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_is_netcdf_like</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-<a id="__codelineno-0-557" name="__codelineno-0-557"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return whether a path is a NetCDF / HDF granule (has an internal axis).</span>
-<a id="__codelineno-0-558" name="__codelineno-0-558"></a>
-<a id="__codelineno-0-559" name="__codelineno-0-559"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-560" name="__codelineno-0-560"></a><span class="sd">            path: A fetched granule path.</span>
-<a id="__codelineno-0-561" name="__codelineno-0-561"></a>
-<a id="__codelineno-0-562" name="__codelineno-0-562"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-563" name="__codelineno-0-563"></a><span class="sd">            bool: `True` for NetCDF / HDF suffixes (which can carry an</span>
-<a id="__codelineno-0-564" name="__codelineno-0-564"></a><span class="sd">                internal multi-timestep time axis), `False` otherwise</span>
-<a id="__codelineno-0-565" name="__codelineno-0-565"></a><span class="sd">                (e.g. a single-timestep COG).</span>
-<a id="__codelineno-0-566" name="__codelineno-0-566"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-567" name="__codelineno-0-567"></a>        <span class="k">return</span> <span class="n">path</span><span class="o">.</span><span class="n">suffix</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="p">{</span><span class="s2">&quot;.nc&quot;</span><span class="p">,</span> <span class="s2">&quot;.nc4&quot;</span><span class="p">,</span> <span class="s2">&quot;.h5&quot;</span><span class="p">,</span> <span class="s2">&quot;.hdf&quot;</span><span class="p">,</span> <span class="s2">&quot;.hdf5&quot;</span><span class="p">,</span> <span class="s2">&quot;.he5&quot;</span><span class="p">}</span>
-<a id="__codelineno-0-568" name="__codelineno-0-568"></a>
-<a id="__codelineno-0-569" name="__codelineno-0-569"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_reduce_internal_axis</span><span class="p">(</span>
-<a id="__codelineno-0-570" name="__codelineno-0-570"></a>        <span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">AggregationConfig</span>
-<a id="__codelineno-0-571" name="__codelineno-0-571"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
-<a id="__codelineno-0-572" name="__codelineno-0-572"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Collapse one NetCDF cube&#39;s internal time axis via `NetCDF.reduce`.</span>
-<a id="__codelineno-0-573" name="__codelineno-0-573"></a>
-<a id="__codelineno-0-574" name="__codelineno-0-574"></a><span class="sd">        If the granule has no `time` dimension (a single-timestep file, or</span>
-<a id="__codelineno-0-575" name="__codelineno-0-575"></a><span class="sd">        an HDF-EOS file whose time is not a decodable CF dimension), there</span>
-<a id="__codelineno-0-576" name="__codelineno-0-576"></a><span class="sd">        is nothing to collapse — it is treated as a one-element stack and</span>
-<a id="__codelineno-0-577" name="__codelineno-0-577"></a><span class="sd">        windowed via :meth:`_reduce_stack` instead of raising.</span>
-<a id="__codelineno-0-578" name="__codelineno-0-578"></a>
-<a id="__codelineno-0-579" name="__codelineno-0-579"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-580" name="__codelineno-0-580"></a><span class="sd">            path: A single NetCDF / HDF granule, ideally carrying a</span>
-<a id="__codelineno-0-581" name="__codelineno-0-581"></a><span class="sd">                multi-timestep `time` axis.</span>
-<a id="__codelineno-0-582" name="__codelineno-0-582"></a><span class="sd">            config: The aggregation request (provides `freq` / `op`).</span>
-<a id="__codelineno-0-583" name="__codelineno-0-583"></a>
-<a id="__codelineno-0-584" name="__codelineno-0-584"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-585" name="__codelineno-0-585"></a><span class="sd">            list[Path]: One reduced NetCDF (written beside the source) when</span>
-<a id="__codelineno-0-586" name="__codelineno-0-586"></a><span class="sd">                a `time` axis is present, otherwise the per-window raster</span>
-<a id="__codelineno-0-587" name="__codelineno-0-587"></a><span class="sd">                paths from the stack fallback.</span>
-<a id="__codelineno-0-588" name="__codelineno-0-588"></a>
-<a id="__codelineno-0-589" name="__codelineno-0-589"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-590" name="__codelineno-0-590"></a><span class="sd">            NotImplementedError: When the installed pyramids has no</span>
-<a id="__codelineno-0-591" name="__codelineno-0-591"></a><span class="sd">                `NetCDF.reduce` (or, on the fallback, no</span>
-<a id="__codelineno-0-592" name="__codelineno-0-592"></a><span class="sd">                `DatasetCollection.groupby`).</span>
-<a id="__codelineno-0-593" name="__codelineno-0-593"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-594" name="__codelineno-0-594"></a>        <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.netcdf</span><span class="w"> </span><span class="kn">import</span> <span class="n">NetCDF</span>
-<a id="__codelineno-0-595" name="__codelineno-0-595"></a>
-<a id="__codelineno-0-596" name="__codelineno-0-596"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">NetCDF</span><span class="p">,</span> <span class="s2">&quot;reduce&quot;</span><span class="p">):</span>
-<a id="__codelineno-0-597" name="__codelineno-0-597"></a>            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
-<a id="__codelineno-0-598" name="__codelineno-0-598"></a>                <span class="s2">&quot;Earthdata.download(aggregate=...) needs pyramids&#39; &quot;</span>
-<a id="__codelineno-0-599" name="__codelineno-0-599"></a>                <span class="s2">&quot;NetCDF.reduce, which the installed pyramids build does &quot;</span>
-<a id="__codelineno-0-600" name="__codelineno-0-600"></a>                <span class="s2">&quot;not provide. Upgrade pyramids, or call download() without &quot;</span>
-<a id="__codelineno-0-601" name="__codelineno-0-601"></a>                <span class="s2">&quot;aggregate= and post-process the granules directly.&quot;</span>
-<a id="__codelineno-0-602" name="__codelineno-0-602"></a>            <span class="p">)</span>
-<a id="__codelineno-0-603" name="__codelineno-0-603"></a>        <span class="n">nc</span> <span class="o">=</span> <span class="n">NetCDF</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">path</span><span class="p">))</span>
-<a id="__codelineno-0-604" name="__codelineno-0-604"></a>        <span class="k">if</span> <span class="s2">&quot;time&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">nc</span><span class="o">.</span><span class="n">dimension_names</span> <span class="ow">or</span> <span class="p">()):</span>
-<a id="__codelineno-0-605" name="__codelineno-0-605"></a>            <span class="c1"># No internal time axis to collapse — e.g. a single-timestep</span>
-<a id="__codelineno-0-606" name="__codelineno-0-606"></a>            <span class="c1"># granule, or an HDF-EOS file whose time is not a decodable CF</span>
-<a id="__codelineno-0-607" name="__codelineno-0-607"></a>            <span class="c1"># dimension. Treat it as a one-element stack so `groupby` windows</span>
-<a id="__codelineno-0-608" name="__codelineno-0-608"></a>            <span class="c1"># it instead of `reduce` raising on a missing dimension.</span>
-<a id="__codelineno-0-609" name="__codelineno-0-609"></a>            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_reduce_stack</span><span class="p">([</span><span class="n">path</span><span class="p">],</span> <span class="n">config</span><span class="p">)</span>
-<a id="__codelineno-0-610" name="__codelineno-0-610"></a>        <span class="n">how</span> <span class="o">=</span> <span class="s2">&quot;mean&quot;</span> <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">op</span> <span class="o">==</span> <span class="s2">&quot;auto&quot;</span> <span class="k">else</span> <span class="n">config</span><span class="o">.</span><span class="n">op</span>
-<a id="__codelineno-0-611" name="__codelineno-0-611"></a>        <span class="n">reduced</span> <span class="o">=</span> <span class="n">nc</span><span class="o">.</span><span class="n">reduce</span><span class="p">(</span><span class="s2">&quot;time&quot;</span><span class="p">,</span> <span class="n">how</span><span class="o">=</span><span class="n">how</span><span class="p">)</span>
-<a id="__codelineno-0-612" name="__codelineno-0-612"></a>        <span class="n">target</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">with_name</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">path</span><span class="o">.</span><span class="n">stem</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">config</span><span class="o">.</span><span class="n">freq</span><span class="si">}</span><span class="s2">_agg.nc&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-613" name="__codelineno-0-613"></a>        <span class="n">reduced</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">target</span><span class="p">))</span>
-<a id="__codelineno-0-614" name="__codelineno-0-614"></a>        <span class="k">return</span> <span class="p">[</span><span class="n">target</span><span class="p">]</span>
-<a id="__codelineno-0-615" name="__codelineno-0-615"></a>
-<a id="__codelineno-0-616" name="__codelineno-0-616"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_reduce_stack</span><span class="p">(</span>
-<a id="__codelineno-0-617" name="__codelineno-0-617"></a>        <span class="bp">self</span><span class="p">,</span> <span class="n">paths</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">],</span> <span class="n">config</span><span class="p">:</span> <span class="n">AggregationConfig</span>
-<a id="__codelineno-0-618" name="__codelineno-0-618"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
-<a id="__codelineno-0-619" name="__codelineno-0-619"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Window a stack of single-timestep granules via `groupby`.</span>
-<a id="__codelineno-0-620" name="__codelineno-0-620"></a>
-<a id="__codelineno-0-621" name="__codelineno-0-621"></a><span class="sd">        The common Earthdata aggregation case: many granules, each one</span>
-<a id="__codelineno-0-622" name="__codelineno-0-622"></a><span class="sd">        timestep, windowed by `config.freq` into one reduced raster per</span>
-<a id="__codelineno-0-623" name="__codelineno-0-623"></a><span class="sd">        window. Handles a NetCDF stack and a COG stack alike (the choice</span>
-<a id="__codelineno-0-624" name="__codelineno-0-624"></a><span class="sd">        is the granule layout, not the format).</span>
-<a id="__codelineno-0-625" name="__codelineno-0-625"></a>
-<a id="__codelineno-0-626" name="__codelineno-0-626"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-627" name="__codelineno-0-627"></a><span class="sd">            paths: The fetched granule paths (a temporal stack).</span>
-<a id="__codelineno-0-628" name="__codelineno-0-628"></a><span class="sd">            config: The aggregation request (provides `freq`).</span>
-<a id="__codelineno-0-629" name="__codelineno-0-629"></a>
-<a id="__codelineno-0-630" name="__codelineno-0-630"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-631" name="__codelineno-0-631"></a><span class="sd">            list[Path]: The per-window reduced raster paths.</span>
+<a id="__codelineno-0-555" name="__codelineno-0-555"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-556" name="__codelineno-0-556"></a><span class="sd">            path: A fetched granule path.</span>
+<a id="__codelineno-0-557" name="__codelineno-0-557"></a>
+<a id="__codelineno-0-558" name="__codelineno-0-558"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-559" name="__codelineno-0-559"></a><span class="sd">            bool: `True` for NetCDF / HDF suffixes (which can carry an</span>
+<a id="__codelineno-0-560" name="__codelineno-0-560"></a><span class="sd">                internal multi-timestep time axis), `False` otherwise</span>
+<a id="__codelineno-0-561" name="__codelineno-0-561"></a><span class="sd">                (e.g. a single-timestep COG).</span>
+<a id="__codelineno-0-562" name="__codelineno-0-562"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-563" name="__codelineno-0-563"></a>        <span class="k">return</span> <span class="n">path</span><span class="o">.</span><span class="n">suffix</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="p">{</span><span class="s2">&quot;.nc&quot;</span><span class="p">,</span> <span class="s2">&quot;.nc4&quot;</span><span class="p">,</span> <span class="s2">&quot;.h5&quot;</span><span class="p">,</span> <span class="s2">&quot;.hdf&quot;</span><span class="p">,</span> <span class="s2">&quot;.hdf5&quot;</span><span class="p">,</span> <span class="s2">&quot;.he5&quot;</span><span class="p">}</span>
+<a id="__codelineno-0-564" name="__codelineno-0-564"></a>
+<a id="__codelineno-0-565" name="__codelineno-0-565"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_reduce_internal_axis</span><span class="p">(</span>
+<a id="__codelineno-0-566" name="__codelineno-0-566"></a>        <span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">AggregationConfig</span>
+<a id="__codelineno-0-567" name="__codelineno-0-567"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
+<a id="__codelineno-0-568" name="__codelineno-0-568"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Collapse one NetCDF cube&#39;s internal time axis via `NetCDF.reduce`.</span>
+<a id="__codelineno-0-569" name="__codelineno-0-569"></a>
+<a id="__codelineno-0-570" name="__codelineno-0-570"></a><span class="sd">        If the granule has no `time` dimension (a single-timestep file, or</span>
+<a id="__codelineno-0-571" name="__codelineno-0-571"></a><span class="sd">        an HDF-EOS file whose time is not a decodable CF dimension), there</span>
+<a id="__codelineno-0-572" name="__codelineno-0-572"></a><span class="sd">        is nothing to collapse — it is treated as a one-element stack and</span>
+<a id="__codelineno-0-573" name="__codelineno-0-573"></a><span class="sd">        windowed via :meth:`_reduce_stack` instead of raising.</span>
+<a id="__codelineno-0-574" name="__codelineno-0-574"></a>
+<a id="__codelineno-0-575" name="__codelineno-0-575"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-576" name="__codelineno-0-576"></a><span class="sd">            path: A single NetCDF / HDF granule, ideally carrying a</span>
+<a id="__codelineno-0-577" name="__codelineno-0-577"></a><span class="sd">                multi-timestep `time` axis.</span>
+<a id="__codelineno-0-578" name="__codelineno-0-578"></a><span class="sd">            config: The aggregation request (provides `freq` / `op`).</span>
+<a id="__codelineno-0-579" name="__codelineno-0-579"></a>
+<a id="__codelineno-0-580" name="__codelineno-0-580"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-581" name="__codelineno-0-581"></a><span class="sd">            list[Path]: One reduced NetCDF (written beside the source) when</span>
+<a id="__codelineno-0-582" name="__codelineno-0-582"></a><span class="sd">                a `time` axis is present, otherwise the per-window raster</span>
+<a id="__codelineno-0-583" name="__codelineno-0-583"></a><span class="sd">                paths from the stack fallback.</span>
+<a id="__codelineno-0-584" name="__codelineno-0-584"></a>
+<a id="__codelineno-0-585" name="__codelineno-0-585"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-586" name="__codelineno-0-586"></a><span class="sd">            NotImplementedError: When the installed pyramids has no</span>
+<a id="__codelineno-0-587" name="__codelineno-0-587"></a><span class="sd">                `NetCDF.reduce` (or, on the fallback, no</span>
+<a id="__codelineno-0-588" name="__codelineno-0-588"></a><span class="sd">                `DatasetCollection.groupby`).</span>
+<a id="__codelineno-0-589" name="__codelineno-0-589"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-590" name="__codelineno-0-590"></a>        <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.netcdf</span><span class="w"> </span><span class="kn">import</span> <span class="n">NetCDF</span>
+<a id="__codelineno-0-591" name="__codelineno-0-591"></a>
+<a id="__codelineno-0-592" name="__codelineno-0-592"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">NetCDF</span><span class="p">,</span> <span class="s2">&quot;reduce&quot;</span><span class="p">):</span>
+<a id="__codelineno-0-593" name="__codelineno-0-593"></a>            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+<a id="__codelineno-0-594" name="__codelineno-0-594"></a>                <span class="s2">&quot;Earthdata.download(aggregate=...) needs pyramids&#39; &quot;</span>
+<a id="__codelineno-0-595" name="__codelineno-0-595"></a>                <span class="s2">&quot;NetCDF.reduce, which the installed pyramids build does &quot;</span>
+<a id="__codelineno-0-596" name="__codelineno-0-596"></a>                <span class="s2">&quot;not provide. Upgrade pyramids, or call download() without &quot;</span>
+<a id="__codelineno-0-597" name="__codelineno-0-597"></a>                <span class="s2">&quot;aggregate= and post-process the granules directly.&quot;</span>
+<a id="__codelineno-0-598" name="__codelineno-0-598"></a>            <span class="p">)</span>
+<a id="__codelineno-0-599" name="__codelineno-0-599"></a>        <span class="n">nc</span> <span class="o">=</span> <span class="n">NetCDF</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">path</span><span class="p">))</span>
+<a id="__codelineno-0-600" name="__codelineno-0-600"></a>        <span class="k">if</span> <span class="s2">&quot;time&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">nc</span><span class="o">.</span><span class="n">dimension_names</span> <span class="ow">or</span> <span class="p">()):</span>
+<a id="__codelineno-0-601" name="__codelineno-0-601"></a>            <span class="c1"># No internal time axis to collapse — e.g. a single-timestep</span>
+<a id="__codelineno-0-602" name="__codelineno-0-602"></a>            <span class="c1"># granule, or an HDF-EOS file whose time is not a decodable CF</span>
+<a id="__codelineno-0-603" name="__codelineno-0-603"></a>            <span class="c1"># dimension. Treat it as a one-element stack so `groupby` windows</span>
+<a id="__codelineno-0-604" name="__codelineno-0-604"></a>            <span class="c1"># it instead of `reduce` raising on a missing dimension.</span>
+<a id="__codelineno-0-605" name="__codelineno-0-605"></a>            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_reduce_stack</span><span class="p">([</span><span class="n">path</span><span class="p">],</span> <span class="n">config</span><span class="p">)</span>
+<a id="__codelineno-0-606" name="__codelineno-0-606"></a>        <span class="n">how</span> <span class="o">=</span> <span class="s2">&quot;mean&quot;</span> <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">op</span> <span class="o">==</span> <span class="s2">&quot;auto&quot;</span> <span class="k">else</span> <span class="n">config</span><span class="o">.</span><span class="n">op</span>
+<a id="__codelineno-0-607" name="__codelineno-0-607"></a>        <span class="n">reduced</span> <span class="o">=</span> <span class="n">nc</span><span class="o">.</span><span class="n">reduce</span><span class="p">(</span><span class="s2">&quot;time&quot;</span><span class="p">,</span> <span class="n">how</span><span class="o">=</span><span class="n">how</span><span class="p">)</span>
+<a id="__codelineno-0-608" name="__codelineno-0-608"></a>        <span class="n">target</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">with_name</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">path</span><span class="o">.</span><span class="n">stem</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">config</span><span class="o">.</span><span class="n">freq</span><span class="si">}</span><span class="s2">_agg.nc&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-609" name="__codelineno-0-609"></a>        <span class="n">reduced</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">target</span><span class="p">))</span>
+<a id="__codelineno-0-610" name="__codelineno-0-610"></a>        <span class="k">return</span> <span class="p">[</span><span class="n">target</span><span class="p">]</span>
+<a id="__codelineno-0-611" name="__codelineno-0-611"></a>
+<a id="__codelineno-0-612" name="__codelineno-0-612"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_reduce_stack</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">paths</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">],</span> <span class="n">config</span><span class="p">:</span> <span class="n">AggregationConfig</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
+<a id="__codelineno-0-613" name="__codelineno-0-613"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Window a stack of single-timestep granules via `groupby`.</span>
+<a id="__codelineno-0-614" name="__codelineno-0-614"></a>
+<a id="__codelineno-0-615" name="__codelineno-0-615"></a><span class="sd">        The common Earthdata aggregation case: many granules, each one</span>
+<a id="__codelineno-0-616" name="__codelineno-0-616"></a><span class="sd">        timestep, windowed by `config.freq` into one reduced raster per</span>
+<a id="__codelineno-0-617" name="__codelineno-0-617"></a><span class="sd">        window. Handles a NetCDF stack and a COG stack alike (the choice</span>
+<a id="__codelineno-0-618" name="__codelineno-0-618"></a><span class="sd">        is the granule layout, not the format).</span>
+<a id="__codelineno-0-619" name="__codelineno-0-619"></a>
+<a id="__codelineno-0-620" name="__codelineno-0-620"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-621" name="__codelineno-0-621"></a><span class="sd">            paths: The fetched granule paths (a temporal stack).</span>
+<a id="__codelineno-0-622" name="__codelineno-0-622"></a><span class="sd">            config: The aggregation request (provides `freq`).</span>
+<a id="__codelineno-0-623" name="__codelineno-0-623"></a>
+<a id="__codelineno-0-624" name="__codelineno-0-624"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-625" name="__codelineno-0-625"></a><span class="sd">            list[Path]: The per-window reduced raster paths.</span>
+<a id="__codelineno-0-626" name="__codelineno-0-626"></a>
+<a id="__codelineno-0-627" name="__codelineno-0-627"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-628" name="__codelineno-0-628"></a><span class="sd">            NotImplementedError: When the installed pyramids has no</span>
+<a id="__codelineno-0-629" name="__codelineno-0-629"></a><span class="sd">                `DatasetCollection.groupby`.</span>
+<a id="__codelineno-0-630" name="__codelineno-0-630"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-631" name="__codelineno-0-631"></a>        <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">DatasetCollection</span>
 <a id="__codelineno-0-632" name="__codelineno-0-632"></a>
-<a id="__codelineno-0-633" name="__codelineno-0-633"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-634" name="__codelineno-0-634"></a><span class="sd">            NotImplementedError: When the installed pyramids has no</span>
-<a id="__codelineno-0-635" name="__codelineno-0-635"></a><span class="sd">                `DatasetCollection.groupby`.</span>
-<a id="__codelineno-0-636" name="__codelineno-0-636"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-637" name="__codelineno-0-637"></a>        <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">DatasetCollection</span>
-<a id="__codelineno-0-638" name="__codelineno-0-638"></a>
-<a id="__codelineno-0-639" name="__codelineno-0-639"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">DatasetCollection</span><span class="p">,</span> <span class="s2">&quot;groupby&quot;</span><span class="p">):</span>
-<a id="__codelineno-0-640" name="__codelineno-0-640"></a>            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
-<a id="__codelineno-0-641" name="__codelineno-0-641"></a>                <span class="s2">&quot;Earthdata.download(aggregate=...) for a granule stack needs &quot;</span>
-<a id="__codelineno-0-642" name="__codelineno-0-642"></a>                <span class="s2">&quot;pyramids&#39; DatasetCollection.groupby, which the installed &quot;</span>
-<a id="__codelineno-0-643" name="__codelineno-0-643"></a>                <span class="s2">&quot;pyramids build does not provide.&quot;</span>
-<a id="__codelineno-0-644" name="__codelineno-0-644"></a>            <span class="p">)</span>
-<a id="__codelineno-0-645" name="__codelineno-0-645"></a>        <span class="n">collection</span> <span class="o">=</span> <span class="n">DatasetCollection</span><span class="o">.</span><span class="n">from_files</span><span class="p">([</span><span class="nb">str</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">paths</span><span class="p">])</span>
-<a id="__codelineno-0-646" name="__codelineno-0-646"></a>        <span class="n">grouped</span> <span class="o">=</span> <span class="n">collection</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">freq</span><span class="p">)</span>
-<a id="__codelineno-0-647" name="__codelineno-0-647"></a>        <span class="k">return</span> <span class="p">[</span><span class="n">Path</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">grouped</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">root_dir</span><span class="p">))]</span>
+<a id="__codelineno-0-633" name="__codelineno-0-633"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">DatasetCollection</span><span class="p">,</span> <span class="s2">&quot;groupby&quot;</span><span class="p">):</span>
+<a id="__codelineno-0-634" name="__codelineno-0-634"></a>            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+<a id="__codelineno-0-635" name="__codelineno-0-635"></a>                <span class="s2">&quot;Earthdata.download(aggregate=...) for a granule stack needs &quot;</span>
+<a id="__codelineno-0-636" name="__codelineno-0-636"></a>                <span class="s2">&quot;pyramids&#39; DatasetCollection.groupby, which the installed &quot;</span>
+<a id="__codelineno-0-637" name="__codelineno-0-637"></a>                <span class="s2">&quot;pyramids build does not provide.&quot;</span>
+<a id="__codelineno-0-638" name="__codelineno-0-638"></a>            <span class="p">)</span>
+<a id="__codelineno-0-639" name="__codelineno-0-639"></a>        <span class="n">collection</span> <span class="o">=</span> <span class="n">DatasetCollection</span><span class="o">.</span><span class="n">from_files</span><span class="p">([</span><span class="nb">str</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">paths</span><span class="p">])</span>
+<a id="__codelineno-0-640" name="__codelineno-0-640"></a>        <span class="n">grouped</span> <span class="o">=</span> <span class="n">collection</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">freq</span><span class="p">)</span>
+<a id="__codelineno-0-641" name="__codelineno-0-641"></a>        <span class="k">return</span> <span class="p">[</span><span class="n">Path</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">grouped</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">root_dir</span><span class="p">))]</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -15837,7 +15825,9 @@ installed pyramids exposes no <code>NetCDF.reduce</code> /
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>src/earthlens/earthdata/backend.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-478">478</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-476">476</a></span>
+<span class="normal"><a href="#__codelineno-0-477">477</a></span>
+<span class="normal"><a href="#__codelineno-0-478">478</a></span>
 <span class="normal"><a href="#__codelineno-0-479">479</a></span>
 <span class="normal"><a href="#__codelineno-0-480">480</a></span>
 <span class="normal"><a href="#__codelineno-0-481">481</a></span>
@@ -15872,46 +15862,44 @@ installed pyramids exposes no <code>NetCDF.reduce</code> /
 <span class="normal"><a href="#__codelineno-0-510">510</a></span>
 <span class="normal"><a href="#__codelineno-0-511">511</a></span>
 <span class="normal"><a href="#__codelineno-0-512">512</a></span>
-<span class="normal"><a href="#__codelineno-0-513">513</a></span>
-<span class="normal"><a href="#__codelineno-0-514">514</a></span>
-<span class="normal"><a href="#__codelineno-0-515">515</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-478" name="__codelineno-0-478"></a><span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
-<a id="__codelineno-0-479" name="__codelineno-0-479"></a>    <span class="bp">self</span><span class="p">,</span>
-<a id="__codelineno-0-480" name="__codelineno-0-480"></a>    <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-<a id="__codelineno-0-481" name="__codelineno-0-481"></a>    <span class="n">aggregate</span><span class="p">:</span> <span class="n">AggregationConfig</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-482" name="__codelineno-0-482"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
-<a id="__codelineno-0-483" name="__codelineno-0-483"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Search CMR, fetch the granules, return their local paths.</span>
-<a id="__codelineno-0-484" name="__codelineno-0-484"></a>
-<a id="__codelineno-0-485" name="__codelineno-0-485"></a><span class="sd">    Composes :meth:`_search` and :meth:`_fetch` to pull every</span>
-<a id="__codelineno-0-486" name="__codelineno-0-486"></a><span class="sd">    granule matching the request bbox + window to `self.root_dir`</span>
-<a id="__codelineno-0-487" name="__codelineno-0-487"></a><span class="sd">    (or in-region S3 handles). When `aggregate` is given, the</span>
-<a id="__codelineno-0-488" name="__codelineno-0-488"></a><span class="sd">    fetched granules are reduced per-window via the existing</span>
-<a id="__codelineno-0-489" name="__codelineno-0-489"></a><span class="sd">    pyramids reducer (`G6`) — the facade only forwards `aggregate=`</span>
-<a id="__codelineno-0-490" name="__codelineno-0-490"></a><span class="sd">    for a `&quot;raster&quot;` instance, having rejected it for `&quot;vector&quot;` /</span>
-<a id="__codelineno-0-491" name="__codelineno-0-491"></a><span class="sd">    `&quot;tabular&quot;`.</span>
-<a id="__codelineno-0-492" name="__codelineno-0-492"></a>
-<a id="__codelineno-0-493" name="__codelineno-0-493"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-494" name="__codelineno-0-494"></a><span class="sd">        progress_bar: Forwarded to `earthaccess` as `show_progress`</span>
-<a id="__codelineno-0-495" name="__codelineno-0-495"></a><span class="sd">            on the download / open call, so `False` suppresses the</span>
-<a id="__codelineno-0-496" name="__codelineno-0-496"></a><span class="sd">            per-granule progress bar.</span>
-<a id="__codelineno-0-497" name="__codelineno-0-497"></a><span class="sd">        aggregate: Optional</span>
-<a id="__codelineno-0-498" name="__codelineno-0-498"></a><span class="sd">            :class:`earthlens.aggregate.AggregationConfig`. Only</span>
-<a id="__codelineno-0-499" name="__codelineno-0-499"></a><span class="sd">            reached for a `&quot;raster&quot;` instance.</span>
-<a id="__codelineno-0-500" name="__codelineno-0-500"></a>
-<a id="__codelineno-0-501" name="__codelineno-0-501"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-502" name="__codelineno-0-502"></a><span class="sd">        list[Path]: The fetched granule paths, or — when</span>
-<a id="__codelineno-0-503" name="__codelineno-0-503"></a><span class="sd">            `aggregate` is set — the per-window reduced raster</span>
-<a id="__codelineno-0-504" name="__codelineno-0-504"></a><span class="sd">            paths.</span>
-<a id="__codelineno-0-505" name="__codelineno-0-505"></a>
-<a id="__codelineno-0-506" name="__codelineno-0-506"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-507" name="__codelineno-0-507"></a><span class="sd">        NotImplementedError: When `aggregate` is set but the</span>
-<a id="__codelineno-0-508" name="__codelineno-0-508"></a><span class="sd">            installed pyramids exposes no `NetCDF.reduce` /</span>
-<a id="__codelineno-0-509" name="__codelineno-0-509"></a><span class="sd">            `DatasetCollection.groupby` for the fetched format.</span>
-<a id="__codelineno-0-510" name="__codelineno-0-510"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-511" name="__codelineno-0-511"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_show_progress</span> <span class="o">=</span> <span class="n">progress_bar</span>
-<a id="__codelineno-0-512" name="__codelineno-0-512"></a>    <span class="n">paths</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api_via_search_fetch</span><span class="p">()</span>
-<a id="__codelineno-0-513" name="__codelineno-0-513"></a>    <span class="k">if</span> <span class="n">aggregate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-514" name="__codelineno-0-514"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_aggregate</span><span class="p">(</span><span class="n">paths</span><span class="p">,</span> <span class="n">aggregate</span><span class="p">)</span>
-<a id="__codelineno-0-515" name="__codelineno-0-515"></a>    <span class="k">return</span> <span class="n">paths</span>
+<span class="normal"><a href="#__codelineno-0-513">513</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-476" name="__codelineno-0-476"></a><span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
+<a id="__codelineno-0-477" name="__codelineno-0-477"></a>    <span class="bp">self</span><span class="p">,</span>
+<a id="__codelineno-0-478" name="__codelineno-0-478"></a>    <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+<a id="__codelineno-0-479" name="__codelineno-0-479"></a>    <span class="n">aggregate</span><span class="p">:</span> <span class="n">AggregationConfig</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-480" name="__codelineno-0-480"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
+<a id="__codelineno-0-481" name="__codelineno-0-481"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Search CMR, fetch the granules, return their local paths.</span>
+<a id="__codelineno-0-482" name="__codelineno-0-482"></a>
+<a id="__codelineno-0-483" name="__codelineno-0-483"></a><span class="sd">    Composes :meth:`_search` and :meth:`_fetch` to pull every</span>
+<a id="__codelineno-0-484" name="__codelineno-0-484"></a><span class="sd">    granule matching the request bbox + window to `self.root_dir`</span>
+<a id="__codelineno-0-485" name="__codelineno-0-485"></a><span class="sd">    (or in-region S3 handles). When `aggregate` is given, the</span>
+<a id="__codelineno-0-486" name="__codelineno-0-486"></a><span class="sd">    fetched granules are reduced per-window via the existing</span>
+<a id="__codelineno-0-487" name="__codelineno-0-487"></a><span class="sd">    pyramids reducer (`G6`) — the facade only forwards `aggregate=`</span>
+<a id="__codelineno-0-488" name="__codelineno-0-488"></a><span class="sd">    for a `&quot;raster&quot;` instance, having rejected it for `&quot;vector&quot;` /</span>
+<a id="__codelineno-0-489" name="__codelineno-0-489"></a><span class="sd">    `&quot;tabular&quot;`.</span>
+<a id="__codelineno-0-490" name="__codelineno-0-490"></a>
+<a id="__codelineno-0-491" name="__codelineno-0-491"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-492" name="__codelineno-0-492"></a><span class="sd">        progress_bar: Forwarded to `earthaccess` as `show_progress`</span>
+<a id="__codelineno-0-493" name="__codelineno-0-493"></a><span class="sd">            on the download / open call, so `False` suppresses the</span>
+<a id="__codelineno-0-494" name="__codelineno-0-494"></a><span class="sd">            per-granule progress bar.</span>
+<a id="__codelineno-0-495" name="__codelineno-0-495"></a><span class="sd">        aggregate: Optional</span>
+<a id="__codelineno-0-496" name="__codelineno-0-496"></a><span class="sd">            :class:`earthlens.aggregate.AggregationConfig`. Only</span>
+<a id="__codelineno-0-497" name="__codelineno-0-497"></a><span class="sd">            reached for a `&quot;raster&quot;` instance.</span>
+<a id="__codelineno-0-498" name="__codelineno-0-498"></a>
+<a id="__codelineno-0-499" name="__codelineno-0-499"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-500" name="__codelineno-0-500"></a><span class="sd">        list[Path]: The fetched granule paths, or — when</span>
+<a id="__codelineno-0-501" name="__codelineno-0-501"></a><span class="sd">            `aggregate` is set — the per-window reduced raster</span>
+<a id="__codelineno-0-502" name="__codelineno-0-502"></a><span class="sd">            paths.</span>
+<a id="__codelineno-0-503" name="__codelineno-0-503"></a>
+<a id="__codelineno-0-504" name="__codelineno-0-504"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-505" name="__codelineno-0-505"></a><span class="sd">        NotImplementedError: When `aggregate` is set but the</span>
+<a id="__codelineno-0-506" name="__codelineno-0-506"></a><span class="sd">            installed pyramids exposes no `NetCDF.reduce` /</span>
+<a id="__codelineno-0-507" name="__codelineno-0-507"></a><span class="sd">            `DatasetCollection.groupby` for the fetched format.</span>
+<a id="__codelineno-0-508" name="__codelineno-0-508"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-509" name="__codelineno-0-509"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_show_progress</span> <span class="o">=</span> <span class="n">progress_bar</span>
+<a id="__codelineno-0-510" name="__codelineno-0-510"></a>    <span class="n">paths</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api_via_search_fetch</span><span class="p">()</span>
+<a id="__codelineno-0-511" name="__codelineno-0-511"></a>    <span class="k">if</span> <span class="n">aggregate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-512" name="__codelineno-0-512"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_aggregate</span><span class="p">(</span><span class="n">paths</span><span class="p">,</span> <span class="n">aggregate</span><span class="p">)</span>
+<a id="__codelineno-0-513" name="__codelineno-0-513"></a>    <span class="k">return</span> <span class="n">paths</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -18628,13 +18616,7 @@ value to gate <code>aggregate=</code>.</p>
 <span class="normal"><a href="#__codelineno-0-638">638</a></span>
 <span class="normal"><a href="#__codelineno-0-639">639</a></span>
 <span class="normal"><a href="#__codelineno-0-640">640</a></span>
-<span class="normal"><a href="#__codelineno-0-641">641</a></span>
-<span class="normal"><a href="#__codelineno-0-642">642</a></span>
-<span class="normal"><a href="#__codelineno-0-643">643</a></span>
-<span class="normal"><a href="#__codelineno-0-644">644</a></span>
-<span class="normal"><a href="#__codelineno-0-645">645</a></span>
-<span class="normal"><a href="#__codelineno-0-646">646</a></span>
-<span class="normal"><a href="#__codelineno-0-647">647</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-56" name="__codelineno-0-56"></a><span class="k">class</span><span class="w"> </span><span class="nc">Earthdata</span><span class="p">(</span><span class="n">AbstractDataSource</span><span class="p">):</span>
+<span class="normal"><a href="#__codelineno-0-641">641</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-56" name="__codelineno-0-56"></a><span class="k">class</span><span class="w"> </span><span class="nc">Earthdata</span><span class="p">(</span><span class="n">AbstractDataSource</span><span class="p">):</span>
 <a id="__codelineno-0-57" name="__codelineno-0-57"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;NASA Earthdata backend (per-dataset output kind).</span>
 <a id="__codelineno-0-58" name="__codelineno-0-58"></a>
 <a id="__codelineno-0-59" name="__codelineno-0-59"></a><span class="sd">    Wraps `earthaccess` + CMR so a user can search a curated NASA</span>
@@ -18801,26 +18783,26 @@ value to gate <code>aggregate=</code>.</p>
 <a id="__codelineno-0-220" name="__codelineno-0-220"></a><span class="sd">        &quot;&quot;&quot;</span>
 <a id="__codelineno-0-221" name="__codelineno-0-221"></a>        <span class="n">kinds</span> <span class="o">=</span> <span class="p">{</span><span class="n">ds</span><span class="o">.</span><span class="n">output_kind</span> <span class="k">for</span> <span class="n">ds</span> <span class="ow">in</span> <span class="n">datasets</span><span class="p">}</span>
 <a id="__codelineno-0-222" name="__codelineno-0-222"></a>        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">kinds</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
-<a id="__codelineno-0-223" name="__codelineno-0-223"></a>            <span class="n">detail</span> <span class="o">=</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-<a id="__codelineno-0-224" name="__codelineno-0-224"></a>                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">ds</span><span class="o">.</span><span class="n">short_name</span><span class="si">}</span><span class="s2">=</span><span class="si">{</span><span class="n">ds</span><span class="o">.</span><span class="n">output_kind</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">ds</span> <span class="ow">in</span> <span class="n">datasets</span>
-<a id="__codelineno-0-225" name="__codelineno-0-225"></a>            <span class="p">)</span>
-<a id="__codelineno-0-226" name="__codelineno-0-226"></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-<a id="__codelineno-0-227" name="__codelineno-0-227"></a>                <span class="s2">&quot;all datasets in one Earthdata request must share one &quot;</span>
-<a id="__codelineno-0-228" name="__codelineno-0-228"></a>                <span class="sa">f</span><span class="s2">&quot;output_kind; got mixed kinds (</span><span class="si">{</span><span class="n">detail</span><span class="si">}</span><span class="s2">). Split the &quot;</span>
-<a id="__codelineno-0-229" name="__codelineno-0-229"></a>                <span class="s2">&quot;request into one call per output kind.&quot;</span>
-<a id="__codelineno-0-230" name="__codelineno-0-230"></a>            <span class="p">)</span>
-<a id="__codelineno-0-231" name="__codelineno-0-231"></a>        <span class="k">return</span> <span class="n">kinds</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
-<a id="__codelineno-0-232" name="__codelineno-0-232"></a>
-<a id="__codelineno-0-233" name="__codelineno-0-233"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_initialize</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<a id="__codelineno-0-234" name="__codelineno-0-234"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Build the :class:`EarthdataAuth`; defer the EDL login to fetch.</span>
-<a id="__codelineno-0-235" name="__codelineno-0-235"></a>
-<a id="__codelineno-0-236" name="__codelineno-0-236"></a><span class="sd">        Returns `None` — `earthaccess` keeps the authenticated handle on</span>
-<a id="__codelineno-0-237" name="__codelineno-0-237"></a><span class="sd">        the :class:`EarthdataAuth` instance (and a persisted token), so</span>
-<a id="__codelineno-0-238" name="__codelineno-0-238"></a><span class="sd">        the parent class binds no opaque `self.client`. The EDL login</span>
-<a id="__codelineno-0-239" name="__codelineno-0-239"></a><span class="sd">        (`EarthdataAuth.configure`, which contacts the auth server) is</span>
-<a id="__codelineno-0-240" name="__codelineno-0-240"></a><span class="sd">        deferred: :meth:`_fetch` already calls the idempotent</span>
-<a id="__codelineno-0-241" name="__codelineno-0-241"></a><span class="sd">        `configure()` before downloading, so constructing the backend</span>
-<a id="__codelineno-0-242" name="__codelineno-0-242"></a><span class="sd">        never authenticates and `_search()` stays offline.</span>
+<a id="__codelineno-0-223" name="__codelineno-0-223"></a>            <span class="n">detail</span> <span class="o">=</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">ds</span><span class="o">.</span><span class="n">short_name</span><span class="si">}</span><span class="s2">=</span><span class="si">{</span><span class="n">ds</span><span class="o">.</span><span class="n">output_kind</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">ds</span> <span class="ow">in</span> <span class="n">datasets</span><span class="p">)</span>
+<a id="__codelineno-0-224" name="__codelineno-0-224"></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+<a id="__codelineno-0-225" name="__codelineno-0-225"></a>                <span class="s2">&quot;all datasets in one Earthdata request must share one &quot;</span>
+<a id="__codelineno-0-226" name="__codelineno-0-226"></a>                <span class="sa">f</span><span class="s2">&quot;output_kind; got mixed kinds (</span><span class="si">{</span><span class="n">detail</span><span class="si">}</span><span class="s2">). Split the &quot;</span>
+<a id="__codelineno-0-227" name="__codelineno-0-227"></a>                <span class="s2">&quot;request into one call per output kind.&quot;</span>
+<a id="__codelineno-0-228" name="__codelineno-0-228"></a>            <span class="p">)</span>
+<a id="__codelineno-0-229" name="__codelineno-0-229"></a>        <span class="k">return</span> <span class="n">kinds</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+<a id="__codelineno-0-230" name="__codelineno-0-230"></a>
+<a id="__codelineno-0-231" name="__codelineno-0-231"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_initialize</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<a id="__codelineno-0-232" name="__codelineno-0-232"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Build the :class:`EarthdataAuth`; defer the EDL login.</span>
+<a id="__codelineno-0-233" name="__codelineno-0-233"></a>
+<a id="__codelineno-0-234" name="__codelineno-0-234"></a><span class="sd">        Returns `None` — `earthaccess` keeps the authenticated handle on</span>
+<a id="__codelineno-0-235" name="__codelineno-0-235"></a><span class="sd">        the :class:`EarthdataAuth` instance (and a persisted token), so</span>
+<a id="__codelineno-0-236" name="__codelineno-0-236"></a><span class="sd">        the parent class binds no opaque `self.client`. The EDL login</span>
+<a id="__codelineno-0-237" name="__codelineno-0-237"></a><span class="sd">        (`EarthdataAuth.configure`, which contacts the auth server) is</span>
+<a id="__codelineno-0-238" name="__codelineno-0-238"></a><span class="sd">        deferred out of construction: it runs on the first :meth:`_search`</span>
+<a id="__codelineno-0-239" name="__codelineno-0-239"></a><span class="sd">        (CMR granule search authenticates via the idempotent `configure()`),</span>
+<a id="__codelineno-0-240" name="__codelineno-0-240"></a><span class="sd">        so constructing the backend never authenticates — but note that a</span>
+<a id="__codelineno-0-241" name="__codelineno-0-241"></a><span class="sd">        dry-run `search()` does, since CMR access goes through the same</span>
+<a id="__codelineno-0-242" name="__codelineno-0-242"></a><span class="sd">        `earthaccess` session.</span>
 <a id="__codelineno-0-243" name="__codelineno-0-243"></a><span class="sd">        &quot;&quot;&quot;</span>
 <a id="__codelineno-0-244" name="__codelineno-0-244"></a>        <span class="n">creds</span> <span class="o">=</span> <span class="n">EarthdataCredentials</span><span class="p">(</span>
 <a id="__codelineno-0-245" name="__codelineno-0-245"></a>            <span class="n">username</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_username</span><span class="p">,</span>
@@ -19050,182 +19032,176 @@ value to gate <code>aggregate=</code>.</p>
 <a id="__codelineno-0-469" name="__codelineno-0-469"></a><span class="sd">                `region`.</span>
 <a id="__codelineno-0-470" name="__codelineno-0-470"></a><span class="sd">        &quot;&quot;&quot;</span>
 <a id="__codelineno-0-471" name="__codelineno-0-471"></a>        <span class="n">caller</span> <span class="o">=</span> <span class="p">(</span>
-<a id="__codelineno-0-472" name="__codelineno-0-472"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">_region</span>
-<a id="__codelineno-0-473" name="__codelineno-0-473"></a>            <span class="ow">or</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;AWS_REGION&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-474" name="__codelineno-0-474"></a>            <span class="ow">or</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;AWS_DEFAULT_REGION&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-475" name="__codelineno-0-475"></a>        <span class="p">)</span>
-<a id="__codelineno-0-476" name="__codelineno-0-476"></a>        <span class="k">return</span> <span class="n">caller</span> <span class="o">==</span> <span class="n">region</span>
-<a id="__codelineno-0-477" name="__codelineno-0-477"></a>
-<a id="__codelineno-0-478" name="__codelineno-0-478"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
-<a id="__codelineno-0-479" name="__codelineno-0-479"></a>        <span class="bp">self</span><span class="p">,</span>
-<a id="__codelineno-0-480" name="__codelineno-0-480"></a>        <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-<a id="__codelineno-0-481" name="__codelineno-0-481"></a>        <span class="n">aggregate</span><span class="p">:</span> <span class="n">AggregationConfig</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-482" name="__codelineno-0-482"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
-<a id="__codelineno-0-483" name="__codelineno-0-483"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Search CMR, fetch the granules, return their local paths.</span>
-<a id="__codelineno-0-484" name="__codelineno-0-484"></a>
-<a id="__codelineno-0-485" name="__codelineno-0-485"></a><span class="sd">        Composes :meth:`_search` and :meth:`_fetch` to pull every</span>
-<a id="__codelineno-0-486" name="__codelineno-0-486"></a><span class="sd">        granule matching the request bbox + window to `self.root_dir`</span>
-<a id="__codelineno-0-487" name="__codelineno-0-487"></a><span class="sd">        (or in-region S3 handles). When `aggregate` is given, the</span>
-<a id="__codelineno-0-488" name="__codelineno-0-488"></a><span class="sd">        fetched granules are reduced per-window via the existing</span>
-<a id="__codelineno-0-489" name="__codelineno-0-489"></a><span class="sd">        pyramids reducer (`G6`) — the facade only forwards `aggregate=`</span>
-<a id="__codelineno-0-490" name="__codelineno-0-490"></a><span class="sd">        for a `&quot;raster&quot;` instance, having rejected it for `&quot;vector&quot;` /</span>
-<a id="__codelineno-0-491" name="__codelineno-0-491"></a><span class="sd">        `&quot;tabular&quot;`.</span>
-<a id="__codelineno-0-492" name="__codelineno-0-492"></a>
-<a id="__codelineno-0-493" name="__codelineno-0-493"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-494" name="__codelineno-0-494"></a><span class="sd">            progress_bar: Forwarded to `earthaccess` as `show_progress`</span>
-<a id="__codelineno-0-495" name="__codelineno-0-495"></a><span class="sd">                on the download / open call, so `False` suppresses the</span>
-<a id="__codelineno-0-496" name="__codelineno-0-496"></a><span class="sd">                per-granule progress bar.</span>
-<a id="__codelineno-0-497" name="__codelineno-0-497"></a><span class="sd">            aggregate: Optional</span>
-<a id="__codelineno-0-498" name="__codelineno-0-498"></a><span class="sd">                :class:`earthlens.aggregate.AggregationConfig`. Only</span>
-<a id="__codelineno-0-499" name="__codelineno-0-499"></a><span class="sd">                reached for a `&quot;raster&quot;` instance.</span>
-<a id="__codelineno-0-500" name="__codelineno-0-500"></a>
-<a id="__codelineno-0-501" name="__codelineno-0-501"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-502" name="__codelineno-0-502"></a><span class="sd">            list[Path]: The fetched granule paths, or — when</span>
-<a id="__codelineno-0-503" name="__codelineno-0-503"></a><span class="sd">                `aggregate` is set — the per-window reduced raster</span>
-<a id="__codelineno-0-504" name="__codelineno-0-504"></a><span class="sd">                paths.</span>
-<a id="__codelineno-0-505" name="__codelineno-0-505"></a>
-<a id="__codelineno-0-506" name="__codelineno-0-506"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-507" name="__codelineno-0-507"></a><span class="sd">            NotImplementedError: When `aggregate` is set but the</span>
-<a id="__codelineno-0-508" name="__codelineno-0-508"></a><span class="sd">                installed pyramids exposes no `NetCDF.reduce` /</span>
-<a id="__codelineno-0-509" name="__codelineno-0-509"></a><span class="sd">                `DatasetCollection.groupby` for the fetched format.</span>
-<a id="__codelineno-0-510" name="__codelineno-0-510"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-511" name="__codelineno-0-511"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_show_progress</span> <span class="o">=</span> <span class="n">progress_bar</span>
-<a id="__codelineno-0-512" name="__codelineno-0-512"></a>        <span class="n">paths</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api_via_search_fetch</span><span class="p">()</span>
-<a id="__codelineno-0-513" name="__codelineno-0-513"></a>        <span class="k">if</span> <span class="n">aggregate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-514" name="__codelineno-0-514"></a>            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_aggregate</span><span class="p">(</span><span class="n">paths</span><span class="p">,</span> <span class="n">aggregate</span><span class="p">)</span>
-<a id="__codelineno-0-515" name="__codelineno-0-515"></a>        <span class="k">return</span> <span class="n">paths</span>
-<a id="__codelineno-0-516" name="__codelineno-0-516"></a>
-<a id="__codelineno-0-517" name="__codelineno-0-517"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_aggregate</span><span class="p">(</span>
-<a id="__codelineno-0-518" name="__codelineno-0-518"></a>        <span class="bp">self</span><span class="p">,</span> <span class="n">paths</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">],</span> <span class="n">config</span><span class="p">:</span> <span class="n">AggregationConfig</span>
-<a id="__codelineno-0-519" name="__codelineno-0-519"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
-<a id="__codelineno-0-520" name="__codelineno-0-520"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Reduce fetched raster granules per-window via pyramids (`G6`).</span>
-<a id="__codelineno-0-521" name="__codelineno-0-521"></a>
-<a id="__codelineno-0-522" name="__codelineno-0-522"></a><span class="sd">        The routing is **axis-driven, not format-driven** — it depends</span>
-<a id="__codelineno-0-523" name="__codelineno-0-523"></a><span class="sd">        on where the time axis lives, not on the file extension:</span>
-<a id="__codelineno-0-524" name="__codelineno-0-524"></a>
-<a id="__codelineno-0-525" name="__codelineno-0-525"></a><span class="sd">        * The common Earthdata case is a **stack of single-timestep</span>
-<a id="__codelineno-0-526" name="__codelineno-0-526"></a><span class="sd">          granules** (one file per overpass / half-hour / day, NetCDF</span>
-<a id="__codelineno-0-527" name="__codelineno-0-527"></a><span class="sd">          *or* COG). That whole stack is windowed by</span>
-<a id="__codelineno-0-528" name="__codelineno-0-528"></a><span class="sd">          :meth:`pyramids.dataset.DatasetCollection.groupby` (the STAC</span>
-<a id="__codelineno-0-529" name="__codelineno-0-529"></a><span class="sd">          path) — one reduced raster per `config.freq` window.</span>
-<a id="__codelineno-0-530" name="__codelineno-0-530"></a><span class="sd">        * The rarer case is a **single granule that already carries a</span>
-<a id="__codelineno-0-531" name="__codelineno-0-531"></a><span class="sd">          multi-timestep time axis inside it** (one NetCDF cube). Its</span>
-<a id="__codelineno-0-532" name="__codelineno-0-532"></a><span class="sd">          internal `time` axis is collapsed by</span>
-<a id="__codelineno-0-533" name="__codelineno-0-533"></a><span class="sd">          :meth:`pyramids.netcdf.NetCDF.reduce` (the CMEMS path).</span>
-<a id="__codelineno-0-534" name="__codelineno-0-534"></a>
-<a id="__codelineno-0-535" name="__codelineno-0-535"></a><span class="sd">        A single COG (one timestep, no internal axis) falls through to</span>
-<a id="__codelineno-0-536" name="__codelineno-0-536"></a><span class="sd">        the stack path as a one-element stack (a single window).</span>
+<a id="__codelineno-0-472" name="__codelineno-0-472"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">_region</span> <span class="ow">or</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;AWS_REGION&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;AWS_DEFAULT_REGION&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-473" name="__codelineno-0-473"></a>        <span class="p">)</span>
+<a id="__codelineno-0-474" name="__codelineno-0-474"></a>        <span class="k">return</span> <span class="n">caller</span> <span class="o">==</span> <span class="n">region</span>
+<a id="__codelineno-0-475" name="__codelineno-0-475"></a>
+<a id="__codelineno-0-476" name="__codelineno-0-476"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
+<a id="__codelineno-0-477" name="__codelineno-0-477"></a>        <span class="bp">self</span><span class="p">,</span>
+<a id="__codelineno-0-478" name="__codelineno-0-478"></a>        <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+<a id="__codelineno-0-479" name="__codelineno-0-479"></a>        <span class="n">aggregate</span><span class="p">:</span> <span class="n">AggregationConfig</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-480" name="__codelineno-0-480"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
+<a id="__codelineno-0-481" name="__codelineno-0-481"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Search CMR, fetch the granules, return their local paths.</span>
+<a id="__codelineno-0-482" name="__codelineno-0-482"></a>
+<a id="__codelineno-0-483" name="__codelineno-0-483"></a><span class="sd">        Composes :meth:`_search` and :meth:`_fetch` to pull every</span>
+<a id="__codelineno-0-484" name="__codelineno-0-484"></a><span class="sd">        granule matching the request bbox + window to `self.root_dir`</span>
+<a id="__codelineno-0-485" name="__codelineno-0-485"></a><span class="sd">        (or in-region S3 handles). When `aggregate` is given, the</span>
+<a id="__codelineno-0-486" name="__codelineno-0-486"></a><span class="sd">        fetched granules are reduced per-window via the existing</span>
+<a id="__codelineno-0-487" name="__codelineno-0-487"></a><span class="sd">        pyramids reducer (`G6`) — the facade only forwards `aggregate=`</span>
+<a id="__codelineno-0-488" name="__codelineno-0-488"></a><span class="sd">        for a `&quot;raster&quot;` instance, having rejected it for `&quot;vector&quot;` /</span>
+<a id="__codelineno-0-489" name="__codelineno-0-489"></a><span class="sd">        `&quot;tabular&quot;`.</span>
+<a id="__codelineno-0-490" name="__codelineno-0-490"></a>
+<a id="__codelineno-0-491" name="__codelineno-0-491"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-492" name="__codelineno-0-492"></a><span class="sd">            progress_bar: Forwarded to `earthaccess` as `show_progress`</span>
+<a id="__codelineno-0-493" name="__codelineno-0-493"></a><span class="sd">                on the download / open call, so `False` suppresses the</span>
+<a id="__codelineno-0-494" name="__codelineno-0-494"></a><span class="sd">                per-granule progress bar.</span>
+<a id="__codelineno-0-495" name="__codelineno-0-495"></a><span class="sd">            aggregate: Optional</span>
+<a id="__codelineno-0-496" name="__codelineno-0-496"></a><span class="sd">                :class:`earthlens.aggregate.AggregationConfig`. Only</span>
+<a id="__codelineno-0-497" name="__codelineno-0-497"></a><span class="sd">                reached for a `&quot;raster&quot;` instance.</span>
+<a id="__codelineno-0-498" name="__codelineno-0-498"></a>
+<a id="__codelineno-0-499" name="__codelineno-0-499"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-500" name="__codelineno-0-500"></a><span class="sd">            list[Path]: The fetched granule paths, or — when</span>
+<a id="__codelineno-0-501" name="__codelineno-0-501"></a><span class="sd">                `aggregate` is set — the per-window reduced raster</span>
+<a id="__codelineno-0-502" name="__codelineno-0-502"></a><span class="sd">                paths.</span>
+<a id="__codelineno-0-503" name="__codelineno-0-503"></a>
+<a id="__codelineno-0-504" name="__codelineno-0-504"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-505" name="__codelineno-0-505"></a><span class="sd">            NotImplementedError: When `aggregate` is set but the</span>
+<a id="__codelineno-0-506" name="__codelineno-0-506"></a><span class="sd">                installed pyramids exposes no `NetCDF.reduce` /</span>
+<a id="__codelineno-0-507" name="__codelineno-0-507"></a><span class="sd">                `DatasetCollection.groupby` for the fetched format.</span>
+<a id="__codelineno-0-508" name="__codelineno-0-508"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-509" name="__codelineno-0-509"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_show_progress</span> <span class="o">=</span> <span class="n">progress_bar</span>
+<a id="__codelineno-0-510" name="__codelineno-0-510"></a>        <span class="n">paths</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api_via_search_fetch</span><span class="p">()</span>
+<a id="__codelineno-0-511" name="__codelineno-0-511"></a>        <span class="k">if</span> <span class="n">aggregate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-512" name="__codelineno-0-512"></a>            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_aggregate</span><span class="p">(</span><span class="n">paths</span><span class="p">,</span> <span class="n">aggregate</span><span class="p">)</span>
+<a id="__codelineno-0-513" name="__codelineno-0-513"></a>        <span class="k">return</span> <span class="n">paths</span>
+<a id="__codelineno-0-514" name="__codelineno-0-514"></a>
+<a id="__codelineno-0-515" name="__codelineno-0-515"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_aggregate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">paths</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">],</span> <span class="n">config</span><span class="p">:</span> <span class="n">AggregationConfig</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
+<a id="__codelineno-0-516" name="__codelineno-0-516"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Reduce fetched raster granules per-window via pyramids (`G6`).</span>
+<a id="__codelineno-0-517" name="__codelineno-0-517"></a>
+<a id="__codelineno-0-518" name="__codelineno-0-518"></a><span class="sd">        The routing is **axis-driven, not format-driven** — it depends</span>
+<a id="__codelineno-0-519" name="__codelineno-0-519"></a><span class="sd">        on where the time axis lives, not on the file extension:</span>
+<a id="__codelineno-0-520" name="__codelineno-0-520"></a>
+<a id="__codelineno-0-521" name="__codelineno-0-521"></a><span class="sd">        * The common Earthdata case is a **stack of single-timestep</span>
+<a id="__codelineno-0-522" name="__codelineno-0-522"></a><span class="sd">          granules** (one file per overpass / half-hour / day, NetCDF</span>
+<a id="__codelineno-0-523" name="__codelineno-0-523"></a><span class="sd">          *or* COG). That whole stack is windowed by</span>
+<a id="__codelineno-0-524" name="__codelineno-0-524"></a><span class="sd">          :meth:`pyramids.dataset.DatasetCollection.groupby` (the STAC</span>
+<a id="__codelineno-0-525" name="__codelineno-0-525"></a><span class="sd">          path) — one reduced raster per `config.freq` window.</span>
+<a id="__codelineno-0-526" name="__codelineno-0-526"></a><span class="sd">        * The rarer case is a **single granule that already carries a</span>
+<a id="__codelineno-0-527" name="__codelineno-0-527"></a><span class="sd">          multi-timestep time axis inside it** (one NetCDF cube). Its</span>
+<a id="__codelineno-0-528" name="__codelineno-0-528"></a><span class="sd">          internal `time` axis is collapsed by</span>
+<a id="__codelineno-0-529" name="__codelineno-0-529"></a><span class="sd">          :meth:`pyramids.netcdf.NetCDF.reduce` (the CMEMS path).</span>
+<a id="__codelineno-0-530" name="__codelineno-0-530"></a>
+<a id="__codelineno-0-531" name="__codelineno-0-531"></a><span class="sd">        A single COG (one timestep, no internal axis) falls through to</span>
+<a id="__codelineno-0-532" name="__codelineno-0-532"></a><span class="sd">        the stack path as a one-element stack (a single window).</span>
+<a id="__codelineno-0-533" name="__codelineno-0-533"></a>
+<a id="__codelineno-0-534" name="__codelineno-0-534"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-535" name="__codelineno-0-535"></a><span class="sd">            paths: The fetched granule paths.</span>
+<a id="__codelineno-0-536" name="__codelineno-0-536"></a><span class="sd">            config: The aggregation request.</span>
 <a id="__codelineno-0-537" name="__codelineno-0-537"></a>
-<a id="__codelineno-0-538" name="__codelineno-0-538"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-539" name="__codelineno-0-539"></a><span class="sd">            paths: The fetched granule paths.</span>
-<a id="__codelineno-0-540" name="__codelineno-0-540"></a><span class="sd">            config: The aggregation request.</span>
-<a id="__codelineno-0-541" name="__codelineno-0-541"></a>
-<a id="__codelineno-0-542" name="__codelineno-0-542"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-543" name="__codelineno-0-543"></a><span class="sd">            list[Path]: The reduced raster paths.</span>
-<a id="__codelineno-0-544" name="__codelineno-0-544"></a>
-<a id="__codelineno-0-545" name="__codelineno-0-545"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-546" name="__codelineno-0-546"></a><span class="sd">            NotImplementedError: When the installed pyramids lacks the</span>
-<a id="__codelineno-0-547" name="__codelineno-0-547"></a><span class="sd">                reducer the chosen path needs.</span>
-<a id="__codelineno-0-548" name="__codelineno-0-548"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-549" name="__codelineno-0-549"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="n">paths</span><span class="p">:</span>
-<a id="__codelineno-0-550" name="__codelineno-0-550"></a>            <span class="k">return</span> <span class="p">[]</span>
-<a id="__codelineno-0-551" name="__codelineno-0-551"></a>        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">paths</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_netcdf_like</span><span class="p">(</span><span class="n">paths</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
-<a id="__codelineno-0-552" name="__codelineno-0-552"></a>            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_reduce_internal_axis</span><span class="p">(</span><span class="n">paths</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">config</span><span class="p">)</span>
-<a id="__codelineno-0-553" name="__codelineno-0-553"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_reduce_stack</span><span class="p">(</span><span class="n">paths</span><span class="p">,</span> <span class="n">config</span><span class="p">)</span>
+<a id="__codelineno-0-538" name="__codelineno-0-538"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-539" name="__codelineno-0-539"></a><span class="sd">            list[Path]: The reduced raster paths.</span>
+<a id="__codelineno-0-540" name="__codelineno-0-540"></a>
+<a id="__codelineno-0-541" name="__codelineno-0-541"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-542" name="__codelineno-0-542"></a><span class="sd">            NotImplementedError: When the installed pyramids lacks the</span>
+<a id="__codelineno-0-543" name="__codelineno-0-543"></a><span class="sd">                reducer the chosen path needs.</span>
+<a id="__codelineno-0-544" name="__codelineno-0-544"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-545" name="__codelineno-0-545"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="n">paths</span><span class="p">:</span>
+<a id="__codelineno-0-546" name="__codelineno-0-546"></a>            <span class="k">return</span> <span class="p">[]</span>
+<a id="__codelineno-0-547" name="__codelineno-0-547"></a>        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">paths</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_netcdf_like</span><span class="p">(</span><span class="n">paths</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+<a id="__codelineno-0-548" name="__codelineno-0-548"></a>            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_reduce_internal_axis</span><span class="p">(</span><span class="n">paths</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">config</span><span class="p">)</span>
+<a id="__codelineno-0-549" name="__codelineno-0-549"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_reduce_stack</span><span class="p">(</span><span class="n">paths</span><span class="p">,</span> <span class="n">config</span><span class="p">)</span>
+<a id="__codelineno-0-550" name="__codelineno-0-550"></a>
+<a id="__codelineno-0-551" name="__codelineno-0-551"></a>    <span class="nd">@staticmethod</span>
+<a id="__codelineno-0-552" name="__codelineno-0-552"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_is_netcdf_like</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<a id="__codelineno-0-553" name="__codelineno-0-553"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return whether a path is a NetCDF / HDF granule (has an internal axis).</span>
 <a id="__codelineno-0-554" name="__codelineno-0-554"></a>
-<a id="__codelineno-0-555" name="__codelineno-0-555"></a>    <span class="nd">@staticmethod</span>
-<a id="__codelineno-0-556" name="__codelineno-0-556"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_is_netcdf_like</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-<a id="__codelineno-0-557" name="__codelineno-0-557"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return whether a path is a NetCDF / HDF granule (has an internal axis).</span>
-<a id="__codelineno-0-558" name="__codelineno-0-558"></a>
-<a id="__codelineno-0-559" name="__codelineno-0-559"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-560" name="__codelineno-0-560"></a><span class="sd">            path: A fetched granule path.</span>
-<a id="__codelineno-0-561" name="__codelineno-0-561"></a>
-<a id="__codelineno-0-562" name="__codelineno-0-562"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-563" name="__codelineno-0-563"></a><span class="sd">            bool: `True` for NetCDF / HDF suffixes (which can carry an</span>
-<a id="__codelineno-0-564" name="__codelineno-0-564"></a><span class="sd">                internal multi-timestep time axis), `False` otherwise</span>
-<a id="__codelineno-0-565" name="__codelineno-0-565"></a><span class="sd">                (e.g. a single-timestep COG).</span>
-<a id="__codelineno-0-566" name="__codelineno-0-566"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-567" name="__codelineno-0-567"></a>        <span class="k">return</span> <span class="n">path</span><span class="o">.</span><span class="n">suffix</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="p">{</span><span class="s2">&quot;.nc&quot;</span><span class="p">,</span> <span class="s2">&quot;.nc4&quot;</span><span class="p">,</span> <span class="s2">&quot;.h5&quot;</span><span class="p">,</span> <span class="s2">&quot;.hdf&quot;</span><span class="p">,</span> <span class="s2">&quot;.hdf5&quot;</span><span class="p">,</span> <span class="s2">&quot;.he5&quot;</span><span class="p">}</span>
-<a id="__codelineno-0-568" name="__codelineno-0-568"></a>
-<a id="__codelineno-0-569" name="__codelineno-0-569"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_reduce_internal_axis</span><span class="p">(</span>
-<a id="__codelineno-0-570" name="__codelineno-0-570"></a>        <span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">AggregationConfig</span>
-<a id="__codelineno-0-571" name="__codelineno-0-571"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
-<a id="__codelineno-0-572" name="__codelineno-0-572"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Collapse one NetCDF cube&#39;s internal time axis via `NetCDF.reduce`.</span>
-<a id="__codelineno-0-573" name="__codelineno-0-573"></a>
-<a id="__codelineno-0-574" name="__codelineno-0-574"></a><span class="sd">        If the granule has no `time` dimension (a single-timestep file, or</span>
-<a id="__codelineno-0-575" name="__codelineno-0-575"></a><span class="sd">        an HDF-EOS file whose time is not a decodable CF dimension), there</span>
-<a id="__codelineno-0-576" name="__codelineno-0-576"></a><span class="sd">        is nothing to collapse — it is treated as a one-element stack and</span>
-<a id="__codelineno-0-577" name="__codelineno-0-577"></a><span class="sd">        windowed via :meth:`_reduce_stack` instead of raising.</span>
-<a id="__codelineno-0-578" name="__codelineno-0-578"></a>
-<a id="__codelineno-0-579" name="__codelineno-0-579"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-580" name="__codelineno-0-580"></a><span class="sd">            path: A single NetCDF / HDF granule, ideally carrying a</span>
-<a id="__codelineno-0-581" name="__codelineno-0-581"></a><span class="sd">                multi-timestep `time` axis.</span>
-<a id="__codelineno-0-582" name="__codelineno-0-582"></a><span class="sd">            config: The aggregation request (provides `freq` / `op`).</span>
-<a id="__codelineno-0-583" name="__codelineno-0-583"></a>
-<a id="__codelineno-0-584" name="__codelineno-0-584"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-585" name="__codelineno-0-585"></a><span class="sd">            list[Path]: One reduced NetCDF (written beside the source) when</span>
-<a id="__codelineno-0-586" name="__codelineno-0-586"></a><span class="sd">                a `time` axis is present, otherwise the per-window raster</span>
-<a id="__codelineno-0-587" name="__codelineno-0-587"></a><span class="sd">                paths from the stack fallback.</span>
-<a id="__codelineno-0-588" name="__codelineno-0-588"></a>
-<a id="__codelineno-0-589" name="__codelineno-0-589"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-590" name="__codelineno-0-590"></a><span class="sd">            NotImplementedError: When the installed pyramids has no</span>
-<a id="__codelineno-0-591" name="__codelineno-0-591"></a><span class="sd">                `NetCDF.reduce` (or, on the fallback, no</span>
-<a id="__codelineno-0-592" name="__codelineno-0-592"></a><span class="sd">                `DatasetCollection.groupby`).</span>
-<a id="__codelineno-0-593" name="__codelineno-0-593"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-594" name="__codelineno-0-594"></a>        <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.netcdf</span><span class="w"> </span><span class="kn">import</span> <span class="n">NetCDF</span>
-<a id="__codelineno-0-595" name="__codelineno-0-595"></a>
-<a id="__codelineno-0-596" name="__codelineno-0-596"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">NetCDF</span><span class="p">,</span> <span class="s2">&quot;reduce&quot;</span><span class="p">):</span>
-<a id="__codelineno-0-597" name="__codelineno-0-597"></a>            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
-<a id="__codelineno-0-598" name="__codelineno-0-598"></a>                <span class="s2">&quot;Earthdata.download(aggregate=...) needs pyramids&#39; &quot;</span>
-<a id="__codelineno-0-599" name="__codelineno-0-599"></a>                <span class="s2">&quot;NetCDF.reduce, which the installed pyramids build does &quot;</span>
-<a id="__codelineno-0-600" name="__codelineno-0-600"></a>                <span class="s2">&quot;not provide. Upgrade pyramids, or call download() without &quot;</span>
-<a id="__codelineno-0-601" name="__codelineno-0-601"></a>                <span class="s2">&quot;aggregate= and post-process the granules directly.&quot;</span>
-<a id="__codelineno-0-602" name="__codelineno-0-602"></a>            <span class="p">)</span>
-<a id="__codelineno-0-603" name="__codelineno-0-603"></a>        <span class="n">nc</span> <span class="o">=</span> <span class="n">NetCDF</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">path</span><span class="p">))</span>
-<a id="__codelineno-0-604" name="__codelineno-0-604"></a>        <span class="k">if</span> <span class="s2">&quot;time&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">nc</span><span class="o">.</span><span class="n">dimension_names</span> <span class="ow">or</span> <span class="p">()):</span>
-<a id="__codelineno-0-605" name="__codelineno-0-605"></a>            <span class="c1"># No internal time axis to collapse — e.g. a single-timestep</span>
-<a id="__codelineno-0-606" name="__codelineno-0-606"></a>            <span class="c1"># granule, or an HDF-EOS file whose time is not a decodable CF</span>
-<a id="__codelineno-0-607" name="__codelineno-0-607"></a>            <span class="c1"># dimension. Treat it as a one-element stack so `groupby` windows</span>
-<a id="__codelineno-0-608" name="__codelineno-0-608"></a>            <span class="c1"># it instead of `reduce` raising on a missing dimension.</span>
-<a id="__codelineno-0-609" name="__codelineno-0-609"></a>            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_reduce_stack</span><span class="p">([</span><span class="n">path</span><span class="p">],</span> <span class="n">config</span><span class="p">)</span>
-<a id="__codelineno-0-610" name="__codelineno-0-610"></a>        <span class="n">how</span> <span class="o">=</span> <span class="s2">&quot;mean&quot;</span> <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">op</span> <span class="o">==</span> <span class="s2">&quot;auto&quot;</span> <span class="k">else</span> <span class="n">config</span><span class="o">.</span><span class="n">op</span>
-<a id="__codelineno-0-611" name="__codelineno-0-611"></a>        <span class="n">reduced</span> <span class="o">=</span> <span class="n">nc</span><span class="o">.</span><span class="n">reduce</span><span class="p">(</span><span class="s2">&quot;time&quot;</span><span class="p">,</span> <span class="n">how</span><span class="o">=</span><span class="n">how</span><span class="p">)</span>
-<a id="__codelineno-0-612" name="__codelineno-0-612"></a>        <span class="n">target</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">with_name</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">path</span><span class="o">.</span><span class="n">stem</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">config</span><span class="o">.</span><span class="n">freq</span><span class="si">}</span><span class="s2">_agg.nc&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-613" name="__codelineno-0-613"></a>        <span class="n">reduced</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">target</span><span class="p">))</span>
-<a id="__codelineno-0-614" name="__codelineno-0-614"></a>        <span class="k">return</span> <span class="p">[</span><span class="n">target</span><span class="p">]</span>
-<a id="__codelineno-0-615" name="__codelineno-0-615"></a>
-<a id="__codelineno-0-616" name="__codelineno-0-616"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_reduce_stack</span><span class="p">(</span>
-<a id="__codelineno-0-617" name="__codelineno-0-617"></a>        <span class="bp">self</span><span class="p">,</span> <span class="n">paths</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">],</span> <span class="n">config</span><span class="p">:</span> <span class="n">AggregationConfig</span>
-<a id="__codelineno-0-618" name="__codelineno-0-618"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
-<a id="__codelineno-0-619" name="__codelineno-0-619"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Window a stack of single-timestep granules via `groupby`.</span>
-<a id="__codelineno-0-620" name="__codelineno-0-620"></a>
-<a id="__codelineno-0-621" name="__codelineno-0-621"></a><span class="sd">        The common Earthdata aggregation case: many granules, each one</span>
-<a id="__codelineno-0-622" name="__codelineno-0-622"></a><span class="sd">        timestep, windowed by `config.freq` into one reduced raster per</span>
-<a id="__codelineno-0-623" name="__codelineno-0-623"></a><span class="sd">        window. Handles a NetCDF stack and a COG stack alike (the choice</span>
-<a id="__codelineno-0-624" name="__codelineno-0-624"></a><span class="sd">        is the granule layout, not the format).</span>
-<a id="__codelineno-0-625" name="__codelineno-0-625"></a>
-<a id="__codelineno-0-626" name="__codelineno-0-626"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-627" name="__codelineno-0-627"></a><span class="sd">            paths: The fetched granule paths (a temporal stack).</span>
-<a id="__codelineno-0-628" name="__codelineno-0-628"></a><span class="sd">            config: The aggregation request (provides `freq`).</span>
-<a id="__codelineno-0-629" name="__codelineno-0-629"></a>
-<a id="__codelineno-0-630" name="__codelineno-0-630"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-631" name="__codelineno-0-631"></a><span class="sd">            list[Path]: The per-window reduced raster paths.</span>
+<a id="__codelineno-0-555" name="__codelineno-0-555"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-556" name="__codelineno-0-556"></a><span class="sd">            path: A fetched granule path.</span>
+<a id="__codelineno-0-557" name="__codelineno-0-557"></a>
+<a id="__codelineno-0-558" name="__codelineno-0-558"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-559" name="__codelineno-0-559"></a><span class="sd">            bool: `True` for NetCDF / HDF suffixes (which can carry an</span>
+<a id="__codelineno-0-560" name="__codelineno-0-560"></a><span class="sd">                internal multi-timestep time axis), `False` otherwise</span>
+<a id="__codelineno-0-561" name="__codelineno-0-561"></a><span class="sd">                (e.g. a single-timestep COG).</span>
+<a id="__codelineno-0-562" name="__codelineno-0-562"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-563" name="__codelineno-0-563"></a>        <span class="k">return</span> <span class="n">path</span><span class="o">.</span><span class="n">suffix</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="p">{</span><span class="s2">&quot;.nc&quot;</span><span class="p">,</span> <span class="s2">&quot;.nc4&quot;</span><span class="p">,</span> <span class="s2">&quot;.h5&quot;</span><span class="p">,</span> <span class="s2">&quot;.hdf&quot;</span><span class="p">,</span> <span class="s2">&quot;.hdf5&quot;</span><span class="p">,</span> <span class="s2">&quot;.he5&quot;</span><span class="p">}</span>
+<a id="__codelineno-0-564" name="__codelineno-0-564"></a>
+<a id="__codelineno-0-565" name="__codelineno-0-565"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_reduce_internal_axis</span><span class="p">(</span>
+<a id="__codelineno-0-566" name="__codelineno-0-566"></a>        <span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">AggregationConfig</span>
+<a id="__codelineno-0-567" name="__codelineno-0-567"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
+<a id="__codelineno-0-568" name="__codelineno-0-568"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Collapse one NetCDF cube&#39;s internal time axis via `NetCDF.reduce`.</span>
+<a id="__codelineno-0-569" name="__codelineno-0-569"></a>
+<a id="__codelineno-0-570" name="__codelineno-0-570"></a><span class="sd">        If the granule has no `time` dimension (a single-timestep file, or</span>
+<a id="__codelineno-0-571" name="__codelineno-0-571"></a><span class="sd">        an HDF-EOS file whose time is not a decodable CF dimension), there</span>
+<a id="__codelineno-0-572" name="__codelineno-0-572"></a><span class="sd">        is nothing to collapse — it is treated as a one-element stack and</span>
+<a id="__codelineno-0-573" name="__codelineno-0-573"></a><span class="sd">        windowed via :meth:`_reduce_stack` instead of raising.</span>
+<a id="__codelineno-0-574" name="__codelineno-0-574"></a>
+<a id="__codelineno-0-575" name="__codelineno-0-575"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-576" name="__codelineno-0-576"></a><span class="sd">            path: A single NetCDF / HDF granule, ideally carrying a</span>
+<a id="__codelineno-0-577" name="__codelineno-0-577"></a><span class="sd">                multi-timestep `time` axis.</span>
+<a id="__codelineno-0-578" name="__codelineno-0-578"></a><span class="sd">            config: The aggregation request (provides `freq` / `op`).</span>
+<a id="__codelineno-0-579" name="__codelineno-0-579"></a>
+<a id="__codelineno-0-580" name="__codelineno-0-580"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-581" name="__codelineno-0-581"></a><span class="sd">            list[Path]: One reduced NetCDF (written beside the source) when</span>
+<a id="__codelineno-0-582" name="__codelineno-0-582"></a><span class="sd">                a `time` axis is present, otherwise the per-window raster</span>
+<a id="__codelineno-0-583" name="__codelineno-0-583"></a><span class="sd">                paths from the stack fallback.</span>
+<a id="__codelineno-0-584" name="__codelineno-0-584"></a>
+<a id="__codelineno-0-585" name="__codelineno-0-585"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-586" name="__codelineno-0-586"></a><span class="sd">            NotImplementedError: When the installed pyramids has no</span>
+<a id="__codelineno-0-587" name="__codelineno-0-587"></a><span class="sd">                `NetCDF.reduce` (or, on the fallback, no</span>
+<a id="__codelineno-0-588" name="__codelineno-0-588"></a><span class="sd">                `DatasetCollection.groupby`).</span>
+<a id="__codelineno-0-589" name="__codelineno-0-589"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-590" name="__codelineno-0-590"></a>        <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.netcdf</span><span class="w"> </span><span class="kn">import</span> <span class="n">NetCDF</span>
+<a id="__codelineno-0-591" name="__codelineno-0-591"></a>
+<a id="__codelineno-0-592" name="__codelineno-0-592"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">NetCDF</span><span class="p">,</span> <span class="s2">&quot;reduce&quot;</span><span class="p">):</span>
+<a id="__codelineno-0-593" name="__codelineno-0-593"></a>            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+<a id="__codelineno-0-594" name="__codelineno-0-594"></a>                <span class="s2">&quot;Earthdata.download(aggregate=...) needs pyramids&#39; &quot;</span>
+<a id="__codelineno-0-595" name="__codelineno-0-595"></a>                <span class="s2">&quot;NetCDF.reduce, which the installed pyramids build does &quot;</span>
+<a id="__codelineno-0-596" name="__codelineno-0-596"></a>                <span class="s2">&quot;not provide. Upgrade pyramids, or call download() without &quot;</span>
+<a id="__codelineno-0-597" name="__codelineno-0-597"></a>                <span class="s2">&quot;aggregate= and post-process the granules directly.&quot;</span>
+<a id="__codelineno-0-598" name="__codelineno-0-598"></a>            <span class="p">)</span>
+<a id="__codelineno-0-599" name="__codelineno-0-599"></a>        <span class="n">nc</span> <span class="o">=</span> <span class="n">NetCDF</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">path</span><span class="p">))</span>
+<a id="__codelineno-0-600" name="__codelineno-0-600"></a>        <span class="k">if</span> <span class="s2">&quot;time&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">nc</span><span class="o">.</span><span class="n">dimension_names</span> <span class="ow">or</span> <span class="p">()):</span>
+<a id="__codelineno-0-601" name="__codelineno-0-601"></a>            <span class="c1"># No internal time axis to collapse — e.g. a single-timestep</span>
+<a id="__codelineno-0-602" name="__codelineno-0-602"></a>            <span class="c1"># granule, or an HDF-EOS file whose time is not a decodable CF</span>
+<a id="__codelineno-0-603" name="__codelineno-0-603"></a>            <span class="c1"># dimension. Treat it as a one-element stack so `groupby` windows</span>
+<a id="__codelineno-0-604" name="__codelineno-0-604"></a>            <span class="c1"># it instead of `reduce` raising on a missing dimension.</span>
+<a id="__codelineno-0-605" name="__codelineno-0-605"></a>            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_reduce_stack</span><span class="p">([</span><span class="n">path</span><span class="p">],</span> <span class="n">config</span><span class="p">)</span>
+<a id="__codelineno-0-606" name="__codelineno-0-606"></a>        <span class="n">how</span> <span class="o">=</span> <span class="s2">&quot;mean&quot;</span> <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">op</span> <span class="o">==</span> <span class="s2">&quot;auto&quot;</span> <span class="k">else</span> <span class="n">config</span><span class="o">.</span><span class="n">op</span>
+<a id="__codelineno-0-607" name="__codelineno-0-607"></a>        <span class="n">reduced</span> <span class="o">=</span> <span class="n">nc</span><span class="o">.</span><span class="n">reduce</span><span class="p">(</span><span class="s2">&quot;time&quot;</span><span class="p">,</span> <span class="n">how</span><span class="o">=</span><span class="n">how</span><span class="p">)</span>
+<a id="__codelineno-0-608" name="__codelineno-0-608"></a>        <span class="n">target</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">with_name</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">path</span><span class="o">.</span><span class="n">stem</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">config</span><span class="o">.</span><span class="n">freq</span><span class="si">}</span><span class="s2">_agg.nc&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-609" name="__codelineno-0-609"></a>        <span class="n">reduced</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">target</span><span class="p">))</span>
+<a id="__codelineno-0-610" name="__codelineno-0-610"></a>        <span class="k">return</span> <span class="p">[</span><span class="n">target</span><span class="p">]</span>
+<a id="__codelineno-0-611" name="__codelineno-0-611"></a>
+<a id="__codelineno-0-612" name="__codelineno-0-612"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_reduce_stack</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">paths</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">],</span> <span class="n">config</span><span class="p">:</span> <span class="n">AggregationConfig</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
+<a id="__codelineno-0-613" name="__codelineno-0-613"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Window a stack of single-timestep granules via `groupby`.</span>
+<a id="__codelineno-0-614" name="__codelineno-0-614"></a>
+<a id="__codelineno-0-615" name="__codelineno-0-615"></a><span class="sd">        The common Earthdata aggregation case: many granules, each one</span>
+<a id="__codelineno-0-616" name="__codelineno-0-616"></a><span class="sd">        timestep, windowed by `config.freq` into one reduced raster per</span>
+<a id="__codelineno-0-617" name="__codelineno-0-617"></a><span class="sd">        window. Handles a NetCDF stack and a COG stack alike (the choice</span>
+<a id="__codelineno-0-618" name="__codelineno-0-618"></a><span class="sd">        is the granule layout, not the format).</span>
+<a id="__codelineno-0-619" name="__codelineno-0-619"></a>
+<a id="__codelineno-0-620" name="__codelineno-0-620"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-621" name="__codelineno-0-621"></a><span class="sd">            paths: The fetched granule paths (a temporal stack).</span>
+<a id="__codelineno-0-622" name="__codelineno-0-622"></a><span class="sd">            config: The aggregation request (provides `freq`).</span>
+<a id="__codelineno-0-623" name="__codelineno-0-623"></a>
+<a id="__codelineno-0-624" name="__codelineno-0-624"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-625" name="__codelineno-0-625"></a><span class="sd">            list[Path]: The per-window reduced raster paths.</span>
+<a id="__codelineno-0-626" name="__codelineno-0-626"></a>
+<a id="__codelineno-0-627" name="__codelineno-0-627"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-628" name="__codelineno-0-628"></a><span class="sd">            NotImplementedError: When the installed pyramids has no</span>
+<a id="__codelineno-0-629" name="__codelineno-0-629"></a><span class="sd">                `DatasetCollection.groupby`.</span>
+<a id="__codelineno-0-630" name="__codelineno-0-630"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-631" name="__codelineno-0-631"></a>        <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">DatasetCollection</span>
 <a id="__codelineno-0-632" name="__codelineno-0-632"></a>
-<a id="__codelineno-0-633" name="__codelineno-0-633"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-634" name="__codelineno-0-634"></a><span class="sd">            NotImplementedError: When the installed pyramids has no</span>
-<a id="__codelineno-0-635" name="__codelineno-0-635"></a><span class="sd">                `DatasetCollection.groupby`.</span>
-<a id="__codelineno-0-636" name="__codelineno-0-636"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-637" name="__codelineno-0-637"></a>        <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">DatasetCollection</span>
-<a id="__codelineno-0-638" name="__codelineno-0-638"></a>
-<a id="__codelineno-0-639" name="__codelineno-0-639"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">DatasetCollection</span><span class="p">,</span> <span class="s2">&quot;groupby&quot;</span><span class="p">):</span>
-<a id="__codelineno-0-640" name="__codelineno-0-640"></a>            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
-<a id="__codelineno-0-641" name="__codelineno-0-641"></a>                <span class="s2">&quot;Earthdata.download(aggregate=...) for a granule stack needs &quot;</span>
-<a id="__codelineno-0-642" name="__codelineno-0-642"></a>                <span class="s2">&quot;pyramids&#39; DatasetCollection.groupby, which the installed &quot;</span>
-<a id="__codelineno-0-643" name="__codelineno-0-643"></a>                <span class="s2">&quot;pyramids build does not provide.&quot;</span>
-<a id="__codelineno-0-644" name="__codelineno-0-644"></a>            <span class="p">)</span>
-<a id="__codelineno-0-645" name="__codelineno-0-645"></a>        <span class="n">collection</span> <span class="o">=</span> <span class="n">DatasetCollection</span><span class="o">.</span><span class="n">from_files</span><span class="p">([</span><span class="nb">str</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">paths</span><span class="p">])</span>
-<a id="__codelineno-0-646" name="__codelineno-0-646"></a>        <span class="n">grouped</span> <span class="o">=</span> <span class="n">collection</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">freq</span><span class="p">)</span>
-<a id="__codelineno-0-647" name="__codelineno-0-647"></a>        <span class="k">return</span> <span class="p">[</span><span class="n">Path</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">grouped</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">root_dir</span><span class="p">))]</span>
+<a id="__codelineno-0-633" name="__codelineno-0-633"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">DatasetCollection</span><span class="p">,</span> <span class="s2">&quot;groupby&quot;</span><span class="p">):</span>
+<a id="__codelineno-0-634" name="__codelineno-0-634"></a>            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+<a id="__codelineno-0-635" name="__codelineno-0-635"></a>                <span class="s2">&quot;Earthdata.download(aggregate=...) for a granule stack needs &quot;</span>
+<a id="__codelineno-0-636" name="__codelineno-0-636"></a>                <span class="s2">&quot;pyramids&#39; DatasetCollection.groupby, which the installed &quot;</span>
+<a id="__codelineno-0-637" name="__codelineno-0-637"></a>                <span class="s2">&quot;pyramids build does not provide.&quot;</span>
+<a id="__codelineno-0-638" name="__codelineno-0-638"></a>            <span class="p">)</span>
+<a id="__codelineno-0-639" name="__codelineno-0-639"></a>        <span class="n">collection</span> <span class="o">=</span> <span class="n">DatasetCollection</span><span class="o">.</span><span class="n">from_files</span><span class="p">([</span><span class="nb">str</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">paths</span><span class="p">])</span>
+<a id="__codelineno-0-640" name="__codelineno-0-640"></a>        <span class="n">grouped</span> <span class="o">=</span> <span class="n">collection</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">freq</span><span class="p">)</span>
+<a id="__codelineno-0-641" name="__codelineno-0-641"></a>        <span class="k">return</span> <span class="p">[</span><span class="n">Path</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">grouped</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">root_dir</span><span class="p">))]</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -19877,7 +19853,9 @@ installed pyramids exposes no <code>NetCDF.reduce</code> /
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>src/earthlens/earthdata/backend.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-478">478</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-476">476</a></span>
+<span class="normal"><a href="#__codelineno-0-477">477</a></span>
+<span class="normal"><a href="#__codelineno-0-478">478</a></span>
 <span class="normal"><a href="#__codelineno-0-479">479</a></span>
 <span class="normal"><a href="#__codelineno-0-480">480</a></span>
 <span class="normal"><a href="#__codelineno-0-481">481</a></span>
@@ -19912,46 +19890,44 @@ installed pyramids exposes no <code>NetCDF.reduce</code> /
 <span class="normal"><a href="#__codelineno-0-510">510</a></span>
 <span class="normal"><a href="#__codelineno-0-511">511</a></span>
 <span class="normal"><a href="#__codelineno-0-512">512</a></span>
-<span class="normal"><a href="#__codelineno-0-513">513</a></span>
-<span class="normal"><a href="#__codelineno-0-514">514</a></span>
-<span class="normal"><a href="#__codelineno-0-515">515</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-478" name="__codelineno-0-478"></a><span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
-<a id="__codelineno-0-479" name="__codelineno-0-479"></a>    <span class="bp">self</span><span class="p">,</span>
-<a id="__codelineno-0-480" name="__codelineno-0-480"></a>    <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-<a id="__codelineno-0-481" name="__codelineno-0-481"></a>    <span class="n">aggregate</span><span class="p">:</span> <span class="n">AggregationConfig</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-482" name="__codelineno-0-482"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
-<a id="__codelineno-0-483" name="__codelineno-0-483"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Search CMR, fetch the granules, return their local paths.</span>
-<a id="__codelineno-0-484" name="__codelineno-0-484"></a>
-<a id="__codelineno-0-485" name="__codelineno-0-485"></a><span class="sd">    Composes :meth:`_search` and :meth:`_fetch` to pull every</span>
-<a id="__codelineno-0-486" name="__codelineno-0-486"></a><span class="sd">    granule matching the request bbox + window to `self.root_dir`</span>
-<a id="__codelineno-0-487" name="__codelineno-0-487"></a><span class="sd">    (or in-region S3 handles). When `aggregate` is given, the</span>
-<a id="__codelineno-0-488" name="__codelineno-0-488"></a><span class="sd">    fetched granules are reduced per-window via the existing</span>
-<a id="__codelineno-0-489" name="__codelineno-0-489"></a><span class="sd">    pyramids reducer (`G6`) — the facade only forwards `aggregate=`</span>
-<a id="__codelineno-0-490" name="__codelineno-0-490"></a><span class="sd">    for a `&quot;raster&quot;` instance, having rejected it for `&quot;vector&quot;` /</span>
-<a id="__codelineno-0-491" name="__codelineno-0-491"></a><span class="sd">    `&quot;tabular&quot;`.</span>
-<a id="__codelineno-0-492" name="__codelineno-0-492"></a>
-<a id="__codelineno-0-493" name="__codelineno-0-493"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-494" name="__codelineno-0-494"></a><span class="sd">        progress_bar: Forwarded to `earthaccess` as `show_progress`</span>
-<a id="__codelineno-0-495" name="__codelineno-0-495"></a><span class="sd">            on the download / open call, so `False` suppresses the</span>
-<a id="__codelineno-0-496" name="__codelineno-0-496"></a><span class="sd">            per-granule progress bar.</span>
-<a id="__codelineno-0-497" name="__codelineno-0-497"></a><span class="sd">        aggregate: Optional</span>
-<a id="__codelineno-0-498" name="__codelineno-0-498"></a><span class="sd">            :class:`earthlens.aggregate.AggregationConfig`. Only</span>
-<a id="__codelineno-0-499" name="__codelineno-0-499"></a><span class="sd">            reached for a `&quot;raster&quot;` instance.</span>
-<a id="__codelineno-0-500" name="__codelineno-0-500"></a>
-<a id="__codelineno-0-501" name="__codelineno-0-501"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-502" name="__codelineno-0-502"></a><span class="sd">        list[Path]: The fetched granule paths, or — when</span>
-<a id="__codelineno-0-503" name="__codelineno-0-503"></a><span class="sd">            `aggregate` is set — the per-window reduced raster</span>
-<a id="__codelineno-0-504" name="__codelineno-0-504"></a><span class="sd">            paths.</span>
-<a id="__codelineno-0-505" name="__codelineno-0-505"></a>
-<a id="__codelineno-0-506" name="__codelineno-0-506"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-507" name="__codelineno-0-507"></a><span class="sd">        NotImplementedError: When `aggregate` is set but the</span>
-<a id="__codelineno-0-508" name="__codelineno-0-508"></a><span class="sd">            installed pyramids exposes no `NetCDF.reduce` /</span>
-<a id="__codelineno-0-509" name="__codelineno-0-509"></a><span class="sd">            `DatasetCollection.groupby` for the fetched format.</span>
-<a id="__codelineno-0-510" name="__codelineno-0-510"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-511" name="__codelineno-0-511"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_show_progress</span> <span class="o">=</span> <span class="n">progress_bar</span>
-<a id="__codelineno-0-512" name="__codelineno-0-512"></a>    <span class="n">paths</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api_via_search_fetch</span><span class="p">()</span>
-<a id="__codelineno-0-513" name="__codelineno-0-513"></a>    <span class="k">if</span> <span class="n">aggregate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-514" name="__codelineno-0-514"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_aggregate</span><span class="p">(</span><span class="n">paths</span><span class="p">,</span> <span class="n">aggregate</span><span class="p">)</span>
-<a id="__codelineno-0-515" name="__codelineno-0-515"></a>    <span class="k">return</span> <span class="n">paths</span>
+<span class="normal"><a href="#__codelineno-0-513">513</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-476" name="__codelineno-0-476"></a><span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
+<a id="__codelineno-0-477" name="__codelineno-0-477"></a>    <span class="bp">self</span><span class="p">,</span>
+<a id="__codelineno-0-478" name="__codelineno-0-478"></a>    <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+<a id="__codelineno-0-479" name="__codelineno-0-479"></a>    <span class="n">aggregate</span><span class="p">:</span> <span class="n">AggregationConfig</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-480" name="__codelineno-0-480"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
+<a id="__codelineno-0-481" name="__codelineno-0-481"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Search CMR, fetch the granules, return their local paths.</span>
+<a id="__codelineno-0-482" name="__codelineno-0-482"></a>
+<a id="__codelineno-0-483" name="__codelineno-0-483"></a><span class="sd">    Composes :meth:`_search` and :meth:`_fetch` to pull every</span>
+<a id="__codelineno-0-484" name="__codelineno-0-484"></a><span class="sd">    granule matching the request bbox + window to `self.root_dir`</span>
+<a id="__codelineno-0-485" name="__codelineno-0-485"></a><span class="sd">    (or in-region S3 handles). When `aggregate` is given, the</span>
+<a id="__codelineno-0-486" name="__codelineno-0-486"></a><span class="sd">    fetched granules are reduced per-window via the existing</span>
+<a id="__codelineno-0-487" name="__codelineno-0-487"></a><span class="sd">    pyramids reducer (`G6`) — the facade only forwards `aggregate=`</span>
+<a id="__codelineno-0-488" name="__codelineno-0-488"></a><span class="sd">    for a `&quot;raster&quot;` instance, having rejected it for `&quot;vector&quot;` /</span>
+<a id="__codelineno-0-489" name="__codelineno-0-489"></a><span class="sd">    `&quot;tabular&quot;`.</span>
+<a id="__codelineno-0-490" name="__codelineno-0-490"></a>
+<a id="__codelineno-0-491" name="__codelineno-0-491"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-492" name="__codelineno-0-492"></a><span class="sd">        progress_bar: Forwarded to `earthaccess` as `show_progress`</span>
+<a id="__codelineno-0-493" name="__codelineno-0-493"></a><span class="sd">            on the download / open call, so `False` suppresses the</span>
+<a id="__codelineno-0-494" name="__codelineno-0-494"></a><span class="sd">            per-granule progress bar.</span>
+<a id="__codelineno-0-495" name="__codelineno-0-495"></a><span class="sd">        aggregate: Optional</span>
+<a id="__codelineno-0-496" name="__codelineno-0-496"></a><span class="sd">            :class:`earthlens.aggregate.AggregationConfig`. Only</span>
+<a id="__codelineno-0-497" name="__codelineno-0-497"></a><span class="sd">            reached for a `&quot;raster&quot;` instance.</span>
+<a id="__codelineno-0-498" name="__codelineno-0-498"></a>
+<a id="__codelineno-0-499" name="__codelineno-0-499"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-500" name="__codelineno-0-500"></a><span class="sd">        list[Path]: The fetched granule paths, or — when</span>
+<a id="__codelineno-0-501" name="__codelineno-0-501"></a><span class="sd">            `aggregate` is set — the per-window reduced raster</span>
+<a id="__codelineno-0-502" name="__codelineno-0-502"></a><span class="sd">            paths.</span>
+<a id="__codelineno-0-503" name="__codelineno-0-503"></a>
+<a id="__codelineno-0-504" name="__codelineno-0-504"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-505" name="__codelineno-0-505"></a><span class="sd">        NotImplementedError: When `aggregate` is set but the</span>
+<a id="__codelineno-0-506" name="__codelineno-0-506"></a><span class="sd">            installed pyramids exposes no `NetCDF.reduce` /</span>
+<a id="__codelineno-0-507" name="__codelineno-0-507"></a><span class="sd">            `DatasetCollection.groupby` for the fetched format.</span>
+<a id="__codelineno-0-508" name="__codelineno-0-508"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-509" name="__codelineno-0-509"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_show_progress</span> <span class="o">=</span> <span class="n">progress_bar</span>
+<a id="__codelineno-0-510" name="__codelineno-0-510"></a>    <span class="n">paths</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api_via_search_fetch</span><span class="p">()</span>
+<a id="__codelineno-0-511" name="__codelineno-0-511"></a>    <span class="k">if</span> <span class="n">aggregate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-512" name="__codelineno-0-512"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_aggregate</span><span class="p">(</span><span class="n">paths</span><span class="p">,</span> <span class="n">aggregate</span><span class="p">)</span>
+<a id="__codelineno-0-513" name="__codelineno-0-513"></a>    <span class="k">return</span> <span class="n">paths</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>

@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -13433,7 +13433,9 @@ gate <code>aggregate=</code>.</p>
 <span class="normal"><a href="#__codelineno-0-391">391</a></span>
 <span class="normal"><a href="#__codelineno-0-392">392</a></span>
 <span class="normal"><a href="#__codelineno-0-393">393</a></span>
-<span class="normal"><a href="#__codelineno-0-394">394</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-56" name="__codelineno-0-56"></a><span class="k">class</span><span class="w"> </span><span class="nc">EUMETSAT</span><span class="p">(</span><span class="n">AbstractDataSource</span><span class="p">):</span>
+<span class="normal"><a href="#__codelineno-0-394">394</a></span>
+<span class="normal"><a href="#__codelineno-0-395">395</a></span>
+<span class="normal"><a href="#__codelineno-0-396">396</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-56" name="__codelineno-0-56"></a><span class="k">class</span><span class="w"> </span><span class="nc">EUMETSAT</span><span class="p">(</span><span class="n">AbstractDataSource</span><span class="p">):</span>
 <a id="__codelineno-0-57" name="__codelineno-0-57"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;EUMETSAT Data Store backend (per-collection output kind).</span>
 <a id="__codelineno-0-58" name="__codelineno-0-58"></a>
 <a id="__codelineno-0-59" name="__codelineno-0-59"></a><span class="sd">    Wraps `eumdac` so a user can search a curated EUMETSAT collection by</span>
@@ -13579,199 +13581,201 @@ gate <code>aggregate=</code>.</p>
 <a id="__codelineno-0-199" name="__codelineno-0-199"></a>        <span class="k">return</span> <span class="n">kinds</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
 <a id="__codelineno-0-200" name="__codelineno-0-200"></a>
 <a id="__codelineno-0-201" name="__codelineno-0-201"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_initialize</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<a id="__codelineno-0-202" name="__codelineno-0-202"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Build the `EumetsatAuth`; defer token minting to fetch.</span>
+<a id="__codelineno-0-202" name="__codelineno-0-202"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Build the `EumetsatAuth`; defer token minting.</span>
 <a id="__codelineno-0-203" name="__codelineno-0-203"></a>
 <a id="__codelineno-0-204" name="__codelineno-0-204"></a><span class="sd">        Returns `None` — `eumdac` keeps the token on the `EumetsatAuth`</span>
 <a id="__codelineno-0-205" name="__codelineno-0-205"></a><span class="sd">        instance, so the parent class binds no opaque `self.client`. The</span>
 <a id="__codelineno-0-206" name="__codelineno-0-206"></a><span class="sd">        token minting (`EumetsatAuth.configure`, which contacts the auth</span>
-<a id="__codelineno-0-207" name="__codelineno-0-207"></a><span class="sd">        server) is deferred: :meth:`_fetch` already calls the idempotent</span>
-<a id="__codelineno-0-208" name="__codelineno-0-208"></a><span class="sd">        `configure()` before downloading, so constructing the backend</span>
-<a id="__codelineno-0-209" name="__codelineno-0-209"></a><span class="sd">        never authenticates and `_search()` stays offline.</span>
-<a id="__codelineno-0-210" name="__codelineno-0-210"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-211" name="__codelineno-0-211"></a>        <span class="n">creds</span> <span class="o">=</span> <span class="n">EumetsatCredentials</span><span class="p">(</span>
-<a id="__codelineno-0-212" name="__codelineno-0-212"></a>            <span class="n">consumer_key</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_consumer_key</span><span class="p">,</span>
-<a id="__codelineno-0-213" name="__codelineno-0-213"></a>            <span class="n">consumer_secret</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_consumer_secret</span><span class="p">,</span>
-<a id="__codelineno-0-214" name="__codelineno-0-214"></a>            <span class="n">credentials_file</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_credentials_file</span><span class="p">,</span>
-<a id="__codelineno-0-215" name="__codelineno-0-215"></a>        <span class="p">)</span>
-<a id="__codelineno-0-216" name="__codelineno-0-216"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_auth</span> <span class="o">=</span> <span class="n">EumetsatAuth</span><span class="p">(</span><span class="n">creds</span><span class="p">)</span>
-<a id="__codelineno-0-217" name="__codelineno-0-217"></a>        <span class="k">return</span> <span class="kc">None</span>
-<a id="__codelineno-0-218" name="__codelineno-0-218"></a>
-<a id="__codelineno-0-219" name="__codelineno-0-219"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_create_grid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lat_lim</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">lon_lim</span><span class="p">:</span> <span class="nb">list</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SpatialExtent</span><span class="p">:</span>
-<a id="__codelineno-0-220" name="__codelineno-0-220"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Validate and wrap the user bbox into a `SpatialExtent`.</span>
-<a id="__codelineno-0-221" name="__codelineno-0-221"></a>
-<a id="__codelineno-0-222" name="__codelineno-0-222"></a><span class="sd">        The Data Store search accepts a plain bounding box, so this is a</span>
-<a id="__codelineno-0-223" name="__codelineno-0-223"></a><span class="sd">        thin wrapper over `SpatialExtent.from_pairs`. An earthlens extent</span>
-<a id="__codelineno-0-224" name="__codelineno-0-224"></a><span class="sd">        constrains longitude to a single `[-180, 180]` range with</span>
-<a id="__codelineno-0-225" name="__codelineno-0-225"></a><span class="sd">        `west &lt;= east`, so it cannot represent an antimeridian-crossing</span>
-<a id="__codelineno-0-226" name="__codelineno-0-226"></a><span class="sd">        box and `_search` issues exactly one search bbox.</span>
-<a id="__codelineno-0-227" name="__codelineno-0-227"></a>
-<a id="__codelineno-0-228" name="__codelineno-0-228"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-229" name="__codelineno-0-229"></a><span class="sd">            lat_lim: `[lat_min, lat_max]` in degrees.</span>
-<a id="__codelineno-0-230" name="__codelineno-0-230"></a><span class="sd">            lon_lim: `[lon_min, lon_max]` in degrees.</span>
-<a id="__codelineno-0-231" name="__codelineno-0-231"></a>
-<a id="__codelineno-0-232" name="__codelineno-0-232"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-233" name="__codelineno-0-233"></a><span class="sd">            SpatialExtent: Validated, frozen bbox.</span>
-<a id="__codelineno-0-234" name="__codelineno-0-234"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-235" name="__codelineno-0-235"></a>        <span class="k">return</span> <span class="n">SpatialExtent</span><span class="o">.</span><span class="n">from_pairs</span><span class="p">(</span><span class="n">lat_lim</span><span class="o">=</span><span class="n">lat_lim</span><span class="p">,</span> <span class="n">lon_lim</span><span class="o">=</span><span class="n">lon_lim</span><span class="p">)</span>
-<a id="__codelineno-0-236" name="__codelineno-0-236"></a>
-<a id="__codelineno-0-237" name="__codelineno-0-237"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_check_input_dates</span><span class="p">(</span>
-<a id="__codelineno-0-238" name="__codelineno-0-238"></a>        <span class="bp">self</span><span class="p">,</span>
-<a id="__codelineno-0-239" name="__codelineno-0-239"></a>        <span class="n">start</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-<a id="__codelineno-0-240" name="__codelineno-0-240"></a>        <span class="n">end</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-<a id="__codelineno-0-241" name="__codelineno-0-241"></a>        <span class="n">temporal_resolution</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-<a id="__codelineno-0-242" name="__codelineno-0-242"></a>        <span class="n">fmt</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-<a id="__codelineno-0-243" name="__codelineno-0-243"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TemporalExtent</span><span class="p">:</span>
-<a id="__codelineno-0-244" name="__codelineno-0-244"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Parse the date range into a `TemporalExtent`.</span>
-<a id="__codelineno-0-245" name="__codelineno-0-245"></a>
-<a id="__codelineno-0-246" name="__codelineno-0-246"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-247" name="__codelineno-0-247"></a><span class="sd">            start: Inclusive start date as a string.</span>
-<a id="__codelineno-0-248" name="__codelineno-0-248"></a><span class="sd">            end: Inclusive end date as a string.</span>
-<a id="__codelineno-0-249" name="__codelineno-0-249"></a><span class="sd">            temporal_resolution: Advisory cadence label; mapped to a</span>
-<a id="__codelineno-0-250" name="__codelineno-0-250"></a><span class="sd">                pandas frequency for the `dates` index when known.</span>
-<a id="__codelineno-0-251" name="__codelineno-0-251"></a><span class="sd">            fmt: `strptime` format applied to `start` and `end`.</span>
-<a id="__codelineno-0-252" name="__codelineno-0-252"></a>
-<a id="__codelineno-0-253" name="__codelineno-0-253"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-254" name="__codelineno-0-254"></a><span class="sd">            TemporalExtent: Frozen model with parsed bounds.</span>
-<a id="__codelineno-0-255" name="__codelineno-0-255"></a>
-<a id="__codelineno-0-256" name="__codelineno-0-256"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-257" name="__codelineno-0-257"></a><span class="sd">            ValueError: If `start` parses to a date later than `end`.</span>
-<a id="__codelineno-0-258" name="__codelineno-0-258"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-259" name="__codelineno-0-259"></a>        <span class="n">start_dt</span> <span class="o">=</span> <span class="n">dt</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">fmt</span><span class="p">)</span>
-<a id="__codelineno-0-260" name="__codelineno-0-260"></a>        <span class="n">end_dt</span> <span class="o">=</span> <span class="n">dt</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">end</span><span class="p">,</span> <span class="n">fmt</span><span class="p">)</span>
-<a id="__codelineno-0-261" name="__codelineno-0-261"></a>        <span class="n">freq_map</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;daily&quot;</span><span class="p">:</span> <span class="s2">&quot;D&quot;</span><span class="p">,</span> <span class="s2">&quot;monthly&quot;</span><span class="p">:</span> <span class="s2">&quot;MS&quot;</span><span class="p">,</span> <span class="s2">&quot;hourly&quot;</span><span class="p">:</span> <span class="s2">&quot;h&quot;</span><span class="p">}</span>
-<a id="__codelineno-0-262" name="__codelineno-0-262"></a>        <span class="n">resolution</span> <span class="o">=</span> <span class="n">freq_map</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">temporal_resolution</span><span class="p">,</span> <span class="s2">&quot;D&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-263" name="__codelineno-0-263"></a>        <span class="n">dates</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">date_range</span><span class="p">(</span><span class="n">start_dt</span><span class="p">,</span> <span class="n">end_dt</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="n">resolution</span><span class="p">)</span>
-<a id="__codelineno-0-264" name="__codelineno-0-264"></a>        <span class="k">return</span> <span class="n">TemporalExtent</span><span class="p">(</span>
-<a id="__codelineno-0-265" name="__codelineno-0-265"></a>            <span class="n">start_date</span><span class="o">=</span><span class="n">start_dt</span><span class="p">,</span>
-<a id="__codelineno-0-266" name="__codelineno-0-266"></a>            <span class="n">end_date</span><span class="o">=</span><span class="n">end_dt</span><span class="p">,</span>
-<a id="__codelineno-0-267" name="__codelineno-0-267"></a>            <span class="n">resolution</span><span class="o">=</span><span class="n">resolution</span><span class="p">,</span>
-<a id="__codelineno-0-268" name="__codelineno-0-268"></a>            <span class="n">dates</span><span class="o">=</span><span class="n">dates</span><span class="p">,</span>
-<a id="__codelineno-0-269" name="__codelineno-0-269"></a>        <span class="p">)</span>
-<a id="__codelineno-0-270" name="__codelineno-0-270"></a>
-<a id="__codelineno-0-271" name="__codelineno-0-271"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_api</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
-<a id="__codelineno-0-272" name="__codelineno-0-272"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Compose `_search` and `_fetch` into the canonical C3 shape.&quot;&quot;&quot;</span>
-<a id="__codelineno-0-273" name="__codelineno-0-273"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api_via_search_fetch</span><span class="p">()</span>
-<a id="__codelineno-0-274" name="__codelineno-0-274"></a>
-<a id="__codelineno-0-275" name="__codelineno-0-275"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_search</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">RemoteProduct</span><span class="p">]:</span>
-<a id="__codelineno-0-276" name="__codelineno-0-276"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Query the Data Store for products of every requested collection.</span>
-<a id="__codelineno-0-277" name="__codelineno-0-277"></a>
-<a id="__codelineno-0-278" name="__codelineno-0-278"></a><span class="sd">        One `Collection.search(bbox=, dtstart=, dtend=)` per resolved</span>
-<a id="__codelineno-0-279" name="__codelineno-0-279"></a><span class="sd">        collection row, scoped to the request bbox and time window. The</span>
-<a id="__codelineno-0-280" name="__codelineno-0-280"></a><span class="sd">        bbox is the `eumdac` `W,S,E,N` comma-string the OpenSearch</span>
-<a id="__codelineno-0-281" name="__codelineno-0-281"></a><span class="sd">        endpoint expects. The `end` date is treated as **inclusive of its</span>
-<a id="__codelineno-0-282" name="__codelineno-0-282"></a><span class="sd">        whole calendar day**: `dtend` is widened to `23:59:59.999999` of</span>
-<a id="__codelineno-0-283" name="__codelineno-0-283"></a><span class="sd">        the end day so a same-day request (`start == end`) covers the</span>
-<a id="__codelineno-0-284" name="__codelineno-0-284"></a><span class="sd">        day&#39;s products instead of collapsing to the midnight instant.</span>
-<a id="__codelineno-0-285" name="__codelineno-0-285"></a><span class="sd">        Each returned `eumdac` product becomes one `RemoteProduct` whose</span>
-<a id="__codelineno-0-286" name="__codelineno-0-286"></a><span class="sd">        `metadata` carries the raw product handle and its collection row,</span>
-<a id="__codelineno-0-287" name="__codelineno-0-287"></a><span class="sd">        so `_fetch` can stream without re-querying.</span>
-<a id="__codelineno-0-288" name="__codelineno-0-288"></a>
-<a id="__codelineno-0-289" name="__codelineno-0-289"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-290" name="__codelineno-0-290"></a><span class="sd">            list[RemoteProduct]: One product per matching Data Store</span>
-<a id="__codelineno-0-291" name="__codelineno-0-291"></a><span class="sd">                product, across every requested collection. An empty list</span>
-<a id="__codelineno-0-292" name="__codelineno-0-292"></a><span class="sd">                (no products in the window) short-circuits the fetch.</span>
-<a id="__codelineno-0-293" name="__codelineno-0-293"></a>
-<a id="__codelineno-0-294" name="__codelineno-0-294"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-295" name="__codelineno-0-295"></a><span class="sd">            ImportError: When the `[eumetsat]` extra (`eumdac`) is not</span>
-<a id="__codelineno-0-296" name="__codelineno-0-296"></a><span class="sd">                installed — surfaced by `EumetsatAuth.datastore()`.</span>
-<a id="__codelineno-0-297" name="__codelineno-0-297"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-298" name="__codelineno-0-298"></a>        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">_auth</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>  <span class="c1"># set by _initialize</span>
-<a id="__codelineno-0-299" name="__codelineno-0-299"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_auth</span><span class="o">.</span><span class="n">configure</span><span class="p">()</span>
-<a id="__codelineno-0-300" name="__codelineno-0-300"></a>        <span class="n">store</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_auth</span><span class="o">.</span><span class="n">datastore</span><span class="p">()</span>
-<a id="__codelineno-0-301" name="__codelineno-0-301"></a>        <span class="c1"># A `SpatialExtent` constrains longitude to a single `[-180, 180]`</span>
-<a id="__codelineno-0-302" name="__codelineno-0-302"></a>        <span class="c1"># range with `west &lt;= east`, so it cannot represent an</span>
-<a id="__codelineno-0-303" name="__codelineno-0-303"></a>        <span class="c1"># antimeridian-crossing box — a single search bbox always suffices.</span>
-<a id="__codelineno-0-304" name="__codelineno-0-304"></a>        <span class="n">bbox</span> <span class="o">=</span> <span class="n">eumdac_bbox</span><span class="p">(</span>
-<a id="__codelineno-0-305" name="__codelineno-0-305"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">west</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">south</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">east</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">north</span>
-<a id="__codelineno-0-306" name="__codelineno-0-306"></a>        <span class="p">)</span>
-<a id="__codelineno-0-307" name="__codelineno-0-307"></a>        <span class="c1"># `end_date` parses to midnight, so a same-day request (start == end)</span>
-<a id="__codelineno-0-308" name="__codelineno-0-308"></a>        <span class="c1"># would otherwise collapse to the zero-width instant 00:00:00 and match</span>
-<a id="__codelineno-0-309" name="__codelineno-0-309"></a>        <span class="c1"># (almost) no products. Extend the end bound to the end of its calendar</span>
-<a id="__codelineno-0-310" name="__codelineno-0-310"></a>        <span class="c1"># day so an inclusive `end` covers the whole day&#39;s products.</span>
-<a id="__codelineno-0-311" name="__codelineno-0-311"></a>        <span class="n">dtstart</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">start_date</span>
-<a id="__codelineno-0-312" name="__codelineno-0-312"></a>        <span class="n">dtend</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">end_date</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span>
-<a id="__codelineno-0-313" name="__codelineno-0-313"></a>            <span class="n">hour</span><span class="o">=</span><span class="mi">23</span><span class="p">,</span> <span class="n">minute</span><span class="o">=</span><span class="mi">59</span><span class="p">,</span> <span class="n">second</span><span class="o">=</span><span class="mi">59</span><span class="p">,</span> <span class="n">microsecond</span><span class="o">=</span><span class="mi">999999</span>
-<a id="__codelineno-0-314" name="__codelineno-0-314"></a>        <span class="p">)</span>
-<a id="__codelineno-0-315" name="__codelineno-0-315"></a>        <span class="n">products</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">RemoteProduct</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
-<a id="__codelineno-0-316" name="__codelineno-0-316"></a>        <span class="k">for</span> <span class="n">ds</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_datasets</span><span class="p">:</span>
-<a id="__codelineno-0-317" name="__codelineno-0-317"></a>            <span class="n">collection</span> <span class="o">=</span> <span class="n">store</span><span class="o">.</span><span class="n">get_collection</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">collection_id</span><span class="p">)</span>
-<a id="__codelineno-0-318" name="__codelineno-0-318"></a>            <span class="k">for</span> <span class="n">product</span> <span class="ow">in</span> <span class="n">collection</span><span class="o">.</span><span class="n">search</span><span class="p">(</span>
-<a id="__codelineno-0-319" name="__codelineno-0-319"></a>                <span class="n">bbox</span><span class="o">=</span><span class="n">bbox</span><span class="p">,</span>
-<a id="__codelineno-0-320" name="__codelineno-0-320"></a>                <span class="n">dtstart</span><span class="o">=</span><span class="n">dtstart</span><span class="p">,</span>
-<a id="__codelineno-0-321" name="__codelineno-0-321"></a>                <span class="n">dtend</span><span class="o">=</span><span class="n">dtend</span><span class="p">,</span>
-<a id="__codelineno-0-322" name="__codelineno-0-322"></a>            <span class="p">):</span>
-<a id="__codelineno-0-323" name="__codelineno-0-323"></a>                <span class="n">products</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-<a id="__codelineno-0-324" name="__codelineno-0-324"></a>                    <span class="n">RemoteProduct</span><span class="p">(</span>
-<a id="__codelineno-0-325" name="__codelineno-0-325"></a>                        <span class="nb">id</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">product</span><span class="p">),</span>
-<a id="__codelineno-0-326" name="__codelineno-0-326"></a>                        <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;product&quot;</span><span class="p">:</span> <span class="n">product</span><span class="p">,</span> <span class="s2">&quot;dataset&quot;</span><span class="p">:</span> <span class="n">ds</span><span class="p">},</span>
-<a id="__codelineno-0-327" name="__codelineno-0-327"></a>                    <span class="p">)</span>
-<a id="__codelineno-0-328" name="__codelineno-0-328"></a>                <span class="p">)</span>
-<a id="__codelineno-0-329" name="__codelineno-0-329"></a>        <span class="k">return</span> <span class="n">products</span>
-<a id="__codelineno-0-330" name="__codelineno-0-330"></a>
-<a id="__codelineno-0-331" name="__codelineno-0-331"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_fetch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">products</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">RemoteProduct</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
-<a id="__codelineno-0-332" name="__codelineno-0-332"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Stream every product `_search` returned to a local file.</span>
-<a id="__codelineno-0-333" name="__codelineno-0-333"></a>
-<a id="__codelineno-0-334" name="__codelineno-0-334"></a><span class="sd">        Each `eumdac` product is opened (`Product.open()` — a streaming</span>
-<a id="__codelineno-0-335" name="__codelineno-0-335"></a><span class="sd">        context manager) and copied to `self.root_dir / &lt;id&gt;`, where the</span>
-<a id="__codelineno-0-336" name="__codelineno-0-336"></a><span class="sd">        product id is reduced to a safe basename (`safe_product_filename`)</span>
-<a id="__codelineno-0-337" name="__codelineno-0-337"></a><span class="sd">        so a server-supplied id with a path separator cannot write outside</span>
-<a id="__codelineno-0-338" name="__codelineno-0-338"></a><span class="sd">        the output directory.</span>
-<a id="__codelineno-0-339" name="__codelineno-0-339"></a>
-<a id="__codelineno-0-340" name="__codelineno-0-340"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-341" name="__codelineno-0-341"></a><span class="sd">            products: The products from `_search`.</span>
-<a id="__codelineno-0-342" name="__codelineno-0-342"></a>
-<a id="__codelineno-0-343" name="__codelineno-0-343"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-344" name="__codelineno-0-344"></a><span class="sd">            list[Path]: Local paths of every fetched product, in search</span>
-<a id="__codelineno-0-345" name="__codelineno-0-345"></a><span class="sd">                order.</span>
-<a id="__codelineno-0-346" name="__codelineno-0-346"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-347" name="__codelineno-0-347"></a>        <span class="n">out_paths</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
-<a id="__codelineno-0-348" name="__codelineno-0-348"></a>        <span class="k">for</span> <span class="n">rp</span> <span class="ow">in</span> <span class="n">products</span><span class="p">:</span>
-<a id="__codelineno-0-349" name="__codelineno-0-349"></a>            <span class="n">product</span> <span class="o">=</span> <span class="n">rp</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;product&quot;</span><span class="p">]</span>
-<a id="__codelineno-0-350" name="__codelineno-0-350"></a>            <span class="n">target</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root_dir</span> <span class="o">/</span> <span class="n">safe_product_filename</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">product</span><span class="p">))</span>
-<a id="__codelineno-0-351" name="__codelineno-0-351"></a>            <span class="k">with</span> <span class="n">product</span><span class="o">.</span><span class="n">open</span><span class="p">()</span> <span class="k">as</span> <span class="n">src</span><span class="p">,</span> <span class="nb">open</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="s2">&quot;wb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">dst</span><span class="p">:</span>
-<a id="__codelineno-0-352" name="__codelineno-0-352"></a>                <span class="n">shutil</span><span class="o">.</span><span class="n">copyfileobj</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">dst</span><span class="p">)</span>
-<a id="__codelineno-0-353" name="__codelineno-0-353"></a>            <span class="n">out_paths</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
-<a id="__codelineno-0-354" name="__codelineno-0-354"></a>        <span class="k">return</span> <span class="n">out_paths</span>
-<a id="__codelineno-0-355" name="__codelineno-0-355"></a>
-<a id="__codelineno-0-356" name="__codelineno-0-356"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
-<a id="__codelineno-0-357" name="__codelineno-0-357"></a>        <span class="bp">self</span><span class="p">,</span>
-<a id="__codelineno-0-358" name="__codelineno-0-358"></a>        <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-<a id="__codelineno-0-359" name="__codelineno-0-359"></a>        <span class="n">aggregate</span><span class="p">:</span> <span class="n">AggregationConfig</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-360" name="__codelineno-0-360"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
-<a id="__codelineno-0-361" name="__codelineno-0-361"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Search the Data Store, fetch native products, return their paths.</span>
-<a id="__codelineno-0-362" name="__codelineno-0-362"></a>
-<a id="__codelineno-0-363" name="__codelineno-0-363"></a><span class="sd">        Composes `_search` and `_fetch` to pull every product matching</span>
-<a id="__codelineno-0-364" name="__codelineno-0-364"></a><span class="sd">        the request bbox + window to `self.root_dir`.</span>
-<a id="__codelineno-0-365" name="__codelineno-0-365"></a>
-<a id="__codelineno-0-366" name="__codelineno-0-366"></a><span class="sd">        `aggregate=` is the server-side subset / reproject path, which on</span>
-<a id="__codelineno-0-367" name="__codelineno-0-367"></a><span class="sd">        the EUMETSAT Data Store is **Data Tailor** (`H4`) — not part of</span>
-<a id="__codelineno-0-368" name="__codelineno-0-368"></a><span class="sd">        the MVP. A non-`None` `aggregate` therefore raises</span>
-<a id="__codelineno-0-369" name="__codelineno-0-369"></a><span class="sd">        `NotImplementedError` naming Data Tailor; native NetCDF products</span>
-<a id="__codelineno-0-370" name="__codelineno-0-370"></a><span class="sd">        can be read / reduced client-side with pyramids after download.</span>
-<a id="__codelineno-0-371" name="__codelineno-0-371"></a>
-<a id="__codelineno-0-372" name="__codelineno-0-372"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-373" name="__codelineno-0-373"></a><span class="sd">            progress_bar: Reserved for parity with the other backends;</span>
-<a id="__codelineno-0-374" name="__codelineno-0-374"></a><span class="sd">                `eumdac`&#39;s streaming download has no built-in bar.</span>
-<a id="__codelineno-0-375" name="__codelineno-0-375"></a><span class="sd">            aggregate: Optional</span>
-<a id="__codelineno-0-376" name="__codelineno-0-376"></a><span class="sd">                `earthlens.aggregate.AggregationConfig`. Rejected — see</span>
-<a id="__codelineno-0-377" name="__codelineno-0-377"></a><span class="sd">                above.</span>
-<a id="__codelineno-0-378" name="__codelineno-0-378"></a>
-<a id="__codelineno-0-379" name="__codelineno-0-379"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-380" name="__codelineno-0-380"></a><span class="sd">            list[Path]: The fetched product paths.</span>
-<a id="__codelineno-0-381" name="__codelineno-0-381"></a>
-<a id="__codelineno-0-382" name="__codelineno-0-382"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-383" name="__codelineno-0-383"></a><span class="sd">            NotImplementedError: When `aggregate` is not `None` (the Data</span>
-<a id="__codelineno-0-384" name="__codelineno-0-384"></a><span class="sd">                Tailor path, `H4`, is deferred).</span>
-<a id="__codelineno-0-385" name="__codelineno-0-385"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-386" name="__codelineno-0-386"></a>        <span class="k">if</span> <span class="n">aggregate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-387" name="__codelineno-0-387"></a>            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
-<a id="__codelineno-0-388" name="__codelineno-0-388"></a>                <span class="s2">&quot;EUMETSAT aggregate=/subset is the Data Tailor path (H4); &quot;</span>
-<a id="__codelineno-0-389" name="__codelineno-0-389"></a>                <span class="s2">&quot;it is not part of the MVP. Download native products &quot;</span>
-<a id="__codelineno-0-390" name="__codelineno-0-390"></a>                <span class="s2">&quot;without aggregate= and reduce NetCDF products client-side &quot;</span>
-<a id="__codelineno-0-391" name="__codelineno-0-391"></a>                <span class="s2">&quot;with pyramids.&quot;</span>
-<a id="__codelineno-0-392" name="__codelineno-0-392"></a>            <span class="p">)</span>
-<a id="__codelineno-0-393" name="__codelineno-0-393"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_show_progress</span> <span class="o">=</span> <span class="n">progress_bar</span>
-<a id="__codelineno-0-394" name="__codelineno-0-394"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api_via_search_fetch</span><span class="p">()</span>
+<a id="__codelineno-0-207" name="__codelineno-0-207"></a><span class="sd">        server) is deferred out of construction: it runs on the first</span>
+<a id="__codelineno-0-208" name="__codelineno-0-208"></a><span class="sd">        :meth:`_search` (the `eumdac` collection search authenticates via</span>
+<a id="__codelineno-0-209" name="__codelineno-0-209"></a><span class="sd">        the idempotent `configure()`), so constructing the backend never</span>
+<a id="__codelineno-0-210" name="__codelineno-0-210"></a><span class="sd">        authenticates — but note that a dry-run `search()` does, since the</span>
+<a id="__codelineno-0-211" name="__codelineno-0-211"></a><span class="sd">        `eumdac` data store needs a token.</span>
+<a id="__codelineno-0-212" name="__codelineno-0-212"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-213" name="__codelineno-0-213"></a>        <span class="n">creds</span> <span class="o">=</span> <span class="n">EumetsatCredentials</span><span class="p">(</span>
+<a id="__codelineno-0-214" name="__codelineno-0-214"></a>            <span class="n">consumer_key</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_consumer_key</span><span class="p">,</span>
+<a id="__codelineno-0-215" name="__codelineno-0-215"></a>            <span class="n">consumer_secret</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_consumer_secret</span><span class="p">,</span>
+<a id="__codelineno-0-216" name="__codelineno-0-216"></a>            <span class="n">credentials_file</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_credentials_file</span><span class="p">,</span>
+<a id="__codelineno-0-217" name="__codelineno-0-217"></a>        <span class="p">)</span>
+<a id="__codelineno-0-218" name="__codelineno-0-218"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_auth</span> <span class="o">=</span> <span class="n">EumetsatAuth</span><span class="p">(</span><span class="n">creds</span><span class="p">)</span>
+<a id="__codelineno-0-219" name="__codelineno-0-219"></a>        <span class="k">return</span> <span class="kc">None</span>
+<a id="__codelineno-0-220" name="__codelineno-0-220"></a>
+<a id="__codelineno-0-221" name="__codelineno-0-221"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_create_grid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lat_lim</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">lon_lim</span><span class="p">:</span> <span class="nb">list</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SpatialExtent</span><span class="p">:</span>
+<a id="__codelineno-0-222" name="__codelineno-0-222"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Validate and wrap the user bbox into a `SpatialExtent`.</span>
+<a id="__codelineno-0-223" name="__codelineno-0-223"></a>
+<a id="__codelineno-0-224" name="__codelineno-0-224"></a><span class="sd">        The Data Store search accepts a plain bounding box, so this is a</span>
+<a id="__codelineno-0-225" name="__codelineno-0-225"></a><span class="sd">        thin wrapper over `SpatialExtent.from_pairs`. An earthlens extent</span>
+<a id="__codelineno-0-226" name="__codelineno-0-226"></a><span class="sd">        constrains longitude to a single `[-180, 180]` range with</span>
+<a id="__codelineno-0-227" name="__codelineno-0-227"></a><span class="sd">        `west &lt;= east`, so it cannot represent an antimeridian-crossing</span>
+<a id="__codelineno-0-228" name="__codelineno-0-228"></a><span class="sd">        box and `_search` issues exactly one search bbox.</span>
+<a id="__codelineno-0-229" name="__codelineno-0-229"></a>
+<a id="__codelineno-0-230" name="__codelineno-0-230"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-231" name="__codelineno-0-231"></a><span class="sd">            lat_lim: `[lat_min, lat_max]` in degrees.</span>
+<a id="__codelineno-0-232" name="__codelineno-0-232"></a><span class="sd">            lon_lim: `[lon_min, lon_max]` in degrees.</span>
+<a id="__codelineno-0-233" name="__codelineno-0-233"></a>
+<a id="__codelineno-0-234" name="__codelineno-0-234"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-235" name="__codelineno-0-235"></a><span class="sd">            SpatialExtent: Validated, frozen bbox.</span>
+<a id="__codelineno-0-236" name="__codelineno-0-236"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-237" name="__codelineno-0-237"></a>        <span class="k">return</span> <span class="n">SpatialExtent</span><span class="o">.</span><span class="n">from_pairs</span><span class="p">(</span><span class="n">lat_lim</span><span class="o">=</span><span class="n">lat_lim</span><span class="p">,</span> <span class="n">lon_lim</span><span class="o">=</span><span class="n">lon_lim</span><span class="p">)</span>
+<a id="__codelineno-0-238" name="__codelineno-0-238"></a>
+<a id="__codelineno-0-239" name="__codelineno-0-239"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_check_input_dates</span><span class="p">(</span>
+<a id="__codelineno-0-240" name="__codelineno-0-240"></a>        <span class="bp">self</span><span class="p">,</span>
+<a id="__codelineno-0-241" name="__codelineno-0-241"></a>        <span class="n">start</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+<a id="__codelineno-0-242" name="__codelineno-0-242"></a>        <span class="n">end</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+<a id="__codelineno-0-243" name="__codelineno-0-243"></a>        <span class="n">temporal_resolution</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+<a id="__codelineno-0-244" name="__codelineno-0-244"></a>        <span class="n">fmt</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+<a id="__codelineno-0-245" name="__codelineno-0-245"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TemporalExtent</span><span class="p">:</span>
+<a id="__codelineno-0-246" name="__codelineno-0-246"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Parse the date range into a `TemporalExtent`.</span>
+<a id="__codelineno-0-247" name="__codelineno-0-247"></a>
+<a id="__codelineno-0-248" name="__codelineno-0-248"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-249" name="__codelineno-0-249"></a><span class="sd">            start: Inclusive start date as a string.</span>
+<a id="__codelineno-0-250" name="__codelineno-0-250"></a><span class="sd">            end: Inclusive end date as a string.</span>
+<a id="__codelineno-0-251" name="__codelineno-0-251"></a><span class="sd">            temporal_resolution: Advisory cadence label; mapped to a</span>
+<a id="__codelineno-0-252" name="__codelineno-0-252"></a><span class="sd">                pandas frequency for the `dates` index when known.</span>
+<a id="__codelineno-0-253" name="__codelineno-0-253"></a><span class="sd">            fmt: `strptime` format applied to `start` and `end`.</span>
+<a id="__codelineno-0-254" name="__codelineno-0-254"></a>
+<a id="__codelineno-0-255" name="__codelineno-0-255"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-256" name="__codelineno-0-256"></a><span class="sd">            TemporalExtent: Frozen model with parsed bounds.</span>
+<a id="__codelineno-0-257" name="__codelineno-0-257"></a>
+<a id="__codelineno-0-258" name="__codelineno-0-258"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-259" name="__codelineno-0-259"></a><span class="sd">            ValueError: If `start` parses to a date later than `end`.</span>
+<a id="__codelineno-0-260" name="__codelineno-0-260"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-261" name="__codelineno-0-261"></a>        <span class="n">start_dt</span> <span class="o">=</span> <span class="n">dt</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">fmt</span><span class="p">)</span>
+<a id="__codelineno-0-262" name="__codelineno-0-262"></a>        <span class="n">end_dt</span> <span class="o">=</span> <span class="n">dt</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">end</span><span class="p">,</span> <span class="n">fmt</span><span class="p">)</span>
+<a id="__codelineno-0-263" name="__codelineno-0-263"></a>        <span class="n">freq_map</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;daily&quot;</span><span class="p">:</span> <span class="s2">&quot;D&quot;</span><span class="p">,</span> <span class="s2">&quot;monthly&quot;</span><span class="p">:</span> <span class="s2">&quot;MS&quot;</span><span class="p">,</span> <span class="s2">&quot;hourly&quot;</span><span class="p">:</span> <span class="s2">&quot;h&quot;</span><span class="p">}</span>
+<a id="__codelineno-0-264" name="__codelineno-0-264"></a>        <span class="n">resolution</span> <span class="o">=</span> <span class="n">freq_map</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">temporal_resolution</span><span class="p">,</span> <span class="s2">&quot;D&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-265" name="__codelineno-0-265"></a>        <span class="n">dates</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">date_range</span><span class="p">(</span><span class="n">start_dt</span><span class="p">,</span> <span class="n">end_dt</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="n">resolution</span><span class="p">)</span>
+<a id="__codelineno-0-266" name="__codelineno-0-266"></a>        <span class="k">return</span> <span class="n">TemporalExtent</span><span class="p">(</span>
+<a id="__codelineno-0-267" name="__codelineno-0-267"></a>            <span class="n">start_date</span><span class="o">=</span><span class="n">start_dt</span><span class="p">,</span>
+<a id="__codelineno-0-268" name="__codelineno-0-268"></a>            <span class="n">end_date</span><span class="o">=</span><span class="n">end_dt</span><span class="p">,</span>
+<a id="__codelineno-0-269" name="__codelineno-0-269"></a>            <span class="n">resolution</span><span class="o">=</span><span class="n">resolution</span><span class="p">,</span>
+<a id="__codelineno-0-270" name="__codelineno-0-270"></a>            <span class="n">dates</span><span class="o">=</span><span class="n">dates</span><span class="p">,</span>
+<a id="__codelineno-0-271" name="__codelineno-0-271"></a>        <span class="p">)</span>
+<a id="__codelineno-0-272" name="__codelineno-0-272"></a>
+<a id="__codelineno-0-273" name="__codelineno-0-273"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_api</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
+<a id="__codelineno-0-274" name="__codelineno-0-274"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Compose `_search` and `_fetch` into the canonical C3 shape.&quot;&quot;&quot;</span>
+<a id="__codelineno-0-275" name="__codelineno-0-275"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api_via_search_fetch</span><span class="p">()</span>
+<a id="__codelineno-0-276" name="__codelineno-0-276"></a>
+<a id="__codelineno-0-277" name="__codelineno-0-277"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_search</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">RemoteProduct</span><span class="p">]:</span>
+<a id="__codelineno-0-278" name="__codelineno-0-278"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Query the Data Store for products of every requested collection.</span>
+<a id="__codelineno-0-279" name="__codelineno-0-279"></a>
+<a id="__codelineno-0-280" name="__codelineno-0-280"></a><span class="sd">        One `Collection.search(bbox=, dtstart=, dtend=)` per resolved</span>
+<a id="__codelineno-0-281" name="__codelineno-0-281"></a><span class="sd">        collection row, scoped to the request bbox and time window. The</span>
+<a id="__codelineno-0-282" name="__codelineno-0-282"></a><span class="sd">        bbox is the `eumdac` `W,S,E,N` comma-string the OpenSearch</span>
+<a id="__codelineno-0-283" name="__codelineno-0-283"></a><span class="sd">        endpoint expects. The `end` date is treated as **inclusive of its</span>
+<a id="__codelineno-0-284" name="__codelineno-0-284"></a><span class="sd">        whole calendar day**: `dtend` is widened to `23:59:59.999999` of</span>
+<a id="__codelineno-0-285" name="__codelineno-0-285"></a><span class="sd">        the end day so a same-day request (`start == end`) covers the</span>
+<a id="__codelineno-0-286" name="__codelineno-0-286"></a><span class="sd">        day&#39;s products instead of collapsing to the midnight instant.</span>
+<a id="__codelineno-0-287" name="__codelineno-0-287"></a><span class="sd">        Each returned `eumdac` product becomes one `RemoteProduct` whose</span>
+<a id="__codelineno-0-288" name="__codelineno-0-288"></a><span class="sd">        `metadata` carries the raw product handle and its collection row,</span>
+<a id="__codelineno-0-289" name="__codelineno-0-289"></a><span class="sd">        so `_fetch` can stream without re-querying.</span>
+<a id="__codelineno-0-290" name="__codelineno-0-290"></a>
+<a id="__codelineno-0-291" name="__codelineno-0-291"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-292" name="__codelineno-0-292"></a><span class="sd">            list[RemoteProduct]: One product per matching Data Store</span>
+<a id="__codelineno-0-293" name="__codelineno-0-293"></a><span class="sd">                product, across every requested collection. An empty list</span>
+<a id="__codelineno-0-294" name="__codelineno-0-294"></a><span class="sd">                (no products in the window) short-circuits the fetch.</span>
+<a id="__codelineno-0-295" name="__codelineno-0-295"></a>
+<a id="__codelineno-0-296" name="__codelineno-0-296"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-297" name="__codelineno-0-297"></a><span class="sd">            ImportError: When the `[eumetsat]` extra (`eumdac`) is not</span>
+<a id="__codelineno-0-298" name="__codelineno-0-298"></a><span class="sd">                installed — surfaced by `EumetsatAuth.datastore()`.</span>
+<a id="__codelineno-0-299" name="__codelineno-0-299"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-300" name="__codelineno-0-300"></a>        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">_auth</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>  <span class="c1"># set by _initialize</span>
+<a id="__codelineno-0-301" name="__codelineno-0-301"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_auth</span><span class="o">.</span><span class="n">configure</span><span class="p">()</span>
+<a id="__codelineno-0-302" name="__codelineno-0-302"></a>        <span class="n">store</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_auth</span><span class="o">.</span><span class="n">datastore</span><span class="p">()</span>
+<a id="__codelineno-0-303" name="__codelineno-0-303"></a>        <span class="c1"># A `SpatialExtent` constrains longitude to a single `[-180, 180]`</span>
+<a id="__codelineno-0-304" name="__codelineno-0-304"></a>        <span class="c1"># range with `west &lt;= east`, so it cannot represent an</span>
+<a id="__codelineno-0-305" name="__codelineno-0-305"></a>        <span class="c1"># antimeridian-crossing box — a single search bbox always suffices.</span>
+<a id="__codelineno-0-306" name="__codelineno-0-306"></a>        <span class="n">bbox</span> <span class="o">=</span> <span class="n">eumdac_bbox</span><span class="p">(</span>
+<a id="__codelineno-0-307" name="__codelineno-0-307"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">west</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">south</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">east</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">north</span>
+<a id="__codelineno-0-308" name="__codelineno-0-308"></a>        <span class="p">)</span>
+<a id="__codelineno-0-309" name="__codelineno-0-309"></a>        <span class="c1"># `end_date` parses to midnight, so a same-day request (start == end)</span>
+<a id="__codelineno-0-310" name="__codelineno-0-310"></a>        <span class="c1"># would otherwise collapse to the zero-width instant 00:00:00 and match</span>
+<a id="__codelineno-0-311" name="__codelineno-0-311"></a>        <span class="c1"># (almost) no products. Extend the end bound to the end of its calendar</span>
+<a id="__codelineno-0-312" name="__codelineno-0-312"></a>        <span class="c1"># day so an inclusive `end` covers the whole day&#39;s products.</span>
+<a id="__codelineno-0-313" name="__codelineno-0-313"></a>        <span class="n">dtstart</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">start_date</span>
+<a id="__codelineno-0-314" name="__codelineno-0-314"></a>        <span class="n">dtend</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">end_date</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span>
+<a id="__codelineno-0-315" name="__codelineno-0-315"></a>            <span class="n">hour</span><span class="o">=</span><span class="mi">23</span><span class="p">,</span> <span class="n">minute</span><span class="o">=</span><span class="mi">59</span><span class="p">,</span> <span class="n">second</span><span class="o">=</span><span class="mi">59</span><span class="p">,</span> <span class="n">microsecond</span><span class="o">=</span><span class="mi">999999</span>
+<a id="__codelineno-0-316" name="__codelineno-0-316"></a>        <span class="p">)</span>
+<a id="__codelineno-0-317" name="__codelineno-0-317"></a>        <span class="n">products</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">RemoteProduct</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+<a id="__codelineno-0-318" name="__codelineno-0-318"></a>        <span class="k">for</span> <span class="n">ds</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_datasets</span><span class="p">:</span>
+<a id="__codelineno-0-319" name="__codelineno-0-319"></a>            <span class="n">collection</span> <span class="o">=</span> <span class="n">store</span><span class="o">.</span><span class="n">get_collection</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">collection_id</span><span class="p">)</span>
+<a id="__codelineno-0-320" name="__codelineno-0-320"></a>            <span class="k">for</span> <span class="n">product</span> <span class="ow">in</span> <span class="n">collection</span><span class="o">.</span><span class="n">search</span><span class="p">(</span>
+<a id="__codelineno-0-321" name="__codelineno-0-321"></a>                <span class="n">bbox</span><span class="o">=</span><span class="n">bbox</span><span class="p">,</span>
+<a id="__codelineno-0-322" name="__codelineno-0-322"></a>                <span class="n">dtstart</span><span class="o">=</span><span class="n">dtstart</span><span class="p">,</span>
+<a id="__codelineno-0-323" name="__codelineno-0-323"></a>                <span class="n">dtend</span><span class="o">=</span><span class="n">dtend</span><span class="p">,</span>
+<a id="__codelineno-0-324" name="__codelineno-0-324"></a>            <span class="p">):</span>
+<a id="__codelineno-0-325" name="__codelineno-0-325"></a>                <span class="n">products</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+<a id="__codelineno-0-326" name="__codelineno-0-326"></a>                    <span class="n">RemoteProduct</span><span class="p">(</span>
+<a id="__codelineno-0-327" name="__codelineno-0-327"></a>                        <span class="nb">id</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">product</span><span class="p">),</span>
+<a id="__codelineno-0-328" name="__codelineno-0-328"></a>                        <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;product&quot;</span><span class="p">:</span> <span class="n">product</span><span class="p">,</span> <span class="s2">&quot;dataset&quot;</span><span class="p">:</span> <span class="n">ds</span><span class="p">},</span>
+<a id="__codelineno-0-329" name="__codelineno-0-329"></a>                    <span class="p">)</span>
+<a id="__codelineno-0-330" name="__codelineno-0-330"></a>                <span class="p">)</span>
+<a id="__codelineno-0-331" name="__codelineno-0-331"></a>        <span class="k">return</span> <span class="n">products</span>
+<a id="__codelineno-0-332" name="__codelineno-0-332"></a>
+<a id="__codelineno-0-333" name="__codelineno-0-333"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_fetch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">products</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">RemoteProduct</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
+<a id="__codelineno-0-334" name="__codelineno-0-334"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Stream every product `_search` returned to a local file.</span>
+<a id="__codelineno-0-335" name="__codelineno-0-335"></a>
+<a id="__codelineno-0-336" name="__codelineno-0-336"></a><span class="sd">        Each `eumdac` product is opened (`Product.open()` — a streaming</span>
+<a id="__codelineno-0-337" name="__codelineno-0-337"></a><span class="sd">        context manager) and copied to `self.root_dir / &lt;id&gt;`, where the</span>
+<a id="__codelineno-0-338" name="__codelineno-0-338"></a><span class="sd">        product id is reduced to a safe basename (`safe_product_filename`)</span>
+<a id="__codelineno-0-339" name="__codelineno-0-339"></a><span class="sd">        so a server-supplied id with a path separator cannot write outside</span>
+<a id="__codelineno-0-340" name="__codelineno-0-340"></a><span class="sd">        the output directory.</span>
+<a id="__codelineno-0-341" name="__codelineno-0-341"></a>
+<a id="__codelineno-0-342" name="__codelineno-0-342"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-343" name="__codelineno-0-343"></a><span class="sd">            products: The products from `_search`.</span>
+<a id="__codelineno-0-344" name="__codelineno-0-344"></a>
+<a id="__codelineno-0-345" name="__codelineno-0-345"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-346" name="__codelineno-0-346"></a><span class="sd">            list[Path]: Local paths of every fetched product, in search</span>
+<a id="__codelineno-0-347" name="__codelineno-0-347"></a><span class="sd">                order.</span>
+<a id="__codelineno-0-348" name="__codelineno-0-348"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-349" name="__codelineno-0-349"></a>        <span class="n">out_paths</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+<a id="__codelineno-0-350" name="__codelineno-0-350"></a>        <span class="k">for</span> <span class="n">rp</span> <span class="ow">in</span> <span class="n">products</span><span class="p">:</span>
+<a id="__codelineno-0-351" name="__codelineno-0-351"></a>            <span class="n">product</span> <span class="o">=</span> <span class="n">rp</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;product&quot;</span><span class="p">]</span>
+<a id="__codelineno-0-352" name="__codelineno-0-352"></a>            <span class="n">target</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root_dir</span> <span class="o">/</span> <span class="n">safe_product_filename</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">product</span><span class="p">))</span>
+<a id="__codelineno-0-353" name="__codelineno-0-353"></a>            <span class="k">with</span> <span class="n">product</span><span class="o">.</span><span class="n">open</span><span class="p">()</span> <span class="k">as</span> <span class="n">src</span><span class="p">,</span> <span class="nb">open</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="s2">&quot;wb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">dst</span><span class="p">:</span>
+<a id="__codelineno-0-354" name="__codelineno-0-354"></a>                <span class="n">shutil</span><span class="o">.</span><span class="n">copyfileobj</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">dst</span><span class="p">)</span>
+<a id="__codelineno-0-355" name="__codelineno-0-355"></a>            <span class="n">out_paths</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
+<a id="__codelineno-0-356" name="__codelineno-0-356"></a>        <span class="k">return</span> <span class="n">out_paths</span>
+<a id="__codelineno-0-357" name="__codelineno-0-357"></a>
+<a id="__codelineno-0-358" name="__codelineno-0-358"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
+<a id="__codelineno-0-359" name="__codelineno-0-359"></a>        <span class="bp">self</span><span class="p">,</span>
+<a id="__codelineno-0-360" name="__codelineno-0-360"></a>        <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+<a id="__codelineno-0-361" name="__codelineno-0-361"></a>        <span class="n">aggregate</span><span class="p">:</span> <span class="n">AggregationConfig</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-362" name="__codelineno-0-362"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
+<a id="__codelineno-0-363" name="__codelineno-0-363"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Search the Data Store, fetch native products, return their paths.</span>
+<a id="__codelineno-0-364" name="__codelineno-0-364"></a>
+<a id="__codelineno-0-365" name="__codelineno-0-365"></a><span class="sd">        Composes `_search` and `_fetch` to pull every product matching</span>
+<a id="__codelineno-0-366" name="__codelineno-0-366"></a><span class="sd">        the request bbox + window to `self.root_dir`.</span>
+<a id="__codelineno-0-367" name="__codelineno-0-367"></a>
+<a id="__codelineno-0-368" name="__codelineno-0-368"></a><span class="sd">        `aggregate=` is the server-side subset / reproject path, which on</span>
+<a id="__codelineno-0-369" name="__codelineno-0-369"></a><span class="sd">        the EUMETSAT Data Store is **Data Tailor** (`H4`) — not part of</span>
+<a id="__codelineno-0-370" name="__codelineno-0-370"></a><span class="sd">        the MVP. A non-`None` `aggregate` therefore raises</span>
+<a id="__codelineno-0-371" name="__codelineno-0-371"></a><span class="sd">        `NotImplementedError` naming Data Tailor; native NetCDF products</span>
+<a id="__codelineno-0-372" name="__codelineno-0-372"></a><span class="sd">        can be read / reduced client-side with pyramids after download.</span>
+<a id="__codelineno-0-373" name="__codelineno-0-373"></a>
+<a id="__codelineno-0-374" name="__codelineno-0-374"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-375" name="__codelineno-0-375"></a><span class="sd">            progress_bar: Reserved for parity with the other backends;</span>
+<a id="__codelineno-0-376" name="__codelineno-0-376"></a><span class="sd">                `eumdac`&#39;s streaming download has no built-in bar.</span>
+<a id="__codelineno-0-377" name="__codelineno-0-377"></a><span class="sd">            aggregate: Optional</span>
+<a id="__codelineno-0-378" name="__codelineno-0-378"></a><span class="sd">                `earthlens.aggregate.AggregationConfig`. Rejected — see</span>
+<a id="__codelineno-0-379" name="__codelineno-0-379"></a><span class="sd">                above.</span>
+<a id="__codelineno-0-380" name="__codelineno-0-380"></a>
+<a id="__codelineno-0-381" name="__codelineno-0-381"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-382" name="__codelineno-0-382"></a><span class="sd">            list[Path]: The fetched product paths.</span>
+<a id="__codelineno-0-383" name="__codelineno-0-383"></a>
+<a id="__codelineno-0-384" name="__codelineno-0-384"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-385" name="__codelineno-0-385"></a><span class="sd">            NotImplementedError: When `aggregate` is not `None` (the Data</span>
+<a id="__codelineno-0-386" name="__codelineno-0-386"></a><span class="sd">                Tailor path, `H4`, is deferred).</span>
+<a id="__codelineno-0-387" name="__codelineno-0-387"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-388" name="__codelineno-0-388"></a>        <span class="k">if</span> <span class="n">aggregate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-389" name="__codelineno-0-389"></a>            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+<a id="__codelineno-0-390" name="__codelineno-0-390"></a>                <span class="s2">&quot;EUMETSAT aggregate=/subset is the Data Tailor path (H4); &quot;</span>
+<a id="__codelineno-0-391" name="__codelineno-0-391"></a>                <span class="s2">&quot;it is not part of the MVP. Download native products &quot;</span>
+<a id="__codelineno-0-392" name="__codelineno-0-392"></a>                <span class="s2">&quot;without aggregate= and reduce NetCDF products client-side &quot;</span>
+<a id="__codelineno-0-393" name="__codelineno-0-393"></a>                <span class="s2">&quot;with pyramids.&quot;</span>
+<a id="__codelineno-0-394" name="__codelineno-0-394"></a>            <span class="p">)</span>
+<a id="__codelineno-0-395" name="__codelineno-0-395"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_show_progress</span> <span class="o">=</span> <span class="n">progress_bar</span>
+<a id="__codelineno-0-396" name="__codelineno-0-396"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api_via_search_fetch</span><span class="p">()</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -14329,9 +14333,7 @@ Tailor path, <code>H4</code>, is deferred).</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>src/earthlens/eumetsat/backend.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-356">356</a></span>
-<span class="normal"><a href="#__codelineno-0-357">357</a></span>
-<span class="normal"><a href="#__codelineno-0-358">358</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-358">358</a></span>
 <span class="normal"><a href="#__codelineno-0-359">359</a></span>
 <span class="normal"><a href="#__codelineno-0-360">360</a></span>
 <span class="normal"><a href="#__codelineno-0-361">361</a></span>
@@ -14367,45 +14369,47 @@ Tailor path, <code>H4</code>, is deferred).</p>
 <span class="normal"><a href="#__codelineno-0-391">391</a></span>
 <span class="normal"><a href="#__codelineno-0-392">392</a></span>
 <span class="normal"><a href="#__codelineno-0-393">393</a></span>
-<span class="normal"><a href="#__codelineno-0-394">394</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-356" name="__codelineno-0-356"></a><span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
-<a id="__codelineno-0-357" name="__codelineno-0-357"></a>    <span class="bp">self</span><span class="p">,</span>
-<a id="__codelineno-0-358" name="__codelineno-0-358"></a>    <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-<a id="__codelineno-0-359" name="__codelineno-0-359"></a>    <span class="n">aggregate</span><span class="p">:</span> <span class="n">AggregationConfig</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-360" name="__codelineno-0-360"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
-<a id="__codelineno-0-361" name="__codelineno-0-361"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Search the Data Store, fetch native products, return their paths.</span>
-<a id="__codelineno-0-362" name="__codelineno-0-362"></a>
-<a id="__codelineno-0-363" name="__codelineno-0-363"></a><span class="sd">    Composes `_search` and `_fetch` to pull every product matching</span>
-<a id="__codelineno-0-364" name="__codelineno-0-364"></a><span class="sd">    the request bbox + window to `self.root_dir`.</span>
-<a id="__codelineno-0-365" name="__codelineno-0-365"></a>
-<a id="__codelineno-0-366" name="__codelineno-0-366"></a><span class="sd">    `aggregate=` is the server-side subset / reproject path, which on</span>
-<a id="__codelineno-0-367" name="__codelineno-0-367"></a><span class="sd">    the EUMETSAT Data Store is **Data Tailor** (`H4`) — not part of</span>
-<a id="__codelineno-0-368" name="__codelineno-0-368"></a><span class="sd">    the MVP. A non-`None` `aggregate` therefore raises</span>
-<a id="__codelineno-0-369" name="__codelineno-0-369"></a><span class="sd">    `NotImplementedError` naming Data Tailor; native NetCDF products</span>
-<a id="__codelineno-0-370" name="__codelineno-0-370"></a><span class="sd">    can be read / reduced client-side with pyramids after download.</span>
-<a id="__codelineno-0-371" name="__codelineno-0-371"></a>
-<a id="__codelineno-0-372" name="__codelineno-0-372"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-373" name="__codelineno-0-373"></a><span class="sd">        progress_bar: Reserved for parity with the other backends;</span>
-<a id="__codelineno-0-374" name="__codelineno-0-374"></a><span class="sd">            `eumdac`&#39;s streaming download has no built-in bar.</span>
-<a id="__codelineno-0-375" name="__codelineno-0-375"></a><span class="sd">        aggregate: Optional</span>
-<a id="__codelineno-0-376" name="__codelineno-0-376"></a><span class="sd">            `earthlens.aggregate.AggregationConfig`. Rejected — see</span>
-<a id="__codelineno-0-377" name="__codelineno-0-377"></a><span class="sd">            above.</span>
-<a id="__codelineno-0-378" name="__codelineno-0-378"></a>
-<a id="__codelineno-0-379" name="__codelineno-0-379"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-380" name="__codelineno-0-380"></a><span class="sd">        list[Path]: The fetched product paths.</span>
-<a id="__codelineno-0-381" name="__codelineno-0-381"></a>
-<a id="__codelineno-0-382" name="__codelineno-0-382"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-383" name="__codelineno-0-383"></a><span class="sd">        NotImplementedError: When `aggregate` is not `None` (the Data</span>
-<a id="__codelineno-0-384" name="__codelineno-0-384"></a><span class="sd">            Tailor path, `H4`, is deferred).</span>
-<a id="__codelineno-0-385" name="__codelineno-0-385"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-386" name="__codelineno-0-386"></a>    <span class="k">if</span> <span class="n">aggregate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-387" name="__codelineno-0-387"></a>        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
-<a id="__codelineno-0-388" name="__codelineno-0-388"></a>            <span class="s2">&quot;EUMETSAT aggregate=/subset is the Data Tailor path (H4); &quot;</span>
-<a id="__codelineno-0-389" name="__codelineno-0-389"></a>            <span class="s2">&quot;it is not part of the MVP. Download native products &quot;</span>
-<a id="__codelineno-0-390" name="__codelineno-0-390"></a>            <span class="s2">&quot;without aggregate= and reduce NetCDF products client-side &quot;</span>
-<a id="__codelineno-0-391" name="__codelineno-0-391"></a>            <span class="s2">&quot;with pyramids.&quot;</span>
-<a id="__codelineno-0-392" name="__codelineno-0-392"></a>        <span class="p">)</span>
-<a id="__codelineno-0-393" name="__codelineno-0-393"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_show_progress</span> <span class="o">=</span> <span class="n">progress_bar</span>
-<a id="__codelineno-0-394" name="__codelineno-0-394"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api_via_search_fetch</span><span class="p">()</span>
+<span class="normal"><a href="#__codelineno-0-394">394</a></span>
+<span class="normal"><a href="#__codelineno-0-395">395</a></span>
+<span class="normal"><a href="#__codelineno-0-396">396</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-358" name="__codelineno-0-358"></a><span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
+<a id="__codelineno-0-359" name="__codelineno-0-359"></a>    <span class="bp">self</span><span class="p">,</span>
+<a id="__codelineno-0-360" name="__codelineno-0-360"></a>    <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+<a id="__codelineno-0-361" name="__codelineno-0-361"></a>    <span class="n">aggregate</span><span class="p">:</span> <span class="n">AggregationConfig</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-362" name="__codelineno-0-362"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
+<a id="__codelineno-0-363" name="__codelineno-0-363"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Search the Data Store, fetch native products, return their paths.</span>
+<a id="__codelineno-0-364" name="__codelineno-0-364"></a>
+<a id="__codelineno-0-365" name="__codelineno-0-365"></a><span class="sd">    Composes `_search` and `_fetch` to pull every product matching</span>
+<a id="__codelineno-0-366" name="__codelineno-0-366"></a><span class="sd">    the request bbox + window to `self.root_dir`.</span>
+<a id="__codelineno-0-367" name="__codelineno-0-367"></a>
+<a id="__codelineno-0-368" name="__codelineno-0-368"></a><span class="sd">    `aggregate=` is the server-side subset / reproject path, which on</span>
+<a id="__codelineno-0-369" name="__codelineno-0-369"></a><span class="sd">    the EUMETSAT Data Store is **Data Tailor** (`H4`) — not part of</span>
+<a id="__codelineno-0-370" name="__codelineno-0-370"></a><span class="sd">    the MVP. A non-`None` `aggregate` therefore raises</span>
+<a id="__codelineno-0-371" name="__codelineno-0-371"></a><span class="sd">    `NotImplementedError` naming Data Tailor; native NetCDF products</span>
+<a id="__codelineno-0-372" name="__codelineno-0-372"></a><span class="sd">    can be read / reduced client-side with pyramids after download.</span>
+<a id="__codelineno-0-373" name="__codelineno-0-373"></a>
+<a id="__codelineno-0-374" name="__codelineno-0-374"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-375" name="__codelineno-0-375"></a><span class="sd">        progress_bar: Reserved for parity with the other backends;</span>
+<a id="__codelineno-0-376" name="__codelineno-0-376"></a><span class="sd">            `eumdac`&#39;s streaming download has no built-in bar.</span>
+<a id="__codelineno-0-377" name="__codelineno-0-377"></a><span class="sd">        aggregate: Optional</span>
+<a id="__codelineno-0-378" name="__codelineno-0-378"></a><span class="sd">            `earthlens.aggregate.AggregationConfig`. Rejected — see</span>
+<a id="__codelineno-0-379" name="__codelineno-0-379"></a><span class="sd">            above.</span>
+<a id="__codelineno-0-380" name="__codelineno-0-380"></a>
+<a id="__codelineno-0-381" name="__codelineno-0-381"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-382" name="__codelineno-0-382"></a><span class="sd">        list[Path]: The fetched product paths.</span>
+<a id="__codelineno-0-383" name="__codelineno-0-383"></a>
+<a id="__codelineno-0-384" name="__codelineno-0-384"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-385" name="__codelineno-0-385"></a><span class="sd">        NotImplementedError: When `aggregate` is not `None` (the Data</span>
+<a id="__codelineno-0-386" name="__codelineno-0-386"></a><span class="sd">            Tailor path, `H4`, is deferred).</span>
+<a id="__codelineno-0-387" name="__codelineno-0-387"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-388" name="__codelineno-0-388"></a>    <span class="k">if</span> <span class="n">aggregate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-389" name="__codelineno-0-389"></a>        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+<a id="__codelineno-0-390" name="__codelineno-0-390"></a>            <span class="s2">&quot;EUMETSAT aggregate=/subset is the Data Tailor path (H4); &quot;</span>
+<a id="__codelineno-0-391" name="__codelineno-0-391"></a>            <span class="s2">&quot;it is not part of the MVP. Download native products &quot;</span>
+<a id="__codelineno-0-392" name="__codelineno-0-392"></a>            <span class="s2">&quot;without aggregate= and reduce NetCDF products client-side &quot;</span>
+<a id="__codelineno-0-393" name="__codelineno-0-393"></a>            <span class="s2">&quot;with pyramids.&quot;</span>
+<a id="__codelineno-0-394" name="__codelineno-0-394"></a>        <span class="p">)</span>
+<a id="__codelineno-0-395" name="__codelineno-0-395"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_show_progress</span> <span class="o">=</span> <span class="n">progress_bar</span>
+<a id="__codelineno-0-396" name="__codelineno-0-396"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api_via_search_fetch</span><span class="p">()</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -16922,7 +16926,9 @@ gate <code>aggregate=</code>.</p>
 <span class="normal"><a href="#__codelineno-0-391">391</a></span>
 <span class="normal"><a href="#__codelineno-0-392">392</a></span>
 <span class="normal"><a href="#__codelineno-0-393">393</a></span>
-<span class="normal"><a href="#__codelineno-0-394">394</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-56" name="__codelineno-0-56"></a><span class="k">class</span><span class="w"> </span><span class="nc">EUMETSAT</span><span class="p">(</span><span class="n">AbstractDataSource</span><span class="p">):</span>
+<span class="normal"><a href="#__codelineno-0-394">394</a></span>
+<span class="normal"><a href="#__codelineno-0-395">395</a></span>
+<span class="normal"><a href="#__codelineno-0-396">396</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-56" name="__codelineno-0-56"></a><span class="k">class</span><span class="w"> </span><span class="nc">EUMETSAT</span><span class="p">(</span><span class="n">AbstractDataSource</span><span class="p">):</span>
 <a id="__codelineno-0-57" name="__codelineno-0-57"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;EUMETSAT Data Store backend (per-collection output kind).</span>
 <a id="__codelineno-0-58" name="__codelineno-0-58"></a>
 <a id="__codelineno-0-59" name="__codelineno-0-59"></a><span class="sd">    Wraps `eumdac` so a user can search a curated EUMETSAT collection by</span>
@@ -17068,199 +17074,201 @@ gate <code>aggregate=</code>.</p>
 <a id="__codelineno-0-199" name="__codelineno-0-199"></a>        <span class="k">return</span> <span class="n">kinds</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
 <a id="__codelineno-0-200" name="__codelineno-0-200"></a>
 <a id="__codelineno-0-201" name="__codelineno-0-201"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_initialize</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<a id="__codelineno-0-202" name="__codelineno-0-202"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Build the `EumetsatAuth`; defer token minting to fetch.</span>
+<a id="__codelineno-0-202" name="__codelineno-0-202"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Build the `EumetsatAuth`; defer token minting.</span>
 <a id="__codelineno-0-203" name="__codelineno-0-203"></a>
 <a id="__codelineno-0-204" name="__codelineno-0-204"></a><span class="sd">        Returns `None` — `eumdac` keeps the token on the `EumetsatAuth`</span>
 <a id="__codelineno-0-205" name="__codelineno-0-205"></a><span class="sd">        instance, so the parent class binds no opaque `self.client`. The</span>
 <a id="__codelineno-0-206" name="__codelineno-0-206"></a><span class="sd">        token minting (`EumetsatAuth.configure`, which contacts the auth</span>
-<a id="__codelineno-0-207" name="__codelineno-0-207"></a><span class="sd">        server) is deferred: :meth:`_fetch` already calls the idempotent</span>
-<a id="__codelineno-0-208" name="__codelineno-0-208"></a><span class="sd">        `configure()` before downloading, so constructing the backend</span>
-<a id="__codelineno-0-209" name="__codelineno-0-209"></a><span class="sd">        never authenticates and `_search()` stays offline.</span>
-<a id="__codelineno-0-210" name="__codelineno-0-210"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-211" name="__codelineno-0-211"></a>        <span class="n">creds</span> <span class="o">=</span> <span class="n">EumetsatCredentials</span><span class="p">(</span>
-<a id="__codelineno-0-212" name="__codelineno-0-212"></a>            <span class="n">consumer_key</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_consumer_key</span><span class="p">,</span>
-<a id="__codelineno-0-213" name="__codelineno-0-213"></a>            <span class="n">consumer_secret</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_consumer_secret</span><span class="p">,</span>
-<a id="__codelineno-0-214" name="__codelineno-0-214"></a>            <span class="n">credentials_file</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_credentials_file</span><span class="p">,</span>
-<a id="__codelineno-0-215" name="__codelineno-0-215"></a>        <span class="p">)</span>
-<a id="__codelineno-0-216" name="__codelineno-0-216"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_auth</span> <span class="o">=</span> <span class="n">EumetsatAuth</span><span class="p">(</span><span class="n">creds</span><span class="p">)</span>
-<a id="__codelineno-0-217" name="__codelineno-0-217"></a>        <span class="k">return</span> <span class="kc">None</span>
-<a id="__codelineno-0-218" name="__codelineno-0-218"></a>
-<a id="__codelineno-0-219" name="__codelineno-0-219"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_create_grid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lat_lim</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">lon_lim</span><span class="p">:</span> <span class="nb">list</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SpatialExtent</span><span class="p">:</span>
-<a id="__codelineno-0-220" name="__codelineno-0-220"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Validate and wrap the user bbox into a `SpatialExtent`.</span>
-<a id="__codelineno-0-221" name="__codelineno-0-221"></a>
-<a id="__codelineno-0-222" name="__codelineno-0-222"></a><span class="sd">        The Data Store search accepts a plain bounding box, so this is a</span>
-<a id="__codelineno-0-223" name="__codelineno-0-223"></a><span class="sd">        thin wrapper over `SpatialExtent.from_pairs`. An earthlens extent</span>
-<a id="__codelineno-0-224" name="__codelineno-0-224"></a><span class="sd">        constrains longitude to a single `[-180, 180]` range with</span>
-<a id="__codelineno-0-225" name="__codelineno-0-225"></a><span class="sd">        `west &lt;= east`, so it cannot represent an antimeridian-crossing</span>
-<a id="__codelineno-0-226" name="__codelineno-0-226"></a><span class="sd">        box and `_search` issues exactly one search bbox.</span>
-<a id="__codelineno-0-227" name="__codelineno-0-227"></a>
-<a id="__codelineno-0-228" name="__codelineno-0-228"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-229" name="__codelineno-0-229"></a><span class="sd">            lat_lim: `[lat_min, lat_max]` in degrees.</span>
-<a id="__codelineno-0-230" name="__codelineno-0-230"></a><span class="sd">            lon_lim: `[lon_min, lon_max]` in degrees.</span>
-<a id="__codelineno-0-231" name="__codelineno-0-231"></a>
-<a id="__codelineno-0-232" name="__codelineno-0-232"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-233" name="__codelineno-0-233"></a><span class="sd">            SpatialExtent: Validated, frozen bbox.</span>
-<a id="__codelineno-0-234" name="__codelineno-0-234"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-235" name="__codelineno-0-235"></a>        <span class="k">return</span> <span class="n">SpatialExtent</span><span class="o">.</span><span class="n">from_pairs</span><span class="p">(</span><span class="n">lat_lim</span><span class="o">=</span><span class="n">lat_lim</span><span class="p">,</span> <span class="n">lon_lim</span><span class="o">=</span><span class="n">lon_lim</span><span class="p">)</span>
-<a id="__codelineno-0-236" name="__codelineno-0-236"></a>
-<a id="__codelineno-0-237" name="__codelineno-0-237"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_check_input_dates</span><span class="p">(</span>
-<a id="__codelineno-0-238" name="__codelineno-0-238"></a>        <span class="bp">self</span><span class="p">,</span>
-<a id="__codelineno-0-239" name="__codelineno-0-239"></a>        <span class="n">start</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-<a id="__codelineno-0-240" name="__codelineno-0-240"></a>        <span class="n">end</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-<a id="__codelineno-0-241" name="__codelineno-0-241"></a>        <span class="n">temporal_resolution</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-<a id="__codelineno-0-242" name="__codelineno-0-242"></a>        <span class="n">fmt</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-<a id="__codelineno-0-243" name="__codelineno-0-243"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TemporalExtent</span><span class="p">:</span>
-<a id="__codelineno-0-244" name="__codelineno-0-244"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Parse the date range into a `TemporalExtent`.</span>
-<a id="__codelineno-0-245" name="__codelineno-0-245"></a>
-<a id="__codelineno-0-246" name="__codelineno-0-246"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-247" name="__codelineno-0-247"></a><span class="sd">            start: Inclusive start date as a string.</span>
-<a id="__codelineno-0-248" name="__codelineno-0-248"></a><span class="sd">            end: Inclusive end date as a string.</span>
-<a id="__codelineno-0-249" name="__codelineno-0-249"></a><span class="sd">            temporal_resolution: Advisory cadence label; mapped to a</span>
-<a id="__codelineno-0-250" name="__codelineno-0-250"></a><span class="sd">                pandas frequency for the `dates` index when known.</span>
-<a id="__codelineno-0-251" name="__codelineno-0-251"></a><span class="sd">            fmt: `strptime` format applied to `start` and `end`.</span>
-<a id="__codelineno-0-252" name="__codelineno-0-252"></a>
-<a id="__codelineno-0-253" name="__codelineno-0-253"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-254" name="__codelineno-0-254"></a><span class="sd">            TemporalExtent: Frozen model with parsed bounds.</span>
-<a id="__codelineno-0-255" name="__codelineno-0-255"></a>
-<a id="__codelineno-0-256" name="__codelineno-0-256"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-257" name="__codelineno-0-257"></a><span class="sd">            ValueError: If `start` parses to a date later than `end`.</span>
-<a id="__codelineno-0-258" name="__codelineno-0-258"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-259" name="__codelineno-0-259"></a>        <span class="n">start_dt</span> <span class="o">=</span> <span class="n">dt</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">fmt</span><span class="p">)</span>
-<a id="__codelineno-0-260" name="__codelineno-0-260"></a>        <span class="n">end_dt</span> <span class="o">=</span> <span class="n">dt</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">end</span><span class="p">,</span> <span class="n">fmt</span><span class="p">)</span>
-<a id="__codelineno-0-261" name="__codelineno-0-261"></a>        <span class="n">freq_map</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;daily&quot;</span><span class="p">:</span> <span class="s2">&quot;D&quot;</span><span class="p">,</span> <span class="s2">&quot;monthly&quot;</span><span class="p">:</span> <span class="s2">&quot;MS&quot;</span><span class="p">,</span> <span class="s2">&quot;hourly&quot;</span><span class="p">:</span> <span class="s2">&quot;h&quot;</span><span class="p">}</span>
-<a id="__codelineno-0-262" name="__codelineno-0-262"></a>        <span class="n">resolution</span> <span class="o">=</span> <span class="n">freq_map</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">temporal_resolution</span><span class="p">,</span> <span class="s2">&quot;D&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-263" name="__codelineno-0-263"></a>        <span class="n">dates</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">date_range</span><span class="p">(</span><span class="n">start_dt</span><span class="p">,</span> <span class="n">end_dt</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="n">resolution</span><span class="p">)</span>
-<a id="__codelineno-0-264" name="__codelineno-0-264"></a>        <span class="k">return</span> <span class="n">TemporalExtent</span><span class="p">(</span>
-<a id="__codelineno-0-265" name="__codelineno-0-265"></a>            <span class="n">start_date</span><span class="o">=</span><span class="n">start_dt</span><span class="p">,</span>
-<a id="__codelineno-0-266" name="__codelineno-0-266"></a>            <span class="n">end_date</span><span class="o">=</span><span class="n">end_dt</span><span class="p">,</span>
-<a id="__codelineno-0-267" name="__codelineno-0-267"></a>            <span class="n">resolution</span><span class="o">=</span><span class="n">resolution</span><span class="p">,</span>
-<a id="__codelineno-0-268" name="__codelineno-0-268"></a>            <span class="n">dates</span><span class="o">=</span><span class="n">dates</span><span class="p">,</span>
-<a id="__codelineno-0-269" name="__codelineno-0-269"></a>        <span class="p">)</span>
-<a id="__codelineno-0-270" name="__codelineno-0-270"></a>
-<a id="__codelineno-0-271" name="__codelineno-0-271"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_api</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
-<a id="__codelineno-0-272" name="__codelineno-0-272"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Compose `_search` and `_fetch` into the canonical C3 shape.&quot;&quot;&quot;</span>
-<a id="__codelineno-0-273" name="__codelineno-0-273"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api_via_search_fetch</span><span class="p">()</span>
-<a id="__codelineno-0-274" name="__codelineno-0-274"></a>
-<a id="__codelineno-0-275" name="__codelineno-0-275"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_search</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">RemoteProduct</span><span class="p">]:</span>
-<a id="__codelineno-0-276" name="__codelineno-0-276"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Query the Data Store for products of every requested collection.</span>
-<a id="__codelineno-0-277" name="__codelineno-0-277"></a>
-<a id="__codelineno-0-278" name="__codelineno-0-278"></a><span class="sd">        One `Collection.search(bbox=, dtstart=, dtend=)` per resolved</span>
-<a id="__codelineno-0-279" name="__codelineno-0-279"></a><span class="sd">        collection row, scoped to the request bbox and time window. The</span>
-<a id="__codelineno-0-280" name="__codelineno-0-280"></a><span class="sd">        bbox is the `eumdac` `W,S,E,N` comma-string the OpenSearch</span>
-<a id="__codelineno-0-281" name="__codelineno-0-281"></a><span class="sd">        endpoint expects. The `end` date is treated as **inclusive of its</span>
-<a id="__codelineno-0-282" name="__codelineno-0-282"></a><span class="sd">        whole calendar day**: `dtend` is widened to `23:59:59.999999` of</span>
-<a id="__codelineno-0-283" name="__codelineno-0-283"></a><span class="sd">        the end day so a same-day request (`start == end`) covers the</span>
-<a id="__codelineno-0-284" name="__codelineno-0-284"></a><span class="sd">        day&#39;s products instead of collapsing to the midnight instant.</span>
-<a id="__codelineno-0-285" name="__codelineno-0-285"></a><span class="sd">        Each returned `eumdac` product becomes one `RemoteProduct` whose</span>
-<a id="__codelineno-0-286" name="__codelineno-0-286"></a><span class="sd">        `metadata` carries the raw product handle and its collection row,</span>
-<a id="__codelineno-0-287" name="__codelineno-0-287"></a><span class="sd">        so `_fetch` can stream without re-querying.</span>
-<a id="__codelineno-0-288" name="__codelineno-0-288"></a>
-<a id="__codelineno-0-289" name="__codelineno-0-289"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-290" name="__codelineno-0-290"></a><span class="sd">            list[RemoteProduct]: One product per matching Data Store</span>
-<a id="__codelineno-0-291" name="__codelineno-0-291"></a><span class="sd">                product, across every requested collection. An empty list</span>
-<a id="__codelineno-0-292" name="__codelineno-0-292"></a><span class="sd">                (no products in the window) short-circuits the fetch.</span>
-<a id="__codelineno-0-293" name="__codelineno-0-293"></a>
-<a id="__codelineno-0-294" name="__codelineno-0-294"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-295" name="__codelineno-0-295"></a><span class="sd">            ImportError: When the `[eumetsat]` extra (`eumdac`) is not</span>
-<a id="__codelineno-0-296" name="__codelineno-0-296"></a><span class="sd">                installed — surfaced by `EumetsatAuth.datastore()`.</span>
-<a id="__codelineno-0-297" name="__codelineno-0-297"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-298" name="__codelineno-0-298"></a>        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">_auth</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>  <span class="c1"># set by _initialize</span>
-<a id="__codelineno-0-299" name="__codelineno-0-299"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_auth</span><span class="o">.</span><span class="n">configure</span><span class="p">()</span>
-<a id="__codelineno-0-300" name="__codelineno-0-300"></a>        <span class="n">store</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_auth</span><span class="o">.</span><span class="n">datastore</span><span class="p">()</span>
-<a id="__codelineno-0-301" name="__codelineno-0-301"></a>        <span class="c1"># A `SpatialExtent` constrains longitude to a single `[-180, 180]`</span>
-<a id="__codelineno-0-302" name="__codelineno-0-302"></a>        <span class="c1"># range with `west &lt;= east`, so it cannot represent an</span>
-<a id="__codelineno-0-303" name="__codelineno-0-303"></a>        <span class="c1"># antimeridian-crossing box — a single search bbox always suffices.</span>
-<a id="__codelineno-0-304" name="__codelineno-0-304"></a>        <span class="n">bbox</span> <span class="o">=</span> <span class="n">eumdac_bbox</span><span class="p">(</span>
-<a id="__codelineno-0-305" name="__codelineno-0-305"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">west</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">south</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">east</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">north</span>
-<a id="__codelineno-0-306" name="__codelineno-0-306"></a>        <span class="p">)</span>
-<a id="__codelineno-0-307" name="__codelineno-0-307"></a>        <span class="c1"># `end_date` parses to midnight, so a same-day request (start == end)</span>
-<a id="__codelineno-0-308" name="__codelineno-0-308"></a>        <span class="c1"># would otherwise collapse to the zero-width instant 00:00:00 and match</span>
-<a id="__codelineno-0-309" name="__codelineno-0-309"></a>        <span class="c1"># (almost) no products. Extend the end bound to the end of its calendar</span>
-<a id="__codelineno-0-310" name="__codelineno-0-310"></a>        <span class="c1"># day so an inclusive `end` covers the whole day&#39;s products.</span>
-<a id="__codelineno-0-311" name="__codelineno-0-311"></a>        <span class="n">dtstart</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">start_date</span>
-<a id="__codelineno-0-312" name="__codelineno-0-312"></a>        <span class="n">dtend</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">end_date</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span>
-<a id="__codelineno-0-313" name="__codelineno-0-313"></a>            <span class="n">hour</span><span class="o">=</span><span class="mi">23</span><span class="p">,</span> <span class="n">minute</span><span class="o">=</span><span class="mi">59</span><span class="p">,</span> <span class="n">second</span><span class="o">=</span><span class="mi">59</span><span class="p">,</span> <span class="n">microsecond</span><span class="o">=</span><span class="mi">999999</span>
-<a id="__codelineno-0-314" name="__codelineno-0-314"></a>        <span class="p">)</span>
-<a id="__codelineno-0-315" name="__codelineno-0-315"></a>        <span class="n">products</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">RemoteProduct</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
-<a id="__codelineno-0-316" name="__codelineno-0-316"></a>        <span class="k">for</span> <span class="n">ds</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_datasets</span><span class="p">:</span>
-<a id="__codelineno-0-317" name="__codelineno-0-317"></a>            <span class="n">collection</span> <span class="o">=</span> <span class="n">store</span><span class="o">.</span><span class="n">get_collection</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">collection_id</span><span class="p">)</span>
-<a id="__codelineno-0-318" name="__codelineno-0-318"></a>            <span class="k">for</span> <span class="n">product</span> <span class="ow">in</span> <span class="n">collection</span><span class="o">.</span><span class="n">search</span><span class="p">(</span>
-<a id="__codelineno-0-319" name="__codelineno-0-319"></a>                <span class="n">bbox</span><span class="o">=</span><span class="n">bbox</span><span class="p">,</span>
-<a id="__codelineno-0-320" name="__codelineno-0-320"></a>                <span class="n">dtstart</span><span class="o">=</span><span class="n">dtstart</span><span class="p">,</span>
-<a id="__codelineno-0-321" name="__codelineno-0-321"></a>                <span class="n">dtend</span><span class="o">=</span><span class="n">dtend</span><span class="p">,</span>
-<a id="__codelineno-0-322" name="__codelineno-0-322"></a>            <span class="p">):</span>
-<a id="__codelineno-0-323" name="__codelineno-0-323"></a>                <span class="n">products</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-<a id="__codelineno-0-324" name="__codelineno-0-324"></a>                    <span class="n">RemoteProduct</span><span class="p">(</span>
-<a id="__codelineno-0-325" name="__codelineno-0-325"></a>                        <span class="nb">id</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">product</span><span class="p">),</span>
-<a id="__codelineno-0-326" name="__codelineno-0-326"></a>                        <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;product&quot;</span><span class="p">:</span> <span class="n">product</span><span class="p">,</span> <span class="s2">&quot;dataset&quot;</span><span class="p">:</span> <span class="n">ds</span><span class="p">},</span>
-<a id="__codelineno-0-327" name="__codelineno-0-327"></a>                    <span class="p">)</span>
-<a id="__codelineno-0-328" name="__codelineno-0-328"></a>                <span class="p">)</span>
-<a id="__codelineno-0-329" name="__codelineno-0-329"></a>        <span class="k">return</span> <span class="n">products</span>
-<a id="__codelineno-0-330" name="__codelineno-0-330"></a>
-<a id="__codelineno-0-331" name="__codelineno-0-331"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_fetch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">products</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">RemoteProduct</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
-<a id="__codelineno-0-332" name="__codelineno-0-332"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Stream every product `_search` returned to a local file.</span>
-<a id="__codelineno-0-333" name="__codelineno-0-333"></a>
-<a id="__codelineno-0-334" name="__codelineno-0-334"></a><span class="sd">        Each `eumdac` product is opened (`Product.open()` — a streaming</span>
-<a id="__codelineno-0-335" name="__codelineno-0-335"></a><span class="sd">        context manager) and copied to `self.root_dir / &lt;id&gt;`, where the</span>
-<a id="__codelineno-0-336" name="__codelineno-0-336"></a><span class="sd">        product id is reduced to a safe basename (`safe_product_filename`)</span>
-<a id="__codelineno-0-337" name="__codelineno-0-337"></a><span class="sd">        so a server-supplied id with a path separator cannot write outside</span>
-<a id="__codelineno-0-338" name="__codelineno-0-338"></a><span class="sd">        the output directory.</span>
-<a id="__codelineno-0-339" name="__codelineno-0-339"></a>
-<a id="__codelineno-0-340" name="__codelineno-0-340"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-341" name="__codelineno-0-341"></a><span class="sd">            products: The products from `_search`.</span>
-<a id="__codelineno-0-342" name="__codelineno-0-342"></a>
-<a id="__codelineno-0-343" name="__codelineno-0-343"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-344" name="__codelineno-0-344"></a><span class="sd">            list[Path]: Local paths of every fetched product, in search</span>
-<a id="__codelineno-0-345" name="__codelineno-0-345"></a><span class="sd">                order.</span>
-<a id="__codelineno-0-346" name="__codelineno-0-346"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-347" name="__codelineno-0-347"></a>        <span class="n">out_paths</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
-<a id="__codelineno-0-348" name="__codelineno-0-348"></a>        <span class="k">for</span> <span class="n">rp</span> <span class="ow">in</span> <span class="n">products</span><span class="p">:</span>
-<a id="__codelineno-0-349" name="__codelineno-0-349"></a>            <span class="n">product</span> <span class="o">=</span> <span class="n">rp</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;product&quot;</span><span class="p">]</span>
-<a id="__codelineno-0-350" name="__codelineno-0-350"></a>            <span class="n">target</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root_dir</span> <span class="o">/</span> <span class="n">safe_product_filename</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">product</span><span class="p">))</span>
-<a id="__codelineno-0-351" name="__codelineno-0-351"></a>            <span class="k">with</span> <span class="n">product</span><span class="o">.</span><span class="n">open</span><span class="p">()</span> <span class="k">as</span> <span class="n">src</span><span class="p">,</span> <span class="nb">open</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="s2">&quot;wb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">dst</span><span class="p">:</span>
-<a id="__codelineno-0-352" name="__codelineno-0-352"></a>                <span class="n">shutil</span><span class="o">.</span><span class="n">copyfileobj</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">dst</span><span class="p">)</span>
-<a id="__codelineno-0-353" name="__codelineno-0-353"></a>            <span class="n">out_paths</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
-<a id="__codelineno-0-354" name="__codelineno-0-354"></a>        <span class="k">return</span> <span class="n">out_paths</span>
-<a id="__codelineno-0-355" name="__codelineno-0-355"></a>
-<a id="__codelineno-0-356" name="__codelineno-0-356"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
-<a id="__codelineno-0-357" name="__codelineno-0-357"></a>        <span class="bp">self</span><span class="p">,</span>
-<a id="__codelineno-0-358" name="__codelineno-0-358"></a>        <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-<a id="__codelineno-0-359" name="__codelineno-0-359"></a>        <span class="n">aggregate</span><span class="p">:</span> <span class="n">AggregationConfig</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-360" name="__codelineno-0-360"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
-<a id="__codelineno-0-361" name="__codelineno-0-361"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Search the Data Store, fetch native products, return their paths.</span>
-<a id="__codelineno-0-362" name="__codelineno-0-362"></a>
-<a id="__codelineno-0-363" name="__codelineno-0-363"></a><span class="sd">        Composes `_search` and `_fetch` to pull every product matching</span>
-<a id="__codelineno-0-364" name="__codelineno-0-364"></a><span class="sd">        the request bbox + window to `self.root_dir`.</span>
-<a id="__codelineno-0-365" name="__codelineno-0-365"></a>
-<a id="__codelineno-0-366" name="__codelineno-0-366"></a><span class="sd">        `aggregate=` is the server-side subset / reproject path, which on</span>
-<a id="__codelineno-0-367" name="__codelineno-0-367"></a><span class="sd">        the EUMETSAT Data Store is **Data Tailor** (`H4`) — not part of</span>
-<a id="__codelineno-0-368" name="__codelineno-0-368"></a><span class="sd">        the MVP. A non-`None` `aggregate` therefore raises</span>
-<a id="__codelineno-0-369" name="__codelineno-0-369"></a><span class="sd">        `NotImplementedError` naming Data Tailor; native NetCDF products</span>
-<a id="__codelineno-0-370" name="__codelineno-0-370"></a><span class="sd">        can be read / reduced client-side with pyramids after download.</span>
-<a id="__codelineno-0-371" name="__codelineno-0-371"></a>
-<a id="__codelineno-0-372" name="__codelineno-0-372"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-373" name="__codelineno-0-373"></a><span class="sd">            progress_bar: Reserved for parity with the other backends;</span>
-<a id="__codelineno-0-374" name="__codelineno-0-374"></a><span class="sd">                `eumdac`&#39;s streaming download has no built-in bar.</span>
-<a id="__codelineno-0-375" name="__codelineno-0-375"></a><span class="sd">            aggregate: Optional</span>
-<a id="__codelineno-0-376" name="__codelineno-0-376"></a><span class="sd">                `earthlens.aggregate.AggregationConfig`. Rejected — see</span>
-<a id="__codelineno-0-377" name="__codelineno-0-377"></a><span class="sd">                above.</span>
-<a id="__codelineno-0-378" name="__codelineno-0-378"></a>
-<a id="__codelineno-0-379" name="__codelineno-0-379"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-380" name="__codelineno-0-380"></a><span class="sd">            list[Path]: The fetched product paths.</span>
-<a id="__codelineno-0-381" name="__codelineno-0-381"></a>
-<a id="__codelineno-0-382" name="__codelineno-0-382"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-383" name="__codelineno-0-383"></a><span class="sd">            NotImplementedError: When `aggregate` is not `None` (the Data</span>
-<a id="__codelineno-0-384" name="__codelineno-0-384"></a><span class="sd">                Tailor path, `H4`, is deferred).</span>
-<a id="__codelineno-0-385" name="__codelineno-0-385"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-386" name="__codelineno-0-386"></a>        <span class="k">if</span> <span class="n">aggregate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-387" name="__codelineno-0-387"></a>            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
-<a id="__codelineno-0-388" name="__codelineno-0-388"></a>                <span class="s2">&quot;EUMETSAT aggregate=/subset is the Data Tailor path (H4); &quot;</span>
-<a id="__codelineno-0-389" name="__codelineno-0-389"></a>                <span class="s2">&quot;it is not part of the MVP. Download native products &quot;</span>
-<a id="__codelineno-0-390" name="__codelineno-0-390"></a>                <span class="s2">&quot;without aggregate= and reduce NetCDF products client-side &quot;</span>
-<a id="__codelineno-0-391" name="__codelineno-0-391"></a>                <span class="s2">&quot;with pyramids.&quot;</span>
-<a id="__codelineno-0-392" name="__codelineno-0-392"></a>            <span class="p">)</span>
-<a id="__codelineno-0-393" name="__codelineno-0-393"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_show_progress</span> <span class="o">=</span> <span class="n">progress_bar</span>
-<a id="__codelineno-0-394" name="__codelineno-0-394"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api_via_search_fetch</span><span class="p">()</span>
+<a id="__codelineno-0-207" name="__codelineno-0-207"></a><span class="sd">        server) is deferred out of construction: it runs on the first</span>
+<a id="__codelineno-0-208" name="__codelineno-0-208"></a><span class="sd">        :meth:`_search` (the `eumdac` collection search authenticates via</span>
+<a id="__codelineno-0-209" name="__codelineno-0-209"></a><span class="sd">        the idempotent `configure()`), so constructing the backend never</span>
+<a id="__codelineno-0-210" name="__codelineno-0-210"></a><span class="sd">        authenticates — but note that a dry-run `search()` does, since the</span>
+<a id="__codelineno-0-211" name="__codelineno-0-211"></a><span class="sd">        `eumdac` data store needs a token.</span>
+<a id="__codelineno-0-212" name="__codelineno-0-212"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-213" name="__codelineno-0-213"></a>        <span class="n">creds</span> <span class="o">=</span> <span class="n">EumetsatCredentials</span><span class="p">(</span>
+<a id="__codelineno-0-214" name="__codelineno-0-214"></a>            <span class="n">consumer_key</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_consumer_key</span><span class="p">,</span>
+<a id="__codelineno-0-215" name="__codelineno-0-215"></a>            <span class="n">consumer_secret</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_consumer_secret</span><span class="p">,</span>
+<a id="__codelineno-0-216" name="__codelineno-0-216"></a>            <span class="n">credentials_file</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_credentials_file</span><span class="p">,</span>
+<a id="__codelineno-0-217" name="__codelineno-0-217"></a>        <span class="p">)</span>
+<a id="__codelineno-0-218" name="__codelineno-0-218"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_auth</span> <span class="o">=</span> <span class="n">EumetsatAuth</span><span class="p">(</span><span class="n">creds</span><span class="p">)</span>
+<a id="__codelineno-0-219" name="__codelineno-0-219"></a>        <span class="k">return</span> <span class="kc">None</span>
+<a id="__codelineno-0-220" name="__codelineno-0-220"></a>
+<a id="__codelineno-0-221" name="__codelineno-0-221"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_create_grid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lat_lim</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">lon_lim</span><span class="p">:</span> <span class="nb">list</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SpatialExtent</span><span class="p">:</span>
+<a id="__codelineno-0-222" name="__codelineno-0-222"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Validate and wrap the user bbox into a `SpatialExtent`.</span>
+<a id="__codelineno-0-223" name="__codelineno-0-223"></a>
+<a id="__codelineno-0-224" name="__codelineno-0-224"></a><span class="sd">        The Data Store search accepts a plain bounding box, so this is a</span>
+<a id="__codelineno-0-225" name="__codelineno-0-225"></a><span class="sd">        thin wrapper over `SpatialExtent.from_pairs`. An earthlens extent</span>
+<a id="__codelineno-0-226" name="__codelineno-0-226"></a><span class="sd">        constrains longitude to a single `[-180, 180]` range with</span>
+<a id="__codelineno-0-227" name="__codelineno-0-227"></a><span class="sd">        `west &lt;= east`, so it cannot represent an antimeridian-crossing</span>
+<a id="__codelineno-0-228" name="__codelineno-0-228"></a><span class="sd">        box and `_search` issues exactly one search bbox.</span>
+<a id="__codelineno-0-229" name="__codelineno-0-229"></a>
+<a id="__codelineno-0-230" name="__codelineno-0-230"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-231" name="__codelineno-0-231"></a><span class="sd">            lat_lim: `[lat_min, lat_max]` in degrees.</span>
+<a id="__codelineno-0-232" name="__codelineno-0-232"></a><span class="sd">            lon_lim: `[lon_min, lon_max]` in degrees.</span>
+<a id="__codelineno-0-233" name="__codelineno-0-233"></a>
+<a id="__codelineno-0-234" name="__codelineno-0-234"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-235" name="__codelineno-0-235"></a><span class="sd">            SpatialExtent: Validated, frozen bbox.</span>
+<a id="__codelineno-0-236" name="__codelineno-0-236"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-237" name="__codelineno-0-237"></a>        <span class="k">return</span> <span class="n">SpatialExtent</span><span class="o">.</span><span class="n">from_pairs</span><span class="p">(</span><span class="n">lat_lim</span><span class="o">=</span><span class="n">lat_lim</span><span class="p">,</span> <span class="n">lon_lim</span><span class="o">=</span><span class="n">lon_lim</span><span class="p">)</span>
+<a id="__codelineno-0-238" name="__codelineno-0-238"></a>
+<a id="__codelineno-0-239" name="__codelineno-0-239"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_check_input_dates</span><span class="p">(</span>
+<a id="__codelineno-0-240" name="__codelineno-0-240"></a>        <span class="bp">self</span><span class="p">,</span>
+<a id="__codelineno-0-241" name="__codelineno-0-241"></a>        <span class="n">start</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+<a id="__codelineno-0-242" name="__codelineno-0-242"></a>        <span class="n">end</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+<a id="__codelineno-0-243" name="__codelineno-0-243"></a>        <span class="n">temporal_resolution</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+<a id="__codelineno-0-244" name="__codelineno-0-244"></a>        <span class="n">fmt</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+<a id="__codelineno-0-245" name="__codelineno-0-245"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TemporalExtent</span><span class="p">:</span>
+<a id="__codelineno-0-246" name="__codelineno-0-246"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Parse the date range into a `TemporalExtent`.</span>
+<a id="__codelineno-0-247" name="__codelineno-0-247"></a>
+<a id="__codelineno-0-248" name="__codelineno-0-248"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-249" name="__codelineno-0-249"></a><span class="sd">            start: Inclusive start date as a string.</span>
+<a id="__codelineno-0-250" name="__codelineno-0-250"></a><span class="sd">            end: Inclusive end date as a string.</span>
+<a id="__codelineno-0-251" name="__codelineno-0-251"></a><span class="sd">            temporal_resolution: Advisory cadence label; mapped to a</span>
+<a id="__codelineno-0-252" name="__codelineno-0-252"></a><span class="sd">                pandas frequency for the `dates` index when known.</span>
+<a id="__codelineno-0-253" name="__codelineno-0-253"></a><span class="sd">            fmt: `strptime` format applied to `start` and `end`.</span>
+<a id="__codelineno-0-254" name="__codelineno-0-254"></a>
+<a id="__codelineno-0-255" name="__codelineno-0-255"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-256" name="__codelineno-0-256"></a><span class="sd">            TemporalExtent: Frozen model with parsed bounds.</span>
+<a id="__codelineno-0-257" name="__codelineno-0-257"></a>
+<a id="__codelineno-0-258" name="__codelineno-0-258"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-259" name="__codelineno-0-259"></a><span class="sd">            ValueError: If `start` parses to a date later than `end`.</span>
+<a id="__codelineno-0-260" name="__codelineno-0-260"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-261" name="__codelineno-0-261"></a>        <span class="n">start_dt</span> <span class="o">=</span> <span class="n">dt</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">fmt</span><span class="p">)</span>
+<a id="__codelineno-0-262" name="__codelineno-0-262"></a>        <span class="n">end_dt</span> <span class="o">=</span> <span class="n">dt</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">end</span><span class="p">,</span> <span class="n">fmt</span><span class="p">)</span>
+<a id="__codelineno-0-263" name="__codelineno-0-263"></a>        <span class="n">freq_map</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;daily&quot;</span><span class="p">:</span> <span class="s2">&quot;D&quot;</span><span class="p">,</span> <span class="s2">&quot;monthly&quot;</span><span class="p">:</span> <span class="s2">&quot;MS&quot;</span><span class="p">,</span> <span class="s2">&quot;hourly&quot;</span><span class="p">:</span> <span class="s2">&quot;h&quot;</span><span class="p">}</span>
+<a id="__codelineno-0-264" name="__codelineno-0-264"></a>        <span class="n">resolution</span> <span class="o">=</span> <span class="n">freq_map</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">temporal_resolution</span><span class="p">,</span> <span class="s2">&quot;D&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-265" name="__codelineno-0-265"></a>        <span class="n">dates</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">date_range</span><span class="p">(</span><span class="n">start_dt</span><span class="p">,</span> <span class="n">end_dt</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="n">resolution</span><span class="p">)</span>
+<a id="__codelineno-0-266" name="__codelineno-0-266"></a>        <span class="k">return</span> <span class="n">TemporalExtent</span><span class="p">(</span>
+<a id="__codelineno-0-267" name="__codelineno-0-267"></a>            <span class="n">start_date</span><span class="o">=</span><span class="n">start_dt</span><span class="p">,</span>
+<a id="__codelineno-0-268" name="__codelineno-0-268"></a>            <span class="n">end_date</span><span class="o">=</span><span class="n">end_dt</span><span class="p">,</span>
+<a id="__codelineno-0-269" name="__codelineno-0-269"></a>            <span class="n">resolution</span><span class="o">=</span><span class="n">resolution</span><span class="p">,</span>
+<a id="__codelineno-0-270" name="__codelineno-0-270"></a>            <span class="n">dates</span><span class="o">=</span><span class="n">dates</span><span class="p">,</span>
+<a id="__codelineno-0-271" name="__codelineno-0-271"></a>        <span class="p">)</span>
+<a id="__codelineno-0-272" name="__codelineno-0-272"></a>
+<a id="__codelineno-0-273" name="__codelineno-0-273"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_api</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
+<a id="__codelineno-0-274" name="__codelineno-0-274"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Compose `_search` and `_fetch` into the canonical C3 shape.&quot;&quot;&quot;</span>
+<a id="__codelineno-0-275" name="__codelineno-0-275"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api_via_search_fetch</span><span class="p">()</span>
+<a id="__codelineno-0-276" name="__codelineno-0-276"></a>
+<a id="__codelineno-0-277" name="__codelineno-0-277"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_search</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">RemoteProduct</span><span class="p">]:</span>
+<a id="__codelineno-0-278" name="__codelineno-0-278"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Query the Data Store for products of every requested collection.</span>
+<a id="__codelineno-0-279" name="__codelineno-0-279"></a>
+<a id="__codelineno-0-280" name="__codelineno-0-280"></a><span class="sd">        One `Collection.search(bbox=, dtstart=, dtend=)` per resolved</span>
+<a id="__codelineno-0-281" name="__codelineno-0-281"></a><span class="sd">        collection row, scoped to the request bbox and time window. The</span>
+<a id="__codelineno-0-282" name="__codelineno-0-282"></a><span class="sd">        bbox is the `eumdac` `W,S,E,N` comma-string the OpenSearch</span>
+<a id="__codelineno-0-283" name="__codelineno-0-283"></a><span class="sd">        endpoint expects. The `end` date is treated as **inclusive of its</span>
+<a id="__codelineno-0-284" name="__codelineno-0-284"></a><span class="sd">        whole calendar day**: `dtend` is widened to `23:59:59.999999` of</span>
+<a id="__codelineno-0-285" name="__codelineno-0-285"></a><span class="sd">        the end day so a same-day request (`start == end`) covers the</span>
+<a id="__codelineno-0-286" name="__codelineno-0-286"></a><span class="sd">        day&#39;s products instead of collapsing to the midnight instant.</span>
+<a id="__codelineno-0-287" name="__codelineno-0-287"></a><span class="sd">        Each returned `eumdac` product becomes one `RemoteProduct` whose</span>
+<a id="__codelineno-0-288" name="__codelineno-0-288"></a><span class="sd">        `metadata` carries the raw product handle and its collection row,</span>
+<a id="__codelineno-0-289" name="__codelineno-0-289"></a><span class="sd">        so `_fetch` can stream without re-querying.</span>
+<a id="__codelineno-0-290" name="__codelineno-0-290"></a>
+<a id="__codelineno-0-291" name="__codelineno-0-291"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-292" name="__codelineno-0-292"></a><span class="sd">            list[RemoteProduct]: One product per matching Data Store</span>
+<a id="__codelineno-0-293" name="__codelineno-0-293"></a><span class="sd">                product, across every requested collection. An empty list</span>
+<a id="__codelineno-0-294" name="__codelineno-0-294"></a><span class="sd">                (no products in the window) short-circuits the fetch.</span>
+<a id="__codelineno-0-295" name="__codelineno-0-295"></a>
+<a id="__codelineno-0-296" name="__codelineno-0-296"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-297" name="__codelineno-0-297"></a><span class="sd">            ImportError: When the `[eumetsat]` extra (`eumdac`) is not</span>
+<a id="__codelineno-0-298" name="__codelineno-0-298"></a><span class="sd">                installed — surfaced by `EumetsatAuth.datastore()`.</span>
+<a id="__codelineno-0-299" name="__codelineno-0-299"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-300" name="__codelineno-0-300"></a>        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">_auth</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>  <span class="c1"># set by _initialize</span>
+<a id="__codelineno-0-301" name="__codelineno-0-301"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_auth</span><span class="o">.</span><span class="n">configure</span><span class="p">()</span>
+<a id="__codelineno-0-302" name="__codelineno-0-302"></a>        <span class="n">store</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_auth</span><span class="o">.</span><span class="n">datastore</span><span class="p">()</span>
+<a id="__codelineno-0-303" name="__codelineno-0-303"></a>        <span class="c1"># A `SpatialExtent` constrains longitude to a single `[-180, 180]`</span>
+<a id="__codelineno-0-304" name="__codelineno-0-304"></a>        <span class="c1"># range with `west &lt;= east`, so it cannot represent an</span>
+<a id="__codelineno-0-305" name="__codelineno-0-305"></a>        <span class="c1"># antimeridian-crossing box — a single search bbox always suffices.</span>
+<a id="__codelineno-0-306" name="__codelineno-0-306"></a>        <span class="n">bbox</span> <span class="o">=</span> <span class="n">eumdac_bbox</span><span class="p">(</span>
+<a id="__codelineno-0-307" name="__codelineno-0-307"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">west</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">south</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">east</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">north</span>
+<a id="__codelineno-0-308" name="__codelineno-0-308"></a>        <span class="p">)</span>
+<a id="__codelineno-0-309" name="__codelineno-0-309"></a>        <span class="c1"># `end_date` parses to midnight, so a same-day request (start == end)</span>
+<a id="__codelineno-0-310" name="__codelineno-0-310"></a>        <span class="c1"># would otherwise collapse to the zero-width instant 00:00:00 and match</span>
+<a id="__codelineno-0-311" name="__codelineno-0-311"></a>        <span class="c1"># (almost) no products. Extend the end bound to the end of its calendar</span>
+<a id="__codelineno-0-312" name="__codelineno-0-312"></a>        <span class="c1"># day so an inclusive `end` covers the whole day&#39;s products.</span>
+<a id="__codelineno-0-313" name="__codelineno-0-313"></a>        <span class="n">dtstart</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">start_date</span>
+<a id="__codelineno-0-314" name="__codelineno-0-314"></a>        <span class="n">dtend</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">end_date</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span>
+<a id="__codelineno-0-315" name="__codelineno-0-315"></a>            <span class="n">hour</span><span class="o">=</span><span class="mi">23</span><span class="p">,</span> <span class="n">minute</span><span class="o">=</span><span class="mi">59</span><span class="p">,</span> <span class="n">second</span><span class="o">=</span><span class="mi">59</span><span class="p">,</span> <span class="n">microsecond</span><span class="o">=</span><span class="mi">999999</span>
+<a id="__codelineno-0-316" name="__codelineno-0-316"></a>        <span class="p">)</span>
+<a id="__codelineno-0-317" name="__codelineno-0-317"></a>        <span class="n">products</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">RemoteProduct</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+<a id="__codelineno-0-318" name="__codelineno-0-318"></a>        <span class="k">for</span> <span class="n">ds</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_datasets</span><span class="p">:</span>
+<a id="__codelineno-0-319" name="__codelineno-0-319"></a>            <span class="n">collection</span> <span class="o">=</span> <span class="n">store</span><span class="o">.</span><span class="n">get_collection</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">collection_id</span><span class="p">)</span>
+<a id="__codelineno-0-320" name="__codelineno-0-320"></a>            <span class="k">for</span> <span class="n">product</span> <span class="ow">in</span> <span class="n">collection</span><span class="o">.</span><span class="n">search</span><span class="p">(</span>
+<a id="__codelineno-0-321" name="__codelineno-0-321"></a>                <span class="n">bbox</span><span class="o">=</span><span class="n">bbox</span><span class="p">,</span>
+<a id="__codelineno-0-322" name="__codelineno-0-322"></a>                <span class="n">dtstart</span><span class="o">=</span><span class="n">dtstart</span><span class="p">,</span>
+<a id="__codelineno-0-323" name="__codelineno-0-323"></a>                <span class="n">dtend</span><span class="o">=</span><span class="n">dtend</span><span class="p">,</span>
+<a id="__codelineno-0-324" name="__codelineno-0-324"></a>            <span class="p">):</span>
+<a id="__codelineno-0-325" name="__codelineno-0-325"></a>                <span class="n">products</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+<a id="__codelineno-0-326" name="__codelineno-0-326"></a>                    <span class="n">RemoteProduct</span><span class="p">(</span>
+<a id="__codelineno-0-327" name="__codelineno-0-327"></a>                        <span class="nb">id</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">product</span><span class="p">),</span>
+<a id="__codelineno-0-328" name="__codelineno-0-328"></a>                        <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;product&quot;</span><span class="p">:</span> <span class="n">product</span><span class="p">,</span> <span class="s2">&quot;dataset&quot;</span><span class="p">:</span> <span class="n">ds</span><span class="p">},</span>
+<a id="__codelineno-0-329" name="__codelineno-0-329"></a>                    <span class="p">)</span>
+<a id="__codelineno-0-330" name="__codelineno-0-330"></a>                <span class="p">)</span>
+<a id="__codelineno-0-331" name="__codelineno-0-331"></a>        <span class="k">return</span> <span class="n">products</span>
+<a id="__codelineno-0-332" name="__codelineno-0-332"></a>
+<a id="__codelineno-0-333" name="__codelineno-0-333"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_fetch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">products</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">RemoteProduct</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
+<a id="__codelineno-0-334" name="__codelineno-0-334"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Stream every product `_search` returned to a local file.</span>
+<a id="__codelineno-0-335" name="__codelineno-0-335"></a>
+<a id="__codelineno-0-336" name="__codelineno-0-336"></a><span class="sd">        Each `eumdac` product is opened (`Product.open()` — a streaming</span>
+<a id="__codelineno-0-337" name="__codelineno-0-337"></a><span class="sd">        context manager) and copied to `self.root_dir / &lt;id&gt;`, where the</span>
+<a id="__codelineno-0-338" name="__codelineno-0-338"></a><span class="sd">        product id is reduced to a safe basename (`safe_product_filename`)</span>
+<a id="__codelineno-0-339" name="__codelineno-0-339"></a><span class="sd">        so a server-supplied id with a path separator cannot write outside</span>
+<a id="__codelineno-0-340" name="__codelineno-0-340"></a><span class="sd">        the output directory.</span>
+<a id="__codelineno-0-341" name="__codelineno-0-341"></a>
+<a id="__codelineno-0-342" name="__codelineno-0-342"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-343" name="__codelineno-0-343"></a><span class="sd">            products: The products from `_search`.</span>
+<a id="__codelineno-0-344" name="__codelineno-0-344"></a>
+<a id="__codelineno-0-345" name="__codelineno-0-345"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-346" name="__codelineno-0-346"></a><span class="sd">            list[Path]: Local paths of every fetched product, in search</span>
+<a id="__codelineno-0-347" name="__codelineno-0-347"></a><span class="sd">                order.</span>
+<a id="__codelineno-0-348" name="__codelineno-0-348"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-349" name="__codelineno-0-349"></a>        <span class="n">out_paths</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+<a id="__codelineno-0-350" name="__codelineno-0-350"></a>        <span class="k">for</span> <span class="n">rp</span> <span class="ow">in</span> <span class="n">products</span><span class="p">:</span>
+<a id="__codelineno-0-351" name="__codelineno-0-351"></a>            <span class="n">product</span> <span class="o">=</span> <span class="n">rp</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;product&quot;</span><span class="p">]</span>
+<a id="__codelineno-0-352" name="__codelineno-0-352"></a>            <span class="n">target</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root_dir</span> <span class="o">/</span> <span class="n">safe_product_filename</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">product</span><span class="p">))</span>
+<a id="__codelineno-0-353" name="__codelineno-0-353"></a>            <span class="k">with</span> <span class="n">product</span><span class="o">.</span><span class="n">open</span><span class="p">()</span> <span class="k">as</span> <span class="n">src</span><span class="p">,</span> <span class="nb">open</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="s2">&quot;wb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">dst</span><span class="p">:</span>
+<a id="__codelineno-0-354" name="__codelineno-0-354"></a>                <span class="n">shutil</span><span class="o">.</span><span class="n">copyfileobj</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">dst</span><span class="p">)</span>
+<a id="__codelineno-0-355" name="__codelineno-0-355"></a>            <span class="n">out_paths</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
+<a id="__codelineno-0-356" name="__codelineno-0-356"></a>        <span class="k">return</span> <span class="n">out_paths</span>
+<a id="__codelineno-0-357" name="__codelineno-0-357"></a>
+<a id="__codelineno-0-358" name="__codelineno-0-358"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
+<a id="__codelineno-0-359" name="__codelineno-0-359"></a>        <span class="bp">self</span><span class="p">,</span>
+<a id="__codelineno-0-360" name="__codelineno-0-360"></a>        <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+<a id="__codelineno-0-361" name="__codelineno-0-361"></a>        <span class="n">aggregate</span><span class="p">:</span> <span class="n">AggregationConfig</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-362" name="__codelineno-0-362"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
+<a id="__codelineno-0-363" name="__codelineno-0-363"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Search the Data Store, fetch native products, return their paths.</span>
+<a id="__codelineno-0-364" name="__codelineno-0-364"></a>
+<a id="__codelineno-0-365" name="__codelineno-0-365"></a><span class="sd">        Composes `_search` and `_fetch` to pull every product matching</span>
+<a id="__codelineno-0-366" name="__codelineno-0-366"></a><span class="sd">        the request bbox + window to `self.root_dir`.</span>
+<a id="__codelineno-0-367" name="__codelineno-0-367"></a>
+<a id="__codelineno-0-368" name="__codelineno-0-368"></a><span class="sd">        `aggregate=` is the server-side subset / reproject path, which on</span>
+<a id="__codelineno-0-369" name="__codelineno-0-369"></a><span class="sd">        the EUMETSAT Data Store is **Data Tailor** (`H4`) — not part of</span>
+<a id="__codelineno-0-370" name="__codelineno-0-370"></a><span class="sd">        the MVP. A non-`None` `aggregate` therefore raises</span>
+<a id="__codelineno-0-371" name="__codelineno-0-371"></a><span class="sd">        `NotImplementedError` naming Data Tailor; native NetCDF products</span>
+<a id="__codelineno-0-372" name="__codelineno-0-372"></a><span class="sd">        can be read / reduced client-side with pyramids after download.</span>
+<a id="__codelineno-0-373" name="__codelineno-0-373"></a>
+<a id="__codelineno-0-374" name="__codelineno-0-374"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-375" name="__codelineno-0-375"></a><span class="sd">            progress_bar: Reserved for parity with the other backends;</span>
+<a id="__codelineno-0-376" name="__codelineno-0-376"></a><span class="sd">                `eumdac`&#39;s streaming download has no built-in bar.</span>
+<a id="__codelineno-0-377" name="__codelineno-0-377"></a><span class="sd">            aggregate: Optional</span>
+<a id="__codelineno-0-378" name="__codelineno-0-378"></a><span class="sd">                `earthlens.aggregate.AggregationConfig`. Rejected — see</span>
+<a id="__codelineno-0-379" name="__codelineno-0-379"></a><span class="sd">                above.</span>
+<a id="__codelineno-0-380" name="__codelineno-0-380"></a>
+<a id="__codelineno-0-381" name="__codelineno-0-381"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-382" name="__codelineno-0-382"></a><span class="sd">            list[Path]: The fetched product paths.</span>
+<a id="__codelineno-0-383" name="__codelineno-0-383"></a>
+<a id="__codelineno-0-384" name="__codelineno-0-384"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-385" name="__codelineno-0-385"></a><span class="sd">            NotImplementedError: When `aggregate` is not `None` (the Data</span>
+<a id="__codelineno-0-386" name="__codelineno-0-386"></a><span class="sd">                Tailor path, `H4`, is deferred).</span>
+<a id="__codelineno-0-387" name="__codelineno-0-387"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-388" name="__codelineno-0-388"></a>        <span class="k">if</span> <span class="n">aggregate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-389" name="__codelineno-0-389"></a>            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+<a id="__codelineno-0-390" name="__codelineno-0-390"></a>                <span class="s2">&quot;EUMETSAT aggregate=/subset is the Data Tailor path (H4); &quot;</span>
+<a id="__codelineno-0-391" name="__codelineno-0-391"></a>                <span class="s2">&quot;it is not part of the MVP. Download native products &quot;</span>
+<a id="__codelineno-0-392" name="__codelineno-0-392"></a>                <span class="s2">&quot;without aggregate= and reduce NetCDF products client-side &quot;</span>
+<a id="__codelineno-0-393" name="__codelineno-0-393"></a>                <span class="s2">&quot;with pyramids.&quot;</span>
+<a id="__codelineno-0-394" name="__codelineno-0-394"></a>            <span class="p">)</span>
+<a id="__codelineno-0-395" name="__codelineno-0-395"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_show_progress</span> <span class="o">=</span> <span class="n">progress_bar</span>
+<a id="__codelineno-0-396" name="__codelineno-0-396"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api_via_search_fetch</span><span class="p">()</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -17818,9 +17826,7 @@ Tailor path, <code>H4</code>, is deferred).</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>src/earthlens/eumetsat/backend.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-356">356</a></span>
-<span class="normal"><a href="#__codelineno-0-357">357</a></span>
-<span class="normal"><a href="#__codelineno-0-358">358</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-358">358</a></span>
 <span class="normal"><a href="#__codelineno-0-359">359</a></span>
 <span class="normal"><a href="#__codelineno-0-360">360</a></span>
 <span class="normal"><a href="#__codelineno-0-361">361</a></span>
@@ -17856,45 +17862,47 @@ Tailor path, <code>H4</code>, is deferred).</p>
 <span class="normal"><a href="#__codelineno-0-391">391</a></span>
 <span class="normal"><a href="#__codelineno-0-392">392</a></span>
 <span class="normal"><a href="#__codelineno-0-393">393</a></span>
-<span class="normal"><a href="#__codelineno-0-394">394</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-356" name="__codelineno-0-356"></a><span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
-<a id="__codelineno-0-357" name="__codelineno-0-357"></a>    <span class="bp">self</span><span class="p">,</span>
-<a id="__codelineno-0-358" name="__codelineno-0-358"></a>    <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-<a id="__codelineno-0-359" name="__codelineno-0-359"></a>    <span class="n">aggregate</span><span class="p">:</span> <span class="n">AggregationConfig</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-360" name="__codelineno-0-360"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
-<a id="__codelineno-0-361" name="__codelineno-0-361"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Search the Data Store, fetch native products, return their paths.</span>
-<a id="__codelineno-0-362" name="__codelineno-0-362"></a>
-<a id="__codelineno-0-363" name="__codelineno-0-363"></a><span class="sd">    Composes `_search` and `_fetch` to pull every product matching</span>
-<a id="__codelineno-0-364" name="__codelineno-0-364"></a><span class="sd">    the request bbox + window to `self.root_dir`.</span>
-<a id="__codelineno-0-365" name="__codelineno-0-365"></a>
-<a id="__codelineno-0-366" name="__codelineno-0-366"></a><span class="sd">    `aggregate=` is the server-side subset / reproject path, which on</span>
-<a id="__codelineno-0-367" name="__codelineno-0-367"></a><span class="sd">    the EUMETSAT Data Store is **Data Tailor** (`H4`) — not part of</span>
-<a id="__codelineno-0-368" name="__codelineno-0-368"></a><span class="sd">    the MVP. A non-`None` `aggregate` therefore raises</span>
-<a id="__codelineno-0-369" name="__codelineno-0-369"></a><span class="sd">    `NotImplementedError` naming Data Tailor; native NetCDF products</span>
-<a id="__codelineno-0-370" name="__codelineno-0-370"></a><span class="sd">    can be read / reduced client-side with pyramids after download.</span>
-<a id="__codelineno-0-371" name="__codelineno-0-371"></a>
-<a id="__codelineno-0-372" name="__codelineno-0-372"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-373" name="__codelineno-0-373"></a><span class="sd">        progress_bar: Reserved for parity with the other backends;</span>
-<a id="__codelineno-0-374" name="__codelineno-0-374"></a><span class="sd">            `eumdac`&#39;s streaming download has no built-in bar.</span>
-<a id="__codelineno-0-375" name="__codelineno-0-375"></a><span class="sd">        aggregate: Optional</span>
-<a id="__codelineno-0-376" name="__codelineno-0-376"></a><span class="sd">            `earthlens.aggregate.AggregationConfig`. Rejected — see</span>
-<a id="__codelineno-0-377" name="__codelineno-0-377"></a><span class="sd">            above.</span>
-<a id="__codelineno-0-378" name="__codelineno-0-378"></a>
-<a id="__codelineno-0-379" name="__codelineno-0-379"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-380" name="__codelineno-0-380"></a><span class="sd">        list[Path]: The fetched product paths.</span>
-<a id="__codelineno-0-381" name="__codelineno-0-381"></a>
-<a id="__codelineno-0-382" name="__codelineno-0-382"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-383" name="__codelineno-0-383"></a><span class="sd">        NotImplementedError: When `aggregate` is not `None` (the Data</span>
-<a id="__codelineno-0-384" name="__codelineno-0-384"></a><span class="sd">            Tailor path, `H4`, is deferred).</span>
-<a id="__codelineno-0-385" name="__codelineno-0-385"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-386" name="__codelineno-0-386"></a>    <span class="k">if</span> <span class="n">aggregate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-387" name="__codelineno-0-387"></a>        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
-<a id="__codelineno-0-388" name="__codelineno-0-388"></a>            <span class="s2">&quot;EUMETSAT aggregate=/subset is the Data Tailor path (H4); &quot;</span>
-<a id="__codelineno-0-389" name="__codelineno-0-389"></a>            <span class="s2">&quot;it is not part of the MVP. Download native products &quot;</span>
-<a id="__codelineno-0-390" name="__codelineno-0-390"></a>            <span class="s2">&quot;without aggregate= and reduce NetCDF products client-side &quot;</span>
-<a id="__codelineno-0-391" name="__codelineno-0-391"></a>            <span class="s2">&quot;with pyramids.&quot;</span>
-<a id="__codelineno-0-392" name="__codelineno-0-392"></a>        <span class="p">)</span>
-<a id="__codelineno-0-393" name="__codelineno-0-393"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_show_progress</span> <span class="o">=</span> <span class="n">progress_bar</span>
-<a id="__codelineno-0-394" name="__codelineno-0-394"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api_via_search_fetch</span><span class="p">()</span>
+<span class="normal"><a href="#__codelineno-0-394">394</a></span>
+<span class="normal"><a href="#__codelineno-0-395">395</a></span>
+<span class="normal"><a href="#__codelineno-0-396">396</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-358" name="__codelineno-0-358"></a><span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
+<a id="__codelineno-0-359" name="__codelineno-0-359"></a>    <span class="bp">self</span><span class="p">,</span>
+<a id="__codelineno-0-360" name="__codelineno-0-360"></a>    <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+<a id="__codelineno-0-361" name="__codelineno-0-361"></a>    <span class="n">aggregate</span><span class="p">:</span> <span class="n">AggregationConfig</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-362" name="__codelineno-0-362"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
+<a id="__codelineno-0-363" name="__codelineno-0-363"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Search the Data Store, fetch native products, return their paths.</span>
+<a id="__codelineno-0-364" name="__codelineno-0-364"></a>
+<a id="__codelineno-0-365" name="__codelineno-0-365"></a><span class="sd">    Composes `_search` and `_fetch` to pull every product matching</span>
+<a id="__codelineno-0-366" name="__codelineno-0-366"></a><span class="sd">    the request bbox + window to `self.root_dir`.</span>
+<a id="__codelineno-0-367" name="__codelineno-0-367"></a>
+<a id="__codelineno-0-368" name="__codelineno-0-368"></a><span class="sd">    `aggregate=` is the server-side subset / reproject path, which on</span>
+<a id="__codelineno-0-369" name="__codelineno-0-369"></a><span class="sd">    the EUMETSAT Data Store is **Data Tailor** (`H4`) — not part of</span>
+<a id="__codelineno-0-370" name="__codelineno-0-370"></a><span class="sd">    the MVP. A non-`None` `aggregate` therefore raises</span>
+<a id="__codelineno-0-371" name="__codelineno-0-371"></a><span class="sd">    `NotImplementedError` naming Data Tailor; native NetCDF products</span>
+<a id="__codelineno-0-372" name="__codelineno-0-372"></a><span class="sd">    can be read / reduced client-side with pyramids after download.</span>
+<a id="__codelineno-0-373" name="__codelineno-0-373"></a>
+<a id="__codelineno-0-374" name="__codelineno-0-374"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-375" name="__codelineno-0-375"></a><span class="sd">        progress_bar: Reserved for parity with the other backends;</span>
+<a id="__codelineno-0-376" name="__codelineno-0-376"></a><span class="sd">            `eumdac`&#39;s streaming download has no built-in bar.</span>
+<a id="__codelineno-0-377" name="__codelineno-0-377"></a><span class="sd">        aggregate: Optional</span>
+<a id="__codelineno-0-378" name="__codelineno-0-378"></a><span class="sd">            `earthlens.aggregate.AggregationConfig`. Rejected — see</span>
+<a id="__codelineno-0-379" name="__codelineno-0-379"></a><span class="sd">            above.</span>
+<a id="__codelineno-0-380" name="__codelineno-0-380"></a>
+<a id="__codelineno-0-381" name="__codelineno-0-381"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-382" name="__codelineno-0-382"></a><span class="sd">        list[Path]: The fetched product paths.</span>
+<a id="__codelineno-0-383" name="__codelineno-0-383"></a>
+<a id="__codelineno-0-384" name="__codelineno-0-384"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-385" name="__codelineno-0-385"></a><span class="sd">        NotImplementedError: When `aggregate` is not `None` (the Data</span>
+<a id="__codelineno-0-386" name="__codelineno-0-386"></a><span class="sd">            Tailor path, `H4`, is deferred).</span>
+<a id="__codelineno-0-387" name="__codelineno-0-387"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-388" name="__codelineno-0-388"></a>    <span class="k">if</span> <span class="n">aggregate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-389" name="__codelineno-0-389"></a>        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+<a id="__codelineno-0-390" name="__codelineno-0-390"></a>            <span class="s2">&quot;EUMETSAT aggregate=/subset is the Data Tailor path (H4); &quot;</span>
+<a id="__codelineno-0-391" name="__codelineno-0-391"></a>            <span class="s2">&quot;it is not part of the MVP. Download native products &quot;</span>
+<a id="__codelineno-0-392" name="__codelineno-0-392"></a>            <span class="s2">&quot;without aggregate= and reduce NetCDF products client-side &quot;</span>
+<a id="__codelineno-0-393" name="__codelineno-0-393"></a>            <span class="s2">&quot;with pyramids.&quot;</span>
+<a id="__codelineno-0-394" name="__codelineno-0-394"></a>        <span class="p">)</span>
+<a id="__codelineno-0-395" name="__codelineno-0-395"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_show_progress</span> <span class="o">=</span> <span class="n">progress_bar</span>
+<a id="__codelineno-0-396" name="__codelineno-0-396"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api_via_search_fetch</span><span class="p">()</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
