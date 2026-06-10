@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -11709,9 +11709,9 @@ def run_or_skip(facade, **download_kwargs):
 
 <span class="n">facade</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
     <span class="n">data_source</span><span class="o">=</span><span class="s1">'sentinel-hub'</span><span class="p">,</span>
-    <span class="n">variables</span><span class="o">=</span><span class="p">{</span><span class="s1">'sentinel-2-l2a-ndvi'</span><span class="p">:</span> <span class="p">[]},</span>
+    <span class="n">dataset</span><span class="o">=</span><span class="s1">'sentinel-2-l2a-ndvi'</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="p">[],</span>
     <span class="n">start</span><span class="o">=</span><span class="s1">'2020-06-10'</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s1">'2020-06-20'</span><span class="p">,</span>
-    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">40.6</span><span class="p">,</span> <span class="mf">41.1</span><span class="p">],</span> <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">14.0</span><span class="p">,</span> <span class="mf">14.5</span><span class="p">],</span>
+    <span class="n">aoi</span><span class="o">=</span><span class="p">[</span><span class="mf">14.0</span><span class="p">,</span> <span class="mf">40.6</span><span class="p">,</span> <span class="mf">14.5</span><span class="p">,</span> <span class="mf">41.1</span><span class="p">],</span>
     <span class="n">path</span><span class="o">=</span><span class="s1">'data/sh-tiling'</span><span class="p">,</span> <span class="n">resolution</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
     <span class="n">api</span><span class="o">=</span><span class="s1">'tiling'</span><span class="p">,</span>
 <span class="p">)</span>
@@ -11722,9 +11722,9 @@ def run_or_skip(facade, **download_kwargs):
 
 facade = EarthLens(
     data_source='sentinel-hub',
-    variables={'sentinel-2-l2a-ndvi': []},
+    dataset='sentinel-2-l2a-ndvi', variables=[],
     start='2020-06-10', end='2020-06-20',
-    lat_lim=[40.6, 41.1], lon_lim=[14.0, 14.5],
+    aoi=[14.0, 40.6, 14.5, 41.1],
     path='data/sh-tiling', resolution=20,
     api='tiling',
 )

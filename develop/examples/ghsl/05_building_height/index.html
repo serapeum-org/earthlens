@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -11520,7 +11520,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <span class="n">paths</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
     <span class="n">data_source</span><span class="o">=</span><span class="s1">'ghsl'</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">'built_height'</span><span class="p">],</span>
     <span class="n">start</span><span class="o">=</span><span class="s1">'2018-01-01'</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s1">'2018-12-31'</span><span class="p">,</span>
-    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">38.68</span><span class="p">,</span> <span class="mf">38.78</span><span class="p">],</span> <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">9.20</span><span class="p">,</span> <span class="o">-</span><span class="mf">9.10</span><span class="p">],</span> <span class="n">path</span><span class="o">=</span><span class="n">out</span><span class="p">,</span>
+    <span class="n">aoi</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">9.20</span><span class="p">,</span> <span class="mf">38.68</span><span class="p">,</span> <span class="o">-</span><span class="mf">9.10</span><span class="p">,</span> <span class="mf">38.78</span><span class="p">],</span> <span class="n">path</span><span class="o">=</span><span class="n">out</span><span class="p">,</span>
 <span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">progress_bar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 <span class="n">paths</span>
 </pre></div>
@@ -11530,7 +11530,7 @@ out = tempfile.mkdtemp()
 paths = EarthLens(
     data_source='ghsl', variables=['built_height'],
     start='2018-01-01', end='2018-12-31',
-    lat_lim=[38.68, 38.78], lon_lim=[-9.20, -9.10], path=out,
+    aoi=[-9.20, 38.68, -9.10, 38.78], path=out,
 ).download(progress_bar=False)
 paths</div>
 </div>

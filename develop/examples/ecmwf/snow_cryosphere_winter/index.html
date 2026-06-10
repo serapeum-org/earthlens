@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -11709,18 +11709,15 @@ Engadine area. Range Oct 2021–Jun 2022 covers a full snow season.</p>
 
 <span class="n">earthlens</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
     <span class="n">data_source</span><span class="o">=</span><span class="s2">"ecmwf"</span><span class="p">,</span>
-    <span class="n">temporal_resolution</span><span class="o">=</span><span class="s2">"monthly"</span><span class="p">,</span>
+    <span class="n">cadence</span><span class="o">=</span><span class="s2">"monthly"</span><span class="p">,</span>
     <span class="n">start</span><span class="o">=</span><span class="s2">"2021-10-01"</span><span class="p">,</span>
     <span class="n">end</span><span class="o">=</span><span class="s2">"2022-06-01"</span><span class="p">,</span>
-    <span class="n">variables</span><span class="o">=</span><span class="p">{</span>
-        <span class="s2">"reanalysis-era5-land-monthly-means"</span><span class="p">:</span> <span class="p">[</span>
+    <span class="n">dataset</span><span class="o">=</span><span class="s2">"reanalysis-era5-land-monthly-means"</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="p">[</span>
             <span class="s2">"snow-depth"</span><span class="p">,</span>
             <span class="s2">"snow-depth-water-equivalent"</span><span class="p">,</span>
             <span class="s2">"2m-temperature"</span><span class="p">,</span>
         <span class="p">],</span>
-    <span class="p">},</span>
-    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">46.0</span><span class="p">,</span> <span class="mf">47.0</span><span class="p">],</span>
-    <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">10.0</span><span class="p">,</span> <span class="mf">11.0</span><span class="p">],</span>
+    <span class="n">aoi</span><span class="o">=</span><span class="p">[</span><span class="mf">10.0</span><span class="p">,</span> <span class="mf">46.0</span><span class="p">,</span> <span class="mf">11.0</span><span class="p">,</span> <span class="mf">47.0</span><span class="p">],</span>
     <span class="n">path</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">OUT</span><span class="p">),</span>
 <span class="p">)</span>
 <span class="n">earthlens</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">aggregate</span><span class="o">=</span><span class="n">AggregationConfig</span><span class="p">(</span><span class="n">freq</span><span class="o">=</span><span class="s2">"1MS"</span><span class="p">,</span> <span class="n">op</span><span class="o">=</span><span class="s2">"auto"</span><span class="p">,</span> <span class="n">cell_size</span><span class="o">=</span><span class="mf">0.1</span><span class="p">))</span>
@@ -11733,18 +11730,15 @@ OUT.mkdir(parents=True, exist_ok=True)
 
 earthlens = EarthLens(
     data_source="ecmwf",
-    temporal_resolution="monthly",
+    cadence="monthly",
     start="2021-10-01",
     end="2022-06-01",
-    variables={
-        "reanalysis-era5-land-monthly-means": [
+    dataset="reanalysis-era5-land-monthly-means", variables=[
             "snow-depth",
             "snow-depth-water-equivalent",
             "2m-temperature",
         ],
-    },
-    lat_lim=[46.0, 47.0],
-    lon_lim=[10.0, 11.0],
+    aoi=[10.0, 46.0, 11.0, 47.0],
     path=str(OUT),
 )
 earthlens.download(aggregate=AggregationConfig(freq="1MS", op="auto", cell_size=0.1))</div>
@@ -11800,9 +11794,9 @@ earthlens.download(aggregate=AggregationConfig(freq="1MS", op="auto", cell_size=
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jupyter-widgets jp-OutputArea-output" id="bf43ea4a-2a63-4f6d-a5c2-e89c8fc59a91" tabindex="0">
+<div class="jupyter-widgets jp-OutputArea-output" id="2d6d5814-f174-464c-bb5e-1aff8e3db892" tabindex="0">
 <script type="text/javascript">
-var element = document.getElementById('bf43ea4a-2a63-4f6d-a5c2-e89c8fc59a91');
+var element = document.getElementById('2d6d5814-f174-464c-bb5e-1aff8e3db892');
 </script>
 <script type="application/vnd.jupyter.widget-view+json">
 {"model_id": "ee948b099ac64f8fbcc6c4a81c51ff7f", "version_major": 2, "version_minor": 0}
@@ -11902,9 +11896,9 @@ var element = document.getElementById('bf43ea4a-2a63-4f6d-a5c2-e89c8fc59a91');
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jupyter-widgets jp-OutputArea-output" id="761b54ff-7f74-4fc7-9ccc-75ba1267146f" tabindex="0">
+<div class="jupyter-widgets jp-OutputArea-output" id="e8ade2d7-1c70-4084-a913-5fe638a10181" tabindex="0">
 <script type="text/javascript">
-var element = document.getElementById('761b54ff-7f74-4fc7-9ccc-75ba1267146f');
+var element = document.getElementById('e8ade2d7-1c70-4084-a913-5fe638a10181');
 </script>
 <script type="application/vnd.jupyter.widget-view+json">
 {"model_id": "7638cce2fb7b4778991701305789c126", "version_major": 2, "version_minor": 0}
@@ -11997,9 +11991,9 @@ var element = document.getElementById('761b54ff-7f74-4fc7-9ccc-75ba1267146f');
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jupyter-widgets jp-OutputArea-output" id="a1343b57-fe42-464c-8743-0aa4e05039b2" tabindex="0">
+<div class="jupyter-widgets jp-OutputArea-output" id="311d4a6a-a57a-404d-89ab-f48379180681" tabindex="0">
 <script type="text/javascript">
-var element = document.getElementById('a1343b57-fe42-464c-8743-0aa4e05039b2');
+var element = document.getElementById('311d4a6a-a57a-404d-89ab-f48379180681');
 </script>
 <script type="application/vnd.jupyter.widget-view+json">
 {"model_id": "004bcee36b3543d0b20be2daf4150849", "version_major": 2, "version_minor": 0}

@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -11619,7 +11619,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
         <span class="n">data_source</span><span class="o">=</span><span class="s1">'tropycal'</span><span class="p">,</span> <span class="n">product</span><span class="o">=</span><span class="s1">'recon'</span><span class="p">,</span> <span class="n">recon_product</span><span class="o">=</span><span class="s1">'hdobs'</span><span class="p">,</span>
         <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">'AL122005'</span><span class="p">],</span> <span class="n">basin</span><span class="o">=</span><span class="s1">'north_atlantic'</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="s1">'hurdat'</span><span class="p">,</span>
         <span class="n">start</span><span class="o">=</span><span class="s1">'2005-08-23'</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s1">'2005-08-31'</span><span class="p">,</span>
-        <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">18.0</span><span class="p">,</span> <span class="mf">31.0</span><span class="p">],</span> <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">98.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">80.0</span><span class="p">],</span> <span class="n">path</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">OUT_DIR</span><span class="p">),</span>
+        <span class="n">aoi</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">98.0</span><span class="p">,</span> <span class="mf">18.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">80.0</span><span class="p">,</span> <span class="mf">31.0</span><span class="p">],</span> <span class="n">path</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">OUT_DIR</span><span class="p">),</span>
     <span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">progress_bar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">obs</span><span class="p">),</span> <span class="s1">'recon observations'</span><span class="p">)</span>
 <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
@@ -11637,7 +11637,7 @@ try:
         data_source='tropycal', product='recon', recon_product='hdobs',
         variables=['AL122005'], basin='north_atlantic', source='hurdat',
         start='2005-08-23', end='2005-08-31',
-        lat_lim=[18.0, 31.0], lon_lim=[-98.0, -80.0], path=str(OUT_DIR),
+        aoi=[-98.0, 18.0, -80.0, 31.0], path=str(OUT_DIR),
     ).download(progress_bar=False)
     print(len(obs), 'recon observations')
 except Exception as exc:

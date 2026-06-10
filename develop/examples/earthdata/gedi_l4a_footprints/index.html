@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -11555,11 +11555,10 @@ OUT_DIR.mkdir(exist_ok=True)</div>
 <span class="k">try</span><span class="p">:</span>
     <span class="n">paths</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
         <span class="n">data_source</span><span class="o">=</span><span class="s1">'earthdata'</span><span class="p">,</span>
-        <span class="n">variables</span><span class="o">=</span><span class="p">{</span><span class="s1">'GEDI_L4A_AGB_Density_V2_1_2056'</span><span class="p">:</span> <span class="p">[</span><span class="s1">'agbd'</span><span class="p">]},</span>
+        <span class="n">dataset</span><span class="o">=</span><span class="s1">'GEDI_L4A_AGB_Density_V2_1_2056'</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">'agbd'</span><span class="p">],</span>
         <span class="n">start</span><span class="o">=</span><span class="s1">'2020-05-01'</span><span class="p">,</span>
         <span class="n">end</span><span class="o">=</span><span class="s1">'2020-05-02'</span><span class="p">,</span>
-        <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">3.0</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">],</span>
-        <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">12.0</span><span class="p">,</span> <span class="mf">18.0</span><span class="p">],</span>
+        <span class="n">aoi</span><span class="o">=</span><span class="p">[</span><span class="mf">12.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">3.0</span><span class="p">,</span> <span class="mf">18.0</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">],</span>
         <span class="n">path</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">OUT_DIR</span><span class="p">),</span>
     <span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">progress_bar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">paths</span><span class="p">),</span> <span class="s1">'granule(s):'</span><span class="p">,</span> <span class="p">[</span><span class="n">Path</span><span class="p">(</span><span class="n">p</span><span class="p">)</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">paths</span><span class="p">])</span>
@@ -11570,11 +11569,10 @@ OUT_DIR.mkdir(exist_ok=True)</div>
 try:
     paths = EarthLens(
         data_source='earthdata',
-        variables={'GEDI_L4A_AGB_Density_V2_1_2056': ['agbd']},
+        dataset='GEDI_L4A_AGB_Density_V2_1_2056', variables=['agbd'],
         start='2020-05-01',
         end='2020-05-02',
-        lat_lim=[-3.0, 3.0],
-        lon_lim=[12.0, 18.0],
+        aoi=[12.0, -3.0, 18.0, 3.0],
         path=str(OUT_DIR),
     ).download(progress_bar=False)
     print(len(paths), 'granule(s):', [Path(p).name for p in paths])

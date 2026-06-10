@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -11710,9 +11710,9 @@ def run_or_skip(facade, **download_kwargs):
 
 <span class="n">facade</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
     <span class="n">data_source</span><span class="o">=</span><span class="s1">'sentinel-hub'</span><span class="p">,</span>
-    <span class="n">variables</span><span class="o">=</span><span class="p">{</span><span class="s1">'sentinel-2-l2a-ndvi'</span><span class="p">:</span> <span class="p">[]},</span>
+    <span class="n">dataset</span><span class="o">=</span><span class="s1">'sentinel-2-l2a-ndvi'</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="p">[],</span>
     <span class="n">start</span><span class="o">=</span><span class="s1">'2020-04-01'</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s1">'2020-06-30'</span><span class="p">,</span>
-    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">40.80</span><span class="p">,</span> <span class="mf">40.83</span><span class="p">],</span> <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">14.24</span><span class="p">,</span> <span class="mf">14.27</span><span class="p">],</span>
+    <span class="n">aoi</span><span class="o">=</span><span class="p">[</span><span class="mf">14.24</span><span class="p">,</span> <span class="mf">40.80</span><span class="p">,</span> <span class="mf">14.27</span><span class="p">,</span> <span class="mf">40.83</span><span class="p">],</span>
     <span class="n">path</span><span class="o">=</span><span class="s1">'data/sh-monthly'</span><span class="p">,</span> <span class="n">resolution</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="n">paths</span> <span class="o">=</span> <span class="n">run_or_skip</span><span class="p">(</span><span class="n">facade</span><span class="p">,</span> <span class="n">aggregate</span><span class="o">=</span><span class="n">AggregationConfig</span><span class="p">(</span><span class="n">freq</span><span class="o">=</span><span class="s1">'1MS'</span><span class="p">,</span> <span class="n">op</span><span class="o">=</span><span class="s1">'mean'</span><span class="p">))</span>
@@ -11723,9 +11723,9 @@ from earthlens.aggregate import AggregationConfig
 
 facade = EarthLens(
     data_source='sentinel-hub',
-    variables={'sentinel-2-l2a-ndvi': []},
+    dataset='sentinel-2-l2a-ndvi', variables=[],
     start='2020-04-01', end='2020-06-30',
-    lat_lim=[40.80, 40.83], lon_lim=[14.24, 14.27],
+    aoi=[14.24, 40.80, 14.27, 40.83],
     path='data/sh-monthly', resolution=20,
 )
 paths = run_or_skip(facade, aggregate=AggregationConfig(freq='1MS', op='mean'))

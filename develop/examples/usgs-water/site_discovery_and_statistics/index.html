@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -11518,8 +11518,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 
 <span class="n">sites</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
     <span class="n">data_source</span><span class="o">=</span><span class="s2">"usgs-water"</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">"discharge"</span><span class="p">],</span>
-    <span class="n">start</span><span class="o">=</span><span class="s2">"2023-01-01"</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">"2023-01-05"</span><span class="p">,</span> <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">38.8</span><span class="p">,</span> <span class="mf">39.1</span><span class="p">],</span>
-    <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">77.3</span><span class="p">,</span> <span class="o">-</span><span class="mf">76.9</span><span class="p">],</span> <span class="n">path</span><span class="o">=</span><span class="s2">"_nb_out"</span><span class="p">,</span> <span class="n">service</span><span class="o">=</span><span class="s2">"sites"</span><span class="p">,</span> <span class="n">api</span><span class="o">=</span><span class="s2">"legacy"</span><span class="p">,</span>
+    <span class="n">start</span><span class="o">=</span><span class="s2">"2023-01-01"</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">"2023-01-05"</span><span class="p">,</span> <span class="n">aoi</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">77.3</span><span class="p">,</span> <span class="mf">38.8</span><span class="p">,</span> <span class="o">-</span><span class="mf">76.9</span><span class="p">,</span> <span class="mf">39.1</span><span class="p">],</span> <span class="n">path</span><span class="o">=</span><span class="s2">"_nb_out"</span><span class="p">,</span> <span class="n">service</span><span class="o">=</span><span class="s2">"sites"</span><span class="p">,</span> <span class="n">api</span><span class="o">=</span><span class="s2">"legacy"</span><span class="p">,</span>
 <span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">progress_bar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 <span class="n">sites</span><span class="p">[[</span><span class="s2">"site_no"</span><span class="p">,</span> <span class="s2">"station_name"</span><span class="p">,</span> <span class="s2">"latitude"</span><span class="p">,</span> <span class="s2">"longitude"</span><span class="p">]]</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
 </pre></div>
@@ -11527,8 +11526,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 
 sites = EarthLens(
     data_source="usgs-water", variables=["discharge"],
-    start="2023-01-01", end="2023-01-05", lat_lim=[38.8, 39.1],
-    lon_lim=[-77.3, -76.9], path="_nb_out", service="sites", api="legacy",
+    start="2023-01-01", end="2023-01-05", aoi=[-77.3, 38.8, -76.9, 39.1], path="_nb_out", service="sites", api="legacy",
 ).download(progress_bar=False)
 sites[["site_no", "station_name", "latitude", "longitude"]].head(10)</div>
 </div>
@@ -11673,8 +11671,7 @@ sites[["site_no", "station_name", "latitude", "longitude"]].head(10)</div>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">stats</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
     <span class="n">data_source</span><span class="o">=</span><span class="s2">"usgs-water"</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">"discharge"</span><span class="p">],</span>
-    <span class="n">start</span><span class="o">=</span><span class="s2">"2018-01-01"</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">"2021-12-31"</span><span class="p">,</span> <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">38.9</span><span class="p">,</span> <span class="mf">39.0</span><span class="p">],</span>
-    <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">77.2</span><span class="p">,</span> <span class="o">-</span><span class="mf">77.0</span><span class="p">],</span> <span class="n">path</span><span class="o">=</span><span class="s2">"_nb_out"</span><span class="p">,</span> <span class="n">service</span><span class="o">=</span><span class="s2">"statistics"</span><span class="p">,</span>
+    <span class="n">start</span><span class="o">=</span><span class="s2">"2018-01-01"</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">"2021-12-31"</span><span class="p">,</span> <span class="n">aoi</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">77.2</span><span class="p">,</span> <span class="mf">38.9</span><span class="p">,</span> <span class="o">-</span><span class="mf">77.0</span><span class="p">,</span> <span class="mf">39.0</span><span class="p">],</span> <span class="n">path</span><span class="o">=</span><span class="s2">"_nb_out"</span><span class="p">,</span> <span class="n">service</span><span class="o">=</span><span class="s2">"statistics"</span><span class="p">,</span>
     <span class="n">sites</span><span class="o">=</span><span class="s2">"01646500"</span><span class="p">,</span> <span class="n">api</span><span class="o">=</span><span class="s2">"legacy"</span><span class="p">,</span> <span class="n">stat_type</span><span class="o">=</span><span class="s2">"monthly"</span><span class="p">,</span>
     <span class="n">output_format</span><span class="o">=</span><span class="s2">"parquet"</span><span class="p">,</span>
 <span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">progress_bar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
@@ -11682,8 +11679,7 @@ sites[["site_no", "station_name", "latitude", "longitude"]].head(10)</div>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-2">stats = EarthLens(
     data_source="usgs-water", variables=["discharge"],
-    start="2018-01-01", end="2021-12-31", lat_lim=[38.9, 39.0],
-    lon_lim=[-77.2, -77.0], path="_nb_out", service="statistics",
+    start="2018-01-01", end="2021-12-31", aoi=[-77.2, 38.9, -77.0, 39.0], path="_nb_out", service="statistics",
     sites="01646500", api="legacy", stat_type="monthly",
     output_format="parquet",
 ).download(progress_bar=False)
