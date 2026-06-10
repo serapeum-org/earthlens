@@ -421,6 +421,52 @@ class TestTopLevelReExports:
         ], f"Unexpected top-level __all__: {earthlens.__all__!r}"
 
 
+class TestFacadeOptions:
+    """The facade's backend-option discovery and early kwarg validation."""
+
+    @pytest.mark.gee
+    def test_options_for_lists_backend_extras(self):
+        """options_for() surfaces the backend-specific constructor knobs."""
+        options = EarthLens.options_for("gee")
+        assert "scale" in options and "crs" in options, f"missing knobs: {options}"
+
+    @pytest.mark.gee
+    def test_options_for_excludes_facade_params(self):
+        """options_for() omits the parameters the facade owns."""
+        options = EarthLens.options_for("gee")
+        assert not ({"start", "lat_lim", "variables"} & set(options)), options
+
+    def test_options_for_unknown_source_raises(self):
+        """options_for() rejects an unknown data_source."""
+        with pytest.raises(ValueError, match="is not a supported data source"):
+            EarthLens.options_for("nope")
+
+    @pytest.mark.chc
+    def test_unexpected_kwarg_raises_typeerror(self, tmp_path):
+        """An unknown backend kwarg is rejected up front with a TypeError."""
+        with pytest.raises(TypeError, match="unexpected keyword argument 'foo'"):
+            EarthLens(
+                data_source="chc",
+                variables=["precipitation"],
+                start="2009-01-01",
+                end="2009-01-02",
+                path=str(tmp_path),
+                foo="bar",
+            )
+
+    @pytest.mark.gee
+    def test_unexpected_kwarg_suggests_closest(self):
+        """A near-miss kwarg name suggests the closest backend option."""
+        with pytest.raises(TypeError, match="service_account"):
+            EarthLens(
+                data_source="gee",
+                variables={"UCSB-CHG/CHIRPS/DAILY": ["precipitation"]},
+                start="2022-01-01",
+                end="2022-01-02",
+                servce_account="x",
+            )
+
+
 @pytest.mark.chc
 class TestFacadeSearch:
     """The facade's search() / count() / preview() dry-run surface."""

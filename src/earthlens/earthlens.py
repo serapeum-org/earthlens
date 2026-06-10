@@ -16,6 +16,7 @@ from __future__ import annotations
 
 import difflib
 import importlib
+import inspect
 from collections.abc import Iterator, Mapping
 from datetime import date, datetime
 from pathlib import Path
@@ -568,8 +569,6 @@ class EarthLens:
         self._check_source(data_source)
 
         backend_cls = self.DataSources[data_source]
-        import inspect
-
         backend_params = inspect.signature(backend_cls.__init__).parameters
 
         # A single `aoi=` supersedes the legacy `lat_lim` / `lon_lim`
@@ -612,6 +611,11 @@ class EarthLens:
             **backend_kwargs,
         }
 
+        # Reject an unknown backend kwarg here, with a did-you-mean, rather
+        # than letting it surface as a raw TypeError from deep in the
+        # backend constructor.
+        self._check_backend_kwargs(data_source, backend_params, merged_kwargs)
+
         # `dataset=` + a plain `variables` list is resolved into the
         # shape each backend wants — a native `dataset` kwarg for the S3
         # backend, or the legacy `{dataset: variables}` dict for the
@@ -653,6 +657,92 @@ class EarthLens:
                 f"{data_source!r} is not a supported data source. "
                 f"Known: {sorted(cls.DataSources)}.{hint}"
             )
+
+    #: Constructor parameter names the facade owns and supplies itself.
+    #: Everything else a backend declares is a backend-specific option,
+    #: surfaced by :meth:`options_for` and accepted as a kwarg.
+    _FACADE_PARAMS = frozenset(
+        {
+            "self",
+            "start",
+            "end",
+            "variables",
+            "dataset",
+            "lat_lim",
+            "lon_lim",
+            "temporal_resolution",
+            "path",
+            "fmt",
+            "aoi",
+            "buffer",
+        }
+    )
+
+    @classmethod
+    def options_for(cls, data_source: str) -> list[str]:
+        """List a backend's extra constructor options.
+
+        The backend-specific keyword arguments a backend accepts beyond
+        the facade's own parameters — the discoverable surface for
+        `**backend_kwargs` (e.g. GEE's `scale` / `crs` / `service_account`,
+        ECMWF's `skip_constraints`).
+
+        Args:
+            data_source: A registered backend key.
+
+        Returns:
+            The sorted backend-specific option names.
+
+        Raises:
+            ValueError: If `data_source` is not a registered key.
+
+        Examples:
+            - GEE exposes its export knobs as options:
+                ```python
+                >>> from earthlens.earthlens import EarthLens
+                >>> options = EarthLens.options_for("gee")
+                >>> "scale" in options and "crs" in options
+                True
+
+                ```
+        """
+        cls._check_source(data_source)
+        params = inspect.signature(cls.DataSources[data_source].__init__).parameters
+        return sorted(
+            name
+            for name, parameter in params.items()
+            if name not in cls._FACADE_PARAMS
+            and parameter.kind
+            not in (parameter.VAR_KEYWORD, parameter.VAR_POSITIONAL)
+        )
+
+    @classmethod
+    def _check_backend_kwargs(
+        cls, data_source: str, backend_params: Any, kwargs: dict[str, object]
+    ) -> None:
+        """Reject an unexpected backend kwarg with a did-you-mean hint.
+
+        Args:
+            data_source: The backend key (for the error message).
+            backend_params: The backend `__init__` parameters mapping.
+            kwargs: The merged backend kwargs about to be forwarded.
+
+        Raises:
+            TypeError: If a key in `kwargs` is not an accepted backend
+                parameter (skipped when the backend declares `**kwargs`).
+        """
+        if any(p.kind == p.VAR_KEYWORD for p in backend_params.values()):
+            return
+        accepted = {name for name in backend_params if name != "self"}
+        for name in kwargs:
+            if name not in accepted:
+                close = difflib.get_close_matches(name, sorted(accepted), n=1)
+                hint = f" Did you mean {close[0]!r}?" if close else ""
+                raise TypeError(
+                    f"the {data_source!r} backend got an unexpected keyword "
+                    f"argument {name!r}.{hint} Backend options: "
+                    f"{cls.options_for(data_source)}."
+                )
 
     @classmethod
     def catalog(cls, data_source: str) -> AbstractCatalog:
