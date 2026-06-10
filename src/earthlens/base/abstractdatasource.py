@@ -323,6 +323,78 @@ class SpatialExtent(BaseModel):
         )
 
 
+class LazyClientMixin:
+    """Defer a backend's network client until first `client` access.
+
+    A backend that authenticates or opens a connection mixes this in
+    (before :class:`AbstractDataSource` in its bases) and implements
+    :meth:`_open_client` — the network half. Its :meth:`_initialize` then
+    keeps only eager, offline work (input validation, catalog resolution)
+    and returns `None`, so the parent never binds an eager `client`. The
+    live client is built lazily on first access to :attr:`client` and
+    cached, so constructing the backend — or a bare `EarthLens(...)` —
+    never touches the network. Authentication errors therefore surface on
+    the first `download()` / `search()` / `client` use rather than at
+    construction.
+
+    Examples:
+        - The client is built once, on first access, then cached:
+            ```python
+            >>> from earthlens.base import LazyClientMixin
+            >>> class Demo(LazyClientMixin):
+            ...     calls = 0
+            ...     def _open_client(self):
+            ...         Demo.calls += 1
+            ...         return "connection"
+            >>> demo = Demo()
+            >>> Demo.calls
+            0
+            >>> demo.client
+            'connection'
+            >>> demo.client
+            'connection'
+            >>> Demo.calls
+            1
+
+            ```
+    """
+
+    def _open_client(self) -> Any:
+        """Open and return the backend's live network client.
+
+        Raises:
+            NotImplementedError: Until a backend overrides it.
+        """
+        raise NotImplementedError(
+            f"{type(self).__name__} mixes in LazyClientMixin but does not "
+            f"implement _open_client."
+        )
+
+    @property
+    def client(self) -> Any:
+        """The backend's network client — opened lazily and cached.
+
+        Returns:
+            The object :meth:`_open_client` returns, built on first access
+            and reused thereafter.
+        """
+        if "_client_obj" not in self.__dict__:
+            self.__dict__["_client_obj"] = self._open_client()
+        return self.__dict__["_client_obj"]
+
+    @client.setter
+    def client(self, value: Any) -> None:
+        """Inject a client, seeding the cache so `_open_client` is skipped.
+
+        Lets callers (and tests) bind a ready-made / fake client; the
+        getter then returns it without ever opening a connection.
+
+        Args:
+            value: The client object to use.
+        """
+        self.__dict__["_client_obj"] = value
+
+
 class AbstractDataSource(ABC):
     """Blueprint for every concrete data-source backend.
 

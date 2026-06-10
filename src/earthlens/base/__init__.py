@@ -10,6 +10,7 @@ from __future__ import annotations
 from earthlens.base.abstractdatasource import (
     AbstractCatalog,
     AbstractDataSource,
+    LazyClientMixin,
     OutputKind,
     RemoteProduct,
     SpatialExtent,
@@ -31,6 +32,7 @@ __all__ = [
     "AbstractDataSource",
     "AuthenticationError",
     "FluxableLeaf",
+    "LazyClientMixin",
     "METRES_PER_DEGREE",
     "OutputKind",
     "Provider",

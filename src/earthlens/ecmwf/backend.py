@@ -15,6 +15,7 @@ from loguru import logger
 from earthlens.aggregate import AggregationConfig, aggregate_netcdf
 from earthlens.base import (
     AbstractDataSource,
+    LazyClientMixin,
     OutputKind,
     SpatialExtent,
     TemporalExtent,
@@ -180,7 +181,7 @@ def _unwrap_zipped_netcdf(target: Path) -> None:
             tmp.unlink(missing_ok=True)
 
 
-class ECMWF(AbstractDataSource):
+class ECMWF(LazyClientMixin, AbstractDataSource):
     """ECMWF / Copernicus Climate Data Store backend.
 
     Downloads ERA5 reanalysis (and ERA5-Land where the catalog
@@ -225,9 +226,10 @@ class ECMWF(AbstractDataSource):
     ):
         """Initialize an ECMWF backend instance.
 
-        Forwards every argument to :class:`AbstractDataSource`,
-        which captures the cdsapi client into `self.client` and
-        the bbox/date dict into `self.space`/`self.time`.
+        Forwards every argument to :class:`AbstractDataSource`, which
+        captures the bbox/date dict into `self.space` / `self.time`. The
+        cdsapi client is built lazily on first access to `self.client`
+        (via :meth:`_open_client`), so construction never authenticates.
 
         Args:
             start: Inclusive start date as a string (parsed with
@@ -321,6 +323,19 @@ class ECMWF(AbstractDataSource):
         )
 
     def _initialize(self):
+        """No eager client — the cdsapi connection is built lazily.
+
+        Returns `None` so the parent does not bind an eager `client`;
+        :meth:`_open_client` constructs the :class:`cdsapi.Client` on
+        first access to `self.client` (i.e. at `download()` time), so
+        constructing the backend never authenticates against CDS.
+
+        Returns:
+            None: Always.
+        """
+        return None
+
+    def _open_client(self):
         """Construct the :class:`cdsapi.Client` for talking to CDS.
 
         Reads credentials from `~/.cdsapirc` (or the `CDSAPI_URL` /
@@ -328,7 +343,8 @@ class ECMWF(AbstractDataSource):
         when the dotfile is absent). If neither is configured, the
         underlying cdsapi exception is wrapped in
         :class:`AuthenticationError` with a message that tells the user
-        exactly where to put their Personal Access Token.
+        exactly where to put their Personal Access Token. Called lazily
+        by :attr:`~earthlens.base.LazyClientMixin.client` on first use.
 
         Returns:
             cdsapi.Client: Authenticated CDS client. Calls to
@@ -355,6 +371,7 @@ class ECMWF(AbstractDataSource):
                 ...     lon_lim=[-75.0, -74.0],
                 ...     path="examples/data/era5",
                 ... )
+                >>> ecmwf.client  # doctest: +SKIP
 
                 ```
         """
