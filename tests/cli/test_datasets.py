@@ -315,6 +315,36 @@ class TestRefresh:
         assert result.exit_code == 0, f"refresh --write failed: {result.output}"
         assert "wrote" in result.output and "_index.yaml" in result.output
 
+    def test_write_path_intact_on_narrow_terminal(self, tmp_path, monkeypatch):
+        """The written path is emitted contiguously even on a narrow terminal.
+
+        A width that cannot fit the path forces Rich to fold it unless the line
+        opts out of wrapping; the full path must survive as one unbroken span.
+        """
+        import io
+        import shutil
+
+        from rich.console import Console
+
+        import earthlens.stac.catalog as stac_catalog
+
+        dst = tmp_path / "catalog"
+        shutil.copytree(stac_catalog.CATALOG_PATH, dst)
+        monkeypatch.setattr(stac_catalog, "CATALOG_PATH", dst)
+        monkeypatch.setattr(
+            refresh_mod,
+            "_get_json",
+            lambda url: {"collections": [{"id": "x"}], "links": []},
+        )
+        buf = io.StringIO()
+        monkeypatch.setattr(
+            datasets_mod, "out_console", lambda: Console(file=buf, width=40)
+        )
+        result = runner.invoke(app, ["datasets", "refresh", "stac", "--write"])
+        assert result.exit_code == 0, f"refresh --write failed: {result.output}"
+        written = str(dst / "_index.yaml")
+        assert written in buf.getvalue(), "path was folded across lines by Rich"
+
 
 class TestAudit:
     """Tests for `datasets audit` (curated-vs-live drift; network mocked)."""
