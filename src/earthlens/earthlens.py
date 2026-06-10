@@ -384,6 +384,7 @@ class EarthLens:
         aoi: Any = None,
         buffer: float | None = None,
         dataset: str | None = None,
+        cadence: str | None = None,
         **backend_kwargs: object,
     ):
         """Resolve the backend and construct it with the user's parameters.
@@ -425,7 +426,12 @@ class EarthLens:
                   backends with no per-step time axis — Overture,
                   Tropycal, FDSN, FIRMS, GDACS, Radar.
 
-                Defaults to `"daily"`.
+                For the first (download-cadence) group, `cadence` is the
+                clearer spelling. Defaults to `"daily"`.
+            cadence: Clearer alias for `temporal_resolution` in its
+                download-cadence role (CHIRPS / S3 / ECMWF / GEE). When
+                given, it overrides `temporal_resolution`. Defaults to
+                `None`.
             start: Inclusive start date. A string (parsed with `fmt`,
                 falling back to ISO-8601), or a `datetime` / `date` /
                 `pandas.Timestamp` object. Defaults to `None`.
@@ -571,6 +577,11 @@ class EarthLens:
             :meth:`download`: Triggers the actual retrieval.
         """
         self._check_source(data_source)
+
+        # `cadence=` is the clearer alias for the download-cadence role of
+        # `temporal_resolution`; when given it simply overrides it.
+        if cadence is not None:
+            temporal_resolution = cadence
 
         backend_cls = self.DataSources[data_source]
         backend_params = inspect.signature(backend_cls.__init__).parameters
@@ -1142,6 +1153,7 @@ def download(
     aoi: Any = None,
     buffer: float | None = None,
     temporal_resolution: str = "daily",
+    cadence: str | None = None,
     fmt: str = "%Y-%m-%d",
     progress_bar: bool = True,
     aggregate: AggregationConfig | None = None,
@@ -1170,6 +1182,8 @@ def download(
         buffer: Half-width in degrees for a point `aoi`.
         temporal_resolution: Backend cadence / label. Defaults to
             `"daily"`.
+        cadence: Clearer alias for `temporal_resolution` (overrides it
+            when given). Defaults to `None`.
         fmt: `strptime` format override for string dates.
         progress_bar: Whether the backend prints a progress bar.
         aggregate: Optional :class:`~earthlens.aggregate.AggregationConfig`.
@@ -1206,6 +1220,7 @@ def download(
         aoi=aoi,
         buffer=buffer,
         temporal_resolution=temporal_resolution,
+        cadence=cadence,
         fmt=fmt,
         **backend_kwargs,
     )

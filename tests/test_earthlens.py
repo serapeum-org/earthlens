@@ -462,6 +462,33 @@ class TestFunctionalDownload:
 
 
 @pytest.mark.chc
+class TestFacadeCadence:
+    """The cadence= alias for temporal_resolution."""
+
+    def _temporal_resolution(self, tmp_path, **kwargs):
+        return EarthLens(
+            data_source="chc",
+            variables=["precipitation"],
+            start="2009-01-01",
+            end="2009-01-02",
+            path=str(tmp_path),
+            **kwargs,
+        ).datasource.temporal_resolution
+
+    def test_cadence_overrides_temporal_resolution(self, tmp_path):
+        """cadence= takes precedence over temporal_resolution."""
+        resolved = self._temporal_resolution(
+            tmp_path, temporal_resolution="daily", cadence="monthly"
+        )
+        assert resolved == "monthly", f"cadence should win; got {resolved}"
+
+    def test_temporal_resolution_used_when_no_cadence(self, tmp_path):
+        """temporal_resolution still applies when cadence is omitted."""
+        resolved = self._temporal_resolution(tmp_path, temporal_resolution="monthly")
+        assert resolved == "monthly", f"got {resolved}"
+
+
+@pytest.mark.chc
 class TestFacadePath:
     """The facade's output-path defaulting."""
 
