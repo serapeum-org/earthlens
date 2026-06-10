@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -11712,7 +11712,7 @@ monthly samples.</p>
     <span class="n">path</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="n">earthlens</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
         <span class="n">data_source</span><span class="o">=</span><span class="s2">"ecmwf"</span><span class="p">,</span>
-        <span class="n">temporal_resolution</span><span class="o">=</span><span class="s2">"monthly"</span><span class="p">,</span>
+        <span class="n">cadence</span><span class="o">=</span><span class="s2">"monthly"</span><span class="p">,</span>
         <span class="n">start</span><span class="o">=</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="n">end</span><span class="p">,</span>
         <span class="n">variables</span><span class="o">=</span><span class="n">VAR</span><span class="p">,</span> <span class="o">**</span><span class="n">EUR</span><span class="p">,</span>
         <span class="n">path</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">path</span><span class="p">),</span>
@@ -11735,7 +11735,7 @@ for path, start, end in [
     path.mkdir(parents=True, exist_ok=True)
     earthlens = EarthLens(
         data_source="ecmwf",
-        temporal_resolution="monthly",
+        cadence="monthly",
         start=start, end=end,
         variables=VAR, **EUR,
         path=str(path),
@@ -11786,9 +11786,9 @@ for path, start, end in [
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jupyter-widgets jp-OutputArea-output" id="278a8e62-9f16-462a-a362-879a4c94c9dc" tabindex="0">
+<div class="jupyter-widgets jp-OutputArea-output" id="9bc7881b-9e57-46ed-9e92-cb978493c9ae" tabindex="0">
 <script type="text/javascript">
-var element = document.getElementById('278a8e62-9f16-462a-a362-879a4c94c9dc');
+var element = document.getElementById('9bc7881b-9e57-46ed-9e92-cb978493c9ae');
 </script>
 <script type="application/vnd.jupyter.widget-view+json">
 {"model_id": "faf9542b5171461292e67e061c129124", "version_major": 2, "version_minor": 0}
@@ -11874,9 +11874,9 @@ var element = document.getElementById('278a8e62-9f16-462a-a362-879a4c94c9dc');
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jupyter-widgets jp-OutputArea-output" id="6f5ed676-e9e6-4c9d-8482-35bed431c6be" tabindex="0">
+<div class="jupyter-widgets jp-OutputArea-output" id="397b3670-770a-4657-b35c-3f93a76d6774" tabindex="0">
 <script type="text/javascript">
-var element = document.getElementById('6f5ed676-e9e6-4c9d-8482-35bed431c6be');
+var element = document.getElementById('397b3670-770a-4657-b35c-3f93a76d6774');
 </script>
 <script type="application/vnd.jupyter.widget-view+json">
 {"model_id": "9f98854fc39240cabaddee63e1e8bb4d", "version_major": 2, "version_minor": 0}

@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -11572,11 +11572,10 @@ cycle_day</div>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">lens</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
     <span class="n">data_source</span><span class="o">=</span><span class="s1">'nwp'</span><span class="p">,</span>
-    <span class="n">variables</span><span class="o">=</span><span class="p">{</span><span class="s1">'gfs'</span><span class="p">:</span> <span class="p">[</span><span class="s1">'temperature_2m'</span><span class="p">]},</span>
+    <span class="n">dataset</span><span class="o">=</span><span class="s1">'gfs'</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">'temperature_2m'</span><span class="p">],</span>
     <span class="n">start</span><span class="o">=</span><span class="n">cycle_day</span><span class="p">,</span>
     <span class="n">end</span><span class="o">=</span><span class="n">cycle_day</span><span class="p">,</span>
-    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mi">40</span><span class="p">,</span> <span class="mi">45</span><span class="p">],</span>
-    <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">80</span><span class="p">,</span> <span class="o">-</span><span class="mi">75</span><span class="p">],</span>
+    <span class="n">aoi</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">80</span><span class="p">,</span> <span class="mi">40</span><span class="p">,</span> <span class="o">-</span><span class="mi">75</span><span class="p">,</span> <span class="mi">45</span><span class="p">],</span>
     <span class="n">path</span><span class="o">=</span><span class="s1">'out/gfs'</span><span class="p">,</span>
     <span class="n">steps</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
     <span class="n">mirror</span><span class="o">=</span><span class="s1">'aws'</span><span class="p">,</span>
@@ -11586,11 +11585,10 @@ cycle_day</div>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-2">lens = EarthLens(
     data_source='nwp',
-    variables={'gfs': ['temperature_2m']},
+    dataset='gfs', variables=['temperature_2m'],
     start=cycle_day,
     end=cycle_day,
-    lat_lim=[40, 45],
-    lon_lim=[-80, -75],
+    aoi=[-80, 40, -75, 45],
     path='out/gfs',
     steps=[0],
     mirror='aws',

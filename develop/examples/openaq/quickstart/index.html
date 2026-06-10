@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -11596,7 +11596,7 @@ start, end = "2024-01-01", "2024-01-31"</div>
         <span class="n">data_source</span><span class="o">=</span><span class="s2">"openaq"</span><span class="p">,</span>
         <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">"pm25"</span><span class="p">],</span>
         <span class="n">start</span><span class="o">=</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="n">end</span><span class="p">,</span>
-        <span class="n">lat_lim</span><span class="o">=</span><span class="n">bbox_lat</span><span class="p">,</span> <span class="n">lon_lim</span><span class="o">=</span><span class="n">bbox_lon</span><span class="p">,</span>
+        <span class="n">aoi</span><span class="o">=</span><span class="p">[</span><span class="n">bbox_lon</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">bbox_lat</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">bbox_lon</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">bbox_lat</span><span class="p">[</span><span class="mi">1</span><span class="p">]],</span>
         <span class="n">temporal_resolution</span><span class="o">=</span><span class="s2">"daily"</span><span class="p">,</span>
         <span class="n">max_locations</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
         <span class="n">path</span><span class="o">=</span><span class="s2">"out/openaq"</span><span class="p">,</span>
@@ -11613,7 +11613,7 @@ if os.environ.get("OPENAQ_API_KEY"):
         data_source="openaq",
         variables=["pm25"],
         start=start, end=end,
-        lat_lim=bbox_lat, lon_lim=bbox_lon,
+        aoi=[bbox_lon[0], bbox_lat[0], bbox_lon[1], bbox_lat[1]],
         temporal_resolution="daily",
         max_locations=10,
         path="out/openaq",

@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -11815,17 +11815,14 @@ Pulling 12 months keeps the retrieve small.</p>
 
 <span class="n">earthlens</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
     <span class="n">data_source</span><span class="o">=</span><span class="s2">"ecmwf"</span><span class="p">,</span>
-    <span class="n">temporal_resolution</span><span class="o">=</span><span class="s2">"monthly"</span><span class="p">,</span>
+    <span class="n">cadence</span><span class="o">=</span><span class="s2">"monthly"</span><span class="p">,</span>
     <span class="n">start</span><span class="o">=</span><span class="s2">"2022-01-01"</span><span class="p">,</span>
     <span class="n">end</span><span class="o">=</span><span class="s2">"2022-12-01"</span><span class="p">,</span>
-    <span class="n">variables</span><span class="o">=</span><span class="p">{</span>
-        <span class="s2">"reanalysis-era5-single-levels-monthly-means"</span><span class="p">:</span> <span class="p">[</span>
+    <span class="n">dataset</span><span class="o">=</span><span class="s2">"reanalysis-era5-single-levels-monthly-means"</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="p">[</span>
             <span class="s2">"sea-surface-temperature"</span><span class="p">,</span>
             <span class="s2">"sea-ice-cover"</span><span class="p">,</span>
         <span class="p">],</span>
-    <span class="p">},</span>
-    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">60.0</span><span class="p">,</span> <span class="mf">70.0</span><span class="p">],</span>
-    <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">30.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">10.0</span><span class="p">],</span>
+    <span class="n">aoi</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">30.0</span><span class="p">,</span> <span class="mf">60.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">10.0</span><span class="p">,</span> <span class="mf">70.0</span><span class="p">],</span>
     <span class="n">path</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">OUT</span><span class="p">),</span>
 <span class="p">)</span>
 <span class="n">earthlens</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">aggregate</span><span class="o">=</span><span class="n">AggregationConfig</span><span class="p">(</span><span class="n">freq</span><span class="o">=</span><span class="s2">"1MS"</span><span class="p">,</span> <span class="n">op</span><span class="o">=</span><span class="s2">"auto"</span><span class="p">))</span>
@@ -11838,17 +11835,14 @@ OUT.mkdir(parents=True, exist_ok=True)
 
 earthlens = EarthLens(
     data_source="ecmwf",
-    temporal_resolution="monthly",
+    cadence="monthly",
     start="2022-01-01",
     end="2022-12-01",
-    variables={
-        "reanalysis-era5-single-levels-monthly-means": [
+    dataset="reanalysis-era5-single-levels-monthly-means", variables=[
             "sea-surface-temperature",
             "sea-ice-cover",
         ],
-    },
-    lat_lim=[60.0, 70.0],
-    lon_lim=[-30.0, -10.0],
+    aoi=[-30.0, 60.0, -10.0, 70.0],
     path=str(OUT),
 )
 earthlens.download(aggregate=AggregationConfig(freq="1MS", op="auto"))</div>
@@ -11897,9 +11891,9 @@ earthlens.download(aggregate=AggregationConfig(freq="1MS", op="auto"))</div>
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jupyter-widgets jp-OutputArea-output" id="48b36b9c-5d48-4e09-9dcc-83028799115b" tabindex="0">
+<div class="jupyter-widgets jp-OutputArea-output" id="c1af58af-4aec-463f-829a-d2fbd5c3431f" tabindex="0">
 <script type="text/javascript">
-var element = document.getElementById('48b36b9c-5d48-4e09-9dcc-83028799115b');
+var element = document.getElementById('c1af58af-4aec-463f-829a-d2fbd5c3431f');
 </script>
 <script type="application/vnd.jupyter.widget-view+json">
 {"model_id": "37573861e0f845c58626e3c80cdee150", "version_major": 2, "version_minor": 0}
@@ -11980,9 +11974,9 @@ var element = document.getElementById('48b36b9c-5d48-4e09-9dcc-83028799115b');
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jupyter-widgets jp-OutputArea-output" id="cd7e4a2b-dc59-4278-84fd-45548eddb640" tabindex="0">
+<div class="jupyter-widgets jp-OutputArea-output" id="64635986-0e13-424f-b524-6d1d7d1518d0" tabindex="0">
 <script type="text/javascript">
-var element = document.getElementById('cd7e4a2b-dc59-4278-84fd-45548eddb640');
+var element = document.getElementById('64635986-0e13-424f-b524-6d1d7d1518d0');
 </script>
 <script type="application/vnd.jupyter.widget-view+json">
 {"model_id": "ebae2ac00b1c4e51904513d5ea4637e2", "version_major": 2, "version_minor": 0}

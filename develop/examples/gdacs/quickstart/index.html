@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -11721,8 +11721,7 @@ print('window:', START, 'to', END)</div>
         <span class="n">data_source</span><span class="o">=</span><span class="s1">'gdacs'</span><span class="p">,</span>
         <span class="n">start</span><span class="o">=</span><span class="n">START</span><span class="p">,</span>
         <span class="n">end</span><span class="o">=</span><span class="n">END</span><span class="p">,</span>
-        <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">90</span><span class="p">,</span> <span class="mi">90</span><span class="p">],</span>
-        <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">180</span><span class="p">,</span> <span class="mi">180</span><span class="p">],</span>
+        <span class="n">aoi</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">180</span><span class="p">,</span> <span class="o">-</span><span class="mi">90</span><span class="p">,</span> <span class="mi">180</span><span class="p">,</span> <span class="mi">90</span><span class="p">],</span>
         <span class="n">alert_level</span><span class="o">=</span><span class="p">[</span><span class="s1">'Green'</span><span class="p">,</span> <span class="s1">'Orange'</span><span class="p">,</span> <span class="s1">'Red'</span><span class="p">],</span>
         <span class="n">path</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">OUT_DIR</span><span class="p">),</span>
     <span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
@@ -11740,8 +11739,7 @@ try:
         data_source='gdacs',
         start=START,
         end=END,
-        lat_lim=[-90, 90],
-        lon_lim=[-180, 180],
+        aoi=[-180, -90, 180, 90],
         alert_level=['Green', 'Orange', 'Red'],
         path=str(OUT_DIR),
     ).download()

@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -11903,10 +11903,9 @@ verbatim.</p>
     <span class="n">data_source</span><span class="o">=</span><span class="s1">'cmems'</span><span class="p">,</span>
     <span class="n">start</span><span class="o">=</span><span class="n">START</span><span class="p">,</span>
     <span class="n">end</span><span class="o">=</span><span class="n">END</span><span class="p">,</span>
-    <span class="n">temporal_resolution</span><span class="o">=</span><span class="s1">'daily'</span><span class="p">,</span>
-    <span class="n">variables</span><span class="o">=</span><span class="p">{</span><span class="s1">'METOFFICE-GLO-SST-L4-NRT-OBS-SST-V2'</span><span class="p">:</span> <span class="p">[</span><span class="s1">'analysed_sst'</span><span class="p">]},</span>
-    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">30.0</span><span class="p">,</span> <span class="mf">36.0</span><span class="p">],</span>
-    <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">10.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">4.0</span><span class="p">],</span>
+    <span class="n">cadence</span><span class="o">=</span><span class="s1">'daily'</span><span class="p">,</span>
+    <span class="n">dataset</span><span class="o">=</span><span class="s1">'METOFFICE-GLO-SST-L4-NRT-OBS-SST-V2'</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">'analysed_sst'</span><span class="p">],</span>
+    <span class="n">aoi</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">10.0</span><span class="p">,</span> <span class="mf">30.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">4.0</span><span class="p">,</span> <span class="mf">36.0</span><span class="p">],</span>
     <span class="n">path</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">OUT_DIR</span><span class="p">),</span>
     <span class="n">service_username</span><span class="o">=</span><span class="n">SERVICE_USERNAME</span><span class="p">,</span>
     <span class="n">service_password</span><span class="o">=</span><span class="n">SERVICE_PASSWORD</span><span class="p">,</span>
@@ -11919,10 +11918,9 @@ verbatim.</p>
     data_source='cmems',
     start=START,
     end=END,
-    temporal_resolution='daily',
-    variables={'METOFFICE-GLO-SST-L4-NRT-OBS-SST-V2': ['analysed_sst']},
-    lat_lim=[30.0, 36.0],
-    lon_lim=[-10.0, -4.0],
+    cadence='daily',
+    dataset='METOFFICE-GLO-SST-L4-NRT-OBS-SST-V2', variables=['analysed_sst'],
+    aoi=[-10.0, 30.0, -4.0, 36.0],
     path=str(OUT_DIR),
     service_username=SERVICE_USERNAME,
     service_password=SERVICE_PASSWORD,

@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -11739,9 +11739,9 @@ def run_or_skip(facade, **download_kwargs):
 
 <span class="n">facade</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
     <span class="n">data_source</span><span class="o">=</span><span class="s1">'openeo'</span><span class="p">,</span>
-    <span class="n">variables</span><span class="o">=</span><span class="p">{</span><span class="s1">'sentinel-5p-no2-monthly'</span><span class="p">:</span> <span class="p">[]},</span>
+    <span class="n">dataset</span><span class="o">=</span><span class="s1">'sentinel-5p-no2-monthly'</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="p">[],</span>
     <span class="n">start</span><span class="o">=</span><span class="s1">'2023-03-01'</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s1">'2023-03-31'</span><span class="p">,</span>
-    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">50.5</span><span class="p">,</span> <span class="mf">53.5</span><span class="p">],</span> <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">3.0</span><span class="p">,</span> <span class="mf">7.0</span><span class="p">],</span>
+    <span class="n">aoi</span><span class="o">=</span><span class="p">[</span><span class="mf">3.0</span><span class="p">,</span> <span class="mf">50.5</span><span class="p">,</span> <span class="mf">7.0</span><span class="p">,</span> <span class="mf">53.5</span><span class="p">],</span>
     <span class="n">path</span><span class="o">=</span><span class="s1">'data/openeo-no2'</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s1">'returns:'</span><span class="p">,</span> <span class="n">facade</span><span class="o">.</span><span class="n">datasource</span><span class="o">.</span><span class="n">_resolved</span><span class="p">[</span><span class="s1">'sentinel-5p-no2-monthly'</span><span class="p">]</span><span class="o">.</span><span class="n">collection_id</span><span class="p">)</span>
@@ -11750,9 +11750,9 @@ def run_or_skip(facade, **download_kwargs):
 
 facade = EarthLens(
     data_source='openeo',
-    variables={'sentinel-5p-no2-monthly': []},
+    dataset='sentinel-5p-no2-monthly', variables=[],
     start='2023-03-01', end='2023-03-31',
-    lat_lim=[50.5, 53.5], lon_lim=[3.0, 7.0],
+    aoi=[3.0, 50.5, 7.0, 53.5],
     path='data/openeo-no2',
 )
 print('returns:', facade.datasource._resolved['sentinel-5p-no2-monthly'].collection_id)</div>

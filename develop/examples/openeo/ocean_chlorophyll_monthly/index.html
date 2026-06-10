@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -11739,9 +11739,9 @@ def run_or_skip(facade, **download_kwargs):
 
 <span class="n">facade</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
     <span class="n">data_source</span><span class="o">=</span><span class="s1">'openeo'</span><span class="p">,</span>
-    <span class="n">variables</span><span class="o">=</span><span class="p">{</span><span class="s1">'sentinel-3-olci-chlorophyll-monthly'</span><span class="p">:</span> <span class="p">[]},</span>
+    <span class="n">dataset</span><span class="o">=</span><span class="s1">'sentinel-3-olci-chlorophyll-monthly'</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="p">[],</span>
     <span class="n">start</span><span class="o">=</span><span class="s1">'2023-07-01'</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s1">'2023-07-31'</span><span class="p">,</span>
-    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">36.0</span><span class="p">,</span> <span class="mf">40.0</span><span class="p">],</span> <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">4.0</span><span class="p">],</span>
+    <span class="n">aoi</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">36.0</span><span class="p">,</span> <span class="mf">4.0</span><span class="p">,</span> <span class="mf">40.0</span><span class="p">],</span>
     <span class="n">path</span><span class="o">=</span><span class="s1">'data/openeo-chl'</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="n">g</span> <span class="o">=</span> <span class="n">facade</span><span class="o">.</span><span class="n">datasource</span><span class="o">.</span><span class="n">_resolved</span><span class="p">[</span><span class="s1">'sentinel-3-olci-chlorophyll-monthly'</span><span class="p">]</span>
@@ -11751,9 +11751,9 @@ def run_or_skip(facade, **download_kwargs):
 
 facade = EarthLens(
     data_source='openeo',
-    variables={'sentinel-3-olci-chlorophyll-monthly': []},
+    dataset='sentinel-3-olci-chlorophyll-monthly', variables=[],
     start='2023-07-01', end='2023-07-31',
-    lat_lim=[36.0, 40.0], lon_lim=[-1.0, 4.0],
+    aoi=[-1.0, 36.0, 4.0, 40.0],
     path='data/openeo-chl',
 )
 g = facade.datasource._resolved['sentinel-3-olci-chlorophyll-monthly']
