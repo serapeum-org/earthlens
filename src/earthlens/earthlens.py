@@ -930,6 +930,59 @@ class EarthLens:
             return hits[:20]
         return difflib.get_close_matches(text, pool, n=10, cutoff=0.3)
 
+    def __getattr__(self, name: str) -> Any:
+        """Delegate an unknown attribute to the bound backend.
+
+        Python calls this only when normal lookup misses, so the facade's
+        own attributes and methods always take precedence. It lets the
+        facade transparently expose a backend's *own* surface without
+        forcing it onto every backend — e.g.
+        `EarthLens(data_source="nwm", ...)._feature_ids()` forwards to the
+        NWM backend, while the same call on a CHIRPS-backed facade raises
+        `AttributeError` (CHIRPS has no such method).
+
+        Args:
+            name: The attribute being looked up.
+
+        Returns:
+            The corresponding attribute of `self.datasource`.
+
+        Raises:
+            AttributeError: If `name` is a dunder, the backend is not yet
+                bound (mid-construction), or the backend lacks `name`.
+
+        Examples:
+            - A backend-specific helper is reachable through the facade
+              (live; skipped here):
+                ```python
+                >>> from earthlens.earthlens import EarthLens
+                >>> el = EarthLens(  # doctest: +SKIP
+                ...     data_source="nwm",
+                ...     dataset="chrtout",
+                ...     variables=["streamflow"],
+                ...     start="2024-01-01", end="2024-01-01",
+                ... )
+                >>> el._feature_ids()  # doctest: +SKIP
+
+                ```
+        """
+        if name.startswith("__") and name.endswith("__"):
+            raise AttributeError(name)
+        datasource = self.__dict__.get("datasource")
+        if datasource is None:
+            raise AttributeError(
+                f"{type(self).__name__!r} object has no attribute {name!r}"
+            )
+        return getattr(datasource, name)
+
+    def __dir__(self) -> list[str]:
+        """Include the bound backend's attributes for tab-completion."""
+        own = set(super().__dir__())
+        datasource = self.__dict__.get("datasource")
+        if datasource is not None:
+            own |= set(dir(datasource))
+        return sorted(own)
+
     def search(self) -> list[RemoteProduct]:
         """List the products this request matches, without downloading them.
 

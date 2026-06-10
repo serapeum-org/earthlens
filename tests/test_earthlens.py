@@ -569,6 +569,52 @@ class TestFacadeOptions:
 
 
 @pytest.mark.chc
+class TestFacadeDelegation:
+    """The facade delegates unknown attributes to the bound backend."""
+
+    def _facade(self, tmp_path):
+        return EarthLens(
+            data_source="chc",
+            variables=["precipitation"],
+            start="2009-01-01",
+            end="2009-01-02",
+            path=str(tmp_path),
+        )
+
+    def test_delegates_backend_attribute(self, tmp_path):
+        """A backend attribute is reachable through the facade."""
+        facade = self._facade(tmp_path)
+        # `vars` lives on the backend, not the facade.
+        assert facade.vars == facade.datasource.vars
+
+    def test_delegates_backend_method(self, tmp_path, monkeypatch):
+        """A backend method is forwarded and called on the backend."""
+        facade = self._facade(tmp_path)
+        monkeypatch.setattr(
+            facade.datasource, "_demo_helper", lambda: "from-backend", raising=False
+        )
+        assert facade._demo_helper() == "from-backend"
+
+    def test_facade_own_attribute_takes_precedence(self, tmp_path):
+        """The facade's own attributes win over delegation."""
+        facade = self._facade(tmp_path)
+        # `download` is defined on the facade itself.
+        assert facade.download.__qualname__.startswith("EarthLens")
+
+    def test_unknown_attribute_raises(self, tmp_path):
+        """An attribute on neither facade nor backend raises AttributeError."""
+        facade = self._facade(tmp_path)
+        with pytest.raises(AttributeError):
+            facade.totally_not_a_real_attribute
+
+    def test_dunder_not_delegated(self, tmp_path):
+        """Dunder lookups are not delegated (avoids proxying magic methods)."""
+        facade = self._facade(tmp_path)
+        with pytest.raises(AttributeError):
+            facade.__nonexistent_dunder__
+
+
+@pytest.mark.chc
 class TestFacadeSearch:
     """The facade's search() / count() / preview() dry-run surface."""
 
