@@ -12,6 +12,8 @@ from __future__ import annotations
 import datetime as dt
 from typing import Any
 
+import pandas as pd
+
 
 def to_datetime(value: Any, fmt: str | None = None) -> dt.datetime:
     """Coerce a date-like value into a `datetime.datetime`.
@@ -73,8 +75,6 @@ def to_datetime(value: Any, fmt: str | None = None) -> dt.datetime:
                 return dt.datetime.strptime(value, fmt)
             except ValueError:
                 pass
-        import pandas as pd
-
         return pd.Timestamp(value).to_pydatetime()
     raise TypeError(
         f"start / end must be a datetime, date, or string; got "

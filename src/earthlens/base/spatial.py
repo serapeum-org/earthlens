@@ -14,6 +14,8 @@ import math
 from collections.abc import Mapping, Sequence
 from typing import Any
 
+from loguru import logger
+
 #: Approximate metres per degree of latitude at the equator. Used by
 #: :func:`estimate_pixel_dims` for fast pre-flight pixel-grid sizing;
 #: slightly over-counts longitude pixels away from the equator (which
@@ -471,7 +473,9 @@ def crop_to_aoi(
     polygon become no-data and the raster is trimmed to the polygon's cell
     extent. Otherwise it is cropped to the rectangular `bbox`. Centralising
     the choice lets every raster backend honour a polygon `aoi=` the same
-    way without duplicating the branch.
+    way without duplicating the branch. On the polygon path a raster that
+    declares no no-data value logs a warning, since the mask can then only
+    trim to the polygon's bounding box (see `_crop_to_mask`).
 
     Args:
         dataset: A `pyramids.Dataset` (anything exposing `crop`).
@@ -489,8 +493,38 @@ def crop_to_aoi(
     """
     geometry = getattr(space, "geometry", None)
     if geometry is not None:
-        return dataset.crop(mask=geometry, touch=True)
+        return _crop_to_mask(dataset, geometry, touch=True)
     return dataset.crop(bbox=list(bbox), epsg=epsg, touch=touch)
+
+
+def _crop_to_mask(dataset: Any, geometry: Any, *, touch: bool) -> Any:
+    """Mask a `Dataset` to `geometry`, warning when it has no no-data value.
+
+    `pyramids.Dataset.crop(mask=...)` writes the dataset's no-data value
+    into the cells outside the polygon. If the raster declares no no-data
+    value, those cells cannot be flagged, so the mask effectively only
+    trims the raster to the polygon's bounding box rather than to the exact
+    shape. That silent degradation is surfaced as a warning so a caller is
+    not misled into thinking a polygon `aoi=` was honoured precisely.
+
+    Args:
+        dataset: A `pyramids.Dataset` / `NetCDF` (anything exposing `crop`
+            and, ideally, `no_data_value`).
+        geometry: A WGS84 `GeoDataFrame` polygon mask.
+        touch: Whether to keep cells merely touching the polygon.
+
+    Returns:
+        The masked `Dataset`.
+    """
+    nodata = getattr(dataset, "no_data_value", None)
+    if nodata is not None and all(v is None for v in nodata):
+        logger.warning(
+            "polygon aoi= mask applied to a raster with no no-data value; "
+            "cells outside the polygon but inside its bounding box cannot be "
+            "flagged, so the result is trimmed to the polygon's bbox rather "
+            "than its exact shape."
+        )
+    return dataset.crop(mask=geometry, touch=touch)
 
 
 def mask_to_geometry(dataset: Any, space: Any, *, touch: bool = True) -> Any:
@@ -500,7 +534,10 @@ def mask_to_geometry(dataset: Any, space: Any, *, touch: bool = True) -> Any:
     cropped to the bbox by another route — CHIRPS's in-array numpy clip, or
     a server-side bbox (ECMWF's CDS `area`, a NetCDF cube). When `space`
     carries a polygon `geometry`, the dataset is masked to that exact shape
-    via `crop(mask=...)`; otherwise it is returned unchanged.
+    via `crop(mask=...)`; otherwise it is returned unchanged. As with
+    `crop_to_aoi`, masking a raster that declares no no-data value logs a
+    warning, since the mask can then only trim to the polygon's bounding box
+    (see `_crop_to_mask`).
 
     Args:
         dataset: A `pyramids.Dataset` / `NetCDF` (anything exposing `crop`).
@@ -516,4 +553,4 @@ def mask_to_geometry(dataset: Any, space: Any, *, touch: bool = True) -> Any:
     geometry = getattr(space, "geometry", None)
     if geometry is None:
         return dataset
-    return dataset.crop(mask=geometry, touch=touch)
+    return _crop_to_mask(dataset, geometry, touch=touch)

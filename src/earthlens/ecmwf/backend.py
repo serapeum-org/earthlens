@@ -831,11 +831,17 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
             masked = cube.crop(mask=geometry, touch=True)
             tmp = target.with_name(target.stem + ".masked" + target.suffix)
             masked.to_file(str(tmp))
-        except (AttributeError, NotImplementedError, ValueError) as exc:
+        except (AttributeError, NotImplementedError) as exc:
+            # The known pyramids#513 limitation: NetCDF.crop calls `crop`
+            # on a non-spatial aux variable (ERA5's `expver`). Degrade to
+            # the bbox NetCDF rather than failing the download. A genuine
+            # error (e.g. a ValueError for a polygon that does not overlap
+            # the data) is left to propagate — it is the caller's bug, not
+            # a pyramids limitation.
             logger.warning(
                 f"polygon aoi= masking skipped for {target.name}; the bbox "
                 f"crop is retained. pyramids could not mask this NetCDF cube "
-                f"({type(exc).__name__}: {exc})."
+                f"({type(exc).__name__}: {exc}) — see serapeum-org/pyramids#513."
             )
             return
         finally:

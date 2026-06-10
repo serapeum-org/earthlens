@@ -31,6 +31,9 @@ def normalize_dataset_variables(
       `{dataset: variables}` dict.
     * A dataset-keyed backend with a dict `variables` and an explicit
       `dataset` is ambiguous and raises.
+    * A dataset-keyed backend with an omitted `variables` (`None`) and an
+      explicit `dataset` composes an empty `{dataset: []}` rather than
+      tripping `list(None)`.
     * When `dataset` is `None`, `variables` is passed through unchanged,
       so the legacy nested-dict call keeps working untouched.
 
@@ -93,4 +96,7 @@ def normalize_dataset_variables(
             "pass variables= as a list when using dataset=, or omit "
             "dataset= and key the variables dict yourself"
         )
-    return {"variables": {dataset: list(variables)}}
+    # Mirror the AbstractDataSource.__init_subclass__ wrapper: an omitted
+    # variables= alongside dataset= composes an empty list rather than
+    # tripping `list(None)`.
+    return {"variables": {dataset: list(variables) if variables is not None else []}}

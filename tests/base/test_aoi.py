@@ -136,6 +136,20 @@ class TestNormalizeAoiGeometry:
         }
         assert normalize_aoi(aoi) == EXPECTED
 
+    def test_bbox_member_wrong_length_falls_through_to_coordinates(self):
+        """A bbox member that is neither 4- nor 6-long is ignored for coordinates."""
+        aoi = {
+            "type": "Polygon",
+            "bbox": [-75, 4, -74],  # malformed: 3 elements, not 4 or 6
+            "coordinates": [[[-75, 4], [-74, 4], [-74, 5], [-75, 5], [-75, 4]]],
+        }
+        assert normalize_aoi(aoi) == EXPECTED
+
+    def test_coordinates_tree_skips_non_coordinate_scalars(self):
+        """A stray non-coordinate scalar in the coordinate tree is ignored."""
+        aoi = {"type": "MultiPoint", "coordinates": [[-75, 4], [-74, 5], None]}
+        assert normalize_aoi(aoi) == EXPECTED
+
 
 class TestNormalizeAoiMalformedGeojson:
     """GeoJSON mappings that cannot define an area."""
@@ -296,12 +310,61 @@ class TestResolveAoiGeometry:
         _, _, geom = resolve_aoi(gdf.to_crs(3857))
         assert geom.crs.to_epsg() == 4326, f"mask not reprojected: {geom.crs}"
 
+    def test_non_polygonal_geodataframe_yields_no_mask(self):
+        """A GeoDataFrame of points carries no polygon mask, only its bbox."""
+        gpd = pytest.importorskip("geopandas")
+        shapely = pytest.importorskip("shapely")
+        gdf = gpd.GeoDataFrame(
+            geometry=[shapely.geometry.Point(-75, 4), shapely.geometry.Point(-74, 5)],
+            crs="EPSG:4326",
+        )
+        lat_lim, lon_lim, geom = resolve_aoi(gdf)
+        assert geom is None, f"a points frame should yield no mask, got {geom!r}"
+        assert (lat_lim, lon_lim) == EXPECTED, f"bbox mismatch: {lat_lim}, {lon_lim}"
+
+    def test_malformed_geojson_polygon_yields_no_mask(self):
+        """A degenerate (2-point) polygon ring carries a bbox but no mask."""
+        pytest.importorskip("shapely")
+        aoi = {"type": "Polygon", "coordinates": [[[-75, 4], [-74, 5]]]}
+        _, _, geom = resolve_aoi(aoi)
+        assert geom is None, f"a degenerate polygon should yield no mask, got {geom!r}"
+
+
+class TestOptionalDependencyFallback:
+    """Polygon-mask extraction degrades to None when shapely/geopandas are absent."""
+
+    def test_geojson_polygon_none_without_shapely(self, monkeypatch):
+        """`_geojson_polygon` returns None when shapely cannot be imported."""
+        import sys
+
+        from earthlens.base.spatial import _geojson_polygon
+
+        monkeypatch.setitem(sys.modules, "shapely.geometry", None)
+        monkeypatch.setitem(sys.modules, "shapely.ops", None)
+        aoi = {
+            "type": "Polygon",
+            "coordinates": [[[-75, 4], [-74, 4], [-74, 5], [-75, 5], [-75, 4]]],
+        }
+        assert _geojson_polygon(aoi) is None, "missing shapely should yield no mask"
+
+    def test_to_clip_gdf_none_without_geopandas(self, monkeypatch):
+        """`_to_clip_gdf` returns None when geopandas cannot be imported."""
+        import sys
+
+        shapely = pytest.importorskip("shapely")
+        from earthlens.base.spatial import _to_clip_gdf
+
+        monkeypatch.setitem(sys.modules, "geopandas", None)
+        poly = shapely.geometry.box(0, 0, 1, 1)
+        assert _to_clip_gdf(poly) is None, "missing geopandas should yield no mask"
+
 
 class _FakeCropDataset:
     """A stand-in pyramids Dataset that records how crop() was called."""
 
-    def __init__(self):
+    def __init__(self, no_data_value=(-9999.0,)):
         self.call = None
+        self.no_data_value = no_data_value
 
     def crop(self, mask=None, touch=True, *, bbox=None, epsg=None):
         self.call = {"mask": mask, "bbox": bbox, "epsg": epsg, "touch": touch}
@@ -365,3 +428,29 @@ class TestMaskToGeometry:
         """A space lacking a geometry attribute returns the dataset unchanged."""
         ds = _FakeCropDataset()
         assert mask_to_geometry(ds, object()) is ds, "should be unchanged"
+
+    def test_warns_when_raster_has_no_nodata(self):
+        """Masking a raster with no no-data value warns about the bbox degrade."""
+        from loguru import logger
+
+        ds = _FakeCropDataset(no_data_value=(None,))
+        messages = []
+        sink_id = logger.add(messages.append, level="WARNING")
+        try:
+            mask_to_geometry(ds, _ExtentStub(geometry=object()))
+        finally:
+            logger.remove(sink_id)
+        assert any("no no-data value" in m for m in messages), f"no warning: {messages}"
+
+    def test_no_warning_when_nodata_is_set(self):
+        """A raster that declares a no-data value masks quietly."""
+        from loguru import logger
+
+        ds = _FakeCropDataset(no_data_value=(-9999.0,))
+        messages = []
+        sink_id = logger.add(messages.append, level="WARNING")
+        try:
+            mask_to_geometry(ds, _ExtentStub(geometry=object()))
+        finally:
+            logger.remove(sink_id)
+        assert not any("no no-data value" in m for m in messages), f"warned: {messages}"

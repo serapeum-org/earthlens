@@ -256,6 +256,45 @@ class SpatialExtent(BaseModel):
             )
         return self
 
+    #: The scalar fields that define spatial identity. `geometry` is a
+    #: heavy, unhashable `GeoDataFrame` whose pandas `==` is non-boolean,
+    #: so it is deliberately excluded from equality / hashing (as it is
+    #: from serialisation) — two extents over the same bbox are equal and
+    #: hashable whether or not one carries a polygon mask.
+    _IDENTITY_FIELDS = (
+        "latitude_min",
+        "latitude_max",
+        "longitude_min",
+        "longitude_max",
+        "resolution",
+    )
+
+    def _identity(self) -> tuple[float | None, ...]:
+        """Return the bbox-identity tuple used for equality / hashing."""
+        return tuple(getattr(self, name) for name in self._IDENTITY_FIELDS)
+
+    def __eq__(self, other: object) -> bool:
+        """Compare two extents by bbox + resolution, ignoring `geometry`.
+
+        Overrides pydantic's field-wise equality, which would otherwise
+        evaluate `GeoDataFrame == GeoDataFrame` (a non-boolean pandas
+        result) and raise for a polygon-`aoi=` extent.
+
+        Args:
+            other: The object to compare against.
+
+        Returns:
+            `True` when `other` is a `SpatialExtent` with the same bbox
+            and resolution; `NotImplemented` for any other type.
+        """
+        if not isinstance(other, SpatialExtent):
+            return NotImplemented
+        return self._identity() == other._identity()
+
+    def __hash__(self) -> int:
+        """Hash by bbox + resolution, ignoring the unhashable `geometry`."""
+        return hash(self._identity())
+
     @classmethod
     def from_pairs(
         cls,

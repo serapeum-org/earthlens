@@ -220,9 +220,7 @@ class Earthdata(AbstractDataSource):
         """
         kinds = {ds.output_kind for ds in datasets}
         if len(kinds) > 1:
-            detail = ", ".join(
-                f"{ds.short_name}={ds.output_kind}" for ds in datasets
-            )
+            detail = ", ".join(f"{ds.short_name}={ds.output_kind}" for ds in datasets)
             raise ValueError(
                 "all datasets in one Earthdata request must share one "
                 f"output_kind; got mixed kinds ({detail}). Split the "
@@ -231,15 +229,17 @@ class Earthdata(AbstractDataSource):
         return kinds.pop()
 
     def _initialize(self):
-        """Build the :class:`EarthdataAuth`; defer the EDL login to fetch.
+        """Build the :class:`EarthdataAuth`; defer the EDL login.
 
         Returns `None` — `earthaccess` keeps the authenticated handle on
         the :class:`EarthdataAuth` instance (and a persisted token), so
         the parent class binds no opaque `self.client`. The EDL login
         (`EarthdataAuth.configure`, which contacts the auth server) is
-        deferred: :meth:`_fetch` already calls the idempotent
-        `configure()` before downloading, so constructing the backend
-        never authenticates and `_search()` stays offline.
+        deferred out of construction: it runs on the first :meth:`_search`
+        (CMR granule search authenticates via the idempotent `configure()`),
+        so constructing the backend never authenticates — but note that a
+        dry-run `search()` does, since CMR access goes through the same
+        `earthaccess` session.
         """
         creds = EarthdataCredentials(
             username=self._username,
@@ -469,9 +469,7 @@ class Earthdata(AbstractDataSource):
                 `region`.
         """
         caller = (
-            self._region
-            or os.getenv("AWS_REGION")
-            or os.getenv("AWS_DEFAULT_REGION")
+            self._region or os.getenv("AWS_REGION") or os.getenv("AWS_DEFAULT_REGION")
         )
         return caller == region
 
@@ -514,9 +512,7 @@ class Earthdata(AbstractDataSource):
             return self._aggregate(paths, aggregate)
         return paths
 
-    def _aggregate(
-        self, paths: list[Path], config: AggregationConfig
-    ) -> list[Path]:
+    def _aggregate(self, paths: list[Path], config: AggregationConfig) -> list[Path]:
         """Reduce fetched raster granules per-window via pyramids (`G6`).
 
         The routing is **axis-driven, not format-driven** — it depends
@@ -613,9 +609,7 @@ class Earthdata(AbstractDataSource):
         reduced.to_file(str(target))
         return [target]
 
-    def _reduce_stack(
-        self, paths: list[Path], config: AggregationConfig
-    ) -> list[Path]:
+    def _reduce_stack(self, paths: list[Path], config: AggregationConfig) -> list[Path]:
         """Window a stack of single-timestep granules via `groupby`.
 
         The common Earthdata aggregation case: many granules, each one

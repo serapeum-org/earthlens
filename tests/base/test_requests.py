@@ -53,3 +53,13 @@ class TestNormalizeDatasetVariables:
             normalize_dataset_variables(
                 _DictBackend, "africa-monthly", {"africa-monthly": ["precipitation"]}
             )
+
+    def test_dataset_without_variables_composes_empty_list(self):
+        """dataset= with no variables= composes {dataset: []}, not a TypeError."""
+        out = normalize_dataset_variables(_DictBackend, "africa-monthly", None)
+        assert out == {"variables": {"africa-monthly": []}}, f"got {out}"
+
+    def test_native_backend_dataset_without_variables(self):
+        """A native-dataset backend forwards dataset= with variables=None."""
+        out = normalize_dataset_variables(_NativeBackend, "sentinel-2", None)
+        assert out == {"dataset": "sentinel-2", "variables": None}, f"got {out}"

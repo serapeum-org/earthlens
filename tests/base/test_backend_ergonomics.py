@@ -119,6 +119,56 @@ class TestBackendPolygonMask:
         assert "geometry" not in space.model_dump(), "geometry must not serialise"
 
 
+class TestSpatialExtentGeometryIdentity:
+    """SpatialExtent equality / hashing ignore the polygon geometry (M1)."""
+
+    def _gdf(self, x):
+        gpd = pytest.importorskip("geopandas")
+        shapely = pytest.importorskip("shapely")
+        return gpd.GeoDataFrame(
+            geometry=[shapely.geometry.box(x, x, x + 1, x + 1)], crs="EPSG:4326"
+        )
+
+    def test_equal_bbox_different_geometry_compares_equal(self):
+        """Two extents over one bbox are equal whatever their masks."""
+        from earthlens.base.abstractdatasource import SpatialExtent
+
+        base = SpatialExtent.from_pairs([0.0, 5.0], [0.0, 5.0])
+        a = base.model_copy(update={"geometry": self._gdf(0)})
+        b = base.model_copy(update={"geometry": self._gdf(1)})
+        assert a == b, "same bbox must compare equal regardless of geometry"
+
+    def test_geometry_vs_none_does_not_raise(self):
+        """Comparing a polygon extent to a bbox extent returns a bool, not a crash."""
+        from earthlens.base.abstractdatasource import SpatialExtent
+
+        base = SpatialExtent.from_pairs([0.0, 5.0], [0.0, 5.0])
+        with_geom = base.model_copy(update={"geometry": self._gdf(0)})
+        assert with_geom == base, "geometry-vs-None must not raise and must be equal"
+
+    def test_different_bbox_not_equal(self):
+        """A different bbox is not equal even with the same mask object."""
+        from earthlens.base.abstractdatasource import SpatialExtent
+
+        gdf = self._gdf(0)
+        a = SpatialExtent.from_pairs([0.0, 5.0], [0.0, 5.0]).model_copy(
+            update={"geometry": gdf}
+        )
+        b = SpatialExtent.from_pairs([0.0, 9.0], [0.0, 5.0]).model_copy(
+            update={"geometry": gdf}
+        )
+        assert a != b, "different bbox must not compare equal"
+
+    def test_polygon_extent_is_hashable(self):
+        """A polygon-aoi extent hashes (by bbox) and can go in a set."""
+        from earthlens.base.abstractdatasource import SpatialExtent
+
+        base = SpatialExtent.from_pairs([0.0, 5.0], [0.0, 5.0])
+        a = base.model_copy(update={"geometry": self._gdf(0)})
+        assert hash(a) == hash(base), "geometry must not affect the hash"
+        assert len({a, base}) == 1, "equal-bbox extents collapse in a set"
+
+
 @pytest.mark.ecmwf
 class TestBackendDirectDatasetSplit:
     """dataset= splits into the keyed variables dict on a dataset-keyed backend."""
