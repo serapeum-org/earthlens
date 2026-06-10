@@ -613,6 +613,18 @@ class TestFacadeDelegation:
         with pytest.raises(AttributeError):
             facade.__nonexistent_dunder__
 
+    def test_attribute_before_backend_bound_raises(self):
+        """Accessing an attribute before `datasource` is set raises AttributeError."""
+        facade = EarthLens.__new__(EarthLens)
+        with pytest.raises(AttributeError, match="has no attribute"):
+            facade.some_attribute
+
+    def test_dir_includes_backend_attributes(self, tmp_path):
+        """dir() surfaces the bound backend's attributes for tab-completion."""
+        facade = self._facade(tmp_path)
+        names = dir(facade)
+        assert "vars" in names and "download" in names, "dir() should merge both"
+
 
 @pytest.mark.chc
 class TestFacadeSearch:

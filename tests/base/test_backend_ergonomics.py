@@ -108,6 +108,20 @@ class TestBackendDirectDatasetSplit:
             )
 
 
+class TestLazyClientMixin:
+    """The mixin's default _open_client guard."""
+
+    def test_missing_open_client_raises(self):
+        """A LazyClientMixin user that forgets _open_client fails on access."""
+        from earthlens.base import LazyClientMixin
+
+        class _NoOpen(LazyClientMixin):
+            pass
+
+        with pytest.raises(NotImplementedError, match="_open_client"):
+            _NoOpen().client
+
+
 class TestNativeAoiBackendUnaffected:
     """A backend with its own aoi= (WorldPop) keeps interpreting it."""
 
