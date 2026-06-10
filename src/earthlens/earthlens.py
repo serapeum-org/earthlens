@@ -1490,6 +1490,14 @@ def sources() -> list[str]:
             True
 
             ```
+        - The list is sorted, so the first key precedes the last:
+            ```python
+            >>> import earthlens
+            >>> keys = earthlens.sources()
+            >>> keys == sorted(keys)
+            True
+
+            ```
     """
     return sorted(EarthLens.DataSources)
 
@@ -1547,6 +1555,22 @@ def search(
     Raises:
         NotImplementedError: If the backend exposes no searchable product
             list (see :meth:`EarthLens.search`).
+
+    Examples:
+        - Dry-run a STAC search and inspect the first product id (live;
+          skipped here because it queries a remote catalog):
+            ```python
+            >>> import earthlens
+            >>> products = earthlens.search(  # doctest: +SKIP
+            ...     "stac",
+            ...     dataset="sentinel-2-l2a",
+            ...     variables=["red"],
+            ...     start="2020-06-01", end="2020-06-30",
+            ...     aoi=[-75, 4, -74, 5],
+            ... )
+            >>> products[0].id  # doctest: +SKIP
+
+            ```
     """
     return EarthLens(
         data_source=data_source,
