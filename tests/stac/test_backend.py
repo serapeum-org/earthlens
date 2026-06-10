@@ -54,8 +54,10 @@ class TestInitialize:
     """_initialize resolves the endpoint, builds the signer, opens the client."""
 
     def test_opens_client_with_endpoint_url(self, fake_pyramids, tmp_path):
-        """The client is opened against the endpoint's URL."""
-        _build_stac(tmp_path, endpoint="earth-search")
+        """The client is opened against the endpoint's URL (lazily, on first use)."""
+        stac = _build_stac(tmp_path, endpoint="earth-search")
+        assert not fake_pyramids.open_client_calls, "construction must not open a client"
+        _ = stac.client
         assert fake_pyramids.open_client_calls[0]["url"].startswith("https://earth-search")
 
     def test_signer_selected_per_endpoint(self, fake_pyramids, tmp_path):

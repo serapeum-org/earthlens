@@ -31,6 +31,7 @@ from loguru import logger
 
 from earthlens.base import (
     AbstractDataSource,
+    LazyClientMixin,
     OutputKind,
     RemoteProduct,
     SpatialExtent,
@@ -42,7 +43,7 @@ if TYPE_CHECKING:
     from earthlens.stac.catalog import Catalog, Collection, Endpoint
 
 
-class STAC(AbstractDataSource):
+class STAC(LazyClientMixin, AbstractDataSource):
     """Unified STAC-API + COG backend (Planetary Computer / CDSE / Earth Search).
 
     Attributes:
@@ -135,7 +136,6 @@ class STAC(AbstractDataSource):
         self._signer: Any = None
         # Per-collection signer overrides, built on demand and cached by type.
         self._signer_cache: dict[str, Any] = {}
-        self._client: Any = None
         super().__init__(
             start=start,
             end=end,
@@ -148,10 +148,13 @@ class STAC(AbstractDataSource):
         )
 
     def _initialize(self) -> None:
-        """Load the catalog, resolve the endpoint + signer, open the STAC client.
+        """Load the catalog and resolve the endpoint + signer (offline).
 
-        Returns `None` so the parent does not bind `self.client`; the opened
-        client is stored on `self._client`.
+        Eager, network-free setup: validate the request, load the catalog,
+        resolve the endpoint, and build the signer. Returns `None` — the
+        STAC client itself is opened lazily on first access to
+        `self.client` (see :meth:`_open_client`), so constructing the
+        backend never opens a connection.
 
         Raises:
             ValueError: When `variables` is empty, names an endpoint /
@@ -186,11 +189,22 @@ class STAC(AbstractDataSource):
         self._signer = build_signer(
             self._endpoint_obj.signer, **self._signer_credentials()
         )
+        return None
 
+    def _open_client(self) -> Any:
+        """Open the STAC API client for the resolved endpoint (lazily).
+
+        Called by :attr:`~earthlens.base.LazyClientMixin.client` on first
+        use, so the network round-trip `open_client` makes (reading the
+        API's landing page) happens at `search()` / `download()` time
+        rather than at construction.
+
+        Returns:
+            The opened STAC client, signed with the endpoint's signer.
+        """
         from pyramids.stac import open_client
 
-        self._client = open_client(self._endpoint_obj.url, signer=self._signer)
-        return None
+        return open_client(self._endpoint_obj.url, signer=self._signer)
 
     def _create_grid(self, lat_lim: list, lon_lim: list) -> SpatialExtent:
         """Build the search AOI bbox(es) and the WGS84 envelope.
@@ -265,7 +279,7 @@ class STAC(AbstractDataSource):
             assets = list(requested) or list(collection.default_assets)
             resolved_id = self._catalog.resolve(self._endpoint, collection_key)
             for bbox in self._bboxes():
-                search = self._client.search(
+                search = self.client.search(
                     collections=[resolved_id],
                     bbox=list(bbox),
                     datetime=f"{start}/{end}",
