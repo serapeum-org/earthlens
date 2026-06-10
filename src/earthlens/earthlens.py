@@ -460,9 +460,11 @@ class EarthLens:
                 `"worldpop"` (alias `"world-pop"`). See
                 `sorted(EarthLens.DataSources)` for the live list.
                 Defaults to `"chc"`.
-            temporal_resolution: `"daily"` or `"monthly"` for most
-                backends; the GEE backend also accepts `"raw"` and
-                `"yearly"`. The concrete backend may accept a narrower
+            temporal_resolution: The download cadence — `"daily"` or
+                `"monthly"` for most backends; the GEE backend also accepts
+                `"raw"` and `"yearly"`. Prefer the `cadence=` alias for the
+                download-cadence backends (CHIRPS / S3 / ECMWF / GEE). The
+                concrete backend may accept a narrower
                 set; check its `temporal_resolution` handling. Note the
                 meaning is backend-specific:
 
@@ -527,10 +529,12 @@ class EarthLens:
                   S3 backend's catalog.
 
                 Defaults to `None`.
-            lat_lim: `[lat_min, lat_max]`. Defaults to
+            lat_lim: Legacy latitude pair `[lat_min, lat_max]` — prefer the
+                single `aoi=` channel, which also accepts a bbox. Defaults to
                 :data:`DEFAULT_LATITUDE_LIMIT` (whole Earth). Mutually
                 exclusive with `aoi`.
-            lon_lim: `[lon_min, lon_max]`. Defaults to
+            lon_lim: Legacy longitude pair `[lon_min, lon_max]` — prefer the
+                single `aoi=` channel. Defaults to
                 :data:`DEFAULT_LONGITUDE_LIMIT` (whole Earth). Mutually
                 exclusive with `aoi`.
             fmt: `strptime` format tried first when `start` / `end` are
@@ -1385,8 +1389,10 @@ def download(
         end: Inclusive end date.
         path: Output directory; defaults to
             `./earthlens-data/<data_source>/` when omitted.
-        lat_lim: `[lat_min, lat_max]` (mutually exclusive with `aoi`).
-        lon_lim: `[lon_min, lon_max]` (mutually exclusive with `aoi`).
+        lat_lim: Legacy `[lat_min, lat_max]` pair — prefer `aoi=` (mutually
+            exclusive with it).
+        lon_lim: Legacy `[lon_min, lon_max]` pair — prefer `aoi=` (mutually
+            exclusive with it).
         aoi: A single area-of-interest (bbox / point+`buffer` / geometry).
         buffer: Half-width in degrees for a point `aoi`.
         temporal_resolution: Backend cadence / label. Defaults to
@@ -1497,8 +1503,10 @@ def search(
         end: Inclusive end date.
         path: Output directory (unused by a dry-run search, but accepted for
             signature parity with :func:`download`).
-        lat_lim: `[lat_min, lat_max]` (mutually exclusive with `aoi`).
-        lon_lim: `[lon_min, lon_max]` (mutually exclusive with `aoi`).
+        lat_lim: Legacy `[lat_min, lat_max]` pair — prefer `aoi=` (mutually
+            exclusive with it).
+        lon_lim: Legacy `[lon_min, lon_max]` pair — prefer `aoi=` (mutually
+            exclusive with it).
         aoi: A single area-of-interest (bbox / point+`buffer` / geometry).
         buffer: Half-width in degrees for a point `aoi`.
         temporal_resolution: Backend cadence / label. Defaults to `"daily"`.
