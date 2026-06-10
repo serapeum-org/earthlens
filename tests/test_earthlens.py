@@ -418,7 +418,47 @@ class TestTopLevelReExports:
             "AggregationConfig",
             "EarthLens",
             "aggregate_netcdf",
+            "download",
         ], f"Unexpected top-level __all__: {earthlens.__all__!r}"
+
+
+class TestFunctionalDownload:
+    """The one-shot earthlens.download() entry point."""
+
+    def test_download_is_exported(self):
+        """earthlens.download is a callable on the package surface."""
+        import earthlens
+
+        assert callable(earthlens.download), "download should be callable"
+
+    def test_download_delegates_to_facade(self, monkeypatch):
+        """download() builds an EarthLens and forwards the run-time args."""
+        import earthlens
+        from earthlens import earthlens as facade_module
+
+        captured = {}
+
+        class _FakeFacade:
+            def __init__(self, **kwargs):
+                captured["init"] = kwargs
+
+            def download(self, **kwargs):
+                captured["download"] = kwargs
+                return ["written.tif"]
+
+        monkeypatch.setattr(facade_module, "EarthLens", _FakeFacade)
+        result = earthlens.download(
+            data_source="chc",
+            variables=["precipitation"],
+            start="2009-01-01",
+            end="2009-01-02",
+            path="out",
+            progress_bar=False,
+        )
+        assert result == ["written.tif"], "should return the facade result"
+        assert captured["init"]["data_source"] == "chc"
+        assert captured["init"]["variables"] == ["precipitation"]
+        assert captured["download"] == {"progress_bar": False, "aggregate": None}
 
 
 @pytest.mark.chc

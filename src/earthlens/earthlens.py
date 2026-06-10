@@ -1127,3 +1127,86 @@ class EarthLens:
                 )
             kwargs["aggregate"] = aggregate
         return self.datasource.download(*args, progress_bar=progress_bar, **kwargs)
+
+
+def download(
+    data_source: str = "chc",
+    *,
+    variables: dict[str, list[str]] | list[str] | None = None,
+    dataset: str | None = None,
+    start: str | datetime | date | None = None,
+    end: str | datetime | date | None = None,
+    path: Path | str | None = None,
+    lat_lim: list[float] | None = None,
+    lon_lim: list[float] | None = None,
+    aoi: Any = None,
+    buffer: float | None = None,
+    temporal_resolution: str = "daily",
+    fmt: str = "%Y-%m-%d",
+    progress_bar: bool = True,
+    aggregate: AggregationConfig | None = None,
+    **backend_kwargs: object,
+) -> Any:
+    """Construct an :class:`EarthLens` and download in one call.
+
+    The one-shot convenience for the common case: it forwards every
+    request argument to :class:`EarthLens` and the run-time arguments to
+    :meth:`EarthLens.download`, so `earthlens.download(...)` replaces the
+    two-step construct-then-download.
+
+    Args:
+        data_source: Backend key (see `sorted(EarthLens.DataSources)`).
+            Defaults to `"chc"`.
+        variables: Variable specification, as for :class:`EarthLens`.
+        dataset: Explicit dataset / collection key (see
+            :class:`EarthLens`).
+        start: Inclusive start date (string / `datetime` / `date`).
+        end: Inclusive end date.
+        path: Output directory; defaults to
+            `./earthlens-data/<data_source>/` when omitted.
+        lat_lim: `[lat_min, lat_max]` (mutually exclusive with `aoi`).
+        lon_lim: `[lon_min, lon_max]` (mutually exclusive with `aoi`).
+        aoi: A single area-of-interest (bbox / point+`buffer` / geometry).
+        buffer: Half-width in degrees for a point `aoi`.
+        temporal_resolution: Backend cadence / label. Defaults to
+            `"daily"`.
+        fmt: `strptime` format override for string dates.
+        progress_bar: Whether the backend prints a progress bar.
+        aggregate: Optional :class:`~earthlens.aggregate.AggregationConfig`.
+        **backend_kwargs: Extra backend-specific options (see
+            :meth:`EarthLens.options_for`).
+
+    Returns:
+        Whatever :meth:`EarthLens.download` returns for the backend.
+
+    Examples:
+        - One-shot CHIRPS download. Marked `# doctest: +SKIP` because it
+          makes a live FTP connection:
+            ```python
+            >>> import earthlens
+            >>> earthlens.download(  # doctest: +SKIP
+            ...     data_source="chc",
+            ...     variables=["precipitation"],
+            ...     start="2009-01-01", end="2009-01-02",
+            ...     aoi=[-75.65, 4.19, -74.73, 4.64],
+            ...     path="examples/data/chirps",
+            ... )
+
+            ```
+    """
+    facade = EarthLens(
+        data_source=data_source,
+        variables=variables,
+        dataset=dataset,
+        start=start,
+        end=end,
+        path=path,
+        lat_lim=lat_lim,
+        lon_lim=lon_lim,
+        aoi=aoi,
+        buffer=buffer,
+        temporal_resolution=temporal_resolution,
+        fmt=fmt,
+        **backend_kwargs,
+    )
+    return facade.download(progress_bar=progress_bar, aggregate=aggregate)
