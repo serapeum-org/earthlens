@@ -38,6 +38,57 @@ DEFAULT_LONGITUDE_LIMIT = [-180, 180]
 #: (whole-Earth coverage).
 DEFAULT_LATITUDE_LIMIT = [-90, 90]
 
+#: Raster file suffixes that :func:`_load_path` reads into a pyramids object.
+#: A `.nc` is read as a `NetCDF`; every other suffix as a `Dataset`.
+_RASTER_SUFFIXES = frozenset(
+    {".tif", ".tiff", ".cog", ".nc", ".nc4", ".bil", ".vrt", ".jp2", ".img"}
+)
+
+
+def _load_path(path: Path) -> Any:
+    """Read a written raster `path` into a native pyramids object.
+
+    Args:
+        path: A path to a raster written by a backend's `download`.
+
+    Returns:
+        A `pyramids.NetCDF` for a `.nc` / `.nc4` path, else a
+        `pyramids.Dataset`.
+    """
+    if path.suffix.lower() in {".nc", ".nc4"}:
+        from pyramids.netcdf import NetCDF
+
+        return NetCDF.read_file(str(path))
+    from pyramids.dataset import Dataset
+
+    return Dataset.read_file(str(path))
+
+
+def _load_result(result: Any) -> Any:
+    """Turn a `download` result into in-memory objects for :meth:`EarthLens.load`.
+
+    A list of paths has each raster entry read into a pyramids object (via
+    :func:`_load_path`); non-raster entries (e.g. a `.csv` table) stay as their
+    `Path`. A non-list result (a `FeatureCollection` / `GeoDataFrame` /
+    `DataFrame` a backend already returns in memory) is passed through.
+
+    Args:
+        result: The value returned by `EarthLens.download`.
+
+    Returns:
+        The in-memory representation described above.
+    """
+    if not isinstance(result, list):
+        return result
+    return [
+        (
+            _load_path(item)
+            if isinstance(item, Path) and item.suffix.lower() in _RASTER_SUFFIXES
+            else item
+        )
+        for item in result
+    ]
+
 
 class _LazyRegistry(Mapping):
     """Maps a data-source key to its backend class, importing on demand.
@@ -1252,6 +1303,50 @@ class EarthLens:
             kwargs["aggregate"] = aggregate
         return self.datasource.download(*args, progress_bar=progress_bar, **kwargs)
 
+    def load(self, *args: object, **kwargs: object) -> Any:
+        """Download and return the data in memory instead of only on disk.
+
+        The lazy-stack convenience: runs :meth:`download` and hands back the
+        fetched data as the project's **native pyramids objects** rather than
+        leaving the caller to re-open files. Raster outputs are read into a
+        `pyramids.Dataset` / `NetCDF` (a `.nc` path becomes a `NetCDF`, every
+        other raster a `Dataset`); a non-raster output a backend already
+        returns in memory (a `FeatureCollection` / `GeoDataFrame` /
+        `DataFrame`) is passed through unchanged, as are non-raster file paths
+        (e.g. a `.csv` table from a mixed backend). The files are still written
+        to `path` — `load` adds the in-memory handle on top.
+
+        `xarray` is intentionally not the return type: a returned
+        `pyramids.Dataset` / `NetCDF` already exposes `.to_xarray()` for callers
+        who want the climate-stack interop, so EarthLens stays free of an
+        xarray dependency.
+
+        Args:
+            *args: Forwarded positionally to :meth:`download`.
+            **kwargs: Forwarded as keywords to :meth:`download`.
+
+        Returns:
+            For a raster / mixed backend, a list with each written raster read
+            into a `pyramids.Dataset` / `NetCDF` (non-raster entries left as
+            their `Path`); for a vector / tabular backend, the in-memory
+            `FeatureCollection` / `GeoDataFrame` / `DataFrame` `download`
+            returned.
+
+        Examples:
+            - Load CHIRPS precipitation into pyramids `Dataset` objects
+              (live; skipped here):
+                ```python
+                >>> from earthlens.earthlens import EarthLens
+                >>> rasters = EarthLens(  # doctest: +SKIP
+                ...     "chc", variables=["precipitation"],
+                ...     start="2020-01-01", end="2020-01-02", aoi=[-75, 4, -74, 5],
+                ... ).load()
+                >>> rasters[0].read_array()  # doctest: +SKIP
+
+                ```
+        """
+        return _load_result(self.download(*args, **kwargs))
+
 
 def download(
     data_source: str = "chc",
@@ -1270,6 +1365,7 @@ def download(
     fmt: str = "%Y-%m-%d",
     progress_bar: bool = True,
     aggregate: AggregationConfig | None = None,
+    load: bool = False,
     **backend_kwargs: object,
 ) -> Any:
     """Construct an :class:`EarthLens` and download in one call.
@@ -1300,11 +1396,16 @@ def download(
         fmt: `strptime` format override for string dates.
         progress_bar: Whether the backend prints a progress bar.
         aggregate: Optional :class:`~earthlens.aggregate.AggregationConfig`.
+        load: When `True`, return the data in memory via
+            :meth:`EarthLens.load` (written rasters read into pyramids
+            `Dataset` / `NetCDF` objects) instead of the written paths.
+            Defaults to `False`.
         **backend_kwargs: Extra backend-specific options (see
             :meth:`EarthLens.options_for`).
 
     Returns:
-        Whatever :meth:`EarthLens.download` returns for the backend.
+        Whatever :meth:`EarthLens.download` returns for the backend, or —
+        when `load=True` — the in-memory objects from :meth:`EarthLens.load`.
 
     Examples:
         - One-shot CHIRPS download. Marked `# doctest: +SKIP` because it
@@ -1337,4 +1438,6 @@ def download(
         fmt=fmt,
         **backend_kwargs,
     )
+    if load:
+        return facade.load(progress_bar=progress_bar, aggregate=aggregate)
     return facade.download(progress_bar=progress_bar, aggregate=aggregate)

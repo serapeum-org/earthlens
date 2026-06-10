@@ -478,6 +478,94 @@ class TestFunctionalDownload:
         ), f"facade must forward the backend paths; got {result}"
 
 
+def _write_ones_tif(path):
+    """Write a tiny all-ones GeoTIFF to `path` for load() tests."""
+    import numpy as np
+    from pyramids.dataset import Dataset
+
+    Dataset.create_from_array(
+        np.ones((4, 4), "float32"),
+        geo=(0.0, 1.0, 0.0, 4.0, 0.0, -1.0),
+        epsg=4326,
+        no_data_value=-9999.0,
+    ).to_file(str(path))
+
+
+class TestFacadeLoad:
+    """EarthLens.load() returns native pyramids objects in memory (H3)."""
+
+    def _facade(self, tmp_path):
+        return EarthLens(
+            "chc",
+            variables=["precipitation"],
+            start="2020-01-01",
+            end="2020-01-02",
+            path=str(tmp_path),
+        )
+
+    def test_load_reads_rasters_into_pyramids(self, tmp_path, monkeypatch):
+        """A list of written raster paths is read into pyramids Dataset objects."""
+        from pyramids.dataset import Dataset
+
+        tif = tmp_path / "ones.tif"
+        _write_ones_tif(tif)
+        facade = self._facade(tmp_path)
+        monkeypatch.setattr(facade.datasource, "download", lambda *a, **k: [tif])
+        loaded = facade.load(progress_bar=False)
+        assert isinstance(loaded[0], Dataset), f"raster not loaded: {loaded!r}"
+        assert loaded[0].read_array().shape == (4, 4), "loaded array shape wrong"
+
+    def test_load_passes_through_in_memory_result(self, tmp_path, monkeypatch):
+        """A non-list (GeoDataFrame / DataFrame) download result passes through."""
+        gpd = pytest.importorskip("geopandas")
+        shapely = pytest.importorskip("shapely")
+        gdf = gpd.GeoDataFrame(geometry=[shapely.geometry.box(0, 0, 1, 1)], crs=4326)
+        facade = self._facade(tmp_path)
+        monkeypatch.setattr(facade.datasource, "download", lambda *a, **k: gdf)
+        out = facade.load(progress_bar=False)
+        assert out is gdf, "in-memory result not passed through"
+
+    def test_load_leaves_non_raster_paths_alone(self, tmp_path):
+        """A mixed result reads rasters but leaves a .csv table as a Path."""
+        from pyramids.dataset import Dataset
+
+        from earthlens.earthlens import _load_result
+
+        tif = tmp_path / "ones.tif"
+        _write_ones_tif(tif)
+        csv = tmp_path / "table.csv"
+        csv.write_text("a,b\n1,2\n")
+        out = _load_result([tif, csv])
+        assert isinstance(out[0], Dataset), "raster should be loaded"
+        assert out[1] == csv, "a .csv table should stay a Path"
+
+    def test_module_download_load_true_calls_load(self, monkeypatch):
+        """earthlens.download(load=True) routes to EarthLens.load()."""
+        import earthlens
+        from earthlens import earthlens as facade_module
+
+        calls = {}
+
+        class _FakeFacade:
+            def __init__(self, **kwargs):
+                calls["init"] = kwargs
+
+            def download(self, **kwargs):
+                calls["download"] = True
+                return ["x.tif"]
+
+            def load(self, **kwargs):
+                calls["load"] = True
+                return ["loaded"]
+
+        monkeypatch.setattr(facade_module, "EarthLens", _FakeFacade)
+        result = earthlens.download(
+            data_source="chc", variables=["precipitation"], load=True
+        )
+        assert result == ["loaded"], "download(load=True) should return load()"
+        assert calls.get("load") and "download" not in calls, "should call load()"
+
+
 @pytest.mark.chc
 class TestFacadeCadence:
     """The cadence= alias for temporal_resolution."""
