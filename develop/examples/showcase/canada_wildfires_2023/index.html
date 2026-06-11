@@ -11699,7 +11699,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <span class="n">SERVICE_KEY</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"GEE_SERVICE_KEY"</span><span class="p">,</span> <span class="s2">"/path/to/key.json"</span><span class="p">)</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">grab</span><span class="p">(</span><span class="n">collection</span><span class="p">,</span> <span class="n">aoi</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">bands</span><span class="p">,</span> <span class="n">scale</span><span class="p">,</span> <span class="n">reducer</span><span class="o">=</span><span class="s2">"median"</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">"""Download one GEE composite over [start, end]; return its GeoTIFF path or None."""</span>
+<span class="w">    </span><span class="sd">"""Download one GEE composite over [start, end]; return its pyramids Dataset or None."""</span>
     <span class="n">el</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span><span class="n">data_source</span><span class="o">=</span><span class="s2">"gee"</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="n">end</span><span class="p">,</span> <span class="n">cadence</span><span class="o">=</span><span class="s2">"raw"</span><span class="p">,</span>
         <span class="n">dataset</span><span class="o">=</span><span class="n">collection</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">bands</span><span class="p">),</span> <span class="n">aoi</span><span class="o">=</span><span class="n">aoi</span><span class="p">,</span>
         <span class="n">path</span><span class="o">=</span><span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">(),</span> <span class="n">scale</span><span class="o">=</span><span class="n">scale</span><span class="p">,</span> <span class="n">reducer</span><span class="o">=</span><span class="n">reducer</span><span class="p">,</span>
@@ -11708,11 +11708,8 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
         <span class="n">el</span><span class="o">.</span><span class="n">authenticate</span><span class="p">()</span>                 <span class="c1"># only auth can fail here</span>
     <span class="k">except</span> <span class="n">AuthenticationError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">"auth skipped:"</span><span class="p">,</span> <span class="n">exc</span><span class="p">);</span> <span class="k">return</span> <span class="kc">None</span>
-    <span class="n">p</span> <span class="o">=</span> <span class="n">el</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">progress_bar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>   <span class="c1"># real errors now surface</span>
-    <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="k">if</span> <span class="n">p</span> <span class="k">else</span> <span class="kc">None</span>
-
-<span class="k">def</span><span class="w"> </span><span class="nf">read</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
-    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">Dataset</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">path</span><span class="p">))</span><span class="o">.</span><span class="n">read_array</span><span class="p">(),</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">"float32"</span><span class="p">)</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="n">el</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">progress_bar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>     <span class="c1"># load() reads the GeoTIFF into memory</span>
+    <span class="k">return</span> <span class="n">out</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">out</span> <span class="k">else</span> <span class="kc">None</span>
 
 <span class="c1"># FIRMS returns a GeoDataFrame of fire pixels (vector) -&gt; matplotlib scatter.</span>
 <span class="n">fires</span> <span class="o">=</span> <span class="kc">None</span>
@@ -11740,7 +11737,7 @@ SERVICE_ACCOUNT = os.environ.get("GEE_SERVICE_ACCOUNT", "my-sa@my-project.iam.gs
 SERVICE_KEY = os.environ.get("GEE_SERVICE_KEY", "/path/to/key.json")
 
 def grab(collection, aoi, start, end, bands, scale, reducer="median"):
-    """Download one GEE composite over [start, end]; return its GeoTIFF path or None."""
+    """Download one GEE composite over [start, end]; return its pyramids Dataset or None."""
     el = EarthLens(data_source="gee", start=start, end=end, cadence="raw",
         dataset=collection, variables=list(bands), aoi=aoi,
         path=tempfile.mkdtemp(), scale=scale, reducer=reducer,
@@ -11749,11 +11746,8 @@ def grab(collection, aoi, start, end, bands, scale, reducer="median"):
         el.authenticate()                 # only auth can fail here
     except AuthenticationError as exc:
         print("auth skipped:", exc); return None
-    p = el.download(progress_bar=False)   # real errors now surface
-    return str(p[0]) if p else None
-
-def read(path):
-    return np.asarray(Dataset.read_file(str(path)).read_array(), dtype="float32")
+    out = el.load(progress_bar=False)     # load() reads the GeoTIFF into memory
+    return out[0] if out else None
 
 # FIRMS returns a GeoDataFrame of fire pixels (vector) -&gt; matplotlib scatter.
 fires = None
@@ -11893,7 +11887,7 @@ else:
     <span class="n">p</span> <span class="o">=</span> <span class="n">grab</span><span class="p">(</span><span class="s2">"COPERNICUS/S2_SR_HARMONIZED"</span><span class="p">,</span> <span class="n">BURN_AOI</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="p">[</span><span class="s2">"B8"</span><span class="p">,</span> <span class="s2">"B12"</span><span class="p">],</span> <span class="n">scale</span><span class="o">=</span><span class="mi">80</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">p</span><span class="p">:</span>
         <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span>
-    <span class="n">a</span> <span class="o">=</span> <span class="n">read</span><span class="p">(</span><span class="n">p</span><span class="p">);</span> <span class="k">return</span> <span class="p">(</span><span class="n">a</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">a</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">/</span> <span class="p">(</span><span class="n">a</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">a</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mf">1e-6</span><span class="p">),</span> <span class="n">p</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">read_array</span><span class="p">(),</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">"float32"</span><span class="p">);</span> <span class="k">return</span> <span class="p">(</span><span class="n">a</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">a</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">/</span> <span class="p">(</span><span class="n">a</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">a</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mf">1e-6</span><span class="p">),</span> <span class="n">p</span>
 <span class="n">nbr_pre</span><span class="p">,</span> <span class="n">pp</span> <span class="o">=</span> <span class="n">nbr</span><span class="p">(</span><span class="s2">"2023-05-01"</span><span class="p">,</span> <span class="s2">"2023-05-31"</span><span class="p">);</span> <span class="n">nbr_post</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">nbr</span><span class="p">(</span><span class="s2">"2023-09-01"</span><span class="p">,</span> <span class="s2">"2023-09-30"</span><span class="p">)</span>
 <span class="k">if</span> <span class="n">nbr_pre</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">nbr_post</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
     <span class="n">h</span><span class="p">,</span> <span class="n">w</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">nbr_pre</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">nbr_post</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="nb">min</span><span class="p">(</span><span class="n">nbr_pre</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">nbr_post</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
@@ -11902,7 +11896,7 @@ else:
     <span class="n">px_km2</span> <span class="o">=</span> <span class="p">(</span><span class="mi">80</span> <span class="o">*</span> <span class="mi">80</span><span class="p">)</span> <span class="o">/</span> <span class="mf">1e6</span>
     <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">13</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
     <span class="c1"># dNBR is a single-band severity index -&gt; wrap into a Dataset and colour-map it with pyramids.</span>
-    <span class="n">src</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">pp</span><span class="p">)</span>
+    <span class="n">src</span> <span class="o">=</span> <span class="n">pp</span>
     <span class="p">(</span><span class="n">Dataset</span><span class="o">.</span><span class="n">create_from_array</span><span class="p">(</span><span class="n">arr</span><span class="o">=</span><span class="n">dnbr</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:],</span> <span class="n">geo</span><span class="o">=</span><span class="n">src</span><span class="o">.</span><span class="n">geotransform</span><span class="p">,</span> <span class="n">epsg</span><span class="o">=</span><span class="n">src</span><span class="o">.</span><span class="n">epsg</span><span class="p">)</span>
             <span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">band</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">"RdYlGn_r"</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">"dNBR burn severity"</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=-</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="mf">1.0</span><span class="p">))</span>
     <span class="n">areas</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">((</span><span class="n">dnbr</span> <span class="o">&gt;=</span> <span class="n">bounds</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">dnbr</span> <span class="o">&lt;</span> <span class="n">bounds</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]))</span> <span class="o">*</span> <span class="n">px_km2</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">)]</span>
@@ -11918,7 +11912,7 @@ def nbr(start, end):
     p = grab("COPERNICUS/S2_SR_HARMONIZED", BURN_AOI, start, end, ["B8", "B12"], scale=80)
     if not p:
         return None, None
-    a = read(p); return (a[0] - a[1]) / (a[0] + a[1] + 1e-6), p
+    a = np.asarray(p.read_array(), dtype="float32"); return (a[0] - a[1]) / (a[0] + a[1] + 1e-6), p
 nbr_pre, pp = nbr("2023-05-01", "2023-05-31"); nbr_post, _ = nbr("2023-09-01", "2023-09-30")
 if nbr_pre is not None and nbr_post is not None:
     h, w = min(nbr_pre.shape[0], nbr_post.shape[0]), min(nbr_pre.shape[1], nbr_post.shape[1])
@@ -11927,7 +11921,7 @@ if nbr_pre is not None and nbr_post is not None:
     px_km2 = (80 * 80) / 1e6
     fig, ax = plt.subplots(1, 2, figsize=(13, 5))
     # dNBR is a single-band severity index -&gt; wrap into a Dataset and colour-map it with pyramids.
-    src = Dataset.read_file(pp)
+    src = pp
     (Dataset.create_from_array(arr=dnbr[None, :, :], geo=src.geotransform, epsg=src.epsg)
             .plot(band=0, ax=ax[0], cmap="RdYlGn_r", title="dNBR burn severity", vmin=-0.1, vmax=1.0))
     areas = [np.sum((dnbr &gt;= bounds[i]) &amp; (dnbr &lt; bounds[i+1])) * px_km2 for i in range(5)]
