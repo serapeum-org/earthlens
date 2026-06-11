@@ -25,8 +25,7 @@ fc = EarthLens(
     lat_lim=[33.0, 35.0],           # Southern California
     lon_lim=[-119.0, -117.0],
     path="out/firms",
-    map_key="...",                  # or set FIRMS_MAP_KEY
-).download()
+).authenticate(api_key="...").download()   # or omit api_key= and set FIRMS_MAP_KEY
 
 fc.head()
 ```

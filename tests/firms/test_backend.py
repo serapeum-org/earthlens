@@ -14,8 +14,8 @@ from earthlens.firms import FIRMS, AuthenticationError
 from .conftest import EMPTY_CSV, VIIRS_CSV, _FakeFirms, _FakeResponse
 
 
-def _make_backend(tmp_path: Path, **overrides) -> FIRMS:
-    """Construct a FIRMS backend with test defaults and a no-op sleep."""
+def _unauthed_backend(tmp_path: Path, **overrides) -> FIRMS:
+    """Construct a FIRMS backend (no key resolved yet) with a no-op sleep."""
     params: dict[str, object] = dict(
         start="2024-08-01",
         end="2024-08-01",
@@ -23,12 +23,83 @@ def _make_backend(tmp_path: Path, **overrides) -> FIRMS:
         lat_lim=[33.0, 35.0],
         lon_lim=[-119.0, -117.0],
         path=str(tmp_path),
-        map_key="k",
     )
     params.update(overrides)
     backend = FIRMS(**params)
     backend._sleep = lambda _seconds: None
     return backend
+
+
+def _make_backend(tmp_path: Path, api_key: str = "k", **overrides) -> FIRMS:
+    """Construct a FIRMS backend armed with `api_key`, ready to download.
+
+    The credential now lives on `authenticate`, not the constructor, so
+    the helper arms the backend with `api_key` (default `"k"`).
+    """
+    backend = _unauthed_backend(tmp_path, **overrides)
+    backend.authenticate(api_key=api_key)
+    return backend
+
+
+@pytest.mark.firms
+class TestAuthenticate:
+    """Credentials resolve via authenticate(), not the constructor."""
+
+    def test_construct_without_key_is_unauthenticated(self, tmp_path: Path):
+        """The constructor takes no key and does not authenticate."""
+        backend = _unauthed_backend(tmp_path)
+        assert backend.client.is_authenticated() is False
+
+    def test_explicit_api_key_is_used(self, tmp_path: Path):
+        """An explicit api_key= is resolved and held."""
+        backend = _unauthed_backend(tmp_path)
+        backend.authenticate(api_key="explicit")
+        assert backend.client.map_key == "explicit"
+
+    def test_omitted_api_key_reads_env(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ):
+        """Omitting api_key= reads FIRMS_MAP_KEY from the environment."""
+        monkeypatch.setenv("FIRMS_MAP_KEY", "from-env")
+        backend = _unauthed_backend(tmp_path)
+        backend.authenticate()
+        assert backend.client.map_key == "from-env"
+
+    def test_explicit_api_key_beats_env(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ):
+        """An explicit api_key= wins over FIRMS_MAP_KEY."""
+        monkeypatch.setenv("FIRMS_MAP_KEY", "from-env")
+        backend = _unauthed_backend(tmp_path)
+        backend.authenticate(api_key="explicit")
+        assert backend.client.map_key == "explicit"
+
+    def test_no_key_anywhere_raises(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ):
+        """No api_key= and no env var raises AuthenticationError."""
+        monkeypatch.delenv("FIRMS_MAP_KEY", raising=False)
+        backend = _unauthed_backend(tmp_path)
+        with pytest.raises(AuthenticationError, match="api_key="):
+            backend.authenticate()
+
+    def test_download_lazily_authenticates_from_env(
+        self, tmp_path: Path, fake_firms: _FakeFirms
+    ):
+        """download() resolves the env key when authenticate() was never called."""
+        backend = _unauthed_backend(tmp_path)
+        result = backend.download(progress_bar=False)
+        assert backend.client.map_key == "k"  # fake_firms sets FIRMS_MAP_KEY=k
+        assert len(result) == 1
+
+    def test_download_without_key_raises(
+        self, tmp_path: Path, fake_firms: _FakeFirms, monkeypatch: pytest.MonkeyPatch
+    ):
+        """download() with no key anywhere raises AuthenticationError."""
+        monkeypatch.delenv("FIRMS_MAP_KEY", raising=False)
+        backend = _unauthed_backend(tmp_path)
+        with pytest.raises(AuthenticationError, match="MAP_KEY"):
+            backend.download(progress_bar=False)
 
 
 @pytest.mark.firms
@@ -143,7 +214,7 @@ class TestFetch:
     ):
         """An HTTP error must not echo the MAP_KEY (it rides in the URL)."""
         fake_firms.responses = [_FakeResponse("bad request", 400)]
-        backend = _make_backend(tmp_path, map_key="SUPERSECRETKEY123")
+        backend = _make_backend(tmp_path, api_key="SUPERSECRETKEY123")
         with pytest.raises(requests.HTTPError) as exc:
             backend.download(progress_bar=False)
         assert "SUPERSECRETKEY123" not in str(exc.value)
@@ -218,7 +289,6 @@ class TestConstructionGuards:
                 lat_lim=[33.0, 35.0],
                 lon_lim=[-119.0, -117.0],
                 path=str(tmp_path),
-                map_key="k",
             )
 
     def test_invalid_file_format_raises_value_error(self, tmp_path: Path):

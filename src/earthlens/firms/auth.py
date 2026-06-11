@@ -44,9 +44,10 @@ _MAP_KEY_URL = "https://firms.modaps.eosdis.nasa.gov/api/map_key/"
 class AuthenticationError(_BaseAuthenticationError):
     """Raised when no usable FIRMS `MAP_KEY` can be resolved.
 
-    Carries a message that names a fix: pass `map_key=` to `FIRMS(...)`,
-    set the `FIRMS_MAP_KEY` environment variable, or request a free key
-    at `firms.modaps.eosdis.nasa.gov/api/map_key/`. A subclass of the
+    Carries a message that names a fix: pass `api_key=` to
+    `EarthLens(...).authenticate()`, set the `FIRMS_MAP_KEY` environment
+    variable, or request a free key at
+    `firms.modaps.eosdis.nasa.gov/api/map_key/`. A subclass of the
     cross-backend :class:`earthlens.base.AuthenticationError` so callers
     can catch every backend's auth failure with one `except` clause.
     """
@@ -159,9 +160,9 @@ class FirmsAuth(AbstractAuth[FirmsCredentials]):
         )
         if not key:
             raise AuthenticationError(
-                "no FIRMS MAP_KEY available: pass map_key= to FIRMS(...) or "
-                "set the FIRMS_MAP_KEY environment variable. Request a free "
-                f"key at {_MAP_KEY_URL}."
+                "no FIRMS MAP_KEY available: pass api_key= to "
+                "EarthLens(...).authenticate() or set the FIRMS_MAP_KEY "
+                f"environment variable. Request a free key at {_MAP_KEY_URL}."
             )
         self._key = key
         self._configured = True

@@ -23,13 +23,17 @@ in the request URL, so avoid logging full FIRMS URLs.
 
 ## 2. Supply the key
 
-The backend resolves the key in this order on construction (the first
-`download()` builds and configures `FirmsAuth`):
+The key is **not** a constructor argument — the constructor describes
+only what to fetch. Supply it at the authentication step, which resolves
+it in this order:
 
-1. **An explicit `map_key=`** passed to `EarthLens(...)` / `FIRMS(...)`.
-2. **The `FIRMS_MAP_KEY` environment variable.**
+1. **An explicit `api_key=`** passed to `EarthLens(...).authenticate()`.
+2. **The `FIRMS_MAP_KEY` environment variable** (read when `api_key` is
+   omitted).
 
-If neither resolves, `FirmsAuth.configure()` raises
+`download()` calls `authenticate()` on your behalf if you never do, so
+the environment-variable path needs no explicit call. If neither source
+resolves a key, `authenticate()` raises
 `earthlens.firms.AuthenticationError` naming the map-key URL — it never
 blocks on an interactive prompt.
 
@@ -37,12 +41,12 @@ blocks on an interactive prompt.
 from earthlens import EarthLens
 
 # (a) explicit — handy in a notebook
-EarthLens(data_source="firms", map_key="...", ...)
+EarthLens(data_source="firms", ...).authenticate(api_key="...").download()
 
 # (b) environment — preferred for scripts / CI
 #   export FIRMS_MAP_KEY=...        (bash)
 #   $env:FIRMS_MAP_KEY = "..."      (PowerShell)
-EarthLens(data_source="firms", ...)
+EarthLens(data_source="firms", ...).download()   # authenticate() reads the env var
 ```
 
 ## 3. CI / secrets

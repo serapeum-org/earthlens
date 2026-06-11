@@ -1086,7 +1086,7 @@ class EarthLens:
             own |= set(dir(datasource))
         return sorted(own)
 
-    def authenticate(self) -> EarthLens:
+    def authenticate(self, **credentials: Any) -> EarthLens:
         """Eagerly authenticate the bound backend; raise on failure.
 
         The explicit, fail-fast counterpart to the lazy authentication
@@ -1097,6 +1097,18 @@ class EarthLens:
         no-op for credential-free backends. Lets callers separate "do I
         have valid credentials?" from the download itself, e.g. wrap only
         `authenticate()` in a `try/except AuthenticationError`.
+
+        Any keyword arguments are forwarded verbatim to the backend's
+        `authenticate`, so a backend that takes its credential there
+        receives it — e.g. FIRMS accepts `api_key=` (falling back to the
+        `FIRMS_MAP_KEY` environment variable when omitted). Passing a
+        credential a backend does not accept raises `TypeError`.
+
+        Args:
+            **credentials: Backend-specific credential keywords forwarded
+                to the bound backend's `authenticate` (e.g. FIRMS's
+                `api_key`). Empty for credential-free or env-resolved
+                backends.
 
         Returns:
             The facade, so it chains:
@@ -1118,8 +1130,20 @@ class EarthLens:
                 ... ).authenticate().download()
 
                 ```
+            - Pass a FIRMS key explicitly at the auth step (live;
+              skipped here):
+                ```python
+                >>> from earthlens.earthlens import EarthLens
+                >>> EarthLens(  # doctest: +SKIP
+                ...     data_source="firms",
+                ...     variables=["VIIRS_SNPP_NRT"],
+                ...     start="2024-08-01", end="2024-08-01",
+                ...     lat_lim=[33.0, 35.0], lon_lim=[-119.0, -117.0],
+                ... ).authenticate(api_key="…").download()
+
+                ```
         """
-        self.datasource.authenticate()
+        self.datasource.authenticate(**credentials)
         return self
 
     def search(self) -> list[RemoteProduct]:
