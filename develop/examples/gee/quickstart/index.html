@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -11818,6 +11818,7 @@ backend via its <code>_LazyRegistry</code>; the remaining kwargs forward verbati
     <span class="n">aoi</span><span class="o">=</span><span class="p">[</span><span class="mf">30.0</span><span class="p">,</span> <span class="mf">28.0</span><span class="p">,</span> <span class="mf">34.0</span><span class="p">,</span> <span class="mf">32.0</span><span class="p">],</span>
     <span class="n">path</span><span class="o">=</span><span class="s1">'out/quickstart'</span><span class="p">,</span>
     <span class="n">scale</span><span class="o">=</span><span class="mi">5566</span><span class="p">,</span>
+<span class="p">)</span><span class="o">.</span><span class="n">authenticate</span><span class="p">(</span>
     <span class="n">service_account</span><span class="o">=</span><span class="n">SERVICE_ACCOUNT</span><span class="p">,</span>
     <span class="n">service_key</span><span class="o">=</span><span class="n">SERVICE_KEY</span><span class="p">,</span>
 <span class="p">)</span>
@@ -11834,6 +11835,7 @@ backend via its <code>_LazyRegistry</code>; the remaining kwargs forward verbati
     aoi=[30.0, 28.0, 34.0, 32.0],
     path='out/quickstart',
     scale=5566,
+).authenticate(
     service_account=SERVICE_ACCOUNT,
     service_key=SERVICE_KEY,
 )

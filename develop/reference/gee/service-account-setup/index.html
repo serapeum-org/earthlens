@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -11321,10 +11321,11 @@ package (<code>pip install earthengine-api</code>, or it ships with the
 <a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a>    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">29.9</span><span class="p">,</span> <span class="mf">30.1</span><span class="p">],</span>
 <a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a>    <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">31.1</span><span class="p">,</span> <span class="mf">31.3</span><span class="p">],</span>
 <a id="__codelineno-7-10" name="__codelineno-7-10" href="#__codelineno-7-10"></a>    <span class="n">path</span><span class="o">=</span><span class="s2">&quot;data/gee&quot;</span><span class="p">,</span>
-<a id="__codelineno-7-11" name="__codelineno-7-11" href="#__codelineno-7-11"></a>    <span class="n">service_account</span><span class="o">=</span><span class="s2">&quot;earthlens-ee@&lt;PROJECT_ID&gt;.iam.gserviceaccount.com&quot;</span><span class="p">,</span>
-<a id="__codelineno-7-12" name="__codelineno-7-12" href="#__codelineno-7-12"></a>    <span class="n">service_key</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;C:\Users\you\.config\earthlens\ee-service-account.json&quot;</span><span class="p">,</span>
-<a id="__codelineno-7-13" name="__codelineno-7-13" href="#__codelineno-7-13"></a><span class="p">)</span>
-<a id="__codelineno-7-14" name="__codelineno-7-14" href="#__codelineno-7-14"></a><span class="n">el</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
+<a id="__codelineno-7-11" name="__codelineno-7-11" href="#__codelineno-7-11"></a><span class="p">)</span><span class="o">.</span><span class="n">authenticate</span><span class="p">(</span>
+<a id="__codelineno-7-12" name="__codelineno-7-12" href="#__codelineno-7-12"></a>    <span class="n">service_account</span><span class="o">=</span><span class="s2">&quot;earthlens-ee@&lt;PROJECT_ID&gt;.iam.gserviceaccount.com&quot;</span><span class="p">,</span>
+<a id="__codelineno-7-13" name="__codelineno-7-13" href="#__codelineno-7-13"></a>    <span class="n">service_key</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;C:\Users\you\.config\earthlens\ee-service-account.json&quot;</span><span class="p">,</span>
+<a id="__codelineno-7-14" name="__codelineno-7-14" href="#__codelineno-7-14"></a><span class="p">)</span>
+<a id="__codelineno-7-15" name="__codelineno-7-15" href="#__codelineno-7-15"></a><span class="n">el</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
 </code></pre></div>
 <p>For CI, store the key's <strong>contents</strong> in a secret (e.g.
 <code>GEE_SERVICE_KEY</code>) and the email in another (<code>GEE_SERVICE_ACCOUNT</code>);

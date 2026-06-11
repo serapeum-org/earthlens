@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -11998,7 +11998,7 @@ if seasons and 2018 in seasons and 2022 in seasons:
     <span class="n">pp</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span><span class="n">data_source</span><span class="o">=</span><span class="s1">'gee'</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="n">year</span><span class="si">}</span><span class="s1">-03-01'</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="n">year</span><span class="si">}</span><span class="s1">-05-31'</span><span class="p">,</span>
         <span class="n">cadence</span><span class="o">=</span><span class="s1">'raw'</span><span class="p">,</span> <span class="n">dataset</span><span class="o">=</span><span class="s1">'MODIS/061/MOD13A2'</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">'NDVI'</span><span class="p">],</span>
         <span class="n">aoi</span><span class="o">=</span><span class="p">[</span><span class="n">LON</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">LAT</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">LON</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">LAT</span><span class="p">[</span><span class="mi">1</span><span class="p">]],</span> <span class="n">path</span><span class="o">=</span><span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">(),</span> <span class="n">scale</span><span class="o">=</span><span class="mi">5000</span><span class="p">,</span> <span class="n">reducer</span><span class="o">=</span><span class="s1">'mean'</span><span class="p">,</span>
-        <span class="n">service_account</span><span class="o">=</span><span class="n">SA</span><span class="p">,</span> <span class="n">service_key</span><span class="o">=</span><span class="n">SK</span><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">progress_bar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">progress_bar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">pp</span><span class="p">:</span> <span class="k">return</span> <span class="kc">None</span>
     <span class="n">a</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">Dataset</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">pp</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span><span class="o">.</span><span class="n">read_array</span><span class="p">(),</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">'float32'</span><span class="p">)</span>
     <span class="k">return</span> <span class="p">(</span><span class="n">a</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">a</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">3</span> <span class="k">else</span> <span class="n">a</span><span class="p">)</span> <span class="o">*</span> <span class="mf">0.0001</span>        <span class="c1"># MODIS NDVI scale factor</span>
@@ -12027,7 +12027,7 @@ def mam_ndvi(year):
     pp = EarthLens(data_source='gee', start=f'{year}-03-01', end=f'{year}-05-31',
         cadence='raw', dataset='MODIS/061/MOD13A2', variables=['NDVI'],
         aoi=[LON[0], LAT[0], LON[1], LAT[1]], path=tempfile.mkdtemp(), scale=5000, reducer='mean',
-        service_account=SA, service_key=SK).download(progress_bar=False)
+        ).download(progress_bar=False)
     if not pp: return None
     a = np.asarray(Dataset.read_file(str(pp[0])).read_array(), dtype='float32')
     return (a[0] if a.ndim == 3 else a) * 0.0001        # MODIS NDVI scale factor

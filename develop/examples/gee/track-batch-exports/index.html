@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -11819,13 +11819,11 @@ print(f'output directory: {OUT_DIR.resolve()}')</div>
     <span class="n">cadence</span><span class="o">=</span><span class="s1">'daily'</span><span class="p">,</span>
     <span class="n">aoi</span><span class="o">=</span><span class="p">[</span><span class="mf">31.1</span><span class="p">,</span> <span class="mf">29.9</span><span class="p">,</span> <span class="mf">31.3</span><span class="p">,</span> <span class="mf">30.1</span><span class="p">],</span>
     <span class="n">path</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">OUT_DIR</span><span class="p">),</span>
-    <span class="n">service_account</span><span class="o">=</span><span class="n">SERVICE_ACCOUNT</span><span class="p">,</span>
-    <span class="n">service_key</span><span class="o">=</span><span class="n">SERVICE_KEY</span><span class="p">,</span>
     <span class="n">scale</span><span class="o">=</span><span class="mf">5566.0</span><span class="p">,</span>
     <span class="n">export_via</span><span class="o">=</span><span class="s1">'drive'</span><span class="p">,</span>
     <span class="n">drive_folder</span><span class="o">=</span><span class="s1">'earthlens_track_demo'</span><span class="p">,</span>
     <span class="n">wait_for_export</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>  <span class="c1"># &lt;- the key knob</span>
-<span class="p">)</span>
+<span class="p">)</span><span class="o">.</span><span class="n">authenticate</span><span class="p">(</span><span class="n">service_account</span><span class="o">=</span><span class="n">SERVICE_ACCOUNT</span><span class="p">,</span> <span class="n">service_key</span><span class="o">=</span><span class="n">SERVICE_KEY</span><span class="p">)</span>
 <span class="n">submitted</span> <span class="o">=</span> <span class="n">gee</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">progress_bar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'submitted </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">submitted</span><span class="p">)</span><span class="si">}</span><span class="s1"> task(s):'</span><span class="p">)</span>
 <span class="k">for</span> <span class="n">info</span> <span class="ow">in</span> <span class="n">submitted</span><span class="p">:</span>
@@ -11838,13 +11836,11 @@ print(f'output directory: {OUT_DIR.resolve()}')</div>
     cadence='daily',
     aoi=[31.1, 29.9, 31.3, 30.1],
     path=str(OUT_DIR),
-    service_account=SERVICE_ACCOUNT,
-    service_key=SERVICE_KEY,
     scale=5566.0,
     export_via='drive',
     drive_folder='earthlens_track_demo',
     wait_for_export=False,  # &lt;- the key knob
-)
+).authenticate(service_account=SERVICE_ACCOUNT, service_key=SERVICE_KEY)
 submitted = gee.download(progress_bar=False)
 print(f'submitted {len(submitted)} task(s):')
 for info in submitted:

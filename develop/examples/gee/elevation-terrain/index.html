@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -11958,11 +11958,9 @@ band ids (first 5):  ['elevation']
         <span class="n">aoi</span><span class="o">=</span><span class="p">[</span><span class="mf">31.1</span><span class="p">,</span> <span class="mf">29.9</span><span class="p">,</span> <span class="mf">31.3</span><span class="p">,</span> <span class="mf">30.1</span><span class="p">],</span>
         <span class="n">cadence</span><span class="o">=</span><span class="s1">'raw'</span><span class="p">,</span>
         <span class="n">path</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">OUT_DIR</span><span class="p">),</span>
-        <span class="n">service_account</span><span class="o">=</span><span class="n">SERVICE_ACCOUNT</span><span class="p">,</span>
-        <span class="n">service_key</span><span class="o">=</span><span class="n">SERVICE_KEY</span><span class="p">,</span>
         <span class="n">scale</span><span class="o">=</span><span class="mf">90.0</span><span class="p">,</span>
         <span class="n">reducer</span><span class="o">=</span><span class="s1">'mean'</span><span class="p">,</span>
-    <span class="p">)</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">authenticate</span><span class="p">(</span><span class="n">service_account</span><span class="o">=</span><span class="n">SERVICE_ACCOUNT</span><span class="p">,</span> <span class="n">service_key</span><span class="o">=</span><span class="n">SERVICE_KEY</span><span class="p">)</span>
     <span class="n">paths</span> <span class="o">=</span> <span class="n">gee</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">progress_bar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'wrote </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">paths</span><span class="p">)</span><span class="si">}</span><span class="s1"> GeoTIFF(s):'</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">paths</span><span class="p">:</span>
@@ -11984,11 +11982,9 @@ band ids (first 5):  ['elevation']
         aoi=[31.1, 29.9, 31.3, 30.1],
         cadence='raw',
         path=str(OUT_DIR),
-        service_account=SERVICE_ACCOUNT,
-        service_key=SERVICE_KEY,
         scale=90.0,
         reducer='mean',
-    )
+    ).authenticate(service_account=SERVICE_ACCOUNT, service_key=SERVICE_KEY)
     paths = gee.download(progress_bar=False)
     print(f'wrote {len(paths)} GeoTIFF(s):')
     for p in paths:
@@ -12271,14 +12267,12 @@ print(f'created folder: {DEMO_FOLDER}')</div>
         <span class="n">aoi</span><span class="o">=</span><span class="p">[</span><span class="mf">31.1</span><span class="p">,</span> <span class="mf">29.9</span><span class="p">,</span> <span class="mf">31.3</span><span class="p">,</span> <span class="mf">30.1</span><span class="p">],</span>
         <span class="n">cadence</span><span class="o">=</span><span class="s1">'raw'</span><span class="p">,</span>
         <span class="n">path</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">OUT_DIR</span><span class="p">),</span>
-        <span class="n">service_account</span><span class="o">=</span><span class="n">SERVICE_ACCOUNT</span><span class="p">,</span>
-        <span class="n">service_key</span><span class="o">=</span><span class="n">SERVICE_KEY</span><span class="p">,</span>
         <span class="n">scale</span><span class="o">=</span><span class="mf">90.0</span><span class="p">,</span>
         <span class="n">reducer</span><span class="o">=</span><span class="s1">'mean'</span><span class="p">,</span>
         <span class="n">export_via</span><span class="o">=</span><span class="s1">'asset'</span><span class="p">,</span>
         <span class="n">asset_id</span><span class="o">=</span><span class="n">DEMO_FOLDER</span><span class="p">,</span>
         <span class="n">wait_for_export</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-    <span class="p">)</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">authenticate</span><span class="p">(</span><span class="n">service_account</span><span class="o">=</span><span class="n">SERVICE_ACCOUNT</span><span class="p">,</span> <span class="n">service_key</span><span class="o">=</span><span class="n">SERVICE_KEY</span><span class="p">)</span>
     <span class="n">submitted</span> <span class="o">=</span> <span class="n">async_gee</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">progress_bar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
     <span class="n">task_info</span> <span class="o">=</span> <span class="n">submitted</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
     <span class="n">submitted_ok</span> <span class="o">=</span> <span class="kc">True</span>
@@ -12300,14 +12294,12 @@ try:
         aoi=[31.1, 29.9, 31.3, 30.1],
         cadence='raw',
         path=str(OUT_DIR),
-        service_account=SERVICE_ACCOUNT,
-        service_key=SERVICE_KEY,
         scale=90.0,
         reducer='mean',
         export_via='asset',
         asset_id=DEMO_FOLDER,
         wait_for_export=False,
-    )
+    ).authenticate(service_account=SERVICE_ACCOUNT, service_key=SERVICE_KEY)
     submitted = async_gee.download(progress_bar=False)
     task_info = submitted[0]
     submitted_ok = True

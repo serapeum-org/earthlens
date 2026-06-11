@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -11027,8 +11027,9 @@ backend), e.g. <code>pyramids.dataset.Dataset.read_file(...)</code>.</p>
 </tbody>
 </table>
 <p>Any extra keyword not named by the facade is forwarded verbatim to the backend
-constructor — e.g. ECMWF's <code>skip_constraints=</code>, or GEE's <code>service_account=</code> /
-<code>scale=</code> / <code>export_via=</code>.</p>
+constructor — e.g. ECMWF's <code>skip_constraints=</code>, or GEE's <code>scale=</code> /
+<code>export_via=</code> / <code>reducer=</code>. (Credentials are not constructor keywords — they go
+to <code>authenticate(...)</code>; see each backend's reference page.)</p>
 <h2 id="next-steps"><a class="toclink" href="#next-steps">Next steps</a><a class="headerlink" href="#next-steps" title="Permanent link">#</a></h2>
 <ul>
 <li><a href="../aggregation/">Temporal aggregation</a> — reduce a downloaded stack into
