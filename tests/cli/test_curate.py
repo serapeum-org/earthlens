@@ -523,8 +523,6 @@ class TestDeepProbers:
     def test_nwp_availability_direct_https_builds_url(self, monkeypatch):
         """_nwp_availability HEADs the first band's URL for a direct-https model."""
         import datetime as dt
-        import sys
-        import types
 
         from earthlens.nwp.catalog import NWPModel
 
@@ -537,9 +535,7 @@ class TestDeepProbers:
             calls["url"] = url
             return _Resp()
 
-        fake = types.ModuleType("requests")
-        fake.head = fake_head
-        monkeypatch.setitem(sys.modules, "requests", fake)
+        monkeypatch.setattr(curate_mod.requests, "head", fake_head)
         model = NWPModel(
             provider="dwd-opendata",
             backend="direct-https",

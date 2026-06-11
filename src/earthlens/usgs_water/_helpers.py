@@ -431,18 +431,20 @@ def normalize(
         pd.DataFrame: The canonical frame for this service.
     """
     if service == "samples":
-        return normalize_samples(df, code_meta)
-    if service == "statistics":
-        return normalize_statistics(df, flavour, code_meta)
-    if service == "sites":
-        return normalize_sites(df, flavour)
-    if service == "peaks":
-        return normalize_peaks(df, flavour)
-    if service == "ratings":
-        return normalize_ratings(df, flavour)
-    if flavour == "waterdata":
-        return normalize_modern_long(df, code_meta)
-    return normalize_legacy_wide(df, code_meta)
+        result = normalize_samples(df, code_meta)
+    elif service == "statistics":
+        result = normalize_statistics(df, flavour, code_meta)
+    elif service == "sites":
+        result = normalize_sites(df, flavour)
+    elif service == "peaks":
+        result = normalize_peaks(df, flavour)
+    elif service == "ratings":
+        result = normalize_ratings(df, flavour)
+    elif flavour == "waterdata":
+        result = normalize_modern_long(df, code_meta)
+    else:
+        result = normalize_legacy_wide(df, code_meta)
+    return result
 
 
 #: Output columns for the water-quality `samples` service (canonical

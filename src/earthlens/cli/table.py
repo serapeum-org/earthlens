@@ -47,6 +47,15 @@ def _format_number(value: float) -> str:
     return str(value)
 
 
+def _cadence_token(value: Any) -> str:
+    """Collapse an `interval`/`unit` cadence object (gee) to a token, or `""`."""
+    unit = getattr(value, "unit", None)
+    if not (isinstance(unit, str) and unit):
+        return ""
+    interval = getattr(value, "interval", None)
+    return unit if interval in (None, 1) else f"{interval} {unit}"
+
+
 def _facet_token(value: Any) -> str:
     """Reduce a record attribute to a clean facet token (or `""`).
 
@@ -79,21 +88,17 @@ def _facet_token(value: Any) -> str:
             ```
     """
     if value is None or isinstance(value, bool):
-        return ""
-    if isinstance(value, str):
-        return value.strip()
-    if isinstance(value, (int, float)):
-        return _format_number(value)
-    unit = getattr(value, "unit", None)
-    if isinstance(unit, str) and unit:
-        interval = getattr(value, "interval", None)
-        if interval in (None, 1):
-            return unit
-        return f"{interval} {unit}"
-    if isinstance(value, (list, tuple, set)):
-        tokens = [t for t in (_facet_token(v) for v in value) if t]
-        return ", ".join(dict.fromkeys(tokens))
-    return ""
+        token = ""
+    elif isinstance(value, str):
+        token = value.strip()
+    elif isinstance(value, (int, float)):
+        token = _format_number(value)
+    else:
+        token = _cadence_token(value)
+        if not token and isinstance(value, (list, tuple, set)):
+            tokens = [t for t in (_facet_token(v) for v in value) if t]
+            token = ", ".join(dict.fromkeys(tokens))
+    return token
 
 
 def _first_token(record: Any, attrs: tuple[str, ...]) -> str:
