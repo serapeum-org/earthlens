@@ -25,6 +25,9 @@ from typing import TYPE_CHECKING, Any
 
 from loguru import logger
 
+from earthlens.base import split_time
+from earthlens.base.spatial import resolve_aoi
+
 if TYPE_CHECKING:
     from earthlens.aggregate import AggregationConfig
     from earthlens.base import AbstractCatalog, AbstractDataSource, RemoteProduct
@@ -682,8 +685,6 @@ class EarthLens:
         if time is not None:
             if start is not None or end is not None:
                 raise ValueError("pass either time= or start=/end=, not both")
-            from earthlens.base import split_time
-
             start, end = split_time(time)
             # An open-ended interval (`"2020-01-01/"`) would leave a `None`
             # bound that the backend silently expands to "now" — a surprise
@@ -716,8 +717,6 @@ class EarthLens:
         elif aoi is not None:
             if lat_lim is not None or lon_lim is not None:
                 raise ValueError("pass either aoi= or lat_lim=/lon_lim=, not both")
-            from earthlens.base.spatial import resolve_aoi
-
             lat_lim, lon_lim, clip_geometry = resolve_aoi(aoi, buffer=buffer)
         elif buffer is not None:
             raise ValueError(
@@ -1334,6 +1333,7 @@ class EarthLens:
                     f"not have a meaningful gridded reduction."
                 )
             kwargs["aggregate"] = aggregate
+
         return self.datasource.download(*args, progress_bar=progress_bar, **kwargs)
 
     def load(self, *args: object, **kwargs: object) -> Any:

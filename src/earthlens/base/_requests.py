@@ -85,18 +85,18 @@ def normalize_dataset_variables(
             ```
     """
     if dataset is None:
-        return {"variables": variables}
-
-    params = inspect.signature(backend_cls.__init__).parameters
-    if "dataset" in params:
-        return {"dataset": dataset, "variables": variables}
-
-    if isinstance(variables, dict):
+        result = {"variables": variables}
+    elif "dataset" in inspect.signature(backend_cls.__init__).parameters:
+        result = {"dataset": dataset, "variables": variables}
+    elif isinstance(variables, dict):
         raise ValueError(
             "pass variables= as a list when using dataset=, or omit "
             "dataset= and key the variables dict yourself"
         )
-    # Mirror the AbstractDataSource.__init_subclass__ wrapper: an omitted
-    # variables= alongside dataset= composes an empty list rather than
-    # tripping `list(None)`.
-    return {"variables": {dataset: list(variables) if variables is not None else []}}
+    else:
+        # Mirror the AbstractDataSource.__init_subclass__ wrapper: an omitted
+        # variables= alongside dataset= composes an empty list rather than
+        # tripping `list(None)`.
+        composed = list(variables) if variables is not None else []
+        result = {"variables": {dataset: composed}}
+    return result
