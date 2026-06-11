@@ -496,8 +496,10 @@ class EarthLens:
                 `start` / `end` pair (STAC `"a/b"` / earthaccess `(a, b)`
                 idiom). Accepts a `"start/end"` string, a `(start, end)`
                 2-sequence, a `slice`, or a single date (an instant). Splits
-                into `start` / `end`; passing it together with `start` /
-                `end` raises `ValueError`. Defaults to `None`.
+                into `start` / `end`; both bounds are required (an
+                open-ended interval such as `"2020-01-01/"` raises), and
+                passing it together with `start` / `end` raises
+                `ValueError`. Defaults to `None`.
             path: Output directory. Created by the backend if it does
                 not exist. When omitted (`None`), defaults to
                 `./earthlens-data/<data_source>/` rather than the current
@@ -683,6 +685,15 @@ class EarthLens:
             from earthlens.base import split_time
 
             start, end = split_time(time)
+            # An open-ended interval (`"2020-01-01/"`) would leave a `None`
+            # bound that the backend silently expands to "now" — a surprise
+            # multi-year span. Require both bounds explicitly.
+            if start is None or end is None:
+                raise ValueError(
+                    "time= needs both bounds; got an open-ended interval. "
+                    "Pass an explicit start and end (e.g. "
+                    "time='2020-01-01/2020-01-31')."
+                )
 
         backend_cls = self.DataSources[data_source]
         backend_params = inspect.signature(backend_cls.__init__).parameters
@@ -1473,16 +1484,20 @@ def download(
 
 
 def sources() -> list[str]:
-    """Return the sorted list of registered `data_source` keys.
+    """Return the sorted list of distinct backends, one canonical key each.
 
     The top-level discovery entry point — no class needed to see what
-    backends `earthlens.download(...)` / :class:`EarthLens` accept.
+    backends `earthlens.download(...)` / :class:`EarthLens` accept. Alias and
+    endpoint keys (`"chirps"` for `"chc"`, `"google-earth-engine"` for
+    `"gee"`, the STAC endpoint keys `"planetary-computer"` / `"earth-search"`
+    / `"cdse"`, …) still work as `data_source=` values but are collapsed to
+    their canonical backend key here, so the list is one entry per backend.
 
     Returns:
-        Every registered key (including aliases), sorted.
+        The canonical `data_source` key of each registered backend, sorted.
 
     Examples:
-        - The CHIRPS and GEE keys are registered:
+        - The CHIRPS and GEE backends are listed by their canonical keys:
             ```python
             >>> import earthlens
             >>> keys = earthlens.sources()
@@ -1490,16 +1505,22 @@ def sources() -> list[str]:
             True
 
             ```
-        - The list is sorted, so the first key precedes the last:
+        - Aliases are collapsed, so each backend appears once:
             ```python
             >>> import earthlens
             >>> keys = earthlens.sources()
-            >>> keys == sorted(keys)
-            True
+            >>> "chirps" in keys or "google-earth-engine" in keys
+            False
 
             ```
     """
-    return sorted(EarthLens.DataSources)
+    seen_modules: set[str] = set()
+    canonical: list[str] = []
+    for key, module, _extras in EarthLens.DataSources.entries():
+        if module not in seen_modules:
+            seen_modules.add(module)
+            canonical.append(key)
+    return sorted(canonical)
 
 
 def search(
@@ -1620,7 +1641,12 @@ def find(text: str) -> dict[str, list[str]]:
     for source in sources():
         try:
             hits = EarthLens.guess_dataset(source, text)
-        except Exception:  # noqa: BLE001 - skip uninstalled / catalog-less backends
+        except (
+            Exception
+        ) as exc:  # noqa: BLE001 - skip uninstalled / catalog-less backends
+            # Log (rather than silently drop) so a real `guess_dataset`
+            # bug is traceable instead of just under-reporting.
+            logger.debug(f"find(): skipping {source!r}: {type(exc).__name__}: {exc}")
             continue
         if hits:
             matches[source] = hits

@@ -542,6 +542,25 @@ class TestFacadeLoad:
         assert isinstance(out[0], Dataset), "raster should be loaded"
         assert out[1] == csv, "a .csv table should stay a Path"
 
+    def test_load_reads_netcdf_into_netcdf(self, tmp_path):
+        """A written .nc path is read into a pyramids NetCDF, not a Dataset."""
+        import numpy as np
+        from pyramids.dataset import Dataset
+        from pyramids.netcdf import NetCDF
+
+        from earthlens.earthlens import _load_result
+
+        nc = tmp_path / "cube.nc"
+        Dataset.create_from_array(
+            np.ones((4, 4), "float32"),
+            geo=(0.0, 1.0, 0.0, 4.0, 0.0, -1.0),
+            epsg=4326,
+        ).to_file(str(nc))
+        out = _load_result([nc])
+        assert isinstance(
+            out[0], NetCDF
+        ), f"a .nc should read as NetCDF; got {out[0]!r}"
+
     def test_module_download_load_true_calls_load(self, monkeypatch):
         """earthlens.download(load=True) routes to EarthLens.load()."""
         import earthlens
@@ -579,6 +598,17 @@ class TestTopLevelDiscovery:
         keys = earthlens.sources()
         assert keys == sorted(keys), "sources() should be sorted"
         assert "chc" in keys and "gee" in keys, f"missing core keys: {keys[:5]}"
+
+    def test_sources_collapses_aliases_to_canonical(self):
+        """sources() lists one canonical key per backend, not the aliases."""
+        import earthlens
+
+        keys = earthlens.sources()
+        assert "chirps" not in keys, "the chirps alias should collapse to chc"
+        assert "google-earth-engine" not in keys, "the gee alias should collapse"
+        assert "planetary-computer" not in keys, "STAC endpoint keys collapse to stac"
+        assert "stac" in keys, "the canonical stac key should be present"
+        assert len(keys) == len(set(keys)), "no duplicate keys"
 
     def test_sources_is_exported(self):
         """sources / search / find are on the package surface."""
@@ -735,6 +765,20 @@ class TestFacadeTimeRange:
                 path=str(tmp_path),
                 time="2020-01-01/2020-02-01",
                 start="2020-01-01",
+            )
+
+    @pytest.mark.parametrize(
+        "time",
+        ["2020-01-01/", "/2020-01-31", ("2020-01-01", None), slice("2020-01-01", None)],
+    )
+    def test_open_ended_time_raises(self, tmp_path, time):
+        """An open-ended time= (a None bound) is rejected, not expanded to today."""
+        with pytest.raises(ValueError, match="needs both bounds"):
+            EarthLens(
+                "chc",
+                variables=["precipitation"],
+                path=str(tmp_path),
+                time=time,
             )
 
 
