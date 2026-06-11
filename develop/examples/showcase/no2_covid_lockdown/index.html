@@ -5451,6 +5451,23 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="What this notebook does">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#credentials" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Credentials
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -10840,6 +10857,23 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="What this notebook does">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#credentials" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Credentials
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -11667,6 +11701,22 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </div>
 </div>
 </div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=e5ea1916">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h3 id="credentials">Credentials<a class="anchor-link" href="#credentials">¶</a></h3><p>This notebook reads its credentials from a <code>.env</code> file at the repository root
+(loaded by the setup cell below — no extra dependency, and your <code>PATH</code> is left
+untouched). Create that <code>.env</code> with at least:</p>
+<div class="highlight"><pre><span></span>GEE_SERVICE_ACCOUNT="your-sa@your-project.iam.gserviceaccount.com"
+GEE_SERVICE_KEY="/path/to/your/service-account-key.json"
+</pre></div>
+</div>
+</div>
+</div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
 <div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=7a441766">
 <div class="jp-Cell-inputWrapper" tabindex="0">
@@ -11690,26 +11740,24 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span><span class="o">,</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span><span class="o">,</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">loguru</span><span class="w"> </span><span class="kn">import</span> <span class="n">logger</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">AuthenticationError</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span>   <span class="c1"># pyramids' own plotting</span>
 
 <span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">"ignore"</span><span class="p">)</span>
 <span class="n">logger</span><span class="o">.</span><span class="n">remove</span><span class="p">()</span>
-<span class="n">SERVICE_ACCOUNT</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"GEE_SERVICE_ACCOUNT"</span><span class="p">,</span> <span class="s2">"my-sa@my-project.iam.gserviceaccount.com"</span><span class="p">)</span>
-<span class="n">SERVICE_KEY</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"GEE_SERVICE_KEY"</span><span class="p">,</span> <span class="s2">"/path/to/key.json"</span><span class="p">)</span>
+<span class="c1"># --- credentials: load the repo-root .env into the environment (no extra dependency; never clobbers PATH) ---</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="k">for</span> <span class="n">_d</span> <span class="ow">in</span> <span class="p">[</span><span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">(),</span> <span class="o">*</span><span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">()</span><span class="o">.</span><span class="n">parents</span><span class="p">]:</span>
+    <span class="n">_env</span> <span class="o">=</span> <span class="n">_d</span> <span class="o">/</span> <span class="s2">".env"</span>
+    <span class="k">if</span> <span class="n">_env</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+        <span class="k">for</span> <span class="n">_ln</span> <span class="ow">in</span> <span class="n">_env</span><span class="o">.</span><span class="n">read_text</span><span class="p">()</span><span class="o">.</span><span class="n">splitlines</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">_ln</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">_ln</span><span class="o">.</span><span class="n">lstrip</span><span class="p">()</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">"#"</span><span class="p">)</span> <span class="ow">and</span> <span class="s2">"="</span> <span class="ow">in</span> <span class="n">_ln</span><span class="p">:</span>
+                <span class="n">_k</span><span class="p">,</span> <span class="n">_v</span> <span class="o">=</span> <span class="n">_ln</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">"="</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">_k</span><span class="o">.</span><span class="n">strip</span><span class="p">(),</span> <span class="n">_v</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s1">'"'</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s2">"'"</span><span class="p">))</span>
+        <span class="k">break</span>
 
-<span class="k">def</span><span class="w"> </span><span class="nf">grab</span><span class="p">(</span><span class="n">collection</span><span class="p">,</span> <span class="n">aoi</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">bands</span><span class="p">,</span> <span class="n">scale</span><span class="p">,</span> <span class="n">reducer</span><span class="o">=</span><span class="s2">"median"</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">"""Download one GEE composite over [start, end]; return its pyramids Dataset or None."""</span>
-    <span class="n">el</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span><span class="n">data_source</span><span class="o">=</span><span class="s2">"gee"</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="n">end</span><span class="p">,</span> <span class="n">cadence</span><span class="o">=</span><span class="s2">"raw"</span><span class="p">,</span>
-        <span class="n">dataset</span><span class="o">=</span><span class="n">collection</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">bands</span><span class="p">),</span> <span class="n">aoi</span><span class="o">=</span><span class="n">aoi</span><span class="p">,</span>
-        <span class="n">path</span><span class="o">=</span><span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">(),</span> <span class="n">scale</span><span class="o">=</span><span class="n">scale</span><span class="p">,</span> <span class="n">reducer</span><span class="o">=</span><span class="n">reducer</span><span class="p">,</span>
-        <span class="n">service_account</span><span class="o">=</span><span class="n">SERVICE_ACCOUNT</span><span class="p">,</span> <span class="n">service_key</span><span class="o">=</span><span class="n">SERVICE_KEY</span><span class="p">)</span>
-    <span class="k">try</span><span class="p">:</span>
-        <span class="n">el</span><span class="o">.</span><span class="n">authenticate</span><span class="p">()</span>                 <span class="c1"># only auth can fail here</span>
-    <span class="k">except</span> <span class="n">AuthenticationError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">"auth skipped:"</span><span class="p">,</span> <span class="n">exc</span><span class="p">);</span> <span class="k">return</span> <span class="kc">None</span>
-    <span class="n">out</span> <span class="o">=</span> <span class="n">el</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">progress_bar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>     <span class="c1"># load() reads the GeoTIFF into memory</span>
-    <span class="k">return</span> <span class="n">out</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">out</span> <span class="k">else</span> <span class="kc">None</span>
+<span class="n">SERVICE_ACCOUNT</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">"GEE_SERVICE_ACCOUNT"</span><span class="p">]</span>   <span class="c1"># Earth Engine service-account email (.env)</span>
+<span class="n">SERVICE_KEY</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">"GEE_SERVICE_KEY"</span><span class="p">]</span>           <span class="c1"># path to the service-account JSON key (.env)</span>
+
 
 <span class="k">def</span><span class="w"> </span><span class="nf">plot_arr</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">like_path</span><span class="p">,</span> <span class="n">ax</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""Colour-map a single-band derived grid (the NO2 column) with pyramids Dataset.plot."""</span>
@@ -11721,34 +11769,32 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">date</span>
 <span class="n">AOI</span> <span class="o">=</span> <span class="p">[</span><span class="mf">108.0</span><span class="p">,</span> <span class="mf">28.0</span><span class="p">,</span> <span class="mf">122.5</span><span class="p">,</span> <span class="mf">41.0</span><span class="p">];</span> <span class="n">C</span> <span class="o">=</span> <span class="s2">"COPERNICUS/S5P/OFFL/L3_NO2"</span>
 <span class="n">NO2</span> <span class="o">=</span> <span class="s2">"tropospheric_NO2_column_number_density"</span>
-<span class="n">a2019</span> <span class="o">=</span> <span class="n">grab</span><span class="p">(</span><span class="n">C</span><span class="p">,</span> <span class="n">AOI</span><span class="p">,</span> <span class="s2">"2019-02-01"</span><span class="p">,</span> <span class="s2">"2019-03-15"</span><span class="p">,</span> <span class="p">[</span><span class="n">NO2</span><span class="p">],</span> <span class="n">scale</span><span class="o">=</span><span class="mi">7000</span><span class="p">,</span> <span class="n">reducer</span><span class="o">=</span><span class="s2">"mean"</span><span class="p">)</span>
-<span class="n">a2020</span> <span class="o">=</span> <span class="n">grab</span><span class="p">(</span><span class="n">C</span><span class="p">,</span> <span class="n">AOI</span><span class="p">,</span> <span class="s2">"2020-02-01"</span><span class="p">,</span> <span class="s2">"2020-03-15"</span><span class="p">,</span> <span class="p">[</span><span class="n">NO2</span><span class="p">],</span> <span class="n">scale</span><span class="o">=</span><span class="mi">7000</span><span class="p">,</span> <span class="n">reducer</span><span class="o">=</span><span class="s2">"mean"</span><span class="p">)</span>
+<span class="n">a2019</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span><span class="n">data_source</span><span class="o">=</span><span class="s2">"gee"</span><span class="p">,</span> <span class="n">cadence</span><span class="o">=</span><span class="s2">"raw"</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">(),</span> <span class="n">service_account</span><span class="o">=</span><span class="n">SERVICE_ACCOUNT</span><span class="p">,</span> <span class="n">service_key</span><span class="o">=</span><span class="n">SERVICE_KEY</span><span class="p">,</span> <span class="n">dataset</span><span class="o">=</span><span class="n">C</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="n">NO2</span><span class="p">],</span> <span class="n">aoi</span><span class="o">=</span><span class="n">AOI</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="s2">"2019-02-01"</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">"2019-03-15"</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mi">7000</span><span class="p">,</span> <span class="n">reducer</span><span class="o">=</span><span class="s2">"mean"</span><span class="p">)</span><span class="o">.</span><span class="n">load</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">a2020</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span><span class="n">data_source</span><span class="o">=</span><span class="s2">"gee"</span><span class="p">,</span> <span class="n">cadence</span><span class="o">=</span><span class="s2">"raw"</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">(),</span> <span class="n">service_account</span><span class="o">=</span><span class="n">SERVICE_ACCOUNT</span><span class="p">,</span> <span class="n">service_key</span><span class="o">=</span><span class="n">SERVICE_KEY</span><span class="p">,</span> <span class="n">dataset</span><span class="o">=</span><span class="n">C</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="n">NO2</span><span class="p">],</span> <span class="n">aoi</span><span class="o">=</span><span class="n">AOI</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="s2">"2020-02-01"</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">"2020-03-15"</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mi">7000</span><span class="p">,</span> <span class="n">reducer</span><span class="o">=</span><span class="s2">"mean"</span><span class="p">)</span><span class="o">.</span><span class="n">load</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">"composites:"</span><span class="p">,</span> <span class="nb">bool</span><span class="p">(</span><span class="n">a2019</span><span class="p">),</span> <span class="nb">bool</span><span class="p">(</span><span class="n">a2020</span><span class="p">))</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-1">import os, tempfile, warnings
 import numpy as np, pandas as pd, matplotlib.pyplot as plt
 from loguru import logger
 from earthlens import EarthLens
-from earthlens.base import AuthenticationError
 from pyramids.dataset import Dataset   # pyramids' own plotting
 
 warnings.filterwarnings("ignore")
 logger.remove()
-SERVICE_ACCOUNT = os.environ.get("GEE_SERVICE_ACCOUNT", "my-sa@my-project.iam.gserviceaccount.com")
-SERVICE_KEY = os.environ.get("GEE_SERVICE_KEY", "/path/to/key.json")
+# --- credentials: load the repo-root .env into the environment (no extra dependency; never clobbers PATH) ---
+from pathlib import Path
+for _d in [Path.cwd(), *Path.cwd().parents]:
+    _env = _d / ".env"
+    if _env.exists():
+        for _ln in _env.read_text().splitlines():
+            if _ln.strip() and not _ln.lstrip().startswith("#") and "=" in _ln:
+                _k, _v = _ln.split("=", 1)
+                os.environ.setdefault(_k.strip(), _v.strip().strip('"').strip("'"))
+        break
 
-def grab(collection, aoi, start, end, bands, scale, reducer="median"):
-    """Download one GEE composite over [start, end]; return its pyramids Dataset or None."""
-    el = EarthLens(data_source="gee", start=start, end=end, cadence="raw",
-        dataset=collection, variables=list(bands), aoi=aoi,
-        path=tempfile.mkdtemp(), scale=scale, reducer=reducer,
-        service_account=SERVICE_ACCOUNT, service_key=SERVICE_KEY)
-    try:
-        el.authenticate()                 # only auth can fail here
-    except AuthenticationError as exc:
-        print("auth skipped:", exc); return None
-    out = el.load(progress_bar=False)     # load() reads the GeoTIFF into memory
-    return out[0] if out else None
+SERVICE_ACCOUNT = os.environ["GEE_SERVICE_ACCOUNT"]   # Earth Engine service-account email (.env)
+SERVICE_KEY = os.environ["GEE_SERVICE_KEY"]           # path to the service-account JSON key (.env)
+
 
 def plot_arr(arr, like_path, ax, **kw):
     """Colour-map a single-band derived grid (the NO2 column) with pyramids Dataset.plot."""
@@ -11760,8 +11806,8 @@ def plot_arr(arr, like_path, ax, **kw):
 from datetime import date
 AOI = [108.0, 28.0, 122.5, 41.0]; C = "COPERNICUS/S5P/OFFL/L3_NO2"
 NO2 = "tropospheric_NO2_column_number_density"
-a2019 = grab(C, AOI, "2019-02-01", "2019-03-15", [NO2], scale=7000, reducer="mean")
-a2020 = grab(C, AOI, "2020-02-01", "2020-03-15", [NO2], scale=7000, reducer="mean")
+a2019 = EarthLens(data_source="gee", cadence="raw", path=tempfile.mkdtemp(), service_account=SERVICE_ACCOUNT, service_key=SERVICE_KEY, dataset=C, variables=[NO2], aoi=AOI, start="2019-02-01", end="2019-03-15", scale=7000, reducer="mean").load()[0]
+a2020 = EarthLens(data_source="gee", cadence="raw", path=tempfile.mkdtemp(), service_account=SERVICE_ACCOUNT, service_key=SERVICE_KEY, dataset=C, variables=[NO2], aoi=AOI, start="2020-02-01", end="2020-03-15", scale=7000, reducer="mean").load()[0]
 print("composites:", bool(a2019), bool(a2020))</div>
 </div>
 </div>
@@ -11894,7 +11940,7 @@ if a2019 and a2020:
     <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="p">(</span><span class="mi">2019</span><span class="p">,</span> <span class="mi">2020</span><span class="p">,</span> <span class="mi">2021</span><span class="p">):</span>
         <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">13</span><span class="p">):</span>
             <span class="n">s</span> <span class="o">=</span> <span class="n">date</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span> <span class="n">e</span> <span class="o">=</span> <span class="n">date</span><span class="p">(</span><span class="n">y</span> <span class="o">+</span> <span class="p">(</span><span class="n">m</span> <span class="o">==</span> <span class="mi">12</span><span class="p">),</span> <span class="p">(</span><span class="n">m</span> <span class="o">%</span> <span class="mi">12</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-            <span class="n">p</span> <span class="o">=</span> <span class="n">grab</span><span class="p">(</span><span class="n">C</span><span class="p">,</span> <span class="n">AOI</span><span class="p">,</span> <span class="n">s</span><span class="o">.</span><span class="n">isoformat</span><span class="p">(),</span> <span class="n">e</span><span class="o">.</span><span class="n">isoformat</span><span class="p">(),</span> <span class="p">[</span><span class="n">NO2</span><span class="p">],</span> <span class="n">scale</span><span class="o">=</span><span class="mi">7000</span><span class="p">,</span> <span class="n">reducer</span><span class="o">=</span><span class="s2">"mean"</span><span class="p">)</span>
+            <span class="n">p</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span><span class="n">data_source</span><span class="o">=</span><span class="s2">"gee"</span><span class="p">,</span> <span class="n">cadence</span><span class="o">=</span><span class="s2">"raw"</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">(),</span> <span class="n">service_account</span><span class="o">=</span><span class="n">SERVICE_ACCOUNT</span><span class="p">,</span> <span class="n">service_key</span><span class="o">=</span><span class="n">SERVICE_KEY</span><span class="p">,</span> <span class="n">dataset</span><span class="o">=</span><span class="n">C</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="n">NO2</span><span class="p">],</span> <span class="n">aoi</span><span class="o">=</span><span class="n">AOI</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="n">s</span><span class="o">.</span><span class="n">isoformat</span><span class="p">(),</span> <span class="n">end</span><span class="o">=</span><span class="n">e</span><span class="o">.</span><span class="n">isoformat</span><span class="p">(),</span> <span class="n">scale</span><span class="o">=</span><span class="mi">7000</span><span class="p">,</span> <span class="n">reducer</span><span class="o">=</span><span class="s2">"mean"</span><span class="p">)</span><span class="o">.</span><span class="n">load</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
             <span class="k">if</span> <span class="n">p</span><span class="p">:</span>
                 <span class="n">arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">read_array</span><span class="p">(),</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">"float32"</span><span class="p">);</span> <span class="n">arr</span> <span class="o">=</span> <span class="n">arr</span> <span class="k">if</span> <span class="n">arr</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">2</span> <span class="k">else</span> <span class="n">arr</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
                 <span class="n">months</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">Timestamp</span><span class="p">(</span><span class="n">s</span><span class="p">));</span> <span class="n">vals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nanmean</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span> <span class="o">*</span> <span class="mf">1e6</span><span class="p">)</span>
@@ -11909,7 +11955,7 @@ if a2019 and a2020:
     for y in (2019, 2020, 2021):
         for m in range(1, 13):
             s = date(y, m, 1); e = date(y + (m == 12), (m % 12) + 1, 1)
-            p = grab(C, AOI, s.isoformat(), e.isoformat(), [NO2], scale=7000, reducer="mean")
+            p = EarthLens(data_source="gee", cadence="raw", path=tempfile.mkdtemp(), service_account=SERVICE_ACCOUNT, service_key=SERVICE_KEY, dataset=C, variables=[NO2], aoi=AOI, start=s.isoformat(), end=e.isoformat(), scale=7000, reducer="mean").load()[0]
             if p:
                 arr = np.asarray(p.read_array(), dtype="float32"); arr = arr if arr.ndim == 2 else arr[0]
                 months.append(pd.Timestamp(s)); vals.append(np.nanmean(arr) * 1e6)

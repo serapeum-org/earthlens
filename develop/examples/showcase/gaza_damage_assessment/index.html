@@ -5283,6 +5283,23 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="What this notebook does">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#credentials" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Credentials
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -10884,6 +10901,23 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="What this notebook does">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#credentials" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Credentials
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -11761,6 +11795,22 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </div>
 </div>
 </div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=d5a802ff">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h3 id="credentials">Credentials<a class="anchor-link" href="#credentials">¶</a></h3><p>This notebook reads its credentials from a <code>.env</code> file at the repository root
+(loaded by the setup cell below — no extra dependency, and your <code>PATH</code> is left
+untouched). Create that <code>.env</code> with at least:</p>
+<div class="highlight"><pre><span></span>GEE_SERVICE_ACCOUNT="your-sa@your-project.iam.gserviceaccount.com"
+GEE_SERVICE_KEY="/path/to/your/service-account-key.json"
+</pre></div>
+</div>
+</div>
+</div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
 <div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=76c55234">
 <div class="jp-Cell-inputWrapper" tabindex="0">
@@ -11785,14 +11835,24 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <span class="kn">from</span><span class="w"> </span><span class="nn">loguru</span><span class="w"> </span><span class="kn">import</span> <span class="n">logger</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">IPython.display</span><span class="w"> </span><span class="kn">import</span> <span class="n">Image</span><span class="p">,</span> <span class="n">display</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">AuthenticationError</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">DatasetCollection</span>   <span class="c1"># pyramids' own IO + plotting</span>
 
 <span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">"ignore"</span><span class="p">)</span>
-<span class="n">logger</span><span class="o">.</span><span class="n">remove</span><span class="p">()</span>   <span class="c1"># silence earthlens / pyramids / GDAL log chatter in the rendered notebook</span>
+<span class="n">logger</span><span class="o">.</span><span class="n">remove</span><span class="p">()</span>
+<span class="c1"># --- credentials: load the repo-root .env into the environment (no extra dependency; never clobbers PATH) ---</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="k">for</span> <span class="n">_d</span> <span class="ow">in</span> <span class="p">[</span><span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">(),</span> <span class="o">*</span><span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">()</span><span class="o">.</span><span class="n">parents</span><span class="p">]:</span>
+    <span class="n">_env</span> <span class="o">=</span> <span class="n">_d</span> <span class="o">/</span> <span class="s2">".env"</span>
+    <span class="k">if</span> <span class="n">_env</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+        <span class="k">for</span> <span class="n">_ln</span> <span class="ow">in</span> <span class="n">_env</span><span class="o">.</span><span class="n">read_text</span><span class="p">()</span><span class="o">.</span><span class="n">splitlines</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">_ln</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">_ln</span><span class="o">.</span><span class="n">lstrip</span><span class="p">()</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">"#"</span><span class="p">)</span> <span class="ow">and</span> <span class="s2">"="</span> <span class="ow">in</span> <span class="n">_ln</span><span class="p">:</span>
+                <span class="n">_k</span><span class="p">,</span> <span class="n">_v</span> <span class="o">=</span> <span class="n">_ln</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">"="</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">_k</span><span class="o">.</span><span class="n">strip</span><span class="p">(),</span> <span class="n">_v</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s1">'"'</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s2">"'"</span><span class="p">))</span>
+        <span class="k">break</span>
+   <span class="c1"># silence earthlens / pyramids / GDAL log chatter in the rendered notebook</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">rcParams</span><span class="p">[</span><span class="s2">"figure.dpi"</span><span class="p">]</span> <span class="o">=</span> <span class="mi">80</span>   <span class="c1"># keep embedded outputs lean</span>
-<span class="n">SERVICE_ACCOUNT</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"GEE_SERVICE_ACCOUNT"</span><span class="p">,</span> <span class="s2">"my-sa@my-project.iam.gserviceaccount.com"</span><span class="p">)</span>
-<span class="n">SERVICE_KEY</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"GEE_SERVICE_KEY"</span><span class="p">,</span> <span class="s2">"/path/to/key.json"</span><span class="p">)</span>
+<span class="n">SERVICE_ACCOUNT</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">"GEE_SERVICE_ACCOUNT"</span><span class="p">]</span>   <span class="c1"># Earth Engine service-account email (.env)</span>
+<span class="n">SERVICE_KEY</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">"GEE_SERVICE_KEY"</span><span class="p">]</span>           <span class="c1"># path to the service-account JSON key (.env)</span>
 
 <span class="n">AOI</span> <span class="o">=</span> <span class="p">[</span><span class="mf">34.28</span><span class="p">,</span> <span class="mf">31.32</span><span class="p">,</span> <span class="mf">34.33</span><span class="p">,</span> <span class="mf">31.37</span><span class="p">]</span>          <span class="c1"># Khan Younis, southern Gaza (lon/lat box)</span>
 <span class="n">COLL</span> <span class="o">=</span> <span class="s2">"COPERNICUS/S2_SR_HARMONIZED"</span>
@@ -11800,32 +11860,10 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
          <span class="s2">"2024-03-10"</span><span class="p">,</span> <span class="s2">"2024-05-09"</span><span class="p">,</span> <span class="s2">"2024-09-11"</span><span class="p">]</span>
 <span class="n">rgb_dir</span><span class="p">,</span> <span class="n">ndvi_dir</span> <span class="o">=</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">(),</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">()</span>
 
-<span class="k">def</span><span class="w"> </span><span class="nf">grab</span><span class="p">(</span><span class="n">bands</span><span class="p">,</span> <span class="n">day</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">"""Download one Sentinel-2 median composite for `day`; return its GeoTIFF path (or None)."""</span>
-    <span class="n">el</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
-        <span class="n">data_source</span><span class="o">=</span><span class="s2">"gee"</span><span class="p">,</span>
-        <span class="n">start</span><span class="o">=</span><span class="n">day</span><span class="p">,</span>
-        <span class="n">end</span><span class="o">=</span><span class="n">day</span><span class="p">,</span>
-        <span class="n">cadence</span><span class="o">=</span><span class="s2">"raw"</span><span class="p">,</span>
-        <span class="n">dataset</span><span class="o">=</span><span class="n">COLL</span><span class="p">,</span>
-        <span class="n">variables</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">bands</span><span class="p">),</span>
-        <span class="n">aoi</span><span class="o">=</span><span class="n">AOI</span><span class="p">,</span>
-        <span class="n">path</span><span class="o">=</span><span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">(),</span>
-        <span class="n">scale</span><span class="o">=</span><span class="n">scale</span><span class="p">,</span>
-        <span class="n">reducer</span><span class="o">=</span><span class="s2">"median"</span><span class="p">,</span>
-        <span class="n">service_account</span><span class="o">=</span><span class="n">SERVICE_ACCOUNT</span><span class="p">,</span>
-        <span class="n">service_key</span><span class="o">=</span><span class="n">SERVICE_KEY</span><span class="p">,</span>
-    <span class="p">)</span>
-    <span class="k">try</span><span class="p">:</span>
-        <span class="n">el</span><span class="o">.</span><span class="n">authenticate</span><span class="p">()</span>                 <span class="c1"># only auth can fail here</span>
-    <span class="k">except</span> <span class="n">AuthenticationError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">"auth skipped:"</span><span class="p">,</span> <span class="n">exc</span><span class="p">);</span> <span class="k">return</span> <span class="kc">None</span>
-    <span class="n">p</span> <span class="o">=</span> <span class="n">el</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">progress_bar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>   <span class="c1"># real errors now surface</span>
-    <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="k">if</span> <span class="n">p</span> <span class="k">else</span> <span class="kc">None</span>
 
 <span class="n">dates</span> <span class="o">=</span> <span class="p">[]</span>
 <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">DATES</span><span class="p">:</span>
-    <span class="n">rgb</span><span class="p">,</span> <span class="n">nir</span> <span class="o">=</span> <span class="n">grab</span><span class="p">([</span><span class="s2">"B4"</span><span class="p">,</span> <span class="s2">"B3"</span><span class="p">,</span> <span class="s2">"B2"</span><span class="p">],</span> <span class="n">d</span><span class="p">),</span> <span class="n">grab</span><span class="p">([</span><span class="s2">"B8"</span><span class="p">,</span> <span class="s2">"B4"</span><span class="p">],</span> <span class="n">d</span><span class="p">)</span>
+    <span class="n">rgb</span><span class="p">,</span> <span class="n">nir</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">EarthLens</span><span class="p">(</span><span class="n">data_source</span><span class="o">=</span><span class="s2">"gee"</span><span class="p">,</span> <span class="n">cadence</span><span class="o">=</span><span class="s2">"raw"</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">(),</span> <span class="n">service_account</span><span class="o">=</span><span class="n">SERVICE_ACCOUNT</span><span class="p">,</span> <span class="n">service_key</span><span class="o">=</span><span class="n">SERVICE_KEY</span><span class="p">,</span> <span class="n">dataset</span><span class="o">=</span><span class="n">COLL</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">"B4"</span><span class="p">,</span> <span class="s2">"B3"</span><span class="p">,</span> <span class="s2">"B2"</span><span class="p">],</span> <span class="n">aoi</span><span class="o">=</span><span class="n">AOI</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="n">d</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="n">d</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">reducer</span><span class="o">=</span><span class="s2">"median"</span><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">progress_bar</span><span class="o">=</span><span class="kc">False</span><span class="p">)[</span><span class="mi">0</span><span class="p">]),</span> <span class="nb">str</span><span class="p">(</span><span class="n">EarthLens</span><span class="p">(</span><span class="n">data_source</span><span class="o">=</span><span class="s2">"gee"</span><span class="p">,</span> <span class="n">cadence</span><span class="o">=</span><span class="s2">"raw"</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">(),</span> <span class="n">service_account</span><span class="o">=</span><span class="n">SERVICE_ACCOUNT</span><span class="p">,</span> <span class="n">service_key</span><span class="o">=</span><span class="n">SERVICE_KEY</span><span class="p">,</span> <span class="n">dataset</span><span class="o">=</span><span class="n">COLL</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">"B8"</span><span class="p">,</span> <span class="s2">"B4"</span><span class="p">],</span> <span class="n">aoi</span><span class="o">=</span><span class="n">AOI</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="n">d</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="n">d</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">reducer</span><span class="o">=</span><span class="s2">"median"</span><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">progress_bar</span><span class="o">=</span><span class="kc">False</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">rgb</span> <span class="ow">and</span> <span class="n">nir</span><span class="p">):</span>
         <span class="k">continue</span>
     <span class="n">tag</span> <span class="o">=</span> <span class="n">d</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">"-"</span><span class="p">,</span> <span class="s2">"."</span><span class="p">)</span>
@@ -11847,14 +11885,24 @@ import numpy as np, pandas as pd, matplotlib.pyplot as plt
 from loguru import logger
 from IPython.display import Image, display
 from earthlens import EarthLens
-from earthlens.base import AuthenticationError
 from pyramids.dataset import Dataset, DatasetCollection   # pyramids' own IO + plotting
 
 warnings.filterwarnings("ignore")
-logger.remove()   # silence earthlens / pyramids / GDAL log chatter in the rendered notebook
+logger.remove()
+# --- credentials: load the repo-root .env into the environment (no extra dependency; never clobbers PATH) ---
+from pathlib import Path
+for _d in [Path.cwd(), *Path.cwd().parents]:
+    _env = _d / ".env"
+    if _env.exists():
+        for _ln in _env.read_text().splitlines():
+            if _ln.strip() and not _ln.lstrip().startswith("#") and "=" in _ln:
+                _k, _v = _ln.split("=", 1)
+                os.environ.setdefault(_k.strip(), _v.strip().strip('"').strip("'"))
+        break
+   # silence earthlens / pyramids / GDAL log chatter in the rendered notebook
 plt.rcParams["figure.dpi"] = 80   # keep embedded outputs lean
-SERVICE_ACCOUNT = os.environ.get("GEE_SERVICE_ACCOUNT", "my-sa@my-project.iam.gserviceaccount.com")
-SERVICE_KEY = os.environ.get("GEE_SERVICE_KEY", "/path/to/key.json")
+SERVICE_ACCOUNT = os.environ["GEE_SERVICE_ACCOUNT"]   # Earth Engine service-account email (.env)
+SERVICE_KEY = os.environ["GEE_SERVICE_KEY"]           # path to the service-account JSON key (.env)
 
 AOI = [34.28, 31.32, 34.33, 31.37]          # Khan Younis, southern Gaza (lon/lat box)
 COLL = "COPERNICUS/S2_SR_HARMONIZED"
@@ -11862,32 +11910,10 @@ DATES = ["2023-01-15", "2023-05-15", "2023-09-12", "2023-12-11",
          "2024-03-10", "2024-05-09", "2024-09-11"]
 rgb_dir, ndvi_dir = tempfile.mkdtemp(), tempfile.mkdtemp()
 
-def grab(bands, day, scale=10):
-    """Download one Sentinel-2 median composite for `day`; return its GeoTIFF path (or None)."""
-    el = EarthLens(
-        data_source="gee",
-        start=day,
-        end=day,
-        cadence="raw",
-        dataset=COLL,
-        variables=list(bands),
-        aoi=AOI,
-        path=tempfile.mkdtemp(),
-        scale=scale,
-        reducer="median",
-        service_account=SERVICE_ACCOUNT,
-        service_key=SERVICE_KEY,
-    )
-    try:
-        el.authenticate()                 # only auth can fail here
-    except AuthenticationError as exc:
-        print("auth skipped:", exc); return None
-    p = el.download(progress_bar=False)   # real errors now surface
-    return str(p[0]) if p else None
 
 dates = []
 for d in DATES:
-    rgb, nir = grab(["B4", "B3", "B2"], d), grab(["B8", "B4"], d)
+    rgb, nir = str(EarthLens(data_source="gee", cadence="raw", path=tempfile.mkdtemp(), service_account=SERVICE_ACCOUNT, service_key=SERVICE_KEY, dataset=COLL, variables=["B4", "B3", "B2"], aoi=AOI, start=d, end=d, scale=10, reducer="median").download(progress_bar=False)[0]), str(EarthLens(data_source="gee", cadence="raw", path=tempfile.mkdtemp(), service_account=SERVICE_ACCOUNT, service_key=SERVICE_KEY, dataset=COLL, variables=["B8", "B4"], aoi=AOI, start=d, end=d, scale=10, reducer="median").download(progress_bar=False)[0])
     if not (rgb and nir):
         continue
     tag = d.replace("-", ".")
