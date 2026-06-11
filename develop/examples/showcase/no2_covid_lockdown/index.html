@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -11702,14 +11702,14 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=e5ea1916">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=a5dcb844">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
 <h3 id="credentials">Credentials<a class="anchor-link" href="#credentials">¶</a></h3><p>This notebook reads its credentials from a <code>.env</code> file at the repository root
-(loaded by the setup cell below — no extra dependency, and your <code>PATH</code> is left
+(loaded with <code>python-dotenv</code> by the setup cell below; your <code>PATH</code> is left
 untouched). Create that <code>.env</code> with at least:</p>
 <div class="highlight"><pre><span></span>GEE_SERVICE_ACCOUNT="your-sa@your-project.iam.gserviceaccount.com"
 GEE_SERVICE_KEY="/path/to/your/service-account-key.json"
@@ -11744,16 +11744,9 @@ GEE_SERVICE_KEY="/path/to/your/service-account-key.json"
 
 <span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">"ignore"</span><span class="p">)</span>
 <span class="n">logger</span><span class="o">.</span><span class="n">remove</span><span class="p">()</span>
-<span class="c1"># --- credentials: load the repo-root .env into the environment (no extra dependency; never clobbers PATH) ---</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
-<span class="k">for</span> <span class="n">_d</span> <span class="ow">in</span> <span class="p">[</span><span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">(),</span> <span class="o">*</span><span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">()</span><span class="o">.</span><span class="n">parents</span><span class="p">]:</span>
-    <span class="n">_env</span> <span class="o">=</span> <span class="n">_d</span> <span class="o">/</span> <span class="s2">".env"</span>
-    <span class="k">if</span> <span class="n">_env</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
-        <span class="k">for</span> <span class="n">_ln</span> <span class="ow">in</span> <span class="n">_env</span><span class="o">.</span><span class="n">read_text</span><span class="p">()</span><span class="o">.</span><span class="n">splitlines</span><span class="p">():</span>
-            <span class="k">if</span> <span class="n">_ln</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">_ln</span><span class="o">.</span><span class="n">lstrip</span><span class="p">()</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">"#"</span><span class="p">)</span> <span class="ow">and</span> <span class="s2">"="</span> <span class="ow">in</span> <span class="n">_ln</span><span class="p">:</span>
-                <span class="n">_k</span><span class="p">,</span> <span class="n">_v</span> <span class="o">=</span> <span class="n">_ln</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">"="</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-                <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">_k</span><span class="o">.</span><span class="n">strip</span><span class="p">(),</span> <span class="n">_v</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s1">'"'</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s2">"'"</span><span class="p">))</span>
-        <span class="k">break</span>
+<span class="c1"># --- credentials: load the repo-root .env with python-dotenv (PATH left untouched) ---</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dotenv</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_dotenv</span><span class="p">,</span> <span class="n">find_dotenv</span>
+<span class="n">load_dotenv</span><span class="p">(</span><span class="n">find_dotenv</span><span class="p">(</span><span class="n">usecwd</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
 
 <span class="n">SERVICE_ACCOUNT</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">"GEE_SERVICE_ACCOUNT"</span><span class="p">]</span>   <span class="c1"># Earth Engine service-account email (.env)</span>
 <span class="n">SERVICE_KEY</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">"GEE_SERVICE_KEY"</span><span class="p">]</span>           <span class="c1"># path to the service-account JSON key (.env)</span>
@@ -11781,16 +11774,9 @@ from pyramids.dataset import Dataset   # pyramids' own plotting
 
 warnings.filterwarnings("ignore")
 logger.remove()
-# --- credentials: load the repo-root .env into the environment (no extra dependency; never clobbers PATH) ---
-from pathlib import Path
-for _d in [Path.cwd(), *Path.cwd().parents]:
-    _env = _d / ".env"
-    if _env.exists():
-        for _ln in _env.read_text().splitlines():
-            if _ln.strip() and not _ln.lstrip().startswith("#") and "=" in _ln:
-                _k, _v = _ln.split("=", 1)
-                os.environ.setdefault(_k.strip(), _v.strip().strip('"').strip("'"))
-        break
+# --- credentials: load the repo-root .env with python-dotenv (PATH left untouched) ---
+from dotenv import load_dotenv, find_dotenv
+load_dotenv(find_dotenv(usecwd=True))
 
 SERVICE_ACCOUNT = os.environ["GEE_SERVICE_ACCOUNT"]   # Earth Engine service-account email (.env)
 SERVICE_KEY = os.environ["GEE_SERVICE_KEY"]           # path to the service-account JSON key (.env)

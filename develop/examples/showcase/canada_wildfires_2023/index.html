@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -11702,18 +11702,18 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=5025e9c7">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=b1710b756d064bee">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
 <h3 id="credentials">Credentials<a class="anchor-link" href="#credentials">¶</a></h3><p>This notebook reads its credentials from a <code>.env</code> file at the repository root
-(loaded by the setup cell below — no extra dependency, and your <code>PATH</code> is left
+(loaded with <code>python-dotenv</code> by the setup cell below; your <code>PATH</code> is left
 untouched). Create that <code>.env</code> with at least:</p>
 <div class="highlight"><pre><span></span>GEE_SERVICE_ACCOUNT="your-sa@your-project.iam.gserviceaccount.com"
 GEE_SERVICE_KEY="/path/to/your/service-account-key.json"
-FIRMS_MAP_KEY="your-free-NASA-FIRMS-map-key"   # optional: enables the active-fire layer
+FIRMS_MAP_KEY="your-free-NASA-FIRMS-map-key"   # for the active-fire layer
 </pre></div>
 </div>
 </div>
@@ -11745,33 +11745,20 @@ FIRMS_MAP_KEY="your-free-NASA-FIRMS-map-key"   # optional: enables the active-fi
 
 <span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">"ignore"</span><span class="p">)</span>
 <span class="n">logger</span><span class="o">.</span><span class="n">remove</span><span class="p">()</span>
-<span class="c1"># --- credentials: load the repo-root .env into the environment (no extra dependency; never clobbers PATH) ---</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
-<span class="k">for</span> <span class="n">_d</span> <span class="ow">in</span> <span class="p">[</span><span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">(),</span> <span class="o">*</span><span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">()</span><span class="o">.</span><span class="n">parents</span><span class="p">]:</span>
-    <span class="n">_env</span> <span class="o">=</span> <span class="n">_d</span> <span class="o">/</span> <span class="s2">".env"</span>
-    <span class="k">if</span> <span class="n">_env</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
-        <span class="k">for</span> <span class="n">_ln</span> <span class="ow">in</span> <span class="n">_env</span><span class="o">.</span><span class="n">read_text</span><span class="p">()</span><span class="o">.</span><span class="n">splitlines</span><span class="p">():</span>
-            <span class="k">if</span> <span class="n">_ln</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">_ln</span><span class="o">.</span><span class="n">lstrip</span><span class="p">()</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">"#"</span><span class="p">)</span> <span class="ow">and</span> <span class="s2">"="</span> <span class="ow">in</span> <span class="n">_ln</span><span class="p">:</span>
-                <span class="n">_k</span><span class="p">,</span> <span class="n">_v</span> <span class="o">=</span> <span class="n">_ln</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">"="</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-                <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">_k</span><span class="o">.</span><span class="n">strip</span><span class="p">(),</span> <span class="n">_v</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s1">'"'</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s2">"'"</span><span class="p">))</span>
-        <span class="k">break</span>
+<span class="c1"># --- credentials: load the repo-root .env with python-dotenv (PATH left untouched) ---</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dotenv</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_dotenv</span><span class="p">,</span> <span class="n">find_dotenv</span>
+<span class="n">load_dotenv</span><span class="p">(</span><span class="n">find_dotenv</span><span class="p">(</span><span class="n">usecwd</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
 
-<span class="n">SERVICE_ACCOUNT</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">"GEE_SERVICE_ACCOUNT"</span><span class="p">]</span>   <span class="c1"># Earth Engine service-account email (.env)</span>
-<span class="n">SERVICE_KEY</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">"GEE_SERVICE_KEY"</span><span class="p">]</span>           <span class="c1"># path to the service-account JSON key (.env)</span>
+<span class="n">SERVICE_ACCOUNT</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">"GEE_SERVICE_ACCOUNT"</span><span class="p">]</span>
+<span class="n">SERVICE_KEY</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">"GEE_SERVICE_KEY"</span><span class="p">]</span>
+<span class="n">FIRMS_MAP_KEY</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">"FIRMS_MAP_KEY"</span><span class="p">]</span>
 
 
 <span class="c1"># FIRMS returns a GeoDataFrame of fire pixels (vector) -&gt; matplotlib scatter.</span>
-<span class="n">fires</span> <span class="o">=</span> <span class="kc">None</span>
-<span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"FIRMS_MAP_KEY"</span><span class="p">):</span>
-    <span class="k">try</span><span class="p">:</span>
-        <span class="n">fires</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span><span class="n">data_source</span><span class="o">=</span><span class="s2">"firms"</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">"VIIRS_SNPP_SP"</span><span class="p">],</span>
-            <span class="n">start</span><span class="o">=</span><span class="s2">"2023-06-02"</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">"2023-06-08"</span><span class="p">,</span> <span class="n">aoi</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">80.0</span><span class="p">,</span> <span class="mf">48.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">72.0</span><span class="p">,</span> <span class="mf">53.0</span><span class="p">],</span>
-            <span class="n">path</span><span class="o">=</span><span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">())</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">progress_bar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">fires</span><span class="p">)</span><span class="si">:</span><span class="s2">,</span><span class="si">}</span><span class="s2"> fire detections"</span><span class="p">)</span>
-    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>  <span class="c1"># noqa: BLE001</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">"skipped FIRMS query:"</span><span class="p">,</span> <span class="n">exc</span><span class="p">)</span>
-<span class="k">else</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">"set FIRMS_MAP_KEY to run the FIRMS cells"</span><span class="p">)</span>
+<span class="n">fires</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span><span class="n">data_source</span><span class="o">=</span><span class="s2">"firms"</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">"VIIRS_SNPP_SP"</span><span class="p">],</span> <span class="n">map_key</span><span class="o">=</span><span class="n">FIRMS_MAP_KEY</span><span class="p">,</span>
+    <span class="n">start</span><span class="o">=</span><span class="s2">"2023-06-02"</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">"2023-06-08"</span><span class="p">,</span> <span class="n">aoi</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">80.0</span><span class="p">,</span> <span class="mf">48.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">72.0</span><span class="p">,</span> <span class="mf">53.0</span><span class="p">],</span>
+    <span class="n">path</span><span class="o">=</span><span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">())</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">progress_bar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">fires</span><span class="p">)</span><span class="si">:</span><span class="s2">,</span><span class="si">}</span><span class="s2"> fire detections"</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-1">import os, tempfile, warnings
 import numpy as np, pandas as pd, matplotlib.pyplot as plt
@@ -11781,33 +11768,20 @@ from pyramids.dataset import Dataset   # pyramids' own plotting
 
 warnings.filterwarnings("ignore")
 logger.remove()
-# --- credentials: load the repo-root .env into the environment (no extra dependency; never clobbers PATH) ---
-from pathlib import Path
-for _d in [Path.cwd(), *Path.cwd().parents]:
-    _env = _d / ".env"
-    if _env.exists():
-        for _ln in _env.read_text().splitlines():
-            if _ln.strip() and not _ln.lstrip().startswith("#") and "=" in _ln:
-                _k, _v = _ln.split("=", 1)
-                os.environ.setdefault(_k.strip(), _v.strip().strip('"').strip("'"))
-        break
+# --- credentials: load the repo-root .env with python-dotenv (PATH left untouched) ---
+from dotenv import load_dotenv, find_dotenv
+load_dotenv(find_dotenv(usecwd=True))
 
-SERVICE_ACCOUNT = os.environ["GEE_SERVICE_ACCOUNT"]   # Earth Engine service-account email (.env)
-SERVICE_KEY = os.environ["GEE_SERVICE_KEY"]           # path to the service-account JSON key (.env)
+SERVICE_ACCOUNT = os.environ["GEE_SERVICE_ACCOUNT"]
+SERVICE_KEY = os.environ["GEE_SERVICE_KEY"]
+FIRMS_MAP_KEY = os.environ["FIRMS_MAP_KEY"]
 
 
 # FIRMS returns a GeoDataFrame of fire pixels (vector) -&gt; matplotlib scatter.
-fires = None
-if os.environ.get("FIRMS_MAP_KEY"):
-    try:
-        fires = EarthLens(data_source="firms", variables=["VIIRS_SNPP_SP"],
-            start="2023-06-02", end="2023-06-08", aoi=[-80.0, 48.0, -72.0, 53.0],
-            path=tempfile.mkdtemp()).download(progress_bar=False)
-        print(f"{len(fires):,} fire detections")
-    except Exception as exc:  # noqa: BLE001
-        print("skipped FIRMS query:", exc)
-else:
-    print("set FIRMS_MAP_KEY to run the FIRMS cells")</div>
+fires = EarthLens(data_source="firms", variables=["VIIRS_SNPP_SP"], map_key=FIRMS_MAP_KEY,
+    start="2023-06-02", end="2023-06-08", aoi=[-80.0, 48.0, -72.0, 53.0],
+    path=tempfile.mkdtemp()).download(progress_bar=False)
+print(f"{len(fires):,} fire detections")</div>
 </div>
 </div>
 </div>
@@ -11856,7 +11830,7 @@ else:
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="k">if</span> <span class="n">fires</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">fires</span><span class="p">):</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">fires</span><span class="p">):</span>
     <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
     <span class="n">sc</span> <span class="o">=</span> <span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">fires</span><span class="o">.</span><span class="n">longitude</span><span class="p">,</span> <span class="n">fires</span><span class="o">.</span><span class="n">latitude</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">fires</span><span class="o">.</span><span class="n">frp</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">lower</span><span class="o">=</span><span class="mi">1</span><span class="p">)),</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">"inferno"</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.6</span><span class="p">)</span>
     <span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">xlabel</span><span class="o">=</span><span class="s2">"longitude"</span><span class="p">,</span> <span class="n">ylabel</span><span class="o">=</span><span class="s2">"latitude"</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="sa">f</span><span class="s2">"VIIRS active fire, 2–8 Jun 2023 (</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">fires</span><span class="p">)</span><span class="si">:</span><span class="s2">,</span><span class="si">}</span><span class="s2">)"</span><span class="p">)</span>
@@ -11866,7 +11840,7 @@ else:
     <span class="n">plt</span><span class="o">.</span><span class="n">setp</span><span class="p">(</span><span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">get_xticklabels</span><span class="p">(),</span> <span class="n">rotation</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">ha</span><span class="o">=</span><span class="s2">"right"</span><span class="p">);</span> <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">();</span> <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"median FRP </span><span class="si">{</span><span class="n">fires</span><span class="o">.</span><span class="n">frp</span><span class="o">.</span><span class="n">median</span><span class="p">()</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> MW | total </span><span class="si">{</span><span class="n">fires</span><span class="o">.</span><span class="n">frp</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="o">/</span><span class="mf">1e3</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> GW"</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-2">if fires is not None and len(fires):
+<div class="clipboard-copy-txt" id="cell-2">if len(fires):
     fig, ax = plt.subplots(1, 2, figsize=(15, 5))
     sc = ax[0].scatter(fires.longitude, fires.latitude, c=np.log10(fires.frp.clip(lower=1)), cmap="inferno", s=6, alpha=0.6)
     ax[0].set(xlabel="longitude", ylabel="latitude", title=f"VIIRS active fire, 2–8 Jun 2023 ({len(fires):,})")
@@ -11934,6 +11908,7 @@ else:
     <span class="n">p</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span><span class="n">data_source</span><span class="o">=</span><span class="s2">"gee"</span><span class="p">,</span> <span class="n">cadence</span><span class="o">=</span><span class="s2">"raw"</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">(),</span> <span class="n">service_account</span><span class="o">=</span><span class="n">SERVICE_ACCOUNT</span><span class="p">,</span> <span class="n">service_key</span><span class="o">=</span><span class="n">SERVICE_KEY</span><span class="p">,</span> <span class="n">dataset</span><span class="o">=</span><span class="s2">"COPERNICUS/S2_SR_HARMONIZED"</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">"B8"</span><span class="p">,</span> <span class="s2">"B12"</span><span class="p">],</span> <span class="n">aoi</span><span class="o">=</span><span class="n">BURN_AOI</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="n">end</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mi">80</span><span class="p">,</span> <span class="n">reducer</span><span class="o">=</span><span class="s2">"median"</span><span class="p">)</span><span class="o">.</span><span class="n">load</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
     <span class="n">a</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">read_array</span><span class="p">(),</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">"float32"</span><span class="p">);</span> <span class="k">return</span> <span class="p">(</span><span class="n">a</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">a</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">/</span> <span class="p">(</span><span class="n">a</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">a</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mf">1e-6</span><span class="p">),</span> <span class="n">p</span>
 <span class="n">nbr_pre</span><span class="p">,</span> <span class="n">pp</span> <span class="o">=</span> <span class="n">nbr</span><span class="p">(</span><span class="s2">"2023-05-01"</span><span class="p">,</span> <span class="s2">"2023-05-31"</span><span class="p">);</span> <span class="n">nbr_post</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">nbr</span><span class="p">(</span><span class="s2">"2023-09-01"</span><span class="p">,</span> <span class="s2">"2023-09-30"</span><span class="p">)</span>
+
 <span class="k">if</span> <span class="n">nbr_pre</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">nbr_post</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
     <span class="n">h</span><span class="p">,</span> <span class="n">w</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">nbr_pre</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">nbr_post</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="nb">min</span><span class="p">(</span><span class="n">nbr_pre</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">nbr_post</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
     <span class="n">dnbr</span> <span class="o">=</span> <span class="n">nbr_pre</span><span class="p">[:</span><span class="n">h</span><span class="p">,</span> <span class="p">:</span><span class="n">w</span><span class="p">]</span> <span class="o">-</span> <span class="n">nbr_post</span><span class="p">[:</span><span class="n">h</span><span class="p">,</span> <span class="p">:</span><span class="n">w</span><span class="p">]</span>
@@ -11957,6 +11932,7 @@ def nbr(start, end):
     p = EarthLens(data_source="gee", cadence="raw", path=tempfile.mkdtemp(), service_account=SERVICE_ACCOUNT, service_key=SERVICE_KEY, dataset="COPERNICUS/S2_SR_HARMONIZED", variables=["B8", "B12"], aoi=BURN_AOI, start=start, end=end, scale=80, reducer="median").load()[0]
     a = np.asarray(p.read_array(), dtype="float32"); return (a[0] - a[1]) / (a[0] + a[1] + 1e-6), p
 nbr_pre, pp = nbr("2023-05-01", "2023-05-31"); nbr_post, _ = nbr("2023-09-01", "2023-09-30")
+
 if nbr_pre is not None and nbr_post is not None:
     h, w = min(nbr_pre.shape[0], nbr_post.shape[0]), min(nbr_pre.shape[1], nbr_post.shape[1])
     dnbr = nbr_pre[:h, :w] - nbr_post[:h, :w]

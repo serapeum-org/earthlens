@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -11715,6 +11715,10 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
 <span class="n">logger</span><span class="o">.</span><span class="n">disable</span><span class="p">(</span><span class="s2">"earthlens"</span><span class="p">);</span> <span class="n">logger</span><span class="o">.</span><span class="n">disable</span><span class="p">(</span><span class="s2">"pyramids"</span><span class="p">)</span>
 
+<span class="c1"># --- credentials: load the repo-root .env with python-dotenv (PATH left untouched) ---</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dotenv</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_dotenv</span><span class="p">,</span> <span class="n">find_dotenv</span>
+<span class="n">load_dotenv</span><span class="p">(</span><span class="n">find_dotenv</span><span class="p">(</span><span class="n">usecwd</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+
 <span class="c1"># --- Download CHIRPS Mar-May monthly rainfall per year and sum to a season total ---</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span>
 <span class="n">LAT</span><span class="p">,</span> <span class="n">LON</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="mf">5.0</span><span class="p">,</span> <span class="mf">12.0</span><span class="p">],</span> <span class="p">[</span><span class="mf">38.0</span><span class="p">,</span> <span class="mf">52.0</span><span class="p">]</span>   <span class="c1"># Horn of Africa (Somalia / Ethiopia / Kenya)</span>
@@ -11744,6 +11748,10 @@ import numpy as np, pandas as pd, matplotlib.pyplot as plt
 from loguru import logger
 from earthlens import EarthLens
 logger.disable("earthlens"); logger.disable("pyramids")
+
+# --- credentials: load the repo-root .env with python-dotenv (PATH left untouched) ---
+from dotenv import load_dotenv, find_dotenv
+load_dotenv(find_dotenv(usecwd=True))
 
 # --- Download CHIRPS Mar-May monthly rainfall per year and sum to a season total ---
 from pyramids.dataset import Dataset
