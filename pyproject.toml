@@ -140,6 +140,8 @@ docs = [
     "matplotlib >=3.5",
     # pyramids-gis[viz] (cleopatra): showcase notebooks plot/animate Datasets.
     "pyramids-gis[viz] >=0.32.0",
+    # python-dotenv: showcase notebooks load credentials from a repo-root .env.
+    "python-dotenv >=1.0",
 ]
 
 notebook = [
