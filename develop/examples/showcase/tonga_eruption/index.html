@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -11681,7 +11681,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=ed74f1fb">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=10793eca">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -11696,6 +11696,46 @@ GEE_SERVICE_KEY="/path/to/your/service-account-key.json"
 </div>
 </div>
 </div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=739ebac7">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="CodeMirror cm-s-jupyter">
+<div class="zeroclipboard-container">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-1">
+<div>
+<span class="notice" hidden="">Copied!</span>
+<svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
+<path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+<path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+</svg>
+</div>
+</clipboard-copy>
+</div>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># Credentials — load the repo-root .env, then read the keys (clear KeyError if any is missing).</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dotenv</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_dotenv</span><span class="p">,</span> <span class="n">find_dotenv</span>
+<span class="n">load_dotenv</span><span class="p">(</span><span class="n">find_dotenv</span><span class="p">(</span><span class="n">usecwd</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+
+<span class="n">SERVICE_ACCOUNT</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">"GEE_SERVICE_ACCOUNT"</span><span class="p">]</span>   <span class="c1"># Earth Engine service-account email (.env)</span>
+<span class="n">SERVICE_KEY</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">"GEE_SERVICE_KEY"</span><span class="p">]</span>           <span class="c1"># path to the service-account JSON key (.env)</span>
+</pre></div>
+<div class="clipboard-copy-txt" id="cell-1"># Credentials — load the repo-root .env, then read the keys (clear KeyError if any is missing).
+import os
+from dotenv import load_dotenv, find_dotenv
+load_dotenv(find_dotenv(usecwd=True))
+
+SERVICE_ACCOUNT = os.environ["GEE_SERVICE_ACCOUNT"]   # Earth Engine service-account email (.env)
+SERVICE_KEY = os.environ["GEE_SERVICE_KEY"]           # path to the service-account JSON key (.env)
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
 <div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=4ab5b738">
 <div class="jp-Cell-inputWrapper" tabindex="0">
@@ -11705,7 +11745,7 @@ GEE_SERVICE_KEY="/path/to/your/service-account-key.json"
 <div class="jp-InputPrompt jp-InputArea-prompt">In [1]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-1">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-2">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -11723,20 +11763,13 @@ GEE_SERVICE_KEY="/path/to/your/service-account-key.json"
 
 <span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">"ignore"</span><span class="p">)</span>
 <span class="n">logger</span><span class="o">.</span><span class="n">remove</span><span class="p">()</span>
-<span class="c1"># --- credentials: load the repo-root .env with python-dotenv (PATH left untouched) ---</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">dotenv</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_dotenv</span><span class="p">,</span> <span class="n">find_dotenv</span>
-<span class="n">load_dotenv</span><span class="p">(</span><span class="n">find_dotenv</span><span class="p">(</span><span class="n">usecwd</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
-
-<span class="n">SERVICE_ACCOUNT</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">"GEE_SERVICE_ACCOUNT"</span><span class="p">]</span>   <span class="c1"># Earth Engine service-account email (.env)</span>
-<span class="n">SERVICE_KEY</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">"GEE_SERVICE_KEY"</span><span class="p">]</span>           <span class="c1"># path to the service-account JSON key (.env)</span>
-
 
 <span class="n">AOI</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="mf">175.45</span><span class="p">,</span> <span class="o">-</span><span class="mf">20.62</span><span class="p">,</span> <span class="o">-</span><span class="mf">175.35</span><span class="p">,</span> <span class="o">-</span><span class="mf">20.52</span><span class="p">];</span> <span class="n">C</span> <span class="o">=</span> <span class="s2">"COPERNICUS/S2_SR_HARMONIZED"</span>
 <span class="n">before</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span><span class="n">data_source</span><span class="o">=</span><span class="s2">"gee"</span><span class="p">,</span> <span class="n">cadence</span><span class="o">=</span><span class="s2">"raw"</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">(),</span> <span class="n">service_account</span><span class="o">=</span><span class="n">SERVICE_ACCOUNT</span><span class="p">,</span> <span class="n">service_key</span><span class="o">=</span><span class="n">SERVICE_KEY</span><span class="p">,</span> <span class="n">dataset</span><span class="o">=</span><span class="n">C</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">"B4"</span><span class="p">,</span> <span class="s2">"B3"</span><span class="p">,</span> <span class="s2">"B2"</span><span class="p">],</span> <span class="n">aoi</span><span class="o">=</span><span class="n">AOI</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="s2">"2021-12-15"</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">"2022-01-13"</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">reducer</span><span class="o">=</span><span class="s2">"median"</span><span class="p">)</span><span class="o">.</span><span class="n">load</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
 <span class="n">after</span>  <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span><span class="n">data_source</span><span class="o">=</span><span class="s2">"gee"</span><span class="p">,</span> <span class="n">cadence</span><span class="o">=</span><span class="s2">"raw"</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">(),</span> <span class="n">service_account</span><span class="o">=</span><span class="n">SERVICE_ACCOUNT</span><span class="p">,</span> <span class="n">service_key</span><span class="o">=</span><span class="n">SERVICE_KEY</span><span class="p">,</span> <span class="n">dataset</span><span class="o">=</span><span class="n">C</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">"B4"</span><span class="p">,</span> <span class="s2">"B3"</span><span class="p">,</span> <span class="s2">"B2"</span><span class="p">],</span> <span class="n">aoi</span><span class="o">=</span><span class="n">AOI</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="s2">"2022-01-20"</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">"2022-02-28"</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">reducer</span><span class="o">=</span><span class="s2">"median"</span><span class="p">)</span><span class="o">.</span><span class="n">load</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">"composites:"</span><span class="p">,</span> <span class="nb">bool</span><span class="p">(</span><span class="n">before</span><span class="p">),</span> <span class="nb">bool</span><span class="p">(</span><span class="n">after</span><span class="p">))</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-1">import os, tempfile, warnings
+<div class="clipboard-copy-txt" id="cell-2">import os, tempfile, warnings
 import numpy as np, matplotlib.pyplot as plt
 from loguru import logger
 from earthlens import EarthLens
@@ -11744,13 +11777,6 @@ from pyramids.dataset import Dataset   # pyramids' own plotting
 
 warnings.filterwarnings("ignore")
 logger.remove()
-# --- credentials: load the repo-root .env with python-dotenv (PATH left untouched) ---
-from dotenv import load_dotenv, find_dotenv
-load_dotenv(find_dotenv(usecwd=True))
-
-SERVICE_ACCOUNT = os.environ["GEE_SERVICE_ACCOUNT"]   # Earth Engine service-account email (.env)
-SERVICE_KEY = os.environ["GEE_SERVICE_KEY"]           # path to the service-account JSON key (.env)
-
 
 AOI = [-175.45, -20.62, -175.35, -20.52]; C = "COPERNICUS/S2_SR_HARMONIZED"
 before = EarthLens(data_source="gee", cadence="raw", path=tempfile.mkdtemp(), service_account=SERVICE_ACCOUNT, service_key=SERVICE_KEY, dataset=C, variables=["B4", "B3", "B2"], aoi=AOI, start="2021-12-15", end="2022-01-13", scale=10, reducer="median").load()[0]
@@ -11794,7 +11820,7 @@ print("composites:", bool(before), bool(after))</div>
 <div class="jp-InputPrompt jp-InputArea-prompt">In [2]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-2">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-3">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -11817,7 +11843,7 @@ print("composites:", bool(before), bool(after))</div>
 <span class="k">else</span><span class="p">:</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">"no scenes - set GEE credentials and rerun"</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-2"># pyramids true-colour render of each composite.
+<div class="clipboard-copy-txt" id="cell-3"># pyramids true-colour render of each composite.
 if before and after:
     fig, ax = plt.subplots(1, 2, figsize=(12, 6))
     before.plot(rgb_options={"rgb": [0, 1, 2], "percentile": 2}, ax=ax[0],

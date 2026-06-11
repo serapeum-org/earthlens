@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -11747,7 +11747,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=f5070c67">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=1d66d77d">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -11762,6 +11762,46 @@ GEE_SERVICE_KEY="/path/to/your/service-account-key.json"
 </div>
 </div>
 </div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=6d25e357">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="CodeMirror cm-s-jupyter">
+<div class="zeroclipboard-container">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-1">
+<div>
+<span class="notice" hidden="">Copied!</span>
+<svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
+<path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+<path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+</svg>
+</div>
+</clipboard-copy>
+</div>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># Credentials — load the repo-root .env, then read the keys (clear KeyError if any is missing).</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dotenv</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_dotenv</span><span class="p">,</span> <span class="n">find_dotenv</span>
+<span class="n">load_dotenv</span><span class="p">(</span><span class="n">find_dotenv</span><span class="p">(</span><span class="n">usecwd</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+
+<span class="n">SERVICE_ACCOUNT</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">"GEE_SERVICE_ACCOUNT"</span><span class="p">]</span>   <span class="c1"># Earth Engine service-account email (.env)</span>
+<span class="n">SERVICE_KEY</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">"GEE_SERVICE_KEY"</span><span class="p">]</span>           <span class="c1"># path to the service-account JSON key (.env)</span>
+</pre></div>
+<div class="clipboard-copy-txt" id="cell-1"># Credentials — load the repo-root .env, then read the keys (clear KeyError if any is missing).
+import os
+from dotenv import load_dotenv, find_dotenv
+load_dotenv(find_dotenv(usecwd=True))
+
+SERVICE_ACCOUNT = os.environ["GEE_SERVICE_ACCOUNT"]   # Earth Engine service-account email (.env)
+SERVICE_KEY = os.environ["GEE_SERVICE_KEY"]           # path to the service-account JSON key (.env)
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
 <div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=64ddc480">
 <div class="jp-Cell-inputWrapper" tabindex="0">
@@ -11771,7 +11811,7 @@ GEE_SERVICE_KEY="/path/to/your/service-account-key.json"
 <div class="jp-InputPrompt jp-InputArea-prompt">In [1]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-1">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-2">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -11789,13 +11829,6 @@ GEE_SERVICE_KEY="/path/to/your/service-account-key.json"
 
 <span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">"ignore"</span><span class="p">)</span>
 <span class="n">logger</span><span class="o">.</span><span class="n">remove</span><span class="p">()</span>
-<span class="c1"># --- credentials: load the repo-root .env with python-dotenv (PATH left untouched) ---</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">dotenv</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_dotenv</span><span class="p">,</span> <span class="n">find_dotenv</span>
-<span class="n">load_dotenv</span><span class="p">(</span><span class="n">find_dotenv</span><span class="p">(</span><span class="n">usecwd</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
-
-<span class="n">SERVICE_ACCOUNT</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">"GEE_SERVICE_ACCOUNT"</span><span class="p">]</span>   <span class="c1"># Earth Engine service-account email (.env)</span>
-<span class="n">SERVICE_KEY</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">"GEE_SERVICE_KEY"</span><span class="p">]</span>           <span class="c1"># path to the service-account JSON key (.env)</span>
-
 
 <span class="c1"># Sentinel-1 VH backscatter (dB): a single radar channel, shown in grey. Open water</span>
 <span class="c1"># is specular and so appears dark - that is what makes flooding visible.</span>
@@ -11804,7 +11837,7 @@ GEE_SERVICE_KEY="/path/to/your/service-account-key.json"
 <span class="n">after</span>  <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span><span class="n">data_source</span><span class="o">=</span><span class="s2">"gee"</span><span class="p">,</span> <span class="n">cadence</span><span class="o">=</span><span class="s2">"raw"</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">(),</span> <span class="n">service_account</span><span class="o">=</span><span class="n">SERVICE_ACCOUNT</span><span class="p">,</span> <span class="n">service_key</span><span class="o">=</span><span class="n">SERVICE_KEY</span><span class="p">,</span> <span class="n">dataset</span><span class="o">=</span><span class="n">C</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">"VH"</span><span class="p">],</span> <span class="n">aoi</span><span class="o">=</span><span class="n">AOI</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="s2">"2022-08-25"</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">"2022-09-20"</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mi">60</span><span class="p">,</span> <span class="n">reducer</span><span class="o">=</span><span class="s2">"mean"</span><span class="p">)</span><span class="o">.</span><span class="n">load</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">"composites:"</span><span class="p">,</span> <span class="nb">bool</span><span class="p">(</span><span class="n">before</span><span class="p">),</span> <span class="nb">bool</span><span class="p">(</span><span class="n">after</span><span class="p">))</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-1">import os, tempfile, warnings
+<div class="clipboard-copy-txt" id="cell-2">import os, tempfile, warnings
 import numpy as np, matplotlib.pyplot as plt
 from loguru import logger
 from earthlens import EarthLens
@@ -11812,13 +11845,6 @@ from pyramids.dataset import Dataset   # pyramids' own plotting
 
 warnings.filterwarnings("ignore")
 logger.remove()
-# --- credentials: load the repo-root .env with python-dotenv (PATH left untouched) ---
-from dotenv import load_dotenv, find_dotenv
-load_dotenv(find_dotenv(usecwd=True))
-
-SERVICE_ACCOUNT = os.environ["GEE_SERVICE_ACCOUNT"]   # Earth Engine service-account email (.env)
-SERVICE_KEY = os.environ["GEE_SERVICE_KEY"]           # path to the service-account JSON key (.env)
-
 
 # Sentinel-1 VH backscatter (dB): a single radar channel, shown in grey. Open water
 # is specular and so appears dark - that is what makes flooding visible.
@@ -11864,7 +11890,7 @@ print("composites:", bool(before), bool(after))</div>
 <div class="jp-InputPrompt jp-InputArea-prompt">In [2]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-2">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-3">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -11881,7 +11907,7 @@ print("composites:", bool(before), bool(after))</div>
     <span class="n">after</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">band</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">"gray"</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">"VH — Aug/Sep 2022 (flood)"</span><span class="p">)</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-2"># pyramids renders each VH composite (dB); open water is the dark fabric.
+<div class="clipboard-copy-txt" id="cell-3"># pyramids renders each VH composite (dB); open water is the dark fabric.
 if before and after:
     fig, ax = plt.subplots(1, 2, figsize=(12, 6))
     before.plot(band=0, ax=ax[0], cmap="gray", title="VH — Jul 2022 (before)")
@@ -11924,7 +11950,7 @@ if before and after:
 <div class="jp-InputPrompt jp-InputArea-prompt">In [3]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-3">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-4">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -11949,7 +11975,7 @@ if before and after:
     <span class="n">ax</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="n">thr</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"tab:blue"</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="sa">f</span><span class="s2">"Otsu threshold = </span><span class="si">{</span><span class="n">thr</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> dB"</span><span class="p">)</span>
     <span class="n">ax</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">xlabel</span><span class="o">=</span><span class="s2">"VH backscatter (dB)"</span><span class="p">,</span> <span class="n">ylabel</span><span class="o">=</span><span class="s2">"pixels"</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">"SAR histogram: water (left) vs land (right)"</span><span class="p">);</span> <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">();</span> <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-3"># Manual Otsu (no extra deps): the dB value maximising between-class variance.
+<div class="clipboard-copy-txt" id="cell-4"># Manual Otsu (no extra deps): the dB value maximising between-class variance.
 def otsu(values, bins=256):
     v = values[np.isfinite(values)]; hist, edges = np.histogram(v, bins=bins)
     centres = (edges[:-1] + edges[1:]) / 2; w = np.cumsum(hist); wb = w / w[-1]
@@ -12000,7 +12026,7 @@ if before and after:
 <div class="jp-InputPrompt jp-InputArea-prompt">In [4]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-4">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-5">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -12021,7 +12047,7 @@ if before and after:
     <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">"newly-flooded land (red)"</span><span class="p">);</span> <span class="n">ax</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s2">"off"</span><span class="p">);</span> <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"newly-flooded area in this tile: </span><span class="si">{</span><span class="n">new_water</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">px_km2</span><span class="si">:</span><span class="s2">,.0f</span><span class="si">}</span><span class="s2"> km^2"</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-4"># New water = below the Otsu threshold now, above it before.
+<div class="clipboard-copy-txt" id="cell-5"># New water = below the Otsu threshold now, above it before.
 if before and after:
     b = np.asarray(before.read_array(), dtype="float32"); b = b if b.ndim == 2 else b[0]
     new_water = (a &lt; thr) &amp; ~(b &lt; thr); px_km2 = (60 * 60) / 1e6
@@ -12075,7 +12101,7 @@ if before and after:
 <div class="jp-InputPrompt jp-InputArea-prompt">In [5]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-5">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-6">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -12116,7 +12142,7 @@ if before and after:
 <span class="k">else</span><span class="p">:</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">"no baseline — set GEE credentials and rerun"</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-5"># Reuse otsu() / before defined above: Otsu-flooded area at
+<div class="clipboard-copy-txt" id="cell-6"># Reuse otsu() / before defined above: Otsu-flooded area at
 # several dates, relative to the dry pre-monsoon baseline.
 if before:
     b = np.asarray(before.read_array(), dtype="float32"); b = b if b.ndim == 2 else b[0]

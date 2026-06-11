@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -11796,7 +11796,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=0add850c">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=f3abd12c">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -11811,6 +11811,46 @@ GEE_SERVICE_KEY="/path/to/your/service-account-key.json"
 </div>
 </div>
 </div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=f8abdad5">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="CodeMirror cm-s-jupyter">
+<div class="zeroclipboard-container">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-1">
+<div>
+<span class="notice" hidden="">Copied!</span>
+<svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
+<path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+<path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+</svg>
+</div>
+</clipboard-copy>
+</div>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># Credentials — load the repo-root .env, then read the keys (clear KeyError if any is missing).</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dotenv</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_dotenv</span><span class="p">,</span> <span class="n">find_dotenv</span>
+<span class="n">load_dotenv</span><span class="p">(</span><span class="n">find_dotenv</span><span class="p">(</span><span class="n">usecwd</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+
+<span class="n">SERVICE_ACCOUNT</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">"GEE_SERVICE_ACCOUNT"</span><span class="p">]</span>   <span class="c1"># Earth Engine service-account email (.env)</span>
+<span class="n">SERVICE_KEY</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">"GEE_SERVICE_KEY"</span><span class="p">]</span>           <span class="c1"># path to the service-account JSON key (.env)</span>
+</pre></div>
+<div class="clipboard-copy-txt" id="cell-1"># Credentials — load the repo-root .env, then read the keys (clear KeyError if any is missing).
+import os
+from dotenv import load_dotenv, find_dotenv
+load_dotenv(find_dotenv(usecwd=True))
+
+SERVICE_ACCOUNT = os.environ["GEE_SERVICE_ACCOUNT"]   # Earth Engine service-account email (.env)
+SERVICE_KEY = os.environ["GEE_SERVICE_KEY"]           # path to the service-account JSON key (.env)
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
 <div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=76c55234">
 <div class="jp-Cell-inputWrapper" tabindex="0">
@@ -11820,7 +11860,7 @@ GEE_SERVICE_KEY="/path/to/your/service-account-key.json"
 <div class="jp-InputPrompt jp-InputArea-prompt">In [1]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-1">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-2">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -11839,20 +11879,14 @@ GEE_SERVICE_KEY="/path/to/your/service-account-key.json"
 
 <span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">"ignore"</span><span class="p">)</span>
 <span class="n">logger</span><span class="o">.</span><span class="n">remove</span><span class="p">()</span>
-<span class="c1"># --- credentials: load the repo-root .env with python-dotenv (PATH left untouched) ---</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">dotenv</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_dotenv</span><span class="p">,</span> <span class="n">find_dotenv</span>
-<span class="n">load_dotenv</span><span class="p">(</span><span class="n">find_dotenv</span><span class="p">(</span><span class="n">usecwd</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
    <span class="c1"># silence earthlens / pyramids / GDAL log chatter in the rendered notebook</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">rcParams</span><span class="p">[</span><span class="s2">"figure.dpi"</span><span class="p">]</span> <span class="o">=</span> <span class="mi">80</span>   <span class="c1"># keep embedded outputs lean</span>
-<span class="n">SERVICE_ACCOUNT</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">"GEE_SERVICE_ACCOUNT"</span><span class="p">]</span>   <span class="c1"># Earth Engine service-account email (.env)</span>
-<span class="n">SERVICE_KEY</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">"GEE_SERVICE_KEY"</span><span class="p">]</span>           <span class="c1"># path to the service-account JSON key (.env)</span>
 
 <span class="n">AOI</span> <span class="o">=</span> <span class="p">[</span><span class="mf">34.28</span><span class="p">,</span> <span class="mf">31.32</span><span class="p">,</span> <span class="mf">34.33</span><span class="p">,</span> <span class="mf">31.37</span><span class="p">]</span>          <span class="c1"># Khan Younis, southern Gaza (lon/lat box)</span>
 <span class="n">COLL</span> <span class="o">=</span> <span class="s2">"COPERNICUS/S2_SR_HARMONIZED"</span>
 <span class="n">DATES</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"2023-01-15"</span><span class="p">,</span> <span class="s2">"2023-05-15"</span><span class="p">,</span> <span class="s2">"2023-09-12"</span><span class="p">,</span> <span class="s2">"2023-12-11"</span><span class="p">,</span>
          <span class="s2">"2024-03-10"</span><span class="p">,</span> <span class="s2">"2024-05-09"</span><span class="p">,</span> <span class="s2">"2024-09-11"</span><span class="p">]</span>
 <span class="n">rgb_dir</span><span class="p">,</span> <span class="n">ndvi_dir</span> <span class="o">=</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">(),</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">()</span>
-
 
 <span class="n">dates</span> <span class="o">=</span> <span class="p">[]</span>
 <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">DATES</span><span class="p">:</span>
@@ -11873,7 +11907,7 @@ GEE_SERVICE_KEY="/path/to/your/service-account-key.json"
 <span class="n">dc_ndvi</span> <span class="o">=</span> <span class="n">DatasetCollection</span><span class="o">.</span><span class="n">read_multiple_files</span><span class="p">(</span><span class="n">ndvi_dir</span><span class="p">,</span> <span class="n">date</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="k">if</span> <span class="n">dates</span> <span class="k">else</span> <span class="kc">None</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">dates</span><span class="p">)</span><span class="si">}</span><span class="s2"> scenes:"</span><span class="p">,</span> <span class="n">dates</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-1">import os, shutil, tempfile, warnings
+<div class="clipboard-copy-txt" id="cell-2">import os, shutil, tempfile, warnings
 import numpy as np, pandas as pd, matplotlib.pyplot as plt
 from loguru import logger
 from IPython.display import Image, display
@@ -11882,20 +11916,14 @@ from pyramids.dataset import Dataset, DatasetCollection   # pyramids' own IO + p
 
 warnings.filterwarnings("ignore")
 logger.remove()
-# --- credentials: load the repo-root .env with python-dotenv (PATH left untouched) ---
-from dotenv import load_dotenv, find_dotenv
-load_dotenv(find_dotenv(usecwd=True))
    # silence earthlens / pyramids / GDAL log chatter in the rendered notebook
 plt.rcParams["figure.dpi"] = 80   # keep embedded outputs lean
-SERVICE_ACCOUNT = os.environ["GEE_SERVICE_ACCOUNT"]   # Earth Engine service-account email (.env)
-SERVICE_KEY = os.environ["GEE_SERVICE_KEY"]           # path to the service-account JSON key (.env)
 
 AOI = [34.28, 31.32, 34.33, 31.37]          # Khan Younis, southern Gaza (lon/lat box)
 COLL = "COPERNICUS/S2_SR_HARMONIZED"
 DATES = ["2023-01-15", "2023-05-15", "2023-09-12", "2023-12-11",
          "2024-03-10", "2024-05-09", "2024-09-11"]
 rgb_dir, ndvi_dir = tempfile.mkdtemp(), tempfile.mkdtemp()
-
 
 dates = []
 for d in DATES:
@@ -11953,7 +11981,7 @@ print(f"{len(dates)} scenes:", dates)</div>
 <div class="jp-InputPrompt jp-InputArea-prompt">In [2]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-2">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-3">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -11975,7 +12003,7 @@ print(f"{len(dates)} scenes:", dates)</div>
 <span class="k">else</span><span class="p">:</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">"no scenes - set GEE_SERVICE_ACCOUNT / GEE_SERVICE_KEY and rerun"</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-2">if dc_rgb:
+<div class="clipboard-copy-txt" id="cell-3">if dc_rgb:
     n = dc_rgb.time_length
     fig, ax = plt.subplots(1, n, figsize=(2.4 * n, 2.7))
     for i, d in enumerate(dates):
@@ -12023,7 +12051,7 @@ else:
 <div class="jp-InputPrompt jp-InputArea-prompt">In [3]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-3">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-4">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -12043,7 +12071,7 @@ else:
         <span class="n">a</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">([]);</span> <span class="n">a</span><span class="o">.</span><span class="n">set_yticks</span><span class="p">([])</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">();</span> <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-3">if dc_rgb:
+<div class="clipboard-copy-txt" id="cell-4">if dc_rgb:
     fig, ax = plt.subplots(1, 2, figsize=(9, 4.5))
     dc_rgb.iloc(0).plot(rgb_options={"rgb": [0, 1, 2], "percentile": 2},
                         ax=ax[0], title=f"{dates[0]} (before)")
@@ -12089,7 +12117,7 @@ else:
 <div class="jp-InputPrompt jp-InputArea-prompt">In [4]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-4">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-5">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -12123,7 +12151,7 @@ else:
 <span class="k">else</span><span class="p">:</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">"no scenes to animate"</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-4"># DatasetCollection.plot animates ONE band, so for true colour we prepare each RGB
+<div class="clipboard-copy-txt" id="cell-5"># DatasetCollection.plot animates ONE band, so for true colour we prepare each RGB
 # frame with cleopatra's ArrayGlyph.prepare_array (the exact stretch Dataset.plot's
 # rgb path uses) and step the frames with matplotlib into a GIF.
 from cleopatra.array_glyph import ArrayGlyph
@@ -12183,7 +12211,7 @@ else:
 <div class="jp-InputPrompt jp-InputArea-prompt">In [5]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-5">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-6">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -12208,7 +12236,7 @@ else:
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"mean NDVI 2023 </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">nanmean</span><span class="p">(</span><span class="n">nd_b</span><span class="p">)</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2"> -&gt; 2024 </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">nanmean</span><span class="p">(</span><span class="n">nd_a</span><span class="p">)</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">; "</span>
           <span class="sa">f</span><span class="s2">"vegetated </span><span class="si">{</span><span class="n">veg</span><span class="p">(</span><span class="n">nd_b</span><span class="p">)</span><span class="si">:</span><span class="s2">.1%</span><span class="si">}</span><span class="s2"> -&gt; </span><span class="si">{</span><span class="n">veg</span><span class="p">(</span><span class="n">nd_a</span><span class="p">)</span><span class="si">:</span><span class="s2">.1%</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-5">if dc_ndvi:
+<div class="clipboard-copy-txt" id="cell-6">if dc_ndvi:
     i_b, i_a = dates.index("2023-05-15"), dates.index("2024-05-09")
     nd_b = dc_ndvi.iloc(i_b).read_array(band=0)
     nd_a = dc_ndvi.iloc(i_a).read_array(band=0)
@@ -12266,7 +12294,7 @@ else:
 <div class="jp-InputPrompt jp-InputArea-prompt">In [6]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-6">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-7">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -12283,7 +12311,7 @@ else:
     <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="s2">"all"</span><span class="p">)</span>          <span class="c1"># drop the static builder frame; keep only the GIF</span>
     <span class="n">display</span><span class="p">(</span><span class="n">Image</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="n">gif</span><span class="p">))</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-6">if dc_ndvi:
+<div class="clipboard-copy-txt" id="cell-7">if dc_ndvi:
     gif = os.path.join(tempfile.mkdtemp(), "ndvi.gif")
     (dc_ndvi.plot(band=0, cmap="RdYlGn", figsize=(5, 5), title="Khan Younis - NDVI 2023 -&gt; 2024")
             .save_animation(gif, fps=1.2))
@@ -12326,7 +12354,7 @@ else:
 <div class="jp-InputPrompt jp-InputArea-prompt">In [7]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-7">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-8">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -12344,7 +12372,7 @@ else:
     <span class="n">ax</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">ylabel</span><span class="o">=</span><span class="s2">"mean NDVI"</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">"Khan Younis - mean vegetation index over time"</span><span class="p">)</span>
     <span class="n">fig</span><span class="o">.</span><span class="n">autofmt_xdate</span><span class="p">();</span> <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-7">if dc_ndvi:
+<div class="clipboard-copy-txt" id="cell-8">if dc_ndvi:
     series_v = [float(np.nanmean(dc_ndvi.iloc(i).read_array(band=0))) for i in range(dc_ndvi.time_length)]
     fig, ax = plt.subplots(figsize=(9, 4))
     ax.plot([pd.Timestamp(d) for d in dates], series_v, "-o", color="tab:green")
