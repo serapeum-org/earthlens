@@ -267,6 +267,11 @@ def fake_ee(monkeypatch) -> _FakeEE:
         _FakeEE: The fake `ee` module (its `ic_log` / `image_log` record
         constructions for assertions).
     """
+    # Credentials now resolve at authenticate()/first-client-access time; provide
+    # them via the environment so the lazy _open_client (and the stubbed
+    # EarthEngineAuth.initialize below) resolve without constructor args.
+    monkeypatch.setenv("GEE_SERVICE_ACCOUNT", "sa@x.iam")
+    monkeypatch.setenv("GEE_SERVICE_KEY", "key.json")
     fake = _FakeEE()
     monkeypatch.setattr(backend_module, "ee", fake)
     monkeypatch.setattr(
@@ -314,8 +319,6 @@ def make_gee(fake_ee, tmp_path):
             lon_lim=[31.2, 31.3],
             path=str(tmp_path),
             scale=90.0,
-            service_account="sa@x.iam",
-            service_key="key.json",
         )
         params.update(overrides)
         return GEE(**params)
@@ -425,19 +428,58 @@ class TestInit:
             GEE(**defaults)
         assert loads == 0
 
-    def test_initialize_without_credentials_raises(self, fake_ee, tmp_path):
-        """No service account and no `project` → `AuthenticationError`."""
+    def test_construct_without_credentials_is_lazy(self, fake_ee, tmp_path, monkeypatch):
+        """The constructor takes no credentials and never authenticates."""
+        monkeypatch.delenv("GEE_SERVICE_ACCOUNT", raising=False)
+        monkeypatch.delenv("GEE_SERVICE_KEY", raising=False)
+        monkeypatch.delenv("GEE_PROJECT", raising=False)
+        gee = GEE(
+            start="2000-02-11",
+            end="2000-02-12",
+            variables={"USGS/SRTMGL1_003": ["elevation"]},
+            lat_lim=[29.9, 30.0],
+            lon_lim=[31.2, 31.3],
+            path=str(tmp_path),
+        )
+        assert gee.project is None
+
+    def test_authenticate_without_credentials_raises(
+        self, fake_ee, tmp_path, monkeypatch
+    ):
+        """No credentials anywhere → authenticate() raises AuthenticationError."""
         from earthlens.gee.backend import AuthenticationError
 
+        monkeypatch.delenv("GEE_SERVICE_ACCOUNT", raising=False)
+        monkeypatch.delenv("GEE_SERVICE_KEY", raising=False)
+        monkeypatch.delenv("GEE_PROJECT", raising=False)
+        gee = GEE(
+            start="2000-02-11",
+            end="2000-02-12",
+            variables={"USGS/SRTMGL1_003": ["elevation"]},
+            lat_lim=[29.9, 30.0],
+            lon_lim=[31.2, 31.3],
+            path=str(tmp_path),
+        )
         with pytest.raises(AuthenticationError, match="needs either service_account"):
-            GEE(
-                start="2000-02-11",
-                end="2000-02-12",
-                variables={"USGS/SRTMGL1_003": ["elevation"]},
-                lat_lim=[29.9, 30.0],
-                lon_lim=[31.2, 31.3],
-                path=str(tmp_path),
-            )
+            gee.authenticate()
+
+    def test_authenticate_with_explicit_credentials(self, fake_ee, tmp_path, monkeypatch):
+        """Explicit service_account/service_key passed to authenticate() are used."""
+        monkeypatch.delenv("GEE_SERVICE_ACCOUNT", raising=False)
+        monkeypatch.delenv("GEE_SERVICE_KEY", raising=False)
+        gee = GEE(
+            start="2000-02-11",
+            end="2000-02-12",
+            variables={"USGS/SRTMGL1_003": ["elevation"]},
+            lat_lim=[29.9, 30.0],
+            lon_lim=[31.2, 31.3],
+            path=str(tmp_path),
+        )
+        result = gee.authenticate(
+            service_account="sa@x.iam", service_key="key.json", project="explicit-proj"
+        )
+        assert result is gee
+        assert gee.project == "explicit-proj"  # stubbed EarthEngineAuth echoes project
 
 
 class TestCheckInputDates:

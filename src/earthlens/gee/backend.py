@@ -45,6 +45,7 @@ no key is given, an interactive `ee.Authenticate()` against an explicit
 from __future__ import annotations
 
 import datetime as dt
+import os
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Iterable, Literal
 
@@ -167,13 +168,6 @@ class GEE(LazyClientMixin, AbstractDataSource):
             `"yearly"`. Defaults to `"raw"`.
         path: Output directory (created if absent). Defaults to the cwd.
         fmt: `strptime` format for `start` / `end`. Defaults to `"%Y-%m-%d"`.
-        service_account: Service-account email for authentication. If
-            given, `service_key` is required.
-        service_key: Path to the service-account JSON key file, or the
-            JSON content as a string.
-        project: Cloud project id to scope Earth Engine calls to. If
-            omitted, read from the service-account key's `project_id`;
-            required when no service account is given.
         scale: Output pixel size in metres. If omitted, each dataset's
             nominal `spatial_resolution` is used.
         crs: Output CRS (EPSG code string). Defaults to `"EPSG:4326"`.
@@ -225,6 +219,14 @@ class GEE(LazyClientMixin, AbstractDataSource):
             :mod:`earthlens.gee.jobs`. Ignored for `export_via="url"`,
             which is always synchronous.
 
+    Credentials are not constructor arguments — the constructor describes
+    only what to fetch. Supply them at the authentication step:
+    :meth:`authenticate` accepts `service_account=` / `service_key=` /
+    `project=`, each falling back to the `GEE_SERVICE_ACCOUNT` /
+    `GEE_SERVICE_KEY` / `GEE_PROJECT` environment variable when omitted.
+    `download()` opens the connection lazily (resolving the same way) if
+    `authenticate()` was never called.
+
     Raises:
         AuthenticationError: If Earth Engine cannot be initialised
             (missing/invalid key, unregistered project, missing IAM role).
@@ -241,7 +243,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
             task does not complete.
 
     Examples:
-        - Construct against a service account and download SRTM over a small bbox:
+        - Authenticate against a service account, then download SRTM over a small bbox:
             ```python
             >>> from earthlens.gee import GEE  # doctest: +SKIP
             >>> gee = GEE(  # doctest: +SKIP
@@ -249,10 +251,11 @@ class GEE(LazyClientMixin, AbstractDataSource):
             ...     variables={"USGS/SRTMGL1_003": ["elevation"]},
             ...     lat_lim=[29.9, 30.0], lon_lim=[31.2, 31.3],
             ...     path="data/gee",
+            ... )
+            >>> paths = gee.authenticate(  # doctest: +SKIP
             ...     service_account="sa@my-project.iam.gserviceaccount.com",
             ...     service_key="/path/to/key.json",
-            ... )
-            >>> paths = gee.download()  # doctest: +SKIP
+            ... ).download()
             ```
     """
 
@@ -274,9 +277,6 @@ class GEE(LazyClientMixin, AbstractDataSource):
         path: Path | str = "",
         fmt: str = "%Y-%m-%d",
         *,
-        service_account: str | None = None,
-        service_key: str | None = None,
-        project: str | None = None,
         scale: float | None = None,
         crs: str = "EPSG:4326",
         reducer: str | None = None,
@@ -312,9 +312,12 @@ class GEE(LazyClientMixin, AbstractDataSource):
         # parent constructor immediately calls `self._initialize()` (and
         # `_create_grid` / `_check_input_dates`), which read them.
         self._catalog = Catalog()
-        self._service_account = service_account
-        self._service_key = service_key
-        self._project = project
+        # Credentials are resolved at authenticate()/first-client-access time
+        # (explicitly or from the GEE_SERVICE_ACCOUNT / GEE_SERVICE_KEY /
+        # GEE_PROJECT environment variables), not at construction.
+        self._service_account: str | None = None
+        self._service_key: str | None = None
+        self._project: str | None = None
         self.project: str | None = None
         self.scale = scale
         self.crs = crs
@@ -344,79 +347,139 @@ class GEE(LazyClientMixin, AbstractDataSource):
         )
 
     def _initialize(self) -> None:
-        """Validate credentials presence; defer the Earth Engine connection.
+        """Defer the Earth Engine connection to first client access.
 
-        Runs the cheap, offline precondition (a `service_account` +
-        `service_key` pair, or an explicit `project`) so a misconfigured
-        request fails fast at construction, then returns `None`. The
-        actual `ee.Authenticate()` / `ee.Initialize(...)` is deferred to
-        first access to `self.client` (see :meth:`_open_client`), so
-        constructing the backend never blocks on auth.
+        Returns `None` without touching credentials — the constructor
+        describes only what to fetch. Both the connection and the
+        credential resolution happen lazily on first access to
+        `self.client` (see :meth:`_open_client`), which
+        :meth:`authenticate` triggers eagerly. So constructing the
+        backend never blocks on auth and needs no credentials.
 
         Returns:
             None: Always.
+        """
+        return None
+
+    def _resolve_credentials(self) -> tuple[str | None, str | None, str | None]:
+        """Resolve credentials from explicit values, then the environment.
+
+        Each credential piece falls back to its environment variable when
+        not set explicitly (via :meth:`authenticate`): `GEE_SERVICE_ACCOUNT`,
+        `GEE_SERVICE_KEY`, `GEE_PROJECT`.
+
+        Returns:
+            tuple: `(service_account, service_key, project)`, each `None`
+                when neither an explicit value nor its env var is set.
+        """
+        service_account = self._service_account or os.environ.get("GEE_SERVICE_ACCOUNT")
+        service_key = self._service_key or os.environ.get("GEE_SERVICE_KEY")
+        project = self._project or os.environ.get("GEE_PROJECT")
+        return service_account, service_key, project
+
+    def authenticate(
+        self,
+        service_account: str | None = None,
+        service_key: str | None = None,
+        project: str | None = None,
+    ) -> GEE:
+        """Resolve credentials and open the Earth Engine connection.
+
+        The explicit, fail-fast credential step. Pass `service_account=`
+        + `service_key=` (and optionally `project=`) to authenticate with
+        a service-account key; omit a value to read its `GEE_SERVICE_ACCOUNT`
+        / `GEE_SERVICE_KEY` / `GEE_PROJECT` environment variable instead.
+        Opening the connection (which `download()` also does lazily if you
+        never call this) validates the credentials against Earth Engine.
+
+        Args:
+            service_account: Service-account email. When `None`, the
+                `GEE_SERVICE_ACCOUNT` environment variable is read.
+            service_key: Path to the service-account JSON key file, or the
+                JSON content as a string. When `None`, the `GEE_SERVICE_KEY`
+                environment variable is read.
+            project: Cloud project id to scope Earth Engine calls to. When
+                `None`, the `GEE_PROJECT` environment variable is read (or
+                the project is taken from the key's `project_id`).
+
+        Returns:
+            The backend instance, so it chains
+            `EarthLens(...).authenticate(...).download()`.
 
         Raises:
-            AuthenticationError: If neither a `service_account` +
-                `service_key` pair nor an explicit `project` was given.
+            AuthenticationError: If no service-account pair and no project
+                can be resolved, or Earth Engine rejects the credentials.
         """
-        if not (self._service_account and self._service_key) and not self._project:
-            raise AuthenticationError(
-                "the GEE backend needs either service_account + service_key, "
-                "or an explicit project= (with cached/ADC credentials). See "
-                "https://developers.google.com/earth-engine/guides/service_account."
-            )
-        return None
+        if service_account is not None:
+            self._service_account = service_account
+        if service_key is not None:
+            self._service_key = service_key
+        if project is not None:
+            self._project = project
+        # LazyClientMixin: first access to `client` runs `_open_client` (auth).
+        _ = self.client
+        return self
 
     def _open_client(self) -> Any:
         """Authenticate and initialise the Earth Engine connection (lazily).
 
-        Uses a service-account key when `service_account` + `service_key`
-        were given (via :class:`EarthEngineAuth`); otherwise runs
-        `ee.Authenticate()` and `ee.Initialize(project=...)` against the
-        explicit `project`. The `ee.Authenticate()` flow is interactive
-        — it opens a browser and waits for the user to paste a token,
-        so on a headless box (CI, Docker, remote shell) it will hang
-        or fail with whatever the EE SDK emits natively; use
-        service-account auth for non-interactive use. The resolved
-        project id is stored on :attr:`project`. Called by
-        :attr:`~earthlens.base.LazyClientMixin.client` on first use.
+        Resolves the credentials (explicit values from :meth:`authenticate`,
+        else the `GEE_SERVICE_ACCOUNT` / `GEE_SERVICE_KEY` / `GEE_PROJECT`
+        environment variables), then uses a service-account key when a
+        `service_account` + `service_key` pair is available (via
+        :class:`EarthEngineAuth`); otherwise runs `ee.Authenticate()` and
+        `ee.Initialize(project=...)` against the resolved `project`. The
+        `ee.Authenticate()` flow is interactive — it opens a browser and
+        waits for the user to paste a token, so on a headless box (CI,
+        Docker, remote shell) it will hang or fail with whatever the EE
+        SDK emits natively; use service-account auth for non-interactive
+        use. The resolved project id is stored on :attr:`project`. Called
+        by :attr:`~earthlens.base.LazyClientMixin.client` on first use.
 
         Returns:
             The `ee` module (cached as `self.client`).
 
         Raises:
-            AuthenticationError: If credentials are invalid, no
-                project can be resolved, the
-                project is not registered for Earth Engine, or the
-                service account lacks the required IAM role on it.
+            AuthenticationError: If no service-account pair and no project
+                can be resolved, the credentials are invalid, the project
+                is not registered for Earth Engine, or the service account
+                lacks the required IAM role on it.
         """
-        if self._service_account and self._service_key:
+        service_account, service_key, project = self._resolve_credentials()
+        if not (service_account and service_key) and not project:
+            raise AuthenticationError(
+                "the GEE backend needs either service_account + service_key, "
+                "or an explicit project=, supplied to authenticate(...) or via "
+                "the GEE_SERVICE_ACCOUNT / GEE_SERVICE_KEY / GEE_PROJECT "
+                "environment variables. See "
+                "https://developers.google.com/earth-engine/guides/service_account."
+            )
+        if service_account and service_key:
             self.project = EarthEngineAuth.initialize(
-                self._service_account, self._service_key, self._project
+                service_account, service_key, project
             )
             return ee
         try:
             ee.Authenticate()
-            ee.Initialize(project=self._project)
+            ee.Initialize(project=project)
         except ee.EEException as exc:
             message = str(exc)
             if "not registered to use Earth Engine" in message:
                 raise AuthenticationError(
-                    f"Cloud project {self._project!r} is not registered to use "
+                    f"Cloud project {project!r} is not registered to use "
                     "Earth Engine. Register it at "
                     "https://code.earthengine.google.com/register, then retry."
                 ) from exc
             raise AuthenticationError(
                 f"Earth Engine initialisation failed for project "
-                f"{self._project!r}: {message}"
+                f"{project!r}: {message}"
             ) from exc
         except Exception as exc:  # noqa: BLE001 - re-raised as AuthenticationError
             raise AuthenticationError(
                 f"Earth Engine initialisation failed for project "
-                f"{self._project!r}: {exc}"
+                f"{project!r}: {exc}"
             ) from exc
-        self.project = self._project
+        self.project = project
         return ee
 
     def _create_grid(self, lat_lim: list[float], lon_lim: list[float]) -> SpatialExtent:

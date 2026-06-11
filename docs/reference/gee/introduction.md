@@ -70,7 +70,8 @@ Cloud project. Two modes:
   for CI or a headless server.
 - **Service account** — a Google Cloud service account plus a JSON key
   file; works everywhere. **This is what the earthlens GEE backend
-  expects** (`service_account=` + `service_key=`).
+  expects** — pass `service_account=` + `service_key=` to
+  `authenticate(...)`, or set `GEE_SERVICE_ACCOUNT` / `GEE_SERVICE_KEY`.
 
 Either way, the *project* must be registered for Earth Engine — a bare
 Cloud project will fail with `Project <id> is not registered to use

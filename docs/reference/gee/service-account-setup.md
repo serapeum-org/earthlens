@@ -216,6 +216,7 @@ el = EarthLens(
     lat_lim=[29.9, 30.1],
     lon_lim=[31.1, 31.3],
     path="data/gee",
+).authenticate(
     service_account="earthlens-ee@<PROJECT_ID>.iam.gserviceaccount.com",
     service_key=r"C:\Users\you\.config\earthlens\ee-service-account.json",
 )

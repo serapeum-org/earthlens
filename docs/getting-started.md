@@ -78,8 +78,9 @@ backend), e.g. `pyramids.dataset.Dataset.read_file(...)`.
 | `path` | Output directory. |
 
 Any extra keyword not named by the facade is forwarded verbatim to the backend
-constructor — e.g. ECMWF's `skip_constraints=`, or GEE's `service_account=` /
-`scale=` / `export_via=`.
+constructor — e.g. ECMWF's `skip_constraints=`, or GEE's `scale=` /
+`export_via=` / `reducer=`. (Credentials are not constructor keywords — they go
+to `authenticate(...)`; see each backend's reference page.)
 
 ## Next steps
 
