@@ -160,47 +160,48 @@ def csv_to_fc(
             ```
     """
     if df is None or df.empty:
-        return empty_fc()
+        result = empty_fc()
+    else:
+        frame = pd.DataFrame(index=df.index)
+        frame["latitude"] = pd.to_numeric(df.get("latitude"), errors="coerce")
+        frame["longitude"] = pd.to_numeric(df.get("longitude"), errors="coerce")
+        frame["acq_datetime"] = _acq_datetime(df)
+        frame["sensor"] = sensor
+        frame["satellite"] = _as_string(df.get("satellite"))
+        raw_confidence = df.get("confidence")
+        frame["confidence"] = _as_string(raw_confidence)
+        frame["confidence_pct"] = _confidence_pct(raw_confidence, family)
+        frame["brightness_k"] = _brightness(df, family)
+        frame["frp"] = _numeric(df, "frp")
+        frame["daynight"] = _as_string(df.get("daynight"))
 
-    frame = pd.DataFrame(index=df.index)
-    frame["latitude"] = pd.to_numeric(df.get("latitude"), errors="coerce")
-    frame["longitude"] = pd.to_numeric(df.get("longitude"), errors="coerce")
-    frame["acq_datetime"] = _acq_datetime(df)
-    frame["sensor"] = sensor
-    frame["satellite"] = _as_string(df.get("satellite"))
-    raw_confidence = df.get("confidence")
-    frame["confidence"] = _as_string(raw_confidence)
-    frame["confidence_pct"] = _confidence_pct(raw_confidence, family)
-    frame["brightness_k"] = _brightness(df, family)
-    frame["frp"] = _numeric(df, "frp")
-    frame["daynight"] = _as_string(df.get("daynight"))
+        # `min_confidence` applies only to families whose confidence_pct is a
+        # true 0-100 percent; non-percent families (GOES) intentionally skip
+        # the filter (thresholding a ~0-1 provider scale would drop every
+        # row). The backend warns about that once per download, not here per
+        # chunk.
+        if min_confidence is not None and family in PERCENT_CONFIDENCE_FAMILIES:
+            frame = frame[frame["confidence_pct"] >= min_confidence]
+        if day_night is not None:
+            frame = frame[frame["daynight"] == day_night]
 
-    # `min_confidence` applies only to families whose confidence_pct is a
-    # true 0-100 percent; non-percent families (GOES) intentionally skip
-    # the filter (thresholding a ~0-1 provider scale would drop every
-    # row). The backend warns about that once per download, not here per
-    # chunk.
-    if min_confidence is not None and family in PERCENT_CONFIDENCE_FAMILIES:
-        frame = frame[frame["confidence_pct"] >= min_confidence]
-    if day_night is not None:
-        frame = frame[frame["daynight"] == day_night]
-
-    if frame.empty:
-        return empty_fc()
-
-    frame = frame.reset_index(drop=True)
-    for column, dtype in ATTRIBUTE_COLUMNS.items():
-        if column == "acq_datetime":
-            frame[column] = frame[column].astype(dtype)
-        elif dtype == "string":
-            frame[column] = frame[column].astype("string")
-    geometry = gpd.points_from_xy(frame["longitude"], frame["latitude"])
-    gdf = gpd.GeoDataFrame(
-        frame[list(ATTRIBUTE_COLUMNS)],
-        geometry=gpd.GeoSeries(geometry, crs=DETECTION_CRS),
-        crs=DETECTION_CRS,
-    )
-    return FeatureCollection(gdf)
+        if frame.empty:
+            result = empty_fc()
+        else:
+            frame = frame.reset_index(drop=True)
+            for column, dtype in ATTRIBUTE_COLUMNS.items():
+                if column == "acq_datetime":
+                    frame[column] = frame[column].astype(dtype)
+                elif dtype == "string":
+                    frame[column] = frame[column].astype("string")
+            geometry = gpd.points_from_xy(frame["longitude"], frame["latitude"])
+            gdf = gpd.GeoDataFrame(
+                frame[list(ATTRIBUTE_COLUMNS)],
+                geometry=gpd.GeoSeries(geometry, crs=DETECTION_CRS),
+                crs=DETECTION_CRS,
+            )
+            result = FeatureCollection(gdf)
+    return result
 
 
 def concat(collections: list[FeatureCollection]) -> FeatureCollection:
@@ -224,10 +225,12 @@ def concat(collections: list[FeatureCollection]) -> FeatureCollection:
     """
     non_empty = [fc for fc in collections if len(fc)]
     if not non_empty:
-        return empty_fc()
-    merged = pd.concat(non_empty, ignore_index=True)
-    gdf = gpd.GeoDataFrame(merged, geometry="geometry", crs=DETECTION_CRS)
-    return FeatureCollection(gdf)
+        result = empty_fc()
+    else:
+        merged = pd.concat(non_empty, ignore_index=True)
+        gdf = gpd.GeoDataFrame(merged, geometry="geometry", crs=DETECTION_CRS)
+        result = FeatureCollection(gdf)
+    return result
 
 
 def empty_fc() -> FeatureCollection:
@@ -306,12 +309,15 @@ def _confidence_pct(raw: pd.Series | None, family: str) -> pd.Series:
         pd.Series: The normalised confidence as floats.
     """
     if raw is None:
-        return np.nan
-    mapping = _CATEGORICAL_CONFIDENCE.get(family)
-    if mapping is not None:
-        tokens = raw.astype("string").str.strip().str.lower()
-        return tokens.map(mapping).astype("float64")
-    return pd.to_numeric(raw, errors="coerce")
+        result = np.nan
+    else:
+        mapping = _CATEGORICAL_CONFIDENCE.get(family)
+        if mapping is not None:
+            tokens = raw.astype("string").str.strip().str.lower()
+            result = tokens.map(mapping).astype("float64")
+        else:
+            result = pd.to_numeric(raw, errors="coerce")
+    return result
 
 
 def _brightness(df: pd.DataFrame, family: str) -> pd.Series:
@@ -332,8 +338,10 @@ def _brightness(df: pd.DataFrame, family: str) -> pd.Series:
     source = _BRIGHTNESS_SOURCE.get(family, "brightness")
     column = df.get(source) if source is not None else None
     if column is None:
-        return pd.Series(np.nan, index=df.index, dtype="float64")
-    return pd.to_numeric(column, errors="coerce")
+        result = pd.Series(np.nan, index=df.index, dtype="float64")
+    else:
+        result = pd.to_numeric(column, errors="coerce")
+    return result
 
 
 def _numeric(df: pd.DataFrame, name: str) -> pd.Series:
@@ -352,8 +360,10 @@ def _numeric(df: pd.DataFrame, name: str) -> pd.Series:
     """
     column = df.get(name)
     if column is None:
-        return pd.Series(np.nan, index=df.index, dtype="float64")
-    return pd.to_numeric(column, errors="coerce")
+        result = pd.Series(np.nan, index=df.index, dtype="float64")
+    else:
+        result = pd.to_numeric(column, errors="coerce")
+    return result
 
 
 def _as_string(column: pd.Series | None) -> pd.Series | str:
@@ -367,5 +377,7 @@ def _as_string(column: pd.Series | None) -> pd.Series | str:
         the source column was absent (broadcast on assignment).
     """
     if column is None:
-        return pd.NA
-    return column.astype("string")
+        result = pd.NA
+    else:
+        result = column.astype("string")
+    return result
