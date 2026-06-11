@@ -11718,13 +11718,13 @@ FIRMS_MAP_KEY="your-free-NASA-FIRMS-map-key"   # for the active-fire layer
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=30fdc58a">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=53016e5785244e74">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [1]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [4]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-1">
@@ -11737,51 +11737,96 @@ FIRMS_MAP_KEY="your-free-NASA-FIRMS-map-key"   # for the active-fire layer
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span><span class="o">,</span><span class="w"> </span><span class="nn">tempfile</span><span class="o">,</span><span class="w"> </span><span class="nn">warnings</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span><span class="o">,</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span><span class="o">,</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">loguru</span><span class="w"> </span><span class="kn">import</span> <span class="n">logger</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">earthlens</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span>   <span class="c1"># pyramids' own plotting</span>
-
-<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">"ignore"</span><span class="p">)</span>
-<span class="n">logger</span><span class="o">.</span><span class="n">remove</span><span class="p">()</span>
-<span class="c1"># --- credentials: load the repo-root .env with python-dotenv (PATH left untouched) ---</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># credentials: load the repo-root .env with python-dotenv (PATH left untouched) ---</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dotenv</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_dotenv</span><span class="p">,</span> <span class="n">find_dotenv</span>
 <span class="n">load_dotenv</span><span class="p">(</span><span class="n">find_dotenv</span><span class="p">(</span><span class="n">usecwd</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
 
 <span class="n">SERVICE_ACCOUNT</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">"GEE_SERVICE_ACCOUNT"</span><span class="p">]</span>
 <span class="n">SERVICE_KEY</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">"GEE_SERVICE_KEY"</span><span class="p">]</span>
 <span class="n">FIRMS_MAP_KEY</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">"FIRMS_MAP_KEY"</span><span class="p">]</span>
-
-
-<span class="c1"># FIRMS returns a GeoDataFrame of fire pixels (vector) -&gt; matplotlib scatter.</span>
-<span class="n">fires</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span><span class="n">data_source</span><span class="o">=</span><span class="s2">"firms"</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">"VIIRS_SNPP_SP"</span><span class="p">],</span> <span class="n">map_key</span><span class="o">=</span><span class="n">FIRMS_MAP_KEY</span><span class="p">,</span>
-    <span class="n">start</span><span class="o">=</span><span class="s2">"2023-06-02"</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">"2023-06-08"</span><span class="p">,</span> <span class="n">aoi</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">80.0</span><span class="p">,</span> <span class="mf">48.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">72.0</span><span class="p">,</span> <span class="mf">53.0</span><span class="p">],</span>
-    <span class="n">path</span><span class="o">=</span><span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">())</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">progress_bar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">fires</span><span class="p">)</span><span class="si">:</span><span class="s2">,</span><span class="si">}</span><span class="s2"> fire detections"</span><span class="p">)</span>
+<span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">x</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="p">(</span><span class="n">SERVICE_ACCOUNT</span><span class="p">,</span> <span class="n">SERVICE_KEY</span><span class="p">,</span> <span class="n">FIRMS_MAP_KEY</span><span class="p">)):</span>
+    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Missing credentials in .env"</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-1">import os, tempfile, warnings
-import numpy as np, pandas as pd, matplotlib.pyplot as plt
-from loguru import logger
-from earthlens import EarthLens
-from pyramids.dataset import Dataset   # pyramids' own plotting
-
-warnings.filterwarnings("ignore")
-logger.remove()
-# --- credentials: load the repo-root .env with python-dotenv (PATH left untouched) ---
+<div class="clipboard-copy-txt" id="cell-1"># credentials: load the repo-root .env with python-dotenv (PATH left untouched) ---
+import os
 from dotenv import load_dotenv, find_dotenv
 load_dotenv(find_dotenv(usecwd=True))
 
 SERVICE_ACCOUNT = os.environ["GEE_SERVICE_ACCOUNT"]
 SERVICE_KEY = os.environ["GEE_SERVICE_KEY"]
 FIRMS_MAP_KEY = os.environ["FIRMS_MAP_KEY"]
+if any(x is None for x in (SERVICE_ACCOUNT, SERVICE_KEY, FIRMS_MAP_KEY)):
+    raise ValueError("Missing credentials in .env")</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=30fdc58a">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [5]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="CodeMirror cm-s-jupyter">
+<div class="zeroclipboard-container">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-2">
+<div>
+<span class="notice" hidden="">Copied!</span>
+<svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
+<path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+<path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+</svg>
+</div>
+</clipboard-copy>
+</div>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span><span class="o">,</span><span class="w"> </span><span class="nn">tempfile</span><span class="o">,</span><span class="w"> </span><span class="nn">warnings</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">loguru</span><span class="w"> </span><span class="kn">import</span> <span class="n">logger</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">earthlens</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span>   <span class="c1"># pyramids' own plotting</span>
 
+<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">"ignore"</span><span class="p">)</span>
+<span class="n">logger</span><span class="o">.</span><span class="n">remove</span><span class="p">()</span>
+
+<span class="c1"># FIRMS returns a GeoDataFrame of fire pixels (vector) -&gt; matplotlib scatter.</span>
+<span class="n">fires</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
+    <span class="n">data_source</span><span class="o">=</span><span class="s2">"firms"</span><span class="p">,</span>
+    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">"VIIRS_SNPP_SP"</span><span class="p">],</span>
+    <span class="n">start</span><span class="o">=</span><span class="s2">"2023-06-02"</span><span class="p">,</span>
+    <span class="n">end</span><span class="o">=</span><span class="s2">"2023-06-08"</span><span class="p">,</span>
+    <span class="n">aoi</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">80.0</span><span class="p">,</span> <span class="mf">48.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">72.0</span><span class="p">,</span> <span class="mf">53.0</span><span class="p">],</span>
+    <span class="n">path</span><span class="o">=</span><span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">()</span>
+<span class="p">)</span><span class="o">.</span><span class="n">authenticate</span><span class="p">(</span><span class="n">api_key</span><span class="o">=</span><span class="n">FIRMS_MAP_KEY</span><span class="p">)</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">fires</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">progress_bar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span><span class="si">:</span><span class="s2">,</span><span class="si">}</span><span class="s2"> fire detections"</span><span class="p">)</span>
+</pre></div>
+<div class="clipboard-copy-txt" id="cell-2">import os, tempfile, warnings
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+from loguru import logger
+from earthlens import EarthLens
+from pyramids.dataset import Dataset   # pyramids' own plotting
+
+warnings.filterwarnings("ignore")
+logger.remove()
 
 # FIRMS returns a GeoDataFrame of fire pixels (vector) -&gt; matplotlib scatter.
-fires = EarthLens(data_source="firms", variables=["VIIRS_SNPP_SP"], map_key=FIRMS_MAP_KEY,
-    start="2023-06-02", end="2023-06-08", aoi=[-80.0, 48.0, -72.0, 53.0],
-    path=tempfile.mkdtemp()).download(progress_bar=False)
-print(f"{len(fires):,} fire detections")</div>
+fires = EarthLens(
+    data_source="firms",
+    variables=["VIIRS_SNPP_SP"],
+    start="2023-06-02",
+    end="2023-06-08",
+    aoi=[-80.0, 48.0, -72.0, 53.0],
+    path=tempfile.mkdtemp()
+).authenticate(api_key=FIRMS_MAP_KEY)
+data = fires.download(progress_bar=False)
+print(f"{len(data):,} fire detections")</div>
 </div>
 </div>
 </div>
@@ -11790,6 +11835,14 @@ print(f"{len(fires):,} fire detections")</div>
 <div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
 </div>
 <div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
+<pre>2026-06-12 00:02:01 | <span class="ansi-green-fg">INFO</span> | pyramids.base.config | Logging is configured.
+2026-06-12 00:02:11 | <span class="ansi-green-fg">INFO</span> | pyogrio._io | Created 24,702 records
+</pre>
+</div>
+</div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
@@ -11820,7 +11873,7 @@ print(f"{len(fires):,} fire detections")</div>
 <div class="jp-InputPrompt jp-InputArea-prompt">In [2]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-2">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-3">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -11830,25 +11883,41 @@ print(f"{len(fires):,} fire detections")</div>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">fires</span><span class="p">):</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
     <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
-    <span class="n">sc</span> <span class="o">=</span> <span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">fires</span><span class="o">.</span><span class="n">longitude</span><span class="p">,</span> <span class="n">fires</span><span class="o">.</span><span class="n">latitude</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">fires</span><span class="o">.</span><span class="n">frp</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">lower</span><span class="o">=</span><span class="mi">1</span><span class="p">)),</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">"inferno"</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.6</span><span class="p">)</span>
-    <span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">xlabel</span><span class="o">=</span><span class="s2">"longitude"</span><span class="p">,</span> <span class="n">ylabel</span><span class="o">=</span><span class="s2">"latitude"</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="sa">f</span><span class="s2">"VIIRS active fire, 2–8 Jun 2023 (</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">fires</span><span class="p">)</span><span class="si">:</span><span class="s2">,</span><span class="si">}</span><span class="s2">)"</span><span class="p">)</span>
+    <span class="n">sc</span> <span class="o">=</span> <span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span>
+        <span class="n">data</span><span class="o">.</span><span class="n">longitude</span><span class="p">,</span>
+        <span class="n">data</span><span class="o">.</span><span class="n">latitude</span><span class="p">,</span>
+        <span class="n">c</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">frp</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">lower</span><span class="o">=</span><span class="mi">1</span><span class="p">)),</span>
+        <span class="n">cmap</span><span class="o">=</span><span class="s2">"inferno"</span><span class="p">,</span>
+        <span class="n">s</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span>
+        <span class="n">alpha</span><span class="o">=</span><span class="mf">0.6</span>
+    <span class="p">)</span>
+
+    <span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">xlabel</span><span class="o">=</span><span class="s2">"longitude"</span><span class="p">,</span> <span class="n">ylabel</span><span class="o">=</span><span class="s2">"latitude"</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="sa">f</span><span class="s2">"VIIRS active fire, 2–8 Jun 2023 (</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span><span class="si">:</span><span class="s2">,</span><span class="si">}</span><span class="s2">)"</span><span class="p">)</span>
     <span class="n">fig</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">sc</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="s2">"log10 FRP (MW)"</span><span class="p">)</span>
-    <span class="n">d</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">fires</span><span class="o">.</span><span class="n">acq_datetime</span><span class="p">,</span> <span class="n">utc</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">dt</span><span class="o">.</span><span class="n">date</span><span class="o">.</span><span class="n">value_counts</span><span class="p">()</span><span class="o">.</span><span class="n">sort_index</span><span class="p">()</span>
+    <span class="n">d</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">acq_datetime</span><span class="p">,</span> <span class="n">utc</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">dt</span><span class="o">.</span><span class="n">date</span><span class="o">.</span><span class="n">value_counts</span><span class="p">()</span><span class="o">.</span><span class="n">sort_index</span><span class="p">()</span>
     <span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">bar</span><span class="p">([</span><span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">d</span><span class="o">.</span><span class="n">index</span><span class="p">],</span> <span class="n">d</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"firebrick"</span><span class="p">);</span> <span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">ylabel</span><span class="o">=</span><span class="s2">"detections"</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">"Detections per day"</span><span class="p">)</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">setp</span><span class="p">(</span><span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">get_xticklabels</span><span class="p">(),</span> <span class="n">rotation</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">ha</span><span class="o">=</span><span class="s2">"right"</span><span class="p">);</span> <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">();</span> <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"median FRP </span><span class="si">{</span><span class="n">fires</span><span class="o">.</span><span class="n">frp</span><span class="o">.</span><span class="n">median</span><span class="p">()</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> MW | total </span><span class="si">{</span><span class="n">fires</span><span class="o">.</span><span class="n">frp</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="o">/</span><span class="mf">1e3</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> GW"</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"median FRP </span><span class="si">{</span><span class="n">data</span><span class="o">.</span><span class="n">frp</span><span class="o">.</span><span class="n">median</span><span class="p">()</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> MW | total </span><span class="si">{</span><span class="n">data</span><span class="o">.</span><span class="n">frp</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="o">/</span><span class="mf">1e3</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> GW"</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-2">if len(fires):
+<div class="clipboard-copy-txt" id="cell-3">if len(data):
     fig, ax = plt.subplots(1, 2, figsize=(15, 5))
-    sc = ax[0].scatter(fires.longitude, fires.latitude, c=np.log10(fires.frp.clip(lower=1)), cmap="inferno", s=6, alpha=0.6)
-    ax[0].set(xlabel="longitude", ylabel="latitude", title=f"VIIRS active fire, 2–8 Jun 2023 ({len(fires):,})")
+    sc = ax[0].scatter(
+        data.longitude,
+        data.latitude,
+        c=np.log10(data.frp.clip(lower=1)),
+        cmap="inferno",
+        s=6,
+        alpha=0.6
+    )
+
+    ax[0].set(xlabel="longitude", ylabel="latitude", title=f"VIIRS active fire, 2–8 Jun 2023 ({len(data):,})")
     fig.colorbar(sc, ax=ax[0], label="log10 FRP (MW)")
-    d = pd.to_datetime(fires.acq_datetime, utc=True).dt.date.value_counts().sort_index()
+    d = pd.to_datetime(data.acq_datetime, utc=True).dt.date.value_counts().sort_index()
     ax[1].bar([str(x) for x in d.index], d.values, color="firebrick"); ax[1].set(ylabel="detections", title="Detections per day")
     plt.setp(ax[1].get_xticklabels(), rotation=30, ha="right"); plt.tight_layout(); plt.show()
-    print(f"median FRP {fires.frp.median():.1f} MW | total {fires.frp.sum()/1e3:.1f} GW")</div>
+    print(f"median FRP {data.frp.median():.1f} MW | total {data.frp.sum()/1e3:.1f} GW")</div>
 </div>
 </div>
 </div>
@@ -11893,7 +11962,7 @@ print(f"{len(fires):,} fire detections")</div>
 <div class="jp-InputPrompt jp-InputArea-prompt">In [3]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-3">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-4">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -11927,7 +11996,7 @@ print(f"{len(fires):,} fire detections")</div>
 <span class="k">else</span><span class="p">:</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">"Sentinel-2 dNBR skipped - set GEE credentials and rerun"</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-3">BURN_AOI = [-77.0, 51.0, -76.0, 52.0]
+<div class="clipboard-copy-txt" id="cell-4">BURN_AOI = [-77.0, 51.0, -76.0, 52.0]
 def nbr(start, end):
     p = EarthLens(data_source="gee", cadence="raw", path=tempfile.mkdtemp(), service_account=SERVICE_ACCOUNT, service_key=SERVICE_KEY, dataset="COPERNICUS/S2_SR_HARMONIZED", variables=["B8", "B12"], aoi=BURN_AOI, start=start, end=end, scale=80, reducer="median").load()[0]
     a = np.asarray(p.read_array(), dtype="float32"); return (a[0] - a[1]) / (a[0] + a[1] + 1e-6), p
