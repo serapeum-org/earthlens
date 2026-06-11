@@ -112,7 +112,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/f1/16/d905e7f53e661ce2c24686c38048d8e2b750ffc4350009d41c4e6c6c9826/h5py-3.16.0-cp314-cp314-manylinux_2_28_x86_64.whl
       - pypi: https://files.pythonhosted.org/packages/c8/95/6a65329e37d7e9cd14688a4dd8e72f88b3e0f8dcd1299769d80c03344c61/hdx_python_api-6.6.8-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/28/e0/baa284cd1d9f41945333554276c5e54ea14857a4619a7d521e932630be01/hdx_python_country-4.1.1-py3-none-any.whl
-      - pypi: https://files.pythonhosted.org/packages/fc/8b/d23c78422ce1754cd4d93df8f41bea79defb1a0672d0860d7929348abcec/hdx_python_utilities-4.0.8-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/24/b5/27994afeaa1cef2f668a764808ff4575bb564f7b47f055122be56dd8d6b4/hdx_python_utilities-4.1.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/9c/a2/e52eebd269fe97733bebf23d0bc242fe385ebc01e0cc7930b1af1947d9bf/herbie_data-2026.3.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/c4/77/4c0456ead6871b060d024204f891546499eb1e57b8ce523671f690f24281/hpc_utils-0.1.5-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/7e/f5/f66802a942d491edb555dd61e3a9961140fd64c90bce1eafd741609d334d/httpcore-1.0.9-py3-none-any.whl
@@ -250,7 +250,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/15/a3/7c8f704b8dc07dfe0a5d01c2edbfd88317aa8e5e3fa7c743eb7a085ae767/wrapt-2.2.1-cp314-cp314-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl
       - pypi: https://files.pythonhosted.org/packages/14/78/cd4d5294e0a7294243d332fdd00a020942faa41472e694f2552976a5fe39/xarray-2025.1.1-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/1a/62/c8d562e7766786ba6587d09c5a8ba9f718ed3fa8af7f4553e8f91c36f302/xlrd-2.0.2-py2.py3-none-any.whl
-      - pypi: https://files.pythonhosted.org/packages/f4/d6/9fd7e753a927cb11d039848a659124e6ec4cfe008704bb2790df7712c36d/xlsx2csv-0.8.6-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/c4/c0/15c21556362c67f1155f3643a375d50ac67559b82c768e64e800a42a2577/xlsx2csv-0.8.4-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/3a/0c/3662f4a66880196a590b202f0db82d919dd2f89e99a27fadef91c4a33d41/xlsxwriter-3.2.9-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/44/48/def306413b25c3d01753603b1a222a011b8621aed27cd7f89cbc27e6b0f4/xlwt-1.3.0-py2.py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/c2/53/d81269aaafccea0d33396c03035de997b743f11e648e6e27a0df99c72980/yarl-1.24.2-cp314-cp314-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl
@@ -358,7 +358,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/6a/b7/9366ed44ced9b7ef357ab48c94205280276db9d7f064aa3012a97227e966/h5py-3.16.0-cp314-cp314-macosx_11_0_arm64.whl
       - pypi: https://files.pythonhosted.org/packages/c8/95/6a65329e37d7e9cd14688a4dd8e72f88b3e0f8dcd1299769d80c03344c61/hdx_python_api-6.6.8-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/28/e0/baa284cd1d9f41945333554276c5e54ea14857a4619a7d521e932630be01/hdx_python_country-4.1.1-py3-none-any.whl
-      - pypi: https://files.pythonhosted.org/packages/fc/8b/d23c78422ce1754cd4d93df8f41bea79defb1a0672d0860d7929348abcec/hdx_python_utilities-4.0.8-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/24/b5/27994afeaa1cef2f668a764808ff4575bb564f7b47f055122be56dd8d6b4/hdx_python_utilities-4.1.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/9c/a2/e52eebd269fe97733bebf23d0bc242fe385ebc01e0cc7930b1af1947d9bf/herbie_data-2026.3.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/c4/77/4c0456ead6871b060d024204f891546499eb1e57b8ce523671f690f24281/hpc_utils-0.1.5-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/7e/f5/f66802a942d491edb555dd61e3a9961140fd64c90bce1eafd741609d334d/httpcore-1.0.9-py3-none-any.whl
@@ -496,7 +496,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/13/3c/b74cfd984cef560b900fb1a727af20352d89e1f06bf2e1114dd3f00f5f5a/wrapt-2.2.1-cp314-cp314-macosx_11_0_arm64.whl
       - pypi: https://files.pythonhosted.org/packages/14/78/cd4d5294e0a7294243d332fdd00a020942faa41472e694f2552976a5fe39/xarray-2025.1.1-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/1a/62/c8d562e7766786ba6587d09c5a8ba9f718ed3fa8af7f4553e8f91c36f302/xlrd-2.0.2-py2.py3-none-any.whl
-      - pypi: https://files.pythonhosted.org/packages/f4/d6/9fd7e753a927cb11d039848a659124e6ec4cfe008704bb2790df7712c36d/xlsx2csv-0.8.6-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/c4/c0/15c21556362c67f1155f3643a375d50ac67559b82c768e64e800a42a2577/xlsx2csv-0.8.4-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/3a/0c/3662f4a66880196a590b202f0db82d919dd2f89e99a27fadef91c4a33d41/xlsxwriter-3.2.9-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/44/48/def306413b25c3d01753603b1a222a011b8621aed27cd7f89cbc27e6b0f4/xlwt-1.3.0-py2.py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/ba/b1/5297bb6a7df4782f7605bffc43b31f5044070935fbbcaa6c705a07e6ac65/yarl-1.24.2-cp314-cp314-macosx_11_0_arm64.whl
@@ -604,7 +604,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/3e/14/615a450205e1b56d16c6783f5ccd116cde05550faad70ae077c955654a75/h5py-3.16.0-cp314-cp314-win_amd64.whl
       - pypi: https://files.pythonhosted.org/packages/c8/95/6a65329e37d7e9cd14688a4dd8e72f88b3e0f8dcd1299769d80c03344c61/hdx_python_api-6.6.8-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/28/e0/baa284cd1d9f41945333554276c5e54ea14857a4619a7d521e932630be01/hdx_python_country-4.1.1-py3-none-any.whl
-      - pypi: https://files.pythonhosted.org/packages/fc/8b/d23c78422ce1754cd4d93df8f41bea79defb1a0672d0860d7929348abcec/hdx_python_utilities-4.0.8-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/24/b5/27994afeaa1cef2f668a764808ff4575bb564f7b47f055122be56dd8d6b4/hdx_python_utilities-4.1.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/9c/a2/e52eebd269fe97733bebf23d0bc242fe385ebc01e0cc7930b1af1947d9bf/herbie_data-2026.3.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/c4/77/4c0456ead6871b060d024204f891546499eb1e57b8ce523671f690f24281/hpc_utils-0.1.5-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/7e/f5/f66802a942d491edb555dd61e3a9961140fd64c90bce1eafd741609d334d/httpcore-1.0.9-py3-none-any.whl
@@ -746,7 +746,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/22/b3/ef7c3295d02e0448a71c639a36a057f46d524d057c9486291a7a3039e65c/wrapt-2.2.1-cp314-cp314-win_amd64.whl
       - pypi: https://files.pythonhosted.org/packages/14/78/cd4d5294e0a7294243d332fdd00a020942faa41472e694f2552976a5fe39/xarray-2025.1.1-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/1a/62/c8d562e7766786ba6587d09c5a8ba9f718ed3fa8af7f4553e8f91c36f302/xlrd-2.0.2-py2.py3-none-any.whl
-      - pypi: https://files.pythonhosted.org/packages/f4/d6/9fd7e753a927cb11d039848a659124e6ec4cfe008704bb2790df7712c36d/xlsx2csv-0.8.6-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/c4/c0/15c21556362c67f1155f3643a375d50ac67559b82c768e64e800a42a2577/xlsx2csv-0.8.4-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/3a/0c/3662f4a66880196a590b202f0db82d919dd2f89e99a27fadef91c4a33d41/xlsxwriter-3.2.9-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/44/48/def306413b25c3d01753603b1a222a011b8621aed27cd7f89cbc27e6b0f4/xlwt-1.3.0-py2.py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/fa/d9/5582d57e2b2db9b85eb6663a22efdd78e08805f3f5389566e9fcad254d1b/yarl-1.24.2-cp314-cp314-win_amd64.whl
@@ -890,7 +890,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/f1/16/d905e7f53e661ce2c24686c38048d8e2b750ffc4350009d41c4e6c6c9826/h5py-3.16.0-cp314-cp314-manylinux_2_28_x86_64.whl
       - pypi: https://files.pythonhosted.org/packages/c8/95/6a65329e37d7e9cd14688a4dd8e72f88b3e0f8dcd1299769d80c03344c61/hdx_python_api-6.6.8-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/28/e0/baa284cd1d9f41945333554276c5e54ea14857a4619a7d521e932630be01/hdx_python_country-4.1.1-py3-none-any.whl
-      - pypi: https://files.pythonhosted.org/packages/fc/8b/d23c78422ce1754cd4d93df8f41bea79defb1a0672d0860d7929348abcec/hdx_python_utilities-4.0.8-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/24/b5/27994afeaa1cef2f668a764808ff4575bb564f7b47f055122be56dd8d6b4/hdx_python_utilities-4.1.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/9c/a2/e52eebd269fe97733bebf23d0bc242fe385ebc01e0cc7930b1af1947d9bf/herbie_data-2026.3.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/c4/77/4c0456ead6871b060d024204f891546499eb1e57b8ce523671f690f24281/hpc_utils-0.1.5-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/7e/f5/f66802a942d491edb555dd61e3a9961140fd64c90bce1eafd741609d334d/httpcore-1.0.9-py3-none-any.whl
@@ -1111,7 +1111,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/15/a3/7c8f704b8dc07dfe0a5d01c2edbfd88317aa8e5e3fa7c743eb7a085ae767/wrapt-2.2.1-cp314-cp314-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl
       - pypi: https://files.pythonhosted.org/packages/14/78/cd4d5294e0a7294243d332fdd00a020942faa41472e694f2552976a5fe39/xarray-2025.1.1-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/1a/62/c8d562e7766786ba6587d09c5a8ba9f718ed3fa8af7f4553e8f91c36f302/xlrd-2.0.2-py2.py3-none-any.whl
-      - pypi: https://files.pythonhosted.org/packages/f4/d6/9fd7e753a927cb11d039848a659124e6ec4cfe008704bb2790df7712c36d/xlsx2csv-0.8.6-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/c4/c0/15c21556362c67f1155f3643a375d50ac67559b82c768e64e800a42a2577/xlsx2csv-0.8.4-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/3a/0c/3662f4a66880196a590b202f0db82d919dd2f89e99a27fadef91c4a33d41/xlsxwriter-3.2.9-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/44/48/def306413b25c3d01753603b1a222a011b8621aed27cd7f89cbc27e6b0f4/xlwt-1.3.0-py2.py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/a8/a9/d23012099dc88ec69a29c6407b41d89681cb674c2043cd5b467c7e299c08/xyzservices-2026.3.0-py3-none-any.whl
@@ -1246,7 +1246,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/6a/b7/9366ed44ced9b7ef357ab48c94205280276db9d7f064aa3012a97227e966/h5py-3.16.0-cp314-cp314-macosx_11_0_arm64.whl
       - pypi: https://files.pythonhosted.org/packages/c8/95/6a65329e37d7e9cd14688a4dd8e72f88b3e0f8dcd1299769d80c03344c61/hdx_python_api-6.6.8-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/28/e0/baa284cd1d9f41945333554276c5e54ea14857a4619a7d521e932630be01/hdx_python_country-4.1.1-py3-none-any.whl
-      - pypi: https://files.pythonhosted.org/packages/fc/8b/d23c78422ce1754cd4d93df8f41bea79defb1a0672d0860d7929348abcec/hdx_python_utilities-4.0.8-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/24/b5/27994afeaa1cef2f668a764808ff4575bb564f7b47f055122be56dd8d6b4/hdx_python_utilities-4.1.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/9c/a2/e52eebd269fe97733bebf23d0bc242fe385ebc01e0cc7930b1af1947d9bf/herbie_data-2026.3.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/c4/77/4c0456ead6871b060d024204f891546499eb1e57b8ce523671f690f24281/hpc_utils-0.1.5-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/7e/f5/f66802a942d491edb555dd61e3a9961140fd64c90bce1eafd741609d334d/httpcore-1.0.9-py3-none-any.whl
@@ -1465,7 +1465,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/13/3c/b74cfd984cef560b900fb1a727af20352d89e1f06bf2e1114dd3f00f5f5a/wrapt-2.2.1-cp314-cp314-macosx_11_0_arm64.whl
       - pypi: https://files.pythonhosted.org/packages/14/78/cd4d5294e0a7294243d332fdd00a020942faa41472e694f2552976a5fe39/xarray-2025.1.1-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/1a/62/c8d562e7766786ba6587d09c5a8ba9f718ed3fa8af7f4553e8f91c36f302/xlrd-2.0.2-py2.py3-none-any.whl
-      - pypi: https://files.pythonhosted.org/packages/f4/d6/9fd7e753a927cb11d039848a659124e6ec4cfe008704bb2790df7712c36d/xlsx2csv-0.8.6-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/c4/c0/15c21556362c67f1155f3643a375d50ac67559b82c768e64e800a42a2577/xlsx2csv-0.8.4-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/3a/0c/3662f4a66880196a590b202f0db82d919dd2f89e99a27fadef91c4a33d41/xlsxwriter-3.2.9-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/44/48/def306413b25c3d01753603b1a222a011b8621aed27cd7f89cbc27e6b0f4/xlwt-1.3.0-py2.py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/a8/a9/d23012099dc88ec69a29c6407b41d89681cb674c2043cd5b467c7e299c08/xyzservices-2026.3.0-py3-none-any.whl
@@ -1599,7 +1599,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/3e/14/615a450205e1b56d16c6783f5ccd116cde05550faad70ae077c955654a75/h5py-3.16.0-cp314-cp314-win_amd64.whl
       - pypi: https://files.pythonhosted.org/packages/c8/95/6a65329e37d7e9cd14688a4dd8e72f88b3e0f8dcd1299769d80c03344c61/hdx_python_api-6.6.8-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/28/e0/baa284cd1d9f41945333554276c5e54ea14857a4619a7d521e932630be01/hdx_python_country-4.1.1-py3-none-any.whl
-      - pypi: https://files.pythonhosted.org/packages/fc/8b/d23c78422ce1754cd4d93df8f41bea79defb1a0672d0860d7929348abcec/hdx_python_utilities-4.0.8-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/24/b5/27994afeaa1cef2f668a764808ff4575bb564f7b47f055122be56dd8d6b4/hdx_python_utilities-4.1.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/9c/a2/e52eebd269fe97733bebf23d0bc242fe385ebc01e0cc7930b1af1947d9bf/herbie_data-2026.3.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/c4/77/4c0456ead6871b060d024204f891546499eb1e57b8ce523671f690f24281/hpc_utils-0.1.5-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/7e/f5/f66802a942d491edb555dd61e3a9961140fd64c90bce1eafd741609d334d/httpcore-1.0.9-py3-none-any.whl
@@ -1821,7 +1821,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/22/b3/ef7c3295d02e0448a71c639a36a057f46d524d057c9486291a7a3039e65c/wrapt-2.2.1-cp314-cp314-win_amd64.whl
       - pypi: https://files.pythonhosted.org/packages/14/78/cd4d5294e0a7294243d332fdd00a020942faa41472e694f2552976a5fe39/xarray-2025.1.1-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/1a/62/c8d562e7766786ba6587d09c5a8ba9f718ed3fa8af7f4553e8f91c36f302/xlrd-2.0.2-py2.py3-none-any.whl
-      - pypi: https://files.pythonhosted.org/packages/f4/d6/9fd7e753a927cb11d039848a659124e6ec4cfe008704bb2790df7712c36d/xlsx2csv-0.8.6-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/c4/c0/15c21556362c67f1155f3643a375d50ac67559b82c768e64e800a42a2577/xlsx2csv-0.8.4-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/3a/0c/3662f4a66880196a590b202f0db82d919dd2f89e99a27fadef91c4a33d41/xlsxwriter-3.2.9-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/44/48/def306413b25c3d01753603b1a222a011b8621aed27cd7f89cbc27e6b0f4/xlwt-1.3.0-py2.py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/a8/a9/d23012099dc88ec69a29c6407b41d89681cb674c2043cd5b467c7e299c08/xyzservices-2026.3.0-py3-none-any.whl
@@ -1962,7 +1962,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/f1/16/d905e7f53e661ce2c24686c38048d8e2b750ffc4350009d41c4e6c6c9826/h5py-3.16.0-cp314-cp314-manylinux_2_28_x86_64.whl
       - pypi: https://files.pythonhosted.org/packages/c8/95/6a65329e37d7e9cd14688a4dd8e72f88b3e0f8dcd1299769d80c03344c61/hdx_python_api-6.6.8-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/28/e0/baa284cd1d9f41945333554276c5e54ea14857a4619a7d521e932630be01/hdx_python_country-4.1.1-py3-none-any.whl
-      - pypi: https://files.pythonhosted.org/packages/fc/8b/d23c78422ce1754cd4d93df8f41bea79defb1a0672d0860d7929348abcec/hdx_python_utilities-4.0.8-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/24/b5/27994afeaa1cef2f668a764808ff4575bb564f7b47f055122be56dd8d6b4/hdx_python_utilities-4.1.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/9c/a2/e52eebd269fe97733bebf23d0bc242fe385ebc01e0cc7930b1af1947d9bf/herbie_data-2026.3.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/1f/7f/13cd798d180af4bf4c0ceddeefba2b864a63c71645abc0308b768d67bb81/hjson-3.1.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/c4/77/4c0456ead6871b060d024204f891546499eb1e57b8ce523671f690f24281/hpc_utils-0.1.5-py3-none-any.whl
@@ -2179,7 +2179,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/15/a3/7c8f704b8dc07dfe0a5d01c2edbfd88317aa8e5e3fa7c743eb7a085ae767/wrapt-2.2.1-cp314-cp314-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl
       - pypi: https://files.pythonhosted.org/packages/14/78/cd4d5294e0a7294243d332fdd00a020942faa41472e694f2552976a5fe39/xarray-2025.1.1-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/1a/62/c8d562e7766786ba6587d09c5a8ba9f718ed3fa8af7f4553e8f91c36f302/xlrd-2.0.2-py2.py3-none-any.whl
-      - pypi: https://files.pythonhosted.org/packages/f4/d6/9fd7e753a927cb11d039848a659124e6ec4cfe008704bb2790df7712c36d/xlsx2csv-0.8.6-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/c4/c0/15c21556362c67f1155f3643a375d50ac67559b82c768e64e800a42a2577/xlsx2csv-0.8.4-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/3a/0c/3662f4a66880196a590b202f0db82d919dd2f89e99a27fadef91c4a33d41/xlsxwriter-3.2.9-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/44/48/def306413b25c3d01753603b1a222a011b8621aed27cd7f89cbc27e6b0f4/xlwt-1.3.0-py2.py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/a8/a9/d23012099dc88ec69a29c6407b41d89681cb674c2043cd5b467c7e299c08/xyzservices-2026.3.0-py3-none-any.whl
@@ -2310,7 +2310,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/6a/b7/9366ed44ced9b7ef357ab48c94205280276db9d7f064aa3012a97227e966/h5py-3.16.0-cp314-cp314-macosx_11_0_arm64.whl
       - pypi: https://files.pythonhosted.org/packages/c8/95/6a65329e37d7e9cd14688a4dd8e72f88b3e0f8dcd1299769d80c03344c61/hdx_python_api-6.6.8-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/28/e0/baa284cd1d9f41945333554276c5e54ea14857a4619a7d521e932630be01/hdx_python_country-4.1.1-py3-none-any.whl
-      - pypi: https://files.pythonhosted.org/packages/fc/8b/d23c78422ce1754cd4d93df8f41bea79defb1a0672d0860d7929348abcec/hdx_python_utilities-4.0.8-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/24/b5/27994afeaa1cef2f668a764808ff4575bb564f7b47f055122be56dd8d6b4/hdx_python_utilities-4.1.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/9c/a2/e52eebd269fe97733bebf23d0bc242fe385ebc01e0cc7930b1af1947d9bf/herbie_data-2026.3.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/1f/7f/13cd798d180af4bf4c0ceddeefba2b864a63c71645abc0308b768d67bb81/hjson-3.1.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/c4/77/4c0456ead6871b060d024204f891546499eb1e57b8ce523671f690f24281/hpc_utils-0.1.5-py3-none-any.whl
@@ -2527,7 +2527,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/13/3c/b74cfd984cef560b900fb1a727af20352d89e1f06bf2e1114dd3f00f5f5a/wrapt-2.2.1-cp314-cp314-macosx_11_0_arm64.whl
       - pypi: https://files.pythonhosted.org/packages/14/78/cd4d5294e0a7294243d332fdd00a020942faa41472e694f2552976a5fe39/xarray-2025.1.1-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/1a/62/c8d562e7766786ba6587d09c5a8ba9f718ed3fa8af7f4553e8f91c36f302/xlrd-2.0.2-py2.py3-none-any.whl
-      - pypi: https://files.pythonhosted.org/packages/f4/d6/9fd7e753a927cb11d039848a659124e6ec4cfe008704bb2790df7712c36d/xlsx2csv-0.8.6-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/c4/c0/15c21556362c67f1155f3643a375d50ac67559b82c768e64e800a42a2577/xlsx2csv-0.8.4-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/3a/0c/3662f4a66880196a590b202f0db82d919dd2f89e99a27fadef91c4a33d41/xlsxwriter-3.2.9-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/44/48/def306413b25c3d01753603b1a222a011b8621aed27cd7f89cbc27e6b0f4/xlwt-1.3.0-py2.py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/a8/a9/d23012099dc88ec69a29c6407b41d89681cb674c2043cd5b467c7e299c08/xyzservices-2026.3.0-py3-none-any.whl
@@ -2657,7 +2657,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/3e/14/615a450205e1b56d16c6783f5ccd116cde05550faad70ae077c955654a75/h5py-3.16.0-cp314-cp314-win_amd64.whl
       - pypi: https://files.pythonhosted.org/packages/c8/95/6a65329e37d7e9cd14688a4dd8e72f88b3e0f8dcd1299769d80c03344c61/hdx_python_api-6.6.8-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/28/e0/baa284cd1d9f41945333554276c5e54ea14857a4619a7d521e932630be01/hdx_python_country-4.1.1-py3-none-any.whl
-      - pypi: https://files.pythonhosted.org/packages/fc/8b/d23c78422ce1754cd4d93df8f41bea79defb1a0672d0860d7929348abcec/hdx_python_utilities-4.0.8-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/24/b5/27994afeaa1cef2f668a764808ff4575bb564f7b47f055122be56dd8d6b4/hdx_python_utilities-4.1.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/9c/a2/e52eebd269fe97733bebf23d0bc242fe385ebc01e0cc7930b1af1947d9bf/herbie_data-2026.3.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/1f/7f/13cd798d180af4bf4c0ceddeefba2b864a63c71645abc0308b768d67bb81/hjson-3.1.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/c4/77/4c0456ead6871b060d024204f891546499eb1e57b8ce523671f690f24281/hpc_utils-0.1.5-py3-none-any.whl
@@ -2876,7 +2876,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/22/b3/ef7c3295d02e0448a71c639a36a057f46d524d057c9486291a7a3039e65c/wrapt-2.2.1-cp314-cp314-win_amd64.whl
       - pypi: https://files.pythonhosted.org/packages/14/78/cd4d5294e0a7294243d332fdd00a020942faa41472e694f2552976a5fe39/xarray-2025.1.1-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/1a/62/c8d562e7766786ba6587d09c5a8ba9f718ed3fa8af7f4553e8f91c36f302/xlrd-2.0.2-py2.py3-none-any.whl
-      - pypi: https://files.pythonhosted.org/packages/f4/d6/9fd7e753a927cb11d039848a659124e6ec4cfe008704bb2790df7712c36d/xlsx2csv-0.8.6-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/c4/c0/15c21556362c67f1155f3643a375d50ac67559b82c768e64e800a42a2577/xlsx2csv-0.8.4-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/3a/0c/3662f4a66880196a590b202f0db82d919dd2f89e99a27fadef91c4a33d41/xlsxwriter-3.2.9-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/44/48/def306413b25c3d01753603b1a222a011b8621aed27cd7f89cbc27e6b0f4/xlwt-1.3.0-py2.py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/a8/a9/d23012099dc88ec69a29c6407b41d89681cb674c2043cd5b467c7e299c08/xyzservices-2026.3.0-py3-none-any.whl
@@ -3021,7 +3021,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/f1/16/d905e7f53e661ce2c24686c38048d8e2b750ffc4350009d41c4e6c6c9826/h5py-3.16.0-cp314-cp314-manylinux_2_28_x86_64.whl
       - pypi: https://files.pythonhosted.org/packages/c8/95/6a65329e37d7e9cd14688a4dd8e72f88b3e0f8dcd1299769d80c03344c61/hdx_python_api-6.6.8-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/28/e0/baa284cd1d9f41945333554276c5e54ea14857a4619a7d521e932630be01/hdx_python_country-4.1.1-py3-none-any.whl
-      - pypi: https://files.pythonhosted.org/packages/fc/8b/d23c78422ce1754cd4d93df8f41bea79defb1a0672d0860d7929348abcec/hdx_python_utilities-4.0.8-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/24/b5/27994afeaa1cef2f668a764808ff4575bb564f7b47f055122be56dd8d6b4/hdx_python_utilities-4.1.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/9c/a2/e52eebd269fe97733bebf23d0bc242fe385ebc01e0cc7930b1af1947d9bf/herbie_data-2026.3.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/c4/77/4c0456ead6871b060d024204f891546499eb1e57b8ce523671f690f24281/hpc_utils-0.1.5-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/7e/f5/f66802a942d491edb555dd61e3a9961140fd64c90bce1eafd741609d334d/httpcore-1.0.9-py3-none-any.whl
@@ -3243,7 +3243,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/15/a3/7c8f704b8dc07dfe0a5d01c2edbfd88317aa8e5e3fa7c743eb7a085ae767/wrapt-2.2.1-cp314-cp314-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl
       - pypi: https://files.pythonhosted.org/packages/14/78/cd4d5294e0a7294243d332fdd00a020942faa41472e694f2552976a5fe39/xarray-2025.1.1-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/1a/62/c8d562e7766786ba6587d09c5a8ba9f718ed3fa8af7f4553e8f91c36f302/xlrd-2.0.2-py2.py3-none-any.whl
-      - pypi: https://files.pythonhosted.org/packages/f4/d6/9fd7e753a927cb11d039848a659124e6ec4cfe008704bb2790df7712c36d/xlsx2csv-0.8.6-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/c4/c0/15c21556362c67f1155f3643a375d50ac67559b82c768e64e800a42a2577/xlsx2csv-0.8.4-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/3a/0c/3662f4a66880196a590b202f0db82d919dd2f89e99a27fadef91c4a33d41/xlsxwriter-3.2.9-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/44/48/def306413b25c3d01753603b1a222a011b8621aed27cd7f89cbc27e6b0f4/xlwt-1.3.0-py2.py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/a8/a9/d23012099dc88ec69a29c6407b41d89681cb674c2043cd5b467c7e299c08/xyzservices-2026.3.0-py3-none-any.whl
@@ -3378,7 +3378,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/6a/b7/9366ed44ced9b7ef357ab48c94205280276db9d7f064aa3012a97227e966/h5py-3.16.0-cp314-cp314-macosx_11_0_arm64.whl
       - pypi: https://files.pythonhosted.org/packages/c8/95/6a65329e37d7e9cd14688a4dd8e72f88b3e0f8dcd1299769d80c03344c61/hdx_python_api-6.6.8-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/28/e0/baa284cd1d9f41945333554276c5e54ea14857a4619a7d521e932630be01/hdx_python_country-4.1.1-py3-none-any.whl
-      - pypi: https://files.pythonhosted.org/packages/fc/8b/d23c78422ce1754cd4d93df8f41bea79defb1a0672d0860d7929348abcec/hdx_python_utilities-4.0.8-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/24/b5/27994afeaa1cef2f668a764808ff4575bb564f7b47f055122be56dd8d6b4/hdx_python_utilities-4.1.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/9c/a2/e52eebd269fe97733bebf23d0bc242fe385ebc01e0cc7930b1af1947d9bf/herbie_data-2026.3.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/c4/77/4c0456ead6871b060d024204f891546499eb1e57b8ce523671f690f24281/hpc_utils-0.1.5-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/7e/f5/f66802a942d491edb555dd61e3a9961140fd64c90bce1eafd741609d334d/httpcore-1.0.9-py3-none-any.whl
@@ -3598,7 +3598,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/13/3c/b74cfd984cef560b900fb1a727af20352d89e1f06bf2e1114dd3f00f5f5a/wrapt-2.2.1-cp314-cp314-macosx_11_0_arm64.whl
       - pypi: https://files.pythonhosted.org/packages/14/78/cd4d5294e0a7294243d332fdd00a020942faa41472e694f2552976a5fe39/xarray-2025.1.1-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/1a/62/c8d562e7766786ba6587d09c5a8ba9f718ed3fa8af7f4553e8f91c36f302/xlrd-2.0.2-py2.py3-none-any.whl
-      - pypi: https://files.pythonhosted.org/packages/f4/d6/9fd7e753a927cb11d039848a659124e6ec4cfe008704bb2790df7712c36d/xlsx2csv-0.8.6-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/c4/c0/15c21556362c67f1155f3643a375d50ac67559b82c768e64e800a42a2577/xlsx2csv-0.8.4-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/3a/0c/3662f4a66880196a590b202f0db82d919dd2f89e99a27fadef91c4a33d41/xlsxwriter-3.2.9-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/44/48/def306413b25c3d01753603b1a222a011b8621aed27cd7f89cbc27e6b0f4/xlwt-1.3.0-py2.py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/a8/a9/d23012099dc88ec69a29c6407b41d89681cb674c2043cd5b467c7e299c08/xyzservices-2026.3.0-py3-none-any.whl
@@ -3732,7 +3732,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/3e/14/615a450205e1b56d16c6783f5ccd116cde05550faad70ae077c955654a75/h5py-3.16.0-cp314-cp314-win_amd64.whl
       - pypi: https://files.pythonhosted.org/packages/c8/95/6a65329e37d7e9cd14688a4dd8e72f88b3e0f8dcd1299769d80c03344c61/hdx_python_api-6.6.8-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/28/e0/baa284cd1d9f41945333554276c5e54ea14857a4619a7d521e932630be01/hdx_python_country-4.1.1-py3-none-any.whl
-      - pypi: https://files.pythonhosted.org/packages/fc/8b/d23c78422ce1754cd4d93df8f41bea79defb1a0672d0860d7929348abcec/hdx_python_utilities-4.0.8-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/24/b5/27994afeaa1cef2f668a764808ff4575bb564f7b47f055122be56dd8d6b4/hdx_python_utilities-4.1.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/9c/a2/e52eebd269fe97733bebf23d0bc242fe385ebc01e0cc7930b1af1947d9bf/herbie_data-2026.3.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/c4/77/4c0456ead6871b060d024204f891546499eb1e57b8ce523671f690f24281/hpc_utils-0.1.5-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/7e/f5/f66802a942d491edb555dd61e3a9961140fd64c90bce1eafd741609d334d/httpcore-1.0.9-py3-none-any.whl
@@ -3955,7 +3955,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/22/b3/ef7c3295d02e0448a71c639a36a057f46d524d057c9486291a7a3039e65c/wrapt-2.2.1-cp314-cp314-win_amd64.whl
       - pypi: https://files.pythonhosted.org/packages/14/78/cd4d5294e0a7294243d332fdd00a020942faa41472e694f2552976a5fe39/xarray-2025.1.1-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/1a/62/c8d562e7766786ba6587d09c5a8ba9f718ed3fa8af7f4553e8f91c36f302/xlrd-2.0.2-py2.py3-none-any.whl
-      - pypi: https://files.pythonhosted.org/packages/f4/d6/9fd7e753a927cb11d039848a659124e6ec4cfe008704bb2790df7712c36d/xlsx2csv-0.8.6-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/c4/c0/15c21556362c67f1155f3643a375d50ac67559b82c768e64e800a42a2577/xlsx2csv-0.8.4-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/3a/0c/3662f4a66880196a590b202f0db82d919dd2f89e99a27fadef91c4a33d41/xlsxwriter-3.2.9-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/44/48/def306413b25c3d01753603b1a222a011b8621aed27cd7f89cbc27e6b0f4/xlwt-1.3.0-py2.py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/a8/a9/d23012099dc88ec69a29c6407b41d89681cb674c2043cd5b467c7e299c08/xyzservices-2026.3.0-py3-none-any.whl
@@ -4103,7 +4103,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/52/a0/c1f604538ff6db22a0690be2dc44ab59178e115f63c917794e529356ab23/h5py-3.16.0-cp311-cp311-manylinux_2_28_x86_64.whl
       - pypi: https://files.pythonhosted.org/packages/c8/95/6a65329e37d7e9cd14688a4dd8e72f88b3e0f8dcd1299769d80c03344c61/hdx_python_api-6.6.8-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/28/e0/baa284cd1d9f41945333554276c5e54ea14857a4619a7d521e932630be01/hdx_python_country-4.1.1-py3-none-any.whl
-      - pypi: https://files.pythonhosted.org/packages/fc/8b/d23c78422ce1754cd4d93df8f41bea79defb1a0672d0860d7929348abcec/hdx_python_utilities-4.0.8-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/24/b5/27994afeaa1cef2f668a764808ff4575bb564f7b47f055122be56dd8d6b4/hdx_python_utilities-4.1.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/9c/a2/e52eebd269fe97733bebf23d0bc242fe385ebc01e0cc7930b1af1947d9bf/herbie_data-2026.3.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/c4/77/4c0456ead6871b060d024204f891546499eb1e57b8ce523671f690f24281/hpc_utils-0.1.5-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/7e/f5/f66802a942d491edb555dd61e3a9961140fd64c90bce1eafd741609d334d/httpcore-1.0.9-py3-none-any.whl
@@ -4322,7 +4322,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/6e/fd/c0cac1f77c9c4f6fe58a920ca632ce379bb8be928720e11e8d73de28a5e9/wrapt-2.2.1-cp311-cp311-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl
       - pypi: https://files.pythonhosted.org/packages/14/78/cd4d5294e0a7294243d332fdd00a020942faa41472e694f2552976a5fe39/xarray-2025.1.1-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/1a/62/c8d562e7766786ba6587d09c5a8ba9f718ed3fa8af7f4553e8f91c36f302/xlrd-2.0.2-py2.py3-none-any.whl
-      - pypi: https://files.pythonhosted.org/packages/f4/d6/9fd7e753a927cb11d039848a659124e6ec4cfe008704bb2790df7712c36d/xlsx2csv-0.8.6-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/c4/c0/15c21556362c67f1155f3643a375d50ac67559b82c768e64e800a42a2577/xlsx2csv-0.8.4-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/3a/0c/3662f4a66880196a590b202f0db82d919dd2f89e99a27fadef91c4a33d41/xlsxwriter-3.2.9-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/44/48/def306413b25c3d01753603b1a222a011b8621aed27cd7f89cbc27e6b0f4/xlwt-1.3.0-py2.py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/a8/a9/d23012099dc88ec69a29c6407b41d89681cb674c2043cd5b467c7e299c08/xyzservices-2026.3.0-py3-none-any.whl
@@ -4457,7 +4457,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/bf/3b/38ff88b347c3e346cda1d3fc1b65a7aa75d40632228d8b8a5d7b58508c24/h5py-3.16.0-cp311-cp311-macosx_11_0_arm64.whl
       - pypi: https://files.pythonhosted.org/packages/c8/95/6a65329e37d7e9cd14688a4dd8e72f88b3e0f8dcd1299769d80c03344c61/hdx_python_api-6.6.8-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/28/e0/baa284cd1d9f41945333554276c5e54ea14857a4619a7d521e932630be01/hdx_python_country-4.1.1-py3-none-any.whl
-      - pypi: https://files.pythonhosted.org/packages/fc/8b/d23c78422ce1754cd4d93df8f41bea79defb1a0672d0860d7929348abcec/hdx_python_utilities-4.0.8-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/24/b5/27994afeaa1cef2f668a764808ff4575bb564f7b47f055122be56dd8d6b4/hdx_python_utilities-4.1.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/9c/a2/e52eebd269fe97733bebf23d0bc242fe385ebc01e0cc7930b1af1947d9bf/herbie_data-2026.3.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/c4/77/4c0456ead6871b060d024204f891546499eb1e57b8ce523671f690f24281/hpc_utils-0.1.5-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/7e/f5/f66802a942d491edb555dd61e3a9961140fd64c90bce1eafd741609d334d/httpcore-1.0.9-py3-none-any.whl
@@ -4674,7 +4674,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/eb/79/b8ff3a61e71babf58a8cf4c0d63358e8bad383e15bf7f35e62d2f6b6e4a4/wrapt-2.2.1-cp311-cp311-macosx_11_0_arm64.whl
       - pypi: https://files.pythonhosted.org/packages/14/78/cd4d5294e0a7294243d332fdd00a020942faa41472e694f2552976a5fe39/xarray-2025.1.1-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/1a/62/c8d562e7766786ba6587d09c5a8ba9f718ed3fa8af7f4553e8f91c36f302/xlrd-2.0.2-py2.py3-none-any.whl
-      - pypi: https://files.pythonhosted.org/packages/f4/d6/9fd7e753a927cb11d039848a659124e6ec4cfe008704bb2790df7712c36d/xlsx2csv-0.8.6-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/c4/c0/15c21556362c67f1155f3643a375d50ac67559b82c768e64e800a42a2577/xlsx2csv-0.8.4-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/3a/0c/3662f4a66880196a590b202f0db82d919dd2f89e99a27fadef91c4a33d41/xlsxwriter-3.2.9-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/44/48/def306413b25c3d01753603b1a222a011b8621aed27cd7f89cbc27e6b0f4/xlwt-1.3.0-py2.py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/a8/a9/d23012099dc88ec69a29c6407b41d89681cb674c2043cd5b467c7e299c08/xyzservices-2026.3.0-py3-none-any.whl
@@ -4808,7 +4808,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/f7/20/e6c0ff62ca2ad1a396a34f4380bafccaaf8791ff8fccf3d995a1fc12d417/h5py-3.16.0-cp311-cp311-win_amd64.whl
       - pypi: https://files.pythonhosted.org/packages/c8/95/6a65329e37d7e9cd14688a4dd8e72f88b3e0f8dcd1299769d80c03344c61/hdx_python_api-6.6.8-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/28/e0/baa284cd1d9f41945333554276c5e54ea14857a4619a7d521e932630be01/hdx_python_country-4.1.1-py3-none-any.whl
-      - pypi: https://files.pythonhosted.org/packages/fc/8b/d23c78422ce1754cd4d93df8f41bea79defb1a0672d0860d7929348abcec/hdx_python_utilities-4.0.8-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/24/b5/27994afeaa1cef2f668a764808ff4575bb564f7b47f055122be56dd8d6b4/hdx_python_utilities-4.1.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/9c/a2/e52eebd269fe97733bebf23d0bc242fe385ebc01e0cc7930b1af1947d9bf/herbie_data-2026.3.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/c4/77/4c0456ead6871b060d024204f891546499eb1e57b8ce523671f690f24281/hpc_utils-0.1.5-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/7e/f5/f66802a942d491edb555dd61e3a9961140fd64c90bce1eafd741609d334d/httpcore-1.0.9-py3-none-any.whl
@@ -5028,7 +5028,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/c8/56/987b9c13b3e1c1a3c6de71284076f996b79caec90e75a87c044a40c23db9/wrapt-2.2.1-cp311-cp311-win_amd64.whl
       - pypi: https://files.pythonhosted.org/packages/14/78/cd4d5294e0a7294243d332fdd00a020942faa41472e694f2552976a5fe39/xarray-2025.1.1-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/1a/62/c8d562e7766786ba6587d09c5a8ba9f718ed3fa8af7f4553e8f91c36f302/xlrd-2.0.2-py2.py3-none-any.whl
-      - pypi: https://files.pythonhosted.org/packages/f4/d6/9fd7e753a927cb11d039848a659124e6ec4cfe008704bb2790df7712c36d/xlsx2csv-0.8.6-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/c4/c0/15c21556362c67f1155f3643a375d50ac67559b82c768e64e800a42a2577/xlsx2csv-0.8.4-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/3a/0c/3662f4a66880196a590b202f0db82d919dd2f89e99a27fadef91c4a33d41/xlsxwriter-3.2.9-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/44/48/def306413b25c3d01753603b1a222a011b8621aed27cd7f89cbc27e6b0f4/xlwt-1.3.0-py2.py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/a8/a9/d23012099dc88ec69a29c6407b41d89681cb674c2043cd5b467c7e299c08/xyzservices-2026.3.0-py3-none-any.whl
@@ -5176,7 +5176,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/9e/e9/1a19e42cd43cc1365e127db6aae85e1c671da1d9a5d746f4d34a50edb577/h5py-3.16.0-cp312-cp312-manylinux_2_28_x86_64.whl
       - pypi: https://files.pythonhosted.org/packages/c8/95/6a65329e37d7e9cd14688a4dd8e72f88b3e0f8dcd1299769d80c03344c61/hdx_python_api-6.6.8-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/28/e0/baa284cd1d9f41945333554276c5e54ea14857a4619a7d521e932630be01/hdx_python_country-4.1.1-py3-none-any.whl
-      - pypi: https://files.pythonhosted.org/packages/fc/8b/d23c78422ce1754cd4d93df8f41bea79defb1a0672d0860d7929348abcec/hdx_python_utilities-4.0.8-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/24/b5/27994afeaa1cef2f668a764808ff4575bb564f7b47f055122be56dd8d6b4/hdx_python_utilities-4.1.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/9c/a2/e52eebd269fe97733bebf23d0bc242fe385ebc01e0cc7930b1af1947d9bf/herbie_data-2026.3.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/c4/77/4c0456ead6871b060d024204f891546499eb1e57b8ce523671f690f24281/hpc_utils-0.1.5-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/7e/f5/f66802a942d491edb555dd61e3a9961140fd64c90bce1eafd741609d334d/httpcore-1.0.9-py3-none-any.whl
@@ -5397,7 +5397,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/17/93/fb357cc7847c58a8ae790be718903afa81a28d23e642c843dc4129e8a0b2/wrapt-2.2.1-cp312-cp312-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl
       - pypi: https://files.pythonhosted.org/packages/14/78/cd4d5294e0a7294243d332fdd00a020942faa41472e694f2552976a5fe39/xarray-2025.1.1-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/1a/62/c8d562e7766786ba6587d09c5a8ba9f718ed3fa8af7f4553e8f91c36f302/xlrd-2.0.2-py2.py3-none-any.whl
-      - pypi: https://files.pythonhosted.org/packages/f4/d6/9fd7e753a927cb11d039848a659124e6ec4cfe008704bb2790df7712c36d/xlsx2csv-0.8.6-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/c4/c0/15c21556362c67f1155f3643a375d50ac67559b82c768e64e800a42a2577/xlsx2csv-0.8.4-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/3a/0c/3662f4a66880196a590b202f0db82d919dd2f89e99a27fadef91c4a33d41/xlsxwriter-3.2.9-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/44/48/def306413b25c3d01753603b1a222a011b8621aed27cd7f89cbc27e6b0f4/xlwt-1.3.0-py2.py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/a8/a9/d23012099dc88ec69a29c6407b41d89681cb674c2043cd5b467c7e299c08/xyzservices-2026.3.0-py3-none-any.whl
@@ -5530,7 +5530,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/b0/42/c84efcc1d4caebafb1ecd8be4643f39c85c47a80fe254d92b8b43b1eadaf/h5py-3.16.0-cp312-cp312-macosx_11_0_arm64.whl
       - pypi: https://files.pythonhosted.org/packages/c8/95/6a65329e37d7e9cd14688a4dd8e72f88b3e0f8dcd1299769d80c03344c61/hdx_python_api-6.6.8-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/28/e0/baa284cd1d9f41945333554276c5e54ea14857a4619a7d521e932630be01/hdx_python_country-4.1.1-py3-none-any.whl
-      - pypi: https://files.pythonhosted.org/packages/fc/8b/d23c78422ce1754cd4d93df8f41bea79defb1a0672d0860d7929348abcec/hdx_python_utilities-4.0.8-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/24/b5/27994afeaa1cef2f668a764808ff4575bb564f7b47f055122be56dd8d6b4/hdx_python_utilities-4.1.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/9c/a2/e52eebd269fe97733bebf23d0bc242fe385ebc01e0cc7930b1af1947d9bf/herbie_data-2026.3.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/c4/77/4c0456ead6871b060d024204f891546499eb1e57b8ce523671f690f24281/hpc_utils-0.1.5-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/7e/f5/f66802a942d491edb555dd61e3a9961140fd64c90bce1eafd741609d334d/httpcore-1.0.9-py3-none-any.whl
@@ -5749,7 +5749,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/26/58/80f6a6599f933f4caecc1cb3ee88a04faf81e8b9bddbd6109c688dd63e0f/wrapt-2.2.1-cp312-cp312-macosx_11_0_arm64.whl
       - pypi: https://files.pythonhosted.org/packages/14/78/cd4d5294e0a7294243d332fdd00a020942faa41472e694f2552976a5fe39/xarray-2025.1.1-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/1a/62/c8d562e7766786ba6587d09c5a8ba9f718ed3fa8af7f4553e8f91c36f302/xlrd-2.0.2-py2.py3-none-any.whl
-      - pypi: https://files.pythonhosted.org/packages/f4/d6/9fd7e753a927cb11d039848a659124e6ec4cfe008704bb2790df7712c36d/xlsx2csv-0.8.6-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/c4/c0/15c21556362c67f1155f3643a375d50ac67559b82c768e64e800a42a2577/xlsx2csv-0.8.4-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/3a/0c/3662f4a66880196a590b202f0db82d919dd2f89e99a27fadef91c4a33d41/xlsxwriter-3.2.9-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/44/48/def306413b25c3d01753603b1a222a011b8621aed27cd7f89cbc27e6b0f4/xlwt-1.3.0-py2.py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/a8/a9/d23012099dc88ec69a29c6407b41d89681cb674c2043cd5b467c7e299c08/xyzservices-2026.3.0-py3-none-any.whl
@@ -5881,7 +5881,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/03/c1/0976b235cf29ead553e22f2fb6385a8252b533715e00d0ae52ed7b900582/h5py-3.16.0-cp312-cp312-win_amd64.whl
       - pypi: https://files.pythonhosted.org/packages/c8/95/6a65329e37d7e9cd14688a4dd8e72f88b3e0f8dcd1299769d80c03344c61/hdx_python_api-6.6.8-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/28/e0/baa284cd1d9f41945333554276c5e54ea14857a4619a7d521e932630be01/hdx_python_country-4.1.1-py3-none-any.whl
-      - pypi: https://files.pythonhosted.org/packages/fc/8b/d23c78422ce1754cd4d93df8f41bea79defb1a0672d0860d7929348abcec/hdx_python_utilities-4.0.8-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/24/b5/27994afeaa1cef2f668a764808ff4575bb564f7b47f055122be56dd8d6b4/hdx_python_utilities-4.1.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/9c/a2/e52eebd269fe97733bebf23d0bc242fe385ebc01e0cc7930b1af1947d9bf/herbie_data-2026.3.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/c4/77/4c0456ead6871b060d024204f891546499eb1e57b8ce523671f690f24281/hpc_utils-0.1.5-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/7e/f5/f66802a942d491edb555dd61e3a9961140fd64c90bce1eafd741609d334d/httpcore-1.0.9-py3-none-any.whl
@@ -6103,7 +6103,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/ef/cb/99450668dd3502d62a54a1c8aa56e44f34cb8c1261b381cfe2e7926c3b75/wrapt-2.2.1-cp312-cp312-win_amd64.whl
       - pypi: https://files.pythonhosted.org/packages/14/78/cd4d5294e0a7294243d332fdd00a020942faa41472e694f2552976a5fe39/xarray-2025.1.1-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/1a/62/c8d562e7766786ba6587d09c5a8ba9f718ed3fa8af7f4553e8f91c36f302/xlrd-2.0.2-py2.py3-none-any.whl
-      - pypi: https://files.pythonhosted.org/packages/f4/d6/9fd7e753a927cb11d039848a659124e6ec4cfe008704bb2790df7712c36d/xlsx2csv-0.8.6-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/c4/c0/15c21556362c67f1155f3643a375d50ac67559b82c768e64e800a42a2577/xlsx2csv-0.8.4-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/3a/0c/3662f4a66880196a590b202f0db82d919dd2f89e99a27fadef91c4a33d41/xlsxwriter-3.2.9-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/44/48/def306413b25c3d01753603b1a222a011b8621aed27cd7f89cbc27e6b0f4/xlwt-1.3.0-py2.py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/a8/a9/d23012099dc88ec69a29c6407b41d89681cb674c2043cd5b467c7e299c08/xyzservices-2026.3.0-py3-none-any.whl
@@ -6249,7 +6249,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/bd/98/ef2b6fe2903e377cbe870c3b2800d62552f1e3dbe81ce49e1923c53d1c5c/h5py-3.16.0-cp313-cp313-manylinux_2_28_x86_64.whl
       - pypi: https://files.pythonhosted.org/packages/c8/95/6a65329e37d7e9cd14688a4dd8e72f88b3e0f8dcd1299769d80c03344c61/hdx_python_api-6.6.8-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/28/e0/baa284cd1d9f41945333554276c5e54ea14857a4619a7d521e932630be01/hdx_python_country-4.1.1-py3-none-any.whl
-      - pypi: https://files.pythonhosted.org/packages/fc/8b/d23c78422ce1754cd4d93df8f41bea79defb1a0672d0860d7929348abcec/hdx_python_utilities-4.0.8-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/24/b5/27994afeaa1cef2f668a764808ff4575bb564f7b47f055122be56dd8d6b4/hdx_python_utilities-4.1.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/9c/a2/e52eebd269fe97733bebf23d0bc242fe385ebc01e0cc7930b1af1947d9bf/herbie_data-2026.3.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/c4/77/4c0456ead6871b060d024204f891546499eb1e57b8ce523671f690f24281/hpc_utils-0.1.5-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/7e/f5/f66802a942d491edb555dd61e3a9961140fd64c90bce1eafd741609d334d/httpcore-1.0.9-py3-none-any.whl
@@ -6470,7 +6470,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/38/65/08d7a6c76ac4493bdb668205ee9c1de1bd5daca61717c3e9aa49b4c01499/wrapt-2.2.1-cp313-cp313-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl
       - pypi: https://files.pythonhosted.org/packages/14/78/cd4d5294e0a7294243d332fdd00a020942faa41472e694f2552976a5fe39/xarray-2025.1.1-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/1a/62/c8d562e7766786ba6587d09c5a8ba9f718ed3fa8af7f4553e8f91c36f302/xlrd-2.0.2-py2.py3-none-any.whl
-      - pypi: https://files.pythonhosted.org/packages/f4/d6/9fd7e753a927cb11d039848a659124e6ec4cfe008704bb2790df7712c36d/xlsx2csv-0.8.6-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/c4/c0/15c21556362c67f1155f3643a375d50ac67559b82c768e64e800a42a2577/xlsx2csv-0.8.4-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/3a/0c/3662f4a66880196a590b202f0db82d919dd2f89e99a27fadef91c4a33d41/xlsxwriter-3.2.9-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/44/48/def306413b25c3d01753603b1a222a011b8621aed27cd7f89cbc27e6b0f4/xlwt-1.3.0-py2.py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/a8/a9/d23012099dc88ec69a29c6407b41d89681cb674c2043cd5b467c7e299c08/xyzservices-2026.3.0-py3-none-any.whl
@@ -6605,7 +6605,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/b0/65/5e088a45d0f43cd814bc5bec521c051d42005a472e804b1a36c48dada09b/h5py-3.16.0-cp313-cp313-macosx_11_0_arm64.whl
       - pypi: https://files.pythonhosted.org/packages/c8/95/6a65329e37d7e9cd14688a4dd8e72f88b3e0f8dcd1299769d80c03344c61/hdx_python_api-6.6.8-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/28/e0/baa284cd1d9f41945333554276c5e54ea14857a4619a7d521e932630be01/hdx_python_country-4.1.1-py3-none-any.whl
-      - pypi: https://files.pythonhosted.org/packages/fc/8b/d23c78422ce1754cd4d93df8f41bea79defb1a0672d0860d7929348abcec/hdx_python_utilities-4.0.8-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/24/b5/27994afeaa1cef2f668a764808ff4575bb564f7b47f055122be56dd8d6b4/hdx_python_utilities-4.1.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/9c/a2/e52eebd269fe97733bebf23d0bc242fe385ebc01e0cc7930b1af1947d9bf/herbie_data-2026.3.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/c4/77/4c0456ead6871b060d024204f891546499eb1e57b8ce523671f690f24281/hpc_utils-0.1.5-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/7e/f5/f66802a942d491edb555dd61e3a9961140fd64c90bce1eafd741609d334d/httpcore-1.0.9-py3-none-any.whl
@@ -6824,7 +6824,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/54/ce/57890814991446a845e09b3445ce8b694f27eb0577004f2c2a36a9772ed4/wrapt-2.2.1-cp313-cp313-macosx_11_0_arm64.whl
       - pypi: https://files.pythonhosted.org/packages/14/78/cd4d5294e0a7294243d332fdd00a020942faa41472e694f2552976a5fe39/xarray-2025.1.1-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/1a/62/c8d562e7766786ba6587d09c5a8ba9f718ed3fa8af7f4553e8f91c36f302/xlrd-2.0.2-py2.py3-none-any.whl
-      - pypi: https://files.pythonhosted.org/packages/f4/d6/9fd7e753a927cb11d039848a659124e6ec4cfe008704bb2790df7712c36d/xlsx2csv-0.8.6-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/c4/c0/15c21556362c67f1155f3643a375d50ac67559b82c768e64e800a42a2577/xlsx2csv-0.8.4-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/3a/0c/3662f4a66880196a590b202f0db82d919dd2f89e99a27fadef91c4a33d41/xlsxwriter-3.2.9-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/44/48/def306413b25c3d01753603b1a222a011b8621aed27cd7f89cbc27e6b0f4/xlwt-1.3.0-py2.py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/a8/a9/d23012099dc88ec69a29c6407b41d89681cb674c2043cd5b467c7e299c08/xyzservices-2026.3.0-py3-none-any.whl
@@ -6958,7 +6958,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/c3/d9/a27997f84341fc0dfcdd1fe4179b6ba6c32a7aa880fdb8c514d4dad6fba3/h5py-3.16.0-cp313-cp313-win_amd64.whl
       - pypi: https://files.pythonhosted.org/packages/c8/95/6a65329e37d7e9cd14688a4dd8e72f88b3e0f8dcd1299769d80c03344c61/hdx_python_api-6.6.8-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/28/e0/baa284cd1d9f41945333554276c5e54ea14857a4619a7d521e932630be01/hdx_python_country-4.1.1-py3-none-any.whl
-      - pypi: https://files.pythonhosted.org/packages/fc/8b/d23c78422ce1754cd4d93df8f41bea79defb1a0672d0860d7929348abcec/hdx_python_utilities-4.0.8-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/24/b5/27994afeaa1cef2f668a764808ff4575bb564f7b47f055122be56dd8d6b4/hdx_python_utilities-4.1.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/9c/a2/e52eebd269fe97733bebf23d0bc242fe385ebc01e0cc7930b1af1947d9bf/herbie_data-2026.3.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/c4/77/4c0456ead6871b060d024204f891546499eb1e57b8ce523671f690f24281/hpc_utils-0.1.5-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/7e/f5/f66802a942d491edb555dd61e3a9961140fd64c90bce1eafd741609d334d/httpcore-1.0.9-py3-none-any.whl
@@ -7180,7 +7180,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/97/73/ce10f0e71c0cfaa1a65faadb8efd4852028b3bb9ba28932b8889df769d38/wrapt-2.2.1-cp313-cp313-win_amd64.whl
       - pypi: https://files.pythonhosted.org/packages/14/78/cd4d5294e0a7294243d332fdd00a020942faa41472e694f2552976a5fe39/xarray-2025.1.1-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/1a/62/c8d562e7766786ba6587d09c5a8ba9f718ed3fa8af7f4553e8f91c36f302/xlrd-2.0.2-py2.py3-none-any.whl
-      - pypi: https://files.pythonhosted.org/packages/f4/d6/9fd7e753a927cb11d039848a659124e6ec4cfe008704bb2790df7712c36d/xlsx2csv-0.8.6-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/c4/c0/15c21556362c67f1155f3643a375d50ac67559b82c768e64e800a42a2577/xlsx2csv-0.8.4-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/3a/0c/3662f4a66880196a590b202f0db82d919dd2f89e99a27fadef91c4a33d41/xlsxwriter-3.2.9-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/44/48/def306413b25c3d01753603b1a222a011b8621aed27cd7f89cbc27e6b0f4/xlwt-1.3.0-py2.py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/a8/a9/d23012099dc88ec69a29c6407b41d89681cb674c2043cd5b467c7e299c08/xyzservices-2026.3.0-py3-none-any.whl
@@ -7325,7 +7325,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/f1/16/d905e7f53e661ce2c24686c38048d8e2b750ffc4350009d41c4e6c6c9826/h5py-3.16.0-cp314-cp314-manylinux_2_28_x86_64.whl
       - pypi: https://files.pythonhosted.org/packages/c8/95/6a65329e37d7e9cd14688a4dd8e72f88b3e0f8dcd1299769d80c03344c61/hdx_python_api-6.6.8-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/28/e0/baa284cd1d9f41945333554276c5e54ea14857a4619a7d521e932630be01/hdx_python_country-4.1.1-py3-none-any.whl
-      - pypi: https://files.pythonhosted.org/packages/fc/8b/d23c78422ce1754cd4d93df8f41bea79defb1a0672d0860d7929348abcec/hdx_python_utilities-4.0.8-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/24/b5/27994afeaa1cef2f668a764808ff4575bb564f7b47f055122be56dd8d6b4/hdx_python_utilities-4.1.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/9c/a2/e52eebd269fe97733bebf23d0bc242fe385ebc01e0cc7930b1af1947d9bf/herbie_data-2026.3.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/c4/77/4c0456ead6871b060d024204f891546499eb1e57b8ce523671f690f24281/hpc_utils-0.1.5-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/7e/f5/f66802a942d491edb555dd61e3a9961140fd64c90bce1eafd741609d334d/httpcore-1.0.9-py3-none-any.whl
@@ -7546,7 +7546,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/15/a3/7c8f704b8dc07dfe0a5d01c2edbfd88317aa8e5e3fa7c743eb7a085ae767/wrapt-2.2.1-cp314-cp314-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl
       - pypi: https://files.pythonhosted.org/packages/14/78/cd4d5294e0a7294243d332fdd00a020942faa41472e694f2552976a5fe39/xarray-2025.1.1-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/1a/62/c8d562e7766786ba6587d09c5a8ba9f718ed3fa8af7f4553e8f91c36f302/xlrd-2.0.2-py2.py3-none-any.whl
-      - pypi: https://files.pythonhosted.org/packages/f4/d6/9fd7e753a927cb11d039848a659124e6ec4cfe008704bb2790df7712c36d/xlsx2csv-0.8.6-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/c4/c0/15c21556362c67f1155f3643a375d50ac67559b82c768e64e800a42a2577/xlsx2csv-0.8.4-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/3a/0c/3662f4a66880196a590b202f0db82d919dd2f89e99a27fadef91c4a33d41/xlsxwriter-3.2.9-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/44/48/def306413b25c3d01753603b1a222a011b8621aed27cd7f89cbc27e6b0f4/xlwt-1.3.0-py2.py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/a8/a9/d23012099dc88ec69a29c6407b41d89681cb674c2043cd5b467c7e299c08/xyzservices-2026.3.0-py3-none-any.whl
@@ -7681,7 +7681,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/6a/b7/9366ed44ced9b7ef357ab48c94205280276db9d7f064aa3012a97227e966/h5py-3.16.0-cp314-cp314-macosx_11_0_arm64.whl
       - pypi: https://files.pythonhosted.org/packages/c8/95/6a65329e37d7e9cd14688a4dd8e72f88b3e0f8dcd1299769d80c03344c61/hdx_python_api-6.6.8-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/28/e0/baa284cd1d9f41945333554276c5e54ea14857a4619a7d521e932630be01/hdx_python_country-4.1.1-py3-none-any.whl
-      - pypi: https://files.pythonhosted.org/packages/fc/8b/d23c78422ce1754cd4d93df8f41bea79defb1a0672d0860d7929348abcec/hdx_python_utilities-4.0.8-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/24/b5/27994afeaa1cef2f668a764808ff4575bb564f7b47f055122be56dd8d6b4/hdx_python_utilities-4.1.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/9c/a2/e52eebd269fe97733bebf23d0bc242fe385ebc01e0cc7930b1af1947d9bf/herbie_data-2026.3.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/c4/77/4c0456ead6871b060d024204f891546499eb1e57b8ce523671f690f24281/hpc_utils-0.1.5-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/7e/f5/f66802a942d491edb555dd61e3a9961140fd64c90bce1eafd741609d334d/httpcore-1.0.9-py3-none-any.whl
@@ -7900,7 +7900,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/13/3c/b74cfd984cef560b900fb1a727af20352d89e1f06bf2e1114dd3f00f5f5a/wrapt-2.2.1-cp314-cp314-macosx_11_0_arm64.whl
       - pypi: https://files.pythonhosted.org/packages/14/78/cd4d5294e0a7294243d332fdd00a020942faa41472e694f2552976a5fe39/xarray-2025.1.1-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/1a/62/c8d562e7766786ba6587d09c5a8ba9f718ed3fa8af7f4553e8f91c36f302/xlrd-2.0.2-py2.py3-none-any.whl
-      - pypi: https://files.pythonhosted.org/packages/f4/d6/9fd7e753a927cb11d039848a659124e6ec4cfe008704bb2790df7712c36d/xlsx2csv-0.8.6-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/c4/c0/15c21556362c67f1155f3643a375d50ac67559b82c768e64e800a42a2577/xlsx2csv-0.8.4-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/3a/0c/3662f4a66880196a590b202f0db82d919dd2f89e99a27fadef91c4a33d41/xlsxwriter-3.2.9-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/44/48/def306413b25c3d01753603b1a222a011b8621aed27cd7f89cbc27e6b0f4/xlwt-1.3.0-py2.py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/a8/a9/d23012099dc88ec69a29c6407b41d89681cb674c2043cd5b467c7e299c08/xyzservices-2026.3.0-py3-none-any.whl
@@ -8034,7 +8034,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/3e/14/615a450205e1b56d16c6783f5ccd116cde05550faad70ae077c955654a75/h5py-3.16.0-cp314-cp314-win_amd64.whl
       - pypi: https://files.pythonhosted.org/packages/c8/95/6a65329e37d7e9cd14688a4dd8e72f88b3e0f8dcd1299769d80c03344c61/hdx_python_api-6.6.8-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/28/e0/baa284cd1d9f41945333554276c5e54ea14857a4619a7d521e932630be01/hdx_python_country-4.1.1-py3-none-any.whl
-      - pypi: https://files.pythonhosted.org/packages/fc/8b/d23c78422ce1754cd4d93df8f41bea79defb1a0672d0860d7929348abcec/hdx_python_utilities-4.0.8-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/24/b5/27994afeaa1cef2f668a764808ff4575bb564f7b47f055122be56dd8d6b4/hdx_python_utilities-4.1.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/9c/a2/e52eebd269fe97733bebf23d0bc242fe385ebc01e0cc7930b1af1947d9bf/herbie_data-2026.3.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/c4/77/4c0456ead6871b060d024204f891546499eb1e57b8ce523671f690f24281/hpc_utils-0.1.5-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/7e/f5/f66802a942d491edb555dd61e3a9961140fd64c90bce1eafd741609d334d/httpcore-1.0.9-py3-none-any.whl
@@ -8256,7 +8256,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/22/b3/ef7c3295d02e0448a71c639a36a057f46d524d057c9486291a7a3039e65c/wrapt-2.2.1-cp314-cp314-win_amd64.whl
       - pypi: https://files.pythonhosted.org/packages/14/78/cd4d5294e0a7294243d332fdd00a020942faa41472e694f2552976a5fe39/xarray-2025.1.1-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/1a/62/c8d562e7766786ba6587d09c5a8ba9f718ed3fa8af7f4553e8f91c36f302/xlrd-2.0.2-py2.py3-none-any.whl
-      - pypi: https://files.pythonhosted.org/packages/f4/d6/9fd7e753a927cb11d039848a659124e6ec4cfe008704bb2790df7712c36d/xlsx2csv-0.8.6-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/c4/c0/15c21556362c67f1155f3643a375d50ac67559b82c768e64e800a42a2577/xlsx2csv-0.8.4-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/3a/0c/3662f4a66880196a590b202f0db82d919dd2f89e99a27fadef91c4a33d41/xlsxwriter-3.2.9-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/44/48/def306413b25c3d01753603b1a222a011b8621aed27cd7f89cbc27e6b0f4/xlwt-1.3.0-py2.py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/a8/a9/d23012099dc88ec69a29c6407b41d89681cb674c2043cd5b467c7e299c08/xyzservices-2026.3.0-py3-none-any.whl
@@ -10635,7 +10635,7 @@ packages:
 - pypi: ./
   name: earthlens
   version: 0.7.0
-  sha256: c56f2372e070fd05708c7b2be09b188d95304b5933eeb7ca8783908af62a5674
+  sha256: 3616f554bc48883e3e09ebbbd7d92840f8f94a4179fa2594c7da689112dcb0ec
   requires_dist:
   - pyramids-gis>=0.32.0
   - geopandas>=1.0.0
@@ -10661,16 +10661,14 @@ packages:
   - urllib3>=1.26 ; extra == 'gee'
   - copernicusmarine>=2.0.0,<3 ; extra == 'cmems'
   - obspy>=1.5.0 ; extra == 'fdsn'
-  - boto3>=1.43.0 ; extra == 'nwm'
-  - botocore>=1.34.0 ; extra == 'nwm'
-  - pyramids-gis[lazy,xarray,parquet]>=0.30.0 ; extra == 'nwm'
+  - earthlens[s3] ; extra == 'nwm'
+  - pyramids-gis[lazy,xarray,parquet]>=0.32.0 ; extra == 'nwm'
   - earthaccess>=0.18.0 ; python_full_version >= '3.12' and extra == 'earthdata'
   - hdx-python-api>=6,<7 ; extra == 'hdx'
   - eumdac>=3.1 ; extra == 'eumetsat'
   - herbie-data>=2026.3 ; extra == 'nwp'
   - ecmwf-opendata>=0.3 ; extra == 'nwp'
-  - boto3>=1.43.0 ; extra == 'radar'
-  - botocore>=1.34.0 ; extra == 'radar'
+  - earthlens[s3] ; extra == 'radar'
   - pyramids-gis[stac] ; extra == 'stac'
   - openeo>=0.47,<0.48 ; extra == 'openeo'
   - sentinelhub>=3.11.5 ; extra == 'sentinel-hub'
@@ -12116,13 +12114,13 @@ packages:
   - tenacity
   - mkapi ; extra == 'docs'
   requires_python: '>=3.10'
-- pypi: https://files.pythonhosted.org/packages/fc/8b/d23c78422ce1754cd4d93df8f41bea79defb1a0672d0860d7929348abcec/hdx_python_utilities-4.0.8-py3-none-any.whl
+- pypi: https://files.pythonhosted.org/packages/24/b5/27994afeaa1cef2f668a764808ff4575bb564f7b47f055122be56dd8d6b4/hdx_python_utilities-4.1.0-py3-none-any.whl
   name: hdx-python-utilities
-  version: 4.0.8
-  sha256: d6f608c680ec3a19357e0e6506fed25f8c8b9ac253e1886962e60f7817de6cd6
+  version: 4.1.0
+  sha256: 5280edfe91ea7c31602269d6ce473c2e5c43fba3bf37b01705466229efb79396
   requires_dist:
-  - frictionless>=5.18.0
-  - ijson>=3.2.3
+  - frictionless>=5.19.0
+  - ijson>=3.5.0
   - jsonlines>=4.0.0
   - loguru
   - openpyxl>=3.1.2
@@ -12134,7 +12132,7 @@ packages:
   - tableschema-to-template>=0.0.13
   - typing-extensions
   - xlrd>=2.0.1
-  - xlsx2csv
+  - xlsx2csv==0.8.4
   - xlwt>=1.3.0
   - cydifflib ; extra == 'diff'
   - mkapi ; extra == 'docs'
@@ -22682,10 +22680,10 @@ packages:
   - pytest ; extra == 'test'
   - pytest-cov ; extra == 'test'
   requires_python: '>=2.7,!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*,!=3.5.*'
-- pypi: https://files.pythonhosted.org/packages/f4/d6/9fd7e753a927cb11d039848a659124e6ec4cfe008704bb2790df7712c36d/xlsx2csv-0.8.6-py3-none-any.whl
+- pypi: https://files.pythonhosted.org/packages/c4/c0/15c21556362c67f1155f3643a375d50ac67559b82c768e64e800a42a2577/xlsx2csv-0.8.4-py3-none-any.whl
   name: xlsx2csv
-  version: 0.8.6
-  sha256: 415341e348b4c474cc84a4c23c4d116e0be07c89be6a84c5fde5e4c948db1943
+  version: 0.8.4
+  sha256: 52ab873fc7b2f2ca75d14aee8bd1985a9f5c1bcb3cc7b80df7a5d57a40a67473
 - pypi: https://files.pythonhosted.org/packages/3a/0c/3662f4a66880196a590b202f0db82d919dd2f89e99a27fadef91c4a33d41/xlsxwriter-3.2.9-py3-none-any.whl
   name: xlsxwriter
   version: 3.2.9

@@ -9,8 +9,8 @@ def pytest_collection_modifyitems(items):
     """Tag every test in this subtree with `@pytest.mark.gee`.
 
     Lets the suite be filtered with `-m gee` and lets the
-    `test-gee` pixi task / GitHub workflow step run only the
-    GEE backend's tests.
+    `test-backend gee` pixi task / GitHub workflow step run only
+    the GEE backend's tests.
 
     Pytest delivers the FULL item list to every conftest hook,
     not just items from this subtree, so we filter by path.

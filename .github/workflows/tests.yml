@@ -31,40 +31,40 @@ jobs:
           cache: true
 
       - name: Run ECMWF tests
-        run: pixi run -e ${{ matrix.environment }} test-ecmwf
+        run: pixi run -e ${{ matrix.environment }} test-backend ecmwf
 
       - name: Run GEE tests
-        run: pixi run -e ${{ matrix.environment }} test-gee
+        run: pixi run -e ${{ matrix.environment }} test-backend gee
 
       - name: Run CMEMS tests
-        run: pixi run -e ${{ matrix.environment }} test-cmems
+        run: pixi run -e ${{ matrix.environment }} test-backend cmems
 
       - name: Run FDSN tests
-        run: pixi run -e ${{ matrix.environment }} test-fdsn
+        run: pixi run -e ${{ matrix.environment }} test-backend fdsn
 
       - name: Run Earthdata tests
-        run: pixi run -e ${{ matrix.environment }} test-earthdata
+        run: pixi run -e ${{ matrix.environment }} test-backend earthdata
 
       - name: Run STAC tests
-        run: pixi run -e ${{ matrix.environment }} test-stac
+        run: pixi run -e ${{ matrix.environment }} test-backend stac
 
       - name: Run GDACS tests
-        run: pixi run -e ${{ matrix.environment }} test-gdacs
+        run: pixi run -e ${{ matrix.environment }} test-backend gdacs
 
       - name: Run OpenAQ tests
-        run: pixi run -e ${{ matrix.environment }} test-openaq
+        run: pixi run -e ${{ matrix.environment }} test-backend openaq
 
       - name: Run Tropycal tests
-        run: pixi run -e ${{ matrix.environment }} test-tropycal
+        run: pixi run -e ${{ matrix.environment }} test-backend tropycal
 
       - name: Run NWP tests
-        run: pixi run -e ${{ matrix.environment }} test-nwp
+        run: pixi run -e ${{ matrix.environment }} test-backend nwp
 
       - name: Run NEXRAD radar tests
-        run: pixi run -e ${{ matrix.environment }} test-radar
+        run: pixi run -e ${{ matrix.environment }} test-backend radar
 
       - name: Run USGS Water tests
-        run: pixi run -e ${{ matrix.environment }} test-usgs-water
+        run: pixi run -e ${{ matrix.environment }} test-backend usgs_water
 
       - name: Upload coverage reports to Codecov with GitHub Action
         uses: codecov/codecov-action@v5
