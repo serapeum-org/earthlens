@@ -371,6 +371,25 @@ class GEE(LazyClientMixin, AbstractDataSource):
         Returns:
             tuple: `(service_account, service_key, project)`, each `None`
                 when neither an explicit value nor its env var is set.
+
+        Examples:
+            - Explicit values (set by :meth:`authenticate`) are returned as-is:
+                ```python
+                >>> import tempfile
+                >>> from earthlens.gee import GEE
+                >>> gee = GEE(
+                ...     start="2000-02-11", end="2000-02-12",
+                ...     variables={"USGS/SRTMGL1_003": ["elevation"]},
+                ...     lat_lim=[29.9, 30.0], lon_lim=[31.2, 31.3],
+                ...     path=tempfile.mkdtemp(),
+                ... )
+                >>> gee._service_account = "sa@demo.iam.gserviceaccount.com"
+                >>> gee._service_key = "/path/to/key.json"
+                >>> gee._project = "demo-project"
+                >>> gee._resolve_credentials()
+                ('sa@demo.iam.gserviceaccount.com', '/path/to/key.json', 'demo-project')
+
+                ```
         """
         service_account = self._service_account or os.environ.get("GEE_SERVICE_ACCOUNT")
         service_key = self._service_key or os.environ.get("GEE_SERVICE_KEY")
@@ -409,6 +428,35 @@ class GEE(LazyClientMixin, AbstractDataSource):
         Raises:
             AuthenticationError: If no service-account pair and no project
                 can be resolved, or Earth Engine rejects the credentials.
+
+        Examples:
+            - Authenticate with a service-account key, then download (live;
+              skipped here):
+                ```python
+                >>> from earthlens.gee import GEE  # doctest: +SKIP
+                >>> GEE(  # doctest: +SKIP
+                ...     start="2000-02-11", end="2000-02-12",
+                ...     variables={"USGS/SRTMGL1_003": ["elevation"]},
+                ...     lat_lim=[29.9, 30.0], lon_lim=[31.2, 31.3], path="data/gee",
+                ... ).authenticate(
+                ...     service_account="sa@my-project.iam.gserviceaccount.com",
+                ...     service_key="/path/to/key.json",
+                ... ).download()
+
+                ```
+            - Resolve the same credentials from the environment instead of
+              passing them (live; skipped here):
+                ```python
+                >>> import os  # doctest: +SKIP
+                >>> os.environ["GEE_SERVICE_ACCOUNT"] = "sa@my-project.iam.gserviceaccount.com"
+                >>> os.environ["GEE_SERVICE_KEY"] = "/path/to/key.json"
+                >>> GEE(  # doctest: +SKIP
+                ...     start="2000-02-11", end="2000-02-12",
+                ...     variables={"USGS/SRTMGL1_003": ["elevation"]},
+                ...     lat_lim=[29.9, 30.0], lon_lim=[31.2, 31.3], path="data/gee",
+                ... ).authenticate().download()
+
+                ```
         """
         if service_account is not None:
             self._service_account = service_account
