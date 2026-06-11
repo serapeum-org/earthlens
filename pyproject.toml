@@ -27,17 +27,6 @@ classifiers = [
 requires-python = ">= 3.11, <4"
 
 dependencies = [
-    # >=0.24.1: fixes get_epsg_from_prj returning the unit code EPSG:9122 for
-    # GRIB CRS (pyramids#403), so Dataset.epsg is 4326 and the NWP
-    # crop/COG/aggregate path no longer trips on an unresolvable EPSG.
-    # >=0.28.0: georeferences geostationary (GOES ABI) NetCDF reads — scales the
-    # scan-angle geotransform to metres — so earthlens.s3 dataset="goes" can warp
-    # to WGS84 and crop (pyramids#452 / PY-1a).
-    # >=0.30.0: adds NetCDF.subset for windowed gridded cloud-cube reads
-    # (pyramids#462), used by earthlens.nwm for gridded operational subsetting.
-    # >=0.32.0: fixes DatasetCollection.plot() crashing (float - NoneType) on
-    # rasters with no no-data value set (pyramids#480) — used by the showcase
-    # notebooks to animate Dataset stacks.
     "pyramids-gis >=0.32.0",
     "geopandas >=1.0.0",
     "joblib >=1.5.0",
@@ -69,11 +58,9 @@ gee = [
 ]
 cmems = ["copernicusmarine >=2.0.0,<3"]
 fdsn = ["obspy >=1.5.0"]
-# NOAA National Water Model via the unsigned noaa-nwm-pds bucket. boto3 fetches
-# the whole-CONUS operational NetCDF files; pyramids-gis[lazy,xarray,parquet]
-# supplies the LabeledDataset reader (earthlens.nwm.NWM, 0.29.0+) that subsets
-# the retrospective Zarr and feature_id-indexed files and writes tabular output
-# — earthlens still never imports xarray/zarr itself (pyramids owns the read).
+# NOAA National Water Model (unsigned noaa-nwm-pds bucket). pyramids-gis with
+# [lazy,xarray,parquet] reads the Zarr / feature_id NetCDF subsets, so earthlens
+# never imports xarray/zarr itself (pyramids owns the read).
 nwm = [
     "boto3 >=1.43.0",
     "botocore >=1.34.0",
