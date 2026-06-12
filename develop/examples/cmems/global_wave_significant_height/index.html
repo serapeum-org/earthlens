@@ -11637,16 +11637,16 @@ fixed date works fine here.</p>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">xarray</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">xr</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.netcdf</span><span class="w"> </span><span class="kn">import</span> <span class="n">NetCDF</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.cmems</span><span class="w"> </span><span class="kn">import</span> <span class="n">Catalog</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.netcdf</span><span class="w"> </span><span class="kn">import</span> <span class="n">NetCDF</span>
 
 <span class="n">OUT_DIR</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s1">'data/cmems-wave'</span><span class="p">)</span>
 <span class="n">OUT_DIR</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
 <span class="n">DATASET_ID</span> <span class="o">=</span> <span class="s1">'cmems_mod_glo_wav_my_0.2deg_PT3H-i'</span>
-<span class="n">POINT_LAT</span><span class="p">,</span> <span class="n">POINT_LON</span> <span class="o">=</span> <span class="mf">48.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">16.0</span>          <span class="c1"># NE Atlantic, west of Brittany</span>
+<span class="n">POINT_LAT</span><span class="p">,</span> <span class="n">POINT_LON</span> <span class="o">=</span> <span class="mf">48.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">16.0</span>  <span class="c1"># NE Atlantic, west of Brittany</span>
 
 <span class="n">ds_meta</span> <span class="o">=</span> <span class="n">Catalog</span><span class="p">()</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">DATASET_ID</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="n">DATASET_ID</span><span class="si">}</span><span class="s1">: domain=</span><span class="si">{</span><span class="n">ds_meta</span><span class="o">.</span><span class="n">domain</span><span class="si">}</span><span class="s1">, cadence=</span><span class="si">{</span><span class="n">ds_meta</span><span class="o">.</span><span class="n">cadence</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
@@ -11656,16 +11656,16 @@ fixed date works fine here.</p>
 from pathlib import Path
 
 import xarray as xr
+from pyramids.netcdf import NetCDF
 
 from earthlens import EarthLens
 from earthlens.cmems import Catalog
-from pyramids.netcdf import NetCDF
 
 OUT_DIR = Path('data/cmems-wave')
 OUT_DIR.mkdir(parents=True, exist_ok=True)
 
 DATASET_ID = 'cmems_mod_glo_wav_my_0.2deg_PT3H-i'
-POINT_LAT, POINT_LON = 48.0, -16.0          # NE Atlantic, west of Brittany
+POINT_LAT, POINT_LON = 48.0, -16.0  # NE Atlantic, west of Brittany
 
 ds_meta = Catalog().get_dataset(DATASET_ID)
 print(f'{DATASET_ID}: domain={ds_meta.domain}, cadence={ds_meta.cadence}')
@@ -11731,7 +11731,8 @@ VHM0 units: m
     <span class="n">start</span><span class="o">=</span><span class="s1">'2014-02-08'</span><span class="p">,</span>
     <span class="n">end</span><span class="o">=</span><span class="s1">'2014-02-10'</span><span class="p">,</span>
     <span class="n">cadence</span><span class="o">=</span><span class="s1">'hourly'</span><span class="p">,</span>
-    <span class="n">dataset</span><span class="o">=</span><span class="n">DATASET_ID</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">'VHM0'</span><span class="p">],</span>
+    <span class="n">dataset</span><span class="o">=</span><span class="n">DATASET_ID</span><span class="p">,</span>
+    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">'VHM0'</span><span class="p">],</span>
     <span class="n">aoi</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">30.0</span><span class="p">,</span> <span class="mf">40.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">5.0</span><span class="p">,</span> <span class="mf">55.0</span><span class="p">],</span>
     <span class="n">path</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">OUT_DIR</span><span class="p">),</span>
     <span class="n">service_username</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'COPERNICUSMARINE_SERVICE_USERNAME'</span><span class="p">),</span>
@@ -11745,7 +11746,8 @@ VHM0 units: m
     start='2014-02-08',
     end='2014-02-10',
     cadence='hourly',
-    dataset=DATASET_ID, variables=['VHM0'],
+    dataset=DATASET_ID,
+    variables=['VHM0'],
     aoi=[-30.0, 40.0, -5.0, 55.0],
     path=str(OUT_DIR),
     service_username=os.environ.get('COPERNICUSMARINE_SERVICE_USERNAME'),
@@ -11959,8 +11961,11 @@ the 3-hourly Hs series at the chosen point as the storm passes.</p>
 
 <span class="n">fig</span><span class="p">,</span> <span class="p">(</span><span class="n">axm</span><span class="p">,</span> <span class="n">axt</span><span class="p">)</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
 <span class="n">mesh</span> <span class="o">=</span> <span class="n">axm</span><span class="o">.</span><span class="n">pcolormesh</span><span class="p">(</span>
-    <span class="n">snapshot</span><span class="p">[</span><span class="s1">'longitude'</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">snapshot</span><span class="p">[</span><span class="s1">'latitude'</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">snapshot</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
-    <span class="n">cmap</span><span class="o">=</span><span class="s1">'viridis'</span><span class="p">,</span> <span class="n">shading</span><span class="o">=</span><span class="s1">'auto'</span><span class="p">,</span>
+    <span class="n">snapshot</span><span class="p">[</span><span class="s1">'longitude'</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+    <span class="n">snapshot</span><span class="p">[</span><span class="s1">'latitude'</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+    <span class="n">snapshot</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+    <span class="n">cmap</span><span class="o">=</span><span class="s1">'viridis'</span><span class="p">,</span>
+    <span class="n">shading</span><span class="o">=</span><span class="s1">'auto'</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="n">fig</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axm</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">'Hs (m)'</span><span class="p">)</span>
 <span class="n">axm</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="n">POINT_LON</span><span class="p">],</span> <span class="p">[</span><span class="n">POINT_LAT</span><span class="p">],</span> <span class="s1">'r*'</span><span class="p">,</span> <span class="n">markersize</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
@@ -11983,8 +11988,11 @@ snapshot = vhm0.isel(time=peak_step)
 
 fig, (axm, axt) = plt.subplots(1, 2, figsize=(12, 4))
 mesh = axm.pcolormesh(
-    snapshot['longitude'].values, snapshot['latitude'].values, snapshot.values,
-    cmap='viridis', shading='auto',
+    snapshot['longitude'].values,
+    snapshot['latitude'].values,
+    snapshot.values,
+    cmap='viridis',
+    shading='auto',
 )
 fig.colorbar(mesh, ax=axm, label='Hs (m)')
 axm.plot([POINT_LON], [POINT_LAT], 'r*', markersize=12)

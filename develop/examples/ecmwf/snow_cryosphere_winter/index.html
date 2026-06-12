@@ -11702,7 +11702,8 @@ Engadine area. Range Oct 2021–Jun 2022 covers a full snow season.</p>
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">earthlens</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span><span class="p">,</span> <span class="n">AggregationConfig</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">earthlens</span><span class="w"> </span><span class="kn">import</span> <span class="n">AggregationConfig</span><span class="p">,</span> <span class="n">EarthLens</span>
 
 <span class="n">OUT</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">"data/era5-land-alps-snow"</span><span class="p">)</span>
 <span class="n">OUT</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -11712,18 +11713,20 @@ Engadine area. Range Oct 2021–Jun 2022 covers a full snow season.</p>
     <span class="n">cadence</span><span class="o">=</span><span class="s2">"monthly"</span><span class="p">,</span>
     <span class="n">start</span><span class="o">=</span><span class="s2">"2021-10-01"</span><span class="p">,</span>
     <span class="n">end</span><span class="o">=</span><span class="s2">"2022-06-01"</span><span class="p">,</span>
-    <span class="n">dataset</span><span class="o">=</span><span class="s2">"reanalysis-era5-land-monthly-means"</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="p">[</span>
-            <span class="s2">"snow-depth"</span><span class="p">,</span>
-            <span class="s2">"snow-depth-water-equivalent"</span><span class="p">,</span>
-            <span class="s2">"2m-temperature"</span><span class="p">,</span>
-        <span class="p">],</span>
+    <span class="n">dataset</span><span class="o">=</span><span class="s2">"reanalysis-era5-land-monthly-means"</span><span class="p">,</span>
+    <span class="n">variables</span><span class="o">=</span><span class="p">[</span>
+        <span class="s2">"snow-depth"</span><span class="p">,</span>
+        <span class="s2">"snow-depth-water-equivalent"</span><span class="p">,</span>
+        <span class="s2">"2m-temperature"</span><span class="p">,</span>
+    <span class="p">],</span>
     <span class="n">aoi</span><span class="o">=</span><span class="p">[</span><span class="mf">10.0</span><span class="p">,</span> <span class="mf">46.0</span><span class="p">,</span> <span class="mf">11.0</span><span class="p">,</span> <span class="mf">47.0</span><span class="p">],</span>
     <span class="n">path</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">OUT</span><span class="p">),</span>
 <span class="p">)</span>
 <span class="n">earthlens</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">aggregate</span><span class="o">=</span><span class="n">AggregationConfig</span><span class="p">(</span><span class="n">freq</span><span class="o">=</span><span class="s2">"1MS"</span><span class="p">,</span> <span class="n">op</span><span class="o">=</span><span class="s2">"auto"</span><span class="p">,</span> <span class="n">cell_size</span><span class="o">=</span><span class="mf">0.1</span><span class="p">))</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-1">from pathlib import Path
-from earthlens import EarthLens, AggregationConfig
+
+from earthlens import AggregationConfig, EarthLens
 
 OUT = Path("data/era5-land-alps-snow")
 OUT.mkdir(parents=True, exist_ok=True)
@@ -11733,11 +11736,12 @@ earthlens = EarthLens(
     cadence="monthly",
     start="2021-10-01",
     end="2022-06-01",
-    dataset="reanalysis-era5-land-monthly-means", variables=[
-            "snow-depth",
-            "snow-depth-water-equivalent",
-            "2m-temperature",
-        ],
+    dataset="reanalysis-era5-land-monthly-means",
+    variables=[
+        "snow-depth",
+        "snow-depth-water-equivalent",
+        "2m-temperature",
+    ],
     aoi=[10.0, 46.0, 11.0, 47.0],
     path=str(OUT),
 )
@@ -11794,9 +11798,9 @@ earthlens.download(aggregate=AggregationConfig(freq="1MS", op="auto", cell_size=
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jupyter-widgets jp-OutputArea-output" id="bb2c1b0d-e79f-4d59-945e-f82a146b174c" tabindex="0">
+<div class="jupyter-widgets jp-OutputArea-output" id="8e2f95ae-bc3c-47b9-b0cf-75b2e408c372" tabindex="0">
 <script type="text/javascript">
-var element = document.getElementById('bb2c1b0d-e79f-4d59-945e-f82a146b174c');
+var element = document.getElementById('8e2f95ae-bc3c-47b9-b0cf-75b2e408c372');
 </script>
 <script type="application/vnd.jupyter.widget-view+json">
 {"model_id": "ee948b099ac64f8fbcc6c4a81c51ff7f", "version_major": 2, "version_minor": 0}
@@ -11896,9 +11900,9 @@ var element = document.getElementById('bb2c1b0d-e79f-4d59-945e-f82a146b174c');
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jupyter-widgets jp-OutputArea-output" id="449b53ec-dbc4-4842-8ae6-e3e24beca4d5" tabindex="0">
+<div class="jupyter-widgets jp-OutputArea-output" id="5c00ba02-f2ce-46e3-b0bd-9a2f249ebc8b" tabindex="0">
 <script type="text/javascript">
-var element = document.getElementById('449b53ec-dbc4-4842-8ae6-e3e24beca4d5');
+var element = document.getElementById('5c00ba02-f2ce-46e3-b0bd-9a2f249ebc8b');
 </script>
 <script type="application/vnd.jupyter.widget-view+json">
 {"model_id": "7638cce2fb7b4778991701305789c126", "version_major": 2, "version_minor": 0}
@@ -11991,9 +11995,9 @@ var element = document.getElementById('449b53ec-dbc4-4842-8ae6-e3e24beca4d5');
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jupyter-widgets jp-OutputArea-output" id="c3ef5ad7-bcb0-4c25-adfe-7c2dd022c5f0" tabindex="0">
+<div class="jupyter-widgets jp-OutputArea-output" id="2705946d-6c1d-4f36-9254-072f3a8e3ef3" tabindex="0">
 <script type="text/javascript">
-var element = document.getElementById('c3ef5ad7-bcb0-4c25-adfe-7c2dd022c5f0');
+var element = document.getElementById('2705946d-6c1d-4f36-9254-072f3a8e3ef3');
 </script>
 <script type="application/vnd.jupyter.widget-view+json">
 {"model_id": "004bcee36b3543d0b20be2daf4150849", "version_major": 2, "version_minor": 0}
@@ -12053,20 +12057,24 @@ var element = document.getElementById('c3ef5ad7-bcb0-4c25-adfe-7c2dd022c5f0');
 
 <span class="n">agg</span> <span class="o">=</span> <span class="n">OUT</span> <span class="o">/</span> <span class="s2">"aggregated"</span>
 
+
 <span class="k">def</span><span class="w"> </span><span class="nf">stack</span><span class="p">(</span><span class="n">cds_variable</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
     <span class="n">paths</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">agg</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">cds_variable</span><span class="si">}</span><span class="s2">_1MS_*.tif"</span><span class="p">))</span>
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">Dataset</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">p</span><span class="p">))</span><span class="o">.</span><span class="n">read_array</span><span class="p">()</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">paths</span><span class="p">])</span>
 
-<span class="n">sde</span>  <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmean</span><span class="p">(</span><span class="n">stack</span><span class="p">(</span><span class="s2">"snow_depth"</span><span class="p">),</span>                    <span class="n">axis</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>   <span class="c1"># m (geometric)</span>
-<span class="n">swe</span>  <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmean</span><span class="p">(</span><span class="n">stack</span><span class="p">(</span><span class="s2">"snow_depth_water_equivalent"</span><span class="p">),</span>   <span class="n">axis</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>   <span class="c1"># m of water eq</span>
-<span class="n">T2m</span>  <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmean</span><span class="p">(</span><span class="n">stack</span><span class="p">(</span><span class="s2">"2m_temperature"</span><span class="p">),</span>                <span class="n">axis</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span> <span class="o">-</span> <span class="mf">273.15</span>  <span class="c1"># °C</span>
+
+<span class="n">sde</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmean</span><span class="p">(</span><span class="n">stack</span><span class="p">(</span><span class="s2">"snow_depth"</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>  <span class="c1"># m (geometric)</span>
+<span class="n">swe</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmean</span><span class="p">(</span><span class="n">stack</span><span class="p">(</span><span class="s2">"snow_depth_water_equivalent"</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>  <span class="c1"># m of water eq</span>
+<span class="n">T2m</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmean</span><span class="p">(</span><span class="n">stack</span><span class="p">(</span><span class="s2">"2m_temperature"</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span> <span class="o">-</span> <span class="mf">273.15</span>  <span class="c1"># °C</span>
 
 <span class="n">months</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">date_range</span><span class="p">(</span><span class="s2">"2021-10-01"</span><span class="p">,</span> <span class="n">periods</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">sde</span><span class="p">),</span> <span class="n">freq</span><span class="o">=</span><span class="s2">"MS"</span><span class="p">)</span>
 <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
-    <span class="p">{</span><span class="s2">"Snow depth [m]"</span><span class="p">:</span> <span class="n">sde</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span>
-     <span class="s2">"SWE [m]"</span><span class="p">:</span>         <span class="n">swe</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span>
-     <span class="s2">"Snow density"</span><span class="p">:</span>    <span class="p">(</span><span class="n">swe</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">sde</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="n">sde</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">))</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span>
-     <span class="s2">"T_2m [°C]"</span><span class="p">:</span>       <span class="n">T2m</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">1</span><span class="p">)},</span>
+    <span class="p">{</span>
+        <span class="s2">"Snow depth [m]"</span><span class="p">:</span> <span class="n">sde</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span>
+        <span class="s2">"SWE [m]"</span><span class="p">:</span> <span class="n">swe</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span>
+        <span class="s2">"Snow density"</span><span class="p">:</span> <span class="p">(</span><span class="n">swe</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">sde</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="n">sde</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">))</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span>
+        <span class="s2">"T_2m [°C]"</span><span class="p">:</span> <span class="n">T2m</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span>
+    <span class="p">},</span>
     <span class="n">index</span><span class="o">=</span><span class="n">months</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="n">df</span>
@@ -12077,20 +12085,24 @@ from pyramids.dataset import Dataset
 
 agg = OUT / "aggregated"
 
+
 def stack(cds_variable: str) -&gt; np.ndarray:
     paths = sorted(agg.glob(f"{cds_variable}_1MS_*.tif"))
     return np.stack([Dataset.read_file(str(p)).read_array() for p in paths])
 
-sde  = np.nanmean(stack("snow_depth"),                    axis=(1, 2))   # m (geometric)
-swe  = np.nanmean(stack("snow_depth_water_equivalent"),   axis=(1, 2))   # m of water eq
-T2m  = np.nanmean(stack("2m_temperature"),                axis=(1, 2)) - 273.15  # °C
+
+sde = np.nanmean(stack("snow_depth"), axis=(1, 2))  # m (geometric)
+swe = np.nanmean(stack("snow_depth_water_equivalent"), axis=(1, 2))  # m of water eq
+T2m = np.nanmean(stack("2m_temperature"), axis=(1, 2)) - 273.15  # °C
 
 months = pd.date_range("2021-10-01", periods=len(sde), freq="MS")
 df = pd.DataFrame(
-    {"Snow depth [m]": sde.round(3),
-     "SWE [m]":         swe.round(3),
-     "Snow density":    (swe / np.where(sde &gt; 0, sde, np.nan)).round(2),
-     "T_2m [°C]":       T2m.round(1)},
+    {
+        "Snow depth [m]": sde.round(3),
+        "SWE [m]": swe.round(3),
+        "Snow density": (swe / np.where(sde &gt; 0, sde, np.nan)).round(2),
+        "T_2m [°C]": T2m.round(1),
+    },
     index=months,
 )
 df</div>

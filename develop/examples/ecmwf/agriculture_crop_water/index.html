@@ -11805,7 +11805,8 @@ call.</p>
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">earthlens</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span><span class="p">,</span> <span class="n">AggregationConfig</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">earthlens</span><span class="w"> </span><span class="kn">import</span> <span class="n">AggregationConfig</span><span class="p">,</span> <span class="n">EarthLens</span>
 
 <span class="n">OUT</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">"data/era5-land-corn-belt"</span><span class="p">)</span>
 <span class="n">OUT</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -11815,19 +11816,21 @@ call.</p>
     <span class="n">cadence</span><span class="o">=</span><span class="s2">"monthly"</span><span class="p">,</span>
     <span class="n">start</span><span class="o">=</span><span class="s2">"2022-05-01"</span><span class="p">,</span>
     <span class="n">end</span><span class="o">=</span><span class="s2">"2022-10-01"</span><span class="p">,</span>
-    <span class="n">dataset</span><span class="o">=</span><span class="s2">"reanalysis-era5-land-monthly-means"</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="p">[</span>
-            <span class="s2">"total-precipitation"</span><span class="p">,</span>
-            <span class="s2">"total-evaporation"</span><span class="p">,</span>
-            <span class="s2">"2m-temperature"</span><span class="p">,</span>
-            <span class="s2">"volumetric-soil-water-layer-1"</span><span class="p">,</span>
-        <span class="p">],</span>
+    <span class="n">dataset</span><span class="o">=</span><span class="s2">"reanalysis-era5-land-monthly-means"</span><span class="p">,</span>
+    <span class="n">variables</span><span class="o">=</span><span class="p">[</span>
+        <span class="s2">"total-precipitation"</span><span class="p">,</span>
+        <span class="s2">"total-evaporation"</span><span class="p">,</span>
+        <span class="s2">"2m-temperature"</span><span class="p">,</span>
+        <span class="s2">"volumetric-soil-water-layer-1"</span><span class="p">,</span>
+    <span class="p">],</span>
     <span class="n">aoi</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">92.0</span><span class="p">,</span> <span class="mf">40.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">91.0</span><span class="p">,</span> <span class="mf">41.0</span><span class="p">],</span>
     <span class="n">path</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">OUT</span><span class="p">),</span>
 <span class="p">)</span>
 <span class="n">earthlens</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">aggregate</span><span class="o">=</span><span class="n">AggregationConfig</span><span class="p">(</span><span class="n">freq</span><span class="o">=</span><span class="s2">"1MS"</span><span class="p">,</span> <span class="n">op</span><span class="o">=</span><span class="s2">"auto"</span><span class="p">,</span> <span class="n">cell_size</span><span class="o">=</span><span class="mf">0.1</span><span class="p">))</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-2">from pathlib import Path
-from earthlens import EarthLens, AggregationConfig
+
+from earthlens import AggregationConfig, EarthLens
 
 OUT = Path("data/era5-land-corn-belt")
 OUT.mkdir(parents=True, exist_ok=True)
@@ -11837,12 +11840,13 @@ earthlens = EarthLens(
     cadence="monthly",
     start="2022-05-01",
     end="2022-10-01",
-    dataset="reanalysis-era5-land-monthly-means", variables=[
-            "total-precipitation",
-            "total-evaporation",
-            "2m-temperature",
-            "volumetric-soil-water-layer-1",
-        ],
+    dataset="reanalysis-era5-land-monthly-means",
+    variables=[
+        "total-precipitation",
+        "total-evaporation",
+        "2m-temperature",
+        "volumetric-soil-water-layer-1",
+    ],
     aoi=[-92.0, 40.0, -91.0, 41.0],
     path=str(OUT),
 )
@@ -11892,9 +11896,9 @@ earthlens.download(aggregate=AggregationConfig(freq="1MS", op="auto", cell_size=
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jupyter-widgets jp-OutputArea-output" id="2a5375fe-0386-4200-90a9-ffd42f0fbdb3" tabindex="0">
+<div class="jupyter-widgets jp-OutputArea-output" id="8f016321-b167-4615-ade6-cf296ddf361b" tabindex="0">
 <script type="text/javascript">
-var element = document.getElementById('2a5375fe-0386-4200-90a9-ffd42f0fbdb3');
+var element = document.getElementById('8f016321-b167-4615-ade6-cf296ddf361b');
 </script>
 <script type="application/vnd.jupyter.widget-view+json">
 {"model_id": "a13f708c39e0471b8a177703cd23074e", "version_major": 2, "version_minor": 0}
@@ -11994,9 +11998,9 @@ var element = document.getElementById('2a5375fe-0386-4200-90a9-ffd42f0fbdb3');
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jupyter-widgets jp-OutputArea-output" id="b485a6db-08eb-4d75-a0ce-3671cbaf55fb" tabindex="0">
+<div class="jupyter-widgets jp-OutputArea-output" id="5c082a51-a315-451e-a0cf-d71f17e7c614" tabindex="0">
 <script type="text/javascript">
-var element = document.getElementById('b485a6db-08eb-4d75-a0ce-3671cbaf55fb');
+var element = document.getElementById('5c082a51-a315-451e-a0cf-d71f17e7c614');
 </script>
 <script type="application/vnd.jupyter.widget-view+json">
 {"model_id": "15f1aa36784e4e8e9e33dfdd50049d36", "version_major": 2, "version_minor": 0}
@@ -12089,9 +12093,9 @@ var element = document.getElementById('b485a6db-08eb-4d75-a0ce-3671cbaf55fb');
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jupyter-widgets jp-OutputArea-output" id="89919b81-62ad-41e1-a30c-597193a81a6a" tabindex="0">
+<div class="jupyter-widgets jp-OutputArea-output" id="8df3a707-d6c5-4d96-9d35-d800be634ddd" tabindex="0">
 <script type="text/javascript">
-var element = document.getElementById('89919b81-62ad-41e1-a30c-597193a81a6a');
+var element = document.getElementById('8df3a707-d6c5-4d96-9d35-d800be634ddd');
 </script>
 <script type="application/vnd.jupyter.widget-view+json">
 {"model_id": "99de251a2ef74926af121aae3e5a24f9", "version_major": 2, "version_minor": 0}
@@ -12170,9 +12174,9 @@ var element = document.getElementById('89919b81-62ad-41e1-a30c-597193a81a6a');
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jupyter-widgets jp-OutputArea-output" id="d21e3cf3-5b5c-4219-93a2-8eb3144f2021" tabindex="0">
+<div class="jupyter-widgets jp-OutputArea-output" id="25e1c77b-2fa9-4ffe-a38e-5dfa27a27b1c" tabindex="0">
 <script type="text/javascript">
-var element = document.getElementById('d21e3cf3-5b5c-4219-93a2-8eb3144f2021');
+var element = document.getElementById('25e1c77b-2fa9-4ffe-a38e-5dfa27a27b1c');
 </script>
 <script type="application/vnd.jupyter.widget-view+json">
 {"model_id": "44badbdba0264570a787303e186fc458", "version_major": 2, "version_minor": 0}
@@ -12233,20 +12237,29 @@ $P - |ET|$ deficit and pair it with soil-moisture L1.</p>
 
 <span class="n">agg</span> <span class="o">=</span> <span class="n">OUT</span> <span class="o">/</span> <span class="s2">"aggregated"</span>
 
+
 <span class="k">def</span><span class="w"> </span><span class="nf">stack</span><span class="p">(</span><span class="n">cds_variable</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
     <span class="n">paths</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">agg</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">cds_variable</span><span class="si">}</span><span class="s2">_1MS_*.tif"</span><span class="p">))</span>
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">Dataset</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">p</span><span class="p">))</span><span class="o">.</span><span class="n">read_array</span><span class="p">()</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">paths</span><span class="p">])</span>
 
-<span class="n">precip</span>        <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmean</span><span class="p">(</span><span class="n">stack</span><span class="p">(</span><span class="s2">"total_precipitation"</span><span class="p">),</span>           <span class="n">axis</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span> <span class="o">*</span> <span class="mi">1000</span>  <span class="c1"># mm</span>
-<span class="n">et</span>            <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">nanmean</span><span class="p">(</span><span class="n">stack</span><span class="p">(</span><span class="s2">"total_evaporation"</span><span class="p">),</span>            <span class="n">axis</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span> <span class="o">*</span> <span class="mi">1000</span>  <span class="c1"># mm (sign flip)</span>
-<span class="n">t_air</span>         <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmean</span><span class="p">(</span><span class="n">stack</span><span class="p">(</span><span class="s2">"2m_temperature"</span><span class="p">),</span>                <span class="n">axis</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span> <span class="o">-</span> <span class="mf">273.15</span>  <span class="c1"># °C</span>
-<span class="n">soil_moisture</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmean</span><span class="p">(</span><span class="n">stack</span><span class="p">(</span><span class="s2">"volumetric_soil_water_layer_1"</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>         <span class="c1"># m^3/m^3</span>
+
+<span class="n">precip</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmean</span><span class="p">(</span><span class="n">stack</span><span class="p">(</span><span class="s2">"total_precipitation"</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span> <span class="o">*</span> <span class="mi">1000</span>  <span class="c1"># mm</span>
+<span class="n">et</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">nanmean</span><span class="p">(</span><span class="n">stack</span><span class="p">(</span><span class="s2">"total_evaporation"</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span> <span class="o">*</span> <span class="mi">1000</span>  <span class="c1"># mm (sign flip)</span>
+<span class="n">t_air</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmean</span><span class="p">(</span><span class="n">stack</span><span class="p">(</span><span class="s2">"2m_temperature"</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span> <span class="o">-</span> <span class="mf">273.15</span>  <span class="c1"># °C</span>
+<span class="n">soil_moisture</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmean</span><span class="p">(</span>
+    <span class="n">stack</span><span class="p">(</span><span class="s2">"volumetric_soil_water_layer_1"</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<span class="p">)</span>  <span class="c1"># m^3/m^3</span>
 
 <span class="n">months</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">date_range</span><span class="p">(</span><span class="s2">"2022-05-01"</span><span class="p">,</span> <span class="n">periods</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">precip</span><span class="p">),</span> <span class="n">freq</span><span class="o">=</span><span class="s2">"MS"</span><span class="p">)</span>
 <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
-    <span class="p">{</span><span class="s2">"P [mm]"</span><span class="p">:</span> <span class="n">precip</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="s2">"|ET| [mm]"</span><span class="p">:</span> <span class="n">et</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="s2">"P-|ET| [mm]"</span><span class="p">:</span> <span class="p">(</span><span class="n">precip</span> <span class="o">-</span> <span class="n">et</span><span class="p">)</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span>
-     <span class="s2">"deficit cum [mm]"</span><span class="p">:</span> <span class="p">(</span><span class="n">precip</span> <span class="o">-</span> <span class="n">et</span><span class="p">)</span><span class="o">.</span><span class="n">cumsum</span><span class="p">()</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span>
-     <span class="s2">"T_2m [°C]"</span><span class="p">:</span> <span class="n">t_air</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="s2">"SM_L1"</span><span class="p">:</span> <span class="n">soil_moisture</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">3</span><span class="p">)},</span>
+    <span class="p">{</span>
+        <span class="s2">"P [mm]"</span><span class="p">:</span> <span class="n">precip</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span>
+        <span class="s2">"|ET| [mm]"</span><span class="p">:</span> <span class="n">et</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span>
+        <span class="s2">"P-|ET| [mm]"</span><span class="p">:</span> <span class="p">(</span><span class="n">precip</span> <span class="o">-</span> <span class="n">et</span><span class="p">)</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span>
+        <span class="s2">"deficit cum [mm]"</span><span class="p">:</span> <span class="p">(</span><span class="n">precip</span> <span class="o">-</span> <span class="n">et</span><span class="p">)</span><span class="o">.</span><span class="n">cumsum</span><span class="p">()</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span>
+        <span class="s2">"T_2m [°C]"</span><span class="p">:</span> <span class="n">t_air</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span>
+        <span class="s2">"SM_L1"</span><span class="p">:</span> <span class="n">soil_moisture</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span>
+    <span class="p">},</span>
     <span class="n">index</span><span class="o">=</span><span class="n">months</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="n">df</span>
@@ -12257,20 +12270,29 @@ from pyramids.dataset import Dataset
 
 agg = OUT / "aggregated"
 
+
 def stack(cds_variable: str) -&gt; np.ndarray:
     paths = sorted(agg.glob(f"{cds_variable}_1MS_*.tif"))
     return np.stack([Dataset.read_file(str(p)).read_array() for p in paths])
 
-precip        = np.nanmean(stack("total_precipitation"),           axis=(1, 2)) * 1000  # mm
-et            = -np.nanmean(stack("total_evaporation"),            axis=(1, 2)) * 1000  # mm (sign flip)
-t_air         = np.nanmean(stack("2m_temperature"),                axis=(1, 2)) - 273.15  # °C
-soil_moisture = np.nanmean(stack("volumetric_soil_water_layer_1"), axis=(1, 2))         # m^3/m^3
+
+precip = np.nanmean(stack("total_precipitation"), axis=(1, 2)) * 1000  # mm
+et = -np.nanmean(stack("total_evaporation"), axis=(1, 2)) * 1000  # mm (sign flip)
+t_air = np.nanmean(stack("2m_temperature"), axis=(1, 2)) - 273.15  # °C
+soil_moisture = np.nanmean(
+    stack("volumetric_soil_water_layer_1"), axis=(1, 2)
+)  # m^3/m^3
 
 months = pd.date_range("2022-05-01", periods=len(precip), freq="MS")
 df = pd.DataFrame(
-    {"P [mm]": precip.round(1), "|ET| [mm]": et.round(1), "P-|ET| [mm]": (precip - et).round(1),
-     "deficit cum [mm]": (precip - et).cumsum().round(1),
-     "T_2m [°C]": t_air.round(1), "SM_L1": soil_moisture.round(3)},
+    {
+        "P [mm]": precip.round(1),
+        "|ET| [mm]": et.round(1),
+        "P-|ET| [mm]": (precip - et).round(1),
+        "deficit cum [mm]": (precip - et).cumsum().round(1),
+        "T_2m [°C]": t_air.round(1),
+        "SM_L1": soil_moisture.round(3),
+    },
     index=months,
 )
 df</div>
@@ -12409,12 +12431,25 @@ natural drainage timescale).</p>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
 
 <span class="n">fig</span><span class="p">,</span> <span class="n">ax1</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
-<span class="n">ax1</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span><span class="n">months</span><span class="p">,</span> <span class="n">precip</span> <span class="o">-</span> <span class="n">et</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"tab:green"</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"P - |ET| [mm/month]"</span><span class="p">)</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span>
+    <span class="n">months</span><span class="p">,</span>
+    <span class="n">precip</span> <span class="o">-</span> <span class="n">et</span><span class="p">,</span>
+    <span class="n">width</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
+    <span class="n">color</span><span class="o">=</span><span class="s2">"tab:green"</span><span class="p">,</span>
+    <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
+    <span class="n">label</span><span class="o">=</span><span class="s2">"P - |ET| [mm/month]"</span><span class="p">,</span>
+<span class="p">)</span>
 <span class="n">ax1</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">"P - |ET| per month [mm]"</span><span class="p">)</span>
 <span class="n">ax1</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"gray"</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
 
 <span class="n">ax2</span> <span class="o">=</span> <span class="n">ax1</span><span class="o">.</span><span class="n">twinx</span><span class="p">()</span>
-<span class="n">ax2</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">months</span><span class="p">,</span> <span class="n">soil_moisture</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s2">"o"</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"tab:brown"</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Soil moisture L1 [m³/m³]"</span><span class="p">)</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+    <span class="n">months</span><span class="p">,</span>
+    <span class="n">soil_moisture</span><span class="p">,</span>
+    <span class="n">marker</span><span class="o">=</span><span class="s2">"o"</span><span class="p">,</span>
+    <span class="n">color</span><span class="o">=</span><span class="s2">"tab:brown"</span><span class="p">,</span>
+    <span class="n">label</span><span class="o">=</span><span class="s2">"Soil moisture L1 [m³/m³]"</span><span class="p">,</span>
+<span class="p">)</span>
 <span class="n">ax2</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">"Soil moisture L1 [m³/m³]"</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"tab:brown"</span><span class="p">)</span>
 
 <span class="n">ax1</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">"Corn-belt growing season 2022 — water surplus and topsoil moisture"</span><span class="p">)</span>
@@ -12425,12 +12460,25 @@ natural drainage timescale).</p>
 <div class="clipboard-copy-txt" id="cell-4">import matplotlib.pyplot as plt
 
 fig, ax1 = plt.subplots(figsize=(9, 5))
-ax1.bar(months, precip - et, width=20, color="tab:green", alpha=0.5, label="P - |ET| [mm/month]")
+ax1.bar(
+    months,
+    precip - et,
+    width=20,
+    color="tab:green",
+    alpha=0.5,
+    label="P - |ET| [mm/month]",
+)
 ax1.set_ylabel("P - |ET| per month [mm]")
 ax1.axhline(0, color="gray", lw=0.5)
 
 ax2 = ax1.twinx()
-ax2.plot(months, soil_moisture, marker="o", color="tab:brown", label="Soil moisture L1 [m³/m³]")
+ax2.plot(
+    months,
+    soil_moisture,
+    marker="o",
+    color="tab:brown",
+    label="Soil moisture L1 [m³/m³]",
+)
 ax2.set_ylabel("Soil moisture L1 [m³/m³]", color="tab:brown")
 
 ax1.set_title("Corn-belt growing season 2022 — water surplus and topsoil moisture")

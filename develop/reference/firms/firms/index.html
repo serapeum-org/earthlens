@@ -14194,7 +14194,9 @@ features, so the facade rejects <code>aggregate=</code> with
 <span class="normal"><a href="#__codelineno-0-646">646</a></span>
 <span class="normal"><a href="#__codelineno-0-647">647</a></span>
 <span class="normal"><a href="#__codelineno-0-648">648</a></span>
-<span class="normal"><a href="#__codelineno-0-649">649</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-94" name="__codelineno-0-94"></a><span class="k">class</span><span class="w"> </span><span class="nc">FIRMS</span><span class="p">(</span><span class="n">AbstractDataSource</span><span class="p">):</span>
+<span class="normal"><a href="#__codelineno-0-649">649</a></span>
+<span class="normal"><a href="#__codelineno-0-650">650</a></span>
+<span class="normal"><a href="#__codelineno-0-651">651</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-94" name="__codelineno-0-94"></a><span class="k">class</span><span class="w"> </span><span class="nc">FIRMS</span><span class="p">(</span><span class="n">AbstractDataSource</span><span class="p">):</span>
 <a id="__codelineno-0-95" name="__codelineno-0-95"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;NASA FIRMS active-fire backend (vector point-feature output).</span>
 <a id="__codelineno-0-96" name="__codelineno-0-96"></a>
 <a id="__codelineno-0-97" name="__codelineno-0-97"></a><span class="sd">    Wraps the FIRMS area CSV API so a user can pull a space/time/sensor</span>
@@ -14601,16 +14603,16 @@ features, so the facade rejects <code>aggregate=</code> with
 <a id="__codelineno-0-498" name="__codelineno-0-498"></a>        <span class="n">text</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">text</span>
 <a id="__codelineno-0-499" name="__codelineno-0-499"></a>        <span class="n">kind</span> <span class="o">=</span> <span class="n">classify_body</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
 <a id="__codelineno-0-500" name="__codelineno-0-500"></a>        <span class="k">if</span> <span class="n">kind</span> <span class="o">==</span> <span class="s2">&quot;auth&quot;</span><span class="p">:</span>
-<a id="__codelineno-0-501" name="__codelineno-0-501"></a>            <span class="k">raise</span> <span class="n">AuthenticationError</span><span class="p">(</span>
-<a id="__codelineno-0-502" name="__codelineno-0-502"></a>                <span class="sa">f</span><span class="s2">&quot;FIRMS rejected the MAP_KEY: </span><span class="si">{</span><span class="n">_truncate</span><span class="p">(</span><span class="n">text</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-503" name="__codelineno-0-503"></a>            <span class="p">)</span>
-<a id="__codelineno-0-504" name="__codelineno-0-504"></a>        <span class="k">if</span> <span class="n">kind</span> <span class="o">==</span> <span class="s2">&quot;quota&quot;</span><span class="p">:</span>
-<a id="__codelineno-0-505" name="__codelineno-0-505"></a>            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
-<a id="__codelineno-0-506" name="__codelineno-0-506"></a>                <span class="s2">&quot;FIRMS transaction quota exhausted after back-off retries: &quot;</span>
-<a id="__codelineno-0-507" name="__codelineno-0-507"></a>                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">_truncate</span><span class="p">(</span><span class="n">text</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-508" name="__codelineno-0-508"></a>            <span class="p">)</span>
-<a id="__codelineno-0-509" name="__codelineno-0-509"></a>        <span class="k">if</span> <span class="n">kind</span> <span class="o">==</span> <span class="s2">&quot;error&quot;</span><span class="p">:</span>
-<a id="__codelineno-0-510" name="__codelineno-0-510"></a>            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;FIRMS returned a non-CSV error body: </span><span class="si">{</span><span class="n">_truncate</span><span class="p">(</span><span class="n">text</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-501" name="__codelineno-0-501"></a>            <span class="k">raise</span> <span class="n">AuthenticationError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;FIRMS rejected the MAP_KEY: </span><span class="si">{</span><span class="n">_truncate</span><span class="p">(</span><span class="n">text</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-502" name="__codelineno-0-502"></a>        <span class="k">if</span> <span class="n">kind</span> <span class="o">==</span> <span class="s2">&quot;quota&quot;</span><span class="p">:</span>
+<a id="__codelineno-0-503" name="__codelineno-0-503"></a>            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+<a id="__codelineno-0-504" name="__codelineno-0-504"></a>                <span class="s2">&quot;FIRMS transaction quota exhausted after back-off retries: &quot;</span>
+<a id="__codelineno-0-505" name="__codelineno-0-505"></a>                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">_truncate</span><span class="p">(</span><span class="n">text</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-506" name="__codelineno-0-506"></a>            <span class="p">)</span>
+<a id="__codelineno-0-507" name="__codelineno-0-507"></a>        <span class="k">if</span> <span class="n">kind</span> <span class="o">==</span> <span class="s2">&quot;error&quot;</span><span class="p">:</span>
+<a id="__codelineno-0-508" name="__codelineno-0-508"></a>            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+<a id="__codelineno-0-509" name="__codelineno-0-509"></a>                <span class="sa">f</span><span class="s2">&quot;FIRMS returned a non-CSV error body: </span><span class="si">{</span><span class="n">_truncate</span><span class="p">(</span><span class="n">text</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-510" name="__codelineno-0-510"></a>            <span class="p">)</span>
 <a id="__codelineno-0-511" name="__codelineno-0-511"></a>        <span class="n">frame</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">StringIO</span><span class="p">(</span><span class="n">text</span><span class="p">))</span>
 <a id="__codelineno-0-512" name="__codelineno-0-512"></a>        <span class="k">return</span> <span class="n">events</span><span class="o">.</span><span class="n">csv_to_fc</span><span class="p">(</span>
 <a id="__codelineno-0-513" name="__codelineno-0-513"></a>            <span class="n">frame</span><span class="p">,</span>
@@ -14632,124 +14634,126 @@ features, so the facade rejects <code>aggregate=</code> with
 <a id="__codelineno-0-529" name="__codelineno-0-529"></a><span class="sd">        Returns:</span>
 <a id="__codelineno-0-530" name="__codelineno-0-530"></a><span class="sd">            str: The fully-formed request URL.</span>
 <a id="__codelineno-0-531" name="__codelineno-0-531"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-532" name="__codelineno-0-532"></a>        <span class="n">bbox</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">west</span><span class="si">}</span><span class="s2">,</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">south</span><span class="si">}</span><span class="s2">,</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">east</span><span class="si">}</span><span class="s2">,</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">north</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-533" name="__codelineno-0-533"></a>        <span class="k">return</span> <span class="n">AREA_URL_TEMPLATE</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-<a id="__codelineno-0-534" name="__codelineno-0-534"></a>            <span class="n">map_key</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">api_key</span><span class="p">,</span>
-<a id="__codelineno-0-535" name="__codelineno-0-535"></a>            <span class="n">sensor</span><span class="o">=</span><span class="n">product</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;sensor&quot;</span><span class="p">],</span>
-<a id="__codelineno-0-536" name="__codelineno-0-536"></a>            <span class="n">bbox</span><span class="o">=</span><span class="n">bbox</span><span class="p">,</span>
-<a id="__codelineno-0-537" name="__codelineno-0-537"></a>            <span class="n">day_range</span><span class="o">=</span><span class="n">product</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;day_range&quot;</span><span class="p">],</span>
-<a id="__codelineno-0-538" name="__codelineno-0-538"></a>            <span class="n">start_date</span><span class="o">=</span><span class="n">product</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;start_date&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">isoformat</span><span class="p">(),</span>
-<a id="__codelineno-0-539" name="__codelineno-0-539"></a>        <span class="p">)</span>
-<a id="__codelineno-0-540" name="__codelineno-0-540"></a>
-<a id="__codelineno-0-541" name="__codelineno-0-541"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_api</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">FeatureCollection</span><span class="p">]:</span>
-<a id="__codelineno-0-542" name="__codelineno-0-542"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Compose `_search` and `_fetch` into the canonical C3 shape.&quot;&quot;&quot;</span>
-<a id="__codelineno-0-543" name="__codelineno-0-543"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api_via_search_fetch</span><span class="p">()</span>
-<a id="__codelineno-0-544" name="__codelineno-0-544"></a>
-<a id="__codelineno-0-545" name="__codelineno-0-545"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_api_via_search_fetch_with_progress</span><span class="p">(</span>
-<a id="__codelineno-0-546" name="__codelineno-0-546"></a>        <span class="bp">self</span><span class="p">,</span> <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span>
-<a id="__codelineno-0-547" name="__codelineno-0-547"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">FeatureCollection</span><span class="p">]:</span>
-<a id="__codelineno-0-548" name="__codelineno-0-548"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;C3 composition with a per-chunk progress bar.</span>
-<a id="__codelineno-0-549" name="__codelineno-0-549"></a>
-<a id="__codelineno-0-550" name="__codelineno-0-550"></a><span class="sd">        Mirrors the CMEMS / OpenAQ progress-aware composition: run the</span>
-<a id="__codelineno-0-551" name="__codelineno-0-551"></a><span class="sd">        cheap :meth:`_search`, then map :meth:`_fetch_one` over the</span>
-<a id="__codelineno-0-552" name="__codelineno-0-552"></a><span class="sd">        products wrapped in a `tqdm` bar (disabled when `progress_bar`</span>
-<a id="__codelineno-0-553" name="__codelineno-0-553"></a><span class="sd">        is `False`). Short-circuits on an empty search.</span>
-<a id="__codelineno-0-554" name="__codelineno-0-554"></a>
-<a id="__codelineno-0-555" name="__codelineno-0-555"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-556" name="__codelineno-0-556"></a><span class="sd">            progress_bar: Show the per-chunk `tqdm` bar when `True`.</span>
-<a id="__codelineno-0-557" name="__codelineno-0-557"></a>
-<a id="__codelineno-0-558" name="__codelineno-0-558"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-559" name="__codelineno-0-559"></a><span class="sd">            list[FeatureCollection]: One collection per product, or `[]`</span>
-<a id="__codelineno-0-560" name="__codelineno-0-560"></a><span class="sd">                when nothing matched.</span>
-<a id="__codelineno-0-561" name="__codelineno-0-561"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-562" name="__codelineno-0-562"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_search_fetch_each</span><span class="p">(</span>
-<a id="__codelineno-0-563" name="__codelineno-0-563"></a>            <span class="n">progress_bar</span><span class="o">=</span><span class="n">progress_bar</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;FIRMS chunks&quot;</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="s2">&quot;chunk&quot;</span>
-<a id="__codelineno-0-564" name="__codelineno-0-564"></a>        <span class="p">)</span>
-<a id="__codelineno-0-565" name="__codelineno-0-565"></a>
-<a id="__codelineno-0-566" name="__codelineno-0-566"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
-<a id="__codelineno-0-567" name="__codelineno-0-567"></a>        <span class="bp">self</span><span class="p">,</span>
-<a id="__codelineno-0-568" name="__codelineno-0-568"></a>        <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-<a id="__codelineno-0-569" name="__codelineno-0-569"></a>        <span class="n">aggregate</span><span class="p">:</span> <span class="n">AggregationConfig</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-570" name="__codelineno-0-570"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FeatureCollection</span><span class="p">:</span>
-<a id="__codelineno-0-571" name="__codelineno-0-571"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Query FIRMS and return the matched detections.</span>
-<a id="__codelineno-0-572" name="__codelineno-0-572"></a>
-<a id="__codelineno-0-573" name="__codelineno-0-573"></a><span class="sd">        Runs the cheap :meth:`_search` (sensor validation + chunk</span>
-<a id="__codelineno-0-574" name="__codelineno-0-574"></a><span class="sd">        planning) then the throttled :meth:`_fetch` (one CSV GET per</span>
-<a id="__codelineno-0-575" name="__codelineno-0-575"></a><span class="sd">        chunk), concatenates the per-chunk collections into one</span>
-<a id="__codelineno-0-576" name="__codelineno-0-576"></a><span class="sd">        FeatureCollection, writes it to one vector file under `path`, and</span>
-<a id="__codelineno-0-577" name="__codelineno-0-577"></a><span class="sd">        returns it. An empty result returns — and writes nothing for — a</span>
-<a id="__codelineno-0-578" name="__codelineno-0-578"></a><span class="sd">        schema-correct empty FeatureCollection.</span>
-<a id="__codelineno-0-579" name="__codelineno-0-579"></a>
-<a id="__codelineno-0-580" name="__codelineno-0-580"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-581" name="__codelineno-0-581"></a><span class="sd">            progress_bar: Show a per-chunk progress bar. Defaults to</span>
-<a id="__codelineno-0-582" name="__codelineno-0-582"></a><span class="sd">                `True`.</span>
-<a id="__codelineno-0-583" name="__codelineno-0-583"></a><span class="sd">            aggregate: Must be `None`. Detections are vector, not</span>
-<a id="__codelineno-0-584" name="__codelineno-0-584"></a><span class="sd">                gridded, so there is no meaningful aggregation. The</span>
-<a id="__codelineno-0-585" name="__codelineno-0-585"></a><span class="sd">                facade already rejects a non-`None` `aggregate=` for a</span>
-<a id="__codelineno-0-586" name="__codelineno-0-586"></a><span class="sd">                `vector` backend; this is the belt-and-suspenders guard</span>
-<a id="__codelineno-0-587" name="__codelineno-0-587"></a><span class="sd">                for direct backend callers.</span>
-<a id="__codelineno-0-588" name="__codelineno-0-588"></a>
-<a id="__codelineno-0-589" name="__codelineno-0-589"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-590" name="__codelineno-0-590"></a><span class="sd">            FeatureCollection: The matched detections, CRS `EPSG:4326`.</span>
-<a id="__codelineno-0-591" name="__codelineno-0-591"></a><span class="sd">                Empty (schema-only) when nothing matched.</span>
-<a id="__codelineno-0-592" name="__codelineno-0-592"></a>
-<a id="__codelineno-0-593" name="__codelineno-0-593"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-594" name="__codelineno-0-594"></a><span class="sd">            NotImplementedError: If `aggregate` is not `None`.</span>
-<a id="__codelineno-0-595" name="__codelineno-0-595"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-596" name="__codelineno-0-596"></a>        <span class="k">if</span> <span class="n">aggregate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-597" name="__codelineno-0-597"></a>            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
-<a id="__codelineno-0-598" name="__codelineno-0-598"></a>                <span class="s2">&quot;FIRMS.download(aggregate=...) is not supported: fire &quot;</span>
-<a id="__codelineno-0-599" name="__codelineno-0-599"></a>                <span class="s2">&quot;detections are vector point features, not gridded rasters, so &quot;</span>
-<a id="__codelineno-0-600" name="__codelineno-0-600"></a>                <span class="s2">&quot;there is no meaningful gridded reduction. Call download() &quot;</span>
-<a id="__codelineno-0-601" name="__codelineno-0-601"></a>                <span class="s2">&quot;without aggregate= and post-process the returned &quot;</span>
-<a id="__codelineno-0-602" name="__codelineno-0-602"></a>                <span class="s2">&quot;FeatureCollection (a GeoDataFrame) directly.&quot;</span>
-<a id="__codelineno-0-603" name="__codelineno-0-603"></a>            <span class="p">)</span>
-<a id="__codelineno-0-604" name="__codelineno-0-604"></a>
-<a id="__codelineno-0-605" name="__codelineno-0-605"></a>        <span class="c1"># Resolve the MAP_KEY from FIRMS_MAP_KEY if authenticate() was not</span>
-<a id="__codelineno-0-606" name="__codelineno-0-606"></a>        <span class="c1"># called explicitly, so EarthLens(...).download() still works when</span>
-<a id="__codelineno-0-607" name="__codelineno-0-607"></a>        <span class="c1"># the key lives in the environment.</span>
-<a id="__codelineno-0-608" name="__codelineno-0-608"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">is_authenticated</span><span class="p">():</span>
-<a id="__codelineno-0-609" name="__codelineno-0-609"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">authenticate</span><span class="p">()</span>
-<a id="__codelineno-0-610" name="__codelineno-0-610"></a>
-<a id="__codelineno-0-611" name="__codelineno-0-611"></a>        <span class="n">collections</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api_via_search_fetch_with_progress</span><span class="p">(</span><span class="n">progress_bar</span><span class="p">)</span>
-<a id="__codelineno-0-612" name="__codelineno-0-612"></a>        <span class="n">collection</span> <span class="o">=</span> <span class="n">events</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">collections</span><span class="p">)</span>
-<a id="__codelineno-0-613" name="__codelineno-0-613"></a>
-<a id="__codelineno-0-614" name="__codelineno-0-614"></a>        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">):</span>
-<a id="__codelineno-0-615" name="__codelineno-0-615"></a>            <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_write</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span>
-<a id="__codelineno-0-616" name="__codelineno-0-616"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-<a id="__codelineno-0-617" name="__codelineno-0-617"></a>                <span class="sa">f</span><span class="s2">&quot;FIRMS download summary: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span><span class="si">}</span><span class="s2"> detection(s) &quot;</span>
-<a id="__codelineno-0-618" name="__codelineno-0-618"></a>                <span class="sa">f</span><span class="s2">&quot;written to </span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-619" name="__codelineno-0-619"></a>            <span class="p">)</span>
-<a id="__codelineno-0-620" name="__codelineno-0-620"></a>        <span class="k">else</span><span class="p">:</span>
-<a id="__codelineno-0-621" name="__codelineno-0-621"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-<a id="__codelineno-0-622" name="__codelineno-0-622"></a>                <span class="s2">&quot;FIRMS download summary: no detections matched the request, &quot;</span>
-<a id="__codelineno-0-623" name="__codelineno-0-623"></a>                <span class="s2">&quot;nothing written&quot;</span>
-<a id="__codelineno-0-624" name="__codelineno-0-624"></a>            <span class="p">)</span>
-<a id="__codelineno-0-625" name="__codelineno-0-625"></a>        <span class="k">return</span> <span class="n">collection</span>
-<a id="__codelineno-0-626" name="__codelineno-0-626"></a>
-<a id="__codelineno-0-627" name="__codelineno-0-627"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">collection</span><span class="p">:</span> <span class="n">FeatureCollection</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
-<a id="__codelineno-0-628" name="__codelineno-0-628"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Write the detections to one vector file under `root_dir`.</span>
-<a id="__codelineno-0-629" name="__codelineno-0-629"></a>
-<a id="__codelineno-0-630" name="__codelineno-0-630"></a><span class="sd">        The filename embeds the sensor list and the query&#39;s date window</span>
-<a id="__codelineno-0-631" name="__codelineno-0-631"></a><span class="sd">        so successive downloads into the same `path` yield distinct</span>
-<a id="__codelineno-0-632" name="__codelineno-0-632"></a><span class="sd">        files. Two downloads of the same request overwrite, the intended</span>
-<a id="__codelineno-0-633" name="__codelineno-0-633"></a><span class="sd">        idempotent behaviour.</span>
-<a id="__codelineno-0-634" name="__codelineno-0-634"></a>
-<a id="__codelineno-0-635" name="__codelineno-0-635"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-636" name="__codelineno-0-636"></a><span class="sd">            collection: The detections to write.</span>
-<a id="__codelineno-0-637" name="__codelineno-0-637"></a>
-<a id="__codelineno-0-638" name="__codelineno-0-638"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-639" name="__codelineno-0-639"></a><span class="sd">            Path: Absolute path of the file written.</span>
-<a id="__codelineno-0-640" name="__codelineno-0-640"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-641" name="__codelineno-0-641"></a>        <span class="n">driver</span><span class="p">,</span> <span class="n">ext</span> <span class="o">=</span> <span class="n">_DRIVERS</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_file_format</span><span class="p">]</span>
-<a id="__codelineno-0-642" name="__codelineno-0-642"></a>        <span class="n">sensors</span> <span class="o">=</span> <span class="s2">&quot;-&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vars</span><span class="p">)</span>
-<a id="__codelineno-0-643" name="__codelineno-0-643"></a>        <span class="n">stem</span> <span class="o">=</span> <span class="p">(</span>
-<a id="__codelineno-0-644" name="__codelineno-0-644"></a>            <span class="sa">f</span><span class="s2">&quot;firms_</span><span class="si">{</span><span class="n">sensors</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">start_date</span><span class="si">:</span><span class="s2">%Y%m%d</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-645" name="__codelineno-0-645"></a>            <span class="sa">f</span><span class="s2">&quot;_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">end_date</span><span class="si">:</span><span class="s2">%Y%m%d</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-646" name="__codelineno-0-646"></a>        <span class="p">)</span>
-<a id="__codelineno-0-647" name="__codelineno-0-647"></a>        <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root_dir</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">stem</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">ext</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-648" name="__codelineno-0-648"></a>        <span class="n">collection</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">out_path</span><span class="p">),</span> <span class="n">driver</span><span class="o">=</span><span class="n">driver</span><span class="p">)</span>
-<a id="__codelineno-0-649" name="__codelineno-0-649"></a>        <span class="k">return</span> <span class="n">out_path</span>
+<a id="__codelineno-0-532" name="__codelineno-0-532"></a>        <span class="n">bbox</span> <span class="o">=</span> <span class="p">(</span>
+<a id="__codelineno-0-533" name="__codelineno-0-533"></a>            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">west</span><span class="si">}</span><span class="s2">,</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">south</span><span class="si">}</span><span class="s2">,</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">east</span><span class="si">}</span><span class="s2">,</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">north</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-534" name="__codelineno-0-534"></a>        <span class="p">)</span>
+<a id="__codelineno-0-535" name="__codelineno-0-535"></a>        <span class="k">return</span> <span class="n">AREA_URL_TEMPLATE</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+<a id="__codelineno-0-536" name="__codelineno-0-536"></a>            <span class="n">map_key</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">api_key</span><span class="p">,</span>
+<a id="__codelineno-0-537" name="__codelineno-0-537"></a>            <span class="n">sensor</span><span class="o">=</span><span class="n">product</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;sensor&quot;</span><span class="p">],</span>
+<a id="__codelineno-0-538" name="__codelineno-0-538"></a>            <span class="n">bbox</span><span class="o">=</span><span class="n">bbox</span><span class="p">,</span>
+<a id="__codelineno-0-539" name="__codelineno-0-539"></a>            <span class="n">day_range</span><span class="o">=</span><span class="n">product</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;day_range&quot;</span><span class="p">],</span>
+<a id="__codelineno-0-540" name="__codelineno-0-540"></a>            <span class="n">start_date</span><span class="o">=</span><span class="n">product</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;start_date&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">isoformat</span><span class="p">(),</span>
+<a id="__codelineno-0-541" name="__codelineno-0-541"></a>        <span class="p">)</span>
+<a id="__codelineno-0-542" name="__codelineno-0-542"></a>
+<a id="__codelineno-0-543" name="__codelineno-0-543"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_api</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">FeatureCollection</span><span class="p">]:</span>
+<a id="__codelineno-0-544" name="__codelineno-0-544"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Compose `_search` and `_fetch` into the canonical C3 shape.&quot;&quot;&quot;</span>
+<a id="__codelineno-0-545" name="__codelineno-0-545"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api_via_search_fetch</span><span class="p">()</span>
+<a id="__codelineno-0-546" name="__codelineno-0-546"></a>
+<a id="__codelineno-0-547" name="__codelineno-0-547"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_api_via_search_fetch_with_progress</span><span class="p">(</span>
+<a id="__codelineno-0-548" name="__codelineno-0-548"></a>        <span class="bp">self</span><span class="p">,</span> <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span>
+<a id="__codelineno-0-549" name="__codelineno-0-549"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">FeatureCollection</span><span class="p">]:</span>
+<a id="__codelineno-0-550" name="__codelineno-0-550"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;C3 composition with a per-chunk progress bar.</span>
+<a id="__codelineno-0-551" name="__codelineno-0-551"></a>
+<a id="__codelineno-0-552" name="__codelineno-0-552"></a><span class="sd">        Mirrors the CMEMS / OpenAQ progress-aware composition: run the</span>
+<a id="__codelineno-0-553" name="__codelineno-0-553"></a><span class="sd">        cheap :meth:`_search`, then map :meth:`_fetch_one` over the</span>
+<a id="__codelineno-0-554" name="__codelineno-0-554"></a><span class="sd">        products wrapped in a `tqdm` bar (disabled when `progress_bar`</span>
+<a id="__codelineno-0-555" name="__codelineno-0-555"></a><span class="sd">        is `False`). Short-circuits on an empty search.</span>
+<a id="__codelineno-0-556" name="__codelineno-0-556"></a>
+<a id="__codelineno-0-557" name="__codelineno-0-557"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-558" name="__codelineno-0-558"></a><span class="sd">            progress_bar: Show the per-chunk `tqdm` bar when `True`.</span>
+<a id="__codelineno-0-559" name="__codelineno-0-559"></a>
+<a id="__codelineno-0-560" name="__codelineno-0-560"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-561" name="__codelineno-0-561"></a><span class="sd">            list[FeatureCollection]: One collection per product, or `[]`</span>
+<a id="__codelineno-0-562" name="__codelineno-0-562"></a><span class="sd">                when nothing matched.</span>
+<a id="__codelineno-0-563" name="__codelineno-0-563"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-564" name="__codelineno-0-564"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_search_fetch_each</span><span class="p">(</span>
+<a id="__codelineno-0-565" name="__codelineno-0-565"></a>            <span class="n">progress_bar</span><span class="o">=</span><span class="n">progress_bar</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;FIRMS chunks&quot;</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="s2">&quot;chunk&quot;</span>
+<a id="__codelineno-0-566" name="__codelineno-0-566"></a>        <span class="p">)</span>
+<a id="__codelineno-0-567" name="__codelineno-0-567"></a>
+<a id="__codelineno-0-568" name="__codelineno-0-568"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
+<a id="__codelineno-0-569" name="__codelineno-0-569"></a>        <span class="bp">self</span><span class="p">,</span>
+<a id="__codelineno-0-570" name="__codelineno-0-570"></a>        <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+<a id="__codelineno-0-571" name="__codelineno-0-571"></a>        <span class="n">aggregate</span><span class="p">:</span> <span class="n">AggregationConfig</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-572" name="__codelineno-0-572"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FeatureCollection</span><span class="p">:</span>
+<a id="__codelineno-0-573" name="__codelineno-0-573"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Query FIRMS and return the matched detections.</span>
+<a id="__codelineno-0-574" name="__codelineno-0-574"></a>
+<a id="__codelineno-0-575" name="__codelineno-0-575"></a><span class="sd">        Runs the cheap :meth:`_search` (sensor validation + chunk</span>
+<a id="__codelineno-0-576" name="__codelineno-0-576"></a><span class="sd">        planning) then the throttled :meth:`_fetch` (one CSV GET per</span>
+<a id="__codelineno-0-577" name="__codelineno-0-577"></a><span class="sd">        chunk), concatenates the per-chunk collections into one</span>
+<a id="__codelineno-0-578" name="__codelineno-0-578"></a><span class="sd">        FeatureCollection, writes it to one vector file under `path`, and</span>
+<a id="__codelineno-0-579" name="__codelineno-0-579"></a><span class="sd">        returns it. An empty result returns — and writes nothing for — a</span>
+<a id="__codelineno-0-580" name="__codelineno-0-580"></a><span class="sd">        schema-correct empty FeatureCollection.</span>
+<a id="__codelineno-0-581" name="__codelineno-0-581"></a>
+<a id="__codelineno-0-582" name="__codelineno-0-582"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-583" name="__codelineno-0-583"></a><span class="sd">            progress_bar: Show a per-chunk progress bar. Defaults to</span>
+<a id="__codelineno-0-584" name="__codelineno-0-584"></a><span class="sd">                `True`.</span>
+<a id="__codelineno-0-585" name="__codelineno-0-585"></a><span class="sd">            aggregate: Must be `None`. Detections are vector, not</span>
+<a id="__codelineno-0-586" name="__codelineno-0-586"></a><span class="sd">                gridded, so there is no meaningful aggregation. The</span>
+<a id="__codelineno-0-587" name="__codelineno-0-587"></a><span class="sd">                facade already rejects a non-`None` `aggregate=` for a</span>
+<a id="__codelineno-0-588" name="__codelineno-0-588"></a><span class="sd">                `vector` backend; this is the belt-and-suspenders guard</span>
+<a id="__codelineno-0-589" name="__codelineno-0-589"></a><span class="sd">                for direct backend callers.</span>
+<a id="__codelineno-0-590" name="__codelineno-0-590"></a>
+<a id="__codelineno-0-591" name="__codelineno-0-591"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-592" name="__codelineno-0-592"></a><span class="sd">            FeatureCollection: The matched detections, CRS `EPSG:4326`.</span>
+<a id="__codelineno-0-593" name="__codelineno-0-593"></a><span class="sd">                Empty (schema-only) when nothing matched.</span>
+<a id="__codelineno-0-594" name="__codelineno-0-594"></a>
+<a id="__codelineno-0-595" name="__codelineno-0-595"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-596" name="__codelineno-0-596"></a><span class="sd">            NotImplementedError: If `aggregate` is not `None`.</span>
+<a id="__codelineno-0-597" name="__codelineno-0-597"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-598" name="__codelineno-0-598"></a>        <span class="k">if</span> <span class="n">aggregate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-599" name="__codelineno-0-599"></a>            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+<a id="__codelineno-0-600" name="__codelineno-0-600"></a>                <span class="s2">&quot;FIRMS.download(aggregate=...) is not supported: fire &quot;</span>
+<a id="__codelineno-0-601" name="__codelineno-0-601"></a>                <span class="s2">&quot;detections are vector point features, not gridded rasters, so &quot;</span>
+<a id="__codelineno-0-602" name="__codelineno-0-602"></a>                <span class="s2">&quot;there is no meaningful gridded reduction. Call download() &quot;</span>
+<a id="__codelineno-0-603" name="__codelineno-0-603"></a>                <span class="s2">&quot;without aggregate= and post-process the returned &quot;</span>
+<a id="__codelineno-0-604" name="__codelineno-0-604"></a>                <span class="s2">&quot;FeatureCollection (a GeoDataFrame) directly.&quot;</span>
+<a id="__codelineno-0-605" name="__codelineno-0-605"></a>            <span class="p">)</span>
+<a id="__codelineno-0-606" name="__codelineno-0-606"></a>
+<a id="__codelineno-0-607" name="__codelineno-0-607"></a>        <span class="c1"># Resolve the MAP_KEY from FIRMS_MAP_KEY if authenticate() was not</span>
+<a id="__codelineno-0-608" name="__codelineno-0-608"></a>        <span class="c1"># called explicitly, so EarthLens(...).download() still works when</span>
+<a id="__codelineno-0-609" name="__codelineno-0-609"></a>        <span class="c1"># the key lives in the environment.</span>
+<a id="__codelineno-0-610" name="__codelineno-0-610"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">is_authenticated</span><span class="p">():</span>
+<a id="__codelineno-0-611" name="__codelineno-0-611"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">authenticate</span><span class="p">()</span>
+<a id="__codelineno-0-612" name="__codelineno-0-612"></a>
+<a id="__codelineno-0-613" name="__codelineno-0-613"></a>        <span class="n">collections</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api_via_search_fetch_with_progress</span><span class="p">(</span><span class="n">progress_bar</span><span class="p">)</span>
+<a id="__codelineno-0-614" name="__codelineno-0-614"></a>        <span class="n">collection</span> <span class="o">=</span> <span class="n">events</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">collections</span><span class="p">)</span>
+<a id="__codelineno-0-615" name="__codelineno-0-615"></a>
+<a id="__codelineno-0-616" name="__codelineno-0-616"></a>        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">):</span>
+<a id="__codelineno-0-617" name="__codelineno-0-617"></a>            <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_write</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span>
+<a id="__codelineno-0-618" name="__codelineno-0-618"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+<a id="__codelineno-0-619" name="__codelineno-0-619"></a>                <span class="sa">f</span><span class="s2">&quot;FIRMS download summary: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span><span class="si">}</span><span class="s2"> detection(s) &quot;</span>
+<a id="__codelineno-0-620" name="__codelineno-0-620"></a>                <span class="sa">f</span><span class="s2">&quot;written to </span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-621" name="__codelineno-0-621"></a>            <span class="p">)</span>
+<a id="__codelineno-0-622" name="__codelineno-0-622"></a>        <span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-0-623" name="__codelineno-0-623"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+<a id="__codelineno-0-624" name="__codelineno-0-624"></a>                <span class="s2">&quot;FIRMS download summary: no detections matched the request, &quot;</span>
+<a id="__codelineno-0-625" name="__codelineno-0-625"></a>                <span class="s2">&quot;nothing written&quot;</span>
+<a id="__codelineno-0-626" name="__codelineno-0-626"></a>            <span class="p">)</span>
+<a id="__codelineno-0-627" name="__codelineno-0-627"></a>        <span class="k">return</span> <span class="n">collection</span>
+<a id="__codelineno-0-628" name="__codelineno-0-628"></a>
+<a id="__codelineno-0-629" name="__codelineno-0-629"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">collection</span><span class="p">:</span> <span class="n">FeatureCollection</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
+<a id="__codelineno-0-630" name="__codelineno-0-630"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Write the detections to one vector file under `root_dir`.</span>
+<a id="__codelineno-0-631" name="__codelineno-0-631"></a>
+<a id="__codelineno-0-632" name="__codelineno-0-632"></a><span class="sd">        The filename embeds the sensor list and the query&#39;s date window</span>
+<a id="__codelineno-0-633" name="__codelineno-0-633"></a><span class="sd">        so successive downloads into the same `path` yield distinct</span>
+<a id="__codelineno-0-634" name="__codelineno-0-634"></a><span class="sd">        files. Two downloads of the same request overwrite, the intended</span>
+<a id="__codelineno-0-635" name="__codelineno-0-635"></a><span class="sd">        idempotent behaviour.</span>
+<a id="__codelineno-0-636" name="__codelineno-0-636"></a>
+<a id="__codelineno-0-637" name="__codelineno-0-637"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-638" name="__codelineno-0-638"></a><span class="sd">            collection: The detections to write.</span>
+<a id="__codelineno-0-639" name="__codelineno-0-639"></a>
+<a id="__codelineno-0-640" name="__codelineno-0-640"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-641" name="__codelineno-0-641"></a><span class="sd">            Path: Absolute path of the file written.</span>
+<a id="__codelineno-0-642" name="__codelineno-0-642"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-643" name="__codelineno-0-643"></a>        <span class="n">driver</span><span class="p">,</span> <span class="n">ext</span> <span class="o">=</span> <span class="n">_DRIVERS</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_file_format</span><span class="p">]</span>
+<a id="__codelineno-0-644" name="__codelineno-0-644"></a>        <span class="n">sensors</span> <span class="o">=</span> <span class="s2">&quot;-&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vars</span><span class="p">)</span>
+<a id="__codelineno-0-645" name="__codelineno-0-645"></a>        <span class="n">stem</span> <span class="o">=</span> <span class="p">(</span>
+<a id="__codelineno-0-646" name="__codelineno-0-646"></a>            <span class="sa">f</span><span class="s2">&quot;firms_</span><span class="si">{</span><span class="n">sensors</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">start_date</span><span class="si">:</span><span class="s2">%Y%m%d</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-647" name="__codelineno-0-647"></a>            <span class="sa">f</span><span class="s2">&quot;_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">end_date</span><span class="si">:</span><span class="s2">%Y%m%d</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-648" name="__codelineno-0-648"></a>        <span class="p">)</span>
+<a id="__codelineno-0-649" name="__codelineno-0-649"></a>        <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root_dir</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">stem</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">ext</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-650" name="__codelineno-0-650"></a>        <span class="n">collection</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">out_path</span><span class="p">),</span> <span class="n">driver</span><span class="o">=</span><span class="n">driver</span><span class="p">)</span>
+<a id="__codelineno-0-651" name="__codelineno-0-651"></a>        <span class="k">return</span> <span class="n">out_path</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -15598,9 +15602,7 @@ Empty (schema-only) when nothing matched.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>src/earthlens/firms/backend.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-566">566</a></span>
-<span class="normal"><a href="#__codelineno-0-567">567</a></span>
-<span class="normal"><a href="#__codelineno-0-568">568</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-568">568</a></span>
 <span class="normal"><a href="#__codelineno-0-569">569</a></span>
 <span class="normal"><a href="#__codelineno-0-570">570</a></span>
 <span class="normal"><a href="#__codelineno-0-571">571</a></span>
@@ -15657,66 +15659,68 @@ Empty (schema-only) when nothing matched.</p>
 <span class="normal"><a href="#__codelineno-0-622">622</a></span>
 <span class="normal"><a href="#__codelineno-0-623">623</a></span>
 <span class="normal"><a href="#__codelineno-0-624">624</a></span>
-<span class="normal"><a href="#__codelineno-0-625">625</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-566" name="__codelineno-0-566"></a><span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
-<a id="__codelineno-0-567" name="__codelineno-0-567"></a>    <span class="bp">self</span><span class="p">,</span>
-<a id="__codelineno-0-568" name="__codelineno-0-568"></a>    <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-<a id="__codelineno-0-569" name="__codelineno-0-569"></a>    <span class="n">aggregate</span><span class="p">:</span> <span class="n">AggregationConfig</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-570" name="__codelineno-0-570"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FeatureCollection</span><span class="p">:</span>
-<a id="__codelineno-0-571" name="__codelineno-0-571"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Query FIRMS and return the matched detections.</span>
-<a id="__codelineno-0-572" name="__codelineno-0-572"></a>
-<a id="__codelineno-0-573" name="__codelineno-0-573"></a><span class="sd">    Runs the cheap :meth:`_search` (sensor validation + chunk</span>
-<a id="__codelineno-0-574" name="__codelineno-0-574"></a><span class="sd">    planning) then the throttled :meth:`_fetch` (one CSV GET per</span>
-<a id="__codelineno-0-575" name="__codelineno-0-575"></a><span class="sd">    chunk), concatenates the per-chunk collections into one</span>
-<a id="__codelineno-0-576" name="__codelineno-0-576"></a><span class="sd">    FeatureCollection, writes it to one vector file under `path`, and</span>
-<a id="__codelineno-0-577" name="__codelineno-0-577"></a><span class="sd">    returns it. An empty result returns — and writes nothing for — a</span>
-<a id="__codelineno-0-578" name="__codelineno-0-578"></a><span class="sd">    schema-correct empty FeatureCollection.</span>
-<a id="__codelineno-0-579" name="__codelineno-0-579"></a>
-<a id="__codelineno-0-580" name="__codelineno-0-580"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-581" name="__codelineno-0-581"></a><span class="sd">        progress_bar: Show a per-chunk progress bar. Defaults to</span>
-<a id="__codelineno-0-582" name="__codelineno-0-582"></a><span class="sd">            `True`.</span>
-<a id="__codelineno-0-583" name="__codelineno-0-583"></a><span class="sd">        aggregate: Must be `None`. Detections are vector, not</span>
-<a id="__codelineno-0-584" name="__codelineno-0-584"></a><span class="sd">            gridded, so there is no meaningful aggregation. The</span>
-<a id="__codelineno-0-585" name="__codelineno-0-585"></a><span class="sd">            facade already rejects a non-`None` `aggregate=` for a</span>
-<a id="__codelineno-0-586" name="__codelineno-0-586"></a><span class="sd">            `vector` backend; this is the belt-and-suspenders guard</span>
-<a id="__codelineno-0-587" name="__codelineno-0-587"></a><span class="sd">            for direct backend callers.</span>
-<a id="__codelineno-0-588" name="__codelineno-0-588"></a>
-<a id="__codelineno-0-589" name="__codelineno-0-589"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-590" name="__codelineno-0-590"></a><span class="sd">        FeatureCollection: The matched detections, CRS `EPSG:4326`.</span>
-<a id="__codelineno-0-591" name="__codelineno-0-591"></a><span class="sd">            Empty (schema-only) when nothing matched.</span>
-<a id="__codelineno-0-592" name="__codelineno-0-592"></a>
-<a id="__codelineno-0-593" name="__codelineno-0-593"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-594" name="__codelineno-0-594"></a><span class="sd">        NotImplementedError: If `aggregate` is not `None`.</span>
-<a id="__codelineno-0-595" name="__codelineno-0-595"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-596" name="__codelineno-0-596"></a>    <span class="k">if</span> <span class="n">aggregate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-597" name="__codelineno-0-597"></a>        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
-<a id="__codelineno-0-598" name="__codelineno-0-598"></a>            <span class="s2">&quot;FIRMS.download(aggregate=...) is not supported: fire &quot;</span>
-<a id="__codelineno-0-599" name="__codelineno-0-599"></a>            <span class="s2">&quot;detections are vector point features, not gridded rasters, so &quot;</span>
-<a id="__codelineno-0-600" name="__codelineno-0-600"></a>            <span class="s2">&quot;there is no meaningful gridded reduction. Call download() &quot;</span>
-<a id="__codelineno-0-601" name="__codelineno-0-601"></a>            <span class="s2">&quot;without aggregate= and post-process the returned &quot;</span>
-<a id="__codelineno-0-602" name="__codelineno-0-602"></a>            <span class="s2">&quot;FeatureCollection (a GeoDataFrame) directly.&quot;</span>
-<a id="__codelineno-0-603" name="__codelineno-0-603"></a>        <span class="p">)</span>
-<a id="__codelineno-0-604" name="__codelineno-0-604"></a>
-<a id="__codelineno-0-605" name="__codelineno-0-605"></a>    <span class="c1"># Resolve the MAP_KEY from FIRMS_MAP_KEY if authenticate() was not</span>
-<a id="__codelineno-0-606" name="__codelineno-0-606"></a>    <span class="c1"># called explicitly, so EarthLens(...).download() still works when</span>
-<a id="__codelineno-0-607" name="__codelineno-0-607"></a>    <span class="c1"># the key lives in the environment.</span>
-<a id="__codelineno-0-608" name="__codelineno-0-608"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">is_authenticated</span><span class="p">():</span>
-<a id="__codelineno-0-609" name="__codelineno-0-609"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">authenticate</span><span class="p">()</span>
-<a id="__codelineno-0-610" name="__codelineno-0-610"></a>
-<a id="__codelineno-0-611" name="__codelineno-0-611"></a>    <span class="n">collections</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api_via_search_fetch_with_progress</span><span class="p">(</span><span class="n">progress_bar</span><span class="p">)</span>
-<a id="__codelineno-0-612" name="__codelineno-0-612"></a>    <span class="n">collection</span> <span class="o">=</span> <span class="n">events</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">collections</span><span class="p">)</span>
-<a id="__codelineno-0-613" name="__codelineno-0-613"></a>
-<a id="__codelineno-0-614" name="__codelineno-0-614"></a>    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">):</span>
-<a id="__codelineno-0-615" name="__codelineno-0-615"></a>        <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_write</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span>
-<a id="__codelineno-0-616" name="__codelineno-0-616"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-<a id="__codelineno-0-617" name="__codelineno-0-617"></a>            <span class="sa">f</span><span class="s2">&quot;FIRMS download summary: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span><span class="si">}</span><span class="s2"> detection(s) &quot;</span>
-<a id="__codelineno-0-618" name="__codelineno-0-618"></a>            <span class="sa">f</span><span class="s2">&quot;written to </span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-619" name="__codelineno-0-619"></a>        <span class="p">)</span>
-<a id="__codelineno-0-620" name="__codelineno-0-620"></a>    <span class="k">else</span><span class="p">:</span>
-<a id="__codelineno-0-621" name="__codelineno-0-621"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-<a id="__codelineno-0-622" name="__codelineno-0-622"></a>            <span class="s2">&quot;FIRMS download summary: no detections matched the request, &quot;</span>
-<a id="__codelineno-0-623" name="__codelineno-0-623"></a>            <span class="s2">&quot;nothing written&quot;</span>
-<a id="__codelineno-0-624" name="__codelineno-0-624"></a>        <span class="p">)</span>
-<a id="__codelineno-0-625" name="__codelineno-0-625"></a>    <span class="k">return</span> <span class="n">collection</span>
+<span class="normal"><a href="#__codelineno-0-625">625</a></span>
+<span class="normal"><a href="#__codelineno-0-626">626</a></span>
+<span class="normal"><a href="#__codelineno-0-627">627</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-568" name="__codelineno-0-568"></a><span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
+<a id="__codelineno-0-569" name="__codelineno-0-569"></a>    <span class="bp">self</span><span class="p">,</span>
+<a id="__codelineno-0-570" name="__codelineno-0-570"></a>    <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+<a id="__codelineno-0-571" name="__codelineno-0-571"></a>    <span class="n">aggregate</span><span class="p">:</span> <span class="n">AggregationConfig</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-572" name="__codelineno-0-572"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FeatureCollection</span><span class="p">:</span>
+<a id="__codelineno-0-573" name="__codelineno-0-573"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Query FIRMS and return the matched detections.</span>
+<a id="__codelineno-0-574" name="__codelineno-0-574"></a>
+<a id="__codelineno-0-575" name="__codelineno-0-575"></a><span class="sd">    Runs the cheap :meth:`_search` (sensor validation + chunk</span>
+<a id="__codelineno-0-576" name="__codelineno-0-576"></a><span class="sd">    planning) then the throttled :meth:`_fetch` (one CSV GET per</span>
+<a id="__codelineno-0-577" name="__codelineno-0-577"></a><span class="sd">    chunk), concatenates the per-chunk collections into one</span>
+<a id="__codelineno-0-578" name="__codelineno-0-578"></a><span class="sd">    FeatureCollection, writes it to one vector file under `path`, and</span>
+<a id="__codelineno-0-579" name="__codelineno-0-579"></a><span class="sd">    returns it. An empty result returns — and writes nothing for — a</span>
+<a id="__codelineno-0-580" name="__codelineno-0-580"></a><span class="sd">    schema-correct empty FeatureCollection.</span>
+<a id="__codelineno-0-581" name="__codelineno-0-581"></a>
+<a id="__codelineno-0-582" name="__codelineno-0-582"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-583" name="__codelineno-0-583"></a><span class="sd">        progress_bar: Show a per-chunk progress bar. Defaults to</span>
+<a id="__codelineno-0-584" name="__codelineno-0-584"></a><span class="sd">            `True`.</span>
+<a id="__codelineno-0-585" name="__codelineno-0-585"></a><span class="sd">        aggregate: Must be `None`. Detections are vector, not</span>
+<a id="__codelineno-0-586" name="__codelineno-0-586"></a><span class="sd">            gridded, so there is no meaningful aggregation. The</span>
+<a id="__codelineno-0-587" name="__codelineno-0-587"></a><span class="sd">            facade already rejects a non-`None` `aggregate=` for a</span>
+<a id="__codelineno-0-588" name="__codelineno-0-588"></a><span class="sd">            `vector` backend; this is the belt-and-suspenders guard</span>
+<a id="__codelineno-0-589" name="__codelineno-0-589"></a><span class="sd">            for direct backend callers.</span>
+<a id="__codelineno-0-590" name="__codelineno-0-590"></a>
+<a id="__codelineno-0-591" name="__codelineno-0-591"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-592" name="__codelineno-0-592"></a><span class="sd">        FeatureCollection: The matched detections, CRS `EPSG:4326`.</span>
+<a id="__codelineno-0-593" name="__codelineno-0-593"></a><span class="sd">            Empty (schema-only) when nothing matched.</span>
+<a id="__codelineno-0-594" name="__codelineno-0-594"></a>
+<a id="__codelineno-0-595" name="__codelineno-0-595"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-596" name="__codelineno-0-596"></a><span class="sd">        NotImplementedError: If `aggregate` is not `None`.</span>
+<a id="__codelineno-0-597" name="__codelineno-0-597"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-598" name="__codelineno-0-598"></a>    <span class="k">if</span> <span class="n">aggregate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-599" name="__codelineno-0-599"></a>        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+<a id="__codelineno-0-600" name="__codelineno-0-600"></a>            <span class="s2">&quot;FIRMS.download(aggregate=...) is not supported: fire &quot;</span>
+<a id="__codelineno-0-601" name="__codelineno-0-601"></a>            <span class="s2">&quot;detections are vector point features, not gridded rasters, so &quot;</span>
+<a id="__codelineno-0-602" name="__codelineno-0-602"></a>            <span class="s2">&quot;there is no meaningful gridded reduction. Call download() &quot;</span>
+<a id="__codelineno-0-603" name="__codelineno-0-603"></a>            <span class="s2">&quot;without aggregate= and post-process the returned &quot;</span>
+<a id="__codelineno-0-604" name="__codelineno-0-604"></a>            <span class="s2">&quot;FeatureCollection (a GeoDataFrame) directly.&quot;</span>
+<a id="__codelineno-0-605" name="__codelineno-0-605"></a>        <span class="p">)</span>
+<a id="__codelineno-0-606" name="__codelineno-0-606"></a>
+<a id="__codelineno-0-607" name="__codelineno-0-607"></a>    <span class="c1"># Resolve the MAP_KEY from FIRMS_MAP_KEY if authenticate() was not</span>
+<a id="__codelineno-0-608" name="__codelineno-0-608"></a>    <span class="c1"># called explicitly, so EarthLens(...).download() still works when</span>
+<a id="__codelineno-0-609" name="__codelineno-0-609"></a>    <span class="c1"># the key lives in the environment.</span>
+<a id="__codelineno-0-610" name="__codelineno-0-610"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">is_authenticated</span><span class="p">():</span>
+<a id="__codelineno-0-611" name="__codelineno-0-611"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">authenticate</span><span class="p">()</span>
+<a id="__codelineno-0-612" name="__codelineno-0-612"></a>
+<a id="__codelineno-0-613" name="__codelineno-0-613"></a>    <span class="n">collections</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api_via_search_fetch_with_progress</span><span class="p">(</span><span class="n">progress_bar</span><span class="p">)</span>
+<a id="__codelineno-0-614" name="__codelineno-0-614"></a>    <span class="n">collection</span> <span class="o">=</span> <span class="n">events</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">collections</span><span class="p">)</span>
+<a id="__codelineno-0-615" name="__codelineno-0-615"></a>
+<a id="__codelineno-0-616" name="__codelineno-0-616"></a>    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">):</span>
+<a id="__codelineno-0-617" name="__codelineno-0-617"></a>        <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_write</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span>
+<a id="__codelineno-0-618" name="__codelineno-0-618"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+<a id="__codelineno-0-619" name="__codelineno-0-619"></a>            <span class="sa">f</span><span class="s2">&quot;FIRMS download summary: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span><span class="si">}</span><span class="s2"> detection(s) &quot;</span>
+<a id="__codelineno-0-620" name="__codelineno-0-620"></a>            <span class="sa">f</span><span class="s2">&quot;written to </span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-621" name="__codelineno-0-621"></a>        <span class="p">)</span>
+<a id="__codelineno-0-622" name="__codelineno-0-622"></a>    <span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-0-623" name="__codelineno-0-623"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+<a id="__codelineno-0-624" name="__codelineno-0-624"></a>            <span class="s2">&quot;FIRMS download summary: no detections matched the request, &quot;</span>
+<a id="__codelineno-0-625" name="__codelineno-0-625"></a>            <span class="s2">&quot;nothing written&quot;</span>
+<a id="__codelineno-0-626" name="__codelineno-0-626"></a>        <span class="p">)</span>
+<a id="__codelineno-0-627" name="__codelineno-0-627"></a>    <span class="k">return</span> <span class="n">collection</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -18163,7 +18167,9 @@ features, so the facade rejects <code>aggregate=</code> with
 <span class="normal"><a href="#__codelineno-0-646">646</a></span>
 <span class="normal"><a href="#__codelineno-0-647">647</a></span>
 <span class="normal"><a href="#__codelineno-0-648">648</a></span>
-<span class="normal"><a href="#__codelineno-0-649">649</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-94" name="__codelineno-0-94"></a><span class="k">class</span><span class="w"> </span><span class="nc">FIRMS</span><span class="p">(</span><span class="n">AbstractDataSource</span><span class="p">):</span>
+<span class="normal"><a href="#__codelineno-0-649">649</a></span>
+<span class="normal"><a href="#__codelineno-0-650">650</a></span>
+<span class="normal"><a href="#__codelineno-0-651">651</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-94" name="__codelineno-0-94"></a><span class="k">class</span><span class="w"> </span><span class="nc">FIRMS</span><span class="p">(</span><span class="n">AbstractDataSource</span><span class="p">):</span>
 <a id="__codelineno-0-95" name="__codelineno-0-95"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;NASA FIRMS active-fire backend (vector point-feature output).</span>
 <a id="__codelineno-0-96" name="__codelineno-0-96"></a>
 <a id="__codelineno-0-97" name="__codelineno-0-97"></a><span class="sd">    Wraps the FIRMS area CSV API so a user can pull a space/time/sensor</span>
@@ -18570,16 +18576,16 @@ features, so the facade rejects <code>aggregate=</code> with
 <a id="__codelineno-0-498" name="__codelineno-0-498"></a>        <span class="n">text</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">text</span>
 <a id="__codelineno-0-499" name="__codelineno-0-499"></a>        <span class="n">kind</span> <span class="o">=</span> <span class="n">classify_body</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
 <a id="__codelineno-0-500" name="__codelineno-0-500"></a>        <span class="k">if</span> <span class="n">kind</span> <span class="o">==</span> <span class="s2">&quot;auth&quot;</span><span class="p">:</span>
-<a id="__codelineno-0-501" name="__codelineno-0-501"></a>            <span class="k">raise</span> <span class="n">AuthenticationError</span><span class="p">(</span>
-<a id="__codelineno-0-502" name="__codelineno-0-502"></a>                <span class="sa">f</span><span class="s2">&quot;FIRMS rejected the MAP_KEY: </span><span class="si">{</span><span class="n">_truncate</span><span class="p">(</span><span class="n">text</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-503" name="__codelineno-0-503"></a>            <span class="p">)</span>
-<a id="__codelineno-0-504" name="__codelineno-0-504"></a>        <span class="k">if</span> <span class="n">kind</span> <span class="o">==</span> <span class="s2">&quot;quota&quot;</span><span class="p">:</span>
-<a id="__codelineno-0-505" name="__codelineno-0-505"></a>            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
-<a id="__codelineno-0-506" name="__codelineno-0-506"></a>                <span class="s2">&quot;FIRMS transaction quota exhausted after back-off retries: &quot;</span>
-<a id="__codelineno-0-507" name="__codelineno-0-507"></a>                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">_truncate</span><span class="p">(</span><span class="n">text</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-508" name="__codelineno-0-508"></a>            <span class="p">)</span>
-<a id="__codelineno-0-509" name="__codelineno-0-509"></a>        <span class="k">if</span> <span class="n">kind</span> <span class="o">==</span> <span class="s2">&quot;error&quot;</span><span class="p">:</span>
-<a id="__codelineno-0-510" name="__codelineno-0-510"></a>            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;FIRMS returned a non-CSV error body: </span><span class="si">{</span><span class="n">_truncate</span><span class="p">(</span><span class="n">text</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-501" name="__codelineno-0-501"></a>            <span class="k">raise</span> <span class="n">AuthenticationError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;FIRMS rejected the MAP_KEY: </span><span class="si">{</span><span class="n">_truncate</span><span class="p">(</span><span class="n">text</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-502" name="__codelineno-0-502"></a>        <span class="k">if</span> <span class="n">kind</span> <span class="o">==</span> <span class="s2">&quot;quota&quot;</span><span class="p">:</span>
+<a id="__codelineno-0-503" name="__codelineno-0-503"></a>            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+<a id="__codelineno-0-504" name="__codelineno-0-504"></a>                <span class="s2">&quot;FIRMS transaction quota exhausted after back-off retries: &quot;</span>
+<a id="__codelineno-0-505" name="__codelineno-0-505"></a>                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">_truncate</span><span class="p">(</span><span class="n">text</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-506" name="__codelineno-0-506"></a>            <span class="p">)</span>
+<a id="__codelineno-0-507" name="__codelineno-0-507"></a>        <span class="k">if</span> <span class="n">kind</span> <span class="o">==</span> <span class="s2">&quot;error&quot;</span><span class="p">:</span>
+<a id="__codelineno-0-508" name="__codelineno-0-508"></a>            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+<a id="__codelineno-0-509" name="__codelineno-0-509"></a>                <span class="sa">f</span><span class="s2">&quot;FIRMS returned a non-CSV error body: </span><span class="si">{</span><span class="n">_truncate</span><span class="p">(</span><span class="n">text</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-510" name="__codelineno-0-510"></a>            <span class="p">)</span>
 <a id="__codelineno-0-511" name="__codelineno-0-511"></a>        <span class="n">frame</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">StringIO</span><span class="p">(</span><span class="n">text</span><span class="p">))</span>
 <a id="__codelineno-0-512" name="__codelineno-0-512"></a>        <span class="k">return</span> <span class="n">events</span><span class="o">.</span><span class="n">csv_to_fc</span><span class="p">(</span>
 <a id="__codelineno-0-513" name="__codelineno-0-513"></a>            <span class="n">frame</span><span class="p">,</span>
@@ -18601,124 +18607,126 @@ features, so the facade rejects <code>aggregate=</code> with
 <a id="__codelineno-0-529" name="__codelineno-0-529"></a><span class="sd">        Returns:</span>
 <a id="__codelineno-0-530" name="__codelineno-0-530"></a><span class="sd">            str: The fully-formed request URL.</span>
 <a id="__codelineno-0-531" name="__codelineno-0-531"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-532" name="__codelineno-0-532"></a>        <span class="n">bbox</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">west</span><span class="si">}</span><span class="s2">,</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">south</span><span class="si">}</span><span class="s2">,</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">east</span><span class="si">}</span><span class="s2">,</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">north</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-533" name="__codelineno-0-533"></a>        <span class="k">return</span> <span class="n">AREA_URL_TEMPLATE</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-<a id="__codelineno-0-534" name="__codelineno-0-534"></a>            <span class="n">map_key</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">api_key</span><span class="p">,</span>
-<a id="__codelineno-0-535" name="__codelineno-0-535"></a>            <span class="n">sensor</span><span class="o">=</span><span class="n">product</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;sensor&quot;</span><span class="p">],</span>
-<a id="__codelineno-0-536" name="__codelineno-0-536"></a>            <span class="n">bbox</span><span class="o">=</span><span class="n">bbox</span><span class="p">,</span>
-<a id="__codelineno-0-537" name="__codelineno-0-537"></a>            <span class="n">day_range</span><span class="o">=</span><span class="n">product</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;day_range&quot;</span><span class="p">],</span>
-<a id="__codelineno-0-538" name="__codelineno-0-538"></a>            <span class="n">start_date</span><span class="o">=</span><span class="n">product</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;start_date&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">isoformat</span><span class="p">(),</span>
-<a id="__codelineno-0-539" name="__codelineno-0-539"></a>        <span class="p">)</span>
-<a id="__codelineno-0-540" name="__codelineno-0-540"></a>
-<a id="__codelineno-0-541" name="__codelineno-0-541"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_api</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">FeatureCollection</span><span class="p">]:</span>
-<a id="__codelineno-0-542" name="__codelineno-0-542"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Compose `_search` and `_fetch` into the canonical C3 shape.&quot;&quot;&quot;</span>
-<a id="__codelineno-0-543" name="__codelineno-0-543"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api_via_search_fetch</span><span class="p">()</span>
-<a id="__codelineno-0-544" name="__codelineno-0-544"></a>
-<a id="__codelineno-0-545" name="__codelineno-0-545"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_api_via_search_fetch_with_progress</span><span class="p">(</span>
-<a id="__codelineno-0-546" name="__codelineno-0-546"></a>        <span class="bp">self</span><span class="p">,</span> <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span>
-<a id="__codelineno-0-547" name="__codelineno-0-547"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">FeatureCollection</span><span class="p">]:</span>
-<a id="__codelineno-0-548" name="__codelineno-0-548"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;C3 composition with a per-chunk progress bar.</span>
-<a id="__codelineno-0-549" name="__codelineno-0-549"></a>
-<a id="__codelineno-0-550" name="__codelineno-0-550"></a><span class="sd">        Mirrors the CMEMS / OpenAQ progress-aware composition: run the</span>
-<a id="__codelineno-0-551" name="__codelineno-0-551"></a><span class="sd">        cheap :meth:`_search`, then map :meth:`_fetch_one` over the</span>
-<a id="__codelineno-0-552" name="__codelineno-0-552"></a><span class="sd">        products wrapped in a `tqdm` bar (disabled when `progress_bar`</span>
-<a id="__codelineno-0-553" name="__codelineno-0-553"></a><span class="sd">        is `False`). Short-circuits on an empty search.</span>
-<a id="__codelineno-0-554" name="__codelineno-0-554"></a>
-<a id="__codelineno-0-555" name="__codelineno-0-555"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-556" name="__codelineno-0-556"></a><span class="sd">            progress_bar: Show the per-chunk `tqdm` bar when `True`.</span>
-<a id="__codelineno-0-557" name="__codelineno-0-557"></a>
-<a id="__codelineno-0-558" name="__codelineno-0-558"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-559" name="__codelineno-0-559"></a><span class="sd">            list[FeatureCollection]: One collection per product, or `[]`</span>
-<a id="__codelineno-0-560" name="__codelineno-0-560"></a><span class="sd">                when nothing matched.</span>
-<a id="__codelineno-0-561" name="__codelineno-0-561"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-562" name="__codelineno-0-562"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_search_fetch_each</span><span class="p">(</span>
-<a id="__codelineno-0-563" name="__codelineno-0-563"></a>            <span class="n">progress_bar</span><span class="o">=</span><span class="n">progress_bar</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;FIRMS chunks&quot;</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="s2">&quot;chunk&quot;</span>
-<a id="__codelineno-0-564" name="__codelineno-0-564"></a>        <span class="p">)</span>
-<a id="__codelineno-0-565" name="__codelineno-0-565"></a>
-<a id="__codelineno-0-566" name="__codelineno-0-566"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
-<a id="__codelineno-0-567" name="__codelineno-0-567"></a>        <span class="bp">self</span><span class="p">,</span>
-<a id="__codelineno-0-568" name="__codelineno-0-568"></a>        <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-<a id="__codelineno-0-569" name="__codelineno-0-569"></a>        <span class="n">aggregate</span><span class="p">:</span> <span class="n">AggregationConfig</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-570" name="__codelineno-0-570"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FeatureCollection</span><span class="p">:</span>
-<a id="__codelineno-0-571" name="__codelineno-0-571"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Query FIRMS and return the matched detections.</span>
-<a id="__codelineno-0-572" name="__codelineno-0-572"></a>
-<a id="__codelineno-0-573" name="__codelineno-0-573"></a><span class="sd">        Runs the cheap :meth:`_search` (sensor validation + chunk</span>
-<a id="__codelineno-0-574" name="__codelineno-0-574"></a><span class="sd">        planning) then the throttled :meth:`_fetch` (one CSV GET per</span>
-<a id="__codelineno-0-575" name="__codelineno-0-575"></a><span class="sd">        chunk), concatenates the per-chunk collections into one</span>
-<a id="__codelineno-0-576" name="__codelineno-0-576"></a><span class="sd">        FeatureCollection, writes it to one vector file under `path`, and</span>
-<a id="__codelineno-0-577" name="__codelineno-0-577"></a><span class="sd">        returns it. An empty result returns — and writes nothing for — a</span>
-<a id="__codelineno-0-578" name="__codelineno-0-578"></a><span class="sd">        schema-correct empty FeatureCollection.</span>
-<a id="__codelineno-0-579" name="__codelineno-0-579"></a>
-<a id="__codelineno-0-580" name="__codelineno-0-580"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-581" name="__codelineno-0-581"></a><span class="sd">            progress_bar: Show a per-chunk progress bar. Defaults to</span>
-<a id="__codelineno-0-582" name="__codelineno-0-582"></a><span class="sd">                `True`.</span>
-<a id="__codelineno-0-583" name="__codelineno-0-583"></a><span class="sd">            aggregate: Must be `None`. Detections are vector, not</span>
-<a id="__codelineno-0-584" name="__codelineno-0-584"></a><span class="sd">                gridded, so there is no meaningful aggregation. The</span>
-<a id="__codelineno-0-585" name="__codelineno-0-585"></a><span class="sd">                facade already rejects a non-`None` `aggregate=` for a</span>
-<a id="__codelineno-0-586" name="__codelineno-0-586"></a><span class="sd">                `vector` backend; this is the belt-and-suspenders guard</span>
-<a id="__codelineno-0-587" name="__codelineno-0-587"></a><span class="sd">                for direct backend callers.</span>
-<a id="__codelineno-0-588" name="__codelineno-0-588"></a>
-<a id="__codelineno-0-589" name="__codelineno-0-589"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-590" name="__codelineno-0-590"></a><span class="sd">            FeatureCollection: The matched detections, CRS `EPSG:4326`.</span>
-<a id="__codelineno-0-591" name="__codelineno-0-591"></a><span class="sd">                Empty (schema-only) when nothing matched.</span>
-<a id="__codelineno-0-592" name="__codelineno-0-592"></a>
-<a id="__codelineno-0-593" name="__codelineno-0-593"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-594" name="__codelineno-0-594"></a><span class="sd">            NotImplementedError: If `aggregate` is not `None`.</span>
-<a id="__codelineno-0-595" name="__codelineno-0-595"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-596" name="__codelineno-0-596"></a>        <span class="k">if</span> <span class="n">aggregate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-597" name="__codelineno-0-597"></a>            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
-<a id="__codelineno-0-598" name="__codelineno-0-598"></a>                <span class="s2">&quot;FIRMS.download(aggregate=...) is not supported: fire &quot;</span>
-<a id="__codelineno-0-599" name="__codelineno-0-599"></a>                <span class="s2">&quot;detections are vector point features, not gridded rasters, so &quot;</span>
-<a id="__codelineno-0-600" name="__codelineno-0-600"></a>                <span class="s2">&quot;there is no meaningful gridded reduction. Call download() &quot;</span>
-<a id="__codelineno-0-601" name="__codelineno-0-601"></a>                <span class="s2">&quot;without aggregate= and post-process the returned &quot;</span>
-<a id="__codelineno-0-602" name="__codelineno-0-602"></a>                <span class="s2">&quot;FeatureCollection (a GeoDataFrame) directly.&quot;</span>
-<a id="__codelineno-0-603" name="__codelineno-0-603"></a>            <span class="p">)</span>
-<a id="__codelineno-0-604" name="__codelineno-0-604"></a>
-<a id="__codelineno-0-605" name="__codelineno-0-605"></a>        <span class="c1"># Resolve the MAP_KEY from FIRMS_MAP_KEY if authenticate() was not</span>
-<a id="__codelineno-0-606" name="__codelineno-0-606"></a>        <span class="c1"># called explicitly, so EarthLens(...).download() still works when</span>
-<a id="__codelineno-0-607" name="__codelineno-0-607"></a>        <span class="c1"># the key lives in the environment.</span>
-<a id="__codelineno-0-608" name="__codelineno-0-608"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">is_authenticated</span><span class="p">():</span>
-<a id="__codelineno-0-609" name="__codelineno-0-609"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">authenticate</span><span class="p">()</span>
-<a id="__codelineno-0-610" name="__codelineno-0-610"></a>
-<a id="__codelineno-0-611" name="__codelineno-0-611"></a>        <span class="n">collections</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api_via_search_fetch_with_progress</span><span class="p">(</span><span class="n">progress_bar</span><span class="p">)</span>
-<a id="__codelineno-0-612" name="__codelineno-0-612"></a>        <span class="n">collection</span> <span class="o">=</span> <span class="n">events</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">collections</span><span class="p">)</span>
-<a id="__codelineno-0-613" name="__codelineno-0-613"></a>
-<a id="__codelineno-0-614" name="__codelineno-0-614"></a>        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">):</span>
-<a id="__codelineno-0-615" name="__codelineno-0-615"></a>            <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_write</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span>
-<a id="__codelineno-0-616" name="__codelineno-0-616"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-<a id="__codelineno-0-617" name="__codelineno-0-617"></a>                <span class="sa">f</span><span class="s2">&quot;FIRMS download summary: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span><span class="si">}</span><span class="s2"> detection(s) &quot;</span>
-<a id="__codelineno-0-618" name="__codelineno-0-618"></a>                <span class="sa">f</span><span class="s2">&quot;written to </span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-619" name="__codelineno-0-619"></a>            <span class="p">)</span>
-<a id="__codelineno-0-620" name="__codelineno-0-620"></a>        <span class="k">else</span><span class="p">:</span>
-<a id="__codelineno-0-621" name="__codelineno-0-621"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-<a id="__codelineno-0-622" name="__codelineno-0-622"></a>                <span class="s2">&quot;FIRMS download summary: no detections matched the request, &quot;</span>
-<a id="__codelineno-0-623" name="__codelineno-0-623"></a>                <span class="s2">&quot;nothing written&quot;</span>
-<a id="__codelineno-0-624" name="__codelineno-0-624"></a>            <span class="p">)</span>
-<a id="__codelineno-0-625" name="__codelineno-0-625"></a>        <span class="k">return</span> <span class="n">collection</span>
-<a id="__codelineno-0-626" name="__codelineno-0-626"></a>
-<a id="__codelineno-0-627" name="__codelineno-0-627"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">collection</span><span class="p">:</span> <span class="n">FeatureCollection</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
-<a id="__codelineno-0-628" name="__codelineno-0-628"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Write the detections to one vector file under `root_dir`.</span>
-<a id="__codelineno-0-629" name="__codelineno-0-629"></a>
-<a id="__codelineno-0-630" name="__codelineno-0-630"></a><span class="sd">        The filename embeds the sensor list and the query&#39;s date window</span>
-<a id="__codelineno-0-631" name="__codelineno-0-631"></a><span class="sd">        so successive downloads into the same `path` yield distinct</span>
-<a id="__codelineno-0-632" name="__codelineno-0-632"></a><span class="sd">        files. Two downloads of the same request overwrite, the intended</span>
-<a id="__codelineno-0-633" name="__codelineno-0-633"></a><span class="sd">        idempotent behaviour.</span>
-<a id="__codelineno-0-634" name="__codelineno-0-634"></a>
-<a id="__codelineno-0-635" name="__codelineno-0-635"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-636" name="__codelineno-0-636"></a><span class="sd">            collection: The detections to write.</span>
-<a id="__codelineno-0-637" name="__codelineno-0-637"></a>
-<a id="__codelineno-0-638" name="__codelineno-0-638"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-639" name="__codelineno-0-639"></a><span class="sd">            Path: Absolute path of the file written.</span>
-<a id="__codelineno-0-640" name="__codelineno-0-640"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-641" name="__codelineno-0-641"></a>        <span class="n">driver</span><span class="p">,</span> <span class="n">ext</span> <span class="o">=</span> <span class="n">_DRIVERS</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_file_format</span><span class="p">]</span>
-<a id="__codelineno-0-642" name="__codelineno-0-642"></a>        <span class="n">sensors</span> <span class="o">=</span> <span class="s2">&quot;-&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vars</span><span class="p">)</span>
-<a id="__codelineno-0-643" name="__codelineno-0-643"></a>        <span class="n">stem</span> <span class="o">=</span> <span class="p">(</span>
-<a id="__codelineno-0-644" name="__codelineno-0-644"></a>            <span class="sa">f</span><span class="s2">&quot;firms_</span><span class="si">{</span><span class="n">sensors</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">start_date</span><span class="si">:</span><span class="s2">%Y%m%d</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-645" name="__codelineno-0-645"></a>            <span class="sa">f</span><span class="s2">&quot;_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">end_date</span><span class="si">:</span><span class="s2">%Y%m%d</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-646" name="__codelineno-0-646"></a>        <span class="p">)</span>
-<a id="__codelineno-0-647" name="__codelineno-0-647"></a>        <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root_dir</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">stem</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">ext</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-648" name="__codelineno-0-648"></a>        <span class="n">collection</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">out_path</span><span class="p">),</span> <span class="n">driver</span><span class="o">=</span><span class="n">driver</span><span class="p">)</span>
-<a id="__codelineno-0-649" name="__codelineno-0-649"></a>        <span class="k">return</span> <span class="n">out_path</span>
+<a id="__codelineno-0-532" name="__codelineno-0-532"></a>        <span class="n">bbox</span> <span class="o">=</span> <span class="p">(</span>
+<a id="__codelineno-0-533" name="__codelineno-0-533"></a>            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">west</span><span class="si">}</span><span class="s2">,</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">south</span><span class="si">}</span><span class="s2">,</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">east</span><span class="si">}</span><span class="s2">,</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">north</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-534" name="__codelineno-0-534"></a>        <span class="p">)</span>
+<a id="__codelineno-0-535" name="__codelineno-0-535"></a>        <span class="k">return</span> <span class="n">AREA_URL_TEMPLATE</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+<a id="__codelineno-0-536" name="__codelineno-0-536"></a>            <span class="n">map_key</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">api_key</span><span class="p">,</span>
+<a id="__codelineno-0-537" name="__codelineno-0-537"></a>            <span class="n">sensor</span><span class="o">=</span><span class="n">product</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;sensor&quot;</span><span class="p">],</span>
+<a id="__codelineno-0-538" name="__codelineno-0-538"></a>            <span class="n">bbox</span><span class="o">=</span><span class="n">bbox</span><span class="p">,</span>
+<a id="__codelineno-0-539" name="__codelineno-0-539"></a>            <span class="n">day_range</span><span class="o">=</span><span class="n">product</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;day_range&quot;</span><span class="p">],</span>
+<a id="__codelineno-0-540" name="__codelineno-0-540"></a>            <span class="n">start_date</span><span class="o">=</span><span class="n">product</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;start_date&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">isoformat</span><span class="p">(),</span>
+<a id="__codelineno-0-541" name="__codelineno-0-541"></a>        <span class="p">)</span>
+<a id="__codelineno-0-542" name="__codelineno-0-542"></a>
+<a id="__codelineno-0-543" name="__codelineno-0-543"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_api</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">FeatureCollection</span><span class="p">]:</span>
+<a id="__codelineno-0-544" name="__codelineno-0-544"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Compose `_search` and `_fetch` into the canonical C3 shape.&quot;&quot;&quot;</span>
+<a id="__codelineno-0-545" name="__codelineno-0-545"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api_via_search_fetch</span><span class="p">()</span>
+<a id="__codelineno-0-546" name="__codelineno-0-546"></a>
+<a id="__codelineno-0-547" name="__codelineno-0-547"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_api_via_search_fetch_with_progress</span><span class="p">(</span>
+<a id="__codelineno-0-548" name="__codelineno-0-548"></a>        <span class="bp">self</span><span class="p">,</span> <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span>
+<a id="__codelineno-0-549" name="__codelineno-0-549"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">FeatureCollection</span><span class="p">]:</span>
+<a id="__codelineno-0-550" name="__codelineno-0-550"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;C3 composition with a per-chunk progress bar.</span>
+<a id="__codelineno-0-551" name="__codelineno-0-551"></a>
+<a id="__codelineno-0-552" name="__codelineno-0-552"></a><span class="sd">        Mirrors the CMEMS / OpenAQ progress-aware composition: run the</span>
+<a id="__codelineno-0-553" name="__codelineno-0-553"></a><span class="sd">        cheap :meth:`_search`, then map :meth:`_fetch_one` over the</span>
+<a id="__codelineno-0-554" name="__codelineno-0-554"></a><span class="sd">        products wrapped in a `tqdm` bar (disabled when `progress_bar`</span>
+<a id="__codelineno-0-555" name="__codelineno-0-555"></a><span class="sd">        is `False`). Short-circuits on an empty search.</span>
+<a id="__codelineno-0-556" name="__codelineno-0-556"></a>
+<a id="__codelineno-0-557" name="__codelineno-0-557"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-558" name="__codelineno-0-558"></a><span class="sd">            progress_bar: Show the per-chunk `tqdm` bar when `True`.</span>
+<a id="__codelineno-0-559" name="__codelineno-0-559"></a>
+<a id="__codelineno-0-560" name="__codelineno-0-560"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-561" name="__codelineno-0-561"></a><span class="sd">            list[FeatureCollection]: One collection per product, or `[]`</span>
+<a id="__codelineno-0-562" name="__codelineno-0-562"></a><span class="sd">                when nothing matched.</span>
+<a id="__codelineno-0-563" name="__codelineno-0-563"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-564" name="__codelineno-0-564"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_search_fetch_each</span><span class="p">(</span>
+<a id="__codelineno-0-565" name="__codelineno-0-565"></a>            <span class="n">progress_bar</span><span class="o">=</span><span class="n">progress_bar</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;FIRMS chunks&quot;</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="s2">&quot;chunk&quot;</span>
+<a id="__codelineno-0-566" name="__codelineno-0-566"></a>        <span class="p">)</span>
+<a id="__codelineno-0-567" name="__codelineno-0-567"></a>
+<a id="__codelineno-0-568" name="__codelineno-0-568"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
+<a id="__codelineno-0-569" name="__codelineno-0-569"></a>        <span class="bp">self</span><span class="p">,</span>
+<a id="__codelineno-0-570" name="__codelineno-0-570"></a>        <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+<a id="__codelineno-0-571" name="__codelineno-0-571"></a>        <span class="n">aggregate</span><span class="p">:</span> <span class="n">AggregationConfig</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-572" name="__codelineno-0-572"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FeatureCollection</span><span class="p">:</span>
+<a id="__codelineno-0-573" name="__codelineno-0-573"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Query FIRMS and return the matched detections.</span>
+<a id="__codelineno-0-574" name="__codelineno-0-574"></a>
+<a id="__codelineno-0-575" name="__codelineno-0-575"></a><span class="sd">        Runs the cheap :meth:`_search` (sensor validation + chunk</span>
+<a id="__codelineno-0-576" name="__codelineno-0-576"></a><span class="sd">        planning) then the throttled :meth:`_fetch` (one CSV GET per</span>
+<a id="__codelineno-0-577" name="__codelineno-0-577"></a><span class="sd">        chunk), concatenates the per-chunk collections into one</span>
+<a id="__codelineno-0-578" name="__codelineno-0-578"></a><span class="sd">        FeatureCollection, writes it to one vector file under `path`, and</span>
+<a id="__codelineno-0-579" name="__codelineno-0-579"></a><span class="sd">        returns it. An empty result returns — and writes nothing for — a</span>
+<a id="__codelineno-0-580" name="__codelineno-0-580"></a><span class="sd">        schema-correct empty FeatureCollection.</span>
+<a id="__codelineno-0-581" name="__codelineno-0-581"></a>
+<a id="__codelineno-0-582" name="__codelineno-0-582"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-583" name="__codelineno-0-583"></a><span class="sd">            progress_bar: Show a per-chunk progress bar. Defaults to</span>
+<a id="__codelineno-0-584" name="__codelineno-0-584"></a><span class="sd">                `True`.</span>
+<a id="__codelineno-0-585" name="__codelineno-0-585"></a><span class="sd">            aggregate: Must be `None`. Detections are vector, not</span>
+<a id="__codelineno-0-586" name="__codelineno-0-586"></a><span class="sd">                gridded, so there is no meaningful aggregation. The</span>
+<a id="__codelineno-0-587" name="__codelineno-0-587"></a><span class="sd">                facade already rejects a non-`None` `aggregate=` for a</span>
+<a id="__codelineno-0-588" name="__codelineno-0-588"></a><span class="sd">                `vector` backend; this is the belt-and-suspenders guard</span>
+<a id="__codelineno-0-589" name="__codelineno-0-589"></a><span class="sd">                for direct backend callers.</span>
+<a id="__codelineno-0-590" name="__codelineno-0-590"></a>
+<a id="__codelineno-0-591" name="__codelineno-0-591"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-592" name="__codelineno-0-592"></a><span class="sd">            FeatureCollection: The matched detections, CRS `EPSG:4326`.</span>
+<a id="__codelineno-0-593" name="__codelineno-0-593"></a><span class="sd">                Empty (schema-only) when nothing matched.</span>
+<a id="__codelineno-0-594" name="__codelineno-0-594"></a>
+<a id="__codelineno-0-595" name="__codelineno-0-595"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-596" name="__codelineno-0-596"></a><span class="sd">            NotImplementedError: If `aggregate` is not `None`.</span>
+<a id="__codelineno-0-597" name="__codelineno-0-597"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-598" name="__codelineno-0-598"></a>        <span class="k">if</span> <span class="n">aggregate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-599" name="__codelineno-0-599"></a>            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+<a id="__codelineno-0-600" name="__codelineno-0-600"></a>                <span class="s2">&quot;FIRMS.download(aggregate=...) is not supported: fire &quot;</span>
+<a id="__codelineno-0-601" name="__codelineno-0-601"></a>                <span class="s2">&quot;detections are vector point features, not gridded rasters, so &quot;</span>
+<a id="__codelineno-0-602" name="__codelineno-0-602"></a>                <span class="s2">&quot;there is no meaningful gridded reduction. Call download() &quot;</span>
+<a id="__codelineno-0-603" name="__codelineno-0-603"></a>                <span class="s2">&quot;without aggregate= and post-process the returned &quot;</span>
+<a id="__codelineno-0-604" name="__codelineno-0-604"></a>                <span class="s2">&quot;FeatureCollection (a GeoDataFrame) directly.&quot;</span>
+<a id="__codelineno-0-605" name="__codelineno-0-605"></a>            <span class="p">)</span>
+<a id="__codelineno-0-606" name="__codelineno-0-606"></a>
+<a id="__codelineno-0-607" name="__codelineno-0-607"></a>        <span class="c1"># Resolve the MAP_KEY from FIRMS_MAP_KEY if authenticate() was not</span>
+<a id="__codelineno-0-608" name="__codelineno-0-608"></a>        <span class="c1"># called explicitly, so EarthLens(...).download() still works when</span>
+<a id="__codelineno-0-609" name="__codelineno-0-609"></a>        <span class="c1"># the key lives in the environment.</span>
+<a id="__codelineno-0-610" name="__codelineno-0-610"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">is_authenticated</span><span class="p">():</span>
+<a id="__codelineno-0-611" name="__codelineno-0-611"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">authenticate</span><span class="p">()</span>
+<a id="__codelineno-0-612" name="__codelineno-0-612"></a>
+<a id="__codelineno-0-613" name="__codelineno-0-613"></a>        <span class="n">collections</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api_via_search_fetch_with_progress</span><span class="p">(</span><span class="n">progress_bar</span><span class="p">)</span>
+<a id="__codelineno-0-614" name="__codelineno-0-614"></a>        <span class="n">collection</span> <span class="o">=</span> <span class="n">events</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">collections</span><span class="p">)</span>
+<a id="__codelineno-0-615" name="__codelineno-0-615"></a>
+<a id="__codelineno-0-616" name="__codelineno-0-616"></a>        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">):</span>
+<a id="__codelineno-0-617" name="__codelineno-0-617"></a>            <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_write</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span>
+<a id="__codelineno-0-618" name="__codelineno-0-618"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+<a id="__codelineno-0-619" name="__codelineno-0-619"></a>                <span class="sa">f</span><span class="s2">&quot;FIRMS download summary: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span><span class="si">}</span><span class="s2"> detection(s) &quot;</span>
+<a id="__codelineno-0-620" name="__codelineno-0-620"></a>                <span class="sa">f</span><span class="s2">&quot;written to </span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-621" name="__codelineno-0-621"></a>            <span class="p">)</span>
+<a id="__codelineno-0-622" name="__codelineno-0-622"></a>        <span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-0-623" name="__codelineno-0-623"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+<a id="__codelineno-0-624" name="__codelineno-0-624"></a>                <span class="s2">&quot;FIRMS download summary: no detections matched the request, &quot;</span>
+<a id="__codelineno-0-625" name="__codelineno-0-625"></a>                <span class="s2">&quot;nothing written&quot;</span>
+<a id="__codelineno-0-626" name="__codelineno-0-626"></a>            <span class="p">)</span>
+<a id="__codelineno-0-627" name="__codelineno-0-627"></a>        <span class="k">return</span> <span class="n">collection</span>
+<a id="__codelineno-0-628" name="__codelineno-0-628"></a>
+<a id="__codelineno-0-629" name="__codelineno-0-629"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">collection</span><span class="p">:</span> <span class="n">FeatureCollection</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
+<a id="__codelineno-0-630" name="__codelineno-0-630"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Write the detections to one vector file under `root_dir`.</span>
+<a id="__codelineno-0-631" name="__codelineno-0-631"></a>
+<a id="__codelineno-0-632" name="__codelineno-0-632"></a><span class="sd">        The filename embeds the sensor list and the query&#39;s date window</span>
+<a id="__codelineno-0-633" name="__codelineno-0-633"></a><span class="sd">        so successive downloads into the same `path` yield distinct</span>
+<a id="__codelineno-0-634" name="__codelineno-0-634"></a><span class="sd">        files. Two downloads of the same request overwrite, the intended</span>
+<a id="__codelineno-0-635" name="__codelineno-0-635"></a><span class="sd">        idempotent behaviour.</span>
+<a id="__codelineno-0-636" name="__codelineno-0-636"></a>
+<a id="__codelineno-0-637" name="__codelineno-0-637"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-638" name="__codelineno-0-638"></a><span class="sd">            collection: The detections to write.</span>
+<a id="__codelineno-0-639" name="__codelineno-0-639"></a>
+<a id="__codelineno-0-640" name="__codelineno-0-640"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-641" name="__codelineno-0-641"></a><span class="sd">            Path: Absolute path of the file written.</span>
+<a id="__codelineno-0-642" name="__codelineno-0-642"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-643" name="__codelineno-0-643"></a>        <span class="n">driver</span><span class="p">,</span> <span class="n">ext</span> <span class="o">=</span> <span class="n">_DRIVERS</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_file_format</span><span class="p">]</span>
+<a id="__codelineno-0-644" name="__codelineno-0-644"></a>        <span class="n">sensors</span> <span class="o">=</span> <span class="s2">&quot;-&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vars</span><span class="p">)</span>
+<a id="__codelineno-0-645" name="__codelineno-0-645"></a>        <span class="n">stem</span> <span class="o">=</span> <span class="p">(</span>
+<a id="__codelineno-0-646" name="__codelineno-0-646"></a>            <span class="sa">f</span><span class="s2">&quot;firms_</span><span class="si">{</span><span class="n">sensors</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">start_date</span><span class="si">:</span><span class="s2">%Y%m%d</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-647" name="__codelineno-0-647"></a>            <span class="sa">f</span><span class="s2">&quot;_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">end_date</span><span class="si">:</span><span class="s2">%Y%m%d</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-648" name="__codelineno-0-648"></a>        <span class="p">)</span>
+<a id="__codelineno-0-649" name="__codelineno-0-649"></a>        <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root_dir</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">stem</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">ext</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-650" name="__codelineno-0-650"></a>        <span class="n">collection</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">out_path</span><span class="p">),</span> <span class="n">driver</span><span class="o">=</span><span class="n">driver</span><span class="p">)</span>
+<a id="__codelineno-0-651" name="__codelineno-0-651"></a>        <span class="k">return</span> <span class="n">out_path</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -19567,9 +19575,7 @@ Empty (schema-only) when nothing matched.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>src/earthlens/firms/backend.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-566">566</a></span>
-<span class="normal"><a href="#__codelineno-0-567">567</a></span>
-<span class="normal"><a href="#__codelineno-0-568">568</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-568">568</a></span>
 <span class="normal"><a href="#__codelineno-0-569">569</a></span>
 <span class="normal"><a href="#__codelineno-0-570">570</a></span>
 <span class="normal"><a href="#__codelineno-0-571">571</a></span>
@@ -19626,66 +19632,68 @@ Empty (schema-only) when nothing matched.</p>
 <span class="normal"><a href="#__codelineno-0-622">622</a></span>
 <span class="normal"><a href="#__codelineno-0-623">623</a></span>
 <span class="normal"><a href="#__codelineno-0-624">624</a></span>
-<span class="normal"><a href="#__codelineno-0-625">625</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-566" name="__codelineno-0-566"></a><span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
-<a id="__codelineno-0-567" name="__codelineno-0-567"></a>    <span class="bp">self</span><span class="p">,</span>
-<a id="__codelineno-0-568" name="__codelineno-0-568"></a>    <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-<a id="__codelineno-0-569" name="__codelineno-0-569"></a>    <span class="n">aggregate</span><span class="p">:</span> <span class="n">AggregationConfig</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-570" name="__codelineno-0-570"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FeatureCollection</span><span class="p">:</span>
-<a id="__codelineno-0-571" name="__codelineno-0-571"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Query FIRMS and return the matched detections.</span>
-<a id="__codelineno-0-572" name="__codelineno-0-572"></a>
-<a id="__codelineno-0-573" name="__codelineno-0-573"></a><span class="sd">    Runs the cheap :meth:`_search` (sensor validation + chunk</span>
-<a id="__codelineno-0-574" name="__codelineno-0-574"></a><span class="sd">    planning) then the throttled :meth:`_fetch` (one CSV GET per</span>
-<a id="__codelineno-0-575" name="__codelineno-0-575"></a><span class="sd">    chunk), concatenates the per-chunk collections into one</span>
-<a id="__codelineno-0-576" name="__codelineno-0-576"></a><span class="sd">    FeatureCollection, writes it to one vector file under `path`, and</span>
-<a id="__codelineno-0-577" name="__codelineno-0-577"></a><span class="sd">    returns it. An empty result returns — and writes nothing for — a</span>
-<a id="__codelineno-0-578" name="__codelineno-0-578"></a><span class="sd">    schema-correct empty FeatureCollection.</span>
-<a id="__codelineno-0-579" name="__codelineno-0-579"></a>
-<a id="__codelineno-0-580" name="__codelineno-0-580"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-581" name="__codelineno-0-581"></a><span class="sd">        progress_bar: Show a per-chunk progress bar. Defaults to</span>
-<a id="__codelineno-0-582" name="__codelineno-0-582"></a><span class="sd">            `True`.</span>
-<a id="__codelineno-0-583" name="__codelineno-0-583"></a><span class="sd">        aggregate: Must be `None`. Detections are vector, not</span>
-<a id="__codelineno-0-584" name="__codelineno-0-584"></a><span class="sd">            gridded, so there is no meaningful aggregation. The</span>
-<a id="__codelineno-0-585" name="__codelineno-0-585"></a><span class="sd">            facade already rejects a non-`None` `aggregate=` for a</span>
-<a id="__codelineno-0-586" name="__codelineno-0-586"></a><span class="sd">            `vector` backend; this is the belt-and-suspenders guard</span>
-<a id="__codelineno-0-587" name="__codelineno-0-587"></a><span class="sd">            for direct backend callers.</span>
-<a id="__codelineno-0-588" name="__codelineno-0-588"></a>
-<a id="__codelineno-0-589" name="__codelineno-0-589"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-590" name="__codelineno-0-590"></a><span class="sd">        FeatureCollection: The matched detections, CRS `EPSG:4326`.</span>
-<a id="__codelineno-0-591" name="__codelineno-0-591"></a><span class="sd">            Empty (schema-only) when nothing matched.</span>
-<a id="__codelineno-0-592" name="__codelineno-0-592"></a>
-<a id="__codelineno-0-593" name="__codelineno-0-593"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-594" name="__codelineno-0-594"></a><span class="sd">        NotImplementedError: If `aggregate` is not `None`.</span>
-<a id="__codelineno-0-595" name="__codelineno-0-595"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-596" name="__codelineno-0-596"></a>    <span class="k">if</span> <span class="n">aggregate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-597" name="__codelineno-0-597"></a>        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
-<a id="__codelineno-0-598" name="__codelineno-0-598"></a>            <span class="s2">&quot;FIRMS.download(aggregate=...) is not supported: fire &quot;</span>
-<a id="__codelineno-0-599" name="__codelineno-0-599"></a>            <span class="s2">&quot;detections are vector point features, not gridded rasters, so &quot;</span>
-<a id="__codelineno-0-600" name="__codelineno-0-600"></a>            <span class="s2">&quot;there is no meaningful gridded reduction. Call download() &quot;</span>
-<a id="__codelineno-0-601" name="__codelineno-0-601"></a>            <span class="s2">&quot;without aggregate= and post-process the returned &quot;</span>
-<a id="__codelineno-0-602" name="__codelineno-0-602"></a>            <span class="s2">&quot;FeatureCollection (a GeoDataFrame) directly.&quot;</span>
-<a id="__codelineno-0-603" name="__codelineno-0-603"></a>        <span class="p">)</span>
-<a id="__codelineno-0-604" name="__codelineno-0-604"></a>
-<a id="__codelineno-0-605" name="__codelineno-0-605"></a>    <span class="c1"># Resolve the MAP_KEY from FIRMS_MAP_KEY if authenticate() was not</span>
-<a id="__codelineno-0-606" name="__codelineno-0-606"></a>    <span class="c1"># called explicitly, so EarthLens(...).download() still works when</span>
-<a id="__codelineno-0-607" name="__codelineno-0-607"></a>    <span class="c1"># the key lives in the environment.</span>
-<a id="__codelineno-0-608" name="__codelineno-0-608"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">is_authenticated</span><span class="p">():</span>
-<a id="__codelineno-0-609" name="__codelineno-0-609"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">authenticate</span><span class="p">()</span>
-<a id="__codelineno-0-610" name="__codelineno-0-610"></a>
-<a id="__codelineno-0-611" name="__codelineno-0-611"></a>    <span class="n">collections</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api_via_search_fetch_with_progress</span><span class="p">(</span><span class="n">progress_bar</span><span class="p">)</span>
-<a id="__codelineno-0-612" name="__codelineno-0-612"></a>    <span class="n">collection</span> <span class="o">=</span> <span class="n">events</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">collections</span><span class="p">)</span>
-<a id="__codelineno-0-613" name="__codelineno-0-613"></a>
-<a id="__codelineno-0-614" name="__codelineno-0-614"></a>    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">):</span>
-<a id="__codelineno-0-615" name="__codelineno-0-615"></a>        <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_write</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span>
-<a id="__codelineno-0-616" name="__codelineno-0-616"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-<a id="__codelineno-0-617" name="__codelineno-0-617"></a>            <span class="sa">f</span><span class="s2">&quot;FIRMS download summary: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span><span class="si">}</span><span class="s2"> detection(s) &quot;</span>
-<a id="__codelineno-0-618" name="__codelineno-0-618"></a>            <span class="sa">f</span><span class="s2">&quot;written to </span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-619" name="__codelineno-0-619"></a>        <span class="p">)</span>
-<a id="__codelineno-0-620" name="__codelineno-0-620"></a>    <span class="k">else</span><span class="p">:</span>
-<a id="__codelineno-0-621" name="__codelineno-0-621"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-<a id="__codelineno-0-622" name="__codelineno-0-622"></a>            <span class="s2">&quot;FIRMS download summary: no detections matched the request, &quot;</span>
-<a id="__codelineno-0-623" name="__codelineno-0-623"></a>            <span class="s2">&quot;nothing written&quot;</span>
-<a id="__codelineno-0-624" name="__codelineno-0-624"></a>        <span class="p">)</span>
-<a id="__codelineno-0-625" name="__codelineno-0-625"></a>    <span class="k">return</span> <span class="n">collection</span>
+<span class="normal"><a href="#__codelineno-0-625">625</a></span>
+<span class="normal"><a href="#__codelineno-0-626">626</a></span>
+<span class="normal"><a href="#__codelineno-0-627">627</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-568" name="__codelineno-0-568"></a><span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
+<a id="__codelineno-0-569" name="__codelineno-0-569"></a>    <span class="bp">self</span><span class="p">,</span>
+<a id="__codelineno-0-570" name="__codelineno-0-570"></a>    <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+<a id="__codelineno-0-571" name="__codelineno-0-571"></a>    <span class="n">aggregate</span><span class="p">:</span> <span class="n">AggregationConfig</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-572" name="__codelineno-0-572"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FeatureCollection</span><span class="p">:</span>
+<a id="__codelineno-0-573" name="__codelineno-0-573"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Query FIRMS and return the matched detections.</span>
+<a id="__codelineno-0-574" name="__codelineno-0-574"></a>
+<a id="__codelineno-0-575" name="__codelineno-0-575"></a><span class="sd">    Runs the cheap :meth:`_search` (sensor validation + chunk</span>
+<a id="__codelineno-0-576" name="__codelineno-0-576"></a><span class="sd">    planning) then the throttled :meth:`_fetch` (one CSV GET per</span>
+<a id="__codelineno-0-577" name="__codelineno-0-577"></a><span class="sd">    chunk), concatenates the per-chunk collections into one</span>
+<a id="__codelineno-0-578" name="__codelineno-0-578"></a><span class="sd">    FeatureCollection, writes it to one vector file under `path`, and</span>
+<a id="__codelineno-0-579" name="__codelineno-0-579"></a><span class="sd">    returns it. An empty result returns — and writes nothing for — a</span>
+<a id="__codelineno-0-580" name="__codelineno-0-580"></a><span class="sd">    schema-correct empty FeatureCollection.</span>
+<a id="__codelineno-0-581" name="__codelineno-0-581"></a>
+<a id="__codelineno-0-582" name="__codelineno-0-582"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-583" name="__codelineno-0-583"></a><span class="sd">        progress_bar: Show a per-chunk progress bar. Defaults to</span>
+<a id="__codelineno-0-584" name="__codelineno-0-584"></a><span class="sd">            `True`.</span>
+<a id="__codelineno-0-585" name="__codelineno-0-585"></a><span class="sd">        aggregate: Must be `None`. Detections are vector, not</span>
+<a id="__codelineno-0-586" name="__codelineno-0-586"></a><span class="sd">            gridded, so there is no meaningful aggregation. The</span>
+<a id="__codelineno-0-587" name="__codelineno-0-587"></a><span class="sd">            facade already rejects a non-`None` `aggregate=` for a</span>
+<a id="__codelineno-0-588" name="__codelineno-0-588"></a><span class="sd">            `vector` backend; this is the belt-and-suspenders guard</span>
+<a id="__codelineno-0-589" name="__codelineno-0-589"></a><span class="sd">            for direct backend callers.</span>
+<a id="__codelineno-0-590" name="__codelineno-0-590"></a>
+<a id="__codelineno-0-591" name="__codelineno-0-591"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-592" name="__codelineno-0-592"></a><span class="sd">        FeatureCollection: The matched detections, CRS `EPSG:4326`.</span>
+<a id="__codelineno-0-593" name="__codelineno-0-593"></a><span class="sd">            Empty (schema-only) when nothing matched.</span>
+<a id="__codelineno-0-594" name="__codelineno-0-594"></a>
+<a id="__codelineno-0-595" name="__codelineno-0-595"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-596" name="__codelineno-0-596"></a><span class="sd">        NotImplementedError: If `aggregate` is not `None`.</span>
+<a id="__codelineno-0-597" name="__codelineno-0-597"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-598" name="__codelineno-0-598"></a>    <span class="k">if</span> <span class="n">aggregate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-599" name="__codelineno-0-599"></a>        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+<a id="__codelineno-0-600" name="__codelineno-0-600"></a>            <span class="s2">&quot;FIRMS.download(aggregate=...) is not supported: fire &quot;</span>
+<a id="__codelineno-0-601" name="__codelineno-0-601"></a>            <span class="s2">&quot;detections are vector point features, not gridded rasters, so &quot;</span>
+<a id="__codelineno-0-602" name="__codelineno-0-602"></a>            <span class="s2">&quot;there is no meaningful gridded reduction. Call download() &quot;</span>
+<a id="__codelineno-0-603" name="__codelineno-0-603"></a>            <span class="s2">&quot;without aggregate= and post-process the returned &quot;</span>
+<a id="__codelineno-0-604" name="__codelineno-0-604"></a>            <span class="s2">&quot;FeatureCollection (a GeoDataFrame) directly.&quot;</span>
+<a id="__codelineno-0-605" name="__codelineno-0-605"></a>        <span class="p">)</span>
+<a id="__codelineno-0-606" name="__codelineno-0-606"></a>
+<a id="__codelineno-0-607" name="__codelineno-0-607"></a>    <span class="c1"># Resolve the MAP_KEY from FIRMS_MAP_KEY if authenticate() was not</span>
+<a id="__codelineno-0-608" name="__codelineno-0-608"></a>    <span class="c1"># called explicitly, so EarthLens(...).download() still works when</span>
+<a id="__codelineno-0-609" name="__codelineno-0-609"></a>    <span class="c1"># the key lives in the environment.</span>
+<a id="__codelineno-0-610" name="__codelineno-0-610"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">is_authenticated</span><span class="p">():</span>
+<a id="__codelineno-0-611" name="__codelineno-0-611"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">authenticate</span><span class="p">()</span>
+<a id="__codelineno-0-612" name="__codelineno-0-612"></a>
+<a id="__codelineno-0-613" name="__codelineno-0-613"></a>    <span class="n">collections</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api_via_search_fetch_with_progress</span><span class="p">(</span><span class="n">progress_bar</span><span class="p">)</span>
+<a id="__codelineno-0-614" name="__codelineno-0-614"></a>    <span class="n">collection</span> <span class="o">=</span> <span class="n">events</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">collections</span><span class="p">)</span>
+<a id="__codelineno-0-615" name="__codelineno-0-615"></a>
+<a id="__codelineno-0-616" name="__codelineno-0-616"></a>    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">):</span>
+<a id="__codelineno-0-617" name="__codelineno-0-617"></a>        <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_write</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span>
+<a id="__codelineno-0-618" name="__codelineno-0-618"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+<a id="__codelineno-0-619" name="__codelineno-0-619"></a>            <span class="sa">f</span><span class="s2">&quot;FIRMS download summary: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span><span class="si">}</span><span class="s2"> detection(s) &quot;</span>
+<a id="__codelineno-0-620" name="__codelineno-0-620"></a>            <span class="sa">f</span><span class="s2">&quot;written to </span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-621" name="__codelineno-0-621"></a>        <span class="p">)</span>
+<a id="__codelineno-0-622" name="__codelineno-0-622"></a>    <span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-0-623" name="__codelineno-0-623"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+<a id="__codelineno-0-624" name="__codelineno-0-624"></a>            <span class="s2">&quot;FIRMS download summary: no detections matched the request, &quot;</span>
+<a id="__codelineno-0-625" name="__codelineno-0-625"></a>            <span class="s2">&quot;nothing written&quot;</span>
+<a id="__codelineno-0-626" name="__codelineno-0-626"></a>        <span class="p">)</span>
+<a id="__codelineno-0-627" name="__codelineno-0-627"></a>    <span class="k">return</span> <span class="n">collection</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>

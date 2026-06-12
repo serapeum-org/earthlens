@@ -11698,8 +11698,7 @@ def run_or_skip(facade, **download_kwargs):
     paths = facade.download(**download_kwargs)
     for path in paths:
         print(path)
-    return paths
-</div>
+    return paths</div>
 </div>
 </div>
 </div>
@@ -11740,8 +11739,10 @@ def run_or_skip(facade, **download_kwargs):
 
 <span class="n">facade</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
     <span class="n">data_source</span><span class="o">=</span><span class="s1">'openeo'</span><span class="p">,</span>
-    <span class="n">dataset</span><span class="o">=</span><span class="s1">'sentinel-2-l2a'</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">'B04'</span><span class="p">,</span> <span class="s1">'B08'</span><span class="p">],</span>
-    <span class="n">start</span><span class="o">=</span><span class="s1">'2023-01-01'</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s1">'2023-12-31'</span><span class="p">,</span>
+    <span class="n">dataset</span><span class="o">=</span><span class="s1">'sentinel-2-l2a'</span><span class="p">,</span>
+    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">'B04'</span><span class="p">,</span> <span class="s1">'B08'</span><span class="p">],</span>
+    <span class="n">start</span><span class="o">=</span><span class="s1">'2023-01-01'</span><span class="p">,</span>
+    <span class="n">end</span><span class="o">=</span><span class="s1">'2023-12-31'</span><span class="p">,</span>
     <span class="n">aoi</span><span class="o">=</span><span class="p">[</span><span class="mf">3.67</span><span class="p">,</span> <span class="mf">40.40</span><span class="p">,</span> <span class="mf">3.72</span><span class="p">,</span> <span class="mf">40.45</span><span class="p">],</span>
     <span class="n">path</span><span class="o">=</span><span class="s1">'data/openeo-aggregate'</span><span class="p">,</span>
     <span class="n">max_cloud_cover</span><span class="o">=</span><span class="mi">40</span><span class="p">,</span>
@@ -11754,8 +11755,10 @@ from earthlens.aggregate import AggregationConfig
 
 facade = EarthLens(
     data_source='openeo',
-    dataset='sentinel-2-l2a', variables=['B04', 'B08'],
-    start='2023-01-01', end='2023-12-31',
+    dataset='sentinel-2-l2a',
+    variables=['B04', 'B08'],
+    start='2023-01-01',
+    end='2023-12-31',
     aoi=[3.67, 40.40, 3.72, 40.45],
     path='data/openeo-aggregate',
     max_cloud_cover=40,
@@ -11798,10 +11801,12 @@ config</div>
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.openeo._helpers</span><span class="w"> </span><span class="kn">import</span> <span class="n">period_for</span><span class="p">,</span> <span class="n">reducer_for</span>
+
 <span class="nb">print</span><span class="p">(</span><span class="s1">'period:'</span><span class="p">,</span> <span class="n">period_for</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">freq</span><span class="p">))</span>
 <span class="nb">print</span><span class="p">(</span><span class="s1">'reducer:'</span><span class="p">,</span> <span class="n">reducer_for</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">op</span><span class="p">))</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-3">from earthlens.openeo._helpers import period_for, reducer_for
+
 print('period:', period_for(config.freq))
 print('reducer:', reducer_for(config.op))</div>
 </div>

@@ -11737,7 +11737,12 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.gee</span><span class="w"> </span><span class="kn">import</span> <span class="n">cancel_task</span><span class="p">,</span> <span class="n">get_task_status</span><span class="p">,</span> <span class="n">list_recent_tasks</span><span class="p">,</span> <span class="n">wait_for_task_id</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.gee</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">cancel_task</span><span class="p">,</span>
+    <span class="n">get_task_status</span><span class="p">,</span>
+    <span class="n">list_recent_tasks</span><span class="p">,</span>
+    <span class="n">wait_for_task_id</span><span class="p">,</span>
+<span class="p">)</span>
 
 <span class="n">OUT_DIR</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s1">'out'</span><span class="p">)</span> <span class="o">/</span> <span class="s1">'track-batch-exports'</span>
 <span class="n">OUT_DIR</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -11750,7 +11755,12 @@ import time
 from pathlib import Path
 
 from earthlens import EarthLens
-from earthlens.gee import cancel_task, get_task_status, list_recent_tasks, wait_for_task_id
+from earthlens.gee import (
+    cancel_task,
+    get_task_status,
+    list_recent_tasks,
+    wait_for_task_id,
+)
 
 OUT_DIR = Path('out') / 'track-batch-exports'
 OUT_DIR.mkdir(parents=True, exist_ok=True)
@@ -11812,10 +11822,12 @@ print(f'output directory: {OUT_DIR.resolve()}')</div>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">gee</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span><span class="n">data_source</span><span class="o">=</span><span class="s2">"gee"</span><span class="p">,</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">gee</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
+    <span class="n">data_source</span><span class="o">=</span><span class="s2">"gee"</span><span class="p">,</span>
     <span class="n">start</span><span class="o">=</span><span class="s1">'2024-06-01'</span><span class="p">,</span>
     <span class="n">end</span><span class="o">=</span><span class="s1">'2024-06-02'</span><span class="p">,</span>
-    <span class="n">dataset</span><span class="o">=</span><span class="s1">'UCSB-CHG/CHIRPS/DAILY'</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">'precipitation'</span><span class="p">],</span>
+    <span class="n">dataset</span><span class="o">=</span><span class="s1">'UCSB-CHG/CHIRPS/DAILY'</span><span class="p">,</span>
+    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">'precipitation'</span><span class="p">],</span>
     <span class="n">cadence</span><span class="o">=</span><span class="s1">'daily'</span><span class="p">,</span>
     <span class="n">aoi</span><span class="o">=</span><span class="p">[</span><span class="mf">31.1</span><span class="p">,</span> <span class="mf">29.9</span><span class="p">,</span> <span class="mf">31.3</span><span class="p">,</span> <span class="mf">30.1</span><span class="p">],</span>
     <span class="n">path</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">OUT_DIR</span><span class="p">),</span>
@@ -11829,10 +11841,12 @@ print(f'output directory: {OUT_DIR.resolve()}')</div>
 <span class="k">for</span> <span class="n">info</span> <span class="ow">in</span> <span class="n">submitted</span><span class="p">:</span>
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'  </span><span class="si">{</span><span class="n">info</span><span class="o">.</span><span class="n">id</span><span class="si">:</span><span class="s1">26</span><span class="si">}</span><span class="s1"> </span><span class="si">{</span><span class="n">info</span><span class="o">.</span><span class="n">state</span><span class="si">:</span><span class="s1">14</span><span class="si">}</span><span class="s1"> </span><span class="si">{</span><span class="n">info</span><span class="o">.</span><span class="n">description</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-2">gee = EarthLens(data_source="gee",
+<div class="clipboard-copy-txt" id="cell-2">gee = EarthLens(
+    data_source="gee",
     start='2024-06-01',
     end='2024-06-02',
-    dataset='UCSB-CHG/CHIRPS/DAILY', variables=['precipitation'],
+    dataset='UCSB-CHG/CHIRPS/DAILY',
+    variables=['precipitation'],
     cadence='daily',
     aoi=[31.1, 29.9, 31.3, 30.1],
     path=str(OUT_DIR),

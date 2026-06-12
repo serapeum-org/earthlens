@@ -11563,22 +11563,32 @@ print('cycle date:', cycle_date)</div>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">nwm</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span><span class="n">data_source</span><span class="o">=</span><span class="s2">"nwm"</span><span class="p">,</span>
-    <span class="n">start</span><span class="o">=</span><span class="n">cycle_date</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="n">cycle_date</span><span class="p">,</span>
-    <span class="n">dataset</span><span class="o">=</span><span class="s1">'chrtout'</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">'streamflow'</span><span class="p">],</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">nwm</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
+    <span class="n">data_source</span><span class="o">=</span><span class="s2">"nwm"</span><span class="p">,</span>
+    <span class="n">start</span><span class="o">=</span><span class="n">cycle_date</span><span class="p">,</span>
+    <span class="n">end</span><span class="o">=</span><span class="n">cycle_date</span><span class="p">,</span>
+    <span class="n">dataset</span><span class="o">=</span><span class="s1">'chrtout'</span><span class="p">,</span>
+    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">'streamflow'</span><span class="p">],</span>
     <span class="n">aoi</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">180</span><span class="p">,</span> <span class="o">-</span><span class="mi">90</span><span class="p">,</span> <span class="mi">180</span><span class="p">,</span> <span class="mi">90</span><span class="p">],</span>
-    <span class="n">configuration</span><span class="o">=</span><span class="s1">'short_range'</span><span class="p">,</span> <span class="n">cycles</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">steps</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+    <span class="n">configuration</span><span class="o">=</span><span class="s1">'short_range'</span><span class="p">,</span>
+    <span class="n">cycles</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+    <span class="n">steps</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
     <span class="n">path</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">out_dir</span><span class="p">),</span>
 <span class="p">)</span>
 <span class="n">paths</span> <span class="o">=</span> <span class="n">nwm</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">progress_bar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">paths</span><span class="p">:</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="n">p</span><span class="o">.</span><span class="n">stat</span><span class="p">()</span><span class="o">.</span><span class="n">st_size</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mf">1e6</span><span class="si">:</span><span class="s1">.1f</span><span class="si">}</span><span class="s1"> MB'</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-2">nwm = EarthLens(data_source="nwm",
-    start=cycle_date, end=cycle_date,
-    dataset='chrtout', variables=['streamflow'],
+<div class="clipboard-copy-txt" id="cell-2">nwm = EarthLens(
+    data_source="nwm",
+    start=cycle_date,
+    end=cycle_date,
+    dataset='chrtout',
+    variables=['streamflow'],
     aoi=[-180, -90, 180, 90],
-    configuration='short_range', cycles=[0], steps=[1],
+    configuration='short_range',
+    cycles=[0],
+    steps=[1],
     path=str(out_dir),
 )
 paths = nwm.download(progress_bar=False)

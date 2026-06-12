@@ -11568,13 +11568,17 @@ cat.themes()</div>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">cat</span><span class="o">.</span><span class="n">themes</span><span class="p">():</span>
     <span class="n">theme</span> <span class="o">=</span> <span class="n">cat</span><span class="o">.</span><span class="n">get_theme</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">name</span><span class="si">:</span><span class="s2">16s</span><span class="si">}</span><span class="s2"> types=</span><span class="si">{</span><span class="n">theme</span><span class="o">.</span><span class="n">types</span><span class="si">}</span><span class="s2"> default=</span><span class="si">{</span><span class="n">theme</span><span class="o">.</span><span class="n">default_type</span><span class="si">!r}</span><span class="s2"> "</span>
-          <span class="sa">f</span><span class="s2">"geometry=</span><span class="si">{</span><span class="n">theme</span><span class="o">.</span><span class="n">geometry</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span>
+        <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">name</span><span class="si">:</span><span class="s2">16s</span><span class="si">}</span><span class="s2"> types=</span><span class="si">{</span><span class="n">theme</span><span class="o">.</span><span class="n">types</span><span class="si">}</span><span class="s2"> default=</span><span class="si">{</span><span class="n">theme</span><span class="o">.</span><span class="n">default_type</span><span class="si">!r}</span><span class="s2"> "</span>
+        <span class="sa">f</span><span class="s2">"geometry=</span><span class="si">{</span><span class="n">theme</span><span class="o">.</span><span class="n">geometry</span><span class="si">}</span><span class="s2">"</span>
+    <span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-2">for name in cat.themes():
     theme = cat.get_theme(name)
-    print(f"{name:16s} types={theme.types} default={theme.default_type!r} "
-          f"geometry={theme.geometry}")</div>
+    print(
+        f"{name:16s} types={theme.types} default={theme.default_type!r} "
+        f"geometry={theme.geometry}"
+    )</div>
 </div>
 </div>
 </div>

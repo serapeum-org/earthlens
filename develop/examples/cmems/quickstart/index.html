@@ -11904,7 +11904,8 @@ verbatim.</p>
     <span class="n">start</span><span class="o">=</span><span class="n">START</span><span class="p">,</span>
     <span class="n">end</span><span class="o">=</span><span class="n">END</span><span class="p">,</span>
     <span class="n">cadence</span><span class="o">=</span><span class="s1">'daily'</span><span class="p">,</span>
-    <span class="n">dataset</span><span class="o">=</span><span class="s1">'METOFFICE-GLO-SST-L4-NRT-OBS-SST-V2'</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">'analysed_sst'</span><span class="p">],</span>
+    <span class="n">dataset</span><span class="o">=</span><span class="s1">'METOFFICE-GLO-SST-L4-NRT-OBS-SST-V2'</span><span class="p">,</span>
+    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">'analysed_sst'</span><span class="p">],</span>
     <span class="n">aoi</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">10.0</span><span class="p">,</span> <span class="mf">30.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">4.0</span><span class="p">,</span> <span class="mf">36.0</span><span class="p">],</span>
     <span class="n">path</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">OUT_DIR</span><span class="p">),</span>
     <span class="n">service_username</span><span class="o">=</span><span class="n">SERVICE_USERNAME</span><span class="p">,</span>
@@ -11919,7 +11920,8 @@ verbatim.</p>
     start=START,
     end=END,
     cadence='daily',
-    dataset='METOFFICE-GLO-SST-L4-NRT-OBS-SST-V2', variables=['analysed_sst'],
+    dataset='METOFFICE-GLO-SST-L4-NRT-OBS-SST-V2',
+    variables=['analysed_sst'],
     aoi=[-10.0, 30.0, -4.0, 36.0],
     path=str(OUT_DIR),
     service_username=SERVICE_USERNAME,
@@ -12026,11 +12028,13 @@ check against the <code>CMEMS</code> class directly.</p>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">cmems</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span><span class="n">data_source</span><span class="o">=</span><span class="s2">"cmems"</span><span class="p">,</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">cmems</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
+    <span class="n">data_source</span><span class="o">=</span><span class="s2">"cmems"</span><span class="p">,</span>
     <span class="n">start</span><span class="o">=</span><span class="n">START</span><span class="p">,</span>
     <span class="n">end</span><span class="o">=</span><span class="n">END</span><span class="p">,</span>
     <span class="n">cadence</span><span class="o">=</span><span class="s1">'daily'</span><span class="p">,</span>
-    <span class="n">dataset</span><span class="o">=</span><span class="s1">'METOFFICE-GLO-SST-L4-NRT-OBS-SST-V2'</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">'analysed_sst'</span><span class="p">],</span>
+    <span class="n">dataset</span><span class="o">=</span><span class="s1">'METOFFICE-GLO-SST-L4-NRT-OBS-SST-V2'</span><span class="p">,</span>
+    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">'analysed_sst'</span><span class="p">],</span>
     <span class="n">aoi</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">10.0</span><span class="p">,</span> <span class="mf">30.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">4.0</span><span class="p">,</span> <span class="mf">36.0</span><span class="p">],</span>
     <span class="n">path</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">OUT_DIR</span><span class="p">),</span>
     <span class="n">service_username</span><span class="o">=</span><span class="n">SERVICE_USERNAME</span><span class="p">,</span>
@@ -12040,11 +12044,13 @@ check against the <code>CMEMS</code> class directly.</p>
 <span class="n">paths</span> <span class="o">=</span> <span class="n">cmems</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">paths</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-4">cmems = EarthLens(data_source="cmems",
+<div class="clipboard-copy-txt" id="cell-4">cmems = EarthLens(
+    data_source="cmems",
     start=START,
     end=END,
     cadence='daily',
-    dataset='METOFFICE-GLO-SST-L4-NRT-OBS-SST-V2', variables=['analysed_sst'],
+    dataset='METOFFICE-GLO-SST-L4-NRT-OBS-SST-V2',
+    variables=['analysed_sst'],
     aoi=[-10.0, 30.0, -4.0, 36.0],
     path=str(OUT_DIR),
     service_username=SERVICE_USERNAME,
@@ -12158,7 +12164,9 @@ CMEMS NetCDFs.</p>
 <span class="n">nc</span> <span class="o">=</span> <span class="n">NetCDF</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">paths</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">read_only</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s1">'variables:'</span><span class="p">,</span> <span class="nb">list</span><span class="p">(</span><span class="n">nc</span><span class="o">.</span><span class="n">meta_data</span><span class="o">.</span><span class="n">variables</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
 <span class="n">sst</span> <span class="o">=</span> <span class="n">nc</span><span class="o">.</span><span class="n">meta_data</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="s1">'analysed_sst'</span><span class="p">]</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'analysed_sst: long_name=</span><span class="si">{</span><span class="nb">getattr</span><span class="p">(</span><span class="n">sst</span><span class="p">,</span><span class="w"> </span><span class="s2">"long_name"</span><span class="p">,</span><span class="w"> </span><span class="kc">None</span><span class="p">)</span><span class="si">!r}</span><span class="s1"> unit=</span><span class="si">{</span><span class="nb">getattr</span><span class="p">(</span><span class="n">sst</span><span class="p">,</span><span class="w"> </span><span class="s2">"unit"</span><span class="p">,</span><span class="w"> </span><span class="kc">None</span><span class="p">)</span><span class="si">!r}</span><span class="s1">'</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span>
+    <span class="sa">f</span><span class="s1">'analysed_sst: long_name=</span><span class="si">{</span><span class="nb">getattr</span><span class="p">(</span><span class="n">sst</span><span class="p">,</span><span class="w"> </span><span class="s2">"long_name"</span><span class="p">,</span><span class="w"> </span><span class="kc">None</span><span class="p">)</span><span class="si">!r}</span><span class="s1"> unit=</span><span class="si">{</span><span class="nb">getattr</span><span class="p">(</span><span class="n">sst</span><span class="p">,</span><span class="w"> </span><span class="s2">"unit"</span><span class="p">,</span><span class="w"> </span><span class="kc">None</span><span class="p">)</span><span class="si">!r}</span><span class="s1">'</span>
+<span class="p">)</span>
 <span class="n">arr</span> <span class="o">=</span> <span class="n">nc</span><span class="o">.</span><span class="n">read_array</span><span class="p">(</span><span class="s1">'analysed_sst'</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'shape (time, lat, lon): </span><span class="si">{</span><span class="n">arr</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
 <span class="n">nc</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
@@ -12168,7 +12176,9 @@ CMEMS NetCDFs.</p>
 nc = NetCDF.read_file(str(paths[0]), read_only=True)
 print('variables:', list(nc.meta_data.variables.keys()))
 sst = nc.meta_data.variables['analysed_sst']
-print(f'analysed_sst: long_name={getattr(sst, "long_name", None)!r} unit={getattr(sst, "unit", None)!r}')
+print(
+    f'analysed_sst: long_name={getattr(sst, "long_name", None)!r} unit={getattr(sst, "unit", None)!r}'
+)
 arr = nc.read_array('analysed_sst')
 print(f'shape (time, lat, lon): {arr.shape}')
 nc.close()</div>

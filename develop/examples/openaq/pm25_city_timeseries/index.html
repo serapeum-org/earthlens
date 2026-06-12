@@ -11528,9 +11528,11 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+
 <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-1">import os
+
 from earthlens import EarthLens</div>
 </div>
 </div>
@@ -11557,12 +11559,12 @@ from earthlens import EarthLens</div>
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">WHO_24H_GUIDELINE</span> <span class="o">=</span> <span class="mf">15.0</span>  <span class="c1"># µg/m³, WHO 2021 24-hour PM2.5 guideline</span>
-<span class="n">bbox_lat</span> <span class="o">=</span> <span class="p">[</span><span class="mf">34.0</span><span class="p">,</span> <span class="mf">34.3</span><span class="p">]</span>   <span class="c1"># Los Angeles basin</span>
+<span class="n">bbox_lat</span> <span class="o">=</span> <span class="p">[</span><span class="mf">34.0</span><span class="p">,</span> <span class="mf">34.3</span><span class="p">]</span>  <span class="c1"># Los Angeles basin</span>
 <span class="n">bbox_lon</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="mf">118.5</span><span class="p">,</span> <span class="o">-</span><span class="mf">118.1</span><span class="p">]</span>
 <span class="n">start</span><span class="p">,</span> <span class="n">end</span> <span class="o">=</span> <span class="s2">"2023-01-01"</span><span class="p">,</span> <span class="s2">"2023-12-31"</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-2">WHO_24H_GUIDELINE = 15.0  # µg/m³, WHO 2021 24-hour PM2.5 guideline
-bbox_lat = [34.0, 34.3]   # Los Angeles basin
+bbox_lat = [34.0, 34.3]  # Los Angeles basin
 bbox_lon = [-118.5, -118.1]
 start, end = "2023-01-01", "2023-12-31"</div>
 </div>
@@ -11594,9 +11596,10 @@ start, end = "2023-01-01", "2023-12-31"</div>
     <span class="n">df</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
         <span class="n">data_source</span><span class="o">=</span><span class="s2">"openaq"</span><span class="p">,</span>
         <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">"pm25"</span><span class="p">],</span>
-        <span class="n">start</span><span class="o">=</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="n">end</span><span class="p">,</span>
+        <span class="n">start</span><span class="o">=</span><span class="n">start</span><span class="p">,</span>
+        <span class="n">end</span><span class="o">=</span><span class="n">end</span><span class="p">,</span>
         <span class="n">aoi</span><span class="o">=</span><span class="p">[</span><span class="n">bbox_lon</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">bbox_lat</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">bbox_lon</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">bbox_lat</span><span class="p">[</span><span class="mi">1</span><span class="p">]],</span>
-        <span class="n">temporal_resolution</span><span class="o">=</span><span class="s2">"daily"</span><span class="p">,</span>   <span class="c1"># server-side daily rollup</span>
+        <span class="n">temporal_resolution</span><span class="o">=</span><span class="s2">"daily"</span><span class="p">,</span>  <span class="c1"># server-side daily rollup</span>
         <span class="n">max_locations</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
         <span class="n">path</span><span class="o">=</span><span class="s2">"out/openaq"</span><span class="p">,</span>
     <span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">progress_bar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
@@ -11609,9 +11612,10 @@ if os.environ.get("OPENAQ_API_KEY"):
     df = EarthLens(
         data_source="openaq",
         variables=["pm25"],
-        start=start, end=end,
+        start=start,
+        end=end,
         aoi=[bbox_lon[0], bbox_lat[0], bbox_lon[1], bbox_lat[1]],
-        temporal_resolution="daily",   # server-side daily rollup
+        temporal_resolution="daily",  # server-side daily rollup
         max_locations=5,
         path="out/openaq",
     ).download(progress_bar=False)
@@ -11647,8 +11651,9 @@ else:
 <span class="k">if</span> <span class="n">df</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">df</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
     <span class="n">city</span> <span class="o">=</span> <span class="p">(</span>
         <span class="n">df</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">day</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="s2">"datetime_utc"</span><span class="p">]</span><span class="o">.</span><span class="n">dt</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="s2">"D"</span><span class="p">))</span>
-          <span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s2">"day"</span><span class="p">)[</span><span class="s2">"value"</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
-          <span class="o">.</span><span class="n">sort_index</span><span class="p">()</span>
+        <span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s2">"day"</span><span class="p">)[</span><span class="s2">"value"</span><span class="p">]</span>
+        <span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+        <span class="o">.</span><span class="n">sort_index</span><span class="p">()</span>
     <span class="p">)</span>
     <span class="n">exceedances</span> <span class="o">=</span> <span class="n">city</span><span class="p">[</span><span class="n">city</span> <span class="o">&gt;</span> <span class="n">WHO_24H_GUIDELINE</span><span class="p">]</span>
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">exceedances</span><span class="p">)</span><span class="si">}</span><span class="s2"> of </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">city</span><span class="p">)</span><span class="si">}</span><span class="s2"> days exceed the WHO guideline"</span><span class="p">)</span>
@@ -11658,8 +11663,9 @@ city = None
 if df is not None and not df.empty:
     city = (
         df.assign(day=df["datetime_utc"].dt.floor("D"))
-          .groupby("day")["value"].mean()
-          .sort_index()
+        .groupby("day")["value"]
+        .mean()
+        .sort_index()
     )
     exceedances = city[city &gt; WHO_24H_GUIDELINE]
     print(f"{len(exceedances)} of {len(city)} days exceed the WHO guideline")</div>
@@ -11689,10 +11695,20 @@ if df is not None and not df.empty:
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="k">if</span> <span class="n">city</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">city</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
     <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+
     <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">11</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
     <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">city</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">city</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"#1f77b4"</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"daily mean PM2.5"</span><span class="p">)</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="n">WHO_24H_GUIDELINE</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"crimson"</span><span class="p">,</span> <span class="n">ls</span><span class="o">=</span><span class="s2">"--"</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"WHO 24h guideline (15)"</span><span class="p">)</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">exceedances</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">exceedances</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"crimson"</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span> <span class="n">zorder</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"exceedance day"</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span>
+        <span class="n">WHO_24H_GUIDELINE</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"crimson"</span><span class="p">,</span> <span class="n">ls</span><span class="o">=</span><span class="s2">"--"</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"WHO 24h guideline (15)"</span>
+    <span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span>
+        <span class="n">exceedances</span><span class="o">.</span><span class="n">index</span><span class="p">,</span>
+        <span class="n">exceedances</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+        <span class="n">color</span><span class="o">=</span><span class="s2">"crimson"</span><span class="p">,</span>
+        <span class="n">s</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span>
+        <span class="n">zorder</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+        <span class="n">label</span><span class="o">=</span><span class="s2">"exceedance day"</span><span class="p">,</span>
+    <span class="p">)</span>
     <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">"PM2.5 (µg/m³)"</span><span class="p">)</span>
     <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">"Los Angeles daily PM2.5 vs. WHO guideline, 2023"</span><span class="p">)</span>
     <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">fontsize</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span>
@@ -11701,10 +11717,20 @@ if df is not None and not df.empty:
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-5">if city is not None and not city.empty:
     import matplotlib.pyplot as plt
+
     fig, ax = plt.subplots(figsize=(11, 4))
     ax.plot(city.index, city.values, color="#1f77b4", lw=1, label="daily mean PM2.5")
-    ax.axhline(WHO_24H_GUIDELINE, color="crimson", ls="--", label="WHO 24h guideline (15)")
-    ax.scatter(exceedances.index, exceedances.values, color="crimson", s=12, zorder=3, label="exceedance day")
+    ax.axhline(
+        WHO_24H_GUIDELINE, color="crimson", ls="--", label="WHO 24h guideline (15)"
+    )
+    ax.scatter(
+        exceedances.index,
+        exceedances.values,
+        color="crimson",
+        s=12,
+        zorder=3,
+        label="exceedance day",
+    )
     ax.set_ylabel("PM2.5 (µg/m³)")
     ax.set_title("Los Angeles daily PM2.5 vs. WHO guideline, 2023")
     ax.legend(fontsize=8)

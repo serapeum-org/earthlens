@@ -11749,14 +11749,18 @@ set so the auto-routing picks <code>sum</code>.</p>
 <span class="n">cat</span> <span class="o">=</span> <span class="n">Catalog</span><span class="p">()</span>
 <span class="k">for</span> <span class="n">code</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">"total-precipitation"</span><span class="p">,</span> <span class="s2">"evaporation"</span><span class="p">,</span> <span class="s2">"surface-runoff"</span><span class="p">):</span>
     <span class="n">spec</span> <span class="o">=</span> <span class="n">cat</span><span class="o">.</span><span class="n">get_variable</span><span class="p">(</span><span class="s2">"reanalysis-era5-single-levels"</span><span class="p">,</span> <span class="n">code</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">code</span><span class="si">:</span><span class="s2">25s</span><span class="si">}</span><span class="s2">  nc=</span><span class="si">{</span><span class="n">spec</span><span class="o">.</span><span class="n">nc_variable</span><span class="si">:</span><span class="s2">5s</span><span class="si">}</span><span class="s2">  units=</span><span class="si">{</span><span class="n">spec</span><span class="o">.</span><span class="n">units</span><span class="si">:</span><span class="s2">25s</span><span class="si">}</span><span class="s2">  is_flux=</span><span class="si">{</span><span class="n">spec</span><span class="o">.</span><span class="n">is_flux</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span>
+        <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">code</span><span class="si">:</span><span class="s2">25s</span><span class="si">}</span><span class="s2">  nc=</span><span class="si">{</span><span class="n">spec</span><span class="o">.</span><span class="n">nc_variable</span><span class="si">:</span><span class="s2">5s</span><span class="si">}</span><span class="s2">  units=</span><span class="si">{</span><span class="n">spec</span><span class="o">.</span><span class="n">units</span><span class="si">:</span><span class="s2">25s</span><span class="si">}</span><span class="s2">  is_flux=</span><span class="si">{</span><span class="n">spec</span><span class="o">.</span><span class="n">is_flux</span><span class="si">}</span><span class="s2">"</span>
+    <span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-1">from earthlens.ecmwf import Catalog
 
 cat = Catalog()
 for code in ("total-precipitation", "evaporation", "surface-runoff"):
     spec = cat.get_variable("reanalysis-era5-single-levels", code)
-    print(f"{code:25s}  nc={spec.nc_variable:5s}  units={spec.units:25s}  is_flux={spec.is_flux}")</div>
+    print(
+        f"{code:25s}  nc={spec.nc_variable:5s}  units={spec.units:25s}  is_flux={spec.is_flux}"
+    )</div>
 </div>
 </div>
 </div>
@@ -11812,7 +11816,8 @@ request body skips the <code>day</code> field. The aggregation runs at <code>1MS
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">earthlens</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span><span class="p">,</span> <span class="n">AggregationConfig</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">earthlens</span><span class="w"> </span><span class="kn">import</span> <span class="n">AggregationConfig</span><span class="p">,</span> <span class="n">EarthLens</span>
 
 <span class="n">OUT</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">"data/era5-water-balance"</span><span class="p">)</span>
 <span class="n">OUT</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -11822,18 +11827,20 @@ request body skips the <code>day</code> field. The aggregation runs at <code>1MS
     <span class="n">cadence</span><span class="o">=</span><span class="s2">"monthly"</span><span class="p">,</span>
     <span class="n">start</span><span class="o">=</span><span class="s2">"2022-01-01"</span><span class="p">,</span>
     <span class="n">end</span><span class="o">=</span><span class="s2">"2022-12-01"</span><span class="p">,</span>
-    <span class="n">dataset</span><span class="o">=</span><span class="s2">"reanalysis-era5-single-levels-monthly-means"</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="p">[</span>
-            <span class="s2">"total-precipitation"</span><span class="p">,</span>
-            <span class="s2">"evaporation"</span><span class="p">,</span>
-            <span class="s2">"surface-runoff"</span><span class="p">,</span>
-        <span class="p">],</span>
+    <span class="n">dataset</span><span class="o">=</span><span class="s2">"reanalysis-era5-single-levels-monthly-means"</span><span class="p">,</span>
+    <span class="n">variables</span><span class="o">=</span><span class="p">[</span>
+        <span class="s2">"total-precipitation"</span><span class="p">,</span>
+        <span class="s2">"evaporation"</span><span class="p">,</span>
+        <span class="s2">"surface-runoff"</span><span class="p">,</span>
+    <span class="p">],</span>
     <span class="n">aoi</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">75.0</span><span class="p">,</span> <span class="mf">4.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">74.0</span><span class="p">,</span> <span class="mf">5.0</span><span class="p">],</span>
     <span class="n">path</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">OUT</span><span class="p">),</span>
 <span class="p">)</span>
 <span class="n">earthlens</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">aggregate</span><span class="o">=</span><span class="n">AggregationConfig</span><span class="p">(</span><span class="n">freq</span><span class="o">=</span><span class="s2">"1MS"</span><span class="p">,</span> <span class="n">op</span><span class="o">=</span><span class="s2">"auto"</span><span class="p">))</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-2">from pathlib import Path
-from earthlens import EarthLens, AggregationConfig
+
+from earthlens import AggregationConfig, EarthLens
 
 OUT = Path("data/era5-water-balance")
 OUT.mkdir(parents=True, exist_ok=True)
@@ -11843,11 +11850,12 @@ earthlens = EarthLens(
     cadence="monthly",
     start="2022-01-01",
     end="2022-12-01",
-    dataset="reanalysis-era5-single-levels-monthly-means", variables=[
-            "total-precipitation",
-            "evaporation",
-            "surface-runoff",
-        ],
+    dataset="reanalysis-era5-single-levels-monthly-means",
+    variables=[
+        "total-precipitation",
+        "evaporation",
+        "surface-runoff",
+    ],
     aoi=[-75.0, 4.0, -74.0, 5.0],
     path=str(OUT),
 )
@@ -11904,9 +11912,9 @@ earthlens.download(aggregate=AggregationConfig(freq="1MS", op="auto"))</div>
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jupyter-widgets jp-OutputArea-output" id="550dbf3c-2618-461b-a10b-973c46c41e17" tabindex="0">
+<div class="jupyter-widgets jp-OutputArea-output" id="cb80aa9b-ec53-47fd-9a95-8af9061f37d0" tabindex="0">
 <script type="text/javascript">
-var element = document.getElementById('550dbf3c-2618-461b-a10b-973c46c41e17');
+var element = document.getElementById('cb80aa9b-ec53-47fd-9a95-8af9061f37d0');
 </script>
 <script type="application/vnd.jupyter.widget-view+json">
 {"model_id": "2512d5ed1a4246e48481d64288c8e22b", "version_major": 2, "version_minor": 0}
@@ -11985,9 +11993,9 @@ var element = document.getElementById('550dbf3c-2618-461b-a10b-973c46c41e17');
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jupyter-widgets jp-OutputArea-output" id="ce610714-ade9-42a1-ae8b-f9a382d0f06b" tabindex="0">
+<div class="jupyter-widgets jp-OutputArea-output" id="88ca0355-ef24-4242-b013-a24a196db1fb" tabindex="0">
 <script type="text/javascript">
-var element = document.getElementById('ce610714-ade9-42a1-ae8b-f9a382d0f06b');
+var element = document.getElementById('88ca0355-ef24-4242-b013-a24a196db1fb');
 </script>
 <script type="application/vnd.jupyter.widget-view+json">
 {"model_id": "8e308878db0e492bb82b80a8d5cf9f60", "version_major": 2, "version_minor": 0}
@@ -12073,9 +12081,9 @@ var element = document.getElementById('ce610714-ade9-42a1-ae8b-f9a382d0f06b');
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jupyter-widgets jp-OutputArea-output" id="3ab904c0-d9fb-4fb6-89d2-40b897d7ccb2" tabindex="0">
+<div class="jupyter-widgets jp-OutputArea-output" id="c9b1a418-6cd0-44e9-974c-f1ab7e5da401" tabindex="0">
 <script type="text/javascript">
-var element = document.getElementById('3ab904c0-d9fb-4fb6-89d2-40b897d7ccb2');
+var element = document.getElementById('c9b1a418-6cd0-44e9-974c-f1ab7e5da401');
 </script>
 <script type="application/vnd.jupyter.widget-view+json">
 {"model_id": "38d6fb386d0e47e0925330ebcebcce6e", "version_major": 2, "version_minor": 0}
@@ -12131,18 +12139,20 @@ to get a single time series per variable.</p>
 
 <span class="n">agg_dir</span> <span class="o">=</span> <span class="n">OUT</span> <span class="o">/</span> <span class="s2">"aggregated"</span>
 
+
 <span class="k">def</span><span class="w"> </span><span class="nf">stack_monthly</span><span class="p">(</span><span class="n">cds_variable</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">"""Stack the 12 monthly GeoTIFFs for one variable into a (12, lat, lon) cube."""</span>
     <span class="n">paths</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">agg_dir</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">cds_variable</span><span class="si">}</span><span class="s2">_1MS_*.tif"</span><span class="p">))</span>
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">Dataset</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">p</span><span class="p">))</span><span class="o">.</span><span class="n">read_array</span><span class="p">()</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">paths</span><span class="p">])</span>
 
+
 <span class="n">precip</span> <span class="o">=</span> <span class="n">stack_monthly</span><span class="p">(</span><span class="s2">"total_precipitation"</span><span class="p">)</span>
-<span class="n">et</span>     <span class="o">=</span> <span class="n">stack_monthly</span><span class="p">(</span><span class="s2">"evaporation"</span><span class="p">)</span>
+<span class="n">et</span> <span class="o">=</span> <span class="n">stack_monthly</span><span class="p">(</span><span class="s2">"evaporation"</span><span class="p">)</span>
 <span class="n">runoff</span> <span class="o">=</span> <span class="n">stack_monthly</span><span class="p">(</span><span class="s2">"surface_runoff"</span><span class="p">)</span>
 
 <span class="c1"># Catchment mean per month — one number per (variable, month).</span>
 <span class="n">precip_mean</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmean</span><span class="p">(</span><span class="n">precip</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
-<span class="n">et_mean</span>     <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmean</span><span class="p">(</span><span class="n">et</span><span class="p">,</span>     <span class="n">axis</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+<span class="n">et_mean</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmean</span><span class="p">(</span><span class="n">et</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
 <span class="n">runoff_mean</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmean</span><span class="p">(</span><span class="n">runoff</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
 
 <span class="n">months</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">date_range</span><span class="p">(</span><span class="s2">"2022-01-01"</span><span class="p">,</span> <span class="n">periods</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="s2">"MS"</span><span class="p">)</span>
@@ -12158,18 +12168,20 @@ from pyramids.dataset import Dataset
 
 agg_dir = OUT / "aggregated"
 
+
 def stack_monthly(cds_variable: str) -&gt; np.ndarray:
     """Stack the 12 monthly GeoTIFFs for one variable into a (12, lat, lon) cube."""
     paths = sorted(agg_dir.glob(f"{cds_variable}_1MS_*.tif"))
     return np.stack([Dataset.read_file(str(p)).read_array() for p in paths])
 
+
 precip = stack_monthly("total_precipitation")
-et     = stack_monthly("evaporation")
+et = stack_monthly("evaporation")
 runoff = stack_monthly("surface_runoff")
 
 # Catchment mean per month — one number per (variable, month).
 precip_mean = np.nanmean(precip, axis=(1, 2))
-et_mean     = np.nanmean(et,     axis=(1, 2))
+et_mean = np.nanmean(et, axis=(1, 2))
 runoff_mean = np.nanmean(runoff, axis=(1, 2))
 
 months = pd.date_range("2022-01-01", periods=12, freq="MS")
@@ -12328,12 +12340,12 @@ convention for <code>surface_runoff</code> (positive away from the surface).</p>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
 
 <span class="n">precip_mm</span> <span class="o">=</span> <span class="n">precip_mean</span> <span class="o">*</span> <span class="mi">1000</span>
-<span class="n">et_mm</span>     <span class="o">=</span> <span class="o">-</span><span class="n">et_mean</span> <span class="o">*</span> <span class="mi">1000</span>   <span class="c1"># ERA5 evaporation is negative for sfc-&gt;atm flux</span>
+<span class="n">et_mm</span> <span class="o">=</span> <span class="o">-</span><span class="n">et_mean</span> <span class="o">*</span> <span class="mi">1000</span>  <span class="c1"># ERA5 evaporation is negative for sfc-&gt;atm flux</span>
 <span class="n">runoff_mm</span> <span class="o">=</span> <span class="n">runoff_mean</span> <span class="o">*</span> <span class="mi">1000</span>
 
 <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">months</span><span class="p">,</span> <span class="n">precip_mm</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s2">"o"</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Precipitation (P)"</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">months</span><span class="p">,</span> <span class="n">et_mm</span><span class="p">,</span>     <span class="n">marker</span><span class="o">=</span><span class="s2">"s"</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Evapotranspiration (|ET|)"</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">months</span><span class="p">,</span> <span class="n">et_mm</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s2">"s"</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Evapotranspiration (|ET|)"</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">months</span><span class="p">,</span> <span class="n">runoff_mm</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s2">"^"</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Surface runoff (R)"</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">"mm / month (catchment mean)"</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">"ERA5 monthly water-balance terms — Coello bbox, 2022"</span><span class="p">)</span>
@@ -12345,12 +12357,12 @@ convention for <code>surface_runoff</code> (positive away from the surface).</p>
 <div class="clipboard-copy-txt" id="cell-4">import matplotlib.pyplot as plt
 
 precip_mm = precip_mean * 1000
-et_mm     = -et_mean * 1000   # ERA5 evaporation is negative for sfc-&gt;atm flux
+et_mm = -et_mean * 1000  # ERA5 evaporation is negative for sfc-&gt;atm flux
 runoff_mm = runoff_mean * 1000
 
 fig, ax = plt.subplots(figsize=(9, 5))
 ax.plot(months, precip_mm, marker="o", label="Precipitation (P)")
-ax.plot(months, et_mm,     marker="s", label="Evapotranspiration (|ET|)")
+ax.plot(months, et_mm, marker="s", label="Evapotranspiration (|ET|)")
 ax.plot(months, runoff_mm, marker="^", label="Surface runoff (R)")
 ax.set_ylabel("mm / month (catchment mean)")
 ax.set_title("ERA5 monthly water-balance terms — Coello bbox, 2022")
@@ -12411,12 +12423,14 @@ has substantial groundwater export or interannual storage swings.</p>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">annual</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
     <span class="p">{</span>
-        <span class="s2">"P (mm/yr)"</span><span class="p">:</span>   <span class="p">[</span><span class="n">precip_mm</span><span class="o">.</span><span class="n">sum</span><span class="p">()],</span>
+        <span class="s2">"P (mm/yr)"</span><span class="p">:</span> <span class="p">[</span><span class="n">precip_mm</span><span class="o">.</span><span class="n">sum</span><span class="p">()],</span>
         <span class="s2">"|ET| (mm/yr)"</span><span class="p">:</span> <span class="p">[</span><span class="n">et_mm</span><span class="o">.</span><span class="n">sum</span><span class="p">()],</span>
-        <span class="s2">"R (mm/yr)"</span><span class="p">:</span>   <span class="p">[</span><span class="n">runoff_mm</span><span class="o">.</span><span class="n">sum</span><span class="p">()],</span>
+        <span class="s2">"R (mm/yr)"</span><span class="p">:</span> <span class="p">[</span><span class="n">runoff_mm</span><span class="o">.</span><span class="n">sum</span><span class="p">()],</span>
         <span class="s2">"Residual P - |ET| - R"</span><span class="p">:</span> <span class="p">[</span><span class="n">precip_mm</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">-</span> <span class="n">et_mm</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">-</span> <span class="n">runoff_mm</span><span class="o">.</span><span class="n">sum</span><span class="p">()],</span>
         <span class="s2">"Residual / P (%)"</span><span class="p">:</span> <span class="p">[</span>
-            <span class="mi">100</span> <span class="o">*</span> <span class="p">(</span><span class="n">precip_mm</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">-</span> <span class="n">et_mm</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">-</span> <span class="n">runoff_mm</span><span class="o">.</span><span class="n">sum</span><span class="p">())</span> <span class="o">/</span> <span class="nb">max</span><span class="p">(</span><span class="n">precip_mm</span><span class="o">.</span><span class="n">sum</span><span class="p">(),</span> <span class="mf">1e-9</span><span class="p">)</span>
+            <span class="mi">100</span>
+            <span class="o">*</span> <span class="p">(</span><span class="n">precip_mm</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">-</span> <span class="n">et_mm</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">-</span> <span class="n">runoff_mm</span><span class="o">.</span><span class="n">sum</span><span class="p">())</span>
+            <span class="o">/</span> <span class="nb">max</span><span class="p">(</span><span class="n">precip_mm</span><span class="o">.</span><span class="n">sum</span><span class="p">(),</span> <span class="mf">1e-9</span><span class="p">)</span>
         <span class="p">],</span>
     <span class="p">}</span>
 <span class="p">)</span>
@@ -12424,12 +12438,14 @@ has substantial groundwater export or interannual storage swings.</p>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-5">annual = pd.DataFrame(
     {
-        "P (mm/yr)":   [precip_mm.sum()],
+        "P (mm/yr)": [precip_mm.sum()],
         "|ET| (mm/yr)": [et_mm.sum()],
-        "R (mm/yr)":   [runoff_mm.sum()],
+        "R (mm/yr)": [runoff_mm.sum()],
         "Residual P - |ET| - R": [precip_mm.sum() - et_mm.sum() - runoff_mm.sum()],
         "Residual / P (%)": [
-            100 * (precip_mm.sum() - et_mm.sum() - runoff_mm.sum()) / max(precip_mm.sum(), 1e-9)
+            100
+            * (precip_mm.sum() - et_mm.sum() - runoff_mm.sum())
+            / max(precip_mm.sum(), 1e-9)
         ],
     }
 )

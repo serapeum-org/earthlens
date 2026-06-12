@@ -11654,8 +11654,7 @@ OUT_DIR.mkdir(exist_ok=True)
 # Set FIRMS_MAP_KEY in your environment; the live cells below skip cleanly
 # (nbval-lax-safe) when it is absent, so the notebook never fails offline.
 HAS_KEY = bool(os.environ.get('FIRMS_MAP_KEY'))
-print('FIRMS_MAP_KEY set:', HAS_KEY)
-</div>
+print('FIRMS_MAP_KEY set:', HAS_KEY)</div>
 </div>
 </div>
 </div>
@@ -11729,8 +11728,7 @@ if HAS_KEY:
         ).download(progress_bar=False)
         print('detections:', len(fires))
     except Exception as exc:  # keep the notebook nbval-lax-safe
-        print('skipped live query:', exc)
-</div>
+        print('skipped live query:', exc)</div>
 </div>
 </div>
 </div>
@@ -11767,17 +11765,32 @@ if HAS_KEY:
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="k">if</span> <span class="n">fires</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">fires</span><span class="p">):</span>
-    <span class="n">cols</span> <span class="o">=</span> <span class="p">[</span><span class="s1">'acq_datetime'</span><span class="p">,</span> <span class="s1">'sensor'</span><span class="p">,</span> <span class="s1">'confidence'</span><span class="p">,</span> <span class="s1">'confidence_pct'</span><span class="p">,</span>
-            <span class="s1">'brightness_k'</span><span class="p">,</span> <span class="s1">'frp'</span><span class="p">,</span> <span class="s1">'daynight'</span><span class="p">,</span> <span class="s1">'geometry'</span><span class="p">]</span>
+    <span class="n">cols</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="s1">'acq_datetime'</span><span class="p">,</span>
+        <span class="s1">'sensor'</span><span class="p">,</span>
+        <span class="s1">'confidence'</span><span class="p">,</span>
+        <span class="s1">'confidence_pct'</span><span class="p">,</span>
+        <span class="s1">'brightness_k'</span><span class="p">,</span>
+        <span class="s1">'frp'</span><span class="p">,</span>
+        <span class="s1">'daynight'</span><span class="p">,</span>
+        <span class="s1">'geometry'</span><span class="p">,</span>
+    <span class="p">]</span>
     <span class="n">display</span><span class="p">(</span><span class="n">fires</span><span class="p">[</span><span class="n">cols</span><span class="p">]</span><span class="o">.</span><span class="n">head</span><span class="p">())</span>
     <span class="nb">print</span><span class="p">(</span><span class="s1">'CRS:'</span><span class="p">,</span> <span class="n">fires</span><span class="o">.</span><span class="n">crs</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-3">if fires is not None and len(fires):
-    cols = ['acq_datetime', 'sensor', 'confidence', 'confidence_pct',
-            'brightness_k', 'frp', 'daynight', 'geometry']
+    cols = [
+        'acq_datetime',
+        'sensor',
+        'confidence',
+        'confidence_pct',
+        'brightness_k',
+        'frp',
+        'daynight',
+        'geometry',
+    ]
     display(fires[cols].head())
-    print('CRS:', fires.crs)
-</div>
+    print('CRS:', fires.crs)</div>
 </div>
 </div>
 </div>
@@ -11829,8 +11842,7 @@ if HAS_KEY:
     ax.set_title(f'FIRMS VIIRS detections, {START} to {END} (colour = FRP, MW)')
     ax.set_xlabel('longitude')
     ax.set_ylabel('latitude')
-    plt.show()
-</div>
+    plt.show()</div>
 </div>
 </div>
 </div>

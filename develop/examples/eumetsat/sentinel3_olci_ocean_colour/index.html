@@ -11566,7 +11566,8 @@ OUT_DIR.mkdir(exist_ok=True)</div>
 <span class="k">try</span><span class="p">:</span>
     <span class="n">paths</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
         <span class="n">data_source</span><span class="o">=</span><span class="s1">'eumetsat'</span><span class="p">,</span>
-        <span class="n">dataset</span><span class="o">=</span><span class="s1">'s3-olci-l2-wfr'</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">'OL_2_WFR'</span><span class="p">],</span>
+        <span class="n">dataset</span><span class="o">=</span><span class="s1">'s3-olci-l2-wfr'</span><span class="p">,</span>
+        <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">'OL_2_WFR'</span><span class="p">],</span>
         <span class="n">start</span><span class="o">=</span><span class="s1">'2024-06-01'</span><span class="p">,</span>
         <span class="n">end</span><span class="o">=</span><span class="s1">'2024-06-01'</span><span class="p">,</span>
         <span class="n">aoi</span><span class="o">=</span><span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">40.0</span><span class="p">,</span> <span class="mf">5.0</span><span class="p">,</span> <span class="mf">45.0</span><span class="p">],</span>
@@ -11582,7 +11583,8 @@ OUT_DIR.mkdir(exist_ok=True)</div>
 try:
     paths = EarthLens(
         data_source='eumetsat',
-        dataset='s3-olci-l2-wfr', variables=['OL_2_WFR'],
+        dataset='s3-olci-l2-wfr',
+        variables=['OL_2_WFR'],
         start='2024-06-01',
         end='2024-06-01',
         aoi=[0.0, 40.0, 5.0, 45.0],
@@ -11592,8 +11594,7 @@ try:
 except Exception as exc:
     # No EUMETSAT_CONSUMER_KEY/SECRET, or a transient Data Store hiccup:
     # the notebook still runs top-to-bottom and reports the skip.
-    print(f'skipped live query: {type(exc).__name__}: {exc}')
-</div>
+    print(f'skipped live query: {type(exc).__name__}: {exc}')</div>
 </div>
 </div>
 </div>

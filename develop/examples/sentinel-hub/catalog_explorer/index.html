@@ -11673,11 +11673,15 @@ print('recipes:', len(cat.recipes))</div>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">cat</span><span class="o">.</span><span class="n">datasets</span><span class="p">):</span>
     <span class="n">col</span> <span class="o">=</span> <span class="n">cat</span><span class="o">.</span><span class="n">get_collection</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="n">key</span><span class="si">:</span><span class="s1">18s</span><span class="si">}</span><span class="s1"> -&gt; </span><span class="si">{</span><span class="n">col</span><span class="o">.</span><span class="n">sh_collection</span><span class="si">:</span><span class="s1">14s</span><span class="si">}</span><span class="s1"> </span><span class="si">{</span><span class="n">col</span><span class="o">.</span><span class="n">resolution</span><span class="si">}</span><span class="s1"> m, default bands </span><span class="si">{</span><span class="n">col</span><span class="o">.</span><span class="n">default_bands</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span>
+        <span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="n">key</span><span class="si">:</span><span class="s1">18s</span><span class="si">}</span><span class="s1"> -&gt; </span><span class="si">{</span><span class="n">col</span><span class="o">.</span><span class="n">sh_collection</span><span class="si">:</span><span class="s1">14s</span><span class="si">}</span><span class="s1"> </span><span class="si">{</span><span class="n">col</span><span class="o">.</span><span class="n">resolution</span><span class="si">}</span><span class="s1"> m, default bands </span><span class="si">{</span><span class="n">col</span><span class="o">.</span><span class="n">default_bands</span><span class="si">}</span><span class="s1">'</span>
+    <span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-2">for key in sorted(cat.datasets):
     col = cat.get_collection(key)
-    print(f'{key:18s} -&gt; {col.sh_collection:14s} {col.resolution} m, default bands {col.default_bands}')</div>
+    print(
+        f'{key:18s} -&gt; {col.sh_collection:14s} {col.resolution} m, default bands {col.default_bands}'
+    )</div>
 </div>
 </div>
 </div>

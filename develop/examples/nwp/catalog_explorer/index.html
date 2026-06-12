@@ -11562,10 +11562,12 @@ print(f'NWP models: {len(cat.datasets)}')</div>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># Models grouped by fetch backend (herbie / ecmwf-opendata / direct-https / meteofrance-api)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">Counter</span>
+
 <span class="nb">dict</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">Counter</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">backend</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">cat</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">values</span><span class="p">())</span><span class="o">.</span><span class="n">items</span><span class="p">()))</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-2"># Models grouped by fetch backend (herbie / ecmwf-opendata / direct-https / meteofrance-api)
 from collections import Counter
+
 dict(sorted(Counter(m.backend for m in cat.datasets.values()).items()))</div>
 </div>
 </div>

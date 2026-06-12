@@ -11752,9 +11752,7 @@ north_atlantic      16   132.5825
     <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
 
     <span class="n">fig</span><span class="p">,</span> <span class="p">(</span><span class="n">ax1</span><span class="p">,</span> <span class="n">ax2</span><span class="p">)</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">13</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
-    <span class="n">tracks</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">'basin'</span><span class="p">)[</span><span class="s1">'ace'</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="o">.</span><span class="n">sort_values</span><span class="p">()</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">barh</span><span class="p">(</span>
-        <span class="n">ax</span><span class="o">=</span><span class="n">ax1</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">'teal'</span>
-    <span class="p">)</span>
+    <span class="n">tracks</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">'basin'</span><span class="p">)[</span><span class="s1">'ace'</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="o">.</span><span class="n">sort_values</span><span class="p">()</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">barh</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax1</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">'teal'</span><span class="p">)</span>
     <span class="n">ax1</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">'Total ACE'</span><span class="p">)</span>
     <span class="n">ax1</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">'2018 ACE by basin'</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">basin</span><span class="p">,</span> <span class="n">grp</span> <span class="ow">in</span> <span class="n">tracks</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">'basin'</span><span class="p">):</span>
@@ -11770,9 +11768,7 @@ north_atlantic      16   132.5825
     import matplotlib.pyplot as plt
 
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(13, 5))
-    tracks.groupby('basin')['ace'].sum().sort_values().plot.barh(
-        ax=ax1, color='teal'
-    )
+    tracks.groupby('basin')['ace'].sum().sort_values().plot.barh(ax=ax1, color='teal')
     ax1.set_xlabel('Total ACE')
     ax1.set_title('2018 ACE by basin')
     for basin, grp in tracks.groupby('basin'):

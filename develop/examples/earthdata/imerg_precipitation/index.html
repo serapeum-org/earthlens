@@ -11555,7 +11555,8 @@ OUT_DIR.mkdir(exist_ok=True)</div>
 <span class="k">try</span><span class="p">:</span>
     <span class="n">paths</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
         <span class="n">data_source</span><span class="o">=</span><span class="s1">'earthdata'</span><span class="p">,</span>
-        <span class="n">dataset</span><span class="o">=</span><span class="s1">'GPM_3IMERGM_07'</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">'precipitation'</span><span class="p">],</span>
+        <span class="n">dataset</span><span class="o">=</span><span class="s1">'GPM_3IMERGM_07'</span><span class="p">,</span>
+        <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">'precipitation'</span><span class="p">],</span>
         <span class="n">start</span><span class="o">=</span><span class="s1">'2023-06-01'</span><span class="p">,</span>
         <span class="n">end</span><span class="o">=</span><span class="s1">'2023-06-30'</span><span class="p">,</span>
         <span class="n">aoi</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">180.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">60.0</span><span class="p">,</span> <span class="mf">180.0</span><span class="p">,</span> <span class="mf">60.0</span><span class="p">],</span>
@@ -11569,7 +11570,8 @@ OUT_DIR.mkdir(exist_ok=True)</div>
 try:
     paths = EarthLens(
         data_source='earthdata',
-        dataset='GPM_3IMERGM_07', variables=['precipitation'],
+        dataset='GPM_3IMERGM_07',
+        variables=['precipitation'],
         start='2023-06-01',
         end='2023-06-30',
         aoi=[-180.0, -60.0, 180.0, 60.0],

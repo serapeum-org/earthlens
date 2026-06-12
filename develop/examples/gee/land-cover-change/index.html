@@ -11951,10 +11951,12 @@ band ids (first 5):  ['Map']
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="k">try</span><span class="p">:</span>
-    <span class="n">gee</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span><span class="n">data_source</span><span class="o">=</span><span class="s2">"gee"</span><span class="p">,</span>
+    <span class="n">gee</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
+        <span class="n">data_source</span><span class="o">=</span><span class="s2">"gee"</span><span class="p">,</span>
         <span class="n">start</span><span class="o">=</span><span class="s1">'2021-01-01'</span><span class="p">,</span>
         <span class="n">end</span><span class="o">=</span><span class="s1">'2021-12-31'</span><span class="p">,</span>
-        <span class="n">dataset</span><span class="o">=</span><span class="s1">'ESA/WorldCover/v200'</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">'Map'</span><span class="p">],</span>
+        <span class="n">dataset</span><span class="o">=</span><span class="s1">'ESA/WorldCover/v200'</span><span class="p">,</span>
+        <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">'Map'</span><span class="p">],</span>
         <span class="n">aoi</span><span class="o">=</span><span class="p">[</span><span class="mf">31.1</span><span class="p">,</span> <span class="mf">29.9</span><span class="p">,</span> <span class="mf">31.3</span><span class="p">,</span> <span class="mf">30.1</span><span class="p">],</span>
         <span class="n">cadence</span><span class="o">=</span><span class="s1">'raw'</span><span class="p">,</span>
         <span class="n">path</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">OUT_DIR</span><span class="p">),</span>
@@ -11968,17 +11970,21 @@ band ids (first 5):  ['Map']
     <span class="n">download_ok</span> <span class="o">=</span> <span class="kc">True</span>
 <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
     <span class="k">if</span> <span class="kc">False</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'live EE call failed (tolerated for this category): </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">exc</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s1">: </span><span class="si">{</span><span class="n">exc</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s1">'live EE call failed (tolerated for this category): </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">exc</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s1">: </span><span class="si">{</span><span class="n">exc</span><span class="si">}</span><span class="s1">'</span>
+        <span class="p">)</span>
         <span class="n">paths</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">download_ok</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">raise</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-3">try:
-    gee = EarthLens(data_source="gee",
+    gee = EarthLens(
+        data_source="gee",
         start='2021-01-01',
         end='2021-12-31',
-        dataset='ESA/WorldCover/v200', variables=['Map'],
+        dataset='ESA/WorldCover/v200',
+        variables=['Map'],
         aoi=[31.1, 29.9, 31.3, 30.1],
         cadence='raw',
         path=str(OUT_DIR),
@@ -11992,7 +11998,9 @@ band ids (first 5):  ['Map']
     download_ok = True
 except Exception as exc:
     if False:
-        print(f'live EE call failed (tolerated for this category): {type(exc).__name__}: {exc}')
+        print(
+            f'live EE call failed (tolerated for this category): {type(exc).__name__}: {exc}'
+        )
         paths = []
         download_ok = False
     else:
@@ -12064,7 +12072,9 @@ except Exception as exc:
     <span class="n">nodata</span> <span class="o">=</span> <span class="n">pds</span><span class="o">.</span><span class="n">no_data_value</span>
     <span class="k">if</span> <span class="n">nodata</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="n">arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ma</span><span class="o">.</span><span class="n">masked_equal</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="nb">float</span><span class="p">(</span><span class="n">nodata</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">nodata</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">))</span> <span class="k">else</span> <span class="n">nodata</span><span class="p">))</span>
+            <span class="n">arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ma</span><span class="o">.</span><span class="n">masked_equal</span><span class="p">(</span>
+                <span class="n">arr</span><span class="p">,</span> <span class="nb">float</span><span class="p">(</span><span class="n">nodata</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">nodata</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">))</span> <span class="k">else</span> <span class="n">nodata</span><span class="p">)</span>
+            <span class="p">)</span>
         <span class="k">except</span> <span class="p">(</span><span class="ne">TypeError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">):</span>
             <span class="k">pass</span>
     <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
@@ -12088,7 +12098,9 @@ else:
     nodata = pds.no_data_value
     if nodata is not None:
         try:
-            arr = np.ma.masked_equal(arr, float(nodata[0] if isinstance(nodata, (list, tuple)) else nodata))
+            arr = np.ma.masked_equal(
+                arr, float(nodata[0] if isinstance(nodata, (list, tuple)) else nodata)
+            )
         except (TypeError, ValueError):
             pass
     fig, ax = plt.subplots(figsize=(6, 5))
@@ -12156,7 +12168,8 @@ else:
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ee</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.gee</span><span class="w"> </span><span class="kn">import</span> <span class="n">list_recent_tasks</span><span class="p">,</span> <span class="n">wait_for_task_id</span><span class="p">,</span> <span class="n">cancel_task</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.gee</span><span class="w"> </span><span class="kn">import</span> <span class="n">cancel_task</span><span class="p">,</span> <span class="n">list_recent_tasks</span><span class="p">,</span> <span class="n">wait_for_task_id</span>
 
 <span class="c1"># The asset goes into a `Folder` asset that we own. `GEE._export_via_batch`</span>
 <span class="c1"># writes the actual image at `&lt;asset_id&gt;/&lt;prefix&gt;`, so `asset_id` here is</span>
@@ -12180,7 +12193,8 @@ else:
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'created folder: </span><span class="si">{</span><span class="n">DEMO_FOLDER</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-5">import ee
-from earthlens.gee import list_recent_tasks, wait_for_task_id, cancel_task
+
+from earthlens.gee import cancel_task, list_recent_tasks, wait_for_task_id
 
 # The asset goes into a `Folder` asset that we own. `GEE._export_via_batch`
 # writes the actual image at `&lt;asset_id&gt;/&lt;prefix&gt;`, so `asset_id` here is
@@ -12260,10 +12274,12 @@ print(f'created folder: {DEMO_FOLDER}')</div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">submitted_ok</span> <span class="o">=</span> <span class="kc">False</span>
 <span class="n">task_info</span> <span class="o">=</span> <span class="kc">None</span>
 <span class="k">try</span><span class="p">:</span>
-    <span class="n">async_gee</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span><span class="n">data_source</span><span class="o">=</span><span class="s2">"gee"</span><span class="p">,</span>
+    <span class="n">async_gee</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
+        <span class="n">data_source</span><span class="o">=</span><span class="s2">"gee"</span><span class="p">,</span>
         <span class="n">start</span><span class="o">=</span><span class="s1">'2021-01-01'</span><span class="p">,</span>
         <span class="n">end</span><span class="o">=</span><span class="s1">'2021-12-31'</span><span class="p">,</span>
-        <span class="n">dataset</span><span class="o">=</span><span class="s1">'ESA/WorldCover/v200'</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">'Map'</span><span class="p">],</span>
+        <span class="n">dataset</span><span class="o">=</span><span class="s1">'ESA/WorldCover/v200'</span><span class="p">,</span>
+        <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">'Map'</span><span class="p">],</span>
         <span class="n">aoi</span><span class="o">=</span><span class="p">[</span><span class="mf">31.1</span><span class="p">,</span> <span class="mf">29.9</span><span class="p">,</span> <span class="mf">31.3</span><span class="p">,</span> <span class="mf">30.1</span><span class="p">],</span>
         <span class="n">cadence</span><span class="o">=</span><span class="s1">'raw'</span><span class="p">,</span>
         <span class="n">path</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">OUT_DIR</span><span class="p">),</span>
@@ -12287,10 +12303,12 @@ print(f'created folder: {DEMO_FOLDER}')</div>
 <div class="clipboard-copy-txt" id="cell-6">submitted_ok = False
 task_info = None
 try:
-    async_gee = EarthLens(data_source="gee",
+    async_gee = EarthLens(
+        data_source="gee",
         start='2021-01-01',
         end='2021-12-31',
-        dataset='ESA/WorldCover/v200', variables=['Map'],
+        dataset='ESA/WorldCover/v200',
+        variables=['Map'],
         aoi=[31.1, 29.9, 31.3, 30.1],
         cadence='raw',
         path=str(OUT_DIR),
@@ -12376,7 +12394,9 @@ except Exception as exc:
         <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'  </span><span class="si">{</span><span class="n">t</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s1">  </span><span class="si">{</span><span class="n">t</span><span class="o">.</span><span class="n">state</span><span class="si">:</span><span class="s1">&lt;12</span><span class="si">}</span><span class="s1"> </span><span class="si">{</span><span class="n">t</span><span class="o">.</span><span class="n">description</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="n">final</span> <span class="o">=</span> <span class="n">wait_for_task_id</span><span class="p">(</span>
-            <span class="n">task_info</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">poll_seconds</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">progress_bar</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">task_info</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+            <span class="n">poll_seconds</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+            <span class="n">progress_bar</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'</span><span class="se">\n</span><span class="s1">final state: </span><span class="si">{</span><span class="n">final</span><span class="o">.</span><span class="n">state</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
     <span class="k">except</span> <span class="ne">RuntimeError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
@@ -12400,7 +12420,9 @@ except Exception as exc:
         print(f'  {t.id}  {t.state:&lt;12} {t.description}')
     try:
         final = wait_for_task_id(
-            task_info.id, poll_seconds=10, progress_bar=False,
+            task_info.id,
+            poll_seconds=10,
+            progress_bar=False,
         )
         print(f'\nfinal state: {final.state}')
     except RuntimeError as exc:
@@ -12474,8 +12496,7 @@ final state: COMPLETED
     <span class="n">produced</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="n">DEMO_FOLDER</span><span class="si">}</span><span class="s1">/</span><span class="si">{</span><span class="n">task_info</span><span class="o">.</span><span class="n">description</span><span class="si">}</span><span class="s1">'</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="n">meta</span> <span class="o">=</span> <span class="n">ee</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">getAsset</span><span class="p">(</span><span class="n">produced</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'asset exists: type=</span><span class="si">{</span><span class="n">meta</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"type"</span><span class="p">)</span><span class="si">}</span><span class="s1"> '</span>
-              <span class="sa">f</span><span class="s1">'name=</span><span class="si">{</span><span class="n">meta</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"name"</span><span class="p">)</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'asset exists: type=</span><span class="si">{</span><span class="n">meta</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"type"</span><span class="p">)</span><span class="si">}</span><span class="s1"> '</span> <span class="sa">f</span><span class="s1">'name=</span><span class="si">{</span><span class="n">meta</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"name"</span><span class="p">)</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
         <span class="n">ee</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">deleteAsset</span><span class="p">(</span><span class="n">produced</span><span class="p">)</span>
         <span class="nb">print</span><span class="p">(</span><span class="s1">'asset deleted'</span><span class="p">)</span>
     <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
@@ -12491,8 +12512,7 @@ final state: COMPLETED
     produced = f'{DEMO_FOLDER}/{task_info.description}'
     try:
         meta = ee.data.getAsset(produced)
-        print(f'asset exists: type={meta.get("type")} '
-              f'name={meta.get("name")}')
+        print(f'asset exists: type={meta.get("type")} ' f'name={meta.get("name")}')
         ee.data.deleteAsset(produced)
         print('asset deleted')
     except Exception as exc:

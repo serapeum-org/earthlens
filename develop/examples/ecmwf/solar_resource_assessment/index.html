@@ -11793,7 +11793,8 @@ seasonal cycle and inter-annual variability.</p>
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">earthlens</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span><span class="p">,</span> <span class="n">AggregationConfig</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">earthlens</span><span class="w"> </span><span class="kn">import</span> <span class="n">AggregationConfig</span><span class="p">,</span> <span class="n">EarthLens</span>
 
 <span class="n">OUT</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">"data/era5-solar-seville"</span><span class="p">)</span>
 <span class="n">OUT</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -11803,16 +11804,18 @@ seasonal cycle and inter-annual variability.</p>
     <span class="n">cadence</span><span class="o">=</span><span class="s2">"monthly"</span><span class="p">,</span>
     <span class="n">start</span><span class="o">=</span><span class="s2">"2021-01-01"</span><span class="p">,</span>
     <span class="n">end</span><span class="o">=</span><span class="s2">"2022-12-01"</span><span class="p">,</span>
-    <span class="n">dataset</span><span class="o">=</span><span class="s2">"reanalysis-era5-single-levels-monthly-means"</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="p">[</span>
-            <span class="s2">"surface-solar-radiation-downwards"</span><span class="p">,</span>
-        <span class="p">],</span>
+    <span class="n">dataset</span><span class="o">=</span><span class="s2">"reanalysis-era5-single-levels-monthly-means"</span><span class="p">,</span>
+    <span class="n">variables</span><span class="o">=</span><span class="p">[</span>
+        <span class="s2">"surface-solar-radiation-downwards"</span><span class="p">,</span>
+    <span class="p">],</span>
     <span class="n">aoi</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">6.0</span><span class="p">,</span> <span class="mf">37.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">5.0</span><span class="p">,</span> <span class="mf">38.0</span><span class="p">],</span>
     <span class="n">path</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">OUT</span><span class="p">),</span>
 <span class="p">)</span>
 <span class="n">earthlens</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">aggregate</span><span class="o">=</span><span class="n">AggregationConfig</span><span class="p">(</span><span class="n">freq</span><span class="o">=</span><span class="s2">"1MS"</span><span class="p">,</span> <span class="n">op</span><span class="o">=</span><span class="s2">"auto"</span><span class="p">))</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-2">from pathlib import Path
-from earthlens import EarthLens, AggregationConfig
+
+from earthlens import AggregationConfig, EarthLens
 
 OUT = Path("data/era5-solar-seville")
 OUT.mkdir(parents=True, exist_ok=True)
@@ -11822,9 +11825,10 @@ earthlens = EarthLens(
     cadence="monthly",
     start="2021-01-01",
     end="2022-12-01",
-    dataset="reanalysis-era5-single-levels-monthly-means", variables=[
-            "surface-solar-radiation-downwards",
-        ],
+    dataset="reanalysis-era5-single-levels-monthly-means",
+    variables=[
+        "surface-solar-radiation-downwards",
+    ],
     aoi=[-6.0, 37.0, -5.0, 38.0],
     path=str(OUT),
 )
@@ -11881,9 +11885,9 @@ earthlens.download(aggregate=AggregationConfig(freq="1MS", op="auto"))</div>
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jupyter-widgets jp-OutputArea-output" id="04819ecf-f7b5-496f-acd0-bf3ce5bcf704" tabindex="0">
+<div class="jupyter-widgets jp-OutputArea-output" id="6e9f71e5-92fc-46b6-b4d3-4dfa4220cefa" tabindex="0">
 <script type="text/javascript">
-var element = document.getElementById('04819ecf-f7b5-496f-acd0-bf3ce5bcf704');
+var element = document.getElementById('6e9f71e5-92fc-46b6-b4d3-4dfa4220cefa');
 </script>
 <script type="application/vnd.jupyter.widget-view+json">
 {"model_id": "e6b1f0ba16424235b9a11248e8b18ff4", "version_major": 2, "version_minor": 0}
@@ -11940,9 +11944,10 @@ by <code>(3.6e6 × days)</code> to express in kWh/m²/day.</p>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">calendar</span><span class="w"> </span><span class="kn">import</span> <span class="n">monthrange</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">calendar</span><span class="w"> </span><span class="kn">import</span> <span class="n">monthrange</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span>
 
 <span class="n">agg</span> <span class="o">=</span> <span class="n">OUT</span> <span class="o">/</span> <span class="s2">"aggregated"</span>
@@ -11955,8 +11960,8 @@ by <code>(3.6e6 × days)</code> to express in kWh/m²/day.</p>
 <span class="n">secs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">monthrange</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">year</span><span class="p">,</span> <span class="n">m</span><span class="o">.</span><span class="n">month</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="mi">86400</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">months</span><span class="p">])</span>
 <span class="n">days</span> <span class="o">=</span> <span class="n">secs</span> <span class="o">/</span> <span class="mi">86400</span>
 
-<span class="n">Wpm2</span>     <span class="o">=</span> <span class="n">site_total_J</span> <span class="o">/</span> <span class="n">secs</span>            <span class="c1"># average power density</span>
-<span class="n">kWh_day</span>  <span class="o">=</span> <span class="n">site_total_J</span> <span class="o">/</span> <span class="p">(</span><span class="mf">3.6e6</span> <span class="o">*</span> <span class="n">days</span><span class="p">)</span>  <span class="c1"># daily energy yield per m²</span>
+<span class="n">Wpm2</span> <span class="o">=</span> <span class="n">site_total_J</span> <span class="o">/</span> <span class="n">secs</span>  <span class="c1"># average power density</span>
+<span class="n">kWh_day</span> <span class="o">=</span> <span class="n">site_total_J</span> <span class="o">/</span> <span class="p">(</span><span class="mf">3.6e6</span> <span class="o">*</span> <span class="n">days</span><span class="p">)</span>  <span class="c1"># daily energy yield per m²</span>
 
 <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
     <span class="p">{</span><span class="s2">"GHI [W/m²]"</span><span class="p">:</span> <span class="n">Wpm2</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="s2">"GHI [kWh/m²/day]"</span><span class="p">:</span> <span class="n">kWh_day</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">2</span><span class="p">)},</span>
@@ -11964,9 +11969,10 @@ by <code>(3.6e6 × days)</code> to express in kWh/m²/day.</p>
 <span class="p">)</span>
 <span class="n">df</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-3">import numpy as np
+<div class="clipboard-copy-txt" id="cell-3">from calendar import monthrange
+
+import numpy as np
 import pandas as pd
-from calendar import monthrange
 from pyramids.dataset import Dataset
 
 agg = OUT / "aggregated"
@@ -11979,8 +11985,8 @@ site_total_J = np.nanmean(joules_per_m2, axis=(1, 2))
 secs = np.array([monthrange(m.year, m.month)[1] * 86400 for m in months])
 days = secs / 86400
 
-Wpm2     = site_total_J / secs            # average power density
-kWh_day  = site_total_J / (3.6e6 * days)  # daily energy yield per m²
+Wpm2 = site_total_J / secs  # average power density
+kWh_day = site_total_J / (3.6e6 * days)  # daily energy yield per m²
 
 df = pd.DataFrame(
     {"GHI [W/m²]": Wpm2.round(1), "GHI [kWh/m²/day]": kWh_day.round(2)},

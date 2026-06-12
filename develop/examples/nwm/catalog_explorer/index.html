@@ -11729,14 +11729,18 @@ horizon, and — for ensembles — its member count.</p>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">cat</span><span class="o">.</span><span class="n">configurations</span><span class="p">):</span>
     <span class="n">c</span> <span class="o">=</span> <span class="n">cat</span><span class="o">.</span><span class="n">get_config</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
     <span class="n">kind</span> <span class="o">=</span> <span class="s1">'ensemble (</span><span class="si">%d</span><span class="s1"> members)'</span> <span class="o">%</span> <span class="n">c</span><span class="o">.</span><span class="n">members</span> <span class="k">if</span> <span class="n">c</span><span class="o">.</span><span class="n">members</span> <span class="k">else</span> <span class="s1">'deterministic'</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="n">key</span><span class="si">:</span><span class="s1">16s</span><span class="si">}</span><span class="s1"> </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">cycles_utc</span><span class="p">)</span><span class="si">:</span><span class="s1">2d</span><span class="si">}</span><span class="s1"> cycles/day  </span><span class="si">{</span><span class="n">c</span><span class="o">.</span><span class="n">step_kind</span><span class="si">:</span><span class="s1">8s</span><span class="si">}</span><span class="s1"> '</span>
-          <span class="sa">f</span><span class="s1">'first=</span><span class="si">{</span><span class="n">c</span><span class="o">.</span><span class="n">first_step</span><span class="si">}</span><span class="s1"> horizon=</span><span class="si">{</span><span class="n">c</span><span class="o">.</span><span class="n">horizon_h</span><span class="si">}</span><span class="s1">h  </span><span class="si">{</span><span class="n">kind</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span>
+        <span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="n">key</span><span class="si">:</span><span class="s1">16s</span><span class="si">}</span><span class="s1"> </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">cycles_utc</span><span class="p">)</span><span class="si">:</span><span class="s1">2d</span><span class="si">}</span><span class="s1"> cycles/day  </span><span class="si">{</span><span class="n">c</span><span class="o">.</span><span class="n">step_kind</span><span class="si">:</span><span class="s1">8s</span><span class="si">}</span><span class="s1"> '</span>
+        <span class="sa">f</span><span class="s1">'first=</span><span class="si">{</span><span class="n">c</span><span class="o">.</span><span class="n">first_step</span><span class="si">}</span><span class="s1"> horizon=</span><span class="si">{</span><span class="n">c</span><span class="o">.</span><span class="n">horizon_h</span><span class="si">}</span><span class="s1">h  </span><span class="si">{</span><span class="n">kind</span><span class="si">}</span><span class="s1">'</span>
+    <span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-3">for key in sorted(cat.configurations):
     c = cat.get_config(key)
     kind = 'ensemble (%d members)' % c.members if c.members else 'deterministic'
-    print(f'{key:16s} {len(c.cycles_utc):2d} cycles/day  {c.step_kind:8s} '
-          f'first={c.first_step} horizon={c.horizon_h}h  {kind}')</div>
+    print(
+        f'{key:16s} {len(c.cycles_utc):2d} cycles/day  {c.step_kind:8s} '
+        f'first={c.first_step} horizon={c.horizon_h}h  {kind}'
+    )</div>
 </div>
 </div>
 </div>
@@ -11777,22 +11781,32 @@ whole-file download.</p>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
 
-<span class="n">nwm</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span><span class="n">data_source</span><span class="o">=</span><span class="s2">"nwm"</span><span class="p">,</span>
-    <span class="n">start</span><span class="o">=</span><span class="s1">'2026-05-26'</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s1">'2026-05-26'</span><span class="p">,</span>
-    <span class="n">dataset</span><span class="o">=</span><span class="s1">'chrtout'</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">'streamflow'</span><span class="p">],</span>
+<span class="n">nwm</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
+    <span class="n">data_source</span><span class="o">=</span><span class="s2">"nwm"</span><span class="p">,</span>
+    <span class="n">start</span><span class="o">=</span><span class="s1">'2026-05-26'</span><span class="p">,</span>
+    <span class="n">end</span><span class="o">=</span><span class="s1">'2026-05-26'</span><span class="p">,</span>
+    <span class="n">dataset</span><span class="o">=</span><span class="s1">'chrtout'</span><span class="p">,</span>
+    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">'streamflow'</span><span class="p">],</span>
     <span class="n">aoi</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">180</span><span class="p">,</span> <span class="o">-</span><span class="mi">90</span><span class="p">,</span> <span class="mi">180</span><span class="p">,</span> <span class="mi">90</span><span class="p">],</span>
-    <span class="n">configuration</span><span class="o">=</span><span class="s1">'short_range'</span><span class="p">,</span> <span class="n">cycles</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">6</span><span class="p">],</span> <span class="n">steps</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span>
+    <span class="n">configuration</span><span class="o">=</span><span class="s1">'short_range'</span><span class="p">,</span>
+    <span class="n">cycles</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">6</span><span class="p">],</span>
+    <span class="n">steps</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span>
 <span class="p">)</span>
 <span class="k">for</span> <span class="n">rp</span> <span class="ow">in</span> <span class="n">nwm</span><span class="o">.</span><span class="n">_search</span><span class="p">():</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">rp</span><span class="o">.</span><span class="n">href</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-4">from earthlens import EarthLens
 
-nwm = EarthLens(data_source="nwm",
-    start='2026-05-26', end='2026-05-26',
-    dataset='chrtout', variables=['streamflow'],
+nwm = EarthLens(
+    data_source="nwm",
+    start='2026-05-26',
+    end='2026-05-26',
+    dataset='chrtout',
+    variables=['streamflow'],
     aoi=[-180, -90, 180, 90],
-    configuration='short_range', cycles=[0, 6], steps=[1, 3],
+    configuration='short_range',
+    cycles=[0, 6],
+    steps=[1, 3],
 )
 for rp in nwm._search():
     print(rp.href)</div>
@@ -11832,19 +11846,31 @@ the product token (<code>channel_rt_1</code>):</p>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">ens</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span><span class="n">data_source</span><span class="o">=</span><span class="s2">"nwm"</span><span class="p">,</span>
-    <span class="n">start</span><span class="o">=</span><span class="s1">'2026-05-26'</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s1">'2026-05-26'</span><span class="p">,</span>
-    <span class="n">dataset</span><span class="o">=</span><span class="s1">'chrtout'</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">'streamflow'</span><span class="p">],</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">ens</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
+    <span class="n">data_source</span><span class="o">=</span><span class="s2">"nwm"</span><span class="p">,</span>
+    <span class="n">start</span><span class="o">=</span><span class="s1">'2026-05-26'</span><span class="p">,</span>
+    <span class="n">end</span><span class="o">=</span><span class="s1">'2026-05-26'</span><span class="p">,</span>
+    <span class="n">dataset</span><span class="o">=</span><span class="s1">'chrtout'</span><span class="p">,</span>
+    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">'streamflow'</span><span class="p">],</span>
     <span class="n">aoi</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">180</span><span class="p">,</span> <span class="o">-</span><span class="mi">90</span><span class="p">,</span> <span class="mi">180</span><span class="p">,</span> <span class="mi">90</span><span class="p">],</span>
-    <span class="n">configuration</span><span class="o">=</span><span class="s1">'medium_range'</span><span class="p">,</span> <span class="n">member</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">cycles</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">steps</span><span class="o">=</span><span class="p">[</span><span class="mi">240</span><span class="p">],</span>
+    <span class="n">configuration</span><span class="o">=</span><span class="s1">'medium_range'</span><span class="p">,</span>
+    <span class="n">member</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+    <span class="n">cycles</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+    <span class="n">steps</span><span class="o">=</span><span class="p">[</span><span class="mi">240</span><span class="p">],</span>
 <span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">ens</span><span class="o">.</span><span class="n">_search</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">href</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-5">ens = EarthLens(data_source="nwm",
-    start='2026-05-26', end='2026-05-26',
-    dataset='chrtout', variables=['streamflow'],
+<div class="clipboard-copy-txt" id="cell-5">ens = EarthLens(
+    data_source="nwm",
+    start='2026-05-26',
+    end='2026-05-26',
+    dataset='chrtout',
+    variables=['streamflow'],
     aoi=[-180, -90, 180, 90],
-    configuration='medium_range', member=3, cycles=[0], steps=[240],
+    configuration='medium_range',
+    member=3,
+    cycles=[0],
+    steps=[240],
 )
 print(ens._search()[0].href)</div>
 </div>

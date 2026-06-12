@@ -11791,7 +11791,9 @@ for res, n in sorted(by_res.items(), key=lambda kv: -kv[1]):
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">d</span> <span class="o">=</span> <span class="n">cat</span><span class="o">.</span><span class="n">datasets</span><span class="p">[</span><span class="s1">'global-daily'</span><span class="p">]</span>
 <span class="nb">print</span><span class="p">(</span><span class="s1">'region            :'</span><span class="p">,</span> <span class="n">d</span><span class="o">.</span><span class="n">region</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">'temporal_resolution:'</span><span class="p">,</span> <span class="n">d</span><span class="o">.</span><span class="n">temporal_resolution</span><span class="p">,</span> <span class="s1">'(pandas freq'</span><span class="p">,</span> <span class="n">d</span><span class="o">.</span><span class="n">pandas_freq</span> <span class="o">+</span> <span class="s1">')'</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span>
+    <span class="s1">'temporal_resolution:'</span><span class="p">,</span> <span class="n">d</span><span class="o">.</span><span class="n">temporal_resolution</span><span class="p">,</span> <span class="s1">'(pandas freq'</span><span class="p">,</span> <span class="n">d</span><span class="o">.</span><span class="n">pandas_freq</span> <span class="o">+</span> <span class="s1">')'</span>
+<span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s1">'spatial_resolution :'</span><span class="p">,</span> <span class="n">d</span><span class="o">.</span><span class="n">spatial_resolution</span><span class="p">,</span> <span class="s1">'deg'</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s1">'lat boundaries     :'</span><span class="p">,</span> <span class="n">d</span><span class="o">.</span><span class="n">lat_boundaries</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s1">'lon boundaries     :'</span><span class="p">,</span> <span class="n">d</span><span class="o">.</span><span class="n">lon_boundaries</span><span class="p">)</span>
@@ -11801,7 +11803,9 @@ for res, n in sorted(by_res.items(), key=lambda kv: -kv[1]):
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-3">d = cat.datasets['global-daily']
 print('region            :', d.region)
-print('temporal_resolution:', d.temporal_resolution, '(pandas freq', d.pandas_freq + ')')
+print(
+    'temporal_resolution:', d.temporal_resolution, '(pandas freq', d.pandas_freq + ')'
+)
 print('spatial_resolution :', d.spatial_resolution, 'deg')
 print('lat boundaries     :', d.lat_boundaries)
 print('lon boundaries     :', d.lon_boundaries)

@@ -11574,7 +11574,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </style>
 <!-- End of mermaid configuration --><div class="jupyter-wrapper">
 <div class="jp-Notebook" data-jp-theme-light="true" data-jp-theme-name="JupyterLab Light">
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=2e694358">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=0e895307">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -11585,7 +11585,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=f0c4099a">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=518d75e1">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -11622,7 +11622,7 @@ print("MPC S2 id:", cat.resolve("planetary-computer", "sentinel-2-l2a"))</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=c9ad2e54">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=e5d66706">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -11633,7 +11633,7 @@ print("MPC S2 id:", cat.resolve("planetary-computer", "sentinel-2-l2a"))</div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=a2fe8324">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=78cc2e16">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -11652,14 +11652,20 @@ print("MPC S2 id:", cat.resolve("planetary-computer", "sentinel-2-l2a"))</div>
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">tempfile</span>
+
 <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.earthlens</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
 
-<span class="n">aoi</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">40.40</span><span class="p">,</span> <span class="mf">40.45</span><span class="p">],</span> <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">3.72</span><span class="p">,</span> <span class="o">-</span><span class="mf">3.67</span><span class="p">],</span> <span class="n">start</span><span class="o">=</span><span class="s2">"2024-06-01"</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">"2024-06-20"</span><span class="p">)</span>
+<span class="n">aoi</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">40.40</span><span class="p">,</span> <span class="mf">40.45</span><span class="p">],</span> <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">3.72</span><span class="p">,</span> <span class="o">-</span><span class="mf">3.67</span><span class="p">],</span> <span class="n">start</span><span class="o">=</span><span class="s2">"2024-06-01"</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">"2024-06-20"</span>
+<span class="p">)</span>
 <span class="k">try</span><span class="p">:</span>
     <span class="n">mpc</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
         <span class="n">data_source</span><span class="o">=</span><span class="s2">"planetary-computer"</span><span class="p">,</span>
-        <span class="n">dataset</span><span class="o">=</span><span class="s2">"sentinel-2-l2a"</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">"B04"</span><span class="p">,</span> <span class="s2">"B03"</span><span class="p">,</span> <span class="s2">"B02"</span><span class="p">],</span>
-        <span class="n">path</span><span class="o">=</span><span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">(),</span> <span class="n">max_items</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="o">**</span><span class="n">aoi</span><span class="p">,</span>
+        <span class="n">dataset</span><span class="o">=</span><span class="s2">"sentinel-2-l2a"</span><span class="p">,</span>
+        <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">"B04"</span><span class="p">,</span> <span class="s2">"B03"</span><span class="p">,</span> <span class="s2">"B02"</span><span class="p">],</span>
+        <span class="n">path</span><span class="o">=</span><span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">(),</span>
+        <span class="n">max_items</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">aoi</span><span class="p">,</span>
     <span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
 <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>  <span class="c1"># noqa: BLE001 - stays runnable offline</span>
     <span class="n">mpc</span> <span class="o">=</span> <span class="p">[]</span>
@@ -11667,14 +11673,20 @@ print("MPC S2 id:", cat.resolve("planetary-computer", "sentinel-2-l2a"))</div>
 <span class="p">[</span><span class="n">p</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">mpc</span><span class="p">]</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-2">import tempfile
+
 from earthlens.earthlens import EarthLens
 
-aoi = dict(lat_lim=[40.40, 40.45], lon_lim=[-3.72, -3.67], start="2024-06-01", end="2024-06-20")
+aoi = dict(
+    lat_lim=[40.40, 40.45], lon_lim=[-3.72, -3.67], start="2024-06-01", end="2024-06-20"
+)
 try:
     mpc = EarthLens(
         data_source="planetary-computer",
-        dataset="sentinel-2-l2a", variables=["B04", "B03", "B02"],
-        path=tempfile.mkdtemp(), max_items=1, **aoi,
+        dataset="sentinel-2-l2a",
+        variables=["B04", "B03", "B02"],
+        path=tempfile.mkdtemp(),
+        max_items=1,
+        **aoi,
     ).download()
 except Exception as exc:  # noqa: BLE001 - stays runnable offline
     mpc = []
@@ -11686,7 +11698,7 @@ except Exception as exc:  # noqa: BLE001 - stays runnable offline
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=d6392b87">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=7aeac2b7">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>

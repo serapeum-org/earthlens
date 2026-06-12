@@ -11555,7 +11555,8 @@ OUT_DIR.mkdir(exist_ok=True)</div>
 <span class="k">try</span><span class="p">:</span>
     <span class="n">paths</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
         <span class="n">data_source</span><span class="o">=</span><span class="s1">'earthdata'</span><span class="p">,</span>
-        <span class="n">dataset</span><span class="o">=</span><span class="s1">'SPL3SMP_E_006'</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">'soil_moisture'</span><span class="p">],</span>
+        <span class="n">dataset</span><span class="o">=</span><span class="s1">'SPL3SMP_E_006'</span><span class="p">,</span>
+        <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">'soil_moisture'</span><span class="p">],</span>
         <span class="n">start</span><span class="o">=</span><span class="s1">'2023-06-01'</span><span class="p">,</span>
         <span class="n">end</span><span class="o">=</span><span class="s1">'2023-06-01'</span><span class="p">,</span>
         <span class="n">aoi</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">180.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">90.0</span><span class="p">,</span> <span class="mf">180.0</span><span class="p">,</span> <span class="mf">90.0</span><span class="p">],</span>
@@ -11569,7 +11570,8 @@ OUT_DIR.mkdir(exist_ok=True)</div>
 try:
     paths = EarthLens(
         data_source='earthdata',
-        dataset='SPL3SMP_E_006', variables=['soil_moisture'],
+        dataset='SPL3SMP_E_006',
+        variables=['soil_moisture'],
         start='2023-06-01',
         end='2023-06-01',
         aoi=[-180.0, -90.0, 180.0, 90.0],
@@ -11605,8 +11607,8 @@ except Exception as exc:
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="k">if</span> <span class="n">paths</span><span class="p">:</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="kn">import</span><span class="w"> </span><span class="nn">h5py</span>
-        <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
         <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
         <span class="k">with</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="n">paths</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s1">'r'</span><span class="p">)</span> <span class="k">as</span> <span class="n">h5</span><span class="p">:</span>
             <span class="n">sm</span> <span class="o">=</span> <span class="n">h5</span><span class="p">[</span><span class="s1">'Soil_Moisture_Retrieval_Data_AM/soil_moisture'</span><span class="p">][:]</span>
@@ -11623,8 +11625,8 @@ except Exception as exc:
 <div class="clipboard-copy-txt" id="cell-3">if paths:
     try:
         import h5py
-        import numpy as np
         import matplotlib.pyplot as plt
+        import numpy as np
 
         with h5py.File(paths[0], 'r') as h5:
             sm = h5['Soil_Moisture_Retrieval_Data_AM/soil_moisture'][:]

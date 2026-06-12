@@ -11546,6 +11546,7 @@ OUT = "_overture_out"</div>
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
+
 <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.earthlens</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.overture</span><span class="w"> </span><span class="kn">import</span> <span class="n">LicenseWarning</span>
 
@@ -11553,8 +11554,10 @@ OUT = "_overture_out"</div>
     <span class="n">warnings</span><span class="o">.</span><span class="n">simplefilter</span><span class="p">(</span><span class="s1">'always'</span><span class="p">)</span>
     <span class="n">paths</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
         <span class="n">data_source</span><span class="o">=</span><span class="s2">"overture"</span><span class="p">,</span>
-        <span class="n">dataset</span><span class="o">=</span><span class="s2">"buildings"</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="p">[],</span>
-        <span class="n">aoi</span><span class="o">=</span><span class="p">[</span><span class="n">LON_LIM</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">LAT_LIM</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">LON_LIM</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">LAT_LIM</span><span class="p">[</span><span class="mi">1</span><span class="p">]],</span> <span class="n">path</span><span class="o">=</span><span class="n">OUT</span><span class="p">,</span>
+        <span class="n">dataset</span><span class="o">=</span><span class="s2">"buildings"</span><span class="p">,</span>
+        <span class="n">variables</span><span class="o">=</span><span class="p">[],</span>
+        <span class="n">aoi</span><span class="o">=</span><span class="p">[</span><span class="n">LON_LIM</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">LAT_LIM</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">LON_LIM</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">LAT_LIM</span><span class="p">[</span><span class="mi">1</span><span class="p">]],</span>
+        <span class="n">path</span><span class="o">=</span><span class="n">OUT</span><span class="p">,</span>
     <span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
 
 <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">caught</span><span class="p">:</span>
@@ -11562,6 +11565,7 @@ OUT = "_overture_out"</div>
         <span class="nb">print</span><span class="p">(</span><span class="s1">'LicenseWarning:'</span><span class="p">,</span> <span class="n">w</span><span class="o">.</span><span class="n">message</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-2">import warnings
+
 from earthlens.earthlens import EarthLens
 from earthlens.overture import LicenseWarning
 
@@ -11569,8 +11573,10 @@ with warnings.catch_warnings(record=True) as caught:
     warnings.simplefilter('always')
     paths = EarthLens(
         data_source="overture",
-        dataset="buildings", variables=[],
-        aoi=[LON_LIM[0], LAT_LIM[0], LON_LIM[1], LAT_LIM[1]], path=OUT,
+        dataset="buildings",
+        variables=[],
+        aoi=[LON_LIM[0], LAT_LIM[0], LON_LIM[1], LAT_LIM[1]],
+        path=OUT,
     ).download()
 
 for w in caught:
@@ -11694,18 +11700,26 @@ Name: count, dtype: int64</pre>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.overture</span><span class="w"> </span><span class="kn">import</span> <span class="n">row_license</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="n">row_license</span><span class="p">([</span>
-    <span class="p">{</span><span class="s1">'dataset'</span><span class="p">:</span> <span class="s1">'Overture'</span><span class="p">,</span> <span class="s1">'license'</span><span class="p">:</span> <span class="s1">'CDLA-Permissive-2.0'</span><span class="p">},</span>
-    <span class="p">{</span><span class="s1">'dataset'</span><span class="p">:</span> <span class="s1">'OpenStreetMap'</span><span class="p">,</span> <span class="s1">'license'</span><span class="p">:</span> <span class="s1">'ODbL-1.0'</span><span class="p">},</span>
-<span class="p">]))</span>
+<span class="nb">print</span><span class="p">(</span>
+    <span class="n">row_license</span><span class="p">(</span>
+        <span class="p">[</span>
+            <span class="p">{</span><span class="s1">'dataset'</span><span class="p">:</span> <span class="s1">'Overture'</span><span class="p">,</span> <span class="s1">'license'</span><span class="p">:</span> <span class="s1">'CDLA-Permissive-2.0'</span><span class="p">},</span>
+            <span class="p">{</span><span class="s1">'dataset'</span><span class="p">:</span> <span class="s1">'OpenStreetMap'</span><span class="p">,</span> <span class="s1">'license'</span><span class="p">:</span> <span class="s1">'ODbL-1.0'</span><span class="p">},</span>
+        <span class="p">]</span>
+    <span class="p">)</span>
+<span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">row_license</span><span class="p">([{</span><span class="s1">'dataset'</span><span class="p">:</span> <span class="s1">'Foursquare'</span><span class="p">,</span> <span class="s1">'license'</span><span class="p">:</span> <span class="s1">'Apache-2.0'</span><span class="p">}]))</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-4">from earthlens.overture import row_license
 
-print(row_license([
-    {'dataset': 'Overture', 'license': 'CDLA-Permissive-2.0'},
-    {'dataset': 'OpenStreetMap', 'license': 'ODbL-1.0'},
-]))
+print(
+    row_license(
+        [
+            {'dataset': 'Overture', 'license': 'CDLA-Permissive-2.0'},
+            {'dataset': 'OpenStreetMap', 'license': 'ODbL-1.0'},
+        ]
+    )
+)
 print(row_license([{'dataset': 'Foursquare', 'license': 'Apache-2.0'}]))</div>
 </div>
 </div>

@@ -11549,7 +11549,8 @@ OUT = "_overture_out"</div>
 
 <span class="n">paths</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
     <span class="n">data_source</span><span class="o">=</span><span class="s2">"overture"</span><span class="p">,</span>
-    <span class="n">dataset</span><span class="o">=</span><span class="s2">"places"</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="p">[],</span>  <span class="c1"># [] -&gt; the theme primary type, "place"</span>
+    <span class="n">dataset</span><span class="o">=</span><span class="s2">"places"</span><span class="p">,</span>
+    <span class="n">variables</span><span class="o">=</span><span class="p">[],</span>  <span class="c1"># [] -&gt; the theme primary type, "place"</span>
     <span class="n">aoi</span><span class="o">=</span><span class="p">[</span><span class="n">LON_LIM</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">LAT_LIM</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">LON_LIM</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">LAT_LIM</span><span class="p">[</span><span class="mi">1</span><span class="p">]],</span>
     <span class="n">path</span><span class="o">=</span><span class="n">OUT</span><span class="p">,</span>
 <span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
@@ -11559,7 +11560,8 @@ OUT = "_overture_out"</div>
 
 paths = EarthLens(
     data_source="overture",
-    dataset="places", variables=[],  # [] -&gt; the theme primary type, "place"
+    dataset="places",
+    variables=[],  # [] -&gt; the theme primary type, "place"
     aoi=[LON_LIM[0], LAT_LIM[0], LON_LIM[1], LAT_LIM[1]],
     path=OUT,
 ).download()
@@ -11741,6 +11743,7 @@ gdf[['id', 'license_id']].head()</div>
         <span class="k">return</span> <span class="n">names</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'primary'</span><span class="p">)</span>
     <span class="k">return</span> <span class="kc">None</span>
 
+
 <span class="n">gdf</span><span class="p">[</span><span class="s1">'name'</span><span class="p">]</span> <span class="o">=</span> <span class="n">gdf</span><span class="p">[</span><span class="s1">'names'</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">primary_name</span><span class="p">)</span>
 <span class="n">gdf</span><span class="p">[[</span><span class="s1">'name'</span><span class="p">,</span> <span class="s1">'license_id'</span><span class="p">]]</span><span class="o">.</span><span class="n">dropna</span><span class="p">(</span><span class="n">subset</span><span class="o">=</span><span class="p">[</span><span class="s1">'name'</span><span class="p">])</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
 </pre></div>
@@ -11748,6 +11751,7 @@ gdf[['id', 'license_id']].head()</div>
     if isinstance(names, dict):
         return names.get('primary')
     return None
+
 
 gdf['name'] = gdf['names'].apply(primary_name)
 gdf[['name', 'license_id']].dropna(subset=['name']).head(10)</div>

@@ -11924,9 +11924,7 @@ since the same short code can appear under more than one dataset.</p>
 <span class="n">cat</span> <span class="o">=</span> <span class="n">Catalog</span><span class="p">()</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">cat</span><span class="o">.</span><span class="n">available_datasets</span><span class="p">)</span><span class="si">}</span><span class="s2"> CDS datasets in catalog"</span><span class="p">)</span>
 
-<span class="n">spec</span> <span class="o">=</span> <span class="n">cat</span><span class="o">.</span><span class="n">get_variable</span><span class="p">(</span>
-    <span class="s2">"reanalysis-era5-single-levels"</span><span class="p">,</span> <span class="s2">"2m-temperature"</span>
-<span class="p">)</span>
+<span class="n">spec</span> <span class="o">=</span> <span class="n">cat</span><span class="o">.</span><span class="n">get_variable</span><span class="p">(</span><span class="s2">"reanalysis-era5-single-levels"</span><span class="p">,</span> <span class="s2">"2m-temperature"</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"cds_variable: </span><span class="si">{</span><span class="n">spec</span><span class="o">.</span><span class="n">cds_variable</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"nc_variable:  </span><span class="si">{</span><span class="n">spec</span><span class="o">.</span><span class="n">nc_variable</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"units:        </span><span class="si">{</span><span class="n">spec</span><span class="o">.</span><span class="n">units</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
@@ -11937,9 +11935,7 @@ since the same short code can appear under more than one dataset.</p>
 cat = Catalog()
 print(f"{len(cat.available_datasets)} CDS datasets in catalog")
 
-spec = cat.get_variable(
-    "reanalysis-era5-single-levels", "2m-temperature"
-)
+spec = cat.get_variable("reanalysis-era5-single-levels", "2m-temperature")
 print(f"cds_variable: {spec.cds_variable}")
 print(f"nc_variable:  {spec.nc_variable}")
 print(f"units:        {spec.units}")
@@ -12154,9 +12150,9 @@ earthlens.download()  # blocks during CDS queue + retrieve (~1–10 min)</div>
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jupyter-widgets jp-OutputArea-output" id="e0634974-61c9-4f14-8a5e-8f2808c7519e" tabindex="0">
+<div class="jupyter-widgets jp-OutputArea-output" id="acbf40cd-2785-4627-80b5-ac70c74be445" tabindex="0">
 <script type="text/javascript">
-var element = document.getElementById('e0634974-61c9-4f14-8a5e-8f2808c7519e');
+var element = document.getElementById('acbf40cd-2785-4627-80b5-ac70c74be445');
 </script>
 <script type="application/vnd.jupyter.widget-view+json">
 {"model_id": "0497b81f794b40e0bb6cbba283b950b1", "version_major": 2, "version_minor": 0}
@@ -12205,8 +12201,8 @@ value range.</p>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.netcdf</span><span class="w"> </span><span class="kn">import</span> <span class="n">NetCDF</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.netcdf</span><span class="w"> </span><span class="kn">import</span> <span class="n">NetCDF</span>
 
 <span class="n">nc_path</span> <span class="o">=</span> <span class="n">OUT</span> <span class="o">/</span> <span class="s2">"2m_temperature_reanalysis-era5-single-levels.nc"</span>
 <span class="n">nc</span> <span class="o">=</span> <span class="n">NetCDF</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">nc_path</span><span class="p">))</span>
@@ -12217,8 +12213,8 @@ value range.</p>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"range:      </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">nanmin</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> .. </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">nanmax</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> K"</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"mean:       </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">nanmean</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> K"</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-5">from pyramids.netcdf import NetCDF
-import numpy as np
+<div class="clipboard-copy-txt" id="cell-5">import numpy as np
+from pyramids.netcdf import NetCDF
 
 nc_path = OUT / "2m_temperature_reanalysis-era5-single-levels.nc"
 nc = NetCDF.read_file(str(nc_path))
@@ -12412,9 +12408,9 @@ earthlens.download(
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jupyter-widgets jp-OutputArea-output" id="585f2ffd-0a76-40f7-bf10-0480990a42d1" tabindex="0">
+<div class="jupyter-widgets jp-OutputArea-output" id="9d363cd2-68f2-43dc-853e-7b15b302c63e" tabindex="0">
 <script type="text/javascript">
-var element = document.getElementById('585f2ffd-0a76-40f7-bf10-0480990a42d1');
+var element = document.getElementById('9d363cd2-68f2-43dc-853e-7b15b302c63e');
 </script>
 <script type="application/vnd.jupyter.widget-view+json">
 {"model_id": "4bb46c5313f94488af32bca5ce9747f6", "version_major": 2, "version_minor": 0}

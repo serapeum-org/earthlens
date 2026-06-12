@@ -11558,7 +11558,8 @@ OUT_DIR.mkdir(exist_ok=True)</div>
 <span class="k">try</span><span class="p">:</span>
     <span class="n">paths</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
         <span class="n">data_source</span><span class="o">=</span><span class="s1">'earthdata'</span><span class="p">,</span>
-        <span class="n">dataset</span><span class="o">=</span><span class="s1">'OPERA_L2_RTC-S1_V1'</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">'VV'</span><span class="p">],</span>
+        <span class="n">dataset</span><span class="o">=</span><span class="s1">'OPERA_L2_RTC-S1_V1'</span><span class="p">,</span>
+        <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">'VV'</span><span class="p">],</span>
         <span class="n">start</span><span class="o">=</span><span class="s1">'2024-01-01'</span><span class="p">,</span>
         <span class="n">end</span><span class="o">=</span><span class="s1">'2024-01-13'</span><span class="p">,</span>
         <span class="n">aoi</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">121.8</span><span class="p">,</span> <span class="mf">36.3</span><span class="p">,</span> <span class="o">-</span><span class="mf">121.5</span><span class="p">,</span> <span class="mf">36.6</span><span class="p">],</span>
@@ -11572,7 +11573,8 @@ OUT_DIR.mkdir(exist_ok=True)</div>
 try:
     paths = EarthLens(
         data_source='earthdata',
-        dataset='OPERA_L2_RTC-S1_V1', variables=['VV'],
+        dataset='OPERA_L2_RTC-S1_V1',
+        variables=['VV'],
         start='2024-01-01',
         end='2024-01-13',
         aoi=[-121.8, 36.3, -121.5, 36.6],
@@ -11607,8 +11609,8 @@ except Exception as exc:
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="k">if</span> <span class="n">paths</span><span class="p">:</span>
     <span class="k">try</span><span class="p">:</span>
-        <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
         <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
         <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span>
 
         <span class="n">vv</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">p</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">paths</span> <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="n">p</span><span class="p">)</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">'_VV.TIF'</span><span class="p">))</span>
@@ -11626,8 +11628,8 @@ except Exception as exc:
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-3">if paths:
     try:
-        import numpy as np
         import matplotlib.pyplot as plt
+        import numpy as np
         from pyramids.dataset import Dataset
 
         vv = next(p for p in paths if str(p).upper().endswith('_VV.TIF'))

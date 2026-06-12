@@ -11699,7 +11699,8 @@ reconstruct the speed magnitude $|\mathbf{v}| = \sqrt{u^2 + v^2}$.</p>
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">earthlens</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span><span class="p">,</span> <span class="n">AggregationConfig</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">earthlens</span><span class="w"> </span><span class="kn">import</span> <span class="n">AggregationConfig</span><span class="p">,</span> <span class="n">EarthLens</span>
 
 <span class="n">OUT</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">"data/era5-wind-cuxhaven"</span><span class="p">)</span>
 <span class="n">OUT</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -11709,17 +11710,19 @@ reconstruct the speed magnitude $|\mathbf{v}| = \sqrt{u^2 + v^2}$.</p>
     <span class="n">cadence</span><span class="o">=</span><span class="s2">"monthly"</span><span class="p">,</span>
     <span class="n">start</span><span class="o">=</span><span class="s2">"2022-01-01"</span><span class="p">,</span>
     <span class="n">end</span><span class="o">=</span><span class="s2">"2022-12-01"</span><span class="p">,</span>
-    <span class="n">dataset</span><span class="o">=</span><span class="s2">"reanalysis-era5-single-levels-monthly-means"</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="p">[</span>
-            <span class="s2">"100m-u-component-of-wind"</span><span class="p">,</span>
-            <span class="s2">"100m-v-component-of-wind"</span><span class="p">,</span>
-        <span class="p">],</span>
+    <span class="n">dataset</span><span class="o">=</span><span class="s2">"reanalysis-era5-single-levels-monthly-means"</span><span class="p">,</span>
+    <span class="n">variables</span><span class="o">=</span><span class="p">[</span>
+        <span class="s2">"100m-u-component-of-wind"</span><span class="p">,</span>
+        <span class="s2">"100m-v-component-of-wind"</span><span class="p">,</span>
+    <span class="p">],</span>
     <span class="n">aoi</span><span class="o">=</span><span class="p">[</span><span class="mf">8.0</span><span class="p">,</span> <span class="mf">53.0</span><span class="p">,</span> <span class="mf">9.0</span><span class="p">,</span> <span class="mf">54.0</span><span class="p">],</span>
     <span class="n">path</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">OUT</span><span class="p">),</span>
 <span class="p">)</span>
 <span class="n">earthlens</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">aggregate</span><span class="o">=</span><span class="n">AggregationConfig</span><span class="p">(</span><span class="n">freq</span><span class="o">=</span><span class="s2">"1MS"</span><span class="p">,</span> <span class="n">op</span><span class="o">=</span><span class="s2">"auto"</span><span class="p">))</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-1">from pathlib import Path
-from earthlens import EarthLens, AggregationConfig
+
+from earthlens import AggregationConfig, EarthLens
 
 OUT = Path("data/era5-wind-cuxhaven")
 OUT.mkdir(parents=True, exist_ok=True)
@@ -11729,10 +11732,11 @@ earthlens = EarthLens(
     cadence="monthly",
     start="2022-01-01",
     end="2022-12-01",
-    dataset="reanalysis-era5-single-levels-monthly-means", variables=[
-            "100m-u-component-of-wind",
-            "100m-v-component-of-wind",
-        ],
+    dataset="reanalysis-era5-single-levels-monthly-means",
+    variables=[
+        "100m-u-component-of-wind",
+        "100m-v-component-of-wind",
+    ],
     aoi=[8.0, 53.0, 9.0, 54.0],
     path=str(OUT),
 )
@@ -11789,9 +11793,9 @@ earthlens.download(aggregate=AggregationConfig(freq="1MS", op="auto"))</div>
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jupyter-widgets jp-OutputArea-output" id="a7866a5d-a435-4c4b-9744-6ef6c0d5ada4" tabindex="0">
+<div class="jupyter-widgets jp-OutputArea-output" id="74dec5ac-29f7-4fbc-894a-4b80218ad840" tabindex="0">
 <script type="text/javascript">
-var element = document.getElementById('a7866a5d-a435-4c4b-9744-6ef6c0d5ada4');
+var element = document.getElementById('74dec5ac-29f7-4fbc-894a-4b80218ad840');
 </script>
 <script type="application/vnd.jupyter.widget-view+json">
 {"model_id": "b22230adb7e4400c90172d2d5ebef2ef", "version_major": 2, "version_minor": 0}
@@ -11870,9 +11874,9 @@ var element = document.getElementById('a7866a5d-a435-4c4b-9744-6ef6c0d5ada4');
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jupyter-widgets jp-OutputArea-output" id="03b1cd3e-6b2b-4b41-8649-6f6470dbcb06" tabindex="0">
+<div class="jupyter-widgets jp-OutputArea-output" id="1b32a597-1791-42b2-9676-a5e445f4bf6c" tabindex="0">
 <script type="text/javascript">
-var element = document.getElementById('03b1cd3e-6b2b-4b41-8649-6f6470dbcb06');
+var element = document.getElementById('1b32a597-1791-42b2-9676-a5e445f4bf6c');
 </script>
 <script type="application/vnd.jupyter.widget-view+json">
 {"model_id": "e6447597621f4cdf946a1049c7d29d32", "version_major": 2, "version_minor": 0}
@@ -11927,20 +11931,26 @@ the mean — careful!).</p>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span>
 
 <span class="n">agg</span> <span class="o">=</span> <span class="n">OUT</span> <span class="o">/</span> <span class="s2">"aggregated"</span>
-<span class="n">u</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span>
-    <span class="n">Dataset</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">p</span><span class="p">))</span><span class="o">.</span><span class="n">read_array</span><span class="p">()</span>
-    <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">agg</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s2">"100m_u_component_of_wind_1MS_*.tif"</span><span class="p">))</span>
-<span class="p">])</span>
-<span class="n">v</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span>
-    <span class="n">Dataset</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">p</span><span class="p">))</span><span class="o">.</span><span class="n">read_array</span><span class="p">()</span>
-    <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">agg</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s2">"100m_v_component_of_wind_1MS_*.tif"</span><span class="p">))</span>
-<span class="p">])</span>
+<span class="n">u</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span>
+    <span class="p">[</span>
+        <span class="n">Dataset</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">p</span><span class="p">))</span><span class="o">.</span><span class="n">read_array</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">agg</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s2">"100m_u_component_of_wind_1MS_*.tif"</span><span class="p">))</span>
+    <span class="p">]</span>
+<span class="p">)</span>
+<span class="n">v</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span>
+    <span class="p">[</span>
+        <span class="n">Dataset</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">p</span><span class="p">))</span><span class="o">.</span><span class="n">read_array</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">agg</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s2">"100m_v_component_of_wind_1MS_*.tif"</span><span class="p">))</span>
+    <span class="p">]</span>
+<span class="p">)</span>
 
-<span class="n">speed</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">u</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">v</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>  <span class="c1"># (month, lat, lon) — but built from monthly-mean components</span>
+<span class="n">speed</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span>
+    <span class="n">u</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">v</span><span class="o">**</span><span class="mi">2</span>
+<span class="p">)</span>  <span class="c1"># (month, lat, lon) — but built from monthly-mean components</span>
 <span class="n">site_speed</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmean</span><span class="p">(</span><span class="n">speed</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
 
 <span class="n">rho</span> <span class="o">=</span> <span class="mf">1.225</span>  <span class="c1"># kg/m^3, sea level</span>
-<span class="n">wpd</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">rho</span> <span class="o">*</span> <span class="n">site_speed</span> <span class="o">**</span> <span class="mi">3</span>  <span class="c1"># rough WPD; cubing the *mean* is conservative</span>
+<span class="n">wpd</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">rho</span> <span class="o">*</span> <span class="n">site_speed</span><span class="o">**</span><span class="mi">3</span>  <span class="c1"># rough WPD; cubing the *mean* is conservative</span>
 
 <span class="n">months</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">date_range</span><span class="p">(</span><span class="s2">"2022-01-01"</span><span class="p">,</span> <span class="n">periods</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">u</span><span class="p">),</span> <span class="n">freq</span><span class="o">=</span><span class="s2">"MS"</span><span class="p">)</span>
 <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
@@ -11954,20 +11964,26 @@ import pandas as pd
 from pyramids.dataset import Dataset
 
 agg = OUT / "aggregated"
-u = np.stack([
-    Dataset.read_file(str(p)).read_array()
-    for p in sorted(agg.glob("100m_u_component_of_wind_1MS_*.tif"))
-])
-v = np.stack([
-    Dataset.read_file(str(p)).read_array()
-    for p in sorted(agg.glob("100m_v_component_of_wind_1MS_*.tif"))
-])
+u = np.stack(
+    [
+        Dataset.read_file(str(p)).read_array()
+        for p in sorted(agg.glob("100m_u_component_of_wind_1MS_*.tif"))
+    ]
+)
+v = np.stack(
+    [
+        Dataset.read_file(str(p)).read_array()
+        for p in sorted(agg.glob("100m_v_component_of_wind_1MS_*.tif"))
+    ]
+)
 
-speed = np.sqrt(u**2 + v**2)  # (month, lat, lon) — but built from monthly-mean components
+speed = np.sqrt(
+    u**2 + v**2
+)  # (month, lat, lon) — but built from monthly-mean components
 site_speed = np.nanmean(speed, axis=(1, 2))
 
 rho = 1.225  # kg/m^3, sea level
-wpd = 0.5 * rho * site_speed ** 3  # rough WPD; cubing the *mean* is conservative
+wpd = 0.5 * rho * site_speed**3  # rough WPD; cubing the *mean* is conservative
 
 months = pd.date_range("2022-01-01", periods=len(u), freq="MS")
 df = pd.DataFrame(

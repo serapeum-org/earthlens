@@ -11515,14 +11515,20 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.worldpop</span><span class="w"> </span><span class="kn">import</span> <span class="n">Catalog</span>
+
 <span class="n">cat</span> <span class="o">=</span> <span class="n">Catalog</span><span class="p">()</span>
-<span class="n">covariates</span> <span class="o">=</span> <span class="p">[</span><span class="n">p</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">cat</span><span class="o">.</span><span class="n">available_products</span><span class="p">()</span> <span class="k">if</span> <span class="n">cat</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">p</span><span class="p">)</span><span class="o">.</span><span class="n">rest_alias</span> <span class="o">==</span> <span class="s1">'covariates'</span><span class="p">]</span>
+<span class="n">covariates</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="n">p</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">cat</span><span class="o">.</span><span class="n">available_products</span><span class="p">()</span> <span class="k">if</span> <span class="n">cat</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">p</span><span class="p">)</span><span class="o">.</span><span class="n">rest_alias</span> <span class="o">==</span> <span class="s1">'covariates'</span>
+<span class="p">]</span>
 <span class="nb">print</span><span class="p">(</span><span class="s1">'covariate layers:'</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">covariates</span><span class="p">))</span>
 <span class="nb">print</span><span class="p">(</span><span class="s1">'cviirs -&gt;'</span><span class="p">,</span> <span class="n">cat</span><span class="o">.</span><span class="n">describe</span><span class="p">(</span><span class="s1">'cviirs'</span><span class="p">)[</span><span class="s1">'description'</span><span class="p">])</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-1">from earthlens.worldpop import Catalog
+
 cat = Catalog()
-covariates = [p for p in cat.available_products() if cat.get(p).rest_alias == 'covariates']
+covariates = [
+    p for p in cat.available_products() if cat.get(p).rest_alias == 'covariates'
+]
 print('covariate layers:', len(covariates))
 print('cviirs -&gt;', cat.describe('cviirs')['description'])</div>
 </div>
@@ -11550,22 +11556,38 @@ print('cviirs -&gt;', cat.describe('cviirs')['description'])</div>
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">tempfile</span>
+
 <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.earthlens</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
+
 <span class="n">d</span> <span class="o">=</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">()</span>
 <span class="n">paths</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
-    <span class="n">data_source</span><span class="o">=</span><span class="s1">'worldpop'</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">'cviirs'</span><span class="p">],</span> <span class="n">aoi</span><span class="o">=</span><span class="s1">'KEN'</span><span class="p">,</span>
-    <span class="n">start</span><span class="o">=</span><span class="s1">'2012'</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s1">'2016'</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="s1">'%Y'</span><span class="p">,</span>
-    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">],</span> <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">36.0</span><span class="p">,</span> <span class="mf">38.0</span><span class="p">],</span> <span class="n">path</span><span class="o">=</span><span class="n">d</span><span class="p">,</span>
+    <span class="n">data_source</span><span class="o">=</span><span class="s1">'worldpop'</span><span class="p">,</span>
+    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">'cviirs'</span><span class="p">],</span>
+    <span class="n">aoi</span><span class="o">=</span><span class="s1">'KEN'</span><span class="p">,</span>
+    <span class="n">start</span><span class="o">=</span><span class="s1">'2012'</span><span class="p">,</span>
+    <span class="n">end</span><span class="o">=</span><span class="s1">'2016'</span><span class="p">,</span>
+    <span class="n">fmt</span><span class="o">=</span><span class="s1">'%Y'</span><span class="p">,</span>
+    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">],</span>
+    <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">36.0</span><span class="p">,</span> <span class="mf">38.0</span><span class="p">],</span>
+    <span class="n">path</span><span class="o">=</span><span class="n">d</span><span class="p">,</span>
 <span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">progress_bar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s1">'written:'</span><span class="p">,</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">paths</span><span class="p">))</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-2">import tempfile
+
 from earthlens.earthlens import EarthLens
+
 d = tempfile.mkdtemp()
 paths = EarthLens(
-    data_source='worldpop', variables=['cviirs'], aoi='KEN',
-    start='2012', end='2016', fmt='%Y',
-    lat_lim=[-1.0, 1.0], lon_lim=[36.0, 38.0], path=d,
+    data_source='worldpop',
+    variables=['cviirs'],
+    aoi='KEN',
+    start='2012',
+    end='2016',
+    fmt='%Y',
+    lat_lim=[-1.0, 1.0],
+    lon_lim=[36.0, 38.0],
+    path=d,
 ).download(progress_bar=False)
 print('written:', sorted(p.name for p in paths))</div>
 </div>
@@ -11604,10 +11626,12 @@ print('written:', sorted(p.name for p in paths))</div>
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span>
+
 <span class="n">ds</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">paths</span><span class="p">)[</span><span class="mi">0</span><span class="p">]))</span>
 <span class="nb">print</span><span class="p">(</span><span class="s1">'EPSG:'</span><span class="p">,</span> <span class="n">ds</span><span class="o">.</span><span class="n">epsg</span><span class="p">,</span> <span class="s1">'shape:'</span><span class="p">,</span> <span class="n">ds</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-3">from pyramids.dataset import Dataset
+
 ds = Dataset.read_file(str(sorted(paths)[0]))
 print('EPSG:', ds.epsg, 'shape:', ds.shape)</div>
 </div>

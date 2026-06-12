@@ -11686,7 +11686,7 @@ print('window:', START, 'to', END, '| target:', TARGET_ISO3)</div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">alerts</span> <span class="o">=</span> <span class="kc">None</span>
 <span class="k">try</span><span class="p">:</span>
     <span class="n">alerts</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
-        <span class="n">variables</span><span class="o">=</span><span class="p">[],</span>            <span class="c1"># all six hazard types</span>
+        <span class="n">variables</span><span class="o">=</span><span class="p">[],</span>  <span class="c1"># all six hazard types</span>
         <span class="n">data_source</span><span class="o">=</span><span class="s1">'gdacs'</span><span class="p">,</span>
         <span class="n">start</span><span class="o">=</span><span class="n">START</span><span class="p">,</span>
         <span class="n">end</span><span class="o">=</span><span class="n">END</span><span class="p">,</span>
@@ -11700,7 +11700,7 @@ print('window:', START, 'to', END, '| target:', TARGET_ISO3)</div>
 <div class="clipboard-copy-txt" id="cell-2">alerts = None
 try:
     alerts = EarthLens(
-        variables=[],            # all six hazard types
+        variables=[],  # all six hazard types
         data_source='gdacs',
         start=START,
         end=END,
@@ -11905,11 +11905,27 @@ if alerts is not None and len(alerts):
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="k">if</span> <span class="n">country</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">country</span><span class="p">):</span>
-    <span class="n">cols</span> <span class="o">=</span> <span class="p">[</span><span class="s1">'from_date'</span><span class="p">,</span> <span class="s1">'hazard_type'</span><span class="p">,</span> <span class="s1">'name'</span><span class="p">,</span> <span class="s1">'alert_level'</span><span class="p">,</span> <span class="s1">'alert_score'</span><span class="p">,</span> <span class="s1">'severity'</span><span class="p">,</span> <span class="s1">'severity_unit'</span><span class="p">]</span>
+    <span class="n">cols</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="s1">'from_date'</span><span class="p">,</span>
+        <span class="s1">'hazard_type'</span><span class="p">,</span>
+        <span class="s1">'name'</span><span class="p">,</span>
+        <span class="s1">'alert_level'</span><span class="p">,</span>
+        <span class="s1">'alert_score'</span><span class="p">,</span>
+        <span class="s1">'severity'</span><span class="p">,</span>
+        <span class="s1">'severity_unit'</span><span class="p">,</span>
+    <span class="p">]</span>
     <span class="n">display</span><span class="p">(</span><span class="n">country</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="s1">'alert_score'</span><span class="p">,</span> <span class="n">ascending</span><span class="o">=</span><span class="kc">False</span><span class="p">)[</span><span class="n">cols</span><span class="p">]</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">10</span><span class="p">))</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-6">if country is not None and len(country):
-    cols = ['from_date', 'hazard_type', 'name', 'alert_level', 'alert_score', 'severity', 'severity_unit']
+    cols = [
+        'from_date',
+        'hazard_type',
+        'name',
+        'alert_level',
+        'alert_score',
+        'severity',
+        'severity_unit',
+    ]
     display(country.sort_values('alert_score', ascending=False)[cols].head(10))</div>
 </div>
 </div>

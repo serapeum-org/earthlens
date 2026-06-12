@@ -11808,7 +11808,8 @@ Pulling 12 months keeps the retrieve small.</p>
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">earthlens</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span><span class="p">,</span> <span class="n">AggregationConfig</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">earthlens</span><span class="w"> </span><span class="kn">import</span> <span class="n">AggregationConfig</span><span class="p">,</span> <span class="n">EarthLens</span>
 
 <span class="n">OUT</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">"data/era5-iceland-sea"</span><span class="p">)</span>
 <span class="n">OUT</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -11818,17 +11819,19 @@ Pulling 12 months keeps the retrieve small.</p>
     <span class="n">cadence</span><span class="o">=</span><span class="s2">"monthly"</span><span class="p">,</span>
     <span class="n">start</span><span class="o">=</span><span class="s2">"2022-01-01"</span><span class="p">,</span>
     <span class="n">end</span><span class="o">=</span><span class="s2">"2022-12-01"</span><span class="p">,</span>
-    <span class="n">dataset</span><span class="o">=</span><span class="s2">"reanalysis-era5-single-levels-monthly-means"</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="p">[</span>
-            <span class="s2">"sea-surface-temperature"</span><span class="p">,</span>
-            <span class="s2">"sea-ice-cover"</span><span class="p">,</span>
-        <span class="p">],</span>
+    <span class="n">dataset</span><span class="o">=</span><span class="s2">"reanalysis-era5-single-levels-monthly-means"</span><span class="p">,</span>
+    <span class="n">variables</span><span class="o">=</span><span class="p">[</span>
+        <span class="s2">"sea-surface-temperature"</span><span class="p">,</span>
+        <span class="s2">"sea-ice-cover"</span><span class="p">,</span>
+    <span class="p">],</span>
     <span class="n">aoi</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">30.0</span><span class="p">,</span> <span class="mf">60.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">10.0</span><span class="p">,</span> <span class="mf">70.0</span><span class="p">],</span>
     <span class="n">path</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">OUT</span><span class="p">),</span>
 <span class="p">)</span>
 <span class="n">earthlens</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">aggregate</span><span class="o">=</span><span class="n">AggregationConfig</span><span class="p">(</span><span class="n">freq</span><span class="o">=</span><span class="s2">"1MS"</span><span class="p">,</span> <span class="n">op</span><span class="o">=</span><span class="s2">"auto"</span><span class="p">))</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-2">from pathlib import Path
-from earthlens import EarthLens, AggregationConfig
+
+from earthlens import AggregationConfig, EarthLens
 
 OUT = Path("data/era5-iceland-sea")
 OUT.mkdir(parents=True, exist_ok=True)
@@ -11838,10 +11841,11 @@ earthlens = EarthLens(
     cadence="monthly",
     start="2022-01-01",
     end="2022-12-01",
-    dataset="reanalysis-era5-single-levels-monthly-means", variables=[
-            "sea-surface-temperature",
-            "sea-ice-cover",
-        ],
+    dataset="reanalysis-era5-single-levels-monthly-means",
+    variables=[
+        "sea-surface-temperature",
+        "sea-ice-cover",
+    ],
     aoi=[-30.0, 60.0, -10.0, 70.0],
     path=str(OUT),
 )
@@ -11891,9 +11895,9 @@ earthlens.download(aggregate=AggregationConfig(freq="1MS", op="auto"))</div>
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jupyter-widgets jp-OutputArea-output" id="19edaddb-82d2-4e4b-a177-1c3794fba5a8" tabindex="0">
+<div class="jupyter-widgets jp-OutputArea-output" id="a3bb49d1-8b10-4eba-b569-fb169d40e7d5" tabindex="0">
 <script type="text/javascript">
-var element = document.getElementById('19edaddb-82d2-4e4b-a177-1c3794fba5a8');
+var element = document.getElementById('a3bb49d1-8b10-4eba-b569-fb169d40e7d5');
 </script>
 <script type="application/vnd.jupyter.widget-view+json">
 {"model_id": "37573861e0f845c58626e3c80cdee150", "version_major": 2, "version_minor": 0}
@@ -11974,9 +11978,9 @@ var element = document.getElementById('19edaddb-82d2-4e4b-a177-1c3794fba5a8');
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jupyter-widgets jp-OutputArea-output" id="3c35a4d1-cf4e-4ee8-bb06-d68621d0a6a3" tabindex="0">
+<div class="jupyter-widgets jp-OutputArea-output" id="b41a98f4-7457-402d-8329-20a6414fa619" tabindex="0">
 <script type="text/javascript">
-var element = document.getElementById('3c35a4d1-cf4e-4ee8-bb06-d68621d0a6a3');
+var element = document.getElementById('b41a98f4-7457-402d-8329-20a6414fa619');
 </script>
 <script type="application/vnd.jupyter.widget-view+json">
 {"model_id": "ebae2ac00b1c4e51904513d5ea4637e2", "version_major": 2, "version_minor": 0}
@@ -12032,18 +12036,22 @@ land NaNs out).</p>
 
 <span class="n">agg_dir</span> <span class="o">=</span> <span class="n">OUT</span> <span class="o">/</span> <span class="s2">"aggregated"</span>
 
+
 <span class="k">def</span><span class="w"> </span><span class="nf">stack</span><span class="p">(</span><span class="n">cds_variable</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
     <span class="n">paths</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">agg_dir</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">cds_variable</span><span class="si">}</span><span class="s2">_1MS_*.tif"</span><span class="p">))</span>
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">Dataset</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">p</span><span class="p">))</span><span class="o">.</span><span class="n">read_array</span><span class="p">()</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">paths</span><span class="p">])</span>
 
+
 <span class="n">sst</span> <span class="o">=</span> <span class="n">stack</span><span class="p">(</span><span class="s2">"sea_surface_temperature"</span><span class="p">)</span>  <span class="c1"># K, NaN over land</span>
-<span class="n">ice</span> <span class="o">=</span> <span class="n">stack</span><span class="p">(</span><span class="s2">"sea_ice_cover"</span><span class="p">)</span>             <span class="c1"># 0..1 fraction</span>
+<span class="n">ice</span> <span class="o">=</span> <span class="n">stack</span><span class="p">(</span><span class="s2">"sea_ice_cover"</span><span class="p">)</span>  <span class="c1"># 0..1 fraction</span>
 
 <span class="n">months</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">date_range</span><span class="p">(</span><span class="s2">"2022-01-01"</span><span class="p">,</span> <span class="n">periods</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="s2">"MS"</span><span class="p">)</span>
 <span class="n">sst_C</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmean</span><span class="p">(</span><span class="n">sst</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span> <span class="o">-</span> <span class="mf">273.15</span>
 <span class="n">ice_pct</span> <span class="o">=</span> <span class="mf">100.0</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmean</span><span class="p">(</span><span class="n">ice</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
 
-<span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s2">"SST [°C]"</span><span class="p">:</span> <span class="n">sst_C</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span> <span class="s2">"Ice cover [%]"</span><span class="p">:</span> <span class="n">ice_pct</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">1</span><span class="p">)},</span> <span class="n">index</span><span class="o">=</span><span class="n">months</span><span class="p">)</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+    <span class="p">{</span><span class="s2">"SST [°C]"</span><span class="p">:</span> <span class="n">sst_C</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span> <span class="s2">"Ice cover [%]"</span><span class="p">:</span> <span class="n">ice_pct</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">1</span><span class="p">)},</span> <span class="n">index</span><span class="o">=</span><span class="n">months</span>
+<span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-3">import numpy as np
 import pandas as pd
@@ -12051,18 +12059,22 @@ from pyramids.dataset import Dataset
 
 agg_dir = OUT / "aggregated"
 
+
 def stack(cds_variable: str) -&gt; np.ndarray:
     paths = sorted(agg_dir.glob(f"{cds_variable}_1MS_*.tif"))
     return np.stack([Dataset.read_file(str(p)).read_array() for p in paths])
 
+
 sst = stack("sea_surface_temperature")  # K, NaN over land
-ice = stack("sea_ice_cover")             # 0..1 fraction
+ice = stack("sea_ice_cover")  # 0..1 fraction
 
 months = pd.date_range("2022-01-01", periods=12, freq="MS")
 sst_C = np.nanmean(sst, axis=(1, 2)) - 273.15
 ice_pct = 100.0 * np.nanmean(ice, axis=(1, 2))
 
-pd.DataFrame({"SST [°C]": sst_C.round(2), "Ice cover [%]": ice_pct.round(1)}, index=months)</div>
+pd.DataFrame(
+    {"SST [°C]": sst_C.round(2), "Ice cover [%]": ice_pct.round(1)}, index=months
+)</div>
 </div>
 </div>
 </div>

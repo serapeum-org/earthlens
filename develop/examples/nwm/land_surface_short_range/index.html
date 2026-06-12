@@ -11526,11 +11526,16 @@ moisture, snow water equivalent, snow depth, accumulated ET. Unlike
 <span class="n">cycle_date</span> <span class="o">=</span> <span class="p">(</span><span class="n">dt</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span> <span class="o">-</span> <span class="n">dt</span><span class="o">.</span><span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="mi">3</span><span class="p">))</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">'%Y-%m-</span><span class="si">%d</span><span class="s1">'</span><span class="p">)</span>
 <span class="n">out_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="s1">'nwm_land_'</span><span class="p">))</span>
 
-<span class="n">nwm</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span><span class="n">data_source</span><span class="o">=</span><span class="s2">"nwm"</span><span class="p">,</span>
-    <span class="n">start</span><span class="o">=</span><span class="n">cycle_date</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="n">cycle_date</span><span class="p">,</span>
-    <span class="n">dataset</span><span class="o">=</span><span class="s1">'ldasout'</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">'SOIL_M'</span><span class="p">,</span> <span class="s1">'SNEQV'</span><span class="p">],</span>
+<span class="n">nwm</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
+    <span class="n">data_source</span><span class="o">=</span><span class="s2">"nwm"</span><span class="p">,</span>
+    <span class="n">start</span><span class="o">=</span><span class="n">cycle_date</span><span class="p">,</span>
+    <span class="n">end</span><span class="o">=</span><span class="n">cycle_date</span><span class="p">,</span>
+    <span class="n">dataset</span><span class="o">=</span><span class="s1">'ldasout'</span><span class="p">,</span>
+    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">'SOIL_M'</span><span class="p">,</span> <span class="s1">'SNEQV'</span><span class="p">],</span>
     <span class="n">aoi</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">180</span><span class="p">,</span> <span class="o">-</span><span class="mi">90</span><span class="p">,</span> <span class="mi">180</span><span class="p">,</span> <span class="mi">90</span><span class="p">],</span>
-    <span class="n">configuration</span><span class="o">=</span><span class="s1">'short_range'</span><span class="p">,</span> <span class="n">cycles</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">steps</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+    <span class="n">configuration</span><span class="o">=</span><span class="s1">'short_range'</span><span class="p">,</span>
+    <span class="n">cycles</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+    <span class="n">steps</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
     <span class="n">path</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">out_dir</span><span class="p">),</span>
 <span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s1">'OUTPUT_KIND:'</span><span class="p">,</span> <span class="n">nwm</span><span class="o">.</span><span class="n">OUTPUT_KIND</span><span class="p">)</span>  <span class="c1"># raster</span>
@@ -11547,11 +11552,16 @@ from earthlens import EarthLens
 cycle_date = (dt.datetime.now() - dt.timedelta(days=3)).strftime('%Y-%m-%d')
 out_dir = Path(tempfile.mkdtemp(prefix='nwm_land_'))
 
-nwm = EarthLens(data_source="nwm",
-    start=cycle_date, end=cycle_date,
-    dataset='ldasout', variables=['SOIL_M', 'SNEQV'],
+nwm = EarthLens(
+    data_source="nwm",
+    start=cycle_date,
+    end=cycle_date,
+    dataset='ldasout',
+    variables=['SOIL_M', 'SNEQV'],
     aoi=[-180, -90, 180, 90],
-    configuration='short_range', cycles=[0], steps=[1],
+    configuration='short_range',
+    cycles=[0],
+    steps=[1],
     path=str(out_dir),
 )
 print('OUTPUT_KIND:', nwm.OUTPUT_KIND)  # raster

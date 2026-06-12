@@ -11555,7 +11555,8 @@ OUT_DIR.mkdir(exist_ok=True)</div>
 <span class="k">try</span><span class="p">:</span>
     <span class="n">paths</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
         <span class="n">data_source</span><span class="o">=</span><span class="s1">'earthdata'</span><span class="p">,</span>
-        <span class="n">dataset</span><span class="o">=</span><span class="s1">'GEDI_L4A_AGB_Density_V2_1_2056'</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">'agbd'</span><span class="p">],</span>
+        <span class="n">dataset</span><span class="o">=</span><span class="s1">'GEDI_L4A_AGB_Density_V2_1_2056'</span><span class="p">,</span>
+        <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">'agbd'</span><span class="p">],</span>
         <span class="n">start</span><span class="o">=</span><span class="s1">'2020-05-01'</span><span class="p">,</span>
         <span class="n">end</span><span class="o">=</span><span class="s1">'2020-05-02'</span><span class="p">,</span>
         <span class="n">aoi</span><span class="o">=</span><span class="p">[</span><span class="mf">12.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">3.0</span><span class="p">,</span> <span class="mf">18.0</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">],</span>
@@ -11569,7 +11570,8 @@ OUT_DIR.mkdir(exist_ok=True)</div>
 try:
     paths = EarthLens(
         data_source='earthdata',
-        dataset='GEDI_L4A_AGB_Density_V2_1_2056', variables=['agbd'],
+        dataset='GEDI_L4A_AGB_Density_V2_1_2056',
+        variables=['agbd'],
         start='2020-05-01',
         end='2020-05-02',
         aoi=[12.0, -3.0, 18.0, 3.0],

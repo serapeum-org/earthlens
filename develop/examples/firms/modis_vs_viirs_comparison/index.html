@@ -11653,8 +11653,7 @@ OUT_DIR.mkdir(exist_ok=True)
 # Set FIRMS_MAP_KEY in your environment; the live cells below skip cleanly
 # (nbval-lax-safe) when it is absent, so the notebook never fails offline.
 HAS_KEY = bool(os.environ.get('FIRMS_MAP_KEY'))
-print('FIRMS_MAP_KEY set:', HAS_KEY)
-</div>
+print('FIRMS_MAP_KEY set:', HAS_KEY)</div>
 </div>
 </div>
 </div>
@@ -11726,8 +11725,7 @@ if HAS_KEY:
         ).download(progress_bar=False)
         print('detections:', len(fires))
     except Exception as exc:
-        print('skipped live query:', exc)
-</div>
+        print('skipped live query:', exc)</div>
 </div>
 </div>
 </div>
@@ -11771,8 +11769,7 @@ if HAS_KEY:
 <div class="clipboard-copy-txt" id="cell-3">if fires is not None and len(fires):
     print(fires.groupby('sensor').size())
     # Both families share a normalised confidence_pct even though raw confidence differs.
-    display(fires.groupby('sensor')[['confidence', 'confidence_pct', 'frp']].head(3))
-</div>
+    display(fires.groupby('sensor')[['confidence', 'confidence_pct', 'frp']].head(3))</div>
 </div>
 </div>
 </div>
@@ -11812,8 +11809,10 @@ if HAS_KEY:
     <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
 
     <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">7</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
-    <span class="k">for</span> <span class="n">sensor</span><span class="p">,</span> <span class="n">colour</span><span class="p">,</span> <span class="n">size</span> <span class="ow">in</span> <span class="p">[(</span><span class="s1">'MODIS_NRT'</span><span class="p">,</span> <span class="s1">'tab:blue'</span><span class="p">,</span> <span class="mi">60</span><span class="p">),</span>
-                                 <span class="p">(</span><span class="s1">'VIIRS_SNPP_NRT'</span><span class="p">,</span> <span class="s1">'tab:red'</span><span class="p">,</span> <span class="mi">18</span><span class="p">)]:</span>
+    <span class="k">for</span> <span class="n">sensor</span><span class="p">,</span> <span class="n">colour</span><span class="p">,</span> <span class="n">size</span> <span class="ow">in</span> <span class="p">[</span>
+        <span class="p">(</span><span class="s1">'MODIS_NRT'</span><span class="p">,</span> <span class="s1">'tab:blue'</span><span class="p">,</span> <span class="mi">60</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">'VIIRS_SNPP_NRT'</span><span class="p">,</span> <span class="s1">'tab:red'</span><span class="p">,</span> <span class="mi">18</span><span class="p">),</span>
+    <span class="p">]:</span>
         <span class="n">subset</span> <span class="o">=</span> <span class="n">fires</span><span class="p">[</span><span class="n">fires</span><span class="p">[</span><span class="s1">'sensor'</span><span class="p">]</span> <span class="o">==</span> <span class="n">sensor</span><span class="p">]</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">subset</span><span class="p">):</span>
             <span class="n">subset</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">colour</span><span class="p">,</span> <span class="n">markersize</span><span class="o">=</span><span class="n">size</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">sensor</span><span class="p">)</span>
@@ -11827,8 +11826,10 @@ if HAS_KEY:
     import matplotlib.pyplot as plt
 
     fig, ax = plt.subplots(figsize=(7, 6))
-    for sensor, colour, size in [('MODIS_NRT', 'tab:blue', 60),
-                                 ('VIIRS_SNPP_NRT', 'tab:red', 18)]:
+    for sensor, colour, size in [
+        ('MODIS_NRT', 'tab:blue', 60),
+        ('VIIRS_SNPP_NRT', 'tab:red', 18),
+    ]:
         subset = fires[fires['sensor'] == sensor]
         if len(subset):
             subset.plot(ax=ax, color=colour, markersize=size, alpha=0.5, label=sensor)
@@ -11836,8 +11837,7 @@ if HAS_KEY:
     ax.set_title(f'MODIS 1 km vs VIIRS 375 m, {START} to {END}')
     ax.set_xlabel('longitude')
     ax.set_ylabel('latitude')
-    plt.show()
-</div>
+    plt.show()</div>
 </div>
 </div>
 </div>

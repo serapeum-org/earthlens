@@ -11663,43 +11663,47 @@ surface 0-10 m to keep the request small.</p>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.netcdf</span><span class="w"> </span><span class="kn">import</span> <span class="n">NetCDF</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.cmems</span><span class="w"> </span><span class="kn">import</span> <span class="n">Catalog</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.netcdf</span><span class="w"> </span><span class="kn">import</span> <span class="n">NetCDF</span>
 
 <span class="n">OUT_DIR</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s1">'data/cmems-pisces'</span><span class="p">)</span>
 <span class="n">OUT_DIR</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
 <span class="n">DATASET_ID</span> <span class="o">=</span> <span class="s1">'cmems_mod_glo_bgc_my_0.25deg_P1D-m'</span>
 <span class="n">VARIABLES</span> <span class="o">=</span> <span class="p">[</span><span class="s1">'chl'</span><span class="p">,</span> <span class="s1">'o2'</span><span class="p">]</span>
-<span class="n">BBOX</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">40.0</span><span class="p">,</span> <span class="mf">44.0</span><span class="p">],</span> <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">12.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">8.0</span><span class="p">])</span>   <span class="c1"># Iberian upwelling box</span>
+<span class="n">BBOX</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">40.0</span><span class="p">,</span> <span class="mf">44.0</span><span class="p">],</span> <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">12.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">8.0</span><span class="p">])</span>  <span class="c1"># Iberian upwelling box</span>
 
 <span class="n">ds</span> <span class="o">=</span> <span class="n">Catalog</span><span class="p">()</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">DATASET_ID</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="n">DATASET_ID</span><span class="si">}</span><span class="s1">: cadence=</span><span class="si">{</span><span class="n">ds</span><span class="o">.</span><span class="n">cadence</span><span class="si">}</span><span class="s1">, domain=</span><span class="si">{</span><span class="n">ds</span><span class="o">.</span><span class="n">domain</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
 <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">VARIABLES</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'  </span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="s1">: units=</span><span class="si">{</span><span class="n">ds</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="n">v</span><span class="p">]</span><span class="o">.</span><span class="n">units</span><span class="si">!r}</span><span class="s1">, long_name=</span><span class="si">{</span><span class="n">ds</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="n">v</span><span class="p">]</span><span class="o">.</span><span class="n">long_name</span><span class="si">!r}</span><span class="s1">'</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span>
+        <span class="sa">f</span><span class="s1">'  </span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="s1">: units=</span><span class="si">{</span><span class="n">ds</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="n">v</span><span class="p">]</span><span class="o">.</span><span class="n">units</span><span class="si">!r}</span><span class="s1">, long_name=</span><span class="si">{</span><span class="n">ds</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="n">v</span><span class="p">]</span><span class="o">.</span><span class="n">long_name</span><span class="si">!r}</span><span class="s1">'</span>
+    <span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-1">import os
 from pathlib import Path
 
 import numpy as np
+from pyramids.netcdf import NetCDF
 
 from earthlens import EarthLens
 from earthlens.cmems import Catalog
-from pyramids.netcdf import NetCDF
 
 OUT_DIR = Path('data/cmems-pisces')
 OUT_DIR.mkdir(parents=True, exist_ok=True)
 
 DATASET_ID = 'cmems_mod_glo_bgc_my_0.25deg_P1D-m'
 VARIABLES = ['chl', 'o2']
-BBOX = dict(lat_lim=[40.0, 44.0], lon_lim=[-12.0, -8.0])   # Iberian upwelling box
+BBOX = dict(lat_lim=[40.0, 44.0], lon_lim=[-12.0, -8.0])  # Iberian upwelling box
 
 ds = Catalog().get_dataset(DATASET_ID)
 print(f'{DATASET_ID}: cadence={ds.cadence}, domain={ds.domain}')
 for v in VARIABLES:
-    print(f'  {v}: units={ds.variables[v].units!r}, long_name={ds.variables[v].long_name!r}')</div>
+    print(
+        f'  {v}: units={ds.variables[v].units!r}, long_name={ds.variables[v].long_name!r}'
+    )</div>
 </div>
 </div>
 </div>
@@ -11763,7 +11767,8 @@ subset call.</p>
     <span class="n">start</span><span class="o">=</span><span class="s1">'2018-01-01'</span><span class="p">,</span>
     <span class="n">end</span><span class="o">=</span><span class="s1">'2020-12-31'</span><span class="p">,</span>
     <span class="n">cadence</span><span class="o">=</span><span class="s1">'daily'</span><span class="p">,</span>
-    <span class="n">dataset</span><span class="o">=</span><span class="n">DATASET_ID</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="n">VARIABLES</span><span class="p">,</span>
+    <span class="n">dataset</span><span class="o">=</span><span class="n">DATASET_ID</span><span class="p">,</span>
+    <span class="n">variables</span><span class="o">=</span><span class="n">VARIABLES</span><span class="p">,</span>
     <span class="o">**</span><span class="n">BBOX</span><span class="p">,</span>
     <span class="n">path</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">OUT_DIR</span><span class="p">),</span>
     <span class="n">minimum_depth</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
@@ -11779,7 +11784,8 @@ subset call.</p>
     start='2018-01-01',
     end='2020-12-31',
     cadence='daily',
-    dataset=DATASET_ID, variables=VARIABLES,
+    dataset=DATASET_ID,
+    variables=VARIABLES,
     **BBOX,
     path=str(OUT_DIR),
     minimum_depth=0.0,
@@ -11876,9 +11882,9 @@ print(paths)</div>
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jupyter-widgets jp-OutputArea-output" id="dcf5cb8d-8b8c-4712-8bf6-10c5974c5be9" tabindex="0">
+<div class="jupyter-widgets jp-OutputArea-output" id="cd508917-29e2-49a3-8c4b-2e566c704a09" tabindex="0">
 <script type="text/javascript">
-var element = document.getElementById('dcf5cb8d-8b8c-4712-8bf6-10c5974c5be9');
+var element = document.getElementById('cd508917-29e2-49a3-8c4b-2e566c704a09');
 </script>
 <script type="application/vnd.jupyter.widget-view+json">
 {"model_id": "207c116d17be436f9d0be666889c63e4", "version_major": 2, "version_minor": 0}
@@ -12023,7 +12029,7 @@ month-of-year (1-12).</p>
 <span class="n">nc</span> <span class="o">=</span> <span class="n">NetCDF</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">paths</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">read_only</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="c1"># decode_cf turns the CF "hours since 1950" time axis into datetime64 so</span>
 <span class="c1"># xarray's calendar-aware groupby works.</span>
-<span class="n">ds</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">decode_cf</span><span class="p">(</span><span class="n">nc</span><span class="o">.</span><span class="n">to_xarray</span><span class="p">())</span>   <span class="c1"># labelled (time, depth, latitude, longitude)</span>
+<span class="n">ds</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">decode_cf</span><span class="p">(</span><span class="n">nc</span><span class="o">.</span><span class="n">to_xarray</span><span class="p">())</span>  <span class="c1"># labelled (time, depth, latitude, longitude)</span>
 <span class="n">nc</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 
 <span class="c1"># Box + surface-layer mean per day, then a monthly climatology over the</span>
@@ -12039,7 +12045,7 @@ month-of-year (1-12).</p>
 nc = NetCDF.read_file(str(paths[0]), read_only=True)
 # decode_cf turns the CF "hours since 1950" time axis into datetime64 so
 # xarray's calendar-aware groupby works.
-ds = xr.decode_cf(nc.to_xarray())   # labelled (time, depth, latitude, longitude)
+ds = xr.decode_cf(nc.to_xarray())  # labelled (time, depth, latitude, longitude)
 nc.close()
 
 # Box + surface-layer mean per day, then a monthly climatology over the

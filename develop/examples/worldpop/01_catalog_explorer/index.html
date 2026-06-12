@@ -11515,10 +11515,12 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.worldpop</span><span class="w"> </span><span class="kn">import</span> <span class="n">Catalog</span>
+
 <span class="n">cat</span> <span class="o">=</span> <span class="n">Catalog</span><span class="p">()</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">cat</span><span class="o">.</span><span class="n">available_products</span><span class="p">())</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-1">from earthlens.worldpop import Catalog
+
 cat = Catalog()
 print(cat.available_products())</div>
 </div>
@@ -11558,12 +11560,18 @@ print(cat.available_products())</div>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s1">'population -&gt;'</span><span class="p">,</span> <span class="n">cat</span><span class="o">.</span><span class="n">resolve</span><span class="p">(</span><span class="s1">'population'</span><span class="p">))</span>
 <span class="nb">print</span><span class="p">(</span><span class="s1">'default pop sub-alias -&gt;'</span><span class="p">,</span> <span class="n">cat</span><span class="o">.</span><span class="n">pick_subalias</span><span class="p">(</span><span class="s1">'pop'</span><span class="p">))</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">'constrained R2025A -&gt;'</span><span class="p">,</span> <span class="n">cat</span><span class="o">.</span><span class="n">pick_subalias</span><span class="p">(</span><span class="s1">'pop'</span><span class="p">,</span> <span class="n">constrained</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">generation</span><span class="o">=</span><span class="s1">'R2025A'</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span>
+    <span class="s1">'constrained R2025A -&gt;'</span><span class="p">,</span>
+    <span class="n">cat</span><span class="o">.</span><span class="n">pick_subalias</span><span class="p">(</span><span class="s1">'pop'</span><span class="p">,</span> <span class="n">constrained</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">generation</span><span class="o">=</span><span class="s1">'R2025A'</span><span class="p">),</span>
+<span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s1">'global 1km -&gt;'</span><span class="p">,</span> <span class="n">cat</span><span class="o">.</span><span class="n">pick_subalias</span><span class="p">(</span><span class="s1">'pop'</span><span class="p">,</span> <span class="n">resolution</span><span class="o">=</span><span class="s1">'1km'</span><span class="p">,</span> <span class="n">scope</span><span class="o">=</span><span class="s1">'global'</span><span class="p">))</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-2">print('population -&gt;', cat.resolve('population'))
 print('default pop sub-alias -&gt;', cat.pick_subalias('pop'))
-print('constrained R2025A -&gt;', cat.pick_subalias('pop', constrained=True, generation='R2025A'))
+print(
+    'constrained R2025A -&gt;',
+    cat.pick_subalias('pop', constrained=True, generation='R2025A'),
+)
 print('global 1km -&gt;', cat.pick_subalias('pop', resolution='1km', scope='global'))</div>
 </div>
 </div>
@@ -11601,13 +11609,35 @@ print('global 1km -&gt;', cat.pick_subalias('pop', resolution='1km', scope='glob
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">cat</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'pop'</span><span class="p">)</span><span class="o">.</span><span class="n">subaliases</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="s1">'| constrained'</span><span class="p">,</span> <span class="n">s</span><span class="o">.</span><span class="n">constrained</span><span class="p">,</span> <span class="s1">'| res'</span><span class="p">,</span> <span class="n">s</span><span class="o">.</span><span class="n">resolution</span><span class="p">,</span>
-          <span class="s1">'| scope'</span><span class="p">,</span> <span class="n">s</span><span class="o">.</span><span class="n">scope</span><span class="p">,</span> <span class="s1">'| gen'</span><span class="p">,</span> <span class="n">s</span><span class="o">.</span><span class="n">generation</span><span class="p">,</span> <span class="s1">'| years'</span><span class="p">,</span> <span class="n">s</span><span class="o">.</span><span class="n">years</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span>
+        <span class="n">s</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+        <span class="s1">'| constrained'</span><span class="p">,</span>
+        <span class="n">s</span><span class="o">.</span><span class="n">constrained</span><span class="p">,</span>
+        <span class="s1">'| res'</span><span class="p">,</span>
+        <span class="n">s</span><span class="o">.</span><span class="n">resolution</span><span class="p">,</span>
+        <span class="s1">'| scope'</span><span class="p">,</span>
+        <span class="n">s</span><span class="o">.</span><span class="n">scope</span><span class="p">,</span>
+        <span class="s1">'| gen'</span><span class="p">,</span>
+        <span class="n">s</span><span class="o">.</span><span class="n">generation</span><span class="p">,</span>
+        <span class="s1">'| years'</span><span class="p">,</span>
+        <span class="n">s</span><span class="o">.</span><span class="n">years</span><span class="p">,</span>
+    <span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s1">'age_structures demographic:'</span><span class="p">,</span> <span class="n">cat</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'age_structures'</span><span class="p">)</span><span class="o">.</span><span class="n">demographic</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-3">for s in cat.get('pop').subaliases:
-    print(s.id, '| constrained', s.constrained, '| res', s.resolution,
-          '| scope', s.scope, '| gen', s.generation, '| years', s.years)
+    print(
+        s.id,
+        '| constrained',
+        s.constrained,
+        '| res',
+        s.resolution,
+        '| scope',
+        s.scope,
+        '| gen',
+        s.generation,
+        '| years',
+        s.years,
+    )
 print('age_structures demographic:', cat.get('age_structures').demographic)</div>
 </div>
 </div>
@@ -11645,14 +11675,16 @@ print('age_structures demographic:', cat.get('age_structures').demographic)</div
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="k">try</span><span class="p">:</span>
-    <span class="n">cat</span><span class="o">.</span><span class="n">pick_subalias</span><span class="p">(</span><span class="s1">'pop'</span><span class="p">,</span> <span class="n">constrained</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">resolution</span><span class="o">=</span><span class="s1">'1km'</span><span class="p">,</span>
-                      <span class="n">generation</span><span class="o">=</span><span class="s1">'R2021'</span><span class="p">,</span> <span class="n">scope</span><span class="o">=</span><span class="s1">'countries'</span><span class="p">)</span>
+    <span class="n">cat</span><span class="o">.</span><span class="n">pick_subalias</span><span class="p">(</span>
+        <span class="s1">'pop'</span><span class="p">,</span> <span class="n">constrained</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">resolution</span><span class="o">=</span><span class="s1">'1km'</span><span class="p">,</span> <span class="n">generation</span><span class="o">=</span><span class="s1">'R2021'</span><span class="p">,</span> <span class="n">scope</span><span class="o">=</span><span class="s1">'countries'</span>
+    <span class="p">)</span>
 <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
     <span class="nb">print</span><span class="p">(</span><span class="s1">'rejected:'</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">exc</span><span class="p">)</span><span class="o">.</span><span class="n">splitlines</span><span class="p">()[</span><span class="mi">0</span><span class="p">])</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-4">try:
-    cat.pick_subalias('pop', constrained=True, resolution='1km',
-                      generation='R2021', scope='countries')
+    cat.pick_subalias(
+        'pop', constrained=True, resolution='1km', generation='R2021', scope='countries'
+    )
 except ValueError as exc:
     print('rejected:', str(exc).splitlines()[0])</div>
 </div>

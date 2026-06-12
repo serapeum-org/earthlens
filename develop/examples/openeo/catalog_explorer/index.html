@@ -11779,13 +11779,17 @@ for step in recipe.graph:
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">'sentinel-1-grd'</span><span class="p">,</span> <span class="s1">'sentinel-5p-no2-monthly'</span><span class="p">]:</span>
     <span class="n">g</span> <span class="o">=</span> <span class="n">cat</span><span class="o">.</span><span class="n">resolve</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s1">: collection_id=</span><span class="si">{</span><span class="n">g</span><span class="o">.</span><span class="n">collection_id</span><span class="si">}</span><span class="s1">, is_recipe=</span><span class="si">{</span><span class="n">g</span><span class="o">.</span><span class="n">is_recipe</span><span class="si">}</span><span class="s1">, '</span>
-          <span class="sa">f</span><span class="s1">'bands=</span><span class="si">{</span><span class="n">g</span><span class="o">.</span><span class="n">bands</span><span class="si">}</span><span class="s1">, steps=</span><span class="si">{</span><span class="p">[</span><span class="nb">next</span><span class="p">(</span><span class="nb">iter</span><span class="p">(</span><span class="n">s</span><span class="p">))</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">s</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="n">g</span><span class="o">.</span><span class="n">graph</span><span class="p">]</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span>
+        <span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s1">: collection_id=</span><span class="si">{</span><span class="n">g</span><span class="o">.</span><span class="n">collection_id</span><span class="si">}</span><span class="s1">, is_recipe=</span><span class="si">{</span><span class="n">g</span><span class="o">.</span><span class="n">is_recipe</span><span class="si">}</span><span class="s1">, '</span>
+        <span class="sa">f</span><span class="s1">'bands=</span><span class="si">{</span><span class="n">g</span><span class="o">.</span><span class="n">bands</span><span class="si">}</span><span class="s1">, steps=</span><span class="si">{</span><span class="p">[</span><span class="nb">next</span><span class="p">(</span><span class="nb">iter</span><span class="p">(</span><span class="n">s</span><span class="p">))</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">s</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="n">g</span><span class="o">.</span><span class="n">graph</span><span class="p">]</span><span class="si">}</span><span class="s1">'</span>
+    <span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-4">for key in ['sentinel-1-grd', 'sentinel-5p-no2-monthly']:
     g = cat.resolve(key)
-    print(f'{key}: collection_id={g.collection_id}, is_recipe={g.is_recipe}, '
-          f'bands={g.bands}, steps={[next(iter(s)) for s in g.graph]}')</div>
+    print(
+        f'{key}: collection_id={g.collection_id}, is_recipe={g.is_recipe}, '
+        f'bands={g.bands}, steps={[next(iter(s)) for s in g.graph]}'
+    )</div>
 </div>
 </div>
 </div>

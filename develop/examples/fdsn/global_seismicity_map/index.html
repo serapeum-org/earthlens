@@ -11604,12 +11604,14 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+
 <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
 
 <span class="n">OUT_DIR</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s1">'fdsn_output'</span><span class="p">)</span>
 <span class="n">OUT_DIR</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-1">from pathlib import Path
+
 from earthlens import EarthLens
 
 OUT_DIR = Path('fdsn_output')
@@ -11715,11 +11717,16 @@ except Exception as exc:
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="k">if</span> <span class="n">events</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">events</span><span class="p">):</span>
     <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+
     <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
     <span class="n">sc</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span>
-        <span class="n">events</span><span class="p">[</span><span class="s1">'longitude'</span><span class="p">],</span> <span class="n">events</span><span class="p">[</span><span class="s1">'latitude'</span><span class="p">],</span>
-        <span class="n">s</span><span class="o">=</span><span class="mi">2</span> <span class="o">**</span> <span class="n">events</span><span class="p">[</span><span class="s1">'magnitude'</span><span class="p">],</span> <span class="n">c</span><span class="o">=</span><span class="n">events</span><span class="p">[</span><span class="s1">'depth_km'</span><span class="p">],</span>
-        <span class="n">cmap</span><span class="o">=</span><span class="s1">'viridis_r'</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.6</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s1">'none'</span><span class="p">,</span>
+        <span class="n">events</span><span class="p">[</span><span class="s1">'longitude'</span><span class="p">],</span>
+        <span class="n">events</span><span class="p">[</span><span class="s1">'latitude'</span><span class="p">],</span>
+        <span class="n">s</span><span class="o">=</span><span class="mi">2</span> <span class="o">**</span> <span class="n">events</span><span class="p">[</span><span class="s1">'magnitude'</span><span class="p">],</span>
+        <span class="n">c</span><span class="o">=</span><span class="n">events</span><span class="p">[</span><span class="s1">'depth_km'</span><span class="p">],</span>
+        <span class="n">cmap</span><span class="o">=</span><span class="s1">'viridis_r'</span><span class="p">,</span>
+        <span class="n">alpha</span><span class="o">=</span><span class="mf">0.6</span><span class="p">,</span>
+        <span class="n">edgecolor</span><span class="o">=</span><span class="s1">'none'</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="n">fig</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">sc</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">'depth (km)'</span><span class="p">)</span>
     <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">'Global M5+ seismicity, 2023 (marker area ~ magnitude)'</span><span class="p">)</span>
@@ -11730,11 +11737,16 @@ except Exception as exc:
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-3">if events is not None and len(events):
     import matplotlib.pyplot as plt
+
     fig, ax = plt.subplots(figsize=(12, 6))
     sc = ax.scatter(
-        events['longitude'], events['latitude'],
-        s=2 ** events['magnitude'], c=events['depth_km'],
-        cmap='viridis_r', alpha=0.6, edgecolor='none',
+        events['longitude'],
+        events['latitude'],
+        s=2 ** events['magnitude'],
+        c=events['depth_km'],
+        cmap='viridis_r',
+        alpha=0.6,
+        edgecolor='none',
     )
     fig.colorbar(sc, ax=ax, label='depth (km)')
     ax.set_title('Global M5+ seismicity, 2023 (marker area ~ magnitude)')

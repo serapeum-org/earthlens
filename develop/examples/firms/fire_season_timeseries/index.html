@@ -11631,8 +11631,7 @@ OUT_DIR.mkdir(exist_ok=True)
 # Set FIRMS_MAP_KEY in your environment; the live cells below skip cleanly
 # (nbval-lax-safe) when it is absent, so the notebook never fails offline.
 HAS_KEY = bool(os.environ.get('FIRMS_MAP_KEY'))
-print('FIRMS_MAP_KEY set:', HAS_KEY)
-</div>
+print('FIRMS_MAP_KEY set:', HAS_KEY)</div>
 </div>
 </div>
 </div>
@@ -11680,7 +11679,7 @@ print('FIRMS_MAP_KEY set:', HAS_KEY)
             <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">'VIIRS_SNPP_NRT'</span><span class="p">],</span>
             <span class="n">start</span><span class="o">=</span><span class="n">START</span><span class="p">,</span>
             <span class="n">end</span><span class="o">=</span><span class="n">END</span><span class="p">,</span>
-            <span class="n">aoi</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">124.0</span><span class="p">,</span> <span class="mf">36.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">118.0</span><span class="p">,</span> <span class="mf">42.0</span><span class="p">],</span>   <span class="c1"># Northern California / Pacific NW</span>
+            <span class="n">aoi</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">124.0</span><span class="p">,</span> <span class="mf">36.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">118.0</span><span class="p">,</span> <span class="mf">42.0</span><span class="p">],</span>  <span class="c1"># Northern California / Pacific NW</span>
             <span class="n">path</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">OUT_DIR</span><span class="p">),</span>
         <span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">progress_bar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
         <span class="nb">print</span><span class="p">(</span><span class="s1">'detections:'</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">fires</span><span class="p">))</span>
@@ -11699,13 +11698,12 @@ if HAS_KEY:
             variables=['VIIRS_SNPP_NRT'],
             start=START,
             end=END,
-            aoi=[-124.0, 36.0, -118.0, 42.0],   # Northern California / Pacific NW
+            aoi=[-124.0, 36.0, -118.0, 42.0],  # Northern California / Pacific NW
             path=str(OUT_DIR),
         ).download(progress_bar=False)
         print('detections:', len(fires))
     except Exception as exc:
-        print('skipped live query:', exc)
-</div>
+        print('skipped live query:', exc)</div>
 </div>
 </div>
 </div>
@@ -11757,8 +11755,13 @@ if HAS_KEY:
     <span class="n">ax2</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">'total FRP (MW)'</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">'tab:red'</span><span class="p">)</span>
     <span class="n">ax1</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s1">'Daily fire activity, </span><span class="si">{</span><span class="n">START</span><span class="si">}</span><span class="s1"> to </span><span class="si">{</span><span class="n">END</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
     <span class="n">peak</span> <span class="o">=</span> <span class="n">counts</span><span class="o">.</span><span class="n">idxmax</span><span class="p">()</span>
-    <span class="n">ax1</span><span class="o">.</span><span class="n">annotate</span><span class="p">(</span><span class="sa">f</span><span class="s1">'peak: </span><span class="si">{</span><span class="n">peak</span><span class="si">}</span><span class="s1">'</span><span class="p">,</span> <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="n">peak</span><span class="p">,</span> <span class="n">counts</span><span class="o">.</span><span class="n">max</span><span class="p">()),</span> <span class="n">xytext</span><span class="o">=</span><span class="p">(</span><span class="mf">0.6</span><span class="p">,</span> <span class="mf">0.85</span><span class="p">),</span>
-                 <span class="n">textcoords</span><span class="o">=</span><span class="s1">'axes fraction'</span><span class="p">,</span> <span class="n">arrowprops</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">arrowstyle</span><span class="o">=</span><span class="s1">'-&gt;'</span><span class="p">))</span>
+    <span class="n">ax1</span><span class="o">.</span><span class="n">annotate</span><span class="p">(</span>
+        <span class="sa">f</span><span class="s1">'peak: </span><span class="si">{</span><span class="n">peak</span><span class="si">}</span><span class="s1">'</span><span class="p">,</span>
+        <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="n">peak</span><span class="p">,</span> <span class="n">counts</span><span class="o">.</span><span class="n">max</span><span class="p">()),</span>
+        <span class="n">xytext</span><span class="o">=</span><span class="p">(</span><span class="mf">0.6</span><span class="p">,</span> <span class="mf">0.85</span><span class="p">),</span>
+        <span class="n">textcoords</span><span class="o">=</span><span class="s1">'axes fraction'</span><span class="p">,</span>
+        <span class="n">arrowprops</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">arrowstyle</span><span class="o">=</span><span class="s1">'-&gt;'</span><span class="p">),</span>
+    <span class="p">)</span>
     <span class="n">fig</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
@@ -11778,11 +11781,15 @@ if HAS_KEY:
     ax2.set_ylabel('total FRP (MW)', color='tab:red')
     ax1.set_title(f'Daily fire activity, {START} to {END}')
     peak = counts.idxmax()
-    ax1.annotate(f'peak: {peak}', xy=(peak, counts.max()), xytext=(0.6, 0.85),
-                 textcoords='axes fraction', arrowprops=dict(arrowstyle='-&gt;'))
+    ax1.annotate(
+        f'peak: {peak}',
+        xy=(peak, counts.max()),
+        xytext=(0.6, 0.85),
+        textcoords='axes fraction',
+        arrowprops=dict(arrowstyle='-&gt;'),
+    )
     fig.tight_layout()
-    plt.show()
-</div>
+    plt.show()</div>
 </div>
 </div>
 </div>

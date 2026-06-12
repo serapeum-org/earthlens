@@ -11697,7 +11697,8 @@ monthly samples.</p>
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">earthlens</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span><span class="p">,</span> <span class="n">AggregationConfig</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">earthlens</span><span class="w"> </span><span class="kn">import</span> <span class="n">AggregationConfig</span><span class="p">,</span> <span class="n">EarthLens</span>
 
 <span class="n">EUR</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"lat_lim"</span><span class="p">:</span> <span class="p">[</span><span class="mf">35.0</span><span class="p">,</span> <span class="mf">60.0</span><span class="p">],</span> <span class="s2">"lon_lim"</span><span class="p">:</span> <span class="p">[</span><span class="o">-</span><span class="mf">10.0</span><span class="p">,</span> <span class="mf">30.0</span><span class="p">]}</span>
 <span class="n">VAR</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"reanalysis-era5-single-levels-monthly-means"</span><span class="p">:</span> <span class="p">[</span><span class="s2">"2m-temperature"</span><span class="p">]}</span>
@@ -11713,14 +11714,17 @@ monthly samples.</p>
     <span class="n">earthlens</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
         <span class="n">data_source</span><span class="o">=</span><span class="s2">"ecmwf"</span><span class="p">,</span>
         <span class="n">cadence</span><span class="o">=</span><span class="s2">"monthly"</span><span class="p">,</span>
-        <span class="n">start</span><span class="o">=</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="n">end</span><span class="p">,</span>
-        <span class="n">variables</span><span class="o">=</span><span class="n">VAR</span><span class="p">,</span> <span class="o">**</span><span class="n">EUR</span><span class="p">,</span>
+        <span class="n">start</span><span class="o">=</span><span class="n">start</span><span class="p">,</span>
+        <span class="n">end</span><span class="o">=</span><span class="n">end</span><span class="p">,</span>
+        <span class="n">variables</span><span class="o">=</span><span class="n">VAR</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">EUR</span><span class="p">,</span>
         <span class="n">path</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">path</span><span class="p">),</span>
     <span class="p">)</span>
     <span class="n">earthlens</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">aggregate</span><span class="o">=</span><span class="n">AggregationConfig</span><span class="p">(</span><span class="n">freq</span><span class="o">=</span><span class="s2">"1MS"</span><span class="p">,</span> <span class="n">op</span><span class="o">=</span><span class="s2">"mean"</span><span class="p">))</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-1">from pathlib import Path
-from earthlens import EarthLens, AggregationConfig
+
+from earthlens import AggregationConfig, EarthLens
 
 EUR = {"lat_lim": [35.0, 60.0], "lon_lim": [-10.0, 30.0]}
 VAR = {"reanalysis-era5-single-levels-monthly-means": ["2m-temperature"]}
@@ -11736,8 +11740,10 @@ for path, start, end in [
     earthlens = EarthLens(
         data_source="ecmwf",
         cadence="monthly",
-        start=start, end=end,
-        variables=VAR, **EUR,
+        start=start,
+        end=end,
+        variables=VAR,
+        **EUR,
         path=str(path),
     )
     earthlens.download(aggregate=AggregationConfig(freq="1MS", op="mean"))</div>
@@ -11786,9 +11792,9 @@ for path, start, end in [
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jupyter-widgets jp-OutputArea-output" id="cf3e7a49-4609-439a-ae31-2cff61656091" tabindex="0">
+<div class="jupyter-widgets jp-OutputArea-output" id="485e54d4-3f35-41df-b732-9edda589ee7b" tabindex="0">
 <script type="text/javascript">
-var element = document.getElementById('cf3e7a49-4609-439a-ae31-2cff61656091');
+var element = document.getElementById('485e54d4-3f35-41df-b732-9edda589ee7b');
 </script>
 <script type="application/vnd.jupyter.widget-view+json">
 {"model_id": "faf9542b5171461292e67e061c129124", "version_major": 2, "version_minor": 0}
@@ -11874,9 +11880,9 @@ var element = document.getElementById('cf3e7a49-4609-439a-ae31-2cff61656091');
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jupyter-widgets jp-OutputArea-output" id="77436a2f-db22-43be-a742-5f7eb23940e7" tabindex="0">
+<div class="jupyter-widgets jp-OutputArea-output" id="daf7568a-8afa-471c-af2c-463b387f4512" tabindex="0">
 <script type="text/javascript">
-var element = document.getElementById('77436a2f-db22-43be-a742-5f7eb23940e7');
+var element = document.getElementById('daf7568a-8afa-471c-af2c-463b387f4512');
 </script>
 <script type="application/vnd.jupyter.widget-view+json">
 {"model_id": "9f98854fc39240cabaddee63e1e8bb4d", "version_major": 2, "version_minor": 0}
@@ -11928,6 +11934,7 @@ average. Result: a 12-month seasonal cycle per decade.</p>
 <span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span>
 
+
 <span class="k">def</span><span class="w"> </span><span class="nf">decade_climatology</span><span class="p">(</span><span class="n">out_dir</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="n">start_year</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">:</span>
     <span class="n">paths</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">((</span><span class="n">out_dir</span> <span class="o">/</span> <span class="s2">"aggregated"</span><span class="p">)</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s2">"2m_temperature_1MS_*.tif"</span><span class="p">))</span>
     <span class="n">cube</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">Dataset</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">p</span><span class="p">))</span><span class="o">.</span><span class="n">read_array</span><span class="p">()</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">paths</span><span class="p">])</span>
@@ -11936,15 +11943,31 @@ average. Result: a 12-month seasonal cycle per decade.</p>
     <span class="n">s</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">site_mean</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">months</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">s</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">month</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
 
+
 <span class="n">old</span> <span class="o">=</span> <span class="n">decade_climatology</span><span class="p">(</span><span class="n">OUT_OLD</span><span class="p">,</span> <span class="mi">1991</span><span class="p">)</span>
 <span class="n">new</span> <span class="o">=</span> <span class="n">decade_climatology</span><span class="p">(</span><span class="n">OUT_NEW</span><span class="p">,</span> <span class="mi">2014</span><span class="p">)</span>
 <span class="n">anom</span> <span class="o">=</span> <span class="n">new</span> <span class="o">-</span> <span class="n">old</span>
 
-<span class="n">names</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"Jan"</span><span class="p">,</span> <span class="s2">"Feb"</span><span class="p">,</span> <span class="s2">"Mar"</span><span class="p">,</span> <span class="s2">"Apr"</span><span class="p">,</span> <span class="s2">"May"</span><span class="p">,</span> <span class="s2">"Jun"</span><span class="p">,</span> <span class="s2">"Jul"</span><span class="p">,</span> <span class="s2">"Aug"</span><span class="p">,</span> <span class="s2">"Sep"</span><span class="p">,</span> <span class="s2">"Oct"</span><span class="p">,</span> <span class="s2">"Nov"</span><span class="p">,</span> <span class="s2">"Dec"</span><span class="p">]</span>
+<span class="n">names</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">"Jan"</span><span class="p">,</span>
+    <span class="s2">"Feb"</span><span class="p">,</span>
+    <span class="s2">"Mar"</span><span class="p">,</span>
+    <span class="s2">"Apr"</span><span class="p">,</span>
+    <span class="s2">"May"</span><span class="p">,</span>
+    <span class="s2">"Jun"</span><span class="p">,</span>
+    <span class="s2">"Jul"</span><span class="p">,</span>
+    <span class="s2">"Aug"</span><span class="p">,</span>
+    <span class="s2">"Sep"</span><span class="p">,</span>
+    <span class="s2">"Oct"</span><span class="p">,</span>
+    <span class="s2">"Nov"</span><span class="p">,</span>
+    <span class="s2">"Dec"</span><span class="p">,</span>
+<span class="p">]</span>
 <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
-    <span class="p">{</span><span class="s2">"1991–2000 [°C]"</span><span class="p">:</span> <span class="n">old</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">(),</span>
-     <span class="s2">"2014–2023 [°C]"</span><span class="p">:</span> <span class="n">new</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">(),</span>
-     <span class="s2">"Δ [°C]"</span><span class="p">:</span>          <span class="n">anom</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()},</span>
+    <span class="p">{</span>
+        <span class="s2">"1991–2000 [°C]"</span><span class="p">:</span> <span class="n">old</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">(),</span>
+        <span class="s2">"2014–2023 [°C]"</span><span class="p">:</span> <span class="n">new</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">(),</span>
+        <span class="s2">"Δ [°C]"</span><span class="p">:</span> <span class="n">anom</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">(),</span>
+    <span class="p">},</span>
     <span class="n">index</span><span class="o">=</span><span class="n">names</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="n">df</span>
@@ -11952,6 +11975,7 @@ average. Result: a 12-month seasonal cycle per decade.</p>
 <div class="clipboard-copy-txt" id="cell-2">import numpy as np
 import pandas as pd
 from pyramids.dataset import Dataset
+
 
 def decade_climatology(out_dir: Path, start_year: int) -&gt; pd.Series:
     paths = sorted((out_dir / "aggregated").glob("2m_temperature_1MS_*.tif"))
@@ -11961,15 +11985,31 @@ def decade_climatology(out_dir: Path, start_year: int) -&gt; pd.Series:
     s = pd.Series(site_mean, index=months)
     return s.groupby(s.index.month).mean()
 
+
 old = decade_climatology(OUT_OLD, 1991)
 new = decade_climatology(OUT_NEW, 2014)
 anom = new - old
 
-names = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+names = [
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
+]
 df = pd.DataFrame(
-    {"1991–2000 [°C]": old.round(2).to_numpy(),
-     "2014–2023 [°C]": new.round(2).to_numpy(),
-     "Δ [°C]":          anom.round(2).to_numpy()},
+    {
+        "1991–2000 [°C]": old.round(2).to_numpy(),
+        "2014–2023 [°C]": new.round(2).to_numpy(),
+        "Δ [°C]": anom.round(2).to_numpy(),
+    },
     index=names,
 )
 df</div>

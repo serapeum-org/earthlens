@@ -26341,7 +26341,9 @@ matched record carries no GeoTIFF (e.g. an archive-only product).</p>
 <span class="normal"><a href="#__codelineno-0-248">248</a></span>
 <span class="normal"><a href="#__codelineno-0-249">249</a></span>
 <span class="normal"><a href="#__codelineno-0-250">250</a></span>
-<span class="normal"><a href="#__codelineno-0-251">251</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-190" name="__codelineno-0-190"></a><span class="k">def</span><span class="w"> </span><span class="nf">global_files_for_year</span><span class="p">(</span>
+<span class="normal"><a href="#__codelineno-0-251">251</a></span>
+<span class="normal"><a href="#__codelineno-0-252">252</a></span>
+<span class="normal"><a href="#__codelineno-0-253">253</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-190" name="__codelineno-0-190"></a><span class="k">def</span><span class="w"> </span><span class="nf">global_files_for_year</span><span class="p">(</span>
 <a id="__codelineno-0-191" name="__codelineno-0-191"></a>    <span class="n">alias</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
 <a id="__codelineno-0-192" name="__codelineno-0-192"></a>    <span class="n">subalias_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
 <a id="__codelineno-0-193" name="__codelineno-0-193"></a>    <span class="n">year</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
@@ -26384,25 +26386,27 @@ matched record carries no GeoTIFF (e.g. an archive-only product).</p>
 <a id="__codelineno-0-230" name="__codelineno-0-230"></a>    <span class="k">if</span> <span class="n">year</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
 <a id="__codelineno-0-231" name="__codelineno-0-231"></a>        <span class="n">record</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">dated</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">d</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="s2">&quot;popyear&quot;</span><span class="p">]))</span>
 <a id="__codelineno-0-232" name="__codelineno-0-232"></a>    <span class="k">else</span><span class="p">:</span>
-<a id="__codelineno-0-233" name="__codelineno-0-233"></a>        <span class="n">record</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span>
-<a id="__codelineno-0-234" name="__codelineno-0-234"></a>            <span class="p">(</span><span class="n">d</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">dated</span> <span class="k">if</span> <span class="nb">int</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="s2">&quot;popyear&quot;</span><span class="p">])</span> <span class="o">==</span> <span class="nb">int</span><span class="p">(</span><span class="n">year</span><span class="p">)),</span> <span class="kc">None</span>
-<a id="__codelineno-0-235" name="__codelineno-0-235"></a>        <span class="p">)</span>
-<a id="__codelineno-0-236" name="__codelineno-0-236"></a>        <span class="k">if</span> <span class="n">record</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-237" name="__codelineno-0-237"></a>            <span class="n">available</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">({</span><span class="nb">int</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="s2">&quot;popyear&quot;</span><span class="p">])</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">dated</span><span class="p">})</span>
-<a id="__codelineno-0-238" name="__codelineno-0-238"></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-<a id="__codelineno-0-239" name="__codelineno-0-239"></a>                <span class="sa">f</span><span class="s2">&quot;WorldPop </span><span class="si">{</span><span class="n">alias</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">subalias_id</span><span class="si">}</span><span class="s2"> year </span><span class="si">{</span><span class="n">year</span><span class="si">}</span><span class="s2"> is not available; &quot;</span>
-<a id="__codelineno-0-240" name="__codelineno-0-240"></a>                <span class="sa">f</span><span class="s2">&quot;have </span><span class="si">{</span><span class="n">available</span><span class="si">}</span><span class="s2">.&quot;</span>
-<a id="__codelineno-0-241" name="__codelineno-0-241"></a>            <span class="p">)</span>
-<a id="__codelineno-0-242" name="__codelineno-0-242"></a>    <span class="n">tifs</span> <span class="o">=</span> <span class="n">record_files</span><span class="p">(</span>
-<a id="__codelineno-0-243" name="__codelineno-0-243"></a>        <span class="n">alias</span><span class="p">,</span> <span class="n">subalias_id</span><span class="p">,</span> <span class="n">record</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">],</span> <span class="n">base_url</span><span class="o">=</span><span class="n">base_url</span><span class="p">,</span> <span class="n">session</span><span class="o">=</span><span class="n">session</span><span class="p">,</span>
-<a id="__codelineno-0-244" name="__codelineno-0-244"></a>        <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">,</span>
-<a id="__codelineno-0-245" name="__codelineno-0-245"></a>    <span class="p">)</span>
-<a id="__codelineno-0-246" name="__codelineno-0-246"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="n">tifs</span><span class="p">:</span>
-<a id="__codelineno-0-247" name="__codelineno-0-247"></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-<a id="__codelineno-0-248" name="__codelineno-0-248"></a>            <span class="sa">f</span><span class="s2">&quot;WorldPop </span><span class="si">{</span><span class="n">alias</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">subalias_id</span><span class="si">}</span><span class="s2"> record </span><span class="si">{</span><span class="n">record</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;popyear&#39;</span><span class="p">)</span><span class="si">!r}</span><span class="s2"> &quot;</span>
-<a id="__codelineno-0-249" name="__codelineno-0-249"></a>            <span class="s2">&quot;carries no GeoTIFF (archive-distributed product?).&quot;</span>
-<a id="__codelineno-0-250" name="__codelineno-0-250"></a>        <span class="p">)</span>
-<a id="__codelineno-0-251" name="__codelineno-0-251"></a>    <span class="k">return</span> <span class="n">tifs</span>
+<a id="__codelineno-0-233" name="__codelineno-0-233"></a>        <span class="n">record</span> <span class="o">=</span> <span class="nb">next</span><span class="p">((</span><span class="n">d</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">dated</span> <span class="k">if</span> <span class="nb">int</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="s2">&quot;popyear&quot;</span><span class="p">])</span> <span class="o">==</span> <span class="nb">int</span><span class="p">(</span><span class="n">year</span><span class="p">)),</span> <span class="kc">None</span><span class="p">)</span>
+<a id="__codelineno-0-234" name="__codelineno-0-234"></a>        <span class="k">if</span> <span class="n">record</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-235" name="__codelineno-0-235"></a>            <span class="n">available</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">({</span><span class="nb">int</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="s2">&quot;popyear&quot;</span><span class="p">])</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">dated</span><span class="p">})</span>
+<a id="__codelineno-0-236" name="__codelineno-0-236"></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+<a id="__codelineno-0-237" name="__codelineno-0-237"></a>                <span class="sa">f</span><span class="s2">&quot;WorldPop </span><span class="si">{</span><span class="n">alias</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">subalias_id</span><span class="si">}</span><span class="s2"> year </span><span class="si">{</span><span class="n">year</span><span class="si">}</span><span class="s2"> is not available; &quot;</span>
+<a id="__codelineno-0-238" name="__codelineno-0-238"></a>                <span class="sa">f</span><span class="s2">&quot;have </span><span class="si">{</span><span class="n">available</span><span class="si">}</span><span class="s2">.&quot;</span>
+<a id="__codelineno-0-239" name="__codelineno-0-239"></a>            <span class="p">)</span>
+<a id="__codelineno-0-240" name="__codelineno-0-240"></a>    <span class="n">tifs</span> <span class="o">=</span> <span class="n">record_files</span><span class="p">(</span>
+<a id="__codelineno-0-241" name="__codelineno-0-241"></a>        <span class="n">alias</span><span class="p">,</span>
+<a id="__codelineno-0-242" name="__codelineno-0-242"></a>        <span class="n">subalias_id</span><span class="p">,</span>
+<a id="__codelineno-0-243" name="__codelineno-0-243"></a>        <span class="n">record</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">],</span>
+<a id="__codelineno-0-244" name="__codelineno-0-244"></a>        <span class="n">base_url</span><span class="o">=</span><span class="n">base_url</span><span class="p">,</span>
+<a id="__codelineno-0-245" name="__codelineno-0-245"></a>        <span class="n">session</span><span class="o">=</span><span class="n">session</span><span class="p">,</span>
+<a id="__codelineno-0-246" name="__codelineno-0-246"></a>        <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">,</span>
+<a id="__codelineno-0-247" name="__codelineno-0-247"></a>    <span class="p">)</span>
+<a id="__codelineno-0-248" name="__codelineno-0-248"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="n">tifs</span><span class="p">:</span>
+<a id="__codelineno-0-249" name="__codelineno-0-249"></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+<a id="__codelineno-0-250" name="__codelineno-0-250"></a>            <span class="sa">f</span><span class="s2">&quot;WorldPop </span><span class="si">{</span><span class="n">alias</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">subalias_id</span><span class="si">}</span><span class="s2"> record </span><span class="si">{</span><span class="n">record</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;popyear&#39;</span><span class="p">)</span><span class="si">!r}</span><span class="s2"> &quot;</span>
+<a id="__codelineno-0-251" name="__codelineno-0-251"></a>            <span class="s2">&quot;carries no GeoTIFF (archive-distributed product?).&quot;</span>
+<a id="__codelineno-0-252" name="__codelineno-0-252"></a>        <span class="p">)</span>
+<a id="__codelineno-0-253" name="__codelineno-0-253"></a>    <span class="k">return</span> <span class="n">tifs</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -26831,9 +26835,7 @@ this returns the URLs ending in <code>.{fmt}</code>.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>src/earthlens/worldpop/rest.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-254">254</a></span>
-<span class="normal"><a href="#__codelineno-0-255">255</a></span>
-<span class="normal"><a href="#__codelineno-0-256">256</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-256">256</a></span>
 <span class="normal"><a href="#__codelineno-0-257">257</a></span>
 <span class="normal"><a href="#__codelineno-0-258">258</a></span>
 <span class="normal"><a href="#__codelineno-0-259">259</a></span>
@@ -26870,46 +26872,48 @@ this returns the URLs ending in <code>.{fmt}</code>.</p>
 <span class="normal"><a href="#__codelineno-0-290">290</a></span>
 <span class="normal"><a href="#__codelineno-0-291">291</a></span>
 <span class="normal"><a href="#__codelineno-0-292">292</a></span>
-<span class="normal"><a href="#__codelineno-0-293">293</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-254" name="__codelineno-0-254"></a><span class="k">def</span><span class="w"> </span><span class="nf">record_archive_files</span><span class="p">(</span>
-<a id="__codelineno-0-255" name="__codelineno-0-255"></a>    <span class="n">alias</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-<a id="__codelineno-0-256" name="__codelineno-0-256"></a>    <span class="n">subalias_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-<a id="__codelineno-0-257" name="__codelineno-0-257"></a>    <span class="n">record_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-<a id="__codelineno-0-258" name="__codelineno-0-258"></a>    <span class="n">fmt</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-<a id="__codelineno-0-259" name="__codelineno-0-259"></a>    <span class="o">*</span><span class="p">,</span>
-<a id="__codelineno-0-260" name="__codelineno-0-260"></a>    <span class="n">base_url</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">BASE_URL</span><span class="p">,</span>
-<a id="__codelineno-0-261" name="__codelineno-0-261"></a>    <span class="n">session</span><span class="p">:</span> <span class="n">requests</span><span class="o">.</span><span class="n">Session</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-262" name="__codelineno-0-262"></a>    <span class="n">timeout</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">_TIMEOUT</span><span class="p">,</span>
-<a id="__codelineno-0-263" name="__codelineno-0-263"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<a id="__codelineno-0-264" name="__codelineno-0-264"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return a record&#39;s archive URLs (`.zip` / `.7z`) via the `?id=` detail.</span>
-<a id="__codelineno-0-265" name="__codelineno-0-265"></a>
-<a id="__codelineno-0-266" name="__codelineno-0-266"></a><span class="sd">    The archive products (`future_pop` per-SSP `.zip`, `dependency_ratios`</span>
-<a id="__codelineno-0-267" name="__codelineno-0-267"></a><span class="sd">    per-continent `.7z`) carry their downloads as archives, not GeoTIFFs;</span>
-<a id="__codelineno-0-268" name="__codelineno-0-268"></a><span class="sd">    this returns the URLs ending in `.{fmt}`.</span>
-<a id="__codelineno-0-269" name="__codelineno-0-269"></a>
-<a id="__codelineno-0-270" name="__codelineno-0-270"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-271" name="__codelineno-0-271"></a><span class="sd">        alias: Top-level product alias.</span>
-<a id="__codelineno-0-272" name="__codelineno-0-272"></a><span class="sd">        subalias_id: The sub-alias id.</span>
-<a id="__codelineno-0-273" name="__codelineno-0-273"></a><span class="sd">        record_id: The `id` of a record from `global_records`.</span>
-<a id="__codelineno-0-274" name="__codelineno-0-274"></a><span class="sd">        fmt: Archive extension to keep — `&quot;zip&quot;` or `&quot;7z&quot;`.</span>
-<a id="__codelineno-0-275" name="__codelineno-0-275"></a><span class="sd">        base_url: REST base URL (overridable for tests).</span>
-<a id="__codelineno-0-276" name="__codelineno-0-276"></a><span class="sd">        session: Optional `requests.Session`.</span>
-<a id="__codelineno-0-277" name="__codelineno-0-277"></a><span class="sd">        timeout: Per-request timeout in seconds.</span>
-<a id="__codelineno-0-278" name="__codelineno-0-278"></a>
-<a id="__codelineno-0-279" name="__codelineno-0-279"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-280" name="__codelineno-0-280"></a><span class="sd">        list[str]: The record&#39;s archive URLs ending in `.{fmt}`.</span>
-<a id="__codelineno-0-281" name="__codelineno-0-281"></a>
-<a id="__codelineno-0-282" name="__codelineno-0-282"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-283" name="__codelineno-0-283"></a><span class="sd">        requests.HTTPError: If the endpoint returns a non-2xx status.</span>
-<a id="__codelineno-0-284" name="__codelineno-0-284"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-285" name="__codelineno-0-285"></a>    <span class="n">getter</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">get</span> <span class="k">if</span> <span class="n">session</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span>
-<a id="__codelineno-0-286" name="__codelineno-0-286"></a>    <span class="n">resp</span> <span class="o">=</span> <span class="n">getter</span><span class="p">(</span>
-<a id="__codelineno-0-287" name="__codelineno-0-287"></a>        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">base_url</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">alias</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">subalias_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="n">record_id</span><span class="p">},</span> <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span>
-<a id="__codelineno-0-288" name="__codelineno-0-288"></a>    <span class="p">)</span>
-<a id="__codelineno-0-289" name="__codelineno-0-289"></a>    <span class="n">resp</span><span class="o">.</span><span class="n">raise_for_status</span><span class="p">()</span>
-<a id="__codelineno-0-290" name="__codelineno-0-290"></a>    <span class="n">data</span> <span class="o">=</span> <span class="n">resp</span><span class="o">.</span><span class="n">json</span><span class="p">()</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;data&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-291" name="__codelineno-0-291"></a>    <span class="n">record</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">and</span> <span class="n">data</span> <span class="k">else</span> <span class="p">(</span><span class="n">data</span> <span class="ow">or</span> <span class="p">{})</span>
-<a id="__codelineno-0-292" name="__codelineno-0-292"></a>    <span class="n">suffix</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;.</span><span class="si">{</span><span class="n">fmt</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-293" name="__codelineno-0-293"></a>    <span class="k">return</span> <span class="p">[</span><span class="n">url</span> <span class="k">for</span> <span class="n">url</span> <span class="ow">in</span> <span class="p">(</span><span class="n">record</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;files&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="p">[])</span> <span class="k">if</span> <span class="n">url</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="n">suffix</span><span class="p">)]</span>
+<span class="normal"><a href="#__codelineno-0-293">293</a></span>
+<span class="normal"><a href="#__codelineno-0-294">294</a></span>
+<span class="normal"><a href="#__codelineno-0-295">295</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-256" name="__codelineno-0-256"></a><span class="k">def</span><span class="w"> </span><span class="nf">record_archive_files</span><span class="p">(</span>
+<a id="__codelineno-0-257" name="__codelineno-0-257"></a>    <span class="n">alias</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+<a id="__codelineno-0-258" name="__codelineno-0-258"></a>    <span class="n">subalias_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+<a id="__codelineno-0-259" name="__codelineno-0-259"></a>    <span class="n">record_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+<a id="__codelineno-0-260" name="__codelineno-0-260"></a>    <span class="n">fmt</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+<a id="__codelineno-0-261" name="__codelineno-0-261"></a>    <span class="o">*</span><span class="p">,</span>
+<a id="__codelineno-0-262" name="__codelineno-0-262"></a>    <span class="n">base_url</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">BASE_URL</span><span class="p">,</span>
+<a id="__codelineno-0-263" name="__codelineno-0-263"></a>    <span class="n">session</span><span class="p">:</span> <span class="n">requests</span><span class="o">.</span><span class="n">Session</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-264" name="__codelineno-0-264"></a>    <span class="n">timeout</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">_TIMEOUT</span><span class="p">,</span>
+<a id="__codelineno-0-265" name="__codelineno-0-265"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<a id="__codelineno-0-266" name="__codelineno-0-266"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return a record&#39;s archive URLs (`.zip` / `.7z`) via the `?id=` detail.</span>
+<a id="__codelineno-0-267" name="__codelineno-0-267"></a>
+<a id="__codelineno-0-268" name="__codelineno-0-268"></a><span class="sd">    The archive products (`future_pop` per-SSP `.zip`, `dependency_ratios`</span>
+<a id="__codelineno-0-269" name="__codelineno-0-269"></a><span class="sd">    per-continent `.7z`) carry their downloads as archives, not GeoTIFFs;</span>
+<a id="__codelineno-0-270" name="__codelineno-0-270"></a><span class="sd">    this returns the URLs ending in `.{fmt}`.</span>
+<a id="__codelineno-0-271" name="__codelineno-0-271"></a>
+<a id="__codelineno-0-272" name="__codelineno-0-272"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-273" name="__codelineno-0-273"></a><span class="sd">        alias: Top-level product alias.</span>
+<a id="__codelineno-0-274" name="__codelineno-0-274"></a><span class="sd">        subalias_id: The sub-alias id.</span>
+<a id="__codelineno-0-275" name="__codelineno-0-275"></a><span class="sd">        record_id: The `id` of a record from `global_records`.</span>
+<a id="__codelineno-0-276" name="__codelineno-0-276"></a><span class="sd">        fmt: Archive extension to keep — `&quot;zip&quot;` or `&quot;7z&quot;`.</span>
+<a id="__codelineno-0-277" name="__codelineno-0-277"></a><span class="sd">        base_url: REST base URL (overridable for tests).</span>
+<a id="__codelineno-0-278" name="__codelineno-0-278"></a><span class="sd">        session: Optional `requests.Session`.</span>
+<a id="__codelineno-0-279" name="__codelineno-0-279"></a><span class="sd">        timeout: Per-request timeout in seconds.</span>
+<a id="__codelineno-0-280" name="__codelineno-0-280"></a>
+<a id="__codelineno-0-281" name="__codelineno-0-281"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-282" name="__codelineno-0-282"></a><span class="sd">        list[str]: The record&#39;s archive URLs ending in `.{fmt}`.</span>
+<a id="__codelineno-0-283" name="__codelineno-0-283"></a>
+<a id="__codelineno-0-284" name="__codelineno-0-284"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-285" name="__codelineno-0-285"></a><span class="sd">        requests.HTTPError: If the endpoint returns a non-2xx status.</span>
+<a id="__codelineno-0-286" name="__codelineno-0-286"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-287" name="__codelineno-0-287"></a>    <span class="n">getter</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">get</span> <span class="k">if</span> <span class="n">session</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span>
+<a id="__codelineno-0-288" name="__codelineno-0-288"></a>    <span class="n">resp</span> <span class="o">=</span> <span class="n">getter</span><span class="p">(</span>
+<a id="__codelineno-0-289" name="__codelineno-0-289"></a>        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">base_url</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">alias</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">subalias_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="n">record_id</span><span class="p">},</span> <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span>
+<a id="__codelineno-0-290" name="__codelineno-0-290"></a>    <span class="p">)</span>
+<a id="__codelineno-0-291" name="__codelineno-0-291"></a>    <span class="n">resp</span><span class="o">.</span><span class="n">raise_for_status</span><span class="p">()</span>
+<a id="__codelineno-0-292" name="__codelineno-0-292"></a>    <span class="n">data</span> <span class="o">=</span> <span class="n">resp</span><span class="o">.</span><span class="n">json</span><span class="p">()</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;data&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-293" name="__codelineno-0-293"></a>    <span class="n">record</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">and</span> <span class="n">data</span> <span class="k">else</span> <span class="p">(</span><span class="n">data</span> <span class="ow">or</span> <span class="p">{})</span>
+<a id="__codelineno-0-294" name="__codelineno-0-294"></a>    <span class="n">suffix</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;.</span><span class="si">{</span><span class="n">fmt</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-295" name="__codelineno-0-295"></a>    <span class="k">return</span> <span class="p">[</span><span class="n">url</span> <span class="k">for</span> <span class="n">url</span> <span class="ow">in</span> <span class="p">(</span><span class="n">record</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;files&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="p">[])</span> <span class="k">if</span> <span class="n">url</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="n">suffix</span><span class="p">)]</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -26987,9 +26991,7 @@ dataset, used to stamp output sidecars.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>src/earthlens/worldpop/rest.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-296">296</a></span>
-<span class="normal"><a href="#__codelineno-0-297">297</a></span>
-<span class="normal"><a href="#__codelineno-0-298">298</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-298">298</a></span>
 <span class="normal"><a href="#__codelineno-0-299">299</a></span>
 <span class="normal"><a href="#__codelineno-0-300">300</a></span>
 <span class="normal"><a href="#__codelineno-0-301">301</a></span>
@@ -27001,21 +27003,23 @@ dataset, used to stamp output sidecars.</p>
 <span class="normal"><a href="#__codelineno-0-307">307</a></span>
 <span class="normal"><a href="#__codelineno-0-308">308</a></span>
 <span class="normal"><a href="#__codelineno-0-309">309</a></span>
-<span class="normal"><a href="#__codelineno-0-310">310</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-296" name="__codelineno-0-296"></a><span class="k">def</span><span class="w"> </span><span class="nf">record_citation</span><span class="p">(</span><span class="n">records</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-297" name="__codelineno-0-297"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the `citation` of the first record, or `None` if absent.</span>
-<a id="__codelineno-0-298" name="__codelineno-0-298"></a>
-<a id="__codelineno-0-299" name="__codelineno-0-299"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-300" name="__codelineno-0-300"></a><span class="sd">        records: The list returned by `rest_records`.</span>
-<a id="__codelineno-0-301" name="__codelineno-0-301"></a>
-<a id="__codelineno-0-302" name="__codelineno-0-302"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-303" name="__codelineno-0-303"></a><span class="sd">        str | None: The CC-BY-4.0 citation text WorldPop attaches to the</span>
-<a id="__codelineno-0-304" name="__codelineno-0-304"></a><span class="sd">            dataset, used to stamp output sidecars.</span>
-<a id="__codelineno-0-305" name="__codelineno-0-305"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-306" name="__codelineno-0-306"></a>    <span class="k">for</span> <span class="n">record</span> <span class="ow">in</span> <span class="n">records</span><span class="p">:</span>
-<a id="__codelineno-0-307" name="__codelineno-0-307"></a>        <span class="n">citation</span> <span class="o">=</span> <span class="n">record</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;citation&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-308" name="__codelineno-0-308"></a>        <span class="k">if</span> <span class="n">citation</span><span class="p">:</span>
-<a id="__codelineno-0-309" name="__codelineno-0-309"></a>            <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">citation</span><span class="p">)</span>
-<a id="__codelineno-0-310" name="__codelineno-0-310"></a>    <span class="k">return</span> <span class="kc">None</span>
+<span class="normal"><a href="#__codelineno-0-310">310</a></span>
+<span class="normal"><a href="#__codelineno-0-311">311</a></span>
+<span class="normal"><a href="#__codelineno-0-312">312</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-298" name="__codelineno-0-298"></a><span class="k">def</span><span class="w"> </span><span class="nf">record_citation</span><span class="p">(</span><span class="n">records</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-299" name="__codelineno-0-299"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the `citation` of the first record, or `None` if absent.</span>
+<a id="__codelineno-0-300" name="__codelineno-0-300"></a>
+<a id="__codelineno-0-301" name="__codelineno-0-301"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-302" name="__codelineno-0-302"></a><span class="sd">        records: The list returned by `rest_records`.</span>
+<a id="__codelineno-0-303" name="__codelineno-0-303"></a>
+<a id="__codelineno-0-304" name="__codelineno-0-304"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-305" name="__codelineno-0-305"></a><span class="sd">        str | None: The CC-BY-4.0 citation text WorldPop attaches to the</span>
+<a id="__codelineno-0-306" name="__codelineno-0-306"></a><span class="sd">            dataset, used to stamp output sidecars.</span>
+<a id="__codelineno-0-307" name="__codelineno-0-307"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-308" name="__codelineno-0-308"></a>    <span class="k">for</span> <span class="n">record</span> <span class="ow">in</span> <span class="n">records</span><span class="p">:</span>
+<a id="__codelineno-0-309" name="__codelineno-0-309"></a>        <span class="n">citation</span> <span class="o">=</span> <span class="n">record</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;citation&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-310" name="__codelineno-0-310"></a>        <span class="k">if</span> <span class="n">citation</span><span class="p">:</span>
+<a id="__codelineno-0-311" name="__codelineno-0-311"></a>            <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">citation</span><span class="p">)</span>
+<a id="__codelineno-0-312" name="__codelineno-0-312"></a>    <span class="k">return</span> <span class="kc">None</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>

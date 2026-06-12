@@ -11638,16 +11638,16 @@ few metres to fetch just the surface field.</p>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">xarray</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">xr</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.netcdf</span><span class="w"> </span><span class="kn">import</span> <span class="n">NetCDF</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.cmems</span><span class="w"> </span><span class="kn">import</span> <span class="n">Catalog</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.netcdf</span><span class="w"> </span><span class="kn">import</span> <span class="n">NetCDF</span>
 
 <span class="n">OUT_DIR</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s1">'data/cmems-medsst'</span><span class="p">)</span>
 <span class="n">OUT_DIR</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
 <span class="n">DATASET_ID</span> <span class="o">=</span> <span class="s1">'cmems_mod_med_phy-temp_my_4.2km_P1D-m'</span>
-<span class="n">DAY</span> <span class="o">=</span> <span class="s1">'2020-08-15'</span>           <span class="c1"># mid-summer, strong basin-wide SST gradient</span>
+<span class="n">DAY</span> <span class="o">=</span> <span class="s1">'2020-08-15'</span>  <span class="c1"># mid-summer, strong basin-wide SST gradient</span>
 
 <span class="n">ds_meta</span> <span class="o">=</span> <span class="n">Catalog</span><span class="p">()</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">DATASET_ID</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="n">DATASET_ID</span><span class="si">}</span><span class="s1">: domain=</span><span class="si">{</span><span class="n">ds_meta</span><span class="o">.</span><span class="n">domain</span><span class="si">}</span><span class="s1">, cadence=</span><span class="si">{</span><span class="n">ds_meta</span><span class="o">.</span><span class="n">cadence</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
@@ -11657,16 +11657,16 @@ few metres to fetch just the surface field.</p>
 from pathlib import Path
 
 import xarray as xr
+from pyramids.netcdf import NetCDF
 
 from earthlens import EarthLens
 from earthlens.cmems import Catalog
-from pyramids.netcdf import NetCDF
 
 OUT_DIR = Path('data/cmems-medsst')
 OUT_DIR.mkdir(parents=True, exist_ok=True)
 
 DATASET_ID = 'cmems_mod_med_phy-temp_my_4.2km_P1D-m'
-DAY = '2020-08-15'           # mid-summer, strong basin-wide SST gradient
+DAY = '2020-08-15'  # mid-summer, strong basin-wide SST gradient
 
 ds_meta = Catalog().get_dataset(DATASET_ID)
 print(f'{DATASET_ID}: domain={ds_meta.domain}, cadence={ds_meta.cadence}')
@@ -11732,7 +11732,8 @@ thetao units: degrees_C
     <span class="n">start</span><span class="o">=</span><span class="n">DAY</span><span class="p">,</span>
     <span class="n">end</span><span class="o">=</span><span class="n">DAY</span><span class="p">,</span>
     <span class="n">cadence</span><span class="o">=</span><span class="s1">'daily'</span><span class="p">,</span>
-    <span class="n">dataset</span><span class="o">=</span><span class="n">DATASET_ID</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">'thetao'</span><span class="p">],</span>
+    <span class="n">dataset</span><span class="o">=</span><span class="n">DATASET_ID</span><span class="p">,</span>
+    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">'thetao'</span><span class="p">],</span>
     <span class="n">aoi</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">6.0</span><span class="p">,</span> <span class="mf">30.0</span><span class="p">,</span> <span class="mf">36.5</span><span class="p">,</span> <span class="mf">46.0</span><span class="p">],</span>
     <span class="n">path</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">OUT_DIR</span><span class="p">),</span>
     <span class="n">minimum_depth</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
@@ -11748,7 +11749,8 @@ thetao units: degrees_C
     start=DAY,
     end=DAY,
     cadence='daily',
-    dataset=DATASET_ID, variables=['thetao'],
+    dataset=DATASET_ID,
+    variables=['thetao'],
     aoi=[-6.0, 30.0, 36.5, 46.0],
     path=str(OUT_DIR),
     minimum_depth=0.0,
@@ -11941,7 +11943,9 @@ print(paths)</div>
 <span class="c1"># Top model level, single day -&gt; 2-D (latitude, longitude).</span>
 <span class="n">sst</span> <span class="o">=</span> <span class="n">ds</span><span class="p">[</span><span class="s1">'thetao'</span><span class="p">]</span><span class="o">.</span><span class="n">isel</span><span class="p">(</span><span class="n">time</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">depth</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
 <span class="n">valid</span> <span class="o">=</span> <span class="n">sst</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">sst</span><span class="o">.</span><span class="n">values</span><span class="p">)]</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'surface thetao min/mean/max: </span><span class="si">{</span><span class="n">valid</span><span class="o">.</span><span class="n">min</span><span class="p">()</span><span class="si">:</span><span class="s1">.1f</span><span class="si">}</span><span class="s1"> / </span><span class="si">{</span><span class="n">valid</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="si">:</span><span class="s1">.1f</span><span class="si">}</span><span class="s1"> / </span><span class="si">{</span><span class="n">valid</span><span class="o">.</span><span class="n">max</span><span class="p">()</span><span class="si">:</span><span class="s1">.1f</span><span class="si">}</span><span class="s1"> degrees_C'</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span>
+    <span class="sa">f</span><span class="s1">'surface thetao min/mean/max: </span><span class="si">{</span><span class="n">valid</span><span class="o">.</span><span class="n">min</span><span class="p">()</span><span class="si">:</span><span class="s1">.1f</span><span class="si">}</span><span class="s1"> / </span><span class="si">{</span><span class="n">valid</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="si">:</span><span class="s1">.1f</span><span class="si">}</span><span class="s1"> / </span><span class="si">{</span><span class="n">valid</span><span class="o">.</span><span class="n">max</span><span class="p">()</span><span class="si">:</span><span class="s1">.1f</span><span class="si">}</span><span class="s1"> degrees_C'</span>
+<span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-3">import numpy as np
 
@@ -11952,7 +11956,9 @@ print('dims:', dict(ds.sizes))
 # Top model level, single day -&gt; 2-D (latitude, longitude).
 sst = ds['thetao'].isel(time=0, depth=0)
 valid = sst.values[~np.isnan(sst.values)]
-print(f'surface thetao min/mean/max: {valid.min():.1f} / {valid.mean():.1f} / {valid.max():.1f} degrees_C')</div>
+print(
+    f'surface thetao min/mean/max: {valid.min():.1f} / {valid.mean():.1f} / {valid.max():.1f} degrees_C'
+)</div>
 </div>
 </div>
 </div>
@@ -12007,8 +12013,11 @@ and Aegean — the classic August Mediterranean SST signature.</p>
 
 <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
 <span class="n">mesh</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">pcolormesh</span><span class="p">(</span>
-    <span class="n">sst</span><span class="p">[</span><span class="s1">'longitude'</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">sst</span><span class="p">[</span><span class="s1">'latitude'</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">sst</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
-    <span class="n">cmap</span><span class="o">=</span><span class="s1">'inferno'</span><span class="p">,</span> <span class="n">shading</span><span class="o">=</span><span class="s1">'auto'</span><span class="p">,</span>
+    <span class="n">sst</span><span class="p">[</span><span class="s1">'longitude'</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+    <span class="n">sst</span><span class="p">[</span><span class="s1">'latitude'</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+    <span class="n">sst</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+    <span class="n">cmap</span><span class="o">=</span><span class="s1">'inferno'</span><span class="p">,</span>
+    <span class="n">shading</span><span class="o">=</span><span class="s1">'auto'</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="n">fig</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">'SST (degrees_C)'</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s1">'Mediterranean surface temperature (</span><span class="si">{</span><span class="n">DAY</span><span class="si">}</span><span class="s1">)'</span><span class="p">)</span>
@@ -12021,8 +12030,11 @@ and Aegean — the classic August Mediterranean SST signature.</p>
 
 fig, ax = plt.subplots(figsize=(10, 4))
 mesh = ax.pcolormesh(
-    sst['longitude'].values, sst['latitude'].values, sst.values,
-    cmap='inferno', shading='auto',
+    sst['longitude'].values,
+    sst['latitude'].values,
+    sst.values,
+    cmap='inferno',
+    shading='auto',
 )
 fig.colorbar(mesh, ax=ax, label='SST (degrees_C)')
 ax.set_title(f'Mediterranean surface temperature ({DAY})')

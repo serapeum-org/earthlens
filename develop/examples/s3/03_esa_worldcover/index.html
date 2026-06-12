@@ -11516,17 +11516,35 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">tempfile</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+
 <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
+
 <span class="n">out</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="s1">'wc_'</span><span class="p">))</span>
-<span class="n">src</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span><span class="n">data_source</span><span class="o">=</span><span class="s2">"amazon-s3"</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="s1">'2021-01-01'</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s1">'2021-01-01'</span><span class="p">,</span> <span class="n">aoi</span><span class="o">=</span><span class="p">[</span><span class="mf">6.40</span><span class="p">,</span> <span class="mf">0.40</span><span class="p">,</span> <span class="mf">6.45</span><span class="p">,</span> <span class="mf">0.45</span><span class="p">],</span> <span class="n">dataset</span><span class="o">=</span><span class="s1">'esa-worldcover'</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">out</span><span class="p">))</span>
+<span class="n">src</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
+    <span class="n">data_source</span><span class="o">=</span><span class="s2">"amazon-s3"</span><span class="p">,</span>
+    <span class="n">start</span><span class="o">=</span><span class="s1">'2021-01-01'</span><span class="p">,</span>
+    <span class="n">end</span><span class="o">=</span><span class="s1">'2021-01-01'</span><span class="p">,</span>
+    <span class="n">aoi</span><span class="o">=</span><span class="p">[</span><span class="mf">6.40</span><span class="p">,</span> <span class="mf">0.40</span><span class="p">,</span> <span class="mf">6.45</span><span class="p">,</span> <span class="mf">0.45</span><span class="p">],</span>
+    <span class="n">dataset</span><span class="o">=</span><span class="s1">'esa-worldcover'</span><span class="p">,</span>
+    <span class="n">path</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">out</span><span class="p">),</span>
+<span class="p">)</span>
 <span class="n">paths</span> <span class="o">=</span> <span class="n">src</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">progress_bar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 <span class="n">paths</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-1">import tempfile
 from pathlib import Path
+
 from earthlens import EarthLens
+
 out = Path(tempfile.mkdtemp(prefix='wc_'))
-src = EarthLens(data_source="amazon-s3", start='2021-01-01', end='2021-01-01', aoi=[6.40, 0.40, 6.45, 0.45], dataset='esa-worldcover', path=str(out))
+src = EarthLens(
+    data_source="amazon-s3",
+    start='2021-01-01',
+    end='2021-01-01',
+    aoi=[6.40, 0.40, 6.45, 0.45],
+    dataset='esa-worldcover',
+    path=str(out),
+)
 paths = src.download(progress_bar=False)
 paths</div>
 </div>
@@ -11554,12 +11572,14 @@ paths</div>
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span>
+
 <span class="n">ds</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">paths</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">'bbox:'</span><span class="p">,</span> <span class="p">[</span><span class="nb">round</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">ds</span><span class="o">.</span><span class="n">bbox</span><span class="p">],</span> <span class="s1">'shape:'</span><span class="p">,</span> <span class="n">ds</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'bbox:'</span><span class="p">,</span> <span class="p">[</span><span class="nb">round</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">ds</span><span class="o">.</span><span class="n">bbox</span><span class="p">],</span> <span class="s1">'shape:'</span><span class="p">,</span> <span class="n">ds</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-2">from pyramids.dataset import Dataset
+
 ds = Dataset.read_file(str(paths[0]))
-print('bbox:', [round(x,3) for x in ds.bbox], 'shape:', ds.shape)</div>
+print('bbox:', [round(x, 3) for x in ds.bbox], 'shape:', ds.shape)</div>
 </div>
 </div>
 </div>

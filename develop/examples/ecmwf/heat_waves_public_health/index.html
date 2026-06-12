@@ -11701,7 +11701,8 @@ variability that monthly aggregation would smooth out.</p>
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">earthlens</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span><span class="p">,</span> <span class="n">AggregationConfig</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">earthlens</span><span class="w"> </span><span class="kn">import</span> <span class="n">AggregationConfig</span><span class="p">,</span> <span class="n">EarthLens</span>
 
 <span class="n">OUT</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">"data/era5-athens-summer"</span><span class="p">)</span>
 <span class="n">OUT</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -11711,17 +11712,19 @@ variability that monthly aggregation would smooth out.</p>
     <span class="n">cadence</span><span class="o">=</span><span class="s2">"daily"</span><span class="p">,</span>
     <span class="n">start</span><span class="o">=</span><span class="s2">"2022-06-01"</span><span class="p">,</span>
     <span class="n">end</span><span class="o">=</span><span class="s2">"2022-08-31"</span><span class="p">,</span>
-    <span class="n">dataset</span><span class="o">=</span><span class="s2">"reanalysis-era5-single-levels"</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="p">[</span>
-            <span class="s2">"2m-temperature"</span><span class="p">,</span>
-            <span class="s2">"2m-dewpoint-temperature"</span><span class="p">,</span>
-        <span class="p">],</span>
+    <span class="n">dataset</span><span class="o">=</span><span class="s2">"reanalysis-era5-single-levels"</span><span class="p">,</span>
+    <span class="n">variables</span><span class="o">=</span><span class="p">[</span>
+        <span class="s2">"2m-temperature"</span><span class="p">,</span>
+        <span class="s2">"2m-dewpoint-temperature"</span><span class="p">,</span>
+    <span class="p">],</span>
     <span class="n">aoi</span><span class="o">=</span><span class="p">[</span><span class="mf">23.0</span><span class="p">,</span> <span class="mf">37.0</span><span class="p">,</span> <span class="mf">24.0</span><span class="p">,</span> <span class="mf">38.0</span><span class="p">],</span>
     <span class="n">path</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">OUT</span><span class="p">),</span>
 <span class="p">)</span>
 <span class="n">earthlens</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">aggregate</span><span class="o">=</span><span class="n">AggregationConfig</span><span class="p">(</span><span class="n">freq</span><span class="o">=</span><span class="s2">"1D"</span><span class="p">,</span> <span class="n">op</span><span class="o">=</span><span class="s2">"mean"</span><span class="p">))</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-1">from pathlib import Path
-from earthlens import EarthLens, AggregationConfig
+
+from earthlens import AggregationConfig, EarthLens
 
 OUT = Path("data/era5-athens-summer")
 OUT.mkdir(parents=True, exist_ok=True)
@@ -11731,10 +11734,11 @@ earthlens = EarthLens(
     cadence="daily",
     start="2022-06-01",
     end="2022-08-31",
-    dataset="reanalysis-era5-single-levels", variables=[
-            "2m-temperature",
-            "2m-dewpoint-temperature",
-        ],
+    dataset="reanalysis-era5-single-levels",
+    variables=[
+        "2m-temperature",
+        "2m-dewpoint-temperature",
+    ],
     aoi=[23.0, 37.0, 24.0, 38.0],
     path=str(OUT),
 )
@@ -11798,9 +11802,9 @@ earthlens.download(aggregate=AggregationConfig(freq="1D", op="mean"))</div>
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jupyter-widgets jp-OutputArea-output" id="55a5884d-cc29-4315-8ed8-34c49bf47924" tabindex="0">
+<div class="jupyter-widgets jp-OutputArea-output" id="e7f5034a-4873-408a-b5d3-0852e7d3ec87" tabindex="0">
 <script type="text/javascript">
-var element = document.getElementById('55a5884d-cc29-4315-8ed8-34c49bf47924');
+var element = document.getElementById('e7f5034a-4873-408a-b5d3-0852e7d3ec87');
 </script>
 <script type="application/vnd.jupyter.widget-view+json">
 {"model_id": "79b1fd9f446a477194495e0f7074b8dc", "version_major": 2, "version_minor": 0}
@@ -11893,9 +11897,9 @@ var element = document.getElementById('55a5884d-cc29-4315-8ed8-34c49bf47924');
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jupyter-widgets jp-OutputArea-output" id="633bedf9-33ed-401c-81c5-5c9f544b1a92" tabindex="0">
+<div class="jupyter-widgets jp-OutputArea-output" id="088cd9e0-a173-4b4e-ad44-c3671fa8b720" tabindex="0">
 <script type="text/javascript">
-var element = document.getElementById('633bedf9-33ed-401c-81c5-5c9f544b1a92');
+var element = document.getElementById('088cd9e0-a173-4b4e-ad44-c3671fa8b720');
 </script>
 <script type="application/vnd.jupyter.widget-view+json">
 {"model_id": "cf3c23e4f4664a2d8a79b43efc7e260c", "version_major": 2, "version_minor": 0}
@@ -11948,41 +11952,60 @@ var element = document.getElementById('633bedf9-33ed-401c-81c5-5c9f544b1a92');
 <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span>
 
 <span class="n">agg</span> <span class="o">=</span> <span class="n">OUT</span> <span class="o">/</span> <span class="s2">"aggregated"</span>
-<span class="n">t_air</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span>
-    <span class="n">Dataset</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">p</span><span class="p">))</span><span class="o">.</span><span class="n">read_array</span><span class="p">()</span>
-    <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">agg</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s2">"2m_temperature_1D_*.tif"</span><span class="p">))</span>
-<span class="p">])</span> <span class="o">-</span> <span class="mf">273.15</span>
-<span class="n">t_dew</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span>
-    <span class="n">Dataset</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">p</span><span class="p">))</span><span class="o">.</span><span class="n">read_array</span><span class="p">()</span>
-    <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">agg</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s2">"2m_dewpoint_temperature_1D_*.tif"</span><span class="p">))</span>
-<span class="p">])</span> <span class="o">-</span> <span class="mf">273.15</span>
+<span class="n">t_air</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span>
+        <span class="p">[</span>
+            <span class="n">Dataset</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">p</span><span class="p">))</span><span class="o">.</span><span class="n">read_array</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">agg</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s2">"2m_temperature_1D_*.tif"</span><span class="p">))</span>
+        <span class="p">]</span>
+    <span class="p">)</span>
+    <span class="o">-</span> <span class="mf">273.15</span>
+<span class="p">)</span>
+<span class="n">t_dew</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span>
+        <span class="p">[</span>
+            <span class="n">Dataset</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">p</span><span class="p">))</span><span class="o">.</span><span class="n">read_array</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">agg</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s2">"2m_dewpoint_temperature_1D_*.tif"</span><span class="p">))</span>
+        <span class="p">]</span>
+    <span class="p">)</span>
+    <span class="o">-</span> <span class="mf">273.15</span>
+<span class="p">)</span>
 
 <span class="c1"># Magnus formula for saturation vapour pressure (hPa).</span>
+
+
 <span class="k">def</span><span class="w"> </span><span class="nf">es</span><span class="p">(</span><span class="n">t_celsius</span><span class="p">):</span>
     <span class="k">return</span> <span class="mf">6.112</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="mf">17.67</span> <span class="o">*</span> <span class="n">t_celsius</span> <span class="o">/</span> <span class="p">(</span><span class="n">t_celsius</span> <span class="o">+</span> <span class="mf">243.5</span><span class="p">))</span>
+
 
 <span class="n">rh</span> <span class="o">=</span> <span class="mf">100.0</span> <span class="o">*</span> <span class="n">es</span><span class="p">(</span><span class="n">t_dew</span><span class="p">)</span> <span class="o">/</span> <span class="n">es</span><span class="p">(</span><span class="n">t_air</span><span class="p">)</span>
 
 <span class="c1"># Stull (2011) wet-bulb approximation, valid for rh &gt; 5% and t -20..50 °C.</span>
+
+
 <span class="k">def</span><span class="w"> </span><span class="nf">wet_bulb</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">rh</span><span class="p">):</span>
     <span class="k">return</span> <span class="p">(</span>
         <span class="n">t</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">arctan</span><span class="p">(</span><span class="mf">0.151977</span> <span class="o">*</span> <span class="p">(</span><span class="n">rh</span> <span class="o">+</span> <span class="mf">8.313659</span><span class="p">)</span> <span class="o">**</span> <span class="mf">0.5</span><span class="p">)</span>
         <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">arctan</span><span class="p">(</span><span class="n">t</span> <span class="o">+</span> <span class="n">rh</span><span class="p">)</span>
         <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">arctan</span><span class="p">(</span><span class="n">rh</span> <span class="o">-</span> <span class="mf">1.676331</span><span class="p">)</span>
-        <span class="o">+</span> <span class="mf">0.00391838</span> <span class="o">*</span> <span class="p">(</span><span class="n">rh</span> <span class="o">**</span> <span class="mf">1.5</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">arctan</span><span class="p">(</span><span class="mf">0.023101</span> <span class="o">*</span> <span class="n">rh</span><span class="p">)</span>
+        <span class="o">+</span> <span class="mf">0.00391838</span> <span class="o">*</span> <span class="p">(</span><span class="n">rh</span><span class="o">**</span><span class="mf">1.5</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">arctan</span><span class="p">(</span><span class="mf">0.023101</span> <span class="o">*</span> <span class="n">rh</span><span class="p">)</span>
         <span class="o">-</span> <span class="mf">4.686035</span>
     <span class="p">)</span>
 
+
 <span class="n">t_wet_bulb</span> <span class="o">=</span> <span class="n">wet_bulb</span><span class="p">(</span><span class="n">t_air</span><span class="p">,</span> <span class="n">rh</span><span class="p">)</span>
 
-<span class="n">site_t_air</span>      <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmean</span><span class="p">(</span><span class="n">t_air</span><span class="p">,</span>      <span class="n">axis</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
-<span class="n">site_rh</span>         <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmean</span><span class="p">(</span><span class="n">rh</span><span class="p">,</span>         <span class="n">axis</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+<span class="n">site_t_air</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmean</span><span class="p">(</span><span class="n">t_air</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+<span class="n">site_rh</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmean</span><span class="p">(</span><span class="n">rh</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
 <span class="n">site_t_wet_bulb</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmean</span><span class="p">(</span><span class="n">t_wet_bulb</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
 
 <span class="n">days</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">date_range</span><span class="p">(</span><span class="s2">"2022-06-01"</span><span class="p">,</span> <span class="n">periods</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">site_t_air</span><span class="p">),</span> <span class="n">freq</span><span class="o">=</span><span class="s2">"D"</span><span class="p">)</span>
 <span class="n">summary</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
-    <span class="p">{</span><span class="s2">"T_2m [°C]"</span><span class="p">:</span> <span class="n">site_t_air</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="s2">"RH [%]"</span><span class="p">:</span> <span class="n">site_rh</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span>
-     <span class="s2">"T_wet-bulb [°C]"</span><span class="p">:</span> <span class="n">site_t_wet_bulb</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">1</span><span class="p">)},</span>
+    <span class="p">{</span>
+        <span class="s2">"T_2m [°C]"</span><span class="p">:</span> <span class="n">site_t_air</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span>
+        <span class="s2">"RH [%]"</span><span class="p">:</span> <span class="n">site_rh</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span>
+        <span class="s2">"T_wet-bulb [°C]"</span><span class="p">:</span> <span class="n">site_t_wet_bulb</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span>
+    <span class="p">},</span>
     <span class="n">index</span><span class="o">=</span><span class="n">days</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="n">summary</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
@@ -11992,41 +12015,60 @@ import pandas as pd
 from pyramids.dataset import Dataset
 
 agg = OUT / "aggregated"
-t_air = np.stack([
-    Dataset.read_file(str(p)).read_array()
-    for p in sorted(agg.glob("2m_temperature_1D_*.tif"))
-]) - 273.15
-t_dew = np.stack([
-    Dataset.read_file(str(p)).read_array()
-    for p in sorted(agg.glob("2m_dewpoint_temperature_1D_*.tif"))
-]) - 273.15
+t_air = (
+    np.stack(
+        [
+            Dataset.read_file(str(p)).read_array()
+            for p in sorted(agg.glob("2m_temperature_1D_*.tif"))
+        ]
+    )
+    - 273.15
+)
+t_dew = (
+    np.stack(
+        [
+            Dataset.read_file(str(p)).read_array()
+            for p in sorted(agg.glob("2m_dewpoint_temperature_1D_*.tif"))
+        ]
+    )
+    - 273.15
+)
 
 # Magnus formula for saturation vapour pressure (hPa).
+
+
 def es(t_celsius):
     return 6.112 * np.exp(17.67 * t_celsius / (t_celsius + 243.5))
+
 
 rh = 100.0 * es(t_dew) / es(t_air)
 
 # Stull (2011) wet-bulb approximation, valid for rh &gt; 5% and t -20..50 °C.
+
+
 def wet_bulb(t, rh):
     return (
         t * np.arctan(0.151977 * (rh + 8.313659) ** 0.5)
         + np.arctan(t + rh)
         - np.arctan(rh - 1.676331)
-        + 0.00391838 * (rh ** 1.5) * np.arctan(0.023101 * rh)
+        + 0.00391838 * (rh**1.5) * np.arctan(0.023101 * rh)
         - 4.686035
     )
 
+
 t_wet_bulb = wet_bulb(t_air, rh)
 
-site_t_air      = np.nanmean(t_air,      axis=(1, 2))
-site_rh         = np.nanmean(rh,         axis=(1, 2))
+site_t_air = np.nanmean(t_air, axis=(1, 2))
+site_rh = np.nanmean(rh, axis=(1, 2))
 site_t_wet_bulb = np.nanmean(t_wet_bulb, axis=(1, 2))
 
 days = pd.date_range("2022-06-01", periods=len(site_t_air), freq="D")
 summary = pd.DataFrame(
-    {"T_2m [°C]": site_t_air.round(1), "RH [%]": site_rh.round(0),
-     "T_wet-bulb [°C]": site_t_wet_bulb.round(1)},
+    {
+        "T_2m [°C]": site_t_air.round(1),
+        "RH [%]": site_rh.round(0),
+        "T_wet-bulb [°C]": site_t_wet_bulb.round(1),
+    },
     index=days,
 )
 summary.head()</div>
@@ -12142,8 +12184,14 @@ healthy adults; &gt; 35 °C is the theoretical limit of human survival
 <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">days</span><span class="p">,</span> <span class="n">site_t_wet_bulb</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Wet-bulb T"</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"tab:purple"</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="mi">30</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"orange"</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span> <span class="n">ls</span><span class="o">=</span><span class="s2">"--"</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"30 °C wet-bulb (stressful)"</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="mi">35</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"red"</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span> <span class="n">ls</span><span class="o">=</span><span class="s2">"--"</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"35 °C wet-bulb (survival limit)"</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">fill_between</span><span class="p">(</span><span class="n">days</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">site_t_wet_bulb</span><span class="p">,</span> <span class="mi">30</span><span class="p">),</span> <span class="n">where</span><span class="o">=</span><span class="n">site_t_wet_bulb</span> <span class="o">&gt;=</span> <span class="mi">30</span><span class="p">,</span>
-                <span class="n">color</span><span class="o">=</span><span class="s2">"orange"</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.25</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">fill_between</span><span class="p">(</span>
+    <span class="n">days</span><span class="p">,</span>
+    <span class="mi">30</span><span class="p">,</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">site_t_wet_bulb</span><span class="p">,</span> <span class="mi">30</span><span class="p">),</span>
+    <span class="n">where</span><span class="o">=</span><span class="n">site_t_wet_bulb</span> <span class="o">&gt;=</span> <span class="mi">30</span><span class="p">,</span>
+    <span class="n">color</span><span class="o">=</span><span class="s2">"orange"</span><span class="p">,</span>
+    <span class="n">alpha</span><span class="o">=</span><span class="mf">0.25</span><span class="p">,</span>
+<span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">"Temperature [°C]"</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">"Athens summer 2022 — daily-mean air and wet-bulb temperatures"</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
@@ -12158,8 +12206,14 @@ ax.plot(days, site_t_air, label="Air T_2m", color="tab:red", lw=1.5)
 ax.plot(days, site_t_wet_bulb, label="Wet-bulb T", color="tab:purple", lw=2)
 ax.axhline(30, color="orange", lw=0.8, ls="--", label="30 °C wet-bulb (stressful)")
 ax.axhline(35, color="red", lw=0.8, ls="--", label="35 °C wet-bulb (survival limit)")
-ax.fill_between(days, 30, np.maximum(site_t_wet_bulb, 30), where=site_t_wet_bulb &gt;= 30,
-                color="orange", alpha=0.25)
+ax.fill_between(
+    days,
+    30,
+    np.maximum(site_t_wet_bulb, 30),
+    where=site_t_wet_bulb &gt;= 30,
+    color="orange",
+    alpha=0.25,
+)
 ax.set_ylabel("Temperature [°C]")
 ax.set_title("Athens summer 2022 — daily-mean air and wet-bulb temperatures")
 ax.legend()

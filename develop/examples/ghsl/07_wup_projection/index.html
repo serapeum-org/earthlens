@@ -11520,24 +11520,38 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># NBVAL_SKIP</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">tempfile</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+
 <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
+
 <span class="n">out</span> <span class="o">=</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">()</span>
 <span class="n">paths</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
-    <span class="n">data_source</span><span class="o">=</span><span class="s1">'ghsl'</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">'GHS_WUP_POP'</span><span class="p">],</span>
-    <span class="n">start</span><span class="o">=</span><span class="s1">'2025-01-01'</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s1">'2100-12-31'</span><span class="p">,</span> <span class="n">epochs</span><span class="o">=</span><span class="p">[</span><span class="mi">2025</span><span class="p">,</span> <span class="mi">2100</span><span class="p">],</span>
-    <span class="n">release</span><span class="o">=</span><span class="s1">'R2025A'</span><span class="p">,</span> <span class="n">aoi</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">9.6</span><span class="p">,</span> <span class="mf">36.9</span><span class="p">,</span> <span class="o">-</span><span class="mf">6.0</span><span class="p">,</span> <span class="mf">42.2</span><span class="p">],</span> <span class="n">path</span><span class="o">=</span><span class="n">out</span><span class="p">,</span>
+    <span class="n">data_source</span><span class="o">=</span><span class="s1">'ghsl'</span><span class="p">,</span>
+    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">'GHS_WUP_POP'</span><span class="p">],</span>
+    <span class="n">start</span><span class="o">=</span><span class="s1">'2025-01-01'</span><span class="p">,</span>
+    <span class="n">end</span><span class="o">=</span><span class="s1">'2100-12-31'</span><span class="p">,</span>
+    <span class="n">epochs</span><span class="o">=</span><span class="p">[</span><span class="mi">2025</span><span class="p">,</span> <span class="mi">2100</span><span class="p">],</span>
+    <span class="n">release</span><span class="o">=</span><span class="s1">'R2025A'</span><span class="p">,</span>
+    <span class="n">aoi</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">9.6</span><span class="p">,</span> <span class="mf">36.9</span><span class="p">,</span> <span class="o">-</span><span class="mf">6.0</span><span class="p">,</span> <span class="mf">42.2</span><span class="p">],</span>
+    <span class="n">path</span><span class="o">=</span><span class="n">out</span><span class="p">,</span>
 <span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">progress_bar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 <span class="p">[</span><span class="n">p</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">paths</span><span class="p">]</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-1"># NBVAL_SKIP
 import tempfile
 from pathlib import Path
+
 from earthlens import EarthLens
+
 out = tempfile.mkdtemp()
 paths = EarthLens(
-    data_source='ghsl', variables=['GHS_WUP_POP'],
-    start='2025-01-01', end='2100-12-31', epochs=[2025, 2100],
-    release='R2025A', aoi=[-9.6, 36.9, -6.0, 42.2], path=out,
+    data_source='ghsl',
+    variables=['GHS_WUP_POP'],
+    start='2025-01-01',
+    end='2100-12-31',
+    epochs=[2025, 2100],
+    release='R2025A',
+    aoi=[-9.6, 36.9, -6.0, 42.2],
+    path=out,
 ).download(progress_bar=False)
 [p.name for p in paths]</div>
 </div>
@@ -11594,13 +11608,19 @@ paths = EarthLens(
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># NBVAL_SKIP</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span><span class="o">,</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+
+<span class="c1"># NBVAL_SKIP</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span>
+
+
 <span class="k">def</span><span class="w"> </span><span class="nf">_load</span><span class="p">(</span><span class="n">p</span><span class="p">):</span>
     <span class="n">a</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">Dataset</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">p</span><span class="p">))</span><span class="o">.</span><span class="n">read_array</span><span class="p">(),</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">'float32'</span><span class="p">)</span>
     <span class="n">a</span> <span class="o">=</span> <span class="n">a</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">a</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">3</span> <span class="k">else</span> <span class="n">a</span>
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">a</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">a</span><span class="p">)</span>
+
+
 <span class="n">by_epoch</span> <span class="o">=</span> <span class="p">{(</span><span class="s1">'2025'</span> <span class="k">if</span> <span class="s1">'_E2025'</span> <span class="ow">in</span> <span class="n">p</span><span class="o">.</span><span class="n">name</span> <span class="k">else</span> <span class="s1">'2100'</span><span class="p">):</span> <span class="n">_load</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">paths</span><span class="p">}</span>
 <span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">11</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
 <span class="k">for</span> <span class="n">ax</span><span class="p">,</span> <span class="n">year</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">axes</span><span class="p">,</span> <span class="p">[</span><span class="s1">'2025'</span><span class="p">,</span> <span class="s1">'2100'</span><span class="p">]):</span>
@@ -11611,13 +11631,19 @@ paths = EarthLens(
 <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-2"># NBVAL_SKIP
-import numpy as np, matplotlib.pyplot as plt
+<div class="clipboard-copy-txt" id="cell-2">import matplotlib.pyplot as plt
+
+# NBVAL_SKIP
+import numpy as np
 from pyramids.dataset import Dataset
+
+
 def _load(p):
     a = np.asarray(Dataset.read_file(str(p)).read_array(), dtype='float32')
     a = a[0] if a.ndim == 3 else a
     return np.where(a &lt; 0, np.nan, a)
+
+
 by_epoch = {('2025' if '_E2025' in p.name else '2100'): _load(p) for p in paths}
 fig, axes = plt.subplots(1, 2, figsize=(11, 5))
 for ax, year in zip(axes, ['2025', '2100']):

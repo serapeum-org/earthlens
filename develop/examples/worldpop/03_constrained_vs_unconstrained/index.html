@@ -11515,32 +11515,60 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">tempfile</span>
+
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.earthlens</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.earthlens</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
+
+
 <span class="k">def</span><span class="w"> </span><span class="nf">total</span><span class="p">(</span><span class="n">constrained</span><span class="p">):</span>
     <span class="n">d</span> <span class="o">=</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">()</span>
-    <span class="n">p</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span><span class="n">data_source</span><span class="o">=</span><span class="s1">'worldpop'</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">'pop'</span><span class="p">],</span> <span class="n">aoi</span><span class="o">=</span><span class="s1">'COM'</span><span class="p">,</span>
-                  <span class="n">start</span><span class="o">=</span><span class="s1">'2020'</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s1">'2020'</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="s1">'%Y'</span><span class="p">,</span>
-                  <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">12.5</span><span class="p">,</span> <span class="o">-</span><span class="mf">11.3</span><span class="p">],</span> <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">43.2</span><span class="p">,</span> <span class="mf">44.6</span><span class="p">],</span> <span class="n">path</span><span class="o">=</span><span class="n">d</span><span class="p">,</span>
-                  <span class="n">constrained</span><span class="o">=</span><span class="n">constrained</span><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">progress_bar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
+        <span class="n">data_source</span><span class="o">=</span><span class="s1">'worldpop'</span><span class="p">,</span>
+        <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">'pop'</span><span class="p">],</span>
+        <span class="n">aoi</span><span class="o">=</span><span class="s1">'COM'</span><span class="p">,</span>
+        <span class="n">start</span><span class="o">=</span><span class="s1">'2020'</span><span class="p">,</span>
+        <span class="n">end</span><span class="o">=</span><span class="s1">'2020'</span><span class="p">,</span>
+        <span class="n">fmt</span><span class="o">=</span><span class="s1">'%Y'</span><span class="p">,</span>
+        <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">12.5</span><span class="p">,</span> <span class="o">-</span><span class="mf">11.3</span><span class="p">],</span>
+        <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">43.2</span><span class="p">,</span> <span class="mf">44.6</span><span class="p">],</span>
+        <span class="n">path</span><span class="o">=</span><span class="n">d</span><span class="p">,</span>
+        <span class="n">constrained</span><span class="o">=</span><span class="n">constrained</span><span class="p">,</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">progress_bar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
     <span class="n">a</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">Dataset</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span><span class="o">.</span><span class="n">read_array</span><span class="p">(),</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">'float64'</span><span class="p">)</span>
     <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nansum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">a</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">a</span><span class="p">)))</span>
+
+
 <span class="nb">print</span><span class="p">(</span><span class="s1">'unconstrained total:'</span><span class="p">,</span> <span class="nb">round</span><span class="p">(</span><span class="n">total</span><span class="p">(</span><span class="kc">False</span><span class="p">)))</span>
 <span class="nb">print</span><span class="p">(</span><span class="s1">'constrained total:  '</span><span class="p">,</span> <span class="nb">round</span><span class="p">(</span><span class="n">total</span><span class="p">(</span><span class="kc">True</span><span class="p">)))</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-1">import tempfile
+
 import numpy as np
-from earthlens.earthlens import EarthLens
 from pyramids.dataset import Dataset
+
+from earthlens.earthlens import EarthLens
+
+
 def total(constrained):
     d = tempfile.mkdtemp()
-    p = EarthLens(data_source='worldpop', variables=['pop'], aoi='COM',
-                  start='2020', end='2020', fmt='%Y',
-                  lat_lim=[-12.5, -11.3], lon_lim=[43.2, 44.6], path=d,
-                  constrained=constrained).download(progress_bar=False)
+    p = EarthLens(
+        data_source='worldpop',
+        variables=['pop'],
+        aoi='COM',
+        start='2020',
+        end='2020',
+        fmt='%Y',
+        lat_lim=[-12.5, -11.3],
+        lon_lim=[43.2, 44.6],
+        path=d,
+        constrained=constrained,
+    ).download(progress_bar=False)
     a = np.asarray(Dataset.read_file(str(p[0])).read_array(), dtype='float64')
     return float(np.nansum(np.where(a &lt; 0, np.nan, a)))
+
+
 print('unconstrained total:', round(total(False)))
 print('constrained total:  ', round(total(True)))</div>
 </div>

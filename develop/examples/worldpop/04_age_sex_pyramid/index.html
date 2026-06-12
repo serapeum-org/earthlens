@@ -11515,23 +11515,45 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">tempfile</span>
+
 <span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+
 <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.earthlens</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
+
 <span class="n">d</span> <span class="o">=</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">()</span>
-<span class="n">paths</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span><span class="n">data_source</span><span class="o">=</span><span class="s1">'worldpop'</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">'age_structures'</span><span class="p">],</span> <span class="n">aoi</span><span class="o">=</span><span class="s1">'COM'</span><span class="p">,</span>
-                  <span class="n">start</span><span class="o">=</span><span class="s1">'2020'</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s1">'2020'</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="s1">'%Y'</span><span class="p">,</span>
-                  <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">12.5</span><span class="p">,</span> <span class="o">-</span><span class="mf">11.3</span><span class="p">],</span> <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">43.2</span><span class="p">,</span> <span class="mf">44.6</span><span class="p">],</span> <span class="n">path</span><span class="o">=</span><span class="n">d</span><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">progress_bar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">paths</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
+    <span class="n">data_source</span><span class="o">=</span><span class="s1">'worldpop'</span><span class="p">,</span>
+    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">'age_structures'</span><span class="p">],</span>
+    <span class="n">aoi</span><span class="o">=</span><span class="s1">'COM'</span><span class="p">,</span>
+    <span class="n">start</span><span class="o">=</span><span class="s1">'2020'</span><span class="p">,</span>
+    <span class="n">end</span><span class="o">=</span><span class="s1">'2020'</span><span class="p">,</span>
+    <span class="n">fmt</span><span class="o">=</span><span class="s1">'%Y'</span><span class="p">,</span>
+    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">12.5</span><span class="p">,</span> <span class="o">-</span><span class="mf">11.3</span><span class="p">],</span>
+    <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">43.2</span><span class="p">,</span> <span class="mf">44.6</span><span class="p">],</span>
+    <span class="n">path</span><span class="o">=</span><span class="n">d</span><span class="p">,</span>
+<span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">progress_bar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 <span class="n">csv</span> <span class="o">=</span> <span class="p">[</span><span class="n">p</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">paths</span> <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="n">p</span><span class="p">)</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">'.csv'</span><span class="p">)][</span><span class="mi">0</span><span class="p">]</span>
 <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">csv</span><span class="p">)</span>
 <span class="n">df</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-1">import tempfile
+
 import pandas as pd
+
 from earthlens.earthlens import EarthLens
+
 d = tempfile.mkdtemp()
-paths = EarthLens(data_source='worldpop', variables=['age_structures'], aoi='COM',
-                  start='2020', end='2020', fmt='%Y',
-                  lat_lim=[-12.5, -11.3], lon_lim=[43.2, 44.6], path=d).download(progress_bar=False)
+paths = EarthLens(
+    data_source='worldpop',
+    variables=['age_structures'],
+    aoi='COM',
+    start='2020',
+    end='2020',
+    fmt='%Y',
+    lat_lim=[-12.5, -11.3],
+    lon_lim=[43.2, 44.6],
+    path=d,
+).download(progress_bar=False)
 csv = [p for p in paths if str(p).endswith('.csv')][0]
 df = pd.read_csv(csv)
 df.head()</div>
@@ -11560,9 +11582,13 @@ df.head()</div>
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib</span>
+
 <span class="n">matplotlib</span><span class="o">.</span><span class="n">use</span><span class="p">(</span><span class="s1">'Agg'</span><span class="p">)</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
-<span class="n">piv</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">pivot_table</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="s1">'age_low'</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="s1">'sex'</span><span class="p">,</span> <span class="n">values</span><span class="o">=</span><span class="s1">'population'</span><span class="p">,</span> <span class="n">aggfunc</span><span class="o">=</span><span class="s1">'sum'</span><span class="p">)</span><span class="o">.</span><span class="n">sort_index</span><span class="p">()</span>
+
+<span class="n">piv</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">pivot_table</span><span class="p">(</span>
+    <span class="n">index</span><span class="o">=</span><span class="s1">'age_low'</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="s1">'sex'</span><span class="p">,</span> <span class="n">values</span><span class="o">=</span><span class="s1">'population'</span><span class="p">,</span> <span class="n">aggfunc</span><span class="o">=</span><span class="s1">'sum'</span>
+<span class="p">)</span><span class="o">.</span><span class="n">sort_index</span><span class="p">()</span>
 <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">barh</span><span class="p">(</span><span class="n">piv</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="o">-</span><span class="n">piv</span><span class="p">[</span><span class="s1">'m'</span><span class="p">],</span> <span class="n">height</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">'male'</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">barh</span><span class="p">(</span><span class="n">piv</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">piv</span><span class="p">[</span><span class="s1">'f'</span><span class="p">],</span> <span class="n">height</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">'female'</span><span class="p">)</span>
@@ -11574,9 +11600,13 @@ df.head()</div>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-2">import matplotlib
+
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
-piv = df.pivot_table(index='age_low', columns='sex', values='population', aggfunc='sum').sort_index()
+
+piv = df.pivot_table(
+    index='age_low', columns='sex', values='population', aggfunc='sum'
+).sort_index()
 fig, ax = plt.subplots(figsize=(5, 5))
 ax.barh(piv.index, -piv['m'], height=4, label='male')
 ax.barh(piv.index, piv['f'], height=4, label='female')

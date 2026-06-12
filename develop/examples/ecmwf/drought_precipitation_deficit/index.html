@@ -11699,7 +11699,8 @@ use 50+. Precipitation is a flux → <code>op="auto"</code> → <code>sum</code>
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">earthlens</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span><span class="p">,</span> <span class="n">AggregationConfig</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">earthlens</span><span class="w"> </span><span class="kn">import</span> <span class="n">AggregationConfig</span><span class="p">,</span> <span class="n">EarthLens</span>
 
 <span class="n">OUT</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">"data/era5-madrid-spi"</span><span class="p">)</span>
 <span class="n">OUT</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -11709,16 +11710,18 @@ use 50+. Precipitation is a flux → <code>op="auto"</code> → <code>sum</code>
     <span class="n">cadence</span><span class="o">=</span><span class="s2">"monthly"</span><span class="p">,</span>
     <span class="n">start</span><span class="o">=</span><span class="s2">"1999-01-01"</span><span class="p">,</span>
     <span class="n">end</span><span class="o">=</span><span class="s2">"2023-12-01"</span><span class="p">,</span>
-    <span class="n">dataset</span><span class="o">=</span><span class="s2">"reanalysis-era5-single-levels-monthly-means"</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="p">[</span>
-            <span class="s2">"total-precipitation"</span><span class="p">,</span>
-        <span class="p">],</span>
+    <span class="n">dataset</span><span class="o">=</span><span class="s2">"reanalysis-era5-single-levels-monthly-means"</span><span class="p">,</span>
+    <span class="n">variables</span><span class="o">=</span><span class="p">[</span>
+        <span class="s2">"total-precipitation"</span><span class="p">,</span>
+    <span class="p">],</span>
     <span class="n">aoi</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">4.0</span><span class="p">,</span> <span class="mf">40.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">3.0</span><span class="p">,</span> <span class="mf">41.0</span><span class="p">],</span>
     <span class="n">path</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">OUT</span><span class="p">),</span>
 <span class="p">)</span>
 <span class="n">earthlens</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">aggregate</span><span class="o">=</span><span class="n">AggregationConfig</span><span class="p">(</span><span class="n">freq</span><span class="o">=</span><span class="s2">"1MS"</span><span class="p">,</span> <span class="n">op</span><span class="o">=</span><span class="s2">"auto"</span><span class="p">))</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-1">from pathlib import Path
-from earthlens import EarthLens, AggregationConfig
+
+from earthlens import AggregationConfig, EarthLens
 
 OUT = Path("data/era5-madrid-spi")
 OUT.mkdir(parents=True, exist_ok=True)
@@ -11728,9 +11731,10 @@ earthlens = EarthLens(
     cadence="monthly",
     start="1999-01-01",
     end="2023-12-01",
-    dataset="reanalysis-era5-single-levels-monthly-means", variables=[
-            "total-precipitation",
-        ],
+    dataset="reanalysis-era5-single-levels-monthly-means",
+    variables=[
+        "total-precipitation",
+    ],
     aoi=[-4.0, 40.0, -3.0, 41.0],
     path=str(OUT),
 )
@@ -11787,9 +11791,9 @@ earthlens.download(aggregate=AggregationConfig(freq="1MS", op="auto"))</div>
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jupyter-widgets jp-OutputArea-output" id="1e377101-6cab-4331-a604-dcabb186d9d9" tabindex="0">
+<div class="jupyter-widgets jp-OutputArea-output" id="f1e32115-e8d1-40e9-b5df-ccb80622433c" tabindex="0">
 <script type="text/javascript">
-var element = document.getElementById('1e377101-6cab-4331-a604-dcabb186d9d9');
+var element = document.getElementById('f1e32115-e8d1-40e9-b5df-ccb80622433c');
 </script>
 <script type="application/vnd.jupyter.widget-view+json">
 {"model_id": "e89599bd5de34305aef13a8f56fb4027", "version_major": 2, "version_minor": 0}
@@ -11857,10 +11861,12 @@ normal z-score here for clarity).</li>
 
 <span class="n">agg</span> <span class="o">=</span> <span class="n">OUT</span> <span class="o">/</span> <span class="s2">"aggregated"</span>
 <span class="n">paths</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">agg</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s2">"total_precipitation_1MS_*.tif"</span><span class="p">))</span>
-<span class="n">monthly_mm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span>
-    <span class="n">np</span><span class="o">.</span><span class="n">nanmean</span><span class="p">(</span><span class="n">Dataset</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">p</span><span class="p">))</span><span class="o">.</span><span class="n">read_array</span><span class="p">())</span> <span class="o">*</span> <span class="mi">1000</span>  <span class="c1"># m -&gt; mm</span>
-    <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">paths</span>
-<span class="p">])</span>
+<span class="n">monthly_mm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+    <span class="p">[</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">nanmean</span><span class="p">(</span><span class="n">Dataset</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">p</span><span class="p">))</span><span class="o">.</span><span class="n">read_array</span><span class="p">())</span> <span class="o">*</span> <span class="mi">1000</span>  <span class="c1"># m -&gt; mm</span>
+        <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">paths</span>
+    <span class="p">]</span>
+<span class="p">)</span>
 <span class="n">months</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">date_range</span><span class="p">(</span><span class="s2">"1999-01-01"</span><span class="p">,</span> <span class="n">periods</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">monthly_mm</span><span class="p">),</span> <span class="n">freq</span><span class="o">=</span><span class="s2">"MS"</span><span class="p">)</span>
 
 <span class="n">p12</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">monthly_mm</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">months</span><span class="p">)</span><span class="o">.</span><span class="n">rolling</span><span class="p">(</span><span class="mi">12</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
@@ -11872,11 +11878,14 @@ normal z-score here for clarity).</li>
     <span class="n">vals</span> <span class="o">=</span> <span class="n">p12</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span>
     <span class="n">spi</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">vals</span> <span class="o">-</span> <span class="n">vals</span><span class="o">.</span><span class="n">mean</span><span class="p">())</span> <span class="o">/</span> <span class="n">vals</span><span class="o">.</span><span class="n">std</span><span class="p">()</span>
 
-<span class="n">tail</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span>
-    <span class="s2">"P [mm/mo]"</span><span class="p">:</span>   <span class="n">monthly_mm</span><span class="p">[</span><span class="o">-</span><span class="mi">12</span><span class="p">:]</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span>
-    <span class="s2">"P-12 [mm]"</span><span class="p">:</span>   <span class="n">p12</span><span class="o">.</span><span class="n">tail</span><span class="p">(</span><span class="mi">12</span><span class="p">)</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">(),</span>
-    <span class="s2">"SPI-12"</span><span class="p">:</span>      <span class="n">spi</span><span class="o">.</span><span class="n">tail</span><span class="p">(</span><span class="mi">12</span><span class="p">)</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">(),</span>
-<span class="p">},</span> <span class="n">index</span><span class="o">=</span><span class="n">months</span><span class="p">[</span><span class="o">-</span><span class="mi">12</span><span class="p">:])</span>
+<span class="n">tail</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+    <span class="p">{</span>
+        <span class="s2">"P [mm/mo]"</span><span class="p">:</span> <span class="n">monthly_mm</span><span class="p">[</span><span class="o">-</span><span class="mi">12</span><span class="p">:]</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span>
+        <span class="s2">"P-12 [mm]"</span><span class="p">:</span> <span class="n">p12</span><span class="o">.</span><span class="n">tail</span><span class="p">(</span><span class="mi">12</span><span class="p">)</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">(),</span>
+        <span class="s2">"SPI-12"</span><span class="p">:</span> <span class="n">spi</span><span class="o">.</span><span class="n">tail</span><span class="p">(</span><span class="mi">12</span><span class="p">)</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">(),</span>
+    <span class="p">},</span>
+    <span class="n">index</span><span class="o">=</span><span class="n">months</span><span class="p">[</span><span class="o">-</span><span class="mi">12</span><span class="p">:],</span>
+<span class="p">)</span>
 <span class="n">tail</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-2">import numpy as np
@@ -11885,10 +11894,12 @@ from pyramids.dataset import Dataset
 
 agg = OUT / "aggregated"
 paths = sorted(agg.glob("total_precipitation_1MS_*.tif"))
-monthly_mm = np.array([
-    np.nanmean(Dataset.read_file(str(p)).read_array()) * 1000  # m -&gt; mm
-    for p in paths
-])
+monthly_mm = np.array(
+    [
+        np.nanmean(Dataset.read_file(str(p)).read_array()) * 1000  # m -&gt; mm
+        for p in paths
+    ]
+)
 months = pd.date_range("1999-01-01", periods=len(monthly_mm), freq="MS")
 
 p12 = pd.Series(monthly_mm, index=months).rolling(12).sum()
@@ -11900,11 +11911,14 @@ for m in range(1, 13):
     vals = p12[mask]
     spi[mask] = (vals - vals.mean()) / vals.std()
 
-tail = pd.DataFrame({
-    "P [mm/mo]":   monthly_mm[-12:].round(1),
-    "P-12 [mm]":   p12.tail(12).round(0).to_numpy(),
-    "SPI-12":      spi.tail(12).round(2).to_numpy(),
-}, index=months[-12:])
+tail = pd.DataFrame(
+    {
+        "P [mm/mo]": monthly_mm[-12:].round(1),
+        "P-12 [mm]": p12.tail(12).round(0).to_numpy(),
+        "SPI-12": spi.tail(12).round(2).to_numpy(),
+    },
+    index=months[-12:],
+)
 tail</div>
 </div>
 </div>
@@ -12055,12 +12069,16 @@ moderate; &gt; 2.0 severe / extreme.</p>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
 
 <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">11</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span><span class="n">spi</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">spi</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
-       <span class="n">color</span><span class="o">=</span><span class="p">[</span><span class="s2">"tab:red"</span> <span class="k">if</span> <span class="n">v</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="s2">"tab:blue"</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">spi</span><span class="o">.</span><span class="n">values</span><span class="p">],</span>
-       <span class="n">width</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.7</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span>
+    <span class="n">spi</span><span class="o">.</span><span class="n">index</span><span class="p">,</span>
+    <span class="n">spi</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+    <span class="n">color</span><span class="o">=</span><span class="p">[</span><span class="s2">"tab:red"</span> <span class="k">if</span> <span class="n">v</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="s2">"tab:blue"</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">spi</span><span class="o">.</span><span class="n">values</span><span class="p">],</span>
+    <span class="n">width</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
+    <span class="n">alpha</span><span class="o">=</span><span class="mf">0.7</span><span class="p">,</span>
+<span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">axhspan</span><span class="p">(</span><span class="o">-</span><span class="mf">1.5</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"orange"</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.10</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Mild dry"</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">axhspan</span><span class="p">(</span><span class="o">-</span><span class="mf">2.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.5</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"red"</span><span class="p">,</span>    <span class="n">alpha</span><span class="o">=</span><span class="mf">0.10</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Moderate dry"</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">axhspan</span><span class="p">(</span><span class="o">-</span><span class="mf">3.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">2.0</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"darkred"</span><span class="p">,</span><span class="n">alpha</span><span class="o">=</span><span class="mf">0.15</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Severe dry"</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">axhspan</span><span class="p">(</span><span class="o">-</span><span class="mf">2.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.5</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"red"</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.10</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Moderate dry"</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">axhspan</span><span class="p">(</span><span class="o">-</span><span class="mf">3.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">2.0</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"darkred"</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.15</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Severe dry"</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"black"</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">"SPI-12"</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="o">-</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
@@ -12073,12 +12091,16 @@ moderate; &gt; 2.0 severe / extreme.</p>
 <div class="clipboard-copy-txt" id="cell-3">import matplotlib.pyplot as plt
 
 fig, ax = plt.subplots(figsize=(11, 5))
-ax.bar(spi.index, spi.values,
-       color=["tab:red" if v &lt; 0 else "tab:blue" for v in spi.values],
-       width=20, alpha=0.7)
+ax.bar(
+    spi.index,
+    spi.values,
+    color=["tab:red" if v &lt; 0 else "tab:blue" for v in spi.values],
+    width=20,
+    alpha=0.7,
+)
 ax.axhspan(-1.5, -1.0, color="orange", alpha=0.10, label="Mild dry")
-ax.axhspan(-2.0, -1.5, color="red",    alpha=0.10, label="Moderate dry")
-ax.axhspan(-3.0, -2.0, color="darkred",alpha=0.15, label="Severe dry")
+ax.axhspan(-2.0, -1.5, color="red", alpha=0.10, label="Moderate dry")
+ax.axhspan(-3.0, -2.0, color="darkred", alpha=0.15, label="Severe dry")
 ax.axhline(0, color="black", lw=0.5)
 ax.set_ylabel("SPI-12")
 ax.set_ylim(-3, 3)
