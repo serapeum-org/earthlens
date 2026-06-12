@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -11834,7 +11834,8 @@ does not yet expose, so it raises a clear <code>NotImplementedError</code>. Thei
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">show</span><span class="p">(</span><span class="n">label</span><span class="p">,</span> <span class="n">fn</span><span class="p">):</span>
     <span class="k">try</span><span class="p">:</span>
-        <span class="n">fn</span><span class="p">();</span> <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="n">label</span><span class="si">}</span><span class="s1">: (no error)'</span><span class="p">)</span>
+        <span class="n">fn</span><span class="p">()</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="n">label</span><span class="si">}</span><span class="s1">: (no error)'</span><span class="p">)</span>
     <span class="k">except</span> <span class="ne">NotImplementedError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
         <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="n">label</span><span class="si">}</span><span class="s1">: NotImplementedError -&gt; </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">exc</span><span class="p">)[:</span><span class="mi">70</span><span class="p">]</span><span class="si">}</span><span class="s1">...'</span><span class="p">)</span>
 
@@ -11846,7 +11847,8 @@ does not yet expose, so it raises a clear <code>NotImplementedError</code>. Thei
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-4">def show(label, fn):
     try:
-        fn(); print(f'{label}: (no error)')
+        fn()
+        print(f'{label}: (no error)')
     except NotImplementedError as exc:
         print(f'{label}: NotImplementedError -&gt; {str(exc)[:70]}...')
 

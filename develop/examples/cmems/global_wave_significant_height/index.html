@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -11965,11 +11965,13 @@ the 3-hourly Hs series at the chosen point as the storm passes.</p>
 <span class="n">fig</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axm</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">'Hs (m)'</span><span class="p">)</span>
 <span class="n">axm</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="n">POINT_LON</span><span class="p">],</span> <span class="p">[</span><span class="n">POINT_LAT</span><span class="p">],</span> <span class="s1">'r*'</span><span class="p">,</span> <span class="n">markersize</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
 <span class="n">axm</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s1">'VHM0 snapshot </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">snapshot</span><span class="p">[</span><span class="s2">"time"</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">)[:</span><span class="mi">13</span><span class="p">]</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
-<span class="n">axm</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">'lon'</span><span class="p">);</span> <span class="n">axm</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">'lat'</span><span class="p">)</span>
+<span class="n">axm</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">'lon'</span><span class="p">)</span>
+<span class="n">axm</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">'lat'</span><span class="p">)</span>
 
 <span class="n">axt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">point</span><span class="p">[</span><span class="s1">'time'</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">point</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s1">'o'</span><span class="p">,</span> <span class="n">ms</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
 <span class="n">axt</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">'Significant wave height at 48N, 16W'</span><span class="p">)</span>
-<span class="n">axt</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">'Hs (m)'</span><span class="p">);</span> <span class="n">axt</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">'time'</span><span class="p">)</span>
+<span class="n">axt</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">'Hs (m)'</span><span class="p">)</span>
+<span class="n">axt</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">'time'</span><span class="p">)</span>
 <span class="n">axt</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span>
 <span class="n">fig</span><span class="o">.</span><span class="n">autofmt_xdate</span><span class="p">()</span>
 <span class="n">fig</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
@@ -11987,11 +11989,13 @@ mesh = axm.pcolormesh(
 fig.colorbar(mesh, ax=axm, label='Hs (m)')
 axm.plot([POINT_LON], [POINT_LAT], 'r*', markersize=12)
 axm.set_title(f'VHM0 snapshot {str(snapshot["time"].values)[:13]}')
-axm.set_xlabel('lon'); axm.set_ylabel('lat')
+axm.set_xlabel('lon')
+axm.set_ylabel('lat')
 
 axt.plot(point['time'].values, point.values, marker='o', ms=3)
 axt.set_title('Significant wave height at 48N, 16W')
-axt.set_ylabel('Hs (m)'); axt.set_xlabel('time')
+axt.set_ylabel('Hs (m)')
+axt.set_xlabel('time')
 axt.grid(alpha=0.3)
 fig.autofmt_xdate()
 fig.tight_layout()</div>

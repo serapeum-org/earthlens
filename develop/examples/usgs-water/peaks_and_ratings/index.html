@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -11649,8 +11649,10 @@ peaks.head()</div>
     <span class="n">sites</span><span class="o">=</span><span class="s2">"01646500"</span><span class="p">,</span> <span class="n">api</span><span class="o">=</span><span class="s2">"legacy"</span><span class="p">,</span>
 <span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">progress_bar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 <span class="n">ax</span> <span class="o">=</span> <span class="n">ratings</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s2">"stage"</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s2">"discharge"</span><span class="p">,</span> <span class="n">legend</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">"Stage (ft)"</span><span class="p">);</span> <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">"Discharge (ft3/s)"</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">"Stage-discharge rating curve"</span><span class="p">);</span> <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">"Stage (ft)"</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">"Discharge (ft3/s)"</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">"Stage-discharge rating curve"</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-2">import matplotlib.pyplot as plt
 ratings = EarthLens(
@@ -11659,8 +11661,10 @@ ratings = EarthLens(
     sites="01646500", api="legacy",
 ).download(progress_bar=False)
 ax = ratings.plot(x="stage", y="discharge", legend=False, figsize=(6, 4))
-ax.set_xlabel("Stage (ft)"); ax.set_ylabel("Discharge (ft3/s)")
-ax.set_title("Stage-discharge rating curve"); plt.tight_layout()</div>
+ax.set_xlabel("Stage (ft)")
+ax.set_ylabel("Discharge (ft3/s)")
+ax.set_title("Stage-discharge rating curve")
+plt.tight_layout()</div>
 </div>
 </div>
 </div>

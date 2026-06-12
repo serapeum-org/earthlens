@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -11681,7 +11681,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=2d041c60">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=5aa06eb2">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -11697,7 +11697,7 @@ GEE_SERVICE_KEY="/path/to/your/service-account-key.json"
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=c3056573">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=57f09044">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -11764,7 +11764,8 @@ SERVICE_KEY = os.environ["GEE_SERVICE_KEY"]           # path to the service-acco
 <span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">"ignore"</span><span class="p">)</span>
 <span class="n">logger</span><span class="o">.</span><span class="n">remove</span><span class="p">()</span>
 
-<span class="n">AOI</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="mf">175.45</span><span class="p">,</span> <span class="o">-</span><span class="mf">20.62</span><span class="p">,</span> <span class="o">-</span><span class="mf">175.35</span><span class="p">,</span> <span class="o">-</span><span class="mf">20.52</span><span class="p">];</span> <span class="n">C</span> <span class="o">=</span> <span class="s2">"COPERNICUS/S2_SR_HARMONIZED"</span>
+<span class="n">AOI</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="mf">175.45</span><span class="p">,</span> <span class="o">-</span><span class="mf">20.62</span><span class="p">,</span> <span class="o">-</span><span class="mf">175.35</span><span class="p">,</span> <span class="o">-</span><span class="mf">20.52</span><span class="p">]</span>
+<span class="n">C</span> <span class="o">=</span> <span class="s2">"COPERNICUS/S2_SR_HARMONIZED"</span>
 <span class="n">before</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span><span class="n">data_source</span><span class="o">=</span><span class="s2">"gee"</span><span class="p">,</span> <span class="n">cadence</span><span class="o">=</span><span class="s2">"raw"</span><span class="p">,</span> <span class="n">dataset</span><span class="o">=</span><span class="n">C</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">"B4"</span><span class="p">,</span> <span class="s2">"B3"</span><span class="p">,</span> <span class="s2">"B2"</span><span class="p">],</span> <span class="n">aoi</span><span class="o">=</span><span class="n">AOI</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="s2">"2021-12-15"</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">"2022-01-13"</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">reducer</span><span class="o">=</span><span class="s2">"median"</span><span class="p">)</span><span class="o">.</span><span class="n">load</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
 <span class="n">after</span>  <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span><span class="n">data_source</span><span class="o">=</span><span class="s2">"gee"</span><span class="p">,</span> <span class="n">cadence</span><span class="o">=</span><span class="s2">"raw"</span><span class="p">,</span> <span class="n">dataset</span><span class="o">=</span><span class="n">C</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">"B4"</span><span class="p">,</span> <span class="s2">"B3"</span><span class="p">,</span> <span class="s2">"B2"</span><span class="p">],</span> <span class="n">aoi</span><span class="o">=</span><span class="n">AOI</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="s2">"2022-01-20"</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">"2022-02-28"</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">reducer</span><span class="o">=</span><span class="s2">"median"</span><span class="p">)</span><span class="o">.</span><span class="n">load</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">"composites:"</span><span class="p">,</span> <span class="nb">bool</span><span class="p">(</span><span class="n">before</span><span class="p">),</span> <span class="nb">bool</span><span class="p">(</span><span class="n">after</span><span class="p">))</span>
@@ -11778,7 +11779,8 @@ from pyramids.dataset import Dataset   # pyramids' own plotting
 warnings.filterwarnings("ignore")
 logger.remove()
 
-AOI = [-175.45, -20.62, -175.35, -20.52]; C = "COPERNICUS/S2_SR_HARMONIZED"
+AOI = [-175.45, -20.62, -175.35, -20.52]
+C = "COPERNICUS/S2_SR_HARMONIZED"
 before = EarthLens(data_source="gee", cadence="raw", dataset=C, variables=["B4", "B3", "B2"], aoi=AOI, start="2021-12-15", end="2022-01-13", scale=10, reducer="median").load()[0]
 after  = EarthLens(data_source="gee", cadence="raw", dataset=C, variables=["B4", "B3", "B2"], aoi=AOI, start="2022-01-20", end="2022-02-28", scale=10, reducer="median").load()[0]
 print("composites:", bool(before), bool(after))</div>
@@ -11838,8 +11840,10 @@ print("composites:", bool(before), bool(after))</div>
     <span class="n">after</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">rgb_options</span><span class="o">=</span><span class="p">{</span><span class="s2">"rgb"</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="s2">"percentile"</span><span class="p">:</span> <span class="mi">2</span><span class="p">},</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
                                   <span class="n">title</span><span class="o">=</span><span class="s2">"Hunga Tonga - after (late Jan-Feb 2022)"</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="p">(</span><span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
-        <span class="n">a</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">([]);</span> <span class="n">a</span><span class="o">.</span><span class="n">set_yticks</span><span class="p">([])</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">();</span> <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+        <span class="n">a</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">([])</span>
+        <span class="n">a</span><span class="o">.</span><span class="n">set_yticks</span><span class="p">([])</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 <span class="k">else</span><span class="p">:</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">"no scenes - set GEE credentials and rerun"</span><span class="p">)</span>
 </pre></div>
@@ -11851,8 +11855,10 @@ if before and after:
     after.plot(rgb_options={"rgb": [0, 1, 2], "percentile": 2}, ax=ax[1],
                                   title="Hunga Tonga - after (late Jan-Feb 2022)")
     for a in (ax[0], ax[1]):
-        a.set_xticks([]); a.set_yticks([])
-    plt.tight_layout(); plt.show()
+        a.set_xticks([])
+        a.set_yticks([])
+    plt.tight_layout()
+    plt.show()
 else:
     print("no scenes - set GEE credentials and rerun")</div>
 </div>

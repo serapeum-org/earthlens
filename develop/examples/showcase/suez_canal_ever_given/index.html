@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -11727,7 +11727,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=9da85b50">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=a5e73b0d">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -11743,7 +11743,7 @@ GEE_SERVICE_KEY="/path/to/your/service-account-key.json"
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=005e1c49">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=daad8f51">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -11812,7 +11812,8 @@ SERVICE_KEY = os.environ["GEE_SERVICE_KEY"]           # path to the service-acco
 
 <span class="n">plt</span><span class="o">.</span><span class="n">rcParams</span><span class="p">[</span><span class="s2">"figure.dpi"</span><span class="p">]</span> <span class="o">=</span> <span class="mi">80</span>   <span class="c1"># keep embedded outputs lean</span>
 
-<span class="n">AOI</span> <span class="o">=</span> <span class="p">[</span><span class="mf">32.570</span><span class="p">,</span> <span class="mf">30.005</span><span class="p">,</span> <span class="mf">32.592</span><span class="p">,</span> <span class="mf">30.030</span><span class="p">];</span> <span class="n">COLL</span> <span class="o">=</span> <span class="s2">"COPERNICUS/S2_SR_HARMONIZED"</span>
+<span class="n">AOI</span> <span class="o">=</span> <span class="p">[</span><span class="mf">32.570</span><span class="p">,</span> <span class="mf">30.005</span><span class="p">,</span> <span class="mf">32.592</span><span class="p">,</span> <span class="mf">30.030</span><span class="p">]</span>
+<span class="n">COLL</span> <span class="o">=</span> <span class="s2">"COPERNICUS/S2_SR_HARMONIZED"</span>
 <span class="n">DATES</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"2021-03-04"</span><span class="p">,</span> <span class="s2">"2021-03-19"</span><span class="p">,</span> <span class="s2">"2021-03-24"</span><span class="p">,</span> <span class="s2">"2021-03-29"</span><span class="p">,</span> <span class="s2">"2021-04-03"</span><span class="p">,</span> <span class="s2">"2021-04-13"</span><span class="p">]</span>
 <span class="n">scene_dir</span> <span class="o">=</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">()</span>
 
@@ -11836,7 +11837,8 @@ logger.remove()
 
 plt.rcParams["figure.dpi"] = 80   # keep embedded outputs lean
 
-AOI = [32.570, 30.005, 32.592, 30.030]; COLL = "COPERNICUS/S2_SR_HARMONIZED"
+AOI = [32.570, 30.005, 32.592, 30.030]
+COLL = "COPERNICUS/S2_SR_HARMONIZED"
 DATES = ["2021-03-04", "2021-03-19", "2021-03-24", "2021-03-29", "2021-04-03", "2021-04-13"]
 scene_dir = tempfile.mkdtemp()
 
@@ -11904,8 +11906,10 @@ print(f"{len(dates)} scenes:", dates)</div>
     <span class="n">axes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">atleast_1d</span><span class="p">(</span><span class="n">axes</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">ax</span><span class="p">,</span> <span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">axes</span><span class="p">,</span> <span class="n">sel</span><span class="p">):</span>
         <span class="n">dc</span><span class="o">.</span><span class="n">iloc</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">rgb_options</span><span class="o">=</span><span class="p">{</span><span class="s2">"rgb"</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="s2">"percentile"</span><span class="p">:</span> <span class="mi">2</span><span class="p">},</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="sa">f</span><span class="s2">"Suez - </span><span class="si">{</span><span class="n">t</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-        <span class="n">ax</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">([]);</span> <span class="n">ax</span><span class="o">.</span><span class="n">set_yticks</span><span class="p">([])</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">();</span> <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">([])</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_yticks</span><span class="p">([])</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 <span class="k">else</span><span class="p">:</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">"no scenes - set GEE_SERVICE_ACCOUNT / GEE_SERVICE_KEY and rerun"</span><span class="p">)</span>
 </pre></div>
@@ -11917,8 +11921,10 @@ if sel:
     axes = np.atleast_1d(axes)
     for ax, (t, i) in zip(axes, sel):
         dc.iloc(i).plot(rgb_options={"rgb": [0, 1, 2], "percentile": 2}, ax=ax, title=f"Suez - {t}")
-        ax.set_xticks([]); ax.set_yticks([])
-    plt.tight_layout(); plt.show()
+        ax.set_xticks([])
+        ax.set_yticks([])
+    plt.tight_layout()
+    plt.show()
 else:
     print("no scenes - set GEE_SERVICE_ACCOUNT / GEE_SERVICE_KEY and rerun")</div>
 </div>
@@ -11974,9 +11980,11 @@ else:
     <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mf">2.4</span> <span class="o">*</span> <span class="n">n</span><span class="p">,</span> <span class="mf">2.7</span><span class="p">))</span>
     <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">d</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">dates</span><span class="p">):</span>
         <span class="n">dc</span><span class="o">.</span><span class="n">iloc</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">rgb_options</span><span class="o">=</span><span class="p">{</span><span class="s2">"rgb"</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="s2">"percentile"</span><span class="p">:</span> <span class="mi">2</span><span class="p">},</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">title</span><span class="o">=</span><span class="n">d</span><span class="p">)</span>
-        <span class="n">ax</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">([]);</span> <span class="n">ax</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">set_yticks</span><span class="p">([])</span>
+        <span class="n">ax</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">([])</span>
+        <span class="n">ax</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">set_yticks</span><span class="p">([])</span>
     <span class="n">fig</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s2">"Suez Canal - Sentinel-2 true colour"</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mf">1.03</span><span class="p">)</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">();</span> <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 <span class="k">else</span><span class="p">:</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">"no scenes to show"</span><span class="p">)</span>
 </pre></div>
@@ -11986,9 +11994,11 @@ if dc:
     fig, ax = plt.subplots(1, n, figsize=(2.4 * n, 2.7))
     for i, d in enumerate(dates):
         dc.iloc(i).plot(rgb_options={"rgb": [0, 1, 2], "percentile": 2}, ax=ax[i], title=d)
-        ax[i].set_xticks([]); ax[i].set_yticks([])
+        ax[i].set_xticks([])
+        ax[i].set_yticks([])
     fig.suptitle("Suez Canal - Sentinel-2 true colour", y=1.03)
-    plt.tight_layout(); plt.show()
+    plt.tight_layout()
+    plt.show()
 else:
     print("no scenes to show")</div>
 </div>
@@ -12051,9 +12061,11 @@ else:
                                    <span class="n">rgb</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="n">percentile</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
               <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">dc</span><span class="o">.</span><span class="n">time_length</span><span class="p">)]</span>
     <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
-    <span class="n">im</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">frames</span><span class="p">[</span><span class="mi">0</span><span class="p">]);</span> <span class="n">ax</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s2">"off"</span><span class="p">)</span>
+    <span class="n">im</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">frames</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s2">"off"</span><span class="p">)</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">_step</span><span class="p">(</span><span class="n">i</span><span class="p">):</span>
-        <span class="n">im</span><span class="o">.</span><span class="n">set_data</span><span class="p">(</span><span class="n">frames</span><span class="p">[</span><span class="n">i</span><span class="p">]);</span> <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Suez Canal - </span><span class="si">{</span><span class="n">dates</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+        <span class="n">im</span><span class="o">.</span><span class="n">set_data</span><span class="p">(</span><span class="n">frames</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Suez Canal - </span><span class="si">{</span><span class="n">dates</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
         <span class="k">return</span> <span class="p">[</span><span class="n">im</span><span class="p">]</span>
     <span class="n">anim</span> <span class="o">=</span> <span class="n">FuncAnimation</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="n">_step</span><span class="p">,</span> <span class="n">frames</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">frames</span><span class="p">),</span> <span class="n">interval</span><span class="o">=</span><span class="mi">800</span><span class="p">)</span>
     <span class="n">gif</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">(),</span> <span class="s2">"true_colour.gif"</span><span class="p">)</span>
@@ -12076,9 +12088,11 @@ if dc:
                                    rgb=[0, 1, 2], percentile=2)
               for i in range(dc.time_length)]
     fig, ax = plt.subplots(figsize=(5, 5))
-    im = ax.imshow(frames[0]); ax.axis("off")
+    im = ax.imshow(frames[0])
+    ax.axis("off")
     def _step(i):
-        im.set_data(frames[i]); ax.set_title(f"Suez Canal - {dates[i]}")
+        im.set_data(frames[i])
+        ax.set_title(f"Suez Canal - {dates[i]}")
         return [im]
     anim = FuncAnimation(fig, _step, frames=len(frames), interval=800)
     gif = os.path.join(tempfile.mkdtemp(), "true_colour.gif")

@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -11760,7 +11760,8 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span><span class="o">,</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span><span class="o">,</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">loguru</span><span class="w"> </span><span class="kn">import</span> <span class="n">logger</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
-<span class="n">logger</span><span class="o">.</span><span class="n">disable</span><span class="p">(</span><span class="s2">"earthlens"</span><span class="p">);</span> <span class="n">logger</span><span class="o">.</span><span class="n">disable</span><span class="p">(</span><span class="s2">"pyramids"</span><span class="p">)</span>
+<span class="n">logger</span><span class="o">.</span><span class="n">disable</span><span class="p">(</span><span class="s2">"earthlens"</span><span class="p">)</span>
+<span class="n">logger</span><span class="o">.</span><span class="n">disable</span><span class="p">(</span><span class="s2">"pyramids"</span><span class="p">)</span>
 
 <span class="c1"># --- Query Tropycal for north-Atlantic best track, keep only Ian ---</span>
 <span class="n">fixes</span> <span class="o">=</span> <span class="kc">None</span>
@@ -11782,7 +11783,8 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 import numpy as np, pandas as pd, matplotlib.pyplot as plt
 from loguru import logger
 from earthlens import EarthLens
-logger.disable("earthlens"); logger.disable("pyramids")
+logger.disable("earthlens")
+logger.disable("pyramids")
 
 # --- Query Tropycal for north-Atlantic best track, keep only Ian ---
 fixes = None
@@ -11854,7 +11856,8 @@ except Exception as exc:  # noqa: BLE001
     <span class="n">sc</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">fixes</span><span class="o">.</span><span class="n">lon</span><span class="p">,</span> <span class="n">fixes</span><span class="o">.</span><span class="n">lat</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="n">fixes</span><span class="o">.</span><span class="n">vmax_kt</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">"turbo"</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">55</span><span class="p">,</span>
                     <span class="n">edgecolor</span><span class="o">=</span><span class="s2">"k"</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span> <span class="n">zorder</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
     <span class="n">ax</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">xlabel</span><span class="o">=</span><span class="s2">"longitude"</span><span class="p">,</span> <span class="n">ylabel</span><span class="o">=</span><span class="s2">"latitude"</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">"Hurricane Ian (2022) — best track"</span><span class="p">)</span>
-    <span class="n">fig</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">sc</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"max sustained wind (kt)"</span><span class="p">);</span> <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+    <span class="n">fig</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">sc</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"max sustained wind (kt)"</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-2"># Path with each six-hourly fix coloured by intensity.
 if fixes is not None and len(fixes):
@@ -11863,7 +11866,8 @@ if fixes is not None and len(fixes):
     sc = ax.scatter(fixes.lon, fixes.lat, c=fixes.vmax_kt, cmap="turbo", s=55,
                     edgecolor="k", linewidth=0.3, zorder=2)
     ax.set(xlabel="longitude", ylabel="latitude", title="Hurricane Ian (2022) — best track")
-    fig.colorbar(sc, ax=ax, label="max sustained wind (kt)"); plt.show()</div>
+    fig.colorbar(sc, ax=ax, label="max sustained wind (kt)")
+    plt.show()</div>
 </div>
 </div>
 </div>
@@ -11916,22 +11920,32 @@ if fixes is not None and len(fixes):
     <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
     <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">fixes</span><span class="o">.</span><span class="n">time</span><span class="p">,</span> <span class="n">fixes</span><span class="o">.</span><span class="n">vmax_kt</span><span class="p">,</span> <span class="s2">"-o"</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"tab:blue"</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"wind (kt)"</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">kt</span><span class="p">,</span> <span class="n">lab</span> <span class="ow">in</span> <span class="p">[(</span><span class="mi">64</span><span class="p">,</span><span class="s2">"C1"</span><span class="p">),(</span><span class="mi">83</span><span class="p">,</span><span class="s2">"C2"</span><span class="p">),(</span><span class="mi">96</span><span class="p">,</span><span class="s2">"C3"</span><span class="p">),(</span><span class="mi">113</span><span class="p">,</span><span class="s2">"C4"</span><span class="p">),(</span><span class="mi">137</span><span class="p">,</span><span class="s2">"C5"</span><span class="p">)]:</span>
-        <span class="n">ax</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="n">kt</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"0.8"</span><span class="p">,</span> <span class="n">ls</span><span class="o">=</span><span class="s2">"--"</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mf">0.7</span><span class="p">);</span> <span class="n">ax</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">fixes</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">kt</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">lab</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"0.5"</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="n">kt</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"0.8"</span><span class="p">,</span> <span class="n">ls</span><span class="o">=</span><span class="s2">"--"</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mf">0.7</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">fixes</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">kt</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">lab</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"0.5"</span><span class="p">)</span>
     <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">"max wind (kt)"</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"tab:blue"</span><span class="p">)</span>
-    <span class="n">ax2</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">twinx</span><span class="p">();</span> <span class="n">ax2</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">fixes</span><span class="o">.</span><span class="n">time</span><span class="p">,</span> <span class="n">fixes</span><span class="o">.</span><span class="n">mslp_hpa</span><span class="p">,</span> <span class="s2">"-s"</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"tab:red"</span><span class="p">,</span> <span class="n">ms</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
-    <span class="n">ax2</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">"central pressure (hPa)"</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"tab:red"</span><span class="p">);</span> <span class="n">ax2</span><span class="o">.</span><span class="n">invert_yaxis</span><span class="p">()</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">"Ian — intensity timeline"</span><span class="p">);</span> <span class="n">fig</span><span class="o">.</span><span class="n">autofmt_xdate</span><span class="p">();</span> <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+    <span class="n">ax2</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">twinx</span><span class="p">()</span>
+    <span class="n">ax2</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">fixes</span><span class="o">.</span><span class="n">time</span><span class="p">,</span> <span class="n">fixes</span><span class="o">.</span><span class="n">mslp_hpa</span><span class="p">,</span> <span class="s2">"-s"</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"tab:red"</span><span class="p">,</span> <span class="n">ms</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+    <span class="n">ax2</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">"central pressure (hPa)"</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"tab:red"</span><span class="p">)</span>
+    <span class="n">ax2</span><span class="o">.</span><span class="n">invert_yaxis</span><span class="p">()</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">"Ian — intensity timeline"</span><span class="p">)</span>
+    <span class="n">fig</span><span class="o">.</span><span class="n">autofmt_xdate</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-3"># Wind (left axis) and central pressure (right axis) over time.
 if fixes is not None and len(fixes):
     fig, ax = plt.subplots(figsize=(9, 4))
     ax.plot(fixes.time, fixes.vmax_kt, "-o", color="tab:blue", label="wind (kt)")
     for kt, lab in [(64,"C1"),(83,"C2"),(96,"C3"),(113,"C4"),(137,"C5")]:
-        ax.axhline(kt, color="0.8", ls="--", lw=0.7); ax.text(fixes.time.iloc[0], kt+1, lab, fontsize=8, color="0.5")
+        ax.axhline(kt, color="0.8", ls="--", lw=0.7)
+        ax.text(fixes.time.iloc[0], kt+1, lab, fontsize=8, color="0.5")
     ax.set_ylabel("max wind (kt)", color="tab:blue")
-    ax2 = ax.twinx(); ax2.plot(fixes.time, fixes.mslp_hpa, "-s", color="tab:red", ms=4)
-    ax2.set_ylabel("central pressure (hPa)", color="tab:red"); ax2.invert_yaxis()
-    ax.set_title("Ian — intensity timeline"); fig.autofmt_xdate(); plt.show()</div>
+    ax2 = ax.twinx()
+    ax2.plot(fixes.time, fixes.mslp_hpa, "-s", color="tab:red", ms=4)
+    ax2.set_ylabel("central pressure (hPa)", color="tab:red")
+    ax2.invert_yaxis()
+    ax.set_title("Ian — intensity timeline")
+    fig.autofmt_xdate()
+    plt.show()</div>
 </div>
 </div>
 </div>
@@ -11987,7 +12001,10 @@ if fixes is not None and len(fixes):
     <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">fixes</span><span class="o">.</span><span class="n">time</span><span class="p">,</span> <span class="n">fixes</span><span class="o">.</span><span class="n">vmax_kt</span><span class="p">,</span> <span class="s2">"-o"</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"tab:blue"</span><span class="p">)</span>
     <span class="n">ax</span><span class="o">.</span><span class="n">fill_between</span><span class="p">(</span><span class="n">fixes</span><span class="o">.</span><span class="n">time</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">fixes</span><span class="o">.</span><span class="n">vmax_kt</span><span class="p">,</span> <span class="n">where</span><span class="o">=</span><span class="n">ri</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="kc">False</span><span class="p">),</span> <span class="n">color</span><span class="o">=</span><span class="s2">"orange"</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.4</span><span class="p">,</span>
                     <span class="n">label</span><span class="o">=</span><span class="s2">"rapid intensification (&gt;=30 kt / 24 h)"</span><span class="p">)</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">ylabel</span><span class="o">=</span><span class="s2">"max wind (kt)"</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">"Rapid intensification episodes"</span><span class="p">);</span> <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">();</span> <span class="n">fig</span><span class="o">.</span><span class="n">autofmt_xdate</span><span class="p">();</span> <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">ylabel</span><span class="o">=</span><span class="s2">"max wind (kt)"</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">"Rapid intensification episodes"</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+    <span class="n">fig</span><span class="o">.</span><span class="n">autofmt_xdate</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"peak 24 h intensification: +</span><span class="si">{</span><span class="n">d24</span><span class="o">.</span><span class="n">max</span><span class="p">()</span><span class="si">:</span><span class="s2">.0f</span><span class="si">}</span><span class="s2"> kt"</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-4"># 24-hour wind change (4 six-hourly steps); shade RI windows (&gt;=30 kt / 24 h).
@@ -11998,7 +12015,10 @@ if fixes is not None and len(fixes):
     ax.plot(fixes.time, fixes.vmax_kt, "-o", color="tab:blue")
     ax.fill_between(fixes.time, 0, fixes.vmax_kt, where=ri.fillna(False), color="orange", alpha=0.4,
                     label="rapid intensification (&gt;=30 kt / 24 h)")
-    ax.set(ylabel="max wind (kt)", title="Rapid intensification episodes"); ax.legend(); fig.autofmt_xdate(); plt.show()
+    ax.set(ylabel="max wind (kt)", title="Rapid intensification episodes")
+    ax.legend()
+    fig.autofmt_xdate()
+    plt.show()
     print(f"peak 24 h intensification: +{d24.max():.0f} kt")</div>
 </div>
 </div>
@@ -12058,13 +12078,15 @@ if fixes is not None and len(fixes):
     <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
     <span class="n">sc</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">fixes</span><span class="o">.</span><span class="n">vmax_kt</span><span class="p">,</span> <span class="n">fixes</span><span class="o">.</span><span class="n">mslp_hpa</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="n">fixes</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">"int64"</span><span class="p">),</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">"viridis"</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">45</span><span class="p">)</span>
     <span class="n">ax</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">xlabel</span><span class="o">=</span><span class="s2">"max wind (kt)"</span><span class="p">,</span> <span class="n">ylabel</span><span class="o">=</span><span class="s2">"central pressure (hPa)"</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">"Wind–pressure relationship"</span><span class="p">)</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">invert_yaxis</span><span class="p">();</span> <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">invert_yaxis</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-5">if fixes is not None and len(fixes):
     fig, ax = plt.subplots(figsize=(6, 5))
     sc = ax.scatter(fixes.vmax_kt, fixes.mslp_hpa, c=fixes.time.astype("int64"), cmap="viridis", s=45)
     ax.set(xlabel="max wind (kt)", ylabel="central pressure (hPa)", title="Wind–pressure relationship")
-    ax.invert_yaxis(); plt.show()</div>
+    ax.invert_yaxis()
+    plt.show()</div>
 </div>
 </div>
 </div>

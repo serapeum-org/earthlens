@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -11796,7 +11796,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=40e85828">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=9b67febf">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -11812,7 +11812,7 @@ GEE_SERVICE_KEY="/path/to/your/service-account-key.json"
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=42c45fd4">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=4bd4b23f">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -11997,9 +11997,11 @@ print(f"{len(dates)} scenes:", dates)</div>
     <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">d</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">dates</span><span class="p">):</span>
         <span class="n">dc_rgb</span><span class="o">.</span><span class="n">iloc</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">rgb_options</span><span class="o">=</span><span class="p">{</span><span class="s2">"rgb"</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="s2">"percentile"</span><span class="p">:</span> <span class="mi">2</span><span class="p">},</span>
                             <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">title</span><span class="o">=</span><span class="n">d</span><span class="p">)</span>
-        <span class="n">ax</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">([]);</span> <span class="n">ax</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">set_yticks</span><span class="p">([])</span>
+        <span class="n">ax</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">([])</span>
+        <span class="n">ax</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">set_yticks</span><span class="p">([])</span>
     <span class="n">fig</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s2">"Khan Younis - Sentinel-2 true colour"</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mf">1.03</span><span class="p">)</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">();</span> <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 <span class="k">else</span><span class="p">:</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">"no scenes - set GEE_SERVICE_ACCOUNT / GEE_SERVICE_KEY and rerun"</span><span class="p">)</span>
 </pre></div>
@@ -12009,9 +12011,11 @@ print(f"{len(dates)} scenes:", dates)</div>
     for i, d in enumerate(dates):
         dc_rgb.iloc(i).plot(rgb_options={"rgb": [0, 1, 2], "percentile": 2},
                             ax=ax[i], title=d)
-        ax[i].set_xticks([]); ax[i].set_yticks([])
+        ax[i].set_xticks([])
+        ax[i].set_yticks([])
     fig.suptitle("Khan Younis - Sentinel-2 true colour", y=1.03)
-    plt.tight_layout(); plt.show()
+    plt.tight_layout()
+    plt.show()
 else:
     print("no scenes - set GEE_SERVICE_ACCOUNT / GEE_SERVICE_KEY and rerun")</div>
 </div>
@@ -12068,8 +12072,10 @@ else:
     <span class="n">dc_rgb</span><span class="o">.</span><span class="n">iloc</span><span class="p">(</span><span class="n">dc_rgb</span><span class="o">.</span><span class="n">time_length</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">rgb_options</span><span class="o">=</span><span class="p">{</span><span class="s2">"rgb"</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="s2">"percentile"</span><span class="p">:</span> <span class="mi">2</span><span class="p">},</span>
                         <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">title</span><span class="o">=</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">dates</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2"> (after)"</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">ax</span><span class="p">:</span>
-        <span class="n">a</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">([]);</span> <span class="n">a</span><span class="o">.</span><span class="n">set_yticks</span><span class="p">([])</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">();</span> <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+        <span class="n">a</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">([])</span>
+        <span class="n">a</span><span class="o">.</span><span class="n">set_yticks</span><span class="p">([])</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-4">if dc_rgb:
     fig, ax = plt.subplots(1, 2, figsize=(9, 4.5))
@@ -12078,8 +12084,10 @@ else:
     dc_rgb.iloc(dc_rgb.time_length - 1).plot(rgb_options={"rgb": [0, 1, 2], "percentile": 2},
                         ax=ax[1], title=f"{dates[-1]} (after)")
     for a in ax:
-        a.set_xticks([]); a.set_yticks([])
-    plt.tight_layout(); plt.show()</div>
+        a.set_xticks([])
+        a.set_yticks([])
+    plt.tight_layout()
+    plt.show()</div>
 </div>
 </div>
 </div>
@@ -12139,9 +12147,11 @@ else:
                                    <span class="n">rgb</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="n">percentile</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
               <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">dc_rgb</span><span class="o">.</span><span class="n">time_length</span><span class="p">)]</span>
     <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
-    <span class="n">im</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">frames</span><span class="p">[</span><span class="mi">0</span><span class="p">]);</span> <span class="n">ax</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s2">"off"</span><span class="p">)</span>
+    <span class="n">im</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">frames</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s2">"off"</span><span class="p">)</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">_step</span><span class="p">(</span><span class="n">i</span><span class="p">):</span>
-        <span class="n">im</span><span class="o">.</span><span class="n">set_data</span><span class="p">(</span><span class="n">frames</span><span class="p">[</span><span class="n">i</span><span class="p">]);</span> <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Khan Younis - </span><span class="si">{</span><span class="n">dates</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+        <span class="n">im</span><span class="o">.</span><span class="n">set_data</span><span class="p">(</span><span class="n">frames</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Khan Younis - </span><span class="si">{</span><span class="n">dates</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
         <span class="k">return</span> <span class="p">[</span><span class="n">im</span><span class="p">]</span>
     <span class="n">anim</span> <span class="o">=</span> <span class="n">FuncAnimation</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="n">_step</span><span class="p">,</span> <span class="n">frames</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">frames</span><span class="p">),</span> <span class="n">interval</span><span class="o">=</span><span class="mi">800</span><span class="p">)</span>
     <span class="n">gif</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">(),</span> <span class="s2">"true_colour.gif"</span><span class="p">)</span>
@@ -12163,9 +12173,11 @@ if dc_rgb:
                                    rgb=[0, 1, 2], percentile=2)
               for i in range(dc_rgb.time_length)]
     fig, ax = plt.subplots(figsize=(5, 5))
-    im = ax.imshow(frames[0]); ax.axis("off")
+    im = ax.imshow(frames[0])
+    ax.axis("off")
     def _step(i):
-        im.set_data(frames[i]); ax.set_title(f"Khan Younis - {dates[i]}")
+        im.set_data(frames[i])
+        ax.set_title(f"Khan Younis - {dates[i]}")
         return [im]
     anim = FuncAnimation(fig, _step, frames=len(frames), interval=800)
     gif = os.path.join(tempfile.mkdtemp(), "true_colour.gif")
@@ -12231,7 +12243,8 @@ else:
     <span class="n">diff</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">create_from_array</span><span class="p">(</span><span class="n">arr</span><span class="o">=</span><span class="p">(</span><span class="n">nd_a</span> <span class="o">-</span> <span class="n">nd_b</span><span class="p">)[</span><span class="kc">None</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:],</span>
         <span class="n">geo</span><span class="o">=</span><span class="n">dc_ndvi</span><span class="o">.</span><span class="n">iloc</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">geotransform</span><span class="p">,</span> <span class="n">epsg</span><span class="o">=</span><span class="n">dc_ndvi</span><span class="o">.</span><span class="n">iloc</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">epsg</span><span class="p">)</span>
     <span class="n">diff</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">band</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">"RdBu"</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">"NDVI change (2024 - 2023)"</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=-</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">();</span> <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
     <span class="n">veg</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">x</span> <span class="o">&gt;</span> <span class="mf">0.3</span><span class="p">))</span>
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"mean NDVI 2023 </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">nanmean</span><span class="p">(</span><span class="n">nd_b</span><span class="p">)</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2"> -&gt; 2024 </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">nanmean</span><span class="p">(</span><span class="n">nd_a</span><span class="p">)</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">; "</span>
           <span class="sa">f</span><span class="s2">"vegetated </span><span class="si">{</span><span class="n">veg</span><span class="p">(</span><span class="n">nd_b</span><span class="p">)</span><span class="si">:</span><span class="s2">.1%</span><span class="si">}</span><span class="s2"> -&gt; </span><span class="si">{</span><span class="n">veg</span><span class="p">(</span><span class="n">nd_a</span><span class="p">)</span><span class="si">:</span><span class="s2">.1%</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
@@ -12246,7 +12259,8 @@ else:
     diff = Dataset.create_from_array(arr=(nd_a - nd_b)[None, :, :],
         geo=dc_ndvi.iloc(0).geotransform, epsg=dc_ndvi.iloc(0).epsg)
     diff.plot(band=0, ax=ax[2], cmap="RdBu", title="NDVI change (2024 - 2023)", vmin=-0.5, vmax=0.5)
-    plt.tight_layout(); plt.show()
+    plt.tight_layout()
+    plt.show()
     veg = lambda x: float(np.mean(x &gt; 0.3))
     print(f"mean NDVI 2023 {np.nanmean(nd_b):.3f} -&gt; 2024 {np.nanmean(nd_a):.3f}; "
           f"vegetated {veg(nd_b):.1%} -&gt; {veg(nd_a):.1%}")</div>
@@ -12370,7 +12384,8 @@ else:
     <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="n">pd</span><span class="o">.</span><span class="n">Timestamp</span><span class="p">(</span><span class="n">d</span><span class="p">)</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">dates</span><span class="p">],</span> <span class="n">series_v</span><span class="p">,</span> <span class="s2">"-o"</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"tab:green"</span><span class="p">)</span>
     <span class="n">ax</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="mf">0.3</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"0.7"</span><span class="p">,</span> <span class="n">ls</span><span class="o">=</span><span class="s2">"--"</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mf">0.8</span><span class="p">)</span>
     <span class="n">ax</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">ylabel</span><span class="o">=</span><span class="s2">"mean NDVI"</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">"Khan Younis - mean vegetation index over time"</span><span class="p">)</span>
-    <span class="n">fig</span><span class="o">.</span><span class="n">autofmt_xdate</span><span class="p">();</span> <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+    <span class="n">fig</span><span class="o">.</span><span class="n">autofmt_xdate</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-8">if dc_ndvi:
     series_v = [float(np.nanmean(dc_ndvi.iloc(i).read_array(band=0))) for i in range(dc_ndvi.time_length)]
@@ -12378,7 +12393,8 @@ else:
     ax.plot([pd.Timestamp(d) for d in dates], series_v, "-o", color="tab:green")
     ax.axhline(0.3, color="0.7", ls="--", lw=0.8)
     ax.set(ylabel="mean NDVI", title="Khan Younis - mean vegetation index over time")
-    fig.autofmt_xdate(); plt.show()</div>
+    fig.autofmt_xdate()
+    plt.show()</div>
 </div>
 </div>
 </div>

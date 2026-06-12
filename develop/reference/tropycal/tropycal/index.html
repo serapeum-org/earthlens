@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -15714,7 +15714,7 @@ features, so the facade rejects <code>aggregate=</code> with
 <a id="__codelineno-0-633" name="__codelineno-0-633"></a>        <span class="bp">self</span><span class="p">,</span>
 <a id="__codelineno-0-634" name="__codelineno-0-634"></a>        <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
 <a id="__codelineno-0-635" name="__codelineno-0-635"></a>        <span class="n">aggregate</span><span class="p">:</span> <span class="n">AggregationConfig</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-636" name="__codelineno-0-636"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;FeatureCollection | pd.DataFrame&quot;</span><span class="p">:</span>
+<a id="__codelineno-0-636" name="__codelineno-0-636"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FeatureCollection</span> <span class="o">|</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
 <a id="__codelineno-0-637" name="__codelineno-0-637"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Load every requested basin and return the unioned tracks.</span>
 <a id="__codelineno-0-638" name="__codelineno-0-638"></a>
 <a id="__codelineno-0-639" name="__codelineno-0-639"></a><span class="sd">        Each basin in `self.vars` is loaded once; its matched features are</span>
@@ -15854,7 +15854,7 @@ features, so the facade rejects <code>aggregate=</code> with
 <a id="__codelineno-0-773" name="__codelineno-0-773"></a>            <span class="p">)</span>
 <a id="__codelineno-0-774" name="__codelineno-0-774"></a>            <span class="k">return</span> <span class="kc">None</span>
 <a id="__codelineno-0-775" name="__codelineno-0-775"></a>
-<a id="__codelineno-0-776" name="__codelineno-0-776"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_download_ships</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;pd.DataFrame&quot;</span><span class="p">:</span>
+<a id="__codelineno-0-776" name="__codelineno-0-776"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_download_ships</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
 <a id="__codelineno-0-777" name="__codelineno-0-777"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Fetch SHIPS guidance for each storm and return one tabular frame.</span>
 <a id="__codelineno-0-778" name="__codelineno-0-778"></a>
 <a id="__codelineno-0-779" name="__codelineno-0-779"></a><span class="sd">        SHIPS is `product=&quot;ships&quot;` — a tabular (not geographic) forecast</span>
@@ -15898,7 +15898,7 @@ features, so the facade rejects <code>aggregate=</code> with
 <a id="__codelineno-0-817" name="__codelineno-0-817"></a>        <span class="k">return</span> <span class="n">combined</span>
 <a id="__codelineno-0-818" name="__codelineno-0-818"></a>
 <a id="__codelineno-0-819" name="__codelineno-0-819"></a>    <span class="nd">@staticmethod</span>
-<a id="__codelineno-0-820" name="__codelineno-0-820"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_ships_frame</span><span class="p">(</span><span class="n">storm</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span> <span class="n">init</span><span class="p">:</span> <span class="n">dt</span><span class="o">.</span><span class="n">datetime</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;pd.DataFrame | None&quot;</span><span class="p">:</span>
+<a id="__codelineno-0-820" name="__codelineno-0-820"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_ships_frame</span><span class="p">(</span><span class="n">storm</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span> <span class="n">init</span><span class="p">:</span> <span class="n">dt</span><span class="o">.</span><span class="n">datetime</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
 <a id="__codelineno-0-821" name="__codelineno-0-821"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a storm&#39;s SHIPS table for `init`, or `None` (logged) if absent.&quot;&quot;&quot;</span>
 <a id="__codelineno-0-822" name="__codelineno-0-822"></a>        <span class="k">try</span><span class="p">:</span>
 <a id="__codelineno-0-823" name="__codelineno-0-823"></a>            <span class="k">return</span> <span class="n">storm</span><span class="o">.</span><span class="n">get_ships</span><span class="p">(</span><span class="n">init</span><span class="p">)</span><span class="o">.</span><span class="n">to_dataframe</span><span class="p">()</span>
@@ -15909,7 +15909,7 @@ features, so the facade rejects <code>aggregate=</code> with
 <a id="__codelineno-0-828" name="__codelineno-0-828"></a>            <span class="p">)</span>
 <a id="__codelineno-0-829" name="__codelineno-0-829"></a>            <span class="k">return</span> <span class="kc">None</span>
 <a id="__codelineno-0-830" name="__codelineno-0-830"></a>
-<a id="__codelineno-0-831" name="__codelineno-0-831"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_write_table</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">storm_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">init</span><span class="p">:</span> <span class="n">dt</span><span class="o">.</span><span class="n">datetime</span><span class="p">,</span> <span class="n">df</span><span class="p">:</span> <span class="s2">&quot;pd.DataFrame&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
+<a id="__codelineno-0-831" name="__codelineno-0-831"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_write_table</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">storm_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">init</span><span class="p">:</span> <span class="n">dt</span><span class="o">.</span><span class="n">datetime</span><span class="p">,</span> <span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
 <a id="__codelineno-0-832" name="__codelineno-0-832"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Write one storm&#39;s SHIPS table to a CSV under `root_dir`.&quot;&quot;&quot;</span>
 <a id="__codelineno-0-833" name="__codelineno-0-833"></a>        <span class="n">stem</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;tropycal_ships_</span><span class="si">{</span><span class="n">storm_id</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">init</span><span class="si">:</span><span class="s2">%Y%m%dT%H</span><span class="si">}</span><span class="s2">&quot;</span>
 <a id="__codelineno-0-834" name="__codelineno-0-834"></a>        <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root_dir</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">stem</span><span class="si">}</span><span class="s2">.csv&quot;</span>
@@ -16759,7 +16759,7 @@ callers.</p>
       <tbody>
           <tr class="doc-section-item">
 <td><code>FeatureCollection</code></td>            <td>
-                  <code>&#39;FeatureCollection | pd.DataFrame&#39;</code>
+                  <code><span title="pyramids.feature.collection.FeatureCollection">FeatureCollection</span> | <span title="pandas.DataFrame">DataFrame</span></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -16880,7 +16880,7 @@ basin's track features, CRS <code>EPSG:4326</code>. Empty
 <a id="__codelineno-0-633" name="__codelineno-0-633"></a>    <span class="bp">self</span><span class="p">,</span>
 <a id="__codelineno-0-634" name="__codelineno-0-634"></a>    <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
 <a id="__codelineno-0-635" name="__codelineno-0-635"></a>    <span class="n">aggregate</span><span class="p">:</span> <span class="n">AggregationConfig</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-636" name="__codelineno-0-636"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;FeatureCollection | pd.DataFrame&quot;</span><span class="p">:</span>
+<a id="__codelineno-0-636" name="__codelineno-0-636"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FeatureCollection</span> <span class="o">|</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
 <a id="__codelineno-0-637" name="__codelineno-0-637"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Load every requested basin and return the unioned tracks.</span>
 <a id="__codelineno-0-638" name="__codelineno-0-638"></a>
 <a id="__codelineno-0-639" name="__codelineno-0-639"></a><span class="sd">    Each basin in `self.vars` is loaded once; its matched features are</span>
@@ -19513,7 +19513,7 @@ features, so the facade rejects <code>aggregate=</code> with
 <a id="__codelineno-0-633" name="__codelineno-0-633"></a>        <span class="bp">self</span><span class="p">,</span>
 <a id="__codelineno-0-634" name="__codelineno-0-634"></a>        <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
 <a id="__codelineno-0-635" name="__codelineno-0-635"></a>        <span class="n">aggregate</span><span class="p">:</span> <span class="n">AggregationConfig</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-636" name="__codelineno-0-636"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;FeatureCollection | pd.DataFrame&quot;</span><span class="p">:</span>
+<a id="__codelineno-0-636" name="__codelineno-0-636"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FeatureCollection</span> <span class="o">|</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
 <a id="__codelineno-0-637" name="__codelineno-0-637"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Load every requested basin and return the unioned tracks.</span>
 <a id="__codelineno-0-638" name="__codelineno-0-638"></a>
 <a id="__codelineno-0-639" name="__codelineno-0-639"></a><span class="sd">        Each basin in `self.vars` is loaded once; its matched features are</span>
@@ -19653,7 +19653,7 @@ features, so the facade rejects <code>aggregate=</code> with
 <a id="__codelineno-0-773" name="__codelineno-0-773"></a>            <span class="p">)</span>
 <a id="__codelineno-0-774" name="__codelineno-0-774"></a>            <span class="k">return</span> <span class="kc">None</span>
 <a id="__codelineno-0-775" name="__codelineno-0-775"></a>
-<a id="__codelineno-0-776" name="__codelineno-0-776"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_download_ships</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;pd.DataFrame&quot;</span><span class="p">:</span>
+<a id="__codelineno-0-776" name="__codelineno-0-776"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_download_ships</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
 <a id="__codelineno-0-777" name="__codelineno-0-777"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Fetch SHIPS guidance for each storm and return one tabular frame.</span>
 <a id="__codelineno-0-778" name="__codelineno-0-778"></a>
 <a id="__codelineno-0-779" name="__codelineno-0-779"></a><span class="sd">        SHIPS is `product=&quot;ships&quot;` — a tabular (not geographic) forecast</span>
@@ -19697,7 +19697,7 @@ features, so the facade rejects <code>aggregate=</code> with
 <a id="__codelineno-0-817" name="__codelineno-0-817"></a>        <span class="k">return</span> <span class="n">combined</span>
 <a id="__codelineno-0-818" name="__codelineno-0-818"></a>
 <a id="__codelineno-0-819" name="__codelineno-0-819"></a>    <span class="nd">@staticmethod</span>
-<a id="__codelineno-0-820" name="__codelineno-0-820"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_ships_frame</span><span class="p">(</span><span class="n">storm</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span> <span class="n">init</span><span class="p">:</span> <span class="n">dt</span><span class="o">.</span><span class="n">datetime</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;pd.DataFrame | None&quot;</span><span class="p">:</span>
+<a id="__codelineno-0-820" name="__codelineno-0-820"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_ships_frame</span><span class="p">(</span><span class="n">storm</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span> <span class="n">init</span><span class="p">:</span> <span class="n">dt</span><span class="o">.</span><span class="n">datetime</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
 <a id="__codelineno-0-821" name="__codelineno-0-821"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a storm&#39;s SHIPS table for `init`, or `None` (logged) if absent.&quot;&quot;&quot;</span>
 <a id="__codelineno-0-822" name="__codelineno-0-822"></a>        <span class="k">try</span><span class="p">:</span>
 <a id="__codelineno-0-823" name="__codelineno-0-823"></a>            <span class="k">return</span> <span class="n">storm</span><span class="o">.</span><span class="n">get_ships</span><span class="p">(</span><span class="n">init</span><span class="p">)</span><span class="o">.</span><span class="n">to_dataframe</span><span class="p">()</span>
@@ -19708,7 +19708,7 @@ features, so the facade rejects <code>aggregate=</code> with
 <a id="__codelineno-0-828" name="__codelineno-0-828"></a>            <span class="p">)</span>
 <a id="__codelineno-0-829" name="__codelineno-0-829"></a>            <span class="k">return</span> <span class="kc">None</span>
 <a id="__codelineno-0-830" name="__codelineno-0-830"></a>
-<a id="__codelineno-0-831" name="__codelineno-0-831"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_write_table</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">storm_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">init</span><span class="p">:</span> <span class="n">dt</span><span class="o">.</span><span class="n">datetime</span><span class="p">,</span> <span class="n">df</span><span class="p">:</span> <span class="s2">&quot;pd.DataFrame&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
+<a id="__codelineno-0-831" name="__codelineno-0-831"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_write_table</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">storm_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">init</span><span class="p">:</span> <span class="n">dt</span><span class="o">.</span><span class="n">datetime</span><span class="p">,</span> <span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
 <a id="__codelineno-0-832" name="__codelineno-0-832"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Write one storm&#39;s SHIPS table to a CSV under `root_dir`.&quot;&quot;&quot;</span>
 <a id="__codelineno-0-833" name="__codelineno-0-833"></a>        <span class="n">stem</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;tropycal_ships_</span><span class="si">{</span><span class="n">storm_id</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">init</span><span class="si">:</span><span class="s2">%Y%m%dT%H</span><span class="si">}</span><span class="s2">&quot;</span>
 <a id="__codelineno-0-834" name="__codelineno-0-834"></a>        <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root_dir</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">stem</span><span class="si">}</span><span class="s2">.csv&quot;</span>
@@ -20558,7 +20558,7 @@ callers.</p>
       <tbody>
           <tr class="doc-section-item">
 <td><code>FeatureCollection</code></td>            <td>
-                  <code>&#39;FeatureCollection | pd.DataFrame&#39;</code>
+                  <code><span title="pyramids.feature.collection.FeatureCollection">FeatureCollection</span> | <span title="pandas.DataFrame">DataFrame</span></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -20679,7 +20679,7 @@ basin's track features, CRS <code>EPSG:4326</code>. Empty
 <a id="__codelineno-0-633" name="__codelineno-0-633"></a>    <span class="bp">self</span><span class="p">,</span>
 <a id="__codelineno-0-634" name="__codelineno-0-634"></a>    <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
 <a id="__codelineno-0-635" name="__codelineno-0-635"></a>    <span class="n">aggregate</span><span class="p">:</span> <span class="n">AggregationConfig</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-636" name="__codelineno-0-636"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;FeatureCollection | pd.DataFrame&quot;</span><span class="p">:</span>
+<a id="__codelineno-0-636" name="__codelineno-0-636"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FeatureCollection</span> <span class="o">|</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
 <a id="__codelineno-0-637" name="__codelineno-0-637"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Load every requested basin and return the unioned tracks.</span>
 <a id="__codelineno-0-638" name="__codelineno-0-638"></a>
 <a id="__codelineno-0-639" name="__codelineno-0-639"></a><span class="sd">    Each basin in `self.vars` is loaded once; its matched features are</span>

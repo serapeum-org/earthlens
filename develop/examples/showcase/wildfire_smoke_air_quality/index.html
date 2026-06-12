@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -11671,7 +11671,8 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <span class="kn">from</span><span class="w"> </span><span class="nn">loguru</span><span class="w"> </span><span class="kn">import</span> <span class="n">logger</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
 
-<span class="n">logger</span><span class="o">.</span><span class="n">disable</span><span class="p">(</span><span class="s2">"earthlens"</span><span class="p">);</span> <span class="n">logger</span><span class="o">.</span><span class="n">disable</span><span class="p">(</span><span class="s2">"pyramids"</span><span class="p">)</span>
+<span class="n">logger</span><span class="o">.</span><span class="n">disable</span><span class="p">(</span><span class="s2">"earthlens"</span><span class="p">)</span>
+<span class="n">logger</span><span class="o">.</span><span class="n">disable</span><span class="p">(</span><span class="s2">"pyramids"</span><span class="p">)</span>
 
 <span class="c1"># OpenAQ returns a tidy DataFrame: station_id, datetime_utc, value (µg/m³), lat, lon.</span>
 <span class="n">pm</span> <span class="o">=</span> <span class="kc">None</span>
@@ -11696,7 +11697,8 @@ import numpy as np, pandas as pd, matplotlib.pyplot as plt
 from loguru import logger
 from earthlens import EarthLens
 
-logger.disable("earthlens"); logger.disable("pyramids")
+logger.disable("earthlens")
+logger.disable("pyramids")
 
 # OpenAQ returns a tidy DataFrame: station_id, datetime_utc, value (µg/m³), lat, lon.
 pm = None
@@ -11779,7 +11781,9 @@ else:
     <span class="n">ax</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"tab:green"</span><span class="p">,</span> <span class="n">ls</span><span class="o">=</span><span class="s2">"--"</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"WHO 24h guideline (15)"</span><span class="p">)</span>
     <span class="n">ax</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="mi">35</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"tab:blue"</span><span class="p">,</span> <span class="n">ls</span><span class="o">=</span><span class="s2">"--"</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"US 24h standard (35)"</span><span class="p">)</span>
     <span class="n">ax</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">ylabel</span><span class="o">=</span><span class="s2">"PM2.5 (µg/m³)"</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">"New York City PM2.5 — Canadian wildfire smoke, June 2023"</span><span class="p">)</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s2">"upper left"</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">8</span><span class="p">);</span> <span class="n">fig</span><span class="o">.</span><span class="n">autofmt_xdate</span><span class="p">();</span> <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s2">"upper left"</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span>
+    <span class="n">fig</span><span class="o">.</span><span class="n">autofmt_xdate</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
     <span class="n">peak</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"peak PM2.5 </span><span class="si">{</span><span class="n">peak</span><span class="si">:</span><span class="s2">.0f</span><span class="si">}</span><span class="s2"> µg/m³ = </span><span class="si">{</span><span class="n">peak</span><span class="o">/</span><span class="mi">15</span><span class="si">:</span><span class="s2">.0f</span><span class="si">}</span><span class="s2">x the WHO 24h guideline, "</span>
           <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">peak</span><span class="o">/</span><span class="mi">35</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">x the US standard"</span><span class="p">)</span>
@@ -11802,7 +11806,9 @@ if pm is not None and len(pm):
     ax.axhline(15, color="tab:green", ls="--", lw=1, label="WHO 24h guideline (15)")
     ax.axhline(35, color="tab:blue", ls="--", lw=1, label="US 24h standard (35)")
     ax.set(ylabel="PM2.5 (µg/m³)", title="New York City PM2.5 — Canadian wildfire smoke, June 2023")
-    ax.legend(loc="upper left", fontsize=8); fig.autofmt_xdate(); plt.show()
+    ax.legend(loc="upper left", fontsize=8)
+    fig.autofmt_xdate()
+    plt.show()
     peak = pm.value.max()
     print(f"peak PM2.5 {peak:.0f} µg/m³ = {peak/15:.0f}x the WHO 24h guideline, "
           f"{peak/35:.1f}x the US standard")
