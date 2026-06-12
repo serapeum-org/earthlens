@@ -2312,4 +2312,3 @@ datasets:
         description: Drought-intensity class (-1=none, 0=D0 abnormally dry, 1=D1 moderate, 2=D2 severe, 3=D3 extreme, 4=D4 exceptional)
         min: -1
         max: 4
-

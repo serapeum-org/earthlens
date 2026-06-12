@@ -127,5 +127,3 @@ class TestCmemsLiveSubset:
             f"aggregate GeoTIFFs should be non-empty: "
             f"{[(p.name, p.stat().st_size) for p in paths]!r}"
         )
-
-

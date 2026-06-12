@@ -1096,4 +1096,3 @@ class Catalog(AbstractCatalog):
                 continue
             result.append(key)
         return sorted(result)
-

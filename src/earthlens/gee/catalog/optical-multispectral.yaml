@@ -9290,4 +9290,3 @@ datasets:
       Nadir_Reflectance_Band7:
         description: Best NBAR at local solar noon for band 7
         wavelength: 2.13
-
