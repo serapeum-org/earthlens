@@ -13,8 +13,8 @@ import pytest
 from earthlens.base import AuthenticationError
 from earthlens.stac import auth_cdse
 from earthlens.stac.signers import (
-    CDSESigner,
     CdseS3Signer,
+    CDSESigner,
     EarthdataSigner,
     PlanetaryComputerSigner,
     _BearerProviderSigner,

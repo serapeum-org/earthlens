@@ -22,7 +22,6 @@ from earthlens.gee.jobs import (
     wait_for_task_id,
 )
 
-
 # -- fixtures ---------------------------------------------------------------
 
 

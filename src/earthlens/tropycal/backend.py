@@ -633,7 +633,7 @@ class TropicalCyclone(AbstractDataSource):
         self,
         progress_bar: bool = True,
         aggregate: AggregationConfig | None = None,
-    ) -> "FeatureCollection | pd.DataFrame":
+    ) -> FeatureCollection | pd.DataFrame:
         """Load every requested basin and return the unioned tracks.
 
         Each basin in `self.vars` is loaded once; its matched features are
@@ -773,7 +773,7 @@ class TropicalCyclone(AbstractDataSource):
             )
             return None
 
-    def _download_ships(self) -> "pd.DataFrame":
+    def _download_ships(self) -> pd.DataFrame:
         """Fetch SHIPS guidance for each storm and return one tabular frame.
 
         SHIPS is `product="ships"` — a tabular (not geographic) forecast
@@ -817,7 +817,7 @@ class TropicalCyclone(AbstractDataSource):
         return combined
 
     @staticmethod
-    def _ships_frame(storm: object, init: dt.datetime) -> "pd.DataFrame | None":
+    def _ships_frame(storm: object, init: dt.datetime) -> pd.DataFrame | None:
         """Return a storm's SHIPS table for `init`, or `None` (logged) if absent."""
         try:
             return storm.get_ships(init).to_dataframe()
@@ -828,7 +828,7 @@ class TropicalCyclone(AbstractDataSource):
             )
             return None
 
-    def _write_table(self, storm_id: str, init: dt.datetime, df: "pd.DataFrame") -> Path:
+    def _write_table(self, storm_id: str, init: dt.datetime, df: pd.DataFrame) -> Path:
         """Write one storm's SHIPS table to a CSV under `root_dir`."""
         stem = f"tropycal_ships_{storm_id}_{init:%Y%m%dT%H}"
         out_path = self.root_dir / f"{stem}.csv"

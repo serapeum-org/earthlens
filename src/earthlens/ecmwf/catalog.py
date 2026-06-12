@@ -60,8 +60,8 @@ from pydantic import BaseModel, ConfigDict, Field, ValidationError, field_valida
 from earthlens.base import AbstractCatalog, FluxableLeaf, Provider
 from earthlens.base.providers import (
     clear_providers_cache as _clear_providers_cache_base,
-    load_providers,
 )
+from earthlens.base.providers import load_providers
 from earthlens.base.yaml_loader import load_yaml_strict
 from earthlens.ecmwf.constraints import fetch_constraints
 
@@ -77,7 +77,7 @@ PROVIDERS_PATH: Path = Path(__file__).parent / "providers.yaml"
 # script append) invalidates the entry naturally. Mirrors the GEE
 # pattern (H1 / M2) so repeated `Catalog()` construction is ~1 ms
 # instead of paying the YAML parse + pydantic validation each time.
-_CATALOG_CACHE: dict[Any, tuple[list[str], dict[str, "Dataset"]]] = {}
+_CATALOG_CACHE: dict[Any, tuple[list[str], dict[str, Dataset]]] = {}
 
 
 def clear_catalog_cache() -> None:
@@ -119,7 +119,7 @@ def _yaml_files_for(path: Path) -> list[Path]:
     )
 
 
-def _load_catalog_data(path: Path) -> tuple[list[str], dict[str, "Dataset"]]:
+def _load_catalog_data(path: Path) -> tuple[list[str], dict[str, Dataset]]:
     """Parse, validate, and cache the CDS catalog at `path`.
 
     Returns a `(available_datasets, datasets)` tuple of the same shape
@@ -206,7 +206,7 @@ def _provider_for_dataset(ds_name: str) -> str:
 def _build_dataset_map(
     datasets_yaml: dict[str, dict[str, Any]],
     catalog_path: Path,
-) -> tuple[dict[str, "Dataset"], int]:
+) -> tuple[dict[str, Dataset], int]:
     """Build the structural per-dataset :class:`Dataset` map (N1).
 
     Walks every entry in `datasets_yaml`, validates each variable into
@@ -282,7 +282,7 @@ def _build_dataset_map(
 
 
 def _synthesize_monthly_entries(
-    structural: dict[str, "Dataset"],
+    structural: dict[str, Dataset],
     datasets_yaml: dict[str, dict[str, Any]],
 ) -> None:
     """Mutate `structural` to add an auto-synthesised entry per `monthly:` xref (N1).
@@ -336,11 +336,8 @@ def _synthesize_monthly_entries(
 # planning/catalog-cross-backend-comparison.md). Re-imported below as
 # `_read_cdsapirc` so any external caller using `from
 # earthlens.ecmwf.catalog import _read_cdsapirc` keeps working.
-from earthlens.ecmwf.jobs import (  # noqa: E402 — re-export for back-compat
-    download_job as _download_job_impl,
-    list_recent_jobs as _list_recent_jobs_impl,
-    read_cdsapirc as _read_cdsapirc,
-)
+from earthlens.ecmwf.jobs import download_job as _download_job_impl  # noqa: E402 — re-export for back-compat
+from earthlens.ecmwf.jobs import list_recent_jobs as _list_recent_jobs_impl
 
 
 class Variable(FluxableLeaf):

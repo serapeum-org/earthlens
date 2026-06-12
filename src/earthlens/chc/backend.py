@@ -33,7 +33,6 @@ The `variables` constructor argument accepts two shapes:
 
 from __future__ import annotations
 
-import datetime as dt
 from contextlib import closing
 from ftplib import FTP  # nosec B402  # noqa: S402
 from pathlib import Path

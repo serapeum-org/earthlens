@@ -101,7 +101,7 @@ class FakeResource(dict):
 class FakeDataset(dict):
     """Fake HDX `Dataset` resolving ids from a class-level registry."""
 
-    registry: dict[str, "FakeDataset"] = {}
+    registry: dict[str, FakeDataset] = {}
 
     def __init__(self, name: str, resources: list[FakeResource], org: str = "fake-org"):
         super().__init__(

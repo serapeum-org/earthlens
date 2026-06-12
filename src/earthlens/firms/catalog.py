@@ -41,7 +41,7 @@ CATALOG_PATH: Path = Path(__file__).parent / "firms_data_catalog.yaml"
 #: Module-level parse cache keyed on `(resolved_path, st_mtime_ns)` so a
 #: repeated `Catalog()` skips the YAML parse + pydantic validation. Mirrors
 #: the FDSN / NWP / radar loaders.
-_CATALOG_CACHE: dict[tuple[str, int], dict[str, "Sensor"]] = {}
+_CATALOG_CACHE: dict[tuple[str, int], dict[str, Sensor]] = {}
 
 
 def clear_catalog_cache() -> None:

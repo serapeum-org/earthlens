@@ -41,7 +41,7 @@ from earthlens.base import (
 
 if TYPE_CHECKING:
     from earthlens.aggregate import AggregationConfig
-    from earthlens.stac.catalog import Catalog, Collection, Endpoint
+    from earthlens.stac.catalog import Catalog, Endpoint
 
 
 class STAC(LazyClientMixin, AbstractDataSource):

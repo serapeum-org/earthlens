@@ -239,8 +239,9 @@ def test_goes_selects_cmi_over_dqf(tmp_path, fake_client_factory, patch_auth):
     """GOES resolves the data variable CMI, never the same-rank DQF quality flag (review M1)."""
     import numpy as np
     import xarray as xr
-    from earthlens.base import RemoteProduct
     from pyramids.netcdf import NetCDF
+
+    from earthlens.base import RemoteProduct
 
     patch_auth(fake_client_factory())
     nc_path = tmp_path / "goes_cmi_dqf.nc"
@@ -268,8 +269,9 @@ def test_nc_variable_name_picks_gridded_over_helper(tmp_path, fake_client_factor
     """With multiple variables and no usable pin, the gridded data var wins over a 1-D helper (M3)."""
     import numpy as np
     import xarray as xr
-    from earthlens.base import RemoteProduct
     from pyramids.netcdf import NetCDF
+
+    from earthlens.base import RemoteProduct
 
     patch_auth(fake_client_factory())
     nc_path = tmp_path / "multivar.nc"
@@ -293,8 +295,9 @@ def test_nc_variable_name_picks_gridded_over_helper(tmp_path, fake_client_factor
 
 def test_netcdf_localise_rebuilds_and_crops(tmp_path, fake_client_factory, patch_auth, tiny_era5_nc):
     """An ERA5-style NetCDF is rebuilt to WGS84, lon-wrapped, and cropped."""
-    from earthlens.base import RemoteProduct
     from pyramids.dataset import Dataset
+
+    from earthlens.base import RemoteProduct
 
     patch_auth(fake_client_factory())
     source = S3(
@@ -314,8 +317,9 @@ def test_netcdf_localise_rebuilds_and_crops(tmp_path, fake_client_factory, patch
 
 def test_goes_geostationary_localise_warps_to_wgs84(tmp_path, fake_client_factory, patch_auth, tiny_goes_nc):
     """GOES (geostationary NetCDF) localise warps the scan-angle grid to WGS84 + crops."""
-    from earthlens.base import RemoteProduct
     from pyramids.dataset import Dataset
+
+    from earthlens.base import RemoteProduct
 
     patch_auth(fake_client_factory())
     # AOI inside the synthetic frame's warped extent (~[-120, 36, -29, 63]).
@@ -342,8 +346,9 @@ def test_variables_accepts_a_single_string(tmp_path, fake_client_factory, patch_
 
 def test_netcdf_no_lon_wrap_branch(tmp_path, fake_client_factory, patch_auth, tiny_era5_nc):
     """A NetCDF dataset without the 0-360 convention skips the longitude wrap."""
-    from earthlens.base import RemoteProduct
     from pyramids.dataset import Dataset
+
+    from earthlens.base import RemoteProduct
 
     patch_auth(fake_client_factory())
     source = S3(

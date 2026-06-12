@@ -713,7 +713,7 @@ class _FakeNetCDF:
         self.geotransform = geotransform
         self._on_sel = on_sel
 
-    def get_variable(self, name: str) -> "_FakeNetCDF":
+    def get_variable(self, name: str) -> _FakeNetCDF:
         """Return self — fake's variable cube has the same surface."""
         return self
 

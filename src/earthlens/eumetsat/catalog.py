@@ -52,7 +52,7 @@ CATALOG_PATH: Path = Path(__file__).parent / "catalog"
 # plus a tuple of `(file, mtime_ns)` for every YAML the load touched, so
 # editing any per-group file invalidates the entry without inspecting
 # every row. Mirrors the Earthdata / CMEMS / GEE multi-file pattern.
-_CATALOG_CACHE: dict[Any, tuple[list[str], dict[str, "EumetsatDataset"]]] = {}
+_CATALOG_CACHE: dict[Any, tuple[list[str], dict[str, EumetsatDataset]]] = {}
 
 OutputKindLiteral = Literal["raster", "vector", "tabular"]
 
@@ -140,7 +140,7 @@ def _yaml_files_for(path: Path) -> list[Path]:
 
 def _load_catalog_data(
     path: Path,
-) -> tuple[list[str], dict[str, "EumetsatDataset"]]:
+) -> tuple[list[str], dict[str, EumetsatDataset]]:
     """Parse, validate, and cache the EUMETSAT catalog at `path`.
 
     Returns an `(available_datasets, datasets)` tuple. When `path` is a

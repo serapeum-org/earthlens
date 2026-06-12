@@ -53,7 +53,7 @@ CATALOG_PATH: Path = Path(__file__).parent / "catalog"
 #: tuple of `(file, mtime_ns)` for every YAML the load touched, so editing any
 #: per-family file invalidates the entry without re-parsing on an unchanged
 #: tree. Mirrors the GEE / CMEMS multi-file pattern.
-_CATALOG_CACHE: dict[Any, tuple[list[str], dict[str, "Product"]]] = {}
+_CATALOG_CACHE: dict[Any, tuple[list[str], dict[str, Product]]] = {}
 
 
 def clear_catalog_cache() -> None:
@@ -92,7 +92,7 @@ def _yaml_files_for(path: Path) -> list[Path]:
     )
 
 
-def _load_catalog_data(path: Path) -> tuple[list[str], dict[str, "Product"]]:
+def _load_catalog_data(path: Path) -> tuple[list[str], dict[str, Product]]:
     """Parse, validate, and cache the GHSL catalog at `path`.
 
     When `path` is a directory, every `*.yaml` is merged: `available_datasets:`

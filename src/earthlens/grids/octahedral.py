@@ -11,7 +11,6 @@ from __future__ import annotations
 
 import numpy as np
 from geopandas import GeoDataFrame, points_from_xy
-
 from pyramids.dataset import Dataset
 from pyramids.dataset.ops.interpolate import grid_points
 

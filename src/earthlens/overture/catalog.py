@@ -45,7 +45,7 @@ CATALOG_PATH: Path = Path(__file__).parent / "overture_data_catalog.yaml"
 #: `(themes, available_releases, available_datasets)` triple. Mirrors the
 #: FDSN / NWP / radar loaders.
 _CATALOG_CACHE: dict[
-    tuple[str, int], tuple[dict[str, "Theme"], list[str], list[str]]
+    tuple[str, int], tuple[dict[str, Theme], list[str], list[str]]
 ] = {}
 
 

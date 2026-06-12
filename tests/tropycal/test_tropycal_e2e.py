@@ -8,9 +8,8 @@ file, so it is marked `slow` and deselected from the default
 
 from __future__ import annotations
 
-import pytest
-
 import pandas as pd
+import pytest
 
 from earthlens.earthlens import EarthLens
 from earthlens.tropycal.events import POINT_COLUMNS, RECON_COLUMNS

@@ -818,12 +818,15 @@ def _build_argparser():
             "list_recent_tasks(state=...)."
         ),
     )
-    list_p.add_argument("--max-age-min", type=int, default=None,
-                       help="drop tasks older than this many minutes")
-    list_p.add_argument("--task-type", default=None,
-                       help='filter by Task.Type (e.g. "EXPORT_IMAGE")')
-    list_p.add_argument("--description-prefix", default=None,
-                       help="substring match against task description")
+    list_p.add_argument(
+        "--max-age-min", type=int, default=None, help="drop tasks older than this many minutes"
+    )
+    list_p.add_argument(
+        "--task-type", default=None, help='filter by Task.Type (e.g. "EXPORT_IMAGE")'
+    )
+    list_p.add_argument(
+        "--description-prefix", default=None, help="substring match against task description"
+    )
     list_p.add_argument("--limit", type=int, default=None)
     list_p.add_argument("--project", default=None)
     list_p.set_defaults(func=_cmd_list)

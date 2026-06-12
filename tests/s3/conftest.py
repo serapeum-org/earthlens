@@ -56,7 +56,7 @@ class FakeS3Client:
 
         shutil.copyfile(self.fixture, dst)
 
-    def get_paginator(self, _name: str) -> "FakePaginator":
+    def get_paginator(self, _name: str) -> FakePaginator:
         return FakePaginator(self.listing)
 
 

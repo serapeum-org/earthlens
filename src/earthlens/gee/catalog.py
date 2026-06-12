@@ -63,9 +63,11 @@ if TYPE_CHECKING:
 from earthlens.base import AbstractCatalog
 from earthlens.base.providers import (
     Provider,
-    clear_providers_cache as _clear_providers_cache_base,
-    load_providers as _load_providers_base,
 )
+from earthlens.base.providers import (
+    clear_providers_cache as _clear_providers_cache_base,
+)
+from earthlens.base.providers import load_providers as _load_providers_base
 from earthlens.base.yaml_loader import load_yaml_strict
 
 CATALOG_PATH: Path = Path(__file__).parent / "catalog"
@@ -79,7 +81,7 @@ PROVIDERS_PATH: Path = Path(__file__).parent / "providers.yaml"
 # call on an unchanged tree should be ~1 ms. `_PROVIDERS_CACHE` below
 # applies the same pattern to `providers.yaml`; both are cleared
 # together by :func:`clear_catalog_cache`.
-_CATALOG_CACHE: dict[Any, tuple[list[str], dict[str, "Dataset"]]] = {}
+_CATALOG_CACHE: dict[Any, tuple[list[str], dict[str, Dataset]]] = {}
 
 
 def _yaml_files_for(path: Path) -> list[Path]:
@@ -98,7 +100,7 @@ def _yaml_files_for(path: Path) -> list[Path]:
     return [path]
 
 
-def _load_catalog_data(path: Path) -> tuple[list[str], dict[str, "Dataset"]]:
+def _load_catalog_data(path: Path) -> tuple[list[str], dict[str, Dataset]]:
     """Parse, validate and cache the catalog at `path`.
 
     Returns a `(available_datasets, datasets)` tuple of the same shape

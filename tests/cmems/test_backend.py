@@ -117,7 +117,7 @@ class _FakeNetCDF:
     _times = [d.isoformat() for d in pd.date_range("2020-01-01", periods=40, freq="D")]
 
     @classmethod
-    def read_file(cls, path: str) -> "_FakeNetCDF":
+    def read_file(cls, path: str) -> _FakeNetCDF:
         return cls()
 
     def get_time_variable(self, var_name="time", time_format="%Y-%m-%d %H:%M:%S"):

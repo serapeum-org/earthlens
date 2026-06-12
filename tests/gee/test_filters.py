@@ -22,7 +22,7 @@ class _FakeCollection:
     def __init__(self):
         self.calls: list[tuple[str, tuple]] = []
 
-    def _chain(self, name: str, *args) -> "_FakeCollection":
+    def _chain(self, name: str, *args) -> _FakeCollection:
         out = _FakeCollection()
         out.calls = self.calls + [(name, args)]
         return out

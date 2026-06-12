@@ -5,7 +5,11 @@ from __future__ import annotations
 import pytest
 
 from earthlens.overture._helpers import CDLA_PERMISSIVE, ODBL, LicenseWarning
-from earthlens.overture.collection import DEFAULT_LICENSE, empty_fc, to_feature_collection
+from earthlens.overture.collection import (
+    DEFAULT_LICENSE,
+    empty_fc,
+    to_feature_collection,
+)
 
 from .conftest import OSM_SOURCES, PERMISSIVE_SOURCES
 

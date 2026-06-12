@@ -7,10 +7,9 @@ from types import SimpleNamespace
 
 import ee
 import geopandas as gpd
+import geopandas as _gpd
 import pytest
 from shapely.geometry import Point
-
-import geopandas as _gpd
 
 from earthlens.gee import sampling
 from earthlens.gee.sampling import (

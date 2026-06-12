@@ -185,8 +185,8 @@ def test_load_rejects_malformed_row(tmp_path):
 
 def test_parse_cache_reuses_on_unchanged_file():
     """Two Catalog() builds reuse the cached parse for the unchanged file."""
-    from earthlens.worldpop import clear_catalog_cache
     from earthlens.worldpop import catalog as catalog_mod
+    from earthlens.worldpop import clear_catalog_cache
 
     clear_catalog_cache()
     Catalog()

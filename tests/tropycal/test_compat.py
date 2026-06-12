@@ -65,8 +65,8 @@ def test_shim_unknown_package_falls_back(monkeypatch):
 
 def test_importing_package_makes_pkg_resources_importable():
     """Importing earthlens.tropycal leaves pkg_resources importable."""
-    import earthlens.tropycal  # noqa: F401
-
     import pkg_resources
+
+    import earthlens.tropycal  # noqa: F401
 
     assert isinstance(pkg_resources.get_distribution("numpy").version, str)

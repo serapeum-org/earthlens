@@ -62,6 +62,12 @@ import warnings
 from pathlib import Path
 from typing import Any, Literal
 
+import pandas as pd
+from pydantic import BaseModel, ConfigDict, Field, ValidationError, model_validator
+
+from earthlens.base import AbstractCatalog, FluxableLeaf
+from earthlens.base.yaml_loader import load_yaml_strict
+
 #: Canonical `temporal_resolution` vocabulary for CHC datasets (M1).
 #:
 #: Every value here is currently used by at least one bundled dataset.
@@ -87,12 +93,6 @@ _TEMPORAL_RESOLUTIONS: tuple[str, ...] = (
     "seasonal",
 )
 
-import pandas as pd
-from pydantic import BaseModel, ConfigDict, Field, ValidationError, model_validator
-
-from earthlens.base import AbstractCatalog, FluxableLeaf
-from earthlens.base.yaml_loader import load_yaml_strict
-
 CATALOG_PATH: Path = Path(__file__).parent / "catalog"
 
 # Module-level cache of parsed catalog data. The cache key is
@@ -115,7 +115,7 @@ CATALOG_PATH: Path = Path(__file__).parent / "catalog"
 _CacheKey = tuple[str, int | tuple[tuple[str, int], ...]]
 _CATALOG_CACHE: dict[
     _CacheKey,
-    tuple[list[str], dict[str, dict[str, list[float]]], dict[str, "Dataset"]],
+    tuple[list[str], dict[str, dict[str, list[float]]], dict[str, Dataset]],
 ] = {}
 
 
@@ -339,8 +339,8 @@ class Dataset(BaseModel):
         """
         if self.file_patterns is None:
             raise ValueError(
-                f"Dataset uses `discrete_files`; iterate "
-                f"`dataset.discrete_files[fmt]` instead."
+                "Dataset uses `discrete_files`; iterate "
+                "`dataset.discrete_files[fmt]` instead."
             )
         return self.file_patterns[self.default_format]
 
@@ -355,7 +355,7 @@ def _build_chc_dataset(
     ds_body: dict[str, Any],
     regions_map: dict[str, dict[str, list[float]]],
     source_path: Path,
-) -> tuple["Dataset", int]:
+) -> tuple[Dataset, int]:
     """Build one :class:`Dataset` from its YAML body + variables (N1).
 
     Validates every variable into a :class:`Variable`, resolves the
@@ -484,7 +484,7 @@ def _build_chc_dataset(
 
 def _load_catalog_data(
     path: Path,
-) -> tuple[list[str], dict[str, dict[str, list[float]]], dict[str, "Dataset"]]:
+) -> tuple[list[str], dict[str, dict[str, list[float]]], dict[str, Dataset]]:
     """Parse, validate, and cache the CHC catalog at `path` (M2).
 
     Dispatches on file vs. directory:
@@ -543,7 +543,7 @@ def _load_catalog_data(
 
 def _load_catalog_file(
     path: Path,
-) -> tuple[list[str], dict[str, dict[str, list[float]]], dict[str, "Dataset"]]:
+) -> tuple[list[str], dict[str, dict[str, list[float]]], dict[str, Dataset]]:
     """Read a legacy single-file CHC catalog into the standard triple."""
     data = load_yaml_strict(path) or {}
 
@@ -576,7 +576,7 @@ def _load_catalog_file(
 
 def _load_catalog_directory(
     directory: Path,
-) -> tuple[list[str], dict[str, dict[str, list[float]]], dict[str, "Dataset"]]:
+) -> tuple[list[str], dict[str, dict[str, list[float]]], dict[str, Dataset]]:
     """Read a GEE-style split catalog (one file per product family).
 
     Layout expected under `directory`:

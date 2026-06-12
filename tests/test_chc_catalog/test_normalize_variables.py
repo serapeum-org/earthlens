@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import pytest
 
-from earthlens.chc.backend import CHIRPS, _LEGACY_DATASET_KEY
+from earthlens.chc.backend import _LEGACY_DATASET_KEY, CHIRPS
 
 pytestmark = [pytest.mark.chc]
 

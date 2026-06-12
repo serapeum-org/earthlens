@@ -48,6 +48,7 @@ class TestPerInstanceAggregateGuard:
     def test_raster_forwards_aggregate(self, fake_earthaccess, edl_env, tmp_path, monkeypatch):
         """A raster instance forwards aggregate= into the backend (stack path)."""
         import pyramids.dataset as dsmod
+
         from tests.earthdata.test_backend import _FakeDatasetCollection
 
         monkeypatch.setattr(dsmod, "DatasetCollection", _FakeDatasetCollection)

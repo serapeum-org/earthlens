@@ -14,7 +14,6 @@ import warnings
 from typing import TYPE_CHECKING
 
 import numpy as np
-
 from pyramids.netcdf.ugrid.dataset import UgridDataset
 
 if TYPE_CHECKING:  # pragma: no cover - typing only

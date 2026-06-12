@@ -24,7 +24,6 @@ import pytest
 from earthlens.aggregate import AggregationConfig
 from earthlens.earthlens import EarthLens
 
-
 _HAVE_CREDS = bool(
     os.environ.get("COPERNICUSMARINE_SERVICE_USERNAME")
     and os.environ.get("COPERNICUSMARINE_SERVICE_PASSWORD")

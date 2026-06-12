@@ -24,7 +24,7 @@ from earthlens.base.yaml_loader import load_yaml_strict
 
 CATALOG_PATH: Path = Path(__file__).parent / "radar_data_catalog.yaml"
 
-_CATALOG_CACHE: dict[Any, dict[str, "Station"]] = {}
+_CATALOG_CACHE: dict[Any, dict[str, Station]] = {}
 
 
 def clear_catalog_cache() -> None:
@@ -32,7 +32,7 @@ def clear_catalog_cache() -> None:
     _CATALOG_CACHE.clear()
 
 
-def _load_stations(path: Path) -> dict[str, "Station"]:
+def _load_stations(path: Path) -> dict[str, Station]:
     """Parse, validate, and cache the station registry at `path`.
 
     Args:

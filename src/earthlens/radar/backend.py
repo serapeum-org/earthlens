@@ -42,7 +42,7 @@ from earthlens.base import (
     SpatialExtent,
     TemporalExtent,
 )
-from earthlens.radar.catalog import Station, Catalog
+from earthlens.radar.catalog import Catalog, Station
 
 if TYPE_CHECKING:
     from earthlens.aggregate import AggregationConfig

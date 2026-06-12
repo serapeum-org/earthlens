@@ -264,6 +264,7 @@ class TestAggregate:
     def test_granule_stack_routes_to_groupby(self, fake_earthaccess, edl_env, tmp_path, monkeypatch):
         """A multi-granule fetch (the common case) windows the stack via groupby."""
         import pyramids.dataset as dsmod
+
         from earthlens.aggregate import AggregationConfig
 
         monkeypatch.setattr(dsmod, "DatasetCollection", _FakeDatasetCollection)
@@ -274,6 +275,7 @@ class TestAggregate:
     def test_single_netcdf_reduces_internal_axis(self, fake_earthaccess, edl_env, tmp_path, monkeypatch):
         """A single NetCDF cube collapses its internal time axis via NetCDF.reduce."""
         import pyramids.netcdf as ncmod
+
         from earthlens.aggregate import AggregationConfig
 
         fake_earthaccess.granules = [{"meta": {"concept-id": "G1"}}]
@@ -290,6 +292,7 @@ class TestAggregate:
         """A single NetCDF with no time axis falls back to the stack/groupby path."""
         import pyramids.dataset as dsmod
         import pyramids.netcdf as ncmod
+
         from earthlens.aggregate import AggregationConfig
 
         fake_earthaccess.granules = [{"meta": {"concept-id": "G1"}}]
@@ -302,6 +305,7 @@ class TestAggregate:
     def test_single_cog_uses_stack_path(self, fake_earthaccess, edl_env, tmp_path, monkeypatch):
         """A lone COG (no internal axis) falls through to the stack path."""
         import pyramids.dataset as dsmod
+
         from earthlens.aggregate import AggregationConfig
 
         monkeypatch.setattr(dsmod, "DatasetCollection", _FakeDatasetCollection)
@@ -312,6 +316,7 @@ class TestAggregate:
     def test_missing_reduce_raises(self, fake_earthaccess, edl_env, tmp_path, monkeypatch):
         """A single NetCDF without NetCDF.reduce raises NotImplementedError."""
         import pyramids.netcdf as ncmod
+
         from earthlens.aggregate import AggregationConfig
 
         fake_earthaccess.granules = [{"meta": {"concept-id": "G1"}}]
@@ -323,6 +328,7 @@ class TestAggregate:
     def test_missing_groupby_raises(self, fake_earthaccess, edl_env, tmp_path, monkeypatch):
         """A stack without DatasetCollection.groupby raises NotImplementedError."""
         import pyramids.dataset as dsmod
+
         from earthlens.aggregate import AggregationConfig
 
         monkeypatch.setattr(dsmod, "DatasetCollection", _DatasetCollectionNoGroupby)

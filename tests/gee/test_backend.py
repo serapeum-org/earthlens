@@ -62,7 +62,7 @@ class _FakeImageCollection:
         self.source = source
         self.calls: list[tuple[str, tuple]] = list(calls or [])
 
-    def _chain(self, name: str, *args) -> "_FakeImageCollection":
+    def _chain(self, name: str, *args) -> _FakeImageCollection:
         return _FakeImageCollection(self.source, self.calls + [(name, args)])
 
     def filterDate(self, start, end):  # noqa: N802

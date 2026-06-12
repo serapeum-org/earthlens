@@ -7,11 +7,11 @@ from pathlib import Path
 
 import earthlens.gee as gee_pkg
 from earthlens.gee import (
+    CATALOG_PATH,
     GEE,
     AuthenticationError,
     Band,
     Cadence,
-    CATALOG_PATH,
     Catalog,
     Dataset,
     EarthEngineAuth,

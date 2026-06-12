@@ -42,8 +42,8 @@ CATALOG_PATH: Path = Path(__file__).parent / "catalog"
 _CATALOG_CACHE: dict[
     Any,
     tuple[
-        dict[str, "Collection"],
-        dict[str, "Recipe"],
+        dict[str, Collection],
+        dict[str, Recipe],
         list[str],
         list[str],
     ],

@@ -40,7 +40,6 @@ Examples:
 
 from __future__ import annotations
 
-import datetime
 import difflib
 import itertools
 import json

@@ -18,8 +18,8 @@ pytestmark = [pytest.mark.s3, pytest.mark.e2e]
 @pytest.fixture(scope="module", autouse=True)
 def _require_network():
     """Skip the module when the public S3 endpoint is unreachable."""
-    import botocore
     import boto3
+    import botocore
     from botocore.config import Config
 
     client = boto3.client(

@@ -93,8 +93,9 @@ import pandas as pd
 from pydantic import BaseModel, ConfigDict
 
 if TYPE_CHECKING:
-    from earthlens.ecmwf import Variable
     from pyramids.netcdf import NetCDF
+
+    from earthlens.ecmwf import Variable
 
 __all__ = ["AggregationConfig", "OperationLiteral", "aggregate_netcdf"]
 
