@@ -49,7 +49,7 @@ def test_facade_rejects_aggregate(tmp_path: Path):
 def test_facade_authenticate_forwards_api_key(tmp_path: Path):
     """EarthLens.authenticate(api_key=...) forwards the key to the FIRMS backend."""
     el = EarthLens(**_facade_kwargs(tmp_path)).authenticate(api_key="facade-key")
-    assert el.datasource.client.map_key == "facade-key"
+    assert el.datasource.client.api_key == "facade-key"
 
 
 @pytest.mark.firms
@@ -59,4 +59,4 @@ def test_facade_authenticate_reads_env(
     """EarthLens.authenticate() with no api_key reads FIRMS_MAP_KEY."""
     monkeypatch.setenv("FIRMS_MAP_KEY", "facade-env")
     el = EarthLens(**_facade_kwargs(tmp_path)).authenticate()
-    assert el.datasource.client.map_key == "facade-env"
+    assert el.datasource.client.api_key == "facade-env"

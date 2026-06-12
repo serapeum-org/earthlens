@@ -54,7 +54,7 @@ class TestAuthenticate:
         """An explicit api_key= is resolved and held."""
         backend = _unauthed_backend(tmp_path)
         backend.authenticate(api_key="explicit")
-        assert backend.client.map_key == "explicit"
+        assert backend.client.api_key == "explicit"
 
     def test_omitted_api_key_reads_env(
         self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
@@ -63,7 +63,7 @@ class TestAuthenticate:
         monkeypatch.setenv("FIRMS_MAP_KEY", "from-env")
         backend = _unauthed_backend(tmp_path)
         backend.authenticate()
-        assert backend.client.map_key == "from-env"
+        assert backend.client.api_key == "from-env"
 
     def test_explicit_api_key_beats_env(
         self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
@@ -72,7 +72,7 @@ class TestAuthenticate:
         monkeypatch.setenv("FIRMS_MAP_KEY", "from-env")
         backend = _unauthed_backend(tmp_path)
         backend.authenticate(api_key="explicit")
-        assert backend.client.map_key == "explicit"
+        assert backend.client.api_key == "explicit"
 
     def test_no_key_anywhere_raises(
         self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
@@ -89,7 +89,7 @@ class TestAuthenticate:
         """download() resolves the env key when authenticate() was never called."""
         backend = _unauthed_backend(tmp_path)
         result = backend.download(progress_bar=False)
-        assert backend.client.map_key == "k"  # fake_firms sets FIRMS_MAP_KEY=k
+        assert backend.client.api_key == "k"  # fake_firms sets FIRMS_MAP_KEY=k
         assert len(result) == 1
 
     def test_download_without_key_raises(

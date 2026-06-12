@@ -212,7 +212,7 @@ class FIRMS(AbstractDataSource):
             FirmsAuth: An unconfigured auth; `is_authenticated()` is
                 `False` until :meth:`authenticate` resolves a key.
         """
-        return FirmsAuth(FirmsCredentials(map_key=None))
+        return FirmsAuth(FirmsCredentials(api_key=None))
 
     def authenticate(self, api_key: str | None = None) -> FIRMS:
         """Resolve the FIRMS `MAP_KEY` and arm the backend for download.
@@ -248,7 +248,7 @@ class FIRMS(AbstractDataSource):
                 ...     lat_lim=[33.0, 35.0], lon_lim=[-119.0, -117.0],
                 ...     path=tempfile.mkdtemp(),
                 ... )
-                >>> backend.authenticate(api_key="demo-key").client.map_key
+                >>> backend.authenticate(api_key="demo-key").client.api_key
                 'demo-key'
 
                 ```
@@ -269,7 +269,7 @@ class FIRMS(AbstractDataSource):
 
                 ```
         """
-        auth = FirmsAuth(FirmsCredentials(map_key=api_key))
+        auth = FirmsAuth(FirmsCredentials(api_key=api_key))
         auth.configure()
         self.client = auth
         return self
@@ -531,7 +531,7 @@ class FIRMS(AbstractDataSource):
         """
         bbox = f"{self.space.west},{self.space.south},{self.space.east},{self.space.north}"
         return AREA_URL_TEMPLATE.format(
-            map_key=self.client.map_key,
+            map_key=self.client.api_key,
             sensor=product.metadata["sensor"],
             bbox=bbox,
             day_range=product.metadata["day_range"],
