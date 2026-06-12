@@ -17,6 +17,7 @@ from __future__ import annotations
 import difflib
 import importlib
 import inspect
+import tempfile
 import warnings
 from collections.abc import Iterator, Mapping
 from datetime import date, datetime
@@ -728,13 +729,18 @@ class EarthLens:
         if lon_lim is None:
             lon_lim = DEFAULT_LONGITUDE_LIMIT
 
-        # An omitted `path` writes to a named per-source subdirectory
-        # rather than scattering files into the current working directory.
-        # An explicit `path=""` still means the CWD (a deliberate choice).
+        # An omitted `path` makes earthlens manage the location: `download()`
+        # persists to a named per-source subdirectory (`./earthlens-data/<source>/`)
+        # rather than scattering files into the cwd, while `load()` (which only
+        # needs the in-memory object) redirects to a throwaway temp dir and
+        # removes the empty default afterwards. An explicit `path=""` still means
+        # the CWD (a deliberate choice).
+        self._explicit_path = path is not None
         if path is None:
             path = Path("earthlens-data") / data_source
             logger.info(
-                f"No `path` given; writing {data_source!r} output under {path}/."
+                f"No `path` given; download() writes {data_source!r} output under "
+                f"{path}/ (load() uses a temp dir)."
             )
 
         # Per-key defaults (e.g. the STAC endpoint aliases pre-bind
@@ -1345,6 +1351,60 @@ class EarthLens:
                 backend implementation (`export_via`, the 32768-px
                 synchronous cap).
         """
+        return self._dispatch_download(
+            *args, progress_bar=progress_bar, aggregate=aggregate, **kwargs
+        )
+
+    def _redirect_output_to_tempdir(self) -> None:
+        """Point the backend output at a throwaway temp dir for an in-memory load.
+
+        Called by :meth:`load` when `path` was omitted: `load` only needs the
+        in-memory object, so the incidental files go to a fresh temp directory
+        instead of the persistent `./earthlens-data/<source>/` default — and the
+        default directory is removed if construction left it empty, so a
+        load-and-plot run never leaves files in the working tree. Creating the
+        temp dir here (not at construction) means a construct-only or
+        download-only run allocates no temp directory.
+        """
+        default_dir = getattr(self.datasource, "root_dir", None)
+        tmp = Path(tempfile.mkdtemp(prefix="earthlens-load-"))
+        self.datasource.root_dir = tmp
+        self.datasource.path = tmp
+        if default_dir is not None and default_dir != tmp:
+            try:
+                if default_dir.is_dir() and not any(default_dir.iterdir()):
+                    default_dir.rmdir()
+            except OSError:
+                pass
+
+    def _dispatch_download(
+        self,
+        *args: object,
+        progress_bar: bool = True,
+        aggregate: AggregationConfig | None = None,
+        **kwargs: object,
+    ) -> Any:
+        """Run the `aggregate=` guard, then forward to the backend's `download`.
+
+        The shared fetch path behind :meth:`download` (which first redirects an
+        omitted `path` to the persistent directory) and :meth:`load` (which
+        keeps the throwaway temp directory). Rejects a non-`None` `aggregate`
+        for a non-raster backend before the backend is called.
+
+        Args:
+            *args: Forwarded positionally to `backend.download`.
+            progress_bar: Whether the backend prints its progress bar.
+            aggregate: Optional aggregation config; only valid for `"raster"` /
+                `"mixed"` backends.
+            **kwargs: Forwarded as keywords to `backend.download`.
+
+        Returns:
+            Whatever the bound backend's `download` returns.
+
+        Raises:
+            NotImplementedError: If `aggregate` is not `None` and the backend's
+                `OUTPUT_KIND` is `"vector"` or `"tabular"`.
+        """
         if aggregate is not None:
             output_kind = getattr(self.datasource, "OUTPUT_KIND", "raster")
             if output_kind not in {"raster", "mixed"}:
@@ -1372,6 +1432,11 @@ class EarthLens:
         `DataFrame`) is passed through unchanged, as are non-raster file paths
         (e.g. a `.csv` table from a mixed backend). The files are still written
         to `path` — `load` adds the in-memory handle on top.
+
+        When `path` was omitted, `load` writes to a throwaway temp directory
+        (not the persistent `./earthlens-data/<source>/` that `download` uses),
+        so a load-and-plot run never leaves files in the working tree — there is
+        no need to pass `path=tempfile.mkdtemp()` yourself.
 
         `xarray` is intentionally not the return type: a returned
         `pyramids.Dataset` / `NetCDF` already exposes `.to_xarray()` for callers
@@ -1402,7 +1467,9 @@ class EarthLens:
 
                 ```
         """
-        return _load_result(self.download(*args, **kwargs))
+        if not self._explicit_path:
+            self._redirect_output_to_tempdir()
+        return _load_result(self._dispatch_download(*args, **kwargs))
 
 
 def download(

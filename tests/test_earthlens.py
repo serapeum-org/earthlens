@@ -786,20 +786,39 @@ class TestFacadeTimeRange:
 class TestFacadePath:
     """The facade's output-path defaulting."""
 
-    def test_omitted_path_defaults_to_named_subdir(self, tmp_path, monkeypatch):
-        """An omitted path writes under ./earthlens-data/<source>/."""
+    def test_omitted_path_download_persists_to_named_subdir(self, tmp_path, monkeypatch):
+        """download() with an omitted path persists under ./earthlens-data/<source>/."""
         from pathlib import Path
 
         monkeypatch.chdir(tmp_path)
-        backend = EarthLens(
+        facade = EarthLens(
             data_source="chc",
             variables=["precipitation"],
             start="2009-01-01",
             end="2009-01-02",
-        ).datasource
+        )
+        monkeypatch.setattr(facade.datasource, "download", lambda *a, **k: [])
+        facade.download(progress_bar=False)
         expected = Path.cwd() / "earthlens-data" / "chc"
-        assert backend.root_dir == expected, f"got {backend.root_dir}"
-        assert backend.root_dir.is_dir(), "the default directory should be created"
+        assert facade.datasource.root_dir == expected, f"got {facade.datasource.root_dir}"
+        assert expected.is_dir(), "download() should keep the default directory"
+
+    def test_omitted_path_load_uses_tempdir(self, tmp_path, monkeypatch):
+        """load() redirects to a temp dir and removes the empty ./earthlens-data default."""
+        from pathlib import Path
+
+        monkeypatch.chdir(tmp_path)
+        facade = EarthLens(
+            data_source="chc",
+            variables=["precipitation"],
+            start="2009-01-01",
+            end="2009-01-02",
+        )
+        monkeypatch.setattr(facade.datasource, "download", lambda *a, **k: [])
+        facade.load(progress_bar=False)
+        default = Path.cwd() / "earthlens-data" / "chc"
+        assert facade.datasource.root_dir != default, "load() should redirect off the default"
+        assert not default.exists(), "load() should remove the empty default dir"
 
     def test_empty_path_still_uses_cwd(self, tmp_path, monkeypatch):
         """An explicit path='' opts into the current working directory."""
@@ -852,13 +871,13 @@ class TestFacadeOptions:
     @pytest.mark.gee
     def test_unexpected_kwarg_suggests_closest(self):
         """A near-miss kwarg name suggests the closest backend option."""
-        with pytest.raises(TypeError, match="service_account"):
+        with pytest.raises(TypeError, match="scale"):
             EarthLens(
                 data_source="gee",
                 variables={"UCSB-CHG/CHIRPS/DAILY": ["precipitation"]},
                 start="2022-01-01",
                 end="2022-01-02",
-                servce_account="x",
+                scal=90,
             )
 
 
