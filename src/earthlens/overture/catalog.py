@@ -205,7 +205,7 @@ class Catalog(AbstractCatalog):
             >>> Catalog().get_theme("building")
             Traceback (most recent call last):
                 ...
-            ValueError: 'building' is not in the Overture theme catalog. Known datasets: ['addresses', 'base', 'buildings', 'divisions', 'places', 'transportation']. Did you mean 'buildings'?
+            ValueError: 'building' is not in the Overture theme catalog. Known themes: ['addresses', 'base', 'buildings', 'divisions', 'places', 'transportation']. Did you mean 'buildings'?
 
             ```
     """

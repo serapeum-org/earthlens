@@ -198,7 +198,7 @@ class Catalog(AbstractCatalog):
             >>> Catalog().get_sensor("MODIS_NR")  # doctest: +ELLIPSIS
             Traceback (most recent call last):
                 ...
-            ValueError: 'MODIS_NR' is not in the FIRMS sensor catalog. Known datasets: [...]. Did you mean 'MODIS_NRT'?
+            ValueError: 'MODIS_NR' is not in the FIRMS sensor catalog. Known sensors: [...]. Did you mean 'MODIS_NRT'?
 
             ```
     """

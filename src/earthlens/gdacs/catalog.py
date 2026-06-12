@@ -112,7 +112,7 @@ class Catalog(AbstractCatalog):
             >>> Catalog().get_hazard("EQK")
             Traceback (most recent call last):
                 ...
-            ValueError: 'EQK' is not in the GDACS hazard catalog. Known datasets: ['DR', 'EQ', 'FL', 'TC', 'VO', 'WF']. Did you mean 'EQ'?
+            ValueError: 'EQK' is not in the GDACS hazard catalog. Known hazard types: ['DR', 'EQ', 'FL', 'TC', 'VO', 'WF']. Did you mean 'EQ'?
 
             ```
     """
