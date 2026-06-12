@@ -154,7 +154,7 @@ The file looks like:
   "type": "service_account",
   "project_id": "<PROJECT_ID>",
   "private_key_id": "…",
-  "private_key": "-----BEGIN PRIVATE KEY-----\n…\n-----END PRIVATE KEY-----\n",
+  "private_key": "<PEM-encoded private key, \n-escaped — keep secret, never commit>",
   "client_email": "earthlens-ee@<PROJECT_ID>.iam.gserviceaccount.com",
   "client_id": "…",
   "token_uri": "https://oauth2.googleapis.com/token",
