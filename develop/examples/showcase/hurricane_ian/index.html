@@ -11756,7 +11756,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span><span class="o">,</span><span class="w"> </span><span class="nn">tempfile</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span><span class="o">,</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span><span class="o">,</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">loguru</span><span class="w"> </span><span class="kn">import</span> <span class="n">logger</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
@@ -11769,8 +11769,8 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
         <span class="n">data_source</span><span class="o">=</span><span class="s2">"tropycal"</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">"north_atlantic"</span><span class="p">],</span>
         <span class="n">start</span><span class="o">=</span><span class="s2">"2022-09-23"</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">"2022-10-01"</span><span class="p">,</span>
         <span class="n">aoi</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">90.0</span><span class="p">,</span> <span class="mf">12.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">70.0</span><span class="p">,</span> <span class="mf">34.0</span><span class="p">],</span>
-        <span class="n">source</span><span class="o">=</span><span class="s2">"hurdat"</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">(),</span>
-    <span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">progress_bar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">source</span><span class="o">=</span><span class="s2">"hurdat"</span><span class="p">,</span> 
+    <span class="p">)</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">progress_bar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
     <span class="n">fixes</span> <span class="o">=</span> <span class="n">fixes</span><span class="p">[</span><span class="n">fixes</span><span class="p">[</span><span class="s2">"name"</span><span class="p">]</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="o">==</span> <span class="s2">"IAN"</span><span class="p">]</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="s2">"time"</span><span class="p">)</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="n">fixes</span><span class="p">[</span><span class="s2">"time"</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">fixes</span><span class="p">[</span><span class="s2">"time"</span><span class="p">])</span>
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">fixes</span><span class="p">)</span><span class="si">}</span><span class="s2"> six-hourly fixes; peak </span><span class="si">{</span><span class="n">fixes</span><span class="o">.</span><span class="n">vmax_kt</span><span class="o">.</span><span class="n">max</span><span class="p">()</span><span class="si">:</span><span class="s2">.0f</span><span class="si">}</span><span class="s2"> kt, "</span>
@@ -11778,7 +11778,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>  <span class="c1"># noqa: BLE001</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">"skipped live query:"</span><span class="p">,</span> <span class="n">exc</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-1">import os, tempfile
+<div class="clipboard-copy-txt" id="cell-1">import os
 import numpy as np, pandas as pd, matplotlib.pyplot as plt
 from loguru import logger
 from earthlens import EarthLens
@@ -11791,8 +11791,8 @@ try:
         data_source="tropycal", variables=["north_atlantic"],
         start="2022-09-23", end="2022-10-01",
         aoi=[-90.0, 12.0, -70.0, 34.0],
-        source="hurdat", path=tempfile.mkdtemp(),
-    ).download(progress_bar=False)
+        source="hurdat", 
+    ).load(progress_bar=False)
     fixes = fixes[fixes["name"].str.upper() == "IAN"].sort_values("time").reset_index(drop=True)
     fixes["time"] = pd.to_datetime(fixes["time"])
     print(f"{len(fixes)} six-hourly fixes; peak {fixes.vmax_kt.max():.0f} kt, "

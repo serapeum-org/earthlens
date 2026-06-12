@@ -11666,7 +11666,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span><span class="o">,</span><span class="w"> </span><span class="nn">tempfile</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span><span class="o">,</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span><span class="o">,</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">loguru</span><span class="w"> </span><span class="kn">import</span> <span class="n">logger</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
@@ -11681,8 +11681,8 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
             <span class="n">data_source</span><span class="o">=</span><span class="s2">"openaq"</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">"pm25"</span><span class="p">],</span>
             <span class="n">start</span><span class="o">=</span><span class="s2">"2023-06-01"</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">"2023-06-12"</span><span class="p">,</span>
             <span class="n">aoi</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">74.1</span><span class="p">,</span> <span class="mf">40.5</span><span class="p">,</span> <span class="o">-</span><span class="mf">73.7</span><span class="p">,</span> <span class="mf">41.0</span><span class="p">],</span>   <span class="c1"># New York City (W, S, E, N)</span>
-            <span class="n">path</span><span class="o">=</span><span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">(),</span>
-        <span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">progress_bar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            
+        <span class="p">)</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">progress_bar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
         <span class="n">pm</span><span class="p">[</span><span class="s2">"datetime_utc"</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">pm</span><span class="p">[</span><span class="s2">"datetime_utc"</span><span class="p">],</span> <span class="n">utc</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">pm</span><span class="p">)</span><span class="si">}</span><span class="s2"> PM2.5 records from </span><span class="si">{</span><span class="n">pm</span><span class="o">.</span><span class="n">station_id</span><span class="o">.</span><span class="n">nunique</span><span class="p">()</span><span class="si">}</span><span class="s2"> stations; "</span>
               <span class="sa">f</span><span class="s2">"peak </span><span class="si">{</span><span class="n">pm</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">max</span><span class="p">()</span><span class="si">:</span><span class="s2">.0f</span><span class="si">}</span><span class="s2"> µg/m³"</span><span class="p">)</span>
@@ -11691,7 +11691,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <span class="k">else</span><span class="p">:</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">"set OPENAQ_API_KEY to run this query"</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-1">import os, tempfile
+<div class="clipboard-copy-txt" id="cell-1">import os
 import numpy as np, pandas as pd, matplotlib.pyplot as plt
 from loguru import logger
 from earthlens import EarthLens
@@ -11706,8 +11706,8 @@ if os.environ.get("OPENAQ_API_KEY"):
             data_source="openaq", variables=["pm25"],
             start="2023-06-01", end="2023-06-12",
             aoi=[-74.1, 40.5, -73.7, 41.0],   # New York City (W, S, E, N)
-            path=tempfile.mkdtemp(),
-        ).download(progress_bar=False)
+            
+        ).load(progress_bar=False)
         pm["datetime_utc"] = pd.to_datetime(pm["datetime_utc"], utc=True)
         print(f"{len(pm)} PM2.5 records from {pm.station_id.nunique()} stations; "
               f"peak {pm.value.max():.0f} µg/m³")

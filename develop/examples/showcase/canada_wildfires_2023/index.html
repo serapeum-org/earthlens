@@ -11782,7 +11782,7 @@ if any(x is None for x in (SERVICE_ACCOUNT, SERVICE_KEY, FIRMS_MAP_KEY)):
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span><span class="o">,</span><span class="w"> </span><span class="nn">tempfile</span><span class="o">,</span><span class="w"> </span><span class="nn">warnings</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span><span class="o">,</span><span class="w"> </span><span class="nn">warnings</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
@@ -11800,12 +11800,11 @@ if any(x is None for x in (SERVICE_ACCOUNT, SERVICE_KEY, FIRMS_MAP_KEY)):
     <span class="n">start</span><span class="o">=</span><span class="s2">"2023-06-02"</span><span class="p">,</span>
     <span class="n">end</span><span class="o">=</span><span class="s2">"2023-06-08"</span><span class="p">,</span>
     <span class="n">aoi</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">80.0</span><span class="p">,</span> <span class="mf">48.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">72.0</span><span class="p">,</span> <span class="mf">53.0</span><span class="p">],</span>
-    <span class="n">path</span><span class="o">=</span><span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">()</span>
 <span class="p">)</span><span class="o">.</span><span class="n">authenticate</span><span class="p">(</span><span class="n">api_key</span><span class="o">=</span><span class="n">FIRMS_MAP_KEY</span><span class="p">)</span>
-<span class="n">data</span> <span class="o">=</span> <span class="n">fires</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">progress_bar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">fires</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">progress_bar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span><span class="si">:</span><span class="s2">,</span><span class="si">}</span><span class="s2"> fire detections"</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-2">import os, tempfile, warnings
+<div class="clipboard-copy-txt" id="cell-2">import os, warnings
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -11823,9 +11822,8 @@ fires = EarthLens(
     start="2023-06-02",
     end="2023-06-08",
     aoi=[-80.0, 48.0, -72.0, 53.0],
-    path=tempfile.mkdtemp()
 ).authenticate(api_key=FIRMS_MAP_KEY)
-data = fires.download(progress_bar=False)
+data = fires.load(progress_bar=False)
 print(f"{len(data):,} fire detections")</div>
 </div>
 </div>
@@ -11974,7 +11972,7 @@ print(f"{len(data):,} fire detections")</div>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">BURN_AOI</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="mf">77.0</span><span class="p">,</span> <span class="mf">51.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">76.0</span><span class="p">,</span> <span class="mf">52.0</span><span class="p">]</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">nbr</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">):</span>
-    <span class="n">p</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span><span class="n">data_source</span><span class="o">=</span><span class="s2">"gee"</span><span class="p">,</span> <span class="n">cadence</span><span class="o">=</span><span class="s2">"raw"</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">(),</span> <span class="n">dataset</span><span class="o">=</span><span class="s2">"COPERNICUS/S2_SR_HARMONIZED"</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">"B8"</span><span class="p">,</span> <span class="s2">"B12"</span><span class="p">],</span> <span class="n">aoi</span><span class="o">=</span><span class="n">BURN_AOI</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="n">end</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mi">80</span><span class="p">,</span> <span class="n">reducer</span><span class="o">=</span><span class="s2">"median"</span><span class="p">)</span><span class="o">.</span><span class="n">authenticate</span><span class="p">(</span><span class="n">service_account</span><span class="o">=</span><span class="n">SERVICE_ACCOUNT</span><span class="p">,</span> <span class="n">service_key</span><span class="o">=</span><span class="n">SERVICE_KEY</span><span class="p">)</span><span class="o">.</span><span class="n">load</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span><span class="n">data_source</span><span class="o">=</span><span class="s2">"gee"</span><span class="p">,</span> <span class="n">cadence</span><span class="o">=</span><span class="s2">"raw"</span><span class="p">,</span> <span class="n">dataset</span><span class="o">=</span><span class="s2">"COPERNICUS/S2_SR_HARMONIZED"</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">"B8"</span><span class="p">,</span> <span class="s2">"B12"</span><span class="p">],</span> <span class="n">aoi</span><span class="o">=</span><span class="n">BURN_AOI</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="n">end</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mi">80</span><span class="p">,</span> <span class="n">reducer</span><span class="o">=</span><span class="s2">"median"</span><span class="p">)</span><span class="o">.</span><span class="n">authenticate</span><span class="p">(</span><span class="n">service_account</span><span class="o">=</span><span class="n">SERVICE_ACCOUNT</span><span class="p">,</span> <span class="n">service_key</span><span class="o">=</span><span class="n">SERVICE_KEY</span><span class="p">)</span><span class="o">.</span><span class="n">load</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
     <span class="n">a</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">read_array</span><span class="p">(),</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">"float32"</span><span class="p">);</span> <span class="k">return</span> <span class="p">(</span><span class="n">a</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">a</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">/</span> <span class="p">(</span><span class="n">a</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">a</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mf">1e-6</span><span class="p">),</span> <span class="n">p</span>
 <span class="n">nbr_pre</span><span class="p">,</span> <span class="n">pp</span> <span class="o">=</span> <span class="n">nbr</span><span class="p">(</span><span class="s2">"2023-05-01"</span><span class="p">,</span> <span class="s2">"2023-05-31"</span><span class="p">);</span> <span class="n">nbr_post</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">nbr</span><span class="p">(</span><span class="s2">"2023-09-01"</span><span class="p">,</span> <span class="s2">"2023-09-30"</span><span class="p">)</span>
 
@@ -11998,7 +11996,7 @@ print(f"{len(data):,} fire detections")</div>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-4">BURN_AOI = [-77.0, 51.0, -76.0, 52.0]
 def nbr(start, end):
-    p = EarthLens(data_source="gee", cadence="raw", path=tempfile.mkdtemp(), dataset="COPERNICUS/S2_SR_HARMONIZED", variables=["B8", "B12"], aoi=BURN_AOI, start=start, end=end, scale=80, reducer="median").authenticate(service_account=SERVICE_ACCOUNT, service_key=SERVICE_KEY).load()[0]
+    p = EarthLens(data_source="gee", cadence="raw", dataset="COPERNICUS/S2_SR_HARMONIZED", variables=["B8", "B12"], aoi=BURN_AOI, start=start, end=end, scale=80, reducer="median").authenticate(service_account=SERVICE_ACCOUNT, service_key=SERVICE_KEY).load()[0]
     a = np.asarray(p.read_array(), dtype="float32"); return (a[0] - a[1]) / (a[0] + a[1] + 1e-6), p
 nbr_pre, pp = nbr("2023-05-01", "2023-05-31"); nbr_post, _ = nbr("2023-09-01", "2023-09-30")
 

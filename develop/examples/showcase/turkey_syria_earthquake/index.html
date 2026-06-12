@@ -11756,7 +11756,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span><span class="o">,</span><span class="w"> </span><span class="nn">tempfile</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span><span class="o">,</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span><span class="o">,</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">loguru</span><span class="w"> </span><span class="kn">import</span> <span class="n">logger</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
@@ -11770,14 +11770,14 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
         <span class="n">data_source</span><span class="o">=</span><span class="s2">"fdsn"</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">"USGS"</span><span class="p">],</span>
         <span class="n">start</span><span class="o">=</span><span class="s2">"2023-02-06"</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">"2023-03-31"</span><span class="p">,</span>
         <span class="n">aoi</span><span class="o">=</span><span class="p">[</span><span class="mf">35.0</span><span class="p">,</span> <span class="mf">35.0</span><span class="p">,</span> <span class="mf">39.5</span><span class="p">,</span> <span class="mf">39.5</span><span class="p">],</span>
-        <span class="n">min_magnitude</span><span class="o">=</span><span class="mf">4.0</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">(),</span>
-    <span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
+        <span class="n">min_magnitude</span><span class="o">=</span><span class="mf">4.0</span><span class="p">,</span> 
+    <span class="p">)</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
     <span class="n">quakes</span><span class="p">[</span><span class="s2">"time"</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">quakes</span><span class="p">[</span><span class="s2">"time"</span><span class="p">])</span>
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">quakes</span><span class="p">)</span><span class="si">}</span><span class="s2"> events M&gt;=4.0; largest M</span><span class="si">{</span><span class="n">quakes</span><span class="o">.</span><span class="n">magnitude</span><span class="o">.</span><span class="n">max</span><span class="p">()</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>  <span class="c1"># noqa: BLE001</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">"live FDSN query skipped (offline?):"</span><span class="p">,</span> <span class="n">exc</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-1">import os, tempfile
+<div class="clipboard-copy-txt" id="cell-1">import os
 import numpy as np, pandas as pd, matplotlib.pyplot as plt
 from loguru import logger
 from earthlens import EarthLens
@@ -11791,8 +11791,8 @@ try:
         data_source="fdsn", variables=["USGS"],
         start="2023-02-06", end="2023-03-31",
         aoi=[35.0, 35.0, 39.5, 39.5],
-        min_magnitude=4.0, path=tempfile.mkdtemp(),
-    ).download()
+        min_magnitude=4.0, 
+    ).load()
     quakes["time"] = pd.to_datetime(quakes["time"])
     print(f"{len(quakes)} events M&gt;=4.0; largest M{quakes.magnitude.max():.1f}")
 except Exception as exc:  # noqa: BLE001
