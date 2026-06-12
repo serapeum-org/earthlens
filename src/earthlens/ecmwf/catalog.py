@@ -65,6 +65,13 @@ from earthlens.base.providers import load_providers
 from earthlens.base.yaml_loader import load_yaml_strict
 from earthlens.ecmwf.constraints import fetch_constraints
 
+# `download_job` / `list_recent_jobs` were split out of this module into
+# `earthlens.ecmwf.jobs` (N3 in planning/catalog-cross-backend-comparison.md).
+# `Catalog` still delegates to them internally, so import the implementations
+# under private names.
+from earthlens.ecmwf.jobs import download_job as _download_job_impl
+from earthlens.ecmwf.jobs import list_recent_jobs as _list_recent_jobs_impl
+
 _LEGACY_MARS_KEYS: frozenset[str] = frozenset(
     {"number_para", "download type", "var_name"}
 )
@@ -329,15 +336,6 @@ def _synthesize_monthly_entries(
             provider=_provider_for_dataset(ds.monthly),
             variables=rebranded,
         )
-
-
-# `_read_cdsapirc`, `list_recent_jobs`, `download_job` moved to
-# `earthlens.ecmwf.jobs` (N3 in
-# planning/catalog-cross-backend-comparison.md). Re-imported below as
-# `_read_cdsapirc` so any external caller using `from
-# earthlens.ecmwf.catalog import _read_cdsapirc` keeps working.
-from earthlens.ecmwf.jobs import download_job as _download_job_impl  # noqa: E402 — re-export for back-compat
-from earthlens.ecmwf.jobs import list_recent_jobs as _list_recent_jobs_impl
 
 
 class Variable(FluxableLeaf):
