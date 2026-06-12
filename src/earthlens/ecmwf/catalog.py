@@ -272,8 +272,7 @@ def _build_dataset_map(
                 ds_vars[code] = Variable(**merged)
             except ValidationError as exc:
                 raise ValueError(
-                    f"{catalog_path} entry {code!r} failed "
-                    f"validation:\n{exc}"
+                    f"{catalog_path} entry {code!r} failed " f"validation:\n{exc}"
                 ) from exc
             total_vars += 1
         structural[ds_name] = Dataset(
@@ -618,11 +617,17 @@ class Catalog(AbstractCatalog):
                 provider not in the registry.
         """
         catalog_path = catalog_path if catalog_path is not None else CATALOG_PATH
-        providers_path = providers_path if providers_path is not None else PROVIDERS_PATH
+        providers_path = (
+            providers_path if providers_path is not None else PROVIDERS_PATH
+        )
         available_datasets, datasets = _load_catalog_data(catalog_path)
         providers = load_providers(providers_path)
         unknown = sorted(
-            {d.provider for d in datasets.values() if d.provider and d.provider not in providers}
+            {
+                d.provider
+                for d in datasets.values()
+                if d.provider and d.provider not in providers
+            }
         )
         if unknown:
             raise ValueError(

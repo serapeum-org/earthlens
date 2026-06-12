@@ -41,8 +41,7 @@ def _write_catalog(tmp_path: Path, dataset_block: str) -> Path:
         "  global:\n"
         "    lat_boundaries: [-50, 50]\n"
         "    lon_boundaries: [-180, 180]\n"
-        "datasets:\n"
-        + dataset_block,
+        "datasets:\n" + dataset_block,
         encoding="utf-8",
     )
     return catalog_yaml
@@ -60,6 +59,7 @@ class TestPandasFreqValidation:
     def test_bundled_catalog_freqs_parse_cleanly(self, bundled_catalog: Catalog):
         """Every dataset's pandas_freq parses without raising."""
         import pandas as pd
+
         bad: list[tuple[str, str]] = []
         for key, ds in bundled_catalog.datasets.items():
             try:
@@ -79,7 +79,11 @@ class TestPandasFreqValidation:
         clear_catalog_cache()
         with pytest.raises(ValueError, match=r"pandas_freq") as exc:
             Catalog.load(catalog_path=catalog_yaml)
-        assert freq in str(exc.value) or "to_offset" in str(exc.value).lower() or "synth" in str(exc.value)
+        assert (
+            freq in str(exc.value)
+            or "to_offset" in str(exc.value).lower()
+            or "synth" in str(exc.value)
+        )
 
     @pytest.mark.parametrize(
         "freq",

@@ -84,8 +84,11 @@ class TestEarthEngineAuthEncodeDecode:
         blob = EarthEngineAuth.encode_service_account(key_file)
         assert isinstance(blob, bytes)
         decoded = EarthEngineAuth.decode_service_account(blob)
-        assert decoded == {"type": "service_account", "client_email": "sa@x.iam",
-                           "project_id": "demo-project"}
+        assert decoded == {
+            "type": "service_account",
+            "client_email": "sa@x.iam",
+            "project_id": "demo-project",
+        }
 
     def test_decode_independent_of_encode(self):
         """`decode_service_account` works on any base64'd JSON object."""
@@ -131,41 +134,60 @@ class TestEarthEngineAuthInitialize:
         """If both credential constructions fail, an `AuthenticationError` is raised."""
         creds = MagicMock(side_effect=[ValueError("nope"), RuntimeError("still nope")])
         monkeypatch.setattr(auth_module.ee, "ServiceAccountCredentials", creds)
-        with pytest.raises(AuthenticationError, match="could not build service-account credentials"):
+        with pytest.raises(
+            AuthenticationError, match="could not build service-account credentials"
+        ):
             EarthEngineAuth.initialize("sa@x.iam", _key_text(project_id="p"))
 
     def test_not_registered_project_raises_friendly(self, monkeypatch):
         """An "EE not registered" error becomes a registration-pointing AuthenticationError."""
         monkeypatch.setattr(auth_module.ee, "ServiceAccountCredentials", MagicMock())
         monkeypatch.setattr(
-            auth_module.ee, "Initialize",
-            MagicMock(side_effect=ee.EEException("Project p is not registered to use Earth Engine")),
+            auth_module.ee,
+            "Initialize",
+            MagicMock(
+                side_effect=ee.EEException(
+                    "Project p is not registered to use Earth Engine"
+                )
+            ),
         )
-        with pytest.raises(AuthenticationError, match="not registered to use Earth Engine"):
+        with pytest.raises(
+            AuthenticationError, match="not registered to use Earth Engine"
+        ):
             EarthEngineAuth.initialize("sa@x.iam", _key_text(project_id="p"))
 
     def test_permission_error_raises_friendly(self, monkeypatch):
         """A serviceUsage permission error becomes an IAM-role-pointing AuthenticationError."""
         monkeypatch.setattr(auth_module.ee, "ServiceAccountCredentials", MagicMock())
         monkeypatch.setattr(
-            auth_module.ee, "Initialize",
-            MagicMock(side_effect=ee.EEException(
-                "Caller does not have required permission ... serviceUsageConsumer")),
+            auth_module.ee,
+            "Initialize",
+            MagicMock(
+                side_effect=ee.EEException(
+                    "Caller does not have required permission ... serviceUsageConsumer"
+                )
+            ),
         )
-        with pytest.raises(AuthenticationError, match="serviceUsageConsumer|earthengine.viewer"):
+        with pytest.raises(
+            AuthenticationError, match="serviceUsageConsumer|earthengine.viewer"
+        ):
             EarthEngineAuth.initialize("sa@x.iam", _key_text(project_id="p"))
 
     def test_other_ee_exception_wrapped(self, monkeypatch):
         """Any other `ee.EEException` is wrapped as an initialisation failure."""
         monkeypatch.setattr(auth_module.ee, "ServiceAccountCredentials", MagicMock())
-        monkeypatch.setattr(auth_module.ee, "Initialize", MagicMock(side_effect=ee.EEException("weird")))
+        monkeypatch.setattr(
+            auth_module.ee, "Initialize", MagicMock(side_effect=ee.EEException("weird"))
+        )
         with pytest.raises(AuthenticationError, match="initialisation failed"):
             EarthEngineAuth.initialize("sa@x.iam", _key_text(project_id="p"))
 
     def test_generic_exception_wrapped(self, monkeypatch):
         """A non-`EEException` from `ee.Initialize` is also wrapped."""
         monkeypatch.setattr(auth_module.ee, "ServiceAccountCredentials", MagicMock())
-        monkeypatch.setattr(auth_module.ee, "Initialize", MagicMock(side_effect=OSError("disk")))
+        monkeypatch.setattr(
+            auth_module.ee, "Initialize", MagicMock(side_effect=OSError("disk"))
+        )
         with pytest.raises(AuthenticationError, match="initialisation failed"):
             EarthEngineAuth.initialize("sa@x.iam", _key_text(project_id="p"))
 

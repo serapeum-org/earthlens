@@ -524,8 +524,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
             ) from exc
         except Exception as exc:  # noqa: BLE001 - re-raised as AuthenticationError
             raise AuthenticationError(
-                f"Earth Engine initialisation failed for project "
-                f"{project!r}: {exc}"
+                f"Earth Engine initialisation failed for project " f"{project!r}: {exc}"
             ) from exc
         self.project = project
         return ee

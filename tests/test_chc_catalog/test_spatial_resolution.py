@@ -36,7 +36,9 @@ class TestSpatialResolution:
         assert ds.spatial_resolution == [0.05]
         assert set(ds.ftp_bases) == {"tif"}
 
-    def test_every_spatial_resolution_is_non_empty_positive_floats(self, catalog: Catalog):
+    def test_every_spatial_resolution_is_non_empty_positive_floats(
+        self, catalog: Catalog
+    ):
         """Every value in `spatial_resolution` is a real, strictly-positive pixel size."""
         bad: list[tuple[str, list[float]]] = []
         for key, ds in catalog.datasets.items():
@@ -46,6 +48,4 @@ class TestSpatialResolution:
                 continue
             if any(not isinstance(v, float) or v <= 0.0 for v in values):
                 bad.append((key, values))
-        assert not bad, (
-            f"datasets with empty or non-positive spatial_resolution: {bad}"
-        )
+        assert not bad, f"datasets with empty or non-positive spatial_resolution: {bad}"

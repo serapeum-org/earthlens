@@ -22,8 +22,7 @@ pytestmark = pytest.mark.hdx
 def temp_catalog_dir(tmp_path: Path) -> Path:
     """Write a tiny two-file catalog directory and return its path."""
     (tmp_path / "a.yaml").write_text(
-        textwrap.dedent(
-            """
+        textwrap.dedent("""
             datasets:
               ds-one:
                 hdx_id: real-one
@@ -33,8 +32,7 @@ def temp_catalog_dir(tmp_path: Path) -> Path:
                 formats: [CSV]
                 resource_filter: CSV
                 output_kinds: [tabular]
-            """
-        ),
+            """),
         encoding="utf-8",
     )
     (tmp_path / "_index.yaml").write_text(

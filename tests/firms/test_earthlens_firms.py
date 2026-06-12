@@ -53,9 +53,7 @@ def test_facade_authenticate_forwards_api_key(tmp_path: Path):
 
 
 @pytest.mark.firms
-def test_facade_authenticate_reads_env(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-):
+def test_facade_authenticate_reads_env(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
     """EarthLens.authenticate() with no api_key reads FIRMS_MAP_KEY."""
     monkeypatch.setenv("FIRMS_MAP_KEY", "facade-env")
     el = EarthLens(**_facade_kwargs(tmp_path)).authenticate()

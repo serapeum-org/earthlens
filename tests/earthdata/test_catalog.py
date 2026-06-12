@@ -46,7 +46,9 @@ datasets:
 """
 
 
-def _write_catalog(tmp_path, providers=_PROVIDERS, files=(_DAAC_A, _DAAC_B), index=None):
+def _write_catalog(
+    tmp_path, providers=_PROVIDERS, files=(_DAAC_A, _DAAC_B), index=None
+):
     """Write a providers.yaml + per-DAAC catalog dir under tmp_path."""
     cat_dir = tmp_path / "catalog"
     cat_dir.mkdir()

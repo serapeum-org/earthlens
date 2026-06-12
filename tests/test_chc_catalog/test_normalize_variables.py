@@ -42,9 +42,7 @@ class TestNormalizeVariables:
 
     def test_none_variables_defaults_to_precipitation(self):
         """`variables=None` resolves to `["precipitation"]` and then through the legacy lookup."""
-        result = CHIRPS._normalize_variables(
-            None, temporal_resolution="daily"
-        )
+        result = CHIRPS._normalize_variables(None, temporal_resolution="daily")
         assert result == {"global-daily": ["precipitation"]}
 
     def test_constructor_propagates_value_error_for_bad_temporal_resolution(self):

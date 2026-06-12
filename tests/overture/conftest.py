@@ -59,7 +59,9 @@ def _make_gdf(
     }
     if nested:
         data["names"] = [{"primary": f"Place {i}", "common": None} for i in range(rows)]
-        data["categories"] = [{"primary": "restaurant", "alternate": []} for _ in range(rows)]
+        data["categories"] = [
+            {"primary": "restaurant", "alternate": []} for _ in range(rows)
+        ]
     gdf = gpd.GeoDataFrame(
         data,
         geometry=[Point(float(i), float(i)) for i in range(rows)],
@@ -137,5 +139,7 @@ def fake_overture(monkeypatch: pytest.MonkeyPatch) -> _FakeOverture:
     """Patch `overturemaps.core.geodataframe` with the recording fake."""
     state = _FakeOverture()
     monkeypatch.setattr("overturemaps.core.geodataframe", state)
-    monkeypatch.setattr("overturemaps.core.record_batch_reader", state.record_batch_reader)
+    monkeypatch.setattr(
+        "overturemaps.core.record_batch_reader", state.record_batch_reader
+    )
     return state

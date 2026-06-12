@@ -37,7 +37,9 @@ CATALOG_PATH: Path = Path(__file__).parent / "catalog"
 # `(file, st_mtime_ns)` for every YAML the load touched, so editing any
 # per-endpoint file invalidates the entry without inspecting every row.
 # Mirrors the GEE / CMEMS multi-file caches.
-_CATALOG_CACHE: dict[Any, tuple[dict[str, Endpoint], dict[str, list[str]], dict[str, Collection]]] = {}
+_CATALOG_CACHE: dict[
+    Any, tuple[dict[str, Endpoint], dict[str, list[str]], dict[str, Collection]]
+] = {}
 
 SignerType = Literal[
     "anonymous", "aws-requester-pays", "mpc-sas", "earthdata", "cdse", "cdse-s3"

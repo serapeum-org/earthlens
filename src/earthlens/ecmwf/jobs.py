@@ -125,8 +125,7 @@ def download_job(
     href = resp.json().get("asset", {}).get("value", {}).get("href")
     if not href:
         raise ValueError(
-            f"job {job_id!r} has no downloadable asset href in its "
-            "results record"
+            f"job {job_id!r} has no downloadable asset href in its " "results record"
         )
     target_path.parent.mkdir(parents=True, exist_ok=True)
     # `href` comes from CDS server JSON; reject anything that is not

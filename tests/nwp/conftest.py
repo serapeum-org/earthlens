@@ -83,7 +83,9 @@ class _FakeDataset:
         self.converted = True
         return self
 
-    def crop(self, bbox: Any = None, epsg: Any = None, touch: bool = True) -> _FakeDataset:
+    def crop(
+        self, bbox: Any = None, epsg: Any = None, touch: bool = True
+    ) -> _FakeDataset:
         """Record the crop bbox / epsg / touch and return self."""
         self.cropped = (tuple(bbox), epsg)
         self.touch = touch
@@ -199,7 +201,9 @@ class _FakeAggDataset:
         return _FakeRef()
 
     @classmethod
-    def create_from_array(cls, arr: Any = None, geo: Any = None, epsg: Any = None) -> tuple:
+    def create_from_array(
+        cls, arr: Any = None, geo: Any = None, epsg: Any = None
+    ) -> tuple:
         """Return a sentinel 'dataset' carrying the reduced array."""
         return ("dataset", arr, geo, epsg)
 

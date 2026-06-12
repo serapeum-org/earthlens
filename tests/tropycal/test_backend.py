@@ -164,7 +164,18 @@ class TestDownload:
         """A storm whose frame is empty is skipped in the fetch loop."""
         fake_tropycal.seasons[2005].append("EMPTY")
         fake_tropycal.storms["EMPTY"] = pd.DataFrame(
-            columns=["time", "lat", "lon", "vmax", "mslp", "type", "wmo_basin", "id", "name", "ace"]
+            columns=[
+                "time",
+                "lat",
+                "lon",
+                "vmax",
+                "mslp",
+                "type",
+                "wmo_basin",
+                "id",
+                "name",
+                "ace",
+            ]
         )
         result = _backend(tmp_path).download()
         assert len(result) == 3
@@ -281,7 +292,9 @@ class TestReconProduct:
 
     def test_search_one_product_per_storm(self, tmp_path):
         """recon _search emits one product per storm id with basin/source meta."""
-        products = _recon_backend(tmp_path, variables=["AL122005", "AL132005"])._search()
+        products = _recon_backend(
+            tmp_path, variables=["AL122005", "AL132005"]
+        )._search()
         assert [p.id for p in products] == ["AL122005", "AL132005"]
         assert products[0].metadata["basin"] == "north_atlantic"
         assert products[0].metadata["recon_product"] == "hdobs"
@@ -327,7 +340,9 @@ class TestReconProduct:
         assert set(RECON_COLUMNS).issubset(result.columns)
         assert list(tmp_path.glob("*.gpkg")) == []
 
-    def test_obs_outside_window_or_bbox_dropped(self, tmp_path, fake_recon, make_recon_obs_frame):
+    def test_obs_outside_window_or_bbox_dropped(
+        self, tmp_path, fake_recon, make_recon_obs_frame
+    ):
         """recon obs outside the window/bbox are filtered out."""
         fake_recon.recon_frame = make_recon_obs_frame(
             times=["2005-08-28 12:00", "2005-08-28 12:10", "2010-01-01 00:00"],
@@ -348,7 +363,9 @@ class TestReconProduct:
         result = _recon_backend(tmp_path).download()
         assert len(result) == 0
 
-    def test_recon_missing_extra_importerror(self, tmp_path, fake_tropycal, monkeypatch):
+    def test_recon_missing_extra_importerror(
+        self, tmp_path, fake_tropycal, monkeypatch
+    ):
         """A failing tropycal.recon import surfaces a friendly ImportError."""
         monkeypatch.setitem(sys.modules, "tropycal.recon", None)
         with pytest.raises(ImportError, match=r"earthlens\[tropycal\]"):
@@ -402,7 +419,9 @@ class TestShipsProduct:
         result = _ships_backend(tmp_path).download()
         assert isinstance(result, pd.DataFrame)
         assert not isinstance(result, gpd.GeoDataFrame)
-        assert {"storm_id", "forecast_init", "fhr", "vmax_noland_kt"}.issubset(result.columns)
+        assert {"storm_id", "forecast_init", "fhr", "vmax_noland_kt"}.issubset(
+            result.columns
+        )
         assert len(result) == 3
         assert set(result["storm_id"]) == {"AL092022"}
 

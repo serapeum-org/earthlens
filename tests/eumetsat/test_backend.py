@@ -33,7 +33,9 @@ def test_construction_sets_output_kind_and_defers_auth(fake_eumdac, tmp_path):
     """Construction copies the row's output_kind but defers token minting."""
     backend = _make_backend(fake_eumdac, tmp_path, {"msg-hrseviri": ["HRSEVIRI"]})
     assert backend.OUTPUT_KIND == "raster"
-    assert backend._auth.is_authenticated() is False, "construction must not authenticate"
+    assert (
+        backend._auth.is_authenticated() is False
+    ), "construction must not authenticate"
     backend._auth.configure()
     assert backend._auth.is_authenticated() is True, "configure() mints the token"
 

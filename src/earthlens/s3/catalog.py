@@ -330,9 +330,7 @@ class Catalog(AbstractCatalog):
         cached = _CATALOG_CACHE.get(key)
         if cached is not None:
             datasets, available = cached
-            return cls(
-                datasets=dict(datasets), available_datasets=list(available)
-            )
+            return cls(datasets=dict(datasets), available_datasets=list(available))
         data = load_yaml_strict(catalog_path) or {}
         datasets_yaml = data.get("datasets") or {}
         if not datasets_yaml:

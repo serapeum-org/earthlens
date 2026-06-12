@@ -125,8 +125,12 @@ class DWDCentre(_NWPCentre):
                     f"request_options for pressure-level band {param!r}."
                 )
             return template.format(
-                cycle=cycle, date=cycle, step=step, level=level,
-                var=var, var_lc=var.lower(),
+                cycle=cycle,
+                date=cycle,
+                step=step,
+                level=level,
+                var=var,
+                var_lc=var.lower(),
             )
         if not model.url_template:
             raise ValueError(

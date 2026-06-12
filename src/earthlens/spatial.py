@@ -440,7 +440,9 @@ def split_points(
 
     hull_gdf, _ = convex_hull_from_points(samples)
     was_split, grid = split_polygon(
-        hull_gdf, cell_size=cell_size, max_pixels=max_pixels,
+        hull_gdf,
+        cell_size=cell_size,
+        max_pixels=max_pixels,
     )
     if not was_split:
         return [samples]

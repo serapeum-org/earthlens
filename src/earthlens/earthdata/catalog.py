@@ -262,9 +262,7 @@ def _load_catalog_data(
                     start=temporal_body.get("start"),
                     end=temporal_body.get("end"),
                 ),
-                bands={
-                    name: Band(**(meta or {})) for name, meta in bands_body.items()
-                },
+                bands={name: Band(**(meta or {})) for name, meta in bands_body.items()},
                 **body,
             )
         except ValidationError as exc:

@@ -786,7 +786,9 @@ class TestFacadeTimeRange:
 class TestFacadePath:
     """The facade's output-path defaulting."""
 
-    def test_omitted_path_download_persists_to_named_subdir(self, tmp_path, monkeypatch):
+    def test_omitted_path_download_persists_to_named_subdir(
+        self, tmp_path, monkeypatch
+    ):
         """download() with an omitted path persists under ./earthlens-data/<source>/."""
         from pathlib import Path
 
@@ -800,7 +802,9 @@ class TestFacadePath:
         monkeypatch.setattr(facade.datasource, "download", lambda *a, **k: [])
         facade.download(progress_bar=False)
         expected = Path.cwd() / "earthlens-data" / "chc"
-        assert facade.datasource.root_dir == expected, f"got {facade.datasource.root_dir}"
+        assert (
+            facade.datasource.root_dir == expected
+        ), f"got {facade.datasource.root_dir}"
         assert expected.is_dir(), "download() should keep the default directory"
 
     def test_omitted_path_load_uses_tempdir(self, tmp_path, monkeypatch):
@@ -817,7 +821,9 @@ class TestFacadePath:
         monkeypatch.setattr(facade.datasource, "download", lambda *a, **k: [])
         facade.load(progress_bar=False)
         default = Path.cwd() / "earthlens-data" / "chc"
-        assert facade.datasource.root_dir != default, "load() should redirect off the default"
+        assert (
+            facade.datasource.root_dir != default
+        ), "load() should redirect off the default"
         assert not default.exists(), "load() should remove the empty default dir"
 
     def test_empty_path_still_uses_cwd(self, tmp_path, monkeypatch):

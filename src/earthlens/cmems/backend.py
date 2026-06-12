@@ -330,8 +330,7 @@ class CMEMS(AbstractDataSource):
             # Reached only for an empty request — total failure raises
             # inside _fetch_with_progress before we get here.
             logger.warning(
-                "CMEMS download summary: no datasets requested, "
-                "nothing written"
+                "CMEMS download summary: no datasets requested, " "nothing written"
             )
         return out_paths
 
@@ -452,9 +451,7 @@ class CMEMS(AbstractDataSource):
                 nc = nc.reduce("depth", how="mean", skipna=config.skipna)
                 depth_collapsed = True
 
-        reduced = nc.reduce(
-            "time", how=how, groupby=labels, skipna=config.skipna
-        )
+        reduced = nc.reduce("time", how=how, groupby=labels, skipna=config.skipna)
 
         out_dir = Path(config.out_dir) if config.out_dir is not None else nc_path.parent
         out_dir.mkdir(parents=True, exist_ok=True)
@@ -587,9 +584,7 @@ class CMEMS(AbstractDataSource):
         """
         return self._fetch_with_progress(products, progress_bar=True)
 
-    def _api_via_search_fetch_with_progress(
-        self, progress_bar: bool
-    ) -> list[Path]:
+    def _api_via_search_fetch_with_progress(self, progress_bar: bool) -> list[Path]:
         """C3 composition with explicit progress-bar control."""
         products = self._search()
         if not products:
@@ -624,9 +619,7 @@ class CMEMS(AbstractDataSource):
             failed_summary = ", ".join(
                 f"{ds_id} ({type(exc).__name__})" for ds_id, exc in failed
             )
-            logger.warning(
-                f"{len(failed)} CMEMS subset(s) failed: {failed_summary}"
-            )
+            logger.warning(f"{len(failed)} CMEMS subset(s) failed: {failed_summary}")
             # Partial failure (some products wrote) returns the successes
             # so a multi-dataset request is not all-or-nothing. Total
             # failure raises rather than returning an empty list, so a
@@ -640,9 +633,7 @@ class CMEMS(AbstractDataSource):
                 )
         return out_paths
 
-    def _subset_one(
-        self, product: RemoteProduct, progress_bar: bool
-    ) -> Path:
+    def _subset_one(self, product: RemoteProduct, progress_bar: bool) -> Path:
         """Submit one `copernicusmarine.subset` request.
 
         Args:

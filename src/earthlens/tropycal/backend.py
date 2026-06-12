@@ -211,9 +211,7 @@ class TropicalCyclone(AbstractDataSource):
                 "tropycal 1.4 has no 'jtwc' source."
             )
         if geometry not in ("point", "track"):
-            raise ValueError(
-                f"geometry must be 'point' or 'track', got {geometry!r}."
-            )
+            raise ValueError(f"geometry must be 'point' or 'track', got {geometry!r}.")
         if product not in _PRODUCTS:
             raise ValueError(
                 f"product must be one of {list(_PRODUCTS)}, got {product!r}."
@@ -371,9 +369,7 @@ class TropicalCyclone(AbstractDataSource):
                     f"{basin!r}; {basin!r} is served by {sources}. "
                     "Pass a supported source= for this basin."
                 )
-            products.append(
-                RemoteProduct(id=basin, metadata={"source": self._source})
-            )
+            products.append(RemoteProduct(id=basin, metadata={"source": self._source}))
         return products
 
     def _fetch(self, products: list[RemoteProduct]) -> list[FeatureCollection]:
@@ -577,7 +573,9 @@ class TropicalCyclone(AbstractDataSource):
             # logged with its exception type and skipped so a multi-year
             # request still returns the seasons that loaded. The type+message
             # are logged so a genuine bug is visible rather than silent.
-            logger.warning(f"tropycal season {year} skipped: {type(exc).__name__}: {exc}")
+            logger.warning(
+                f"tropycal season {year} skipped: {type(exc).__name__}: {exc}"
+            )
             return []
 
     @staticmethod

@@ -171,7 +171,9 @@ def _mgrs_tiles(bbox: tuple[float, float, float, float]) -> list[tuple[str, str,
     for lat in lat_steps:
         for lon in lon_steps:
             easting, northing, zone, band = utm.from_latlon(lat, lon)
-            tiles.setdefault((str(zone), band, _mgrs_square(zone, easting, northing)), None)
+            tiles.setdefault(
+                (str(zone), band, _mgrs_square(zone, easting, northing)), None
+            )
     return list(tiles)
 
 
@@ -197,8 +199,12 @@ def _list_keys(
     """List object keys under `prefix` (paginated)."""
     keys: list[str] = []
     paginator = client.get_paginator("list_objects_v2")
-    for page in paginator.paginate(Bucket=bucket, Prefix=prefix, **_payer(request_payer)):
-        keys.extend(obj["Key"] for obj in page.get("Contents", []) if obj.get("Size", 0))
+    for page in paginator.paginate(
+        Bucket=bucket, Prefix=prefix, **_payer(request_payer)
+    ):
+        keys.extend(
+            obj["Key"] for obj in page.get("Contents", []) if obj.get("Size", 0)
+        )
     return keys
 
 
@@ -229,7 +235,9 @@ def _era5_products(dataset, variables, bbox, dates, client) -> list[RemoteProduc
         for year, month in _year_months(dates):
             prefix = f"{stream}/{year}{month:02d}/"
             token = f".{var.native}."
-            for key in _list_keys(client, dataset.bucket, prefix, dataset.requester_pays):
+            for key in _list_keys(
+                client, dataset.bucket, prefix, dataset.requester_pays
+            ):
                 if token in key.rsplit("/", 1)[-1] and key.endswith(".nc"):
                     out.append(
                         RemoteProduct(
@@ -267,7 +275,9 @@ def _sentinel2_products(dataset, variables, bbox, dates, client) -> list[RemoteP
     for zone, band, square in _mgrs_tiles(bbox):
         for year, month in _year_months(dates):
             month_prefix = f"{collection}/{zone}/{band}/{square}/{year}/{month}/"
-            scenes = _list_prefixes(client, dataset.bucket, month_prefix, dataset.requester_pays)
+            scenes = _list_prefixes(
+                client, dataset.bucket, month_prefix, dataset.requester_pays
+            )
             if max_scenes is not None and len(scenes) > max_scenes:
                 logger.warning(
                     f"sentinel-2: {len(scenes)} scenes under {month_prefix}; "
@@ -299,12 +309,16 @@ def _goes_products(dataset, variables, bbox, dates, client) -> list[RemoteProduc
     for date in _days(dates):
         doy = date.timetuple().tm_yday
         day_prefix = f"{product}/{date.year}/{doy:03d}/"
-        hour_prefixes = _list_prefixes(client, dataset.bucket, day_prefix, dataset.requester_pays)
+        hour_prefixes = _list_prefixes(
+            client, dataset.bucket, day_prefix, dataset.requester_pays
+        )
         if not hour_prefixes:
             continue
         # One frame per day: the first frame of the first hour. The day has many
         # frames (every ~10-15 min); the rest are intentionally not planned.
-        keys = _list_keys(client, dataset.bucket, hour_prefixes[0], dataset.requester_pays)
+        keys = _list_keys(
+            client, dataset.bucket, hour_prefixes[0], dataset.requester_pays
+        )
         for var in variables:
             token = f"{var.native}_G"
             match = next((k for k in keys if token in k.rsplit("/", 1)[-1]), None)
@@ -328,7 +342,9 @@ def _goes_products(dataset, variables, bbox, dates, client) -> list[RemoteProduc
     return out
 
 
-def _copernicus_dem_products(dataset, variables, bbox, dates, client) -> list[RemoteProduct]:
+def _copernicus_dem_products(
+    dataset, variables, bbox, dates, client
+) -> list[RemoteProduct]:
     """Copernicus DEM (copernicus-dem-30m): one COG per 1-degree tile covering the bbox."""
     west, south, east, north = bbox
     step = int(dataset.params["tile_degrees"])
@@ -354,7 +370,9 @@ def _copernicus_dem_products(dataset, variables, bbox, dates, client) -> list[Re
     return out
 
 
-def _esa_worldcover_products(dataset, variables, bbox, dates, client) -> list[RemoteProduct]:
+def _esa_worldcover_products(
+    dataset, variables, bbox, dates, client
+) -> list[RemoteProduct]:
     """ESA WorldCover (esa-worldcover): one COG per 3-degree tile covering the bbox."""
     west, south, east, north = bbox
     step = int(dataset.params["tile_degrees"])
@@ -383,7 +401,9 @@ def _esa_worldcover_products(dataset, variables, bbox, dates, client) -> list[Re
     return out
 
 
-def _generic_template_products(dataset, variables, bbox, dates, client) -> list[RemoteProduct]:
+def _generic_template_products(
+    dataset, variables, bbox, dates, client
+) -> list[RemoteProduct]:
     """Passthrough: format `params['key_template']` per (variable, date).
 
     The template may reference `{variable}`, `{year}`, `{month}`,
@@ -426,10 +446,15 @@ def _generic_template_products(dataset, variables, bbox, dates, client) -> list[
 
 
 _LANDSAT_SENSORS: dict[str, str] = {
-    "LC08": "oli-tirs", "LC09": "oli-tirs",
-    "LO08": "oli", "LO09": "oli",
-    "LT08": "tirs", "LT09": "tirs",
-    "LE07": "etm", "LT05": "tm", "LT04": "tm",
+    "LC08": "oli-tirs",
+    "LC09": "oli-tirs",
+    "LO08": "oli",
+    "LO09": "oli",
+    "LT08": "tirs",
+    "LT09": "tirs",
+    "LE07": "etm",
+    "LT05": "tm",
+    "LT04": "tm",
 }
 
 
@@ -471,7 +496,11 @@ def _landsat_products(dataset, variables, bbox, dates, client) -> list[RemotePro
             RemoteProduct(
                 id=f"{scene}_{var.native}",
                 href=key,
-                metadata={"bucket": dataset.bucket, "variable": var.native, "scene": scene},
+                metadata={
+                    "bucket": dataset.bucket,
+                    "variable": var.native,
+                    "scene": scene,
+                },
             )
         )
     return out

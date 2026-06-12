@@ -230,9 +230,7 @@ def global_files_for_year(
     if year is None:
         record = max(dated, key=lambda d: int(d["popyear"]))
     else:
-        record = next(
-            (d for d in dated if int(d["popyear"]) == int(year)), None
-        )
+        record = next((d for d in dated if int(d["popyear"]) == int(year)), None)
         if record is None:
             available = sorted({int(d["popyear"]) for d in dated})
             raise ValueError(
@@ -240,7 +238,11 @@ def global_files_for_year(
                 f"have {available}."
             )
     tifs = record_files(
-        alias, subalias_id, record["id"], base_url=base_url, session=session,
+        alias,
+        subalias_id,
+        record["id"],
+        base_url=base_url,
+        session=session,
         timeout=timeout,
     )
     if not tifs:

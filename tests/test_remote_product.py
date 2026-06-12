@@ -52,9 +52,9 @@ class TestRemoteProduct:
         a = RemoteProduct(id="a")
         b = RemoteProduct(id="b")
         a.metadata["k"] = 1
-        assert b.metadata == {}, (
-            f"default factory leaked across instances: b.metadata={b.metadata!r}"
-        )
+        assert (
+            b.metadata == {}
+        ), f"default factory leaked across instances: b.metadata={b.metadata!r}"
 
     def test_equality_value_based(self):
         """Two `RemoteProduct`s with the same fields compare equal."""
@@ -98,9 +98,7 @@ class _MinimalSource(AbstractDataSource):
         return None
 
     def _check_input_dates(self, start, end, temporal_resolution, fmt):
-        return TemporalExtent(
-            start_date=start, end_date=end, resolution="D", dates=[]
-        )
+        return TemporalExtent(start_date=start, end_date=end, resolution="D", dates=[])
 
     def _create_grid(self, lat_lim, lon_lim):
         return SpatialExtent.from_pairs(lat_lim=lat_lim, lon_lim=lon_lim)
@@ -139,9 +137,9 @@ class TestSearchFetchHelpers:
             src, "_fetch", lambda products: fetch_calls.append(products) or []
         )
         assert src._api_via_search_fetch() == []
-        assert fetch_calls == [], (
-            f"_fetch should not be called when search is empty: {fetch_calls!r}"
-        )
+        assert (
+            fetch_calls == []
+        ), f"_fetch should not be called when search is empty: {fetch_calls!r}"
 
     def test_api_via_search_fetch_forwards_products(self, src, monkeypatch):
         """Non-empty `_search()` is handed to `_fetch()` verbatim."""
@@ -153,7 +151,10 @@ class TestSearchFetchHelpers:
         )
         result = src._api_via_search_fetch()
         assert seen == [products], f"products not forwarded verbatim: {seen!r}"
-        assert result == [Path("a"), Path("b")], f"fetch result not returned: {result!r}"
+        assert result == [
+            Path("a"),
+            Path("b"),
+        ], f"fetch result not returned: {result!r}"
 
     def test_subclass_overriding_only_search_and_fetch(self, tmp_path):
         """A subclass that overrides `_search`+`_fetch` (not `_api`) works via composition."""

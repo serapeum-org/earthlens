@@ -13,9 +13,6 @@ from tests.gee.conftest import *
 import pyramids  # noqa: F401  # isort: skip
 
 
-
-
-
 @pytest.fixture(scope="session")
 def dates() -> List:
     return ["2009-01-01", "2009-01-02"]

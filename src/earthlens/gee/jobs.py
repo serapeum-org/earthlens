@@ -62,9 +62,7 @@ from tqdm import tqdm
 #: short-circuit `wait_for_task_id` before the real `CANCELLED`
 #: arrives, leaving callers unable to tell "cancel completed"
 #: apart from "cancel still in flight".
-TERMINAL_TASK_STATES: frozenset[str] = frozenset(
-    {"COMPLETED", "FAILED", "CANCELLED"}
-)
+TERMINAL_TASK_STATES: frozenset[str] = frozenset({"COMPLETED", "FAILED", "CANCELLED"})
 
 #: Every state earthlens may report on a normalised `TaskInfo`. Earth
 #: Engine has two overlapping vocabularies: the high-level
@@ -92,7 +90,7 @@ _VALID_TASK_STATES: frozenset[str] = frozenset(
 #: `ee.batch.Task.State` and the underlying Google Long-Running-Operations
 #: vocabulary overlap but use different terms for the same states.
 _STATE_ALIASES: dict[str, str] = {
-    "PENDING": "READY",                  # queued, awaiting a worker
+    "PENDING": "READY",  # queued, awaiting a worker
     "SUCCEEDED": "COMPLETED",
     "CANCELLING": "CANCEL_REQUESTED",
 }
@@ -203,7 +201,7 @@ def _resolve_project(project: str | None) -> str:
         )
 
     if raw.startswith("projects/"):
-        return raw[len("projects/"):]
+        return raw[len("projects/") :]
     return raw
 
 
@@ -224,9 +222,11 @@ def _parse_iso(ts: str | None) -> dt.datetime | None:
         return None
     # ISO-8601 with `Z` (Zulu). `fromisoformat` handles `+00:00` natively
     # from Python 3.11 onwards but not the bare `Z` suffix.
-    return dt.datetime.fromisoformat(ts.replace("Z", "+00:00")).astimezone(
-        dt.timezone.utc
-    ).replace(tzinfo=None)
+    return (
+        dt.datetime.fromisoformat(ts.replace("Z", "+00:00"))
+        .astimezone(dt.timezone.utc)
+        .replace(tzinfo=None)
+    )
 
 
 def _parse_ms(ms: int | float | None) -> dt.datetime | None:
@@ -282,7 +282,9 @@ def _op_to_taskinfo(payload: dict[str, Any]) -> TaskInfo:
     else:
         # `task.status()` flat shape.
         op_name = payload.get("name", "")
-        task_id = str(payload.get("id") or (op_name.rsplit("/", 1)[-1] if op_name else ""))
+        task_id = str(
+            payload.get("id") or (op_name.rsplit("/", 1)[-1] if op_name else "")
+        )
         state = str(payload.get("state", "")).rsplit(".", 1)[-1].upper()
         task_type = str(payload.get("task_type", ""))
         create_time = _parse_ms(payload.get("creation_timestamp_ms"))
@@ -507,7 +509,9 @@ def wait_for_task_id(
             `CANCEL_REQUESTED`; the message includes
             `TaskInfo.error_message` when present.
     """
-    spinner = tqdm(desc=f"EE task {task_id[:12]}", unit="poll", disable=not progress_bar)
+    spinner = tqdm(
+        desc=f"EE task {task_id[:12]}", unit="poll", disable=not progress_bar
+    )
     info: TaskInfo
     try:
         while True:
@@ -811,7 +815,10 @@ def _build_argparser():
 
     list_p = sub.add_parser("list", help="list recent tasks (one per line)")
     list_p.add_argument(
-        "--state", default=None, nargs="+", metavar="STATE",
+        "--state",
+        default=None,
+        nargs="+",
+        metavar="STATE",
         help=(
             'filter by one or more states (e.g. "--state RUNNING READY" '
             'or "--state FAILED"). Mirrors the iterable form of '
@@ -819,13 +826,18 @@ def _build_argparser():
         ),
     )
     list_p.add_argument(
-        "--max-age-min", type=int, default=None, help="drop tasks older than this many minutes"
+        "--max-age-min",
+        type=int,
+        default=None,
+        help="drop tasks older than this many minutes",
     )
     list_p.add_argument(
         "--task-type", default=None, help='filter by Task.Type (e.g. "EXPORT_IMAGE")'
     )
     list_p.add_argument(
-        "--description-prefix", default=None, help="substring match against task description"
+        "--description-prefix",
+        default=None,
+        help="substring match against task description",
     )
     list_p.add_argument("--limit", type=int, default=None)
     list_p.add_argument("--project", default=None)

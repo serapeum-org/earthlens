@@ -44,9 +44,7 @@ class _FakeCmems(types.ModuleType):
         self.CouldNotConnectToAuthenticationSystem = type(
             "CouldNotConnectToAuthenticationSystem", (Exception,), {}
         )
-        self.CredentialsCannotBeNone = type(
-            "CredentialsCannotBeNone", (Exception,), {}
-        )
+        self.CredentialsCannotBeNone = type("CredentialsCannotBeNone", (Exception,), {})
 
     def login(self, **kwargs: Any) -> bool:
         self.login_calls.append(dict(kwargs))
@@ -61,9 +59,9 @@ class _FakeCmems(types.ModuleType):
             raise per_ds
         if self.subset_raises is not None:
             raise self.subset_raises
-        assert self.subset_response is not None, (
-            "test forgot to set `subset_response` on the fake module"
-        )
+        assert (
+            self.subset_response is not None
+        ), "test forgot to set `subset_response` on the fake module"
         return self.subset_response
 
 
@@ -192,9 +190,9 @@ class TestCMEMSConstruction:
 
     def test_init_captures_space(self, cmems_instance: CMEMS):
         """The user bbox is captured onto `self.space` via `SpatialExtent`."""
-        assert isinstance(cmems_instance.space, SpatialExtent), (
-            "self.space must be a SpatialExtent instance"
-        )
+        assert isinstance(
+            cmems_instance.space, SpatialExtent
+        ), "self.space must be a SpatialExtent instance"
         assert cmems_instance.space.south == 40.0
         assert cmems_instance.space.north == 42.0
         assert cmems_instance.space.west == -10.0
@@ -212,10 +210,12 @@ class TestCMEMSConstruction:
         self, fake_cmems: _FakeCmems, cmems_instance: CMEMS
     ):
         """Construction stores the auth offline but does not log in."""
-        assert len(fake_cmems.login_calls) == 0, (
-            f"construction must not authenticate, got {len(fake_cmems.login_calls)}"
-        )
-        assert cmems_instance._auth is not None, "CmemsAuth must be stored on the instance"
+        assert (
+            len(fake_cmems.login_calls) == 0
+        ), f"construction must not authenticate, got {len(fake_cmems.login_calls)}"
+        assert (
+            cmems_instance._auth is not None
+        ), "CmemsAuth must be stored on the instance"
         assert isinstance(cmems_instance._auth, CmemsAuth)
         cmems_instance._auth.configure()
         assert len(fake_cmems.login_calls) == 1, "first configure() authenticates once"
@@ -245,9 +245,10 @@ class TestCMEMSSearch:
     def test_search_carries_variables_in_metadata(self, cmems_instance: CMEMS):
         """The variable list rides on `product.metadata['variables']`."""
         products = cmems_instance._search()
-        assert products[0].metadata["variables"] == ["thetao", "so"], (
-            f"variables not carried in metadata; got {products[0].metadata!r}"
-        )
+        assert products[0].metadata["variables"] == [
+            "thetao",
+            "so",
+        ], f"variables not carried in metadata; got {products[0].metadata!r}"
 
     def test_search_multi_dataset(self, fake_cmems: _FakeCmems, tmp_path: Path):
         """Multiple datasets in `self.vars` → multiple products."""
@@ -323,13 +324,11 @@ class TestCMEMSFetch:
         cm._fetch(cm._search())
         filename = fake_cmems.subset_calls[0]["output_filename"]
         for bad in ("/", "\\", ":", "*", "?", '"', "<", ">", "|"):
-            assert bad not in filename, (
-                f"unsafe character {bad!r} leaked into output_filename: {filename!r}"
-            )
+            assert (
+                bad not in filename
+            ), f"unsafe character {bad!r} leaked into output_filename: {filename!r}"
 
-    def test_total_failure_raises(
-        self, fake_cmems: _FakeCmems, cmems_instance: CMEMS
-    ):
+    def test_total_failure_raises(self, fake_cmems: _FakeCmems, cmems_instance: CMEMS):
         """When every subset fails, _fetch raises rather than returning []."""
         fake_cmems.subset_raises = RuntimeError("server upset")
         with pytest.raises(RuntimeError, match="all 1 CMEMS subset"):
@@ -342,9 +341,7 @@ class TestCMEMSFetch:
         good = tmp_path / "good.nc"
         good.write_bytes(b"")
         fake_cmems.subset_response = _FakeResponse(good)
-        fake_cmems.subset_raises_for = {
-            "bad_ds": RuntimeError("server upset")
-        }
+        fake_cmems.subset_raises_for = {"bad_ds": RuntimeError("server upset")}
         cm = CMEMS(
             start="2024-01-01",
             end="2024-01-02",
@@ -360,9 +357,9 @@ class TestCMEMSFetch:
             service_password="secret",
         )
         paths = cm._fetch(cm._search())
-        assert paths == [good], (
-            f"partial failure should return only the survivor; got {paths!r}"
-        )
+        assert paths == [
+            good
+        ], f"partial failure should return only the survivor; got {paths!r}"
 
     def test_subset_missing_file_path_raises(
         self, fake_cmems: _FakeCmems, cmems_instance: CMEMS
@@ -375,9 +372,7 @@ class TestCMEMSFetch:
 
         fake_cmems.subset_response = _NoPath()  # type: ignore[assignment]
         with pytest.raises(FileNotFoundError, match="no file_path"):
-            cmems_instance._subset_one(
-                cmems_instance._search()[0], progress_bar=False
-            )
+            cmems_instance._subset_one(cmems_instance._search()[0], progress_bar=False)
 
     def test_invalid_credentials_midcall_wrapped(
         self, fake_cmems: _FakeCmems, cmems_instance: CMEMS
@@ -385,9 +380,7 @@ class TestCMEMSFetch:
         """An `InvalidUsernameOrPassword` mid-subset becomes `AuthenticationError`."""
         fake_cmems.subset_raises = fake_cmems.InvalidUsernameOrPassword("expired")
         with pytest.raises(AuthenticationError, match="mid-request"):
-            cmems_instance._subset_one(
-                cmems_instance._search()[0], progress_bar=False
-            )
+            cmems_instance._subset_one(cmems_instance._search()[0], progress_bar=False)
 
 
 @pytest.mark.cmems
@@ -405,7 +398,10 @@ class TestCMEMSDownload:
         assert paths == [target], f"download() should return [{target}], got {paths!r}"
 
     def test_download_aggregate_guarded_without_reduce(
-        self, fake_cmems: _FakeCmems, cmems_instance: CMEMS, tmp_path: Path,
+        self,
+        fake_cmems: _FakeCmems,
+        cmems_instance: CMEMS,
+        tmp_path: Path,
         monkeypatch: pytest.MonkeyPatch,
     ):
         """`aggregate=` raises NotImplementedError when pyramids lacks `reduce`."""
@@ -424,7 +420,10 @@ class TestCMEMSDownload:
             )
 
     def test_download_aggregate_via_reduce(
-        self, fake_cmems: _FakeCmems, cmems_instance: CMEMS, tmp_path: Path,
+        self,
+        fake_cmems: _FakeCmems,
+        cmems_instance: CMEMS,
+        tmp_path: Path,
         monkeypatch: pytest.MonkeyPatch,
     ):
         """`aggregate=` reduces each subset into per-(variable, window) GeoTIFFs."""
@@ -463,12 +462,16 @@ class TestCMEMSDownload:
             get_time_variable=lambda *a, **k: ["2020-01-01", "2020-03-01"]
         )
         labels = CMEMS._window_labels(nc, "D")
-        assert labels == ["20200101", "20200301"], (
-            f"one label per timestep expected, empty daily buckets skipped; got {labels}"
-        )
+        assert labels == [
+            "20200101",
+            "20200301",
+        ], f"one label per timestep expected, empty daily buckets skipped; got {labels}"
 
     def test_download_aggregate_at_depth_level(
-        self, fake_cmems: _FakeCmems, cmems_instance: CMEMS, tmp_path: Path,
+        self,
+        fake_cmems: _FakeCmems,
+        cmems_instance: CMEMS,
+        tmp_path: Path,
         monkeypatch: pytest.MonkeyPatch,
     ):
         """`level=` selects a single depth via `sel` instead of collapsing it."""
@@ -487,7 +490,10 @@ class TestCMEMSDownload:
         ], f"depth should be `sel`-ected (no depth reduce), got: {_FAKE_REDUCE_CALLS}"
 
     def test_download_aggregate_single_window_reshapes_2d(
-        self, fake_cmems: _FakeCmems, cmems_instance: CMEMS, tmp_path: Path,
+        self,
+        fake_cmems: _FakeCmems,
+        cmems_instance: CMEMS,
+        tmp_path: Path,
         monkeypatch: pytest.MonkeyPatch,
     ):
         """A freq collapsing all steps to one window yields a 2-D array, reshaped to 3-D."""
@@ -507,7 +513,10 @@ class TestCMEMSDownload:
         assert paths[0].exists(), "single-window GeoTIFF should be written"
 
     def test_aggregate_one_raises_without_time_dimension(
-        self, cmems_instance: CMEMS, tmp_path: Path, monkeypatch: pytest.MonkeyPatch,
+        self,
+        cmems_instance: CMEMS,
+        tmp_path: Path,
+        monkeypatch: pytest.MonkeyPatch,
     ):
         """`_aggregate_one` rejects a NetCDF lacking a `time` dimension."""
         _install_fake_pyramids_reduce(monkeypatch)
@@ -522,7 +531,10 @@ class TestCMEMSDownload:
             )
 
     def test_aggregate_one_without_depth_skips_depth_reduce(
-        self, cmems_instance: CMEMS, tmp_path: Path, monkeypatch: pytest.MonkeyPatch,
+        self,
+        cmems_instance: CMEMS,
+        tmp_path: Path,
+        monkeypatch: pytest.MonkeyPatch,
     ):
         """A 2-D (no `depth`) NetCDF goes straight to the time reduce."""
         _install_fake_pyramids_reduce(monkeypatch)
@@ -532,7 +544,9 @@ class TestCMEMSDownload:
         nc_path = tmp_path / "cmems_mod_glo_phy_my_0.083deg_P1D-m.nc"
         nc_path.write_bytes(b"")
         written = cmems_instance._aggregate_one(
-            nc_path, AggregationConfig(freq="1MS", op="mean", out_dir=str(tmp_path)), "mean"
+            nc_path,
+            AggregationConfig(freq="1MS", op="mean", out_dir=str(tmp_path)),
+            "mean",
         )
         assert len(written) == 2, f"expected two monthly windows, got {len(written)}"
         assert _FAKE_REDUCE_CALLS == [
@@ -557,16 +571,19 @@ class TestSafeFilename:
     @pytest.mark.parametrize(
         "raw, expected",
         [
-            ("cmems_mod_glo_phy_my_0.083deg_P1D-m", "cmems_mod_glo_phy_my_0.083deg_P1D-m"),
+            (
+                "cmems_mod_glo_phy_my_0.083deg_P1D-m",
+                "cmems_mod_glo_phy_my_0.083deg_P1D-m",
+            ),
             ("a/b\\c:d", "a_b_c_d"),
             ('a*b?c"d<e>f|g', "a_b_c_d_e_f_g"),
         ],
     )
     def test_safe_filename(self, raw: str, expected: str):
         """Illegal characters are uniformly replaced with `_`."""
-        assert _safe_filename(raw) == expected, (
-            f"_safe_filename({raw!r}) should be {expected!r}, got {_safe_filename(raw)!r}"
-        )
+        assert (
+            _safe_filename(raw) == expected
+        ), f"_safe_filename({raw!r}) should be {expected!r}, got {_safe_filename(raw)!r}"
 
 
 @pytest.mark.cmems
@@ -586,25 +603,29 @@ class TestUniqueOutputNames:
     def test_collision_is_disambiguated_and_unique(self):
         """Two ids normalising to the same stem get distinct hash-suffixed names."""
         names = _unique_output_names(["a/b", "a_b"], "nc")
-        assert len(set(names.values())) == 2, (
-            f"colliding ids must get unique filenames, got {names!r}"
-        )
+        assert (
+            len(set(names.values())) == 2
+        ), f"colliding ids must get unique filenames, got {names!r}"
         for value in names.values():
-            assert value.startswith("a_b_") and value.endswith(".nc"), (
-                f"disambiguated name should keep the stem + suffix, got {value!r}"
-            )
+            assert value.startswith("a_b_") and value.endswith(
+                ".nc"
+            ), f"disambiguated name should keep the stem + suffix, got {value!r}"
 
     def test_disambiguation_is_deterministic(self):
         """The hash suffix is stable across calls (same id -> same name)."""
         first = _unique_output_names(["a/b", "a_b"], "nc")
         second = _unique_output_names(["a/b", "a_b"], "nc")
-        assert first == second, f"output names must be deterministic: {first} != {second}"
+        assert (
+            first == second
+        ), f"output names must be deterministic: {first} != {second}"
 
     @pytest.mark.parametrize("ext", ["nc", "zarr"])
     def test_extension_applied(self, ext: str):
         """The supplied extension is appended to every filename."""
         names = _unique_output_names(["ds-1"], ext)
-        assert names["ds-1"] == f"ds-1.{ext}", f"expected ds-1.{ext}, got {names['ds-1']!r}"
+        assert (
+            names["ds-1"] == f"ds-1.{ext}"
+        ), f"expected ds-1.{ext}, got {names['ds-1']!r}"
 
     def test_empty_input(self):
         """No dataset ids yields an empty map."""

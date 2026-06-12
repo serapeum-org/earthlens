@@ -618,17 +618,18 @@ def aggregate_netcdf(
     results: list[tuple[pd.Timestamp, np.ndarray, Path | None]] = []
     for window_label, mask in _window_groups(time_axis, config.freq):
         slice_ = arr[mask, :, :]
-        reduced = _reduce(slice_, op=op, skipna=config.skipna, min_count=config.min_count)
+        reduced = _reduce(
+            slice_, op=op, skipna=config.skipna, min_count=config.min_count
+        )
 
         target: Path | None = None
         if out_dir is not None:
             target = out_dir / (
-                f"{var_info.cds_variable}_{config.freq}_"
-                f"{window_label:%Y%m%d}.tif"
+                f"{var_info.cds_variable}_{config.freq}_" f"{window_label:%Y%m%d}.tif"
             )
-            Dataset.create_from_array(
-                arr=reduced, geo=geo, epsg=4326
-            ).to_file(str(target))
+            Dataset.create_from_array(arr=reduced, geo=geo, epsg=4326).to_file(
+                str(target)
+            )
 
         results.append((window_label, reduced, target))
 

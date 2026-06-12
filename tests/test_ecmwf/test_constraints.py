@@ -279,9 +279,7 @@ class TestCombinatorialPartitionUnion:
             },
         ).check()
 
-    def test_cross_partition_request_with_unknown_variable_rejected(
-        self, monkeypatch
-    ):
+    def test_cross_partition_request_with_unknown_variable_rejected(self, monkeypatch):
         """Variable typo still raises before the time-partition union runs.
 
         Phase 3 (variable-typo check) rejects the request before
@@ -322,9 +320,7 @@ class TestCombinatorialPartitionUnion:
                 },
             ).check()
 
-    def test_cross_partition_year_only_in_one_partition_passes(
-        self, monkeypatch
-    ):
+    def test_cross_partition_year_only_in_one_partition_passes(self, monkeypatch):
         """Year present in only one partition is still OK if some entry
         covers it.
 

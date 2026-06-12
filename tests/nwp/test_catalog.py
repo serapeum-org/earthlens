@@ -54,7 +54,19 @@ class TestCatalogLoad:
         """The shipped catalog resolves the MVP models plus the expanded set."""
         models = set(Catalog().datasets)
         mvp = {"gfs", "gefs", "hrrr", "ifs-hres", "icon-global"}
-        expanded = {"rap", "nam", "nbm", "rrfs", "gdps", "rdps", "hrdps", "icon-eu", "icon-d2", "ens", "aifs"}
+        expanded = {
+            "rap",
+            "nam",
+            "nbm",
+            "rrfs",
+            "gdps",
+            "rdps",
+            "hrdps",
+            "icon-eu",
+            "icon-d2",
+            "ens",
+            "aifs",
+        }
         assert mvp <= models and expanded <= models, sorted(models)
 
     def test_load_from_disk(self, tmp_path, monkeypatch):
@@ -85,9 +97,7 @@ class TestCatalogLoad:
     def test_invalid_row_raises(self, tmp_path, monkeypatch):
         """A row with an unknown field surfaces a validation ValueError."""
         body = "datasets:\n  bad:\n    provider: p\n    nope: 1\n"
-        monkeypatch.setattr(
-            catalog_mod, "CATALOG_PATH", _write_catalog(tmp_path, body)
-        )
+        monkeypatch.setattr(catalog_mod, "CATALOG_PATH", _write_catalog(tmp_path, body))
         with pytest.raises(ValueError, match="failed validation"):
             Catalog()
 
@@ -104,7 +114,13 @@ class TestCatalogResolve:
     def test_models_expose_extended_surface_bands(self):
         """Forecast models carry the extended surface-field set."""
         cat = Catalog()
-        extended = {"relative_humidity_2m", "wind_gust", "surface_pressure", "total_cloud_cover", "cape"}
+        extended = {
+            "relative_humidity_2m",
+            "wind_gust",
+            "surface_pressure",
+            "total_cloud_cover",
+            "cape",
+        }
         for key in ("gfs", "ifs-hres", "icon-eu", "arpege-world"):
             assert extended <= set(cat.get_model(key).bands), key
         # the GRIB2 gust selector is the standard surface GUST regex

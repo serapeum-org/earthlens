@@ -178,7 +178,10 @@ class TestGuardBbox:
     def test_whole_earth_buildings_rejected(self, tmp_path: Path):
         """A whole-Earth bbox on buildings is rejected."""
         backend = _make_backend(
-            tmp_path, variables={"buildings": []}, lat_lim=[-90, 90], lon_lim=[-180, 180]
+            tmp_path,
+            variables={"buildings": []},
+            lat_lim=[-90, 90],
+            lon_lim=[-180, 180],
         )
         with pytest.raises(ValueError, match=r"square-degree cap for the 'buildings'"):
             backend._guard_bbox(["buildings"])
@@ -236,8 +239,10 @@ class TestSearch:
     def test_one_product_per_type(self, tmp_path: Path):
         """`_search` yields one product per requested type."""
         backend = _make_backend(
-            tmp_path, variables={"transportation": ["segment", "connector"]},
-            lat_lim=[40.757, 40.759], lon_lim=[-73.987, -73.984],
+            tmp_path,
+            variables={"transportation": ["segment", "connector"]},
+            lat_lim=[40.757, 40.759],
+            lon_lim=[-73.987, -73.984],
         )
         products = backend._search()
         assert [p.id for p in products] == [
@@ -249,7 +254,10 @@ class TestSearch:
     def test_search_enforces_guard(self, tmp_path: Path):
         """`_search` raises when the bbox is too large for a guarded theme."""
         backend = _make_backend(
-            tmp_path, variables={"buildings": []}, lat_lim=[-90, 90], lon_lim=[-180, 180]
+            tmp_path,
+            variables={"buildings": []},
+            lat_lim=[-90, 90],
+            lon_lim=[-180, 180],
         )
         with pytest.raises(ValueError, match=r"square-degree cap"):
             backend._search()
@@ -259,9 +267,13 @@ class TestSearch:
 class TestFetchAndDownload:
     """`_fetch` / `download` against the faked SDK."""
 
-    def test_fetch_calls_sdk_with_type_bbox_release(self, tmp_path: Path, fake_overture):
+    def test_fetch_calls_sdk_with_type_bbox_release(
+        self, tmp_path: Path, fake_overture
+    ):
         """`_fetch` calls the SDK once per type with the type, bbox, release."""
-        backend = _make_backend(tmp_path, variables={"places": []}, release="2026-05-20.0")
+        backend = _make_backend(
+            tmp_path, variables={"places": []}, release="2026-05-20.0"
+        )
         backend.download()
         assert len(fake_overture.calls) == 1
         call = fake_overture.calls[0]
@@ -292,9 +304,7 @@ class TestFetchAndDownload:
         "file_format, suffix",
         [("geoparquet", ".parquet"), ("gpkg", ".gpkg"), ("geojson", ".geojson")],
     )
-    def test_write_formats(
-        self, tmp_path: Path, fake_overture, file_format, suffix
-    ):
+    def test_write_formats(self, tmp_path: Path, fake_overture, file_format, suffix):
         """Each output format writes the expected extension."""
         backend = _make_backend(
             tmp_path, variables={"places": []}, file_format=file_format
@@ -303,11 +313,11 @@ class TestFetchAndDownload:
         assert paths[0].suffix == suffix
         assert paths[0].exists()
 
-    def test_filename_embeds_theme_type_release(
-        self, tmp_path: Path, fake_overture
-    ):
+    def test_filename_embeds_theme_type_release(self, tmp_path: Path, fake_overture):
         """The written filename embeds theme, type, and release."""
-        backend = _make_backend(tmp_path, variables={"places": []}, release="2026-05-20.0")
+        backend = _make_backend(
+            tmp_path, variables={"places": []}, release="2026-05-20.0"
+        )
         path = backend.download()[0]
         assert path.name == "overture_places_place_2026-05-20.0.parquet"
 
@@ -335,7 +345,9 @@ class TestFetchAndDownload:
         assert list(tmp_path.glob("overture_*")) == []
 
     @pytest.mark.parametrize("file_format", ["geoparquet", "gpkg", "geojson"])
-    def test_write_nested_columns(self, tmp_path: Path, fake_overture, make_gdf, file_format):
+    def test_write_nested_columns(
+        self, tmp_path: Path, fake_overture, make_gdf, file_format
+    ):
         """Nested struct columns (names/categories) round-trip through every format."""
         fake_overture.set_gdf(
             "place", make_gdf([PERMISSIVE_SOURCES, OSM_SOURCES], nested=True)
@@ -351,16 +363,22 @@ class TestFetchAndDownload:
         assert len(back) == 2
         assert "license_id" in back.columns
 
-    def test_stream_uses_record_batch_reader(self, tmp_path: Path, fake_overture, make_gdf):
+    def test_stream_uses_record_batch_reader(
+        self, tmp_path: Path, fake_overture, make_gdf
+    ):
         """`stream=True` reads via record_batch_reader, not geodataframe."""
         fake_overture.set_gdf("place", make_gdf([PERMISSIVE_SOURCES, OSM_SOURCES]))
         backend = _make_backend(tmp_path, variables={"places": []}, stream=True)
         gdf = gpd.read_parquet(backend.download()[0])
         assert len(fake_overture.reader_calls) == 1, "should stream"
-        assert fake_overture.calls == [], "geodataframe must not be called when streaming"
+        assert (
+            fake_overture.calls == []
+        ), "geodataframe must not be called when streaming"
         assert list(gdf["license_id"]) == ["Apache-2.0; CDLA-Permissive-2.0", ODBL]
 
-    def test_max_features_streams_with_early_stop(self, tmp_path: Path, fake_overture, make_gdf):
+    def test_max_features_streams_with_early_stop(
+        self, tmp_path: Path, fake_overture, make_gdf
+    ):
         """`max_features` routes through the streaming reader and caps the rows."""
         fake_overture.set_gdf("place", make_gdf([PERMISSIVE_SOURCES] * 6))
         backend = _make_backend(tmp_path, variables={"places": []}, max_features=2)
@@ -374,7 +392,9 @@ class TestFetchAndDownload:
         backend = _make_backend(tmp_path, variables={"places": []})
         backend.download()
         assert len(fake_overture.calls) == 1, "geodataframe materialise path"
-        assert fake_overture.reader_calls == [], "no streaming without stream/max_features"
+        assert (
+            fake_overture.reader_calls == []
+        ), "no streaming without stream/max_features"
 
     def test_download_rejects_aggregate(self, tmp_path: Path):
         """A non-None aggregate is rejected at the backend."""
@@ -415,16 +435,25 @@ class TestDuckDBQueryPath:
         """A `where=` predicate fetches via query_overture, not the SDK."""
         seen: dict = {}
 
-        def fake_query(theme, otype, release, bbox, where=None, columns=None, limit=None):
+        def fake_query(
+            theme, otype, release, bbox, where=None, columns=None, limit=None
+        ):
             seen.update(
-                theme=theme, otype=otype, release=release, bbox=bbox,
-                where=where, columns=columns, limit=limit,
+                theme=theme,
+                otype=otype,
+                release=release,
+                bbox=bbox,
+                where=where,
+                columns=columns,
+                limit=limit,
             )
             return make_gdf([OSM_SOURCES])
 
         monkeypatch.setattr("earthlens.overture.query.query_overture", fake_query)
         backend = _make_backend(
-            tmp_path, variables={"buildings": []}, where="height > 10",
+            tmp_path,
+            variables={"buildings": []},
+            where="height > 10",
             release="2026-05-20.0",
         )
         with pytest.warns(LicenseWarning):
@@ -436,9 +465,7 @@ class TestDuckDBQueryPath:
         assert fake_overture.reader_calls == [], "reader must not be used with where="
         assert "license_id" in gpd.read_parquet(paths[0]).columns
 
-    def test_columns_and_limit_forwarded(
-        self, tmp_path: Path, make_gdf, monkeypatch
-    ):
+    def test_columns_and_limit_forwarded(self, tmp_path: Path, make_gdf, monkeypatch):
         """`columns` and `max_features` reach query_overture (limit)."""
         seen: dict = {}
         monkeypatch.setattr(
@@ -446,7 +473,10 @@ class TestDuckDBQueryPath:
             lambda *a, **k: seen.update(k) or make_gdf([PERMISSIVE_SOURCES]),
         )
         backend = _make_backend(
-            tmp_path, variables={"places": []}, columns=["names"], max_features=5,
+            tmp_path,
+            variables={"places": []},
+            columns=["names"],
+            max_features=5,
         )
         backend.download()
         assert seen["columns"] == ["names"]
@@ -454,7 +484,9 @@ class TestDuckDBQueryPath:
 
     def test_resolve_release_explicit(self, tmp_path: Path):
         """`_resolve_release` returns the explicit release when given."""
-        backend = _make_backend(tmp_path, variables={"places": []}, release="2020-01-01.0")
+        backend = _make_backend(
+            tmp_path, variables={"places": []}, release="2020-01-01.0"
+        )
         assert backend._resolve_release() == "2020-01-01.0"
 
     def test_resolve_release_falls_back_to_index(self, tmp_path: Path):
@@ -485,9 +517,9 @@ class TestStreamToGeodataframe:
         import pyarrow as pa
 
         schema = pa.table(
-            make_gdf([PERMISSIVE_SOURCES]).set_crs("EPSG:4326").to_arrow(
-                geometry_encoding="WKB"
-            )
+            make_gdf([PERMISSIVE_SOURCES])
+            .set_crs("EPSG:4326")
+            .to_arrow(geometry_encoding="WKB")
         ).schema
         reader = pa.RecordBatchReader.from_batches(schema, [])
         assert len(_stream_to_geodataframe(reader, max_features=None)) == 0

@@ -58,9 +58,7 @@ class TestConstruction:
         backend = _backend(tmp_path, variables=[])
         assert backend.vars == ["pm25"]
 
-    def test_invalid_resolution_raises(
-        self, tmp_path: Path, fake_openaq: _FakeOpenaq
-    ):
+    def test_invalid_resolution_raises(self, tmp_path: Path, fake_openaq: _FakeOpenaq):
         """An unknown temporal_resolution raises ValueError."""
         with pytest.raises(ValueError, match="temporal_resolution must be"):
             _backend(tmp_path, temporal_resolution="weekly")
@@ -149,9 +147,7 @@ class TestSearch:
         product = _backend(tmp_path)._search()[0]
         assert product.metadata["provider"] == "openaq"
 
-    def test_parameters_id_forwarded(
-        self, tmp_path: Path, fake_openaq: _FakeOpenaq
-    ):
+    def test_parameters_id_forwarded(self, tmp_path: Path, fake_openaq: _FakeOpenaq):
         """variables=['pm25','no2'] forwards the full id union to locations."""
         _backend(tmp_path, variables=["pm25", "no2"])._search()
         assert fake_openaq.location_calls()[0]["parameters_id"] == [2, 5, 7, 15]
@@ -209,7 +205,9 @@ class TestFetch:
         assert str(frame["datetime_utc"].dtype) == "datetime64[ns, UTC]"
         assert frame["value"].iloc[0] == 12.3
 
-    def test_date_window_forwarded_daily(self, tmp_path: Path, fake_openaq: _FakeOpenaq):
+    def test_date_window_forwarded_daily(
+        self, tmp_path: Path, fake_openaq: _FakeOpenaq
+    ):
         """The default daily rollup carries a calendar date_from/date_to window."""
         backend = _backend(tmp_path)  # temporal_resolution defaults to "daily" -> /days
         backend._fetch_one(backend._search()[0])
@@ -285,9 +283,7 @@ class TestDownload:
         round_trip = pd.read_csv(written[0])
         assert list(round_trip.columns) == list(_SCHEMA)
 
-    def test_empty_writes_schema_only(
-        self, tmp_path: Path, fake_openaq: _FakeOpenaq
-    ):
+    def test_empty_writes_schema_only(self, tmp_path: Path, fake_openaq: _FakeOpenaq):
         """No locations -> empty schema-only frame, still written to disk."""
         fake_openaq.locations = {"results": []}
         backend = _backend(tmp_path)
@@ -329,7 +325,10 @@ class TestHelpers:
     @pytest.mark.parametrize(
         "measurement, expected",
         [
-            ({"period": {"datetimeFrom": {"utc": "2024-01-01T00:00:00Z"}}}, "2024-01-01T00:00:00Z"),
+            (
+                {"period": {"datetimeFrom": {"utc": "2024-01-01T00:00:00Z"}}},
+                "2024-01-01T00:00:00Z",
+            ),
             ({"datetime": {"utc": "2024-02-02T00:00:00Z"}}, "2024-02-02T00:00:00Z"),
             ({"date": {"utc": "2024-03-03T00:00:00Z"}}, "2024-03-03T00:00:00Z"),
             ({}, None),

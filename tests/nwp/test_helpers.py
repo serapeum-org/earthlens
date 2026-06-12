@@ -80,9 +80,7 @@ class TestNameHelpers:
 
     def test_valid_time(self):
         """valid_time adds the step hours to the cycle."""
-        assert valid_time(dt.datetime(2024, 6, 1, 0), 30) == dt.datetime(
-            2024, 6, 2, 6
-        )
+        assert valid_time(dt.datetime(2024, 6, 1, 0), 30) == dt.datetime(2024, 6, 2, 6)
 
 
 class TestEnsureDir:

@@ -30,12 +30,16 @@ class TestLoadYamlStrict:
 
     def test_parses_mapping(self, tmp_path):
         """A simple mapping is returned as a dict."""
-        path = _write(tmp_path, "ok.yaml", """\
+        path = _write(
+            tmp_path,
+            "ok.yaml",
+            """\
             name: demo
             items:
               - a
               - b
-        """)
+        """,
+        )
         data = load_yaml_strict(path)
         assert data == {"name": "demo", "items": ["a", "b"]}
 
@@ -51,11 +55,15 @@ class TestLoadYamlStrict:
 
     def test_nested_mappings(self, tmp_path):
         """Nested mappings are parsed recursively."""
-        path = _write(tmp_path, "nested.yaml", """\
+        path = _write(
+            tmp_path,
+            "nested.yaml",
+            """\
             outer:
               inner:
                 leaf: 1
-        """)
+        """,
+        )
         assert load_yaml_strict(path) == {"outer": {"inner": {"leaf": 1}}}
 
     def test_duplicate_top_level_key_rejected(self, tmp_path):
@@ -66,22 +74,31 @@ class TestLoadYamlStrict:
 
     def test_duplicate_nested_key_rejected(self, tmp_path):
         """A duplicated key inside a nested mapping is also rejected."""
-        path = _write(tmp_path, "dup_nested.yaml", """\
+        path = _write(
+            tmp_path,
+            "dup_nested.yaml",
+            """\
             outer:
               x: 1
               x: 2
-        """)
+        """,
+        )
         with pytest.raises(ValueError, match="duplicate YAML key 'x'"):
             load_yaml_strict(path)
 
     def test_list_of_mappings(self, tmp_path):
         """A list of mappings parses correctly (no false duplicates across items)."""
-        path = _write(tmp_path, "list.yaml", """\
+        path = _write(
+            tmp_path,
+            "list.yaml",
+            """\
             items:
               - name: a
                 v: 1
               - name: b
                 v: 2
-        """)
-        assert load_yaml_strict(path) == {"items": [{"name": "a", "v": 1},
-                                                    {"name": "b", "v": 2}]}
+        """,
+        )
+        assert load_yaml_strict(path) == {
+            "items": [{"name": "a", "v": 1}, {"name": "b", "v": 2}]
+        }

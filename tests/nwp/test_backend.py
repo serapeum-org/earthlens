@@ -181,8 +181,11 @@ class TestMembersFor:
         return Catalog(
             datasets={
                 "gefs": NWPModel(
-                    provider="noaa-nodd", model_family="gefs", cycles_utc=[0],
-                    horizon_h=240, backend="herbie",
+                    provider="noaa-nodd",
+                    model_family="gefs",
+                    cycles_utc=[0],
+                    horizon_h=240,
+                    backend="herbie",
                     bands={"temperature_2m": ":TMP:2 m above ground:"},
                     members=["mean", "0", "1", "2"],
                 ),
@@ -203,7 +206,9 @@ class TestMembersFor:
     def test_explicit_members(self, tmp_path):
         """members= selects the requested members."""
         cat = self._ens_catalog()
-        b = _make(cat, tmp_path, variables={"gefs": ["temperature_2m"]}, members=["1", "2"])
+        b = _make(
+            cat, tmp_path, variables={"gefs": ["temperature_2m"]}, members=["1", "2"]
+        )
         assert b._members_for(b._requests[0][1]) == ["1", "2"]
 
     def test_unknown_member_raises(self, tmp_path):
@@ -219,7 +224,9 @@ class TestSearch:
 
     def test_expands_cycles_and_steps(self, mini_catalog, tmp_path):
         """_search yields one product per (cycle, step) across the range."""
-        b = _make(mini_catalog, tmp_path, start="2024-06-01", end="2024-06-02", steps=[0, 6])
+        b = _make(
+            mini_catalog, tmp_path, start="2024-06-01", end="2024-06-02", steps=[0, 6]
+        )
         products = b._search()
         assert len(products) == 2 * 2 * 2
         assert products[0].id == "gfs.2024060100.f000"
@@ -233,15 +240,23 @@ class TestSearch:
         cat = Catalog(
             datasets={
                 "gefs": NWPModel(
-                    provider="noaa-nodd", model_family="gefs", cycles_utc=[0],
-                    horizon_h=240, backend="herbie",
+                    provider="noaa-nodd",
+                    model_family="gefs",
+                    cycles_utc=[0],
+                    horizon_h=240,
+                    backend="herbie",
                     bands={"temperature_2m": ":TMP:2 m above ground:"},
                     members=["mean", "1", "2"],
                 )
             }
         )
-        b = _make(cat, tmp_path, variables={"gefs": ["temperature_2m"]},
-                  steps=[0, 6], members=["1", "2"])
+        b = _make(
+            cat,
+            tmp_path,
+            variables={"gefs": ["temperature_2m"]},
+            steps=[0, 6],
+            members=["1", "2"],
+        )
         products = b._search()
         assert len(products) == 1 * 2 * 2  # 1 cycle × 2 steps × 2 members
         assert products[0].id == "gefs.2024060100.f000.m1"
@@ -276,7 +291,9 @@ class TestCentreFor:
         assert b._centre_for("herbie") is first
         assert built == ["herbie"]
 
-    def test_threads_show_progress_onto_centre(self, mini_catalog, tmp_path, fake_pyramids):
+    def test_threads_show_progress_onto_centre(
+        self, mini_catalog, tmp_path, fake_pyramids
+    ):
         """download(progress_bar=False) sets show_progress on the centre (L4)."""
         b = _make(mini_catalog, tmp_path)
         b._centres["herbie"] = _CountingCentre(tmp_path)
@@ -287,7 +304,9 @@ class TestCentreFor:
 class TestFetch:
     """Tests for the GRIB2 -> cropped COG pipeline."""
 
-    def test_fetch_writes_one_cog_per_product(self, mini_catalog, tmp_path, fake_pyramids):
+    def test_fetch_writes_one_cog_per_product(
+        self, mini_catalog, tmp_path, fake_pyramids
+    ):
         """_fetch opens, crops, and writes one COG per (cycle, step)."""
         b = _make(mini_catalog, tmp_path, steps=[0, 6])
         b._centres["herbie"] = _CountingCentre(tmp_path)
@@ -304,7 +323,10 @@ class TestFetch:
         b = _make(mini_catalog, tmp_path)
         b._centres["herbie"] = _CountingCentre(tmp_path)
         paths = b.download(progress_bar=False)
-        assert [p.name for p in paths] == ["gfs_2024060100_f000.tif", "gfs_2024060112_f000.tif"]
+        assert [p.name for p in paths] == [
+            "gfs_2024060100_f000.tif",
+            "gfs_2024060112_f000.tif",
+        ]
 
     def test_api_composes_search_fetch(self, mini_catalog, tmp_path, fake_pyramids):
         """_api() composes _search + _fetch into the COG list."""
@@ -386,7 +408,9 @@ class TestAggregate:
         """Aggregating an empty stack is a no-op."""
         assert _make(mini_catalog, tmp_path)._aggregate([], self._config()) == []
 
-    def test_reduces_stack_to_per_window_cogs(self, mini_catalog, tmp_path, fake_aggregate):
+    def test_reduces_stack_to_per_window_cogs(
+        self, mini_catalog, tmp_path, fake_aggregate
+    ):
         """Two cycles in one daily window collapse to a single window COG."""
         b = _make(mini_catalog, tmp_path)
         paths = [
@@ -398,18 +422,28 @@ class TestAggregate:
         assert out[0].name == "gfs_mean_1D_2024060100.tif"
         assert len(fake_aggregate["written"]) == 1
 
-    def test_accumulated_field_warns(self, mini_catalog, tmp_path, fake_aggregate, monkeypatch):
+    def test_accumulated_field_warns(
+        self, mini_catalog, tmp_path, fake_aggregate, monkeypatch
+    ):
         """Aggregating an accumulated (*_acc) band logs a warning (M3)."""
         warnings = []
-        monkeypatch.setattr(backend_mod.logger, "warning", lambda msg: warnings.append(msg))
-        b = _make(mini_catalog, tmp_path, variables={"icon-global": ["precipitation_acc"]})
+        monkeypatch.setattr(
+            backend_mod.logger, "warning", lambda msg: warnings.append(msg)
+        )
+        b = _make(
+            mini_catalog, tmp_path, variables={"icon-global": ["precipitation_acc"]}
+        )
         b._aggregate([tmp_path / "icon-global_2024060100_f000.tif"], self._config())
         assert any("accumulated" in m for m in warnings), warnings
 
-    def test_instantaneous_field_no_warn(self, mini_catalog, tmp_path, fake_aggregate, monkeypatch):
+    def test_instantaneous_field_no_warn(
+        self, mini_catalog, tmp_path, fake_aggregate, monkeypatch
+    ):
         """A non-accumulated band aggregates without the accumulation warning."""
         warnings = []
-        monkeypatch.setattr(backend_mod.logger, "warning", lambda msg: warnings.append(msg))
+        monkeypatch.setattr(
+            backend_mod.logger, "warning", lambda msg: warnings.append(msg)
+        )
         b = _make(mini_catalog, tmp_path, variables={"gfs": ["temperature_2m"]})
         b._aggregate([tmp_path / "gfs_2024060100_f000.tif"], self._config())
         assert not any("accumulated" in m for m in warnings), warnings
@@ -424,11 +458,15 @@ class TestAggregate:
         with pytest.raises(ValueError, match="single model"):
             b._aggregate([tmp_path / "gfs_2024060100_f000.tif"], self._config())
 
-    def test_download_with_aggregate(self, mini_catalog, tmp_path, fake_pyramids, fake_aggregate):
+    def test_download_with_aggregate(
+        self, mini_catalog, tmp_path, fake_pyramids, fake_aggregate
+    ):
         """download(aggregate=...) fetches then reduces the stack end to end."""
         b = _make(mini_catalog, tmp_path)
         b._centres["herbie"] = _CountingCentre(tmp_path)
-        out = b.download(progress_bar=False, aggregate=self._config(freq="1D", op="mean"))
+        out = b.download(
+            progress_bar=False, aggregate=self._config(freq="1D", op="mean")
+        )
         assert len(out) == 1 and out[0].name.startswith("gfs_mean_1D_")
 
 

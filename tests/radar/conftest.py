@@ -37,7 +37,7 @@ class _FakeS3:
             prefixes: set[str] = set()
             contents: list[str] = []
             for k in keys:
-                rest = k[len(Prefix):]
+                rest = k[len(Prefix) :]
                 if Delimiter in rest:
                     prefixes.add(Prefix + rest.split(Delimiter, 1)[0] + Delimiter)
                 else:

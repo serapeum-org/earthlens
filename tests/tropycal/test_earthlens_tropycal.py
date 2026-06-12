@@ -44,10 +44,7 @@ class TestFacadeRouting:
 
     def test_key_resolves_to_class(self):
         """The `tropycal` key resolves to `earthlens.tropycal.TropicalCyclone`."""
-        assert (
-            EarthLens.DataSources["tropycal"]
-            is earthlens.tropycal.TropicalCyclone
-        )
+        assert EarthLens.DataSources["tropycal"] is earthlens.tropycal.TropicalCyclone
 
     def test_facade_builds_backend(self, tmp_path: Path):
         """The facade binds a TropicalCyclone instance as its datasource."""

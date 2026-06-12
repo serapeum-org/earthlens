@@ -122,7 +122,9 @@ class TestConstruction:
 class TestSearchAndUrl:
     """`_search` chunking and URL shaping."""
 
-    def test_url_carries_bbox_in_wsen_order(self, tmp_path: Path, fake_firms: _FakeFirms):
+    def test_url_carries_bbox_in_wsen_order(
+        self, tmp_path: Path, fake_firms: _FakeFirms
+    ):
         """The bbox path segment is W,S,E,N and the sensor + key appear."""
         backend = _make_backend(tmp_path)
         backend.download(progress_bar=False)
@@ -257,9 +259,7 @@ class TestCoverageWarning:
         self, tmp_path: Path, fake_firms: _FakeFirms, warnings_log: list[str]
     ):
         """A 2019 window on an NRT sensor warns and names the _SP variant."""
-        backend = _make_backend(
-            tmp_path, start="2019-01-01", end="2019-01-01"
-        )
+        backend = _make_backend(tmp_path, start="2019-01-01", end="2019-01-01")
         backend.download(progress_bar=False)
         assert any("VIIRS_SNPP_SP" in msg for msg in warnings_log)
 
@@ -301,7 +301,9 @@ class TestConstructionGuards:
 class TestWrite:
     """Output-format selection."""
 
-    def test_geojson_format_writes_geojson(self, tmp_path: Path, fake_firms: _FakeFirms):
+    def test_geojson_format_writes_geojson(
+        self, tmp_path: Path, fake_firms: _FakeFirms
+    ):
         """file_format='geojson' writes a .geojson file."""
         backend = _make_backend(tmp_path, file_format="geojson")
         backend.download(progress_bar=False)
@@ -367,7 +369,9 @@ class TestCoverageWarningExtra:
             code="MODIS_SP",
             family="MODIS",
             resolution_m=1000,
-            temporal=Temporal(start=dt.date(2000, 11, 1), end=dt.date(2026, 2, 28), quality="SP"),
+            temporal=Temporal(
+                start=dt.date(2000, 11, 1), end=dt.date(2026, 2, 28), quality="SP"
+            ),
         )
         backend._warn_if_out_of_coverage(
             sensor, dt.date(2026, 5, 1), dt.date(2026, 5, 10)
@@ -418,7 +422,9 @@ class TestCoverageWarningExtra:
 class TestApiComposition:
     """The canonical `_api` / `_fetch` composition (non-progress path)."""
 
-    def test_api_composes_search_and_fetch(self, tmp_path: Path, fake_firms: _FakeFirms):
+    def test_api_composes_search_and_fetch(
+        self, tmp_path: Path, fake_firms: _FakeFirms
+    ):
         """_api() runs the search/fetch split and returns per-chunk collections."""
         backend = _make_backend(tmp_path)
         collections = backend._api()

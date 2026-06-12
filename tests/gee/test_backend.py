@@ -428,7 +428,9 @@ class TestInit:
             GEE(**defaults)
         assert loads == 0
 
-    def test_construct_without_credentials_is_lazy(self, fake_ee, tmp_path, monkeypatch):
+    def test_construct_without_credentials_is_lazy(
+        self, fake_ee, tmp_path, monkeypatch
+    ):
         """The constructor takes no credentials and never authenticates."""
         monkeypatch.delenv("GEE_SERVICE_ACCOUNT", raising=False)
         monkeypatch.delenv("GEE_SERVICE_KEY", raising=False)
@@ -463,7 +465,9 @@ class TestInit:
         with pytest.raises(AuthenticationError, match="needs either service_account"):
             gee.authenticate()
 
-    def test_authenticate_with_explicit_credentials(self, fake_ee, tmp_path, monkeypatch):
+    def test_authenticate_with_explicit_credentials(
+        self, fake_ee, tmp_path, monkeypatch
+    ):
         """Explicit service_account/service_key passed to authenticate() are used."""
         monkeypatch.delenv("GEE_SERVICE_ACCOUNT", raising=False)
         monkeypatch.delenv("GEE_SERVICE_KEY", raising=False)

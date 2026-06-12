@@ -91,9 +91,7 @@ class TestEarthdataAuth:
         monkeypatch.delenv("EARTHDATA_PASSWORD", raising=False)
         monkeypatch.delenv("EARTHDATA_TOKEN", raising=False)
         auth = EarthdataAuth(
-            EarthdataCredentials(
-                token="jwt-token", netrc_path=Path("/no/such/netrc")
-            )
+            EarthdataCredentials(token="jwt-token", netrc_path=Path("/no/such/netrc"))
         )
         auth.configure()
         assert auth.is_authenticated() is True

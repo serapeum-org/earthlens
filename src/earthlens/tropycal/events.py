@@ -408,7 +408,9 @@ def recon_to_fc(
             "lat": kept["_lat"].to_numpy(),
             "lon": kept["_lon"].to_numpy(),
             "wspd_kt": pd.to_numeric(_column(kept, "wspd"), errors="coerce").to_numpy(),
-            "pres_hpa": pd.to_numeric(_column(kept, "p_sfc"), errors="coerce").to_numpy(),
+            "pres_hpa": pd.to_numeric(
+                _column(kept, "p_sfc"), errors="coerce"
+            ).to_numpy(),
             "temp_c": pd.to_numeric(_column(kept, "temp"), errors="coerce").to_numpy(),
         }
     )
@@ -518,7 +520,9 @@ def _points_to_fc(fixes: pd.DataFrame, source: str) -> FeatureCollection:
             "lat": fixes["_lat"].to_numpy(),
             "lon": fixes["_lon"].to_numpy(),
             "vmax_kt": vmax.to_numpy(),
-            "mslp_hpa": pd.to_numeric(_column(fixes, "mslp"), errors="coerce").to_numpy(),
+            "mslp_hpa": pd.to_numeric(
+                _column(fixes, "mslp"), errors="coerce"
+            ).to_numpy(),
             "storm_type": _column(fixes, "type").to_numpy(),
             "category": _categories(vmax).to_numpy(),
             "basin": _column(fixes, "wmo_basin").to_numpy(),
@@ -584,7 +588,9 @@ def _track_row(
     positioned = in_window.dropna(subset=["_lat", "_lon"])
     if len(positioned) < 2:
         return None
-    coords = list(zip(positioned["_lon"].astype(float), positioned["_lat"].astype(float)))
+    coords = list(
+        zip(positioned["_lon"].astype(float), positioned["_lat"].astype(float))
+    )
     vmax = pd.to_numeric(in_window.get("vmax"), errors="coerce")
     mslp = pd.to_numeric(in_window.get("mslp"), errors="coerce")
     max_vmax = float(vmax.max()) if vmax.notna().any() else float("nan")

@@ -160,8 +160,12 @@ class TestCatalog:
 
         cat = Catalog(
             datasets={
-                "north_atlantic": Basin(name="NA", sources=["ibtracs"], fields={"vmax": {"units": "kt"}}),
-                "nosrc": Basin(name="NoSrc", sources=[], fields={"vmax": {"units": "kt"}}),
+                "north_atlantic": Basin(
+                    name="NA", sources=["ibtracs"], fields={"vmax": {"units": "kt"}}
+                ),
+                "nosrc": Basin(
+                    name="NoSrc", sources=[], fields={"vmax": {"units": "kt"}}
+                ),
                 "broken": Basin(name="Broken", sources=["jtwc"], fields={}),
             }
         )

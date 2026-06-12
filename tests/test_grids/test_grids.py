@@ -94,7 +94,9 @@ class TestFromOrca:
     def test_mismatched_shapes_raise(self):
         """Coordinate/data arrays of differing shape are rejected."""
         with pytest.raises(ValueError, match="same shape"):
-            from_orca(np.zeros((2, 3)), np.zeros((2, 2)), np.zeros((2, 3)), cell_size=0.5)
+            from_orca(
+                np.zeros((2, 3)), np.zeros((2, 2)), np.zeros((2, 3)), cell_size=0.5
+            )
 
     def test_non_2d_input_raises(self):
         """1-D inputs are rejected (ORCA needs a 2-D mesh)."""
@@ -104,7 +106,9 @@ class TestFromOrca:
     def test_too_small_grid_raises(self):
         """A grid smaller than 2x2 cannot form quad cells."""
         with pytest.raises(ValueError, match="at least 2 x 2"):
-            from_orca(np.zeros((1, 3)), np.zeros((1, 3)), np.zeros((1, 3)), cell_size=0.5)
+            from_orca(
+                np.zeros((1, 3)), np.zeros((1, 3)), np.zeros((1, 3)), cell_size=0.5
+            )
 
     def test_nan_values_are_tolerated(self):
         """NaN-masked nodes are averaged away without raising (all-NaN face path)."""

@@ -197,7 +197,9 @@ def feature_collections_to_dataframe(
     if not fcs:
         return pd.DataFrame()
     retrying = _retry_on_transient_errors(
-        feature_collection_to_dataframe, tries=tries, backoff=backoff,
+        feature_collection_to_dataframe,
+        tries=tries,
+        backoff=backoff,
     )
     with Pool(pool_size) as pool:
         frames = pool.map(retrying, fcs)
@@ -229,7 +231,9 @@ def feature_collection_to_gdf(
     rows = []
     for feature in payload.get("features", []):
         row = dict(feature.get("properties", {}))
-        row["geometry"] = shape(feature["geometry"]) if feature.get("geometry") else None
+        row["geometry"] = (
+            shape(feature["geometry"]) if feature.get("geometry") else None
+        )
         rows.append(row)
     crs_str = f"EPSG:{crs}" if isinstance(crs, int) else crs
     if not rows:

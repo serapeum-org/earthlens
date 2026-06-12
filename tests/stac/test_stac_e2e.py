@@ -37,9 +37,14 @@ class TestEarthSearchE2E:
     def test_sentinel2_writes_cog(self, tmp_path: Path):
         """A one-item Sentinel-2 pull over Madrid writes a readable COG."""
         stac = STAC(
-            start=_START, end=_END, variables={"sentinel-2-l2a": ["red"]},
-            lat_lim=_LAT, lon_lim=_LON, path=str(tmp_path),
-            endpoint="earth-search", max_items=1,
+            start=_START,
+            end=_END,
+            variables={"sentinel-2-l2a": ["red"]},
+            lat_lim=_LAT,
+            lon_lim=_LON,
+            path=str(tmp_path),
+            endpoint="earth-search",
+            max_items=1,
         )
         paths = stac.download()
         assert paths, "expected at least one COG written"
@@ -55,9 +60,14 @@ class TestPlanetaryComputerE2E:
         """A one-item Sentinel-2 pull from MPC writes a readable COG."""
         pytest.importorskip("pystac_client", reason="MPC e2e needs pystac-client")
         stac = STAC(
-            start=_START, end=_END, variables={"sentinel-2-l2a": ["B04"]},
-            lat_lim=_LAT, lon_lim=_LON, path=str(tmp_path),
-            endpoint="planetary-computer", max_items=1,
+            start=_START,
+            end=_END,
+            variables={"sentinel-2-l2a": ["B04"]},
+            lat_lim=_LAT,
+            lon_lim=_LON,
+            path=str(tmp_path),
+            endpoint="planetary-computer",
+            max_items=1,
         )
         paths = stac.download()
         assert paths, "expected at least one COG written"
@@ -76,9 +86,14 @@ class TestCdseE2E:
     def test_sentinel2_writes_cog(self, tmp_path: Path):
         """A one-item CDSE Sentinel-2 pull writes a readable COG."""
         stac = STAC(
-            start=_START, end=_END, variables={"sentinel-2-l2a": ["B04"]},
-            lat_lim=_LAT, lon_lim=_LON, path=str(tmp_path),
-            endpoint="cdse", max_items=1,
+            start=_START,
+            end=_END,
+            variables={"sentinel-2-l2a": ["B04"]},
+            lat_lim=_LAT,
+            lon_lim=_LON,
+            path=str(tmp_path),
+            endpoint="cdse",
+            max_items=1,
         )
         paths = stac.download()
         assert paths, "expected at least one COG written"

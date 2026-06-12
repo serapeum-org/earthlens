@@ -19,9 +19,13 @@ def test_amazon_s3_routes_to_the_s3_backend(fake_client_factory, patch_auth):
     """EarthLens('amazon-s3', ...) builds the S3 backend and forwards dataset=."""
     patch_auth(fake_client_factory())
     facade = EarthLens(
-        variables=None, data_source="amazon-s3",
-        start="2021-01-01", end="2021-01-01",
-        lat_lim=[0.4, 0.6], lon_lim=[6.4, 6.6], dataset="copernicus-dem",
+        variables=None,
+        data_source="amazon-s3",
+        start="2021-01-01",
+        end="2021-01-01",
+        lat_lim=[0.4, 0.6],
+        lon_lim=[6.4, 6.6],
+        dataset="copernicus-dem",
     )
     assert isinstance(facade.datasource, S3)
     assert facade.datasource._dataset.bucket == "copernicus-dem-30m"

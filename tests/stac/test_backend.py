@@ -56,17 +56,24 @@ class TestInitialize:
     def test_opens_client_with_endpoint_url(self, fake_pyramids, tmp_path):
         """The client is opened against the endpoint's URL (lazily, on first use)."""
         stac = _build_stac(tmp_path, endpoint="earth-search")
-        assert not fake_pyramids.open_client_calls, "construction must not open a client"
+        assert (
+            not fake_pyramids.open_client_calls
+        ), "construction must not open a client"
         _ = stac.client
-        assert fake_pyramids.open_client_calls[0]["url"].startswith("https://earth-search")
+        assert fake_pyramids.open_client_calls[0]["url"].startswith(
+            "https://earth-search"
+        )
 
     def test_signer_selected_per_endpoint(self, fake_pyramids, tmp_path):
         """Each endpoint binds the signer its catalog row names."""
         s_es = _build_stac(tmp_path, endpoint="earth-search")
         s_pc = _build_stac(tmp_path, endpoint="planetary-computer")
         s_cdse = _build_stac(
-            tmp_path, endpoint="cdse", variables={"sentinel-1-grd": ["vv"]},
-            access_key="ak", secret_key="sk",
+            tmp_path,
+            endpoint="cdse",
+            variables={"sentinel-1-grd": ["vv"]},
+            access_key="ak",
+            secret_key="sk",
         )
         assert s_es._signer.name == "anonymous"
         assert s_pc._signer.name == "planetary-computer"
@@ -75,9 +82,12 @@ class TestInitialize:
     def test_endpoint_inferred_from_first_collection(self, fake_pyramids, tmp_path):
         """With no endpoint kwarg the home endpoint of the first collection is used."""
         stac = STAC(
-            start="2024-01-01", end="2024-01-02",
+            start="2024-01-01",
+            end="2024-01-02",
             variables={"sentinel-2-l2a": ["B04"]},
-            lat_lim=[0.0, 1.0], lon_lim=[0.0, 1.0], path=str(tmp_path),
+            lat_lim=[0.0, 1.0],
+            lon_lim=[0.0, 1.0],
+            path=str(tmp_path),
         )
         assert stac._endpoint == "planetary-computer"
 
@@ -85,17 +95,24 @@ class TestInitialize:
         """A collection not served by the chosen endpoint is rejected, not mis-queried."""
         with pytest.raises(ValueError, match="not served by endpoint"):
             STAC(
-                start="2024-01-01", end="2024-01-02",
+                start="2024-01-01",
+                end="2024-01-02",
                 variables={"landsat-c2-l2": ["red"], "sentinel-1-grd": ["vv"]},
-                lat_lim=[0.0, 1.0], lon_lim=[0.0, 1.0], path=str(tmp_path),
+                lat_lim=[0.0, 1.0],
+                lon_lim=[0.0, 1.0],
+                path=str(tmp_path),
             )
 
     def test_empty_variables_raises(self, fake_pyramids, tmp_path):
         """An empty variables mapping is rejected."""
         with pytest.raises(ValueError, match="at least one collection"):
             STAC(
-                start="2024-01-01", end="2024-01-02", variables={},
-                lat_lim=[40.0, 41.0], lon_lim=[-4.0, -3.0], path=str(tmp_path),
+                start="2024-01-01",
+                end="2024-01-02",
+                variables={},
+                lat_lim=[40.0, 41.0],
+                lon_lim=[-4.0, -3.0],
+                path=str(tmp_path),
                 endpoint="earth-search",
             )
 
@@ -123,9 +140,12 @@ class TestGridAndDates:
     def test_crossing_aoi_splits_into_two_bboxes(self, fake_pyramids, tmp_path):
         """A west>east lon_lim is split into an eastern + western half."""
         stac = STAC(
-            start="2024-01-01", end="2024-01-02",
+            start="2024-01-01",
+            end="2024-01-02",
             variables={"sentinel-2-l2a": ["B04"]},
-            lat_lim=[0.0, 10.0], lon_lim=[170.0, -170.0], path=str(tmp_path),
+            lat_lim=[0.0, 10.0],
+            lon_lim=[170.0, -170.0],
+            path=str(tmp_path),
             endpoint="earth-search",
         )
         assert stac._bboxes() == [
@@ -136,9 +156,12 @@ class TestGridAndDates:
     def test_crossing_aoi_envelope_is_full_longitude(self, fake_pyramids, tmp_path):
         """The gross self.space envelope spans -180..180 for a crossing AOI."""
         stac = STAC(
-            start="2024-01-01", end="2024-01-02",
+            start="2024-01-01",
+            end="2024-01-02",
             variables={"sentinel-2-l2a": ["B04"]},
-            lat_lim=[0.0, 10.0], lon_lim=[170.0, -170.0], path=str(tmp_path),
+            lat_lim=[0.0, 10.0],
+            lon_lim=[170.0, -170.0],
+            path=str(tmp_path),
             endpoint="earth-search",
         )
         assert (stac.space.west, stac.space.east) == (-180.0, 180.0)
@@ -166,7 +189,9 @@ class TestSearch:
         fake_pyramids.items_by_collection["sentinel-2-c1-l2a"] = [
             make_item("a", "2024-01-05", {})
         ]
-        stac = _build_stac(tmp_path, endpoint="earth-search", variables={"sentinel-2-l2a": []})
+        stac = _build_stac(
+            tmp_path, endpoint="earth-search", variables={"sentinel-2-l2a": []}
+        )
         products = stac._search()
         assert products[0].metadata["assets"] == ["B02", "B03", "B04", "B08"]
 
@@ -175,10 +200,16 @@ class TestSearch:
 class TestFetch:
     """_fetch mosaics per (collection, date) and writes one COG per group."""
 
-    def test_single_tile_merges_each_band_and_writes_one_cog(self, fake_pyramids, tmp_path):
+    def test_single_tile_merges_each_band_and_writes_one_cog(
+        self, fake_pyramids, tmp_path
+    ):
         """One tile per date mosaics each band, stacks, and writes one COG."""
         fake_pyramids.items_by_collection["sentinel-2-c1-l2a"] = [
-            make_item("a", "2024-01-05", {"B04": "https://h/a_b04.tif", "B08": "https://h/a_b08.tif"})
+            make_item(
+                "a",
+                "2024-01-05",
+                {"B04": "https://h/a_b04.tif", "B08": "https://h/a_b08.tif"},
+            )
         ]
         stac = _build_stac(tmp_path, endpoint="earth-search")
         paths = stac._fetch(stac._search())
@@ -190,21 +221,39 @@ class TestFetch:
     def test_multi_tile_calls_merge_per_band(self, fake_pyramids, tmp_path):
         """Two tiles on one date are mosaicked per band before stacking."""
         fake_pyramids.items_by_collection["sentinel-2-c1-l2a"] = [
-            make_item("a", "2024-01-05", {"B04": "https://h/a_b04.tif", "B08": "https://h/a_b08.tif"}),
-            make_item("b", "2024-01-05", {"B04": "https://h/b_b04.tif", "B08": "https://h/b_b08.tif"}),
+            make_item(
+                "a",
+                "2024-01-05",
+                {"B04": "https://h/a_b04.tif", "B08": "https://h/a_b08.tif"},
+            ),
+            make_item(
+                "b",
+                "2024-01-05",
+                {"B04": "https://h/b_b04.tif", "B08": "https://h/b_b08.tif"},
+            ),
         ]
         stac = _build_stac(tmp_path, endpoint="earth-search")
         stac._fetch(stac._search())
         assert len(fake_pyramids.merge_calls) == 2
 
-    def test_mixed_resolution_bands_use_aligned_stack_bands(self, fake_pyramids, tmp_path):
+    def test_mixed_resolution_bands_use_aligned_stack_bands(
+        self, fake_pyramids, tmp_path
+    ):
         """Mixed-resolution bands stack via stack_bands(align=True) with a dtype-safe nodata."""
         fake_pyramids.items_by_collection["sentinel-2-c1-l2a"] = [
-            make_item("a", "2024-01-05", {"B04": "https://h/a_b04.tif", "B08": "https://h/a_b08.tif"})
+            make_item(
+                "a",
+                "2024-01-05",
+                {"B04": "https://h/a_b04.tif", "B08": "https://h/a_b08.tif"},
+            )
         ]
         # the B08 band mosaic comes back at a coarser grid than B04
         fake_pyramids.dataset_shapes = {"_B08_": (1, 1, 1)}
-        stac = _build_stac(tmp_path, endpoint="earth-search", variables={"sentinel-2-l2a": ["B04", "B08"]})
+        stac = _build_stac(
+            tmp_path,
+            endpoint="earth-search",
+            variables={"sentinel-2-l2a": ["B04", "B08"]},
+        )
         paths = stac._fetch(stac._search())
         assert len(paths) == 1
         assert len(fake_pyramids.stack_calls) == 1
@@ -215,7 +264,11 @@ class TestFetch:
     def test_same_resolution_bands_use_stack_bands(self, fake_pyramids, tmp_path):
         """Same-grid bands also stack via stack_bands(align=True), preserving band names."""
         fake_pyramids.items_by_collection["sentinel-2-c1-l2a"] = [
-            make_item("a", "2024-01-05", {"B04": "https://h/a_b04.tif", "B08": "https://h/a_b08.tif"})
+            make_item(
+                "a",
+                "2024-01-05",
+                {"B04": "https://h/a_b04.tif", "B08": "https://h/a_b08.tif"},
+            )
         ]
         stac = _build_stac(tmp_path, endpoint="earth-search")
         stac._fetch(stac._search())
@@ -228,10 +281,14 @@ class TestFetch:
         fake_pyramids.items_by_collection["sentinel-2-c1-l2a"] = [
             make_item("a", "2024-01-05", {"B04": "https://h/a.tif"})
         ]
-        stac = _build_stac(tmp_path, endpoint="earth-search", variables={"sentinel-2-l2a": ["B04"]})
+        stac = _build_stac(
+            tmp_path, endpoint="earth-search", variables={"sentinel-2-l2a": ["B04"]}
+        )
         stac._fetch(stac._search())
         cropped = fake_pyramids.write_data[-1]
-        assert cropped.cropped_epsg == 4326, "crop bbox must be declared in WGS84 (EPSG:4326)"
+        assert (
+            cropped.cropped_epsg == 4326
+        ), "crop bbox must be declared in WGS84 (EPSG:4326)"
         assert cropped.cropped_bbox == [-4.0, 40.0, -3.0, 41.0]
 
     def test_fetch_wraps_in_cloudconfig_with_gdal_env(self, fake_pyramids, tmp_path):
@@ -240,8 +297,11 @@ class TestFetch:
             make_item("a", "2024-01-05", {"vv": "https://h/a_vv.tif"})
         ]
         stac = _build_stac(
-            tmp_path, endpoint="cdse", variables={"sentinel-1-grd": ["vv"]},
-            access_key="ak", secret_key="sk",
+            tmp_path,
+            endpoint="cdse",
+            variables={"sentinel-1-grd": ["vv"]},
+            access_key="ak",
+            secret_key="sk",
         )
         stac._fetch(stac._search())
         assert _FakeCloudConfig.active_extras[-1]["AWS_S3_ENDPOINT"]
@@ -259,7 +319,9 @@ class TestFetch:
             make_item("b", "2024-01-05", {"B04": "https://h/b_b04.tif"}),
         ]
         stac = _build_stac(
-            tmp_path, endpoint="planetary-computer", variables={"sentinel-2-l2a": ["B04"]}
+            tmp_path,
+            endpoint="planetary-computer",
+            variables={"sentinel-2-l2a": ["B04"]},
         )
         stac._fetch(stac._search())
         merged_src = fake_pyramids.merge_calls[0][0]
@@ -272,19 +334,29 @@ class TestFetch:
             make_item("west", "2024-01-05", {"B04": "https://h/west.tif"}),
         ]
         stac = STAC(
-            start="2024-01-01", end="2024-01-31",
+            start="2024-01-01",
+            end="2024-01-31",
             variables={"sentinel-2-l2a": ["B04"]},
-            lat_lim=[0.0, 10.0], lon_lim=[170.0, -170.0], path=str(tmp_path),
+            lat_lim=[0.0, 10.0],
+            lon_lim=[170.0, -170.0],
+            path=str(tmp_path),
             endpoint="earth-search",
         )
         names = sorted(p.name for p in stac._fetch(stac._search()))
-        assert names == ["sentinel-2-l2a_2024-01-05_part0.tif", "sentinel-2-l2a_2024-01-05_part1.tif"]
+        assert names == [
+            "sentinel-2-l2a_2024-01-05_part0.tif",
+            "sentinel-2-l2a_2024-01-05_part1.tif",
+        ]
 
     def test_cross_crs_tiles_set_merge_dst_crs(self, fake_pyramids, tmp_path):
         """Tiles with differing proj:epsg make merge_rasters reproject via dst_crs."""
         fake_pyramids.items_by_collection["sentinel-2-c1-l2a"] = [
-            make_item("a", "2024-01-05", {"B04": "https://h/a_b04.tif"}, proj_epsg=32630),
-            make_item("b", "2024-01-05", {"B04": "https://h/b_b04.tif"}, proj_epsg=32631),
+            make_item(
+                "a", "2024-01-05", {"B04": "https://h/a_b04.tif"}, proj_epsg=32630
+            ),
+            make_item(
+                "b", "2024-01-05", {"B04": "https://h/b_b04.tif"}, proj_epsg=32631
+            ),
         ]
         stac = _build_stac(
             tmp_path, endpoint="earth-search", variables={"sentinel-2-l2a": ["B04"]}
@@ -299,7 +371,10 @@ class TestFetch:
             make_item("a", "2024-01-05", {"B04": "https://h/a.tif"}, proj_epsg=32630)
         ]
         stac = _build_stac(
-            tmp_path, endpoint="earth-search", variables={"sentinel-2-l2a": ["B04"]}, epsg=3857
+            tmp_path,
+            endpoint="earth-search",
+            variables={"sentinel-2-l2a": ["B04"]},
+            epsg=3857,
         )
         stac._fetch(stac._search())
         assert fake_pyramids.merge_calls[0][2]["dst_crs"] == 3857
@@ -309,14 +384,18 @@ class TestFetch:
         fake_pyramids.items_by_collection["sentinel-2-c1-l2a"] = [
             make_item("a", "2024-01-05", {"B04": "https://h/a.tif"})
         ]
-        stac = _build_stac(tmp_path, endpoint="earth-search", variables={"sentinel-2-l2a": ["B04"]})
+        stac = _build_stac(
+            tmp_path, endpoint="earth-search", variables={"sentinel-2-l2a": ["B04"]}
+        )
         stac._fetch(stac._search())
         assert fake_pyramids.stack_calls[0]["no_data_value"] == 0
         assert fake_pyramids.merge_calls[0][2]["no_data_value"] == 0
 
     def test_nodata_for_reads_catalog_else_zero(self, fake_pyramids, tmp_path):
         """_nodata_for returns the catalog asset nodata, else 0 (dtype-safe)."""
-        stac = _build_stac(tmp_path, endpoint="earth-search", variables={"sentinel-2-l2a": ["B04"]})
+        stac = _build_stac(
+            tmp_path, endpoint="earth-search", variables={"sentinel-2-l2a": ["B04"]}
+        )
         assert stac._nodata_for("sentinel-2-l2a", ["B04"]) == 0
         assert stac._nodata_for("no-such-collection", ["x"]) == 0
 
@@ -325,14 +404,20 @@ class TestFetch:
         fake_pyramids.items_by_collection["sentinel-2-c1-l2a"] = [
             make_item("a", "2024-01-05", {"B04": "https://h/a.tif"})
         ]
-        stac = _build_stac(tmp_path, endpoint="earth-search", variables={"sentinel-2-l2a": ["B04"]})
+        stac = _build_stac(
+            tmp_path, endpoint="earth-search", variables={"sentinel-2-l2a": ["B04"]}
+        )
         assert len(stac._api()) == 1
 
     def test_same_crs_tiles_leave_dst_crs_none(self, fake_pyramids, tmp_path):
         """Tiles sharing proj:epsg keep their native CRS (dst_crs=None)."""
         fake_pyramids.items_by_collection["sentinel-2-c1-l2a"] = [
-            make_item("a", "2024-01-05", {"B04": "https://h/a_b04.tif"}, proj_epsg=32630),
-            make_item("b", "2024-01-05", {"B04": "https://h/b_b04.tif"}, proj_epsg=32630),
+            make_item(
+                "a", "2024-01-05", {"B04": "https://h/a_b04.tif"}, proj_epsg=32630
+            ),
+            make_item(
+                "b", "2024-01-05", {"B04": "https://h/b_b04.tif"}, proj_epsg=32630
+            ),
         ]
         stac = _build_stac(
             tmp_path, endpoint="earth-search", variables={"sentinel-2-l2a": ["B04"]}
@@ -348,7 +433,9 @@ class TestDownload:
     def test_download_returns_written_paths(self, fake_pyramids, tmp_path):
         """download() returns one COG path per (collection, date) group."""
         fake_pyramids.items_by_collection["sentinel-2-c1-l2a"] = [
-            make_item("a", "2024-01-05", {"B04": "https://h/a.tif", "B08": "https://h/b.tif"})
+            make_item(
+                "a", "2024-01-05", {"B04": "https://h/a.tif", "B08": "https://h/b.tif"}
+            )
         ]
         stac = _build_stac(tmp_path, endpoint="earth-search")
         assert len(stac.download()) == 1
@@ -361,9 +448,15 @@ class TestDownload:
             make_item("a", "2024-01-05", {"B04": "https://h/a.tif"}),
             make_item("b", "2024-01-20", {"B04": "https://h/b.tif"}),
         ]
-        stac = _build_stac(tmp_path, endpoint="earth-search", variables={"sentinel-2-l2a": ["B04"]})
-        out = stac.download(aggregate=AggregationConfig(freq="1MS", out_dir=tmp_path / "agg"))
-        assert len(out) == 1, f"two Jan dates should reduce to one monthly COG, got {out}"
+        stac = _build_stac(
+            tmp_path, endpoint="earth-search", variables={"sentinel-2-l2a": ["B04"]}
+        )
+        out = stac.download(
+            aggregate=AggregationConfig(freq="1MS", out_dir=tmp_path / "agg")
+        )
+        assert (
+            len(out) == 1
+        ), f"two Jan dates should reduce to one monthly COG, got {out}"
         assert out[0].name == "sentinel-2-l2a_mean_1MS_20240101.tif"
         # the intermediate per-date COGs are cleaned up (M3)
         assert not (tmp_path / "sentinel-2-l2a_2024-01-05.tif").exists()
@@ -377,16 +470,22 @@ class TestSignerOverride:
     def test_override_resolves_to_requester_pays(self, fake_pyramids, tmp_path):
         """earth-search/landsat-c2-l2 reads with aws-requester-pays, not anonymous."""
         stac = _build_stac(
-            tmp_path, endpoint="earth-search", variables={"earth-search/landsat-c2-l2": ["red"]}
+            tmp_path,
+            endpoint="earth-search",
+            variables={"earth-search/landsat-c2-l2": ["red"]},
         )
-        assert stac._signer_for("earth-search/landsat-c2-l2").name == "aws-requester-pays"
+        assert (
+            stac._signer_for("earth-search/landsat-c2-l2").name == "aws-requester-pays"
+        )
         # a collection without an override keeps the endpoint (anonymous) signer
         assert stac._signer_for("sentinel-2-l2a").name == "anonymous"
 
     def test_override_signer_cached_by_type(self, fake_pyramids, tmp_path):
         """A repeated override lookup returns the same cached signer instance."""
         stac = _build_stac(
-            tmp_path, endpoint="earth-search", variables={"earth-search/landsat-c2-l2": ["red"]}
+            tmp_path,
+            endpoint="earth-search",
+            variables={"earth-search/landsat-c2-l2": ["red"]},
         )
         first = stac._signer_for("earth-search/landsat-c2-l2")
         assert stac._signer_for("earth-search/landsat-c2-l2") is first
@@ -397,10 +496,14 @@ class TestSignerOverride:
             make_item("a", "2024-01-05", {"red": "s3://usgs-landsat/x/red.tif"})
         ]
         stac = _build_stac(
-            tmp_path, endpoint="earth-search", variables={"earth-search/landsat-c2-l2": ["red"]}
+            tmp_path,
+            endpoint="earth-search",
+            variables={"earth-search/landsat-c2-l2": ["red"]},
         )
         stac._fetch(stac._search())
-        assert _FakeCloudConfig.active_extras[-1].get("AWS_REQUEST_PAYER") == "requester"
+        assert (
+            _FakeCloudConfig.active_extras[-1].get("AWS_REQUEST_PAYER") == "requester"
+        )
         assert fake_pyramids.merge_calls[0][0][0].startswith("/vsis3/usgs-landsat/")
 
 
@@ -410,7 +513,9 @@ class TestSignerCredentials:
 
     def test_signer_credentials_drops_unset_kwargs(self, fake_pyramids, tmp_path):
         """_signer_credentials returns only the set creds; unset token/client_id are dropped."""
-        stac = _build_stac(tmp_path, endpoint="earth-search", username="u", password="p")
+        stac = _build_stac(
+            tmp_path, endpoint="earth-search", username="u", password="p"
+        )
         creds = stac._signer_credentials()
         assert creds["username"] == "u"
         assert creds["password"] == "p"
@@ -423,7 +528,9 @@ class TestSignerCredentials:
         """_initialize forwards the set bearer creds to build_signer (client_id dropped)."""
         spy = _BuildSignerSpy()
         monkeypatch.setattr("earthlens.stac.signers.build_signer", spy)
-        _build_stac(tmp_path, endpoint="earth-search", username="u", password="p", token="t")
+        _build_stac(
+            tmp_path, endpoint="earth-search", username="u", password="p", token="t"
+        )
         creds = spy.calls[0][1]
         assert creds["username"] == "u"
         assert creds["password"] == "p"
@@ -444,7 +551,9 @@ class TestSignerCredentials:
             password="p",
         )
         stac._signer_for("earth-search/landsat-c2-l2")
-        override_calls = [creds for kind, creds in spy.calls if kind == "aws-requester-pays"]
+        override_calls = [
+            creds for kind, creds in spy.calls if kind == "aws-requester-pays"
+        ]
         assert override_calls and override_calls[0]["username"] == "u"
 
 
@@ -517,9 +626,18 @@ class TestModuleHelpers:
 
         bx = (0.0, 0.0, 1.0, 1.0)
         products = [
-            RemoteProduct(id="a", metadata={"collection_key": "c", "date": "2024-01-05", "bbox": bx}),
-            RemoteProduct(id="b", metadata={"collection_key": "c", "date": "2024-01-05", "bbox": bx}),
-            RemoteProduct(id="d", metadata={"collection_key": "c", "date": "2024-01-06", "bbox": bx}),
+            RemoteProduct(
+                id="a",
+                metadata={"collection_key": "c", "date": "2024-01-05", "bbox": bx},
+            ),
+            RemoteProduct(
+                id="b",
+                metadata={"collection_key": "c", "date": "2024-01-05", "bbox": bx},
+            ),
+            RemoteProduct(
+                id="d",
+                metadata={"collection_key": "c", "date": "2024-01-06", "bbox": bx},
+            ),
         ]
         groups = dict(_group_products(products))
         assert len(groups[("c", "2024-01-05", bx)]) == 2

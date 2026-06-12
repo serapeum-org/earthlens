@@ -128,7 +128,9 @@ class TestFrameToFcPoint:
 
     def test_no_match_returns_empty(self):
         """A storm wholly outside the window yields an empty point FC."""
-        frame = _frame(times=("2010-01-01 00:00", "2010-01-01 06:00", "2010-01-02 00:00"))
+        frame = _frame(
+            times=("2010-01-01 00:00", "2010-01-01 06:00", "2010-01-02 00:00")
+        )
         fc = events.frame_to_fc(
             [frame], geometry="point", window=_WINDOW, bbox=_BBOX, source="hurdat"
         )
@@ -138,7 +140,11 @@ class TestFrameToFcPoint:
     def test_empty_frame_skipped(self):
         """An empty input frame contributes nothing."""
         fc = events.frame_to_fc(
-            [pd.DataFrame()], geometry="point", window=_WINDOW, bbox=_BBOX, source="hurdat"
+            [pd.DataFrame()],
+            geometry="point",
+            window=_WINDOW,
+            bbox=_BBOX,
+            source="hurdat",
         )
         assert len(fc) == 0
 
@@ -286,8 +292,12 @@ class TestReconToFc:
     def test_maps_obs_points(self):
         """recon_to_fc maps obs to points with the recon schema + EPSG:4326."""
         fc = events.recon_to_fc(
-            _recon_frame(), storm_id="AL122005", recon_product="hdobs",
-            window=_WINDOW, bbox=_BBOX, source="hurdat",
+            _recon_frame(),
+            storm_id="AL122005",
+            recon_product="hdobs",
+            window=_WINDOW,
+            bbox=_BBOX,
+            source="hurdat",
         )
         assert len(fc) == 2
         assert set(events.RECON_COLUMNS).issubset(fc.columns)
@@ -298,8 +308,12 @@ class TestReconToFc:
     def test_none_frame_empty(self):
         """A None frame (no recon data) returns an empty recon FC."""
         fc = events.recon_to_fc(
-            None, storm_id="X", recon_product="hdobs",
-            window=_WINDOW, bbox=_BBOX, source="hurdat",
+            None,
+            storm_id="X",
+            recon_product="hdobs",
+            window=_WINDOW,
+            bbox=_BBOX,
+            source="hurdat",
         )
         assert len(fc) == 0
         assert set(events.RECON_COLUMNS).issubset(fc.columns)
@@ -310,8 +324,12 @@ class TestReconToFc:
             times=("2005-08-28 12:00", "2010-01-01 00:00"), lons=(-85.0, -85.1)
         )
         fc = events.recon_to_fc(
-            frame, storm_id="X", recon_product="hdobs",
-            window=_WINDOW, bbox=_BBOX, source="hurdat",
+            frame,
+            storm_id="X",
+            recon_product="hdobs",
+            window=_WINDOW,
+            bbox=_BBOX,
+            source="hurdat",
         )
         assert len(fc) == 1
 
@@ -319,8 +337,12 @@ class TestReconToFc:
         """When every obs is filtered out, an empty recon FC is returned."""
         frame = _recon_frame(lons=(-60.0, -55.0))  # both east of the box
         fc = events.recon_to_fc(
-            frame, storm_id="X", recon_product="hdobs",
-            window=_WINDOW, bbox=_BBOX, source="hurdat",
+            frame,
+            storm_id="X",
+            recon_product="hdobs",
+            window=_WINDOW,
+            bbox=_BBOX,
+            source="hurdat",
         )
         assert len(fc) == 0
 
@@ -329,8 +351,12 @@ class TestReconToFc:
         frame = _recon_frame()
         frame.loc[0, "wspd"] = float("nan")
         fc = events.recon_to_fc(
-            frame, storm_id="X", recon_product="hdobs",
-            window=_WINDOW, bbox=_BBOX, source="hurdat",
+            frame,
+            storm_id="X",
+            recon_product="hdobs",
+            window=_WINDOW,
+            bbox=_BBOX,
+            source="hurdat",
         )
         assert len(fc) == 2
         assert pd.isna(fc["wspd_kt"].iloc[0])
@@ -340,16 +366,24 @@ class TestReconToFc:
         frame = _recon_frame()
         frame.loc[0, "lat"] = float("nan")
         fc = events.recon_to_fc(
-            frame, storm_id="X", recon_product="hdobs",
-            window=_WINDOW, bbox=_BBOX, source="hurdat",
+            frame,
+            storm_id="X",
+            recon_product="hdobs",
+            window=_WINDOW,
+            bbox=_BBOX,
+            source="hurdat",
         )
         assert len(fc) == 1
 
     def test_concat_recon_fcs(self):
         """concat_recon_fcs unions per-storm recon collections; empty fallback."""
         a = events.recon_to_fc(
-            _recon_frame(), storm_id="A", recon_product="hdobs",
-            window=_WINDOW, bbox=_BBOX, source="hurdat",
+            _recon_frame(),
+            storm_id="A",
+            recon_product="hdobs",
+            window=_WINDOW,
+            bbox=_BBOX,
+            source="hurdat",
         )
         merged = events.concat_recon_fcs([a, events.empty_recon_fc()])
         assert len(merged) == 2

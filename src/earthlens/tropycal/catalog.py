@@ -240,9 +240,7 @@ class Catalog(AbstractCatalog):
         """
         catalog_path = catalog_path if catalog_path is not None else CATALOG_PATH
         basins = _load_basins(catalog_path)
-        return cls(
-            datasets=dict(basins), available_datasets=sorted(basins)
-        )
+        return cls(datasets=dict(basins), available_datasets=sorted(basins))
 
     def get_catalog(self) -> dict[str, Basin]:
         """Return the basin map (satisfies the abstract contract).

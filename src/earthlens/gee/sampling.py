@@ -108,7 +108,8 @@ def sample_points(
     if len(gdf) == 0:
         raise ValueError("sample_points requires a non-empty GeoDataFrame")
     non_point = [
-        (i, g.geom_type) for i, g in enumerate(gdf.geometry)
+        (i, g.geom_type)
+        for i, g in enumerate(gdf.geometry)
         if g.geom_type not in _POINT_GEOM_TYPES
     ]
     if non_point:

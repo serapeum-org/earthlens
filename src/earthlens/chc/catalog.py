@@ -476,8 +476,7 @@ def _build_chc_dataset(
         )
     except (ValidationError, KeyError) as exc:
         raise ValueError(
-            f"{source_path.name} dataset {ds_key!r} "
-            f"failed validation:\n{exc}"
+            f"{source_path.name} dataset {ds_key!r} " f"failed validation:\n{exc}"
         ) from exc
     return ds, len(ds_vars)
 
@@ -601,9 +600,7 @@ def _load_catalog_directory(
 
     index_data = load_yaml_strict(index_path) or {}
     available = list(index_data.get("available_datasets") or [])
-    regions_map: dict[str, dict[str, list[float]]] = (
-        index_data.get("regions") or {}
-    )
+    regions_map: dict[str, dict[str, list[float]]] = index_data.get("regions") or {}
 
     structural: dict[str, Dataset] = {}
     seen_in: dict[str, str] = {}
@@ -620,9 +617,7 @@ def _load_catalog_directory(
                     "Each CHC dataset key must live in exactly one "
                     "per-family file."
                 )
-            ds, n_vars = _build_chc_dataset(
-                ds_key, ds_body, regions_map, yaml_path
-            )
+            ds, n_vars = _build_chc_dataset(ds_key, ds_body, regions_map, yaml_path)
             structural[ds_key] = ds
             seen_in[ds_key] = yaml_path.name
             total_vars += n_vars
@@ -876,9 +871,7 @@ class Catalog(AbstractCatalog):
         used_regions: set[str] = set()
         # Track `(units, types)` tuples per `(variable_name, temporal_resolution)`
         # so the drift check can flag heterogeneous groups in one pass.
-        variable_metadata: dict[
-            tuple[str, str], set[tuple[str, str | None]]
-        ] = {}
+        variable_metadata: dict[tuple[str, str], set[tuple[str, str | None]]] = {}
         for ds_key, ds in self.datasets.items():
             if not ds.variables:
                 empty_dataset.append(ds_key)
@@ -1092,7 +1085,10 @@ class Catalog(AbstractCatalog):
         for key, ds in self.datasets.items():
             if region is not None and ds.region != region:
                 continue
-            if temporal_resolution is not None and ds.temporal_resolution != temporal_resolution:
+            if (
+                temporal_resolution is not None
+                and ds.temporal_resolution != temporal_resolution
+            ):
                 continue
             result.append(key)
         return sorted(result)

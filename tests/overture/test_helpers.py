@@ -22,7 +22,9 @@ class TestRowLicense:
 
     def test_odbl_explicit(self):
         """An explicit ODbL source yields ODbL."""
-        assert row_license([{"dataset": "OpenStreetMap", "license": "ODbL-1.0"}]) == ODBL
+        assert (
+            row_license([{"dataset": "OpenStreetMap", "license": "ODbL-1.0"}]) == ODBL
+        )
 
     def test_odbl_wins_when_not_first(self):
         """ODbL wins even when a permissive source is listed first."""

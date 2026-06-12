@@ -498,16 +498,16 @@ class FIRMS(AbstractDataSource):
         text = response.text
         kind = classify_body(text)
         if kind == "auth":
-            raise AuthenticationError(
-                f"FIRMS rejected the MAP_KEY: {_truncate(text)}"
-            )
+            raise AuthenticationError(f"FIRMS rejected the MAP_KEY: {_truncate(text)}")
         if kind == "quota":
             raise RuntimeError(
                 "FIRMS transaction quota exhausted after back-off retries: "
                 f"{_truncate(text)}"
             )
         if kind == "error":
-            raise RuntimeError(f"FIRMS returned a non-CSV error body: {_truncate(text)}")
+            raise RuntimeError(
+                f"FIRMS returned a non-CSV error body: {_truncate(text)}"
+            )
         frame = pd.read_csv(StringIO(text))
         return events.csv_to_fc(
             frame,
@@ -529,7 +529,9 @@ class FIRMS(AbstractDataSource):
         Returns:
             str: The fully-formed request URL.
         """
-        bbox = f"{self.space.west},{self.space.south},{self.space.east},{self.space.north}"
+        bbox = (
+            f"{self.space.west},{self.space.south},{self.space.east},{self.space.north}"
+        )
         return AREA_URL_TEMPLATE.format(
             map_key=self.client.api_key,
             sensor=product.metadata["sensor"],

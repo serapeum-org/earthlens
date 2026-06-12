@@ -45,7 +45,9 @@ class _SeqSession:
         headers: dict[str, str] | None = None,
         timeout: float | None = None,
     ) -> _Resp:
-        self.calls.append({"url": url, "params": dict(params or {}), "headers": dict(headers or {})})
+        self.calls.append(
+            {"url": url, "params": dict(params or {}), "headers": dict(headers or {})}
+        )
         return self._responses.pop(0)
 
 
@@ -53,9 +55,7 @@ def _client(responses: list[_Resp], **kwargs: Any) -> tuple[OpenaqClient, _SeqSe
     """Build a client over a sequenced fake session with no real sleeps."""
     session = _SeqSession(responses)
     waits: list[float] = []
-    client = OpenaqClient(
-        "key", session=session, sleep=waits.append, **kwargs
-    )
+    client = OpenaqClient("key", session=session, sleep=waits.append, **kwargs)
     client._waits = waits  # type: ignore[attr-defined]
     return client, session
 
@@ -208,6 +208,8 @@ class TestListEndpoints:
         )
         params = session.calls[0]["params"]
         assert session.calls[0]["url"] == f"{BASE_URL}/sensors/10/{rollup}"
-        assert params["date_from"] == "2024-01-01", "date should be truncated to YYYY-MM-DD"
+        assert (
+            params["date_from"] == "2024-01-01"
+        ), "date should be truncated to YYYY-MM-DD"
         assert params["date_to"] == "2024-01-07"
         assert "datetime_from" not in params

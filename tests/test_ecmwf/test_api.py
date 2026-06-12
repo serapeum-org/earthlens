@@ -463,9 +463,7 @@ class TestApiMonthly:
             product_type=["monthly_averaged_reanalysis"],
         )
 
-    def test_monthly_targets_dataset_from_var_info(
-        self, ecmwf_stub, monthly_var_info
-    ):
+    def test_monthly_targets_dataset_from_var_info(self, ecmwf_stub, monthly_var_info):
         """`_api()` retrieves from `var_info.cds_dataset` verbatim."""
         ecmwf_stub.temporal_resolution = "monthly"
         ecmwf_stub._api(monthly_var_info)
@@ -516,14 +514,18 @@ class TestBuildRequest:
         """`_build_request` returns a dict carrying every CDS-required key."""
         request = ecmwf_stub._build_request(single_level_var_info)
         for key in (
-            "product_type", "variable", "year", "month", "day",
-            "time", "data_format", "area",
+            "product_type",
+            "variable",
+            "year",
+            "month",
+            "day",
+            "time",
+            "data_format",
+            "area",
         ):
             assert key in request, f"Missing required key {key!r}: {request}"
 
-    def test_does_not_call_client_retrieve(
-        self, ecmwf_stub, single_level_var_info
-    ):
+    def test_does_not_call_client_retrieve(self, ecmwf_stub, single_level_var_info):
         """The pure builder must not touch `self.client.retrieve`."""
         ecmwf_stub._build_request(single_level_var_info)
         assert ecmwf_stub.client.retrieve.call_count == 0, (
@@ -547,9 +549,12 @@ class TestBuildRequest:
         ecmwf_stub.temporal_resolution = "daily"
         request = ecmwf_stub._build_request(single_level_var_info)
         assert "day" in request, f"daily branch should set `day`; got {request}"
-        assert request["time"] == ["00:00", "06:00", "12:00", "18:00"], (
-            f"daily branch should pin four 6-hourly slots; got {request['time']!r}"
-        )
+        assert request["time"] == [
+            "00:00",
+            "06:00",
+            "12:00",
+            "18:00",
+        ], f"daily branch should pin four 6-hourly slots; got {request['time']!r}"
 
     def test_monthly_branch_omits_day_and_pins_single_time(
         self, ecmwf_stub, single_level_var_info
@@ -557,12 +562,12 @@ class TestBuildRequest:
         """Monthly resolution omits `day` and pins `time=['00:00']`."""
         ecmwf_stub.temporal_resolution = "monthly"
         request = ecmwf_stub._build_request(single_level_var_info)
-        assert "day" not in request, (
-            f"monthly branch must omit `day` (CDS rejects it); got {request}"
-        )
-        assert request["time"] == ["00:00"], (
-            f"monthly branch should pin single 00:00 slot; got {request['time']!r}"
-        )
+        assert (
+            "day" not in request
+        ), f"monthly branch must omit `day` (CDS rejects it); got {request}"
+        assert request["time"] == [
+            "00:00"
+        ], f"monthly branch should pin single 00:00 slot; got {request['time']!r}"
 
     def test_pressure_level_forwarded_to_request(
         self, ecmwf_stub, pressure_level_var_info
@@ -602,9 +607,9 @@ class TestBuildRequest:
         )
         request = ecmwf_stub._build_request(spec)
         for stripped in ("day", "time", "area"):
-            assert stripped not in request, (
-                f"`oceanic_monthly` should strip {stripped!r}; got {request}"
-            )
+            assert (
+                stripped not in request
+            ), f"`oceanic_monthly` should strip {stripped!r}; got {request}"
 
     def test_extras_re_introduce_a_stripped_key(self, ecmwf_stub):
         """An explicit `extras[area]` survives the request_kind strip."""

@@ -183,7 +183,9 @@ class TestDataset:
             title="Demo image",
             ee_type="image",
             extent=Extent(start_date="2000-01-01"),
-            bands={"elevation": Band(id="elevation", description="Elevation", units="m")},
+            bands={
+                "elevation": Band(id="elevation", description="Elevation", units="m")
+            },
         )
 
     def _collection(self) -> Dataset:
@@ -254,8 +256,12 @@ class TestCatalog:
 
     def test_curated_subset_of_available(self, shipped_catalog: Catalog):
         """Every curated dataset id is also listed in `available_datasets`."""
-        missing = set(shipped_catalog.datasets) - set(shipped_catalog.available_datasets)
-        assert not missing, f"curated datasets absent from available_datasets: {missing}"
+        missing = set(shipped_catalog.datasets) - set(
+            shipped_catalog.available_datasets
+        )
+        assert (
+            not missing
+        ), f"curated datasets absent from available_datasets: {missing}"
 
     def test_get_catalog_returns_datasets(self, shipped_catalog: Catalog):
         """`get_catalog` returns the same mapping as `.datasets`."""
@@ -290,7 +296,9 @@ class TestCatalog:
         cat = Catalog()
         assert set(cat.datasets) == {"DEMO/IMAGE", "DEMO/COLLECTION"}
         assert cat.get_dataset("DEMO/IMAGE").ee_type == "image"
-        assert cat.get_dataset("DEMO/COLLECTION").cadence == Cadence(interval=8, unit="day")
+        assert cat.get_dataset("DEMO/COLLECTION").cadence == Cadence(
+            interval=8, unit="day"
+        )
         assert cat.get_band("DEMO/COLLECTION", "value").scale == 0.1
 
     def test_duplicate_dataset_key_rejected(self, monkeypatch, tmp_path):
@@ -349,7 +357,9 @@ class TestCatalog:
         """)
         path = _write_catalog_yaml(tmp_path, yaml_text)
         monkeypatch.setattr(catalog_module, "CATALOG_PATH", path)
-        with pytest.raises(ValueError, match="invalid band 'elevation' under dataset 'DEMO/IMAGE'"):
+        with pytest.raises(
+            ValueError, match="invalid band 'elevation' under dataset 'DEMO/IMAGE'"
+        ):
             Catalog()
 
     def test_unknown_dataset_field_rejected(self, monkeypatch, tmp_path):
@@ -459,11 +469,22 @@ class TestLicenseField:
     def test_shipped_catalog_uses_normalised_licenses(self, shipped_catalog: Catalog):
         """Every shipped stanza carries one of the agreed SPDX / conventional licence ids."""
         allowed = {
-            "CC-BY-4.0", "CC-BY-SA-4.0", "CC-BY-NC-4.0", "CC-BY-NC-SA-4.0",
-            "CC0-1.0", "ODbL-1.0", "OGL-Canada-2.0", "etalab-2.0",
-            "CDLA-Permissive-1.0", "public-domain", "proprietary", "unknown",
+            "CC-BY-4.0",
+            "CC-BY-SA-4.0",
+            "CC-BY-NC-4.0",
+            "CC-BY-NC-SA-4.0",
+            "CC0-1.0",
+            "ODbL-1.0",
+            "OGL-Canada-2.0",
+            "etalab-2.0",
+            "CDLA-Permissive-1.0",
+            "public-domain",
+            "proprietary",
+            "unknown",
         }
-        bad = sorted({d.license for d in shipped_catalog.datasets.values()} - allowed - {None})
+        bad = sorted(
+            {d.license for d in shipped_catalog.datasets.values()} - allowed - {None}
+        )
         assert not bad, f"unexpected license ids: {bad}"
 
     def test_terms_note_preserved_for_proprietary(self, shipped_catalog: Catalog):
@@ -481,8 +502,11 @@ class TestCatalogHealth:
         """The report keys are stable: same five checks every time."""
         report = shipped_catalog.health()
         assert set(report) == {
-            "long_title", "html_in_title", "raster_no_bands",
-            "unregistered_provider", "unused_provider",
+            "long_title",
+            "html_in_title",
+            "raster_no_bands",
+            "unregistered_provider",
+            "unused_provider",
         }
         assert all(isinstance(v, list) for v in report.values())
 
@@ -495,8 +519,14 @@ class TestCatalogHealth:
 
     def test_flags_html_and_long_titles_when_injected(self, shipped_catalog: Catalog):
         """Mutating the loaded catalog with bad titles surfaces them in the report."""
-        bad_html = Dataset(id="X", title="A <b>bold</b> dataset", extent=Extent(start_date="2000-01-01"))
-        bad_long = Dataset(id="Y", title="x" * 181, extent=Extent(start_date="2000-01-01"))
+        bad_html = Dataset(
+            id="X",
+            title="A <b>bold</b> dataset",
+            extent=Extent(start_date="2000-01-01"),
+        )
+        bad_long = Dataset(
+            id="Y", title="x" * 181, extent=Extent(start_date="2000-01-01")
+        )
         shipped_catalog.datasets["X"] = bad_html
         shipped_catalog.datasets["Y"] = bad_long
         report = shipped_catalog.health()
@@ -530,7 +560,9 @@ class TestCatalogCache:
         # Rewrite the file with a different title and a bumped mtime
         new_yaml = _MINIMAL_YAML.replace("Demo static image", "Demo CHANGED image")
         path.write_text(new_yaml)
-        os.utime(path, ns=(path.stat().st_atime_ns, path.stat().st_mtime_ns + 1_000_000_000))
+        os.utime(
+            path, ns=(path.stat().st_atime_ns, path.stat().st_mtime_ns + 1_000_000_000)
+        )
 
         b = Catalog()
         assert b.get_dataset("DEMO/IMAGE").title == "Demo CHANGED image"

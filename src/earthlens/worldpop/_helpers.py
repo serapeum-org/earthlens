@@ -217,7 +217,9 @@ def extract_geotiffs(archive_path: Path, fmt: str, dest_dir: Path) -> list[Path]
         import zipfile
 
         with zipfile.ZipFile(archive_path) as zf:
-            members = [m for m in zf.namelist() if m.lower().endswith((".tif", ".tiff"))]
+            members = [
+                m for m in zf.namelist() if m.lower().endswith((".tif", ".tiff"))
+            ]
             for member in members:
                 zf.extract(member, dest_dir)
     elif fmt == "7z":
@@ -236,9 +238,7 @@ def extract_geotiffs(archive_path: Path, fmt: str, dest_dir: Path) -> list[Path]
     else:
         raise ValueError(f"unsupported archive format {fmt!r}; expected '7z' or 'zip'.")
     extracted = sorted(
-        p
-        for p in dest_dir.rglob("*")
-        if p.suffix.lower() in (".tif", ".tiff")
+        p for p in dest_dir.rglob("*") if p.suffix.lower() in (".tif", ".tiff")
     )
     # Normalise the extracted files' permissions: py7zr restores the POSIX
     # mode stored in the archive, and these WorldPop members carry a

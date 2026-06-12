@@ -24,7 +24,9 @@ class _FakeCmemsModule(types.ModuleType):
         super().__init__("copernicusmarine")
         self._login_result = login_result
         self.login_calls: list[dict[str, object]] = []
-        self.InvalidUsernameOrPassword = type("InvalidUsernameOrPassword", (Exception,), {})
+        self.InvalidUsernameOrPassword = type(
+            "InvalidUsernameOrPassword", (Exception,), {}
+        )
         self.CouldNotConnectToAuthenticationSystem = type(
             "CouldNotConnectToAuthenticationSystem", (Exception,), {}
         )
@@ -37,7 +39,9 @@ class _FakeCmemsModule(types.ModuleType):
         return bool(self._login_result)
 
 
-def _install_fake_cmems(monkeypatch: pytest.MonkeyPatch, login_result: object) -> _FakeCmemsModule:
+def _install_fake_cmems(
+    monkeypatch: pytest.MonkeyPatch, login_result: object
+) -> _FakeCmemsModule:
     fake = _FakeCmemsModule(login_result)
     monkeypatch.setitem(sys.modules, "copernicusmarine", fake)
     return fake
@@ -50,37 +54,40 @@ class TestCmemsCredentials:
     def test_default_construction(self):
         """No-arg construction leaves every field None."""
         creds = CmemsCredentials()
-        assert creds.username is None, f"username should default to None, got {creds.username!r}"
-        assert creds.password is None, f"password should default to None, got {creds.password!r}"
+        assert (
+            creds.username is None
+        ), f"username should default to None, got {creds.username!r}"
+        assert (
+            creds.password is None
+        ), f"password should default to None, got {creds.password!r}"
         assert creds.credentials_file is None, "credentials_file should default to None"
 
     def test_password_is_secret(self):
         """SecretStr hides the password from repr."""
         creds = CmemsCredentials(username="u", password="pw")
-        assert "pw" not in repr(creds), (
-            f"password leaked into repr: {repr(creds)}"
-        )
-        assert creds.password.get_secret_value() == "pw", (
-            "SecretStr.get_secret_value() must round-trip the plaintext"
-        )
+        assert "pw" not in repr(creds), f"password leaked into repr: {repr(creds)}"
+        assert (
+            creds.password.get_secret_value() == "pw"
+        ), "SecretStr.get_secret_value() must round-trip the plaintext"
 
     def test_frozen(self):
         """CmemsCredentials is frozen — assignment after construction raises."""
         creds = CmemsCredentials(username="u")
         with pytest.raises(Exception, match="frozen|immutable") as exc_info:
             creds.username = "other"
-        assert "frozen" in str(exc_info.value).lower() or "immutable" in str(
-            exc_info.value
-        ).lower(), f"expected frozen-instance error, got {exc_info.value!r}"
+        assert (
+            "frozen" in str(exc_info.value).lower()
+            or "immutable" in str(exc_info.value).lower()
+        ), f"expected frozen-instance error, got {exc_info.value!r}"
 
     def test_credentials_file_path(self, tmp_path: Path):
         """credentials_file is stored as `pathlib.Path`."""
         target = tmp_path / "saved-creds"
         target.write_text("")
         creds = CmemsCredentials(credentials_file=target)
-        assert creds.credentials_file == target, (
-            f"credentials_file did not round-trip: got {creds.credentials_file!r}"
-        )
+        assert (
+            creds.credentials_file == target
+        ), f"credentials_file did not round-trip: got {creds.credentials_file!r}"
 
 
 @pytest.mark.cmems
@@ -106,28 +113,28 @@ class TestCmemsAuthAbstractAuthShape:
 
     def test_subclasses_abstract_auth(self):
         """`CmemsAuth` is an `AbstractAuth` subclass."""
-        assert issubclass(CmemsAuth, AbstractAuth), (
-            "CmemsAuth must inherit from earthlens.base.AbstractAuth"
-        )
+        assert issubclass(
+            CmemsAuth, AbstractAuth
+        ), "CmemsAuth must inherit from earthlens.base.AbstractAuth"
 
     def test_fresh_instance_not_authenticated(self):
         """A freshly built auth has not yet authenticated."""
         auth = CmemsAuth(CmemsCredentials(username="u", password="p"))
-        assert auth.is_authenticated() is False, (
-            "freshly constructed CmemsAuth should report is_authenticated() == False"
-        )
+        assert (
+            auth.is_authenticated() is False
+        ), "freshly constructed CmemsAuth should report is_authenticated() == False"
 
     def test_configure_flips_predicate(self, monkeypatch: pytest.MonkeyPatch):
         """`configure()` sets `is_authenticated()` to True on success."""
         fake = _install_fake_cmems(monkeypatch, login_result=True)
         auth = CmemsAuth(CmemsCredentials(username="u", password="p"))
         auth.configure()
-        assert auth.is_authenticated() is True, (
-            "is_authenticated() must be True after a successful configure()"
-        )
-        assert len(fake.login_calls) == 1, (
-            f"expected one login() call, got {len(fake.login_calls)}"
-        )
+        assert (
+            auth.is_authenticated() is True
+        ), "is_authenticated() must be True after a successful configure()"
+        assert (
+            len(fake.login_calls) == 1
+        ), f"expected one login() call, got {len(fake.login_calls)}"
 
     def test_configure_is_idempotent(self, monkeypatch: pytest.MonkeyPatch):
         """Second `configure()` is a no-op once authenticated."""
@@ -136,9 +143,9 @@ class TestCmemsAuthAbstractAuthShape:
         auth.configure()
         auth.configure()
         auth.configure()
-        assert len(fake.login_calls) == 1, (
-            f"login() should be called exactly once; got {len(fake.login_calls)}"
-        )
+        assert (
+            len(fake.login_calls) == 1
+        ), f"login() should be called exactly once; got {len(fake.login_calls)}"
 
 
 @pytest.mark.cmems
@@ -155,9 +162,9 @@ class TestCmemsAuthErrorPaths:
         auth = CmemsAuth(CmemsCredentials(username="u", password="p"))
         with pytest.raises(AuthenticationError, match="rejected") as exc_info:
             auth.configure()
-        assert isinstance(exc_info.value.__cause__, fake.InvalidUsernameOrPassword), (
-            "raw InvalidUsernameOrPassword must be preserved as __cause__"
-        )
+        assert isinstance(
+            exc_info.value.__cause__, fake.InvalidUsernameOrPassword
+        ), "raw InvalidUsernameOrPassword must be preserved as __cause__"
 
     def test_connection_error_wrapped(self, monkeypatch: pytest.MonkeyPatch):
         """Connectivity failures are wrapped with a network hint."""
@@ -166,7 +173,9 @@ class TestCmemsAuthErrorPaths:
         auth = CmemsAuth(CmemsCredentials(username="u", password="p"))
         with pytest.raises(AuthenticationError, match="reach") as exc_info:
             auth.configure()
-        assert isinstance(exc_info.value.__cause__, fake.CouldNotConnectToAuthenticationSystem)
+        assert isinstance(
+            exc_info.value.__cause__, fake.CouldNotConnectToAuthenticationSystem
+        )
 
     def test_empty_credentials_wrapped(self, monkeypatch: pytest.MonkeyPatch):
         """`CredentialsCannotBeNone` is wrapped with a "pass creds" hint."""
@@ -195,9 +204,13 @@ class TestCmemsAuthErrorPaths:
         monkeypatch.setenv("USERPROFILE", str(tmp_path))
         fake = _install_fake_cmems(monkeypatch, login_result=True)
         auth = CmemsAuth(CmemsCredentials())
-        with pytest.raises(AuthenticationError, match="no Copernicus Marine credentials"):
+        with pytest.raises(
+            AuthenticationError, match="no Copernicus Marine credentials"
+        ):
             auth.configure()
-        assert fake.login_calls == [], "SDK login() must not be called when no creds resolve"
+        assert (
+            fake.login_calls == []
+        ), "SDK login() must not be called when no creds resolve"
 
 
 @pytest.mark.cmems
@@ -214,13 +227,11 @@ class TestCmemsAuthCredentialResolution:
         call = fake.login_calls[0]
         assert call["username"] == "u", f"username not forwarded; got {call!r}"
         assert call["password"] == "pw", f"password not forwarded; got {call!r}"
-        assert call.get("check_credentials_valid") is True, (
-            "check_credentials_valid must be True so login() actually validates"
-        )
+        assert (
+            call.get("check_credentials_valid") is True
+        ), "check_credentials_valid must be True so login() actually validates"
 
-    def test_environment_fallback(
-        self, monkeypatch: pytest.MonkeyPatch
-    ):
+    def test_environment_fallback(self, monkeypatch: pytest.MonkeyPatch):
         """When credentials are empty, env vars supply them."""
         monkeypatch.setenv("COPERNICUSMARINE_SERVICE_USERNAME", "env-user")
         monkeypatch.setenv("COPERNICUSMARINE_SERVICE_PASSWORD", "envpw")
@@ -228,7 +239,9 @@ class TestCmemsAuthCredentialResolution:
         auth = CmemsAuth(CmemsCredentials())
         auth.configure()
         call = fake.login_calls[0]
-        assert call["username"] == "env-user", f"env username not picked up; got {call!r}"
+        assert (
+            call["username"] == "env-user"
+        ), f"env username not picked up; got {call!r}"
         assert call["password"] == "envpw", f"env password not picked up; got {call!r}"
 
     def test_credentials_file_forwarded(
@@ -251,9 +264,9 @@ class TestCmemsAuthContextManager:
         """`with CmemsAuth(creds) as auth:` authenticates on enter."""
         fake = _install_fake_cmems(monkeypatch, login_result=True)
         with CmemsAuth(CmemsCredentials(username="u", password="p")) as auth:
-            assert auth.is_authenticated() is True, (
-                "context manager entry should configure() the auth"
-            )
-        assert len(fake.login_calls) == 1, (
-            f"expected one login() call inside the with-block, got {len(fake.login_calls)}"
-        )
+            assert (
+                auth.is_authenticated() is True
+            ), "context manager entry should configure() the auth"
+        assert (
+            len(fake.login_calls) == 1
+        ), f"expected one login() call inside the with-block, got {len(fake.login_calls)}"

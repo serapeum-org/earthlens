@@ -406,11 +406,15 @@ class Dataset(BaseModel):
     id: str
     title: str
     provider: str | None = None
-    ee_type: Literal["image", "image_collection", "table", "table_collection", "bigquery_table"] = "image_collection"
+    ee_type: Literal[
+        "image", "image_collection", "table", "table_collection", "bigquery_table"
+    ] = "image_collection"
     cadence: Cadence | None = None
     spatial_resolution: float | None = None
     extent: Extent
-    default_reducer: Literal["mean", "median", "mosaic", "min", "max", "mode", "sum"] = "median"
+    default_reducer: Literal[
+        "mean", "median", "mosaic", "min", "max", "mode", "sum"
+    ] = "median"
     license: str | None = None
     terms_note: str | None = None
     source: Literal["ee_native", "republished", "community"] = "ee_native"
@@ -638,11 +642,17 @@ class Catalog(AbstractCatalog):
                 an unregistered provider slug.
         """
         catalog_path = catalog_path if catalog_path is not None else CATALOG_PATH
-        providers_path = providers_path if providers_path is not None else PROVIDERS_PATH
+        providers_path = (
+            providers_path if providers_path is not None else PROVIDERS_PATH
+        )
         available_datasets, datasets = _load_catalog_data(catalog_path)
         providers = _load_providers(providers_path)
         unknown = sorted(
-            {d.provider for d in datasets.values() if d.provider and d.provider not in providers}
+            {
+                d.provider
+                for d in datasets.values()
+                if d.provider and d.provider not in providers
+            }
         )
         if unknown:
             raise ValueError(
@@ -820,7 +830,9 @@ class Catalog(AbstractCatalog):
         return get_task_status(task_id, **kwargs)
 
     def audit_recent_tasks(
-        self, max_age_min: int = 7 * 24 * 60, **kwargs: Any,
+        self,
+        max_age_min: int = 7 * 24 * 60,
+        **kwargs: Any,
     ) -> dict[str, list[TaskInfo]]:
         """Group recent batch tasks by state — the task-side `health()`.
 

@@ -31,7 +31,9 @@ def _require_network():
         ),
     )
     try:
-        client.list_objects_v2(Bucket="esa-worldcover", Prefix="v200/2021/map/", MaxKeys=1)
+        client.list_objects_v2(
+            Bucket="esa-worldcover", Prefix="v200/2021/map/", MaxKeys=1
+        )
     except Exception as exc:  # noqa: BLE001
         pytest.skip(f"S3 unreachable: {exc}")
 
@@ -51,9 +53,12 @@ def test_copernicus_dem(tmp_path):
     from earthlens.s3 import S3
 
     source = S3(
-        start="2021-01-01", end="2021-01-01",
-        lat_lim=[0.40, 0.45], lon_lim=[6.40, 6.45],
-        dataset="copernicus-dem", path=str(tmp_path),
+        start="2021-01-01",
+        end="2021-01-01",
+        lat_lim=[0.40, 0.45],
+        lon_lim=[6.40, 6.45],
+        dataset="copernicus-dem",
+        path=str(tmp_path),
     )
     paths = source.download(progress_bar=False)
     assert len(paths) == 1
@@ -65,9 +70,12 @@ def test_esa_worldcover(tmp_path):
     from earthlens.s3 import S3
 
     source = S3(
-        start="2021-01-01", end="2021-01-01",
-        lat_lim=[0.40, 0.45], lon_lim=[6.40, 6.45],
-        dataset="esa-worldcover", path=str(tmp_path),
+        start="2021-01-01",
+        end="2021-01-01",
+        lat_lim=[0.40, 0.45],
+        lon_lim=[6.40, 6.45],
+        dataset="esa-worldcover",
+        path=str(tmp_path),
     )
     paths = source.download(progress_bar=False)
     assert len(paths) == 1
@@ -79,9 +87,13 @@ def test_sentinel2_reprojects_from_utm(tmp_path):
     from earthlens.s3 import S3
 
     source = S3(
-        start="2024-06-01", end="2024-06-06",
-        lat_lim=[30.00, 30.06], lon_lim=[31.20, 31.26],
-        dataset="sentinel-2-l2a", variables=["red"], path=str(tmp_path),
+        start="2024-06-01",
+        end="2024-06-06",
+        lat_lim=[30.00, 30.06],
+        lon_lim=[31.20, 31.26],
+        dataset="sentinel-2-l2a",
+        variables=["red"],
+        path=str(tmp_path),
     )
     products = source._search()
     assert products, "no Sentinel-2 scenes found for the window"
@@ -97,9 +109,13 @@ def test_era5_netcdf(tmp_path):
     from earthlens.s3 import S3
 
     source = S3(
-        start="2023-12-01", end="2023-12-01",
-        lat_lim=[40.0, 42.0], lon_lim=[12.0, 14.0],
-        dataset="era5", variables=["t2m"], path=str(tmp_path),
+        start="2023-12-01",
+        end="2023-12-01",
+        lat_lim=[40.0, 42.0],
+        lon_lim=[12.0, 14.0],
+        dataset="era5",
+        variables=["t2m"],
+        path=str(tmp_path),
     )
     paths = source.download(progress_bar=False)
     assert len(paths) == 1 and Path(paths[0]).exists()
@@ -128,10 +144,14 @@ def test_usgs_landsat_requester_pays(tmp_path):
     from earthlens.s3 import S3
 
     source = S3(
-        start="2021-09-01", end="2021-09-01",
-        lat_lim=[36.5, 37.0], lon_lim=[-120.5, -120.0],
-        dataset="usgs-landsat", variables=["red"],
-        scene="LC08_L2SP_039037_20210901_20210910_02_T1", path=str(tmp_path),
+        start="2021-09-01",
+        end="2021-09-01",
+        lat_lim=[36.5, 37.0],
+        lon_lim=[-120.5, -120.0],
+        dataset="usgs-landsat",
+        variables=["red"],
+        scene="LC08_L2SP_039037_20210901_20210910_02_T1",
+        path=str(tmp_path),
     )
     written = source._fetch(source._search()[:1])
     _assert_cropped(written[0])
@@ -147,9 +167,13 @@ def test_naip_requester_pays(tmp_path):
 
     tile = "al/2021/100cm/rgbir_cog/30086/m_3008601_ne_16_060_20211004"
     source = S3(
-        start="2021-10-04", end="2021-10-04",
-        lat_lim=[30.0, 30.1], lon_lim=[-86.0, -85.9],
-        dataset="naip-source", tile=tile, path=str(tmp_path),
+        start="2021-10-04",
+        end="2021-10-04",
+        lat_lim=[30.0, 30.1],
+        lon_lim=[-86.0, -85.9],
+        dataset="naip-source",
+        tile=tile,
+        path=str(tmp_path),
     )
     written = source._fetch(source._search()[:1])
     _assert_cropped(written[0])
@@ -163,9 +187,13 @@ def test_goes_reprojects_from_geostationary(tmp_path):
     from earthlens.s3 import S3
 
     source = S3(
-        start="2024-06-28", end="2024-06-28",
-        lat_lim=[30.0, 32.0], lon_lim=[-100.0, -98.0],
-        dataset="goes", variables=["C13"], path=str(tmp_path),
+        start="2024-06-28",
+        end="2024-06-28",
+        lat_lim=[30.0, 32.0],
+        lon_lim=[-100.0, -98.0],
+        dataset="goes",
+        variables=["C13"],
+        path=str(tmp_path),
     )
     products = source._search()
     assert products, "no GOES frames found"

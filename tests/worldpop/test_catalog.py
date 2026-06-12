@@ -245,7 +245,11 @@ def test_describe_returns_record(catalog):
 
 def test_covariates_curated(catalog):
     """All 54 covariate layers are curated as products routing to 'covariates'."""
-    covs = [p for p in catalog.available_products() if catalog.get(p).rest_alias == "covariates"]
+    covs = [
+        p
+        for p in catalog.available_products()
+        if catalog.get(p).rest_alias == "covariates"
+    ]
     assert len(covs) == 54
     assert catalog.get("cviirs").endpoint() == "covariates"
     assert catalog.get("pop").endpoint() == "pop"  # non-covariate uses its key

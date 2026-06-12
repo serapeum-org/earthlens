@@ -87,8 +87,11 @@ class TestSearch:
     def test_list_keys_paginates(self, tmp_path, fake_s3, monkeypatch):
         """_list_keys follows NextContinuationToken across pages."""
         pages = [
-            {"Contents": [{"Key": "KTLX/100/a"}], "IsTruncated": True,
-             "NextContinuationToken": "t1"},
+            {
+                "Contents": [{"Key": "KTLX/100/a"}],
+                "IsTruncated": True,
+                "NextContinuationToken": "t1",
+            },
             {"Contents": [{"Key": "KTLX/100/b"}], "IsTruncated": False},
         ]
         calls = {"n": 0}
@@ -105,8 +108,11 @@ class TestSearch:
     def test_list_prefixes_paginates(self, fake_s3):
         """_list_prefixes follows NextContinuationToken across pages."""
         pages = [
-            {"CommonPrefixes": [{"Prefix": "KTLX/100/"}], "IsTruncated": True,
-             "NextContinuationToken": "t1"},
+            {
+                "CommonPrefixes": [{"Prefix": "KTLX/100/"}],
+                "IsTruncated": True,
+                "NextContinuationToken": "t1",
+            },
             {"CommonPrefixes": [{"Prefix": "KTLX/101/"}], "IsTruncated": False},
         ]
         calls = {"n": 0}
@@ -121,13 +127,17 @@ class TestSearch:
 
     def test_first_key_returns_earliest(self, fake_s3):
         """_first_key returns the lexicographically first chunk of a volume."""
-        assert Radar._first_key(fake_s3, "KTLX/100/") == "KTLX/100/20240601-120000-001-S"
+        assert (
+            Radar._first_key(fake_s3, "KTLX/100/") == "KTLX/100/20240601-120000-001-S"
+        )
 
     def test_first_key_empty_prefix_is_none(self, fake_s3):
         """_first_key returns None when no objects live under the prefix."""
         assert Radar._first_key(fake_s3, "ZZZZ/") is None
 
-    def test_search_skips_volume_without_first_key(self, tmp_path, fake_s3, monkeypatch):
+    def test_search_skips_volume_without_first_key(
+        self, tmp_path, fake_s3, monkeypatch
+    ):
         """A listed volume prefix with no first chunk is skipped (no product)."""
         b = _make(tmp_path)
         monkeypatch.setattr(b, "_list_prefixes", lambda client, prefix: ["KTLX/999/"])
@@ -207,7 +217,12 @@ class TestDownload:
         assert len(gdf) == 2
         assert set(gdf["station_id"]) == {"KTLX"}
         assert list(gdf.columns) == [
-            "station_id", "volume", "scan_time", "n_chunks", "path", "geometry"
+            "station_id",
+            "volume",
+            "scan_time",
+            "n_chunks",
+            "path",
+            "geometry",
         ]
         assert gdf.crs is not None and gdf.crs.to_epsg() == 4326
         assert gdf.geometry.iloc[0] is not None  # KTLX is in the catalog
