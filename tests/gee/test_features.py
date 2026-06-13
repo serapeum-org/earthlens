@@ -1,6 +1,6 @@
 """Tests for `earthlens.gee.features` — Shapely / GeoDataFrame → Earth Engine.
 
-`ee` is faked via ``monkeypatch`` with a recorder so no Earth Engine
+`ee` is faked via `monkeypatch` with a recorder so no Earth Engine
 calls are made; real Shapely geometries and a real `GeoDataFrame` are
 used (geopandas is a hard dependency).
 """

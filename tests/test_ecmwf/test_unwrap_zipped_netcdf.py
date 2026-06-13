@@ -2,9 +2,9 @@
 
 CDS occasionally returns a zip-wrapped NetCDF even when
 `data_format='netcdf'` was requested (observed consistently on
-``reanalysis-era5-land-monthly-means`` and similar partitioned
+`reanalysis-era5-land-monthly-means` and similar partitioned
 datasets). The helper detects the zip header, extracts the single
-inner ``.nc`` member, and overwrites the target file in place. These
+inner `.nc` member, and overwrites the target file in place. These
 tests pin the contract for that helper without going to CDS.
 """
 

@@ -1,6 +1,6 @@
 """Tests for `earthlens.gee.auth` — service-account authentication.
 
-`ee.ServiceAccountCredentials` and `ee.Initialize` are stubbed via ``monkeypatch``
+`ee.ServiceAccountCredentials` and `ee.Initialize` are stubbed via `monkeypatch`
 so no network or real credentials are touched; the real `ee.EEException` class is
 kept so the backend's `except ee.EEException` branches are exercised faithfully.
 """
@@ -36,7 +36,7 @@ def stub_ee(monkeypatch):
     """Stub `ee.ServiceAccountCredentials` and `ee.Initialize`; keep `ee.EEException` real.
 
     Returns:
-        tuple: ``(credentials_stub, initialize_stub)`` — both ``MagicMock``s.
+        tuple: `(credentials_stub, initialize_stub)` — both `MagicMock`s.
     """
     creds = MagicMock(name="ServiceAccountCredentials")
     init = MagicMock(name="Initialize")
@@ -77,7 +77,7 @@ class TestAuthenticationError:
 
 
 class TestEarthEngineAuthEncodeDecode:
-    """Tests for ``encode_service_account`` / ``decode_service_account``."""
+    """Tests for `encode_service_account` / `decode_service_account`."""
 
     def test_round_trip(self, key_file):
         """Encoding then decoding a key file yields the original mapping."""
@@ -97,7 +97,7 @@ class TestEarthEngineAuthEncodeDecode:
 
 
 class TestEarthEngineAuthInitialize:
-    """Tests for ``EarthEngineAuth.initialize`` and the constructor."""
+    """Tests for `EarthEngineAuth.initialize` and the constructor."""
 
     def test_no_project_raises(self):
         """A key with no `project_id` and no `project` arg fails fast."""

@@ -14,7 +14,7 @@ A `(dataset_id, variable_short_name)` pair resolves to a
 :class:`Variable` via :meth:`Catalog.get_variable`, and the full
 :class:`Dataset` shape (cadence, temporal coverage, domain) is
 available via :meth:`AbstractCatalog.get_dataset` /
-``Catalog()["..."]``.
+`Catalog()["..."]`.
 
 `available_datasets:` is the informational index of every dataset id
 the toolbox publishes (~1,251 today, the full

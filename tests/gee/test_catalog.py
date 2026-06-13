@@ -131,12 +131,12 @@ class TestBand:
             Band(id="x", description="d", not_a_band_field="x")
 
     def test_description_optional(self):
-        """``description`` defaults to ``None`` (M4)."""
+        """`description` defaults to `None` (M4)."""
         b = Band(id="x")
         assert b.description is None
 
     def test_missing_id_rejected(self):
-        """``id`` is required."""
+        """`id` is required."""
         with pytest.raises(ValidationError):
             Band(description="d")
 

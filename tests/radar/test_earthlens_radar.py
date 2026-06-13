@@ -11,7 +11,7 @@ pytestmark = [pytest.mark.radar, pytest.mark.unit]
 
 
 class TestRegistry:
-    """Tests for the ``"radar"`` / ``"nexrad"`` registry entries."""
+    """Tests for the `"radar"` / `"nexrad"` registry entries."""
 
     def test_keys_present(self):
         """Both radar keys are registered."""

@@ -228,9 +228,9 @@ class TestValidateRequest:
 class TestCombinatorialPartitionUnion:
     """Tests for the time-partition-union branch of `_check_combinatorial`.
 
-    Real datasets (notably ``reanalysis-era5-land-monthly-means``) publish
+    Real datasets (notably `reanalysis-era5-land-monthly-means`) publish
     constraints as multiple structurally identical entries that differ only
-    in the time partition (e.g. ``month=['01'..'04']`` vs ``['05'..'12']``).
+    in the time partition (e.g. `month=['01'..'04']` vs `['05'..'12']`).
     CDS itself accepts requests spanning the partition boundary by silently
     splitting the retrieval, so the validator must too. These tests pin
     the union semantics: non-time keys still require single-entry cover,

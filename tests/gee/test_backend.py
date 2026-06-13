@@ -1,7 +1,7 @@
 """Tests for `earthlens.gee.backend` — the `GEE` data source.
 
-Earth Engine and the HTTP download are fully faked via ``monkeypatch``:
-``ee`` is replaced with a small chainable recorder
+Earth Engine and the HTTP download are fully faked via `monkeypatch`:
+`ee` is replaced with a small chainable recorder
 (`_FakeImageCollection` / `_FakeImage` / `_FakeGeometry`), `requests`
 with a stub that returns non-zip bytes, and `EarthEngineAuth.initialize`
 with a stub that returns a fixed project. The real shipped
