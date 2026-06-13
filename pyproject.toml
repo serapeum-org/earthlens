@@ -282,13 +282,23 @@ cz-bump = { cmd = "cz bump", description = "Bump version using Commitizen" }
 
 [tool.pixi.environments]
 default = { solve-group = "default" }
-dev = { features = ["dev", "all"], solve-group = "default" }
+dev = { features = ["dev", "all", "nwp"], solve-group = "default" }
 docs = { features = ["docs"], solve-group = "docs" }
 py311 = { features = ["py311", "dev", "all"], solve-group = "py311" }
 py312 = { features = ["py312", "dev", "all"], solve-group = "py312" }
 py313 = { features = ["py313", "dev", "all"], solve-group = "py313" }
 py314 = { features = ["py314", "dev", "all"], solve-group = "py314" }
-notebook = { features = ["dev", "notebook", "all"], solve-group = "default" }
+notebook = { features = ["dev", "notebook", "all", "nwp"], solve-group = "default" }
+
+# eccodes C library (conda-forge): herbie-data's cfgrib import chain needs the
+# binary at runtime — the pip `eccodes` binding cannot locate the native lib on
+# its own (it fails with `OSError: cannot load library 'libeccodes.dll'`). Scoped
+# to the `nwp` feature, which the `dev` and `notebook` envs include, so the NWP
+# backend and the live `nwp/*` notebooks can decode GRIB. The docs and per-Python
+# test-matrix envs deliberately omit it: CI's unit suite fakes herbie, so those
+# envs never touch the binary.
+[tool.pixi.feature.nwp.dependencies]
+eccodes = ">=2.47,<3"
 
 [tool.pixi.feature.py311.dependencies]
 python = "3.11.*"
