@@ -826,6 +826,7 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
         from pyramids.netcdf import NetCDF
 
         cube = NetCDF.read_file(str(target))
+        masked = None
         try:
             masked = cube.crop(mask=geometry, touch=True)
             tmp = target.with_name(target.stem + ".masked" + target.suffix)
@@ -845,6 +846,8 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
             return
         finally:
             cube.close()
+            if masked is not None:
+                masked.close()
         os.replace(tmp, target)
 
     def _build_request(self, var_info: Variable) -> dict[str, Any]:
