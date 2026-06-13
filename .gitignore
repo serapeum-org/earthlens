@@ -175,3 +175,15 @@ docs/examples/hdx/hdx_output/
 docs/examples/overture/_overture_out/
 docs/examples/usgs-water/_nb_out/
 docs/examples/sentinel-hub/data/
+
+# Ad-hoc agent / verification scratch dropped in the repo root (notebook
+# compile checks, result dumps). Anchored to root so src/ `_helpers.py`-style
+# files are unaffected.
+/_*.py
+/_*.txt
+/_*.json
+/_*.log
+
+# PyCharm-injected debugger / Jupyter-debug support libs (e.g.
+# 261_24374_152-pycharm-support-libs/ with pydev/ + jupyter_debug/).
+*-pycharm-support-libs/
