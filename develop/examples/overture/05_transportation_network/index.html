@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -9432,6 +9432,24 @@
         
       
       
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overture — Transportation network (live)
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
       <a href="./" class="md-nav__link md-nav__link--active">
         
   
@@ -9448,6 +9466,86 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#setup" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Setup
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Setup">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#define-the-area-of-interest" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Define the area of interest
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#download-the-transportation-segments" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Download the transportation segments
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#inspect-the-segments" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Inspect the segments
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#plot-the-road-network" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Plot the road network
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
       
     </li>
   
@@ -10733,6 +10831,75 @@
     
   
   
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#setup" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Setup
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Setup">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#define-the-area-of-interest" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Define the area of interest
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#download-the-transportation-segments" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Download the transportation segments
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#inspect-the-segments" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Inspect the segments
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#plot-the-road-network" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Plot the road network
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
 </nav>
                   </div>
                 </div>
@@ -11485,7 +11652,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </style>
 <!-- End of mermaid configuration --><div class="jupyter-wrapper">
 <div class="jp-Notebook" data-jp-theme-light="true" data-jp-theme-name="JupyterLab Light">
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=87d43244">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=b7a9f0c1">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -11495,16 +11662,69 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </div>
 </div>
 </div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=490601b6">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h2 id="setup">Setup<a class="anchor-link" href="#setup">¶</a></h2><p>Consolidate the imports up front: <code>EarthLens</code> is the unified entry point, and <code>geopandas</code> reads the GeoParquet that the Overture backend writes to disk.</p>
+</div>
+</div>
+</div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=2dd2ddca">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=577e6cbc">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [1]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-1">
+<div>
+<span class="notice" hidden="">Copied!</span>
+<svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
+<path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+<path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+</svg>
+</div>
+</clipboard-copy>
+</div>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">geopandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">gpd</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.earthlens</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
+</pre></div>
+<div class="clipboard-copy-txt" id="cell-1">import geopandas as gpd
+
+from earthlens.earthlens import EarthLens</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=d39e2e79">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h3 id="define-the-area-of-interest">Define the area of interest<a class="anchor-link" href="#define-the-area-of-interest">¶</a></h3><p>A small Times Square block, given as south/north latitude and west/east longitude bounds, plus the output directory for the downloaded GeoParquet.</p>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=0a60fa91">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="CodeMirror cm-s-jupyter">
+<div class="zeroclipboard-container">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-2">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -11518,7 +11738,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <span class="n">LON_LIM</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="mf">73.987</span><span class="p">,</span> <span class="o">-</span><span class="mf">73.984</span><span class="p">]</span>  <span class="c1"># [west, east] — a Times Square block</span>
 <span class="n">OUT</span> <span class="o">=</span> <span class="s2">"_overture_out"</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-1">LAT_LIM = [40.757, 40.759]  # [south, north]
+<div class="clipboard-copy-txt" id="cell-2">LAT_LIM = [40.757, 40.759]  # [south, north]
 LON_LIM = [-73.987, -73.984]  # [west, east] — a Times Square block
 OUT = "_overture_out"</div>
 </div>
@@ -11526,93 +11746,24 @@ OUT = "_overture_out"</div>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=a273d1ba">
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=6e6d3527">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h3 id="download-the-transportation-segments">Download the transportation segments<a class="anchor-link" href="#download-the-transportation-segments">¶</a></h3><p>Build the <code>EarthLens</code> request for the <code>transportation</code> theme, then call <code>download()</code> on its own line so the construction and the fetch read as separate steps. The Overture backend writes a GeoParquet file and returns the list of written paths.</p>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=a0735c7c">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [2]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="CodeMirror cm-s-jupyter">
-<div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-2">
-<div>
-<span class="notice" hidden="">Copied!</span>
-<svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
-<path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z" fill="currentColor" fill-rule="evenodd"></path>
-<path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z" fill="currentColor" fill-rule="evenodd"></path>
-</svg>
-</div>
-</clipboard-copy>
-</div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.earthlens</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
-
-<span class="n">paths</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
-    <span class="n">data_source</span><span class="o">=</span><span class="s2">"overture"</span><span class="p">,</span>
-    <span class="n">dataset</span><span class="o">=</span><span class="s2">"transportation"</span><span class="p">,</span>
-    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">"segment"</span><span class="p">],</span>
-    <span class="n">aoi</span><span class="o">=</span><span class="p">[</span><span class="n">LON_LIM</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">LAT_LIM</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">LON_LIM</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">LAT_LIM</span><span class="p">[</span><span class="mi">1</span><span class="p">]],</span>
-    <span class="n">path</span><span class="o">=</span><span class="n">OUT</span><span class="p">,</span>
-<span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
-<span class="n">paths</span>
-</pre></div>
-<div class="clipboard-copy-txt" id="cell-2">from earthlens.earthlens import EarthLens
-
-paths = EarthLens(
-    data_source="overture",
-    dataset="transportation",
-    variables=["segment"],
-    aoi=[LON_LIM[0], LAT_LIM[0], LON_LIM[1], LAT_LIM[1]],
-    path=OUT,
-).download()
-paths</div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
-</div>
-<div class="jp-OutputArea jp-Cell-outputArea">
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
-<pre>2026-05-27 14:52:00 | <span class="ansi-green-fg">INFO</span> | pyramids.base.config | Logging is configured.
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
-<pre><span class="ansi-green-fg">2026-05-27 14:52:00.837</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">earthlens.overture.backend</span>:<span class="ansi-cyan-fg">_fetch</span>:<span class="ansi-cyan-fg">377</span> - <span class="ansi-bold">Fetching Overture 'segment' (theme 'transportation') for bbox (-73.987, 40.757, -73.984, 40.759) (release=latest)</span>
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
-<pre>C:\gdrive\algorithms\remote-sensing\earthlens\.claude\worktrees\overture\src\earthlens\overture\collection.py:77: LicenseWarning: transportation/segment: 80 of 80 feature(s) are ODbL-1.0 (OSM-derived). ODbL-1.0 carries attribution and share-alike obligations that CDLA-Permissive-2.0 does not; honour them when redistributing these rows.
-  warn_if_odbl(license_ids, label)
-<span class="ansi-green-fg">2026-05-27 14:52:40.033</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">earthlens.overture.backend</span>:<span class="ansi-cyan-fg">_fetch</span>:<span class="ansi-cyan-fg">386</span> - <span class="ansi-bold">transportation/segment: wrote 80 feature(s) to C:\gdrive\algorithms\remote-sensing\earthlens\.claude\worktrees\overture\docs\examples\overture\_overture_out\overture_transportation_segment_latest.parquet</span>
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child jp-OutputArea-executeResult">
-<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[2]:</div>
-<div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain" tabindex="0">
-<pre>[WindowsPath('C:/gdrive/algorithms/remote-sensing/earthlens/.claude/worktrees/overture/docs/examples/overture/_overture_out/overture_transportation_segment_latest.parquet')]</pre>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=67bdd7b7">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [3]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-3">
@@ -11625,123 +11776,48 @@ paths</div>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">geopandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">gpd</span>
-
-<span class="n">gdf</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">read_parquet</span><span class="p">(</span><span class="n">paths</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-<span class="nb">print</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">gdf</span><span class="p">),</span> <span class="s1">'segments;  geom'</span><span class="p">,</span> <span class="n">gdf</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">geom_type</span><span class="o">.</span><span class="n">unique</span><span class="p">())</span>
-<span class="n">gdf</span><span class="p">[[</span><span class="s1">'id'</span><span class="p">,</span> <span class="s1">'subtype'</span><span class="p">,</span> <span class="s1">'class'</span><span class="p">,</span> <span class="s1">'license_id'</span><span class="p">]]</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">overture</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
+    <span class="n">data_source</span><span class="o">=</span><span class="s2">"overture"</span><span class="p">,</span>
+    <span class="n">dataset</span><span class="o">=</span><span class="s2">"transportation"</span><span class="p">,</span>
+    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">"segment"</span><span class="p">],</span>
+    <span class="n">aoi</span><span class="o">=</span><span class="p">[</span><span class="n">LON_LIM</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">LAT_LIM</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">LON_LIM</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">LAT_LIM</span><span class="p">[</span><span class="mi">1</span><span class="p">]],</span>
+    <span class="n">path</span><span class="o">=</span><span class="n">OUT</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">paths</span> <span class="o">=</span> <span class="n">overture</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
+<span class="n">paths</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-3">import geopandas as gpd
-
-gdf = gpd.read_parquet(paths[0])
-print(len(gdf), 'segments;  geom', gdf.geometry.geom_type.unique())
-gdf[['id', 'subtype', 'class', 'license_id']].head()</div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
-</div>
-<div class="jp-OutputArea jp-Cell-outputArea">
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>80 segments;  geom &lt;ArrowStringArray&gt;
-['LineString']
-Length: 1, dtype: str
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child jp-OutputArea-executeResult">
-<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[3]:</div>
-<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/html" tabindex="0">
-<div>
-<style scoped="">
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-<thead>
-<tr style="text-align: right;">
-<th></th>
-<th>id</th>
-<th>subtype</th>
-<th>class</th>
-<th>license_id</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<th>0</th>
-<td>fa2f8191-70b5-49e4-9bd5-29ac326e3c75</td>
-<td>rail</td>
-<td>subway</td>
-<td>ODbL-1.0</td>
-</tr>
-<tr>
-<th>1</th>
-<td>10a7f5d4-8df6-4d73-b465-b5bf85ee2775</td>
-<td>rail</td>
-<td>subway</td>
-<td>ODbL-1.0</td>
-</tr>
-<tr>
-<th>2</th>
-<td>58e6d598-e714-4db6-a188-405ef143adcc</td>
-<td>rail</td>
-<td>subway</td>
-<td>ODbL-1.0</td>
-</tr>
-<tr>
-<th>3</th>
-<td>9ebb72a7-7f73-4c7e-b376-b512af3e7eb2</td>
-<td>rail</td>
-<td>subway</td>
-<td>ODbL-1.0</td>
-</tr>
-<tr>
-<th>4</th>
-<td>b670600d-60e3-4bba-813b-cf67efdde949</td>
-<td>rail</td>
-<td>subway</td>
-<td>ODbL-1.0</td>
-</tr>
-</tbody>
-</table>
+<div class="clipboard-copy-txt" id="cell-3">overture = EarthLens(
+    data_source="overture",
+    dataset="transportation",
+    variables=["segment"],
+    aoi=[LON_LIM[0], LAT_LIM[0], LON_LIM[1], LAT_LIM[1]],
+    path=OUT,
+)
+paths = overture.download()
+paths</div>
 </div>
 </div>
 </div>
 </div>
 </div>
 </div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=91c1b794">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=bdc441bf">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p>Road segments by <code>class</code>:</p>
+<h3 id="inspect-the-segments">Inspect the segments<a class="anchor-link" href="#inspect-the-segments">¶</a></h3><p>Read the written GeoParquet into a <code>GeoDataFrame</code> and peek at a few rows. Each segment carries a <code>subtype</code>, a road <code>class</code>, and a per-row <code>license_id</code>.</p>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=38f6766f">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=7a58c47d">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [4]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-4">
@@ -11754,45 +11830,77 @@ Length: 1, dtype: str
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">gdf</span><span class="p">[</span><span class="s1">'class'</span><span class="p">]</span><span class="o">.</span><span class="n">value_counts</span><span class="p">()</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">gdf</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">read_parquet</span><span class="p">(</span><span class="n">paths</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">gdf</span><span class="p">),</span> <span class="s1">'segments;  geom'</span><span class="p">,</span> <span class="n">gdf</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">geom_type</span><span class="o">.</span><span class="n">unique</span><span class="p">())</span>
+<span class="n">gdf</span><span class="p">[[</span><span class="s1">'id'</span><span class="p">,</span> <span class="s1">'subtype'</span><span class="p">,</span> <span class="s1">'class'</span><span class="p">,</span> <span class="s1">'license_id'</span><span class="p">]]</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-4">gdf['class'].value_counts()</div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
-</div>
-<div class="jp-OutputArea jp-Cell-outputArea">
-<div class="jp-OutputArea-child jp-OutputArea-executeResult">
-<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[4]:</div>
-<div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain" tabindex="0">
-<pre>class
-footway           39
-subway            19
-secondary          8
-residential        5
-pedestrian         4
-service            2
-standard_gauge     2
-primary            1
-Name: count, dtype: int64</pre>
+<div class="clipboard-copy-txt" id="cell-4">gdf = gpd.read_parquet(paths[0])
+print(len(gdf), 'segments;  geom', gdf.geometry.geom_type.unique())
+gdf[['id', 'subtype', 'class', 'license_id']].head()</div>
 </div>
 </div>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=d553f56e">
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=d986a74a">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<p>Road segments by <code>class</code>:</p>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=7f1f9862">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [5]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-5">
+<div>
+<span class="notice" hidden="">Copied!</span>
+<svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
+<path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+<path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+</svg>
+</div>
+</clipboard-copy>
+</div>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">gdf</span><span class="p">[</span><span class="s1">'class'</span><span class="p">]</span><span class="o">.</span><span class="n">value_counts</span><span class="p">()</span>
+</pre></div>
+<div class="clipboard-copy-txt" id="cell-5">gdf['class'].value_counts()</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=fe8d852d">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h3 id="plot-the-road-network">Plot the road network<a class="anchor-link" href="#plot-the-road-network">¶</a></h3><p>Draw every segment as a line to see the block's road and rail layout.</p>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=b61d7b10">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="CodeMirror cm-s-jupyter">
+<div class="zeroclipboard-container">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-6">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -11806,21 +11914,9 @@ Name: count, dtype: int64</pre>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">'Overture road segments'</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_axis_off</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-5">ax = gdf.plot(figsize=(5, 5), linewidth=0.8)
+<div class="clipboard-copy-txt" id="cell-6">ax = gdf.plot(figsize=(5, 5), linewidth=0.8)
 ax.set_title('Overture road segments')
 ax.set_axis_off()</div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
-</div>
-<div class="jp-OutputArea jp-Cell-outputArea">
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedImage jp-OutputArea-output" tabindex="0">
-<img alt="No description has been provided for this image" class="" src="data:image/png;base64,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"/>
 </div>
 </div>
 </div>

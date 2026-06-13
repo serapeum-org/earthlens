@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -8155,6 +8155,17 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#setup" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Setup
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#credentials" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -10810,6 +10821,17 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#setup" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Setup
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#credentials" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -11596,7 +11618,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </style>
 <!-- End of mermaid configuration --><div class="jupyter-wrapper">
 <div class="jp-Notebook" data-jp-theme-light="true" data-jp-theme-name="JupyterLab Light">
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=c00e7ed8">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=e68b6d66">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -11609,18 +11631,18 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=b165a6b3">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=af9393e7">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="credentials">Credentials<a class="anchor-link" href="#credentials">¶</a></h2><p>openEO authenticates with CDSE via OIDC. The download cell below runs for real when credentials are present (env <code>OPENEO_CLIENT_ID</code> / <code>OPENEO_CLIENT_SECRET</code>, or a cached refresh token from a prior interactive login) and prints a skip note otherwise - so this notebook executes cleanly with or without secrets. See the Authentication page.</p>
+<h2 id="setup">Setup<a class="anchor-link" href="#setup">¶</a></h2><p>First the imports. <code>earthlens</code> provides the unified <code>EarthLens</code> entry point; <code>os</code> and <code>pathlib</code> are used to probe for openEO credentials below.</p>
 </div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=a964c376">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=842d6118">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -11641,17 +11663,99 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 
+<span class="kn">from</span><span class="w"> </span><span class="nn">earthlens</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
+</pre></div>
+<div class="clipboard-copy-txt" id="cell-1">import os
+from pathlib import Path
 
-<span class="k">def</span><span class="w"> </span><span class="nf">has_openeo_credentials</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+from earthlens import EarthLens</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=e3bbe319">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h2 id="credentials">Credentials<a class="anchor-link" href="#credentials">¶</a></h2><p>openEO authenticates with CDSE via OIDC. The download cell below runs for real when credentials are present (env <code>OPENEO_CLIENT_ID</code> / <code>OPENEO_CLIENT_SECRET</code>, or a cached refresh token from a prior interactive login) and prints a skip note otherwise - so this notebook executes cleanly with or without secrets. See the Authentication page.</p>
+<p><code>has_openeo_credentials()</code> checks each supported credential source in turn: the headless client-id/secret pair, a refresh token, or a cached <code>~/.openeo</code> login.</p>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=92f32be9">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="CodeMirror cm-s-jupyter">
+<div class="zeroclipboard-container">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-2">
+<div>
+<span class="notice" hidden="">Copied!</span>
+<svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
+<path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+<path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+</svg>
+</div>
+</clipboard-copy>
+</div>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">has_openeo_credentials</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">"""Whether some openEO OIDC credential source is available."""</span>
     <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"OPENEO_CLIENT_ID"</span><span class="p">)</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"OPENEO_CLIENT_SECRET"</span><span class="p">):</span>
         <span class="k">return</span> <span class="kc">True</span>
     <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"OPENEO_REFRESH_TOKEN"</span><span class="p">):</span>
         <span class="k">return</span> <span class="kc">True</span>
     <span class="k">return</span> <span class="p">(</span><span class="n">Path</span><span class="o">.</span><span class="n">home</span><span class="p">()</span> <span class="o">/</span> <span class="s2">".openeo"</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span>
-
-
-<span class="k">def</span><span class="w"> </span><span class="nf">run_or_skip</span><span class="p">(</span><span class="n">facade</span><span class="p">,</span> <span class="o">**</span><span class="n">download_kwargs</span><span class="p">):</span>
+</pre></div>
+<div class="clipboard-copy-txt" id="cell-2">def has_openeo_credentials() -&gt; bool:
+    """Whether some openEO OIDC credential source is available."""
+    if os.environ.get("OPENEO_CLIENT_ID") and os.environ.get("OPENEO_CLIENT_SECRET"):
+        return True
+    if os.environ.get("OPENEO_REFRESH_TOKEN"):
+        return True
+    return (Path.home() / ".openeo").exists()</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=94e76b62">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<p><code>run_or_skip()</code> wraps the live <code>download()</code> so the notebook runs top-to-bottom with no errors whether or not CDSE OIDC credentials are configured (so the docs build never needs secrets): it downloads when credentials exist and prints a skip note otherwise.</p>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=da616c8a">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="CodeMirror cm-s-jupyter">
+<div class="zeroclipboard-container">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-3">
+<div>
+<span class="notice" hidden="">Copied!</span>
+<svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
+<path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+<path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+</svg>
+</div>
+</clipboard-copy>
+</div>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">run_or_skip</span><span class="p">(</span><span class="n">facade</span><span class="p">,</span> <span class="o">**</span><span class="n">download_kwargs</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""Run the live download when credentials exist, else print a skip note.</span>
 
 <span class="sd">    Keeps the notebook executing top-to-bottom with no errors whether or not</span>
@@ -11669,20 +11773,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
         <span class="nb">print</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">paths</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-1">import os
-from pathlib import Path
-
-
-def has_openeo_credentials() -&gt; bool:
-    """Whether some openEO OIDC credential source is available."""
-    if os.environ.get("OPENEO_CLIENT_ID") and os.environ.get("OPENEO_CLIENT_SECRET"):
-        return True
-    if os.environ.get("OPENEO_REFRESH_TOKEN"):
-        return True
-    return (Path.home() / ".openeo").exists()
-
-
-def run_or_skip(facade, **download_kwargs):
+<div class="clipboard-copy-txt" id="cell-3">def run_or_skip(facade, **download_kwargs):
     """Run the live download when credentials exist, else print a skip note.
 
     Keeps the notebook executing top-to-bottom with no errors whether or not
@@ -11705,18 +11796,18 @@ def run_or_skip(facade, **download_kwargs):
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=ec02b895">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=f97d2c7d">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="build-the-request">Build the request<a class="anchor-link" href="#build-the-request">¶</a></h2>
+<h2 id="build-the-request">Build the request<a class="anchor-link" href="#build-the-request">¶</a></h2><p>Construct the <code>EarthLens</code> facade for the <code>sentinel-5p-no2-monthly</code> recipe over the Benelux box and one month, then confirm which openEO collection it resolves to.</p>
 </div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=5a8eb428">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=7efb133e">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -11724,7 +11815,7 @@ def run_or_skip(facade, **download_kwargs):
 <div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-2">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-4">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -11734,9 +11825,7 @@ def run_or_skip(facade, **download_kwargs):
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
-
-<span class="n">facade</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">facade</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
     <span class="n">data_source</span><span class="o">=</span><span class="s1">'openeo'</span><span class="p">,</span>
     <span class="n">dataset</span><span class="o">=</span><span class="s1">'sentinel-5p-no2-monthly'</span><span class="p">,</span>
     <span class="n">variables</span><span class="o">=</span><span class="p">[],</span>
@@ -11747,9 +11836,7 @@ def run_or_skip(facade, **download_kwargs):
 <span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s1">'returns:'</span><span class="p">,</span> <span class="n">facade</span><span class="o">.</span><span class="n">datasource</span><span class="o">.</span><span class="n">_resolved</span><span class="p">[</span><span class="s1">'sentinel-5p-no2-monthly'</span><span class="p">]</span><span class="o">.</span><span class="n">collection_id</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-2">from earthlens import EarthLens
-
-facade = EarthLens(
+<div class="clipboard-copy-txt" id="cell-4">facade = EarthLens(
     data_source='openeo',
     dataset='sentinel-5p-no2-monthly',
     variables=[],
@@ -11765,18 +11852,18 @@ print('returns:', facade.datasource._resolved['sentinel-5p-no2-monthly'].collect
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=4e950e4f">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=4ee7beaf">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="download-server-side-execution">Download (server-side execution)<a class="anchor-link" href="#download-server-side-execution">¶</a></h2>
+<h2 id="download-server-side-execution">Download (server-side execution)<a class="anchor-link" href="#download-server-side-execution">¶</a></h2><p>Trigger the server-side monthly-mean reduction and download the resulting NetCDF. With no credentials this prints a skip note and returns an empty list.</p>
 </div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=6b2f844c">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=c671deab">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -11784,7 +11871,7 @@ print('returns:', facade.datasource._resolved['sentinel-5p-no2-monthly'].collect
 <div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-3">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-5">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -11797,7 +11884,7 @@ print('returns:', facade.datasource._resolved['sentinel-5p-no2-monthly'].collect
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">paths</span> <span class="o">=</span> <span class="n">run_or_skip</span><span class="p">(</span><span class="n">facade</span><span class="p">)</span>
 <span class="n">paths</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-3">paths = run_or_skip(facade)
+<div class="clipboard-copy-txt" id="cell-5">paths = run_or_skip(facade)
 paths</div>
 </div>
 </div>
