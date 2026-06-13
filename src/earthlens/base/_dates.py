@@ -15,6 +15,26 @@ from typing import Any
 import pandas as pd
 
 
+def _strip_tz(value: dt.datetime) -> dt.datetime:
+    """Return `value` as a naive `datetime`, converting to UTC first if aware.
+
+    Keeps :func:`to_datetime` output uniformly tz-naive: a timezone-aware
+    input is converted to UTC and stripped, so mixing (for example) a naive
+    `start` with an offset-bearing `end` never raises the
+    "can't compare offset-naive and offset-aware datetimes" `TypeError`
+    downstream.
+
+    Args:
+        value: The `datetime` to normalize; may be naive or aware.
+
+    Returns:
+        A naive `datetime` (the UTC wall-clock time when `value` was aware).
+    """
+    if value.tzinfo is not None:
+        return value.astimezone(dt.timezone.utc).replace(tzinfo=None)
+    return value
+
+
 def to_datetime(value: Any, fmt: str | None = None) -> dt.datetime:
     """Coerce a date-like value into a `datetime.datetime`.
 
@@ -23,11 +43,17 @@ def to_datetime(value: Any, fmt: str | None = None) -> dt.datetime:
     string path:
 
     * a `datetime.datetime` (including a `pandas.Timestamp`, which is a
-      subclass) is returned unchanged;
+      subclass) is returned as a naive `datetime`;
     * a `datetime.date` is promoted to midnight of that day;
     * a string is parsed with `fmt` when given, falling back to a lenient
       ISO-8601 / pandas parse when `fmt` does not match — so a plain
       `"2022-01-01"` and a full `"2022-01-01T06:00"` both work.
+
+    The result is always **timezone-naive**: a timezone-aware input (an
+    offset-bearing string such as `"2022-01-01T06:30:00+02:00"`, or an aware
+    `datetime`) is converted to UTC and stripped, so mixing a naive `start`
+    with an aware `end` never raises a naive-vs-aware comparison `TypeError`
+    downstream.
 
     Args:
         value: The date-like value — a `datetime`, a `date`, a
@@ -64,18 +90,25 @@ def to_datetime(value: Any, fmt: str | None = None) -> dt.datetime:
             datetime.datetime(2022, 1, 1, 6, 30)
 
             ```
+        - A timezone-aware string is normalized to naive UTC (here `+02:00`
+          becomes `04:30`):
+            ```python
+            >>> to_datetime("2022-01-01T06:30:00+02:00")
+            datetime.datetime(2022, 1, 1, 4, 30)
+
+            ```
     """
     if isinstance(value, dt.datetime):
-        return value
+        return _strip_tz(value)
     if isinstance(value, dt.date):
         return dt.datetime(value.year, value.month, value.day)
     if isinstance(value, str):
         if fmt is not None:
             try:
-                return dt.datetime.strptime(value, fmt)
+                return _strip_tz(dt.datetime.strptime(value, fmt))
             except ValueError:
                 pass
-        return pd.Timestamp(value).to_pydatetime()
+        return _strip_tz(pd.Timestamp(value).to_pydatetime())
     raise TypeError(
         f"start / end must be a datetime, date, or string; got "
         f"{type(value).__name__}"

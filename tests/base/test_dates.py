@@ -6,6 +6,7 @@ import pandas as pd
 import pytest
 
 from earthlens.base import split_time, to_datetime
+from earthlens.base._dates import _strip_tz
 
 
 class TestToDatetime:
@@ -52,6 +53,47 @@ class TestToDatetime:
         """A string that is neither fmt- nor ISO-parseable raises."""
         with pytest.raises(ValueError):
             to_datetime("not-a-date", fmt="%Y-%m-%d")
+
+    def test_aware_string_normalized_to_naive_utc(self):
+        """An offset-bearing string becomes naive UTC (+02:00 06:30 -> 04:30)."""
+        result = to_datetime("2022-01-01T06:30:00+02:00")
+        assert result == dt.datetime(2022, 1, 1, 4, 30)
+        assert result.tzinfo is None
+
+    def test_aware_datetime_normalized_to_naive_utc(self):
+        """An aware datetime is converted to UTC and stripped of tzinfo."""
+        aware = dt.datetime(2022, 1, 1, 6, 30, tzinfo=dt.timezone(dt.timedelta(hours=2)))
+        result = to_datetime(aware)
+        assert result == dt.datetime(2022, 1, 1, 4, 30)
+        assert result.tzinfo is None
+
+    def test_strptime_with_tz_offset_normalized(self):
+        """A fmt carrying %z still yields a naive UTC datetime."""
+        result = to_datetime("2022-01-01T06:30+0200", fmt="%Y-%m-%dT%H:%M%z")
+        assert result == dt.datetime(2022, 1, 1, 4, 30)
+        assert result.tzinfo is None
+
+    def test_mixed_naive_and_aware_inputs_are_comparable(self):
+        """A naive start and an aware end no longer raise on comparison (M1)."""
+        start = to_datetime("2022-01-01")
+        end = to_datetime("2022-01-02T00:00:00+05:00")
+        assert start < end  # would raise naive-vs-aware TypeError before the fix
+
+
+class TestStripTz:
+    """Naive-UTC normalization helper backing to_datetime."""
+
+    def test_naive_returned_unchanged_identity(self):
+        """A naive datetime is returned as the same object."""
+        naive = dt.datetime(2022, 1, 1, 9, 15)
+        assert _strip_tz(naive) is naive
+
+    def test_aware_converted_to_utc_and_stripped(self):
+        """An aware datetime is shifted to UTC and loses its tzinfo."""
+        aware = dt.datetime(2022, 1, 1, 9, 15, tzinfo=dt.timezone(dt.timedelta(hours=-3)))
+        result = _strip_tz(aware)
+        assert result == dt.datetime(2022, 1, 1, 12, 15)
+        assert result.tzinfo is None
 
 
 class TestSplitTime:
