@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -6804,6 +6804,24 @@
         
       
       
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Output kinds &amp; product formats (no network)
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
       <a href="./" class="md-nav__link md-nav__link--active">
         
   
@@ -6820,6 +6838,69 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#setup" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Setup
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#output-kinds-and-formats-at-a-glance" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Output kinds and formats at a glance
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#readable-today-vs-native" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Readable today vs. native
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#recap" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Recap
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
       
     </li>
   
@@ -10733,6 +10814,58 @@
     
   
   
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#setup" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Setup
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#output-kinds-and-formats-at-a-glance" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Output kinds and formats at a glance
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#readable-today-vs-native" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Readable today vs. native
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#recap" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Recap
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
 </nav>
                   </div>
                 </div>
@@ -11485,7 +11618,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </style>
 <!-- End of mermaid configuration --><div class="jupyter-wrapper">
 <div class="jp-Notebook" data-jp-theme-light="true" data-jp-theme-name="JupyterLab Light">
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=0b6001a1">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=b12e304b">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -11495,8 +11628,19 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </div>
 </div>
 </div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=2891a9fb">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h2 id="setup">Setup<a class="anchor-link" href="#setup">¶</a></h2><p>Load the EUMETSAT <code>Catalog</code> and a <code>Counter</code> for tallying. This is a metadata-only walk of the shipped catalog, so no credentials or network are needed.</p>
+</div>
+</div>
+</div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=5bb939c8">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=8a183aca">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -11519,23 +11663,30 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.eumetsat</span><span class="w"> </span><span class="kn">import</span> <span class="n">Catalog</span>
 
 <span class="n">cat</span> <span class="o">=</span> <span class="n">Catalog</span><span class="p">()</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">'output kinds:'</span><span class="p">,</span> <span class="n">Counter</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">output_kind</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">cat</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">values</span><span class="p">()))</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">'formats     :'</span><span class="p">,</span> <span class="n">Counter</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">format</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">cat</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">values</span><span class="p">()))</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-1">from collections import Counter
 
 from earthlens.eumetsat import Catalog
 
-cat = Catalog()
-print('output kinds:', Counter(c.output_kind for c in cat.datasets.values()))
-print('formats     :', Counter(c.format for c in cat.datasets.values()))</div>
+cat = Catalog()</div>
 </div>
 </div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=6b48743d">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h2 id="output-kinds-and-formats-at-a-glance">Output kinds and formats at a glance<a class="anchor-link" href="#output-kinds-and-formats-at-a-glance">¶</a></h2><p>Tally every catalogued dataset by its <code>output_kind</code> and by its on-disk <code>format</code> so you can see the mix at a glance.</p>
 </div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=6a2bc137">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=4f940c13">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -11544,6 +11695,46 @@ print('formats     :', Counter(c.format for c in cat.datasets.values()))</div>
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-2">
+<div>
+<span class="notice" hidden="">Copied!</span>
+<svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
+<path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+<path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+</svg>
+</div>
+</clipboard-copy>
+</div>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s1">'output kinds:'</span><span class="p">,</span> <span class="n">Counter</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">output_kind</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">cat</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">values</span><span class="p">()))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'formats     :'</span><span class="p">,</span> <span class="n">Counter</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">format</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">cat</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">values</span><span class="p">()))</span>
+</pre></div>
+<div class="clipboard-copy-txt" id="cell-2">print('output kinds:', Counter(c.output_kind for c in cat.datasets.values()))
+print('formats     :', Counter(c.format for c in cat.datasets.values()))</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=2efebf79">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h2 id="readable-today-vs-native">Readable today vs. native<a class="anchor-link" href="#readable-today-vs-native">¶</a></h2><p>Split the datasets into the <code>netcdf</code> products <code>pyramids</code> can read directly and the <code>native</code> SEVIRI / FCI products that still need a satpy bridge.</p>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=1bb3992d">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="CodeMirror cm-s-jupyter">
+<div class="zeroclipboard-container">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-3">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -11562,7 +11753,7 @@ print('formats     :', Counter(c.format for c in cat.datasets.values()))</div>
 <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">native</span><span class="p">):</span>
     <span class="nb">print</span><span class="p">(</span><span class="s1">'  '</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-2">readable = [k for k, c in cat.datasets.items() if c.format == 'netcdf']
+<div class="clipboard-copy-txt" id="cell-3">readable = [k for k, c in cat.datasets.items() if c.format == 'netcdf']
 native = [k for k, c in cat.datasets.items() if c.format == 'native']
 print('pyramids-readable today (netcdf):')
 for k in sorted(readable):
@@ -11576,13 +11767,13 @@ for k in sorted(native):
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=38ec3961">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=e07b517c">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p><code>download(aggregate=...)</code> is the server-side Data Tailor path and is deferred; download native products and reduce the NetCDF ones client-side with <code>pyramids</code> in the meantime.</p>
+<h2 id="recap">Recap<a class="anchor-link" href="#recap">¶</a></h2><p><code>download(aggregate=...)</code> is the server-side Data Tailor path and is deferred; download native products and reduce the NetCDF ones client-side with <code>pyramids</code> in the meantime.</p>
 </div>
 </div>
 </div>

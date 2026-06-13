@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -6235,6 +6235,17 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#catalog-raster-vs-vector-datasets" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Catalog: raster vs vector datasets
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#what-the-output-kind-controls" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -10799,6 +10810,17 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#catalog-raster-vs-vector-datasets" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Catalog: raster vs vector datasets
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#what-the-output-kind-controls" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -11574,7 +11596,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </style>
 <!-- End of mermaid configuration --><div class="jupyter-wrapper">
 <div class="jp-Notebook" data-jp-theme-light="true" data-jp-theme-name="JupyterLab Light">
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=d37380d2">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=f333aed8">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -11584,13 +11606,24 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=1a13746c">
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=40e6ab6c">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h2 id="catalog-raster-vs-vector-datasets">Catalog: raster vs vector datasets<a class="anchor-link" href="#catalog-raster-vs-vector-datasets">¶</a></h2><p>Load the Earthdata catalog and split its datasets by <code>output_kind</code>. Each row already declares whether it resolves to a <code>raster</code> or a <code>vector</code> request, so the partition is a simple comprehension over <code>cat.datasets</code>.</p>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=cdedab9b">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [1]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-1">
@@ -11608,37 +11641,59 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <span class="n">cat</span> <span class="o">=</span> <span class="n">Catalog</span><span class="p">()</span>
 <span class="n">raster</span> <span class="o">=</span> <span class="p">[</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">cat</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">d</span><span class="o">.</span><span class="n">output_kind</span> <span class="o">==</span> <span class="s1">'raster'</span><span class="p">]</span>
 <span class="n">vector</span> <span class="o">=</span> <span class="p">[</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">cat</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">d</span><span class="o">.</span><span class="n">output_kind</span> <span class="o">==</span> <span class="s1">'vector'</span><span class="p">]</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">'raster datasets:'</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">raster</span><span class="p">))</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">'vector datasets:'</span><span class="p">,</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">vector</span><span class="p">))</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-1">from earthlens.earthdata import Catalog
 
 cat = Catalog()
 raster = [k for k, d in cat.datasets.items() if d.output_kind == 'raster']
-vector = [k for k, d in cat.datasets.items() if d.output_kind == 'vector']
-print('raster datasets:', len(raster))
+vector = [k for k, d in cat.datasets.items() if d.output_kind == 'vector']</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=e6ddf107">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<p>The raster datasets are the gridded products; the vector ones are the point / footprint products (ICESat-2, GEDI, OCO-2). Print the counts to see the split:</p>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=1097a0a6">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="CodeMirror cm-s-jupyter">
+<div class="zeroclipboard-container">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-2">
+<div>
+<span class="notice" hidden="">Copied!</span>
+<svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
+<path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+<path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+</svg>
+</div>
+</clipboard-copy>
+</div>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s1">'raster datasets:'</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">raster</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'vector datasets:'</span><span class="p">,</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">vector</span><span class="p">))</span>
+</pre></div>
+<div class="clipboard-copy-txt" id="cell-2">print('raster datasets:', len(raster))
 print('vector datasets:', sorted(vector))</div>
 </div>
 </div>
 </div>
 </div>
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
-</div>
-<div class="jp-OutputArea jp-Cell-outputArea">
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>raster datasets: 26
-vector datasets: ['ATL06_006', 'ATL08_006', 'GEDI02_A_002', 'GEDI_L4A_AGB_Density_V2_1_2056', 'OCO2_L2_Lite_FP_112r']
-</pre>
 </div>
 </div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=25520abc">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=e88d0397">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -11654,26 +11709,26 @@ vector datasets: ['ATL06_006', 'ATL08_006', 'GEDI02_A_002', 'GEDI_L4A_AGB_Densit
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=b0430e3a">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=b303fd88">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="daac-registry">DAAC registry<a class="anchor-link" href="#daac-registry">¶</a></h2><p>Each CMR provider code maps to a DAAC, its cloud region, and the S3 credentials endpoint used for in-region streaming:</p>
+<h2 id="daac-registry">DAAC registry<a class="anchor-link" href="#daac-registry">¶</a></h2><p>Each CMR provider code maps to a DAAC, its cloud region, and the S3 credentials endpoint used for in-region streaming. Look up the first few provider codes to see the mapping:</p>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=c3a4c0a6">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=f2cf64c3">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [2]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-2">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-3">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -11687,26 +11742,9 @@ vector datasets: ['ATL06_006', 'ATL08_006', 'GEDI02_A_002', 'GEDI_L4A_AGB_Densit
     <span class="n">daac</span> <span class="o">=</span> <span class="n">cat</span><span class="o">.</span><span class="n">get_daac</span><span class="p">(</span><span class="n">code</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="n">code</span><span class="si">:</span><span class="s1">12s</span><span class="si">}</span><span class="s1"> -&gt; </span><span class="si">{</span><span class="n">daac</span><span class="o">.</span><span class="n">daac</span><span class="si">:</span><span class="s1">10s</span><span class="si">}</span><span class="s1"> (</span><span class="si">{</span><span class="n">daac</span><span class="o">.</span><span class="n">cloud_region</span><span class="si">}</span><span class="s1">)'</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-2">for code in sorted(cat.daacs)[:5]:
+<div class="clipboard-copy-txt" id="cell-3">for code in sorted(cat.daacs)[:5]:
     daac = cat.get_daac(code)
     print(f'{code:12s} -&gt; {daac.daac:10s} ({daac.cloud_region})')</div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
-</div>
-<div class="jp-OutputArea jp-Cell-outputArea">
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>ASF          -&gt; ASF        (us-west-2)
-GES_DISC     -&gt; GES DISC   (us-west-2)
-LAADS        -&gt; LAADS      (us-west-2)
-LARC_CLOUD   -&gt; ASDC       (us-west-2)
-LPCLOUD      -&gt; LP DAAC    (us-west-2)
-</pre>
 </div>
 </div>
 </div>

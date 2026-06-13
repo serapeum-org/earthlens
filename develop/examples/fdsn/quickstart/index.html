@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -7053,10 +7053,32 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#query" class="md-nav__link">
+  <a href="#setup" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Query
+        Setup
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#build-the-query" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Build the query
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#download-the-events" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Download the events
       
     </span>
   </a>
@@ -10810,10 +10832,32 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#query" class="md-nav__link">
+  <a href="#setup" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Query
+        Setup
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#build-the-query" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Build the query
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#download-the-events" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Download the events
       
     </span>
   </a>
@@ -11596,7 +11640,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </style>
 <!-- End of mermaid configuration --><div class="jupyter-wrapper">
 <div class="jp-Notebook" data-jp-theme-light="true" data-jp-theme-name="JupyterLab Light">
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=cbef6352">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=99bf07f4">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -11607,8 +11651,19 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </div>
 </div>
 </div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=d94f5888">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h2 id="setup">Setup<a class="anchor-link" href="#setup">¶</a></h2><p>Import <code>EarthLens</code> and create the output directory. The FDSN backend writes the query result to a GeoPackage on disk and also returns it in memory.</p>
+</div>
+</div>
+</div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=2efaf00a">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=2dc3f42e">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -11645,18 +11700,18 @@ OUT_DIR.mkdir(exist_ok=True)</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=2f7dcf6d">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=6fba06da">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="query">Query<a class="anchor-link" href="#query">¶</a></h2><p><code>variables=['USGS']</code> selects the network; query filters (<code>min_magnitude</code>, …) are explicit keyword arguments. The result is written to <code>fdsn_output/usgs.gpkg</code> and returned in memory.</p>
+<h2 id="build-the-query">Build the query<a class="anchor-link" href="#build-the-query">¶</a></h2><p><code>variables=['USGS']</code> selects the network; query filters (<code>min_magnitude</code>, …) are explicit keyword arguments. Building the request is its own step, kept separate from the network call below.</p>
 </div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=5ffe3cac">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=ec0ae55e">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -11674,57 +11729,43 @@ OUT_DIR.mkdir(exist_ok=True)</div>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># Live USGS query for recent M5+ events. Wrapped so the notebook stays</span>
-<span class="c1"># safe under nbval-lax when run offline (the cell never raises).</span>
-<span class="n">events</span> <span class="o">=</span> <span class="kc">None</span>
-<span class="k">try</span><span class="p">:</span>
-    <span class="n">events</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
-        <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">'USGS'</span><span class="p">],</span>
-        <span class="n">data_source</span><span class="o">=</span><span class="s1">'fdsn'</span><span class="p">,</span>
-        <span class="n">start</span><span class="o">=</span><span class="s1">'2024-01-01'</span><span class="p">,</span>
-        <span class="n">end</span><span class="o">=</span><span class="s1">'2024-01-31'</span><span class="p">,</span>
-        <span class="n">aoi</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">180</span><span class="p">,</span> <span class="o">-</span><span class="mi">90</span><span class="p">,</span> <span class="mi">180</span><span class="p">,</span> <span class="mi">90</span><span class="p">],</span>
-        <span class="n">min_magnitude</span><span class="o">=</span><span class="mf">5.0</span><span class="p">,</span>
-        <span class="n">path</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">OUT_DIR</span><span class="p">),</span>
-    <span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">events</span><span class="p">)</span><span class="si">}</span><span class="s1"> events'</span><span class="p">)</span>
-<span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'live FDSN query skipped (offline?): </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">exc</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s1">: </span><span class="si">{</span><span class="n">exc</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">fdsn</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
+    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">'USGS'</span><span class="p">],</span>
+    <span class="n">data_source</span><span class="o">=</span><span class="s1">'fdsn'</span><span class="p">,</span>
+    <span class="n">start</span><span class="o">=</span><span class="s1">'2024-01-01'</span><span class="p">,</span>
+    <span class="n">end</span><span class="o">=</span><span class="s1">'2024-01-31'</span><span class="p">,</span>
+    <span class="n">aoi</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">180</span><span class="p">,</span> <span class="o">-</span><span class="mi">90</span><span class="p">,</span> <span class="mi">180</span><span class="p">,</span> <span class="mi">90</span><span class="p">],</span>
+    <span class="n">min_magnitude</span><span class="o">=</span><span class="mf">5.0</span><span class="p">,</span>
+    <span class="n">path</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">OUT_DIR</span><span class="p">),</span>
+<span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-2"># Live USGS query for recent M5+ events. Wrapped so the notebook stays
-# safe under nbval-lax when run offline (the cell never raises).
-events = None
-try:
-    events = EarthLens(
-        variables=['USGS'],
-        data_source='fdsn',
-        start='2024-01-01',
-        end='2024-01-31',
-        aoi=[-180, -90, 180, 90],
-        min_magnitude=5.0,
-        path=str(OUT_DIR),
-    ).download()
-    print(f'{len(events)} events')
-except Exception as exc:
-    print(f'live FDSN query skipped (offline?): {type(exc).__name__}: {exc}')</div>
+<div class="clipboard-copy-txt" id="cell-2">fdsn = EarthLens(
+    variables=['USGS'],
+    data_source='fdsn',
+    start='2024-01-01',
+    end='2024-01-31',
+    aoi=[-180, -90, 180, 90],
+    min_magnitude=5.0,
+    path=str(OUT_DIR),
+)</div>
 </div>
 </div>
 </div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=f94fb0ff">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=bda72153">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="inspect-the-events">Inspect the events<a class="anchor-link" href="#inspect-the-events">¶</a></h2>
+<h2 id="download-the-events">Download the events<a class="anchor-link" href="#download-the-events">¶</a></h2><p><code>download()</code> runs the live USGS query, writes <code>fdsn_output/usgs.gpkg</code>, and returns the events in memory. The call is wrapped so the notebook stays safe under nbval-lax when run offline (the cell never raises).</p>
 </div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=40cb5b15">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=8acc8178">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -11742,31 +11783,37 @@ except Exception as exc:
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="k">if</span> <span class="n">events</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">events</span><span class="p">):</span>
-    <span class="n">display</span><span class="p">(</span><span class="n">events</span><span class="p">[[</span><span class="s1">'time'</span><span class="p">,</span> <span class="s1">'magnitude'</span><span class="p">,</span> <span class="s1">'depth_km'</span><span class="p">,</span> <span class="s1">'provider'</span><span class="p">,</span> <span class="s1">'geometry'</span><span class="p">]]</span><span class="o">.</span><span class="n">head</span><span class="p">())</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s1">'CRS:'</span><span class="p">,</span> <span class="n">events</span><span class="o">.</span><span class="n">crs</span><span class="p">)</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">events</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">events</span> <span class="o">=</span> <span class="n">fdsn</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">events</span><span class="p">)</span><span class="si">}</span><span class="s1"> events'</span><span class="p">)</span>
+<span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'live FDSN query skipped (offline?): </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">exc</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s1">: </span><span class="si">{</span><span class="n">exc</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-3">if events is not None and len(events):
-    display(events[['time', 'magnitude', 'depth_km', 'provider', 'geometry']].head())
-    print('CRS:', events.crs)</div>
+<div class="clipboard-copy-txt" id="cell-3">events = None
+try:
+    events = fdsn.download()
+    print(f'{len(events)} events')
+except Exception as exc:
+    print(f'live FDSN query skipped (offline?): {type(exc).__name__}: {exc}')</div>
 </div>
 </div>
 </div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=16f31cc3">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=8b116c2a">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="plot-the-epicentres">Plot the epicentres<a class="anchor-link" href="#plot-the-epicentres">¶</a></h2><p>Marker area scales with magnitude.</p>
+<h2 id="inspect-the-events">Inspect the events<a class="anchor-link" href="#inspect-the-events">¶</a></h2>
 </div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=c15208bc">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=a0e4152e">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -11785,12 +11832,54 @@ except Exception as exc:
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="k">if</span> <span class="n">events</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">events</span><span class="p">):</span>
+    <span class="n">display</span><span class="p">(</span><span class="n">events</span><span class="p">[[</span><span class="s1">'time'</span><span class="p">,</span> <span class="s1">'magnitude'</span><span class="p">,</span> <span class="s1">'depth_km'</span><span class="p">,</span> <span class="s1">'provider'</span><span class="p">,</span> <span class="s1">'geometry'</span><span class="p">]]</span><span class="o">.</span><span class="n">head</span><span class="p">())</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">'CRS:'</span><span class="p">,</span> <span class="n">events</span><span class="o">.</span><span class="n">crs</span><span class="p">)</span>
+</pre></div>
+<div class="clipboard-copy-txt" id="cell-4">if events is not None and len(events):
+    display(events[['time', 'magnitude', 'depth_km', 'provider', 'geometry']].head())
+    print('CRS:', events.crs)</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=b615b513">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h2 id="plot-the-epicentres">Plot the epicentres<a class="anchor-link" href="#plot-the-epicentres">¶</a></h2><p>Marker area scales with magnitude.</p>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=023e356f">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="CodeMirror cm-s-jupyter">
+<div class="zeroclipboard-container">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-5">
+<div>
+<span class="notice" hidden="">Copied!</span>
+<svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
+<path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+<path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+</svg>
+</div>
+</clipboard-copy>
+</div>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="k">if</span> <span class="n">events</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">events</span><span class="p">):</span>
     <span class="n">ax</span> <span class="o">=</span> <span class="n">events</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">markersize</span><span class="o">=</span><span class="n">events</span><span class="p">[</span><span class="s1">'magnitude'</span><span class="p">]</span> <span class="o">**</span> <span class="mi">2</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">'firebrick'</span><span class="p">)</span>
     <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">'M5.0+ earthquakes, January 2024 (USGS)'</span><span class="p">)</span>
     <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">'longitude'</span><span class="p">)</span>
     <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">'latitude'</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-4">if events is not None and len(events):
+<div class="clipboard-copy-txt" id="cell-5">if events is not None and len(events):
     ax = events.plot(markersize=events['magnitude'] ** 2, alpha=0.5, color='firebrick')
     ax.set_title('M5.0+ earthquakes, January 2024 (USGS)')
     ax.set_xlabel('longitude')

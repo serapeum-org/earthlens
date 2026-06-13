@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -6240,6 +6240,24 @@
         
       
       
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GEDI L4A aboveground-biomass footprints (NASA Earthdata)
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
       <a href="./" class="md-nav__link md-nav__link--active">
         
   
@@ -6256,6 +6274,69 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#setup" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Setup
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#download-a-gedi-l4a-granule" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Download a GEDI L4A granule
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#read-one-beam-of-footprints" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Read one beam of footprints
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#plot-the-footprints" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Plot the footprints
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
       
     </li>
   
@@ -10733,6 +10814,58 @@
     
   
   
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#setup" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Setup
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#download-a-gedi-l4a-granule" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Download a GEDI L4A granule
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#read-one-beam-of-footprints" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Read one beam of footprints
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#plot-the-footprints" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Plot the footprints
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
 </nav>
                   </div>
                 </div>
@@ -11485,18 +11618,42 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </style>
 <!-- End of mermaid configuration --><div class="jupyter-wrapper">
 <div class="jp-Notebook" data-jp-theme-light="true" data-jp-theme-name="JupyterLab Light">
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=617ee114">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=34f10580">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h1 id="gedi-l4a-aboveground-biomass-footprints-nasa-earthdata">GEDI L4A aboveground-biomass footprints (NASA Earthdata)<a class="anchor-link" href="#gedi-l4a-aboveground-biomass-footprints-nasa-earthdata">¶</a></h1><p>Download GEDI L4A footprint granules from the ORNL DAAC — a <strong>vector</strong> product (per-shot aboveground biomass), so <code>OUTPUT_KIND='vector'</code> and the facade rejects <code>aggregate=</code>. The backend fetches whole HDF5 orbit granules (no server-side subsetting in the MVP), so a wide window pulls several hundred MB; keep the window small. Live query — needs the <code>[earthdata]</code> extra and EDL credentials; wrapped for nbval-lax safety offline.</p>
+<h1 id="gedi-l4a-aboveground-biomass-footprints-nasa-earthdata">GEDI L4A aboveground-biomass footprints (NASA Earthdata)<a class="anchor-link" href="#gedi-l4a-aboveground-biomass-footprints-nasa-earthdata">¶</a></h1><p>GEDI L4A footprint granules from the ORNL DAAC are a <strong>vector</strong> product
+(per-shot aboveground biomass), so the backend reports <code>OUTPUT_KIND='vector'</code>
+and the facade rejects <code>aggregate=</code>. This notebook downloads a granule, reads
+one beam of per-shot footprints from the HDF5 file, and scatters them coloured
+by biomass.</p>
+<blockquote>
+<p>The backend fetches whole HDF5 orbit granules (no server-side subsetting in
+the MVP), so a wide window pulls several hundred MB — keep the window small.
+This is a live query: it needs the <code>[earthdata]</code> extra and EDL credentials,
+and every step is wrapped so the notebook stays safe to run offline.</p>
+</blockquote>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=d5698429">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h2 id="setup">Setup<a class="anchor-link" href="#setup">¶</a></h2><p>The only import needed up front is the unified <code>EarthLens</code> entry point plus
+<code>Path</code> for the output directory; <code>h5py</code> and <code>matplotlib</code> are imported later,
+right where the granule is read and plotted. We also create the directory the
+granule will be written to.</p>
 </div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=b2048b2e">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=78ec5ee8">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -11532,8 +11689,24 @@ OUT_DIR.mkdir(exist_ok=True)</div>
 </div>
 </div>
 </div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=264ab849">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h2 id="download-a-gedi-l4a-granule">Download a GEDI L4A granule<a class="anchor-link" href="#download-a-gedi-l4a-granule">¶</a></h2><p>Build the request first — the GEDI L4A dataset id, the <code>agbd</code> variable, a
+narrow two-day window, and a small bounding box over the Congo Basin — then
+call <code>download()</code> to fetch the matching HDF5 granule(s) into <code>OUT_DIR</code>. The
+construct and download steps are kept on separate lines, and the whole block
+is wrapped so a missing credential or extra simply prints a skip message
+offline.</p>
+</div>
+</div>
+</div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=59725407">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=a6e7e011">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -11553,7 +11726,7 @@ OUT_DIR.mkdir(exist_ok=True)</div>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">paths</span> <span class="o">=</span> <span class="kc">None</span>
 <span class="k">try</span><span class="p">:</span>
-    <span class="n">paths</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
+    <span class="n">gedi</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
         <span class="n">data_source</span><span class="o">=</span><span class="s1">'earthdata'</span><span class="p">,</span>
         <span class="n">dataset</span><span class="o">=</span><span class="s1">'GEDI_L4A_AGB_Density_V2_1_2056'</span><span class="p">,</span>
         <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">'agbd'</span><span class="p">],</span>
@@ -11561,14 +11734,15 @@ OUT_DIR.mkdir(exist_ok=True)</div>
         <span class="n">end</span><span class="o">=</span><span class="s1">'2020-05-02'</span><span class="p">,</span>
         <span class="n">aoi</span><span class="o">=</span><span class="p">[</span><span class="mf">12.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">3.0</span><span class="p">,</span> <span class="mf">18.0</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">],</span>
         <span class="n">path</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">OUT_DIR</span><span class="p">),</span>
-    <span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">progress_bar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="p">)</span>
+    <span class="n">paths</span> <span class="o">=</span> <span class="n">gedi</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">progress_bar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">paths</span><span class="p">),</span> <span class="s1">'granule(s):'</span><span class="p">,</span> <span class="p">[</span><span class="n">Path</span><span class="p">(</span><span class="n">p</span><span class="p">)</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">paths</span><span class="p">])</span>
 <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'skipped live query: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">exc</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s1">: </span><span class="si">{</span><span class="n">exc</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-2">paths = None
 try:
-    paths = EarthLens(
+    gedi = EarthLens(
         data_source='earthdata',
         dataset='GEDI_L4A_AGB_Density_V2_1_2056',
         variables=['agbd'],
@@ -11576,7 +11750,8 @@ try:
         end='2020-05-02',
         aoi=[12.0, -3.0, 18.0, 3.0],
         path=str(OUT_DIR),
-    ).download(progress_bar=False)
+    )
+    paths = gedi.download(progress_bar=False)
     print(len(paths), 'granule(s):', [Path(p).name for p in paths])
 except Exception as exc:
     print(f'skipped live query: {type(exc).__name__}: {exc}')</div>
@@ -11585,8 +11760,22 @@ except Exception as exc:
 </div>
 </div>
 </div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=b87d6ae2">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h2 id="read-one-beam-of-footprints">Read one beam of footprints<a class="anchor-link" href="#read-one-beam-of-footprints">¶</a></h2><p>Each granule is an HDF5 file of per-beam footprints. We open the first beam
+and pull a sample of its lowest-mode latitude/longitude and <code>agbd</code> values. The
+read is wrapped so an <code>h5py</code> or structure surprise does not mask the download
+above.</p>
+</div>
+</div>
+</div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=08c5906f">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=b7cced12">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -11604,19 +11793,71 @@ except Exception as exc:
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># Each granule is an HDF5 file of per-beam footprints (lat/lon + agbd). Read a</span>
-<span class="c1"># sample from the first beam and scatter it. Wrapped so an h5py / structure</span>
-<span class="c1"># surprise does not mask the download above.</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">lat</span> <span class="o">=</span> <span class="n">lon</span> <span class="o">=</span> <span class="n">agbd</span> <span class="o">=</span> <span class="n">beam</span> <span class="o">=</span> <span class="kc">None</span>
 <span class="k">if</span> <span class="n">paths</span><span class="p">:</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="kn">import</span><span class="w"> </span><span class="nn">h5py</span>
-        <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
 
         <span class="k">with</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="n">paths</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s1">'r'</span><span class="p">)</span> <span class="k">as</span> <span class="n">h5</span><span class="p">:</span>
             <span class="n">beam</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">h5</span> <span class="k">if</span> <span class="n">k</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">'BEAM'</span><span class="p">))</span>
             <span class="n">lat</span> <span class="o">=</span> <span class="n">h5</span><span class="p">[</span><span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="n">beam</span><span class="si">}</span><span class="s1">/lat_lowestmode'</span><span class="p">][:</span><span class="mi">5000</span><span class="p">]</span>
             <span class="n">lon</span> <span class="o">=</span> <span class="n">h5</span><span class="p">[</span><span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="n">beam</span><span class="si">}</span><span class="s1">/lon_lowestmode'</span><span class="p">][:</span><span class="mi">5000</span><span class="p">]</span>
             <span class="n">agbd</span> <span class="o">=</span> <span class="n">h5</span><span class="p">[</span><span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="n">beam</span><span class="si">}</span><span class="s1">/agbd'</span><span class="p">][:</span><span class="mi">5000</span><span class="p">]</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'read step skipped: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">exc</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s1">: </span><span class="si">{</span><span class="n">exc</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
+</pre></div>
+<div class="clipboard-copy-txt" id="cell-3">lat = lon = agbd = beam = None
+if paths:
+    try:
+        import h5py
+
+        with h5py.File(paths[0], 'r') as h5:
+            beam = next(k for k in h5 if k.startswith('BEAM'))
+            lat = h5[f'{beam}/lat_lowestmode'][:5000]
+            lon = h5[f'{beam}/lon_lowestmode'][:5000]
+            agbd = h5[f'{beam}/agbd'][:5000]
+    except Exception as exc:
+        print(f'read step skipped: {type(exc).__name__}: {exc}')</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=9ddae4dd">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h2 id="plot-the-footprints">Plot the footprints<a class="anchor-link" href="#plot-the-footprints">¶</a></h2><p>Scatter the sampled footprints coloured by aboveground biomass density
+(<code>agbd</code>, Mg/ha) to see how biomass varies along the beam track.</p>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=d6f381ad">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="CodeMirror cm-s-jupyter">
+<div class="zeroclipboard-container">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-4">
+<div>
+<span class="notice" hidden="">Copied!</span>
+<svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
+<path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+<path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+</svg>
+</div>
+</clipboard-copy>
+</div>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="k">if</span> <span class="n">beam</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+
         <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
         <span class="n">sc</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">lon</span><span class="p">,</span> <span class="n">lat</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="n">agbd</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">'YlGn'</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
         <span class="n">fig</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">sc</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">'AGBD (Mg/ha)'</span><span class="p">)</span>
@@ -11626,21 +11867,12 @@ except Exception as exc:
         <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
         <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
     <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'read/plot step skipped: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">exc</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s1">: </span><span class="si">{</span><span class="n">exc</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'plot step skipped: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">exc</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s1">: </span><span class="si">{</span><span class="n">exc</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-3"># Each granule is an HDF5 file of per-beam footprints (lat/lon + agbd). Read a
-# sample from the first beam and scatter it. Wrapped so an h5py / structure
-# surprise does not mask the download above.
-if paths:
+<div class="clipboard-copy-txt" id="cell-4">if beam is not None:
     try:
-        import h5py
         import matplotlib.pyplot as plt
 
-        with h5py.File(paths[0], 'r') as h5:
-            beam = next(k for k in h5 if k.startswith('BEAM'))
-            lat = h5[f'{beam}/lat_lowestmode'][:5000]
-            lon = h5[f'{beam}/lon_lowestmode'][:5000]
-            agbd = h5[f'{beam}/agbd'][:5000]
         fig, ax = plt.subplots(figsize=(8, 6))
         sc = ax.scatter(lon, lat, c=agbd, cmap='YlGn', s=6, vmin=0)
         fig.colorbar(sc, ax=ax, label='AGBD (Mg/ha)')
@@ -11650,7 +11882,7 @@ if paths:
         plt.tight_layout()
         plt.show()
     except Exception as exc:
-        print(f'read/plot step skipped: {type(exc).__name__}: {exc}')</div>
+        print(f'plot step skipped: {type(exc).__name__}: {exc}')</div>
 </div>
 </div>
 </div>
