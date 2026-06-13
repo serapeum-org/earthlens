@@ -634,6 +634,8 @@ class GEE(LazyClientMixin, AbstractDataSource):
                 ...     variables={"UCSB-CHG/CHIRPS/DAILY": ["precipitation"]},
                 ...     lat_lim=[29.0, 30.0], lon_lim=[31.0, 32.0],
                 ...     path="data/gee", scale=5566,
+                ... )
+                >>> gee.authenticate(  # doctest: +SKIP
                 ...     service_account="sa@p.iam.gserviceaccount.com",
                 ...     service_key="/path/to/key.json",
                 ... )
@@ -648,7 +650,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
                 ...     start="2020-06-01", end="2020-06-01",
                 ...     variables={"UCSB-CHG/CHIRPS/DAILY": ["precipitation"]},
                 ...     lat_lim=[29.0, 30.0], lon_lim=[31.0, 32.0],
-                ...     scale=5566, project="my-project",
+                ...     scale=5566,
                 ... )
                 >>> gee.download(aggregate=object())  # doctest: +SKIP
                 Traceback (most recent call last):
@@ -661,7 +663,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
             earthlens.gee.Catalog: Resolves the `{asset_id: [band, ...]}`
                 request against `src/earthlens/gee/catalog/`.
             earthlens.gee.auth.EarthEngineAuth: Performs the one-time
-                `ee.Initialize` used by :meth:`_initialize`.
+                `ee.Initialize` used by :meth:`_open_client`.
         """
         if aggregate is not None:
             raise NotImplementedError(
