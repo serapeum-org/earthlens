@@ -499,6 +499,15 @@ class AbstractDataSource(ABC):
         The original `__init__` is preserved as the wrapper's `__wrapped__`,
         so signature introspection (e.g. `EarthLens.options_for`) and the
         facade's kwarg validation still see the backend's real parameters.
+
+        Note:
+            No backend currently subclasses another backend. If one ever
+            does, its `__init__` must not forward the ergonomic kwargs
+            (`aoi` / `buffer` / `cadence` / `dataset`) up to
+            `super().__init__()`: the parent's wrapper would resolve them a
+            second time (e.g. re-running `resolve_aoi`). Forward only the
+            already-resolved native parameters (`lat_lim` / `lon_lim` /
+            `temporal_resolution` / `variables`) instead.
         """
         super().__init_subclass__(**kwargs)
         orig = cls.__dict__.get("__init__")
