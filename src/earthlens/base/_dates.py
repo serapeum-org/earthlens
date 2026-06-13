@@ -126,7 +126,8 @@ def split_time(value: Any) -> tuple[Any, Any]:
     * a `"start/end"` string (STAC interval) — split on the first `/`; an
       empty half (`"a/"` / `"/b"`) becomes `None` (open-ended);
     * a `(start, end)` / `[start, end]` 2-sequence;
-    * a `slice(start, stop)` — `value.start` / `value.stop`;
+    * a `slice(start, stop)` — `value.start` / `value.stop` (a `step` is
+      rejected, since a step has no meaning on a date range);
     * a single date-like string / `datetime` / `date` — an instant, returned
       as `(value, value)`.
 
@@ -137,7 +138,8 @@ def split_time(value: Any) -> tuple[Any, Any]:
         `(start, end)`, each a date-like value (or `None` for an open half).
 
     Raises:
-        ValueError: If a sequence does not have exactly two elements.
+        ValueError: If a sequence does not have exactly two elements, or if
+            a `slice` carries a `step`.
         TypeError: If `value` is of an unsupported type.
 
     Examples:
@@ -161,6 +163,10 @@ def split_time(value: Any) -> tuple[Any, Any]:
             ```
     """
     if isinstance(value, slice):
+        if value.step is not None:
+            raise ValueError(
+                f"time= slice does not accept a step; got step={value.step!r}"
+            )
         return value.start, value.stop
     if isinstance(value, str):
         if "/" in value:

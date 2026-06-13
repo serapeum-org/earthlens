@@ -120,6 +120,11 @@ class TestSplitTime:
             "2020-03-01",
         )
 
+    def test_slice_with_step_raises(self):
+        """A slice carrying a step is rejected (no meaning on a date range)."""
+        with pytest.raises(ValueError, match="slice does not accept a step"):
+            split_time(slice("2020-01-01", "2020-03-01", 2))
+
     def test_single_string_is_an_instant(self):
         """A plain date string with no slash is a single instant."""
         assert split_time("2020-01-01") == ("2020-01-01", "2020-01-01")
