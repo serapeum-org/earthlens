@@ -65,12 +65,15 @@ from earthlens.base.providers import load_providers
 from earthlens.base.yaml_loader import load_yaml_strict
 from earthlens.ecmwf.constraints import fetch_constraints
 
-# `download_job` / `list_recent_jobs` were split out of this module into
-# `earthlens.ecmwf.jobs` (N3 in planning/catalog-cross-backend-comparison.md).
-# `Catalog` still delegates to them internally, so import the implementations
-# under private names.
+# `read_cdsapirc` / `download_job` / `list_recent_jobs` were split out of this
+# module into `earthlens.ecmwf.jobs` (N3 in
+# planning/catalog-cross-backend-comparison.md). `Catalog` still delegates to
+# `download_job` / `list_recent_jobs` internally, so import them under private
+# names; `_read_cdsapirc` is re-exported only so any external caller using
+# `from earthlens.ecmwf.catalog import _read_cdsapirc` keeps working.
 from earthlens.ecmwf.jobs import download_job as _download_job_impl
 from earthlens.ecmwf.jobs import list_recent_jobs as _list_recent_jobs_impl
+from earthlens.ecmwf.jobs import read_cdsapirc as _read_cdsapirc  # noqa: F401
 
 _LEGACY_MARS_KEYS: frozenset[str] = frozenset(
     {"number_para", "download type", "var_name"}
