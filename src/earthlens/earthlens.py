@@ -572,10 +572,13 @@ class EarthLens:
                 verbatim to the chosen backend's constructor — for
                 backend-specific options the facade does not name
                 explicitly (e.g. ECMWF's `skip_constraints`, or GEE's
-                `service_account` / `service_key` / `project` / `scale` /
-                `crs` / `reducer` / `export_via` / `drive_folder` /
-                `gcs_bucket` / `region`). A kwarg the backend does not
-                accept is its `TypeError`, not the facade's.
+                `scale` / `crs` / `reducer` / `export_via` /
+                `drive_folder` / `gcs_bucket` / `region`). Credentials are
+                not constructor kwargs: backends that defer auth take them
+                on `authenticate()` instead (e.g. GEE's `service_account`
+                / `service_key` / `project`), so forwarding those through
+                the facade raises `TypeError`. A kwarg the backend does
+                not accept is its `TypeError`, not the facade's.
 
         Raises:
             ValueError: If `data_source` is not a key of
@@ -585,12 +588,13 @@ class EarthLens:
             AuthenticationError: For backends that defer auth
                 (ECMWF, GEE, STAC, CMEMS, …) the network handshake is
                 lazy, so an auth failure surfaces on the first
-                `download()` / `search()`, not here. GEE is the
-                exception that still raises at construction — but only
-                its *offline* precondition (neither `service_account` +
-                `service_key` nor an explicit `project=` was given); its
-                actual Earth Engine errors (invalid key, unregistered
-                project) are also deferred to first use.
+                `authenticate()` / `download()` / `search()`, not at
+                construction. GEE resolves and opens its Earth Engine
+                connection lazily too: its *offline* precondition (no
+                `service_account` + `service_key` / `project` and no
+                matching environment variable) and its actual Earth
+                Engine errors (invalid key, unregistered project) all
+                surface on first use, not here.
             ImportError: If the chosen backend's optional SDK is not
                 installed (e.g. `data_source="gee"` without
                 `pip install earthlens[gee]`).
