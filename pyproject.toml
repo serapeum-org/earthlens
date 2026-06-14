@@ -26,7 +26,7 @@ classifiers = [
 requires-python = ">=3.11,<4"
 
 dependencies = [
-    "pyramids-gis >=0.32.0",
+    "pyramids-gis >=0.33.0",
     "geopandas >=1.0.0",
     "joblib >=1.5.0",
     "loguru >=0.7.3",
@@ -62,12 +62,21 @@ fdsn = ["obspy >=1.5.0"]
 # never imports xarray/zarr itself (pyramids owns the read).
 nwm = [
     "earthlens[s3]",
-    "pyramids-gis[lazy,xarray,parquet] >=0.32.0",
+    "pyramids-gis[lazy,xarray,parquet] >=0.33.0",
 ]
 earthdata = ["earthaccess >=0.18.0; python_version >= '3.12'"]
 hdx = ["hdx-python-api >=6,<7"]
 eumetsat = ["eumdac >=3.1"]
-nwp = ["herbie-data >=2026.3", "ecmwf-opendata >=0.3"]
+# herbie/cfgrib decode GRIB through the ecCodes C library. On Linux/macOS the
+# pip `eccodes` binding pulls the binary via `eccodeslib`; that package has no
+# Windows build, so on Windows `ecmwflibs` (ECMWF's binary bundle) supplies the
+# `eccodes.dll`, wired up by `earthlens.nwp._eccodes.ensure_eccodes()`. (Conda
+# envs get the binary from the `eccodes` conda package below; the shim no-ops.)
+nwp = [
+    "herbie-data >=2026.3",
+    "ecmwf-opendata >=0.3",
+    "ecmwflibs; sys_platform == 'win32'",
+]
 radar = ["earthlens[s3]"]
 stac = ["pyramids-gis[stac]"]
 openeo = ["openeo >=0.47,<0.48"]
@@ -93,7 +102,7 @@ dev = [
     # pyramids-gis[viz] (cleopatra): the showcase notebooks render rasters and
     # animate Dataset stacks via Dataset.plot / DatasetCollection.plot; not a
     # runtime dep of earthlens itself.
-    "pyramids-gis[viz] >=0.32.0",
+    "pyramids-gis[viz] >=0.33.0",
     "pre-commit >=3.7.1",
     "pre-commit-hooks >=4.6.0",
     "pytest >=8.2.2",
@@ -122,7 +131,7 @@ docs = [
     # matplotlib: mkdocs-jupyter runs the notebooks at build time.
     "matplotlib >=3.5",
     # pyramids-gis[viz] (cleopatra): showcase notebooks plot/animate Datasets.
-    "pyramids-gis[viz] >=0.32.0",
+    "pyramids-gis[viz] >=0.33.0",
     # python-dotenv: showcase notebooks load credentials from a repo-root .env.
     "python-dotenv >=1.0",
 ]
@@ -258,6 +267,12 @@ platforms = ["win-64", "linux-64", "osx-arm64"]
 # pixi falls back to the GDAL-less sdist. ubuntu-latest (24.04) provides glibc 2.39.
 [tool.pixi.system-requirements]
 libc = "2.39"
+# ecmwflibs (the Windows GRIB binary for the nwp extra) only ships an
+# osx-arm64 wheel tagged macosx_15; pixi defaults osx-arm64 to macOS 13, so
+# without this floor the multi-platform lock cannot place it. Raising the
+# target to 15 matches that wheel; every other package's older-macOS wheels
+# stay valid (a lower macOS floor is always compatible with a higher target).
+macos = "15.0"
 
 [tool.pixi.pypi-dependencies]
 # Dev/test env pulls every backend's SDK (`[all]`) so the full suite runs.

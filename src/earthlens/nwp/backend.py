@@ -405,6 +405,10 @@ class NWP(AbstractDataSource):
                 product, in order. Shorter than `products` when some
                 were skipped under `errors` in `{"warn", "skip"}`.
         """
+        from earthlens.nwp._eccodes import ensure_eccodes
+
+        ensure_eccodes()
+
         from pyramids.dataset.cog import write_cog
         from pyramids.grib import open_grib
 
