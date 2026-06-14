@@ -67,9 +67,11 @@ def test_download_one_short_range_channel_rt(tmp_path):
 
 
 @pytest.mark.xfail(
-    reason="pyramids LabeledDataset's GDAL /vsis3 reader can't open the eu-central-1 "
-    "retrospective Zarr store (S3 PermanentRedirect) — serapeum-org/pyramids#535",
-    raises=ValueError,
+    reason="pyramids 0.34.0 (#537) resolves the bucket region so the eu-central-1 "
+    "retrospective Zarr store now opens, but GDAL's multidim Zarr reader silently "
+    "returns all-zeros for the zstd-compressed feature_id coordinate, so the label "
+    "subset raises KeyError ('feature_id' values not found) — serapeum-org/pyramids#560",
+    raises=KeyError,
     strict=False,
 )
 @pytest.mark.skipif(not _network_available(), reason="noaa-nwm-pds unreachable")

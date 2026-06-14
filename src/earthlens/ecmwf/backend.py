@@ -810,12 +810,10 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
         so a partial write cannot corrupt the cube. A no-op for a bbox /
         point `aoi=`.
 
-        Best-effort: a CDS cube ships a non-spatial aux variable (ERA5's
-        `expver`) that currently trips `pyramids.NetCDF.crop` — it calls
-        `crop` on that raw `MDArray` (serapeum-org/pyramids#513). When that
-        happens the bbox-cropped NetCDF is kept and a warning is logged
-        rather than failing the download — polygon masking starts working
-        automatically once pyramids skips non-spatial variables.
+        pyramids carries the CDS cube's non-spatial aux variable (ERA5's
+        `expver`) through the crop unchanged (serapeum-org/pyramids#514),
+        so the mask applies cleanly; any genuine error (e.g. a polygon that
+        does not overlap the data) is left to propagate.
 
         Args:
             target: Path to the NetCDF written by `_api`.
@@ -831,19 +829,6 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
             masked = cube.crop(mask=geometry, touch=True)
             tmp = target.with_name(target.stem + ".masked" + target.suffix)
             masked.to_file(str(tmp))
-        except (AttributeError, NotImplementedError) as exc:
-            # The known pyramids#513 limitation: NetCDF.crop calls `crop`
-            # on a non-spatial aux variable (ERA5's `expver`). Degrade to
-            # the bbox NetCDF rather than failing the download. A genuine
-            # error (e.g. a ValueError for a polygon that does not overlap
-            # the data) is left to propagate — it is the caller's bug, not
-            # a pyramids limitation.
-            logger.warning(
-                f"polygon aoi= masking skipped for {target.name}; the bbox "
-                f"crop is retained. pyramids could not mask this NetCDF cube "
-                f"({type(exc).__name__}: {exc}) — see serapeum-org/pyramids#513."
-            )
-            return
         finally:
             cube.close()
             if masked is not None:
