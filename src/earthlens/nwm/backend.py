@@ -553,7 +553,7 @@ class NWM(AbstractDataSource):
             raise ImportError(
                 "NWM subsetting / retrospective reads need the pyramids "
                 "LabeledDataset reader; install `pip install "
-                "earthlens[nwm]` (pyramids-gis[lazy,xarray,parquet] >= 0.30.0)."
+                "earthlens[nwm]` (pyramids-gis[parquet] >= 0.33.0)."
             ) from exc
         return LabeledDataset
 
@@ -572,7 +572,7 @@ class NWM(AbstractDataSource):
             raise ImportError(
                 "NWM gridded subsetting needs the pyramids NetCDF reader; "
                 "install `pip install earthlens[nwm]` "
-                "(pyramids-gis[lazy,xarray,parquet] >= 0.30.0)."
+                "(pyramids-gis[parquet] >= 0.33.0)."
             ) from exc
         return NetCDF
 
@@ -904,7 +904,7 @@ def _close_quietly(cube: Any) -> None:
         cube: An opened `LabeledDataset`.
     """
     try:
-        cube.dataset.close()
+        cube.close()
     except Exception:  # noqa: BLE001 - best-effort handle release
         pass
 

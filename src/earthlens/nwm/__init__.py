@@ -27,7 +27,7 @@ with an interleaved vertical/layer dimension, e.g. `SOIL_M`) is deferred
 with a clear `NotImplementedError`.
 
 The `[nwm]` extra pulls `boto3` (unsigned S3) plus
-`pyramids-gis[lazy,xarray,parquet]` (the pyramids readers); both are
+`pyramids-gis[parquet]` (the pyramids readers); both are
 imported lazily, so the package imports — and `NWM(...)` constructs —
 without the extra installed (a friendly `ImportError` naming
 `earthlens[nwm]` surfaces at `download()` time).

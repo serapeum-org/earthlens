@@ -57,12 +57,14 @@ gee = [
 ]
 cmems = ["copernicusmarine >=2.0.0,<3"]
 fdsn = ["obspy >=1.5.0"]
-# NOAA National Water Model (unsigned noaa-nwm-pds bucket). pyramids-gis with
-# [lazy,xarray,parquet] reads the Zarr / feature_id NetCDF subsets, so earthlens
-# never imports xarray/zarr itself (pyramids owns the read).
+# NOAA National Water Model (unsigned noaa-nwm-pds bucket). The NWM backend
+# reads Zarr / feature_id NetCDF subsets through pyramids' LabeledDataset (now a
+# GDAL multidimensional reader — no xarray/dask, serapeum-org/pyramids#520) and
+# NetCDF.subset; earthlens never imports xarray/zarr itself (pyramids owns the
+# read). Only `[parquet]` is needed, and only for LabeledDataset.to_parquet.
 nwm = [
     "earthlens[s3]",
-    "pyramids-gis[lazy,xarray,parquet] >=0.33.0",
+    "pyramids-gis[parquet] >=0.33.0",
 ]
 earthdata = ["earthaccess >=0.18.0; python_version >= '3.12'"]
 hdx = ["hdx-python-api >=6,<7"]

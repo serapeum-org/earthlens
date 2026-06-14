@@ -57,7 +57,6 @@ class FakeLabeled:
     def __init__(self, href: str, variables: Any) -> None:
         self.href = href
         self.variables = variables
-        self.dataset = self  # so `_close_quietly(cube)` finds `.dataset.close()`
 
     @classmethod
     def read_file(cls, path, *, anon: bool = False, variables=None, **kw):
@@ -123,7 +122,6 @@ class FakeNetCDF:
 
     def __init__(self, path: str) -> None:
         self.path = path
-        self.dataset = self  # so `_close_quietly` finds `.dataset.close()`
 
     @classmethod
     def read_file(cls, path, **kw) -> FakeNetCDF:

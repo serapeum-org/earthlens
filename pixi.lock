@@ -11338,7 +11338,7 @@ packages:
 - pypi: ./
   name: earthlens
   version: 0.7.0
-  sha256: 5b2bf20700a9c41168411ecc45615fc2f094fa40aa3cf9aebe2eb040328ee15e
+  sha256: a41ca0129dc3fff690a3ed6cf7d4f520f6209a32182fc039c86d3109ffacc556
   requires_dist:
   - pyramids-gis>=0.33.0
   - geopandas>=1.0.0
@@ -11365,7 +11365,7 @@ packages:
   - copernicusmarine>=2.0.0,<3 ; extra == 'cmems'
   - obspy>=1.5.0 ; extra == 'fdsn'
   - earthlens[s3] ; extra == 'nwm'
-  - pyramids-gis[lazy,xarray,parquet]>=0.33.0 ; extra == 'nwm'
+  - pyramids-gis[parquet]>=0.33.0 ; extra == 'nwm'
   - earthaccess>=0.18.0 ; python_full_version >= '3.12' and extra == 'earthdata'
   - hdx-python-api>=6,<7 ; extra == 'hdx'
   - eumdac>=3.1 ; extra == 'eumetsat'
