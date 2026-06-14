@@ -819,12 +819,22 @@ class TestFacadePath:
             end="2009-01-02",
         )
         monkeypatch.setattr(facade.datasource, "download", lambda *a, **k: [])
+        temp_dir = None
+
+        def _capture(*a, **k):
+            nonlocal temp_dir
+            temp_dir = facade.datasource.path
+            return []
+
+        monkeypatch.setattr(facade.datasource, "download", _capture)
         facade.load(progress_bar=False)
         default = Path.cwd() / "earthlens-data" / "chc"
         assert (
             facade.datasource.root_dir != default
         ), "load() should redirect off the default"
         assert not default.exists(), "load() should remove the empty default dir"
+        # An empty result holds no handle into the temp dir, so it is gone at once.
+        assert not Path(temp_dir).exists(), "load() leaked its temp dir"
 
     def test_empty_path_still_uses_cwd(self, tmp_path, monkeypatch):
         """An explicit path='' opts into the current working directory."""
@@ -839,6 +849,74 @@ class TestFacadePath:
             path="",
         ).datasource
         assert backend.root_dir == Path.cwd(), f"got {backend.root_dir}"
+
+
+class _FakeRaster:
+    """A stand-in for a pyramids raster: `copy()` detaches, `close()` releases."""
+
+    def __init__(self, detached=False):
+        self.detached = detached
+        self.closed = False
+
+    def copy(self):
+        return _FakeRaster(detached=True)
+
+    def close(self):
+        self.closed = True
+
+
+class TestLoadTempdirCleanup:
+    """load() detaches its result from the temp dir and removes it at once."""
+
+    def _tempdir(self, tmp_path):
+        d = tmp_path / "earthlens-load-x"
+        d.mkdir()
+        (d / "raster.tif").write_bytes(b"data")
+        return d
+
+    def test_inmemory_result_removed_immediately(self, tmp_path):
+        """A passthrough (non-list) result holds no handle, so the dir goes at once."""
+        from earthlens.earthlens import _detach_and_cleanup
+
+        d = self._tempdir(tmp_path)
+        out = _detach_and_cleanup(d, {"in": "memory"})
+        assert out == {"in": "memory"}, "passthrough result should be returned as-is"
+        assert not d.exists(), "in-memory result should free the temp dir immediately"
+
+    def test_empty_list_removed_immediately(self, tmp_path):
+        """An empty list has nothing reading from the dir, so it goes at once."""
+        from earthlens.earthlens import _detach_and_cleanup
+
+        d = self._tempdir(tmp_path)
+        _detach_and_cleanup(d, [])
+        assert not d.exists(), "empty result should free the temp dir immediately"
+
+    def test_rasters_detached_and_dir_removed(self, tmp_path):
+        """Each raster is replaced by its in-memory copy, closed, and the dir removed."""
+        from earthlens.earthlens import _detach_and_cleanup
+
+        d = self._tempdir(tmp_path)
+        original = _FakeRaster()
+        out = _detach_and_cleanup(d, [original])
+        assert original.closed, "the file-backed raster should be closed"
+        assert out[0] is not original, "result should be the detached in-memory copy"
+        assert out[0].detached, "returned raster should be the copy()"
+        assert not d.exists(), "temp dir should be removed once rasters are detached"
+
+    def test_raw_path_result_deferred_to_exit_sweep(self, tmp_path):
+        """A raw Path in the result defers cleanup to the process-exit sweep."""
+        from earthlens.earthlens import (
+            _LOAD_TEMP_DIRS,
+            _detach_and_cleanup,
+            _sweep_load_tempdirs,
+        )
+
+        d = self._tempdir(tmp_path)
+        _detach_and_cleanup(d, [d / "table.csv"])
+        assert d.exists(), "a caller-owned path must not be removed immediately"
+        assert str(d) in _LOAD_TEMP_DIRS, "dir should be registered for the exit sweep"
+        _sweep_load_tempdirs()
+        assert not d.exists(), "exit sweep should remove the deferred dir"
 
 
 class TestFacadeOptions:

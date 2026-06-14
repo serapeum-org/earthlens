@@ -14,9 +14,11 @@ SDK into a friendly `ImportError` naming the extra to install.
 
 from __future__ import annotations
 
+import atexit
 import difflib
 import importlib
 import inspect
+import shutil
 import tempfile
 import warnings
 from collections.abc import Iterator, Mapping
@@ -92,6 +94,70 @@ def _load_result(result: Any) -> Any:
         )
         for item in result
     ]
+
+
+#: `load()` temp directories deferred to the process-exit sweep — only the rare
+#: case where the result hands back a raw `Path` the caller still reads (a mixed
+#: backend's `.csv`). Raster results are detached in-memory and removed at once.
+_LOAD_TEMP_DIRS: set[str] = set()
+
+
+@atexit.register
+def _sweep_load_tempdirs() -> None:
+    """Remove any deferred `load()` temp dir still pending when the process exits."""
+    for temp_dir in list(_LOAD_TEMP_DIRS):
+        shutil.rmtree(temp_dir, ignore_errors=True)
+        _LOAD_TEMP_DIRS.discard(temp_dir)
+
+
+def _detach_and_cleanup(temp_dir: Path, result: Any) -> Any:
+    """Detach a `load()` result from its temp dir, then remove the directory.
+
+    `load()` writes a backend's incidental files to a throwaway temp directory
+    when `path` was omitted. The rasters it returns (`pyramids.Dataset` /
+    `NetCDF`) otherwise read from those files lazily and hold an open handle —
+    on Windows that even locks the files. Each raster is therefore replaced with
+    an in-memory `copy()` and its file handle closed, so the directory can be
+    removed immediately and deterministically (no reliance on garbage-collection
+    timing). A raw `Path` the caller still owns (a mixed backend's `.csv`) cannot
+    be detached, so the directory is deferred to the process-exit sweep instead.
+
+    Args:
+        temp_dir: The directory created by
+            :meth:`EarthLens._redirect_output_to_tempdir`.
+        result: The value produced by :func:`_load_result`.
+
+    Returns:
+        The result with each file-backed raster swapped for an in-memory copy.
+    """
+    # A passthrough in-memory object (GeoDataFrame / DataFrame) holds no handle.
+    if not isinstance(result, list):
+        shutil.rmtree(temp_dir, ignore_errors=True)
+        return result
+
+    detached: list[Any] = []
+    caller_owns_path = False
+    for item in result:
+        if isinstance(item, (str, Path)):
+            caller_owns_path = True
+            detached.append(item)
+        elif hasattr(item, "copy") and hasattr(item, "close"):
+            # A pyramids raster: deep-copy into memory, then release the file.
+            try:
+                in_memory = item.copy()
+                item.close()
+                detached.append(in_memory)
+            except Exception:  # noqa: BLE001 — keep the original; defer cleanup
+                caller_owns_path = True
+                detached.append(item)
+        else:
+            detached.append(item)  # already in memory (e.g. a GeoDataFrame)
+
+    if caller_owns_path:
+        _LOAD_TEMP_DIRS.add(str(temp_dir))  # defer to the process-exit sweep
+    else:
+        shutil.rmtree(temp_dir, ignore_errors=True)
+    return detached
 
 
 class _LazyRegistry(Mapping):
@@ -1440,7 +1506,12 @@ class EarthLens:
         When `path` was omitted, `load` writes to a throwaway temp directory
         (not the persistent `./earthlens-data/<source>/` that `download` uses),
         so a load-and-plot run never leaves files in the working tree — there is
-        no need to pass `path=tempfile.mkdtemp()` yourself.
+        no need to pass `path=tempfile.mkdtemp()` yourself. Each returned raster
+        is detached into an in-memory copy and the temp directory is removed
+        immediately, so repeated `load()` calls — e.g. a per-year loop — do not
+        accumulate gigabytes under the system temp dir. (Because the data is
+        copied into memory, a `path=`-less `load` of a very large raster reads it
+        fully into RAM; pass `path=` to keep the lazy, file-backed objects.)
 
         `xarray` is intentionally not the return type: a returned
         `pyramids.Dataset` / `NetCDF` already exposes `.to_xarray()` for callers
@@ -1471,9 +1542,12 @@ class EarthLens:
 
                 ```
         """
-        if not self._explicit_path:
-            self._redirect_output_to_tempdir()
-        return _load_result(self._dispatch_download(*args, **kwargs))
+        if self._explicit_path:
+            return _load_result(self._dispatch_download(*args, **kwargs))
+        self._redirect_output_to_tempdir()
+        temp_dir = self.datasource.path
+        result = _load_result(self._dispatch_download(*args, **kwargs))
+        return _detach_and_cleanup(temp_dir, result)
 
 
 def download(
