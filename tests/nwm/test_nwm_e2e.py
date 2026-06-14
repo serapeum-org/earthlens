@@ -66,6 +66,12 @@ def test_download_one_short_range_channel_rt(tmp_path):
     assert written.name.endswith(".conus.nc")
 
 
+@pytest.mark.xfail(
+    reason="pyramids LabeledDataset's GDAL /vsis3 reader can't open the eu-central-1 "
+    "retrospective Zarr store (S3 PermanentRedirect) — serapeum-org/pyramids#535",
+    raises=ValueError,
+    strict=False,
+)
 @pytest.mark.skipif(not _network_available(), reason="noaa-nwm-pds unreachable")
 def test_retrospective_streamflow_subset(tmp_path):
     """Subset the retrospective chrtout Zarr to a few reaches and a short window."""
