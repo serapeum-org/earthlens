@@ -5,8 +5,6 @@ environments:
     - url: https://conda.anaconda.org/conda-forge/
     indexes:
     - https://pypi.org/simple
-    options:
-      pypi-prerelease-mode: if-necessary-or-explicit
     packages:
       linux-64:
       - conda: https://conda.anaconda.org/conda-forge/linux-64/_openmp_mutex-4.5-20_gnu.conda
@@ -770,8 +768,6 @@ environments:
     - url: https://conda.anaconda.org/conda-forge/
     indexes:
     - https://pypi.org/simple
-    options:
-      pypi-prerelease-mode: if-necessary-or-explicit
     packages:
       linux-64:
       - conda: https://conda.anaconda.org/conda-forge/linux-64/_openmp_mutex-4.5-20_gnu.conda
@@ -926,6 +922,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/85/fc/af19e70aed4c29d3ecddd14f1693c00674866b3352b40015a0d768464242/eckitlib-2.0.7.20-cp314-cp314-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl
       - pypi: https://files.pythonhosted.org/packages/13/a6/27bc3c51cf862c8b70bc8fe21b812b9c1ca6f31ecee9def96c82d93f003b/ecmwf_datastores_client-0.5.1-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/6a/2a/b2a925b4e2830901f6e9064b90892eb3aba4b4ca8564bbaa5acc18666727/ecmwf_opendata-0.3.29-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/e5/40/1600f5dde9274c2ab33fbe5ca8e635c08c4d798fa363aad1bdd914c34aad/ecmwflibs-0.7.0-cp314-cp314-manylinux_2_28_x86_64.whl
       - pypi: https://files.pythonhosted.org/packages/de/15/545e2b6cf2e3be84bc1ed85613edd75b8aea69807a71c26f4ca6a9258e82/email_validator-2.3.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/c1/8b/5fe2cc11fee489817272089c4203e679c63b570a5aaeb18d852ae3cbba6a/et_xmlfile-2.0.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/f2/50/19f18fb17dc7bad32070fbca54d40f6fe8e5711deb1c744c84ac9d13ec10/eumdac-3.1.1-py3-none-any.whl
@@ -1323,6 +1320,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/bf/fb/9b751ced57d7f885accadc8b85735fdbd39c6197883d374b37d2bfebe079/eckitlib-2.0.7.20-cp314-cp314-macosx_13_0_arm64.whl
       - pypi: https://files.pythonhosted.org/packages/13/a6/27bc3c51cf862c8b70bc8fe21b812b9c1ca6f31ecee9def96c82d93f003b/ecmwf_datastores_client-0.5.1-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/6a/2a/b2a925b4e2830901f6e9064b90892eb3aba4b4ca8564bbaa5acc18666727/ecmwf_opendata-0.3.29-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/70/f5/cccdcc447d8d661421726f2945f220ff7ce2a3f474724ca92123ddbf5110/ecmwflibs-0.7.0-cp314-cp314-macosx_10_15_x86_64.macosx_15_0_arm64.whl
       - pypi: https://files.pythonhosted.org/packages/de/15/545e2b6cf2e3be84bc1ed85613edd75b8aea69807a71c26f4ca6a9258e82/email_validator-2.3.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/c1/8b/5fe2cc11fee489817272089c4203e679c63b570a5aaeb18d852ae3cbba6a/et_xmlfile-2.0.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/f2/50/19f18fb17dc7bad32070fbca54d40f6fe8e5711deb1c744c84ac9d13ec10/eumdac-3.1.1-py3-none-any.whl
@@ -1977,8 +1975,6 @@ environments:
     - url: https://conda.anaconda.org/conda-forge/
     indexes:
     - https://pypi.org/simple
-    options:
-      pypi-prerelease-mode: if-necessary-or-explicit
     packages:
       linux-64:
       - conda: https://conda.anaconda.org/conda-forge/linux-64/_openmp_mutex-4.5-20_gnu.conda
@@ -2957,8 +2953,6 @@ environments:
     - url: https://conda.anaconda.org/conda-forge/
     indexes:
     - https://pypi.org/simple
-    options:
-      pypi-prerelease-mode: if-necessary-or-explicit
     packages:
       linux-64:
       - conda: https://conda.anaconda.org/conda-forge/linux-64/_openmp_mutex-4.5-20_gnu.conda
@@ -3113,6 +3107,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/85/fc/af19e70aed4c29d3ecddd14f1693c00674866b3352b40015a0d768464242/eckitlib-2.0.7.20-cp314-cp314-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl
       - pypi: https://files.pythonhosted.org/packages/13/a6/27bc3c51cf862c8b70bc8fe21b812b9c1ca6f31ecee9def96c82d93f003b/ecmwf_datastores_client-0.5.1-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/6a/2a/b2a925b4e2830901f6e9064b90892eb3aba4b4ca8564bbaa5acc18666727/ecmwf_opendata-0.3.29-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/e5/40/1600f5dde9274c2ab33fbe5ca8e635c08c4d798fa363aad1bdd914c34aad/ecmwflibs-0.7.0-cp314-cp314-manylinux_2_28_x86_64.whl
       - pypi: https://files.pythonhosted.org/packages/de/15/545e2b6cf2e3be84bc1ed85613edd75b8aea69807a71c26f4ca6a9258e82/email_validator-2.3.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/c1/8b/5fe2cc11fee489817272089c4203e679c63b570a5aaeb18d852ae3cbba6a/et_xmlfile-2.0.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/f2/50/19f18fb17dc7bad32070fbca54d40f6fe8e5711deb1c744c84ac9d13ec10/eumdac-3.1.1-py3-none-any.whl
@@ -3511,6 +3506,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/bf/fb/9b751ced57d7f885accadc8b85735fdbd39c6197883d374b37d2bfebe079/eckitlib-2.0.7.20-cp314-cp314-macosx_13_0_arm64.whl
       - pypi: https://files.pythonhosted.org/packages/13/a6/27bc3c51cf862c8b70bc8fe21b812b9c1ca6f31ecee9def96c82d93f003b/ecmwf_datastores_client-0.5.1-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/6a/2a/b2a925b4e2830901f6e9064b90892eb3aba4b4ca8564bbaa5acc18666727/ecmwf_opendata-0.3.29-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/70/f5/cccdcc447d8d661421726f2945f220ff7ce2a3f474724ca92123ddbf5110/ecmwflibs-0.7.0-cp314-cp314-macosx_10_15_x86_64.macosx_15_0_arm64.whl
       - pypi: https://files.pythonhosted.org/packages/de/15/545e2b6cf2e3be84bc1ed85613edd75b8aea69807a71c26f4ca6a9258e82/email_validator-2.3.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/c1/8b/5fe2cc11fee489817272089c4203e679c63b570a5aaeb18d852ae3cbba6a/et_xmlfile-2.0.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/f2/50/19f18fb17dc7bad32070fbca54d40f6fe8e5711deb1c744c84ac9d13ec10/eumdac-3.1.1-py3-none-any.whl
@@ -4167,8 +4163,6 @@ environments:
     - url: https://conda.anaconda.org/conda-forge/
     indexes:
     - https://pypi.org/simple
-    options:
-      pypi-prerelease-mode: if-necessary-or-explicit
     packages:
       linux-64:
       - conda: https://conda.anaconda.org/conda-forge/linux-64/_openmp_mutex-4.5-20_gnu.conda
@@ -5253,8 +5247,6 @@ environments:
     - url: https://conda.anaconda.org/conda-forge/
     indexes:
     - https://pypi.org/simple
-    options:
-      pypi-prerelease-mode: if-necessary-or-explicit
     packages:
       linux-64:
       - conda: https://conda.anaconda.org/conda-forge/linux-64/_openmp_mutex-4.5-20_gnu.conda
@@ -6339,8 +6331,6 @@ environments:
     - url: https://conda.anaconda.org/conda-forge/
     indexes:
     - https://pypi.org/simple
-    options:
-      pypi-prerelease-mode: if-necessary-or-explicit
     packages:
       linux-64:
       - conda: https://conda.anaconda.org/conda-forge/linux-64/_openmp_mutex-4.5-20_gnu.conda
@@ -7428,8 +7418,6 @@ environments:
     - url: https://conda.anaconda.org/conda-forge/
     indexes:
     - https://pypi.org/simple
-    options:
-      pypi-prerelease-mode: if-necessary-or-explicit
     packages:
       linux-64:
       - conda: https://conda.anaconda.org/conda-forge/linux-64/_openmp_mutex-4.5-20_gnu.conda
@@ -11397,6 +11385,7 @@ packages:
   - py7zr>=0.20 ; extra == 'worldpop'
   - earthlens[s3,ecmwf,gee,cmems,fdsn,earthdata,hdx,eumetsat,nwp,nwm,radar,stac,openeo,sentinel-hub,tropycal,overture,usgs-water,ghsl,worldpop] ; extra == 'all'
   requires_python: '>=3.11,<4'
+  editable: true
 - pypi: https://files.pythonhosted.org/packages/09/40/42bb2d98bc6103194d25fa8da141cd43cabf32277cbf2ab513fe35532196/eccodes-2.47.0-cp311-cp311-win_amd64.whl
   name: eccodes
   version: 2.47.0
@@ -11588,6 +11577,13 @@ packages:
   sha256: 2bbfab8a7fe2dc3d2d835e296f338be0f35872cbfa1d485c286f51e230de7df1
   requires_dist:
   - multiurl>=0.2.1
+- pypi: https://files.pythonhosted.org/packages/70/f5/cccdcc447d8d661421726f2945f220ff7ce2a3f474724ca92123ddbf5110/ecmwflibs-0.7.0-cp314-cp314-macosx_10_15_x86_64.macosx_15_0_arm64.whl
+  name: ecmwflibs
+  version: 0.7.0
+  sha256: 37863b7fc46452ad8bacc45600d1a498581b1146e0ce290667e2be799da24efe
+  requires_dist:
+  - findlibs
+  requires_python: '>=3.10'
 - pypi: https://files.pythonhosted.org/packages/80/86/8a297ff355fb0fc5cea31f3a62ff3d0328c9608a1d3f40ac4c1072f7268a/ecmwflibs-0.7.0-cp311-cp311-win_amd64.whl
   name: ecmwflibs
   version: 0.7.0
@@ -11606,6 +11602,13 @@ packages:
   name: ecmwflibs
   version: 0.7.0
   sha256: 516ca23d164bb1bb5a313b7e4ea00859ce54dffbb001fd4ae5a39614822f0e5d
+  requires_dist:
+  - findlibs
+  requires_python: '>=3.10'
+- pypi: https://files.pythonhosted.org/packages/e5/40/1600f5dde9274c2ab33fbe5ca8e635c08c4d798fa363aad1bdd914c34aad/ecmwflibs-0.7.0-cp314-cp314-manylinux_2_28_x86_64.whl
+  name: ecmwflibs
+  version: 0.7.0
+  sha256: 62bbcdc9b6bf44e6829facee06920119d099c37580c6242cc1f7e7c5c66d95f7
   requires_dist:
   - findlibs
   requires_python: '>=3.10'
