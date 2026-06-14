@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -12102,6 +12102,8 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">tempfile</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
@@ -12115,6 +12117,8 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <span class="n">logger</span><span class="o">.</span><span class="n">disable</span><span class="p">(</span><span class="s2">"pyramids"</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-1">import os
+import tempfile
+from pathlib import Path
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -12226,8 +12230,14 @@ GEE_SERVICE_KEY="/path/to/your/service-account-key.json"
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">LAT</span><span class="p">,</span> <span class="n">LON</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="mf">5.0</span><span class="p">,</span> <span class="mf">12.0</span><span class="p">],</span> <span class="p">[</span><span class="mf">38.0</span><span class="p">,</span> <span class="mf">52.0</span><span class="p">]</span>  <span class="c1"># Horn of Africa (Somalia / Ethiopia / Kenya)</span>
+<span class="c1"># One bounded output root for the whole run; pass it to load() so each</span>
+<span class="c1"># year writes to a known directory instead of a throwaway temp dir.</span>
+<span class="n">OUT_DIR</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="s2">"horn-of-africa-"</span><span class="p">))</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-3">LAT, LON = [-5.0, 12.0], [38.0, 52.0]  # Horn of Africa (Somalia / Ethiopia / Kenya)</div>
+<div class="clipboard-copy-txt" id="cell-3">LAT, LON = [-5.0, 12.0], [38.0, 52.0]  # Horn of Africa (Somalia / Ethiopia / Kenya)
+# One bounded output root for the whole run; pass it to load() so each
+# year writes to a known directory instead of a throwaway temp dir.
+OUT_DIR = Path(tempfile.mkdtemp(prefix="horn-of-africa-"))</div>
 </div>
 </div>
 </div>
@@ -12272,6 +12282,7 @@ GEE_SERVICE_KEY="/path/to/your/service-account-key.json"
         <span class="n">start</span><span class="o">=</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">year</span><span class="si">}</span><span class="s2">-03-01"</span><span class="p">,</span>
         <span class="n">end</span><span class="o">=</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">year</span><span class="si">}</span><span class="s2">-05-31"</span><span class="p">,</span>
         <span class="n">aoi</span><span class="o">=</span><span class="p">[</span><span class="n">LON</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">LAT</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">LON</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">LAT</span><span class="p">[</span><span class="mi">1</span><span class="p">]],</span>
+        <span class="n">path</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">OUT_DIR</span> <span class="o">/</span> <span class="s2">"chirps"</span> <span class="o">/</span> <span class="nb">str</span><span class="p">(</span><span class="n">year</span><span class="p">)),</span>
     <span class="p">)</span>
     <span class="n">rasters</span> <span class="o">=</span> <span class="n">chirps</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">progress_bar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
     <span class="n">grids</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">read_array</span><span class="p">(),</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">"float32"</span><span class="p">)</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">rasters</span><span class="p">]</span>
@@ -12288,6 +12299,7 @@ GEE_SERVICE_KEY="/path/to/your/service-account-key.json"
         start=f"{year}-03-01",
         end=f"{year}-05-31",
         aoi=[LON[0], LAT[0], LON[1], LAT[1]],
+        path=str(OUT_DIR / "chirps" / str(year)),
     )
     rasters = chirps.load(progress_bar=False)
     grids = [np.asarray(r.read_array(), dtype="float32") for r in rasters]
@@ -12837,6 +12849,7 @@ SERVICE_KEY = os.environ.get("GEE_SERVICE_KEY", "")</div>
         <span class="n">aoi</span><span class="o">=</span><span class="p">[</span><span class="n">LON</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">LAT</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">LON</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">LAT</span><span class="p">[</span><span class="mi">1</span><span class="p">]],</span>
         <span class="n">scale</span><span class="o">=</span><span class="mi">5000</span><span class="p">,</span>
         <span class="n">reducer</span><span class="o">=</span><span class="s2">"mean"</span><span class="p">,</span>
+        <span class="n">path</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">OUT_DIR</span> <span class="o">/</span> <span class="s2">"modis"</span> <span class="o">/</span> <span class="nb">str</span><span class="p">(</span><span class="n">year</span><span class="p">)),</span>
     <span class="p">)</span>
     <span class="n">scene</span><span class="o">.</span><span class="n">authenticate</span><span class="p">(</span><span class="n">service_account</span><span class="o">=</span><span class="n">SERVICE_ACCOUNT</span><span class="p">,</span> <span class="n">service_key</span><span class="o">=</span><span class="n">SERVICE_KEY</span><span class="p">)</span>
     <span class="n">rasters</span> <span class="o">=</span> <span class="n">scene</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">progress_bar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
@@ -12857,6 +12870,7 @@ SERVICE_KEY = os.environ.get("GEE_SERVICE_KEY", "")</div>
         aoi=[LON[0], LAT[0], LON[1], LAT[1]],
         scale=5000,
         reducer="mean",
+        path=str(OUT_DIR / "modis" / str(year)),
     )
     scene.authenticate(service_account=SERVICE_ACCOUNT, service_key=SERVICE_KEY)
     rasters = scene.load(progress_bar=False)
