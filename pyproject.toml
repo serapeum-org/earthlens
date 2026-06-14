@@ -26,7 +26,7 @@ classifiers = [
 requires-python = ">=3.11,<4"
 
 dependencies = [
-    "pyramids-gis >=0.33.0",
+    "pyramids-gis >=0.34.0",
     "geopandas >=1.0.0",
     "joblib >=1.5.0",
     "loguru >=0.7.3",
@@ -64,7 +64,7 @@ fdsn = ["obspy >=1.5.0"]
 # read). Only `[parquet]` is needed, and only for LabeledDataset.to_parquet.
 nwm = [
     "earthlens[s3]",
-    "pyramids-gis[parquet] >=0.33.0",
+    "pyramids-gis[parquet] >=0.34.0",
 ]
 earthdata = ["earthaccess >=0.18.0; python_version >= '3.12'"]
 hdx = ["hdx-python-api >=6,<7"]
@@ -104,7 +104,7 @@ dev = [
     # pyramids-gis[viz] (cleopatra): the showcase notebooks render rasters and
     # animate Dataset stacks via Dataset.plot / DatasetCollection.plot; not a
     # runtime dep of earthlens itself.
-    "pyramids-gis[viz] >=0.33.0",
+    "pyramids-gis[viz] >=0.34.0",
     # cleopatra: the showcase notebooks import it directly (ArrayGlyph,
     # animation.embed_gif, ArrayGlyph.save_animation); >=0.18.0 for that
     # RGB-frame animation embed/save API.
@@ -137,7 +137,7 @@ docs = [
     # matplotlib: mkdocs-jupyter runs the notebooks at build time.
     "matplotlib >=3.5",
     # pyramids-gis[viz] (cleopatra): showcase notebooks plot/animate Datasets.
-    "pyramids-gis[viz] >=0.33.0",
+    "pyramids-gis[viz] >=0.34.0",
     # cleopatra: notebooks import it directly; >=0.18.0 for the RGB-frame
     # animation embed_gif / save_animation API used by the showcase GIFs.
     "cleopatra >=0.18.0",
