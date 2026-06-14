@@ -59,6 +59,7 @@ class TestApp:
             [sys.executable, "-m", "earthlens.cli", "--help"],
             capture_output=True,
             text=True,
+            encoding="utf-8",
             timeout=120,
         )
         assert result.returncode == 0, f"module entrypoint failed: {result.stderr}"
