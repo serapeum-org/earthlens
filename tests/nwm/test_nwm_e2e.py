@@ -66,6 +66,10 @@ def test_download_one_short_range_channel_rt(tmp_path):
     assert written.name.endswith(".conus.nc")
 
 
+# `raises=KeyError` is intentionally narrow: it pins the xfail to the known
+# pyramids#560 symptom only. If pyramids changes the failure in any other way,
+# we want that surfaced (not silently absorbed); `strict=False` lets the test
+# xpass cleanly the moment #560 is fixed and the subset starts working.
 @pytest.mark.xfail(
     reason="pyramids 0.34.0 (#537) resolves the bucket region so the eu-central-1 "
     "retrospective Zarr store now opens, but GDAL's multidim Zarr reader silently "

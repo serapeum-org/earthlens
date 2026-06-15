@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import gc
 import os
 import shutil
 import zipfile
@@ -810,10 +811,12 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
         so a partial write cannot corrupt the cube. A no-op for a bbox /
         point `aoi=`.
 
-        pyramids carries the CDS cube's non-spatial aux variable (ERA5's
-        `expver`) through the crop unchanged (serapeum-org/pyramids#514),
-        so the mask applies cleanly; any genuine error (e.g. a polygon that
-        does not overlap the data) is left to propagate.
+        pyramids 0.34.0 (serapeum-org/pyramids#514) no longer fails the crop
+        on a CDS cube's non-spatial aux variable: numeric aux vars are carried
+        through, and a string one (ERA5's `expver`) is dropped with a warning
+        rather than raising. So the geophysical variable masks cleanly; any
+        genuine error (e.g. a polygon that does not overlap the data) is left
+        to propagate.
 
         Args:
             target: Path to the NetCDF written by `_api`.
@@ -825,14 +828,24 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
 
         cube = NetCDF.read_file(str(target))
         masked = None
+        tmp = target.with_name(target.stem + ".masked" + target.suffix)
+        wrote_tmp = False
         try:
             masked = cube.crop(mask=geometry, touch=True)
-            tmp = target.with_name(target.stem + ".masked" + target.suffix)
             masked.to_file(str(tmp))
+            wrote_tmp = True
         finally:
             cube.close()
             if masked is not None:
                 masked.close()
+            # pyramids' GDAL handles are not released by close() alone, so on
+            # Windows the source/target stay locked and os.replace below
+            # raises PermissionError. Drop the references and force a
+            # collection to release the handles before the atomic replace.
+            cube = masked = None
+            gc.collect()
+            if not wrote_tmp:
+                tmp.unlink(missing_ok=True)
         os.replace(tmp, target)
 
     def _build_request(self, var_info: Variable) -> dict[str, Any]:
