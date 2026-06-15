@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -11913,7 +11913,8 @@ size lives on :attr:<code>SpatialExtent.resolution</code> (populated by
 <span class="normal"><a href="#__codelineno-0-924">924</a></span>
 <span class="normal"><a href="#__codelineno-0-925">925</a></span>
 <span class="normal"><a href="#__codelineno-0-926">926</a></span>
-<span class="normal"><a href="#__codelineno-0-927">927</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-187" name="__codelineno-0-187"></a><span class="k">class</span><span class="w"> </span><span class="nc">ECMWF</span><span class="p">(</span><span class="n">LazyClientMixin</span><span class="p">,</span> <span class="n">AbstractDataSource</span><span class="p">):</span>
+<span class="normal"><a href="#__codelineno-0-927">927</a></span>
+<span class="normal"><a href="#__codelineno-0-928">928</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-187" name="__codelineno-0-187"></a><span class="k">class</span><span class="w"> </span><span class="nc">ECMWF</span><span class="p">(</span><span class="n">LazyClientMixin</span><span class="p">,</span> <span class="n">AbstractDataSource</span><span class="p">):</span>
 <a id="__codelineno-0-188" name="__codelineno-0-188"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;ECMWF / Copernicus Climate Data Store backend.</span>
 <a id="__codelineno-0-189" name="__codelineno-0-189"></a>
 <a id="__codelineno-0-190" name="__codelineno-0-190"></a><span class="sd">    Downloads ERA5 reanalysis (and ERA5-Land where the catalog</span>
@@ -12569,91 +12570,92 @@ size lives on :attr:<code>SpatialExtent.resolution</code> (populated by
 <a id="__codelineno-0-840" name="__codelineno-0-840"></a>                <span class="n">masked</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 <a id="__codelineno-0-841" name="__codelineno-0-841"></a>            <span class="c1"># pyramids&#39; GDAL handles are not released by close() alone, so on</span>
 <a id="__codelineno-0-842" name="__codelineno-0-842"></a>            <span class="c1"># Windows the source/target stay locked and os.replace below</span>
-<a id="__codelineno-0-843" name="__codelineno-0-843"></a>            <span class="c1"># raises PermissionError. Drop the references and force a</span>
-<a id="__codelineno-0-844" name="__codelineno-0-844"></a>            <span class="c1"># collection to release the handles before the atomic replace.</span>
-<a id="__codelineno-0-845" name="__codelineno-0-845"></a>            <span class="n">cube</span> <span class="o">=</span> <span class="n">masked</span> <span class="o">=</span> <span class="kc">None</span>
-<a id="__codelineno-0-846" name="__codelineno-0-846"></a>            <span class="n">gc</span><span class="o">.</span><span class="n">collect</span><span class="p">()</span>
-<a id="__codelineno-0-847" name="__codelineno-0-847"></a>            <span class="k">if</span> <span class="ow">not</span> <span class="n">wrote_tmp</span><span class="p">:</span>
-<a id="__codelineno-0-848" name="__codelineno-0-848"></a>                <span class="n">tmp</span><span class="o">.</span><span class="n">unlink</span><span class="p">(</span><span class="n">missing_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<a id="__codelineno-0-849" name="__codelineno-0-849"></a>        <span class="n">os</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">tmp</span><span class="p">,</span> <span class="n">target</span><span class="p">)</span>
-<a id="__codelineno-0-850" name="__codelineno-0-850"></a>
-<a id="__codelineno-0-851" name="__codelineno-0-851"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_build_request</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">var_info</span><span class="p">:</span> <span class="n">Variable</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
-<a id="__codelineno-0-852" name="__codelineno-0-852"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Assemble the CDS retrieve-request dict for one variable.</span>
-<a id="__codelineno-0-853" name="__codelineno-0-853"></a>
-<a id="__codelineno-0-854" name="__codelineno-0-854"></a><span class="sd">        Pure function over `var_info`, `self.time.dates`,</span>
-<a id="__codelineno-0-855" name="__codelineno-0-855"></a><span class="sd">        `self.space`, and `self.temporal_resolution`. No I/O, no</span>
-<a id="__codelineno-0-856" name="__codelineno-0-856"></a><span class="sd">        validation, no client calls — just dictionary assembly.</span>
-<a id="__codelineno-0-857" name="__codelineno-0-857"></a><span class="sd">        :meth:`_api` consumes the result and submits it via</span>
-<a id="__codelineno-0-858" name="__codelineno-0-858"></a><span class="sd">        :meth:`cdsapi.Client.retrieve`.</span>
-<a id="__codelineno-0-859" name="__codelineno-0-859"></a>
-<a id="__codelineno-0-860" name="__codelineno-0-860"></a><span class="sd">        Build order (later steps override earlier ones):</span>
-<a id="__codelineno-0-861" name="__codelineno-0-861"></a>
-<a id="__codelineno-0-862" name="__codelineno-0-862"></a><span class="sd">        1. Template defaults (`variable`, `year`, `month`,</span>
-<a id="__codelineno-0-863" name="__codelineno-0-863"></a><span class="sd">           `data_format`, `area`, `product_type`).</span>
-<a id="__codelineno-0-864" name="__codelineno-0-864"></a><span class="sd">        2. Daily / monthly branch — daily adds `day` plus four</span>
-<a id="__codelineno-0-865" name="__codelineno-0-865"></a><span class="sd">           six-hourly `time` slots; monthly pins `time=[&quot;00:00&quot;]`</span>
-<a id="__codelineno-0-866" name="__codelineno-0-866"></a><span class="sd">           and omits `day` (CDS monthly-means datasets reject</span>
-<a id="__codelineno-0-867" name="__codelineno-0-867"></a><span class="sd">           `day`).</span>
-<a id="__codelineno-0-868" name="__codelineno-0-868"></a><span class="sd">        3. Pressure-level forward — `cds_pressure_level` becomes</span>
-<a id="__codelineno-0-869" name="__codelineno-0-869"></a><span class="sd">           `pressure_level` on the request.</span>
-<a id="__codelineno-0-870" name="__codelineno-0-870"></a><span class="sd">        4. `var_info.extras` merge — per-row catalog overrides win</span>
-<a id="__codelineno-0-871" name="__codelineno-0-871"></a><span class="sd">           over the template defaults.</span>
-<a id="__codelineno-0-872" name="__codelineno-0-872"></a><span class="sd">        5. `request_kind` strip — drop template-default keys the</span>
-<a id="__codelineno-0-873" name="__codelineno-0-873"></a><span class="sd">           dataset family rejects (e.g. ORAS5 rejects</span>
-<a id="__codelineno-0-874" name="__codelineno-0-874"></a><span class="sd">           `day`/`time`/`area`). Done after the extras merge so a</span>
-<a id="__codelineno-0-875" name="__codelineno-0-875"></a><span class="sd">           user can re-introduce a stripped key by setting it</span>
-<a id="__codelineno-0-876" name="__codelineno-0-876"></a><span class="sd">           explicitly in extras.</span>
-<a id="__codelineno-0-877" name="__codelineno-0-877"></a><span class="sd">        6. Per-row `None` opt-outs — any `extras` key set to `None`</span>
-<a id="__codelineno-0-878" name="__codelineno-0-878"></a><span class="sd">           is dropped from the request, the per-row escape hatch</span>
-<a id="__codelineno-0-879" name="__codelineno-0-879"></a><span class="sd">           for datasets that reject the default bbox without</span>
-<a id="__codelineno-0-880" name="__codelineno-0-880"></a><span class="sd">           forcing a new `request_kind`.</span>
-<a id="__codelineno-0-881" name="__codelineno-0-881"></a>
-<a id="__codelineno-0-882" name="__codelineno-0-882"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-883" name="__codelineno-0-883"></a><span class="sd">            var_info: Catalog row for the variable being requested.</span>
-<a id="__codelineno-0-884" name="__codelineno-0-884"></a><span class="sd">                Drives every field on the request except `area` /</span>
-<a id="__codelineno-0-885" name="__codelineno-0-885"></a><span class="sd">                `year` / `month` / `day` / `time` (which come from</span>
-<a id="__codelineno-0-886" name="__codelineno-0-886"></a><span class="sd">                `self.space` and `self.time`).</span>
-<a id="__codelineno-0-887" name="__codelineno-0-887"></a>
-<a id="__codelineno-0-888" name="__codelineno-0-888"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-889" name="__codelineno-0-889"></a><span class="sd">            dict[str, Any]: Request dict ready to pass as the</span>
-<a id="__codelineno-0-890" name="__codelineno-0-890"></a><span class="sd">            second positional argument to</span>
-<a id="__codelineno-0-891" name="__codelineno-0-891"></a><span class="sd">            :meth:`cdsapi.Client.retrieve`.</span>
-<a id="__codelineno-0-892" name="__codelineno-0-892"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-893" name="__codelineno-0-893"></a>        <span class="n">dates</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">dates</span>
-<a id="__codelineno-0-894" name="__codelineno-0-894"></a>        <span class="n">request</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
-<a id="__codelineno-0-895" name="__codelineno-0-895"></a>            <span class="s2">&quot;variable&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">var_info</span><span class="o">.</span><span class="n">cds_variable</span><span class="p">],</span>
-<a id="__codelineno-0-896" name="__codelineno-0-896"></a>            <span class="s2">&quot;year&quot;</span><span class="p">:</span> <span class="nb">sorted</span><span class="p">({</span><span class="nb">str</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">year</span><span class="p">)</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">dates</span><span class="p">}),</span>
-<a id="__codelineno-0-897" name="__codelineno-0-897"></a>            <span class="s2">&quot;month&quot;</span><span class="p">:</span> <span class="nb">sorted</span><span class="p">({</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">d</span><span class="o">.</span><span class="n">month</span><span class="si">:</span><span class="s2">02d</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">dates</span><span class="p">}),</span>
-<a id="__codelineno-0-898" name="__codelineno-0-898"></a>            <span class="s2">&quot;data_format&quot;</span><span class="p">:</span> <span class="s2">&quot;netcdf&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-899" name="__codelineno-0-899"></a>            <span class="s2">&quot;area&quot;</span><span class="p">:</span> <span class="p">[</span>
-<a id="__codelineno-0-900" name="__codelineno-0-900"></a>                <span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">north</span><span class="p">,</span>
-<a id="__codelineno-0-901" name="__codelineno-0-901"></a>                <span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">west</span><span class="p">,</span>
-<a id="__codelineno-0-902" name="__codelineno-0-902"></a>                <span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">south</span><span class="p">,</span>
-<a id="__codelineno-0-903" name="__codelineno-0-903"></a>                <span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">east</span><span class="p">,</span>
-<a id="__codelineno-0-904" name="__codelineno-0-904"></a>            <span class="p">],</span>
-<a id="__codelineno-0-905" name="__codelineno-0-905"></a>            <span class="s2">&quot;product_type&quot;</span><span class="p">:</span> <span class="n">var_info</span><span class="o">.</span><span class="n">product_type</span><span class="p">,</span>
-<a id="__codelineno-0-906" name="__codelineno-0-906"></a>        <span class="p">}</span>
-<a id="__codelineno-0-907" name="__codelineno-0-907"></a>
-<a id="__codelineno-0-908" name="__codelineno-0-908"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">temporal_resolution</span> <span class="o">==</span> <span class="s2">&quot;monthly&quot;</span><span class="p">:</span>
-<a id="__codelineno-0-909" name="__codelineno-0-909"></a>            <span class="n">request</span><span class="p">[</span><span class="s2">&quot;time&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;00:00&quot;</span><span class="p">]</span>
-<a id="__codelineno-0-910" name="__codelineno-0-910"></a>        <span class="k">else</span><span class="p">:</span>
-<a id="__codelineno-0-911" name="__codelineno-0-911"></a>            <span class="n">request</span><span class="p">[</span><span class="s2">&quot;day&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">({</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">d</span><span class="o">.</span><span class="n">day</span><span class="si">:</span><span class="s2">02d</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">dates</span><span class="p">})</span>
-<a id="__codelineno-0-912" name="__codelineno-0-912"></a>            <span class="n">request</span><span class="p">[</span><span class="s2">&quot;time&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;00:00&quot;</span><span class="p">,</span> <span class="s2">&quot;06:00&quot;</span><span class="p">,</span> <span class="s2">&quot;12:00&quot;</span><span class="p">,</span> <span class="s2">&quot;18:00&quot;</span><span class="p">]</span>
-<a id="__codelineno-0-913" name="__codelineno-0-913"></a>
-<a id="__codelineno-0-914" name="__codelineno-0-914"></a>        <span class="k">if</span> <span class="n">var_info</span><span class="o">.</span><span class="n">cds_pressure_level</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-915" name="__codelineno-0-915"></a>            <span class="n">request</span><span class="p">[</span><span class="s2">&quot;pressure_level&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">var_info</span><span class="o">.</span><span class="n">cds_pressure_level</span>
-<a id="__codelineno-0-916" name="__codelineno-0-916"></a>
-<a id="__codelineno-0-917" name="__codelineno-0-917"></a>        <span class="n">request</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">var_info</span><span class="o">.</span><span class="n">extras</span><span class="p">)</span>
-<a id="__codelineno-0-918" name="__codelineno-0-918"></a>
-<a id="__codelineno-0-919" name="__codelineno-0-919"></a>        <span class="k">for</span> <span class="n">stripped</span> <span class="ow">in</span> <span class="n">_REQUEST_KIND_STRIPS</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">var_info</span><span class="o">.</span><span class="n">request_kind</span><span class="p">,</span> <span class="p">()):</span>
-<a id="__codelineno-0-920" name="__codelineno-0-920"></a>            <span class="k">if</span> <span class="n">stripped</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">var_info</span><span class="o">.</span><span class="n">extras</span><span class="p">:</span>
-<a id="__codelineno-0-921" name="__codelineno-0-921"></a>                <span class="n">request</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">stripped</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-<a id="__codelineno-0-922" name="__codelineno-0-922"></a>
-<a id="__codelineno-0-923" name="__codelineno-0-923"></a>        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">var_info</span><span class="o">.</span><span class="n">extras</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
-<a id="__codelineno-0-924" name="__codelineno-0-924"></a>            <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-925" name="__codelineno-0-925"></a>                <span class="n">request</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-<a id="__codelineno-0-926" name="__codelineno-0-926"></a>
-<a id="__codelineno-0-927" name="__codelineno-0-927"></a>        <span class="k">return</span> <span class="n">request</span>
+<a id="__codelineno-0-843" name="__codelineno-0-843"></a>            <span class="c1"># raises PermissionError (serapeum-org/pyramids#564). Drop the</span>
+<a id="__codelineno-0-844" name="__codelineno-0-844"></a>            <span class="c1"># references and force a collection to release the handles before</span>
+<a id="__codelineno-0-845" name="__codelineno-0-845"></a>            <span class="c1"># the atomic replace.</span>
+<a id="__codelineno-0-846" name="__codelineno-0-846"></a>            <span class="n">cube</span> <span class="o">=</span> <span class="n">masked</span> <span class="o">=</span> <span class="kc">None</span>
+<a id="__codelineno-0-847" name="__codelineno-0-847"></a>            <span class="n">gc</span><span class="o">.</span><span class="n">collect</span><span class="p">()</span>
+<a id="__codelineno-0-848" name="__codelineno-0-848"></a>            <span class="k">if</span> <span class="ow">not</span> <span class="n">wrote_tmp</span><span class="p">:</span>
+<a id="__codelineno-0-849" name="__codelineno-0-849"></a>                <span class="n">tmp</span><span class="o">.</span><span class="n">unlink</span><span class="p">(</span><span class="n">missing_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<a id="__codelineno-0-850" name="__codelineno-0-850"></a>        <span class="n">os</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">tmp</span><span class="p">,</span> <span class="n">target</span><span class="p">)</span>
+<a id="__codelineno-0-851" name="__codelineno-0-851"></a>
+<a id="__codelineno-0-852" name="__codelineno-0-852"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_build_request</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">var_info</span><span class="p">:</span> <span class="n">Variable</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<a id="__codelineno-0-853" name="__codelineno-0-853"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Assemble the CDS retrieve-request dict for one variable.</span>
+<a id="__codelineno-0-854" name="__codelineno-0-854"></a>
+<a id="__codelineno-0-855" name="__codelineno-0-855"></a><span class="sd">        Pure function over `var_info`, `self.time.dates`,</span>
+<a id="__codelineno-0-856" name="__codelineno-0-856"></a><span class="sd">        `self.space`, and `self.temporal_resolution`. No I/O, no</span>
+<a id="__codelineno-0-857" name="__codelineno-0-857"></a><span class="sd">        validation, no client calls — just dictionary assembly.</span>
+<a id="__codelineno-0-858" name="__codelineno-0-858"></a><span class="sd">        :meth:`_api` consumes the result and submits it via</span>
+<a id="__codelineno-0-859" name="__codelineno-0-859"></a><span class="sd">        :meth:`cdsapi.Client.retrieve`.</span>
+<a id="__codelineno-0-860" name="__codelineno-0-860"></a>
+<a id="__codelineno-0-861" name="__codelineno-0-861"></a><span class="sd">        Build order (later steps override earlier ones):</span>
+<a id="__codelineno-0-862" name="__codelineno-0-862"></a>
+<a id="__codelineno-0-863" name="__codelineno-0-863"></a><span class="sd">        1. Template defaults (`variable`, `year`, `month`,</span>
+<a id="__codelineno-0-864" name="__codelineno-0-864"></a><span class="sd">           `data_format`, `area`, `product_type`).</span>
+<a id="__codelineno-0-865" name="__codelineno-0-865"></a><span class="sd">        2. Daily / monthly branch — daily adds `day` plus four</span>
+<a id="__codelineno-0-866" name="__codelineno-0-866"></a><span class="sd">           six-hourly `time` slots; monthly pins `time=[&quot;00:00&quot;]`</span>
+<a id="__codelineno-0-867" name="__codelineno-0-867"></a><span class="sd">           and omits `day` (CDS monthly-means datasets reject</span>
+<a id="__codelineno-0-868" name="__codelineno-0-868"></a><span class="sd">           `day`).</span>
+<a id="__codelineno-0-869" name="__codelineno-0-869"></a><span class="sd">        3. Pressure-level forward — `cds_pressure_level` becomes</span>
+<a id="__codelineno-0-870" name="__codelineno-0-870"></a><span class="sd">           `pressure_level` on the request.</span>
+<a id="__codelineno-0-871" name="__codelineno-0-871"></a><span class="sd">        4. `var_info.extras` merge — per-row catalog overrides win</span>
+<a id="__codelineno-0-872" name="__codelineno-0-872"></a><span class="sd">           over the template defaults.</span>
+<a id="__codelineno-0-873" name="__codelineno-0-873"></a><span class="sd">        5. `request_kind` strip — drop template-default keys the</span>
+<a id="__codelineno-0-874" name="__codelineno-0-874"></a><span class="sd">           dataset family rejects (e.g. ORAS5 rejects</span>
+<a id="__codelineno-0-875" name="__codelineno-0-875"></a><span class="sd">           `day`/`time`/`area`). Done after the extras merge so a</span>
+<a id="__codelineno-0-876" name="__codelineno-0-876"></a><span class="sd">           user can re-introduce a stripped key by setting it</span>
+<a id="__codelineno-0-877" name="__codelineno-0-877"></a><span class="sd">           explicitly in extras.</span>
+<a id="__codelineno-0-878" name="__codelineno-0-878"></a><span class="sd">        6. Per-row `None` opt-outs — any `extras` key set to `None`</span>
+<a id="__codelineno-0-879" name="__codelineno-0-879"></a><span class="sd">           is dropped from the request, the per-row escape hatch</span>
+<a id="__codelineno-0-880" name="__codelineno-0-880"></a><span class="sd">           for datasets that reject the default bbox without</span>
+<a id="__codelineno-0-881" name="__codelineno-0-881"></a><span class="sd">           forcing a new `request_kind`.</span>
+<a id="__codelineno-0-882" name="__codelineno-0-882"></a>
+<a id="__codelineno-0-883" name="__codelineno-0-883"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-884" name="__codelineno-0-884"></a><span class="sd">            var_info: Catalog row for the variable being requested.</span>
+<a id="__codelineno-0-885" name="__codelineno-0-885"></a><span class="sd">                Drives every field on the request except `area` /</span>
+<a id="__codelineno-0-886" name="__codelineno-0-886"></a><span class="sd">                `year` / `month` / `day` / `time` (which come from</span>
+<a id="__codelineno-0-887" name="__codelineno-0-887"></a><span class="sd">                `self.space` and `self.time`).</span>
+<a id="__codelineno-0-888" name="__codelineno-0-888"></a>
+<a id="__codelineno-0-889" name="__codelineno-0-889"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-890" name="__codelineno-0-890"></a><span class="sd">            dict[str, Any]: Request dict ready to pass as the</span>
+<a id="__codelineno-0-891" name="__codelineno-0-891"></a><span class="sd">            second positional argument to</span>
+<a id="__codelineno-0-892" name="__codelineno-0-892"></a><span class="sd">            :meth:`cdsapi.Client.retrieve`.</span>
+<a id="__codelineno-0-893" name="__codelineno-0-893"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-894" name="__codelineno-0-894"></a>        <span class="n">dates</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">dates</span>
+<a id="__codelineno-0-895" name="__codelineno-0-895"></a>        <span class="n">request</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+<a id="__codelineno-0-896" name="__codelineno-0-896"></a>            <span class="s2">&quot;variable&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">var_info</span><span class="o">.</span><span class="n">cds_variable</span><span class="p">],</span>
+<a id="__codelineno-0-897" name="__codelineno-0-897"></a>            <span class="s2">&quot;year&quot;</span><span class="p">:</span> <span class="nb">sorted</span><span class="p">({</span><span class="nb">str</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">year</span><span class="p">)</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">dates</span><span class="p">}),</span>
+<a id="__codelineno-0-898" name="__codelineno-0-898"></a>            <span class="s2">&quot;month&quot;</span><span class="p">:</span> <span class="nb">sorted</span><span class="p">({</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">d</span><span class="o">.</span><span class="n">month</span><span class="si">:</span><span class="s2">02d</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">dates</span><span class="p">}),</span>
+<a id="__codelineno-0-899" name="__codelineno-0-899"></a>            <span class="s2">&quot;data_format&quot;</span><span class="p">:</span> <span class="s2">&quot;netcdf&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-900" name="__codelineno-0-900"></a>            <span class="s2">&quot;area&quot;</span><span class="p">:</span> <span class="p">[</span>
+<a id="__codelineno-0-901" name="__codelineno-0-901"></a>                <span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">north</span><span class="p">,</span>
+<a id="__codelineno-0-902" name="__codelineno-0-902"></a>                <span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">west</span><span class="p">,</span>
+<a id="__codelineno-0-903" name="__codelineno-0-903"></a>                <span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">south</span><span class="p">,</span>
+<a id="__codelineno-0-904" name="__codelineno-0-904"></a>                <span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">east</span><span class="p">,</span>
+<a id="__codelineno-0-905" name="__codelineno-0-905"></a>            <span class="p">],</span>
+<a id="__codelineno-0-906" name="__codelineno-0-906"></a>            <span class="s2">&quot;product_type&quot;</span><span class="p">:</span> <span class="n">var_info</span><span class="o">.</span><span class="n">product_type</span><span class="p">,</span>
+<a id="__codelineno-0-907" name="__codelineno-0-907"></a>        <span class="p">}</span>
+<a id="__codelineno-0-908" name="__codelineno-0-908"></a>
+<a id="__codelineno-0-909" name="__codelineno-0-909"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">temporal_resolution</span> <span class="o">==</span> <span class="s2">&quot;monthly&quot;</span><span class="p">:</span>
+<a id="__codelineno-0-910" name="__codelineno-0-910"></a>            <span class="n">request</span><span class="p">[</span><span class="s2">&quot;time&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;00:00&quot;</span><span class="p">]</span>
+<a id="__codelineno-0-911" name="__codelineno-0-911"></a>        <span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-0-912" name="__codelineno-0-912"></a>            <span class="n">request</span><span class="p">[</span><span class="s2">&quot;day&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">({</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">d</span><span class="o">.</span><span class="n">day</span><span class="si">:</span><span class="s2">02d</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">dates</span><span class="p">})</span>
+<a id="__codelineno-0-913" name="__codelineno-0-913"></a>            <span class="n">request</span><span class="p">[</span><span class="s2">&quot;time&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;00:00&quot;</span><span class="p">,</span> <span class="s2">&quot;06:00&quot;</span><span class="p">,</span> <span class="s2">&quot;12:00&quot;</span><span class="p">,</span> <span class="s2">&quot;18:00&quot;</span><span class="p">]</span>
+<a id="__codelineno-0-914" name="__codelineno-0-914"></a>
+<a id="__codelineno-0-915" name="__codelineno-0-915"></a>        <span class="k">if</span> <span class="n">var_info</span><span class="o">.</span><span class="n">cds_pressure_level</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-916" name="__codelineno-0-916"></a>            <span class="n">request</span><span class="p">[</span><span class="s2">&quot;pressure_level&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">var_info</span><span class="o">.</span><span class="n">cds_pressure_level</span>
+<a id="__codelineno-0-917" name="__codelineno-0-917"></a>
+<a id="__codelineno-0-918" name="__codelineno-0-918"></a>        <span class="n">request</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">var_info</span><span class="o">.</span><span class="n">extras</span><span class="p">)</span>
+<a id="__codelineno-0-919" name="__codelineno-0-919"></a>
+<a id="__codelineno-0-920" name="__codelineno-0-920"></a>        <span class="k">for</span> <span class="n">stripped</span> <span class="ow">in</span> <span class="n">_REQUEST_KIND_STRIPS</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">var_info</span><span class="o">.</span><span class="n">request_kind</span><span class="p">,</span> <span class="p">()):</span>
+<a id="__codelineno-0-921" name="__codelineno-0-921"></a>            <span class="k">if</span> <span class="n">stripped</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">var_info</span><span class="o">.</span><span class="n">extras</span><span class="p">:</span>
+<a id="__codelineno-0-922" name="__codelineno-0-922"></a>                <span class="n">request</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">stripped</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+<a id="__codelineno-0-923" name="__codelineno-0-923"></a>
+<a id="__codelineno-0-924" name="__codelineno-0-924"></a>        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">var_info</span><span class="o">.</span><span class="n">extras</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
+<a id="__codelineno-0-925" name="__codelineno-0-925"></a>            <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-926" name="__codelineno-0-926"></a>                <span class="n">request</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+<a id="__codelineno-0-927" name="__codelineno-0-927"></a>
+<a id="__codelineno-0-928" name="__codelineno-0-928"></a>        <span class="k">return</span> <span class="n">request</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
