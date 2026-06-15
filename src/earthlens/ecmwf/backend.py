@@ -840,8 +840,9 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
                 masked.close()
             # pyramids' GDAL handles are not released by close() alone, so on
             # Windows the source/target stay locked and os.replace below
-            # raises PermissionError. Drop the references and force a
-            # collection to release the handles before the atomic replace.
+            # raises PermissionError (serapeum-org/pyramids#564). Drop the
+            # references and force a collection to release the handles before
+            # the atomic replace.
             cube = masked = None
             gc.collect()
             if not wrote_tmp:
