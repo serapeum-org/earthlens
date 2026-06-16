@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -8889,6 +8889,34 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#setup" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Setup
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Setup">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#credentials" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Credentials
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#query-both-sensors" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -8896,6 +8924,34 @@
       
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="Query both sensors">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#build-the-request" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Build the request
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#download-the-detections" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Download the detections
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -10810,6 +10866,34 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#setup" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Setup
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Setup">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#credentials" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Credentials
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#query-both-sensors" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -10817,6 +10901,34 @@
       
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="Query both sensors">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#build-the-request" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Build the request
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#download-the-detections" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Download the detections
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -11596,7 +11708,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </style>
 <!-- End of mermaid configuration --><div class="jupyter-wrapper">
 <div class="jp-Notebook" data-jp-theme-light="true" data-jp-theme-name="JupyterLab Light">
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=69d0e770">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=c9d0db3a">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -11606,8 +11718,19 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </div>
 </div>
 </div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=52bf49bf">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h2 id="setup">Setup<a class="anchor-link" href="#setup">¶</a></h2><p>Consolidate the imports and create the output directory. <code>earthlens</code> provides the unified <code>EarthLens</code> entry point; the download workflow writes a GeoJSON to <code>OUT_DIR</code> and returns the merged detections as a <code>GeoDataFrame</code>.</p>
+</div>
+</div>
+</div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=4b124e62">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=5dc537b1">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -11633,12 +11756,6 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 
 <span class="n">OUT_DIR</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s1">'firms_output'</span><span class="p">)</span>
 <span class="n">OUT_DIR</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-
-<span class="c1"># FIRMS needs a free MAP_KEY (https://firms.modaps.eosdis.nasa.gov/api/map_key/).</span>
-<span class="c1"># Set FIRMS_MAP_KEY in your environment; the live cells below skip cleanly</span>
-<span class="c1"># (nbval-lax-safe) when it is absent, so the notebook never fails offline.</span>
-<span class="n">HAS_KEY</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'FIRMS_MAP_KEY'</span><span class="p">))</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">'FIRMS_MAP_KEY set:'</span><span class="p">,</span> <span class="n">HAS_KEY</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-1">import datetime as dt
 import os
@@ -11647,32 +11764,25 @@ from pathlib import Path
 from earthlens import EarthLens
 
 OUT_DIR = Path('firms_output')
-OUT_DIR.mkdir(exist_ok=True)
-
-# FIRMS needs a free MAP_KEY (https://firms.modaps.eosdis.nasa.gov/api/map_key/).
-# Set FIRMS_MAP_KEY in your environment; the live cells below skip cleanly
-# (nbval-lax-safe) when it is absent, so the notebook never fails offline.
-HAS_KEY = bool(os.environ.get('FIRMS_MAP_KEY'))
-print('FIRMS_MAP_KEY set:', HAS_KEY)
+OUT_DIR.mkdir(exist_ok=True)</div>
 </div>
 </div>
 </div>
 </div>
 </div>
 </div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=86fafbd8">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=dab1992d">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="query-both-sensors">Query both sensors<a class="anchor-link" href="#query-both-sensors">¶</a></h2><p>Pass both sensor codes in <code>variables</code>; the backend issues one request per <code>(sensor, chunk)</code> and merges them. The <code>sensor</code> column distinguishes the source.</p>
+<h3 id="credentials">Credentials<a class="anchor-link" href="#credentials">¶</a></h3><p>FIRMS needs a free <code>MAP_KEY</code> (<a href="https://firms.modaps.eosdis.nasa.gov/api/map_key/">https://firms.modaps.eosdis.nasa.gov/api/map_key/</a>). Set <code>FIRMS_MAP_KEY</code> in your environment; the live cells below skip cleanly when it is absent, so the notebook never fails offline.</p>
 </div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=8b410456">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=206ece93">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -11690,64 +11800,40 @@ print('FIRMS_MAP_KEY set:', HAS_KEY)
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">TODAY</span> <span class="o">=</span> <span class="n">dt</span><span class="o">.</span><span class="n">date</span><span class="o">.</span><span class="n">today</span><span class="p">()</span>
-<span class="n">START</span> <span class="o">=</span> <span class="p">(</span><span class="n">TODAY</span> <span class="o">-</span> <span class="n">dt</span><span class="o">.</span><span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="mi">7</span><span class="p">))</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">'%Y-%m-</span><span class="si">%d</span><span class="s1">'</span><span class="p">)</span>
-<span class="n">END</span> <span class="o">=</span> <span class="n">TODAY</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">'%Y-%m-</span><span class="si">%d</span><span class="s1">'</span><span class="p">)</span>
-
-<span class="n">fires</span> <span class="o">=</span> <span class="kc">None</span>
-<span class="k">if</span> <span class="n">HAS_KEY</span><span class="p">:</span>
-    <span class="k">try</span><span class="p">:</span>
-        <span class="n">fires</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
-            <span class="n">data_source</span><span class="o">=</span><span class="s1">'firms'</span><span class="p">,</span>
-            <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">'MODIS_NRT'</span><span class="p">,</span> <span class="s1">'VIIRS_SNPP_NRT'</span><span class="p">],</span>
-            <span class="n">start</span><span class="o">=</span><span class="n">START</span><span class="p">,</span>
-            <span class="n">end</span><span class="o">=</span><span class="n">END</span><span class="p">,</span>
-            <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">33.0</span><span class="p">,</span> <span class="mf">35.0</span><span class="p">],</span>
-            <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">119.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">117.0</span><span class="p">],</span>
-            <span class="n">path</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">OUT_DIR</span><span class="p">),</span>
-        <span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">progress_bar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s1">'detections:'</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">fires</span><span class="p">))</span>
-    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s1">'skipped live query:'</span><span class="p">,</span> <span class="n">exc</span><span class="p">)</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">HAS_KEY</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'FIRMS_MAP_KEY'</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'FIRMS_MAP_KEY set:'</span><span class="p">,</span> <span class="n">HAS_KEY</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-2">TODAY = dt.date.today()
-START = (TODAY - dt.timedelta(days=7)).strftime('%Y-%m-%d')
-END = TODAY.strftime('%Y-%m-%d')
-
-fires = None
-if HAS_KEY:
-    try:
-        fires = EarthLens(
-            data_source='firms',
-            variables=['MODIS_NRT', 'VIIRS_SNPP_NRT'],
-            start=START,
-            end=END,
-            lat_lim=[33.0, 35.0],
-            lon_lim=[-119.0, -117.0],
-            path=str(OUT_DIR),
-        ).download(progress_bar=False)
-        print('detections:', len(fires))
-    except Exception as exc:
-        print('skipped live query:', exc)
+<div class="clipboard-copy-txt" id="cell-2">HAS_KEY = bool(os.environ.get('FIRMS_MAP_KEY'))
+print('FIRMS_MAP_KEY set:', HAS_KEY)</div>
 </div>
 </div>
 </div>
 </div>
 </div>
 </div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=964b0b04">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=ad491b47">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="detections-per-sensor-and-confidence-handling">Detections per sensor and confidence handling<a class="anchor-link" href="#detections-per-sensor-and-confidence-handling">¶</a></h2>
+<h2 id="query-both-sensors">Query both sensors<a class="anchor-link" href="#query-both-sensors">¶</a></h2><p>Pass both sensor codes in <code>variables</code>; the backend issues one request per <code>(sensor, chunk)</code> and merges them. The <code>sensor</code> column distinguishes the source.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=52d45faa">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h3 id="build-the-request">Build the request<a class="anchor-link" href="#build-the-request">¶</a></h3><p>Define the seven-day window and the southern-California bbox, then construct the <code>EarthLens</code> request for both sensors. The construct step is kept separate from the download so each is easy to read and re-run.</p>
 </div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=ebcd7af6">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=860fc6b1">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -11765,34 +11851,53 @@ if HAS_KEY:
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="k">if</span> <span class="n">fires</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">fires</span><span class="p">):</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">fires</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">'sensor'</span><span class="p">)</span><span class="o">.</span><span class="n">size</span><span class="p">())</span>
-    <span class="c1"># Both families share a normalised confidence_pct even though raw confidence differs.</span>
-    <span class="n">display</span><span class="p">(</span><span class="n">fires</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">'sensor'</span><span class="p">)[[</span><span class="s1">'confidence'</span><span class="p">,</span> <span class="s1">'confidence_pct'</span><span class="p">,</span> <span class="s1">'frp'</span><span class="p">]]</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">3</span><span class="p">))</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">TODAY</span> <span class="o">=</span> <span class="n">dt</span><span class="o">.</span><span class="n">date</span><span class="o">.</span><span class="n">today</span><span class="p">()</span>
+<span class="n">START</span> <span class="o">=</span> <span class="p">(</span><span class="n">TODAY</span> <span class="o">-</span> <span class="n">dt</span><span class="o">.</span><span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="mi">7</span><span class="p">))</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">'%Y-%m-</span><span class="si">%d</span><span class="s1">'</span><span class="p">)</span>
+<span class="n">END</span> <span class="o">=</span> <span class="n">TODAY</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">'%Y-%m-</span><span class="si">%d</span><span class="s1">'</span><span class="p">)</span>
+
+<span class="n">fires</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="k">if</span> <span class="n">HAS_KEY</span><span class="p">:</span>
+    <span class="n">request</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
+        <span class="n">data_source</span><span class="o">=</span><span class="s1">'firms'</span><span class="p">,</span>
+        <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">'MODIS_NRT'</span><span class="p">,</span> <span class="s1">'VIIRS_SNPP_NRT'</span><span class="p">],</span>
+        <span class="n">start</span><span class="o">=</span><span class="n">START</span><span class="p">,</span>
+        <span class="n">end</span><span class="o">=</span><span class="n">END</span><span class="p">,</span>
+        <span class="n">aoi</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">119.0</span><span class="p">,</span> <span class="mf">33.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">117.0</span><span class="p">,</span> <span class="mf">35.0</span><span class="p">],</span>
+        <span class="n">path</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">OUT_DIR</span><span class="p">),</span>
+    <span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-3">if fires is not None and len(fires):
-    print(fires.groupby('sensor').size())
-    # Both families share a normalised confidence_pct even though raw confidence differs.
-    display(fires.groupby('sensor')[['confidence', 'confidence_pct', 'frp']].head(3))
+<div class="clipboard-copy-txt" id="cell-3">TODAY = dt.date.today()
+START = (TODAY - dt.timedelta(days=7)).strftime('%Y-%m-%d')
+END = TODAY.strftime('%Y-%m-%d')
+
+fires = None
+if HAS_KEY:
+    request = EarthLens(
+        data_source='firms',
+        variables=['MODIS_NRT', 'VIIRS_SNPP_NRT'],
+        start=START,
+        end=END,
+        aoi=[-119.0, 33.0, -117.0, 35.0],
+        path=str(OUT_DIR),
+    )</div>
 </div>
 </div>
 </div>
 </div>
 </div>
 </div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=b1fa1ea1">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=9f97d0d9">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="overlay-the-two-sensors">Overlay the two sensors<a class="anchor-link" href="#overlay-the-two-sensors">¶</a></h2>
+<h3 id="download-the-detections">Download the detections<a class="anchor-link" href="#download-the-detections">¶</a></h3><p>Run the merged query. The live call is wrapped in <code>try</code>/<code>except</code> so the notebook degrades gracefully (an expired key, a network outage, or an offline run prints the reason and leaves <code>fires</code> empty instead of raising).</p>
 </div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=b1259ef9">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=ad9533ad">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -11810,12 +11915,104 @@ if HAS_KEY:
 </div>
 </clipboard-copy>
 </div>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="k">if</span> <span class="n">HAS_KEY</span><span class="p">:</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">fires</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">progress_bar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">'detections:'</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">fires</span><span class="p">))</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">'skipped live query:'</span><span class="p">,</span> <span class="n">exc</span><span class="p">)</span>
+</pre></div>
+<div class="clipboard-copy-txt" id="cell-4">if HAS_KEY:
+    try:
+        fires = request.download(progress_bar=False)
+        print('detections:', len(fires))
+    except Exception as exc:
+        print('skipped live query:', exc)</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=0d20d1d8">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h2 id="detections-per-sensor-and-confidence-handling">Detections per sensor and confidence handling<a class="anchor-link" href="#detections-per-sensor-and-confidence-handling">¶</a></h2><p>Count the rows per sensor and peek at the confidence columns. Both families share a normalised <code>confidence_pct</code> even though the raw <code>confidence</code> differs (MODIS numeric vs VIIRS categorical).</p>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=8f3eef55">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="CodeMirror cm-s-jupyter">
+<div class="zeroclipboard-container">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-5">
+<div>
+<span class="notice" hidden="">Copied!</span>
+<svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
+<path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+<path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+</svg>
+</div>
+</clipboard-copy>
+</div>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="k">if</span> <span class="n">fires</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">fires</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">fires</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">'sensor'</span><span class="p">)</span><span class="o">.</span><span class="n">size</span><span class="p">())</span>
+    <span class="n">display</span><span class="p">(</span><span class="n">fires</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">'sensor'</span><span class="p">)[[</span><span class="s1">'confidence'</span><span class="p">,</span> <span class="s1">'confidence_pct'</span><span class="p">,</span> <span class="s1">'frp'</span><span class="p">]]</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">3</span><span class="p">))</span>
+</pre></div>
+<div class="clipboard-copy-txt" id="cell-5">if fires is not None and len(fires):
+    print(fires.groupby('sensor').size())
+    display(fires.groupby('sensor')[['confidence', 'confidence_pct', 'frp']].head(3))</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=8af1d273">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h2 id="overlay-the-two-sensors">Overlay the two sensors<a class="anchor-link" href="#overlay-the-two-sensors">¶</a></h2><p>Plot both sensors on one map: MODIS in blue at a larger marker size, VIIRS in red at a smaller one, so the finer VIIRS sampling shows through the coarser MODIS footprints.</p>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=dec69ad7">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="CodeMirror cm-s-jupyter">
+<div class="zeroclipboard-container">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-6">
+<div>
+<span class="notice" hidden="">Copied!</span>
+<svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
+<path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+<path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+</svg>
+</div>
+</clipboard-copy>
+</div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="k">if</span> <span class="n">fires</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">fires</span><span class="p">):</span>
     <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
 
     <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">7</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
-    <span class="k">for</span> <span class="n">sensor</span><span class="p">,</span> <span class="n">colour</span><span class="p">,</span> <span class="n">size</span> <span class="ow">in</span> <span class="p">[(</span><span class="s1">'MODIS_NRT'</span><span class="p">,</span> <span class="s1">'tab:blue'</span><span class="p">,</span> <span class="mi">60</span><span class="p">),</span>
-                                 <span class="p">(</span><span class="s1">'VIIRS_SNPP_NRT'</span><span class="p">,</span> <span class="s1">'tab:red'</span><span class="p">,</span> <span class="mi">18</span><span class="p">)]:</span>
+    <span class="k">for</span> <span class="n">sensor</span><span class="p">,</span> <span class="n">colour</span><span class="p">,</span> <span class="n">size</span> <span class="ow">in</span> <span class="p">[</span>
+        <span class="p">(</span><span class="s1">'MODIS_NRT'</span><span class="p">,</span> <span class="s1">'tab:blue'</span><span class="p">,</span> <span class="mi">60</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">'VIIRS_SNPP_NRT'</span><span class="p">,</span> <span class="s1">'tab:red'</span><span class="p">,</span> <span class="mi">18</span><span class="p">),</span>
+    <span class="p">]:</span>
         <span class="n">subset</span> <span class="o">=</span> <span class="n">fires</span><span class="p">[</span><span class="n">fires</span><span class="p">[</span><span class="s1">'sensor'</span><span class="p">]</span> <span class="o">==</span> <span class="n">sensor</span><span class="p">]</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">subset</span><span class="p">):</span>
             <span class="n">subset</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">colour</span><span class="p">,</span> <span class="n">markersize</span><span class="o">=</span><span class="n">size</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">sensor</span><span class="p">)</span>
@@ -11825,12 +12022,14 @@ if HAS_KEY:
     <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">'latitude'</span><span class="p">)</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-4">if fires is not None and len(fires):
+<div class="clipboard-copy-txt" id="cell-6">if fires is not None and len(fires):
     import matplotlib.pyplot as plt
 
     fig, ax = plt.subplots(figsize=(7, 6))
-    for sensor, colour, size in [('MODIS_NRT', 'tab:blue', 60),
-                                 ('VIIRS_SNPP_NRT', 'tab:red', 18)]:
+    for sensor, colour, size in [
+        ('MODIS_NRT', 'tab:blue', 60),
+        ('VIIRS_SNPP_NRT', 'tab:red', 18),
+    ]:
         subset = fires[fires['sensor'] == sensor]
         if len(subset):
             subset.plot(ax=ax, color=colour, markersize=size, alpha=0.5, label=sensor)
@@ -11838,8 +12037,7 @@ if HAS_KEY:
     ax.set_title(f'MODIS 1 km vs VIIRS 375 m, {START} to {END}')
     ax.set_xlabel('longitude')
     ax.set_ylabel('latitude')
-    plt.show()
-</div>
+    plt.show()</div>
 </div>
 </div>
 </div>

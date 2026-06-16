@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -11620,7 +11620,10 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">has_sh_credentials</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">"""Whether Sentinel Hub OAuth client-credentials are available."""</span>
-    <span class="k">return</span> <span class="nb">bool</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"SENTINELHUB_CLIENT_ID"</span><span class="p">)</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"SENTINELHUB_CLIENT_SECRET"</span><span class="p">))</span>
+    <span class="k">return</span> <span class="nb">bool</span><span class="p">(</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"SENTINELHUB_CLIENT_ID"</span><span class="p">)</span>
+        <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"SENTINELHUB_CLIENT_SECRET"</span><span class="p">)</span>
+    <span class="p">)</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">run_or_skip</span><span class="p">(</span><span class="n">facade</span><span class="p">,</span> <span class="o">**</span><span class="n">download_kwargs</span><span class="p">):</span>
@@ -11648,7 +11651,10 @@ from pathlib import Path
 
 def has_sh_credentials() -&gt; bool:
     """Whether Sentinel Hub OAuth client-credentials are available."""
-    return bool(os.environ.get("SENTINELHUB_CLIENT_ID") and os.environ.get("SENTINELHUB_CLIENT_SECRET"))
+    return bool(
+        os.environ.get("SENTINELHUB_CLIENT_ID")
+        and os.environ.get("SENTINELHUB_CLIENT_SECRET")
+    )
 
 
 def run_or_skip(facade, **download_kwargs):
@@ -11668,8 +11674,7 @@ def run_or_skip(facade, **download_kwargs):
     results = facade.download(**download_kwargs)
     for item in results:
         print(item)
-    return results
-</div>
+    return results</div>
 </div>
 </div>
 </div>
@@ -11709,10 +11714,13 @@ def run_or_skip(facade, **download_kwargs):
 
 <span class="n">facade</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
     <span class="n">data_source</span><span class="o">=</span><span class="s1">'sentinel-hub'</span><span class="p">,</span>
-    <span class="n">variables</span><span class="o">=</span><span class="p">{</span><span class="s1">'sentinel-2-l2a-true-colour'</span><span class="p">:</span> <span class="p">[]},</span>
-    <span class="n">start</span><span class="o">=</span><span class="s1">'2020-07-01'</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s1">'2020-07-15'</span><span class="p">,</span>
-    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">48.85</span><span class="p">,</span> <span class="mf">48.87</span><span class="p">],</span> <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">2.34</span><span class="p">,</span> <span class="mf">2.36</span><span class="p">],</span>
-    <span class="n">path</span><span class="o">=</span><span class="s1">'data/sh-true-colour'</span><span class="p">,</span> <span class="n">resolution</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+    <span class="n">dataset</span><span class="o">=</span><span class="s1">'sentinel-2-l2a-true-colour'</span><span class="p">,</span>
+    <span class="n">variables</span><span class="o">=</span><span class="p">[],</span>
+    <span class="n">start</span><span class="o">=</span><span class="s1">'2020-07-01'</span><span class="p">,</span>
+    <span class="n">end</span><span class="o">=</span><span class="s1">'2020-07-15'</span><span class="p">,</span>
+    <span class="n">aoi</span><span class="o">=</span><span class="p">[</span><span class="mf">2.34</span><span class="p">,</span> <span class="mf">48.85</span><span class="p">,</span> <span class="mf">2.36</span><span class="p">,</span> <span class="mf">48.87</span><span class="p">],</span>
+    <span class="n">path</span><span class="o">=</span><span class="s1">'data/sh-true-colour'</span><span class="p">,</span>
+    <span class="n">resolution</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
     <span class="n">mosaicking_order</span><span class="o">=</span><span class="s1">'leastCC'</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="n">paths</span> <span class="o">=</span> <span class="n">run_or_skip</span><span class="p">(</span><span class="n">facade</span><span class="p">)</span>
@@ -11722,10 +11730,13 @@ def run_or_skip(facade, **download_kwargs):
 
 facade = EarthLens(
     data_source='sentinel-hub',
-    variables={'sentinel-2-l2a-true-colour': []},
-    start='2020-07-01', end='2020-07-15',
-    lat_lim=[48.85, 48.87], lon_lim=[2.34, 2.36],
-    path='data/sh-true-colour', resolution=10,
+    dataset='sentinel-2-l2a-true-colour',
+    variables=[],
+    start='2020-07-01',
+    end='2020-07-15',
+    aoi=[2.34, 48.85, 2.36, 48.87],
+    path='data/sh-true-colour',
+    resolution=10,
     mosaicking_order='leastCC',
 )
 paths = run_or_skip(facade)

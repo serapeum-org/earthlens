@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -7878,6 +7878,24 @@
         
       
       
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    PM2.5 city time-series vs. the WHO guideline
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
       <a href="./" class="md-nav__link md-nav__link--active">
         
   
@@ -7894,6 +7912,80 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#setup" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Setup
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-request" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The request
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#fetch-the-daily-pm25-rollup" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fetch the daily PM2.5 rollup
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#collapse-to-a-city-wide-daily-mean" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Collapse to a city-wide daily mean
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#plot-the-series-against-the-guideline" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Plot the series against the guideline
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
       
     </li>
   
@@ -10733,6 +10825,69 @@
     
   
   
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#setup" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Setup
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-request" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The request
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#fetch-the-daily-pm25-rollup" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fetch the daily PM2.5 rollup
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#collapse-to-a-city-wide-daily-mean" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Collapse to a city-wide daily mean
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#plot-the-series-against-the-guideline" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Plot the series against the guideline
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
 </nav>
                   </div>
                 </div>
@@ -11485,31 +11640,48 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </style>
 <!-- End of mermaid configuration --><div class="jupyter-wrapper">
 <div class="jp-Notebook" data-jp-theme-light="true" data-jp-theme-name="JupyterLab Light">
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=5d7bdf72">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=dac390f2">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h1 id="pm25-city-time-series-vs-the-who-guideline">PM2.5 city time-series vs. the WHO guideline<a class="anchor-link" href="#pm25-city-time-series-vs-the-who-guideline">¶</a></h1><p>Fetch a <strong>year</strong> of daily-rollup PM2.5 for one city, plot the series, overlay the <strong>WHO 24-hour guideline (15 µg/m³)</strong>, and annotate the exceedance days. Shows the value of OpenAQ's server-side daily rollup for long windows — a year is ~365 rows per sensor, not tens of thousands of raw readings.</p>
+<h1 id="pm25-city-time-series-vs-the-who-guideline">PM2.5 city time-series vs. the WHO guideline<a class="anchor-link" href="#pm25-city-time-series-vs-the-who-guideline">¶</a></h1><p>Fetch a <strong>year</strong> of daily-rollup PM2.5 for one city, plot the series, overlay the
+<strong>WHO 24-hour guideline (15 µg/m³)</strong>, and annotate the exceedance days. This shows the
+value of OpenAQ's server-side daily rollup for long windows — a year is ~365 rows per
+sensor, not tens of thousands of raw readings.</p>
 </div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=a2d96295">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=f3d9dabd">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
 <blockquote>
-<p>Needs a free <code>OPENAQ_API_KEY</code> (see the authentication page). The live cell is guarded so the notebook stays <code>--nbval-lax</code>-safe.</p>
+<p>Needs a free <code>OPENAQ_API_KEY</code> (see the authentication page). The live cell is guarded
+so the notebook stays <code>--nbval-lax</code>-safe.</p>
 </blockquote>
 </div>
 </div>
 </div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=9d7ea3ff">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h2 id="setup">Setup<a class="anchor-link" href="#setup">¶</a></h2><p><code>os</code> lets us read the API key from the environment, and <code>earthlens</code> provides the
+unified <code>EarthLens</code> entry point. The matplotlib import is deferred to the plotting cell
+so the notebook imports cleanly even without a display backend.</p>
+</div>
+</div>
+</div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=ddcde619">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=b7952abb">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -11528,17 +11700,31 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+
 <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-1">import os
+
 from earthlens import EarthLens</div>
 </div>
 </div>
 </div>
 </div>
 </div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=5512fbec">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h2 id="the-request">The request<a class="anchor-link" href="#the-request">¶</a></h2><p>Define the analysis parameters up front: the WHO 24-hour guideline used for the
+overlay, a bounding box over the Los Angeles basin, and the one-year date window.</p>
+</div>
+</div>
+</div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=acd1a87a">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=ee078306">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -11557,12 +11743,12 @@ from earthlens import EarthLens</div>
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">WHO_24H_GUIDELINE</span> <span class="o">=</span> <span class="mf">15.0</span>  <span class="c1"># µg/m³, WHO 2021 24-hour PM2.5 guideline</span>
-<span class="n">bbox_lat</span> <span class="o">=</span> <span class="p">[</span><span class="mf">34.0</span><span class="p">,</span> <span class="mf">34.3</span><span class="p">]</span>   <span class="c1"># Los Angeles basin</span>
+<span class="n">bbox_lat</span> <span class="o">=</span> <span class="p">[</span><span class="mf">34.0</span><span class="p">,</span> <span class="mf">34.3</span><span class="p">]</span>  <span class="c1"># Los Angeles basin</span>
 <span class="n">bbox_lon</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="mf">118.5</span><span class="p">,</span> <span class="o">-</span><span class="mf">118.1</span><span class="p">]</span>
 <span class="n">start</span><span class="p">,</span> <span class="n">end</span> <span class="o">=</span> <span class="s2">"2023-01-01"</span><span class="p">,</span> <span class="s2">"2023-12-31"</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-2">WHO_24H_GUIDELINE = 15.0  # µg/m³, WHO 2021 24-hour PM2.5 guideline
-bbox_lat = [34.0, 34.3]   # Los Angeles basin
+bbox_lat = [34.0, 34.3]  # Los Angeles basin
 bbox_lon = [-118.5, -118.1]
 start, end = "2023-01-01", "2023-12-31"</div>
 </div>
@@ -11570,8 +11756,22 @@ start, end = "2023-01-01", "2023-12-31"</div>
 </div>
 </div>
 </div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=323374dd">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h2 id="fetch-the-daily-pm25-rollup">Fetch the daily PM2.5 rollup<a class="anchor-link" href="#fetch-the-daily-pm25-rollup">¶</a></h2><p>OpenAQ is a tabular backend, so <code>download()</code> returns a <code>DataFrame</code> of daily rows. We
+build the request first, then call <code>download()</code> on its own line. The whole block is
+guarded on <code>OPENAQ_API_KEY</code> so the notebook stays runnable (and <code>--nbval-lax</code>-safe)
+without credentials.</p>
+</div>
+</div>
+</div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=05c91411">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=45402fa2">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -11591,30 +11791,34 @@ start, end = "2023-01-01", "2023-12-31"</div>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">df</span> <span class="o">=</span> <span class="kc">None</span>
 <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"OPENAQ_API_KEY"</span><span class="p">):</span>
-    <span class="n">df</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
+    <span class="n">measurements</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
         <span class="n">data_source</span><span class="o">=</span><span class="s2">"openaq"</span><span class="p">,</span>
         <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">"pm25"</span><span class="p">],</span>
-        <span class="n">start</span><span class="o">=</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="n">end</span><span class="p">,</span>
-        <span class="n">lat_lim</span><span class="o">=</span><span class="n">bbox_lat</span><span class="p">,</span> <span class="n">lon_lim</span><span class="o">=</span><span class="n">bbox_lon</span><span class="p">,</span>
-        <span class="n">temporal_resolution</span><span class="o">=</span><span class="s2">"daily"</span><span class="p">,</span>   <span class="c1"># server-side daily rollup</span>
+        <span class="n">start</span><span class="o">=</span><span class="n">start</span><span class="p">,</span>
+        <span class="n">end</span><span class="o">=</span><span class="n">end</span><span class="p">,</span>
+        <span class="n">aoi</span><span class="o">=</span><span class="p">[</span><span class="n">bbox_lon</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">bbox_lat</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">bbox_lon</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">bbox_lat</span><span class="p">[</span><span class="mi">1</span><span class="p">]],</span>
+        <span class="n">temporal_resolution</span><span class="o">=</span><span class="s2">"daily"</span><span class="p">,</span>  <span class="c1"># server-side daily rollup</span>
         <span class="n">max_locations</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
         <span class="n">path</span><span class="o">=</span><span class="s2">"out/openaq"</span><span class="p">,</span>
-    <span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">progress_bar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="p">)</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">measurements</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">progress_bar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
 <span class="k">else</span><span class="p">:</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">"set OPENAQ_API_KEY to run the live cell"</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-3">df = None
 if os.environ.get("OPENAQ_API_KEY"):
-    df = EarthLens(
+    measurements = EarthLens(
         data_source="openaq",
         variables=["pm25"],
-        start=start, end=end,
-        lat_lim=bbox_lat, lon_lim=bbox_lon,
-        temporal_resolution="daily",   # server-side daily rollup
+        start=start,
+        end=end,
+        aoi=[bbox_lon[0], bbox_lat[0], bbox_lon[1], bbox_lat[1]],
+        temporal_resolution="daily",  # server-side daily rollup
         max_locations=5,
         path="out/openaq",
-    ).download(progress_bar=False)
+    )
+    df = measurements.download(progress_bar=False)
     print(df.shape)
 else:
     print("set OPENAQ_API_KEY to run the live cell")</div>
@@ -11623,8 +11827,21 @@ else:
 </div>
 </div>
 </div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=f4e32492">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h2 id="collapse-to-a-city-wide-daily-mean">Collapse to a city-wide daily mean<a class="anchor-link" href="#collapse-to-a-city-wide-daily-mean">¶</a></h2><p>The request can return several stations across the basin. Averaging their values per
+day yields one city-wide series, and we count how many of those days exceed the WHO
+guideline.</p>
+</div>
+</div>
+</div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=d46dad10">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=36586508">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -11642,24 +11859,24 @@ else:
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># Collapse to a city-wide daily mean across the stations.</span>
-<span class="n">city</span> <span class="o">=</span> <span class="kc">None</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">city</span> <span class="o">=</span> <span class="kc">None</span>
 <span class="k">if</span> <span class="n">df</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">df</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
     <span class="n">city</span> <span class="o">=</span> <span class="p">(</span>
         <span class="n">df</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">day</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="s2">"datetime_utc"</span><span class="p">]</span><span class="o">.</span><span class="n">dt</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="s2">"D"</span><span class="p">))</span>
-          <span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s2">"day"</span><span class="p">)[</span><span class="s2">"value"</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
-          <span class="o">.</span><span class="n">sort_index</span><span class="p">()</span>
+        <span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s2">"day"</span><span class="p">)[</span><span class="s2">"value"</span><span class="p">]</span>
+        <span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+        <span class="o">.</span><span class="n">sort_index</span><span class="p">()</span>
     <span class="p">)</span>
     <span class="n">exceedances</span> <span class="o">=</span> <span class="n">city</span><span class="p">[</span><span class="n">city</span> <span class="o">&gt;</span> <span class="n">WHO_24H_GUIDELINE</span><span class="p">]</span>
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">exceedances</span><span class="p">)</span><span class="si">}</span><span class="s2"> of </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">city</span><span class="p">)</span><span class="si">}</span><span class="s2"> days exceed the WHO guideline"</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-4"># Collapse to a city-wide daily mean across the stations.
-city = None
+<div class="clipboard-copy-txt" id="cell-4">city = None
 if df is not None and not df.empty:
     city = (
         df.assign(day=df["datetime_utc"].dt.floor("D"))
-          .groupby("day")["value"].mean()
-          .sort_index()
+        .groupby("day")["value"]
+        .mean()
+        .sort_index()
     )
     exceedances = city[city &gt; WHO_24H_GUIDELINE]
     print(f"{len(exceedances)} of {len(city)} days exceed the WHO guideline")</div>
@@ -11668,8 +11885,20 @@ if df is not None and not df.empty:
 </div>
 </div>
 </div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=0a89a63f">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h2 id="plot-the-series-against-the-guideline">Plot the series against the guideline<a class="anchor-link" href="#plot-the-series-against-the-guideline">¶</a></h2><p>Plot the daily mean as a line, draw the WHO guideline as a dashed reference, and mark
+every exceedance day in crimson so the polluted stretches stand out at a glance.</p>
+</div>
+</div>
+</div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=635dc731">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=1b098c10">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -11689,10 +11918,20 @@ if df is not None and not df.empty:
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="k">if</span> <span class="n">city</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">city</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
     <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+
     <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">11</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
     <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">city</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">city</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"#1f77b4"</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"daily mean PM2.5"</span><span class="p">)</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="n">WHO_24H_GUIDELINE</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"crimson"</span><span class="p">,</span> <span class="n">ls</span><span class="o">=</span><span class="s2">"--"</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"WHO 24h guideline (15)"</span><span class="p">)</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">exceedances</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">exceedances</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"crimson"</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span> <span class="n">zorder</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"exceedance day"</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span>
+        <span class="n">WHO_24H_GUIDELINE</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"crimson"</span><span class="p">,</span> <span class="n">ls</span><span class="o">=</span><span class="s2">"--"</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"WHO 24h guideline (15)"</span>
+    <span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span>
+        <span class="n">exceedances</span><span class="o">.</span><span class="n">index</span><span class="p">,</span>
+        <span class="n">exceedances</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+        <span class="n">color</span><span class="o">=</span><span class="s2">"crimson"</span><span class="p">,</span>
+        <span class="n">s</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span>
+        <span class="n">zorder</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+        <span class="n">label</span><span class="o">=</span><span class="s2">"exceedance day"</span><span class="p">,</span>
+    <span class="p">)</span>
     <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">"PM2.5 (µg/m³)"</span><span class="p">)</span>
     <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">"Los Angeles daily PM2.5 vs. WHO guideline, 2023"</span><span class="p">)</span>
     <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">fontsize</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span>
@@ -11701,10 +11940,20 @@ if df is not None and not df.empty:
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-5">if city is not None and not city.empty:
     import matplotlib.pyplot as plt
+
     fig, ax = plt.subplots(figsize=(11, 4))
     ax.plot(city.index, city.values, color="#1f77b4", lw=1, label="daily mean PM2.5")
-    ax.axhline(WHO_24H_GUIDELINE, color="crimson", ls="--", label="WHO 24h guideline (15)")
-    ax.scatter(exceedances.index, exceedances.values, color="crimson", s=12, zorder=3, label="exceedance day")
+    ax.axhline(
+        WHO_24H_GUIDELINE, color="crimson", ls="--", label="WHO 24h guideline (15)"
+    )
+    ax.scatter(
+        exceedances.index,
+        exceedances.values,
+        color="crimson",
+        s=12,
+        zorder=3,
+        label="exceedance day",
+    )
     ax.set_ylabel("PM2.5 (µg/m³)")
     ax.set_title("Los Angeles daily PM2.5 vs. WHO guideline, 2023")
     ax.legend(fontsize=8)

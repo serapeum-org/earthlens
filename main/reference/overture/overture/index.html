@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -12143,7 +12143,7 @@ newest first, from the bundled YAML's informational index.</p>
 <a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="o">&gt;&gt;&gt;</span> <span class="n">Catalog</span><span class="p">()</span><span class="o">.</span><span class="n">get_theme</span><span class="p">(</span><span class="s2">&quot;building&quot;</span><span class="p">)</span>
 <a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="n">Traceback</span> <span class="p">(</span><span class="n">most</span> <span class="n">recent</span> <span class="n">call</span> <span class="n">last</span><span class="p">):</span>
 <a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>    <span class="o">...</span>
-<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="ne">ValueError</span><span class="p">:</span> <span class="s1">&#39;building&#39;</span> <span class="ow">is</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">the</span> <span class="n">Overture</span> <span class="n">theme</span> <span class="n">catalog</span><span class="o">.</span> <span class="n">Known</span> <span class="n">datasets</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;addresses&#39;</span><span class="p">,</span> <span class="s1">&#39;base&#39;</span><span class="p">,</span> <span class="s1">&#39;buildings&#39;</span><span class="p">,</span> <span class="s1">&#39;divisions&#39;</span><span class="p">,</span> <span class="s1">&#39;places&#39;</span><span class="p">,</span> <span class="s1">&#39;transportation&#39;</span><span class="p">]</span><span class="o">.</span> <span class="n">Did</span> <span class="n">you</span> <span class="n">mean</span> <span class="s1">&#39;buildings&#39;</span><span class="err">?</span>
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="ne">ValueError</span><span class="p">:</span> <span class="s1">&#39;building&#39;</span> <span class="ow">is</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">the</span> <span class="n">Overture</span> <span class="n">theme</span> <span class="n">catalog</span><span class="o">.</span> <span class="n">Known</span> <span class="n">themes</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;addresses&#39;</span><span class="p">,</span> <span class="s1">&#39;base&#39;</span><span class="p">,</span> <span class="s1">&#39;buildings&#39;</span><span class="p">,</span> <span class="s1">&#39;divisions&#39;</span><span class="p">,</span> <span class="s1">&#39;places&#39;</span><span class="p">,</span> <span class="s1">&#39;transportation&#39;</span><span class="p">]</span><span class="o">.</span> <span class="n">Did</span> <span class="n">you</span> <span class="n">mean</span> <span class="s1">&#39;buildings&#39;</span><span class="err">?</span>
 </code></pre></div></li>
 </ul>
 
@@ -12419,7 +12419,7 @@ newest first, from the bundled YAML's informational index.</p>
 <a id="__codelineno-0-205" name="__codelineno-0-205"></a><span class="sd">            &gt;&gt;&gt; Catalog().get_theme(&quot;building&quot;)</span>
 <a id="__codelineno-0-206" name="__codelineno-0-206"></a><span class="sd">            Traceback (most recent call last):</span>
 <a id="__codelineno-0-207" name="__codelineno-0-207"></a><span class="sd">                ...</span>
-<a id="__codelineno-0-208" name="__codelineno-0-208"></a><span class="sd">            ValueError: &#39;building&#39; is not in the Overture theme catalog. Known datasets: [&#39;addresses&#39;, &#39;base&#39;, &#39;buildings&#39;, &#39;divisions&#39;, &#39;places&#39;, &#39;transportation&#39;]. Did you mean &#39;buildings&#39;?</span>
+<a id="__codelineno-0-208" name="__codelineno-0-208"></a><span class="sd">            ValueError: &#39;building&#39; is not in the Overture theme catalog. Known themes: [&#39;addresses&#39;, &#39;base&#39;, &#39;buildings&#39;, &#39;divisions&#39;, &#39;places&#39;, &#39;transportation&#39;]. Did you mean &#39;buildings&#39;?</span>
 <a id="__codelineno-0-209" name="__codelineno-0-209"></a>
 <a id="__codelineno-0-210" name="__codelineno-0-210"></a><span class="sd">            ```</span>
 <a id="__codelineno-0-211" name="__codelineno-0-211"></a><span class="sd">    &quot;&quot;&quot;</span>
@@ -16261,7 +16261,9 @@ empty <code>geometry</code> column, CRS <code>EPSG:4326</code>.</p>
 <span class="normal"><a href="#__codelineno-0-141">141</a></span>
 <span class="normal"><a href="#__codelineno-0-142">142</a></span>
 <span class="normal"><a href="#__codelineno-0-143">143</a></span>
-<span class="normal"><a href="#__codelineno-0-144">144</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-115" name="__codelineno-0-115"></a><span class="k">def</span><span class="w"> </span><span class="nf">empty_fc</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">FeatureCollection</span><span class="p">:</span>
+<span class="normal"><a href="#__codelineno-0-144">144</a></span>
+<span class="normal"><a href="#__codelineno-0-145">145</a></span>
+<span class="normal"><a href="#__codelineno-0-146">146</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-115" name="__codelineno-0-115"></a><span class="k">def</span><span class="w"> </span><span class="nf">empty_fc</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">FeatureCollection</span><span class="p">:</span>
 <a id="__codelineno-0-116" name="__codelineno-0-116"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return an empty `FeatureCollection` with the minimal Overture schema.</span>
 <a id="__codelineno-0-117" name="__codelineno-0-117"></a>
 <a id="__codelineno-0-118" name="__codelineno-0-118"></a><span class="sd">    Used for a query that matched nothing (an empty bbox) so callers</span>
@@ -16286,11 +16288,13 @@ empty <code>geometry</code> column, CRS <code>EPSG:4326</code>.</p>
 <a id="__codelineno-0-137" name="__codelineno-0-137"></a>
 <a id="__codelineno-0-138" name="__codelineno-0-138"></a><span class="sd">            ```</span>
 <a id="__codelineno-0-139" name="__codelineno-0-139"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-140" name="__codelineno-0-140"></a>    <span class="n">frame</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="n">column</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">([],</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;object&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">column</span> <span class="ow">in</span> <span class="n">_EMPTY_COLUMNS</span><span class="p">})</span>
-<a id="__codelineno-0-141" name="__codelineno-0-141"></a>    <span class="n">gdf</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">(</span>
-<a id="__codelineno-0-142" name="__codelineno-0-142"></a>        <span class="n">frame</span><span class="p">,</span> <span class="n">geometry</span><span class="o">=</span><span class="n">gpd</span><span class="o">.</span><span class="n">GeoSeries</span><span class="p">([],</span> <span class="n">crs</span><span class="o">=</span><span class="n">OVERTURE_CRS</span><span class="p">),</span> <span class="n">crs</span><span class="o">=</span><span class="n">OVERTURE_CRS</span>
-<a id="__codelineno-0-143" name="__codelineno-0-143"></a>    <span class="p">)</span>
-<a id="__codelineno-0-144" name="__codelineno-0-144"></a>    <span class="k">return</span> <span class="n">FeatureCollection</span><span class="p">(</span><span class="n">gdf</span><span class="p">)</span>
+<a id="__codelineno-0-140" name="__codelineno-0-140"></a>    <span class="n">frame</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+<a id="__codelineno-0-141" name="__codelineno-0-141"></a>        <span class="p">{</span><span class="n">column</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">([],</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;object&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">column</span> <span class="ow">in</span> <span class="n">_EMPTY_COLUMNS</span><span class="p">}</span>
+<a id="__codelineno-0-142" name="__codelineno-0-142"></a>    <span class="p">)</span>
+<a id="__codelineno-0-143" name="__codelineno-0-143"></a>    <span class="n">gdf</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">(</span>
+<a id="__codelineno-0-144" name="__codelineno-0-144"></a>        <span class="n">frame</span><span class="p">,</span> <span class="n">geometry</span><span class="o">=</span><span class="n">gpd</span><span class="o">.</span><span class="n">GeoSeries</span><span class="p">([],</span> <span class="n">crs</span><span class="o">=</span><span class="n">OVERTURE_CRS</span><span class="p">),</span> <span class="n">crs</span><span class="o">=</span><span class="n">OVERTURE_CRS</span>
+<a id="__codelineno-0-145" name="__codelineno-0-145"></a>    <span class="p">)</span>
+<a id="__codelineno-0-146" name="__codelineno-0-146"></a>    <span class="k">return</span> <span class="n">FeatureCollection</span><span class="p">(</span><span class="n">gdf</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -19101,7 +19105,7 @@ newest first, from the bundled YAML's informational index.</p>
 <a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="o">&gt;&gt;&gt;</span> <span class="n">Catalog</span><span class="p">()</span><span class="o">.</span><span class="n">get_theme</span><span class="p">(</span><span class="s2">&quot;building&quot;</span><span class="p">)</span>
 <a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="n">Traceback</span> <span class="p">(</span><span class="n">most</span> <span class="n">recent</span> <span class="n">call</span> <span class="n">last</span><span class="p">):</span>
 <a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>    <span class="o">...</span>
-<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="ne">ValueError</span><span class="p">:</span> <span class="s1">&#39;building&#39;</span> <span class="ow">is</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">the</span> <span class="n">Overture</span> <span class="n">theme</span> <span class="n">catalog</span><span class="o">.</span> <span class="n">Known</span> <span class="n">datasets</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;addresses&#39;</span><span class="p">,</span> <span class="s1">&#39;base&#39;</span><span class="p">,</span> <span class="s1">&#39;buildings&#39;</span><span class="p">,</span> <span class="s1">&#39;divisions&#39;</span><span class="p">,</span> <span class="s1">&#39;places&#39;</span><span class="p">,</span> <span class="s1">&#39;transportation&#39;</span><span class="p">]</span><span class="o">.</span> <span class="n">Did</span> <span class="n">you</span> <span class="n">mean</span> <span class="s1">&#39;buildings&#39;</span><span class="err">?</span>
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="ne">ValueError</span><span class="p">:</span> <span class="s1">&#39;building&#39;</span> <span class="ow">is</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">the</span> <span class="n">Overture</span> <span class="n">theme</span> <span class="n">catalog</span><span class="o">.</span> <span class="n">Known</span> <span class="n">themes</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;addresses&#39;</span><span class="p">,</span> <span class="s1">&#39;base&#39;</span><span class="p">,</span> <span class="s1">&#39;buildings&#39;</span><span class="p">,</span> <span class="s1">&#39;divisions&#39;</span><span class="p">,</span> <span class="s1">&#39;places&#39;</span><span class="p">,</span> <span class="s1">&#39;transportation&#39;</span><span class="p">]</span><span class="o">.</span> <span class="n">Did</span> <span class="n">you</span> <span class="n">mean</span> <span class="s1">&#39;buildings&#39;</span><span class="err">?</span>
 </code></pre></div></li>
 </ul>
 
@@ -19377,7 +19381,7 @@ newest first, from the bundled YAML's informational index.</p>
 <a id="__codelineno-0-205" name="__codelineno-0-205"></a><span class="sd">            &gt;&gt;&gt; Catalog().get_theme(&quot;building&quot;)</span>
 <a id="__codelineno-0-206" name="__codelineno-0-206"></a><span class="sd">            Traceback (most recent call last):</span>
 <a id="__codelineno-0-207" name="__codelineno-0-207"></a><span class="sd">                ...</span>
-<a id="__codelineno-0-208" name="__codelineno-0-208"></a><span class="sd">            ValueError: &#39;building&#39; is not in the Overture theme catalog. Known datasets: [&#39;addresses&#39;, &#39;base&#39;, &#39;buildings&#39;, &#39;divisions&#39;, &#39;places&#39;, &#39;transportation&#39;]. Did you mean &#39;buildings&#39;?</span>
+<a id="__codelineno-0-208" name="__codelineno-0-208"></a><span class="sd">            ValueError: &#39;building&#39; is not in the Overture theme catalog. Known themes: [&#39;addresses&#39;, &#39;base&#39;, &#39;buildings&#39;, &#39;divisions&#39;, &#39;places&#39;, &#39;transportation&#39;]. Did you mean &#39;buildings&#39;?</span>
 <a id="__codelineno-0-209" name="__codelineno-0-209"></a>
 <a id="__codelineno-0-210" name="__codelineno-0-210"></a><span class="sd">            ```</span>
 <a id="__codelineno-0-211" name="__codelineno-0-211"></a><span class="sd">    &quot;&quot;&quot;</span>
@@ -21224,7 +21228,9 @@ empty <code>geometry</code> column, CRS <code>EPSG:4326</code>.</p>
 <span class="normal"><a href="#__codelineno-0-141">141</a></span>
 <span class="normal"><a href="#__codelineno-0-142">142</a></span>
 <span class="normal"><a href="#__codelineno-0-143">143</a></span>
-<span class="normal"><a href="#__codelineno-0-144">144</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-115" name="__codelineno-0-115"></a><span class="k">def</span><span class="w"> </span><span class="nf">empty_fc</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">FeatureCollection</span><span class="p">:</span>
+<span class="normal"><a href="#__codelineno-0-144">144</a></span>
+<span class="normal"><a href="#__codelineno-0-145">145</a></span>
+<span class="normal"><a href="#__codelineno-0-146">146</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-115" name="__codelineno-0-115"></a><span class="k">def</span><span class="w"> </span><span class="nf">empty_fc</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">FeatureCollection</span><span class="p">:</span>
 <a id="__codelineno-0-116" name="__codelineno-0-116"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return an empty `FeatureCollection` with the minimal Overture schema.</span>
 <a id="__codelineno-0-117" name="__codelineno-0-117"></a>
 <a id="__codelineno-0-118" name="__codelineno-0-118"></a><span class="sd">    Used for a query that matched nothing (an empty bbox) so callers</span>
@@ -21249,11 +21255,13 @@ empty <code>geometry</code> column, CRS <code>EPSG:4326</code>.</p>
 <a id="__codelineno-0-137" name="__codelineno-0-137"></a>
 <a id="__codelineno-0-138" name="__codelineno-0-138"></a><span class="sd">            ```</span>
 <a id="__codelineno-0-139" name="__codelineno-0-139"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-140" name="__codelineno-0-140"></a>    <span class="n">frame</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="n">column</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">([],</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;object&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">column</span> <span class="ow">in</span> <span class="n">_EMPTY_COLUMNS</span><span class="p">})</span>
-<a id="__codelineno-0-141" name="__codelineno-0-141"></a>    <span class="n">gdf</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">(</span>
-<a id="__codelineno-0-142" name="__codelineno-0-142"></a>        <span class="n">frame</span><span class="p">,</span> <span class="n">geometry</span><span class="o">=</span><span class="n">gpd</span><span class="o">.</span><span class="n">GeoSeries</span><span class="p">([],</span> <span class="n">crs</span><span class="o">=</span><span class="n">OVERTURE_CRS</span><span class="p">),</span> <span class="n">crs</span><span class="o">=</span><span class="n">OVERTURE_CRS</span>
-<a id="__codelineno-0-143" name="__codelineno-0-143"></a>    <span class="p">)</span>
-<a id="__codelineno-0-144" name="__codelineno-0-144"></a>    <span class="k">return</span> <span class="n">FeatureCollection</span><span class="p">(</span><span class="n">gdf</span><span class="p">)</span>
+<a id="__codelineno-0-140" name="__codelineno-0-140"></a>    <span class="n">frame</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+<a id="__codelineno-0-141" name="__codelineno-0-141"></a>        <span class="p">{</span><span class="n">column</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">([],</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;object&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">column</span> <span class="ow">in</span> <span class="n">_EMPTY_COLUMNS</span><span class="p">}</span>
+<a id="__codelineno-0-142" name="__codelineno-0-142"></a>    <span class="p">)</span>
+<a id="__codelineno-0-143" name="__codelineno-0-143"></a>    <span class="n">gdf</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">(</span>
+<a id="__codelineno-0-144" name="__codelineno-0-144"></a>        <span class="n">frame</span><span class="p">,</span> <span class="n">geometry</span><span class="o">=</span><span class="n">gpd</span><span class="o">.</span><span class="n">GeoSeries</span><span class="p">([],</span> <span class="n">crs</span><span class="o">=</span><span class="n">OVERTURE_CRS</span><span class="p">),</span> <span class="n">crs</span><span class="o">=</span><span class="n">OVERTURE_CRS</span>
+<a id="__codelineno-0-145" name="__codelineno-0-145"></a>    <span class="p">)</span>
+<a id="__codelineno-0-146" name="__codelineno-0-146"></a>    <span class="k">return</span> <span class="n">FeatureCollection</span><span class="p">(</span><span class="n">gdf</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -21810,9 +21818,7 @@ column of source structs).</p>
 <span class="normal"><a href="#__codelineno-0-179">179</a></span>
 <span class="normal"><a href="#__codelineno-0-180">180</a></span>
 <span class="normal"><a href="#__codelineno-0-181">181</a></span>
-<span class="normal"><a href="#__codelineno-0-182">182</a></span>
-<span class="normal"><a href="#__codelineno-0-183">183</a></span>
-<span class="normal"><a href="#__codelineno-0-184">184</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-139" name="__codelineno-0-139"></a><span class="k">def</span><span class="w"> </span><span class="nf">derive_license_ids</span><span class="p">(</span><span class="n">gdf</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">:</span>
+<span class="normal"><a href="#__codelineno-0-182">182</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-139" name="__codelineno-0-139"></a><span class="k">def</span><span class="w"> </span><span class="nf">derive_license_ids</span><span class="p">(</span><span class="n">gdf</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">:</span>
 <a id="__codelineno-0-140" name="__codelineno-0-140"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the per-row `license_id` series for an Overture `GeoDataFrame`.</span>
 <a id="__codelineno-0-141" name="__codelineno-0-141"></a>
 <a id="__codelineno-0-142" name="__codelineno-0-142"></a><span class="sd">    Applies `row_license` over the `sources` column. When the frame has</span>
@@ -21854,10 +21860,8 @@ column of source structs).</p>
 <a id="__codelineno-0-178" name="__codelineno-0-178"></a><span class="sd">            ```</span>
 <a id="__codelineno-0-179" name="__codelineno-0-179"></a><span class="sd">    &quot;&quot;&quot;</span>
 <a id="__codelineno-0-180" name="__codelineno-0-180"></a>    <span class="k">if</span> <span class="s2">&quot;sources&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">gdf</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
-<a id="__codelineno-0-181" name="__codelineno-0-181"></a>        <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span>
-<a id="__codelineno-0-182" name="__codelineno-0-182"></a>            <span class="p">[</span><span class="n">CDLA_PERMISSIVE</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">gdf</span><span class="p">),</span> <span class="n">index</span><span class="o">=</span><span class="n">gdf</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;object&quot;</span>
-<a id="__codelineno-0-183" name="__codelineno-0-183"></a>        <span class="p">)</span>
-<a id="__codelineno-0-184" name="__codelineno-0-184"></a>    <span class="k">return</span> <span class="n">gdf</span><span class="p">[</span><span class="s2">&quot;sources&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">row_license</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">&quot;object&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-181" name="__codelineno-0-181"></a>        <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">([</span><span class="n">CDLA_PERMISSIVE</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">gdf</span><span class="p">),</span> <span class="n">index</span><span class="o">=</span><span class="n">gdf</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;object&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-182" name="__codelineno-0-182"></a>    <span class="k">return</span> <span class="n">gdf</span><span class="p">[</span><span class="s2">&quot;sources&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">row_license</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">&quot;object&quot;</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -22188,7 +22192,9 @@ warning message (e.g. <code>"buildings/building"</code>).</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>src/earthlens/overture/_helpers.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-187">187</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-185">185</a></span>
+<span class="normal"><a href="#__codelineno-0-186">186</a></span>
+<span class="normal"><a href="#__codelineno-0-187">187</a></span>
 <span class="normal"><a href="#__codelineno-0-188">188</a></span>
 <span class="normal"><a href="#__codelineno-0-189">189</a></span>
 <span class="normal"><a href="#__codelineno-0-190">190</a></span>
@@ -22226,49 +22232,47 @@ warning message (e.g. <code>"buildings/building"</code>).</p>
 <span class="normal"><a href="#__codelineno-0-222">222</a></span>
 <span class="normal"><a href="#__codelineno-0-223">223</a></span>
 <span class="normal"><a href="#__codelineno-0-224">224</a></span>
-<span class="normal"><a href="#__codelineno-0-225">225</a></span>
-<span class="normal"><a href="#__codelineno-0-226">226</a></span>
-<span class="normal"><a href="#__codelineno-0-227">227</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-187" name="__codelineno-0-187"></a><span class="k">def</span><span class="w"> </span><span class="nf">warn_if_odbl</span><span class="p">(</span><span class="n">license_ids</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span> <span class="n">label</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-<a id="__codelineno-0-188" name="__codelineno-0-188"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Emit a `LicenseWarning` when any row carries `ODbL-1.0`.</span>
-<a id="__codelineno-0-189" name="__codelineno-0-189"></a>
-<a id="__codelineno-0-190" name="__codelineno-0-190"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-191" name="__codelineno-0-191"></a><span class="sd">        license_ids: The per-row `license_id` series (from</span>
-<a id="__codelineno-0-192" name="__codelineno-0-192"></a><span class="sd">            `derive_license_ids`).</span>
-<a id="__codelineno-0-193" name="__codelineno-0-193"></a><span class="sd">        label: A short label naming the fetched theme/type, for the</span>
-<a id="__codelineno-0-194" name="__codelineno-0-194"></a><span class="sd">            warning message (e.g. `&quot;buildings/building&quot;`).</span>
-<a id="__codelineno-0-195" name="__codelineno-0-195"></a>
-<a id="__codelineno-0-196" name="__codelineno-0-196"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-197" name="__codelineno-0-197"></a><span class="sd">        int: The number of `ODbL-1.0` rows found (0 emits no warning).</span>
-<a id="__codelineno-0-198" name="__codelineno-0-198"></a>
-<a id="__codelineno-0-199" name="__codelineno-0-199"></a><span class="sd">    Examples:</span>
-<a id="__codelineno-0-200" name="__codelineno-0-200"></a><span class="sd">        - A permissive-only series emits nothing and counts zero:</span>
-<a id="__codelineno-0-201" name="__codelineno-0-201"></a><span class="sd">            ```python</span>
-<a id="__codelineno-0-202" name="__codelineno-0-202"></a><span class="sd">            &gt;&gt;&gt; import pandas as pd</span>
-<a id="__codelineno-0-203" name="__codelineno-0-203"></a><span class="sd">            &gt;&gt;&gt; from earthlens.overture._helpers import warn_if_odbl</span>
-<a id="__codelineno-0-204" name="__codelineno-0-204"></a><span class="sd">            &gt;&gt;&gt; warn_if_odbl(pd.Series([&quot;CDLA-Permissive-2.0&quot;, &quot;Apache-2.0&quot;]), &quot;places/place&quot;)</span>
-<a id="__codelineno-0-205" name="__codelineno-0-205"></a><span class="sd">            0</span>
-<a id="__codelineno-0-206" name="__codelineno-0-206"></a>
-<a id="__codelineno-0-207" name="__codelineno-0-207"></a><span class="sd">            ```</span>
-<a id="__codelineno-0-208" name="__codelineno-0-208"></a><span class="sd">        - ODbL rows are counted (and a `LicenseWarning` is emitted):</span>
-<a id="__codelineno-0-209" name="__codelineno-0-209"></a><span class="sd">            ```python</span>
-<a id="__codelineno-0-210" name="__codelineno-0-210"></a><span class="sd">            &gt;&gt;&gt; import pandas as pd</span>
-<a id="__codelineno-0-211" name="__codelineno-0-211"></a><span class="sd">            &gt;&gt;&gt; from earthlens.overture._helpers import warn_if_odbl</span>
-<a id="__codelineno-0-212" name="__codelineno-0-212"></a><span class="sd">            &gt;&gt;&gt; warn_if_odbl(pd.Series([&quot;ODbL-1.0&quot;, &quot;CDLA-Permissive-2.0&quot;]), &quot;buildings/building&quot;)</span>
-<a id="__codelineno-0-213" name="__codelineno-0-213"></a><span class="sd">            1</span>
-<a id="__codelineno-0-214" name="__codelineno-0-214"></a>
-<a id="__codelineno-0-215" name="__codelineno-0-215"></a><span class="sd">            ```</span>
-<a id="__codelineno-0-216" name="__codelineno-0-216"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-217" name="__codelineno-0-217"></a>    <span class="n">odbl_count</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="n">license_ids</span> <span class="o">==</span> <span class="n">ODBL</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">())</span>
-<a id="__codelineno-0-218" name="__codelineno-0-218"></a>    <span class="k">if</span> <span class="n">odbl_count</span><span class="p">:</span>
-<a id="__codelineno-0-219" name="__codelineno-0-219"></a>        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-<a id="__codelineno-0-220" name="__codelineno-0-220"></a>            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">label</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">odbl_count</span><span class="si">}</span><span class="s2"> of </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">license_ids</span><span class="p">)</span><span class="si">}</span><span class="s2"> feature(s) are &quot;</span>
-<a id="__codelineno-0-221" name="__codelineno-0-221"></a>            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">ODBL</span><span class="si">}</span><span class="s2"> (OSM-derived). ODbL-1.0 carries attribution and &quot;</span>
-<a id="__codelineno-0-222" name="__codelineno-0-222"></a>            <span class="s2">&quot;share-alike obligations that CDLA-Permissive-2.0 does not; &quot;</span>
-<a id="__codelineno-0-223" name="__codelineno-0-223"></a>            <span class="s2">&quot;honour them when redistributing these rows.&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-224" name="__codelineno-0-224"></a>            <span class="n">LicenseWarning</span><span class="p">,</span>
-<a id="__codelineno-0-225" name="__codelineno-0-225"></a>            <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
-<a id="__codelineno-0-226" name="__codelineno-0-226"></a>        <span class="p">)</span>
-<a id="__codelineno-0-227" name="__codelineno-0-227"></a>    <span class="k">return</span> <span class="n">odbl_count</span>
+<span class="normal"><a href="#__codelineno-0-225">225</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-185" name="__codelineno-0-185"></a><span class="k">def</span><span class="w"> </span><span class="nf">warn_if_odbl</span><span class="p">(</span><span class="n">license_ids</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span> <span class="n">label</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<a id="__codelineno-0-186" name="__codelineno-0-186"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Emit a `LicenseWarning` when any row carries `ODbL-1.0`.</span>
+<a id="__codelineno-0-187" name="__codelineno-0-187"></a>
+<a id="__codelineno-0-188" name="__codelineno-0-188"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-189" name="__codelineno-0-189"></a><span class="sd">        license_ids: The per-row `license_id` series (from</span>
+<a id="__codelineno-0-190" name="__codelineno-0-190"></a><span class="sd">            `derive_license_ids`).</span>
+<a id="__codelineno-0-191" name="__codelineno-0-191"></a><span class="sd">        label: A short label naming the fetched theme/type, for the</span>
+<a id="__codelineno-0-192" name="__codelineno-0-192"></a><span class="sd">            warning message (e.g. `&quot;buildings/building&quot;`).</span>
+<a id="__codelineno-0-193" name="__codelineno-0-193"></a>
+<a id="__codelineno-0-194" name="__codelineno-0-194"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-195" name="__codelineno-0-195"></a><span class="sd">        int: The number of `ODbL-1.0` rows found (0 emits no warning).</span>
+<a id="__codelineno-0-196" name="__codelineno-0-196"></a>
+<a id="__codelineno-0-197" name="__codelineno-0-197"></a><span class="sd">    Examples:</span>
+<a id="__codelineno-0-198" name="__codelineno-0-198"></a><span class="sd">        - A permissive-only series emits nothing and counts zero:</span>
+<a id="__codelineno-0-199" name="__codelineno-0-199"></a><span class="sd">            ```python</span>
+<a id="__codelineno-0-200" name="__codelineno-0-200"></a><span class="sd">            &gt;&gt;&gt; import pandas as pd</span>
+<a id="__codelineno-0-201" name="__codelineno-0-201"></a><span class="sd">            &gt;&gt;&gt; from earthlens.overture._helpers import warn_if_odbl</span>
+<a id="__codelineno-0-202" name="__codelineno-0-202"></a><span class="sd">            &gt;&gt;&gt; warn_if_odbl(pd.Series([&quot;CDLA-Permissive-2.0&quot;, &quot;Apache-2.0&quot;]), &quot;places/place&quot;)</span>
+<a id="__codelineno-0-203" name="__codelineno-0-203"></a><span class="sd">            0</span>
+<a id="__codelineno-0-204" name="__codelineno-0-204"></a>
+<a id="__codelineno-0-205" name="__codelineno-0-205"></a><span class="sd">            ```</span>
+<a id="__codelineno-0-206" name="__codelineno-0-206"></a><span class="sd">        - ODbL rows are counted (and a `LicenseWarning` is emitted):</span>
+<a id="__codelineno-0-207" name="__codelineno-0-207"></a><span class="sd">            ```python</span>
+<a id="__codelineno-0-208" name="__codelineno-0-208"></a><span class="sd">            &gt;&gt;&gt; import pandas as pd</span>
+<a id="__codelineno-0-209" name="__codelineno-0-209"></a><span class="sd">            &gt;&gt;&gt; from earthlens.overture._helpers import warn_if_odbl</span>
+<a id="__codelineno-0-210" name="__codelineno-0-210"></a><span class="sd">            &gt;&gt;&gt; warn_if_odbl(pd.Series([&quot;ODbL-1.0&quot;, &quot;CDLA-Permissive-2.0&quot;]), &quot;buildings/building&quot;)</span>
+<a id="__codelineno-0-211" name="__codelineno-0-211"></a><span class="sd">            1</span>
+<a id="__codelineno-0-212" name="__codelineno-0-212"></a>
+<a id="__codelineno-0-213" name="__codelineno-0-213"></a><span class="sd">            ```</span>
+<a id="__codelineno-0-214" name="__codelineno-0-214"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-215" name="__codelineno-0-215"></a>    <span class="n">odbl_count</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="n">license_ids</span> <span class="o">==</span> <span class="n">ODBL</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">())</span>
+<a id="__codelineno-0-216" name="__codelineno-0-216"></a>    <span class="k">if</span> <span class="n">odbl_count</span><span class="p">:</span>
+<a id="__codelineno-0-217" name="__codelineno-0-217"></a>        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+<a id="__codelineno-0-218" name="__codelineno-0-218"></a>            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">label</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">odbl_count</span><span class="si">}</span><span class="s2"> of </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">license_ids</span><span class="p">)</span><span class="si">}</span><span class="s2"> feature(s) are &quot;</span>
+<a id="__codelineno-0-219" name="__codelineno-0-219"></a>            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">ODBL</span><span class="si">}</span><span class="s2"> (OSM-derived). ODbL-1.0 carries attribution and &quot;</span>
+<a id="__codelineno-0-220" name="__codelineno-0-220"></a>            <span class="s2">&quot;share-alike obligations that CDLA-Permissive-2.0 does not; &quot;</span>
+<a id="__codelineno-0-221" name="__codelineno-0-221"></a>            <span class="s2">&quot;honour them when redistributing these rows.&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-222" name="__codelineno-0-222"></a>            <span class="n">LicenseWarning</span><span class="p">,</span>
+<a id="__codelineno-0-223" name="__codelineno-0-223"></a>            <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+<a id="__codelineno-0-224" name="__codelineno-0-224"></a>        <span class="p">)</span>
+<a id="__codelineno-0-225" name="__codelineno-0-225"></a>    <span class="k">return</span> <span class="n">odbl_count</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>

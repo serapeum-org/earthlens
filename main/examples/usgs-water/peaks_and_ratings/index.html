@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -9886,6 +9886,24 @@
         
       
       
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    USGS Water — annual peaks and rating curves
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
       <a href="./" class="md-nav__link md-nav__link--active">
         
   
@@ -9902,6 +9920,114 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#what-this-notebook-does" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What this notebook does
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#setup" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Setup
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-annual-peak-streamflow" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1 · Annual peak streamflow
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="1 · Annual peak streamflow">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#download-the-peaks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Download the peaks
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-stage-discharge-rating-curve" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2 · Stage-discharge rating curve
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2 · Stage-discharge rating curve">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#download-the-rating-table" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Download the rating table
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#plot-the-rating-curve" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Plot the rating curve
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
       
     </li>
   
@@ -10733,6 +10859,103 @@
     
   
   
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#what-this-notebook-does" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What this notebook does
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#setup" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Setup
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-annual-peak-streamflow" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1 · Annual peak streamflow
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="1 · Annual peak streamflow">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#download-the-peaks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Download the peaks
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-stage-discharge-rating-curve" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2 · Stage-discharge rating curve
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2 · Stage-discharge rating curve">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#download-the-rating-table" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Download the rating table
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#plot-the-rating-curve" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Plot the rating curve
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
 </nav>
                   </div>
                 </div>
@@ -11485,23 +11708,57 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </style>
 <!-- End of mermaid configuration --><div class="jupyter-wrapper">
 <div class="jp-Notebook" data-jp-theme-light="true" data-jp-theme-name="JupyterLab Light">
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=5fee11ff">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=3c8e91f6">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h1 id="usgs-water-annual-peaks-and-rating-curves">USGS Water — annual peaks and rating curves<a class="anchor-link" href="#usgs-water-annual-peaks-and-rating-curves">¶</a></h1><p>The site-keyed services: annual peak streamflow and the stage-discharge rating curve for a gauge. Both require an explicit <code>sites=</code>.</p>
+<h1 id="usgs-water-annual-peaks-and-rating-curves">USGS Water — annual peaks and rating curves<a class="anchor-link" href="#usgs-water-annual-peaks-and-rating-curves">¶</a></h1><p>The site-keyed services: annual peak streamflow and the stage-discharge
+rating curve for a gauge. Both require an explicit <code>sites=</code>.</p>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=e0b4df64">
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=71b99cfb">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h2 id="what-this-notebook-does">What this notebook does<a class="anchor-link" href="#what-this-notebook-does">¶</a></h2><ol>
+<li><strong>Annual peaks</strong> — the highest instantaneous streamflow recorded each
+year at a single gauge (USGS Water is a <em>tabular</em> backend → <code>download()</code>
+writes a CSV and returns a <code>DataFrame</code>).</li>
+<li><strong>Rating curve</strong> — the stage-discharge relationship for the same gauge,
+plotted with matplotlib.</li>
+</ol>
+<blockquote>
+<p>No credentials needed — USGS Water is a public service. Both services are
+keyed on a single gauge id passed via <code>sites=</code>.</p>
+</blockquote>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=1af5d4bc">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h2 id="setup">Setup<a class="anchor-link" href="#setup">¶</a></h2><p>A single import cell: <code>matplotlib</code> for the rating-curve plot and the
+unified <code>EarthLens</code> entry point.</p>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=55ee4016">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [1]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-1">
@@ -11514,124 +11771,39 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.earthlens</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
 
-<span class="n">peaks</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
-    <span class="n">data_source</span><span class="o">=</span><span class="s2">"usgs-water"</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">"discharge"</span><span class="p">],</span>
-    <span class="n">start</span><span class="o">=</span><span class="s2">"1950-01-01"</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">"2020-12-31"</span><span class="p">,</span> <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">38.9</span><span class="p">,</span> <span class="mf">39.0</span><span class="p">],</span>
-    <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">77.2</span><span class="p">,</span> <span class="o">-</span><span class="mf">77.0</span><span class="p">],</span> <span class="n">path</span><span class="o">=</span><span class="s2">"_nb_out"</span><span class="p">,</span> <span class="n">service</span><span class="o">=</span><span class="s2">"peaks"</span><span class="p">,</span>
-    <span class="n">sites</span><span class="o">=</span><span class="s2">"01646500"</span><span class="p">,</span> <span class="n">api</span><span class="o">=</span><span class="s2">"legacy"</span><span class="p">,</span>
-<span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">progress_bar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-<span class="n">peaks</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.earthlens</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-1">from earthlens.earthlens import EarthLens
+<div class="clipboard-copy-txt" id="cell-1">import matplotlib.pyplot as plt
 
-peaks = EarthLens(
-    data_source="usgs-water", variables=["discharge"],
-    start="1950-01-01", end="2020-12-31", lat_lim=[38.9, 39.0],
-    lon_lim=[-77.2, -77.0], path="_nb_out", service="peaks",
-    sites="01646500", api="legacy",
-).download(progress_bar=False)
-peaks.head()</div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
-</div>
-<div class="jp-OutputArea jp-Cell-outputArea">
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
-<pre><span class="ansi-green-fg">2026-05-27 19:02:10.363</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">earthlens.usgs_water.backend</span>:<span class="ansi-cyan-fg">download</span>:<span class="ansi-cyan-fg">371</span> - <span class="ansi-bold">USGSWater peaks: 71 row(s) written to C:\gdrive\algorithms\remote-sensing\earthlens\.claude\worktrees\usgs-water\_nb_out\usgs_peaks_all.csv</span>
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child jp-OutputArea-executeResult">
-<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[1]:</div>
-<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/html" tabindex="0">
-<div>
-<style scoped="">
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-<thead>
-<tr style="text-align: right;">
-<th></th>
-<th>site_no</th>
-<th>datetime</th>
-<th>peak_value</th>
-<th>gage_height</th>
-<th>qualifier</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<th>0</th>
-<td>01646500</td>
-<td>1950-02-03 00:00:00+00:00</td>
-<td>77200</td>
-<td>10.01</td>
-<td>NaN</td>
-</tr>
-<tr>
-<th>1</th>
-<td>01646500</td>
-<td>1950-12-06 00:00:00+00:00</td>
-<td>140000</td>
-<td>13.85</td>
-<td>NaN</td>
-</tr>
-<tr>
-<th>2</th>
-<td>01646500</td>
-<td>1952-04-29 00:00:00+00:00</td>
-<td>148000</td>
-<td>14.17</td>
-<td>NaN</td>
-</tr>
-<tr>
-<th>3</th>
-<td>01646500</td>
-<td>1952-11-23 00:00:00+00:00</td>
-<td>140000</td>
-<td>13.76</td>
-<td>NaN</td>
-</tr>
-<tr>
-<th>4</th>
-<td>01646500</td>
-<td>1954-03-03 00:00:00+00:00</td>
-<td>116000</td>
-<td>12.47</td>
-<td>NaN</td>
-</tr>
-</tbody>
-</table>
+from earthlens.earthlens import EarthLens</div>
 </div>
 </div>
 </div>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=8b15c8f0">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=4ae46cb6">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h2 id="1-annual-peak-streamflow">1 · Annual peak streamflow<a class="anchor-link" href="#1-annual-peak-streamflow">¶</a></h2><p>The <code>peaks</code> service returns one row per water year — the annual maximum
+instantaneous discharge at gauge <code>01646500</code> (Potomac River near
+Washington, D.C.). We build the request first: source, variable, the date
+window, the gauge id, and the <code>legacy</code> API plane that serves this service.</p>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=5cb74649">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [2]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-2">
@@ -11644,46 +11816,216 @@ peaks.head()</div>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
-<span class="n">ratings</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
-    <span class="n">data_source</span><span class="o">=</span><span class="s2">"usgs-water"</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">"discharge"</span><span class="p">],</span>
-    <span class="n">start</span><span class="o">=</span><span class="s2">"2023-01-01"</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">"2023-01-05"</span><span class="p">,</span> <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">38.9</span><span class="p">,</span> <span class="mf">39.0</span><span class="p">],</span>
-    <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">77.2</span><span class="p">,</span> <span class="o">-</span><span class="mf">77.0</span><span class="p">],</span> <span class="n">path</span><span class="o">=</span><span class="s2">"_nb_out"</span><span class="p">,</span> <span class="n">service</span><span class="o">=</span><span class="s2">"ratings"</span><span class="p">,</span>
-    <span class="n">sites</span><span class="o">=</span><span class="s2">"01646500"</span><span class="p">,</span> <span class="n">api</span><span class="o">=</span><span class="s2">"legacy"</span><span class="p">,</span>
-<span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">progress_bar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-<span class="n">ax</span> <span class="o">=</span> <span class="n">ratings</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s2">"stage"</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s2">"discharge"</span><span class="p">,</span> <span class="n">legend</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">"Stage (ft)"</span><span class="p">);</span> <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">"Discharge (ft3/s)"</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">"Stage-discharge rating curve"</span><span class="p">);</span> <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">peaks_request</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
+    <span class="n">data_source</span><span class="o">=</span><span class="s2">"usgs-water"</span><span class="p">,</span>
+    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">"discharge"</span><span class="p">],</span>
+    <span class="n">start</span><span class="o">=</span><span class="s2">"1950-01-01"</span><span class="p">,</span>
+    <span class="n">end</span><span class="o">=</span><span class="s2">"2020-12-31"</span><span class="p">,</span>
+    <span class="n">aoi</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">77.2</span><span class="p">,</span> <span class="mf">38.9</span><span class="p">,</span> <span class="o">-</span><span class="mf">77.0</span><span class="p">,</span> <span class="mf">39.0</span><span class="p">],</span>
+    <span class="n">path</span><span class="o">=</span><span class="s2">"_nb_out"</span><span class="p">,</span>
+    <span class="n">service</span><span class="o">=</span><span class="s2">"peaks"</span><span class="p">,</span>
+    <span class="n">sites</span><span class="o">=</span><span class="s2">"01646500"</span><span class="p">,</span>
+    <span class="n">api</span><span class="o">=</span><span class="s2">"legacy"</span><span class="p">,</span>
+<span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-2">import matplotlib.pyplot as plt
-ratings = EarthLens(
-    data_source="usgs-water", variables=["discharge"],
-    start="2023-01-01", end="2023-01-05", lat_lim=[38.9, 39.0],
-    lon_lim=[-77.2, -77.0], path="_nb_out", service="ratings",
-    sites="01646500", api="legacy",
-).download(progress_bar=False)
-ax = ratings.plot(x="stage", y="discharge", legend=False, figsize=(6, 4))
-ax.set_xlabel("Stage (ft)"); ax.set_ylabel("Discharge (ft3/s)")
-ax.set_title("Stage-discharge rating curve"); plt.tight_layout()</div>
+<div class="clipboard-copy-txt" id="cell-2">peaks_request = EarthLens(
+    data_source="usgs-water",
+    variables=["discharge"],
+    start="1950-01-01",
+    end="2020-12-31",
+    aoi=[-77.2, 38.9, -77.0, 39.0],
+    path="_nb_out",
+    service="peaks",
+    sites="01646500",
+    api="legacy",
+)</div>
 </div>
 </div>
 </div>
 </div>
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
-</div>
-<div class="jp-OutputArea jp-Cell-outputArea">
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
-<pre><span class="ansi-green-fg">2026-05-27 19:02:11.803</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">earthlens.usgs_water.backend</span>:<span class="ansi-cyan-fg">download</span>:<span class="ansi-cyan-fg">371</span> - <span class="ansi-bold">USGSWater ratings: 31 row(s) written to C:\gdrive\algorithms\remote-sensing\earthlens\.claude\worktrees\usgs-water\_nb_out\usgs_ratings_all.csv</span>
-</pre>
 </div>
 </div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedImage jp-OutputArea-output" tabindex="0">
-<img alt="No description has been provided for this image" class="" src="data:image/png;base64,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"/>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=ae520262">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h3 id="download-the-peaks">Download the peaks<a class="anchor-link" href="#download-the-peaks">¶</a></h3><p><code>download()</code> fetches the annual peaks, writes them to a CSV under
+<code>_nb_out</code>, and returns the same rows as a <code>DataFrame</code>.</p>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=1fca0b2d">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="CodeMirror cm-s-jupyter">
+<div class="zeroclipboard-container">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-3">
+<div>
+<span class="notice" hidden="">Copied!</span>
+<svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
+<path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+<path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+</svg>
+</div>
+</clipboard-copy>
+</div>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">peaks</span> <span class="o">=</span> <span class="n">peaks_request</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">progress_bar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">peaks</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+<div class="clipboard-copy-txt" id="cell-3">peaks = peaks_request.download(progress_bar=False)
+peaks.head()</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=95f8ccd5">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h2 id="2-stage-discharge-rating-curve">2 · Stage-discharge rating curve<a class="anchor-link" href="#2-stage-discharge-rating-curve">¶</a></h2><p>The <code>ratings</code> service returns the rating table that converts gauge stage
+(water height) into discharge for the same gauge. The date window is
+incidental here — the rating curve is a single current relationship — so a
+short window keeps the request small.</p>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=748a4dd7">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="CodeMirror cm-s-jupyter">
+<div class="zeroclipboard-container">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-4">
+<div>
+<span class="notice" hidden="">Copied!</span>
+<svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
+<path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+<path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+</svg>
+</div>
+</clipboard-copy>
+</div>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">ratings_request</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
+    <span class="n">data_source</span><span class="o">=</span><span class="s2">"usgs-water"</span><span class="p">,</span>
+    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">"discharge"</span><span class="p">],</span>
+    <span class="n">start</span><span class="o">=</span><span class="s2">"2023-01-01"</span><span class="p">,</span>
+    <span class="n">end</span><span class="o">=</span><span class="s2">"2023-01-05"</span><span class="p">,</span>
+    <span class="n">aoi</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">77.2</span><span class="p">,</span> <span class="mf">38.9</span><span class="p">,</span> <span class="o">-</span><span class="mf">77.0</span><span class="p">,</span> <span class="mf">39.0</span><span class="p">],</span>
+    <span class="n">path</span><span class="o">=</span><span class="s2">"_nb_out"</span><span class="p">,</span>
+    <span class="n">service</span><span class="o">=</span><span class="s2">"ratings"</span><span class="p">,</span>
+    <span class="n">sites</span><span class="o">=</span><span class="s2">"01646500"</span><span class="p">,</span>
+    <span class="n">api</span><span class="o">=</span><span class="s2">"legacy"</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+<div class="clipboard-copy-txt" id="cell-4">ratings_request = EarthLens(
+    data_source="usgs-water",
+    variables=["discharge"],
+    start="2023-01-01",
+    end="2023-01-05",
+    aoi=[-77.2, 38.9, -77.0, 39.0],
+    path="_nb_out",
+    service="ratings",
+    sites="01646500",
+    api="legacy",
+)</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=beab71e6">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h3 id="download-the-rating-table">Download the rating table<a class="anchor-link" href="#download-the-rating-table">¶</a></h3><p>As before, <code>download()</code> writes the CSV and hands back the <code>DataFrame</code>.</p>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=a8af0f58">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="CodeMirror cm-s-jupyter">
+<div class="zeroclipboard-container">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-5">
+<div>
+<span class="notice" hidden="">Copied!</span>
+<svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
+<path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+<path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+</svg>
+</div>
+</clipboard-copy>
+</div>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">ratings</span> <span class="o">=</span> <span class="n">ratings_request</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">progress_bar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</pre></div>
+<div class="clipboard-copy-txt" id="cell-5">ratings = ratings_request.download(progress_bar=False)</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=4f41c004">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h3 id="plot-the-rating-curve">Plot the rating curve<a class="anchor-link" href="#plot-the-rating-curve">¶</a></h3><p>Stage on the x-axis against discharge on the y-axis gives the classic
+rising rating curve.</p>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=47d0cbdf">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="CodeMirror cm-s-jupyter">
+<div class="zeroclipboard-container">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-6">
+<div>
+<span class="notice" hidden="">Copied!</span>
+<svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
+<path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+<path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+</svg>
+</div>
+</clipboard-copy>
+</div>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">ax</span> <span class="o">=</span> <span class="n">ratings</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s2">"stage"</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s2">"discharge"</span><span class="p">,</span> <span class="n">legend</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">"Stage (ft)"</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">"Discharge (ft3/s)"</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">"Stage-discharge rating curve"</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+</pre></div>
+<div class="clipboard-copy-txt" id="cell-6">ax = ratings.plot(x="stage", y="discharge", legend=False, figsize=(6, 4))
+ax.set_xlabel("Stage (ft)")
+ax.set_ylabel("Discharge (ft3/s)")
+ax.set_title("Stage-discharge rating curve")
+plt.tight_layout()</div>
 </div>
 </div>
 </div>

@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -11027,13 +11027,14 @@ file automatically).</p>
 <a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>    <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">30.0</span><span class="p">,</span> <span class="mf">34.0</span><span class="p">],</span>                <span class="c1"># [lon_min, lon_max]</span>
 <a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a>    <span class="n">path</span><span class="o">=</span><span class="s2">&quot;data/gee&quot;</span><span class="p">,</span>
 <a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a>    <span class="n">scale</span><span class="o">=</span><span class="mi">5566</span><span class="p">,</span>                          <span class="c1"># output pixel size in metres</span>
-<a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a>    <span class="n">service_account</span><span class="o">=</span><span class="s2">&quot;my-sa@my-project.iam.gserviceaccount.com&quot;</span><span class="p">,</span>
-<a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a>    <span class="n">service_key</span><span class="o">=</span><span class="s2">&quot;/path/to/key.json&quot;</span><span class="p">,</span>     <span class="c1"># path, or the JSON content as a string</span>
-<a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a><span class="p">)</span>
-<a id="__codelineno-1-15" name="__codelineno-1-15" href="#__codelineno-1-15"></a><span class="n">paths</span> <span class="o">=</span> <span class="n">gee</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
-<a id="__codelineno-1-16" name="__codelineno-1-16" href="#__codelineno-1-16"></a><span class="c1"># -&gt; [PosixPath(&#39;data/gee/UCSB-CHG_CHIRPS_DAILY_precipitation_20200601.tif&#39;),</span>
-<a id="__codelineno-1-17" name="__codelineno-1-17" href="#__codelineno-1-17"></a><span class="c1">#     PosixPath(&#39;data/gee/UCSB-CHG_CHIRPS_DAILY_precipitation_20200701.tif&#39;),</span>
-<a id="__codelineno-1-18" name="__codelineno-1-18" href="#__codelineno-1-18"></a><span class="c1">#     PosixPath(&#39;data/gee/UCSB-CHG_CHIRPS_DAILY_precipitation_20200801.tif&#39;)]</span>
+<a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a><span class="p">)</span><span class="o">.</span><span class="n">authenticate</span><span class="p">(</span>
+<a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a>    <span class="n">service_account</span><span class="o">=</span><span class="s2">&quot;my-sa@my-project.iam.gserviceaccount.com&quot;</span><span class="p">,</span>
+<a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a>    <span class="n">service_key</span><span class="o">=</span><span class="s2">&quot;/path/to/key.json&quot;</span><span class="p">,</span>     <span class="c1"># path, or the JSON content as a string</span>
+<a id="__codelineno-1-15" name="__codelineno-1-15" href="#__codelineno-1-15"></a><span class="p">)</span>
+<a id="__codelineno-1-16" name="__codelineno-1-16" href="#__codelineno-1-16"></a><span class="n">paths</span> <span class="o">=</span> <span class="n">gee</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
+<a id="__codelineno-1-17" name="__codelineno-1-17" href="#__codelineno-1-17"></a><span class="c1"># -&gt; [PosixPath(&#39;data/gee/UCSB-CHG_CHIRPS_DAILY_precipitation_20200601.tif&#39;),</span>
+<a id="__codelineno-1-18" name="__codelineno-1-18" href="#__codelineno-1-18"></a><span class="c1">#     PosixPath(&#39;data/gee/UCSB-CHG_CHIRPS_DAILY_precipitation_20200701.tif&#39;),</span>
+<a id="__codelineno-1-19" name="__codelineno-1-19" href="#__codelineno-1-19"></a><span class="c1">#     PosixPath(&#39;data/gee/UCSB-CHG_CHIRPS_DAILY_precipitation_20200801.tif&#39;)]</span>
 </code></pre></div>
 <p>The request is <code>{asset_id: [band, ...]}</code> — list every band you want from
 each dataset (one image carries many; ERA5-Land alone has ~150).
@@ -11106,10 +11107,11 @@ large AOIs use <code>"drive"</code> / <code>"gcs"</code>:</p>
 <a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>    <span class="n">variables</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;COPERNICUS/S2_SR_HARMONIZED&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;B4&quot;</span><span class="p">,</span> <span class="s2">&quot;B8&quot;</span><span class="p">]},</span>
 <a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">51.0</span><span class="p">,</span> <span class="mf">53.0</span><span class="p">],</span> <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">4.0</span><span class="p">,</span> <span class="mf">7.0</span><span class="p">],</span>
 <a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>    <span class="n">scale</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">export_via</span><span class="o">=</span><span class="s2">&quot;drive&quot;</span><span class="p">,</span> <span class="n">drive_folder</span><span class="o">=</span><span class="s2">&quot;ee_exports&quot;</span><span class="p">,</span>
-<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>    <span class="n">service_account</span><span class="o">=</span><span class="s2">&quot;my-sa@my-project.iam.gserviceaccount.com&quot;</span><span class="p">,</span>
-<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>    <span class="n">service_key</span><span class="o">=</span><span class="s2">&quot;/path/to/key.json&quot;</span><span class="p">,</span>
-<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="p">)</span>
-<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="n">locations</span> <span class="o">=</span> <span class="n">gee</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>   <span class="c1"># blocks while the batch tasks run; pull the files from Drive</span>
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="p">)</span><span class="o">.</span><span class="n">authenticate</span><span class="p">(</span>
+<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>    <span class="n">service_account</span><span class="o">=</span><span class="s2">&quot;my-sa@my-project.iam.gserviceaccount.com&quot;</span><span class="p">,</span>
+<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>    <span class="n">service_key</span><span class="o">=</span><span class="s2">&quot;/path/to/key.json&quot;</span><span class="p">,</span>
+<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="p">)</span>
+<a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a><span class="n">locations</span> <span class="o">=</span> <span class="n">gee</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>   <span class="c1"># blocks while the batch tasks run; pull the files from Drive</span>
 </code></pre></div>
 <blockquote>
 <p><code>"gcs"</code> writes to Cloud Storage, which incurs normal GCP storage/egress

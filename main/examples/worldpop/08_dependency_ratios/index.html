@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -11515,22 +11515,40 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">tempfile</span>
+
 <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.earthlens</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
+
 <span class="n">d</span> <span class="o">=</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">()</span>
 <span class="n">paths</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
-    <span class="n">data_source</span><span class="o">=</span><span class="s1">'worldpop'</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">'dependency_ratios'</span><span class="p">],</span> <span class="n">aoi</span><span class="o">=</span><span class="s1">'KEN'</span><span class="p">,</span>
-    <span class="n">start</span><span class="o">=</span><span class="s1">'2010'</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s1">'2010'</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="s1">'%Y'</span><span class="p">,</span> <span class="n">resolution</span><span class="o">=</span><span class="s1">'1km'</span><span class="p">,</span>
-    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">4.0</span><span class="p">,</span> <span class="mf">4.0</span><span class="p">],</span> <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">34.0</span><span class="p">,</span> <span class="mf">41.0</span><span class="p">],</span> <span class="n">path</span><span class="o">=</span><span class="n">d</span><span class="p">,</span>
+    <span class="n">data_source</span><span class="o">=</span><span class="s1">'worldpop'</span><span class="p">,</span>
+    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">'dependency_ratios'</span><span class="p">],</span>
+    <span class="n">aoi</span><span class="o">=</span><span class="s1">'KEN'</span><span class="p">,</span>
+    <span class="n">start</span><span class="o">=</span><span class="s1">'2010'</span><span class="p">,</span>
+    <span class="n">end</span><span class="o">=</span><span class="s1">'2010'</span><span class="p">,</span>
+    <span class="n">fmt</span><span class="o">=</span><span class="s1">'%Y'</span><span class="p">,</span>
+    <span class="n">resolution</span><span class="o">=</span><span class="s1">'1km'</span><span class="p">,</span>
+    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">4.0</span><span class="p">,</span> <span class="mf">4.0</span><span class="p">],</span>
+    <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">34.0</span><span class="p">,</span> <span class="mf">41.0</span><span class="p">],</span>
+    <span class="n">path</span><span class="o">=</span><span class="n">d</span><span class="p">,</span>
 <span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">progress_bar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s1">'written:'</span><span class="p">,</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">paths</span><span class="p">))</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-1">import tempfile
+
 from earthlens.earthlens import EarthLens
+
 d = tempfile.mkdtemp()
 paths = EarthLens(
-    data_source='worldpop', variables=['dependency_ratios'], aoi='KEN',
-    start='2010', end='2010', fmt='%Y', resolution='1km',
-    lat_lim=[-4.0, 4.0], lon_lim=[34.0, 41.0], path=d,
+    data_source='worldpop',
+    variables=['dependency_ratios'],
+    aoi='KEN',
+    start='2010',
+    end='2010',
+    fmt='%Y',
+    resolution='1km',
+    lat_lim=[-4.0, 4.0],
+    lon_lim=[34.0, 41.0],
+    path=d,
 ).download(progress_bar=False)
 print('written:', sorted(p.name for p in paths))</div>
 </div>
@@ -11570,6 +11588,7 @@ print('written:', sorted(p.name for p in paths))</div>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span>
+
 <span class="n">total</span> <span class="o">=</span> <span class="p">[</span><span class="n">p</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">paths</span> <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">'DepRatio_1km.tif'</span><span class="p">)][</span><span class="mi">0</span><span class="p">]</span>
 <span class="n">ds</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">total</span><span class="p">))</span>
 <span class="n">arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">read_array</span><span class="p">(),</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">'float64'</span><span class="p">)</span>
@@ -11580,6 +11599,7 @@ print('written:', sorted(p.name for p in paths))</div>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-2">import numpy as np
 from pyramids.dataset import Dataset
+
 total = [p for p in paths if p.name.endswith('DepRatio_1km.tif')][0]
 ds = Dataset.read_file(str(total))
 arr = np.asarray(ds.read_array(), dtype='float64')

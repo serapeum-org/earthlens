@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -11687,7 +11687,7 @@ picks the operational run (<code>short_range</code>, <code>analysis_assim</code>
 <code>channel_rt</code>, ~30 MB <code>land</code>). A <strong>subset</strong> — <code>sites=</code> (<code>feature_id</code> /
 USGS <code>gage_id</code>), a narrower bbox, or a <code>[start, end]</code> window — and the
 <strong>retrospective</strong> archive (<code>mode="retrospective"</code>) are read through
-pyramids (≥ 0.30.0): the feature/lake/node-indexed <strong>tabular</strong> products
+pyramids (≥ 0.34.0): the feature/lake/node-indexed <strong>tabular</strong> products
 (<code>chrtout</code>, <code>lakeout</code>, <code>coastal</code>) go through
 <code>pyramids.netcdf.LabeledDataset</code> (open anon + lazily, select
 labels/bbox/time, write a tidy <code>feature_id × time</code> Parquet table); the
@@ -11698,7 +11698,7 @@ pyramids owns the read. The gridded <strong>retrospective</strong> (and a variab
 with an interleaved vertical/layer dimension, e.g. <code>SOIL_M</code>) is deferred
 with a clear <code>NotImplementedError</code>.</p>
 <p>The <code>[nwm]</code> extra pulls <code>boto3</code> (unsigned S3) plus
-<code>pyramids-gis[lazy,xarray,parquet]</code> (the pyramids readers); both are
+<code>pyramids-gis[parquet]</code> (the pyramids readers); both are
 imported lazily, so the package imports — and <code>NWM(...)</code> constructs —
 without the extra installed (a friendly <code>ImportError</code> naming
 <code>earthlens[nwm]</code> surfaces at <code>download()</code> time).</p>
@@ -14076,7 +14076,7 @@ for both. The class default is <code>"raster"</code>.</p>
 <a id="__codelineno-0-553" name="__codelineno-0-553"></a>            <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span>
 <a id="__codelineno-0-554" name="__codelineno-0-554"></a>                <span class="s2">&quot;NWM subsetting / retrospective reads need the pyramids &quot;</span>
 <a id="__codelineno-0-555" name="__codelineno-0-555"></a>                <span class="s2">&quot;LabeledDataset reader; install `pip install &quot;</span>
-<a id="__codelineno-0-556" name="__codelineno-0-556"></a>                <span class="s2">&quot;earthlens[nwm]` (pyramids-gis[lazy,xarray,parquet] &gt;= 0.30.0).&quot;</span>
+<a id="__codelineno-0-556" name="__codelineno-0-556"></a>                <span class="s2">&quot;earthlens[nwm]` (pyramids-gis[parquet] &gt;= 0.34.0).&quot;</span>
 <a id="__codelineno-0-557" name="__codelineno-0-557"></a>            <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span>
 <a id="__codelineno-0-558" name="__codelineno-0-558"></a>        <span class="k">return</span> <span class="n">LabeledDataset</span>
 <a id="__codelineno-0-559" name="__codelineno-0-559"></a>
@@ -14095,7 +14095,7 @@ for both. The class default is <code>"raster"</code>.</p>
 <a id="__codelineno-0-572" name="__codelineno-0-572"></a>            <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span>
 <a id="__codelineno-0-573" name="__codelineno-0-573"></a>                <span class="s2">&quot;NWM gridded subsetting needs the pyramids NetCDF reader; &quot;</span>
 <a id="__codelineno-0-574" name="__codelineno-0-574"></a>                <span class="s2">&quot;install `pip install earthlens[nwm]` &quot;</span>
-<a id="__codelineno-0-575" name="__codelineno-0-575"></a>                <span class="s2">&quot;(pyramids-gis[lazy,xarray,parquet] &gt;= 0.30.0).&quot;</span>
+<a id="__codelineno-0-575" name="__codelineno-0-575"></a>                <span class="s2">&quot;(pyramids-gis[parquet] &gt;= 0.34.0).&quot;</span>
 <a id="__codelineno-0-576" name="__codelineno-0-576"></a>            <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span>
 <a id="__codelineno-0-577" name="__codelineno-0-577"></a>        <span class="k">return</span> <span class="n">NetCDF</span>
 <a id="__codelineno-0-578" name="__codelineno-0-578"></a>
@@ -16066,7 +16066,7 @@ crosses cycles x steps x products to enumerate the exact S3 keys.</p>
   request downloads the whole files (boto3, no read). A <strong>subset</strong> — by
   <code>sites=</code> (<code>feature_id</code> / USGS <code>gage_id</code>), a narrower bbox, or a
   <code>[start, end]</code> window — and the <strong>retrospective</strong> archive
-  (<code>mode="retrospective"</code>) are read through pyramids (≥ 0.30.0): the
+  (<code>mode="retrospective"</code>) are read through pyramids (≥ 0.34.0): the
   feature/lake/node-indexed <strong>tabular</strong> products (<code>chrtout</code>, <code>lakeout</code>,
   <code>coastal</code>) go through <code>pyramids.netcdf.LabeledDataset</code> (open anon +
   lazily, select labels/bbox/time, write a tidy <code>feature_id × time</code>
@@ -17237,7 +17237,7 @@ for both. The class default is <code>"raster"</code>.</p>
 <a id="__codelineno-0-553" name="__codelineno-0-553"></a>            <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span>
 <a id="__codelineno-0-554" name="__codelineno-0-554"></a>                <span class="s2">&quot;NWM subsetting / retrospective reads need the pyramids &quot;</span>
 <a id="__codelineno-0-555" name="__codelineno-0-555"></a>                <span class="s2">&quot;LabeledDataset reader; install `pip install &quot;</span>
-<a id="__codelineno-0-556" name="__codelineno-0-556"></a>                <span class="s2">&quot;earthlens[nwm]` (pyramids-gis[lazy,xarray,parquet] &gt;= 0.30.0).&quot;</span>
+<a id="__codelineno-0-556" name="__codelineno-0-556"></a>                <span class="s2">&quot;earthlens[nwm]` (pyramids-gis[parquet] &gt;= 0.34.0).&quot;</span>
 <a id="__codelineno-0-557" name="__codelineno-0-557"></a>            <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span>
 <a id="__codelineno-0-558" name="__codelineno-0-558"></a>        <span class="k">return</span> <span class="n">LabeledDataset</span>
 <a id="__codelineno-0-559" name="__codelineno-0-559"></a>
@@ -17256,7 +17256,7 @@ for both. The class default is <code>"raster"</code>.</p>
 <a id="__codelineno-0-572" name="__codelineno-0-572"></a>            <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span>
 <a id="__codelineno-0-573" name="__codelineno-0-573"></a>                <span class="s2">&quot;NWM gridded subsetting needs the pyramids NetCDF reader; &quot;</span>
 <a id="__codelineno-0-574" name="__codelineno-0-574"></a>                <span class="s2">&quot;install `pip install earthlens[nwm]` &quot;</span>
-<a id="__codelineno-0-575" name="__codelineno-0-575"></a>                <span class="s2">&quot;(pyramids-gis[lazy,xarray,parquet] &gt;= 0.30.0).&quot;</span>
+<a id="__codelineno-0-575" name="__codelineno-0-575"></a>                <span class="s2">&quot;(pyramids-gis[parquet] &gt;= 0.34.0).&quot;</span>
 <a id="__codelineno-0-576" name="__codelineno-0-576"></a>            <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span>
 <a id="__codelineno-0-577" name="__codelineno-0-577"></a>        <span class="k">return</span> <span class="n">NetCDF</span>
 <a id="__codelineno-0-578" name="__codelineno-0-578"></a>

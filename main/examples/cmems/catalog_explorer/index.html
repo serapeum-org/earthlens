@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -5925,6 +5925,34 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#setup" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Setup
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Setup">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#load-the-catalog" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Load the catalog
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#curated-datasets-by-domain" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -10821,6 +10849,34 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#setup" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Setup
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Setup">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#load-the-catalog" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Load the catalog
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#curated-datasets-by-domain" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -11618,7 +11674,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </style>
 <!-- End of mermaid configuration --><div class="jupyter-wrapper">
 <div class="jp-Notebook" data-jp-theme-light="true" data-jp-theme-name="JupyterLab Light">
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=cat-00-title">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=c3ed26bc">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -11641,13 +11697,25 @@ recognises straight to <code>CMEMS(variables={id: [...]})</code>.</p>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=cat-01-load">
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=1b8d4b57">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h2 id="setup">Setup<a class="anchor-link" href="#setup">¶</a></h2><p>The only imports we need: <code>Counter</code> for the tallies further down and the
+<code>earthlens.cmems</code> <code>Catalog</code> loader. No backend SDK, no credentials.</p>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=59aa4875">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [1]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-1">
@@ -11663,17 +11731,53 @@ recognises straight to <code>CMEMS(variables={id: [...]})</code>.</p>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">Counter</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.cmems</span><span class="w"> </span><span class="kn">import</span> <span class="n">Catalog</span>
+</pre></div>
+<div class="clipboard-copy-txt" id="cell-1">from collections import Counter
 
-<span class="n">cat</span> <span class="o">=</span> <span class="n">Catalog</span><span class="p">()</span>
+from earthlens.cmems import Catalog</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=71e049b2">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h3 id="load-the-catalog">Load the catalog<a class="anchor-link" href="#load-the-catalog">¶</a></h3><p>Constructing <code>Catalog()</code> parses the bundled YAML files into memory. We
+print the two tiers' sizes and confirm the curated map is a strict subset
+of the full index.</p>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=8cffad0b">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="CodeMirror cm-s-jupyter">
+<div class="zeroclipboard-container">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-2">
+<div>
+<span class="notice" hidden="">Copied!</span>
+<svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
+<path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+<path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+</svg>
+</div>
+</clipboard-copy>
+</div>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">cat</span> <span class="o">=</span> <span class="n">Catalog</span><span class="p">()</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'available_datasets (index): </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">cat</span><span class="o">.</span><span class="n">available_datasets</span><span class="p">)</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'curated datasets:           </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">cat</span><span class="o">.</span><span class="n">datasets</span><span class="p">)</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'curated is subset of index: </span><span class="si">{</span><span class="nb">set</span><span class="p">(</span><span class="n">cat</span><span class="o">.</span><span class="n">datasets</span><span class="p">)</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="nb">set</span><span class="p">(</span><span class="n">cat</span><span class="o">.</span><span class="n">available_datasets</span><span class="p">)</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-1">from collections import Counter
-
-from earthlens.cmems import Catalog
-
-cat = Catalog()
+<div class="clipboard-copy-txt" id="cell-2">cat = Catalog()
 print(f'available_datasets (index): {len(cat.available_datasets)}')
 print(f'curated datasets:           {len(cat.datasets)}')
 print(f'curated is subset of index: {set(cat.datasets) &lt;= set(cat.available_datasets)}')</div>
@@ -11681,24 +11785,9 @@ print(f'curated is subset of index: {set(cat.datasets) &lt;= set(cat.available_d
 </div>
 </div>
 </div>
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
-</div>
-<div class="jp-OutputArea jp-Cell-outputArea">
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>available_datasets (index): 1251
-curated datasets:           1141
-curated is subset of index: True
-</pre>
 </div>
 </div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=cat-02-domains-md">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=6f212372">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -11710,16 +11799,16 @@ product id. This is also how the catalog files are split on disk
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=cat-03-domains">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=dc29be03">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [2]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-2">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-3">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -11737,7 +11826,7 @@ product id. This is also how the catalog files are split on disk
 <span class="k">for</span> <span class="n">cadence</span><span class="p">,</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">by_cadence</span><span class="o">.</span><span class="n">most_common</span><span class="p">():</span>
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'  </span><span class="si">{</span><span class="n">cadence</span><span class="si">:</span><span class="s1">12s</span><span class="si">}</span><span class="s1"> </span><span class="si">{</span><span class="n">n</span><span class="si">:</span><span class="s1">4d</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-2">by_domain = Counter(d.domain for d in cat.datasets.values())
+<div class="clipboard-copy-txt" id="cell-3">by_domain = Counter(d.domain for d in cat.datasets.values())
 for domain, n in by_domain.most_common():
     print(f'  {domain:15s} {n:4d}')
 by_cadence = Counter(d.cadence for d in cat.datasets.values())
@@ -11748,40 +11837,9 @@ for cadence, n in by_cadence.most_common():
 </div>
 </div>
 </div>
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
-</div>
-<div class="jp-OutputArea jp-Cell-outputArea">
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>  global           424
-  ibi              146
-  mediterranean    131
-  black-sea        112
-  nw-shelf          95
-  indicator         80
-  polar             68
-  baltic-sea        52
-  arctic            33
-
-by cadence:
-  daily         430
-  irregular     378
-  monthly       193
-  hourly         69
-  annual         41
-  climatology    22
-  6hourly         4
-  weekly          4
-</pre>
 </div>
 </div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=cat-04-search-md">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=3a4379af">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -11794,16 +11852,16 @@ theme / cadence token you want. CMEMS encodes a lot in the id itself
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=cat-05-search">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=c8d6efa9">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [3]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-3">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-4">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -11822,11 +11880,12 @@ theme / cadence token you want. CMEMS encodes a lot in the id itself
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">hits</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">limit</span><span class="p">:</span>
         <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'  ... and </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">hits</span><span class="p">)</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">limit</span><span class="si">}</span><span class="s1"> more'</span><span class="p">)</span>
 
+
 <span class="n">search</span><span class="p">(</span><span class="s1">'glo_phy_my'</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">()</span>
 <span class="n">search</span><span class="p">(</span><span class="s1">'_wav_'</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-3">def search(token, limit=8):
+<div class="clipboard-copy-txt" id="cell-4">def search(token, limit=8):
     hits = [d for d in cat.available_datasets if token in d]
     print(f'{token!r}: {len(hits)} matches')
     for d in hits[:limit]:
@@ -11835,6 +11894,7 @@ theme / cadence token you want. CMEMS encodes a lot in the id itself
     if len(hits) &gt; limit:
         print(f'  ... and {len(hits) - limit} more')
 
+
 search('glo_phy_my')
 print()
 search('_wav_')</div>
@@ -11842,42 +11902,9 @@ search('_wav_')</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
-</div>
-<div class="jp-OutputArea jp-Cell-outputArea">
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>'glo_phy_my': 32 matches
-  c3s_obs-si_glo_phy_my_nh-l3_P1M (curated)
-  cmems_mod_glo_phy_my_0.083deg-climatology_P1M-m (curated)
-  cmems_mod_glo_phy_my_0.083deg_P1D-m (curated)
-  cmems_mod_glo_phy_my_0.083deg_P1M-m (curated)
-  cmems_mod_glo_phy_my_0.083deg_static (curated)
-  cmems_obs-mob_glo_phy_my_0.125deg_P1D-m (curated)
-  cmems_obs-mob_glo_phy_my_0.125deg_P1M-m (curated)
-  cmems_obs-mob_glo_phy_mynrt_0.125deg-climatology-uncertainty_P1M-m (curated)
-  ... and 24 more
-
-'_wav_': 34 matches
-  cmems_mod_arc_wav_my_3km-climatology_P1M-m
-  cmems_mod_arc_wav_my_3km_PT1H-i
-  cmems_mod_bal_wav_anfc_PT1H-i (curated)
-  cmems_mod_bal_wav_anfc_static (curated)
-  cmems_mod_bal_wav_my_2km-climatology_P1M-m (curated)
-  cmems_mod_bal_wav_my_PT1H-i (curated)
-  cmems_mod_bal_wav_my_aflux_PT1H-i (curated)
-  cmems_mod_bal_wav_my_static (curated)
-  ... and 26 more
-</pre>
 </div>
 </div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=cat-06-inspect-md">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=268edaeb">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -11889,16 +11916,16 @@ long-name without ever touching the network.</p>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=cat-07-inspect">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=cea9f0a8">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [4]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-4">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-5">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -11917,7 +11944,7 @@ long-name without ever touching the network.</p>
 <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">var</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">variables</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'  </span><span class="si">{</span><span class="n">name</span><span class="si">:</span><span class="s1">10s</span><span class="si">}</span><span class="s1"> </span><span class="si">{</span><span class="n">var</span><span class="o">.</span><span class="n">units</span><span class="si">:</span><span class="s1">10s</span><span class="si">}</span><span class="s1"> </span><span class="si">{</span><span class="n">var</span><span class="o">.</span><span class="n">long_name</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-4">ds = cat.get_dataset('cmems_mod_glo_phy_my_0.083deg_P1D-m')
+<div class="clipboard-copy-txt" id="cell-5">ds = cat.get_dataset('cmems_mod_glo_phy_my_0.083deg_P1D-m')
 print(f'product:  {ds.product}')
 print(f'title:    {ds.title}')
 print(f'cadence:  {ds.cadence}   domain: {ds.domain}')
@@ -11929,37 +11956,9 @@ for name, var in sorted(ds.variables.items()):
 </div>
 </div>
 </div>
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
-</div>
-<div class="jp-OutputArea jp-Cell-outputArea">
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>product:  GLOBAL_MULTIYEAR_PHY_001_030
-title:    daily mean fields from Global Ocean Physics Analysis and Forecast updated Daily
-cadence:  daily   domain: global
-temporal: 1993-01-01 -&gt; None
-variables:
-  bottomT    degrees_C  Sea water potential temperature at sea floor
-  mlotst     m          Ocean mixed layer thickness defined by sigma theta
-  siconc     1          Sea ice area fraction
-  sithick    m          Sea ice thickness
-  so         1e-3       Sea water salinity
-  thetao     degrees_C  Sea water potential temperature
-  uo         m s-1      Eastward sea water velocity
-  usi        m s-1      Eastward sea ice velocity
-  vo         m s-1      Northward sea water velocity
-  vsi        m s-1      Northward sea ice velocity
-  zos        m          Sea surface height above geoid
-</pre>
 </div>
 </div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=cat-08-next-md">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=51347044">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>

@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -11082,7 +11082,8 @@ Cloud project. Two modes:</p>
   for CI or a headless server.</li>
 <li><strong>Service account</strong> — a Google Cloud service account plus a JSON key
   file; works everywhere. <strong>This is what the earthlens GEE backend
-  expects</strong> (<code>service_account=</code> + <code>service_key=</code>).</li>
+  expects</strong> — pass <code>service_account=</code> + <code>service_key=</code> to
+  <code>authenticate(...)</code>, or set <code>GEE_SERVICE_ACCOUNT</code> / <code>GEE_SERVICE_KEY</code>.</li>
 </ul>
 <p>Either way, the <em>project</em> must be registered for Earth Engine — a bare
 Cloud project will fail with <code>Project &lt;id&gt; is not registered to use

@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -7787,6 +7787,45 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#setup" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Setup
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Setup">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#the-request-window" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The request window
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#fetch-the-alerts" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fetch the alerts
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#overlay-the-two-hazards" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -10799,6 +10838,45 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#setup" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Setup
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Setup">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#the-request-window" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The request window
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#fetch-the-alerts" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fetch the alerts
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#overlay-the-two-hazards" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -11574,7 +11652,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </style>
 <!-- End of mermaid configuration --><div class="jupyter-wrapper">
 <div class="jp-Notebook" data-jp-theme-light="true" data-jp-theme-name="JupyterLab Light">
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=ov00intro0001">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=fb52a6c9">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -11585,8 +11663,19 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </div>
 </div>
 </div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=1b212ff6">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h2 id="setup">Setup<a class="anchor-link" href="#setup">¶</a></h2><p>The imports up front: <code>datetime</code> / <code>Path</code> for the request window and an output directory, and the unified <code>EarthLens</code> entry point. GDACS is anonymous, so there are no credentials to load.</p>
+</div>
+</div>
+</div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=ov01setup0001">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=b1d73fa4">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -11611,15 +11700,6 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 
 <span class="n">OUT_DIR</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s1">'gdacs_output'</span><span class="p">)</span>
 <span class="n">OUT_DIR</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-
-<span class="c1"># A recent 120-day window over the Asia-Pacific basin (active for both</span>
-<span class="c1"># seismicity and tropical cyclones).</span>
-<span class="n">TODAY</span> <span class="o">=</span> <span class="n">dt</span><span class="o">.</span><span class="n">date</span><span class="o">.</span><span class="n">today</span><span class="p">()</span>
-<span class="n">START</span> <span class="o">=</span> <span class="p">(</span><span class="n">TODAY</span> <span class="o">-</span> <span class="n">dt</span><span class="o">.</span><span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="mi">120</span><span class="p">))</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">'%Y-%m-</span><span class="si">%d</span><span class="s1">'</span><span class="p">)</span>
-<span class="n">END</span> <span class="o">=</span> <span class="n">TODAY</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">'%Y-%m-</span><span class="si">%d</span><span class="s1">'</span><span class="p">)</span>
-<span class="n">LAT_LIM</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="mi">15</span><span class="p">,</span> <span class="mi">45</span><span class="p">]</span>
-<span class="n">LON_LIM</span> <span class="o">=</span> <span class="p">[</span><span class="mi">90</span><span class="p">,</span> <span class="mi">180</span><span class="p">]</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">'window:'</span><span class="p">,</span> <span class="n">START</span><span class="p">,</span> <span class="s1">'to'</span><span class="p">,</span> <span class="n">END</span><span class="p">,</span> <span class="s1">'| box lat'</span><span class="p">,</span> <span class="n">LAT_LIM</span><span class="p">,</span> <span class="s1">'lon'</span><span class="p">,</span> <span class="n">LON_LIM</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-1">import datetime as dt
 from pathlib import Path
@@ -11627,23 +11707,25 @@ from pathlib import Path
 from earthlens import EarthLens
 
 OUT_DIR = Path('gdacs_output')
-OUT_DIR.mkdir(exist_ok=True)
-
-# A recent 120-day window over the Asia-Pacific basin (active for both
-# seismicity and tropical cyclones).
-TODAY = dt.date.today()
-START = (TODAY - dt.timedelta(days=120)).strftime('%Y-%m-%d')
-END = TODAY.strftime('%Y-%m-%d')
-LAT_LIM = [-15, 45]
-LON_LIM = [90, 180]
-print('window:', START, 'to', END, '| box lat', LAT_LIM, 'lon', LON_LIM)</div>
+OUT_DIR.mkdir(exist_ok=True)</div>
 </div>
 </div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=997fa139">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h3 id="the-request-window">The request window<a class="anchor-link" href="#the-request-window">¶</a></h3><p>A recent 120-day window over the Asia-Pacific basin (active for both seismicity and tropical cyclones), plus the latitude / longitude box the backend clips to.</p>
 </div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=ov02query0001">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=bc176a6d">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -11661,35 +11743,83 @@ print('window:', START, 'to', END, '| box lat', LAT_LIM, 'lon', LON_LIM)</div>
 </div>
 </clipboard-copy>
 </div>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">TODAY</span> <span class="o">=</span> <span class="n">dt</span><span class="o">.</span><span class="n">date</span><span class="o">.</span><span class="n">today</span><span class="p">()</span>
+<span class="n">START</span> <span class="o">=</span> <span class="p">(</span><span class="n">TODAY</span> <span class="o">-</span> <span class="n">dt</span><span class="o">.</span><span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="mi">120</span><span class="p">))</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">'%Y-%m-</span><span class="si">%d</span><span class="s1">'</span><span class="p">)</span>
+<span class="n">END</span> <span class="o">=</span> <span class="n">TODAY</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">'%Y-%m-</span><span class="si">%d</span><span class="s1">'</span><span class="p">)</span>
+<span class="n">LAT_LIM</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="mi">15</span><span class="p">,</span> <span class="mi">45</span><span class="p">]</span>
+<span class="n">LON_LIM</span> <span class="o">=</span> <span class="p">[</span><span class="mi">90</span><span class="p">,</span> <span class="mi">180</span><span class="p">]</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'window:'</span><span class="p">,</span> <span class="n">START</span><span class="p">,</span> <span class="s1">'to'</span><span class="p">,</span> <span class="n">END</span><span class="p">,</span> <span class="s1">'| box lat'</span><span class="p">,</span> <span class="n">LAT_LIM</span><span class="p">,</span> <span class="s1">'lon'</span><span class="p">,</span> <span class="n">LON_LIM</span><span class="p">)</span>
+</pre></div>
+<div class="clipboard-copy-txt" id="cell-2">TODAY = dt.date.today()
+START = (TODAY - dt.timedelta(days=120)).strftime('%Y-%m-%d')
+END = TODAY.strftime('%Y-%m-%d')
+LAT_LIM = [-15, 45]
+LON_LIM = [90, 180]
+print('window:', START, 'to', END, '| box lat', LAT_LIM, 'lon', LON_LIM)</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=9d6198b2">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h2 id="fetch-the-alerts">Fetch the alerts<a class="anchor-link" href="#fetch-the-alerts">¶</a></h2><p>Build the request first, then <code>download()</code> it on its own line so each step is easy to read and re-run. The <code>try</code> / <code>except</code> lets the notebook skip gracefully when run offline.</p>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=e8c2bbd9">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="CodeMirror cm-s-jupyter">
+<div class="zeroclipboard-container">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-3">
+<div>
+<span class="notice" hidden="">Copied!</span>
+<svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
+<path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+<path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+</svg>
+</div>
+</clipboard-copy>
+</div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">alerts</span> <span class="o">=</span> <span class="kc">None</span>
 <span class="k">try</span><span class="p">:</span>
-    <span class="n">alerts</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
+    <span class="n">gdacs</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
         <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">'EQ'</span><span class="p">,</span> <span class="s1">'TC'</span><span class="p">],</span>
         <span class="n">data_source</span><span class="o">=</span><span class="s1">'gdacs'</span><span class="p">,</span>
         <span class="n">start</span><span class="o">=</span><span class="n">START</span><span class="p">,</span>
         <span class="n">end</span><span class="o">=</span><span class="n">END</span><span class="p">,</span>
-        <span class="n">lat_lim</span><span class="o">=</span><span class="n">LAT_LIM</span><span class="p">,</span>
-        <span class="n">lon_lim</span><span class="o">=</span><span class="n">LON_LIM</span><span class="p">,</span>
+        <span class="n">aoi</span><span class="o">=</span><span class="p">[</span><span class="n">LON_LIM</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">LAT_LIM</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">LON_LIM</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">LAT_LIM</span><span class="p">[</span><span class="mi">1</span><span class="p">]],</span>
         <span class="n">alert_level</span><span class="o">=</span><span class="p">[</span><span class="s1">'Green'</span><span class="p">,</span> <span class="s1">'Orange'</span><span class="p">,</span> <span class="s1">'Red'</span><span class="p">],</span>
         <span class="n">path</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">OUT_DIR</span><span class="p">),</span>
-    <span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
+    <span class="p">)</span>
+    <span class="n">alerts</span> <span class="o">=</span> <span class="n">gdacs</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">alerts</span><span class="p">)</span><span class="si">}</span><span class="s1"> alerts in box'</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">alerts</span><span class="p">[</span><span class="s1">'hazard_type'</span><span class="p">]</span><span class="o">.</span><span class="n">value_counts</span><span class="p">()</span><span class="o">.</span><span class="n">to_dict</span><span class="p">())</span>
 <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'live GDACS query skipped (offline?): </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">exc</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s1">: </span><span class="si">{</span><span class="n">exc</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-2">alerts = None
+<div class="clipboard-copy-txt" id="cell-3">alerts = None
 try:
-    alerts = EarthLens(
+    gdacs = EarthLens(
         variables=['EQ', 'TC'],
         data_source='gdacs',
         start=START,
         end=END,
-        lat_lim=LAT_LIM,
-        lon_lim=LON_LIM,
+        aoi=[LON_LIM[0], LAT_LIM[0], LON_LIM[1], LAT_LIM[1]],
         alert_level=['Green', 'Orange', 'Red'],
         path=str(OUT_DIR),
-    ).download()
+    )
+    alerts = gdacs.download()
     print(f'{len(alerts)} alerts in box')
     print(alerts['hazard_type'].value_counts().to_dict())
 except Exception as exc:
@@ -11700,7 +11830,7 @@ except Exception as exc:
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=ov03plot00001">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=b52893f4">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -11711,7 +11841,7 @@ except Exception as exc:
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=ov04plot00002">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=1007d03c">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -11719,7 +11849,7 @@ except Exception as exc:
 <div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-3">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-4">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -11754,7 +11884,7 @@ except Exception as exc:
     <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s1">'hazard'</span><span class="p">)</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-3">if alerts is not None and len(alerts):
+<div class="clipboard-copy-txt" id="cell-4">if alerts is not None and len(alerts):
     import matplotlib.pyplot as plt
 
     colours = {'Green': 'green', 'Orange': 'orange', 'Red': 'red'}
@@ -11784,7 +11914,7 @@ except Exception as exc:
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=ov05glide0001">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=2ef94982">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -11795,7 +11925,7 @@ except Exception as exc:
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=ov06glide0002">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=46e92722">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -11803,7 +11933,7 @@ except Exception as exc:
 <div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-4">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-5">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -11819,7 +11949,7 @@ except Exception as exc:
     <span class="n">cols</span> <span class="o">=</span> <span class="p">[</span><span class="s1">'hazard_type'</span><span class="p">,</span> <span class="s1">'name'</span><span class="p">,</span> <span class="s1">'country'</span><span class="p">,</span> <span class="s1">'alert_level'</span><span class="p">,</span> <span class="s1">'glide'</span><span class="p">]</span>
     <span class="n">display</span><span class="p">(</span><span class="n">has_glide</span><span class="p">[</span><span class="n">cols</span><span class="p">]</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">15</span><span class="p">))</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-4">if alerts is not None and len(alerts):
+<div class="clipboard-copy-txt" id="cell-5">if alerts is not None and len(alerts):
     has_glide = alerts[alerts['glide'].notna() &amp; (alerts['glide'] != '')]
     print(f'{len(has_glide)} of {len(alerts)} alerts carry a GLIDE id')
     cols = ['hazard_type', 'name', 'country', 'alert_level', 'glide']

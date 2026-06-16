@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -10917,24 +10917,28 @@ it like a password; you can regenerate it anytime from that same page.
 Unlike a header-based key, the FIRMS <code>MAP_KEY</code> travels as a path segment
 in the request URL, so avoid logging full FIRMS URLs.</p>
 <h2 id="2-supply-the-key"><a class="toclink" href="#2-supply-the-key">2. Supply the key</a><a class="headerlink" href="#2-supply-the-key" title="Permanent link">#</a></h2>
-<p>The backend resolves the key in this order on construction (the first
-<code>download()</code> builds and configures <code>FirmsAuth</code>):</p>
+<p>The key is <strong>not</strong> a constructor argument — the constructor describes
+only what to fetch. Supply it at the authentication step, which resolves
+it in this order:</p>
 <ol>
-<li><strong>An explicit <code>map_key=</code></strong> passed to <code>EarthLens(...)</code> / <code>FIRMS(...)</code>.</li>
-<li><strong>The <code>FIRMS_MAP_KEY</code> environment variable.</strong></li>
+<li><strong>An explicit <code>api_key=</code></strong> passed to <code>EarthLens(...).authenticate()</code>.</li>
+<li><strong>The <code>FIRMS_MAP_KEY</code> environment variable</strong> (read when <code>api_key</code> is
+   omitted).</li>
 </ol>
-<p>If neither resolves, <code>FirmsAuth.configure()</code> raises
+<p><code>download()</code> calls <code>authenticate()</code> on your behalf if you never do, so
+the environment-variable path needs no explicit call. If neither source
+resolves a key, <code>authenticate()</code> raises
 <code>earthlens.firms.AuthenticationError</code> naming the map-key URL — it never
 blocks on an interactive prompt.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="c1"># (a) explicit — handy in a notebook</span>
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="n">EarthLens</span><span class="p">(</span><span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;firms&quot;</span><span class="p">,</span> <span class="n">map_key</span><span class="o">=</span><span class="s2">&quot;...&quot;</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="n">EarthLens</span><span class="p">(</span><span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;firms&quot;</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span><span class="o">.</span><span class="n">authenticate</span><span class="p">(</span><span class="n">api_key</span><span class="o">=</span><span class="s2">&quot;...&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
 <a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>
 <a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="c1"># (b) environment — preferred for scripts / CI</span>
 <a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="c1">#   export FIRMS_MAP_KEY=...        (bash)</span>
 <a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="c1">#   $env:FIRMS_MAP_KEY = &quot;...&quot;      (PowerShell)</span>
-<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="n">EarthLens</span><span class="p">(</span><span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;firms&quot;</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span>
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="n">EarthLens</span><span class="p">(</span><span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;firms&quot;</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>   <span class="c1"># authenticate() reads the env var</span>
 </code></pre></div>
 <h2 id="3-ci-secrets"><a class="toclink" href="#3-ci-secrets">3. CI / secrets</a><a class="headerlink" href="#3-ci-secrets" title="Permanent link">#</a></h2>
 <p>For automated runs, store the key as a secret and expose it as

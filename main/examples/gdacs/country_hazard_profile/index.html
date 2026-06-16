@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -7815,6 +7815,45 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#setup" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Setup
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Setup">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#window-and-target-country" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Window and target country
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#fetch-the-alerts" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fetch the alerts
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#select-the-country" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -7833,6 +7872,23 @@
       
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="Breakdown by hazard and alert level">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#alerts-by-hazard-type" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Alerts by hazard type
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -10810,6 +10866,45 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#setup" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Setup
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Setup">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#window-and-target-country" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Window and target country
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#fetch-the-alerts" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fetch the alerts
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#select-the-country" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -10828,6 +10923,23 @@
       
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="Breakdown by hazard and alert level">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#alerts-by-hazard-type" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Alerts by hazard type
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -11596,7 +11708,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </style>
 <!-- End of mermaid configuration --><div class="jupyter-wrapper">
 <div class="jp-Notebook" data-jp-theme-light="true" data-jp-theme-name="JupyterLab Light">
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=cp00intro0001">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=ce0a9b2d">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -11607,8 +11719,19 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </div>
 </div>
 </div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=167a4402">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h2 id="setup">Setup<a class="anchor-link" href="#setup">¶</a></h2><p>Consolidate the imports up front. <code>earthlens</code> provides the unified <code>EarthLens</code> entry point; <code>pandas</code> and <code>matplotlib</code> are used later for the crosstab and the bar chart.</p>
+</div>
+</div>
+</div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=cp01setup0001">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=e2262065">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -11629,43 +11752,36 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">dt</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+
 <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
-
-<span class="n">OUT_DIR</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s1">'gdacs_output'</span><span class="p">)</span>
-<span class="n">OUT_DIR</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-
-<span class="c1"># The country to profile (ISO-3166 alpha-3). The Philippines sees frequent</span>
-<span class="c1"># multi-hazard activity (earthquakes, cyclones, floods, volcanoes).</span>
-<span class="n">TARGET_ISO3</span> <span class="o">=</span> <span class="s1">'PHL'</span>
-
-<span class="n">TODAY</span> <span class="o">=</span> <span class="n">dt</span><span class="o">.</span><span class="n">date</span><span class="o">.</span><span class="n">today</span><span class="p">()</span>
-<span class="n">START</span> <span class="o">=</span> <span class="p">(</span><span class="n">TODAY</span> <span class="o">-</span> <span class="n">dt</span><span class="o">.</span><span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="mi">180</span><span class="p">))</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">'%Y-%m-</span><span class="si">%d</span><span class="s1">'</span><span class="p">)</span>
-<span class="n">END</span> <span class="o">=</span> <span class="n">TODAY</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">'%Y-%m-</span><span class="si">%d</span><span class="s1">'</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">'window:'</span><span class="p">,</span> <span class="n">START</span><span class="p">,</span> <span class="s1">'to'</span><span class="p">,</span> <span class="n">END</span><span class="p">,</span> <span class="s1">'| target:'</span><span class="p">,</span> <span class="n">TARGET_ISO3</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-1">import datetime as dt
 from pathlib import Path
 
-from earthlens import EarthLens
+import matplotlib.pyplot as plt
+import pandas as pd
 
-OUT_DIR = Path('gdacs_output')
-OUT_DIR.mkdir(exist_ok=True)
-
-# The country to profile (ISO-3166 alpha-3). The Philippines sees frequent
-# multi-hazard activity (earthquakes, cyclones, floods, volcanoes).
-TARGET_ISO3 = 'PHL'
-
-TODAY = dt.date.today()
-START = (TODAY - dt.timedelta(days=180)).strftime('%Y-%m-%d')
-END = TODAY.strftime('%Y-%m-%d')
-print('window:', START, 'to', END, '| target:', TARGET_ISO3)</div>
+from earthlens import EarthLens</div>
 </div>
 </div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=f36bf354">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h3 id="window-and-target-country">Window and target country<a class="anchor-link" href="#window-and-target-country">¶</a></h3><p>Pick the country to profile (ISO-3166 alpha-3) and the six-month window. The Philippines (<code>PHL</code>) sees frequent multi-hazard activity — earthquakes, cyclones, floods, volcanoes.</p>
 </div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=cp02query0001">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=85f2cb9b">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -11683,32 +11799,86 @@ print('window:', START, 'to', END, '| target:', TARGET_ISO3)</div>
 </div>
 </clipboard-copy>
 </div>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">OUT_DIR</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s1">'gdacs_output'</span><span class="p">)</span>
+<span class="n">OUT_DIR</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="n">TARGET_ISO3</span> <span class="o">=</span> <span class="s1">'PHL'</span>
+
+<span class="n">TODAY</span> <span class="o">=</span> <span class="n">dt</span><span class="o">.</span><span class="n">date</span><span class="o">.</span><span class="n">today</span><span class="p">()</span>
+<span class="n">START</span> <span class="o">=</span> <span class="p">(</span><span class="n">TODAY</span> <span class="o">-</span> <span class="n">dt</span><span class="o">.</span><span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="mi">180</span><span class="p">))</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">'%Y-%m-</span><span class="si">%d</span><span class="s1">'</span><span class="p">)</span>
+<span class="n">END</span> <span class="o">=</span> <span class="n">TODAY</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">'%Y-%m-</span><span class="si">%d</span><span class="s1">'</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'window:'</span><span class="p">,</span> <span class="n">START</span><span class="p">,</span> <span class="s1">'to'</span><span class="p">,</span> <span class="n">END</span><span class="p">,</span> <span class="s1">'| target:'</span><span class="p">,</span> <span class="n">TARGET_ISO3</span><span class="p">)</span>
+</pre></div>
+<div class="clipboard-copy-txt" id="cell-2">OUT_DIR = Path('gdacs_output')
+OUT_DIR.mkdir(exist_ok=True)
+
+TARGET_ISO3 = 'PHL'
+
+TODAY = dt.date.today()
+START = (TODAY - dt.timedelta(days=180)).strftime('%Y-%m-%d')
+END = TODAY.strftime('%Y-%m-%d')
+print('window:', START, 'to', END, '| target:', TARGET_ISO3)</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=40be0e82">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h2 id="fetch-the-alerts">Fetch the alerts<a class="anchor-link" href="#fetch-the-alerts">¶</a></h2><p>Build the GDACS request first, then call <code>download()</code> on it as a separate step. An empty <code>variables</code> list pulls all six hazard types over the whole globe; the <code>try</code>/<code>except</code> lets the notebook skip gracefully when offline.</p>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=894b4bff">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="CodeMirror cm-s-jupyter">
+<div class="zeroclipboard-container">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-3">
+<div>
+<span class="notice" hidden="">Copied!</span>
+<svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
+<path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+<path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+</svg>
+</div>
+</clipboard-copy>
+</div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">alerts</span> <span class="o">=</span> <span class="kc">None</span>
 <span class="k">try</span><span class="p">:</span>
-    <span class="n">alerts</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
-        <span class="n">variables</span><span class="o">=</span><span class="p">[],</span>            <span class="c1"># all six hazard types</span>
+    <span class="n">gdacs</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
+        <span class="n">variables</span><span class="o">=</span><span class="p">[],</span>  <span class="c1"># all six hazard types</span>
         <span class="n">data_source</span><span class="o">=</span><span class="s1">'gdacs'</span><span class="p">,</span>
         <span class="n">start</span><span class="o">=</span><span class="n">START</span><span class="p">,</span>
         <span class="n">end</span><span class="o">=</span><span class="n">END</span><span class="p">,</span>
-        <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">90</span><span class="p">,</span> <span class="mi">90</span><span class="p">],</span>
-        <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">180</span><span class="p">,</span> <span class="mi">180</span><span class="p">],</span>
+        <span class="n">aoi</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">180</span><span class="p">,</span> <span class="o">-</span><span class="mi">90</span><span class="p">,</span> <span class="mi">180</span><span class="p">,</span> <span class="mi">90</span><span class="p">],</span>
         <span class="n">path</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">OUT_DIR</span><span class="p">),</span>
-    <span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
+    <span class="p">)</span>
+    <span class="n">alerts</span> <span class="o">=</span> <span class="n">gdacs</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">alerts</span><span class="p">)</span><span class="si">}</span><span class="s1"> alerts worldwide'</span><span class="p">)</span>
 <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'live GDACS query skipped (offline?): </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">exc</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s1">: </span><span class="si">{</span><span class="n">exc</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-2">alerts = None
+<div class="clipboard-copy-txt" id="cell-3">alerts = None
 try:
-    alerts = EarthLens(
-        variables=[],            # all six hazard types
+    gdacs = EarthLens(
+        variables=[],  # all six hazard types
         data_source='gdacs',
         start=START,
         end=END,
-        lat_lim=[-90, 90],
-        lon_lim=[-180, 180],
+        aoi=[-180, -90, 180, 90],
         path=str(OUT_DIR),
-    ).download()
+    )
+    alerts = gdacs.download()
     print(f'{len(alerts)} alerts worldwide')
 except Exception as exc:
     print(f'live GDACS query skipped (offline?): {type(exc).__name__}: {exc}')</div>
@@ -11718,7 +11888,7 @@ except Exception as exc:
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=cp03pick00001">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=a39c408d">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -11729,7 +11899,7 @@ except Exception as exc:
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=cp04pick00002">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=c27272b6">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -11737,7 +11907,7 @@ except Exception as exc:
 <div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-3">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-4">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -11761,7 +11931,7 @@ except Exception as exc:
         <span class="n">name</span> <span class="o">=</span> <span class="n">country</span><span class="p">[</span><span class="s1">'country'</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">country</span><span class="p">)</span><span class="si">}</span><span class="s1"> alerts for </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1"> (</span><span class="si">{</span><span class="n">label</span><span class="si">}</span><span class="s1">)'</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-3">country = None
+<div class="clipboard-copy-txt" id="cell-4">country = None
 if alerts is not None and len(alerts):
     country = alerts[alerts['iso3'] == TARGET_ISO3]
     label = TARGET_ISO3
@@ -11780,59 +11950,18 @@ if alerts is not None and len(alerts):
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=cp05break0001">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=9c11fbf1">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="breakdown-by-hazard-and-alert-level">Breakdown by hazard and alert level<a class="anchor-link" href="#breakdown-by-hazard-and-alert-level">¶</a></h2>
+<h2 id="breakdown-by-hazard-and-alert-level">Breakdown by hazard and alert level<a class="anchor-link" href="#breakdown-by-hazard-and-alert-level">¶</a></h2><p>Cross-tabulate hazard type against alert level, ensuring every <code>Green</code> / <code>Orange</code> / <code>Red</code> column is present so the table shape is stable.</p>
 </div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=cp06break0002">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="CodeMirror cm-s-jupyter">
-<div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-4">
-<div>
-<span class="notice" hidden="">Copied!</span>
-<svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
-<path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z" fill="currentColor" fill-rule="evenodd"></path>
-<path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z" fill="currentColor" fill-rule="evenodd"></path>
-</svg>
-</div>
-</clipboard-copy>
-</div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="k">if</span> <span class="n">country</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">country</span><span class="p">):</span>
-    <span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
-
-    <span class="n">crosstab</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">crosstab</span><span class="p">(</span><span class="n">country</span><span class="p">[</span><span class="s1">'hazard_type'</span><span class="p">],</span> <span class="n">country</span><span class="p">[</span><span class="s1">'alert_level'</span><span class="p">])</span>
-    <span class="k">for</span> <span class="n">level</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">'Green'</span><span class="p">,</span> <span class="s1">'Orange'</span><span class="p">,</span> <span class="s1">'Red'</span><span class="p">]:</span>
-        <span class="k">if</span> <span class="n">level</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">crosstab</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
-            <span class="n">crosstab</span><span class="p">[</span><span class="n">level</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
-    <span class="n">display</span><span class="p">(</span><span class="n">crosstab</span><span class="p">[[</span><span class="s1">'Green'</span><span class="p">,</span> <span class="s1">'Orange'</span><span class="p">,</span> <span class="s1">'Red'</span><span class="p">]])</span>
-</pre></div>
-<div class="clipboard-copy-txt" id="cell-4">if country is not None and len(country):
-    import pandas as pd
-
-    crosstab = pd.crosstab(country['hazard_type'], country['alert_level'])
-    for level in ['Green', 'Orange', 'Red']:
-        if level not in crosstab.columns:
-            crosstab[level] = 0
-    display(crosstab[['Green', 'Orange', 'Red']])</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=cp07chart0001">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=cb64823e">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -11851,44 +11980,36 @@ if alerts is not None and len(alerts):
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="k">if</span> <span class="n">country</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">country</span><span class="p">):</span>
-    <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
-
-    <span class="n">counts</span> <span class="o">=</span> <span class="n">country</span><span class="p">[</span><span class="s1">'hazard_type'</span><span class="p">]</span><span class="o">.</span><span class="n">value_counts</span><span class="p">()</span><span class="o">.</span><span class="n">sort_index</span><span class="p">()</span>
-    <span class="n">ax</span> <span class="o">=</span> <span class="n">counts</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">kind</span><span class="o">=</span><span class="s1">'bar'</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">'steelblue'</span><span class="p">)</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s1">'Alerts by hazard type — </span><span class="si">{</span><span class="n">label</span><span class="si">}</span><span class="s1">, </span><span class="si">{</span><span class="n">START</span><span class="si">}</span><span class="s1"> to </span><span class="si">{</span><span class="n">END</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">'hazard type'</span><span class="p">)</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">'alert count'</span><span class="p">)</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+    <span class="n">crosstab</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">crosstab</span><span class="p">(</span><span class="n">country</span><span class="p">[</span><span class="s1">'hazard_type'</span><span class="p">],</span> <span class="n">country</span><span class="p">[</span><span class="s1">'alert_level'</span><span class="p">])</span>
+    <span class="k">for</span> <span class="n">level</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">'Green'</span><span class="p">,</span> <span class="s1">'Orange'</span><span class="p">,</span> <span class="s1">'Red'</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="n">level</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">crosstab</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+            <span class="n">crosstab</span><span class="p">[</span><span class="n">level</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">display</span><span class="p">(</span><span class="n">crosstab</span><span class="p">[[</span><span class="s1">'Green'</span><span class="p">,</span> <span class="s1">'Orange'</span><span class="p">,</span> <span class="s1">'Red'</span><span class="p">]])</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-5">if country is not None and len(country):
-    import matplotlib.pyplot as plt
-
-    counts = country['hazard_type'].value_counts().sort_index()
-    ax = counts.plot(kind='bar', color='steelblue')
-    ax.set_title(f'Alerts by hazard type — {label}, {START} to {END}')
-    ax.set_xlabel('hazard type')
-    ax.set_ylabel('alert count')
-    plt.tight_layout()
-    plt.show()</div>
+    crosstab = pd.crosstab(country['hazard_type'], country['alert_level'])
+    for level in ['Green', 'Orange', 'Red']:
+        if level not in crosstab.columns:
+            crosstab[level] = 0
+    display(crosstab[['Green', 'Orange', 'Red']])</div>
 </div>
 </div>
 </div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=cp08sev000001">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=855947f0">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="most-severe-alerts">Most severe alerts<a class="anchor-link" href="#most-severe-alerts">¶</a></h2><p>Sorted by alert score, highest first.</p>
+<h3 id="alerts-by-hazard-type">Alerts by hazard type<a class="anchor-link" href="#alerts-by-hazard-type">¶</a></h3><p>A bar chart of the per-hazard alert counts for the selected country and window.</p>
 </div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=cp09sev000002">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=4bdf5707">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -11907,11 +12028,79 @@ if alerts is not None and len(alerts):
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="k">if</span> <span class="n">country</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">country</span><span class="p">):</span>
-    <span class="n">cols</span> <span class="o">=</span> <span class="p">[</span><span class="s1">'from_date'</span><span class="p">,</span> <span class="s1">'hazard_type'</span><span class="p">,</span> <span class="s1">'name'</span><span class="p">,</span> <span class="s1">'alert_level'</span><span class="p">,</span> <span class="s1">'alert_score'</span><span class="p">,</span> <span class="s1">'severity'</span><span class="p">,</span> <span class="s1">'severity_unit'</span><span class="p">]</span>
-    <span class="n">display</span><span class="p">(</span><span class="n">country</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="s1">'alert_score'</span><span class="p">,</span> <span class="n">ascending</span><span class="o">=</span><span class="kc">False</span><span class="p">)[</span><span class="n">cols</span><span class="p">]</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">10</span><span class="p">))</span>
+    <span class="n">counts</span> <span class="o">=</span> <span class="n">country</span><span class="p">[</span><span class="s1">'hazard_type'</span><span class="p">]</span><span class="o">.</span><span class="n">value_counts</span><span class="p">()</span><span class="o">.</span><span class="n">sort_index</span><span class="p">()</span>
+    <span class="n">ax</span> <span class="o">=</span> <span class="n">counts</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">kind</span><span class="o">=</span><span class="s1">'bar'</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">'steelblue'</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s1">'Alerts by hazard type — </span><span class="si">{</span><span class="n">label</span><span class="si">}</span><span class="s1">, </span><span class="si">{</span><span class="n">START</span><span class="si">}</span><span class="s1"> to </span><span class="si">{</span><span class="n">END</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">'hazard type'</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">'alert count'</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-6">if country is not None and len(country):
-    cols = ['from_date', 'hazard_type', 'name', 'alert_level', 'alert_score', 'severity', 'severity_unit']
+    counts = country['hazard_type'].value_counts().sort_index()
+    ax = counts.plot(kind='bar', color='steelblue')
+    ax.set_title(f'Alerts by hazard type — {label}, {START} to {END}')
+    ax.set_xlabel('hazard type')
+    ax.set_ylabel('alert count')
+    plt.tight_layout()
+    plt.show()</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=9da9b8e8">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h2 id="most-severe-alerts">Most severe alerts<a class="anchor-link" href="#most-severe-alerts">¶</a></h2><p>Sorted by alert score, highest first.</p>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=eaa9b6e7">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="CodeMirror cm-s-jupyter">
+<div class="zeroclipboard-container">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-7">
+<div>
+<span class="notice" hidden="">Copied!</span>
+<svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
+<path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+<path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+</svg>
+</div>
+</clipboard-copy>
+</div>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="k">if</span> <span class="n">country</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">country</span><span class="p">):</span>
+    <span class="n">cols</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="s1">'from_date'</span><span class="p">,</span>
+        <span class="s1">'hazard_type'</span><span class="p">,</span>
+        <span class="s1">'name'</span><span class="p">,</span>
+        <span class="s1">'alert_level'</span><span class="p">,</span>
+        <span class="s1">'alert_score'</span><span class="p">,</span>
+        <span class="s1">'severity'</span><span class="p">,</span>
+        <span class="s1">'severity_unit'</span><span class="p">,</span>
+    <span class="p">]</span>
+    <span class="n">display</span><span class="p">(</span><span class="n">country</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="s1">'alert_score'</span><span class="p">,</span> <span class="n">ascending</span><span class="o">=</span><span class="kc">False</span><span class="p">)[</span><span class="n">cols</span><span class="p">]</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">10</span><span class="p">))</span>
+</pre></div>
+<div class="clipboard-copy-txt" id="cell-7">if country is not None and len(country):
+    cols = [
+        'from_date',
+        'hazard_type',
+        'name',
+        'alert_level',
+        'alert_score',
+        'severity',
+        'severity_unit',
+    ]
     display(country.sort_values('alert_score', ascending=False)[cols].head(10))</div>
 </div>
 </div>

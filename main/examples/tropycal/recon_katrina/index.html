@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -11611,15 +11611,22 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
 
-<span class="n">OUT_DIR</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s1">'tropycal_output'</span><span class="p">);</span> <span class="n">OUT_DIR</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">OUT_DIR</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s1">'tropycal_output'</span><span class="p">)</span>
+<span class="n">OUT_DIR</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
 <span class="n">obs</span> <span class="o">=</span> <span class="kc">None</span>
 <span class="k">try</span><span class="p">:</span>
     <span class="n">obs</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
-        <span class="n">data_source</span><span class="o">=</span><span class="s1">'tropycal'</span><span class="p">,</span> <span class="n">product</span><span class="o">=</span><span class="s1">'recon'</span><span class="p">,</span> <span class="n">recon_product</span><span class="o">=</span><span class="s1">'hdobs'</span><span class="p">,</span>
-        <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">'AL122005'</span><span class="p">],</span> <span class="n">basin</span><span class="o">=</span><span class="s1">'north_atlantic'</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="s1">'hurdat'</span><span class="p">,</span>
-        <span class="n">start</span><span class="o">=</span><span class="s1">'2005-08-23'</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s1">'2005-08-31'</span><span class="p">,</span>
-        <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">18.0</span><span class="p">,</span> <span class="mf">31.0</span><span class="p">],</span> <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">98.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">80.0</span><span class="p">],</span> <span class="n">path</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">OUT_DIR</span><span class="p">),</span>
+        <span class="n">data_source</span><span class="o">=</span><span class="s1">'tropycal'</span><span class="p">,</span>
+        <span class="n">product</span><span class="o">=</span><span class="s1">'recon'</span><span class="p">,</span>
+        <span class="n">recon_product</span><span class="o">=</span><span class="s1">'hdobs'</span><span class="p">,</span>
+        <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">'AL122005'</span><span class="p">],</span>
+        <span class="n">basin</span><span class="o">=</span><span class="s1">'north_atlantic'</span><span class="p">,</span>
+        <span class="n">source</span><span class="o">=</span><span class="s1">'hurdat'</span><span class="p">,</span>
+        <span class="n">start</span><span class="o">=</span><span class="s1">'2005-08-23'</span><span class="p">,</span>
+        <span class="n">end</span><span class="o">=</span><span class="s1">'2005-08-31'</span><span class="p">,</span>
+        <span class="n">aoi</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">98.0</span><span class="p">,</span> <span class="mf">18.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">80.0</span><span class="p">,</span> <span class="mf">31.0</span><span class="p">],</span>
+        <span class="n">path</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">OUT_DIR</span><span class="p">),</span>
     <span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">progress_bar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">obs</span><span class="p">),</span> <span class="s1">'recon observations'</span><span class="p">)</span>
 <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
@@ -11629,15 +11636,22 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 
 from earthlens import EarthLens
 
-OUT_DIR = Path('tropycal_output'); OUT_DIR.mkdir(exist_ok=True)
+OUT_DIR = Path('tropycal_output')
+OUT_DIR.mkdir(exist_ok=True)
 
 obs = None
 try:
     obs = EarthLens(
-        data_source='tropycal', product='recon', recon_product='hdobs',
-        variables=['AL122005'], basin='north_atlantic', source='hurdat',
-        start='2005-08-23', end='2005-08-31',
-        lat_lim=[18.0, 31.0], lon_lim=[-98.0, -80.0], path=str(OUT_DIR),
+        data_source='tropycal',
+        product='recon',
+        recon_product='hdobs',
+        variables=['AL122005'],
+        basin='north_atlantic',
+        source='hurdat',
+        start='2005-08-23',
+        end='2005-08-31',
+        aoi=[-98.0, 18.0, -80.0, 31.0],
+        path=str(OUT_DIR),
     ).download(progress_bar=False)
     print(len(obs), 'recon observations')
 except Exception as exc:
@@ -11678,11 +11692,19 @@ except Exception as exc:
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="k">if</span> <span class="n">obs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">obs</span><span class="p">):</span>
-    <span class="n">display</span><span class="p">(</span><span class="n">obs</span><span class="p">[[</span><span class="s1">'storm_id'</span><span class="p">,</span> <span class="s1">'recon_product'</span><span class="p">,</span> <span class="s1">'time'</span><span class="p">,</span> <span class="s1">'wspd_kt'</span><span class="p">,</span> <span class="s1">'pres_hpa'</span><span class="p">,</span> <span class="s1">'geometry'</span><span class="p">]]</span><span class="o">.</span><span class="n">head</span><span class="p">())</span>
+    <span class="n">display</span><span class="p">(</span>
+        <span class="n">obs</span><span class="p">[</span>
+            <span class="p">[</span><span class="s1">'storm_id'</span><span class="p">,</span> <span class="s1">'recon_product'</span><span class="p">,</span> <span class="s1">'time'</span><span class="p">,</span> <span class="s1">'wspd_kt'</span><span class="p">,</span> <span class="s1">'pres_hpa'</span><span class="p">,</span> <span class="s1">'geometry'</span><span class="p">]</span>
+        <span class="p">]</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+    <span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="s1">'CRS:'</span><span class="p">,</span> <span class="n">obs</span><span class="o">.</span><span class="n">crs</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-2">if obs is not None and len(obs):
-    display(obs[['storm_id', 'recon_product', 'time', 'wspd_kt', 'pres_hpa', 'geometry']].head())
+    display(
+        obs[
+            ['storm_id', 'recon_product', 'time', 'wspd_kt', 'pres_hpa', 'geometry']
+        ].head()
+    )
     print('CRS:', obs.crs)</div>
 </div>
 </div>
@@ -11725,8 +11747,10 @@ except Exception as exc:
     <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
     <span class="n">obs</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">column</span><span class="o">=</span><span class="s1">'wspd_kt'</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">'viridis'</span><span class="p">,</span> <span class="n">legend</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">markersize</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
     <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">'Katrina (2005) recon flight-level obs, coloured by wind (kt)'</span><span class="p">)</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">'Longitude'</span><span class="p">);</span> <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">'Latitude'</span><span class="p">)</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">();</span> <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">'Longitude'</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">'Latitude'</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-3">if obs is not None and len(obs):
     import matplotlib.pyplot as plt
@@ -11734,8 +11758,10 @@ except Exception as exc:
     fig, ax = plt.subplots(figsize=(8, 6))
     obs.plot(ax=ax, column='wspd_kt', cmap='viridis', legend=True, markersize=4)
     ax.set_title('Katrina (2005) recon flight-level obs, coloured by wind (kt)')
-    ax.set_xlabel('Longitude'); ax.set_ylabel('Latitude')
-    plt.tight_layout(); plt.show()</div>
+    ax.set_xlabel('Longitude')
+    ax.set_ylabel('Latitude')
+    plt.tight_layout()
+    plt.show()</div>
 </div>
 </div>
 </div>

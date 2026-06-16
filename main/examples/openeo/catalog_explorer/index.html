@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -11654,7 +11654,7 @@ print('available processes  (full index):', len(cat.available_processes))</div>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="inspect-a-collection">Inspect a collection<a class="anchor-link" href="#inspect-a-collection">¶</a></h2>
+<h2 id="inspect-a-collection">Inspect a collection<a class="anchor-link" href="#inspect-a-collection">¶</a></h2><p><code>get_collection()</code> returns a curated collection row. Print its <code>collection_id</code>, cadence, native resolution, and the default vs. full band list so you know exactly what <code>load()</code> would request.</p>
 </div>
 </div>
 </div>
@@ -11702,7 +11702,7 @@ print('all bands:    ', col.bands)</div>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="inspect-a-recipes-process-graph">Inspect a recipe's process graph<a class="anchor-link" href="#inspect-a-recipes-process-graph">¶</a></h2>
+<h2 id="inspect-a-recipes-process-graph">Inspect a recipe's process graph<a class="anchor-link" href="#inspect-a-recipes-process-graph">¶</a></h2><p>A recipe is a named process graph layered on top of a base collection. <code>get_recipe()</code> exposes its base collection, bands, output format, and the ordered graph steps the backend will execute.</p>
 </div>
 </div>
 </div>
@@ -11779,13 +11779,17 @@ for step in recipe.graph:
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">'sentinel-1-grd'</span><span class="p">,</span> <span class="s1">'sentinel-5p-no2-monthly'</span><span class="p">]:</span>
     <span class="n">g</span> <span class="o">=</span> <span class="n">cat</span><span class="o">.</span><span class="n">resolve</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s1">: collection_id=</span><span class="si">{</span><span class="n">g</span><span class="o">.</span><span class="n">collection_id</span><span class="si">}</span><span class="s1">, is_recipe=</span><span class="si">{</span><span class="n">g</span><span class="o">.</span><span class="n">is_recipe</span><span class="si">}</span><span class="s1">, '</span>
-          <span class="sa">f</span><span class="s1">'bands=</span><span class="si">{</span><span class="n">g</span><span class="o">.</span><span class="n">bands</span><span class="si">}</span><span class="s1">, steps=</span><span class="si">{</span><span class="p">[</span><span class="nb">next</span><span class="p">(</span><span class="nb">iter</span><span class="p">(</span><span class="n">s</span><span class="p">))</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">s</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="n">g</span><span class="o">.</span><span class="n">graph</span><span class="p">]</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span>
+        <span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s1">: collection_id=</span><span class="si">{</span><span class="n">g</span><span class="o">.</span><span class="n">collection_id</span><span class="si">}</span><span class="s1">, is_recipe=</span><span class="si">{</span><span class="n">g</span><span class="o">.</span><span class="n">is_recipe</span><span class="si">}</span><span class="s1">, '</span>
+        <span class="sa">f</span><span class="s1">'bands=</span><span class="si">{</span><span class="n">g</span><span class="o">.</span><span class="n">bands</span><span class="si">}</span><span class="s1">, steps=</span><span class="si">{</span><span class="p">[</span><span class="nb">next</span><span class="p">(</span><span class="nb">iter</span><span class="p">(</span><span class="n">s</span><span class="p">))</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">s</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="n">g</span><span class="o">.</span><span class="n">graph</span><span class="p">]</span><span class="si">}</span><span class="s1">'</span>
+    <span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-4">for key in ['sentinel-1-grd', 'sentinel-5p-no2-monthly']:
     g = cat.resolve(key)
-    print(f'{key}: collection_id={g.collection_id}, is_recipe={g.is_recipe}, '
-          f'bands={g.bands}, steps={[next(iter(s)) for s in g.graph]}')</div>
+    print(
+        f'{key}: collection_id={g.collection_id}, is_recipe={g.is_recipe}, '
+        f'bands={g.bands}, steps={[next(iter(s)) for s in g.graph]}'
+    )</div>
 </div>
 </div>
 </div>
