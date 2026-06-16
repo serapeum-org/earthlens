@@ -58,6 +58,7 @@ gee = GEE(
     lon_lim=[30.0, 34.0],                # [lon_min, lon_max]
     path="data/gee",
     scale=5566,                          # output pixel size in metres
+).authenticate(
     service_account="my-sa@my-project.iam.gserviceaccount.com",
     service_key="/path/to/key.json",     # path, or the JSON content as a string
 )
@@ -123,6 +124,7 @@ gee = GEE(
     variables={"COPERNICUS/S2_SR_HARMONIZED": ["B4", "B8"]},
     lat_lim=[51.0, 53.0], lon_lim=[4.0, 7.0],
     scale=10, export_via="drive", drive_folder="ee_exports",
+).authenticate(
     service_account="my-sa@my-project.iam.gserviceaccount.com",
     service_key="/path/to/key.json",
 )

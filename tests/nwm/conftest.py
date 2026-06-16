@@ -57,7 +57,6 @@ class FakeLabeled:
     def __init__(self, href: str, variables: Any) -> None:
         self.href = href
         self.variables = variables
-        self.dataset = self  # so `_close_quietly(cube)` finds `.dataset.close()`
 
     @classmethod
     def read_file(cls, path, *, anon: bool = False, variables=None, **kw):
@@ -65,22 +64,22 @@ class FakeLabeled:
         cls.calls.append(("read_file", {"path": str(path), "anon": anon}))
         return cls(str(path), variables)
 
-    def select(self, **labels: Any) -> "FakeLabeled":
+    def select(self, **labels: Any) -> FakeLabeled:
         """Record a label selection."""
         FakeLabeled.calls.append(("select", labels))
         return self
 
-    def select_by_coord(self, coord: str, values: Any) -> "FakeLabeled":
+    def select_by_coord(self, coord: str, values: Any) -> FakeLabeled:
         """Record a secondary-coordinate (gage_id) selection."""
         FakeLabeled.calls.append(("select_by_coord", (coord, list(values))))
         return self
 
-    def select_bbox(self, bbox: Any, **kw: Any) -> "FakeLabeled":
+    def select_bbox(self, bbox: Any, **kw: Any) -> FakeLabeled:
         """Record a bbox selection."""
         FakeLabeled.calls.append(("select_bbox", tuple(bbox)))
         return self
 
-    def select_time(self, start: Any, end: Any, **kw: Any) -> "FakeLabeled":
+    def select_time(self, start: Any, end: Any, **kw: Any) -> FakeLabeled:
         """Record a time-window selection."""
         FakeLabeled.calls.append(("select_time", (start, end)))
         return self
@@ -123,10 +122,9 @@ class FakeNetCDF:
 
     def __init__(self, path: str) -> None:
         self.path = path
-        self.dataset = self  # so `_close_quietly` finds `.dataset.close()`
 
     @classmethod
-    def read_file(cls, path, **kw) -> "FakeNetCDF":
+    def read_file(cls, path, **kw) -> FakeNetCDF:
         """Record the open and return a recording instance."""
         cls.calls.append(("read_file", str(path)))
         return cls(str(path))

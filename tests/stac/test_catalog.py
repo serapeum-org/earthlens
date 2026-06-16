@@ -66,7 +66,9 @@ class TestBundledCatalog:
     def test_bulk_cog_collections_curated(self):
         """The bulk COG-imagery curation populated many endpoint-namespaced entries."""
         cat = Catalog()
-        assert len(cat.datasets) > 100, f"expected the bulk COG curation, got {len(cat.datasets)}"
+        assert (
+            len(cat.datasets) > 100
+        ), f"expected the bulk COG curation, got {len(cat.datasets)}"
         namespaced = [k for k in cat.datasets if "/" in k]
         assert namespaced, "expected endpoint-namespaced <endpoint>/<id> bulk entries"
         # every namespaced key's endpoint prefix matches its collection's endpoint
@@ -78,10 +80,15 @@ class TestBundledCatalog:
         cat = Catalog()
         # Landsat: RGB+NIR, not the qa_pixel/qa_radsat the alphabetical pick chose.
         assert cat.get_collection("earth-search/landsat-c2-l2").default_assets == [
-            "red", "green", "blue", "nir08",
+            "red",
+            "green",
+            "blue",
+            "nir08",
         ]
         # CDSE NDVI: the data band, not the uncertainty/quality/count bands.
-        assert cat.get_collection("cdse/clms_ndvi_global_1km_10daily_v3_cog").default_assets == [
+        assert cat.get_collection(
+            "cdse/clms_ndvi_global_1km_10daily_v3_cog"
+        ).default_assets == [
             "ndvi_ndvi",
         ]
 
@@ -92,11 +99,16 @@ class TestResolve:
 
     def test_alias_applied_for_earth_search(self):
         """Earth Search serves Sentinel-2 L2A under sentinel-2-c1-l2a."""
-        assert Catalog().resolve("earth-search", "sentinel-2-l2a") == "sentinel-2-c1-l2a"
+        assert (
+            Catalog().resolve("earth-search", "sentinel-2-l2a") == "sentinel-2-c1-l2a"
+        )
 
     def test_default_id_when_no_alias(self):
         """Without an alias the collection_id (== key here) is returned."""
-        assert Catalog().resolve("planetary-computer", "sentinel-2-l2a") == "sentinel-2-l2a"
+        assert (
+            Catalog().resolve("planetary-computer", "sentinel-2-l2a")
+            == "sentinel-2-l2a"
+        )
 
     def test_unknown_collection_raises(self):
         """Resolving an unknown collection raises ValueError."""
@@ -147,7 +159,10 @@ class TestLoaderRules:
             "endpoints:\n  e:\n    url: u\n    signer: anonymous\n"
             "collections:\n  c:\n    endpoint: e\n",
         )
-        _write(tmp_path / "b.yaml", "endpoints:\n  e:\n    url: u2\n    signer: anonymous\n")
+        _write(
+            tmp_path / "b.yaml",
+            "endpoints:\n  e:\n    url: u2\n    signer: anonymous\n",
+        )
         with pytest.raises(ValueError, match="declared in two catalog files"):
             _load_catalog_data(tmp_path)
 

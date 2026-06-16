@@ -45,7 +45,7 @@ _KNOWN_SOURCES: frozenset[str] = frozenset({"ibtracs", "hurdat"})
 # mtime_ns)` so any real file mutation invalidates the entry naturally.
 # Mirrors the ECMWF / GEE catalog cache so repeated `Catalog()`
 # construction skips the YAML parse + pydantic validation.
-_CATALOG_CACHE: dict[tuple[str, int], dict[str, "Basin"]] = {}
+_CATALOG_CACHE: dict[tuple[str, int], dict[str, Basin]] = {}
 
 
 def clear_catalog_cache() -> None:
@@ -59,7 +59,7 @@ def clear_catalog_cache() -> None:
     _CATALOG_CACHE.clear()
 
 
-def _load_basins(path: Path) -> dict[str, "Basin"]:
+def _load_basins(path: Path) -> dict[str, Basin]:
     """Parse, validate, and cache the basin map at `path`.
 
     Cached on `(resolved-path, mtime_ns)` so a second `Catalog()` on an
@@ -240,9 +240,7 @@ class Catalog(AbstractCatalog):
         """
         catalog_path = catalog_path if catalog_path is not None else CATALOG_PATH
         basins = _load_basins(catalog_path)
-        return cls(
-            datasets=dict(basins), available_datasets=sorted(basins)
-        )
+        return cls(datasets=dict(basins), available_datasets=sorted(basins))
 
     def get_catalog(self) -> dict[str, Basin]:
         """Return the basin map (satisfies the abstract contract).

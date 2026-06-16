@@ -33,8 +33,8 @@ def pytest_collection_modifyitems(items):
     """Tag every test in this subtree with `@pytest.mark.ecmwf`.
 
     Lets the suite be filtered with `-m ecmwf` and lets the
-    `test-ecmwf` pixi task / GitHub workflow step run only the
-    ECMWF backend's tests.
+    `test-backend ecmwf` pixi task / GitHub workflow step run only
+    the ECMWF backend's tests.
 
     Pytest delivers the FULL item list to every conftest hook,
     not just items from this subtree, so we filter by path.

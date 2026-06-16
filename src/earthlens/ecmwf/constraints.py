@@ -40,7 +40,6 @@ Examples:
 
 from __future__ import annotations
 
-import datetime
 import difflib
 import itertools
 import json
@@ -432,8 +431,7 @@ class RequestValidator:
 
         keys = sorted(req_norm)
         entry_sets: list[dict[str, set[Any]]] = [
-            {k: set(entry[k]) for k in keys if k in entry}
-            for entry in self.constraints
+            {k: set(entry[k]) for k in keys if k in entry} for entry in self.constraints
         ]
 
         for combo in itertools.product(*[sorted(req_norm[k]) for k in keys]):
@@ -445,9 +443,7 @@ class RequestValidator:
             if served:
                 continue
             bad_keys = self._find_offending_values(req_norm)
-            offending_combo = ", ".join(
-                f"{k}={v!r}" for k, v in tuple_dict.items()
-            )
+            offending_combo = ", ".join(f"{k}={v!r}" for k, v in tuple_dict.items())
             hint = (
                 f"Offending values: {', '.join(bad_keys)}"
                 if bad_keys

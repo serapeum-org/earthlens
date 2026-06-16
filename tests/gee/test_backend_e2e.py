@@ -42,9 +42,7 @@ def test_live_srtm_download(tmp_path):
         lon_lim=[31.25, 31.3],
         path=str(tmp_path),
         scale=90,
-        service_account=_SERVICE_ACCOUNT,
-        service_key=_SERVICE_KEY,
-    )
+    ).authenticate(service_account=_SERVICE_ACCOUNT, service_key=_SERVICE_KEY)
     paths = el.download(progress_bar=False)
     assert len(paths) == 1, f"expected one GeoTIFF, got {paths}"
     target = paths[0]

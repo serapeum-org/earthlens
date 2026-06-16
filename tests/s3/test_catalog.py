@@ -57,7 +57,9 @@ def test_variable_resolves_by_friendly_alias_and_raw_token(catalog, key):
 
 def test_default_variables_used_when_none_requested(catalog):
     """resolve_variables falls back to the dataset defaults."""
-    natives = [v.native for v in catalog.resolve("sentinel-2-l2a").resolve_variables(None)]
+    natives = [
+        v.native for v in catalog.resolve("sentinel-2-l2a").resolve_variables(None)
+    ]
     assert natives == ["B04", "B03", "B02"]
 
 

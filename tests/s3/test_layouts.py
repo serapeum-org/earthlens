@@ -20,7 +20,9 @@ def catalog():
 def test_copernicus_dem_single_tile(catalog):
     """A bbox inside one 1-degree tile yields that tile's COG key."""
     dem = catalog.resolve("copernicus-dem")
-    products = plan_products(dem, dem.resolve_variables(None), (6.4, 0.4, 6.6, 0.6), [], None)
+    products = plan_products(
+        dem, dem.resolve_variables(None), (6.4, 0.4, 6.6, 0.6), [], None
+    )
     assert [p.href for p in products] == [
         "Copernicus_DSM_COG_10_N00_00_E006_00_DEM/"
         "Copernicus_DSM_COG_10_N00_00_E006_00_DEM.tif"
@@ -30,21 +32,27 @@ def test_copernicus_dem_single_tile(catalog):
 def test_copernicus_dem_spans_multiple_tiles(catalog):
     """A 2-degree-wide bbox yields one product per covered 1-degree tile."""
     dem = catalog.resolve("copernicus-dem")
-    products = plan_products(dem, dem.resolve_variables(None), (5.5, 0.5, 7.5, 0.5), [], None)
+    products = plan_products(
+        dem, dem.resolve_variables(None), (5.5, 0.5, 7.5, 0.5), [], None
+    )
     assert [p.metadata["tile"] for p in products] == ["N00E005", "N00E006", "N00E007"]
 
 
 def test_copernicus_dem_southern_western_hemisphere(catalog):
     """Negative lat/lon format as S/W with correct zero-padding."""
     dem = catalog.resolve("copernicus-dem")
-    products = plan_products(dem, dem.resolve_variables(None), (-74.2, -1.2, -74.1, -1.1), [], None)
+    products = plan_products(
+        dem, dem.resolve_variables(None), (-74.2, -1.2, -74.1, -1.1), [], None
+    )
     assert products[0].metadata["tile"] == "S02W075"
 
 
 def test_esa_worldcover_three_degree_tile(catalog):
     """WorldCover keys carry the version/epoch and a 3-degree tile id."""
     wc = catalog.resolve("esa-worldcover")
-    products = plan_products(wc, wc.resolve_variables(None), (6.4, 0.4, 6.6, 0.6), [], None)
+    products = plan_products(
+        wc, wc.resolve_variables(None), (6.4, 0.4, 6.6, 0.6), [], None
+    )
     assert products[0].href == (
         "v200/2021/map/ESA_WorldCover_10m_2021_v200_N00E006_Map.tif"
     )
@@ -62,8 +70,11 @@ def test_era5_matches_variable_token_in_listing(catalog, fake_client_factory):
         }
     )
     products = plan_products(
-        era5, [era5.resolve_variable("t2m")], (0, 0, 1, 1),
-        pd.date_range("2024-06-01", "2024-06-02"), client,
+        era5,
+        [era5.resolve_variable("t2m")],
+        (0, 0, 1, 1),
+        pd.date_range("2024-06-01", "2024-06-02"),
+        client,
     )
     assert len(products) == 1 and "128_167_2t" in products[0].href
 
@@ -80,8 +91,11 @@ def test_goes_matches_channel_at_first_hour(catalog, fake_client_factory):
         }
     )
     products = plan_products(
-        goes, [goes.resolve_variable("C02")], (-100, 30, -99, 31),
-        pd.to_datetime(["2024-06-28"]), client,
+        goes,
+        [goes.resolve_variable("C02")],
+        (-100, 30, -99, 31),
+        pd.to_datetime(["2024-06-28"]),
+        client,
     )
     assert len(products) == 1 and "M6C02_G16" in products[0].href
 
@@ -98,8 +112,11 @@ def test_sentinel2_lists_scenes_over_mgrs_tiles(catalog, fake_client_factory):
         }
     )
     products = plan_products(
-        s2, [s2.resolve_variable("red")], (2.2, 48.8, 2.5, 48.9),
-        pd.date_range("2024-06-01", "2024-06-15"), client,
+        s2,
+        [s2.resolve_variable("red")],
+        (2.2, 48.8, 2.5, 48.9),
+        pd.date_range("2024-06-01", "2024-06-15"),
+        client,
     )
     assert len(products) == 2 and all(p.href.endswith("B04.tif") for p in products)
 
@@ -118,8 +135,11 @@ def test_sentinel2_max_scenes_caps_and_dedupes_ids(catalog, fake_client_factory)
         }
     )
     products = plan_products(
-        s2, [s2.resolve_variable("red")], (2.2, 48.8, 2.5, 48.9),
-        pd.date_range("2024-06-01", "2024-06-15"), client,
+        s2,
+        [s2.resolve_variable("red")],
+        (2.2, 48.8, 2.5, 48.9),
+        pd.date_range("2024-06-01", "2024-06-15"),
+        client,
     )
     assert len(products) == 1  # capped from 3 scenes
     assert products[0].metadata["scene"].endswith("/2/")  # kept the most recent
@@ -137,13 +157,21 @@ def test_passthrough_template_formats_per_date(catalog):
         }
     )
     s2 = catalog.resolve("sentinel-2-l2a")
-    products = plan_products(ds, [s2.resolve_variable("red")], (0, 0, 1, 1), pd.to_datetime(["2024-06-01"]), None)
+    products = plan_products(
+        ds,
+        [s2.resolve_variable("red")],
+        (0, 0, 1, 1),
+        pd.to_datetime(["2024-06-01"]),
+        None,
+    )
     assert products[0].href == "2024/B04.tif"
 
 
 def test_passthrough_without_template_raises(catalog):
     """A passthrough lacking key_template fails clearly."""
-    ds = catalog.resolve({"bucket": "b", "format": "cog", "layout": "deterministic_tiles"})
+    ds = catalog.resolve(
+        {"bucket": "b", "format": "cog", "layout": "deterministic_tiles"}
+    )
     with pytest.raises(ValueError, match="key_template"):
         plan_products(ds, [], (0, 0, 1, 1), [], None)
 
@@ -156,18 +184,25 @@ def test_sample_axis_handles_reversed_and_endpoint():
     pts = _sample_axis(0.0, 0.5, step=0.2)
     assert pts[0] == 0.0 and pts[-1] == 0.5  # endpoint appended
     exact = _sample_axis(0.0, 0.4, step=0.2)
-    assert exact[-1] == 0.4 and exact.count(0.4) == 1  # endpoint already present, not duplicated
+    assert (
+        exact[-1] == 0.4 and exact.count(0.4) == 1
+    )  # endpoint already present, not duplicated
 
 
 def test_goes_channel_with_no_matching_key_is_skipped(catalog, fake_client_factory):
     """A GOES channel with no matching object in the hour yields no product."""
     goes = catalog.resolve("goes")
     client = fake_client_factory(
-        listing={"noaa-goes16": ["ABI-L2-CMIPF/2024/180/00/OR_ABI-L2-CMIPF-M6C02_G16_s.nc"]}
+        listing={
+            "noaa-goes16": ["ABI-L2-CMIPF/2024/180/00/OR_ABI-L2-CMIPF-M6C02_G16_s.nc"]
+        }
     )
     products = plan_products(
-        goes, [goes.resolve_variable("C13")], (-100, 30, -99, 31),
-        pd.to_datetime(["2024-06-28"]), client,
+        goes,
+        [goes.resolve_variable("C13")],
+        (-100, 30, -99, 31),
+        pd.to_datetime(["2024-06-28"]),
+        client,
     )
     assert products == []  # only C02 is present, C13 requested
 
@@ -175,8 +210,12 @@ def test_goes_channel_with_no_matching_key_is_skipped(catalog, fake_client_facto
 def test_unknown_builder_raises(catalog):
     """A bogus builder token is reported with the known set."""
     ds = catalog.resolve(
-        {"bucket": "b", "format": "cog", "layout": "deterministic_tiles",
-         "params": {"builder": "bogus"}}
+        {
+            "bucket": "b",
+            "format": "cog",
+            "layout": "deterministic_tiles",
+            "params": {"builder": "bogus"},
+        }
     )
     with pytest.raises(ValueError, match="no S3 key resolver"):
         plan_products(ds, [], (0, 0, 1, 1), [], None)
@@ -186,9 +225,13 @@ def test_landsat_builds_keys_from_a_scene_id(catalog):
     """Landsat parses sensor/path/row/year from the scene id; one key per band."""
     ls = catalog.resolve("usgs-landsat")
     ls = ls.model_copy(
-        update={"params": {**ls.params, "scene": "LC08_L2SP_039037_20210901_20210910_02_T1"}}
+        update={
+            "params": {**ls.params, "scene": "LC08_L2SP_039037_20210901_20210910_02_T1"}
+        }
     )
-    products = plan_products(ls, ls.resolve_variables(["red", "nir"]), (0, 0, 1, 1), [], None)
+    products = plan_products(
+        ls, ls.resolve_variables(["red", "nir"]), (0, 0, 1, 1), [], None
+    )
     assert [p.href for p in products] == [
         "collection02/level-2/standard/oli-tirs/2021/039/037/"
         "LC08_L2SP_039037_20210901_20210910_02_T1/"
@@ -209,7 +252,9 @@ def test_landsat_without_scene_raises(catalog):
 def test_landsat_unknown_sensor_raises(catalog):
     """An unrecognised Landsat sensor prefix is reported clearly."""
     ls = catalog.resolve("usgs-landsat")
-    ls = ls.model_copy(update={"params": {**ls.params, "scene": "ZZ99_L2SP_039037_2021_x_02_T1"}})
+    ls = ls.model_copy(
+        update={"params": {**ls.params, "scene": "ZZ99_L2SP_039037_2021_x_02_T1"}}
+    )
     with pytest.raises(ValueError, match="unrecognised Landsat sensor"):
         plan_products(ls, ls.resolve_variables(["red"]), (0, 0, 1, 1), [], None)
 
@@ -228,7 +273,10 @@ def test_goes_skips_a_day_with_no_frames(catalog, fake_client_factory):
     goes = catalog.resolve("goes")
     client = fake_client_factory(listing={"noaa-goes16": []})
     products = plan_products(
-        goes, [goes.resolve_variable("C02")], (-100, 30, -99, 31),
-        pd.to_datetime(["2024-06-28"]), client,
+        goes,
+        [goes.resolve_variable("C02")],
+        (-100, 30, -99, 31),
+        pd.to_datetime(["2024-06-28"]),
+        client,
     )
     assert products == []

@@ -45,10 +45,7 @@ def _write_catalog(tmp_path: Path, dataset_blocks: list[str]) -> Path:
     """Write a single-file catalog containing the given dataset blocks."""
     catalog_yaml = tmp_path / "catalog.yaml"
     # Extract dataset keys from each block ("  <key>:\n..." -> "<key>")
-    keys = [
-        block.splitlines()[0].strip().rstrip(":")
-        for block in dataset_blocks
-    ]
+    keys = [block.splitlines()[0].strip().rstrip(":") for block in dataset_blocks]
     body = "available_datasets:\n"
     for key in keys:
         body += f"  - {key}\n"
@@ -74,7 +71,9 @@ def bundled_catalog() -> Catalog:
 class TestVariableMetadataDrift:
     """`health()['variable_metadata_drift']` flags groups with mismatched (units, types)."""
 
-    def test_bundled_catalog_reports_known_precipitation_daily_drift(self, bundled_catalog: Catalog):
+    def test_bundled_catalog_reports_known_precipitation_daily_drift(
+        self, bundled_catalog: Catalog
+    ):
         """The shipped catalog has exactly one drift: precipitation/daily (gefs-v12-16day outlier)."""
         report = bundled_catalog.health()
         assert report["variable_metadata_drift"] == ["precipitation/daily"]

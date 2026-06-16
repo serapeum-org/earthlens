@@ -16,8 +16,11 @@ and the :class:`earthlens.earthlens.EarthLens` facade rejects an
 detection table). `download()` returns the in-memory FeatureCollection
 and, as a side effect, writes it to one vector file under `path`.
 
-FIRMS needs a free **`MAP_KEY`** (resolved by :class:`FirmsAuth`) but no
-SDK and no `[firms]` extra — the only dependencies are `requests` +
+FIRMS needs a free **`MAP_KEY`** — pass it to :meth:`FIRMS.authenticate`
+as `api_key=`, or set `FIRMS_MAP_KEY` and let `authenticate()` /
+`download()` read it from the environment. It is *not* a constructor
+argument: the constructor describes only what to fetch. There is no SDK
+and no `[firms]` extra — the only dependencies are `requests` +
 `pandas`, both core. Sensor selection follows the vector-backend reading
 of `variables` (see the package docstring): `variables` is a `list[str]`
 of FIRMS sensor codes (`["VIIRS_SNPP_NRT"]`,
@@ -98,7 +101,10 @@ class FIRMS(AbstractDataSource):
     one CSV GET; the rows are mapped to a
     :class:`~pyramids.feature.collection.FeatureCollection`.
 
-    FIRMS needs a free `MAP_KEY` (resolved by :class:`FirmsAuth`).
+    FIRMS needs a free `MAP_KEY`. Supply it to :meth:`authenticate` as
+    `api_key=`, or set the `FIRMS_MAP_KEY` environment variable and let
+    `authenticate()` / `download()` resolve it. Credentials are not a
+    constructor argument — the constructor describes only what to fetch.
 
     Attributes:
         OUTPUT_KIND: `"vector"` — the result is a table of detection
@@ -118,7 +124,6 @@ class FIRMS(AbstractDataSource):
         temporal_resolution: str = "all",
         path: Path | str = "",
         fmt: str = "%Y-%m-%d",
-        map_key: str | None = None,
         min_confidence: float | None = None,
         day_night: str | None = None,
         file_format: FileFormat = "gpkg",
@@ -145,9 +150,6 @@ class FIRMS(AbstractDataSource):
             path: Output directory for the written vector file. Created
                 by the parent class if absent.
             fmt: `strptime` format for `start` / `end`.
-            map_key: FIRMS `MAP_KEY`. Resolved (with the `FIRMS_MAP_KEY`
-                env var as fallback) by :class:`FirmsAuth`; `None` defers
-                to the environment.
             min_confidence: Optional 0-100 lower bound applied
                 client-side on the normalised `confidence_pct` column
                 (FIRMS has no server-side confidence filter). `None`
@@ -176,7 +178,6 @@ class FIRMS(AbstractDataSource):
                 "detection filters are the explicit min_confidence= / "
                 "day_night= keyword arguments."
             )
-        self._map_key = map_key
         self._min_confidence = min_confidence
         self._day_night = day_night
         self._file_format: FileFormat = file_format
@@ -199,19 +200,79 @@ class FIRMS(AbstractDataSource):
         )
 
     def _initialize(self) -> FirmsAuth:
-        """Build and configure the :class:`FirmsAuth` for this instance.
+        """Build the (unconfigured) :class:`FirmsAuth` holder.
+
+        No credentials are resolved here — the constructor describes only
+        what to fetch. The `MAP_KEY` is resolved later by
+        :meth:`authenticate` (explicitly via `api_key=`, or from the
+        `FIRMS_MAP_KEY` environment variable), which `download()` also
+        triggers lazily if it has not run.
 
         Returns:
-            FirmsAuth: The configured auth holding the resolved
-                `MAP_KEY`.
+            FirmsAuth: An unconfigured auth; `is_authenticated()` is
+                `False` until :meth:`authenticate` resolves a key.
+        """
+        return FirmsAuth(FirmsCredentials(api_key=None))
+
+    def authenticate(self, api_key: str | None = None) -> FIRMS:
+        """Resolve the FIRMS `MAP_KEY` and arm the backend for download.
+
+        The explicit, fail-fast credential step. Pass `api_key=` to use a
+        key directly; omit it (or pass `None`) to read the `FIRMS_MAP_KEY`
+        environment variable. Either way the resolved key is held for the
+        subsequent :meth:`download`. Calling it again with a different
+        `api_key` re-arms with the new key. `download()` calls this with
+        no argument on your behalf if you never do, so an explicit call is
+        only needed to pass a key directly or to validate up front.
+
+        Args:
+            api_key: The FIRMS `MAP_KEY` to use. When `None`, the
+                `FIRMS_MAP_KEY` environment variable is read instead.
+
+        Returns:
+            The backend instance, so it chains
+            `EarthLens(...).authenticate(api_key=...).download()`.
 
         Raises:
-            AuthenticationError: If no `MAP_KEY` can be resolved from
-                `map_key=` or `FIRMS_MAP_KEY`.
+            AuthenticationError: If `api_key` is `None` and no
+                `FIRMS_MAP_KEY` environment variable is set.
+
+        Examples:
+            - Arm the backend with an explicit key and read it back:
+                ```python
+                >>> import tempfile
+                >>> from earthlens.firms import FIRMS
+                >>> backend = FIRMS(
+                ...     start="2024-08-01", end="2024-08-01",
+                ...     variables=["VIIRS_SNPP_NRT"],
+                ...     lat_lim=[33.0, 35.0], lon_lim=[-119.0, -117.0],
+                ...     path=tempfile.mkdtemp(),
+                ... )
+                >>> backend.authenticate(api_key="demo-key").client.api_key
+                'demo-key'
+
+                ```
+            - A fresh backend is unauthenticated until the key resolves:
+                ```python
+                >>> import tempfile
+                >>> from earthlens.firms import FIRMS
+                >>> backend = FIRMS(
+                ...     start="2024-08-01", end="2024-08-01",
+                ...     variables=["VIIRS_SNPP_NRT"],
+                ...     lat_lim=[33.0, 35.0], lon_lim=[-119.0, -117.0],
+                ...     path=tempfile.mkdtemp(),
+                ... )
+                >>> backend.client.is_authenticated()
+                False
+                >>> backend.authenticate(api_key="abc123").client.is_authenticated()
+                True
+
+                ```
         """
-        auth = FirmsAuth(FirmsCredentials(map_key=self._map_key))
+        auth = FirmsAuth(FirmsCredentials(api_key=api_key))
         auth.configure()
-        return auth
+        self.client = auth
+        return self
 
     def _create_grid(self, lat_lim: list, lon_lim: list) -> SpatialExtent:
         """Wrap the WGS84 bbox into a :class:`SpatialExtent` (no snapping).
@@ -437,16 +498,16 @@ class FIRMS(AbstractDataSource):
         text = response.text
         kind = classify_body(text)
         if kind == "auth":
-            raise AuthenticationError(
-                f"FIRMS rejected the MAP_KEY: {_truncate(text)}"
-            )
+            raise AuthenticationError(f"FIRMS rejected the MAP_KEY: {_truncate(text)}")
         if kind == "quota":
             raise RuntimeError(
                 "FIRMS transaction quota exhausted after back-off retries: "
                 f"{_truncate(text)}"
             )
         if kind == "error":
-            raise RuntimeError(f"FIRMS returned a non-CSV error body: {_truncate(text)}")
+            raise RuntimeError(
+                f"FIRMS returned a non-CSV error body: {_truncate(text)}"
+            )
         frame = pd.read_csv(StringIO(text))
         return events.csv_to_fc(
             frame,
@@ -468,9 +529,11 @@ class FIRMS(AbstractDataSource):
         Returns:
             str: The fully-formed request URL.
         """
-        bbox = f"{self.space.west},{self.space.south},{self.space.east},{self.space.north}"
+        bbox = (
+            f"{self.space.west},{self.space.south},{self.space.east},{self.space.north}"
+        )
         return AREA_URL_TEMPLATE.format(
-            map_key=self.client.map_key,
+            map_key=self.client.api_key,
             sensor=product.metadata["sensor"],
             bbox=bbox,
             day_range=product.metadata["day_range"],
@@ -540,6 +603,12 @@ class FIRMS(AbstractDataSource):
                 "without aggregate= and post-process the returned "
                 "FeatureCollection (a GeoDataFrame) directly."
             )
+
+        # Resolve the MAP_KEY from FIRMS_MAP_KEY if authenticate() was not
+        # called explicitly, so EarthLens(...).download() still works when
+        # the key lives in the environment.
+        if not self.client.is_authenticated():
+            self.authenticate()
 
         collections = self._api_via_search_fetch_with_progress(progress_bar)
         collection = events.concat(collections)

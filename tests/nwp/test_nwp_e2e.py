@@ -37,8 +37,12 @@ def _herbie_available() -> bool:
 
 def _recent_cycle(hours_ago: int = 36) -> dt.datetime:
     """A 00/06/12/18 cycle roughly `hours_ago` in the past (data still online)."""
-    moment = dt.datetime.now(dt.UTC).replace(tzinfo=None) - dt.timedelta(hours=hours_ago)
-    return moment.replace(hour=(moment.hour // 6) * 6, minute=0, second=0, microsecond=0)
+    moment = dt.datetime.now(dt.UTC).replace(tzinfo=None) - dt.timedelta(
+        hours=hours_ago
+    )
+    return moment.replace(
+        hour=(moment.hour // 6) * 6, minute=0, second=0, microsecond=0
+    )
 
 
 class TestGFSLive:

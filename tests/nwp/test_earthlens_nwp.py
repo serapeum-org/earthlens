@@ -11,7 +11,7 @@ pytestmark = [pytest.mark.nwp, pytest.mark.unit]
 
 
 class TestRegistry:
-    """Tests for the ``"nwp"`` registry entry on the facade."""
+    """Tests for the `"nwp"` registry entry on the facade."""
 
     def test_key_present(self):
         """The nwp key is registered alongside the other backends."""

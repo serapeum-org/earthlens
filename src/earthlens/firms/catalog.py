@@ -41,7 +41,7 @@ CATALOG_PATH: Path = Path(__file__).parent / "firms_data_catalog.yaml"
 #: Module-level parse cache keyed on `(resolved_path, st_mtime_ns)` so a
 #: repeated `Catalog()` skips the YAML parse + pydantic validation. Mirrors
 #: the FDSN / NWP / radar loaders.
-_CATALOG_CACHE: dict[tuple[str, int], dict[str, "Sensor"]] = {}
+_CATALOG_CACHE: dict[tuple[str, int], dict[str, Sensor]] = {}
 
 
 def clear_catalog_cache() -> None:
@@ -198,7 +198,7 @@ class Catalog(AbstractCatalog):
             >>> Catalog().get_sensor("MODIS_NR")  # doctest: +ELLIPSIS
             Traceback (most recent call last):
                 ...
-            ValueError: 'MODIS_NR' is not in the FIRMS sensor catalog. Known datasets: [...]. Did you mean 'MODIS_NRT'?
+            ValueError: 'MODIS_NR' is not in the FIRMS sensor catalog. Known sensors: [...]. Did you mean 'MODIS_NRT'?
 
             ```
     """

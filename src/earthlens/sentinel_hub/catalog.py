@@ -48,7 +48,7 @@ _RECIPE_KINDS: frozenset[str] = frozenset({"render", "stats"})
 # invalidates the entry. Mirrors the openEO / STAC / GEE caches.
 _CATALOG_CACHE: dict[
     Any,
-    tuple[dict[str, "Collection"], dict[str, "EvalscriptRecipe"], list[str]],
+    tuple[dict[str, Collection], dict[str, EvalscriptRecipe], list[str]],
 ] = {}
 
 

@@ -14,7 +14,7 @@ A `(dataset_id, variable_short_name)` pair resolves to a
 :class:`Variable` via :meth:`Catalog.get_variable`, and the full
 :class:`Dataset` shape (cadence, temporal coverage, domain) is
 available via :meth:`AbstractCatalog.get_dataset` /
-``Catalog()["..."]``.
+`Catalog()["..."]`.
 
 `available_datasets:` is the informational index of every dataset id
 the toolbox publishes (~1,251 today, the full
@@ -47,7 +47,7 @@ CATALOG_PATH: Path = Path(__file__).parent / "catalog"
 # path plus a tuple of `(file, mtime_ns)` for every YAML the load
 # touched, so editing any per-domain file invalidates the entry
 # without inspecting every row. Mirrors the GEE multi-file pattern.
-_CATALOG_CACHE: dict[Any, tuple[list[str], dict[str, "Dataset"]]] = {}
+_CATALOG_CACHE: dict[Any, tuple[list[str], dict[str, Dataset]]] = {}
 
 CadenceLiteral = Literal[
     "hourly",
@@ -142,7 +142,7 @@ def _yaml_files_for(path: Path) -> list[Path]:
     )
 
 
-def _load_catalog_data(path: Path) -> tuple[list[str], dict[str, "Dataset"]]:
+def _load_catalog_data(path: Path) -> tuple[list[str], dict[str, Dataset]]:
     """Parse, validate, and cache the CMEMS catalog at `path`.
 
     Returns a `(available_datasets, datasets)` tuple of the same

@@ -45,9 +45,12 @@ class TestRouting:
 class TestPerInstanceAggregateGuard:
     """The facade gates aggregate= on the per-instance OUTPUT_KIND (G1/G6)."""
 
-    def test_raster_forwards_aggregate(self, fake_earthaccess, edl_env, tmp_path, monkeypatch):
+    def test_raster_forwards_aggregate(
+        self, fake_earthaccess, edl_env, tmp_path, monkeypatch
+    ):
         """A raster instance forwards aggregate= into the backend (stack path)."""
         import pyramids.dataset as dsmod
+
         from tests.earthdata.test_backend import _FakeDatasetCollection
 
         monkeypatch.setattr(dsmod, "DatasetCollection", _FakeDatasetCollection)
@@ -61,7 +64,9 @@ class TestPerInstanceAggregateGuard:
         with pytest.raises(NotImplementedError, match="vector"):
             fac.download(aggregate=AggregationConfig(freq="1MS"))
 
-    def test_vector_download_without_aggregate_ok(self, fake_earthaccess, edl_env, tmp_path):
+    def test_vector_download_without_aggregate_ok(
+        self, fake_earthaccess, edl_env, tmp_path
+    ):
         """A vector instance downloads fine without aggregate=."""
         fac = _facade(tmp_path, {"ATL08_006": ["h_canopy"]})
         paths = fac.download()

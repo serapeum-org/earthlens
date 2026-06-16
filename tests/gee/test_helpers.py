@@ -18,7 +18,13 @@ from earthlens.gee._helpers import (
 class _FakeTask:
     """A stand-in for an `ee.batch.Task` (records `start()`, scripted `status()`)."""
 
-    def __init__(self, states: list[str], *, error_message: str | None = None, error: str | None = None):
+    def __init__(
+        self,
+        states: list[str],
+        *,
+        error_message: str | None = None,
+        error: str | None = None,
+    ):
         self._states = list(states)
         self._error_message = error_message
         self._error = error
@@ -147,7 +153,9 @@ class TestWaitForTask:
         """A `RUNNING` task is polled (with sleeps) until it `COMPLETED`s."""
         slept: list[float] = []
         task = _FakeTask(["READY", "RUNNING", "COMPLETED"])
-        result = wait_for_task(task, poll_seconds=7.0, progress_bar=False, sleep=slept.append)
+        result = wait_for_task(
+            task, poll_seconds=7.0, progress_bar=False, sleep=slept.append
+        )
         assert task.poll_count == 3
         assert slept == [7.0, 7.0]
         assert result["state"] == "COMPLETED"
@@ -173,7 +181,9 @@ class TestWaitForTask:
     def test_enum_repr_state_is_recognised_as_terminal(self):
         """An enum-repr terminal state (`"State.COMPLETED"`) ends the loop cleanly."""
         task = _FakeTask(["State.COMPLETED"])
-        assert wait_for_task(task, progress_bar=False, sleep=lambda s: None) == {"state": "State.COMPLETED"}
+        assert wait_for_task(task, progress_bar=False, sleep=lambda s: None) == {
+            "state": "State.COMPLETED"
+        }
 
 
 class TestSplitAoiForUrl:
@@ -199,6 +209,7 @@ class TestSplitAoiForUrl:
         space = SpatialExtent.from_pairs([0.0, 40.0], [0.0, 40.0])
         w, h = space.estimate_pixel_dims(30)
         import math as _math
+
         expected = _math.ceil(w / EE_MAX_DIMENSION) * _math.ceil(h / EE_MAX_DIMENSION)
         assert len(split_aoi_for_url(space, scale_m=30)) == expected
 

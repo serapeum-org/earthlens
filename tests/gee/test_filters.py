@@ -22,7 +22,7 @@ class _FakeCollection:
     def __init__(self):
         self.calls: list[tuple[str, tuple]] = []
 
-    def _chain(self, name: str, *args) -> "_FakeCollection":
+    def _chain(self, name: str, *args) -> _FakeCollection:
         out = _FakeCollection()
         out.calls = self.calls + [(name, args)]
         return out
@@ -86,7 +86,9 @@ class TestByCloudCoverLte:
     def test_property_name_overridable(self, fake_ee):
         """Explicit `property_name=` is forwarded — e.g. Sentinel-2."""
         out = by_cloud_cover_lte(
-            _FakeCollection(), 10, property_name="CLOUDY_PIXEL_PERCENTAGE",
+            _FakeCollection(),
+            10,
+            property_name="CLOUDY_PIXEL_PERCENTAGE",
         )
         assert out.calls == [("filter", (("lte", "CLOUDY_PIXEL_PERCENTAGE", 10),))]
 

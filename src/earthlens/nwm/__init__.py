@@ -15,7 +15,7 @@ A plain operational request **downloads the whole-CONUS files** (~14 MB
 `channel_rt`, ~30 MB `land`). A **subset** — `sites=` (`feature_id` /
 USGS `gage_id`), a narrower bbox, or a `[start, end]` window — and the
 **retrospective** archive (`mode="retrospective"`) are read through
-pyramids (≥ 0.30.0): the feature/lake/node-indexed **tabular** products
+pyramids (≥ 0.34.0): the feature/lake/node-indexed **tabular** products
 (`chrtout`, `lakeout`, `coastal`) go through
 `pyramids.netcdf.LabeledDataset` (open anon + lazily, select
 labels/bbox/time, write a tidy `feature_id × time` Parquet table); the
@@ -27,7 +27,7 @@ with an interleaved vertical/layer dimension, e.g. `SOIL_M`) is deferred
 with a clear `NotImplementedError`.
 
 The `[nwm]` extra pulls `boto3` (unsigned S3) plus
-`pyramids-gis[lazy,xarray,parquet]` (the pyramids readers); both are
+`pyramids-gis[parquet]` (the pyramids readers); both are
 imported lazily, so the package imports — and `NWM(...)` constructs —
 without the extra installed (a friendly `ImportError` naming
 `earthlens[nwm]` surfaces at `download()` time).

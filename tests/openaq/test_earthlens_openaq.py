@@ -55,9 +55,7 @@ class TestFacadeRouting:
         """The facade binds an OpenAQ instance as its datasource."""
         assert isinstance(_facade(tmp_path).datasource, earthlens.openaq.OpenAQ)
 
-    def test_backend_kwargs_forwarded(
-        self, tmp_path: Path, fake_openaq: _FakeOpenaq
-    ):
+    def test_backend_kwargs_forwarded(self, tmp_path: Path, fake_openaq: _FakeOpenaq):
         """Filter kwargs ride through **backend_kwargs to the backend."""
         facade = _facade(tmp_path, max_locations=5, file_format="parquet")
         assert facade.datasource._max_locations == 5
@@ -75,9 +73,9 @@ class TestFacadeAggregateRejection:
         facade = _facade(tmp_path)
         with pytest.raises(NotImplementedError) as exc:
             facade.download(aggregate=AggregationConfig(freq="1MS", op="mean"))
-        assert "tabular" in str(exc.value), (
-            f"rejection message should mention 'tabular', got: {exc.value}"
-        )
+        assert "tabular" in str(
+            exc.value
+        ), f"rejection message should mention 'tabular', got: {exc.value}"
 
     def test_aggregate_none_reaches_backend(
         self, tmp_path: Path, fake_openaq: _FakeOpenaq
@@ -91,9 +89,7 @@ class TestFacadeAggregateRejection:
 class TestFacadeDownload:
     """The facade returns the backend's DataFrame."""
 
-    def test_download_returns_dataframe(
-        self, tmp_path: Path, fake_openaq: _FakeOpenaq
-    ):
+    def test_download_returns_dataframe(self, tmp_path: Path, fake_openaq: _FakeOpenaq):
         """A facade download returns the long-format DataFrame."""
         df = _facade(tmp_path).download(progress_bar=False)
         assert isinstance(df, pd.DataFrame)

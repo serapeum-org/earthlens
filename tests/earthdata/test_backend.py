@@ -134,19 +134,27 @@ class TestConstruction:
     def test_mixed_kind_rejected(self, fake_earthaccess, edl_env, tmp_path):
         """Mixing raster and vector datasets is rejected."""
         with pytest.raises(ValueError, match="mixed kinds"):
-            _make(tmp_path, {"GPM_3IMERGHHL_07": ["precipitation"], "ATL08_006": ["h_canopy"]})
+            _make(
+                tmp_path,
+                {"GPM_3IMERGHHL_07": ["precipitation"], "ATL08_006": ["h_canopy"]},
+            )
 
     def test_empty_variables_rejected(self, fake_earthaccess, edl_env, tmp_path):
         """An empty variables mapping is rejected."""
         with pytest.raises(ValueError, match="non-empty"):
             _make(tmp_path, {})
 
-    def test_daac_with_multiple_datasets_rejected(self, fake_earthaccess, edl_env, tmp_path):
+    def test_daac_with_multiple_datasets_rejected(
+        self, fake_earthaccess, edl_env, tmp_path
+    ):
         """daac= combined with several datasets is rejected up front."""
         with pytest.raises(ValueError, match="daac= only applies to a single-dataset"):
             _make(
                 tmp_path,
-                {"GPM_3IMERGHHL_07": ["precipitation"], "GPM_3IMERGM_07": ["precipitation"]},
+                {
+                    "GPM_3IMERGHHL_07": ["precipitation"],
+                    "GPM_3IMERGM_07": ["precipitation"],
+                },
                 daac="GES_DISC",
             )
 
@@ -160,10 +168,12 @@ class TestConstruction:
         with pytest.raises(ValueError, match="Did you mean"):
             _make(tmp_path, {"GPM_3IMERGHHL": ["precipitation"]})
 
-    def test_login_runs_at_construction(self, fake_earthaccess, edl_env, tmp_path):
-        """Construction authenticates once via earthaccess.login."""
-        _make(tmp_path, {"GPM_3IMERGHHL_07": ["precipitation"]})
-        assert len(fake_earthaccess.login_calls) == 1
+    def test_login_deferred_until_fetch(self, fake_earthaccess, edl_env, tmp_path):
+        """Construction does not authenticate; login is deferred to first fetch."""
+        obj = _make(tmp_path, {"GPM_3IMERGHHL_07": ["precipitation"]})
+        assert len(fake_earthaccess.login_calls) == 0, "construction must not log in"
+        obj._auth.configure()
+        assert len(fake_earthaccess.login_calls) == 1, "configure() authenticates once"
 
 
 class TestSearch:
@@ -216,17 +226,23 @@ class TestFetch:
 
     def test_direct_s3_always_uses_open(self, fake_earthaccess, edl_env, tmp_path):
         """direct_s3='always' streams from S3 regardless of region."""
-        obj = _make(tmp_path, {"GPM_3IMERGHHL_07": ["precipitation"]}, direct_s3="always")
+        obj = _make(
+            tmp_path, {"GPM_3IMERGHHL_07": ["precipitation"]}, direct_s3="always"
+        )
         obj.download()
         assert fake_earthaccess.open_calls and not fake_earthaccess.download_calls
 
     def test_auto_in_region_uses_open(self, fake_earthaccess, edl_env, tmp_path):
         """auto + in-region + cloud-hosted streams from S3."""
-        obj = _make(tmp_path, {"GPM_3IMERGHHL_07": ["precipitation"]}, region="us-west-2")
+        obj = _make(
+            tmp_path, {"GPM_3IMERGHHL_07": ["precipitation"]}, region="us-west-2"
+        )
         obj.download()
         assert fake_earthaccess.open_calls and not fake_earthaccess.download_calls
 
-    def test_never_uses_download_even_in_region(self, fake_earthaccess, edl_env, tmp_path):
+    def test_never_uses_download_even_in_region(
+        self, fake_earthaccess, edl_env, tmp_path
+    ):
         """direct_s3='never' downloads even when in-region."""
         obj = _make(
             tmp_path,
@@ -243,7 +259,9 @@ class TestFetch:
         obj = _make(tmp_path, {"GPM_3IMERGHHL_07": ["precipitation"]})
         assert obj._in_region("us-west-2") is True
 
-    def test_progress_bar_forwarded_to_download(self, fake_earthaccess, edl_env, tmp_path):
+    def test_progress_bar_forwarded_to_download(
+        self, fake_earthaccess, edl_env, tmp_path
+    ):
         """progress_bar=False is forwarded to earthaccess as show_progress."""
         obj = _make(tmp_path, {"GPM_3IMERGHHL_07": ["precipitation"]})
         obj.download(progress_bar=False)
@@ -251,7 +269,9 @@ class TestFetch:
 
     def test_progress_bar_forwarded_to_open(self, fake_earthaccess, edl_env, tmp_path):
         """progress_bar is forwarded to earthaccess.open on the S3 path."""
-        obj = _make(tmp_path, {"GPM_3IMERGHHL_07": ["precipitation"]}, direct_s3="always")
+        obj = _make(
+            tmp_path, {"GPM_3IMERGHHL_07": ["precipitation"]}, direct_s3="always"
+        )
         obj.download(progress_bar=False)
         assert fake_earthaccess.open_calls[-1]["show_progress"] is False
 
@@ -259,9 +279,12 @@ class TestFetch:
 class TestAggregate:
     """download(aggregate=) routing — axis-driven, not format-driven (G6)."""
 
-    def test_granule_stack_routes_to_groupby(self, fake_earthaccess, edl_env, tmp_path, monkeypatch):
+    def test_granule_stack_routes_to_groupby(
+        self, fake_earthaccess, edl_env, tmp_path, monkeypatch
+    ):
         """A multi-granule fetch (the common case) windows the stack via groupby."""
         import pyramids.dataset as dsmod
+
         from earthlens.aggregate import AggregationConfig
 
         monkeypatch.setattr(dsmod, "DatasetCollection", _FakeDatasetCollection)
@@ -269,9 +292,12 @@ class TestAggregate:
         out = obj.download(aggregate=AggregationConfig(freq="1MS"))
         assert [p.name for p in out] == ["window_2020.tif"]
 
-    def test_single_netcdf_reduces_internal_axis(self, fake_earthaccess, edl_env, tmp_path, monkeypatch):
+    def test_single_netcdf_reduces_internal_axis(
+        self, fake_earthaccess, edl_env, tmp_path, monkeypatch
+    ):
         """A single NetCDF cube collapses its internal time axis via NetCDF.reduce."""
         import pyramids.netcdf as ncmod
+
         from earthlens.aggregate import AggregationConfig
 
         fake_earthaccess.granules = [{"meta": {"concept-id": "G1"}}]
@@ -288,6 +314,7 @@ class TestAggregate:
         """A single NetCDF with no time axis falls back to the stack/groupby path."""
         import pyramids.dataset as dsmod
         import pyramids.netcdf as ncmod
+
         from earthlens.aggregate import AggregationConfig
 
         fake_earthaccess.granules = [{"meta": {"concept-id": "G1"}}]
@@ -297,9 +324,12 @@ class TestAggregate:
         out = obj.download(aggregate=AggregationConfig(freq="1MS"))
         assert [p.name for p in out] == ["window_2020.tif"]
 
-    def test_single_cog_uses_stack_path(self, fake_earthaccess, edl_env, tmp_path, monkeypatch):
+    def test_single_cog_uses_stack_path(
+        self, fake_earthaccess, edl_env, tmp_path, monkeypatch
+    ):
         """A lone COG (no internal axis) falls through to the stack path."""
         import pyramids.dataset as dsmod
+
         from earthlens.aggregate import AggregationConfig
 
         monkeypatch.setattr(dsmod, "DatasetCollection", _FakeDatasetCollection)
@@ -307,9 +337,12 @@ class TestAggregate:
         out = obj._aggregate([Path("only.tif")], AggregationConfig(freq="YS"))
         assert [p.name for p in out] == ["window_2020.tif"]
 
-    def test_missing_reduce_raises(self, fake_earthaccess, edl_env, tmp_path, monkeypatch):
+    def test_missing_reduce_raises(
+        self, fake_earthaccess, edl_env, tmp_path, monkeypatch
+    ):
         """A single NetCDF without NetCDF.reduce raises NotImplementedError."""
         import pyramids.netcdf as ncmod
+
         from earthlens.aggregate import AggregationConfig
 
         fake_earthaccess.granules = [{"meta": {"concept-id": "G1"}}]
@@ -318,9 +351,12 @@ class TestAggregate:
         with pytest.raises(NotImplementedError, match="NetCDF.reduce"):
             obj.download(aggregate=AggregationConfig(freq="1MS"))
 
-    def test_missing_groupby_raises(self, fake_earthaccess, edl_env, tmp_path, monkeypatch):
+    def test_missing_groupby_raises(
+        self, fake_earthaccess, edl_env, tmp_path, monkeypatch
+    ):
         """A stack without DatasetCollection.groupby raises NotImplementedError."""
         import pyramids.dataset as dsmod
+
         from earthlens.aggregate import AggregationConfig
 
         monkeypatch.setattr(dsmod, "DatasetCollection", _DatasetCollectionNoGroupby)
@@ -328,7 +364,9 @@ class TestAggregate:
         with pytest.raises(NotImplementedError, match="groupby"):
             obj._aggregate([Path("a.tif"), Path("b.tif")], AggregationConfig(freq="YS"))
 
-    def test_search_missing_earthaccess_raises(self, fake_earthaccess, edl_env, tmp_path, monkeypatch):
+    def test_search_missing_earthaccess_raises(
+        self, fake_earthaccess, edl_env, tmp_path, monkeypatch
+    ):
         """_search surfaces a friendly ImportError when earthaccess is gone."""
         from tests.earthdata.test_auth import _block_earthaccess
 

@@ -37,6 +37,7 @@ from earthlens.base import (
     RemoteProduct,
     SpatialExtent,
     TemporalExtent,
+    crop_to_aoi,
 )
 from earthlens.nwp._helpers import (
     cog_name,
@@ -404,6 +405,10 @@ class NWP(AbstractDataSource):
                 product, in order. Shorter than `products` when some
                 were skipped under `errors` in `{"warn", "skip"}`.
         """
+        from earthlens.nwp._eccodes import ensure_eccodes
+
+        ensure_eccodes()
+
         from pyramids.dataset.cog import write_cog
         from pyramids.grib import open_grib
 
@@ -457,7 +462,7 @@ class NWP(AbstractDataSource):
         # cutline path, which masks the field but keeps the full grid extent
         # (and historically crashed on the GRIB driver's EPSG:9122 CRS — fixed
         # in pyramids 0.24.1, pyramids#403 / PY-1). We want the bbox window.
-        cropped = dataset.crop(bbox=bbox, epsg=4326, touch=False)
+        cropped = crop_to_aoi(dataset, self.space, bbox=bbox, touch=False)
         target = self.root_dir / cog_name(
             meta["model_key"], meta["cycle"], meta["step"], meta.get("member")
         )
@@ -535,9 +540,7 @@ class NWP(AbstractDataSource):
             return self._aggregate(paths, aggregate)
         return paths
 
-    def _aggregate(
-        self, paths: list[Path], config: AggregationConfig
-    ) -> list[Path]:
+    def _aggregate(self, paths: list[Path], config: AggregationConfig) -> list[Path]:
         """Reduce the `(cycle, step)` COG stack into per-window COGs (`C6`).
 
         Labels each COG by the window its **valid time** (`cycle + step`)

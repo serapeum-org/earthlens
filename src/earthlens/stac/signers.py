@@ -416,9 +416,7 @@ class EarthdataSigner(_BearerProviderSigner):
                 "EarthdataSigner needs a token (EARTHDATA_TOKEN/PAT) or "
                 "EARTHDATA_USERNAME + EARTHDATA_PASSWORD."
             )
-        creds = base64.b64encode(
-            f"{self._username}:{self._password}".encode()
-        ).decode()
+        creds = base64.b64encode(f"{self._username}:{self._password}".encode()).decode()
         request = urllib.request.Request(self._TOKEN_URL, method="POST")
         request.add_header("Authorization", f"Basic {creds}")
         request.add_header("Accept", "application/json")
@@ -617,7 +615,7 @@ class CdseS3Signer:
             not a CDSE asset.
         """
         if href.startswith("s3://"):
-            return "/vsis3/" + href[len("s3://"):]
+            return "/vsis3/" + href[len("s3://") :]
         if href.startswith(("https://", "http://")):
             from urllib.parse import urlsplit
 

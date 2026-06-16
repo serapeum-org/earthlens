@@ -40,8 +40,8 @@ from earthlens.stac.catalog import (
     Extent,
 )
 from earthlens.stac.signers import (
-    CDSESigner,
     CdseS3Signer,
+    CDSESigner,
     EarthdataSigner,
     PlanetaryComputerSigner,
     build_signer,

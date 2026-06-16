@@ -7,11 +7,11 @@ from pathlib import Path
 
 import earthlens.gee as gee_pkg
 from earthlens.gee import (
+    CATALOG_PATH,
     GEE,
     AuthenticationError,
     Band,
     Cadence,
-    CATALOG_PATH,
     Catalog,
     Dataset,
     EarthEngineAuth,
@@ -20,13 +20,30 @@ from earthlens.gee import (
 )
 
 _EXPECTED_EXPORTS = {
-    "GEE", "AuthenticationError", "Catalog", "Dataset", "Band", "Cadence",
-    "Extent", "Provider", "CATALOG_PATH", "PROVIDERS_PATH", "EarthEngineAuth",
-    "create_geometry", "create_feature", "sample_points",
-    "feature_collection_to_dataframe", "feature_collection_to_gdf",
-    "feature_collections_to_dataframe", "sample_points_to_gdf",
-    "TaskInfo", "list_recent_tasks", "get_task_status", "cancel_task",
-    "wait_for_task_id", "resolve_destination",
+    "GEE",
+    "AuthenticationError",
+    "Catalog",
+    "Dataset",
+    "Band",
+    "Cadence",
+    "Extent",
+    "Provider",
+    "CATALOG_PATH",
+    "PROVIDERS_PATH",
+    "EarthEngineAuth",
+    "create_geometry",
+    "create_feature",
+    "sample_points",
+    "feature_collection_to_dataframe",
+    "feature_collection_to_gdf",
+    "feature_collections_to_dataframe",
+    "sample_points_to_gdf",
+    "TaskInfo",
+    "list_recent_tasks",
+    "get_task_status",
+    "cancel_task",
+    "wait_for_task_id",
+    "resolve_destination",
 }
 
 
@@ -35,9 +52,9 @@ class TestPublicSurface:
 
     def test_all_lists_the_expected_names(self):
         """`__all__` is exactly the documented public surface."""
-        assert set(gee_pkg.__all__) == _EXPECTED_EXPORTS, (
-            f"__all__ mismatch: {set(gee_pkg.__all__) ^ _EXPECTED_EXPORTS}"
-        )
+        assert (
+            set(gee_pkg.__all__) == _EXPECTED_EXPORTS
+        ), f"__all__ mismatch: {set(gee_pkg.__all__) ^ _EXPECTED_EXPORTS}"
 
     def test_classes_resolve_to_their_modules(self):
         """The re-exported classes are the canonical ones from their submodules."""
@@ -56,12 +73,17 @@ class TestPublicSurface:
 
     def test_feature_helpers_are_callable(self):
         """`create_geometry` / `create_feature` are importable callables."""
-        assert callable(create_geometry) and create_geometry.__name__ == "create_geometry"
+        assert (
+            callable(create_geometry) and create_geometry.__name__ == "create_geometry"
+        )
         assert callable(create_feature) and create_feature.__name__ == "create_feature"
 
     def test_catalog_usable_from_package_root(self):
         """`Catalog` works when imported from `earthlens.gee` directly."""
-        assert Catalog().get_dataset("USGS/SRTMGL1_003").title == "NASA SRTM Digital Elevation 30m"
+        assert (
+            Catalog().get_dataset("USGS/SRTMGL1_003").title
+            == "NASA SRTM Digital Elevation 30m"
+        )
 
     def test_module_has_a_docstring(self):
         """The package has a module docstring describing the backend."""

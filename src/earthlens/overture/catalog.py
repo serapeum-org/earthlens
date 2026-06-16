@@ -44,9 +44,9 @@ CATALOG_PATH: Path = Path(__file__).parent / "overture_data_catalog.yaml"
 #: repeated `Catalog()` skips the YAML parse + pydantic validation. Stores the
 #: `(themes, available_releases, available_datasets)` triple. Mirrors the
 #: FDSN / NWP / radar loaders.
-_CATALOG_CACHE: dict[
-    tuple[str, int], tuple[dict[str, "Theme"], list[str], list[str]]
-] = {}
+_CATALOG_CACHE: dict[tuple[str, int], tuple[dict[str, Theme], list[str], list[str]]] = (
+    {}
+)
 
 
 def clear_catalog_cache() -> None:
@@ -205,7 +205,7 @@ class Catalog(AbstractCatalog):
             >>> Catalog().get_theme("building")
             Traceback (most recent call last):
                 ...
-            ValueError: 'building' is not in the Overture theme catalog. Known datasets: ['addresses', 'base', 'buildings', 'divisions', 'places', 'transportation']. Did you mean 'buildings'?
+            ValueError: 'building' is not in the Overture theme catalog. Known themes: ['addresses', 'base', 'buildings', 'divisions', 'places', 'transportation']. Did you mean 'buildings'?
 
             ```
     """

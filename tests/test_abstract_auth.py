@@ -106,9 +106,9 @@ class TestAbstractAuth:
         auth = _CountingAuth(_Creds(token="x"))
         auth.configure()
         auth.configure()
-        assert auth.configure_calls == 1, (
-            f"configure should be idempotent; got {auth.configure_calls} calls"
-        )
+        assert (
+            auth.configure_calls == 1
+        ), f"configure should be idempotent; got {auth.configure_calls} calls"
 
     def test_context_manager_enter_calls_configure(self):
         """`with auth as a` calls `configure()` on entry and returns `auth`."""

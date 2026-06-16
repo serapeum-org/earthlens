@@ -93,9 +93,7 @@ class TestUtmEpsgForPolygon:
 
     def test_picks_centroid_zone(self):
         """The EPSG is derived from the bbox centroid of the input."""
-        poly = Polygon(
-            [(31.0, 30.0), (31.2, 30.0), (31.2, 30.2), (31.0, 30.2)]
-        )
+        poly = Polygon([(31.0, 30.0), (31.2, 30.0), (31.2, 30.2), (31.0, 30.2)])
         gdf = gpd.GeoDataFrame({"id": [1]}, geometry=[poly], crs="EPSG:4326")
         assert utm_epsg_for_polygon(gdf) == 32636
 
@@ -117,9 +115,7 @@ class TestProjectToUtm:
 
     def test_returns_projected_gdf_and_epsg(self):
         """The output GDF carries the new CRS and the EPSG matches."""
-        poly = Polygon(
-            [(31.0, 30.0), (31.2, 30.0), (31.2, 30.2), (31.0, 30.2)]
-        )
+        poly = Polygon([(31.0, 30.0), (31.2, 30.0), (31.2, 30.2), (31.0, 30.2)])
         gdf = gpd.GeoDataFrame({"id": [1]}, geometry=[poly], crs="EPSG:4326")
         projected, epsg = project_to_utm(gdf)
         assert epsg == 32636
@@ -127,9 +123,7 @@ class TestProjectToUtm:
 
     def test_geometry_coords_are_in_metres(self):
         """Projected coords are metres; bbox width must be ~22 km for 0.2°."""
-        poly = Polygon(
-            [(31.0, 30.0), (31.2, 30.0), (31.2, 30.2), (31.0, 30.2)]
-        )
+        poly = Polygon([(31.0, 30.0), (31.2, 30.0), (31.2, 30.2), (31.0, 30.2)])
         gdf = gpd.GeoDataFrame({"id": [1]}, geometry=[poly], crs="EPSG:4326")
         projected, _ = project_to_utm(gdf)
         xmin, _, xmax, _ = projected.total_bounds

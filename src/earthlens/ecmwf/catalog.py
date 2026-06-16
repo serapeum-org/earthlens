@@ -60,10 +60,20 @@ from pydantic import BaseModel, ConfigDict, Field, ValidationError, field_valida
 from earthlens.base import AbstractCatalog, FluxableLeaf, Provider
 from earthlens.base.providers import (
     clear_providers_cache as _clear_providers_cache_base,
-    load_providers,
 )
+from earthlens.base.providers import load_providers
 from earthlens.base.yaml_loader import load_yaml_strict
 from earthlens.ecmwf.constraints import fetch_constraints
+
+# `read_cdsapirc` / `download_job` / `list_recent_jobs` were split out of this
+# module into `earthlens.ecmwf.jobs` (N3 in
+# planning/catalog-cross-backend-comparison.md). `Catalog` still delegates to
+# `download_job` / `list_recent_jobs` internally, so import them under private
+# names; `_read_cdsapirc` is re-exported only so any external caller using
+# `from earthlens.ecmwf.catalog import _read_cdsapirc` keeps working.
+from earthlens.ecmwf.jobs import download_job as _download_job_impl
+from earthlens.ecmwf.jobs import list_recent_jobs as _list_recent_jobs_impl
+from earthlens.ecmwf.jobs import read_cdsapirc as _read_cdsapirc  # noqa: F401
 
 _LEGACY_MARS_KEYS: frozenset[str] = frozenset(
     {"number_para", "download type", "var_name"}
@@ -77,7 +87,7 @@ PROVIDERS_PATH: Path = Path(__file__).parent / "providers.yaml"
 # script append) invalidates the entry naturally. Mirrors the GEE
 # pattern (H1 / M2) so repeated `Catalog()` construction is ~1 ms
 # instead of paying the YAML parse + pydantic validation each time.
-_CATALOG_CACHE: dict[Any, tuple[list[str], dict[str, "Dataset"]]] = {}
+_CATALOG_CACHE: dict[Any, tuple[list[str], dict[str, Dataset]]] = {}
 
 
 def clear_catalog_cache() -> None:
@@ -119,7 +129,7 @@ def _yaml_files_for(path: Path) -> list[Path]:
     )
 
 
-def _load_catalog_data(path: Path) -> tuple[list[str], dict[str, "Dataset"]]:
+def _load_catalog_data(path: Path) -> tuple[list[str], dict[str, Dataset]]:
     """Parse, validate, and cache the CDS catalog at `path`.
 
     Returns a `(available_datasets, datasets)` tuple of the same shape
@@ -206,7 +216,7 @@ def _provider_for_dataset(ds_name: str) -> str:
 def _build_dataset_map(
     datasets_yaml: dict[str, dict[str, Any]],
     catalog_path: Path,
-) -> tuple[dict[str, "Dataset"], int]:
+) -> tuple[dict[str, Dataset], int]:
     """Build the structural per-dataset :class:`Dataset` map (N1).
 
     Walks every entry in `datasets_yaml`, validates each variable into
@@ -265,8 +275,7 @@ def _build_dataset_map(
                 ds_vars[code] = Variable(**merged)
             except ValidationError as exc:
                 raise ValueError(
-                    f"{catalog_path} entry {code!r} failed "
-                    f"validation:\n{exc}"
+                    f"{catalog_path} entry {code!r} failed " f"validation:\n{exc}"
                 ) from exc
             total_vars += 1
         structural[ds_name] = Dataset(
@@ -282,7 +291,7 @@ def _build_dataset_map(
 
 
 def _synthesize_monthly_entries(
-    structural: dict[str, "Dataset"],
+    structural: dict[str, Dataset],
     datasets_yaml: dict[str, dict[str, Any]],
 ) -> None:
     """Mutate `structural` to add an auto-synthesised entry per `monthly:` xref (N1).
@@ -329,18 +338,6 @@ def _synthesize_monthly_entries(
             provider=_provider_for_dataset(ds.monthly),
             variables=rebranded,
         )
-
-
-# `_read_cdsapirc`, `list_recent_jobs`, `download_job` moved to
-# `earthlens.ecmwf.jobs` (N3 in
-# planning/catalog-cross-backend-comparison.md). Re-imported below as
-# `_read_cdsapirc` so any external caller using `from
-# earthlens.ecmwf.catalog import _read_cdsapirc` keeps working.
-from earthlens.ecmwf.jobs import (  # noqa: E402 — re-export for back-compat
-    download_job as _download_job_impl,
-    list_recent_jobs as _list_recent_jobs_impl,
-    read_cdsapirc as _read_cdsapirc,
-)
 
 
 class Variable(FluxableLeaf):
@@ -623,11 +620,17 @@ class Catalog(AbstractCatalog):
                 provider not in the registry.
         """
         catalog_path = catalog_path if catalog_path is not None else CATALOG_PATH
-        providers_path = providers_path if providers_path is not None else PROVIDERS_PATH
+        providers_path = (
+            providers_path if providers_path is not None else PROVIDERS_PATH
+        )
         available_datasets, datasets = _load_catalog_data(catalog_path)
         providers = load_providers(providers_path)
         unknown = sorted(
-            {d.provider for d in datasets.values() if d.provider and d.provider not in providers}
+            {
+                d.provider
+                for d in datasets.values()
+                if d.provider and d.provider not in providers
+            }
         )
         if unknown:
             raise ValueError(

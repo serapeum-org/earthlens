@@ -469,4 +469,3 @@ datasets:
         description: The factors to normalize the gamma0 backscatter to sigma0, provided
       mask:
         description: Mask layer containing valid/invalid, layover, and shadow
-

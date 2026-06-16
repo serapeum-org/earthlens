@@ -13,8 +13,8 @@ import pytest
 from earthlens.base import AuthenticationError
 from earthlens.stac import auth_cdse
 from earthlens.stac.signers import (
-    CDSESigner,
     CdseS3Signer,
+    CDSESigner,
     EarthdataSigner,
     PlanetaryComputerSigner,
     _BearerProviderSigner,
@@ -23,7 +23,12 @@ from earthlens.stac.signers import (
 
 from .conftest import make_item
 
-_EARTHDATA_ENV = ("EARTHDATA_TOKEN", "EARTHDATA_PAT", "EARTHDATA_USERNAME", "EARTHDATA_PASSWORD")
+_EARTHDATA_ENV = (
+    "EARTHDATA_TOKEN",
+    "EARTHDATA_PAT",
+    "EARTHDATA_USERNAME",
+    "EARTHDATA_PASSWORD",
+)
 _CDSE_ENV = ("CDSE_USERNAME", "CDSE_PASSWORD")
 
 
@@ -105,7 +110,10 @@ class TestCdseS3Signer:
 
     def test_sign_href_non_http_scheme_passthrough(self):
         """A non-s3, non-http href is returned unchanged."""
-        assert CdseS3Signer("ak", "sk").sign_href("/vsicurl/local.tif") == "/vsicurl/local.tif"
+        assert (
+            CdseS3Signer("ak", "sk").sign_href("/vsicurl/local.tif")
+            == "/vsicurl/local.tif"
+        )
 
     def test_gdal_env_carries_s3_credentials_no_authorization(self):
         """gdal_env supplies the S3 endpoint + keys and never an Authorization header."""
@@ -201,7 +209,10 @@ class TestPlanetaryComputerSigner:
 
     def test_sign_item_skips_item_without_assets(self):
         """An Item whose assets are empty is skipped without error."""
-        assert PlanetaryComputerSigner().sign_item(make_item("x", "2024-01-05", {})) is None
+        assert (
+            PlanetaryComputerSigner().sign_item(make_item("x", "2024-01-05", {}))
+            is None
+        )
 
     def test_sign_item_handles_non_iterable(self):
         """A non-iterable, asset-less argument is treated as a single item."""
@@ -229,7 +240,9 @@ class TestPlanetaryComputerSigner:
 
     def test_parse_expiry_naive_datetime_assumed_utc(self):
         """A naive (tz-less) expiry timestamp is read as UTC."""
-        assert PlanetaryComputerSigner._parse_expiry("2099-01-01T00:00:00") > time.time()
+        assert (
+            PlanetaryComputerSigner._parse_expiry("2099-01-01T00:00:00") > time.time()
+        )
 
 
 @pytest.mark.stac
@@ -326,7 +339,8 @@ class TestCDSESigner:
         for var in _CDSE_ENV:
             monkeypatch.delenv(var, raising=False)
         calls = _patch_urlopen(
-            monkeypatch, [{"access_token": "acc", "refresh_token": "r", "expires_in": 600}]
+            monkeypatch,
+            [{"access_token": "acc", "refresh_token": "r", "expires_in": 600}],
         )
         signer = CDSESigner(username="u", password="p")
         signer.gdal_env()
@@ -372,7 +386,8 @@ class TestCDSESigner:
         for var in _CDSE_ENV:
             monkeypatch.delenv(var, raising=False)
         _patch_urlopen(
-            monkeypatch, [{"access_token": "acc", "refresh_token": "r", "expires_in": 600}]
+            monkeypatch,
+            [{"access_token": "acc", "refresh_token": "r", "expires_in": 600}],
         )
         request = SimpleNamespace(headers={})
         CDSESigner(username="u", password="p").sign_request(request)
@@ -432,7 +447,12 @@ class TestBuildSigner:
     def test_cdse_tolerates_backend_s3_kwargs(self):
         """build_signer drops the region/S3 kwargs the backend always forwards."""
         signer = build_signer(
-            "cdse", username="u", password="p", region="eu", access_key="ak", secret_key="sk"
+            "cdse",
+            username="u",
+            password="p",
+            region="eu",
+            access_key="ak",
+            secret_key="sk",
         )
         assert isinstance(signer, CDSESigner)
         assert signer.name == "cdse"
@@ -457,7 +477,10 @@ class TestS3Credentials:
         """Explicit kwargs are returned even when env vars are also set."""
         monkeypatch.setenv("CDSE_S3_ACCESS_KEY", "env-ak")
         monkeypatch.setenv("CDSE_S3_SECRET_KEY", "env-sk")
-        assert auth_cdse.s3_credentials(access_key="ak", secret_key="sk") == ("ak", "sk")
+        assert auth_cdse.s3_credentials(access_key="ak", secret_key="sk") == (
+            "ak",
+            "sk",
+        )
 
     def test_env_fallback(self, monkeypatch):
         """The env vars supply the keys when no kwargs are given."""
@@ -467,14 +490,21 @@ class TestS3Credentials:
 
     def test_missing_both_raises_authentication_error(self, monkeypatch):
         """Missing keys raise AuthenticationError naming the dashboard URL."""
-        for var in ("CDSE_S3_ACCESS_KEY", "CDSE_S3_SECRET_KEY", "CDSE_USERNAME", "CDSE_PASSWORD"):
+        for var in (
+            "CDSE_S3_ACCESS_KEY",
+            "CDSE_S3_SECRET_KEY",
+            "CDSE_USERNAME",
+            "CDSE_PASSWORD",
+        ):
             monkeypatch.delenv(var, raising=False)
         with pytest.raises(AuthenticationError, match="dataspace.copernicus.eu"):
             auth_cdse.s3_credentials()
 
     def test_extra_kwargs_ignored(self, monkeypatch):
         """Unrelated kwargs forwarded by build_signer are ignored."""
-        assert auth_cdse.s3_credentials(access_key="ak", secret_key="sk", region="x") == (
+        assert auth_cdse.s3_credentials(
+            access_key="ak", secret_key="sk", region="x"
+        ) == (
             "ak",
             "sk",
         )

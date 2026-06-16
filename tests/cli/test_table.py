@@ -10,12 +10,12 @@ from earthlens.cli.table import (
     FACET_NAMES,
     CatalogRow,
     CatalogTable,
-    build_table,
-    clear_table_cache,
     _facet_token,
     _first_token,
     _format_number,
     _to_row,
+    build_table,
+    clear_table_cache,
 )
 
 pytestmark = pytest.mark.cli

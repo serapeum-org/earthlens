@@ -127,11 +127,12 @@ class TestFacadeConstruction:
         assert el.datasource is fake_gee.return_value
 
     def test_forwards_backend_kwargs(self, fake_gee):
-        """GEE-specific keyword arguments are forwarded verbatim to `GEE(...)`."""
+        """GEE-specific keyword arguments are forwarded verbatim to `GEE(...)`.
+
+        Credentials are not among them — they live on `authenticate(...)`,
+        not the constructor.
+        """
         extra = dict(
-            service_account="sa@x.iam",
-            service_key="key.json",
-            project="p",
             scale=90,
             crs="EPSG:3857",
             reducer="median",
@@ -146,6 +147,13 @@ class TestFacadeConstruction:
             assert (
                 kwargs.get(name) == value
             ), f"{name} not forwarded: {kwargs.get(name)!r}"
+
+    def test_authenticate_forwards_credentials(self, fake_gee):
+        """EarthLens.authenticate(...) forwards GEE credentials to the backend."""
+        el = EarthLens(**_gee_kwargs())
+        el.authenticate(service_account="sa@x.iam", service_key="key.json")
+        kwargs = fake_gee.return_value.authenticate.call_args.kwargs
+        assert kwargs == {"service_account": "sa@x.iam", "service_key": "key.json"}
 
     def test_alias_builds_same_backend(self, fake_gee):
         """`data_source="google-earth-engine"` constructs the `GEE` backend too."""
@@ -164,7 +172,7 @@ class TestFacadeConstruction:
 
     def test_unknown_data_source_raises_value_error(self):
         """An unknown `data_source` is rejected before any backend import."""
-        with pytest.raises(ValueError, match="nope not supported"):
+        with pytest.raises(ValueError, match="'nope' is not a supported data source"):
             EarthLens(variables=[], data_source="nope")
 
 

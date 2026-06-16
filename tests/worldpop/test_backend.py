@@ -95,7 +95,9 @@ def _patch_archive_http(monkeypatch, title, archive_url, archive_bytes):
         if url.endswith((".7z", ".zip")):
             return _FakeResponse(content=archive_bytes)
         if params and "id" in params:
-            return _FakeResponse(json_data={"data": {"id": "1", "files": [archive_url]}})
+            return _FakeResponse(
+                json_data={"data": {"id": "1", "files": [archive_url]}}
+            )
         if "/rest/data/" in url:
             return _FakeResponse(json_data={"data": [{"id": "1", "title": title}]})
         raise AssertionError(f"unexpected URL: {url}")
@@ -112,8 +114,10 @@ def test_dependency_ratios_extracts_and_crops(wp_kwargs, monkeypatch, tiny_tif_b
     ]
     archive = _make_7z(tiny_tif_bytes, names)
     _patch_archive_http(
-        monkeypatch, "Africa 1km Dependency Ratios",
-        "https://x/Africa_1km_Dependency_Ratios.7z", archive,
+        monkeypatch,
+        "Africa 1km Dependency Ratios",
+        "https://x/Africa_1km_Dependency_Ratios.7z",
+        archive,
     )
     backend = WorldPop(
         **wp_kwargs(variables=["dependency_ratios"], resolution="1km", aoi="KEN")
@@ -128,16 +132,24 @@ def test_dependency_ratios_extracts_and_crops(wp_kwargs, monkeypatch, tiny_tif_b
     assert Dataset.read_file(str(out[0])).epsg == 4326
 
 
-def test_dependency_ratios_unsupported_continent_errors(wp_kwargs, monkeypatch, tiny_tif_bytes):
+def test_dependency_ratios_unsupported_continent_errors(
+    wp_kwargs, monkeypatch, tiny_tif_bytes
+):
     """An AOI outside the served continents raises a clear error."""
     _patch_archive_http(
-        monkeypatch, "Africa 1km Dependency Ratios", "https://x/a.7z",
+        monkeypatch,
+        "Africa 1km Dependency Ratios",
+        "https://x/a.7z",
         _make_7z(tiny_tif_bytes, ["AFR_2010_SubNat_DepRatio.tif"]),
     )
     # a bbox centre over the mid-Atlantic is in no served continent
     backend = WorldPop(
-        **wp_kwargs(variables=["dependency_ratios"], resolution="1km",
-                    lat_lim=[0.0, 1.0], lon_lim=[-30.0, -29.0])
+        **wp_kwargs(
+            variables=["dependency_ratios"],
+            resolution="1km",
+            lat_lim=[0.0, 1.0],
+            lon_lim=[-30.0, -29.0],
+        )
     )
     with pytest.raises(ValueError, match="not in a supported continent"):
         backend.download(progress_bar=False)
@@ -148,12 +160,19 @@ def test_future_pop_opt_in_extracts_year(wp_kwargs, monkeypatch, tiny_tif_bytes)
     names = ["ssp2_2025_1km.tif", "ssp2_2030_1km.tif", "ssp2_2100_1km.tif"]
     archive = _make_zip(tiny_tif_bytes, names)
     _patch_archive_http(
-        monkeypatch, "Global projections",
-        "https://x/FuturePop_SSP2_1km_v0_2.zip", archive,
+        monkeypatch,
+        "Global projections",
+        "https://x/FuturePop_SSP2_1km_v0_2.zip",
+        archive,
     )
     backend = WorldPop(
-        **wp_kwargs(variables=["future_pop"], resolution="1km", year=2030,
-                    ssp="SSP2", allow_large_archive=True)
+        **wp_kwargs(
+            variables=["future_pop"],
+            resolution="1km",
+            year=2030,
+            ssp="SSP2",
+            allow_large_archive=True,
+        )
     )
     out = backend.download(progress_bar=False)
     assert len(out) == 1
@@ -241,7 +260,9 @@ def _patch_global_http(monkeypatch, tiny_tif_bytes, files):
 
 def test_global_search_plans_global_item(wp_kwargs, monkeypatch, tiny_tif_bytes):
     """_search plans a global item (iso3='global') for a global-scope request."""
-    _patch_global_http(monkeypatch, tiny_tif_bytes, ["https://x/ppp_2000_1km_Aggregated.tif"])
+    _patch_global_http(
+        monkeypatch, tiny_tif_bytes, ["https://x/ppp_2000_1km_Aggregated.tif"]
+    )
     backend = WorldPop(**wp_kwargs(year=2000, resolution="1km", scope="global"))
     plan = backend._search()
     assert len(plan) == 1
@@ -251,7 +272,9 @@ def test_global_search_plans_global_item(wp_kwargs, monkeypatch, tiny_tif_bytes)
 
 def test_global_download_crops_to_aoi(wp_kwargs, monkeypatch, tiny_tif_bytes):
     """A global-mosaic download crops the whole-world file to the AOI bbox."""
-    _patch_global_http(monkeypatch, tiny_tif_bytes, ["https://x/ppp_2000_1km_Aggregated.tif"])
+    _patch_global_http(
+        monkeypatch, tiny_tif_bytes, ["https://x/ppp_2000_1km_Aggregated.tif"]
+    )
     backend = WorldPop(**wp_kwargs(year=2000, resolution="1km", scope="global"))
     out = backend.download(progress_bar=False)
     tifs = [p for p in out if str(p).endswith(".tif")]
@@ -392,7 +415,9 @@ def test_404_propagates(wp_kwargs, monkeypatch):
         backend.download(progress_bar=False)
 
 
-def test_http_get_retries_transient_then_succeeds(wp_kwargs, monkeypatch, tiny_tif_bytes):
+def test_http_get_retries_transient_then_succeeds(
+    wp_kwargs, monkeypatch, tiny_tif_bytes
+):
     """A transient ConnectionError is retried with backoff, then succeeds."""
     import earthlens.worldpop.backend as backend_mod
 
@@ -496,7 +521,9 @@ def test_worldpoppy_search_skips_rest(wp_kwargs, fake_worldpoppy):
     assert plan and all(rp.href is None for rp in plan)
 
 
-def test_worldpoppy_multiproduct_attribution(wp_kwargs, monkeypatch, tiny_tif_bytes, tmp_path):
+def test_worldpoppy_multiproduct_attribution(
+    wp_kwargs, monkeypatch, tiny_tif_bytes, tmp_path
+):
     """Two products via worldpoppy are attributed to distinct files by provenance."""
     import sys
     import types
@@ -521,7 +548,10 @@ def test_worldpoppy_multiproduct_attribution(wp_kwargs, monkeypatch, tiny_tif_by
 
     backend = WorldPop(
         **wp_kwargs(
-            variables=["pop", "pop_density"], year=2020, resolution="1km", api="worldpoppy"
+            variables=["pop", "pop_density"],
+            year=2020,
+            resolution="1km",
+            api="worldpoppy",
         )
     )
     out = backend.download(progress_bar=False)

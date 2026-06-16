@@ -72,7 +72,13 @@ class _FakeFirms:
 
 @pytest.fixture
 def fake_firms(monkeypatch: pytest.MonkeyPatch) -> _FakeFirms:
-    """Patch `requests.get` in the FIRMS backend with the recording fake."""
+    """Patch `requests.get` in the FIRMS backend with the recording fake.
+
+    Also sets a dummy `FIRMS_MAP_KEY` so `download()` resolves a key from
+    the environment via its lazy `authenticate()`; tests that need a
+    specific key call `backend.authenticate(api_key=...)` to override.
+    """
+    monkeypatch.setenv("FIRMS_MAP_KEY", "k")
     state = _FakeFirms()
     monkeypatch.setattr("earthlens.firms.backend.requests.get", state)
     return state

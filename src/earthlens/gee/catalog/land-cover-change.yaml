@@ -7897,4 +7897,3 @@ datasets:
       Nighttime:
         description: Nighttime UHI
         units: 'deg_C'
-

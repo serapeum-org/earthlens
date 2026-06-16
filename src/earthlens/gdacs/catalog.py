@@ -41,7 +41,7 @@ CATALOG_PATH: Path = Path(__file__).parent / "gdacs_data_catalog.yaml"
 #: Module-level parse cache keyed on `(resolved_path, st_mtime_ns)` so a
 #: repeated `Catalog()` skips the YAML parse + pydantic validation. Mirrors
 #: the FDSN / NWP / radar loaders.
-_CATALOG_CACHE: dict[tuple[str, int], dict[str, "HazardType"]] = {}
+_CATALOG_CACHE: dict[tuple[str, int], dict[str, HazardType]] = {}
 
 
 def clear_catalog_cache() -> None:
@@ -112,7 +112,7 @@ class Catalog(AbstractCatalog):
             >>> Catalog().get_hazard("EQK")
             Traceback (most recent call last):
                 ...
-            ValueError: 'EQK' is not in the GDACS hazard catalog. Known datasets: ['DR', 'EQ', 'FL', 'TC', 'VO', 'WF']. Did you mean 'EQ'?
+            ValueError: 'EQK' is not in the GDACS hazard catalog. Known hazard types: ['DR', 'EQ', 'FL', 'TC', 'VO', 'WF']. Did you mean 'EQ'?
 
             ```
     """

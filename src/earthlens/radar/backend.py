@@ -42,7 +42,7 @@ from earthlens.base import (
     SpatialExtent,
     TemporalExtent,
 )
-from earthlens.radar.catalog import Station, Catalog
+from earthlens.radar.catalog import Catalog, Station
 
 if TYPE_CHECKING:
     from earthlens.aggregate import AggregationConfig
@@ -346,7 +346,9 @@ class Radar(AbstractDataSource):
         """
         return [path for _, path in self._fetch_pairs(products)]
 
-    def _fetch_pairs(self, products: list[RemoteProduct]) -> list[tuple[RemoteProduct, Path]]:
+    def _fetch_pairs(
+        self, products: list[RemoteProduct]
+    ) -> list[tuple[RemoteProduct, Path]]:
         """Assemble each volume, returning `(product, path)` pairs.
 
         Like :meth:`_fetch` but keeps each path paired with the product
@@ -385,7 +387,9 @@ class Radar(AbstractDataSource):
         try:
             with open(tmp, "wb") as handle:
                 for key in meta["chunk_keys"]:
-                    handle.write(client.get_object(Bucket=BUCKET, Key=key)["Body"].read())
+                    handle.write(
+                        client.get_object(Bucket=BUCKET, Key=key)["Body"].read()
+                    )
             tmp.replace(target)
         except BaseException:
             tmp.unlink(missing_ok=True)

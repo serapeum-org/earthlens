@@ -36,7 +36,7 @@ CATALOG_PATH: Path = Path(__file__).parent / "usgs_water_data_catalog.yaml"
 #: plus the YAML's `st_mtime_ns`, so editing the file invalidates the
 #: entry without re-parsing on every `Catalog()`. Mirrors the
 #: `_CATALOG_CACHE` pattern in the GEE / ECMWF / CMEMS / FDSN loaders.
-_CATALOG_CACHE: dict[tuple[str, int], dict[str, "Parameter"]] = {}
+_CATALOG_CACHE: dict[tuple[str, int], dict[str, Parameter]] = {}
 
 #: A 5-digit NWIS parameter code (the raw form `resolve` passes through).
 _CODE_RE = re.compile(r"^\d{5}$")
@@ -53,7 +53,7 @@ def clear_catalog_cache() -> None:
     _CATALOG_CACHE.clear()
 
 
-def _load_catalog_data(path: Path) -> dict[str, "Parameter"]:
+def _load_catalog_data(path: Path) -> dict[str, Parameter]:
     """Parse, validate, and cache the parameter catalog at `path`.
 
     Args:

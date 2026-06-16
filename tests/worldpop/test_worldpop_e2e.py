@@ -103,9 +103,14 @@ def test_live_dependency_ratios_archive(tmp_path: Path):
     out = EarthLens(
         data_source="worldpop",
         variables=["dependency_ratios"],
-        start="2010", end="2010", fmt="%Y",
-        lat_lim=[-4.0, 4.0], lon_lim=[34.0, 41.0],
-        path=str(tmp_path), aoi="KEN", resolution="1km",
+        start="2010",
+        end="2010",
+        fmt="%Y",
+        lat_lim=[-4.0, 4.0],
+        lon_lim=[34.0, 41.0],
+        path=str(tmp_path),
+        aoi="KEN",
+        resolution="1km",
     ).download(progress_bar=False)
     tifs = [p for p in out if str(p).endswith(".tif")]
     assert len(tifs) == 3  # total / old-age / young-age ratios

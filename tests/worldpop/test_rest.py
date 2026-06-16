@@ -96,7 +96,9 @@ def _fake_global(monkeypatch, summary, detail_files):
 
     def fake_get(url, params=None, timeout=None):
         if params and "id" in params:
-            return _FakeResponse(json_data={"data": {"id": params["id"], "files": detail_files}})
+            return _FakeResponse(
+                json_data={"data": {"id": params["id"], "files": detail_files}}
+            )
         return _FakeResponse(json_data={"data": summary})
 
     monkeypatch.setattr(requests, "get", fake_get)

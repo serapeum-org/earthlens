@@ -1,4 +1,4 @@
-"""Unit tests for :meth:`ECMWF._initialize` and the credentials heuristic.
+"""Unit tests for :meth:`ECMWF._open_client` and the credentials heuristic.
 
 Covers H3 (the rewritten error message), C2 (only wrap credential-
 shaped errors as `AuthenticationError`), and the contract that
@@ -17,14 +17,14 @@ pytestmark = [pytest.mark.unit]
 
 
 class TestInitialize:
-    """Tests for :meth:`ECMWF._initialize` (H3, C2)."""
+    """Tests for :meth:`ECMWF._open_client` (H3, C2)."""
 
     def test_returns_constructed_client_when_credentials_valid(self, monkeypatch):
-        """`initialize()` returns whatever `cdsapi.Client()` returns."""
+        """`_open_client()` returns whatever `cdsapi.Client()` returns."""
         sentinel = _SentinelClient()
         monkeypatch.setattr(cdsapi, "Client", lambda: sentinel)
         ecmwf = ECMWF.__new__(ECMWF)
-        result = ecmwf._initialize()
+        result = ecmwf._open_client()
         assert result is sentinel
 
     def test_raises_authentication_error_when_cdsapi_raises(self, monkeypatch):
@@ -37,7 +37,7 @@ class TestInitialize:
         monkeypatch.setattr(cdsapi, "Client", boom)
         ecmwf = ECMWF.__new__(ECMWF)
         with pytest.raises(AuthenticationError) as excinfo:
-            ecmwf._initialize()
+            ecmwf._open_client()
         assert excinfo.value.__cause__ is original
 
     def test_non_credentials_exception_propagates_untouched(self, monkeypatch):
@@ -52,7 +52,7 @@ class TestInitialize:
         monkeypatch.setattr(cdsapi, "Client", boom)
         ecmwf = ECMWF.__new__(ECMWF)
         with pytest.raises(ConnectionError) as excinfo:
-            ecmwf._initialize()
+            ecmwf._open_client()
         assert excinfo.value is original
 
     def test_error_message_points_at_cdsapirc(self, monkeypatch):
@@ -64,7 +64,7 @@ class TestInitialize:
         monkeypatch.setattr(cdsapi, "Client", boom)
         ecmwf = ECMWF.__new__(ECMWF)
         with pytest.raises(AuthenticationError) as excinfo:
-            ecmwf._initialize()
+            ecmwf._open_client()
         message = str(excinfo.value)
         assert "~/.cdsapirc" in message
         assert "cds.climate.copernicus.eu/how-to-api" in message
@@ -78,7 +78,7 @@ class TestInitialize:
         monkeypatch.setattr(cdsapi, "Client", boom)
         ecmwf = ECMWF.__new__(ECMWF)
         with pytest.raises(AuthenticationError) as excinfo:
-            ecmwf._initialize()
+            ecmwf._open_client()
         message = str(excinfo.value)
         for legacy in ("ECMWF_API_URL", "ECMWF_API_KEY", "ECMWF_API_EMAIL"):
             assert legacy not in message

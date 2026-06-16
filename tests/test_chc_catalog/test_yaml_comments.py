@@ -10,9 +10,7 @@ from earthlens.chc.catalog import CATALOG_PATH
 pytestmark = [pytest.mark.chc]
 
 
-_PROVISIONAL_LINE = (
-    "Provisional pattern; verify against the FTP listing before use."
-)
+_PROVISIONAL_LINE = "Provisional pattern; verify against the FTP listing before use."
 
 
 def _read_folded(name: str) -> str:

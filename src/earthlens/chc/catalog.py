@@ -62,6 +62,12 @@ import warnings
 from pathlib import Path
 from typing import Any, Literal
 
+import pandas as pd
+from pydantic import BaseModel, ConfigDict, Field, ValidationError, model_validator
+
+from earthlens.base import AbstractCatalog, FluxableLeaf
+from earthlens.base.yaml_loader import load_yaml_strict
+
 #: Canonical `temporal_resolution` vocabulary for CHC datasets (M1).
 #:
 #: Every value here is currently used by at least one bundled dataset.
@@ -87,12 +93,6 @@ _TEMPORAL_RESOLUTIONS: tuple[str, ...] = (
     "seasonal",
 )
 
-import pandas as pd
-from pydantic import BaseModel, ConfigDict, Field, ValidationError, model_validator
-
-from earthlens.base import AbstractCatalog, FluxableLeaf
-from earthlens.base.yaml_loader import load_yaml_strict
-
 CATALOG_PATH: Path = Path(__file__).parent / "catalog"
 
 # Module-level cache of parsed catalog data. The cache key is
@@ -115,7 +115,7 @@ CATALOG_PATH: Path = Path(__file__).parent / "catalog"
 _CacheKey = tuple[str, int | tuple[tuple[str, int], ...]]
 _CATALOG_CACHE: dict[
     _CacheKey,
-    tuple[list[str], dict[str, dict[str, list[float]]], dict[str, "Dataset"]],
+    tuple[list[str], dict[str, dict[str, list[float]]], dict[str, Dataset]],
 ] = {}
 
 
@@ -339,8 +339,8 @@ class Dataset(BaseModel):
         """
         if self.file_patterns is None:
             raise ValueError(
-                f"Dataset uses `discrete_files`; iterate "
-                f"`dataset.discrete_files[fmt]` instead."
+                "Dataset uses `discrete_files`; iterate "
+                "`dataset.discrete_files[fmt]` instead."
             )
         return self.file_patterns[self.default_format]
 
@@ -355,7 +355,7 @@ def _build_chc_dataset(
     ds_body: dict[str, Any],
     regions_map: dict[str, dict[str, list[float]]],
     source_path: Path,
-) -> tuple["Dataset", int]:
+) -> tuple[Dataset, int]:
     """Build one :class:`Dataset` from its YAML body + variables (N1).
 
     Validates every variable into a :class:`Variable`, resolves the
@@ -476,15 +476,14 @@ def _build_chc_dataset(
         )
     except (ValidationError, KeyError) as exc:
         raise ValueError(
-            f"{source_path.name} dataset {ds_key!r} "
-            f"failed validation:\n{exc}"
+            f"{source_path.name} dataset {ds_key!r} " f"failed validation:\n{exc}"
         ) from exc
     return ds, len(ds_vars)
 
 
 def _load_catalog_data(
     path: Path,
-) -> tuple[list[str], dict[str, dict[str, list[float]]], dict[str, "Dataset"]]:
+) -> tuple[list[str], dict[str, dict[str, list[float]]], dict[str, Dataset]]:
     """Parse, validate, and cache the CHC catalog at `path` (M2).
 
     Dispatches on file vs. directory:
@@ -543,7 +542,7 @@ def _load_catalog_data(
 
 def _load_catalog_file(
     path: Path,
-) -> tuple[list[str], dict[str, dict[str, list[float]]], dict[str, "Dataset"]]:
+) -> tuple[list[str], dict[str, dict[str, list[float]]], dict[str, Dataset]]:
     """Read a legacy single-file CHC catalog into the standard triple."""
     data = load_yaml_strict(path) or {}
 
@@ -576,7 +575,7 @@ def _load_catalog_file(
 
 def _load_catalog_directory(
     directory: Path,
-) -> tuple[list[str], dict[str, dict[str, list[float]]], dict[str, "Dataset"]]:
+) -> tuple[list[str], dict[str, dict[str, list[float]]], dict[str, Dataset]]:
     """Read a GEE-style split catalog (one file per product family).
 
     Layout expected under `directory`:
@@ -601,9 +600,7 @@ def _load_catalog_directory(
 
     index_data = load_yaml_strict(index_path) or {}
     available = list(index_data.get("available_datasets") or [])
-    regions_map: dict[str, dict[str, list[float]]] = (
-        index_data.get("regions") or {}
-    )
+    regions_map: dict[str, dict[str, list[float]]] = index_data.get("regions") or {}
 
     structural: dict[str, Dataset] = {}
     seen_in: dict[str, str] = {}
@@ -620,9 +617,7 @@ def _load_catalog_directory(
                     "Each CHC dataset key must live in exactly one "
                     "per-family file."
                 )
-            ds, n_vars = _build_chc_dataset(
-                ds_key, ds_body, regions_map, yaml_path
-            )
+            ds, n_vars = _build_chc_dataset(ds_key, ds_body, regions_map, yaml_path)
             structural[ds_key] = ds
             seen_in[ds_key] = yaml_path.name
             total_vars += n_vars
@@ -876,9 +871,7 @@ class Catalog(AbstractCatalog):
         used_regions: set[str] = set()
         # Track `(units, types)` tuples per `(variable_name, temporal_resolution)`
         # so the drift check can flag heterogeneous groups in one pass.
-        variable_metadata: dict[
-            tuple[str, str], set[tuple[str, str | None]]
-        ] = {}
+        variable_metadata: dict[tuple[str, str], set[tuple[str, str | None]]] = {}
         for ds_key, ds in self.datasets.items():
             if not ds.variables:
                 empty_dataset.append(ds_key)
@@ -1092,8 +1085,10 @@ class Catalog(AbstractCatalog):
         for key, ds in self.datasets.items():
             if region is not None and ds.region != region:
                 continue
-            if temporal_resolution is not None and ds.temporal_resolution != temporal_resolution:
+            if (
+                temporal_resolution is not None
+                and ds.temporal_resolution != temporal_resolution
+            ):
                 continue
             result.append(key)
         return sorted(result)
-

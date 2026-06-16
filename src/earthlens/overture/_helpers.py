@@ -178,9 +178,7 @@ def derive_license_ids(gdf: pd.DataFrame) -> pd.Series:
             ```
     """
     if "sources" not in gdf.columns:
-        return pd.Series(
-            [CDLA_PERMISSIVE] * len(gdf), index=gdf.index, dtype="object"
-        )
+        return pd.Series([CDLA_PERMISSIVE] * len(gdf), index=gdf.index, dtype="object")
     return gdf["sources"].apply(row_license).astype("object")
 
 

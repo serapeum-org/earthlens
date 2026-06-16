@@ -31,18 +31,20 @@ from loguru import logger
 
 from earthlens.base import (
     AbstractDataSource,
+    LazyClientMixin,
     OutputKind,
     RemoteProduct,
     SpatialExtent,
     TemporalExtent,
+    crop_to_aoi,
 )
 
 if TYPE_CHECKING:
     from earthlens.aggregate import AggregationConfig
-    from earthlens.stac.catalog import Catalog, Collection, Endpoint
+    from earthlens.stac.catalog import Catalog, Endpoint
 
 
-class STAC(AbstractDataSource):
+class STAC(LazyClientMixin, AbstractDataSource):
     """Unified STAC-API + COG backend (Planetary Computer / CDSE / Earth Search).
 
     Attributes:
@@ -135,7 +137,6 @@ class STAC(AbstractDataSource):
         self._signer: Any = None
         # Per-collection signer overrides, built on demand and cached by type.
         self._signer_cache: dict[str, Any] = {}
-        self._client: Any = None
         super().__init__(
             start=start,
             end=end,
@@ -148,10 +149,13 @@ class STAC(AbstractDataSource):
         )
 
     def _initialize(self) -> None:
-        """Load the catalog, resolve the endpoint + signer, open the STAC client.
+        """Load the catalog and resolve the endpoint + signer (offline).
 
-        Returns `None` so the parent does not bind `self.client`; the opened
-        client is stored on `self._client`.
+        Eager, network-free setup: validate the request, load the catalog,
+        resolve the endpoint, and build the signer. Returns `None` — the
+        STAC client itself is opened lazily on first access to
+        `self.client` (see :meth:`_open_client`), so constructing the
+        backend never opens a connection.
 
         Raises:
             ValueError: When `variables` is empty, names an endpoint /
@@ -176,7 +180,10 @@ class STAC(AbstractDataSource):
         # otherwise a later collection would silently search the wrong API.
         for col_key in self._variables:
             collection = self._catalog.get_collection(col_key)
-            if self._endpoint != collection.endpoint and self._endpoint not in collection.aliases:
+            if (
+                self._endpoint != collection.endpoint
+                and self._endpoint not in collection.aliases
+            ):
                 raise ValueError(
                     f"collection {col_key!r} is not served by endpoint "
                     f"{self._endpoint!r} (home {collection.endpoint!r}, aliases "
@@ -186,11 +193,22 @@ class STAC(AbstractDataSource):
         self._signer = build_signer(
             self._endpoint_obj.signer, **self._signer_credentials()
         )
+        return None
 
+    def _open_client(self) -> Any:
+        """Open the STAC API client for the resolved endpoint (lazily).
+
+        Called by :attr:`~earthlens.base.LazyClientMixin.client` on first
+        use, so the network round-trip `open_client` makes (reading the
+        API's landing page) happens at `search()` / `download()` time
+        rather than at construction.
+
+        Returns:
+            The opened STAC client, signed with the endpoint's signer.
+        """
         from pyramids.stac import open_client
 
-        self._client = open_client(self._endpoint_obj.url, signer=self._signer)
-        return None
+        return open_client(self._endpoint_obj.url, signer=self._signer)
 
     def _create_grid(self, lat_lim: list, lon_lim: list) -> SpatialExtent:
         """Build the search AOI bbox(es) and the WGS84 envelope.
@@ -265,7 +283,7 @@ class STAC(AbstractDataSource):
             assets = list(requested) or list(collection.default_assets)
             resolved_id = self._catalog.resolve(self._endpoint, collection_key)
             for bbox in self._bboxes():
-                search = self._client.search(
+                search = self.client.search(
                     collections=[resolved_id],
                     bbox=list(bbox),
                     datetime=f"{start}/{end}",
@@ -339,8 +357,11 @@ class STAC(AbstractDataSource):
                     # reprojects mismatched-CRS tiles onto one grid in a single
                     # pass (multi-UTM Sentinel-2). A single tile is handled too.
                     merge_rasters(
-                        [str(h) for h in hrefs], str(tmp), method="last",
-                        dst_crs=target_crs, no_data_value=nodata,
+                        [str(h) for h in hrefs],
+                        str(tmp),
+                        method="last",
+                        dst_crs=target_crs,
+                        no_data_value=nodata,
                     )
                     band_paths.append(tmp)
                 stacked = self._stack_bands(band_paths, list(assets), nodata)
@@ -349,8 +370,12 @@ class STAC(AbstractDataSource):
                 part = f"_part{idx}" if multi else ""
                 target = Path(self.root_dir) / f"{safe_key}_{date}{part}.tif"
                 # crop wants the bbox as a keyword in an explicit CRS; the AOI
-                # is WGS84 while the mosaic is in the tiles' native CRS.
-                write_cog(stacked.crop(bbox=list(bbox_key), epsg=4326), str(target))
+                # is WGS84 while the mosaic is in the tiles' native CRS. A
+                # polygon aoi= masks to the exact shape (see crop_to_aoi).
+                write_cog(
+                    crop_to_aoi(stacked, self.space, bbox=list(bbox_key), touch=True),
+                    str(target),
+                )
             out.append(target)
             self._written.append((collection_key, date, idx, target))
             _cleanup(band_paths)
@@ -448,7 +473,9 @@ class STAC(AbstractDataSource):
                 return asset.nodata
         return 0
 
-    def _stack_bands(self, band_paths: list[Path], assets: list[str], nodata: float | int) -> Any:
+    def _stack_bands(
+        self, band_paths: list[Path], assets: list[str], nodata: float | int
+    ) -> Any:
         """Stack per-band mosaics into one multiband `Dataset`.
 
         Delegates to pyramids' `stack_bands(align=True, no_data_value=…)`: same
@@ -472,8 +499,10 @@ class STAC(AbstractDataSource):
         from pyramids.dataset.merge import stack_bands
 
         return stack_bands(
-            [str(p) for p in band_paths], band_names=list(assets),
-            align=True, no_data_value=nodata,
+            [str(p) for p in band_paths],
+            band_names=list(assets),
+            align=True,
+            no_data_value=nodata,
         )
 
     def download(
@@ -522,7 +551,9 @@ class STAC(AbstractDataSource):
         from pyramids.dataset.cog import write_cog
 
         op = "mean" if config.op == "auto" else config.op
-        out_dir = Path(config.out_dir) if config.out_dir is not None else Path(self.root_dir)
+        out_dir = (
+            Path(config.out_dir) if config.out_dir is not None else Path(self.root_dir)
+        )
         out_dir.mkdir(parents=True, exist_ok=True)
 
         groups: dict[tuple[str, int], list[tuple[str, Path]]] = {}
@@ -541,8 +572,13 @@ class STAC(AbstractDataSource):
             geo, epsg = _geo_of(Dataset, files[0])
             part = f"_part{idx}" if multi else ""
             for label, array in reduced.items():
-                target = out_dir / f"{collection_key}_{op}_{config.freq}_{label}{part}.tif"
-                write_cog(Dataset.create_from_array(arr=array, geo=geo, epsg=epsg), str(target))
+                target = (
+                    out_dir / f"{collection_key}_{op}_{config.freq}_{label}{part}.tif"
+                )
+                write_cog(
+                    Dataset.create_from_array(arr=array, geo=geo, epsg=epsg),
+                    str(target),
+                )
                 written.append(target)
         # The per-date COGs are intermediates of the aggregation; drop them so
         # the caller is left with only the per-window outputs.
@@ -668,7 +704,7 @@ def _to_vsi(href: str) -> str:
         The GDAL-readable href.
     """
     if href.startswith("s3://"):
-        return "/vsis3/" + href[len("s3://"):]
+        return "/vsis3/" + href[len("s3://") :]
     return href
 
 

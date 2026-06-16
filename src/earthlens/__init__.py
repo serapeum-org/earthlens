@@ -30,9 +30,17 @@ except ImportError:  # pragma: no cover
     from importlib_metadata import version
 
 from earthlens.aggregate import AggregationConfig, aggregate_netcdf
-from earthlens.earthlens import EarthLens
+from earthlens.earthlens import EarthLens, download, find, search, sources
 
-__all__ = ["AggregationConfig", "EarthLens", "aggregate_netcdf"]
+__all__ = [
+    "AggregationConfig",
+    "EarthLens",
+    "aggregate_netcdf",
+    "download",
+    "find",
+    "search",
+    "sources",
+]
 
 
 try:

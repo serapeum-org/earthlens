@@ -58,8 +58,7 @@ def _write_catalog(tmp_path: Path, dataset_block: str) -> Path:
         "  global:\n"
         "    lat_boundaries: [-50, 50]\n"
         "    lon_boundaries: [-180, 180]\n"
-        "datasets:\n"
-        + dataset_block,
+        "datasets:\n" + dataset_block,
         encoding="utf-8",
     )
     return catalog_yaml
@@ -94,7 +93,9 @@ class TestTemporalResolutionVocabulary:
         block = _dataset_block("synth", temporal_resolution="not-a-resolution")
         catalog_yaml = _write_catalog(tmp_path, block)
         clear_catalog_cache()
-        with pytest.raises(ValueError, match=r"not-a-resolution|temporal_resolution") as exc:
+        with pytest.raises(
+            ValueError, match=r"not-a-resolution|temporal_resolution"
+        ) as exc:
             Catalog.load(catalog_path=catalog_yaml)
         message = str(exc.value)
         # Either the raw pydantic ValidationError mentions the literal options,
@@ -121,4 +122,6 @@ class TestTemporalResolutionVocabulary:
             Catalog.load(catalog_path=catalog_yaml)
         # `_build_chc_dataset` wraps the pydantic ValidationError as ValueError;
         # `__cause__` should point at the original pydantic exception.
-        assert isinstance(exc.value.__cause__, ValidationError) or "weekly" in str(exc.value)
+        assert isinstance(exc.value.__cause__, ValidationError) or "weekly" in str(
+            exc.value
+        )

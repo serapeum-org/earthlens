@@ -136,7 +136,8 @@ class TestECMWFBackend:
     def test_ecmwf_is_registered_in_data_sources(self):
         """`EarthLens.DataSources` maps `"ecmwf"` to :class:`ECMWF`."""
         assert "ecmwf" in EarthLens.DataSources, (
-            f"'ecmwf' missing from DataSources keys: " f"{sorted(EarthLens.DataSources)}"
+            f"'ecmwf' missing from DataSources keys: "
+            f"{sorted(EarthLens.DataSources)}"
         )
         assert EarthLens.DataSources["ecmwf"] is ECMWF, (
             f"DataSources['ecmwf'] should be the ECMWF class; got "
@@ -167,7 +168,7 @@ class TestECMWFBackend:
 
     def test_unknown_data_source_still_raises(self, tmp_path):
         """Unknown `data_source` values still raise `ValueError`."""
-        with pytest.raises(ValueError, match="not supported"):
+        with pytest.raises(ValueError, match="is not a supported data source"):
             EarthLens(
                 data_source="not-a-real-source",
                 start="2022-01-01",
@@ -213,16 +214,55 @@ class TestECMWFBackend:
             ecmwf.root_dir == tmp_path.resolve()
         ), f"root_dir should be the tmp path; got {ecmwf.root_dir}"
 
+    def test_dataset_arg_composes_variables_dict(self, tmp_path, monkeypatch):
+        """`dataset=` + a list yields the same vars as the nested-dict form."""
+        monkeypatch.setattr(cdsapi, "Client", lambda: _SentinelClient())
+
+        earthlens = EarthLens(
+            data_source="ecmwf",
+            temporal_resolution="monthly",
+            start="2022-01-01",
+            end="2022-02-01",
+            dataset="reanalysis-era5-single-levels",
+            variables=["2m-temperature", "total-precipitation"],
+            lat_lim=[4.0, 5.0],
+            lon_lim=[-75.0, -74.0],
+            path=str(tmp_path),
+        )
+
+        assert earthlens.datasource.vars == {
+            "reanalysis-era5-single-levels": [
+                "2m-temperature",
+                "total-precipitation",
+            ],
+        }, f"dataset= should compose the keyed dict; got {earthlens.datasource.vars!r}"
+
+    def test_dataset_arg_with_dict_variables_raises(self, tmp_path, monkeypatch):
+        """`dataset=` together with a dict `variables` is rejected."""
+        monkeypatch.setattr(cdsapi, "Client", lambda: _SentinelClient())
+
+        with pytest.raises(ValueError, match="pass variables= as a list"):
+            EarthLens(
+                data_source="ecmwf",
+                start="2022-01-01",
+                end="2022-02-01",
+                dataset="reanalysis-era5-single-levels",
+                variables={"reanalysis-era5-single-levels": ["2m-temperature"]},
+                lat_lim=[4.0, 5.0],
+                lon_lim=[-75.0, -74.0],
+                path=str(tmp_path),
+            )
+
     def test_full_download_through_facade_routes_to_cdsapi(self, tmp_path, monkeypatch):
         """End-to-end: `EarthLens(...).download()` reaches CDS.
 
-            * Two cdsapi.Client.retrieve calls — one per variable
-            * Each retrieve receives the right dataset name and
-              `variable=[cds_variable]` from the catalog
+        * Two cdsapi.Client.retrieve calls — one per variable
+        * Each retrieve receives the right dataset name and
+          `variable=[cds_variable]` from the catalog
 
-            Per-date GeoTIFF post-processing is intentionally not
-            part of the package; see
-            `examples/post_process_ecmwf_netcdf.py`.
+        Per-date GeoTIFF post-processing is intentionally not
+        part of the package; see
+        `examples/post_process_ecmwf_netcdf.py`.
         """
         retrieved = []
 
@@ -329,12 +369,12 @@ class TestEarthLensDownloadAggregate:
         cfg = AggregationConfig(freq="1D")
         stub_facade.download(progress_bar=False, aggregate=cfg)
         _, kwargs = stub_facade.datasource.download.call_args
-        assert kwargs.get("progress_bar") is False, (
-            f"`progress_bar` should still be forwarded; got kwargs={kwargs!r}"
-        )
-        assert kwargs.get("aggregate") is cfg, (
-            f"`aggregate` should be forwarded alongside; got kwargs={kwargs!r}"
-        )
+        assert (
+            kwargs.get("progress_bar") is False
+        ), f"`progress_bar` should still be forwarded; got kwargs={kwargs!r}"
+        assert (
+            kwargs.get("aggregate") is cfg
+        ), f"`aggregate` should be forwarded alongside; got kwargs={kwargs!r}"
 
     def test_extra_kwargs_pass_through_unchanged(self, stub_facade):
         """Backend-specific kwargs (e.g. CHIRPS `cores=`) still pass through."""
@@ -363,9 +403,9 @@ class TestTopLevelReExports:
         """`AggregationConfig` and `aggregate_netcdf` resolve at top level."""
         import earthlens
 
-        assert earthlens.AggregationConfig is AggregationConfig, (
-            f"Top-level AggregationConfig drift: {earthlens.AggregationConfig!r}"
-        )
+        assert (
+            earthlens.AggregationConfig is AggregationConfig
+        ), f"Top-level AggregationConfig drift: {earthlens.AggregationConfig!r}"
         assert callable(earthlens.aggregate_netcdf), (
             f"Top-level aggregate_netcdf must be callable; got "
             f"{earthlens.aggregate_netcdf!r}"
@@ -379,4 +419,827 @@ class TestTopLevelReExports:
             "AggregationConfig",
             "EarthLens",
             "aggregate_netcdf",
+            "download",
+            "find",
+            "search",
+            "sources",
         ], f"Unexpected top-level __all__: {earthlens.__all__!r}"
+
+
+class TestFunctionalDownload:
+    """The one-shot earthlens.download() entry point."""
+
+    def test_download_is_exported(self):
+        """earthlens.download is a callable on the package surface."""
+        import earthlens
+
+        assert callable(earthlens.download), "download should be callable"
+
+    def test_download_delegates_to_facade(self, monkeypatch):
+        """download() builds an EarthLens and forwards the run-time args."""
+        import earthlens
+        from earthlens import earthlens as facade_module
+
+        captured = {}
+
+        class _FakeFacade:
+            def __init__(self, **kwargs):
+                captured["init"] = kwargs
+
+            def download(self, **kwargs):
+                captured["download"] = kwargs
+                return ["written.tif"]
+
+        monkeypatch.setattr(facade_module, "EarthLens", _FakeFacade)
+        result = earthlens.download(
+            data_source="chc",
+            variables=["precipitation"],
+            start="2009-01-01",
+            end="2009-01-02",
+            path="out",
+            progress_bar=False,
+        )
+        assert result == ["written.tif"], "should return the facade result"
+        assert captured["init"]["data_source"] == "chc"
+        assert captured["init"]["variables"] == ["precipitation"]
+        assert captured["download"] == {"progress_bar": False, "aggregate": None}
+
+    def test_facade_download_forwards_backend_return(self, tmp_path, monkeypatch):
+        """EarthLens(...).download() returns the backend's value, never None (H2)."""
+        facade = EarthLens(
+            "chc",
+            variables=["precipitation"],
+            start="2009-01-01",
+            end="2009-01-02",
+            path=str(tmp_path),
+        )
+        sentinel = [tmp_path / "a.tif", tmp_path / "b.tif"]
+        monkeypatch.setattr(facade.datasource, "download", lambda *a, **k: sentinel)
+        result = facade.download(progress_bar=False)
+        assert (
+            result is sentinel
+        ), f"facade must forward the backend paths; got {result}"
+
+
+def _write_ones_tif(path):
+    """Write a tiny all-ones GeoTIFF to `path` for load() tests."""
+    import numpy as np
+    from pyramids.dataset import Dataset
+
+    Dataset.create_from_array(
+        np.ones((4, 4), "float32"),
+        geo=(0.0, 1.0, 0.0, 4.0, 0.0, -1.0),
+        epsg=4326,
+        no_data_value=-9999.0,
+    ).to_file(str(path))
+
+
+class TestFacadeLoad:
+    """EarthLens.load() returns native pyramids objects in memory (H3)."""
+
+    def _facade(self, tmp_path):
+        return EarthLens(
+            "chc",
+            variables=["precipitation"],
+            start="2020-01-01",
+            end="2020-01-02",
+            path=str(tmp_path),
+        )
+
+    def test_load_reads_rasters_into_pyramids(self, tmp_path, monkeypatch):
+        """A list of written raster paths is read into pyramids Dataset objects."""
+        from pyramids.dataset import Dataset
+
+        tif = tmp_path / "ones.tif"
+        _write_ones_tif(tif)
+        facade = self._facade(tmp_path)
+        monkeypatch.setattr(facade.datasource, "download", lambda *a, **k: [tif])
+        loaded = facade.load(progress_bar=False)
+        assert isinstance(loaded[0], Dataset), f"raster not loaded: {loaded!r}"
+        assert loaded[0].read_array().shape == (4, 4), "loaded array shape wrong"
+
+    def test_load_passes_through_in_memory_result(self, tmp_path, monkeypatch):
+        """A non-list (GeoDataFrame / DataFrame) download result passes through."""
+        gpd = pytest.importorskip("geopandas")
+        shapely = pytest.importorskip("shapely")
+        gdf = gpd.GeoDataFrame(geometry=[shapely.geometry.box(0, 0, 1, 1)], crs=4326)
+        facade = self._facade(tmp_path)
+        monkeypatch.setattr(facade.datasource, "download", lambda *a, **k: gdf)
+        out = facade.load(progress_bar=False)
+        assert out is gdf, "in-memory result not passed through"
+
+    def test_load_leaves_non_raster_paths_alone(self, tmp_path):
+        """A mixed result reads rasters but leaves a .csv table as a Path."""
+        from pyramids.dataset import Dataset
+
+        from earthlens.earthlens import _load_result
+
+        tif = tmp_path / "ones.tif"
+        _write_ones_tif(tif)
+        csv = tmp_path / "table.csv"
+        csv.write_text("a,b\n1,2\n")
+        out = _load_result([tif, csv])
+        assert isinstance(out[0], Dataset), "raster should be loaded"
+        assert out[1] == csv, "a .csv table should stay a Path"
+
+    def test_load_reads_netcdf_into_netcdf(self, tmp_path):
+        """A written .nc path is read into a pyramids NetCDF, not a Dataset."""
+        import numpy as np
+        from pyramids.dataset import Dataset
+        from pyramids.netcdf import NetCDF
+
+        from earthlens.earthlens import _load_result
+
+        nc = tmp_path / "cube.nc"
+        Dataset.create_from_array(
+            np.ones((4, 4), "float32"),
+            geo=(0.0, 1.0, 0.0, 4.0, 0.0, -1.0),
+            epsg=4326,
+        ).to_file(str(nc))
+        out = _load_result([nc])
+        assert isinstance(
+            out[0], NetCDF
+        ), f"a .nc should read as NetCDF; got {out[0]!r}"
+
+    def test_module_download_load_true_calls_load(self, monkeypatch):
+        """earthlens.download(load=True) routes to EarthLens.load()."""
+        import earthlens
+        from earthlens import earthlens as facade_module
+
+        calls = {}
+
+        class _FakeFacade:
+            def __init__(self, **kwargs):
+                calls["init"] = kwargs
+
+            def download(self, **kwargs):
+                calls["download"] = True
+                return ["x.tif"]
+
+            def load(self, **kwargs):
+                calls["load"] = True
+                return ["loaded"]
+
+        monkeypatch.setattr(facade_module, "EarthLens", _FakeFacade)
+        result = earthlens.download(
+            data_source="chc", variables=["precipitation"], load=True
+        )
+        assert result == ["loaded"], "download(load=True) should return load()"
+        assert calls.get("load") and "download" not in calls, "should call load()"
+
+
+class TestTopLevelDiscovery:
+    """Module-level sources() / search() / find() conveniences (M1)."""
+
+    def test_sources_lists_registered_keys(self):
+        """sources() returns the sorted registered data_source keys."""
+        import earthlens
+
+        keys = earthlens.sources()
+        assert keys == sorted(keys), "sources() should be sorted"
+        assert "chc" in keys and "gee" in keys, f"missing core keys: {keys[:5]}"
+
+    def test_sources_collapses_aliases_to_canonical(self):
+        """sources() lists one canonical key per backend, not the aliases."""
+        import earthlens
+
+        keys = earthlens.sources()
+        assert "chirps" not in keys, "the chirps alias should collapse to chc"
+        assert "google-earth-engine" not in keys, "the gee alias should collapse"
+        assert "planetary-computer" not in keys, "STAC endpoint keys collapse to stac"
+        assert "stac" in keys, "the canonical stac key should be present"
+        assert len(keys) == len(set(keys)), "no duplicate keys"
+
+    def test_sources_is_exported(self):
+        """sources / search / find are on the package surface."""
+        import earthlens
+
+        assert all(
+            callable(getattr(earthlens, name)) for name in ("sources", "search", "find")
+        ), "sources/search/find must be callable package attributes"
+
+    def test_search_delegates_to_facade(self, monkeypatch):
+        """search() builds an EarthLens and returns its .search()."""
+        import earthlens
+        from earthlens import earthlens as facade_module
+
+        captured = {}
+
+        class _FakeFacade:
+            def __init__(self, **kwargs):
+                captured["init"] = kwargs
+
+            def search(self):
+                captured["search"] = True
+                return ["product"]
+
+        monkeypatch.setattr(facade_module, "EarthLens", _FakeFacade)
+        result = earthlens.search(data_source="stac", variables=["red"])
+        assert result == ["product"], "search() should return facade.search()"
+        assert captured["init"]["data_source"] == "stac"
+        assert captured.get("search"), "facade.search() should be called"
+
+    def test_find_aggregates_guess_dataset(self, monkeypatch):
+        """find() collects guess_dataset hits and skips sources that raise."""
+        import earthlens
+        from earthlens import earthlens as facade_module
+
+        monkeypatch.setattr(facade_module, "sources", lambda: ["chc", "gee", "broken"])
+
+        def _fake_guess(cls, source, text):
+            if source == "broken":
+                raise ImportError("no SDK")
+            return [f"{source}-ds"] if source == "chc" else []
+
+        monkeypatch.setattr(
+            facade_module.EarthLens,
+            "guess_dataset",
+            classmethod(_fake_guess),
+        )
+        result = earthlens.find("precip")
+        assert result == {"chc": ["chc-ds"]}, f"unexpected find() result: {result}"
+
+
+@pytest.mark.chc
+class TestFacadeCadence:
+    """The cadence= alias for temporal_resolution."""
+
+    def _temporal_resolution(self, tmp_path, **kwargs):
+        return EarthLens(
+            data_source="chc",
+            variables=["precipitation"],
+            start="2009-01-01",
+            end="2009-01-02",
+            path=str(tmp_path),
+            **kwargs,
+        ).datasource.temporal_resolution
+
+    def test_cadence_overrides_temporal_resolution(self, tmp_path):
+        """cadence= takes precedence over temporal_resolution."""
+        resolved = self._temporal_resolution(
+            tmp_path, temporal_resolution="daily", cadence="monthly"
+        )
+        assert resolved == "monthly", f"cadence should win; got {resolved}"
+
+    def test_temporal_resolution_used_when_no_cadence(self, tmp_path):
+        """temporal_resolution still applies when cadence is omitted."""
+        resolved = self._temporal_resolution(tmp_path, temporal_resolution="monthly")
+        assert resolved == "monthly", f"got {resolved}"
+
+
+class TestFacadeConstructorOrder:
+    """data_source is the first positional; the legacy order is shimmed."""
+
+    def _base(self, tmp_path):
+        return dict(start="2009-01-01", end="2009-01-02", path=str(tmp_path))
+
+    def test_data_source_first_positional(self, tmp_path):
+        """EarthLens('chc', variables=[...]) puts data_source first."""
+        el = EarthLens("chc", variables=["precipitation"], **self._base(tmp_path))
+        assert type(el.datasource).__name__ == "CHIRPS", "data_source-first failed"
+
+    def test_keyword_order_still_works(self, tmp_path):
+        """The all-keyword call (variables=, data_source=) is unaffected."""
+        el = EarthLens(
+            variables=["precipitation"], data_source="chc", **self._base(tmp_path)
+        )
+        assert type(el.datasource).__name__ == "CHIRPS", "keyword call failed"
+
+    def test_legacy_positional_order_warns_and_swaps(self, tmp_path):
+        """The legacy EarthLens(variables, data_source) order warns and swaps."""
+        with pytest.warns(DeprecationWarning, match="data_source first"):
+            el = EarthLens(["precipitation"], "chc", **self._base(tmp_path))
+        assert el.datasource.vars == {"global-daily": ["precipitation"]}, "swap failed"
+
+    def test_legacy_single_positional_list_defaults_chc(self, tmp_path):
+        """A lone EarthLens([...]) variables list defaults the source to chc."""
+        with pytest.warns(DeprecationWarning):
+            el = EarthLens(["precipitation"], **self._base(tmp_path))
+        assert type(el.datasource).__name__ == "CHIRPS", "default source failed"
+
+    def test_missing_variables_raises(self, tmp_path):
+        """A source with no variables= raises a clear error, not a backend TypeError."""
+        with pytest.raises(ValueError, match="variables= is required"):
+            EarthLens("chc", **self._base(tmp_path))
+
+
+class TestFacadeTimeRange:
+    """The single time= range splits into start/end (L1)."""
+
+    def _window(self, tmp_path, **kwargs):
+        time = EarthLens(
+            "chc", variables=["precipitation"], path=str(tmp_path), **kwargs
+        ).datasource.time
+        return (
+            time.start_date.date().isoformat(),
+            time.end_date.date().isoformat(),
+        )
+
+    def test_interval_string(self, tmp_path):
+        """time='a/b' sets start and end."""
+        assert self._window(tmp_path, time="2020-01-01/2020-01-31") == (
+            "2020-01-01",
+            "2020-01-31",
+        )
+
+    def test_tuple(self, tmp_path):
+        """time=(a, b) sets start and end."""
+        assert self._window(tmp_path, time=("2020-01-01", "2020-02-01")) == (
+            "2020-01-01",
+            "2020-02-01",
+        )
+
+    def test_slice(self, tmp_path):
+        """time=slice(a, b) sets start and end."""
+        assert self._window(tmp_path, time=slice("2020-01-01", "2020-03-01")) == (
+            "2020-01-01",
+            "2020-03-01",
+        )
+
+    def test_time_with_start_end_raises(self, tmp_path):
+        """Passing both time= and start=/end= is rejected."""
+        with pytest.raises(ValueError, match="either time= or start="):
+            EarthLens(
+                "chc",
+                variables=["precipitation"],
+                path=str(tmp_path),
+                time="2020-01-01/2020-02-01",
+                start="2020-01-01",
+            )
+
+    @pytest.mark.parametrize(
+        "time",
+        ["2020-01-01/", "/2020-01-31", ("2020-01-01", None), slice("2020-01-01", None)],
+    )
+    def test_open_ended_time_raises(self, tmp_path, time):
+        """An open-ended time= (a None bound) is rejected, not expanded to today."""
+        with pytest.raises(ValueError, match="needs both bounds"):
+            EarthLens(
+                "chc",
+                variables=["precipitation"],
+                path=str(tmp_path),
+                time=time,
+            )
+
+
+@pytest.mark.chc
+class TestFacadePath:
+    """The facade's output-path defaulting."""
+
+    def test_omitted_path_download_persists_to_named_subdir(
+        self, tmp_path, monkeypatch
+    ):
+        """download() with an omitted path persists under ./earthlens-data/<source>/."""
+        from pathlib import Path
+
+        monkeypatch.chdir(tmp_path)
+        facade = EarthLens(
+            data_source="chc",
+            variables=["precipitation"],
+            start="2009-01-01",
+            end="2009-01-02",
+        )
+        monkeypatch.setattr(facade.datasource, "download", lambda *a, **k: [])
+        facade.download(progress_bar=False)
+        expected = Path.cwd() / "earthlens-data" / "chc"
+        assert (
+            facade.datasource.root_dir == expected
+        ), f"got {facade.datasource.root_dir}"
+        assert expected.is_dir(), "download() should keep the default directory"
+
+    def test_omitted_path_load_uses_tempdir(self, tmp_path, monkeypatch):
+        """load() redirects to a temp dir and removes the empty ./earthlens-data default."""
+        from pathlib import Path
+
+        monkeypatch.chdir(tmp_path)
+        facade = EarthLens(
+            data_source="chc",
+            variables=["precipitation"],
+            start="2009-01-01",
+            end="2009-01-02",
+        )
+        monkeypatch.setattr(facade.datasource, "download", lambda *a, **k: [])
+        temp_dir = None
+
+        def _capture(*a, **k):
+            nonlocal temp_dir
+            temp_dir = facade.datasource.path
+            return []
+
+        monkeypatch.setattr(facade.datasource, "download", _capture)
+        facade.load(progress_bar=False)
+        default = Path.cwd() / "earthlens-data" / "chc"
+        assert (
+            facade.datasource.root_dir != default
+        ), "load() should redirect off the default"
+        assert not default.exists(), "load() should remove the empty default dir"
+        # An empty result holds no handle into the temp dir, so it is gone at once.
+        assert not Path(temp_dir).exists(), "load() leaked its temp dir"
+
+    def test_empty_path_still_uses_cwd(self, tmp_path, monkeypatch):
+        """An explicit path='' opts into the current working directory."""
+        from pathlib import Path
+
+        monkeypatch.chdir(tmp_path)
+        backend = EarthLens(
+            data_source="chc",
+            variables=["precipitation"],
+            start="2009-01-01",
+            end="2009-01-02",
+            path="",
+        ).datasource
+        assert backend.root_dir == Path.cwd(), f"got {backend.root_dir}"
+
+
+class _FakeRaster:
+    """A stand-in for a pyramids raster: `copy()` detaches, `close()` releases."""
+
+    def __init__(self, detached=False):
+        self.detached = detached
+        self.closed = False
+
+    def copy(self):
+        return _FakeRaster(detached=True)
+
+    def close(self):
+        self.closed = True
+
+
+class TestLoadTempdirCleanup:
+    """load() detaches its result from the temp dir and removes it at once."""
+
+    def _tempdir(self, tmp_path):
+        d = tmp_path / "earthlens-load-x"
+        d.mkdir()
+        (d / "raster.tif").write_bytes(b"data")
+        return d
+
+    def test_inmemory_result_removed_immediately(self, tmp_path):
+        """A passthrough (non-list) result holds no handle, so the dir goes at once."""
+        from earthlens.earthlens import _detach_and_cleanup
+
+        d = self._tempdir(tmp_path)
+        out = _detach_and_cleanup(d, {"in": "memory"})
+        assert out == {"in": "memory"}, "passthrough result should be returned as-is"
+        assert not d.exists(), "in-memory result should free the temp dir immediately"
+
+    def test_empty_list_removed_immediately(self, tmp_path):
+        """An empty list has nothing reading from the dir, so it goes at once."""
+        from earthlens.earthlens import _detach_and_cleanup
+
+        d = self._tempdir(tmp_path)
+        _detach_and_cleanup(d, [])
+        assert not d.exists(), "empty result should free the temp dir immediately"
+
+    def test_rasters_detached_and_dir_removed(self, tmp_path):
+        """Each raster is replaced by its in-memory copy, closed, and the dir removed."""
+        from earthlens.earthlens import _detach_and_cleanup
+
+        d = self._tempdir(tmp_path)
+        original = _FakeRaster()
+        out = _detach_and_cleanup(d, [original])
+        assert original.closed, "the file-backed raster should be closed"
+        assert out[0] is not original, "result should be the detached in-memory copy"
+        assert out[0].detached, "returned raster should be the copy()"
+        assert not d.exists(), "temp dir should be removed once rasters are detached"
+
+    def test_raw_path_result_deferred_to_exit_sweep(self, tmp_path):
+        """A raw Path in the result defers cleanup to the process-exit sweep."""
+        from earthlens.earthlens import (
+            _LOAD_TEMP_DIRS,
+            _detach_and_cleanup,
+            _sweep_load_tempdirs,
+        )
+
+        d = self._tempdir(tmp_path)
+        _detach_and_cleanup(d, [d / "table.csv"])
+        assert d.exists(), "a caller-owned path must not be removed immediately"
+        assert str(d) in _LOAD_TEMP_DIRS, "dir should be registered for the exit sweep"
+        _sweep_load_tempdirs()
+        assert not d.exists(), "exit sweep should remove the deferred dir"
+
+
+class TestFacadeOptions:
+    """The facade's backend-option discovery and early kwarg validation."""
+
+    @pytest.mark.gee
+    def test_options_for_lists_backend_extras(self):
+        """options_for() surfaces the backend-specific constructor knobs."""
+        options = EarthLens.options_for("gee")
+        assert "scale" in options and "crs" in options, f"missing knobs: {options}"
+
+    @pytest.mark.gee
+    def test_options_for_excludes_facade_params(self):
+        """options_for() omits the parameters the facade owns."""
+        options = EarthLens.options_for("gee")
+        assert not ({"start", "lat_lim", "variables"} & set(options)), options
+
+    def test_options_for_unknown_source_raises(self):
+        """options_for() rejects an unknown data_source."""
+        with pytest.raises(ValueError, match="is not a supported data source"):
+            EarthLens.options_for("nope")
+
+    @pytest.mark.chc
+    def test_unexpected_kwarg_raises_typeerror(self, tmp_path):
+        """An unknown backend kwarg is rejected up front with a TypeError."""
+        with pytest.raises(TypeError, match="unexpected keyword argument 'foo'"):
+            EarthLens(
+                data_source="chc",
+                variables=["precipitation"],
+                start="2009-01-01",
+                end="2009-01-02",
+                path=str(tmp_path),
+                foo="bar",
+            )
+
+    @pytest.mark.gee
+    def test_unexpected_kwarg_suggests_closest(self):
+        """A near-miss kwarg name suggests the closest backend option."""
+        with pytest.raises(TypeError, match="scale"):
+            EarthLens(
+                data_source="gee",
+                variables={"UCSB-CHG/CHIRPS/DAILY": ["precipitation"]},
+                start="2022-01-01",
+                end="2022-01-02",
+                scal=90,
+            )
+
+
+@pytest.mark.chc
+class TestFacadeDelegation:
+    """The facade delegates unknown attributes to the bound backend."""
+
+    def _facade(self, tmp_path):
+        return EarthLens(
+            data_source="chc",
+            variables=["precipitation"],
+            start="2009-01-01",
+            end="2009-01-02",
+            path=str(tmp_path),
+        )
+
+    def test_delegates_backend_attribute(self, tmp_path):
+        """A backend attribute is reachable through the facade."""
+        facade = self._facade(tmp_path)
+        # `vars` lives on the backend, not the facade.
+        assert facade.vars == facade.datasource.vars
+
+    def test_delegates_backend_method(self, tmp_path, monkeypatch):
+        """A backend method is forwarded and called on the backend."""
+        facade = self._facade(tmp_path)
+        monkeypatch.setattr(
+            facade.datasource, "_demo_helper", lambda: "from-backend", raising=False
+        )
+        assert facade._demo_helper() == "from-backend"
+
+    def test_facade_own_attribute_takes_precedence(self, tmp_path):
+        """The facade's own attributes win over delegation."""
+        facade = self._facade(tmp_path)
+        # `download` is defined on the facade itself.
+        assert facade.download.__qualname__.startswith("EarthLens")
+
+    def test_unknown_attribute_raises(self, tmp_path):
+        """An attribute on neither facade nor backend raises AttributeError."""
+        facade = self._facade(tmp_path)
+        with pytest.raises(AttributeError):
+            facade.totally_not_a_real_attribute
+
+    def test_dunder_not_delegated(self, tmp_path):
+        """Dunder lookups are not delegated (avoids proxying magic methods)."""
+        facade = self._facade(tmp_path)
+        with pytest.raises(AttributeError):
+            facade.__nonexistent_dunder__
+
+    def test_attribute_before_backend_bound_raises(self):
+        """Accessing an attribute before `datasource` is set raises AttributeError."""
+        facade = EarthLens.__new__(EarthLens)
+        with pytest.raises(AttributeError, match="has no attribute"):
+            facade.some_attribute
+
+    def test_dir_includes_backend_attributes(self, tmp_path):
+        """dir() surfaces the bound backend's attributes for tab-completion."""
+        facade = self._facade(tmp_path)
+        names = dir(facade)
+        assert "vars" in names and "download" in names, "dir() should merge both"
+
+    def test_authenticate_returns_facade_and_delegates(self, tmp_path, monkeypatch):
+        """authenticate() forwards to the backend and returns the facade."""
+        facade = self._facade(tmp_path)
+        called = []
+        monkeypatch.setattr(
+            facade.datasource, "authenticate", lambda: called.append(True)
+        )
+        result = facade.authenticate()
+        assert result is facade, "authenticate() should return the facade for chaining"
+        assert called == [True], "should delegate to the backend's authenticate()"
+
+
+@pytest.mark.chc
+class TestFacadeSearch:
+    """The facade's search() / count() / preview() dry-run surface."""
+
+    def _facade(self, tmp_path):
+        return EarthLens(
+            data_source="chc",
+            variables=["precipitation"],
+            start="2009-01-01",
+            end="2009-01-02",
+            path=str(tmp_path),
+        )
+
+    def test_search_on_legacy_backend_raises(self, tmp_path):
+        """A legacy _api-only backend rejects search() with guidance."""
+        with pytest.raises(NotImplementedError, match="search\\(\\)/preview"):
+            self._facade(tmp_path).search()
+
+    def test_count_on_legacy_backend_raises(self, tmp_path):
+        """A legacy backend rejects count() with the same guidance."""
+        with pytest.raises(NotImplementedError, match="call download"):
+            self._facade(tmp_path).count()
+
+    def test_search_delegates_to_backend(self, tmp_path, monkeypatch):
+        """search() returns the backend's _search products."""
+        from earthlens.base import RemoteProduct
+
+        facade = self._facade(tmp_path)
+        products = [RemoteProduct(id="a"), RemoteProduct(id="b")]
+        monkeypatch.setattr(facade.datasource, "_search", lambda: products)
+        assert facade.search() == products, "search() should return the products"
+
+    def test_count_uses_search_length(self, tmp_path, monkeypatch):
+        """count() falls back to the length of _search."""
+        from earthlens.base import RemoteProduct
+
+        facade = self._facade(tmp_path)
+        monkeypatch.setattr(
+            facade.datasource,
+            "_search",
+            lambda: [RemoteProduct(id=str(i)) for i in range(3)],
+        )
+        assert facade.count() == 3, "count() should match the product count"
+
+    def test_preview_flattens_products(self, tmp_path, monkeypatch):
+        """preview() flattens id / href / metadata and caps at n."""
+        from earthlens.base import RemoteProduct
+
+        facade = self._facade(tmp_path)
+        products = [
+            RemoteProduct(id="a", href="h1", metadata={"cloud": 5}),
+            RemoteProduct(id="b", href="h2"),
+        ]
+        monkeypatch.setattr(facade.datasource, "_search", lambda: products)
+        assert facade.preview(1) == [{"id": "a", "href": "h1", "cloud": 5}]
+
+
+@pytest.mark.chc
+class TestFacadeDiscovery:
+    """The facade's catalog-discovery classmethods."""
+
+    def test_catalog_returns_loaded_catalog(self):
+        """catalog() returns the backend's loaded catalog."""
+        catalog = EarthLens.catalog("chc")
+        assert len(catalog) > 0, "the CHC catalog should expose datasets"
+
+    def test_list_datasets_includes_known_key(self):
+        """list_datasets() returns the curated dataset keys."""
+        keys = EarthLens.list_datasets("chc")
+        assert "africa-monthly" in keys, f"missing africa-monthly in {keys[:5]}..."
+
+    def test_describe_dataset_returns_record(self):
+        """describe_dataset() returns a record carrying variables."""
+        dataset = EarthLens.describe_dataset("chc", "africa-monthly")
+        assert dataset.variables, "the dataset record should declare variables"
+
+    def test_describe_unknown_dataset_raises(self):
+        """describe_dataset() suggests the closest key on a miss."""
+        with pytest.raises(ValueError, match="africa-monthly"):
+            EarthLens.describe_dataset("chc", "africa-month")
+
+    def test_guess_dataset_substring(self):
+        """guess_dataset() finds datasets by case-insensitive substring."""
+        hits = EarthLens.guess_dataset("chc", "MONTHLY")
+        assert "africa-monthly" in hits, f"substring search missed it: {hits}"
+
+    def test_guess_dataset_fuzzy_fallback(self):
+        """guess_dataset() falls back to fuzzy matches when no substring hits."""
+        hits = EarthLens.guess_dataset("chc", "africa-dialy")
+        assert any("africa-daily" == h for h in hits), f"no fuzzy match in {hits}"
+
+    def test_discovery_unknown_source_raises(self):
+        """An unknown data_source is rejected with a did-you-mean hint."""
+        with pytest.raises(ValueError, match="is not a supported data source"):
+            EarthLens.list_datasets("chrips")
+
+    def test_catalog_missing_raises_not_implemented(self, monkeypatch):
+        """A backend whose module ships no Catalog raises NotImplementedError."""
+        import earthlens.chc as chc_module
+
+        monkeypatch.delattr(chc_module, "Catalog", raising=False)
+        with pytest.raises(NotImplementedError, match="no catalog"):
+            EarthLens.catalog("chc")
+
+    def test_catalog_missing_sdk_raises_importerror(self, monkeypatch):
+        """A backend whose module fails to import surfaces a friendly ImportError."""
+        from earthlens import earthlens as facade_module
+
+        def _boom(name):
+            raise ImportError("no SDK")
+
+        monkeypatch.setattr(facade_module.importlib, "import_module", _boom)
+        with pytest.raises(ImportError, match="catalog is unavailable"):
+            EarthLens.catalog("gee")
+
+
+@pytest.mark.chc
+class TestFacadeAoi:
+    """The facade's aoi= parameter routes to the backend's spatial extent."""
+
+    def _build(self, tmp_path, **kwargs):
+        return EarthLens(
+            data_source="chc",
+            variables=["precipitation"],
+            start="2009-01-01",
+            end="2009-01-02",
+            path=str(tmp_path),
+            **kwargs,
+        ).datasource.space
+
+    def test_aoi_bbox_sets_spatial_extent(self, tmp_path):
+        """A bbox aoi= populates the backend's SpatialExtent edges."""
+        space = self._build(tmp_path, aoi=[-75.65, 4.19, -74.73, 4.64])
+        assert (space.south, space.north, space.west, space.east) == (
+            4.19,
+            4.64,
+            -75.65,
+            -74.73,
+        )
+
+    def test_aoi_matches_legacy_lat_lon_pairs(self, tmp_path):
+        """aoi= and the legacy lat_lim/lon_lim pair yield the same extent."""
+        via_aoi = self._build(tmp_path, aoi=[-75.65, 4.19, -74.73, 4.64])
+        via_pairs = self._build(
+            tmp_path, lat_lim=[4.19, 4.64], lon_lim=[-75.65, -74.73]
+        )
+        assert via_aoi == via_pairs
+
+    def test_aoi_point_with_buffer(self, tmp_path):
+        """A point aoi= with buffer builds a square extent."""
+        space = self._build(tmp_path, aoi=(-75.0, 4.0), buffer=0.25)
+        assert (space.south, space.north, space.west, space.east) == (
+            3.75,
+            4.25,
+            -75.25,
+            -74.75,
+        )
+
+    def test_aoi_polygon_attaches_mask(self, tmp_path):
+        """A polygon aoi= attaches a GeoDataFrame mask to the backend extent."""
+        gpd = pytest.importorskip("geopandas")
+        shapely = pytest.importorskip("shapely")
+        poly = shapely.geometry.Polygon([(-75, 4), (-74, 4), (-74.5, 5)])
+        gdf = gpd.GeoDataFrame(geometry=[poly], crs="EPSG:4326")
+        space = self._build(tmp_path, aoi=gdf)
+        assert space.geometry is not None, "polygon aoi should attach a mask"
+        assert (space.west, space.east) == (-75.0, -74.0), "bbox envelope wrong"
+
+    def test_aoi_bbox_attaches_no_mask(self, tmp_path):
+        """A bbox aoi= leaves the extent's geometry as None."""
+        space = self._build(tmp_path, aoi=[-75.65, 4.19, -74.73, 4.64])
+        assert space.geometry is None, f"bbox should attach no mask: {space.geometry!r}"
+
+    def test_aoi_with_lat_lim_raises(self, tmp_path):
+        """Passing both aoi= and lat_lim= is rejected."""
+        with pytest.raises(ValueError, match="either aoi= or lat_lim"):
+            self._build(tmp_path, aoi=[-75.65, 4.19, -74.73, 4.64], lat_lim=[4, 5])
+
+    def test_buffer_without_aoi_raises(self, tmp_path):
+        """buffer= without a point aoi= is rejected."""
+        with pytest.raises(ValueError, match="buffer= only applies"):
+            self._build(tmp_path, buffer=0.5)
+
+    def test_accepts_date_objects(self, tmp_path):
+        """The facade threads date objects through to the backend window."""
+        import datetime as dt
+
+        space_time = EarthLens(
+            data_source="chc",
+            variables=["precipitation"],
+            start=dt.date(2009, 1, 1),
+            end=dt.date(2009, 1, 2),
+            path=str(tmp_path),
+        ).datasource.time
+        assert space_time.start_date == dt.datetime(2009, 1, 1)
+        assert space_time.end_date == dt.datetime(2009, 1, 2)
+
+    def test_native_aoi_backend_rejects_buffer(self):
+        """A backend that owns aoi= (WorldPop) rejects buffer= up front."""
+        pytest.importorskip("earthlens.worldpop")
+        with pytest.raises(ValueError, match="buffer= is not supported"):
+            EarthLens(
+                data_source="worldpop",
+                variables=["population"],
+                start="2020-01-01",
+                end="2020-12-31",
+                aoi="USA",
+                buffer=0.5,
+            )

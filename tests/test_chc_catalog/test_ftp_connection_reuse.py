@@ -73,9 +73,7 @@ class TestFtpConnectionReuse:
         ds = chirps.catalog.datasets["global-daily"]
         var = ds.variables["precipitation"]
         # Parallel branch with one worker so joblib serialisation is real.
-        chirps._download_dataset(
-            "global-daily", ds, var, progress_bar=False, cores=1
-        )
+        chirps._download_dataset("global-daily", ds, var, progress_bar=False, cores=1)
         assert len(spy.ftp_args) == 5
         # Every per-date call sees ftp=None -- workers can't share the
         # unpicklable FTP socket so the parallel branch keeps the old
@@ -116,16 +114,20 @@ class TestFtpConnectionReuse:
         # That's 1 initial open + 1 reopen = 2 total `_open_ftp` calls.
         assert len(open_calls) == 2, open_calls
 
-    def test_fetch_ftp_with_provided_session_skips_login(self, monkeypatch, tmp_path: Path):
+    def test_fetch_ftp_with_provided_session_skips_login(
+        self, monkeypatch, tmp_path: Path
+    ):
         """Calling `_fetch_ftp(..., ftp=session)` does NOT open a new FTP connection."""
         session = MagicMock(name="caller_session")
         # If anyone calls `FTP(...)` (the bare constructor) the test fails.
         monkeypatch.setattr(
             chc_backend, "_open_ftp", lambda: pytest.fail("must not open a new FTP")
         )
+
         # Make `retrbinary` write a placeholder byte so the open(...) actually runs.
         def _fake_retr(cmd, callback):
             callback(b"x")
+
         session.retrbinary.side_effect = _fake_retr
         local_path = tmp_path / "out.bin"
         CHIRPS._fetch_ftp(
@@ -152,8 +154,10 @@ class TestFtpConnectionReuse:
         monkeypatch.setattr(
             chc_backend, "_open_ftp", lambda: pytest.fail("must not open a new FTP")
         )
+
         def _fake_retr(cmd, callback):
             callback(b"x")
+
         session.retrbinary.side_effect = _fake_retr
         CHIRPS._fetch_ftp(
             "/some/remote/dir/",  # already absolute
@@ -179,8 +183,10 @@ class TestFtpConnectionReuse:
         monkeypatch.setattr(
             chc_backend, "_open_ftp", lambda: pytest.fail("must not open a new FTP")
         )
+
         def _fake_retr(cmd, callback):
             callback(b"x")
+
         session.retrbinary.side_effect = _fake_retr
         for date_subdir in ("pub/.../2009/", "pub/.../2009/"):
             CHIRPS._fetch_ftp(

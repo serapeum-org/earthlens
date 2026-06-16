@@ -32,7 +32,7 @@ from earthlens.base.yaml_loader import load_yaml_strict
 
 CATALOG_PATH: Path = Path(__file__).parent / "nwm_data_catalog.yaml"
 
-_CATALOG_CACHE: dict[tuple[str, int], "Catalog"] = {}
+_CATALOG_CACHE: dict[tuple[str, int], Catalog] = {}
 
 
 def clear_catalog_cache() -> None:

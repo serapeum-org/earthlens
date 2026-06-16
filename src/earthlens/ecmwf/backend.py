@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import datetime as dt
 import os
 import shutil
 import zipfile
@@ -15,9 +14,14 @@ from loguru import logger
 from earthlens.aggregate import AggregationConfig, aggregate_netcdf
 from earthlens.base import (
     AbstractDataSource,
+)
+from earthlens.base import AuthenticationError as _BaseAuthenticationError
+from earthlens.base import (
+    LazyClientMixin,
     OutputKind,
     SpatialExtent,
     TemporalExtent,
+    to_datetime,
 )
 from earthlens.ecmwf.catalog import Catalog, Variable
 from earthlens.ecmwf.constraints import RequestValidator
@@ -47,7 +51,7 @@ _REQUEST_KIND_STRIPS: dict[str, tuple[str, ...]] = {
 }
 
 
-class AuthenticationError(Exception):
+class AuthenticationError(_BaseAuthenticationError):
     """Raised when cdsapi cannot authenticate against the Climate Data Store.
 
     The ECMWF backend uses :class:`cdsapi.Client` to talk to CDS. The
@@ -179,7 +183,7 @@ def _unwrap_zipped_netcdf(target: Path) -> None:
             tmp.unlink(missing_ok=True)
 
 
-class ECMWF(AbstractDataSource):
+class ECMWF(LazyClientMixin, AbstractDataSource):
     """ECMWF / Copernicus Climate Data Store backend.
 
     Downloads ERA5 reanalysis (and ERA5-Land where the catalog
@@ -224,9 +228,10 @@ class ECMWF(AbstractDataSource):
     ):
         """Initialize an ECMWF backend instance.
 
-        Forwards every argument to :class:`AbstractDataSource`,
-        which captures the cdsapi client into `self.client` and
-        the bbox/date dict into `self.space`/`self.time`.
+        Forwards every argument to :class:`AbstractDataSource`, which
+        captures the bbox/date dict into `self.space` / `self.time`. The
+        cdsapi client is built lazily on first access to `self.client`
+        (via :meth:`_open_client`), so construction never authenticates.
 
         Args:
             start: Inclusive start date as a string (parsed with
@@ -298,8 +303,8 @@ class ECMWF(AbstractDataSource):
                 `"daily"` nor `"monthly"`, or if the parsed
                 `start` is later than the parsed `end`.
         """
-        start = dt.datetime.strptime(start, fmt)
-        end = dt.datetime.strptime(end, fmt)
+        start = to_datetime(start, fmt)
+        end = to_datetime(end, fmt)
 
         if temporal_resolution == "daily":
             dates = pd.date_range(start, end, freq="D")
@@ -320,6 +325,19 @@ class ECMWF(AbstractDataSource):
         )
 
     def _initialize(self):
+        """No eager client — the cdsapi connection is built lazily.
+
+        Returns `None` so the parent does not bind an eager `client`;
+        :meth:`_open_client` constructs the :class:`cdsapi.Client` on
+        first access to `self.client` (i.e. at `download()` time), so
+        constructing the backend never authenticates against CDS.
+
+        Returns:
+            None: Always.
+        """
+        return None
+
+    def _open_client(self):
         """Construct the :class:`cdsapi.Client` for talking to CDS.
 
         Reads credentials from `~/.cdsapirc` (or the `CDSAPI_URL` /
@@ -327,7 +345,8 @@ class ECMWF(AbstractDataSource):
         when the dotfile is absent). If neither is configured, the
         underlying cdsapi exception is wrapped in
         :class:`AuthenticationError` with a message that tells the user
-        exactly where to put their Personal Access Token.
+        exactly where to put their Personal Access Token. Called lazily
+        by :attr:`~earthlens.base.LazyClientMixin.client` on first use.
 
         Returns:
             cdsapi.Client: Authenticated CDS client. Calls to
@@ -354,12 +373,15 @@ class ECMWF(AbstractDataSource):
                 ...     lon_lim=[-75.0, -74.0],
                 ...     path="examples/data/era5",
                 ... )
+                >>> ecmwf.client  # doctest: +SKIP
 
                 ```
         """
         try:
             client = cdsapi.Client()
-        except Exception as exc:  # noqa: BLE001 - cdsapi raises a variety of types; classify here and re-raise as AuthenticationError
+        except (
+            Exception
+        ) as exc:  # noqa: BLE001 - cdsapi raises a variety of types; classify here and re-raise as AuthenticationError
             if _looks_like_missing_credentials(exc):
                 raise AuthenticationError(
                     "cdsapi could not authenticate against the Climate "
@@ -569,7 +591,9 @@ class ECMWF(AbstractDataSource):
                     nc_path = self._download_dataset(
                         var_info, progress_bar=progress_bar
                     )
-                except Exception as exc:  # noqa: BLE001 - log + continue so one bad variable doesn't kill the batch
+                except (
+                    Exception
+                ) as exc:  # noqa: BLE001 - log + continue so one bad variable doesn't kill the batch
                     logger.error(
                         f"ECMWF download for {dataset_name}/{var} failed: "
                         f"{type(exc).__name__}: {exc}"
@@ -579,10 +603,10 @@ class ECMWF(AbstractDataSource):
 
                 if effective_aggregate is not None:
                     try:
-                        agg = aggregate_netcdf(
-                            nc_path, var_info, effective_aggregate
-                        )
-                    except Exception as exc:  # noqa: BLE001 - log + continue so one bad aggregate doesn't kill the batch
+                        agg = aggregate_netcdf(nc_path, var_info, effective_aggregate)
+                    except (
+                        Exception
+                    ) as exc:  # noqa: BLE001 - log + continue so one bad aggregate doesn't kill the batch
                         logger.error(
                             f"ECMWF aggregate for {dataset_name}/{var} failed: "
                             f"{type(exc).__name__}: {exc}"
@@ -758,7 +782,9 @@ class ECMWF(AbstractDataSource):
         logger.info(f"Requesting {dataset} from CDS; this may take several minutes")
         try:
             self.client.retrieve(dataset, request, str(target))
-        except Exception as exc:  # noqa: BLE001 - cdsapi raises a variety of types; classify here and re-raise as PermissionError when licence-related
+        except (
+            Exception
+        ) as exc:  # noqa: BLE001 - cdsapi raises a variety of types; classify here and re-raise as PermissionError when licence-related
             if _looks_like_licence_not_accepted(exc):
                 raise PermissionError(
                     f"CDS rejected the request for {dataset!r}: licence "
@@ -770,7 +796,49 @@ class ECMWF(AbstractDataSource):
                 ) from exc
             raise
         _unwrap_zipped_netcdf(target)
+        self._mask_netcdf_to_geometry(target)
         return target
+
+    def _mask_netcdf_to_geometry(self, target: Path) -> None:
+        """Mask a written NetCDF cube to a polygon `aoi=`, if one was given.
+
+        The CDS `area` field already crops server-side to the bbox; this
+        trims the bbox corners to the exact polygon when the request's
+        `aoi=` was a polygon (carried on `self.space.geometry`). Every
+        variable / time slice is masked via `pyramids.NetCDF.crop`, written
+        through a sibling temp file that atomically replaces the original
+        so a partial write cannot corrupt the cube. A no-op for a bbox /
+        point `aoi=`.
+
+        pyramids carries the CDS cube's non-spatial aux variables (ERA5's
+        `expver` / `number`) through the crop — numeric and string alike
+        (serapeum-org/pyramids#514, #567) — so the mask applies cleanly; any
+        genuine error (e.g. a polygon that does not overlap the data) is left
+        to propagate.
+
+        Args:
+            target: Path to the NetCDF written by `_api`.
+        """
+        geometry = getattr(self.space, "geometry", None)
+        if geometry is None:
+            return
+        from pyramids.netcdf import NetCDF
+
+        cube = NetCDF.read_file(str(target))
+        masked = None
+        tmp = target.with_name(target.stem + ".masked" + target.suffix)
+        wrote_tmp = False
+        try:
+            masked = cube.crop(mask=geometry, touch=True)
+            masked.to_file(str(tmp))
+            wrote_tmp = True
+        finally:
+            cube.close()
+            if masked is not None:
+                masked.close()
+            if not wrote_tmp:
+                tmp.unlink(missing_ok=True)
+        os.replace(tmp, target)
 
     def _build_request(self, var_info: Variable) -> dict[str, Any]:
         """Assemble the CDS retrieve-request dict for one variable.

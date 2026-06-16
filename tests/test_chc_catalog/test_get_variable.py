@@ -24,9 +24,9 @@ class TestGetVariable:
         """The 2nd positional arg has no default value (M4 removed the pre-M4 'precipitation')."""
         sig = inspect.signature(Catalog.get_variable)
         param = sig.parameters["variable_name"]
-        assert param.default is inspect.Parameter.empty, (
-            f"variable_name should be required after M4; got default={param.default!r}"
-        )
+        assert (
+            param.default is inspect.Parameter.empty
+        ), f"variable_name should be required after M4; got default={param.default!r}"
 
     def test_explicit_variable_name_returns_variable(self, catalog: Catalog):
         """Explicit (dataset_key, variable_name) still resolves to the Variable."""

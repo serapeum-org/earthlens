@@ -71,22 +71,27 @@ def bundled_catalog() -> Catalog:
 class TestRegionAuthoritative:
     """Contract: every dataset's spatial bounds come from `regions[ds.region]`."""
 
-    def test_bundled_catalog_bounds_match_their_region_exactly(self, bundled_catalog: Catalog):
+    def test_bundled_catalog_bounds_match_their_region_exactly(
+        self, bundled_catalog: Catalog
+    ):
         """Every dataset's lat/lon_boundaries match its region's definition 1:1."""
         offenders: list[tuple[str, str, list, list, list, list]] = []
         for key, ds in bundled_catalog.datasets.items():
             region_def = bundled_catalog.available_regions.get(ds.region)
-            assert region_def is not None, (
-                f"{key}: region {ds.region!r} is missing from available_regions"
-            )
+            assert (
+                region_def is not None
+            ), f"{key}: region {ds.region!r} is missing from available_regions"
             expected_lat = [float(v) for v in region_def["lat_boundaries"]]
             expected_lon = [float(v) for v in region_def["lon_boundaries"]]
             if ds.lat_boundaries != expected_lat or ds.lon_boundaries != expected_lon:
                 offenders.append(
                     (
-                        key, ds.region,
-                        ds.lat_boundaries, ds.lon_boundaries,
-                        expected_lat, expected_lon,
+                        key,
+                        ds.region,
+                        ds.lat_boundaries,
+                        ds.lon_boundaries,
+                        expected_lat,
+                        expected_lon,
                     )
                 )
         assert not offenders, (
@@ -94,7 +99,9 @@ class TestRegionAuthoritative:
             f"(H1 regression): {offenders}"
         )
 
-    def test_centennial_trends_uses_the_new_dedicated_region(self, bundled_catalog: Catalog):
+    def test_centennial_trends_uses_the_new_dedicated_region(
+        self, bundled_catalog: Catalog
+    ):
         """CenTrends entries point at `east-africa-centennial` with the wider extent."""
         ds = bundled_catalog.get_dataset("centennial-trends-v1-monthly")
         assert ds.region == "east-africa-centennial"
@@ -131,7 +138,9 @@ class TestLoaderRejections:
         with pytest.raises(ValueError, match=r"H1|regions:"):
             Catalog.load(catalog_path=catalog_yaml)
 
-    def test_unknown_region_raises_value_error_listing_known_regions(self, tmp_path: Path):
+    def test_unknown_region_raises_value_error_listing_known_regions(
+        self, tmp_path: Path
+    ):
         """A dataset with a region not defined in `regions:` raises with the available list."""
         body = _dataset_block("synth-daily", region="not-a-region")
         catalog_yaml = _write_catalog(tmp_path, body)

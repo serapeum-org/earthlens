@@ -29,7 +29,10 @@ def _gfs(**overrides) -> NWPModel:
         horizon_h=48,
         backend="herbie",
         mirrors=["aws", "google", "azure"],
-        bands={"temperature_2m": ":TMP:2 m above ground:", "precipitation_acc": ":APCP:surface:"},
+        bands={
+            "temperature_2m": ":TMP:2 m above ground:",
+            "precipitation_acc": ":APCP:surface:",
+        },
     )
     base.update(overrides)
     return NWPModel(**base)
@@ -89,11 +92,19 @@ class TestNOAACentre:
         """fetch_one joins the params' regexes and returns Herbie's path."""
         centre = NOAACentre(tmp_path)
         out = centre.fetch_one(
-            _gfs(), dt.datetime(2024, 6, 1, 0), 6, ["temperature_2m", "precipitation_acc"], "auto"
+            _gfs(),
+            dt.datetime(2024, 6, 1, 0),
+            6,
+            ["temperature_2m", "precipitation_acc"],
+            "auto",
         )
         handle = fake_herbie.instances[-1]
         assert handle.download_calls == [":TMP:2 m above ground:|:APCP:surface:"]
-        assert handle.kwargs["fxx"] == 6 and handle.kwargs["priority"] == ["aws", "google", "azure"]
+        assert handle.kwargs["fxx"] == 6 and handle.kwargs["priority"] == [
+            "aws",
+            "google",
+            "azure",
+        ]
         assert "product" not in handle.kwargs
         assert str(out).endswith("subset_gfs_f6.grib2")
 
@@ -101,13 +112,20 @@ class TestNOAACentre:
         """A model with a product (HRRR) forwards product= to Herbie."""
         NOAACentre(tmp_path).fetch_one(
             _gfs(model_family="hrrr", product="wrfsfcf"),
-            dt.datetime(2024, 6, 1, 0), 0, ["temperature_2m"], "aws",
+            dt.datetime(2024, 6, 1, 0),
+            0,
+            ["temperature_2m"],
+            "aws",
         )
         assert fake_herbie.instances[-1].kwargs["product"] == "wrfsfcf"
 
     def test_fetch_one_splats_request_options(self, fake_herbie, tmp_path):
         """request_options (e.g. domain for HiResW/HREF) pass through to Herbie."""
-        model = _gfs(model_family="hiresw", product="arw_2p5km", request_options={"domain": "conus"})
+        model = _gfs(
+            model_family="hiresw",
+            product="arw_2p5km",
+            request_options={"domain": "conus"},
+        )
         NOAACentre(tmp_path).fetch_one(
             model, dt.datetime(2024, 6, 1, 0), 0, ["temperature_2m"], "aws"
         )
@@ -116,11 +134,21 @@ class TestNOAACentre:
     def test_fetch_one_member_to_herbie(self, fake_herbie, tmp_path):
         """A numeric member becomes an int Herbie member=; 'mean' stays a string."""
         NOAACentre(tmp_path).fetch_one(
-            _gfs(model_family="gefs"), dt.datetime(2024, 6, 1, 0), 0, ["temperature_2m"], "aws", "5"
+            _gfs(model_family="gefs"),
+            dt.datetime(2024, 6, 1, 0),
+            0,
+            ["temperature_2m"],
+            "aws",
+            "5",
         )
         assert fake_herbie.instances[-1].kwargs["member"] == 5
         NOAACentre(tmp_path).fetch_one(
-            _gfs(model_family="gefs"), dt.datetime(2024, 6, 1, 0), 0, ["temperature_2m"], "aws", "mean"
+            _gfs(model_family="gefs"),
+            dt.datetime(2024, 6, 1, 0),
+            0,
+            ["temperature_2m"],
+            "aws",
+            "mean",
         )
         assert fake_herbie.instances[-1].kwargs["member"] == "mean"
 
@@ -128,7 +156,9 @@ class TestNOAACentre:
         """show_progress is forwarded to Herbie's verbose= (L4)."""
         centre = NOAACentre(tmp_path)
         centre.show_progress = False
-        centre.fetch_one(_gfs(), dt.datetime(2024, 6, 1, 0), 0, ["temperature_2m"], "aws")
+        centre.fetch_one(
+            _gfs(), dt.datetime(2024, 6, 1, 0), 0, ["temperature_2m"], "aws"
+        )
         assert fake_herbie.instances[-1].kwargs["verbose"] is False
 
     def test_import_herbie_success(self, fake_herbie):
@@ -202,16 +232,29 @@ class TestECMWFCentre:
             )
         assert list(tmp_path.iterdir()) == [], "no partial file should remain"
 
-    def test_fetch_one_pressure_level_groups_into_retrieves(self, fake_ecmwf_client, tmp_path):
+    def test_fetch_one_pressure_level_groups_into_retrieves(
+        self, fake_ecmwf_client, tmp_path
+    ):
         """A surface+pressure request issues one retrieve per level type/level."""
         model = NWPModel(
-            provider="ecmwf-opendata", model_family="ifs", cycles_utc=[0], horizon_h=240,
-            backend="ecmwf-opendata", mirrors=["aws"],
-            bands={"temperature_2m": "2t", "temperature_850hPa": "t@850", "geopotential_height_500hPa": "gh@500"},
+            provider="ecmwf-opendata",
+            model_family="ifs",
+            cycles_utc=[0],
+            horizon_h=240,
+            backend="ecmwf-opendata",
+            mirrors=["aws"],
+            bands={
+                "temperature_2m": "2t",
+                "temperature_850hPa": "t@850",
+                "geopotential_height_500hPa": "gh@500",
+            },
         )
         out = ECMWFCentre(tmp_path).fetch_one(
-            model, dt.datetime(2024, 6, 1, 0), 0,
-            ["temperature_2m", "temperature_850hPa", "geopotential_height_500hPa"], "aws",
+            model,
+            dt.datetime(2024, 6, 1, 0),
+            0,
+            ["temperature_2m", "temperature_850hPa", "geopotential_height_500hPa"],
+            "aws",
         )
         calls = fake_ecmwf_client.instances[-1].retrieve_calls
         assert len(calls) == 3
@@ -231,31 +274,49 @@ class TestECMWFCentre:
 
     def test_source_auto_no_known_mirror_falls_back(self):
         """mirror='auto' with no usable catalog mirror falls back to 'ecmwf'."""
-        model = NWPModel(provider="ecmwf-opendata", backend="ecmwf-opendata", mirrors=["nomads"])
+        model = NWPModel(
+            provider="ecmwf-opendata", backend="ecmwf-opendata", mirrors=["nomads"]
+        )
         assert _source_for("auto", model) == "ecmwf"
 
     def test_fetch_one_retrieves_param_tokens(self, fake_ecmwf_client, tmp_path):
         """fetch_one calls retrieve with the param tokens and a target path."""
         out = ECMWFCentre(tmp_path).fetch_one(
-            self._ifs(), dt.datetime(2024, 6, 1, 12), 24, ["temperature_2m", "precipitation_acc"], "azure"
+            self._ifs(),
+            dt.datetime(2024, 6, 1, 12),
+            24,
+            ["temperature_2m", "precipitation_acc"],
+            "azure",
         )
         client = fake_ecmwf_client.instances[-1]
         assert client.source == "azure"
         assert client.kwargs.get("model") == "ifs"
         call = client.retrieve_calls[-1]
-        assert call["param"] == ["2t", "tp"] and call["step"] == 24 and call["time"] == 12
+        assert (
+            call["param"] == ["2t", "tp"] and call["step"] == 24 and call["time"] == 12
+        )
         assert call["date"] == "2024-06-01"
         assert "stream" not in call
         assert out.exists() and out.name == "ifs_2024060112_f024.grib2"
 
-    def test_fetch_one_perturbed_member_sets_pf_and_number(self, fake_ecmwf_client, tmp_path):
+    def test_fetch_one_perturbed_member_sets_pf_and_number(
+        self, fake_ecmwf_client, tmp_path
+    ):
         """A numeric ENS member selects type=pf + number=<member>."""
         ens = NWPModel(
-            provider="ecmwf-opendata", model_family="ens", cycles_utc=[0], horizon_h=360,
-            backend="ecmwf-opendata", mirrors=["aws"], bands={"temperature_2m": "2t"},
-            request_options={"stream": "enfo", "type": "cf"}, members=["control", "1", "2"],
+            provider="ecmwf-opendata",
+            model_family="ens",
+            cycles_utc=[0],
+            horizon_h=360,
+            backend="ecmwf-opendata",
+            mirrors=["aws"],
+            bands={"temperature_2m": "2t"},
+            request_options={"stream": "enfo", "type": "cf"},
+            members=["control", "1", "2"],
         )
-        out = ECMWFCentre(tmp_path).fetch_one(ens, dt.datetime(2024, 6, 1, 0), 0, ["temperature_2m"], "aws", "3")
+        out = ECMWFCentre(tmp_path).fetch_one(
+            ens, dt.datetime(2024, 6, 1, 0), 0, ["temperature_2m"], "aws", "3"
+        )
         call = fake_ecmwf_client.instances[-1].retrieve_calls[-1]
         assert call["type"] == "pf" and call["number"] == 3
         assert out.name == "ens_2024060100_f000_m3.grib2"
@@ -263,11 +324,19 @@ class TestECMWFCentre:
     def test_fetch_one_control_member_keeps_cf(self, fake_ecmwf_client, tmp_path):
         """The 'control' member keeps the row's configured type (cf), no number."""
         ens = NWPModel(
-            provider="ecmwf-opendata", model_family="ens", cycles_utc=[0], horizon_h=360,
-            backend="ecmwf-opendata", mirrors=["aws"], bands={"temperature_2m": "2t"},
-            request_options={"stream": "enfo", "type": "cf"}, members=["control", "1"],
+            provider="ecmwf-opendata",
+            model_family="ens",
+            cycles_utc=[0],
+            horizon_h=360,
+            backend="ecmwf-opendata",
+            mirrors=["aws"],
+            bands={"temperature_2m": "2t"},
+            request_options={"stream": "enfo", "type": "cf"},
+            members=["control", "1"],
         )
-        ECMWFCentre(tmp_path).fetch_one(ens, dt.datetime(2024, 6, 1, 0), 0, ["temperature_2m"], "aws", "control")
+        ECMWFCentre(tmp_path).fetch_one(
+            ens, dt.datetime(2024, 6, 1, 0), 0, ["temperature_2m"], "aws", "control"
+        )
         call = fake_ecmwf_client.instances[-1].retrieve_calls[-1]
         assert call["type"] == "cf" and "number" not in call
 
@@ -283,7 +352,9 @@ class TestECMWFCentre:
             bands={"temperature_2m": "2t"},
             request_options={"ecmwf_model": "aifs-single"},
         )
-        out = ECMWFCentre(tmp_path).fetch_one(aifs, dt.datetime(2024, 6, 1, 0), 0, ["temperature_2m"], "aws")
+        out = ECMWFCentre(tmp_path).fetch_one(
+            aifs, dt.datetime(2024, 6, 1, 0), 0, ["temperature_2m"], "aws"
+        )
         assert fake_ecmwf_client.instances[-1].kwargs.get("model") == "aifs-single"
         assert out.name == "aifs_2024060100_f000.grib2"
 
@@ -299,7 +370,9 @@ class TestECMWFCentre:
             bands={"temperature_2m": "2t"},
             request_options={"stream": "enfo", "type": "cf"},
         )
-        ECMWFCentre(tmp_path).fetch_one(ens, dt.datetime(2024, 6, 1, 0), 0, ["temperature_2m"], "aws")
+        ECMWFCentre(tmp_path).fetch_one(
+            ens, dt.datetime(2024, 6, 1, 0), 0, ["temperature_2m"], "aws"
+        )
         call = fake_ecmwf_client.instances[-1].retrieve_calls[-1]
         assert call["stream"] == "enfo" and call["type"] == "cf"
 
@@ -333,7 +406,11 @@ class TestDWDCentre:
     def test_fetch_one_builds_urls_and_concatenates(self, fake_requests, tmp_path):
         """fetch_one builds per-variable URLs and concatenates decompressed messages."""
         out = DWDCentre(tmp_path).fetch_one(
-            self._icon(), dt.datetime(2024, 6, 1, 0), 3, ["temperature_2m", "precipitation_acc"], "auto"
+            self._icon(),
+            dt.datetime(2024, 6, 1, 0),
+            3,
+            ["temperature_2m", "precipitation_acc"],
+            "auto",
         )
         assert fake_requests["urls"] == [
             "https://x/00/t_2m/icon_2024060100_003_T_2M.grib2.bz2",
@@ -358,14 +435,18 @@ class TestDWDCentre:
             },
             bands={"temperature_850hPa": "T@850"},
         )
-        url = DWDCentre._band_url(model, "temperature_850hPa", dt.datetime(2024, 6, 1, 0), 3)
+        url = DWDCentre._band_url(
+            model, "temperature_850hPa", dt.datetime(2024, 6, 1, 0), 3
+        )
         assert url == "https://x/t/pl_2024060100_003_850_T.bz2"
 
     def test_band_url_pressure_level_without_pl_template_raises(self, tmp_path):
         """A pressure-level band with no pl_url_template is rejected."""
         model = self._icon(request_options={}, bands={"temperature_850hPa": "T@850"})
         with pytest.raises(ValueError, match="pl_url_template"):
-            DWDCentre._band_url(model, "temperature_850hPa", dt.datetime(2024, 6, 1, 0), 0)
+            DWDCentre._band_url(
+                model, "temperature_850hPa", dt.datetime(2024, 6, 1, 0), 0
+            )
 
     def test_fetch_one_failure_leaves_no_partial_file(self, tmp_path, monkeypatch):
         """A failure on a later variable leaves no truncated .grib2 (L1)."""
@@ -437,8 +518,11 @@ class TestMeteoFranceCentre:
         monkeypatch.setitem(sys.modules, "botocore.client", client_mod)
 
         out = MeteoFranceCentre(tmp_path).fetch_one(
-            self._mf(), dt.datetime(2024, 6, 1, 0), 3,
-            ["temperature_2m", "precipitation_acc"], "auto",
+            self._mf(),
+            dt.datetime(2024, 6, 1, 0),
+            3,
+            ["temperature_2m", "precipitation_acc"],
+            "auto",
         )
         assert keys == [
             ("mf-nwp-models", "arpege-world/2024060100/f003_T2M.grib2"),
@@ -548,12 +632,17 @@ class TestMeteoFranceAPICentre:
         centre = MeteoFranceAPICentre(tmp_path)
         centre.bbox = (-5.0, 41.0, 10.0, 51.0)
         out = centre.fetch_one(
-            self._arpege(), dt.datetime(2024, 6, 1, 0), 24,
-            ["temperature_2m", "precipitation_acc"], "auto",
+            self._arpege(),
+            dt.datetime(2024, 6, 1, 0),
+            24,
+            ["temperature_2m", "precipitation_acc"],
+            "auto",
         )
         assert len(calls) == 2
         first = calls[0]
-        assert first["url"].endswith("/wcs/MF-NWP-GLOBAL-ARPEGE-025-GLOBE-WCS/GetCoverage")
+        assert first["url"].endswith(
+            "/wcs/MF-NWP-GLOBAL-ARPEGE-025-GLOBE-WCS/GetCoverage"
+        )
         assert first["headers"] == {"apikey": "k"}
         qs = first["params"]
         assert ("service", "WCS") in qs and ("version", "2.0.1") in qs
@@ -579,7 +668,10 @@ class TestMeteoFranceAPICentre:
             dt2.datetime(2024, 6, 1, 0),
             dt2.datetime(2024, 6, 1, 12),
         )
-        assert ("coverageid", "TEMPERATURE__ISOBARIC_SURFACE___2024-06-01T00.00.00Z") in query
+        assert (
+            "coverageid",
+            "TEMPERATURE__ISOBARIC_SURFACE___2024-06-01T00.00.00Z",
+        ) in query
         assert ("subset", "pressure(85000)") in query
 
     def test_fetch_one_without_options_raises(self, monkeypatch, tmp_path):
@@ -587,8 +679,11 @@ class TestMeteoFranceAPICentre:
         monkeypatch.setenv("MF_API_KEY", "k")
         with pytest.raises(ValueError, match="api_base"):
             MeteoFranceAPICentre(tmp_path).fetch_one(
-                self._arpege(request_options={}), dt.datetime(2024, 6, 1, 0), 0,
-                ["temperature_2m"], "auto",
+                self._arpege(request_options={}),
+                dt.datetime(2024, 6, 1, 0),
+                0,
+                ["temperature_2m"],
+                "auto",
             )
 
     def test_query_without_bbox_omits_spatial_subset(self, tmp_path):
@@ -616,7 +711,11 @@ class TestMeteoFranceAPICentre:
         monkeypatch.setitem(sys.modules, "requests", module)
         with pytest.raises(RuntimeError, match="gateway down"):
             MeteoFranceAPICentre(tmp_path).fetch_one(
-                self._arpege(), dt.datetime(2024, 6, 1, 0), 0, ["temperature_2m"], "auto"
+                self._arpege(),
+                dt.datetime(2024, 6, 1, 0),
+                0,
+                ["temperature_2m"],
+                "auto",
             )
         assert list(tmp_path.iterdir()) == [], "no partial file should remain"
 

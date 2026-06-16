@@ -24,7 +24,6 @@ import pytest
 from earthlens.aggregate import AggregationConfig
 from earthlens.earthlens import EarthLens
 
-
 _HAVE_CREDS = bool(
     os.environ.get("COPERNICUSMARINE_SERVICE_USERNAME")
     and os.environ.get("COPERNICUSMARINE_SERVICE_PASSWORD")
@@ -35,9 +34,9 @@ _HAVE_CREDS = bool(
 # eventually leaves the dataset bounds (`CoordinatesOutOfDatasetBounds`).
 # Probe ~30 days back from today, comfortably inside the NRT window and
 # after the ~1-day publication latency.
-_NRT_PROBE_DATE = (
-    dt.datetime.now(dt.timezone.utc) - dt.timedelta(days=30)
-).strftime("%Y-%m-%d")
+_NRT_PROBE_DATE = (dt.datetime.now(dt.timezone.utc) - dt.timedelta(days=30)).strftime(
+    "%Y-%m-%d"
+)
 
 
 @pytest.mark.e2e
@@ -65,13 +64,15 @@ class TestCmemsLiveSubset:
             path=str(tmp_path),
         )
         paths = el.download(progress_bar=False)
-        assert paths, f"no files written into {tmp_path!r}: {list(tmp_path.iterdir())!r}"
-        assert all(p.exists() for p in paths), (
-            f"download() returned non-existent paths: {paths!r}"
-        )
-        assert all(p.stat().st_size > 0 for p in paths), (
-            f"download() returned empty files: {[(p, p.stat().st_size) for p in paths]!r}"
-        )
+        assert (
+            paths
+        ), f"no files written into {tmp_path!r}: {list(tmp_path.iterdir())!r}"
+        assert all(
+            p.exists() for p in paths
+        ), f"download() returned non-existent paths: {paths!r}"
+        assert all(
+            p.stat().st_size > 0 for p in paths
+        ), f"download() returned empty files: {[(p, p.stat().st_size) for p in paths]!r}"
 
     def test_glorys_thetao_subset(self, tmp_path: Path):
         """GLORYS12 daily thetao subset — single point × 1 day."""
@@ -116,16 +117,14 @@ class TestCmemsLiveSubset:
             aggregate=AggregationConfig(freq="1MS", op="mean", out_dir=str(tmp_path)),
         )
         assert paths, "monthly aggregate should write at least one GeoTIFF"
-        assert all(p.suffix == ".tif" for p in paths), (
-            f"aggregate output should be GeoTIFFs, got {[p.name for p in paths]!r}"
-        )
+        assert all(
+            p.suffix == ".tif" for p in paths
+        ), f"aggregate output should be GeoTIFFs, got {[p.name for p in paths]!r}"
         names = [p.name for p in paths]
-        assert any(n.endswith("_thetao_1MS_20200601.tif") for n in names), (
-            f"expected a June-2020 monthly window GeoTIFF, got {names!r}"
-        )
+        assert any(
+            n.endswith("_thetao_1MS_20200601.tif") for n in names
+        ), f"expected a June-2020 monthly window GeoTIFF, got {names!r}"
         assert all(p.exists() and p.stat().st_size > 0 for p in paths), (
             f"aggregate GeoTIFFs should be non-empty: "
             f"{[(p.name, p.stat().st_size) for p in paths]!r}"
         )
-
-

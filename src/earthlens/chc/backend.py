@@ -33,7 +33,6 @@ The `variables` constructor argument accepts two shapes:
 
 from __future__ import annotations
 
-import datetime as dt
 from contextlib import closing
 from ftplib import FTP  # nosec B402  # noqa: S402
 from pathlib import Path
@@ -51,6 +50,8 @@ from earthlens.base import (
     OutputKind,
     SpatialExtent,
     TemporalExtent,
+    mask_to_geometry,
+    to_datetime,
 )
 from earthlens.chc.catalog import Catalog
 from earthlens.chc.catalog import Dataset as ChcDataset
@@ -275,9 +276,7 @@ class CHIRPS(AbstractDataSource):
         return {_LEGACY_DATASET_KEY[temporal_resolution]: list(variables)}
 
     @staticmethod
-    def _validate_keys(
-        catalog: Catalog, variables: dict[str, list[str]]
-    ) -> None:
+    def _validate_keys(catalog: Catalog, variables: dict[str, list[str]]) -> None:
         """Reject unknown dataset keys / variable names before download."""
         for ds_key, var_names in variables.items():
             if ds_key not in catalog.datasets:
@@ -326,8 +325,8 @@ class CHIRPS(AbstractDataSource):
             `self.time.dates` would otherwise get a misleading daily
             index for a `monthly` or `6-hourly` dataset.
         """
-        start_dt = dt.datetime.strptime(start, fmt)
-        end_dt = dt.datetime.strptime(end, fmt)
+        start_dt = to_datetime(start, fmt)
+        end_dt = to_datetime(end, fmt)
         return TemporalExtent(
             start_date=start_dt,
             end_date=end_dt,
@@ -335,9 +334,7 @@ class CHIRPS(AbstractDataSource):
             dates=pd.DatetimeIndex([]),
         )
 
-    def _create_grid(
-        self, lat_lim: list[float], lon_lim: list[float]
-    ) -> SpatialExtent:
+    def _create_grid(self, lat_lim: list[float], lon_lim: list[float]) -> SpatialExtent:
         """Return a `SpatialExtent` for the user's bbox.
 
         Returns:
@@ -436,7 +433,9 @@ class CHIRPS(AbstractDataSource):
                             cores=cores,
                         )
                     )
-                except Exception as exc:  # noqa: BLE001 - log + continue so one bad variable doesn't kill the batch
+                except (
+                    Exception
+                ) as exc:  # noqa: BLE001 - log + continue so one bad variable doesn't kill the batch
                     logger.error(
                         f"CHIRPS download for {ds_key}/{var_name} failed: "
                         f"{type(exc).__name__}: {exc}"
@@ -447,8 +446,7 @@ class CHIRPS(AbstractDataSource):
 
         if failed:
             failed_summary = ", ".join(
-                f"{ds}/{v} ({type(exc).__name__})"
-                for (ds, v), exc in failed
+                f"{ds}/{v} ({type(exc).__name__})" for (ds, v), exc in failed
             )
             logger.warning(
                 f"CHIRPS download summary: {len(succeeded)} succeeded "
@@ -491,8 +489,8 @@ class CHIRPS(AbstractDataSource):
         ds_end = pd.Timestamp(dataset.end_date) if dataset.end_date else None
 
         window_start = max(self.time.start_date, ds_start)
-        window_end = self.time.end_date if ds_end is None else min(
-            self.time.end_date, ds_end
+        window_end = (
+            self.time.end_date if ds_end is None else min(self.time.end_date, ds_end)
         )
         if window_start > window_end:
             logger.warning(
@@ -504,9 +502,7 @@ class CHIRPS(AbstractDataSource):
             )
             return []
 
-        dates = pd.date_range(
-            window_start, window_end, freq=dataset.pandas_freq
-        )
+        dates = pd.date_range(window_start, window_end, freq=dataset.pandas_freq)
         # M1: catch per-date failures so a single transient (TCP reset,
         # FTP 550, a one-off bad raster) doesn't abort the rest of the
         # batch for this `(ds, var)`. The outer `download()` loop kept
@@ -529,9 +525,7 @@ class CHIRPS(AbstractDataSource):
                     dates, desc=f"CHIRPS {ds_key}", disable=not progress_bar
                 ):
                     try:
-                        path = self._api(
-                            ds_key, dataset, var, date, ftp=ftp_session
-                        )
+                        path = self._api(ds_key, dataset, var, date, ftp=ftp_session)
                     except Exception as exc:  # noqa: BLE001 - log + continue per date
                         failed.append((date, exc))
                         ftp_session = _reopen_ftp(ftp_session)
@@ -612,9 +606,7 @@ class CHIRPS(AbstractDataSource):
         ftp_base = dataset.ftp_bases[fmt_key]
         filenames = dataset.discrete_files[fmt_key]
         is_2d_raster = fmt_key in {"tif", "cog", "bil"}
-        iterable = tqdm(
-            filenames, desc=f"CHC {ds_key}", disable=not progress_bar
-        )
+        iterable = tqdm(filenames, desc=f"CHC {ds_key}", disable=not progress_bar)
         # L5: one shared anonymous-login round-trip across the whole
         # discrete-files batch. CHPclim v2 in particular is 12 files
         # served from the same dir; pre-L5 that meant 12 logins.
@@ -654,6 +646,8 @@ class CHIRPS(AbstractDataSource):
             epsg=raster.epsg,
             no_data_value=nodata_sentinel,
         )
+        # A polygon aoi= masks the bbox-clipped raster to the exact shape.
+        new_raster = mask_to_geometry(new_raster, self.space)
         new_raster.to_file(str(path))
 
     def _api(
@@ -711,7 +705,9 @@ class CHIRPS(AbstractDataSource):
         local_compressed = self.root_dir / remote_filename
         try:
             self._fetch_ftp(remote_dir, remote_filename, local_compressed, ftp=ftp)
-        except Exception:  # noqa: BLE001 - clean up the partial download on any FTP-stack failure, then re-raise unchanged
+        except (
+            Exception
+        ):  # noqa: BLE001 - clean up the partial download on any FTP-stack failure, then re-raise unchanged
             if local_compressed.exists():
                 try:
                     local_compressed.unlink()
@@ -719,9 +715,7 @@ class CHIRPS(AbstractDataSource):
                     pass
             raise
 
-        return self._post_process(
-            local_compressed, ds_key, dataset, var, date
-        )
+        return self._post_process(local_compressed, ds_key, dataset, var, date)
 
     @staticmethod
     def _placeholders(
@@ -835,9 +829,7 @@ class CHIRPS(AbstractDataSource):
         local_path = compressed_path
         if str(compressed_path).endswith(".gz"):
             extracted = compressed_path.with_suffix("")
-            extract_from_gz(
-                str(compressed_path), str(extracted), delete=True
-            )
+            extract_from_gz(str(compressed_path), str(extracted), delete=True)
             local_path = extracted
 
         raster = Dataset.read_file(str(local_path))
@@ -854,15 +846,15 @@ class CHIRPS(AbstractDataSource):
             data.dtype, copy=False
         )
 
-        out_path = self.root_dir / self._output_filename(
-            ds_key, dataset, var, date
-        )
+        out_path = self.root_dir / self._output_filename(ds_key, dataset, var, date)
         new_raster = Dataset.create_from_array(
             clipped,
             geo=new_geo,
             epsg=raster.epsg,
             no_data_value=nodata_sentinel,
         )
+        # A polygon aoi= masks the bbox-clipped raster to the exact shape.
+        new_raster = mask_to_geometry(new_raster, self.space)
         new_raster.to_file(str(out_path))
 
         try:
@@ -944,13 +936,15 @@ class CHIRPS(AbstractDataSource):
         if granularity == "annual":
             date_str = f"{date.year}"
         elif granularity in {
-            "monthly", "monthly-climatology", "2-monthly", "3-monthly"
+            "monthly",
+            "monthly-climatology",
+            "2-monthly",
+            "3-monthly",
         }:
             date_str = f"{date.year}.{date.month:02d}"
         elif granularity == "6-hourly":
             date_str = (
-                f"{date.year}.{date.month:02d}.{date.day:02d}."
-                f"{date.hour:02d}"
+                f"{date.year}.{date.month:02d}.{date.day:02d}." f"{date.hour:02d}"
             )
         else:
             date_str = f"{date.year}.{date.month:02d}.{date.day:02d}"

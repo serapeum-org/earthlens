@@ -46,8 +46,12 @@ class TestAliasEndpointBinding:
     def test_cdse_alias_prebinds_endpoint(self, fake_pyramids, tmp_path):
         """data_source='cdse' constructs the backend bound to the cdse endpoint."""
         el = _facade(
-            fake_pyramids, tmp_path, "cdse",
-            variables={"sentinel-1-grd": ["vv"]}, access_key="ak", secret_key="sk",
+            fake_pyramids,
+            tmp_path,
+            "cdse",
+            variables={"sentinel-1-grd": ["vv"]},
+            access_key="ak",
+            secret_key="sk",
         )
         assert isinstance(el.datasource, STAC)
         assert el.datasource._endpoint == "cdse"
@@ -59,7 +63,9 @@ class TestAliasEndpointBinding:
 
     def test_explicit_endpoint_overrides_alias_default(self, fake_pyramids, tmp_path):
         """A user endpoint= kwarg wins over the alias default."""
-        el = _facade(fake_pyramids, tmp_path, "planetary-computer", endpoint="earth-search")
+        el = _facade(
+            fake_pyramids, tmp_path, "planetary-computer", endpoint="earth-search"
+        )
         assert el.datasource._endpoint == "earth-search"
 
 

@@ -42,9 +42,7 @@ class TestCatalogBundledYaml:
         """The informational `available_datasets` index round-trips."""
         cat = Catalog()
         assert isinstance(cat.available_datasets, list)
-        assert any(
-            "phy" in d or "sst" in d.lower() for d in cat.available_datasets
-        ), (
+        assert any("phy" in d or "sst" in d.lower() for d in cat.available_datasets), (
             "expected at least one physics or SST dataset id, got "
             f"{cat.available_datasets[:5]!r}"
         )
@@ -53,29 +51,33 @@ class TestCatalogBundledYaml:
         """Every curated dataset id is a member of `available_datasets`."""
         cat = Catalog()
         missing = set(cat.datasets) - set(cat.available_datasets)
-        assert not missing, (
-            f"curated datasets absent from available_datasets: {sorted(missing)[:5]}"
-        )
+        assert (
+            not missing
+        ), f"curated datasets absent from available_datasets: {sorted(missing)[:5]}"
 
     def test_curated_glorys_present(self):
         """The curated GLORYS12 dataset row resolves end-to-end."""
         cat = Catalog()
         ds = cat.get_dataset("cmems_mod_glo_phy_my_0.083deg_P1D-m")
-        assert ds.cadence == "daily", f"GLORYS12 cadence should be daily, got {ds.cadence!r}"
-        assert ds.domain == "global", f"GLORYS12 domain should be global, got {ds.domain!r}"
-        assert "thetao" in ds.variables, (
-            f"GLORYS12 should expose thetao; got {list(ds.variables)}"
-        )
+        assert (
+            ds.cadence == "daily"
+        ), f"GLORYS12 cadence should be daily, got {ds.cadence!r}"
+        assert (
+            ds.domain == "global"
+        ), f"GLORYS12 domain should be global, got {ds.domain!r}"
+        assert (
+            "thetao" in ds.variables
+        ), f"GLORYS12 should expose thetao; got {list(ds.variables)}"
 
     def test_get_variable_known_pair(self):
         """`get_variable` resolves a `(dataset, variable)` pair."""
-        v = Catalog().get_variable(
-            "cmems_mod_glo_phy_my_0.083deg_P1D-m", "thetao"
-        )
-        assert v.units == "degrees_C", f"thetao units should be degrees_C, got {v.units!r}"
-        assert v.long_name.startswith("Sea water potential temperature"), (
-            f"long_name not preserved: {v.long_name!r}"
-        )
+        v = Catalog().get_variable("cmems_mod_glo_phy_my_0.083deg_P1D-m", "thetao")
+        assert (
+            v.units == "degrees_C"
+        ), f"thetao units should be degrees_C, got {v.units!r}"
+        assert v.long_name.startswith(
+            "Sea water potential temperature"
+        ), f"long_name not preserved: {v.long_name!r}"
 
     def test_get_variable_unknown_dataset(self):
         """Unknown dataset id raises KeyError."""
@@ -119,26 +121,27 @@ class TestYamlFilesFor:
         (tmp_path / "a.yaml").write_text("datasets: {}\n")
         (tmp_path / "notes.txt").write_text("ignore me\n")
         files = _yaml_files_for(tmp_path)
-        assert [f.name for f in files] == ["a.yaml", "b.yaml"], (
-            f"expected sorted *.yaml only, got {[f.name for f in files]}"
-        )
+        assert [f.name for f in files] == [
+            "a.yaml",
+            "b.yaml",
+        ], f"expected sorted *.yaml only, got {[f.name for f in files]}"
 
     def test_single_file_returns_itself(self, tmp_path: Path):
         """An existing single file returns just that file."""
         target = tmp_path / "one.yaml"
         target.write_text("datasets: {}\n")
-        assert _yaml_files_for(target) == [target], (
-            f"single file should return [itself], got {_yaml_files_for(target)!r}"
-        )
+        assert _yaml_files_for(target) == [
+            target
+        ], f"single file should return [itself], got {_yaml_files_for(target)!r}"
 
     def test_missing_path_raises_valueerror(self, tmp_path: Path):
         """A path that is neither a dir nor an existing file fails loud."""
         missing = tmp_path / "nope" / "missing.yaml"
         with pytest.raises(ValueError, match="does not exist") as exc:
             _yaml_files_for(missing)
-        assert "missing.yaml" in str(exc.value), (
-            f"error should name the bad path, got {exc.value}"
-        )
+        assert "missing.yaml" in str(
+            exc.value
+        ), f"error should name the bad path, got {exc.value}"
 
 
 @pytest.mark.cmems
@@ -161,10 +164,7 @@ class TestCatalogLoaderEdgeCases:
         """A dataset entry without any `variables:` fails loud."""
         bad = tmp_path / "empty_vars.yaml"
         bad.write_text(
-            "datasets:\n"
-            "  some-dataset:\n"
-            "    product: P\n"
-            "    title: T\n"
+            "datasets:\n" "  some-dataset:\n" "    product: P\n" "    title: T\n"
         )
         with pytest.raises(ValueError, match="variables"):
             _load_catalog_data(bad)
@@ -208,9 +208,9 @@ class TestCatalogLoaderEdgeCases:
             "        units: K\n"
         )
         second = _load_catalog_data(target)
-        assert second[1]["ds-1"].variables["v"].units == "K", (
-            "second read should pick up the rewritten unit"
-        )
+        assert (
+            second[1]["ds-1"].variables["v"].units == "K"
+        ), "second read should pick up the rewritten unit"
 
 
 @pytest.mark.cmems

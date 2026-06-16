@@ -27,7 +27,9 @@ class _FakeFC:
     Records `getDownloadURL` / `getInfo` calls and returns scripted payloads.
     """
 
-    def __init__(self, url: str = "http://fake.test/data.csv", info: dict | None = None):
+    def __init__(
+        self, url: str = "http://fake.test/data.csv", info: dict | None = None
+    ):
         self._url = url
         self._info = info or {"features": []}
         self.get_download_calls: list[dict] = []
@@ -51,7 +53,9 @@ def fake_read_csv(monkeypatch):
     """Replace `pd.read_csv` with a stub that returns a fixed frame regardless of URL."""
 
     def _stub(url, *args, **kwargs):
-        return pd.DataFrame({"system:index": [0, 1], ".geo": ["a", "b"], "val": [10, 20]})
+        return pd.DataFrame(
+            {"system:index": [0, 1], ".geo": ["a", "b"], "val": [10, 20]}
+        )
 
     monkeypatch.setattr(io_module.pd, "read_csv", _stub)
 
@@ -119,7 +123,11 @@ class TestRetryOnTransientErrors:
             raise ConnectionResetError("flake")
 
         wrapped = _retry_on_transient_errors(
-            _fn, tries=4, backoff=2.0, initial_delay=1.0, sleep=delays.append,
+            _fn,
+            tries=4,
+            backoff=2.0,
+            initial_delay=1.0,
+            sleep=delays.append,
         )
         with pytest.raises(ConnectionResetError):
             wrapped()
@@ -185,7 +193,8 @@ class TestFeatureCollectionToDataframe:
         assert fc.get_download_calls[0]["filetype"] == "CSV"
 
     def test_explicit_empty_selectors_forwards_empty_list_and_keeps_columns(
-        self, fake_read_csv,
+        self,
+        fake_read_csv,
     ):
         """`selectors=[]` is honoured verbatim — neither collapsed to None nor stripped (L3)."""
         fc = _FakeFC()
@@ -256,13 +265,21 @@ class TestFeatureCollectionToGdf:
 
     def test_sets_modern_crs_string(self):
         """`crs=4326` becomes `"EPSG:4326"`, not the legacy `{"init": ...}` shape."""
-        payload = {"features": [{"geometry": {"type": "Point", "coordinates": [0, 0]}, "properties": {}}]}
+        payload = {
+            "features": [
+                {"geometry": {"type": "Point", "coordinates": [0, 0]}, "properties": {}}
+            ]
+        }
         gdf = feature_collection_to_gdf(_FakeFC(info=payload), crs=4326)
         assert str(gdf.crs).upper() == "EPSG:4326"
 
     def test_passes_through_string_crs(self):
         """A string `crs` is used verbatim — useful for non-EPSG specifications."""
-        payload = {"features": [{"geometry": {"type": "Point", "coordinates": [0, 0]}, "properties": {}}]}
+        payload = {
+            "features": [
+                {"geometry": {"type": "Point", "coordinates": [0, 0]}, "properties": {}}
+            ]
+        }
         gdf = feature_collection_to_gdf(_FakeFC(info=payload), crs="EPSG:3857")
         assert str(gdf.crs).upper() == "EPSG:3857"
 

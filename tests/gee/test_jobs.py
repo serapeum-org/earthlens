@@ -22,7 +22,6 @@ from earthlens.gee.jobs import (
     wait_for_task_id,
 )
 
-
 # -- fixtures ---------------------------------------------------------------
 
 
@@ -30,7 +29,8 @@ from earthlens.gee.jobs import (
 def _stub_project(monkeypatch):
     """Pretend `ee.Initialize` happened with `earth-engine-415620`."""
     monkeypatch.setattr(
-        jobs_module.ee.data, "_get_projects_path",
+        jobs_module.ee.data,
+        "_get_projects_path",
         lambda: "projects/earth-engine-415620",
         raising=False,
     )
@@ -118,27 +118,36 @@ class TestResolveProject:
         assert _operation_name(full) == full
 
     def test_falls_back_to_cloud_api_user_project_when_getter_missing(
-        self, monkeypatch,
+        self,
+        monkeypatch,
     ):
         """If a future EE SDK removes `_get_projects_path`, fall back (L3)."""
         monkeypatch.delattr(jobs_module.ee.data, "_get_projects_path", raising=False)
         monkeypatch.setattr(
-            jobs_module.ee.data, "_cloud_api_user_project",
-            "fallback-project", raising=False,
+            jobs_module.ee.data,
+            "_cloud_api_user_project",
+            "fallback-project",
+            raising=False,
         )
         assert _resolve_project(None) == "fallback-project"
 
     def test_falls_back_when_getter_raises(self, monkeypatch):
         """A raising `_get_projects_path` still resolves via the module-level state."""
+
         def _boom():
             raise RuntimeError("EE SDK internals changed under us")
 
         monkeypatch.setattr(
-            jobs_module.ee.data, "_get_projects_path", _boom, raising=False,
+            jobs_module.ee.data,
+            "_get_projects_path",
+            _boom,
+            raising=False,
         )
         monkeypatch.setattr(
-            jobs_module.ee.data, "_cloud_api_user_project",
-            "projects/recovered-project", raising=False,
+            jobs_module.ee.data,
+            "_cloud_api_user_project",
+            "projects/recovered-project",
+            raising=False,
         )
         # `projects/` prefix is stripped just like the primary path.
         assert _resolve_project(None) == "recovered-project"
@@ -147,9 +156,14 @@ class TestResolveProject:
         """Both EE internals gone → clear remediation message, not AttributeError."""
         monkeypatch.delattr(jobs_module.ee.data, "_get_projects_path", raising=False)
         monkeypatch.setattr(
-            jobs_module.ee.data, "_cloud_api_user_project", None, raising=False,
+            jobs_module.ee.data,
+            "_cloud_api_user_project",
+            None,
+            raising=False,
         )
-        with pytest.raises(RuntimeError, match="Could not resolve the current EE project"):
+        with pytest.raises(
+            RuntimeError, match="Could not resolve the current EE project"
+        ):
             _resolve_project(None)
 
     def test_ee_sdk_still_exposes_the_private_helper(self):
@@ -161,6 +175,7 @@ class TestResolveProject:
         `_resolve_project` accordingly.
         """
         import ee
+
         assert hasattr(ee.data, "_get_projects_path"), (
             "`ee.data._get_projects_path` is gone on this SDK release — "
             "`_resolve_project` in `earthlens.gee.jobs` needs to drop "
@@ -187,19 +202,26 @@ class TestOpAdapter:
         assert info.error_message is None
 
     def test_list_operations_shape_completed_carries_destination_uris(self):
-        info = _op_to_taskinfo(_op(
-            state="COMPLETED", done=True,
-            destination_uris=["drive://my_folder/scene_0001.tif"],
-        ))
+        info = _op_to_taskinfo(
+            _op(
+                state="COMPLETED",
+                done=True,
+                destination_uris=["drive://my_folder/scene_0001.tif"],
+            )
+        )
         assert info.state == "COMPLETED"
         assert info.done is True
         assert info.destination_uris == ("drive://my_folder/scene_0001.tif",)
         assert info.error_message is None
 
     def test_list_operations_shape_failed_carries_error_message(self):
-        info = _op_to_taskinfo(_op(
-            state="FAILED", done=True, error_message="quota exceeded",
-        ))
+        info = _op_to_taskinfo(
+            _op(
+                state="FAILED",
+                done=True,
+                error_message="quota exceeded",
+            )
+        )
         assert info.state == "FAILED"
         assert info.error_message == "quota exceeded"
         assert info.destination_uris == ()
@@ -217,11 +239,14 @@ class TestOpAdapter:
         with pytest.raises(ValueError, match="unknown EE task state 'GARGLE'"):
             _op_to_taskinfo(_op(state="GARGLE"))
 
-    @pytest.mark.parametrize("lro, normalised", [
-        ("PENDING", "READY"),
-        ("SUCCEEDED", "COMPLETED"),
-        ("CANCELLING", "CANCEL_REQUESTED"),
-    ])
+    @pytest.mark.parametrize(
+        "lro, normalised",
+        [
+            ("PENDING", "READY"),
+            ("SUCCEEDED", "COMPLETED"),
+            ("CANCELLING", "CANCEL_REQUESTED"),
+        ],
+    )
     def test_lro_state_aliases_are_normalised(self, lro, normalised):
         """The Operations LRO vocabulary folds into the `Task.State` vocabulary."""
         info = _op_to_taskinfo(_op(state=lro))
@@ -256,8 +281,10 @@ class TestListRecentTasks:
             def _stub(project=None):
                 captured["calls"].append(project)
                 return ops
+
             monkeypatch.setattr(jobs_module.ee.data, "listOperations", _stub)
             return captured
+
         return _make
 
     def test_returns_all_when_no_filter(self, fake_list):
@@ -266,44 +293,54 @@ class TestListRecentTasks:
         assert {t.id for t in tasks} == {"ID0001", "ID0002"}
 
     def test_sorted_newest_first(self, fake_list):
-        fake_list([
-            _op(task_id="A", create_iso="2026-01-01T00:00:00Z"),
-            _op(task_id="B", create_iso="2026-05-17T00:00:00Z"),
-            _op(task_id="C", create_iso="2026-03-15T00:00:00Z"),
-        ])
+        fake_list(
+            [
+                _op(task_id="A", create_iso="2026-01-01T00:00:00Z"),
+                _op(task_id="B", create_iso="2026-05-17T00:00:00Z"),
+                _op(task_id="C", create_iso="2026-03-15T00:00:00Z"),
+            ]
+        )
         ids = [t.id for t in list_recent_tasks()]
         assert ids == ["B", "C", "A"]
 
     def test_state_filter_string(self, fake_list):
-        fake_list([
-            _op(state="RUNNING", task_id="R1"),
-            _op(state="COMPLETED", task_id="C1"),
-        ])
+        fake_list(
+            [
+                _op(state="RUNNING", task_id="R1"),
+                _op(state="COMPLETED", task_id="C1"),
+            ]
+        )
         ids = [t.id for t in list_recent_tasks(state="RUNNING")]
         assert ids == ["R1"]
 
     def test_state_filter_set(self, fake_list):
-        fake_list([
-            _op(state="RUNNING", task_id="R1"),
-            _op(state="FAILED", task_id="F1", done=True, error_message="oops"),
-            _op(state="COMPLETED", task_id="C1", done=True),
-        ])
+        fake_list(
+            [
+                _op(state="RUNNING", task_id="R1"),
+                _op(state="FAILED", task_id="F1", done=True, error_message="oops"),
+                _op(state="COMPLETED", task_id="C1", done=True),
+            ]
+        )
         ids = {t.id for t in list_recent_tasks(state={"FAILED", "COMPLETED"})}
         assert ids == {"F1", "C1"}
 
     def test_task_type_filter(self, fake_list):
-        fake_list([
-            _op(task_type="EXPORT_IMAGE", task_id="I1"),
-            _op(task_type="EXPORT_TABLE", task_id="T1"),
-        ])
+        fake_list(
+            [
+                _op(task_type="EXPORT_IMAGE", task_id="I1"),
+                _op(task_type="EXPORT_TABLE", task_id="T1"),
+            ]
+        )
         ids = [t.id for t in list_recent_tasks(task_type="EXPORT_TABLE")]
         assert ids == ["T1"]
 
     def test_description_prefix_filter(self, fake_list):
-        fake_list([
-            _op(description="USGS_SRTMGL1_003_elevation_20000211", task_id="A"),
-            _op(description="COPERNICUS_S2_SR_HARMONIZED_B4_20240601", task_id="B"),
-        ])
+        fake_list(
+            [
+                _op(description="USGS_SRTMGL1_003_elevation_20000211", task_id="A"),
+                _op(description="COPERNICUS_S2_SR_HARMONIZED_B4_20240601", task_id="B"),
+            ]
+        )
         ids = [t.id for t in list_recent_tasks(description_prefix="USGS_")]
         assert ids == ["A"]
 
@@ -318,20 +355,24 @@ class TestListRecentTasks:
                 return now
 
         monkeypatch.setattr(jobs_module.dt, "datetime", _FixedDatetime)
-        fake_list([
-            _op(task_id="OLD", create_iso="2026-05-17T15:30:00Z"),
-            _op(task_id="FRESH", create_iso="2026-05-17T17:55:00Z"),
-        ])
+        fake_list(
+            [
+                _op(task_id="OLD", create_iso="2026-05-17T15:30:00Z"),
+                _op(task_id="FRESH", create_iso="2026-05-17T17:55:00Z"),
+            ]
+        )
         # 1 hour window → only FRESH (created 5 min before "now").
         ids = [t.id for t in list_recent_tasks(max_age_min=60)]
         assert ids == ["FRESH"]
 
     def test_limit_clips_after_sort(self, fake_list):
-        fake_list([
-            _op(task_id="A", create_iso="2026-01-01T00:00:00Z"),
-            _op(task_id="B", create_iso="2026-05-17T00:00:00Z"),
-            _op(task_id="C", create_iso="2026-03-15T00:00:00Z"),
-        ])
+        fake_list(
+            [
+                _op(task_id="A", create_iso="2026-01-01T00:00:00Z"),
+                _op(task_id="B", create_iso="2026-05-17T00:00:00Z"),
+                _op(task_id="C", create_iso="2026-03-15T00:00:00Z"),
+            ]
+        )
         ids = [t.id for t in list_recent_tasks(limit=2)]
         assert ids == ["B", "C"]
 
@@ -362,7 +403,9 @@ class TestGetTaskStatus:
 
         def _stub(op_name):
             captured["op_name"] = op_name
-            return _op(state="COMPLETED", done=True, destination_uris=["drive://x/y.tif"])
+            return _op(
+                state="COMPLETED", done=True, destination_uris=["drive://x/y.tif"]
+            )
 
         monkeypatch.setattr(jobs_module.ee.data, "getOperation", _stub)
         info = get_task_status("ID0001")
@@ -388,7 +431,8 @@ class TestCancelTask:
     def test_calls_cancel_operation_with_canonical_name(self, monkeypatch):
         captured = {}
         monkeypatch.setattr(
-            jobs_module.ee.data, "cancelOperation",
+            jobs_module.ee.data,
+            "cancelOperation",
             lambda n: captured.setdefault("op_name", n),
         )
         cancel_task("ID0042", project="my-project")
@@ -423,12 +467,13 @@ class TestCancelTask:
         finally:
             _loguru.remove(sink_id)
         joined = "".join(buffer)
-        assert "already terminal" in joined, (
-            f"expected an INFO log mentioning 'already terminal'; got {joined!r}"
-        )
+        assert (
+            "already terminal" in joined
+        ), f"expected an INFO log mentioning 'already terminal'; got {joined!r}"
 
     def test_failed_precondition_in_message_is_swallowed(self, monkeypatch):
         """A non-HttpError carrying `FAILED_PRECONDITION` text is also swallowed."""
+
         def _stub(_op_name):
             raise RuntimeError("FAILED_PRECONDITION: operation is done")
 
@@ -462,8 +507,11 @@ class TestWaitForTaskId:
 
     def test_returns_when_already_completed(self, monkeypatch):
         monkeypatch.setattr(
-            jobs_module.ee.data, "getOperation",
-            lambda n: _op(state="COMPLETED", done=True, destination_uris=["drive://x.tif"]),
+            jobs_module.ee.data,
+            "getOperation",
+            lambda n: _op(
+                state="COMPLETED", done=True, destination_uris=["drive://x.tif"]
+            ),
         )
         out = wait_for_task_id("ID0001", progress_bar=False, sleep=lambda s: None)
         assert out.state == "COMPLETED"
@@ -472,17 +520,21 @@ class TestWaitForTaskId:
         states = iter(["READY", "RUNNING", "COMPLETED"])
         slept: list[float] = []
         monkeypatch.setattr(
-            jobs_module.ee.data, "getOperation",
+            jobs_module.ee.data,
+            "getOperation",
             lambda n: _op(state=next(states), done=False),
         )
         # Polling stops on COMPLETED; the third call's `done=False` doesn't
         # matter — the state-based check is what terminates the loop.
-        wait_for_task_id("ID0001", poll_seconds=2, progress_bar=False, sleep=slept.append)
+        wait_for_task_id(
+            "ID0001", poll_seconds=2, progress_bar=False, sleep=slept.append
+        )
         assert slept == [2, 2]  # two sleeps between three polls
 
     def test_failed_task_raises_with_error_message(self, monkeypatch):
         monkeypatch.setattr(
-            jobs_module.ee.data, "getOperation",
+            jobs_module.ee.data,
+            "getOperation",
             lambda n: _op(state="FAILED", done=True, error_message="quota exceeded"),
         )
         with pytest.raises(RuntimeError, match="ended FAILED: quota exceeded"):
@@ -490,7 +542,8 @@ class TestWaitForTaskId:
 
     def test_cancelled_task_raises(self, monkeypatch):
         monkeypatch.setattr(
-            jobs_module.ee.data, "getOperation",
+            jobs_module.ee.data,
+            "getOperation",
             lambda n: _op(state="CANCELLED", done=True),
         )
         with pytest.raises(RuntimeError, match="ended CANCELLED"):
@@ -507,12 +560,16 @@ class TestWaitForTaskId:
         states = iter(["CANCEL_REQUESTED", "CANCEL_REQUESTED", "CANCELLED"])
         slept: list[float] = []
         monkeypatch.setattr(
-            jobs_module.ee.data, "getOperation",
+            jobs_module.ee.data,
+            "getOperation",
             lambda n: _op(state=next(states), done=False),
         )
         with pytest.raises(RuntimeError, match="ended CANCELLED"):
             wait_for_task_id(
-                "ID0001", poll_seconds=1, progress_bar=False, sleep=slept.append,
+                "ID0001",
+                poll_seconds=1,
+                progress_bar=False,
+                sleep=slept.append,
             )
         # Three polls means two sleeps between them — proves we did NOT
         # exit on the first CANCEL_REQUESTED.
@@ -526,9 +583,13 @@ class TestResolveDestination:
     """Tests for `resolve_destination`."""
 
     def _completed_info(self, uris: list[str]) -> TaskInfo:
-        return _op_to_taskinfo(_op(
-            state="COMPLETED", done=True, destination_uris=uris,
-        ))
+        return _op_to_taskinfo(
+            _op(
+                state="COMPLETED",
+                done=True,
+                destination_uris=uris,
+            )
+        )
 
     def test_returns_destination_uris_for_completed_task(self):
         info = self._completed_info(["drive://my_folder/scene.tif"])
@@ -538,17 +599,22 @@ class TestResolveDestination:
         info = _op_to_taskinfo(_op(state="RUNNING"))
         assert resolve_destination(info) == []
 
-    @pytest.mark.parametrize("uri", [
-        "drive://my_folder/scene.tif",
-        "gs://my-bucket/scene.tif",
-        "projects/my-project/assets/my-folder/scene",
-    ])
+    @pytest.mark.parametrize(
+        "uri",
+        [
+            "drive://my_folder/scene.tif",
+            "gs://my-bucket/scene.tif",
+            "projects/my-project/assets/my-folder/scene",
+        ],
+    )
     def test_returns_each_sink_destination_verbatim(self, uri):
         info = self._completed_info([uri])
         assert resolve_destination(info) == [uri]
 
     def test_download_to_recognises_gs_uri_and_calls_pull_gcs(
-        self, monkeypatch, tmp_path,
+        self,
+        monkeypatch,
+        tmp_path,
     ):
         """A `gs://bucket/key` URI dispatches to `_pull_gcs(bucket, key, dest_dir)`."""
         captured: dict = {}
@@ -591,19 +657,18 @@ class TestResolveDestination:
             return dest_dir / "scene.tif"
 
         monkeypatch.setattr(jobs_module, "_pull_drive_file", _stub)
-        info = self._completed_info([
-            "https://drive.google.com/file/d/1abcDEF_xYz/view?usp=drive_web"
-        ])
+        info = self._completed_info(
+            ["https://drive.google.com/file/d/1abcDEF_xYz/view?usp=drive_web"]
+        )
         resolve_destination(info, download_to=tmp_path)
         assert captured == {"file_id": "1abcDEF_xYz"}
 
     def test_download_to_passes_drive_folder_url_through_with_warning(
-        self, tmp_path,
+        self,
+        tmp_path,
     ):
         """Drive folder URLs are surfaced verbatim (no list+download)."""
-        info = self._completed_info([
-            "https://drive.google.com/#folders/1zzzFolderId"
-        ])
+        info = self._completed_info(["https://drive.google.com/#folders/1zzzFolderId"])
         out = resolve_destination(info, download_to=tmp_path)
         assert out == ["https://drive.google.com/#folders/1zzzFolderId"]
 
@@ -641,8 +706,10 @@ class TestResolveDestination:
         captured: dict = {}
         sentinel_creds = object()
         monkeypatch.setattr(
-            jobs_module.ee.data, "get_persistent_credentials",
-            lambda: sentinel_creds, raising=False,
+            jobs_module.ee.data,
+            "get_persistent_credentials",
+            lambda: sentinel_creds,
+            raising=False,
         )
 
         class _FakeBlob:
@@ -706,6 +773,7 @@ class TestCatalogShortcuts:
     def test_catalog_list_recent_tasks_delegates(self, monkeypatch):
         """`Catalog.list_recent_tasks(**kw)` forwards verbatim to the jobs module."""
         from earthlens.gee import Catalog
+
         captured: dict = {}
 
         def _stub(**kw):
@@ -714,7 +782,9 @@ class TestCatalogShortcuts:
 
         monkeypatch.setattr(jobs_module, "list_recent_tasks", _stub)
         cat = Catalog.model_construct(
-            available_datasets=[], datasets={}, providers={},
+            available_datasets=[],
+            datasets={},
+            providers={},
         )
         result = cat.list_recent_tasks(state="RUNNING", max_age_min=120)
         assert result == ["sentinel"]
@@ -723,6 +793,7 @@ class TestCatalogShortcuts:
     def test_catalog_get_task_status_delegates(self, monkeypatch):
         """`Catalog.get_task_status(id, **kw)` forwards verbatim."""
         from earthlens.gee import Catalog
+
         captured: dict = {}
 
         def _stub(task_id, **kw):
@@ -732,7 +803,9 @@ class TestCatalogShortcuts:
 
         monkeypatch.setattr(jobs_module, "get_task_status", _stub)
         cat = Catalog.model_construct(
-            available_datasets=[], datasets={}, providers={},
+            available_datasets=[],
+            datasets={},
+            providers={},
         )
         result = cat.get_task_status("ID0001", project="my-project")
         assert result == "sentinel"
@@ -747,8 +820,9 @@ class TestCatalogShortcuts:
             return [
                 _op_to_taskinfo(_op(state="RUNNING", task_id="R1")),
                 _op_to_taskinfo(_op(state="COMPLETED", task_id="C1", done=True)),
-                _op_to_taskinfo(_op(state="FAILED", task_id="F1", done=True,
-                                    error_message="oops")),
+                _op_to_taskinfo(
+                    _op(state="FAILED", task_id="F1", done=True, error_message="oops")
+                ),
                 _op_to_taskinfo(_op(state="COMPLETED", task_id="C2", done=True)),
             ]
 
@@ -762,6 +836,7 @@ class TestCatalogShortcuts:
     def test_audit_recent_tasks_rejects_state_kwarg(self, monkeypatch):
         """`state=` would silently narrow the report — reject it explicitly."""
         from earthlens.gee import Catalog
+
         monkeypatch.setattr(jobs_module, "list_recent_tasks", lambda **kw: [])
         cat = Catalog.model_construct(available_datasets=[], datasets={}, providers={})
         with pytest.raises(ValueError, match="don't pass `state=`"):
@@ -770,6 +845,7 @@ class TestCatalogShortcuts:
     def test_audit_recent_tasks_empty_window_returns_empty_dict(self, monkeypatch):
         """No matching tasks → empty dict."""
         from earthlens.gee import Catalog
+
         monkeypatch.setattr(jobs_module, "list_recent_tasks", lambda **kw: [])
         cat = Catalog.model_construct(available_datasets=[], datasets={}, providers={})
         assert cat.audit_recent_tasks() == {}
@@ -791,9 +867,15 @@ class TestCli:
 
         monkeypatch.setattr(jobs_module, "list_recent_tasks", _stub_list)
         monkeypatch.setattr(jobs_module, "_maybe_initialize_ee", lambda: None)
-        rc = jobs_module.main([
-            "list", "--state", "RUNNING", "--max-age-min", "30",
-        ])
+        rc = jobs_module.main(
+            [
+                "list",
+                "--state",
+                "RUNNING",
+                "--max-age-min",
+                "30",
+            ]
+        )
         out = capsys.readouterr().out
         assert rc == 0
         assert "LCMD1" in out
@@ -825,8 +907,9 @@ class TestCli:
         assert "(no tasks match)" in capsys.readouterr().out
 
     def test_status_command_dumps_pydantic_json(self, monkeypatch, capsys):
-        info = _op_to_taskinfo(_op(state="COMPLETED", done=True,
-                                   destination_uris=["drive://x.tif"]))
+        info = _op_to_taskinfo(
+            _op(state="COMPLETED", done=True, destination_uris=["drive://x.tif"])
+        )
         monkeypatch.setattr(jobs_module, "get_task_status", lambda *a, **k: info)
         monkeypatch.setattr(jobs_module, "_maybe_initialize_ee", lambda: None)
         rc = jobs_module.main(["status", "ID0001"])
@@ -838,7 +921,8 @@ class TestCli:
     def test_cancel_command_calls_cancel_task(self, monkeypatch, capsys):
         captured: dict = {}
         monkeypatch.setattr(
-            jobs_module, "cancel_task",
+            jobs_module,
+            "cancel_task",
             lambda task_id, **kw: captured.update({"task_id": task_id, **kw}),
         )
         monkeypatch.setattr(jobs_module, "_maybe_initialize_ee", lambda: None)
@@ -848,8 +932,9 @@ class TestCli:
         assert "cancel requested for ID0001" in capsys.readouterr().out
 
     def test_wait_command_invokes_wait_for_task_id(self, monkeypatch, capsys):
-        info = _op_to_taskinfo(_op(state="COMPLETED", done=True,
-                                   destination_uris=["drive://x.tif"]))
+        info = _op_to_taskinfo(
+            _op(state="COMPLETED", done=True, destination_uris=["drive://x.tif"])
+        )
         monkeypatch.setattr(jobs_module, "wait_for_task_id", lambda *a, **k: info)
         monkeypatch.setattr(jobs_module, "_maybe_initialize_ee", lambda: None)
         rc = jobs_module.main(["wait", "ID0001", "--no-progress-bar"])
@@ -865,6 +950,7 @@ class TestCli:
         traceback for a known failure mode (task ended FAILED / CANCELLED).
         The CLI should report the error to stderr and exit non-zero.
         """
+
         def _stub(*_a, **_k):
             raise RuntimeError("Earth Engine task ID0001 ended FAILED: quota exceeded")
 

@@ -132,9 +132,7 @@ class S3Auth(AbstractAuth[S3Credentials]):
             self._client = boto3.client(
                 "s3",
                 region_name=region,
-                config=botocore.client.Config(
-                    signature_version=botocore.UNSIGNED
-                ),
+                config=botocore.client.Config(signature_version=botocore.UNSIGNED),
             )
 
     def is_authenticated(self) -> bool:

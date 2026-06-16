@@ -62,14 +62,14 @@ from earthlens.tropycal._compat import ensure_pkg_resources
 ensure_pkg_resources()
 
 from earthlens.tropycal.backend import TropicalCyclone, Tropycal  # noqa: E402
-from earthlens.tropycal.catalog import (
+from earthlens.tropycal.catalog import (  # noqa: E402
     CATALOG_PATH,
     Basin,
     Catalog,
     TrackField,
     clear_catalog_cache,
 )
-from earthlens.tropycal.events import (
+from earthlens.tropycal.events import (  # noqa: E402
     empty_fc,
     empty_recon_fc,
     frame_to_fc,

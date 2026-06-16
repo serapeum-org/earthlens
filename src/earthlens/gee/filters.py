@@ -39,7 +39,8 @@ def by_year(collection: ee.ImageCollection, year: int) -> ee.ImageCollection:
 
 
 def by_bounds(
-    collection: ee.ImageCollection, region: ee.Geometry | ee.FeatureCollection,
+    collection: ee.ImageCollection,
+    region: ee.Geometry | ee.FeatureCollection,
 ) -> ee.ImageCollection:
     """Filter an `ee.ImageCollection` to images intersecting `region`.
 
@@ -59,7 +60,9 @@ def by_bounds(
 
 
 def by_property_in(
-    collection: ee.ImageCollection, property_name: str, values: Iterable[Any],
+    collection: ee.ImageCollection,
+    property_name: str,
+    values: Iterable[Any],
 ) -> ee.ImageCollection:
     """Filter an `ee.ImageCollection` to images whose `property_name` is in `values`.
 

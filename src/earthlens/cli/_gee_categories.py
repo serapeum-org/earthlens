@@ -11,7 +11,7 @@ move a stanza by hand or override the file with `--target`.
 from __future__ import annotations
 
 # All categories we emit, in display / file-order. Anything not matched
-# by the rules table lands in ``other``.
+# by the rules table lands in `other`.
 CATEGORIES = [
     "optical-multispectral",
     "sar-radar",

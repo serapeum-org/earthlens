@@ -137,7 +137,9 @@ def empty_fc() -> FeatureCollection:
 
             ```
     """
-    frame = pd.DataFrame({column: pd.Series([], dtype="object") for column in _EMPTY_COLUMNS})
+    frame = pd.DataFrame(
+        {column: pd.Series([], dtype="object") for column in _EMPTY_COLUMNS}
+    )
     gdf = gpd.GeoDataFrame(
         frame, geometry=gpd.GeoSeries([], crs=OVERTURE_CRS), crs=OVERTURE_CRS
     )

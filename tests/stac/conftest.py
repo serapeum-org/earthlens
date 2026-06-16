@@ -30,7 +30,10 @@ class _FakeItem:
     """A STAC item stand-in with id, datetime, and an assets map."""
 
     def __init__(
-        self, item_id: str, date: str, asset_hrefs: dict[str, str],
+        self,
+        item_id: str,
+        date: str,
+        asset_hrefs: dict[str, str],
         proj_epsg: int | None = None,
     ) -> None:
         import datetime as dt
@@ -76,8 +79,9 @@ class _FakeClient:
 class _FakeDataset:
     """A pyramids Dataset stand-in for the load/mosaic/write path."""
 
-    def __init__(self, href: str = "", epsg: int | None = 32630,
-                 shape: tuple = (1, 2, 2)) -> None:
+    def __init__(
+        self, href: str = "", epsg: int | None = 32630, shape: tuple = (1, 2, 2)
+    ) -> None:
         self.href = href
         self.epsg = epsg
         self.shape = shape
@@ -105,7 +109,9 @@ class _FakeDataset:
         out.aligned_to = reference.shape
         return out
 
-    def crop(self, mask=None, touch: bool = True, *, bbox=None, epsg=None) -> _FakeDataset:
+    def crop(
+        self, mask=None, touch: bool = True, *, bbox=None, epsg=None
+    ) -> _FakeDataset:
         """Mirror pyramids' keyword-only crop, recording the bbox + its CRS."""
         out = _FakeDataset(self.href, self.epsg)
         out.cropped_bbox = list(bbox) if bbox is not None else None
@@ -217,7 +223,9 @@ class _PlanetaryComputerSigner(_AnonymousSigner):
         return href + "?sas=token"
 
 
-def _resolved_href(item_or_asset: Any, asset_key: Any = None, *, signer: Any = None) -> str:
+def _resolved_href(
+    item_or_asset: Any, asset_key: Any = None, *, signer: Any = None
+) -> str:
     """Stand-in for pyramids.stac.resolved_href: resolve href + apply sign_href."""
     if asset_key is None:
         asset = item_or_asset
@@ -226,7 +234,9 @@ def _resolved_href(item_or_asset: Any, asset_key: Any = None, *, signer: Any = N
         if assets is None and isinstance(item_or_asset, dict):
             assets = item_or_asset.get("assets")
         if not assets or asset_key not in assets:
-            raise KeyError(f"asset {asset_key!r} not found; available {sorted(assets or [])}")
+            raise KeyError(
+                f"asset {asset_key!r} not found; available {sorted(assets or [])}"
+            )
         asset = assets[asset_key]
     href = getattr(asset, "href", None)
     if href is None and isinstance(asset, dict):
@@ -298,7 +308,9 @@ def fake_pyramids(monkeypatch: pytest.MonkeyPatch) -> FakePyramids:
 
     def _read_file(href, **kwargs):
         epsg = next((v for k, v in fp.dataset_epsgs.items() if k in str(href)), 32630)
-        shape = next((v for k, v in fp.dataset_shapes.items() if k in str(href)), (1, 2, 2))
+        shape = next(
+            (v for k, v in fp.dataset_shapes.items() if k in str(href)), (1, 2, 2)
+        )
         return _FakeDataset(href, epsg, shape)
 
     def _create_from_array(arr=None, geo=None, epsg=None, no_data_value=None, **kwargs):

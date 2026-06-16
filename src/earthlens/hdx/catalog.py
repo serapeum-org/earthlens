@@ -44,7 +44,7 @@ CATALOG_PATH: Path = Path(__file__).parent / "catalog"
 # plus a tuple of `(file, mtime_ns)` for every YAML the load touched, so
 # editing any per-theme file invalidates the entry without inspecting
 # every row. Mirrors the Earthdata / CMEMS multi-file pattern.
-_CATALOG_CACHE: dict[Any, tuple[list[str], dict[str, "HdxDataset"]]] = {}
+_CATALOG_CACHE: dict[Any, tuple[list[str], dict[str, HdxDataset]]] = {}
 # Same `(path, mtime_ns)` cache for the auto-generated `available_datasets`
 # index. The index is held as JSON (`_available.json`), not YAML, and parsed
 # separately from the curated per-theme YAMLs — so a `Catalog()` pays only the
@@ -187,7 +187,7 @@ def _yaml_files_for(path: Path) -> list[Path]:
     )
 
 
-def _load_catalog_data(path: Path) -> tuple[list[str], dict[str, "HdxDataset"]]:
+def _load_catalog_data(path: Path) -> tuple[list[str], dict[str, HdxDataset]]:
     """Parse, validate, and cache the HDX catalog at `path`.
 
     Returns a `(available_datasets, datasets)` tuple. When `path` is a

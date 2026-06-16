@@ -58,7 +58,7 @@ class _FakeStream:
 class _FakeCollection:
     """Stand-in for an `eumdac` collection — yields products on search."""
 
-    def __init__(self, collection_id: str, store: "_FakeDataStore") -> None:
+    def __init__(self, collection_id: str, store: _FakeDataStore) -> None:
         self.collection_id = collection_id
         self._store = store
 

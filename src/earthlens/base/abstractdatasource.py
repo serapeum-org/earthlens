@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import difflib
+import functools
+import inspect
 import os
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
@@ -217,6 +219,19 @@ class SpatialExtent(BaseModel):
     resolution: float | None = Field(
         default=None, gt=0.0, description="Grid cell size in degrees"
     )
+    geometry: Any = Field(
+        default=None,
+        exclude=True,
+        repr=False,
+        description=(
+            "Optional WGS84 polygon mask (a geopandas `GeoDataFrame`) "
+            "captured when the request's area of interest was a polygon "
+            "rather than a plain bbox. Raster backends that clip via "
+            "`pyramids.Dataset.crop` use it to mask the fetched bbox to "
+            "the exact polygon; `None` means clip to the rectangular "
+            "bbox only. Excluded from serialisation."
+        ),
+    )
 
     @model_validator(mode="after")
     def _check_min_le_max(self) -> SpatialExtent:
@@ -240,6 +255,45 @@ class SpatialExtent(BaseModel):
                 f"longitude_max ({self.longitude_max})"
             )
         return self
+
+    #: The scalar fields that define spatial identity. `geometry` is a
+    #: heavy, unhashable `GeoDataFrame` whose pandas `==` is non-boolean,
+    #: so it is deliberately excluded from equality / hashing (as it is
+    #: from serialisation) — two extents over the same bbox are equal and
+    #: hashable whether or not one carries a polygon mask.
+    _IDENTITY_FIELDS = (
+        "latitude_min",
+        "latitude_max",
+        "longitude_min",
+        "longitude_max",
+        "resolution",
+    )
+
+    def _identity(self) -> tuple[float | None, ...]:
+        """Return the bbox-identity tuple used for equality / hashing."""
+        return tuple(getattr(self, name) for name in self._IDENTITY_FIELDS)
+
+    def __eq__(self, other: object) -> bool:
+        """Compare two extents by bbox + resolution, ignoring `geometry`.
+
+        Overrides pydantic's field-wise equality, which would otherwise
+        evaluate `GeoDataFrame == GeoDataFrame` (a non-boolean pandas
+        result) and raise for a polygon-`aoi=` extent.
+
+        Args:
+            other: The object to compare against.
+
+        Returns:
+            `True` when `other` is a `SpatialExtent` with the same bbox
+            and resolution; `NotImplemented` for any other type.
+        """
+        if not isinstance(other, SpatialExtent):
+            return NotImplemented
+        return self._identity() == other._identity()
+
+    def __hash__(self) -> int:
+        """Hash by bbox + resolution, ignoring the unhashable `geometry`."""
+        return hash(self._identity())
 
     @classmethod
     def from_pairs(
@@ -323,6 +377,78 @@ class SpatialExtent(BaseModel):
         )
 
 
+class LazyClientMixin:
+    """Defer a backend's network client until first `client` access.
+
+    A backend that authenticates or opens a connection mixes this in
+    (before :class:`AbstractDataSource` in its bases) and implements
+    :meth:`_open_client` — the network half. Its :meth:`_initialize` then
+    keeps only eager, offline work (input validation, catalog resolution)
+    and returns `None`, so the parent never binds an eager `client`. The
+    live client is built lazily on first access to :attr:`client` and
+    cached, so constructing the backend — or a bare `EarthLens(...)` —
+    never touches the network. Authentication errors therefore surface on
+    the first `download()` / `search()` / `client` use rather than at
+    construction.
+
+    Examples:
+        - The client is built once, on first access, then cached:
+            ```python
+            >>> from earthlens.base import LazyClientMixin
+            >>> class Demo(LazyClientMixin):
+            ...     calls = 0
+            ...     def _open_client(self):
+            ...         Demo.calls += 1
+            ...         return "connection"
+            >>> demo = Demo()
+            >>> Demo.calls
+            0
+            >>> demo.client
+            'connection'
+            >>> demo.client
+            'connection'
+            >>> Demo.calls
+            1
+
+            ```
+    """
+
+    def _open_client(self) -> Any:
+        """Open and return the backend's live network client.
+
+        Raises:
+            NotImplementedError: Until a backend overrides it.
+        """
+        raise NotImplementedError(
+            f"{type(self).__name__} mixes in LazyClientMixin but does not "
+            f"implement _open_client."
+        )
+
+    @property
+    def client(self) -> Any:
+        """The backend's network client — opened lazily and cached.
+
+        Returns:
+            The object :meth:`_open_client` returns, built on first access
+            and reused thereafter.
+        """
+        if "_client_obj" not in self.__dict__:
+            self.__dict__["_client_obj"] = self._open_client()
+        return self.__dict__["_client_obj"]
+
+    @client.setter
+    def client(self, value: Any) -> None:
+        """Inject a client, seeding the cache so `_open_client` is skipped.
+
+        Lets callers (and tests) bind a ready-made / fake client; the
+        getter then returns it without ever opening a connection.
+
+        Args:
+            value: The client object to use.
+        """
+        self.__dict__["_client_obj"] = value
+
+
 class AbstractDataSource(ABC):
     """Blueprint for every concrete data-source backend.
 
@@ -355,6 +481,88 @@ class AbstractDataSource(ABC):
     """
 
     OUTPUT_KIND: OutputKind = "raster"
+
+    def __init_subclass__(cls, **kwargs: Any) -> None:
+        """Give every backend the facade's ergonomic constructor sugar.
+
+        Wraps each concrete backend's `__init__` so that — whether reached
+        through the `EarthLens` facade or by constructing the backend
+        class directly — it also accepts:
+
+        * `aoi` (+ `buffer`): any shape :func:`earthlens.base.spatial.normalize_aoi`
+          understands, reduced to `lat_lim` / `lon_lim`; a backend that
+          declares its own `aoi` (WorldPop) keeps it;
+        * `cadence`: a clearer alias for `temporal_resolution`;
+        * `dataset`: split out of a single-key `variables` dict (or passed
+          through to a backend with a native `dataset`, e.g. S3).
+
+        The original `__init__` is preserved as the wrapper's `__wrapped__`,
+        so signature introspection (e.g. `EarthLens.options_for`) and the
+        facade's kwarg validation still see the backend's real parameters.
+
+        Note:
+            No backend currently subclasses another backend. If one ever
+            does, its `__init__` must not forward the ergonomic kwargs
+            (`aoi` / `buffer` / `cadence` / `dataset`) up to
+            `super().__init__()`: the parent's wrapper would resolve them a
+            second time (e.g. re-running `resolve_aoi`). Forward only the
+            already-resolved native parameters (`lat_lim` / `lon_lim` /
+            `temporal_resolution` / `variables`) instead.
+        """
+        super().__init_subclass__(**kwargs)
+        orig = cls.__dict__.get("__init__")
+        if orig is None or getattr(orig, "_ergonomic", False):
+            return
+        params = inspect.signature(orig).parameters
+        native_aoi = "aoi" in params
+        native_dataset = "dataset" in params
+
+        @functools.wraps(orig)
+        def __init__(
+            self, *args, aoi=None, buffer=None, cadence=None, dataset=None, **kw
+        ):
+            clip_geometry = None
+            if cadence is not None:
+                kw["temporal_resolution"] = cadence
+            if dataset is not None:
+                if native_dataset:
+                    kw["dataset"] = dataset
+                elif isinstance(kw.get("variables"), dict):
+                    raise ValueError(
+                        "pass variables= as a list when using dataset=, or omit "
+                        "dataset= and key the variables dict yourself"
+                    )
+                else:
+                    v = kw.get("variables")
+                    kw["variables"] = {dataset: list(v) if v is not None else []}
+            if aoi is not None:
+                if native_aoi:
+                    if buffer is not None:
+                        raise ValueError(
+                            f"buffer= is not supported by {cls.__name__}, which "
+                            "interprets aoi= itself"
+                        )
+                    kw["aoi"] = aoi
+                else:
+                    if kw.get("lat_lim") is not None or kw.get("lon_lim") is not None:
+                        raise ValueError(
+                            "pass either aoi= or lat_lim=/lon_lim=, not both"
+                        )
+                    from earthlens.base.spatial import resolve_aoi
+
+                    kw["lat_lim"], kw["lon_lim"], clip_geometry = resolve_aoi(
+                        aoi, buffer=buffer
+                    )
+            elif buffer is not None:
+                raise ValueError(
+                    "buffer= only applies to a point aoi=(lon, lat); pass aoi= too"
+                )
+            orig(self, *args, **kw)
+            if clip_geometry is not None:
+                self._attach_clip_geometry(clip_geometry)
+
+        __init__._ergonomic = True
+        cls.__init__ = __init__
 
     def __init__(
         self,
@@ -433,6 +641,50 @@ class AbstractDataSource(ABC):
         self.path = self.root_dir
         if not os.path.exists(self.root_dir):
             os.makedirs(self.root_dir)
+
+    def _attach_clip_geometry(self, geometry: Any) -> None:
+        """Record a polygon mask on `self.space` for precise clipping.
+
+        Called by the ergonomic `__init__` wrapper when the request's
+        `aoi=` was a polygon rather than a plain bbox. The geometry is
+        stored on the (frozen) :class:`SpatialExtent` via a copy so that
+        raster backends clipping through `pyramids.Dataset.crop` can mask
+        the fetched bbox down to the exact shape. A no-op when `self.space`
+        is not a :class:`SpatialExtent`.
+
+        Args:
+            geometry: A WGS84 `GeoDataFrame` polygon mask.
+        """
+        space = getattr(self, "space", None)
+        if isinstance(space, SpatialExtent):
+            self.space = space.model_copy(update={"geometry": geometry})
+
+    def authenticate(self) -> AbstractDataSource:
+        """Eagerly establish the backend's authenticated connection.
+
+        The explicit, fail-fast counterpart to the lazy authentication
+        that otherwise happens on the first :meth:`download` / `search`:
+        it opens the network client for backends that have one (those
+        mixing in :class:`LazyClientMixin` — e.g. GEE, ECMWF, STAC) or
+        runs the credential `configure()` step for backends that hold an
+        auth object (CMEMS, Earthdata, EUMETSAT, …), raising
+        :class:`~earthlens.base.AuthenticationError` on failure. It is a
+        no-op for credential-free backends (CHIRPS, GDACS, Overture, …),
+        and is idempotent.
+
+        Returns:
+            The backend instance, so callers can chain
+            `EarthLens(...).authenticate().download()`.
+
+        Raises:
+            AuthenticationError: If the backend cannot authenticate.
+        """
+        if isinstance(self, LazyClientMixin):
+            # Accessing `client` runs the cached `_open_client` (auth).
+            _ = self.client
+        elif getattr(self, "_auth", None) is not None:
+            self._auth.configure()
+        return self
 
     @abstractmethod
     def _check_input_dates(
@@ -546,6 +798,23 @@ class AbstractDataSource(ABC):
             f"either override _api directly (legacy) or override both "
             f"_search and _fetch (post-C3)."
         )
+
+    def _count(self) -> int:
+        """Return how many products :meth:`_search` would yield, without fetching.
+
+        Default implementation runs :meth:`_search` and counts the
+        result. Backends with a cheap server-side total (e.g. a STAC
+        `numberMatched` read with `limit=1`) should override this to
+        avoid materialising the whole product list.
+
+        Returns:
+            int: The number of products the current request matches.
+
+        Raises:
+            NotImplementedError: When the backend keeps the legacy
+                `_api`-only flow and implements no :meth:`_search`.
+        """
+        return len(self._search())
 
     def _fetch(self, products: list[RemoteProduct]) -> list[Any]:
         """Download the bytes of every product `_search` returned.

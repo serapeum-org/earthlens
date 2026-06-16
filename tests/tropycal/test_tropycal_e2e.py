@@ -8,9 +8,8 @@ file, so it is marked `slow` and deselected from the default
 
 from __future__ import annotations
 
-import pytest
-
 import pandas as pd
+import pytest
 
 from earthlens.earthlens import EarthLens
 from earthlens.tropycal.events import POINT_COLUMNS, RECON_COLUMNS
@@ -102,5 +101,7 @@ def test_realtime_active_storms(tmp_path):
         path=str(tmp_path),
     ).download(progress_bar=False)
 
-    assert set(POINT_COLUMNS).issubset(fc.columns), "realtime should use the point schema"
+    assert set(POINT_COLUMNS).issubset(
+        fc.columns
+    ), "realtime should use the point schema"
     assert fc.crs.to_epsg() == 4326, f"expected EPSG:4326, got {fc.crs}"

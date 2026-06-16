@@ -1130,115 +1130,135 @@ def _nwp_recent_cycle(model: Any) -> Any:
     return moment.replace(hour=hours[0], minute=0, second=0, microsecond=0)
 
 
+def _nwp_probe_direct_https(model: Any, cycle: Any, step: int) -> str:
+    """Probe a `direct-https` model with an HTTP HEAD on its url_template."""
+    bands = getattr(model, "bands", None) or {}
+    if not getattr(model, "url_template", None) or not bands:
+        return "no url_template/bands"
+    var = next(iter(bands.values()))
+    url = model.url_template.format(
+        cycle=cycle, date=cycle, step=step, var=var, var_lc=var.lower()
+    )
+    try:
+        code = requests.head(url, timeout=_TIMEOUT, allow_redirects=True).status_code
+        return f"HTTP {code} ({url})"
+    except Exception as exc:  # noqa: BLE001 — reported, not raised
+        return f"unreachable: {type(exc).__name__} ({url})"
+
+
+def _nwp_probe_direct_boto3(model: Any, cycle: Any, step: int) -> str:
+    """Probe a `direct-boto3` model with an unsigned-S3 head_object."""
+    bands = getattr(model, "bands", None) or {}
+    options = getattr(model, "request_options", None) or {}
+    bucket = options.get("bucket")
+    key_template = options.get("key_template") or getattr(model, "url_template", "")
+    if not (bucket and key_template and bands):
+        return "no bucket/key_template/bands"
+    import boto3
+    from botocore import UNSIGNED
+    from botocore.client import Config
+
+    var = next(iter(bands.values()))
+    key = key_template.format(
+        cycle=cycle, date=cycle, step=step, var=var, var_lc=var.lower()
+    )
+    client = boto3.client(
+        "s3",
+        region_name=options.get("region", "eu-west-1"),
+        config=Config(signature_version=UNSIGNED),
+    )
+    try:
+        head = client.head_object(Bucket=bucket, Key=key)
+        return f"OK {head['ContentLength']} bytes (s3://{bucket}/{key})"
+    except Exception as exc:  # noqa: BLE001 — reported, not raised
+        return f"unreachable: {type(exc).__name__} (s3://{bucket}/{key})"
+
+
+def _nwp_probe_ecmwf_opendata(model: Any, cycle: Any, step: int) -> str:
+    """Probe an `ecmwf-opendata` model by asking the SDK for its latest cycle."""
+    options = getattr(model, "request_options", None) or {}
+    try:
+        from ecmwf.opendata import Client
+    except ImportError:
+        return "ecmwf-opendata not installed (pip install earthlens[nwp])"
+    client = Client(source="aws", model=options.get("ecmwf_model", "ifs"))
+    request = {"type": options.get("type", "fc"), "step": 0}
+    if options.get("stream"):
+        request["stream"] = options["stream"]
+    try:
+        return f"latest cycle {client.latest(**request):%Y-%m-%d %HZ}"
+    except Exception as exc:  # noqa: BLE001 — reported, not raised
+        return f"unreachable: {type(exc).__name__}: {exc}"
+
+
+def _nwp_probe_meteofrance(model: Any, cycle: Any, step: int) -> str:
+    """Probe a `meteofrance-api` model with a keyed WCS GetCapabilities."""
+    options = getattr(model, "request_options", None) or {}
+    api_base, service = options.get("api_base"), options.get("coverage_service")
+    if not (api_base and service):
+        return "no api_base/coverage_service in request_options"
+    key = os.environ.get("METEO_FRANCE_API_KEY") or os.environ.get("MF_API_KEY")
+    if not key:
+        return "needs METEO_FRANCE_API_KEY"
+    url = f"{api_base}/wcs/{service}/GetCapabilities"
+    try:
+        code = requests.get(
+            url,
+            params={"service": "WCS", "version": "2.0.1"},
+            headers={"apikey": key},
+            timeout=_TIMEOUT,
+        ).status_code
+        return f"HTTP {code} ({url})"
+    except Exception as exc:  # noqa: BLE001 — reported, not raised
+        return f"unreachable: {type(exc).__name__} ({url})"
+
+
+def _nwp_probe_herbie(model: Any, cycle: Any, step: int) -> str:
+    """Probe a `herbie` model by resolving its GRIB source for the cycle."""
+    import contextlib
+    import io
+
+    try:
+        with contextlib.redirect_stdout(io.StringIO()):
+            from herbie import Herbie
+    except Exception:  # noqa: BLE001 — optional SDK / eccodes binary
+        return "herbie unavailable (needs the [nwp] extra + eccodes binary)"
+    kwargs: dict[str, Any] = {"model": model.model_family, "fxx": step}
+    if getattr(model, "product", None) is not None:
+        kwargs["product"] = model.product
+    try:
+        with contextlib.redirect_stdout(io.StringIO()):
+            grib = Herbie(cycle, **kwargs).grib
+        return f"resolved {grib}" if grib else "no GRIB at this cycle/step"
+    except Exception as exc:  # noqa: BLE001 — reported, not raised
+        return f"unreachable: {type(exc).__name__}: {exc}"
+
+
+_NWP_PROBES: dict[str, Callable[[Any, Any, int], str]] = {
+    "direct-https": _nwp_probe_direct_https,
+    "direct-boto3": _nwp_probe_direct_boto3,
+    "ecmwf-opendata": _nwp_probe_ecmwf_opendata,
+    "meteofrance-api": _nwp_probe_meteofrance,
+    "herbie": _nwp_probe_herbie,
+}
+
+
 def _nwp_availability(model: Any, cycle: Any, step: int) -> str:
     """Return a live 'is this fetchable now?' status, dispatching on backend.
 
     Ports `tools/nwp/probe_nwp_model.py`: a cheap availability check per
     centre (HTTP HEAD / unsigned-S3 head_object / ecmwf-opendata latest /
     Météo-France GetCapabilities / Herbie GRIB resolve). No bulk download.
+    Each centre's check lives in a `_nwp_probe_*` helper keyed by backend
+    in `_NWP_PROBES`.
     """
     backend = getattr(model, "backend", None)
-    bands = getattr(model, "bands", None) or {}
-    options = getattr(model, "request_options", None) or {}
-
-    if backend == "direct-https":
-        if not getattr(model, "url_template", None) or not bands:
-            return "no url_template/bands"
-        import requests
-
-        var = next(iter(bands.values()))
-        url = model.url_template.format(
-            cycle=cycle, date=cycle, step=step, var=var, var_lc=var.lower()
-        )
-        try:
-            code = requests.head(
-                url, timeout=_TIMEOUT, allow_redirects=True
-            ).status_code
-            return f"HTTP {code} ({url})"
-        except Exception as exc:  # noqa: BLE001 — reported, not raised
-            return f"unreachable: {type(exc).__name__} ({url})"
-
-    if backend == "direct-boto3":
-        bucket = options.get("bucket")
-        key_template = options.get("key_template") or getattr(model, "url_template", "")
-        if not (bucket and key_template and bands):
-            return "no bucket/key_template/bands"
-        import boto3
-        from botocore import UNSIGNED
-        from botocore.client import Config
-
-        var = next(iter(bands.values()))
-        key = key_template.format(
-            cycle=cycle, date=cycle, step=step, var=var, var_lc=var.lower()
-        )
-        client = boto3.client(
-            "s3",
-            region_name=options.get("region", "eu-west-1"),
-            config=Config(signature_version=UNSIGNED),
-        )
-        try:
-            head = client.head_object(Bucket=bucket, Key=key)
-            return f"OK {head['ContentLength']} bytes (s3://{bucket}/{key})"
-        except Exception as exc:  # noqa: BLE001 — reported, not raised
-            return f"unreachable: {type(exc).__name__} (s3://{bucket}/{key})"
-
-    if backend == "ecmwf-opendata":
-        try:
-            from ecmwf.opendata import Client
-        except ImportError:
-            return "ecmwf-opendata not installed (pip install earthlens[nwp])"
-        client = Client(source="aws", model=options.get("ecmwf_model", "ifs"))
-        request = {"type": options.get("type", "fc"), "step": 0}
-        if options.get("stream"):
-            request["stream"] = options["stream"]
-        try:
-            return f"latest cycle {client.latest(**request):%Y-%m-%d %HZ}"
-        except Exception as exc:  # noqa: BLE001 — reported, not raised
-            return f"unreachable: {type(exc).__name__}: {exc}"
-
-    if backend == "meteofrance-api":
-        import os
-
-        import requests
-
-        api_base, service = options.get("api_base"), options.get("coverage_service")
-        if not (api_base and service):
-            return "no api_base/coverage_service in request_options"
-        key = os.environ.get("METEO_FRANCE_API_KEY") or os.environ.get("MF_API_KEY")
-        if not key:
-            return "needs METEO_FRANCE_API_KEY"
-        url = f"{api_base}/wcs/{service}/GetCapabilities"
-        try:
-            code = requests.get(
-                url,
-                params={"service": "WCS", "version": "2.0.1"},
-                headers={"apikey": key},
-                timeout=_TIMEOUT,
-            ).status_code
-            return f"HTTP {code} ({url})"
-        except Exception as exc:  # noqa: BLE001 — reported, not raised
-            return f"unreachable: {type(exc).__name__} ({url})"
-
-    if backend == "herbie":
-        import contextlib
-        import io
-
-        try:
-            with contextlib.redirect_stdout(io.StringIO()):
-                from herbie import Herbie
-        except Exception:  # noqa: BLE001 — optional SDK / eccodes binary
-            return "herbie unavailable (needs the [nwp] extra + eccodes binary)"
-        kwargs: dict[str, Any] = {"model": model.model_family, "fxx": step}
-        if getattr(model, "product", None) is not None:
-            kwargs["product"] = model.product
-        try:
-            with contextlib.redirect_stdout(io.StringIO()):
-                grib = Herbie(cycle, **kwargs).grib
-            return f"resolved {grib}" if grib else "no GRIB at this cycle/step"
-        except Exception as exc:  # noqa: BLE001 — reported, not raised
-            return f"unreachable: {type(exc).__name__}: {exc}"
-
-    return f"no live availability probe for backend {backend!r}"
+    probe = _NWP_PROBES.get(backend)
+    return (
+        probe(model, cycle, step)
+        if probe is not None
+        else f"no live availability probe for backend {backend!r}"
+    )
 
 
 def _nwp_deep_sample(model: Any, step: int) -> dict[str, dict[str, Any]]:

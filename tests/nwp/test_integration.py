@@ -36,7 +36,9 @@ def _nwp(catalog, tmp_path, variables, **kwargs):
 class TestNOAAFlow:
     """End-to-end GFS fetch via the Herbie dispatch."""
 
-    def test_download_writes_cropped_cogs(self, mini_catalog, tmp_path, fake_herbie, fake_pyramids):
+    def test_download_writes_cropped_cogs(
+        self, mini_catalog, tmp_path, fake_herbie, fake_pyramids
+    ):
         """download() walks two cycles, fetches via Herbie, and crops each COG."""
         nwp = _nwp(mini_catalog, tmp_path, {"gfs": ["temperature_2m"]})
         paths = nwp.download(progress_bar=False)
@@ -52,9 +54,15 @@ class TestNOAAFlow:
 class TestDWDFlow:
     """End-to-end ICON fetch via the direct-HTTPS dispatch."""
 
-    def test_download_builds_urls_and_crops(self, mini_catalog, tmp_path, fake_requests, fake_pyramids):
+    def test_download_builds_urls_and_crops(
+        self, mini_catalog, tmp_path, fake_requests, fake_pyramids
+    ):
         """download() builds per-variable DWD URLs and crops the concatenated GRIB."""
-        nwp = _nwp(mini_catalog, tmp_path, {"icon-global": ["temperature_2m", "precipitation_acc"]})
+        nwp = _nwp(
+            mini_catalog,
+            tmp_path,
+            {"icon-global": ["temperature_2m", "precipitation_acc"]},
+        )
         paths = nwp.download(progress_bar=False)
         assert len(paths) == 2
         assert any("t_2m" in url for url in fake_requests["urls"])
@@ -65,7 +73,9 @@ class TestDWDFlow:
 class TestECMWFFlow:
     """End-to-end IFS fetch via the ecmwf-opendata dispatch."""
 
-    def test_download_retrieves_and_crops(self, tmp_path, fake_ecmwf_client, fake_pyramids):
+    def test_download_retrieves_and_crops(
+        self, tmp_path, fake_ecmwf_client, fake_pyramids
+    ):
         """download() retrieves IFS param tokens and crops the result."""
         from earthlens.nwp import Catalog
 

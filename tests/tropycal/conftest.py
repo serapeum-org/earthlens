@@ -72,7 +72,9 @@ class _FakeShips:
 class _FakeStorm:
     """Stand-in for a tropycal `Storm` returning canned DataFrames."""
 
-    def __init__(self, frame: pd.DataFrame, ships_frame: pd.DataFrame | None = None) -> None:
+    def __init__(
+        self, frame: pd.DataFrame, ships_frame: pd.DataFrame | None = None
+    ) -> None:
         self._frame = frame
         self._ships_frame = ships_frame
 
@@ -81,7 +83,9 @@ class _FakeStorm:
 
     def get_ships(self, time) -> _FakeShips:
         if self._ships_frame is None:
-            raise ValueError("SHIPS data is unavailable for the requested storm or time.")
+            raise ValueError(
+                "SHIPS data is unavailable for the requested storm or time."
+            )
         return _FakeShips(self._ships_frame)
 
 
@@ -111,7 +115,9 @@ class _FakeState:
         self.recon_frame: pd.DataFrame | None = None
         self.active_ids: list[str] = []
 
-    def add_storm(self, year: int, frame: pd.DataFrame, storm_id: str | None = None) -> None:
+    def add_storm(
+        self, year: int, frame: pd.DataFrame, storm_id: str | None = None
+    ) -> None:
         """Register a storm DataFrame under a season year."""
         storm_id = storm_id or str(frame["id"].iloc[0])
         self.seasons.setdefault(year, []).append(storm_id)
@@ -127,7 +133,9 @@ def _make_trackdataset_cls(state: _FakeState) -> type:
     """Build a fake `TrackDataset` class bound to `state`."""
 
     class _FakeTrackDataset:
-        def __init__(self, basin: str = "north_atlantic", source: str = "hurdat", **kwargs):
+        def __init__(
+            self, basin: str = "north_atlantic", source: str = "hurdat", **kwargs
+        ):
             state.constructions.append((basin, source))
 
         def get_season(self, year: int) -> _FakeSeason:

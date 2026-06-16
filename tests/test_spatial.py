@@ -17,7 +17,9 @@ from earthlens.spatial import (
 )
 
 
-def _wgs84_box(west: float, south: float, east: float, north: float) -> gpd.GeoDataFrame:
+def _wgs84_box(
+    west: float, south: float, east: float, north: float
+) -> gpd.GeoDataFrame:
     poly = Polygon(
         [(west, south), (east, south), (east, north), (west, north), (west, south)]
     )
@@ -53,7 +55,9 @@ class TestGridPolygon:
         assert union.bounds[2] >= bbox[2] - 1e-9
         assert union.bounds[3] >= bbox[3] - 1e-9
 
-    @pytest.mark.parametrize("cell_size, max_pixels", [(0, 100), (-1, 100), (10, 0), (10, -5)])
+    @pytest.mark.parametrize(
+        "cell_size, max_pixels", [(0, 100), (-1, 100), (10, 0), (10, -5)]
+    )
     def test_non_positive_args_raise(self, cell_size, max_pixels):
         """`cell_size` and `max_pixels` must both be positive."""
         gdf = _wgs84_box(31.0, 30.0, 31.05, 30.05)
@@ -156,7 +160,10 @@ class TestSplitPolygon:
         """`project_to_map_epsg=False` leaves the grid in the UTM CRS."""
         gdf = _wgs84_box(31.0, 30.0, 31.5, 30.5)
         _, grid = split_polygon(
-            gdf, cell_size=30, max_pixels=1e5, project_to_map_epsg=False,
+            gdf,
+            cell_size=30,
+            max_pixels=1e5,
+            project_to_map_epsg=False,
         )
         assert grid.crs.to_epsg() == 32636
 
@@ -164,7 +171,10 @@ class TestSplitPolygon:
         """`map_epsg=` overrides the input CRS for the reprojection target."""
         gdf = _wgs84_box(31.0, 30.0, 31.5, 30.5)
         _, grid = split_polygon(
-            gdf, cell_size=30, max_pixels=1e5, map_epsg="EPSG:3857",
+            gdf,
+            cell_size=30,
+            max_pixels=1e5,
+            map_epsg="EPSG:3857",
         )
         assert grid.crs.to_epsg() == 3857
 
@@ -211,7 +221,11 @@ class TestSplitPoints:
             crs="EPSG:4326",
         )
         chunks = split_points(
-            pts, cell_size=30, max_pixels=1e5, min_points=10, output_crs="EPSG:3857",
+            pts,
+            cell_size=30,
+            max_pixels=1e5,
+            min_points=10,
+            output_crs="EPSG:3857",
         )
         assert chunks
         for chunk in chunks:
@@ -229,9 +243,7 @@ class TestSplitPointsStragglers:
         from earthlens import spatial as spatial_module
 
         def _fake_split_polygon(*args, **kwargs):
-            tiny = Polygon(
-                [(-1e-9, -1e-9), (1e-9, -1e-9), (1e-9, 1e-9), (-1e-9, 1e-9)]
-            )
+            tiny = Polygon([(-1e-9, -1e-9), (1e-9, -1e-9), (1e-9, 1e-9), (-1e-9, 1e-9)])
             return True, gpd.GeoDataFrame(geometry=[tiny], crs="EPSG:4326")
 
         monkeypatch.setattr(spatial_module, "split_polygon", _fake_split_polygon)
@@ -249,9 +261,7 @@ class TestSplitPointsStragglers:
         from earthlens import spatial as spatial_module
 
         def _fake_split_polygon(*args, **kwargs):
-            tiny = Polygon(
-                [(-1e-9, -1e-9), (1e-9, -1e-9), (1e-9, 1e-9), (-1e-9, 1e-9)]
-            )
+            tiny = Polygon([(-1e-9, -1e-9), (1e-9, -1e-9), (1e-9, 1e-9), (-1e-9, 1e-9)])
             return True, gpd.GeoDataFrame(geometry=[tiny], crs="EPSG:4326")
 
         monkeypatch.setattr(spatial_module, "split_polygon", _fake_split_polygon)
@@ -261,7 +271,10 @@ class TestSplitPointsStragglers:
             crs="EPSG:4326",
         )
         chunks = spatial_module.split_points(
-            pts, cell_size=30, min_points=1, output_crs="EPSG:3857",
+            pts,
+            cell_size=30,
+            min_points=1,
+            output_crs="EPSG:3857",
         )
         assert chunks and all(c.crs.to_epsg() == 3857 for c in chunks)
 
@@ -273,6 +286,9 @@ class TestSplitPolygonCrsFallback:
         """A `map_epsg=` that pyproj can't parse falls back to EPSG:4326."""
         gdf = _wgs84_box(31.0, 30.0, 31.5, 30.5)
         _, grid = split_polygon(
-            gdf, cell_size=30, max_pixels=1e5, map_epsg="not-a-valid-epsg",
+            gdf,
+            cell_size=30,
+            max_pixels=1e5,
+            map_epsg="not-a-valid-epsg",
         )
         assert grid.crs.to_epsg() == 4326

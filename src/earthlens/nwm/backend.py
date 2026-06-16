@@ -25,7 +25,7 @@ Two properties shape the backend:
   request downloads the whole files (boto3, no read). A **subset** — by
   `sites=` (`feature_id` / USGS `gage_id`), a narrower bbox, or a
   `[start, end]` window — and the **retrospective** archive
-  (`mode="retrospective"`) are read through pyramids (≥ 0.30.0): the
+  (`mode="retrospective"`) are read through pyramids (≥ 0.34.0): the
   feature/lake/node-indexed **tabular** products (`chrtout`, `lakeout`,
   `coastal`) go through `pyramids.netcdf.LabeledDataset` (open anon +
   lazily, select labels/bbox/time, write a tidy `feature_id × time`
@@ -553,7 +553,7 @@ class NWM(AbstractDataSource):
             raise ImportError(
                 "NWM subsetting / retrospective reads need the pyramids "
                 "LabeledDataset reader; install `pip install "
-                "earthlens[nwm]` (pyramids-gis[lazy,xarray,parquet] >= 0.30.0)."
+                "earthlens[nwm]` (pyramids-gis[parquet] >= 0.34.0)."
             ) from exc
         return LabeledDataset
 
@@ -572,7 +572,7 @@ class NWM(AbstractDataSource):
             raise ImportError(
                 "NWM gridded subsetting needs the pyramids NetCDF reader; "
                 "install `pip install earthlens[nwm]` "
-                "(pyramids-gis[lazy,xarray,parquet] >= 0.30.0)."
+                "(pyramids-gis[parquet] >= 0.34.0)."
             ) from exc
         return NetCDF
 
@@ -904,7 +904,7 @@ def _close_quietly(cube: Any) -> None:
         cube: An opened `LabeledDataset`.
     """
     try:
-        cube.dataset.close()
+        cube.close()
     except Exception:  # noqa: BLE001 - best-effort handle release
         pass
 

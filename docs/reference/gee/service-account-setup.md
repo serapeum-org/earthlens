@@ -154,7 +154,7 @@ The file looks like:
   "type": "service_account",
   "project_id": "<PROJECT_ID>",
   "private_key_id": "…",
-  "private_key": "-----BEGIN PRIVATE KEY-----\n…\n-----END PRIVATE KEY-----\n",
+  "private_key": "<PEM-encoded private key, \n-escaped — keep secret, never commit>",
   "client_email": "earthlens-ee@<PROJECT_ID>.iam.gserviceaccount.com",
   "client_id": "…",
   "token_uri": "https://oauth2.googleapis.com/token",
@@ -216,6 +216,7 @@ el = EarthLens(
     lat_lim=[29.9, 30.1],
     lon_lim=[31.1, 31.3],
     path="data/gee",
+).authenticate(
     service_account="earthlens-ee@<PROJECT_ID>.iam.gserviceaccount.com",
     service_key=r"C:\Users\you\.config\earthlens\ee-service-account.json",
 )

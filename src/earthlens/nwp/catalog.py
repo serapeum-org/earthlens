@@ -33,7 +33,7 @@ CATALOG_PATH: Path = Path(__file__).parent / "nwp_data_catalog.yaml"
 
 # Module-level cache keyed on `(resolved_path, mtime_ns)` so editing the
 # YAML invalidates the entry without re-parsing on every construction.
-_CATALOG_CACHE: dict[Any, dict[str, "NWPModel"]] = {}
+_CATALOG_CACHE: dict[Any, dict[str, NWPModel]] = {}
 
 #: The download backends an `NWPModel` can declare. `herbie` and
 #: `ecmwf-opendata` go through their SDKs (`.idx` byte-range subsetting);
@@ -61,7 +61,7 @@ def clear_catalog_cache() -> None:
     _CATALOG_CACHE.clear()
 
 
-def _load_catalog_data(path: Path) -> dict[str, "NWPModel"]:
+def _load_catalog_data(path: Path) -> dict[str, NWPModel]:
     """Parse, validate, and cache the NWP catalog at `path`.
 
     Args:

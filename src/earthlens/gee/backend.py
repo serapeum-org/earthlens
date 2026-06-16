@@ -45,6 +45,7 @@ no key is given, an interactive `ee.Authenticate()` against an explicit
 from __future__ import annotations
 
 import datetime as dt
+import os
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Iterable, Literal
 
@@ -58,9 +59,11 @@ from tqdm import tqdm
 
 from earthlens.base import (
     AbstractDataSource,
+    LazyClientMixin,
     OutputKind,
     SpatialExtent,
     TemporalExtent,
+    to_datetime,
 )
 from earthlens.gee._helpers import (
     EE_MAX_DIMENSION,
@@ -131,13 +134,13 @@ def _validate_pure_config(
             f"'yearly', got {temporal_resolution!r}"
         )
     try:
-        start_dt = dt.datetime.strptime(start, fmt)
+        start_dt = to_datetime(start, fmt)
     except (ValueError, TypeError) as exc:
         raise ValueError(
             f"start={start!r} is not parseable with fmt={fmt!r}: {exc}"
         ) from exc
     try:
-        end_dt = dt.datetime.strptime(end, fmt)
+        end_dt = to_datetime(end, fmt)
     except (ValueError, TypeError) as exc:
         raise ValueError(
             f"end={end!r} is not parseable with fmt={fmt!r}: {exc}"
@@ -149,7 +152,7 @@ def _validate_pure_config(
         )
 
 
-class GEE(AbstractDataSource):
+class GEE(LazyClientMixin, AbstractDataSource):
     """Google Earth Engine data source.
 
     Args:
@@ -165,13 +168,6 @@ class GEE(AbstractDataSource):
             `"yearly"`. Defaults to `"raw"`.
         path: Output directory (created if absent). Defaults to the cwd.
         fmt: `strptime` format for `start` / `end`. Defaults to `"%Y-%m-%d"`.
-        service_account: Service-account email for authentication. If
-            given, `service_key` is required.
-        service_key: Path to the service-account JSON key file, or the
-            JSON content as a string.
-        project: Cloud project id to scope Earth Engine calls to. If
-            omitted, read from the service-account key's `project_id`;
-            required when no service account is given.
         scale: Output pixel size in metres. If omitted, each dataset's
             nominal `spatial_resolution` is used.
         crs: Output CRS (EPSG code string). Defaults to `"EPSG:4326"`.
@@ -223,6 +219,14 @@ class GEE(AbstractDataSource):
             :mod:`earthlens.gee.jobs`. Ignored for `export_via="url"`,
             which is always synchronous.
 
+    Credentials are not constructor arguments — the constructor describes
+    only what to fetch. Supply them at the authentication step:
+    :meth:`authenticate` accepts `service_account=` / `service_key=` /
+    `project=`, each falling back to the `GEE_SERVICE_ACCOUNT` /
+    `GEE_SERVICE_KEY` / `GEE_PROJECT` environment variable when omitted.
+    `download()` opens the connection lazily (resolving the same way) if
+    `authenticate()` was never called.
+
     Raises:
         AuthenticationError: If Earth Engine cannot be initialised
             (missing/invalid key, unregistered project, missing IAM role).
@@ -239,7 +243,7 @@ class GEE(AbstractDataSource):
             task does not complete.
 
     Examples:
-        - Construct against a service account and download SRTM over a small bbox:
+        - Authenticate against a service account, then download SRTM over a small bbox:
             ```python
             >>> from earthlens.gee import GEE  # doctest: +SKIP
             >>> gee = GEE(  # doctest: +SKIP
@@ -247,10 +251,11 @@ class GEE(AbstractDataSource):
             ...     variables={"USGS/SRTMGL1_003": ["elevation"]},
             ...     lat_lim=[29.9, 30.0], lon_lim=[31.2, 31.3],
             ...     path="data/gee",
+            ... )
+            >>> paths = gee.authenticate(  # doctest: +SKIP
             ...     service_account="sa@my-project.iam.gserviceaccount.com",
             ...     service_key="/path/to/key.json",
-            ... )
-            >>> paths = gee.download()  # doctest: +SKIP
+            ... ).download()
             ```
     """
 
@@ -272,9 +277,6 @@ class GEE(AbstractDataSource):
         path: Path | str = "",
         fmt: str = "%Y-%m-%d",
         *,
-        service_account: str | None = None,
-        service_key: str | None = None,
-        project: str | None = None,
         scale: float | None = None,
         crs: str = "EPSG:4326",
         reducer: str | None = None,
@@ -310,9 +312,12 @@ class GEE(AbstractDataSource):
         # parent constructor immediately calls `self._initialize()` (and
         # `_create_grid` / `_check_input_dates`), which read them.
         self._catalog = Catalog()
-        self._service_account = service_account
-        self._service_key = service_key
-        self._project = project
+        # Credentials are resolved at authenticate()/first-client-access time
+        # (explicitly or from the GEE_SERVICE_ACCOUNT / GEE_SERVICE_KEY /
+        # GEE_PROJECT environment variables), not at construction.
+        self._service_account: str | None = None
+        self._service_key: str | None = None
+        self._project: str | None = None
         self.project: str | None = None
         self.scale = scale
         self.crs = crs
@@ -341,61 +346,187 @@ class GEE(AbstractDataSource):
             path=path,
         )
 
-    def _initialize(self) -> Any:
-        """Authenticate and initialise the Earth Engine connection.
+    def _initialize(self) -> None:
+        """Defer the Earth Engine connection to first client access.
 
-        Uses a service-account key when `service_account` + `service_key`
-        were given (via :class:`EarthEngineAuth`); otherwise runs
-        `ee.Authenticate()` and `ee.Initialize(project=...)` against the
-        explicit `project`. The `ee.Authenticate()` flow is interactive
-        — it opens a browser and waits for the user to paste a token,
-        so on a headless box (CI, Docker, remote shell) it will hang
-        or fail with whatever the EE SDK emits natively; use
-        service-account auth for non-interactive use. The resolved
-        project id is stored on :attr:`project`.
+        Returns `None` without touching credentials — the constructor
+        describes only what to fetch. Both the connection and the
+        credential resolution happen lazily on first access to
+        `self.client` (see :meth:`_open_client`), which
+        :meth:`authenticate` triggers eagerly. So constructing the
+        backend never blocks on auth and needs no credentials.
 
         Returns:
-            The `ee` module (truthy, so the parent stores it as
-            `self.client`).
+            None: Always.
+        """
+        return None
+
+    def _resolve_credentials(self) -> tuple[str | None, str | None, str | None]:
+        """Resolve credentials from explicit values, then the environment.
+
+        Each credential piece falls back to its environment variable when
+        not set explicitly (via :meth:`authenticate`): `GEE_SERVICE_ACCOUNT`,
+        `GEE_SERVICE_KEY`, `GEE_PROJECT`.
+
+        Returns:
+            tuple: `(service_account, service_key, project)`, each `None`
+                when neither an explicit value nor its env var is set.
+
+        Examples:
+            - Explicit values (set by :meth:`authenticate`) are returned as-is:
+                ```python
+                >>> import tempfile
+                >>> from earthlens.gee import GEE
+                >>> gee = GEE(
+                ...     start="2000-02-11", end="2000-02-12",
+                ...     variables={"USGS/SRTMGL1_003": ["elevation"]},
+                ...     lat_lim=[29.9, 30.0], lon_lim=[31.2, 31.3],
+                ...     path=tempfile.mkdtemp(),
+                ... )
+                >>> gee._service_account = "sa@demo.iam.gserviceaccount.com"
+                >>> gee._service_key = "/path/to/key.json"
+                >>> gee._project = "demo-project"
+                >>> gee._resolve_credentials()
+                ('sa@demo.iam.gserviceaccount.com', '/path/to/key.json', 'demo-project')
+
+                ```
+        """
+        service_account = self._service_account or os.environ.get("GEE_SERVICE_ACCOUNT")
+        service_key = self._service_key or os.environ.get("GEE_SERVICE_KEY")
+        project = self._project or os.environ.get("GEE_PROJECT")
+        return service_account, service_key, project
+
+    def authenticate(
+        self,
+        service_account: str | None = None,
+        service_key: str | None = None,
+        project: str | None = None,
+    ) -> GEE:
+        """Resolve credentials and open the Earth Engine connection.
+
+        The explicit, fail-fast credential step. Pass `service_account=`
+        + `service_key=` (and optionally `project=`) to authenticate with
+        a service-account key; omit a value to read its `GEE_SERVICE_ACCOUNT`
+        / `GEE_SERVICE_KEY` / `GEE_PROJECT` environment variable instead.
+        Opening the connection (which `download()` also does lazily if you
+        never call this) validates the credentials against Earth Engine.
+
+        Args:
+            service_account: Service-account email. When `None`, the
+                `GEE_SERVICE_ACCOUNT` environment variable is read.
+            service_key: Path to the service-account JSON key file, or the
+                JSON content as a string. When `None`, the `GEE_SERVICE_KEY`
+                environment variable is read.
+            project: Cloud project id to scope Earth Engine calls to. When
+                `None`, the `GEE_PROJECT` environment variable is read (or
+                the project is taken from the key's `project_id`).
+
+        Returns:
+            The backend instance, so it chains
+            `EarthLens(...).authenticate(...).download()`.
 
         Raises:
-            AuthenticationError: If credentials are missing/invalid, no
-                project can be resolved, the
-                project is not registered for Earth Engine, or the
-                service account lacks the required IAM role on it.
+            AuthenticationError: If no service-account pair and no project
+                can be resolved, or Earth Engine rejects the credentials.
+
+        Examples:
+            - Authenticate with a service-account key, then download (live;
+              skipped here):
+                ```python
+                >>> from earthlens.gee import GEE  # doctest: +SKIP
+                >>> GEE(  # doctest: +SKIP
+                ...     start="2000-02-11", end="2000-02-12",
+                ...     variables={"USGS/SRTMGL1_003": ["elevation"]},
+                ...     lat_lim=[29.9, 30.0], lon_lim=[31.2, 31.3], path="data/gee",
+                ... ).authenticate(
+                ...     service_account="sa@my-project.iam.gserviceaccount.com",
+                ...     service_key="/path/to/key.json",
+                ... ).download()
+
+                ```
+            - Resolve the same credentials from the environment instead of
+              passing them (live; skipped here):
+                ```python
+                >>> import os  # doctest: +SKIP
+                >>> os.environ["GEE_SERVICE_ACCOUNT"] = "sa@my-project.iam.gserviceaccount.com"
+                >>> os.environ["GEE_SERVICE_KEY"] = "/path/to/key.json"
+                >>> GEE(  # doctest: +SKIP
+                ...     start="2000-02-11", end="2000-02-12",
+                ...     variables={"USGS/SRTMGL1_003": ["elevation"]},
+                ...     lat_lim=[29.9, 30.0], lon_lim=[31.2, 31.3], path="data/gee",
+                ... ).authenticate().download()
+
+                ```
         """
-        if self._service_account and self._service_key:
-            self.project = EarthEngineAuth.initialize(
-                self._service_account, self._service_key, self._project
-            )
-            return ee
-        if not self._project:
+        if service_account is not None:
+            self._service_account = service_account
+        if service_key is not None:
+            self._service_key = service_key
+        if project is not None:
+            self._project = project
+        # LazyClientMixin: first access to `client` runs `_open_client` (auth).
+        _ = self.client
+        return self
+
+    def _open_client(self) -> Any:
+        """Authenticate and initialise the Earth Engine connection (lazily).
+
+        Resolves the credentials (explicit values from :meth:`authenticate`,
+        else the `GEE_SERVICE_ACCOUNT` / `GEE_SERVICE_KEY` / `GEE_PROJECT`
+        environment variables), then uses a service-account key when a
+        `service_account` + `service_key` pair is available (via
+        :class:`EarthEngineAuth`); otherwise runs `ee.Authenticate()` and
+        `ee.Initialize(project=...)` against the resolved `project`. The
+        `ee.Authenticate()` flow is interactive — it opens a browser and
+        waits for the user to paste a token, so on a headless box (CI,
+        Docker, remote shell) it will hang or fail with whatever the EE
+        SDK emits natively; use service-account auth for non-interactive
+        use. The resolved project id is stored on :attr:`project`. Called
+        by :attr:`~earthlens.base.LazyClientMixin.client` on first use.
+
+        Returns:
+            The `ee` module (cached as `self.client`).
+
+        Raises:
+            AuthenticationError: If no service-account pair and no project
+                can be resolved, the credentials are invalid, the project
+                is not registered for Earth Engine, or the service account
+                lacks the required IAM role on it.
+        """
+        service_account, service_key, project = self._resolve_credentials()
+        if not (service_account and service_key) and not project:
             raise AuthenticationError(
                 "the GEE backend needs either service_account + service_key, "
-                "or an explicit project= (with cached/ADC credentials). See "
+                "or an explicit project=, supplied to authenticate(...) or via "
+                "the GEE_SERVICE_ACCOUNT / GEE_SERVICE_KEY / GEE_PROJECT "
+                "environment variables. See "
                 "https://developers.google.com/earth-engine/guides/service_account."
             )
+        if service_account and service_key:
+            self.project = EarthEngineAuth.initialize(
+                service_account, service_key, project
+            )
+            return ee
         try:
             ee.Authenticate()
-            ee.Initialize(project=self._project)
+            ee.Initialize(project=project)
         except ee.EEException as exc:
             message = str(exc)
             if "not registered to use Earth Engine" in message:
                 raise AuthenticationError(
-                    f"Cloud project {self._project!r} is not registered to use "
+                    f"Cloud project {project!r} is not registered to use "
                     "Earth Engine. Register it at "
                     "https://code.earthengine.google.com/register, then retry."
                 ) from exc
             raise AuthenticationError(
                 f"Earth Engine initialisation failed for project "
-                f"{self._project!r}: {message}"
+                f"{project!r}: {message}"
             ) from exc
         except Exception as exc:  # noqa: BLE001 - re-raised as AuthenticationError
             raise AuthenticationError(
-                f"Earth Engine initialisation failed for project "
-                f"{self._project!r}: {exc}"
+                f"Earth Engine initialisation failed for project " f"{project!r}: {exc}"
             ) from exc
-        self.project = self._project
+        self.project = project
         return ee
 
     def _create_grid(self, lat_lim: list[float], lon_lim: list[float]) -> SpatialExtent:
@@ -437,12 +568,14 @@ class GEE(AbstractDataSource):
             ValueError: If `temporal_resolution` is not one of `"raw"`,
                 `"daily"`, `"monthly"`, `"yearly"`, or if `start > end`.
         """
-        start_dt = dt.datetime.strptime(start, fmt)
-        end_dt = dt.datetime.strptime(end, fmt)
+        start_dt = to_datetime(start, fmt)
+        end_dt = to_datetime(end, fmt)
         if temporal_resolution == "raw":
             dates = pd.DatetimeIndex([start_dt])
         elif temporal_resolution in _RESOLUTION_FREQ:
-            dates = pd.date_range(start_dt, end_dt, freq=_RESOLUTION_FREQ[temporal_resolution])
+            dates = pd.date_range(
+                start_dt, end_dt, freq=_RESOLUTION_FREQ[temporal_resolution]
+            )
         else:
             raise ValueError(
                 "temporal_resolution must be 'raw', 'daily', 'monthly', or "
@@ -501,6 +634,8 @@ class GEE(AbstractDataSource):
                 ...     variables={"UCSB-CHG/CHIRPS/DAILY": ["precipitation"]},
                 ...     lat_lim=[29.0, 30.0], lon_lim=[31.0, 32.0],
                 ...     path="data/gee", scale=5566,
+                ... )
+                >>> gee.authenticate(  # doctest: +SKIP
                 ...     service_account="sa@p.iam.gserviceaccount.com",
                 ...     service_key="/path/to/key.json",
                 ... )
@@ -515,7 +650,7 @@ class GEE(AbstractDataSource):
                 ...     start="2020-06-01", end="2020-06-01",
                 ...     variables={"UCSB-CHG/CHIRPS/DAILY": ["precipitation"]},
                 ...     lat_lim=[29.0, 30.0], lon_lim=[31.0, 32.0],
-                ...     scale=5566, project="my-project",
+                ...     scale=5566,
                 ... )
                 >>> gee.download(aggregate=object())  # doctest: +SKIP
                 Traceback (most recent call last):
@@ -528,13 +663,15 @@ class GEE(AbstractDataSource):
             earthlens.gee.Catalog: Resolves the `{asset_id: [band, ...]}`
                 request against `src/earthlens/gee/catalog/`.
             earthlens.gee.auth.EarthEngineAuth: Performs the one-time
-                `ee.Initialize` used by :meth:`_initialize`.
+                `ee.Initialize` used by :meth:`_open_client`.
         """
         if aggregate is not None:
             raise NotImplementedError(
                 "aggregate= is not yet supported by the GEE backend "
                 "(planned — see the GEE plan task M3)."
             )
+        # Trigger the lazy Earth Engine auth/init before any `ee` call.
+        _ = self.client
         outputs: list[Path | str | TaskInfo] = []
         for asset_id, bands in self.vars.items():
             outputs.extend(self._download_dataset(asset_id, list(bands), progress_bar))
@@ -644,7 +781,11 @@ class GEE(AbstractDataSource):
         freq = _RESOLUTION_FREQ[self.temporal_resolution]
         bucket_starts = pd.date_range(start, end, freq=freq, inclusive="left")
         for i, bucket_start in enumerate(bucket_starts):
-            bucket_end = bucket_starts[i + 1] if i + 1 < len(bucket_starts) else pd.Timestamp(end)
+            bucket_end = (
+                bucket_starts[i + 1]
+                if i + 1 < len(bucket_starts)
+                else pd.Timestamp(end)
+            )
             window = collection.filterDate(
                 bucket_start.strftime("%Y-%m-%d"), bucket_end.strftime("%Y-%m-%d")
             )
@@ -703,7 +844,9 @@ class GEE(AbstractDataSource):
             return self._export_via_url(image, var_info, float(scale), region, prefix)
         return self._export_via_batch(image, float(scale), region, prefix)
 
-    def _export_via_url(self, image, var_info: Dataset, scale: float, region, prefix: str) -> Path:
+    def _export_via_url(
+        self, image, var_info: Dataset, scale: float, region, prefix: str
+    ) -> Path:
         """Fetch a GeoTIFF from `image.getDownloadURL`; enforce the 32768-px cap.
 
         Earth Engine returns a single GeoTIFF when one band is exported and
@@ -734,9 +877,7 @@ class GEE(AbstractDataSource):
             )
         return self._download_one_url_tile(image, region, scale, prefix)
 
-    def _download_one_url_tile(
-        self, image, region, scale: float, prefix: str
-    ) -> Path:
+    def _download_one_url_tile(self, image, region, scale: float, prefix: str) -> Path:
         """Issue one `getDownloadURL` request → tif at `<prefix>.tif`.
 
         Single-tile worker shared by the small-AOI path and the
@@ -800,12 +941,12 @@ class GEE(AbstractDataSource):
         merge_rasters([str(p) for p in tile_paths], str(target))
         for p in tile_paths:
             p.unlink(missing_ok=True)
-        logger.info(
-            f"Stitched {len(tile_paths)} tile(s) into {target} via pyramids."
-        )
+        logger.info(f"Stitched {len(tile_paths)} tile(s) into {target} via pyramids.")
         return target
 
-    def _export_via_batch(self, image, scale: float, region, prefix: str) -> str | TaskInfo:
+    def _export_via_batch(
+        self, image, scale: float, region, prefix: str
+    ) -> str | TaskInfo:
         """Queue an `ee.batch.Export.image.to{Drive,CloudStorage,Asset}` task.
 
         When `wait_for_export=True` (the default) blocks until the task
@@ -848,23 +989,29 @@ class GEE(AbstractDataSource):
             )
             return info
         wait_for_task(task, progress_bar=True)
-        logger.info(f"Exported {destination} (pull it from the {self.export_via} destination)")
+        logger.info(
+            f"Exported {destination} (pull it from the {self.export_via} destination)"
+        )
         return destination
 
     def _ee_region(self):
         """Return the `ee.Geometry` to clip / filter requests to.
 
         Uses the constructor `region` `GeoDataFrame` (converted via
-        :func:`earthlens.gee.features.create_feature`) when given,
-        otherwise an `ee.Geometry.Rectangle` built from the lat/lon
-        bbox. Computed once and cached.
+        :func:`earthlens.gee.features.create_feature`) when given, else a
+        polygon `aoi=` carried on `self.space.geometry` (the unified
+        ergonomic channel), and otherwise an `ee.Geometry.Rectangle` built
+        from the lat/lon bbox. Computed once and cached.
 
         Returns:
             The `ee.Geometry`.
         """
         if self._ee_geometry is None:
+            aoi_geometry = getattr(self.space, "geometry", None)
             if self.region is not None:
                 self._ee_geometry = create_feature(self.region).geometry()
+            elif aoi_geometry is not None:
+                self._ee_geometry = create_feature(aoi_geometry).geometry()
             else:
                 self._ee_geometry = ee.Geometry.Rectangle(
                     [
@@ -909,9 +1056,7 @@ class GEE(AbstractDataSource):
             return None, None
         return start, end_excl
 
-    def _effective_extent(
-        self, var_info: Dataset
-    ) -> tuple[dt.datetime, dt.datetime]:
+    def _effective_extent(self, var_info: Dataset) -> tuple[dt.datetime, dt.datetime]:
         """Resolve a dataset's effective `(start, end_exclusive)` extent.
 
         The catalog's `start_date` is always a curated string (the
@@ -932,10 +1077,9 @@ class GEE(AbstractDataSource):
         catalog_end_str = var_info.extent.end_date
 
         if catalog_end_str is not None:
-            ds_end_excl = (
-                dt.datetime.strptime(catalog_end_str, "%Y-%m-%d")
-                + dt.timedelta(days=1)
-            )
+            ds_end_excl = dt.datetime.strptime(
+                catalog_end_str, "%Y-%m-%d"
+            ) + dt.timedelta(days=1)
             return ds_start, ds_end_excl
 
         _, ee_end = self._maybe_discover_ee_extent(var_info)
@@ -944,10 +1088,9 @@ class GEE(AbstractDataSource):
 
         # `now()` would be local-naive; the rest of the path is naive
         # UTC, so use a naive UTC value.
-        ds_end_excl = (
-            dt.datetime.now(dt.timezone.utc).replace(tzinfo=None)
-            + dt.timedelta(days=1)
-        )
+        ds_end_excl = dt.datetime.now(dt.timezone.utc).replace(
+            tzinfo=None
+        ) + dt.timedelta(days=1)
         return ds_start, ds_end_excl
 
     def _maybe_discover_ee_extent(
@@ -990,9 +1133,12 @@ class GEE(AbstractDataSource):
         """
         try:
             collection = ee.ImageCollection(var_info.id)
-            result = collection.reduceColumns(
-                ee.Reducer.minMax(), ["system:time_start"]
-            ).getInfo() or {}
+            result = (
+                collection.reduceColumns(
+                    ee.Reducer.minMax(), ["system:time_start"]
+                ).getInfo()
+                or {}
+            )
         except Exception as exc:  # noqa: BLE001 - downgrade EE errors to a warning
             logger.warning(
                 f"discover_extent: reduceColumns(minMax) failed for "

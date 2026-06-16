@@ -7,10 +7,9 @@ from types import SimpleNamespace
 
 import ee
 import geopandas as gpd
+import geopandas as _gpd
 import pytest
 from shapely.geometry import Point
-
-import geopandas as _gpd
 
 from earthlens.gee import sampling
 from earthlens.gee.sampling import (
@@ -55,7 +54,9 @@ class _FakeImage:
 
 def _fake_reducer_namespace():
     """Build a namespace mimicking `ee.Reducer` for every whitelisted name."""
-    return SimpleNamespace(**{name: lambda n=name: f"reducer<{n}>" for name in _REDUCER_WHITELIST})
+    return SimpleNamespace(
+        **{name: lambda n=name: f"reducer<{n}>" for name in _REDUCER_WHITELIST}
+    )
 
 
 @pytest.fixture
@@ -115,6 +116,7 @@ class TestSamplePoints:
     def test_polygon_geometry_rejected(self, fake_ee):
         """Non-point geometries raise `ValueError` naming the offending row (L4)."""
         from shapely.geometry import Polygon
+
         gdf = gpd.GeoDataFrame(
             {"id": [0, 1]},
             geometry=[
@@ -129,6 +131,7 @@ class TestSamplePoints:
     def test_multipoint_accepted(self, fake_ee):
         """`MultiPoint` rows pass the type guard (they have `.bounds`)."""
         from shapely.geometry import MultiPoint
+
         gdf = gpd.GeoDataFrame(
             {"id": [0]},
             geometry=[MultiPoint([(0, 0), (1, 1)])],
@@ -156,7 +159,9 @@ class TestSamplePoints:
 
         assert n_clips == n_reduces >= 1
         assert {call["scale"] for call in image.recorder["reduce_calls"]} == {42}
-        assert {call["reducer"] for call in image.recorder["reduce_calls"]} == {"reducer<first>"}
+        assert {call["reducer"] for call in image.recorder["reduce_calls"]} == {
+            "reducer<first>"
+        }
         assert isinstance(result, _FakeFeatureCollection)
 
     def test_named_reducer_threads_through_to_each_call(self, fake_ee):
@@ -164,7 +169,9 @@ class TestSamplePoints:
         gdf = _points_gdf(5)
         image = _FakeImage()
         sample_points(image, gdf, scale_m=10, reducer="mean")
-        assert {call["reducer"] for call in image.recorder["reduce_calls"]} == {"reducer<mean>"}
+        assert {call["reducer"] for call in image.recorder["reduce_calls"]} == {
+            "reducer<mean>"
+        }
 
     def test_returns_real_feature_collection_when_unpatched(self):
         """Without monkey-patching, the symbol resolves to the real `ee.FeatureCollection`.
@@ -184,11 +191,15 @@ class TestSamplePointsToGdf:
         def _stub_fc_to_gdf(fc, *, crs=4326):
             seen["fc"] = fc
             seen["crs"] = crs
-            return _gpd.GeoDataFrame({"x": [1]}, geometry=_gpd.points_from_xy([0], [0]), crs=f"EPSG:{crs}")
+            return _gpd.GeoDataFrame(
+                {"x": [1]}, geometry=_gpd.points_from_xy([0], [0]), crs=f"EPSG:{crs}"
+            )
 
         monkeypatch.setattr(sampling, "_fc_to_gdf", _stub_fc_to_gdf)
         gdf = _points_gdf(5)
-        out = sample_points_to_gdf(_FakeImage(), gdf, scale_m=30, reducer="mean", crs=4326)
+        out = sample_points_to_gdf(
+            _FakeImage(), gdf, scale_m=30, reducer="mean", crs=4326
+        )
         assert isinstance(out, _gpd.GeoDataFrame)
         assert seen["crs"] == 4326
         # The FC handed to `_fc_to_gdf` is the merged collection produced by

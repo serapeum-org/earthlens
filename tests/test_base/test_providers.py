@@ -72,8 +72,7 @@ class TestLoadProviders:
         """A row missing the required `display_name` raises `ValueError`."""
         path = _write(
             tmp_path / "providers.yaml",
-            "providers:\n"
-            "  ucsb-chc: {}\n",
+            "providers:\n" "  ucsb-chc: {}\n",
         )
         with pytest.raises(ValueError, match="invalid provider 'ucsb-chc'"):
             load_providers(path)
@@ -93,7 +92,9 @@ class TestLoadProviders:
             calls.append(p)
             return {"providers": {"x": {"display_name": "X"}}}
 
-        path = _write(tmp_path / "providers.yaml", "providers:\n  x:\n    display_name: X\n")
+        path = _write(
+            tmp_path / "providers.yaml", "providers:\n  x:\n    display_name: X\n"
+        )
         monkeypatch.setattr(providers_module, "load_yaml_strict", _spy_loader)
         load_providers(path)
         load_providers(path)

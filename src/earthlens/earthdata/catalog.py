@@ -57,9 +57,9 @@ AUTO_PATH: Path = Path(__file__).parent / "catalog" / "_auto.json"
 # path plus a tuple of `(file, mtime_ns)` for every YAML the load
 # touched, so editing any per-DAAC file invalidates the entry without
 # inspecting every row. Mirrors the CMEMS / GEE multi-file pattern.
-_CATALOG_CACHE: dict[Any, tuple[list[str], dict[str, "EarthdataDataset"]]] = {}
+_CATALOG_CACHE: dict[Any, tuple[list[str], dict[str, EarthdataDataset]]] = {}
 # Same `(path, mtime_ns)` cache for the DAAC provider registry.
-_PROVIDERS_CACHE: dict[Any, dict[str, "EarthdataDAAC"]] = {}
+_PROVIDERS_CACHE: dict[Any, dict[str, EarthdataDAAC]] = {}
 # …and for the auto-generated long-tail rows (kept as raw dicts — a model is
 # built only for the one key a caller resolves, so membership/resolution never
 # instantiates all ~8k pydantic rows).
@@ -125,7 +125,7 @@ def _yaml_files_for(path: Path) -> list[Path]:
     )
 
 
-def _load_providers(path: Path) -> dict[str, "EarthdataDAAC"]:
+def _load_providers(path: Path) -> dict[str, EarthdataDAAC]:
     """Parse, validate, and cache the DAAC provider registry.
 
     Args:
@@ -196,7 +196,7 @@ def _load_auto_raw(path: Path) -> dict[str, dict]:
 
 def _load_catalog_data(
     path: Path,
-) -> tuple[list[str], dict[str, "EarthdataDataset"]]:
+) -> tuple[list[str], dict[str, EarthdataDataset]]:
     """Parse, validate, and cache the Earthdata catalog at `path`.
 
     Returns a `(available_datasets, datasets)` tuple. When `path` is a
@@ -262,9 +262,7 @@ def _load_catalog_data(
                     start=temporal_body.get("start"),
                     end=temporal_body.get("end"),
                 ),
-                bands={
-                    name: Band(**(meta or {})) for name, meta in bands_body.items()
-                },
+                bands={name: Band(**(meta or {})) for name, meta in bands_body.items()},
                 **body,
             )
         except ValidationError as exc:
