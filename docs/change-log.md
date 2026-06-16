@@ -1,5 +1,18 @@
 # Change Log
 
+## 0.8.0 (2026-06-16)
+
+### Feat
+
+- **facade**: improve EarthLens public-API ergonomics (#407)
+- **nwm**: add earthlens.nwm (NOAA National Water Model) backend (#225)
+- **grids,stac**: adopt the specialized grid adapters and EO-agency signers from pyramids (#386)
+- **cli**: add the earthlens catalog-query CLI and retire tools/ (#383)
+
+### Fix
+
+- **cli**: keep datasets --write paths off the Rich wrap boundary (#408)
+
 ## 0.7.0 (2026-06-03)
 
 ### Feat
