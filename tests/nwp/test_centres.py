@@ -754,26 +754,45 @@ class TestECCCCentre:
         return NWPModel(**base)
 
     def _fake_requests_uncompressed(self, monkeypatch):
-        """Fake `requests.get` that returns the variable token as the body."""
+        """Fake `requests.Session.get` that streams the variable token as the body."""
         import sys
         import types
 
-        state: dict[str, list[str]] = {"urls": []}
+        state: dict[str, Any] = {"urls": [], "stream_calls": 0, "chunk_sizes": []}
 
         class _Resp:
             def __init__(self, body):
-                self.content = body
+                self._body = body
+
+            def __enter__(self):
+                return self
+
+            def __exit__(self, *exc):
+                return False
 
             def raise_for_status(self):
                 return None
 
-        def fake_get(url, timeout=None):
-            state["urls"].append(url)
-            var = url.rsplit("_MSC_GDPS_", 1)[-1].split("_LatLon", 1)[0]
-            return _Resp(b"<" + var.encode() + b">")
+            def iter_content(self, chunk_size):
+                state["stream_calls"] += 1
+                state["chunk_sizes"].append(chunk_size)
+                # Emit two chunks so the test exercises the iter loop, not
+                # a single materialise-then-write path.
+                yield self._body[: len(self._body) // 2]
+                yield self._body[len(self._body) // 2 :]
+
+        class _Session:
+            def get(self, url, stream=False, timeout=None):
+                state["urls"].append(url)
+                var = url.rsplit("_MSC_GDPS_", 1)[-1].split("_LatLon", 1)[0]
+                return _Resp(b"<" + var.encode() + b">")
+
+            def close(self):
+                pass
 
         module = types.ModuleType("requests")
-        module.get = fake_get
+        module.Session = _Session
+        module.get = lambda url, **kw: _Resp(b"")  # legacy compat (other tests)
         monkeypatch.setitem(sys.modules, "requests", module)
         return state
 
@@ -835,16 +854,89 @@ class TestECCCCentre:
         )
         assert url.endswith("TMP_TGL_2m_mem007.grib2")
 
+    def test_band_url_non_numeric_member_raises_value_error(self):
+        """A non-numeric member id is rejected with a clean ValueError."""
+        from earthlens.nwp.centres.eccc import ECCCCentre
+
+        template = "https://example.test/{var}_{member:03d}.grib2"
+        model = NWPModel(
+            provider="eccc-msc",
+            backend="eccc-msc",
+            cycles_utc=[0, 12],
+            url_template=template,
+            bands={"temperature_2m": "TMP_TGL_2m"},
+        )
+        with pytest.raises(ValueError, match="numeric string"):
+            ECCCCentre._band_url(
+                model, "temperature_2m", dt.datetime(2026, 6, 17, 0), 0, member="cf"
+            )
+
+    def test_unknown_mirror_raises(self, tmp_path):
+        """A `mirror=` value outside ('auto', 'origin') fails loud."""
+        from earthlens.nwp.centres.eccc import ECCCCentre
+
+        with pytest.raises(ValueError, match="single origin host"):
+            ECCCCentre(tmp_path).fetch_one(
+                self._gdps(),
+                dt.datetime(2026, 6, 17, 0),
+                0,
+                ["temperature_2m"],
+                mirror="msc-backup",
+            )
+
+    def test_fetch_one_streams_with_iter_content(self, monkeypatch, tmp_path):
+        """`fetch_one` streams via `iter_content` (no `.content` materialisation)."""
+        from earthlens.nwp.centres.eccc import ECCCCentre
+
+        state = self._fake_requests_uncompressed(monkeypatch)
+        ECCCCentre(tmp_path).fetch_one(
+            self._gdps(),
+            dt.datetime(2026, 6, 17, 0),
+            3,
+            ["temperature_2m"],
+            "origin",
+        )
+        assert state["stream_calls"] >= 1
+        assert all(size > 0 for size in state["chunk_sizes"])
+
+    def test_fetch_one_reuses_one_session_per_centre(self, monkeypatch, tmp_path):
+        """One `requests.Session()` is reused across multiple fetch_one calls."""
+        from earthlens.nwp.centres.eccc import ECCCCentre
+
+        self._fake_requests_uncompressed(monkeypatch)
+        centre = ECCCCentre(tmp_path)
+        centre.fetch_one(
+            self._gdps(),
+            dt.datetime(2026, 6, 17, 0),
+            3,
+            ["temperature_2m"],
+            "origin",
+        )
+        first_session = centre._session
+        centre.fetch_one(
+            self._gdps(),
+            dt.datetime(2026, 6, 17, 12),
+            6,
+            ["temperature_2m"],
+            "origin",
+        )
+        assert centre._session is first_session
+
     def test_fetch_one_failure_leaves_no_partial_file(self, tmp_path, monkeypatch):
         """A failure on a later band leaves no truncated `.grib2`."""
         import sys
         import types
 
-        def failing_get(url, timeout=None):
-            raise RuntimeError("network down")
+        class _FailingSession:
+            def get(self, url, stream=False, timeout=None):
+                raise RuntimeError("network down")
+
+            def close(self):
+                pass
 
         module = types.ModuleType("requests")
-        module.get = failing_get
+        module.Session = _FailingSession
+        module.get = lambda url, **kw: (_ for _ in ()).throw(RuntimeError("network down"))
         monkeypatch.setitem(sys.modules, "requests", module)
 
         from earthlens.nwp.centres.eccc import ECCCCentre
