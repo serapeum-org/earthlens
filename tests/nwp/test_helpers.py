@@ -187,6 +187,18 @@ class TestParseIdx:
         body = '{"_offset":0,"_length":100,"param":"2t"}\n{broken json\n'
         assert len(_parse_idx(body)) == 1
 
+    def test_ecmwf_non_numeric_step_dropped(self):
+        """A JSON line whose `step` is not int-castable is dropped, not raised."""
+        from earthlens.nwp._helpers import _parse_idx
+
+        body = (
+            '{"_offset":0,"_length":100,"param":"2t","step":"nope"}\n'
+            '{"_offset":100,"_length":50,"param":"tp","step":3}\n'
+        )
+        frame = _parse_idx(body)
+        assert len(frame) == 1
+        assert list(frame["step"]) == [3]
+
     def test_noaa_short_line_dropped(self):
         """A NOAA line with fewer than six colon-separated fields is dropped."""
         from earthlens.nwp._helpers import _parse_idx

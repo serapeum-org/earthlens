@@ -899,6 +899,48 @@ class TestECCCCentre:
         assert state["stream_calls"] >= 1
         assert all(size > 0 for size in state["chunk_sizes"])
 
+    def test_fetch_one_skips_empty_chunks(self, monkeypatch, tmp_path):
+        """An empty chunk from `iter_content` is filtered out, not written."""
+        import sys
+        import types
+
+        from earthlens.nwp.centres.eccc import ECCCCentre
+
+        class _Resp:
+            def __enter__(self):
+                return self
+
+            def __exit__(self, *exc):
+                return False
+
+            def raise_for_status(self):
+                return None
+
+            def iter_content(self, chunk_size):
+                yield b""
+                yield b"payload"
+                yield b""
+
+        class _Session:
+            def get(self, url, stream=False, timeout=None):
+                return _Resp()
+
+            def close(self):
+                pass
+
+        module = types.ModuleType("requests")
+        module.Session = _Session
+        monkeypatch.setitem(sys.modules, "requests", module)
+        out = ECCCCentre(tmp_path).fetch_one(
+            self._gdps(),
+            dt.datetime(2026, 6, 17, 0),
+            3,
+            ["temperature_2m"],
+            "origin",
+        )
+        # Only the non-empty middle chunk is written.
+        assert out.read_bytes() == b"payload"
+
     def test_fetch_one_reuses_one_session_per_centre(self, monkeypatch, tmp_path):
         """One `requests.Session()` is reused across multiple fetch_one calls."""
         from earthlens.nwp.centres.eccc import ECCCCentre
