@@ -157,6 +157,7 @@ nav:
       - Introduction: reference/stac/introduction.md
       - Usage: reference/stac/usage.md
       - Authentication: reference/stac/authentication.md
+      - Migration from GEE: reference/stac/migration-from-gee.md
       - Reference: reference/stac/stac.md
     - GDACS (disaster alerts):
       - Introduction: reference/gdacs/introduction.md
