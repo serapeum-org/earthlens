@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -15961,19 +15961,16 @@ per-collection <code>signer: bdc-token</code> override on the token-gated rows o
 
 <p><span class="doc-section-title">Examples:</span></p>
     <ul>
-<li>A clean https href becomes a query-bearing one:
-    <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="o">&gt;&gt;&gt;</span> <span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="o">&gt;&gt;&gt;</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;BDC_ACCESS_TOKEN&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;tok&quot;</span>
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="o">&gt;&gt;&gt;</span> <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.stac</span><span class="w"> </span><span class="kn">import</span> <span class="n">BdcTokenSigner</span>
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="o">&gt;&gt;&gt;</span> <span class="n">BdcTokenSigner</span><span class="p">()</span><span class="o">.</span><span class="n">sign_href</span><span class="p">(</span><span class="s2">&quot;https://data.inpe.br/bdc/data/x.tif&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="s1">&#39;https://data.inpe.br/bdc/data/x.tif?access_token=tok&#39;</span>
+<li>A clean https href becomes a query-bearing one (passing the token
+  explicitly so the example does not mutate the process env):
+    <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="o">&gt;&gt;&gt;</span> <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.stac</span><span class="w"> </span><span class="kn">import</span> <span class="n">BdcTokenSigner</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="o">&gt;&gt;&gt;</span> <span class="n">BdcTokenSigner</span><span class="p">(</span><span class="n">token</span><span class="o">=</span><span class="s2">&quot;tok&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">sign_href</span><span class="p">(</span><span class="s2">&quot;https://data.inpe.br/bdc/data/x.tif&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="s1">&#39;https://data.inpe.br/bdc/data/x.tif?access_token=tok&#39;</span>
 </code></pre></div></li>
 <li>An href that already carries a query gets <code>&amp;access_token=…</code> instead:
-    <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="o">&gt;&gt;&gt;</span> <span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
-<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="o">&gt;&gt;&gt;</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;BDC_ACCESS_TOKEN&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;tok&quot;</span>
-<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="o">&gt;&gt;&gt;</span> <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.stac</span><span class="w"> </span><span class="kn">import</span> <span class="n">BdcTokenSigner</span>
-<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="o">&gt;&gt;&gt;</span> <span class="n">BdcTokenSigner</span><span class="p">()</span><span class="o">.</span><span class="n">sign_href</span><span class="p">(</span><span class="s2">&quot;https://data.inpe.br/bdc/data/x.tif?foo=1&quot;</span><span class="p">)</span>
-<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="s1">&#39;https://data.inpe.br/bdc/data/x.tif?foo=1&amp;access_token=tok&#39;</span>
+    <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="o">&gt;&gt;&gt;</span> <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.stac</span><span class="w"> </span><span class="kn">import</span> <span class="n">BdcTokenSigner</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="o">&gt;&gt;&gt;</span> <span class="n">BdcTokenSigner</span><span class="p">(</span><span class="n">token</span><span class="o">=</span><span class="s2">&quot;tok&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">sign_href</span><span class="p">(</span><span class="s2">&quot;https://data.inpe.br/bdc/data/x.tif?foo=1&quot;</span><span class="p">)</span>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="s1">&#39;https://data.inpe.br/bdc/data/x.tif?foo=1&amp;access_token=tok&#39;</span>
 </code></pre></div></li>
 </ul>
 
@@ -16062,10 +16059,7 @@ per-collection <code>signer: bdc-token</code> override on the token-gated rows o
 <span class="normal"><a href="#__codelineno-0-726">726</a></span>
 <span class="normal"><a href="#__codelineno-0-727">727</a></span>
 <span class="normal"><a href="#__codelineno-0-728">728</a></span>
-<span class="normal"><a href="#__codelineno-0-729">729</a></span>
-<span class="normal"><a href="#__codelineno-0-730">730</a></span>
-<span class="normal"><a href="#__codelineno-0-731">731</a></span>
-<span class="normal"><a href="#__codelineno-0-732">732</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-653" name="__codelineno-0-653"></a><span class="k">class</span><span class="w"> </span><span class="nc">BdcTokenSigner</span><span class="p">(</span><span class="n">_BaseSigner</span><span class="p">):</span>
+<span class="normal"><a href="#__codelineno-0-729">729</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-653" name="__codelineno-0-653"></a><span class="k">class</span><span class="w"> </span><span class="nc">BdcTokenSigner</span><span class="p">(</span><span class="n">_BaseSigner</span><span class="p">):</span>
 <a id="__codelineno-0-654" name="__codelineno-0-654"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Brazil Data Cube (BDC) OAuth-token URL signer.</span>
 <a id="__codelineno-0-655" name="__codelineno-0-655"></a>
 <a id="__codelineno-0-656" name="__codelineno-0-656"></a><span class="sd">    Some Brazil Data Cube collections (token-gated tiers) require an</span>
@@ -16092,59 +16086,56 @@ per-collection <code>signer: bdc-token</code> override on the token-gated rows o
 <a id="__codelineno-0-677" name="__codelineno-0-677"></a><span class="sd">        token: Explicit BDC OAuth token. Defaults to `$BDC_ACCESS_TOKEN`.</span>
 <a id="__codelineno-0-678" name="__codelineno-0-678"></a>
 <a id="__codelineno-0-679" name="__codelineno-0-679"></a><span class="sd">    Examples:</span>
-<a id="__codelineno-0-680" name="__codelineno-0-680"></a><span class="sd">        - A clean https href becomes a query-bearing one:</span>
-<a id="__codelineno-0-681" name="__codelineno-0-681"></a><span class="sd">            ```python</span>
-<a id="__codelineno-0-682" name="__codelineno-0-682"></a><span class="sd">            &gt;&gt;&gt; import os</span>
-<a id="__codelineno-0-683" name="__codelineno-0-683"></a><span class="sd">            &gt;&gt;&gt; os.environ[&quot;BDC_ACCESS_TOKEN&quot;] = &quot;tok&quot;</span>
-<a id="__codelineno-0-684" name="__codelineno-0-684"></a><span class="sd">            &gt;&gt;&gt; from earthlens.stac import BdcTokenSigner</span>
-<a id="__codelineno-0-685" name="__codelineno-0-685"></a><span class="sd">            &gt;&gt;&gt; BdcTokenSigner().sign_href(&quot;https://data.inpe.br/bdc/data/x.tif&quot;)</span>
-<a id="__codelineno-0-686" name="__codelineno-0-686"></a><span class="sd">            &#39;https://data.inpe.br/bdc/data/x.tif?access_token=tok&#39;</span>
-<a id="__codelineno-0-687" name="__codelineno-0-687"></a>
-<a id="__codelineno-0-688" name="__codelineno-0-688"></a><span class="sd">            ```</span>
-<a id="__codelineno-0-689" name="__codelineno-0-689"></a><span class="sd">        - An href that already carries a query gets `&amp;access_token=…` instead:</span>
-<a id="__codelineno-0-690" name="__codelineno-0-690"></a><span class="sd">            ```python</span>
-<a id="__codelineno-0-691" name="__codelineno-0-691"></a><span class="sd">            &gt;&gt;&gt; import os</span>
-<a id="__codelineno-0-692" name="__codelineno-0-692"></a><span class="sd">            &gt;&gt;&gt; os.environ[&quot;BDC_ACCESS_TOKEN&quot;] = &quot;tok&quot;</span>
-<a id="__codelineno-0-693" name="__codelineno-0-693"></a><span class="sd">            &gt;&gt;&gt; from earthlens.stac import BdcTokenSigner</span>
-<a id="__codelineno-0-694" name="__codelineno-0-694"></a><span class="sd">            &gt;&gt;&gt; BdcTokenSigner().sign_href(&quot;https://data.inpe.br/bdc/data/x.tif?foo=1&quot;)</span>
-<a id="__codelineno-0-695" name="__codelineno-0-695"></a><span class="sd">            &#39;https://data.inpe.br/bdc/data/x.tif?foo=1&amp;access_token=tok&#39;</span>
+<a id="__codelineno-0-680" name="__codelineno-0-680"></a><span class="sd">        - A clean https href becomes a query-bearing one (passing the token</span>
+<a id="__codelineno-0-681" name="__codelineno-0-681"></a><span class="sd">          explicitly so the example does not mutate the process env):</span>
+<a id="__codelineno-0-682" name="__codelineno-0-682"></a><span class="sd">            ```python</span>
+<a id="__codelineno-0-683" name="__codelineno-0-683"></a><span class="sd">            &gt;&gt;&gt; from earthlens.stac import BdcTokenSigner</span>
+<a id="__codelineno-0-684" name="__codelineno-0-684"></a><span class="sd">            &gt;&gt;&gt; BdcTokenSigner(token=&quot;tok&quot;).sign_href(&quot;https://data.inpe.br/bdc/data/x.tif&quot;)</span>
+<a id="__codelineno-0-685" name="__codelineno-0-685"></a><span class="sd">            &#39;https://data.inpe.br/bdc/data/x.tif?access_token=tok&#39;</span>
+<a id="__codelineno-0-686" name="__codelineno-0-686"></a>
+<a id="__codelineno-0-687" name="__codelineno-0-687"></a><span class="sd">            ```</span>
+<a id="__codelineno-0-688" name="__codelineno-0-688"></a><span class="sd">        - An href that already carries a query gets `&amp;access_token=…` instead:</span>
+<a id="__codelineno-0-689" name="__codelineno-0-689"></a><span class="sd">            ```python</span>
+<a id="__codelineno-0-690" name="__codelineno-0-690"></a><span class="sd">            &gt;&gt;&gt; from earthlens.stac import BdcTokenSigner</span>
+<a id="__codelineno-0-691" name="__codelineno-0-691"></a><span class="sd">            &gt;&gt;&gt; BdcTokenSigner(token=&quot;tok&quot;).sign_href(&quot;https://data.inpe.br/bdc/data/x.tif?foo=1&quot;)</span>
+<a id="__codelineno-0-692" name="__codelineno-0-692"></a><span class="sd">            &#39;https://data.inpe.br/bdc/data/x.tif?foo=1&amp;access_token=tok&#39;</span>
+<a id="__codelineno-0-693" name="__codelineno-0-693"></a>
+<a id="__codelineno-0-694" name="__codelineno-0-694"></a><span class="sd">            ```</span>
+<a id="__codelineno-0-695" name="__codelineno-0-695"></a><span class="sd">    &quot;&quot;&quot;</span>
 <a id="__codelineno-0-696" name="__codelineno-0-696"></a>
-<a id="__codelineno-0-697" name="__codelineno-0-697"></a><span class="sd">            ```</span>
-<a id="__codelineno-0-698" name="__codelineno-0-698"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-699" name="__codelineno-0-699"></a>
-<a id="__codelineno-0-700" name="__codelineno-0-700"></a>    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;bdc-token&quot;</span>
-<a id="__codelineno-0-701" name="__codelineno-0-701"></a>
-<a id="__codelineno-0-702" name="__codelineno-0-702"></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">token</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-703" name="__codelineno-0-703"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Store the explicit token (or defer to `$BDC_ACCESS_TOKEN`).&quot;&quot;&quot;</span>
-<a id="__codelineno-0-704" name="__codelineno-0-704"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_explicit_token</span> <span class="o">=</span> <span class="n">token</span>
-<a id="__codelineno-0-705" name="__codelineno-0-705"></a>
-<a id="__codelineno-0-706" name="__codelineno-0-706"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_token</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<a id="__codelineno-0-707" name="__codelineno-0-707"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the BDC OAuth token from kwarg or `BDC_ACCESS_TOKEN`.&quot;&quot;&quot;</span>
-<a id="__codelineno-0-708" name="__codelineno-0-708"></a>        <span class="n">token</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_explicit_token</span> <span class="ow">or</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;BDC_ACCESS_TOKEN&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-709" name="__codelineno-0-709"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="n">token</span><span class="p">:</span>
-<a id="__codelineno-0-710" name="__codelineno-0-710"></a>            <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">AuthenticationError</span>
-<a id="__codelineno-0-711" name="__codelineno-0-711"></a>
-<a id="__codelineno-0-712" name="__codelineno-0-712"></a>            <span class="k">raise</span> <span class="n">AuthenticationError</span><span class="p">(</span>
-<a id="__codelineno-0-713" name="__codelineno-0-713"></a>                <span class="s2">&quot;set BDC_ACCESS_TOKEN — this Brazil Data Cube collection requires &quot;</span>
-<a id="__codelineno-0-714" name="__codelineno-0-714"></a>                <span class="s2">&quot;an OAuth token; open collections such as CBERS4-WFI-16D-2 do not &quot;</span>
-<a id="__codelineno-0-715" name="__codelineno-0-715"></a>                <span class="s2">&quot;need one and read anonymously.&quot;</span>
-<a id="__codelineno-0-716" name="__codelineno-0-716"></a>            <span class="p">)</span>
-<a id="__codelineno-0-717" name="__codelineno-0-717"></a>        <span class="k">return</span> <span class="n">token</span>
+<a id="__codelineno-0-697" name="__codelineno-0-697"></a>    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;bdc-token&quot;</span>
+<a id="__codelineno-0-698" name="__codelineno-0-698"></a>
+<a id="__codelineno-0-699" name="__codelineno-0-699"></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">token</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-700" name="__codelineno-0-700"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Store the explicit token (or defer to `$BDC_ACCESS_TOKEN`).&quot;&quot;&quot;</span>
+<a id="__codelineno-0-701" name="__codelineno-0-701"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_explicit_token</span> <span class="o">=</span> <span class="n">token</span>
+<a id="__codelineno-0-702" name="__codelineno-0-702"></a>
+<a id="__codelineno-0-703" name="__codelineno-0-703"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_token</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<a id="__codelineno-0-704" name="__codelineno-0-704"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the BDC OAuth token from kwarg or `BDC_ACCESS_TOKEN`.&quot;&quot;&quot;</span>
+<a id="__codelineno-0-705" name="__codelineno-0-705"></a>        <span class="n">token</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_explicit_token</span> <span class="ow">or</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;BDC_ACCESS_TOKEN&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-706" name="__codelineno-0-706"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="n">token</span><span class="p">:</span>
+<a id="__codelineno-0-707" name="__codelineno-0-707"></a>            <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">AuthenticationError</span>
+<a id="__codelineno-0-708" name="__codelineno-0-708"></a>
+<a id="__codelineno-0-709" name="__codelineno-0-709"></a>            <span class="k">raise</span> <span class="n">AuthenticationError</span><span class="p">(</span>
+<a id="__codelineno-0-710" name="__codelineno-0-710"></a>                <span class="s2">&quot;set BDC_ACCESS_TOKEN — this Brazil Data Cube collection requires &quot;</span>
+<a id="__codelineno-0-711" name="__codelineno-0-711"></a>                <span class="s2">&quot;an OAuth token; open collections such as CBERS4-WFI-16D-2 do not &quot;</span>
+<a id="__codelineno-0-712" name="__codelineno-0-712"></a>                <span class="s2">&quot;need one and read anonymously.&quot;</span>
+<a id="__codelineno-0-713" name="__codelineno-0-713"></a>            <span class="p">)</span>
+<a id="__codelineno-0-714" name="__codelineno-0-714"></a>        <span class="k">return</span> <span class="n">token</span>
+<a id="__codelineno-0-715" name="__codelineno-0-715"></a>
+<a id="__codelineno-0-716" name="__codelineno-0-716"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">sign_href</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">href</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<a id="__codelineno-0-717" name="__codelineno-0-717"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Append `?access_token=&lt;token&gt;` (or `&amp;access_token=`) to the asset href.</span>
 <a id="__codelineno-0-718" name="__codelineno-0-718"></a>
-<a id="__codelineno-0-719" name="__codelineno-0-719"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">sign_href</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">href</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<a id="__codelineno-0-720" name="__codelineno-0-720"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Append `?access_token=&lt;token&gt;` (or `&amp;access_token=`) to the asset href.</span>
-<a id="__codelineno-0-721" name="__codelineno-0-721"></a>
-<a id="__codelineno-0-722" name="__codelineno-0-722"></a><span class="sd">        Uses `urlsplit`/`urlunsplit` so the token lands in the URL&#39;s query</span>
-<a id="__codelineno-0-723" name="__codelineno-0-723"></a><span class="sd">        component even when the href carries a `#fragment` (a naive</span>
-<a id="__codelineno-0-724" name="__codelineno-0-724"></a><span class="sd">        `&quot;?&quot; in href` check would mistake a fragment for a query and append</span>
-<a id="__codelineno-0-725" name="__codelineno-0-725"></a><span class="sd">        after `#`, where the server never sees it).</span>
-<a id="__codelineno-0-726" name="__codelineno-0-726"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-727" name="__codelineno-0-727"></a>        <span class="kn">from</span><span class="w"> </span><span class="nn">urllib.parse</span><span class="w"> </span><span class="kn">import</span> <span class="n">urlsplit</span><span class="p">,</span> <span class="n">urlunsplit</span><span class="p">,</span> <span class="n">quote</span>
-<a id="__codelineno-0-728" name="__codelineno-0-728"></a>
-<a id="__codelineno-0-729" name="__codelineno-0-729"></a>        <span class="n">token</span> <span class="o">=</span> <span class="n">quote</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_token</span><span class="p">(),</span> <span class="n">safe</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-730" name="__codelineno-0-730"></a>        <span class="n">parts</span> <span class="o">=</span> <span class="n">urlsplit</span><span class="p">(</span><span class="n">href</span><span class="p">)</span>
-<a id="__codelineno-0-731" name="__codelineno-0-731"></a>        <span class="n">new_query</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">parts</span><span class="o">.</span><span class="n">query</span><span class="si">}</span><span class="s2">&amp;access_token=</span><span class="si">{</span><span class="n">token</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">if</span> <span class="n">parts</span><span class="o">.</span><span class="n">query</span> <span class="k">else</span> <span class="sa">f</span><span class="s2">&quot;access_token=</span><span class="si">{</span><span class="n">token</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-732" name="__codelineno-0-732"></a>        <span class="k">return</span> <span class="n">urlunsplit</span><span class="p">((</span><span class="n">parts</span><span class="o">.</span><span class="n">scheme</span><span class="p">,</span> <span class="n">parts</span><span class="o">.</span><span class="n">netloc</span><span class="p">,</span> <span class="n">parts</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="n">new_query</span><span class="p">,</span> <span class="n">parts</span><span class="o">.</span><span class="n">fragment</span><span class="p">))</span>
+<a id="__codelineno-0-719" name="__codelineno-0-719"></a><span class="sd">        Uses `urlsplit`/`urlunsplit` so the token lands in the URL&#39;s query</span>
+<a id="__codelineno-0-720" name="__codelineno-0-720"></a><span class="sd">        component even when the href carries a `#fragment` (a naive</span>
+<a id="__codelineno-0-721" name="__codelineno-0-721"></a><span class="sd">        `&quot;?&quot; in href` check would mistake a fragment for a query and append</span>
+<a id="__codelineno-0-722" name="__codelineno-0-722"></a><span class="sd">        after `#`, where the server never sees it).</span>
+<a id="__codelineno-0-723" name="__codelineno-0-723"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-724" name="__codelineno-0-724"></a>        <span class="kn">from</span><span class="w"> </span><span class="nn">urllib.parse</span><span class="w"> </span><span class="kn">import</span> <span class="n">urlsplit</span><span class="p">,</span> <span class="n">urlunsplit</span><span class="p">,</span> <span class="n">quote</span>
+<a id="__codelineno-0-725" name="__codelineno-0-725"></a>
+<a id="__codelineno-0-726" name="__codelineno-0-726"></a>        <span class="n">token</span> <span class="o">=</span> <span class="n">quote</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_token</span><span class="p">(),</span> <span class="n">safe</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-727" name="__codelineno-0-727"></a>        <span class="n">parts</span> <span class="o">=</span> <span class="n">urlsplit</span><span class="p">(</span><span class="n">href</span><span class="p">)</span>
+<a id="__codelineno-0-728" name="__codelineno-0-728"></a>        <span class="n">new_query</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">parts</span><span class="o">.</span><span class="n">query</span><span class="si">}</span><span class="s2">&amp;access_token=</span><span class="si">{</span><span class="n">token</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">if</span> <span class="n">parts</span><span class="o">.</span><span class="n">query</span> <span class="k">else</span> <span class="sa">f</span><span class="s2">&quot;access_token=</span><span class="si">{</span><span class="n">token</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-729" name="__codelineno-0-729"></a>        <span class="k">return</span> <span class="n">urlunsplit</span><span class="p">((</span><span class="n">parts</span><span class="o">.</span><span class="n">scheme</span><span class="p">,</span> <span class="n">parts</span><span class="o">.</span><span class="n">netloc</span><span class="p">,</span> <span class="n">parts</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="n">new_query</span><span class="p">,</span> <span class="n">parts</span><span class="o">.</span><span class="n">fragment</span><span class="p">))</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -16177,11 +16168,11 @@ per-collection <code>signer: bdc-token</code> override on the token-gated rows o
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>src/earthlens/stac/signers.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-702">702</a></span>
-<span class="normal"><a href="#__codelineno-0-703">703</a></span>
-<span class="normal"><a href="#__codelineno-0-704">704</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-702" name="__codelineno-0-702"></a><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">token</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-703" name="__codelineno-0-703"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Store the explicit token (or defer to `$BDC_ACCESS_TOKEN`).&quot;&quot;&quot;</span>
-<a id="__codelineno-0-704" name="__codelineno-0-704"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_explicit_token</span> <span class="o">=</span> <span class="n">token</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-699">699</a></span>
+<span class="normal"><a href="#__codelineno-0-700">700</a></span>
+<span class="normal"><a href="#__codelineno-0-701">701</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-699" name="__codelineno-0-699"></a><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">token</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-700" name="__codelineno-0-700"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Store the explicit token (or defer to `$BDC_ACCESS_TOKEN`).&quot;&quot;&quot;</span>
+<a id="__codelineno-0-701" name="__codelineno-0-701"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_explicit_token</span> <span class="o">=</span> <span class="n">token</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -16208,7 +16199,10 @@ after <code>#</code>, where the server never sees it).</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>src/earthlens/stac/signers.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-719">719</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-716">716</a></span>
+<span class="normal"><a href="#__codelineno-0-717">717</a></span>
+<span class="normal"><a href="#__codelineno-0-718">718</a></span>
+<span class="normal"><a href="#__codelineno-0-719">719</a></span>
 <span class="normal"><a href="#__codelineno-0-720">720</a></span>
 <span class="normal"><a href="#__codelineno-0-721">721</a></span>
 <span class="normal"><a href="#__codelineno-0-722">722</a></span>
@@ -16218,23 +16212,20 @@ after <code>#</code>, where the server never sees it).</p>
 <span class="normal"><a href="#__codelineno-0-726">726</a></span>
 <span class="normal"><a href="#__codelineno-0-727">727</a></span>
 <span class="normal"><a href="#__codelineno-0-728">728</a></span>
-<span class="normal"><a href="#__codelineno-0-729">729</a></span>
-<span class="normal"><a href="#__codelineno-0-730">730</a></span>
-<span class="normal"><a href="#__codelineno-0-731">731</a></span>
-<span class="normal"><a href="#__codelineno-0-732">732</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-719" name="__codelineno-0-719"></a><span class="k">def</span><span class="w"> </span><span class="nf">sign_href</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">href</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<a id="__codelineno-0-720" name="__codelineno-0-720"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Append `?access_token=&lt;token&gt;` (or `&amp;access_token=`) to the asset href.</span>
-<a id="__codelineno-0-721" name="__codelineno-0-721"></a>
-<a id="__codelineno-0-722" name="__codelineno-0-722"></a><span class="sd">    Uses `urlsplit`/`urlunsplit` so the token lands in the URL&#39;s query</span>
-<a id="__codelineno-0-723" name="__codelineno-0-723"></a><span class="sd">    component even when the href carries a `#fragment` (a naive</span>
-<a id="__codelineno-0-724" name="__codelineno-0-724"></a><span class="sd">    `&quot;?&quot; in href` check would mistake a fragment for a query and append</span>
-<a id="__codelineno-0-725" name="__codelineno-0-725"></a><span class="sd">    after `#`, where the server never sees it).</span>
-<a id="__codelineno-0-726" name="__codelineno-0-726"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-727" name="__codelineno-0-727"></a>    <span class="kn">from</span><span class="w"> </span><span class="nn">urllib.parse</span><span class="w"> </span><span class="kn">import</span> <span class="n">urlsplit</span><span class="p">,</span> <span class="n">urlunsplit</span><span class="p">,</span> <span class="n">quote</span>
-<a id="__codelineno-0-728" name="__codelineno-0-728"></a>
-<a id="__codelineno-0-729" name="__codelineno-0-729"></a>    <span class="n">token</span> <span class="o">=</span> <span class="n">quote</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_token</span><span class="p">(),</span> <span class="n">safe</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-730" name="__codelineno-0-730"></a>    <span class="n">parts</span> <span class="o">=</span> <span class="n">urlsplit</span><span class="p">(</span><span class="n">href</span><span class="p">)</span>
-<a id="__codelineno-0-731" name="__codelineno-0-731"></a>    <span class="n">new_query</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">parts</span><span class="o">.</span><span class="n">query</span><span class="si">}</span><span class="s2">&amp;access_token=</span><span class="si">{</span><span class="n">token</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">if</span> <span class="n">parts</span><span class="o">.</span><span class="n">query</span> <span class="k">else</span> <span class="sa">f</span><span class="s2">&quot;access_token=</span><span class="si">{</span><span class="n">token</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-732" name="__codelineno-0-732"></a>    <span class="k">return</span> <span class="n">urlunsplit</span><span class="p">((</span><span class="n">parts</span><span class="o">.</span><span class="n">scheme</span><span class="p">,</span> <span class="n">parts</span><span class="o">.</span><span class="n">netloc</span><span class="p">,</span> <span class="n">parts</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="n">new_query</span><span class="p">,</span> <span class="n">parts</span><span class="o">.</span><span class="n">fragment</span><span class="p">))</span>
+<span class="normal"><a href="#__codelineno-0-729">729</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-716" name="__codelineno-0-716"></a><span class="k">def</span><span class="w"> </span><span class="nf">sign_href</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">href</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<a id="__codelineno-0-717" name="__codelineno-0-717"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Append `?access_token=&lt;token&gt;` (or `&amp;access_token=`) to the asset href.</span>
+<a id="__codelineno-0-718" name="__codelineno-0-718"></a>
+<a id="__codelineno-0-719" name="__codelineno-0-719"></a><span class="sd">    Uses `urlsplit`/`urlunsplit` so the token lands in the URL&#39;s query</span>
+<a id="__codelineno-0-720" name="__codelineno-0-720"></a><span class="sd">    component even when the href carries a `#fragment` (a naive</span>
+<a id="__codelineno-0-721" name="__codelineno-0-721"></a><span class="sd">    `&quot;?&quot; in href` check would mistake a fragment for a query and append</span>
+<a id="__codelineno-0-722" name="__codelineno-0-722"></a><span class="sd">    after `#`, where the server never sees it).</span>
+<a id="__codelineno-0-723" name="__codelineno-0-723"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-724" name="__codelineno-0-724"></a>    <span class="kn">from</span><span class="w"> </span><span class="nn">urllib.parse</span><span class="w"> </span><span class="kn">import</span> <span class="n">urlsplit</span><span class="p">,</span> <span class="n">urlunsplit</span><span class="p">,</span> <span class="n">quote</span>
+<a id="__codelineno-0-725" name="__codelineno-0-725"></a>
+<a id="__codelineno-0-726" name="__codelineno-0-726"></a>    <span class="n">token</span> <span class="o">=</span> <span class="n">quote</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_token</span><span class="p">(),</span> <span class="n">safe</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-727" name="__codelineno-0-727"></a>    <span class="n">parts</span> <span class="o">=</span> <span class="n">urlsplit</span><span class="p">(</span><span class="n">href</span><span class="p">)</span>
+<a id="__codelineno-0-728" name="__codelineno-0-728"></a>    <span class="n">new_query</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">parts</span><span class="o">.</span><span class="n">query</span><span class="si">}</span><span class="s2">&amp;access_token=</span><span class="si">{</span><span class="n">token</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">if</span> <span class="n">parts</span><span class="o">.</span><span class="n">query</span> <span class="k">else</span> <span class="sa">f</span><span class="s2">&quot;access_token=</span><span class="si">{</span><span class="n">token</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-729" name="__codelineno-0-729"></a>    <span class="k">return</span> <span class="n">urlunsplit</span><span class="p">((</span><span class="n">parts</span><span class="o">.</span><span class="n">scheme</span><span class="p">,</span> <span class="n">parts</span><span class="o">.</span><span class="n">netloc</span><span class="p">,</span> <span class="n">parts</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="n">new_query</span><span class="p">,</span> <span class="n">parts</span><span class="o">.</span><span class="n">fragment</span><span class="p">))</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -18922,17 +18913,20 @@ CDSE S3 credential resolution kwargs for <code>cdse-s3</code> (see
 </code></pre></div></li>
 <li>An unknown signer name is rejected:
     <div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="o">&gt;&gt;&gt;</span> <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.stac</span><span class="w"> </span><span class="kn">import</span> <span class="n">build_signer</span>
-<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="o">&gt;&gt;&gt;</span> <span class="n">build_signer</span><span class="p">(</span><span class="s2">&quot;nope&quot;</span><span class="p">)</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="o">&gt;&gt;&gt;</span> <span class="n">build_signer</span><span class="p">(</span><span class="s2">&quot;nope&quot;</span><span class="p">)</span>  <span class="c1"># doctest: +ELLIPSIS</span>
 <a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="n">Traceback</span> <span class="p">(</span><span class="n">most</span> <span class="n">recent</span> <span class="n">call</span> <span class="n">last</span><span class="p">):</span>
 <a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>    <span class="o">...</span>
-<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="ne">ValueError</span><span class="p">:</span> <span class="n">unknown</span> <span class="n">signer_type</span> <span class="s1">&#39;nope&#39;</span><span class="p">;</span> <span class="n">expected</span> <span class="n">one</span> <span class="n">of</span> <span class="s1">&#39;anonymous&#39;</span><span class="p">,</span> <span class="s1">&#39;aws-requester-pays&#39;</span><span class="p">,</span> <span class="s1">&#39;mpc-sas&#39;</span><span class="p">,</span> <span class="s1">&#39;earthdata&#39;</span><span class="p">,</span> <span class="s1">&#39;cdse&#39;</span><span class="p">,</span> <span class="s1">&#39;cdse-s3&#39;</span><span class="p">,</span> <span class="s1">&#39;bdc-token&#39;</span><span class="o">.</span>
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="ne">ValueError</span><span class="p">:</span> <span class="n">unknown</span> <span class="n">signer_type</span> <span class="s1">&#39;nope&#39;</span><span class="p">;</span> <span class="n">expected</span> <span class="n">one</span> <span class="n">of</span> <span class="o">...</span> <span class="s1">&#39;bdc-token&#39;</span><span class="o">.</span>
 </code></pre></div></li>
 </ul>
 
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>src/earthlens/stac/signers.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-735">735</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-732">732</a></span>
+<span class="normal"><a href="#__codelineno-0-733">733</a></span>
+<span class="normal"><a href="#__codelineno-0-734">734</a></span>
+<span class="normal"><a href="#__codelineno-0-735">735</a></span>
 <span class="normal"><a href="#__codelineno-0-736">736</a></span>
 <span class="normal"><a href="#__codelineno-0-737">737</a></span>
 <span class="normal"><a href="#__codelineno-0-738">738</a></span>
@@ -19012,93 +19006,90 @@ CDSE S3 credential resolution kwargs for <code>cdse-s3</code> (see
 <span class="normal"><a href="#__codelineno-0-812">812</a></span>
 <span class="normal"><a href="#__codelineno-0-813">813</a></span>
 <span class="normal"><a href="#__codelineno-0-814">814</a></span>
-<span class="normal"><a href="#__codelineno-0-815">815</a></span>
-<span class="normal"><a href="#__codelineno-0-816">816</a></span>
-<span class="normal"><a href="#__codelineno-0-817">817</a></span>
-<span class="normal"><a href="#__codelineno-0-818">818</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-735" name="__codelineno-0-735"></a><span class="k">def</span><span class="w"> </span><span class="nf">build_signer</span><span class="p">(</span><span class="n">signer_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">creds</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
-<a id="__codelineno-0-736" name="__codelineno-0-736"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Build the signer named by a catalog `signer:` field.</span>
-<a id="__codelineno-0-737" name="__codelineno-0-737"></a>
-<a id="__codelineno-0-738" name="__codelineno-0-738"></a><span class="sd">    The `anonymous` / `aws-requester-pays` signers come from `pyramids.stac`</span>
-<a id="__codelineno-0-739" name="__codelineno-0-739"></a><span class="sd">    (imported lazily so the package imports without the `[stac]` extra); the</span>
-<a id="__codelineno-0-740" name="__codelineno-0-740"></a><span class="sd">    `mpc-sas` / `earthdata` / `cdse` / `cdse-s3` / `bdc-token` provider signers</span>
-<a id="__codelineno-0-741" name="__codelineno-0-741"></a><span class="sd">    are the earthlens-local classes above.</span>
-<a id="__codelineno-0-742" name="__codelineno-0-742"></a>
-<a id="__codelineno-0-743" name="__codelineno-0-743"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-744" name="__codelineno-0-744"></a><span class="sd">        signer_type: One of `&quot;anonymous&quot;`, `&quot;aws-requester-pays&quot;`, `&quot;mpc-sas&quot;`,</span>
-<a id="__codelineno-0-745" name="__codelineno-0-745"></a><span class="sd">            `&quot;earthdata&quot;`, `&quot;cdse&quot;`, `&quot;cdse-s3&quot;`, `&quot;bdc-token&quot;`.</span>
-<a id="__codelineno-0-746" name="__codelineno-0-746"></a><span class="sd">        **creds: Extra credentials forwarded to the selected signer — `region`</span>
-<a id="__codelineno-0-747" name="__codelineno-0-747"></a><span class="sd">            for `aws-requester-pays`; `username` / `password` / `token` for</span>
-<a id="__codelineno-0-748" name="__codelineno-0-748"></a><span class="sd">            `earthdata`; `username` / `password` / `client_id` for `cdse`; the</span>
-<a id="__codelineno-0-749" name="__codelineno-0-749"></a><span class="sd">            CDSE S3 credential resolution kwargs for `cdse-s3` (see</span>
-<a id="__codelineno-0-750" name="__codelineno-0-750"></a><span class="sd">            `auth_cdse.s3_credentials`); `token` for `bdc-token` (defaults to</span>
-<a id="__codelineno-0-751" name="__codelineno-0-751"></a><span class="sd">            `$BDC_ACCESS_TOKEN`).</span>
+<span class="normal"><a href="#__codelineno-0-815">815</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-732" name="__codelineno-0-732"></a><span class="k">def</span><span class="w"> </span><span class="nf">build_signer</span><span class="p">(</span><span class="n">signer_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">creds</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<a id="__codelineno-0-733" name="__codelineno-0-733"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Build the signer named by a catalog `signer:` field.</span>
+<a id="__codelineno-0-734" name="__codelineno-0-734"></a>
+<a id="__codelineno-0-735" name="__codelineno-0-735"></a><span class="sd">    The `anonymous` / `aws-requester-pays` signers come from `pyramids.stac`</span>
+<a id="__codelineno-0-736" name="__codelineno-0-736"></a><span class="sd">    (imported lazily so the package imports without the `[stac]` extra); the</span>
+<a id="__codelineno-0-737" name="__codelineno-0-737"></a><span class="sd">    `mpc-sas` / `earthdata` / `cdse` / `cdse-s3` / `bdc-token` provider signers</span>
+<a id="__codelineno-0-738" name="__codelineno-0-738"></a><span class="sd">    are the earthlens-local classes above.</span>
+<a id="__codelineno-0-739" name="__codelineno-0-739"></a>
+<a id="__codelineno-0-740" name="__codelineno-0-740"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-741" name="__codelineno-0-741"></a><span class="sd">        signer_type: One of `&quot;anonymous&quot;`, `&quot;aws-requester-pays&quot;`, `&quot;mpc-sas&quot;`,</span>
+<a id="__codelineno-0-742" name="__codelineno-0-742"></a><span class="sd">            `&quot;earthdata&quot;`, `&quot;cdse&quot;`, `&quot;cdse-s3&quot;`, `&quot;bdc-token&quot;`.</span>
+<a id="__codelineno-0-743" name="__codelineno-0-743"></a><span class="sd">        **creds: Extra credentials forwarded to the selected signer — `region`</span>
+<a id="__codelineno-0-744" name="__codelineno-0-744"></a><span class="sd">            for `aws-requester-pays`; `username` / `password` / `token` for</span>
+<a id="__codelineno-0-745" name="__codelineno-0-745"></a><span class="sd">            `earthdata`; `username` / `password` / `client_id` for `cdse`; the</span>
+<a id="__codelineno-0-746" name="__codelineno-0-746"></a><span class="sd">            CDSE S3 credential resolution kwargs for `cdse-s3` (see</span>
+<a id="__codelineno-0-747" name="__codelineno-0-747"></a><span class="sd">            `auth_cdse.s3_credentials`); `token` for `bdc-token` (defaults to</span>
+<a id="__codelineno-0-748" name="__codelineno-0-748"></a><span class="sd">            `$BDC_ACCESS_TOKEN`).</span>
+<a id="__codelineno-0-749" name="__codelineno-0-749"></a>
+<a id="__codelineno-0-750" name="__codelineno-0-750"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-751" name="__codelineno-0-751"></a><span class="sd">        A signer satisfying the `pyramids.stac.Signer` protocol.</span>
 <a id="__codelineno-0-752" name="__codelineno-0-752"></a>
-<a id="__codelineno-0-753" name="__codelineno-0-753"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-754" name="__codelineno-0-754"></a><span class="sd">        A signer satisfying the `pyramids.stac.Signer` protocol.</span>
+<a id="__codelineno-0-753" name="__codelineno-0-753"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-754" name="__codelineno-0-754"></a><span class="sd">        ValueError: When `signer_type` is not a known signer name.</span>
 <a id="__codelineno-0-755" name="__codelineno-0-755"></a>
-<a id="__codelineno-0-756" name="__codelineno-0-756"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-757" name="__codelineno-0-757"></a><span class="sd">        ValueError: When `signer_type` is not a known signer name.</span>
-<a id="__codelineno-0-758" name="__codelineno-0-758"></a>
-<a id="__codelineno-0-759" name="__codelineno-0-759"></a><span class="sd">    Examples:</span>
-<a id="__codelineno-0-760" name="__codelineno-0-760"></a><span class="sd">        - The MPC key maps to earthlens&#39; native SAS signer (no SDK):</span>
-<a id="__codelineno-0-761" name="__codelineno-0-761"></a><span class="sd">            ```python</span>
-<a id="__codelineno-0-762" name="__codelineno-0-762"></a><span class="sd">            &gt;&gt;&gt; from earthlens.stac import build_signer</span>
-<a id="__codelineno-0-763" name="__codelineno-0-763"></a><span class="sd">            &gt;&gt;&gt; build_signer(&quot;mpc-sas&quot;).name</span>
-<a id="__codelineno-0-764" name="__codelineno-0-764"></a><span class="sd">            &#39;planetary-computer&#39;</span>
-<a id="__codelineno-0-765" name="__codelineno-0-765"></a>
-<a id="__codelineno-0-766" name="__codelineno-0-766"></a><span class="sd">            ```</span>
-<a id="__codelineno-0-767" name="__codelineno-0-767"></a><span class="sd">        - Build the CDSE S3 signer from explicit S3 keys:</span>
-<a id="__codelineno-0-768" name="__codelineno-0-768"></a><span class="sd">            ```python</span>
-<a id="__codelineno-0-769" name="__codelineno-0-769"></a><span class="sd">            &gt;&gt;&gt; from earthlens.stac import build_signer</span>
-<a id="__codelineno-0-770" name="__codelineno-0-770"></a><span class="sd">            &gt;&gt;&gt; build_signer(&quot;cdse-s3&quot;, access_key=&quot;ak&quot;, secret_key=&quot;sk&quot;).gdal_env()[&quot;AWS_ACCESS_KEY_ID&quot;]</span>
-<a id="__codelineno-0-771" name="__codelineno-0-771"></a><span class="sd">            &#39;ak&#39;</span>
-<a id="__codelineno-0-772" name="__codelineno-0-772"></a>
-<a id="__codelineno-0-773" name="__codelineno-0-773"></a><span class="sd">            ```</span>
-<a id="__codelineno-0-774" name="__codelineno-0-774"></a><span class="sd">        - Build the BDC token signer with an explicit token:</span>
-<a id="__codelineno-0-775" name="__codelineno-0-775"></a><span class="sd">            ```python</span>
-<a id="__codelineno-0-776" name="__codelineno-0-776"></a><span class="sd">            &gt;&gt;&gt; from earthlens.stac import build_signer</span>
-<a id="__codelineno-0-777" name="__codelineno-0-777"></a><span class="sd">            &gt;&gt;&gt; build_signer(&quot;bdc-token&quot;, token=&quot;abc&quot;).name</span>
-<a id="__codelineno-0-778" name="__codelineno-0-778"></a><span class="sd">            &#39;bdc-token&#39;</span>
-<a id="__codelineno-0-779" name="__codelineno-0-779"></a>
-<a id="__codelineno-0-780" name="__codelineno-0-780"></a><span class="sd">            ```</span>
-<a id="__codelineno-0-781" name="__codelineno-0-781"></a><span class="sd">        - An unknown signer name is rejected:</span>
-<a id="__codelineno-0-782" name="__codelineno-0-782"></a><span class="sd">            ```python</span>
-<a id="__codelineno-0-783" name="__codelineno-0-783"></a><span class="sd">            &gt;&gt;&gt; from earthlens.stac import build_signer</span>
-<a id="__codelineno-0-784" name="__codelineno-0-784"></a><span class="sd">            &gt;&gt;&gt; build_signer(&quot;nope&quot;)</span>
-<a id="__codelineno-0-785" name="__codelineno-0-785"></a><span class="sd">            Traceback (most recent call last):</span>
-<a id="__codelineno-0-786" name="__codelineno-0-786"></a><span class="sd">                ...</span>
-<a id="__codelineno-0-787" name="__codelineno-0-787"></a><span class="sd">            ValueError: unknown signer_type &#39;nope&#39;; expected one of &#39;anonymous&#39;, &#39;aws-requester-pays&#39;, &#39;mpc-sas&#39;, &#39;earthdata&#39;, &#39;cdse&#39;, &#39;cdse-s3&#39;, &#39;bdc-token&#39;.</span>
-<a id="__codelineno-0-788" name="__codelineno-0-788"></a>
-<a id="__codelineno-0-789" name="__codelineno-0-789"></a><span class="sd">            ```</span>
-<a id="__codelineno-0-790" name="__codelineno-0-790"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-791" name="__codelineno-0-791"></a>    <span class="k">if</span> <span class="n">signer_type</span> <span class="o">==</span> <span class="s2">&quot;anonymous&quot;</span><span class="p">:</span>
-<a id="__codelineno-0-792" name="__codelineno-0-792"></a>        <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.stac</span><span class="w"> </span><span class="kn">import</span> <span class="n">AnonymousSigner</span>
-<a id="__codelineno-0-793" name="__codelineno-0-793"></a>
-<a id="__codelineno-0-794" name="__codelineno-0-794"></a>        <span class="k">return</span> <span class="n">AnonymousSigner</span><span class="p">()</span>
-<a id="__codelineno-0-795" name="__codelineno-0-795"></a>    <span class="k">if</span> <span class="n">signer_type</span> <span class="o">==</span> <span class="s2">&quot;aws-requester-pays&quot;</span><span class="p">:</span>
-<a id="__codelineno-0-796" name="__codelineno-0-796"></a>        <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.stac</span><span class="w"> </span><span class="kn">import</span> <span class="n">AWSRequesterPaysSigner</span>
-<a id="__codelineno-0-797" name="__codelineno-0-797"></a>
-<a id="__codelineno-0-798" name="__codelineno-0-798"></a>        <span class="k">return</span> <span class="n">AWSRequesterPaysSigner</span><span class="p">(</span><span class="n">region</span><span class="o">=</span><span class="n">creds</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;region&quot;</span><span class="p">))</span>
-<a id="__codelineno-0-799" name="__codelineno-0-799"></a>    <span class="k">if</span> <span class="n">signer_type</span> <span class="o">==</span> <span class="s2">&quot;mpc-sas&quot;</span><span class="p">:</span>
-<a id="__codelineno-0-800" name="__codelineno-0-800"></a>        <span class="k">return</span> <span class="n">PlanetaryComputerSigner</span><span class="p">()</span>
-<a id="__codelineno-0-801" name="__codelineno-0-801"></a>    <span class="k">if</span> <span class="n">signer_type</span> <span class="o">==</span> <span class="s2">&quot;earthdata&quot;</span><span class="p">:</span>
-<a id="__codelineno-0-802" name="__codelineno-0-802"></a>        <span class="n">keys</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;username&quot;</span><span class="p">,</span> <span class="s2">&quot;password&quot;</span><span class="p">,</span> <span class="s2">&quot;token&quot;</span><span class="p">,</span> <span class="s2">&quot;refresh_window&quot;</span><span class="p">,</span> <span class="s2">&quot;timeout&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-803" name="__codelineno-0-803"></a>        <span class="k">return</span> <span class="n">EarthdataSigner</span><span class="p">(</span><span class="o">**</span><span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">creds</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">keys</span> <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">creds</span><span class="p">})</span>
-<a id="__codelineno-0-804" name="__codelineno-0-804"></a>    <span class="k">if</span> <span class="n">signer_type</span> <span class="o">==</span> <span class="s2">&quot;cdse&quot;</span><span class="p">:</span>
-<a id="__codelineno-0-805" name="__codelineno-0-805"></a>        <span class="n">keys</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;username&quot;</span><span class="p">,</span> <span class="s2">&quot;password&quot;</span><span class="p">,</span> <span class="s2">&quot;client_id&quot;</span><span class="p">,</span> <span class="s2">&quot;refresh_window&quot;</span><span class="p">,</span> <span class="s2">&quot;timeout&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-806" name="__codelineno-0-806"></a>        <span class="k">return</span> <span class="n">CDSESigner</span><span class="p">(</span><span class="o">**</span><span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">creds</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">keys</span> <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">creds</span><span class="p">})</span>
-<a id="__codelineno-0-807" name="__codelineno-0-807"></a>    <span class="k">if</span> <span class="n">signer_type</span> <span class="o">==</span> <span class="s2">&quot;cdse-s3&quot;</span><span class="p">:</span>
-<a id="__codelineno-0-808" name="__codelineno-0-808"></a>        <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.stac</span><span class="w"> </span><span class="kn">import</span> <span class="n">auth_cdse</span>
-<a id="__codelineno-0-809" name="__codelineno-0-809"></a>
-<a id="__codelineno-0-810" name="__codelineno-0-810"></a>        <span class="n">access_key</span><span class="p">,</span> <span class="n">secret_key</span> <span class="o">=</span> <span class="n">auth_cdse</span><span class="o">.</span><span class="n">s3_credentials</span><span class="p">(</span><span class="o">**</span><span class="n">creds</span><span class="p">)</span>
-<a id="__codelineno-0-811" name="__codelineno-0-811"></a>        <span class="k">return</span> <span class="n">CdseS3Signer</span><span class="p">(</span><span class="n">access_key</span><span class="o">=</span><span class="n">access_key</span><span class="p">,</span> <span class="n">secret_key</span><span class="o">=</span><span class="n">secret_key</span><span class="p">)</span>
-<a id="__codelineno-0-812" name="__codelineno-0-812"></a>    <span class="k">if</span> <span class="n">signer_type</span> <span class="o">==</span> <span class="s2">&quot;bdc-token&quot;</span><span class="p">:</span>
-<a id="__codelineno-0-813" name="__codelineno-0-813"></a>        <span class="k">return</span> <span class="n">BdcTokenSigner</span><span class="p">(</span><span class="n">token</span><span class="o">=</span><span class="n">creds</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;token&quot;</span><span class="p">))</span>
-<a id="__codelineno-0-814" name="__codelineno-0-814"></a>    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-<a id="__codelineno-0-815" name="__codelineno-0-815"></a>        <span class="sa">f</span><span class="s2">&quot;unknown signer_type </span><span class="si">{</span><span class="n">signer_type</span><span class="si">!r}</span><span class="s2">; expected one of &quot;</span>
-<a id="__codelineno-0-816" name="__codelineno-0-816"></a>        <span class="s2">&quot;&#39;anonymous&#39;, &#39;aws-requester-pays&#39;, &#39;mpc-sas&#39;, &#39;earthdata&#39;, &#39;cdse&#39;, &quot;</span>
-<a id="__codelineno-0-817" name="__codelineno-0-817"></a>        <span class="s2">&quot;&#39;cdse-s3&#39;, &#39;bdc-token&#39;.&quot;</span>
-<a id="__codelineno-0-818" name="__codelineno-0-818"></a>    <span class="p">)</span>
+<a id="__codelineno-0-756" name="__codelineno-0-756"></a><span class="sd">    Examples:</span>
+<a id="__codelineno-0-757" name="__codelineno-0-757"></a><span class="sd">        - The MPC key maps to earthlens&#39; native SAS signer (no SDK):</span>
+<a id="__codelineno-0-758" name="__codelineno-0-758"></a><span class="sd">            ```python</span>
+<a id="__codelineno-0-759" name="__codelineno-0-759"></a><span class="sd">            &gt;&gt;&gt; from earthlens.stac import build_signer</span>
+<a id="__codelineno-0-760" name="__codelineno-0-760"></a><span class="sd">            &gt;&gt;&gt; build_signer(&quot;mpc-sas&quot;).name</span>
+<a id="__codelineno-0-761" name="__codelineno-0-761"></a><span class="sd">            &#39;planetary-computer&#39;</span>
+<a id="__codelineno-0-762" name="__codelineno-0-762"></a>
+<a id="__codelineno-0-763" name="__codelineno-0-763"></a><span class="sd">            ```</span>
+<a id="__codelineno-0-764" name="__codelineno-0-764"></a><span class="sd">        - Build the CDSE S3 signer from explicit S3 keys:</span>
+<a id="__codelineno-0-765" name="__codelineno-0-765"></a><span class="sd">            ```python</span>
+<a id="__codelineno-0-766" name="__codelineno-0-766"></a><span class="sd">            &gt;&gt;&gt; from earthlens.stac import build_signer</span>
+<a id="__codelineno-0-767" name="__codelineno-0-767"></a><span class="sd">            &gt;&gt;&gt; build_signer(&quot;cdse-s3&quot;, access_key=&quot;ak&quot;, secret_key=&quot;sk&quot;).gdal_env()[&quot;AWS_ACCESS_KEY_ID&quot;]</span>
+<a id="__codelineno-0-768" name="__codelineno-0-768"></a><span class="sd">            &#39;ak&#39;</span>
+<a id="__codelineno-0-769" name="__codelineno-0-769"></a>
+<a id="__codelineno-0-770" name="__codelineno-0-770"></a><span class="sd">            ```</span>
+<a id="__codelineno-0-771" name="__codelineno-0-771"></a><span class="sd">        - Build the BDC token signer with an explicit token:</span>
+<a id="__codelineno-0-772" name="__codelineno-0-772"></a><span class="sd">            ```python</span>
+<a id="__codelineno-0-773" name="__codelineno-0-773"></a><span class="sd">            &gt;&gt;&gt; from earthlens.stac import build_signer</span>
+<a id="__codelineno-0-774" name="__codelineno-0-774"></a><span class="sd">            &gt;&gt;&gt; build_signer(&quot;bdc-token&quot;, token=&quot;abc&quot;).name</span>
+<a id="__codelineno-0-775" name="__codelineno-0-775"></a><span class="sd">            &#39;bdc-token&#39;</span>
+<a id="__codelineno-0-776" name="__codelineno-0-776"></a>
+<a id="__codelineno-0-777" name="__codelineno-0-777"></a><span class="sd">            ```</span>
+<a id="__codelineno-0-778" name="__codelineno-0-778"></a><span class="sd">        - An unknown signer name is rejected:</span>
+<a id="__codelineno-0-779" name="__codelineno-0-779"></a><span class="sd">            ```python</span>
+<a id="__codelineno-0-780" name="__codelineno-0-780"></a><span class="sd">            &gt;&gt;&gt; from earthlens.stac import build_signer</span>
+<a id="__codelineno-0-781" name="__codelineno-0-781"></a><span class="sd">            &gt;&gt;&gt; build_signer(&quot;nope&quot;)  # doctest: +ELLIPSIS</span>
+<a id="__codelineno-0-782" name="__codelineno-0-782"></a><span class="sd">            Traceback (most recent call last):</span>
+<a id="__codelineno-0-783" name="__codelineno-0-783"></a><span class="sd">                ...</span>
+<a id="__codelineno-0-784" name="__codelineno-0-784"></a><span class="sd">            ValueError: unknown signer_type &#39;nope&#39;; expected one of ... &#39;bdc-token&#39;.</span>
+<a id="__codelineno-0-785" name="__codelineno-0-785"></a>
+<a id="__codelineno-0-786" name="__codelineno-0-786"></a><span class="sd">            ```</span>
+<a id="__codelineno-0-787" name="__codelineno-0-787"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-788" name="__codelineno-0-788"></a>    <span class="k">if</span> <span class="n">signer_type</span> <span class="o">==</span> <span class="s2">&quot;anonymous&quot;</span><span class="p">:</span>
+<a id="__codelineno-0-789" name="__codelineno-0-789"></a>        <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.stac</span><span class="w"> </span><span class="kn">import</span> <span class="n">AnonymousSigner</span>
+<a id="__codelineno-0-790" name="__codelineno-0-790"></a>
+<a id="__codelineno-0-791" name="__codelineno-0-791"></a>        <span class="k">return</span> <span class="n">AnonymousSigner</span><span class="p">()</span>
+<a id="__codelineno-0-792" name="__codelineno-0-792"></a>    <span class="k">if</span> <span class="n">signer_type</span> <span class="o">==</span> <span class="s2">&quot;aws-requester-pays&quot;</span><span class="p">:</span>
+<a id="__codelineno-0-793" name="__codelineno-0-793"></a>        <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.stac</span><span class="w"> </span><span class="kn">import</span> <span class="n">AWSRequesterPaysSigner</span>
+<a id="__codelineno-0-794" name="__codelineno-0-794"></a>
+<a id="__codelineno-0-795" name="__codelineno-0-795"></a>        <span class="k">return</span> <span class="n">AWSRequesterPaysSigner</span><span class="p">(</span><span class="n">region</span><span class="o">=</span><span class="n">creds</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;region&quot;</span><span class="p">))</span>
+<a id="__codelineno-0-796" name="__codelineno-0-796"></a>    <span class="k">if</span> <span class="n">signer_type</span> <span class="o">==</span> <span class="s2">&quot;mpc-sas&quot;</span><span class="p">:</span>
+<a id="__codelineno-0-797" name="__codelineno-0-797"></a>        <span class="k">return</span> <span class="n">PlanetaryComputerSigner</span><span class="p">()</span>
+<a id="__codelineno-0-798" name="__codelineno-0-798"></a>    <span class="k">if</span> <span class="n">signer_type</span> <span class="o">==</span> <span class="s2">&quot;earthdata&quot;</span><span class="p">:</span>
+<a id="__codelineno-0-799" name="__codelineno-0-799"></a>        <span class="n">keys</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;username&quot;</span><span class="p">,</span> <span class="s2">&quot;password&quot;</span><span class="p">,</span> <span class="s2">&quot;token&quot;</span><span class="p">,</span> <span class="s2">&quot;refresh_window&quot;</span><span class="p">,</span> <span class="s2">&quot;timeout&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-800" name="__codelineno-0-800"></a>        <span class="k">return</span> <span class="n">EarthdataSigner</span><span class="p">(</span><span class="o">**</span><span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">creds</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">keys</span> <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">creds</span><span class="p">})</span>
+<a id="__codelineno-0-801" name="__codelineno-0-801"></a>    <span class="k">if</span> <span class="n">signer_type</span> <span class="o">==</span> <span class="s2">&quot;cdse&quot;</span><span class="p">:</span>
+<a id="__codelineno-0-802" name="__codelineno-0-802"></a>        <span class="n">keys</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;username&quot;</span><span class="p">,</span> <span class="s2">&quot;password&quot;</span><span class="p">,</span> <span class="s2">&quot;client_id&quot;</span><span class="p">,</span> <span class="s2">&quot;refresh_window&quot;</span><span class="p">,</span> <span class="s2">&quot;timeout&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-803" name="__codelineno-0-803"></a>        <span class="k">return</span> <span class="n">CDSESigner</span><span class="p">(</span><span class="o">**</span><span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">creds</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">keys</span> <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">creds</span><span class="p">})</span>
+<a id="__codelineno-0-804" name="__codelineno-0-804"></a>    <span class="k">if</span> <span class="n">signer_type</span> <span class="o">==</span> <span class="s2">&quot;cdse-s3&quot;</span><span class="p">:</span>
+<a id="__codelineno-0-805" name="__codelineno-0-805"></a>        <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.stac</span><span class="w"> </span><span class="kn">import</span> <span class="n">auth_cdse</span>
+<a id="__codelineno-0-806" name="__codelineno-0-806"></a>
+<a id="__codelineno-0-807" name="__codelineno-0-807"></a>        <span class="n">access_key</span><span class="p">,</span> <span class="n">secret_key</span> <span class="o">=</span> <span class="n">auth_cdse</span><span class="o">.</span><span class="n">s3_credentials</span><span class="p">(</span><span class="o">**</span><span class="n">creds</span><span class="p">)</span>
+<a id="__codelineno-0-808" name="__codelineno-0-808"></a>        <span class="k">return</span> <span class="n">CdseS3Signer</span><span class="p">(</span><span class="n">access_key</span><span class="o">=</span><span class="n">access_key</span><span class="p">,</span> <span class="n">secret_key</span><span class="o">=</span><span class="n">secret_key</span><span class="p">)</span>
+<a id="__codelineno-0-809" name="__codelineno-0-809"></a>    <span class="k">if</span> <span class="n">signer_type</span> <span class="o">==</span> <span class="s2">&quot;bdc-token&quot;</span><span class="p">:</span>
+<a id="__codelineno-0-810" name="__codelineno-0-810"></a>        <span class="k">return</span> <span class="n">BdcTokenSigner</span><span class="p">(</span><span class="n">token</span><span class="o">=</span><span class="n">creds</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;token&quot;</span><span class="p">))</span>
+<a id="__codelineno-0-811" name="__codelineno-0-811"></a>    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+<a id="__codelineno-0-812" name="__codelineno-0-812"></a>        <span class="sa">f</span><span class="s2">&quot;unknown signer_type </span><span class="si">{</span><span class="n">signer_type</span><span class="si">!r}</span><span class="s2">; expected one of &quot;</span>
+<a id="__codelineno-0-813" name="__codelineno-0-813"></a>        <span class="s2">&quot;&#39;anonymous&#39;, &#39;aws-requester-pays&#39;, &#39;mpc-sas&#39;, &#39;earthdata&#39;, &#39;cdse&#39;, &quot;</span>
+<a id="__codelineno-0-814" name="__codelineno-0-814"></a>        <span class="s2">&quot;&#39;cdse-s3&#39;, &#39;bdc-token&#39;.&quot;</span>
+<a id="__codelineno-0-815" name="__codelineno-0-815"></a>    <span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
