@@ -165,6 +165,44 @@ class TestNWPModel:
         for backend in ("herbie", "ecmwf-opendata", "direct-https", "direct-boto3"):
             assert backend in KNOWN_BACKENDS
 
+    def test_license_defaults_to_none(self):
+        """An ad-hoc row without a `license` is `None` — never inferred."""
+        assert NWPModel(provider="noaa-nodd").license is None
+
+    def test_license_round_trips(self):
+        """A populated `license` survives construction."""
+        assert NWPModel(provider="noaa-nodd", license="PD-US-GOV").license == "PD-US-GOV"
+
+
+class TestBundledLicenses:
+    """Tests for C2: every shipped row carries its provider's license."""
+
+    _EXPECTED = {
+        "noaa-nodd": "PD-US-GOV",
+        "ecmwf-opendata": "CC-BY-4.0",
+        "dwd-opendata": "CC-BY-4.0",
+        "meteofrance": "Etalab-2.0",
+        "eccc-msc": "OGL-Canada-2.0",
+    }
+
+    def test_every_shipped_row_has_a_license(self):
+        """No bundled NWP model row is missing its `license`."""
+        from earthlens.nwp import Catalog
+
+        missing = [k for k, m in Catalog().datasets.items() if m.license is None]
+        assert missing == [], f"rows without license: {missing}"
+
+    def test_license_matches_provider(self):
+        """Every row's `license` matches the curated per-provider value."""
+        from earthlens.nwp import Catalog
+
+        wrong = [
+            (k, m.provider, m.license, self._EXPECTED[m.provider])
+            for k, m in Catalog().datasets.items()
+            if m.license != self._EXPECTED.get(m.provider)
+        ]
+        assert wrong == [], f"license mismatch: {wrong}"
+
 
 class TestClearCache:
     """Tests for clear_catalog_cache."""

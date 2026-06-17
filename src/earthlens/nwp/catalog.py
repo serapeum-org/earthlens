@@ -157,6 +157,14 @@ class NWPModel(BaseModel):
             AIFS, `{"stream": "enfo", "type": "cf"}` for the ENS control);
             an unsigned-S3 centre uses `bucket` / `key_template` /
             `region`. Empty for the simple deterministic models.
+        license: SPDX-style licence identifier the provider publishes the
+            data under, surfaced as catalog metadata so downstream users
+            and redistribution honour it. Never inferred from the URL —
+            populated row-by-row in `nwp_data_catalog.yaml` from the
+            provider's stated terms (`"PD-US-GOV"` for NOAA NODD;
+            `"CC-BY-4.0"` for ECMWF Open Data and DWD; `"Etalab-2.0"`
+            for Météo-France; `"OGL-Canada-2.0"` for ECCC). `None` only
+            for an ad-hoc row that has not been curated yet.
 
     Examples:
         - Build a minimal Herbie-backed row and read its selector:
@@ -202,6 +210,7 @@ class NWPModel(BaseModel):
     bands: dict[str, str] = Field(default_factory=dict)
     request_options: dict[str, Any] = Field(default_factory=dict)
     members: list[str] = Field(default_factory=list)
+    license: str | None = None
 
 
 class Catalog(AbstractCatalog):
