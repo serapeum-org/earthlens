@@ -293,13 +293,15 @@ class EarthLens:
             ```python
             >>> from earthlens.earthlens import EarthLens
             >>> sorted(EarthLens.DataSources)  # doctest: +NORMALIZE_WHITESPACE
-            ['amazon-s3', 'cdse', 'chc', 'chirps', 'cmems', 'earth-search',
-             'earthdata', 'ecmwf', 'eumetsat', 'fdsn', 'firms', 'gdacs', 'gee',
-             'ghs', 'ghsl', 'google-earth-engine', 'hdx', 'human-settlement',
+            ['amazon-s3', 'bdc', 'brazil-data-cube', 'cdse', 'chc', 'chirps',
+             'cmems', 'dea', 'deafrica', 'digital-earth-africa',
+             'digital-earth-australia', 'earth-search', 'earthdata', 'ecmwf',
+             'eumetsat', 'fdsn', 'firms', 'gdacs', 'gee', 'ghs', 'ghsl',
+             'google-earth-engine', 'hdx', 'human-settlement', 'landsat',
              'national-water-model', 'nexrad', 'nwis', 'nwm', 'nwp', 'openaq',
              'openeo', 'overture', 'planetary-computer', 'radar', 'sentinel-hub',
-             'sentinelhub', 'stac', 'tropycal', 'usgs-nwis', 'usgs-water',
-             'world-pop', 'worldpop']
+             'sentinelhub', 'stac', 'tropycal', 'usgs-landsat', 'usgs-nwis',
+             'usgs-water', 'veda', 'world-pop', 'worldpop']
 
             ```
         - Asking for an unknown backend raises `ValueError`:
@@ -477,6 +479,53 @@ class EarthLens:
                 {"endpoint": "earth-search"},
             ),
             "cdse": ("earthlens.stac", "STAC", "stac", {"endpoint": "cdse"}),
+            # Digital Earth Africa STAC (anonymous, af-south-1) — WOfS, FC,
+            # crop mask, Landsat/Sentinel-2 ARD, GeoMedian, Copernicus DEM.
+            "deafrica": ("earthlens.stac", "STAC", "stac", {"endpoint": "deafrica"}),
+            "digital-earth-africa": (
+                "earthlens.stac",
+                "STAC",
+                "stac",
+                {"endpoint": "deafrica"},
+            ),
+            # Digital Earth Australia STAC (anonymous, ap-southeast-2) —
+            # Landsat / Sentinel-2 NBART ARD, WOfS, FC, GeoMedian, Intertidal,
+            # mangrove cover, SRTM DEM.
+            "dea": ("earthlens.stac", "STAC", "stac", {"endpoint": "dea"}),
+            "digital-earth-australia": (
+                "earthlens.stac",
+                "STAC",
+                "stac",
+                {"endpoint": "dea"},
+            ),
+            # NASA VEDA STAC (anonymous, us-west-2) — NASA-curated derived
+            # products: Black Marble HD nightlights, CMIP6 climate, NLDAS-3,
+            # fire/disaster-damage, HLS NDVI, EPA emissions.
+            "veda": ("earthlens.stac", "STAC", "stac", {"endpoint": "veda"}),
+            # USGS LandsatLook (the authoritative Landsat C2 STAC; SR/ST/L1
+            # split into separate collections, requester-pays on
+            # s3://usgs-landsat, us-west-2). Alias 'landsat' for convenience.
+            "usgs-landsat": (
+                "earthlens.stac",
+                "STAC",
+                "stac",
+                {"endpoint": "usgs-landsat"},
+            ),
+            "landsat": (
+                "earthlens.stac",
+                "STAC",
+                "stac",
+                {"endpoint": "usgs-landsat"},
+            ),
+            # INPE Brazil Data Cube (BDC) STAC v1 — anonymous, the only global
+            # source of CBERS-4/4A and AMAZONIA-1. Alias 'brazil-data-cube'.
+            "bdc": ("earthlens.stac", "STAC", "stac", {"endpoint": "bdc"}),
+            "brazil-data-cube": (
+                "earthlens.stac",
+                "STAC",
+                "stac",
+                {"endpoint": "bdc"},
+            ),
             # USGS NWIS / Water Data (dataretrieval). Tabular DataFrame of
             # per-site water observations; anonymous access works. The
             # "usgs-nwis" / "nwis" aliases point at the same backend.

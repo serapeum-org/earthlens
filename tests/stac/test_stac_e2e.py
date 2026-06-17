@@ -98,3 +98,99 @@ class TestCdseE2E:
         paths = stac.download()
         assert paths, "expected at least one COG written"
         assert all(Path(p).is_file() for p in paths), f"missing COG file in {paths}"
+
+
+@pytest.mark.stac
+@pytest.mark.e2e
+class TestDeafricaE2E:
+    """Digital Earth Africa — anonymous, af-south-1."""
+
+    def test_wofs_writes_cog(self, tmp_path: Path):
+        """A one-item WOfS pull over Johannesburg writes a readable COG."""
+        stac = STAC(
+            start="2024-01-01", end="2024-12-31",
+            variables={"deafrica/wofs_ls": ["water"]},
+            lat_lim=[-26.5, -26.0], lon_lim=[28.0, 28.5],
+            path=str(tmp_path), endpoint="deafrica", max_items=1,
+        )
+        paths = stac.download()
+        assert paths, "expected at least one COG written"
+        assert all(Path(p).is_file() for p in paths), f"missing COG file in {paths}"
+
+
+@pytest.mark.stac
+@pytest.mark.e2e
+class TestDeaE2E:
+    """Digital Earth Australia — anonymous, ap-southeast-2."""
+
+    def test_wofs_writes_cog(self, tmp_path: Path):
+        """A one-item WOfS pull over Canberra writes a readable COG."""
+        stac = STAC(
+            start="2024-01-01", end="2024-12-31",
+            variables={"dea/ga_ls_wo_3": ["water"]},
+            lat_lim=[-35.5, -35.0], lon_lim=[149.0, 149.5],
+            path=str(tmp_path), endpoint="dea", max_items=1,
+        )
+        paths = stac.download()
+        assert paths, "expected at least one COG written"
+        assert all(Path(p).is_file() for p in paths), f"missing COG file in {paths}"
+
+
+@pytest.mark.stac
+@pytest.mark.e2e
+class TestVedaE2E:
+    """NASA VEDA — anonymous, us-west-2."""
+
+    def test_nldas3_writes_cog(self, tmp_path: Path):
+        """A one-item NLDAS-3 pull writes a readable COG."""
+        stac = STAC(
+            start="2020-01-01", end="2024-12-31",
+            variables={"veda/nldas3": ["cog_default"]},
+            lat_lim=[35.0, 45.0], lon_lim=[-100.0, -90.0],
+            path=str(tmp_path), endpoint="veda", max_items=1,
+        )
+        paths = stac.download()
+        assert paths, "expected at least one COG written"
+        assert all(Path(p).is_file() for p in paths), f"missing COG file in {paths}"
+
+
+@pytest.mark.stac
+@pytest.mark.e2e
+class TestBdcE2E:
+    """Brazil Data Cube — anonymous (open collections; token-gated ones gated on BDC_ACCESS_TOKEN)."""
+
+    def test_cbers4_wfi_writes_cog(self, tmp_path: Path):
+        """A one-item CBERS-4 WFI 16-day composite over São Paulo writes a readable COG."""
+        stac = STAC(
+            start="2024-01-01", end="2024-12-31",
+            variables={"bdc/CBERS4-WFI-16D-2": ["NDVI"]},
+            lat_lim=[-23.7, -23.2], lon_lim=[-46.8, -46.3],
+            path=str(tmp_path), endpoint="bdc", max_items=1,
+        )
+        paths = stac.download()
+        assert paths, "expected at least one COG written"
+        assert all(Path(p).is_file() for p in paths), f"missing COG file in {paths}"
+
+
+@pytest.mark.stac
+@pytest.mark.e2e
+@pytest.mark.skipif(
+    not (
+        os.environ.get("AWS_ACCESS_KEY_ID") and os.environ.get("AWS_SECRET_ACCESS_KEY")
+    ),
+    reason="usgs-landsat e2e is requester-pays — needs AWS_ACCESS_KEY_ID / AWS_SECRET_ACCESS_KEY",
+)
+class TestUsgsLandsatE2E:
+    """USGS LandsatLook — requester-pays on s3://usgs-landsat (gated on AWS creds)."""
+
+    def test_c2l2_sr_writes_cog(self, tmp_path: Path):
+        """A one-item Landsat C2 L2 SR pull over SF Bay writes a readable COG."""
+        stac = STAC(
+            start="2024-06-01", end="2024-08-31",
+            variables={"usgs-landsat/landsat-c2l2-sr": ["red"]},
+            lat_lim=[37.5, 38.0], lon_lim=[-122.5, -122.0],
+            path=str(tmp_path), endpoint="usgs-landsat", max_items=1,
+        )
+        paths = stac.download()
+        assert paths, "expected at least one COG written"
+        assert all(Path(p).is_file() for p in paths), f"missing COG file in {paths}"

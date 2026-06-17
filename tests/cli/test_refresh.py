@@ -657,6 +657,11 @@ class TestWrite:
             "planetary-computer",
             "cdse",
             "earth-search",
+            "deafrica",
+            "dea",
+            "veda",
+            "usgs-landsat",
+            "bdc",
         ], "endpoints block preserved"
         assert data["available_collections"]["planetary-computer"] == ["only-one"]
 

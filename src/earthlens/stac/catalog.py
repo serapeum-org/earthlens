@@ -42,7 +42,8 @@ _CATALOG_CACHE: dict[
 ] = {}
 
 SignerType = Literal[
-    "anonymous", "aws-requester-pays", "mpc-sas", "earthdata", "cdse", "cdse-s3"
+    "anonymous", "aws-requester-pays", "mpc-sas", "earthdata", "cdse",
+    "cdse-s3", "bdc-token",
 ]
 
 
@@ -116,10 +117,12 @@ class Endpoint(BaseModel):
     """One STAC API endpoint: its URL, signer type, and optional region.
 
     Attributes:
-        key: Endpoint key (`"planetary-computer"`, `"cdse"`, `"earth-search"`).
+        key: Endpoint key (`"planetary-computer"`, `"cdse"`, `"earth-search"`,
+            `"deafrica"`, `"dea"`, `"veda"`, `"usgs-landsat"`, `"bdc"`).
         url: STAC API root URL.
-        signer: Signer type used for this endpoint's assets — one of
-            `"anonymous"`, `"aws-requester-pays"`, `"mpc-sas"`, `"cdse-s3"`.
+        signer: Signer type used for this endpoint's assets — one of the
+            `SignerType` literals (`"anonymous"`, `"aws-requester-pays"`,
+            `"mpc-sas"`, `"earthdata"`, `"cdse"`, `"cdse-s3"`, `"bdc-token"`).
         region: Optional AWS region for requester-pays / S3 endpoints.
     """
 
@@ -151,6 +154,10 @@ class Collection(BaseModel):
             whose assets sit on a requester-pays S3 bucket (Earth Search's
             `landsat-c2-l2` → `s3://usgs-landsat`). `None` uses the endpoint
             signer.
+        requires_token: Documentation flag for token-gated collections (e.g. a
+            Brazil Data Cube row that needs `$BDC_ACCESS_TOKEN`). The flag is
+            informational only; the actual routing comes from `signer`
+            (e.g. `signer: bdc-token`). Defaults to `False`.
     """
 
     model_config = ConfigDict(frozen=True, extra="forbid")
@@ -164,6 +171,7 @@ class Collection(BaseModel):
     extent: Extent | None = None
     assets: dict[str, Asset] = Field(default_factory=dict)
     signer: SignerType | None = None
+    requires_token: bool = False
 
 
 def _load_catalog_data(
@@ -292,7 +300,7 @@ class Catalog(AbstractCatalog):
             >>> from earthlens.stac import Catalog
             >>> cat = Catalog()
             >>> sorted(cat.endpoints)
-            ['cdse', 'earth-search', 'planetary-computer']
+            ['bdc', 'cdse', 'dea', 'deafrica', 'earth-search', 'planetary-computer', 'usgs-landsat', 'veda']
             >>> cat.get_collection("sentinel-2-l2a").resolution
             10.0
 

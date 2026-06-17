@@ -1,0 +1,174 @@
+# Curated collections served by INPE's Brazil Data Cube (BDC) STAC v1.
+# Asset bytes live at https://data.inpe.br/bdc/data/... — the endpoint default
+# signer is `anonymous` and (per the A1 probe, 2026-06-17) every collection
+# currently exposed in the public STAC reads with no token. The
+# `requires_token` flag + `signer: bdc-token` override are kept available for
+# the rare token-gated tiers BDC may publish in future without forcing a
+# backend change; see `BdcTokenSigner` in `signers.py`.
+#
+# The seven flagship picks below cover BDC's unique global imagery: CBERS-4
+# WFI 16-day composites, CBERS-4A WFI / WPM scenes, AMAZONIA-1 WFI scenes
+# (only global source), Sentinel-2 L2A (mirror), and MODIS Terra/Aqua VI
+# 16-day composites.
+
+collections:
+  bdc/AMZ1-WFI-L4-SR-1:
+    assets:
+      BAND1:
+        common_name: green
+        title: AMAZONIA-1 WFI band 1 (green)
+      BAND2:
+        common_name: red
+        title: AMAZONIA-1 WFI band 2 (red)
+      BAND3:
+        common_name: nir
+        title: AMAZONIA-1 WFI band 3 (NIR)
+      BAND4:
+        title: AMAZONIA-1 WFI band 4
+    collection_id: AMZ1-WFI-L4-SR-1
+    default_assets:
+    - BAND2
+    - BAND1
+    - BAND3
+    endpoint: bdc
+  bdc/CB4A-WFI-L4-SR-1:
+    assets:
+      BAND13:
+        title: CBERS-4A WFI band 13
+      BAND14:
+        title: CBERS-4A WFI band 14
+      BAND15:
+        title: CBERS-4A WFI band 15
+      BAND16:
+        title: CBERS-4A WFI band 16
+    collection_id: CB4A-WFI-L4-SR-1
+    default_assets:
+    - BAND15
+    - BAND14
+    - BAND13
+    endpoint: bdc
+  bdc/CB4A-WPM-L4-DN-1:
+    assets:
+      BAND0:
+        title: CBERS-4A WPM panchromatic
+      BAND1:
+        common_name: blue
+        title: CBERS-4A WPM band 1 (blue)
+      BAND2:
+        common_name: green
+        title: CBERS-4A WPM band 2 (green)
+      BAND3:
+        common_name: red
+        title: CBERS-4A WPM band 3 (red)
+      BAND4:
+        common_name: nir
+        title: CBERS-4A WPM band 4 (NIR)
+    collection_id: CB4A-WPM-L4-DN-1
+    default_assets:
+    - BAND3
+    - BAND2
+    - BAND1
+    - BAND4
+    endpoint: bdc
+  bdc/CBERS4-WFI-16D-2:
+    assets:
+      BAND13:
+        title: CBERS-4 WFI band 13 (16-day composite)
+      BAND14:
+        title: CBERS-4 WFI band 14 (16-day composite)
+      BAND15:
+        title: CBERS-4 WFI band 15 (16-day composite)
+      BAND16:
+        title: CBERS-4 WFI band 16 (16-day composite)
+      EVI:
+        title: Enhanced Vegetation Index
+      NDVI:
+        title: Normalised Difference Vegetation Index
+    collection_id: CBERS4-WFI-16D-2
+    default_assets:
+    - BAND15
+    - BAND14
+    - BAND13
+    endpoint: bdc
+  bdc/S2_L2A-1:
+    assets:
+      AOT:
+        title: Aerosol optical thickness
+      B01:
+        common_name: coastal
+        title: Coastal/aerosol (60m)
+      B02:
+        common_name: blue
+        title: Blue (10m)
+      B03:
+        common_name: green
+        title: Green (10m)
+      B04:
+        common_name: red
+        title: Red (10m)
+      B05:
+        common_name: rededge
+        title: Red edge 1 (20m)
+      B06:
+        common_name: rededge
+        title: Red edge 2 (20m)
+      B07:
+        common_name: rededge
+        title: Red edge 3 (20m)
+      B08:
+        common_name: nir
+        title: Near-infrared (10m)
+      B8A:
+        common_name: nir08
+        title: Narrow near-infrared (20m)
+      B09:
+        common_name: nir09
+        title: Water vapour (60m)
+      B11:
+        common_name: swir16
+        title: SWIR1 (20m)
+      B12:
+        common_name: swir22
+        title: SWIR2 (20m)
+      SCL:
+        dtype: uint8
+        title: Scene classification layer
+    collection_id: S2_L2A-1
+    default_assets:
+    - B04
+    - B03
+    - B02
+    - B08
+    endpoint: bdc
+  bdc/mod13q1-6.1:
+    assets:
+      EVI:
+        title: MODIS Terra 16-day EVI (250m)
+      MIR_reflectance:
+        common_name: swir16
+        title: MIR reflectance
+      NDVI:
+        title: MODIS Terra 16-day NDVI (250m)
+      NIR_reflectance:
+        common_name: nir
+        title: NIR reflectance
+    collection_id: mod13q1-6.1
+    default_assets:
+    - NDVI
+    endpoint: bdc
+  bdc/myd13q1-6.1:
+    assets:
+      EVI:
+        title: MODIS Aqua 16-day EVI (250m)
+      MIR_reflectance:
+        common_name: swir16
+        title: MIR reflectance
+      NDVI:
+        title: MODIS Aqua 16-day NDVI (250m)
+      NIR_reflectance:
+        common_name: nir
+        title: NIR reflectance
+    collection_id: myd13q1-6.1
+    default_assets:
+    - NDVI
+    endpoint: bdc

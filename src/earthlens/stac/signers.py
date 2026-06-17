@@ -20,6 +20,10 @@ library, per the pyramids/earthlens split (serapeum-org/earthlens#384):
   read with S3 access-key/secret credentials, so this signer is a **GDAL-env S3
   signer** (shaped like `AWSRequesterPaysSigner`), not a bearer signer — a
   different mechanism from `CDSESigner`, so both coexist.
+* `BdcTokenSigner` — Brazil Data Cube (BDC). Rewrites the asset href to carry
+  an `?access_token=…` query parameter; the token is read from
+  `$BDC_ACCESS_TOKEN`. Used by the token-gated BDC tiers (rare — most BDC
+  collections in the published STAC v1 catalog read anonymously).
 
 Search is anonymous on these providers (`sign_request` is a no-op); only the
 asset-read boundary needs credentials. The `build_signer` factory maps a catalog
@@ -646,22 +650,102 @@ class CdseS3Signer:
         }
 
 
+class BdcTokenSigner(_BaseSigner):
+    """Brazil Data Cube (BDC) OAuth-token URL signer.
+
+    Some Brazil Data Cube collections (token-gated tiers) require an
+    `?access_token=<token>` query parameter on each asset href; open
+    collections (the bulk of the published STAC v1 catalog) are anonymous and
+    do not need a token. `BdcTokenSigner` rewrites a clean asset href into a
+    token-bearing one for every read, leaving the bare-anonymous BDC reads to
+    the `anonymous` signer (the endpoint default).
+
+    BDC search itself is anonymous — `sign_request` is a no-op, and
+    `sign_item` does not mutate returned items. The token rides in the asset
+    URL's query string, not the GDAL environment, so `gdal_env` is empty: a
+    signed `https://data.inpe.br/...tif?access_token=…` href is read directly
+    through GDAL `/vsicurl/` with no extra config.
+
+    The token is read from the `BDC_ACCESS_TOKEN` environment variable on
+    first use; absent it, `sign_href` raises `AuthenticationError` (from
+    `earthlens.base`) naming the env var and pointing at an open collection
+    so the user can switch tiers if they want. Wire it in via a
+    per-collection `signer: bdc-token` override on the token-gated rows of
+    `catalog/bdc.yaml`.
+
+    Args:
+        token: Explicit BDC OAuth token. Defaults to `$BDC_ACCESS_TOKEN`.
+
+    Examples:
+        - A clean https href becomes a query-bearing one (passing the token
+          explicitly so the example does not mutate the process env):
+            ```python
+            >>> from earthlens.stac import BdcTokenSigner
+            >>> BdcTokenSigner(token="tok").sign_href("https://data.inpe.br/bdc/data/x.tif")
+            'https://data.inpe.br/bdc/data/x.tif?access_token=tok'
+
+            ```
+        - An href that already carries a query gets `&access_token=…` instead:
+            ```python
+            >>> from earthlens.stac import BdcTokenSigner
+            >>> BdcTokenSigner(token="tok").sign_href("https://data.inpe.br/bdc/data/x.tif?foo=1")
+            'https://data.inpe.br/bdc/data/x.tif?foo=1&access_token=tok'
+
+            ```
+    """
+
+    name = "bdc-token"
+
+    def __init__(self, token: str | None = None) -> None:
+        """Store the explicit token (or defer to `$BDC_ACCESS_TOKEN`)."""
+        self._explicit_token = token
+
+    def _token(self) -> str:
+        """Return the BDC OAuth token from kwarg or `BDC_ACCESS_TOKEN`."""
+        token = self._explicit_token or os.environ.get("BDC_ACCESS_TOKEN")
+        if not token:
+            from earthlens.base import AuthenticationError
+
+            raise AuthenticationError(
+                "set BDC_ACCESS_TOKEN — this Brazil Data Cube collection requires "
+                "an OAuth token; open collections such as CBERS4-WFI-16D-2 do not "
+                "need one and read anonymously."
+            )
+        return token
+
+    def sign_href(self, href: str) -> str:
+        """Append `?access_token=<token>` (or `&access_token=`) to the asset href.
+
+        Uses `urlsplit`/`urlunsplit` so the token lands in the URL's query
+        component even when the href carries a `#fragment` (a naive
+        `"?" in href` check would mistake a fragment for a query and append
+        after `#`, where the server never sees it).
+        """
+        from urllib.parse import urlsplit, urlunsplit, quote
+
+        token = quote(self._token(), safe="")
+        parts = urlsplit(href)
+        new_query = f"{parts.query}&access_token={token}" if parts.query else f"access_token={token}"
+        return urlunsplit((parts.scheme, parts.netloc, parts.path, new_query, parts.fragment))
+
+
 def build_signer(signer_type: str, **creds: Any) -> Any:
     """Build the signer named by a catalog `signer:` field.
 
     The `anonymous` / `aws-requester-pays` signers come from `pyramids.stac`
     (imported lazily so the package imports without the `[stac]` extra); the
-    `mpc-sas` / `earthdata` / `cdse` / `cdse-s3` provider signers are the
-    earthlens-local classes above.
+    `mpc-sas` / `earthdata` / `cdse` / `cdse-s3` / `bdc-token` provider signers
+    are the earthlens-local classes above.
 
     Args:
         signer_type: One of `"anonymous"`, `"aws-requester-pays"`, `"mpc-sas"`,
-            `"earthdata"`, `"cdse"`, `"cdse-s3"`.
+            `"earthdata"`, `"cdse"`, `"cdse-s3"`, `"bdc-token"`.
         **creds: Extra credentials forwarded to the selected signer — `region`
             for `aws-requester-pays`; `username` / `password` / `token` for
             `earthdata`; `username` / `password` / `client_id` for `cdse`; the
             CDSE S3 credential resolution kwargs for `cdse-s3` (see
-            `auth_cdse.s3_credentials`).
+            `auth_cdse.s3_credentials`); `token` for `bdc-token` (defaults to
+            `$BDC_ACCESS_TOKEN`).
 
     Returns:
         A signer satisfying the `pyramids.stac.Signer` protocol.
@@ -684,13 +768,20 @@ def build_signer(signer_type: str, **creds: Any) -> Any:
             'ak'
 
             ```
+        - Build the BDC token signer with an explicit token:
+            ```python
+            >>> from earthlens.stac import build_signer
+            >>> build_signer("bdc-token", token="abc").name
+            'bdc-token'
+
+            ```
         - An unknown signer name is rejected:
             ```python
             >>> from earthlens.stac import build_signer
-            >>> build_signer("nope")
+            >>> build_signer("nope")  # doctest: +ELLIPSIS
             Traceback (most recent call last):
                 ...
-            ValueError: unknown signer_type 'nope'; expected one of 'anonymous', 'aws-requester-pays', 'mpc-sas', 'earthdata', 'cdse', 'cdse-s3'.
+            ValueError: unknown signer_type 'nope'; expected one of ... 'bdc-token'.
 
             ```
     """
@@ -715,7 +806,10 @@ def build_signer(signer_type: str, **creds: Any) -> Any:
 
         access_key, secret_key = auth_cdse.s3_credentials(**creds)
         return CdseS3Signer(access_key=access_key, secret_key=secret_key)
+    if signer_type == "bdc-token":
+        return BdcTokenSigner(token=creds.get("token"))
     raise ValueError(
         f"unknown signer_type {signer_type!r}; expected one of "
-        "'anonymous', 'aws-requester-pays', 'mpc-sas', 'earthdata', 'cdse', 'cdse-s3'."
+        "'anonymous', 'aws-requester-pays', 'mpc-sas', 'earthdata', 'cdse', "
+        "'cdse-s3', 'bdc-token'."
     )

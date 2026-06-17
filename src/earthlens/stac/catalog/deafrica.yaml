@@ -1,0 +1,241 @@
+# Curated collections served by Digital Earth Africa (Open Data Cube STAC over
+# AWS af-south-1). All assets are anonymous on `s3://deafrica-services`; the
+# endpoint default signer (`anonymous`) applies — no per-row override needed.
+
+collections:
+  deafrica/crop_mask:
+    assets:
+      filtered:
+        dtype: uint8
+        title: Filtered cropland probability
+      mask:
+        dtype: uint8
+        title: Binary cropland mask
+      prob:
+        dtype: uint8
+        title: Raw cropland probability
+    collection_id: crop_mask
+    default_assets:
+    - mask
+    endpoint: deafrica
+  deafrica/dem_cop_30:
+    assets:
+      elevation:
+        dtype: float32
+        title: Elevation (metres)
+    collection_id: dem_cop_30
+    default_assets:
+    - elevation
+    endpoint: deafrica
+  deafrica/dem_cop_90:
+    assets:
+      elevation:
+        dtype: float32
+        title: Elevation (metres)
+    collection_id: dem_cop_90
+    default_assets:
+    - elevation
+    endpoint: deafrica
+  deafrica/fc_ls:
+    assets:
+      bs:
+        dtype: uint8
+        title: Bare soil fraction (%)
+      npv:
+        dtype: uint8
+        title: Non-photosynthetic vegetation fraction (%)
+      pv:
+        dtype: uint8
+        title: Photosynthetic vegetation fraction (%)
+      ue:
+        dtype: uint8
+        title: Unmixing error
+    collection_id: fc_ls
+    default_assets:
+    - bs
+    - pv
+    - npv
+    endpoint: deafrica
+  deafrica/gm_ls8_ls9_annual:
+    assets:
+      BCMAD:
+        title: Bray-Curtis MAD across input bands
+      COUNT:
+        title: Count of clear observations
+      EMAD:
+        title: Euclidean MAD across input bands
+      SMAD:
+        title: Spectral MAD across input bands
+      SR_B2:
+        common_name: blue
+        title: Blue surface reflectance geomedian
+      SR_B3:
+        common_name: green
+        title: Green surface reflectance geomedian
+      SR_B4:
+        common_name: red
+        title: Red surface reflectance geomedian
+      SR_B5:
+        common_name: nir
+        title: Near-infrared surface reflectance geomedian
+      SR_B6:
+        common_name: swir16
+        title: SWIR1 surface reflectance geomedian
+      SR_B7:
+        common_name: swir22
+        title: SWIR2 surface reflectance geomedian
+    collection_id: gm_ls8_ls9_annual
+    default_assets:
+    - SR_B4
+    - SR_B3
+    - SR_B2
+    - SR_B5
+    endpoint: deafrica
+  deafrica/ls8_sr:
+    assets:
+      QA_PIXEL:
+        title: Pixel quality assessment
+      QA_RADSAT:
+        title: Radiometric saturation quality
+      SR_B1:
+        common_name: coastal
+        title: Coastal/aerosol surface reflectance
+      SR_B2:
+        common_name: blue
+        title: Blue surface reflectance
+      SR_B3:
+        common_name: green
+        title: Green surface reflectance
+      SR_B4:
+        common_name: red
+        title: Red surface reflectance
+      SR_B5:
+        common_name: nir
+        title: Near-infrared surface reflectance
+      SR_B6:
+        common_name: swir16
+        title: SWIR1 surface reflectance
+      SR_B7:
+        common_name: swir22
+        title: SWIR2 surface reflectance
+      ST_B10:
+        common_name: lwir11
+        title: Surface temperature thermal band
+    collection_id: ls8_sr
+    default_assets:
+    - SR_B4
+    - SR_B3
+    - SR_B2
+    - SR_B5
+    endpoint: deafrica
+  deafrica/ls9_sr:
+    assets:
+      QA_PIXEL:
+        title: Pixel quality assessment
+      QA_RADSAT:
+        title: Radiometric saturation quality
+      SR_B1:
+        common_name: coastal
+        title: Coastal/aerosol surface reflectance
+      SR_B2:
+        common_name: blue
+        title: Blue surface reflectance
+      SR_B3:
+        common_name: green
+        title: Green surface reflectance
+      SR_B4:
+        common_name: red
+        title: Red surface reflectance
+      SR_B5:
+        common_name: nir
+        title: Near-infrared surface reflectance
+      SR_B6:
+        common_name: swir16
+        title: SWIR1 surface reflectance
+      SR_B7:
+        common_name: swir22
+        title: SWIR2 surface reflectance
+      ST_B10:
+        common_name: lwir11
+        title: Surface temperature thermal band
+    collection_id: ls9_sr
+    default_assets:
+    - SR_B4
+    - SR_B3
+    - SR_B2
+    - SR_B5
+    endpoint: deafrica
+  deafrica/s2_l2a:
+    assets:
+      AOT:
+        title: Aerosol optical thickness
+      B01:
+        common_name: coastal
+        title: Coastal/aerosol (60m)
+      B02:
+        common_name: blue
+        title: Blue (10m)
+      B03:
+        common_name: green
+        title: Green (10m)
+      B04:
+        common_name: red
+        title: Red (10m)
+      B05:
+        common_name: rededge
+        title: Red edge 1 (20m)
+      B06:
+        common_name: rededge
+        title: Red edge 2 (20m)
+      B07:
+        common_name: rededge
+        title: Red edge 3 (20m)
+      B08:
+        common_name: nir
+        title: Near-infrared (10m)
+      B8A:
+        common_name: nir08
+        title: Narrow near-infrared (20m)
+      B09:
+        common_name: nir09
+        title: Water vapour (60m)
+      B11:
+        common_name: swir16
+        title: SWIR1 (20m)
+      B12:
+        common_name: swir22
+        title: SWIR2 (20m)
+      SCL:
+        dtype: uint8
+        title: Scene classification layer
+      WVP:
+        title: Water vapour
+    collection_id: s2_l2a
+    default_assets:
+    - B04
+    - B03
+    - B02
+    - B08
+    endpoint: deafrica
+  deafrica/wofs_ls:
+    assets:
+      water:
+        dtype: uint8
+        title: Water observation classification
+    collection_id: wofs_ls
+    default_assets:
+    - water
+    endpoint: deafrica
+  deafrica/wofs_ls_summary_annual:
+    assets:
+      count_clear:
+        title: Annual count of clear observations
+      count_wet:
+        title: Annual count of wet observations
+      frequency:
+        dtype: float32
+        title: Annual wet fraction (count_wet / count_clear)
+    collection_id: wofs_ls_summary_annual
+    default_assets:
+    - frequency
+    endpoint: deafrica

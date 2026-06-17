@@ -13,6 +13,7 @@ import pytest
 from earthlens.base import AuthenticationError
 from earthlens.stac import auth_cdse
 from earthlens.stac.signers import (
+    BdcTokenSigner,
     CdseS3Signer,
     CDSESigner,
     EarthdataSigner,
@@ -463,10 +464,77 @@ class TestBuildSigner:
         assert isinstance(signer, CdseS3Signer)
         assert signer.gdal_env()["AWS_ACCESS_KEY_ID"] == "ak"
 
+    def test_bdc_token_from_kwargs(self):
+        """The bdc-token name resolves to BdcTokenSigner forwarding the token."""
+        signer = build_signer("bdc-token", token="abc")
+        assert isinstance(signer, BdcTokenSigner)
+        assert signer.name == "bdc-token"
+
+    def test_bdc_token_from_env(self, monkeypatch):
+        """build_signer('bdc-token') without kwargs falls back to $BDC_ACCESS_TOKEN."""
+        monkeypatch.setenv("BDC_ACCESS_TOKEN", "env-tok")
+        signer = build_signer("bdc-token")
+        assert signer.sign_href("https://x/y.tif") == "https://x/y.tif?access_token=env-tok"
+
     def test_unknown_signer_raises(self):
         """An unknown signer name raises ValueError naming the choices."""
         with pytest.raises(ValueError, match="unknown signer_type"):
             build_signer("nope")
+
+
+@pytest.mark.stac
+class TestBdcTokenSigner:
+    """`BdcTokenSigner` appends ?access_token=… to BDC asset hrefs."""
+
+    def test_name(self):
+        """The signer reports the bdc-token catalog label."""
+        assert BdcTokenSigner(token="tok").name == "bdc-token"
+
+    def test_query_separator_when_no_existing_query(self, monkeypatch):
+        """A clean https href gets `?access_token=…` appended."""
+        monkeypatch.setenv("BDC_ACCESS_TOKEN", "tok")
+        out = BdcTokenSigner().sign_href("https://data.inpe.br/bdc/data/x.tif")
+        assert out == "https://data.inpe.br/bdc/data/x.tif?access_token=tok"
+
+    def test_query_separator_when_query_already_present(self, monkeypatch):
+        """An href that already carries a query gets `&access_token=…` instead."""
+        monkeypatch.setenv("BDC_ACCESS_TOKEN", "tok")
+        out = BdcTokenSigner().sign_href("https://data.inpe.br/x.tif?foo=1")
+        assert out == "https://data.inpe.br/x.tif?foo=1&access_token=tok"
+
+    def test_fragment_does_not_get_token_appended_after_it(self, monkeypatch):
+        """An href with a `#fragment` keeps the fragment last; token lands in the query."""
+        monkeypatch.setenv("BDC_ACCESS_TOKEN", "tok")
+        out = BdcTokenSigner().sign_href("https://data.inpe.br/x.tif#frag")
+        assert out == "https://data.inpe.br/x.tif?access_token=tok#frag"
+
+    def test_token_is_url_encoded(self, monkeypatch):
+        """Tokens with reserved chars are URL-encoded so the query parses correctly."""
+        monkeypatch.setenv("BDC_ACCESS_TOKEN", "tok=&val/+")
+        out = BdcTokenSigner().sign_href("https://data.inpe.br/x.tif")
+        assert out == "https://data.inpe.br/x.tif?access_token=tok%3D%26val%2F%2B"
+
+    def test_explicit_token_overrides_env(self, monkeypatch):
+        """The kwarg token wins over $BDC_ACCESS_TOKEN."""
+        monkeypatch.setenv("BDC_ACCESS_TOKEN", "env-tok")
+        out = BdcTokenSigner(token="kwarg-tok").sign_href("https://x/y.tif")
+        assert out == "https://x/y.tif?access_token=kwarg-tok"
+
+    def test_missing_token_raises_authentication_error(self, monkeypatch):
+        """Missing $BDC_ACCESS_TOKEN raises AuthenticationError naming the env var."""
+        monkeypatch.delenv("BDC_ACCESS_TOKEN", raising=False)
+        with pytest.raises(AuthenticationError, match="BDC_ACCESS_TOKEN"):
+            BdcTokenSigner().sign_href("https://x/y.tif")
+
+    def test_sign_request_and_item_are_noops(self):
+        """BDC search is anonymous — sign_request and sign_item return None."""
+        signer = BdcTokenSigner(token="tok")
+        assert signer.sign_request(object()) is None
+        assert signer.sign_item(object()) is None
+
+    def test_gdal_env_is_empty(self):
+        """The credential rides in the URL, so the GDAL env stays empty."""
+        assert BdcTokenSigner(token="tok").gdal_env() == {}
 
 
 @pytest.mark.stac

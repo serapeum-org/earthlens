@@ -44,6 +44,110 @@ class TestBundledCatalog:
         assert cat.endpoints["planetary-computer"].signer == "mpc-sas"
         assert cat.endpoints["cdse"].signer == "cdse-s3"
         assert cat.endpoints["earth-search"].signer == "anonymous"
+        assert cat.endpoints["deafrica"].signer == "anonymous"
+        assert cat.endpoints["deafrica"].region == "af-south-1"
+
+    def test_all_eight_endpoints_load_together(self):
+        """The 8 bundled per-endpoint yaml files merge under the duplicate-key loader."""
+        cat = Catalog()
+        assert set(cat.endpoints) == {
+            "planetary-computer", "cdse", "earth-search",
+            "deafrica", "dea", "veda", "usgs-landsat", "bdc",
+        }
+        # available_collections holds a per-endpoint live index for each of the 8;
+        # source-coop is documentation-only (no endpoint, no collections).
+        for ep in cat.endpoints:
+            assert ep in cat.available_collections, ep
+            assert len(cat.available_collections[ep]) >= 3, ep
+
+    def test_deafrica_collections_curated(self):
+        """The deafrica endpoint exposes its curated flagship collections."""
+        cat = Catalog()
+        wofs = cat.get_collection("deafrica/wofs_ls")
+        assert wofs.endpoint == "deafrica"
+        assert wofs.signer is None  # no per-collection override → endpoint default (anonymous)
+        assert wofs.default_assets == ["water"]
+        # the 10 confirmed roadmap collections all load
+        for key in (
+            "deafrica/wofs_ls", "deafrica/wofs_ls_summary_annual",
+            "deafrica/fc_ls", "deafrica/crop_mask",
+            "deafrica/gm_ls8_ls9_annual", "deafrica/ls8_sr", "deafrica/ls9_sr",
+            "deafrica/s2_l2a", "deafrica/dem_cop_30", "deafrica/dem_cop_90",
+        ):
+            assert cat.get_collection(key).endpoint == "deafrica", key
+
+    def test_dea_collections_curated(self):
+        """The dea endpoint exposes its curated flagship collections."""
+        cat = Catalog()
+        assert cat.endpoints["dea"].region == "ap-southeast-2"
+        assert cat.endpoints["dea"].signer == "anonymous"
+        ard = cat.get_collection("dea/ga_ls8c_ard_3")
+        assert ard.endpoint == "dea"
+        assert ard.signer is None
+        assert ard.default_assets == ["nbart_red", "nbart_green", "nbart_blue", "nbart_nir"]
+        for key in (
+            "dea/ga_ls8c_ard_3", "dea/ga_ls9c_ard_3", "dea/ga_s2am_ard_3", "dea/ga_s2bm_ard_3",
+            "dea/ga_ls_wo_3", "dea/ga_ls_fc_3", "dea/ga_ls8c_nbart_gm_cyear_3",
+            "dea/ga_s2ls_intertidal_cyear_3", "dea/ga_ls_mangrove_cover_cyear_3",
+            "dea/ga_srtm_dem1sv1_0",
+        ):
+            assert cat.get_collection(key).endpoint == "dea", key
+
+    def test_veda_collections_curated(self):
+        """The veda endpoint exposes its curated flagship collections."""
+        cat = Catalog()
+        assert cat.endpoints["veda"].region == "us-west-2"
+        assert cat.endpoints["veda"].signer == "anonymous"
+        nldas = cat.get_collection("veda/nldas3")
+        assert nldas.endpoint == "veda"
+        assert nldas.signer is None
+        assert nldas.default_assets == ["cog_default"]
+        for key in (
+            "veda/nldas3", "veda/delta-disasters-hd-blackmarble-nightlights",
+            "veda/CMIP245-winter-median-pr", "veda/CMIP585-winter-median-pr",
+            "veda/caldor-fire-burn-severity", "veda/hls-ndvi",
+            "veda/EPA-annual-emissions-1A-Combustion-Mobile",
+        ):
+            assert cat.get_collection(key).endpoint == "veda", key
+
+    def test_usgs_landsat_collections_requester_pays(self):
+        """USGS LandsatLook collections inherit aws-requester-pays from the endpoint default."""
+        cat = Catalog()
+        assert cat.endpoints["usgs-landsat"].region == "us-west-2"
+        assert cat.endpoints["usgs-landsat"].signer == "aws-requester-pays"
+        sr = cat.get_collection("usgs-landsat/landsat-c2l2-sr")
+        assert sr.endpoint == "usgs-landsat"
+        # explicit per-collection override (matches the endpoint default — kept
+        # explicit so the requester-pays intent is visible at the row level).
+        assert sr.signer == "aws-requester-pays"
+        assert sr.default_assets == ["red", "green", "blue", "nir08"]
+        for key in (
+            "usgs-landsat/landsat-c2l2-sr",
+            "usgs-landsat/landsat-c2l2-st",
+            "usgs-landsat/landsat-c2l1",
+        ):
+            col = cat.get_collection(key)
+            assert col.endpoint == "usgs-landsat", key
+            assert col.signer == "aws-requester-pays", key
+
+    def test_bdc_collections_curated(self):
+        """The bdc endpoint exposes its curated flagship collections (all anonymous today)."""
+        cat = Catalog()
+        assert cat.endpoints["bdc"].signer == "anonymous"
+        ndvi = cat.get_collection("bdc/CBERS4-WFI-16D-2")
+        assert ndvi.endpoint == "bdc"
+        assert ndvi.signer is None
+        assert ndvi.requires_token is False
+        for key in (
+            "bdc/CBERS4-WFI-16D-2", "bdc/CB4A-WFI-L4-SR-1", "bdc/CB4A-WPM-L4-DN-1",
+            "bdc/AMZ1-WFI-L4-SR-1", "bdc/S2_L2A-1",
+            "bdc/mod13q1-6.1", "bdc/myd13q1-6.1",
+        ):
+            col = cat.get_collection(key)
+            assert col.endpoint == "bdc", key
+            # all currently-exposed BDC collections read anonymously
+            assert col.signer is None, key
+            assert col.requires_token is False, key
 
     def test_available_collections_index(self):
         """The informational available_collections index is keyed by endpoint."""
@@ -175,6 +279,19 @@ class TestLoaderRules:
         )
         with pytest.raises(ValueError, match="invalid collection"):
             _load_catalog_data(tmp_path)
+
+    def test_requires_token_round_trips(self, tmp_path):
+        """The Collection.requires_token field parses + survives the loader."""
+        _write(
+            tmp_path / "a.yaml",
+            "endpoints:\n  e:\n    url: u\n    signer: anonymous\n"
+            "collections:\n  gated:\n    endpoint: e\n    requires_token: true\n"
+            "    signer: bdc-token\n",
+        )
+        _, _, collections = _load_catalog_data(tmp_path)
+        col = collections["gated"]
+        assert col.requires_token is True, "requires_token field survives the loader"
+        assert col.signer == "bdc-token", "bdc-token is a valid SignerType literal"
 
     def test_get_catalog_returns_datasets(self):
         """get_catalog returns the same curated collection map as datasets."""

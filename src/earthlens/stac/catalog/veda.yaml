@@ -1,0 +1,80 @@
+# Curated collections served by NASA VEDA (Visualisation, Exploration, and Data
+# Analysis platform). Anonymous on `s3://veda-data-store` (us-west-2). All
+# VEDA collections expose a uniform `cog_default` data asset (plus a
+# `rendered_preview` PNG/JPG); curate `cog_default` as the default.
+#
+# Flagship picks from the ~247 VEDA collections — NASA-curated derived
+# products spanning climate (CMIP6), urban (Black Marble HD), hydrology
+# (NLDAS-3), fire (Caldor), vegetation (HLS NDVI) and emissions (EPA).
+
+collections:
+  veda/CMIP245-winter-median-pr:
+    assets:
+      cog_default:
+        title: Winter median precipitation difference (CMIP6 SSP2-4.5)
+      rendered_preview:
+        title: Rendered preview
+    collection_id: CMIP245-winter-median-pr
+    default_assets:
+    - cog_default
+    endpoint: veda
+  veda/CMIP585-winter-median-pr:
+    assets:
+      cog_default:
+        title: Winter median precipitation difference (CMIP6 SSP5-8.5)
+      rendered_preview:
+        title: Rendered preview
+    collection_id: CMIP585-winter-median-pr
+    default_assets:
+    - cog_default
+    endpoint: veda
+  veda/EPA-annual-emissions-1A-Combustion-Mobile:
+    aliases:
+      veda: EPA-annual-emissions_1A_Combustion_Mobile
+    assets:
+      cog_default:
+        title: EPA annual mobile-combustion methane emissions (1A)
+      rendered_preview:
+        title: Rendered preview
+    collection_id: EPA-annual-emissions_1A_Combustion_Mobile
+    default_assets:
+    - cog_default
+    endpoint: veda
+  veda/caldor-fire-burn-severity:
+    assets:
+      cog_default:
+        title: Caldor Fire burn-severity classification
+      rendered_preview:
+        title: Rendered preview
+    collection_id: caldor-fire-burn-severity
+    default_assets:
+    - cog_default
+    endpoint: veda
+  veda/delta-disasters-hd-blackmarble-nightlights:
+    assets:
+      cog_default:
+        title: Black Marble HD nightlights (disaster-impacted areas)
+      rendered_preview:
+        title: Rendered preview
+    collection_id: delta-disasters-hd-blackmarble-nightlights
+    default_assets:
+    - cog_default
+    endpoint: veda
+  veda/hls-ndvi:
+    assets:
+      cog_default:
+        title: HLS NDVI (daily)
+    collection_id: hls-ndvi
+    default_assets:
+    - cog_default
+    endpoint: veda
+  veda/nldas3:
+    assets:
+      cog_default:
+        title: NLDAS-3 land surface state (LIS-HIST)
+      rendered_preview:
+        title: Rendered preview
+    collection_id: nldas3
+    default_assets:
+    - cog_default
+    endpoint: veda
