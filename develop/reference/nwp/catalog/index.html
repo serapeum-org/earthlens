@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -2306,34 +2306,6 @@
     
   
     Authentication
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../stac/migration-from-gee/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Migration from GEE
   
 
     
@@ -11063,26 +11035,34 @@ doesn't carry).</p>
 <tr>
 <td><code>gdps</code></td>
 <td>ECCC MSC</td>
-<td><code>herbie</code></td>
+<td><code>eccc-msc</code></td>
 <td>00/12</td>
 <td>240 h</td>
-<td>15 km global</td>
+<td>15 km global, direct Datamart (WIS2 tokens, 30 d retention)</td>
 </tr>
 <tr>
 <td><code>rdps</code></td>
 <td>ECCC MSC</td>
-<td><code>herbie</code></td>
+<td><code>eccc-msc</code></td>
 <td>00/06/12/18</td>
 <td>84 h</td>
-<td>10 km regional</td>
+<td>10 km regional, direct Datamart (WIS2 tokens, 30 d retention)</td>
 </tr>
 <tr>
 <td><code>hrdps</code></td>
 <td>ECCC MSC</td>
-<td><code>herbie</code></td>
+<td><code>eccc-msc</code></td>
 <td>00/06/12/18</td>
 <td>48 h</td>
-<td>2.5 km (<code>continental</code>)</td>
+<td>2.5 km continental, direct Datamart (WIS2 tokens, 30 d retention)</td>
+</tr>
+<tr>
+<td><code>geps</code></td>
+<td>ECCC MSC</td>
+<td><code>eccc-msc</code></td>
+<td>00/12</td>
+<td>384 h</td>
+<td>0.5° ensemble (21 members per <code>_allmbrs</code> file), 14 d retention</td>
 </tr>
 <tr>
 <td><code>icon-eu</code></td>
