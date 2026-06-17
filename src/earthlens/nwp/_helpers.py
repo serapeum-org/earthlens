@@ -507,14 +507,17 @@ def get_idx(
     """
     path = _idx_cache_path(url)
     ttl_seconds = _resolve_idx_ttl(ttl)
-    if path.exists():
-        try:
-            if (time.time() - path.stat().st_mtime) < ttl_seconds:
-                frame = _parse_idx(path.read_text(encoding="utf-8", errors="replace"))
-                if not frame.empty:
-                    return frame
-        except OSError:
-            pass
+    # Any `OSError` while probing the cache (file racing with cleanup, a
+    # permission flap, an unexpected errno on `path.exists()`) collapses into
+    # a miss so the helper re-fetches rather than propagating an opaque
+    # `stat`/`read` failure up through user code.
+    try:
+        if path.exists() and (time.time() - path.stat().st_mtime) < ttl_seconds:
+            frame = _parse_idx(path.read_text(encoding="utf-8", errors="replace"))
+            if not frame.empty:
+                return frame
+    except OSError:
+        pass
     path.parent.mkdir(parents=True, exist_ok=True)
     # Write through a sibling temp file and atomically replace on success.
     # A downloader exception leaves the existing cache (if any) untouched;
