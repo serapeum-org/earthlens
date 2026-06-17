@@ -458,6 +458,90 @@ class TestAggregate:
         with pytest.raises(ValueError, match="single model"):
             b._aggregate([tmp_path / "gfs_2024060100_f000.tif"], self._config())
 
+    def test_icosahedral_model_rejected(self, tmp_path):
+        """An icosahedral-grid model (declared by `grid_kind`) refuses aggregation."""
+        from earthlens.nwp import NWP, Catalog, NWPModel
+
+        cat = Catalog(
+            datasets={
+                "icon-icos": NWPModel(
+                    provider="dwd-opendata",
+                    backend="direct-https",
+                    cycles_utc=[0, 12],
+                    horizon_h=48,
+                    idx=False,
+                    mirrors=["origin"],
+                    url_template="https://example.test/{var}.grib2",
+                    bands={"temperature_2m": "T_2M"},
+                    grid_kind="icosahedral",
+                ),
+            }
+        )
+        b = NWP(
+            start="2024-06-01",
+            end="2024-06-01",
+            variables={"icon-icos": ["temperature_2m"]},
+            lat_lim=[40, 45],
+            lon_lim=[-80, -75],
+            path=str(tmp_path),
+            catalog=cat,
+        )
+        with pytest.raises(NotImplementedError, match="icosahedral"):
+            b._aggregate([tmp_path / "icon-icos_2024060100_f000.tif"], self._config())
+        # The error must not name `icon-d2` as an alternative — `icon-d2`'s
+        # own catalog row carries `grid_kind: icosahedral` and would re-fail.
+        with pytest.raises(NotImplementedError) as excinfo:
+            b._aggregate([tmp_path / "icon-icos_2024060100_f000.tif"], self._config())
+        assert "ICON-D2" not in str(excinfo.value)
+
+    def test_url_template_substring_alone_no_longer_rejects(self, tmp_path):
+        """A regular-grid row whose URL happens to contain the word `icosahedral`
+        is no longer rejected — the guard uses `grid_kind`, not URL substring."""
+        from earthlens.nwp import NWP, Catalog, NWPModel
+
+        cat = Catalog(
+            datasets={
+                "ok-grid": NWPModel(
+                    provider="dwd-opendata",
+                    backend="direct-https",
+                    cycles_utc=[0, 12],
+                    horizon_h=48,
+                    idx=False,
+                    mirrors=["origin"],
+                    # URL string contains the word, but the row declares
+                    # itself regular — the guard trusts the declaration.
+                    url_template="https://example.test/icosahedral_paper_{var}.grib2",
+                    bands={"temperature_2m": "T_2M"},
+                ),
+            }
+        )
+        b = NWP(
+            start="2024-06-01",
+            end="2024-06-01",
+            variables={"ok-grid": ["temperature_2m"]},
+            lat_lim=[40, 45],
+            lon_lim=[-80, -75],
+            path=str(tmp_path),
+            catalog=cat,
+        )
+        # No NotImplementedError; the guard passes through to pyramids
+        # (which we intercept with the fake_aggregate fixture in the other
+        # tests). Here we exercise the *check*, not the reducer body, so a
+        # bare _aggregate call with an empty path list returns [].
+        assert b._aggregate([], self._config()) == []
+
+    def test_bundled_icosahedral_rows_have_grid_kind(self):
+        """Every DWD ICON icosahedral row in the bundled catalog carries the flag."""
+        from earthlens.nwp import Catalog
+
+        cat = Catalog()
+        expected = {"icon-global", "icon-d2", "icon-eps", "icon-eu-eps", "icon-d2-eps"}
+        for key in expected:
+            assert cat.datasets[key].grid_kind == "icosahedral", key
+        # icon-eu (regular lat-lon, croppable) and gfs default to regular.
+        assert cat.datasets["icon-eu"].grid_kind == "regular-latlon"
+        assert cat.datasets["gfs"].grid_kind == "regular-latlon"
+
     def test_download_with_aggregate(
         self, mini_catalog, tmp_path, fake_pyramids, fake_aggregate
     ):
@@ -495,3 +579,83 @@ def test_unknown_backend_raises(tmp_path):
             path=str(tmp_path),
             catalog=cat,
         )
+
+
+class TestRetentionWarning:
+    """C3 — RetentionWarning fires when the request precedes a model's window."""
+
+    @staticmethod
+    def _short_window_catalog():
+        """Two-model catalog: one with `retention_days=1`, one archival."""
+        from earthlens.nwp import Catalog, NWPModel
+
+        return Catalog(
+            datasets={
+                "icon": NWPModel(
+                    provider="dwd-opendata",
+                    backend="direct-https",
+                    cycles_utc=[0, 12],
+                    horizon_h=48,
+                    idx=False,
+                    mirrors=["origin"],
+                    url_template="https://example.test/{cycle:%H}/{var}.bz2",
+                    bands={"t2m": "T_2M"},
+                    retention_days=1,
+                ),
+                "gfs": NWPModel(
+                    provider="noaa-nodd",
+                    backend="herbie",
+                    cycles_utc=[0, 12],
+                    horizon_h=48,
+                    mirrors=["aws"],
+                    bands={"t2m": ":TMP:2 m above ground:"},
+                ),
+            }
+        )
+
+    def _build(self, catalog, model_key, tmp_path, start):
+        from earthlens.nwp import NWP
+
+        return NWP(
+            start=start,
+            end=start,
+            variables={model_key: ["t2m"]},
+            lat_lim=[40, 45],
+            lon_lim=[-80, -75],
+            path=str(tmp_path),
+            catalog=catalog,
+        )
+
+    def test_out_of_window_warns(self, tmp_path):
+        """A start older than `now - retention_days` warns with the cutoff date."""
+        from earthlens.nwp import RetentionWarning
+
+        cat = self._short_window_catalog()
+        old = (dt.datetime.now(dt.UTC).replace(tzinfo=None) - dt.timedelta(days=30)).strftime(
+            "%Y-%m-%d"
+        )
+        with pytest.warns(RetentionWarning, match="retains"):
+            self._build(cat, "icon", tmp_path, old)
+
+    def test_in_window_is_silent(self, tmp_path, recwarn):
+        """An in-window start (today) does not emit RetentionWarning."""
+        from earthlens.nwp import RetentionWarning
+
+        cat = self._short_window_catalog()
+        today = dt.datetime.now(dt.UTC).strftime("%Y-%m-%d")
+        self._build(cat, "icon", tmp_path, today)
+        assert not [w for w in recwarn if issubclass(w.category, RetentionWarning)]
+
+    def test_archival_model_is_silent(self, tmp_path, recwarn):
+        """A `retention_days=None` row never warns, even for an ancient start."""
+        from earthlens.nwp import RetentionWarning
+
+        cat = self._short_window_catalog()
+        self._build(cat, "gfs", tmp_path, "2000-01-01")
+        assert not [w for w in recwarn if issubclass(w.category, RetentionWarning)]
+
+    def test_retention_warning_is_importable_from_package(self):
+        """`RetentionWarning` is on the public `earthlens.nwp` surface."""
+        from earthlens.nwp import RetentionWarning
+
+        assert issubclass(RetentionWarning, UserWarning)

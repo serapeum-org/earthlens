@@ -40,13 +40,25 @@ _CATALOG_CACHE: dict[Any, dict[str, NWPModel]] = {}
 #: `direct-https` / `direct-boto3` are earthlens' own per-centre modules
 #: for providers Herbie does not cover (DWD, Météo-France, ECCC).
 BackendLiteral = Literal[
-    "herbie", "ecmwf-opendata", "direct-https", "direct-boto3", "meteofrance-api"
+    "herbie",
+    "ecmwf-opendata",
+    "direct-https",
+    "direct-boto3",
+    "meteofrance-api",
+    "eccc-msc",
 ]
 
 #: The set of backends earthlens knows how to dispatch. Used by the
 #: backend to fail fast on an unknown `backend:` value at construction.
 KNOWN_BACKENDS: frozenset[str] = frozenset(
-    ("herbie", "ecmwf-opendata", "direct-https", "direct-boto3", "meteofrance-api")
+    (
+        "herbie",
+        "ecmwf-opendata",
+        "direct-https",
+        "direct-boto3",
+        "meteofrance-api",
+        "eccc-msc",
+    )
 )
 
 
@@ -157,6 +169,30 @@ class NWPModel(BaseModel):
             AIFS, `{"stream": "enfo", "type": "cf"}` for the ENS control);
             an unsigned-S3 centre uses `bucket` / `key_template` /
             `region`. Empty for the simple deterministic models.
+        license: SPDX-style licence identifier the provider publishes the
+            data under, surfaced as catalog metadata so downstream users
+            and redistribution honour it. Never inferred from the URL —
+            populated row-by-row in `nwp_data_catalog.yaml` from the
+            provider's stated terms (`"PD-US-GOV"` for NOAA NODD;
+            `"CC-BY-4.0"` for ECMWF Open Data and DWD; `"Etalab-2.0"`
+            for Météo-France; `"OGL-Canada-2.0"` for ECCC). `None` only
+            for an ad-hoc row that has not been curated yet.
+        retention_days: How long the provider keeps a cycle online before
+            it rolls off the live endpoint. `None` means archival or
+            unspecified (the backend stays silent); a positive integer is
+            the rolling-window length in days, and `NWP.__init__` emits a
+            :class:`RetentionWarning` when the requested `start` is older
+            than `now - retention_days` (the #1 confusing failure for
+            short-retention providers — DWD keeps roughly one day, MF
+            fourteen). Never inferred — populated per row from the
+            provider's stated retention policy.
+        grid_kind: The model's native horizontal grid type. Defaults to
+            `"regular-latlon"` (every NOAA / ECMWF / DWD-ICON-EU / ECCC
+            row); `"icosahedral"` flags an unstructured DWD ICON grid
+            (icon-global, icon-d2, icon-eps, icon-eu-eps, icon-d2-eps).
+            `NWP._aggregate` checks this field — not the URL — to refuse
+            aggregation on a grid `pyramids.dataset.DatasetCollection`
+            cannot co-register.
 
     Examples:
         - Build a minimal Herbie-backed row and read its selector:
@@ -202,6 +238,9 @@ class NWPModel(BaseModel):
     bands: dict[str, str] = Field(default_factory=dict)
     request_options: dict[str, Any] = Field(default_factory=dict)
     members: list[str] = Field(default_factory=list)
+    license: str | None = None
+    retention_days: int | None = None
+    grid_kind: Literal["regular-latlon", "icosahedral"] = "regular-latlon"
 
 
 class Catalog(AbstractCatalog):

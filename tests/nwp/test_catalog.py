@@ -165,6 +165,44 @@ class TestNWPModel:
         for backend in ("herbie", "ecmwf-opendata", "direct-https", "direct-boto3"):
             assert backend in KNOWN_BACKENDS
 
+    def test_license_defaults_to_none(self):
+        """An ad-hoc row without a `license` is `None` — never inferred."""
+        assert NWPModel(provider="noaa-nodd").license is None
+
+    def test_license_round_trips(self):
+        """A populated `license` survives construction."""
+        assert NWPModel(provider="noaa-nodd", license="PD-US-GOV").license == "PD-US-GOV"
+
+
+class TestBundledLicenses:
+    """Tests for C2: every shipped row carries its provider's license."""
+
+    _EXPECTED = {
+        "noaa-nodd": "PD-US-GOV",
+        "ecmwf-opendata": "CC-BY-4.0",
+        "dwd-opendata": "CC-BY-4.0",
+        "meteofrance": "Etalab-2.0",
+        "eccc-msc": "OGL-Canada-2.0",
+    }
+
+    def test_every_shipped_row_has_a_license(self):
+        """No bundled NWP model row is missing its `license`."""
+        from earthlens.nwp import Catalog
+
+        missing = [k for k, m in Catalog().datasets.items() if m.license is None]
+        assert missing == [], f"rows without license: {missing}"
+
+    def test_license_matches_provider(self):
+        """Every row's `license` matches the curated per-provider value."""
+        from earthlens.nwp import Catalog
+
+        wrong = [
+            (k, m.provider, m.license, self._EXPECTED[m.provider])
+            for k, m in Catalog().datasets.items()
+            if m.license != self._EXPECTED.get(m.provider)
+        ]
+        assert wrong == [], f"license mismatch: {wrong}"
+
 
 class TestClearCache:
     """Tests for clear_catalog_cache."""
@@ -185,3 +223,39 @@ def test_load_catalog_data_missing_file_raises(tmp_path):
 
     with pytest.raises(FileNotFoundError):
         _load_catalog_data(tmp_path / "absent.yaml")
+
+
+class TestBundledRetention:
+    """Tests for C3: every short-retention row carries the published window."""
+
+    def test_dwd_rows_one_day(self):
+        """Every dwd-opendata row carries `retention_days=1`."""
+        from earthlens.nwp import Catalog
+
+        for k, m in Catalog().datasets.items():
+            if m.provider == "dwd-opendata":
+                assert m.retention_days == 1, f"{k!r} retention={m.retention_days}"
+
+    def test_meteofrance_rows_fourteen_days(self):
+        """Every meteofrance row carries `retention_days=14`."""
+        from earthlens.nwp import Catalog
+
+        for k, m in Catalog().datasets.items():
+            if m.provider == "meteofrance":
+                assert m.retention_days == 14, f"{k!r} retention={m.retention_days}"
+
+    def test_archival_providers_have_no_retention(self):
+        """NOAA NODD + ECMWF Open Data rows leave retention_days as None."""
+        from earthlens.nwp import Catalog
+
+        for k, m in Catalog().datasets.items():
+            if m.provider in ("noaa-nodd", "ecmwf-opendata"):
+                assert m.retention_days is None, f"{k!r} retention={m.retention_days}"
+
+    def test_eccc_rows_carry_datamart_retention(self):
+        """ECCC rows carry the Datamart rolling windows (30 d deterministic, 14 d ensemble)."""
+        from earthlens.nwp import Catalog
+
+        expected = {"gdps": 30, "rdps": 30, "hrdps": 30, "geps": 14}
+        for k, days in expected.items():
+            assert Catalog().datasets[k].retention_days == days

@@ -1240,6 +1240,8 @@ _NWP_PROBES: dict[str, Callable[[Any, Any, int], str]] = {
     "ecmwf-opendata": _nwp_probe_ecmwf_opendata,
     "meteofrance-api": _nwp_probe_meteofrance,
     "herbie": _nwp_probe_herbie,
+    # ECCC Datamart uses the same per-variable HTTPS HEAD pattern as DWD.
+    "eccc-msc": _nwp_probe_direct_https,
 }
 
 

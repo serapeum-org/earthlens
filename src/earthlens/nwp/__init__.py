@@ -30,6 +30,7 @@ Public surface (re-exported from this package):
 
 from __future__ import annotations
 
+from earthlens.nwp._warnings import RetentionWarning
 from earthlens.nwp.backend import NWP
 from earthlens.nwp.catalog import CATALOG_PATH, Catalog, NWPModel
 
@@ -38,4 +39,5 @@ __all__ = [
     "Catalog",
     "NWP",
     "NWPModel",
+    "RetentionWarning",
 ]

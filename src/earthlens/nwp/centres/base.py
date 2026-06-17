@@ -38,6 +38,7 @@ CENTRE_REGISTRY: dict[str, tuple[str, str]] = {
         "earthlens.nwp.centres.meteofrance_api",
         "MeteoFranceAPICentre",
     ),
+    "eccc-msc": ("earthlens.nwp.centres.eccc", "ECCCCentre"),
 }
 
 

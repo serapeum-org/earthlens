@@ -49,6 +49,7 @@ class TestResolveCentre:
             "direct-https",
             "direct-boto3",
             "meteofrance-api",
+            "eccc-msc",
         }
 
     @pytest.mark.parametrize(
@@ -716,6 +717,279 @@ class TestMeteoFranceAPICentre:
                 0,
                 ["temperature_2m"],
                 "auto",
+            )
+        assert list(tmp_path.iterdir()) == [], "no partial file should remain"
+
+
+class TestECCCCentre:
+    """Tests for the direct-HTTPS ECCC MSC Datamart centre."""
+
+    _GDPS_TMPL = (
+        "https://dd.weather.gc.ca/{date:%Y%m%d}/WXO-DD/model_gdps/15km/"
+        "{cycle:%H}/{step:03d}/{date:%Y%m%d}T{cycle:%H}Z_MSC_GDPS_"
+        "{var}_LatLon0.15_PT{step:03d}H.grib2"
+    )
+    _GEPS_TMPL = (
+        "https://dd.weather.gc.ca/{date:%Y%m%d}/WXO-DD/ensemble/geps/grib2/raw/"
+        "{cycle:%H}/{step:03d}/CMC_geps-raw_{var}_latlon0p5x0p5_"
+        "{date:%Y%m%d}{cycle:%H}_P{step:03d}_allmbrs.grib2"
+    )
+
+    def _gdps(self, **overrides) -> NWPModel:
+        """Build a GDPS catalog row, overriding any field."""
+        base = dict(
+            provider="eccc-msc",
+            model_family="gdps",
+            cycles_utc=[0, 12],
+            horizon_h=240,
+            idx=False,
+            backend="eccc-msc",
+            url_template=self._GDPS_TMPL,
+            bands={
+                "temperature_2m": "AirTemp_AGL-2m",
+                "precipitation_acc": "Precip-Accum_Sfc",
+            },
+        )
+        base.update(overrides)
+        return NWPModel(**base)
+
+    def _fake_requests_uncompressed(self, monkeypatch):
+        """Fake `requests.Session.get` that streams the variable token as the body."""
+        import sys
+        import types
+
+        state: dict[str, Any] = {"urls": [], "stream_calls": 0, "chunk_sizes": []}
+
+        class _Resp:
+            def __init__(self, body):
+                self._body = body
+
+            def __enter__(self):
+                return self
+
+            def __exit__(self, *exc):
+                return False
+
+            def raise_for_status(self):
+                return None
+
+            def iter_content(self, chunk_size):
+                state["stream_calls"] += 1
+                state["chunk_sizes"].append(chunk_size)
+                # Emit two chunks so the test exercises the iter loop, not
+                # a single materialise-then-write path.
+                yield self._body[: len(self._body) // 2]
+                yield self._body[len(self._body) // 2 :]
+
+        class _Session:
+            def get(self, url, stream=False, timeout=None):
+                state["urls"].append(url)
+                var = url.rsplit("_MSC_GDPS_", 1)[-1].split("_LatLon", 1)[0]
+                return _Resp(b"<" + var.encode() + b">")
+
+            def close(self):
+                pass
+
+        module = types.ModuleType("requests")
+        module.Session = _Session
+        module.get = lambda url, **kw: _Resp(b"")  # legacy compat (other tests)
+        monkeypatch.setitem(sys.modules, "requests", module)
+        return state
+
+    def test_fetch_one_builds_urls_and_concatenates(self, monkeypatch, tmp_path):
+        """`fetch_one` builds per-band URLs and concatenates the bodies."""
+        from earthlens.nwp.centres.eccc import ECCCCentre
+
+        state = self._fake_requests_uncompressed(monkeypatch)
+        out = ECCCCentre(tmp_path).fetch_one(
+            self._gdps(),
+            dt.datetime(2026, 6, 17, 0),
+            3,
+            ["temperature_2m", "precipitation_acc"],
+            "origin",
+        )
+        assert state["urls"] == [
+            "https://dd.weather.gc.ca/20260617/WXO-DD/model_gdps/15km/00/003/"
+            "20260617T00Z_MSC_GDPS_AirTemp_AGL-2m_LatLon0.15_PT003H.grib2",
+            "https://dd.weather.gc.ca/20260617/WXO-DD/model_gdps/15km/00/003/"
+            "20260617T00Z_MSC_GDPS_Precip-Accum_Sfc_LatLon0.15_PT003H.grib2",
+        ]
+        assert out.read_bytes() == b"<AirTemp_AGL-2m><Precip-Accum_Sfc>"
+        assert out.name == "gdps_2026061700_f003.grib2"
+
+    def test_fetch_one_without_template_raises(self, tmp_path):
+        """A model lacking a url_template raises ValueError."""
+        from earthlens.nwp.centres.eccc import ECCCCentre
+
+        model = self._gdps(url_template=None)
+        with pytest.raises(ValueError, match="url_template"):
+            ECCCCentre(tmp_path).fetch_one(
+                model, dt.datetime(2026, 6, 17, 0), 0, ["temperature_2m"], "origin"
+            )
+
+    def test_band_url_unknown_param_raises(self, tmp_path):
+        """An unknown band name surfaces a clean KeyError."""
+        from earthlens.nwp.centres.eccc import ECCCCentre
+
+        model = self._gdps()
+        with pytest.raises(KeyError):
+            ECCCCentre._band_url(model, "nope", dt.datetime(2026, 6, 17, 0), 0)
+
+    def test_band_url_geps_member_substitutes(self):
+        """A GEPS-style template with `{member:03d}` zero-pads the member id."""
+        from earthlens.nwp.centres.eccc import ECCCCentre
+
+        template = (
+            "https://dd.weather.gc.ca/{date:%Y%m%d}/.../{var}_mem{member:03d}.grib2"
+        )
+        model = NWPModel(
+            provider="eccc-msc",
+            backend="eccc-msc",
+            cycles_utc=[0, 12],
+            url_template=template,
+            bands={"temperature_2m": "TMP_TGL_2m"},
+        )
+        url = ECCCCentre._band_url(
+            model, "temperature_2m", dt.datetime(2026, 6, 17, 0), 0, member="7"
+        )
+        assert url.endswith("TMP_TGL_2m_mem007.grib2")
+
+    def test_band_url_non_numeric_member_raises_value_error(self):
+        """A non-numeric member id is rejected with a clean ValueError."""
+        from earthlens.nwp.centres.eccc import ECCCCentre
+
+        template = "https://example.test/{var}_{member:03d}.grib2"
+        model = NWPModel(
+            provider="eccc-msc",
+            backend="eccc-msc",
+            cycles_utc=[0, 12],
+            url_template=template,
+            bands={"temperature_2m": "TMP_TGL_2m"},
+        )
+        with pytest.raises(ValueError, match="numeric string"):
+            ECCCCentre._band_url(
+                model, "temperature_2m", dt.datetime(2026, 6, 17, 0), 0, member="cf"
+            )
+
+    def test_unknown_mirror_raises(self, tmp_path):
+        """A `mirror=` value outside ('auto', 'origin') fails loud."""
+        from earthlens.nwp.centres.eccc import ECCCCentre
+
+        with pytest.raises(ValueError, match="single origin host"):
+            ECCCCentre(tmp_path).fetch_one(
+                self._gdps(),
+                dt.datetime(2026, 6, 17, 0),
+                0,
+                ["temperature_2m"],
+                mirror="msc-backup",
+            )
+
+    def test_fetch_one_streams_with_iter_content(self, monkeypatch, tmp_path):
+        """`fetch_one` streams via `iter_content` (no `.content` materialisation)."""
+        from earthlens.nwp.centres.eccc import ECCCCentre
+
+        state = self._fake_requests_uncompressed(monkeypatch)
+        ECCCCentre(tmp_path).fetch_one(
+            self._gdps(),
+            dt.datetime(2026, 6, 17, 0),
+            3,
+            ["temperature_2m"],
+            "origin",
+        )
+        assert state["stream_calls"] >= 1
+        assert all(size > 0 for size in state["chunk_sizes"])
+
+    def test_fetch_one_skips_empty_chunks(self, monkeypatch, tmp_path):
+        """An empty chunk from `iter_content` is filtered out, not written."""
+        import sys
+        import types
+
+        from earthlens.nwp.centres.eccc import ECCCCentre
+
+        class _Resp:
+            def __enter__(self):
+                return self
+
+            def __exit__(self, *exc):
+                return False
+
+            def raise_for_status(self):
+                return None
+
+            def iter_content(self, chunk_size):
+                yield b""
+                yield b"payload"
+                yield b""
+
+        class _Session:
+            def get(self, url, stream=False, timeout=None):
+                return _Resp()
+
+            def close(self):
+                pass
+
+        module = types.ModuleType("requests")
+        module.Session = _Session
+        monkeypatch.setitem(sys.modules, "requests", module)
+        out = ECCCCentre(tmp_path).fetch_one(
+            self._gdps(),
+            dt.datetime(2026, 6, 17, 0),
+            3,
+            ["temperature_2m"],
+            "origin",
+        )
+        # Only the non-empty middle chunk is written.
+        assert out.read_bytes() == b"payload"
+
+    def test_fetch_one_reuses_one_session_per_centre(self, monkeypatch, tmp_path):
+        """One `requests.Session()` is reused across multiple fetch_one calls."""
+        from earthlens.nwp.centres.eccc import ECCCCentre
+
+        self._fake_requests_uncompressed(monkeypatch)
+        centre = ECCCCentre(tmp_path)
+        centre.fetch_one(
+            self._gdps(),
+            dt.datetime(2026, 6, 17, 0),
+            3,
+            ["temperature_2m"],
+            "origin",
+        )
+        first_session = centre._session
+        centre.fetch_one(
+            self._gdps(),
+            dt.datetime(2026, 6, 17, 12),
+            6,
+            ["temperature_2m"],
+            "origin",
+        )
+        assert centre._session is first_session
+
+    def test_fetch_one_failure_leaves_no_partial_file(self, tmp_path, monkeypatch):
+        """A failure on a later band leaves no truncated `.grib2`."""
+        import sys
+        import types
+
+        class _FailingSession:
+            def get(self, url, stream=False, timeout=None):
+                raise RuntimeError("network down")
+
+            def close(self):
+                pass
+
+        module = types.ModuleType("requests")
+        module.Session = _FailingSession
+        module.get = lambda url, **kw: (_ for _ in ()).throw(RuntimeError("network down"))
+        monkeypatch.setitem(sys.modules, "requests", module)
+
+        from earthlens.nwp.centres.eccc import ECCCCentre
+
+        with pytest.raises(RuntimeError, match="network down"):
+            ECCCCentre(tmp_path).fetch_one(
+                self._gdps(),
+                dt.datetime(2026, 6, 17, 0),
+                0,
+                ["temperature_2m"],
+                "origin",
             )
         assert list(tmp_path.iterdir()) == [], "no partial file should remain"
 

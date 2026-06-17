@@ -12,6 +12,7 @@ datasets:
 
   gfs:                                    # NOAA NODD, via Herbie
     provider: noaa-nodd
+    license: PD-US-GOV
     model_family: gfs
     resolution: 0.25deg
     cycles_utc: [0, 6, 12, 18]
@@ -104,6 +105,7 @@ datasets:
 
   gefs:                                   # NOAA NODD ensemble, via Herbie
     provider: noaa-nodd
+    license: PD-US-GOV
     model_family: gefs
     resolution: 0.5deg
     cycles_utc: [0, 6, 12, 18]
@@ -198,6 +200,7 @@ datasets:
 
   hrrr:                                   # NOAA NODD, hourly cycles, via Herbie
     provider: noaa-nodd
+    license: PD-US-GOV
     model_family: hrrr
     resolution: 3km
     cycles_utc: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23]
@@ -290,6 +293,7 @@ datasets:
 
   ifs-hres:                               # ECMWF Open Data (IFS HRES)
     provider: ecmwf-opendata
+    license: CC-BY-4.0
     model_family: ifs
     resolution: 0.25deg
     cycles_utc: [0, 6, 12, 18]
@@ -382,6 +386,8 @@ datasets:
 
   icon-global:                            # DWD Open Data, direct HTTPS .bz2 (no .idx)
     provider: dwd-opendata
+    license: CC-BY-4.0
+    retention_days: 1
     model_family: icon
     resolution: 0.125deg
     cycles_utc: [0, 6, 12, 18]
@@ -391,6 +397,7 @@ datasets:
     format: grib2
     idx: false
     backend: direct-https
+    grid_kind: icosahedral
     mirrors: [origin]
     url_template: "https://opendata.dwd.de/weather/nwp/icon/grib/{cycle:%H}/{var_lc}/icon_global_icosahedral_single-level_{date:%Y%m%d%H}_{step:03d}_{var}.grib2.bz2"
     request_options:
@@ -484,6 +491,7 @@ datasets:
 
   rap:                                    # NOAA NODD, hourly RAP, via Herbie
     provider: noaa-nodd
+    license: PD-US-GOV
     model_family: rap
     resolution: 13km
     cycles_utc: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23]
@@ -568,6 +576,7 @@ datasets:
 
   nam:                                    # NOAA NODD, NAM 12 km CONUS, via Herbie
     provider: noaa-nodd
+    license: PD-US-GOV
     model_family: nam
     resolution: 12km
     cycles_utc: [0, 6, 12, 18]
@@ -658,6 +667,7 @@ datasets:
 
   nbm:                                    # NOAA NODD, National Blend of Models, via Herbie
     provider: noaa-nodd
+    license: PD-US-GOV
     model_family: nbm
     resolution: 13km
     cycles_utc: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23]
@@ -678,6 +688,7 @@ datasets:
 
   rrfs:                                   # NOAA NODD, Rapid Refresh Forecast System, via Herbie
     provider: noaa-nodd
+    license: PD-US-GOV
     model_family: rrfs
     resolution: 3km
     cycles_utc: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23]
@@ -757,186 +768,195 @@ datasets:
 
   gdps:                                   # ECCC, Global Deterministic Prediction System, via Herbie
     provider: eccc-msc
+    license: OGL-Canada-2.0
+    retention_days: 30
+    idx: false
     model_family: gdps
     resolution: 15km
     cycles_utc: [0, 12]
     cadence_h: 12
     step_cadence_h: 3
     horizon_h: 240
-    backend: herbie
-    mirrors: [msc]
+    backend: eccc-msc
+    url_template: "https://dd.weather.gc.ca/{date:%Y%m%d}/WXO-DD/model_gdps/15km/{cycle:%H}/{step:03d}/{date:%Y%m%d}T{cycle:%H}Z_MSC_GDPS_{var}_LatLon0.15_PT{step:03d}H.grib2"
+    mirrors: [origin]
     bands:
-      temperature_2m: ":TMP:2 m above ground:"
-      precipitation_acc: ":APCP:surface:"
-      dewpoint_2m: ":DPT:2 m above ground:"
-      relative_humidity_2m: ":RH:2 m above ground:"
-      wind_u_10m: ":UGRD:10 m above ground:"
-      wind_v_10m: ":VGRD:10 m above ground:"
-      wind_gust: ":GUST:surface:"
-      pressure_msl: ":PRMSL:mean sea level:"
-      surface_pressure: ":PRES:surface:"
-      total_cloud_cover: ":TCDC:entire atmosphere:"
-      cape: ":CAPE:surface:"
-      downward_shortwave_radiation: ":DSWRF:surface:"
-      # Pressure-level (3-D) fields — the level is encoded in the .idx regex.
-      geopotential_height_1000hPa: ":HGT:1000 mb:"
-      geopotential_height_925hPa: ":HGT:925 mb:"
-      geopotential_height_850hPa: ":HGT:850 mb:"
-      geopotential_height_700hPa: ":HGT:700 mb:"
-      geopotential_height_600hPa: ":HGT:600 mb:"
-      geopotential_height_500hPa: ":HGT:500 mb:"
-      geopotential_height_400hPa: ":HGT:400 mb:"
-      geopotential_height_300hPa: ":HGT:300 mb:"
-      geopotential_height_250hPa: ":HGT:250 mb:"
-      geopotential_height_200hPa: ":HGT:200 mb:"
-      geopotential_height_150hPa: ":HGT:150 mb:"
-      geopotential_height_100hPa: ":HGT:100 mb:"
-      geopotential_height_50hPa: ":HGT:50 mb:"
-      temperature_1000hPa: ":TMP:1000 mb:"
-      temperature_925hPa: ":TMP:925 mb:"
-      temperature_850hPa: ":TMP:850 mb:"
-      temperature_700hPa: ":TMP:700 mb:"
-      temperature_600hPa: ":TMP:600 mb:"
-      temperature_500hPa: ":TMP:500 mb:"
-      temperature_400hPa: ":TMP:400 mb:"
-      temperature_300hPa: ":TMP:300 mb:"
-      temperature_250hPa: ":TMP:250 mb:"
-      temperature_200hPa: ":TMP:200 mb:"
-      temperature_150hPa: ":TMP:150 mb:"
-      temperature_100hPa: ":TMP:100 mb:"
-      temperature_50hPa: ":TMP:50 mb:"
-      wind_u_1000hPa: ":UGRD:1000 mb:"
-      wind_u_925hPa: ":UGRD:925 mb:"
-      wind_u_850hPa: ":UGRD:850 mb:"
-      wind_u_700hPa: ":UGRD:700 mb:"
-      wind_u_600hPa: ":UGRD:600 mb:"
-      wind_u_500hPa: ":UGRD:500 mb:"
-      wind_u_400hPa: ":UGRD:400 mb:"
-      wind_u_300hPa: ":UGRD:300 mb:"
-      wind_u_250hPa: ":UGRD:250 mb:"
-      wind_u_200hPa: ":UGRD:200 mb:"
-      wind_u_150hPa: ":UGRD:150 mb:"
-      wind_u_100hPa: ":UGRD:100 mb:"
-      wind_u_50hPa: ":UGRD:50 mb:"
-      wind_v_1000hPa: ":VGRD:1000 mb:"
-      wind_v_925hPa: ":VGRD:925 mb:"
-      wind_v_850hPa: ":VGRD:850 mb:"
-      wind_v_700hPa: ":VGRD:700 mb:"
-      wind_v_600hPa: ":VGRD:600 mb:"
-      wind_v_500hPa: ":VGRD:500 mb:"
-      wind_v_400hPa: ":VGRD:400 mb:"
-      wind_v_300hPa: ":VGRD:300 mb:"
-      wind_v_250hPa: ":VGRD:250 mb:"
-      wind_v_200hPa: ":VGRD:200 mb:"
-      wind_v_150hPa: ":VGRD:150 mb:"
-      wind_v_100hPa: ":VGRD:100 mb:"
-      wind_v_50hPa: ":VGRD:50 mb:"
-      relative_humidity_1000hPa: ":RH:1000 mb:"
-      relative_humidity_925hPa: ":RH:925 mb:"
-      relative_humidity_850hPa: ":RH:850 mb:"
-      relative_humidity_700hPa: ":RH:700 mb:"
-      relative_humidity_600hPa: ":RH:600 mb:"
-      relative_humidity_500hPa: ":RH:500 mb:"
-      relative_humidity_400hPa: ":RH:400 mb:"
-      relative_humidity_300hPa: ":RH:300 mb:"
-      relative_humidity_250hPa: ":RH:250 mb:"
-      relative_humidity_200hPa: ":RH:200 mb:"
-      relative_humidity_150hPa: ":RH:150 mb:"
-      relative_humidity_100hPa: ":RH:100 mb:"
-      relative_humidity_50hPa: ":RH:50 mb:"
+      temperature_2m: "AirTemp_AGL-2m"
+      precipitation_acc: "Precip-Accum_Sfc"
+      dewpoint_2m: "DewPoint_AGL-2m"
+      relative_humidity_2m: "RelativeHumidity_AGL-2m"
+      wind_u_10m: "WindU_AGL-10m"
+      wind_v_10m: "WindV_AGL-10m"
+      wind_gust: "WindGust_AGL-10m"
+      pressure_msl: "Pressure_MSL"
+      surface_pressure: "Pressure_Sfc"
+      total_cloud_cover: "TotalCloudCover_Sfc"
+      cape: "CAPE_Sfc"
+      downward_shortwave_radiation: "DownwardShortwaveRadiationFlux-Accum_Sfc"
+      geopotential_height_1000hPa: "GeopotentialHeight_IsbL-1000"
+      geopotential_height_925hPa: "GeopotentialHeight_IsbL-0925"
+      geopotential_height_850hPa: "GeopotentialHeight_IsbL-0850"
+      geopotential_height_700hPa: "GeopotentialHeight_IsbL-0700"
+      geopotential_height_600hPa: "GeopotentialHeight_IsbL-0600"
+      geopotential_height_500hPa: "GeopotentialHeight_IsbL-0500"
+      geopotential_height_400hPa: "GeopotentialHeight_IsbL-0400"
+      geopotential_height_300hPa: "GeopotentialHeight_IsbL-0300"
+      geopotential_height_250hPa: "GeopotentialHeight_IsbL-0250"
+      geopotential_height_200hPa: "GeopotentialHeight_IsbL-0200"
+      geopotential_height_150hPa: "GeopotentialHeight_IsbL-0150"
+      geopotential_height_100hPa: "GeopotentialHeight_IsbL-0100"
+      geopotential_height_50hPa: "GeopotentialHeight_IsbL-0050"
+      temperature_1000hPa: "AirTemp_IsbL-1000"
+      temperature_925hPa: "AirTemp_IsbL-0925"
+      temperature_850hPa: "AirTemp_IsbL-0850"
+      temperature_700hPa: "AirTemp_IsbL-0700"
+      temperature_600hPa: "AirTemp_IsbL-0600"
+      temperature_500hPa: "AirTemp_IsbL-0500"
+      temperature_400hPa: "AirTemp_IsbL-0400"
+      temperature_300hPa: "AirTemp_IsbL-0300"
+      temperature_250hPa: "AirTemp_IsbL-0250"
+      temperature_200hPa: "AirTemp_IsbL-0200"
+      temperature_150hPa: "AirTemp_IsbL-0150"
+      temperature_100hPa: "AirTemp_IsbL-0100"
+      temperature_50hPa: "AirTemp_IsbL-0050"
+      wind_u_1000hPa: "WindU_IsbL-1000"
+      wind_u_925hPa: "WindU_IsbL-0925"
+      wind_u_850hPa: "WindU_IsbL-0850"
+      wind_u_700hPa: "WindU_IsbL-0700"
+      wind_u_600hPa: "WindU_IsbL-0600"
+      wind_u_500hPa: "WindU_IsbL-0500"
+      wind_u_400hPa: "WindU_IsbL-0400"
+      wind_u_300hPa: "WindU_IsbL-0300"
+      wind_u_250hPa: "WindU_IsbL-0250"
+      wind_u_200hPa: "WindU_IsbL-0200"
+      wind_u_150hPa: "WindU_IsbL-0150"
+      wind_u_100hPa: "WindU_IsbL-0100"
+      wind_u_50hPa: "WindU_IsbL-0050"
+      wind_v_1000hPa: "WindV_IsbL-1000"
+      wind_v_925hPa: "WindV_IsbL-0925"
+      wind_v_850hPa: "WindV_IsbL-0850"
+      wind_v_700hPa: "WindV_IsbL-0700"
+      wind_v_600hPa: "WindV_IsbL-0600"
+      wind_v_500hPa: "WindV_IsbL-0500"
+      wind_v_400hPa: "WindV_IsbL-0400"
+      wind_v_300hPa: "WindV_IsbL-0300"
+      wind_v_250hPa: "WindV_IsbL-0250"
+      wind_v_200hPa: "WindV_IsbL-0200"
+      wind_v_150hPa: "WindV_IsbL-0150"
+      wind_v_100hPa: "WindV_IsbL-0100"
+      wind_v_50hPa: "WindV_IsbL-0050"
+      relative_humidity_1000hPa: "RelativeHumidity_IsbL-1000"
+      relative_humidity_925hPa: "RelativeHumidity_IsbL-0925"
+      relative_humidity_850hPa: "RelativeHumidity_IsbL-0850"
+      relative_humidity_700hPa: "RelativeHumidity_IsbL-0700"
+      relative_humidity_600hPa: "RelativeHumidity_IsbL-0600"
+      relative_humidity_500hPa: "RelativeHumidity_IsbL-0500"
+      relative_humidity_400hPa: "RelativeHumidity_IsbL-0400"
+      relative_humidity_300hPa: "RelativeHumidity_IsbL-0300"
+      relative_humidity_250hPa: "RelativeHumidity_IsbL-0250"
+      relative_humidity_200hPa: "RelativeHumidity_IsbL-0200"
+      relative_humidity_150hPa: "RelativeHumidity_IsbL-0150"
+      relative_humidity_100hPa: "RelativeHumidity_IsbL-0100"
+      relative_humidity_50hPa: "RelativeHumidity_IsbL-0050"
 
   rdps:                                   # ECCC, Regional Deterministic Prediction System, via Herbie
     provider: eccc-msc
+    license: OGL-Canada-2.0
+    retention_days: 30
+    idx: false
     model_family: rdps
     resolution: 10km
     cycles_utc: [0, 6, 12, 18]
     cadence_h: 6
     step_cadence_h: 1
     horizon_h: 84
-    backend: herbie
-    mirrors: [msc]
+    backend: eccc-msc
+    url_template: "https://dd.weather.gc.ca/{date:%Y%m%d}/WXO-DD/model_rdps/10km/{cycle:%H}/{step:03d}/{date:%Y%m%d}T{cycle:%H}Z_MSC_RDPS_{var}_RLatLon0.09_PT{step:03d}H.grib2"
+    mirrors: [origin]
     bands:
-      temperature_2m: ":TMP:2 m above ground:"
-      precipitation_acc: ":APCP:surface:"
-      dewpoint_2m: ":DPT:2 m above ground:"
-      relative_humidity_2m: ":RH:2 m above ground:"
-      wind_u_10m: ":UGRD:10 m above ground:"
-      wind_v_10m: ":VGRD:10 m above ground:"
-      wind_gust: ":GUST:surface:"
-      pressure_msl: ":PRMSL:mean sea level:"
-      surface_pressure: ":PRES:surface:"
-      total_cloud_cover: ":TCDC:entire atmosphere:"
-      cape: ":CAPE:surface:"
-      downward_shortwave_radiation: ":DSWRF:surface:"
-      # Pressure-level (3-D) fields — the level is encoded in the .idx regex.
-      geopotential_height_1000hPa: ":HGT:1000 mb:"
-      geopotential_height_925hPa: ":HGT:925 mb:"
-      geopotential_height_850hPa: ":HGT:850 mb:"
-      geopotential_height_700hPa: ":HGT:700 mb:"
-      geopotential_height_600hPa: ":HGT:600 mb:"
-      geopotential_height_500hPa: ":HGT:500 mb:"
-      geopotential_height_400hPa: ":HGT:400 mb:"
-      geopotential_height_300hPa: ":HGT:300 mb:"
-      geopotential_height_250hPa: ":HGT:250 mb:"
-      geopotential_height_200hPa: ":HGT:200 mb:"
-      geopotential_height_150hPa: ":HGT:150 mb:"
-      geopotential_height_100hPa: ":HGT:100 mb:"
-      geopotential_height_50hPa: ":HGT:50 mb:"
-      temperature_1000hPa: ":TMP:1000 mb:"
-      temperature_925hPa: ":TMP:925 mb:"
-      temperature_850hPa: ":TMP:850 mb:"
-      temperature_700hPa: ":TMP:700 mb:"
-      temperature_600hPa: ":TMP:600 mb:"
-      temperature_500hPa: ":TMP:500 mb:"
-      temperature_400hPa: ":TMP:400 mb:"
-      temperature_300hPa: ":TMP:300 mb:"
-      temperature_250hPa: ":TMP:250 mb:"
-      temperature_200hPa: ":TMP:200 mb:"
-      temperature_150hPa: ":TMP:150 mb:"
-      temperature_100hPa: ":TMP:100 mb:"
-      temperature_50hPa: ":TMP:50 mb:"
-      wind_u_1000hPa: ":UGRD:1000 mb:"
-      wind_u_925hPa: ":UGRD:925 mb:"
-      wind_u_850hPa: ":UGRD:850 mb:"
-      wind_u_700hPa: ":UGRD:700 mb:"
-      wind_u_600hPa: ":UGRD:600 mb:"
-      wind_u_500hPa: ":UGRD:500 mb:"
-      wind_u_400hPa: ":UGRD:400 mb:"
-      wind_u_300hPa: ":UGRD:300 mb:"
-      wind_u_250hPa: ":UGRD:250 mb:"
-      wind_u_200hPa: ":UGRD:200 mb:"
-      wind_u_150hPa: ":UGRD:150 mb:"
-      wind_u_100hPa: ":UGRD:100 mb:"
-      wind_u_50hPa: ":UGRD:50 mb:"
-      wind_v_1000hPa: ":VGRD:1000 mb:"
-      wind_v_925hPa: ":VGRD:925 mb:"
-      wind_v_850hPa: ":VGRD:850 mb:"
-      wind_v_700hPa: ":VGRD:700 mb:"
-      wind_v_600hPa: ":VGRD:600 mb:"
-      wind_v_500hPa: ":VGRD:500 mb:"
-      wind_v_400hPa: ":VGRD:400 mb:"
-      wind_v_300hPa: ":VGRD:300 mb:"
-      wind_v_250hPa: ":VGRD:250 mb:"
-      wind_v_200hPa: ":VGRD:200 mb:"
-      wind_v_150hPa: ":VGRD:150 mb:"
-      wind_v_100hPa: ":VGRD:100 mb:"
-      wind_v_50hPa: ":VGRD:50 mb:"
-      relative_humidity_1000hPa: ":RH:1000 mb:"
-      relative_humidity_925hPa: ":RH:925 mb:"
-      relative_humidity_850hPa: ":RH:850 mb:"
-      relative_humidity_700hPa: ":RH:700 mb:"
-      relative_humidity_600hPa: ":RH:600 mb:"
-      relative_humidity_500hPa: ":RH:500 mb:"
-      relative_humidity_400hPa: ":RH:400 mb:"
-      relative_humidity_300hPa: ":RH:300 mb:"
-      relative_humidity_250hPa: ":RH:250 mb:"
-      relative_humidity_200hPa: ":RH:200 mb:"
-      relative_humidity_150hPa: ":RH:150 mb:"
-      relative_humidity_100hPa: ":RH:100 mb:"
-      relative_humidity_50hPa: ":RH:50 mb:"
+      temperature_2m: "AirTemp_AGL-2m"
+      precipitation_acc: "Precip-Accum_Sfc"
+      dewpoint_2m: "DewPoint_AGL-2m"
+      relative_humidity_2m: "RelativeHumidity_AGL-2m"
+      wind_u_10m: "WindU_AGL-10m"
+      wind_v_10m: "WindV_AGL-10m"
+      wind_gust: "WindGust_AGL-10m"
+      pressure_msl: "Pressure_MSL"
+      surface_pressure: "Pressure_Sfc"
+      total_cloud_cover: "TotalCloudCover_Sfc"
+      cape: "CAPE_Sfc"
+      downward_shortwave_radiation: "DownwardShortwaveRadiationFlux-Accum_Sfc"
+      geopotential_height_1000hPa: "GeopotentialHeight_IsbL-1000"
+      geopotential_height_925hPa: "GeopotentialHeight_IsbL-0925"
+      geopotential_height_850hPa: "GeopotentialHeight_IsbL-0850"
+      geopotential_height_700hPa: "GeopotentialHeight_IsbL-0700"
+      geopotential_height_600hPa: "GeopotentialHeight_IsbL-0600"
+      geopotential_height_500hPa: "GeopotentialHeight_IsbL-0500"
+      geopotential_height_400hPa: "GeopotentialHeight_IsbL-0400"
+      geopotential_height_300hPa: "GeopotentialHeight_IsbL-0300"
+      geopotential_height_250hPa: "GeopotentialHeight_IsbL-0250"
+      geopotential_height_200hPa: "GeopotentialHeight_IsbL-0200"
+      geopotential_height_150hPa: "GeopotentialHeight_IsbL-0150"
+      geopotential_height_100hPa: "GeopotentialHeight_IsbL-0100"
+      geopotential_height_50hPa: "GeopotentialHeight_IsbL-0050"
+      temperature_1000hPa: "AirTemp_IsbL-1000"
+      temperature_925hPa: "AirTemp_IsbL-0925"
+      temperature_850hPa: "AirTemp_IsbL-0850"
+      temperature_700hPa: "AirTemp_IsbL-0700"
+      temperature_600hPa: "AirTemp_IsbL-0600"
+      temperature_500hPa: "AirTemp_IsbL-0500"
+      temperature_400hPa: "AirTemp_IsbL-0400"
+      temperature_300hPa: "AirTemp_IsbL-0300"
+      temperature_250hPa: "AirTemp_IsbL-0250"
+      temperature_200hPa: "AirTemp_IsbL-0200"
+      temperature_150hPa: "AirTemp_IsbL-0150"
+      temperature_100hPa: "AirTemp_IsbL-0100"
+      temperature_50hPa: "AirTemp_IsbL-0050"
+      wind_u_1000hPa: "WindU_IsbL-1000"
+      wind_u_925hPa: "WindU_IsbL-0925"
+      wind_u_850hPa: "WindU_IsbL-0850"
+      wind_u_700hPa: "WindU_IsbL-0700"
+      wind_u_600hPa: "WindU_IsbL-0600"
+      wind_u_500hPa: "WindU_IsbL-0500"
+      wind_u_400hPa: "WindU_IsbL-0400"
+      wind_u_300hPa: "WindU_IsbL-0300"
+      wind_u_250hPa: "WindU_IsbL-0250"
+      wind_u_200hPa: "WindU_IsbL-0200"
+      wind_u_150hPa: "WindU_IsbL-0150"
+      wind_u_100hPa: "WindU_IsbL-0100"
+      wind_u_50hPa: "WindU_IsbL-0050"
+      wind_v_1000hPa: "WindV_IsbL-1000"
+      wind_v_925hPa: "WindV_IsbL-0925"
+      wind_v_850hPa: "WindV_IsbL-0850"
+      wind_v_700hPa: "WindV_IsbL-0700"
+      wind_v_600hPa: "WindV_IsbL-0600"
+      wind_v_500hPa: "WindV_IsbL-0500"
+      wind_v_400hPa: "WindV_IsbL-0400"
+      wind_v_300hPa: "WindV_IsbL-0300"
+      wind_v_250hPa: "WindV_IsbL-0250"
+      wind_v_200hPa: "WindV_IsbL-0200"
+      wind_v_150hPa: "WindV_IsbL-0150"
+      wind_v_100hPa: "WindV_IsbL-0100"
+      wind_v_50hPa: "WindV_IsbL-0050"
+      relative_humidity_1000hPa: "RelativeHumidity_IsbL-1000"
+      relative_humidity_925hPa: "RelativeHumidity_IsbL-0925"
+      relative_humidity_850hPa: "RelativeHumidity_IsbL-0850"
+      relative_humidity_700hPa: "RelativeHumidity_IsbL-0700"
+      relative_humidity_600hPa: "RelativeHumidity_IsbL-0600"
+      relative_humidity_500hPa: "RelativeHumidity_IsbL-0500"
+      relative_humidity_400hPa: "RelativeHumidity_IsbL-0400"
+      relative_humidity_300hPa: "RelativeHumidity_IsbL-0300"
+      relative_humidity_250hPa: "RelativeHumidity_IsbL-0250"
+      relative_humidity_200hPa: "RelativeHumidity_IsbL-0200"
+      relative_humidity_150hPa: "RelativeHumidity_IsbL-0150"
+      relative_humidity_100hPa: "RelativeHumidity_IsbL-0100"
+      relative_humidity_50hPa: "RelativeHumidity_IsbL-0050"
 
   hrdps:                                  # ECCC, High-Resolution Deterministic Prediction System, via Herbie
     provider: eccc-msc
+    license: OGL-Canada-2.0
+    retention_days: 30
+    idx: false
     model_family: hrdps
     resolution: 2.5km
     cycles_utc: [0, 6, 12, 18]
@@ -944,90 +964,132 @@ datasets:
     step_cadence_h: 1
     horizon_h: 48
     product: continental
-    backend: herbie
-    mirrors: [msc]
+    backend: eccc-msc
+    url_template: "https://dd.weather.gc.ca/{date:%Y%m%d}/WXO-DD/model_hrdps/continental/2.5km/{cycle:%H}/{step:03d}/{date:%Y%m%d}T{cycle:%H}Z_MSC_HRDPS-WEonG_{var}_RLatLon0.0225_PT{step:03d}H.grib2"
+    mirrors: [origin]
     bands:
-      temperature_2m: ":TMP:2 m above ground:"
-      precipitation_acc: ":APCP:surface:"
-      dewpoint_2m: ":DPT:2 m above ground:"
-      relative_humidity_2m: ":RH:2 m above ground:"
-      wind_u_10m: ":UGRD:10 m above ground:"
-      wind_v_10m: ":VGRD:10 m above ground:"
-      wind_gust: ":GUST:surface:"
-      pressure_msl: ":PRMSL:mean sea level:"
-      surface_pressure: ":PRES:surface:"
-      total_cloud_cover: ":TCDC:entire atmosphere:"
-      cape: ":CAPE:surface:"
-      downward_shortwave_radiation: ":DSWRF:surface:"
-      # Pressure-level (3-D) fields — the level is encoded in the .idx regex.
-      geopotential_height_1000hPa: ":HGT:1000 mb:"
-      geopotential_height_925hPa: ":HGT:925 mb:"
-      geopotential_height_850hPa: ":HGT:850 mb:"
-      geopotential_height_700hPa: ":HGT:700 mb:"
-      geopotential_height_600hPa: ":HGT:600 mb:"
-      geopotential_height_500hPa: ":HGT:500 mb:"
-      geopotential_height_400hPa: ":HGT:400 mb:"
-      geopotential_height_300hPa: ":HGT:300 mb:"
-      geopotential_height_250hPa: ":HGT:250 mb:"
-      geopotential_height_200hPa: ":HGT:200 mb:"
-      geopotential_height_150hPa: ":HGT:150 mb:"
-      geopotential_height_100hPa: ":HGT:100 mb:"
-      geopotential_height_50hPa: ":HGT:50 mb:"
-      temperature_1000hPa: ":TMP:1000 mb:"
-      temperature_925hPa: ":TMP:925 mb:"
-      temperature_850hPa: ":TMP:850 mb:"
-      temperature_700hPa: ":TMP:700 mb:"
-      temperature_600hPa: ":TMP:600 mb:"
-      temperature_500hPa: ":TMP:500 mb:"
-      temperature_400hPa: ":TMP:400 mb:"
-      temperature_300hPa: ":TMP:300 mb:"
-      temperature_250hPa: ":TMP:250 mb:"
-      temperature_200hPa: ":TMP:200 mb:"
-      temperature_150hPa: ":TMP:150 mb:"
-      temperature_100hPa: ":TMP:100 mb:"
-      temperature_50hPa: ":TMP:50 mb:"
-      wind_u_1000hPa: ":UGRD:1000 mb:"
-      wind_u_925hPa: ":UGRD:925 mb:"
-      wind_u_850hPa: ":UGRD:850 mb:"
-      wind_u_700hPa: ":UGRD:700 mb:"
-      wind_u_600hPa: ":UGRD:600 mb:"
-      wind_u_500hPa: ":UGRD:500 mb:"
-      wind_u_400hPa: ":UGRD:400 mb:"
-      wind_u_300hPa: ":UGRD:300 mb:"
-      wind_u_250hPa: ":UGRD:250 mb:"
-      wind_u_200hPa: ":UGRD:200 mb:"
-      wind_u_150hPa: ":UGRD:150 mb:"
-      wind_u_100hPa: ":UGRD:100 mb:"
-      wind_u_50hPa: ":UGRD:50 mb:"
-      wind_v_1000hPa: ":VGRD:1000 mb:"
-      wind_v_925hPa: ":VGRD:925 mb:"
-      wind_v_850hPa: ":VGRD:850 mb:"
-      wind_v_700hPa: ":VGRD:700 mb:"
-      wind_v_600hPa: ":VGRD:600 mb:"
-      wind_v_500hPa: ":VGRD:500 mb:"
-      wind_v_400hPa: ":VGRD:400 mb:"
-      wind_v_300hPa: ":VGRD:300 mb:"
-      wind_v_250hPa: ":VGRD:250 mb:"
-      wind_v_200hPa: ":VGRD:200 mb:"
-      wind_v_150hPa: ":VGRD:150 mb:"
-      wind_v_100hPa: ":VGRD:100 mb:"
-      wind_v_50hPa: ":VGRD:50 mb:"
-      relative_humidity_1000hPa: ":RH:1000 mb:"
-      relative_humidity_925hPa: ":RH:925 mb:"
-      relative_humidity_850hPa: ":RH:850 mb:"
-      relative_humidity_700hPa: ":RH:700 mb:"
-      relative_humidity_600hPa: ":RH:600 mb:"
-      relative_humidity_500hPa: ":RH:500 mb:"
-      relative_humidity_400hPa: ":RH:400 mb:"
-      relative_humidity_300hPa: ":RH:300 mb:"
-      relative_humidity_250hPa: ":RH:250 mb:"
-      relative_humidity_200hPa: ":RH:200 mb:"
-      relative_humidity_150hPa: ":RH:150 mb:"
-      relative_humidity_100hPa: ":RH:100 mb:"
-      relative_humidity_50hPa: ":RH:50 mb:"
+      temperature_2m: "AirTemp_AGL-2m"
+      precipitation_acc: "Precip-Accum_Sfc"
+      dewpoint_2m: "DewPoint_AGL-2m"
+      relative_humidity_2m: "RelativeHumidity_AGL-2m"
+      wind_u_10m: "WindU_AGL-10m"
+      wind_v_10m: "WindV_AGL-10m"
+      wind_gust: "WindGust_AGL-10m"
+      pressure_msl: "Pressure_MSL"
+      surface_pressure: "Pressure_Sfc"
+      total_cloud_cover: "TotalCloudCover_Sfc"
+      cape: "CAPE_Sfc"
+      downward_shortwave_radiation: "DownwardShortwaveRadiationFlux-Accum_Sfc"
+      geopotential_height_1000hPa: "GeopotentialHeight_IsbL-1000"
+      geopotential_height_925hPa: "GeopotentialHeight_IsbL-0925"
+      geopotential_height_850hPa: "GeopotentialHeight_IsbL-0850"
+      geopotential_height_700hPa: "GeopotentialHeight_IsbL-0700"
+      geopotential_height_600hPa: "GeopotentialHeight_IsbL-0600"
+      geopotential_height_500hPa: "GeopotentialHeight_IsbL-0500"
+      geopotential_height_400hPa: "GeopotentialHeight_IsbL-0400"
+      geopotential_height_300hPa: "GeopotentialHeight_IsbL-0300"
+      geopotential_height_250hPa: "GeopotentialHeight_IsbL-0250"
+      geopotential_height_200hPa: "GeopotentialHeight_IsbL-0200"
+      geopotential_height_150hPa: "GeopotentialHeight_IsbL-0150"
+      geopotential_height_100hPa: "GeopotentialHeight_IsbL-0100"
+      geopotential_height_50hPa: "GeopotentialHeight_IsbL-0050"
+      temperature_1000hPa: "AirTemp_IsbL-1000"
+      temperature_925hPa: "AirTemp_IsbL-0925"
+      temperature_850hPa: "AirTemp_IsbL-0850"
+      temperature_700hPa: "AirTemp_IsbL-0700"
+      temperature_600hPa: "AirTemp_IsbL-0600"
+      temperature_500hPa: "AirTemp_IsbL-0500"
+      temperature_400hPa: "AirTemp_IsbL-0400"
+      temperature_300hPa: "AirTemp_IsbL-0300"
+      temperature_250hPa: "AirTemp_IsbL-0250"
+      temperature_200hPa: "AirTemp_IsbL-0200"
+      temperature_150hPa: "AirTemp_IsbL-0150"
+      temperature_100hPa: "AirTemp_IsbL-0100"
+      temperature_50hPa: "AirTemp_IsbL-0050"
+      wind_u_1000hPa: "WindU_IsbL-1000"
+      wind_u_925hPa: "WindU_IsbL-0925"
+      wind_u_850hPa: "WindU_IsbL-0850"
+      wind_u_700hPa: "WindU_IsbL-0700"
+      wind_u_600hPa: "WindU_IsbL-0600"
+      wind_u_500hPa: "WindU_IsbL-0500"
+      wind_u_400hPa: "WindU_IsbL-0400"
+      wind_u_300hPa: "WindU_IsbL-0300"
+      wind_u_250hPa: "WindU_IsbL-0250"
+      wind_u_200hPa: "WindU_IsbL-0200"
+      wind_u_150hPa: "WindU_IsbL-0150"
+      wind_u_100hPa: "WindU_IsbL-0100"
+      wind_u_50hPa: "WindU_IsbL-0050"
+      wind_v_1000hPa: "WindV_IsbL-1000"
+      wind_v_925hPa: "WindV_IsbL-0925"
+      wind_v_850hPa: "WindV_IsbL-0850"
+      wind_v_700hPa: "WindV_IsbL-0700"
+      wind_v_600hPa: "WindV_IsbL-0600"
+      wind_v_500hPa: "WindV_IsbL-0500"
+      wind_v_400hPa: "WindV_IsbL-0400"
+      wind_v_300hPa: "WindV_IsbL-0300"
+      wind_v_250hPa: "WindV_IsbL-0250"
+      wind_v_200hPa: "WindV_IsbL-0200"
+      wind_v_150hPa: "WindV_IsbL-0150"
+      wind_v_100hPa: "WindV_IsbL-0100"
+      wind_v_50hPa: "WindV_IsbL-0050"
+      relative_humidity_1000hPa: "RelativeHumidity_IsbL-1000"
+      relative_humidity_925hPa: "RelativeHumidity_IsbL-0925"
+      relative_humidity_850hPa: "RelativeHumidity_IsbL-0850"
+      relative_humidity_700hPa: "RelativeHumidity_IsbL-0700"
+      relative_humidity_600hPa: "RelativeHumidity_IsbL-0600"
+      relative_humidity_500hPa: "RelativeHumidity_IsbL-0500"
+      relative_humidity_400hPa: "RelativeHumidity_IsbL-0400"
+      relative_humidity_300hPa: "RelativeHumidity_IsbL-0300"
+      relative_humidity_250hPa: "RelativeHumidity_IsbL-0250"
+      relative_humidity_200hPa: "RelativeHumidity_IsbL-0200"
+      relative_humidity_150hPa: "RelativeHumidity_IsbL-0150"
+      relative_humidity_100hPa: "RelativeHumidity_IsbL-0100"
+      relative_humidity_50hPa: "RelativeHumidity_IsbL-0050"
+
+  geps:                                   # ECCC, Global Ensemble Prediction System (21 members), direct Datamart
+    provider: eccc-msc
+    license: OGL-Canada-2.0
+    retention_days: 14
+    model_family: geps
+    resolution: 0.5deg
+    cycles_utc: [0, 12]
+    cadence_h: 12
+    step_cadence_h: 3
+    horizon_h: 384
+    format: grib2
+    idx: false
+    backend: eccc-msc
+    mirrors: [origin]
+    # Datamart GEPS raw publishes one file per (cycle, step, variable) with all
+    # 21 ensemble members (control + 20 perturbations) inside; the legacy CMC
+    # token convention is `VAR_<LEVEL_KIND>_<LEVEL_VALUE>` (TMP_TGL_2m, HGT_ISBL_0500).
+    url_template: "https://dd.weather.gc.ca/{date:%Y%m%d}/WXO-DD/ensemble/geps/grib2/raw/{cycle:%H}/{step:03d}/CMC_geps-raw_{var}_latlon0p5x0p5_{date:%Y%m%d}{cycle:%H}_P{step:03d}_allmbrs.grib2"
+    # members: empty -- the raw file contains every member already; no per-member
+    # fetch axis. Downstream callers extract individual members from the GRIB.
+    bands:
+      temperature_2m: "TMP_TGL_2m"
+      relative_humidity_2m: "RH_TGL_2m"
+      wind_u_10m: "UGRD_TGL_10m"
+      wind_v_10m: "VGRD_TGL_10m"
+      precipitation_acc: "APCP_SFC_0"
+      pressure_msl: "PRMSL_MSL_0"
+      surface_pressure: "PRES_SFC_0"
+      total_cloud_cover: "TCDC_SFC_0"
+      cape: "CAPE_SFC_0"
+      downward_shortwave_radiation: "DSWRF_SFC_0"
+      # Pressure-level (3-D) fields - common levels only; extend via curate.
+      geopotential_height_1000hPa: "HGT_ISBL_1000"
+      geopotential_height_850hPa: "HGT_ISBL_0850"
+      geopotential_height_500hPa: "HGT_ISBL_0500"
+      geopotential_height_250hPa: "HGT_ISBL_0250"
+      temperature_850hPa: "TMP_ISBL_0850"
+      temperature_500hPa: "TMP_ISBL_0500"
+      temperature_250hPa: "TMP_ISBL_0250"
 
   icon-eu:                                # DWD, ICON-EU regular lat-lon (croppable), direct HTTPS
     provider: dwd-opendata
+    license: CC-BY-4.0
+    retention_days: 1
     model_family: icon-eu
     resolution: 0.0625deg
     cycles_utc: [0, 6, 12, 18]
@@ -1122,6 +1184,8 @@ datasets:
 
   icon-d2:                                # DWD, ICON-D2 native icosahedral (raw fetch; not croppable), direct HTTPS
     provider: dwd-opendata
+    license: CC-BY-4.0
+    retention_days: 1
     model_family: icon-d2
     resolution: 2.2km
     cycles_utc: [0, 3, 6, 9, 12, 15, 18, 21]
@@ -1131,6 +1195,7 @@ datasets:
     format: grib2
     idx: false
     backend: direct-https
+    grid_kind: icosahedral
     mirrors: [origin]
     # ICON-D2 single-level files are icosahedral (like icon-global) and use a
     # lowercase var token in the filename — raw download works; crop does not.
@@ -1218,6 +1283,7 @@ datasets:
 
   ens:                                    # ECMWF Open Data, IFS ENS control forecast
     provider: ecmwf-opendata
+    license: CC-BY-4.0
     model_family: ens
     resolution: 0.25deg
     cycles_utc: [0, 6, 12, 18]
@@ -1310,6 +1376,7 @@ datasets:
 
   aifs:                                   # ECMWF Open Data, AIFS (data-driven), single model
     provider: ecmwf-opendata
+    license: CC-BY-4.0
     model_family: aifs
     resolution: 0.25deg
     cycles_utc: [0, 6, 12, 18]
@@ -1405,6 +1472,7 @@ datasets:
 
   rtma:                                   # NOAA, Real-Time Mesoscale Analysis (2.5 km CONUS), via Herbie
     provider: noaa-nodd
+    license: PD-US-GOV
     model_family: rtma
     resolution: 2.5km
     cycles_utc: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23]
@@ -1423,6 +1491,7 @@ datasets:
 
   urma:                                   # NOAA, Un-Restricted Mesoscale Analysis (2.5 km CONUS), via Herbie
     provider: noaa-nodd
+    license: PD-US-GOV
     model_family: urma
     resolution: 2.5km
     cycles_utc: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23]
@@ -1441,6 +1510,7 @@ datasets:
 
   hiresw-arw:                             # NOAA, High-Resolution Window ARW 2.5 km CONUS, via Herbie
     provider: noaa-nodd
+    license: PD-US-GOV
     model_family: hiresw
     resolution: 2.5km
     cycles_utc: [0, 12]
@@ -1533,6 +1603,7 @@ datasets:
 
   href:                                   # NOAA, High Resolution Ensemble Forecast (mean), via Herbie
     provider: noaa-nodd
+    license: PD-US-GOV
     model_family: href
     resolution: 3km
     cycles_utc: [0, 6, 12, 18]
@@ -1630,6 +1701,8 @@ datasets:
 
   arpege-world:                           # Météo-France ARPEGE global 0.25°, WCS API
     provider: meteofrance
+    license: Etalab-2.0
+    retention_days: 14
     model_family: arpege
     resolution: 0.25deg
     cycles_utc: [0, 6, 12, 18]
@@ -1722,6 +1795,8 @@ datasets:
 
   arome-france:                           # Météo-France AROME high-res France 0.025°, WCS API
     provider: meteofrance
+    license: Etalab-2.0
+    retention_days: 14
     model_family: arome
     resolution: 0.025deg
     cycles_utc: [0, 3, 6, 9, 12, 15, 18, 21]
@@ -1814,6 +1889,8 @@ datasets:
 
   icon-eps:                                  # DWD ICON-EPS ensemble (all members per file; icosahedral, raw; surface-only)
     provider: dwd-opendata
+    license: CC-BY-4.0
+    retention_days: 1
     model_family: icon-eps
     cycles_utc: [0, 6, 12, 18]
     step_cadence_h: 1
@@ -1821,6 +1898,7 @@ datasets:
     format: grib2
     idx: false
     backend: direct-https
+    grid_kind: icosahedral
     mirrors: [origin]
     url_template: "https://opendata.dwd.de/weather/nwp/icon-eps/grib/{cycle:%H}/{var_lc}/icon-eps_global_icosahedral_single-level_{date:%Y%m%d%H}_{step:03d}_{var_lc}.grib2.bz2"
     bands:
@@ -1835,6 +1913,8 @@ datasets:
       total_cloud_cover: clct
   icon-eu-eps:                                  # DWD ICON-EPS ensemble (all members per file; icosahedral, raw; surface-only)
     provider: dwd-opendata
+    license: CC-BY-4.0
+    retention_days: 1
     model_family: icon-eu-eps
     cycles_utc: [0, 6, 12, 18]
     step_cadence_h: 1
@@ -1842,6 +1922,7 @@ datasets:
     format: grib2
     idx: false
     backend: direct-https
+    grid_kind: icosahedral
     mirrors: [origin]
     url_template: "https://opendata.dwd.de/weather/nwp/icon-eu-eps/grib/{cycle:%H}/{var_lc}/icon-eu-eps_europe_icosahedral_single-level_{date:%Y%m%d%H}_{step:03d}_{var_lc}.grib2.bz2"
     bands:
@@ -1856,6 +1937,8 @@ datasets:
       total_cloud_cover: clct
   icon-d2-eps:                                  # DWD ICON-EPS ensemble (all members per file; icosahedral, raw; surface-only)
     provider: dwd-opendata
+    license: CC-BY-4.0
+    retention_days: 1
     model_family: icon-d2-eps
     cycles_utc: [0, 3, 6, 9, 12, 15, 18, 21]
     step_cadence_h: 1
@@ -1863,6 +1946,7 @@ datasets:
     format: grib2
     idx: false
     backend: direct-https
+    grid_kind: icosahedral
     mirrors: [origin]
     url_template: "https://opendata.dwd.de/weather/nwp/icon-d2-eps/grib/{cycle:%H}/{var_lc}/icon-d2-eps_germany_icosahedral_single-level_{date:%Y%m%d%H}_{step:03d}_2d_{var_lc}.grib2.bz2"
     bands:
@@ -1877,6 +1961,7 @@ datasets:
       total_cloud_cover: clct
   nam-conusnest:                                  # NAM 5 km CONUS nest
     provider: noaa-nodd
+    license: PD-US-GOV
     model_family: nam
     cycles_utc: [0, 6, 12, 18]
     step_cadence_h: 1
@@ -1963,6 +2048,7 @@ datasets:
       relative_humidity_50hPa: ":RH:50 mb:"
   hiresw-fv3:                                  # HiResW FV3 2.5 km CONUS
     provider: noaa-nodd
+    license: PD-US-GOV
     model_family: hiresw
     cycles_utc: [0, 12]
     step_cadence_h: 1
@@ -2051,6 +2137,7 @@ datasets:
       relative_humidity_50hPa: ":RH:50 mb:"
   nbm-ak:                                  # National Blend - Alaska
     provider: noaa-nodd
+    license: PD-US-GOV
     model_family: nbm
     cycles_utc: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23]
     step_cadence_h: 1
@@ -2067,6 +2154,7 @@ datasets:
       downward_shortwave_radiation: ":DSWRF:surface:"
   nbm-hi:                                  # National Blend - Hawaii
     provider: noaa-nodd
+    license: PD-US-GOV
     model_family: nbm
     cycles_utc: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23]
     step_cadence_h: 1
@@ -2083,6 +2171,7 @@ datasets:
       downward_shortwave_radiation: ":DSWRF:surface:"
   nbm-pr:                                  # National Blend - Puerto Rico
     provider: noaa-nodd
+    license: PD-US-GOV
     model_family: nbm
     cycles_utc: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23]
     step_cadence_h: 1
@@ -2099,6 +2188,7 @@ datasets:
       downward_shortwave_radiation: ":DSWRF:surface:"
   ens-mean:                                  # ECMWF ENS ensemble mean
     provider: ecmwf-opendata
+    license: CC-BY-4.0
     model_family: ens-mean
     cycles_utc: [0, 6, 12, 18]
     step_cadence_h: 3
@@ -2186,6 +2276,7 @@ datasets:
       relative_humidity_50hPa: "r@50"
   ens-spread:                                  # ECMWF ENS ensemble spread
     provider: ecmwf-opendata
+    license: CC-BY-4.0
     model_family: ens-spread
     cycles_utc: [0, 6, 12, 18]
     step_cadence_h: 3

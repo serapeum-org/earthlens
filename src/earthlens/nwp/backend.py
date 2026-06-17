@@ -25,6 +25,7 @@ the `(cycle, step)` stack (`C6`).
 from __future__ import annotations
 
 import datetime as dt
+import warnings
 from pathlib import Path
 from typing import TYPE_CHECKING
 
@@ -45,6 +46,7 @@ from earthlens.nwp._helpers import (
     parse_cog_valid_time,
     window_labels,
 )
+from earthlens.nwp._warnings import RetentionWarning
 from earthlens.nwp.catalog import KNOWN_BACKENDS, Catalog, NWPModel
 from earthlens.nwp.centres import resolve_centre
 
@@ -153,6 +155,7 @@ class NWP(AbstractDataSource):
             fmt=fmt,
             path=path,
         )
+        self._warn_retention()
 
     def _resolve_models(
         self, variables: dict[str, list[str]]
@@ -188,6 +191,43 @@ class NWP(AbstractDataSource):
                 )
             resolved.append((model_key, model, list(params)))
         return resolved
+
+    def _warn_retention(self) -> None:
+        """Emit `RetentionWarning` for any request older than a model's window.
+
+        Iterates `self._requests` once per construction; a model row with
+        `retention_days = None` is treated as archival and is silent. The
+        cutoff is computed in naive UTC against `self.time.start_date` so
+        the comparison matches the catalog's `start` / `end` parsing.
+
+        The warning message renders both `start` and `cutoff` to the hour
+        (`timespec='hours'`) rather than to the day, so a same-day
+        sub-window failure reads as "older than 2026-06-16T14:00" rather
+        than the ambiguous "older than 2026-06-16".
+
+        Stacklevel attribution: 3 frames is correct for a direct
+        `NWP(...)` call (1=this method, 2=`__init__`, 3=caller). The
+        :class:`~earthlens.EarthLens` facade adds one frame, so a
+        facade-route warning is attributed to `earthlens.py`; users
+        wanting a precise call-site should filter on
+        `category=RetentionWarning` rather than module.
+        """
+        cutoff_base = dt.datetime.now(dt.UTC).replace(tzinfo=None)
+        start = self.time.start_date
+        for model_key, model, _params in self._requests:
+            window = model.retention_days
+            if window is None:
+                continue
+            cutoff = cutoff_base - dt.timedelta(days=window)
+            if start < cutoff:
+                warnings.warn(
+                    f"{model_key!r} retains ~{window} day(s); requested "
+                    f"start {start.isoformat(timespec='hours')} is older than "
+                    f"the retention cutoff at {cutoff.isoformat(timespec='hours')} "
+                    "UTC — expect empty results.",
+                    RetentionWarning,
+                    stacklevel=3,
+                )
 
     def _initialize(self):
         """No-op auth hook — every MVP centre is an open bucket.
@@ -579,6 +619,25 @@ class NWP(AbstractDataSource):
                 f"got {sorted(model_keys)}. Different models have different "
                 "native grids and cannot be co-registered into one stack — "
                 "issue one request per model."
+            )
+        # The only model row that is not a regular lat/lon raster is ICON
+        # global on its native icosahedral grid (DWD `icon_global_icosahedral_…`
+        # URL pattern). The shared COG stack reducer assumes co-registered
+        # rasters, so refuse the aggregation explicitly here rather than letting
+        # pyramids silently mis-grid an unstructured layout (the C4 / M12
+        # icosahedral guard).
+        only_key, only_model, _ = self._requests[0]
+        # `grid_kind` is the declarative source of truth for whether a row
+        # is co-registerable into a DatasetCollection stack. The catalog
+        # tags every icosahedral DWD ICON row (icon-global, icon-d2,
+        # icon-eps, icon-eu-eps, icon-d2-eps); every other row defaults to
+        # `"regular-latlon"`.
+        if only_model.grid_kind == "icosahedral":
+            raise NotImplementedError(
+                f"NWP aggregate: {only_key!r} is on an icosahedral grid "
+                "(not a regular lat/lon raster); aggregation is not "
+                "supported. Request a griddable model (ICON-EU, or a "
+                "regridded global feed) instead."
             )
         from pyramids.dataset import Dataset, DatasetCollection
         from pyramids.dataset.cog import write_cog
