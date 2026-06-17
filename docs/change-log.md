@@ -1,5 +1,12 @@
 # Change Log
 
+## 0.9.0 (2026-06-17)
+
+### Feat
+
+- **stac**: add 5 new STAC endpoints (DEAfrica, DEA, VEDA, USGS LandsatLook, Brazil Data Cube) (#425)
+- **nwp**: harden the shipped nwp/nwm backends  (#426)
+
 ## 0.8.0 (2026-06-16)
 
 ### Feat
