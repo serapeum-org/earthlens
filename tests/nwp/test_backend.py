@@ -491,6 +491,46 @@ class TestAggregate:
         )
         with pytest.raises(NotImplementedError, match="icosahedral"):
             b._aggregate([tmp_path / "icon-icos_2024060100_f000.tif"], self._config())
+        # The error must not name `icon-d2` as an alternative — `icon-d2`'s
+        # own catalog row carries an `icosahedral` URL and would re-fail.
+        with pytest.raises(NotImplementedError) as excinfo:
+            b._aggregate([tmp_path / "icon-icos_2024060100_f000.tif"], self._config())
+        assert "ICON-D2" not in str(excinfo.value)
+
+    def test_pl_url_template_icosahedral_also_rejected(self, tmp_path):
+        """A regular-lat-lon `url_template` but icosahedral `pl_url_template` still fails."""
+        from earthlens.nwp import NWP, Catalog, NWPModel
+
+        cat = Catalog(
+            datasets={
+                "mixed-grid": NWPModel(
+                    provider="dwd-opendata",
+                    backend="direct-https",
+                    cycles_utc=[0, 12],
+                    horizon_h=48,
+                    idx=False,
+                    mirrors=["origin"],
+                    url_template="https://example.test/{var}_latlon.grib2",
+                    request_options={
+                        "pl_url_template": (
+                            "https://example.test/icon_global_icosahedral_pl_{var}.grib2"
+                        )
+                    },
+                    bands={"temperature_2m": "T_2M"},
+                ),
+            }
+        )
+        b = NWP(
+            start="2024-06-01",
+            end="2024-06-01",
+            variables={"mixed-grid": ["temperature_2m"]},
+            lat_lim=[40, 45],
+            lon_lim=[-80, -75],
+            path=str(tmp_path),
+            catalog=cat,
+        )
+        with pytest.raises(NotImplementedError, match="icosahedral"):
+            b._aggregate([tmp_path / "mixed-grid_2024060100_f000.tif"], self._config())
 
     def test_download_with_aggregate(
         self, mini_catalog, tmp_path, fake_pyramids, fake_aggregate

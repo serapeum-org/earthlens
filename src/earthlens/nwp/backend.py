@@ -199,6 +199,18 @@ class NWP(AbstractDataSource):
         `retention_days = None` is treated as archival and is silent. The
         cutoff is computed in naive UTC against `self.time.start_date` so
         the comparison matches the catalog's `start` / `end` parsing.
+
+        The warning message renders both `start` and `cutoff` to the hour
+        (`timespec='hours'`) rather than to the day, so a same-day
+        sub-window failure reads as "older than 2026-06-16T14:00" rather
+        than the ambiguous "older than 2026-06-16".
+
+        Stacklevel attribution: 3 frames is correct for a direct
+        `NWP(...)` call (1=this method, 2=`__init__`, 3=caller). The
+        :class:`~earthlens.EarthLens` facade adds one frame, so a
+        facade-route warning is attributed to `earthlens.py`; users
+        wanting a precise call-site should filter on
+        `category=RetentionWarning` rather than module.
         """
         cutoff_base = dt.datetime.now(dt.UTC).replace(tzinfo=None)
         start = self.time.start_date
@@ -210,8 +222,9 @@ class NWP(AbstractDataSource):
             if start < cutoff:
                 warnings.warn(
                     f"{model_key!r} retains ~{window} day(s); requested "
-                    f"start {start.date()} is older than {cutoff.date()} "
-                    "— expect empty results.",
+                    f"start {start.isoformat(timespec='hours')} is older than "
+                    f"the retention cutoff at {cutoff.isoformat(timespec='hours')} "
+                    "UTC — expect empty results.",
                     RetentionWarning,
                     stacklevel=3,
                 )
@@ -614,12 +627,19 @@ class NWP(AbstractDataSource):
         # pyramids silently mis-grid an unstructured layout (the C4 / M12
         # icosahedral guard).
         only_key, only_model, _ = self._requests[0]
-        if only_model.url_template and "icosahedral" in only_model.url_template:
+        # The check spans the row's surface url_template plus any
+        # pl_url_template the row may carry in request_options — both can
+        # name an icosahedral grid, and either is enough to make the row
+        # un-griddable through the shared COG stack reducer.
+        pl_url_template = (only_model.request_options or {}).get("pl_url_template", "")
+        if (only_model.url_template and "icosahedral" in only_model.url_template) or (
+            "icosahedral" in pl_url_template
+        ):
             raise NotImplementedError(
                 f"NWP aggregate: {only_key!r} is on an icosahedral grid "
                 "(not a regular lat/lon raster); aggregation is not "
-                "supported. Request a griddable model (ICON-EU, ICON-D2, "
-                "or a regridded global feed) instead."
+                "supported. Request a griddable model (ICON-EU, or a "
+                "regridded global feed) instead."
             )
         from pyramids.dataset import Dataset, DatasetCollection
         from pyramids.dataset.cog import write_cog
