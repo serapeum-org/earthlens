@@ -25,6 +25,7 @@ the `(cycle, step)` stack (`C6`).
 from __future__ import annotations
 
 import datetime as dt
+import warnings
 from pathlib import Path
 from typing import TYPE_CHECKING
 
@@ -45,6 +46,7 @@ from earthlens.nwp._helpers import (
     parse_cog_valid_time,
     window_labels,
 )
+from earthlens.nwp._warnings import RetentionWarning
 from earthlens.nwp.catalog import KNOWN_BACKENDS, Catalog, NWPModel
 from earthlens.nwp.centres import resolve_centre
 
@@ -153,6 +155,7 @@ class NWP(AbstractDataSource):
             fmt=fmt,
             path=path,
         )
+        self._warn_retention()
 
     def _resolve_models(
         self, variables: dict[str, list[str]]
@@ -188,6 +191,30 @@ class NWP(AbstractDataSource):
                 )
             resolved.append((model_key, model, list(params)))
         return resolved
+
+    def _warn_retention(self) -> None:
+        """Emit `RetentionWarning` for any request older than a model's window.
+
+        Iterates `self._requests` once per construction; a model row with
+        `retention_days = None` is treated as archival and is silent. The
+        cutoff is computed in naive UTC against `self.time.start_date` so
+        the comparison matches the catalog's `start` / `end` parsing.
+        """
+        cutoff_base = dt.datetime.now(dt.UTC).replace(tzinfo=None)
+        start = self.time.start_date
+        for model_key, model, _params in self._requests:
+            window = model.retention_days
+            if window is None:
+                continue
+            cutoff = cutoff_base - dt.timedelta(days=window)
+            if start < cutoff:
+                warnings.warn(
+                    f"{model_key!r} retains ~{window} day(s); requested "
+                    f"start {start.date()} is older than {cutoff.date()} "
+                    "— expect empty results.",
+                    RetentionWarning,
+                    stacklevel=3,
+                )
 
     def _initialize(self):
         """No-op auth hook — every MVP centre is an open bucket.

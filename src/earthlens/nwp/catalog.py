@@ -165,6 +165,15 @@ class NWPModel(BaseModel):
             `"CC-BY-4.0"` for ECMWF Open Data and DWD; `"Etalab-2.0"`
             for Météo-France; `"OGL-Canada-2.0"` for ECCC). `None` only
             for an ad-hoc row that has not been curated yet.
+        retention_days: How long the provider keeps a cycle online before
+            it rolls off the live endpoint. `None` means archival or
+            unspecified (the backend stays silent); a positive integer is
+            the rolling-window length in days, and `NWP.__init__` emits a
+            :class:`RetentionWarning` when the requested `start` is older
+            than `now - retention_days` (the #1 confusing failure for
+            short-retention providers — DWD keeps roughly one day, MF
+            fourteen). Never inferred — populated per row from the
+            provider's stated retention policy.
 
     Examples:
         - Build a minimal Herbie-backed row and read its selector:
@@ -211,6 +220,7 @@ class NWPModel(BaseModel):
     request_options: dict[str, Any] = Field(default_factory=dict)
     members: list[str] = Field(default_factory=list)
     license: str | None = None
+    retention_days: int | None = None
 
 
 class Catalog(AbstractCatalog):

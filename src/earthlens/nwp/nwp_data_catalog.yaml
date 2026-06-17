@@ -387,6 +387,7 @@ datasets:
   icon-global:                            # DWD Open Data, direct HTTPS .bz2 (no .idx)
     provider: dwd-opendata
     license: CC-BY-4.0
+    retention_days: 1
     model_family: icon
     resolution: 0.125deg
     cycles_utc: [0, 6, 12, 18]
@@ -1041,6 +1042,7 @@ datasets:
   icon-eu:                                # DWD, ICON-EU regular lat-lon (croppable), direct HTTPS
     provider: dwd-opendata
     license: CC-BY-4.0
+    retention_days: 1
     model_family: icon-eu
     resolution: 0.0625deg
     cycles_utc: [0, 6, 12, 18]
@@ -1136,6 +1138,7 @@ datasets:
   icon-d2:                                # DWD, ICON-D2 native icosahedral (raw fetch; not croppable), direct HTTPS
     provider: dwd-opendata
     license: CC-BY-4.0
+    retention_days: 1
     model_family: icon-d2
     resolution: 2.2km
     cycles_utc: [0, 3, 6, 9, 12, 15, 18, 21]
@@ -1651,6 +1654,7 @@ datasets:
   arpege-world:                           # Météo-France ARPEGE global 0.25°, WCS API
     provider: meteofrance
     license: Etalab-2.0
+    retention_days: 14
     model_family: arpege
     resolution: 0.25deg
     cycles_utc: [0, 6, 12, 18]
@@ -1744,6 +1748,7 @@ datasets:
   arome-france:                           # Météo-France AROME high-res France 0.025°, WCS API
     provider: meteofrance
     license: Etalab-2.0
+    retention_days: 14
     model_family: arome
     resolution: 0.025deg
     cycles_utc: [0, 3, 6, 9, 12, 15, 18, 21]
@@ -1837,6 +1842,7 @@ datasets:
   icon-eps:                                  # DWD ICON-EPS ensemble (all members per file; icosahedral, raw; surface-only)
     provider: dwd-opendata
     license: CC-BY-4.0
+    retention_days: 1
     model_family: icon-eps
     cycles_utc: [0, 6, 12, 18]
     step_cadence_h: 1
@@ -1859,6 +1865,7 @@ datasets:
   icon-eu-eps:                                  # DWD ICON-EPS ensemble (all members per file; icosahedral, raw; surface-only)
     provider: dwd-opendata
     license: CC-BY-4.0
+    retention_days: 1
     model_family: icon-eu-eps
     cycles_utc: [0, 6, 12, 18]
     step_cadence_h: 1
@@ -1881,6 +1888,7 @@ datasets:
   icon-d2-eps:                                  # DWD ICON-EPS ensemble (all members per file; icosahedral, raw; surface-only)
     provider: dwd-opendata
     license: CC-BY-4.0
+    retention_days: 1
     model_family: icon-d2-eps
     cycles_utc: [0, 3, 6, 9, 12, 15, 18, 21]
     step_cadence_h: 1

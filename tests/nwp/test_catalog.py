@@ -223,3 +223,31 @@ def test_load_catalog_data_missing_file_raises(tmp_path):
 
     with pytest.raises(FileNotFoundError):
         _load_catalog_data(tmp_path / "absent.yaml")
+
+
+class TestBundledRetention:
+    """Tests for C3: every short-retention row carries the published window."""
+
+    def test_dwd_rows_one_day(self):
+        """Every dwd-opendata row carries `retention_days=1`."""
+        from earthlens.nwp import Catalog
+
+        for k, m in Catalog().datasets.items():
+            if m.provider == "dwd-opendata":
+                assert m.retention_days == 1, f"{k!r} retention={m.retention_days}"
+
+    def test_meteofrance_rows_fourteen_days(self):
+        """Every meteofrance row carries `retention_days=14`."""
+        from earthlens.nwp import Catalog
+
+        for k, m in Catalog().datasets.items():
+            if m.provider == "meteofrance":
+                assert m.retention_days == 14, f"{k!r} retention={m.retention_days}"
+
+    def test_archival_providers_have_no_retention(self):
+        """NOAA NODD + ECMWF Open Data + ECCC rows leave retention_days as None."""
+        from earthlens.nwp import Catalog
+
+        for k, m in Catalog().datasets.items():
+            if m.provider in ("noaa-nodd", "ecmwf-opendata", "eccc-msc"):
+                assert m.retention_days is None, f"{k!r} retention={m.retention_days}"
