@@ -1,0 +1,77 @@
+# ASF (Alaska Satellite Facility) product catalog.
+#
+# Each row maps a friendly product key to its `asf_search` enum
+# values plus a `stackable` flag indicating whether the product
+# supports `ASFProduct.stack()` (the InSAR baseline search).
+#
+# Rules per row:
+# - exactly one of `platform` (an `asf.PLATFORM` member name) or
+#   `dataset` (an `asf.DATASET` member name) must be set;
+# - `product_type` is an `asf.PRODUCT_TYPE` member name;
+# - `aliases` is a list of friendly synonyms users can pass in
+#   `variables=[...]`;
+# - `stackable: true` reflects what `asf_search.<Class>.get_default_baseline_product_type()`
+#   returns for the matching product class (Sentinel-1 SLC,
+#   Sentinel-1 BURST, ALOS PALSAR L1.1, etc.).
+#
+# Catalog refresh policy: hand-maintained (the SDK constants change
+# rarely, the curated set is small). The `earthlens datasets refresh
+# asf --validate` CLI handler runs a sanity check that every row's
+# constant names still exist on the installed asf_search.
+
+products:
+  sentinel-1-slc:
+    aliases: [s1-slc, sentinel1-slc]
+    platform: SENTINEL1
+    product_type: SLC
+    stackable: true
+    description: Sentinel-1 Single Look Complex (the standard InSAR input)
+
+  sentinel-1-burst:
+    aliases: [s1-burst, sentinel1-burst]
+    dataset: SLC_BURST
+    product_type: BURST
+    stackable: true
+    description: Sentinel-1 SLC burst (per-burst InSAR-ready subset of an SLC)
+
+  sentinel-1-grd:
+    aliases: [s1-grd, sentinel1-grd]
+    platform: SENTINEL1
+    product_type: GRD_HD
+    stackable: false
+    description: Sentinel-1 Ground Range Detected, high-resolution dual-pol (search-only)
+
+  alos-palsar-slc:
+    aliases: [alos-slc, palsar-slc, alos-l1.1]
+    platform: ALOS
+    product_type: L1_1
+    stackable: true
+    description: ALOS PALSAR Level-1.1 SLC
+
+  opera-rtc-s1:
+    aliases: [opera-rtc, opera-s1-rtc]
+    dataset: OPERA_S1
+    product_type: RTC
+    stackable: false
+    description: OPERA Sentinel-1 Radiometric Terrain Corrected (processed, search-only)
+
+  opera-cslc-s1:
+    aliases: [opera-cslc, opera-s1-cslc]
+    dataset: OPERA_S1
+    product_type: CSLC
+    stackable: true
+    description: OPERA Sentinel-1 Coregistered Single Look Complex
+
+  aria-s1-gunw:
+    aliases: [aria-gunw, gunw]
+    dataset: ARIA_S1_GUNW
+    product_type: GUNW_STD
+    stackable: false
+    description: ARIA Sentinel-1 Geocoded Unwrapped Interferogram (precomputed)
+
+  nisar-rslc:
+    aliases: [nisar-slc]
+    platform: NISAR
+    product_type: RSLC
+    stackable: true
+    description: NISAR Radar Single Look Complex (data starts arriving post-launch)
