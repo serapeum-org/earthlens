@@ -2321,6 +2321,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../../../reference/stac/migration-from-gee/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Migration from GEE
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../../reference/stac/stac/" class="md-nav__link">
         
   
@@ -7686,6 +7714,118 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../regional_data_cubes/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Regional Open Data Cubes — DEAfrica + DEA
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../bdc_cbers_amazonia/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Brazil Data Cube — CBERS-4 / AMAZONIA-1 / MODIS VI
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../veda_nasa_derived/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    NASA VEDA — NLDAS-3, CMIP, Black Marble HD
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../usgs_landsat_requester_pays/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    USGS LandsatLook — Landsat C2 requester-pays
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -9673,34 +9813,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../../nwp/nwp_polish_features/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    NWP polish features — catalog metadata &amp; guards (no network)
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../../nwp/gfs_temperature/" class="md-nav__link">
         
   
@@ -9737,34 +9849,6 @@
     
   
     DWD ICON precipitation — direct-HTTPS fetch
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../nwp/eccc_gdps/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    ECCC GDPS 2 m temperature — direct MSC Datamart fetch
   
 
     
@@ -11652,19 +11736,19 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </style>
 <!-- End of mermaid configuration --><div class="jupyter-wrapper">
 <div class="jp-Notebook" data-jp-theme-light="true" data-jp-theme-name="JupyterLab Light">
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=c5d48c14">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=7402e9ac">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
 <h1 id="stac-quickstart-sentinel-2-cogs-from-earth-search">STAC quickstart — Sentinel-2 COGs from Earth Search<a class="anchor-link" href="#stac-quickstart-sentinel-2-cogs-from-earth-search">¶</a></h1><p>The <code>earthlens.stac</code> backend searches a STAC API, mosaics the matching items to your bbox, reprojects/stacks the requested bands, and writes one Cloud-Optimized GeoTIFF per <code>(collection, date)</code>. Earth Search (Element 84 / AWS) is anonymous, so this needs only <code>pip install earthlens[stac]</code> — no account.</p>
-<p>The download cell runs a <strong>real</strong> request against Earth Search; it degrades gracefully (prints a note) if run without network.</p>
+<p>The download cell runs a <strong>real</strong> request against Earth Search; if the network is down or the upstream is broken, the cell will error so you can see why.</p>
 </div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=17f1ae61">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=6f3bb62a">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -11675,7 +11759,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=dcc2b68a">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=ece5261b">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -11712,7 +11796,7 @@ print("default assets:", cat.get_collection("sentinel-2-l2a").default_assets)</d
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=a6614d6e">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=449d92f4">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -11723,7 +11807,7 @@ print("default assets:", cat.get_collection("sentinel-2-l2a").default_assets)</d
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=1b6eafc3">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=a185e310">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -11755,11 +11839,7 @@ print("default assets:", cat.get_collection("sentinel-2-l2a").default_assets)</d
     <span class="n">path</span><span class="o">=</span><span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">(),</span>
     <span class="n">max_items</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="k">try</span><span class="p">:</span>
-    <span class="n">paths</span> <span class="o">=</span> <span class="n">el</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
-<span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>  <span class="c1"># noqa: BLE001 - quickstart stays runnable offline</span>
-    <span class="n">paths</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">"download skipped (needs network access):"</span><span class="p">,</span> <span class="n">exc</span><span class="p">)</span>
+<span class="n">paths</span> <span class="o">=</span> <span class="n">el</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
 <span class="n">paths</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-2">import tempfile
@@ -11776,11 +11856,7 @@ el = EarthLens(
     path=tempfile.mkdtemp(),
     max_items=1,
 )
-try:
-    paths = el.download()
-except Exception as exc:  # noqa: BLE001 - quickstart stays runnable offline
-    paths = []
-    print("download skipped (needs network access):", exc)
+paths = el.download()
 paths</div>
 </div>
 </div>
@@ -11788,7 +11864,7 @@ paths</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=82fd8783">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=61baf5d3">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -11799,7 +11875,7 @@ paths</div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=5405c6b4">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=dfd41e3d">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -11819,28 +11895,23 @@ paths</div>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span>
 
-<span class="k">if</span> <span class="n">paths</span><span class="p">:</span>
-    <span class="n">ds</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">paths</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
-    <span class="n">arr</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">read_array</span><span class="p">()</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">"bands:"</span><span class="p">,</span> <span class="n">ds</span><span class="o">.</span><span class="n">band_count</span><span class="p">,</span> <span class="s2">"epsg:"</span><span class="p">,</span> <span class="n">ds</span><span class="o">.</span><span class="n">epsg</span><span class="p">,</span> <span class="s2">"shape:"</span><span class="p">,</span> <span class="n">arr</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
-<span class="k">else</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">"no COG written — run this notebook with network access"</span><span class="p">)</span>
+<span class="n">ds</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">paths</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+<span class="n">arr</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">read_array</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"bands:"</span><span class="p">,</span> <span class="n">ds</span><span class="o">.</span><span class="n">band_count</span><span class="p">,</span> <span class="s2">"epsg:"</span><span class="p">,</span> <span class="n">ds</span><span class="o">.</span><span class="n">epsg</span><span class="p">,</span> <span class="s2">"shape:"</span><span class="p">,</span> <span class="n">arr</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-3">from pyramids.dataset import Dataset
 
-if paths:
-    ds = Dataset.read_file(str(paths[0]))
-    arr = ds.read_array()
-    print("bands:", ds.band_count, "epsg:", ds.epsg, "shape:", arr.shape)
-else:
-    print("no COG written — run this notebook with network access")</div>
+ds = Dataset.read_file(str(paths[0]))
+arr = ds.read_array()
+print("bands:", ds.band_count, "epsg:", ds.epsg, "shape:", arr.shape)
 </div>
 </div>
 </div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=c2a79c5e">
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=1c079566">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
