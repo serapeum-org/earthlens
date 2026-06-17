@@ -9830,6 +9830,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../../../examples/nwp/nwp_polish_features/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    NWP polish features — catalog metadata &amp; guards (no network)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../../examples/nwp/gfs_temperature/" class="md-nav__link">
         
   
@@ -9866,6 +9894,34 @@
     
   
     DWD ICON precipitation — direct-HTTPS fetch
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../examples/nwp/eccc_gdps/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ECCC GDPS 2 m temperature — direct MSC Datamart fetch
   
 
     
@@ -11175,26 +11231,34 @@ doesn't carry).</p>
 <tr>
 <td><code>gdps</code></td>
 <td>ECCC MSC</td>
-<td><code>herbie</code></td>
+<td><code>eccc-msc</code></td>
 <td>00/12</td>
 <td>240 h</td>
-<td>15 km global</td>
+<td>15 km global, direct Datamart (WIS2 tokens, 30 d retention)</td>
 </tr>
 <tr>
 <td><code>rdps</code></td>
 <td>ECCC MSC</td>
-<td><code>herbie</code></td>
+<td><code>eccc-msc</code></td>
 <td>00/06/12/18</td>
 <td>84 h</td>
-<td>10 km regional</td>
+<td>10 km regional, direct Datamart (WIS2 tokens, 30 d retention)</td>
 </tr>
 <tr>
 <td><code>hrdps</code></td>
 <td>ECCC MSC</td>
-<td><code>herbie</code></td>
+<td><code>eccc-msc</code></td>
 <td>00/06/12/18</td>
 <td>48 h</td>
-<td>2.5 km (<code>continental</code>)</td>
+<td>2.5 km continental, direct Datamart (WIS2 tokens, 30 d retention)</td>
+</tr>
+<tr>
+<td><code>geps</code></td>
+<td>ECCC MSC</td>
+<td><code>eccc-msc</code></td>
+<td>00/12</td>
+<td>384 h</td>
+<td>0.5° ensemble (21 members per <code>_allmbrs</code> file), 14 d retention</td>
 </tr>
 <tr>
 <td><code>icon-eu</code></td>
