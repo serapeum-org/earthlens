@@ -104,6 +104,7 @@ class TestRegistry:
             "tropycal",
             "usgs-nwis",
             "usgs-water",
+            "veda",
             "world-pop",
             "worldpop",
         ]

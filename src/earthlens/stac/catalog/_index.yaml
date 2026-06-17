@@ -27,6 +27,10 @@ endpoints:
     url: https://explorer.dea.ga.gov.au/stac
     signer: anonymous
     region: ap-southeast-2
+  veda:
+    url: https://openveda.cloud/api/stac
+    signer: anonymous
+    region: us-west-2
 
 available_collections:
   planetary-computer:

@@ -80,6 +80,23 @@ class TestBundledCatalog:
         ):
             assert cat.get_collection(key).endpoint == "dea", key
 
+    def test_veda_collections_curated(self):
+        """The veda endpoint exposes its curated flagship collections."""
+        cat = Catalog()
+        assert cat.endpoints["veda"].region == "us-west-2"
+        assert cat.endpoints["veda"].signer == "anonymous"
+        nldas = cat.get_collection("veda/nldas3")
+        assert nldas.endpoint == "veda"
+        assert nldas.signer is None
+        assert nldas.default_assets == ["cog_default"]
+        for key in (
+            "veda/nldas3", "veda/delta-disasters-hd-blackmarble-nightlights",
+            "veda/CMIP245-winter-median-pr", "veda/CMIP585-winter-median-pr",
+            "veda/caldor-fire-burn-severity", "veda/hls-ndvi",
+            "veda/EPA-annual-emissions-1A-Combustion-Mobile",
+        ):
+            assert cat.get_collection(key).endpoint == "veda", key
+
     def test_available_collections_index(self):
         """The informational available_collections index is keyed by endpoint."""
         avail = Catalog().available_collections

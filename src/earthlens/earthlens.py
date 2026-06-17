@@ -299,7 +299,7 @@ class EarthLens:
              'ghs', 'ghsl', 'google-earth-engine', 'hdx', 'human-settlement',
              'national-water-model', 'nexrad', 'nwis', 'nwm', 'nwp', 'openaq',
              'openeo', 'overture', 'planetary-computer', 'radar', 'sentinel-hub',
-             'sentinelhub', 'stac', 'tropycal', 'usgs-nwis', 'usgs-water',
+             'sentinelhub', 'stac', 'tropycal', 'usgs-nwis', 'usgs-water', 'veda',
              'world-pop', 'worldpop']
 
             ```
@@ -497,6 +497,10 @@ class EarthLens:
                 "stac",
                 {"endpoint": "dea"},
             ),
+            # NASA VEDA STAC (anonymous, us-west-2) — NASA-curated derived
+            # products: Black Marble HD nightlights, CMIP6 climate, NLDAS-3,
+            # fire/disaster-damage, HLS NDVI, EPA emissions.
+            "veda": ("earthlens.stac", "STAC", "stac", {"endpoint": "veda"}),
             # USGS NWIS / Water Data (dataretrieval). Tabular DataFrame of
             # per-site water observations; anonymous access works. The
             # "usgs-nwis" / "nwis" aliases point at the same backend.

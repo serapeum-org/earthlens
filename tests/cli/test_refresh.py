@@ -659,6 +659,7 @@ class TestWrite:
             "earth-search",
             "deafrica",
             "dea",
+            "veda",
         ], "endpoints block preserved"
         assert data["available_collections"]["planetary-computer"] == ["only-one"]
 
