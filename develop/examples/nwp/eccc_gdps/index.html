@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -12103,11 +12103,12 @@ summary statistics in Kelvin.</p>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="k">if</span> <span class="n">grib_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
     <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.grib</span><span class="w"> </span><span class="kn">import</span> <span class="n">open_grib</span>
 
-    <span class="c1"># GDPS GRIB2 messages are JPEG2000-compressed. Reading them needs</span>
-    <span class="c1"># the GDAL `JP2OpenJPEG` plugin; the PyPI pyramids-gis wheel ships</span>
-    <span class="c1"># a vendored GDAL without it, so the read step can fail on some</span>
-    <span class="c1"># installs. The fetch itself (the new code path the notebook is</span>
-    <span class="c1"># demonstrating) is unaffected — we degrade cleanly here.</span>
+    <span class="c1"># GDPS GRIB2 messages are JPEG2000-packed. Reading them needs</span>
+    <span class="c1"># a GDAL JP2 driver; the PyPI pyramids-gis wheel currently ships</span>
+    <span class="c1"># a vendored GDAL without one (tracked upstream as</span>
+    <span class="c1"># https://github.com/serapeum-org/pyramids/issues/600). The fetch</span>
+    <span class="c1"># itself (the new code path this notebook demonstrates) is</span>
+    <span class="c1"># unaffected -- we degrade cleanly here.</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="n">ds</span> <span class="o">=</span> <span class="n">open_grib</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">grib_path</span><span class="p">))</span>
         <span class="n">arr</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">read_array</span><span class="p">()</span>
@@ -12121,8 +12122,9 @@ summary statistics in Kelvin.</p>
     <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
         <span class="n">msg</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">exc</span><span class="p">)</span>
         <span class="k">if</span> <span class="s1">'JP2'</span> <span class="ow">in</span> <span class="n">msg</span> <span class="ow">or</span> <span class="s1">'JPEG2000'</span> <span class="ow">in</span> <span class="n">msg</span> <span class="ow">or</span> <span class="s1">'jpc'</span> <span class="ow">in</span> <span class="n">msg</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s1">'GDAL JPEG2000 plugin missing — fetched OK,'</span>
-                  <span class="s1">' read step skipped. Install libgdal-jp2openjpeg to inspect arrays.'</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">'GDAL JPEG2000 plugin missing -- fetched OK,'</span>
+                  <span class="s1">' read step skipped (tracked upstream:'</span>
+                  <span class="s1">' serapeum-org/pyramids#600).'</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span>
 <span class="k">else</span><span class="p">:</span>
@@ -12131,11 +12133,12 @@ summary statistics in Kelvin.</p>
 <div class="clipboard-copy-txt" id="cell-5">if grib_path is not None:
     from pyramids.grib import open_grib
 
-    # GDPS GRIB2 messages are JPEG2000-compressed. Reading them needs
-    # the GDAL `JP2OpenJPEG` plugin; the PyPI pyramids-gis wheel ships
-    # a vendored GDAL without it, so the read step can fail on some
-    # installs. The fetch itself (the new code path the notebook is
-    # demonstrating) is unaffected — we degrade cleanly here.
+    # GDPS GRIB2 messages are JPEG2000-packed. Reading them needs
+    # a GDAL JP2 driver; the PyPI pyramids-gis wheel currently ships
+    # a vendored GDAL without one (tracked upstream as
+    # https://github.com/serapeum-org/pyramids/issues/600). The fetch
+    # itself (the new code path this notebook demonstrates) is
+    # unaffected -- we degrade cleanly here.
     try:
         ds = open_grib(str(grib_path))
         arr = ds.read_array()
@@ -12149,8 +12152,9 @@ summary statistics in Kelvin.</p>
     except Exception as exc:
         msg = str(exc)
         if 'JP2' in msg or 'JPEG2000' in msg or 'jpc' in msg:
-            print('GDAL JPEG2000 plugin missing — fetched OK,'
-                  ' read step skipped. Install libgdal-jp2openjpeg to inspect arrays.')
+            print('GDAL JPEG2000 plugin missing -- fetched OK,'
+                  ' read step skipped (tracked upstream:'
+                  ' serapeum-org/pyramids#600).')
         else:
             raise
 else:
@@ -12166,14 +12170,14 @@ else:
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
-<pre>2026-06-17 21:33:24 | <span class="ansi-green-fg">INFO</span> | pyramids.base.config | Logging is configured.
+<pre>2026-06-17 21:44:48 | <span class="ansi-green-fg">INFO</span> | pyramids.base.config | Logging is configured.
 </pre>
 </div>
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>GDAL JPEG2000 plugin missing — fetched OK, read step skipped. Install libgdal-jp2openjpeg to inspect arrays.
+<pre>GDAL JPEG2000 plugin missing -- fetched OK, read step skipped (tracked upstream: serapeum-org/pyramids#600).
 </pre>
 </div>
 </div>
