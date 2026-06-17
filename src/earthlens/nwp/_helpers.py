@@ -14,6 +14,8 @@ import datetime as dt
 import hashlib
 import json
 import os
+import re
+import tempfile
 import time
 from collections.abc import Callable, Iterable
 from pathlib import Path
@@ -294,13 +296,47 @@ def _resolve_idx_ttl(ttl: float | None) -> float:
     return float(_DEFAULT_IDX_TTL)
 
 
+_NOAA_FCST_RE = re.compile(r"^(\d+)(?:-\d+)?\s*hour", re.IGNORECASE)
+
+
+def _parse_noaa_step(token: str) -> int:
+    """Map a NOAA forecast-time token to an integer lead-time in hours.
+
+    The NOAA `.idx` forecast field is human-readable text — `anl` for the
+    analysis step, `6 hour fcst` for an `f006` deterministic step,
+    `0-3 hour acc fcst` for the start of a 0-3 h accumulation window.
+    All shapes collapse to a single non-negative integer so the
+    canonical `step` column is comparable across NOAA and ECMWF.
+
+    Args:
+        token: The raw `:`-separated forecast field.
+
+    Returns:
+        int: The forecast lead time in hours. `0` for `anl` / blank;
+            the leading hour count for any `N hour …` shape; `-1` for
+            anything unrecognised (kept as an explicit sentinel rather
+            than silently mapped to `0`).
+    """
+    stripped = token.strip().lower()
+    if not stripped or stripped == "anl":
+        return 0
+    match = _NOAA_FCST_RE.match(stripped)
+    if match:
+        return int(match.group(1))
+    return -1
+
+
 def _parse_idx_noaa(text: str) -> pd.DataFrame:
     """Parse a NOAA `:`-separated `.idx` into the canonical idx frame.
 
     NOAA NODD writes one message per line: `msg : offset : date :
     abbr : level : forecast` (e.g. ` 1:0:d=2024060100:HGT:1000 mb:anl`).
-    `length` is derived from the next message's offset; the trailing
-    message gets `-1` (read-to-end).
+    The forecast field is parsed through :func:`_parse_noaa_step` so the
+    `step` column is an `int` comparable with the ECMWF parser's output.
+    `length` is derived from the next distinct offset; duplicate offsets
+    (the same byte position appearing more than once) are dropped so a
+    duplicate does not collapse the row to `length=0`. The trailing
+    message keeps `length=-1` (read to end of file).
 
     Args:
         text: The raw `.idx` body.
@@ -324,13 +360,28 @@ def _parse_idx_noaa(text: str) -> pd.DataFrame:
             offset = int(parts[1])
         except ValueError:
             continue
-        rows.append((msg_id, offset, parts[3].strip(), parts[4].strip(), parts[5].strip()))
+        rows.append(
+            (
+                msg_id,
+                offset,
+                parts[3].strip(),
+                parts[4].strip(),
+                _parse_noaa_step(parts[5]),
+            )
+        )
     if not rows:
         return pd.DataFrame(columns=list(_IDX_COLUMNS))
     frame = pd.DataFrame(rows, columns=["msg_id", "offset", "var", "level", "step"])
-    frame = frame.sort_values("offset").reset_index(drop=True)
-    nxt = frame["offset"].shift(-1)
-    frame["length"] = (nxt - frame["offset"]).fillna(-1).astype("int64")
+    # Sort by offset and drop duplicate offsets — keep the first occurrence
+    # so a sub-message sharing an envelope offset does not yield `length=0`.
+    frame = (
+        frame.sort_values("offset").drop_duplicates("offset", keep="first").reset_index(drop=True)
+    )
+    # Compute `length` directly in the loop to avoid the float intermediate
+    # `(nxt - frame["offset"]).fillna(-1).astype("int64")` would produce.
+    offsets = frame["offset"].tolist()
+    lengths = [offsets[i + 1] - offsets[i] for i in range(len(offsets) - 1)] + [-1]
+    frame["length"] = lengths
     return frame[list(_IDX_COLUMNS)]
 
 
@@ -339,14 +390,19 @@ def _parse_idx_ecmwf(text: str) -> pd.DataFrame:
 
     Each non-empty line is one JSON object with `_offset` / `_length`
     byte-range fields plus the variable selectors (`param`,
-    `levelist`, `step`). Malformed lines are skipped.
+    `levelist`, `step`). Malformed lines (invalid JSON, missing
+    `_offset`, missing `_length`, non-numeric step) are skipped — they
+    cannot produce a usable byte-range and must not poison the
+    canonical schema with the NOAA "read to EOF" sentinel `-1`.
 
     Args:
         text: The raw `.index` body (one JSON object per line).
 
     Returns:
         pandas.DataFrame: Rows with the canonical columns. Empty when
-            no parseable line is present.
+            no parseable line is present. `length=-1` is reserved for
+            the NOAA tail message (read-to-EOF); this parser never
+            emits it.
     """
     import pandas as pd
 
@@ -358,9 +414,18 @@ def _parse_idx_ecmwf(text: str) -> pd.DataFrame:
             obj = json.loads(line)
         except json.JSONDecodeError:
             continue
+        # An entry without an `_offset` or `_length` cannot drive a Range
+        # fetch — drop it rather than fall back to -1, which would
+        # collide with the NOAA tail sentinel downstream.
+        if "_offset" not in obj or "_length" not in obj:
+            continue
         try:
-            offset = int(obj.get("_offset", -1))
-            length = int(obj.get("_length", -1))
+            offset = int(obj["_offset"])
+            length = int(obj["_length"])
+        except (TypeError, ValueError):
+            continue
+        try:
+            step = int(obj.get("step", 0))
         except (TypeError, ValueError):
             continue
         rows.append(
@@ -370,7 +435,7 @@ def _parse_idx_ecmwf(text: str) -> pd.DataFrame:
                 length,
                 str(obj.get("param", "")),
                 str(obj.get("levelist", "")),
-                str(obj.get("step", "")),
+                step,
             )
         )
     if not rows:
@@ -415,12 +480,18 @@ def get_idx(
     direct-fetch path (a non-SDK centre, or a direct retry shim
     around an SDK that does not cache).
 
+    Writes are **atomic**: the downloader writes to a sibling
+    temporary file and the helper renames it onto the cache path only
+    on success, so a mid-download failure never leaves a truncated
+    cache file shadowing the previous good copy.
+
     Args:
         url: The full URL of the `.idx` / `.index` file (used as
             the cache key after SHA-256 truncation).
-        downloader: Callable that fetches the body of `url` and
-            writes it to the given `Path`. Injected so tests can
-            count calls and bypass the network.
+        downloader: A callable that fetches the body of `url` and
+            writes it to the given `Path`. The helper has no transport
+            dependency itself, so any HTTP / S3 / file-copy implementation
+            can be plugged in.
         ttl: Optional override for the cache TTL in seconds. `None`
             (the default) consults `EARTHLENS_NWP_IDX_TTL`, falling
             back to `_DEFAULT_IDX_TTL` (24 h).
@@ -445,5 +516,16 @@ def get_idx(
         except OSError:
             pass
     path.parent.mkdir(parents=True, exist_ok=True)
-    downloader(url, path)
+    # Write through a sibling temp file and atomically replace on success.
+    # A downloader exception leaves the existing cache (if any) untouched;
+    # the temp file is unlinked in the cleanup path.
+    fd, tmp_name = tempfile.mkstemp(prefix=path.name + ".", suffix=".part", dir=path.parent)
+    os.close(fd)
+    tmp_path = Path(tmp_name)
+    try:
+        downloader(url, tmp_path)
+        os.replace(tmp_path, path)
+    except BaseException:
+        tmp_path.unlink(missing_ok=True)
+        raise
     return _parse_idx(path.read_text(encoding="utf-8", errors="replace"))

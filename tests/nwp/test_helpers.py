@@ -236,6 +236,65 @@ class TestParseIdx:
         assert len(_parse_idx(noaa)) == 2
         assert len(_parse_idx(ecmwf)) == 2
 
+    def test_noaa_step_parses_to_int(self):
+        """NOAA forecast field is parsed to int (anl -> 0, N hour fcst -> N)."""
+        from earthlens.nwp._helpers import _parse_idx
+
+        body = (
+            "1:0:d=:HGT:sfc:anl\n"
+            "2:100:d=:TMP:sfc:6 hour fcst\n"
+            "3:200:d=:APCP:sfc:0-3 hour acc fcst\n"
+        )
+        frame = _parse_idx(body)
+        steps = list(frame["step"])
+        assert steps == [0, 6, 0]
+        assert all(isinstance(s, int) for s in steps)
+
+    def test_noaa_unknown_step_token_marked(self):
+        """An unrecognised forecast field maps to -1 (explicit sentinel)."""
+        from earthlens.nwp._helpers import _parse_idx_noaa
+
+        body = "1:0:d=:HGT:sfc:wat\n"
+        assert int(_parse_idx_noaa(body).loc[0, "step"]) == -1
+
+    def test_ecmwf_step_parses_to_int(self):
+        """ECMWF JSON `step` is coerced to int — same dtype as the NOAA column."""
+        from earthlens.nwp._helpers import _parse_idx
+
+        body = (
+            '{"_offset":0,"_length":100,"param":"2t","step":0}\n'
+            '{"_offset":100,"_length":50,"param":"tp","step":6}\n'
+        )
+        frame = _parse_idx(body)
+        assert list(frame["step"]) == [0, 6]
+
+    def test_ecmwf_missing_length_is_dropped(self):
+        """An ECMWF entry without `_length` is skipped, not flagged with length=-1."""
+        from earthlens.nwp._helpers import _parse_idx
+
+        body = (
+            '{"_offset":0,"_length":100,"param":"2t"}\n'
+            '{"_offset":100,"param":"tp","step":0}\n'
+        )
+        frame = _parse_idx(body)
+        assert len(frame) == 1
+        # `-1` is reserved for the NOAA tail row; ECMWF must never emit it.
+        assert -1 not in frame["length"].tolist()
+
+    def test_noaa_duplicate_offsets_are_deduped(self):
+        """A duplicate offset does not collapse a row to length=0."""
+        from earthlens.nwp._helpers import _parse_idx
+
+        body = (
+            "1:0:d=:HGT:sfc:anl\n"
+            "2:8192:d=:TMP:sfc:anl\n"
+            "3:8192:d=:UGRD:sfc:anl\n"
+        )
+        frame = _parse_idx(body)
+        # Only the first row at offset 8192 is kept; the dup is dropped.
+        assert len(frame) == 2
+        assert 0 not in frame["length"].tolist()
+
 
 class TestGetIdx:
     """Tests for the cached `.idx` fetcher."""
@@ -323,6 +382,27 @@ class TestGetIdx:
         get_idx(url, dl, ttl=10_000.0)
         get_idx(url, dl, ttl=10_000.0)
         assert len(calls) == 1
+
+    def test_failing_downloader_preserves_existing_cache(self):
+        """A downloader exception leaves the previous good cache untouched."""
+        from earthlens.nwp._helpers import _idx_cache_path, get_idx
+
+        url = "https://example.test/atomic.idx"
+        path = _idx_cache_path(url)
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(_NOAA_IDX, encoding="utf-8")
+        good_bytes = path.read_bytes()
+
+        def failing(url, tmp_path):
+            tmp_path.write_text("partial body", encoding="utf-8")
+            raise RuntimeError("network down")
+
+        with pytest.raises(RuntimeError, match="network down"):
+            get_idx(url, failing, ttl=0.0)
+        # The cache survives unchanged; no stray .part files are left in dir.
+        assert path.read_bytes() == good_bytes
+        siblings = [p.name for p in path.parent.iterdir() if p.name != path.name]
+        assert siblings == [], f"stray files left behind: {siblings}"
 
     def test_stat_race_refetches(self, monkeypatch):
         """A cache file whose `stat()` raises `OSError` falls through to a refetch."""
