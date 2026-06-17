@@ -82,11 +82,15 @@ def _validate_nwp(catalog: Any) -> tuple[int, list[str]]:
         `(checked, issues)` — the model count and one message per problem.
     """
     issues: list[str] = []
+    # Backends whose fetcher reads `model.url_template` directly. Adding
+    # a new direct-fetch backend means adding it here so a missing
+    # `url_template` is caught at lint time, not at fetch time.
+    _DIRECT_URL_BACKENDS = ("direct-https", "eccc-msc")
     models = catalog.datasets
     for key, record in models.items():
         backend = getattr(record, "backend", None)
-        if backend == "direct-https" and not getattr(record, "url_template", None):
-            issues.append(f"{key}: direct-https model has no url_template")
+        if backend in _DIRECT_URL_BACKENDS and not getattr(record, "url_template", None):
+            issues.append(f"{key}: {backend} model has no url_template")
         if backend == "herbie" and not getattr(record, "model_family", None):
             issues.append(f"{key}: herbie model has no model_family")
         if not (getattr(record, "bands", None) or {}):

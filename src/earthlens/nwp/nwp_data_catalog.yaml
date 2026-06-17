@@ -397,6 +397,7 @@ datasets:
     format: grib2
     idx: false
     backend: direct-https
+    grid_kind: icosahedral
     mirrors: [origin]
     url_template: "https://opendata.dwd.de/weather/nwp/icon/grib/{cycle:%H}/{var_lc}/icon_global_icosahedral_single-level_{date:%Y%m%d%H}_{step:03d}_{var}.grib2.bz2"
     request_options:
@@ -1194,6 +1195,7 @@ datasets:
     format: grib2
     idx: false
     backend: direct-https
+    grid_kind: icosahedral
     mirrors: [origin]
     # ICON-D2 single-level files are icosahedral (like icon-global) and use a
     # lowercase var token in the filename — raw download works; crop does not.
@@ -1896,6 +1898,7 @@ datasets:
     format: grib2
     idx: false
     backend: direct-https
+    grid_kind: icosahedral
     mirrors: [origin]
     url_template: "https://opendata.dwd.de/weather/nwp/icon-eps/grib/{cycle:%H}/{var_lc}/icon-eps_global_icosahedral_single-level_{date:%Y%m%d%H}_{step:03d}_{var_lc}.grib2.bz2"
     bands:
@@ -1919,6 +1922,7 @@ datasets:
     format: grib2
     idx: false
     backend: direct-https
+    grid_kind: icosahedral
     mirrors: [origin]
     url_template: "https://opendata.dwd.de/weather/nwp/icon-eu-eps/grib/{cycle:%H}/{var_lc}/icon-eu-eps_europe_icosahedral_single-level_{date:%Y%m%d%H}_{step:03d}_{var_lc}.grib2.bz2"
     bands:
@@ -1942,6 +1946,7 @@ datasets:
     format: grib2
     idx: false
     backend: direct-https
+    grid_kind: icosahedral
     mirrors: [origin]
     url_template: "https://opendata.dwd.de/weather/nwp/icon-d2-eps/grib/{cycle:%H}/{var_lc}/icon-d2-eps_germany_icosahedral_single-level_{date:%Y%m%d%H}_{step:03d}_2d_{var_lc}.grib2.bz2"
     bands:

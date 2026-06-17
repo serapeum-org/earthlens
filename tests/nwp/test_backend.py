@@ -459,7 +459,7 @@ class TestAggregate:
             b._aggregate([tmp_path / "gfs_2024060100_f000.tif"], self._config())
 
     def test_icosahedral_model_rejected(self, tmp_path):
-        """An icosahedral-grid model (DWD ICON global) refuses aggregation."""
+        """An icosahedral-grid model (declared by `grid_kind`) refuses aggregation."""
         from earthlens.nwp import NWP, Catalog, NWPModel
 
         cat = Catalog(
@@ -471,12 +471,9 @@ class TestAggregate:
                     horizon_h=48,
                     idx=False,
                     mirrors=["origin"],
-                    url_template=(
-                        "https://example.test/{cycle:%H}/{var_lc}/"
-                        "icon_global_icosahedral_{date:%Y%m%d%H}_"
-                        "{step:03d}_{var}.grib2.bz2"
-                    ),
+                    url_template="https://example.test/{var}.grib2",
                     bands={"temperature_2m": "T_2M"},
+                    grid_kind="icosahedral",
                 ),
             }
         )
@@ -492,30 +489,28 @@ class TestAggregate:
         with pytest.raises(NotImplementedError, match="icosahedral"):
             b._aggregate([tmp_path / "icon-icos_2024060100_f000.tif"], self._config())
         # The error must not name `icon-d2` as an alternative — `icon-d2`'s
-        # own catalog row carries an `icosahedral` URL and would re-fail.
+        # own catalog row carries `grid_kind: icosahedral` and would re-fail.
         with pytest.raises(NotImplementedError) as excinfo:
             b._aggregate([tmp_path / "icon-icos_2024060100_f000.tif"], self._config())
         assert "ICON-D2" not in str(excinfo.value)
 
-    def test_pl_url_template_icosahedral_also_rejected(self, tmp_path):
-        """A regular-lat-lon `url_template` but icosahedral `pl_url_template` still fails."""
+    def test_url_template_substring_alone_no_longer_rejects(self, tmp_path):
+        """A regular-grid row whose URL happens to contain the word `icosahedral`
+        is no longer rejected — the guard uses `grid_kind`, not URL substring."""
         from earthlens.nwp import NWP, Catalog, NWPModel
 
         cat = Catalog(
             datasets={
-                "mixed-grid": NWPModel(
+                "ok-grid": NWPModel(
                     provider="dwd-opendata",
                     backend="direct-https",
                     cycles_utc=[0, 12],
                     horizon_h=48,
                     idx=False,
                     mirrors=["origin"],
-                    url_template="https://example.test/{var}_latlon.grib2",
-                    request_options={
-                        "pl_url_template": (
-                            "https://example.test/icon_global_icosahedral_pl_{var}.grib2"
-                        )
-                    },
+                    # URL string contains the word, but the row declares
+                    # itself regular — the guard trusts the declaration.
+                    url_template="https://example.test/icosahedral_paper_{var}.grib2",
                     bands={"temperature_2m": "T_2M"},
                 ),
             }
@@ -523,14 +518,29 @@ class TestAggregate:
         b = NWP(
             start="2024-06-01",
             end="2024-06-01",
-            variables={"mixed-grid": ["temperature_2m"]},
+            variables={"ok-grid": ["temperature_2m"]},
             lat_lim=[40, 45],
             lon_lim=[-80, -75],
             path=str(tmp_path),
             catalog=cat,
         )
-        with pytest.raises(NotImplementedError, match="icosahedral"):
-            b._aggregate([tmp_path / "mixed-grid_2024060100_f000.tif"], self._config())
+        # No NotImplementedError; the guard passes through to pyramids
+        # (which we intercept with the fake_aggregate fixture in the other
+        # tests). Here we exercise the *check*, not the reducer body, so a
+        # bare _aggregate call with an empty path list returns [].
+        assert b._aggregate([], self._config()) == []
+
+    def test_bundled_icosahedral_rows_have_grid_kind(self):
+        """Every DWD ICON icosahedral row in the bundled catalog carries the flag."""
+        from earthlens.nwp import Catalog
+
+        cat = Catalog()
+        expected = {"icon-global", "icon-d2", "icon-eps", "icon-eu-eps", "icon-d2-eps"}
+        for key in expected:
+            assert cat.datasets[key].grid_kind == "icosahedral", key
+        # icon-eu (regular lat-lon, croppable) and gfs default to regular.
+        assert cat.datasets["icon-eu"].grid_kind == "regular-latlon"
+        assert cat.datasets["gfs"].grid_kind == "regular-latlon"
 
     def test_download_with_aggregate(
         self, mini_catalog, tmp_path, fake_pyramids, fake_aggregate

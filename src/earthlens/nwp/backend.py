@@ -627,14 +627,12 @@ class NWP(AbstractDataSource):
         # pyramids silently mis-grid an unstructured layout (the C4 / M12
         # icosahedral guard).
         only_key, only_model, _ = self._requests[0]
-        # The check spans the row's surface url_template plus any
-        # pl_url_template the row may carry in request_options — both can
-        # name an icosahedral grid, and either is enough to make the row
-        # un-griddable through the shared COG stack reducer.
-        pl_url_template = (only_model.request_options or {}).get("pl_url_template", "")
-        if (only_model.url_template and "icosahedral" in only_model.url_template) or (
-            "icosahedral" in pl_url_template
-        ):
+        # `grid_kind` is the declarative source of truth for whether a row
+        # is co-registerable into a DatasetCollection stack. The catalog
+        # tags every icosahedral DWD ICON row (icon-global, icon-d2,
+        # icon-eps, icon-eu-eps, icon-d2-eps); every other row defaults to
+        # `"regular-latlon"`.
+        if only_model.grid_kind == "icosahedral":
             raise NotImplementedError(
                 f"NWP aggregate: {only_key!r} is on an icosahedral grid "
                 "(not a regular lat/lon raster); aggregation is not "

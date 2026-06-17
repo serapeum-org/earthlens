@@ -186,6 +186,13 @@ class NWPModel(BaseModel):
             short-retention providers — DWD keeps roughly one day, MF
             fourteen). Never inferred — populated per row from the
             provider's stated retention policy.
+        grid_kind: The model's native horizontal grid type. Defaults to
+            `"regular-latlon"` (every NOAA / ECMWF / DWD-ICON-EU / ECCC
+            row); `"icosahedral"` flags an unstructured DWD ICON grid
+            (icon-global, icon-d2, icon-eps, icon-eu-eps, icon-d2-eps).
+            `NWP._aggregate` checks this field — not the URL — to refuse
+            aggregation on a grid `pyramids.dataset.DatasetCollection`
+            cannot co-register.
 
     Examples:
         - Build a minimal Herbie-backed row and read its selector:
@@ -233,6 +240,7 @@ class NWPModel(BaseModel):
     members: list[str] = Field(default_factory=list)
     license: str | None = None
     retention_days: int | None = None
+    grid_kind: Literal["regular-latlon", "icosahedral"] = "regular-latlon"
 
 
 class Catalog(AbstractCatalog):
