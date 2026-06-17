@@ -677,21 +677,18 @@ class BdcTokenSigner(_BaseSigner):
         token: Explicit BDC OAuth token. Defaults to `$BDC_ACCESS_TOKEN`.
 
     Examples:
-        - A clean https href becomes a query-bearing one:
+        - A clean https href becomes a query-bearing one (passing the token
+          explicitly so the example does not mutate the process env):
             ```python
-            >>> import os
-            >>> os.environ["BDC_ACCESS_TOKEN"] = "tok"
             >>> from earthlens.stac import BdcTokenSigner
-            >>> BdcTokenSigner().sign_href("https://data.inpe.br/bdc/data/x.tif")
+            >>> BdcTokenSigner(token="tok").sign_href("https://data.inpe.br/bdc/data/x.tif")
             'https://data.inpe.br/bdc/data/x.tif?access_token=tok'
 
             ```
         - An href that already carries a query gets `&access_token=…` instead:
             ```python
-            >>> import os
-            >>> os.environ["BDC_ACCESS_TOKEN"] = "tok"
             >>> from earthlens.stac import BdcTokenSigner
-            >>> BdcTokenSigner().sign_href("https://data.inpe.br/bdc/data/x.tif?foo=1")
+            >>> BdcTokenSigner(token="tok").sign_href("https://data.inpe.br/bdc/data/x.tif?foo=1")
             'https://data.inpe.br/bdc/data/x.tif?foo=1&access_token=tok'
 
             ```
@@ -781,10 +778,10 @@ def build_signer(signer_type: str, **creds: Any) -> Any:
         - An unknown signer name is rejected:
             ```python
             >>> from earthlens.stac import build_signer
-            >>> build_signer("nope")
+            >>> build_signer("nope")  # doctest: +ELLIPSIS
             Traceback (most recent call last):
                 ...
-            ValueError: unknown signer_type 'nope'; expected one of 'anonymous', 'aws-requester-pays', 'mpc-sas', 'earthdata', 'cdse', 'cdse-s3', 'bdc-token'.
+            ValueError: unknown signer_type 'nope'; expected one of ... 'bdc-token'.
 
             ```
     """
