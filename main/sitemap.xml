@@ -525,6 +525,10 @@
          <lastmod>2026-06-17</lastmod>
     </url>
     <url>
+         <loc>https://serapeum-org.github.io/earthlens/main/examples/stac/bdc_cbers_amazonia/</loc>
+         <lastmod>2026-06-17</lastmod>
+    </url>
+    <url>
          <loc>https://serapeum-org.github.io/earthlens/main/examples/stac/mpc_landsat_cdse_sentinel_same_aoi/</loc>
          <lastmod>2026-06-17</lastmod>
     </url>
@@ -533,7 +537,19 @@
          <lastmod>2026-06-17</lastmod>
     </url>
     <url>
+         <loc>https://serapeum-org.github.io/earthlens/main/examples/stac/regional_data_cubes/</loc>
+         <lastmod>2026-06-17</lastmod>
+    </url>
+    <url>
          <loc>https://serapeum-org.github.io/earthlens/main/examples/stac/sentinel2_ndvi_timeseries/</loc>
+         <lastmod>2026-06-17</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/main/examples/stac/usgs_landsat_requester_pays/</loc>
+         <lastmod>2026-06-17</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/main/examples/stac/veda_nasa_derived/</loc>
          <lastmod>2026-06-17</lastmod>
     </url>
     <url>
@@ -986,6 +1002,10 @@
     </url>
     <url>
          <loc>https://serapeum-org.github.io/earthlens/main/reference/stac/introduction/</loc>
+         <lastmod>2026-06-17</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/main/reference/stac/migration-from-gee/</loc>
          <lastmod>2026-06-17</lastmod>
     </url>
     <url>

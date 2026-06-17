@@ -2321,6 +2321,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../../../reference/stac/migration-from-gee/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Migration from GEE
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../../reference/stac/stac/" class="md-nav__link">
         
   
@@ -7616,6 +7644,118 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../regional_data_cubes/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Regional Open Data Cubes — DEAfrica + DEA
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../bdc_cbers_amazonia/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Brazil Data Cube — CBERS-4 / AMAZONIA-1 / MODIS VI
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../veda_nasa_derived/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    NASA VEDA — NLDAS-3, CMIP, Black Marble HD
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../usgs_landsat_requester_pays/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    USGS LandsatLook — Landsat C2 requester-pays
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -11541,18 +11681,18 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </style>
 <!-- End of mermaid configuration --><div class="jupyter-wrapper">
 <div class="jp-Notebook" data-jp-theme-light="true" data-jp-theme-name="JupyterLab Light">
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=52ae8988">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=7d5d0be6">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h1 id="sentinel-2-monthly-ndvi-time-series-earth-search">Sentinel-2 monthly NDVI time-series (Earth Search)<a class="anchor-link" href="#sentinel-2-monthly-ndvi-time-series-earth-search">¶</a></h1><p>Shows the <strong>raster <code>aggregate=</code></strong> path: pull Sentinel-2 red + NIR over a small AOI for a couple of months, reduce per month into per-window COGs, then compute mean NDVI per month. The download runs live against Earth Search (anonymous) and degrades gracefully offline.</p>
+<h1 id="sentinel-2-monthly-ndvi-time-series-earth-search">Sentinel-2 monthly NDVI time-series (Earth Search)<a class="anchor-link" href="#sentinel-2-monthly-ndvi-time-series-earth-search">¶</a></h1><p>Shows the <strong>raster <code>aggregate=</code></strong> path: pull Sentinel-2 red + NIR over a small AOI for a couple of months, reduce per month into per-window COGs, then compute mean NDVI per month. The download runs live against Earth Search (anonymous).</p>
 </div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=83b3c313">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=ca740fad">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -11586,13 +11726,9 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
     <span class="n">path</span><span class="o">=</span><span class="n">out</span><span class="p">,</span>
     <span class="n">max_items</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="k">try</span><span class="p">:</span>
-    <span class="n">monthly</span> <span class="o">=</span> <span class="n">el</span><span class="o">.</span><span class="n">download</span><span class="p">(</span>
-        <span class="n">aggregate</span><span class="o">=</span><span class="n">AggregationConfig</span><span class="p">(</span><span class="n">freq</span><span class="o">=</span><span class="s2">"1MS"</span><span class="p">,</span> <span class="n">op</span><span class="o">=</span><span class="s2">"mean"</span><span class="p">,</span> <span class="n">out_dir</span><span class="o">=</span><span class="n">out</span> <span class="o">+</span> <span class="s2">"/monthly"</span><span class="p">)</span>
-    <span class="p">)</span>
-<span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>  <span class="c1"># noqa: BLE001 - stays runnable offline</span>
-    <span class="n">monthly</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">"download skipped (needs network access):"</span><span class="p">,</span> <span class="n">exc</span><span class="p">)</span>
+<span class="n">monthly</span> <span class="o">=</span> <span class="n">el</span><span class="o">.</span><span class="n">download</span><span class="p">(</span>
+    <span class="n">aggregate</span><span class="o">=</span><span class="n">AggregationConfig</span><span class="p">(</span><span class="n">freq</span><span class="o">=</span><span class="s2">"1MS"</span><span class="p">,</span> <span class="n">op</span><span class="o">=</span><span class="s2">"mean"</span><span class="p">,</span> <span class="n">out_dir</span><span class="o">=</span><span class="n">out</span> <span class="o">+</span> <span class="s2">"/monthly"</span><span class="p">)</span>
+<span class="p">)</span>
 <span class="p">[</span><span class="n">p</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">monthly</span><span class="p">]</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-1">import tempfile
@@ -11611,13 +11747,9 @@ el = EarthLens(
     path=out,
     max_items=2,
 )
-try:
-    monthly = el.download(
-        aggregate=AggregationConfig(freq="1MS", op="mean", out_dir=out + "/monthly")
-    )
-except Exception as exc:  # noqa: BLE001 - stays runnable offline
-    monthly = []
-    print("download skipped (needs network access):", exc)
+monthly = el.download(
+    aggregate=AggregationConfig(freq="1MS", op="mean", out_dir=out + "/monthly")
+)
 [p.name for p in monthly]</div>
 </div>
 </div>
@@ -11625,7 +11757,7 @@ except Exception as exc:  # noqa: BLE001 - stays runnable offline
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=63de9c08">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=6ecde5d4">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -11636,7 +11768,7 @@ except Exception as exc:  # noqa: BLE001 - stays runnable offline
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=d51fbf8d">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=6a3fc5a7">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -11662,8 +11794,6 @@ except Exception as exc:  # noqa: BLE001 - stays runnable offline
     <span class="n">red</span><span class="p">,</span> <span class="n">nir</span> <span class="o">=</span> <span class="n">arr</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">arr</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
     <span class="n">ndvi</span> <span class="o">=</span> <span class="p">(</span><span class="n">nir</span> <span class="o">-</span> <span class="n">red</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">nir</span> <span class="o">+</span> <span class="n">red</span> <span class="o">+</span> <span class="mf">1e-9</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">cog</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s2">"mean NDVI:"</span><span class="p">,</span> <span class="nb">round</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nanmean</span><span class="p">(</span><span class="n">ndvi</span><span class="p">)),</span> <span class="mi">3</span><span class="p">))</span>
-<span class="k">if</span> <span class="ow">not</span> <span class="n">monthly</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">"no windows — run this notebook with network access"</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-2">import numpy as np
 from pyramids.dataset import Dataset
@@ -11672,9 +11802,7 @@ for cog in monthly:
     arr = Dataset.read_file(str(cog)).read_array().astype(float)
     red, nir = arr[0], arr[1]
     ndvi = (nir - red) / (nir + red + 1e-9)
-    print(cog.name, "mean NDVI:", round(float(np.nanmean(ndvi)), 3))
-if not monthly:
-    print("no windows — run this notebook with network access")</div>
+    print(cog.name, "mean NDVI:", round(float(np.nanmean(ndvi)), 3))</div>
 </div>
 </div>
 </div>

@@ -16,7 +16,7 @@
         <link rel="prev" href="../sentinel2_ndvi_timeseries/">
       
       
-        <link rel="next" href="../../gdacs/quickstart/">
+        <link rel="next" href="../regional_data_cubes/">
       
       
         
@@ -2301,6 +2301,34 @@
     
   
     Authentication
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../reference/stac/migration-from-gee/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Migration from GEE
   
 
     
@@ -7675,6 +7703,118 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../regional_data_cubes/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Regional Open Data Cubes — DEAfrica + DEA
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../bdc_cbers_amazonia/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Brazil Data Cube — CBERS-4 / AMAZONIA-1 / MODIS VI
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../veda_nasa_derived/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    NASA VEDA — NLDAS-3, CMIP, Black Marble HD
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../usgs_landsat_requester_pays/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    USGS LandsatLook — Landsat C2 requester-pays
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -11630,18 +11770,18 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </style>
 <!-- End of mermaid configuration --><div class="jupyter-wrapper">
 <div class="jp-Notebook" data-jp-theme-light="true" data-jp-theme-name="JupyterLab Light">
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=1d9433d7">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=01294992">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h1 id="same-aoi-across-providers-mpc-cdse">Same AOI across providers: MPC + CDSE<a class="anchor-link" href="#same-aoi-across-providers-mpc-cdse">¶</a></h1><p>Demonstrates the endpoint/signer abstraction: the <strong>same</strong> request shape pulls from Microsoft Planetary Computer (Azure SAS URL signing) and Copernicus Data Space (S3 credentials) over one AOI. Only <code>data_source</code> (and CDSE keys) change. The MPC pull runs live (degrades gracefully offline); the CDSE pull is a recipe (needs S3 keys).</p>
+<h1 id="same-aoi-across-providers-mpc-cdse">Same AOI across providers: MPC + CDSE<a class="anchor-link" href="#same-aoi-across-providers-mpc-cdse">¶</a></h1><p>Demonstrates the endpoint/signer abstraction: the <strong>same</strong> request shape pulls from Microsoft Planetary Computer (Azure SAS URL signing) and Copernicus Data Space (S3 credentials) over one AOI. Only <code>data_source</code> (and CDSE keys) change. The MPC pull runs live; the CDSE pull is a recipe (needs S3 keys).</p>
 </div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=e7e4cf09">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=d4d3af44">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -11678,18 +11818,18 @@ print("MPC S2 id:", cat.resolve("planetary-computer", "sentinel-2-l2a"))</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=0c1f5293">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=70f58674">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="planetary-computer-sentinel-2-sas-signing-no-account-live">Planetary Computer — Sentinel-2 (SAS signing, no account, live)<a class="anchor-link" href="#planetary-computer-sentinel-2-sas-signing-no-account-live">¶</a></h2><p>MPC serves Sentinel-2 L2A bands as <code>B04</code>/<code>B03</code>/<code>B02</code>; assets are signed with an Azure SAS token via the <code>planetary-computer</code> SDK.</p>
+<h2 id="planetary-computer-sentinel-2-sas-signing-no-account-live">Planetary Computer — Sentinel-2 (SAS signing, no account, live)<a class="anchor-link" href="#planetary-computer-sentinel-2-sas-signing-no-account-live">¶</a></h2><p>MPC serves Sentinel-2 L2A bands as <code>B04</code>/<code>B03</code>/<code>B02</code>; assets are signed with an Azure SAS token by pyramids' native <code>PlanetaryComputerSigner</code> (no SDK).</p>
 </div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=4fc739dd">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=777556a7">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -11714,18 +11854,14 @@ print("MPC S2 id:", cat.resolve("planetary-computer", "sentinel-2-l2a"))</div>
 <span class="n">aoi</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
     <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">40.40</span><span class="p">,</span> <span class="mf">40.45</span><span class="p">],</span> <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">3.72</span><span class="p">,</span> <span class="o">-</span><span class="mf">3.67</span><span class="p">],</span> <span class="n">start</span><span class="o">=</span><span class="s2">"2024-06-01"</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">"2024-06-20"</span>
 <span class="p">)</span>
-<span class="k">try</span><span class="p">:</span>
-    <span class="n">mpc</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
-        <span class="n">data_source</span><span class="o">=</span><span class="s2">"planetary-computer"</span><span class="p">,</span>
-        <span class="n">dataset</span><span class="o">=</span><span class="s2">"sentinel-2-l2a"</span><span class="p">,</span>
-        <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">"B04"</span><span class="p">,</span> <span class="s2">"B03"</span><span class="p">,</span> <span class="s2">"B02"</span><span class="p">],</span>
-        <span class="n">path</span><span class="o">=</span><span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">(),</span>
-        <span class="n">max_items</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-        <span class="o">**</span><span class="n">aoi</span><span class="p">,</span>
-    <span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
-<span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>  <span class="c1"># noqa: BLE001 - stays runnable offline</span>
-    <span class="n">mpc</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">"download skipped (needs network access):"</span><span class="p">,</span> <span class="n">exc</span><span class="p">)</span>
+<span class="n">mpc</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
+    <span class="n">data_source</span><span class="o">=</span><span class="s2">"planetary-computer"</span><span class="p">,</span>
+    <span class="n">dataset</span><span class="o">=</span><span class="s2">"sentinel-2-l2a"</span><span class="p">,</span>
+    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">"B04"</span><span class="p">,</span> <span class="s2">"B03"</span><span class="p">,</span> <span class="s2">"B02"</span><span class="p">],</span>
+    <span class="n">path</span><span class="o">=</span><span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">(),</span>
+    <span class="n">max_items</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="o">**</span><span class="n">aoi</span><span class="p">,</span>
+<span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
 <span class="p">[</span><span class="n">p</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">mpc</span><span class="p">]</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-2">import tempfile
@@ -11735,18 +11871,14 @@ from earthlens.earthlens import EarthLens
 aoi = dict(
     lat_lim=[40.40, 40.45], lon_lim=[-3.72, -3.67], start="2024-06-01", end="2024-06-20"
 )
-try:
-    mpc = EarthLens(
-        data_source="planetary-computer",
-        dataset="sentinel-2-l2a",
-        variables=["B04", "B03", "B02"],
-        path=tempfile.mkdtemp(),
-        max_items=1,
-        **aoi,
-    ).download()
-except Exception as exc:  # noqa: BLE001 - stays runnable offline
-    mpc = []
-    print("download skipped (needs network access):", exc)
+mpc = EarthLens(
+    data_source="planetary-computer",
+    dataset="sentinel-2-l2a",
+    variables=["B04", "B03", "B02"],
+    path=tempfile.mkdtemp(),
+    max_items=1,
+    **aoi,
+).download()
 [p.name for p in mpc]</div>
 </div>
 </div>
@@ -11754,7 +11886,7 @@ except Exception as exc:  # noqa: BLE001 - stays runnable offline
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=513d3884">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=d195fb51">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -11831,13 +11963,13 @@ except Exception as exc:  # noqa: BLE001 - stays runnable offline
         
         
           
-          <a href="../../gdacs/quickstart/" class="md-footer__link md-footer__link--next" aria-label="Next: GDACS quickstart — recent disaster alerts">
+          <a href="../regional_data_cubes/" class="md-footer__link md-footer__link--next" aria-label="Next: Regional Open Data Cubes — DEAfrica + DEA">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                GDACS quickstart — recent disaster alerts
+                Regional Open Data Cubes — DEAfrica + DEA
               </div>
             </div>
             <div class="md-footer__button md-icon">
