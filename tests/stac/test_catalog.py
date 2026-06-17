@@ -47,6 +47,19 @@ class TestBundledCatalog:
         assert cat.endpoints["deafrica"].signer == "anonymous"
         assert cat.endpoints["deafrica"].region == "af-south-1"
 
+    def test_all_eight_endpoints_load_together(self):
+        """The 8 bundled per-endpoint yaml files merge under the duplicate-key loader."""
+        cat = Catalog()
+        assert set(cat.endpoints) == {
+            "planetary-computer", "cdse", "earth-search",
+            "deafrica", "dea", "veda", "usgs-landsat", "bdc",
+        }
+        # available_collections holds a per-endpoint live index for each of the 8;
+        # source-coop is documentation-only (no endpoint, no collections).
+        for ep in cat.endpoints:
+            assert ep in cat.available_collections, ep
+            assert len(cat.available_collections[ep]) >= 3, ep
+
     def test_deafrica_collections_curated(self):
         """The deafrica endpoint exposes its curated flagship collections."""
         cat = Catalog()
