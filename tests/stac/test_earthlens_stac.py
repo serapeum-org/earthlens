@@ -28,13 +28,14 @@ class TestRouting:
     """The facade registers and resolves the STAC keys."""
 
     def test_keys_present(self):
-        """stac plus every endpoint alias (incl. usgs-landsat) is registered."""
+        """stac plus every endpoint alias (incl. bdc) is registered."""
         for key in (
             "stac", "planetary-computer", "earth-search", "cdse",
             "deafrica", "digital-earth-africa",
             "dea", "digital-earth-australia",
             "veda",
             "usgs-landsat", "landsat",
+            "bdc", "brazil-data-cube",
         ):
             assert key in EarthLens.DataSources
 
@@ -46,6 +47,7 @@ class TestRouting:
             "dea", "digital-earth-australia",
             "veda",
             "usgs-landsat", "landsat",
+            "bdc", "brazil-data-cube",
         ):
             assert EarthLens.DataSources[key] is STAC
 
@@ -119,6 +121,19 @@ class TestAliasEndpointBinding:
             variables={"usgs-landsat/landsat-c2l2-sr": ["red"]},
         )
         assert el2.datasource._endpoint == "usgs-landsat"
+
+    def test_bdc_alias_prebinds_endpoint(self, fake_pyramids, tmp_path):
+        """data_source='bdc' / 'brazil-data-cube' bind the bdc endpoint."""
+        el = _facade(
+            fake_pyramids, tmp_path, "bdc",
+            variables={"bdc/CBERS4-WFI-16D-2": ["NDVI"]},
+        )
+        assert el.datasource._endpoint == "bdc"
+        el2 = _facade(
+            fake_pyramids, tmp_path, "brazil-data-cube",
+            variables={"bdc/CBERS4-WFI-16D-2": ["NDVI"]},
+        )
+        assert el2.datasource._endpoint == "bdc"
 
     def test_explicit_endpoint_overrides_alias_default(self, fake_pyramids, tmp_path):
         """A user endpoint= kwarg wins over the alias default."""

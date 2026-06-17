@@ -42,7 +42,8 @@ _CATALOG_CACHE: dict[
 ] = {}
 
 SignerType = Literal[
-    "anonymous", "aws-requester-pays", "mpc-sas", "earthdata", "cdse", "cdse-s3"
+    "anonymous", "aws-requester-pays", "mpc-sas", "earthdata", "cdse",
+    "cdse-s3", "bdc-token",
 ]
 
 
@@ -151,6 +152,10 @@ class Collection(BaseModel):
             whose assets sit on a requester-pays S3 bucket (Earth Search's
             `landsat-c2-l2` → `s3://usgs-landsat`). `None` uses the endpoint
             signer.
+        requires_token: Documentation flag for token-gated collections (e.g. a
+            Brazil Data Cube row that needs `$BDC_ACCESS_TOKEN`). The flag is
+            informational only; the actual routing comes from `signer`
+            (e.g. `signer: bdc-token`). Defaults to `False`.
     """
 
     model_config = ConfigDict(frozen=True, extra="forbid")
@@ -164,6 +169,7 @@ class Collection(BaseModel):
     extent: Extent | None = None
     assets: dict[str, Asset] = Field(default_factory=dict)
     signer: SignerType | None = None
+    requires_token: bool = False
 
 
 def _load_catalog_data(

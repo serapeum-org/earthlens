@@ -35,6 +35,9 @@ endpoints:
     url: https://landsatlook.usgs.gov/stac-server
     signer: aws-requester-pays
     region: us-west-2
+  bdc:
+    url: https://data.inpe.br/bdc/stac/v1
+    signer: anonymous
 
 available_collections:
   planetary-computer:

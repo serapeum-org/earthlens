@@ -117,6 +117,25 @@ class TestBundledCatalog:
             assert col.endpoint == "usgs-landsat", key
             assert col.signer == "aws-requester-pays", key
 
+    def test_bdc_collections_curated(self):
+        """The bdc endpoint exposes its curated flagship collections (all anonymous today)."""
+        cat = Catalog()
+        assert cat.endpoints["bdc"].signer == "anonymous"
+        ndvi = cat.get_collection("bdc/CBERS4-WFI-16D-2")
+        assert ndvi.endpoint == "bdc"
+        assert ndvi.signer is None
+        assert ndvi.requires_token is False
+        for key in (
+            "bdc/CBERS4-WFI-16D-2", "bdc/CB4A-WFI-L4-SR-1", "bdc/CB4A-WPM-L4-DN-1",
+            "bdc/AMZ1-WFI-L4-SR-1", "bdc/S2_L2A-1",
+            "bdc/mod13q1-6.1", "bdc/myd13q1-6.1",
+        ):
+            col = cat.get_collection(key)
+            assert col.endpoint == "bdc", key
+            # all currently-exposed BDC collections read anonymously
+            assert col.signer is None, key
+            assert col.requires_token is False, key
+
     def test_available_collections_index(self):
         """The informational available_collections index is keyed by endpoint."""
         avail = Catalog().available_collections
@@ -247,6 +266,19 @@ class TestLoaderRules:
         )
         with pytest.raises(ValueError, match="invalid collection"):
             _load_catalog_data(tmp_path)
+
+    def test_requires_token_round_trips(self, tmp_path):
+        """The Collection.requires_token field parses + survives the loader."""
+        _write(
+            tmp_path / "a.yaml",
+            "endpoints:\n  e:\n    url: u\n    signer: anonymous\n"
+            "collections:\n  gated:\n    endpoint: e\n    requires_token: true\n"
+            "    signer: bdc-token\n",
+        )
+        _, _, collections = _load_catalog_data(tmp_path)
+        col = collections["gated"]
+        assert col.requires_token is True, "requires_token field survives the loader"
+        assert col.signer == "bdc-token", "bdc-token is a valid SignerType literal"
 
     def test_get_catalog_returns_datasets(self):
         """get_catalog returns the same curated collection map as datasets."""

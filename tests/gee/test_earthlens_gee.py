@@ -67,6 +67,8 @@ class TestRegistry:
         assert "google-earth-engine" in EarthLens.DataSources
         assert sorted(EarthLens.DataSources) == [
             "amazon-s3",
+            "bdc",
+            "brazil-data-cube",
             "cdse",
             "chc",
             "chirps",

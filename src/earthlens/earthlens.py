@@ -293,14 +293,15 @@ class EarthLens:
             ```python
             >>> from earthlens.earthlens import EarthLens
             >>> sorted(EarthLens.DataSources)  # doctest: +NORMALIZE_WHITESPACE
-            ['amazon-s3', 'cdse', 'chc', 'chirps', 'cmems', 'dea', 'deafrica',
-             'digital-earth-africa', 'digital-earth-australia', 'earth-search',
-             'earthdata', 'ecmwf', 'eumetsat', 'fdsn', 'firms', 'gdacs', 'gee',
-             'ghs', 'ghsl', 'google-earth-engine', 'hdx', 'human-settlement',
-             'landsat', 'national-water-model', 'nexrad', 'nwis', 'nwm', 'nwp',
-             'openaq', 'openeo', 'overture', 'planetary-computer', 'radar',
-             'sentinel-hub', 'sentinelhub', 'stac', 'tropycal', 'usgs-landsat',
-             'usgs-nwis', 'usgs-water', 'veda', 'world-pop', 'worldpop']
+            ['amazon-s3', 'bdc', 'brazil-data-cube', 'cdse', 'chc', 'chirps',
+             'cmems', 'dea', 'deafrica', 'digital-earth-africa',
+             'digital-earth-australia', 'earth-search', 'earthdata', 'ecmwf',
+             'eumetsat', 'fdsn', 'firms', 'gdacs', 'gee', 'ghs', 'ghsl',
+             'google-earth-engine', 'hdx', 'human-settlement', 'landsat',
+             'national-water-model', 'nexrad', 'nwis', 'nwm', 'nwp', 'openaq',
+             'openeo', 'overture', 'planetary-computer', 'radar', 'sentinel-hub',
+             'sentinelhub', 'stac', 'tropycal', 'usgs-landsat', 'usgs-nwis',
+             'usgs-water', 'veda', 'world-pop', 'worldpop']
 
             ```
         - Asking for an unknown backend raises `ValueError`:
@@ -515,6 +516,15 @@ class EarthLens:
                 "STAC",
                 "stac",
                 {"endpoint": "usgs-landsat"},
+            ),
+            # INPE Brazil Data Cube (BDC) STAC v1 — anonymous, the only global
+            # source of CBERS-4/4A and AMAZONIA-1. Alias 'brazil-data-cube'.
+            "bdc": ("earthlens.stac", "STAC", "stac", {"endpoint": "bdc"}),
+            "brazil-data-cube": (
+                "earthlens.stac",
+                "STAC",
+                "stac",
+                {"endpoint": "bdc"},
             ),
             # USGS NWIS / Water Data (dataretrieval). Tabular DataFrame of
             # per-site water observations; anonymous access works. The
