@@ -71,6 +71,8 @@ class TestRegistry:
             "chc",
             "chirps",
             "cmems",
+            "deafrica",
+            "digital-earth-africa",
             "earth-search",
             "earthdata",
             "ecmwf",

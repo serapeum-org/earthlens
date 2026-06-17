@@ -293,9 +293,10 @@ class EarthLens:
             ```python
             >>> from earthlens.earthlens import EarthLens
             >>> sorted(EarthLens.DataSources)  # doctest: +NORMALIZE_WHITESPACE
-            ['amazon-s3', 'cdse', 'chc', 'chirps', 'cmems', 'earth-search',
-             'earthdata', 'ecmwf', 'eumetsat', 'fdsn', 'firms', 'gdacs', 'gee',
-             'ghs', 'ghsl', 'google-earth-engine', 'hdx', 'human-settlement',
+            ['amazon-s3', 'cdse', 'chc', 'chirps', 'cmems', 'deafrica',
+             'digital-earth-africa', 'earth-search', 'earthdata', 'ecmwf',
+             'eumetsat', 'fdsn', 'firms', 'gdacs', 'gee', 'ghs', 'ghsl',
+             'google-earth-engine', 'hdx', 'human-settlement',
              'national-water-model', 'nexrad', 'nwis', 'nwm', 'nwp', 'openaq',
              'openeo', 'overture', 'planetary-computer', 'radar', 'sentinel-hub',
              'sentinelhub', 'stac', 'tropycal', 'usgs-nwis', 'usgs-water',
@@ -477,6 +478,15 @@ class EarthLens:
                 {"endpoint": "earth-search"},
             ),
             "cdse": ("earthlens.stac", "STAC", "stac", {"endpoint": "cdse"}),
+            # Digital Earth Africa STAC (anonymous, af-south-1) — WOfS, FC,
+            # crop mask, Landsat/Sentinel-2 ARD, GeoMedian, Copernicus DEM.
+            "deafrica": ("earthlens.stac", "STAC", "stac", {"endpoint": "deafrica"}),
+            "digital-earth-africa": (
+                "earthlens.stac",
+                "STAC",
+                "stac",
+                {"endpoint": "deafrica"},
+            ),
             # USGS NWIS / Water Data (dataretrieval). Tabular DataFrame of
             # per-site water observations; anonymous access works. The
             # "usgs-nwis" / "nwis" aliases point at the same backend.

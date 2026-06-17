@@ -44,6 +44,24 @@ class TestBundledCatalog:
         assert cat.endpoints["planetary-computer"].signer == "mpc-sas"
         assert cat.endpoints["cdse"].signer == "cdse-s3"
         assert cat.endpoints["earth-search"].signer == "anonymous"
+        assert cat.endpoints["deafrica"].signer == "anonymous"
+        assert cat.endpoints["deafrica"].region == "af-south-1"
+
+    def test_deafrica_collections_curated(self):
+        """The deafrica endpoint exposes its curated flagship collections."""
+        cat = Catalog()
+        wofs = cat.get_collection("deafrica/wofs_ls")
+        assert wofs.endpoint == "deafrica"
+        assert wofs.signer is None  # no per-collection override → endpoint default (anonymous)
+        assert wofs.default_assets == ["water"]
+        # the 10 confirmed roadmap collections all load
+        for key in (
+            "deafrica/wofs_ls", "deafrica/wofs_ls_summary_annual",
+            "deafrica/fc_ls", "deafrica/crop_mask",
+            "deafrica/gm_ls8_ls9_annual", "deafrica/ls8_sr", "deafrica/ls9_sr",
+            "deafrica/s2_l2a", "deafrica/dem_cop_30", "deafrica/dem_cop_90",
+        ):
+            assert cat.get_collection(key).endpoint == "deafrica", key
 
     def test_available_collections_index(self):
         """The informational available_collections index is keyed by endpoint."""
