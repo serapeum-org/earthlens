@@ -20,11 +20,14 @@ where `{var}` is the joined `VARIABLE_LEVEL` token (e.g.
 model row's `bands:` map. ECCC files are uncompressed (unlike DWD's
 `.bz2`), so there is no decompression step.
 
-GEPS is the one ensemble model — its filename carries an extra `_{member:03d}`
-slot for the perturbed member id (`_000` is the control, `_001` … `_020`
-are the perturbations). The catalog's `url_template` for GEPS includes
-the `{member:03d}` field; deterministic models leave it out and the
-formatter skips it.
+GEPS is the one ensemble model. The bundled `geps` row uses Datamart's
+**raw `_allmbrs`** layout — one file per `(cycle, step, variable)` that
+already concatenates every member (control + 20 perturbations) — so the
+shipped centre has no per-member fetch axis. The static `_band_url`
+nonetheless honours an optional `{member:03d}` substitution: a future
+catalog row could point at a per-member URL pattern (e.g. the
+`grib2/products/...mem{NNN}.grib2` per-statistic feed) without any
+centre-code change. Today no row uses it.
 
 License note (`C6` / `G4`). Real-time AMQP push exists via
 `sarracenia`, but `sarracenia` is GPL and is therefore **not vendored**;

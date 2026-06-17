@@ -57,9 +57,10 @@ doesn't carry).
 | `nam` | NOAA NODD | `herbie` | 00/06/12/18 | 84 h | 12 km CONUS (`awphys`) |
 | `nbm` | NOAA NODD | `herbie` | hourly | 264 h | National Blend (`co`) |
 | `rrfs` | NOAA NODD | `herbie` | hourly | 60 h | 3 km (`prslev`) |
-| `gdps` | ECCC MSC | `herbie` | 00/12 | 240 h | 15 km global |
-| `rdps` | ECCC MSC | `herbie` | 00/06/12/18 | 84 h | 10 km regional |
-| `hrdps` | ECCC MSC | `herbie` | 00/06/12/18 | 48 h | 2.5 km (`continental`) |
+| `gdps` | ECCC MSC | `eccc-msc` | 00/12 | 240 h | 15 km global, direct Datamart (WIS2 tokens, 30 d retention) |
+| `rdps` | ECCC MSC | `eccc-msc` | 00/06/12/18 | 84 h | 10 km regional, direct Datamart (WIS2 tokens, 30 d retention) |
+| `hrdps` | ECCC MSC | `eccc-msc` | 00/06/12/18 | 48 h | 2.5 km continental, direct Datamart (WIS2 tokens, 30 d retention) |
+| `geps` | ECCC MSC | `eccc-msc` | 00/12 | 384 h | 0.5° ensemble (21 members per `_allmbrs` file), 14 d retention |
 | `icon-eu` | DWD Open Data | `direct-https` | 00/06/12/18 | 120 h | **regular lat-lon (croppable)** ✓ probed |
 | `icon-d2` | DWD Open Data | `direct-https` | every 3 h | 48 h | icosahedral (raw fetch) ✓ probed |
 | `ens` | ECMWF Open Data | `ecmwf-opendata` | 00/06/12/18 | 360 h | IFS ENS control (`enfo`/`cf`) ✓ probed |
