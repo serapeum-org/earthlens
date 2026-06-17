@@ -10,13 +10,13 @@
       
       
       
-        <link rel="canonical" href="https://serapeum-org.github.io/earthlens/develop/reference/earthdata/authentication/">
+        <link rel="canonical" href="https://serapeum-org.github.io/earthlens/develop/reference/stac/migration-from-gee/">
       
       
-        <link rel="prev" href="../usage/">
+        <link rel="prev" href="../authentication/">
       
       
-        <link rel="next" href="../catalog/">
+        <link rel="next" href="../stac/">
       
       
         
@@ -27,7 +27,7 @@
     
     
       
-        <title>Authentication - earthlens</title>
+        <title>Migration from GEE - earthlens</title>
       
     
     
@@ -83,7 +83,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#nasa-earthdata-authentication" class="md-skip">
+        <a href="#migrating-from-google-earth-engine-to-earthlensstac" class="md-skip">
           Skip to content
         </a>
       
@@ -123,7 +123,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Authentication
+              Migration from GEE
             
           </span>
         </div>
@@ -1255,8 +1255,6 @@
                 
   
   
-    
-  
   
   
     
@@ -1267,11 +1265,11 @@
       
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_5" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_5" >
         
           
           <label class="md-nav__link" for="__nav_3_5" id="__nav_3_5_label" tabindex="0">
@@ -1292,7 +1290,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_5_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_5_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_3_5">
             <span class="md-nav__icon md-icon"></span>
             
@@ -1310,7 +1308,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../introduction/" class="md-nav__link">
+      <a href="../../earthdata/introduction/" class="md-nav__link">
         
   
   
@@ -1338,7 +1336,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../usage/" class="md-nav__link">
+      <a href="../../earthdata/usage/" class="md-nav__link">
         
   
   
@@ -1363,37 +1361,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Authentication
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../../earthdata/authentication/" class="md-nav__link">
         
   
   
@@ -1409,81 +1380,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#installation" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Installation
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#get-an-account" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Get an account
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#credential-sources-in-priority-order" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Credential sources (in priority order)
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#in-region-s3-access" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        In-region S3 access
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#ci-secrets" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        CI secrets
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -1496,7 +1392,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../catalog/" class="md-nav__link">
+      <a href="../../earthdata/catalog/" class="md-nav__link">
         
   
   
@@ -1524,7 +1420,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../earthdata/" class="md-nav__link">
+      <a href="../../earthdata/earthdata/" class="md-nav__link">
         
   
   
@@ -2293,6 +2189,8 @@
                 
   
   
+    
+  
   
   
     
@@ -2303,11 +2201,11 @@
       
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_10" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_10" checked>
         
           
           <label class="md-nav__link" for="__nav_3_10" id="__nav_3_10_label" tabindex="0">
@@ -2328,7 +2226,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_10_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_10_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_3_10">
             <span class="md-nav__icon md-icon"></span>
             
@@ -2346,7 +2244,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../stac/introduction/" class="md-nav__link">
+      <a href="../introduction/" class="md-nav__link">
         
   
   
@@ -2374,7 +2272,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../stac/usage/" class="md-nav__link">
+      <a href="../usage/" class="md-nav__link">
         
   
   
@@ -2402,7 +2300,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../stac/authentication/" class="md-nav__link">
+      <a href="../authentication/" class="md-nav__link">
         
   
   
@@ -2427,10 +2325,37 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../../stac/migration-from-gee/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Migration from GEE
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -2446,6 +2371,175 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#when-to-use-which-backend" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        When to use which backend
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#top-10-gee-earthlensstac-mappings" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Top-10 GEE → earthlens.stac mappings
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#runnable-snippets" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Runnable snippets
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Runnable snippets">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#copernicuss2_sr_harmonized-mpc-sentinel-2-l2a-rgb" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        COPERNICUS/S2_SR_HARMONIZED → MPC sentinel-2-l2a (RGB)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#landsatlc08c02t1_l2-usgs-landsatlook-requester-pays" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        LANDSAT/LC08/C02/T1_L2 → USGS LandsatLook (requester-pays)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#nasahlshlsl30v002-mpc-hls2-l30" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        NASA/HLS/HLSL30/v002 → MPC hls2-l30
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#modis061mod13q1-bdc-mod13q1-61-16-day-ndvi-anonymous" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        MODIS/061/MOD13Q1 → BDC mod13q1-6.1 (16-day NDVI, anonymous)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#copernicusdemglo30-mpc-cop-dem-glo-30-dem-anonymous" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        COPERNICUS/DEM/GLO30 → MPC cop-dem-glo-30 (DEM, anonymous)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#esaworldcoverv200-mpc-esa-worldcover-10-m-land-cover" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ESA/WorldCover/v200 → MPC esa-worldcover (10 m land cover)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#usgs3dep10m-mpc-3dep-seamless-10-m-dem-us-only" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        USGS/3DEP/10m → MPC 3dep-seamless (10 m DEM, US only)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#server-side-reductions-googledynamicworldv1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Server-side reductions: GOOGLE/DYNAMICWORLD/V1
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#what-does-not-migrate" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What does not migrate
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#see-also" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        See also
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -2458,7 +2552,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../stac/stac/" class="md-nav__link">
+      <a href="../stac/" class="md-nav__link">
         
   
   
@@ -10860,10 +10954,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#installation" class="md-nav__link">
+  <a href="#when-to-use-which-backend" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Installation
+        When to use which backend
       
     </span>
   </a>
@@ -10871,10 +10965,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#get-an-account" class="md-nav__link">
+  <a href="#top-10-gee-earthlensstac-mappings" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Get an account
+        Top-10 GEE → earthlens.stac mappings
       
     </span>
   </a>
@@ -10882,10 +10976,104 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#credential-sources-in-priority-order" class="md-nav__link">
+  <a href="#runnable-snippets" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Credential sources (in priority order)
+        Runnable snippets
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Runnable snippets">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#copernicuss2_sr_harmonized-mpc-sentinel-2-l2a-rgb" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        COPERNICUS/S2_SR_HARMONIZED → MPC sentinel-2-l2a (RGB)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#landsatlc08c02t1_l2-usgs-landsatlook-requester-pays" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        LANDSAT/LC08/C02/T1_L2 → USGS LandsatLook (requester-pays)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#nasahlshlsl30v002-mpc-hls2-l30" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        NASA/HLS/HLSL30/v002 → MPC hls2-l30
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#modis061mod13q1-bdc-mod13q1-61-16-day-ndvi-anonymous" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        MODIS/061/MOD13Q1 → BDC mod13q1-6.1 (16-day NDVI, anonymous)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#copernicusdemglo30-mpc-cop-dem-glo-30-dem-anonymous" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        COPERNICUS/DEM/GLO30 → MPC cop-dem-glo-30 (DEM, anonymous)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#esaworldcoverv200-mpc-esa-worldcover-10-m-land-cover" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ESA/WorldCover/v200 → MPC esa-worldcover (10 m land cover)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#usgs3dep10m-mpc-3dep-seamless-10-m-dem-us-only" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        USGS/3DEP/10m → MPC 3dep-seamless (10 m DEM, US only)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#server-side-reductions-googledynamicworldv1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Server-side reductions: GOOGLE/DYNAMICWORLD/V1
       
     </span>
   </a>
@@ -10893,10 +11081,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#in-region-s3-access" class="md-nav__link">
+  <a href="#what-does-not-migrate" class="md-nav__link">
     <span class="md-ellipsis">
       
-        In-region S3 access
+        What does not migrate
       
     </span>
   </a>
@@ -10904,10 +11092,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#ci-secrets" class="md-nav__link">
+  <a href="#see-also" class="md-nav__link">
     <span class="md-ellipsis">
       
-        CI secrets
+        See also
       
     </span>
   </a>
@@ -10931,7 +11119,7 @@
 
 
   
-    <a href="https://github.com/serapeum-org/earthlens/edit/master/docs/reference/earthdata/authentication.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
+    <a href="https://github.com/serapeum-org/earthlens/edit/master/docs/reference/stac/migration-from-gee.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
     </a>
@@ -10940,148 +11128,197 @@
     
       
     
-    <a href="https://github.com/serapeum-org/earthlens/raw/master/docs/reference/earthdata/authentication.md" title="View source of this page" class="md-content__button md-icon">
+    <a href="https://github.com/serapeum-org/earthlens/raw/master/docs/reference/stac/migration-from-gee.md" title="View source of this page" class="md-content__button md-icon">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 18c.56 0 1 .44 1 1s-.44 1-1 1-1-.44-1-1 .44-1 1-1m0-3c-2.73 0-5.06 1.66-6 4 .94 2.34 3.27 4 6 4s5.06-1.66 6-4c-.94-2.34-3.27-4-6-4m0 6.5a2.5 2.5 0 0 1-2.5-2.5 2.5 2.5 0 0 1 2.5-2.5 2.5 2.5 0 0 1 2.5 2.5 2.5 2.5 0 0 1-2.5 2.5M9.27 20H6V4h7v5h5v4.07c.7.08 1.36.25 2 .49V8l-6-6H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h4.5a8.2 8.2 0 0 1-1.23-2"/></svg>
     </a>
   
 
 
-<h1 id="nasa-earthdata-authentication"><a class="toclink" href="#nasa-earthdata-authentication">NASA Earthdata — authentication</a><a class="headerlink" href="#nasa-earthdata-authentication" title="Permanent link">#</a></h1>
-<p>The Earthdata backend authenticates once per process against <strong>Earthdata
-Login (EDL)</strong> and reuses that session across every DAAC.</p>
-<h2 id="installation"><a class="toclink" href="#installation">Installation</a><a class="headerlink" href="#installation" title="Permanent link">#</a></h2>
-<p>The backend needs the <code>earthdata</code> extra:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>pip<span class="w"> </span>install<span class="w"> </span>earthlens<span class="o">[</span>earthdata<span class="o">]</span>
-</code></pre></div>
-<p>This pulls <a href="https://earthaccess.readthedocs.io"><code>earthaccess</code></a> <code>&gt;=0.18</code>,
-which <strong>requires Python ≥ 3.12</strong>. On Python 3.11 the dependency will not
-resolve — the rest of earthlens still works, but the Earthdata backend
-is unavailable until you move to 3.12+. The <code>earthaccess</code> import is
-lazy, so <code>import earthlens.earthdata</code> succeeds without the extra; the
-friendly <code>ImportError</code> (naming <code>earthlens[earthdata]</code>) is only raised
-when you actually log in.</p>
-<h2 id="get-an-account"><a class="toclink" href="#get-an-account">Get an account</a><a class="headerlink" href="#get-an-account" title="Permanent link">#</a></h2>
-<p>Earthdata Login (EDL) is free and takes a couple of minutes. One account
-gives you <strong>both</strong> a username/password <strong>and</strong> an optional bearer
-<strong>token</strong> (generated from your profile) — either authenticates this
-backend, with one important exception: <strong>ASF needs username/password</strong>
-(see the warning below). The token is not a separate API key; it is an
-alternative credential minted from the same account.</p>
-<ol>
-<li>Go to <a href="https://urs.earthdata.nasa.gov">urs.earthdata.nasa.gov</a> and
-   click <strong>Register</strong>.</li>
-<li>Choose a <strong>username</strong> and <strong>password</strong> and fill in the email, name,
-   and affiliation / study-area fields NASA requests.</li>
-<li><strong>Verify your email</strong> via the link NASA sends; your account is then
-   active.</li>
-<li>Your <strong>username + password</strong> are the credentials — wire them in via
-   the sources below.</li>
-</ol>
-<p>Two one-time, dataset-specific steps you may hit:</p>
+<h1 id="migrating-from-google-earth-engine-to-earthlensstac"><a class="toclink" href="#migrating-from-google-earth-engine-to-earthlensstac">Migrating from Google Earth Engine to <code>earthlens.stac</code></a><a class="headerlink" href="#migrating-from-google-earth-engine-to-earthlensstac" title="Permanent link">#</a></h1>
+<p>Most workloads that load imagery from a single Earth Engine asset id (<code>ee.ImageCollection("…")</code>)
+map directly to one of <code>earthlens.stac</code>'s eight curated endpoints. The two backends speak different
+APIs — Earth Engine is a server-side processing language; <code>earthlens.stac</code> is a STAC-API
+client that hands you Cloud-Optimized GeoTIFFs — but the catalogue overlap is broad enough that
+the top ten GEE asset ids each have an <code>earthlens.stac</code> equivalent. This page lists them.</p>
+<h2 id="when-to-use-which-backend"><a class="toclink" href="#when-to-use-which-backend">When to use which backend</a><a class="headerlink" href="#when-to-use-which-backend" title="Permanent link">#</a></h2>
 <ul>
-<li><strong>Authorize the DAAC application.</strong> Some DAACs require you to approve
-  their application once, or downloads return <strong>HTTP 401</strong> even with a
-  valid token. <strong>ASF (Sentinel-1 / OPERA) is the common case.</strong> To
-  authorize it:<ol>
-<li>Log in at <a href="https://urs.earthdata.nasa.gov">urs.earthdata.nasa.gov</a>.</li>
-<li>Top-right menu → <strong>Applications → Authorized Apps</strong>.</li>
-<li>Click <strong>Approve More Applications</strong>, find <strong>“Alaska Satellite
-   Facility Data Access”</strong>, and authorize it. If it is not listed,
-   go to <strong>EULAs → Accept New EULAs</strong> and accept the ASF one (ASF
-   gates its datapool behind a EULA).</li>
-<li>Alternatively, open any ASF granule once via
-   <a href="https://search.asf.alaska.edu">ASF Vertex</a> while logged in and
-   approve when prompted.
-  The same flow applies to any DAAC whose download 401s — approve its
-  application from <strong>Authorized Apps</strong>.</li>
-</ol>
-</li>
+<li><strong>You want pixels on disk over your AOI/window</strong> → <code>earthlens.stac</code>. One COG per
+  <code>(collection, date)</code>, anonymous reads on most endpoints (Earth Search, Digital Earth Africa /
+  Australia, NASA VEDA, Brazil Data Cube, Microsoft Planetary Computer), requester-pays on
+  <code>usgs-landsat</code>, S3 keys on <code>cdse</code>.</li>
+<li><strong>You want a server-side reduction</strong> (e.g. composites, mosaics, indices computed on EE's
+  cluster) → <code>earthlens.openeo</code> (the openEO process-graph backend). See
+  <a href="#server-side-reductions-google-dynamicworld-v1"><code>Dynamic World</code></a> below.</li>
+<li><strong>You want GEE-only assets</strong> (e.g. Google's proprietary atmospheric correction, internal LST
+  products) → keep <code>earthlens.gee</code>; nothing in <code>earthlens.stac</code> substitutes for it.</li>
 </ul>
-<p>!!! warning "ASF needs username/password, not a bearer token"
-      Authorizing the ASF app is necessary but <strong>not sufficient</strong> for a
-      token. ASF's datapool redirects through an EDL OAuth flow
-      (<code>datapool.asf.alaska.edu</code> → <code>cumulus.asf.alaska.edu</code> →
-      <code>urs.earthdata.nasa.gov</code>), and a bearer token is dropped across
-      that cross-host redirect → <strong>HTTP 401</strong>. For ASF (Sentinel-1 /
-      OPERA) downloads, authenticate with <strong>username/password</strong> (or a
-      <code>~/.netrc</code> entry) so <code>earthaccess</code> can hold the OAuth session, or
-      stream in-region from S3. A bare <code>EARTHDATA_TOKEN</code> works for the
-      other DAACs (GES DISC, ORNL, OB.DAAC, NSIDC, …) but not ASF HTTPS.
-- <strong>Accept a EULA.</strong> A few collections (e.g. GPM IMERG at GES DISC) ask
-  you to accept a licence agreement on first download.</p>
-<h2 id="credential-sources-in-priority-order"><a class="toclink" href="#credential-sources-in-priority-order">Credential sources (in priority order)</a><a class="headerlink" href="#credential-sources-in-priority-order" title="Permanent link">#</a></h2>
-<p><code>EarthData(...)</code> resolves a login strategy automatically, in this
-priority order:</p>
-<ol>
-<li><strong>EDL bearer token</strong> — an explicit <code>EarthData(..., token=...)</code> or the
-   <code>EARTHDATA_TOKEN</code> environment variable. A token authenticates without
-   a password (the token-equivalent of GEE's service key); generate one
-   from your EDL profile under <strong>Generate Token</strong>. Best for CI and
-   headless use — no password in plaintext. <strong>Works for every DAAC
-   except ASF</strong> — ASF's OAuth-redirecting datapool drops the bearer
-   token (see the ASF warning above), so Sentinel-1 / OPERA needs
-   username/password.</li>
-<li><strong>Username / password</strong> — <code>EarthData(..., username=..., password=...)</code>
-   or the <code>EARTHDATA_USERNAME</code> / <code>EARTHDATA_PASSWORD</code> environment
-   variables. Works for <strong>all</strong> DAACs, including ASF. Required for
-   ASF / OPERA.</li>
-<li><strong><code>~/.netrc</code></strong> — add a machine entry:</li>
-</ol>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>machine urs.earthdata.nasa.gov
-<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>    login YOUR_USERNAME
-<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>    password YOUR_PASSWORD
-</code></pre></div>
-<p>Pass a non-default path with <code>EarthData(..., netrc_path=...)</code>.
-4. <strong>Interactive prompt</strong> — the last resort when none of the above
-   resolves; <code>earthaccess</code> prompts and persists a token.</p>
-<p>An explicit <code>token=</code> / <code>username=</code> / <code>password=</code> is exported to the
-matching environment variable (<code>EARTHDATA_TOKEN</code>, or <code>EARTHDATA_USERNAME</code>
-/ <code>EARTHDATA_PASSWORD</code>) that <code>earthaccess</code>'s environment strategy reads.
-After a successful login, <code>earthaccess</code> persists the token so later
-processes reuse it.</p>
-<h2 id="in-region-s3-access"><a class="toclink" href="#in-region-s3-access">In-region S3 access</a><a class="headerlink" href="#in-region-s3-access" title="Permanent link">#</a></h2>
-<p>For cloud-hosted collections, the authenticated session also mints
-<strong>rotating, per-provider S3 credentials</strong> (valid roughly one hour). The
-backend uses them automatically when streaming in-region — see
-<a href="../usage/#cloud-streaming-vs-https-download">Usage → cloud streaming</a>.</p>
-<h2 id="ci-secrets"><a class="toclink" href="#ci-secrets">CI secrets</a><a class="headerlink" href="#ci-secrets" title="Permanent link">#</a></h2>
-<p>The live e2e suite (<code>-m "e2e and earthdata"</code>, run by the <code>e2e-earthdata</code>
-job under Python ≥ 3.12) reads either an <code>EARTHDATA_TOKEN</code> <strong>or</strong> an
-<code>EARTHDATA_USERNAME</code> / <code>EARTHDATA_PASSWORD</code> repository secret, and skips
-cleanly when none are set. Configure with the GitHub CLI — a single
-token is the simplest:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>gh<span class="w"> </span>secret<span class="w"> </span><span class="nb">set</span><span class="w"> </span>EARTHDATA_TOKEN<span class="w"> </span>--repo<span class="w"> </span>&lt;owner&gt;/&lt;repo&gt;<span class="w">      </span><span class="c1"># paste your EDL bearer token</span>
-<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="c1"># …and/or the username/password pair (required for the ASF / OPERA test):</span>
-<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>gh<span class="w"> </span>secret<span class="w"> </span><span class="nb">set</span><span class="w"> </span>EARTHDATA_USERNAME<span class="w"> </span>--repo<span class="w"> </span>&lt;owner&gt;/&lt;repo&gt;<span class="w">   </span><span class="c1"># paste your EDL username</span>
-<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>gh<span class="w"> </span>secret<span class="w"> </span><span class="nb">set</span><span class="w"> </span>EARTHDATA_PASSWORD<span class="w"> </span>--repo<span class="w"> </span>&lt;owner&gt;/&lt;repo&gt;<span class="w">   </span><span class="c1"># paste your EDL password</span>
-</code></pre></div>
-<p>Which secret to set depends on how much you want CI to confirm:</p>
+<h2 id="top-10-gee-earthlensstac-mappings"><a class="toclink" href="#top-10-gee-earthlensstac-mappings">Top-10 GEE → <code>earthlens.stac</code> mappings</a><a class="headerlink" href="#top-10-gee-earthlensstac-mappings" title="Permanent link">#</a></h2>
 <table>
 <thead>
 <tr>
-<th>Secret(s)</th>
-<th>e2e tests that run</th>
+<th>GEE asset id</th>
+<th><code>earthlens.stac</code> endpoint / collection</th>
 <th>Notes</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><code>EARTHDATA_TOKEN</code> only</td>
-<td>the token notebooks (IMERG, GEDI, PACE, SMAP) + the IMERG fetch</td>
-<td>The OPERA / ASF test skips. Lower risk — a token is scoped and expires (~60 days).</td>
+<td><code>COPERNICUS/S2_SR_HARMONIZED</code></td>
+<td><code>planetary-computer / sentinel-2-l2a</code> (or <code>earth-search / sentinel-2-l2a</code>)</td>
+<td>Same MGRS scenes; Earth Search is fully anonymous, MPC mints a SAS token.</td>
 </tr>
 <tr>
-<td><code>EARTHDATA_TOKEN</code> + <code>EARTHDATA_USERNAME</code> / <code>EARTHDATA_PASSWORD</code></td>
-<td><strong>all</strong>, including the OPERA / ASF test</td>
-<td>ASF needs the username/password path. Note this puts your <strong>real EDL password</strong> in the Actions secret store.</td>
+<td><code>LANDSAT/LC08/C02/T1_L2</code></td>
+<td><code>usgs-landsat / landsat-c2l2-sr</code></td>
+<td>Authoritative USGS source; requester-pays on <code>s3://usgs-landsat</code>. MPC's <code>landsat-c2-l2</code> is a mirror.</td>
+</tr>
+<tr>
+<td><code>LANDSAT/LC09/C02/T1_L2</code></td>
+<td><code>usgs-landsat / landsat-c2l2-sr</code></td>
+<td>LC08 and LC09 share the SR product; filter by <code>platform</code> in the search.</td>
+</tr>
+<tr>
+<td><code>NASA/HLS/HLSL30/v002</code></td>
+<td><code>planetary-computer / hls2-l30</code></td>
+<td>Harmonised Landsat (30 m). MPC handles the EDL auth so you don't need an Earthdata account.</td>
+</tr>
+<tr>
+<td><code>NASA/HLS/HLSS30/v002</code></td>
+<td><code>planetary-computer / hls2-s30</code></td>
+<td>Harmonised Sentinel-2 (30 m).</td>
+</tr>
+<tr>
+<td><code>MODIS/061/MOD13Q1</code></td>
+<td><code>bdc / mod13q1-6.1</code></td>
+<td>16-day NDVI/EVI; BDC reads anonymously today.</td>
+</tr>
+<tr>
+<td><code>MODIS/061/MYD13Q1</code></td>
+<td><code>bdc / myd13q1-6.1</code></td>
+<td>16-day NDVI/EVI (Aqua).</td>
+</tr>
+<tr>
+<td><code>COPERNICUS/DEM/GLO30</code></td>
+<td><code>planetary-computer / cop-dem-glo-30</code> (or <code>earth-search / cop-dem-glo-30</code>)</td>
+<td>30 m global DEM, anonymous.</td>
+</tr>
+<tr>
+<td><code>ESA/WorldCover/v200</code></td>
+<td><code>planetary-computer / esa-worldcover</code></td>
+<td>2021 global 10 m land cover.</td>
+</tr>
+<tr>
+<td><code>USGS/3DEP/10m</code></td>
+<td><code>planetary-computer / 3dep-seamless</code></td>
+<td>USGS 10 m DEM, US-only coverage.</td>
 </tr>
 </tbody>
 </table>
-<p>Until the relevant secret(s) are set, the live e2e tests (including the
-example-notebook execution) <strong>skip</strong> rather than fail. The
-<code>TestEarthdataAsfNotebook</code> (OPERA) test is gated on
-<code>EARTHDATA_USERNAME</code> / <code>EARTHDATA_PASSWORD</code> specifically.</p>
+<p>For DEM specifically, <code>earth-search/cop-dem-glo-90</code> and <code>deafrica/dem_cop_30</code> / <code>dem_cop_90</code> are
+also valid anonymous mirrors with different default extents.</p>
+<h2 id="runnable-snippets"><a class="toclink" href="#runnable-snippets">Runnable snippets</a><a class="headerlink" href="#runnable-snippets" title="Permanent link">#</a></h2>
+<p>Each snippet replaces the equivalent <code>ee.ImageCollection(...).filterBounds(...).filterDate(...)
+.first()</code> recipe in Earth Engine and writes a Cloud-Optimized GeoTIFF.</p>
+<h3 id="copernicuss2_sr_harmonized-mpc-sentinel-2-l2a-rgb"><a class="toclink" href="#copernicuss2_sr_harmonized-mpc-sentinel-2-l2a-rgb"><code>COPERNICUS/S2_SR_HARMONIZED</code> → MPC sentinel-2-l2a (RGB)</a><a class="headerlink" href="#copernicuss2_sr_harmonized-mpc-sentinel-2-l2a-rgb" title="Permanent link">#</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="n">paths</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;planetary-computer&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">variables</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;sentinel-2-l2a&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;B04&quot;</span><span class="p">,</span> <span class="s2">&quot;B03&quot;</span><span class="p">,</span> <span class="s2">&quot;B02&quot;</span><span class="p">]},</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">40.40</span><span class="p">,</span> <span class="mf">40.45</span><span class="p">],</span> <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">3.72</span><span class="p">,</span> <span class="o">-</span><span class="mf">3.67</span><span class="p">],</span>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    <span class="n">start</span><span class="o">=</span><span class="s2">&quot;2024-06-01&quot;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">&quot;2024-06-20&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    <span class="n">path</span><span class="o">=</span><span class="s2">&quot;./out&quot;</span><span class="p">,</span> <span class="n">max_items</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
+</code></pre></div>
+<h3 id="landsatlc08c02t1_l2-usgs-landsatlook-requester-pays"><a class="toclink" href="#landsatlc08c02t1_l2-usgs-landsatlook-requester-pays"><code>LANDSAT/LC08/C02/T1_L2</code> → USGS LandsatLook (requester-pays)</a><a class="headerlink" href="#landsatlc08c02t1_l2-usgs-landsatlook-requester-pays" title="Permanent link">#</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="n">paths</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>    <span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;usgs-landsat&quot;</span><span class="p">,</span>        <span class="c1"># alias &#39;landsat&#39; works too</span>
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>    <span class="n">variables</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;usgs-landsat/landsat-c2l2-sr&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;red&quot;</span><span class="p">,</span> <span class="s2">&quot;green&quot;</span><span class="p">,</span> <span class="s2">&quot;blue&quot;</span><span class="p">,</span> <span class="s2">&quot;nir08&quot;</span><span class="p">]},</span>
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">37.5</span><span class="p">,</span> <span class="mf">38.0</span><span class="p">],</span> <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">122.5</span><span class="p">,</span> <span class="o">-</span><span class="mf">122.0</span><span class="p">],</span>
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>    <span class="n">start</span><span class="o">=</span><span class="s2">&quot;2024-06-01&quot;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">&quot;2024-08-31&quot;</span><span class="p">,</span>
+<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>    <span class="n">path</span><span class="o">=</span><span class="s2">&quot;./out&quot;</span><span class="p">,</span> <span class="n">max_items</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
+</code></pre></div>
+<p>USGS LandsatLook reads from <code>s3://usgs-landsat</code> (requester-pays) — make sure
+<code>AWS_ACCESS_KEY_ID</code> / <code>AWS_SECRET_ACCESS_KEY</code> are set.</p>
+<h3 id="nasahlshlsl30v002-mpc-hls2-l30"><a class="toclink" href="#nasahlshlsl30v002-mpc-hls2-l30"><code>NASA/HLS/HLSL30/v002</code> → MPC hls2-l30</a><a class="headerlink" href="#nasahlshlsl30v002-mpc-hls2-l30" title="Permanent link">#</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">paths</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>    <span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;planetary-computer&quot;</span><span class="p">,</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>    <span class="n">variables</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;hls2-l30&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;B04&quot;</span><span class="p">,</span> <span class="s2">&quot;B05&quot;</span><span class="p">]},</span>   <span class="c1"># red + nir for NDVI</span>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">40.40</span><span class="p">,</span> <span class="mf">40.45</span><span class="p">],</span> <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">3.72</span><span class="p">,</span> <span class="o">-</span><span class="mf">3.67</span><span class="p">],</span>
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>    <span class="n">start</span><span class="o">=</span><span class="s2">&quot;2024-06-01&quot;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">&quot;2024-08-31&quot;</span><span class="p">,</span>
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>    <span class="n">path</span><span class="o">=</span><span class="s2">&quot;./out&quot;</span><span class="p">,</span> <span class="n">max_items</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
+</code></pre></div>
+<h3 id="modis061mod13q1-bdc-mod13q1-61-16-day-ndvi-anonymous"><a class="toclink" href="#modis061mod13q1-bdc-mod13q1-61-16-day-ndvi-anonymous"><code>MODIS/061/MOD13Q1</code> → BDC mod13q1-6.1 (16-day NDVI, anonymous)</a><a class="headerlink" href="#modis061mod13q1-bdc-mod13q1-61-16-day-ndvi-anonymous" title="Permanent link">#</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">paths</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>    <span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;bdc&quot;</span><span class="p">,</span>                  <span class="c1"># alias &#39;brazil-data-cube&#39; works too</span>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>    <span class="n">variables</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;bdc/mod13q1-6.1&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;NDVI&quot;</span><span class="p">]},</span>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">23.7</span><span class="p">,</span> <span class="o">-</span><span class="mf">23.2</span><span class="p">],</span> <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">46.8</span><span class="p">,</span> <span class="o">-</span><span class="mf">46.3</span><span class="p">],</span>
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>    <span class="n">start</span><span class="o">=</span><span class="s2">&quot;2024-01-01&quot;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">&quot;2024-12-31&quot;</span><span class="p">,</span>
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>    <span class="n">path</span><span class="o">=</span><span class="s2">&quot;./out&quot;</span><span class="p">,</span> <span class="n">max_items</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
+</code></pre></div>
+<h3 id="copernicusdemglo30-mpc-cop-dem-glo-30-dem-anonymous"><a class="toclink" href="#copernicusdemglo30-mpc-cop-dem-glo-30-dem-anonymous"><code>COPERNICUS/DEM/GLO30</code> → MPC cop-dem-glo-30 (DEM, anonymous)</a><a class="headerlink" href="#copernicusdemglo30-mpc-cop-dem-glo-30-dem-anonymous" title="Permanent link">#</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="n">paths</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>    <span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;planetary-computer&quot;</span><span class="p">,</span>
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>    <span class="n">variables</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;cop-dem-glo-30&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;data&quot;</span><span class="p">]},</span>
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">40.40</span><span class="p">,</span> <span class="mf">40.45</span><span class="p">],</span> <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">3.72</span><span class="p">,</span> <span class="o">-</span><span class="mf">3.67</span><span class="p">],</span>
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>    <span class="n">start</span><span class="o">=</span><span class="s2">&quot;2020-01-01&quot;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">&quot;2024-12-31&quot;</span><span class="p">,</span>
+<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>    <span class="n">path</span><span class="o">=</span><span class="s2">&quot;./out&quot;</span><span class="p">,</span> <span class="n">max_items</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
+</code></pre></div>
+<h3 id="esaworldcoverv200-mpc-esa-worldcover-10-m-land-cover"><a class="toclink" href="#esaworldcoverv200-mpc-esa-worldcover-10-m-land-cover"><code>ESA/WorldCover/v200</code> → MPC esa-worldcover (10 m land cover)</a><a class="headerlink" href="#esaworldcoverv200-mpc-esa-worldcover-10-m-land-cover" title="Permanent link">#</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="n">paths</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>    <span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;planetary-computer&quot;</span><span class="p">,</span>
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>    <span class="n">variables</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;esa-worldcover&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;map&quot;</span><span class="p">]},</span>
+<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">40.40</span><span class="p">,</span> <span class="mf">40.45</span><span class="p">],</span> <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">3.72</span><span class="p">,</span> <span class="o">-</span><span class="mf">3.67</span><span class="p">],</span>
+<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>    <span class="n">start</span><span class="o">=</span><span class="s2">&quot;2021-01-01&quot;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">&quot;2021-12-31&quot;</span><span class="p">,</span>
+<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>    <span class="n">path</span><span class="o">=</span><span class="s2">&quot;./out&quot;</span><span class="p">,</span> <span class="n">max_items</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+<a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
+</code></pre></div>
+<h3 id="usgs3dep10m-mpc-3dep-seamless-10-m-dem-us-only"><a class="toclink" href="#usgs3dep10m-mpc-3dep-seamless-10-m-dem-us-only"><code>USGS/3DEP/10m</code> → MPC 3dep-seamless (10 m DEM, US only)</a><a class="headerlink" href="#usgs3dep10m-mpc-3dep-seamless-10-m-dem-us-only" title="Permanent link">#</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="n">paths</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>    <span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;planetary-computer&quot;</span><span class="p">,</span>
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>    <span class="n">variables</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;3dep-seamless&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;data&quot;</span><span class="p">]},</span>
+<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">37.5</span><span class="p">,</span> <span class="mf">38.0</span><span class="p">],</span> <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">122.5</span><span class="p">,</span> <span class="o">-</span><span class="mf">122.0</span><span class="p">],</span>
+<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>    <span class="n">start</span><span class="o">=</span><span class="s2">&quot;2020-01-01&quot;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">&quot;2024-12-31&quot;</span><span class="p">,</span>
+<a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>    <span class="n">path</span><span class="o">=</span><span class="s2">&quot;./out&quot;</span><span class="p">,</span> <span class="n">max_items</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+<a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
+</code></pre></div>
+<h2 id="server-side-reductions-googledynamicworldv1"><a class="toclink" href="#server-side-reductions-googledynamicworldv1">Server-side reductions: <code>GOOGLE/DYNAMICWORLD/V1</code></a><a class="headerlink" href="#server-side-reductions-googledynamicworldv1" title="Permanent link">#</a></h2>
+<p>There is no STAC equivalent for Dynamic World — it is a server-side ML reduction (run on Google's
+cluster) rather than a downloadable raster catalogue. The equivalent in <code>earthlens</code> is the
+process-graph backend:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="n">paths</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>    <span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;openeo&quot;</span><span class="p">,</span>
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>    <span class="n">variables</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;DYNAMIC_WORLD&quot;</span><span class="p">:</span> <span class="p">[</span><span class="o">...</span><span class="p">]},</span>   <span class="c1"># see earthlens.openeo</span>
+<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>    <span class="o">...</span>
+<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
+</code></pre></div>
+<p>Same applies to other GEE-resident reducers — composite-on-the-fly, cloudless mosaics, server-side
+spectral indices. Use <code>earthlens.openeo</code> (or stay on <code>earthlens.gee</code>) when the workload is the
+reduction, not the raster.</p>
+<h2 id="what-does-not-migrate"><a class="toclink" href="#what-does-not-migrate">What does not migrate</a><a class="headerlink" href="#what-does-not-migrate" title="Permanent link">#</a></h2>
+<p>The following GEE assets have no <code>earthlens.stac</code> equivalent today:</p>
+<ul>
+<li>Google's proprietary cloud-masking / atmospheric-correction layers (e.g. <code>COPERNICUS/S2_CLOUD_PROBABILITY</code>).
+  Use the QA bands shipped with the STAC products (e.g. Sentinel-2 <code>SCL</code>, Landsat <code>qa_pixel</code>).</li>
+<li>Region-of-interest reducers (<code>ee.Reducer.mean()</code> etc.). Use <code>earthlens.openeo</code> for those, or
+  pull the COGs and reduce locally with pyramids.</li>
+<li><code>GOOGLE/*</code> (Dynamic World, Open Buildings, Floods). See the openEO note above; Open Buildings
+  is also available as a flat-S3 release that an <code>earthlens.s3</code>-style dataset row can serve.</li>
+</ul>
+<h2 id="see-also"><a class="toclink" href="#see-also">See also</a><a class="headerlink" href="#see-also" title="Permanent link">#</a></h2>
+<ul>
+<li><a href="../introduction/">Introduction</a> — the eight endpoints + when each one wins.</li>
+<li><a href="../usage/">Usage</a> — the request shape (<code>variables={collection: [asset]}</code>, <code>aggregate=</code>, antimeridian).</li>
+<li><a href="../authentication/">Authentication</a> — the auth model per endpoint (anonymous / SAS / S3 keys /
+  requester-pays / EDL bearer).</li>
+</ul>
 
 
 
@@ -11117,7 +11354,7 @@ example-notebook execution) <strong>skip</strong> rather than fail. The
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
           
-          <a href="../usage/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Usage">
+          <a href="../authentication/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Authentication">
             <div class="md-footer__button md-icon">
               
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
@@ -11127,20 +11364,20 @@ example-notebook execution) <strong>skip</strong> rather than fail. The
                 Previous
               </span>
               <div class="md-ellipsis">
-                Usage
+                Authentication
               </div>
             </div>
           </a>
         
         
           
-          <a href="../catalog/" class="md-footer__link md-footer__link--next" aria-label="Next: Catalog &amp; tooling">
+          <a href="../stac/" class="md-footer__link md-footer__link--next" aria-label="Next: Reference">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                Catalog & tooling
+                Reference
               </div>
             </div>
             <div class="md-footer__button md-icon">
