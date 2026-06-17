@@ -245,9 +245,17 @@ class TestBundledRetention:
                 assert m.retention_days == 14, f"{k!r} retention={m.retention_days}"
 
     def test_archival_providers_have_no_retention(self):
-        """NOAA NODD + ECMWF Open Data + ECCC rows leave retention_days as None."""
+        """NOAA NODD + ECMWF Open Data rows leave retention_days as None."""
         from earthlens.nwp import Catalog
 
         for k, m in Catalog().datasets.items():
-            if m.provider in ("noaa-nodd", "ecmwf-opendata", "eccc-msc"):
+            if m.provider in ("noaa-nodd", "ecmwf-opendata"):
                 assert m.retention_days is None, f"{k!r} retention={m.retention_days}"
+
+    def test_eccc_rows_carry_datamart_retention(self):
+        """ECCC rows carry the Datamart rolling windows (30 d deterministic, 14 d ensemble)."""
+        from earthlens.nwp import Catalog
+
+        expected = {"gdps": 30, "rdps": 30, "hrdps": 30, "geps": 14}
+        for k, days in expected.items():
+            assert Catalog().datasets[k].retention_days == days

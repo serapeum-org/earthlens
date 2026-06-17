@@ -40,13 +40,25 @@ _CATALOG_CACHE: dict[Any, dict[str, NWPModel]] = {}
 #: `direct-https` / `direct-boto3` are earthlens' own per-centre modules
 #: for providers Herbie does not cover (DWD, Météo-France, ECCC).
 BackendLiteral = Literal[
-    "herbie", "ecmwf-opendata", "direct-https", "direct-boto3", "meteofrance-api"
+    "herbie",
+    "ecmwf-opendata",
+    "direct-https",
+    "direct-boto3",
+    "meteofrance-api",
+    "eccc-msc",
 ]
 
 #: The set of backends earthlens knows how to dispatch. Used by the
 #: backend to fail fast on an unknown `backend:` value at construction.
 KNOWN_BACKENDS: frozenset[str] = frozenset(
-    ("herbie", "ecmwf-opendata", "direct-https", "direct-boto3", "meteofrance-api")
+    (
+        "herbie",
+        "ecmwf-opendata",
+        "direct-https",
+        "direct-boto3",
+        "meteofrance-api",
+        "eccc-msc",
+    )
 )
 
 
