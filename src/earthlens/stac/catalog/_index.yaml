@@ -31,6 +31,10 @@ endpoints:
     url: https://openveda.cloud/api/stac
     signer: anonymous
     region: us-west-2
+  usgs-landsat:
+    url: https://landsatlook.usgs.gov/stac-server
+    signer: aws-requester-pays
+    region: us-west-2
 
 available_collections:
   planetary-computer:

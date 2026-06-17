@@ -97,6 +97,26 @@ class TestBundledCatalog:
         ):
             assert cat.get_collection(key).endpoint == "veda", key
 
+    def test_usgs_landsat_collections_requester_pays(self):
+        """USGS LandsatLook collections inherit aws-requester-pays from the endpoint default."""
+        cat = Catalog()
+        assert cat.endpoints["usgs-landsat"].region == "us-west-2"
+        assert cat.endpoints["usgs-landsat"].signer == "aws-requester-pays"
+        sr = cat.get_collection("usgs-landsat/landsat-c2l2-sr")
+        assert sr.endpoint == "usgs-landsat"
+        # explicit per-collection override (matches the endpoint default — kept
+        # explicit so the requester-pays intent is visible at the row level).
+        assert sr.signer == "aws-requester-pays"
+        assert sr.default_assets == ["red", "green", "blue", "nir08"]
+        for key in (
+            "usgs-landsat/landsat-c2l2-sr",
+            "usgs-landsat/landsat-c2l2-st",
+            "usgs-landsat/landsat-c2l1",
+        ):
+            col = cat.get_collection(key)
+            assert col.endpoint == "usgs-landsat", key
+            assert col.signer == "aws-requester-pays", key
+
     def test_available_collections_index(self):
         """The informational available_collections index is keyed by endpoint."""
         avail = Catalog().available_collections

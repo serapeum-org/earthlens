@@ -297,10 +297,10 @@ class EarthLens:
              'digital-earth-africa', 'digital-earth-australia', 'earth-search',
              'earthdata', 'ecmwf', 'eumetsat', 'fdsn', 'firms', 'gdacs', 'gee',
              'ghs', 'ghsl', 'google-earth-engine', 'hdx', 'human-settlement',
-             'national-water-model', 'nexrad', 'nwis', 'nwm', 'nwp', 'openaq',
-             'openeo', 'overture', 'planetary-computer', 'radar', 'sentinel-hub',
-             'sentinelhub', 'stac', 'tropycal', 'usgs-nwis', 'usgs-water', 'veda',
-             'world-pop', 'worldpop']
+             'landsat', 'national-water-model', 'nexrad', 'nwis', 'nwm', 'nwp',
+             'openaq', 'openeo', 'overture', 'planetary-computer', 'radar',
+             'sentinel-hub', 'sentinelhub', 'stac', 'tropycal', 'usgs-landsat',
+             'usgs-nwis', 'usgs-water', 'veda', 'world-pop', 'worldpop']
 
             ```
         - Asking for an unknown backend raises `ValueError`:
@@ -501,6 +501,21 @@ class EarthLens:
             # products: Black Marble HD nightlights, CMIP6 climate, NLDAS-3,
             # fire/disaster-damage, HLS NDVI, EPA emissions.
             "veda": ("earthlens.stac", "STAC", "stac", {"endpoint": "veda"}),
+            # USGS LandsatLook (the authoritative Landsat C2 STAC; SR/ST/L1
+            # split into separate collections, requester-pays on
+            # s3://usgs-landsat, us-west-2). Alias 'landsat' for convenience.
+            "usgs-landsat": (
+                "earthlens.stac",
+                "STAC",
+                "stac",
+                {"endpoint": "usgs-landsat"},
+            ),
+            "landsat": (
+                "earthlens.stac",
+                "STAC",
+                "stac",
+                {"endpoint": "usgs-landsat"},
+            ),
             # USGS NWIS / Water Data (dataretrieval). Tabular DataFrame of
             # per-site water observations; anonymous access works. The
             # "usgs-nwis" / "nwis" aliases point at the same backend.

@@ -1,0 +1,222 @@
+# Curated collections served by USGS LandsatLook (the authoritative Landsat
+# Collection 2 STAC). Asset bytes live on `s3://usgs-landsat` (us-west-2),
+# requester-pays — the endpoint default signer is `aws-requester-pays`, and
+# every curated collection inherits it. Earth Search mirrors a subset of the
+# same data with a slightly different layout (`landsat-c2-l2` combines SR+ST);
+# USGS keeps SR / ST / L1 as separate collections.
+
+collections:
+  usgs-landsat/landsat-c2l1:
+    assets:
+      ANG.txt:
+        title: Angle coefficients file
+      MTL.json:
+        title: Product metadata (JSON)
+      MTL.txt:
+        title: Product metadata (TXT)
+      MTL.xml:
+        title: Product metadata (XML)
+      SAA:
+        dtype: int16
+        nodata: -32768
+        title: Solar Azimuth Angle
+      SZA:
+        dtype: int16
+        nodata: -32768
+        title: Solar Zenith Angle
+      VAA:
+        dtype: int16
+        nodata: -32768
+        title: View Azimuth Angle
+      VZA:
+        dtype: int16
+        nodata: -32768
+        title: View Zenith Angle
+      blue:
+        common_name: blue
+        dtype: uint16
+        nodata: 0
+        title: Blue Band (L1 TOA)
+      cirrus:
+        common_name: cirrus
+        dtype: uint16
+        nodata: 0
+        title: Cirrus Band
+      coastal:
+        common_name: coastal
+        dtype: uint16
+        nodata: 0
+        title: Coastal/Aerosol Band (L1 TOA)
+      green:
+        common_name: green
+        dtype: uint16
+        nodata: 0
+        title: Green Band (L1 TOA)
+      lwir11:
+        common_name: lwir11
+        dtype: uint16
+        nodata: 0
+        title: Thermal IR Band 1 (10.6-11.2 μm)
+      lwir12:
+        common_name: lwir12
+        dtype: uint16
+        nodata: 0
+        title: Thermal IR Band 2 (11.5-12.5 μm)
+      nir08:
+        common_name: nir08
+        dtype: uint16
+        nodata: 0
+        title: NIR Band (L1 TOA)
+      pan:
+        common_name: pan
+        dtype: uint16
+        nodata: 0
+        title: Panchromatic Band
+      qa_pixel:
+        dtype: uint16
+        nodata: 1
+        title: Pixel Quality Assessment Band
+      qa_radsat:
+        dtype: uint16
+        title: Radiometric Saturation Quality
+      red:
+        common_name: red
+        dtype: uint16
+        nodata: 0
+        title: Red Band (L1 TOA)
+      swir16:
+        common_name: swir16
+        dtype: uint16
+        nodata: 0
+        title: SWIR1 Band (L1 TOA)
+      swir22:
+        common_name: swir22
+        dtype: uint16
+        nodata: 0
+        title: SWIR2 Band (L1 TOA)
+    collection_id: landsat-c2l1
+    default_assets:
+    - red
+    - green
+    - blue
+    - nir08
+    endpoint: usgs-landsat
+    signer: aws-requester-pays
+  usgs-landsat/landsat-c2l2-sr:
+    assets:
+      ANG.txt:
+        title: Angle coefficients file
+      MTL.json:
+        title: Product metadata (JSON)
+      MTL.txt:
+        title: Product metadata (TXT)
+      MTL.xml:
+        title: Product metadata (XML)
+      blue:
+        common_name: blue
+        dtype: uint16
+        nodata: 0
+        title: Blue Surface Reflectance
+      coastal:
+        common_name: coastal
+        dtype: uint16
+        nodata: 0
+        title: Coastal/Aerosol Surface Reflectance
+      green:
+        common_name: green
+        dtype: uint16
+        nodata: 0
+        title: Green Surface Reflectance
+      index:
+        title: Asset index
+      nir08:
+        common_name: nir08
+        dtype: uint16
+        nodata: 0
+        title: NIR Surface Reflectance
+      qa_aerosol:
+        dtype: uint8
+        nodata: 1
+        title: Aerosol Quality Assessment
+      qa_pixel:
+        dtype: uint16
+        nodata: 1
+        title: Pixel Quality Assessment
+      qa_radsat:
+        dtype: uint16
+        title: Radiometric Saturation Quality
+      red:
+        common_name: red
+        dtype: uint16
+        nodata: 0
+        title: Red Surface Reflectance
+      swir16:
+        common_name: swir16
+        dtype: uint16
+        nodata: 0
+        title: SWIR1 Surface Reflectance
+      swir22:
+        common_name: swir22
+        dtype: uint16
+        nodata: 0
+        title: SWIR2 Surface Reflectance
+    collection_id: landsat-c2l2-sr
+    default_assets:
+    - red
+    - green
+    - blue
+    - nir08
+    endpoint: usgs-landsat
+    signer: aws-requester-pays
+  usgs-landsat/landsat-c2l2-st:
+    assets:
+      ANG.txt:
+        title: Angle coefficients file
+      ATRAN:
+        dtype: int16
+        nodata: -9999
+        title: Atmospheric Transmittance
+      CDIST:
+        dtype: int16
+        nodata: -9999
+        title: Cloud Distance
+      DRAD:
+        dtype: int16
+        nodata: -9999
+        title: Downwelled Radiance
+      EMIS:
+        dtype: int16
+        nodata: -9999
+        title: Emissivity
+      EMSD:
+        dtype: int16
+        nodata: -9999
+        title: Emissivity Standard Deviation
+      MTL.json:
+        title: Product metadata (JSON)
+      MTL.txt:
+        title: Product metadata (TXT)
+      MTL.xml:
+        title: Product metadata (XML)
+      TRAD:
+        dtype: int16
+        nodata: -9999
+        title: Thermal Radiance
+      URAD:
+        dtype: int16
+        nodata: -9999
+        title: Upwelled Radiance
+      lwir:
+        common_name: lwir
+        dtype: uint16
+        nodata: 0
+        title: Surface Temperature Band
+      qa:
+        dtype: int16
+        nodata: -9999
+        title: Surface Temperature Quality Assessment
+    collection_id: landsat-c2l2-st
+    default_assets:
+    - lwir
+    endpoint: usgs-landsat
+    signer: aws-requester-pays
