@@ -458,6 +458,40 @@ class TestAggregate:
         with pytest.raises(ValueError, match="single model"):
             b._aggregate([tmp_path / "gfs_2024060100_f000.tif"], self._config())
 
+    def test_icosahedral_model_rejected(self, tmp_path):
+        """An icosahedral-grid model (DWD ICON global) refuses aggregation."""
+        from earthlens.nwp import NWP, Catalog, NWPModel
+
+        cat = Catalog(
+            datasets={
+                "icon-icos": NWPModel(
+                    provider="dwd-opendata",
+                    backend="direct-https",
+                    cycles_utc=[0, 12],
+                    horizon_h=48,
+                    idx=False,
+                    mirrors=["origin"],
+                    url_template=(
+                        "https://example.test/{cycle:%H}/{var_lc}/"
+                        "icon_global_icosahedral_{date:%Y%m%d%H}_"
+                        "{step:03d}_{var}.grib2.bz2"
+                    ),
+                    bands={"temperature_2m": "T_2M"},
+                ),
+            }
+        )
+        b = NWP(
+            start="2024-06-01",
+            end="2024-06-01",
+            variables={"icon-icos": ["temperature_2m"]},
+            lat_lim=[40, 45],
+            lon_lim=[-80, -75],
+            path=str(tmp_path),
+            catalog=cat,
+        )
+        with pytest.raises(NotImplementedError, match="icosahedral"):
+            b._aggregate([tmp_path / "icon-icos_2024060100_f000.tif"], self._config())
+
     def test_download_with_aggregate(
         self, mini_catalog, tmp_path, fake_pyramids, fake_aggregate
     ):

@@ -607,6 +607,20 @@ class NWP(AbstractDataSource):
                 "native grids and cannot be co-registered into one stack — "
                 "issue one request per model."
             )
+        # The only model row that is not a regular lat/lon raster is ICON
+        # global on its native icosahedral grid (DWD `icon_global_icosahedral_…`
+        # URL pattern). The shared COG stack reducer assumes co-registered
+        # rasters, so refuse the aggregation explicitly here rather than letting
+        # pyramids silently mis-grid an unstructured layout (the C4 / M12
+        # icosahedral guard).
+        only_key, only_model, _ = self._requests[0]
+        if only_model.url_template and "icosahedral" in only_model.url_template:
+            raise NotImplementedError(
+                f"NWP aggregate: {only_key!r} is on an icosahedral grid "
+                "(not a regular lat/lon raster); aggregation is not "
+                "supported. Request a griddable model (ICON-EU, ICON-D2, "
+                "or a regridded global feed) instead."
+            )
         from pyramids.dataset import Dataset, DatasetCollection
         from pyramids.dataset.cog import write_cog
 
