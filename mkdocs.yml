@@ -379,8 +379,10 @@ nav:
       - Attribute pushdown (where=): examples/overture/07_attribute_pushdown.ipynb
     - Open NWP forecasts:
       - Catalog explorer (no network): examples/nwp/catalog_explorer.ipynb
+      - Polish features (no network): examples/nwp/nwp_polish_features.ipynb
       - GFS 2 m temperature (live): examples/nwp/gfs_temperature.ipynb
       - DWD ICON precipitation (live): examples/nwp/icon_precipitation.ipynb
+      - ECCC GDPS 2 m temperature (live): examples/nwp/eccc_gdps.ipynb
     - NEXRAD radar:
       - Catalog explorer (no network): examples/radar/catalog_explorer.ipynb
     - USGS Water (NWIS):
