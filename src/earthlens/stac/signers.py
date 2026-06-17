@@ -667,11 +667,11 @@ class BdcTokenSigner(_BaseSigner):
     through GDAL `/vsicurl/` with no extra config.
 
     The token is read from the `BDC_ACCESS_TOKEN` environment variable on
-    first use; absent it, `sign_href` raises
-    :class:`earthlens.base.AuthenticationError` naming the env var and
-    pointing at an open collection so the user can switch tiers if they want.
-    Wire it in via a per-collection `signer: bdc-token` override on the
-    token-gated rows of `catalog/bdc.yaml`.
+    first use; absent it, `sign_href` raises `AuthenticationError` (from
+    `earthlens.base`) naming the env var and pointing at an open collection
+    so the user can switch tiers if they want. Wire it in via a
+    per-collection `signer: bdc-token` override on the token-gated rows of
+    `catalog/bdc.yaml`.
 
     Args:
         token: Explicit BDC OAuth token. Defaults to `$BDC_ACCESS_TOKEN`.
@@ -717,10 +717,19 @@ class BdcTokenSigner(_BaseSigner):
         return token
 
     def sign_href(self, href: str) -> str:
-        """Append `?access_token=<token>` (or `&access_token=`) to the asset href."""
-        token = self._token()
-        sep = "&" if "?" in href else "?"
-        return f"{href}{sep}access_token={token}"
+        """Append `?access_token=<token>` (or `&access_token=`) to the asset href.
+
+        Uses `urlsplit`/`urlunsplit` so the token lands in the URL's query
+        component even when the href carries a `#fragment` (a naive
+        `"?" in href` check would mistake a fragment for a query and append
+        after `#`, where the server never sees it).
+        """
+        from urllib.parse import urlsplit, urlunsplit, quote
+
+        token = quote(self._token(), safe="")
+        parts = urlsplit(href)
+        new_query = f"{parts.query}&access_token={token}" if parts.query else f"access_token={token}"
+        return urlunsplit((parts.scheme, parts.netloc, parts.path, new_query, parts.fragment))
 
 
 def build_signer(signer_type: str, **creds: Any) -> Any:

@@ -117,10 +117,12 @@ class Endpoint(BaseModel):
     """One STAC API endpoint: its URL, signer type, and optional region.
 
     Attributes:
-        key: Endpoint key (`"planetary-computer"`, `"cdse"`, `"earth-search"`).
+        key: Endpoint key (`"planetary-computer"`, `"cdse"`, `"earth-search"`,
+            `"deafrica"`, `"dea"`, `"veda"`, `"usgs-landsat"`, `"bdc"`).
         url: STAC API root URL.
-        signer: Signer type used for this endpoint's assets — one of
-            `"anonymous"`, `"aws-requester-pays"`, `"mpc-sas"`, `"cdse-s3"`.
+        signer: Signer type used for this endpoint's assets — one of the
+            `SignerType` literals (`"anonymous"`, `"aws-requester-pays"`,
+            `"mpc-sas"`, `"earthdata"`, `"cdse"`, `"cdse-s3"`, `"bdc-token"`).
         region: Optional AWS region for requester-pays / S3 endpoints.
     """
 
@@ -298,7 +300,7 @@ class Catalog(AbstractCatalog):
             >>> from earthlens.stac import Catalog
             >>> cat = Catalog()
             >>> sorted(cat.endpoints)
-            ['cdse', 'earth-search', 'planetary-computer']
+            ['bdc', 'cdse', 'dea', 'deafrica', 'earth-search', 'planetary-computer', 'usgs-landsat', 'veda']
             >>> cat.get_collection("sentinel-2-l2a").resolution
             10.0
 

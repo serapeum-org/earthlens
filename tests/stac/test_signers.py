@@ -502,6 +502,18 @@ class TestBdcTokenSigner:
         out = BdcTokenSigner().sign_href("https://data.inpe.br/x.tif?foo=1")
         assert out == "https://data.inpe.br/x.tif?foo=1&access_token=tok"
 
+    def test_fragment_does_not_get_token_appended_after_it(self, monkeypatch):
+        """An href with a `#fragment` keeps the fragment last; token lands in the query."""
+        monkeypatch.setenv("BDC_ACCESS_TOKEN", "tok")
+        out = BdcTokenSigner().sign_href("https://data.inpe.br/x.tif#frag")
+        assert out == "https://data.inpe.br/x.tif?access_token=tok#frag"
+
+    def test_token_is_url_encoded(self, monkeypatch):
+        """Tokens with reserved chars are URL-encoded so the query parses correctly."""
+        monkeypatch.setenv("BDC_ACCESS_TOKEN", "tok=&val/+")
+        out = BdcTokenSigner().sign_href("https://data.inpe.br/x.tif")
+        assert out == "https://data.inpe.br/x.tif?access_token=tok%3D%26val%2F%2B"
+
     def test_explicit_token_overrides_env(self, monkeypatch):
         """The kwarg token wins over $BDC_ACCESS_TOKEN."""
         monkeypatch.setenv("BDC_ACCESS_TOKEN", "env-tok")
