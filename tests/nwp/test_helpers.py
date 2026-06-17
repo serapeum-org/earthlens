@@ -187,6 +187,55 @@ class TestParseIdx:
         body = '{"_offset":0,"_length":100,"param":"2t"}\n{broken json\n'
         assert len(_parse_idx(body)) == 1
 
+    def test_noaa_short_line_dropped(self):
+        """A NOAA line with fewer than six colon-separated fields is dropped."""
+        from earthlens.nwp._helpers import _parse_idx
+
+        body = "1:0:d=:HGT:sfc\n2:8192:d=:TMP:2 m above ground:anl\n"
+        assert len(_parse_idx(body)) == 1
+
+    def test_noaa_non_numeric_msg_id_dropped(self):
+        """A NOAA line with a non-numeric msg_id or offset is dropped."""
+        from earthlens.nwp._helpers import _parse_idx
+
+        body = "abc:0:d=:HGT:sfc:anl\n2:8192:d=:TMP:sfc:anl\n"
+        assert len(_parse_idx(body)) == 1
+
+    def test_noaa_all_bad_returns_empty(self):
+        """All-malformed NOAA body collapses to the empty canonical frame."""
+        from earthlens.nwp._helpers import _IDX_COLUMNS, _parse_idx
+
+        frame = _parse_idx("only one field\nshort:line\n")
+        assert tuple(frame.columns) == _IDX_COLUMNS
+        assert frame.empty
+
+    def test_ecmwf_non_numeric_offset_dropped(self):
+        """An ECMWF JSON line with a non-numeric `_offset` / `_length` is dropped."""
+        from earthlens.nwp._helpers import _parse_idx
+
+        body = (
+            '{"_offset":"nope","_length":"nope","param":"2t"}\n'
+            '{"_offset":256,"_length":100,"param":"tp"}\n'
+        )
+        assert len(_parse_idx(body)) == 1
+
+    def test_ecmwf_all_bad_returns_empty(self):
+        """All-malformed ECMWF body collapses to the empty canonical frame."""
+        from earthlens.nwp._helpers import _IDX_COLUMNS, _parse_idx
+
+        frame = _parse_idx('{not json\n{still not\n')
+        assert tuple(frame.columns) == _IDX_COLUMNS
+        assert frame.empty
+
+    def test_blank_lines_skipped_in_both_shapes(self):
+        """Embedded blank lines in either shape are skipped, not counted."""
+        from earthlens.nwp._helpers import _parse_idx
+
+        noaa = "1:0:d=:HGT:sfc:anl\n\n2:8192:d=:TMP:sfc:anl\n"
+        ecmwf = '{"_offset":0,"_length":100,"param":"2t"}\n\n{"_offset":100,"_length":50,"param":"tp"}\n'
+        assert len(_parse_idx(noaa)) == 2
+        assert len(_parse_idx(ecmwf)) == 2
+
 
 class TestGetIdx:
     """Tests for the cached `.idx` fetcher."""
@@ -274,6 +323,28 @@ class TestGetIdx:
         get_idx(url, dl, ttl=10_000.0)
         get_idx(url, dl, ttl=10_000.0)
         assert len(calls) == 1
+
+    def test_stat_race_refetches(self, monkeypatch):
+        """A cache file whose `stat()` raises `OSError` falls through to a refetch."""
+        from earthlens.nwp._helpers import _idx_cache_path, get_idx
+
+        url = "https://example.test/race.idx"
+        path = _idx_cache_path(url)
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(_NOAA_IDX, encoding="utf-8")
+
+        real_stat = type(path).stat
+
+        def _flaky_stat(self, *args, **kwargs):
+            if self == path:
+                raise OSError("simulated race")
+            return real_stat(self, *args, **kwargs)
+
+        monkeypatch.setattr(type(path), "stat", _flaky_stat)
+        dl, calls = _counting_downloader(_NOAA_IDX)
+        frame = get_idx(url, dl)
+        assert len(calls) == 1
+        assert len(frame) == 3
 
 
 class TestIdxCachePath:
