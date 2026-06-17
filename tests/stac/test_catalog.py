@@ -63,6 +63,23 @@ class TestBundledCatalog:
         ):
             assert cat.get_collection(key).endpoint == "deafrica", key
 
+    def test_dea_collections_curated(self):
+        """The dea endpoint exposes its curated flagship collections."""
+        cat = Catalog()
+        assert cat.endpoints["dea"].region == "ap-southeast-2"
+        assert cat.endpoints["dea"].signer == "anonymous"
+        ard = cat.get_collection("dea/ga_ls8c_ard_3")
+        assert ard.endpoint == "dea"
+        assert ard.signer is None
+        assert ard.default_assets == ["nbart_red", "nbart_green", "nbart_blue", "nbart_nir"]
+        for key in (
+            "dea/ga_ls8c_ard_3", "dea/ga_ls9c_ard_3", "dea/ga_s2am_ard_3", "dea/ga_s2bm_ard_3",
+            "dea/ga_ls_wo_3", "dea/ga_ls_fc_3", "dea/ga_ls8c_nbart_gm_cyear_3",
+            "dea/ga_s2ls_intertidal_cyear_3", "dea/ga_ls_mangrove_cover_cyear_3",
+            "dea/ga_srtm_dem1sv1_0",
+        ):
+            assert cat.get_collection(key).endpoint == "dea", key
+
     def test_available_collections_index(self):
         """The informational available_collections index is keyed by endpoint."""
         avail = Catalog().available_collections

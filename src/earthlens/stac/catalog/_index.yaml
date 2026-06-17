@@ -23,6 +23,10 @@ endpoints:
     url: https://explorer.digitalearth.africa/stac
     signer: anonymous
     region: af-south-1
+  dea:
+    url: https://explorer.dea.ga.gov.au/stac
+    signer: anonymous
+    region: ap-southeast-2
 
 available_collections:
   planetary-computer:

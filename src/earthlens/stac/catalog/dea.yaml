@@ -1,0 +1,258 @@
+# Curated collections served by Digital Earth Australia (Open Data Cube STAC
+# over AWS ap-southeast-2). All assets are anonymous on `s3://dea-public-data`;
+# the endpoint default signer (`anonymous`) applies — no per-row override.
+#
+# Five collections (ARD + WOfS) carry full asset blocks probed from live items;
+# the remaining five (FC, GeoMedian, Intertidal, Mangrove, SRTM DEM) are
+# curated with conservative asset blocks based on the DEA product
+# documentation since the live STAC API did not return sample items for them
+# during the A1 probe — refine when items become discoverable.
+
+collections:
+  dea/ga_ls8c_ard_3:
+    assets:
+      nbart_blue:
+        common_name: blue
+        title: NBART blue surface reflectance
+      nbart_coastal_aerosol:
+        common_name: coastal
+        title: NBART coastal/aerosol surface reflectance
+      nbart_green:
+        common_name: green
+        title: NBART green surface reflectance
+      nbart_nir:
+        common_name: nir
+        title: NBART near-infrared surface reflectance
+      nbart_panchromatic:
+        common_name: pan
+        title: NBART panchromatic
+      nbart_red:
+        common_name: red
+        title: NBART red surface reflectance
+      nbart_swir_1:
+        common_name: swir16
+        title: NBART SWIR1 surface reflectance
+      nbart_swir_2:
+        common_name: swir22
+        title: NBART SWIR2 surface reflectance
+    collection_id: ga_ls8c_ard_3
+    default_assets:
+    - nbart_red
+    - nbart_green
+    - nbart_blue
+    - nbart_nir
+    endpoint: dea
+  dea/ga_ls8c_nbart_gm_cyear_3:
+    assets:
+      BCMAD:
+        title: Bray-Curtis MAD across input bands
+      COUNT:
+        title: Count of clear observations
+      EMAD:
+        title: Euclidean MAD across input bands
+      SMAD:
+        title: Spectral MAD across input bands
+      nbart_blue:
+        common_name: blue
+        title: NBART blue annual geomedian
+      nbart_green:
+        common_name: green
+        title: NBART green annual geomedian
+      nbart_nir:
+        common_name: nir
+        title: NBART near-infrared annual geomedian
+      nbart_red:
+        common_name: red
+        title: NBART red annual geomedian
+      nbart_swir_1:
+        common_name: swir16
+        title: NBART SWIR1 annual geomedian
+      nbart_swir_2:
+        common_name: swir22
+        title: NBART SWIR2 annual geomedian
+    collection_id: ga_ls8c_nbart_gm_cyear_3
+    default_assets:
+    - nbart_red
+    - nbart_green
+    - nbart_blue
+    - nbart_nir
+    endpoint: dea
+  dea/ga_ls9c_ard_3:
+    assets:
+      nbart_blue:
+        common_name: blue
+        title: NBART blue surface reflectance
+      nbart_coastal_aerosol:
+        common_name: coastal
+        title: NBART coastal/aerosol surface reflectance
+      nbart_green:
+        common_name: green
+        title: NBART green surface reflectance
+      nbart_nir:
+        common_name: nir
+        title: NBART near-infrared surface reflectance
+      nbart_panchromatic:
+        common_name: pan
+        title: NBART panchromatic
+      nbart_red:
+        common_name: red
+        title: NBART red surface reflectance
+      nbart_swir_1:
+        common_name: swir16
+        title: NBART SWIR1 surface reflectance
+      nbart_swir_2:
+        common_name: swir22
+        title: NBART SWIR2 surface reflectance
+    collection_id: ga_ls9c_ard_3
+    default_assets:
+    - nbart_red
+    - nbart_green
+    - nbart_blue
+    - nbart_nir
+    endpoint: dea
+  dea/ga_ls_fc_3:
+    assets:
+      bs:
+        dtype: uint8
+        title: Bare soil fraction (%)
+      npv:
+        dtype: uint8
+        title: Non-photosynthetic vegetation fraction (%)
+      pv:
+        dtype: uint8
+        title: Photosynthetic vegetation fraction (%)
+      ue:
+        dtype: uint8
+        title: Unmixing error
+    collection_id: ga_ls_fc_3
+    default_assets:
+    - bs
+    - pv
+    - npv
+    endpoint: dea
+  dea/ga_ls_mangrove_cover_cyear_3:
+    assets:
+      canopy_cover_class:
+        dtype: uint8
+        title: Annual mangrove canopy cover class
+      extent:
+        dtype: uint8
+        title: Mangrove extent mask
+    collection_id: ga_ls_mangrove_cover_cyear_3
+    default_assets:
+    - canopy_cover_class
+    endpoint: dea
+  dea/ga_ls_wo_3:
+    assets:
+      water:
+        dtype: uint8
+        title: Water observation classification
+    collection_id: ga_ls_wo_3
+    default_assets:
+    - water
+    endpoint: dea
+  dea/ga_s2am_ard_3:
+    assets:
+      nbart_blue:
+        common_name: blue
+        title: NBART blue surface reflectance (10m)
+      nbart_coastal_aerosol:
+        common_name: coastal
+        title: NBART coastal/aerosol surface reflectance (60m)
+      nbart_green:
+        common_name: green
+        title: NBART green surface reflectance (10m)
+      nbart_nir_1:
+        common_name: nir
+        title: NBART near-infrared (10m)
+      nbart_nir_2:
+        common_name: nir08
+        title: NBART narrow near-infrared (20m)
+      nbart_red:
+        common_name: red
+        title: NBART red surface reflectance (10m)
+      nbart_red_edge_1:
+        common_name: rededge
+        title: NBART red edge 1 (20m)
+      nbart_red_edge_2:
+        common_name: rededge
+        title: NBART red edge 2 (20m)
+      nbart_red_edge_3:
+        common_name: rededge
+        title: NBART red edge 3 (20m)
+      nbart_swir_2:
+        common_name: swir16
+        title: NBART SWIR1 (20m)
+      nbart_swir_3:
+        common_name: swir22
+        title: NBART SWIR2 (20m)
+    collection_id: ga_s2am_ard_3
+    default_assets:
+    - nbart_red
+    - nbart_green
+    - nbart_blue
+    - nbart_nir_1
+    endpoint: dea
+  dea/ga_s2bm_ard_3:
+    assets:
+      nbart_blue:
+        common_name: blue
+        title: NBART blue surface reflectance (10m)
+      nbart_coastal_aerosol:
+        common_name: coastal
+        title: NBART coastal/aerosol surface reflectance (60m)
+      nbart_green:
+        common_name: green
+        title: NBART green surface reflectance (10m)
+      nbart_nir_1:
+        common_name: nir
+        title: NBART near-infrared (10m)
+      nbart_nir_2:
+        common_name: nir08
+        title: NBART narrow near-infrared (20m)
+      nbart_red:
+        common_name: red
+        title: NBART red surface reflectance (10m)
+      nbart_red_edge_1:
+        common_name: rededge
+        title: NBART red edge 1 (20m)
+      nbart_red_edge_2:
+        common_name: rededge
+        title: NBART red edge 2 (20m)
+      nbart_red_edge_3:
+        common_name: rededge
+        title: NBART red edge 3 (20m)
+      nbart_swir_2:
+        common_name: swir16
+        title: NBART SWIR1 (20m)
+      nbart_swir_3:
+        common_name: swir22
+        title: NBART SWIR2 (20m)
+    collection_id: ga_s2bm_ard_3
+    default_assets:
+    - nbart_red
+    - nbart_green
+    - nbart_blue
+    - nbart_nir_1
+    endpoint: dea
+  dea/ga_s2ls_intertidal_cyear_3:
+    assets:
+      elevation:
+        dtype: float32
+        title: Intertidal elevation relative to MSL (m)
+      exposure:
+        dtype: float32
+        title: Intertidal exposure (% of time exposed)
+    collection_id: ga_s2ls_intertidal_cyear_3
+    default_assets:
+    - elevation
+    endpoint: dea
+  dea/ga_srtm_dem1sv1_0:
+    assets:
+      dem:
+        dtype: float32
+        title: SRTM 1-second DEM elevation (m)
+    collection_id: ga_srtm_dem1sv1_0
+    default_assets:
+    - dem
+    endpoint: dea

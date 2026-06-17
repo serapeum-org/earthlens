@@ -28,10 +28,11 @@ class TestRouting:
     """The facade registers and resolves the STAC keys."""
 
     def test_keys_present(self):
-        """stac plus the endpoint aliases (incl. deafrica) are registered."""
+        """stac plus the endpoint aliases (incl. deafrica, dea) are registered."""
         for key in (
             "stac", "planetary-computer", "earth-search", "cdse",
             "deafrica", "digital-earth-africa",
+            "dea", "digital-earth-australia",
         ):
             assert key in EarthLens.DataSources
 
@@ -40,6 +41,7 @@ class TestRouting:
         for key in (
             "stac", "planetary-computer", "earth-search", "cdse",
             "deafrica", "digital-earth-africa",
+            "dea", "digital-earth-australia",
         ):
             assert EarthLens.DataSources[key] is STAC
 
@@ -79,6 +81,19 @@ class TestAliasEndpointBinding:
             variables={"deafrica/wofs_ls": ["water"]},
         )
         assert el2.datasource._endpoint == "deafrica"
+
+    def test_dea_alias_prebinds_endpoint(self, fake_pyramids, tmp_path):
+        """data_source='dea' / 'digital-earth-australia' bind the dea endpoint."""
+        el = _facade(
+            fake_pyramids, tmp_path, "dea",
+            variables={"dea/ga_ls_wo_3": ["water"]},
+        )
+        assert el.datasource._endpoint == "dea"
+        el2 = _facade(
+            fake_pyramids, tmp_path, "digital-earth-australia",
+            variables={"dea/ga_ls_wo_3": ["water"]},
+        )
+        assert el2.datasource._endpoint == "dea"
 
     def test_explicit_endpoint_overrides_alias_default(self, fake_pyramids, tmp_path):
         """A user endpoint= kwarg wins over the alias default."""

@@ -293,10 +293,10 @@ class EarthLens:
             ```python
             >>> from earthlens.earthlens import EarthLens
             >>> sorted(EarthLens.DataSources)  # doctest: +NORMALIZE_WHITESPACE
-            ['amazon-s3', 'cdse', 'chc', 'chirps', 'cmems', 'deafrica',
-             'digital-earth-africa', 'earth-search', 'earthdata', 'ecmwf',
-             'eumetsat', 'fdsn', 'firms', 'gdacs', 'gee', 'ghs', 'ghsl',
-             'google-earth-engine', 'hdx', 'human-settlement',
+            ['amazon-s3', 'cdse', 'chc', 'chirps', 'cmems', 'dea', 'deafrica',
+             'digital-earth-africa', 'digital-earth-australia', 'earth-search',
+             'earthdata', 'ecmwf', 'eumetsat', 'fdsn', 'firms', 'gdacs', 'gee',
+             'ghs', 'ghsl', 'google-earth-engine', 'hdx', 'human-settlement',
              'national-water-model', 'nexrad', 'nwis', 'nwm', 'nwp', 'openaq',
              'openeo', 'overture', 'planetary-computer', 'radar', 'sentinel-hub',
              'sentinelhub', 'stac', 'tropycal', 'usgs-nwis', 'usgs-water',
@@ -486,6 +486,16 @@ class EarthLens:
                 "STAC",
                 "stac",
                 {"endpoint": "deafrica"},
+            ),
+            # Digital Earth Australia STAC (anonymous, ap-southeast-2) —
+            # Landsat / Sentinel-2 NBART ARD, WOfS, FC, GeoMedian, Intertidal,
+            # mangrove cover, SRTM DEM.
+            "dea": ("earthlens.stac", "STAC", "stac", {"endpoint": "dea"}),
+            "digital-earth-australia": (
+                "earthlens.stac",
+                "STAC",
+                "stac",
+                {"endpoint": "dea"},
             ),
             # USGS NWIS / Water Data (dataretrieval). Tabular DataFrame of
             # per-site water observations; anonymous access works. The
