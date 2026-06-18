@@ -170,7 +170,7 @@ def warn_license(license_id: str, label: str, *, detail: str | None = None) -> b
         f"obligations"
     )
     if detail:
-        message += f" — {detail}"
+        message += f" - {detail}"
     message += ". Honour attribution and do not redistribute without permission."
     warnings.warn(message, LicenseWarning, stacklevel=2)
     return True

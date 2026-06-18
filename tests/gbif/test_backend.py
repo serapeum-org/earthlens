@@ -150,3 +150,18 @@ class TestFetchAndDownload:
         """A non-None aggregate raises NotImplementedError mentioning vector."""
         with pytest.raises(NotImplementedError, match="vector"):
             _backend(tmp_path).download(aggregate=object())
+
+    def test_api_returns_collection(self, tmp_path, fake_gbif):
+        """`_api` returns the occurrence FeatureCollection."""
+        fake_gbif.occurrences.set_pages(
+            [{"results": [fake_gbif.record()], "count": 1, "endOfRecords": True}]
+        )
+        assert len(_backend(tmp_path)._api()) == 1
+
+    def test_geojson_write(self, tmp_path, fake_gbif):
+        """A non-parquet file_format writes via the OGR driver."""
+        fake_gbif.occurrences.set_pages(
+            [{"results": [fake_gbif.record()], "count": 1, "endOfRecords": True}]
+        )
+        _backend(tmp_path, file_format="geojson").download()
+        assert (tmp_path / "gbif_occurrences.geojson").exists()

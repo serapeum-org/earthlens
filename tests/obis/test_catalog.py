@@ -4,7 +4,8 @@ from __future__ import annotations
 
 import pytest
 
-from earthlens.obis import Catalog
+from earthlens.obis import Catalog, Species
+from earthlens.obis import catalog as catalog_module
 
 
 @pytest.mark.obis
@@ -16,6 +17,38 @@ class TestCatalogLoad:
         cat = Catalog()
         assert "blue-whale" in cat
         assert cat["blue-whale"].scientific_name == "Balaenoptera musculus"
+
+    def test_load_classmethod_and_cache(self):
+        """`load` reads from disk and a second call hits the parse cache."""
+        catalog_module.clear_catalog_cache()
+        first = Catalog.load()
+        second = Catalog.load()
+        assert first["blue-whale"].scientific_name == second["blue-whale"].scientific_name
+
+    def test_supplied_datasets_skip_disk(self):
+        """Passing `datasets=` skips the disk read."""
+        cat = Catalog(datasets={"x": Species(scientific_name="Mola mola")})
+        assert list(cat) == ["x"]
+
+    def test_missing_block_raises(self, tmp_path, monkeypatch):
+        """A YAML without a `species:` block raises a clear ValueError."""
+        empty = tmp_path / "empty.yaml"
+        empty.write_text("other: {}\n", encoding="utf-8")
+        monkeypatch.setattr(catalog_module, "CATALOG_PATH", empty)
+        catalog_module.clear_catalog_cache()
+        with pytest.raises(ValueError, match="empty 'species:' block"):
+            Catalog()
+        catalog_module.clear_catalog_cache()
+
+    def test_invalid_row_raises(self, tmp_path, monkeypatch):
+        """A species row missing its name raises a validation ValueError."""
+        bad = tmp_path / "bad.yaml"
+        bad.write_text("species:\n  blue-whale:\n    title: no name\n", encoding="utf-8")
+        monkeypatch.setattr(catalog_module, "CATALOG_PATH", bad)
+        catalog_module.clear_catalog_cache()
+        with pytest.raises(ValueError, match="failed validation"):
+            Catalog()
+        catalog_module.clear_catalog_cache()
 
 
 @pytest.mark.obis

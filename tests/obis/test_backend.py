@@ -41,6 +41,11 @@ class TestConstruction:
         with pytest.raises(ValueError, match="at least one species"):
             _backend(tmp_path, variables=[])
 
+    def test_unknown_file_format_rejected(self, tmp_path):
+        """An unknown file_format raises a ValueError."""
+        with pytest.raises(ValueError, match="file_format must be one of"):
+            _backend(tmp_path, file_format="shp")
+
 
 @pytest.mark.obis
 class TestPlanSearch:
@@ -109,3 +114,14 @@ class TestFetchAndDownload:
         """A non-None aggregate raises NotImplementedError mentioning vector."""
         with pytest.raises(NotImplementedError, match="vector"):
             _backend(tmp_path).download(aggregate=object())
+
+    def test_api_returns_collection(self, tmp_path, fake_obis):
+        """`_api` returns the occurrence FeatureCollection."""
+        fake_obis.occurrences.set_frame(fake_obis.frame([fake_obis.row()]))
+        assert len(_backend(tmp_path)._api()) == 1
+
+    def test_geojson_write(self, tmp_path, fake_obis):
+        """A non-parquet file_format writes via the OGR driver."""
+        fake_obis.occurrences.set_frame(fake_obis.frame([fake_obis.row()]))
+        _backend(tmp_path, file_format="geojson").download()
+        assert (tmp_path / "obis_occurrences.geojson").exists()

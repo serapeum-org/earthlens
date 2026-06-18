@@ -4,7 +4,8 @@ from __future__ import annotations
 
 import pytest
 
-from earthlens.gbif import Catalog
+from earthlens.gbif import Catalog, Taxon
+from earthlens.gbif import catalog as catalog_module
 
 
 @pytest.mark.gbif
@@ -17,6 +18,38 @@ class TestCatalogLoad:
         assert "birds" in cat
         assert cat["birds"].taxon_key == 212
         assert cat["mammals"].taxon_key == 359
+
+    def test_load_classmethod_and_cache(self):
+        """`load` reads from disk and a second call hits the parse cache."""
+        catalog_module.clear_catalog_cache()
+        first = Catalog.load()
+        second = Catalog.load()
+        assert first["birds"].taxon_key == second["birds"].taxon_key == 212
+
+    def test_supplied_datasets_skip_disk(self):
+        """Passing `datasets=` skips the disk read."""
+        cat = Catalog(datasets={"x": Taxon(taxon_key=1)})
+        assert list(cat) == ["x"]
+
+    def test_missing_block_raises(self, tmp_path, monkeypatch):
+        """A YAML without a `taxa:` block raises a clear ValueError."""
+        empty = tmp_path / "empty.yaml"
+        empty.write_text("other: {}\n", encoding="utf-8")
+        monkeypatch.setattr(catalog_module, "CATALOG_PATH", empty)
+        catalog_module.clear_catalog_cache()
+        with pytest.raises(ValueError, match="empty 'taxa:' block"):
+            Catalog()
+        catalog_module.clear_catalog_cache()
+
+    def test_invalid_row_raises(self, tmp_path, monkeypatch):
+        """A taxon row missing its required key raises a validation ValueError."""
+        bad = tmp_path / "bad.yaml"
+        bad.write_text("taxa:\n  birds:\n    title: no key\n", encoding="utf-8")
+        monkeypatch.setattr(catalog_module, "CATALOG_PATH", bad)
+        catalog_module.clear_catalog_cache()
+        with pytest.raises(ValueError, match="failed validation"):
+            Catalog()
+        catalog_module.clear_catalog_cache()
 
 
 @pytest.mark.gbif
