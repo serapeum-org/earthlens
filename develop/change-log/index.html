@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -12047,9 +12047,12 @@
   <code>asf_search</code>-backed search and the InSAR baseline <code>stack()</code>. Reuses NASA
   Earthdata Login auth from <code>earthlens.earthdata</code> (no second credential
   system); search runs anonymously, only download authenticates. Ships a
-  29-row curated product catalog (Sentinel-1 SLC/BURST/GRD/OCN + per-satellite
-  variants, ALOS PALSAR / ALOS-2, the OPERA-S1 family, ARIA GUNW, NISAR, ERS-1/2,
-  JERS-1, RADARSAT-1, plus SEASAT / SIR-C / AIRSAR / UAVSAR / SMAP). Aliases
+  42-row curated product catalog (Sentinel-1 SLC/BURST/GRD/OCN + per-satellite
+  variants, ALOS PALSAR / ALOS-2, the full OPERA-S1 family including
+  OPERA-S1-CALVAL, ARIA GUNW, the complete NISAR product family — RSLC /
+  GSLC / GCOV / L0B / RIFG / RUNW / GUNW / ROFF / GOFF / LRCLK_UTC — the
+  TROPO atmospheric corrections, ERS-1/2, JERS-1, RADARSAT-1, plus SEASAT /
+  SIR-C / AIRSAR / UAVSAR / SMAP). Aliases
   <code>asf</code> / <code>alaska-satellite-facility</code> / <code>insar</code>. <code>aggregate=</code> rejected with
   <code>NotImplementedError</code> — the MVP returns SAR product paths for downstream
   InSAR tooling (HyP3 / ISCE / SNAP / MintPy) rather than processing them

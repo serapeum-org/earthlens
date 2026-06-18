@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -11564,11 +11564,15 @@ EDL bearer token. The backend reuses
 the credential ladder, and the error path are documented under
 <a href="../authentication/">Authentication</a>.</p>
 <h2 id="products-and-the-stackable-flag"><a class="toclink" href="#products-and-the-stackable-flag">Products and the <code>stackable</code> flag</a><a class="headerlink" href="#products-and-the-stackable-flag" title="Permanent link">#</a></h2>
-<p>The catalog ships <strong>29 curated rows</strong> covering Sentinel-1
+<p>The catalog ships <strong>42 curated rows</strong> covering Sentinel-1
 (SLC / BURST / GRD / OCN / RAW + per-satellite variants), ALOS
-PALSAR + ALOS-2, the OPERA-S1 family (RTC / CSLC / DIST-ALERT),
-ARIA GUNW, NISAR, ERS-1/2, JERS-1, RADARSAT-1, plus the SEASAT /
-SIR-C / AIRSAR / UAVSAR / SMAP archive completeness rows. Each
+PALSAR + ALOS-2, the OPERA-S1 family (RTC / CSLC / DIST-ALERT +
+the OPERA-S1-CALVAL calibration companion), ARIA GUNW, the full
+NISAR product family (RSLC / GSLC / GCOV / L0B / RIFG / RUNW /
+GUNW / ROFF / GOFF / LRCLK_UTC), the TROPO atmospheric
+corrections used by downstream InSAR processors, ERS-1/2,
+JERS-1, RADARSAT-1, plus the SEASAT / SIR-C / AIRSAR / UAVSAR /
+SMAP archive completeness rows. Each
 row carries either an <code>asf.PLATFORM</code> member or an <code>asf.DATASET</code>
 member, plus an <code>asf.PRODUCT_TYPE</code> member and a <code>stackable: bool</code>
 flag.</p>

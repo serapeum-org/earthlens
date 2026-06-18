@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -11484,11 +11484,14 @@
 
 
 <h1 id="asf-curated-products"><a class="toclink" href="#asf-curated-products">ASF — curated products</a><a class="headerlink" href="#asf-curated-products" title="Permanent link">#</a></h1>
-<p>The <code>asf</code> catalog ships <strong>29 curated product rows</strong> covering every
-stackable product class in <code>asf_search</code> plus the legacy archives
-ASF mirrors. Each row maps a friendly product key to its raw
-<code>asf_search</code> enum values (<code>PLATFORM</code> or <code>DATASET</code>, plus
-<code>PRODUCT_TYPE</code>) and flags whether <code>ASFProduct.stack()</code> is
+<p>The <code>asf</code> catalog ships <strong>42 curated product rows</strong> covering every
+stackable product class in <code>asf_search</code>, the legacy archives ASF
+mirrors, the full NISAR product family (anticipatory — image
+products land post-launch), the OPERA-S1-CALVAL calibration
+companion, and the TROPO atmospheric corrections used by
+downstream InSAR processors. Each row maps a friendly product key
+to its raw <code>asf_search</code> enum values (<code>PLATFORM</code> or <code>DATASET</code>,
+plus <code>PRODUCT_TYPE</code>) and flags whether <code>ASFProduct.stack()</code> is
 meaningful for it.</p>
 <p>Inspect the catalog at runtime:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.asf</span><span class="w"> </span><span class="kn">import</span> <span class="n">Catalog</span>
@@ -11567,6 +11570,12 @@ them in stack mode with <code>reference=&lt;granule id&gt;</code>.</p>
 <td>OPERA Coregistered Single Look Complex</td>
 </tr>
 <tr>
+<td><code>opera-cslc-calval</code></td>
+<td><code>opera-s1-cslc-calval</code></td>
+<td><code>DATASET.OPERA_S1_CALVAL</code> + <code>CSLC</code></td>
+<td>OPERA-S1 CSLC calibration / validation (no live products yet)</td>
+</tr>
+<tr>
 <td><code>aria-s1-gunw</code></td>
 <td><code>aria-gunw</code>, <code>gunw</code></td>
 <td><code>DATASET.ARIA_S1_GUNW</code> + <code>GUNW_STD</code></td>
@@ -11576,7 +11585,19 @@ them in stack mode with <code>reference=&lt;granule id&gt;</code>.</p>
 <td><code>nisar-rslc</code></td>
 <td><code>nisar-slc</code></td>
 <td><code>PLATFORM.NISAR</code> + <code>RSLC</code></td>
-<td>NISAR Radar Single Look Complex (post-launch)</td>
+<td>NISAR Range-Doppler SLC (Level-1 InSAR-ready, post-launch)</td>
+</tr>
+<tr>
+<td><code>nisar-gslc</code></td>
+<td><code>nisar-geocoded-slc</code></td>
+<td><code>PLATFORM.NISAR</code> + <code>GSLC</code></td>
+<td>NISAR Geocoded SLC (Level-2, post-launch)</td>
+</tr>
+<tr>
+<td><code>nisar-gcov</code></td>
+<td><code>nisar-covariance</code></td>
+<td><code>PLATFORM.NISAR</code> + <code>GCOV</code></td>
+<td>NISAR Geocoded Covariance (Level-2 polarimetric, post-launch)</td>
 </tr>
 <tr>
 <td><code>ers-1-slc</code></td>
@@ -11672,6 +11693,66 @@ search mode (without <code>reference=</code>).</p>
 <td><code>opera-dist-s1</code>, <code>dist-alert-s1</code></td>
 <td><code>DATASET.OPERA_S1</code> + <code>DIST_ALERT_S1</code></td>
 <td>OPERA land-surface disturbance alert</td>
+</tr>
+<tr>
+<td><code>opera-rtc-calval</code></td>
+<td><code>opera-s1-rtc-calval</code></td>
+<td><code>DATASET.OPERA_S1_CALVAL</code> + <code>RTC</code></td>
+<td>OPERA-S1 RTC calibration / validation (no live products yet)</td>
+</tr>
+<tr>
+<td><code>nisar-l0b</code></td>
+<td><code>nisar-raw</code></td>
+<td><code>PLATFORM.NISAR</code> + <code>L0B</code></td>
+<td>NISAR Level-0B raw downlink (post-launch)</td>
+</tr>
+<tr>
+<td><code>nisar-rifg</code></td>
+<td><code>nisar-interferogram</code></td>
+<td><code>PLATFORM.NISAR</code> + <code>RIFG</code></td>
+<td>NISAR Range-Doppler Interferogram (Level-2 InSAR output)</td>
+</tr>
+<tr>
+<td><code>nisar-runw</code></td>
+<td><code>nisar-unwrapped</code></td>
+<td><code>PLATFORM.NISAR</code> + <code>RUNW</code></td>
+<td>NISAR Range-Doppler Unwrapped (Level-2 InSAR output)</td>
+</tr>
+<tr>
+<td><code>nisar-gunw</code></td>
+<td><code>nisar-geocoded-unwrapped</code></td>
+<td><code>PLATFORM.NISAR</code> + <code>GUNW</code></td>
+<td>NISAR Geocoded Unwrapped Interferogram (Level-3 InSAR output)</td>
+</tr>
+<tr>
+<td><code>nisar-roff</code></td>
+<td><code>nisar-offsets</code></td>
+<td><code>PLATFORM.NISAR</code> + <code>ROFF</code></td>
+<td>NISAR Range-Doppler Pixel Offsets (Level-2 InSAR output)</td>
+</tr>
+<tr>
+<td><code>nisar-goff</code></td>
+<td><code>nisar-geocoded-offsets</code></td>
+<td><code>PLATFORM.NISAR</code> + <code>GOFF</code></td>
+<td>NISAR Geocoded Pixel Offsets (Level-3 InSAR output)</td>
+</tr>
+<tr>
+<td><code>nisar-lrclk-utc</code></td>
+<td><code>nisar-clock</code></td>
+<td><code>PLATFORM.NISAR</code> + <code>LRCLK_UTC</code></td>
+<td>NISAR L-band radar clock-correction files (the live NISAR data so far)</td>
+</tr>
+<tr>
+<td><code>tropo-ecmwf</code></td>
+<td><code>ecmwf-tropo</code></td>
+<td><code>DATASET.TROPO</code> + <code>ECMWF_TROPO</code></td>
+<td>ECMWF-derived tropospheric phase-delay correction (atmospheric)</td>
+</tr>
+<tr>
+<td><code>tropo-zenith</code></td>
+<td><code>zenith-tropo</code></td>
+<td><code>DATASET.TROPO</code> + <code>TROPO_ZENITH</code></td>
+<td>Tropospheric zenith-total-delay correction (atmospheric)</td>
 </tr>
 <tr>
 <td><code>seasat-l1</code></td>
@@ -11795,7 +11876,7 @@ The CLI's <code>refresh</code> verb reports <code>unsupported</code>:</p>
 curated row's PLATFORM / DATASET / PRODUCT_TYPE member name still
 exists on the installed <code>asf_search</code>:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>earthlens<span class="w"> </span>datasets<span class="w"> </span>validate<span class="w"> </span>asf
-<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="c1"># ok: 29 row(s) checked, 0 issue(s)</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="c1"># ok: 42 row(s) checked, 0 issue(s)</span>
 </code></pre></div>
 <p>That covers the failure mode the SDK actually exhibits — a
 breaking rename of a constant. Add a row by hand-editing
