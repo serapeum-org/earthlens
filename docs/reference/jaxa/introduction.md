@@ -119,10 +119,12 @@ HDF5 readers for SGLI products are downstream of earthlens.
     )
     ```
 
-The SDK does **not** auto-read either env var — earthlens reads them and
-assigns them to `gportal.username` / `gportal.password` inside
-`JaxaAuth.configure("gportal")`. Search is anonymous; only the actual
-SFTP `download` step uses the credentials.
+The SDK does **not** auto-read either env var — earthlens reads them
+inside `JaxaAuth.configure()` and threads them straight to
+`gportal.download(username=, password=)` as call-site kwargs, so the
+SDK's module-level credential globals stay untouched between requests.
+Search is anonymous; only the actual SFTP `download` step uses the
+credentials.
 
 ## Things to know up front
 

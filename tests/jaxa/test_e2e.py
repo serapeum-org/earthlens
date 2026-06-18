@@ -56,28 +56,22 @@ def test_jaxa_earth_authless_fetch_lives(tmp_path: Path) -> None:
     not (os.environ.get("GPORTAL_USERNAME") and os.environ.get("GPORTAL_PASSWORD")),
     reason="needs $GPORTAL_USERNAME + $GPORTAL_PASSWORD",
 )
-def test_gportal_search_lives(tmp_path: Path) -> None:
+def test_gportal_search_lives() -> None:
     """A live G-Portal search over a 1-day window matches a small product set.
 
-    Search is **anonymous** even with credentials available (the SDK only
-    needs creds for `download`). The test verifies search reaches the
-    live catalog without going through the SFTP download stage.
+    Search is **anonymous** even with credentials available (the SDK
+    only needs creds for `download`). The test verifies search reaches
+    the live catalog; the JAXA backend's auth threading keeps credentials
+    off the SDK's module-level globals, so this helper does not need to
+    set or restore them.
     """
     pytest.importorskip("gportal")
     import gportal
 
-    # Auth side effect — the JAXA backend would normally do this, but the
-    # test calls gportal directly so we set the module attrs ourselves.
-    gportal.username = os.environ["GPORTAL_USERNAME"]
-    gportal.password = os.environ["GPORTAL_PASSWORD"]
-    try:
-        search = gportal.search(
-            dataset_ids=["10003001"],
-            start_time="2024-01-01",
-            end_time="2024-01-02",
-            count=3,
-        )
-        assert (search.matched() or 0) >= 1
-    finally:
-        gportal.username = None
-        gportal.password = None
+    search = gportal.search(
+        dataset_ids=["10003001"],
+        start_time="2024-01-01",
+        end_time="2024-01-02",
+        count=3,
+    )
+    assert (search.matched() or 0) >= 1

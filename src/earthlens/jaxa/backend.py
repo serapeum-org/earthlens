@@ -45,6 +45,20 @@ from earthlens.base.abstractdatasource import (
 from earthlens.jaxa.auth import JaxaAuth, JaxaCredentials
 from earthlens.jaxa.catalog import Catalog, Dataset, JaxaProtocol
 
+#: Maps an `EarthLens(temporal_resolution=...)` value to the pandas
+#: frequency alias used for `self.time.dates`. JAXA's two SDK paths only
+#: read `start_date` / `end_date` directly, so the `dates` index is
+#: informational — but it should still report a frequency that matches
+#: the cadence the user asked for instead of silently snapping every
+#: non-`daily` value to month-start.
+_FREQ_ALIAS: dict[str, str] = {
+    "raw": "D",
+    "hourly": "h",
+    "daily": "D",
+    "monthly": "MS",
+    "yearly": "YS",
+}
+
 
 class JAXA(AbstractDataSource):
     """Unified JAXA backend over two protocols (`jaxa-earth` and `gportal`).
@@ -100,8 +114,8 @@ class JAXA(AbstractDataSource):
                 `jaxa-earth` branch. `None` uses each dataset's default
                 band. Ignored for `gportal`.
             gportal_username: Explicit G-Portal username. When omitted,
-                `JaxaAuth.configure("gportal")` reads `$GPORTAL_USERNAME`.
-                Only used by the `gportal` branch.
+                `JaxaAuth.configure()` reads `$GPORTAL_USERNAME` at
+                authentication time. Only used by the `gportal` branch.
             gportal_password: Explicit G-Portal password. When omitted,
                 falls back to `$GPORTAL_PASSWORD`. Only used by the
                 `gportal` branch.
@@ -143,7 +157,10 @@ class JAXA(AbstractDataSource):
             if gportal_password is not None
             else None,
         )
-        self._auth = JaxaAuth(creds)
+        # Bind the protocol so `AbstractDataSource.authenticate()` (which
+        # calls `self._auth.configure()` with no args) fails fast on
+        # missing G-Portal credentials.
+        self._auth = JaxaAuth(creds, protocol=self._protocol)
 
         super().__init__(
             start=start,
@@ -181,8 +198,9 @@ class JAXA(AbstractDataSource):
 
         Both SDKs (`jaxa.earth`, `gportal`) are imported lazily in their
         branch modules, and `jaxa-earth` is authless. The optional
-        `gportal` credentials are resolved lazily by `download()` (the
-        first call to `JaxaAuth.configure("gportal")`).
+        `gportal` credentials are resolved lazily — `download()` calls
+        `self._auth.configure()` before dispatching, and so does the
+        explicit `EarthLens(...).authenticate()` entry point.
 
         Returns:
             None: No backend client to attach.
@@ -228,7 +246,7 @@ class JAXA(AbstractDataSource):
         """
         start_dt = dt.datetime.strptime(start, fmt)
         end_dt = dt.datetime.strptime(end, fmt)
-        freq_alias = "D" if temporal_resolution == "daily" else "MS"
+        freq_alias = _FREQ_ALIAS.get(temporal_resolution, "MS")
         dates = pd.date_range(start_dt, end_dt, freq=freq_alias)
         return TemporalExtent(
             start_date=start_dt,
@@ -246,11 +264,11 @@ class JAXA(AbstractDataSource):
                 `gportal`, depending on the mission).
         """
         out_dir = Path(self.path)
+        self._auth.configure()
         written: list[Path] = []
         if self._protocol == "jaxa-earth":
             from earthlens.jaxa._jaxa_earth import fetch_jaxa_earth
 
-            self._auth.configure("jaxa-earth")
             for ds in self._resolved:
                 written.extend(
                     fetch_jaxa_earth(
@@ -265,13 +283,13 @@ class JAXA(AbstractDataSource):
         else:
             from earthlens.jaxa._gportal import fetch_gportal
 
-            self._auth.configure("gportal")
             for ds in self._resolved:
                 written.extend(
                     fetch_gportal(
                         dataset=ds,
                         space=self.space,
                         time=self.time,
+                        auth=self._auth,
                         out_dir=out_dir,
                     )
                 )

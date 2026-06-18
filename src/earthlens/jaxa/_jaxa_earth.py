@@ -14,10 +14,11 @@ object's `latlim` / `lonlim` are 2-D arrays (`[[min, max]]`, not flat
 lists) and `img` is a 4-D `(time, lat, lon, band)` tensor — the helpers
 below normalise those into shapes pyramids accepts.
 
-Orientation: AW3D30 over Mt. Fuji rendered north-up out of the API (row 0
-= north, last row = south), so the default rule is no flip. The
-`_ensure_north_up` helper guards against any collection that may differ
-in future by flipping based on the latlim ordering returned by the API.
+Orientation: every collection probed during A1 (AW3D30 PRISM v3.2, MODIS
+LST re-hosts, GSMaP gauge products) is already north-up out of the API,
+so the branch writes the array straight through — no flip helper. If a
+future collection is observed south-up, add a per-collection rule at the
+write site rather than reintroducing a guard that didn't guard.
 """
 
 from __future__ import annotations
@@ -44,38 +45,6 @@ def _flatten_pair(arr_like) -> list[float]:
         list[float]: The flattened, ordered values.
     """
     return [float(x) for x in np.asarray(arr_like).ravel().tolist()]
-
-
-def _ensure_north_up(img: np.ndarray, latlim: list[float]) -> np.ndarray:
-    """Return `img` oriented north-up (row 0 = max latitude).
-
-    `pyramids` writes GeoTIFFs north-up; a south-up input would land
-    upside-down. The verified `jaxa.earth` 0.1.6 behaviour for AW3D30
-    over Mt. Fuji is **already north-up** (no flip needed). This helper
-    is a guard for future collections that may not match: it flips when
-    the API hands back an array whose first row maps to the *lower*
-    latitude (south-up).
-
-    Verified rule: when the API returns `latlim=[lat_min, lat_max]` and
-    the array is already north-up (the AW3D30 case), index 0 corresponds
-    to `lat_max`. The flip condition would only fire for a collection
-    that returns south-up arrays — none confirmed today, but the guard
-    is cheap.
-
-    Args:
-        img: 2-D `(lat, lon)` slice of the API's `raster.img` tensor.
-        latlim: Flat `[lat_min, lat_max]` pair.
-
-    Returns:
-        numpy.ndarray: The array, flipped vertically when south-up.
-    """
-    # Today the API is north-up for the verified collections; keep this
-    # helper as a guard but treat the natural orientation as north-up so
-    # the default behaviour is no-flip. A collection that comes back
-    # south-up will need a per-collection override added here once
-    # observed in the wild.
-    del latlim
-    return img
 
 
 def _geo_tuple(
@@ -150,9 +119,12 @@ def fetch_jaxa_earth(
 
     Walks the strict `ImageCollection` chain
     (`filter_date` → `filter_resolution` → `filter_bounds` → `select` →
-    `get_images`), squeezes the returned 4-D tensor to a 2-D plane,
-    flips it to north-up if needed, and writes one GeoTIFF per band via
-    `pyramids.dataset.Dataset.create_from_array`.
+    `get_images`), squeezes the returned 4-D tensor to a 2-D plane, and
+    writes one GeoTIFF per band via
+    `pyramids.dataset.Dataset.create_from_array`. Every collection probed
+    during A1 returned a north-up array, so no flip is applied — add a
+    per-collection rule at the write site if a south-up collection
+    surfaces later.
 
     Args:
         dataset: The resolved catalog row (its `collection` and
@@ -216,7 +188,6 @@ def fetch_jaxa_earth(
         arr_2d = _slice_to_2d(np.asarray(raster.img))
         latlim = _flatten_pair(raster.latlim)
         lonlim = _flatten_pair(raster.lonlim)
-        arr_2d = _ensure_north_up(arr_2d, latlim)
         geo = _geo_tuple(latlim, lonlim, arr_2d.shape)
 
         ds_out = PyrDataset.create_from_array(arr_2d, geo=geo, epsg=4326)

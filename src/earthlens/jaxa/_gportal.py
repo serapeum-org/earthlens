@@ -8,9 +8,11 @@ each `Product` over SFTP via `gportal.download(...)`.
 
 `gportal.download` is sequential upstream (a list comprehension in
 `gportal/sftp.py`); the function has no `processes=` argument and adding
-concurrency at this layer is a follow-on. Auth is module-level —
-`JaxaAuth.configure("gportal")` sets `gportal.username` and
-`gportal.password` before this branch runs.
+concurrency at this layer is a follow-on. Credentials are passed as
+explicit kwargs to `gportal.download(...)` rather than via the SDK's
+module-level `gportal.username` / `.password` globals — the auth object
+holds the resolved values privately so no module-level mutation leaks
+between requests.
 """
 
 from __future__ import annotations
@@ -18,6 +20,7 @@ from __future__ import annotations
 from pathlib import Path
 
 from earthlens.base.abstractdatasource import SpatialExtent, TemporalExtent
+from earthlens.jaxa.auth import JaxaAuth
 from earthlens.jaxa.catalog import Dataset
 
 
@@ -26,6 +29,7 @@ def fetch_gportal(
     dataset: Dataset,
     space: SpatialExtent,
     time: TemporalExtent,
+    auth: JaxaAuth,
     out_dir: Path,
 ) -> list[Path]:
     """Search G-Portal for a dataset and SFTP-download the matching products.
@@ -35,6 +39,11 @@ def fetch_gportal(
             G-Portal numeric dataset id passed to `gportal.search`).
         space: The validated WGS84 bbox.
         time: The validated date window.
+        auth: A configured :class:`JaxaAuth`; its
+            :attr:`~earthlens.jaxa.JaxaAuth.username` and
+            :attr:`~earthlens.jaxa.JaxaAuth.password` are passed straight
+            to ``gportal.download(username=, password=)`` so the SDK's
+            module-level credential globals stay untouched.
         out_dir: Output directory (created if missing).
 
     Returns:
@@ -45,6 +54,8 @@ def fetch_gportal(
     Raises:
         ImportError: If the `gportal` SDK is not installed.
         ValueError: If `dataset.short_name` is missing — bad catalog row.
+        AuthenticationError: When `auth` has not been configured (i.e.
+            its `username` / `password` are still `None`).
     """
     try:
         import gportal  # type: ignore[import-not-found]
@@ -57,6 +68,13 @@ def fetch_gportal(
     if not dataset.short_name:
         raise ValueError(
             f"dataset {dataset.key!r} has no short_name — bad catalog row."
+        )
+
+    from earthlens.jaxa.auth import AuthenticationError
+
+    if auth.username is None or auth.password is None:
+        raise AuthenticationError(
+            "G-Portal credentials are not resolved; call auth.configure() first."
         )
 
     search = gportal.search(
@@ -74,7 +92,12 @@ def fetch_gportal(
         return []
 
     out_dir.mkdir(parents=True, exist_ok=True)
-    paths = gportal.download(products, local_dir=str(out_dir))
+    paths = gportal.download(
+        products,
+        local_dir=str(out_dir),
+        username=auth.username,
+        password=auth.password.get_secret_value(),
+    )
     if isinstance(paths, str):
         paths = [paths]
     return [Path(p) for p in paths]

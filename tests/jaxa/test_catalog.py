@@ -124,3 +124,21 @@ def test_catalog_dict_surface() -> None:
     assert "aw3d30" in cat
     assert cat["aw3d30"].protocol == "jaxa-earth"
     assert len(cat) >= 5
+
+
+@pytest.mark.jaxa
+@pytest.mark.unit
+def test_catalog_dict_surface_accepts_aliases() -> None:
+    """`cat[alias]` / `alias in cat` work the same way as `cat.get(alias)`."""
+    cat = Catalog()
+    assert "elevation" in cat
+    assert cat["elevation"].key == "aw3d30"
+
+
+@pytest.mark.jaxa
+@pytest.mark.unit
+def test_catalog_getitem_unknown_key_raises_key_error() -> None:
+    """`cat[missing]` raises `KeyError` (dict-style), not `ValueError`."""
+    cat = Catalog()
+    with pytest.raises(KeyError):
+        _ = cat["not-a-real-key"]

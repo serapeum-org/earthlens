@@ -67,3 +67,55 @@ def test_aggregate_argument_not_supported(base_kwargs) -> None:
     backend = JAXA(variables=["elevation"], **base_kwargs)
     with pytest.raises(NotImplementedError, match="aggregate"):
         backend.download(aggregate=object())
+
+
+@pytest.mark.jaxa
+@pytest.mark.unit
+def test_authenticate_fails_fast_for_missing_gportal_credentials(
+    monkeypatch, base_kwargs
+) -> None:
+    """`lens.datasource.authenticate()` raises eagerly on a gportal request without creds."""
+    from earthlens.jaxa import AuthenticationError
+
+    monkeypatch.delenv("GPORTAL_USERNAME", raising=False)
+    monkeypatch.delenv("GPORTAL_PASSWORD", raising=False)
+    backend = JAXA(variables=["sgli-l380"], **base_kwargs)
+    assert backend.protocol == "gportal"
+    with pytest.raises(AuthenticationError, match="GPORTAL_USERNAME"):
+        backend.authenticate()
+
+
+@pytest.mark.jaxa
+@pytest.mark.unit
+def test_authenticate_no_op_for_jaxa_earth(monkeypatch, base_kwargs) -> None:
+    """`authenticate()` is a no-op for jaxa-earth even without env vars."""
+    monkeypatch.delenv("GPORTAL_USERNAME", raising=False)
+    monkeypatch.delenv("GPORTAL_PASSWORD", raising=False)
+    backend = JAXA(variables=["elevation"], **base_kwargs)
+    backend.authenticate()  # must not raise
+    assert backend.auth.is_authenticated()
+
+
+@pytest.mark.jaxa
+@pytest.mark.unit
+@pytest.mark.parametrize(
+    "cadence,expected_freq",
+    [
+        ("daily", "D"),
+        ("hourly", "h"),
+        ("monthly", "MS"),
+        ("yearly", "YS"),
+        ("raw", "D"),
+        ("nonsense", "MS"),  # unknown values fall back to month-start
+    ],
+)
+def test_temporal_resolution_maps_to_frequency_alias(
+    base_kwargs, cadence, expected_freq
+) -> None:
+    """`temporal_resolution` resolves to the documented pandas frequency alias."""
+    backend = JAXA(
+        variables=["elevation"],
+        temporal_resolution=cadence,
+        **{k: v for k, v in base_kwargs.items() if k != "temporal_resolution"},
+    )
+    assert backend.time.resolution == expected_freq

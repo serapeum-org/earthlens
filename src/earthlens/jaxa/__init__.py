@@ -11,8 +11,9 @@ complementary SDKs, selected per-dataset by a `protocol` discriminator:
 * `protocol: gportal` — credentialed SFTP access through the community
   `gportal` SDK (raw L1/L2 swaths of GCOM-W AMSR2 / GCOM-C SGLI /
   ALOS-2 PALSAR-2 / EarthCARE / GPM / …). Requires a free G-Portal
-  account; `JaxaAuth.configure("gportal")` resolves the credentials from
-  explicit kwargs or `$GPORTAL_USERNAME` / `$GPORTAL_PASSWORD`.
+  account; `JaxaAuth(creds, protocol="gportal").configure()` resolves
+  the credentials from explicit kwargs or `$GPORTAL_USERNAME` /
+  `$GPORTAL_PASSWORD`.
 
 The third JAXA archive, **P-Tree** (Himawari geostationary AHI, FTP +
 HSD `.bz2`), is a deferred follow-on (planning `G8`).

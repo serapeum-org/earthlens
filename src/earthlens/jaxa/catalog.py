@@ -210,13 +210,12 @@ class Catalog(AbstractCatalog):
         Raises:
             ValueError: If the file has no `datasets:` block, or any row
                 fails validation (missing identifier, alias conflict).
+            FileNotFoundError: If `catalog_path` does not exist (the
+                bundled YAML ships with the wheel, so this only fires
+                when a caller passes an explicit, missing path).
         """
         path = catalog_path if catalog_path is not None else CATALOG_PATH
-        try:
-            mtime = path.stat().st_mtime_ns
-        except FileNotFoundError:
-            mtime = 0
-        cache_key = (str(path.resolve()), mtime)
+        cache_key = (str(path.resolve()), path.stat().st_mtime_ns)
         cached = _CATALOG_CACHE.get(cache_key)
         if cached is not None:
             return cached
@@ -301,3 +300,25 @@ class Catalog(AbstractCatalog):
             list[str]: Sorted canonical keys filtered by protocol.
         """
         return sorted(k for k, ds in self.datasets.items() if ds.protocol == protocol)
+
+    def __contains__(self, name: object) -> bool:
+        """`name in cat` — accept both canonical keys and friendly aliases.
+
+        Overrides :meth:`AbstractCatalog.__contains__`, which only checks
+        `self.datasets`, so the alias surface (`"elevation" in cat`)
+        matches what `cat.get("elevation")` already accepts.
+        """
+        return name in self.aliases
+
+    def __getitem__(self, name: str) -> Dataset:
+        """`cat[name]` — accept both canonical keys and friendly aliases.
+
+        Overrides :meth:`AbstractCatalog.__getitem__` so dict-style
+        lookup matches the same alias surface as :meth:`get`. Raises
+        :class:`KeyError` on miss (the dict-style contract; callers that
+        want a did-you-mean hint use :meth:`get` instead).
+        """
+        try:
+            return self.get(name)
+        except ValueError as exc:
+            raise KeyError(name) from exc
