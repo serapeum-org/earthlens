@@ -35,6 +35,7 @@ _CURATED_ENUM = (
     "overture",
     "fdsn",
     "firms",
+    "asf",
     "radar",
     "tropycal",
     "gdacs",
@@ -142,6 +143,39 @@ class TestStructuralLints:
         _checked, issues = _validate_tropycal(catalog)
         assert any("mars_basin" in i and "not in" in i for i in issues), "bad basin"
         assert any("jtwc" in i for i in issues), "unsupported source flagged"
+
+    def test_asf_flags_unknown_constant_names(self):
+        """An asf row whose PLATFORM/PRODUCT_TYPE constant is gone is flagged."""
+        from earthlens.cli.validate import _validate_asf
+
+        catalog = SimpleNamespace(
+            datasets={
+                "bad-row": SimpleNamespace(
+                    platform="NOT_A_PLATFORM",
+                    dataset=None,
+                    product_type="NOT_A_TYPE",
+                ),
+            }
+        )
+        _checked, issues = _validate_asf(catalog)
+        assert any("NOT_A_PLATFORM" in i for i in issues), "platform miss flagged"
+        assert any("NOT_A_TYPE" in i for i in issues), "product_type miss flagged"
+
+    def test_asf_flags_unknown_dataset_constant(self):
+        """An asf row whose DATASET constant is gone is flagged."""
+        from earthlens.cli.validate import _validate_asf
+
+        catalog = SimpleNamespace(
+            datasets={
+                "bad-row": SimpleNamespace(
+                    platform=None,
+                    dataset="NOT_A_DATASET",
+                    product_type="SLC",
+                ),
+            }
+        )
+        _checked, issues = _validate_asf(catalog)
+        assert any("NOT_A_DATASET" in i for i in issues), "dataset miss flagged"
 
 
 class TestValidateOne:

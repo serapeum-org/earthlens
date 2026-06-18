@@ -120,6 +120,10 @@ nav:
       - Usage: reference/s3/usage.md
       - Available datasets: reference/s3/datasets.md
       - Reference: reference/s3/reference.md
+    - ASF (InSAR / SAR):
+      - Introduction: reference/asf/introduction.md
+      - Usage: reference/asf/usage.md
+      - Reference: reference/asf/asf.md
     - CMEMS (Copernicus Marine):
       - Introduction: reference/cmems/introduction.md
       - Usage: reference/cmems/usage.md
