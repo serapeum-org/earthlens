@@ -88,9 +88,10 @@ def _slice_to_2d(img: np.ndarray) -> np.ndarray:
         numpy.ndarray: 2-D `(lat, lon)` slice — `img[0, :, :, 0]`.
 
     Raises:
-        ValueError: If `img` is not 4-D or has more than one entry on
-            the time or band axis (multi-step requests are not handled
-            here yet).
+        ValueError: If `img` is not 4-D, has more than one entry on the
+            time or band axis (multi-step requests are not handled here
+            yet), or has a zero-pixel spatial extent (the requested
+            bbox + ppu produced an empty array).
     """
     if img.ndim != 4:
         raise ValueError(
@@ -149,7 +150,10 @@ def fetch_jaxa_earth(
 
     Raises:
         ImportError: If the `jaxa.earth` SDK is not installed.
-        ValueError: If neither `bands` nor `dataset.default_band` is set.
+        ValueError: If `dataset.collection` is missing, neither `bands`
+            nor `dataset.default_band` is set, or the API returns an
+            array shape the writer cannot consume (multi-time /
+            multi-band stack, zero pixels — see :func:`_slice_to_2d`).
     """
     try:
         from jaxa.earth import je  # type: ignore[import-not-found]
