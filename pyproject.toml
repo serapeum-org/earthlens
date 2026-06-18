@@ -93,9 +93,10 @@ usgs-water = ["dataretrieval >=1.1.4"]
 ghsl = []
 worldpop = ["worldpoppy >=0.4", "py7zr >=0.20"]
 gbif = ["pygbif >=0.6.6"]
+obis = ["pyobis >=1.6.1"]
 # Self-referential: the union of every backend extra, without re-listing deps.
 all = [
-    "earthlens[s3,ecmwf,gee,cmems,fdsn,earthdata,hdx,eumetsat,nwp,nwm,radar,stac,openeo,sentinel-hub,tropycal,overture,usgs-water,ghsl,worldpop,gbif]",
+    "earthlens[s3,ecmwf,gee,cmems,fdsn,earthdata,hdx,eumetsat,nwp,nwm,radar,stac,openeo,sentinel-hub,tropycal,overture,usgs-water,ghsl,worldpop,gbif,obis]",
 ]
 
 [dependency-groups]
@@ -270,6 +271,7 @@ markers = [
     "cli: tests for the `earthlens` console script / federated catalog-query CLI (typer and rich are core dependencies; no extra needed).",
     "biodiversity: tests for the shared biodiversity-cluster helpers (`wkt_from_bbox`, `occurrences_to_fc`, `LicenseWarning`; no extra SDK).",
     "gbif: tests for the GBIF species-occurrence backend (requires the `gbif` extra: pygbif; search is anonymous).",
+    "obis: tests for the OBIS marine-occurrence backend (requires the `obis` extra: pyobis; search is anonymous).",
 ]
 
 [tool.pixi.workspace]

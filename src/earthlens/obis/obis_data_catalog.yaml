@@ -1,0 +1,25 @@
+# OBIS species catalog — friendly species keys for the earthlens OBIS backend.
+#
+# Each entry maps a friendly name a user can pass in `variables` to an OBIS
+# `scientificname`. OBIS keys occurrence search on the scientific name string
+# (not a numeric id), so these are convenience aliases for a handful of
+# well-known marine species. For any other taxon, pass the name explicitly with
+# the `species:` prefix (`variables=["species:Mola mola"]`).
+#
+# Verify upstream with: earthlens datasets validate obis
+species:
+  common-dolphin:
+    scientific_name: "Delphinus delphis"
+    title: "Common dolphin"
+  blue-whale:
+    scientific_name: "Balaenoptera musculus"
+    title: "Blue whale"
+  great-white-shark:
+    scientific_name: "Carcharodon carcharias"
+    title: "Great white shark"
+  loggerhead-turtle:
+    scientific_name: "Caretta caretta"
+    title: "Loggerhead sea turtle"
+  ocean-sunfish:
+    scientific_name: "Mola mola"
+    title: "Ocean sunfish"
