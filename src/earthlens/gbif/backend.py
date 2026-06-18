@@ -259,10 +259,11 @@ class GBIF(AbstractDataSource):
         """Run the paginated `occ.search` loop up to `max_records`.
 
         Accumulates `result["results"]` page by page (300/page), stopping
-        on `result["endOfRecords"]`, when `max_records` is reached, or at
-        GBIF's 100,000 `offset + limit` ceiling. Logs one line when the
-        upstream `count` exceeds `max_records`, pointing at the async
-        download API.
+        on `result["endOfRecords"]`, when `max_records` is reached, or
+        before a page would breach GBIF's 100,000 `offset + limit` ceiling
+        (since 300 does not divide 100,000, the last fully-valid page ends
+        at 99,900 records). Logs one line when the upstream `count` exceeds
+        `max_records`, pointing at the async download API.
 
         Args:
             occ: The `pygbif.occurrences` module (or a stand-in exposing

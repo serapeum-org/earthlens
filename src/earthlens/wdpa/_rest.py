@@ -112,7 +112,12 @@ def _row(area: dict) -> dict[str, Any] | None:
     designation = area.get("designation") or {}
     category = area.get("iucn_category") or {}
     countries = area.get("countries") or []
-    iso3 = countries[0].get("iso_3") if countries else area.get("iso3")
+    first_country = countries[0] if countries else None
+    iso3 = (
+        first_country.get("iso_3")
+        if isinstance(first_country, dict)
+        else first_country
+    ) or area.get("iso3")
     return {
         "wdpa_id": str(area.get("wdpa_id") or area.get("id") or ""),
         "name": area.get("name"),
